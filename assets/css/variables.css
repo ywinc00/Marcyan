@@ -1,14 +1,82 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN — GLOBAL DESIGN SYSTEM
+   Single source of truth for all visual tokens.
+   Every component must consume values from this file.
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --black: #080808;
-  --dark: #0f0f0f;
-  --card: #141414;
-  --border: rgba(255,255,255,0.07);
-  --white: #f0ede8;
-  --muted: rgba(240,237,232,0.45);
-  --accent: #c8a96e;
-  --accent2: #4fc3a1;
-  --glow: rgba(200,169,110,0.15);
-  --font-display: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'Space Mono', monospace;
+
+  /* ── Color palette ──────────────────────────────────────────── */
+  --black:   #080808;
+  --dark:    #0f0f0f;
+  --card:    #141414;
+  --border:  rgba(255,255,255,0.07);
+  --white:   #f0ede8;
+  --muted:   rgba(240,237,232,0.45);
+  --accent:  #c8a96e;   /* gold — primary brand color */
+  --accent2: #4fc3a1;   /* teal — secondary / AI color */
+  --glow:    rgba(200,169,110,0.15);
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-display: 'Cormorant Garamond', serif;  /* headlines */
+  --font-body:    'DM Sans', sans-serif;         /* body copy */
+  --font-mono:    'Space Mono', monospace;       /* labels, tags, UI */
+
+  /* ── Type scale ─────────────────────────────────────────────── */
+  --text-xs:   9px;   /* micro labels */
+  --text-sm:  10px;   /* tags, nav links */
+  --text-base:11px;   /* buttons, mono UI */
+  --text-md:  13px;   /* secondary body */
+  --text-lg:  14px;   /* primary body */
+  --text-xl:  16px;   /* lead paragraphs */
+  --text-2xl: 20px;   /* subheadings */
+  --text-3xl: 28px;   /* card headings */
+
+  /* ── Letter spacing ─────────────────────────────────────────── */
+  --tracking-tight:   -1px;
+  --tracking-normal:   0px;
+  --tracking-wide:     2px;  /* buttons */
+  --tracking-wider:    3px;  /* section tags */
+  --tracking-widest:   4px;  /* hero tag */
+  --tracking-logo:     6px;  /* nav logo */
+  --tracking-footer:   8px;  /* footer logo */
+
+  /* ── Spacing scale (4px base) ───────────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  28px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-15: 60px;
+  --space-16: 64px;
+  --space-18: 72px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-30: 120px;
+
+  /* ── Transitions ────────────────────────────────────────────── */
+  --ease-fast:   0.15s ease;
+  --ease-base:   0.3s ease;
+  --ease-slow:   0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-reveal: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Z-index scale ──────────────────────────────────────────── */
+  --z-base:        1;
+  --z-above:      10;
+  --z-nav:       100;
+  --z-cursor-ring: 9998;
+  --z-cursor:     9999;
+
+  /* ── Section layout ─────────────────────────────────────────── */
+  --section-padding-x: 60px;
+  --section-padding-y: 120px;
+  --section-padding-x-mobile: 24px;
+  --section-padding-y-mobile:  80px;
+
 }

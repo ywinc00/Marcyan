@@ -1,0 +1,31 @@
+/* ── Language toggle — matches exact site aesthetic ── */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.lang-btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: none;
+  transition: color var(--ease-base);
+  line-height: 1;
+}
+
+.lang-btn:hover  { color: var(--white); }
+.lang-btn.active { color: var(--accent); }
+
+.lang-sep {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--border);
+  pointer-events: none;
+  user-select: none;
+}

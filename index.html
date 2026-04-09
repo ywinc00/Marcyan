@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcyan — AI-Powered Web Design · Houston & Miami</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Design tokens -->
+<link rel="stylesheet" href="assets/css/variables.css">
+<!-- Base reset & shared components -->
+<link rel="stylesheet" href="assets/css/base.css">
+<!-- UI components -->
+<link rel="stylesheet" href="assets/css/cursor.css">
+<link rel="stylesheet" href="assets/css/nav.css">
+<link rel="stylesheet" href="assets/css/hero.css">
+<link rel="stylesheet" href="assets/css/marquee.css">
+<link rel="stylesheet" href="assets/css/services.css">
+<link rel="stylesheet" href="assets/css/ai-section.css">
+<link rel="stylesheet" href="assets/css/process.css">
+<link rel="stylesheet" href="assets/css/stats.css">
+<link rel="stylesheet" href="assets/css/portfolio.css">
+<link rel="stylesheet" href="assets/css/testimonials.css">
+<link rel="stylesheet" href="assets/css/locations.css">
+<link rel="stylesheet" href="assets/css/contact.css">
+<link rel="stylesheet" href="assets/css/footer.css">
+<!-- Animations & responsive (last so it can override) -->
+<link rel="stylesheet" href="assets/css/animations.css">
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Mar<span>c</span>yan</a>
+  <ul class="nav-links">
+    <li><a href="#services">Servicios</a></li>
+    <li><a href="#ai-section">IA</a></li>
+    <li><a href="#portfolio">Proyectos</a></li>
+    <li><a href="#locations">Ciudades</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Iniciar Proyecto</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-scan"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">IA Operativa · Houston & Miami</div>
+    <h1>Diseño Web<br>que <em>piensa</em><br>por ti</h1>
+    <p class="hero-sub">Marcyan combina diseño de élite con inteligencia artificial operativa para crear sitios que convierten, posicionan y evolucionan — sin que tengas que mover un dedo.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Ver Propuesta Gratis</a>
+      <a href="#portfolio" class="btn-secondary">Ver Proyectos →</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="ai-card">
+      <div class="ai-card-label"><div class="dot"></div>Marcyan AI · Análisis en vivo</div>
+      <div class="ai-metric"><span class="ai-metric-label">Conversión estimada</span><span class="ai-metric-val">+247%</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">Velocidad de carga</span><span class="ai-metric-val">98 / 100</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">SEO Score</span><span class="ai-metric-val">96 / 100</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">Accesibilidad</span><span class="ai-metric-val">100 / 100</span></div>
+      <div class="ai-bar-row">
+        <div class="ai-bar-label"><span>Rendimiento global</span><span>94%</span></div>
+        <div class="ai-bar-track"><div class="ai-bar-fill" style="width:94%"></div></div>
+      </div>
+      <div class="ai-bar-row" style="margin-top:12px">
+        <div class="ai-bar-label"><span>Engagement IA</span><span>89%</span></div>
+        <div class="ai-bar-track"><div class="ai-bar-fill" style="width:89%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="marquee-item">Diseño Web</span>
+    <span class="marquee-item">Inteligencia Artificial</span>
+    <span class="marquee-item">SEO Avanzado</span>
+    <span class="marquee-item">E-Commerce</span>
+    <span class="marquee-item">Branding Digital</span>
+    <span class="marquee-item">Houston TX</span>
+    <span class="marquee-item">Miami FL</span>
+    <span class="marquee-item">Landing Pages</span>
+    <span class="marquee-item">Diseño Web</span>
+    <span class="marquee-item">Inteligencia Artificial</span>
+    <span class="marquee-item">SEO Avanzado</span>
+    <span class="marquee-item">E-Commerce</span>
+    <span class="marquee-item">Branding Digital</span>
+    <span class="marquee-item">Houston TX</span>
+    <span class="marquee-item">Miami FL</span>
+    <span class="marquee-item">Landing Pages</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div>
+      <div class="section-tag reveal">Nuestros Servicios</div>
+      <h2 class="section-title reveal reveal-delay-1">Todo lo que tu<br>marca <em>necesita</em></h2>
+    </div>
+    <a href="#contact" class="btn-secondary reveal reveal-delay-2">Ver todos los servicios →</a>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <span class="service-icon">⬡</span>
+      <h3>Diseño Web Premium</h3>
+      <p>Sitios de alto impacto construidos desde cero. Cada píxel responde a tu identidad de marca y a tus objetivos de negocio en Houston y Miami.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-num">02</div>
+      <span class="service-icon">◈</span>
+      <h3>IA Conversacional</h3>
+      <p>Asistentes virtuales integrados directamente en tu sitio. Atienden clientes 24/7, califican leads y automatizan ventas mientras duermes.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-num">03</div>
+      <span class="service-icon">◎</span>
+      <h3>E-Commerce & Tiendas</h3>
+      <p>Plataformas de venta en línea optimizadas para conversión. Shopify, WooCommerce o soluciones propias con IA para recomendaciones personalizadas.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">04</div>
+      <span class="service-icon">⟡</span>
+      <h3>SEO Impulsado por IA</h3>
+      <p>Posicionamiento en Google que se adapta en tiempo real. Nuestra IA analiza competidores, tendencias y ajusta tu estrategia automáticamente.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-num">05</div>
+      <span class="service-icon">⬡</span>
+      <h3>Branding & Identidad</h3>
+      <p>Logos, paletas, tipografías y sistemas visuales completos. Generamos conceptos con IA y refinamos cada detalle con criterio humano experto.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-num">06</div>
+      <span class="service-icon">◈</span>
+      <h3>Mantenimiento Continuo</h3>
+      <p>Tu sitio nunca se detiene. Monitoreo 24/7, actualizaciones de seguridad, respaldos automáticos y soporte bilingüe en Houston y Miami.</p>
+      <div class="service-arrow">Explorar ↗</div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section id="ai-section">
+  <div class="ai-bg"></div>
+  <div class="ai-layout">
+    <div>
+      <div class="section-tag reveal">Tecnología Marcyan</div>
+      <h2 class="section-title reveal reveal-delay-1">La IA que<br>trabaja para<br><em>tu negocio</em></h2>
+      <p style="font-size:16px;color:var(--muted);line-height:1.8;margin-top:24px" class="reveal reveal-delay-2">No usamos IA como palabra de moda. Nuestra plataforma analiza, optimiza y actúa en nombre de tu empresa en tiempo real — desde el copy hasta el comportamiento del usuario.</p>
+    </div>
+    <div class="ai-features">
+      <div class="ai-feature reveal">
+        <div class="ai-feature-icon">⟡</div>
+        <div class="ai-feature-text">
+          <h4>Análisis de Comportamiento</h4>
+          <p>Nuestra IA rastrea cómo interactúan los visitantes y ajusta elementos clave del sitio para maximizar conversiones automáticamente.</p>
+        </div>
+      </div>
+      <div class="ai-feature reveal reveal-delay-1">
+        <div class="ai-feature-icon">◈</div>
+        <div class="ai-feature-text">
+          <h4>Generación de Contenido</h4>
+          <p>Páginas, blogs y copy optimizados para SEO generados y actualizados continuamente. Siempre fresco, siempre relevante.</p>
+        </div>
+      </div>
+      <div class="ai-feature reveal reveal-delay-2">
+        <div class="ai-feature-icon">◎</div>
+        <div class="ai-feature-text">
+          <h4>A/B Testing Autónomo</h4>
+          <p>Pruebas continuas de variantes de diseño y copy. La IA selecciona la versión ganadora sin que tengas que intervenir.</p>
+        </div>
+      </div>
+      <div class="ai-feature reveal reveal-delay-3">
+        <div class="ai-feature-icon">⬡</div>
+        <div class="ai-feature-text">
+          <h4>Reportes Predictivos</h4>
+          <p>Informes semanales que no solo muestran el pasado — predicen tendencias futuras y recomiendan acciones concretas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-tag reveal">Cómo Trabajamos</div>
+  <h2 class="section-title reveal reveal-delay-1">Del concepto al<br><em>lanzamiento</em></h2>
+  <div class="process-steps">
+    <div class="process-step reveal">
+      <div class="step-num">01</div>
+      <h4>Descubrimiento</h4>
+      <p>Analizamos tu negocio, competidores y mercado local en Houston o Miami para definir la estrategia correcta.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-1">
+      <div class="step-num">02</div>
+      <h4>Estrategia IA</h4>
+      <p>Diseñamos el ecosistema digital ideal: sitio, IA, SEO y automatizaciones, todo coordinado.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-2">
+      <div class="step-num">03</div>
+      <h4>Diseño & Dev</h4>
+      <p>Construimos cada elemento con precisión. Revisiones constantes hasta que cada detalle sea perfecto.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-3">
+      <div class="step-num">04</div>
+      <h4>Pruebas & QA</h4>
+      <p>Testing riguroso en todos los dispositivos. Velocidad, SEO, accesibilidad y seguridad verificados.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-4">
+      <div class="step-num">05</div>
+      <h4>Lanzamiento</h4>
+      <p>Go live con soporte en vivo. La IA entra en operación y comenzamos a optimizar desde el día uno.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="reveal">
+    <div class="stat-num">180+</div>
+    <div class="stat-label">Proyectos Entregados</div>
+  </div>
+  <div class="reveal reveal-delay-1">
+    <div class="stat-num">97%</div>
+    <div class="stat-label">Clientes Satisfechos</div>
+  </div>
+  <div class="reveal reveal-delay-2">
+    <div class="stat-num">2×</div>
+    <div class="stat-label">Ciudades Presentes</div>
+  </div>
+  <div class="reveal reveal-delay-3">
+    <div class="stat-num">24/7</div>
+    <div class="stat-label">Soporte IA Activo</div>
+  </div>
+</div>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px;flex-wrap:wrap;gap:24px">
+    <div>
+      <div class="section-tag reveal">Portafolio</div>
+      <h2 class="section-title reveal reveal-delay-1">Trabajo que<br><em>habla solo</em></h2>
+    </div>
+    <a href="#contact" class="btn-secondary reveal reveal-delay-2">Ver todos los proyectos →</a>
+  </div>
+
+  <div class="portfolio-grid">
+    <div class="portfolio-item reveal">
+      <div class="portfolio-bg p1">
+        <div class="p-pattern"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:52px;font-weight:300;color:var(--accent);opacity:0.3">Luxora</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:8px">REAL ESTATE · MIAMI</div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-info">
+          <div class="tag">Real Estate · Miami</div>
+          <h3>Luxora Properties</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-item reveal reveal-delay-1">
+      <div class="portfolio-bg p2">
+        <div class="p-pattern"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:40px;font-weight:300;color:var(--accent2);opacity:0.3">Verdana</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:8px">E-COMMERCE · HOUSTON</div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-info">
+          <div class="tag">E-Commerce · Houston</div>
+          <h3>Verdana Foods</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-item reveal reveal-delay-2">
+      <div class="portfolio-bg p3">
+        <div class="p-pattern"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:40px;font-weight:300;color:#8888ff;opacity:0.3">Axon</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:8px">TECH STARTUP · MIAMI</div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-info">
+          <div class="tag">Tech Startup · Miami</div>
+          <h3>Axon Analytics</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-item reveal reveal-delay-3">
+      <div class="portfolio-bg p4">
+        <div class="p-pattern"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:40px;font-weight:300;color:#ff8888;opacity:0.3">Solera</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:8px">RESTAURANTE · HOUSTON</div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-info">
+          <div class="tag">Restaurante · Houston</div>
+          <h3>Solera Kitchen</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-item reveal reveal-delay-4">
+      <div class="portfolio-bg p5">
+        <div class="p-pattern"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:40px;font-weight:300;color:#d4cc88;opacity:0.3">Nova</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:8px">CONSULTORÍA · MIAMI</div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-info">
+          <div class="tag">Consultoría · Miami</div>
+          <h3>Nova Consulting</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-tag reveal">Testimonios</div>
+  <h2 class="section-title reveal reveal-delay-1">Lo que dicen<br>nuestros <em>clientes</em></h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">Marcyan transformó completamente nuestra presencia digital. El sitio no solo es hermoso — la IA integrada triplicó nuestras consultas en el primer mes.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">R</div>
+        <div><div class="author-name">Roberto Mendez</div><div class="author-title">CEO · Luxora Properties, Miami</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">La comunicación fue impecable desde el día uno. Entregaron en tiempo, respetaron nuestra visión y añadieron ideas que jamás habríamos imaginado.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div><div class="author-name">Andrea Collins</div><div class="author-title">Fundadora · Verdana Foods, Houston</div></div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">El chatbot de IA que Marcyan integró en nuestro sitio responde mejor que muchos de nuestros agentes. Increíble inversión que se pagó sola en semanas.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">M</div>
+        <div><div class="author-name">Marcus Johnson</div><div class="author-title">Director · Axon Analytics, Miami</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATIONS -->
+<section id="locations" style="padding:100px 60px">
+  <div class="section-tag reveal">Nuestras Ciudades</div>
+  <h2 class="section-title reveal reveal-delay-1">Presentes donde<br>tu negocio <em>crece</em></h2>
+  <div class="locations-grid" style="margin-top:60px">
+    <div class="location-card reveal" data-city="HTX">
+      <div class="location-tag">● Oficina Activa</div>
+      <h3>Houston, TX</h3>
+      <div class="location-detail">
+        Energy Corridor<br>
+        Houston, Texas 77042<br><br>
+        +1 (832) 000-0000<br>
+        houston@marcyan.com
+      </div>
+    </div>
+    <div class="location-card reveal reveal-delay-1" data-city="MIA">
+      <div class="location-tag">● Oficina Activa</div>
+      <h3>Miami, FL</h3>
+      <div class="location-detail">
+        Brickell District<br>
+        Miami, Florida 33131<br><br>
+        +1 (305) 000-0000<br>
+        miami@marcyan.com
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-layout">
+    <div class="contact-intro">
+      <div class="section-tag reveal">Contacto</div>
+      <h2 class="section-title reveal reveal-delay-1">Hablemos de<br>tu <em>proyecto</em></h2>
+      <p class="reveal reveal-delay-2">Cuéntanos tu idea. En menos de 24 horas tendrás una propuesta personalizada, sin compromisos y completamente gratis.</p>
+      <div class="reveal reveal-delay-3">
+        <div class="contact-detail"><span class="contact-detail-icon">Email</span><span class="contact-detail-val">hola@marcyan.com</span></div>
+        <div class="contact-detail"><span class="contact-detail-icon">Houston</span><span class="contact-detail-val">+1 (832) 000-0000</span></div>
+        <div class="contact-detail"><span class="contact-detail-icon">Miami</span><span class="contact-detail-val">+1 (305) 000-0000</span></div>
+        <div class="contact-detail"><span class="contact-detail-icon">Horario</span><span class="contact-detail-val">Lun–Vie 9am–6pm CT</span></div>
+      </div>
+    </div>
+
+    <form class="contact-form reveal reveal-delay-2" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nombre</label>
+          <input type="text" placeholder="Tu nombre">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" placeholder="tu@email.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Empresa</label>
+          <input type="text" placeholder="Nombre de tu empresa">
+        </div>
+        <div class="form-field">
+          <label>Ciudad</label>
+          <select>
+            <option value="">Seleccionar</option>
+            <option>Houston, TX</option>
+            <option>Miami, FL</option>
+            <option>Otra ciudad</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Servicio de Interés</label>
+        <select>
+          <option value="">¿Qué necesitas?</option>
+          <option>Sitio Web desde Cero</option>
+          <option>Rediseño de Sitio Actual</option>
+          <option>E-Commerce / Tienda Online</option>
+          <option>IA Conversacional / Chatbot</option>
+          <option>SEO & Posicionamiento</option>
+          <option>Branding & Identidad Visual</option>
+          <option>Paquete Completo</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Cuéntanos tu proyecto</label>
+        <textarea placeholder="Describe brevemente lo que necesitas..."></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Enviar Mensaje →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">Mar<span>c</span>yan</div>
+      <div class="footer-tagline">Diseño Web Impulsado por IA · Houston & Miami</div>
+    </div>
+    <div class="footer-nav">
+      <div class="footer-col">
+        <h5>Servicios</h5>
+        <ul>
+          <li><a href="#">Diseño Web</a></li>
+          <li><a href="#">E-Commerce</a></li>
+          <li><a href="#">IA Conversacional</a></li>
+          <li><a href="#">SEO con IA</a></li>
+          <li><a href="#">Branding</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Empresa</h5>
+        <ul>
+          <li><a href="#">Nosotros</a></li>
+          <li><a href="#">Portafolio</a></li>
+          <li><a href="#">Clientes</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Carreras</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Ciudades</h5>
+        <ul>
+          <li><a href="#">Houston TX</a></li>
+          <li><a href="#">Miami FL</a></li>
+          <li><a href="#">Servicio Nacional</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Marcyan LLC · Todos los derechos reservados</div>
+    <div class="footer-socials">
+      <a href="#">Instagram</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Behance</a>
+      <a href="#">Twitter/X</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts (defer so they run after DOM is ready) -->
+<script src="assets/js/cursor.js" defer></script>
+<script src="assets/js/navbar.js" defer></script>
+<script src="assets/js/reveal.js" defer></script>
+<script src="assets/js/counter.js" defer></script>
+<script src="assets/js/form.js" defer></script>
+
+</body>
+</html>

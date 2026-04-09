@@ -1,0 +1,148 @@
+/* ── Hero layout ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0 60px;
+  overflow: hidden;
+}
+
+/* Grid background */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+@keyframes gridPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+/* Radial glow */
+.hero-glow {
+  position: absolute;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(200,169,110,0.12) 0%, transparent 70%);
+  top: 50%; left: 35%;
+  transform: translate(-50%, -50%);
+  animation: glowFloat 6s ease-in-out infinite;
+}
+@keyframes glowFloat { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.1)} }
+
+/* Scanning line */
+.hero-scan {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
+  animation: scanLine 8s linear infinite;
+}
+@keyframes scanLine { 0%{top:-1px} 100%{top:100%} }
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  max-width: 900px;
+  animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 36px;
+  animation: fadeUp 1.2s 0.2s both;
+}
+.hero-tag::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(62px, 8vw, 110px);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -1px;
+  margin-bottom: 32px;
+  animation: fadeUp 1.2s 0.3s both;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 52px;
+  animation: fadeUp 1.2s 0.4s both;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  animation: fadeUp 1.2s 0.5s both;
+}
+
+/* ── Floating AI card (right side) ── */
+.hero-visual {
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 360px;
+  animation: fadeUp 1.4s 0.6s both;
+  display: none;
+}
+@media (min-width: 1100px) { .hero-visual { display: block; } }
+
+.ai-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 28px;
+  position: relative;
+}
+.ai-card-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.ai-metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ai-metric:last-child { border-bottom: none; }
+.ai-metric-label { font-size: 11px; color: var(--muted); }
+.ai-metric-val { font-family: var(--font-mono); font-size: 12px; color: var(--accent2); }
+
+.ai-bar-row { margin-top: 20px; }
+.ai-bar-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.ai-bar-label span { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.ai-bar-track { height: 3px; background: rgba(255,255,255,0.06); width: 100%; }
+.ai-bar-fill { height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }

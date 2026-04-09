@@ -20,4 +20,12 @@
   .stats-strip { padding: 40px 24px; }
   #locations { padding: 60px 24px; }
   footer { padding: 40px 24px; }
+
+  /* ── Hide custom cursor on mobile (touch devices) ── */
+  .cursor,
+  .cursor-ring { display: none; }
+
+  body,
+  a, button, input, select, textarea,
+  .service-card, .portfolio-item { cursor: auto; }
 }

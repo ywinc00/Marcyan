@@ -1,4 +1,14 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/formulario/:path*",
+      "destination": "https://formulario-para-clientes-1je93kxaj-yan8.vercel.app/:path*"
+    },
+    {
+      "source": "/formulario",
+      "destination": "https://formulario-para-clientes-1je93kxaj-yan8.vercel.app"
+    }
+  ]
 }

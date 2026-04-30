@@ -133,14 +133,30 @@ export default async function handler(req, res) {
       )
     `;
 
-    // Notificación email (no bloqueante: si Resend falla, el brief ya está guardado)
+    // Notificación email — la AWAITAMOS antes de responder.
+    // En serverless, una promesa "fire-and-forget" se descarta cuando la
+    // función responde y se congela. Si Resend falla, NO bloqueamos el
+    // brief: ya está guardado en Postgres y respondemos OK igualmente.
+    let emailDelivered = true;
     if (resend) {
-      sendNotification(projectId, data, pages, features).catch(err => {
-        console.error('[Resend] notification failed:', err);
-      });
+      try {
+        await Promise.race([
+          sendNotification(projectId, data, pages, features),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Resend timeout (8s)')), 8000)
+          )
+        ]);
+        console.log(`[brief] ${projectId} insertado y email enviado`);
+      } catch (err) {
+        emailDelivered = false;
+        console.error(`[brief] ${projectId} insertado, pero email falló:`, err && err.message ? err.message : err);
+      }
+    } else {
+      console.warn('[brief] RESEND_API_KEY no configurada — email omitido');
+      emailDelivered = false;
     }
 
-    return res.status(200).json({ ok: true, projectId });
+    return res.status(200).json({ ok: true, projectId, emailDelivered });
 
   } catch (err) {
     console.error('[brief] submission error:', err);
@@ -243,7 +259,9 @@ async function sendNotification(projectId, d, pages, features) {
     `Ciudad:     ${d.city_state || '-'}\n\n` +
     `(Detalle completo en el HTML del email.)`;
 
-  await resend.emails.send({
+  // Resend SDK v4+ devuelve { data, error } en lugar de lanzar.
+  // Lo convertimos en throw para que el caller lo capture.
+  const result = await resend.emails.send({
     from: FROM_EMAIL,
     to: NOTIFY_EMAIL,
     subject,
@@ -251,6 +269,13 @@ async function sendNotification(projectId, d, pages, features) {
     text,
     replyTo: d.email || undefined
   });
+  if (result && result.error) {
+    const e = result.error;
+    throw new Error(
+      `Resend ${e.name || 'error'}: ${e.message || JSON.stringify(e)}`
+    );
+  }
+  return result && result.data;
 }
 
 function section(title, rows) {

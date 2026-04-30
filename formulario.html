@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Brief de Cliente — Marcyan</title>
+<meta name="description" content="Formulario de información para clientes de Marcyan — Diseño Web, IA, Houston, Miami.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/assets/css/variables.css">
+<link rel="stylesheet" href="/assets/css/form.css">
+</head>
+<body class="brief-page">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+  <header class="brief-header">
+    <div class="brief-logo-area">
+      <a href="/" class="brief-logo" aria-label="Volver al inicio">Mar<span>cyan</span></a>
+      <div class="brief-tagline">Diseño Web · IA · Houston · Miami</div>
+    </div>
+    <div class="brief-meta">
+      <div class="brief-badge">Brief de Cliente</div>
+      <div class="brief-meta-fields">
+        <div class="brief-meta-field">
+          <span class="brief-meta-label">Fecha</span>
+          <input class="brief-meta-input" type="date" id="brief-date" readonly tabindex="-1" aria-label="Fecha del brief">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="brief-main">
+
+    <!-- ═══ INTRO ═════════════════════════════════════════════ -->
+    <div class="brief-intro">
+      <p>Esta plantilla nos permite conocer tu negocio a fondo para diseñar una presencia digital que refleje tu identidad, conecte con tu audiencia y genere resultados reales. Complétala con la mayor precisión posible.</p>
+    </div>
+
+    <form id="brief-form" novalidate autocomplete="on">
+
+      <!-- Honeypot anti-spam (oculto, sólo bots lo llenan) -->
+      <div class="brief-honeypot" aria-hidden="true">
+        <label>No llenar este campo
+          <input type="text" name="website_hp" tabindex="-1" autocomplete="off">
+        </label>
+      </div>
+
+      <!-- ═══ 01 · INFORMACIÓN DEL NEGOCIO ═══════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">01</span>
+          <h2 class="brief-section-title">Información del negocio</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field">
+            <label class="brief-label" for="business_name">Nombre del negocio</label>
+            <input class="brief-input" type="text" id="business_name" name="business_name" placeholder="Nombre legal o comercial" autocomplete="organization">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="owner_name">Nombre del propietario / contacto principal</label>
+            <input class="brief-input" type="text" id="owner_name" name="owner_name" placeholder="Nombre completo" autocomplete="name">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="industry">Industria / Rubro</label>
+            <input class="brief-input" type="text" id="industry" name="industry" placeholder="Ej: Restaurante, Salud, Moda, Consultoría…">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="years_in_market">Años en el mercado</label>
+            <input class="brief-input" type="text" id="years_in_market" name="years_in_market" placeholder="Ej: 2 años, recién iniciando…">
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="business_description">Descripción del negocio (¿qué hacen y para quién?)</label>
+            <textarea class="brief-input brief-tall" id="business_description" name="business_description" placeholder="Describe brevemente tu negocio, propuesta de valor y qué te diferencia de la competencia…"></textarea>
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="products_services">Productos / Servicios principales</label>
+            <textarea class="brief-input" id="products_services" name="products_services" placeholder="Lista los servicios o productos que ofreces. Ej: consultoría financiera, venta de ropa, diseño de interiores…"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 02 · CONTACTO E INFORMACIÓN DIGITAL ════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">02</span>
+          <h2 class="brief-section-title">Contacto e información digital</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field">
+            <label class="brief-label" for="phone">Teléfono</label>
+            <input class="brief-input" type="tel" id="phone" name="phone" placeholder="+1 (000) 000-0000" autocomplete="tel">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="email">Correo electrónico</label>
+            <input class="brief-input" type="email" id="email" name="email" placeholder="correo@negocio.com" autocomplete="email">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="city_state">Ciudad / Estado</label>
+            <input class="brief-input" type="text" id="city_state" name="city_state" placeholder="Ej: Houston, TX">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="current_website">Página web actual (si tiene)</label>
+            <input class="brief-input" type="url" id="current_website" name="current_website" placeholder="https://www.mipagina.com" autocomplete="url">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="instagram">Instagram</label>
+            <input class="brief-input" type="text" id="instagram" name="instagram" placeholder="@usuario">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="facebook">Facebook</label>
+            <input class="brief-input" type="text" id="facebook" name="facebook" placeholder="facebook.com/negocio">
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="other_socials">Otras redes (TikTok, LinkedIn, YouTube…)</label>
+            <input class="brief-input" type="text" id="other_socials" name="other_socials" placeholder="@usuario / enlace">
+          </div>
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">Google Business Profile</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="google_business" value="si"> Sí, tengo</label>
+              <label class="brief-radio-pill"><input type="radio" name="google_business" value="no"> No tengo</label>
+              <label class="brief-radio-pill"><input type="radio" name="google_business" value="noSe"> No sé</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 03 · TIPO DE SITIO ═════════════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">03</span>
+          <h2 class="brief-section-title">Tipo de sitio web</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">¿Qué tipo de sitio necesita? (selecciona el que mejor aplique)</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="landing"> Landing Page</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="corporativo"> Sitio Corporativo</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="ecommerce"> E-Commerce / Tienda</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="portfolio"> Portafolio</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="reservas"> Sistema de Reservas</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="blog"> Blog / Contenido</label>
+              <label class="brief-radio-pill"><input type="radio" name="website_type" value="otro"> Otro</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Tiene dominio (URL) propio?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_domain" value="si"> Sí</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_domain" value="no"> No</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Tiene hosting / servidor?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_hosting" value="si"> Sí</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_hosting" value="no"> No</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_hosting" value="noSe"> No sé</label>
+            </div>
+          </div>
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">¿Qué páginas / secciones debe incluir el sitio?</span>
+            <div class="brief-check-group">
+              <div class="brief-check-grid">
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Inicio (Home)"> Inicio (Home)</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Sobre Nosotros"> Sobre Nosotros</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Servicios / Productos"> Servicios / Productos</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Galería / Portafolio"> Galería / Portafolio</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Testimonios / Reseñas"> Testimonios / Reseñas</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Blog / Noticias"> Blog / Noticias</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Precios / Paquetes"> Precios / Paquetes</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Formulario de Contacto"> Formulario de Contacto</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Reservas / Citas"> Reservas / Citas</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Tienda Online"> Tienda Online</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="FAQ"> FAQ</label>
+                <label class="brief-check-item"><input type="checkbox" name="pages_required" value="Mapa / Ubicación"> Mapa / Ubicación</label>
+              </div>
+            </div>
+          </div>
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">Funcionalidades especiales requeridas</span>
+            <div class="brief-check-group">
+              <div class="brief-check-grid">
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Chatbot / IA"> Chatbot / IA</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Chat en vivo"> Chat en vivo</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Carrito de compras"> Carrito de compras</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Pasarela de pago"> Pasarela de pago</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Formularios personalizados"> Formularios personalizados</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Portal de clientes"> Portal de clientes</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Integración WhatsApp"> Integración WhatsApp</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="SEO optimizado"> SEO optimizado</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Multilenguaje"> Multilenguaje (ES/EN)</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Integración redes sociales"> Integración redes sociales</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="CRM / Email Marketing"> CRM / Email Marketing</label>
+                <label class="brief-check-item"><input type="checkbox" name="features_required" value="Google Analytics"> Google Analytics</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 04 · AUDIENCIA Y OBJETIVOS ═════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">04</span>
+          <h2 class="brief-section-title">Audiencia y objetivos</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field">
+            <label class="brief-label" for="target_audience">¿A quién va dirigido el negocio?</label>
+            <textarea class="brief-input" id="target_audience" name="target_audience" placeholder="Describe tu cliente ideal: edad, género, nivel económico, idioma, ubicación…"></textarea>
+          </div>
+          <div class="brief-field">
+            <label class="brief-label" for="main_objective">¿Cuál es el principal objetivo del sitio web?</label>
+            <textarea class="brief-input" id="main_objective" name="main_objective" placeholder="Ej: generar ventas, captar leads, dar información, reservas en línea, posicionamiento de marca…"></textarea>
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="visitor_action">¿Qué acción deseas que haga el visitante al entrar al sitio?</label>
+            <input class="brief-input" type="text" id="visitor_action" name="visitor_action" placeholder="Ej: que llame, que compre, que llene un formulario, que reserve una cita…">
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="competitors">¿Quiénes son tus principales competidores? (links si los tienes)</label>
+            <textarea class="brief-input" id="competitors" name="competitors" placeholder="Ej: www.competidor1.com — Los diferencia el precio / www.competidor2.com — Tienen mejor servicio…"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 05 · IDENTIDAD DE MARCA ════════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">05</span>
+          <h2 class="brief-section-title">Identidad de marca</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field">
+            <span class="brief-label is-teal">¿Tiene logotipo?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_logo" value="si"> Sí, tengo logo</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_logo" value="no"> Necesito logo</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_logo" value="update"> Quiero renovarlo</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <label class="brief-label is-teal" for="brand_colors">Colores de marca (si tiene)</label>
+            <input class="brief-input" type="text" id="brand_colors" name="brand_colors" placeholder="Ej: azul marino #1A2B6D, dorado #C8A96E…">
+          </div>
+          <div class="brief-field">
+            <label class="brief-label is-teal" for="brand_fonts">Tipografías / fuentes actuales (si tiene)</label>
+            <input class="brief-input" type="text" id="brand_fonts" name="brand_fonts" placeholder="Ej: Montserrat, Times New Roman, no sé…">
+          </div>
+          <div class="brief-field">
+            <span class="brief-label is-teal">Personalidad de marca</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="luxury"> Lujo / Premium</label>
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="moderno"> Moderno / Tech</label>
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="amigable"> Amigable / Cálido</label>
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="profesional"> Profesional</label>
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="minimalista"> Minimalista</label>
+              <label class="brief-radio-pill"><input type="radio" name="brand_personality" value="creativo"> Creativo / Atrevido</label>
+            </div>
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label is-teal" for="inspiration_sites">Sitios web de referencia o inspiración (links)</label>
+            <textarea class="brief-input" id="inspiration_sites" name="inspiration_sites" placeholder="Comparte 2 o 3 sitios que te gusten y por qué. Ej: www.apple.com — me gusta su simplicidad y elegancia…"></textarea>
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label is-teal" for="design_dislikes">¿Qué NO te gusta en diseño web? (colores, estilos, elementos a evitar)</label>
+            <textarea class="brief-input" id="design_dislikes" name="design_dislikes" placeholder="Ej: no me gustan los diseños recargados, fondos oscuros, muchas animaciones…"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 06 · CONTENIDO ═════════════════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">06</span>
+          <h2 class="brief-section-title">Contenido del sitio</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field">
+            <span class="brief-label">¿Tiene fotos / imágenes del negocio?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_photos" value="si"> Sí, tengo fotos</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_photos" value="pocas"> Tengo pocas</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_photos" value="no"> No tengo</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Tiene textos / copywriting redactados?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_copy" value="si"> Sí, tengo textos</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_copy" value="parcial"> Algunos</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_copy" value="no"> No, necesito apoyo</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Tiene videos o material audiovisual?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="has_video" value="si"> Sí</label>
+              <label class="brief-radio-pill"><input type="radio" name="has_video" value="no"> No</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">Idioma(s) del sitio web</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="language" value="es"> Solo español</label>
+              <label class="brief-radio-pill"><input type="radio" name="language" value="en"> Solo inglés</label>
+              <label class="brief-radio-pill"><input type="radio" name="language" value="biling"> Bilingüe</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 07 · PRESUPUESTO Y TIEMPO ══════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">07</span>
+          <h2 class="brief-section-title">Presupuesto y tiempo de entrega</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">Rango de inversión estimada</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="budget_range" value="500-1000"> $500 – $1,000</label>
+              <label class="brief-radio-pill"><input type="radio" name="budget_range" value="1000-2500"> $1,000 – $2,500</label>
+              <label class="brief-radio-pill"><input type="radio" name="budget_range" value="2500-5000"> $2,500 – $5,000</label>
+              <label class="brief-radio-pill"><input type="radio" name="budget_range" value="5000+"> $5,000+</label>
+              <label class="brief-radio-pill"><input type="radio" name="budget_range" value="noSe"> No sé aún</label>
+            </div>
+          </div>
+          <div class="brief-field brief-span-2">
+            <span class="brief-label">¿Para cuándo necesita el sitio listo?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="timeline" value="urgente"> ASAP (urgente)</label>
+              <label class="brief-radio-pill"><input type="radio" name="timeline" value="2-4sem"> 2 – 4 semanas</label>
+              <label class="brief-radio-pill"><input type="radio" name="timeline" value="1-2mes"> 1 – 2 meses</label>
+              <label class="brief-radio-pill"><input type="radio" name="timeline" value="flexible"> Soy flexible</label>
+            </div>
+          </div>
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="deadline">Fecha límite importante (evento, lanzamiento, etc.)</label>
+            <input class="brief-input" type="text" id="deadline" name="deadline" placeholder="Ej: inauguración 15 de mayo, Black Friday, lanzamiento de producto…">
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ 08 · NOTAS ═════════════════════════════════════ -->
+      <section class="brief-section">
+        <header class="brief-section-header">
+          <span class="brief-section-num">08</span>
+          <h2 class="brief-section-title">Notas adicionales</h2>
+          <span class="brief-section-line"></span>
+        </header>
+        <div class="brief-grid-2">
+          <div class="brief-field brief-span-2">
+            <label class="brief-label" for="additional_notes">¿Hay algo más que debamos saber sobre tu negocio o proyecto?</label>
+            <textarea class="brief-input brief-taller" id="additional_notes" name="additional_notes" placeholder="Cuéntanos todo lo que consideres importante: contexto especial, restricciones, ideas, preguntas que tengas…"></textarea>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Cómo se enteró de Marcyan?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="referred_by" value="instagram"> Instagram</label>
+              <label class="brief-radio-pill"><input type="radio" name="referred_by" value="facebook"> Facebook</label>
+              <label class="brief-radio-pill"><input type="radio" name="referred_by" value="google"> Google</label>
+              <label class="brief-radio-pill"><input type="radio" name="referred_by" value="referido"> Recomendación</label>
+              <label class="brief-radio-pill"><input type="radio" name="referred_by" value="otro"> Otro</label>
+            </div>
+          </div>
+          <div class="brief-field">
+            <span class="brief-label">¿Ha trabajado antes con una agencia de diseño web?</span>
+            <div class="brief-radio-group">
+              <label class="brief-radio-pill"><input type="radio" name="previous_agency" value="si"> Sí</label>
+              <label class="brief-radio-pill"><input type="radio" name="previous_agency" value="no"> No, primera vez</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SUBMIT ════════════════════════════════════════ -->
+      <div class="brief-submit-bar">
+        <button type="submit" class="brief-submit-btn" id="brief-submit">
+          <span class="brief-submit-label">Enviar Brief</span>
+          <span class="brief-submit-loading">Enviando…</span>
+        </button>
+      </div>
+
+      <!-- Mensajes de respuesta -->
+      <div class="brief-success" id="brief-success" hidden role="status" aria-live="polite">
+        <h3>¡Brief recibido!</h3>
+        <p>Tu brief fue registrado con el ID <strong class="brief-success-id" id="brief-success-id">MRC-XXX</strong>. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+      </div>
+
+      <div class="brief-error" id="brief-error" hidden role="alert" aria-live="assertive">
+        <p class="brief-error-msg" id="brief-error-msg">Hubo un error al enviar el formulario. Intenta de nuevo.</p>
+      </div>
+
+    </form>
+
+    <!-- ═══ FOOTER ═══════════════════════════════════════════ -->
+    <footer class="brief-footer">
+      <p class="brief-footer-note">Tu información es completamente confidencial. Este brief nos permite crear una propuesta personalizada sin compromisos. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+      <div class="brief-footer-contact">
+        <div class="brief-footer-brand">Marcyan</div>
+        <div class="brief-footer-sub">Houston TX · Miami FL</div>
+        <div class="brief-footer-sub" style="color: var(--accent2);">Diseño Web · IA · SEO · Branding</div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="/assets/js/form-brief.js" defer></script>
+</body>
+</html>

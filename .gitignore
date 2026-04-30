@@ -1,11 +1,22 @@
 # Vercel
 .vercel
 
+# Node / dependencias (Vercel las instala en build)
+node_modules/
+*.log
+npm-debug.log*
+
+# Env locales
+.env
+.env.local
+.env.*.local
+
 # OS
 .DS_Store
 Thumbs.db
 
-# Editor
+# Editor / herramientas locales
 .vscode/
 .idea/
+.claude/
 *.swp

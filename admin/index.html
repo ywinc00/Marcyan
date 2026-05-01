@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Marcyan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/variables.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body class="admin-page admin-login-page">
+
+  <main class="admin-login-card" id="login-root">
+    <h1 class="admin-login-title">Marcyan</h1>
+    <p class="admin-login-sub">Panel · Acceso</p>
+
+    <form id="login-form" novalidate>
+      <label class="admin-login-label" for="login-email">Tu correo electrónico</label>
+      <input class="admin-input" type="email" id="login-email" name="email"
+             autocomplete="email" placeholder="tu@marcyanstudio.com" required>
+
+      <button type="submit" class="admin-login-btn" id="login-btn">
+        <span class="login-label">Enviarme enlace de acceso</span>
+        <span class="login-loading" hidden>Enviando…</span>
+      </button>
+
+      <div class="admin-login-msg" id="login-msg" hidden></div>
+    </form>
+
+    <p class="admin-login-foot">
+      <a href="/">← Volver al sitio</a>
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      const form    = document.getElementById('login-form');
+      const input   = document.getElementById('login-email');
+      const btn     = document.getElementById('login-btn');
+      const lblOk   = btn.querySelector('.login-label');
+      const lblLoad = btn.querySelector('.login-loading');
+      const msg     = document.getElementById('login-msg');
+
+      // ?error=invalid → magic link inválido
+      const params = new URLSearchParams(location.search);
+      if (params.get('error') === 'invalid') {
+        msg.hidden = false;
+        msg.className = 'admin-login-msg is-error';
+        msg.textContent = 'El enlace de acceso es inválido o expiró. Solicita uno nuevo.';
+      }
+
+      function setLoading(loading) {
+        btn.disabled = loading;
+        lblOk.hidden = loading;
+        lblLoad.hidden = !loading;
+      }
+
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        msg.hidden = true;
+        const email = (input.value || '').trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          msg.hidden = false;
+          msg.className = 'admin-login-msg is-error';
+          msg.textContent = 'Email inválido.';
+          return;
+        }
+        setLoading(true);
+        try {
+          const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          const json = await res.json().catch(() => null);
+          if (!res.ok || !json || !json.ok) {
+            msg.hidden = false;
+            msg.className = 'admin-login-msg is-error';
+            msg.textContent = (json && json.error) || 'No pudimos enviar el enlace. Intenta de nuevo.';
+            return;
+          }
+          msg.hidden = false;
+          msg.className = 'admin-login-msg is-ok';
+          msg.textContent = 'Si el email está autorizado, recibirás un enlace de acceso en un minuto. Revisa tu inbox y spam.';
+          input.disabled = true;
+          btn.disabled = true;
+        } catch (err) {
+          msg.hidden = false;
+          msg.className = 'admin-login-msg is-error';
+          msg.textContent = 'No pudimos conectar con el servidor.';
+        } finally {
+          setLoading(false);
+          btn.disabled = btn.disabled || input.disabled;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

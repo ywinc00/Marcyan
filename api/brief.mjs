@@ -1,19 +1,17 @@
 // ════════════════════════════════════════════════════════════════
 //  POST /api/brief
 //  Recibe el formulario, genera project_id MRC-XXX,
-//  inserta en Postgres y notifica por email vía Resend.
+//  inserta en Postgres, registra event y notifica:
+//    1) Email al admin (notificación de nuevo brief)
+//    2) Email al cliente (auto-respuesta de confirmación)
 // ════════════════════════════════════════════════════════════════
-
 import { sql } from '@vercel/postgres';
-import { Resend } from 'resend';
+import { logEvent } from '../lib/db.mjs';
+import {
+  emailAdminNewBrief, emailClientConfirmation, resend,
+} from '../lib/email.mjs';
+import { clientIp } from '../lib/auth.mjs';
 
-const RESEND_KEY     = process.env.RESEND_API_KEY;
-const NOTIFY_EMAIL   = process.env.BRIEF_NOTIFY_EMAIL || 'hello@marcyanstudio.com';
-const FROM_EMAIL     = process.env.BRIEF_FROM_EMAIL  || 'Marcyan Briefs <noreply@marcyanstudio.com>';
-
-const resend = RESEND_KEY ? new Resend(RESEND_KEY) : null;
-
-// Mapeo nombre del campo (cliente) → columna DB
 const TEXT_FIELDS = [
   'business_name','owner_name','industry','years_in_market',
   'business_description','products_services',
@@ -25,15 +23,13 @@ const TEXT_FIELDS = [
   'inspiration_sites','design_dislikes',
   'has_photos','has_copy','has_video','language',
   'budget_range','timeline','deadline',
-  'additional_notes','referred_by','previous_agency'
+  'additional_notes','referred_by','previous_agency',
 ];
 
-// ── Helpers ────────────────────────────────────────────────────
 function sanitize(v, max = 5000) {
   if (v === null || v === undefined) return null;
   const s = String(v).trim();
-  if (!s) return null;
-  return s.slice(0, max);
+  return s ? s.slice(0, max) : null;
 }
 
 function sanitizeArray(v, maxItems = 50, maxLen = 120) {
@@ -44,22 +40,14 @@ function sanitizeArray(v, maxItems = 50, maxLen = 120) {
     .map(x => String(x).slice(0, maxLen));
 }
 
-function clientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
-  if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
-  return req.headers['x-real-ip'] || null;
-}
+const withTimeout = (p, ms, label) =>
+  Promise.race([
+    p,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timeout (${ms}ms)`)), ms)
+    ),
+  ]);
 
-function escapeHtml(s) {
-  return String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/\n/g, '<br>');
-}
-
-// ── Handler ────────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -69,32 +57,31 @@ export default async function handler(req, res) {
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};
 
-    // Honeypot: si el bot llenó el campo oculto, fingimos éxito.
+    // Honeypot anti-spam
     if (body.website_hp) {
       return res.status(200).json({ ok: true, projectId: 'MRC-000' });
     }
 
-    // Validación mínima: requerimos email o teléfono
+    // Validación mínima
     const email = sanitize(body.email, 200);
     const phone = sanitize(body.phone, 50);
     if (!email && !phone) {
       return res.status(400).json({
         ok: false,
-        error: 'Necesitamos al menos un email o un teléfono para contactarte.'
+        error: 'Necesitamos al menos un email o un teléfono para contactarte.',
       });
     }
 
-    // Sanitizar todos los campos de texto
+    // Sanitizar
     const data = {};
     for (const f of TEXT_FIELDS) data[f] = sanitize(body[f]);
     data.email = email;
     data.phone = phone;
 
-    // Arrays (checkbox groups)
     const pages    = sanitizeArray(body.pages_required);
     const features = sanitizeArray(body.features_required);
 
-    // Generar project_id atómicamente
+    // Generar project_id atómico
     const idResult = await sql`SELECT next_project_id() AS id`;
     const projectId = idResult.rows[0].id;
 
@@ -133,166 +120,61 @@ export default async function handler(req, res) {
       )
     `;
 
-    // Notificación email — la AWAITAMOS antes de responder.
-    // En serverless, una promesa "fire-and-forget" se descarta cuando la
-    // función responde y se congela. Si Resend falla, NO bloqueamos el
-    // brief: ya está guardado en Postgres y respondemos OK igualmente.
-    let emailDelivered = true;
+    // Audit log: brief recibido
+    await logEvent({
+      projectId,
+      type: 'brief_received',
+      actorEmail: null,
+      data: {
+        business_name: data.business_name || null,
+        email: data.email || null,
+        ip: clientIp(req),
+      },
+    });
+
+    // Notificaciones email — paralelo, awaitadas, no bloquean al brief si fallan
+    let emailAdminOk = false;
+    let emailClientOk = false;
+
     if (resend) {
-      try {
-        await Promise.race([
-          sendNotification(projectId, data, pages, features),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Resend timeout (8s)')), 8000)
-          )
-        ]);
-        console.log(`[brief] ${projectId} insertado y email enviado`);
-      } catch (err) {
-        emailDelivered = false;
-        console.error(`[brief] ${projectId} insertado, pero email falló:`, err && err.message ? err.message : err);
-      }
+      const adminP = withTimeout(
+        emailAdminNewBrief({ projectId, data, pages, features }),
+        8000, 'Resend admin'
+      ).then(() => { emailAdminOk = true; })
+       .catch(err => console.error(`[brief] ${projectId} admin email falló:`, err && err.message));
+
+      const clientP = data.email
+        ? withTimeout(
+            emailClientConfirmation({
+              projectId,
+              clientEmail: data.email,
+              ownerName: data.owner_name,
+              businessName: data.business_name,
+            }),
+            8000, 'Resend client'
+          ).then(() => { emailClientOk = true; })
+           .catch(err => console.error(`[brief] ${projectId} client email falló:`, err && err.message))
+        : Promise.resolve();
+
+      await Promise.all([adminP, clientP]);
+
+      console.log(`[brief] ${projectId} insertado · adminEmail=${emailAdminOk} · clientEmail=${emailClientOk}`);
     } else {
-      console.warn('[brief] RESEND_API_KEY no configurada — email omitido');
-      emailDelivered = false;
+      console.warn(`[brief] ${projectId} insertado · RESEND_API_KEY no configurada, sin emails`);
     }
 
-    return res.status(200).json({ ok: true, projectId, emailDelivered });
+    return res.status(200).json({
+      ok: true,
+      projectId,
+      emailAdmin: emailAdminOk,
+      emailClient: emailClientOk,
+    });
 
   } catch (err) {
     console.error('[brief] submission error:', err);
     return res.status(500).json({
       ok: false,
-      error: 'Error al procesar el formulario. Por favor intenta de nuevo en un momento.'
+      error: 'Error al procesar el formulario. Por favor intenta de nuevo en un momento.',
     });
   }
-}
-
-// ── Email de notificación ─────────────────────────────────────
-async function sendNotification(projectId, d, pages, features) {
-  const subject = `Nuevo brief ${projectId} — ${d.business_name || 'sin nombre de negocio'}`;
-
-  const sectionsHtml = [
-    section('01 · Negocio', [
-      ['Nombre del negocio', d.business_name],
-      ['Propietario', d.owner_name],
-      ['Industria', d.industry],
-      ['Años en el mercado', d.years_in_market],
-      ['Descripción', d.business_description],
-      ['Productos / Servicios', d.products_services],
-    ]),
-    section('02 · Contacto', [
-      ['Teléfono', d.phone],
-      ['Email', d.email],
-      ['Ciudad / Estado', d.city_state],
-      ['Web actual', d.current_website],
-      ['Instagram', d.instagram],
-      ['Facebook', d.facebook],
-      ['Otras redes', d.other_socials],
-      ['Google Business', d.google_business],
-    ]),
-    section('03 · Tipo de sitio', [
-      ['Tipo', d.website_type],
-      ['¿Dominio propio?', d.has_domain],
-      ['¿Hosting?', d.has_hosting],
-      ['Páginas / secciones', pages.join(' · ') || null],
-      ['Funcionalidades', features.join(' · ') || null],
-    ]),
-    section('04 · Audiencia & Objetivos', [
-      ['Audiencia', d.target_audience],
-      ['Objetivo principal', d.main_objective],
-      ['Acción del visitante', d.visitor_action],
-      ['Competidores', d.competitors],
-    ]),
-    section('05 · Identidad de marca', [
-      ['¿Logo?', d.has_logo],
-      ['Colores', d.brand_colors],
-      ['Tipografías', d.brand_fonts],
-      ['Personalidad', d.brand_personality],
-      ['Inspiración', d.inspiration_sites],
-      ['No le gusta', d.design_dislikes],
-    ]),
-    section('06 · Contenido', [
-      ['Fotos', d.has_photos],
-      ['Textos', d.has_copy],
-      ['Video', d.has_video],
-      ['Idioma', d.language],
-    ]),
-    section('07 · Presupuesto & Tiempos', [
-      ['Inversión estimada', d.budget_range],
-      ['Tiempo de entrega', d.timeline],
-      ['Fecha límite', d.deadline],
-    ]),
-    section('08 · Notas', [
-      ['Notas adicionales', d.additional_notes],
-      ['¿Cómo se enteró?', d.referred_by],
-      ['Agencia previa', d.previous_agency],
-    ]),
-  ].join('');
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<body style="margin:0;padding:0;background:#080808;">
-  <div style="max-width:720px;margin:0 auto;background:#080808;color:#f0ede8;font-family:'DM Sans',Arial,sans-serif;font-weight:300;padding:40px 32px;">
-    <div style="border-bottom:1px solid rgba(200,169,110,0.4);padding-bottom:18px;margin-bottom:28px;">
-      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:600;letter-spacing:0.18em;color:#c8a96e;text-transform:uppercase;">
-        Nuevo Brief · ${escapeHtml(projectId)}
-      </div>
-      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;color:#6b6b6b;text-transform:uppercase;margin-top:6px;">
-        Marcyan · Brief de Cliente
-      </div>
-    </div>
-    ${sectionsHtml}
-    <div style="border-top:1px solid rgba(200,169,110,0.18);margin-top:32px;padding-top:14px;color:#6b6b6b;font-size:11px;">
-      Recibido el ${new Date().toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' })}
-    </div>
-  </div>
-</body>
-</html>`.trim();
-
-  const text =
-    `Nuevo brief ${projectId}\n\n` +
-    `Negocio:    ${d.business_name || '-'}\n` +
-    `Propietario: ${d.owner_name || '-'}\n` +
-    `Email:      ${d.email || '-'}\n` +
-    `Teléfono:   ${d.phone || '-'}\n` +
-    `Ciudad:     ${d.city_state || '-'}\n\n` +
-    `(Detalle completo en el HTML del email.)`;
-
-  // Resend SDK v4+ devuelve { data, error } en lugar de lanzar.
-  // Lo convertimos en throw para que el caller lo capture.
-  const result = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: NOTIFY_EMAIL,
-    subject,
-    html,
-    text,
-    replyTo: d.email || undefined
-  });
-  if (result && result.error) {
-    const e = result.error;
-    throw new Error(
-      `Resend ${e.name || 'error'}: ${e.message || JSON.stringify(e)}`
-    );
-  }
-  return result && result.data;
-}
-
-function section(title, rows) {
-  const filled = rows.filter(([, v]) => v !== null && v !== undefined && v !== '');
-  if (!filled.length) return '';
-  const tr = filled.map(([k, v]) => `
-    <tr>
-      <td style="padding:6px 16px 6px 0;color:#c8a96e;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;vertical-align:top;width:38%;">${escapeHtml(k)}</td>
-      <td style="padding:6px 0;color:#f0ede8;font-size:13px;line-height:1.5;vertical-align:top;">${escapeHtml(v)}</td>
-    </tr>
-  `).join('');
-  return `
-    <div style="margin-bottom:24px;">
-      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-weight:600;letter-spacing:0.06em;color:#f0ede8;text-transform:uppercase;border-bottom:1px solid rgba(200,169,110,0.18);padding-bottom:6px;margin-bottom:8px;">
-        ${escapeHtml(title)}
-      </div>
-      <table style="width:100%;border-collapse:collapse;">${tr}</table>
-    </div>
-  `;
 }

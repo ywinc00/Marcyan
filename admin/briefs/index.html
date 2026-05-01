@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Briefs · Marcyan Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/variables.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body class="admin-page">
+
+  <header class="admin-top">
+    <a href="/admin/briefs" class="admin-brand">
+      <span class="admin-brand-logo">Mar<span>cyan</span></span>
+      <span class="admin-brand-tag">Admin · Briefs</span>
+    </a>
+    <div class="admin-user">
+      <span class="admin-user-email" id="user-email">…</span>
+      <button class="admin-logout-btn" id="logout-btn">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <h1 class="admin-page-title">Briefs de cliente</h1>
+
+    <!-- Stats -->
+    <section class="admin-stats" id="stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total</div>
+        <div class="admin-stat-value" id="st-total">–</div>
+      </div>
+      <div class="admin-stat-card is-pending">
+        <div class="admin-stat-label">Pendientes</div>
+        <div class="admin-stat-value" id="st-pending">–</div>
+      </div>
+      <div class="admin-stat-card is-progress">
+        <div class="admin-stat-label">En curso</div>
+        <div class="admin-stat-value" id="st-progress">–</div>
+      </div>
+      <div class="admin-stat-card is-completed">
+        <div class="admin-stat-label">Completados (mes)</div>
+        <div class="admin-stat-value" id="st-completed">–</div>
+      </div>
+    </section>
+
+    <!-- Toolbar -->
+    <section class="admin-toolbar">
+      <div class="admin-filters" id="filters">
+        <button class="admin-filter-chip is-active" data-status="">Todos <span class="admin-filter-chip-count" id="f-all">0</span></button>
+        <button class="admin-filter-chip" data-status="pending">Pendientes <span class="admin-filter-chip-count" id="f-pending">0</span></button>
+        <button class="admin-filter-chip" data-status="contacted">Contactados <span class="admin-filter-chip-count" id="f-contacted">0</span></button>
+        <button class="admin-filter-chip" data-status="in_progress">En curso <span class="admin-filter-chip-count" id="f-progress">0</span></button>
+        <button class="admin-filter-chip" data-status="completed">Completados <span class="admin-filter-chip-count" id="f-completed">0</span></button>
+        <button class="admin-filter-chip" data-status="archived">Archivados <span class="admin-filter-chip-count" id="f-archived">0</span></button>
+      </div>
+      <input class="admin-search" type="search" id="search-input"
+             placeholder="Buscar por negocio, email, ID…">
+      <a class="admin-btn" id="export-btn" href="#">⬇ CSV</a>
+    </section>
+
+    <!-- Tabla -->
+    <section class="admin-table-wrap" id="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Negocio</th>
+            <th>Contacto</th>
+            <th>Status</th>
+            <th>Recibido</th>
+          </tr>
+        </thead>
+        <tbody id="briefs-body">
+          <tr><td colspan="5" class="admin-empty">
+            <div class="admin-empty-title">Cargando…</div>
+          </td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Paginación -->
+    <div class="admin-pagination" id="pagination" hidden>
+      <span id="pag-info"></span>
+      <span>
+        <button class="admin-btn" id="pag-prev" disabled>‹ Anterior</button>
+        <button class="admin-btn" id="pag-next" disabled>Siguiente ›</button>
+      </span>
+    </div>
+  </main>
+
+  <script src="/assets/js/admin/list.js" defer></script>
+</body>
+</html>

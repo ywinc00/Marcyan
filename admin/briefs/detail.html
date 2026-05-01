@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Brief · Marcyan Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/variables.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body class="admin-page">
+
+  <header class="admin-top">
+    <a href="/admin/briefs" class="admin-brand">
+      <span class="admin-brand-logo">Mar<span>cyan</span></span>
+      <span class="admin-brand-tag">Admin · Brief</span>
+    </a>
+    <div class="admin-user">
+      <span class="admin-user-email" id="user-email">…</span>
+      <button class="admin-logout-btn" id="logout-btn">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="admin-detail" id="detail-root">
+      <div class="admin-detail-main">
+        <div id="detail-content">
+          <p class="admin-empty-title" style="text-align:center;padding:3rem 0;">Cargando…</p>
+        </div>
+      </div>
+      <aside class="admin-detail-aside" id="detail-aside" hidden>
+        <!-- Acciones (status, summary, email manual, audit) -->
+        <div class="admin-aside-card">
+          <h3 class="admin-aside-title">Estado del proyecto</h3>
+          <select class="admin-status-select" id="status-select">
+            <option value="pending">Pendiente</option>
+            <option value="contacted">Contactado</option>
+            <option value="in_progress">En curso</option>
+            <option value="completed">Completado</option>
+            <option value="archived">Archivado</option>
+          </select>
+
+          <h3 class="admin-aside-title" style="margin-top:1rem;">Resumen del proyecto</h3>
+          <textarea class="admin-summary-textarea" id="summary-input"
+                    placeholder="Al cerrar el proyecto, escribe aquí un resumen del trabajo realizado…"></textarea>
+
+          <div class="admin-aside-actions">
+            <button class="admin-btn is-primary" id="save-btn">Guardar cambios</button>
+          </div>
+          <div class="admin-save-status" id="save-status"></div>
+        </div>
+
+        <div class="admin-aside-card">
+          <h3 class="admin-aside-title">Enviar email al cliente</h3>
+          <form class="admin-email-form" id="email-form">
+            <input class="admin-input" type="text" id="email-subject"
+                   placeholder="Asunto" maxlength="200">
+            <textarea class="admin-summary-textarea" id="email-body" rows="5"
+                      placeholder="Escribe el mensaje al cliente…" maxlength="10000"></textarea>
+            <button type="submit" class="admin-btn">Enviar</button>
+          </form>
+          <div class="admin-save-status" id="email-status"></div>
+        </div>
+
+        <div class="admin-aside-card">
+          <h3 class="admin-aside-title">Historial de eventos</h3>
+          <ul class="admin-events" id="events-list">
+            <li class="admin-event"><span class="admin-event-time">…</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="/assets/js/admin/detail.js" defer></script>
+</body>
+</html>

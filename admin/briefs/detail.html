@@ -32,7 +32,19 @@
         </div>
       </div>
       <aside class="admin-detail-aside" id="detail-aside" hidden>
-        <!-- Acciones (status, summary, email manual, audit) -->
+        <!-- Acciones rápidas -->
+        <div class="admin-aside-card">
+          <h3 class="admin-aside-title">Acciones</h3>
+          <div class="admin-action-grid">
+            <button type="button" class="admin-btn" id="download-print-btn">⎙ Imprimir / PDF</button>
+            <button type="button" class="admin-btn" id="download-html-btn">⬇ Descargar .html</button>
+            <button type="button" class="admin-btn" id="edit-toggle-btn">✎ Editar brief</button>
+            <button type="button" class="admin-btn is-danger" id="delete-btn">🗑 Eliminar</button>
+          </div>
+          <div class="admin-save-status" id="action-status"></div>
+        </div>
+
+        <!-- Estado del proyecto + resumen -->
         <div class="admin-aside-card">
           <h3 class="admin-aside-title">Estado del proyecto</h3>
           <select class="admin-status-select" id="status-select">

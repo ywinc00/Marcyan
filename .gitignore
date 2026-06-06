@@ -1,3 +1,7 @@
+# Astro build output & cache
+dist/
+.astro/
+
 # Vercel
 .vercel
 

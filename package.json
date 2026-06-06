@@ -2,9 +2,19 @@
   "name": "marcyan-web",
   "version": "1.0.0",
   "private": true,
-  "description": "Marcyan — sitio web y formulario de brief de cliente",
+  "type": "module",
+  "description": "Marcyan Studio — sitio web (Astro) + brief de cliente + panel admin",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
     "resend": "^4.0.1"
+  },
+  "devDependencies": {
+    "astro": "^6.4.4"
   }
 }

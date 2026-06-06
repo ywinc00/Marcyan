@@ -1,0 +1,607 @@
+---
+// /formulario — Brief de Cliente (8 secciones) · ES-only, sin prefijo de idioma.
+// Re-vestido al DS v2. Endpoint de conversión → POST /api/brief.
+// ⚠️ NO cambiar los name="" ni los value="" de los campos: deben seguir
+//    coincidiendo con TEXT_FIELDS + pages_required/features_required (arrays)
+//    + honeypot website_hp en api/brief.mjs. Solo cambia la piel.
+import Layout from '../layouts/Layout.astro';
+import SiteNav from '../components/layout/SiteNav.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import Kicker from '../components/ui/Kicker.astro';
+import { content } from '../i18n/content';
+import { clusterNav } from '../i18n/clusters';
+
+const pageNav = { ...clusterNav, cta: { label: 'Iniciar Proyecto', href: '/formulario' } };
+
+// ── Opciones (value EXACTO = contrato con la DB; label = lo que ve el cliente) ──
+const googleBusiness = [{ v: 'si', l: 'Sí, tengo' }, { v: 'no', l: 'No tengo' }, { v: 'noSe', l: 'No sé' }];
+const websiteType = [
+  { v: 'landing', l: 'Landing Page' }, { v: 'corporativo', l: 'Sitio Corporativo' },
+  { v: 'ecommerce', l: 'E-Commerce / Tienda' }, { v: 'portfolio', l: 'Portafolio' },
+  { v: 'reservas', l: 'Sistema de Reservas' }, { v: 'blog', l: 'Blog / Contenido' }, { v: 'otro', l: 'Otro' },
+];
+const hasDomain = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No' }];
+const hasHosting = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No' }, { v: 'noSe', l: 'No sé' }];
+const pagesRequired = [
+  'Inicio (Home)', 'Sobre Nosotros', 'Servicios / Productos', 'Galería / Portafolio',
+  'Testimonios / Reseñas', 'Blog / Noticias', 'Precios / Paquetes', 'Formulario de Contacto',
+  'Reservas / Citas', 'Tienda Online', 'FAQ', 'Mapa / Ubicación',
+];
+const featuresRequired = [
+  { v: 'Chatbot / IA', l: 'Chatbot / IA' }, { v: 'Chat en vivo', l: 'Chat en vivo' },
+  { v: 'Carrito de compras', l: 'Carrito de compras' }, { v: 'Pasarela de pago', l: 'Pasarela de pago' },
+  { v: 'Formularios personalizados', l: 'Formularios personalizados' }, { v: 'Portal de clientes', l: 'Portal de clientes' },
+  { v: 'Integración WhatsApp', l: 'Integración WhatsApp' }, { v: 'SEO optimizado', l: 'SEO optimizado' },
+  { v: 'Multilenguaje', l: 'Multilenguaje (ES/EN)' }, { v: 'Integración redes sociales', l: 'Integración redes sociales' },
+  { v: 'CRM / Email Marketing', l: 'CRM / Email Marketing' }, { v: 'Google Analytics', l: 'Google Analytics' },
+];
+const hasLogo = [{ v: 'si', l: 'Sí, tengo logo' }, { v: 'no', l: 'Necesito logo' }, { v: 'update', l: 'Quiero renovarlo' }];
+const brandPersonality = [
+  { v: 'luxury', l: 'Lujo / Premium' }, { v: 'moderno', l: 'Moderno / Tech' }, { v: 'amigable', l: 'Amigable / Cálido' },
+  { v: 'profesional', l: 'Profesional' }, { v: 'minimalista', l: 'Minimalista' }, { v: 'creativo', l: 'Creativo / Atrevido' },
+];
+const hasPhotos = [{ v: 'si', l: 'Sí, tengo fotos' }, { v: 'pocas', l: 'Tengo pocas' }, { v: 'no', l: 'No tengo' }];
+const hasCopy = [{ v: 'si', l: 'Sí, tengo textos' }, { v: 'parcial', l: 'Algunos' }, { v: 'no', l: 'No, necesito apoyo' }];
+const hasVideo = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No' }];
+const language = [{ v: 'es', l: 'Solo español' }, { v: 'en', l: 'Solo inglés' }, { v: 'biling', l: 'Bilingüe' }];
+const budgetRange = [
+  { v: '500-1000', l: '$500 – $1,000' }, { v: '1000-2500', l: '$1,000 – $2,500' },
+  { v: '2500-5000', l: '$2,500 – $5,000' }, { v: '5000+', l: '$5,000+' }, { v: 'noSe', l: 'No sé aún' },
+];
+const timeline = [
+  { v: 'urgente', l: 'ASAP (urgente)' }, { v: '2-4sem', l: '2 – 4 semanas' },
+  { v: '1-2mes', l: '1 – 2 meses' }, { v: 'flexible', l: 'Soy flexible' },
+];
+const referredBy = [
+  { v: 'instagram', l: 'Instagram' }, { v: 'facebook', l: 'Facebook' }, { v: 'google', l: 'Google' },
+  { v: 'referido', l: 'Recomendación' }, { v: 'otro', l: 'Otro' },
+];
+const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }];
+---
+<Layout
+  title="Brief de Cliente — Marcyan Studio"
+  description="Cuéntanos sobre tu negocio para diseñar una propuesta personalizada. Diseño web, IA y SEO en Houston y Miami."
+  lang="es"
+  path="/formulario"
+  canonical="https://marcyanstudio.com/formulario"
+  hasEn={false}
+  noindex={true}
+>
+  <SiteNav nav={pageNav} lang="es" homeHref="/es/" />
+
+  <main id="main" class="brief">
+    <div class="container brief__inner">
+      <header class="brief__head">
+        <Kicker>Brief de Cliente</Kicker>
+        <h1 class="h1">Cuéntanos sobre tu <em>proyecto</em></h1>
+        <p class="lead">Esta plantilla nos permite conocer tu negocio a fondo para diseñar una presencia digital que refleje tu identidad, conecte con tu audiencia y genere resultados reales. Complétala con la mayor precisión posible.</p>
+        <p class="brief__date" data-brief-date></p>
+      </header>
+
+      <form id="brief-form" class="brief__form" novalidate autocomplete="on">
+        <!-- Honeypot anti-spam (oculto; solo bots lo llenan) -->
+        <input type="text" name="website_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <!-- ═══ 01 · INFORMACIÓN DEL NEGOCIO ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">01</span><h2 class="brief-sec__title">Información del negocio</h2></header>
+          <div class="brief-grid">
+            <label class="field">
+              <span class="field__lbl">Nombre del negocio</span>
+              <input type="text" name="business_name" placeholder="Nombre legal o comercial" autocomplete="organization" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Nombre del propietario / contacto principal</span>
+              <input type="text" name="owner_name" placeholder="Nombre completo" autocomplete="name" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Industria / Rubro</span>
+              <input type="text" name="industry" placeholder="Ej: Restaurante, Salud, Moda, Consultoría…" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Años en el mercado</span>
+              <input type="text" name="years_in_market" placeholder="Ej: 2 años, recién iniciando…" />
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">Descripción del negocio (¿qué hacen y para quién?)</span>
+              <textarea name="business_description" rows="4" placeholder="Describe brevemente tu negocio, propuesta de valor y qué te diferencia de la competencia…"></textarea>
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">Productos / Servicios principales</span>
+              <textarea name="products_services" rows="3" placeholder="Lista los servicios o productos que ofreces. Ej: consultoría financiera, venta de ropa, diseño de interiores…"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ═══ 02 · CONTACTO E INFORMACIÓN DIGITAL ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">02</span><h2 class="brief-sec__title">Contacto e información digital</h2></header>
+          <div class="brief-grid">
+            <label class="field">
+              <span class="field__lbl">Teléfono</span>
+              <input type="tel" name="phone" placeholder="+1 (___) ___-____" autocomplete="tel" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Correo electrónico</span>
+              <input type="email" name="email" placeholder="correo@negocio.com" autocomplete="email" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Ciudad / Estado</span>
+              <input type="text" name="city_state" placeholder="Ej: Houston, TX" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Página web actual (si tiene)</span>
+              <input type="url" name="current_website" placeholder="https://www.mipagina.com" autocomplete="url" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Instagram</span>
+              <input type="text" name="instagram" placeholder="@usuario" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Facebook</span>
+              <input type="text" name="facebook" placeholder="facebook.com/negocio" />
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">Otras redes (TikTok, LinkedIn, YouTube…)</span>
+              <input type="text" name="other_socials" placeholder="@usuario / enlace" />
+            </label>
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">Google Business Profile</legend>
+              <div class="pills">
+                {googleBusiness.map((o) => (
+                  <label class="pill"><input type="radio" name="google_business" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- ═══ 03 · TIPO DE SITIO ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">03</span><h2 class="brief-sec__title">Tipo de sitio web</h2></header>
+          <div class="brief-grid">
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">¿Qué tipo de sitio necesita? (selecciona el que mejor aplique)</legend>
+              <div class="pills">
+                {websiteType.map((o) => (
+                  <label class="pill"><input type="radio" name="website_type" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene dominio (URL) propio?</legend>
+              <div class="pills">
+                {hasDomain.map((o) => (
+                  <label class="pill"><input type="radio" name="has_domain" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene hosting / servidor?</legend>
+              <div class="pills">
+                {hasHosting.map((o) => (
+                  <label class="pill"><input type="radio" name="has_hosting" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">¿Qué páginas / secciones debe incluir el sitio?</legend>
+              <div class="checks">
+                {pagesRequired.map((v) => (
+                  <label class="check"><input type="checkbox" name="pages_required" value={v} /><span>{v}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">Funcionalidades especiales requeridas</legend>
+              <div class="checks">
+                {featuresRequired.map((o) => (
+                  <label class="check"><input type="checkbox" name="features_required" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- ═══ 04 · AUDIENCIA Y OBJETIVOS ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">04</span><h2 class="brief-sec__title">Audiencia y objetivos</h2></header>
+          <div class="brief-grid">
+            <label class="field">
+              <span class="field__lbl">¿A quién va dirigido el negocio?</span>
+              <textarea name="target_audience" rows="3" placeholder="Describe tu cliente ideal: edad, género, nivel económico, idioma, ubicación…"></textarea>
+            </label>
+            <label class="field">
+              <span class="field__lbl">¿Cuál es el principal objetivo del sitio web?</span>
+              <textarea name="main_objective" rows="3" placeholder="Ej: generar ventas, captar leads, dar información, reservas en línea, posicionamiento de marca…"></textarea>
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">¿Qué acción deseas que haga el visitante al entrar al sitio?</span>
+              <input type="text" name="visitor_action" placeholder="Ej: que llame, que compre, que llene un formulario, que reserve una cita…" />
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">¿Quiénes son tus principales competidores? (links si los tienes)</span>
+              <textarea name="competitors" rows="3" placeholder="Ej: www.competidor1.com — Los diferencia el precio / www.competidor2.com — Tienen mejor servicio…"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ═══ 05 · IDENTIDAD DE MARCA ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">05</span><h2 class="brief-sec__title">Identidad de marca</h2></header>
+          <div class="brief-grid">
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene logotipo?</legend>
+              <div class="pills">
+                {hasLogo.map((o) => (
+                  <label class="pill"><input type="radio" name="has_logo" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <label class="field">
+              <span class="field__lbl">Colores de marca (si tiene)</span>
+              <input type="text" name="brand_colors" placeholder="Ej: azul marino #1A2B6D, dorado #C8A96E…" />
+            </label>
+            <label class="field">
+              <span class="field__lbl">Tipografías / fuentes actuales (si tiene)</span>
+              <input type="text" name="brand_fonts" placeholder="Ej: Montserrat, Times New Roman, no sé…" />
+            </label>
+            <fieldset class="field-set">
+              <legend class="field__lbl">Personalidad de marca</legend>
+              <div class="pills">
+                {brandPersonality.map((o) => (
+                  <label class="pill"><input type="radio" name="brand_personality" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <label class="field brief-span-2">
+              <span class="field__lbl">Sitios web de referencia o inspiración (links)</span>
+              <textarea name="inspiration_sites" rows="3" placeholder="Comparte 2 o 3 sitios que te gusten y por qué. Ej: www.apple.com — me gusta su simplicidad y elegancia…"></textarea>
+            </label>
+            <label class="field brief-span-2">
+              <span class="field__lbl">¿Qué NO te gusta en diseño web? (colores, estilos, elementos a evitar)</span>
+              <textarea name="design_dislikes" rows="3" placeholder="Ej: no me gustan los diseños recargados, fondos oscuros, muchas animaciones…"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- ═══ 06 · CONTENIDO ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">06</span><h2 class="brief-sec__title">Contenido del sitio</h2></header>
+          <div class="brief-grid">
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene fotos / imágenes del negocio?</legend>
+              <div class="pills">
+                {hasPhotos.map((o) => (
+                  <label class="pill"><input type="radio" name="has_photos" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene textos / copywriting redactados?</legend>
+              <div class="pills">
+                {hasCopy.map((o) => (
+                  <label class="pill"><input type="radio" name="has_copy" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Tiene videos o material audiovisual?</legend>
+              <div class="pills">
+                {hasVideo.map((o) => (
+                  <label class="pill"><input type="radio" name="has_video" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">Idioma(s) del sitio web</legend>
+              <div class="pills">
+                {language.map((o) => (
+                  <label class="pill"><input type="radio" name="language" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- ═══ 07 · PRESUPUESTO Y TIEMPO ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">07</span><h2 class="brief-sec__title">Presupuesto y tiempo de entrega</h2></header>
+          <div class="brief-grid">
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">Rango de inversión estimada</legend>
+              <div class="pills">
+                {budgetRange.map((o) => (
+                  <label class="pill"><input type="radio" name="budget_range" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set brief-span-2">
+              <legend class="field__lbl">¿Para cuándo necesita el sitio listo?</legend>
+              <div class="pills">
+                {timeline.map((o) => (
+                  <label class="pill"><input type="radio" name="timeline" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <label class="field brief-span-2">
+              <span class="field__lbl">Fecha límite importante (evento, lanzamiento, etc.)</span>
+              <input type="text" name="deadline" placeholder="Ej: inauguración 15 de mayo, Black Friday, lanzamiento de producto…" />
+            </label>
+          </div>
+        </section>
+
+        <!-- ═══ 08 · NOTAS ═══ -->
+        <section class="brief-sec">
+          <header class="brief-sec__head"><span class="brief-sec__num">08</span><h2 class="brief-sec__title">Notas adicionales</h2></header>
+          <div class="brief-grid">
+            <label class="field brief-span-2">
+              <span class="field__lbl">¿Hay algo más que debamos saber sobre tu negocio o proyecto?</span>
+              <textarea name="additional_notes" rows="4" placeholder="Cuéntanos todo lo que consideres importante: contexto especial, restricciones, ideas, preguntas que tengas…"></textarea>
+            </label>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Cómo se enteró de Marcyan?</legend>
+              <div class="pills">
+                {referredBy.map((o) => (
+                  <label class="pill"><input type="radio" name="referred_by" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset class="field-set">
+              <legend class="field__lbl">¿Ha trabajado antes con una agencia de diseño web?</legend>
+              <div class="pills">
+                {previousAgency.map((o) => (
+                  <label class="pill"><input type="radio" name="previous_agency" value={o.v} /><span>{o.l}</span></label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- ═══ SUBMIT ═══ -->
+        <div class="brief-submit-bar">
+          <button type="submit" class="brief-submit" id="brief-submit">
+            <span class="brief-submit__label">Enviar Brief</span>
+            <span class="brief-submit__loading">Enviando…</span>
+          </button>
+        </div>
+
+        <div class="brief-result brief-result--ok" id="brief-success" hidden role="status" aria-live="polite">
+          <p class="brief-result__title">¡Brief recibido!</p>
+          <p>Tu brief fue registrado con el ID <strong id="brief-success-id">MRC-XXX</strong>. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+        </div>
+        <div class="brief-result brief-result--err" id="brief-error" hidden role="alert" aria-live="assertive">
+          <p id="brief-error-msg">Hubo un error al enviar el formulario. Intenta de nuevo.</p>
+        </div>
+      </form>
+
+      <p class="brief__note">Tu información es completamente confidencial. Este brief nos permite crear una propuesta personalizada sin compromisos. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+    </div>
+  </main>
+
+  <SiteFooter footer={content.es.footer} />
+</Layout>
+
+<style>
+  .brief em { color: var(--accent-gold); font-style: normal; }
+  .brief__inner { max-width: 920px; }
+  .brief__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8); }
+  .brief__head .lead { max-width: 64ch; }
+  .brief__date {
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  }
+  .brief__note {
+    margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--border-subtle);
+    color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-loose); max-width: 64ch;
+  }
+
+  .brief__form { display: flex; flex-direction: column; gap: var(--space-8); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  /* ── Sección ── */
+  .brief-sec {
+    display: flex; flex-direction: column; gap: var(--space-5);
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6); min-width: 0;
+  }
+  .brief-sec__head {
+    display: flex; align-items: baseline; gap: var(--space-3);
+    padding-bottom: var(--space-3); border-bottom: 1px solid var(--border);
+  }
+  .brief-sec__num { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); flex: 0 0 auto; }
+  /* min-width:0 → el título envuelve en móvil en vez de desbordar (causa raíz scroll-x). */
+  .brief-sec__title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; color: var(--fg-primary); min-width: 0; }
+
+  .brief-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  .brief-span-2 { grid-column: 1 / -1; }
+
+  /* ── Campos (alineado con Contact.astro) ── */
+  .field, .field-set { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+  .field-set { border: 0; padding: 0; margin: 0; }
+  .field__lbl {
+    font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600;
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
+  }
+  legend.field__lbl { padding: 0; margin-bottom: var(--space-1); }
+
+  .field input, .field textarea {
+    width: 100%; min-width: 0; min-height: var(--tap-min);
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md);
+    color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-base);
+    padding: 11px 14px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  .field textarea { resize: vertical; min-height: 96px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--fg-subtle); }
+  .field input:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim);
+  }
+
+  /* ── Radios tipo pill ── */
+  .pills { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .pill {
+    position: relative; display: inline-flex; align-items: center; min-height: var(--tap-min);
+    padding: var(--space-2) var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--text-sm);
+    cursor: pointer; transition: border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
+  }
+  .pill input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+  .pill:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .pill:has(input:checked) {
+    border-color: var(--accent-gold); background: var(--accent-gold-dim); color: var(--fg-primary);
+  }
+  .pill:has(input:focus-visible) { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+
+  /* ── Checkboxes (grid) ── */
+  .checks { display: grid; grid-template-columns: 1fr; gap: var(--space-2); }
+  .check {
+    display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap-min);
+    padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--text-sm);
+    cursor: pointer; transition: border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
+  }
+  .check input { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--accent-gold); cursor: pointer; }
+  .check:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .check:has(input:checked) { border-color: var(--accent-gold-line); background: var(--accent-gold-dim); color: var(--fg-primary); }
+  .check:has(input:focus-visible) { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+
+  /* ── Submit ── */
+  .brief-submit-bar { display: flex; }
+  .brief-submit {
+    width: 100%; min-height: var(--tap-min); padding: 14px 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent-gold); color: var(--fg-inverse);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-base);
+    border-radius: var(--radius-md); cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base), transform var(--duration-fast);
+  }
+  .brief-submit:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }
+  .brief-submit:active { transform: scale(0.99); }
+  .brief-submit:disabled { opacity: 0.7; cursor: default; }
+  .brief-submit__loading { display: none; }
+  .brief-submit.is-loading .brief-submit__label { display: none; }
+  .brief-submit.is-loading .brief-submit__loading { display: inline; }
+
+  /* ── Mensajes ── */
+  .brief-result { padding: var(--space-5); border-radius: var(--radius-md); font-size: var(--text-sm); }
+  .brief-result__title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; margin-bottom: var(--space-2); }
+  .brief-result :global(strong) { font-weight: 600; }
+  .brief-result--ok { background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal); }
+  .brief-result--ok :global(strong) { color: var(--fg-primary); }
+  .brief-result--err { background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); color: #e07a7a; }
+
+  @media (--sm) {
+    .brief-grid { grid-template-columns: 1fr 1fr; }
+    .checks { grid-template-columns: 1fr 1fr; }
+  }
+  @media (--md) {
+    .brief-sec { padding: var(--space-7); }
+    .checks { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  @media (--motion-reduce) { .brief-submit:active { transform: none; } }
+</style>
+
+<script>
+  const form = document.getElementById('brief-form') as HTMLFormElement | null;
+  if (form) {
+    // Fecha decorativa (no se envía)
+    const dateEl = document.querySelector('[data-brief-date]');
+    if (dateEl) {
+      try {
+        dateEl.textContent =
+          'Brief · ' + new Intl.DateTimeFormat('es', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
+      } catch (_) { /* ignore */ }
+    }
+
+    const button = document.getElementById('brief-submit') as HTMLButtonElement | null;
+    const success = document.getElementById('brief-success') as HTMLElement | null;
+    const successId = document.getElementById('brief-success-id') as HTMLElement | null;
+    const errorBox = document.getElementById('brief-error') as HTMLElement | null;
+    const errorMsg = document.getElementById('brief-error-msg') as HTMLElement | null;
+
+    // Campos cuyo name representa un array (checkbox groups). DEBE coincidir con api/brief.mjs.
+    const ARRAY_FIELDS = new Set(['pages_required', 'features_required']);
+
+    function collect() {
+      const fd = new FormData(form as HTMLFormElement);
+      const data: Record<string, any> = {};
+      for (const [key, value] of fd.entries()) {
+        if (ARRAY_FIELDS.has(key)) {
+          if (!Array.isArray(data[key])) data[key] = [];
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      }
+      for (const f of ARRAY_FIELDS) if (!Array.isArray(data[f])) data[f] = [];
+      return data;
+    }
+
+    function validate(data: Record<string, any>) {
+      const email = (data.email || '').trim();
+      const phone = (data.phone || '').trim();
+      if (!email && !phone) return 'Necesitamos al menos un email o un teléfono para contactarte.';
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'El correo electrónico no parece válido.';
+      return null;
+    }
+
+    function showError(msg: string) {
+      if (success) success.hidden = true;
+      if (errorBox && errorMsg) {
+        errorMsg.textContent = msg || 'Hubo un error al enviar el formulario. Intenta de nuevo.';
+        errorBox.hidden = false;
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function setLoading(on: boolean) {
+      if (!button) return;
+      button.disabled = on;
+      button.classList.toggle('is-loading', on);
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if (success) success.hidden = true;
+      if (errorBox) errorBox.hidden = true;
+
+      const data = collect();
+      if (data.website_hp) return; // honeypot
+
+      const err = validate(data);
+      if (err) { showError(err); return; }
+
+      setLoading(true);
+      try {
+        const res = await fetch('/api/brief', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        let payload: any = null;
+        try { payload = await res.json(); } catch (_) { /* ignore */ }
+
+        if (!res.ok || !payload || !payload.ok) {
+          showError((payload && payload.error) || 'No pudimos procesar el envío. Intenta de nuevo en un momento.');
+          setLoading(false);
+          return;
+        }
+
+        // Éxito — mostrar mensaje y bloquear el form
+        if (errorBox) errorBox.hidden = true;
+        if (success) {
+          if (successId) successId.textContent = payload.projectId || '';
+          success.hidden = false;
+          success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        form.querySelectorAll('input, textarea, select, button').forEach((el) => {
+          (el as HTMLInputElement).disabled = true;
+        });
+      } catch (e) {
+        showError('No pudimos conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        setLoading(false);
+      }
+    });
+  }
+</script>

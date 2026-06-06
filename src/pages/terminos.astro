@@ -1,0 +1,64 @@
+---
+// /terminos — Términos del Servicio (ES-only, sin prefijo de idioma).
+// Re-vestida al DS v2. Contenido honesto portado de public/terminos.html.
+import Layout from '../layouts/Layout.astro';
+import SiteNav from '../components/layout/SiteNav.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import LegalDoc from '../components/sections/LegalDoc.astro';
+import { content, nap } from '../i18n/content';
+import { clusterNav } from '../i18n/clusters';
+
+const pageNav = { ...clusterNav, cta: { label: 'Iniciar Proyecto', href: '/formulario' } };
+---
+<Layout
+  title="Términos del Servicio · Marcyan Studio"
+  description="Términos y condiciones de uso del sitio y los servicios de Marcyan Studio: diseño web, IA y SEO en Houston y Miami."
+  lang="es"
+  path="/terminos"
+  canonical="https://marcyanstudio.com/terminos"
+  hasEn={false}
+>
+  <SiteNav nav={pageNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LegalDoc title="Términos del Servicio" updated="6 de junio de 2026">
+      <h2>1. Aceptación de los términos</h2>
+      <p>Al acceder y utilizar el sitio <a href="https://marcyanstudio.com">marcyanstudio.com</a> aceptas estos Términos del Servicio. Si no estás de acuerdo con ellos, te pedimos que no utilices el sitio.</p>
+
+      <h2>2. Quiénes somos</h2>
+      <p><strong>Marcyan Studio</strong> es una agencia que ofrece servicios de diseño y desarrollo web, inteligencia artificial aplicada, comercio electrónico, SEO, SEO local y branding, con cobertura en Houston, TX y Miami, FL.</p>
+
+      <h2>3. Uso del sitio</h2>
+      <p>Te comprometes a usar el sitio de forma lícita y a no realizar actividades que puedan dañarlo, interrumpirlo o comprometer su seguridad, ni a extraer datos de forma automatizada y abusiva. Nos reservamos el derecho de restringir el acceso ante un uso indebido.</p>
+
+      <h2>4. Propiedad intelectual</h2>
+      <p>El contenido del sitio —textos, diseño, gráficos, logotipo y marca <strong>Marcyan Studio</strong>— es de nuestra propiedad o se usa con licencia, y está protegido por las leyes aplicables. No puedes reproducirlo ni reutilizarlo sin nuestra autorización previa por escrito.</p>
+
+      <h2>5. Formularios y comunicaciones</h2>
+      <p>La información que nos envías a través de los formularios debe ser veraz y actual. Enviar un formulario o solicitud nos permite contactarte, pero <strong>no crea por sí mismo una relación contractual de servicios</strong>: cualquier proyecto se rige por un acuerdo o propuesta aceptada por separado.</p>
+
+      <h2>6. Propuestas, precios y servicios</h2>
+      <p>Los precios y rangos que publicamos en el sitio son <strong>orientativos</strong> y pueden variar según el alcance de cada proyecto. Las propuestas y cotizaciones no son vinculantes hasta que ambas partes las acepten formalmente. Nos reservamos el derecho de modificar o descontinuar servicios.</p>
+
+      <h2>7. Enlaces a terceros</h2>
+      <p>El sitio puede incluir enlaces a sitios de terceros. No controlamos ni nos hacemos responsables de su contenido ni de sus prácticas de privacidad.</p>
+
+      <h2>8. Garantías y limitación de responsabilidad</h2>
+      <p>El sitio se ofrece «tal cual» y «según disponibilidad», sin garantías de ningún tipo. En la medida en que lo permita la ley, Marcyan Studio no será responsable por daños indirectos, incidentales o consecuentes derivados del uso del sitio.</p>
+
+      <h2>9. Indemnización</h2>
+      <p>Aceptas mantener indemne a Marcyan Studio frente a reclamaciones derivadas de tu uso indebido del sitio o del incumplimiento de estos términos.</p>
+
+      <h2>10. Ley aplicable</h2>
+      <p>Estos términos se rigen por las leyes del estado de Texas, Estados Unidos, sin perjuicio de las normas de protección al consumidor que resulten obligatorias en tu lugar de residencia.</p>
+
+      <h2>11. Cambios en los términos</h2>
+      <p>Podemos actualizar estos términos en cualquier momento. La versión vigente, con su fecha, estará siempre publicada en esta página.</p>
+
+      <h2>12. Contacto</h2>
+      <p>¿Dudas sobre estos términos? Escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+    </LegalDoc>
+  </main>
+
+  <SiteFooter footer={content.es.footer} />
+</Layout>

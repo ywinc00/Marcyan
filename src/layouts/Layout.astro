@@ -39,7 +39,9 @@ const {
 
 const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;
 const canon = canonical ?? `${SITE}/${lang}${clean}/`;
-const esHref = `${SITE}/es${clean}/`;
+// Páginas SIN prefijo de idioma (legales, formulario) pasan `canonical` explícito:
+// el hreflang es/x-default debe apuntar a ESA URL, no a la auto /es/{path}/ (sería 404).
+const esHref = canonical ?? `${SITE}/es${clean}/`;
 const enHref = `${SITE}/en${clean}/`;
 const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
 

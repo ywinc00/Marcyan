@@ -22,15 +22,11 @@ export default defineConfig({
     // · NO usamos la opción i18n: las landings de cluster son solo-ES por ahora;
     //   el hreflang lo emite cada página en su <head> (Layout). Así evitamos
     //   alternates /en/… que aún devuelven 404.
-    // · filter: fuera la galería interna /kit (noindex).
-    // · customPages: páginas estáticas servidas desde public/ (no son rutas Astro).
+    // · filter: fuera la galería interna /kit y el /formulario (ambos noindex).
+    // · /privacidad y /terminos ya son páginas Astro (src/pages/*.astro) → el
+    //   sitemap las incluye solo; por eso ya NO van en customPages (evita duplicar).
     sitemap({
-      filter: (page) => !page.includes('/kit'),
-      customPages: [
-        'https://marcyanstudio.com/formulario',
-        'https://marcyanstudio.com/privacidad',
-        'https://marcyanstudio.com/terminos',
-      ],
+      filter: (page) => !page.includes('/kit') && !page.includes('/formulario'),
     }),
   ],
   trailingSlash: 'ignore',

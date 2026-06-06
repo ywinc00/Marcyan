@@ -1,0 +1,63 @@
+---
+// Documento legal (Privacidad / Términos) — prosa legible con tokens DS v2.
+// El cuerpo llega por <slot> (h2/p/ul/a/strong); sus estilos van como :global
+// ACOTADO bajo .legal-doc__prose (el CSS scopeado de Astro no alcanza al slot).
+import Kicker from '../ui/Kicker.astro';
+
+interface Props {
+  /** Eyebrow (mono). */
+  eyebrow?: string;
+  title: string;
+  /** Texto de "Última actualización". */
+  updated: string;
+  updatedLabel?: string;
+}
+const { eyebrow = 'Legal', title, updated, updatedLabel = 'Última actualización' } = Astro.props;
+---
+<section class="section legal-doc">
+  <div class="container legal-doc__inner">
+    <Kicker>{eyebrow}</Kicker>
+    <h1 class="h1 legal-doc__title">{title}</h1>
+    <p class="legal-doc__updated">{updatedLabel}: {updated}</p>
+    <div class="legal-doc__prose">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .legal-doc__inner { display: flex; flex-direction: column; gap: var(--space-4); }
+  .legal-doc__title { margin-top: var(--space-2); }
+  .legal-doc__updated {
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  }
+
+  .legal-doc__prose { max-width: 72ch; margin-top: var(--space-5); }
+
+  /* El cuerpo se inyecta por slot → estilar con :global acotado al wrapper. */
+  .legal-doc__prose :global(h2) {
+    font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug);
+    margin-top: var(--space-7); margin-bottom: var(--space-3);
+  }
+  .legal-doc__prose :global(h2:first-child) { margin-top: 0; }
+  .legal-doc__prose :global(p) {
+    color: var(--fg-secondary); font-size: var(--text-md);
+    line-height: var(--leading-loose); margin-bottom: var(--space-4);
+  }
+  .legal-doc__prose :global(ul) {
+    margin: 0 0 var(--space-4); padding-left: var(--space-5);
+    display: flex; flex-direction: column; gap: var(--space-2);
+  }
+  .legal-doc__prose :global(li) {
+    color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose);
+  }
+  .legal-doc__prose :global(li)::marker { color: var(--accent-gold); }
+  .legal-doc__prose :global(strong) { color: var(--fg-primary); font-weight: 600; }
+  .legal-doc__prose :global(a) {
+    color: var(--accent-teal); overflow-wrap: anywhere;
+    transition: color var(--duration-fast); text-decoration-color: var(--accent-teal-line);
+  }
+  .legal-doc__prose :global(a:hover) { color: var(--fg-primary); text-decoration: underline; }
+</style>

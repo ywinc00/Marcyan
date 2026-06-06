@@ -92,6 +92,7 @@ export const content = {
         { icon: 'lucide:messages-square', title: 'Asistentes conversacionales', desc: 'Asistentes de chat que atienden a tus clientes, califican prospectos y agendan citas las 24 horas, en su idioma.' },
         { icon: 'lucide:workflow', title: 'Automatizaciones', desc: 'Conectamos tu sitio con las herramientas que ya usas, para que los nuevos prospectos, avisos y seguimientos ocurran solos.' },
       ],
+      cta: { label: 'Ver IA para tu negocio', href: '/es/ia-para-pymes' },
     },
 
     process: {
@@ -133,8 +134,15 @@ export const content = {
       tag: 'Nuestras Ciudades',
       title: 'Presentes donde<br>tu negocio <em>crece</em>',
       items: [
-        { city: 'Houston', state: 'TX', badge: 'Área de servicio', area: 'Houston y toda el área metropolitana', tel: nap.houston },
-        { city: 'Miami', state: 'FL', badge: 'Área de servicio', area: 'Miami y toda el área metropolitana', tel: nap.miami },
+        { city: 'Houston', state: 'TX', badge: 'Área de servicio', area: 'Houston y toda el área metropolitana', tel: nap.houston,
+          links: [
+            { label: 'SEO local en Houston', href: '/es/houston/seo-local' },
+            { label: 'Diseño web en Houston', href: '/es/houston/diseno-web' },
+          ] },
+        { city: 'Miami', state: 'FL', badge: 'Área de servicio', area: 'Miami y toda el área metropolitana', tel: nap.miami,
+          links: [
+            { label: 'Diseño web en Miami', href: '/es/miami/diseno-web' },
+          ] },
       ],
     },
 
@@ -163,21 +171,22 @@ export const content = {
       tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
       cols: [
         { title: 'Servicios', links: [
-          { label: 'Diseño Web', href: '#servicios' },
-          { label: 'E-Commerce', href: '#servicios' },
-          { label: 'IA Conversacional', href: '#ia' },
-          { label: 'SEO con IA', href: '#servicios' },
-          { label: 'Branding', href: '#servicios' },
+          { label: 'Diseño Web', href: '/es/#servicios' },
+          { label: 'E-Commerce', href: '/es/#servicios' },
+          { label: 'IA para Negocios', href: '/es/ia-para-pymes' },
+          { label: 'SEO con IA', href: '/es/#servicios' },
+          { label: 'Branding', href: '/es/#servicios' },
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [
-          { label: 'Proyectos', href: '#proyectos' },
+          { label: 'Proyectos', href: '/es/#proyectos' },
           { label: 'Privacidad', href: '/privacidad' },
           { label: 'Términos', href: '/terminos' },
         ] },
         { title: 'Ciudades', links: [
-          { label: 'Houston TX', href: '#ciudades' },
-          { label: 'Miami FL', href: '#ciudades' },
+          { label: 'SEO Local · Houston', href: '/es/houston/seo-local' },
+          { label: 'Diseño Web · Houston', href: '/es/houston/diseno-web' },
+          { label: 'Diseño Web · Miami', href: '/es/miami/diseno-web' },
         ] },
       ],
       legal: [

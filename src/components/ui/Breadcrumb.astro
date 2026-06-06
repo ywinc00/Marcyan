@@ -1,0 +1,45 @@
+---
+// Migas de pan accesibles + JSON-LD BreadcrumbList co-localizado.
+// El último item es la página actual (sin enlace, aria-current="page").
+import Icon from './Icon.astro';
+import { breadcrumbList, type CrumbItem } from '../../lib/schema';
+
+interface Props {
+  items: CrumbItem[];
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { items, lang = 'es', class: cls } = Astro.props;
+const label = lang === 'es' ? 'Migas de pan' : 'Breadcrumb';
+const ld = breadcrumbList(items);
+---
+<nav class:list={['crumbs', cls]} aria-label={label}>
+  <ol>
+    {items.map((it, i) => (
+      <li>
+        {i < items.length - 1
+          ? <a href={it.path}>{it.name}</a>
+          : <span aria-current="page">{it.name}</span>}
+        {i < items.length - 1 && (
+          <Icon name="lucide:chevron-right" class="crumbs__sep" />
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />
+
+<style>
+  .crumbs ol {
+    list-style: none; display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--space-1) var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+  }
+  .crumbs li { display: inline-flex; align-items: center; gap: var(--space-1); min-width: 0; }
+  .crumbs a { color: var(--fg-secondary); transition: color var(--duration-fast); overflow-wrap: anywhere; }
+  .crumbs a:hover { color: var(--accent-gold); }
+  .crumbs [aria-current="page"] { color: var(--fg-primary); overflow-wrap: anywhere; }
+  .crumbs__sep { width: 13px; height: 13px; color: var(--fg-subtle); flex: 0 0 auto; }
+</style>

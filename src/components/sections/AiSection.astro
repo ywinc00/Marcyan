@@ -3,6 +3,7 @@
 // Layout: intro (sticky en desktop) + 4 features.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
+import Button from '../ui/Button.astro';
 
 interface Props { ai: any }
 const { ai } = Astro.props;
@@ -13,6 +14,9 @@ const { ai } = Astro.props;
       <Kicker tone="teal">{ai.tag}</Kicker>
       <h2 class="h2" set:html={ai.title} />
       <p class="lead">{ai.desc}</p>
+      {ai.cta && (
+        <Button href={ai.cta.href} variant="teal" size="md" class="ai__cta">{ai.cta.label}</Button>
+      )}
     </div>
     <ul class="ai__features">
       {ai.features.map((f: any) => (
@@ -31,7 +35,8 @@ const { ai } = Astro.props;
 <style>
   .ai :global(em) { color: var(--accent-teal); font-style: normal; }
   .ai__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-7); }
-  .ai__intro { display: flex; flex-direction: column; gap: var(--space-4); }
+  .ai__intro { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+  .ai__cta { margin-top: var(--space-2); }
   .ai__features { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
   .ai__feature { display: flex; gap: var(--space-4); align-items: flex-start; min-width: 0; }
   .ai__feature-icon {

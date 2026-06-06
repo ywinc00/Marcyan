@@ -1,0 +1,85 @@
+---
+// Hero de landing de cluster (servicio+ciudad / wedge). Enfocado y ligero:
+// badge de ciudad + H1 con keyword + subtítulo de dolor/beneficio + 1-2 CTA.
+// Sin motor planetario (eso es solo la home); aquí, acento de gradiente estático.
+// tone: gold (servicios/ciudad) | teal (IA).
+import Badge from '../ui/Badge.astro';
+import Button from '../ui/Button.astro';
+import Kicker from '../ui/Kicker.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  badge?: string;
+  badgeIcon?: string;
+  kicker?: string;
+  h1: string;
+  sub: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+  chips?: string[];
+  tone?: 'gold' | 'teal';
+}
+const { badge, badgeIcon, kicker, h1, sub, primary, secondary, chips = [], tone = 'gold' } = Astro.props;
+---
+<section class:list={['l-hero', `l-hero--${tone}`]}>
+  <div class="container l-hero__inner">
+    <slot name="breadcrumb" />
+    {badge && (
+      <Badge variant={tone}>
+        {badgeIcon && <Icon name={badgeIcon} />}
+        {badge}
+      </Badge>
+    )}
+    {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
+    <h1 class="display l-hero__h1" set:html={h1} />
+    <p class="lead l-hero__sub">{sub}</p>
+    <div class="l-hero__cta">
+      <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
+      {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
+    </div>
+    {chips.length > 0 && (
+      <ul class="l-hero__chips" aria-label="Garantías">
+        {chips.map((ch) => (
+          <li><Icon name="lucide:check" /> {ch}</li>
+        ))}
+      </ul>
+    )}
+  </div>
+</section>
+
+<style>
+  .l-hero {
+    position: relative; isolation: isolate; overflow: hidden;
+    padding-block: calc(var(--nav-h) + var(--space-8)) var(--section-gap);
+  }
+  .l-hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(70% 90% at 85% 0%, var(--glow), transparent 60%),
+      radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, var(--accent-teal), transparent 90%), transparent 55%);
+  }
+  .l-hero--gold { --glow: var(--accent-gold-glow); }
+  .l-hero--teal { --glow: color-mix(in srgb, var(--accent-teal), transparent 75%); }
+  .l-hero--teal :global(.display em) { color: var(--accent-teal); font-style: normal; }
+  .l-hero--gold :global(.display em) { color: var(--accent-gold); font-style: normal; }
+
+  .l-hero__inner { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
+  .l-hero__h1 { max-width: 18ch; }
+  .l-hero__sub { max-width: 60ch; }
+  .l-hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-2); }
+
+  .l-hero__chips {
+    list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
+    margin-top: var(--space-4);
+  }
+  .l-hero__chips li {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .l-hero__chips :global(svg) { width: 15px; height: 15px; color: var(--accent-teal); flex: 0 0 auto; }
+
+  @media (--md) {
+    .l-hero__cta { gap: var(--space-4); }
+  }
+</style>

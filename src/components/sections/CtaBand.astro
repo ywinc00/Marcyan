@@ -1,0 +1,45 @@
+---
+// Banda de CTA final. Centrada, con gradiente de acento. → #contacto / /formulario.
+import Button from '../ui/Button.astro';
+
+interface Props {
+  title: string;
+  sub?: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+  tone?: 'gold' | 'teal';
+}
+const { title, sub, primary, secondary, tone = 'gold' } = Astro.props;
+---
+<section class:list={['section ctaband', `ctaband--${tone}`]}>
+  <div class="container ctaband__inner">
+    <h2 class="h2" set:html={title} />
+    {sub && <p class="lead">{sub}</p>}
+    <div class="ctaband__cta">
+      <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
+      {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ctaband :global(.h2 em) { font-style: normal; }
+  .ctaband--gold { --tint: var(--accent-gold); --glow: var(--accent-gold-glow); }
+  .ctaband--teal { --tint: var(--accent-teal); --glow: color-mix(in srgb, var(--accent-teal), transparent 78%); }
+  .ctaband :global(.h2 em) { color: var(--tint); }
+
+  .ctaband__inner {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-5);
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-xl); padding: var(--space-8) var(--space-6);
+  }
+  .ctaband__inner::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(80% 120% at 50% 0%, var(--glow), transparent 60%);
+  }
+  .ctaband__inner .lead { max-width: 56ch; }
+  .ctaband__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-2); }
+
+  @media (--md) { .ctaband__inner { padding: var(--space-9) var(--space-8); } }
+</style>

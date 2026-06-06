@@ -1,0 +1,76 @@
+---
+// Sección FAQ — acordeón nativo <details>/<summary> (accesible por teclado sin JS)
+// + JSON-LD FAQPage co-localizado. El texto del schema coincide VERBATIM con el
+// visible (requisito de Google / palanca AEO). Respuestas en texto plano.
+import Icon from '../ui/Icon.astro';
+import Kicker from '../ui/Kicker.astro';
+import { faqPage, type FaqItem } from '../../lib/schema';
+
+interface Props {
+  tag: string;
+  title: string;
+  items: FaqItem[];
+}
+const { tag, title, items } = Astro.props;
+const ld = faqPage(items);
+---
+<section class="section faq" id="faq">
+  <div class="container faq__inner">
+    <header class="faq__head">
+      <Kicker>{tag}</Kicker>
+      <h2 class="h2" set:html={title} />
+    </header>
+
+    <div class="faq__list">
+      {items.map((it) => (
+        <details class="faq__item">
+          <summary class="faq__q">
+            <span>{it.q}</span>
+            <Icon name="lucide:plus" class="faq__icon" />
+          </summary>
+          <div class="faq__a"><p>{it.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />
+
+<style>
+  .faq :global(em) { color: var(--accent-gold); font-style: normal; }
+  .faq__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-7); }
+  .faq__head { display: flex; flex-direction: column; gap: var(--space-4); }
+  .faq__list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .faq__item {
+    min-width: 0; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .faq__item[open] { border-color: var(--border-accent); }
+
+  .faq__q {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    min-height: var(--tap-min); padding: var(--space-4) var(--space-5);
+    cursor: pointer; list-style: none;
+    font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
+    color: var(--fg-primary);
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__q:hover { color: var(--accent-gold); }
+  .faq__icon {
+    flex: 0 0 auto; width: 20px; height: 20px; color: var(--accent-gold);
+    transition: transform var(--duration-base) var(--ease-out-expo);
+  }
+  .faq__item[open] .faq__icon { transform: rotate(45deg); }
+
+  .faq__a { padding: 0 var(--space-5) var(--space-5); }
+  .faq__a p { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-loose); max-width: 72ch; }
+
+  @media (--motion-reduce) { .faq__icon { transition: none; } }
+  @media (--lg) {
+    .faq__inner { grid-template-columns: 0.8fr 1.2fr; gap: var(--space-9); align-items: start; }
+    .faq__head { position: sticky; top: calc(var(--nav-h) + var(--space-5)); }
+  }
+</style>

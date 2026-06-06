@@ -1,0 +1,76 @@
+---
+// Panel de precio "desde $" + lista de lo que incluye + CTA. Publicar precios
+// reales es palanca AEO (la IA no cita números que no diste) y de confianza.
+import Icon from '../ui/Icon.astro';
+import Kicker from '../ui/Kicker.astro';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  tag: string;
+  title: string;
+  /** Precio mostrado, p.ej. "$600". */
+  price: string;
+  /** Sufijo de unidad, p.ej. "/mes" o "proyecto único". */
+  unit?: string;
+  lead?: string;
+  features: string[];
+  cta: { label: string; href: string };
+  /** Nota fina (p.ej. honestidad sobre alcance). */
+  note?: string;
+  tone?: 'gold' | 'teal';
+}
+const { tag, title, price, unit, lead, features, cta, note, tone = 'gold' } = Astro.props;
+---
+<section class:list={['section pricing', `pricing--${tone}`]}>
+  <div class="container">
+    <div class="pricing__card">
+      <div class="pricing__intro">
+        <Kicker tone={tone}>{tag}</Kicker>
+        <h2 class="h3" set:html={title} />
+        {lead && <p class="pricing__lead">{lead}</p>}
+        <p class="pricing__price">
+          <span class="pricing__from">desde</span>
+          <span class="pricing__amt">{price}</span>
+          {unit && <span class="pricing__unit">{unit}</span>}
+        </p>
+        <Button href={cta.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg" class="pricing__cta">{cta.label}</Button>
+        {note && <p class="pricing__note">{note}</p>}
+      </div>
+      <ul class="pricing__features">
+        {features.map((f) => (
+          <li><Icon name="lucide:check" /> <span>{f}</span></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing :global(.h3 em) { font-style: normal; }
+  .pricing--gold { --tint: var(--accent-gold); }
+  .pricing--teal { --tint: var(--accent-teal); }
+  .pricing :global(.h3 em) { color: var(--tint); }
+
+  .pricing__card {
+    min-width: 0; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+    padding: var(--space-6); display: grid; grid-template-columns: 1fr; gap: var(--space-6);
+  }
+  .pricing__intro { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+  .pricing__lead { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); max-width: 46ch; }
+  .pricing__price { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+  .pricing__from { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+  .pricing__amt { font-family: var(--font-display); font-size: var(--fluid-h2); font-weight: 700; color: var(--tint); line-height: 1; }
+  .pricing__unit { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary); }
+  .pricing__cta { margin-top: var(--space-1); }
+  .pricing__note { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); max-width: 50ch; }
+
+  .pricing__features { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-3); align-content: start; }
+  .pricing__features li { display: flex; align-items: flex-start; gap: var(--space-3); font-size: var(--text-sm); color: var(--fg-primary); min-width: 0; }
+  .pricing__features :global(svg) { width: 18px; height: 18px; color: var(--tint); flex: 0 0 auto; margin-top: 2px; }
+
+  @media (--sm) { .pricing__features { grid-template-columns: repeat(2, 1fr); } }
+  @media (--lg) {
+    .pricing__card { grid-template-columns: 0.9fr 1.1fr; gap: var(--space-9); padding: var(--space-8); align-items: center; }
+  }
+</style>

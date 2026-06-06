@@ -1,0 +1,8 @@
+---
+// Emite el JSON-LD Service de una landing (provider enlazado al @id de la Org).
+// Co-localizado con la página; complementa el @graph base del Layout.
+import { service, type ServiceInput } from '../../lib/schema';
+type Props = ServiceInput;
+const ld = service(Astro.props);
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

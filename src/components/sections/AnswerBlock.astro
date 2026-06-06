@@ -1,0 +1,57 @@
+---
+// Bloque "answer-first" (palanca AEO #1): H2 = pregunta literal + respuesta
+// directa de 40-60 palabras con un dato/fuente. Pensado para citarse verbatim
+// por asistentes de IA (ChatGPT/Perplexity) y para featured snippets.
+// El texto NO se duplica en schema aquí (la FAQPage vive en Faq.astro); este
+// bloque es contenido visible de alta densidad informativa.
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  q: string;
+  a: string;
+  /** Fuente del dato citado, p.ej. "Google" o "SOCi, 2026". */
+  source?: string;
+}
+const { q, a, source } = Astro.props;
+---
+<section class="section answer" aria-labelledby="answer-q">
+  <div class="container">
+    <div class="answer__card">
+      <h2 class="answer__q h3" id="answer-q">{q}</h2>
+      <p class="answer__a">{a}</p>
+      {source && (
+        <p class="answer__src">
+          <Icon name="lucide:bar-chart-3" /> <span>Fuente: {source}</span>
+        </p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .answer { padding-block: 0; }
+  .answer__card {
+    position: relative; min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6) var(--space-6) var(--space-6) var(--space-7);
+    box-shadow: var(--shadow-card);
+  }
+  .answer__q { margin-bottom: var(--space-4); }
+  .answer__a {
+    font-family: var(--font-body); font-size: var(--fluid-lead);
+    line-height: var(--leading-loose); color: var(--fg-primary); max-width: 68ch;
+  }
+  .answer__src {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .answer__src :global(svg) { width: 14px; height: 14px; color: var(--accent-teal); flex: 0 0 auto; }
+
+  @media (--md) {
+    .answer__card { padding: var(--space-7) var(--space-8); padding-left: var(--space-8); }
+  }
+</style>

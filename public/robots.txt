@@ -59,4 +59,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://marcyanstudio.com/sitemap.xml
+Sitemap: https://marcyanstudio.com/sitemap-index.xml

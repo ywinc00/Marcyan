@@ -1,0 +1,103 @@
+---
+// PLANTILLA de las landings de cluster (Ola 1 SEO). Ensambla la página completa
+// a partir de un objeto ClusterPage. Cada ruta (/es/houston/seo-local, etc.) es
+// un archivo fino que solo pasa su slice de contenido aquí.
+//
+// Estructura (mobile-first, DS v2): Nav · Hero+Breadcrumb · AnswerBlock (AEO) ·
+// Qué incluye · Proceso · Contexto local · Precio · Proof · FAQ · CTA · Relacionados
+// · Contacto (form → /api/brief) · Footer.
+//
+// Reutiliza componentes de la home (Process, Projects, Contact, SiteNav, SiteFooter)
+// y los nuevos (LandingHero, AnswerBlock, FeatureGrid, Prose, Pricing, Faq, CtaBand,
+// RelatedLinks, Breadcrumb, ServiceLd). Solo ES (hasEn=false).
+import Layout from '../layouts/Layout.astro';
+import SiteNav from './layout/SiteNav.astro';
+import SiteFooter from './layout/SiteFooter.astro';
+import Breadcrumb from './ui/Breadcrumb.astro';
+import LandingHero from './sections/LandingHero.astro';
+import AnswerBlock from './sections/AnswerBlock.astro';
+import FeatureGrid from './sections/FeatureGrid.astro';
+import Process from './sections/Process.astro';
+import Prose from './sections/Prose.astro';
+import Pricing from './sections/Pricing.astro';
+import Projects from './sections/Projects.astro';
+import Faq from './sections/Faq.astro';
+import CtaBand from './sections/CtaBand.astro';
+import RelatedLinks from './sections/RelatedLinks.astro';
+import Contact from './sections/Contact.astro';
+import ServiceLd from './seo/ServiceLd.astro';
+import { content } from '../i18n/content';
+import { clusterNav, type ClusterPage } from '../i18n/clusters';
+
+interface Props { cluster: ClusterPage }
+const { cluster } = Astro.props;
+const c = content.es;
+// path sin prefijo de idioma para el Layout (construye canonical + hreflang es).
+const pathNoLocale = cluster.path.replace(/^\/es\//, '');
+---
+<Layout
+  title={cluster.meta.title}
+  description={cluster.meta.description}
+  lang="es"
+  path={pathNoLocale}
+  hasEn={false}
+>
+  <ServiceLd slot="head" {...cluster.service} />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero {...cluster.hero}>
+      <Breadcrumb slot="breadcrumb" items={cluster.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={cluster.answer.q} a={cluster.answer.a} source={cluster.answer.source} />
+
+    <FeatureGrid
+      tag={cluster.includes.tag}
+      title={cluster.includes.title}
+      intro={cluster.includes.intro}
+      items={cluster.includes.items}
+      tone={cluster.includes.tone}
+    />
+
+    <Process process={c.process} />
+
+    <Prose
+      tag={cluster.local.tag}
+      title={cluster.local.title}
+      paragraphs={cluster.local.paragraphs}
+      tone={cluster.local.tone}
+    />
+
+    <Pricing
+      tag={cluster.pricing.tag}
+      title={cluster.pricing.title}
+      price={cluster.pricing.price}
+      unit={cluster.pricing.unit}
+      lead={cluster.pricing.lead}
+      features={cluster.pricing.features}
+      cta={cluster.pricing.cta}
+      note={cluster.pricing.note}
+      tone={cluster.pricing.tone}
+    />
+
+    <Projects projects={cluster.proof} />
+
+    <Faq tag={cluster.faq.tag} title={cluster.faq.title} items={cluster.faq.items} />
+
+    <CtaBand
+      title={cluster.cta.title}
+      sub={cluster.cta.sub}
+      primary={cluster.cta.primary}
+      secondary={cluster.cta.secondary}
+      tone={cluster.cta.tone}
+    />
+
+    <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

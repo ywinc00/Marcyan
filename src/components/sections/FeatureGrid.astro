@@ -1,0 +1,59 @@
+---
+// Grid genérico de características (p.ej. "qué incluye el servicio").
+// Reutilizable en cualquier landing. tone: gold | teal.
+import Icon from '../ui/Icon.astro';
+import Card from '../ui/Card.astro';
+import Kicker from '../ui/Kicker.astro';
+
+interface Item { icon: string; title: string; desc: string }
+interface Props {
+  tag: string;
+  title: string;
+  intro?: string;
+  items: Item[];
+  tone?: 'gold' | 'teal';
+}
+const { tag, title, intro, items, tone = 'gold' } = Astro.props;
+---
+<section class:list={['section fgrid', `fgrid--${tone}`]}>
+  <div class="container">
+    <header class="fgrid__head">
+      <Kicker tone={tone}>{tag}</Kicker>
+      <h2 class="h2" set:html={title} />
+      {intro && <p class="lead">{intro}</p>}
+    </header>
+    <div class="fgrid__grid">
+      {items.map((it) => (
+        <Card class="fgrid__item">
+          <span class="fgrid__icon"><Icon name={it.icon} /></span>
+          <h3 class="fgrid__title">{it.title}</h3>
+          <p class="fgrid__desc">{it.desc}</p>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .fgrid :global(.h2 em) { font-style: normal; }
+  .fgrid--gold :global(.h2 em) { color: var(--accent-gold); }
+  .fgrid--teal :global(.h2 em) { color: var(--accent-teal); }
+
+  .fgrid__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); max-width: 60ch; }
+  .fgrid__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+
+  .fgrid__item { display: flex; flex-direction: column; gap: var(--space-3); height: 100%; }
+  .fgrid__icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; border-radius: var(--radius-md);
+    background: var(--tint-dim); border: 1px solid var(--tint-line); color: var(--tint);
+  }
+  .fgrid--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); }
+  .fgrid--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); }
+  .fgrid__icon :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+  .fgrid__title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; }
+  .fgrid__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+
+  @media (--sm) { .fgrid__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (--lg) { .fgrid__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); } }
+</style>

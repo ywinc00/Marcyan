@@ -5,7 +5,7 @@
 //  · ≥ md  → barra completa (links + lang + CTA inline).
 // Accesible: aria-expanded, aria-hidden/inert, foco atrapado, Esc/overlay cierran,
 // objetivos ≥44px. NUNCA se oculta la nav sin reemplazo (regla dura nº2).
-import { Icon } from 'astro-icon/components';
+import Icon from '../ui/Icon.astro';
 import LogoWordmark from '../brand/LogoWordmark.astro';
 import Button from '../ui/Button.astro';
 
@@ -170,7 +170,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
 
   /* reservar espacio para la barra CTA inferior (móvil) → no tapa el footer */
   @media (--lt-md) {
-    :global(body) { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+    :global(body) { padding-bottom: calc(var(--tap-min) + var(--space-3) * 2 + env(safe-area-inset-bottom)); }
   }
 </style>
 

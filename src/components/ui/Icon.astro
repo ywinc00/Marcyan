@@ -1,0 +1,16 @@
+---
+// Wrapper de astro-icon. Por defecto marca el icono como DECORATIVO (aria-hidden),
+// porque en todo el sitio el texto adyacente ya transmite el significado (WCAG 1.1.1).
+// Para un icono con significado propio, pasar `title` y se expone como imagen accesible.
+import { Icon as AstroIcon } from 'astro-icon/components';
+
+interface Props {
+  name: string;
+  title?: string;
+  [key: string]: any;
+}
+const { name, title, ...rest } = Astro.props;
+---
+{title
+  ? <AstroIcon name={name} title={title} {...rest} />
+  : <AstroIcon name={name} aria-hidden="true" {...rest} />}

@@ -1,6 +1,6 @@
 ---
 // Sección Ubicaciones — Houston y Miami (Service-Area Business, sin dirección pública).
-import { Icon } from 'astro-icon/components';
+import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { locations: any }
@@ -55,7 +55,7 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
   }
   .loc__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
   .loc__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; }
-  .loc__state { color: var(--fg-subtle); }
+  .loc__state { color: var(--fg-secondary); }
   .loc__area { color: var(--fg-secondary); font-size: var(--text-sm); }
   .loc__tel { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); margin-top: var(--space-1); }
   .loc__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }

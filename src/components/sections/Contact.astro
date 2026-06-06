@@ -2,7 +2,7 @@
 // Sección Contacto — form real que envía a /api/brief (mismo pipeline que /formulario).
 // Mapeo de campos idéntico al del sitio anterior: owner_name · email · business_name ·
 // city_state · main_objective · additional_notes (+ honeypot website_hp).
-import { Icon } from 'astro-icon/components';
+import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import { nap } from '../../i18n/content';
@@ -153,6 +153,8 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorBox.hidden = true; okBox.hidden = true;
+      const emailEl = form.querySelector('[name="email"]') as HTMLInputElement | null;
+      emailEl?.removeAttribute('aria-invalid');
 
       const fd = new FormData(form);
       const data: Record<string, string> = {};
@@ -160,7 +162,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 
       if (data.website_hp) return; // honeypot
       if (!isEmail(data.email || '')) {
-        errorBox.textContent = S.invalid || 'Email inválido.'; errorBox.hidden = false; return;
+        errorBox.textContent = S.invalid || 'Email inválido.'; errorBox.hidden = false;
+        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.setAttribute('aria-describedby', 'home-form-error'); emailEl.focus(); }
+        return;
       }
 
       const orig = btn.textContent;

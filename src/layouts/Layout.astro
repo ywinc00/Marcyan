@@ -9,6 +9,7 @@ import '@fontsource-variable/space-grotesk/index.css';
 import '@fontsource-variable/dm-sans/index.css';
 import '@fontsource-variable/jetbrains-mono/index.css';
 import '../styles/global.css';
+import { nap } from '../i18n/content';
 
 interface Props {
   title: string;
@@ -29,7 +30,7 @@ const {
   path = '/',
   canonical,
   noindex = false,
-  ogImage = '/assets/og-default.png',
+  ogImage = '/assets/og/og-default.png',
 } = Astro.props;
 
 const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;
@@ -37,6 +38,56 @@ const canon = canonical ?? `${SITE}/${lang}${clean}/`;
 const esHref = `${SITE}/es${clean}/`;
 const enHref = `${SITE}/en${clean}/`;
 const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
+
+// JSON-LD @graph (Organization + LocalBusiness por ciudad) — server-rendered,
+// restaura el structured data del Sprint 0. NAP desde i18n/content (DRY).
+const tel = (p: string) => p.replace(/[^\d+]/g, '');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE}/#organization`,
+      name: 'Marcyan Studio',
+      url: `${SITE}/`,
+      email: nap.email,
+      description:
+        'Agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas en Houston y Miami. Atención bilingüe español e inglés.',
+      slogan: 'Diseño web que piensa por ti',
+      knowsLanguage: ['es', 'en'],
+      areaServed: [
+        { '@type': 'City', name: 'Houston' },
+        { '@type': 'City', name: 'Miami' },
+      ],
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${SITE}/#houston`,
+      name: 'Marcyan Studio',
+      parentOrganization: { '@id': `${SITE}/#organization` },
+      url: `${SITE}/`,
+      telephone: tel(nap.houston),
+      email: nap.email,
+      priceRange: '$$',
+      knowsLanguage: ['es', 'en'],
+      address: { '@type': 'PostalAddress', addressLocality: 'Houston', addressRegion: 'TX', addressCountry: 'US' },
+      areaServed: { '@type': 'City', name: 'Houston' },
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${SITE}/#miami`,
+      name: 'Marcyan Studio',
+      parentOrganization: { '@id': `${SITE}/#organization` },
+      url: `${SITE}/`,
+      telephone: tel(nap.miami),
+      email: nap.email,
+      priceRange: '$$',
+      knowsLanguage: ['es', 'en'],
+      address: { '@type': 'PostalAddress', addressLocality: 'Miami', addressRegion: 'FL', addressCountry: 'US' },
+      areaServed: { '@type': 'City', name: 'Miami' },
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang={lang}>
@@ -60,8 +111,14 @@ const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canon} />
     <meta property="og:image" content={`${SITE}${ogImage}`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={`${SITE}${ogImage}`} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
     {/* Favicon planeta (placeholder en línea; el mark real llega en Fase B) */}
     <link
@@ -72,6 +129,7 @@ const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
     <slot name="head" />
   </head>
   <body>
+    <a href="#main" class="skip-link">{lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}</a>
     <slot />
   </body>
 </html>

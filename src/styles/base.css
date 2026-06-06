@@ -81,6 +81,19 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
+/* Skip-to-content (WCAG 2.4.1) — oculto hasta foco por teclado */
+.skip-link {
+  position: fixed; top: 0; left: 0; z-index: var(--z-modal);
+  margin: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-gold); color: var(--fg-inverse);
+  font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  transform: translateY(-150%);
+  transition: transform var(--duration-fast) var(--ease-in-out);
+}
+.skip-link:focus { transform: translateY(0); }
+
 .container {
   width: 100%;
   max-width: var(--container-max);

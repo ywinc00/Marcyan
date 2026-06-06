@@ -180,7 +180,179 @@ export const content = {
           { label: 'Miami FL', href: '#ciudades' },
         ] },
       ],
+      legal: [
+        { label: 'Privacidad', href: '/privacidad' },
+        { label: 'Términos', href: '/terminos' },
+      ],
       copy: '© 2026 Marcyan Studio · Todos los derechos reservados',
+    },
+  },
+
+  en: {
+    locale: 'en' as Locale,
+
+    nav: {
+      links: [
+        { label: 'Services', href: '#servicios' },
+        { label: 'AI', href: '#ia' },
+        { label: 'Projects', href: '#proyectos' },
+        { label: 'Cities', href: '#ciudades' },
+      ] as Link[],
+      cta: { label: 'Start Project', href: '#contacto' },
+      langLabel: 'ES',
+      langHref: '/es/',
+      openMenu: 'Open menu',
+      closeMenu: 'Close menu',
+    },
+
+    hero: {
+      tag: 'Operational AI · Houston & Miami',
+      h1: 'Web Design<br>that <em>thinks</em><br>for you',
+      sub: 'Marcyan Studio combines elite design with operational artificial intelligence to create sites that convert, rank, and evolve — built fast, built to be found.',
+      primary: { label: 'Get Free Proposal', href: '#contacto' },
+      secondary: { label: 'View Projects', href: '#proyectos' },
+      nodes: [
+        { label: 'Services', href: '#servicios' },
+        { label: 'AI', href: '#ia' },
+        { label: 'Projects', href: '#proyectos' },
+        { label: 'Cities', href: '#ciudades' },
+      ] as Link[],
+      caso0: {
+        label: 'Marcyan · Case #0 (this site)',
+        rows: [
+          { l: 'Site', v: 'Static HTML' },
+          { l: 'AI crawlers', v: 'Readable' },
+          { l: 'Languages', v: 'ES · EN' },
+          { l: 'Coverage', v: 'Houston · Miami' },
+          { l: 'Leads', v: 'Own database' },
+        ],
+      },
+    },
+
+    services: {
+      tag: 'Our Services',
+      title: 'Everything your<br>brand <em>needs</em>',
+      explore: 'Explore',
+      cta: { label: 'Tell us your project', href: '#contacto' },
+      items: [
+        { n: '01', icon: 'lucide:layout-template', title: 'Premium Web Design', price: 'from $1,500',
+          desc: 'High-impact sites built from scratch. Every pixel responds to your brand identity and business goals in Houston and Miami.' },
+        { n: '02', icon: 'lucide:message-circle', title: 'Conversational AI', price: 'from $900',
+          desc: 'Virtual assistants integrated directly into your site. They serve customers around the clock, answer questions, and capture qualified leads even while you sleep.' },
+        { n: '03', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $2,900',
+          desc: 'Conversion-optimized online sales platforms. Shopify, WooCommerce, or custom solutions with AI for personalized recommendations.' },
+        { n: '04', icon: 'lucide:search', title: 'AI-Powered SEO', price: 'from $600/mo',
+          desc: 'SEO that keeps up with the market. We use AI to analyze competitors and trends, then continuously refine your strategy to improve how you rank.' },
+        { n: '05', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $750',
+          desc: 'Logos, palettes, typography, and complete visual systems. We generate concepts with AI and refine every detail with expert human judgment.' },
+        { n: '06', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo',
+          desc: 'We keep your site healthy: uptime checks, security and software updates, regular backups, and bilingual support in Houston and Miami.' },
+      ] as ServiceItem[],
+    },
+
+    ai: {
+      tag: 'Marcyan Technology',
+      title: 'The AI that<br>works for<br><em>your business</em>',
+      desc: "We don't use AI as a buzzword. We use it to build faster, write better, and help your business get found — by people and by AI assistants alike.",
+      features: [
+        { icon: 'lucide:bot', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Perplexity can actually read — so your business shows up when people ask them.' },
+        { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, drafted with AI and refined by hand. Bilingual Spanish and English, written for your local market.' },
+        { icon: 'lucide:messages-square', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
+        { icon: 'lucide:workflow', title: 'Automations', desc: 'We connect your site to the tools you already use, so new leads, notifications, and follow-ups happen on their own.' },
+      ],
+    },
+
+    process: {
+      tag: 'How We Work',
+      title: 'From concept to<br><em>launch</em>',
+      steps: [
+        { n: '01', title: 'Discovery', desc: 'We analyze your business, competitors, and local market in Houston or Miami to define the right strategy.' },
+        { n: '02', title: 'AI Strategy', desc: 'We design the ideal digital ecosystem: site, AI, SEO, and automations — all coordinated.' },
+        { n: '03', title: 'Design & Dev', desc: 'We build every element with precision. Constant revisions until every detail is perfect.' },
+        { n: '04', title: 'Testing & QA', desc: 'Rigorous testing across all devices — we check speed, SEO, accessibility, and security on every build.' },
+        { n: '05', title: 'Launch', desc: 'Go live with live support. AI enters operation and we start optimizing from day one.' },
+      ],
+    },
+
+    projects: {
+      tag: 'Portfolio',
+      title: 'Real work, real<br><em>businesses</em>',
+      cta: { label: 'Start your project', href: '#contacto' },
+      items: [
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Full rebuild from scratch + local SEO — now ranking.', accent: 'gold' },
+        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Rebuilt from scratch + local SEO — now ranking.', accent: 'teal' },
+        { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', url: 'https://julios-landscape-tx.vercel.app', display: 'julios-landscape-tx.vercel.app', result: 'Brand, identity, and website created from zero.', accent: 'gold' },
+        { name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', url: 'https://rosi-nails.vercel.app', display: 'rosi-nails.vercel.app', result: 'Custom web app: clients book appointments and browse nail inspiration.', accent: 'teal' },
+      ],
+    },
+
+    guarantees: {
+      tag: 'Why Marcyan',
+      title: 'What you can<br><em>count on</em>',
+      items: [
+        { icon: 'lucide:zap', title: 'Proposal in 24h', desc: "Tell us your idea and you'll get a personalized proposal in under 24 hours — no cost, no commitment." },
+        { icon: 'lucide:ruler', title: 'Built to measure', desc: 'No templates. Every site is designed and coded from scratch around your business and your goals.' },
+        { icon: 'lucide:radar', title: 'Ready for AI & search', desc: 'Fast HTML that Google and AI assistants can read, so your business gets found where people are now searching.' },
+        { icon: 'lucide:languages', title: 'Bilingual & local', desc: 'We work with you in Spanish and English, with real local context for Houston and Miami.' },
+      ],
+    },
+
+    locations: {
+      tag: 'Our Cities',
+      title: 'Present where<br>your business <em>grows</em>',
+      items: [
+        { city: 'Houston', state: 'TX', badge: 'Service Area', area: 'Houston & greater metro area', tel: nap.houston },
+        { city: 'Miami', state: 'FL', badge: 'Service Area', area: 'Miami & greater metro area', tel: nap.miami },
+      ],
+    },
+
+    contact: {
+      tag: 'Contact',
+      title: "Let's talk about<br>your <em>project</em>",
+      desc: 'Tell us your idea. In less than 24 hours you will have a personalized proposal — no commitment, completely free.',
+      info: { hoursLbl: 'Hours', hours: 'Mon–Fri 9am–6pm CT' },
+      form: {
+        name: { label: 'Name', ph: 'Your name' },
+        email: { label: 'Email', ph: 'you@email.com' },
+        company: { label: 'Company', ph: 'Your company name' },
+        city: { label: 'City', ph: 'Select', opts: ['Houston, TX', 'Miami, FL', 'Other city'] },
+        service: { label: 'Service of Interest', ph: 'What do you need?', opts: ['Website from Scratch', 'Redesign of Current Site', 'E-Commerce / Online Store', 'Conversational AI / Chatbot', 'SEO & Positioning', 'Branding & Visual Identity', 'Full Package'] },
+        message: { label: 'Tell us about your project', ph: 'Briefly describe what you need...' },
+        submit: 'Send Message',
+        sending: 'Sending…',
+        success: '✓ Message sent',
+        error: 'Something went wrong. Please try again, or use our full project form.',
+        emailInvalid: 'Please enter a valid email so we can reach you.',
+        briefLink: 'full project form',
+      },
+    },
+
+    footer: {
+      tagline: 'AI-Powered Web Design · Houston & Miami',
+      cols: [
+        { title: 'Services', links: [
+          { label: 'Web Design', href: '#servicios' },
+          { label: 'E-Commerce', href: '#servicios' },
+          { label: 'Conversational AI', href: '#ia' },
+          { label: 'AI SEO', href: '#servicios' },
+          { label: 'Branding', href: '#servicios' },
+          { label: 'Project Form', href: '/formulario' },
+        ] },
+        { title: 'Company', links: [
+          { label: 'Projects', href: '#proyectos' },
+          { label: 'Privacy', href: '/privacidad' },
+          { label: 'Terms', href: '/terminos' },
+        ] },
+        { title: 'Cities', links: [
+          { label: 'Houston TX', href: '#ciudades' },
+          { label: 'Miami FL', href: '#ciudades' },
+        ] },
+      ],
+      legal: [
+        { label: 'Privacy', href: '/privacidad' },
+        { label: 'Terms', href: '/terminos' },
+      ],
+      copy: '© 2026 Marcyan Studio · All rights reserved',
     },
   },
 };

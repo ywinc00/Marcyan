@@ -1,0 +1,58 @@
+---
+// Variante apilada: planeta arriba + "MARCYAN" / descriptor centrados.
+// Para tarjetas, avatares, momentos de marca cuadrados. Proporción 200:200.
+interface Props {
+  size?: number | string;
+  title?: string;
+  decorative?: boolean;
+  class?: string;
+}
+const { size = 160, title = 'Marcyan', decorative = false, class: cls } = Astro.props;
+const uid = 'stk' + Math.random().toString(36).slice(2, 8);
+---
+<svg
+  class:list={['logo-stacked', cls]}
+  width={size} viewBox="0 0 200 200"
+  role={decorative ? 'presentation' : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={decorative ? undefined : title}
+>
+  {!decorative && <title>{title}</title>}
+  <defs>
+    <radialGradient id={`${uid}-p`} cx="45%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="var(--accent-gold)" />
+      <stop offset="55%" stop-color="var(--accent-gold-deep)" />
+      <stop offset="100%" stop-color="var(--planet-core)" />
+    </radialGradient>
+    <radialGradient id={`${uid}-g`} cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.20" />
+      <stop offset="100%" stop-color="var(--accent-gold)" stop-opacity="0" />
+    </radialGradient>
+    <clipPath id={`${uid}-c`}><circle cx="100" cy="88" r="46" /></clipPath>
+  </defs>
+
+  <circle cx="100" cy="88" r="72" fill={`url(#${uid}-g)`} />
+  <path d="M26 88 A74 20 0 0 0 174 88" fill="none" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity="0.30" stroke-linecap="round" />
+  <circle cx="100" cy="88" r="46" fill={`url(#${uid}-p)`} />
+  <ellipse cx="114" cy="94" rx="42" ry="42" fill="rgba(0,0,0,0.42)" clip-path={`url(#${uid}-c)`} />
+  <path d="M26 88 A74 20 0 0 1 174 88" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-opacity="0.82" stroke-linecap="round" />
+  <circle cx="174" cy="88" r="8" fill="var(--accent-teal)" />
+  <circle cx="40" cy="74" r="4" fill="var(--accent-gold)" opacity="0.5" />
+
+  <text class="stk-name" x="100" y="160">MARCYAN</text>
+  <text class="stk-sub" x="100" y="178">DIGITAL STUDIO</text>
+</svg>
+
+<style>
+  .logo-stacked { display: block; height: auto; }
+  .stk-name {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+    fill: var(--fg-primary); text-anchor: middle;
+  }
+  .stk-sub {
+    font-family: var(--font-body);
+    font-size: 9.5px; font-weight: 400; letter-spacing: 3px;
+    fill: var(--fg-secondary); text-anchor: middle;
+  }
+</style>

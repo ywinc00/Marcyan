@@ -1,0 +1,28 @@
+---
+// Superficie de tarjeta. Si recibe href → es un enlace-tarjeta con hover (borde→oro).
+interface Props { href?: string; interactive?: boolean; class?: string; [key: string]: any }
+const { href, interactive = false, class: cls, ...rest } = Astro.props;
+const Tag = href ? 'a' : 'div';
+const isInteractive = Boolean(href) || interactive;
+---
+<Tag class:list={['card', isInteractive && 'card--interactive', cls]} href={href} {...rest}>
+  <slot />
+</Tag>
+
+<style>
+  .card {
+    display: block; min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+    transition: border-color var(--duration-base) var(--ease-out-expo),
+                box-shadow var(--duration-base), transform var(--duration-base);
+  }
+  .card--interactive { text-decoration: none; color: inherit; cursor: pointer; }
+  .card--interactive:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+  @media (--motion-reduce) { .card--interactive:hover { transform: none; } }
+</style>

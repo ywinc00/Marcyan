@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN — DESIGN TOKENS  ·  v2 "Space-Tech"  ·  FUENTE ÚNICA
+   Adaptado de _ds/colors_and_type.css (sistema canónico). Cambios:
+     · Fuentes AUTO-HOSPEDADAS (Fontsource) — sin @import de Google.
+     · + escala de tipo FLUIDA con clamp() (el display ya no rompe móvil).
+     · + tokens de layout (container, gutter, section, nav, tap).
+   Breakpoints → src/styles/media.css (sm480 md768 lg1024 xl1280).
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Fondos ─────────────────────────────── */
+  --bg-base:     #080808;   /* fondo de página (nunca negro puro) */
+  --bg-2:        #0e0e0d;   /* fondo alterno sutil */
+  --bg-card:     #141414;   /* tarjetas, paneles */
+  --bg-elevated: #1c1c1c;   /* superficies elevadas, dropdowns */
+  --bg-overlay:  rgba(8, 8, 8, 0.85);
+
+  /* ── Acento: Oro (acento primario — usar con MODERACIÓN, ~7%) ── */
+  --accent-gold:      #c8a96e;
+  --accent-gold-deep: #8a6630;
+  --accent-gold-dim:  rgba(200, 169, 110, 0.15);
+  --accent-gold-line: rgba(200, 169, 110, 0.30);
+  --accent-gold-glow: rgba(200, 169, 110, 0.25);
+
+  /* ── Acento: Teal (IA / señal / secundario — ~3%) ── */
+  --accent-teal:      #4fc3a1;
+  --accent-teal-dim:  rgba(79, 195, 161, 0.15);
+  --accent-teal-line: rgba(79, 195, 161, 0.30);
+
+  /* alias cortos (compatibilidad con deck/hero importados) */
+  --accent:   var(--accent-gold);
+  --accent-2: var(--accent-teal);
+  --planet-core: #2e2010;
+
+  /* ── Texto ──────────────────────────────── */
+  --fg-primary:   #f0ede8;  /* blanco cálido */
+  --fg-secondary: #9a9590;  /* muted */
+  --fg-subtle:    #4a4845;  /* disabled / placeholder */
+  --fg-inverse:   #080808;  /* texto sobre acento */
+
+  /* ── Bordes ─────────────────────────────── */
+  --border:        #242420;
+  --border-subtle: #1a1a18;
+  --border-accent: rgba(200, 169, 110, 0.30);
+
+  /* ── Sombras ────────────────────────────── */
+  --shadow-card:  0 0 0 1px rgba(200,169,110,0.04), 0 4px 24px rgba(0,0,0,0.6);
+  --shadow-hover: 0 0 0 1px rgba(200,169,110,0.18), 0 8px 40px rgba(0,0,0,0.7);
+  --shadow-gold:  0 0 24px rgba(200,169,110,0.15);
+  --shadow-teal:  0 0 24px rgba(79,195,161,0.15);
+  --shadow-modal: 0 24px 80px rgba(0,0,0,0.9);
+
+  /* ── Semánticos ─────────────────────────── */
+  --color-success: #4fc3a1;
+  --color-warning: #c8a96e;
+  --color-error:   #e05c5c;
+  --color-info:    #5ba4d4;
+
+  /* ── Radios ─────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;    /* botones */
+  --radius-lg:   12px;   /* tarjetas */
+  --radius-xl:   20px;
+  --radius-pill: 100px;  /* badges/tags */
+
+  /* ── Espaciado (base 4px) ───────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+
+  /* ── Familias (auto-hospedadas vía Fontsource) ── */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Escala de tipo FIJA (UI, cuerpo, datos) ── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 16px;
+  --text-md:   18px;
+  --text-lg:   22px;
+  --text-xl:   28px;
+  --text-2xl:  36px;
+  --text-3xl:  48px;
+  --text-4xl:  64px;
+  --text-5xl:  80px;
+
+  /* ── Escala de tipo FLUIDA (display / headings) ──
+     clamp(min, preferido, max): nunca desborda en 320, llega al máx en desktop. */
+  --fluid-display: clamp(2.5rem,   1.30rem + 6.00vw, 5rem);     /* 40 → 80 */
+  --fluid-h1:      clamp(2.25rem,  1.30rem + 4.75vw, 4rem);     /* 36 → 64 */
+  --fluid-h2:      clamp(2rem,     1.30rem + 3.50vw, 3rem);     /* 32 → 48 */
+  --fluid-h3:      clamp(1.5rem,   1.15rem + 1.75vw, 2.25rem);  /* 24 → 36 */
+  --fluid-h4:      clamp(1.25rem,  1.07rem + 0.90vw, 1.75rem);  /* 20 → 28 */
+  --fluid-lead:    clamp(1.0625rem,1.01rem + 0.27vw, 1.25rem);  /* 17 → 20 */
+
+  /* ── Line-height ────────────────────────── */
+  --leading-tight:  1.1;
+  --leading-snug:   1.25;
+  --leading-normal: 1.5;
+  --leading-loose:  1.75;
+
+  /* ── Tracking ───────────────────────────── */
+  --tracking-tight:  -0.03em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.06em;
+  --tracking-wider:   0.12em;
+  --tracking-widest:  0.22em;
+
+  /* ── Animación ──────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease: var(--ease-out-expo);   /* alias deck/hero */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 400ms;
+
+  /* ── Layout / responsive ────────────────── */
+  --container-max: 1280px;                                   /* = xl */
+  --container-pad: clamp(1.25rem, 0.85rem + 2.00vw, 4rem);   /* gutter fluido 20 → 64 */
+  --section-gap:   clamp(4rem, 2.50rem + 7.50vw, 8rem);      /* vertical 64 → 128 */
+  --nav-h:   64px;
+  --tap-min: 44px;                                            /* objetivo táctil mínimo */
+
+  /* ── Breakpoints (solo referencia; la verdad vive en media.css) ── */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  /* ── Z-index ────────────────────────────── */
+  --z-base:   1;
+  --z-above:  10;
+  --z-nav:    100;
+  --z-drawer: 200;
+  --z-modal:  300;
+}

@@ -1,0 +1,51 @@
+---
+// Botón / enlace-botón. Variantes: primary (oro) · secondary (contorno) · teal · ghost.
+// Renderiza <a> si hay href, si no <button>. Altura mínima ≥44px (objetivo táctil).
+interface Props {
+  variant?: 'primary' | 'secondary' | 'teal' | 'ghost';
+  size?: 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit';
+  class?: string;
+  [key: string]: any;
+}
+const { variant = 'primary', size = 'md', href, type = 'button', class: cls, ...rest } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+<Tag
+  class:list={['btn', `btn--${variant}`, `btn--${size}`, cls]}
+  href={href}
+  type={href ? undefined : type}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    font-family: var(--font-body); font-weight: 600; letter-spacing: 0.01em;
+    border-radius: var(--radius-md); cursor: pointer; text-align: center;
+    text-decoration: none; white-space: nowrap; min-height: var(--tap-min);
+    transition: background var(--duration-fast) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-expo),
+                color var(--duration-fast), box-shadow var(--duration-base), transform var(--duration-fast);
+  }
+  .btn--md { padding: 10px 22px; font-size: var(--text-sm); }
+  .btn--lg { padding: 14px 28px; font-size: var(--text-base); }
+  .btn:active { transform: scale(0.97); }
+
+  .btn--primary { background: var(--accent-gold); color: var(--fg-inverse); }
+  .btn--primary:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }
+
+  .btn--secondary { background: transparent; color: var(--fg-primary); border: 1px solid var(--border-accent); }
+  .btn--secondary:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+  .btn--teal { background: var(--accent-teal); color: var(--fg-inverse); }
+  .btn--teal:hover { background: color-mix(in srgb, var(--accent-teal), white 10%); box-shadow: var(--shadow-teal); }
+
+  .btn--ghost { background: transparent; color: var(--fg-secondary); padding-inline: var(--space-2); }
+  .btn--ghost:hover { color: var(--accent-gold); }
+
+  @media (--motion-reduce) { .btn:active { transform: none; } }
+</style>

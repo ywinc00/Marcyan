@@ -1,0 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN — BREAKPOINTS (FUENTE ÚNICA)
+   Estos @custom-media son inyectados globalmente por PostCSS
+   (@csstools/postcss-global-data) en cada componente. PROHIBIDO
+   escribir valores de breakpoint sueltos en cualquier otro lugar.
+
+   Uso:   @media (--md) { … }        ·  ≥768
+          @media (--lt-md) { … }     ·  <768
+          @media (--motion-ok) { … }
+
+   Escala: sm 480 · md 768 · lg 1024 · xl 1280
+   (los componentes responden además a su propio ancho con @container)
+   ═══════════════════════════════════════════════════════════════ */
+
+@custom-media --sm (min-width: 480px);
+@custom-media --md (min-width: 768px);
+@custom-media --lg (min-width: 1024px);
+@custom-media --xl (min-width: 1280px);
+
+/* Rangos máximos (usar con moderación; preferir mobile-first min-width) */
+@custom-media --lt-sm (max-width: 479.98px);
+@custom-media --lt-md (max-width: 767.98px);
+@custom-media --lt-lg (max-width: 1023.98px);
+
+/* Preferencias del usuario (DRY para motion) */
+@custom-media --motion-ok (prefers-reduced-motion: no-preference);
+@custom-media --motion-reduce (prefers-reduced-motion: reduce);
+@custom-media --hover-fine (hover: hover) and (pointer: fine);

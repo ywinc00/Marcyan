@@ -11,10 +11,17 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@fontsource-variable/space-grotesk": "^5.2.10",
+    "@iconify-json/lucide": "^1.2.111",
     "@vercel/postgres": "^0.10.0",
+    "astro-icon": "^1.1.5",
     "resend": "^4.0.1"
   },
   "devDependencies": {
-    "astro": "^6.4.4"
+    "@csstools/postcss-global-data": "^4.0.0",
+    "astro": "^6.4.4",
+    "postcss-custom-media": "^12.0.1"
   }
 }

@@ -1,0 +1,52 @@
+---
+// Sección IA — "La IA que trabaja para tu negocio". Acento teal (tecnología/IA).
+// Layout: intro (sticky en desktop) + 4 features.
+import { Icon } from 'astro-icon/components';
+import Kicker from '../ui/Kicker.astro';
+
+interface Props { ai: any }
+const { ai } = Astro.props;
+---
+<section class="section ai" id="ia">
+  <div class="container ai__inner">
+    <div class="ai__intro">
+      <Kicker tone="teal">{ai.tag}</Kicker>
+      <h2 class="h2" set:html={ai.title} />
+      <p class="lead">{ai.desc}</p>
+    </div>
+    <ul class="ai__features">
+      {ai.features.map((f: any) => (
+        <li class="ai__feature">
+          <span class="ai__feature-icon"><Icon name={f.icon} /></span>
+          <div class="ai__feature-body">
+            <h3 class="ai__feature-title">{f.title}</h3>
+            <p class="ai__feature-desc">{f.desc}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ai :global(em) { color: var(--accent-teal); font-style: normal; }
+  .ai__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-7); }
+  .ai__intro { display: flex; flex-direction: column; gap: var(--space-4); }
+  .ai__features { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+  .ai__feature { display: flex; gap: var(--space-4); align-items: flex-start; min-width: 0; }
+  .ai__feature-icon {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; border-radius: var(--radius-md);
+    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
+  }
+  .ai__feature-icon :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+  .ai__feature-body { min-width: 0; }
+  .ai__feature-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; margin-bottom: var(--space-1); }
+  .ai__feature-desc { color: var(--fg-secondary); font-size: var(--text-sm); }
+
+  @media (--md) { .ai__features { grid-template-columns: 1fr 1fr; gap: var(--space-6) var(--space-5); } }
+  @media (--lg) {
+    .ai__inner { grid-template-columns: 0.85fr 1.15fr; gap: var(--space-9); align-items: start; }
+    .ai__intro { position: sticky; top: calc(var(--nav-h) + var(--space-5)); }
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+// Isotipo Marcyan — planeta + órbita (2 arcos) + satélite teal.
+// Themeable: los colores salen de los tokens; cambia con [data-palette].
+// IDs de gradiente únicos por instancia (sin colisiones con varios logos en página).
+interface Props {
+  size?: number | string;
+  title?: string;
+  /** decorativo = sin nombre accesible (úsalo cuando va junto al wordmark/texto). */
+  decorative?: boolean;
+  class?: string;
+}
+const { size = 40, title = 'Marcyan', decorative = false, class: cls } = Astro.props;
+const uid = 'mk' + Math.random().toString(36).slice(2, 8);
+---
+<svg
+  class:list={['logo-mark', cls]}
+  width={size} height={size} viewBox="0 0 80 80"
+  role={decorative ? 'presentation' : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={decorative ? undefined : title}
+>
+  {!decorative && <title>{title}</title>}
+  <defs>
+    <radialGradient id={`${uid}-p`} cx="45%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="var(--accent-gold)" />
+      <stop offset="55%" stop-color="var(--accent-gold-deep)" />
+      <stop offset="100%" stop-color="var(--planet-core)" />
+    </radialGradient>
+    <radialGradient id={`${uid}-g`} cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="var(--accent-gold)" stop-opacity="0" />
+    </radialGradient>
+    <clipPath id={`${uid}-c`}><circle cx="40" cy="40" r="22" /></clipPath>
+  </defs>
+
+  <circle cx="40" cy="40" r="38" fill={`url(#${uid}-g)`} />
+  {/* órbita · mitad trasera (pasa por DETRÁS del planeta) */}
+  <path d="M4 40 A36 10 0 0 0 76 40" fill="none" stroke="var(--accent-gold)" stroke-width="1.4" stroke-opacity="0.30" stroke-linecap="round" />
+  {/* planeta */}
+  <circle cx="40" cy="40" r="22" fill={`url(#${uid}-p)`} />
+  <ellipse cx="48" cy="43" rx="20" ry="20" fill="rgba(0,0,0,0.4)" clip-path={`url(#${uid}-c)`} />
+  {/* órbita · mitad delantera (pasa por DELANTE) */}
+  <path d="M4 40 A36 10 0 0 1 76 40" fill="none" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity="0.85" stroke-linecap="round" />
+  {/* satélite = IA */}
+  <circle cx="76" cy="40" r="4" fill="var(--accent-teal)" />
+</svg>
+
+<style>
+  .logo-mark { display: block; height: auto; }
+</style>

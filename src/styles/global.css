@@ -1,0 +1,4 @@
+/* Entrada única de estilos globales. Se importa una vez en Layout.astro.
+   Orden importa: primero tokens (variables), luego base (reset/utilidades). */
+@import './tokens.css';
+@import './base.css';

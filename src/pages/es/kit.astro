@@ -1,0 +1,201 @@
+---
+// Galería viva del design system (semilla de Fase C). Superficie de QA — noindex.
+// Verifica: fuentes auto-hospedadas, escala fluida, tokens de color/espaciado,
+// y que @media (--md) (custom-media) funciona dentro de <style> scopeado.
+import Layout from '../../layouts/Layout.astro';
+import LogoWordmark from '../../components/brand/LogoWordmark.astro';
+import LogoStacked from '../../components/brand/LogoStacked.astro';
+import LogoMark from '../../components/brand/LogoMark.astro';
+import { Icon } from 'astro-icon/components';
+
+const palette: [string, string, string, string][] = [
+  ['Oro Marcyan', '#C8A96E', '--accent-gold', 'Acento primario · CTAs'],
+  ['Teal Señal', '#4FC3A1', '--accent-teal', 'IA · tags · éxito'],
+  ['Negro Base', '#080808', '--bg-base', 'Fondo de página'],
+  ['Carbón', '#141414', '--bg-card', 'Tarjetas, paneles'],
+  ['Blanco Cálido', '#F0EDE8', '--fg-primary', 'Texto primario'],
+];
+const spaces = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const radii: [string, number][] = [['sm', 4], ['md', 8], ['lg', 12], ['xl', 20], ['pill', 100]];
+---
+<Layout title="Kit · Marcyan Design System" noindex={true} path="/kit">
+  <main class="container kit">
+    <header class="kit-head">
+      <span class="label gold">Design System · Fase A — Cimientos</span>
+      <h1 class="display">Cimientos<span class="teal">.</span></h1>
+      <p class="lead">
+        Tokens, tipografía auto-hospedada y escala fluida montados sobre Astro.
+        Esta página es la superficie de QA del sistema — no se indexa.
+      </p>
+    </header>
+
+    <!-- Marca -->
+    <section class="kit-block">
+      <span class="label">Marca · logos themeables (planeta · órbita · satélite IA)</span>
+      <div class="logos">
+        <article class="logo-card"><LogoWordmark width={240} /><span class="caption">Wordmark · principal</span></article>
+        <article class="logo-card"><LogoStacked size={148} /><span class="caption">Apilado</span></article>
+        <article class="logo-card logo-card--row">
+          <LogoMark size={72} />
+          <LogoMark size={40} />
+          <LogoMark size={24} />
+          <span class="caption">Isotipo · escalado</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Tipografía -->
+    <section class="kit-block">
+      <span class="label">Tipografía · escala fluida</span>
+      <div class="stack">
+        <p class="display">Despegue digital</p>
+        <p class="h1">Todo para crecer</p>
+        <p class="h2">Soluciones con IA aplicada</p>
+        <p class="h3">Presencia online real</p>
+        <p class="h4">Resultados, no promesas</p>
+        <p class="lead">Lead — Tu negocio, presente en el universo digital.</p>
+        <p class="body">Body — Diseño web con inteligencia artificial operativa para PYMEs en Houston y Miami.</p>
+        <p class="caption">Caption — texto secundario y notas.</p>
+        <p class="label">Label · servicios · desarrollo · ia</p>
+        <p class="mono">mono — 98 / 100 · seo 96 · a11y 100</p>
+      </div>
+    </section>
+
+    <!-- Familias -->
+    <section class="kit-block">
+      <span class="label">Tres voces, un sistema</span>
+      <div class="fonts">
+        <article class="font-card">
+          <span class="specimen" style="font-family:var(--font-display);font-weight:700">Aa</span>
+          <b>Space Grotesk</b><span class="caption">Display · titulares</span>
+        </article>
+        <article class="font-card">
+          <span class="specimen" style="font-family:var(--font-body)">Aa</span>
+          <b>DM Sans</b><span class="caption">Cuerpo · UI</span>
+        </article>
+        <article class="font-card">
+          <span class="specimen" style="font-family:var(--font-mono);color:var(--accent-teal)">Aa</span>
+          <b>JetBrains Mono</b><span class="caption">Datos · etiquetas</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Color + proporción 70/20/7/3 -->
+    <section class="kit-block">
+      <span class="label">Color · proporción 70 / 20 / 7 / 3</span>
+      <div class="prop-bar" aria-hidden="true">
+        <span style="flex:70;background:var(--bg-base)">70 · oscuro</span>
+        <span style="flex:20;background:var(--bg-card)">20 · superficie</span>
+        <span style="flex:7;background:var(--accent-gold);color:#080808">7 · oro</span>
+        <span style="flex:3;background:var(--accent-teal);color:#080808">3</span>
+      </div>
+      <div class="swatches">
+        {palette.map(([name, hex, tok, role]) => (
+          <article class="swatch">
+            <span class="chip" style={`background:${hex}`}></span>
+            <b>{name}</b>
+            <span class="mono">{hex}</span>
+            <span class="caption">{tok} · {role}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Espaciado + radios -->
+    <section class="kit-block">
+      <span class="label">Espaciado (base 4px) · radios</span>
+      <div class="spaces">
+        {spaces.map((n) => (
+          <div class="space-row">
+            <span class="mono">--space-{n}</span>
+            <span class="bar" style={`width:var(--space-${n})`}></span>
+          </div>
+        ))}
+      </div>
+      <div class="radii">
+        {radii.map(([n, v]) => (
+          <div class="radius-demo" style={`border-radius:var(--radius-${n})`}>
+            <span class="caption">{n} · {v}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Iconografía -->
+    <section class="kit-block">
+      <span class="label">Iconografía · Lucide · contorno 1.5px</span>
+      <div class="icons">
+        <Icon name="lucide:globe" />
+        <Icon name="lucide:smartphone" />
+        <Icon name="lucide:search" />
+        <Icon name="lucide:cpu" />
+        <Icon name="lucide:rocket" />
+        <Icon name="lucide:wrench" />
+        <Icon name="lucide:sparkles" />
+        <Icon name="lucide:orbit" />
+        <Icon name="lucide:message-circle" />
+        <Icon name="lucide:trending-up" />
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .kit { padding-block: var(--space-9) var(--space-10); display: flex; flex-direction: column; gap: var(--space-9); }
+  .kit-head { display: flex; flex-direction: column; gap: var(--space-4); max-width: 62ch; }
+  .kit-block { display: flex; flex-direction: column; gap: var(--space-5); }
+  .stack { display: flex; flex-direction: column; gap: var(--space-4); }
+
+  .fonts { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  @media (--md) { .fonts { grid-template-columns: repeat(3, 1fr); } }
+  .font-card {
+    display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6); min-width: 0;
+  }
+  .font-card .specimen { font-size: clamp(48px, 8vw, 72px); line-height: 1; }
+  .font-card b { font-family: var(--font-display); font-size: var(--text-lg); }
+
+  .prop-bar {
+    display: flex; height: 84px; border-radius: var(--radius-lg);
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .prop-bar span {
+    display: flex; align-items: flex-end; padding: var(--space-3); min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary);
+  }
+
+  .swatches { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  @media (--md) { .swatches { grid-template-columns: repeat(5, 1fr); } }
+  .swatch {
+    display: flex; flex-direction: column; gap: var(--space-1); min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-4);
+  }
+  .swatch .chip { height: 56px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+  .swatch b { font-family: var(--font-display); font-size: var(--text-base); }
+
+  .spaces { display: flex; flex-direction: column; gap: var(--space-2); }
+  .space-row { display: flex; align-items: center; gap: var(--space-4); }
+  .space-row .mono { width: 96px; flex: 0 0 auto; color: var(--fg-secondary); }
+  .space-row .bar { height: 14px; background: var(--accent-gold-line); border-radius: var(--radius-sm); }
+
+  .logos { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  @media (--md) { .logos { grid-template-columns: repeat(3, 1fr); } }
+  .logo-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4);
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6); min-width: 0;
+  }
+  .logo-card--row { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .logo-card--row .caption { flex-basis: 100%; }
+
+  .icons { display: flex; flex-wrap: wrap; gap: var(--space-5); color: var(--fg-primary); }
+  .icons :global(svg) { width: 28px; height: 28px; stroke-width: 1.5; }
+
+  .radii { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+  .radius-demo {
+    width: 96px; height: 72px; background: var(--bg-card);
+    border: 1px solid var(--border-accent); display: flex; align-items: flex-end; padding: var(--space-2);
+  }
+</style>

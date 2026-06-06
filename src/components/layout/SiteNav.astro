@@ -1,0 +1,237 @@
+---
+// Navegación del sitio. Mobile-first:
+//  · < md  → logo + hamburguesa → drawer off-canvas (links + lang + CTA dentro)
+//            + barra de CTA fija inferior (aparece al pasar el hero).
+//  · ≥ md  → barra completa (links + lang + CTA inline).
+// Accesible: aria-expanded, aria-hidden/inert, foco atrapado, Esc/overlay cierran,
+// objetivos ≥44px. NUNCA se oculta la nav sin reemplazo (regla dura nº2).
+import { Icon } from 'astro-icon/components';
+import LogoWordmark from '../brand/LogoWordmark.astro';
+import Button from '../ui/Button.astro';
+
+interface Props { nav: any; lang?: string; homeHref?: string }
+const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
+const otherLang = lang === 'es' ? 'en' : 'es';
+---
+<header class="nav" data-nav>
+  <div class="nav__bar container">
+    <a class="nav__logo" href={homeHref} aria-label="Marcyan Studio — inicio">
+      <LogoWordmark width={148} decorative={true} />
+    </a>
+
+    <nav class="nav__links" aria-label="Principal">
+      {nav.links.map((l: any) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+
+    <div class="nav__actions">
+      <a class="nav__lang" href={nav.langHref} hreflang={otherLang} aria-label={`Ver en ${otherLang.toUpperCase()}`}>{nav.langLabel}</a>
+      <Button href={nav.cta.href} variant="primary" size="md" class="nav__cta">{nav.cta.label}</Button>
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>
+        <span class="sr-only">{nav.openMenu}</span>
+        <Icon name="lucide:menu" />
+      </button>
+    </div>
+  </div>
+
+  <div class="nav__overlay" data-nav-overlay></div>
+
+  <aside id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label="Menú" aria-hidden="true" inert>
+    <div class="nav__drawer-head">
+      <LogoWordmark width={140} decorative={true} />
+      <button class="nav__close" type="button" data-nav-close>
+        <span class="sr-only">{nav.closeMenu}</span>
+        <Icon name="lucide:x" />
+      </button>
+    </div>
+    <nav class="nav__drawer-links" aria-label="Menú móvil">
+      {nav.links.map((l: any) => <a href={l.href} data-nav-link>{l.label}</a>)}
+    </nav>
+    <div class="nav__drawer-foot">
+      <a class="nav__drawer-lang" href={nav.langHref} hreflang={otherLang}>{nav.langLabel === 'EN' ? 'English' : 'Español'}</a>
+      <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link>{nav.cta.label}</Button>
+    </div>
+  </aside>
+</header>
+
+<div class="nav__cta-bar" data-nav-ctabar>
+  <Button href={nav.cta.href} variant="primary" size="lg" class="u-full">{nav.cta.label}</Button>
+</div>
+
+<style>
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: var(--z-nav);
+    transition: background var(--duration-slow) var(--ease-out-expo),
+                border-color var(--duration-slow), backdrop-filter var(--duration-slow);
+    border-bottom: 1px solid transparent;
+  }
+  .nav.is-scrolled {
+    background: var(--bg-overlay);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom-color: var(--border);
+  }
+  .nav__bar {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    height: var(--nav-h);
+  }
+  .nav__logo { flex: 0 0 auto; display: inline-flex; align-items: center; }
+
+  .nav__links { display: none; }
+  .nav__actions { display: flex; align-items: center; gap: var(--space-3); }
+
+  .nav__lang { display: none; }
+  .nav__cta { display: none; }
+
+  .nav__toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: var(--tap-min); height: var(--tap-min); color: var(--fg-primary);
+    border-radius: var(--radius-md);
+  }
+  .nav__toggle :global(svg) { width: 26px; height: 26px; stroke-width: 1.75; }
+
+  /* ── ≥ md: barra completa ─────────────────────────────── */
+  @media (--md) {
+    .nav__links { display: flex; align-items: center; gap: var(--space-6); }
+    .nav__links a {
+      font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg-secondary);
+      padding: var(--space-2) 0; transition: color var(--duration-fast);
+    }
+    .nav__links a:hover { color: var(--fg-primary); }
+    .nav__lang {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: var(--tap-min); padding-inline: var(--space-2);
+      font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+      color: var(--fg-secondary); transition: color var(--duration-fast);
+    }
+    .nav__lang:hover { color: var(--accent-gold); }
+    .nav__cta { display: inline-flex; }
+    .nav__toggle { display: none; }
+  }
+
+  /* ── Drawer (off-canvas) ──────────────────────────────── */
+  .nav__overlay {
+    position: fixed; inset: 0; z-index: var(--z-drawer);
+    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+    opacity: 0; pointer-events: none; transition: opacity var(--duration-base) var(--ease-out-expo);
+  }
+  .nav__overlay[data-open] { opacity: 1; pointer-events: auto; }
+
+  .nav__drawer {
+    position: fixed; inset: 0 0 0 auto; z-index: calc(var(--z-drawer) + 1);
+    width: min(86vw, 360px); max-width: 100%;
+    display: flex; flex-direction: column; gap: var(--space-6);
+    padding: var(--space-5) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
+    background: var(--bg-elevated); border-left: 1px solid var(--border);
+    transform: translateX(100%); transition: transform var(--duration-slow) var(--ease-out-expo);
+    overflow-y: auto; overscroll-behavior: contain;
+  }
+  .nav__drawer[data-open] { transform: translateX(0); }
+
+  .nav__drawer-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+  .nav__close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: var(--tap-min); height: var(--tap-min); color: var(--fg-secondary);
+    border-radius: var(--radius-md); flex: 0 0 auto;
+  }
+  .nav__close:hover { color: var(--fg-primary); }
+  .nav__close :global(svg) { width: 24px; height: 24px; stroke-width: 1.75; }
+
+  .nav__drawer-links { display: flex; flex-direction: column; }
+  .nav__drawer-links a {
+    display: flex; align-items: center; min-height: var(--tap-min);
+    font-family: var(--font-display); font-size: var(--text-lg); font-weight: 500;
+    color: var(--fg-primary); padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav__drawer-links a:hover { color: var(--accent-gold); }
+
+  .nav__drawer-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-4); }
+  .nav__drawer-lang {
+    display: inline-flex; align-items: center; min-height: var(--tap-min);
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary);
+    letter-spacing: var(--tracking-wide);
+  }
+  .nav__drawer-lang:hover { color: var(--accent-gold); }
+
+  @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
+
+  /* ── Barra CTA fija inferior (móvil) ──────────────────── */
+  .nav__cta-bar {
+    position: fixed; inset: auto 0 0 0; z-index: var(--z-nav);
+    padding: var(--space-3) var(--container-pad) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--bg-overlay); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    transform: translateY(110%); transition: transform var(--duration-slow) var(--ease-out-expo);
+  }
+  .nav__cta-bar.is-visible { transform: translateY(0); }
+  @media (--md) { .nav__cta-bar { display: none; } }
+  @media (--motion-reduce) {
+    .nav, .nav__overlay, .nav__drawer, .nav__cta-bar { transition: none; }
+  }
+
+  /* reservar espacio para la barra CTA inferior (móvil) → no tapa el footer */
+  @media (--lt-md) {
+    :global(body) { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-nav]');
+  if (root) {
+    const toggle = root.querySelector('[data-nav-toggle]') as HTMLButtonElement;
+    const drawer = root.querySelector('[data-nav-drawer]') as HTMLElement;
+    const overlay = root.querySelector('[data-nav-overlay]') as HTMLElement;
+    const closeBtn = root.querySelector('[data-nav-close]') as HTMLButtonElement;
+    const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
+    const ctabar = document.querySelector('[data-nav-ctabar]') as HTMLElement;
+    let lastFocus: HTMLElement | null = null;
+
+    const focusables = () =>
+      Array.from(drawer.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
+        .filter((el) => el.offsetParent !== null);
+
+    function open() {
+      lastFocus = document.activeElement as HTMLElement;
+      drawer.setAttribute('data-open', '');
+      overlay.setAttribute('data-open', '');
+      drawer.removeAttribute('inert');
+      drawer.setAttribute('aria-hidden', 'false');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      focusables()[0]?.focus();
+    }
+    function close() {
+      drawer.removeAttribute('data-open');
+      overlay.removeAttribute('data-open');
+      drawer.setAttribute('inert', '');
+      drawer.setAttribute('aria-hidden', 'true');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      lastFocus?.focus();
+    }
+
+    toggle.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    links.forEach((l) => l.addEventListener('click', close));
+
+    document.addEventListener('keydown', (e) => {
+      if (!drawer.hasAttribute('data-open')) return;
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Tab') {
+        const f = focusables();
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    // estado scrolled + barra CTA inferior tras pasar el hero
+    const onScroll = () => {
+      root.classList.toggle('is-scrolled', window.scrollY > 24);
+      if (ctabar) ctabar.classList.toggle('is-visible', window.scrollY > 560);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>

@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import icon from 'astro-icon';
 
 // ─────────────────────────────────────────────────────────────
 // Marcyan Studio — sitio estático bilingüe (ES default / EN).
@@ -14,6 +15,7 @@ import { defineConfig } from 'astro/config';
 // ─────────────────────────────────────────────────────────────
 export default defineConfig({
   site: 'https://marcyanstudio.com',
+  integrations: [icon()],
   trailingSlash: 'ignore',
   build: { format: 'directory' },
   redirects: {

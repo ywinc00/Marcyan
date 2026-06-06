@@ -1,0 +1,46 @@
+---
+// Sección Garantías — "Con lo que puedes contar" (reemplazó testimonios falsos).
+// 4 garantías reales con icono.
+import { Icon } from 'astro-icon/components';
+import Card from '../ui/Card.astro';
+import Kicker from '../ui/Kicker.astro';
+
+interface Props { guarantees: any }
+const { guarantees } = Astro.props;
+---
+<section class="section guarantees" id="garantias">
+  <div class="container">
+    <header class="guarantees__head">
+      <Kicker>{guarantees.tag}</Kicker>
+      <h2 class="h2" set:html={guarantees.title} />
+    </header>
+    <div class="guarantees__grid">
+      {guarantees.items.map((g: any) => (
+        <Card class="guarantee">
+          <span class="guarantee__icon"><Icon name={g.icon} /></span>
+          <h3 class="guarantee__title">{g.title}</h3>
+          <p class="guarantee__desc">{g.desc}</p>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .guarantees :global(em) { color: var(--accent-gold); font-style: normal; }
+  .guarantees__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .guarantees__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  .guarantee { display: flex; flex-direction: column; gap: var(--space-3); }
+  .guarantee__icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+    margin-bottom: var(--space-1);
+  }
+  .guarantee__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .guarantee__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
+  .guarantee__desc { color: var(--fg-secondary); font-size: var(--text-sm); }
+
+  @media (--sm) { .guarantees__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (--lg) { .guarantees__grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-5); } }
+</style>

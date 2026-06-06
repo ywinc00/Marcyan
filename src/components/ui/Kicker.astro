@@ -1,0 +1,17 @@
+---
+// Eyebrow de sección (estilo Manual): mono, con línea. tone: gold (def) | teal.
+interface Props { tone?: 'gold' | 'teal'; class?: string }
+const { tone = 'gold', class: cls } = Astro.props;
+---
+<span class:list={['kicker', `kicker--${tone}`, cls]}><slot /></span>
+
+<style>
+  .kicker {
+    display: inline-flex; align-items: center; gap: var(--space-3);
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+    letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--k);
+  }
+  .kicker::before { content: ""; width: 28px; height: 1px; background: var(--k); flex: 0 0 auto; }
+  .kicker--gold { --k: var(--accent-gold); }
+  .kicker--teal { --k: var(--accent-teal); }
+</style>

@@ -1,0 +1,77 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Layout base de Marcyan — design system v2 "Space-Tech".
+// Auto-hospeda las 3 fuentes (Fontsource, sin Google CDN), carga los
+// tokens/reset globales y arma <head> SEO/i18n (hreflang es/en/x-default).
+// Todas las páginas del sitio nuevo deben extender de aquí.
+// ─────────────────────────────────────────────────────────────
+import '@fontsource-variable/space-grotesk/index.css';
+import '@fontsource-variable/dm-sans/index.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: 'es' | 'en';
+  /** Ruta SIN prefijo de idioma, p.ej. "/" o "/servicios". Construye canonical + hreflang. */
+  path?: string;
+  canonical?: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+const SITE = 'https://marcyanstudio.com';
+const {
+  title,
+  description = 'Marcyan Studio — diseño web, IA y SEO para PYMEs en Houston y Miami.',
+  lang = 'es',
+  path = '/',
+  canonical,
+  noindex = false,
+  ogImage = '/assets/og-default.png',
+} = Astro.props;
+
+const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;
+const canon = canonical ?? `${SITE}/${lang}${clean}/`;
+const esHref = `${SITE}/es${clean}/`;
+const enHref = `${SITE}/en${clean}/`;
+const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canon} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="alternate" hreflang="es" href={esHref} />
+    <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="alternate" hreflang="x-default" href={esHref} />
+
+    <meta name="theme-color" content="#080808" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Marcyan Studio" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canon} />
+    <meta property="og:image" content={`${SITE}${ogImage}`} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/* Favicon planeta (placeholder en línea; el mark real llega en Fase B) */}
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23c8a96e'/%3E%3Cellipse cx='16' cy='16' rx='15' ry='4.5' fill='none' stroke='%23c8a96e' stroke-width='1.4'/%3E%3Ccircle cx='30' cy='13' r='2' fill='%234fc3a1'/%3E%3C/svg%3E"
+    />
+
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

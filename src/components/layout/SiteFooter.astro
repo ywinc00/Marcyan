@@ -1,0 +1,93 @@
+---
+// Pie del sitio: marca + NAP real + columnas de enlaces + legal.
+// (Social va comentado hasta tener handles — listo para sameAs.)
+import LogoWordmark from '../brand/LogoWordmark.astro';
+import { nap } from '../../i18n/content';
+
+interface Props { footer: any }
+const { footer } = Astro.props;
+const telHou = nap.houston.replace(/[^\d+]/g, '');
+const telMia = nap.miami.replace(/[^\d+]/g, '');
+---
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <a href="#top" aria-label="Marcyan Studio — inicio" class="footer__logo">
+        <LogoWordmark width={188} />
+      </a>
+      <p class="footer__tagline">{footer.tagline}</p>
+      <ul class="footer__contact">
+        <li><a href={`mailto:${nap.email}`}>{nap.email}</a></li>
+        <li><span class="footer__city">Houston</span> <a href={`tel:${telHou}`}>{nap.houston}</a></li>
+        <li><span class="footer__city">Miami</span> <a href={`tel:${telMia}`}>{nap.miami}</a></li>
+      </ul>
+    </div>
+
+    <nav class="footer__cols" aria-label="Enlaces del pie">
+      {footer.cols.map((col: any) => (
+        <div class="footer__col">
+          <h2 class="footer__col-title">{col.title}</h2>
+          <ul>
+            {col.links.map((l: any) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  </div>
+
+  <div class="container footer__bottom">
+    <span>{footer.copy}</span>
+    <span class="footer__legal">
+      <a href="/privacidad">Privacidad</a>
+      <span aria-hidden="true">·</span>
+      <a href="/terminos">Términos</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+    padding-block: var(--space-8) var(--space-6);
+    margin-top: var(--space-9);
+  }
+  .footer__inner {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-8);
+  }
+  .footer__brand { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+  .footer__logo { display: inline-flex; width: fit-content; }
+  .footer__tagline { color: var(--fg-secondary); font-size: var(--text-sm); max-width: 38ch; }
+  .footer__contact { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+  .footer__contact a { color: var(--fg-secondary); font-size: var(--text-sm); transition: color var(--duration-fast); }
+  .footer__contact a:hover { color: var(--accent-gold); }
+  .footer__city { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: var(--tracking-wide); margin-right: var(--space-1); }
+
+  .footer__cols {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-5);
+  }
+  .footer__col-title {
+    font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600;
+    letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle);
+    margin-bottom: var(--space-4);
+  }
+  .footer__col ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+  .footer__col a { color: var(--fg-secondary); font-size: var(--text-sm); transition: color var(--duration-fast); }
+  .footer__col a:hover { color: var(--fg-primary); }
+
+  .footer__bottom {
+    display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
+    justify-content: space-between; align-items: center;
+    margin-top: var(--space-8); padding-top: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+    font-size: var(--text-xs); color: var(--fg-subtle);
+  }
+  .footer__legal { display: inline-flex; gap: var(--space-2); }
+  .footer__legal a { color: var(--fg-subtle); transition: color var(--duration-fast); }
+  .footer__legal a:hover { color: var(--accent-gold); }
+
+  @media (--md) {
+    .footer__inner { grid-template-columns: 1.4fr 2fr; gap: var(--space-10); }
+    .footer__cols { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>

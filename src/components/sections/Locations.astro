@@ -1,0 +1,64 @@
+---
+// Sección Ubicaciones — Houston y Miami (Service-Area Business, sin dirección pública).
+import { Icon } from 'astro-icon/components';
+import Kicker from '../ui/Kicker.astro';
+
+interface Props { locations: any }
+const { locations } = Astro.props;
+const tel = (s: string) => s.replace(/[^\d+]/g, '');
+---
+<section class="section locations" id="ciudades">
+  <div class="container">
+    <header class="locations__head">
+      <Kicker>{locations.tag}</Kicker>
+      <h2 class="h2" set:html={locations.title} />
+    </header>
+    <div class="locations__grid">
+      {locations.items.map((c: any) => (
+        <article class="loc">
+          <div class="loc__top">
+            <span class="loc__pin"><Icon name="lucide:map-pin" /></span>
+            <span class="loc__badge"><span class="loc__badge-dot"></span>{c.badge}</span>
+          </div>
+          <h3 class="loc__city">{c.city} <span class="loc__state">{c.state}</span></h3>
+          <p class="loc__area">{c.area}</p>
+          <a class="loc__tel" href={`tel:${tel(c.tel)}`}>{c.tel}</a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .locations :global(em) { color: var(--accent-gold); font-style: normal; }
+  .locations__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .locations__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+
+  .loc {
+    min-width: 0; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6);
+    display: flex; flex-direction: column; gap: var(--space-3);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .loc:hover { border-color: var(--border-accent); }
+  .loc__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .loc__pin {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  }
+  .loc__pin :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .loc__badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-teal);
+  }
+  .loc__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
+  .loc__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; }
+  .loc__state { color: var(--fg-subtle); }
+  .loc__area { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .loc__tel { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); margin-top: var(--space-1); }
+  .loc__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
+
+  @media (--md) { .locations__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-5); } }
+</style>

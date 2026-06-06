@@ -1,0 +1,48 @@
+---
+// Sección Proceso — 5 pasos del concepto al lanzamiento. Línea/órbita conectora.
+import Kicker from '../ui/Kicker.astro';
+
+interface Props { process: any }
+const { process } = Astro.props;
+---
+<section class="section process" id="proceso">
+  <div class="container">
+    <header class="process__head">
+      <Kicker>{process.tag}</Kicker>
+      <h2 class="h2" set:html={process.title} />
+    </header>
+    <ol class="process__steps">
+      {process.steps.map((s: any) => (
+        <li class="process__step">
+          <span class="process__num">{s.n}</span>
+          <h3 class="process__step-title">{s.title}</h3>
+          <p class="process__step-desc">{s.desc}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process :global(em) { color: var(--accent-gold); font-style: normal; }
+  .process__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+
+  .process__steps { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-4); counter-reset: step; }
+  .process__step {
+    position: relative; min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-5);
+    display: flex; flex-direction: column; gap: var(--space-2);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .process__step:hover { border-color: var(--border-accent); }
+  .process__num {
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
+    letter-spacing: var(--tracking-wide); margin-bottom: var(--space-1);
+  }
+  .process__step-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
+  .process__step-desc { color: var(--fg-secondary); font-size: var(--text-sm); }
+
+  @media (--sm) { .process__steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (--lg) { .process__steps { grid-template-columns: repeat(5, 1fr); gap: var(--space-3); } }
+</style>

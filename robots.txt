@@ -1,0 +1,62 @@
+# Marcyan Studio — robots.txt
+# Diseño web · IA · SEO para PYMEs hispanas — Houston, TX y Miami, FL
+# Permitimos a propósito a los rastreadores de IA (estrategia AEO/GEO).
+
+# ── Buscadores tradicionales y demás bots ──
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# ── Asistentes y buscadores de IA (permitidos explícitamente) ──
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://marcyanstudio.com/sitemap.xml

@@ -1,12 +1,13 @@
 ---
 // Sección Proceso — "Riel conectado" con energía que recorre los pasos.
-//  · PC (puntero fino): al pasar el cursor por un círculo, ESTE se resalta y crece;
-//    al alejarse vuelve a su tamaño; por la línea viaja una luz sutil de un punto al
-//    siguiente. CTA de lanzamiento inline abajo.
-//  · Móvil (táctil): el MISMO patrón pero lo activa el SCROLL — un círculo activo a la
-//    vez, la línea se va llenando, y al llegar al nodo final el COHETE despega del
-//    círculo hasta el centro de la pantalla, donde aparece el CTA. Al seguir scrolleando
-//    se sale de la animación.
+//  · PC (riel horizontal + puntero fino): al pasar el cursor por un círculo, ESTE se
+//    resalta y crece suavemente; al alejarse vuelve; por la línea viaja una luz hacia
+//    el siguiente. Animación pulida (easing expo, tiempos naturales). CTA inline abajo.
+//  · Móvil/apilado (<1024): el MISMO patrón pero lo activa el SCROLL — un círculo activo
+//    a la vez + la línea se va llenando. Al llegar al nodo final, EL MISMO cohete del
+//    círculo despega LENTO y se detiene en el centro de la pantalla; al detenerse salen
+//    los botones y el fondo se difumina. **Se reproduce UNA sola vez** (primera bajada):
+//    no se revierte ni se re-ilumina al volver.
 //  · reduced-motion / sin JS: estado normal + CTA inline (sin animaciones).
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
@@ -37,16 +38,16 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
       ))}
     </ol>
 
-    <!-- CTA inline (PC / reduced-motion / sin JS) -->
+    <!-- CTA inline (PC / reduced-motion / sin JS / tras el show en móvil) -->
     <div class="riel__launch-inline">
       {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
       <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
     </div>
   </div>
 
-  <!-- FINALE (móvil con movimiento): el cohete vuela al centro + CTA. Transitorio. -->
+  <!-- FINALE (móvil, una sola vez): el cohete vuela al centro + CTA + fondo difuminado -->
   <div class="riel__finale" data-finale aria-hidden="true">
-    <span class="riel__rocket-fly" aria-hidden="true"><Icon name="lucide:rocket" /></span>
+    <span class="riel__rocket-fly" data-rocket aria-hidden="true"><Icon name="lucide:rocket" /></span>
     <div class="riel__finale-cta">
       {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
       <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
@@ -64,23 +65,23 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   .riel__step:not(:last-child)::after {
     content: ""; position: absolute; left: 24px; top: 24px; width: 2px; height: calc(100% + var(--space-6));
     transform: translateX(-1px); background: var(--border); z-index: 0;
-    transition: background var(--duration-slow) var(--ease-out-expo);
+    transition: background 0.5s var(--ease-out-expo);
   }
   .riel__dot {
     position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;
     display: inline-flex; align-items: center; justify-content: center;
     background: var(--bg-elevated); border: 1px solid var(--accent-gold-line);
-    transition: transform var(--duration-base) var(--ease-out-expo), border-color var(--duration-base), box-shadow var(--duration-base);
+    transition: transform 0.34s var(--ease-out-expo), border-color 0.34s var(--ease-out-expo), box-shadow 0.34s var(--ease-out-expo);
   }
-  .riel__dot :global(svg) { width: 22px; height: 22px; color: var(--accent-gold); stroke-width: 1.6; transition: transform var(--duration-slow) var(--ease-out-expo), opacity var(--duration-slow); }
+  .riel__dot :global(svg) { width: 22px; height: 22px; color: var(--accent-gold); stroke-width: 1.6; transition: opacity 0.4s var(--ease-out-expo); }
   .riel__tx { display: flex; flex-direction: column; gap: var(--space-1); padding-top: 2px; }
   .riel__num { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: var(--tracking-wide); }
   .riel__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
   .riel__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  /* CÍRCULO ACTIVO: se resalta y crece (PC=hover · móvil=is-active por scroll) */
-  .riel__step.is-active .riel__dot { transform: scale(1.14); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 18px var(--accent-gold-glow); }
-  /* la energía que ya pasó deja la línea encendida (móvil) */
+  /* CÍRCULO ACTIVO (móvil=is-active por scroll): se resalta y crece */
+  .riel__step.is-active .riel__dot { transform: scale(1.13); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 18px var(--accent-gold-glow); }
+  /* la energía que ya pasó deja la línea encendida */
   .riel__step.is-passed::after { background: var(--accent-gold-line); }
 
   /* riel horizontal (desktop) */
@@ -94,16 +95,17 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
     .riel__tx { padding-top: 0; align-items: center; }
   }
 
-  /* PC (riel horizontal + puntero fino): hover resalta el círculo + luz que viaja por la línea */
+  /* PC (riel horizontal + puntero fino): hover pulido + luz que viaja por la línea */
   @media (--lg) and (--hover-fine) {
-    .riel__step:hover .riel__dot { transform: scale(1.14); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 18px var(--accent-gold-glow); }
+    .riel__step:hover .riel__dot { transform: scale(1.13); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 22px var(--accent-gold-glow); }
+    .riel__step:hover .riel__dot :global(svg) { color: var(--accent-gold); }
     .riel__step:not(:last-child)::after {
       background:
-        linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%) -45% 0 / 45% 100% no-repeat,
+        linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%) -55% 0 / 55% 100% no-repeat,
         var(--border);
     }
-    .riel__step:hover:not(:last-child)::after { animation: rielflow 0.9s var(--ease-out-expo); }
-    @keyframes rielflow { from { background-position: -45% 0, 0 0; } to { background-position: 145% 0, 0 0; } }
+    .riel__step:hover:not(:last-child)::after { animation: rielflow 1.15s var(--ease-out-expo); }
+    @keyframes rielflow { from { background-position: -55% 0, 0 0; } to { background-position: 155% 0, 0 0; } }
   }
 
   /* ── CTA inline (abajo) ────────────────────────────────── */
@@ -111,26 +113,31 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   .has-finale .riel__launch-inline { display: none; }
   .riel__cta-kicker { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
 
-  /* ── FINALE: cohete al centro + CTA (sólo móvil con movimiento) ── */
+  /* ── FINALE: cohete al centro + CTA + fondo difuminado (móvil, una vez) ── */
   .riel__finale {
     position: fixed; inset: 0; z-index: 60; display: none;
-    flex-direction: column; align-items: center; justify-content: center; gap: var(--space-5);
+    flex-direction: column; align-items: center; justify-content: center; gap: var(--space-6);
     pointer-events: none; opacity: 0; visibility: hidden;
-    background: radial-gradient(closest-side at 50% 50%, rgba(8, 8, 8, 0.72), rgba(8, 8, 8, 0.4) 45%, transparent 72%);
-    transition: opacity var(--duration-slow) var(--ease-out-expo), visibility 0s linear var(--duration-slow);
+    background: rgba(8, 8, 8, 0.42);
+    -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+    transition: opacity 0.5s var(--ease-out-expo), visibility 0s linear 0.5s;
   }
   .has-finale .riel__finale { display: flex; }
-  .process.is-launched .riel__finale { opacity: 1; visibility: visible; transition: opacity var(--duration-slow) var(--ease-out-expo); }
-  .riel__rocket-fly { position: relative; color: var(--accent-gold); transform: translateY(60px) scale(0.5) rotate(-8deg); opacity: 0; transition: transform 0.8s var(--ease-out-expo), opacity 0.5s; }
-  .riel__rocket-fly :global(svg) { width: 56px; height: 56px; display: block; }
-  .riel__rocket-fly::after { content: ""; position: absolute; left: 50%; bottom: -10px; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle, var(--accent-gold-glow), transparent 70%); transform: translateX(-50%) scale(0); opacity: 0; pointer-events: none; }
-  .process.is-launched .riel__rocket-fly { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
-  .process.is-launched .riel__rocket-fly::after { animation: rsmoke 0.9s var(--ease-out-expo) 0.1s forwards; }
-  @keyframes rsmoke { 0% { transform: translateX(-50%) scale(0.3); opacity: 0.8; } 100% { transform: translateX(-50%) translateY(22px) scale(2.6); opacity: 0; } }
-  .riel__finale-cta { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); pointer-events: auto; opacity: 0; transform: translateY(14px); transition: opacity 0.5s var(--ease-out-expo) 0.3s, transform 0.5s var(--ease-out-expo) 0.3s; }
-  .process.is-launched .riel__finale-cta { opacity: 1; transform: none; }
-  /* el cohete del nodo final "despega" del círculo cuando se lanza */
-  .process.is-launched .riel__step:last-child .riel__dot :global(svg) { transform: translateY(-10px) rotate(-8deg); opacity: 0.25; }
+  .process.is-launched .riel__finale { opacity: 1; visibility: visible; transition: opacity 0.5s var(--ease-out-expo); }
+  .process.is-done .riel__finale { opacity: 0; visibility: hidden; transition: opacity 0.6s var(--ease-out-expo), visibility 0s linear 0.6s; }
+
+  /* el cohete que vuela (FLIP: arranca en el nodo, JS le pone el transform inicial) */
+  .riel__rocket-fly { position: relative; color: var(--accent-gold); transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .riel__rocket-fly :global(svg) { width: 54px; height: 54px; display: block; }
+  .riel__rocket-fly::after { content: ""; position: absolute; left: 50%; bottom: -10px; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle, var(--accent-gold-glow), transparent 70%); transform: translateX(-50%) scale(0); opacity: 0; pointer-events: none; }
+  .process.is-launched .riel__rocket-fly::after { animation: rsmoke 1.3s var(--ease-out-expo) forwards; }
+  @keyframes rsmoke { 0% { transform: translateX(-50%) scale(0.4); opacity: 0.7; } 100% { transform: translateX(-50%) translateY(26px) scale(2.8); opacity: 0; } }
+
+  /* el CTA sale CUANDO el cohete ya se detuvo (delay ~ el vuelo) */
+  .riel__finale-cta { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); pointer-events: auto; opacity: 0; transform: translateY(16px); transition: opacity 0.55s var(--ease-out-expo), transform 0.55s var(--ease-out-expo); }
+  .process.is-launched .riel__finale-cta { opacity: 1; transform: none; transition-delay: 1.15s; }
+  /* el cohete del nodo final desaparece (se ve que "salió" del círculo) */
+  .process.is-launched .riel__step:last-child .riel__dot :global(svg) { opacity: 0; }
 
   @media (--motion-reduce) {
     .riel__finale { display: none !important; }
@@ -145,38 +152,71 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-step]'));
 
-    // En desktop (riel horizontal ≥1024) el efecto es por HOVER (CSS). En el layout
-    // apilado (<1024 = móvil/ventana angosta) el motor es por SCROLL + cohete.
+    // Desktop (riel horizontal ≥1024) → efecto por HOVER (CSS). Layout apilado (<1024) →
+    // motor por SCROLL + cohete, que se reproduce UNA sola vez.
     if (window.innerWidth < 1024 && !reduce && steps.length) {
       section.classList.add('has-finale');
-
-      // 1) energía por scroll: un círculo activo a la vez + la línea se va llenando
+      const last = steps[steps.length - 1];
+      const rocket = section.querySelector<HTMLElement>('[data-rocket]');
+      let played = false;
       let ticking = false;
+
+      // 1) energía por scroll (sólo mientras no se ha reproducido)
       const update = () => {
         ticking = false;
+        if (played) return;
         const center = window.innerHeight * 0.5;
         let active = -1;
         for (let i = 0; i < steps.length; i++) {
           const r = steps[i].getBoundingClientRect();
-          if (r.top + 24 <= center) active = i; // último cuyo dot pasó el centro
+          if (r.top + 24 <= center) active = i;
         }
         steps.forEach((s, i) => {
           s.classList.toggle('is-active', i === active);
           s.classList.toggle('is-passed', i < active);
         });
+        // disparo del cohete: cuando el dot del nodo final sube a la mitad-baja del viewport
+        const ld = last.querySelector('.riel__dot') as HTMLElement | null;
+        if (ld && ld.getBoundingClientRect().top + 24 <= window.innerHeight * 0.7) play();
       };
-      window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-      window.addEventListener('resize', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+      const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
       update();
 
-      // 2) cohete al centro + CTA cuando el último nodo llega a la franja central; al
-      //    seguir scrolleando se sale (bidireccional).
-      const last = steps[steps.length - 1];
-      const io = new IntersectionObserver(
-        ([e]) => section.classList.toggle('is-launched', e.isIntersecting),
-        { rootMargin: '-42% 0px -42% 0px' }
-      );
-      io.observe(last);
+      // 2) cohete: vuela del nodo final al centro (lento) → se detiene → salen botones.
+      function play() {
+        if (played) return;
+        played = true;
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+        // estado final: la línea queda encendida (no se revierte), sin escala activa
+        steps.forEach((s, i) => { s.classList.remove('is-active'); s.classList.toggle('is-passed', i < steps.length); });
+
+        // FLIP: el cohete arranca EN el círculo del nodo y vuela al centro
+        const dot = last.querySelector('.riel__dot') as HTMLElement;
+        const dr = dot.getBoundingClientRect();
+        const dx = dr.left + dr.width / 2 - window.innerWidth / 2;
+        const dy = dr.top + dr.height / 2 - window.innerHeight / 2;
+        if (rocket) {
+          rocket.style.transition = 'none';
+          rocket.style.transform = `translate(${dx}px, ${dy}px) scale(0.45)`;
+        }
+        section.classList.add('is-launched'); // muestra overlay + blur + oculta el cohete del nodo
+        // siguiente tick: re-habilita la transición CSS y lo lleva al centro (vuelo lento)
+        setTimeout(() => { if (rocket) { rocket.style.transition = ''; rocket.style.transform = ''; } }, 40);
+
+        // al seguir hacia abajo (o alejarse), se desvanece SIN revertir; y no vuelve a cargar
+        const dismiss = () => {
+          const r = last.getBoundingClientRect();
+          if (r.bottom < window.innerHeight * 0.12 || r.top > window.innerHeight * 0.92) {
+            section.classList.add('is-done');
+            section.classList.remove('has-finale'); // deja el CTA inline para futuras visitas
+            window.removeEventListener('scroll', dismiss);
+          }
+        };
+        window.addEventListener('scroll', dismiss, { passive: true });
+      }
     }
   }
 </script>

@@ -35,7 +35,6 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     </div>
 
     <div class="hero__stage" data-hero-stage>
-      <div class="hero__cursorlight" data-hero-cursorlight aria-hidden="true"></div>
       <svg viewBox="0 0 400 400" role="img" aria-label="Marcyan — planeta en órbita" class="hero__svg">
         <defs>
           <radialGradient id={`${uid}-p`} cx="44%" cy="36%" r="62%">
@@ -120,13 +119,6 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .hero__stage { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin-inline: auto; will-change: transform; }
   .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
   .hero__orbit { position: absolute; inset: 0; z-index: 3; }
-  /* luz que sigue al cursor (escritorio) — recorre el camino de los nodos */
-  .hero__cursorlight {
-    position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 50%;
-    background: radial-gradient(circle, var(--accent-gold-glow), transparent 68%);
-    opacity: 0; pointer-events: none; z-index: 2; mix-blend-mode: screen;
-    transition: opacity var(--duration-base) var(--ease-out-expo);
-  }
   .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; cursor: pointer; }
   .hero__hint {
     position: absolute; left: 50%; bottom: -8px; transform: translate(-50%, 100%); z-index: 5;
@@ -185,15 +177,9 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
   .hero__orbit .hero-node .moon__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal .moon__dot { background: var(--accent-teal); }
-  /* hover: el nodo se ILUMINA (borde + fondo + halo) */
-  .hero__orbit .hero-node:hover {
-    background: rgba(34, 30, 22, 0.92); border-color: var(--accent-gold); color: var(--fg-primary);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent-gold), 0 0 22px var(--accent-gold-glow);
-  }
-  .hero__orbit .hero-node.teal:hover {
-    border-color: var(--accent-teal);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent-teal), 0 0 22px var(--accent-teal-dim);
-  }
+  /* hover sutil del nodo (sin halo de "linterna") */
+  .hero__orbit .hero-node:hover { border-color: var(--accent-gold); color: var(--fg-primary); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+  .hero__orbit .hero-node.teal:hover { border-color: var(--accent-teal); }
   .hero__orbit .hero-amb {
     position: absolute; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%;
     background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold);
@@ -212,7 +198,6 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     const hintTxt = hero.querySelector('[data-hero-hint-txt]') as HTMLElement;
     const caso0 = hero.querySelector('[data-hero-caso0]') as HTMLElement;
     const starsEl = hero.querySelector('[data-hero-stars]') as HTMLElement;
-    const cursorLight = hero.querySelector('[data-hero-cursorlight]') as HTMLElement;
 
     const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -314,18 +299,12 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     }
 
     const onEnter = () => { if (!isAuto) target = 1; };
-    const onLeave = () => { if (!isAuto) { target = 0; cursorLight.style.opacity = '0'; } };
+    const onLeave = () => { if (!isAuto) target = 0; };
     const onMove = (e: PointerEvent) => {
       if (isAuto) return;
       const hr = hero.getBoundingClientRect();
       tTiltY = ((e.clientX - hr.left) / hr.width - 0.5) * 6;
       tTiltX = -((e.clientY - hr.top) / hr.height - 0.5) * 4;
-      // luz que sigue al cursor, sólo cerca del escenario del planeta
-      const sr = stage.getBoundingClientRect();
-      const lx = e.clientX - sr.left, ly = e.clientY - sr.top;
-      const near = lx > -90 && lx < sr.width + 90 && ly > -90 && ly < sr.height + 90;
-      cursorLight.style.opacity = near ? '1' : '0';
-      cursorLight.style.transform = `translate(${lx}px,${ly}px) translate(-50%,-50%)`;
     };
     // primer toque (móvil): recién entonces sale la órbita
     const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; } };
@@ -360,7 +339,6 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       stage.style.transform = '';
       hint.style.display = 'none';
       headline.style.opacity = '';
-      cursorLight.style.opacity = '0';
       hero.removeEventListener('pointerenter', onEnter);
       hero.removeEventListener('pointerleave', onLeave);
       hero.removeEventListener('pointermove', onMove);

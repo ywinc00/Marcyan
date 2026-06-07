@@ -103,5 +103,7 @@ const [featured, ...rest] = services.items;
     .services__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
     .svc-c { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-5); }
     .svc-hero { padding: var(--space-7); }
+    /* la pila se reparte para cuadrar su alto con el del servicio destacado */
+    .svc-list { justify-content: space-between; }
   }
 </style>

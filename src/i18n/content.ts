@@ -99,6 +99,7 @@ export const content = {
     process: {
       tag: 'Cómo Trabajamos',
       title: 'Del concepto al<br><em>lanzamiento</em>',
+      launch: { kicker: '¿Listo para despegar?', label: 'Lanza tu proyecto ahora', href: '#contacto' },
       steps: [
         { n: '01', title: 'Descubrimiento', desc: 'Analizamos tu negocio, competidores y mercado local en Houston o Miami para definir la estrategia correcta.' },
         { n: '02', title: 'Estrategia IA', desc: 'Diseñamos el ecosistema digital ideal: sitio, IA, SEO y automatizaciones, todo coordinado.' },
@@ -222,11 +223,11 @@ export const content = {
       primary: { label: 'Get Free Proposal', href: '#contacto' },
       secondary: { label: 'View Projects', href: '#proyectos' },
       nodes: [
-        { label: 'Services', href: '#servicios' },
-        { label: 'AI', href: '#ia' },
-        { label: 'Projects', href: '#proyectos' },
-        { label: 'Cities', href: '#ciudades' },
-      ] as Link[],
+        { label: 'Services', href: '#servicios', icon: 'lucide:layers' },
+        { label: 'AI', href: '#ia', icon: 'lucide:sparkles' },
+        { label: 'Projects', href: '#proyectos', icon: 'lucide:folder' },
+        { label: 'Cities', href: '#ciudades', icon: 'lucide:map-pin' },
+      ],
       caso0: {
         label: 'Marcyan · Case #0 (this site)',
         rows: [
@@ -243,6 +244,7 @@ export const content = {
       tag: 'Our Services',
       title: 'Everything your<br>brand <em>needs</em>',
       explore: 'Explore',
+      featuredBadge: 'Featured service',
       cta: { label: 'Tell us your project', href: '#contacto' },
       items: [
         { n: '01', icon: 'lucide:layout-template', title: 'Premium Web Design', price: 'from $1,500',
@@ -275,6 +277,7 @@ export const content = {
     process: {
       tag: 'How We Work',
       title: 'From concept to<br><em>launch</em>',
+      launch: { kicker: 'Ready for liftoff?', label: 'Launch your project now', href: '#contacto' },
       steps: [
         { n: '01', title: 'Discovery', desc: 'We analyze your business, competitors, and local market in Houston or Miami to define the right strategy.' },
         { n: '02', title: 'AI Strategy', desc: 'We design the ideal digital ecosystem: site, AI, SEO, and automations — all coordinated.' },
@@ -289,10 +292,10 @@ export const content = {
       title: 'Real work, real<br><em>businesses</em>',
       cta: { label: 'Start your project', href: '#contacto' },
       items: [
-        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Full rebuild from scratch + local SEO — now ranking.', accent: 'gold' },
-        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Rebuilt from scratch + local SEO — now ranking.', accent: 'teal' },
-        { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', url: 'https://julios-landscape-tx.vercel.app', display: 'julios-landscape-tx.vercel.app', result: 'Brand, identity, and website created from zero.', accent: 'gold' },
-        { name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', url: 'https://rosi-nails.vercel.app', display: 'rosi-nails.vercel.app', result: 'Custom web app: clients book appointments and browse nail inspiration.', accent: 'teal' },
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Full rebuild from scratch + local SEO — now ranking.', accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
+        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Rebuilt from scratch + local SEO — now ranking.', accent: 'teal', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
+        { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', url: 'https://julios-landscape-tx.vercel.app', display: 'julios-landscape-tx.vercel.app', result: 'Brand, identity, and website created from zero.', accent: 'gold', badge: 'Brand + Site', tags: ['Brand identity', 'Custom site'] },
+        { name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', url: 'https://rosi-nails.vercel.app', display: 'rosi-nails.vercel.app', result: 'Custom web app: clients book appointments and browse nail inspiration.', accent: 'teal', badge: 'Web app', tags: ['Appointment booking', 'Custom'] },
       ],
     },
 

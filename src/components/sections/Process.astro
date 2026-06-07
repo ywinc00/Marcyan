@@ -1,15 +1,21 @@
 ---
-// Sección Proceso — Variante B "Riel conectado".
+// Sección Proceso — Variante B "Riel conectado" + energía por scroll.
 // 5 pasos en un riel lineal conectado: dot (icono) + nº + título + desc.
-// Vertical en móvil, horizontal en desktop. Claridad lineal, alineado.
+// Vertical en móvil, horizontal en desktop. El conector va EXACTO entre los
+// centros de los dots (sin sobresalir del último).
+// Al hacer scroll, la "energía" recorre el camino (cada paso se ilumina al
+// entrar en vista; al scrollear al revés se apaga → estado normal). Al llegar
+// a "Lanzamiento", el cohete despega con humo dorado y revela un CTA.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
+import Button from '../ui/Button.astro';
 
 interface Props { process: any }
 const { process } = Astro.props;
 const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucide:shield-check', 'lucide:rocket'];
+const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#contacto' };
 ---
-<section class="section process" id="proceso">
+<section class="section process" id="proceso" data-process>
   <div class="container">
     <header class="process__head">
       <Kicker>{process.tag}</Kicker>
@@ -18,7 +24,7 @@ const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucid
 
     <ol class="riel">
       {process.steps.map((s: any, i: number) => (
-        <li class="riel__step">
+        <li class="riel__step" data-step>
           <span class="riel__dot"><Icon name={s.icon ?? fallbackIcons[i % fallbackIcons.length]} /></span>
           <div class="riel__tx">
             <span class="riel__num">{s.n}</span>
@@ -28,6 +34,14 @@ const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucid
         </li>
       ))}
     </ol>
+
+    <div class="riel__launch" data-launch>
+      <span class="riel__rocket" aria-hidden="true"><Icon name="lucide:rocket" /></span>
+      <div class="riel__cta-wrap">
+        {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
+        <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -36,16 +50,18 @@ const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucid
   .process__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
 
   .riel { position: relative; list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
-  /* riel vertical (móvil) — pasa por el centro de los dots */
-  .riel::before {
-    content: ""; position: absolute; left: 24px; top: 24px; bottom: 24px; width: 1px;
-    background: linear-gradient(var(--accent-gold-line), var(--border)); z-index: 0;
+  .riel__step { position: relative; display: grid; grid-template-columns: 48px 1fr; column-gap: var(--space-4); align-items: start; }
+  /* conector: del centro de este dot al centro del siguiente (último sin conector) */
+  .riel__step:not(:last-child)::after {
+    content: ""; position: absolute; left: 24px; top: 24px; width: 2px; height: calc(100% + var(--space-6));
+    transform: translateX(-1px); background: var(--border); z-index: 0;
+    transition: background var(--duration-slow) var(--ease-out-expo);
   }
-  .riel__step { position: relative; z-index: 1; display: grid; grid-template-columns: 48px 1fr; column-gap: var(--space-4); align-items: start; }
   .riel__dot {
-    width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;
+    position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;
     display: inline-flex; align-items: center; justify-content: center;
     background: var(--bg-elevated); border: 1px solid var(--accent-gold-line);
+    transition: border-color var(--duration-base), box-shadow var(--duration-base);
   }
   .riel__dot :global(svg) { width: 22px; height: 22px; color: var(--accent-gold); stroke-width: 1.6; }
   .riel__tx { display: flex; flex-direction: column; gap: var(--space-1); padding-top: 2px; }
@@ -53,12 +69,73 @@ const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucid
   .riel__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
   .riel__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
+  /* energía: paso iluminado + conector que se llena */
+  .riel__step.is-lit .riel__dot { border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 16px var(--accent-gold-glow); }
+  .riel__step.is-lit::after { background: var(--accent-gold-line); }
+
   /* riel horizontal (desktop) */
   @media (--lg) {
     .riel { grid-template-columns: repeat(5, 1fr); gap: var(--space-5); }
-    .riel::before { left: 10%; right: 10%; top: 24px; bottom: auto; width: auto; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-gold-line) 12%, var(--border)); }
-    .riel__step { grid-template-columns: 1fr; row-gap: var(--space-4); }
-    .riel__dot { margin-inline: 0; }
-    .riel__tx { padding-top: 0; }
+    .riel__step { grid-template-columns: 1fr; justify-items: center; text-align: center; row-gap: var(--space-4); }
+    .riel__step:not(:last-child)::after {
+      left: 50%; top: 24px; width: calc(100% + var(--space-5)); height: 2px;
+      transform: translateY(-1px);
+    }
+    .riel__tx { padding-top: 0; align-items: center; }
+  }
+
+  /* ── Lanzamiento (cohete + CTA de conversión) ──────────── */
+  .riel__launch { margin-top: var(--space-8); display: flex; flex-direction: column; align-items: center; gap: var(--space-4); text-align: center; }
+  .riel__rocket { position: relative; color: var(--accent-gold); transition: transform var(--duration-slow) var(--ease-out-expo); }
+  .riel__rocket :global(svg) { width: 38px; height: 38px; stroke-width: 1.5; display: block; }
+  /* humo dorado bajo el cohete */
+  .riel__rocket::after {
+    content: ""; position: absolute; left: 50%; bottom: -8px; width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-gold-glow), transparent 70%);
+    transform: translateX(-50%) scale(0); opacity: 0; pointer-events: none;
+  }
+  .riel__launch.is-go .riel__rocket { transform: translateY(-16px); }
+  .riel__launch.is-go .riel__rocket::after { animation: rsmoke 0.9s var(--ease-out-expo) forwards; }
+  @keyframes rsmoke { 0% { transform: translateX(-50%) scale(0.2); opacity: 0.7; } 100% { transform: translateX(-50%) translateY(14px) scale(2.4); opacity: 0; } }
+  .riel__cta-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); opacity: 0; transform: translateY(12px); transition: opacity var(--duration-slow) var(--ease-out-expo) 0.2s, transform var(--duration-slow) var(--ease-out-expo) 0.2s; }
+  .riel__launch.is-go .riel__cta-wrap { opacity: 1; transform: none; }
+  .riel__cta-kicker { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
+
+  @media (--motion-reduce) {
+    .riel__step.is-lit .riel__dot, .riel__step.is-lit::after { transition: none; }
+    .riel__rocket { transition: none; }
+    .riel__launch.is-go .riel__rocket { transform: none; }
+    .riel__launch.is-go .riel__rocket::after { animation: none; }
+    .riel__cta-wrap { transition: none; }
   }
 </style>
+
+<script>
+  const section = document.querySelector('[data-process]');
+  if (section) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-step]'));
+    const launch = section.querySelector<HTMLElement>('[data-launch]');
+
+    if (reduce) {
+      // sin animación de scroll: estado normal + CTA visible (no se "lanza" nada)
+      launch?.classList.add('is-go');
+    } else {
+      // energía por scroll: se ilumina al entrar en vista, se apaga al salir
+      // (scrollear al revés → estado normal). Bidireccional via IntersectionObserver.
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => e.target.classList.toggle('is-lit', e.isIntersecting)),
+        { rootMargin: '0px 0px -35% 0px', threshold: 0.15 }
+      );
+      steps.forEach((s) => io.observe(s));
+
+      if (launch) {
+        const lo = new IntersectionObserver(
+          (entries) => entries.forEach((e) => e.target.classList.toggle('is-go', e.isIntersecting)),
+          { rootMargin: '0px 0px -20% 0px', threshold: 0.35 }
+        );
+        lo.observe(launch);
+      }
+    }
+  }
+</script>

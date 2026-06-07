@@ -3,11 +3,11 @@
 //  · SSR / fallback (siempre): titular + nodos "lunas" como <a> reales (chips) + CTA.
 //    Funciona sin JS, en móvil y con prefers-reduced-motion.
 //  · Realce: motor planetario 2.5D (SVG + DOM + CSS + rAF, sin WebGL).
-//      Escritorio (puntero fino): arranca CALMO → el hover energiza el sistema,
-//        el titular cede foco y el "Caso 0" se escribe abajo-dcha. Parallax con el cursor.
-//      Táctil / móvil: el planeta ES el MAPA DE NAVEGACIÓN — auto-activo y centrado;
-//        cada nodo es un <a> real. Sin parallax.
-//  Iluminación del planeta IGUAL a la muestra (sin elipses/puntos extra; órbita 1.6/2.2).
+//      Escritorio (puntero fino): arranca CALMO → el hover energiza el sistema (rápido y
+//        natural); los nodos se iluminan al pasar el cursor y una luz sutil sigue el mouse
+//        recorriendo el camino. El titular cede foco y el "Caso 0" se escribe abajo-dcha.
+//      Táctil / móvil: el planeta es el MAPA DE NAVEGACIÓN, pero NO orbita hasta el primer
+//        toque (calmo con pista "Toca para explorar"). Sin parallax. Resize NO reinicia.
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
@@ -35,6 +35,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     </div>
 
     <div class="hero__stage" data-hero-stage>
+      <div class="hero__cursorlight" data-hero-cursorlight aria-hidden="true"></div>
       <svg viewBox="0 0 400 400" role="img" aria-label="Marcyan — planeta en órbita" class="hero__svg">
         <defs>
           <radialGradient id={`${uid}-p`} cx="44%" cy="36%" r="62%">
@@ -61,7 +62,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       </svg>
       <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
       <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
-      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span>Pasa el cursor sobre el planeta</div>
+      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>Pasa el cursor sobre el planeta</span></div>
     </div>
   </div>
 
@@ -119,6 +120,13 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .hero__stage { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin-inline: auto; will-change: transform; }
   .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
   .hero__orbit { position: absolute; inset: 0; z-index: 3; }
+  /* luz que sigue al cursor (escritorio) — recorre el camino de los nodos */
+  .hero__cursorlight {
+    position: absolute; left: 0; top: 0; width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-gold-glow), transparent 68%);
+    opacity: 0; pointer-events: none; z-index: 2; mix-blend-mode: screen;
+    transition: opacity var(--duration-base) var(--ease-out-expo);
+  }
   .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; cursor: pointer; }
   .hero__hint {
     position: absolute; left: 50%; bottom: -8px; transform: translate(-50%, 100%); z-index: 5;
@@ -170,15 +178,22 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     border: 1px solid var(--accent-gold-line); color: var(--fg-primary);
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; line-height: 1;
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5); opacity: 0; will-change: transform, opacity;
-    transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
   }
   .hero__orbit .hero-node.teal { border-color: var(--accent-teal-line); }
   .hero__orbit .hero-node svg { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
   .hero__orbit .hero-node .moon__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal .moon__dot { background: var(--accent-teal); }
-  .hero__orbit .hero-node:hover { border-color: var(--accent-gold); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--accent-gold-dim); }
-  .hero__orbit .hero-node.teal:hover { border-color: var(--accent-teal); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--accent-teal-dim); }
+  /* hover: el nodo se ILUMINA (borde + fondo + halo) */
+  .hero__orbit .hero-node:hover {
+    background: rgba(34, 30, 22, 0.92); border-color: var(--accent-gold); color: var(--fg-primary);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent-gold), 0 0 22px var(--accent-gold-glow);
+  }
+  .hero__orbit .hero-node.teal:hover {
+    border-color: var(--accent-teal);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent-teal), 0 0 22px var(--accent-teal-dim);
+  }
   .hero__orbit .hero-amb {
     position: absolute; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%;
     background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold);
@@ -194,12 +209,14 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     const moons = hero.querySelector('[data-hero-moons]') as HTMLElement;
     const headline = hero.querySelector('[data-hero-headline]') as HTMLElement;
     const hint = hero.querySelector('[data-hero-hint]') as HTMLElement;
+    const hintTxt = hero.querySelector('[data-hero-hint-txt]') as HTMLElement;
     const caso0 = hero.querySelector('[data-hero-caso0]') as HTMLElement;
     const starsEl = hero.querySelector('[data-hero-stars]') as HTMLElement;
+    const cursorLight = hero.querySelector('[data-hero-cursorlight]') as HTMLElement;
 
     const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const auto = () => !mqFine.matches || window.innerWidth < 1024; // táctil / apilado (<lg) → mapa auto-activo
+    const auto = () => !mqFine.matches || window.innerWidth < 1024; // táctil / apilado (<lg) → toque-activado
 
     // campo estelar sutil
     (function fillStars() {
@@ -224,7 +241,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 
     const ROLL = -18 * Math.PI / 180, COS = Math.cos(ROLL), SIN = Math.sin(ROLL), FLATTEN = 0.42;
     let bodies: any[] = [];
-    let cx = 0, cy = 0, maxR = 0, isAuto = auto();
+    let cx = 0, cy = 0, maxR = 0, isAuto = auto(), lastAuto = isAuto, activated = false;
     let energy = 0, target = 0;
     let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
     let rafId = 0, last = 0, running = false;
@@ -252,27 +269,29 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
         el.href = a.getAttribute('href') || '#';
         el.innerHTML = a.innerHTML; // conserva icono + etiqueta
         orbit.appendChild(el);
-        bodies.push({ el, R: lanes[idx % lanes.length], ang: (idx / n) * Math.PI * 2 + 0.3, speed: 0.05 + 0.012 * (idx % 3), node: true });
+        bodies.push({ el, R: lanes[idx % lanes.length], ang: (idx / n) * Math.PI * 2 + 0.3, speed: 0.06 + 0.015 * (idx % 3), node: true });
       });
       const ambN = isAuto ? 3 : 6;
       for (let i = 0; i < ambN; i++) {
         const el = document.createElement('span');
         el.className = 'hero-amb';
         orbit.appendChild(el);
-        bodies.push({ el, R: 0.5 + 0.5 * (i / ambN), ang: (i / ambN) * Math.PI * 2, speed: 0.06 + 0.02 * (i % 3), sz: 0.6 + 0.7 * ((i % 3) / 3) });
+        bodies.push({ el, R: 0.5 + 0.5 * (i / ambN), ang: (i / ambN) * Math.PI * 2, speed: 0.07 + 0.025 * (i % 3), sz: 0.6 + 0.7 * ((i % 3) / 3) });
       }
     }
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      energy += (target - energy) * Math.min(1, dt * 5);
+      energy += (target - energy) * Math.min(1, dt * 8); // emergencia rápida y natural
+      // en reposo total no tocamos el DOM (ahorra CPU/batería); el loop sigue barato
+      if (energy < 0.004 && target < 0.004) { rafId = requestAnimationFrame(frame); return; }
       if (!isAuto) {
-        tiltX += (tTiltX - tiltX) * Math.min(1, dt * 4);
-        tiltY += (tTiltY - tiltY) * Math.min(1, dt * 4);
+        tiltX += (tTiltX - tiltX) * Math.min(1, dt * 5);
+        tiltY += (tTiltY - tiltY) * Math.min(1, dt * 5);
         stage.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
       }
       for (const b of bodies) {
-        b.ang += b.speed * dt * (0.4 + 0.8 * energy);
-        const p = project(b.R * maxR * (0.55 + 0.45 * energy), b.ang);
+        b.ang += b.speed * dt * (0.5 + 0.9 * energy);
+        const p = project(b.R * maxR * (0.6 + 0.4 * energy), b.ang);
         const front = (p.depth + 1) / 2;
         if (b.node) {
           const sc = 0.85 + 0.15 * p.depth;
@@ -286,8 +305,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
           b.el.style.zIndex = p.depth > 0 ? '5' : '0';
         }
       }
+      hint.style.opacity = Math.max(0, 1 - energy * 2.4).toFixed(3);
       if (!isAuto) {
-        hint.style.opacity = Math.max(0, 1 - energy * 2.4).toFixed(3);
         headline.style.opacity = (1 - energy * 0.5).toFixed(3);
         caso0.classList.toggle('is-shown', energy > 0.5);
       }
@@ -295,26 +314,37 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     }
 
     const onEnter = () => { if (!isAuto) target = 1; };
-    const onLeave = () => { if (!isAuto) target = 0; };
+    const onLeave = () => { if (!isAuto) { target = 0; cursorLight.style.opacity = '0'; } };
     const onMove = (e: PointerEvent) => {
       if (isAuto) return;
-      const r = hero.getBoundingClientRect();
-      const nx = (e.clientX - r.left) / r.width - 0.5;
-      const ny = (e.clientY - r.top) / r.height - 0.5;
-      tTiltY = nx * 6; tTiltX = -ny * 4;
+      const hr = hero.getBoundingClientRect();
+      tTiltY = ((e.clientX - hr.left) / hr.width - 0.5) * 6;
+      tTiltX = -((e.clientY - hr.top) / hr.height - 0.5) * 4;
+      // luz que sigue al cursor, sólo cerca del escenario del planeta
+      const sr = stage.getBoundingClientRect();
+      const lx = e.clientX - sr.left, ly = e.clientY - sr.top;
+      const near = lx > -90 && lx < sr.width + 90 && ly > -90 && ly < sr.height + 90;
+      cursorLight.style.opacity = near ? '1' : '0';
+      cursorLight.style.transform = `translate(${lx}px,${ly}px) translate(-50%,-50%)`;
     };
+    // primer toque (móvil): recién entonces sale la órbita
+    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; } };
 
     function enable() {
       if (running) return;
       running = true;
       hero.classList.add('hero--orbital');
-      isAuto = auto();
-      target = isAuto ? 1 : 0; energy = isAuto ? 0.0 : 0;
-      if (!isAuto) hint.style.display = 'inline-flex';
+      isAuto = auto(); lastAuto = isAuto; activated = false;
+      target = 0; energy = 0;                       // siempre arranca calmo (móvil: hasta el toque)
+      hintTxt.textContent = isAuto ? 'Toca para explorar' : 'Pasa el cursor sobre el planeta';
+      hint.style.display = 'inline-flex'; hint.style.opacity = '1';
+      headline.style.opacity = '';
       measure(); build();
       hero.addEventListener('pointerenter', onEnter);
       hero.addEventListener('pointerleave', onLeave);
       hero.addEventListener('pointermove', onMove);
+      hero.addEventListener('pointerdown', onActivate);
+      hero.addEventListener('click', onActivate);
       ro = new ResizeObserver(() => measure());
       ro.observe(stage);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (running) measure(); });
@@ -330,9 +360,12 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       stage.style.transform = '';
       hint.style.display = 'none';
       headline.style.opacity = '';
+      cursorLight.style.opacity = '0';
       hero.removeEventListener('pointerenter', onEnter);
       hero.removeEventListener('pointerleave', onLeave);
       hero.removeEventListener('pointermove', onMove);
+      hero.removeEventListener('pointerdown', onActivate);
+      hero.removeEventListener('click', onActivate);
       if (ro) { ro.disconnect(); ro = null; }
     }
     function sync() {
@@ -341,7 +374,16 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     }
     mqReduce.addEventListener('change', sync);
     mqFine.addEventListener('change', sync);
-    let rt: number; window.addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(sync, 200); }, { passive: true });
+    // En resize NO reiniciamos la animación (eso causaba el bug del scroll en móvil:
+    // la barra del navegador dispara resize → sólo re-medimos. Sólo si cruza el umbral
+    // (apilado ↔ desktop) reconstruimos.)
+    let rt: number;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => {
+        if (auto() !== lastAuto) { sync(); } else { measure(); }
+      }, 150);
+    }, { passive: true });
     sync();
   }
 </script>

@@ -12,7 +12,6 @@ import Button from '../ui/Button.astro';
 
 interface Props { nav: any; lang?: string; homeHref?: string }
 const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
-const otherLang = lang === 'es' ? 'en' : 'es';
 ---
 <header class="nav" data-nav>
   <div class="nav__bar container">
@@ -56,15 +55,6 @@ const otherLang = lang === 'es' ? 'en' : 'es';
       {nav.links.map((l: any) => <a href={l.href} data-nav-link>{l.label}</a>)}
     </nav>
     <div class="nav__drawer-foot">
-      <div class="nav__lang nav__lang--drawer" aria-label="Idioma">
-        {lang === 'es'
-          ? <span class="nav__lang-opt is-on" aria-current="true">ES</span>
-          : <a class="nav__lang-opt" href={nav.langHref} hreflang="es" data-nav-link>ES</a>}
-        <span class="nav__lang-sep" aria-hidden="true"></span>
-        {lang === 'en'
-          ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
-          : <a class="nav__lang-opt" href={nav.langHref} hreflang="en" data-nav-link>EN</a>}
-      </div>
       <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link>{nav.cta.label}</Button>
     </div>
   </aside>
@@ -96,8 +86,8 @@ const otherLang = lang === 'es' ? 'en' : 'es';
   .nav__links { display: none; }
   .nav__actions { display: flex; align-items: center; gap: var(--space-3); }
 
-  /* Switch de idioma ES | EN (ambos visibles, el activo en oro) */
-  .nav__lang { display: none; align-items: center; gap: var(--space-2); }
+  /* Switch de idioma ES | EN (ambos visibles, el activo en oro) — visible también en móvil */
+  .nav__lang { display: inline-flex; align-items: center; gap: var(--space-2); }
   .nav__lang-opt {
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     color: var(--fg-subtle); transition: color var(--duration-fast);
@@ -176,7 +166,6 @@ const otherLang = lang === 'es' ? 'en' : 'es';
   .nav__drawer-links a:hover { color: var(--accent-gold); }
 
   .nav__drawer-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-4); }
-  .nav__lang--drawer { display: inline-flex; }
 
   @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
 

@@ -19,25 +19,6 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       <Kicker>{contact.tag}</Kicker>
       <h2 class="h2" set:html={contact.title} />
       <p class="lead">{contact.desc}</p>
-
-      <ul class="contact__info">
-        <li>
-          <span class="contact__info-ic"><Icon name="lucide:mail" /></span>
-          <a href={`mailto:${nap.email}`}>{nap.email}</a>
-        </li>
-        <li>
-          <span class="contact__info-ic"><Icon name="lucide:phone" /></span>
-          <span><span class="contact__info-lbl">Houston</span> <a href={`tel:${telHou}`}>{nap.houston}</a></span>
-        </li>
-        <li>
-          <span class="contact__info-ic"><Icon name="lucide:phone" /></span>
-          <span><span class="contact__info-lbl">Miami</span> <a href={`tel:${telMia}`}>{nap.miami}</a></span>
-        </li>
-        <li>
-          <span class="contact__info-ic"><Icon name="lucide:clock" /></span>
-          <span><span class="contact__info-lbl">{contact.info.hoursLbl}</span> {contact.info.hours}</span>
-        </li>
-      </ul>
     </div>
 
     <form
@@ -89,6 +70,25 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       <p class="form-status form-status--error" id="home-form-error" role="alert" hidden></p>
       <p class="form-status form-status--ok" id="home-form-success" role="status" hidden></p>
     </form>
+
+    <ul class="contact__info">
+      <li>
+        <span class="contact__info-ic"><Icon name="lucide:mail" /></span>
+        <a href={`mailto:${nap.email}`}>{nap.email}</a>
+      </li>
+      <li>
+        <span class="contact__info-ic"><Icon name="lucide:phone" /></span>
+        <span><span class="contact__info-lbl">Houston</span> <a href={`tel:${telHou}`}>{nap.houston}</a></span>
+      </li>
+      <li>
+        <span class="contact__info-ic"><Icon name="lucide:phone" /></span>
+        <span><span class="contact__info-lbl">Miami</span> <a href={`tel:${telMia}`}>{nap.miami}</a></span>
+      </li>
+      <li>
+        <span class="contact__info-ic"><Icon name="lucide:clock" /></span>
+        <span><span class="contact__info-lbl">{contact.info.hoursLbl}</span> {contact.info.hours}</span>
+      </li>
+    </ul>
   </div>
 </section>
 
@@ -137,7 +137,11 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 
   @media (--sm) { .field-row { grid-template-columns: 1fr 1fr; } }
   @media (--lg) {
-    .contact__inner { grid-template-columns: 0.9fr 1.1fr; gap: var(--space-9); align-items: start; }
+    /* izquierda: intro + info · derecha: formulario (abarca ambas filas) */
+    .contact__inner { grid-template-columns: 0.9fr 1.1fr; gap: var(--space-7) var(--space-9); align-items: start; }
+    .contact__intro { grid-column: 1; grid-row: 1; }
+    .contact__info  { grid-column: 1; grid-row: 2; }
+    .contact__form  { grid-column: 2; grid-row: 1 / span 2; }
   }
 </style>
 

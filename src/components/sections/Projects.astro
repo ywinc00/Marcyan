@@ -1,15 +1,16 @@
 ---
-// Sección Proyectos — Variante B "Renderizado en dispositivo".
-// Cada trabajo real se muestra como un RENDER en marco (laptop + móvil) + info
-// (badge, nombre, ciudad, resultado, tags). Sin enlaces sueltos: la URL es leyenda,
-// no enlace vivo (no se rompe si el cliente cambia su web). Equal-height + alineado.
-// La pantalla del laptop está lista para una <img> de captura real más adelante.
+// Sección Proyectos — Variante B "Renderizado en dispositivo", como la muestra:
+// se ve UN solo trabajo destacado (laptop + móvil + info) y se "camina" a los
+// demás con flechas + puntos + contador. Sin tarjetas apiladas. Sin enlaces
+// sueltos (la URL es leyenda). La pantalla del laptop queda lista para una <img>.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 
 interface Props { projects: any }
 const { projects } = Astro.props;
+const items = projects.items;
+const total = String(items.length).padStart(2, '0');
 ---
 <section class="section projects" id="proyectos">
   <div class="container">
@@ -21,28 +22,39 @@ const { projects } = Astro.props;
       <Button href={projects.cta.href} variant="secondary" class="projects__head-cta">{projects.cta.label}</Button>
     </header>
 
-    <div class="projects__grid">
-      {projects.items.map((p: any) => (
-        <article class="proj" data-accent={p.accent}>
-          <div class="proj__devices" aria-hidden="true">
-            <div class="proj__laptop">
-              <div class="proj__screen"><span class="proj__wm">{p.name}</span></div>
-              <div class="proj__base"></div>
+    <div class="pf" data-projects role="group" aria-label={projects.tag}>
+      <div class="pf__stage">
+        {items.map((p: any, idx: number) => (
+          <article class={`pf__slide${idx === 0 ? ' is-active' : ''}`} data-slide data-accent={p.accent} aria-hidden={idx === 0 ? 'false' : 'true'}>
+            <div class="pf__devices" aria-hidden="true">
+              <div class="pf__laptop">
+                <div class="pf__screen"><span class="pf__wm">{p.name}</span></div>
+                <div class="pf__base"></div>
+              </div>
+              <div class="pf__phone"><div class="pf__pscreen"></div></div>
             </div>
-            <div class="proj__phone"><div class="proj__pscreen"></div></div>
-          </div>
-          <div class="proj__info">
-            {p.badge && <span class="proj__badge">{p.badge}</span>}
-            <h3 class="proj__name">{p.name}</h3>
-            <span class="proj__cat">{p.cat}</span>
-            <p class="proj__result">{p.result}</p>
-            {p.tags && (
-              <div class="proj__tags">{p.tags.map((t: string) => <span class="proj__tag">{t}</span>)}</div>
-            )}
-            <span class="proj__url"><Icon name="lucide:globe" />{p.display}</span>
-          </div>
-        </article>
-      ))}
+            <div class="pf__info">
+              {p.badge && <span class="pf__badge">{p.badge}</span>}
+              <h3 class="pf__name">{p.name}</h3>
+              <span class="pf__cat">{p.cat}</span>
+              <p class="pf__result">{p.result}</p>
+              {p.tags && <div class="pf__tags">{p.tags.map((t: string) => <span class="pf__tag">{t}</span>)}</div>}
+              <span class="pf__url"><Icon name="lucide:globe" />{p.display}</span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="pf__nav">
+        <button class="pf__arrow" type="button" data-prev aria-label="Trabajo anterior"><Icon name="lucide:arrow-left" /></button>
+        <div class="pf__dots">
+          {items.map((p: any, idx: number) => (
+            <button class={`pf__dot${idx === 0 ? ' is-on' : ''}`} type="button" data-dot aria-current={idx === 0 ? 'true' : 'false'} aria-label={p.name}></button>
+          ))}
+        </div>
+        <button class="pf__arrow" type="button" data-next aria-label="Trabajo siguiente"><Icon name="lucide:arrow-right" /></button>
+        <span class="pf__counter" data-counter aria-hidden="true">01 / {total}</span>
+      </div>
     </div>
   </div>
 </section>
@@ -52,76 +64,90 @@ const { projects } = Astro.props;
   .projects__head { display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; margin-bottom: var(--space-7); }
   .projects__intro { display: flex; flex-direction: column; gap: var(--space-4); }
 
-  .projects__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); align-items: stretch; }
+  .pf { position: relative; }
+  .pf__stage { display: grid; }
 
-  .proj {
-    display: flex; flex-direction: column; min-width: 0; overflow: hidden;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  /* sólo la activa se ve; las demás se apilan en la misma celda de grid */
+  .pf__slide { grid-area: 1 / 1; display: none; }
+  .pf__slide.is-active { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: center; animation: pfin var(--duration-slow) var(--ease-out-expo); }
+  @keyframes pfin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (--motion-reduce) { .pf__slide.is-active { animation: none; } }
+
+  /* device render */
+  .pf__devices {
+    position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
     --a: var(--accent-gold);
-    transition: border-color var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base);
-  }
-  .proj[data-accent="teal"] { --a: var(--accent-teal); }
-  .proj:hover { border-color: var(--border-accent); box-shadow: var(--shadow-hover); }
-
-  /* ── render en dispositivo ─────────────────────────────── */
-  .proj__devices {
-    position: relative; aspect-ratio: 16 / 9; overflow: hidden;
-    border-bottom: 1px solid var(--border);
-    background:
-      radial-gradient(120% 120% at 18% 10%, color-mix(in srgb, var(--a), transparent 82%), transparent 60%),
-      var(--bg-2);
+    background: radial-gradient(120% 120% at 16% 8%, color-mix(in srgb, var(--a), transparent 80%), transparent 60%), var(--bg-2);
     display: flex; align-items: center; justify-content: center;
   }
-  .proj__laptop { position: relative; width: 70%; }
-  .proj__screen {
+  .pf__slide[data-accent="teal"] .pf__devices { --a: var(--accent-teal); }
+  .pf__laptop { position: relative; width: 66%; }
+  .pf__screen {
     position: relative; aspect-ratio: 16 / 10; border-radius: 10px 10px 0 0;
     border: 1px solid var(--border); border-bottom: 0;
-    background:
-      radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, var(--a), transparent 70%), transparent 58%),
-      var(--bg-base);
+    background: radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, var(--a), transparent 68%), transparent 58%), var(--bg-base);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
-  .proj__screen :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .proj__wm {
-    font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 4vw, 30px); line-height: 1;
-    color: color-mix(in srgb, var(--a), transparent 45%); letter-spacing: -0.02em; text-align: center;
-    padding: var(--space-3); max-width: 100%; overflow-wrap: anywhere;
-  }
-  .proj__base { height: 10px; border-radius: 0 0 7px 7px; background: var(--bg-elevated); border: 1px solid var(--border); }
-  .proj__phone {
-    position: absolute; right: 12%; bottom: 10%; width: 16%; aspect-ratio: 1 / 2;
-    border-radius: 9px; border: 1px solid var(--border); background: var(--bg-elevated); padding: 3px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-  }
-  .proj__pscreen {
-    width: 100%; height: 100%; border-radius: 6px;
-    background:
-      radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--a), transparent 72%), transparent 60%),
-      var(--bg-base);
-  }
+  .pf__screen :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .pf__wm { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 4.5vw, 34px); line-height: 1; color: color-mix(in srgb, var(--a), transparent 42%); letter-spacing: -0.02em; text-align: center; padding: var(--space-3); max-width: 100%; overflow-wrap: anywhere; }
+  .pf__base { height: 12px; border-radius: 0 0 8px 8px; background: var(--bg-elevated); border: 1px solid var(--border); }
+  .pf__phone { position: absolute; right: 9%; bottom: 9%; width: 15%; aspect-ratio: 1 / 2; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); padding: 3px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55); }
+  .pf__pscreen { width: 100%; height: 100%; border-radius: 7px; background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--a), transparent 70%), transparent 60%), var(--bg-base); }
 
-  /* ── info ──────────────────────────────────────────────── */
-  .proj__info { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); flex: 1; }
-  .proj__badge {
-    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--a);
-    background: color-mix(in srgb, var(--a), transparent 88%); border: 1px solid color-mix(in srgb, var(--a), transparent 70%);
-    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); margin-bottom: var(--space-1);
-  }
-  .proj__name { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; }
-  .proj__cat { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .proj__result { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); flex: 1; margin-top: var(--space-1); }
-  .proj__tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
-  .proj__tag {
-    font-size: var(--text-xs); color: var(--fg-secondary);
-    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-pill);
-    padding: var(--space-1) var(--space-3);
-  }
-  .proj__url { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); }
-  .proj__url :global(svg) { width: 14px; height: 14px; }
+  /* info */
+  .pf__info { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+  .pf__badge { align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); margin-bottom: var(--space-1); }
+  .pf__slide[data-accent="teal"] .pf__badge { color: var(--accent-teal); background: var(--accent-teal-dim); border-color: var(--accent-teal-line); }
+  .pf__name { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; }
+  .pf__cat { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .pf__result { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); margin-top: var(--space-1); }
+  .pf__tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .pf__tag { font-size: var(--text-xs); color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); }
+  .pf__url { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); }
+  .pf__url :global(svg) { width: 14px; height: 14px; }
+
+  /* navegación */
+  .pf__nav { display: flex; align-items: center; gap: var(--space-4); margin-top: var(--space-6); }
+  .pf__arrow { display: inline-flex; align-items: center; justify-content: center; width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md); border: 1px solid var(--border-accent); color: var(--fg-primary); transition: border-color var(--duration-fast), color var(--duration-fast), background var(--duration-fast); }
+  .pf__arrow:hover { border-color: var(--accent-gold); color: var(--accent-gold); background: var(--accent-gold-dim); }
+  .pf__arrow :global(svg) { width: 18px; height: 18px; }
+  .pf__dots { display: flex; align-items: center; gap: var(--space-2); }
+  .pf__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); border: 0; transition: background var(--duration-fast), transform var(--duration-fast); }
+  .pf__dot.is-on { background: var(--accent-gold); transform: scale(1.25); }
+  .pf__counter { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle); letter-spacing: var(--tracking-wide); }
 
   @media (--md) {
     .projects__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
-    .projects__grid { grid-template-columns: repeat(2, 1fr); }
+    .pf__slide.is-active { grid-template-columns: 1.1fr 0.9fr; gap: var(--space-8); }
   }
 </style>
+
+<script>
+  const root = document.querySelector('[data-projects]');
+  if (root) {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+    const counter = root.querySelector<HTMLElement>('[data-counter]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-next]');
+    const n = slides.length;
+    let i = 0;
+    const pad = (x: number) => String(x).padStart(2, '0');
+
+    function go(k: number) {
+      i = (k + n) % n;
+      slides.forEach((s, idx) => { const on = idx === i; s.classList.toggle('is-active', on); s.setAttribute('aria-hidden', on ? 'false' : 'true'); });
+      dots.forEach((d, idx) => { const on = idx === i; d.classList.toggle('is-on', on); d.setAttribute('aria-current', on ? 'true' : 'false'); });
+      if (counter) counter.textContent = `${pad(i + 1)} / ${pad(n)}`;
+    }
+
+    prev?.addEventListener('click', () => go(i - 1));
+    next?.addEventListener('click', () => go(i + 1));
+    dots.forEach((d, idx) => d.addEventListener('click', () => go(idx)));
+    root.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'ArrowLeft') { go(i - 1); }
+      else if ((e as KeyboardEvent).key === 'ArrowRight') { go(i + 1); }
+    });
+  }
+</script>

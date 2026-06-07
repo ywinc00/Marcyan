@@ -1,12 +1,13 @@
 ---
 // Navegación del sitio. Mobile-first:
-//  · < md  → logo + hamburguesa → drawer off-canvas (links + lang + CTA dentro)
+//  · < md  → marca + hamburguesa → drawer off-canvas (links + lang + CTA dentro)
 //            + barra de CTA fija inferior (aparece al pasar el hero).
-//  · ≥ md  → barra completa (links + lang + CTA inline).
+//  · ≥ md  → barra completa (links + lang ES|EN + CTA outline inline).
+// Sobre el hero la barra es TRANSPARENTE (se funde); al hacer scroll gana blur+fondo.
 // Accesible: aria-expanded, aria-hidden/inert, foco atrapado, Esc/overlay cierran,
 // objetivos ≥44px. NUNCA se oculta la nav sin reemplazo (regla dura nº2).
 import Icon from '../ui/Icon.astro';
-import LogoWordmark from '../brand/LogoWordmark.astro';
+import BrandType from '../brand/BrandType.astro';
 import Button from '../ui/Button.astro';
 
 interface Props { nav: any; lang?: string; homeHref?: string }
@@ -16,7 +17,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
 <header class="nav" data-nav>
   <div class="nav__bar container">
     <a class="nav__logo" href={homeHref} aria-label="Marcyan Studio — inicio">
-      <LogoWordmark width={148} decorative={true} />
+      <BrandType />
     </a>
 
     <nav class="nav__links" aria-label="Principal">
@@ -24,8 +25,16 @@ const otherLang = lang === 'es' ? 'en' : 'es';
     </nav>
 
     <div class="nav__actions">
-      <a class="nav__lang" href={nav.langHref} hreflang={otherLang} aria-label={`Ver en ${otherLang.toUpperCase()}`}>{nav.langLabel}</a>
-      <Button href={nav.cta.href} variant="primary" size="md" class="nav__cta">{nav.cta.label}</Button>
+      <div class="nav__lang" aria-label="Idioma">
+        {lang === 'es'
+          ? <span class="nav__lang-opt is-on" aria-current="true">ES</span>
+          : <a class="nav__lang-opt" href={nav.langHref} hreflang="es">ES</a>}
+        <span class="nav__lang-sep" aria-hidden="true"></span>
+        {lang === 'en'
+          ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
+          : <a class="nav__lang-opt" href={nav.langHref} hreflang="en">EN</a>}
+      </div>
+      <a class="nav__cta" href={nav.cta.href}>{nav.cta.label}</a>
       <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>
         <span class="sr-only">{nav.openMenu}</span>
         <Icon name="lucide:menu" />
@@ -37,7 +46,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
 
   <aside id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label="Menú" aria-hidden="true" inert>
     <div class="nav__drawer-head">
-      <LogoWordmark width={140} decorative={true} />
+      <BrandType />
       <button class="nav__close" type="button" data-nav-close>
         <span class="sr-only">{nav.closeMenu}</span>
         <Icon name="lucide:x" />
@@ -47,7 +56,15 @@ const otherLang = lang === 'es' ? 'en' : 'es';
       {nav.links.map((l: any) => <a href={l.href} data-nav-link>{l.label}</a>)}
     </nav>
     <div class="nav__drawer-foot">
-      <a class="nav__drawer-lang" href={nav.langHref} hreflang={otherLang}>{nav.langLabel === 'EN' ? 'English' : 'Español'}</a>
+      <div class="nav__lang nav__lang--drawer" aria-label="Idioma">
+        {lang === 'es'
+          ? <span class="nav__lang-opt is-on" aria-current="true">ES</span>
+          : <a class="nav__lang-opt" href={nav.langHref} hreflang="es" data-nav-link>ES</a>}
+        <span class="nav__lang-sep" aria-hidden="true"></span>
+        {lang === 'en'
+          ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
+          : <a class="nav__lang-opt" href={nav.langHref} hreflang="en" data-nav-link>EN</a>}
+      </div>
       <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link>{nav.cta.label}</Button>
     </div>
   </aside>
@@ -64,6 +81,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
                 border-color var(--duration-slow), backdrop-filter var(--duration-slow);
     border-bottom: 1px solid transparent;
   }
+  /* Sobre el hero: transparente (se funde). Al hacer scroll: blur + fondo. */
   .nav.is-scrolled {
     background: var(--bg-overlay);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -78,8 +96,27 @@ const otherLang = lang === 'es' ? 'en' : 'es';
   .nav__links { display: none; }
   .nav__actions { display: flex; align-items: center; gap: var(--space-3); }
 
-  .nav__lang { display: none; }
-  .nav__cta { display: none; }
+  /* Switch de idioma ES | EN (ambos visibles, el activo en oro) */
+  .nav__lang { display: none; align-items: center; gap: var(--space-2); }
+  .nav__lang-opt {
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    color: var(--fg-subtle); transition: color var(--duration-fast);
+    min-height: var(--tap-min); display: inline-flex; align-items: center;
+  }
+  .nav__lang-opt.is-on { color: var(--accent-gold); }
+  a.nav__lang-opt:hover { color: var(--fg-primary); }
+  .nav__lang-sep { width: 1px; height: 13px; background: var(--border); }
+
+  /* CTA outline dorado (se funde con el hero, no es un bloque sólido) */
+  .nav__cta {
+    display: none; align-items: center; justify-content: center;
+    min-height: var(--tap-min); padding: 9px 18px; border-radius: var(--radius-md);
+    font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
+    color: var(--accent-gold); background: var(--accent-gold-dim);
+    border: 1px solid var(--accent-gold-line);
+    transition: background var(--duration-fast) var(--ease-out-expo), color var(--duration-fast);
+  }
+  .nav__cta:hover { background: var(--accent-gold); color: var(--fg-inverse); }
 
   .nav__toggle {
     display: inline-flex; align-items: center; justify-content: center;
@@ -96,13 +133,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
       padding: var(--space-2) 0; transition: color var(--duration-fast);
     }
     .nav__links a:hover { color: var(--fg-primary); }
-    .nav__lang {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-height: var(--tap-min); padding-inline: var(--space-2);
-      font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-      color: var(--fg-secondary); transition: color var(--duration-fast);
-    }
-    .nav__lang:hover { color: var(--accent-gold); }
+    .nav__lang { display: inline-flex; }
     .nav__cta { display: inline-flex; }
     .nav__toggle { display: none; }
   }
@@ -145,12 +176,7 @@ const otherLang = lang === 'es' ? 'en' : 'es';
   .nav__drawer-links a:hover { color: var(--accent-gold); }
 
   .nav__drawer-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-4); }
-  .nav__drawer-lang {
-    display: inline-flex; align-items: center; min-height: var(--tap-min);
-    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary);
-    letter-spacing: var(--tracking-wide);
-  }
-  .nav__drawer-lang:hover { color: var(--accent-gold); }
+  .nav__lang--drawer { display: inline-flex; }
 
   @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
 

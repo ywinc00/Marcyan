@@ -1,13 +1,15 @@
 ---
-// Sección Servicios — 6 servicios reales con precio "desde $". Cards mobile-first
-// (1→2→3 col) con hover borde→oro. Icono Lucide por servicio.
+// Sección Servicios — Variante C "Destacado + compactas".
+// 1 servicio ESTRELLA destacado (badge + icono + título + desc + Explorar→ + precio)
+// + lista vertical de servicios compactos (icono + título + precio + flecha).
+// Dirige la atención y muestra precios (citable para AEO). Equal-height + alineado.
 import Icon from '../ui/Icon.astro';
-import Card from '../ui/Card.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 
 interface Props { services: any }
 const { services } = Astro.props;
+const [featured, ...rest] = services.items;
 ---
 <section class="section services" id="servicios">
   <div class="container">
@@ -19,55 +21,87 @@ const { services } = Astro.props;
       <Button href={services.cta.href} variant="secondary" class="services__head-cta">{services.cta.label}</Button>
     </header>
 
-    <div class="services__grid">
-      {services.items.map((s: any) => (
-        <Card class="svc">
-          <div class="svc__top">
-            <span class="svc__num">{s.n}</span>
-            <Icon name={s.icon} class="svc__icon" />
-          </div>
-          <h3 class="svc__title">{s.title}</h3>
-          <p class="svc__desc">{s.desc}</p>
-          <div class="svc__foot">
-            <span class="svc__price">{s.price}</span>
-            <span class="svc__explore">{services.explore} <Icon name="lucide:arrow-up-right" /></span>
-          </div>
-        </Card>
-      ))}
+    <div class="svc-c">
+      <article class="svc-hero">
+        {services.featuredBadge && <span class="svc-hero__badge">{services.featuredBadge}</span>}
+        <Icon name={featured.icon} class="svc-hero__icon" />
+        <h3 class="svc-hero__title">{featured.title}</h3>
+        <p class="svc-hero__desc">{featured.desc}</p>
+        <div class="svc-hero__foot">
+          <span class="svc-hero__explore">{services.explore} <Icon name="lucide:arrow-right" /></span>
+          <span class="svc-hero__price">{featured.price}</span>
+        </div>
+      </article>
+
+      <ul class="svc-list">
+        {rest.map((s: any) => (
+          <li class="svc-item" data-accent={s.icon?.includes('message') || s.icon?.includes('search') ? 'teal' : 'gold'}>
+            <span class="svc-item__ic"><Icon name={s.icon} /></span>
+            <span class="svc-item__tx">
+              <span class="svc-item__title">{s.title}</span>
+              <span class="svc-item__price">{s.price}</span>
+            </span>
+            <span class="svc-item__arr"><Icon name="lucide:arrow-up-right" /></span>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </section>
 
 <style>
-  .services__head {
-    display: flex; flex-direction: column; gap: var(--space-5);
-    align-items: flex-start; margin-bottom: var(--space-7);
-  }
+  .services__head { display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; margin-bottom: var(--space-7); }
   .services__intro { display: flex; flex-direction: column; gap: var(--space-4); }
   .services__intro :global(.h2) :global(em) { color: var(--accent-gold); font-style: normal; }
 
-  .services__grid {
-    display: grid; grid-template-columns: 1fr; gap: var(--space-4);
-  }
+  .svc-c { display: grid; grid-template-columns: 1fr; gap: var(--space-4); align-items: stretch; }
 
-  .svc { display: flex; flex-direction: column; gap: var(--space-3); height: 100%; }
-  .svc__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-1); }
-  .svc__num { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); letter-spacing: var(--tracking-wide); }
-  .svc__icon { width: 26px; height: 26px; color: var(--fg-secondary); stroke-width: 1.5; transition: color var(--duration-base); }
-  .svc:hover .svc__icon { color: var(--accent-gold); }
-  .svc__title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; line-height: var(--leading-snug); }
-  .svc__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); flex: 1; }
-  .svc__foot {
-    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
-    margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);
+  /* Servicio estrella */
+  .svc-hero {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    background:
+      radial-gradient(120% 120% at 0% 0%, var(--accent-gold-dim), transparent 55%),
+      var(--bg-card);
+    border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg);
+    padding: var(--space-6); box-shadow: var(--shadow-card);
   }
-  .svc__price { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); }
-  .svc__explore { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--accent-teal); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
-  .svc__explore :global(svg) { width: 14px; height: 14px; }
+  .svc-hero__badge {
+    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
+    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3);
+  }
+  .svc-hero__icon { width: 34px; height: 34px; color: var(--accent-gold); stroke-width: 1.5; margin-top: var(--space-2); }
+  .svc-hero__title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: var(--leading-snug); }
+  .svc-hero__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); flex: 1; }
+  .svc-hero__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+  .svc-hero__explore { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: 600; color: var(--accent-gold); }
+  .svc-hero__explore :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .svc-hero:hover .svc-hero__explore :global(svg) { transform: translateX(4px); }
+  .svc-hero__price { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary); }
 
-  @media (--sm) { .services__grid { grid-template-columns: repeat(2, 1fr); } }
+  /* Lista compacta */
+  .svc-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+  .svc-item {
+    display: flex; align-items: center; gap: var(--space-4);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5); min-height: 64px;
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .svc-item:hover { border-color: var(--border-accent); }
+  .svc-item__ic { display: inline-flex; flex: 0 0 auto; }
+  .svc-item__ic :global(svg) { width: 22px; height: 22px; color: var(--fg-secondary); stroke-width: 1.5; transition: color var(--duration-base); }
+  .svc-item:hover .svc-item__ic :global(svg) { color: var(--accent-gold); }
+  .svc-item__tx { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .svc-item__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
+  .svc-item__price { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
+  .svc-item__arr { display: inline-flex; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-base); }
+  .svc-item__arr :global(svg) { width: 16px; height: 16px; }
+  .svc-item:hover .svc-item__arr { color: var(--accent-gold); }
+
   @media (--lg) {
-    .services__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
     .services__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+    .svc-c { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-5); }
+    .svc-hero { padding: var(--space-7); }
   }
 </style>

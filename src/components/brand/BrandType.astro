@@ -1,0 +1,24 @@
+---
+// Marca tipográfica (wordmark de TEXTO) — se lee claro a cualquier tamaño,
+// a diferencia del logo ilustrado. MAR[C dorada]YAN + sub "Digital Studio".
+// El logo ilustrado (LogoWordmark/LogoMark) se reserva para footer / página de marca.
+interface Props { sub?: boolean; class?: string }
+const { sub = true, class: cls } = Astro.props;
+---
+<span class:list={['brandtype', cls]}>
+  <span class="brandtype__name">MAR<span class="brandtype__c">C</span>YAN</span>
+  {sub && <span class="brandtype__sub">Digital Studio</span>}
+</span>
+
+<style>
+  .brandtype { display: inline-flex; flex-direction: column; gap: 2px; line-height: 1; }
+  .brandtype__name {
+    font-family: var(--font-display); font-weight: 700; font-size: var(--text-md);
+    letter-spacing: 0.16em; color: var(--fg-primary);
+  }
+  .brandtype__c { color: var(--accent-gold); }
+  .brandtype__sub {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--fg-subtle);
+  }
+</style>

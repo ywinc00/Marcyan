@@ -44,11 +44,11 @@ export const content = {
       secondary: { label: 'Ver Proyectos', href: '#proyectos' },
       // nodos en órbita = enlaces reales (la home no es la única navegación)
       nodes: [
-        { label: 'Servicios', href: '#servicios' },
-        { label: 'IA', href: '#ia' },
-        { label: 'Proyectos', href: '#proyectos' },
-        { label: 'Ciudades', href: '#ciudades' },
-      ] as Link[],
+        { label: 'Servicios', href: '#servicios', icon: 'lucide:layers' },
+        { label: 'IA', href: '#ia', icon: 'lucide:sparkles' },
+        { label: 'Proyectos', href: '#proyectos', icon: 'lucide:folder' },
+        { label: 'Ciudades', href: '#ciudades', icon: 'lucide:map-pin' },
+      ],
       caso0: {
         label: 'Marcyan · Caso 0 (este sitio)',
         rows: [
@@ -65,6 +65,7 @@ export const content = {
       tag: 'Nuestros Servicios',
       title: 'Todo lo que tu<br>marca <em>necesita</em>',
       explore: 'Explorar',
+      featuredBadge: 'Servicio estrella',
       cta: { label: 'Cuéntanos tu proyecto', href: '#contacto' },
       items: [
         { n: '01', icon: 'lucide:layout-template', title: 'Diseño Web Premium', price: 'desde $1,500',
@@ -112,10 +113,10 @@ export const content = {
       title: 'Trabajo real, negocios<br><em>reales</em>',
       cta: { label: 'Inicia tu proyecto', href: '#contacto' },
       items: [
-        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'gold' },
-        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'teal' },
-        { name: "Julio's Landscape TX", cat: 'Paisajismo · Houston, TX', url: 'https://julios-landscape-tx.vercel.app', display: 'julios-landscape-tx.vercel.app', result: 'Marca, identidad y sitio web creados desde cero.', accent: 'gold' },
-        { name: 'Rosy Nails & Care', cat: 'Salón de uñas · Houston, TX', url: 'https://rosi-nails.vercel.app', display: 'rosi-nails.vercel.app', result: 'Web app a medida: las clientas agendan citas y exploran inspiración de uñas.', accent: 'teal' },
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'gold', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
+        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'teal', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
+        { name: "Julio's Landscape TX", cat: 'Paisajismo · Houston, TX', url: 'https://julios-landscape-tx.vercel.app', display: 'julios-landscape-tx.vercel.app', result: 'Marca, identidad y sitio web creados desde cero.', accent: 'gold', badge: 'Marca + Sitio', tags: ['Identidad de marca', 'Sitio a medida'] },
+        { name: 'Rosy Nails & Care', cat: 'Salón de uñas · Houston, TX', url: 'https://rosi-nails.vercel.app', display: 'rosi-nails.vercel.app', result: 'Web app a medida: las clientas agendan citas y exploran inspiración de uñas.', accent: 'teal', badge: 'Web app', tags: ['Agenda de citas', 'A medida'] },
       ],
     },
 

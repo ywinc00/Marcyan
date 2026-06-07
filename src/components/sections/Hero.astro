@@ -1,102 +1,106 @@
 ---
-// HERO de la home.
-//  · SSR / fallback (siempre): titular + CTAs + nodos "lunas" como <a> reales (chips).
-//    Funciona sin JS, en móvil, y con prefers-reduced-motion.
-//  · Realce (solo desktop + hover + motion-ok): motor planetario 2.5D — los mismos
-//    enlaces orbitan el planeta con proyección isométrica, parallax con cursor y
-//    energía al pasar el cursor. Sin Three.js: SVG + DOM + CSS + requestAnimationFrame.
-import Badge from '../ui/Badge.astro';
+// HERO de la home — acercado a la muestra (Hero PC Marcyan).
+//  · SSR / fallback (siempre): titular + nodos "lunas" como <a> reales (chips) + CTA.
+//    Funciona sin JS, en móvil y con prefers-reduced-motion.
+//  · Realce: motor planetario 2.5D (SVG + DOM + CSS + rAF, sin WebGL).
+//      Escritorio (puntero fino): arranca CALMO → el hover energiza el sistema,
+//        el titular cede foco y el "Caso 0" se escribe abajo-dcha. Parallax con el cursor.
+//      Táctil / móvil: el planeta ES el MAPA DE NAVEGACIÓN — auto-activo y centrado;
+//        cada nodo es un <a> real. Sin parallax.
+//  Iluminación del planeta IGUAL a la muestra (sin elipses/puntos extra; órbita 1.6/2.2).
+import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
-import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
 
 interface Props { hero: any }
 const { hero } = Astro.props;
 const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 ---
 <section class="hero" id="top" data-hero>
-  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__stars" data-hero-stars aria-hidden="true"></div>
 
   <div class="container hero__inner">
-    <div class="hero__text">
-      <Badge variant="teal" class="hero__tag">{hero.tag}</Badge>
+    <div class="hero__headline" data-hero-headline>
+      <Kicker>{hero.tag}</Kicker>
       <h1 class="display hero__h1" set:html={hero.h1} />
       <p class="lead hero__sub">{hero.sub}</p>
-      <div class="hero__cta">
-        <Button href={hero.primary.href} variant="primary" size="lg">{hero.primary.label}</Button>
-        <Button href={hero.secondary.href} variant="secondary" size="lg">{hero.secondary.label}</Button>
-      </div>
       <nav class="hero__moons" aria-label="Explorar el sitio" data-hero-moons>
         {hero.nodes.map((n: any, i: number) => (
           <a class="moon" href={n.href} data-accent={i % 2 ? 'teal' : 'gold'}>
-            <span class="moon__dot" aria-hidden="true"></span>{n.label}
+            {n.icon ? <Icon name={n.icon} class="moon__icon" /> : <span class="moon__dot" aria-hidden="true"></span>}
+            <span>{n.label}</span>
           </a>
         ))}
       </nav>
     </div>
 
-    <div class="hero__visual" data-hero-visual>
-      <div class="hero__stage" data-hero-stage>
-        <svg viewBox="0 0 400 400" role="img" aria-label="Marcyan — planeta en órbita" class="hero__svg">
-          <defs>
-            <radialGradient id={`${uid}-p`} cx="44%" cy="36%" r="60%">
-              <stop offset="0%" stop-color="var(--accent-gold)" />
-              <stop offset="52%" stop-color="var(--accent-gold-deep)" />
-              <stop offset="100%" stop-color="var(--planet-core)" />
-            </radialGradient>
-            <radialGradient id={`${uid}-g`} cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.20" />
-              <stop offset="100%" stop-color="var(--accent-gold)" stop-opacity="0" />
-            </radialGradient>
-            <clipPath id={`${uid}-c`}><circle cx="200" cy="200" r="110" /></clipPath>
-          </defs>
-          <circle cx="200" cy="200" r="180" fill={`url(#${uid}-g)`} />
-          <ellipse cx="200" cy="200" rx="186" ry="58" fill="none" stroke="var(--accent-gold)" stroke-width="1" stroke-opacity="0.14" transform="rotate(-18 200 200)" />
-          <ellipse cx="200" cy="200" rx="150" ry="44" fill="none" stroke="var(--accent-teal)" stroke-width="1" stroke-opacity="0.12" transform="rotate(-18 200 200)" />
-          <circle cx="64" cy="116" r="1.6" fill="var(--fg-primary)" opacity="0.5" />
-          <circle cx="348" cy="290" r="1.3" fill="var(--fg-primary)" opacity="0.4" />
-          <circle cx="316" cy="92" r="1.8" fill="var(--accent-gold)" opacity="0.5" />
-          {/* órbita principal · mitad trasera */}
-          <path d="M28.8 245.6 A180 52 -18 0 0 371.2 154.4" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-opacity="0.32" stroke-linecap="round" />
-          {/* planeta */}
-          <circle cx="200" cy="200" r="110" fill={`url(#${uid}-p)`} />
-          <ellipse cx="226" cy="210" rx="102" ry="102" fill="rgba(0,0,0,0.42)" clip-path={`url(#${uid}-c)`} />
-          {/* órbita principal · mitad delantera */}
-          <path d="M28.8 245.6 A180 52 -18 0 1 371.2 154.4" fill="none" stroke="var(--accent-gold)" stroke-width="2.4" stroke-opacity="0.9" stroke-linecap="round" />
-          {/* satélite = IA */}
-          <circle cx="371.2" cy="154.4" r="8" fill="var(--accent-teal)" />
-        </svg>
-        <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
-      </div>
-
-      <Card class="hero__caso0">
-        <span class="hero__caso0-label">
-          <span class="hero__live" aria-hidden="true"></span>{hero.caso0.label}
-        </span>
-        <ul class="hero__caso0-rows">
-          {hero.caso0.rows.map((r: any) => (
-            <li><span class="hero__caso0-l">{r.l}</span><span class="hero__caso0-v">{r.v}</span></li>
-          ))}
-        </ul>
-      </Card>
+    <div class="hero__stage" data-hero-stage>
+      <svg viewBox="0 0 400 400" role="img" aria-label="Marcyan — planeta en órbita" class="hero__svg">
+        <defs>
+          <radialGradient id={`${uid}-p`} cx="44%" cy="36%" r="62%">
+            <stop offset="0%" stop-color="var(--accent-gold)" />
+            <stop offset="52%" stop-color="var(--accent-gold-deep)" />
+            <stop offset="100%" stop-color="var(--planet-core)" />
+          </radialGradient>
+          <radialGradient id={`${uid}-g`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="var(--accent-gold)" stop-opacity="0" />
+          </radialGradient>
+          <clipPath id={`${uid}-c`}><circle cx="200" cy="200" r="110" /></clipPath>
+        </defs>
+        <circle cx="200" cy="200" r="190" fill={`url(#${uid}-g)`} />
+        {/* órbita · mitad trasera */}
+        <path d="M28.8 255.6 A180 52 -18 0 0 371.2 144.4" fill="none" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity="0.30" stroke-linecap="round" />
+        {/* planeta */}
+        <circle cx="200" cy="200" r="110" fill={`url(#${uid}-p)`} />
+        <ellipse cx="222" cy="212" rx="100" ry="100" fill="rgba(0,0,0,0.42)" clip-path={`url(#${uid}-c)`} />
+        {/* órbita · mitad delantera */}
+        <path d="M28.8 255.6 A180 52 -18 0 1 371.2 144.4" fill="none" stroke="var(--accent-gold)" stroke-width="2.2" stroke-opacity="0.88" stroke-linecap="round" />
+        {/* satélite = IA */}
+        <circle cx="371" cy="144" r="8" fill="var(--accent-teal)" />
+      </svg>
+      <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
+      <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
+      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span>Pasa el cursor sobre el planeta</div>
     </div>
+  </div>
+
+  <div class="hero__caso0" data-hero-caso0 aria-hidden="true">
+    <div class="hero__caso0-head">{hero.caso0.label}</div>
+    <ul class="hero__caso0-rows">
+      {hero.caso0.rows.map((r: any) => (
+        <li><span class="hero__caso0-l">{r.l}</span><span class="hero__caso0-v">{r.v}</span></li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="hero__dock">
+    <Button href={hero.primary.href} variant="primary" size="lg">{hero.primary.label}</Button>
+    <a class="hero__dock-link" href={hero.secondary.href}>{hero.secondary.label} →</a>
   </div>
 </section>
 
 <style>
-  .hero { position: relative; padding-top: calc(var(--nav-h) + var(--space-7)); padding-bottom: var(--space-9); overflow: clip; }
-  .hero__bg {
-    position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: radial-gradient(60% 50% at 70% 28%, var(--accent-gold-dim), transparent 70%);
+  .hero {
+    position: relative; overflow: clip;
+    padding-top: calc(var(--nav-h) + var(--space-7)); padding-bottom: var(--space-9);
   }
-  .hero__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: center; }
+  /* viñeta de la muestra: oro tenue + fondo oscuro inferior (da profundidad, no sobre-ilumina) */
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(78% 70% at 62% 48%, var(--accent-gold-dim), transparent 62%),
+      radial-gradient(120% 90% at 50% 120%, rgba(0, 0, 0, 0.6), transparent 60%);
+  }
+  .hero__stars { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .hero__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-7); align-items: center; }
 
-  .hero__text { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); min-width: 0; }
+  .hero__headline { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); min-width: 0; text-align: left; }
   .hero__h1 { margin-top: var(--space-1); }
   .hero__h1 :global(em) { color: var(--accent-gold); font-style: normal; }
-  .hero__sub { max-width: 52ch; }
-  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .hero__sub { max-width: 50ch; }
 
-  .hero__moons { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .hero__moons { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
   .moon {
     display: inline-flex; align-items: center; gap: var(--space-2);
     min-height: var(--tap-min); padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill);
@@ -106,51 +110,62 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   }
   .moon__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); flex: 0 0 auto; }
   .moon[data-accent="gold"] .moon__dot { background: var(--accent-gold); }
+  .moon :global(.moon__icon), .moon :global(svg) { width: 16px; height: 16px; color: var(--accent-teal); flex: 0 0 auto; }
+  .moon[data-accent="gold"] :global(svg) { color: var(--accent-gold); }
   .moon:hover { border-color: var(--border-accent); color: var(--fg-primary); }
-
-  .hero__visual { display: flex; flex-direction: column; align-items: center; gap: var(--space-5); min-width: 0; }
-  .hero__stage { position: relative; width: 100%; max-width: 440px; aspect-ratio: 1 / 1; margin-inline: auto; }
-  .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
-  .hero__orbit { position: absolute; inset: 0; z-index: 3; }
-
-  /* Los nodos/partículas orbitales se inyectan por JS → sus estilos van en un bloque
-     is:global más abajo (el CSS scopeado no alcanza elementos creados en runtime). */
   .hero--orbital .hero__moons { display: none; }
 
-  .hero__caso0 { width: 100%; max-width: 360px; padding: var(--space-5); }
-  .hero__caso0-label {
-    display: flex; align-items: center; gap: var(--space-2);
+  /* ── escenario del planeta ─────────────────────────────── */
+  .hero__stage { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin-inline: auto; will-change: transform; }
+  .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+  .hero__orbit { position: absolute; inset: 0; z-index: 3; }
+  .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; cursor: pointer; }
+  .hero__hint {
+    position: absolute; left: 50%; bottom: -8px; transform: translate(-50%, 100%); z-index: 5;
+    display: none; align-items: center; gap: var(--space-2);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4);
+    text-transform: uppercase; color: var(--fg-secondary); white-space: nowrap; pointer-events: none;
   }
-  .hero__live { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-teal); animation: pulse 2.4s var(--ease-out-expo) infinite; }
-  .hero__caso0-rows { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
-  .hero__caso0-rows li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2); }
-  .hero__caso0-rows li:last-child { border-bottom: 0; padding-bottom: 0; }
-  .hero__caso0-l { color: var(--fg-secondary); font-size: var(--text-sm); }
-  .hero__caso0-v { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); }
+  .hero__hint-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); box-shadow: 0 0 0 0 var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
+  @keyframes hpulse { 0% { box-shadow: 0 0 0 0 var(--accent-gold-glow); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  @media (--motion-reduce) { .hero__hint-dot { animation: none; } }
 
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 var(--accent-teal-dim); }
-    70% { box-shadow: 0 0 0 8px transparent; }
-    100% { box-shadow: 0 0 0 0 transparent; }
+  /* ── Caso 0 — texto desnudo, abajo-dcha, SOLO escritorio ── */
+  .hero__caso0 { display: none; }
+  .hero__caso0-head {
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold); margin-bottom: var(--space-3);
   }
-  @media (--motion-reduce) { .hero__live { animation: none; } }
+  .hero__caso0-rows { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-end; }
+  .hero__caso0-rows li { display: flex; gap: var(--space-4); align-items: baseline; font-family: var(--font-mono); font-size: var(--text-xs); }
+  .hero__caso0-l { color: var(--fg-subtle); letter-spacing: 0.04em; }
+  .hero__caso0-v { color: var(--fg-secondary); min-width: 120px; text-align: right; }
 
+  /* ── CTA dock — abajo, centro ──────────────────────────── */
+  .hero__dock { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
+  .hero__dock-link {
+    display: inline-flex; align-items: center; min-height: var(--tap-min);
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-secondary); transition: color var(--duration-fast);
+  }
+  .hero__dock-link:hover { color: var(--accent-gold); }
+
+  /* ── ≥ lg: titular izq · planeta der · Caso0 abajo-dcha · dock abajo-centro ── */
   @media (--lg) {
-    .hero { padding-top: calc(var(--nav-h) + var(--space-9)); padding-bottom: var(--space-10); min-height: 92svh; }
-    .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-9); }
-    .hero__visual { align-items: flex-end; }
-    .hero__stage { max-width: 480px; }
-    .hero__caso0 { align-self: flex-end; }
+    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: 92svh; }
+    .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); }
+    .hero__stage { max-width: 440px; }
+    .hero__caso0 { display: block; position: absolute; right: var(--container-pad); bottom: var(--space-8); text-align: right; pointer-events: none; opacity: 0; transform: translateY(8px); transition: opacity var(--duration-slow) var(--ease-out-expo), transform var(--duration-slow) var(--ease-out-expo); }
+    .hero__caso0.is-shown { opacity: 1; transform: none; }
+    .hero__dock { position: absolute; left: 50%; bottom: var(--space-7); transform: translateX(-50%); flex-direction: row; align-items: center; gap: var(--space-4); margin-top: 0; }
   }
 </style>
 
-<!-- Estilos de los cuerpos orbitales (inyectados por JS, por eso is:global, namespaced bajo .hero__orbit) -->
+<!-- Estilos de los cuerpos orbitales (inyectados por JS → is:global, bajo .hero__orbit) -->
 <style is:global>
   .hero__orbit .hero-node {
     position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 8px;
-    padding: 7px 14px 7px 11px; border-radius: var(--radius-pill); white-space: nowrap; text-decoration: none;
+    padding: 7px 14px 7px 12px; border-radius: var(--radius-pill); white-space: nowrap; text-decoration: none;
     background: rgba(18, 18, 18, 0.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     border: 1px solid var(--accent-gold-line); color: var(--fg-primary);
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; line-height: 1;
@@ -158,8 +173,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
   }
   .hero__orbit .hero-node.teal { border-color: var(--accent-teal-line); }
-  .hero__orbit .hero-node__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
-  .hero__orbit .hero-node.teal .hero-node__dot { background: var(--accent-teal); }
+  .hero__orbit .hero-node svg { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; }
+  .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
+  .hero__orbit .hero-node .moon__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
+  .hero__orbit .hero-node.teal .moon__dot { background: var(--accent-teal); }
   .hero__orbit .hero-node:hover { border-color: var(--accent-gold); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--accent-gold-dim); }
   .hero__orbit .hero-node.teal:hover { border-color: var(--accent-teal); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--accent-teal-dim); }
   .hero__orbit .hero-amb {
@@ -170,22 +187,45 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 </style>
 
 <script>
-  // Motor planetario — realce progresivo. Solo se activa en desktop con puntero fino
-  // y sin prefers-reduced-motion. En cualquier otro caso, los chips estáticos quedan.
   const hero = document.querySelector('[data-hero]') as HTMLElement | null;
   if (hero) {
     const stage = hero.querySelector('[data-hero-stage]') as HTMLElement;
     const orbit = hero.querySelector('[data-hero-orbit]') as HTMLElement;
-    const visual = hero.querySelector('[data-hero-visual]') as HTMLElement;
     const moons = hero.querySelector('[data-hero-moons]') as HTMLElement;
+    const headline = hero.querySelector('[data-hero-headline]') as HTMLElement;
+    const hint = hero.querySelector('[data-hero-hint]') as HTMLElement;
+    const caso0 = hero.querySelector('[data-hero-caso0]') as HTMLElement;
+    const starsEl = hero.querySelector('[data-hero-stars]') as HTMLElement;
 
-    const mqOrbital = window.matchMedia('(min-width: 1024px) and (hover: hover) and (pointer: fine)');
+    const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const auto = () => !mqFine.matches || window.innerWidth < 1024; // táctil / apilado (<lg) → mapa auto-activo
+
+    // campo estelar sutil
+    (function fillStars() {
+      if (!starsEl || starsEl.childElementCount) return;
+      const n = window.innerWidth < 768 ? 60 : 100;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < n; i++) {
+        const s = document.createElement('span');
+        const sz = (i % 7) * 0.28 + 0.5;
+        s.style.cssText = `position:absolute;border-radius:50%;background:var(--fg-primary);width:${sz}px;height:${sz}px;` +
+          `top:${(i * 137) % 100}%;left:${(i * 53) % 100}%;opacity:.18;` +
+          (mqReduce.matches ? '' : `animation:hstar ${2 + (i % 5)}s ease-in-out ${(i % 9) * 0.4}s infinite;`);
+        frag.appendChild(s);
+      }
+      starsEl.appendChild(frag);
+      if (!document.getElementById('hstar-kf')) {
+        const st = document.createElement('style'); st.id = 'hstar-kf';
+        st.textContent = '@keyframes hstar{0%,100%{opacity:.12}50%{opacity:.6}}';
+        document.head.appendChild(st);
+      }
+    })();
 
     const ROLL = -18 * Math.PI / 180, COS = Math.cos(ROLL), SIN = Math.sin(ROLL), FLATTEN = 0.42;
     let bodies: any[] = [];
-    let cx = 0, cy = 0, maxR = 0;
-    let energy = 0.7, target = 0.7;
+    let cx = 0, cy = 0, maxR = 0, isAuto = auto();
+    let energy = 0, target = 0;
     let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
     let rafId = 0, last = 0, running = false;
     let ro: ResizeObserver | null = null;
@@ -204,50 +244,60 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       orbit.innerHTML = '';
       bodies = [];
       const n = links.length;
+      const lanes = isAuto ? [0.84, 1.0] : [0.72, 0.92];
       links.forEach((a, idx) => {
         const teal = a.getAttribute('data-accent') === 'teal';
         const el = document.createElement('a');
         el.className = 'hero-node' + (teal ? ' teal' : '');
         el.href = a.getAttribute('href') || '#';
-        el.innerHTML = `<span class="hero-node__dot"></span><span>${a.textContent!.trim()}</span>`;
+        el.innerHTML = a.innerHTML; // conserva icono + etiqueta
         orbit.appendChild(el);
-        bodies.push({ el, R: 0.74 + 0.18 * (idx % 2), ang: (idx / n) * Math.PI * 2 + 0.3, speed: 0.05 + 0.012 * (idx % 3), node: true });
+        bodies.push({ el, R: lanes[idx % lanes.length], ang: (idx / n) * Math.PI * 2 + 0.3, speed: 0.05 + 0.012 * (idx % 3), node: true });
       });
-      for (let i = 0; i < 6; i++) {
+      const ambN = isAuto ? 3 : 6;
+      for (let i = 0; i < ambN; i++) {
         const el = document.createElement('span');
         el.className = 'hero-amb';
         orbit.appendChild(el);
-        bodies.push({ el, R: 0.5 + 0.5 * (i / 6), ang: (i / 6) * Math.PI * 2, speed: 0.06 + 0.02 * (i % 3), sz: 0.6 + 0.7 * ((i % 3) / 3) });
+        bodies.push({ el, R: 0.5 + 0.5 * (i / ambN), ang: (i / ambN) * Math.PI * 2, speed: 0.06 + 0.02 * (i % 3), sz: 0.6 + 0.7 * ((i % 3) / 3) });
       }
     }
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       energy += (target - energy) * Math.min(1, dt * 5);
-      tiltX += (tTiltX - tiltX) * Math.min(1, dt * 4);
-      tiltY += (tTiltY - tiltY) * Math.min(1, dt * 4);
-      stage.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      if (!isAuto) {
+        tiltX += (tTiltX - tiltX) * Math.min(1, dt * 4);
+        tiltY += (tTiltY - tiltY) * Math.min(1, dt * 4);
+        stage.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      }
       for (const b of bodies) {
-        b.ang += b.speed * dt * (0.5 + 0.7 * energy);
-        const p = project(b.R * maxR, b.ang);
+        b.ang += b.speed * dt * (0.4 + 0.8 * energy);
+        const p = project(b.R * maxR * (0.55 + 0.45 * energy), b.ang);
         const front = (p.depth + 1) / 2;
         if (b.node) {
           const sc = 0.85 + 0.15 * p.depth;
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${sc})`;
-          b.el.style.opacity = (0.25 + 0.75 * front).toFixed(3);
+          b.el.style.opacity = (energy * (0.2 + 0.8 * front)).toFixed(3);
           b.el.style.zIndex = p.depth > 0 ? '6' : '1';
-          b.el.style.pointerEvents = p.depth > -0.35 ? 'auto' : 'none';
+          b.el.style.pointerEvents = (energy > 0.5 && p.depth > -0.35) ? 'auto' : 'none';
         } else {
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${b.sz})`;
-          b.el.style.opacity = (0.25 + 0.45 * front).toFixed(3);
+          b.el.style.opacity = (energy * (0.2 + 0.4 * front)).toFixed(3);
           b.el.style.zIndex = p.depth > 0 ? '5' : '0';
         }
+      }
+      if (!isAuto) {
+        hint.style.opacity = Math.max(0, 1 - energy * 2.4).toFixed(3);
+        headline.style.opacity = (1 - energy * 0.5).toFixed(3);
+        caso0.classList.toggle('is-shown', energy > 0.5);
       }
       rafId = requestAnimationFrame(frame);
     }
 
-    const onEnter = () => { target = 1; };
-    const onLeave = () => { target = 0.7; };
+    const onEnter = () => { if (!isAuto) target = 1; };
+    const onLeave = () => { if (!isAuto) target = 0; };
     const onMove = (e: PointerEvent) => {
+      if (isAuto) return;
       const r = hero.getBoundingClientRect();
       const nx = (e.clientX - r.left) / r.width - 0.5;
       const ny = (e.clientY - r.top) / r.height - 0.5;
@@ -258,11 +308,13 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       if (running) return;
       running = true;
       hero.classList.add('hero--orbital');
+      isAuto = auto();
+      target = isAuto ? 1 : 0; energy = isAuto ? 0.0 : 0;
+      if (!isAuto) hint.style.display = 'inline-flex';
       measure(); build();
-      visual.addEventListener('pointerenter', onEnter);
-      visual.addEventListener('pointerleave', onLeave);
+      hero.addEventListener('pointerenter', onEnter);
+      hero.addEventListener('pointerleave', onLeave);
       hero.addEventListener('pointermove', onMove);
-      // re-mide en cuanto el stage tiene su tamaño real (y ante cualquier cambio)
       ro = new ResizeObserver(() => measure());
       ro.observe(stage);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (running) measure(); });
@@ -276,17 +328,20 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.classList.remove('hero--orbital');
       orbit.innerHTML = '';
       stage.style.transform = '';
-      visual.removeEventListener('pointerenter', onEnter);
-      visual.removeEventListener('pointerleave', onLeave);
+      hint.style.display = 'none';
+      headline.style.opacity = '';
+      hero.removeEventListener('pointerenter', onEnter);
+      hero.removeEventListener('pointerleave', onLeave);
       hero.removeEventListener('pointermove', onMove);
       if (ro) { ro.disconnect(); ro = null; }
     }
     function sync() {
-      if (mqOrbital.matches && !mqReduce.matches) enable();
-      else disable();
+      if (mqReduce.matches) { disable(); return; } // reduced-motion → chips estáticos
+      disable(); enable();
     }
-    mqOrbital.addEventListener('change', sync);
     mqReduce.addEventListener('change', sync);
+    mqFine.addEventListener('change', sync);
+    let rt: number; window.addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(sync, 200); }, { passive: true });
     sync();
   }
 </script>

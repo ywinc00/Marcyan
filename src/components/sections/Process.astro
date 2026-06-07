@@ -1,9 +1,13 @@
 ---
-// Sección Proceso — 5 pasos del concepto al lanzamiento. Línea/órbita conectora.
+// Sección Proceso — Variante B "Riel conectado".
+// 5 pasos en un riel lineal conectado: dot (icono) + nº + título + desc.
+// Vertical en móvil, horizontal en desktop. Claridad lineal, alineado.
+import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { process: any }
 const { process } = Astro.props;
+const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucide:shield-check', 'lucide:rocket'];
 ---
 <section class="section process" id="proceso">
   <div class="container">
@@ -11,12 +15,16 @@ const { process } = Astro.props;
       <Kicker>{process.tag}</Kicker>
       <h2 class="h2" set:html={process.title} />
     </header>
-    <ol class="process__steps">
-      {process.steps.map((s: any) => (
-        <li class="process__step">
-          <span class="process__num">{s.n}</span>
-          <h3 class="process__step-title">{s.title}</h3>
-          <p class="process__step-desc">{s.desc}</p>
+
+    <ol class="riel">
+      {process.steps.map((s: any, i: number) => (
+        <li class="riel__step">
+          <span class="riel__dot"><Icon name={s.icon ?? fallbackIcons[i % fallbackIcons.length]} /></span>
+          <div class="riel__tx">
+            <span class="riel__num">{s.n}</span>
+            <h3 class="riel__title">{s.title}</h3>
+            <p class="riel__desc">{s.desc}</p>
+          </div>
         </li>
       ))}
     </ol>
@@ -27,22 +35,30 @@ const { process } = Astro.props;
   .process :global(em) { color: var(--accent-gold); font-style: normal; }
   .process__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
 
-  .process__steps { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-4); counter-reset: step; }
-  .process__step {
-    position: relative; min-width: 0;
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: var(--space-5);
-    display: flex; flex-direction: column; gap: var(--space-2);
-    transition: border-color var(--duration-base) var(--ease-out-expo);
+  .riel { position: relative; list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+  /* riel vertical (móvil) — pasa por el centro de los dots */
+  .riel::before {
+    content: ""; position: absolute; left: 24px; top: 24px; bottom: 24px; width: 1px;
+    background: linear-gradient(var(--accent-gold-line), var(--border)); z-index: 0;
   }
-  .process__step:hover { border-color: var(--border-accent); }
-  .process__num {
-    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
-    letter-spacing: var(--tracking-wide); margin-bottom: var(--space-1);
+  .riel__step { position: relative; z-index: 1; display: grid; grid-template-columns: 48px 1fr; column-gap: var(--space-4); align-items: start; }
+  .riel__dot {
+    width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--bg-elevated); border: 1px solid var(--accent-gold-line);
   }
-  .process__step-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .process__step-desc { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .riel__dot :global(svg) { width: 22px; height: 22px; color: var(--accent-gold); stroke-width: 1.6; }
+  .riel__tx { display: flex; flex-direction: column; gap: var(--space-1); padding-top: 2px; }
+  .riel__num { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: var(--tracking-wide); }
+  .riel__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
+  .riel__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  @media (--sm) { .process__steps { grid-template-columns: repeat(2, 1fr); } }
-  @media (--lg) { .process__steps { grid-template-columns: repeat(5, 1fr); gap: var(--space-3); } }
+  /* riel horizontal (desktop) */
+  @media (--lg) {
+    .riel { grid-template-columns: repeat(5, 1fr); gap: var(--space-5); }
+    .riel::before { left: 10%; right: 10%; top: 24px; bottom: auto; width: auto; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-gold-line) 12%, var(--border)); }
+    .riel__step { grid-template-columns: 1fr; row-gap: var(--space-4); }
+    .riel__dot { margin-inline: 0; }
+    .riel__tx { padding-top: 0; }
+  }
 </style>

@@ -34,6 +34,11 @@
   --accent-2: var(--accent-teal);
   --planet-core: #2e2010;
 
+  /* RGB crudos (para efectos canvas: rgba(var(--x-rgb), alfa)) — derivados de los HEX de arriba */
+  --accent-gold-rgb: 200, 169, 110;
+  --accent-teal-rgb: 79, 195, 161;
+  --star-rgb:        240, 237, 232;
+
   /* ── Texto ──────────────────────────────── */
   --fg-primary:   #f0ede8;  /* blanco cálido */
   --fg-secondary: #9a9590;  /* muted */

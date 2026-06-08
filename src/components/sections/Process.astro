@@ -18,7 +18,7 @@ const { process } = Astro.props;
 const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucide:shield-check', 'lucide:rocket'];
 const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#contacto' };
 ---
-<section class="section process" id="proceso" data-process>
+<section class="section process" id="proceso" data-process data-fx="gold">
   <div class="container">
     <header class="process__head">
       <Kicker>{process.tag}</Kicker>

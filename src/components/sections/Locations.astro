@@ -7,7 +7,7 @@ interface Props { locations: any }
 const { locations } = Astro.props;
 const tel = (s: string) => s.replace(/[^\d+]/g, '');
 ---
-<section class="section locations" id="ciudades">
+<section class="section locations" id="ciudades" data-fx="gold">
   <div class="container">
     <header class="locations__head">
       <Kicker>{locations.tag}</Kicker>

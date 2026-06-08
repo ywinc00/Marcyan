@@ -1,27 +1,85 @@
 ---
-// Sección Garantías — "Con lo que puedes contar" (reemplazó testimonios falsos).
-// 4 garantías reales con icono.
+// Sección "Por qué Marcyan" (Garantías) — Variante "Destacado + compactas".
+// 1 garantía DESTACADA (la diferencial: legible para IA) con mini-widget de
+// "escaneo" animado + badge, y 3 garantías compactas. Mantiene los TEXTOS reales
+// de content.ts; el layout y los adornos (badge, escaneo, ghost 24h, chips ES/EN)
+// son puramente visuales. Acento oro. Móvil: apilado.
 import Icon from '../ui/Icon.astro';
-import Card from '../ui/Card.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { guarantees: any }
 const { guarantees } = Astro.props;
+
+const items = guarantees.items as any[];
+// La destacada = la garantía "Listo para IA y buscadores" (icono radar).
+let featIdx = items.findIndex((i) => (i.icon || '').includes('radar'));
+if (featIdx < 0) featIdx = items.length > 2 ? 2 : 0;
+const featured = items[featIdx];
+const rest = items.filter((_, i) => i !== featIdx);
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const total = pad2(items.length);
+// adorno por garantía (atado al icono, no al texto → no toca los copies)
+const motif = (s: any) => {
+  const ic = s.icon || '';
+  if (ic.includes('zap')) return 'hours';      // → marca de agua "24h"
+  if (ic.includes('languages')) return 'lang'; // → chips ES / EN
+  return '';
+};
 ---
-<section class="section guarantees" id="garantias">
+<section class="section guarantees" id="garantias" data-fx="gold">
   <div class="container">
     <header class="guarantees__head">
       <Kicker>{guarantees.tag}</Kicker>
       <h2 class="h2" set:html={guarantees.title} />
     </header>
-    <div class="guarantees__grid">
-      {guarantees.items.map((g: any) => (
-        <Card class="guarantee">
-          <span class="guarantee__icon"><Icon name={g.icon} /></span>
-          <h3 class="guarantee__title">{g.title}</h3>
-          <p class="guarantee__desc">{g.desc}</p>
-        </Card>
-      ))}
+
+    <div class="why-grid">
+      <!-- DESTACADA: legible para IA -->
+      <article class="why-feat">
+        <div class="feat-top">
+          <span class="ix">01 / {total}</span>
+          {guarantees.featuredBadge && (
+            <span class="feat-badge"><Icon name="lucide:sparkles" /> {guarantees.featuredBadge}</span>
+          )}
+        </div>
+        <span class="feat-ic"><Icon name={featured.icon} /></span>
+        <h3 class="feat-title">{featured.title}</h3>
+        <p class="feat-desc">{featured.desc}</p>
+
+        <div class="scan" aria-hidden="true">
+          <div class="scan-head"><span class="scan-dot"></span><span>{guarantees.scanLabel}</span></div>
+          <span class="ln" style="width:82%"></span>
+          <span class="ln acc" style="width:46%"></span>
+          <span class="ln" style="width:64%"></span>
+          <span class="ln" style="width:38%"></span>
+          <span class="scanbar"></span>
+        </div>
+      </article>
+
+      <!-- COMPACTAS -->
+      <div class="why-stack">
+        {rest.map((s, i) => {
+          const m = motif(s);
+          return (
+            <div class:list={['why-card', m && `has-${m}`]}>
+              <span class="wc-ic"><Icon name={s.icon} /></span>
+              <div class="wc-tx">
+                <div class="wc-row"><h4>{s.title}</h4><span class="ix">{pad2(i + 2)}</span></div>
+                <p>{s.desc}</p>
+                {m === 'lang' && (
+                  <div class="wc-chips">
+                    <span class="chip on">ES</span>
+                    <span class="chip on">EN</span>
+                    <span class="chip muted">Houston · Miami</span>
+                  </div>
+                )}
+              </div>
+              {m === 'hours' && <span class="wc-ghost" aria-hidden="true">24h</span>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   </div>
 </section>
@@ -29,18 +87,92 @@ const { guarantees } = Astro.props;
 <style>
   .guarantees :global(em) { color: var(--accent-gold); font-style: normal; }
   .guarantees__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
-  .guarantees__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
-  .guarantee { display: flex; flex-direction: column; gap: var(--space-3); }
-  .guarantee__icon {
-    display: inline-flex; align-items: center; justify-content: center;
+
+  .why-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); align-items: stretch; }
+  .ix { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); letter-spacing: var(--tracking-wide); }
+
+  /* ── Garantía destacada ─────────────────────────────────── */
+  .why-feat {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    background:
+      radial-gradient(120% 120% at 0% 0%, var(--accent-gold-dim), transparent 55%),
+      var(--bg-card);
+    border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg);
+    padding: var(--space-6); box-shadow: var(--shadow-card);
+  }
+  .feat-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .feat-badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
+    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3);
+  }
+  .feat-badge :global(svg) { width: 13px; height: 13px; }
+  .feat-ic { color: var(--accent-gold); margin-top: var(--space-2); }
+  .feat-ic :global(svg) { width: 34px; height: 34px; stroke-width: 1.5; }
+  .feat-title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: var(--leading-snug); }
+  .feat-desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); }
+
+  /* mini-widget "escaneo IA": skeleton + barra que recorre (legible para IA) */
+  .scan {
+    position: relative; margin-top: var(--space-4); overflow: hidden;
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: var(--bg-base); padding: var(--space-4);
+    display: flex; flex-direction: column; gap: var(--space-3);
+  }
+  .scan-head { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .scan-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: scandot 2.2s ease-out infinite; }
+  .scan .ln { height: 6px; border-radius: 100px; background: var(--bg-elevated); }
+  .scan .ln.acc { background: var(--accent-gold); opacity: 0.5; }
+  .scanbar {
+    position: absolute; left: 0; right: 0; top: -22px; height: 22px; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(var(--accent-gold-rgb), 0.16), transparent);
+    border-top: 1px solid rgba(var(--accent-gold-rgb), 0.5);
+    animation: scanmove 3.6s var(--ease-in-out) infinite;
+  }
+  @keyframes scanmove { 0% { top: -22px; opacity: 0; } 12% { opacity: 1; } 86% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+  @keyframes scandot { 0% { box-shadow: 0 0 0 0 var(--accent-teal); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* ── Garantías compactas ────────────────────────────────── */
+  .why-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+  .why-card {
+    position: relative; overflow: hidden;
+    display: flex; gap: var(--space-4); align-items: flex-start;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .why-card:hover { border-color: var(--border-accent); }
+  .wc-ic {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; border-radius: var(--radius-md);
     background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-    margin-bottom: var(--space-1);
   }
-  .guarantee__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .guarantee__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .guarantee__desc { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .wc-ic :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .wc-tx { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: var(--space-1); }
+  .wc-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .wc-row h4 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
+  .wc-tx p { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  @media (--sm) { .guarantees__grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (--lg) { .guarantees__grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-5); } }
+  /* chips ES / EN (garantía bilingüe) */
+  .wc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
+  .chip { font-family: var(--font-mono); font-size: var(--text-xs); border-radius: var(--radius-pill); padding: 2px var(--space-2); border: 1px solid var(--border); color: var(--fg-secondary); }
+  .chip.on { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .chip.muted { color: var(--fg-subtle); border-color: transparent; padding-inline: var(--space-1); }
+
+  /* marca de agua "24h" (garantía de propuesta) */
+  .wc-ghost {
+    position: absolute; right: var(--space-2); bottom: -12px;
+    font-family: var(--font-mono); font-weight: 700; font-size: 60px; line-height: 1; letter-spacing: -0.05em;
+    color: var(--accent-gold); opacity: 0.06; pointer-events: none;
+  }
+
+  @media (--motion-reduce) { .scanbar { display: none; } .scan-dot { animation: none; } }
+
+  @media (--lg) {
+    .why-grid { grid-template-columns: 1.02fr 0.98fr; gap: var(--space-5); }
+    .why-feat { padding: var(--space-7); }
+    /* la pila reparte su alto para cuadrar con la destacada */
+    .why-stack { justify-content: space-between; }
+  }
 </style>

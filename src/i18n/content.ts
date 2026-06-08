@@ -94,6 +94,19 @@ export const content = {
         { icon: 'lucide:workflow', title: 'Automatizaciones', desc: 'Conectamos tu sitio con las herramientas que ya usas, para que los nuevos prospectos, avisos y seguimientos ocurran solos.' },
       ],
       cta: { label: 'Ver IA para tu negocio', href: '/es/ia-para-pymes' },
+      // Demo ILUSTRATIVO del asistente (texto de muestra, editable). No es copy de negocio.
+      demo: {
+        title: 'Asistente Marcyan', status: 'En línea', lang: 'ES · EN',
+        messages: [
+          { who: 'user', text: 'Hola, ¿hacen páginas para restaurantes?' },
+          { who: 'ai', text: '¡Claro! Diseñamos sitios con menú, reservas y pedidos. ¿Cómo se llama tu negocio?', meta: 'Responde al instante' },
+          { who: 'user', text: 'Tacos El Güero, en Houston.' },
+          { who: 'ai', text: 'Perfecto 🌮 Te preparo una propuesta gratis en 24 h. ¿A qué correo te la enviamos?', meta: 'Califica el prospecto' },
+          { who: 'user', text: 'gerardo@tacoselguero.com' },
+        ],
+        flow: ['Mensaje', 'IA responde', 'Lead guardado', 'Te avisamos'],
+        toast: { title: 'Nuevo lead capturado', sub: 'Enviado a tu CRM · WhatsApp notificado' },
+      },
     },
 
     process: {
@@ -125,6 +138,8 @@ export const content = {
     guarantees: {
       tag: 'Por qué Marcyan',
       title: 'Con lo que puedes<br><em>contar</em>',
+      featuredBadge: 'Diferencial',
+      scanLabel: 'Legible para IA',
       items: [
         { icon: 'lucide:zap', title: 'Propuesta en 24h', desc: 'Cuéntanos tu idea y recibe una propuesta personalizada en menos de 24 horas — sin costo ni compromiso.' },
         { icon: 'lucide:ruler', title: 'Todo a medida', desc: 'Sin plantillas. Cada sitio se diseña y programa desde cero alrededor de tu negocio y tus objetivos.' },
@@ -273,6 +288,19 @@ export const content = {
         { icon: 'lucide:messages-square', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
         { icon: 'lucide:workflow', title: 'Automations', desc: 'We connect your site to the tools you already use, so new leads, notifications, and follow-ups happen on their own.' },
       ],
+      // Illustrative assistant demo (sample text, editable). Not business copy.
+      demo: {
+        title: 'Marcyan Assistant', status: 'Online', lang: 'ES · EN',
+        messages: [
+          { who: 'user', text: 'Hi, do you build websites for restaurants?' },
+          { who: 'ai', text: 'Absolutely! We design sites with menus, reservations and ordering. What is your business called?', meta: 'Replies instantly' },
+          { who: 'user', text: 'Tacos El Güero, in Houston.' },
+          { who: 'ai', text: 'Perfect 🌮 I will prepare a free proposal within 24 h. What email should we send it to?', meta: 'Qualifies the lead' },
+          { who: 'user', text: 'gerardo@tacoselguero.com' },
+        ],
+        flow: ['Message', 'AI replies', 'Lead saved', 'We notify you'],
+        toast: { title: 'New lead captured', sub: 'Sent to your CRM · WhatsApp notified' },
+      },
     },
 
     process: {
@@ -304,6 +332,8 @@ export const content = {
     guarantees: {
       tag: 'Why Marcyan',
       title: 'What you can<br><em>count on</em>',
+      featuredBadge: 'Differentiator',
+      scanLabel: 'AI-readable',
       items: [
         { icon: 'lucide:zap', title: 'Proposal in 24h', desc: "Tell us your idea and you'll get a personalized proposal in under 24 hours — no cost, no commitment." },
         { icon: 'lucide:ruler', title: 'Built to measure', desc: 'No templates. Every site is designed and coded from scratch around your business and your goals.' },

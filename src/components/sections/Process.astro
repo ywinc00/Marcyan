@@ -124,20 +124,22 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   }
   .has-finale .riel__finale { display: flex; }
   .process.is-launched .riel__finale { opacity: 1; visibility: visible; transition: opacity 0.5s var(--ease-out-expo); }
-  .process.is-done .riel__finale { opacity: 0; visibility: hidden; transition: opacity 0.6s var(--ease-out-expo), visibility 0s linear 0.6s; }
+  .process.is-done .riel__finale { opacity: 0; visibility: hidden; transition: opacity 0.35s var(--ease-out-expo), visibility 0s linear 0.35s; }
 
-  /* el cohete que vuela (FLIP: arranca en el nodo, JS le pone el transform inicial) */
-  .riel__rocket-fly { position: relative; color: var(--accent-gold); transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  /* el cohete que vuela (FLIP: arranca en el nodo, JS le pone el transform inicial). Vuelo LENTO. */
+  .riel__rocket-fly { position: relative; color: var(--accent-gold); transition: transform 1.9s cubic-bezier(0.22, 1, 0.36, 1); }
   .riel__rocket-fly :global(svg) { width: 54px; height: 54px; display: block; }
   .riel__rocket-fly::after { content: ""; position: absolute; left: 50%; bottom: -10px; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle, var(--accent-gold-glow), transparent 70%); transform: translateX(-50%) scale(0); opacity: 0; pointer-events: none; }
-  .process.is-launched .riel__rocket-fly::after { animation: rsmoke 1.3s var(--ease-out-expo) forwards; }
+  .process.is-launched .riel__rocket-fly::after { animation: rsmoke 1.9s var(--ease-out-expo) forwards; }
   @keyframes rsmoke { 0% { transform: translateX(-50%) scale(0.4); opacity: 0.7; } 100% { transform: translateX(-50%) translateY(26px) scale(2.8); opacity: 0; } }
 
   /* el CTA sale CUANDO el cohete ya se detuvo (delay ~ el vuelo) */
   .riel__finale-cta { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); pointer-events: auto; opacity: 0; transform: translateY(16px); transition: opacity 0.55s var(--ease-out-expo), transform 0.55s var(--ease-out-expo); }
-  .process.is-launched .riel__finale-cta { opacity: 1; transform: none; transition-delay: 1.15s; }
-  /* el cohete del nodo final desaparece (se ve que "salió" del círculo) */
+  .process.is-launched .riel__finale-cta { opacity: 1; transform: none; transition-delay: 1.7s; }
+  /* el cohete del nodo final desaparece (se ve que "salió" del círculo)… */
   .process.is-launched .riel__step:last-child .riel__dot :global(svg) { opacity: 0; }
+  /* …y al salir del finale VUELVE a su círculo */
+  .process.is-done .riel__step:last-child .riel__dot :global(svg) { opacity: 1; }
 
   @media (--motion-reduce) {
     .riel__finale { display: none !important; }
@@ -157,66 +159,55 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
     if (window.innerWidth < 1024 && !reduce && steps.length) {
       section.classList.add('has-finale');
       const last = steps[steps.length - 1];
+      const lastDot = last.querySelector('.riel__dot') as HTMLElement;
       const rocket = section.querySelector<HTMLElement>('[data-rocket]');
-      let played = false;
+      let phase: 'idle' | 'launched' | 'done' = 'idle';
       let ticking = false;
 
-      // 1) energía por scroll (sólo mientras no se ha reproducido)
+      // el cohete arranca EN el círculo del nodo final y vuela LENTO a su sitio (centro)
+      function launch() {
+        phase = 'launched';
+        steps.forEach((s) => { s.classList.remove('is-active'); s.classList.add('is-passed'); });
+        if (rocket) {
+          const rr = rocket.getBoundingClientRect();      // posición de reposo (centrada)
+          const dr = lastDot.getBoundingClientRect();
+          const dx = (dr.left + dr.width / 2) - (rr.left + rr.width / 2);
+          const dy = (dr.top + dr.height / 2) - (rr.top + rr.height / 2);
+          rocket.style.transition = 'none';
+          rocket.style.transform = `translate(${dx}px, ${dy}px) scale(0.5)`;
+        }
+        section.classList.add('is-launched');             // overlay + blur + oculta el cohete del nodo
+        setTimeout(() => { if (rocket) { rocket.style.transition = ''; rocket.style.transform = ''; } }, 40);
+      }
+      // una vez reproducido: se cierra (sin revertir), el cohete vuelve al círculo, no recarga
+      function finish() {
+        phase = 'done';
+        section.classList.add('is-done');
+        section.classList.remove('has-finale');           // CTA inline para futuras visitas
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      }
       const update = () => {
         ticking = false;
-        if (played) return;
-        const center = window.innerHeight * 0.5;
-        let active = -1;
-        for (let i = 0; i < steps.length; i++) {
-          const r = steps[i].getBoundingClientRect();
-          if (r.top + 24 <= center) active = i;
+        const vh = window.innerHeight;
+        if (phase === 'idle') {
+          const center = vh * 0.5;
+          let active = -1;
+          for (let i = 0; i < steps.length; i++) {
+            if (steps[i].getBoundingClientRect().top + 24 <= center) active = i;
+          }
+          steps.forEach((s, i) => { s.classList.toggle('is-active', i === active); s.classList.toggle('is-passed', i < active); });
+          if (active === steps.length - 1) launch(); // dispara JUSTO cuando la energía llega al nodo final
+        } else if (phase === 'launched') {
+          // al alejarse del nodo final (arriba o abajo) se cierra RÁPIDO
+          const cy = lastDot.getBoundingClientRect().top + 24;
+          if (cy < vh * 0.32 || cy > vh * 0.95) finish();
         }
-        steps.forEach((s, i) => {
-          s.classList.toggle('is-active', i === active);
-          s.classList.toggle('is-passed', i < active);
-        });
-        // disparo del cohete: cuando el dot del nodo final sube a la mitad-baja del viewport
-        const ld = last.querySelector('.riel__dot') as HTMLElement | null;
-        if (ld && ld.getBoundingClientRect().top + 24 <= window.innerHeight * 0.7) play();
       };
       const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll, { passive: true });
       update();
-
-      // 2) cohete: vuela del nodo final al centro (lento) → se detiene → salen botones.
-      function play() {
-        if (played) return;
-        played = true;
-        window.removeEventListener('scroll', onScroll);
-        window.removeEventListener('resize', onScroll);
-        // estado final: la línea queda encendida (no se revierte), sin escala activa
-        steps.forEach((s, i) => { s.classList.remove('is-active'); s.classList.toggle('is-passed', i < steps.length); });
-
-        // FLIP: el cohete arranca EN el círculo del nodo y vuela al centro
-        const dot = last.querySelector('.riel__dot') as HTMLElement;
-        const dr = dot.getBoundingClientRect();
-        const dx = dr.left + dr.width / 2 - window.innerWidth / 2;
-        const dy = dr.top + dr.height / 2 - window.innerHeight / 2;
-        if (rocket) {
-          rocket.style.transition = 'none';
-          rocket.style.transform = `translate(${dx}px, ${dy}px) scale(0.45)`;
-        }
-        section.classList.add('is-launched'); // muestra overlay + blur + oculta el cohete del nodo
-        // siguiente tick: re-habilita la transición CSS y lo lleva al centro (vuelo lento)
-        setTimeout(() => { if (rocket) { rocket.style.transition = ''; rocket.style.transform = ''; } }, 40);
-
-        // al seguir hacia abajo (o alejarse), se desvanece SIN revertir; y no vuelve a cargar
-        const dismiss = () => {
-          const r = last.getBoundingClientRect();
-          if (r.bottom < window.innerHeight * 0.12 || r.top > window.innerHeight * 0.92) {
-            section.classList.add('is-done');
-            section.classList.remove('has-finale'); // deja el CTA inline para futuras visitas
-            window.removeEventListener('scroll', dismiss);
-          }
-        };
-        window.addEventListener('scroll', dismiss, { passive: true });
-      }
     }
   }
 </script>

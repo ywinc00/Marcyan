@@ -199,9 +199,9 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
           steps.forEach((s, i) => { s.classList.toggle('is-active', i === active); s.classList.toggle('is-passed', i < active); });
           if (active === steps.length - 1) launch(); // dispara JUSTO cuando la energía llega al nodo final
         } else if (phase === 'launched') {
-          // al alejarse del nodo final (arriba o abajo) se cierra RÁPIDO
+          // se cierra al alejarte del nodo final (punto medio: ni tan pronto ni tan tarde)
           const cy = lastDot.getBoundingClientRect().top + 24;
-          if (cy < vh * 0.32 || cy > vh * 0.95) finish();
+          if (cy < vh * 0.16 || cy > vh * 0.98) finish();
         }
       };
       const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };

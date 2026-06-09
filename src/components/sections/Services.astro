@@ -17,6 +17,7 @@ const [featured, ...rest] = services.items;
       <div class="services__intro">
         <Kicker>{services.tag}</Kicker>
         <h2 class="h2" set:html={services.title} />
+        {services.note && <p class="services__note">{services.note}</p>}
       </div>
       <Button href={services.cta.href} variant="secondary" class="services__head-cta">{services.cta.label}</Button>
     </header>
@@ -53,6 +54,11 @@ const [featured, ...rest] = services.items;
   .services__head { display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; margin-bottom: var(--space-7); }
   .services__intro { display: flex; flex-direction: column; gap: var(--space-4); }
   .services__intro :global(.h2) :global(em) { color: var(--accent-gold); font-style: normal; }
+  .services__note {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--accent-teal); max-width: 56ch;
+  }
 
   .svc-c { display: grid; grid-template-columns: 1fr; gap: var(--space-4); align-items: stretch; }
 

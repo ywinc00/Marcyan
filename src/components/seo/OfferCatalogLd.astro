@@ -1,0 +1,17 @@
+---
+// Emite el JSON-LD OfferCatalog (lista de servicios con precio real).
+// Munición AEO: la IA puede citar la tarifa de Marcyan (solo Once Once lo hace
+// en el mercado). Co-localizado; el provider enlaza al @id de la Org del Layout.
+// Lo usan la home (/es/) y el hub /es/precios con la misma fuente (i18n/pricing).
+import { offerCatalog, type OfferItem } from '../../lib/schema';
+
+interface Props {
+  items: OfferItem[];
+  name?: string;
+  /** Ruta canónica del catálogo (p.ej. "/es/precios"). */
+  url?: string;
+}
+const { items, name, url } = Astro.props;
+const ld = offerCatalog(items, { name, url });
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

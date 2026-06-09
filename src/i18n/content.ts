@@ -25,6 +25,7 @@ export const content = {
     nav: {
       links: [
         { label: 'Servicios', href: '#servicios' },
+        { label: 'Precios', href: '/es/precios' },
         { label: 'IA', href: '#ia' },
         { label: 'Proyectos', href: '#proyectos' },
         { label: 'Ciudades', href: '#ciudades' },
@@ -64,9 +65,10 @@ export const content = {
     services: {
       tag: 'Nuestros Servicios',
       title: 'Todo lo que tu<br>marca <em>necesita</em>',
+      note: 'Precios públicos, sin letra pequeña — hasta el SEO mensual y el mantenimiento.',
       explore: 'Explorar',
       featuredBadge: 'Servicio estrella',
-      cta: { label: 'Cuéntanos tu proyecto', href: '#contacto' },
+      cta: { label: 'Ver precios y qué incluye', href: '/es/precios' },
       items: [
         { n: '01', icon: 'lucide:layout-template', title: 'Diseño Web Premium', price: 'desde $1,500',
           desc: 'Sitios de alto impacto construidos desde cero. Cada píxel responde a tu identidad de marca y a tus objetivos de negocio en Houston y Miami.' },
@@ -189,6 +191,7 @@ export const content = {
       tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
       cols: [
         { title: 'Servicios', links: [
+          { label: 'Precios', href: '/es/precios' },
           { label: 'Diseño Web', href: '/es/#servicios' },
           { label: 'E-Commerce', href: '/es/#servicios' },
           { label: 'IA para Negocios', href: '/es/ia-para-pymes' },

@@ -15,7 +15,9 @@ import Guarantees from '../../components/sections/Guarantees.astro';
 import Locations from '../../components/sections/Locations.astro';
 import Contact from '../../components/sections/Contact.astro';
 import StarField from '../../components/StarField.astro';
+import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import { content } from '../../i18n/content';
+import { offerItems } from '../../i18n/pricing';
 
 const c = content.es;
 ---
@@ -25,6 +27,9 @@ const c = content.es;
   lang="es"
   path="/"
 >
+  {/* OfferCatalog con los 6 servicios + precio (Offer/priceSpecification) — munición AEO. */}
+  <OfferCatalogLd slot="head" items={offerItems} url="/es/precios" />
+
   <SiteNav nav={c.nav} lang="es" homeHref="/es/" />
   <main id="main">
     <Hero hero={c.hero} />

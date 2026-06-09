@@ -1,0 +1,78 @@
+---
+// HUB DE PRECIOS · /es/precios — Fase 0 SEO.
+// "Precios públicos, sin letra pequeña": los 6 servicios con "desde $X" + qué
+// incluye, answer-first AEO, framing de transparencia (publicamos lo recurrente
+// que la competencia esconde) y FAQ con FAQPage. Schema: OfferCatalog con
+// Offer/priceSpecification de los 6 (munición AEO; solo Once Once lo hace).
+// ES por ahora (hasEn=false). /en/precios queda para la Ola 4.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import Prose from '../../components/sections/Prose.astro';
+import PriceGrid from '../../components/sections/PriceGrid.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import Faq from '../../components/sections/Faq.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { priceServices, offerItems, preciosPage as p } from '../../i18n/pricing';
+
+const c = content.es;
+---
+<Layout
+  title={p.meta.title}
+  description={p.meta.description}
+  lang="es"
+  path="precios"
+  hasEn={false}
+>
+  <OfferCatalogLd slot="head" items={offerItems} url={p.path} name="Precios — Marcyan Studio" />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      kicker={p.hero.kicker}
+      h1={p.hero.h1}
+      sub={p.hero.sub}
+      primary={p.hero.primary}
+      secondary={p.hero.secondary}
+      chips={p.hero.chips}
+      tone={p.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={p.answer.q} a={p.answer.a} />
+
+    <Prose
+      tag={p.transparency.tag}
+      title={p.transparency.title}
+      paragraphs={p.transparency.paragraphs}
+      tone={p.transparency.tone}
+    />
+
+    <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={priceServices} />
+
+    <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
+
+    <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
+
+    <CtaBand
+      title={p.cta.title}
+      sub={p.cta.sub}
+      primary={p.cta.primary}
+      secondary={p.cta.secondary}
+      tone={p.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

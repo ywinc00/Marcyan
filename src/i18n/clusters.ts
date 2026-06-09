@@ -63,6 +63,7 @@ export interface ClusterPage {
 export const clusterNav = {
   links: [
     { label: 'Servicios', href: '/es/#servicios' },
+    { label: 'Precios', href: '/es/precios' },
     { label: 'IA', href: '/es/ia-para-pymes' },
     { label: 'Proyectos', href: '/es/#proyectos' },
     { label: 'Ciudades', href: '/es/#ciudades' },
@@ -558,12 +559,119 @@ const iaPymes: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// 5 · FLAGSHIP DE PRECIO (Fase 0) — "¿Cuánto cuesta una página web en Houston?"
+//   Página de intención de precio answer-first. Reusa la plantilla ClusterLanding
+//   → hereda Service+Offer($1,500)+FAQPage+BreadcrumbList. Enlaza a /es/precios
+//   y a /es/houston/diseno-web. Munición AEO (Once Once explota este clúster).
+// ═══════════════════════════════════════════════════════════════
+const precioWebHouston: ClusterPage = {
+  meta: {
+    title: '¿Cuánto cuesta una página web en Houston? Precio real 2026 | Marcyan',
+    description:
+      'Una página web profesional en Houston cuesta desde $1,500: a medida, bilingüe y con SEO base. Te explicamos qué incluye y de qué depende el precio, sin costos ocultos.',
+  },
+  path: '/es/precios/cuanto-cuesta-una-pagina-web-houston',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Precios', path: '/es/precios' },
+    { name: '¿Cuánto cuesta una página web en Houston?', path: '/es/precios/cuanto-cuesta-una-pagina-web-houston' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Precio · Diseño web',
+    h1: 'Cuánto cuesta una <em>página web</em> en Houston',
+    sub: 'Respuesta directa y sin rodeos: cuánto invertir, qué incluye y de qué depende el precio de un sitio profesional en Houston — con cifras reales, no un «contáctanos para cotizar».',
+    primary: { label: 'Pedir mi precio exacto', href: '#contacto' },
+    secondary: { label: 'Ver todos los precios', href: '/es/precios' },
+    chips: ['Desde $1,500', 'A medida y bilingüe', 'SEO base incluido'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta una página web en Houston?',
+    a: 'Una página web profesional a medida en Houston cuesta desde $1,500. Ese precio incluye un sitio rápido, bilingüe (español e inglés) y con SEO base. El total final depende del número de páginas y de las funciones que necesites: una tienda en línea o un sistema de reservas suben la inversión.',
+  },
+  includes: {
+    tag: 'Qué incluye ese precio',
+    title: 'Qué obtienes <em>desde $1,500</em>',
+    items: webIncludesItems,
+    tone: 'gold',
+  },
+  local: {
+    tag: 'De qué depende',
+    title: 'Por qué decimos <em>«desde»</em> y no un precio fijo',
+    paragraphs: [
+      'El precio de un sitio web no es una talla única: depende de cuántas páginas necesites, de las funciones (reservas, pagos, blog, integraciones) y de si quieres una o dos versiones de idioma. Un sitio de presentación de varias páginas parte de $1,500; una tienda en línea (e-commerce) arranca más arriba, alrededor de $2,900.',
+      'Por eso publicamos el punto de partida real y no un número inflado para «cerrarte en la llamada». <strong>Te damos el alcance y el total por escrito en la propuesta</strong>, antes de que decidas, sin costos que aparezcan después.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Página web en Houston, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
+    features: webFeatures,
+    cta: { label: 'Solicitar propuesta', href: '#contacto' },
+    note: webPriceNote,
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Sitios reales que <em>ya están en vivo</em>',
+    cta: { label: 'Inicia tu proyecto', href: '#contacto' },
+    items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Precio de tu página web, <em>sin letra chica</em>',
+    items: [
+      { q: '¿Qué incluye el precio de $1,500?', a: 'Incluye un sitio profesional a medida de varias páginas, diseñado desde cero, rápido, listo para móvil, con versión en español e inglés, SEO técnico base y un formulario de contacto que llega a tu correo. No es una plantilla: se diseña alrededor de tu marca y tus objetivos.' },
+      { q: '¿Por qué «desde $1,500» y no un precio fijo?', a: 'Porque cada negocio necesita algo distinto. $1,500 es el punto de partida real para un sitio de presentación. El total sube si pides más páginas, una tienda en línea, reservas o integraciones. Te damos el alcance y el precio cerrado por escrito en la propuesta, antes de empezar.' },
+      { q: '¿El precio incluye SEO?', a: 'Incluye SEO técnico base: estructura correcta, velocidad, etiquetas y un formato que Google y los asistentes de IA pueden leer. El posicionamiento local continuo (Perfil de Google, reseñas, contenido mensual) es el servicio aparte de SEO local, desde $600 al mes, si lo necesitas.' },
+      { q: '¿En cuánto tiempo está lista mi página?', a: 'Un sitio típico de varias páginas toma entre 2 y 4 semanas, según la rapidez con que recibamos tu contenido (textos, fotos, logo) y el número de revisiones. Las tiendas en línea toman más tiempo. Te damos un calendario realista desde el inicio.' },
+      { q: '¿Hay mensualidades obligatorias?', a: 'No. El diseño web se paga por proyecto, una sola vez. El mantenimiento (desde $120 al mes) es opcional: respaldos, seguridad y soporte. Puedes manejar el sitio por tu cuenta si prefieres — el sitio es tuyo, nunca te dejamos amarrado.' },
+      { q: '¿La propuesta tiene costo?', a: 'No. Cuéntanos tu proyecto y en menos de 24 horas recibes una propuesta personalizada con alcance y precio, sin costo ni compromiso. Si decides no avanzar, no pasa nada.' },
+    ],
+  },
+  cta: {
+    title: 'Pide el precio <em>exacto</em> de tu sitio',
+    sub: 'Cuéntanos cuántas páginas y qué funciones necesitas, y recibe una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios y precios relacionados',
+    links: [
+      { label: 'Todos los precios', href: '/es/precios', desc: 'Los 6 servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: proceso, proyectos y FAQ.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web en Houston',
+    serviceType: 'Diseño web',
+    description:
+      'Diseño y desarrollo de páginas web a medida para negocios en Houston: rápidas, bilingües (español e inglés), con SEO base, desde $1,500.',
+    path: '/es/precios/cuanto-cuesta-una-pagina-web-houston',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
 // ── Registro de las landings (clave = slug de ruta) ──
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
   'miami/diseno-web': miamiWeb,
   'ia-para-pymes': iaPymes,
+  'precios/cuanto-cuesta-una-pagina-web-houston': precioWebHouston,
 } satisfies Record<string, ClusterPage>;
 
 export { nap };

@@ -46,6 +46,8 @@ export interface ServiceInput {
   priceCurrency?: string;
   /** Unidad de facturación si aplica (p.ej. "MON" para mensual). */
   unitText?: string;
+  /** true → tarifa recurrente mensual: emite UnitPriceSpecification con unitCode MON (precio "por mes"). */
+  monthly?: boolean;
   /** @id del proveedor (por defecto, una de las ProfessionalService del Layout). */
   providerId?: string;
 }
@@ -62,6 +64,7 @@ export function service(input: ServiceInput) {
     priceValue,
     priceCurrency = 'USD',
     unitText,
+    monthly = false,
     providerId = ORG_ID,
   } = input;
 
@@ -72,12 +75,20 @@ export function service(input: ServiceInput) {
         { '@type': 'City', name: 'Miami' },
       ];
 
-  const priceSpec: Record<string, unknown> = {
-    '@type': 'PriceSpecification',
-    price: priceValue,
-    priceCurrency,
-    ...(unitText ? { unitText } : {}),
-  };
+  const priceSpec: Record<string, unknown> = monthly
+    ? {
+        '@type': 'UnitPriceSpecification',
+        price: priceValue,
+        priceCurrency,
+        // "$X por mes" canónico (1 mes = unitCode MON), espejo de offerCatalog().
+        referenceQuantity: { '@type': 'QuantitativeValue', value: '1', unitCode: 'MON' },
+      }
+    : {
+        '@type': 'PriceSpecification',
+        price: priceValue,
+        priceCurrency,
+        ...(unitText ? { unitText } : {}),
+      };
 
   return {
     '@context': 'https://schema.org',

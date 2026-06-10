@@ -214,7 +214,7 @@ const houstonSeo: ClusterPage = {
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido y a medida es la base de todo buen SEO.', icon: 'lucide:layout-template' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:message-circle' },
-      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Vende en línea con una tienda a medida y bilingüe.', icon: 'lucide:shopping-bag' },
+      { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:tag' },
     ],
   },
   service: {
@@ -226,6 +226,7 @@ const houstonSeo: ClusterPage = {
     areaCity: 'Houston',
     areaRegion: 'Texas',
     priceValue: '600',
+    monthly: true,
     providerId: HOUSTON_ID,
   },
 };
@@ -647,9 +648,9 @@ const precioWebHouston: ClusterPage = {
     tag: 'Sigue explorando',
     title: 'Servicios y precios relacionados',
     links: [
-      { label: 'Todos los precios', href: '/es/precios', desc: 'Los 6 servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: proceso, proyectos y FAQ.', icon: 'lucide:layout-template' },
-      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:message-circle' },
+      { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:search' },
     ],
   },
   service: {
@@ -773,7 +774,7 @@ const houstonIa: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
-      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Vende en línea 24/7, con pagos y catálogo.', icon: 'lucide:shopping-bag' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
       { label: 'IA para tu negocio (general)', href: '/es/ia-para-pymes', desc: 'Cómo la IA ayuda a un negocio pequeño, en español.', icon: 'lucide:bot' },
     ],
   },
@@ -916,15 +917,382 @@ const houstonEcommerce: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// 8 · PRECIO — ¿CUÁNTO CUESTA UN CHATBOT? ($900, wedge IA)  [Ola 2 · B2]
+//   Intención de precio del wedge IA (demanda ALTA validada). Ángulo: $900 PAGO
+//   ÚNICO, servicio gestionado (instalación+entrenamiento+mantenimiento), NO una
+//   suscripción que crece. Honestidad DURA: Meta cobra por conversación vía la
+//   API de WhatsApp → se DICE de frente (no "no pagas nada más").
+// ═══════════════════════════════════════════════════════════════
+const precioChatbot: ClusterPage = {
+  meta: {
+    title: '¿Cuánto cuesta un chatbot de WhatsApp con IA? Precio real | Marcyan',
+    description:
+      'Un asistente con IA con Marcyan cuesta desde $900, pago único, e incluye instalación, entrenamiento y mantenimiento — no es una suscripción que crece cada mes. Propuesta gratis en 24h.',
+  },
+  path: '/es/precios/cuanto-cuesta-un-chatbot',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Precios', path: '/es/precios' },
+    { name: '¿Cuánto cuesta un chatbot?', path: '/es/precios/cuanto-cuesta-un-chatbot' },
+  ],
+  hero: {
+    badge: 'Asistente con IA',
+    badgeIcon: 'lucide:bot',
+    kicker: 'Precio · IA conversacional',
+    h1: 'Cuánto cuesta un <em>chatbot</em> con IA',
+    sub: 'Respuesta directa: cuánto invertir en un asistente con IA para tu WhatsApp y tu sitio, qué incluye y por qué un servicio hecho por nosotros no es lo mismo que una suscripción de software que crece cada mes.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver IA conversacional en Houston', href: '/es/houston/ia-conversacional' },
+    chips: ['Desde $900, pago único', 'Instalación + entrenamiento', 'Te lo mantenemos'],
+    tone: 'teal',
+  },
+  answer: {
+    q: '¿Cuánto cuesta un chatbot de WhatsApp para tu negocio?',
+    a: 'Con Marcyan, un asistente con IA para tu WhatsApp y tu sitio empieza en $900, como pago único, e incluye la instalación, el entrenamiento con la información de tu negocio y el mantenimiento. No es una suscripción de software que configuras tú: es un servicio hecho por nosotros, con un precio claro por adelantado.',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Qué cubre el <em>precio</em>',
+    items: [
+      { icon: 'lucide:settings-2', title: 'Instalación completa', desc: 'Lo dejamos funcionando en tu sitio y tu WhatsApp. Tú no peleas con ninguna configuración.' },
+      { icon: 'lucide:graduation-cap', title: 'Entrenamiento con tu negocio', desc: 'Lo alimentamos con tus servicios, precios, horarios y preguntas frecuentes, para que responda como tu negocio.' },
+      { icon: 'lucide:message-circle', title: 'WhatsApp y sitio web', desc: 'Conectamos el asistente con tu WhatsApp y tu sitio para que conteste donde tus clientes te escriben.' },
+      { icon: 'lucide:calendar-check', title: 'Captación y agenda', desc: 'Capta prospectos y agenda citas a cualquier hora, sin que se te escape un cliente.' },
+      { icon: 'lucide:user-round', title: 'Pase a una persona', desc: 'Cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda atrapado.' },
+      { icon: 'lucide:wrench', title: 'Soporte y mantenimiento', desc: 'No te dejamos solo después del lanzamiento: lo ajustamos y le damos mantenimiento.' },
+    ],
+    tone: 'teal',
+  },
+  local: {
+    tag: 'Cómo se cobra',
+    title: 'Un servicio hecho por ti, no una <em>suscripción que crece</em>',
+    paragraphs: [
+      'En el mercado abundan las apps de chatbot por suscripción: empiezan baratas (unos $15 a $30 al mes) pero el precio sube al sumar la IA, las plantillas y los cobros por uso, y la configuras tú. Al otro extremo, un desarrollo totalmente a la medida puede costar miles de dólares. Nuestro punto medio: $900 una sola vez, hecho por nosotros.',
+      '<strong>Seamos claros con un detalle técnico:</strong> si se usa la API oficial de WhatsApp, Meta cobra algunas conversaciones (hay un volumen gratis al mes y luego un costo por conversación). Ese cobro es de Meta, no nuestro — te lo explicamos por adelantado para que no haya sorpresas. Nosotros cobramos por dejarte el asistente funcionando, no por cada mensaje.',
+    ],
+    tone: 'teal',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Asistente con IA, <em>desde $900</em>',
+    price: '$900',
+    unit: 'pago único',
+    lead: 'Pago único por el servicio: instalación, entrenamiento, puesta en marcha y mantenimiento. Sin mensualidad obligatoria.',
+    features: [
+      'Instalación y puesta en marcha',
+      'Entrenamiento con tu negocio',
+      'Conexión con WhatsApp y tu sitio',
+      'Mensajes y respuestas en español',
+      'Capacitación para tu equipo',
+      'Mantenimiento y soporte',
+    ],
+    cta: { label: 'Quiero mi asistente', href: '#contacto' },
+    note: '$900 es el punto de partida para una automatización inicial (por ejemplo, un asistente que contesta y agenda) e incluye instalación, entrenamiento, puesta en marcha y mantenimiento. Los proyectos más completos se cotizan según el alcance. Aparte: si se usa la API oficial de WhatsApp, Meta cobra algunas conversaciones — ese costo es de Meta, no nuestro, y te lo explicamos por adelantado.',
+    tone: 'teal',
+  },
+  proof: {
+    tag: 'Automatización real',
+    title: 'Automatización que <em>ya está en vivo</em>',
+    cta: { label: 'Quiero algo así', href: '#contacto' },
+    items: [...proj('Rosy Nails & Care'), caso0],
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Precio del chatbot, <em>sin letra chica</em>',
+    items: [
+      { q: '¿El chatbot se paga una sola vez o es mensual?', a: 'Con nosotros se paga una sola vez: desde $900 por la instalación, el entrenamiento y la puesta en marcha, con mantenimiento incluido. No te amarramos a una mensualidad obligatoria. Si más adelante quieres un plan de mantenimiento continuo más amplio, es opcional y se cotiza aparte, siempre con un precio claro.' },
+      { q: '¿Qué incluye el precio de $900?', a: 'Incluye instalar el asistente, entrenarlo con la información de tu negocio (servicios, precios, horarios, preguntas frecuentes), conectarlo con tu WhatsApp y tu sitio, dejar listos los mensajes en español, capacitar a tu equipo y darle mantenimiento. Es un servicio hecho por nosotros, no un software que configuras tú.' },
+      { q: '¿Tengo que pagarle algo a WhatsApp o a Meta aparte?', a: 'Puede que sí, y preferimos decírtelo de frente: si se usa la API oficial de WhatsApp, Meta ofrece un volumen de conversaciones gratis al mes y luego cobra un costo por conversación. Ese cobro es de Meta, no nuestro. Te explicamos por adelantado si aplica a tu caso, para que no haya sorpresas.' },
+      { q: '¿En qué se diferencia de una app de chatbot por suscripción?', a: 'Las apps por suscripción suelen empezar baratas y subir al sumar la IA y los extras, y las configuras tú. Nosotros te lo dejamos funcionando, entrenado con tu negocio y en español de verdad. Pagas por el resultado, no por pelear con una herramienta cada mes.' },
+      { q: '¿Necesito saber de tecnología?', a: 'No. Nosotros lo configuramos, lo conectamos y te lo entregamos funcionando, con una capacitación sencilla para tu equipo. Tú te dedicas a tu negocio; de la parte técnica nos encargamos nosotros.' },
+      { q: '¿En cuánto tiempo queda listo?', a: 'Una automatización inicial suele quedar lista en una a tres semanas, según qué herramientas conectemos y qué tan listo esté tu contenido (respuestas, horarios, servicios). Te damos un calendario realista desde el inicio.' },
+    ],
+  },
+  cta: {
+    title: 'Pon un asistente a <em>contestar por ti</em>',
+    sub: 'Cuéntanos qué quieres que conteste y agende, y te damos una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'teal',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'IA y precios',
+    links: [
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El servicio a detalle, con casos de uso reales.', icon: 'lucide:message-circle' },
+      { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'El precio de un sitio, con qué incluye.', icon: 'lucide:layout-template' },
+      { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Chatbot e IA Conversacional',
+    serviceType: 'Automatización con IA y asistentes conversacionales',
+    description:
+      'Servicio gestionado de asistente con IA para negocios: instalación, entrenamiento con la información del negocio, conexión con WhatsApp y sitio web, y mantenimiento. En español, desde $900 (pago único).',
+    path: '/es/precios/cuanto-cuesta-un-chatbot',
+    priceValue: '900',
+    providerId: ORG_ID,
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 9 · PRECIO — ¿CUÁNTO CUESTA EL SEO LOCAL EN HOUSTON? ($600/mes)  [Ola 2 · B2]
+//   Intención de precio (demanda ALTA). Ángulo TRANSPARENCIA: tarifa mensual
+//   publicada. ⚠️ Once Once YA usa "transparencia + mes a mes" → DIFERENCIAR con
+//   answer-first + FAQPage + honestidad de plazos + wedge bilingüe (no clonar, no
+//   competir solo por precio, no nombrar competidores). Offer MENSUAL (monthly).
+// ═══════════════════════════════════════════════════════════════
+const precioSeoHouston: ClusterPage = {
+  meta: {
+    title: '¿Cuánto cuesta el SEO local en Houston? Precio mensual real | Marcyan',
+    description:
+      'El SEO local en Houston con Marcyan empieza en $600 al mes, publicado y sin contratos largos forzados. Qué incluye y en cuánto se ven resultados. Propuesta gratis en 24h.',
+  },
+  path: '/es/precios/cuanto-cuesta-seo-local-houston',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Precios', path: '/es/precios' },
+    { name: '¿Cuánto cuesta el SEO local en Houston?', path: '/es/precios/cuanto-cuesta-seo-local-houston' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Precio · SEO local',
+    h1: 'Cuánto cuesta el <em>SEO local</em> en Houston',
+    sub: 'Respuesta directa, con la tarifa mensual publicada: cuánto invertir en SEO local en Houston, qué incluye y en cuánto tiempo se ven resultados — sin que tengas que pedir una llamada para conocer el precio.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver SEO local en Houston', href: '/es/houston/seo-local' },
+    chips: ['Desde $600/mes', 'Sin contratos largos forzados', 'Reportes claros'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta el SEO local en Houston?',
+    a: 'El SEO local en Houston con Marcyan empieza en $600 al mes, y lo publicamos de frente. El precio final depende de tu competencia y de cuántas páginas o ubicaciones trabajemos. Lo cobramos mes a mes, sin contratos largos forzados, y verás las primeras señales en 2 a 8 semanas, con tracción real en 3 a 6 meses.',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Qué incluye tu <em>mensualidad</em>',
+    items: [
+      { icon: 'lucide:map-pin', title: 'Perfil de Google de Negocio', desc: 'Creamos u optimizamos tu ficha: categorías, servicios, fotos, descripción bilingüe y publicaciones.' },
+      { icon: 'lucide:list-checks', title: 'NAP y directorios', desc: 'Tu nombre, dirección y teléfono consistentes en Google, Bing, Apple Maps y directorios clave.' },
+      { icon: 'lucide:file-text', title: 'Contenido local mensual', desc: 'Páginas y contenido por servicio y zona, escritos para tu mercado de Houston, en español e inglés.' },
+      { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'Te ayudamos a pedir y responder reseñas de forma constante, en el idioma de cada cliente.' },
+      { icon: 'lucide:bar-chart-3', title: 'Reporte mensual claro', desc: 'Cada mes ves qué hicimos y cómo va tu posicionamiento, sin tecnicismos confusos.' },
+      { icon: 'lucide:bot', title: 'Listo para la IA (AEO)', desc: 'Tu información en un formato que ChatGPT y Perplexity pueden leer y citar.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué lo publicamos',
+    title: 'La tarifa mensual, <em>a la vista</em>',
+    paragraphs: [
+      'El SEO local cobrado mes a mes va desde unos cientos hasta varios miles de dólares, según la competencia de tu sector y tu ciudad. Muchas agencias no te dicen su tarifa hasta meterte en una llamada de ventas. Nosotros la publicamos: empieza en $600 al mes, y de ahí ajustamos según tu caso, siempre por escrito.',
+      '<strong>El SEO no es un interruptor, es una inversión que crece.</strong> Por eso trabajamos mes a mes, sin amarrarte a un contrato largo, pero te explicamos con honestidad que rendir toma su tiempo: las primeras señales llegan en semanas y el liderazgo sólido en búsquedas competidas, en varios meses. Preferimos que te quedes por los resultados.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'SEO local, <em>desde $600 al mes</em>',
+    price: '$600',
+    unit: '/mes',
+    lead: 'Mes a mes, sin contratos largos forzados. Empezamos con lo esencial y crecemos según los resultados.',
+    features: [
+      'Optimización del Perfil de Google de Negocio',
+      'NAP en directorios clave',
+      '1 página local optimizada al mes',
+      'Gestión de reseñas',
+      'Reporte mensual claro',
+      'Soporte bilingüe',
+    ],
+    cta: { label: 'Solicitar propuesta', href: '#contacto' },
+    note: 'El precio final depende del estado actual de tu negocio, de tu competencia y de cuántas páginas o ubicaciones trabajemos. Te damos un alcance y un precio claros en la propuesta gratuita, antes de que decidas. No prometemos el primer lugar: nadie controla el algoritmo de Google.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Negocios de Houston que <em>ya posicionan</em>',
+    cta: { label: 'Inicia tu proyecto', href: '#contacto' },
+    items: proj('Texas Rush Remove', "Julio's Landscape TX"),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Precio del SEO local, <em>sin rodeos</em>',
+    items: [
+      { q: '¿Cuánto cuesta el SEO local en Houston al mes?', a: 'Empieza en $600 al mes. El precio final depende de tu competencia, del estado actual de tu negocio y de cuántas páginas o ubicaciones trabajemos. Lo publicamos de frente y te entregamos un alcance y un precio claros en la propuesta gratuita, antes de que decidas.' },
+      { q: '¿Hay contrato o permanencia mínima?', a: 'No te amarramos a un contrato largo: trabajamos mes a mes y puedes pausar o cancelar avisando con una anticipación razonable. Eso sí, te explicamos con honestidad que el SEO necesita varios meses para rendir — preferimos que te quedes por los resultados, no por una cláusula.' },
+      { q: '¿En cuánto tiempo se ven resultados?', a: 'Las primeras señales suelen aparecer entre 2 y 8 semanas: más reseñas y más vistas en tu ficha de Google. La tracción sólida en búsquedas competidas toma de 3 a 6 meses de trabajo constante. El SEO es acumulativo: una inversión que crece, no un interruptor.' },
+      { q: '¿Qué incluye la mensualidad?', a: 'Optimización de tu Perfil de Google de Negocio, consistencia de tu NAP en directorios, una página local al mes, gestión de reseñas, SEO técnico y preparación para los asistentes de IA, más un reporte mensual claro. Ajustamos el alcance a tu presupuesto y a tus prioridades.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo de Google. Lo que sí garantizamos es trabajo honesto y medible: optimización correcta, reportes claros y mejoras continuas. Nuestro compromiso es con el método y la transparencia, no con un número imposible de asegurar.' },
+      { q: '¿Por qué unas agencias cobran $600 y otras miles?', a: 'Porque el alcance cambia muchísimo: número de ubicaciones, competencia del sector, cantidad de contenido y si incluyen anuncios o no. Nuestra tarifa empieza en $600 al mes para lo esencial del SEO local y sube según lo que tu caso necesite — siempre dicho por adelantado.' },
+    ],
+  },
+  cta: {
+    title: 'Aparece en Houston, mes <em>a mes</em>',
+    sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de SEO local con alcance y precio claros en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'SEO y precios',
+    links: [
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'El servicio a detalle, con qué incluye y proyectos.', icon: 'lucide:search' },
+      { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'El precio de un sitio, con qué incluye y de qué depende.', icon: 'lucide:layout-template' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:message-circle' },
+    ],
+  },
+  service: {
+    name: 'SEO Local en Houston',
+    serviceType: 'SEO local',
+    description:
+      'SEO local mensual para PYMEs en Houston: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe, gestión de reseñas y reporte mensual. Desde $600 al mes, sin contratos largos forzados.',
+    path: '/es/precios/cuanto-cuesta-seo-local-houston',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '600',
+    monthly: true,
+    providerId: HOUSTON_ID,
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 10 · HOUSTON — BRANDING E IDENTIDAD ($750)  [Ola 2 · B2]
+//   Keyword "diseño de logo / branding houston". SERVICIO profesional (NO DIY).
+//   PROOF REAL: Julio's Landscape TX (marca+identidad+sitio desde cero). Ángulo
+//   honesto "¿usan IA?": IA para explorar, criterio humano para decidir. Stat
+//   académico real (Lindgaard et al. 2006, primera impresión visual = 50 ms).
+// ═══════════════════════════════════════════════════════════════
+const houstonBranding: ClusterPage = {
+  meta: {
+    title: 'Diseño de Logo y Marca en Houston | Branding bilingüe | Marcyan',
+    description:
+      'Diseño de logo e identidad de marca en Houston para negocios hispanos: logo, paleta, tipografías y guía de uso. A medida, en español, desde $750. Propuesta gratis en 24h.',
+  },
+  path: '/es/houston/branding',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Branding e Identidad', path: '/es/houston/branding' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Branding e identidad',
+    h1: 'Diseño de logo y marca en <em>Houston</em>',
+    sub: 'Una identidad que se ve profesional y se siente tuya: logo, colores, tipografía y un sistema visual coherente. Diseñada a medida, en español, para que tu negocio en Houston cause una excelente primera impresión.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver todos los precios', href: '/es/precios' },
+    chips: ['Desde $750', 'A medida, no plantillas', 'Archivos listos para usar'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta el diseño de logo y marca en Houston?',
+    a: 'El diseño de logo y marca en Houston con Marcyan empieza en $750 e incluye logo, paleta de color, tipografías y una guía de uso. La inversión importa: un estudio académico (Lindgaard et al., 2006) halló que la primera impresión visual se forma en apenas 50 milisegundos. Te entregamos una identidad coherente y lista para usar.',
+    source: 'Lindgaard et al., 2006 · Behaviour & Information Technology',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Una marca <em>completa</em>, no solo un logo',
+    items: [
+      { icon: 'lucide:pen-tool', title: 'Logo a medida', desc: 'Diseñado desde cero alrededor de tu negocio, con las variantes que necesitas para cada uso.' },
+      { icon: 'lucide:palette', title: 'Paleta de color', desc: 'Colores que transmiten la personalidad de tu marca y funcionan en pantalla e impresión.' },
+      { icon: 'lucide:type', title: 'Tipografías', desc: 'La selección de fuentes que le da voz y coherencia a todo lo que comunicas.' },
+      { icon: 'lucide:book-open', title: 'Guía de uso', desc: 'Un documento claro de cómo usar tu marca, para que se vea consistente en todos lados.' },
+      { icon: 'lucide:folder', title: 'Archivos listos', desc: 'Tu logo en todos los formatos que necesitas (vectorial, PNG, PDF), listos para usar.' },
+      { icon: 'lucide:sparkles', title: 'IA para explorar, criterio humano para decidir', desc: 'Usamos IA para proponer ideas rápido, pero cada decisión la toma un diseñador. La estrategia no la deja a la máquina.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Cómo lo hacemos',
+    title: 'IA para <em>explorar</em>, criterio humano para decidir',
+    paragraphs: [
+      'La inteligencia artificial es excelente para generar muchas ideas rápido y barato — pero una marca que aguante el tiempo necesita estrategia y criterio. Por eso usamos la IA para acelerar la exploración y proponer caminos, y un diseñador define la dirección, refina cada detalle y se asegura de que tu marca diga lo correcto.',
+      'Y si lo que necesitas es marca <strong>y</strong> sitio web, lo hacemos junto: tu identidad y tu página nacen coherentes desde el primer día. Diseñamos para el mercado hispano de Houston, en español, con el tono que conecta con tu cliente.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Branding e identidad, <em>desde $750</em>',
+    price: '$750',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del alcance: solo logo o un sistema de marca completo.',
+    features: [
+      'Logo a medida y sus variantes',
+      'Paleta de color y tipografías',
+      'Guía de uso de la marca',
+      'Archivos listos para usar',
+      'Conceptos explorados con IA',
+      'Opción de sumar tu sitio web',
+    ],
+    cta: { label: 'Quiero mi marca', href: '#contacto' },
+    note: '$750 es el punto de partida para una identidad de marca. El precio final depende del alcance: desde un logo con lo esencial hasta un sistema visual completo. Si lo combinas con tu página web, te damos un alcance y un precio claros para todo el proyecto.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Marcas y sitios <em>creados desde cero</em>',
+    cta: { label: 'Inicia tu marca', href: '#contacto' },
+    // Julio's = marca+identidad+sitio desde cero (proof de branding real). El resto, a medida.
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Diseño de marca en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta el diseño de un logo profesional en Houston?', a: 'Empieza en $750 e incluye el logo a medida con sus variantes, paleta de color, tipografías y una guía de uso. El precio final depende del alcance: desde lo esencial de un logo hasta un sistema de marca completo. Te damos un presupuesto claro en la propuesta gratuita.' },
+      { q: '¿Qué incluye un paquete de identidad de marca?', a: 'Logo y sus variantes, paleta de color, selección de tipografías, una guía de uso para que tu marca se vea consistente, y los archivos finales en todos los formatos que necesitas. Si quieres, sumamos tu página web para que todo nazca coherente.' },
+      { q: '¿Cuál es la diferencia entre un logo y la identidad de marca?', a: 'El logo es el símbolo de tu negocio; la identidad de marca es todo el sistema visual a su alrededor: colores, tipografías, estilo y las reglas para usarlos. Un logo solo te identifica; una identidad completa hace que tu negocio se vea profesional y coherente en todos lados.' },
+      { q: '¿Usan inteligencia artificial o lo hace un diseñador?', a: 'Las dos cosas, en su justo lugar. Usamos IA para explorar ideas rápido, pero las decisiones de estrategia y el refinamiento los hace un diseñador. La IA acelera; el criterio humano decide. Así obtienes una marca pensada, no una plantilla generada al azar.' },
+      { q: '¿El diseño de marca incluye la página web?', a: 'Puede incluirla. El branding y el sitio web son servicios distintos, pero los combinamos a menudo porque juntos quedan coherentes desde el inicio. Si quieres marca y sitio, te damos un alcance y un precio claros para todo el proyecto.' },
+      { q: '¿Atienden a negocios hispanos y en español?', a: 'Sí, es nuestra especialidad. Trabajamos enfocados en el mercado hispano de Houston: diseñamos y te acompañamos en español, con el contexto cultural correcto para que tu marca conecte con tu cliente.' },
+    ],
+  },
+  cta: {
+    title: 'Dale a tu negocio una <em>marca a su altura</em>',
+    sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de branding personalizada en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Suma tu sitio para que marca y web nazcan coherentes.', icon: 'lucide:layout-template' },
+      { label: 'Agencia en Houston', href: '/es/houston', desc: 'Todos nuestros servicios para negocios de Houston.', icon: 'lucide:map-pin' },
+      { label: 'Todos los precios', href: '/es/precios', desc: 'El precio de arranque de cada servicio y qué incluye.', icon: 'lucide:tag' },
+    ],
+  },
+  service: {
+    name: 'Branding e Identidad en Houston',
+    serviceType: 'Diseño de marca (branding)',
+    description:
+      'Diseño de logo e identidad de marca a medida para negocios en Houston: logo y variantes, paleta de color, tipografías, guía de uso y archivos finales. En español, con opción de sumar el sitio web.',
+    path: '/es/houston/branding',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '750',
+    providerId: HOUSTON_ID,
+  },
+};
+
 // ── Registro de las landings (clave = slug de ruta) ──
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
   'houston/ia-conversacional': houstonIa,
   'houston/ecommerce': houstonEcommerce,
+  'houston/branding': houstonBranding,
   'miami/diseno-web': miamiWeb,
   'ia-para-pymes': iaPymes,
   'precios/cuanto-cuesta-una-pagina-web-houston': precioWebHouston,
+  'precios/cuanto-cuesta-un-chatbot': precioChatbot,
+  'precios/cuanto-cuesta-seo-local-houston': precioSeoHouston,
 } satisfies Record<string, ClusterPage>;
 
 export { nap };

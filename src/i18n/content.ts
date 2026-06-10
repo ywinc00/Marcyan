@@ -195,11 +195,11 @@ export const content = {
       cols: [
         { title: 'Servicios', links: [
           { label: 'Precios', href: '/es/precios' },
-          { label: 'Diseño Web', href: '/es/#servicios' },
-          { label: 'E-Commerce', href: '/es/#servicios' },
+          { label: 'Diseño Web', href: '/es/houston/diseno-web' },
+          { label: 'E-Commerce', href: '/es/houston/ecommerce' },
           { label: 'IA para Negocios', href: '/es/ia-para-pymes' },
-          { label: 'SEO con IA', href: '/es/#servicios' },
-          { label: 'Branding', href: '/es/#servicios' },
+          { label: 'SEO con IA', href: '/es/houston/seo-local' },
+          { label: 'Branding', href: '/es/houston/branding' },
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [

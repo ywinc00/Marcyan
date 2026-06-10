@@ -45,6 +45,7 @@ export const houstonHub = {
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan y agendan 24/7. Desde $900.', icon: 'lucide:message-circle' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
+      { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto. Desde $750.', icon: 'lucide:palette' },
     ] as RelatedLink[],
   },
   local: {
@@ -90,5 +91,6 @@ export const houstonHub = {
     { name: 'SEO Local en Houston', path: '/es/houston/seo-local' },
     { name: 'IA Conversacional en Houston', path: '/es/houston/ia-conversacional' },
     { name: 'Tienda en Línea en Houston', path: '/es/houston/ecommerce' },
+    { name: 'Branding e Identidad en Houston', path: '/es/houston/branding' },
   ] as ListLink[],
 };

@@ -156,8 +156,11 @@ export const content = {
       items: [
         { city: 'Houston', state: 'TX', badge: 'Área de servicio', area: 'Houston y toda el área metropolitana', tel: nap.houston,
           links: [
-            { label: 'SEO local en Houston', href: '/es/houston/seo-local' },
+            { label: 'Agencia en Houston', href: '/es/houston' },
             { label: 'Diseño web en Houston', href: '/es/houston/diseno-web' },
+            { label: 'SEO local en Houston', href: '/es/houston/seo-local' },
+            { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional' },
+            { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce' },
           ] },
         { city: 'Miami', state: 'FL', badge: 'Área de servicio', area: 'Miami y toda el área metropolitana', tel: nap.miami,
           links: [
@@ -205,8 +208,11 @@ export const content = {
           { label: 'Términos', href: '/terminos' },
         ] },
         { title: 'Ciudades', links: [
-          { label: 'SEO Local · Houston', href: '/es/houston/seo-local' },
+          { label: 'Agencia en Houston', href: '/es/houston' },
           { label: 'Diseño Web · Houston', href: '/es/houston/diseno-web' },
+          { label: 'SEO Local · Houston', href: '/es/houston/seo-local' },
+          { label: 'IA Conversacional · Houston', href: '/es/houston/ia-conversacional' },
+          { label: 'Tienda en Línea · Houston', href: '/es/houston/ecommerce' },
           { label: 'Diseño Web · Miami', href: '/es/miami/diseno-web' },
         ] },
       ],

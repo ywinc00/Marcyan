@@ -124,7 +124,7 @@ const houstonSeo: ClusterPage = {
   path: '/es/houston/seo-local',
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
-    { name: 'Houston', path: '/es/#ciudades' },
+    { name: 'Houston', path: '/es/houston' },
     { name: 'SEO Local', path: '/es/houston/seo-local' },
   ],
   hero: {
@@ -213,8 +213,8 @@ const houstonSeo: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido y a medida es la base de todo buen SEO.', icon: 'lucide:layout-template' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Atiende y capta clientes 24/7 con asistentes en español.', icon: 'lucide:bot' },
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos para esa ciudad.', icon: 'lucide:palette' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:message-circle' },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Vende en línea con una tienda a medida y bilingüe.', icon: 'lucide:shopping-bag' },
     ],
   },
   service: {
@@ -242,7 +242,7 @@ const houstonWeb: ClusterPage = {
   path: '/es/houston/diseno-web',
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
-    { name: 'Houston', path: '/es/#ciudades' },
+    { name: 'Houston', path: '/es/houston' },
     { name: 'Diseño Web', path: '/es/houston/diseno-web' },
   ],
   hero: {
@@ -317,8 +317,8 @@ const houstonWeb: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Suma asistentes y automatización a tu sitio.', icon: 'lucide:bot' },
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos allí.', icon: 'lucide:palette' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta y agenda 24/7.', icon: 'lucide:message-circle' },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Cuando quieras vender en línea, te montamos la tienda.', icon: 'lucide:shopping-bag' },
     ],
   },
   service: {
@@ -665,10 +665,263 @@ const precioWebHouston: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// 6 · HOUSTON — IA CONVERSACIONAL  ⭐ PÁGINA ESTRELLA (cruce DESOCUPADO)
+//   Keywords validadas (jun 2026): "recepcionista virtual con IA español Houston",
+//   "chatbot en español para negocios Houston". El SERP solo lo ocupan SaaS
+//   globales/LATAM DIY; CERO agencia hispana local en Houston que lo INSTALE y
+//   MANTENGA. Foso = ciudad × hispano-local × done-for-you. Lenguaje de DOLOR,
+//   no técnico. Honestidad: sin "únicos en Houston" (superlativo no verificado);
+//   stats de blogs de vendors NO se citan como datos (solo el de HBR/MIT, real).
+// ═══════════════════════════════════════════════════════════════
+const houstonIa: ClusterPage = {
+  meta: {
+    title: 'IA Conversacional en Houston | Asistente que contesta 24/7 | Marcyan',
+    description:
+      'Asistente con IA para negocios en Houston: contesta llamadas y WhatsApp perdidos, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde $900.',
+  },
+  path: '/es/houston/ia-conversacional',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'IA Conversacional', path: '/es/houston/ia-conversacional' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'IA Conversacional',
+    h1: 'Asistente de IA para tu <em>negocio</em> en Houston',
+    sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta llamadas y mensajes perdidos, agenda citas y atiende en español las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
+    primary: { label: 'Quiero una propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver cómo funciona', href: '#faq' },
+    chips: ['En español de verdad', 'Te lo instalamos y mantenemos', 'Siempre te pasa con una persona'],
+    tone: 'teal',
+  },
+  answer: {
+    q: '¿Cómo puede un asistente de IA ayudar a un negocio en Houston?',
+    a: 'Un asistente de IA contesta al instante, justo cuando más importa: atiende llamadas y mensajes perdidos, agenda citas y responde preguntas en español las 24 horas. Responder a un prospecto en los primeros 5 minutos lo hace hasta 21 veces más probable de calificar que esperar 30, según el Lead Response Management Study del MIT.',
+    source: 'Lead Response Management Study (MIT)',
+  },
+  includes: {
+    tag: 'Qué hace por ti',
+    title: 'IA que <em>no deja escapar</em> ni un cliente',
+    items: [
+      { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando no puedes contestar, la IA responde por mensaje al instante para que el cliente no se vaya con la competencia.' },
+      { icon: 'lucide:message-circle', title: 'Contesta WhatsApp y mensajes', desc: 'Responde y da seguimiento por WhatsApp y redes a cualquier hora, incluso a las 11 de la noche y los fines de semana.' },
+      { icon: 'lucide:calendar-check', title: 'Agenda citas solo', desc: 'Tus clientes reservan citas sin llamadas ni idas y vueltas — de día, de noche y en español.' },
+      { icon: 'lucide:languages', title: 'Atiende en español de verdad', desc: 'Configurado en el español de tus clientes, con tu tono. No es una traducción robótica.' },
+      { icon: 'lucide:user-round', title: 'Siempre te pasa con una persona', desc: 'Cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda atrapado con un robot.' },
+      { icon: 'lucide:wrench', title: 'Lo instalamos y mantenemos', desc: 'No te entregamos un software para que pelees con él: lo dejamos funcionando, entrenado con tu negocio, y lo cuidamos.' },
+    ],
+    tone: 'teal',
+  },
+  local: {
+    tag: 'Por qué con nosotros',
+    title: 'Una agencia hispana que <em>te lo instala</em>, no un software que peleas solo',
+    paragraphs: [
+      'En internet hay decenas de herramientas de IA que te venden una suscripción y te dejan solo para configurarla. Para un negocio ocupado, eso casi siempre termina olvidado. Nosotros trabajamos distinto: somos una agencia hispana en Houston que te lo instala, lo entrena con tu negocio y le da mantenimiento.',
+      'Hablamos tu idioma y conocemos a tu cliente hispano. Configuramos el asistente en español de verdad — no traducido por un robot — y nos aseguramos de que, cuando un cliente quiera una persona, hable con tu equipo. <strong>Tú te dedicas a tu negocio; de la tecnología nos encargamos nosotros.</strong>',
+    ],
+    tone: 'teal',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Asistente con IA, <em>desde $900</em>',
+    price: '$900',
+    unit: 'proyecto inicial',
+    lead: 'Empezamos con una solución concreta a tu mayor dolor — no con un proyecto enorme.',
+    features: [
+      'Asistente configurado a medida',
+      'En español, con tu tono',
+      'Integración con WhatsApp y tu calendario',
+      'Mensajes y respuestas listos',
+      'Capacitación para tu equipo',
+      'Instalación y mantenimiento',
+    ],
+    cta: { label: 'Quiero automatizar mi negocio', href: '#contacto' },
+    note: '$900 es el punto de partida para una automatización inicial (por ejemplo, un asistente o una agenda de citas). A diferencia de una suscripción de software que configuras tú, aquí incluimos la instalación, el entrenamiento con tu negocio y el mantenimiento. Los proyectos más completos se cotizan según el alcance.',
+    tone: 'teal',
+  },
+  proof: {
+    tag: 'Automatización real',
+    title: 'Automatización que <em>ya está en vivo</em>',
+    cta: { label: 'Quiero algo así', href: '#contacto' },
+    // Rosy Nails = web-app real de reservas (automatiza el agendado) + Caso #0.
+    items: [...proj('Rosy Nails & Care'), caso0],
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'IA para tu negocio en Houston, en <em>simple</em>',
+    items: [
+      { q: '¿Cuánto cuesta poner un asistente con IA en mi negocio?', a: 'Una automatización inicial empieza en $900 e incluye la instalación, el entrenamiento con tu negocio y el mantenimiento — no es solo una suscripción de software que configuras tú. Empezamos con una sola solución a tu mayor dolor y crecemos desde ahí. Te damos un precio claro en la propuesta gratuita.' },
+      { q: '¿Necesito saber de tecnología para usarlo?', a: 'No, y esa es justamente la idea. Nosotros lo configuramos, lo conectamos y te lo dejamos funcionando, con una capacitación sencilla para tu equipo. Tú te dedicas a tu negocio; de la parte técnica nos encargamos nosotros.' },
+      { q: '¿El asistente habla español o suena como robot?', a: 'Habla español de verdad, con el tono de tu negocio — no una traducción robótica. Lo configuramos para el español de tus clientes en Houston, y también en inglés si lo necesitas. El objetivo es que tus clientes se sientan bien atendidos.' },
+      { q: '¿La IA puede contestar mi WhatsApp y agendar citas sola?', a: 'Sí. Conectamos el asistente con tu WhatsApp, tu calendario y muchas de las herramientas que ya usas, para que responda mensajes y agende citas a cualquier hora. En la propuesta te decimos con honestidad qué se puede integrar y qué no, sin promesas vacías.' },
+      { q: '¿Qué pasa si el cliente quiere hablar con una persona?', a: 'Siempre puede. El asistente está hecho para ayudar, no para atrapar a nadie: cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda dando vueltas con un robot.' },
+      { q: '¿En cuánto tiempo queda funcionando?', a: 'Una automatización inicial suele quedar lista en una a tres semanas, según qué herramientas conectemos y qué tan listo esté tu contenido (respuestas, horarios, servicios). Te damos un calendario realista desde el inicio.' },
+    ],
+  },
+  cta: {
+    title: 'Deja de perder clientes por <em>no contestar</em>',
+    sub: 'Cuéntanos cuál es tu mayor dolor — llamadas perdidas, WhatsApp sin responder, citas que no se agendan — y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'teal',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Vende en línea 24/7, con pagos y catálogo.', icon: 'lucide:shopping-bag' },
+      { label: 'IA para tu negocio (general)', href: '/es/ia-para-pymes', desc: 'Cómo la IA ayuda a un negocio pequeño, en español.', icon: 'lucide:bot' },
+    ],
+  },
+  service: {
+    name: 'IA Conversacional en Houston',
+    serviceType: 'Automatización con IA y asistentes conversacionales',
+    description:
+      'Asistentes conversacionales con IA para negocios en Houston: rescate de llamadas y mensajes perdidos, atención por WhatsApp, agenda de citas y soporte 24/7 en español. Instalación y mantenimiento incluidos.',
+    path: '/es/houston/ia-conversacional',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '900',
+    providerId: HOUSTON_ID,
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 7 · HOUSTON — E-COMMERCE / TIENDA EN LÍNEA   ($2,900)
+//   Keyword validada: "diseño de tienda en línea en Houston". Nicho ocupado
+//   pero fragmentado/barato; el cruce "tienda bilingüe ES/EN" está DESOCUPADO.
+//   Honestidad DURA: NO hay cliente e-commerce real → sin portafolio de tiendas;
+//   framing "Cliente Fundador" + proof adyacente real (web-app Rosy Nails, sitios
+//   en vivo). Pagos/EIN/merchant = requisitos del cliente (decirlo claro).
+// ═══════════════════════════════════════════════════════════════
+const houstonEcommerce: ClusterPage = {
+  meta: {
+    title: 'Diseño de Tienda en Línea en Houston | E-Commerce bilingüe | Marcyan',
+    description:
+      'Diseño de tienda en línea en Houston para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde $2,900. Propuesta gratis en 24h.',
+  },
+  path: '/es/houston/ecommerce',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Tienda en Línea', path: '/es/houston/ecommerce' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Tienda en línea',
+    h1: 'Diseño de tienda en línea en <em>Houston</em>',
+    sub: 'Vende en línea las 24 horas con una tienda a medida, rápida y bilingüe. Catálogo, pagos seguros y todo listo para que tus clientes en Houston te compren desde el celular — en español e inglés.',
+    primary: { label: 'Cotizar mi tienda', href: '#contacto' },
+    secondary: { label: 'Ver todos los precios', href: '/es/precios' },
+    chips: ['Pagos seguros', 'Bilingüe ES/EN', 'Shopify, WooCommerce o a medida'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta una tienda en línea en Houston?',
+    a: 'Una tienda en línea profesional en Houston empieza en $2,900 e incluye catálogo, carrito, pagos seguros y versión bilingüe. Y la inversión tiene sentido: el comercio electrónico ya supera el 16% de las ventas minoristas en Estados Unidos y crece año con año, según el U.S. Census Bureau.',
+    source: 'U.S. Census Bureau',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Una tienda lista para <em>vender</em>',
+    items: [
+      { icon: 'lucide:shopping-bag', title: 'Catálogo y carrito', desc: 'Tus productos organizados, con fotos y variantes, y un carrito de compras claro y fácil de usar.' },
+      { icon: 'lucide:credit-card', title: 'Pagos seguros en línea', desc: 'Aceptas tarjeta y PayPal con pasarelas confiables como Stripe. Te guiamos con la cuenta y los requisitos.' },
+      { icon: 'lucide:smartphone', title: 'Diseñada para el celular', desc: 'La mayoría compra desde el teléfono. Tu tienda carga rápido y se ve impecable en cualquier pantalla.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Vende en español a tu comunidad y amplía tu alcance en inglés, todo en la misma tienda.' },
+      { icon: 'lucide:search', title: 'Lista para Google y la IA', desc: 'Estructura optimizada para que te encuentren en buscadores y en asistentes como ChatGPT.' },
+      { icon: 'lucide:settings', title: 'La plataforma correcta para ti', desc: 'Shopify, WooCommerce o una solución a medida — la elegimos contigo según tu producto y tu presupuesto.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Cómo lo hacemos',
+    title: '¿Shopify, WooCommerce o <em>a medida</em>?',
+    paragraphs: [
+      'No vendemos una sola plataforma a la fuerza. Si quieres lanzar rápido y vender simple, Shopify suele ser ideal; si necesitas más control o ya usas WordPress, WooCommerce encaja mejor; y para necesidades especiales, construimos a medida. Lo elegimos contigo según tu producto, tu volumen y tu presupuesto — con honestidad.',
+      'Para vender en Estados Unidos hay requisitos que son tuyos: una cuenta para recibir pagos y, según el caso, tu EIN del IRS. <strong>Te guiamos paso a paso en todo el proceso.</strong> Y como en Houston tu mercado es bilingüe, diseñamos tu tienda en español e inglés desde el inicio — un cruce que pocos aprovechan.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Tienda en línea, <em>desde $2,900</em>',
+    price: '$2,900',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de productos y de las funciones que necesites.',
+    features: [
+      'Diseño a medida de tu tienda',
+      'Catálogo y carrito de compras',
+      'Pagos seguros (tarjeta y PayPal)',
+      'Versión en español e inglés',
+      'Optimización SEO base',
+      'Lista para móvil y para la IA',
+    ],
+    cta: { label: 'Cotizar mi tienda', href: '#contacto' },
+    note: '$2,900 es el punto de partida para una tienda profesional. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y la migración si ya tienes una tienda. El mantenimiento y la actualización de productos se cotizan aparte, siempre con un precio claro.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Construimos a medida, y <em>buscamos tu tienda</em>',
+    cta: { label: 'Sé nuestro primer caso de e-commerce', href: '#contacto' },
+    // Honestidad: NO hay cliente e-commerce. Mostramos capacidad real (web-app a
+    // medida de Rosy Nails + sitios en vivo), etiquetada por lo que es. Sin
+    // insinuar que son tiendas. El FAQ aclara el framing "Cliente Fundador".
+    items: proj('Rosy Nails & Care', 'Texas Rush Remove', "Julio's Landscape TX"),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu tienda en línea en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta hacer una tienda en línea en Houston?', a: 'Una tienda profesional a medida empieza en $2,900. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y si hay que migrar una tienda existente. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Qué es mejor para mi tienda: Shopify o WooCommerce?', a: 'Depende de tu caso. Shopify es ideal para lanzar rápido y vender simple, sin preocuparte por lo técnico; WooCommerce te da más control y encaja si ya usas WordPress. Para necesidades especiales construimos a medida. Lo elegimos contigo con honestidad, según tu producto y tu presupuesto.' },
+      { q: '¿Cómo recibo los pagos con tarjeta y PayPal?', a: 'Tu tienda se conecta con pasarelas seguras como Stripe y PayPal. Para vender en Estados Unidos necesitas una cuenta para recibir pagos y, según el caso, tu EIN del IRS; te guiamos paso a paso en lo que es tuyo, sin dejarte solo con la parte complicada.' },
+      { q: '¿La tienda incluye dominio, hospedaje y certificado de seguridad (SSL)?', a: 'Te orientamos con el dominio, el hospedaje y el certificado SSL para que tu tienda salga en vivo y segura, sin dolores de cabeza. Según la plataforma, algunos van incluidos en su plan; te explicamos con claridad qué se paga y a quién, antes de empezar.' },
+      { q: '¿La tienda es bilingüe en español e inglés?', a: 'Sí, y es una de nuestras ventajas. Diseñamos tu tienda en español e inglés desde el inicio, para que vendas en español a tu comunidad y amplíes tu alcance en inglés — un cruce que pocos competidores en Houston aprovechan.' },
+      { q: '¿Tienen tiendas en línea ya hechas que pueda ver?', a: 'Seremos honestos: estamos comenzando con e-commerce, así que todavía no publicamos un caso de tienda propio. Sí construimos web-apps y sitios a medida que ya están en vivo (como la app de reservas de Rosy Nails). Por eso ofrecemos cupos de Cliente Fundador para tu tienda, con condiciones especiales.' },
+    ],
+  },
+  cta: {
+    title: 'Empieza a vender en línea en <em>Houston</em>',
+    sub: 'Cuéntanos qué vendes y cuántos productos tienes, y recibe una propuesta de tienda en línea en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Cotizar mi tienda gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Si aún no necesitas vender en línea, empieza por tu sitio.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu tienda aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que contesta y agenda 24/7.', icon: 'lucide:message-circle' },
+    ],
+  },
+  service: {
+    name: 'Diseño de Tienda en Línea en Houston',
+    serviceType: 'Diseño de tienda en línea (e-commerce)',
+    description:
+      'Diseño y desarrollo de tiendas en línea a medida para negocios en Houston: catálogo, carrito, pagos seguros, bilingüe (español e inglés), en Shopify, WooCommerce o a medida.',
+    path: '/es/houston/ecommerce',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '2900',
+    providerId: HOUSTON_ID,
+  },
+};
+
 // ── Registro de las landings (clave = slug de ruta) ──
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
+  'houston/ia-conversacional': houstonIa,
+  'houston/ecommerce': houstonEcommerce,
   'miami/diseno-web': miamiWeb,
   'ia-para-pymes': iaPymes,
   'precios/cuanto-cuesta-una-pagina-web-houston': precioWebHouston,

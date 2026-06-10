@@ -90,6 +90,7 @@ export function service(input: ServiceInput) {
     areaServed,
     offers: {
       '@type': 'Offer',
+      price: priceValue,
       priceCurrency,
       priceSpecification: priceSpec,
       availability: 'https://schema.org/InStock',
@@ -121,6 +122,30 @@ export function breadcrumbList(items: CrumbItem[]) {
       position: i + 1,
       name: it.name,
       item: abs(it.path),
+    })),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// ItemList — lista ordenada de enlaces (p.ej. los servicios de un hub de ciudad).
+// Útil en páginas-hub (/es/houston) para declarar a buscadores/IA el conjunto de
+// servicios que se ofrecen en esa ciudad, cada uno apuntando a su landing.
+// ─────────────────────────────────────────────────────────────
+export interface ListLink {
+  name: string;
+  /** Ruta con prefijo de idioma SIN dominio, p.ej. "/es/houston/ia-conversacional". */
+  path: string;
+}
+export function itemList(items: ListLink[], opts?: { name?: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    ...(opts?.name ? { name: opts.name } : {}),
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      url: abs(it.path),
     })),
   };
 }

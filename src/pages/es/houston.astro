@@ -1,0 +1,79 @@
+---
+// HUB DE CIUDAD · /es/houston — nodo del silo geográfico (Ola 2).
+// Presenta Houston + enlaza a los servicios ×Houston. NO es una landing de un
+// solo servicio: reusa los componentes del DS (LandingHero, AnswerBlock,
+// RelatedLinks, Prose, Faq, CtaBand, Contact). Schema: ItemList de los servicios
+// + BreadcrumbList (del Breadcrumb). El @graph base ya da la ProfessionalService
+// de Houston. ES por ahora (hasEn=false). /en/houston queda para la Ola 4.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import Prose from '../../components/sections/Prose.astro';
+import Faq from '../../components/sections/Faq.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import ItemListLd from '../../components/seo/ItemListLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { houstonHub as h } from '../../i18n/houston';
+
+const c = content.es;
+---
+<Layout
+  title={h.meta.title}
+  description={h.meta.description}
+  lang="es"
+  path="houston"
+  hasEn={false}
+>
+  <ItemListLd slot="head" items={h.itemList} name="Servicios de Marcyan en Houston" />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      badge={h.hero.badge}
+      badgeIcon={h.hero.badgeIcon}
+      kicker={h.hero.kicker}
+      h1={h.hero.h1}
+      sub={h.hero.sub}
+      primary={h.hero.primary}
+      secondary={h.hero.secondary}
+      chips={h.hero.chips}
+      tone={h.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
+
+    <RelatedLinks tag={h.services.tag} title={h.services.title} links={h.services.links} />
+
+    <Prose
+      tag={h.local.tag}
+      title={h.local.title}
+      paragraphs={h.local.paragraphs}
+      tone={h.local.tone}
+    />
+
+    <RelatedLinks tag={h.related.tag} title={h.related.title} links={h.related.links} />
+
+    <Faq tag={h.faq.tag} title={h.faq.title} items={h.faq.items} />
+
+    <CtaBand
+      title={h.cta.title}
+      sub={h.cta.sub}
+      primary={h.cta.primary}
+      secondary={h.cta.secondary}
+      tone={h.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

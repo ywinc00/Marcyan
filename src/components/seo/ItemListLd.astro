@@ -1,0 +1,15 @@
+---
+// Emite el JSON-LD ItemList (lista ordenada de servicios de un hub de ciudad).
+// Declara a buscadores/IA el conjunto de servicios ofrecidos en la ciudad, cada
+// uno apuntando a su landing. Co-localizado; complementa el BreadcrumbList del
+// breadcrumb y el @graph base del Layout (que ya da la ProfessionalService).
+import { itemList, type ListLink } from '../../lib/schema';
+
+interface Props {
+  items: ListLink[];
+  name?: string;
+}
+const { items, name } = Astro.props;
+const ld = itemList(items, { name });
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

@@ -1,0 +1,130 @@
+---
+// ÍNDICE DEL BLOG · /es/blog — lista las piezas en tarjetas (fecha, título,
+// extracto, etiqueta). Reusa el DS v2 (LandingHero, CtaBand, Contact, Card).
+// Schema: Blog (listado) + BreadcrumbList (del Breadcrumb). ES por ahora
+// (hasEn=false); /en/blog queda para la Ola 4.
+import Layout from '../../../layouts/Layout.astro';
+import SiteNav from '../../../components/layout/SiteNav.astro';
+import SiteFooter from '../../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../../components/sections/LandingHero.astro';
+import CtaBand from '../../../components/sections/CtaBand.astro';
+import Contact from '../../../components/sections/Contact.astro';
+import Card from '../../../components/ui/Card.astro';
+import Kicker from '../../../components/ui/Kicker.astro';
+import Icon from '../../../components/ui/Icon.astro';
+import BlogListingLd from '../../../components/seo/BlogListingLd.astro';
+import { content } from '../../../i18n/content';
+import { clusterNav } from '../../../i18n/clusters';
+import { blogIndex } from '../../../i18n/blog';
+import { getCollection } from 'astro:content';
+
+const c = content.es;
+const b = blogIndex;
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime(),
+);
+
+const fmt = (d: Date) => new Intl.DateTimeFormat('es', { dateStyle: 'long', timeZone: 'UTC' }).format(d);
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const postRefs = posts.map((p) => ({
+  headline: p.data.title,
+  path: `/es/blog/${p.id}`,
+  description: p.data.description,
+  datePublished: iso(p.data.datePublished),
+}));
+---
+<Layout title={b.meta.title} description={b.meta.description} lang="es" path="blog" hasEn={false}>
+  <BlogListingLd slot="head" posts={postRefs} name="Blog de Marcyan Studio" description={b.meta.description} path="/es/blog" />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      badge={b.hero.badge}
+      badgeIcon={b.hero.badgeIcon}
+      kicker={b.hero.kicker}
+      h1={b.hero.h1}
+      sub={b.hero.sub}
+      primary={b.hero.primary}
+      secondary={b.hero.secondary}
+      tone={b.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={b.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <section class="section bloglist">
+      <div class="container">
+        <header class="bloglist__head">
+          <Kicker>{b.list.tag}</Kicker>
+          <h2 class="h2" set:html={b.list.title} />
+        </header>
+
+        {posts.length === 0 ? (
+          <p class="bloglist__empty">{b.empty}</p>
+        ) : (
+          <ul class="bloglist__grid">
+            {posts.map((p) => (
+              <li>
+                <Card href={`/es/blog/${p.id}`} class="postcard">
+                  <div class="postcard__meta">
+                    <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
+                    {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
+                  </div>
+                  <h3 class="postcard__title">{p.data.title}</h3>
+                  <p class="postcard__excerpt">{p.data.description}</p>
+                  <span class="postcard__cta">{b.cardCta} <Icon name="lucide:arrow-right" /></span>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+
+    <CtaBand
+      title={b.cta.title}
+      sub={b.cta.sub}
+      primary={b.cta.primary}
+      secondary={b.cta.secondary}
+      tone={b.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>
+
+<style>
+  .bloglist__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .bloglist :global(.h2 em) { color: var(--accent-gold); font-style: normal; }
+  .bloglist__empty { color: var(--fg-secondary); font-size: var(--text-md); }
+
+  .bloglist__grid { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+
+  .postcard { display: flex; flex-direction: column; gap: var(--space-3); height: 100%; }
+  .postcard__meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .postcard__tag { color: var(--accent-gold); }
+  .postcard__title {
+    font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600;
+    line-height: var(--leading-snug); color: var(--fg-primary);
+  }
+  .postcard__excerpt { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); }
+  .postcard__cta {
+    margin-top: auto; display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); color: var(--accent-gold);
+  }
+  .postcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .postcard:hover .postcard__cta :global(svg) { transform: translateX(3px); }
+
+  @media (--md) { .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); } }
+  @media (--lg) { .bloglist__grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (--motion-reduce) { .postcard:hover .postcard__cta :global(svg) { transform: none; } }
+</style>

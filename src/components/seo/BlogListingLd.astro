@@ -1,0 +1,15 @@
+---
+// Emite el JSON-LD Blog (listado) de /es/blog — declara cada pieza como
+// BlogPosting resumido. publisher → @id de la Organization del Layout.
+import { blog, type BlogPostRef } from '../../lib/schema';
+interface Props {
+  posts: BlogPostRef[];
+  name: string;
+  description: string;
+  /** Ruta del índice con prefijo de idioma, sin dominio (p.ej. "/es/blog"). */
+  path: string;
+}
+const { posts, name, description, path } = Astro.props;
+const ld = blog(posts, { name, description, path });
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

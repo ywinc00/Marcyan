@@ -1,0 +1,8 @@
+---
+// Emite el JSON-LD BlogPosting de una pieza del blog (author/publisher → @id de
+// la Organization del @graph del Layout). Co-localizado con la página.
+import { article, type ArticleInput } from '../../lib/schema';
+type Props = ArticleInput;
+const ld = article(Astro.props);
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

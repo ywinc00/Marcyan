@@ -26,6 +26,7 @@ export const content = {
       links: [
         { label: 'Servicios', href: '#servicios' },
         { label: 'Precios', href: '/es/precios' },
+        { label: 'Blog', href: '/es/blog' },
         { label: 'IA', href: '#ia' },
         { label: 'Proyectos', href: '#proyectos' },
         { label: 'Ciudades', href: '#ciudades' },
@@ -203,6 +204,7 @@ export const content = {
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [
+          { label: 'Blog', href: '/es/blog' },
           { label: 'Proyectos', href: '/es/#proyectos' },
           { label: 'Privacidad', href: '/privacidad' },
           { label: 'Términos', href: '/terminos' },

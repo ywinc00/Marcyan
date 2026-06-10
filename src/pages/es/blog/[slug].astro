@@ -1,0 +1,109 @@
+---
+// RENDERER DE POST · /es/blog/[slug] — ensambla una pieza desde su Markdown.
+// Estructura: Nav · Hero(kicker/título/fecha)+Breadcrumb · AnswerBlock (AEO) ·
+// <Content/> (cuerpo Markdown estilizado) · FAQ (FAQPage) · Relacionados ·
+// CtaBand · Contacto · Footer. Schema: BlogPosting + FAQPage + BreadcrumbList.
+// El @graph base (Organization + 2 ProfessionalService) ya vive en el Layout.
+import { getCollection, render } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import SiteNav from '../../../components/layout/SiteNav.astro';
+import SiteFooter from '../../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
+import ArticleHero from '../../../components/sections/ArticleHero.astro';
+import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
+import Article from '../../../components/sections/Article.astro';
+import Faq from '../../../components/sections/Faq.astro';
+import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
+import CtaBand from '../../../components/sections/CtaBand.astro';
+import Contact from '../../../components/sections/Contact.astro';
+import ArticleLd from '../../../components/seo/ArticleLd.astro';
+import { content } from '../../../i18n/content';
+import { clusterNav } from '../../../i18n/clusters';
+import { postChrome } from '../../../i18n/blog';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const c = content.es;
+const d = post.data;
+const slugPath = `/es/blog/${post.id}`;
+
+const iso = (x: Date) => x.toISOString().slice(0, 10);
+const fmt = (x: Date) => new Intl.DateTimeFormat('es', { dateStyle: 'long', timeZone: 'UTC' }).format(x);
+const dateISO = iso(d.datePublished);
+const updatedISO = d.updated ? iso(d.updated) : undefined;
+
+// Tiempo de lectura honesto a partir del cuerpo Markdown (~200 palabras/min).
+const words = (post.body ?? '').trim().split(/\s+/).filter(Boolean).length;
+const readingMin = Math.max(1, Math.round(words / 200));
+const readingLabel = `${readingMin} ${postChrome.readingSuffix}`;
+
+const ogImage = d.ogImage ?? '/assets/og/og-default.png';
+const crumbs = [...postChrome.root, { name: d.title, path: slugPath }];
+const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
+---
+<Layout
+  title={`${d.title} | Marcyan Studio`}
+  description={d.description}
+  lang="es"
+  path={`blog/${post.id}`}
+  hasEn={false}
+  ogImage={ogImage}
+>
+  <ArticleLd
+    slot="head"
+    headline={d.title}
+    description={d.description}
+    path={slugPath}
+    datePublished={dateISO}
+    dateModified={updatedISO}
+    image={ogImage}
+    section={d.tags[0]}
+    keywords={d.tags}
+  />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <ArticleHero
+      kicker={d.heroKicker ?? 'Blog de Marcyan'}
+      title={d.title}
+      lead={d.description}
+      dateISO={dateISO}
+      dateLabel={fmt(d.datePublished)}
+      readingLabel={readingLabel}
+      tags={d.tags}
+    >
+      <Breadcrumb slot="breadcrumb" items={crumbs} lang="es" />
+    </ArticleHero>
+
+    <AnswerBlock q={d.answer.q} a={d.answer.a} source={d.answer.source} />
+
+    <Article><Content /></Article>
+
+    {d.faq.length > 0 && (
+      <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
+    )}
+
+    {related.length > 0 && (
+      <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />
+    )}
+
+    <CtaBand
+      title={postChrome.cta.title}
+      sub={postChrome.cta.sub}
+      primary={postChrome.cta.primary}
+      secondary={postChrome.cta.secondary}
+      tone={postChrome.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

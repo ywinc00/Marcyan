@@ -1,0 +1,116 @@
+---
+// Cuerpo del artículo: estiliza el HTML que produce <Content/> (Markdown).
+// El H1 vive en el hero; aquí los H2 (preguntas, palanca AEO) hacia abajo.
+// Ancho de lectura controlado + tokens del DS. Tablas con scroll propio para
+// no romper la doctrina anti-scroll-x. Estilos a contenido dinámico = :global().
+---
+<section class="section article">
+  <div class="container">
+    <div class="article__body"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .article { padding-block: var(--space-7); }
+  .article__body { max-width: 72ch; margin-inline: auto; }
+
+  /* Ritmo vertical entre bloques */
+  .article__body :global(p),
+  .article__body :global(ul),
+  .article__body :global(ol),
+  .article__body :global(blockquote),
+  .article__body :global(pre),
+  .article__body :global(figure),
+  .article__body :global(table),
+  .article__body :global(hr) { margin-top: var(--space-5); }
+  .article__body :global(h2) { margin-top: var(--space-8); }
+  .article__body :global(h3) { margin-top: var(--space-6); }
+  .article__body :global(h4) { margin-top: var(--space-5); }
+  .article__body > :global(:first-child) { margin-top: 0; }
+
+  /* Encabezados (font display, escala fluida) */
+  .article__body :global(h2),
+  .article__body :global(h3),
+  .article__body :global(h4) {
+    font-family: var(--font-display); color: var(--fg-primary);
+    line-height: var(--leading-snug); letter-spacing: var(--tracking-normal);
+    text-wrap: balance; scroll-margin-top: calc(var(--nav-h) + var(--space-5));
+  }
+  .article__body :global(h2) { font-size: var(--fluid-h3); font-weight: 600; }
+  .article__body :global(h3) { font-size: var(--fluid-h4); font-weight: 600; }
+  .article__body :global(h4) { font-size: var(--text-lg); font-weight: 600; }
+
+  /* Párrafos y texto (legible == fg-secondary, regla del DS) */
+  .article__body :global(p),
+  .article__body :global(li) {
+    color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose);
+  }
+  .article__body :global(strong) { color: var(--fg-primary); font-weight: 600; }
+  .article__body :global(em) { font-style: italic; }
+
+  /* Enlaces internos/externos */
+  .article__body :global(a) {
+    color: var(--accent-gold); text-decoration: underline;
+    text-decoration-color: var(--accent-gold-line); text-underline-offset: 3px;
+    transition: text-decoration-color var(--duration-fast), color var(--duration-fast);
+  }
+  .article__body :global(a:hover) { text-decoration-color: var(--accent-gold); }
+
+  /* Listas */
+  .article__body :global(ul),
+  .article__body :global(ol) { padding-left: var(--space-6); }
+  .article__body :global(ul) { list-style: disc; }
+  .article__body :global(ol) { list-style: decimal; }
+  .article__body :global(li + li) { margin-top: var(--space-2); }
+  .article__body :global(li::marker) { color: var(--accent-gold); }
+  .article__body :global(li > ul),
+  .article__body :global(li > ol) { margin-top: var(--space-2); }
+
+  /* Cita */
+  .article__body :global(blockquote) {
+    border-left: 3px solid var(--accent-gold); background: var(--bg-card);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: var(--space-4) var(--space-5); color: var(--fg-primary);
+  }
+  .article__body :global(blockquote p) { color: var(--fg-primary); }
+  .article__body :global(blockquote :first-child) { margin-top: 0; }
+
+  /* Código */
+  .article__body :global(code) {
+    font-family: var(--font-mono); font-size: 0.9em; color: var(--accent-teal);
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 2px 6px; border-radius: var(--radius-sm);
+  }
+  .article__body :global(pre) {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-5);
+    overflow-x: auto;
+  }
+  .article__body :global(pre code) { background: none; border: none; padding: 0; color: var(--fg-primary); }
+
+  /* Imágenes / figuras */
+  .article__body :global(img) { border-radius: var(--radius-lg); border: 1px solid var(--border); }
+  .article__body :global(figcaption) {
+    margin-top: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); text-align: center;
+  }
+
+  /* Separador */
+  .article__body :global(hr) { border: 0; border-top: 1px solid var(--border); }
+
+  /* Tablas (scroll propio → no rompe el ancho de página) */
+  .article__body :global(table) {
+    display: block; max-width: 100%; overflow-x: auto;
+    border-collapse: collapse; font-size: var(--text-sm);
+  }
+  .article__body :global(th),
+  .article__body :global(td) {
+    border: 1px solid var(--border); padding: var(--space-3) var(--space-4);
+    text-align: left; vertical-align: top; color: var(--fg-secondary);
+  }
+  .article__body :global(th) {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--fg-primary); background: var(--bg-card); white-space: nowrap;
+  }
+  .article__body :global(tbody tr:nth-child(even)) { background: var(--bg-2); }
+</style>

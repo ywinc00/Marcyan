@@ -64,6 +64,7 @@ export const clusterNav = {
   links: [
     { label: 'Servicios', href: '/es/#servicios' },
     { label: 'Precios', href: '/es/precios' },
+    { label: 'Blog', href: '/es/blog' },
     { label: 'IA', href: '/es/ia-para-pymes' },
     { label: 'Proyectos', href: '/es/#proyectos' },
     { label: 'Ciudades', href: '/es/#ciudades' },

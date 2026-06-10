@@ -224,6 +224,105 @@ export function offerCatalog(items: OfferItem[], opts?: { name?: string; url?: s
 }
 
 // ─────────────────────────────────────────────────────────────
+// BLOG / Article — BlogPosting por pieza + Blog (listado) para /es/blog.
+// Autor y editor = la Organization del @graph del Layout (NO inventamos un
+// Person del fundador hasta tener el dato real). Co-localizado, server-rendered.
+// ─────────────────────────────────────────────────────────────
+
+/** Une un path/ruta de imagen al sitio SIN barra final (las URLs de imagen no la llevan). */
+function absAsset(src?: string): string | undefined {
+  if (!src) return undefined;
+  if (/^https?:\/\//.test(src)) return src;
+  return `${SITE}/${String(src).replace(/^\/+/, '')}`;
+}
+
+export interface ArticleInput {
+  headline: string;
+  description: string;
+  /** Ruta canónica de la pieza (con prefijo de idioma, sin dominio), p.ej. "/es/blog/slug". */
+  path: string;
+  /** Fecha de publicación en ISO (YYYY-MM-DD o completa). */
+  datePublished: string;
+  /** Última actualización en ISO (si difiere de la publicación). */
+  dateModified?: string;
+  inLanguage?: string;
+  /** Imagen social (path interno o URL absoluta). */
+  image?: string;
+  /** Sección/categoría (p.ej. la primera etiqueta). */
+  section?: string;
+  /** Etiquetas → keywords. */
+  keywords?: string[];
+}
+
+/** BlogPosting de una pieza; author/publisher enlazan al @id de la Organization (DRY). */
+export function article(input: ArticleInput) {
+  const {
+    headline,
+    description,
+    path,
+    datePublished,
+    dateModified,
+    inLanguage = 'es',
+    image,
+    section,
+    keywords,
+  } = input;
+  const url = abs(path);
+  const img = absAsset(image);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline,
+    description,
+    url,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    datePublished,
+    dateModified: dateModified ?? datePublished,
+    inLanguage,
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    ...(img ? { image: img } : {}),
+    ...(section ? { articleSection: section } : {}),
+    ...(keywords && keywords.length ? { keywords: keywords.join(', ') } : {}),
+  };
+}
+
+export interface BlogPostRef {
+  headline: string;
+  /** Ruta de la pieza (con prefijo de idioma, sin dominio). */
+  path: string;
+  description?: string;
+  datePublished: string;
+}
+
+/** Blog (listado) para /es/blog — declara cada pieza como BlogPosting resumido. */
+export function blog(
+  posts: BlogPostRef[],
+  opts: { name: string; description: string; path: string; inLanguage?: string },
+) {
+  const url = abs(opts.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': `${url}#blog`,
+    name: opts.name,
+    description: opts.description,
+    url,
+    inLanguage: opts.inLanguage ?? 'es',
+    publisher: { '@id': ORG_ID },
+    blogPost: posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.headline,
+      url: abs(p.path),
+      ...(p.description ? { description: p.description } : {}),
+      datePublished: p.datePublished,
+      author: { '@id': ORG_ID },
+      publisher: { '@id': ORG_ID },
+    })),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // SCAFFOLDING (NO EMITIR aún) — AggregateRating/Review.
 // 0/10 competidores publican rating en schema → estrellas en SERP que nadie
 // tiene. REGLA DURA: prohibido inventar reseñas. Este builder queda listo para

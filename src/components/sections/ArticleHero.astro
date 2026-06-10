@@ -1,0 +1,70 @@
+---
+// Hero de una pieza de blog: kicker + H1 + bajada + meta (fecha · lectura) + tags.
+// Variante editorial del LandingHero (sin CTA; el CTA vive al final del artículo).
+// El breadcrumb entra por slot, igual que en LandingHero.
+import Kicker from '../ui/Kicker.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  kicker?: string;
+  title: string;
+  lead?: string;
+  /** Fecha en formato máquina YYYY-MM-DD (atributo datetime). */
+  dateISO: string;
+  /** Fecha legible, p.ej. "10 de junio de 2026". */
+  dateLabel: string;
+  /** Texto de tiempo de lectura ya formateado, p.ej. "6 min de lectura". */
+  readingLabel?: string;
+  tags?: string[];
+}
+const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [] } = Astro.props;
+---
+<header class="p-hero">
+  <div class="container p-hero__inner">
+    <slot name="breadcrumb" />
+    {kicker && <Kicker>{kicker}</Kicker>}
+    <h1 class="h1 p-hero__title">{title}</h1>
+    {lead && <p class="lead p-hero__lead">{lead}</p>}
+    <div class="p-hero__meta">
+      <time datetime={dateISO}><Icon name="lucide:calendar" /> {dateLabel}</time>
+      {readingLabel && <span><Icon name="lucide:clock" /> {readingLabel}</span>}
+    </div>
+    {tags.length > 0 && (
+      <ul class="p-hero__tags" aria-label="Temas">
+        {tags.map((t) => <li>{t}</li>)}
+      </ul>
+    )}
+  </div>
+</header>
+
+<style>
+  .p-hero {
+    position: relative; isolation: isolate; overflow: hidden;
+    padding-block: calc(var(--nav-h) + var(--space-8)) var(--space-7);
+  }
+  .p-hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(70% 90% at 85% 0%, var(--accent-gold-glow), transparent 60%),
+      radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, var(--accent-teal), transparent 90%), transparent 55%);
+  }
+  .p-hero__inner { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
+  .p-hero__title { max-width: 22ch; }
+  .p-hero__lead { max-width: 64ch; }
+
+  .p-hero__meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .p-hero__meta time, .p-hero__meta span { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .p-hero__meta :global(svg) { width: 14px; height: 14px; color: var(--accent-teal); flex: 0 0 auto; }
+
+  .p-hero__tags { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .p-hero__tags li {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+    background: var(--bg-card); border: 1px solid var(--border);
+  }
+</style>

@@ -8,9 +8,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check:kb": "node scripts/verify-chat-kb.mjs",
+    "test:chat": "node scripts/test-chat-guard.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",

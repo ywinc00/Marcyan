@@ -41,7 +41,7 @@ export const content = {
     hero: {
       tag: 'IA Operativa · Houston & Miami',
       h1: 'Diseño Web<br>que <em>piensa</em><br>por ti',
-      sub: 'Marcyan Studio combina diseño de élite con inteligencia artificial operativa para crear sitios que convierten, posicionan y evolucionan — construidos rápido y para que te encuentren.',
+      sub: 'Sitios bilingües de verdad (español e inglés) que cargan rápido y que ChatGPT sí puede leer, para que más clientes te encuentren. Propuesta gratis en menos de 24 horas.',
       primary: { label: 'Ver Propuesta Gratis', href: '#contacto' },
       secondary: { label: 'Ver Proyectos', href: '#proyectos' },
       // nodos en órbita = enlaces reales (la home no es la única navegación)
@@ -77,8 +77,8 @@ export const content = {
           desc: 'Asistentes virtuales integrados directamente en tu sitio. Atienden a tus clientes a toda hora, responden preguntas y captan prospectos calificados incluso mientras duermes.' },
         { n: '03', icon: 'lucide:shopping-bag', title: 'E-Commerce & Tiendas', price: 'desde $2,900',
           desc: 'Plataformas de venta en línea optimizadas para conversión. Shopify, WooCommerce o soluciones propias con IA para recomendaciones personalizadas.' },
-        { n: '04', icon: 'lucide:search', title: 'SEO Impulsado por IA', price: 'desde $600/mes',
-          desc: 'SEO que sigue el ritmo del mercado. Usamos IA para analizar competidores y tendencias, y refinamos tu estrategia de forma continua para mejorar tu posicionamiento.' },
+        { n: '04', icon: 'lucide:search', title: 'SEO Local', price: 'desde $600/mes',
+          desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, y usamos IA para afinar tu estrategia local de forma continua.' },
         { n: '05', icon: 'lucide:palette', title: 'Branding & Identidad', price: 'desde $750',
           desc: 'Logos, paletas de color, tipografías y sistemas visuales completos. Generamos conceptos con IA y refinamos cada detalle con criterio humano experto.' },
         { n: '06', icon: 'lucide:wrench', title: 'Mantenimiento Continuo', price: 'desde $120/mes',
@@ -89,7 +89,7 @@ export const content = {
     ai: {
       tag: 'Tecnología Marcyan',
       title: 'La IA que<br>trabaja para<br><em>tu negocio</em>',
-      desc: 'No usamos la IA como palabra de moda. La usamos para construir más rápido, escribir mejor y ayudar a que tu negocio aparezca — ante las personas y ante los asistentes de IA.',
+      desc: 'El asistente que te responde aquí mismo es el producto que construimos para ti: usamos la IA primero en nosotros, para entregar tu web más rápido y para que ChatGPT y Perplexity puedan encontrarte.',
       features: [
         { icon: 'lucide:bot', title: 'Que la IA te encuentre', desc: 'Construimos en HTML estático y rápido que asistentes como ChatGPT y Perplexity sí pueden leer, para que tu negocio aparezca cuando les preguntan.' },
         { icon: 'lucide:pen-tool', title: 'Contenido y textos', desc: 'Páginas y textos enfocados en SEO, redactados con IA y afinados a mano. Bilingüe español e inglés, escritos para tu mercado local.' },
@@ -117,11 +117,11 @@ export const content = {
       title: 'Del concepto al<br><em>lanzamiento</em>',
       launch: { kicker: '¿Listo para despegar?', label: 'Lanza tu proyecto ahora', href: '#contacto' },
       steps: [
-        { n: '01', title: 'Descubrimiento', desc: 'Analizamos tu negocio, competidores y mercado local en Houston o Miami para definir la estrategia correcta.' },
-        { n: '02', title: 'Estrategia IA', desc: 'Diseñamos el ecosistema digital ideal: sitio, IA, SEO y automatizaciones, todo coordinado.' },
-        { n: '03', title: 'Diseño & Dev', desc: 'Construimos cada elemento con precisión. Revisiones constantes hasta que cada detalle sea perfecto.' },
-        { n: '04', title: 'Pruebas & QA', desc: 'Pruebas rigurosas en todos los dispositivos. Revisamos velocidad, SEO, accesibilidad y seguridad en cada entrega.' },
-        { n: '05', title: 'Lanzamiento', desc: 'Salimos en vivo con soporte en tiempo real. La IA entra en operación y comenzamos a optimizar desde el día uno.' },
+        { n: '01', title: 'Propuesta en 24h', desc: 'Nos cuentas tu negocio y en menos de 24 horas tienes una propuesta clara, gratis y sin compromiso — sin agendar una llamada de ventas para enterarte de algo.' },
+        { n: '02', title: 'Plan a la vista', desc: 'Acordamos el alcance con los precios sobre la mesa, incluido el SEO mensual y el mantenimiento que otros te esconden, para que sepas qué pagas antes de tocar una sola línea de código.' },
+        { n: '03', title: 'Diseño bilingüe', desc: 'Construimos tu sitio en español e inglés de verdad, no con un botón de Google Translate, y lo revisas en vivo hasta que suene como tú en los dos idiomas.' },
+        { n: '04', title: 'Que te encuentren', desc: 'Lo dejamos rápido y en HTML limpio que ChatGPT, Perplexity y Google sí pueden leer, para que tu negocio aparezca cuando alguien pregunta por lo que ofreces.' },
+        { n: '05', title: 'En vivo y contigo', desc: 'Salimos en vivo y tu asistente de IA — el mismo que te atiende aquí — entra a atender clientes; seguimos contigo después del lanzamiento, no desaparecemos.' },
       ],
     },
 
@@ -199,7 +199,7 @@ export const content = {
           { label: 'Diseño Web', href: '/es/houston/diseno-web' },
           { label: 'E-Commerce', href: '/es/houston/ecommerce' },
           { label: 'IA para Negocios', href: '/es/ia-para-pymes' },
-          { label: 'SEO con IA', href: '/es/houston/seo-local' },
+          { label: 'SEO Local', href: '/es/houston/seo-local' },
           { label: 'Branding', href: '/es/houston/branding' },
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
@@ -246,7 +246,7 @@ export const content = {
     hero: {
       tag: 'Operational AI · Houston & Miami',
       h1: 'Web Design<br>that <em>thinks</em><br>for you',
-      sub: 'Marcyan Studio combines elite design with operational artificial intelligence to create sites that convert, rank, and evolve — built fast, built to be found.',
+      sub: 'Truly bilingual sites (Spanish and English) that load fast and that ChatGPT can actually read, so more customers find you. Free proposal in under 24 hours.',
       primary: { label: 'Get Free Proposal', href: '#contacto' },
       secondary: { label: 'View Projects', href: '#proyectos' },
       nodes: [
@@ -270,6 +270,7 @@ export const content = {
     services: {
       tag: 'Our Services',
       title: 'Everything your<br>brand <em>needs</em>',
+      note: 'Public pricing, no fine print — down to monthly SEO and maintenance.',
       explore: 'Explore',
       featuredBadge: 'Featured service',
       cta: { label: 'Tell us your project', href: '#contacto' },
@@ -280,8 +281,8 @@ export const content = {
           desc: 'Virtual assistants integrated directly into your site. They serve customers around the clock, answer questions, and capture qualified leads even while you sleep.' },
         { n: '03', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $2,900',
           desc: 'Conversion-optimized online sales platforms. Shopify, WooCommerce, or custom solutions with AI for personalized recommendations.' },
-        { n: '04', icon: 'lucide:search', title: 'AI-Powered SEO', price: 'from $600/mo',
-          desc: 'SEO that keeps up with the market. We use AI to analyze competitors and trends, then continuously refine your strategy to improve how you rank.' },
+        { n: '04', icon: 'lucide:search', title: 'Local SEO', price: 'from $600/mo',
+          desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, using AI to continuously refine your local strategy.' },
         { n: '05', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $750',
           desc: 'Logos, palettes, typography, and complete visual systems. We generate concepts with AI and refine every detail with expert human judgment.' },
         { n: '06', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo',
@@ -292,7 +293,7 @@ export const content = {
     ai: {
       tag: 'Marcyan Technology',
       title: 'The AI that<br>works for<br><em>your business</em>',
-      desc: "We don't use AI as a buzzword. We use it to build faster, write better, and help your business get found — by people and by AI assistants alike.",
+      desc: 'The assistant answering you right here is the product we build for you: we put AI to work on ourselves first — to ship your site faster and help ChatGPT and Perplexity find you.',
       features: [
         { icon: 'lucide:bot', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Perplexity can actually read — so your business shows up when people ask them.' },
         { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, drafted with AI and refined by hand. Bilingual Spanish and English, written for your local market.' },
@@ -319,11 +320,11 @@ export const content = {
       title: 'From concept to<br><em>launch</em>',
       launch: { kicker: 'Ready for liftoff?', label: 'Launch your project now', href: '#contacto' },
       steps: [
-        { n: '01', title: 'Discovery', desc: 'We analyze your business, competitors, and local market in Houston or Miami to define the right strategy.' },
-        { n: '02', title: 'AI Strategy', desc: 'We design the ideal digital ecosystem: site, AI, SEO, and automations — all coordinated.' },
-        { n: '03', title: 'Design & Dev', desc: 'We build every element with precision. Constant revisions until every detail is perfect.' },
-        { n: '04', title: 'Testing & QA', desc: 'Rigorous testing across all devices — we check speed, SEO, accessibility, and security on every build.' },
-        { n: '05', title: 'Launch', desc: 'Go live with live support. AI enters operation and we start optimizing from day one.' },
+        { n: '01', title: 'Proposal in 24h', desc: 'Tell us about your business and within 24 hours you get a clear proposal — free, no strings, no sales call required just to hear back.' },
+        { n: '02', title: 'Plan in plain sight', desc: 'We agree on scope with prices on the table — including the monthly SEO and maintenance others hide from you — so you know what you pay before we touch a single line of code.' },
+        { n: '03', title: 'Bilingual by design', desc: 'We build your site in real Spanish and English — not a Google Translate toggle — and you review it live until it sounds like you in both languages.' },
+        { n: '04', title: 'Get found', desc: 'We ship it fast and in clean HTML that ChatGPT, Perplexity, and Google can actually read, so your business shows up when people ask for what you offer.' },
+        { n: '05', title: 'Live, with you', desc: 'We go live and your AI assistant — the same one helping you here — starts handling customers; we stay with you after launch instead of disappearing.' },
       ],
     },
 
@@ -390,7 +391,7 @@ export const content = {
           { label: 'Web Design', href: '#servicios' },
           { label: 'E-Commerce', href: '#servicios' },
           { label: 'Conversational AI', href: '#ia' },
-          { label: 'AI SEO', href: '#servicios' },
+          { label: 'Local SEO', href: '#servicios' },
           { label: 'Branding', href: '#servicios' },
           { label: 'Project Form', href: '/formulario' },
         ] },

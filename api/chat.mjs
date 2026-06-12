@@ -16,12 +16,12 @@
 //     de Anthropic. El rate-limit en memoria es solo la primera línea.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL } from '../lib/chat-kb.mjs';
 
 // Da hasta 30s a la función (Haiku responde en 1-3s; headroom para reintentos).
 export const config = { maxDuration: 30 };
 
-const DEFAULT_MODEL = 'claude-haiku-4-5';
+const DEFAULT_MODEL = 'claude-sonnet-4-6';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6']);
 
@@ -143,6 +143,27 @@ export function validSessionId(sid) {
   return typeof sid === 'string' && /^[\w-]{1,64}$/.test(sid);
 }
 
+// Extrae { text, action } de la respuesta de Anthropic (con o sin tool_use).
+// Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
+// Un solo turno: NO se envía tool_result ni hay 2ª llamada.
+export function parseToolResponse(content, lang = 'es') {
+  const blocks = Array.isArray(content) ? content : [];
+  let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
+  const toolUse = blocks.find((b) => b && b.type === 'tool_use' && b.name === CONTACT_TOOL.name);
+  let action = null;
+  if (toolUse) {
+    const motivo = toolUse.input && toolUse.input.motivo;
+    const variant = motivo === 'muestra_gratis' ? 'muestra_gratis' : 'contacto'; // allowlist, default seguro
+    action = { type: 'capture', variant };
+  }
+  if (!text && action) {
+    text = lang === 'en'
+      ? 'Happy to set this up — just leave your name and the best email or phone, and the team will send it over.'
+      : 'Con gusto lo preparamos — déjame tu nombre y el mejor email o teléfono, y el equipo te lo envía.';
+  }
+  return { text: text || null, action };
+}
+
 const withTimeout = (p, ms, label) =>
   Promise.race([
     p,
@@ -200,20 +221,23 @@ export default async function handler(req, res) {
         max_tokens: LIMITS.MAX_TOKENS,
         // Bloque estable (instrucciones + KB) → cache de prompt + a prueba de inyección.
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+        // Herramienta de SOLO-UI para disparar la captura de contacto.
+        // tool_choice = auto (omitido) → el modelo decide cuándo; NO enviamos
+        // tool_result ni hacemos 2ª llamada: leemos el tool_use de esta respuesta.
+        tools: [CONTACT_TOOL],
         // El ÚNICO lugar donde vive el input del usuario.
         messages,
-        // SIN temperature/top_p/top_k/thinking → seguro en haiku-4-5 / sonnet-4-6 / opus.
+        // SIN temperature/top_p/top_k/thinking → seguro en sonnet-4-6 / haiku-4-5.
       }),
       22000,
       'anthropic'
     );
 
-    const text = Array.isArray(r.content)
-      ? r.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim()
-      : '';
-
-    const reply = brandPostFilter(text, lang); // última red de honestidad de marca
-    return res.status(200).json({ reply });
+    // Un solo turno: leemos texto + tool_use de ESTA respuesta (sin tool_result).
+    const { text, action } = parseToolResponse(r.content, lang);
+    let reply = brandPostFilter(text || M.fallback, lang); // honestidad de marca
+    reply = pricePostFilter(reply, lang);                   // cifras fuera del allowlist
+    return res.status(200).json(action ? { reply, action } : { reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
     console.error('[chat] anthropic error:', err && err.message);

@@ -1,19 +1,16 @@
 ---
 // ─────────────────────────────────────────────────────────────
-// ChatWidget — Asistente de Marcyan (v1: informativo + captura de lead).
-// Isla cliente: botón flotante + panel con DOS vistas:
-//   · CHAT  → habla SOLO con /api/chat (la API key vive en el servidor).
-//   · LEAD  → mini-formulario "Solicitar propuesta" que postea al endpoint
-//             EXISTENTE /api/brief (mismo contrato que el form del home).
+// ChatWidget — Asistente consultivo de Marcyan (v2).
+// Isla cliente: botón flotante + panel de chat. Habla con /api/chat
+// (la API key vive en el servidor). Cuando el modelo lo decide, /api/chat
+// devuelve { action:{type:'capture'} } y el widget muestra una CAPTURA
+// INLINE mínima (nombre + email/teléfono) que postea al endpoint EXISTENTE
+// /api/brief. La PII viaja SOLO del formulario a /api/brief, NUNCA al modelo.
 //
-// SEGURIDAD/PRIVACIDAD:
-//   · La PII (nombre/email/teléfono) viaja SOLO del formulario a /api/brief;
-//     NUNCA entra al chat ni al contexto del modelo.
-//   · El usuario inicia el guardado (no el modelo) → sin superficie de
-//     inyección sobre la escritura. /api/brief valida server-side + honeypot.
-//   · El texto del modelo se pinta con textContent (sin innerHTML); solo se
-//     "linkifican" tokens conocidos (/formulario, email, teléfonos).
-// Bilingüe ES/EN, a11y (dialog, aria, teclado, focus-trap, 44px), tokens DS.
+// SEGURIDAD: el texto del modelo se limpia de markdown y se pinta con
+// textContent (sin innerHTML); solo se "linkifican" tokens conocidos.
+// La tarjeta de captura se construye con HTML ESTÁTICO (sin interpolar
+// texto del modelo/usuario); los valores se asignan vía .value.
 // ─────────────────────────────────────────────────────────────
 import Icon from './ui/Icon.astro';
 import { nap } from '../i18n/content';
@@ -29,57 +26,57 @@ const STR = {
     close: 'Cerrar el chat',
     title: 'Asistente Marcyan',
     status: 'Responde al instante',
-    greeting: '¡Hola! 👋 Soy el asistente de Marcyan Studio. Pregúntame por precios, servicios o cómo empezar tu proyecto.',
+    greeting: '¡Hola! 👋 Soy el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento — y si quieres, te preparamos una muestra gratis de tu sitio.',
     placeholder: 'Escribe tu mensaje…',
     send: 'Enviar mensaje',
     typing: 'Escribiendo…',
     error: 'No pude responder ahora. Cuéntanos tu proyecto en /formulario.',
     privacy: 'Asistente informativo. No guardamos tus mensajes.',
-    // Lead (propuesta)
-    cta: 'Solicitar propuesta gratis',
-    leadTitle: 'Solicita tu propuesta gratis',
-    leadIntro: 'Déjanos tus datos y te enviamos una propuesta con alcance y precio en menos de 24 horas, sin compromiso.',
-    fName: 'Nombre',
-    fEmail: 'Email',
-    fPhone: 'Teléfono',
-    fBusiness: 'Tu negocio',
-    fNeed: '¿Qué necesitas?',
-    consentPre: 'Al enviar aceptas nuestra',
-    consentLink: 'política de privacidad',
-    fSend: 'Enviar solicitud',
-    fSending: 'Enviando…',
-    back: 'Volver al chat',
-    leadOk: '¡Gracias! Recibimos tu solicitud (folio %ID%). Te contactamos en menos de 24 horas. 🚀',
-    leadErr: 'No pudimos enviar tu solicitud. Intenta de nuevo o escríbenos en /formulario.',
-    leadRequired: 'Necesitamos al menos un email o un teléfono para contactarte.',
+    leaveData: 'Dejar mis datos',
+    fullForm: 'formulario completo',
+    // Captura inline
+    capTitleSample: 'Te preparamos una muestra gratis',
+    capTitleContact: 'Déjanos tus datos y te contactamos',
+    capSub: 'Solo tu nombre y el mejor email o teléfono. Sin compromiso.',
+    capName: 'Nombre',
+    capEmail: 'Email',
+    capPhone: 'Teléfono',
+    capSend: 'Enviar',
+    capSending: 'Enviando…',
+    capDismiss: 'Ahora no',
+    capConsentPre: 'Al enviar aceptas nuestra',
+    capConsentLink: 'política de privacidad',
+    capOk: '¡Gracias! Lo recibimos (folio %ID%). El equipo te contacta en menos de 24 horas. 🚀',
+    capErr: 'No pudimos enviar tus datos. Intenta de nuevo o escríbenos en /formulario.',
+    capRequired: 'Déjanos al menos un email o un teléfono.',
   },
   en: {
     open: 'Open the help chat',
     close: 'Close the chat',
     title: 'Marcyan Assistant',
     status: 'Replies instantly',
-    greeting: 'Hi! 👋 I’m Marcyan Studio’s assistant. Ask me about pricing, services, or how to start your project.',
+    greeting: 'Hi! 👋 I’m Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you — and if you like, we’ll prepare a free sample of your site.',
     placeholder: 'Type your message…',
     send: 'Send message',
     typing: 'Typing…',
     error: 'I couldn’t reply right now. Tell us about your project at /formulario.',
     privacy: 'Informational assistant. We don’t store your messages.',
-    cta: 'Request a free proposal',
-    leadTitle: 'Request your free proposal',
-    leadIntro: 'Leave your details and we’ll send a proposal with scope and pricing within 24 hours, no strings attached.',
-    fName: 'Name',
-    fEmail: 'Email',
-    fPhone: 'Phone',
-    fBusiness: 'Your business',
-    fNeed: 'What do you need?',
-    consentPre: 'By submitting you accept our',
-    consentLink: 'privacy policy',
-    fSend: 'Send request',
-    fSending: 'Sending…',
-    back: 'Back to chat',
-    leadOk: 'Thank you! We received your request (ref %ID%). We’ll get back to you within 24 hours. 🚀',
-    leadErr: 'We couldn’t send your request. Please try again or reach us at /formulario.',
-    leadRequired: 'We need at least an email or a phone number to contact you.',
+    leaveData: 'Leave my details',
+    fullForm: 'full form',
+    capTitleSample: 'We’ll prepare a free sample for you',
+    capTitleContact: 'Leave your details and we’ll reach out',
+    capSub: 'Just your name and the best email or phone. No strings attached.',
+    capName: 'Name',
+    capEmail: 'Email',
+    capPhone: 'Phone',
+    capSend: 'Send',
+    capSending: 'Sending…',
+    capDismiss: 'Not now',
+    capConsentPre: 'By submitting you accept our',
+    capConsentLink: 'privacy policy',
+    capOk: 'Thank you! We got it (ref %ID%). The team will reach out within 24 hours. 🚀',
+    capErr: 'We couldn’t send your details. Please try again or reach us at /formulario.',
+    capRequired: 'Please leave at least an email or a phone number.',
   },
 };
 const CHIPS = {
@@ -107,12 +104,7 @@ const links = [
   { token: nap.houston, href: telHref(nap.houston) },
   { token: nap.miami, href: telHref(nap.miami) },
 ];
-const clientConfig = {
-  lang,
-  strings: { typing: t.typing, error: t.error, leadOk: t.leadOk, leadErr: t.leadErr, leadRequired: t.leadRequired, fSending: t.fSending, fSend: t.fSend },
-  links,
-  referredBy: 'Asistente del sitio (chatbot)',
-};
+const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)' };
 ---
 
 <div class="mrc-chat" id="mrc-chat" data-mrc-root>
@@ -150,85 +142,38 @@ const clientConfig = {
       </button>
     </header>
 
-    <!-- Barra CTA (siempre visible en la vista de chat) -->
-    <button type="button" class="mrc-propose" data-mrc-propose>
-      <Icon name="lucide:sparkles" />
-      <span>{t.cta}</span>
-    </button>
-
-    <!-- VISTA CHAT -->
-    <div class="mrc-view mrc-view--chat" data-mrc-chatview>
-      <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false">
-        <div class="mrc-bub mrc-ai">{t.greeting}</div>
-      </div>
-
-      <div class="mrc-chips" data-mrc-chips>
-        {chips.map((c) => (
-          <button type="button" class="mrc-chip" data-msg={c.msg}>{c.label}</button>
-        ))}
-      </div>
-
-      <form class="mrc-form" data-mrc-form>
-        <label class="mrc-sr" for="mrc-chat-input">{t.placeholder}</label>
-        <textarea
-          id="mrc-chat-input"
-          class="mrc-input"
-          data-mrc-input
-          rows="1"
-          placeholder={t.placeholder}
-          autocomplete="off"
-          maxlength="2000"
-        ></textarea>
-        <button type="button" class="mrc-send" data-mrc-send aria-label={t.send}>
-          <Icon name="lucide:arrow-up" />
-        </button>
-      </form>
-
-      <p class="mrc-privacy">{t.privacy}</p>
+    <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false">
+      <div class="mrc-bub mrc-ai">{t.greeting}</div>
     </div>
 
-    <!-- VISTA LEAD (propuesta) -->
-    <div class="mrc-view mrc-view--lead" data-mrc-leadview hidden>
-      <button type="button" class="mrc-back" data-mrc-back>
-        <Icon name="lucide:chevron-left" /><span>{t.back}</span>
+    <div class="mrc-chips" data-mrc-chips>
+      {chips.map((c) => (
+        <button type="button" class="mrc-chip" data-msg={c.msg}>{c.label}</button>
+      ))}
+    </div>
+
+    <form class="mrc-form" data-mrc-form>
+      <label class="mrc-sr" for="mrc-chat-input">{t.placeholder}</label>
+      <textarea
+        id="mrc-chat-input"
+        class="mrc-input"
+        data-mrc-input
+        rows="1"
+        placeholder={t.placeholder}
+        autocomplete="off"
+        maxlength="2000"
+      ></textarea>
+      <button type="button" class="mrc-send" data-mrc-send aria-label={t.send}>
+        <Icon name="lucide:arrow-up" />
       </button>
-      <h3 class="mrc-lead-title">{t.leadTitle}</h3>
-      <p class="mrc-lead-intro">{t.leadIntro}</p>
+    </form>
 
-      <form class="mrc-leadform" data-mrc-leadform novalidate>
-        <div class="mrc-field">
-          <label for="mrc-l-name">{t.fName}</label>
-          <input id="mrc-l-name" type="text" autocomplete="name" maxlength="120" />
-        </div>
-        <div class="mrc-field-row">
-          <div class="mrc-field">
-            <label for="mrc-l-email">{t.fEmail}</label>
-            <input id="mrc-l-email" type="email" autocomplete="email" maxlength="200" inputmode="email" />
-          </div>
-          <div class="mrc-field">
-            <label for="mrc-l-phone">{t.fPhone}</label>
-            <input id="mrc-l-phone" type="tel" autocomplete="tel" maxlength="50" inputmode="tel" />
-          </div>
-        </div>
-        <div class="mrc-field">
-          <label for="mrc-l-business">{t.fBusiness}</label>
-          <input id="mrc-l-business" type="text" autocomplete="organization" maxlength="160" />
-        </div>
-        <div class="mrc-field">
-          <label for="mrc-l-need">{t.fNeed}</label>
-          <textarea id="mrc-l-need" rows="2" maxlength="1000"></textarea>
-        </div>
-
-        {/* Honeypot anti-spam (mismo nombre que el form del sitio: website_hp) */}
-        <input type="text" id="mrc-l-hp" class="mrc-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-        <p class="mrc-consent">{t.consentPre} <a class="mrc-link" href="/privacidad">{t.consentLink}</a>.</p>
-
-        <button type="submit" class="mrc-lead-send" data-mrc-leadsend>{t.fSend}</button>
-        <p class="mrc-lead-result" data-mrc-lead-result role="status" aria-live="polite" hidden></p>
-      </form>
-    </div>
-
+    <p class="mrc-foot">
+      <span>{t.privacy}</span>
+      <span class="mrc-foot-actions">
+        <button type="button" class="mrc-foot-link" data-mrc-leave>{t.leaveData}</button>
+      </span>
+    </p>
   </section>
 
   <script type="application/json" data-mrc-config set:html={JSON.stringify(clientConfig)} />
@@ -293,24 +238,6 @@ const clientConfig = {
   .mrc-close:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
   .mrc-close :global(svg) { width: 18px; height: 18px; }
 
-  /* ── Barra CTA "Solicitar propuesta" ────────────────────── */
-  .mrc-propose {
-    display: flex; align-items: center; justify-content: center; gap: var(--space-2);
-    width: 100%; padding: 10px var(--space-4); cursor: pointer;
-    font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600;
-    color: var(--accent-teal); background: var(--accent-teal-dim);
-    border: none; border-bottom: 1px solid var(--accent-teal-line);
-    transition: background var(--duration-fast), color var(--duration-fast);
-  }
-  .mrc-propose:hover { background: var(--accent-teal-line); color: var(--fg-primary); }
-  .mrc-propose:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: -2px; }
-  .mrc-propose[hidden] { display: none; }
-  .mrc-propose :global(svg) { width: 16px; height: 16px; }
-
-  /* ── Vistas ─────────────────────────────────────────────── */
-  .mrc-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .mrc-view[hidden] { display: none; }
-
   .mrc-log {
     flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3);
     padding: var(--space-4); overflow-y: auto; overscroll-behavior: contain;
@@ -351,54 +278,16 @@ const clientConfig = {
   .mrc-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
   .mrc-send :global(svg) { width: 18px; height: 18px; stroke-width: 2; }
 
-  .mrc-privacy { padding: 0 var(--space-4) var(--space-3); font-size: var(--text-xs); color: var(--fg-subtle); text-align: center; }
-
-  /* ── Vista LEAD (formulario de propuesta) ───────────────── */
-  .mrc-view--lead { padding: var(--space-4); gap: var(--space-3); overflow-y: auto; }
-  .mrc-back {
-    align-self: flex-start; display: inline-flex; align-items: center; gap: 2px;
-    background: transparent; border: none; cursor: pointer; padding: 4px 0;
-    color: var(--fg-secondary); font-size: var(--text-sm); font-family: var(--font-body);
+  .mrc-foot {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
+    padding: 0 var(--space-4) var(--space-3); font-size: var(--text-xs); color: var(--fg-subtle);
   }
-  .mrc-back:hover { color: var(--accent-teal); }
-  .mrc-back:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-back :global(svg) { width: 16px; height: 16px; }
-  .mrc-lead-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
-  .mrc-lead-intro { font-size: var(--text-sm); color: var(--fg-secondary); line-height: var(--leading-normal); }
-
-  .mrc-leadform { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-1); }
-  .mrc-field-row { display: flex; gap: var(--space-2); }
-  .mrc-field-row .mrc-field { flex: 1; min-width: 0; }
-  .mrc-field { display: flex; flex-direction: column; gap: 4px; }
-  .mrc-field label { font-size: var(--text-xs); color: var(--fg-secondary); font-weight: 500; }
-  .mrc-field input, .mrc-field textarea {
-    font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg-primary);
-    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
-    padding: 9px var(--space-3); width: 100%; resize: none;
+  .mrc-foot-link {
+    background: transparent; border: none; cursor: pointer; padding: 2px 0;
+    font-size: var(--text-xs); color: var(--fg-secondary); text-decoration: underline; font-family: var(--font-body);
   }
-  .mrc-field input:focus-visible, .mrc-field textarea:focus-visible {
-    outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim);
-  }
-  .mrc-field input[aria-invalid="true"] { border-color: var(--color-error); }
-
-  .mrc-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-
-  .mrc-consent { font-size: var(--text-xs); color: var(--fg-subtle); line-height: var(--leading-normal); }
-
-  .mrc-lead-send {
-    margin-top: var(--space-1); padding: 11px var(--space-4); border: none; border-radius: var(--radius-md);
-    background: var(--accent-teal); color: var(--fg-inverse); cursor: pointer;
-    font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600;
-    min-height: var(--tap-min); transition: opacity var(--duration-fast), transform var(--duration-fast);
-  }
-  .mrc-lead-send:hover { transform: translateY(-1px); }
-  .mrc-lead-send:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-lead-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  .mrc-lead-result { font-size: var(--text-sm); line-height: var(--leading-normal); padding: var(--space-3); border-radius: var(--radius-md); }
-  .mrc-lead-result[hidden] { display: none; }
-  .mrc-lead-result.ok  { color: var(--accent-teal); background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); }
-  .mrc-lead-result.err { color: var(--color-error); background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); }
+  .mrc-foot-link:hover { color: var(--accent-teal); }
+  .mrc-foot-link:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
 
   .mrc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
@@ -409,8 +298,8 @@ const clientConfig = {
 </style>
 
 <style is:global>
-  /* Burbujas dinámicas (las crea el JS → sin atributo de scope de Astro).
-     Scopeadas a mano bajo .mrc-chat. */
+  /* Elementos dinámicos (los crea el JS → sin atributo de scope de Astro).
+     Scopeados a mano bajo .mrc-chat. */
   .mrc-chat .mrc-bub {
     max-width: 88%; padding: var(--space-3) var(--space-4); border-radius: 14px;
     font-size: var(--text-sm); line-height: var(--leading-normal); word-wrap: break-word; white-space: pre-wrap;
@@ -427,9 +316,40 @@ const clientConfig = {
   .mrc-chat .mrc-typing span:nth-child(3) { animation-delay: 0.3s; }
   @keyframes mrc-typedot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .mrc-chat .mrc-typing span { animation: none; } }
+
+  /* Tarjeta de captura inline (HTML estático, sin datos del modelo/usuario) */
+  .mrc-chat .mrc-capture {
+    align-self: stretch; background: var(--bg-elevated); border: 1px solid var(--accent-teal-line);
+    border-radius: var(--radius-md); padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3);
+  }
+  .mrc-chat .mrc-cap-title { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
+  .mrc-chat .mrc-cap-sub { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); }
+  .mrc-chat .mrc-cap-row { display: flex; gap: var(--space-2); }
+  .mrc-chat .mrc-cap-row > * { flex: 1; min-width: 0; }
+  .mrc-chat .mrc-capture input {
+    width: 100%; font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg-primary);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px var(--space-3);
+  }
+  .mrc-chat .mrc-capture input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  .mrc-chat .mrc-cap-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .mrc-chat .mrc-cap-consent { font-size: 10px; color: var(--fg-subtle); line-height: var(--leading-normal); }
+  .mrc-chat .mrc-cap-consent a { color: var(--accent-teal); text-decoration: underline; }
+  .mrc-chat .mrc-cap-actions { display: flex; gap: var(--space-2); align-items: center; }
+  .mrc-chat .mrc-cap-send {
+    flex: 1; padding: 10px var(--space-4); border: none; border-radius: var(--radius-md);
+    background: var(--accent-teal); color: var(--fg-inverse); cursor: pointer; min-height: var(--tap-min);
+    font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600;
+  }
+  .mrc-chat .mrc-cap-send:disabled { opacity: 0.5; cursor: not-allowed; }
+  .mrc-chat .mrc-cap-dismiss { background: transparent; border: none; color: var(--fg-secondary); cursor: pointer; font-size: var(--text-xs); text-decoration: underline; }
+  .mrc-chat .mrc-cap-result { font-size: var(--text-sm); line-height: var(--leading-normal); }
+  .mrc-chat .mrc-cap-result.ok { color: var(--accent-teal); }
+  .mrc-chat .mrc-cap-result.err { color: var(--color-error); }
 </style>
 
 <script>
+  import { stripMarkdown } from '../lib/chat-format.mjs';
+
   const root = document.getElementById('mrc-chat');
   const cfgEl = root && root.querySelector('[data-mrc-config]');
   if (root && cfgEl) {
@@ -447,26 +367,19 @@ const clientConfig = {
     const input = root.querySelector('[data-mrc-input]');
     const sendBtn = root.querySelector('[data-mrc-send]');
     const chipRow = root.querySelector('[data-mrc-chips]');
-    // Lead (propuesta)
-    const proposeBtn = root.querySelector('[data-mrc-propose]');
-    const backBtn = root.querySelector('[data-mrc-back]');
-    const chatView = root.querySelector('[data-mrc-chatview]');
-    const leadView = root.querySelector('[data-mrc-leadview]');
-    const leadForm = root.querySelector('[data-mrc-leadform]');
-    const leadSend = root.querySelector('[data-mrc-leadsend]');
-    const leadResult = root.querySelector('[data-mrc-lead-result]');
+    const leaveBtn = root.querySelector('[data-mrc-leave]');
 
     const sid = (crypto && crypto.randomUUID)
       ? crypto.randomUUID()
       : String(Date.now()) + Math.random().toString(36).slice(2);
 
-    let history = [];      // solo pares user/assistant COMPLETADOS (alternancia válida)
-    let lastUserText = ''; // para prefijar el formulario de propuesta
+    let history = [];      // solo pares user/assistant completados (alternancia válida)
+    let lastUserText = '';
     let busy = false;
     let opened = false;
-    let leadSubmitted = false;
+    let captured = false;  // ya envió sus datos
 
-    // ── Linkify SEGURO: solo tokens conocidos → nodos DOM (nunca innerHTML del modelo) ──
+    // ── Linkify SEGURO: solo tokens conocidos → nodos DOM ──
     function linkify(text) {
       const frag = document.createDocumentFragment();
       if (!LINKS.length) { frag.appendChild(document.createTextNode(text)); return frag; }
@@ -488,21 +401,21 @@ const clientConfig = {
     function appendBubble(role, text) {
       const b = document.createElement('div');
       b.className = 'mrc-bub mrc-' + role;
-      if (role === 'ai') b.appendChild(linkify(text));
+      if (role === 'ai') b.appendChild(linkify(stripMarkdown(text)));
       else b.textContent = text;
       log.appendChild(b);
       log.scrollTop = log.scrollHeight;
     }
     function showTyping() {
-      const t = document.createElement('div');
-      t.className = 'mrc-typing'; t.setAttribute('data-mrc-typing', '');
-      t.setAttribute('aria-label', T.typing || 'Typing');
-      t.appendChild(document.createElement('span'));
-      t.appendChild(document.createElement('span'));
-      t.appendChild(document.createElement('span'));
-      log.appendChild(t); log.scrollTop = log.scrollHeight;
+      const ty = document.createElement('div');
+      ty.className = 'mrc-typing'; ty.setAttribute('data-mrc-typing', '');
+      ty.setAttribute('aria-label', T.typing || 'Typing');
+      ty.appendChild(document.createElement('span'));
+      ty.appendChild(document.createElement('span'));
+      ty.appendChild(document.createElement('span'));
+      log.appendChild(ty); log.scrollTop = log.scrollHeight;
     }
-    function hideTyping() { const t = log.querySelector('[data-mrc-typing]'); if (t) t.remove(); }
+    function hideTyping() { const ty = log.querySelector('[data-mrc-typing]'); if (ty) ty.remove(); }
     function setBusy(v) { busy = v; if (sendBtn) sendBtn.disabled = v; if (input) input.disabled = v; }
 
     async function send(textRaw) {
@@ -524,11 +437,14 @@ const clientConfig = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages: reqMessages, sessionId: sid, lang }),
         });
-        let data = null; try { data = await res.json(); } catch (_) { /* respuesta no-JSON */ }
+        let data = null; try { data = await res.json(); } catch (_) {}
         hideTyping();
         if (data && data.reply) {
           appendBubble('ai', data.reply);
           history = reqMessages.concat([{ role: 'assistant', content: data.reply }]);
+          if (data.action && data.action.type === 'capture') {
+            openCapture(data.action.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
+          }
         } else {
           appendBubble('sys', (data && data.error) || T.error);
         }
@@ -547,76 +463,91 @@ const clientConfig = {
       input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     }
 
-    // ── Vista de propuesta (lead) ──
-    function showLead() {
-      if (chatView) chatView.hidden = true;
-      if (proposeBtn) proposeBtn.hidden = true;
-      if (leadView) leadView.hidden = false;
-      // Prefijar "¿qué necesitas?" con el último mensaje del usuario (texto propio, editable).
-      const need = root.querySelector('#mrc-l-need');
-      if (need && !need.value && lastUserText) need.value = lastUserText;
-      const first = root.querySelector('#mrc-l-name');
-      if (first) first.focus();
-    }
-    function showChat() {
-      if (leadView) leadView.hidden = true;
-      if (chatView) chatView.hidden = false;
-      if (proposeBtn) proposeBtn.hidden = false;
-      if (proposeBtn) proposeBtn.focus();
-    }
-
-    function val(id) { const el = root.querySelector(id); return el ? el.value.trim() : ''; }
-
-    async function submitLead() {
-      if (leadSubmitted) return;
-      const email = val('#mrc-l-email');
-      const phone = val('#mrc-l-phone');
-      const emailEl = root.querySelector('#mrc-l-email');
-      const phoneEl = root.querySelector('#mrc-l-phone');
-      // Requisito (igual que /api/brief): al menos email o teléfono.
-      if (!email && !phone) {
-        if (leadResult) { leadResult.hidden = false; leadResult.className = 'mrc-lead-result err'; leadResult.textContent = T.leadRequired; }
-        if (emailEl) emailEl.setAttribute('aria-invalid', 'true');
-        if (phoneEl) phoneEl.setAttribute('aria-invalid', 'true');
+    // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/brief) ──
+    function openCapture(variant) {
+      if (captured) return;
+      if (log.querySelector('[data-mrc-capture]')) { // ya hay una abierta → enfocar
+        const n = log.querySelector('#mrc-c-name'); if (n) n.focus();
         return;
       }
-      if (emailEl) emailEl.removeAttribute('aria-invalid');
-      if (phoneEl) phoneEl.removeAttribute('aria-invalid');
+      const title = variant === 'muestra_gratis' ? T.capTitleSample : T.capTitleContact;
+      const card = document.createElement('div');
+      card.className = 'mrc-capture';
+      card.setAttribute('data-mrc-capture', '');
+      // HTML estático (todas las cadenas son nuestras, no del modelo/usuario).
+      card.innerHTML =
+        '<div class="mrc-cap-title"></div>' +
+        '<p class="mrc-cap-sub"></p>' +
+        '<input id="mrc-c-name" type="text" autocomplete="name" maxlength="120" />' +
+        '<div class="mrc-cap-row">' +
+          '<input id="mrc-c-email" type="email" autocomplete="email" inputmode="email" maxlength="200" />' +
+          '<input id="mrc-c-phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="50" />' +
+        '</div>' +
+        '<input id="mrc-c-hp" class="mrc-cap-hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />' +
+        '<p class="mrc-cap-consent"></p>' +
+        '<div class="mrc-cap-actions">' +
+          '<button type="button" class="mrc-cap-send" data-mrc-capsend></button>' +
+          '<button type="button" class="mrc-cap-dismiss" data-mrc-capdismiss></button>' +
+        '</div>' +
+        '<p class="mrc-cap-result" data-mrc-capresult hidden></p>';
+      // Rellenar textos por separado (textContent / placeholder → seguro).
+      card.querySelector('.mrc-cap-title').textContent = title;
+      card.querySelector('.mrc-cap-sub').textContent = T.capSub;
+      card.querySelector('#mrc-c-name').placeholder = T.capName;
+      card.querySelector('#mrc-c-email').placeholder = T.capEmail;
+      card.querySelector('#mrc-c-phone').placeholder = T.capPhone;
+      card.querySelector('[data-mrc-capsend]').textContent = T.capSend;
+      card.querySelector('[data-mrc-capdismiss]').textContent = T.capDismiss;
+      const consent = card.querySelector('.mrc-cap-consent');
+      consent.appendChild(document.createTextNode((T.capConsentPre || '') + ' '));
+      const cl = document.createElement('a'); cl.href = '/privacidad'; cl.textContent = T.capConsentLink || 'privacidad';
+      consent.appendChild(cl); consent.appendChild(document.createTextNode('.'));
 
-      const need = val('#mrc-l-need');
+      log.appendChild(card);
+      log.scrollTop = log.scrollHeight;
+
+      const need = (lastUserText || '').slice(0, 1000);
+      card.querySelector('[data-mrc-capdismiss]').addEventListener('click', () => card.remove());
+      card.querySelector('[data-mrc-capsend]').addEventListener('click', () => submitCapture(card, variant, need));
+      const nameEl = card.querySelector('#mrc-c-name'); if (nameEl) nameEl.focus();
+    }
+
+    async function submitCapture(card, variant, need) {
+      const get = (id) => { const el = card.querySelector(id); return el ? el.value.trim() : ''; };
+      const email = get('#mrc-c-email');
+      const phone = get('#mrc-c-phone');
+      const result = card.querySelector('[data-mrc-capresult]');
+      const sendB = card.querySelector('[data-mrc-capsend]');
+      if (!email && !phone) {
+        if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capRequired; }
+        return;
+      }
+      const note = variant === 'muestra_gratis' ? 'Solicitó una muestra gratis vía el asistente del sitio.' : 'Pidió que lo contacten vía el asistente del sitio.';
       const body = {
-        owner_name: val('#mrc-l-name'),
+        owner_name: get('#mrc-c-name'),
         email,
         phone,
-        business_name: val('#mrc-l-business'),
         main_objective: need,
-        additional_notes: need,
+        additional_notes: note + (need ? ' Mensaje: ' + need : ''),
         referred_by: REFERRED_BY,
-        website_hp: val('#mrc-l-hp'), // honeypot (lo valida /api/brief en el servidor)
+        website_hp: get('#mrc-c-hp'),
       };
-
-      if (leadSend) { leadSend.disabled = true; leadSend.textContent = T.fSending; }
-      if (leadResult) leadResult.hidden = true;
+      if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
+      if (result) result.hidden = true;
       try {
         const res = await fetch('/api/brief', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
         });
         let data = null; try { data = await res.json(); } catch (_) {}
         if (res.ok && data && data.ok) {
-          leadSubmitted = true;
-          if (leadForm) Array.prototype.forEach.call(leadForm.querySelectorAll('input, textarea, .mrc-lead-send'), (el) => { el.disabled = true; });
-          if (leadResult) {
-            leadResult.hidden = false; leadResult.className = 'mrc-lead-result ok';
-            leadResult.textContent = (T.leadOk || 'OK').replace('%ID%', data.projectId || '—');
-          }
-        } else {
-          throw new Error('bad response');
-        }
+          captured = true;
+          card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
+          card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
+          if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = (T.capOk || 'OK').replace('%ID%', data.projectId || '—'); }
+        } else { throw new Error('bad response'); }
       } catch (_) {
-        if (leadSend) { leadSend.disabled = false; leadSend.textContent = T.fSend; }
-        if (leadResult) { leadResult.hidden = false; leadResult.className = 'mrc-lead-result err'; leadResult.textContent = T.leadErr; }
+        if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
+        if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capErr; }
       }
     }
 
@@ -654,9 +585,7 @@ const clientConfig = {
         if (btn) send(btn.getAttribute('data-msg'));
       });
     }
-    if (proposeBtn) proposeBtn.addEventListener('click', showLead);
-    if (backBtn) backBtn.addEventListener('click', showChat);
-    if (leadForm) leadForm.addEventListener('submit', (e) => { e.preventDefault(); submitLead(); });
+    if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
 
     // ESC + focus-trap dentro del panel
     panel.addEventListener('keydown', (e) => {

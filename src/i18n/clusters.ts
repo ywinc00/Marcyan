@@ -320,6 +320,7 @@ const houstonWeb: ClusterPage = {
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta y agenda 24/7.', icon: 'lucide:message-circle' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Cuando quieras vender en línea, te montamos la tienda.', icon: 'lucide:shopping-bag' },
+      { label: 'Sitios para bienes raíces', href: '/es/houston/bienes-raices', desc: '¿Eres agente? Sitio con tus propiedades y SEO por zona.', icon: 'lucide:home' },
     ],
   },
   service: {
@@ -775,7 +776,7 @@ const houstonIa: ClusterPage = {
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
       { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
-      { label: 'IA para tu negocio (general)', href: '/es/ia-para-pymes', desc: 'Cómo la IA ayuda a un negocio pequeño, en español.', icon: 'lucide:bot' },
+      { label: 'IA para abogados de inmigración', href: '/es/houston/abogados-inmigracion', desc: 'El caso de uso: captar y agendar consultas 24/7 en español.', icon: 'lucide:scale' },
     ],
   },
   service: {
@@ -1642,12 +1643,257 @@ const miamiEcommerce: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// OLA 3 · INDUSTRIA × CIUDAD (Houston primero). Inicio enfocado: 2 verticales de
+// alto valor. Copy GENUINO por industria (no templado). Honestidad DURA: sin
+// clientes de estos rubros → Cliente Fundador + proof real etiquetado por lo que
+// es. ABOGADOS: regulado → la IA NO da consejo legal, sin prometer resultados de
+// un caso ni "visa garantizada". Sin "#1".
+// ═══════════════════════════════════════════════════════════════
+const houstonAbogadosInmigracion: ClusterPage = {
+  meta: {
+    title: 'Marketing con IA para Abogados de Inmigración en Houston | Marcyan',
+    description:
+      'Capta más consultas de inmigración en Houston: un asistente con IA que responde y agenda 24/7 en español, sitio bilingüe que da confianza y SEO local. Sin promesas vacías. Propuesta gratis.',
+  },
+  path: '/es/houston/abogados-inmigracion',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Abogados de inmigración', path: '/es/houston/abogados-inmigracion' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Inmigración · Houston',
+    h1: 'Marketing con IA para <em>abogados de inmigración</em> en Houston',
+    sub: 'Tus futuros clientes buscan ayuda en español, muchas veces de noche o el fin de semana. Captamos y agendamos esas consultas con un asistente de IA 24/7, sobre un sitio bilingüe que da confianza — sin prometer resultados de ningún caso.',
+    primary: { label: 'Quiero más consultas', href: '#contacto' },
+    secondary: { label: 'Ver cómo funciona', href: '#faq' },
+    chips: ['Capta consultas 24/7', 'En español de verdad', 'La IA no da consejo legal'],
+    tone: 'teal',
+  },
+  answer: {
+    q: '¿Cómo consigue más clientes un abogado de inmigración en Houston?',
+    a: 'Llegando primero y en español: la mayoría de las consultas de inmigración entran fuera de horario y se van con quien responde antes. Responder en 5 minutos hace a un prospecto 21 veces más probable de calificar que en 30, según el Lead Response Management Study del MIT. Un asistente con IA capta y agenda consultas 24/7.',
+    source: 'Lead Response Management Study (MIT)',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sistema para <em>no perder ni una consulta</em>',
+    items: [
+      { icon: 'lucide:message-circle', title: 'IA que capta consultas 24/7', desc: 'Responde y agenda la primera consulta en español a cualquier hora, incluso de madrugada o en fin de semana. Ninguna se enfría.' },
+      { icon: 'lucide:clipboard-list', title: 'Intake básico organizado', desc: 'La IA reúne los datos generales del caso (nombre, contacto, tipo de trámite) y te los pasa listos. Tú decides a quién y cómo atender.' },
+      { icon: 'lucide:shield-check', title: 'Sitio bilingüe que da confianza', desc: 'Un despacho se elige por confianza. Sitio profesional en español e inglés, rápido, con tus áreas de práctica y llamadas a la acción claras.' },
+      { icon: 'lucide:search', title: 'SEO local de inmigración', desc: 'Apareces cuando alguien busca «abogado de inmigración cerca de mí» en Houston, en Google Maps y en los asistentes de IA.' },
+      { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'La confianza se construye con reseñas reales. Te ayudamos a pedirlas y responderlas, en el idioma de cada cliente.' },
+      { icon: 'lucide:scale', title: 'Sin consejo legal automatizado', desc: 'La IA agenda y responde lo general (horarios, ubicación, áreas de práctica). El consejo legal lo das tú: claro, ético y sin promesas.' },
+    ],
+    tone: 'teal',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En inmigración, la consulta que <em>no contestas</em> se va con otro',
+    paragraphs: [
+      'Houston es uno de los mercados de inmigración más grandes del país, y tus futuros clientes buscan ayuda en su idioma — muchas veces de noche o el fin de semana, cuando tu despacho ya cerró. En ese momento, el que contesta primero se queda con el caso.',
+      'Por eso el centro de nuestro sistema es un asistente con IA que capta y agenda esas consultas 24/7, en español, <strong>sin dar consejo legal</strong>: reúne lo básico y te lo pasa, tú llevas el caso. Lo combinamos con un sitio bilingüe que transmite confianza y SEO local para que te encuentren. <strong>Honestidad ante todo:</strong> nunca prometemos el resultado de un caso ni una «visa garantizada» — eso no se promete.',
+    ],
+    tone: 'teal',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Captación con IA, <em>desde $900</em>',
+    price: '$900',
+    unit: 'proyecto inicial',
+    lead: 'Empezamos por el asistente que capta consultas. El sitio y el SEO se suman según tu despacho.',
+    features: [
+      'Asistente con IA que capta y agenda 24/7',
+      'En español, con el tono de tu despacho',
+      'Integración con WhatsApp y tu calendario',
+      'Intake básico de cada consulta',
+      'Capacitación para tu equipo',
+      'Instalación y mantenimiento',
+    ],
+    cta: { label: 'Quiero más consultas', href: '#contacto' },
+    note: '$900 es el punto de partida del asistente de captación. El sitio web bilingüe (desde $1,500) y el SEO local (desde $600/mes) son servicios que se suman según lo que tu despacho necesite. Nunca cobramos por prometer el resultado de un caso, porque eso no se promete.',
+    tone: 'teal',
+  },
+  proof: {
+    tag: 'Automatización real',
+    title: 'Agenda automática que <em>ya está en vivo</em>',
+    cta: { label: 'Quiero algo así para mi despacho', href: '#contacto' },
+    // Honestidad: aún no hay despacho cliente. Rosy Nails = web-app real que agenda
+    // citas (paralelo honesto a "agendar consultas") + Caso #0. NO se insinúa que
+    // sea un despacho; el FAQ aclara el framing Cliente Fundador.
+    items: [...proj('Rosy Nails & Care'), caso0],
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'IA para tu despacho de inmigración, <em>claro y ético</em>',
+    items: [
+      { q: '¿La IA le da consejo legal a mis clientes?', a: 'No, y es deliberado. El asistente responde lo general (horarios, ubicación, áreas de práctica, cómo agendar), capta los datos básicos de la consulta y la agenda contigo. El consejo legal lo das tú. Lo dejamos claro al cliente para que sepa cuándo habla con un asistente y cuándo contigo.' },
+      { q: '¿Garantizan más casos o el resultado de un trámite?', a: 'No, y desconfía de quien lo prometa. Nadie ético puede garantizar el resultado de un caso de inmigración ni una visa. Lo que sí hacemos es que no se te escape ninguna consulta y que tu despacho se vea profesional y confiable. El resto, y el caso, lo llevas tú.' },
+      { q: '¿Tienen despachos de inmigración como clientes?', a: 'Seremos honestos: aún no publicamos un caso de un despacho de inmigración. Sí tenemos automatización real en vivo (como la app que agenda citas de Rosy Nails) y nuestro propio sitio como Caso #0. Por eso ofrecemos cupos de Cliente Fundador para despachos, con condiciones especiales.' },
+      { q: '¿Cuánto cuesta?', a: 'El asistente de captación con IA empieza en $900. El sitio web bilingüe va desde $1,500 y el SEO local desde $600 al mes. Armamos el sistema según tu despacho y te damos un precio claro por escrito en la propuesta gratuita.' },
+      { q: '¿Funciona en español y se integra con WhatsApp?', a: 'Sí. El español es la diferencia en este mercado: configuramos el asistente en el español de tus clientes y lo conectamos con tu WhatsApp y tu calendario, para que la consulta llegue por donde te escriben. Te decimos con honestidad qué se integra y qué no.' },
+      { q: '¿Es compatible con las reglas de publicidad para abogados?', a: 'Trabajamos para que lo sea: sin promesas de resultados, sin «#1», sin testimonios inventados y dejando claro que el asistente no es un abogado. Tú revisas el contenido antes de publicar; la responsabilidad ética de la comunicación de tu despacho es tuya, y la respetamos.' },
+    ],
+  },
+  cta: {
+    title: 'Que ninguna consulta de inmigración <em>se enfríe</em>',
+    sub: 'Cuéntanos cómo llegan hoy tus consultas y te propondremos un sistema de captación con IA en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'teal',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El asistente que capta y agenda 24/7, a detalle.', icon: 'lucide:message-circle' },
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El sitio bilingüe que transmite confianza.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que te encuentren cuando buscan un abogado.', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Marketing con IA para Abogados de Inmigración en Houston',
+    serviceType: 'Marketing digital y captación con IA para despachos de inmigración',
+    description:
+      'Sistema de captación para despachos de inmigración en Houston: asistente con IA que capta y agenda consultas 24/7 en español (sin dar consejo legal), sitio bilingüe y SEO local. Sin promesas de resultados.',
+    path: '/es/houston/abogados-inmigracion',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '900',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonBienesRaices: ClusterPage = {
+  meta: {
+    title: 'Diseño Web para Bienes Raíces en Houston | Sitios que captan | Marcyan',
+    description:
+      'Diseño web y SEO para agentes de bienes raíces en Houston: sitio bilingüe con tus propiedades, captación de compradores y vendedores, y SEO local. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/bienes-raices',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Bienes raíces', path: '/es/houston/bienes-raices' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Bienes raíces · Houston',
+    h1: 'Diseño web para <em>bienes raíces</em> en Houston',
+    sub: 'Un sitio bilingüe con tus propiedades, rápido en el celular y pensado para captar compradores y vendedores — más SEO local para aparecer cuando buscan «casas en venta» en tu zona de Houston.',
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Tus propiedades', 'Bilingüe ES/EN', 'Rápido en el celular'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita el sitio web de un agente de bienes raíces en Houston?',
+    a: 'Un sitio rápido en el celular (ahí busca la mayoría de los compradores), bilingüe, con tus propiedades bien presentadas y formularios que capten a quien quiere comprar o vender. Más SEO local para aparecer cuando buscan «casas en venta» en tu zona. El 53% abandona una página móvil que tarda más de 3 segundos en cargar.',
+    source: 'Google',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que <em>trabaja</em> por tu negocio',
+    items: [
+      { icon: 'lucide:home', title: 'Tus propiedades, bien presentadas', desc: 'Listados con fotos, mapa y detalles, fáciles de explorar. Conectamos con tu fuente de propiedades donde se pueda.' },
+      { icon: 'lucide:inbox', title: 'Captación de compradores y vendedores', desc: 'Formularios y un asistente que responde 24/7 para que cada interesado quede registrado, no perdido en mensajes.' },
+      { icon: 'lucide:search', title: 'SEO local por zona', desc: 'Apareces cuando buscan «casas en venta en Katy» o «agente inmobiliario en Sugar Land», en Google y en la IA.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'La mayoría busca casa desde el teléfono. Tu sitio carga al instante y se ve impecable en cualquier pantalla.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Le hablas a tu comprador hispano en su idioma y amplías tu alcance en inglés, todo en el mismo sitio.' },
+      { icon: 'lucide:badge-check', title: 'Tu marca personal', desc: 'En bienes raíces la gente te elige a TI. Tu sitio proyecta tu marca, tus reseñas y tu trayectoria.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, tu comprador busca casa <em>desde el celular y en español</em>',
+    paragraphs: [
+      'El mercado inmobiliario de Houston es enorme y muy hispano, y la búsqueda casi siempre empieza en el teléfono: alguien escribe «casas en venta en Katy» o «townhomes en Cypress» camino al trabajo. Si tu sitio no carga rápido o no habla su idioma, te pierde en segundos.',
+      'Por eso construimos tu sitio rápido y bilingüe, con tus propiedades al frente y la captación bien armada, y lo respaldamos con SEO local por zona para que aparezcas en esas búsquedas. <strong>Sin promesas de posición:</strong> nadie controla el algoritmo de Google; lo que hacemos es darte la mejor base honesta.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio de bienes raíces, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de páginas, las propiedades y las integraciones.',
+    features: [
+      'Diseño a medida con tu marca',
+      'Listados de propiedades',
+      'Captación de compradores y vendedores',
+      'Versión en español e inglés',
+      'SEO base y rápido en móvil',
+      'Listo para Google y la IA',
+    ],
+    cta: { label: 'Quiero mi sitio', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional. El SEO local continuo (desde $600/mes) y un asistente con IA para responder 24/7 (desde $900) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Sitios a medida reales — y <em>buscamos tu marca</em> inmobiliaria',
+    cta: { label: 'Sé nuestro primer caso en bienes raíces', href: '#contacto' },
+    // Honestidad: aún no hay agente inmobiliario cliente. Proof real de sitios a
+    // medida (etiquetado por su rubro/ciudad real) + Cliente Fundador. Sin insinuar
+    // que sean de bienes raíces.
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu sitio de bienes raíces en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio para un agente de bienes raíces?', a: 'Un sitio profesional a medida empieza en $1,500. El precio final depende del número de páginas, cuántas propiedades muestres y qué integraciones necesites. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Se conecta con el MLS o con un IDX?', a: 'Depende de tu acceso y de las reglas de tu MLS. Donde es posible, integramos o embebemos un feed de propiedades; donde no, montamos tus listados de forma manual o semiautomática. Te decimos con honestidad qué se puede hacer en tu caso antes de empezar, sin prometer integraciones que no existan.' },
+      { q: '¿Tienen clientes en bienes raíces?', a: 'Seremos honestos: aún no publicamos un caso de un agente inmobiliario. Sí tenemos sitios a medida reales y verificables en otros rubros (con enlaces que puedes visitar) y nuestro propio sitio como Caso #0. Por eso ofrecemos cupos de Cliente Fundador para agentes, con condiciones especiales.' },
+      { q: '¿El sitio capta compradores y vendedores?', a: 'Sí: formularios claros, llamadas a la acción y, si lo sumas, un asistente con IA que responde 24/7. La idea es que ningún interesado se pierda entre mensajes — que cada uno quede registrado y contigo.' },
+      { q: '¿El sitio es bilingüe?', a: 'Sí. En Houston tu comprador busca en español e inglés, así que diseñamos en ambos idiomas desde el inicio, con el contexto correcto para tu mercado.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo. Te damos una base técnica sólida, SEO local honesto y reportes claros; el liderazgo en búsquedas competidas se construye con trabajo constante, no con una garantía imposible.' },
+    ],
+  },
+  cta: {
+    title: 'Tu próximo sitio de <em>bienes raíces</em> empieza aquí',
+    sub: 'Cuéntanos cómo trabajas y qué zonas cubres, y recibe una propuesta de sitio y SEO en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas cuando buscan casas en tu zona.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que responde y capta interesados 24/7.', icon: 'lucide:message-circle' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web para Bienes Raíces en Houston',
+    serviceType: 'Diseño web y SEO para agentes de bienes raíces',
+    description:
+      'Diseño y desarrollo de sitios web para agentes de bienes raíces en Houston: bilingües, rápidos en móvil, con listados de propiedades, captación de prospectos y SEO local por zona.',
+    path: '/es/houston/bienes-raices',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
   'houston/ia-conversacional': houstonIa,
   'houston/ecommerce': houstonEcommerce,
   'houston/branding': houstonBranding,
+  'houston/abogados-inmigracion': houstonAbogadosInmigracion,
+  'houston/bienes-raices': houstonBienesRaices,
   'miami/diseno-web': miamiWeb,
   'miami/ia-conversacional': miamiIa,
   'miami/seo-local': miamiSeo,

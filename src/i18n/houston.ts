@@ -49,6 +49,14 @@ export const houstonHub = {
       { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto. Desde $750.', icon: 'lucide:palette' },
     ] as RelatedLink[],
   },
+  industries: {
+    tag: 'Por industria',
+    title: 'Soluciones por <em>sector</em>',
+    links: [
+      { label: 'Abogados de inmigración', href: '/es/houston/abogados-inmigracion', desc: 'Capta y agenda consultas 24/7 con IA, en español. Sin promesas de resultados.', icon: 'lucide:scale' },
+      { label: 'Bienes raíces', href: '/es/houston/bienes-raices', desc: 'Sitio con tus propiedades, captación y SEO local por zona.', icon: 'lucide:home' },
+    ] as RelatedLink[],
+  },
   local: {
     tag: 'Houston',
     title: 'Conocemos el <em>mercado de Houston</em>',

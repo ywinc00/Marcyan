@@ -1683,7 +1683,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
     title: 'Un sistema para <em>no perder ni una consulta</em>',
     items: [
       { icon: 'lucide:message-circle', title: 'IA que capta consultas 24/7', desc: 'Responde y agenda la primera consulta en español a cualquier hora, incluso de madrugada o en fin de semana. Ninguna se enfría.' },
-      { icon: 'lucide:clipboard-list', title: 'Intake básico organizado', desc: 'La IA reúne los datos generales del caso (nombre, contacto, tipo de trámite) y te los pasa listos. Tú decides a quién y cómo atender.' },
+      { icon: 'lucide:clipboard-list', title: 'Intake básico (datos de la consulta)', desc: 'La IA reúne los datos generales del caso (nombre, contacto, tipo de trámite) y te los pasa listos. Tú decides a quién y cómo atender.' },
       { icon: 'lucide:shield-check', title: 'Sitio bilingüe que da confianza', desc: 'Un despacho se elige por confianza. Sitio profesional en español e inglés, rápido, con tus áreas de práctica y llamadas a la acción claras.' },
       { icon: 'lucide:search', title: 'SEO local de inmigración', desc: 'Apareces cuando alguien busca «abogado de inmigración cerca de mí» en Houston, en Google Maps y en los asistentes de IA.' },
       { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'La confianza se construye con reseñas reales. Te ayudamos a pedirlas y responderlas, en el idioma de cada cliente.' },
@@ -1770,7 +1770,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
 
 const houstonBienesRaices: ClusterPage = {
   meta: {
-    title: 'Diseño Web para Bienes Raíces en Houston | Sitios que captan | Marcyan',
+    title: 'Sitios Web para Agentes de Bienes Raíces en Houston | Marcyan',
     description:
       'Diseño web y SEO para agentes de bienes raíces en Houston: sitio bilingüe con tus propiedades, captación de compradores y vendedores, y SEO local. Desde $1,500. Propuesta gratis.',
   },
@@ -1784,7 +1784,7 @@ const houstonBienesRaices: ClusterPage = {
     badge: 'Houston, TX',
     badgeIcon: 'lucide:map-pin',
     kicker: 'Bienes raíces · Houston',
-    h1: 'Diseño web para <em>bienes raíces</em> en Houston',
+    h1: 'Sitios para <em>agentes de bienes raíces</em> en Houston',
     sub: 'Un sitio bilingüe con tus propiedades, rápido en el celular y pensado para captar compradores y vendedores — más SEO local para aparecer cuando buscan «casas en venta» en tu zona de Houston.',
     primary: { label: 'Quiero mi sitio', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
@@ -1794,7 +1794,7 @@ const houstonBienesRaices: ClusterPage = {
   answer: {
     q: '¿Qué necesita el sitio web de un agente de bienes raíces en Houston?',
     a: 'Un sitio rápido en el celular (ahí busca la mayoría de los compradores), bilingüe, con tus propiedades bien presentadas y formularios que capten a quien quiere comprar o vender. Más SEO local para aparecer cuando buscan «casas en venta» en tu zona. El 53% abandona una página móvil que tarda más de 3 segundos en cargar.',
-    source: 'Google',
+    source: 'Think with Google (2017)',
   },
   includes: {
     tag: 'Qué incluye',
@@ -1813,7 +1813,7 @@ const houstonBienesRaices: ClusterPage = {
     tag: 'Por qué este enfoque',
     title: 'En Houston, tu comprador busca casa <em>desde el celular y en español</em>',
     paragraphs: [
-      'El mercado inmobiliario de Houston es enorme y muy hispano, y la búsqueda casi siempre empieza en el teléfono: alguien escribe «casas en venta en Katy» o «townhomes en Cypress» camino al trabajo. Si tu sitio no carga rápido o no habla su idioma, te pierde en segundos.',
+      'El mercado inmobiliario de Houston es enorme y muy hispano, y la búsqueda casi siempre empieza en el teléfono: alguien escribe «casas en venta en Katy» o «townhomes en Cypress» camino al trabajo. Si tu sitio no carga rápido o no habla su idioma, pierdes a ese comprador en segundos.',
       'Por eso construimos tu sitio rápido y bilingüe, con tus propiedades al frente y la captación bien armada, y lo respaldamos con SEO local por zona para que aparezcas en esas búsquedas. <strong>Sin promesas de posición:</strong> nadie controla el algoritmo de Google; lo que hacemos es darte la mejor base honesta.',
     ],
     tone: 'gold',
@@ -1874,7 +1874,7 @@ const houstonBienesRaices: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web para Bienes Raíces en Houston',
+    name: 'Sitios Web para Agentes de Bienes Raíces en Houston',
     serviceType: 'Diseño web y SEO para agentes de bienes raíces',
     description:
       'Diseño y desarrollo de sitios web para agentes de bienes raíces en Houston: bilingües, rápidos en móvil, con listados de propiedades, captación de prospectos y SEO local por zona.',

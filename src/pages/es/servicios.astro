@@ -1,0 +1,77 @@
+---
+// CATÁLOGO DE SERVICIOS · /es/servicios — hub de servicios (Track E).
+// Reúne los 7 productos (con niveles) en una página navegable, reusando los
+// componentes del DS (LandingHero, AnswerBlock, PriceGrid, RelatedLinks,
+// FeatureGrid, Faq, CtaBand, Contact). Schema: OfferCatalog (todos los niveles)
+// + ItemList (los 7 servicios) + BreadcrumbList. ES por ahora (hasEn=false).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import PriceGrid from '../../components/sections/PriceGrid.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import FeatureGrid from '../../components/sections/FeatureGrid.astro';
+import Faq from '../../components/sections/Faq.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
+import ItemListLd from '../../components/seo/ItemListLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { priceServices, offerItems } from '../../i18n/pricing';
+import { serviciosPage as s } from '../../i18n/servicios';
+
+const c = content.es;
+---
+<Layout
+  title={s.meta.title}
+  description={s.meta.description}
+  lang="es"
+  path="servicios"
+  hasEn={false}
+>
+  <Fragment slot="head">
+    <OfferCatalogLd items={offerItems} url={s.path} name="Servicios y precios — Marcyan Studio" />
+    <ItemListLd items={s.itemList} name="Servicios de Marcyan Studio" />
+  </Fragment>
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      kicker={s.hero.kicker}
+      h1={s.hero.h1}
+      sub={s.hero.sub}
+      primary={s.hero.primary}
+      secondary={s.hero.secondary}
+      chips={s.hero.chips}
+      tone={s.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={s.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={s.answer.q} a={s.answer.a} />
+
+    <PriceGrid tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
+
+    <RelatedLinks tag={s.related.tag} title={s.related.title} links={s.related.links} />
+
+    <FeatureGrid tag={s.why.tag} title={s.why.title} items={s.why.items} tone={s.why.tone} />
+
+    <Faq tag={s.faq.tag} title={s.faq.title} items={s.faq.items} />
+
+    <CtaBand
+      title={s.cta.title}
+      sub={s.cta.sub}
+      primary={s.cta.primary}
+      secondary={s.cta.secondary}
+      tone={s.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

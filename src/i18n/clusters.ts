@@ -61,13 +61,12 @@ export interface ClusterPage {
 // anclas deben apuntar a /es/. El toggle de idioma cae a la home EN (no hay
 // espejo /en/ de las landings hasta la Ola 3).
 export const clusterNav = {
+  // Nav plana unificada — misma que la home (content.es.nav), páginas REALES.
   links: [
-    { label: 'Servicios', href: '/es/#servicios' },
+    { label: 'Servicios', href: '/es/servicios' },
     { label: 'Precios', href: '/es/precios' },
+    { label: 'Ciudades', href: '/es/houston' },
     { label: 'Blog', href: '/es/blog' },
-    { label: 'IA', href: '/es/ia-para-pymes' },
-    { label: 'Proyectos', href: '/es/#proyectos' },
-    { label: 'Ciudades', href: '/es/#ciudades' },
   ],
   cta: { label: 'Iniciar Proyecto', href: '#contacto' },
   langLabel: 'EN',

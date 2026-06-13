@@ -8,7 +8,7 @@
 export type Locale = 'es' | 'en';
 
 export interface Link { label: string; href: string }
-export interface ServiceItem { n: string; icon: string; title: string; desc: string; price: string }
+export interface ServiceItem { n: string; icon: string; title: string; desc: string; price: string; href: string }
 
 // NAP real (Sprint 0) — Service-Area Business, sin dirección pública.
 export const nap = {
@@ -23,13 +23,12 @@ export const content = {
     locale: 'es' as Locale,
 
     nav: {
+      // Nav plana unificada (home + páginas internas vía clusterNav): páginas REALES.
       links: [
-        { label: 'Servicios', href: '#servicios' },
+        { label: 'Servicios', href: '/es/servicios' },
         { label: 'Precios', href: '/es/precios' },
+        { label: 'Ciudades', href: '/es/houston' },
         { label: 'Blog', href: '/es/blog' },
-        { label: 'IA', href: '#ia' },
-        { label: 'Proyectos', href: '#proyectos' },
-        { label: 'Ciudades', href: '#ciudades' },
       ] as Link[],
       cta: { label: 'Iniciar Proyecto', href: '#contacto' },
       langLabel: 'EN',
@@ -69,20 +68,24 @@ export const content = {
       note: 'Precios públicos, sin letra pequeña — hasta el SEO mensual y el mantenimiento.',
       explore: 'Explorar',
       featuredBadge: 'Servicio estrella',
-      cta: { label: 'Ver precios y qué incluye', href: '/es/precios' },
+      cta: { label: 'Ver todos los servicios', href: '/es/servicios' },
+      // Teaser: lidera con el ancla baja de cada producto. Precios espejo de
+      // src/i18n/pricing.ts (PRICE_ANCHORS); el catálogo completo vive en /es/servicios.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Diseño Web Premium', price: 'desde $1,500',
-          desc: 'Sitios de alto impacto construidos desde cero. Cada píxel responde a tu identidad de marca y a tus objetivos de negocio en Houston y Miami.' },
-        { n: '02', icon: 'lucide:message-circle', title: 'IA Conversacional', price: 'desde $900',
-          desc: 'Asistentes virtuales integrados directamente en tu sitio. Atienden a tus clientes a toda hora, responden preguntas y captan prospectos calificados incluso mientras duermes.' },
-        { n: '03', icon: 'lucide:shopping-bag', title: 'E-Commerce & Tiendas', price: 'desde $2,900',
-          desc: 'Plataformas de venta en línea optimizadas para conversión. Shopify, WooCommerce o soluciones propias con IA para recomendaciones personalizadas.' },
-        { n: '04', icon: 'lucide:search', title: 'SEO Local', price: 'desde $600/mes',
-          desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, y usamos IA para afinar tu estrategia local de forma continua.' },
-        { n: '05', icon: 'lucide:palette', title: 'Branding & Identidad', price: 'desde $750',
-          desc: 'Logos, paletas de color, tipografías y sistemas visuales completos. Generamos conceptos con IA y refinamos cada detalle con criterio humano experto.' },
-        { n: '06', icon: 'lucide:wrench', title: 'Mantenimiento Continuo', price: 'desde $120/mes',
-          desc: 'Mantenemos tu sitio sano: chequeos de disponibilidad, actualizaciones de seguridad y software, respaldos periódicos y soporte bilingüe en Houston y Miami.' },
+        { n: '01', icon: 'lucide:layout-template', title: 'Diseño Web', price: 'desde $400', href: '/es/houston/diseno-web',
+          desc: 'Sitios de alto impacto a medida: desde una landing que convierte hasta un sitio completo, rápido y bilingüe, listo para Google y la IA.' },
+        { n: '02', icon: 'lucide:message-circle', title: 'IA Conversacional', price: 'desde $500', href: '/es/ia-para-pymes',
+          desc: 'Asistentes que atienden a tus clientes, responden preguntas y captan prospectos las 24 horas — en español, integrados a tu sitio.' },
+        { n: '03', icon: 'lucide:bot', title: 'SEO para IA', price: 'Diagnóstico gratis', href: '/es/servicios',
+          desc: 'Que ChatGPT, Perplexity y Google te recomienden a ti cuando alguien busca lo que ofreces. Empieza con un diagnóstico de visibilidad gratis.' },
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Tiendas', price: 'desde $900', href: '/es/houston/ecommerce',
+          desc: 'Tiendas en línea para vender de verdad: catálogo, carrito y pagos seguros, en experiencia bilingüe — desde una tienda esencial hasta una a medida.' },
+        { n: '05', icon: 'lucide:search', title: 'SEO Local', price: 'desde $300', href: '/es/houston/seo-local',
+          desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas — puntual o mes a mes.' },
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identidad', price: 'desde $150', href: '/es/houston/branding',
+          desc: 'Desde solo tu logo hasta una identidad completa: paleta, tipografías y guía de uso, generadas con IA y afinadas con criterio humano.' },
+        { n: '07', icon: 'lucide:wrench', title: 'Mantenimiento Continuo', price: 'desde $120/mes', href: '#contacto',
+          desc: 'Mantenemos tu sitio sano: disponibilidad, seguridad, respaldos periódicos y soporte bilingüe en Houston y Miami.' },
       ] as ServiceItem[],
     },
 
@@ -195,8 +198,10 @@ export const content = {
       tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
       cols: [
         { title: 'Servicios', links: [
+          { label: 'Todos los servicios', href: '/es/servicios' },
           { label: 'Precios', href: '/es/precios' },
           { label: 'Diseño Web', href: '/es/houston/diseno-web' },
+          { label: 'SEO para IA', href: '/es/servicios' },
           { label: 'E-Commerce', href: '/es/houston/ecommerce' },
           { label: 'IA para Negocios', href: '/es/ia-para-pymes' },
           { label: 'SEO Local', href: '/es/houston/seo-local' },
@@ -274,19 +279,22 @@ export const content = {
       explore: 'Explore',
       featuredBadge: 'Featured service',
       cta: { label: 'Tell us your project', href: '#contacto' },
+      // Teaser: leads with each product's low anchor. Mirror of src/i18n/pricing.ts.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Premium Web Design', price: 'from $1,500',
-          desc: 'High-impact sites built from scratch. Every pixel responds to your brand identity and business goals in Houston and Miami.' },
-        { n: '02', icon: 'lucide:message-circle', title: 'Conversational AI', price: 'from $900',
-          desc: 'Virtual assistants integrated directly into your site. They serve customers around the clock, answer questions, and capture qualified leads even while you sleep.' },
-        { n: '03', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $2,900',
-          desc: 'Conversion-optimized online sales platforms. Shopify, WooCommerce, or custom solutions with AI for personalized recommendations.' },
-        { n: '04', icon: 'lucide:search', title: 'Local SEO', price: 'from $600/mo',
-          desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, using AI to continuously refine your local strategy.' },
-        { n: '05', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $750',
-          desc: 'Logos, palettes, typography, and complete visual systems. We generate concepts with AI and refine every detail with expert human judgment.' },
-        { n: '06', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo',
-          desc: 'We keep your site healthy: uptime checks, security and software updates, regular backups, and bilingual support in Houston and Miami.' },
+        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '#contacto',
+          desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
+        { n: '02', icon: 'lucide:message-circle', title: 'Conversational AI', price: 'from $500', href: '#contacto',
+          desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock — in their language, built into your site.' },
+        { n: '03', icon: 'lucide:bot', title: 'AI SEO', price: 'Free audit', href: '#contacto',
+          desc: 'Get recommended by ChatGPT, Perplexity, and Google when people search for what you offer. Starts with a free AI-visibility audit.' },
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '#contacto',
+          desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience — from an essential store to a custom one.' },
+        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '#contacto',
+          desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews — one-time or monthly.' },
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '#contacto',
+          desc: 'From just your logo to a full identity: palette, typography, and usage guide, generated with AI and refined with expert human judgment.' },
+        { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
+          desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
       ] as ServiceItem[],
     },
 

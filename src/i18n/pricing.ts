@@ -134,7 +134,7 @@ export const catalog: CatalogProduct[] = [
     name: 'SEO para IA (Visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
-      'Que ChatGPT, Perplexity y Google te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA Conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
+      'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA Conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
     tagline: 'Que la IA te recomiende cuando preguntan por tu servicio.',
     anchorUnit: 'diagnóstico',
     href: '/es/houston/seo-para-ia',
@@ -142,7 +142,7 @@ export const catalog: CatalogProduct[] = [
     tone: 'teal',
     tiers: [
       { key: 'aeoDiagnostic', name: 'Diagnóstico de Visibilidad en IA', value: null, display: tierDisplay(null), anchor: true,
-        blurb: 'Revisamos si ChatGPT, Perplexity y Google pueden encontrarte y recomendarte. Sin costo ni compromiso.', href: '/es/houston/seo-para-ia' },
+        blurb: 'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.', href: '/es/houston/seo-para-ia' },
       { key: 'aeoFoundations', name: 'Cimientos AEO', value: PRICE_ANCHORS.aeoFoundations, display: tierDisplay(PRICE_ANCHORS.aeoFoundations),
         blurb: 'Te preparamos para la IA: Bing Places, schema, FAQ y llms.txt para que los asistentes te lean y te citen.', href: '/es/houston/seo-para-ia' },
       { key: 'aeoMonitoring', name: 'Monitoreo en IA', value: PRICE_ANCHORS.aeoMonitoring, monthly: true, display: tierDisplay(PRICE_ANCHORS.aeoMonitoring, true),
@@ -366,7 +366,7 @@ export const preciosPage = {
       },
       {
         q: '¿De verdad el diagnóstico de visibilidad en IA es gratis?',
-        a: 'Sí, sin costo ni compromiso. Revisamos si ChatGPT, Perplexity y Google pueden encontrarte y recomendarte, y te decimos con honestidad cómo estás. Si quieres que trabajemos los cimientos o el monitoreo después, esos sí tienen precio publicado; el diagnóstico no.',
+        a: 'Sí, sin costo ni compromiso. Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte, y te decimos con honestidad cómo estás. Si quieres que trabajemos los cimientos o el monitoreo después, esos sí tienen precio publicado; el diagnóstico no.',
       },
       {
         q: '¿Hay contratos forzados o permanencia?',

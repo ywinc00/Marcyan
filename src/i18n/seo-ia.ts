@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // CONTENIDO · Landing /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
-// El mayor wedge del negocio: que ChatGPT/Perplexity/Google te RECOMIENDEN a TI.
+// El mayor wedge del negocio: que ChatGPT/Gemini/Meta AI te RECOMIENDEN a TI.
 // Distinto de IA Conversacional (que atiende a TUS clientes). Página bespoke que
 // reusa los componentes del DS (patrón /es/servicios) + PriceGrid para los 3
 // niveles (Diagnóstico GRATIS · Cimientos $500 · Monitoreo $200/mes).
@@ -26,14 +26,14 @@ export const aeoTiers: PriceService[] = [
     name: 'Diagnóstico de Visibilidad en IA',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
-      'Revisamos si ChatGPT, Perplexity y Google pueden encontrarte y recomendarte. Sin costo ni compromiso.',
+      'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.',
     priceValue: '0',
     free: true,
     displayPrice: 'Gratis',
     displayUnit: 'sin compromiso',
     tagline: 'Revisamos si la IA puede encontrarte y recomendarte hoy.',
     includes: [
-      'Revisión en ChatGPT, Perplexity y Google',
+      'Revisión en ChatGPT, Gemini y Meta AI',
       'Estado de tu Bing Places y tu schema',
       'Qué te falta para que la IA te cite',
       'Sin costo ni compromiso',
@@ -76,7 +76,7 @@ export const aeoTiers: PriceService[] = [
     displayUnit: '/mes',
     tagline: 'Seguimos cómo te ven y te mencionan los asistentes.',
     includes: [
-      'Seguimiento mensual en ChatGPT y Perplexity',
+      'Seguimiento mensual en ChatGPT y Gemini',
       'Reporte claro de menciones y citas',
       'Ajustes continuos según resultados',
       'Mes a mes, sin permanencia',
@@ -91,7 +91,7 @@ export const seoIaPage = {
   meta: {
     title: 'SEO para IA en Houston — Que ChatGPT te recomiende | Marcyan',
     description:
-      'Que ChatGPT, Perplexity y Google te recomienden a TI cuando preguntan por tu servicio. Diagnóstico de visibilidad en IA gratis; cimientos desde $500. Agencia hispana en Houston.',
+      'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando preguntan por tu servicio. Diagnóstico de visibilidad en IA gratis; cimientos desde $500. Agencia hispana en Houston.',
   },
   path: LANDING,
   breadcrumb: [
@@ -104,14 +104,14 @@ export const seoIaPage = {
     badgeIcon: 'lucide:map-pin',
     kicker: 'SEO para IA · Visibilidad en IA',
     h1: 'Que ChatGPT te <em>recomiende</em> a ti',
-    sub: 'Tus clientes ya le preguntan a ChatGPT y Perplexity por negocios como el tuyo. Hacemos que la IA te encuentre, te entienda y te recomiende — en español. Empieza con un diagnóstico gratis.',
+    sub: 'Tus clientes ya le preguntan a ChatGPT, a Gemini y a la IA de su WhatsApp por negocios como el tuyo. Hacemos que la IA te encuentre, te entienda y te recomiende — en español. Empieza con un diagnóstico gratis.',
     primary: { label: 'Pide tu diagnóstico gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo empezar', href: '#precios' },
     chips: ['Diagnóstico gratis', 'Te lo implementamos', 'Menos competencia en español'],
     tone: 'teal' as const,
   },
   answer: {
-    q: '¿Cómo hago que ChatGPT y Perplexity recomienden mi negocio?',
+    q: '¿Cómo hago que ChatGPT y Gemini recomienden mi negocio?',
     a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Importa hacerlo ya — según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
     source: 'SOCi · Índice de Visibilidad Local 2026',
   },
@@ -121,7 +121,7 @@ export const seoIaPage = {
     title: 'IA que te <em>recomienda</em> ≠ IA que <em>atiende</em>',
     paragraphs: [
       'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7 — eso es nuestra <a href="/es/houston/ia-conversacional">IA Conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
-      'Tus clientes ya le preguntan a ChatGPT y a Perplexity «¿qué taller, abogado o restaurante me recomiendas?». La pregunta es simple: <strong>¿apareces tú o aparece tu competencia?</strong> El SEO para IA (también llamado AEO o GEO) hace que seas tú.',
+      'Tus clientes ya le preguntan a ChatGPT y a Gemini (la IA que ya aparece en las búsquedas de Google) «¿qué taller, abogado o restaurante me recomiendas?». La pregunta es simple: <strong>¿apareces tú o aparece tu competencia?</strong> El SEO para IA (también llamado AEO o GEO) hace que seas tú.',
     ],
     tone: 'teal' as const,
   },
@@ -158,7 +158,7 @@ export const seoIaPage = {
     tag: 'Preguntas frecuentes',
     title: 'SEO para IA, <em>sin rodeos</em>',
     items: [
-      { q: '¿Qué es el SEO para IA (AEO/GEO)?', a: 'Es el trabajo de optimización para que los asistentes de IA — ChatGPT, Perplexity, Google AI — puedan encontrarte, entenderte y recomendarte cuando alguien pregunta por un servicio como el tuyo. También se le llama AEO (optimización para motores de respuesta) o GEO. En corto: que la IA te cite a ti, no solo a tu competencia.' },
+      { q: '¿Qué es el SEO para IA (AEO/GEO)?', a: 'Es el trabajo de optimización para que los asistentes de IA — ChatGPT, Gemini, Meta AI — puedan encontrarte, entenderte y recomendarte cuando alguien pregunta por un servicio como el tuyo. También se le llama AEO (optimización para motores de respuesta) o GEO. En corto: que la IA te cite a ti, no solo a tu competencia.' },
       { q: '¿Es lo mismo que el SEO de toda la vida?', a: 'No, pero se complementan. El SEO clásico busca posicionarte en la lista de resultados de Google; el SEO para IA busca que los asistentes te mencionen en su respuesta directa. Comparten cimientos (un sitio rápido, legible y con buena información), pero la IA usa señales propias, como Bing y los datos estructurados.' },
       { q: '¿Cuánto cuesta?', a: 'El diagnóstico de visibilidad en IA es gratis, sin compromiso. Si quieres que trabajemos los cimientos (Bing, datos estructurados, preguntas frecuentes y un archivo que guía a la IA) es desde $500 una sola vez, y el monitoreo mensual desde $200 al mes. Todo publicado, sin letra pequeña.' },
       { q: '¿En cuánto tiempo se ven resultados?', a: 'Es difícil dar una fecha exacta, y desconfía de quien te la prometa. Como referencia —no garantía—, las primeras señales suelen tomar semanas y una presencia más sólida, varios meses. Además, las respuestas de la IA cambian solas: por eso es un trabajo continuo, no un interruptor que se enciende una vez.' },
@@ -168,7 +168,7 @@ export const seoIaPage = {
   },
   cta: {
     title: 'Descubre si la IA te <em>recomienda</em> — gratis',
-    sub: 'Pídenos el diagnóstico de visibilidad en IA: revisamos si ChatGPT, Perplexity y Google pueden encontrarte y te decimos con honestidad cómo estás. Sin costo ni compromiso.',
+    sub: 'Pídenos el diagnóstico de visibilidad en IA: revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y te decimos con honestidad cómo estás. Sin costo ni compromiso.',
     primary: { label: 'Pedir diagnóstico gratis', href: '#contacto' },
     secondary: { label: 'Ver formulario completo', href: '/formulario' },
     tone: 'teal' as const,
@@ -177,7 +177,7 @@ export const seoIaPage = {
     tag: 'Sigue explorando',
     title: 'Aprende y compara',
     links: [
-      { label: 'Guía: cómo aparecer en ChatGPT y Perplexity', href: '/es/blog/como-aparecer-en-chatgpt-perplexity', desc: 'La guía paso a paso, si prefieres entender el cómo a fondo.', icon: 'lucide:book-open' },
+      { label: 'Guía: cómo aparecer en ChatGPT y Gemini', href: '/es/blog/como-aparecer-en-chatgpt-perplexity', desc: 'La guía paso a paso, si prefieres entender el cómo a fondo.', icon: 'lucide:book-open' },
       { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'La otra IA: un asistente que atiende a tus clientes 24/7.', icon: 'lucide:message-circle' },
       { label: 'Precios y planes', href: '/es/precios', desc: 'Todos los servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: 'Agencia en Houston', href: '/es/houston', desc: 'Todos nuestros servicios para negocios de Houston.', icon: 'lucide:map-pin' },
@@ -188,7 +188,7 @@ export const seoIaPage = {
     name: 'SEO para IA en Houston (Visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
-      'Optimización para que los asistentes de IA (ChatGPT, Perplexity, Google AI) encuentren, entiendan y recomienden tu negocio: Bing Places, datos estructurados, contenido answer-first, NAP y monitoreo. En español, para Houston.',
+      'Optimización para que los asistentes de IA (ChatGPT, Gemini, Meta AI) encuentren, entiendan y recomienden tu negocio: Bing Places, datos estructurados, contenido answer-first, NAP y monitoreo. En español, para Houston.',
     path: LANDING,
     areaCity: 'Houston',
     areaRegion: 'Texas',

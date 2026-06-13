@@ -1,17 +1,17 @@
 ---
-title: "Cómo lograr que ChatGPT y Perplexity recomienden tu negocio (guía AEO en español)"
-description: "Guía clara de AEO (optimización para motores de respuesta): cómo funciona la IA al recomendar negocios y qué hacer para que ChatGPT, Perplexity y los buscadores con IA te encuentren. Con datos reales y sin promesas vacías."
+title: "Cómo lograr que ChatGPT y Gemini recomienden tu negocio (guía AEO en español)"
+description: "Guía clara de AEO (optimización para motores de respuesta): cómo funciona la IA al recomendar negocios y qué hacer para que ChatGPT, Gemini y los buscadores con IA te encuentren. Con datos reales y sin promesas vacías."
 datePublished: 2026-06-10
 tags: ["Inteligencia artificial", "AEO"]
 heroKicker: "Guía AEO"
 heroBadge: "Visibilidad en IA"
 answer:
-  q: "¿Cómo hago que ChatGPT o Perplexity recomienden mi negocio?"
+  q: "¿Cómo hago que ChatGPT o Gemini recomienden mi negocio?"
   a: "Para que un asistente de IA recomiende tu negocio, primero debe poder leer tu sitio, entenderlo y confiar en él. En la práctica: publica páginas en HTML rápido, responde preguntas concretas con datos claros, marca tu información con schema y mantén tus perfiles consistentes. Hoy el 45% de los consumidores ya pide recomendaciones locales a la IA."
   source: "BrightLocal, 2026"
 faq:
   - q: "¿Qué es el AEO o GEO?"
-    a: "AEO significa optimización para motores de respuesta (Answer Engine Optimization), también llamado GEO (optimización para motores generativos). Es el conjunto de prácticas para que asistentes como ChatGPT, Perplexity o las vistas con IA de Google entiendan tu negocio y lo citen al responder. Es primo del SEO, pero apunta a las respuestas de la IA, no solo a los enlaces azules."
+    a: "AEO significa optimización para motores de respuesta (Answer Engine Optimization), también llamado GEO (optimización para motores generativos). Es el conjunto de prácticas para que asistentes como ChatGPT, Meta AI o las vistas con IA de Google entiendan tu negocio y lo citen al responder. Es primo del SEO, pero apunta a las respuestas de la IA, no solo a los enlaces azules."
   - q: "¿Puedo pagar para que ChatGPT recomiende mi negocio?"
     a: "No. ChatGPT no acepta pagos para recomendar negocios locales en sus respuestas. Lo que sí puedes hacer es ganarte la recomendación: tener un sitio que la IA pueda leer, responder preguntas con datos claros y mantener perfiles y reseñas consistentes. Cualquiera que te garantice el primer lugar en la IA no está siendo honesto."
   - q: "¿Sirve de algo marcar mi sitio con schema?"
@@ -39,7 +39,7 @@ related:
     icon: "lucide:tag"
 ---
 
-Cada vez más personas no abren Google: le preguntan a ChatGPT o a Perplexity. Y cuando esa persona pregunta *"¿qué diseñador web me recomiendas en Houston?"* o *"¿dónde arreglo el aire de mi carro cerca de mí?"*, la IA responde con unos pocos nombres. Si tu negocio no está entre ellos, es como no existir. Esta guía explica, en español sencillo, **cómo decide la IA a quién recomendar y qué puedes hacer para entrar en esa lista** —con datos reales y sin prometer imposibles.
+Cada vez más personas no abren Google: le preguntan a ChatGPT o a Gemini. Y cuando esa persona pregunta *"¿qué diseñador web me recomiendas en Houston?"* o *"¿dónde arreglo el aire de mi carro cerca de mí?"*, la IA responde con unos pocos nombres. Si tu negocio no está entre ellos, es como no existir. Esta guía explica, en español sencillo, **cómo decide la IA a quién recomendar y qué puedes hacer para entrar en esa lista** —con datos reales y sin prometer imposibles.
 
 ## ¿Qué es el AEO (optimización para motores de respuesta)?
 

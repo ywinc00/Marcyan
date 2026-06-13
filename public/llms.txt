@@ -2,7 +2,7 @@
 
 > Agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas (PYMEs) hispanas en Estados Unidos. Atendemos a negocios en Houston, TX y Miami, FL, en español e inglés.
 
-Marcyan Studio combina diseño de alto nivel con IA operativa: sitios que convierten, posicionan en Google y en los asistentes de IA (ChatGPT, Perplexity, Gemini), y automatizaciones que ahorran tiempo al dueño del negocio (contestar mensajes, agendar citas, calificar clientes).
+Marcyan Studio combina diseño de alto nivel con IA operativa: sitios que convierten, posicionan en Google y en los asistentes de IA (ChatGPT, Gemini, Meta AI), y automatizaciones que ahorran tiempo al dueño del negocio (contestar mensajes, agendar citas, calificar clientes).
 
 ## Servicios
 - Diseño y desarrollo web premium (sitios a la medida, rápidos y optimizados).

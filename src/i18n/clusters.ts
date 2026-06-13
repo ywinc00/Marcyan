@@ -65,7 +65,7 @@ export const clusterNav = {
   links: [
     { label: 'Servicios', href: '/es/servicios' },
     { label: 'Precios', href: '/es/precios' },
-    { label: 'Ciudades', href: '/es/houston' },
+    { label: 'Ciudades', href: '/es/ciudades' },
     { label: 'Blog', href: '/es/blog' },
   ],
   cta: { label: 'Iniciar Proyecto', href: '#contacto' },
@@ -85,7 +85,7 @@ const proj = (...names: string[]): ProjectItem[] =>
 // Caso #0 — este mismo sitio (honesto, ya referenciado en el hero de la home).
 const caso0: ProjectItem = {
   name: 'Este sitio · Caso #0',
-  cat: 'Marcyan · Houston & Miami',
+  cat: 'Marcyan · Nuestro propio sitio',
   url: '/es/',
   display: 'marcyanstudio.com',
   result: 'Construido en HTML estático para que ChatGPT y Gemini puedan leerlo y citarlo.',
@@ -350,7 +350,7 @@ const miamiWeb: ClusterPage = {
   path: '/es/miami/diseno-web',
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
-    { name: 'Miami', path: '/es/#ciudades' },
+    { name: 'Miami', path: '/es/miami' },
     { name: 'Diseño Web', path: '/es/miami/diseno-web' },
   ],
   hero: {
@@ -379,7 +379,7 @@ const miamiWeb: ClusterPage = {
     tag: 'Por qué Miami',
     title: 'Miami es <em>bilingüe por naturaleza</em>',
     paragraphs: [
-      'Miami es uno de los mercados más hispanos de Estados Unidos: el español no es un «extra», es el idioma de tus clientes. Un sitio que no habla su idioma — y que no carga rápido en el celular — deja dinero sobre la mesa.',
+      'Miami es uno de los mercados más hispanos de Estados Unidos — cerca del 69% de Miami-Dade, de Hialeah a Doral y de Brickell a Kendall —, y el español no es un «extra»: es el idioma de tus clientes. Un sitio que no habla su idioma, y que no carga rápido en el celular, deja dinero sobre la mesa.',
       '<strong>Seamos transparentes:</strong> apenas estamos abriendo nuestra operación de diseño en Miami, así que todavía no mostramos casos locales aquí. Lo que sí mostramos es trabajo real y verificable que ya hicimos para otros negocios (en Houston y Orlando) — y buscamos a nuestros primeros Clientes Fundadores de Miami para sumar casos de esta ciudad.',
     ],
     tone: 'gold',
@@ -425,9 +425,9 @@ const miamiWeb: ClusterPage = {
     tag: 'Sigue explorando',
     title: 'Servicios relacionados',
     links: [
-      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Nuestra base de operaciones, con casos verificables.', icon: 'lucide:layout-template' },
-      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio aparezca en Google y en Maps.', icon: 'lucide:search' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Suma asistentes y automatización a tu sitio.', icon: 'lucide:bot' },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:message-circle' },
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:layout-template' },
     ],
   },
   service: {
@@ -1282,6 +1282,366 @@ const houstonBranding: ClusterPage = {
 };
 
 // ── Registro de las landings (clave = slug de ruta) ──
+// ═══════════════════════════════════════════════════════════════
+// SILO MIAMI (Ola 2 · Bloque 3). Contexto GENUINO de Miami (NO clon de Houston):
+//   Miami-Dade ~69% hispano (Census) — mayoría absoluta, español = lengua del
+//   comercio. Liderado por cubanos (~51%) pero pan-latino: venezolanos (Doral),
+//   colombianos (Kendall/Brickell), nicaragüenses (Sweetwater). Español CARIBEÑO
+//   (NO modismos mexicanos). Mercado SATURADO en web/SEO → diferenciar por
+//   honestidad/AEO, NO precio. Honestidad DURA: SIN clientes en Miami → Cliente
+//   Fundador + proof etiquetado por su ciudad real (Houston/Orlando), nunca Miami.
+// ═══════════════════════════════════════════════════════════════
+const miamiIa: ClusterPage = {
+  meta: {
+    title: 'IA Conversacional en Miami | Asistente que contesta 24/7 | Marcyan',
+    description:
+      'Asistente con IA para negocios de Miami: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde $900.',
+  },
+  path: '/es/miami/ia-conversacional',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Miami', path: '/es/miami' },
+    { name: 'IA Conversacional', path: '/es/miami/ia-conversacional' },
+  ],
+  hero: {
+    badge: 'Miami, FL',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'IA Conversacional',
+    h1: 'Asistente de IA para tu <em>negocio</em> en Miami',
+    sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en el español de tus clientes las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
+    primary: { label: 'Quiero una propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver cómo funciona', href: '#faq' },
+    chips: ['En español de verdad', 'Te lo instalamos y mantenemos', 'Siempre te pasa con una persona'],
+    tone: 'teal',
+  },
+  answer: {
+    q: '¿Cómo puede un asistente de IA ayudar a un negocio en Miami?',
+    a: 'En Miami tus clientes te escriben por WhatsApp, y el que contesta primero se queda con la venta. Un asistente de IA responde al instante, agenda citas y atiende en español las 24 horas. Responder en los primeros 5 minutos hace 21 veces más probable calificar un prospecto que esperar 30, según el Lead Response Management Study del MIT.',
+    source: 'Lead Response Management Study (MIT)',
+  },
+  includes: {
+    tag: 'Qué hace por ti',
+    title: 'IA que <em>no deja escapar</em> ni un cliente',
+    items: [
+      { icon: 'lucide:message-circle', title: 'Contesta WhatsApp y mensajes', desc: 'WhatsApp es el canal donde el cliente cubano, venezolano o colombiano de Miami te escribe. La IA responde y da seguimiento a cualquier hora, hasta de madrugada.' },
+      { icon: 'lucide:calendar-check', title: 'Agenda citas y reservas solo', desc: 'Tu restaurante, tu clínica estética o tu taller llenan la agenda sin que pares de trabajar: el cliente reserva por su cuenta, de día o de noche.' },
+      { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando no puedes contestar, la IA responde por mensaje al instante para que el cliente no se vaya con el de al lado.' },
+      { icon: 'lucide:languages', title: 'Habla como se habla en Miami', desc: 'Lo configuramos en el español que de verdad usan tus clientes, con su acento y su tono. No suena a traducción ni a robot, y detecta si prefieren inglés.' },
+      { icon: 'lucide:user-round', title: 'Siempre te pasa con una persona', desc: 'Cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda atrapado con un robot.' },
+      { icon: 'lucide:wrench', title: 'Lo instalamos y mantenemos', desc: 'No te entregamos un software para que pelees con él: lo dejamos funcionando, entrenado con tu negocio, y lo cuidamos.' },
+    ],
+    tone: 'teal',
+  },
+  local: {
+    tag: 'Por qué con nosotros',
+    title: 'Una agencia hispana que <em>te lo instala</em>, no un software que peleas solo',
+    paragraphs: [
+      'En internet hay decenas de apps de IA que te venden una suscripción y te dejan solo para configurarla. Para un negocio ocupado, eso casi siempre termina olvidado. Nosotros trabajamos distinto: te lo instalamos, lo entrenamos con tu negocio y le damos mantenimiento — tú no tocas nada.',
+      'En Miami eso pesa todavía más: aquí el primer contacto pasa por WhatsApp, desde la cafetería de Hialeah hasta la clínica de Brickell, y casi siempre en español. Configuramos el asistente para que hable como tus clientes — cubano, venezolano, colombiano — y conteste al toque. <strong>Tú te dedicas a tu negocio; de la tecnología nos encargamos nosotros.</strong>',
+    ],
+    tone: 'teal',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Asistente con IA, <em>desde $900</em>',
+    price: '$900',
+    unit: 'proyecto inicial',
+    lead: 'Empezamos con una solución concreta a tu mayor dolor — no con un proyecto enorme.',
+    features: [
+      'Asistente configurado a medida',
+      'En el español de tus clientes',
+      'Integración con WhatsApp y tu calendario',
+      'Mensajes y respuestas listos',
+      'Capacitación para tu equipo',
+      'Instalación y mantenimiento',
+    ],
+    cta: { label: 'Quiero automatizar mi negocio', href: '#contacto' },
+    note: '$900 es el punto de partida para una automatización inicial (por ejemplo, un asistente o una agenda de citas). A diferencia de una suscripción de software que configuras tú, aquí incluimos la instalación, el entrenamiento con tu negocio y el mantenimiento. Los proyectos más completos se cotizan según el alcance.',
+    tone: 'teal',
+  },
+  proof: {
+    tag: 'Automatización real',
+    title: 'Automatización que <em>ya está en vivo</em>',
+    cta: { label: 'Quiero algo así', href: '#contacto' },
+    // Rosy Nails = web-app real de reservas (Houston) + Caso #0. NO son de Miami.
+    items: [...proj('Rosy Nails & Care'), caso0],
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'IA para tu negocio en Miami, en <em>simple</em>',
+    items: [
+      { q: '¿Cuánto cuesta poner un asistente con IA en mi negocio?', a: 'Una automatización inicial empieza en $900 e incluye la instalación, el entrenamiento con tu negocio y el mantenimiento — no es solo una suscripción de software que configuras tú. Empezamos con una sola solución a tu mayor dolor y crecemos desde ahí. Te damos un precio claro en la propuesta gratuita.' },
+      { q: '¿Necesito saber de tecnología para usarlo?', a: 'No, y esa es justamente la idea. Nosotros lo configuramos, lo conectamos y te lo dejamos funcionando, con una capacitación sencilla para tu equipo. Tú te dedicas a tu negocio; de la parte técnica nos encargamos nosotros.' },
+      { q: '¿El asistente habla en el español de Miami o suena como robot?', a: 'Habla como tus clientes: el español que de verdad se usa en Miami — cubano, venezolano, colombiano —, con el tono de tu negocio. No es una traducción robótica, y detecta si el cliente prefiere inglés.' },
+      { q: '¿La IA puede contestar mi WhatsApp y agendar citas sola?', a: 'Sí. Conectamos el asistente con tu WhatsApp, tu calendario y las herramientas que ya usas, para que responda y agende citas o reservas a cualquier hora — ideal para restaurantes, clínicas, talleres y consultorios. En la propuesta te decimos con honestidad qué se puede integrar y qué no.' },
+      { q: '¿Qué pasa si el cliente quiere hablar con una persona?', a: 'Siempre puede. El asistente está hecho para ayudar, no para atrapar a nadie: cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda dando vueltas con un robot.' },
+      { q: '¿En cuánto tiempo queda funcionando?', a: 'Una automatización inicial suele quedar lista en una a tres semanas, según qué herramientas conectemos y qué tan listo esté tu contenido (respuestas, horarios, servicios). Te damos un calendario realista desde el inicio.' },
+    ],
+  },
+  cta: {
+    title: 'Deja de perder clientes por <em>no contestar</em>',
+    sub: 'En Miami, el cliente que te escribe por WhatsApp y no recibe respuesta se va con otro. Cuéntanos tu mayor dolor y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'teal',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:message-circle' },
+    ],
+  },
+  service: {
+    name: 'IA Conversacional en Miami',
+    serviceType: 'Automatización con IA y asistentes conversacionales',
+    description:
+      'Asistentes conversacionales con IA para negocios en Miami: rescate de WhatsApp y llamadas perdidas, agenda de citas y soporte 24/7 en el español de los clientes de Miami. Instalación y mantenimiento incluidos.',
+    path: '/es/miami/ia-conversacional',
+    areaCity: 'Miami',
+    areaRegion: 'Florida',
+    priceValue: '900',
+    providerId: MIAMI_ID,
+  },
+};
+
+const miamiSeo: ClusterPage = {
+  meta: {
+    title: 'SEO Local en Miami: posiciona tu negocio en Google | Marcyan',
+    description:
+      'Agencia de SEO local en Miami para negocios hispanos. Optimizamos tu Perfil de Google, tu sitio y tus reseñas para que te encuentren en Miami-Dade. Propuesta gratis en 24h.',
+  },
+  path: '/es/miami/seo-local',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Miami', path: '/es/miami' },
+    { name: 'SEO Local', path: '/es/miami/seo-local' },
+  ],
+  hero: {
+    badge: 'Miami, FL',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'SEO Local',
+    h1: 'SEO Local en <em>Miami</em>',
+    sub: 'Aparece cuando tus clientes buscan en Google Maps y en los asistentes de IA. Optimizamos tu presencia local para que tu negocio en Miami gane más llamadas, visitas y reseñas — en español e inglés.',
+    primary: { label: 'Propuesta gratis en 24h', href: '#contacto' },
+    secondary: { label: 'Ver cómo trabajamos', href: '#proceso' },
+    chips: ['Bilingüe ES/EN', 'Sin contratos eternos', 'Reportes claros'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué es el SEO local y cómo ayuda a un negocio en Miami?',
+    a: 'El SEO local es el trabajo de optimización que hace que tu negocio aparezca cuando alguien busca un servicio «cerca de mí» en Miami. Importa porque el 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'SEO local que <em>sí</em> mueve la aguja',
+    items: [
+      { icon: 'lucide:map-pin', title: 'Perfil de Google de Negocio', desc: 'Creamos u optimizamos tu ficha: categorías, servicios, fotos, descripción bilingüe y publicaciones.' },
+      { icon: 'lucide:list-checks', title: 'NAP consistente', desc: 'Tu nombre, dirección y teléfono idénticos en Google, Bing, Apple Maps y directorios — la base que la IA lee.' },
+      { icon: 'lucide:file-text', title: 'Contenido y páginas locales', desc: 'Páginas por servicio y zona, escritas para tu mercado de Miami, en español e inglés.' },
+      { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'Te ayudamos a pedir y responder reseñas de forma constante, en el idioma de cada cliente.' },
+      { icon: 'lucide:gauge', title: 'SEO técnico y velocidad', desc: 'Sitio rápido en HTML que Google y los asistentes de IA pueden leer sin tropiezos.' },
+      { icon: 'lucide:bot', title: 'Listo para la IA (AEO)', desc: 'Tu información en Bing y en un formato que ChatGPT y Gemini pueden citar.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué local',
+    title: 'En Miami, el español <em>manda</em>',
+    paragraphs: [
+      'Miami-Dade es uno de los mercados más hispanos de Estados Unidos: cerca del 69% de su población es latina, según el U.S. Census Bureau (ACS 2023). Aquí el español no es un «extra», es la lengua del comercio — y aparecer en el «paquete local» de Google Maps, en español, puede ser la diferencia entre una llamada y un cliente perdido.',
+      'Trabajamos toda el área de Miami-Dade con contexto real: Doral, Hialeah, Kendall, Coral Gables, Brickell y más. <strong>Conocemos a tu cliente</strong> — cubano, venezolano, colombiano — y optimizamos para cómo busca de verdad, en el español que de verdad habla.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'SEO local, <em>desde $600 al mes</em>',
+    price: '$600',
+    unit: '/mes',
+    lead: 'Sin contratos eternos. Empezamos con lo esencial y crecemos según los resultados.',
+    features: [
+      'Optimización del Perfil de Google de Negocio',
+      'NAP en directorios clave',
+      '1 página local optimizada al mes',
+      'Gestión de reseñas',
+      'Reporte mensual claro',
+      'Soporte bilingüe',
+    ],
+    cta: { label: 'Solicitar propuesta', href: '#contacto' },
+    note: 'El precio final depende del estado actual de tu negocio y de tu competencia. Te damos un alcance honesto en la propuesta, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'SEO real y verificable — y <em>buscamos tu negocio</em> en Miami',
+    cta: { label: 'Sé nuestro primer caso en Miami', href: '#contacto' },
+    // Honestidad: NO hay cliente de SEO en Miami. Proof etiquetado por su ciudad
+    // real (Houston). NO se insinúa que sea de Miami; el título y el FAQ lo aclaran.
+    items: proj('Texas Rush Remove', "Julio's Landscape TX"),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'SEO local en Miami, sin <em>letra chica</em>',
+    items: [
+      { q: '¿Cuánto cuesta el SEO local en Miami?', a: 'Nuestros planes de SEO local empiezan en $600 al mes, sin contratos a largo plazo. El precio final depende del estado actual de tu negocio, de tu competencia y de cuántas páginas o ubicaciones trabajemos. Te entregamos un alcance y un precio claros en la propuesta gratuita, antes de que decidas.' },
+      { q: '¿Tienen clientes en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados de esta ciudad. Sí tenemos trabajo de SEO real y verificable hecho para negocios en Houston, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en Miami, con condiciones especiales.' },
+      { q: '¿En cuánto tiempo se ven resultados?', a: 'Las primeras señales suelen aparecer entre 2 y 8 semanas: más reseñas y más vistas en tu ficha de Google. El liderazgo sólido en búsquedas competidas toma de 3 a 6 meses de trabajo constante. El SEO es acumulativo: no es un interruptor, es una inversión que crece.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo de Google. Lo que sí garantizamos es trabajo honesto y medible: optimización correcta, reportes claros y mejoras continuas. Nuestro compromiso es con el método y la transparencia, no con un número imposible de asegurar.' },
+      { q: '¿Qué incluye exactamente el servicio?', a: 'Optimización de tu Perfil de Google de Negocio, consistencia de tu nombre, dirección y teléfono (NAP) en directorios, páginas locales por servicio, gestión de reseñas, SEO técnico y preparación para los asistentes de IA. Ajustamos el alcance a tu presupuesto y a tus prioridades.' },
+      { q: '¿Trabajan en español e inglés?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. En Miami el español es la lengua del comercio, así que priorizamos el contenido en el español que de verdad usan tus clientes, y también lo hacemos en inglés.' },
+    ],
+  },
+  cta: {
+    title: 'Sé uno de nuestros primeros <em>casos en Miami</em>',
+    sub: 'Buscamos Clientes Fundadores en Miami. Cuéntanos sobre tu negocio y recibe una propuesta de SEO local en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Un sitio rápido y a medida es la base de todo buen SEO.', icon: 'lucide:layout-template' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:message-circle' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'SEO Local en Miami',
+    serviceType: 'SEO local',
+    description:
+      'Optimización de SEO local para negocios en Miami: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe, gestión de reseñas y preparación para asistentes de IA.',
+    path: '/es/miami/seo-local',
+    areaCity: 'Miami',
+    areaRegion: 'Florida',
+    priceValue: '600',
+    monthly: true,
+    providerId: MIAMI_ID,
+  },
+};
+
+const miamiEcommerce: ClusterPage = {
+  meta: {
+    title: 'Diseño de Tienda en Línea en Miami | E-Commerce bilingüe | Marcyan',
+    description:
+      'Diseño de tienda en línea en Miami para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde $2,900. Propuesta gratis en 24h.',
+  },
+  path: '/es/miami/ecommerce',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Miami', path: '/es/miami' },
+    { name: 'Tienda en Línea', path: '/es/miami/ecommerce' },
+  ],
+  hero: {
+    badge: 'Miami, FL',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Tienda en línea',
+    h1: 'Diseño de tienda en línea en <em>Miami</em>',
+    sub: 'Vende en línea las 24 horas con una tienda a medida, rápida y bilingüe. Catálogo, pagos seguros y todo listo para que tus clientes en Miami te compren desde el celular — en español e inglés.',
+    primary: { label: 'Cotizar mi tienda', href: '#contacto' },
+    secondary: { label: 'Ver todos los precios', href: '/es/precios' },
+    chips: ['Pagos seguros', 'Bilingüe ES/EN', 'Shopify, WooCommerce o a medida'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta una tienda en línea en Miami?',
+    a: 'Una tienda en línea profesional en Miami empieza en $2,900 e incluye catálogo, carrito, pagos seguros y versión bilingüe. Y en Miami, puerta de Latinoamérica, una tienda te deja venderle a la comunidad hispana local y más allá: el comercio electrónico ya supera el 16% de las ventas minoristas en EE.UU., según el U.S. Census Bureau.',
+    source: 'U.S. Census Bureau',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Una tienda lista para <em>vender</em>',
+    items: [
+      { icon: 'lucide:shopping-bag', title: 'Catálogo y carrito', desc: 'Tus productos organizados, con fotos y variantes, y un carrito de compras claro y fácil de usar.' },
+      { icon: 'lucide:credit-card', title: 'Pagos seguros, también de fuera', desc: 'Aceptas tarjeta y PayPal con pasarelas confiables como Stripe — incluido el cliente que paga desde Latinoamérica. Te guiamos con la cuenta y los requisitos.' },
+      { icon: 'lucide:smartphone', title: 'Diseñada para el celular', desc: 'La mayoría compra desde el teléfono. Tu tienda carga rápido y se ve impecable en cualquier pantalla.' },
+      { icon: 'lucide:languages', title: 'Bilingüe para Miami y la región', desc: 'Le vendes en español a la comunidad cubana, venezolana y colombiana de Miami, y amplías tu alcance en inglés — todo en la misma tienda.' },
+      { icon: 'lucide:search', title: 'Lista para Google y la IA', desc: 'Estructura optimizada para que te encuentren en buscadores y en asistentes como ChatGPT.' },
+      { icon: 'lucide:settings', title: 'La plataforma correcta para ti', desc: 'Shopify, WooCommerce o una solución a medida — la elegimos contigo según tu producto y tu presupuesto.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Cómo lo hacemos',
+    title: '¿Shopify, WooCommerce o <em>a medida</em>?',
+    paragraphs: [
+      'En Miami hay tiendas para todo — desde la repostería de Hialeah hasta la marca de moda de Wynwood — y cada una pide su plataforma. No vendemos una sola a la fuerza: Shopify para lanzar rápido y vender simple, WooCommerce si necesitas más control o ya usas WordPress, y a medida para lo especial. Lo elegimos contigo, con honestidad, según tu producto y tu presupuesto.',
+      'Para vender en Estados Unidos hay requisitos que son tuyos: una cuenta para recibir pagos y, según el caso, tu EIN del IRS. <strong>Te guiamos paso a paso en todo el proceso.</strong> Y como Miami es puerta de Latinoamérica y tu mercado es bilingüe, diseñamos tu tienda en español e inglés desde el inicio — para venderle a la comunidad hispana de Miami y más allá.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Tienda en línea, <em>desde $2,900</em>',
+    price: '$2,900',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de productos y de las funciones que necesites.',
+    features: [
+      'Diseño a medida de tu tienda',
+      'Catálogo y carrito de compras',
+      'Pagos seguros (tarjeta y PayPal)',
+      'Versión en español e inglés',
+      'Optimización SEO base',
+      'Lista para móvil y para la IA',
+    ],
+    cta: { label: 'Cotizar mi tienda', href: '#contacto' },
+    note: '$2,900 es el punto de partida para una tienda profesional. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y la migración si ya tienes una tienda. El mantenimiento y la actualización de productos se cotizan aparte, siempre con un precio claro.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Construimos a medida, y <em>buscamos tu tienda</em> en Miami',
+    cta: { label: 'Sé nuestro primer caso de e-commerce', href: '#contacto' },
+    // Honestidad: NO hay cliente e-commerce ni de Miami. Capacidad real (web-app
+    // Rosy Nails + sitios en vivo de Houston), etiquetada por lo que es.
+    items: proj('Rosy Nails & Care', 'Texas Rush Remove', "Julio's Landscape TX"),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu tienda en línea en Miami, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta hacer una tienda en línea en Miami?', a: 'Una tienda profesional a medida empieza en $2,900. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y si hay que migrar una tienda existente. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Qué es mejor para mi tienda: Shopify o WooCommerce?', a: 'Depende de tu caso. Shopify es ideal para lanzar rápido y vender simple, sin preocuparte por lo técnico; WooCommerce te da más control y encaja si ya usas WordPress. Para necesidades especiales construimos a medida. Lo elegimos contigo con honestidad, según tu producto y tu presupuesto.' },
+      { q: '¿Cómo recibo los pagos con tarjeta y PayPal?', a: 'Tu tienda se conecta con pasarelas seguras como Stripe y PayPal. Para vender en Estados Unidos necesitas una cuenta para recibir pagos y, según el caso, tu EIN del IRS; te guiamos paso a paso en lo que es tuyo, sin dejarte solo con la parte complicada.' },
+      { q: '¿La tienda incluye dominio, hospedaje y certificado de seguridad (SSL)?', a: 'Te orientamos con el dominio, el hospedaje y el certificado SSL para que tu tienda salga en vivo y segura, sin dolores de cabeza. Según la plataforma, algunos van incluidos en su plan; te explicamos con claridad qué se paga y a quién, antes de empezar.' },
+      { q: '¿La tienda es bilingüe, y puedo venderle a clientes fuera de Miami?', a: 'Sí a las dos. Diseñamos tu tienda en español e inglés desde el inicio, para venderle a la comunidad cubana, venezolana y colombiana de Miami. Y como Miami es puerta de Latinoamérica, la dejamos lista para recibir pedidos y pagos de clientes en otros países, si tu producto se presta.' },
+      { q: '¿Tienen tiendas en línea ya hechas en Miami que pueda ver?', a: 'Seremos honestos: estamos comenzando con e-commerce y nuestra operación en Miami, así que todavía no publicamos un caso de tienda propio en esta ciudad. Sí construimos web-apps y sitios a medida que ya están en vivo (como la app de reservas de Rosy Nails). Por eso ofrecemos cupos de Cliente Fundador para tu tienda, con condiciones especiales.' },
+    ],
+  },
+  cta: {
+    title: 'Empieza a vender en línea en <em>Miami</em>',
+    sub: 'En Miami, una tienda en línea bilingüe te abre la comunidad local y la región. Cuéntanos qué vendes y cuántos productos tienes, y recibe una propuesta en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Cotizar mi tienda gratis', href: '#contacto' },
+    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Si aún no necesitas vender en línea, empieza por tu sitio.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Que tu tienda aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:shopping-bag' },
+    ],
+  },
+  service: {
+    name: 'Diseño de Tienda en Línea en Miami',
+    serviceType: 'Diseño de tienda en línea (e-commerce)',
+    description:
+      'Diseño y desarrollo de tiendas en línea a medida para negocios en Miami: catálogo, carrito, pagos seguros, bilingüe (español e inglés), en Shopify, WooCommerce o a medida.',
+    path: '/es/miami/ecommerce',
+    areaCity: 'Miami',
+    areaRegion: 'Florida',
+    priceValue: '2900',
+    providerId: MIAMI_ID,
+  },
+};
+
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
@@ -1289,6 +1649,9 @@ export const clusters = {
   'houston/ecommerce': houstonEcommerce,
   'houston/branding': houstonBranding,
   'miami/diseno-web': miamiWeb,
+  'miami/ia-conversacional': miamiIa,
+  'miami/seo-local': miamiSeo,
+  'miami/ecommerce': miamiEcommerce,
   'ia-para-pymes': iaPymes,
   'precios/cuanto-cuesta-una-pagina-web-houston': precioWebHouston,
   'precios/cuanto-cuesta-un-chatbot': precioChatbot,

@@ -27,7 +27,7 @@ export const content = {
       links: [
         { label: 'Servicios', href: '/es/servicios' },
         { label: 'Precios', href: '/es/precios' },
-        { label: 'Ciudades', href: '/es/houston' },
+        { label: 'Ciudades', href: '/es/ciudades' },
         { label: 'Blog', href: '/es/blog' },
       ] as Link[],
       cta: { label: 'Iniciar Proyecto', href: '#contacto' },
@@ -168,7 +168,11 @@ export const content = {
           ] },
         { city: 'Miami', state: 'FL', badge: 'Área de servicio', area: 'Miami y toda el área metropolitana', tel: nap.miami,
           links: [
+            { label: 'Agencia en Miami', href: '/es/miami' },
             { label: 'Diseño web en Miami', href: '/es/miami/diseno-web' },
+            { label: 'SEO local en Miami', href: '/es/miami/seo-local' },
+            { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional' },
+            { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce' },
           ] },
       ],
     },
@@ -215,12 +219,13 @@ export const content = {
           { label: 'Términos', href: '/terminos' },
         ] },
         { title: 'Ciudades', links: [
+          { label: 'Houston y Miami', href: '/es/ciudades' },
           { label: 'Agencia en Houston', href: '/es/houston' },
           { label: 'Diseño Web · Houston', href: '/es/houston/diseno-web' },
-          { label: 'SEO Local · Houston', href: '/es/houston/seo-local' },
           { label: 'IA Conversacional · Houston', href: '/es/houston/ia-conversacional' },
-          { label: 'Tienda en Línea · Houston', href: '/es/houston/ecommerce' },
+          { label: 'Agencia en Miami', href: '/es/miami' },
           { label: 'Diseño Web · Miami', href: '/es/miami/diseno-web' },
+          { label: 'IA Conversacional · Miami', href: '/es/miami/ia-conversacional' },
         ] },
       ],
       legal: [

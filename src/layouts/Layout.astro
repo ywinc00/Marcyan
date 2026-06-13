@@ -90,7 +90,9 @@ const jsonLd = {
       email: nap.email,
       priceRange: '$$',
       knowsLanguage: ['es', 'en'],
-      address: { '@type': 'PostalAddress', addressLocality: 'Miami', addressRegion: 'FL', addressCountry: 'US' },
+      // SAB sin presencia física en Miami: solo areaServed (sin PostalAddress),
+      // coherente con el copy "sin dirección pública". Houston sí lleva address
+      // por ser la base de operaciones.
       areaServed: { '@type': 'City', name: 'Miami' },
     },
   ],

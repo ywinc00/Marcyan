@@ -1,0 +1,98 @@
+---
+// ÍNDICE DE CIUDADES · /es/ciudades — nodo raíz del silo geográfico (Ola 2 · B3).
+// Resuelve la nav "Ciudades" ahora que hay 2 hubs (Houston + Miami). Mínimo:
+// presenta las 2 ciudades y enlaza a sus hubs. Schema: ItemList (los 2 hubs) +
+// BreadcrumbList. Reusa componentes del DS. ES por ahora (hasEn=false).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import ItemListLd from '../../components/seo/ItemListLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+
+const c = content.es;
+
+const hero = {
+  kicker: 'Nuestras ciudades',
+  h1: 'Houston y <em>Miami</em>',
+  sub: 'Atendemos a negocios hispanos en Houston, Texas y Miami, Florida — en español e inglés, con contexto local real de cada mercado. Elige tu ciudad para ver los servicios.',
+  primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+  secondary: { label: 'Ver servicios', href: '/es/servicios' },
+  chips: ['Houston, TX', 'Miami, FL', 'Bilingüe ES/EN'],
+  tone: 'gold' as const,
+};
+const breadcrumb = [
+  { name: 'Inicio', path: '/es/' },
+  { name: 'Ciudades', path: '/es/ciudades' },
+];
+const answer = {
+  q: '¿En qué ciudades trabaja Marcyan?',
+  a: 'Marcyan Studio atiende a negocios hispanos en Houston, Texas y Miami, Florida, como negocio de área de servicio (sin oficina pública). En ambas trabajamos diseño web, IA conversacional y SEO local, en español e inglés y con contexto local real — Houston es nuestra base de operaciones, con casos verificables.',
+};
+const cities = {
+  tag: 'Elige tu ciudad',
+  title: 'Dos ciudades, un <em>mismo equipo</em>',
+  links: [
+    { label: 'Agencia en Houston, TX', href: '/es/houston', desc: 'Nuestra base: diseño web, SEO, IA, e-commerce y branding, con casos reales.', icon: 'lucide:map-pin' },
+    { label: 'Agencia en Miami, FL', href: '/es/miami', desc: 'Diseño web, SEO local, IA y tiendas — en el español del Caribe. Cupos de Cliente Fundador.', icon: 'lucide:map-pin' },
+  ],
+};
+const cta = {
+  title: 'Cuéntanos de tu negocio, <em>te orientamos gratis</em>',
+  sub: 'En menos de 24 horas recibes una propuesta con alcance y precio claros, sin compromiso — en tu ciudad y en tu idioma.',
+  primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+  secondary: { label: 'Ver formulario completo', href: '/formulario' },
+  tone: 'gold' as const,
+};
+const itemList = [
+  { name: 'Marcyan en Houston, TX', path: '/es/houston' },
+  { name: 'Marcyan en Miami, FL', path: '/es/miami' },
+];
+---
+<Layout
+  title="Ciudades — Houston y Miami | Agencia hispana bilingüe | Marcyan"
+  description="Marcyan Studio trabaja con negocios hispanos en Houston, TX y Miami, FL: diseño web, IA y SEO local, en español e inglés. Elige tu ciudad."
+  lang="es"
+  path="ciudades"
+  hasEn={false}
+>
+  <ItemListLd slot="head" items={itemList} name="Ciudades de Marcyan Studio" />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      kicker={hero.kicker}
+      h1={hero.h1}
+      sub={hero.sub}
+      primary={hero.primary}
+      secondary={hero.secondary}
+      chips={hero.chips}
+      tone={hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={answer.q} a={answer.a} />
+
+    <RelatedLinks tag={cities.tag} title={cities.title} links={cities.links} />
+
+    <CtaBand
+      title={cta.title}
+      sub={cta.sub}
+      primary={cta.primary}
+      secondary={cta.secondary}
+      tone={cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

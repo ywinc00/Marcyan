@@ -50,6 +50,18 @@ export interface ServiceInput {
   monthly?: boolean;
   /** @id del proveedor (por defecto, una de las ProfessionalService del Layout). */
   providerId?: string;
+  /** Producto multi-nivel: si se define, el Service emite un Offer por nivel
+   *  (p.ej. AEO: diagnóstico gratis + cimientos + monitoreo). priceValue se ignora
+   *  para los offers (cada nivel trae el suyo). "0" = gratis. */
+  tiers?: ServiceTier[];
+}
+
+export interface ServiceTier {
+  name: string;
+  /** Valor numérico; "0" = gratis. */
+  priceValue: string;
+  /** true → tarifa recurrente mensual. */
+  monthly?: boolean;
 }
 
 /** Service con provider enlazado al @id de la Organization/ProfessionalService. */
@@ -66,6 +78,7 @@ export function service(input: ServiceInput) {
     unitText,
     monthly = false,
     providerId = ORG_ID,
+    tiers,
   } = input;
 
   const areaServed = areaCity
@@ -75,20 +88,36 @@ export function service(input: ServiceInput) {
         { '@type': 'City', name: 'Miami' },
       ];
 
-  const priceSpec: Record<string, unknown> = monthly
-    ? {
-        '@type': 'UnitPriceSpecification',
-        price: priceValue,
-        priceCurrency,
-        // "$X por mes" canónico (1 mes = unitCode MON), espejo de offerCatalog().
-        referenceQuantity: { '@type': 'QuantitativeValue', value: '1', unitCode: 'MON' },
-      }
-    : {
-        '@type': 'PriceSpecification',
-        price: priceValue,
-        priceCurrency,
-        ...(unitText ? { unitText } : {}),
-      };
+  const url = abs(path);
+  // Un Offer (con su priceSpecification: mensual = UnitPriceSpecification MON).
+  const mkOffer = (value: string, isMonthly?: boolean, tierName?: string) => ({
+    '@type': 'Offer',
+    ...(tierName ? { name: tierName } : {}),
+    price: value,
+    priceCurrency,
+    priceSpecification: isMonthly
+      ? {
+          '@type': 'UnitPriceSpecification',
+          price: value,
+          priceCurrency,
+          // "$X por mes" canónico (1 mes = unitCode MON), espejo de offerCatalog().
+          referenceQuantity: { '@type': 'QuantitativeValue', value: '1', unitCode: 'MON' },
+        }
+      : {
+          '@type': 'PriceSpecification',
+          price: value,
+          priceCurrency,
+          ...(unitText ? { unitText } : {}),
+        },
+    availability: 'https://schema.org/InStock',
+    url,
+  });
+
+  // Multi-nivel (p.ej. AEO) → un Offer por nivel; si no, un único Offer.
+  const offers =
+    tiers && tiers.length
+      ? tiers.map((t) => mkOffer(t.priceValue, t.monthly, t.name))
+      : mkOffer(priceValue, monthly);
 
   return {
     '@context': 'https://schema.org',
@@ -96,17 +125,10 @@ export function service(input: ServiceInput) {
     name,
     serviceType,
     description,
-    url: abs(path),
+    url,
     provider: { '@id': providerId },
     areaServed,
-    offers: {
-      '@type': 'Offer',
-      price: priceValue,
-      priceCurrency,
-      priceSpecification: priceSpec,
-      availability: 'https://schema.org/InStock',
-      url: abs(path),
-    },
+    offers,
   };
 }
 

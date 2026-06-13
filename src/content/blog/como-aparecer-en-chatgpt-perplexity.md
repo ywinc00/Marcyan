@@ -21,6 +21,10 @@ faq:
   - q: "¿Necesito un sitio nuevo para que la IA me lea?"
     a: "No siempre, pero importa cómo está construido. Los rastreadores de IA no ejecutan JavaScript (Vercel y MERJ, 2025), así que los sitios que dependen de JS para mostrar su contenido —muchos hechos en Wix o React— quedan prácticamente invisibles para la IA. Si tu sitio es lento o se arma con JavaScript, conviene revisarlo."
 related:
+  - label: "SEO para IA en Houston (servicio)"
+    href: "/es/houston/seo-para-ia"
+    desc: "Te lo implementamos: diagnóstico gratis, cimientos y monitoreo."
+    icon: "lucide:bot"
   - label: "IA para tu negocio (PYMEs)"
     href: "/es/ia-para-pymes"
     desc: "Cómo la inteligencia artificial ayuda a un negocio pequeño."

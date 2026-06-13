@@ -1,0 +1,90 @@
+---
+// LANDING · /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
+// El mayor wedge: que ChatGPT/Perplexity/Google te RECOMIENDEN a TI. Página
+// bespoke (patrón /es/servicios) que reusa los componentes del DS + PriceGrid
+// para los 3 niveles (diagnóstico gratis · cimientos $500 · monitoreo $200/mes).
+// Schema: Service con Offer×3 (ServiceLd con tiers) + FAQPage (Faq) +
+// BreadcrumbList (Breadcrumb). ES por ahora (hasEn=false).
+import Layout from '../../../layouts/Layout.astro';
+import SiteNav from '../../../components/layout/SiteNav.astro';
+import SiteFooter from '../../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
+import Prose from '../../../components/sections/Prose.astro';
+import PriceGrid from '../../../components/sections/PriceGrid.astro';
+import FeatureGrid from '../../../components/sections/FeatureGrid.astro';
+import Faq from '../../../components/sections/Faq.astro';
+import CtaBand from '../../../components/sections/CtaBand.astro';
+import Contact from '../../../components/sections/Contact.astro';
+import ServiceLd from '../../../components/seo/ServiceLd.astro';
+import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
+import { content } from '../../../i18n/content';
+import { clusterNav } from '../../../i18n/clusters';
+import { seoIaPage as p, aeoTiers } from '../../../i18n/seo-ia';
+
+const c = content.es;
+---
+<Layout
+  title={p.meta.title}
+  description={p.meta.description}
+  lang="es"
+  path="houston/seo-para-ia"
+  hasEn={false}
+>
+  <ServiceLd slot="head" {...p.service} />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+
+  <main id="main">
+    <LandingHero
+      badge={p.hero.badge}
+      badgeIcon={p.hero.badgeIcon}
+      kicker={p.hero.kicker}
+      h1={p.hero.h1}
+      sub={p.hero.sub}
+      primary={p.hero.primary}
+      secondary={p.hero.secondary}
+      chips={p.hero.chips}
+      tone={p.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={p.answer.q} a={p.answer.a} source={p.answer.source} />
+
+    <Prose
+      tag={p.distinction.tag}
+      title={p.distinction.title}
+      paragraphs={p.distinction.paragraphs}
+      tone={p.distinction.tone}
+    />
+
+    <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={aeoTiers} />
+
+    <FeatureGrid tag={p.mechanics.tag} title={p.mechanics.title} items={p.mechanics.items} tone={p.mechanics.tone} />
+
+    <Prose
+      tag={p.caso0.tag}
+      title={p.caso0.title}
+      paragraphs={p.caso0.paragraphs}
+      tone={p.caso0.tone}
+    />
+
+    <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
+
+    <CtaBand
+      title={p.cta.title}
+      sub={p.cta.sub}
+      primary={p.cta.primary}
+      secondary={p.cta.secondary}
+      tone={p.cta.tone}
+    />
+
+    <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

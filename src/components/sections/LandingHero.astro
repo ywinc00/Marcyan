@@ -38,7 +38,7 @@ const { badge, badgeIcon, kicker, h1, sub, primary, secondary, chips = [], tone 
       {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
     </div>
     {chips.length > 0 && (
-      <ul class="l-hero__chips" aria-label="Garantías">
+      <ul class="l-hero__chips" aria-label="Puntos clave">
         {chips.map((ch) => (
           <li><Icon name="lucide:check" /> {ch}</li>
         ))}

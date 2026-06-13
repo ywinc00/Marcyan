@@ -28,7 +28,7 @@ const { tag, title, intro, items } = Astro.props;
           <div class="pcard__top">
             <span class="pcard__icon"><Icon name={s.icon} /></span>
             <span class="pcard__price">
-              <span class="pcard__from">desde</span>
+              {!s.free && <span class="pcard__from">desde</span>}
               <span class="pcard__amt">{s.displayPrice}</span>
               <span class="pcard__unit">{s.displayUnit}</span>
             </span>

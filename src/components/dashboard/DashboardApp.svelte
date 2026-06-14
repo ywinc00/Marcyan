@@ -232,19 +232,32 @@
           <div class="panel">
             <div class="panel__lbl">Actividad por mes <span class="panel__sub">leads + briefs</span></div>
             {#if home}
-              <svg class="chart" viewBox="0 0 560 180" role="img" aria-label="Actividad por mes">
+              <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Actividad por mes">
+                <defs>
+                  <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(200,169,110)" flood-opacity="0.5" />
+                  </filter>
+                </defs>
+                <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
+                <line x1="0" y1="82" x2="560" y2="82" class="chart__grid" />
+                <line x1="0" y1="120" x2="560" y2="120" class="chart__grid" />
+                <line x1="0" y1="158" x2="560" y2="158" class="chart__base" />
                 {#each activity as a, i}
                   <rect
-                    x={i * (560 / activity.length) + (560 / activity.length) * 0.22}
-                    y={150 - (a.total / chartMax) * 132}
-                    width={(560 / activity.length) * 0.56}
-                    height={(a.total / chartMax) * 132}
-                    rx="3"
-                    fill={i === activity.length - 1 ? 'var(--accent-teal)' : 'var(--accent-gold)'}
-                    opacity={i === activity.length - 1 ? 1 : 0.5} />
-                  <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y="170" text-anchor="middle" class="chart__lbl">{monthLabel(a.month)}</text>
-                  {#if a.total > 0}
-                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={150 - (a.total / chartMax) * 132 - 5} text-anchor="middle" class="chart__val">{a.total}</text>
+                    x={i * (560 / activity.length) + (560 / activity.length) * 0.25}
+                    y={158 - (a.total / chartMax) * 118}
+                    width={(560 / activity.length) * 0.5}
+                    height={(a.total / chartMax) * 118}
+                    rx="5"
+                    fill={i === activity.length - 1 ? 'var(--accent-gold)' : '#2b2b33'}
+                    filter={i === activity.length - 1 ? 'url(#barGlow)' : undefined} />
+                  <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y="180" text-anchor="middle" class="chart__lbl" class:is-active={i === activity.length - 1}>{monthLabel(a.month)}</text>
+                  {#if i === activity.length - 1}
+                    <circle cx={i * (560 / activity.length) + (560 / activity.length) / 2} cy={158 - (a.total / chartMax) * 118} r="3.5" fill="var(--accent-gold)" />
+                    <rect x={i * (560 / activity.length) + (560 / activity.length) / 2 - 16} y={158 - (a.total / chartMax) * 118 - 26} width="32" height="18" rx="5" fill="var(--accent-gold)" />
+                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={158 - (a.total / chartMax) * 118 - 13} text-anchor="middle" class="chart__tip">{a.total}</text>
+                  {:else if a.total > 0}
+                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={158 - (a.total / chartMax) * 118 - 6} text-anchor="middle" class="chart__val">{a.total}</text>
                   {/if}
                 {/each}
               </svg>
@@ -409,7 +422,11 @@
 
   .chart { width: 100%; height: auto; display: block; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
+  .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
   .chart__val { fill: var(--fg-secondary); font-family: var(--font-mono); font-size: 11px; }
+  .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
+  .chart__base { stroke: rgba(255, 255, 255, 0.12); }
+  .chart__tip { fill: var(--fg-inverse); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 
   .funnel { display: flex; flex-direction: column; gap: var(--space-3); }
   .funnel__row { display: flex; align-items: center; gap: var(--space-3); }

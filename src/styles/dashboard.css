@@ -1,0 +1,47 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN · PANEL — capa visual "Orbit" (solo /dashboard)
+   Redefine tokens del DS dentro del panel para adoptar el lenguaje
+   visual de Orbit (bordes hairline, superficies en capas, radios 14px),
+   manteniendo la identidad Marcyan (oro #c8a96e, teal #4fc3a1, fuentes).
+   Importado SOLO por DashboardLayout → no afecta el sitio público.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Superficies en capas (estilo Orbit, base negra Marcyan) ── */
+  --bg-base:     #0c0c10;   /* fondo del panel (main) */
+  --bg-2:        #08080b;   /* sidebar — más oscuro que el main (estilo Orbit) */
+  --bg-card:     #141418;   /* = surface */
+  --bg-elevated: #1b1b20;   /* = surface-2 */
+  --surface-3:   #23232a;   /* tooltips, chips activos */
+
+  /* ── Bordes HAIRLINE translúcidos (clave del look Orbit) ── */
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.045);
+  --border-strong: rgba(255, 255, 255, 0.11);
+  --border-accent: var(--accent-gold-line);
+
+  /* ── Texto: 3 niveles legibles (blanco cálido Marcyan) ── */
+  --fg-primary:   #f1efe9;
+  --fg-secondary: #a6a29b;
+  --fg-subtle:    #6f6d74;
+
+  /* ── Radios Orbit ── */
+  --radius-md: 9px;
+  --radius-lg: 14px;
+
+  /* ── Sombras: planas + glow del acento (barra/CTA destacada) ── */
+  --shadow-card:  none;
+  --shadow-hover: 0 0 0 1px var(--border-strong);
+  --shadow-gold:  0 8px 30px -8px rgba(var(--accent-gold-rgb), 0.55);
+  --shadow-teal:  0 8px 30px -8px rgba(var(--accent-teal-rgb), 0.45);
+}
+
+/* Acento único disciplinado: el oro hace el rol del naranja de Orbit. */
+
+/* Scrollbar sutil acorde al panel */
+.admin-page-scope, .dash *::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: #26262c; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: #34343c; background-clip: padding-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+::selection { background: rgba(var(--accent-gold-rgb), 0.28); color: #fff; }

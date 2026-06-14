@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import BriefsSection from './BriefsSection.svelte';
 
   // ── Estado ───────────────────────────────────────────────────
   let phase = $state('loading');      // loading | login | app
@@ -34,7 +35,7 @@
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', live: true },
     { id: 'leads', label: 'Leads', icon: 'M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5', live: true },
-    { id: 'briefs', label: 'Briefs', icon: 'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6', live: false },
+    { id: 'briefs', label: 'Briefs', icon: 'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6', live: true },
     { id: 'clientes', label: 'Clientes', icon: 'M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 11a4 4 0 100-8 4 4 0 000 8', live: false },
     { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: false },
     { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: false },
@@ -318,6 +319,9 @@
             </table>
           </div>
         {/if}
+
+      {:else if section === 'briefs'}
+        <BriefsSection />
       {/if}
     </main>
   </div>

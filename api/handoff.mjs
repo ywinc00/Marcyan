@@ -35,6 +35,7 @@ export default async function handler(req, res) {
 
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};
+    if (JSON.stringify(body).length > 500000) return res.status(413).json({ ok: false, error: 'Payload demasiado grande' });
 
     // Honeypot anti-spam
     if (body.website_hp) {

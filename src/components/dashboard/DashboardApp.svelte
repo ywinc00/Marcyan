@@ -222,10 +222,22 @@
         <h1 class="greet">Hola, {firstName}</h1>
 
         <div class="kpis">
-          <div class="kpi"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{home ? home.kpis.new_leads : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Briefs pendientes</span><span class="kpi__num">{home ? home.kpis.pending_briefs : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">En curso (mes)</span><span class="kpi__num">{home ? home.kpis.projects_this_month : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Cobrado (mes)</span><span class="kpi__num teal">{home && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span></div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{home?.kpis ? home.kpis.new_leads : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Briefs pendientes</span><span class="kpi__num">{home?.kpis ? home.kpis.pending_briefs : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">En curso (mes)</span><span class="kpi__num">{home?.kpis ? home.kpis.projects_this_month : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Cobrado (mes)</span><span class="kpi__num teal">{home?.kpis && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM3 7l9 6 9-6" /></svg>
+          </div>
         </div>
 
         <div class="home-split">
@@ -389,7 +401,7 @@
   .nav__item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-md); border: 0; background: transparent; color: var(--fg-secondary); font-size: var(--text-sm); cursor: pointer; text-align: left; width: 100%; transition: all var(--duration-fast); }
   .nav__item svg { width: 17px; height: 17px; flex: 0 0 auto; }
   .nav__item:hover:not(:disabled) { background: var(--bg-elevated); color: var(--fg-primary); }
-  .nav__item.active { background: var(--accent-gold-dim); color: var(--accent-gold); border-left: 2px solid var(--accent-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-weight: 500; }
+  .nav__item.active { background: var(--bg-elevated); color: var(--accent-gold); box-shadow: inset 2px 0 0 var(--accent-gold), 0 0 0 1px var(--border); border-radius: var(--radius-md); font-weight: 600; }
   .nav__item.soon { cursor: default; color: var(--fg-subtle); }
   .nav__soon { margin-left: auto; font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-subtle); }
   .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-teal); padding: 8px 10px; border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md); }
@@ -408,7 +420,9 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
 
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; flex-direction: column; gap: 4px; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+  .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .kpi__art { width: 38px; height: 38px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.32; }
   .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); }
   .kpi__num.gold { color: var(--accent-gold); }

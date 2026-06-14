@@ -13,10 +13,11 @@
     return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
   }
   // Dólares de un input de texto → centavos enteros.
+  const MAX_CENTS = 9999999999; // tope 99,999,999.99 USD (evita overflow BIGINT)
   function dollarsToCents(v) {
     const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
-    if (!Number.isFinite(n)) return 0;
-    return Math.round(n * 100);
+    if (!Number.isFinite(n) || n < 0) return 0;
+    return Math.min(Math.round(n * 100), MAX_CENTS);
   }
   const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -40,7 +41,7 @@
   // ── Estado: resumen / KPIs ───────────────────────────────────
   let summary = $state(null);
   const revenue = $derived(summary ? summary.revenue_by_month : []);
-  const chartMax = $derived(Math.max(1, ...revenue.map((r) => r.total_cents)));
+  const chartMax = $derived(Math.max(1, ...revenue.map((r) => Math.max(0, +r.total_cents || 0))));
 
   // ── Estado: facturas ─────────────────────────────────────────
   let invoices = $state([]);

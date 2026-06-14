@@ -1,0 +1,10 @@
+---
+// /dashboard — panel de operaciones de Marcyan.
+// Shell + login reusan la MISMA auth (cookie mrc_admin + requireAdmin) y
+// los endpoints api/admin/*. Toda la zona interactiva es una isla Svelte.
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DashboardApp from '../../components/dashboard/DashboardApp.svelte';
+---
+<DashboardLayout title="Marcyan · Panel">
+  <DashboardApp client:only="svelte" />
+</DashboardLayout>

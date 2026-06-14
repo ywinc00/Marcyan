@@ -524,6 +524,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       }
       const note = variant === 'muestra_gratis' ? 'Solicitó una muestra gratis vía el asistente del sitio.' : 'Pidió que lo contacten vía el asistente del sitio.';
       const body = {
+        source: 'chat',
         owner_name: get('#mrc-c-name'),
         email,
         phone,
@@ -535,7 +536,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
       if (result) result.hidden = true;
       try {
-        const res = await fetch('/api/brief', {
+        const res = await fetch('/api/contact', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
         });
         let data = null; try { data = await res.json(); } catch (_) {}
@@ -543,7 +544,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           captured = true;
           card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
           card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
-          if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = (T.capOk || 'OK').replace('%ID%', data.projectId || '—'); }
+          if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = (T.capOk || 'OK').replace('%ID%', data.refId || data.projectId || '—'); }
         } else { throw new Error('bad response'); }
       } catch (_) {
         if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }

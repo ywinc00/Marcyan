@@ -6,10 +6,10 @@
 //   Autorización (cualquiera de las dos):
 //     · sesión de admin (cookie) — uso desde el dashboard ("Actualizar ahora")
 //     · header Authorization: Bearer <CRON_SECRET> — uso desde el cron de Vercel
-//   Degrada con gracia: si falta GOOGLE_SA_KEY, responde ok:false con
+//   Degrada con gracia: si falta la config WIF, responde ok:false con
 //   error 'not_configured' por proyecto, sin romper.
 import { requireAdmin, readCookie, getSession } from '../../../lib/auth.mjs';
-import { getSeoProject, syncProject, syncAll, isConfigured } from '../../../lib/seo.mjs';
+import { getSeoProject, syncProject, syncAll, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -41,6 +41,10 @@ export default async function handler(req, res) {
     if (!session) return;
     actor = session.email;
   }
+
+  // En runtime, Vercel entrega el token OIDC como header (no como env var);
+  // se lo pasamos a lib/seo para el intercambio WIF de esta invocación.
+  setOidcToken(req.headers['x-vercel-oidc-token']);
 
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};

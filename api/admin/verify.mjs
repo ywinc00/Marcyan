@@ -5,8 +5,10 @@ import {
   buildCookie, clientIp,
 } from '../../lib/auth.mjs';
 
-const REDIRECT_OK    = '/admin/briefs';
-const REDIRECT_FAIL  = '/admin?error=invalid';
+// Tras autenticar, el destino por defecto es el dashboard nuevo.
+// El panel viejo sigue accesible directo en /admin/briefs.
+const REDIRECT_OK    = '/dashboard';
+const REDIRECT_FAIL  = '/dashboard?error=invalid';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

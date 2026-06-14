@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import icon from 'astro-icon';
 import sitemap from '@astrojs/sitemap';
+import svelte from '@astrojs/svelte';
 
 // ─────────────────────────────────────────────────────────────
 // Marcyan Studio — sitio estático bilingüe (ES default / EN).
@@ -18,6 +19,9 @@ export default defineConfig({
   site: 'https://marcyanstudio.com',
   integrations: [
     icon(),
+    // Isla interactiva del dashboard (/dashboard). No afecta el output
+    // estático del sitio público: solo hidrata donde se usa client:*.
+    svelte(),
     // Sitemap auto-generado a partir de src/pages (se mantiene solo en Olas futuras).
     // · NO usamos la opción i18n: las landings de cluster son solo-ES por ahora;
     //   el hreflang lo emite cada página en su <head> (Layout). Así evitamos

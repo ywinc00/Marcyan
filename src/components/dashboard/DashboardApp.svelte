@@ -1,0 +1,324 @@
+<script>
+  import { onMount } from 'svelte';
+
+  // ── Estado ───────────────────────────────────────────────────
+  let phase = $state('loading');      // loading | login | app
+  let user = $state('');
+  let emailInput = $state('');
+  let loginMsg = $state('');
+  let loginSending = $state(false);
+
+  let section = $state('dashboard');  // dashboard | leads
+  let leads = $state([]);
+  let stats = $state(null);
+  let leadsLoading = $state(false);
+  let leadsError = $state('');
+
+  const NAV = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', live: true },
+    { id: 'leads', label: 'Leads', icon: 'M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5', live: true },
+    { id: 'briefs', label: 'Briefs', icon: 'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6', live: false },
+    { id: 'clientes', label: 'Clientes', icon: 'M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 11a4 4 0 100-8 4 4 0 000 8', live: false },
+    { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: false },
+    { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: false },
+    { id: 'chat', label: 'Chat', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z', live: false },
+  ];
+
+  const STATUSES = [
+    { id: 'new', label: 'Nuevo' },
+    { id: 'contacted', label: 'Contactado' },
+    { id: 'converted', label: 'Convertido' },
+    { id: 'archived', label: 'Archivado' },
+  ];
+
+  // ── Helpers ──────────────────────────────────────────────────
+  async function api(url, opts = {}) {
+    return fetch(url, {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      ...opts,
+    });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  const firstName = $derived(user ? user.split('@')[0] : '');
+  const sectionTitle = $derived((NAV.find((n) => n.id === section) || {}).label || '');
+
+  // ── Sesión ───────────────────────────────────────────────────
+  async function checkSession() {
+    try {
+      const res = await api('/api/admin/me');
+      if (res.ok) {
+        const j = await res.json();
+        if (j && j.email) { user = j.email; phase = 'app'; loadLeads(); return; }
+      }
+    } catch (_) {}
+    phase = 'login';
+  }
+
+  async function doLogin(e) {
+    e.preventDefault();
+    const email = emailInput.trim();
+    if (!email) return;
+    loginSending = true;
+    loginMsg = '';
+    try {
+      await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ email }) });
+    } catch (_) {}
+    loginSending = false;
+    loginMsg = 'Si tu correo está autorizado, te enviamos un enlace de acceso. Ábrelo y vuelve a /dashboard.';
+  }
+
+  async function logout() {
+    try { await api('/api/admin/logout', { method: 'POST' }); } catch (_) {}
+    user = '';
+    phase = 'login';
+  }
+
+  // ── Leads ────────────────────────────────────────────────────
+  async function loadLeads() {
+    leadsLoading = true;
+    leadsError = '';
+    try {
+      const res = await api('/api/admin/leads?limit=100');
+      if (res.status === 401) { phase = 'login'; return; }
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || 'Error');
+      leads = j.rows || [];
+      stats = j.stats || null;
+    } catch (err) {
+      leadsError = err.message || 'Error al cargar leads';
+    } finally {
+      leadsLoading = false;
+    }
+  }
+
+  async function setStatus(lead, status) {
+    const prev = lead.status;
+    lead.status = status;
+    leads = [...leads];
+    try {
+      const res = await api('/api/admin/leads/' + encodeURIComponent(lead.ref_id), {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error();
+      loadLeads();
+    } catch (_) {
+      lead.status = prev;
+      leads = [...leads];
+    }
+  }
+
+  onMount(checkSession);
+</script>
+
+{#if phase === 'loading'}
+  <div class="center"><div class="spinner"></div></div>
+
+{:else if phase === 'login'}
+  <div class="center">
+    <form class="login" onsubmit={doLogin}>
+      <div class="brand brand--lg">
+        <span class="planet" aria-hidden="true"></span>
+        <span class="wordmark">MAR<em>CYAN</em></span>
+      </div>
+      <p class="login__tag">Panel de operaciones</p>
+      <label class="login__lbl" for="login-email">Tu correo</label>
+      <input id="login-email" type="email" bind:value={emailInput} placeholder="tu@marcyanstudio.com" autocomplete="email" required />
+      <button type="submit" class="btn btn--primary" disabled={loginSending}>
+        {loginSending ? 'Enviando…' : 'Enviar enlace de acceso'}
+      </button>
+      {#if loginMsg}<p class="login__msg">{loginMsg}</p>{/if}
+    </form>
+  </div>
+
+{:else}
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="planet" aria-hidden="true"></span>
+        <span class="wordmark">MAR<em>CYAN</em></span>
+      </div>
+      <nav class="nav">
+        <span class="nav__cap">Operación</span>
+        {#each NAV as item}
+          <button
+            class="nav__item"
+            class:active={section === item.id}
+            class:soon={!item.live}
+            disabled={!item.live}
+            onclick={() => item.live && (section = item.id)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={item.icon} /></svg>
+            <span>{item.label}</span>
+            {#if !item.live}<span class="nav__soon">pronto</span>{/if}
+          </button>
+        {/each}
+      </nav>
+      <div class="sidebar__foot">
+        <span class="online"></span> En línea
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <span class="crumb">{sectionTitle}</span>
+        <div class="topbar__right">
+          <span class="install">Instalar app</span>
+          <span class="user" title={user}>{user}</span>
+          <button class="btn btn--ghost" onclick={logout}>Salir</button>
+        </div>
+      </header>
+
+      {#if section === 'dashboard'}
+        <h1 class="greet">Hola, {firstName}</h1>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{stats ? stats.new : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Este mes</span><span class="kpi__num">{stats ? stats.this_month : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Del chatbot</span><span class="kpi__num teal">{stats ? stats.from_chat : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Convertidos</span><span class="kpi__num">{stats ? stats.converted : '–'}</span></div>
+        </div>
+        <p class="note">Bandeja de leads activa. Briefs, Clientes, Finanzas, SEO y Chat llegan en las próximas fases.</p>
+
+      {:else if section === 'leads'}
+        <div class="sec-head">
+          <h1 class="greet">Leads</h1>
+          <button class="btn btn--ghost" onclick={loadLeads}>Actualizar</button>
+        </div>
+
+        {#if leadsLoading}
+          <div class="empty">Cargando…</div>
+        {:else if leadsError}
+          <div class="empty err">{leadsError}</div>
+        {:else if leads.length === 0}
+          <div class="empty">Sin leads todavía. Cuando alguien use el formulario de contacto o el chatbot, aparecerá aquí.</div>
+        {:else}
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Ref</th><th>Contacto</th><th>Origen</th><th>Mensaje</th><th>Fecha</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+                {#each leads as lead (lead.ref_id)}
+                  <tr>
+                    <td class="mono gold">{lead.ref_id}</td>
+                    <td>
+                      <div class="c-name">{lead.name || '—'}</div>
+                      <div class="c-sub">{lead.email || lead.phone || ''}</div>
+                    </td>
+                    <td><span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : 'contacto'}</span></td>
+                    <td class="msg">{lead.interest || lead.message || '—'}</td>
+                    <td class="mono dim">{fmtDate(lead.created_at)}</td>
+                    <td>
+                      <select class="status status--{lead.status}" value={lead.status} onchange={(e) => setStatus(lead, e.currentTarget.value)}>
+                        {#each STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
+                      </select>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        {/if}
+      {/if}
+    </main>
+  </div>
+{/if}
+
+<style>
+  /* ── Layout base ── */
+  .center { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--space-5); }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Marca ── */
+  .brand { display: flex; align-items: center; gap: var(--space-3); }
+  .brand--lg { justify-content: center; margin-bottom: var(--space-2); }
+  .planet { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent-gold); position: relative; flex: 0 0 auto; }
+  .planet::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--accent-gold); }
+  .wordmark { font-family: var(--font-display); font-weight: 700; letter-spacing: .14em; font-size: 15px; color: var(--accent-gold); }
+  .wordmark em { font-style: italic; font-weight: 400; color: var(--accent-gold); opacity: .85; }
+
+  /* ── Login ── */
+  .login { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7) var(--space-6); }
+  .login__tag { text-align: center; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg-secondary); margin: 0 0 var(--space-3); }
+  .login__lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
+  .login input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 11px 14px; font-size: var(--text-base); min-height: var(--tap-min); }
+  .login input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .login__msg { font-size: var(--text-sm); color: var(--accent-teal); line-height: 1.5; margin: var(--space-1) 0 0; }
+
+  /* ── Botones ── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-md); padding: 10px 16px; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); min-height: var(--tap-min); }
+  .btn--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
+  .btn--primary:hover:not(:disabled) { background: #dabd86; }
+  .btn--ghost:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* ── Shell ── */
+  .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .sidebar { background: var(--bg-2); border-right: 1px solid var(--border); padding: var(--space-5) var(--space-4); display: flex; flex-direction: column; gap: var(--space-5); }
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav__cap { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); padding: 0 10px var(--space-2); }
+  .nav__item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-md); border: 0; background: transparent; color: var(--fg-secondary); font-size: var(--text-sm); cursor: pointer; text-align: left; width: 100%; transition: all var(--duration-fast); }
+  .nav__item svg { width: 17px; height: 17px; flex: 0 0 auto; }
+  .nav__item:hover:not(:disabled) { background: var(--bg-elevated); color: var(--fg-primary); }
+  .nav__item.active { background: var(--accent-gold-dim); color: var(--accent-gold); border-left: 2px solid var(--accent-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-weight: 500; }
+  .nav__item.soon { cursor: default; color: var(--fg-subtle); }
+  .nav__soon { margin-left: auto; font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-subtle); }
+  .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-teal); padding: 8px 10px; border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md); }
+  .online { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
+
+  /* ── Main ── */
+  .main { padding: var(--space-5) var(--space-6); min-width: 0; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
+  .crumb { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .topbar__right { display: flex; align-items: center; gap: var(--space-4); }
+  .install { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-sm); padding: 5px 9px; }
+  .user { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
+  .sec-head { display: flex; align-items: center; justify-content: space-between; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; flex-direction: column; gap: 4px; }
+  .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); }
+  .kpi__num.gold { color: var(--accent-gold); }
+  .kpi__num.teal { color: var(--accent-teal); }
+  .note { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: var(--space-5); font-style: italic; }
+
+  /* ── Tabla de leads ── */
+  .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-top: var(--space-4); }
+  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 12px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .table td { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; color: var(--fg-secondary); }
+  .table tr:last-child td { border-bottom: 0; }
+  .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
+  .gold { color: var(--accent-gold); }
+  .dim { color: var(--fg-subtle); white-space: nowrap; }
+  .c-name { color: var(--fg-primary); }
+  .c-sub { font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); margin-top: 2px; }
+  .msg { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .src { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; }
+  .src--chat { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .src--contact { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .status { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 8px; font-size: var(--text-xs); cursor: pointer; }
+  .status:focus { outline: none; border-color: var(--accent-gold); }
+  .status--converted { color: var(--accent-teal); }
+  .status--archived { color: var(--fg-subtle); }
+
+  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7); text-align: center; color: var(--fg-secondary); font-style: italic; margin-top: var(--space-4); }
+  .empty.err { color: var(--color-error); font-style: normal; }
+
+  @media (max-width: 720px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    .nav { flex-direction: row; flex-wrap: wrap; }
+    .nav__cap, .nav__soon, .sidebar__foot { display: none; }
+  }
+</style>

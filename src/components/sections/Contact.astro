@@ -174,7 +174,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       const orig = btn.textContent;
       btn.disabled = true; btn.textContent = S.sending || 'Enviando…';
       try {
-        const res = await fetch('/api/brief', {
+        const res = await fetch('/api/contact', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
         });
         let payload: any = null;
@@ -185,7 +185,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
           errorBox.hidden = false; btn.disabled = false; btn.textContent = orig;
           return;
         }
-        okBox.textContent = (S.success || '✓') + (payload.projectId ? ' · ' + payload.projectId : '');
+        okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
         okBox.hidden = false;
         form.querySelectorAll('input, select, textarea, button').forEach((el) => ((el as HTMLInputElement).disabled = true));
         btn.textContent = S.success || '✓';

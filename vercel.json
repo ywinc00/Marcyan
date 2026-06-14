@@ -2,5 +2,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/dashboard/sw.js",
+      "headers": [{ "key": "Service-Worker-Allowed", "value": "/dashboard" }]
+    }
+  ]
 }

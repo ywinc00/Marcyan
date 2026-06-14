@@ -1,6 +1,10 @@
 <script>
   import { onMount } from 'svelte';
   import BriefsSection from './BriefsSection.svelte';
+  import FinanzasSection from './FinanzasSection.svelte';
+  import ProgresoSection from './ProgresoSection.svelte';
+  import SeoSection from './SeoSection.svelte';
+  import NotificationsSection from './NotificationsSection.svelte';
 
   // ── Estado ───────────────────────────────────────────────────
   let phase = $state('loading');      // loading | login | app
@@ -36,10 +40,10 @@
     { id: 'dashboard', label: 'Dashboard', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', live: true },
     { id: 'leads', label: 'Leads', icon: 'M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5', live: true },
     { id: 'briefs', label: 'Briefs', icon: 'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6', live: true },
-    { id: 'clientes', label: 'Clientes', icon: 'M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 11a4 4 0 100-8 4 4 0 000 8', live: false },
-    { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: false },
-    { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: false },
-    { id: 'chat', label: 'Chat', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z', live: false },
+    { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: true },
+    { id: 'progreso', label: 'Progreso', icon: 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11', live: true },
+    { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: true },
+    { id: 'notificaciones', label: 'Avisos', icon: 'M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0', live: true },
   ];
 
   const STATUSES = [
@@ -322,6 +326,14 @@
 
       {:else if section === 'briefs'}
         <BriefsSection />
+      {:else if section === 'finanzas'}
+        <FinanzasSection />
+      {:else if section === 'progreso'}
+        <ProgresoSection />
+      {:else if section === 'seo'}
+        <SeoSection />
+      {:else if section === 'notificaciones'}
+        <NotificationsSection />
       {/if}
     </main>
   </div>

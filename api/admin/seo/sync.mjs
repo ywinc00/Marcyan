@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ok,
       configured,
-      error: configured ? null : 'GOOGLE_SA_KEY no configurada',
+      error: configured ? null : 'Google no conectado (Workload Identity Federation)',
       results,
     });
   } catch (err) {

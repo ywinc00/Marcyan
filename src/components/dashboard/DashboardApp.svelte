@@ -14,6 +14,23 @@
   let leadsLoading = $state(false);
   let leadsError = $state('');
 
+  let home = $state(null);
+  let installPrompt = $state(null);
+
+  const MONTH_LABELS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function monthLabel(m) { return MONTH_LABELS[parseInt(m.slice(5, 7), 10) - 1] || m; }
+  const activity = $derived(home ? home.activity : []);
+  const chartMax = $derived(Math.max(1, ...activity.map((a) => a.total)));
+  const funnelRows = $derived(home ? [
+    { name: 'Nuevos',      n: home.funnel.new,       cls: 'g'  },
+    { name: 'Contactados', n: home.funnel.contacted, cls: 'g2' },
+    { name: 'Convertidos', n: home.funnel.converted, cls: 't'  },
+    { name: 'Archivados',  n: home.funnel.archived,  cls: 'd'  },
+  ] : []);
+  const funnelMax = $derived(home
+    ? Math.max(1, home.funnel.new, home.funnel.contacted, home.funnel.converted, home.funnel.archived)
+    : 1);
+
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', live: true },
     { id: 'leads', label: 'Leads', icon: 'M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5', live: true },
@@ -54,7 +71,7 @@
       const res = await api('/api/admin/me');
       if (res.ok) {
         const j = await res.json();
-        if (j && j.email) { user = j.email; phase = 'app'; loadLeads(); return; }
+        if (j && j.email) { user = j.email; phase = 'app'; loadHome(); loadLeads(); return; }
       }
     } catch (_) {}
     phase = 'login';
@@ -77,6 +94,24 @@
     try { await api('/api/admin/logout', { method: 'POST' }); } catch (_) {}
     user = '';
     phase = 'login';
+  }
+
+  // ── Home / analítica ─────────────────────────────────────────
+  async function loadHome() {
+    try {
+      const res = await api('/api/admin/dashboard/analytics');
+      if (res.status === 401) { phase = 'login'; return; }
+      const j = await res.json();
+      if (j.ok) home = j;
+    } catch (_) {}
+  }
+
+  // ── PWA install ──────────────────────────────────────────────
+  async function doInstall() {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    try { await installPrompt.userChoice; } catch (_) {}
+    installPrompt = null;
   }
 
   // ── Leads ────────────────────────────────────────────────────
@@ -114,7 +149,10 @@
     }
   }
 
-  onMount(checkSession);
+  onMount(() => {
+    checkSession();
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; });
+  });
 </script>
 
 {#if phase === 'loading'}
@@ -169,7 +207,7 @@
       <header class="topbar">
         <span class="crumb">{sectionTitle}</span>
         <div class="topbar__right">
-          <span class="install">Instalar app</span>
+          {#if installPrompt}<button class="install" onclick={doInstall}>⤓ Instalar app</button>{/if}
           <span class="user" title={user}>{user}</span>
           <button class="btn btn--ghost" onclick={logout}>Salir</button>
         </div>
@@ -177,13 +215,68 @@
 
       {#if section === 'dashboard'}
         <h1 class="greet">Hola, {firstName}</h1>
+
         <div class="kpis">
-          <div class="kpi"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{stats ? stats.new : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Este mes</span><span class="kpi__num">{stats ? stats.this_month : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Del chatbot</span><span class="kpi__num teal">{stats ? stats.from_chat : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Convertidos</span><span class="kpi__num">{stats ? stats.converted : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{home ? home.kpis.new_leads : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Briefs pendientes</span><span class="kpi__num">{home ? home.kpis.pending_briefs : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">En curso (mes)</span><span class="kpi__num">{home ? home.kpis.projects_this_month : '–'}</span></div>
+          <div class="kpi"><span class="kpi__lbl">Cobrado (mes)</span><span class="kpi__num teal">{home && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span></div>
         </div>
-        <p class="note">Bandeja de leads activa. Briefs, Clientes, Finanzas, SEO y Chat llegan en las próximas fases.</p>
+
+        <div class="home-split">
+          <div class="panel">
+            <div class="panel__lbl">Actividad por mes <span class="panel__sub">leads + briefs</span></div>
+            {#if home}
+              <svg class="chart" viewBox="0 0 560 180" role="img" aria-label="Actividad por mes">
+                {#each activity as a, i}
+                  <rect
+                    x={i * (560 / activity.length) + (560 / activity.length) * 0.22}
+                    y={150 - (a.total / chartMax) * 132}
+                    width={(560 / activity.length) * 0.56}
+                    height={(a.total / chartMax) * 132}
+                    rx="3"
+                    fill={i === activity.length - 1 ? 'var(--accent-teal)' : 'var(--accent-gold)'}
+                    opacity={i === activity.length - 1 ? 1 : 0.5} />
+                  <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y="170" text-anchor="middle" class="chart__lbl">{monthLabel(a.month)}</text>
+                  {#if a.total > 0}
+                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={150 - (a.total / chartMax) * 132 - 5} text-anchor="middle" class="chart__val">{a.total}</text>
+                  {/if}
+                {/each}
+              </svg>
+            {:else}<div class="muted">Cargando…</div>{/if}
+          </div>
+
+          <div class="panel">
+            <div class="panel__lbl">Leads por estado</div>
+            {#if home}
+              <div class="funnel">
+                {#each funnelRows as row}
+                  <div class="funnel__row">
+                    <span class="funnel__name">{row.name}</span>
+                    <div class="funnel__track"><div class="funnel__bar funnel__bar--{row.cls}" style="width:{Math.round((row.n / funnelMax) * 100)}%"></div></div>
+                    <span class="funnel__n">{row.n}</span>
+                  </div>
+                {/each}
+              </div>
+            {:else}<div class="muted">Cargando…</div>{/if}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__lbl">Leads recientes</div>
+          {#if leads.length}
+            <div class="recent">
+              {#each leads.slice(0, 6) as lead (lead.ref_id)}
+                <div class="recent__row">
+                  <span class="mono gold">{lead.ref_id}</span>
+                  <span class="recent__name">{lead.name || lead.email || lead.phone || '—'}</span>
+                  <span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : 'contacto'}</span>
+                  <span class="mono dim">{fmtDate(lead.created_at)}</span>
+                </div>
+              {/each}
+            </div>
+          {:else}<div class="muted">Sin leads todavía.</div>{/if}
+        </div>
 
       {:else if section === 'leads'}
         <div class="sec-head">
@@ -278,7 +371,8 @@
   .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
   .crumb { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
   .topbar__right { display: flex; align-items: center; gap: var(--space-4); }
-  .install { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-sm); padding: 5px 9px; }
+  .install { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold); background: transparent; border: 1px solid var(--accent-gold-line); border-radius: var(--radius-sm); padding: 5px 9px; cursor: pointer; transition: all var(--duration-fast); }
+  .install:hover { background: var(--accent-gold-dim); border-color: var(--accent-gold); }
   .user { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
@@ -290,7 +384,34 @@
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
-  .note { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: var(--space-5); font-style: italic; }
+  /* ── Home: paneles, gráfico, embudo, recientes ── */
+  .home-split { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
+  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
+  .panel__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
+  .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
+
+  .chart { width: 100%; height: auto; display: block; }
+  .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
+  .chart__val { fill: var(--fg-secondary); font-family: var(--font-mono); font-size: 11px; }
+
+  .funnel { display: flex; flex-direction: column; gap: var(--space-3); }
+  .funnel__row { display: flex; align-items: center; gap: var(--space-3); }
+  .funnel__name { width: 90px; flex: 0 0 auto; font-size: var(--text-xs); color: var(--fg-secondary); }
+  .funnel__track { flex: 1; height: 14px; background: var(--bg-elevated); border-radius: var(--radius-pill); overflow: hidden; }
+  .funnel__bar { height: 100%; border-radius: var(--radius-pill); min-width: 2px; transition: width var(--duration-base) var(--ease); }
+  .funnel__bar--g  { background: rgba(var(--accent-teal-rgb), .85); }
+  .funnel__bar--g2 { background: rgba(var(--accent-teal-rgb), .55); }
+  .funnel__bar--t  { background: var(--accent-teal); }
+  .funnel__bar--d  { background: rgba(var(--accent-gold-rgb), .5); }
+  .funnel__n { width: 28px; flex: 0 0 auto; text-align: right; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
+
+  .recent { display: flex; flex-direction: column; }
+  .recent__row { display: flex; align-items: center; gap: var(--space-3); padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--text-sm); }
+  .recent__row:last-child { border-bottom: 0; }
+  .recent__name { flex: 1; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  @media (max-width: 720px) { .home-split { grid-template-columns: 1fr; } }
 
   /* ── Tabla de leads ── */
   .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-top: var(--space-4); }

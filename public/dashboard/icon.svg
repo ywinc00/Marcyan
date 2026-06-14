@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Marcyan">
+  <rect width="512" height="512" fill="#080808"/>
+  <ellipse cx="256" cy="262" rx="172" ry="52" fill="none" stroke="#c8a96e" stroke-width="11" opacity="0.85"/>
+  <circle cx="256" cy="248" r="112" fill="#c8a96e"/>
+  <circle cx="408" cy="156" r="22" fill="#4fc3a1"/>
+</svg>

@@ -49,6 +49,10 @@ const STR = {
     capOk: '¡Gracias! Lo recibimos (folio %ID%). El equipo te contacta en menos de 24 horas. 🚀',
     capErr: 'No pudimos enviar tus datos. Intenta de nuevo o escríbenos en /formulario.',
     capRequired: 'Déjanos al menos un email o un teléfono.',
+    human: 'Hablar con una persona',
+    capTitleHuman: 'Te conecto con una persona',
+    capSubHuman: 'Déjanos cómo contactarte y un asesor te escribe. (No es chat en vivo.)',
+    capHandoffOk: 'Listo, le avisamos a una persona. Te contacta por email o WhatsApp pronto. 🙌',
   },
   en: {
     open: 'Open the help chat',
@@ -77,6 +81,10 @@ const STR = {
     capOk: 'Thank you! We got it (ref %ID%). The team will reach out within 24 hours. 🚀',
     capErr: 'We couldn’t send your details. Please try again or reach us at /formulario.',
     capRequired: 'Please leave at least an email or a phone number.',
+    human: 'Talk to a person',
+    capTitleHuman: 'I’ll connect you with a person',
+    capSubHuman: 'Leave your contact and an advisor will reach out. (Not live chat.)',
+    capHandoffOk: 'Done — we notified a person. They’ll reach out by email or WhatsApp soon. 🙌',
   },
 };
 const CHIPS = {
@@ -137,6 +145,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         <b>{t.title}</b>
         <span class="mrc-status"><span class="mrc-live" aria-hidden="true"></span>{t.status}</span>
       </span>
+      <button type="button" class="mrc-human" data-mrc-human aria-label={t.human} title={t.human}>
+        <Icon name="lucide:user" />
+      </button>
       <button type="button" class="mrc-close" data-mrc-close aria-label={t.close}>
         <Icon name="lucide:x" />
       </button>
@@ -236,6 +247,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-close:hover { color: var(--fg-primary); background: var(--bg-elevated); }
   .mrc-close:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-human {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
+    background: transparent; border: none; color: var(--accent-gold); cursor: pointer;
+    transition: color var(--duration-fast), background var(--duration-fast);
+  }
+  .mrc-human:hover { background: var(--accent-gold-dim); }
+  .mrc-human:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-human :global(svg) { width: 18px; height: 18px; }
   .mrc-close :global(svg) { width: 18px; height: 18px; }
 
   .mrc-log {
@@ -470,7 +490,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         const n = log.querySelector('#mrc-c-name'); if (n) n.focus();
         return;
       }
-      const title = variant === 'muestra_gratis' ? T.capTitleSample : T.capTitleContact;
+      const title = variant === 'handoff' ? (T.capTitleHuman || T.capTitleContact)
+        : variant === 'muestra_gratis' ? T.capTitleSample : T.capTitleContact;
       const card = document.createElement('div');
       card.className = 'mrc-capture';
       card.setAttribute('data-mrc-capture', '');
@@ -492,7 +513,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         '<p class="mrc-cap-result" data-mrc-capresult hidden></p>';
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
-      card.querySelector('.mrc-cap-sub').textContent = T.capSub;
+      card.querySelector('.mrc-cap-sub').textContent = variant === 'handoff' ? (T.capSubHuman || T.capSub) : T.capSub;
       card.querySelector('#mrc-c-name').placeholder = T.capName;
       card.querySelector('#mrc-c-email').placeholder = T.capEmail;
       card.querySelector('#mrc-c-phone').placeholder = T.capPhone;
@@ -522,6 +543,29 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capRequired; }
         return;
       }
+      // Handoff: pedir hablar con una persona → /api/handoff (no crea lead; avisa al fundador).
+      if (variant === 'handoff') {
+        if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
+        if (result) result.hidden = true;
+        try {
+          const res = await fetch('/api/handoff', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: get('#mrc-c-name'), contact: email || phone, message: need, lang, website_hp: get('#mrc-c-hp') }),
+          });
+          let data = null; try { data = await res.json(); } catch (_) {}
+          if (res.ok && data && data.ok) {
+            captured = true;
+            card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
+            card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
+            if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = T.capHandoffOk || T.capOk; }
+          } else { throw new Error('bad response'); }
+        } catch (_) {
+          if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
+          if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capErr; }
+        }
+        return;
+      }
+
       const note = variant === 'muestra_gratis' ? 'Solicitó una muestra gratis vía el asistente del sitio.' : 'Pidió que lo contacten vía el asistente del sitio.';
       const body = {
         source: 'chat',
@@ -572,6 +616,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // ── Eventos ──
     fab.addEventListener('click', toggle);
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
+    const humanBtn = root.querySelector('[data-mrc-human]');
+    if (humanBtn) humanBtn.addEventListener('click', () => openCapture('handoff'));
     if (form) form.addEventListener('submit', (e) => { e.preventDefault(); send(input && input.value); });
     if (sendBtn) sendBtn.addEventListener('click', () => send(input && input.value));
     if (input) {

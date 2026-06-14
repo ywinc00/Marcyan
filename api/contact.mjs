@@ -7,6 +7,7 @@
 //    2) Email al cliente (auto-respuesta de confirmación)
 // ════════════════════════════════════════════════════════════════
 import { createLead } from '../lib/leads.mjs';
+import { createNotification } from '../lib/notifications.mjs';
 import { emailAdminNewLead, emailClientLeadConfirmation, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
 
@@ -32,6 +33,7 @@ export default async function handler(req, res) {
 
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};
+    if (JSON.stringify(body).length > 500000) return res.status(413).json({ ok: false, error: 'Payload demasiado grande' });
 
     // Honeypot anti-spam
     if (body.website_hp) {
@@ -65,6 +67,15 @@ export default async function handler(req, res) {
     };
 
     const refId = await createLead(data);
+
+    // Aviso in-dashboard (createNotification nunca lanza; es defensiva)
+    await createNotification({
+      type: 'new_lead',
+      title: `Nuevo lead — ${data.name || data.email || data.phone || 'sin nombre'}`,
+      body: data.interest || data.message || null,
+      ref: refId,
+      url: '/dashboard',
+    });
 
     // Notificaciones email — awaitadas, no bloquean al lead si fallan
     let emailAdminOk = false;

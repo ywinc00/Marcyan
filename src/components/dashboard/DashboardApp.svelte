@@ -1,6 +1,10 @@
 <script>
   import { onMount } from 'svelte';
   import BriefsSection from './BriefsSection.svelte';
+  import FinanzasSection from './FinanzasSection.svelte';
+  import ProgresoSection from './ProgresoSection.svelte';
+  import SeoSection from './SeoSection.svelte';
+  import NotificationsSection from './NotificationsSection.svelte';
 
   // ── Estado ───────────────────────────────────────────────────
   let phase = $state('loading');      // loading | login | app
@@ -36,10 +40,10 @@
     { id: 'dashboard', label: 'Dashboard', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', live: true },
     { id: 'leads', label: 'Leads', icon: 'M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5', live: true },
     { id: 'briefs', label: 'Briefs', icon: 'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6', live: true },
-    { id: 'clientes', label: 'Clientes', icon: 'M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 11a4 4 0 100-8 4 4 0 000 8', live: false },
-    { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: false },
-    { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: false },
-    { id: 'chat', label: 'Chat', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z', live: false },
+    { id: 'finanzas', label: 'Finanzas', icon: 'M3 7h18v10H3zM3 7l9 6 9-6', live: true },
+    { id: 'progreso', label: 'Progreso', icon: 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11', live: true },
+    { id: 'seo', label: 'SEO', icon: 'M4 20V10M10 20V4M16 20v-6M22 20H2', live: true },
+    { id: 'notificaciones', label: 'Avisos', icon: 'M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0', live: true },
   ];
 
   const STATUSES = [
@@ -218,29 +222,54 @@
         <h1 class="greet">Hola, {firstName}</h1>
 
         <div class="kpis">
-          <div class="kpi"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{home ? home.kpis.new_leads : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Briefs pendientes</span><span class="kpi__num">{home ? home.kpis.pending_briefs : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">En curso (mes)</span><span class="kpi__num">{home ? home.kpis.projects_this_month : '–'}</span></div>
-          <div class="kpi"><span class="kpi__lbl">Cobrado (mes)</span><span class="kpi__num teal">{home && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span></div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Leads nuevos</span><span class="kpi__num gold">{home?.kpis ? home.kpis.new_leads : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9 6 9-6M3 8v10h18V8M3 8l9-5 9 5" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Briefs pendientes</span><span class="kpi__num">{home?.kpis ? home.kpis.pending_briefs : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">En curso (mes)</span><span class="kpi__num">{home?.kpis ? home.kpis.projects_this_month : '–'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <div class="kpi">
+            <div class="kpi__txt"><span class="kpi__lbl">Cobrado (mes)</span><span class="kpi__num teal">{home?.kpis && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span></div>
+            <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM3 7l9 6 9-6" /></svg>
+          </div>
         </div>
 
         <div class="home-split">
           <div class="panel">
             <div class="panel__lbl">Actividad por mes <span class="panel__sub">leads + briefs</span></div>
             {#if home}
-              <svg class="chart" viewBox="0 0 560 180" role="img" aria-label="Actividad por mes">
+              <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Actividad por mes">
+                <defs>
+                  <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(200,169,110)" flood-opacity="0.5" />
+                  </filter>
+                </defs>
+                <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
+                <line x1="0" y1="82" x2="560" y2="82" class="chart__grid" />
+                <line x1="0" y1="120" x2="560" y2="120" class="chart__grid" />
+                <line x1="0" y1="158" x2="560" y2="158" class="chart__base" />
                 {#each activity as a, i}
                   <rect
-                    x={i * (560 / activity.length) + (560 / activity.length) * 0.22}
-                    y={150 - (a.total / chartMax) * 132}
-                    width={(560 / activity.length) * 0.56}
-                    height={(a.total / chartMax) * 132}
-                    rx="3"
-                    fill={i === activity.length - 1 ? 'var(--accent-teal)' : 'var(--accent-gold)'}
-                    opacity={i === activity.length - 1 ? 1 : 0.5} />
-                  <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y="170" text-anchor="middle" class="chart__lbl">{monthLabel(a.month)}</text>
-                  {#if a.total > 0}
-                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={150 - (a.total / chartMax) * 132 - 5} text-anchor="middle" class="chart__val">{a.total}</text>
+                    x={i * (560 / activity.length) + (560 / activity.length) * 0.25}
+                    y={158 - (a.total / chartMax) * 118}
+                    width={(560 / activity.length) * 0.5}
+                    height={(a.total / chartMax) * 118}
+                    rx="5"
+                    fill={i === activity.length - 1 ? 'var(--accent-gold)' : '#2b2b33'}
+                    filter={i === activity.length - 1 ? 'url(#barGlow)' : undefined} />
+                  <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y="180" text-anchor="middle" class="chart__lbl" class:is-active={i === activity.length - 1}>{monthLabel(a.month)}</text>
+                  {#if i === activity.length - 1}
+                    <circle cx={i * (560 / activity.length) + (560 / activity.length) / 2} cy={158 - (a.total / chartMax) * 118} r="3.5" fill="var(--accent-gold)" />
+                    <rect x={i * (560 / activity.length) + (560 / activity.length) / 2 - 16} y={158 - (a.total / chartMax) * 118 - 26} width="32" height="18" rx="5" fill="var(--accent-gold)" />
+                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={158 - (a.total / chartMax) * 118 - 13} text-anchor="middle" class="chart__tip">{a.total}</text>
+                  {:else if a.total > 0}
+                    <text x={i * (560 / activity.length) + (560 / activity.length) / 2} y={158 - (a.total / chartMax) * 118 - 6} text-anchor="middle" class="chart__val">{a.total}</text>
                   {/if}
                 {/each}
               </svg>
@@ -322,6 +351,14 @@
 
       {:else if section === 'briefs'}
         <BriefsSection />
+      {:else if section === 'finanzas'}
+        <FinanzasSection />
+      {:else if section === 'progreso'}
+        <ProgresoSection />
+      {:else if section === 'seo'}
+        <SeoSection />
+      {:else if section === 'notificaciones'}
+        <NotificationsSection />
       {/if}
     </main>
   </div>
@@ -364,7 +401,7 @@
   .nav__item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-md); border: 0; background: transparent; color: var(--fg-secondary); font-size: var(--text-sm); cursor: pointer; text-align: left; width: 100%; transition: all var(--duration-fast); }
   .nav__item svg { width: 17px; height: 17px; flex: 0 0 auto; }
   .nav__item:hover:not(:disabled) { background: var(--bg-elevated); color: var(--fg-primary); }
-  .nav__item.active { background: var(--accent-gold-dim); color: var(--accent-gold); border-left: 2px solid var(--accent-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-weight: 500; }
+  .nav__item.active { background: var(--bg-elevated); color: var(--accent-gold); box-shadow: inset 2px 0 0 var(--accent-gold), 0 0 0 1px var(--border); border-radius: var(--radius-md); font-weight: 600; }
   .nav__item.soon { cursor: default; color: var(--fg-subtle); }
   .nav__soon { margin-left: auto; font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-subtle); }
   .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-teal); padding: 8px 10px; border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md); }
@@ -383,7 +420,9 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
 
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; flex-direction: column; gap: 4px; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+  .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .kpi__art { width: 38px; height: 38px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.32; }
   .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); }
   .kpi__num.gold { color: var(--accent-gold); }
@@ -397,7 +436,11 @@
 
   .chart { width: 100%; height: auto; display: block; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
+  .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
   .chart__val { fill: var(--fg-secondary); font-family: var(--font-mono); font-size: 11px; }
+  .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
+  .chart__base { stroke: rgba(255, 255, 255, 0.12); }
+  .chart__tip { fill: var(--fg-inverse); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 
   .funnel { display: flex; flex-direction: column; gap: var(--space-3); }
   .funnel__row { display: flex; align-items: center; gap: var(--space-3); }

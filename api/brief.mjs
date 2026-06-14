@@ -7,6 +7,7 @@
 // ════════════════════════════════════════════════════════════════
 import { sql } from '@vercel/postgres';
 import { logEvent } from '../lib/db.mjs';
+import { createNotification } from '../lib/notifications.mjs';
 import {
   emailAdminNewBrief, emailClientConfirmation, resend,
 } from '../lib/email.mjs';
@@ -56,6 +57,7 @@ export default async function handler(req, res) {
 
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};
+    if (JSON.stringify(body).length > 500000) return res.status(413).json({ ok: false, error: 'Payload demasiado grande' });
 
     // Honeypot anti-spam
     if (body.website_hp) {
@@ -130,6 +132,15 @@ export default async function handler(req, res) {
         email: data.email || null,
         ip: clientIp(req),
       },
+    });
+
+    // Aviso in-dashboard (createNotification nunca lanza; es defensiva)
+    await createNotification({
+      type: 'new_brief',
+      title: `Nuevo brief — ${data.business_name || 'sin nombre'}`,
+      body: data.main_objective || null,
+      ref: projectId,
+      url: '/dashboard',
     });
 
     // Notificaciones email — paralelo, awaitadas, no bloquean al brief si fallan

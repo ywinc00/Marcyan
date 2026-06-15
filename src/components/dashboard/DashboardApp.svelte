@@ -108,9 +108,11 @@
   const activeSubs = $derived(subs.filter((s) => s.active).slice(0, 6));
   const monthlyRunRate = $derived(subs
     .filter((s) => s.active)
-    .reduce((sum, s) => sum + (s.cycle === 'yearly' ? Math.round((s.amount_cents || 0) / 12) : (s.amount_cents || 0)), 0));
+    .reduce((sum, s) => { const c = Number(s.amount_cents) || 0; return sum + (s.cycle === 'yearly' ? Math.round(c / 12) : c); }, 0));
+  // OJO: amount_cents es BIGINT → @vercel/postgres lo da como STRING; hay que
+  // coercer a Number ANTES de sumar (si no, sum + "1791" concatena strings).
   function money(cents) {
-    return '$' + ((cents || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return '$' + ((Number(cents) || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
   // ── Proyectos recientes (Orbit table) ────────────────────────

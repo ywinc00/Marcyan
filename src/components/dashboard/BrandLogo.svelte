@@ -1,56 +1,42 @@
 <script>
   /* ════════════════════════════════════════════════════════════════
      BrandLogo — logo de marca para una suscripción/SaaS de la agencia.
-     Tiny + reusable. Svelte 5 runes.
+     SIN API key. Tiny + reusable. Svelte 5 runes.
 
      CADENA DE FALLBACK (graceful degradation):
-       1) logo.dev   → logo REAL a todo color de la empresa
-                       (https://img.logo.dev/<dominio>?token=…). Requiere
-                       PUBLIC_LOGODEV_TOKEN (Astro inyecta PUBLIC_* en el
-                       bundle del cliente). Sin token → 401, así que sólo
-                       se intenta si hay token Y conocemos el dominio.
-       2) simpleicons → SVG monocromo en color de marca
-                       (https://cdn.simpleicons.org/<slug>). Se usa si no
-                       hay token, si el dominio es desconocido, o si la
-                       imagen de logo.dev falla al cargar.
-       3) monograma  → tile cuadrado redondeado con color de fondo
-                       determinista (hash del nombre) y la inicial en
-                       blanco. Último recurso.
+       1) favicon    → logo REAL de la empresa vía el servicio de favicons
+                       de Google (SIN key):
+                       https://www.google.com/s2/favicons?domain=<dominio>&sz=128
+                       Se usa si conocemos el dominio de la marca.
+       2) simpleicons → SVG de marca (https://cdn.simpleicons.org/<slug>).
+                       Se usa si no hay dominio, o si el favicon falla.
+       3) monograma  → tile cuadrado con color determinista (hash del
+                       nombre) y la inicial en blanco. Último recurso.
 
-     El paso se controla con un $state `stage` y handlers onerror que
-     avanzan logodev → simpleicons → monogram. Se reinicia al cambiar
-     `name`.
+     Las imágenes (favicon/simpleicons) van sobre un chip claro para que
+     los logos oscuros (Vercel, GitHub…) se vean sobre el fondo dark.
+     El paso se controla con un $state `stage` + onerror; se reinicia al
+     cambiar `name`.
 
-     Uso:
-       <BrandLogo name="Vercel Pro" />
-       <BrandLogo name="Figma" size={18} />
-
-     Env var requerida para activar logo.dev:
-       PUBLIC_LOGODEV_TOKEN  (publishable key de logo.dev)
+     Uso:  <BrandLogo name="Vercel Pro" />   <BrandLogo name="Figma" size={18} />
      ════════════════════════════════════════════════════════════════ */
 
   let { name = '', size = 22 } = $props();
 
-  // Publishable key de logo.dev. Astro inyecta las PUBLIC_* en el bundle
-  // del cliente, así que es seguro leerla aquí. Si está vacía saltamos
-  // logo.dev y empezamos directamente en simpleicons.
-  const LOGODEV_TOKEN = import.meta.env.PUBLIC_LOGODEV_TOKEN || '';
-
-  // keyword (en minúsculas) → { domain, slug }. La clave se busca como
-  // SUBSTRING dentro del nombre normalizado, así "Vercel Pro" → vercel,
-  // "Google Workspace" → google, "Adobe Creative Cloud" → adobe, etc.
-  // Ordenado de más específico a más genérico para que p.ej. "amazon web
-  // services" gane sobre "amazon" y "google cloud" sobre "google".
-  //   domain → usado por logo.dev (logo real a color)
-  //   slug   → usado por simpleicons (SVG de marca)
+  // keyword (minúsculas) → { domain, slug }. Se busca como SUBSTRING dentro
+  // del nombre normalizado: "Vercel Pro"→vercel, "Google Workspace"→google,
+  // "Adobe Creative Cloud"→adobe. Más específico primero (p.ej. "google
+  // cloud" gana sobre "google").
+  //   domain → favicon real (Google s2)   ·   slug → simpleicons
   const MAP = [
     ['amazon web services', { domain: 'aws.amazon.com', slug: 'amazonaws' }],
     ['google cloud', { domain: 'cloud.google.com', slug: 'googlecloud' }],
-    ['google workspace', { domain: 'google.com', slug: 'google' }],
+    ['google workspace', { domain: 'workspace.google.com', slug: 'google' }],
     ['vercel', { domain: 'vercel.com', slug: 'vercel' }],
     ['figma', { domain: 'figma.com', slug: 'figma' }],
     ['namecheap', { domain: 'namecheap.com', slug: 'namecheap' }],
     ['anthropic', { domain: 'anthropic.com', slug: 'anthropic' }],
+    ['claude', { domain: 'anthropic.com', slug: 'anthropic' }],
     ['adobe', { domain: 'adobe.com', slug: 'adobe' }],
     ['github', { domain: 'github.com', slug: 'github' }],
     ['notion', { domain: 'notion.so', slug: 'notion' }],
@@ -99,20 +85,16 @@
   const color = $derived(hashColor(name));
   const px = $derived(size + 'px');
 
-  // logo.dev: pedimos 2x para retina (size*2) + retina=true + png.
-  const logodevSrc = $derived(
-    domain && LOGODEV_TOKEN
-      ? `https://img.logo.dev/${domain}?token=${LOGODEV_TOKEN}&size=${size * 2}&format=png&retina=true`
-      : null,
+  // Favicon real (Google s2, sin key). Pedimos 128px y lo escalamos.
+  const faviconSrc = $derived(
+    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
   );
   const simpleiconsSrc = $derived(
     slug ? `https://cdn.simpleicons.org/${slug}` : null,
   );
 
-  // Etapa inicial de la cadena según lo que tengamos disponible:
-  //   logodev (si hay token + dominio) → simpleicons (si hay slug) → monogram
   function initialStage() {
-    if (logodevSrc) return 'logodev';
+    if (faviconSrc) return 'favicon';
     if (simpleiconsSrc) return 'simpleicons';
     return 'monogram';
   }
@@ -121,14 +103,14 @@
   // Reinicia la cadena cuando cambia el nombre (o las fuentes derivadas).
   $effect(() => {
     name;
-    logodevSrc;
+    faviconSrc;
     simpleiconsSrc;
     stage = initialStage();
   });
 
-  // Avanza al siguiente eslabón de la cadena cuando un <img> falla.
+  // Avanza al siguiente eslabón cuando un <img> falla al cargar.
   function fail() {
-    if (stage === 'logodev') {
+    if (stage === 'favicon') {
       stage = simpleiconsSrc ? 'simpleicons' : 'monogram';
     } else if (stage === 'simpleicons') {
       stage = 'monogram';
@@ -136,28 +118,15 @@
   }
 </script>
 
-{#if stage === 'logodev' && logodevSrc}
-  <img
-    class="brandlogo"
-    src={logodevSrc}
-    alt={name}
-    width={size}
-    height={size}
-    style={`width:${px};height:${px}`}
-    loading="lazy"
-    onerror={fail}
-  />
-{:else if stage === 'simpleicons' && simpleiconsSrc}
-  <img
-    class="brandlogo"
-    src={simpleiconsSrc}
-    alt={name}
-    width={size}
-    height={size}
-    style={`width:${px};height:${px}`}
-    loading="lazy"
-    onerror={fail}
-  />
+{#if (stage === 'favicon' && faviconSrc) || (stage === 'simpleicons' && simpleiconsSrc)}
+  <span class="brandlogo brandlogo--chip" style={`width:${px};height:${px}`}>
+    <img
+      src={stage === 'favicon' ? faviconSrc : simpleiconsSrc}
+      alt={name}
+      loading="lazy"
+      onerror={fail}
+    />
+  </span>
 {:else}
   <span
     class="brandlogo brandlogo--mono"
@@ -169,16 +138,25 @@
 
 <style>
   .brandlogo {
-    display: inline-block;
-    flex-shrink: 0;
-    object-fit: contain;
-    border-radius: var(--radius-sm);
-    image-rendering: auto;
-  }
-  .brandlogo--mono {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  /* Chip claro: garantiza que logos oscuros (Vercel, GitHub) se vean. */
+  .brandlogo--chip {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .brandlogo--chip img {
+    width: 76%;
+    height: 76%;
+    object-fit: contain;
+    display: block;
+  }
+  .brandlogo--mono {
     border-radius: var(--radius-md);
     color: #fff;
     font-family: var(--font-display);

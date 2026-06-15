@@ -56,8 +56,19 @@
   let newMsLabel = $state('');
   let addingMs = $state(false);
 
+  // ── Estado "eliminar proyecto" ──────────────────────────────
+  let showDelete = $state(false);
+  let deleting = $state(false);
+
   // ── Derivados ────────────────────────────────────────────────
   const percent = $derived(progress ? progress.percent : 0);
+
+  // Resumen rápido (KPI chips) derivado de las filas cargadas.
+  const summary = $derived.by(() => {
+    const c = { active: 0, on_hold: 0, completed: 0, cancelled: 0 };
+    for (const r of rows) if (c[r.status] != null) c[r.status] += 1;
+    return c;
+  });
 
   // ── Carga lista ──────────────────────────────────────────────
   async function loadList() {
@@ -149,6 +160,21 @@
     finally { addingMs = false; }
   }
 
+  // ── Eliminar proyecto ────────────────────────────────────────
+  // selected.id es STRING (BIGINT) — se pasa tal cual, sin parseInt.
+  async function doDelete() {
+    if (!selected) return;
+    deleting = true;
+    try {
+      const r = await api('/api/admin/projects/' + encodeURIComponent(selected.id), { method: 'DELETE' });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Error');
+      showDelete = false; selected = null;
+      loadList();
+    } catch (e) { saveOk = false; saveMsg = e.message || 'Error al eliminar'; showDelete = false; }
+    finally { deleting = false; }
+  }
+
   // ── Crear proyecto ───────────────────────────────────────────
   function openNew() { showNew = true; newMsg = ''; nf = { name: '', briefProjectId: '', serviceType: '', amount: '', status: 'active' }; }
   async function createProject() {
@@ -186,6 +212,29 @@
     <button class="b b--primary" onclick={openNew}>+ Nuevo proyecto</button>
   </div>
 
+  {#if rows.length}
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi__n teal">{summary.active}</span>
+        <span class="kpi__l">Activos</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__n gold">{summary.on_hold}</span>
+        <span class="kpi__l">En pausa</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__n">{summary.completed}</span>
+        <span class="kpi__l">Completados</span>
+      </div>
+      {#if summary.cancelled}
+        <div class="kpi">
+          <span class="kpi__n err">{summary.cancelled}</span>
+          <span class="kpi__l">Cancelados</span>
+        </div>
+      {/if}
+    </div>
+  {/if}
+
   <div class="chips">
     {#each P_FILTERS as f}
       <button class="chip" class:on={filter === f.id} onclick={() => setFilter(f.id)}>{f.label}</button>
@@ -199,7 +248,18 @@
   {:else if error}
     <div class="empty err">{error}</div>
   {:else if rows.length === 0}
-    <div class="empty">Sin proyectos que coincidan. Crea uno con “+ Nuevo proyecto”.</div>
+    <div class="empty empty--big">
+      <div class="empty__icon" aria-hidden="true">📁</div>
+      <p class="empty__title">
+        {#if filter || search}Sin proyectos que coincidan{:else}Aún no hay proyectos{/if}
+      </p>
+      <p class="empty__sub">
+        {#if filter || search}Probá otro filtro o limpiá la búsqueda.{:else}Creá el primero para empezar a seguir su avance.{/if}
+      </p>
+      {#if !filter && !search}
+        <button class="b b--primary" onclick={openNew}>+ Nuevo proyecto</button>
+      {/if}
+    </div>
   {:else}
     <div class="cards">
       {#each rows as r (r.id)}
@@ -351,6 +411,12 @@
           {#if selected.brief_project_id}<div class="kv"><span class="kv__k">Brief</span><span class="kv__v mono gold">{selected.brief_project_id}</span></div>{/if}
           <div class="kv"><span class="kv__k">Creado</span><span class="kv__v mono">{fmtDateTime(selected.created_at)}</span></div>
         </div>
+
+        <div class="card card--danger">
+          <h3 class="card__t card__t--danger">Zona de riesgo</h3>
+          <p class="danger-note">Eliminar borra el proyecto y todos sus hitos. No se puede deshacer.</p>
+          <button class="b b--danger full" onclick={() => showDelete = true}>🗑 Eliminar proyecto</button>
+        </div>
       </aside>
     </div>
   {/if}
@@ -383,9 +449,31 @@
   </div>
 {/if}
 
+{#if showDelete && selected}
+  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}>
+    <div class="modal">
+      <h3 class="modal__t modal__t--danger">Eliminar proyecto</h3>
+      <p class="modal__b">
+        Se borra <strong class="mono gold">{selected.project_code || ('PRJ-' + selected.id)}</strong>
+        y sus hitos. Esta acción es <strong>irreversible</strong>.
+      </p>
+      <div class="modal__act">
+        <button class="b b--ghost" onclick={() => showDelete = false}>Cancelar</button>
+        <button class="b b--danger" disabled={deleting} onclick={doDelete}>{deleting ? 'Eliminando…' : 'Eliminar'}</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
+
+  /* KPI chips (resumen de la lista) */
+  .kpis { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); }
+  .kpi { flex: 1 1 0; min-width: 110px; display: flex; flex-direction: column; gap: 2px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
+  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
+  .kpi__l { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-subtle); }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
@@ -397,8 +485,8 @@
 
   /* Tarjetas de proyecto */
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-3); }
-  .pcard { display: flex; flex-direction: column; gap: 6px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--duration-fast); }
-  .pcard:hover { border-color: var(--accent-gold); background: var(--bg-elevated); }
+  .pcard { display: flex; flex-direction: column; gap: 6px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast); }
+  .pcard:hover { border-color: var(--accent-gold); background: var(--bg-elevated); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
   .pcard__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .pcard__id { font-size: var(--text-xs); }
   .pcard__name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); line-height: 1.2; }
@@ -420,6 +508,12 @@
   .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; }
   .empty.err { color: var(--color-error); font-style: normal; }
   .muted { padding: var(--space-4); }
+
+  /* Empty state centrado (Orbit) */
+  .empty--big { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-9) var(--space-6); font-style: normal; }
+  .empty__icon { font-size: 32px; opacity: .65; margin-bottom: var(--space-1); }
+  .empty__title { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); margin: 0; }
+  .empty__sub { font-size: var(--text-sm); color: var(--fg-subtle); margin: 0 0 var(--space-2); }
 
   /* Detalle */
   .back { background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; cursor: pointer; margin: var(--space-4) 0; padding: 4px 0; }
@@ -463,6 +557,9 @@
   .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
   .card__t { font-family: var(--font-mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 var(--space-3); }
+  .card--danger { border-color: rgba(224,92,92,.28); }
+  .card__t--danger { color: var(--color-error); }
+  .danger-note { font-size: var(--text-xs); color: var(--fg-subtle); margin: 0 0 var(--space-3); line-height: 1.4; }
   .kv { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border-subtle); }
   .kv:last-child { border-bottom: 0; }
   .kv__k { font-size: var(--text-xs); color: var(--fg-secondary); }
@@ -472,12 +569,15 @@
   .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
   .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
   .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
+  .b--danger { color: var(--color-error); border-color: rgba(224,92,92,.4); }
+  .b--danger:hover:not(:disabled) { background: rgba(224,92,92,.1); border-color: var(--color-error); color: var(--color-error); }
   .b.full { width: 100%; }
   .b:disabled { opacity: .5; cursor: not-allowed; }
 
   .mono { font-family: var(--font-mono); }
   .gold { color: var(--accent-gold); }
   .teal { color: var(--accent-teal); }
+  .err { color: var(--color-error); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
 
   .msg { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--color-error); min-height: 12px; }
@@ -487,6 +587,8 @@
   .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
   .modal { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-lg); padding: var(--space-5); }
   .modal__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--accent-gold); margin: 0 0 var(--space-3); }
+  .modal__t--danger { color: var(--color-error); }
+  .modal__b { font-size: var(--text-sm); color: var(--fg-secondary); line-height: 1.5; margin: 0 0 var(--space-2); }
   .fl { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); margin: 10px 0 4px; }
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
 

@@ -475,10 +475,14 @@
   .src { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; }
   .src--chat { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
   .src--contact { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .status { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 8px; font-size: var(--text-xs); cursor: pointer; }
-  .status:focus { outline: none; border-color: var(--accent-gold); }
-  .status--converted { color: var(--accent-teal); }
-  .status--archived { color: var(--fg-subtle); }
+  /* Estado como píldora tintada (Orbit) — sigue siendo un <select> editable */
+  .status { appearance: none; -webkit-appearance: none; background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); color: var(--accent-gold); padding: 5px 12px; font-size: 11px; font-weight: 600; letter-spacing: .02em; cursor: pointer; transition: filter var(--duration-fast), box-shadow var(--duration-fast); }
+  .status:hover { filter: brightness(1.12); }
+  .status:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .status option { background: var(--bg-elevated); color: var(--fg-primary); }
+  .status--contacted { background: var(--accent-teal-dim); border-color: var(--accent-teal-line); color: var(--accent-teal); }
+  .status--converted { background: var(--accent-teal-dim); border-color: var(--accent-teal-line); color: var(--accent-teal); }
+  .status--archived { background: var(--bg-elevated); border-color: var(--border-strong); color: var(--fg-subtle); }
 
   .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7); text-align: center; color: var(--fg-secondary); font-style: italic; margin-top: var(--space-4); }
   .empty.err { color: var(--color-error); font-style: normal; }

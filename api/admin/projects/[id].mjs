@@ -1,19 +1,25 @@
-// /api/admin/projects/:id   (id = projects.id numérico)
-//   GET   → { project, milestones, progress }
-//   PATCH → { status?, name?, serviceType?, agreedAmountCents? } actualiza el proyecto
+// /api/admin/projects/:id   (id = projects.id, BIGINT)
+//   GET    → { project, milestones, progress }
+//   PATCH  → { status?, name?, serviceType?, agreedAmountCents? } actualiza el proyecto
+//   DELETE → elimina el proyecto y sus hitos
 // Protegida con requireAdmin.
 import { requireAdmin } from '../../../lib/auth.mjs';
 import { sql } from '@vercel/postgres';
 import {
-  getProject, listMilestones, projectProgress, PROJECT_STATUSES,
+  getProject, listMilestones, projectProgress, deleteProject, PROJECT_STATUSES,
 } from '../../../lib/projects.mjs';
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
 
-  const id = parseInt((req.query?.id || '').toString(), 10);
-  if (!Number.isFinite(id)) return res.status(400).json({ ok: false, error: 'ID inválido' });
+  // El id es BIGINT → @vercel/postgres lo devuelve como STRING. NO usar parseInt:
+  // corrompe ids grandes (>2^53) → el WHERE no matchea → 404. Validamos formato y
+  // pasamos el string tal cual (la query parametrizada lo liga al BIGINT).
+  const id = (req.query?.id ?? '').toString().trim();
+  if (!id || !/^\d+$/.test(id)) {
+    return res.status(400).json({ ok: false, error: 'ID inválido' });
+  }
 
   if (req.method === 'GET') {
     try {
@@ -83,6 +89,20 @@ export default async function handler(req, res) {
     }
   }
 
-  res.setHeader('Allow', 'GET, PATCH');
+  if (req.method === 'DELETE') {
+    try {
+      const before = await getProject(id);
+      if (!before) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
+      const ok = await deleteProject(id);
+      if (!ok) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
+      console.log(`[admin/projects/:id DELETE] ${id} eliminado por ${session.email}`);
+      return res.status(200).json({ ok: true, deleted: id });
+    } catch (err) {
+      console.error('[admin/projects/:id DELETE] error:', err);
+      return res.status(500).json({ ok: false, error: 'Error al eliminar proyecto' });
+    }
+  }
+
+  res.setHeader('Allow', 'GET, PATCH, DELETE');
   return res.status(405).json({ ok: false, error: 'Method not allowed' });
 }

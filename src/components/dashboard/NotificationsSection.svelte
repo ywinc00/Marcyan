@@ -2,8 +2,22 @@
   import { onMount } from 'svelte';
 
   // ── Helpers (autosuficiente, igual que BriefsSection) ─────────
+  // api() con timeout vía AbortController: si una Function se cuelga
+  // (cold-start lento, deploy a medias), abortamos a los ~12s para que
+  // la UI muestre el estado de error en vez de un "Cargando…" infinito.
   async function api(url, opts = {}) {
-    return fetch(url, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 12000);
+    try {
+      return await fetch(url, {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl.signal,
+        ...opts,
+      });
+    } finally {
+      clearTimeout(t);
+    }
   }
   function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
   function fmtDateTime(d) { return d ? new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
@@ -15,6 +29,18 @@
     if (diff < 86400) return Math.floor(diff / 3600) + 'h';
     if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
     return fmtDate(d);
+  }
+
+  // Traduce fallos de red/timeout (AbortError, TypeError "Failed to fetch")
+  // a un mensaje en español accionable. Cualquier otro error conserva su texto.
+  function friendlyError(e) {
+    if (e && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
+      return 'La conexión tardó demasiado. Pulsa Actualizar para reintentar.';
+    }
+    if (e instanceof TypeError) {
+      return 'No se pudo conectar. Revisa tu conexión y pulsa Actualizar.';
+    }
+    return (e && e.message) || 'Error al cargar';
   }
 
   // type → etiqueta + glifo + clase de color
@@ -47,7 +73,7 @@
       if (!j.ok) throw new Error(j.error || 'Error');
       rows = j.rows || [];
       unread = j.unread || 0;
-    } catch (e) { error = e.message || 'Error al cargar'; }
+    } catch (e) { error = friendlyError(e); }
     finally { loading = false; }
   }
 
@@ -63,7 +89,7 @@
       rows = rows.map((x) => (x.id === n.id ? j.notification : x));
       unread = j.unread ?? Math.max(0, unread - 1);
       if (onlyUnread) rows = rows.filter((x) => !x.read_at);
-    } catch (e) { error = e.message || 'Error al marcar'; }
+    } catch (e) { error = friendlyError(e); }
   }
 
   async function markAll() {
@@ -75,7 +101,7 @@
       if (!j.ok) throw new Error(j.error || 'Error');
       unread = j.unread ?? 0;
       await load();
-    } catch (e) { error = e.message || 'Error al marcar todas'; }
+    } catch (e) { error = friendlyError(e); }
     finally { busyAll = false; }
   }
 
@@ -99,10 +125,13 @@
   </button>
 </div>
 
-{#if error}<div class="msg">{error}</div>{/if}
-
-{#if loading}
-  <div class="empty">Cargando…</div>
+{#if error}
+  <div class="empty empty--err" role="alert">
+    <p class="empty__msg">{error}</p>
+    <button class="b b--primary" onclick={load}>↻ Actualizar</button>
+  </div>
+{:else if loading}
+  <div class="empty"><span class="spin" aria-hidden="true"></span>Cargando…</div>
 {:else if rows.length === 0}
   <div class="empty">
     {onlyUnread ? 'No tienes avisos sin leer.' : 'Sin avisos todavía. Cuando llegue un lead, un brief o alguien pida hablar con una persona, aparecerá aquí.'}
@@ -139,17 +168,23 @@
 <style>
   .sec-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); display: inline-flex; align-items: center; gap: 10px; }
-  .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .1em; color: var(--accent-teal); background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); border-radius: var(--radius-pill); padding: 2px 9px; }
+  /* Pill Orbit: el conteo de no-leídos junto al título usa el acento (naranja)
+     para llamar la atención, igual que el borde de las tarjetas no leídas. */
+  .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: 2px 9px; }
   .head-act { display: inline-flex; gap: 6px; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-4); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
   .chip:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
   .chip.on { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); }
-  .chip__n { padding: 0 5px; background: rgba(255,255,255,.06); border-radius: 8px; font-size: 9px; }
+  .chip__n { padding: 1px 6px; min-width: 16px; text-align: center; background: var(--surface-3); border-radius: var(--radius-pill); font-size: 9px; color: var(--fg-secondary); }
+  .chip.on .chip__n { background: var(--accent-gold); color: var(--fg-inverse); }
 
-  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; }
-  .msg { font-family: var(--font-mono); font-size: 10px; color: var(--color-error); margin-bottom: var(--space-3); }
+  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
+  .empty--err { border-color: var(--border-accent); }
+  .empty__msg { margin: 0; color: var(--fg-primary); font-size: var(--text-sm); line-height: 1.55; max-width: 38ch; }
+  .spin { width: 16px; height: 16px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 
@@ -166,7 +201,11 @@
 
   .note__body { min-width: 0; flex: 1 1 auto; }
   .note__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
-  .note__type { font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); }
+  /* La etiqueta de tipo hereda el color de su categoría (igual que el icono):
+     lead/brief naranja, handoff verde, sistema neutro. */
+  .note__type { font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--accent-gold); }
+  .note--handoff .note__type { color: var(--accent-teal); }
+  .note--system .note__type { color: var(--fg-subtle); }
   .note__ref { font-size: var(--text-xs); }
   .note__when { font-size: 10px; margin-left: auto; }
 
@@ -187,9 +226,5 @@
   .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
 
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 12px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: #dabd86; }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--ghost vive en dashboard.css (global). */
 </style>

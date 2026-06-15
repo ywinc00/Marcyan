@@ -24,3 +24,6 @@ Thumbs.db
 .idea/
 .claude/
 *.swp
+
+# dev-only dashboard mock backend (never shipped)
+public/dev/

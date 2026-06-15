@@ -1,5 +1,6 @@
 // /api/admin/finance/summary
-//   GET → métricas para KPIs (cobrado mes, por cobrar, vencido) + ingresos por mes
+//   GET → métricas para KPIs (cobrado mes, por cobrar, vencido, gastos mes,
+//         run-rate de suscripciones, neto del mes) + ingresos por mes
 // Protegido con requireAdmin. Montos en CENTAVOS USD.
 import { requireAdmin } from '../../../lib/auth.mjs';
 import { financeSummary } from '../../../lib/finance.mjs';

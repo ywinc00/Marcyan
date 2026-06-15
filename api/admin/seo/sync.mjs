@@ -52,8 +52,9 @@ export default async function handler(req, res) {
 
     let results;
     if (body.id != null && body.id !== '') {
-      const id = parseInt(body.id, 10);
-      if (!Number.isFinite(id)) return res.status(400).json({ ok: false, error: 'ID inválido' });
+      // id BIGINT → string (ver nota en projects/[id].mjs); parseInt corrompía ids grandes.
+      const id = String(body.id).trim();
+      if (!/^\d+$/.test(id)) return res.status(400).json({ ok: false, error: 'ID inválido' });
       const project = await getSeoProject(id);
       if (!project) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
       results = [await syncProject(project, days)];

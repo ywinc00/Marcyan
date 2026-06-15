@@ -1,17 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════
-   MARCYAN · PANEL — capa visual "Orbit" (solo /dashboard)
-   Redefine tokens del DS dentro del panel para adoptar el lenguaje
-   visual de Orbit (bordes hairline, superficies en capas, radios 14px),
-   manteniendo la identidad Marcyan (oro #c8a96e, teal #4fc3a1, fuentes).
-   Importado SOLO por DashboardLayout → no afecta el sitio público.
+   MARCYAN · PANEL — capa visual "ORBIT" (solo /dashboard)
+   Este panel es INTERNO (no lo ve el público), así que NO sigue la
+   identidad de marca del sitio: adopta 1:1 el lenguaje visual de Orbit
+   (Practica/05-orbit-dashboard) — paleta dark en capas, bordes hairline,
+   acento NARANJA único, tipografía Inter. Redefine los tokens del DS
+   SOLO dentro del panel (importado únicamente por DashboardLayout) →
+   no afecta el sitio público.
+
+   El acento se centraliza en --accent-gold (histórico): cambiar ese
+   valor reculorea todo el panel en una línea.
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* ── Superficies en capas (estilo Orbit, base negra Marcyan) ── */
-  --bg-base:     #0c0c10;   /* fondo del panel (main) */
-  --bg-2:        #08080b;   /* sidebar — más oscuro que el main (estilo Orbit) */
-  --bg-card:     #141418;   /* = surface */
-  --bg-elevated: #1b1b20;   /* = surface-2 */
+  /* ── Superficies en capas (Orbit) ── */
+  --bg-base:     #0e0e11;   /* fondo del main */
+  --bg-2:        #0b0b0e;   /* sidebar (más oscuro que el main) */
+  --bg-card:     #16161a;   /* surface — tarjetas/paneles */
+  --bg-elevated: #1b1b20;   /* surface-2 — hover, inputs, nested */
   --surface-3:   #23232a;   /* tooltips, chips activos */
+  --bg-overlay:  rgba(8, 8, 11, 0.72);
 
   /* ── Bordes HAIRLINE translúcidos (clave del look Orbit) ── */
   --border:        rgba(255, 255, 255, 0.07);
@@ -19,29 +25,135 @@
   --border-strong: rgba(255, 255, 255, 0.11);
   --border-accent: var(--accent-gold-line);
 
-  /* ── Texto: 3 niveles legibles (blanco cálido Marcyan) ── */
-  --fg-primary:   #f1efe9;
-  --fg-secondary: #a6a29b;
-  --fg-subtle:    #6f6d74;
+  /* ── Texto: 3 niveles (neutro frío, estilo Orbit) ── */
+  --fg-primary:   #f4f4f5;
+  --fg-secondary: #a1a1aa;
+  --fg-subtle:    #6b6b74;
+  --fg-inverse:   #ffffff;   /* texto sobre el acento naranja */
+
+  /* ── Acento ÚNICO: Naranja Orbit (lo lleva el token "gold") ── */
+  --accent-gold:       #f97316;
+  --accent-gold-deep:  #ea580c;
+  --accent-gold-hover: #fb923c;
+  --accent-gold-dim:   rgba(249, 115, 22, 0.16);
+  --accent-gold-line:  rgba(249, 115, 22, 0.32);
+  --accent-gold-glow:  rgba(249, 115, 22, 0.30);
+  --accent-gold-rgb:   249, 115, 22;
+
+  /* ── Secundario de datos / positivo: Verde Orbit (token "teal") ── */
+  --accent-teal:      #34d399;
+  --accent-teal-dim:  rgba(52, 211, 153, 0.14);
+  --accent-teal-line: rgba(52, 211, 153, 0.30);
+  --accent-teal-rgb:  52, 211, 153;
+
+  --accent:   var(--accent-gold);
+  --accent-2: var(--accent-teal);
+
+  /* ── Semánticos (Orbit) ── */
+  --color-success: #22c55e;
+  --color-warning: #f5b338;
+  --color-error:   #ef4444;
+  --color-error-rgb: 239, 68, 68;
+  --color-info:    #60a5fa;
 
   /* ── Radios Orbit ── */
-  --radius-md: 9px;
-  --radius-lg: 14px;
+  --radius-sm:   6px;
+  --radius-md:   9px;
+  --radius-lg:   14px;
+  --radius-pill: 999px;
 
-  /* ── Sombras: planas + glow del acento (barra/CTA destacada) ── */
+  /* ── Sombras: planas + glow del acento ── */
   --shadow-card:  none;
   --shadow-hover: 0 0 0 1px var(--border-strong);
-  --shadow-gold:  0 8px 30px -8px rgba(var(--accent-gold-rgb), 0.55);
-  --shadow-teal:  0 8px 30px -8px rgba(var(--accent-teal-rgb), 0.45);
+  --shadow-gold:  0 8px 30px -8px rgba(249, 115, 22, 0.55);
+  --shadow-teal:  0 8px 30px -8px rgba(52, 211, 153, 0.40);
+  --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.72);
+
+  /* ── Tipografía: Inter en todo (Orbit). El token "mono" también
+        es Inter para que las etiquetas tracked/uppercase queden como
+        las de Orbit (Inter 500, no monospace). ── */
+  --font-display: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Orbit: títulos apretados */
+  --tracking-tight: -0.025em;
 }
 
-/* Acento único disciplinado: el oro hace el rol del naranja de Orbit. */
+/* Números alineados (tabular) en datos/tablas — Inter trae tnum */
+body { font-feature-settings: "cv05", "ss01"; }
+.mono, table, .kpi__num, .stat__num, [class*="num"] { font-variant-numeric: tabular-nums; }
 
 /* Scrollbar sutil acorde al panel */
-.admin-page-scope, .dash *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-thumb { background: #26262c; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
-*::-webkit-scrollbar-thumb:hover { background: #34343c; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb { background: #2a2a31; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: #3a3a43; background-clip: padding-box; }
 *::-webkit-scrollbar-track { background: transparent; }
 
-::selection { background: rgba(var(--accent-gold-rgb), 0.28); color: #fff; }
+::selection { background: rgba(249, 115, 22, 0.30); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════════
+   Selects con piel propia (sin chrome nativo del SO)
+   Reglas GLOBALES: los componentes Svelte no hashean estos
+   selectores externos, así que el caret se aplica a todo <select>
+   con .inp (Briefs/Finanzas/Progreso/Seo) y al .ms__sel de Progreso.
+   Solo afecta apariencia visual; el <select> sigue siendo nativo
+   y editable. NO toca los pill-select inline (Finanzas/Leads), que
+   ya tienen su propio tratamiento.
+   ═══════════════════════════════════════════════════════════════ */
+select.inp,
+.inp select,
+.ms__sel {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b74' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Vocabulario de botones unificado (Orbit) — clases GLOBALES.
+   Una sola definición de .b/.btn para TODO el panel: 11px, Inter,
+   sentence-case (sin uppercase ni tracking ancho). Los componentes
+   reusan estas clases en vez de redefinir su propio .b/.btn.
+   ═══════════════════════════════════════════════════════════════ */
+.b,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .01em;
+  text-transform: none;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-secondary);
+  transition: all var(--duration-fast);
+}
+.b:hover:not(:disabled),
+.btn:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
+.b--primary,
+.btn--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 600; }
+.b--primary:hover:not(:disabled),
+.btn--primary:hover:not(:disabled) { background: var(--accent-gold-hover); border-color: var(--accent-gold-hover); }
+.b--ghost:hover:not(:disabled),
+.btn--ghost:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
+.b--danger,
+.btn--danger { color: var(--color-error); border-color: rgba(var(--color-error-rgb), .4); }
+.b--danger:hover:not(:disabled),
+.btn--danger:hover:not(:disabled) { background: rgba(var(--color-error-rgb), .1); border-color: var(--color-error); color: var(--color-error); }
+.b--mini,
+.btn--mini { padding: 7px 11px; }
+.b.full,
+.btn.full { width: 100%; }
+.b:disabled,
+.btn:disabled { opacity: .5; cursor: not-allowed; }

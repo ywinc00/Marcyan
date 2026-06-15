@@ -38,10 +38,17 @@
     { id: 'card', label: 'Tarjeta' }, { id: 'other', label: 'Otro' },
   ];
 
+  const SUB_CYCLES = [{ id: 'monthly', label: 'Mensual' }, { id: 'yearly', label: 'Anual' }];
+  function cycleLabel(c) { return (SUB_CYCLES.find((x) => x.id === c) || {}).label || c; }
+
   // ── Estado: resumen / KPIs ───────────────────────────────────
   let summary = $state(null);
   const revenue = $derived(summary ? summary.revenue_by_month : []);
   const chartMax = $derived(Math.max(1, ...revenue.map((r) => Math.max(0, +r.total_cents || 0))));
+  // Gastos del mes = gastos puntuales + run-rate mensual de suscripciones.
+  const expensesMonthCents = $derived(
+    summary ? (Number(summary.expenses_this_month_cents || 0) + Number(summary.subscriptions_monthly_cents || 0)) : 0,
+  );
 
   // ── Estado: facturas ─────────────────────────────────────────
   let invoices = $state([]);
@@ -75,6 +82,24 @@
   let payForm = $state({ amount: '', method: 'zelle', paid_at: todayISO(), reference: '' });
   let payMsg = $state(''); let payOk = $state(false); let paying = $state(false);
 
+  // ── Estado: egresos (gastos + suscripciones) ─────────────────
+  let expenses = $state([]);
+  let expForm = $state({ label: '', category: '', amount: '', spent_at: todayISO(), vendor: '' });
+  let expMsg = $state(''); let expOk = $state(false); let expBusy = $state(false);
+
+  let subs = $state([]);
+  let subForm = $state({ name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '' });
+  let subMsg = $state(''); let subOk = $state(false); let subBusy = $state(false);
+
+  // Run-rate mensual de suscripciones activas (yearly→/12), calculado en cliente
+  // para reflejar toggles al instante; el summary lo confirma tras refresh.
+  const subsMonthlyCents = $derived(
+    subs.filter((s) => s.active).reduce((acc, s) => {
+      const c = Number(s.amount_cents || 0);
+      return acc + (s.cycle === 'yearly' ? Math.round(c / 12) : c);
+    }, 0),
+  );
+
   // ── Carga ────────────────────────────────────────────────────
   async function loadSummary() {
     try { const r = await api('/api/admin/finance/summary'); const j = await r.json(); if (j.ok) summary = j.summary; } catch (_) {}
@@ -96,6 +121,12 @@
     } catch (e) { error = e.message || 'Error al cargar'; }
     finally { loading = false; }
   }
+  async function loadExpenses() {
+    try { const r = await api('/api/admin/expenses?limit=100'); const j = await r.json(); if (j.ok) expenses = j.rows || []; } catch (_) {}
+  }
+  async function loadSubs() {
+    try { const r = await api('/api/admin/subscriptions'); const j = await r.json(); if (j.ok) subs = j.rows || []; } catch (_) {}
+  }
   function setInvFilter(s) { invFilter = s; invOffset = 0; loadInvoices(); }
   function onSearchInput(e) {
     invSearch = e.currentTarget.value;
@@ -105,7 +136,7 @@
   function nextPage() { if (invOffset + LIMIT < invTotal) { invOffset += LIMIT; loadInvoices(); } }
   function prevPage() { if (invOffset > 0) { invOffset = Math.max(0, invOffset - LIMIT); loadInvoices(); } }
 
-  function refreshAll() { loadSummary(); loadInvoices(); loadClients(); }
+  function refreshAll() { loadSummary(); loadInvoices(); loadClients(); loadExpenses(); loadSubs(); }
 
   // ── Alta de cliente ──────────────────────────────────────────
   async function submitClient() {
@@ -117,7 +148,7 @@
       const r = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ ...cliForm }) });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'Error');
-      cliFormOk = true; cliFormMsg = `✓ ${j.client.client_code} creado`;
+      cliFormOk = true; cliFormMsg = `${j.client.client_code} creado`;
       cliForm = { business_name: '', owner_name: '', email: '', phone: '', city_state: '', notes: '' };
       await loadClients();
       setTimeout(() => { showClientForm = false; cliFormMsg = ''; }, 900);
@@ -133,7 +164,7 @@
       const r = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ from_brief: pid }) });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'Error');
-      convOk = true; convMsg = `✓ ${j.client.client_code} — ${j.client.business_name || 'cliente'}`;
+      convOk = true; convMsg = `${j.client.client_code} — ${j.client.business_name || 'cliente'}`;
       convBrief = '';
       await loadClients();
       setTimeout(() => { showConvertForm = false; convMsg = ''; }, 1200);
@@ -157,7 +188,7 @@
       }) });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'Error');
-      invFormOk = true; invFormMsg = `✓ ${j.invoice.invoice_number} creada`;
+      invFormOk = true; invFormMsg = `${j.invoice.invoice_number} creada`;
       invForm = { client_id: '', amount: '', description: '', issued_at: todayISO(), due_date: '', status: 'sent' };
       invOffset = 0;
       await loadInvoices(); await loadSummary();
@@ -199,40 +230,143 @@
       }) });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'Error');
-      payOk = true; payMsg = '✓ Pago registrado';
+      payOk = true; payMsg = 'Pago registrado';
       await loadInvoices(); await loadSummary();
       setTimeout(() => { payInvoice = null; payMsg = ''; }, 900);
     } catch (e) { payOk = false; payMsg = e.message || 'Error al registrar'; }
     finally { paying = false; }
   }
 
+  // ── Gastos de empresa ────────────────────────────────────────
+  async function submitExpense() {
+    const label = expForm.label.trim();
+    if (!label) { expOk = false; expMsg = 'Escribe una etiqueta'; return; }
+    const cents = dollarsToCents(expForm.amount);
+    if (cents <= 0) { expOk = false; expMsg = 'El monto debe ser mayor a 0'; return; }
+    expBusy = true; expMsg = 'Guardando…'; expOk = false;
+    try {
+      const r = await api('/api/admin/expenses', { method: 'POST', body: JSON.stringify({
+        label,
+        category: expForm.category || null,
+        amount_cents: cents,
+        spent_at: expForm.spent_at || null,
+        vendor: expForm.vendor || null,
+      }) });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Error');
+      expOk = true; expMsg = 'Gasto añadido';
+      expForm = { label: '', category: '', amount: '', spent_at: todayISO(), vendor: '' };
+      await loadExpenses(); await loadSummary();
+      setTimeout(() => { expMsg = ''; }, 1500);
+    } catch (e) { expOk = false; expMsg = e.message || 'Error al guardar'; }
+    finally { expBusy = false; }
+  }
+  async function deleteExpense(exp) {
+    const prev = expenses;
+    expenses = expenses.filter((e) => e.id !== exp.id);
+    try {
+      const r = await api('/api/admin/expenses/' + exp.id, { method: 'DELETE' });
+      const j = await r.json();
+      if (!j.ok) throw new Error();
+      await loadSummary();
+    } catch (_) { expenses = prev; }
+  }
+
+  // ── Suscripciones ────────────────────────────────────────────
+  async function submitSub() {
+    const name = subForm.name.trim();
+    if (!name) { subOk = false; subMsg = 'Escribe un nombre'; return; }
+    const cents = dollarsToCents(subForm.amount);
+    if (cents <= 0) { subOk = false; subMsg = 'El monto debe ser mayor a 0'; return; }
+    subBusy = true; subMsg = 'Guardando…'; subOk = false;
+    try {
+      const r = await api('/api/admin/subscriptions', { method: 'POST', body: JSON.stringify({
+        name,
+        category: subForm.category || null,
+        amount_cents: cents,
+        cycle: subForm.cycle,
+        next_charge_at: subForm.next_charge_at || null,
+      }) });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Error');
+      subOk = true; subMsg = 'Suscripción añadida';
+      subForm = { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '' };
+      await loadSubs(); await loadSummary();
+      setTimeout(() => { subMsg = ''; }, 1500);
+    } catch (e) { subOk = false; subMsg = e.message || 'Error al guardar'; }
+    finally { subBusy = false; }
+  }
+  async function toggleSub(sub) {
+    const prev = sub.active;
+    sub.active = !sub.active; subs = [...subs];
+    try {
+      const r = await api('/api/admin/subscriptions/' + sub.id, { method: 'PATCH', body: JSON.stringify({ active: sub.active }) });
+      const j = await r.json();
+      if (!j.ok) throw new Error();
+      await loadSummary();
+    } catch (_) { sub.active = prev; subs = [...subs]; }
+  }
+  async function deleteSub(sub) {
+    const prev = subs;
+    subs = subs.filter((s) => s.id !== sub.id);
+    try {
+      const r = await api('/api/admin/subscriptions/' + sub.id, { method: 'DELETE' });
+      const j = await r.json();
+      if (!j.ok) throw new Error();
+      await loadSummary();
+    } catch (_) { subs = prev; }
+  }
+
   onMount(() => { refreshAll(); });
 </script>
 
-<!-- ═══ KPIs ═══ -->
+<!-- ═══ Encabezado ═══ -->
 <div class="sec-head">
   <h1 class="greet">Finanzas</h1>
-  <button class="b b--ghost" onclick={refreshAll}>↻ Actualizar</button>
+  <button class="b b--ghost" onclick={refreshAll}>Actualizar</button>
 </div>
 
+<!-- ═══ KPIs ═══ -->
 <div class="kpis">
   <div class="kpi">
-    <span class="kpi__lbl">Cobrado (mes)</span>
-    <span class="kpi__num teal">{summary ? fmtUsd(summary.collected_this_month_cents) : '—'}</span>
+    <div class="kpi__txt">
+      <span class="kpi__lbl">Cobrado (mes)</span>
+      <span class="kpi__num teal">{summary ? fmtUsd(summary.collected_this_month_cents) : '—'}</span>
+    </div>
+    <svg class="kpi__art teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM3 7l9 6 9-6" /></svg>
   </div>
   <div class="kpi">
-    <span class="kpi__lbl">Por cobrar</span>
-    <span class="kpi__num gold">{summary ? fmtUsd(summary.ar_total_cents) : '—'}</span>
+    <div class="kpi__txt">
+      <span class="kpi__lbl">Por cobrar</span>
+      <span class="kpi__num gold">{summary ? fmtUsd(summary.ar_total_cents) : '—'}</span>
+    </div>
+    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6" /></svg>
   </div>
   <div class="kpi">
-    <span class="kpi__lbl">Vencido</span>
-    <span class="kpi__num" class:danger={summary && summary.overdue_cents > 0}>{summary ? fmtUsd(summary.overdue_cents) : '—'}</span>
-    {#if summary && summary.overdue_count > 0}<span class="kpi__hint">{summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'}</span>{/if}
+    <div class="kpi__txt">
+      <span class="kpi__lbl">Vencido</span>
+      <span class="kpi__num" class:danger={summary && summary.overdue_cents > 0}>{summary ? fmtUsd(summary.overdue_cents) : '—'}</span>
+      {#if summary && summary.overdue_count > 0}<span class="kpi__hint">{summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'}</span>{/if}
+    </div>
+    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
   </div>
   <div class="kpi">
-    <span class="kpi__lbl">Facturas abiertas</span>
-    <span class="kpi__num">{summary ? summary.counts.open_invoices : '—'}</span>
-    {#if summary}<span class="kpi__hint">{summary.counts.clients} cliente{summary.counts.clients === 1 ? '' : 's'}</span>{/if}
+    <div class="kpi__txt">
+      <span class="kpi__lbl">Gastos (mes)</span>
+      <span class="kpi__num">{summary ? fmtUsd(expensesMonthCents) : '—'}</span>
+      {#if summary}<span class="kpi__hint">+ {fmtUsd(summary.subscriptions_monthly_cents)} subs/mes</span>{/if}
+    </div>
+    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12" /></svg>
+  </div>
+  <div class="kpi">
+    <div class="kpi__txt">
+      <span class="kpi__lbl">Neto (mes)</span>
+      <span class="kpi__num"
+        class:teal={summary && summary.net_this_month_cents >= 0}
+        class:danger={summary && summary.net_this_month_cents < 0}>{summary ? fmtUsd(summary.net_this_month_cents) : '—'}</span>
+      {#if summary}<span class="kpi__hint">cobrado − egresos</span>{/if}
+    </div>
+    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M21 7v6M21 7h-6" /></svg>
   </div>
 </div>
 
@@ -240,19 +374,32 @@
 <div class="panel">
   <div class="panel__lbl">Ingresos por mes <span class="panel__sub">últimos 6 · por fecha de pago</span></div>
   {#if summary}
-    <svg class="chart" viewBox="0 0 560 180" role="img" aria-label="Ingresos por mes">
+    <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Ingresos por mes">
+      <defs>
+        <filter id="finBarGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
+        </filter>
+      </defs>
+      <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
+      <line x1="0" y1="82" x2="560" y2="82" class="chart__grid" />
+      <line x1="0" y1="120" x2="560" y2="120" class="chart__grid" />
+      <line x1="0" y1="158" x2="560" y2="158" class="chart__base" />
       {#each revenue as a, i}
         <rect
-          x={i * (560 / revenue.length) + (560 / revenue.length) * 0.22}
-          y={150 - (a.total_cents / chartMax) * 132}
-          width={(560 / revenue.length) * 0.56}
-          height={Math.max(0, (a.total_cents / chartMax) * 132)}
-          rx="3"
-          fill={i === revenue.length - 1 ? 'var(--accent-teal)' : 'var(--accent-gold)'}
-          opacity={i === revenue.length - 1 ? 1 : 0.5} />
-        <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y="170" text-anchor="middle" class="chart__lbl">{monthLabel(a.month)}</text>
-        {#if a.total_cents > 0}
-          <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y={150 - (a.total_cents / chartMax) * 132 - 5} text-anchor="middle" class="chart__val">{fmtUsd(a.total_cents)}</text>
+          x={i * (560 / revenue.length) + (560 / revenue.length) * 0.25}
+          y={158 - (a.total_cents / chartMax) * 118}
+          width={(560 / revenue.length) * 0.5}
+          height={Math.max(0, (a.total_cents / chartMax) * 118)}
+          rx="5"
+          fill={i === revenue.length - 1 ? 'var(--accent-gold)' : '#2b2b33'}
+          filter={i === revenue.length - 1 ? 'url(#finBarGlow)' : undefined} />
+        <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y="180" text-anchor="middle" class="chart__lbl" class:is-active={i === revenue.length - 1}>{monthLabel(a.month)}</text>
+        {#if i === revenue.length - 1}
+          <circle cx={i * (560 / revenue.length) + (560 / revenue.length) / 2} cy={158 - (a.total_cents / chartMax) * 118} r="3.5" fill="var(--accent-gold)" />
+          <rect x={i * (560 / revenue.length) + (560 / revenue.length) / 2 - 38} y={158 - (a.total_cents / chartMax) * 118 - 27} width="76" height="18" rx="5" fill="var(--accent-gold)" />
+          <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y={158 - (a.total_cents / chartMax) * 118 - 14} text-anchor="middle" class="chart__tip">{fmtUsd(a.total_cents)}</text>
+        {:else if a.total_cents > 0}
+          <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y={158 - (a.total_cents / chartMax) * 118 - 6} text-anchor="middle" class="chart__val">{fmtUsd(a.total_cents)}</text>
         {/if}
       {/each}
     </svg>
@@ -263,7 +410,7 @@
 <div class="actions">
   <button class="b b--primary" onclick={() => { showInvoiceForm = !showInvoiceForm; showClientForm = false; showConvertForm = false; }}>+ Factura</button>
   <button class="b" onclick={() => { showClientForm = !showClientForm; showInvoiceForm = false; showConvertForm = false; }}>+ Cliente</button>
-  <button class="b" onclick={() => { showConvertForm = !showConvertForm; showInvoiceForm = false; showClientForm = false; }}>⇄ Brief → Cliente</button>
+  <button class="b" onclick={() => { showConvertForm = !showConvertForm; showInvoiceForm = false; showClientForm = false; }}>Brief → Cliente</button>
 </div>
 
 {#if showInvoiceForm}
@@ -360,29 +507,35 @@
 {:else if error}
   <div class="empty err">{error}</div>
 {:else if invoices.length === 0}
-  <div class="empty">Sin facturas que coincidan. Crea una con “+ Factura”.</div>
+  <div class="empty">
+    <div class="empty__title">Sin facturas que coincidan</div>
+    <div class="empty__sub">Crea una con “+ Factura”.</div>
+  </div>
 {:else}
   <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>Factura</th><th>Cliente</th><th>Monto</th><th>Saldo</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Factura</th><th>Cliente</th><th class="num">Monto</th><th class="num">Saldo</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
       <tbody>
         {#each invoices as inv (inv.id)}
           <tr>
             <td class="mono gold">{inv.invoice_number}</td>
             <td class="t-name">{inv.client_name || inv.client_code || '—'}</td>
-            <td class="mono">{fmtUsd(inv.amount_cents)}</td>
-            <td class="mono" class:teal={Number(inv.balance_cents) <= 0} class:gold={Number(inv.balance_cents) > 0}>{fmtUsd(inv.balance_cents)}</td>
+            <td class="mono num">{fmtUsd(inv.amount_cents)}</td>
+            <td class="mono num" class:teal={Number(inv.balance_cents) <= 0} class:gold={Number(inv.balance_cents) > 0}>{fmtUsd(inv.balance_cents)}</td>
             <td class="mono dim">{inv.due_date ? fmtDate(inv.due_date) : '—'}</td>
             <td>
-              <select class="status status--{inv.status}" value={inv.status} onchange={(e) => setInvoiceStatus(inv, e.currentTarget.value)}>
-                {#each INVOICE_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
-              </select>
+              <div class="pill-select pill--{inv.status}">
+                <span class="pill__dot"></span>
+                <select aria-label="Estado de factura" value={inv.status} onchange={(e) => setInvoiceStatus(inv, e.currentTarget.value)}>
+                  {#each INVOICE_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
+                </select>
+              </div>
             </td>
             <td class="t-act">
               {#if inv.status !== 'paid' && inv.status !== 'void' && Number(inv.balance_cents) > 0}
                 <button class="b b--mini b--primary" onclick={() => openPay(inv)}>+ Pago</button>
               {:else if inv.status === 'paid'}
-                <span class="paid-tick">✓ pagada</span>
+                <span class="paid-tick">pagada</span>
               {/if}
             </td>
           </tr>
@@ -401,11 +554,102 @@
   {/if}
 {/if}
 
+<!-- ═══ Egresos y suscripciones ═══ -->
+<div class="egresos">
+  <!-- (a) Gastos de empresa -->
+  <div class="panel egresos__col">
+    <div class="panel__lbl">
+      Gastos de empresa <span class="panel__sub">puntuales</span>
+      {#if summary}<span class="panel__total">{fmtUsd(summary.expenses_this_month_cents)} este mes</span>{/if}
+    </div>
+
+    <div class="inline-form">
+      <input class="inp" type="text" placeholder="Concepto (p. ej. dominio)" bind:value={expForm.label} />
+      <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={expForm.category} />
+      <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={expForm.amount} />
+      <input class="inp inp--sm" type="date" bind:value={expForm.spent_at} />
+      <input class="inp inp--sm" type="text" placeholder="Vendor" bind:value={expForm.vendor} />
+      <button class="b b--primary b--mini" disabled={expBusy} onclick={submitExpense}>+ Gasto</button>
+    </div>
+    {#if expMsg}<div class="msg msg--inline" class:ok={expOk}>{expMsg}</div>{/if}
+
+    {#if expenses.length === 0}
+      <div class="mini-empty">Aún no hay gastos registrados.</div>
+    {:else}
+      <div class="table-wrap table-wrap--flush">
+        <table class="table">
+          <thead><tr><th>Concepto</th><th>Categoría</th><th class="num">Monto</th><th>Fecha</th><th></th></tr></thead>
+          <tbody>
+            {#each expenses as exp (exp.id)}
+              <tr>
+                <td class="t-name">{exp.label}{#if exp.vendor}<span class="sub-meta"> · {exp.vendor}</span>{/if}</td>
+                <td>{#if exp.category}<span class="tag">{exp.category}</span>{:else}<span class="dim">—</span>{/if}</td>
+                <td class="mono num">{fmtUsd(exp.amount_cents)}</td>
+                <td class="mono dim">{fmtDate(exp.spent_at)}</td>
+                <td class="t-act"><button class="icon-del" title="Eliminar gasto" aria-label="Eliminar gasto" onclick={() => deleteExpense(exp)}>×</button></td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
+  </div>
+
+  <!-- (b) Suscripciones -->
+  <div class="panel egresos__col">
+    <div class="panel__lbl">
+      Suscripciones <span class="panel__sub">SaaS recurrentes</span>
+      <span class="panel__total">{fmtUsd(subsMonthlyCents)}/mes activas</span>
+    </div>
+
+    <div class="inline-form">
+      <input class="inp" type="text" placeholder="Servicio (p. ej. Vercel)" bind:value={subForm.name} />
+      <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={subForm.category} />
+      <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={subForm.amount} />
+      <select class="inp inp--sm" bind:value={subForm.cycle}>{#each SUB_CYCLES as c}<option value={c.id}>{c.label}</option>{/each}</select>
+      <input class="inp inp--sm" type="date" title="Próximo cargo" bind:value={subForm.next_charge_at} />
+      <button class="b b--primary b--mini" disabled={subBusy} onclick={submitSub}>+ Suscripción</button>
+    </div>
+    {#if subMsg}<div class="msg msg--inline" class:ok={subOk}>{subMsg}</div>{/if}
+
+    {#if subs.length === 0}
+      <div class="mini-empty">Aún no hay suscripciones.</div>
+    {:else}
+      <div class="table-wrap table-wrap--flush">
+        <table class="table">
+          <thead><tr><th>Servicio</th><th class="num">Monto</th><th>Próx. cargo</th><th>Activa</th><th></th></tr></thead>
+          <tbody>
+            {#each subs as sub (sub.id)}
+              <tr class:row-off={!sub.active}>
+                <td class="t-name">
+                  {sub.name}
+                  <span class="cycle-pill">{cycleLabel(sub.cycle)}</span>
+                  {#if sub.category}<span class="sub-meta"> · {sub.category}</span>{/if}
+                </td>
+                <td class="mono num">{fmtUsd(sub.amount_cents)}</td>
+                <td class="mono dim">{sub.next_charge_at ? fmtDate(sub.next_charge_at) : '—'}</td>
+                <td>
+                  <button class="toggle" class:on={sub.active} role="switch" aria-checked={sub.active} aria-label="Activar suscripción" onclick={() => toggleSub(sub)}>
+                    <span class="toggle__knob"></span>
+                  </button>
+                </td>
+                <td class="t-act"><button class="icon-del" title="Eliminar suscripción" aria-label="Eliminar suscripción" onclick={() => deleteSub(sub)}>×</button></td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
+  </div>
+</div>
+
 <!-- ═══ Modal: registrar pago ═══ -->
 {#if payInvoice}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) closePay(); }}>
-    <div class="modal">
-      <h3 class="modal__t">Registrar pago</h3>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) closePay(); }}
+       onkeydown={(e) => { if (e.key === 'Escape') closePay(); }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pay-modal-title">
+      <h3 class="modal__t" id="pay-modal-title">Registrar pago</h3>
       <p class="modal__b">
         Factura <strong>{payInvoice.invoice_number}</strong> · {payInvoice.client_name || ''}<br />
         Total {fmtUsd(payInvoice.amount_cents)} · Saldo <strong>{fmtUsd(payInvoice.balance_cents)}</strong>
@@ -432,11 +676,14 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; flex-direction: column; gap: 4px; }
-  .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  /* KPIs — con mini-art de esquina (referencia: home) */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--space-3); }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+  .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .kpi__art { width: 36px; height: 36px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.3; }
+  .kpi__art.teal { color: var(--accent-teal); }
+  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; color: var(--fg-secondary); }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   .kpi__num.danger { color: var(--color-error); }
@@ -444,12 +691,17 @@
 
   /* Panel + chart */
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
-  .panel__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4); }
-  .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
+  .panel__lbl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__sub { color: var(--fg-subtle); }
+  .panel__total { margin-left: auto; color: var(--accent-gold); text-transform: none; letter-spacing: 0; font-size: 11px; }
   .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
   .chart { width: 100%; height: auto; display: block; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
+  .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
   .chart__val { fill: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; }
+  .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
+  .chart__base { stroke: rgba(255, 255, 255, 0.12); }
+  .chart__tip { fill: var(--fg-inverse); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 
   /* Acciones */
   .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--space-4); }
@@ -461,12 +713,16 @@
   .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 16px; }
   .f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .f--wide { grid-column: 1 / -1; }
-  .f__lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); }
+  .f__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
   .form-card__foot { display: flex; align-items: center; gap: 8px; margin-top: var(--space-4); }
   .spacer { flex: 1; }
 
-  .inp { width: 100%; padding: 9px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
+  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
   .inp:focus { border-color: var(--accent-gold); }
+  .inp--sm { padding: 8px 10px; font-size: var(--text-xs); }
+  /* Reserva espacio para el caret del select (la imagen viene del global). */
+  select.inp { padding-right: 30px; }
+  select.inp--sm { padding-right: 26px; background-position: right 8px center; }
 
   /* Chips + search */
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--space-5) 0 var(--space-3); }
@@ -478,40 +734,74 @@
 
   /* Tabla */
   .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .table-wrap--flush { border: 0; border-top: 1px solid var(--border-subtle); border-radius: 0; margin-top: var(--space-2); }
   .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-  .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 12px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  .table td { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); vertical-align: middle; }
-  .table tr:last-child td { border-bottom: 0; }
+  .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 11px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .table th.num { text-align: right; }
+  .table td { padding: 11px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); vertical-align: middle; }
+  .table tbody tr:last-child td { border-bottom: 0; }
+  .table tbody tr:hover { background: var(--bg-elevated); }
   .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
   .gold { color: var(--accent-gold); }
   .teal { color: var(--accent-teal); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
   .t-name { color: var(--fg-primary); }
+  .sub-meta { color: var(--fg-subtle); font-size: var(--text-xs); }
   .t-act { text-align: right; white-space: nowrap; }
   .paid-tick { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-teal); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-secondary); font-size: 10px; }
 
-  .status { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 8px; font-size: var(--text-xs); cursor: pointer; }
-  .status:focus { outline: none; border-color: var(--accent-gold); }
-  .status--paid { color: var(--accent-teal); }
-  .status--partial { color: #dfc08a; }
-  .status--overdue { color: var(--color-error); }
-  .status--void { color: var(--fg-subtle); }
+  /* Pill-select de estado (factura) */
+  .pill-select { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-elevated); }
+  .pill-select .pill__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-subtle); flex: 0 0 auto; }
+  .pill-select select { background: transparent; border: 0; outline: none; color: inherit; font-family: var(--font-mono); font-size: 10px; letter-spacing: .04em; cursor: pointer; padding-right: 2px; }
+  .pill-select select option { color: var(--fg-primary); background: var(--bg-card); }
+  .pill--draft   { color: var(--fg-secondary); border-color: var(--border); }
+  .pill--draft   .pill__dot { background: var(--fg-subtle); }
+  .pill--sent    { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .pill--sent    .pill__dot { background: var(--accent-gold); }
+  .pill--partial { color: var(--accent-gold-hover); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .pill--partial .pill__dot { background: var(--accent-gold-hover); }
+  .pill--paid    { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .pill--paid    .pill__dot { background: var(--accent-teal); }
+  .pill--overdue { color: var(--color-error); border-color: rgba(239, 68, 68, .35); background: rgba(239, 68, 68, .12); }
+  .pill--overdue .pill__dot { background: var(--color-error); }
+  .pill--void    { color: var(--fg-subtle); border-color: var(--border); }
+  .pill--void    .pill__dot { background: var(--fg-subtle); }
 
   .pager { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); font-size: 11px; }
 
-  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; }
-  .empty.err { color: var(--color-error); font-style: normal; }
+  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7) var(--space-6); text-align: center; }
+  .empty__title { color: var(--fg-primary); font-weight: 600; font-size: var(--text-sm); }
+  .empty__sub { color: var(--fg-secondary); font-size: var(--text-xs); margin-top: 4px; }
+  .empty.err { color: var(--color-error); }
+
+  /* Egresos y suscripciones */
+  .egresos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
+  .egresos__col { margin-top: 0; }
+  .inline-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .inline-form .inp { flex: 1 1 130px; min-width: 0; }
+  .inline-form .inp--sm { flex: 0 1 92px; }
+  .mini-empty { color: var(--fg-subtle); font-size: var(--text-xs); padding: var(--space-4) 0 var(--space-2); }
+  .row-off { opacity: .5; }
+  .cycle-pill { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* Toggle de activa */
+  .toggle { width: 34px; height: 19px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-elevated); padding: 0; cursor: pointer; position: relative; transition: all var(--duration-fast); }
+  .toggle__knob { position: absolute; top: 50%; left: 2px; transform: translateY(-50%); width: 13px; height: 13px; border-radius: 50%; background: var(--fg-subtle); transition: all var(--duration-fast); }
+  .toggle.on { background: var(--accent-teal-dim); border-color: var(--accent-teal-line); }
+  .toggle.on .toggle__knob { left: 16px; background: var(--accent-teal); }
+
+  .icon-del { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--fg-subtle); font-size: 18px; line-height: 1; cursor: pointer; transition: all var(--duration-fast); }
+  .icon-del:hover { color: var(--color-error); border-color: rgba(239, 68, 68, .35); background: rgba(239, 68, 68, .1); }
 
   /* Botones */
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 14px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: #dabd86; }
-  .b--mini { padding: 5px 9px; }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--mini vive en dashboard.css (global). */
 
   .msg { font-family: var(--font-mono); font-size: 10px; color: var(--color-error); }
   .msg.ok { color: var(--accent-teal); }
+  .msg--inline { margin-top: 8px; }
 
   /* Modal */
   .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
@@ -521,5 +811,6 @@
   .modal__b strong { color: var(--accent-gold); }
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
 
+  @media (max-width: 920px) { .egresos { grid-template-columns: 1fr; } }
   @media (max-width: 720px) { .fgrid { grid-template-columns: 1fr; } }
 </style>

@@ -247,7 +247,7 @@
               <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Actividad por mes">
                 <defs>
                   <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
-                    <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(200,169,110)" flood-opacity="0.5" />
+                    <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
                   </filter>
                 </defs>
                 <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
@@ -389,7 +389,7 @@
   /* ── Botones ── */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-md); padding: 10px 16px; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); min-height: var(--tap-min); }
   .btn--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .btn--primary:hover:not(:disabled) { background: #dabd86; }
+  .btn--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
   .btn--ghost:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
   .btn:disabled { opacity: .55; cursor: not-allowed; }
 

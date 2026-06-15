@@ -12,9 +12,12 @@ export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
 
-  const idRaw = (req.query?.id || '').toString();
-  const id = parseInt(idRaw, 10);
-  if (!idRaw || !Number.isFinite(id)) {
+  // El id es BIGINT → @vercel/postgres lo devuelve como STRING. NO usar
+  // parseInt: corrompe ids grandes (>2^53) → el WHERE no matchea → 404 →
+  // el front borra el detalle y colapsa al placeholder. Validamos formato
+  // y pasamos el string tal cual (la query parametrizada lo liga al BIGINT).
+  const id = (req.query?.id ?? '').toString().trim();
+  if (!id || !/^\d+$/.test(id)) {
     return res.status(400).json({ ok: false, error: 'ID inválido' });
   }
 

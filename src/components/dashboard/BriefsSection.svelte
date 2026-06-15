@@ -436,7 +436,7 @@
   .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; }
   .badge--pending { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .badge--contacted { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .badge--in_progress { color: #dfc08a; border-color: rgba(223,192,138,.4); background: rgba(223,192,138,.06); }
+  .badge--in_progress { color: #fb923c; border-color: rgba(223,192,138,.4); background: rgba(223,192,138,.06); }
   .badge--completed { color: #9be8c1; border-color: rgba(155,232,193,.35); background: rgba(155,232,193,.06); }
   .badge--archived { color: var(--fg-subtle); border-color: rgba(120,120,120,.3); background: rgba(120,120,120,.05); }
 
@@ -482,7 +482,7 @@
   .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 12px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
   .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
   .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: #dabd86; }
+  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
   .b--danger { color: var(--color-error); border-color: rgba(224,92,92,.4); }
   .b--danger:hover:not(:disabled) { background: rgba(224,92,92,.1); border-color: var(--color-error); }
   .b.full { width: 100%; }

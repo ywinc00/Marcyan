@@ -471,7 +471,7 @@
   .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 12px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
   .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
   .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: #dabd86; }
+  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
   .b.full { width: 100%; }
   .b:disabled { opacity: .5; cursor: not-allowed; }
 

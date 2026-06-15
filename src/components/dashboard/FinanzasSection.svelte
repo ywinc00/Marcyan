@@ -493,7 +493,7 @@
   .status { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 8px; font-size: var(--text-xs); cursor: pointer; }
   .status:focus { outline: none; border-color: var(--accent-gold); }
   .status--paid { color: var(--accent-teal); }
-  .status--partial { color: #dfc08a; }
+  .status--partial { color: #fb923c; }
   .status--overdue { color: var(--color-error); }
   .status--void { color: var(--fg-subtle); }
 
@@ -506,7 +506,7 @@
   .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 14px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
   .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
   .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: #dabd86; }
+  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
   .b--mini { padding: 5px 9px; }
   .b:disabled { opacity: .5; cursor: not-allowed; }
 

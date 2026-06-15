@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers (autosuficiente, mismo patrón que BriefsSection) ──
   async function api(url, opts = {}) {
@@ -344,27 +345,12 @@
         <span class="kpi__lbl">Clics (GSC)</span>
         <div class="kpi__row">
           <span class="kpi__num gold">{nfmt(kpis.clicks)}</span>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="seoArtClick" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
-                </linearGradient>
-                <radialGradient id="seoGlowGold" cx="50%" cy="40%" r="60%">
-                  <stop offset="0" stop-color="#f97316" stop-opacity="0.5"/><stop offset="1" stop-color="#f97316" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <ellipse cx="32" cy="50" rx="20" ry="6" fill="#000" opacity="0.35"/>
-              <circle cx="32" cy="30" r="26" fill="url(#seoGlowGold)"/>
-              <path d="M24 16l22 9-9 4 6 9-5 3-6-9-7 6z" fill="url(#seoArtClick)" stroke="#7c2d12" stroke-width="1"/>
-              <path d="M24 16l22 9-9 4z" fill="#fff" opacity="0.22"/>
-            </svg>
-          </div>
+          <KpiArt kind="cursor" size={52} />
         </div>
         {#if tClicks}
           <p class="kpi__delta"><span class={tClicks.better ? 'up' : 'down'}>{tClicks.txt} {tClicks.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
         {:else}
-          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} día{gscDaily.length === 1 ? '' : 's'}</span></p>
         {/if}
       </div>
 
@@ -373,28 +359,12 @@
         <span class="kpi__lbl">Impresiones (GSC)</span>
         <div class="kpi__row">
           <span class="kpi__num">{nfmt(kpis.impressions)}</span>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="seoArtEye" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#3a3a44"/><stop offset="1" stop-color="#1b1b20"/>
-                </linearGradient>
-                <radialGradient id="seoIris" cx="50%" cy="45%" r="55%">
-                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#c2410c"/>
-                </radialGradient>
-              </defs>
-              <ellipse cx="32" cy="51" rx="19" ry="5" fill="#000" opacity="0.32"/>
-              <path d="M8 32c8-13 40-13 48 0-8 13-40 13-48 0z" fill="url(#seoArtEye)" stroke="#4a4a55" stroke-width="1.2"/>
-              <circle cx="32" cy="32" r="11" fill="url(#seoIris)"/>
-              <circle cx="32" cy="32" r="5" fill="#1b1b20"/>
-              <circle cx="29" cy="29" r="2.4" fill="#fff" opacity="0.85"/>
-            </svg>
-          </div>
+          <KpiArt kind="eye" size={52} />
         </div>
         {#if tImpr}
           <p class="kpi__delta"><span class={tImpr.better ? 'up' : 'down'}>{tImpr.txt} {tImpr.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
         {:else}
-          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} día{gscDaily.length === 1 ? '' : 's'}</span></p>
         {/if}
       </div>
 
@@ -403,26 +373,7 @@
         <span class="kpi__lbl">Posición media</span>
         <div class="kpi__row">
           <span class="kpi__num">{kpis.avgPos ? (Math.round(kpis.avgPos * 10) / 10) : '—'}</span>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="seoArtMedal" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#d97706"/>
-                </linearGradient>
-                <radialGradient id="seoGlowMedal" cx="50%" cy="45%" r="60%">
-                  <stop offset="0" stop-color="#f59e0b" stop-opacity="0.45"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <ellipse cx="32" cy="52" rx="17" ry="5" fill="#000" opacity="0.32"/>
-              <circle cx="32" cy="34" r="24" fill="url(#seoGlowMedal)"/>
-              <path d="M22 10h6l4 8-7 4-7-4z" fill="#ea580c"/>
-              <path d="M42 10h-6l-4 8 7 4 7-4z" fill="#fb923c"/>
-              <circle cx="32" cy="38" r="15" fill="url(#seoArtMedal)" stroke="#92400e" stroke-width="1.2"/>
-              <circle cx="32" cy="38" r="10" fill="none" stroke="#fff" stroke-width="1" opacity="0.4"/>
-              <path d="M32 32l1.9 4 4.3.4-3.3 2.8 1 4.2-3.9-2.3-3.9 2.3 1-4.2-3.3-2.8 4.3-.4z" fill="#fffbeb"/>
-              <ellipse cx="27" cy="32" rx="5" ry="3" fill="#fff" opacity="0.3"/>
-            </svg>
-          </div>
+          <KpiArt kind="medal" size={52} />
         </div>
         {#if tPos}
           <p class="kpi__delta"><span class={tPos.better ? 'up' : 'down'}>{tPos.txt} {tPos.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">menor = mejor</span></p>
@@ -436,28 +387,12 @@
         <span class="kpi__lbl">Sesiones (GA4)</span>
         <div class="kpi__row">
           <span class="kpi__num teal">{nfmt(kpis.sessions)}</span>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="seoArtUser" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#059669"/>
-                </linearGradient>
-                <radialGradient id="seoGlowTeal" cx="50%" cy="40%" r="60%">
-                  <stop offset="0" stop-color="#34d399" stop-opacity="0.45"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <ellipse cx="32" cy="53" rx="19" ry="5" fill="#000" opacity="0.32"/>
-              <circle cx="32" cy="30" r="26" fill="url(#seoGlowTeal)"/>
-              <circle cx="32" cy="24" r="11" fill="url(#seoArtUser)" stroke="#065f46" stroke-width="1"/>
-              <path d="M14 52c0-11 8-16 18-16s18 5 18 16z" fill="url(#seoArtUser)" stroke="#065f46" stroke-width="1"/>
-              <ellipse cx="28" cy="20" rx="4" ry="3" fill="#fff" opacity="0.35"/>
-            </svg>
-          </div>
+          <KpiArt kind="users" size={52} />
         </div>
         {#if tSess}
           <p class="kpi__delta"><span class={tSess.better ? 'up' : 'down'}>{tSess.txt} {tSess.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
         {:else}
-          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+          <p class="kpi__delta"><span class="muted">últimos {ga4Daily.length} día{ga4Daily.length === 1 ? '' : 's'}</span></p>
         {/if}
       </div>
     </div>
@@ -638,9 +573,14 @@
             <table class="table">
               <thead><tr><th>Consulta</th><th class="num">Clics</th><th class="num">Impr.</th><th class="num">CTR</th><th class="num">Pos.</th></tr></thead>
               <tbody>
-                {#each topQueries as q}
+                {#each topQueries as q, i}
                   <tr>
-                    <td class="t-name">{q.query || '—'}</td>
+                    <td class="t-name">
+                      <span class="q-cell">
+                        <span class="rank">{i + 1}</span>
+                        <span class="q-text">{q.query || '—'}</span>
+                      </span>
+                    </td>
                     <td class="num mono gold">{nfmt(q.clicks)}</td>
                     <td class="num mono">{nfmt(q.impressions)}</td>
                     <td class="num mono dim">{pct(q.ctr)}</td>
@@ -723,21 +663,25 @@
   .proj-meta.is-reloading { opacity: .65; }
   .reloading { color: var(--accent-gold); }
 
-  /* ── KPIs (Orbit stat cards) ── */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 14px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  /* ── KPIs (Orbit stat cards: label · número grande · delta · arte 3D) ──
+     Proporciones 1:1 con Orbit: padding 16px, número 36px/700/-0.025em,
+     label 13px/500 secundario, arte ~52px en la esquina, grid 4 cols
+     iguales gap 14px (auto-fit ≥184px → degrada a 2/1 col si falta sitio
+     o si solo hay datos esparcidos). */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 13px; display: flex; flex-direction: column; gap: 8px; min-width: 0; transition: border-color var(--duration-fast); }
   .kpi:hover { border-color: var(--border-strong); }
-  .kpi__lbl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin-bottom: 8px; }
-  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-3xl, 30px); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
-  .kpi__art { width: 56px; height: 56px; flex: 0 0 auto; }
-  .kpi__art svg { width: 100%; height: 100%; display: block; }
-  .kpi__delta { margin: 12px 0 0; font-size: var(--text-xs); }
+  .kpi__delta { margin: 4px 0 0; font-size: 11.5px; }
   .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
   .kpi__delta .down { color: var(--color-error); font-weight: 600; }
   .kpi__delta .muted { color: var(--fg-subtle); }
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .kpis { grid-template-columns: 1fr; } }
 
   /* ── Indexación ── */
   .idx { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
@@ -774,8 +718,10 @@
   .muted-box { color: var(--fg-secondary); font-size: var(--text-sm); line-height: 1.55; text-align: center; padding: var(--space-5) var(--space-4); }
   .muted-box strong { color: var(--fg-primary); }
 
-  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
-  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-4); }
+  /* Dentro de .charts los paneles ya van en el grid → sin margin propio. */
+  .charts .panel { margin-top: 0; }
+  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-4); }
   .panel__lbl { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
 
@@ -797,6 +743,11 @@
   .table tr:last-child td { border-bottom: 0; }
   .table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .t-name { color: var(--fg-primary); }
+  /* Celda de consulta con monograma de rango (estilo tabla Orbit:
+     glifo/avatar de cabeza + nombre). El rango da jerarquía sin ruido. */
+  .q-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .rank { flex: 0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); }
+  .q-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
   .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); }

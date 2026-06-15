@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers (autosuficiente, igual que BriefsSection) ─────────
   // api() con timeout vía AbortController: si una Function se cuelga
@@ -128,30 +129,16 @@
 </div>
 
 <!-- Strip superior denso: KPI de no-leídos (con ilustración esquinera) +
-     desglose por tipo, en una fila de tarjetas compactas estilo Orbit. -->
+     desglose por tipo, en una fila de 4 tarjetas estilo Orbit "stats".
+     La ilustración esquinera usa <KpiArt> compartido (mismo lenguaje
+     glossy en todas las secciones). Mapas semánticos:
+       sin leer → bell · leads → inbox · briefs → docs · handoffs → users. -->
 <section class="strip">
   <article class="kcard kcard--accent">
     <p class="kcard__label">Sin leer</p>
     <div class="kcard__row">
       <span class="kcard__num">{String(unread).padStart(2, '0')}</span>
-      <span class="kcard__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="bellg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/>
-            </linearGradient>
-            <radialGradient id="bellglow" cx="50%" cy="40%" r="60%">
-              <stop offset="0" stop-color="rgba(249,115,22,0.45)"/><stop offset="1" stop-color="rgba(249,115,22,0)"/>
-            </radialGradient>
-          </defs>
-          <ellipse cx="32" cy="34" rx="26" ry="22" fill="url(#bellglow)"/>
-          <path d="M20 40c0-9 2-18 12-18s12 9 12 18z" fill="url(#bellg)" stroke="#FFD9B8" stroke-opacity="0.35"/>
-          <path d="M22 40c0-8 2-15 10-15" stroke="#fff" stroke-opacity="0.4" stroke-width="1.4" stroke-linecap="round"/>
-          <rect x="17" y="40" width="30" height="5" rx="2.5" fill="#23232A" stroke="#4A4A55"/>
-          <circle cx="32" cy="49" r="3.5" fill="url(#bellg)"/>
-          {#if unread}<circle cx="44" cy="22" r="6" fill="#EF4444" stroke="#0e0e11" stroke-width="2"/>{/if}
-        </svg>
-      </span>
+      <KpiArt kind="bell" size={48} />
     </div>
     <p class="kcard__delta">
       {#if unread}<span class="warn">{unread} {unread === 1 ? 'aviso pendiente' : 'avisos pendientes'}</span>
@@ -163,15 +150,7 @@
     <p class="kcard__label">Leads</p>
     <div class="kcard__row">
       <span class="kcard__num">{counts.new_lead}</span>
-      <span class="kcard__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs><linearGradient id="envg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/></linearGradient></defs>
-          <rect x="14" y="22" width="36" height="24" rx="3" fill="#23232A" stroke="#4A4A55"/>
-          <path d="M14 24l18 13 18-13" fill="none" stroke="url(#envg)" stroke-width="2.4"/>
-          <path d="M14 24l18 13 18-13v-2H14z" fill="url(#envg)" fill-opacity="0.25"/>
-        </svg>
-      </span>
+      <KpiArt kind="inbox" size={48} />
     </div>
     <p class="kcard__delta"><span class="muted">en este feed</span></p>
   </article>
@@ -180,15 +159,7 @@
     <p class="kcard__label">Briefs</p>
     <div class="kcard__row">
       <span class="kcard__num">{counts.new_brief}</span>
-      <span class="kcard__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs><linearGradient id="docg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/></linearGradient></defs>
-          <rect x="18" y="16" width="26" height="34" rx="3" fill="#16161A" stroke="#4A4A55"/>
-          <rect x="16" y="20" width="26" height="34" rx="3" fill="#23232A" stroke="#4A4A55"/>
-          <path d="M21 28h16M21 33h16M21 38h10" stroke="url(#docg)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </span>
+      <KpiArt kind="docs" size={48} />
     </div>
     <p class="kcard__delta"><span class="muted">en este feed</span></p>
   </article>
@@ -197,14 +168,7 @@
     <p class="kcard__label">Handoffs</p>
     <div class="kcard__row">
       <span class="kcard__num">{counts.chat_handoff}</span>
-      <span class="kcard__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs><linearGradient id="chatg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#6EE7B7"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
-          <path d="M16 22h32a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H28l-9 7v-7h-3a3 3 0 0 1-3-3V25a3 3 0 0 1 3-3z" fill="url(#chatg)" fill-opacity="0.22" stroke="#34d399" stroke-opacity="0.5"/>
-          <circle cx="26" cy="32" r="2" fill="url(#chatg)"/><circle cx="32" cy="32" r="2" fill="url(#chatg)"/><circle cx="38" cy="32" r="2" fill="url(#chatg)"/>
-        </svg>
-      </span>
+      <KpiArt kind="users" size={48} />
     </div>
     <p class="kcard__delta"><span class="muted">pidieron persona</span></p>
   </article>
@@ -269,26 +233,29 @@
 
 <style>
   .sec-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); display: inline-flex; align-items: center; gap: 10px; }
+  /* Título estilo Orbit ".hello": 28px peso 700 tracking -0.025em, márgenes apretados. */
+  .greet { font-family: var(--font-display); font-weight: 700; font-size: 28px; letter-spacing: -0.025em; margin: 4px 0 12px; display: inline-flex; align-items: center; gap: 10px; }
   /* Pill Orbit: el conteo de no-leídos junto al título usa el acento (naranja)
      para llamar la atención, igual que el borde de las tarjetas no leídas. */
   .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: 2px 9px; }
   .head-act { display: inline-flex; gap: 6px; }
 
-  /* ── Strip superior: 4 KPI cards densas (Orbit "stats") ──────────
-     La primera resalta los no-leídos con borde de acento + glow; el
-     resto desglosa el feed por tipo. Cada una lleva una ilustración
-     esquinera SVG en capas con gradiente + glow (look 3D suave). */
-  .strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4); }
-  .kcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); transition: border-color var(--duration-fast); }
+  /* ── Strip superior: 4 KPI cards (Orbit "stats", proporciones exactas) ──
+     Orbit: padding 16 16 14, radio 14, hairline; label 13px peso 500
+     mb 10; número 36px peso 700 tracking -0.025em; arte esquinero ~44-48
+     con leve opacidad; delta 13px mt 12; grid de 4 col gap 14.
+     La primera resalta los no-leídos con borde de acento + glow; el resto
+     desglosa el feed por tipo. El arte usa <KpiArt> compartido (glossy 3D). */
+  .strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: var(--space-4); }
+  .kcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; transition: border-color var(--duration-fast); }
   .kcard:hover { border-color: var(--border-strong); }
   .kcard--accent { border-color: var(--accent-gold-line); box-shadow: var(--shadow-gold); background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), .07), transparent 60%), var(--bg-card); }
-  .kcard__label { margin: 0 0 8px; color: var(--fg-secondary); font-size: var(--text-xs); font-weight: 500; }
-  .kcard__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .kcard__num { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); font-variant-numeric: tabular-nums; }
-  .kcard__art { width: 56px; height: 56px; display: inline-flex; flex: 0 0 auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-  .kcard__art svg { width: 100%; height: 100%; }
-  .kcard__delta { margin: 10px 0 0; font-size: 12px; }
+  .kcard__label { margin: 0 0 10px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
+  .kcard__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; }
+  .kcard__num { font-family: var(--font-display); font-weight: 700; font-size: 36px; line-height: 1; letter-spacing: -0.025em; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
+  /* El arte esquinero respira ligeramente atenuado, como en Orbit. */
+  .kcard__row :global(.kpi-art) { opacity: 0.92; }
+  .kcard__delta { margin: 12px 0 0; font-size: 13px; }
   .kcard__delta .warn { color: var(--accent-gold); font-weight: 600; }
   .kcard__delta .ok { color: var(--accent-teal); font-weight: 600; }
   .kcard__delta .muted { color: var(--fg-subtle); }
@@ -333,7 +300,7 @@
   .note__ref { font-size: 10px; color: var(--accent-gold); letter-spacing: .04em; }
   .note__when { font-size: 10px; margin-left: auto; }
 
-  .note__title { font-size: var(--text-sm); color: var(--fg-primary); line-height: 1.45; font-weight: 500; }
+  .note__title { font-size: 13.5px; color: var(--fg-primary); line-height: 1.45; font-weight: 500; }
   .note__text { font-size: 12.5px; color: var(--fg-secondary); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
 
   .note__foot { display: flex; align-items: center; gap: var(--space-4); margin-top: 7px; }

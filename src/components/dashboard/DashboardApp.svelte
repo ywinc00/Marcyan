@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import BrandLogo from './BrandLogo.svelte';
+  import KpiArt from './KpiArt.svelte';
   import BriefsSection from './BriefsSection.svelte';
   import FinanzasSection from './FinanzasSection.svelte';
   import ProgresoSection from './ProgresoSection.svelte';
@@ -29,11 +30,26 @@
   let hoverBar = $state(-1);
 
   const MONTH_LABELS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  function monthLabel(m) { return MONTH_LABELS[parseInt(m.slice(5, 7), 10) - 1] || m; }
-  const activity = $derived(home ? home.activity : []);
-  const chartMax = $derived(Math.max(1, ...activity.map((a) => a.total)));
+  function monthLabel(m) { return m ? (MONTH_LABELS[parseInt(m.slice(5, 7), 10) - 1] || m) : ''; }
+  const activity = $derived(home && Array.isArray(home.activity) ? home.activity : []);
   // Barra "activa": la que tiene el cursor encima, o el mes actual si no hay hover.
-  const activeBar = $derived(hoverBar >= 0 ? hoverBar : activity.length - 1);
+  // Si no hay datos, queda en -1 (el bloque del gráfico no se renderiza).
+  const activeBar = $derived(
+    activity.length === 0 ? -1
+    : hoverBar >= 0 && hoverBar < activity.length ? hoverBar
+    : activity.length - 1
+  );
+  // Escala "bonita" del eje Y: ticks redondeados por encima del máximo real
+  // para que las etiquetas del eje derecho sean números limpios (Orbit).
+  const yTop = $derived.by(() => {
+    const m = Math.max(...activity.map((a) => a.total || 0), 0);
+    if (m <= 0) return 4;            // datos vacíos → eje 0..4 (no rompe)
+    const pow = Math.pow(10, Math.floor(Math.log10(m)));
+    const n = Math.ceil(m / pow) * pow;
+    return n === m ? n + pow / 2 : n; // un respiro sobre el pico
+  });
+  // 4 etiquetas de eje (arriba→abajo) — enteras y crecientes.
+  const yTicks = $derived([yTop, yTop * 0.75, yTop * 0.5, yTop * 0.25].map((v) => Math.round(v)));
 
   // ── Embudo (pills decrecientes Orbit) ────────────────────────
   const funnelRows = $derived(home ? [
@@ -59,19 +75,29 @@
   const sparkPoints = $derived.by(() => {
     if (!activity.length) return [];
     let acc = 0;
-    return activity.map((a) => (acc += a.total));
+    return activity.map((a) => (acc += (a.total || 0)));
   });
   const sparkTotal = $derived(sparkPoints.length ? sparkPoints[sparkPoints.length - 1] : 0);
   const SPARK_W = 560, SPARK_H = 150;
+  // Devuelve line/area + coordenadas del último punto (dot final).
+  // n===1 → traza una línea plana en la base para que no quede vacío.
   const sparkPath = $derived.by(() => {
     const n = sparkPoints.length;
-    if (n < 2) return { line: '', area: '' };
+    if (n === 0) return { line: '', area: '', dot: null };
     const max = Math.max(1, ...sparkPoints);
+    const yOf = (v) => SPARK_H - 8 - (v / max) * (SPARK_H - 24);
+    if (n === 1) {
+      const y = yOf(sparkPoints[0]).toFixed(1);
+      const line = `M0 ${y} L${SPARK_W} ${y}`;
+      const area = `M0 ${SPARK_H} L0 ${y} L${SPARK_W} ${y} L${SPARK_W} ${SPARK_H} Z`;
+      return { line, area, dot: { x: SPARK_W, y: +y } };
+    }
     const step = SPARK_W / (n - 1);
-    const xy = sparkPoints.map((v, i) => [i * step, SPARK_H - 8 - (v / max) * (SPARK_H - 24)]);
+    const xy = sparkPoints.map((v, i) => [i * step, yOf(v)]);
     const line = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
     const area = 'M0 ' + SPARK_H + ' ' + line.replace(/^M/, 'L') + ' L' + SPARK_W + ' ' + SPARK_H + ' Z';
-    return { line, area };
+    const last = xy[xy.length - 1];
+    return { line, area, dot: { x: last[0], y: last[1] } };
   });
 
   // ── Suscripciones activas → sidebar + run-rate mensual ───────
@@ -338,43 +364,25 @@
       {#if section === 'dashboard'}
         <h1 class="greet">Hola, {firstName}</h1>
 
-        <!-- ── KPIs: número grande + delta + arte de esquina 3D-ish ── -->
+        <!-- ── KPIs: número grande + delta + arte de esquina glossy (KpiArt) ── -->
         <div class="kpis">
           <article class="kpi">
             <p class="kpi__lbl">Leads nuevos</p>
             <div class="kpi__row">
               <span class="kpi__num gold">{home?.kpis ? home.kpis.new_leads : '–'}</span>
-              <div class="kpi__art" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none">
-                  <defs>
-                    <linearGradient id="kpiInbox" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
-                    </linearGradient>
-                  </defs>
-                  <rect x="12" y="20" width="40" height="28" rx="5" fill="#1b1b20" stroke="#3a3a43"/>
-                  <path d="M12 25l20 13 20-13" fill="none" stroke="#4a4a55" stroke-width="1.4"/>
-                  <rect x="20" y="12" width="24" height="18" rx="3" fill="url(#kpiInbox)"/>
-                  <path d="M24 18h16M24 22h11" stroke="#fff" stroke-opacity="0.85" stroke-width="1.6" stroke-linecap="round"/>
-                  <circle cx="46" cy="44" r="3" fill="#fff" fill-opacity="0.18"/>
-                </svg>
-              </div>
+              <KpiArt kind="inbox" size={52} />
             </div>
-            <p class="kpi__delta"><span class="up">{home?.kpis?.new_leads ? '+' + home.kpis.new_leads : '·'}</span> <span class="muted">este mes</span></p>
+            <p class="kpi__delta">
+              {#if home?.kpis?.new_leads}<span class="up">+{home.kpis.new_leads}</span> <span class="muted">este mes</span>
+              {:else}<span class="muted">aún sin leads este mes</span>{/if}
+            </p>
           </article>
 
           <article class="kpi">
             <p class="kpi__lbl">Briefs pendientes</p>
             <div class="kpi__row">
               <span class="kpi__num">{home?.kpis ? home.kpis.pending_briefs : '–'}</span>
-              <div class="kpi__art" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none">
-                  <rect x="18" y="22" width="28" height="34" rx="3" fill="#23232a" stroke="#4a4a55"/>
-                  <rect x="14" y="16" width="28" height="34" rx="3" fill="#1b1b20" stroke="#4a4a55"/>
-                  <path d="M19 24h18M19 29h18M19 34h12" stroke="#6b6b74" stroke-width="1.6" stroke-linecap="round"/>
-                  <path d="M24 40l2.5 2.5L32 37" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <rect x="14" y="16" width="28" height="6" rx="3" fill="#fff" fill-opacity="0.05"/>
-                </svg>
-              </div>
+              <KpiArt kind="docs" size={52} />
             </div>
             <p class="kpi__delta"><span class="muted">en cola de revisión</span></p>
           </article>
@@ -383,19 +391,7 @@
             <p class="kpi__lbl">En curso (mes)</p>
             <div class="kpi__row">
               <span class="kpi__num">{home?.kpis ? home.kpis.projects_this_month : '–'}</span>
-              <div class="kpi__art" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none">
-                  <defs>
-                    <radialGradient id="kpiClock" cx="0.4" cy="0.35" r="0.8">
-                      <stop offset="0" stop-color="#2a2a31"/><stop offset="1" stop-color="#15151a"/>
-                    </radialGradient>
-                  </defs>
-                  <circle cx="32" cy="34" r="20" fill="url(#kpiClock)" stroke="#4a4a55"/>
-                  <circle cx="32" cy="34" r="20" fill="none" stroke="#fb923c" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="78 126" transform="rotate(-90 32 34)"/>
-                  <path d="M32 34V24M32 34l7 4" stroke="#f4f4f5" stroke-width="2" stroke-linecap="round"/>
-                  <ellipse cx="26" cy="27" rx="6" ry="4" fill="#fff" fill-opacity="0.07"/>
-                </svg>
-              </div>
+              <KpiArt kind="clock" size={52} />
             </div>
             <p class="kpi__delta"><span class="muted">proyectos activos</span></p>
           </article>
@@ -404,21 +400,7 @@
             <p class="kpi__lbl">Cobrado (mes)</p>
             <div class="kpi__row">
               <span class="kpi__num teal">{home?.kpis && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span>
-              <div class="kpi__art" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none">
-                  <defs>
-                    <linearGradient id="kpiCoin" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#34d399"/>
-                    </linearGradient>
-                  </defs>
-                  <ellipse cx="32" cy="48" rx="16" ry="5" fill="#1b1b20" stroke="#3a3a43"/>
-                  <ellipse cx="32" cy="44" rx="16" ry="5" fill="#23232a" stroke="#4a4a55"/>
-                  <ellipse cx="32" cy="40" rx="16" ry="5" fill="#1b1b20" stroke="#4a4a55"/>
-                  <ellipse cx="32" cy="34" rx="16" ry="6" fill="url(#kpiCoin)"/>
-                  <text x="32" y="38" text-anchor="middle" font-size="9" font-weight="700" fill="#0e3b2c">$</text>
-                  <ellipse cx="27" cy="32" rx="5" ry="2" fill="#fff" fill-opacity="0.35"/>
-                </svg>
-              </div>
+              <KpiArt kind="coins" size={52} />
             </div>
             <p class="kpi__delta"><span class="up">cobrado</span> <span class="muted">vs mes anterior</span></p>
           </article>
@@ -430,21 +412,34 @@
             <header class="card__head">
               <div>
                 <p class="card__lbl">Actividad por mes</p>
-                <h3 class="card__amount">{activity.length ? activity[activeBar]?.total ?? 0 : 0} <span class="muted">{activity.length ? monthLabel(activity[activeBar]?.month || '') : ''}</span></h3>
+                <h3 class="card__amount">{activeBar >= 0 ? (activity[activeBar]?.total ?? 0) : 0} <span class="muted">{activeBar >= 0 ? monthLabel(activity[activeBar]?.month) : ''}</span></h3>
               </div>
               <span class="chip">leads + briefs</span>
             </header>
 
-            {#if home && activity.length}
+            {#if !home}
+              <div class="chart-skeleton" aria-hidden="true"></div>
+            {:else if activity.length === 0}
+              <div class="empty-block">
+                <KpiArt kind="chart-up" size={40} />
+                <p>Sin actividad todavía.<br />Aparecerá aquí cuando lleguen leads o briefs.</p>
+              </div>
+            {:else}
+              <!-- VW=viewBox · PR=carril derecho de números · PW=plot útil · PLOT=alto de barras -->
               {@const N = activity.length}
-              {@const PW = 560}
-              {@const slot = PW / N}
+              {@const VW = 600}
+              {@const PR = 40}
+              {@const PW = VW - PR}
               {@const PLOT = 150}
+              {@const slot = PW / N}
+              {@const bw = Math.min(56, slot * 0.5)}
               <div class="plot">
-                {#if hoverBar >= 0}
-                  <span class="chart-tip" style="left:{(hoverBar * slot + slot / 2) / PW * 100}%;top:{(PLOT - (activity[hoverBar].total / chartMax) * (PLOT - 22)) / 196 * 100}%">{activity[hoverBar].total}</span>
+                {#if hoverBar >= 0 && hoverBar < N}
+                  {@const hx = (hoverBar * slot + slot / 2) / VW * 100}
+                  {@const hy = (PLOT - (activity[hoverBar].total / yTop) * (PLOT - 18)) / 196 * 100}
+                  <span class="chart-tip" style="left:{hx}%;top:{hy}%">{activity[hoverBar].total}</span>
                 {/if}
-                <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Actividad por mes" onmouseleave={() => (hoverBar = -1)}>
+                <svg class="chart" viewBox="0 0 {VW} 196" role="img" aria-label="Actividad por mes" onmouseleave={() => (hoverBar = -1)}>
                   <defs>
                     <linearGradient id="barActive" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
@@ -453,36 +448,39 @@
                       <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
                     </filter>
                   </defs>
-                  <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
-                  <line x1="0" y1="82" x2="560" y2="82" class="chart__grid" />
-                  <line x1="0" y1="120" x2="560" y2="120" class="chart__grid" />
-                  <line x1="0" y1="150" x2="560" y2="150" class="chart__base" />
+
+                  <!-- gridlines punteadas + números del eje derecho (4 ticks) -->
+                  {#each yTicks as t, gi}
+                    {@const gy = (gi / 4) * PLOT + 6}
+                    <line x1="0" y1={gy} x2={PW} y2={gy} class="chart__grid" />
+                    <text x={VW} y={gy + 3} text-anchor="end" class="chart__axis">{t}</text>
+                  {/each}
+                  <line x1="0" y1={PLOT} x2={PW} y2={PLOT} class="chart__base" />
 
                   {#each activity as a, i}
-                    {@const bx = i * slot + slot * 0.28}
-                    {@const bw = slot * 0.44}
-                    {@const bh = (a.total / chartMax) * (PLOT - 22)}
-                    {@const by = PLOT - bh}
                     {@const cx = i * slot + slot / 2}
+                    {@const bx = cx - bw / 2}
+                    {@const bh = (Math.max(a.total, 0) / yTop) * (PLOT - 18)}
+                    {@const by = PLOT - bh}
                     {@const isActive = i === activeBar}
-                    {#if isActive}
-                      <line x1="0" y1={by} x2="560" y2={by} class="chart__guide" />
+                    {#if isActive && a.total > 0}
+                      <line x1="0" y1={by} x2={PW} y2={by} class="chart__guide" />
                     {/if}
                     <rect
-                      x={bx} y={by} width={bw} height={Math.max(bh, 1)} rx="5"
+                      x={bx} y={by} width={bw} height={Math.max(bh, 2)} rx="6"
                       fill={isActive ? 'url(#barActive)' : '#2b2b33'}
                       filter={isActive ? 'url(#barGlow)' : undefined} />
                     <!-- hit area transparente para hover cómodo -->
                     <rect x={i * slot} y="0" width={slot} height={PLOT} fill="transparent"
                       onmouseenter={() => (hoverBar = i)} role="presentation" />
-                    {#if isActive}
-                      <circle cx={cx} cy={by} r="4" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="1.5" />
+                    {#if isActive && a.total > 0}
+                      <circle cx={cx} cy={by} r="4.5" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
                     {/if}
                     <text x={cx} y="174" text-anchor="middle" class="chart__lbl" class:is-active={isActive}>{monthLabel(a.month)}</text>
                   {/each}
                 </svg>
               </div>
-            {:else}<div class="muted">Cargando…</div>{/if}
+            {/if}
           </article>
 
           <article class="card">
@@ -510,7 +508,13 @@
                 {/each}
               </div>
               <button class="ptable__more" onclick={() => (section = 'progreso')}>Ver todos los proyectos</button>
-            {:else}<div class="muted">Sin proyectos todavía.</div>{/if}
+            {:else}
+              <div class="empty-block">
+                <KpiArt kind="folder" size={40} />
+                <p>Sin proyectos todavía.</p>
+                <button class="b b--mini" onclick={() => (section = 'progreso')}>Crear el primero</button>
+              </div>
+            {/if}
           </article>
         </div>
 
@@ -523,16 +527,18 @@
                 <h3 class="card__amount">{home ? (home.funnel.new + home.funnel.contacted + home.funnel.converted + home.funnel.archived) : 0} <span class="muted">en pipeline</span></h3>
               </div>
             </header>
-            {#if home}
+            {#if !home}
+              <div class="funnel-skeleton" aria-hidden="true"></div>
+            {:else}
               <div class="funnel">
                 {#each funnelRows as row, i}
                   <div class="funnel__row">
-                    <span class="funnel__pill" class:funnel__pill--accent={i === 0} style="--w:{funnelW(i)}%">{row.name}</span>
+                    <span class="funnel__pill" class:funnel__pill--accent={i === 0 && row.n > 0} style="--w:{funnelW(i)}%">{row.name}</span>
                     <span class="funnel__n">{row.n}</span>
                   </div>
                 {/each}
               </div>
-            {:else}<div class="muted">Cargando…</div>{/if}
+            {/if}
           </article>
 
           <article class="card">
@@ -543,23 +549,36 @@
               </div>
               <span class="chip chip--up">↑ tendencia</span>
             </header>
-            {#if home && sparkPath.line}
-              <svg class="spark" viewBox="0 0 {SPARK_W} {SPARK_H}" preserveAspectRatio="none" role="img" aria-label="Actividad acumulada">
-                <defs>
-                  <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#f97316" stop-opacity="0.42"/>
-                    <stop offset="1" stop-color="#f97316" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                <path d={sparkPath.area} fill="url(#sparkFill)" />
-                <path d={sparkPath.line} fill="none" stroke="#f97316" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            {:else}<div class="muted">Cargando…</div>{/if}
+            {#if !home}
+              <div class="spark-skeleton" aria-hidden="true"></div>
+            {:else if sparkPath.line}
+              <div class="spark-wrap">
+                <svg class="spark" viewBox="0 0 {SPARK_W} {SPARK_H}" preserveAspectRatio="none" role="img" aria-label="Actividad acumulada">
+                  <defs>
+                    <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#f97316" stop-opacity="0.42"/>
+                      <stop offset="1" stop-color="#f97316" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d={sparkPath.area} fill="url(#sparkFill)" />
+                  <path d={sparkPath.line} fill="none" stroke="#f97316" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+                </svg>
+                <!-- Dot final como overlay HTML (no se deforma por preserveAspectRatio=none) -->
+                {#if sparkPath.dot}
+                  <span class="spark-dot" style="left:{sparkPath.dot.x / SPARK_W * 100}%;top:{sparkPath.dot.y / SPARK_H * 100}%"></span>
+                {/if}
+              </div>
+            {:else}
+              <div class="empty-block">
+                <KpiArt kind="chart-up" size={40} />
+                <p>La tendencia aparece con el primer mes de datos.</p>
+              </div>
+            {/if}
           </article>
         </div>
 
         <!-- ── Leads recientes (compacto) ── -->
-        <article class="card">
+        <article class="card card--spaced">
           <header class="card__head card__head--row">
             <h3 class="card__title">Leads recientes</h3>
             <button class="link-btn" onclick={() => (section = 'leads')}>Ver todos</button>
@@ -708,49 +727,68 @@
   .install:hover { background: var(--accent-gold-dim); border-color: var(--accent-gold); }
   .user { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
+  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-1) 0 var(--space-3); }
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
 
-  /* ── KPI cards: número grande + delta + arte de esquina ── */
-  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) var(--space-3); }
-  .kpi__lbl { margin: 0 0 var(--space-3); font-weight: 500; font-size: var(--text-sm); color: var(--fg-secondary); }
-  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  /* ── KPI cards: número grande + delta + arte de esquina (Orbit .stat) ── */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; }
+  .kpi__lbl { margin: 0 0 10px; font-weight: 500; font-size: 13px; color: var(--fg-secondary); }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 52px; }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
-  .kpi__art { width: 60px; height: 60px; flex: 0 0 auto; }
-  .kpi__art svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-  .kpi__delta { margin: var(--space-3) 0 0; font-size: var(--text-sm); }
+  .kpi__delta { margin: 12px 0 0; font-size: 13px; color: var(--fg-subtle); }
   .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
 
-  /* ── Grids densos de cards ── */
-  .grid-2 { display: grid; gap: var(--space-3); margin-top: var(--space-3); }
-  .grid-2--chart { grid-template-columns: 1.5fr 1fr; }
-  .grid-2--funnel { grid-template-columns: 1fr 1.45fr; }
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5) var(--space-4); }
-  .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+  /* ── Grids densos de cards (proporciones exactas Orbit) ── */
+  .grid-2 { display: grid; gap: 14px; margin-top: var(--space-4); }
+  .grid-2--chart { grid-template-columns: 1.4fr 1fr; }
+  .grid-2--funnel { grid-template-columns: 1fr 1.6fr; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+  .card--spaced { margin-top: 14px; }
+  .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: 18px; }
   .card__head--row { align-items: center; margin-bottom: var(--space-2); }
-  .card__lbl { margin: 0 0 6px; color: var(--fg-secondary); font-size: var(--text-sm); font-weight: 500; }
-  .card__title { margin: 0; font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
-  .card__amount { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: var(--tracking-tight); line-height: 1; }
+  .card__lbl { margin: 0 0 6px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
+  .card__title { margin: 0; font-size: 14px; font-weight: 600; color: var(--fg-primary); }
+  .card__amount { margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: var(--tracking-tight); line-height: 1; }
   .card__amount.big { font-size: 30px; }
-  .card__amount .muted { font-size: var(--text-sm); font-weight: 400; letter-spacing: 0; }
+  .card__amount .muted { font-size: 13px; font-weight: 400; letter-spacing: 0; }
   .chip { font-size: 11px; font-weight: 500; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 5px 11px; white-space: nowrap; }
   .chip--up { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
   .link-btn { background: transparent; border: 0; color: var(--fg-secondary); font-size: var(--text-sm); cursor: pointer; padding: 4px 6px; border-radius: var(--radius-sm); transition: color var(--duration-fast); }
   .link-btn:hover { color: var(--accent-gold); }
   .muted { color: var(--fg-subtle); font-size: var(--text-sm); padding: var(--space-4) 0; }
 
-  /* ── Gráfico de barras interactivo ── */
+  /* ── Gráfico de barras interactivo (Orbit) ── */
   .plot { position: relative; }
-  .chart { width: 100%; height: auto; display: block; }
-  .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
-  .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart__lbl { fill: var(--fg-secondary); font-family: var(--font-body); font-size: 12px; }
+  .chart__lbl.is-active { fill: var(--fg-primary); font-weight: 600; }
+  .chart__axis { fill: var(--fg-subtle); font-family: var(--font-body); font-size: 11px; }
   .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
   .chart__base { stroke: rgba(255, 255, 255, 0.12); }
   .chart__guide { stroke: rgba(255, 255, 255, 0.22); stroke-dasharray: 4 4; }
   .chart rect[role="presentation"] { cursor: pointer; }
+
+  /* ── Estados vacíos / cargando (densos, intencionales) ── */
+  .empty-block {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; text-align: center; min-height: 168px; padding: var(--space-4);
+    color: var(--fg-subtle); font-size: var(--text-sm); line-height: 1.5;
+  }
+  .empty-block p { margin: 0; }
+  .empty-block .b { margin-top: 2px; }
+  .chart-skeleton, .funnel-skeleton, .spark-skeleton {
+    border-radius: var(--radius-md);
+    background: linear-gradient(100deg, var(--bg-elevated) 30%, rgba(255,255,255,0.04) 50%, var(--bg-elevated) 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s ease-in-out infinite;
+  }
+  .chart-skeleton { height: 196px; }
+  .spark-skeleton { height: 150px; }
+  .funnel-skeleton { height: 168px; }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
   /* ── Tabla de proyectos (Orbit) ── */
   .ptable { display: flex; flex-direction: column; }
@@ -778,7 +816,14 @@
   .pill-st--hold { color: var(--fg-subtle); border-color: var(--border-strong); background: var(--bg-elevated); }
 
   /* sparkline */
+  .spark-wrap { position: relative; }
   .spark { display: block; width: 100%; height: 150px; }
+  .spark-dot {
+    position: absolute; width: 11px; height: 11px; border-radius: 50%;
+    background: #f97316; border: 3px solid var(--bg-card);
+    transform: translate(-50%, -50%); pointer-events: none;
+    box-shadow: 0 0 0 1px var(--accent-gold-line), 0 4px 12px -2px var(--accent-gold-glow);
+  }
 
   /* leads recientes compactos */
   .recent { display: flex; flex-direction: column; }

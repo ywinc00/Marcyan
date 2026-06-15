@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import BrandLogo from './BrandLogo.svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers ──────────────────────────────────────────────────
   async function api(url, opts = {}) {
@@ -141,22 +142,36 @@
 
   // ── Gráfico interactivo: estado de hover ─────────────────────
   let hoverIdx = $state(-1);
+  const hasRevenue = $derived(revenue.length > 0);
   // Geometría del gráfico (coordenadas internas del viewBox).
-  const CW = 560, CH = 196, TOP = 40, BASE = 158, PLOT = BASE - TOP; // alto útil = 118
+  // CW/CH = lienzo; TOP/BASE delimitan el área de trazado (PLOT alto útil).
+  const CW = 560, CH = 200, TOP = 38, BASE = 160, PLOT = BASE - TOP; // alto útil = 122
+  const BAR_MAX = 56;      // ancho máx de barra (à la Orbit: bars no se ensanchan)
   function bandW() { return CW / Math.max(1, revenue.length); }
-  function barX(i) { return i * bandW() + bandW() * 0.25; }
+  // Ancho real de la barra: 50% del band, pero acotado a BAR_MAX para que
+  // 1-2 meses no produzcan losas anchas (datos escasos lucen intencionales).
+  function barW() { return Math.min(bandW() * 0.5, BAR_MAX); }
   function barCx(i) { return i * bandW() + bandW() / 2; }
-  function barY(c) { return BASE - (Number(c || 0) / chartMax) * PLOT; }
+  function barX(i) { return barCx(i) - barW() / 2; }
+  // Altura de barra; chartMax >= 1 evita división por cero / NaN con 0 datos.
+  function barH(c) { return Math.max(0, (Number(c || 0) / chartMax) * PLOT); }
+  function barY(c) { return BASE - barH(c); }
   function onChartMove(e) {
+    if (!hasRevenue) return;
     const svg = e.currentTarget;
     const r = svg.getBoundingClientRect();
+    if (!r.width) return;
     const x = ((e.clientX - r.left) / r.width) * CW;
     const i = Math.floor(x / bandW());
     hoverIdx = (i >= 0 && i < revenue.length) ? i : -1;
   }
   function onChartLeave() { hoverIdx = -1; }
   // Índice activo del gráfico: el hover gana; si no, el último mes.
-  const activeIdx = $derived(hoverIdx >= 0 ? hoverIdx : revenue.length - 1);
+  // Acotado a [0, len-1] para no salir de rango con datos escasos.
+  const activeIdx = $derived(
+    !hasRevenue ? -1 : (hoverIdx >= 0 ? hoverIdx : revenue.length - 1),
+  );
+  const activeRow = $derived(activeIdx >= 0 ? revenue[activeIdx] : null);
 
   // ── Carga ────────────────────────────────────────────────────
   async function loadSummary() {
@@ -391,24 +406,7 @@
     <span class="kpi__lbl">Cobrado (mes)</span>
     <div class="kpi__row">
       <span class="kpi__num teal">{summary ? fmtUsd0(summary.collected_this_month_cents) : '—'}</span>
-      <span class="kpi__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="finCoin" x1="0" y1="0" x2="0.6" y2="1">
-              <stop offset="0" stop-color="#6ee7b7" /><stop offset="1" stop-color="#10b981" />
-            </linearGradient>
-            <radialGradient id="finCoinGlow" cx="0.5" cy="0.4" r="0.6">
-              <stop offset="0" stop-color="#34d399" stop-opacity="0.55" /><stop offset="1" stop-color="#34d399" stop-opacity="0" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="32" cy="50" rx="18" ry="6" fill="url(#finCoinGlow)" />
-          <ellipse cx="32" cy="34" rx="17" ry="17" fill="#0f6e52" />
-          <ellipse cx="32" cy="30" rx="17" ry="17" fill="url(#finCoin)" stroke="#a7f3d0" stroke-opacity="0.5" />
-          <ellipse cx="32" cy="30" rx="11.5" ry="11.5" fill="none" stroke="#065f46" stroke-opacity="0.55" stroke-width="1.5" />
-          <path d="M32 23v14M28.5 26.5c0-2 1.6-3 3.5-3s3.5 1 3.5 2.6M35.5 33.5c0 2-1.6 3-3.5 3s-3.5-1-3.5-2.6" stroke="#065f46" stroke-width="2" stroke-linecap="round" />
-          <ellipse cx="26" cy="24" rx="5" ry="3" fill="#ffffff" fill-opacity="0.3" />
-        </svg>
-      </span>
+      <KpiArt kind="coins" size={52} />
     </div>
     <p class="kpi__delta">
       {#if revDelta !== null}
@@ -423,22 +421,7 @@
     <span class="kpi__lbl">Por cobrar</span>
     <div class="kpi__row">
       <span class="kpi__num gold">{summary ? fmtUsd0(summary.ar_total_cents) : '—'}</span>
-      <span class="kpi__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="finDoc" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#3a3a44" /><stop offset="1" stop-color="#1b1b20" />
-            </linearGradient>
-            <linearGradient id="finDocTop" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#fbbf72" /><stop offset="1" stop-color="#f97316" />
-            </linearGradient>
-          </defs>
-          <rect x="16" y="16" width="30" height="38" rx="4" fill="url(#finDoc)" stroke="#4a4a55" />
-          <rect x="12" y="11" width="30" height="38" rx="4" fill="url(#finDocTop)" />
-          <path d="M17 20h20M17 26h20M17 32h13" stroke="#7c2d12" stroke-opacity="0.65" stroke-width="2" stroke-linecap="round" />
-          <rect x="13" y="12" width="28" height="9" rx="3" fill="#ffffff" fill-opacity="0.18" />
-        </svg>
-      </span>
+      <KpiArt kind="invoice" size={52} />
     </div>
     <p class="kpi__delta">
       {#if summary}<span class="dimtxt">{summary.counts ? summary.counts.open_invoices : 0} factura{summary.counts && summary.counts.open_invoices === 1 ? '' : 's'} abiertas</span>{:else}<span class="dimtxt">cuentas por cobrar</span>{/if}
@@ -450,24 +433,7 @@
     <span class="kpi__lbl">Vencido</span>
     <div class="kpi__row">
       <span class="kpi__num" class:danger={summary && summary.overdue_cents > 0}>{summary ? fmtUsd0(summary.overdue_cents) : '—'}</span>
-      <span class="kpi__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="finClock" x1="0" y1="0" x2="0.6" y2="1">
-              <stop offset="0" stop-color="#fca5a5" /><stop offset="1" stop-color="#ef4444" />
-            </linearGradient>
-            <radialGradient id="finClockGlow" cx="0.5" cy="0.45" r="0.6">
-              <stop offset="0" stop-color="#ef4444" stop-opacity="0.5" /><stop offset="1" stop-color="#ef4444" stop-opacity="0" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="32" cy="50" rx="17" ry="6" fill="url(#finClockGlow)" />
-          <circle cx="32" cy="31" r="17" fill="#7f1d1d" />
-          <circle cx="32" cy="29" r="17" fill="url(#finClock)" stroke="#fecaca" stroke-opacity="0.5" />
-          <circle cx="32" cy="29" r="12" fill="#3f0d0d" fill-opacity="0.35" />
-          <path d="M32 29V20M32 29l6 4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" />
-          <ellipse cx="26" cy="23" rx="5" ry="3" fill="#ffffff" fill-opacity="0.3" />
-        </svg>
-      </span>
+      <KpiArt kind="alert" size={52} />
     </div>
     <p class="kpi__delta">
       {#if summary && summary.overdue_count > 0}<span class="down">{summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'}</span> <span class="dimtxt">requieren atención</span>{:else}<span class="up">al día</span> <span class="dimtxt">sin vencidos</span>{/if}
@@ -479,23 +445,7 @@
     <span class="kpi__lbl">Gastos (mes)</span>
     <div class="kpi__row">
       <span class="kpi__num">{summary ? fmtUsd0(expensesMonthCents) : '—'}</span>
-      <span class="kpi__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="finCard" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#52525b" /><stop offset="1" stop-color="#27272e" />
-            </linearGradient>
-            <linearGradient id="finCardFront" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#fbbf72" /><stop offset="1" stop-color="#ea580c" />
-            </linearGradient>
-          </defs>
-          <rect x="14" y="22" width="38" height="26" rx="5" fill="url(#finCard)" stroke="#4a4a55" />
-          <rect x="11" y="16" width="38" height="26" rx="5" fill="url(#finCardFront)" />
-          <rect x="11" y="22" width="38" height="6" fill="#7c2d12" fill-opacity="0.55" />
-          <rect x="16" y="34" width="14" height="4" rx="2" fill="#ffffff" fill-opacity="0.45" />
-          <rect x="12" y="17" width="36" height="5" rx="2" fill="#ffffff" fill-opacity="0.2" />
-        </svg>
-      </span>
+      <KpiArt kind="card" size={52} />
     </div>
     <p class="kpi__delta">
       {#if summary}<span class="dimtxt">{fmtUsd(summary.subscriptions_monthly_cents)} en subs/mes</span>{:else}<span class="dimtxt">gastos + subs</span>{/if}
@@ -509,22 +459,7 @@
       <span class="kpi__num"
         class:teal={summary && summary.net_this_month_cents >= 0}
         class:danger={summary && summary.net_this_month_cents < 0}>{summary ? fmtUsd0(summary.net_this_month_cents) : '—'}</span>
-      <span class="kpi__art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none">
-          <defs>
-            <linearGradient id="finTrend" x1="0" y1="1" x2="1" y2="0">
-              <stop offset="0" stop-color="#6ee7b7" /><stop offset="1" stop-color="#10b981" />
-            </linearGradient>
-          </defs>
-          <rect x="14" y="40" width="7" height="10" rx="2" fill="#2b2b33" />
-          <rect x="24" y="33" width="7" height="17" rx="2" fill="#2b2b33" />
-          <rect x="34" y="27" width="7" height="23" rx="2" fill="#2b2b33" />
-          <rect x="44" y="19" width="7" height="31" rx="2" fill="url(#finTrend)" />
-          <path d="M16 38l9-5 9-6 11-8" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M45 11h6v6" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="51" cy="11" r="2.4" fill="#6ee7b7" />
-        </svg>
-      </span>
+      <KpiArt kind="chart-up" size={52} />
     </div>
     <p class="kpi__delta">
       {#if summary}<span class:up={summary.net_this_month_cents >= 0} class:down={summary.net_this_month_cents < 0}>{summary.net_this_month_cents >= 0 ? 'positivo' : 'negativo'}</span> <span class="dimtxt">cobrado − egresos</span>{:else}<span class="dimtxt">cobrado − egresos</span>{/if}
@@ -536,21 +471,31 @@
 <div class="panel chart-panel">
   <div class="chart-head">
     <div>
-      <div class="panel__lbl">Ingresos por mes <span class="panel__sub">últimos 6 · por fecha de pago</span></div>
+      <div class="panel__lbl">Ingresos por mes <span class="panel__sub">por fecha de pago</span></div>
       {#if summary}
-        <div class="chart-amount">{fmtUsd(revenue[activeIdx] ? revenue[activeIdx].total_cents : 0)}</div>
+        <div class="chart-amount">{fmtUsd(activeRow ? activeRow.total_cents : 0)}</div>
         <div class="chart-sub">
-          {#if revenue[activeIdx]}<span class="cap">{monthLabel(revenue[activeIdx].month)}</span>{/if}
+          {#if activeRow}<span class="cap">{monthLabel(activeRow.month)}</span>{/if}
           {#if revDelta !== null && activeIdx === revenue.length - 1}
             <span class:up={revDelta >= 0} class:down={revDelta < 0}>{revDelta >= 0 ? '+' : ''}{revDelta}%</span> <span class="dimtxt">vs mes anterior</span>
           {/if}
         </div>
       {/if}
     </div>
-    <div class="legend"><span class="legend__dot"></span> mes actual</div>
+    <div class="legend"><span class="legend__dot"></span> mes activo</div>
   </div>
 
-  {#if summary}
+  {#if !summary}
+    <div class="muted">Cargando…</div>
+  {:else if !hasRevenue}
+    <div class="chart-empty">
+      <KpiArt kind="chart-up" size={44} />
+      <div class="chart-empty__txt">
+        <div class="chart-empty__title">Aún no hay ingresos registrados</div>
+        <div class="chart-empty__sub">Registra un pago en una factura y aparecerá aquí.</div>
+      </div>
+    </div>
+  {:else}
     <div class="chart-wrap">
       <svg
         class="chart"
@@ -564,52 +509,52 @@
             <stop offset="0" stop-color="#fb923c" /><stop offset="1" stop-color="#ea580c" />
           </linearGradient>
           <filter id="finBarGlow" x="-60%" y="-60%" width="220%" height="220%">
-            <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
+            <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="rgb(249, 115, 22)" flood-opacity="0.55" />
           </filter>
         </defs>
 
-        <!-- gridlines + etiquetas de eje Y -->
+        <!-- gridlines punteadas + etiquetas de eje Y -->
         {#each [0, 1, 2, 3] as g}
           {@const gy = TOP + (PLOT / 3) * g}
           <line x1="0" y1={gy} x2={CW} y2={gy} class={g === 3 ? 'chart__base' : 'chart__grid'} />
-          <text x="2" y={gy - 4} class="chart__axis">{fmtUsdShort(chartMax - (chartMax / 3) * g)}</text>
+          <text x="2" y={gy - 5} class="chart__axis">{fmtUsdShort(chartMax - (chartMax / 3) * g)}</text>
         {/each}
 
-        <!-- guía punteada al valor activo -->
-        {#if revenue[activeIdx]}
-          {@const ay = barY(revenue[activeIdx].total_cents)}
+        <!-- guía punteada horizontal al valor activo -->
+        {#if activeRow}
+          {@const ay = barY(activeRow.total_cents)}
           <line x1="0" y1={ay} x2={CW} y2={ay} class="chart__guide" />
         {/if}
 
-        <!-- barras -->
+        <!-- barras redondeadas (la activa: gradiente naranja + glow) -->
         {#each revenue as a, i}
           {@const active = i === activeIdx}
           <rect
             x={barX(i)}
             y={barY(a.total_cents)}
-            width={bandW() * 0.5}
-            height={Math.max(0, (a.total_cents / chartMax) * PLOT)}
-            rx="6"
+            width={barW()}
+            height={barH(a.total_cents)}
+            rx="7"
             fill={active ? 'url(#finBarActive)' : '#2b2b33'}
             filter={active ? 'url(#finBarGlow)' : undefined}
             class="chart__bar" />
-          <text x={barCx(i)} y={CH - 6} text-anchor="middle" class="chart__lbl" class:is-active={active}>{monthLabel(a.month)}</text>
+          <text x={barCx(i)} y={CH - 5} text-anchor="middle" class="chart__lbl" class:is-active={active}>{monthLabel(a.month)}</text>
         {/each}
 
         <!-- punto en el valor activo -->
-        {#if revenue[activeIdx]}
-          <circle cx={barCx(activeIdx)} cy={barY(revenue[activeIdx].total_cents)} r="4" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
+        {#if activeRow}
+          <circle cx={barCx(activeIdx)} cy={barY(activeRow.total_cents)} r="4" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2.5" />
         {/if}
       </svg>
 
       <!-- tooltip flotante (primitiva global .chart-tip) -->
-      {#if revenue[activeIdx]}
+      {#if activeRow}
         <span
           class="chart-tip"
-          style="left:{(barCx(activeIdx) / CW) * 100}%;top:{(barY(revenue[activeIdx].total_cents) / CH) * 100}%">{fmtUsd(revenue[activeIdx].total_cents)}</span>
+          style="left:{(barCx(activeIdx) / CW) * 100}%;top:{(barY(activeRow.total_cents) / CH) * 100}%">{fmtUsd(activeRow.total_cents)}</span>
       {/if}
     </div>
-  {:else}<div class="muted">Cargando…</div>{/if}
+  {/if}
 </div>
 
 <!-- ═══ Facturas — encabezado + acciones de alta ═══ -->
@@ -914,18 +859,22 @@
   .up { color: var(--accent-teal); font-weight: 600; }
   .down { color: var(--color-error); font-weight: 600; }
 
-  /* KPIs — tarjetas Orbit densas con arte 3D de esquina + delta */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 13px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); color: var(--fg-secondary); }
-  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; }
+  /* KPIs — tarjetas Orbit densas con arte 3D de esquina + delta.
+     Proporciones exactas de Orbit: 4 columnas iguales, gap 14px;
+     padding 16/16/14; número 36px tight; arte 52px; delta 13px. */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; display: flex; flex-direction: column; min-width: 0; }
+  .kpi__lbl { margin: 0 0 10px; font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   .kpi__num.danger { color: var(--color-error); }
-  .kpi__art { width: 56px; height: 56px; flex: 0 0 auto; display: inline-flex; }
-  .kpi__art svg { width: 100%; height: 100%; }
-  .kpi__delta { margin: 0; font-size: 11.5px; }
+  .kpi__delta { margin: 12px 0 0; font-size: var(--text-sm); }
+
+  /* Responsive: 4→2→1 columnas, igual que el resto del dashboard. */
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 460px) { .kpis { grid-template-columns: 1fr; } }
 
   /* Panel + chart */
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
@@ -945,7 +894,7 @@
 
   .chart-wrap { position: relative; }
   .chart { width: 100%; height: auto; display: block; cursor: crosshair; }
-  .chart__bar { transition: y .18s ease, height .18s ease; }
+  .chart__bar { transition: y .18s ease, height .18s ease, fill .18s ease; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
   .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
   .chart__axis { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; }
@@ -953,8 +902,13 @@
   .chart__base { stroke: rgba(255, 255, 255, 0.12); }
   .chart__guide { stroke: rgba(249, 115, 22, 0.4); stroke-dasharray: 4 4; }
 
+  /* Empty state del chart — alto similar al gráfico para no saltar el layout */
+  .chart-empty { display: flex; align-items: center; gap: 14px; min-height: 168px; padding: var(--space-3) var(--space-2); }
+  .chart-empty__title { font-weight: 600; font-size: var(--text-sm); color: var(--fg-primary); }
+  .chart-empty__sub { font-size: var(--text-xs); color: var(--fg-secondary); margin-top: 3px; }
+
   /* Encabezado de bloque + acciones */
-  .block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: var(--space-5) 0 var(--space-3); }
+  .block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 18px 0 var(--space-3); }
   .block-head__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); margin: 0; display: flex; align-items: baseline; gap: 8px; }
   .block-head__t .dimtxt { font-family: var(--font-mono); font-size: 11px; font-weight: 400; }
   .actions { display: flex; flex-wrap: wrap; gap: 8px; }

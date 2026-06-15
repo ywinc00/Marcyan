@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers ──────────────────────────────────────────────────
   // Timeout de cliente (~12s) vía AbortController: una función colgada o un
@@ -107,12 +108,18 @@
   let searchTimer;
 
   // Embudo derivado de stats (counts por estado + ancho relativo).
+  // Ancho = proporción sobre el máximo, suelo del 28% (= min-width de la
+  // pill global) para que ninguna etapa con datos desaparezca. Robusto
+  // con datos escasos: 1 brief → su etapa al 100%, el resto al suelo.
   const funnel = $derived.by(() => {
     if (!stats) return [];
     const counts = FUNNEL_ORDER.map((id) => ({ id, label: statusLabel(id), n: stats[id] ?? 0 }));
     const max = Math.max(1, ...counts.map((c) => c.n));
     return counts.map((c) => ({ ...c, w: Math.max(28, Math.round((c.n / max) * 100)) }));
   });
+  // ¿Hay algún brief en el pipeline? → si no, mostramos un empty-state
+  // tidy en vez de cinco pills al 28% que sugerirían datos falsos.
+  const hasPipeline = $derived(funnel.some((f) => f.n > 0));
 
   // ── Estado detalle ───────────────────────────────────────────
   let selected = $state(null);
@@ -285,44 +292,26 @@
   </div>
 
   {#if stats}
-    <!-- KPI strip + embudo: densidad Orbit -->
+    <!-- KPI strip + embudo: densidad Orbit. Grid = 3 KPIs (iguales) + 1
+         celda de pipeline más ancha; degrada a 2 cols / 1 col en estrecho. -->
     <section class="kpis">
       <article class="kpi">
         <p class="kpi__label">Total briefs</p>
         <div class="kpi__row">
           <h3 class="kpi__num">{stats.total ?? 0}</h3>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="kpiDocA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A2A33"/><stop offset="1" stop-color="#16161A"/></linearGradient>
-                <linearGradient id="kpiDocB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/></linearGradient>
-              </defs>
-              <rect x="18" y="16" width="32" height="40" rx="4" fill="url(#kpiDocA)" stroke="#4A4A55"/>
-              <rect x="12" y="10" width="32" height="40" rx="4" fill="url(#kpiDocB)" stroke="rgba(255,255,255,.25)"/>
-              <path d="M18 18h20M18 24h20M18 30h13" stroke="#fff" stroke-opacity=".85" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="44" cy="48" r="3" fill="#fff" fill-opacity=".5"/>
-            </svg>
-          </div>
+          <KpiArt kind="folder" size={54} />
         </div>
-        <p class="kpi__delta"><span class="up">+{stats.this_month ?? 0}</span> <span class="muted">este mes</span></p>
+        <p class="kpi__delta">
+          {#if (stats.this_month ?? 0) > 0}<span class="up">+{stats.this_month}</span> <span class="muted">este mes</span>
+          {:else}<span class="muted">sin altas este mes</span>{/if}
+        </p>
       </article>
 
       <article class="kpi">
         <p class="kpi__label">Por atender</p>
         <div class="kpi__row">
           <h3 class="kpi__num">{(stats.pending ?? 0) + (stats.contacted ?? 0)}</h3>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <radialGradient id="kpiBell" cx="0.5" cy="0.35" r="0.75"><stop offset="0" stop-color="#FBBF77"/><stop offset="1" stop-color="#EA580C"/></radialGradient>
-              </defs>
-              <ellipse cx="32" cy="50" rx="20" ry="5" fill="#000" fill-opacity=".25"/>
-              <path d="M18 44c0-9 4-18 14-18s14 9 14 18z" fill="url(#kpiBell)" stroke="rgba(255,255,255,.25)"/>
-              <rect x="14" y="44" width="36" height="5" rx="2.5" fill="#23232A" stroke="#4A4A55"/>
-              <circle cx="32" cy="22" r="3.5" fill="#FBBF77"/>
-              <path d="M22 36c1-5 4-8 10-9" stroke="#fff" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
+          <KpiArt kind="bell" size={54} />
         </div>
         <p class="kpi__delta"><span class="dot dot--gold"></span> <span class="muted">pendientes + contactados</span></p>
       </article>
@@ -331,31 +320,28 @@
         <p class="kpi__label">Completados</p>
         <div class="kpi__row">
           <h3 class="kpi__num">{stats.completed ?? 0}</h3>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <linearGradient id="kpiOk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6EE7B7"/><stop offset="1" stop-color="#059669"/></linearGradient>
-              </defs>
-              <ellipse cx="32" cy="50" rx="18" ry="4" fill="#000" fill-opacity=".25"/>
-              <circle cx="32" cy="30" r="18" fill="url(#kpiOk)" stroke="rgba(255,255,255,.3)"/>
-              <circle cx="26" cy="24" r="6" fill="#fff" fill-opacity=".22"/>
-              <path d="M24 30l5 6 11-12" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <KpiArt kind="check" size={54} />
         </div>
-        <p class="kpi__delta"><span class="up">+{stats.completed_this_month ?? 0}</span> <span class="muted">este mes</span></p>
+        <p class="kpi__delta">
+          {#if (stats.completed_this_month ?? 0) > 0}<span class="up">+{stats.completed_this_month}</span> <span class="muted">este mes</span>
+          {:else}<span class="muted">ninguno este mes</span>{/if}
+        </p>
       </article>
 
       <article class="kpi kpi--funnel">
         <p class="kpi__label">Pipeline por estado</p>
-        <div class="funnel">
-          {#each funnel as f, i}
-            <div class="funnel__row">
-              <span class="funnel__pill" class:funnel__pill--accent={i === 0} style="--w:{f.w}%">{f.label}</span>
-              <span class="funnel__n">{f.n}</span>
-            </div>
-          {/each}
-        </div>
+        {#if hasPipeline}
+          <div class="funnel">
+            {#each funnel as f, i}
+              <div class="funnel__row">
+                <span class="funnel__pill" class:funnel__pill--accent={i === 0} style="--w:{f.w}%">{f.label}</span>
+                <span class="funnel__n">{f.n}</span>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <p class="funnel-empty">Aún sin briefs en el pipeline.</p>
+        {/if}
       </article>
     </section>
   {/if}
@@ -569,21 +555,25 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* ── KPI strip (Orbit stats) ───────────────────────────────── */
-  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 1.3fr; gap: 12px; margin-bottom: var(--space-4); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px 16px 13px; min-width: 0; }
-  .kpi__label { margin: 0 0 8px; color: var(--fg-secondary); font-size: 12.5px; font-weight: 500; }
+  /* ── KPI strip (Orbit stats) ───────────────────────────────────
+     Orbit: 4 columnas, gap 14px, card radius 14px sin sombra. Aquí 3
+     KPIs iguales + 1 celda de pipeline algo más ancha (lleva 5 filas).
+     Proporciones 1:1 con Orbit .stat: padding 16/16/14, número 36px/700
+     con tracking -0.025em, label 13px/500 secundario, delta 13px. */
+  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 1.35fr; gap: 14px; margin-bottom: var(--space-4); align-items: stretch; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; min-width: 0; }
+  .kpi__label { margin: 0 0 10px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
   .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .kpi__num { margin: 0; font-family: var(--font-display); font-size: 32px; font-weight: 700; letter-spacing: var(--tracking-tight); line-height: 1; color: var(--fg-primary); }
-  .kpi__art { width: 52px; height: 52px; flex-shrink: 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
-  .kpi__art svg { width: 100%; height: 100%; }
-  .kpi__delta { margin: 11px 0 0; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .kpi__num { margin: 0; font-family: var(--font-display); font-size: 36px; font-weight: 700; letter-spacing: -0.025em; line-height: 1; color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .kpi__delta { margin: 12px 0 0; font-size: 13px; display: flex; align-items: center; gap: 6px; }
   .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
   .kpi__delta .muted { color: var(--fg-subtle); }
-  .dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+  .dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
   .dot--gold { background: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
-  .kpi--funnel { grid-row: span 1; }
-  .kpi--funnel .funnel { margin-top: 4px; }
+  /* La celda de pipeline alinea su label con el resto y deja respirar el embudo */
+  .kpi--funnel { display: flex; flex-direction: column; }
+  .kpi--funnel .funnel { margin-top: 2px; }
+  .funnel-empty { margin: 6px 0 0; color: var(--fg-subtle); font-size: 12.5px; line-height: 1.45; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-4); }
   .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
@@ -596,8 +586,11 @@
   .search::placeholder { color: var(--fg-subtle); }
   .search:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
 
-  /* ── Card-grid de briefs (Orbit rows, denso) ───────────────── */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  /* ── Card-grid de briefs (Orbit rows, denso) ─────────────────
+     gap 14px = misma rejilla que las KPI arriba; cards radius 14px,
+     hairline 1px, hover → bg elevated (igual que las filas de tabla
+     Orbit). Avatar-monograma como icono guía, status pill a la derecha. */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(278px, 1fr)); gap: 14px; }
   .bcard { display: flex; flex-direction: column; gap: 11px; text-align: left; width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: background var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast); }
   .bcard:hover { background: var(--bg-elevated); border-color: var(--accent-gold-line); transform: translateY(-1px); }
   .bcard__top { display: flex; align-items: center; gap: 10px; }

@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers (autosuficiente, igual que BriefsSection) ────────
   async function api(url, opts = {}) {
@@ -238,122 +239,58 @@
   </div>
 
   {#if rows.length}
-    <div class="kpis">
-      <!-- KPI: Activos (teal) — render glossy de "reloj/órbita en marcha" -->
+    <!-- Strip de KPI estilo Orbit "stats": 4 columnas iguales, label arriba,
+         número grande, delta abajo + ilustración glossy compartida (KpiArt)
+         en la esquina. Mapas semánticos: activos→rocket, en pausa→pause,
+         completados→check (verde), valor→coins (verde). -->
+    <section class="kpis">
       <article class="kpi">
-        <div class="kpi__txt">
-          <span class="kpi__l">Activos</span>
-          <span class="kpi__n teal">{summary.active}</span>
-          <span class="kpi__delta"><span class="muted">en curso ahora</span></span>
+        <p class="kpi__l">Activos</p>
+        <div class="kpi__row">
+          <span class="kpi__n">{summary.active}</span>
+          <KpiArt kind="rocket" size={56} />
         </div>
-        <div class="kpi__art" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <defs>
-              <radialGradient id="pk-act" cx="38%" cy="30%" r="75%">
-                <stop offset="0" stop-color="#6ee7c2"/><stop offset="55%" stop-color="#34d399"/><stop offset="1" stop-color="#0f8f6b"/>
-              </radialGradient>
-            </defs>
-            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#34d399" opacity=".18"/>
-            <circle cx="32" cy="30" r="20" fill="url(#pk-act)" stroke="#7df0cd" stroke-opacity=".5"/>
-            <path d="M14 24a20 20 0 0 1 30-9" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <path d="M32 19v12l8 5" stroke="#063b2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
-          </svg>
-        </div>
+        <p class="kpi__delta"><span class="muted">en curso ahora</span></p>
       </article>
 
-      <!-- KPI: En pausa (gold) — render de "pausa" en disco vidrioso -->
       <article class="kpi">
-        <div class="kpi__txt">
-          <span class="kpi__l">En pausa</span>
-          <span class="kpi__n gold">{summary.on_hold}</span>
-          <span class="kpi__delta"><span class="muted">esperando insumos</span></span>
+        <p class="kpi__l">En pausa</p>
+        <div class="kpi__row">
+          <span class="kpi__n">{summary.on_hold}</span>
+          <KpiArt kind="pause" size={56} />
         </div>
-        <div class="kpi__art" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <defs>
-              <radialGradient id="pk-hold" cx="38%" cy="30%" r="75%">
-                <stop offset="0" stop-color="#fdba74"/><stop offset="55%" stop-color="#f97316"/><stop offset="1" stop-color="#b34708"/>
-              </radialGradient>
-            </defs>
-            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#f97316" opacity=".18"/>
-            <circle cx="32" cy="30" r="20" fill="url(#pk-hold)" stroke="#ffd2a8" stroke-opacity=".5"/>
-            <rect x="25" y="21" width="5" height="18" rx="2.2" fill="#5c2406"/>
-            <rect x="34" y="21" width="5" height="18" rx="2.2" fill="#5c2406"/>
-            <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
-          </svg>
-        </div>
+        <p class="kpi__delta"><span class="muted">esperando insumos</span></p>
       </article>
 
-      <!-- KPI: Completados — render de "check" sobre disco apilado -->
       <article class="kpi">
-        <div class="kpi__txt">
-          <span class="kpi__l">Completados</span>
+        <p class="kpi__l">Completados</p>
+        <div class="kpi__row">
           <span class="kpi__n">{summary.completed}</span>
-          <span class="kpi__delta"><span class="muted">entregados</span></span>
+          <KpiArt kind="check" size={56} />
         </div>
-        <div class="kpi__art" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <defs>
-              <radialGradient id="pk-done" cx="38%" cy="30%" r="75%">
-                <stop offset="0" stop-color="#3f3f48"/><stop offset="60%" stop-color="#26262d"/><stop offset="1" stop-color="#16161a"/>
-              </radialGradient>
-            </defs>
-            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#000" opacity=".28"/>
-            <circle cx="32" cy="30" r="20" fill="url(#pk-done)" stroke="#4a4a55"/>
-            <path d="M23 30.5l6 6 12-13" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <ellipse cx="25" cy="22" rx="6" ry="3.2" fill="#fff" opacity=".14"/>
-          </svg>
-        </div>
+        <p class="kpi__delta"><span class="muted">entregados</span></p>
       </article>
 
-      <!-- KPI: Valor en cartera — suma de montos acordados -->
       <article class="kpi">
-        <div class="kpi__txt">
-          <span class="kpi__l">Valor en cartera</span>
-          <span class="kpi__n gold kpi__n--money">{fmtMoney(totalAgreedCents)}</span>
-          <span class="kpi__delta"><span class="muted">{rows.length} {rows.length === 1 ? 'proyecto' : 'proyectos'}</span></span>
+        <p class="kpi__l">Valor en cartera</p>
+        <div class="kpi__row">
+          <span class="kpi__n kpi__n--money">{fmtMoney(totalAgreedCents)}</span>
+          <KpiArt kind="coins" size={56} />
         </div>
-        <div class="kpi__art" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <defs>
-              <linearGradient id="pk-val" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#fdba74"/><stop offset="1" stop-color="#ea580c"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="32" cy="57" rx="18" ry="4" fill="#f97316" opacity=".16"/>
-            <rect x="16" y="40" width="32" height="8" rx="3" fill="#23232a" stroke="#4a4a55"/>
-            <rect x="19" y="29" width="26" height="10" rx="3" fill="#2c2c33" stroke="#4a4a55"/>
-            <circle cx="32" cy="20" r="13" fill="url(#pk-val)" stroke="#ffd2a8" stroke-opacity=".5"/>
-            <path d="M32 14v12M28.5 17.5h5.5a2.2 2.2 0 0 1 0 4.4h-4a2.2 2.2 0 0 0 0 4.4H35" stroke="#5c2406" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-            <ellipse cx="27" cy="14" rx="4.5" ry="2.6" fill="#fff" opacity=".45"/>
-          </svg>
-        </div>
+        <p class="kpi__delta"><span class="muted">{rows.length} {rows.length === 1 ? 'proyecto' : 'proyectos'} en pantalla</span></p>
       </article>
 
       {#if summary.cancelled}
         <article class="kpi">
-          <div class="kpi__txt">
-            <span class="kpi__l">Cancelados</span>
-            <span class="kpi__n err">{summary.cancelled}</span>
-            <span class="kpi__delta"><span class="down">archivados</span></span>
+          <p class="kpi__l">Cancelados</p>
+          <div class="kpi__row">
+            <span class="kpi__n">{summary.cancelled}</span>
+            <KpiArt kind="warning" size={56} />
           </div>
-          <div class="kpi__art" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none">
-              <defs>
-                <radialGradient id="pk-cnl" cx="38%" cy="30%" r="75%">
-                  <stop offset="0" stop-color="#fca5a5"/><stop offset="55%" stop-color="#ef4444"/><stop offset="1" stop-color="#991b1b"/>
-                </radialGradient>
-              </defs>
-              <ellipse cx="32" cy="56" rx="17" ry="4" fill="#ef4444" opacity=".18"/>
-              <circle cx="32" cy="30" r="20" fill="url(#pk-cnl)" stroke="#fecaca" stroke-opacity=".5"/>
-              <path d="M25 23l14 14M39 23L25 37" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
-              <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
-            </svg>
-          </div>
+          <p class="kpi__delta"><span class="down">archivados</span></p>
         </article>
       {/if}
-    </div>
+    </section>
   {/if}
 
   <div class="chips">
@@ -631,21 +568,25 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* KPI cards (resumen de la lista) — tratamiento Orbit: label + número
-     grande + delta + render glossy en la esquina (SVG con gradiente+glow). */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); }
-  .kpi { position: relative; overflow: hidden; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 13px; transition: border-color var(--duration-fast), transform var(--duration-fast); }
-  .kpi:hover { border-color: var(--border-strong); transform: translateY(-1px); }
-  .kpi__txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-  .kpi__l { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
-  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
+  /* KPI cards (resumen de la lista) — tratamiento Orbit "stats" 1:1:
+     4 columnas iguales (gap 14px), label arriba, número grande + KpiArt
+     en la fila, delta debajo. Mismas proporciones que .stat de Orbit y
+     que el .strip/.kcard del resto del panel para que el set sea unísono. */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: var(--space-2) 0 var(--space-4); }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; transition: border-color var(--duration-fast); }
+  .kpi:hover { border-color: var(--border-strong); }
+  .kpi__l { margin: 0 0 10px; font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums; }
   .kpi__n--money { font-size: 26px; }
-  .kpi__delta { display: flex; align-items: baseline; gap: 6px; font-size: 11.5px; margin-top: 1px; }
+  .kpi__delta { margin: 12px 0 0; font-size: var(--text-sm); }
   .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
   .kpi__delta .down { color: var(--color-error); font-weight: 600; }
   .kpi__delta .muted { color: var(--fg-subtle); }
-  .kpi__art { width: 58px; height: 58px; flex: 0 0 auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
-  .kpi__art svg { width: 100%; height: 100%; display: block; }
+
+  /* En pantallas estrechas la rejilla de 4 colapsa a 2 (igual que el
+     resto del panel), para que las tarjetas no se aplasten. */
+  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
@@ -655,10 +596,12 @@
   .search { width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-size: var(--text-base); outline: none; margin-bottom: var(--space-4); }
   .search:focus { border-color: var(--accent-gold); }
 
-  /* Tarjetas de proyecto — densas, con monograma de cliente */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(264px, 1fr)); gap: var(--space-3); }
-  .pcard { display: flex; flex-direction: column; gap: 9px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px; cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast); }
-  .pcard:hover { border-color: var(--accent-gold); background: var(--bg-elevated); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+  /* Tarjetas de proyecto — densas, con monograma de cliente.
+     Look Orbit: hairline 1px, radio 14px, SIN sombra pesada; el hover
+     solo sube el borde a strong + bg elevado + lift sutil (no glow gold). */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .pcard { display: flex; flex-direction: column; gap: 9px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast); }
+  .pcard:hover { border-color: var(--border-strong); background: var(--bg-elevated); transform: translateY(-1px); }
   .pcard__top { display: flex; align-items: flex-start; gap: 10px; }
   .pcard__hd { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
   .pcard__id { font-size: 10px; letter-spacing: .04em; }
@@ -698,7 +641,7 @@
   /* Detalle */
   .back { background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; cursor: pointer; margin: var(--space-4) 0; padding: 4px 0; }
   .back:hover { color: var(--accent-gold); }
-  .detail { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: var(--space-5); align-items: start; }
+  .detail { display: grid; grid-template-columns: minmax(0,1fr) 296px; gap: 18px; align-items: start; }
   .detail__main { min-width: 0; }
   .d-head { display: flex; align-items: flex-start; gap: var(--space-3); border-bottom: 1px solid var(--border); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
   .d-head__txt { min-width: 0; flex: 1; }
@@ -746,7 +689,7 @@
   /* Reserva espacio para el caret del select (la imagen viene del global). */
   select.inp { padding-right: 30px; }
 
-  .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
+  .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: 14px; }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
   .card__t { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); }
   .card--danger { border-color: rgba(var(--color-error-rgb),.28); }

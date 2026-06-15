@@ -20,7 +20,7 @@
 
   // ── Estado ───────────────────────────────────────────────────
   let projects = $state([]);
-  let connected = $state(true);   // ¿GOOGLE_SA_KEY presente?
+  let connected = $state(true);   // ¿WIF configurado (GOOGLE_WIF_AUDIENCE + GOOGLE_SA_EMAIL)?
   let loading = $state(false);
   let error = $state('');
 
@@ -154,7 +154,7 @@
       const r = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }) });
       const j = await r.json();
       if (j.configured === false) {
-        syncOk = false; syncMsg = 'Conectá Google (GOOGLE_SA_KEY) para sincronizar datos reales.';
+        syncOk = false; syncMsg = 'Conectá Google (Workload Identity Federation) para sincronizar datos reales.';
       } else if (!j.ok) {
         const res0 = j.results && j.results[0];
         const detailErr = res0 ? [res0.gsc?.error, res0.ga4?.error].filter(Boolean).join(' · ') : '';
@@ -207,7 +207,7 @@
   <h1 class="greet">SEO</h1>
   <div class="head-actions">
     {#if !connected}
-      <span class="conn conn--off" title="Falta GOOGLE_SA_KEY">● Google no conectado</span>
+      <span class="conn conn--off" title="Falta configurar Workload Identity Federation">● Google no conectado</span>
     {:else}
       <span class="conn conn--on">● Google conectado</span>
     {/if}
@@ -218,9 +218,10 @@
 {#if !connected}
   <div class="notice">
     <strong>Conectá Google para ver datos.</strong>
-    Falta la clave de la cuenta de servicio (<code>GOOGLE_SA_KEY</code>). Podés crear proyectos y guardar
-    sus IDs de GA4 / Search Console ahora; en cuanto se configure la cuenta de servicio y se den los
-    permisos por cliente, el botón "Actualizar ahora" traerá las métricas reales.
+    Falta configurar el acceso a Google sin clave (<code>Workload Identity Federation</code>: envs
+    <code>GOOGLE_WIF_AUDIENCE</code> + <code>GOOGLE_SA_EMAIL</code> y OIDC habilitado en Vercel). Podés crear
+    proyectos y guardar sus IDs de GA4 / Search Console ahora; en cuanto se den los permisos por cliente,
+    el botón "Actualizar ahora" traerá las métricas reales.
   </div>
 {/if}
 

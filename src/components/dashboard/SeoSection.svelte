@@ -122,7 +122,7 @@
       connected = j.connected !== false;
       if (selectFirst && projects.length && selectedId == null) {
         selectProject(projects[0].id);
-      } else if (selectedId != null && !projects.some((p) => p.id === selectedId)) {
+      } else if (selectedId != null && !projects.some((p) => String(p.id) === String(selectedId))) {
         selectedId = null; detail = null;
       }
     } catch (e) { error = e.message || 'Error al cargar'; }
@@ -143,7 +143,10 @@
 
   function onSelectChange(e) {
     const v = e.currentTarget.value;
-    if (v) selectProject(parseInt(v, 10));
+    // Los IDs vienen como string (columna BIGINT de Postgres); NO usar parseInt
+    // o el value del <select> (número) no matchea las <option value> (string)
+    // y deja de verse el proyecto seleccionado.
+    if (v) selectProject(v);
   }
 
   // ── Sincronizar ──────────────────────────────────────────────

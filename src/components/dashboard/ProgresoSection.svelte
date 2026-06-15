@@ -60,6 +60,21 @@
   let showDelete = $state(false);
   let deleting = $state(false);
 
+  // ── Monograma de cliente/proyecto (avatar con iniciales) ────
+  // Color de fondo determinista hasheado del nombre (paleta sobria).
+  const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+  function monoColor(n) {
+    let h = 0; const s = n || '?';
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return MONO_PALETTE[Math.abs(h) % MONO_PALETTE.length];
+  }
+  function initials(n) {
+    const parts = (n || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '—';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
   // ── Derivados ────────────────────────────────────────────────
   const percent = $derived(progress ? progress.percent : 0);
 
@@ -69,6 +84,16 @@
     for (const r of rows) if (c[r.status] != null) c[r.status] += 1;
     return c;
   });
+
+  // Suma de montos acordados (cents) de las filas en pantalla, para el KPI de valor.
+  const totalAgreedCents = $derived.by(() => {
+    let t = 0;
+    for (const r of rows) { const n = Number(r.agreed_amount_cents); if (Number.isFinite(n)) t += n; }
+    return t;
+  });
+
+  // ── Hover del stepper (detalle): índice del nodo bajo el cursor ──
+  let hoverStep = $state(-1);
 
   // ── Carga lista ──────────────────────────────────────────────
   async function loadList() {
@@ -97,7 +122,7 @@
   // ── Detalle ──────────────────────────────────────────────────
   async function openProject(id) {
     detailLoading = true; selected = null; milestones = []; progress = null;
-    saveMsg = ''; newMsLabel = '';
+    saveMsg = ''; newMsLabel = ''; hoverStep = -1;
     try {
       const r = await api('/api/admin/projects/' + encodeURIComponent(id));
       const j = await r.json();
@@ -214,35 +239,119 @@
 
   {#if rows.length}
     <div class="kpis">
-      <div class="kpi">
+      <!-- KPI: Activos (teal) — render glossy de "reloj/órbita en marcha" -->
+      <article class="kpi">
         <div class="kpi__txt">
-          <span class="kpi__n teal">{summary.active}</span>
           <span class="kpi__l">Activos</span>
+          <span class="kpi__n teal">{summary.active}</span>
+          <span class="kpi__delta"><span class="muted">en curso ahora</span></span>
         </div>
-        <svg class="kpi__art kpi__art--teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      </div>
-      <div class="kpi">
+        <div class="kpi__art" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <defs>
+              <radialGradient id="pk-act" cx="38%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#6ee7c2"/><stop offset="55%" stop-color="#34d399"/><stop offset="1" stop-color="#0f8f6b"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#34d399" opacity=".18"/>
+            <circle cx="32" cy="30" r="20" fill="url(#pk-act)" stroke="#7df0cd" stroke-opacity=".5"/>
+            <path d="M14 24a20 20 0 0 1 30-9" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M32 19v12l8 5" stroke="#063b2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI: En pausa (gold) — render de "pausa" en disco vidrioso -->
+      <article class="kpi">
         <div class="kpi__txt">
-          <span class="kpi__n gold">{summary.on_hold}</span>
           <span class="kpi__l">En pausa</span>
+          <span class="kpi__n gold">{summary.on_hold}</span>
+          <span class="kpi__delta"><span class="muted">esperando insumos</span></span>
         </div>
-        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 9v6M14 9v6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      </div>
-      <div class="kpi">
+        <div class="kpi__art" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <defs>
+              <radialGradient id="pk-hold" cx="38%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#fdba74"/><stop offset="55%" stop-color="#f97316"/><stop offset="1" stop-color="#b34708"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#f97316" opacity=".18"/>
+            <circle cx="32" cy="30" r="20" fill="url(#pk-hold)" stroke="#ffd2a8" stroke-opacity=".5"/>
+            <rect x="25" y="21" width="5" height="18" rx="2.2" fill="#5c2406"/>
+            <rect x="34" y="21" width="5" height="18" rx="2.2" fill="#5c2406"/>
+            <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI: Completados — render de "check" sobre disco apilado -->
+      <article class="kpi">
         <div class="kpi__txt">
-          <span class="kpi__n">{summary.completed}</span>
           <span class="kpi__l">Completados</span>
+          <span class="kpi__n">{summary.completed}</span>
+          <span class="kpi__delta"><span class="muted">entregados</span></span>
         </div>
-        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-      </div>
+        <div class="kpi__art" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <defs>
+              <radialGradient id="pk-done" cx="38%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#3f3f48"/><stop offset="60%" stop-color="#26262d"/><stop offset="1" stop-color="#16161a"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="32" cy="56" rx="17" ry="4" fill="#000" opacity=".28"/>
+            <circle cx="32" cy="30" r="20" fill="url(#pk-done)" stroke="#4a4a55"/>
+            <path d="M23 30.5l6 6 12-13" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <ellipse cx="25" cy="22" rx="6" ry="3.2" fill="#fff" opacity=".14"/>
+          </svg>
+        </div>
+      </article>
+
+      <!-- KPI: Valor en cartera — suma de montos acordados -->
+      <article class="kpi">
+        <div class="kpi__txt">
+          <span class="kpi__l">Valor en cartera</span>
+          <span class="kpi__n gold kpi__n--money">{fmtMoney(totalAgreedCents)}</span>
+          <span class="kpi__delta"><span class="muted">{rows.length} {rows.length === 1 ? 'proyecto' : 'proyectos'}</span></span>
+        </div>
+        <div class="kpi__art" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <defs>
+              <linearGradient id="pk-val" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fdba74"/><stop offset="1" stop-color="#ea580c"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="32" cy="57" rx="18" ry="4" fill="#f97316" opacity=".16"/>
+            <rect x="16" y="40" width="32" height="8" rx="3" fill="#23232a" stroke="#4a4a55"/>
+            <rect x="19" y="29" width="26" height="10" rx="3" fill="#2c2c33" stroke="#4a4a55"/>
+            <circle cx="32" cy="20" r="13" fill="url(#pk-val)" stroke="#ffd2a8" stroke-opacity=".5"/>
+            <path d="M32 14v12M28.5 17.5h5.5a2.2 2.2 0 0 1 0 4.4h-4a2.2 2.2 0 0 0 0 4.4H35" stroke="#5c2406" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+            <ellipse cx="27" cy="14" rx="4.5" ry="2.6" fill="#fff" opacity=".45"/>
+          </svg>
+        </div>
+      </article>
+
       {#if summary.cancelled}
-        <div class="kpi">
+        <article class="kpi">
           <div class="kpi__txt">
-            <span class="kpi__n err">{summary.cancelled}</span>
             <span class="kpi__l">Cancelados</span>
+            <span class="kpi__n err">{summary.cancelled}</span>
+            <span class="kpi__delta"><span class="down">archivados</span></span>
           </div>
-          <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9l-6 6M9 9l6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </div>
+          <div class="kpi__art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <defs>
+                <radialGradient id="pk-cnl" cx="38%" cy="30%" r="75%">
+                  <stop offset="0" stop-color="#fca5a5"/><stop offset="55%" stop-color="#ef4444"/><stop offset="1" stop-color="#991b1b"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="32" cy="56" rx="17" ry="4" fill="#ef4444" opacity=".18"/>
+              <circle cx="32" cy="30" r="20" fill="url(#pk-cnl)" stroke="#fecaca" stroke-opacity=".5"/>
+              <path d="M25 23l14 14M39 23L25 37" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
+              <ellipse cx="25" cy="22" rx="6" ry="3.4" fill="#fff" opacity=".4"/>
+            </svg>
+          </div>
+        </article>
       {/if}
     </div>
   {/if}
@@ -275,28 +384,44 @@
   {:else}
     <div class="cards">
       {#each rows as r (r.id)}
+        {@const done = (r.progress || 0) >= 100}
         <button class="pcard" onclick={() => openProject(r.id)}>
           <div class="pcard__top">
-            <div class="pcard__id mono gold">{r.project_code || ('PRJ-' + r.id)}</div>
+            <span class="pmono pmono--card" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`}>{initials(r.client_name || r.name)}</span>
+            <div class="pcard__hd">
+              <span class="pcard__id mono gold">{r.project_code || ('PRJ-' + r.id)}</span>
+              <span class="pcard__name">{r.name || '— sin nombre —'}</span>
+            </div>
             <span class="badge badge--{r.status}">{pStatusLabel(r.status)}</span>
           </div>
-          <div class="pcard__name">{r.name || '— sin nombre —'}</div>
+
           <div class="pcard__sub mono">
-            {r.client_name || 'Sin cliente'}{#if r.brief_project_id} · {r.brief_project_id}{/if}
+            <svg class="pcard__usr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg>
+            <span class="pcard__client">{r.client_name || 'Sin cliente'}</span>
+            {#if r.brief_project_id}<span class="dot">·</span><span>{r.brief_project_id}</span>{/if}
           </div>
 
-          <!-- Barra de progreso (SVG a mano) -->
+          <!-- Barra de progreso (SVG a mano) — naranja en curso / verde al 100% -->
           <div class="pcard__prog">
-            <svg class="pbar" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
-              <rect x="0" y="0" width="100" height="6" rx="3" fill="var(--bg-elevated)" />
-              <rect x="0" y="0" width={Math.max(r.progress || 0, r.progress ? 2 : 0)} height="6" rx="3"
-                    fill={(r.progress || 0) >= 100 ? 'var(--accent-teal)' : 'var(--accent-gold)'} />
+            <svg class="pbar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id={`pg-${r.id}`} x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color={done ? '#6ee7c2' : '#fdba74'}/>
+                  <stop offset="1" stop-color={done ? 'var(--accent-teal)' : 'var(--accent-gold)'}/>
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="100" height="8" rx="4" fill="var(--bg-elevated)" />
+              <rect x="0" y="0" width={Math.max(r.progress || 0, r.progress ? 3 : 0)} height="8" rx="4" fill={`url(#pg-${r.id})`} />
             </svg>
-            <span class="pcard__pct mono">{r.progress || 0}%</span>
+            <span class="pcard__pct mono" class:teal={done}>{r.progress || 0}%</span>
           </div>
-          <div class="pcard__foot mono">
-            {r.milestones_done || 0}/{r.milestones_total || 0} hitos
-            {#if r.agreed_amount_cents != null}<span class="dot">·</span> {fmtMoney(r.agreed_amount_cents)}{/if}
+
+          <div class="pcard__foot">
+            <span class="pcard__hit mono">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+              {r.milestones_done || 0}/{r.milestones_total || 0} hitos
+            </span>
+            {#if r.agreed_amount_cents != null}<span class="pcard__amt mono teal">{fmtMoney(r.agreed_amount_cents)}</span>{/if}
           </div>
         </button>
       {/each}
@@ -322,14 +447,17 @@
     <div class="detail">
       <div class="detail__main">
         <div class="d-head">
-          <h1 class="d-id">{selected.project_code || ('PRJ-' + selected.id)}</h1>
-          <p class="d-biz">{selected.name || '— sin nombre —'}</p>
-          <div class="d-meta mono">
-            <span>{selected.client_name || 'Sin cliente'}</span>
-            {#if selected.brief_project_id}<span>· Brief {selected.brief_project_id}</span>{/if}
-            {#if selected.service_type}<span>· {selected.service_type}</span>{/if}
-            {#if selected.started_at}<span>· Inicio {fmtDate(selected.started_at)}</span>{/if}
-            {#if selected.completed_at}<span>· Fin {fmtDate(selected.completed_at)}</span>{/if}
+          <span class="pmono pmono--lg" style={`background:${monoColor(selected.client_name || selected.name || selected.project_code)}`}>{initials(selected.client_name || selected.name)}</span>
+          <div class="d-head__txt">
+            <h1 class="d-id">{selected.project_code || ('PRJ-' + selected.id)}</h1>
+            <p class="d-biz">{selected.name || '— sin nombre —'}</p>
+            <div class="d-meta mono">
+              <span>{selected.client_name || 'Sin cliente'}</span>
+              {#if selected.brief_project_id}<span>· Brief {selected.brief_project_id}</span>{/if}
+              {#if selected.service_type}<span>· {selected.service_type}</span>{/if}
+              {#if selected.started_at}<span>· Inicio {fmtDate(selected.started_at)}</span>{/if}
+              {#if selected.completed_at}<span>· Fin {fmtDate(selected.completed_at)}</span>{/if}
+            </div>
           </div>
         </div>
 
@@ -341,37 +469,54 @@
           </div>
 
           {#if milestones.length}
-            <svg class="stepper" viewBox="0 0 {Math.max(milestones.length * 120, 120)} 78" role="img" aria-label="Stepper de hitos">
-              <!-- línea base -->
-              <line x1="60" y1="30" x2={Math.max(milestones.length * 120, 120) - 60} y2="30"
-                    stroke="var(--border)" stroke-width="2" />
-              {#each milestones as ms, i}
-                {@const cx = 60 + i * 120}
-                {@const isDone = ms.status === 'done'}
-                {@const isCurrent = ms.status === 'in_progress'}
-                <!-- segmento coloreado hasta el último hito hecho -->
-                {#if i > 0}
-                  <line x1={60 + (i - 1) * 120} y1="30" x2={cx} y2="30"
-                        stroke={milestones[i - 1].status === 'done' ? 'var(--accent-gold)' : 'var(--border)'}
-                        stroke-width="2" />
-                {/if}
-                <circle cx={cx} cy="30" r="11"
-                        fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal-dim)' : 'var(--bg-elevated)'}
-                        stroke={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--border)'}
-                        stroke-width="2" />
-                {#if isDone}
-                  <path d="M{cx - 4.5} 30 l3 3 l6 -6.5" fill="none" stroke="var(--fg-inverse)" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" />
-                {:else if isCurrent}
-                  <circle cx={cx} cy="30" r="3.5" fill="var(--accent-teal)" />
-                {/if}
-                <text x={cx} y="58" text-anchor="middle" class="step__lbl">{ms.label}</text>
-                <text x={cx} y="72" text-anchor="middle"
-                      class="step__st" fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--fg-subtle)'}>
-                  {mStatusLabel(ms.status)}
-                </text>
-              {/each}
-            </svg>
+            {@const W = Math.max(milestones.length * 120, 120)}
+            <div class="stepper-wrap" role="presentation" onmouseleave={() => (hoverStep = -1)}>
+              <svg class="stepper" viewBox="0 0 {W} 84" role="img" aria-label="Stepper de hitos">
+                <!-- línea base -->
+                <line x1="60" y1="30" x2={W - 60} y2="30" stroke="var(--border)" stroke-width="2" />
+                {#each milestones as ms, i}
+                  {@const cx = 60 + i * 120}
+                  {@const isDone = ms.status === 'done'}
+                  {@const isCurrent = ms.status === 'in_progress'}
+                  {@const hot = hoverStep === i}
+                  <!-- segmento coloreado hasta el último hito hecho -->
+                  {#if i > 0}
+                    <line x1={60 + (i - 1) * 120} y1="30" x2={cx} y2="30"
+                          stroke={milestones[i - 1].status === 'done' ? 'var(--accent-gold)' : 'var(--border)'}
+                          stroke-width="2" />
+                  {/if}
+                  <!-- guía vertical punteada al hover (estilo Orbit) -->
+                  {#if hot}
+                    <line x1={cx} y1="14" x2={cx} y2="74" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="2 3" />
+                    <circle cx={cx} cy="30" r="15" fill="none" stroke={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--border-strong)'} stroke-opacity=".55" stroke-width="1.5" />
+                  {/if}
+                  <circle cx={cx} cy="30" r="11"
+                          fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal-dim)' : 'var(--bg-elevated)'}
+                          stroke={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--border)'}
+                          stroke-width="2" />
+                  {#if isDone}
+                    <path d="M{cx - 4.5} 30 l3 3 l6 -6.5" fill="none" stroke="var(--fg-inverse)" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                  {:else if isCurrent}
+                    <circle cx={cx} cy="30" r="3.5" fill="var(--accent-teal)" />
+                  {/if}
+                  <text x={cx} y="58" text-anchor="middle" class="step__lbl">{ms.label}</text>
+                  <text x={cx} y="72" text-anchor="middle"
+                        class="step__st" fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--fg-subtle)'}>
+                    {mStatusLabel(ms.status)}
+                  </text>
+                  <!-- zona de hover invisible y ancha por nodo -->
+                  <rect x={cx - 58} y="0" width="116" height="84" fill="transparent"
+                        onmouseenter={() => (hoverStep = i)} role="presentation" />
+                {/each}
+              </svg>
+              {#if hoverStep >= 0 && milestones[hoverStep]}
+                {@const cx = 60 + hoverStep * 120}
+                <span class="chart-tip" style={`left:${(cx / W) * 100}%;top:18px`}>
+                  {milestones[hoverStep].label} · {mStatusLabel(milestones[hoverStep].status)}
+                </span>
+              {/if}
+            </div>
           {:else}
             <div class="muted">— este proyecto no tiene hitos —</div>
           {/if}
@@ -388,7 +533,8 @@
                 </button>
                 <span class="ms__label">{ms.label}</span>
                 {#if ms.due_date}<span class="ms__due mono">vence {fmtDate(ms.due_date)}</span>{/if}
-                <select class="ms__sel" value={ms.status} onchange={(e) => setMilestoneStatus(ms, e.currentTarget.value)}>
+                <span class="ms__pill ms__pill--{ms.status}">{mStatusLabel(ms.status)}</span>
+                <select class="ms__sel" value={ms.status} onchange={(e) => setMilestoneStatus(ms, e.currentTarget.value)} aria-label="Estado del hito">
                   {#each M_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
                 </select>
               </li>
@@ -485,14 +631,21 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* KPI cards (resumen de la lista) — con mini-art de esquina (ref: home) */
-  .kpis { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); }
-  .kpi { flex: 1 1 0; min-width: 130px; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
-  .kpi__txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .kpi__art { width: 34px; height: 34px; flex: 0 0 auto; color: var(--accent-gold); opacity: .3; }
-  .kpi__art--teal { color: var(--accent-teal); }
-  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
-  .kpi__l { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-subtle); }
+  /* KPI cards (resumen de la lista) — tratamiento Orbit: label + número
+     grande + delta + render glossy en la esquina (SVG con gradiente+glow). */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); }
+  .kpi { position: relative; overflow: hidden; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 13px; transition: border-color var(--duration-fast), transform var(--duration-fast); }
+  .kpi:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .kpi__txt { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .kpi__l { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
+  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
+  .kpi__n--money { font-size: 26px; }
+  .kpi__delta { display: flex; align-items: baseline; gap: 6px; font-size: 11.5px; margin-top: 1px; }
+  .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
+  .kpi__delta .down { color: var(--color-error); font-weight: 600; }
+  .kpi__delta .muted { color: var(--fg-subtle); }
+  .kpi__art { width: 58px; height: 58px; flex: 0 0 auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+  .kpi__art svg { width: 100%; height: 100%; display: block; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
@@ -502,18 +655,26 @@
   .search { width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-size: var(--text-base); outline: none; margin-bottom: var(--space-4); }
   .search:focus { border-color: var(--accent-gold); }
 
-  /* Tarjetas de proyecto */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-3); }
-  .pcard { display: flex; flex-direction: column; gap: 6px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast); }
+  /* Tarjetas de proyecto — densas, con monograma de cliente */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(264px, 1fr)); gap: var(--space-3); }
+  .pcard { display: flex; flex-direction: column; gap: 9px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px; cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast); }
   .pcard:hover { border-color: var(--accent-gold); background: var(--bg-elevated); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
-  .pcard__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .pcard__id { font-size: var(--text-xs); }
-  .pcard__name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); line-height: 1.2; }
-  .pcard__sub { font-size: 11px; color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pcard__prog { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-  .pbar { flex: 1; height: 6px; display: block; }
-  .pcard__pct { font-size: 11px; color: var(--fg-secondary); width: 34px; text-align: right; flex: 0 0 auto; }
-  .pcard__foot { font-size: 10px; color: var(--fg-subtle); letter-spacing: .04em; }
+  .pcard__top { display: flex; align-items: flex-start; gap: 10px; }
+  .pcard__hd { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .pcard__id { font-size: 10px; letter-spacing: .04em; }
+  .pcard__name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pmono--card { width: 34px; height: 34px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; letter-spacing: -.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+  .pcard__sub { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fg-subtle); overflow: hidden; }
+  .pcard__usr { width: 13px; height: 13px; flex: 0 0 auto; color: var(--fg-subtle); }
+  .pcard__client { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pcard__prog { display: flex; align-items: center; gap: 10px; margin-top: 1px; }
+  .pbar { flex: 1; height: 8px; display: block; }
+  .pcard__pct { font-size: 11px; font-weight: 600; color: var(--accent-gold); width: 34px; text-align: right; flex: 0 0 auto; }
+  .pcard__pct.teal { color: var(--accent-teal); }
+  .pcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 9px; border-top: 1px solid var(--border-subtle); }
+  .pcard__hit { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--fg-secondary); }
+  .pcard__hit svg { width: 13px; height: 13px; color: var(--fg-subtle); }
+  .pcard__amt { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .dot { color: var(--fg-subtle); }
 
   .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; }
@@ -539,7 +700,9 @@
   .back:hover { color: var(--accent-gold); }
   .detail { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: var(--space-5); align-items: start; }
   .detail__main { min-width: 0; }
-  .d-head { border-bottom: 1px solid var(--border); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
+  .d-head { display: flex; align-items: flex-start; gap: var(--space-3); border-bottom: 1px solid var(--border); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
+  .d-head__txt { min-width: 0; flex: 1; }
+  .pmono--lg { width: 46px; height: 46px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1; letter-spacing: -.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
   .d-id { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); color: var(--accent-gold); margin: 0; }
   .d-biz { font-family: var(--font-display); font-style: italic; color: var(--fg-secondary); margin: 4px 0; }
   .d-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: .1em; }
@@ -549,8 +712,10 @@
   .block__title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-md); letter-spacing: normal; text-transform: none; color: var(--fg-primary); margin: 0 0 var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); flex: 1; }
   .prog-sum { font-size: 11px; color: var(--fg-subtle); margin-left: 12px; }
 
-  /* Stepper SVG */
+  /* Stepper SVG interactivo */
+  .stepper-wrap { position: relative; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 10px; }
   .stepper { width: 100%; height: auto; display: block; max-width: 100%; }
+  .stepper rect[role="presentation"] { cursor: pointer; }
   .step__lbl { fill: var(--fg-primary); font-family: var(--font-display); font-size: 11px; font-weight: 600; }
   .step__st  { font-family: var(--font-mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
 
@@ -564,6 +729,11 @@
   .ms__label { flex: 1; color: var(--fg-primary); font-size: var(--text-sm); }
   .ms--done .ms__label { color: var(--fg-secondary); }
   .ms__due { font-size: 10px; color: var(--fg-subtle); }
+  /* Pill de estado tintada (se oculta en pantallas estrechas a favor del select) */
+  .ms__pill { padding: 2px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; border: 1px solid; white-space: nowrap; flex: 0 0 auto; }
+  .ms__pill--pending { color: var(--fg-subtle); border-color: var(--border); background: var(--bg-elevated); }
+  .ms__pill--in_progress { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .ms__pill--done { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   /* El caret (background-image) lo aplica la regla global .ms__sel en dashboard.css. */
   .ms__sel { background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 26px 6px 8px; font-size: var(--text-xs); cursor: pointer; flex: 0 0 auto; background-position: right 8px center; }
   .ms__sel:focus { outline: none; border-color: var(--accent-gold); }
@@ -609,4 +779,5 @@
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
 
   @media (max-width: 880px) { .detail { grid-template-columns: 1fr; } .detail__aside { position: static; } }
+  @media (max-width: 560px) { .ms__pill { display: none; } }
 </style>

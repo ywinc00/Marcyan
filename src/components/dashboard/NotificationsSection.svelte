@@ -43,12 +43,13 @@
     return (e && e.message) || 'Error al cargar';
   }
 
-  // type → etiqueta + glifo + clase de color
+  // type → etiqueta + clase de color. El glifo se dibuja como un pequeño
+  // objeto SVG en capas (depth + glow) por tipo, no como un icono plano.
   const TYPES = {
-    new_lead:     { label: 'Nuevo lead',  glyph: '✉', cls: 'lead' },
-    new_brief:    { label: 'Nuevo brief', glyph: '▣', cls: 'brief' },
-    chat_handoff: { label: 'Handoff',     glyph: '☎', cls: 'handoff' },
-    system:       { label: 'Sistema',     glyph: '◆', cls: 'system' },
+    new_lead:     { label: 'Nuevo lead',  cls: 'lead' },
+    new_brief:    { label: 'Nuevo brief', cls: 'brief' },
+    chat_handoff: { label: 'Handoff',     cls: 'handoff' },
+    system:       { label: 'Sistema',     cls: 'system' },
   };
   function typeMeta(t) { return TYPES[t] || TYPES.system; }
 
@@ -60,6 +61,14 @@
   let error = $state('');
   let busyAll = $state(false);
   const LIMIT = 50;
+
+  // Conteos por tipo para el desglose del strip superior (solo lectura,
+  // derivado de las filas ya cargadas — no toca los endpoints).
+  const counts = $derived.by(() => {
+    const c = { new_lead: 0, new_brief: 0, chat_handoff: 0, system: 0 };
+    for (const n of rows) { if (c[n.type] != null) c[n.type]++; else c.system++; }
+    return c;
+  });
 
   // ── Carga ────────────────────────────────────────────────────
   async function load() {
@@ -118,6 +127,89 @@
   </span>
 </div>
 
+<!-- Strip superior denso: KPI de no-leídos (con ilustración esquinera) +
+     desglose por tipo, en una fila de tarjetas compactas estilo Orbit. -->
+<section class="strip">
+  <article class="kcard kcard--accent">
+    <p class="kcard__label">Sin leer</p>
+    <div class="kcard__row">
+      <span class="kcard__num">{String(unread).padStart(2, '0')}</span>
+      <span class="kcard__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <defs>
+            <linearGradient id="bellg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/>
+            </linearGradient>
+            <radialGradient id="bellglow" cx="50%" cy="40%" r="60%">
+              <stop offset="0" stop-color="rgba(249,115,22,0.45)"/><stop offset="1" stop-color="rgba(249,115,22,0)"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="32" cy="34" rx="26" ry="22" fill="url(#bellglow)"/>
+          <path d="M20 40c0-9 2-18 12-18s12 9 12 18z" fill="url(#bellg)" stroke="#FFD9B8" stroke-opacity="0.35"/>
+          <path d="M22 40c0-8 2-15 10-15" stroke="#fff" stroke-opacity="0.4" stroke-width="1.4" stroke-linecap="round"/>
+          <rect x="17" y="40" width="30" height="5" rx="2.5" fill="#23232A" stroke="#4A4A55"/>
+          <circle cx="32" cy="49" r="3.5" fill="url(#bellg)"/>
+          {#if unread}<circle cx="44" cy="22" r="6" fill="#EF4444" stroke="#0e0e11" stroke-width="2"/>{/if}
+        </svg>
+      </span>
+    </div>
+    <p class="kcard__delta">
+      {#if unread}<span class="warn">{unread} {unread === 1 ? 'aviso pendiente' : 'avisos pendientes'}</span>
+      {:else}<span class="ok">Todo al día</span>{/if}
+    </p>
+  </article>
+
+  <article class="kcard">
+    <p class="kcard__label">Leads</p>
+    <div class="kcard__row">
+      <span class="kcard__num">{counts.new_lead}</span>
+      <span class="kcard__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <defs><linearGradient id="envg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/></linearGradient></defs>
+          <rect x="14" y="22" width="36" height="24" rx="3" fill="#23232A" stroke="#4A4A55"/>
+          <path d="M14 24l18 13 18-13" fill="none" stroke="url(#envg)" stroke-width="2.4"/>
+          <path d="M14 24l18 13 18-13v-2H14z" fill="url(#envg)" fill-opacity="0.25"/>
+        </svg>
+      </span>
+    </div>
+    <p class="kcard__delta"><span class="muted">en este feed</span></p>
+  </article>
+
+  <article class="kcard">
+    <p class="kcard__label">Briefs</p>
+    <div class="kcard__row">
+      <span class="kcard__num">{counts.new_brief}</span>
+      <span class="kcard__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <defs><linearGradient id="docg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#FB923C"/><stop offset="1" stop-color="#EA580C"/></linearGradient></defs>
+          <rect x="18" y="16" width="26" height="34" rx="3" fill="#16161A" stroke="#4A4A55"/>
+          <rect x="16" y="20" width="26" height="34" rx="3" fill="#23232A" stroke="#4A4A55"/>
+          <path d="M21 28h16M21 33h16M21 38h10" stroke="url(#docg)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </div>
+    <p class="kcard__delta"><span class="muted">en este feed</span></p>
+  </article>
+
+  <article class="kcard">
+    <p class="kcard__label">Handoffs</p>
+    <div class="kcard__row">
+      <span class="kcard__num">{counts.chat_handoff}</span>
+      <span class="kcard__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <defs><linearGradient id="chatg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6EE7B7"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
+          <path d="M16 22h32a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H28l-9 7v-7h-3a3 3 0 0 1-3-3V25a3 3 0 0 1 3-3z" fill="url(#chatg)" fill-opacity="0.22" stroke="#34d399" stroke-opacity="0.5"/>
+          <circle cx="26" cy="32" r="2" fill="url(#chatg)"/><circle cx="32" cy="32" r="2" fill="url(#chatg)"/><circle cx="38" cy="32" r="2" fill="url(#chatg)"/>
+        </svg>
+      </span>
+    </div>
+    <p class="kcard__delta"><span class="muted">pidieron persona</span></p>
+  </article>
+</section>
+
 <div class="chips">
   <button class="chip" class:on={!onlyUnread} onclick={() => setFilter(false)}>Todos</button>
   <button class="chip" class:on={onlyUnread} onclick={() => setFilter(true)}>
@@ -141,11 +233,21 @@
     {#each rows as n (n.id)}
       {@const tm = typeMeta(n.type)}
       <li class="note note--{tm.cls}" class:unread={!n.read_at}>
-        <span class="note__icon note__icon--{tm.cls}" aria-hidden="true">{tm.glyph}</span>
+        <span class="note__icon note__icon--{tm.cls}" aria-hidden="true">
+          {#if tm.cls === 'lead'}
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6" width="17" height="12" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 7.5L12 13l7.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          {:else if tm.cls === 'brief'}
+            <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          {:else if tm.cls === 'handoff'}
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17h-9l-5 4v-4H4a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 4 6z" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="9" cy="11.5" r="1" fill="currentColor"/><circle cx="12" cy="11.5" r="1" fill="currentColor"/><circle cx="15" cy="11.5" r="1" fill="currentColor"/></svg>
+          {:else}
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4.5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          {/if}
+        </span>
         <div class="note__body">
           <div class="note__top">
-            <span class="note__type">{tm.label}</span>
-            {#if n.ref}<span class="note__ref mono gold">{n.ref}</span>{/if}
+            <span class="note__pill note__pill--{tm.cls}">{tm.label}</span>
+            {#if n.ref}<span class="note__ref mono">{n.ref}</span>{/if}
             <span class="note__when mono dim" title={fmtDateTime(n.created_at)}>{rel(n.created_at)}</span>
           </div>
           <div class="note__title">{n.title}</div>
@@ -173,6 +275,24 @@
   .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: 2px 9px; }
   .head-act { display: inline-flex; gap: 6px; }
 
+  /* ── Strip superior: 4 KPI cards densas (Orbit "stats") ──────────
+     La primera resalta los no-leídos con borde de acento + glow; el
+     resto desglosa el feed por tipo. Cada una lleva una ilustración
+     esquinera SVG en capas con gradiente + glow (look 3D suave). */
+  .strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-4); }
+  .kcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); transition: border-color var(--duration-fast); }
+  .kcard:hover { border-color: var(--border-strong); }
+  .kcard--accent { border-color: var(--accent-gold-line); box-shadow: var(--shadow-gold); background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), .07), transparent 60%), var(--bg-card); }
+  .kcard__label { margin: 0 0 8px; color: var(--fg-secondary); font-size: var(--text-xs); font-weight: 500; }
+  .kcard__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .kcard__num { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); font-variant-numeric: tabular-nums; }
+  .kcard__art { width: 56px; height: 56px; display: inline-flex; flex: 0 0 auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
+  .kcard__art svg { width: 100%; height: 100%; }
+  .kcard__delta { margin: 10px 0 0; font-size: 12px; }
+  .kcard__delta .warn { color: var(--accent-gold); font-weight: 600; }
+  .kcard__delta .ok { color: var(--accent-teal); font-weight: 600; }
+  .kcard__delta .muted { color: var(--fg-subtle); }
+
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-4); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
   .chip:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
@@ -186,45 +306,53 @@
   .spin { width: 16px; height: 16px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+  /* Feed denso: el orden es importante, así que mantenemos una columna
+     pero con tarjetas compactas y de alta densidad de información. */
+  .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 
-  .note { position: relative; display: flex; gap: var(--space-3); padding: var(--space-4); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), background var(--duration-fast); }
-  .note:hover { border-color: var(--border-accent); }
-  .note.unread { background: var(--bg-elevated); border-left: 3px solid var(--accent-gold); }
+  .note { position: relative; display: flex; gap: var(--space-3); padding: 12px var(--space-4) 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), background var(--duration-fast); }
+  .note:hover { border-color: var(--border-accent); background: var(--bg-elevated); }
+  .note.unread { background: var(--bg-elevated); border-left: 3px solid var(--accent-gold); padding-left: 11px; }
   .note--handoff.unread { border-left-color: var(--accent-teal); }
 
-  .note__icon { flex: 0 0 auto; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 15px; color: var(--fg-secondary); }
-  .note__icon--lead { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .note__icon--brief { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  /* Icono = glifo SVG nítido en un tile redondeado teñido por tipo. */
+  .note__icon { flex: 0 0 auto; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--fg-secondary); }
+  .note__icon svg { width: 20px; height: 20px; }
+  .note__icon--lead, .note__icon--brief { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .note__icon--handoff { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .note__icon--system { color: var(--fg-secondary); }
+  .note__icon--system { color: var(--fg-subtle); background: var(--surface-3); }
 
   .note__body { min-width: 0; flex: 1 1 auto; }
-  .note__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
-  /* La etiqueta de tipo hereda el color de su categoría (igual que el icono):
-     lead/brief naranja, handoff verde, sistema neutro. */
-  .note__type { font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--accent-gold); }
-  .note--handoff .note__type { color: var(--accent-teal); }
-  .note--system .note__type { color: var(--fg-subtle); }
-  .note__ref { font-size: var(--text-xs); }
+  .note__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+  /* Etiqueta de tipo como PILL teñida (no texto suelto): lead/brief
+     naranja, handoff verde, sistema neutro. */
+  .note__pill { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; border-radius: var(--radius-pill); padding: 2px 8px; border: 1px solid transparent; }
+  .note__pill--lead, .note__pill--brief { color: var(--accent-gold); background: var(--accent-gold-dim); border-color: var(--accent-gold-line); }
+  .note__pill--handoff { color: var(--accent-teal); background: var(--accent-teal-dim); border-color: var(--accent-teal-line); }
+  .note__pill--system { color: var(--fg-subtle); background: var(--surface-3); border-color: var(--border); }
+  .note__ref { font-size: 10px; color: var(--accent-gold); letter-spacing: .04em; }
   .note__when { font-size: 10px; margin-left: auto; }
 
-  .note__title { font-size: var(--text-sm); color: var(--fg-primary); line-height: 1.5; font-weight: 500; }
-  .note__text { font-size: var(--text-sm); color: var(--fg-secondary); line-height: 1.55; margin-top: 3px; white-space: pre-wrap; word-break: break-word; }
+  .note__title { font-size: var(--text-sm); color: var(--fg-primary); line-height: 1.45; font-weight: 500; }
+  .note__text { font-size: 12.5px; color: var(--fg-secondary); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
 
-  .note__foot { display: flex; align-items: center; gap: var(--space-4); margin-top: 8px; }
+  .note__foot { display: flex; align-items: center; gap: var(--space-4); margin-top: 7px; }
   .note__link { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-teal); text-decoration: none; }
   .note__link:hover { color: var(--accent-gold); }
   .note__mark { background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-subtle); }
   .note__mark:hover { color: var(--accent-gold); }
   .note__read { font-size: 10px; }
 
-  .note__dot { position: absolute; top: 14px; right: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); box-shadow: var(--shadow-gold); }
+  .note__dot { position: absolute; top: 13px; right: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); box-shadow: var(--shadow-gold); }
   .note--handoff .note__dot { background: var(--accent-teal); box-shadow: var(--shadow-teal); }
 
   .mono { font-family: var(--font-mono); }
-  .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
+
+  /* Responsive: el strip colapsa a 2 columnas en pantallas estrechas. */
+  @media (max-width: 720px) {
+    .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
 
   /* La definición canónica de .b/.b--primary/.b--ghost vive en dashboard.css (global). */
 </style>

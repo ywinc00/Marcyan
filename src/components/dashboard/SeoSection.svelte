@@ -86,18 +86,44 @@
     return { clicks, impressions, avgPos, sessions, conversions };
   });
 
+  // Delta por serie: compara la suma de la 2ª mitad vs la 1ª mitad del rango.
+  // Devuelve { dir: 'up'|'down'|'flat', txt: '+12%' } o null si no hay base.
+  // Para "posición media" un número MENOR es mejor → invertimos el signo (better).
+  function trend(values, lowerIsBetter = false) {
+    const v = (values || []).filter((x) => Number.isFinite(+x)).map((x) => +x);
+    if (v.length < 4) return null;
+    const mid = Math.floor(v.length / 2);
+    const a = v.slice(0, mid).reduce((s, x) => s + x, 0);
+    const b = v.slice(mid).reduce((s, x) => s + x, 0);
+    if (a <= 0) return null;
+    const change = ((b - a) / a) * 100;
+    const rounded = Math.round(change * 10) / 10;
+    if (Math.abs(rounded) < 0.1) return { dir: 'flat', txt: '0%', better: true };
+    const better = lowerIsBetter ? rounded < 0 : rounded > 0;
+    return { dir: rounded > 0 ? 'up' : 'down', txt: (rounded > 0 ? '+' : '') + rounded + '%', better };
+  }
+  const tClicks = $derived(trend(gscDaily.map((r) => r.clicks)));
+  const tImpr   = $derived(trend(gscDaily.map((r) => r.impressions)));
+  const tPos    = $derived(trend(gscDaily.filter((r) => r.position > 0).map((r) => r.position), true));
+  const tSess   = $derived(trend(ga4Daily.map((r) => r.sessions)));
+
   const hasData = $derived(gscDaily.length > 0 || ga4Daily.length > 0);
 
   // Snapshot de indexación (objeto, no serie). El backend lo expone bajo
   // metrics.indexation: { indexed, not_indexed, total, checked_at, issues, pages }.
   const indexation = $derived(detail && detail.metrics ? (detail.metrics.indexation || null) : null);
+  // Geometría del donut de indexación (circunferencia para stroke-dasharray).
+  const DONUT_R = 34, DONUT_C = 2 * Math.PI * 34;
+  const idxRatio = $derived(
+    indexation && indexation.total ? Math.max(0, Math.min(1, indexation.indexed / indexation.total)) : 0
+  );
 
   // ── Construcción de path de línea SVG (a mano, sin librerías) ──
   // points: array de números (la serie). Devuelve { line, area, pts } en
   // coordenadas del viewBox W×H con padding inferior para etiquetas.
-  function linePath(values, W, H, padTop = 8, padBottom = 22, padX = 6) {
+  function linePath(values, W, H, padTop = 12, padBottom = 24, padX = 10) {
     const n = values.length;
-    if (n === 0) return { line: '', area: '', pts: [] };
+    if (n === 0) return { line: '', area: '', pts: [], max: 1 };
     const max = Math.max(1, ...values);
     const innerW = W - padX * 2;
     const innerH = H - padTop - padBottom;
@@ -108,10 +134,9 @@
     const area = `${line} L${pts[pts.length - 1].x.toFixed(1)},${(padTop + innerH).toFixed(1)} L${pts[0].x.toFixed(1)},${(padTop + innerH).toFixed(1)} Z`;
     return { line, area, pts, max };
   }
-  const VBW = 560, VBH = 180;
-  // Líneas de cuadrícula horizontales (dashed, estilo home): 3 niveles
-  // dentro del área de trazado (padTop=8 … padBottom=22).
-  const gridLines = [50, 90, 130];
+  const VBW = 560, VBH = 200, PAD_BOTTOM = 24;
+  // Líneas de cuadrícula horizontales (dashed): 4 niveles dentro del plot.
+  const gridLines = [24, 64, 104, 144];
   const clicksChart = $derived(linePath(gscDaily.map((r) => r.clicks), VBW, VBH));
   const imprChart   = $derived(linePath(gscDaily.map((r) => r.impressions), VBW, VBH));
   // Etiquetas X: primera, media, última (para no saturar)
@@ -127,8 +152,27 @@
   }
   const xLabels = $derived(axisLabels(gscDaily));
   function labelX(i, n) {
-    const padX = 6, innerW = VBW - padX * 2;
+    const padX = 10, innerW = VBW - padX * 2;
     return n === 1 ? VBW / 2 : padX + (i * innerW) / (n - 1);
+  }
+
+  // ── Interactividad de los gráficos (hover → tip + guía + punto) ──
+  // Guardamos el índice apuntado por cada gráfico. onmousemove encuentra el
+  // punto más cercano en X dentro del viewBox (convertimos px → coord SVG).
+  let hoverClicks = $state(-1);
+  let hoverImpr = $state(-1);
+  function nearestIndex(evt, pts) {
+    if (!pts.length) return -1;
+    const svg = evt.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width) return -1;
+    const xSvg = ((evt.clientX - rect.left) / rect.width) * VBW;
+    let best = 0, bestD = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const d = Math.abs(pts[i].x - xSvg);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
   }
 
   // ── Carga de proyectos ───────────────────────────────────────
@@ -293,46 +337,175 @@
     </div>
     {#if syncMsg}<div class="msg" class:ok={syncOk}>{syncMsg}</div>{/if}
 
-    <!-- KPIs (con mini-art en la esquina, estilo home) -->
+    <!-- KPIs (Orbit: label + número grande + delta + arte 3D en la esquina) -->
     <div class="kpis">
+      <!-- Clics -->
       <div class="kpi">
-        <div class="kpi__txt"><span class="kpi__lbl">Clics (GSC)</span><span class="kpi__num gold">{nfmt(kpis.clicks)}</span></div>
-        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3-3 3 3M12 8v9M3 21h18M5 21V9l7-6 7 6v12" /></svg>
+        <span class="kpi__lbl">Clics (GSC)</span>
+        <div class="kpi__row">
+          <span class="kpi__num gold">{nfmt(kpis.clicks)}</span>
+          <div class="kpi__art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <defs>
+                <linearGradient id="seoArtClick" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
+                </linearGradient>
+                <radialGradient id="seoGlowGold" cx="50%" cy="40%" r="60%">
+                  <stop offset="0" stop-color="#f97316" stop-opacity="0.5"/><stop offset="1" stop-color="#f97316" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="32" cy="50" rx="20" ry="6" fill="#000" opacity="0.35"/>
+              <circle cx="32" cy="30" r="26" fill="url(#seoGlowGold)"/>
+              <path d="M24 16l22 9-9 4 6 9-5 3-6-9-7 6z" fill="url(#seoArtClick)" stroke="#7c2d12" stroke-width="1"/>
+              <path d="M24 16l22 9-9 4z" fill="#fff" opacity="0.22"/>
+            </svg>
+          </div>
+        </div>
+        {#if tClicks}
+          <p class="kpi__delta"><span class={tClicks.better ? 'up' : 'down'}>{tClicks.txt} {tClicks.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
+        {:else}
+          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+        {/if}
       </div>
+
+      <!-- Impresiones -->
       <div class="kpi">
-        <div class="kpi__txt"><span class="kpi__lbl">Impresiones (GSC)</span><span class="kpi__num">{nfmt(kpis.impressions)}</span></div>
-        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z M12 15a3 3 0 100-6 3 3 0 000 6z" /></svg>
+        <span class="kpi__lbl">Impresiones (GSC)</span>
+        <div class="kpi__row">
+          <span class="kpi__num">{nfmt(kpis.impressions)}</span>
+          <div class="kpi__art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <defs>
+                <linearGradient id="seoArtEye" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#3a3a44"/><stop offset="1" stop-color="#1b1b20"/>
+                </linearGradient>
+                <radialGradient id="seoIris" cx="50%" cy="45%" r="55%">
+                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#c2410c"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="32" cy="51" rx="19" ry="5" fill="#000" opacity="0.32"/>
+              <path d="M8 32c8-13 40-13 48 0-8 13-40 13-48 0z" fill="url(#seoArtEye)" stroke="#4a4a55" stroke-width="1.2"/>
+              <circle cx="32" cy="32" r="11" fill="url(#seoIris)"/>
+              <circle cx="32" cy="32" r="5" fill="#1b1b20"/>
+              <circle cx="29" cy="29" r="2.4" fill="#fff" opacity="0.85"/>
+            </svg>
+          </div>
+        </div>
+        {#if tImpr}
+          <p class="kpi__delta"><span class={tImpr.better ? 'up' : 'down'}>{tImpr.txt} {tImpr.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
+        {:else}
+          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+        {/if}
       </div>
+
+      <!-- Posición media -->
       <div class="kpi">
-        <div class="kpi__txt"><span class="kpi__lbl">Posición media</span><span class="kpi__num">{kpis.avgPos ? (Math.round(kpis.avgPos * 10) / 10) : '—'}</span></div>
-        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.8 5.7 21l2.3-7.1-6-4.5h7.6z" /></svg>
+        <span class="kpi__lbl">Posición media</span>
+        <div class="kpi__row">
+          <span class="kpi__num">{kpis.avgPos ? (Math.round(kpis.avgPos * 10) / 10) : '—'}</span>
+          <div class="kpi__art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <defs>
+                <linearGradient id="seoArtMedal" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#d97706"/>
+                </linearGradient>
+                <radialGradient id="seoGlowMedal" cx="50%" cy="45%" r="60%">
+                  <stop offset="0" stop-color="#f59e0b" stop-opacity="0.45"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="32" cy="52" rx="17" ry="5" fill="#000" opacity="0.32"/>
+              <circle cx="32" cy="34" r="24" fill="url(#seoGlowMedal)"/>
+              <path d="M22 10h6l4 8-7 4-7-4z" fill="#ea580c"/>
+              <path d="M42 10h-6l-4 8 7 4 7-4z" fill="#fb923c"/>
+              <circle cx="32" cy="38" r="15" fill="url(#seoArtMedal)" stroke="#92400e" stroke-width="1.2"/>
+              <circle cx="32" cy="38" r="10" fill="none" stroke="#fff" stroke-width="1" opacity="0.4"/>
+              <path d="M32 32l1.9 4 4.3.4-3.3 2.8 1 4.2-3.9-2.3-3.9 2.3 1-4.2-3.3-2.8 4.3-.4z" fill="#fffbeb"/>
+              <ellipse cx="27" cy="32" rx="5" ry="3" fill="#fff" opacity="0.3"/>
+            </svg>
+          </div>
+        </div>
+        {#if tPos}
+          <p class="kpi__delta"><span class={tPos.better ? 'up' : 'down'}>{tPos.txt} {tPos.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">menor = mejor</span></p>
+        {:else}
+          <p class="kpi__delta"><span class="muted">promedio del rango</span></p>
+        {/if}
       </div>
+
+      <!-- Sesiones -->
       <div class="kpi">
-        <div class="kpi__txt"><span class="kpi__lbl">Sesiones (GA4)</span><span class="kpi__num teal">{nfmt(kpis.sessions)}</span></div>
-        <svg class="kpi__art kpi__art--teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></svg>
+        <span class="kpi__lbl">Sesiones (GA4)</span>
+        <div class="kpi__row">
+          <span class="kpi__num teal">{nfmt(kpis.sessions)}</span>
+          <div class="kpi__art" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <defs>
+                <linearGradient id="seoArtUser" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#059669"/>
+                </linearGradient>
+                <radialGradient id="seoGlowTeal" cx="50%" cy="40%" r="60%">
+                  <stop offset="0" stop-color="#34d399" stop-opacity="0.45"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="32" cy="53" rx="19" ry="5" fill="#000" opacity="0.32"/>
+              <circle cx="32" cy="30" r="26" fill="url(#seoGlowTeal)"/>
+              <circle cx="32" cy="24" r="11" fill="url(#seoArtUser)" stroke="#065f46" stroke-width="1"/>
+              <path d="M14 52c0-11 8-16 18-16s18 5 18 16z" fill="url(#seoArtUser)" stroke="#065f46" stroke-width="1"/>
+              <ellipse cx="28" cy="20" rx="4" ry="3" fill="#fff" opacity="0.35"/>
+            </svg>
+          </div>
+        </div>
+        {#if tSess}
+          <p class="kpi__delta"><span class={tSess.better ? 'up' : 'down'}>{tSess.txt} {tSess.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
+        {:else}
+          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} días</span></p>
+        {/if}
       </div>
     </div>
 
-    <!-- Indexación -->
+    <!-- Indexación (Orbit: donut + barra/leyenda + issues funnel + tabla) -->
     <div class="panel">
       <div class="panel__lbl">Indexación <span class="panel__sub">Search Console</span></div>
       {#if indexation}
         <div class="idx">
-          <div class="idx__bignum">
-            <span class="idx__ratio"><span class="gold">{nfmt(indexation.indexed)}</span> / {nfmt(indexation.total)}</span>
-            <span class="idx__cap">páginas indexadas{indexation.total ? ` · ${pctOf(indexation.indexed, indexation.total)}` : ''}</span>
+          <!-- Donut + ratio -->
+          <div class="idx__donut-wrap">
+            <svg class="idx__donut" viewBox="0 0 88 88" role="img" aria-label="{nfmt(indexation.indexed)} de {nfmt(indexation.total)} páginas indexadas">
+              <defs>
+                <linearGradient id="seoDonut" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
+                </linearGradient>
+              </defs>
+              <circle cx="44" cy="44" r={DONUT_R} fill="none" stroke="var(--bg-elevated)" stroke-width="11" />
+              <circle
+                cx="44" cy="44" r={DONUT_R} fill="none" stroke="url(#seoDonut)" stroke-width="11"
+                stroke-linecap="round"
+                stroke-dasharray="{(idxRatio * DONUT_C).toFixed(1)} {DONUT_C.toFixed(1)}"
+                transform="rotate(-90 44 44)"
+                style="transition: stroke-dasharray var(--duration-base) var(--ease)"
+              />
+              <text x="44" y="41" text-anchor="middle" class="idx__donut-pct">{indexation.total ? pctOf(indexation.indexed, indexation.total) : '0%'}</text>
+              <text x="44" y="55" text-anchor="middle" class="idx__donut-cap">indexado</text>
+            </svg>
           </div>
-          <div class="idx__bar" role="img" aria-label="{indexation.indexed} de {indexation.total} páginas indexadas">
-            <div class="idx__fill" style="width:{indexation.total ? Math.round((indexation.indexed / indexation.total) * 100) : 0}%"></div>
-          </div>
-          <div class="idx__legend mono">
-            <span><span class="dot dot--gold"></span>Indexadas {nfmt(indexation.indexed)}</span>
-            <span><span class="dot dot--track"></span>Sin indexar {nfmt(indexation.not_indexed)}</span>
-            {#if indexation.checked_at}<span class="dim">· revisado {fmtDateTime(indexation.checked_at)}</span>{/if}
+          <!-- Bignum + barra + leyenda -->
+          <div class="idx__body">
+            <div class="idx__bignum">
+              <span class="idx__ratio"><span class="gold">{nfmt(indexation.indexed)}</span> / {nfmt(indexation.total)}</span>
+              <span class="idx__cap">páginas indexadas</span>
+            </div>
+            <div class="idx__bar" role="img" aria-label="{indexation.indexed} de {indexation.total} páginas indexadas">
+              <div class="idx__fill" style="width:{indexation.total ? Math.round((indexation.indexed / indexation.total) * 100) : 0}%"></div>
+            </div>
+            <div class="idx__legend mono">
+              <span><span class="dot dot--gold"></span>Indexadas {nfmt(indexation.indexed)}</span>
+              <span><span class="dot dot--track"></span>Sin indexar {nfmt(indexation.not_indexed)}</span>
+              {#if indexation.checked_at}<span class="dim">· revisado {fmtDateTime(indexation.checked_at)}</span>{/if}
+            </div>
           </div>
         </div>
 
         {#if indexation.issues && indexation.issues.length}
+          <div class="idx__issues-lbl">Motivos de exclusión</div>
           <ul class="issues">
             {#each indexation.issues as it}
               <li class="issue"><span class="issue__reason">{it.reason}</span><span class="issue__count mono">{nfmt(it.count)}</span></li>
@@ -376,43 +549,83 @@
         {/if}
       </div>
     {:else}
-      <!-- Gráficos de línea (clics e impresiones) -->
+      <!-- Gráficos de línea INTERACTIVOS (clics e impresiones) -->
       <div class="charts">
+        <!-- ── Clics (naranja) ── -->
         <div class="panel">
           <div class="panel__lbl">Clics en el tiempo <span class="panel__sub">últimos {gscDaily.length} días</span></div>
           {#if gscDaily.length}
-            <svg class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Clics en el tiempo">
-              {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
-              <path d={clicksChart.area} fill="var(--accent-gold-dim)" stroke="none" />
-              <path d={clicksChart.line} fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-              {#each clicksChart.pts as p, i}
-                {#if i === clicksChart.pts.length - 1}
-                  <circle cx={p.x} cy={p.y} r="3.5" fill="var(--accent-gold)" />
+            <div class="chart-box">
+              {#if hoverClicks >= 0 && clicksChart.pts[hoverClicks]}
+                <span class="chart-tip" style="left:{(clicksChart.pts[hoverClicks].x / VBW) * 100}%;top:{(clicksChart.pts[hoverClicks].y / VBH) * 100}%">
+                  <strong>{nfmt(clicksChart.pts[hoverClicks].v)}</strong> clics
+                  <span class="chart-tip__d">{shortDay(gscDaily[hoverClicks].date)}</span>
+                </span>
+              {/if}
+              <svg
+                class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Clics en el tiempo"
+                onmousemove={(e) => hoverClicks = nearestIndex(e, clicksChart.pts)}
+                onmouseleave={() => hoverClicks = -1}
+              >
+                <defs>
+                  <linearGradient id="seoClicksFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="var(--accent-gold)" stop-opacity="0.30"/>
+                    <stop offset="1" stop-color="var(--accent-gold)" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
+                <path d={clicksChart.area} fill="url(#seoClicksFill)" stroke="none" />
+                <path d={clicksChart.line} fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                {#if hoverClicks >= 0 && clicksChart.pts[hoverClicks]}
+                  <line x1={clicksChart.pts[hoverClicks].x} y1="6" x2={clicksChart.pts[hoverClicks].x} y2={VBH - PAD_BOTTOM} class="chart__guide" />
+                  <circle cx={clicksChart.pts[hoverClicks].x} cy={clicksChart.pts[hoverClicks].y} r="5" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
+                {:else}
+                  <circle cx={clicksChart.pts[clicksChart.pts.length - 1].x} cy={clicksChart.pts[clicksChart.pts.length - 1].y} r="3.5" fill="var(--accent-gold)" />
                 {/if}
-              {/each}
-              {#each xLabels as l}
-                <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
-              {/each}
-            </svg>
+                {#each xLabels as l}
+                  <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
+                {/each}
+              </svg>
+            </div>
           {:else}<div class="muted">Sin datos de GSC.</div>{/if}
         </div>
 
+        <!-- ── Impresiones (verde) ── -->
         <div class="panel">
           <div class="panel__lbl">Impresiones en el tiempo <span class="panel__sub">últimos {gscDaily.length} días</span></div>
           {#if gscDaily.length}
-            <svg class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Impresiones en el tiempo">
-              {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
-              <path d={imprChart.area} fill="var(--accent-teal-dim)" stroke="none" />
-              <path d={imprChart.line} fill="none" stroke="var(--accent-teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-              {#each imprChart.pts as p, i}
-                {#if i === imprChart.pts.length - 1}
-                  <circle cx={p.x} cy={p.y} r="3.5" fill="var(--accent-teal)" />
+            <div class="chart-box">
+              {#if hoverImpr >= 0 && imprChart.pts[hoverImpr]}
+                <span class="chart-tip" style="left:{(imprChart.pts[hoverImpr].x / VBW) * 100}%;top:{(imprChart.pts[hoverImpr].y / VBH) * 100}%">
+                  <strong>{nfmt(imprChart.pts[hoverImpr].v)}</strong> impr.
+                  <span class="chart-tip__d">{shortDay(gscDaily[hoverImpr].date)}</span>
+                </span>
+              {/if}
+              <svg
+                class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Impresiones en el tiempo"
+                onmousemove={(e) => hoverImpr = nearestIndex(e, imprChart.pts)}
+                onmouseleave={() => hoverImpr = -1}
+              >
+                <defs>
+                  <linearGradient id="seoImprFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="var(--accent-teal)" stop-opacity="0.30"/>
+                    <stop offset="1" stop-color="var(--accent-teal)" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
+                <path d={imprChart.area} fill="url(#seoImprFill)" stroke="none" />
+                <path d={imprChart.line} fill="none" stroke="var(--accent-teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                {#if hoverImpr >= 0 && imprChart.pts[hoverImpr]}
+                  <line x1={imprChart.pts[hoverImpr].x} y1="6" x2={imprChart.pts[hoverImpr].x} y2={VBH - PAD_BOTTOM} class="chart__guide" />
+                  <circle cx={imprChart.pts[hoverImpr].x} cy={imprChart.pts[hoverImpr].y} r="5" fill="var(--accent-teal)" stroke="var(--bg-card)" stroke-width="2" />
+                {:else}
+                  <circle cx={imprChart.pts[imprChart.pts.length - 1].x} cy={imprChart.pts[imprChart.pts.length - 1].y} r="3.5" fill="var(--accent-teal)" />
                 {/if}
-              {/each}
-              {#each xLabels as l}
-                <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
-              {/each}
-            </svg>
+                {#each xLabels as l}
+                  <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
+                {/each}
+              </svg>
+            </div>
           {:else}<div class="muted">Sin datos de GSC.</div>{/if}
         </div>
       </div>
@@ -510,32 +723,44 @@
   .proj-meta.is-reloading { opacity: .65; }
   .reloading { color: var(--accent-gold); }
 
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
-  .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-  .kpi__art { width: 36px; height: 36px; flex: 0 0 auto; color: var(--accent-gold); opacity: .3; }
-  .kpi__art--teal { color: var(--accent-teal); }
-  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  /* ── KPIs (Orbit stat cards) ── */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 14px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  .kpi:hover { border-color: var(--border-strong); }
+  .kpi__lbl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin-bottom: 8px; }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-3xl, 30px); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
+  .kpi__art { width: 56px; height: 56px; flex: 0 0 auto; }
+  .kpi__art svg { width: 100%; height: 100%; display: block; }
+  .kpi__delta { margin: 12px 0 0; font-size: var(--text-xs); }
+  .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
+  .kpi__delta .down { color: var(--color-error); font-weight: 600; }
+  .kpi__delta .muted { color: var(--fg-subtle); }
 
   /* ── Indexación ── */
-  .idx { display: flex; flex-direction: column; gap: var(--space-3); }
+  .idx { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+  .idx__donut-wrap { flex: 0 0 auto; }
+  .idx__donut { width: 96px; height: 96px; display: block; }
+  .idx__donut-pct { fill: var(--fg-primary); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: var(--tracking-tight); }
+  .idx__donut-cap { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em; text-transform: uppercase; }
+  .idx__body { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: var(--space-3); }
   .idx__bignum { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .idx__ratio { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .idx__cap { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
   .idx__bar { height: 14px; background: var(--bg-elevated); border-radius: var(--radius-pill); overflow: hidden; }
-  .idx__fill { height: 100%; background: var(--accent-gold); border-radius: var(--radius-pill); min-width: 2px; transition: width var(--duration-base) var(--ease); }
+  .idx__fill { height: 100%; background: linear-gradient(90deg, var(--accent-gold-hover), var(--accent-gold-deep)); border-radius: var(--radius-pill); min-width: 2px; transition: width var(--duration-base) var(--ease); }
   .idx__legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 10px; color: var(--fg-secondary); letter-spacing: .04em; }
   .idx__legend .dim { color: var(--fg-subtle); }
   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
   .dot--gold { background: var(--accent-gold); }
   .dot--track { background: var(--surface-3, var(--bg-elevated)); border: 1px solid var(--border-strong); }
 
-  .issues { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+  .idx__issues-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); margin: var(--space-4) 0 8px; }
+  .issues { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
   .issue { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 9px 12px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
-  .issue__reason { font-size: var(--text-sm); color: var(--fg-secondary); }
+  .issue__reason { font-size: var(--text-sm); color: var(--fg-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .issue__count { font-size: var(--text-xs); color: var(--color-warning); }
   .idx__pages { margin-top: var(--space-4); }
   .idx__url { max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -553,10 +778,15 @@
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
   .panel__lbl { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
+
+  /* Contenedor relativo para posicionar la .chart-tip con left/top en %. */
+  .chart-box { position: relative; }
   .chart { width: 100%; height: auto; display: block; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
   .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
-  .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
+  .chart__guide { stroke: rgba(255, 255, 255, 0.22); stroke-dasharray: 3 4; stroke-width: 1; }
+  .chart-tip__d { display: block; font-weight: 400; color: var(--fg-subtle); font-size: 10px; margin-top: 2px; }
+  .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: normal; padding: var(--space-4) 0; }
 
   .table-wrap { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
   .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
@@ -598,5 +828,5 @@
   .modal__b strong { color: var(--fg-primary); }
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
 
-  @media (max-width: 880px) { .charts { grid-template-columns: 1fr; } }
+  @media (max-width: 880px) { .charts { grid-template-columns: 1fr; } .idx { gap: var(--space-4); } }
 </style>

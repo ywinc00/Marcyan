@@ -122,7 +122,7 @@
       connected = j.connected !== false;
       if (selectFirst && projects.length && selectedId == null) {
         selectProject(projects[0].id);
-      } else if (selectedId != null && !projects.some((p) => p.id === selectedId)) {
+      } else if (selectedId != null && !projects.some((p) => String(p.id) === String(selectedId))) {
         selectedId = null; detail = null;
       }
     } catch (e) { error = e.message || 'Error al cargar'; }
@@ -143,31 +143,38 @@
 
   function onSelectChange(e) {
     const v = e.currentTarget.value;
-    if (v) selectProject(parseInt(v, 10));
+    // Los IDs vienen como string (columna BIGINT de Postgres); NO usar parseInt
+    // o el value del <select> (número) no matchea las <option value> (string)
+    // y deja de verse el proyecto seleccionado.
+    if (v) selectProject(v);
   }
 
   // ── Sincronizar ──────────────────────────────────────────────
   async function syncNow() {
     if (!selectedId) return;
     syncing = true; syncMsg = 'Sincronizando con Google…'; syncOk = false;
+    let okFlag = false, msg = '';
     try {
       const r = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }) });
       const j = await r.json();
       if (j.configured === false) {
-        syncOk = false; syncMsg = 'Conectá Google (Workload Identity Federation) para sincronizar datos reales.';
+        msg = 'Conectá Google (Workload Identity Federation) para sincronizar datos reales.';
       } else if (!j.ok) {
         const res0 = j.results && j.results[0];
         const detailErr = res0 ? [res0.gsc?.error, res0.ga4?.error].filter(Boolean).join(' · ') : '';
-        syncOk = false; syncMsg = 'Sincronización parcial: ' + (detailErr || j.error || 'revisá la conexión');
+        msg = 'Sincronización parcial: ' + (detailErr || j.error || 'revisá la conexión');
       } else {
         const res0 = j.results && j.results[0];
         const total = res0 ? (res0.gsc.synced + res0.ga4.synced) : 0;
-        syncOk = true; syncMsg = `✓ ${total} registro(s) actualizados`;
+        okFlag = true; msg = `✓ ${total} registro(s) actualizados`;
       }
+      // Refrescar datos ANTES de fijar el mensaje: selectProject() resetea syncMsg,
+      // así que si lo seteáramos antes, se borraría y el usuario no vería nada
+      // (era el bug de "clic y no pasa nada").
       await selectProject(selectedId);
       await loadProjects();
-    } catch (e) { syncOk = false; syncMsg = e.message || 'Error al sincronizar'; }
-    finally { syncing = false; }
+    } catch (e) { okFlag = false; msg = e.message || 'Error al sincronizar'; }
+    finally { syncing = false; syncMsg = msg; syncOk = okFlag; }
   }
 
   // ── Alta de proyecto ─────────────────────────────────────────

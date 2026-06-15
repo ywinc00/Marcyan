@@ -26,6 +26,10 @@
   let subs = $state([]);
   let installPrompt = $state(null);
 
+  // Búsqueda ⌘K de la barra lateral + sello "Actualizado".
+  let navQuery = $state('');
+  let loadedAt = $state(null);
+
   // Índice de barra resaltada en el gráfico (hover). Por defecto, el mes actual.
   let hoverBar = $state(-1);
 
@@ -164,6 +168,57 @@
 
   const firstName = $derived(user ? user.split('@')[0] : '');
   const sectionTitle = $derived((NAV.find((n) => n.id === section) || {}).label || '');
+  const userInitial = $derived((user || '?').trim().charAt(0).toUpperCase() || '?');
+
+  // ── Búsqueda ⌘K: filtra el nav (y las suscripciones) por etiqueta ──
+  const navMatch = $derived(navQuery.trim().toLowerCase());
+  const filteredNav = $derived(
+    navMatch ? NAV.filter((n) => n.label.toLowerCase().includes(navMatch)) : NAV
+  );
+  const filteredSubs = $derived(
+    navMatch ? activeSubs.filter((s) => (s.name || '').toLowerCase().includes(navMatch)) : activeSubs
+  );
+  // Enter con exactamente un nav coincidente → lo selecciona.
+  function onNavSearchKey(e) {
+    if (e.key !== 'Enter') return;
+    const hits = filteredNav.filter((n) => n.live);
+    if (hits.length === 1) { section = hits[0].id; navQuery = ''; }
+  }
+
+  // ── Saludo según la hora del día ────────────────────────────
+  const greeting = $derived.by(() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Buenos días';
+    if (h < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  });
+
+  // Proyectos activos reales para el segundo crumb del dashboard.
+  const activeProjectCount = $derived(projects.filter((p) => p.status === 'active').length);
+
+  function fmtClock(d) {
+    return d ? d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+  }
+
+  // ── Exportar leads a CSV (cliente) ──────────────────────────
+  function csvCell(v) {
+    const s = v == null ? '' : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function exportLeads() {
+    const cols = ['ref_id', 'name', 'email', 'phone', 'source', 'status', 'created_at'];
+    const head = cols.join(',');
+    const body = (leads || []).map((l) => cols.map((c) => csvCell(l[c])).join(',')).join('\n');
+    const blob = new Blob([head + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'leads-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   // Tira de conteo por estado para la cabecera de Leads (densidad).
   const leadCounts = $derived([
@@ -210,7 +265,7 @@
       const res = await api('/api/admin/dashboard/analytics');
       if (res.status === 401) { phase = 'login'; return; }
       const j = await res.json();
-      if (j.ok) home = j;
+      if (j.ok) { home = j; loadedAt = new Date(); }
     } catch (_) {}
   }
 
@@ -308,9 +363,16 @@
         <span class="planet" aria-hidden="true"></span>
         <span class="wordmark">MAR<em>CYAN</em></span>
       </div>
+
+      <div class="search">
+        <svg class="search__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+        <input type="text" placeholder="Buscar" aria-label="Buscar en el panel" bind:value={navQuery} onkeydown={onNavSearchKey} />
+        <kbd>⌘K</kbd>
+      </div>
+
       <nav class="nav">
         <span class="nav__cap">Operación</span>
-        {#each NAV as item}
+        {#each filteredNav as item}
           <button
             class="nav__item"
             class:active={section === item.id}
@@ -328,17 +390,21 @@
       <div class="side-subs">
         <span class="nav__cap">Suscripciones</span>
         {#if activeSubs.length}
-          <div class="subs">
-            {#each activeSubs as s (s.id)}
-              <div class="subs__row" title={`${s.name} · ${money(s.amount_cents)}/${s.cycle === 'yearly' ? 'año' : 'mes'}`}>
-                <BrandLogo name={s.name} size={22} />
-                <span class="subs__name">{s.name}</span>
-                <span class="subs__tag">{s.category}</span>
-              </div>
-            {/each}
-          </div>
+          {#if filteredSubs.length}
+            <div class="subs">
+              {#each filteredSubs as s (s.id)}
+                <div class="subs__row" title={`${s.name} · ${money(s.amount_cents)}/${s.cycle === 'yearly' ? 'año' : 'mes'}`}>
+                  <BrandLogo name={s.name} size={22} />
+                  <span class="subs__name">{s.name}</span>
+                  <span class="subs__tag">{s.category}</span>
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <p class="subs__hint">Sin coincidencias.</p>
+          {/if}
           <div class="runrate">
-            <span class="runrate__lbl">Gasto / mes</span>
+            <span class="runrate__cap">Gasto / mes</span>
             <span class="runrate__num">{money(monthlyRunRate)}</span>
           </div>
         {:else}
@@ -353,16 +419,31 @@
 
     <main class="main">
       <header class="topbar">
-        <span class="crumb">{sectionTitle}</span>
+        <div class="crumbs">
+          <span class="crumb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>
+            {sectionTitle}
+          </span>
+          {#if section === 'dashboard' && activeProjectCount > 0}
+            <span class="crumb crumb--muted">· {activeProjectCount} proyecto{activeProjectCount === 1 ? '' : 's'} activo{activeProjectCount === 1 ? '' : 's'}</span>
+          {/if}
+        </div>
         <div class="topbar__right">
+          {#if loadedAt}<span class="updated">Actualizado {fmtClock(loadedAt)}</span>{/if}
           {#if installPrompt}<button class="install" onclick={doInstall}>⤓ Instalar app</button>{/if}
-          <span class="user" title={user}>{user}</span>
+          <span class="me" title={user} aria-hidden="true">{userInitial}</span>
           <button class="b b--ghost" onclick={logout}>Salir</button>
         </div>
       </header>
 
       {#if section === 'dashboard'}
-        <h1 class="greet">Hola, {firstName}</h1>
+        <div class="greet-row">
+          <h1 class="greet">{greeting}, {firstName}</h1>
+          <button class="b" onclick={exportLeads} disabled={!leads.length} title={leads.length ? '' : 'No hay leads para exportar'}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M8 8l4-4 4 4M12 4v12" /></svg>
+            Exportar leads
+          </button>
+        </div>
 
         <!-- ── KPIs: número grande + delta + arte de esquina glossy (KpiArt) ── -->
         <div class="kpis">
@@ -370,7 +451,7 @@
             <p class="kpi__lbl">Leads nuevos</p>
             <div class="kpi__row">
               <span class="kpi__num gold">{home?.kpis ? home.kpis.new_leads : '–'}</span>
-              <KpiArt kind="inbox" size={52} />
+              <KpiArt kind="inbox" size={46} />
             </div>
             <p class="kpi__delta">
               {#if home?.kpis?.new_leads}<span class="up">+{home.kpis.new_leads}</span> <span class="muted">este mes</span>
@@ -382,7 +463,7 @@
             <p class="kpi__lbl">Briefs pendientes</p>
             <div class="kpi__row">
               <span class="kpi__num">{home?.kpis ? home.kpis.pending_briefs : '–'}</span>
-              <KpiArt kind="docs" size={52} />
+              <KpiArt kind="docs" size={46} />
             </div>
             <p class="kpi__delta"><span class="muted">en cola de revisión</span></p>
           </article>
@@ -391,7 +472,7 @@
             <p class="kpi__lbl">En curso (mes)</p>
             <div class="kpi__row">
               <span class="kpi__num">{home?.kpis ? home.kpis.projects_this_month : '–'}</span>
-              <KpiArt kind="clock" size={52} />
+              <KpiArt kind="clock" size={46} />
             </div>
             <p class="kpi__delta"><span class="muted">proyectos activos</span></p>
           </article>
@@ -400,7 +481,7 @@
             <p class="kpi__lbl">Cobrado (mes)</p>
             <div class="kpi__row">
               <span class="kpi__num teal">{home?.kpis && home.kpis.revenue_this_month != null ? home.kpis.revenue_this_month : '—'}</span>
-              <KpiArt kind="coins" size={52} />
+              <KpiArt kind="coins" size={46} />
             </div>
             <p class="kpi__delta"><span class="up">cobrado</span> <span class="muted">vs mes anterior</span></p>
           </article>
@@ -444,6 +525,9 @@
                     <linearGradient id="barActive" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
                     </linearGradient>
+                    <linearGradient id="barIdle" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#2a2a2f"/><stop offset="1" stop-color="#1b1b20"/>
+                    </linearGradient>
                     <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
                       <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
                     </filter>
@@ -452,7 +536,10 @@
                   <!-- gridlines punteadas + números del eje derecho (4 ticks) -->
                   {#each yTicks as t, gi}
                     {@const gy = (gi / 4) * PLOT + 6}
-                    <line x1="0" y1={gy} x2={PW} y2={gy} class="chart__grid" />
+                    <line x1="0" y1={gy} x2={VW} y2={gy} class="chart__grid" />
+                    <!-- placa opaca para que la rejilla "pase por detrás" del número (Orbit) -->
+                    {@const lw = (String(t).length * 7) + 8}
+                    <rect x={VW - lw} y={gy - 8} width={lw} height="16" fill="var(--bg-card)" />
                     <text x={VW} y={gy + 3} text-anchor="end" class="chart__axis">{t}</text>
                   {/each}
                   <line x1="0" y1={PLOT} x2={PW} y2={PLOT} class="chart__base" />
@@ -467,9 +554,14 @@
                       <line x1="0" y1={by} x2={PW} y2={by} class="chart__guide" />
                     {/if}
                     <rect
-                      x={bx} y={by} width={bw} height={Math.max(bh, 2)} rx="6"
-                      fill={isActive ? 'url(#barActive)' : '#2b2b33'}
+                      x={bx} y={by} width={bw} height={Math.max(bh, 2)} rx="11"
+                      fill={isActive ? 'url(#barActive)' : 'url(#barIdle)'}
                       filter={isActive ? 'url(#barGlow)' : undefined} />
+                    <!-- brillo especular superior (da volumen a las barras) -->
+                    {#if bh > 6}
+                      <rect x={bx + 2} y={by + 1.5} width={Math.max(bw - 4, 0)} height="2" rx="1"
+                        fill={isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)'} />
+                    {/if}
                     <!-- hit area transparente para hover cómodo -->
                     <rect x={i * slot} y="0" width={slot} height={PLOT} fill="transparent"
                       onmouseenter={() => (hoverBar = i)} role="presentation" />
@@ -489,6 +581,10 @@
             </header>
             {#if recentProjects.length}
               <div class="ptable">
+                <div class="ptable__head">
+                  <span>Proyecto</span>
+                  <span>Estado</span>
+                </div>
                 {#each recentProjects as p (p.id)}
                   {@const st = projStatus(p.status)}
                   <div class="prow">
@@ -701,7 +797,7 @@
   .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
   .sidebar { background: var(--bg-2); border-right: 1px solid var(--border); padding: var(--space-5) var(--space-4); display: flex; flex-direction: column; gap: var(--space-5); }
   .nav { display: flex; flex-direction: column; gap: 3px; }
-  .nav__cap { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); padding: 0 10px var(--space-2); }
+  .nav__cap { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); padding: 0 10px var(--space-2); }
   .nav__item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-md); border: 0; background: transparent; color: var(--fg-secondary); font-size: var(--text-sm); cursor: pointer; text-align: left; width: 100%; transition: all var(--duration-fast); }
   .nav__item svg { width: 17px; height: 17px; flex: 0 0 auto; }
   .nav__item:hover:not(:disabled) { background: var(--bg-elevated); color: var(--fg-primary); }
@@ -714,39 +810,51 @@
   /* ── Sidebar: suscripciones ── */
   .side-subs { display: flex; flex-direction: column; gap: 4px; }
   .subs__hint { margin: 4px 10px 0; font-size: var(--text-xs); color: var(--fg-subtle); line-height: 1.5; }
-  .runrate { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: 6px 0 0; padding: 9px 11px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); }
-  .runrate__lbl { font-size: var(--text-xs); color: var(--fg-subtle); }
-  .runrate__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-sm); color: var(--accent-gold); font-variant-numeric: tabular-nums; }
+  .runrate { display: flex; flex-direction: column; gap: 5px; margin: 8px 0 0; padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
+  .runrate__cap { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); }
+  .runrate__num { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--accent-gold); font-variant-numeric: tabular-nums; }
 
   /* ── Main ── */
   .main { padding: var(--space-5) var(--space-6); min-width: 0; }
   .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
-  .crumb { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); }
+  .crumbs { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .crumb { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-primary); }
+  .crumb svg { width: 16px; height: 16px; color: var(--fg-secondary); flex: 0 0 auto; }
+  .crumb--muted { color: var(--fg-subtle); font-weight: 400; white-space: nowrap; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-4); }
+  .updated { font-size: 13px; color: var(--fg-subtle); white-space: nowrap; }
   .install { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold); background: transparent; border: 1px solid var(--accent-gold-line); border-radius: var(--radius-sm); padding: 5px 9px; cursor: pointer; transition: all var(--duration-fast); }
   .install:hover { background: var(--accent-gold-dim); border-color: var(--accent-gold); }
-  .user { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 auto; border-radius: var(--radius-pill); background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; box-shadow: 0 0 0 2px var(--bg-base); }
 
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-1) 0 var(--space-3); }
+  /* ── Búsqueda ⌘K del sidebar (Orbit) ── */
+  .search { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--fg-secondary); }
+  .search__ico { width: 16px; height: 16px; flex: 0 0 auto; color: var(--fg-subtle); }
+  .search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; font-family: inherit; font-size: 13.5px; color: var(--fg-primary); }
+  .search input::placeholder { color: var(--fg-subtle); }
+  .search kbd { font-family: inherit; font-size: 11px; color: var(--fg-subtle); background: var(--bg-elevated); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
+
+  .greet-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin: var(--space-1) 0 0; }
+  .greet { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.1; letter-spacing: -0.025em; margin: 0; }
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
 
   /* ── KPI cards: número grande + delta + arte de esquina (Orbit .stat) ── */
-  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
   .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; }
   .kpi__lbl { margin: 0 0 10px; font-weight: 500; font-size: 13px; color: var(--fg-secondary); }
   .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 52px; }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: 36px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   .kpi__delta { margin: 12px 0 0; font-size: 13px; color: var(--fg-subtle); }
   .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
 
   /* ── Grids densos de cards (proporciones exactas Orbit) ── */
-  .grid-2 { display: grid; gap: 14px; margin-top: var(--space-4); }
+  .grid-2 { display: grid; gap: 14px; margin-top: 18px; }
   .grid-2--chart { grid-template-columns: 1.4fr 1fr; }
   .grid-2--funnel { grid-template-columns: 1fr 1.6fr; }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
-  .card--spaced { margin-top: 14px; }
+  .card--spaced { margin-top: 18px; }
   .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: 18px; }
   .card__head--row { align-items: center; margin-bottom: var(--space-2); }
   .card__lbl { margin: 0 0 6px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
@@ -792,6 +900,7 @@
 
   /* ── Tabla de proyectos (Orbit) ── */
   .ptable { display: flex; flex-direction: column; }
+  .ptable__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 8px 7px; font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); }
   .prow { display: flex; align-items: center; gap: var(--space-3); padding: 9px 8px; border-top: 1px solid var(--border-subtle); border-radius: var(--radius-sm); transition: background var(--duration-fast); }
   .prow:first-child { border-top: 0; }
   .prow:hover { background: var(--bg-elevated); }

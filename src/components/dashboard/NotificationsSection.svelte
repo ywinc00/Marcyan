@@ -180,8 +180,8 @@
   .chip__n { padding: 1px 6px; min-width: 16px; text-align: center; background: var(--surface-3); border-radius: var(--radius-pill); font-size: 9px; color: var(--fg-secondary); }
   .chip.on .chip__n { background: var(--accent-gold); color: var(--fg-inverse); }
 
-  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; }
-  .empty--err { border-color: var(--border-accent); font-style: normal; }
+  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
+  .empty--err { border-color: var(--border-accent); }
   .empty__msg { margin: 0; color: var(--fg-primary); font-size: var(--text-sm); line-height: 1.55; max-width: 38ch; }
   .spin { width: 16px; height: 16px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -203,7 +203,7 @@
   .note__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
   /* La etiqueta de tipo hereda el color de su categoría (igual que el icono):
      lead/brief naranja, handoff verde, sistema neutro. */
-  .note__type { font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); }
+  .note__type { font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--accent-gold); }
   .note--handoff .note__type { color: var(--accent-teal); }
   .note--system .note__type { color: var(--fg-subtle); }
   .note__ref { font-size: var(--text-xs); }
@@ -226,9 +226,5 @@
   .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
 
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 12px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--ghost vive en dashboard.css (global). */
 </style>

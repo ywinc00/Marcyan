@@ -645,9 +645,11 @@
 
 <!-- ═══ Modal: registrar pago ═══ -->
 {#if payInvoice}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) closePay(); }}>
-    <div class="modal">
-      <h3 class="modal__t">Registrar pago</h3>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) closePay(); }}
+       onkeydown={(e) => { if (e.key === 'Escape') closePay(); }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pay-modal-title">
+      <h3 class="modal__t" id="pay-modal-title">Registrar pago</h3>
       <p class="modal__b">
         Factura <strong>{payInvoice.invoice_number}</strong> · {payInvoice.client_name || ''}<br />
         Total {fmtUsd(payInvoice.amount_cents)} · Saldo <strong>{fmtUsd(payInvoice.balance_cents)}</strong>
@@ -680,8 +682,8 @@
   .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .kpi__art { width: 36px; height: 36px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.3; }
   .kpi__art.teal { color: var(--accent-teal); }
-  .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; color: var(--fg-secondary); }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   .kpi__num.danger { color: var(--color-error); }
@@ -689,7 +691,7 @@
 
   /* Panel + chart */
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
-  .panel__lbl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__lbl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); }
   .panel__total { margin-left: auto; color: var(--accent-gold); text-transform: none; letter-spacing: 0; font-size: 11px; }
   .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
@@ -711,13 +713,16 @@
   .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 16px; }
   .f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .f--wide { grid-column: 1 / -1; }
-  .f__lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); }
+  .f__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
   .form-card__foot { display: flex; align-items: center; gap: 8px; margin-top: var(--space-4); }
   .spacer { flex: 1; }
 
-  .inp { width: 100%; padding: 9px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
+  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
   .inp:focus { border-color: var(--accent-gold); }
   .inp--sm { padding: 8px 10px; font-size: var(--text-xs); }
+  /* Reserva espacio para el caret del select (la imagen viene del global). */
+  select.inp { padding-right: 30px; }
+  select.inp--sm { padding-right: 26px; background-position: right 8px center; }
 
   /* Chips + search */
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--space-5) 0 var(--space-3); }
@@ -778,7 +783,7 @@
   .inline-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .inline-form .inp { flex: 1 1 130px; min-width: 0; }
   .inline-form .inp--sm { flex: 0 1 92px; }
-  .mini-empty { color: var(--fg-subtle); font-size: var(--text-xs); font-style: italic; padding: var(--space-4) 0 var(--space-2); }
+  .mini-empty { color: var(--fg-subtle); font-size: var(--text-xs); padding: var(--space-4) 0 var(--space-2); }
   .row-off { opacity: .5; }
   .cycle-pill { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
 
@@ -792,12 +797,7 @@
   .icon-del:hover { color: var(--color-error); border-color: rgba(239, 68, 68, .35); background: rgba(239, 68, 68, .1); }
 
   /* Botones */
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 14px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
-  .b--mini { padding: 7px 11px; }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--mini vive en dashboard.css (global). */
 
   .msg { font-family: var(--font-mono); font-size: 10px; color: var(--color-error); }
   .msg.ok { color: var(--accent-teal); }

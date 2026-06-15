@@ -449,9 +449,11 @@
 
 <!-- Modal: alta de proyecto -->
 {#if showAdd}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showAdd = false; }}>
-    <div class="modal">
-      <h3 class="modal__t">Nuevo proyecto SEO</h3>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) showAdd = false; }}
+       onkeydown={(e) => { if (e.key === 'Escape') showAdd = false; }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-add-title">
+      <h3 class="modal__t" id="seo-add-title">Nuevo proyecto SEO</h3>
       <p class="modal__b">Guardá el nombre del proyecto y los identificadores de Google. Los datos se sincronizan después.</p>
       <label class="f-lbl" for="np-name">Nombre del proyecto *</label>
       <input id="np-name" class="inp" type="text" bind:value={form.name} placeholder="Sitio principal" />
@@ -474,9 +476,11 @@
 
 <!-- Modal: eliminar -->
 {#if showDelete && detail}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}>
-    <div class="modal">
-      <h3 class="modal__t">Eliminar proyecto</h3>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}
+       onkeydown={(e) => { if (e.key === 'Escape') showDelete = false; }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-del-title">
+      <h3 class="modal__t" id="seo-del-title">Eliminar proyecto</h3>
       <p class="modal__b">Se borra <strong>{detail.project.name}</strong> y todas sus métricas cacheadas. Esta acción es <strong>irreversible</strong>.</p>
       <div class="modal__act">
         <button class="b b--ghost" onclick={() => showDelete = false}>Cancelar</button>
@@ -499,7 +503,7 @@
   .notice code, code { font-family: var(--font-mono); font-size: 12px; color: var(--accent-gold); background: rgba(255,255,255,.04); padding: 1px 5px; border-radius: var(--radius-sm); }
 
   .picker { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
-  .picker__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); }
+  .picker__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
   .picker .inp { width: auto; min-width: 240px; flex: 1; max-width: 420px; }
 
   .proj-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px; color: var(--fg-subtle); text-transform: none; letter-spacing: .04em; margin-bottom: var(--space-3); transition: opacity var(--duration-fast); }
@@ -511,7 +515,7 @@
   .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .kpi__art { width: 36px; height: 36px; flex: 0 0 auto; color: var(--accent-gold); opacity: .3; }
   .kpi__art--teal { color: var(--accent-teal); }
-  .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
@@ -538,7 +542,7 @@
 
   .pill { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; white-space: nowrap; }
   .pill--ok { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .pill--err { color: var(--color-error); border-color: rgba(224,92,92,.4); background: rgba(224,92,92,.1); }
+  .pill--err { color: var(--color-error); border-color: rgba(var(--color-error-rgb),.4); background: rgba(var(--color-error-rgb),.1); }
   .pill--warn { color: var(--color-warning); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .pill--neutral { color: var(--fg-subtle); border-color: var(--border-strong); background: var(--bg-elevated); }
 
@@ -547,7 +551,7 @@
 
   .charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
-  .panel__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__lbl { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
   .chart { width: 100%; height: auto; display: block; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
@@ -569,29 +573,20 @@
 
   .proj-foot { margin-top: var(--space-5); display: flex; justify-content: flex-end; }
 
-  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; margin-top: var(--space-3); line-height: 1.6; }
-  .empty.err { color: var(--color-error); font-style: normal; }
-  .empty strong { color: var(--fg-primary); font-style: normal; }
+  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); margin-top: var(--space-3); line-height: 1.6; }
+  .empty.err { color: var(--color-error); }
+  .empty strong { color: var(--fg-primary); }
 
-  .inp { width: 100%; padding: 9px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
   .inp:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
-  /* Select del picker: misma piel de input + caret propio en oro. */
-  select.inp {
-    appearance: none; -webkit-appearance: none; -moz-appearance: none;
-    padding-right: 34px; cursor: pointer;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
-    background-repeat: no-repeat; background-position: right 12px center;
-  }
+  /* Select del picker: misma piel de input. El caret (gris sutil) lo aplica
+     la regla global select.inp en dashboard.css; aquí solo reservamos espacio. */
+  select.inp { padding-right: 30px; cursor: pointer; }
   select.inp:hover { border-color: var(--border-strong); }
-  .f-lbl { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); margin: var(--space-3) 0 4px; }
+  .f-lbl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: var(--space-3) 0 4px; }
 
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 14px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
-  .b--danger { color: var(--color-error); border-color: rgba(224,92,92,.4); }
-  .b--danger:hover:not(:disabled) { background: rgba(224,92,92,.1); border-color: var(--color-error); }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--ghost/.b--danger
+     vive en dashboard.css (global). */
 
   .msg { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--color-error); min-height: 12px; }
   .msg.ok { color: var(--accent-teal); }

@@ -215,21 +215,33 @@
   {#if rows.length}
     <div class="kpis">
       <div class="kpi">
-        <span class="kpi__n teal">{summary.active}</span>
-        <span class="kpi__l">Activos</span>
+        <div class="kpi__txt">
+          <span class="kpi__n teal">{summary.active}</span>
+          <span class="kpi__l">Activos</span>
+        </div>
+        <svg class="kpi__art kpi__art--teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       </div>
       <div class="kpi">
-        <span class="kpi__n gold">{summary.on_hold}</span>
-        <span class="kpi__l">En pausa</span>
+        <div class="kpi__txt">
+          <span class="kpi__n gold">{summary.on_hold}</span>
+          <span class="kpi__l">En pausa</span>
+        </div>
+        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 9v6M14 9v6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       </div>
       <div class="kpi">
-        <span class="kpi__n">{summary.completed}</span>
-        <span class="kpi__l">Completados</span>
+        <div class="kpi__txt">
+          <span class="kpi__n">{summary.completed}</span>
+          <span class="kpi__l">Completados</span>
+        </div>
+        <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
       </div>
       {#if summary.cancelled}
         <div class="kpi">
-          <span class="kpi__n err">{summary.cancelled}</span>
-          <span class="kpi__l">Cancelados</span>
+          <div class="kpi__txt">
+            <span class="kpi__n err">{summary.cancelled}</span>
+            <span class="kpi__l">Cancelados</span>
+          </div>
+          <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9l-6 6M9 9l6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         </div>
       {/if}
     </div>
@@ -423,19 +435,21 @@
 {/if}
 
 {#if showNew}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showNew = false; }}>
-    <div class="modal">
-      <h3 class="modal__t">Nuevo proyecto</h3>
-      <label class="fl">Nombre del proyecto *</label>
-      <input class="inp" type="text" placeholder="Sitio web — Negocio X" bind:value={nf.name} autocomplete="off" />
-      <label class="fl">Brief vinculado (opcional)</label>
-      <input class="inp" type="text" placeholder="MRC-001" bind:value={nf.briefProjectId} autocomplete="off" />
-      <label class="fl">Tipo de servicio (opcional)</label>
-      <input class="inp" type="text" placeholder="Landing, sitio completo, AEO…" bind:value={nf.serviceType} autocomplete="off" />
-      <label class="fl">Monto acordado USD (opcional)</label>
-      <input class="inp" type="number" min="0" step="1" placeholder="400" bind:value={nf.amount} />
-      <label class="fl">Estado inicial</label>
-      <select class="inp" bind:value={nf.status}>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) showNew = false; }}
+       onkeydown={(e) => { if (e.key === 'Escape') showNew = false; }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="new-proj-title">
+      <h3 class="modal__t" id="new-proj-title">Nuevo proyecto</h3>
+      <label class="fl" for="np-name">Nombre del proyecto *</label>
+      <input id="np-name" class="inp" type="text" placeholder="Sitio web — Negocio X" bind:value={nf.name} autocomplete="off" />
+      <label class="fl" for="np-brief">Brief vinculado (opcional)</label>
+      <input id="np-brief" class="inp" type="text" placeholder="MRC-001" bind:value={nf.briefProjectId} autocomplete="off" />
+      <label class="fl" for="np-service">Tipo de servicio (opcional)</label>
+      <input id="np-service" class="inp" type="text" placeholder="Landing, sitio completo, AEO…" bind:value={nf.serviceType} autocomplete="off" />
+      <label class="fl" for="np-amount">Monto acordado USD (opcional)</label>
+      <input id="np-amount" class="inp" type="number" min="0" step="1" placeholder="400" bind:value={nf.amount} />
+      <label class="fl" for="np-status">Estado inicial</label>
+      <select id="np-status" class="inp" bind:value={nf.status}>
         {#each P_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
       </select>
       {#if newMsg}<div class="msg">{newMsg}</div>{/if}
@@ -450,9 +464,11 @@
 {/if}
 
 {#if showDelete && selected}
-  <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}>
-    <div class="modal">
-      <h3 class="modal__t modal__t--danger">Eliminar proyecto</h3>
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}
+       onkeydown={(e) => { if (e.key === 'Escape') showDelete = false; }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-proj-title">
+      <h3 class="modal__t modal__t--danger" id="del-proj-title">Eliminar proyecto</h3>
       <p class="modal__b">
         Se borra <strong class="mono gold">{selected.project_code || ('PRJ-' + selected.id)}</strong>
         y sus hitos. Esta acción es <strong>irreversible</strong>.
@@ -469,11 +485,14 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* KPI chips (resumen de la lista) */
+  /* KPI cards (resumen de la lista) — con mini-art de esquina (ref: home) */
   .kpis { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); }
-  .kpi { flex: 1 1 0; min-width: 110px; display: flex; flex-direction: column; gap: 2px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
-  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
-  .kpi__l { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-subtle); }
+  .kpi { flex: 1 1 0; min-width: 130px; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
+  .kpi__txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .kpi__art { width: 34px; height: 34px; flex: 0 0 auto; color: var(--accent-gold); opacity: .3; }
+  .kpi__art--teal { color: var(--accent-teal); }
+  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
+  .kpi__l { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-subtle); }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
@@ -500,14 +519,14 @@
   .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; }
   .badge--active { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
   .badge--on_hold { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .badge--completed { color: #9be8c1; border-color: rgba(155,232,193,.35); background: rgba(155,232,193,.06); }
-  .badge--cancelled { color: var(--color-error); border-color: rgba(224,92,92,.35); background: rgba(224,92,92,.06); }
+  .badge--completed { color: var(--accent-teal); border-color: rgba(var(--accent-teal-rgb),.22); background: rgba(var(--accent-teal-rgb),.07); }
+  .badge--cancelled { color: var(--color-error); border-color: rgba(var(--color-error-rgb),.35); background: rgba(var(--color-error-rgb),.06); }
 
   .pager { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); font-size: 11px; }
 
-  .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); font-style: italic; }
-  .empty.err { color: var(--color-error); font-style: normal; }
-  .muted { padding: var(--space-4); }
+  .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
+  .empty.err { color: var(--color-error); }
+  .muted { padding: var(--space-4); font-style: italic; }
 
   /* Empty state centrado (Orbit) */
   .empty--big { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-9) var(--space-6); font-style: normal; }
@@ -527,7 +546,7 @@
 
   .block { margin-bottom: var(--space-4); }
   .block__head { display: flex; align-items: baseline; justify-content: space-between; }
-  .block__title { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-primary); margin: 0 0 var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); flex: 1; }
+  .block__title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-md); letter-spacing: normal; text-transform: none; color: var(--fg-primary); margin: 0 0 var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); flex: 1; }
   .prog-sum { font-size: 11px; color: var(--fg-subtle); margin-left: 12px; }
 
   /* Stepper SVG */
@@ -545,19 +564,22 @@
   .ms__label { flex: 1; color: var(--fg-primary); font-size: var(--text-sm); }
   .ms--done .ms__label { color: var(--fg-secondary); }
   .ms__due { font-size: 10px; color: var(--fg-subtle); }
-  .ms__sel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 8px; font-size: var(--text-xs); cursor: pointer; flex: 0 0 auto; }
+  /* El caret (background-image) lo aplica la regla global .ms__sel en dashboard.css. */
+  .ms__sel { background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 26px 6px 8px; font-size: var(--text-xs); cursor: pointer; flex: 0 0 auto; background-position: right 8px center; }
   .ms__sel:focus { outline: none; border-color: var(--accent-gold); }
 
   .ms-add { display: flex; gap: 8px; }
   .ms-add .inp { flex: 1; }
 
-  .inp { width: 100%; padding: 9px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
+  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
   .inp:focus { border-color: var(--accent-gold); }
+  /* Reserva espacio para el caret del select (la imagen viene del global). */
+  select.inp { padding-right: 30px; }
 
   .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
-  .card__t { font-family: var(--font-mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-gold); margin: 0 0 var(--space-3); }
-  .card--danger { border-color: rgba(224,92,92,.28); }
+  .card__t { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); }
+  .card--danger { border-color: rgba(var(--color-error-rgb),.28); }
   .card__t--danger { color: var(--color-error); }
   .danger-note { font-size: var(--text-xs); color: var(--fg-subtle); margin: 0 0 var(--space-3); line-height: 1.4; }
   .kv { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border-subtle); }
@@ -565,14 +587,8 @@
   .kv__k { font-size: var(--text-xs); color: var(--fg-secondary); }
   .kv__v { font-size: var(--text-sm); color: var(--fg-primary); text-align: right; }
 
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: var(--radius-md); padding: 9px 12px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
-  .b--danger { color: var(--color-error); border-color: rgba(224,92,92,.4); }
-  .b--danger:hover:not(:disabled) { background: rgba(224,92,92,.1); border-color: var(--color-error); color: var(--color-error); }
-  .b.full { width: 100%; }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--danger/.b.full
+     vive en dashboard.css (global). */
 
   .mono { font-family: var(--font-mono); }
   .gold { color: var(--accent-gold); }
@@ -589,7 +605,7 @@
   .modal__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--accent-gold); margin: 0 0 var(--space-3); }
   .modal__t--danger { color: var(--color-error); }
   .modal__b { font-size: var(--text-sm); color: var(--fg-secondary); line-height: 1.5; margin: 0 0 var(--space-2); }
-  .fl { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent-gold); margin: 10px 0 4px; }
+  .fl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 10px 0 4px; }
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
 
   @media (max-width: 880px) { .detail { grid-template-columns: 1fr; } .detail__aside { position: static; } }

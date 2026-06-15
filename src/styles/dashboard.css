@@ -53,6 +53,7 @@
   --color-success: #22c55e;
   --color-warning: #f5b338;
   --color-error:   #ef4444;
+  --color-error-rgb: 239, 68, 68;
   --color-info:    #60a5fa;
 
   /* ── Radios Orbit ── */
@@ -90,3 +91,69 @@ body { font-feature-settings: "cv05", "ss01"; }
 *::-webkit-scrollbar-track { background: transparent; }
 
 ::selection { background: rgba(249, 115, 22, 0.30); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════════
+   Selects con piel propia (sin chrome nativo del SO)
+   Reglas GLOBALES: los componentes Svelte no hashean estos
+   selectores externos, así que el caret se aplica a todo <select>
+   con .inp (Briefs/Finanzas/Progreso/Seo) y al .ms__sel de Progreso.
+   Solo afecta apariencia visual; el <select> sigue siendo nativo
+   y editable. NO toca los pill-select inline (Finanzas/Leads), que
+   ya tienen su propio tratamiento.
+   ═══════════════════════════════════════════════════════════════ */
+select.inp,
+.inp select,
+.ms__sel {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b74' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Vocabulario de botones unificado (Orbit) — clases GLOBALES.
+   Una sola definición de .b/.btn para TODO el panel: 11px, Inter,
+   sentence-case (sin uppercase ni tracking ancho). Los componentes
+   reusan estas clases en vez de redefinir su propio .b/.btn.
+   ═══════════════════════════════════════════════════════════════ */
+.b,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .01em;
+  text-transform: none;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-secondary);
+  transition: all var(--duration-fast);
+}
+.b:hover:not(:disabled),
+.btn:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
+.b--primary,
+.btn--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 600; }
+.b--primary:hover:not(:disabled),
+.btn--primary:hover:not(:disabled) { background: var(--accent-gold-hover); border-color: var(--accent-gold-hover); }
+.b--ghost:hover:not(:disabled),
+.btn--ghost:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
+.b--danger,
+.btn--danger { color: var(--color-error); border-color: rgba(var(--color-error-rgb), .4); }
+.b--danger:hover:not(:disabled),
+.btn--danger:hover:not(:disabled) { background: rgba(var(--color-error-rgb), .1); border-color: var(--color-error); color: var(--color-error); }
+.b--mini,
+.btn--mini { padding: 7px 11px; }
+.b.full,
+.btn.full { width: 100%; }
+.b:disabled,
+.btn:disabled { opacity: .5; cursor: not-allowed; }

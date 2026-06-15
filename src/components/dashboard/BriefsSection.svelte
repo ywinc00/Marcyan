@@ -433,9 +433,11 @@
   </div>
 
   {#if showDelete}
-    <div class="backdrop" onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}>
-      <div class="modal">
-        <h3 class="modal__t">Eliminar brief</h3>
+    <div class="backdrop" role="presentation" tabindex="-1"
+         onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}
+         onkeydown={(e) => { if (e.key === 'Escape') showDelete = false; }}>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-brief-title">
+        <h3 class="modal__t" id="del-brief-title">Eliminar brief</h3>
         <p class="modal__b">Esta acción es <strong>irreversible</strong>. Se borran también los eventos de auditoría de <strong>{selected.project_id}</strong>. Para confirmar, escribe el ID:</p>
         <code class="modal__code">{selected.project_id}</code>
         <input class="inp" type="text" placeholder={selected.project_id} bind:value={deleteConfirm} autocomplete="off" />
@@ -487,9 +489,9 @@
 
   .pager { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); font-size: 11px; }
 
-  .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); }
+  .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
   .empty.err { color: var(--color-error); }
-  .muted { padding: var(--space-3); border: 0; background: transparent; text-align: left; color: var(--fg-subtle); }
+  .muted { padding: var(--space-3); border: 0; background: transparent; text-align: left; color: var(--fg-subtle); line-height: 1.45; }
 
   /* Estado de carga / error del detalle — tarjeta centrada e intencional */
   .state-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-8) var(--space-6); text-align: center; }
@@ -513,35 +515,30 @@
   .editbar__lbl { font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-gold); }
 
   .block { margin-bottom: var(--space-5); }
-  .block__title { font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); margin: 0 0 var(--space-3); padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle); }
+  .block__title { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle); }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4) var(--space-5); }
   .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .field.span { grid-column: 1 / -1; }
-  .field__lbl { font-family: var(--font-body); font-weight: 600; font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-subtle); }
+  .field__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-subtle); }
   .field__val { font-size: var(--text-sm); color: var(--fg-primary); line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
   .field__val.empty { color: var(--fg-subtle); }
   .field__val.pre { white-space: pre-wrap; }
   .tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .tag { padding: 2px 9px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 11px; color: var(--fg-secondary); }
 
-  .inp { width: 100%; padding: 9px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; resize: vertical; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; resize: vertical; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
   .inp::placeholder { color: var(--fg-subtle); }
   .inp:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  /* Reserva espacio para el caret del select (la imagen viene del global). */
+  select.inp { padding-right: 30px; }
 
   .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
-  .card__t { font-family: var(--font-body); font-weight: 600; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); margin: 0 0 var(--space-3); }
+  .card__t { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); }
   .actgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-  .b { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-md); padding: 8px 12px; font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); }
-  .b:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
-  .b--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .b--primary:hover:not(:disabled) { background: var(--accent-gold-hover); border-color: var(--accent-gold-hover); }
-  .b--ghost:hover:not(:disabled) { border-color: var(--accent-gold-line); color: var(--fg-primary); }
-  .b--danger { color: var(--color-error); border-color: rgba(239,68,68,.4); }
-  .b--danger:hover:not(:disabled) { background: rgba(239,68,68,.1); border-color: var(--color-error); color: var(--color-error); }
-  .b.full { width: 100%; }
-  .b:disabled { opacity: .5; cursor: not-allowed; }
+  /* La definición canónica de .b/.b--primary/.b--ghost/.b--danger/.b.full
+     vive en dashboard.css (global). */
 
   .msg { margin-top: 8px; font-size: 11px; color: var(--color-error); min-height: 12px; }
   .msg.ok { color: var(--accent-teal); }

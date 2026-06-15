@@ -173,7 +173,7 @@
       <p class="login__tag">Panel de operaciones</p>
       <label class="login__lbl" for="login-email">Tu correo</label>
       <input id="login-email" type="email" bind:value={emailInput} placeholder="tu@marcyanstudio.com" autocomplete="email" required />
-      <button type="submit" class="btn btn--primary" disabled={loginSending}>
+      <button type="submit" class="b b--primary" disabled={loginSending}>
         {loginSending ? 'Enviando…' : 'Enviar enlace de acceso'}
       </button>
       {#if loginMsg}<p class="login__msg">{loginMsg}</p>{/if}
@@ -214,7 +214,7 @@
         <div class="topbar__right">
           {#if installPrompt}<button class="install" onclick={doInstall}>⤓ Instalar app</button>{/if}
           <span class="user" title={user}>{user}</span>
-          <button class="btn btn--ghost" onclick={logout}>Salir</button>
+          <button class="b b--ghost" onclick={logout}>Salir</button>
         </div>
       </header>
 
@@ -311,7 +311,7 @@
       {:else if section === 'leads'}
         <div class="sec-head">
           <h1 class="greet">Leads</h1>
-          <button class="btn btn--ghost" onclick={loadLeads}>Actualizar</button>
+          <button class="b b--ghost" onclick={loadLeads}>Actualizar</button>
         </div>
 
         {#if leadsLoading}
@@ -387,11 +387,7 @@
   .login__msg { font-size: var(--text-sm); color: var(--accent-teal); line-height: 1.5; margin: var(--space-1) 0 0; }
 
   /* ── Botones ── */
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius-md); padding: 10px 16px; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); transition: all var(--duration-fast); min-height: var(--tap-min); }
-  .btn--primary { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); font-weight: 700; }
-  .btn--primary:hover:not(:disabled) { background: var(--accent-gold-hover); }
-  .btn--ghost:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  /* La definición canónica de .b/.btn vive en dashboard.css (global). */
 
   /* ── Shell ── */
   .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
@@ -410,7 +406,7 @@
   /* ── Main ── */
   .main { padding: var(--space-5) var(--space-6); min-width: 0; }
   .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
-  .crumb { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .crumb { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); }
   .topbar__right { display: flex; align-items: center; gap: var(--space-4); }
   .install { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold); background: transparent; border: 1px solid var(--accent-gold-line); border-radius: var(--radius-sm); padding: 5px 9px; cursor: pointer; transition: all var(--duration-fast); }
   .install:hover { background: var(--accent-gold-dim); border-color: var(--accent-gold); }
@@ -423,14 +419,14 @@
   .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
   .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .kpi__art { width: 38px; height: 38px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.32; }
-  .kpi__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; color: var(--fg-secondary); }
   .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   /* ── Home: paneles, gráfico, embudo, recientes ── */
   .home-split { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
-  .panel__lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__lbl { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
   .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
 
@@ -450,7 +446,7 @@
   .funnel__bar--g  { background: rgba(var(--accent-teal-rgb), .85); }
   .funnel__bar--g2 { background: rgba(var(--accent-teal-rgb), .55); }
   .funnel__bar--t  { background: var(--accent-teal); }
-  .funnel__bar--d  { background: rgba(var(--accent-gold-rgb), .5); }
+  .funnel__bar--d  { background: rgba(107, 107, 116, .55); }
   .funnel__n { width: 28px; flex: 0 0 auto; text-align: right; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
 
   .recent { display: flex; flex-direction: column; }
@@ -484,8 +480,8 @@
   .status--converted { background: var(--accent-teal-dim); border-color: var(--accent-teal-line); color: var(--accent-teal); }
   .status--archived { background: var(--bg-elevated); border-color: var(--border-strong); color: var(--fg-subtle); }
 
-  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7); text-align: center; color: var(--fg-secondary); font-style: italic; margin-top: var(--space-4); }
-  .empty.err { color: var(--color-error); font-style: normal; }
+  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); margin-top: var(--space-4); line-height: 1.55; }
+  .empty.err { color: var(--color-error); }
 
   @media (max-width: 720px) {
     .shell { grid-template-columns: 1fr; }

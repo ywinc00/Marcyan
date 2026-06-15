@@ -157,3 +157,132 @@ select.inp,
 .btn.full { width: 100%; }
 .b:disabled,
 .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ORBIT PRIMITIVES v2 — clases GLOBALES reutilizables por las
+   secciones del panel para mantener una piel consistente. Aditivo:
+   no toca ninguna regla anterior. Los componentes Svelte NO hashean
+   estos selectores, así que basta con poner las clases en el markup.
+
+   Tres familias:
+     1) FUNNEL  — embudo "Leads by Status" (pills de ancho decreciente)
+     2) SUBS    — lista de suscripciones del sidebar (logo + nombre + tag)
+     3) CHART-TIP — tooltip flotante para gráficos interactivos
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1) FUNNEL (embudo Orbit "Leads by Status") ──────────────────
+   Markup:
+     <div class="funnel">
+       <div class="funnel__row">
+         <span class="funnel__pill" style="--w:100%">Nuevos</span>
+         <span class="funnel__n">134</span>
+       </div>
+       <div class="funnel__row">
+         <span class="funnel__pill funnel__pill--accent" style="--w:80%">…</span>
+         <span class="funnel__n">120</span>
+       </div>
+       … filas con --w decreciente: 100% / 80% / 60% / 38% …
+     </div>
+   La pill se ensancha/encoge animada vía --w; min-width evita que
+   etapas pequeñas desaparezcan. --pill--accent = etapa destacada. */
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.funnel__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.funnel__pill {
+  width: var(--w);
+  min-width: 28%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 7px 14px;
+  font-size: 12.5px;
+  color: var(--fg-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: width .4s ease;
+}
+.funnel__pill--accent {
+  background: rgba(var(--accent-gold-rgb), .16);
+  border-color: var(--accent-gold-line);
+  color: var(--accent-gold);
+}
+.funnel__n {
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-secondary);
+  font-size: 13px;
+  text-align: right;
+}
+
+/* ── 2) SUBS (suscripciones del sidebar: logo + nombre + tag) ─────
+   Markup (junto al componente BrandLogo):
+     <div class="subs">
+       <div class="subs__row">
+         <BrandLogo name="Vercel Pro" size={20} />
+         <span class="subs__name">Vercel Pro</span>
+         <span class="subs__tag">HOSTING</span>
+       </div>
+       …
+     </div>
+   .subs__tag usa margin-left:auto → se ancla a la derecha aunque el
+   nombre sea corto. */
+.subs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.subs__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast);
+}
+.subs__row:hover {
+  background: var(--bg-elevated);
+}
+.subs__name {
+  font-size: 13.5px;
+  color: var(--fg-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.subs__tag {
+  margin-left: auto;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--fg-subtle);
+}
+
+/* ── 3) CHART-TIP (tooltip flotante para gráficos interactivos) ───
+   Posicionar el contenedor del gráfico en position:relative y mover
+   este tip con left/top inline (en px) siguiendo el cursor o la barra:
+     <span class="chart-tip" style="left:142px;top:60px">$9,340</span>
+   El transform centra horizontal y lo sube 120% sobre el punto. */
+.chart-tip {
+  position: absolute;
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  color: var(--fg-primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 9px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -120%);
+  z-index: 5;
+  box-shadow: var(--shadow-modal);
+}

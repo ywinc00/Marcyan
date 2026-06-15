@@ -1,5 +1,7 @@
 <script>
   import { onMount } from 'svelte';
+  import BrandLogo from './BrandLogo.svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers ──────────────────────────────────────────────────
   async function api(url, opts = {}) {
@@ -11,6 +13,17 @@
   function fmtUsd(cents) {
     const n = Number(cents || 0) / 100;
     return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+  }
+  // USD compacto para los tips del gráfico (p. ej. $4.1K).
+  function fmtUsdShort(cents) {
+    const n = Number(cents || 0) / 100;
+    if (n >= 1000) return '$' + (n / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'K';
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+  // USD SIN centavos para los números grandes de los KPI (5 tarjetas angostas) —
+  // así el monto no se corta con "…"; el detalle al centavo vive en las tablas.
+  function fmtUsd0(cents) {
+    return (Number(cents || 0) / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   }
   // Dólares de un input de texto → centavos enteros.
   const MAX_CENTS = 9999999999; // tope 99,999,999.99 USD (evita overflow BIGINT)
@@ -41,6 +54,21 @@
   const SUB_CYCLES = [{ id: 'monthly', label: 'Mensual' }, { id: 'yearly', label: 'Anual' }];
   function cycleLabel(c) { return (SUB_CYCLES.find((x) => x.id === c) || {}).label || c; }
 
+  // Monograma de cliente (iniciales) — para la tabla de facturas estilo Orbit.
+  function initials(s) {
+    const t = (s || '').trim();
+    if (!t) return '·';
+    const parts = t.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+  function monoColor(s) {
+    let h = 0; const str = s || '?';
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return MONO_PALETTE[Math.abs(h) % MONO_PALETTE.length];
+  }
+
   // ── Estado: resumen / KPIs ───────────────────────────────────
   let summary = $state(null);
   const revenue = $derived(summary ? summary.revenue_by_month : []);
@@ -49,6 +77,14 @@
   const expensesMonthCents = $derived(
     summary ? (Number(summary.expenses_this_month_cents || 0) + Number(summary.subscriptions_monthly_cents || 0)) : 0,
   );
+  // Delta del último mes vs el anterior (para el chart + KPI cobrado).
+  const revDelta = $derived.by(() => {
+    if (revenue.length < 2) return null;
+    const last = Number(revenue[revenue.length - 1].total_cents || 0);
+    const prev = Number(revenue[revenue.length - 2].total_cents || 0);
+    if (prev <= 0) return null;
+    return Math.round(((last - prev) / prev) * 100);
+  });
 
   // ── Estado: facturas ─────────────────────────────────────────
   let invoices = $state([]);
@@ -86,10 +122,12 @@
   let expenses = $state([]);
   let expForm = $state({ label: '', category: '', amount: '', spent_at: todayISO(), vendor: '' });
   let expMsg = $state(''); let expOk = $state(false); let expBusy = $state(false);
+  let showExpForm = $state(false);
 
   let subs = $state([]);
   let subForm = $state({ name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '' });
   let subMsg = $state(''); let subOk = $state(false); let subBusy = $state(false);
+  let showSubForm = $state(false);
 
   // Run-rate mensual de suscripciones activas (yearly→/12), calculado en cliente
   // para reflejar toggles al instante; el summary lo confirma tras refresh.
@@ -99,6 +137,41 @@
       return acc + (s.cycle === 'yearly' ? Math.round(c / 12) : c);
     }, 0),
   );
+  const subsActiveCount = $derived(subs.filter((s) => s.active).length);
+  const expensesThisMonthCents = $derived(summary ? Number(summary.expenses_this_month_cents || 0) : 0);
+
+  // ── Gráfico interactivo: estado de hover ─────────────────────
+  let hoverIdx = $state(-1);
+  const hasRevenue = $derived(revenue.length > 0);
+  // Geometría del gráfico (coordenadas internas del viewBox).
+  // CW/CH = lienzo; TOP/BASE delimitan el área de trazado (PLOT alto útil).
+  const CW = 560, CH = 200, TOP = 38, BASE = 160, PLOT = BASE - TOP; // alto útil = 122
+  const BAR_MAX = 56;      // ancho máx de barra (à la Orbit: bars no se ensanchan)
+  function bandW() { return CW / Math.max(1, revenue.length); }
+  // Ancho real de la barra: 50% del band, pero acotado a BAR_MAX para que
+  // 1-2 meses no produzcan losas anchas (datos escasos lucen intencionales).
+  function barW() { return Math.min(bandW() * 0.5, BAR_MAX); }
+  function barCx(i) { return i * bandW() + bandW() / 2; }
+  function barX(i) { return barCx(i) - barW() / 2; }
+  // Altura de barra; chartMax >= 1 evita división por cero / NaN con 0 datos.
+  function barH(c) { return Math.max(0, (Number(c || 0) / chartMax) * PLOT); }
+  function barY(c) { return BASE - barH(c); }
+  function onChartMove(e) {
+    if (!hasRevenue) return;
+    const svg = e.currentTarget;
+    const r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    const x = ((e.clientX - r.left) / r.width) * CW;
+    const i = Math.floor(x / bandW());
+    hoverIdx = (i >= 0 && i < revenue.length) ? i : -1;
+  }
+  function onChartLeave() { hoverIdx = -1; }
+  // Índice activo del gráfico: el hover gana; si no, el último mes.
+  // Acotado a [0, len-1] para no salir de rango con datos escasos.
+  const activeIdx = $derived(
+    !hasRevenue ? -1 : (hoverIdx >= 0 ? hoverIdx : revenue.length - 1),
+  );
+  const activeRow = $derived(activeIdx >= 0 ? revenue[activeIdx] : null);
 
   // ── Carga ────────────────────────────────────────────────────
   async function loadSummary() {
@@ -257,7 +330,7 @@
       expOk = true; expMsg = 'Gasto añadido';
       expForm = { label: '', category: '', amount: '', spent_at: todayISO(), vendor: '' };
       await loadExpenses(); await loadSummary();
-      setTimeout(() => { expMsg = ''; }, 1500);
+      setTimeout(() => { expMsg = ''; showExpForm = false; }, 1200);
     } catch (e) { expOk = false; expMsg = e.message || 'Error al guardar'; }
     finally { expBusy = false; }
   }
@@ -292,7 +365,7 @@
       subOk = true; subMsg = 'Suscripción añadida';
       subForm = { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '' };
       await loadSubs(); await loadSummary();
-      setTimeout(() => { subMsg = ''; }, 1500);
+      setTimeout(() => { subMsg = ''; showSubForm = false; }, 1200);
     } catch (e) { subOk = false; subMsg = e.message || 'Error al guardar'; }
     finally { subBusy = false; }
   }
@@ -326,91 +399,172 @@
   <button class="b b--ghost" onclick={refreshAll}>Actualizar</button>
 </div>
 
-<!-- ═══ KPIs ═══ -->
+<!-- ═══ KPIs — tarjetas Orbit con arte 3D de esquina + delta ═══ -->
 <div class="kpis">
+  <!-- Cobrado (mes) -->
   <div class="kpi">
-    <div class="kpi__txt">
-      <span class="kpi__lbl">Cobrado (mes)</span>
-      <span class="kpi__num teal">{summary ? fmtUsd(summary.collected_this_month_cents) : '—'}</span>
+    <span class="kpi__lbl">Cobrado (mes)</span>
+    <div class="kpi__row">
+      <span class="kpi__num teal">{summary ? fmtUsd0(summary.collected_this_month_cents) : '—'}</span>
+      <KpiArt kind="coins" size={52} />
     </div>
-    <svg class="kpi__art teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM3 7l9 6 9-6" /></svg>
+    <p class="kpi__delta">
+      {#if revDelta !== null}
+        <span class:up={revDelta >= 0} class:down={revDelta < 0}>{revDelta >= 0 ? '+' : ''}{revDelta}%</span>
+        <span class="dimtxt">vs mes anterior</span>
+      {:else}<span class="dimtxt">pagos recibidos</span>{/if}
+    </p>
   </div>
+
+  <!-- Por cobrar -->
   <div class="kpi">
-    <div class="kpi__txt">
-      <span class="kpi__lbl">Por cobrar</span>
-      <span class="kpi__num gold">{summary ? fmtUsd(summary.ar_total_cents) : '—'}</span>
+    <span class="kpi__lbl">Por cobrar</span>
+    <div class="kpi__row">
+      <span class="kpi__num gold">{summary ? fmtUsd0(summary.ar_total_cents) : '—'}</span>
+      <KpiArt kind="invoice" size={52} />
     </div>
-    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6zM14 3v6h6" /></svg>
+    <p class="kpi__delta">
+      {#if summary}<span class="dimtxt">{summary.counts ? summary.counts.open_invoices : 0} factura{summary.counts && summary.counts.open_invoices === 1 ? '' : 's'} abiertas</span>{:else}<span class="dimtxt">cuentas por cobrar</span>{/if}
+    </p>
   </div>
+
+  <!-- Vencido -->
   <div class="kpi">
-    <div class="kpi__txt">
-      <span class="kpi__lbl">Vencido</span>
-      <span class="kpi__num" class:danger={summary && summary.overdue_cents > 0}>{summary ? fmtUsd(summary.overdue_cents) : '—'}</span>
-      {#if summary && summary.overdue_count > 0}<span class="kpi__hint">{summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'}</span>{/if}
+    <span class="kpi__lbl">Vencido</span>
+    <div class="kpi__row">
+      <span class="kpi__num" class:danger={summary && summary.overdue_cents > 0}>{summary ? fmtUsd0(summary.overdue_cents) : '—'}</span>
+      <KpiArt kind="alert" size={52} />
     </div>
-    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <p class="kpi__delta">
+      {#if summary && summary.overdue_count > 0}<span class="down">{summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'}</span> <span class="dimtxt">requieren atención</span>{:else}<span class="up">al día</span> <span class="dimtxt">sin vencidos</span>{/if}
+    </p>
   </div>
+
+  <!-- Gastos (mes) -->
   <div class="kpi">
-    <div class="kpi__txt">
-      <span class="kpi__lbl">Gastos (mes)</span>
-      <span class="kpi__num">{summary ? fmtUsd(expensesMonthCents) : '—'}</span>
-      {#if summary}<span class="kpi__hint">+ {fmtUsd(summary.subscriptions_monthly_cents)} subs/mes</span>{/if}
+    <span class="kpi__lbl">Gastos (mes)</span>
+    <div class="kpi__row">
+      <span class="kpi__num">{summary ? fmtUsd0(expensesMonthCents) : '—'}</span>
+      <KpiArt kind="card" size={52} />
     </div>
-    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12" /></svg>
+    <p class="kpi__delta">
+      {#if summary}<span class="dimtxt">{fmtUsd(summary.subscriptions_monthly_cents)} en subs/mes</span>{:else}<span class="dimtxt">gastos + subs</span>{/if}
+    </p>
   </div>
+
+  <!-- Neto (mes) -->
   <div class="kpi">
-    <div class="kpi__txt">
-      <span class="kpi__lbl">Neto (mes)</span>
+    <span class="kpi__lbl">Neto (mes)</span>
+    <div class="kpi__row">
       <span class="kpi__num"
         class:teal={summary && summary.net_this_month_cents >= 0}
-        class:danger={summary && summary.net_this_month_cents < 0}>{summary ? fmtUsd(summary.net_this_month_cents) : '—'}</span>
-      {#if summary}<span class="kpi__hint">cobrado − egresos</span>{/if}
+        class:danger={summary && summary.net_this_month_cents < 0}>{summary ? fmtUsd0(summary.net_this_month_cents) : '—'}</span>
+      <KpiArt kind="chart-up" size={52} />
     </div>
-    <svg class="kpi__art" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M21 7v6M21 7h-6" /></svg>
+    <p class="kpi__delta">
+      {#if summary}<span class:up={summary.net_this_month_cents >= 0} class:down={summary.net_this_month_cents < 0}>{summary.net_this_month_cents >= 0 ? 'positivo' : 'negativo'}</span> <span class="dimtxt">cobrado − egresos</span>{:else}<span class="dimtxt">cobrado − egresos</span>{/if}
+    </p>
   </div>
 </div>
 
-<!-- ═══ Gráfico de ingresos por mes (SVG a mano) ═══ -->
-<div class="panel">
-  <div class="panel__lbl">Ingresos por mes <span class="panel__sub">últimos 6 · por fecha de pago</span></div>
-  {#if summary}
-    <svg class="chart" viewBox="0 0 560 196" role="img" aria-label="Ingresos por mes">
-      <defs>
-        <filter id="finBarGlow" x="-60%" y="-60%" width="220%" height="220%">
-          <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="rgb(249, 115, 22)" flood-opacity="0.5" />
-        </filter>
-      </defs>
-      <line x1="0" y1="44" x2="560" y2="44" class="chart__grid" />
-      <line x1="0" y1="82" x2="560" y2="82" class="chart__grid" />
-      <line x1="0" y1="120" x2="560" y2="120" class="chart__grid" />
-      <line x1="0" y1="158" x2="560" y2="158" class="chart__base" />
-      {#each revenue as a, i}
-        <rect
-          x={i * (560 / revenue.length) + (560 / revenue.length) * 0.25}
-          y={158 - (a.total_cents / chartMax) * 118}
-          width={(560 / revenue.length) * 0.5}
-          height={Math.max(0, (a.total_cents / chartMax) * 118)}
-          rx="5"
-          fill={i === revenue.length - 1 ? 'var(--accent-gold)' : '#2b2b33'}
-          filter={i === revenue.length - 1 ? 'url(#finBarGlow)' : undefined} />
-        <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y="180" text-anchor="middle" class="chart__lbl" class:is-active={i === revenue.length - 1}>{monthLabel(a.month)}</text>
-        {#if i === revenue.length - 1}
-          <circle cx={i * (560 / revenue.length) + (560 / revenue.length) / 2} cy={158 - (a.total_cents / chartMax) * 118} r="3.5" fill="var(--accent-gold)" />
-          <rect x={i * (560 / revenue.length) + (560 / revenue.length) / 2 - 38} y={158 - (a.total_cents / chartMax) * 118 - 27} width="76" height="18" rx="5" fill="var(--accent-gold)" />
-          <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y={158 - (a.total_cents / chartMax) * 118 - 14} text-anchor="middle" class="chart__tip">{fmtUsd(a.total_cents)}</text>
-        {:else if a.total_cents > 0}
-          <text x={i * (560 / revenue.length) + (560 / revenue.length) / 2} y={158 - (a.total_cents / chartMax) * 118 - 6} text-anchor="middle" class="chart__val">{fmtUsd(a.total_cents)}</text>
+<!-- ═══ Gráfico de ingresos por mes (SVG interactivo a mano) ═══ -->
+<div class="panel chart-panel">
+  <div class="chart-head">
+    <div>
+      <div class="panel__lbl">Ingresos por mes <span class="panel__sub">por fecha de pago</span></div>
+      {#if summary}
+        <div class="chart-amount">{fmtUsd(activeRow ? activeRow.total_cents : 0)}</div>
+        <div class="chart-sub">
+          {#if activeRow}<span class="cap">{monthLabel(activeRow.month)}</span>{/if}
+          {#if revDelta !== null && activeIdx === revenue.length - 1}
+            <span class:up={revDelta >= 0} class:down={revDelta < 0}>{revDelta >= 0 ? '+' : ''}{revDelta}%</span> <span class="dimtxt">vs mes anterior</span>
+          {/if}
+        </div>
+      {/if}
+    </div>
+    <div class="legend"><span class="legend__dot"></span> mes activo</div>
+  </div>
+
+  {#if !summary}
+    <div class="muted">Cargando…</div>
+  {:else if !hasRevenue}
+    <div class="chart-empty">
+      <KpiArt kind="chart-up" size={44} />
+      <div class="chart-empty__txt">
+        <div class="chart-empty__title">Aún no hay ingresos registrados</div>
+        <div class="chart-empty__sub">Registra un pago en una factura y aparecerá aquí.</div>
+      </div>
+    </div>
+  {:else}
+    <div class="chart-wrap">
+      <svg
+        class="chart"
+        viewBox="0 0 {CW} {CH}"
+        role="img"
+        aria-label="Ingresos por mes"
+        onmousemove={onChartMove}
+        onmouseleave={onChartLeave}>
+        <defs>
+          <linearGradient id="finBarActive" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fb923c" /><stop offset="1" stop-color="#ea580c" />
+          </linearGradient>
+          <filter id="finBarGlow" x="-60%" y="-60%" width="220%" height="220%">
+            <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="rgb(249, 115, 22)" flood-opacity="0.55" />
+          </filter>
+        </defs>
+
+        <!-- gridlines punteadas + etiquetas de eje Y -->
+        {#each [0, 1, 2, 3] as g}
+          {@const gy = TOP + (PLOT / 3) * g}
+          <line x1="0" y1={gy} x2={CW} y2={gy} class={g === 3 ? 'chart__base' : 'chart__grid'} />
+          <text x="2" y={gy - 5} class="chart__axis">{fmtUsdShort(chartMax - (chartMax / 3) * g)}</text>
+        {/each}
+
+        <!-- guía punteada horizontal al valor activo -->
+        {#if activeRow}
+          {@const ay = barY(activeRow.total_cents)}
+          <line x1="0" y1={ay} x2={CW} y2={ay} class="chart__guide" />
         {/if}
-      {/each}
-    </svg>
-  {:else}<div class="muted">Cargando…</div>{/if}
+
+        <!-- barras redondeadas (la activa: gradiente naranja + glow) -->
+        {#each revenue as a, i}
+          {@const active = i === activeIdx}
+          <rect
+            x={barX(i)}
+            y={barY(a.total_cents)}
+            width={barW()}
+            height={barH(a.total_cents)}
+            rx="7"
+            fill={active ? 'url(#finBarActive)' : '#2b2b33'}
+            filter={active ? 'url(#finBarGlow)' : undefined}
+            class="chart__bar" />
+          <text x={barCx(i)} y={CH - 5} text-anchor="middle" class="chart__lbl" class:is-active={active}>{monthLabel(a.month)}</text>
+        {/each}
+
+        <!-- punto en el valor activo -->
+        {#if activeRow}
+          <circle cx={barCx(activeIdx)} cy={barY(activeRow.total_cents)} r="4" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2.5" />
+        {/if}
+      </svg>
+
+      <!-- tooltip flotante (primitiva global .chart-tip) -->
+      {#if activeRow}
+        <span
+          class="chart-tip"
+          style="left:{(barCx(activeIdx) / CW) * 100}%;top:{(barY(activeRow.total_cents) / CH) * 100}%">{fmtUsd(activeRow.total_cents)}</span>
+      {/if}
+    </div>
+  {/if}
 </div>
 
-<!-- ═══ Acciones de alta ═══ -->
-<div class="actions">
-  <button class="b b--primary" onclick={() => { showInvoiceForm = !showInvoiceForm; showClientForm = false; showConvertForm = false; }}>+ Factura</button>
-  <button class="b" onclick={() => { showClientForm = !showClientForm; showInvoiceForm = false; showConvertForm = false; }}>+ Cliente</button>
-  <button class="b" onclick={() => { showConvertForm = !showConvertForm; showInvoiceForm = false; showClientForm = false; }}>Brief → Cliente</button>
+<!-- ═══ Facturas — encabezado + acciones de alta ═══ -->
+<div class="block-head">
+  <h2 class="block-head__t">Facturas <span class="dimtxt">{invTotal} en total</span></h2>
+  <div class="actions">
+    <button class="b b--primary b--mini" onclick={() => { showInvoiceForm = !showInvoiceForm; showClientForm = false; showConvertForm = false; }}>+ Factura</button>
+    <button class="b b--mini" onclick={() => { showClientForm = !showClientForm; showInvoiceForm = false; showConvertForm = false; }}>+ Cliente</button>
+    <button class="b b--mini" onclick={() => { showConvertForm = !showConvertForm; showInvoiceForm = false; showClientForm = false; }}>Brief → Cliente</button>
+  </div>
 </div>
 
 {#if showInvoiceForm}
@@ -501,7 +655,7 @@
 
 <input class="search" type="search" placeholder="Buscar por factura, cliente, código…" oninput={onSearchInput} />
 
-<!-- ═══ Tabla de facturas ═══ -->
+<!-- ═══ Tabla de facturas (filas Orbit con monograma) ═══ -->
 {#if loading}
   <div class="empty">Cargando…</div>
 {:else if error}
@@ -519,7 +673,15 @@
         {#each invoices as inv (inv.id)}
           <tr>
             <td class="mono gold">{inv.invoice_number}</td>
-            <td class="t-name">{inv.client_name || inv.client_code || '—'}</td>
+            <td>
+              <span class="cell-id">
+                <span class="mono-avatar" style="background:{monoColor(inv.client_name || inv.client_code || '?')}">{initials(inv.client_name || inv.client_code)}</span>
+                <span class="cell-id__txt">
+                  <span class="t-name">{inv.client_name || inv.client_code || '—'}</span>
+                  {#if inv.client_code && inv.client_name}<span class="sub-meta">{inv.client_code}</span>{/if}
+                </span>
+              </span>
+            </td>
             <td class="mono num">{fmtUsd(inv.amount_cents)}</td>
             <td class="mono num" class:teal={Number(inv.balance_cents) <= 0} class:gold={Number(inv.balance_cents) > 0}>{fmtUsd(inv.balance_cents)}</td>
             <td class="mono dim">{inv.due_date ? fmtDate(inv.due_date) : '—'}</td>
@@ -560,18 +722,23 @@
   <div class="panel egresos__col">
     <div class="panel__lbl">
       Gastos de empresa <span class="panel__sub">puntuales</span>
-      {#if summary}<span class="panel__total">{fmtUsd(summary.expenses_this_month_cents)} este mes</span>{/if}
+      <span class="panel__total">{fmtUsd(expensesThisMonthCents)} este mes</span>
     </div>
 
-    <div class="inline-form">
-      <input class="inp" type="text" placeholder="Concepto (p. ej. dominio)" bind:value={expForm.label} />
-      <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={expForm.category} />
-      <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={expForm.amount} />
-      <input class="inp inp--sm" type="date" bind:value={expForm.spent_at} />
-      <input class="inp inp--sm" type="text" placeholder="Vendor" bind:value={expForm.vendor} />
-      <button class="b b--primary b--mini" disabled={expBusy} onclick={submitExpense}>+ Gasto</button>
+    <div class="mini-add">
+      <button class="b b--mini b--ghost" onclick={() => { showExpForm = !showExpForm; }}>{showExpForm ? 'Cerrar' : '+ Gasto'}</button>
     </div>
-    {#if expMsg}<div class="msg msg--inline" class:ok={expOk}>{expMsg}</div>{/if}
+    {#if showExpForm}
+      <div class="inline-form">
+        <input class="inp" type="text" placeholder="Concepto (p. ej. dominio)" bind:value={expForm.label} />
+        <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={expForm.category} />
+        <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={expForm.amount} />
+        <input class="inp inp--sm" type="date" bind:value={expForm.spent_at} />
+        <input class="inp inp--sm" type="text" placeholder="Vendor" bind:value={expForm.vendor} />
+        <button class="b b--primary b--mini" disabled={expBusy} onclick={submitExpense}>Guardar</button>
+      </div>
+      {#if expMsg}<div class="msg msg--inline" class:ok={expOk}>{expMsg}</div>{/if}
+    {/if}
 
     {#if expenses.length === 0}
       <div class="mini-empty">Aún no hay gastos registrados.</div>
@@ -595,49 +762,61 @@
     {/if}
   </div>
 
-  <!-- (b) Suscripciones -->
+  <!-- (b) Suscripciones — destacando los logos de marca -->
   <div class="panel egresos__col">
     <div class="panel__lbl">
       Suscripciones <span class="panel__sub">SaaS recurrentes</span>
       <span class="panel__total">{fmtUsd(subsMonthlyCents)}/mes activas</span>
     </div>
 
-    <div class="inline-form">
-      <input class="inp" type="text" placeholder="Servicio (p. ej. Vercel)" bind:value={subForm.name} />
-      <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={subForm.category} />
-      <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={subForm.amount} />
-      <select class="inp inp--sm" bind:value={subForm.cycle}>{#each SUB_CYCLES as c}<option value={c.id}>{c.label}</option>{/each}</select>
-      <input class="inp inp--sm" type="date" title="Próximo cargo" bind:value={subForm.next_charge_at} />
-      <button class="b b--primary b--mini" disabled={subBusy} onclick={submitSub}>+ Suscripción</button>
+    <!-- titular run-rate -->
+    <div class="subs-headline">
+      <div>
+        <span class="subs-headline__num">{fmtUsd(subsMonthlyCents)}</span>
+        <span class="subs-headline__unit">/ mes</span>
+      </div>
+      <span class="subs-headline__meta">{subsActiveCount} activa{subsActiveCount === 1 ? '' : 's'} · {fmtUsd(subsMonthlyCents * 12)}/año</span>
     </div>
-    {#if subMsg}<div class="msg msg--inline" class:ok={subOk}>{subMsg}</div>{/if}
+
+    <div class="mini-add">
+      <button class="b b--mini b--ghost" onclick={() => { showSubForm = !showSubForm; }}>{showSubForm ? 'Cerrar' : '+ Suscripción'}</button>
+    </div>
+    {#if showSubForm}
+      <div class="inline-form">
+        <input class="inp" type="text" placeholder="Servicio (p. ej. Vercel)" bind:value={subForm.name} />
+        <input class="inp inp--sm" type="text" placeholder="Categoría" bind:value={subForm.category} />
+        <input class="inp inp--sm" type="text" inputmode="decimal" placeholder="$ USD" bind:value={subForm.amount} />
+        <select class="inp inp--sm" bind:value={subForm.cycle}>{#each SUB_CYCLES as c}<option value={c.id}>{c.label}</option>{/each}</select>
+        <input class="inp inp--sm" type="date" title="Próximo cargo" bind:value={subForm.next_charge_at} />
+        <button class="b b--primary b--mini" disabled={subBusy} onclick={submitSub}>Guardar</button>
+      </div>
+      {#if subMsg}<div class="msg msg--inline" class:ok={subOk}>{subMsg}</div>{/if}
+    {/if}
 
     {#if subs.length === 0}
       <div class="mini-empty">Aún no hay suscripciones.</div>
     {:else}
-      <div class="table-wrap table-wrap--flush">
-        <table class="table">
-          <thead><tr><th>Servicio</th><th class="num">Monto</th><th>Próx. cargo</th><th>Activa</th><th></th></tr></thead>
-          <tbody>
-            {#each subs as sub (sub.id)}
-              <tr class:row-off={!sub.active}>
-                <td class="t-name">
-                  {sub.name}
-                  <span class="cycle-pill">{cycleLabel(sub.cycle)}</span>
-                  {#if sub.category}<span class="sub-meta"> · {sub.category}</span>{/if}
-                </td>
-                <td class="mono num">{fmtUsd(sub.amount_cents)}</td>
-                <td class="mono dim">{sub.next_charge_at ? fmtDate(sub.next_charge_at) : '—'}</td>
-                <td>
-                  <button class="toggle" class:on={sub.active} role="switch" aria-checked={sub.active} aria-label="Activar suscripción" onclick={() => toggleSub(sub)}>
-                    <span class="toggle__knob"></span>
-                  </button>
-                </td>
-                <td class="t-act"><button class="icon-del" title="Eliminar suscripción" aria-label="Eliminar suscripción" onclick={() => deleteSub(sub)}>×</button></td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+      <div class="sub-list">
+        {#each subs as sub (sub.id)}
+          <div class="sub-row" class:row-off={!sub.active}>
+            <BrandLogo name={sub.name} size={26} />
+            <div class="sub-row__main">
+              <span class="sub-row__name">{sub.name}</span>
+              <span class="sub-row__meta">
+                {#if sub.category}<span class="tag tag--xs">{sub.category}</span>{/if}
+                <span class="dim">próx. {sub.next_charge_at ? fmtDate(sub.next_charge_at) : '—'}</span>
+              </span>
+            </div>
+            <div class="sub-row__price">
+              <span class="mono">{fmtUsd(sub.amount_cents)}</span>
+              <span class="cycle-pill">{cycleLabel(sub.cycle)}</span>
+            </div>
+            <button class="toggle" class:on={sub.active} role="switch" aria-checked={sub.active} aria-label="Activar suscripción" onclick={() => toggleSub(sub)}>
+              <span class="toggle__knob"></span>
+            </button>
+            <button class="icon-del" title="Eliminar suscripción" aria-label="Eliminar suscripción" onclick={() => deleteSub(sub)}>×</button>
+          </div>
+        {/each}
       </div>
     {/if}
   </div>
@@ -676,35 +855,63 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
-  /* KPIs — con mini-art de esquina (referencia: home) */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
-  .kpi__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-  .kpi__art { width: 36px; height: 36px; flex: 0 0 auto; color: var(--accent-gold); opacity: 0.3; }
-  .kpi__art.teal { color: var(--accent-teal); }
-  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; color: var(--fg-secondary); }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  .dimtxt { color: var(--fg-subtle); }
+  .up { color: var(--accent-teal); font-weight: 600; }
+  .down { color: var(--color-error); font-weight: 600; }
+
+  /* KPIs — tarjetas Orbit densas con arte 3D de esquina + delta.
+     Proporciones exactas de Orbit: 4 columnas iguales, gap 14px;
+     padding 16/16/14; número 36px tight; arte 52px; delta 13px. */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; display: flex; flex-direction: column; min-width: 0; }
+  .kpi__lbl { margin: 0 0 10px; font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .kpi__num.gold { color: var(--accent-gold); }
   .kpi__num.teal { color: var(--accent-teal); }
   .kpi__num.danger { color: var(--color-error); }
-  .kpi__hint { font-family: var(--font-mono); font-size: 10px; color: var(--fg-subtle); }
+  .kpi__delta { margin: 12px 0 0; font-size: var(--text-sm); }
+
+  /* Responsive: 4→2→1 columnas, igual que el resto del dashboard. */
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 460px) { .kpis { grid-template-columns: 1fr; } }
 
   /* Panel + chart */
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
-  .panel__lbl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
+  .panel__lbl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); color: var(--fg-secondary); margin-bottom: var(--space-4); }
   .panel__sub { color: var(--fg-subtle); }
-  .panel__total { margin-left: auto; color: var(--accent-gold); text-transform: none; letter-spacing: 0; font-size: 11px; }
+  .panel__total { margin-left: auto; color: var(--accent-gold); font-size: 11px; }
   .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: italic; padding: var(--space-4) 0; }
-  .chart { width: 100%; height: auto; display: block; }
+
+  .chart-panel { margin-top: var(--space-4); }
+  .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: var(--space-3); }
+  .chart-head .panel__lbl { margin-bottom: 8px; }
+  .chart-amount { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); line-height: 1; color: var(--fg-primary); }
+  .chart-sub { margin-top: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .chart-sub .cap { text-transform: uppercase; letter-spacing: .06em; font-family: var(--font-mono); font-size: 10px; color: var(--accent-gold); }
+  .legend { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fg-subtle); white-space: nowrap; }
+  .legend__dot { width: 9px; height: 9px; border-radius: 3px; background: linear-gradient(180deg, #fb923c, #ea580c); box-shadow: var(--shadow-gold); }
+
+  .chart-wrap { position: relative; }
+  .chart { width: 100%; height: auto; display: block; cursor: crosshair; }
+  .chart__bar { transition: y .18s ease, height .18s ease, fill .18s ease; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
   .chart__lbl.is-active { fill: var(--accent-gold); font-weight: 700; }
-  .chart__val { fill: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; }
+  .chart__axis { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; }
   .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
   .chart__base { stroke: rgba(255, 255, 255, 0.12); }
-  .chart__tip { fill: var(--fg-inverse); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+  .chart__guide { stroke: rgba(249, 115, 22, 0.4); stroke-dasharray: 4 4; }
 
-  /* Acciones */
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--space-4); }
+  /* Empty state del chart — alto similar al gráfico para no saltar el layout */
+  .chart-empty { display: flex; align-items: center; gap: 14px; min-height: 168px; padding: var(--space-3) var(--space-2); }
+  .chart-empty__title { font-weight: 600; font-size: var(--text-sm); color: var(--fg-primary); }
+  .chart-empty__sub { font-size: var(--text-xs); color: var(--fg-secondary); margin-top: 3px; }
+
+  /* Encabezado de bloque + acciones */
+  .block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 18px 0 var(--space-3); }
+  .block-head__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); margin: 0; display: flex; align-items: baseline; gap: 8px; }
+  .block-head__t .dimtxt { font-family: var(--font-mono); font-size: 11px; font-weight: 400; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
   /* Form cards */
   .form-card { background: var(--bg-card); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-3); }
@@ -713,7 +920,7 @@
   .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 16px; }
   .f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .f--wide { grid-column: 1 / -1; }
-  .f__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
+  .f__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); text-transform: none; color: var(--fg-secondary); }
   .form-card__foot { display: flex; align-items: center; gap: 8px; margin-top: var(--space-4); }
   .spacer { flex: 1; }
 
@@ -725,7 +932,7 @@
   select.inp--sm { padding-right: 26px; background-position: right 8px center; }
 
   /* Chips + search */
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--space-5) 0 var(--space-3); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--space-4) 0 var(--space-3); }
   .chip { display: inline-flex; align-items: center; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
   .chip:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
   .chip.on { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); }
@@ -738,7 +945,7 @@
   .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
   .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 11px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
   .table th.num { text-align: right; }
-  .table td { padding: 11px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); vertical-align: middle; }
+  .table td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); vertical-align: middle; }
   .table tbody tr:last-child td { border-bottom: 0; }
   .table tbody tr:hover { background: var(--bg-elevated); }
   .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
@@ -751,6 +958,13 @@
   .t-act { text-align: right; white-space: nowrap; }
   .paid-tick { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-teal); }
   .tag { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-secondary); font-size: 10px; }
+  .tag--xs { padding: 1px 7px; font-size: 9px; }
+
+  /* Celda de identidad con monograma (filas Orbit) */
+  .cell-id { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+  .mono-avatar { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: -.01em; }
+  .cell-id__txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+  .cell-id__txt .sub-meta { font-family: var(--font-mono); }
 
   /* Pill-select de estado (factura) */
   .pill-select { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-elevated); }
@@ -778,22 +992,40 @@
   .empty.err { color: var(--color-error); }
 
   /* Egresos y suscripciones */
-  .egresos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
+  .egresos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-4); }
   .egresos__col { margin-top: 0; }
-  .inline-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .mini-add { margin-bottom: 6px; }
+  .inline-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 4px; }
   .inline-form .inp { flex: 1 1 130px; min-width: 0; }
   .inline-form .inp--sm { flex: 0 1 92px; }
   .mini-empty { color: var(--fg-subtle); font-size: var(--text-xs); padding: var(--space-4) 0 var(--space-2); }
   .row-off { opacity: .5; }
-  .cycle-pill { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+  .cycle-pill { display: inline-block; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--fg-subtle); font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* Titular run-rate de suscripciones */
+  .subs-headline { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; margin-bottom: var(--space-3); border-radius: var(--radius-md); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); }
+  .subs-headline__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); color: var(--accent-gold); }
+  .subs-headline__unit { font-size: 12px; color: var(--accent-gold); opacity: .8; }
+  .subs-headline__meta { font-family: var(--font-mono); font-size: 10px; color: var(--fg-subtle); }
+
+  /* Lista de suscripciones — filas Orbit con logo de marca */
+  .sub-list { display: flex; flex-direction: column; }
+  .sub-row { display: flex; align-items: center; gap: 11px; padding: 9px 4px; border-top: 1px solid var(--border-subtle); transition: background var(--duration-fast); border-radius: var(--radius-md); }
+  .sub-row:first-child { border-top: 0; }
+  .sub-row:hover { background: var(--bg-elevated); }
+  .sub-row__main { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .sub-row__name { font-size: var(--text-sm); color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sub-row__meta { display: flex; align-items: center; gap: 7px; font-size: var(--text-xs); }
+  .sub-row__price { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex: 0 0 auto; }
+  .sub-row__price .mono { color: var(--fg-primary); font-variant-numeric: tabular-nums; }
 
   /* Toggle de activa */
-  .toggle { width: 34px; height: 19px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-elevated); padding: 0; cursor: pointer; position: relative; transition: all var(--duration-fast); }
+  .toggle { width: 34px; height: 19px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg-elevated); padding: 0; cursor: pointer; position: relative; transition: all var(--duration-fast); flex: 0 0 auto; }
   .toggle__knob { position: absolute; top: 50%; left: 2px; transform: translateY(-50%); width: 13px; height: 13px; border-radius: 50%; background: var(--fg-subtle); transition: all var(--duration-fast); }
   .toggle.on { background: var(--accent-teal-dim); border-color: var(--accent-teal-line); }
   .toggle.on .toggle__knob { left: 16px; background: var(--accent-teal); }
 
-  .icon-del { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--fg-subtle); font-size: 18px; line-height: 1; cursor: pointer; transition: all var(--duration-fast); }
+  .icon-del { width: 24px; height: 24px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--fg-subtle); font-size: 18px; line-height: 1; cursor: pointer; transition: all var(--duration-fast); }
   .icon-del:hover { color: var(--color-error); border-color: rgba(239, 68, 68, .35); background: rgba(239, 68, 68, .1); }
 
   /* Botones */
@@ -801,7 +1033,7 @@
 
   .msg { font-family: var(--font-mono); font-size: 10px; color: var(--color-error); }
   .msg.ok { color: var(--accent-teal); }
-  .msg--inline { margin-top: 8px; }
+  .msg--inline { margin-top: 6px; margin-bottom: 4px; }
 
   /* Modal */
   .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }

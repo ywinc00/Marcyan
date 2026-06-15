@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import KpiArt from './KpiArt.svelte';
 
   // ── Helpers ──────────────────────────────────────────────────
   // Timeout de cliente (~12s) vía AbortController: una función colgada o un
@@ -31,6 +32,19 @@
     if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
     return fmtDate(d);
   }
+  // Monograma determinista: iniciales del negocio + color estable por hash.
+  const AVATAR_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+  function initials(s) {
+    const parts = (s || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '—';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  function avatarColor(s) {
+    let h = 0; const str = s || '?';
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return AVATAR_PALETTE[Math.abs(h) % AVATAR_PALETTE.length];
+  }
 
   const STATUSES = [
     { id: 'pending', label: 'Pendiente' }, { id: 'contacted', label: 'Contactado' },
@@ -42,6 +56,10 @@
   const FILTERS = [
     { id: '', label: 'Todos' }, ...STATUSES,
   ];
+
+  // Embudo de estados (orden de pipeline) — anchos relativos calculados sobre
+  // el máximo para que la barra más alta llene la fila.
+  const FUNNEL_ORDER = ['pending', 'contacted', 'in_progress', 'completed', 'archived'];
 
   const SECTIONS = [
     ['01 · Negocio', [
@@ -88,6 +106,20 @@
   let loading = $state(false);
   let error = $state('');
   let searchTimer;
+
+  // Embudo derivado de stats (counts por estado + ancho relativo).
+  // Ancho = proporción sobre el máximo, suelo del 28% (= min-width de la
+  // pill global) para que ninguna etapa con datos desaparezca. Robusto
+  // con datos escasos: 1 brief → su etapa al 100%, el resto al suelo.
+  const funnel = $derived.by(() => {
+    if (!stats) return [];
+    const counts = FUNNEL_ORDER.map((id) => ({ id, label: statusLabel(id), n: stats[id] ?? 0 }));
+    const max = Math.max(1, ...counts.map((c) => c.n));
+    return counts.map((c) => ({ ...c, w: Math.max(28, Math.round((c.n / max) * 100)) }));
+  });
+  // ¿Hay algún brief en el pipeline? → si no, mostramos un empty-state
+  // tidy en vez de cinco pills al 28% que sugerirían datos falsos.
+  const hasPipeline = $derived(funnel.some((f) => f.n > 0));
 
   // ── Estado detalle ───────────────────────────────────────────
   let selected = $state(null);
@@ -260,15 +292,68 @@
   </div>
 
   {#if stats}
-    <div class="chips">
-      {#each FILTERS as f}
-        <button class="chip" class:on={filter === f.id} onclick={() => setFilter(f.id)}>
-          {f.label}
-          <span class="chip__n">{f.id === '' ? stats.total : (stats[f.id === 'in_progress' ? 'in_progress' : f.id] ?? 0)}</span>
-        </button>
-      {/each}
-    </div>
+    <!-- KPI strip + embudo: densidad Orbit. Grid = 3 KPIs (iguales) + 1
+         celda de pipeline más ancha; degrada a 2 cols / 1 col en estrecho. -->
+    <section class="kpis">
+      <article class="kpi">
+        <p class="kpi__label">Total briefs</p>
+        <div class="kpi__row">
+          <h3 class="kpi__num">{stats.total ?? 0}</h3>
+          <KpiArt kind="folder" size={54} />
+        </div>
+        <p class="kpi__delta">
+          {#if (stats.this_month ?? 0) > 0}<span class="up">+{stats.this_month}</span> <span class="muted">este mes</span>
+          {:else}<span class="muted">sin altas este mes</span>{/if}
+        </p>
+      </article>
+
+      <article class="kpi">
+        <p class="kpi__label">Por atender</p>
+        <div class="kpi__row">
+          <h3 class="kpi__num">{(stats.pending ?? 0) + (stats.contacted ?? 0)}</h3>
+          <KpiArt kind="bell" size={54} />
+        </div>
+        <p class="kpi__delta"><span class="dot dot--gold"></span> <span class="muted">pendientes + contactados</span></p>
+      </article>
+
+      <article class="kpi">
+        <p class="kpi__label">Completados</p>
+        <div class="kpi__row">
+          <h3 class="kpi__num">{stats.completed ?? 0}</h3>
+          <KpiArt kind="check" size={54} />
+        </div>
+        <p class="kpi__delta">
+          {#if (stats.completed_this_month ?? 0) > 0}<span class="up">+{stats.completed_this_month}</span> <span class="muted">este mes</span>
+          {:else}<span class="muted">ninguno este mes</span>{/if}
+        </p>
+      </article>
+
+      <article class="kpi kpi--funnel">
+        <p class="kpi__label">Pipeline por estado</p>
+        {#if hasPipeline}
+          <div class="funnel">
+            {#each funnel as f, i}
+              <div class="funnel__row">
+                <span class="funnel__pill" class:funnel__pill--accent={i === 0} style="--w:{f.w}%">{f.label}</span>
+                <span class="funnel__n">{f.n}</span>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <p class="funnel-empty">Aún sin briefs en el pipeline.</p>
+        {/if}
+      </article>
+    </section>
   {/if}
+
+  <div class="chips">
+    {#each FILTERS as f}
+      <button class="chip" class:on={filter === f.id} onclick={() => setFilter(f.id)}>
+        {f.label}
+        {#if stats}<span class="chip__n">{f.id === '' ? stats.total : (stats[f.id] ?? 0)}</span>{/if}
+      </button>
+    {/each}
+  </div>
 
   <input class="search" type="search" placeholder="Buscar por negocio, email, ID…" oninput={onSearchInput} />
 
@@ -279,21 +364,28 @@
   {:else if rows.length === 0}
     <div class="empty">Sin briefs que coincidan.</div>
   {:else}
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>ID</th><th>Negocio</th><th>Contacto</th><th>Estado</th><th class="ta-r">Recibido</th></tr></thead>
-        <tbody>
-          {#each rows as r (r.project_id)}
-            <tr onclick={() => openBrief(r.project_id)}>
-              <td class="mono gold">{r.project_id}</td>
-              <td class="t-name">{r.business_name || '—'}</td>
-              <td class="t-sub mono">{r.email || r.phone || '—'}</td>
-              <td><span class="badge badge--{r.status}">{statusLabel(r.status)}</span></td>
-              <td class="mono dim ta-r" title={fmtDateTime(r.created_at)}>{rel(r.created_at)}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+    <div class="cards">
+      {#each rows as r (r.project_id)}
+        <button class="bcard" type="button" onclick={() => openBrief(r.project_id)}>
+          <div class="bcard__top">
+            <span class="mono avatar" style="background:{avatarColor(r.business_name)}">{initials(r.business_name)}</span>
+            <div class="bcard__id-wrap">
+              <span class="bcard__name">{r.business_name || '— sin nombre —'}</span>
+              <span class="bcard__sub mono">{r.email || r.phone || r.project_id}</span>
+            </div>
+            <span class="badge badge--{r.status}">{statusLabel(r.status)}</span>
+          </div>
+          <div class="bcard__meta">
+            {#if r.website_type}<span class="meta-pill">{r.website_type}</span>{/if}
+            {#if r.budget_range}<span class="meta-pill meta-pill--gold">{r.budget_range}</span>{/if}
+            {#if r.city_state}<span class="meta-pill meta-pill--ghost">{r.city_state}</span>{/if}
+          </div>
+          <div class="bcard__foot">
+            <span class="mono gold">{r.project_id}</span>
+            <span class="mono dim" title={fmtDateTime(r.created_at)}>recibido {rel(r.created_at)}</span>
+          </div>
+        </button>
+      {/each}
     </div>
     {#if total > LIMIT}
       <div class="pager">
@@ -330,12 +422,18 @@
   <div class="detail">
     <div class="detail__main">
       <div class="d-head">
-        <h1 class="d-id">{selected.project_id}</h1>
-        <p class="d-biz">{selected.business_name || '— sin nombre de negocio —'}</p>
-        <div class="d-meta mono">
-          <span>Recibido {fmtDateTime(selected.created_at)}</span>
-          {#if selected.contacted_at}<span>· Contactado {fmtDate(selected.contacted_at)}</span>{/if}
-          {#if selected.completed_at}<span>· Completado {fmtDate(selected.completed_at)}</span>{/if}
+        <span class="mono avatar avatar--lg" style="background:{avatarColor(selected.business_name)}">{initials(selected.business_name)}</span>
+        <div class="d-head__txt">
+          <div class="d-head__row">
+            <h1 class="d-id">{selected.project_id}</h1>
+            <span class="badge badge--{selected.status}">{statusLabel(selected.status)}</span>
+          </div>
+          <p class="d-biz">{selected.business_name || '— sin nombre de negocio —'}</p>
+          <div class="d-meta mono">
+            <span>Recibido {fmtDateTime(selected.created_at)}</span>
+            {#if selected.contacted_at}<span>· Contactado {fmtDate(selected.contacted_at)}</span>{/if}
+            {#if selected.completed_at}<span>· Completado {fmtDate(selected.completed_at)}</span>{/if}
+          </div>
         </div>
       </div>
 
@@ -421,9 +519,12 @@
           <ul class="events">
             {#each events as ev}
               <li class="ev">
-                <div class="ev__t">{EVENT_LABELS[ev.event_type] || ev.event_type}</div>
-                <div class="ev__a">{ev.actor_email || 'sistema'}</div>
-                <div class="ev__d mono">{fmtDateTime(ev.created_at)}</div>
+                <span class="ev__dot" aria-hidden="true"></span>
+                <div class="ev__body">
+                  <div class="ev__t">{EVENT_LABELS[ev.event_type] || ev.event_type}</div>
+                  <div class="ev__a">{ev.actor_email || 'sistema'}</div>
+                  <div class="ev__d mono">{fmtDateTime(ev.created_at)}</div>
+                </div>
               </li>
             {/each}
           </ul>
@@ -454,6 +555,26 @@
   .sec-head { display: flex; align-items: center; justify-content: space-between; }
   .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
+  /* ── KPI strip (Orbit stats) ───────────────────────────────────
+     Orbit: 4 columnas, gap 14px, card radius 14px sin sombra. Aquí 3
+     KPIs iguales + 1 celda de pipeline algo más ancha (lleva 5 filas).
+     Proporciones 1:1 con Orbit .stat: padding 16/16/14, número 36px/700
+     con tracking -0.025em, label 13px/500 secundario, delta 13px. */
+  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 1.35fr; gap: 14px; margin-bottom: var(--space-4); align-items: stretch; }
+  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; min-width: 0; }
+  .kpi__label { margin: 0 0 10px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
+  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .kpi__num { margin: 0; font-family: var(--font-display); font-size: 36px; font-weight: 700; letter-spacing: -0.025em; line-height: 1; color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .kpi__delta { margin: 12px 0 0; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
+  .kpi__delta .muted { color: var(--fg-subtle); }
+  .dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
+  .dot--gold { background: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  /* La celda de pipeline alinea su label con el resto y deja respirar el embudo */
+  .kpi--funnel { display: flex; flex-direction: column; }
+  .kpi--funnel .funnel { margin-top: 2px; }
+  .funnel-empty { margin: 6px 0 0; color: var(--fg-subtle); font-size: 12.5px; line-height: 1.45; }
+
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-4); }
   .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
   .chip:hover { border-color: var(--accent-gold-line); color: var(--fg-primary); }
@@ -465,21 +586,32 @@
   .search::placeholder { color: var(--fg-subtle); }
   .search:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
 
-  .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-  .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 12px 14px; border-bottom: 1px solid var(--border); }
-  .table td { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); }
-  .table tbody tr { cursor: pointer; transition: background var(--duration-fast); }
-  .table tbody tr:hover { background: var(--bg-elevated); }
-  .table tr:last-child td { border-bottom: 0; }
+  /* ── Card-grid de briefs (Orbit rows, denso) ─────────────────
+     gap 14px = misma rejilla que las KPI arriba; cards radius 14px,
+     hairline 1px, hover → bg elevated (igual que las filas de tabla
+     Orbit). Avatar-monograma como icono guía, status pill a la derecha. */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(278px, 1fr)); gap: 14px; }
+  .bcard { display: flex; flex-direction: column; gap: 11px; text-align: left; width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: background var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast); }
+  .bcard:hover { background: var(--bg-elevated); border-color: var(--accent-gold-line); transform: translateY(-1px); }
+  .bcard__top { display: flex; align-items: center; gap: 10px; }
+  .bcard__id-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .bcard__name { font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bcard__sub { font-size: 11px; color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bcard__meta { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
+  .bcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 9px; border-top: 1px solid var(--border-subtle); }
+
+  .avatar { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex-shrink: 0; border-radius: var(--radius-md); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 0; }
+  .avatar--lg { width: 52px; height: 52px; font-size: 18px; border-radius: var(--radius-lg); }
+
+  .meta-pill { display: inline-flex; align-items: center; padding: 3px 9px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 11px; color: var(--fg-secondary); white-space: nowrap; }
+  .meta-pill--gold { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); font-variant-numeric: tabular-nums; }
+  .meta-pill--ghost { color: var(--fg-subtle); }
+
   .mono { font-family: var(--font-mono); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
   .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); white-space: nowrap; }
-  .ta-r { text-align: right; }
-  .t-name { color: var(--fg-primary); }
-  .t-sub { font-size: 11px; color: var(--fg-subtle); }
 
-  .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; flex-shrink: 0; }
   /* Pills tintados sobre la paleta Orbit (naranja = activo/atención, verde = positivo) */
   .badge--pending { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .badge--contacted { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
@@ -506,7 +638,9 @@
   .back:hover { color: var(--accent-gold); }
   .detail { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--space-5); align-items: start; }
   .detail__main { min-width: 0; }
-  .d-head { border-bottom: 1px solid var(--border); padding-bottom: var(--space-4); margin-bottom: var(--space-5); }
+  .d-head { display: flex; align-items: flex-start; gap: 14px; border-bottom: 1px solid var(--border); padding-bottom: var(--space-4); margin-bottom: var(--space-5); }
+  .d-head__txt { min-width: 0; flex: 1; }
+  .d-head__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .d-id { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); color: var(--accent-gold); margin: 0; }
   .d-biz { font-size: var(--text-md); color: var(--fg-primary); margin: 6px 0 10px; }
   .d-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 10px; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
@@ -514,9 +648,9 @@
   .editbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; margin-bottom: var(--space-4); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-md); }
   .editbar__lbl { font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-gold); }
 
-  .block { margin-bottom: var(--space-5); }
+  .block { margin-bottom: var(--space-5); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) var(--space-5); }
   .block__title { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4) var(--space-5); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4) var(--space-5); }
   .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .field.span { grid-column: 1 / -1; }
   .field__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-subtle); }
@@ -544,8 +678,10 @@
   .msg.ok { color: var(--accent-teal); }
 
   .events { list-style: none; margin: 0; padding: 0; }
-  .ev { padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+  .ev { position: relative; display: flex; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
   .ev:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ev__dot { flex-shrink: 0; width: 8px; height: 8px; margin-top: 5px; border-radius: 999px; background: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .ev__body { min-width: 0; }
   .ev__t { font-size: var(--text-sm); font-weight: 500; color: var(--fg-primary); }
   .ev__a { font-size: 11px; color: var(--fg-secondary); margin-top: 2px; }
   .ev__d { font-size: 10px; color: var(--fg-subtle); margin-top: 2px; font-variant-numeric: tabular-nums; }
@@ -558,5 +694,7 @@
   .modal__code { display: block; margin-bottom: 10px; color: var(--accent-gold); font-family: var(--font-mono); }
   .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
+  @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi--funnel { grid-column: 1 / -1; } }
   @media (max-width: 880px) { .detail { grid-template-columns: 1fr; } .detail__aside { position: static; } }
+  @media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } .kpi--funnel { grid-column: auto; } }
 </style>

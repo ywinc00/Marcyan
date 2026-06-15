@@ -63,7 +63,14 @@ export default async function handler(req, res) {
 
     const configured = isConfigured();
     const ok = configured && results.every((r) => r.ok);
-    console.log(`[admin/seo/sync] ${results.length} proyecto(s) por ${actor} — configured=${configured}`);
+    // Diagnóstico: los errores por proyecto solo viajan en el body; los logueamos
+    // también para verlos en los runtime logs de Vercel (WIF vs 403 de GA4/GSC).
+    for (const r of results) {
+      if (r && !r.ok) {
+        console.error(`[admin/seo/sync] proyecto ${r.project_id} (${r.name || '?'}) — gsc=${(r.gsc && r.gsc.error) || 'ok'} · ga4=${(r.ga4 && r.ga4.error) || 'ok'}`);
+      }
+    }
+    console.log(`[admin/seo/sync] ${results.length} proyecto(s) por ${actor} — configured=${configured} ok=${ok}`);
     return res.status(200).json({
       ok,
       configured,

@@ -368,7 +368,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 </style>
 
 <script>
-  import { stripMarkdown } from '../lib/chat-format.mjs';
+  import { stripMarkdown, invitesContact } from '../lib/chat-format.mjs';
 
   const root = document.getElementById('mrc-chat');
   const cfgEl = root && root.querySelector('[data-mrc-config]');
@@ -464,6 +464,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           history = reqMessages.concat([{ role: 'assistant', content: data.reply }]);
           if (data.action && data.action.type === 'capture') {
             openCapture(data.action.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
+          } else if (!captured && invitesContact(data.reply)) {
+            // El bot invitó a dejar datos pero no disparó la herramienta → abrimos
+            // la captura igual, para que el formulario prometido SÍ aparezca.
+            openCapture('contacto');
           }
         } else {
           appendBubble('sys', (data && data.error) || T.error);

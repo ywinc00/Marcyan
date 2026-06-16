@@ -28,3 +28,13 @@ export function stripMarkdown(s) {
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)')
     .trim();
 }
+
+// ¿El texto del bot OFRECE/PROMETE el formulario de contacto? Red de seguridad
+// para abrir la captura cuando el modelo escribió la invitación pero NO llamó a
+// la herramienta (sin `action`). Matchea frases de oferta de captura; NO matchea
+// el simple enlace a /formulario.
+const INVITE_RX = /(mostrar\w*|abrir|abro|muestro|despliego|ense[ñn]ar\w*)\s+(un|el|tu|la)?\s*formulario|formulario\s+(r[áa]pido|breve|seguro|ahora|aqu[íi]|de\s+contacto)|d[eé]j\w*\s+(tus|tu)\s+(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero)|show\s+(you\s+)?(a|the)?\s*(quick\s+|brief\s+)?form|leave\s+your\s+(details|name|info|email|phone|contact|number)|drop\s+your\s+(name|email|phone|details|info)/i;
+
+export function invitesContact(text) {
+  return typeof text === 'string' && INVITE_RX.test(text);
+}

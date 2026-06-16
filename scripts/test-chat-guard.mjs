@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { validateMessages, validSessionId, parseToolResponse } from '../api/chat.mjs';
 import { brandPostFilter, pricePostFilter } from '../lib/chat-kb.mjs';
-import { stripMarkdown } from '../src/lib/chat-format.mjs';
+import { stripMarkdown, invitesContact } from '../src/lib/chat-format.mjs';
 
 let pass = 0;
 const fails = [];
@@ -70,6 +70,16 @@ check('deja email/teléfono intactos', () => {
   const out = stripMarkdown('escríbenos a contact@marcyanstudio.com o al +1 713-823-9144');
   assert.ok(out.includes('contact@marcyanstudio.com') && out.includes('+1 713-823-9144'));
 });
+
+// ── v2.1: invitesContact (red de seguridad si el modelo no llamó la tool) ──
+check('invite: "mostrarte un formulario" → true', () => assert.equal(invitesContact('Déjame mostrarte un formulario rápido y seguro.'), true));
+check('invite: "mostrar el formulario ahora" → true', () => assert.equal(invitesContact('Déjame mostrar el formulario ahora mismo.'), true));
+check('invite: "déjame tus datos" → true', () => assert.equal(invitesContact('Con gusto, déjame tus datos y te contactamos.'), true));
+check('invite: "deja tu correo" → true', () => assert.equal(invitesContact('Solo deja tu correo o teléfono.'), true));
+check('invite EN: "leave your details" → true', () => assert.equal(invitesContact('Just leave your details and we’ll reach out.'), true));
+check('NO invita: enlace /formulario → false', () => assert.equal(invitesContact('Si prefieres, escríbenos en /formulario.'), false));
+check('NO invita: pregunta de seguimiento → false', () => assert.equal(invitesContact('¿Ya tienes sitio web o estás empezando desde cero?'), false));
+check('NO invita: precio → false', () => assert.equal(invitesContact('Un sitio a medida arranca desde $1,500.'), false));
 
 // ── v2: brandPostFilter suavizado (Miami honesto pasa; claims firmes no) ──
 check('Miami honesto pasa', () => {

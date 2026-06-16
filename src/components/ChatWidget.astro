@@ -287,6 +287,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-input::placeholder { color: var(--fg-subtle); }
   .mrc-input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  /* iOS hace auto-zoom al enfocar un input con font-size < 16px y descuadra el
+     panel fijo en móvil. En táctil subimos el campo a 16px para evitarlo
+     (en desktop se queda compacto). */
+  @media (pointer: coarse), (max-width: 480px) { .mrc-input { font-size: var(--text-base); } }
   .mrc-send {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
@@ -351,6 +355,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px var(--space-3);
   }
   .mrc-chat .mrc-capture input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  /* iOS: evitar auto-zoom al enfocar (font-size >= 16px en táctil). */
+  @media (pointer: coarse), (max-width: 480px) { .mrc-chat .mrc-capture input { font-size: var(--text-base); } }
   .mrc-chat .mrc-cap-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   .mrc-chat .mrc-cap-consent { font-size: 10px; color: var(--fg-subtle); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-consent a { color: var(--accent-teal); text-decoration: underline; }

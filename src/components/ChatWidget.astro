@@ -1,11 +1,18 @@
 ---
 // ─────────────────────────────────────────────────────────────
-// ChatWidget — Asistente consultivo de Marcyan (v2).
+// ChatWidget — Asistente consultivo de Marcyan ("Marcy").
 // Isla cliente: botón flotante + panel de chat. Habla con /api/chat
 // (la API key vive en el servidor). Cuando el modelo lo decide, /api/chat
 // devuelve { action:{type:'capture'} } y el widget muestra una CAPTURA
-// INLINE mínima (nombre + email/teléfono) que postea al endpoint EXISTENTE
-// /api/brief. La PII viaja SOLO del formulario a /api/brief, NUNCA al modelo.
+// INLINE mínima (nombre + email/teléfono) que postea a /api/contact (leads)
+// o /api/handoff. La PII viaja SOLO del formulario a esos endpoints,
+// NUNCA al modelo.
+//
+// REDISEÑO (solo capa visual/UX): avatar ilustrado "Marcy" (MarcyAvatar),
+// pantalla de BIENVENIDA (avatar + temas + diagnóstico gratis), CONVERSACIÓN
+// con burbujas, y en móvil el panel va a PANTALLA COMPLETA. La lógica y el
+// blindaje del bot NO cambian (mismo contrato /api/chat, captura, handoff,
+// invitesContact, stripMarkdown, focus-trap, VisualViewport).
 //
 // SEGURIDAD: el texto del modelo se limpia de markdown y se pinta con
 // textContent (sin innerHTML); solo se "linkifican" tokens conocidos.
@@ -13,6 +20,7 @@
 // texto del modelo/usuario); los valores se asignan vía .value.
 // ─────────────────────────────────────────────────────────────
 import Icon from './ui/Icon.astro';
+import MarcyAvatar from './chat/MarcyAvatar.astro';
 import { nap } from '../i18n/content';
 
 interface Props { lang?: 'es' | 'en'; }
@@ -24,9 +32,12 @@ const STR = {
   es: {
     open: 'Abrir el chat de ayuda',
     close: 'Cerrar el chat',
-    title: 'Asistente Marcyan',
+    title: 'Marcy',
     status: 'Responde al instante',
-    greeting: '¡Hola! 👋 Soy el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento — y si quieres, te preparamos una muestra gratis de tu sitio.',
+    greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento — y si quieres, te preparamos una muestra gratis de tu sitio.',
+    welcomeTitle: 'Hola, soy Marcy',
+    welcomeSub: '¿En qué te ayudo hoy?',
+    fabNudge: '¿Necesitas ayuda?',
     placeholder: 'Escribe tu mensaje…',
     send: 'Enviar mensaje',
     typing: 'Escribiendo…',
@@ -53,13 +64,18 @@ const STR = {
     capTitleHuman: 'Te conecto con una persona',
     capSubHuman: 'Déjanos cómo contactarte y un asesor te escribe. (No es chat en vivo.)',
     capHandoffOk: 'Listo, le avisamos a una persona. Te contacta por email o WhatsApp pronto. 🙌',
+    ctaFree: 'Diagnóstico gratis',
+    ctaFreeMsg: 'Quiero un diagnóstico gratis de mi visibilidad en IA.',
   },
   en: {
     open: 'Open the help chat',
     close: 'Close the chat',
-    title: 'Marcyan Assistant',
+    title: 'Marcy',
     status: 'Replies instantly',
-    greeting: 'Hi! 👋 I’m Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you — and if you like, we’ll prepare a free sample of your site.',
+    greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you — and if you like, we’ll prepare a free sample of your site.',
+    welcomeTitle: 'Hi, I’m Marcy',
+    welcomeSub: 'How can I help you today?',
+    fabNudge: 'Need a hand?',
     placeholder: 'Type your message…',
     send: 'Send message',
     typing: 'Typing…',
@@ -85,25 +101,30 @@ const STR = {
     capTitleHuman: 'I’ll connect you with a person',
     capSubHuman: 'Leave your contact and an advisor will reach out. (Not live chat.)',
     capHandoffOk: 'Done — we notified a person. They’ll reach out by email or WhatsApp soon. 🙌',
+    ctaFree: 'Free diagnosis',
+    ctaFreeMsg: 'I’d like a free diagnosis of my AI visibility.',
   },
 };
-const CHIPS = {
+
+// Temas de la bienvenida (grid) + chips de respuesta rápida (conversación).
+// Cada uno SIEMBRA un mensaje de usuario (mismo patrón que ya existía).
+const TOPICS = {
   es: [
-    { label: 'Precios', msg: '¿Cuáles son sus precios?' },
-    { label: 'Diseño web', msg: 'Cuéntame sobre el diseño web.' },
-    { label: 'IA conversacional', msg: '¿Qué es la IA conversacional que ofrecen?' },
-    { label: 'Empezar', msg: '¿Cómo empiezo un proyecto con ustedes?' },
+    { label: 'Diseño web', icon: 'lucide:layout-dashboard', msg: 'Cuéntame sobre el diseño web.' },
+    { label: 'IA chatbot', icon: 'lucide:bot', msg: '¿Qué es la IA conversacional que ofrecen?' },
+    { label: 'Precios', icon: 'lucide:tag', msg: '¿Cuáles son sus precios?' },
+    { label: 'SEO para IA', icon: 'lucide:radar', msg: '¿Qué es el SEO para IA (AEO) y el diagnóstico?' },
   ],
   en: [
-    { label: 'Pricing', msg: 'What are your prices?' },
-    { label: 'Web design', msg: 'Tell me about your web design.' },
-    { label: 'AI assistant', msg: 'What is the AI assistant service?' },
-    { label: 'Get started', msg: 'How do I start a project with you?' },
+    { label: 'Web design', icon: 'lucide:layout-dashboard', msg: 'Tell me about your web design.' },
+    { label: 'AI chatbot', icon: 'lucide:bot', msg: 'What is the AI assistant service?' },
+    { label: 'Pricing', icon: 'lucide:tag', msg: 'What are your prices?' },
+    { label: 'AI SEO', icon: 'lucide:radar', msg: 'What is AI SEO (AEO) and the free diagnosis?' },
   ],
 };
 
 const t = STR[lang];
-const chips = CHIPS[lang];
+const topics = TOPICS[lang];
 
 // Tokens seguros que el cliente puede convertir en enlaces (nunca innerHTML del modelo).
 const links = [
@@ -115,7 +136,10 @@ const links = [
 const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)' };
 ---
 
-<div class="mrc-chat" id="mrc-chat" data-mrc-root>
+<div class="mrc-chat" id="mrc-chat" data-mrc-root data-stage="welcome">
+  <!-- Burbuja sutil de atención (aparece a los pocos segundos) -->
+  <span class="mrc-nudge" data-mrc-nudge hidden aria-hidden="true">{t.fabNudge}</span>
+
   <!-- Botón flotante -->
   <button
     type="button"
@@ -126,7 +150,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     aria-controls="mrc-chat-panel"
     aria-label={t.open}
   >
-    <span class="mrc-fab-ic mrc-fab-ic--open"><Icon name="lucide:message-circle" /></span>
+    <span class="mrc-fab-ic mrc-fab-ic--open"><MarcyAvatar variant="mini" uid="fab" class="mrc-fab-marcy" /></span>
     <span class="mrc-fab-ic mrc-fab-ic--close"><Icon name="lucide:x" /></span>
   </button>
 
@@ -137,28 +161,51 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     role="dialog"
     aria-modal="true"
     aria-label={t.title}
+    tabindex="-1"
     hidden
   >
+    <div class="mrc-fx" aria-hidden="true"></div>
+
     <header class="mrc-head">
-      <span class="mrc-avatar"><Icon name="lucide:bot" /></span>
-      <span class="mrc-head-tx">
-        <b>{t.title}</b>
-        <span class="mrc-status"><span class="mrc-live" aria-hidden="true"></span>{t.status}</span>
+      <span class="mrc-head-id">
+        <span class="mrc-avatar"><MarcyAvatar variant="mini" uid="head" /></span>
+        <span class="mrc-head-tx">
+          <b>{t.title}</b>
+          <span class="mrc-status"><span class="mrc-live" aria-hidden="true"></span>{t.status}</span>
+        </span>
       </span>
       <button type="button" class="mrc-human" data-mrc-human aria-label={t.human} title={t.human}>
-        <Icon name="lucide:user" />
+        <Icon name="lucide:user-round" />
       </button>
       <button type="button" class="mrc-close" data-mrc-close aria-label={t.close}>
         <Icon name="lucide:x" />
       </button>
     </header>
 
-    <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false">
-      <div class="mrc-bub mrc-ai">{t.greeting}</div>
+    <!-- Estado BIENVENIDA -->
+    <div class="mrc-welcome" data-mrc-welcome>
+      <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" uid="hero" /></span>
+      <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
+      <p class="mrc-welcome-sub">{t.welcomeSub}</p>
+      <div class="mrc-topics" data-mrc-topics>
+        {topics.map((tp) => (
+          <button type="button" class="mrc-topic" data-msg={tp.msg}>
+            <span class="mrc-topic-ic"><Icon name={tp.icon} /></span>
+            <span class="mrc-topic-tx">{tp.label}</span>
+          </button>
+        ))}
+      </div>
+      <button type="button" class="mrc-cta-free" data-msg={t.ctaFreeMsg}>
+        <span class="mrc-cta-ic"><Icon name="lucide:sparkles" /></span>
+        <span>{t.ctaFree}</span>
+      </button>
     </div>
 
+    <!-- Estado CONVERSACIÓN -->
+    <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false"></div>
+
     <div class="mrc-chips" data-mrc-chips>
-      {chips.map((c) => (
+      {topics.map((c) => (
         <button type="button" class="mrc-chip" data-msg={c.msg}>{c.label}</button>
       ))}
     </div>
@@ -193,19 +240,38 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 <style>
   .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); }
 
-  /* ── Botón flotante ─────────────────────────────────────── */
+  /* ── Burbuja de atención ────────────────────────────────── */
+  .mrc-nudge {
+    position: absolute; right: 66px; bottom: 14px; white-space: nowrap;
+    padding: 8px var(--space-3); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--accent-teal-line); color: var(--fg-primary);
+    font-family: var(--font-body); font-size: var(--text-xs);
+    box-shadow: var(--shadow-card);
+    animation: mrc-nudge-in var(--duration-slow) var(--ease-out-expo);
+  }
+  .mrc-nudge[hidden] { display: none; }
+  .mrc-nudge::after {
+    content: ''; position: absolute; right: -5px; top: 50%; transform: translateY(-50%) rotate(45deg);
+    width: 10px; height: 10px; background: var(--bg-elevated);
+    border-right: 1px solid var(--accent-teal-line); border-top: 1px solid var(--accent-teal-line);
+  }
+  @keyframes mrc-nudge-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+
+  /* ── Botón flotante (Marcy mini) ────────────────────────── */
   .mrc-fab {
     position: relative; display: inline-flex; align-items: center; justify-content: center;
-    width: 56px; height: 56px; min-width: var(--tap-min); min-height: var(--tap-min);
+    width: 58px; height: 58px; min-width: var(--tap-min); min-height: var(--tap-min);
     border-radius: 50%; cursor: pointer;
-    background: var(--accent-teal); color: var(--fg-inverse); border: none;
+    background: radial-gradient(circle at 50% 32%, var(--bg-elevated), var(--bg-base));
+    color: var(--fg-primary); border: 1px solid var(--accent-teal-line);
     box-shadow: var(--shadow-teal), 0 6px 24px rgba(0, 0, 0, 0.5);
     transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
   }
-  .mrc-fab:hover { transform: translateY(-2px) scale(1.04); }
+  .mrc-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-teal), 0 10px 32px rgba(0, 0, 0, 0.6); }
   .mrc-fab:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; }
-  .mrc-fab-ic { position: absolute; display: inline-flex; transition: opacity var(--duration-base), transform var(--duration-base); }
-  .mrc-fab-ic :global(svg) { width: 24px; height: 24px; stroke-width: 2; }
+  .mrc-fab-ic { position: absolute; display: inline-flex; align-items: center; justify-content: center; transition: opacity var(--duration-base), transform var(--duration-base); }
+  .mrc-fab-ic :global(svg) { width: 22px; height: 22px; stroke-width: 2; }
+  .mrc-fab-ic--open :global(.marcy) { width: 38px; height: 38px; }
   .mrc-fab-ic--close { opacity: 0; transform: rotate(-90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--open { opacity: 0; transform: rotate(90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--close { opacity: 1; transform: none; }
@@ -213,9 +279,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   /* ── Panel ──────────────────────────────────────────────── */
   .mrc-panel[hidden] { display: none; }
   .mrc-panel {
-    position: absolute; right: 0; bottom: calc(56px + var(--space-3));
+    position: absolute; right: 0; bottom: calc(58px + var(--space-3));
     display: flex; flex-direction: column;
-    width: min(380px, calc(100vw - 24px)); height: min(560px, calc(100vh - 120px));
+    width: min(384px, calc(100vw - 24px)); height: min(600px, calc(100vh - 100px));
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
     box-shadow: var(--shadow-modal); overflow: hidden;
     animation: mrc-in var(--duration-base) var(--ease-out-expo);
@@ -223,41 +289,97 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   @keyframes mrc-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
 
+  /* fondo ambiental (glow oro/teal + estrellas sutiles) */
+  .mrc-fx { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(150px 130px at 90% 4%, var(--accent-gold-glow), transparent 70%),
+      radial-gradient(190px 170px at 4% 98%, rgba(var(--accent-teal-rgb), 0.10), transparent 72%);
+  }
+  .mrc-fx::after {
+    content: ''; position: absolute; inset: 0; opacity: 0.5;
+    background-image:
+      radial-gradient(1.5px 1.5px at 18% 22%, rgba(var(--star-rgb), 0.6), transparent),
+      radial-gradient(1px 1px at 72% 14%, rgba(var(--star-rgb), 0.5), transparent),
+      radial-gradient(1px 1px at 40% 58%, rgba(var(--star-rgb), 0.4), transparent),
+      radial-gradient(1.5px 1.5px at 86% 72%, rgba(var(--star-rgb), 0.5), transparent),
+      radial-gradient(1px 1px at 26% 84%, rgba(var(--star-rgb), 0.45), transparent),
+      radial-gradient(1px 1px at 60% 36%, rgba(var(--star-rgb), 0.4), transparent);
+  }
+  /* contenido por encima del fondo */
+  .mrc-head, .mrc-welcome, .mrc-log, .mrc-chips, .mrc-form, .mrc-foot { position: relative; z-index: 1; }
+
   .mrc-head {
     display: flex; align-items: center; gap: var(--space-3);
     padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border);
     background: linear-gradient(180deg, var(--accent-teal-dim), transparent);
   }
+  .mrc-head-id { display: flex; align-items: center; gap: var(--space-3); flex: 1; min-width: 0; }
   .mrc-avatar {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
+    flex: 0 0 auto; display: grid; place-items: center; width: 38px; height: 38px;
+    background: radial-gradient(circle, var(--accent-teal-dim), transparent 70%);
   }
-  .mrc-avatar :global(svg) { width: 18px; height: 18px; }
-  .mrc-head-tx { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; flex: 1; }
-  .mrc-head-tx b { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
+  .mrc-avatar :global(.marcy) { width: 36px; height: 36px; }
+  .mrc-head-tx { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+  .mrc-head-tx b { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
   .mrc-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary); }
   .mrc-live { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: mrc-pulse 2s ease-out infinite; }
   @keyframes mrc-pulse { 0% { box-shadow: 0 0 0 0 var(--accent-teal-line); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  .mrc-close {
+  .mrc-close, .mrc-human {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
-    background: transparent; border: none; color: var(--fg-secondary); cursor: pointer;
+    background: transparent; border: none; cursor: pointer;
     transition: color var(--duration-fast), background var(--duration-fast);
   }
+  .mrc-close { color: var(--fg-secondary); }
   .mrc-close:hover { color: var(--fg-primary); background: var(--bg-elevated); }
-  .mrc-close:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-human {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
-    background: transparent; border: none; color: var(--accent-gold); cursor: pointer;
-    transition: color var(--duration-fast), background var(--duration-fast);
-  }
+  .mrc-human { color: var(--accent-gold); }
   .mrc-human:hover { background: var(--accent-gold-dim); }
-  .mrc-human:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-human :global(svg) { width: 18px; height: 18px; }
-  .mrc-close :global(svg) { width: 18px; height: 18px; }
+  .mrc-close:focus-visible, .mrc-human:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-human :global(svg), .mrc-close :global(svg) { width: 18px; height: 18px; }
 
+  /* ── Estado BIENVENIDA ──────────────────────────────────── */
+  .mrc-welcome {
+    flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: var(--space-2); padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+  .mrc-hero-avatar {
+    width: clamp(80px, 22vw, 100px); margin-top: 0;
+    filter: drop-shadow(0 8px 20px rgba(var(--accent-teal-rgb), 0.18));
+  }
+  .mrc-hero-avatar :global(.marcy) { width: 100%; }
+  .mrc-welcome-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
+  .mrc-welcome-sub { font-size: var(--text-sm); color: var(--fg-secondary); margin-top: calc(-1 * var(--space-1)); }
+  .mrc-topics {
+    width: 100%; max-width: 360px; margin-top: var(--space-2);
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);
+  }
+  .mrc-topic {
+    display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2);
+    padding: var(--space-3); border-radius: var(--radius-md); min-height: 56px; min-width: 0;
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); cursor: pointer;
+    text-align: left; font-family: var(--font-body); font-size: var(--text-sm);
+    transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), transform var(--duration-fast);
+  }
+  .mrc-topic:hover { border-color: var(--accent-teal-line); background: var(--accent-teal-dim); transform: translateY(-1px); }
+  .mrc-topic:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-topic-ic { display: inline-flex; color: var(--accent-teal); }
+  .mrc-topic-ic :global(svg) { width: 20px; height: 20px; }
+  .mrc-topic-tx { font-weight: 500; overflow-wrap: anywhere; }
+  .mrc-cta-free {
+    width: 100%; max-width: 360px;
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    padding: 12px var(--space-4); min-height: var(--tap-min); border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+    font-family: var(--font-display); font-weight: 600; font-size: var(--text-sm); cursor: pointer;
+    transition: color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+  }
+  .mrc-cta-free:hover { background: var(--accent-gold); color: var(--fg-inverse); box-shadow: var(--shadow-gold); transform: translateY(-1px); }
+  .mrc-cta-free:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .mrc-cta-ic { display: inline-flex; }
+  .mrc-cta-ic :global(svg) { width: 18px; height: 18px; }
+
+  /* ── Estado CONVERSACIÓN ────────────────────────────────── */
   .mrc-log {
     flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3);
     padding: var(--space-4); overflow-y: auto; overscroll-behavior: contain;
@@ -272,7 +394,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-chip:hover { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
   .mrc-chip:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-chips[hidden] { display: none; }
+
+  /* Cambio de estado: bienvenida ↔ conversación */
+  .mrc-chat[data-stage="welcome"] .mrc-log,
+  .mrc-chat[data-stage="welcome"] .mrc-chips,
+  .mrc-chat[data-stage="welcome"] .mrc-head-id,
+  .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
+  .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
+  .mrc-chat[data-stage="chat"] .mrc-welcome { display: none; }
 
   .mrc-form {
     display: flex; align-items: flex-end; gap: var(--space-2);
@@ -290,7 +419,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   /* iOS hace auto-zoom al enfocar un input con font-size < 16px y descuadra el
      panel fijo en móvil. En táctil subimos el campo a 16px para evitarlo
      (en desktop se queda compacto). */
-  @media (pointer: coarse), (max-width: 480px) { .mrc-input { font-size: var(--text-base); } }
+  @media (pointer: coarse), (--lt-sm) { .mrc-input { font-size: var(--text-base); } }
   .mrc-send {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
@@ -315,27 +444,31 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
   .mrc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-  /* Móvil: el panel es una hoja inferior CONSCIENTE DEL TECLADO. El JS expone
-     --mrc-kb (alto del teclado) y --mrc-vvh (alto visible real, VisualViewport)
-     para que el panel se quede por encima del teclado y no se pierda el header
-     ni el input al escribir. */
-  @media (max-width: 480px) {
+  /* Móvil: PANTALLA COMPLETA (sensación de app nativa), CONSCIENTE DEL TECLADO.
+     El JS expone --mrc-vvh (alto visible real), --mrc-vvtop (desplazamiento del
+     viewport visual) y --mrc-kb (alto del teclado, VisualViewport) para que el
+     panel ocupe el área visible y el input quede SIEMPRE por encima del teclado. */
+  @media (--lt-sm) {
     .mrc-panel {
-      position: fixed; left: 8px; right: 8px; width: auto;
-      bottom: calc(var(--mrc-kb, 0px) + 8px);
-      height: min(560px, calc(var(--mrc-vvh, 100dvh) - 16px));
+      position: fixed; left: 0; right: 0; bottom: auto;
+      top: var(--mrc-vvtop, 0px);
+      width: auto; height: var(--mrc-vvh, 100dvh);
+      border-radius: 0; border: none;
     }
+    .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
+    .mrc-topics, .mrc-cta-free { max-width: 420px; }
+    .mrc-welcome { justify-content: center; }
   }
 
   @media (--motion-reduce) {
-    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send { animation: none !important; transition: none !important; }
+    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-topic, .mrc-cta-free { animation: none !important; transition: none !important; }
   }
   @media print { .mrc-chat { display: none !important; } }
 </style>
 
 <style is:global>
-  /* Elementos dinámicos (los crea el JS → sin atributo de scope de Astro).
-     Scopeados a mano bajo .mrc-chat. */
+  /* Elementos dinámicos (los crea el JS → sin atributo de scope de Astro) y el
+     avatar Marcy (otro componente). Scopeados a mano bajo .mrc-chat. */
   .mrc-chat .mrc-bub {
     max-width: 88%; padding: var(--space-3) var(--space-4); border-radius: 14px;
     font-size: var(--text-sm); line-height: var(--leading-normal); word-wrap: break-word; white-space: pre-wrap;
@@ -353,6 +486,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   @keyframes mrc-typedot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .mrc-chat .mrc-typing span { animation: none; } }
 
+  /* Avatar Marcy: micro-animaciones (flota, parpadea, brilla) — solo con el
+     chat abierto y solo si el usuario no pidió reducir movimiento. */
+  .mrc-chat .marcy__eyes { transform-box: fill-box; transform-origin: center; }
+  @media (prefers-reduced-motion: no-preference) {
+    .mrc-chat[data-open] .marcy--hero .marcy__float { animation: mrc-float 4.5s ease-in-out infinite; }
+    .mrc-chat[data-open] .marcy__eyes { animation: mrc-blink 6s ease-in-out infinite; }
+    .mrc-chat[data-open] .marcy--hero .marcy__planet { animation: mrc-glow 5s ease-in-out infinite; }
+    .mrc-chat[data-open] .mrc-fx::after { animation: mrc-twinkle 7s ease-in-out infinite; }
+  }
+  @keyframes mrc-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @keyframes mrc-blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.12); } }
+  @keyframes mrc-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
+  @keyframes mrc-twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.28; } }
+
   /* Tarjeta de captura inline (HTML estático, sin datos del modelo/usuario) */
   .mrc-chat .mrc-capture {
     align-self: stretch; background: var(--bg-elevated); border: 1px solid var(--accent-teal-line);
@@ -368,7 +515,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-chat .mrc-capture input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
   /* iOS: evitar auto-zoom al enfocar (font-size >= 16px en táctil). */
-  @media (pointer: coarse), (max-width: 480px) { .mrc-chat .mrc-capture input { font-size: var(--text-base); } }
+  @media (pointer: coarse), (max-width: 479.98px) { .mrc-chat .mrc-capture input { font-size: var(--text-base); } }
   .mrc-chat .mrc-cap-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   .mrc-chat .mrc-cap-consent { font-size: 10px; color: var(--fg-subtle); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-consent a { color: var(--accent-teal); text-decoration: underline; }
@@ -405,7 +552,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     const input = root.querySelector('[data-mrc-input]');
     const sendBtn = root.querySelector('[data-mrc-send]');
     const chipRow = root.querySelector('[data-mrc-chips]');
+    const welcomeEl = root.querySelector('[data-mrc-welcome]');
     const leaveBtn = root.querySelector('[data-mrc-leave]');
+    const nudge = root.querySelector('[data-mrc-nudge]');
 
     const sid = (crypto && crypto.randomUUID)
       ? crypto.randomUUID()
@@ -415,7 +564,23 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let lastUserText = '';
     let busy = false;
     let opened = false;
+    let started = false;   // ya pasó de bienvenida a conversación
     let captured = false;  // ya envió sus datos
+
+    // Cambia de estado bienvenida → conversación; inyecta el saludo de Marcy
+    // como primera burbuja (display-only, NO entra al historial del modelo).
+    function setStage(s) { if (root) root.setAttribute('data-stage', s); }
+    function ensureChat() {
+      if (started) return;
+      started = true;
+      setStage('chat');
+      appendBubble('ai', T.greeting || '');
+      // El elemento activado (tema/CTA de bienvenida) se oculta al cambiar de
+      // estado → mover el foco a un elemento estable DENTRO del diálogo para no
+      // perder el focus-trap/ESC mientras /api/chat responde (el input está
+      // deshabilitado por setBusy; el finally lo re-enfoca al terminar).
+      if (opened && closeBtn) closeBtn.focus();
+    }
 
     // ── Linkify SEGURO: solo tokens conocidos → nodos DOM ──
     function linkify(text) {
@@ -461,8 +626,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (!text || busy) return;
       lastUserText = text;
       setBusy(true);
+      ensureChat();
       appendBubble('user', text);
-      if (chipRow) chipRow.hidden = true;
       if (input) input.value = '';
       autoGrow();
       showTyping();
@@ -505,8 +670,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     }
 
-    // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/brief) ──
+    // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/contact|/api/handoff) ──
     function openCapture(variant) {
+      ensureChat();
       if (captured) return;
       if (log.querySelector('[data-mrc-capture]')) { // ya hay una abierta → enfocar
         const n = log.querySelector('#mrc-c-name'); if (n) n.focus();
@@ -621,13 +787,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // ── Teclado móvil: ajusta el panel al área visible (VisualViewport) ──
     // Sin esto, al abrir el teclado el área visible se encoge pero el panel
     // fijo no, y se pierde el header/los mensajes. Exponemos --mrc-kb (alto del
-    // teclado) y --mrc-vvh (alto visible real) que el CSS móvil usa.
+    // teclado), --mrc-vvh (alto visible real) y --mrc-vvtop (desplazamiento del
+    // viewport visual) que el CSS de pantalla completa usa.
     const vv = window.visualViewport;
     function syncViewport() {
       if (!vv || !root) return;
       const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
       root.style.setProperty('--mrc-kb', kb + 'px');
       root.style.setProperty('--mrc-vvh', Math.round(vv.height) + 'px');
+      root.style.setProperty('--mrc-vvtop', Math.round(vv.offsetTop) + 'px');
       if (opened && log) log.scrollTop = log.scrollHeight;
     }
     if (vv) {
@@ -641,8 +809,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
+      if (nudge) nudge.hidden = true;
       syncViewport();
-      requestAnimationFrame(() => { if (input) input.focus(); });
+      requestAnimationFrame(() => {
+        // En bienvenida NO enfocamos el input (en móvil abriría el teclado y
+        // taparía el grid); enfocamos el primer tema. En conversación, el input.
+        if (root.getAttribute('data-stage') === 'chat' && input) { input.focus(); return; }
+        const first = panel.querySelector('[data-mrc-topics] .mrc-topic');
+        (first || closeBtn || panel).focus();
+      });
     }
     function closePanel() {
       panel.hidden = true;
@@ -651,6 +826,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       opened = false;
       if (input) input.blur();         // cierra el teclado
       root.style.setProperty('--mrc-kb', '0px');
+      root.style.setProperty('--mrc-vvtop', '0px');
       fab.focus();
     }
     function toggle() { (opened ? closePanel : openPanel)(); }
@@ -668,13 +844,31 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
       });
     }
-    if (chipRow) {
-      chipRow.addEventListener('click', (e) => {
+    // Grid de temas (bienvenida) y chips de respuesta rápida (conversación):
+    // ambos SIEMBRAN un mensaje de usuario.
+    function seedFrom(container) {
+      if (!container) return;
+      container.addEventListener('click', (e) => {
         const btn = e.target && e.target.closest ? e.target.closest('[data-msg]') : null;
         if (btn) send(btn.getAttribute('data-msg'));
       });
     }
+    seedFrom(welcomeEl);
+    seedFrom(chipRow);
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
+
+    // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.
+    try {
+      if (nudge && !sessionStorage.getItem('mrcNudge')) {
+        setTimeout(() => {
+          if (!opened && nudge) {
+            nudge.hidden = false;
+            try { sessionStorage.setItem('mrcNudge', '1'); } catch (_) {}
+            setTimeout(() => { if (nudge && !opened) nudge.hidden = true; }, 9000);
+          }
+        }, 3500);
+      }
+    } catch (_) {}
 
     // Al enfocar un campo: reajusta al teclado y, si está dentro del log (campos
     // de la captura), lo deja a la vista por encima del teclado.

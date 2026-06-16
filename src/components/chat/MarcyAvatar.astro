@@ -1,143 +1,54 @@
 ---
 // ─────────────────────────────────────────────────────────────
-// MarcyAvatar — mascota ORIGINAL del asistente "Marcy" (Marcyan).
-// SVG vectorial inline: transparente, escala perfecta (héroe ~112px y
-// mini ~26px), 0 peticiones de red y temable con los tokens del DS.
-// Es un robot cute glossy estilo mascota de app: cuerpo carbón, ojos teal
-// con glow, acentos oro y un mini-planeta en la antena (guiño marciano).
+// MarcyAvatar — mascota del asistente "Marcy" (Marcyan).
+// Render 3D APROBADO por el dueño (robot negro glossy, ojos teal con glow,
+// acentos oro, audífonos, anillo de Saturno sobre la cabeza + planeta en el
+// pecho = motivo marciano). Entregado como imagen optimizada con transparencia.
 //
-// SWAP a render 3D (fase 2, opcional): cuando el dueño genere a Marcy con
-// el prompt del plan (Midjourney/DALL·E/Meshy → PNG/WebP transparente),
-// dejar el WebP en public/assets/bot/ y reemplazar el <svg> de la variante
-// por <img src="/assets/bot/marcy-<variant>.webp" alt="" loading="lazy" />.
-// El cableado (clases marcy/marcy__float/marcy__eyes y los tamaños) queda
-// igual; solo cambia el contenido del avatar. Ver public/assets/bot/README.md.
+//   variant="hero" → pose completa flotando (pantalla de bienvenida)  ~364×512
+//   variant="mini" → busto (cabeza + cascos + anillo + planeta) para header/FAB  256×256
 //
-// IDs de gradiente/glow prefijados con `uid` → varias instancias en la
-// misma página (héroe + mini + FAB) sin colisión de IDs.
+// Cada variante es <picture> con WebP (principal) + PNG (fallback), width/height
+// explícitos (sin layout shift). El "parpadeo" del SVG anterior ya no aplica
+// (imagen estática); la flotación y el glow ambiental viven en ChatWidget.
+// reduced-motion → fijo.
+//
+// defer=true (lo usa el héroe): NO pone el src real en el HTML; lo deja en
+// data-src/data-srcset y un placeholder transparente. ChatWidget lo activa al
+// ABRIR el chat → el asset grande NO se descarga en el render inicial del sitio.
+// (El mini va eager: el FAB es visible y ya lo muestra; el header reusa la caché.)
+//
+// Fuente: public/assets/bot/marcy-{hero,mini}.{webp,png} (ver README.md de esa
+// carpeta para regenerarlos desde el render original).
 // ─────────────────────────────────────────────────────────────
-interface Props { variant?: 'hero' | 'mini'; uid?: string; class?: string; }
-const { variant = 'mini', uid = 'm', class: cls = '' } = Astro.props;
-const p = `mrcy-${uid}`;
+interface Props { variant?: 'hero' | 'mini'; defer?: boolean; class?: string; }
+const { variant = 'mini', defer = false, class: cls = '' } = Astro.props;
+
+const dims = variant === 'hero' ? { w: 364, h: 512 } : { w: 256, h: 256 };
+// El héroe lleva alt descriptivo (la imagen aporta significado en la bienvenida);
+// el mini es DECORATIVO (siempre va junto al texto "Marcy") → alt vacío.
+const alt = variant === 'hero' ? 'Marcy, el asistente de Marcyan' : '';
+const webp = `/assets/bot/marcy-${variant}.webp`;
+const png = `/assets/bot/marcy-${variant}.png`;
+// GIF 1×1 transparente (placeholder mientras el héroe está diferido).
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 ---
-{variant === 'hero' ? (
-  <svg
-    class={`marcy marcy--hero ${cls}`}
-    viewBox="0 0 200 224"
-    fill="none"
-    role="img"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <linearGradient id={`${p}-body`} x1="100" y1="44" x2="100" y2="150" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#2c2c2c" />
-        <stop offset="0.45" stop-color="#161616" />
-        <stop offset="1" stop-color="#090909" />
-      </linearGradient>
-      <linearGradient id={`${p}-torso`} x1="100" y1="146" x2="100" y2="214" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#222" />
-        <stop offset="1" stop-color="#070707" />
-      </linearGradient>
-      <radialGradient id={`${p}-visor`} cx="0.5" cy="0.32" r="0.85">
-        <stop offset="0" stop-color="#0d1f1a" />
-        <stop offset="1" stop-color="#020605" />
-      </radialGradient>
-      <radialGradient id={`${p}-planet`} cx="0.35" cy="0.3" r="0.9">
-        <stop offset="0" stop-color="#ecd3a4" />
-        <stop offset="1" stop-color="#a47c3e" />
-      </radialGradient>
-    </defs>
-
-    <!-- sombra de suelo (estática, no flota → da sensación 3D) -->
-    <ellipse cx="100" cy="216" rx="46" ry="7" fill="#000" opacity="0.28" />
-
-    <g class="marcy__float">
-      <!-- antena + planeta marciano -->
-      <g class="marcy__planet">
-        <circle cx="100" cy="24" r="11" fill={`url(#${p}-planet)`} opacity="0.22" />
-        <path d="M100 52 V31" stroke="#c8a96e" stroke-width="3" stroke-linecap="round" />
-        <ellipse cx="100" cy="24" rx="13" ry="5" fill="none" stroke="#c8a96e" stroke-width="2" opacity="0.85" transform="rotate(-20 100 24)" />
-        <circle cx="100" cy="24" r="5.5" fill={`url(#${p}-planet)`} />
-      </g>
-
-      <!-- orejas / acentos oro -->
-      <rect x="45" y="86" width="9" height="24" rx="4.5" fill="#c8a96e" opacity="0.9" />
-      <rect x="146" y="86" width="9" height="24" rx="4.5" fill="#c8a96e" opacity="0.9" />
-
-      <!-- torso / hombros -->
-      <rect x="44" y="150" width="112" height="70" rx="34" fill={`url(#${p}-torso)`} />
-      <circle cx="100" cy="182" r="6.5" fill={`url(#${p}-planet)`} />
-      <circle cx="100" cy="182" r="11" fill="#c8a96e" opacity="0.18" />
-
-      <!-- cabeza -->
-      <rect x="52" y="50" width="96" height="92" rx="34" fill={`url(#${p}-body)`} stroke="#3a3a38" stroke-width="1" />
-      <!-- gloss superior -->
-      <ellipse cx="100" cy="68" rx="38" ry="15" fill="#fff" opacity="0.06" />
-      <!-- rim teal/oro sutil -->
-      <path d="M66 60 Q56 76 58 100" stroke="#4fc3a1" stroke-width="2" opacity="0.25" stroke-linecap="round" />
-      <path d="M134 60 Q144 76 142 100" stroke="#c8a96e" stroke-width="2" opacity="0.25" stroke-linecap="round" />
-
-      <!-- visor -->
-      <rect x="64" y="68" width="72" height="52" rx="24" fill={`url(#${p}-visor)`} stroke="#4fc3a1" stroke-opacity="0.30" stroke-width="1" />
-
-      <!-- ojos (parpadean) -->
-      <g class="marcy__eyes">
-        <ellipse cx="86" cy="92" rx="9" ry="11" fill="#4fc3a1" opacity="0.22" />
-        <ellipse cx="114" cy="92" rx="9" ry="11" fill="#4fc3a1" opacity="0.22" />
-        <rect x="81" y="85" width="10" height="15" rx="5" fill="#5fe0bb" />
-        <rect x="109" y="85" width="10" height="15" rx="5" fill="#5fe0bb" />
-        <circle cx="84" cy="89" r="1.6" fill="#eafff8" />
-        <circle cx="112" cy="89" r="1.6" fill="#eafff8" />
-      </g>
-
-      <!-- sonrisa -->
-      <path d="M89 110 Q100 117 111 110" stroke="#4fc3a1" stroke-width="2.4" stroke-linecap="round" opacity="0.8" />
-    </g>
-  </svg>
-) : (
-  <svg
-    class={`marcy marcy--mini ${cls}`}
-    viewBox="0 0 64 64"
-    fill="none"
-    role="img"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <linearGradient id={`${p}-body`} x1="32" y1="12" x2="32" y2="54" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#2c2c2c" />
-        <stop offset="1" stop-color="#0a0a0a" />
-      </linearGradient>
-      <radialGradient id={`${p}-visor`} cx="0.5" cy="0.32" r="0.85">
-        <stop offset="0" stop-color="#0d1f1a" />
-        <stop offset="1" stop-color="#020605" />
-      </radialGradient>
-    </defs>
-
-    <g class="marcy__float">
-      <!-- antena -->
-      <path d="M32 15 V8" stroke="#c8a96e" stroke-width="2.4" stroke-linecap="round" />
-      <circle cx="32" cy="6" r="3.4" fill="#c8a96e" />
-      <!-- orejas oro -->
-      <rect x="8" y="28" width="5" height="13" rx="2.5" fill="#c8a96e" opacity="0.9" />
-      <rect x="51" y="28" width="5" height="13" rx="2.5" fill="#c8a96e" opacity="0.9" />
-      <!-- cabeza -->
-      <rect x="12" y="15" width="40" height="39" rx="16" fill={`url(#${p}-body)`} stroke="#3a3a38" stroke-width="1" />
-      <ellipse cx="32" cy="24" rx="15" ry="6" fill="#fff" opacity="0.06" />
-      <!-- visor -->
-      <rect x="18" y="23" width="28" height="21" rx="10" fill={`url(#${p}-visor)`} stroke="#4fc3a1" stroke-opacity="0.30" stroke-width="1" />
-      <!-- ojos -->
-      <g class="marcy__eyes">
-        <rect x="24" y="29" width="6" height="9" rx="3" fill="#5fe0bb" />
-        <rect x="34" y="29" width="6" height="9" rx="3" fill="#5fe0bb" />
-      </g>
-      <!-- sonrisa -->
-      <path d="M27 41 Q32 45 37 41" stroke="#4fc3a1" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
-    </g>
-  </svg>
-)}
+<picture class={`marcy marcy--${variant} ${cls}`}>
+  <source srcset={defer ? undefined : webp} data-srcset={defer ? webp : undefined} type="image/webp" />
+  <img
+    src={defer ? BLANK : png}
+    data-src={defer ? png : undefined}
+    data-mrc-defer={defer ? '' : undefined}
+    alt={alt}
+    width={dims.w}
+    height={dims.h}
+    loading={defer ? 'lazy' : 'eager'}
+    decoding="async"
+    draggable="false"
+  />
+</picture>
 
 <style>
-  .marcy { display: block; width: 100%; height: auto; overflow: visible; }
+  .marcy { display: block; line-height: 0; }
+  .marcy img { display: block; max-width: 100%; height: auto; -webkit-user-select: none; user-select: none; }
 </style>

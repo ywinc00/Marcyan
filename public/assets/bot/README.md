@@ -1,32 +1,50 @@
 # Avatar de "Marcy" (asistente del sitio)
 
-Hoy el avatar es un **SVG vectorial original** (`src/components/chat/MarcyAvatar.astro`):
-transparente, escala perfecta, 0 peticiones de red y temable con los tokens del DS.
-No hace falta ningún archivo aquí para que funcione.
+Avatar = **render 3D aprobado** (robot negro glossy, ojos teal con glow, acentos
+oro, audífonos, anillo de Saturno sobre la cabeza + planeta en el pecho). Se sirve
+como imagen optimizada con **fondo transparente**.
 
-## Cómo cambiar a un render 3D (fase 2, opcional)
+## Archivos (los consume `src/components/chat/MarcyAvatar.astro`)
 
-1. Genera a Marcy con este prompt (Midjourney / DALL·E / Meshy), fondo **transparente**:
+| Archivo            | Uso                                   | Tamaño aprox |
+|--------------------|---------------------------------------|--------------|
+| `marcy-hero.webp`  | pose completa — pantalla de bienvenida | 364×512, ~53KB |
+| `marcy-hero.png`   | fallback PNG del héroe                  | 364×512, ~270KB |
+| `marcy-mini.webp`  | busto (cabeza+cascos+anillo+planeta) — header/FAB | 256×256, ~26KB |
+| `marcy-mini.png`   | fallback PNG del mini                   | 256×256, ~122KB |
 
-   > A cute friendly 3D robot mascot, glossy smooth rounded design, premium app-mascot
-   > style (Pixar-like), dark charcoal near-black glossy body, glowing soft teal eyes,
-   > gold metallic accents and a small gold chest light, a tiny orbiting planet/ring emblem
-   > as a space motif, warm curious helpful expression, gently floating pose, soft studio
-   > lighting with subtle teal and gold rim light, clean minimal, isolated on transparent
-   > background, high detail —no text, low-poly, fragmented, neon, purple, blue
+`MarcyAvatar.astro` usa `<picture>` (WebP + PNG fallback). El **héroe carga
+diferido** (`defer` → `data-src`, lo activa el JS al ABRIR el chat) para no pesar
+en el render inicial del sitio; el **mini va eager** porque el FAB es visible.
 
-2. Exporta y optimiza a **WebP** (con PNG de respaldo) y déjalos aquí:
-   - `marcy-hero.webp` / `marcy-hero.png`  → ~512px (pantalla de bienvenida)
-   - `marcy-mini.webp` / `marcy-mini.png`  → ~96px  (header + botón flotante)
+## Regenerar desde un render nuevo
 
-3. En `src/components/chat/MarcyAvatar.astro`, reemplaza el `<svg>` de cada variante por:
+Deja el render fuente (PNG transparente, vertical) como `marcy-hero.png` y corre
+(necesita `sharp`, ya está en `node_modules`):
 
-   ```html
-   <picture>
-     <source srcset="/assets/bot/marcy-hero.webp" type="image/webp" />
-     <img class="marcy marcy--hero" src="/assets/bot/marcy-hero.png" alt="" loading="lazy" decoding="async" />
-   </picture>
-   ```
+```js
+const sharp = require('sharp');
+const src = await sharp('public/assets/bot/marcy-hero.png').ensureAlpha().toBuffer();
+// HERO: recorta el margen transparente del cuerpo y escala a 512 de alto.
+//   Ajusta el bbox {left,top,width,height} al nuevo render (mide el área opaca).
+const hero = { left:123, top:176, width:769, height:1081 };
+await sharp(src).extract(hero).resize({height:512}).webp({quality:84, alphaQuality:100}).toFile('public/assets/bot/marcy-hero.webp');
+await sharp(src).extract(hero).resize({height:512}).png({compressionLevel:9}).toFile('public/assets/bot/marcy-hero.png');
+// MINI: recorta el busto (cabeza + cascos + anillo + planeta) y escala a 256².
+const mini = { left:139, top:206, width:730, height:730 };
+await sharp(src).extract(mini).resize(256,256).webp({quality:86, alphaQuality:100}).toFile('public/assets/bot/marcy-mini.webp');
+await sharp(src).extract(mini).resize(256,256).png({compressionLevel:9}).toFile('public/assets/bot/marcy-mini.png');
+```
 
-El cableado del widget (clases `marcy` / `marcy__float` / `marcy__eyes`, tamaños y
-animaciones) no cambia: solo se sustituye el contenido del avatar.
+Si el fondo NO es transparente (sale recuadro sobre el panel oscuro), recórtalo
+primero. El cableado del widget (clases, tamaños, animación de flotar) no cambia:
+solo se sustituyen estos 4 archivos.
+
+## Prompt del personaje (para generar otra pose/estado)
+
+> A cute friendly 3D robot mascot, glossy smooth rounded design, premium app-mascot
+> style (Pixar-like), dark charcoal near-black glossy body, glowing soft teal eyes,
+> gold metallic accents and a small gold chest light, a tiny orbiting planet/ring emblem
+> as a space motif, warm curious helpful expression, gently floating pose, soft studio
+> lighting with subtle teal and gold rim light, clean minimal, isolated on transparent
+> background, high detail —no text, low-poly, fragmented, neon, purple, blue

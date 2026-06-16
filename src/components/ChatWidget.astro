@@ -150,7 +150,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     aria-controls="mrc-chat-panel"
     aria-label={t.open}
   >
-    <span class="mrc-fab-ic mrc-fab-ic--open"><MarcyAvatar variant="mini" uid="fab" class="mrc-fab-marcy" /></span>
+    <span class="mrc-fab-ic mrc-fab-ic--open"><MarcyAvatar variant="mini" class="mrc-fab-marcy" /></span>
     <span class="mrc-fab-ic mrc-fab-ic--close"><Icon name="lucide:x" /></span>
   </button>
 
@@ -168,7 +168,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     <header class="mrc-head">
       <span class="mrc-head-id">
-        <span class="mrc-avatar"><MarcyAvatar variant="mini" uid="head" /></span>
+        <span class="mrc-avatar"><MarcyAvatar variant="mini" defer /></span>
         <span class="mrc-head-tx">
           <b>{t.title}</b>
           <span class="mrc-status"><span class="mrc-live" aria-hidden="true"></span>{t.status}</span>
@@ -184,7 +184,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     <!-- Estado BIENVENIDA -->
     <div class="mrc-welcome" data-mrc-welcome>
-      <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" uid="hero" /></span>
+      <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer /></span>
       <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
       <p class="mrc-welcome-sub">{t.welcomeSub}</p>
       <div class="mrc-topics" data-mrc-topics>
@@ -271,7 +271,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-fab:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; }
   .mrc-fab-ic { position: absolute; display: inline-flex; align-items: center; justify-content: center; transition: opacity var(--duration-base), transform var(--duration-base); }
   .mrc-fab-ic :global(svg) { width: 22px; height: 22px; stroke-width: 2; }
-  .mrc-fab-ic--open :global(.marcy) { width: 38px; height: 38px; }
+  .mrc-fab-ic--open :global(.marcy img) { width: 40px; height: 40px; }
   .mrc-fab-ic--close { opacity: 0; transform: rotate(-90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--open { opacity: 0; transform: rotate(90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--close { opacity: 1; transform: none; }
@@ -318,7 +318,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     flex: 0 0 auto; display: grid; place-items: center; width: 38px; height: 38px;
     background: radial-gradient(circle, var(--accent-teal-dim), transparent 70%);
   }
-  .mrc-avatar :global(.marcy) { width: 36px; height: 36px; }
+  .mrc-avatar :global(.marcy img) { width: 38px; height: 38px; }
   .mrc-head-tx { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
   .mrc-head-tx b { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
   .mrc-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary); }
@@ -344,10 +344,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     gap: var(--space-2); padding: var(--space-4) var(--space-4) var(--space-3);
   }
   .mrc-hero-avatar {
-    width: clamp(80px, 22vw, 100px); margin-top: 0;
-    filter: drop-shadow(0 8px 20px rgba(var(--accent-teal-rgb), 0.18));
+    margin-top: 0;
+    filter: drop-shadow(0 10px 22px rgba(var(--accent-teal-rgb), 0.20));
   }
-  .mrc-hero-avatar :global(.marcy) { width: 100%; }
+  .mrc-hero-avatar :global(.marcy img) { height: clamp(96px, 23vw, 108px); width: auto; max-width: none; }
   .mrc-welcome-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
   .mrc-welcome-sub { font-size: var(--text-sm); color: var(--fg-secondary); margin-top: calc(-1 * var(--space-1)); }
   .mrc-topics {
@@ -486,18 +486,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   @keyframes mrc-typedot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .mrc-chat .mrc-typing span { animation: none; } }
 
-  /* Avatar Marcy: micro-animaciones (flota, parpadea, brilla) — solo con el
-     chat abierto y solo si el usuario no pidió reducir movimiento. */
-  .mrc-chat .marcy__eyes { transform-box: fill-box; transform-origin: center; }
+  /* Avatar Marcy (imagen): el héroe flota suave; el glow ambiental (.mrc-fx)
+     titila. Solo con el chat abierto y si el usuario no pidió reducir movimiento
+     (imagen estática en reduced-motion). */
   @media (prefers-reduced-motion: no-preference) {
-    .mrc-chat[data-open] .marcy--hero .marcy__float { animation: mrc-float 4.5s ease-in-out infinite; }
-    .mrc-chat[data-open] .marcy__eyes { animation: mrc-blink 6s ease-in-out infinite; }
-    .mrc-chat[data-open] .marcy--hero .marcy__planet { animation: mrc-glow 5s ease-in-out infinite; }
+    .mrc-chat[data-open] .marcy--hero img { animation: mrc-float 4.5s ease-in-out infinite; }
     .mrc-chat[data-open] .mrc-fx::after { animation: mrc-twinkle 7s ease-in-out infinite; }
   }
   @keyframes mrc-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-  @keyframes mrc-blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.12); } }
-  @keyframes mrc-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
   @keyframes mrc-twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.28; } }
 
   /* Tarjeta de captura inline (HTML estático, sin datos del modelo/usuario) */
@@ -803,8 +799,24 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       vv.addEventListener('scroll', syncViewport);
     }
 
+    // El asset grande del avatar (héroe) está diferido (data-src) para no
+    // descargarlo en el render inicial del sitio. Se activa al abrir el chat.
+    let deferredLoaded = false;
+    function loadDeferredAssets() {
+      if (deferredLoaded) return;
+      deferredLoaded = true;
+      root.querySelectorAll('[data-mrc-defer]').forEach((img) => {
+        const pic = img.closest('picture');
+        if (pic) pic.querySelectorAll('source[data-srcset]').forEach((s) => { s.srcset = s.getAttribute('data-srcset'); });
+        const ds = img.getAttribute('data-src');
+        if (ds) img.src = ds;
+        img.removeAttribute('data-mrc-defer');
+      });
+    }
+
     // ── Abrir / cerrar panel ──
     function openPanel() {
+      loadDeferredAssets();
       panel.hidden = false;
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');

@@ -315,6 +315,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
   .mrc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
+  /* Móvil: el panel es una hoja inferior CONSCIENTE DEL TECLADO. El JS expone
+     --mrc-kb (alto del teclado) y --mrc-vvh (alto visible real, VisualViewport)
+     para que el panel se quede por encima del teclado y no se pierda el header
+     ni el input al escribir. */
+  @media (max-width: 480px) {
+    .mrc-panel {
+      position: fixed; left: 8px; right: 8px; width: auto;
+      bottom: calc(var(--mrc-kb, 0px) + 8px);
+      height: min(560px, calc(var(--mrc-vvh, 100dvh) - 16px));
+    }
+  }
+
   @media (--motion-reduce) {
     .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send { animation: none !important; transition: none !important; }
   }
@@ -606,12 +618,30 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       }
     }
 
+    // ── Teclado móvil: ajusta el panel al área visible (VisualViewport) ──
+    // Sin esto, al abrir el teclado el área visible se encoge pero el panel
+    // fijo no, y se pierde el header/los mensajes. Exponemos --mrc-kb (alto del
+    // teclado) y --mrc-vvh (alto visible real) que el CSS móvil usa.
+    const vv = window.visualViewport;
+    function syncViewport() {
+      if (!vv || !root) return;
+      const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      root.style.setProperty('--mrc-kb', kb + 'px');
+      root.style.setProperty('--mrc-vvh', Math.round(vv.height) + 'px');
+      if (opened && log) log.scrollTop = log.scrollHeight;
+    }
+    if (vv) {
+      vv.addEventListener('resize', syncViewport);
+      vv.addEventListener('scroll', syncViewport);
+    }
+
     // ── Abrir / cerrar panel ──
     function openPanel() {
       panel.hidden = false;
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
+      syncViewport();
       requestAnimationFrame(() => { if (input) input.focus(); });
     }
     function closePanel() {
@@ -619,6 +649,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       root.removeAttribute('data-open');
       fab.setAttribute('aria-expanded', 'false');
       opened = false;
+      if (input) input.blur();         // cierra el teclado
+      root.style.setProperty('--mrc-kb', '0px');
       fab.focus();
     }
     function toggle() { (opened ? closePanel : openPanel)(); }
@@ -643,6 +675,17 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       });
     }
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
+
+    // Al enfocar un campo: reajusta al teclado y, si está dentro del log (campos
+    // de la captura), lo deja a la vista por encima del teclado.
+    panel.addEventListener('focusin', () => {
+      syncViewport();
+      setTimeout(() => {
+        syncViewport();
+        const a = document.activeElement;
+        if (a && a.scrollIntoView && log && log.contains(a)) a.scrollIntoView({ block: 'center' });
+      }, 280);
+    });
 
     // ESC + focus-trap dentro del panel
     panel.addEventListener('keydown', (e) => {

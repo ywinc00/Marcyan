@@ -133,6 +133,7 @@ export const content = {
       title: 'Trabajo real, negocios<br><em>reales</em>',
       cta: { label: 'Inicia tu proyecto', href: '#contacto' },
       more: 'Ver Proyectos',
+      shotAlt: { pc: 'vista de escritorio', movil: 'vista móvil' },
       items: [
         { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'gold', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
         { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Reconstruido desde cero + SEO local — ya posiciona.', accent: 'teal', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
@@ -346,6 +347,7 @@ export const content = {
       title: 'Real work, real<br><em>businesses</em>',
       cta: { label: 'Start your project', href: '#contacto' },
       more: 'View Projects',
+      shotAlt: { pc: 'desktop view', movil: 'mobile view' },
       items: [
         { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', url: 'https://texasrushremove.com', display: 'texasrushremove.com', result: 'Full rebuild from scratch + local SEO — now ranking.', accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
         { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', url: 'https://movejunkaway.com', display: 'movejunkaway.com', result: 'Rebuilt from scratch + local SEO — now ranking.', accent: 'teal', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },

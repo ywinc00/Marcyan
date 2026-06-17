@@ -61,17 +61,19 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
               {/* TELÉFONO */}
               <div class="dv-phone">
                 <span class="dv-island" aria-hidden="true"></span>
-                {shot ? (
-                  <img
-                    class="dv-pshot"
-                    src={`/Galeria/${shot.slug}-movil.webp`}
-                    alt={`${p.name} — ${projects.shotAlt?.movil ?? 'móvil'}`}
-                    width="1320" height={shot.mh}
-                    loading={eager ? 'eager' : 'lazy'} decoding="async"
-                  />
-                ) : (
-                  <div class="dv-pwire" aria-hidden="true"></div>
-                )}
+                <div class="dv-pscreen">
+                  {shot ? (
+                    <img
+                      class="dv-pshot"
+                      src={`/Galeria/${shot.slug}-movil.webp`}
+                      alt={`${p.name} — ${projects.shotAlt?.movil ?? 'móvil'}`}
+                      width="1320" height={shot.mh}
+                      loading={eager ? 'eager' : 'lazy'} decoding="async"
+                    />
+                  ) : (
+                    <div class="dv-pwire" aria-hidden="true"></div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -124,12 +126,13 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
   /* ── LAPTOP realista ───────────────────────────────────── */
   .dv-laptop {
     position: absolute; left: 50%; top: 50%; transform: translate(-58%, -52%); width: 70%;
-    filter: drop-shadow(0 24px 34px rgba(0, 0, 0, 0.5));
   }
+  /* sombra vía box-shadow (NO filter): el filtro rasteriza la imagen y la ablanda
+     en monitores DPR 1; con box-shadow la captura se renderiza nítida. */
   .dv-screen {
     position: relative; background: #0a0a0b; border: 1px solid #34343a;
     border-radius: 12px 12px 5px 5px; padding: 7px 7px 9px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: 0 22px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
   .dv-cam {
     position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
@@ -156,17 +159,21 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
 
   /* ── TELÉFONO realista (flota en frente, a la derecha) ──── */
   .dv-phone {
-    position: absolute; right: 3%; bottom: 5%; z-index: 3; width: 26%; aspect-ratio: 9 / 19.5;
-    background: #0a0a0b; border: 1px solid #34343a; border-radius: clamp(14px, 1.6vw, 22px); padding: 4px;
-    box-shadow: 0 26px 42px rgba(0, 0, 0, 0.62), 0 3px 8px rgba(0, 0, 0, 0.4);
+    position: absolute; right: 3%; bottom: 13%; z-index: 3; width: 24%; aspect-ratio: 9 / 16;
+    background: #0a0a0b; border: 1px solid #34343a; border-radius: clamp(13px, 1.5vw, 20px); padding: 4px;
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.6), 0 3px 8px rgba(0, 0, 0, 0.4);
   }
-  .dv-pshot, .dv-pwire {
-    display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center;
-    border-radius: clamp(11px, 1.3vw, 18px); background: var(--bg-base);
+  .dv-pscreen {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    border-radius: clamp(10px, 1.3vw, 16px); background: var(--bg-base);
   }
+  /* proporción 9/16 ≈ la de las capturas → object-fit cover llena el marco y
+     recorta SÓLO abajo (no los costados; el recorte lateral queda < 3%). */
+  .dv-pshot { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .dv-pwire { width: 100%; height: 100%; }
   .dv-island {
     position: absolute; top: 7px; left: 50%; transform: translateX(-50%); z-index: 4;
-    width: 32%; height: 6px; border-radius: 100px; background: #000;
+    width: 30%; height: 6px; border-radius: 100px; background: #000;
   }
 
   /* ── info ──────────────────────────────────────────────── */

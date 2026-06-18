@@ -138,7 +138,7 @@ export const seoIaPage = {
     items: [
       { icon: 'lucide:search', title: 'Bing Places (la base de ChatGPT)', desc: 'ChatGPT consulta Bing, no Google. Damos de alta y optimizamos tu Bing Places — el paso fácil que casi nadie da.' },
       { icon: 'lucide:braces', title: 'Datos estructurados (schema)', desc: 'Marcamos tu información en JSON-LD para que los asistentes entiendan quién eres, qué ofreces y a qué precio.' },
-      { icon: 'lucide:messages-square', title: 'Respuestas listas para citar', desc: 'Preguntas y respuestas claras en español e inglés, en el formato corto de 40-60 palabras (answer-first) que la IA cita textualmente.' },
+      { icon: 'marcyan-ai', title: 'Respuestas listas para citar', desc: 'Preguntas y respuestas claras en español e inglés, en el formato corto de 40-60 palabras (answer-first) que la IA cita textualmente.' },
       { icon: 'lucide:list-checks', title: 'NAP consistente y directorios', desc: 'Tu nombre, dirección y teléfono iguales en todas partes — la IA saca buena parte de sus datos locales de ahí.' },
       { icon: 'lucide:gauge', title: 'HTML que la IA sí lee', desc: 'Los rastreadores de IA no ejecutan JavaScript. Construimos en HTML estático (Astro), legible para ellos; si un sitio depende de JavaScript para mostrar su contenido, la IA puede no verlo.' },
       { icon: 'lucide:line-chart', title: 'Medición y ajuste', desc: 'Seguimos cómo te ven y te mencionan los asistentes, y ajustamos. La visibilidad en IA es volátil — por eso se cuida mes a mes.' },
@@ -178,7 +178,7 @@ export const seoIaPage = {
     title: 'Aprende y compara',
     links: [
       { label: 'Guía: cómo aparecer en ChatGPT y Gemini', href: '/es/blog/como-aparecer-en-chatgpt-perplexity', desc: 'La guía paso a paso, si prefieres entender el cómo a fondo.', icon: 'lucide:book-open' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'La otra IA: un asistente que atiende a tus clientes 24/7.', icon: 'lucide:message-circle' },
+      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'La otra IA: un asistente que atiende a tus clientes 24/7.', icon: 'marcyan-ai' },
       { label: 'Precios y planes', href: '/es/precios', desc: 'Todos los servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: 'Agencia en Houston', href: '/es/houston', desc: 'Todos nuestros servicios para negocios de Houston.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],

@@ -111,7 +111,7 @@ export const catalog: CatalogProduct[] = [
   },
   {
     id: 'ia-conversacional',
-    icon: 'lucide:message-circle',
+    icon: 'marcyan-ai',
     name: 'IA Conversacional',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
@@ -130,7 +130,7 @@ export const catalog: CatalogProduct[] = [
   },
   {
     id: 'seo-ia',
-    icon: 'lucide:bot',
+    icon: 'marcyan-ai',
     name: 'SEO para IA (Visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
@@ -342,7 +342,7 @@ export const preciosPage = {
         label: '¿Cuánto cuesta un chatbot?',
         href: '/es/precios/cuanto-cuesta-un-chatbot',
         desc: 'Qué incluye un asistente con IA y por qué no es solo una suscripción.',
-        icon: 'lucide:message-circle',
+        icon: 'marcyan-ai',
       },
       {
         label: '¿Cuánto cuesta el SEO local en Houston?',

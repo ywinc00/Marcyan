@@ -45,7 +45,7 @@ export const miamiHub = {
     links: [
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'lucide:message-circle' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'marcyan-ai' },
       { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
   },
@@ -63,7 +63,7 @@ export const miamiHub = {
     title: 'Precios y más',
     links: [
       { label: 'Precios y planes', href: '/es/precios', desc: 'Todos los servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
-      { label: 'SEO para IA (que la IA te recomiende)', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden. Diagnóstico gratis.', icon: 'lucide:bot' },
+      { label: 'SEO para IA (que la IA te recomiende)', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden. Diagnóstico gratis.', icon: 'marcyan-ai' },
       { label: 'Agencia en Houston', href: '/es/houston', desc: 'Nuestra base de operaciones, con casos verificables.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },

@@ -55,6 +55,12 @@
   let showDelete = $state(false);
   let deleting = $state(false);
 
+  // Editar (corrige campos sin borrar/recrear; usa el PATCH ya existente)
+  let showEdit = $state(false);
+  let editForm = $state({ name: '', client_name: '', ga4_property_id: '', gsc_site_url: '', domain: '', active: true });
+  let editSaving = $state(false);
+  let editMsg = $state('');
+
   // ── Derivados de métricas ────────────────────────────────────
   const gscDaily = $derived(
     detail && detail.metrics && detail.metrics.gsc
@@ -260,6 +266,40 @@
       selectProject(j.project.id);
     } catch (e) { addMsg = e.message || 'Error al crear'; }
     finally { saving = false; }
+  }
+
+  // ── Editar proyecto ──────────────────────────────────────────
+  function openEdit() {
+    if (!detail) return;
+    const p = detail.project;
+    editForm = {
+      name: p.name || '',
+      client_name: p.client_name || '',
+      ga4_property_id: p.ga4_property_id || '',
+      gsc_site_url: p.gsc_site_url || '',
+      domain: p.domain || '',
+      active: p.active !== false,
+    };
+    editMsg = '';
+    showEdit = true;
+  }
+  async function saveEdit() {
+    if (!selectedId) return;
+    if (!editForm.name.trim()) { editMsg = 'El nombre es obligatorio'; return; }
+    editSaving = true; editMsg = '';
+    try {
+      const r = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), {
+        method: 'PATCH',
+        body: JSON.stringify(editForm),
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'Error');
+      showEdit = false;
+      // Refrescar el detalle (nuevos identificadores) y la lista (nombre/cliente).
+      await selectProject(selectedId);
+      await loadProjects();
+    } catch (e) { editMsg = e.message || 'Error al guardar'; }
+    finally { editSaving = false; }
   }
 
   // ── Eliminar proyecto ────────────────────────────────────────
@@ -595,6 +635,7 @@
     {/if}
 
     <div class="proj-foot">
+      <button class="b b--ghost" onclick={openEdit}>✎ Editar proyecto</button>
       <button class="b b--danger" onclick={() => showDelete = true}>🗑 Eliminar proyecto</button>
     </div>
   {/if}
@@ -622,6 +663,37 @@
       <div class="modal__act">
         <button class="b b--ghost" onclick={() => showAdd = false}>Cancelar</button>
         <button class="b b--primary" disabled={saving || !form.name.trim()} onclick={createProject}>{saving ? 'Creando…' : 'Crear proyecto'}</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Modal: editar proyecto -->
+{#if showEdit && detail}
+  <div class="backdrop" role="presentation" tabindex="-1"
+       onclick={(e) => { if (e.target === e.currentTarget) showEdit = false; }}
+       onkeydown={(e) => { if (e.key === 'Escape') showEdit = false; }}>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-edit-title">
+      <h3 class="modal__t" id="seo-edit-title">Editar proyecto SEO</h3>
+      <p class="modal__b">Corregí el nombre, el dominio o los identificadores de Google. En Search Console usá la propiedad sobre la que la cuenta de servicio TIENE permiso: el <strong>prefijo</strong> (<code>https://ejemplo.com/</code>) o el <strong>dominio</strong> (<code>sc-domain:ejemplo.com</code>).</p>
+      <label class="f-lbl" for="ep-name">Nombre del proyecto *</label>
+      <input id="ep-name" class="inp" type="text" bind:value={editForm.name} placeholder="Sitio principal" />
+      <label class="f-lbl" for="ep-client">Cliente</label>
+      <input id="ep-client" class="inp" type="text" bind:value={editForm.client_name} placeholder="(opcional)" />
+      <label class="f-lbl" for="ep-domain">Dominio</label>
+      <input id="ep-domain" class="inp" type="text" bind:value={editForm.domain} placeholder="ejemplo.com" />
+      <label class="f-lbl" for="ep-ga4">ID de propiedad GA4</label>
+      <input id="ep-ga4" class="inp" type="text" bind:value={editForm.ga4_property_id} placeholder="123456789" inputmode="numeric" />
+      <label class="f-lbl" for="ep-gsc">URL de Search Console</label>
+      <input id="ep-gsc" class="inp" type="text" bind:value={editForm.gsc_site_url} placeholder="https://ejemplo.com/ o sc-domain:ejemplo.com" />
+      <label class="f-check">
+        <input type="checkbox" bind:checked={editForm.active} />
+        <span>Proyecto activo (se incluye en la sincronización masiva)</span>
+      </label>
+      {#if editMsg}<div class="msg">{editMsg}</div>{/if}
+      <div class="modal__act">
+        <button class="b b--ghost" onclick={() => showEdit = false}>Cancelar</button>
+        <button class="b b--primary" disabled={editSaving || !editForm.name.trim()} onclick={saveEdit}>{editSaving ? 'Guardando…' : 'Guardar cambios'}</button>
       </div>
     </div>
   </div>
@@ -752,7 +824,7 @@
   .gold { color: var(--accent-gold); }
   .dim { color: var(--fg-subtle); }
 
-  .proj-foot { margin-top: var(--space-5); display: flex; justify-content: flex-end; }
+  .proj-foot { margin-top: var(--space-5); display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
 
   .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); margin-top: var(--space-3); line-height: 1.6; }
   .empty.err { color: var(--color-error); }
@@ -765,6 +837,8 @@
   select.inp { padding-right: 30px; cursor: pointer; }
   select.inp:hover { border-color: var(--border-strong); }
   .f-lbl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: var(--space-3) 0 4px; }
+  .f-check { display: flex; align-items: center; gap: 8px; margin-top: var(--space-4); font-size: var(--text-sm); color: var(--fg-secondary); cursor: pointer; }
+  .f-check input { accent-color: var(--accent-gold); width: 15px; height: 15px; flex: 0 0 auto; }
 
   /* La definición canónica de .b/.b--primary/.b--ghost/.b--danger
      vive en dashboard.css (global). */

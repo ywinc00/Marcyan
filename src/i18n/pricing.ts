@@ -130,7 +130,7 @@ export const catalog: CatalogProduct[] = [
   },
   {
     id: 'seo-ia',
-    icon: 'marcyan-ai',
+    icon: 'lucide:sparkles',
     name: 'SEO para IA (Visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:

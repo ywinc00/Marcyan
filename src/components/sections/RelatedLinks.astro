@@ -22,7 +22,7 @@ const { tag, title, links } = Astro.props;
     <div class="related__grid">
       {links.map((l) => (
         <Card href={l.href} class="related__item">
-          <span class="related__icon"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span>
+          <span class="related__icon"><Icon name={l.icon ?? 'lucide:link'} /></span>
           <div class="related__body">
             <h3 class="related__title">{l.label}</h3>
             <p class="related__desc">{l.desc}</p>

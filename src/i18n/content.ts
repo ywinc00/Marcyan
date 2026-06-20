@@ -50,16 +50,6 @@ export const content = {
         { label: 'Proyectos', href: '#proyectos', icon: 'lucide:folder' },
         { label: 'Ciudades', href: '#ciudades', icon: 'lucide:map-pin' },
       ],
-      caso0: {
-        label: 'Marcyan · Caso 0 (este sitio)',
-        rows: [
-          { l: 'Sitio', v: 'HTML estático' },
-          { l: 'Rastreadores IA', v: 'Legible' },
-          { l: 'Idiomas', v: 'ES · EN' },
-          { l: 'Cobertura', v: 'Houston · Miami' },
-          { l: 'Leads', v: 'Base propia' },
-        ],
-      },
     },
 
     services: {
@@ -266,16 +256,6 @@ export const content = {
         { label: 'Projects', href: '#proyectos', icon: 'lucide:folder' },
         { label: 'Cities', href: '#ciudades', icon: 'lucide:map-pin' },
       ],
-      caso0: {
-        label: 'Marcyan · Case #0 (this site)',
-        rows: [
-          { l: 'Site', v: 'Static HTML' },
-          { l: 'AI crawlers', v: 'Readable' },
-          { l: 'Languages', v: 'ES · EN' },
-          { l: 'Coverage', v: 'Houston · Miami' },
-          { l: 'Leads', v: 'Own database' },
-        ],
-      },
     },
 
     services: {

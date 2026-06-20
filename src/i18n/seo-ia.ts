@@ -136,12 +136,12 @@ export const seoIaPage = {
     title: 'Cómo te preparamos para que la <em>IA te cite</em>',
     tone: 'teal' as const,
     items: [
-      { icon: 'lucide:search', title: 'Bing Places (la base de ChatGPT)', desc: 'ChatGPT consulta Bing, no Google. Damos de alta y optimizamos tu Bing Places — el paso fácil que casi nadie da.' },
+      { icon: 'lucide:scan-search', title: 'Bing Places (la base de ChatGPT)', desc: 'ChatGPT consulta Bing, no Google. Damos de alta y optimizamos tu Bing Places — el paso fácil que casi nadie da.' },
       { icon: 'lucide:braces', title: 'Datos estructurados (schema)', desc: 'Marcamos tu información en JSON-LD para que los asistentes entiendan quién eres, qué ofreces y a qué precio.' },
       { icon: 'marcyan-ai', title: 'Respuestas listas para citar', desc: 'Preguntas y respuestas claras en español e inglés, en el formato corto de 40-60 palabras (answer-first) que la IA cita textualmente.' },
       { icon: 'lucide:list-checks', title: 'NAP consistente y directorios', desc: 'Tu nombre, dirección y teléfono iguales en todas partes — la IA saca buena parte de sus datos locales de ahí.' },
       { icon: 'lucide:gauge', title: 'HTML que la IA sí lee', desc: 'Los rastreadores de IA no ejecutan JavaScript. Construimos en HTML estático (Astro), legible para ellos; si un sitio depende de JavaScript para mostrar su contenido, la IA puede no verlo.' },
-      { icon: 'lucide:line-chart', title: 'Medición y ajuste', desc: 'Seguimos cómo te ven y te mencionan los asistentes, y ajustamos. La visibilidad en IA es volátil — por eso se cuida mes a mes.' },
+      { icon: 'lucide:activity', title: 'Medición y ajuste', desc: 'Seguimos cómo te ven y te mencionan los asistentes, y ajustamos. La visibilidad en IA es volátil — por eso se cuida mes a mes.' },
     ],
   },
   // Caso #0 + done-for-you + wedge bilingüe (Prose).

@@ -72,7 +72,7 @@ export const houstonHub = {
     links: [
       { label: 'Precios y planes', href: '/es/precios', desc: 'Los 6 servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'La respuesta directa, con el precio real y qué incluye.', icon: 'lucide:help-circle' },
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos allí.', icon: 'lucide:palette' },
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos allí.', icon: 'lucide:layout-template' },
     ] as RelatedLink[],
   },
   faq: {

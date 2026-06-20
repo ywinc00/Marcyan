@@ -111,7 +111,7 @@ export const catalog: CatalogProduct[] = [
   },
   {
     id: 'ia-conversacional',
-    icon: 'marcyan-ai',
+    icon: 'lucide:bot-message-square',
     name: 'IA Conversacional',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
@@ -342,7 +342,7 @@ export const preciosPage = {
         label: '¿Cuánto cuesta un chatbot?',
         href: '/es/precios/cuanto-cuesta-un-chatbot',
         desc: 'Qué incluye un asistente con IA y por qué no es solo una suscripción.',
-        icon: 'marcyan-ai',
+        icon: 'lucide:bot-message-square',
       },
       {
         label: '¿Cuánto cuesta el SEO local en Houston?',

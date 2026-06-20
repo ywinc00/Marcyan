@@ -152,7 +152,7 @@ const houstonSeo: ClusterPage = {
       { icon: 'lucide:file-text', title: 'Contenido y páginas locales', desc: 'Páginas por servicio y ciudad, escritas para tu mercado de Houston, en español e inglés.' },
       { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'Te ayudamos a pedir y responder reseñas de forma constante, en el idioma de cada cliente.' },
       { icon: 'lucide:gauge', title: 'SEO técnico y velocidad', desc: 'Sitio rápido en HTML que Google y los asistentes de IA pueden leer sin tropiezos.' },
-      { icon: 'marcyan-ai', title: 'Listo para la IA (AEO)', desc: 'Tu información en Bing y en un formato que ChatGPT y Gemini pueden citar.' },
+      { icon: 'lucide:sparkles', title: 'Listo para la IA (AEO)', desc: 'Tu información en Bing y en un formato que ChatGPT y Gemini pueden citar.' },
     ],
     tone: 'gold',
   },
@@ -213,7 +213,7 @@ const houstonSeo: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido y a medida es la base de todo buen SEO.', icon: 'lucide:layout-template' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:bot-message-square' },
       { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:tag' },
     ],
   },
@@ -318,7 +318,7 @@ const houstonWeb: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta y agenda 24/7.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta y agenda 24/7.', icon: 'lucide:bot-message-square' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Cuando quieras vender en línea, te montamos la tienda.', icon: 'lucide:shopping-bag' },
       { label: 'Sitios para bienes raíces', href: '/es/houston/bienes-raices', desc: '¿Eres agente? Sitio con tus propiedades y SEO por zona.', icon: 'lucide:home' },
     ],
@@ -427,7 +427,7 @@ const miamiWeb: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:bot-message-square' },
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:layout-template' },
     ],
   },
@@ -479,11 +479,11 @@ const iaPymes: ClusterPage = {
     tag: 'Qué podemos hacer',
     title: 'IA que <em>trabaja</em> mientras tú trabajas',
     items: [
-      { icon: 'marcyan-ai', title: 'Asistente que contesta 24/7', desc: 'Un asistente de chat en tu sitio que responde preguntas y capta prospectos a cualquier hora, en español.' },
-      { icon: 'marcyan-ai', title: 'WhatsApp automático', desc: 'Respuestas y seguimiento automáticos por WhatsApp y mensajes, para que ningún cliente se quede esperando.' },
+      { icon: 'lucide:bot-message-square', title: 'Asistente que contesta 24/7', desc: 'Un asistente de chat en tu sitio que responde preguntas y capta prospectos a cualquier hora, en español.' },
+      { icon: 'lucide:message-circle', title: 'WhatsApp automático', desc: 'Respuestas y seguimiento automáticos por WhatsApp y mensajes, para que ningún cliente se quede esperando.' },
       { icon: 'lucide:calendar-check', title: 'Agenda de citas con IA', desc: 'Tus clientes reservan citas solos, de día y de noche, sin llamadas ni idas y vueltas.' },
       { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando no puedes contestar, la IA responde por mensaje al instante para que no pierdas al cliente.' },
-      { icon: 'marcyan-ai', title: 'Aparece en ChatGPT y Gemini', desc: 'Preparamos tu información para que los asistentes de IA puedan encontrarte y recomendarte.' },
+      { icon: 'lucide:sparkles', title: 'Aparece en ChatGPT y Gemini', desc: 'Preparamos tu información para que los asistentes de IA puedan encontrarte y recomendarte.' },
       { icon: 'lucide:workflow', title: 'Automatiza el seguimiento', desc: 'Conectamos la IA con las herramientas que ya usas para que avisos y seguimientos ocurran solos.' },
     ],
     tone: 'teal',
@@ -650,7 +650,7 @@ const precioWebHouston: ClusterPage = {
     title: 'Servicios y precios relacionados',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: proceso, proyectos y FAQ.', icon: 'lucide:layout-template' },
-      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'marcyan-ai' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:bot-message-square' },
       { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:search' },
     ],
   },
@@ -709,7 +709,7 @@ const houstonIa: ClusterPage = {
     title: 'IA que <em>no deja escapar</em> ni un cliente',
     items: [
       { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando no puedes contestar, la IA responde por mensaje al instante para que el cliente no se vaya con la competencia.' },
-      { icon: 'marcyan-ai', title: 'Contesta WhatsApp y mensajes', desc: 'Responde y da seguimiento por WhatsApp y redes a cualquier hora, incluso a las 11 de la noche y los fines de semana.' },
+      { icon: 'lucide:message-circle', title: 'Contesta WhatsApp y mensajes', desc: 'Responde y da seguimiento por WhatsApp y redes a cualquier hora, incluso a las 11 de la noche y los fines de semana.' },
       { icon: 'lucide:calendar-check', title: 'Agenda citas solo', desc: 'Tus clientes reservan citas sin llamadas ni idas y vueltas — de día, de noche y en español.' },
       { icon: 'lucide:languages', title: 'Atiende en español de verdad', desc: 'Configurado en el español de tus clientes, con tu tono. No es una traducción robótica.' },
       { icon: 'lucide:user-round', title: 'Siempre te pasa con una persona', desc: 'Cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda atrapado con un robot.' },
@@ -902,7 +902,7 @@ const houstonEcommerce: ClusterPage = {
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Si aún no necesitas vender en línea, empieza por tu sitio.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu tienda aparezca en Google y en Maps.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que contesta y agenda 24/7.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que contesta y agenda 24/7.', icon: 'lucide:bot-message-square' },
     ],
   },
   service: {
@@ -958,7 +958,7 @@ const precioChatbot: ClusterPage = {
     items: [
       { icon: 'lucide:settings-2', title: 'Instalación completa', desc: 'Lo dejamos funcionando en tu sitio y tu WhatsApp. Tú no peleas con ninguna configuración.' },
       { icon: 'lucide:graduation-cap', title: 'Entrenamiento con tu negocio', desc: 'Lo alimentamos con tus servicios, precios, horarios y preguntas frecuentes, para que responda como tu negocio.' },
-      { icon: 'marcyan-ai', title: 'WhatsApp y sitio web', desc: 'Conectamos el asistente con tu WhatsApp y tu sitio para que conteste donde tus clientes te escriben.' },
+      { icon: 'lucide:message-circle', title: 'WhatsApp y sitio web', desc: 'Conectamos el asistente con tu WhatsApp y tu sitio para que conteste donde tus clientes te escriben.' },
       { icon: 'lucide:calendar-check', title: 'Captación y agenda', desc: 'Capta prospectos y agenda citas a cualquier hora, sin que se te escape un cliente.' },
       { icon: 'lucide:user-round', title: 'Pase a una persona', desc: 'Cuando hace falta un humano, pasa la conversación a tu equipo. El cliente nunca queda atrapado.' },
       { icon: 'lucide:wrench', title: 'Soporte y mantenimiento', desc: 'No te dejamos solo después del lanzamiento: lo ajustamos y le damos mantenimiento.' },
@@ -1021,7 +1021,7 @@ const precioChatbot: ClusterPage = {
     tag: 'Sigue explorando',
     title: 'IA y precios',
     links: [
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El servicio a detalle, con casos de uso reales.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El servicio a detalle, con casos de uso reales.', icon: 'lucide:bot-message-square' },
       { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'El precio de un sitio, con qué incluye.', icon: 'lucide:layout-template' },
       { label: '¿Cuánto cuesta el SEO local en Houston?', href: '/es/precios/cuanto-cuesta-seo-local-houston', desc: 'La tarifa mensual publicada y qué incluye.', icon: 'lucide:search' },
     ],
@@ -1080,7 +1080,7 @@ const precioSeoHouston: ClusterPage = {
       { icon: 'lucide:file-text', title: 'Contenido local mensual', desc: 'Páginas y contenido por servicio y zona, escritos para tu mercado de Houston, en español e inglés.' },
       { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'Te ayudamos a pedir y responder reseñas de forma constante, en el idioma de cada cliente.' },
       { icon: 'lucide:bar-chart-3', title: 'Reporte mensual claro', desc: 'Cada mes ves qué hicimos y cómo va tu posicionamiento, sin tecnicismos confusos.' },
-      { icon: 'marcyan-ai', title: 'Listo para la IA (AEO)', desc: 'Tu información en un formato que ChatGPT y Gemini pueden leer y citar.' },
+      { icon: 'lucide:sparkles', title: 'Listo para la IA (AEO)', desc: 'Tu información en un formato que ChatGPT y Gemini pueden leer y citar.' },
     ],
     tone: 'gold',
   },
@@ -1142,7 +1142,7 @@ const precioSeoHouston: ClusterPage = {
     links: [
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'El servicio a detalle, con qué incluye y proyectos.', icon: 'lucide:search' },
       { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'El precio de un sitio, con qué incluye y de qué depende.', icon: 'lucide:layout-template' },
-      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'marcyan-ai' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:bot-message-square' },
     ],
   },
   service: {
@@ -1203,7 +1203,7 @@ const houstonBranding: ClusterPage = {
       { icon: 'lucide:type', title: 'Tipografías', desc: 'La selección de fuentes que le da voz y coherencia a todo lo que comunicas.' },
       { icon: 'lucide:book-open', title: 'Guía de uso', desc: 'Un documento claro de cómo usar tu marca, para que se vea consistente en todos lados.' },
       { icon: 'lucide:folder', title: 'Archivos listos', desc: 'Tu logo en todos los formatos que necesitas (vectorial, PNG, PDF), listos para usar.' },
-      { icon: 'marcyan-ai', title: 'IA para explorar, criterio humano para decidir', desc: 'Usamos IA para proponer ideas rápido, pero cada decisión la toma un diseñador. La estrategia no la deja a la máquina.' },
+      { icon: 'lucide:sparkles', title: 'IA para explorar, criterio humano para decidir', desc: 'Usamos IA para proponer ideas rápido, pero cada decisión la toma un diseñador. La estrategia no la deja a la máquina.' },
     ],
     tone: 'gold',
   },
@@ -1324,7 +1324,7 @@ const miamiIa: ClusterPage = {
     tag: 'Qué hace por ti',
     title: 'IA que <em>no deja escapar</em> ni un cliente',
     items: [
-      { icon: 'marcyan-ai', title: 'Contesta WhatsApp y mensajes', desc: 'WhatsApp es el canal donde el cliente cubano, venezolano o colombiano de Miami te escribe. La IA responde y da seguimiento a cualquier hora, hasta de madrugada.' },
+      { icon: 'lucide:message-circle', title: 'Contesta WhatsApp y mensajes', desc: 'WhatsApp es el canal donde el cliente cubano, venezolano o colombiano de Miami te escribe. La IA responde y da seguimiento a cualquier hora, hasta de madrugada.' },
       { icon: 'lucide:calendar-check', title: 'Agenda citas y reservas solo', desc: 'Tu restaurante, tu clínica estética o tu taller llenan la agenda sin que pares de trabajar: el cliente reserva por su cuenta, de día o de noche.' },
       { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando no puedes contestar, la IA responde por mensaje al instante para que el cliente no se vaya con el de al lado.' },
       { icon: 'lucide:languages', title: 'Habla como se habla en Miami', desc: 'Lo configuramos en el español que de verdad usan tus clientes, con su acento y su tono. No suena a traducción ni a robot, y detecta si prefieren inglés.' },
@@ -1392,7 +1392,7 @@ const miamiIa: ClusterPage = {
     links: [
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
       { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios/cuanto-cuesta-un-chatbot', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:bot-message-square' },
     ],
   },
   service: {
@@ -1445,7 +1445,7 @@ const miamiSeo: ClusterPage = {
       { icon: 'lucide:file-text', title: 'Contenido y páginas locales', desc: 'Páginas por servicio y zona, escritas para tu mercado de Miami, en español e inglés.' },
       { icon: 'lucide:star', title: 'Reseñas y reputación', desc: 'Te ayudamos a pedir y responder reseñas de forma constante, en el idioma de cada cliente.' },
       { icon: 'lucide:gauge', title: 'SEO técnico y velocidad', desc: 'Sitio rápido en HTML que Google y los asistentes de IA pueden leer sin tropiezos.' },
-      { icon: 'marcyan-ai', title: 'Listo para la IA (AEO)', desc: 'Tu información en Bing y en un formato que ChatGPT y Gemini pueden citar.' },
+      { icon: 'lucide:sparkles', title: 'Listo para la IA (AEO)', desc: 'Tu información en Bing y en un formato que ChatGPT y Gemini pueden citar.' },
     ],
     tone: 'gold',
   },
@@ -1508,7 +1508,7 @@ const miamiSeo: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Un sitio rápido y a medida es la base de todo buen SEO.', icon: 'lucide:layout-template' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente en español.', icon: 'lucide:bot-message-square' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:search' },
     ],
   },
@@ -1682,7 +1682,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
     tag: 'Qué incluye',
     title: 'Un sistema para <em>no perder ni una consulta</em>',
     items: [
-      { icon: 'marcyan-ai', title: 'IA que capta consultas 24/7', desc: 'Responde y agenda la primera consulta en español a cualquier hora, incluso de madrugada o en fin de semana. Ninguna se enfría.' },
+      { icon: 'lucide:bot-message-square', title: 'IA que capta consultas 24/7', desc: 'Responde y agenda la primera consulta en español a cualquier hora, incluso de madrugada o en fin de semana. Ninguna se enfría.' },
       { icon: 'lucide:clipboard-list', title: 'Intake básico (datos de la consulta)', desc: 'La IA reúne los datos generales del caso (nombre, contacto, tipo de trámite) y te los pasa listos. Tú decides a quién y cómo atender.' },
       { icon: 'lucide:shield-check', title: 'Sitio bilingüe que da confianza', desc: 'Un despacho se elige por confianza. Sitio profesional en español e inglés, rápido, con tus áreas de práctica y llamadas a la acción claras.' },
       { icon: 'lucide:search', title: 'SEO local de inmigración', desc: 'Apareces cuando alguien busca «abogado de inmigración cerca de mí» en Houston, en Google Maps y en los asistentes de IA.' },
@@ -1750,7 +1750,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
     tag: 'Sigue explorando',
     title: 'Servicios que componen el sistema',
     links: [
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El asistente que capta y agenda 24/7, a detalle.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El asistente que capta y agenda 24/7, a detalle.', icon: 'lucide:bot-message-square' },
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El sitio bilingüe que transmite confianza.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que te encuentren cuando buscan un abogado.', icon: 'lucide:search' },
     ],
@@ -1870,7 +1870,7 @@ const houstonBienesRaices: ClusterPage = {
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas cuando buscan casas en tu zona.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que responde y capta interesados 24/7.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que responde y capta interesados 24/7.', icon: 'lucide:bot-message-square' },
     ],
   },
   service: {

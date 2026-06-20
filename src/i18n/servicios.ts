@@ -44,8 +44,8 @@ export const serviciosPage = {
     title: 'Cada servicio en <em>detalle</em>',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Landing, rediseño o sitio completo a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7.', icon: 'marcyan-ai' },
-      { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden a ti. Diagnóstico gratis.', icon: 'marcyan-ai' },
+      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7.', icon: 'lucide:bot-message-square' },
+      { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden a ti. Diagnóstico gratis.', icon: 'lucide:sparkles' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la búsqueda local de tu zona.', icon: 'lucide:search' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Catálogo, carrito y pagos seguros para vender en línea.', icon: 'lucide:shopping-bag' },
       { label: 'Branding en Houston', href: '/es/houston/branding', desc: 'Desde solo el logo hasta una identidad de marca completa.', icon: 'lucide:palette' },
@@ -57,7 +57,7 @@ export const serviciosPage = {
     title: 'Lo que nos hace <em>distintos</em>',
     items: [
       { icon: 'lucide:languages', title: 'Bilingüe de verdad', desc: 'Tu sitio en español e inglés real, no un botón de Google Translate. Nuestro propio sitio es bilingüe.' },
-      { icon: 'marcyan-ai', title: 'Te encuentra la IA', desc: 'Construimos en HTML rápido que ChatGPT, Gemini y Meta AI sí pueden leer, para que aparezcas cuando preguntan por lo que ofreces.' },
+      { icon: 'lucide:sparkles', title: 'Te encuentra la IA', desc: 'Construimos en HTML rápido que ChatGPT, Gemini y Meta AI sí pueden leer, para que aparezcas cuando preguntan por lo que ofreces.' },
       { icon: 'lucide:tag', title: 'Precios públicos', desc: 'Publicamos todo, hasta el SEO mensual y el mantenimiento. Sin letra pequeña ni sorpresas en la factura.' },
       { icon: 'lucide:map-pin', title: 'Presencia local real', desc: 'Te atendemos en Houston y Miami, en tu idioma y tu zona horaria — no una operación remota anónima.' },
     ],

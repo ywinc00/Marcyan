@@ -61,8 +61,6 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       tone={cluster.includes.tone}
     />
 
-    <Projects projects={cluster.proof} />
-
     <Process process={c.process} />
 
     <Prose
@@ -84,6 +82,8 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       tone={cluster.pricing.tone}
     />
 
+    <Projects projects={cluster.proof} />
+
     <Faq tag={cluster.faq.tag} title={cluster.faq.title} items={cluster.faq.items} />
 
     <CtaBand
@@ -94,7 +94,7 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       tone={cluster.cta.tone}
     />
 
-    <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} tone={cluster.hero.tone} />
+    <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} />
 
     <Contact contact={c.contact} />
   </main>

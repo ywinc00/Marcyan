@@ -50,6 +50,16 @@ export const content = {
         { label: 'Proyectos', href: '#proyectos', icon: 'lucide:folder' },
         { label: 'Ciudades', href: '#ciudades', icon: 'lucide:map-pin' },
       ],
+      caso0: {
+        label: 'Marcyan · Caso 0 (este sitio)',
+        rows: [
+          { l: 'Sitio', v: 'HTML estático' },
+          { l: 'Rastreadores IA', v: 'Legible' },
+          { l: 'Idiomas', v: 'ES · EN' },
+          { l: 'Cobertura', v: 'Houston · Miami' },
+          { l: 'Leads', v: 'Base propia' },
+        ],
+      },
     },
 
     services: {
@@ -64,9 +74,9 @@ export const content = {
       items: [
         { n: '01', icon: 'lucide:layout-template', title: 'Diseño Web', price: 'desde $400', href: '/es/houston/diseno-web',
           desc: 'Sitios de alto impacto a medida: desde una landing que convierte hasta un sitio completo, rápido y bilingüe, listo para Google y la IA.' },
-        { n: '02', icon: 'lucide:bot-message-square', title: 'IA Conversacional', price: 'desde $500', href: '/es/ia-para-pymes',
+        { n: '02', icon: 'marcyan-ai', title: 'IA Conversacional', price: 'desde $500', href: '/es/ia-para-pymes',
           desc: 'Asistentes que atienden a tus clientes, responden preguntas y captan prospectos las 24 horas — en español, integrados a tu sitio.' },
-        { n: '03', icon: 'lucide:sparkles', title: 'SEO para IA', price: 'Diagnóstico gratis', href: '/es/houston/seo-para-ia',
+        { n: '03', icon: 'lucide:bot', title: 'SEO para IA', price: 'Diagnóstico gratis', href: '/es/houston/seo-para-ia',
           desc: 'Que ChatGPT, Gemini y Meta AI te recomienden a ti cuando alguien busca lo que ofreces. Empieza con un diagnóstico de visibilidad gratis.' },
         { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Tiendas', price: 'desde $900', href: '/es/houston/ecommerce',
           desc: 'Tiendas en línea para vender de verdad: catálogo, carrito y pagos seguros, en experiencia bilingüe — desde una tienda esencial hasta una a medida.' },
@@ -84,9 +94,9 @@ export const content = {
       title: 'La IA que<br>trabaja para<br><em>tu negocio</em>',
       desc: 'El asistente que te responde aquí mismo es el producto que construimos para ti: usamos la IA primero en nosotros, para entregar tu web más rápido y para que ChatGPT y Gemini puedan encontrarte.',
       features: [
-        { icon: 'lucide:sparkles', title: 'Que la IA te encuentre', desc: 'Construimos en HTML estático y rápido que asistentes como ChatGPT y Gemini sí pueden leer, para que tu negocio aparezca cuando les preguntan.' },
+        { icon: 'marcyan-ai', title: 'Que la IA te encuentre', desc: 'Construimos en HTML estático y rápido que asistentes como ChatGPT y Gemini sí pueden leer, para que tu negocio aparezca cuando les preguntan.' },
         { icon: 'lucide:pen-tool', title: 'Contenido y textos', desc: 'Páginas y textos enfocados en SEO, redactados con IA y afinados a mano. Bilingüe español e inglés, escritos para tu mercado local.' },
-        { icon: 'lucide:bot-message-square', title: 'Asistentes conversacionales', desc: 'Asistentes de chat que atienden a tus clientes, califican prospectos y agendan citas las 24 horas, en su idioma.' },
+        { icon: 'marcyan-ai', title: 'Asistentes conversacionales', desc: 'Asistentes de chat que atienden a tus clientes, califican prospectos y agendan citas las 24 horas, en su idioma.' },
         { icon: 'lucide:workflow', title: 'Automatizaciones', desc: 'Conectamos tu sitio con las herramientas que ya usas, para que los nuevos prospectos, avisos y seguimientos ocurran solos.' },
       ],
       cta: { label: 'Ver IA para tu negocio', href: '/es/ia-para-pymes' },
@@ -256,6 +266,16 @@ export const content = {
         { label: 'Projects', href: '#proyectos', icon: 'lucide:folder' },
         { label: 'Cities', href: '#ciudades', icon: 'lucide:map-pin' },
       ],
+      caso0: {
+        label: 'Marcyan · Case #0 (this site)',
+        rows: [
+          { l: 'Site', v: 'Static HTML' },
+          { l: 'AI crawlers', v: 'Readable' },
+          { l: 'Languages', v: 'ES · EN' },
+          { l: 'Coverage', v: 'Houston · Miami' },
+          { l: 'Leads', v: 'Own database' },
+        ],
+      },
     },
 
     services: {
@@ -269,9 +289,9 @@ export const content = {
       items: [
         { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '#contacto',
           desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
-        { n: '02', icon: 'lucide:bot-message-square', title: 'Conversational AI', price: 'from $500', href: '#contacto',
+        { n: '02', icon: 'marcyan-ai', title: 'Conversational AI', price: 'from $500', href: '#contacto',
           desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock — in their language, built into your site.' },
-        { n: '03', icon: 'lucide:sparkles', title: 'AI SEO', price: 'Free audit', href: '#contacto',
+        { n: '03', icon: 'lucide:bot', title: 'AI SEO', price: 'Free audit', href: '#contacto',
           desc: 'Get recommended by ChatGPT, Gemini, and Meta AI when people search for what you offer. Starts with a free AI-visibility audit.' },
         { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '#contacto',
           desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience — from an essential store to a custom one.' },
@@ -289,9 +309,9 @@ export const content = {
       title: 'The AI that<br>works for<br><em>your business</em>',
       desc: 'The assistant answering you right here is the product we build for you: we put AI to work on ourselves first — to ship your site faster and help ChatGPT and Gemini find you.',
       features: [
-        { icon: 'lucide:sparkles', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Gemini can actually read — so your business shows up when people ask them.' },
+        { icon: 'marcyan-ai', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Gemini can actually read — so your business shows up when people ask them.' },
         { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, drafted with AI and refined by hand. Bilingual Spanish and English, written for your local market.' },
-        { icon: 'lucide:bot-message-square', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
+        { icon: 'marcyan-ai', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
         { icon: 'lucide:workflow', title: 'Automations', desc: 'We connect your site to the tools you already use, so new leads, notifications, and follow-ups happen on their own.' },
       ],
       // Illustrative assistant demo (sample text, editable). Not business copy.

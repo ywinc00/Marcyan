@@ -43,8 +43,8 @@ export const houstonHub = {
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan y agendan 24/7. Desde $900.', icon: 'lucide:bot-message-square' },
-      { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden. Diagnóstico gratis.', icon: 'lucide:sparkles' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan y agendan 24/7. Desde $900.', icon: 'marcyan-ai' },
+      { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden. Diagnóstico gratis.', icon: 'marcyan-ai' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
       { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto. Desde $750.', icon: 'lucide:palette' },
     ] as RelatedLink[],
@@ -72,7 +72,7 @@ export const houstonHub = {
     links: [
       { label: 'Precios y planes', href: '/es/precios', desc: 'Los 6 servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'La respuesta directa, con el precio real y qué incluye.', icon: 'lucide:help-circle' },
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos allí.', icon: 'lucide:layout-template' },
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: '¿También operas en Miami? También diseñamos allí.', icon: 'lucide:palette' },
     ] as RelatedLink[],
   },
   faq: {

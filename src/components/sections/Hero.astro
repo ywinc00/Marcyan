@@ -5,7 +5,7 @@
 //  · Realce: motor planetario 2.5D (SVG + DOM + CSS + rAF, sin WebGL).
 //      Escritorio (puntero fino): arranca CALMO → el hover energiza el sistema (rápido y
 //        natural); los nodos se iluminan al pasar el cursor y una luz sutil sigue el mouse
-//        recorriendo el camino.
+//        recorriendo el camino. El titular cede foco y el "Caso 0" se escribe abajo-dcha.
 //      Táctil / móvil: el planeta es el MAPA DE NAVEGACIÓN, pero NO orbita hasta el primer
 //        toque (calmo con pista "Toca para explorar"). Sin parallax. Resize NO reinicia.
 import Kicker from '../ui/Kicker.astro';
@@ -14,7 +14,7 @@ import Icon from '../ui/Icon.astro';
 
 interface Props { hero: any }
 const { hero } = Astro.props;
-const uid = 'hero-planet';
+const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 ---
 <section class="hero" id="top" data-hero>
   <div class="hero__stars" data-hero-stars aria-hidden="true"></div>
@@ -63,6 +63,15 @@ const uid = 'hero-planet';
       <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
       <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>Pasa el cursor sobre el planeta</span></div>
     </div>
+  </div>
+
+  <div class="hero__caso0" data-hero-caso0 aria-hidden="true">
+    <div class="hero__caso0-head">{hero.caso0.label}</div>
+    <ul class="hero__caso0-rows">
+      {hero.caso0.rows.map((r: any) => (
+        <li><span class="hero__caso0-l">{r.l}</span><span class="hero__caso0-v">{r.v}</span></li>
+      ))}
+    </ul>
   </div>
 
   <div class="hero__dock">
@@ -121,6 +130,17 @@ const uid = 'hero-planet';
   @keyframes hpulse { 0% { box-shadow: 0 0 0 0 var(--accent-gold-glow); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
   @media (--motion-reduce) { .hero__hint-dot { animation: none; } }
 
+  /* ── Caso 0 — texto desnudo, abajo-dcha, SOLO escritorio ── */
+  .hero__caso0 { display: none; }
+  .hero__caso0-head {
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold); margin-bottom: var(--space-3);
+  }
+  .hero__caso0-rows { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-end; }
+  .hero__caso0-rows li { display: flex; gap: var(--space-4); align-items: baseline; font-family: var(--font-mono); font-size: var(--text-xs); }
+  .hero__caso0-l { color: var(--fg-subtle); letter-spacing: 0.04em; }
+  .hero__caso0-v { color: var(--fg-secondary); min-width: 120px; text-align: right; }
+
   /* ── CTA dock — abajo, centro ──────────────────────────── */
   .hero__dock { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
   .hero__dock-link {
@@ -130,12 +150,14 @@ const uid = 'hero-planet';
   }
   .hero__dock-link:hover { color: var(--accent-gold); }
 
-  /* ── ≥ lg: titular izq · planeta der · dock centrado EN FLUJO, bajo la rejilla ── */
+  /* ── ≥ lg: titular izq · planeta der · Caso0 abajo-dcha · dock abajo-centro ── */
   @media (--lg) {
-    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); }
+    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: 92svh; }
     .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); }
     .hero__stage { max-width: 440px; }
-    .hero__dock { flex-direction: row; justify-content: center; gap: var(--space-4); margin-top: var(--space-8); }
+    .hero__caso0 { display: block; position: absolute; right: var(--container-pad); bottom: var(--space-8); text-align: right; pointer-events: none; opacity: 0; transform: translateY(8px); transition: opacity var(--duration-slow) var(--ease-out-expo), transform var(--duration-slow) var(--ease-out-expo); }
+    .hero__caso0.is-shown { opacity: 1; transform: none; }
+    .hero__dock { position: absolute; left: 50%; bottom: var(--space-7); transform: translateX(-50%); flex-direction: row; align-items: center; gap: var(--space-4); margin-top: 0; }
   }
 </style>
 
@@ -174,6 +196,7 @@ const uid = 'hero-planet';
     const headline = hero.querySelector('[data-hero-headline]') as HTMLElement;
     const hint = hero.querySelector('[data-hero-hint]') as HTMLElement;
     const hintTxt = hero.querySelector('[data-hero-hint-txt]') as HTMLElement;
+    const caso0 = hero.querySelector('[data-hero-caso0]') as HTMLElement;
     const starsEl = hero.querySelector('[data-hero-stars]') as HTMLElement;
 
     const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -268,6 +291,10 @@ const uid = 'hero-planet';
         }
       }
       hint.style.opacity = Math.max(0, 1 - energy * 2.4).toFixed(3);
+      if (!isAuto) {
+        headline.style.opacity = (1 - energy * 0.5).toFixed(3);
+        caso0.classList.toggle('is-shown', energy > 0.5);
+      }
       rafId = requestAnimationFrame(frame);
     }
 
@@ -289,8 +316,7 @@ const uid = 'hero-planet';
       isAuto = auto(); lastAuto = isAuto; activated = false;
       target = 0; energy = 0;                       // siempre arranca calmo (móvil: hasta el toque)
       hintTxt.textContent = isAuto ? 'Toca para explorar' : 'Pasa el cursor sobre el planeta';
-      // El hint solo aporta en táctil (la órbita no arranca sin toque). En escritorio el hover ya invita → fuera.
-      hint.style.display = isAuto ? 'inline-flex' : 'none'; hint.style.opacity = '1';
+      hint.style.display = 'inline-flex'; hint.style.opacity = '1';
       headline.style.opacity = '';
       measure(); build();
       hero.addEventListener('pointerenter', onEnter);

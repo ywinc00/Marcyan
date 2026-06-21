@@ -27,11 +27,14 @@ const { tag, title, intro, items } = Astro.props;
         <article class:list={['pcard', `pcard--${s.tone}`]}>
           <div class="pcard__top">
             <span class="pcard__icon"><Icon name={s.icon} /></span>
-            <span class="pcard__price">
-              {!s.free && <span class="pcard__from">desde</span>}
-              <span class="pcard__amt">{s.displayPrice}</span>
-              <span class="pcard__unit">{s.displayUnit}</span>
-            </span>
+            {s.free
+              ? <span class="pcard__badge"><Icon name="lucide:sparkles" /> Diagnóstico gratis</span>
+              : (
+                <span class="pcard__price">
+                  <span class="pcard__from">desde</span>
+                  <span class="pcard__amt">{s.displayPrice}{s.monthly ? <span class="pcard__per">/mes</span> : null}</span>
+                </span>
+              )}
           </div>
           <h3 class="pcard__name">{s.name}</h3>
           <p class="pcard__tagline">{s.tagline}</p>
@@ -78,9 +81,16 @@ const { tag, title, intro, items } = Astro.props;
   .pcard__price { display: flex; flex-direction: column; align-items: flex-end; text-align: right; line-height: 1.1; }
   .pcard__from { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--fg-secondary); }
   .pcard__amt { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; color: var(--tint); }
-  .pcard__unit { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
+  .pcard__per { font-family: var(--font-mono); font-size: var(--text-md); font-weight: 400; color: var(--fg-secondary); }
+  .pcard__badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--accent-teal); background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line);
+    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3);
+  }
+  .pcard__badge :global(svg) { width: 13px; height: 13px; flex: 0 0 auto; }
 
-  .pcard__name { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; margin-top: var(--space-1); }
+  .pcard__name { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; margin-top: var(--space-1); }
   .pcard__tagline { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
   .pcard__features { list-style: none; display: grid; gap: var(--space-2); margin-top: var(--space-1); }

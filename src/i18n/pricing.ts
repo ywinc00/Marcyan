@@ -100,6 +100,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/houston/diseno-web',
     ctaLabel: 'Ver diseño web',
     tone: 'gold',
+    cardBullets: [
+      'A medida y rápido, sin plantillas',
+      'Bilingüe español e inglés de verdad',
+      'Listo para Google y para la IA',
+    ],
     tiers: [
       { key: 'webLanding', name: 'Landing Page', value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding), anchor: true,
         blurb: 'Una sola página enfocada en convertir: ideal para una promoción, un servicio o validar tu negocio.', href: '/es/houston/diseno-web' },
@@ -121,6 +126,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/ia-para-pymes',
     ctaLabel: 'Ver IA para tu negocio',
     tone: 'teal',
+    cardBullets: [
+      'Atiende y capta prospectos 24/7, en español',
+      'Integrado a tu sitio y tus herramientas',
+      'Lo instalamos y entrenamos con tu negocio',
+    ],
     tiers: [
       { key: 'iaBasic', name: 'Asistente básico', value: PRICE_ANCHORS.iaBasic, display: tierDisplay(PRICE_ANCHORS.iaBasic), anchor: true,
         blurb: 'Un asistente con un flujo principal (contestar y captar prospectos), configurado en español.', href: '/es/ia-para-pymes' },
@@ -140,6 +150,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/houston/seo-para-ia',
     ctaLabel: 'Pedir diagnóstico gratis',
     tone: 'teal',
+    cardBullets: [
+      'Diagnóstico de visibilidad en IA gratis',
+      'Bing Places, schema y respuestas citables',
+      'Que ChatGPT y Gemini te recomienden',
+    ],
     tiers: [
       { key: 'aeoDiagnostic', name: 'Diagnóstico de Visibilidad en IA', value: null, display: tierDisplay(null), anchor: true,
         blurb: 'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.', href: '/es/houston/seo-para-ia' },
@@ -161,6 +176,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/houston/ecommerce',
     ctaLabel: 'Ver tienda en línea',
     tone: 'gold',
+    cardBullets: [
+      'Catálogo, carrito y pagos seguros',
+      'Pensada para vender desde el celular',
+      'Bilingüe, lista para Google y la IA',
+    ],
     tiers: [
       { key: 'ecommerceEssential', name: 'Tienda Esencial', value: PRICE_ANCHORS.ecommerceEssential, display: tierDisplay(PRICE_ANCHORS.ecommerceEssential), anchor: true,
         blurb: 'Catálogo simple con carrito y pagos, para empezar a vender en línea sin complicarte.', href: '/es/houston/ecommerce' },
@@ -180,6 +200,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/houston/seo-local',
     ctaLabel: 'Ver SEO local',
     tone: 'gold',
+    cardBullets: [
+      'Apareces en Google Maps y la búsqueda local',
+      'Perfil de Google, NAP, contenido y reseñas',
+      'Puntual o mes a mes, sin permanencia',
+    ],
     tiers: [
       { key: 'seoInitial', name: 'Optimización inicial', value: PRICE_ANCHORS.seoInitial, display: tierDisplay(PRICE_ANCHORS.seoInitial), anchor: true,
         blurb: 'Puesta a punto de tu Perfil de Google y tu presencia local. Pago único, sin permanencia.', href: '/es/houston/seo-local' },
@@ -199,6 +224,11 @@ export const catalog: CatalogProduct[] = [
     href: '/es/houston/branding',
     ctaLabel: 'Ver branding',
     tone: 'gold',
+    cardBullets: [
+      'Logo a medida con criterio humano',
+      'Paleta, tipografías y guía de uso',
+      'Archivos listos para cualquier uso',
+    ],
     tiers: [
       { key: 'brandingLogo', name: 'Diseño de Logo', value: PRICE_ANCHORS.brandingLogo, display: tierDisplay(PRICE_ANCHORS.brandingLogo), anchor: true,
         blurb: 'Solo el logo y sus variantes, con criterio humano. El arranque más accesible de tu marca.', href: '/es/houston/branding' },

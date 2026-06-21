@@ -9,7 +9,7 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
-import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import Locations from '../../components/sections/Locations.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
@@ -35,13 +35,17 @@ const answer = {
   q: '¿En qué ciudades trabaja Marcyan?',
   a: 'Marcyan Studio atiende a negocios hispanos en Houston, Texas y Miami, Florida, como negocio de área de servicio (sin oficina pública). En ambas trabajamos diseño web, IA conversacional y SEO local, en español e inglés y con contexto local real — Houston es nuestra base de operaciones, con casos verificables.',
 };
-const cities = {
+// Cada ciudad como tarjeta rica (nombre, área, teléfono y enlaces de servicio),
+// reutilizando los datos reales de content.locations. Houston = base (oro),
+// Miami = Cliente Fundador (teal). Da identidad propia a este hub geográfico.
+const cityCards = {
   tag: 'Elige tu ciudad',
   title: 'Dos ciudades, un <em>mismo equipo</em>',
-  links: [
-    { label: 'Agencia en Houston, TX', href: '/es/houston', desc: 'Nuestra base: diseño web, SEO, IA, e-commerce y branding, con casos reales.', icon: 'lucide:map-pin' },
-    { label: 'Agencia en Miami, FL', href: '/es/miami', desc: 'Diseño web, SEO local, IA y tiendas — en el español del Caribe. Cupos de Cliente Fundador.', icon: 'lucide:map-pin' },
-  ],
+  items: c.locations.items.map((it, i) => ({
+    ...it,
+    badge: i === 0 ? 'Base de operaciones' : 'Cupos Cliente Fundador',
+    badgeTone: i === 0 ? 'gold' : 'teal',
+  })),
 };
 const cta = {
   title: 'Cuéntanos de tu negocio, <em>te orientamos gratis</em>',
@@ -81,7 +85,7 @@ const itemList = [
 
     <AnswerBlock q={answer.q} a={answer.a} />
 
-    <RelatedLinks tag={cities.tag} title={cities.title} links={cities.links} />
+    <Locations locations={cityCards} />
 
     <CtaBand
       title={cta.title}

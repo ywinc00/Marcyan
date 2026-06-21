@@ -18,7 +18,7 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
         <article class="loc">
           <div class="loc__top">
             <span class="loc__pin"><Icon name="lucide:map-pin" /></span>
-            <span class="loc__badge"><span class="loc__badge-dot"></span>{c.badge}</span>
+            <span class="loc__badge" data-tone={c.badgeTone ?? 'teal'}><span class="loc__badge-dot"></span>{c.badge}</span>
           </div>
           <h3 class="loc__city">{c.city} <span class="loc__state">{c.state}</span></h3>
           <p class="loc__area">{c.area}</p>
@@ -61,6 +61,8 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
     text-transform: uppercase; color: var(--accent-teal);
   }
   .loc__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
+  .loc__badge[data-tone="gold"] { color: var(--accent-gold); }
+  .loc__badge[data-tone="gold"] .loc__badge-dot { background: var(--accent-gold); }
   .loc__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; }
   .loc__state { color: var(--fg-secondary); }
   .loc__area { color: var(--fg-secondary); font-size: var(--text-sm); }

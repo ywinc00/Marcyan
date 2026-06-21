@@ -61,6 +61,8 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       tone={cluster.includes.tone}
     />
 
+    <Projects projects={cluster.proof} />
+
     <Process process={c.process} />
 
     <Prose
@@ -81,8 +83,6 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       note={cluster.pricing.note}
       tone={cluster.pricing.tone}
     />
-
-    <Projects projects={cluster.proof} />
 
     <Faq tag={cluster.faq.tag} title={cluster.faq.title} items={cluster.faq.items} />
 

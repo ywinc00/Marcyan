@@ -82,15 +82,6 @@ const proj = (...names: string[]): ProjectItem[] =>
     .map((n) => homeProjects.find((p) => p.name === n))
     .filter((p): p is ProjectItem => Boolean(p));
 
-// Caso #0 — este mismo sitio (honesto, ya referenciado en el hero de la home).
-const caso0: ProjectItem = {
-  name: 'Este sitio · Caso #0',
-  cat: 'Marcyan · Nuestro propio sitio',
-  url: '/es/',
-  display: 'marcyanstudio.com',
-  result: 'Construido en HTML estático para que ChatGPT y Gemini puedan leerlo y citarlo.',
-  accent: 'teal',
-};
 
 // ── Contenido compartido entre las dos landings de diseño web ──
 const webIncludesItems: FeatureItem[] = [
@@ -520,7 +511,7 @@ const iaPymes: ClusterPage = {
     title: 'Automatización que <em>ya está en vivo</em>',
     cta: { label: 'Quiero algo así', href: '#contacto' },
     // Rosy Nails = web app de reservas (automatiza el agendado, es honesto). + Caso #0.
-    items: [...proj('Rosy Nails & Care'), caso0],
+    items: [...proj('Rosy Nails & Care')],
   },
   faq: {
     tag: 'Preguntas frecuentes',
@@ -749,7 +740,7 @@ const houstonIa: ClusterPage = {
     title: 'Automatización que <em>ya está en vivo</em>',
     cta: { label: 'Quiero algo así', href: '#contacto' },
     // Rosy Nails = web-app real de reservas (automatiza el agendado) + Caso #0.
-    items: [...proj('Rosy Nails & Care'), caso0],
+    items: [...proj('Rosy Nails & Care')],
   },
   faq: {
     tag: 'Preguntas frecuentes',
@@ -996,7 +987,7 @@ const precioChatbot: ClusterPage = {
     tag: 'Automatización real',
     title: 'Automatización que <em>ya está en vivo</em>',
     cta: { label: 'Quiero algo así', href: '#contacto' },
-    items: [...proj('Rosy Nails & Care'), caso0],
+    items: [...proj('Rosy Nails & Care')],
   },
   faq: {
     tag: 'Preguntas frecuentes',
@@ -1365,7 +1356,7 @@ const miamiIa: ClusterPage = {
     title: 'Automatización que <em>ya está en vivo</em>',
     cta: { label: 'Quiero algo así', href: '#contacto' },
     // Rosy Nails = web-app real de reservas (Houston) + Caso #0. NO son de Miami.
-    items: [...proj('Rosy Nails & Care'), caso0],
+    items: [...proj('Rosy Nails & Care')],
   },
   faq: {
     tag: 'Preguntas frecuentes',
@@ -1725,7 +1716,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
     // Honestidad: aún no hay despacho cliente. Rosy Nails = web-app real que agenda
     // citas (paralelo honesto a "agendar consultas") + Caso #0. NO se insinúa que
     // sea un despacho; el FAQ aclara el framing Cliente Fundador.
-    items: [...proj('Rosy Nails & Care'), caso0],
+    items: [...proj('Rosy Nails & Care')],
   },
   faq: {
     tag: 'Preguntas frecuentes',

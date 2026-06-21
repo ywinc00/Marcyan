@@ -37,7 +37,7 @@ const [featured, ...rest] = services.items;
       <ul class="svc-list">
         {rest.map((s: any) => (
           <li>
-            <a class="svc-item" href={s.href} data-accent={s.icon?.includes('message') ? 'teal' : 'gold'}>
+            <a class="svc-item" href={s.href} data-accent={s.icon?.includes('message') || s.icon?.includes('search') ? 'teal' : 'gold'}>
               <span class="svc-item__ic"><Icon name={s.icon} /></span>
               <span class="svc-item__tx">
                 <span class="svc-item__title">{s.title}</span>
@@ -109,10 +109,6 @@ const [featured, ...rest] = services.items;
   .svc-item__arr { display: inline-flex; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-base); }
   .svc-item__arr :global(svg) { width: 16px; height: 16px; }
   .svc-item:hover .svc-item__arr { color: var(--accent-gold); }
-  /* item de IA = señal teal (icono teal + hover teal en vez de oro) */
-  .svc-item[data-accent="teal"] .svc-item__ic :global(svg) { color: var(--accent-teal); }
-  .svc-item[data-accent="teal"]:hover { border-color: var(--accent-teal-line); }
-  .svc-item[data-accent="teal"]:hover .svc-item__arr { color: var(--accent-teal); }
 
   @media (--lg) {
     .services__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }

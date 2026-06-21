@@ -10,11 +10,10 @@ interface Props {
   tag: string;
   title: string;
   links: LinkItem[];
-  tone?: 'gold' | 'teal';
 }
-const { tag, title, links, tone = 'gold' } = Astro.props;
+const { tag, title, links } = Astro.props;
 ---
-<section class:list={['section related', `related--${tone}`]}>
+<section class="section related">
   <div class="container">
     <header class="related__head">
       <Kicker>{tag}</Kicker>
@@ -23,7 +22,7 @@ const { tag, title, links, tone = 'gold' } = Astro.props;
     <div class="related__grid">
       {links.map((l) => (
         <Card href={l.href} class="related__item">
-          <span class="related__icon"><Icon name={l.icon ?? 'lucide:link'} /></span>
+          <span class="related__icon"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span>
           <div class="related__body">
             <h3 class="related__title">{l.label}</h3>
             <p class="related__desc">{l.desc}</p>
@@ -36,23 +35,21 @@ const { tag, title, links, tone = 'gold' } = Astro.props;
 </section>
 
 <style>
-  .related--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); }
-  .related--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); }
-  .related__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+  .related__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
   .related__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 
   .related__item { display: flex; align-items: center; gap: var(--space-4); }
   .related__icon {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--tint-dim); border: 1px solid var(--tint-line); color: var(--tint);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
   }
   .related__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
   .related__body { min-width: 0; flex: 1; }
   .related__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
   .related__desc { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: 2px; }
   .related__go { flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle); transition: transform var(--duration-base), color var(--duration-base); }
-  .related__item:hover .related__go { color: var(--tint); transform: translateX(4px); }
+  .related__item:hover .related__go { color: var(--accent-gold); transform: translateX(3px); }
   @media (--motion-reduce) { .related__item:hover .related__go { transform: none; } }
 
   @media (--md) { .related__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); } }

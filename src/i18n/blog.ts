@@ -45,8 +45,6 @@ export const postChrome = {
   readingSuffix: 'min de lectura',
   faq: { tag: 'Preguntas frecuentes', title: 'Preguntas <em>frecuentes</em>' },
   related: { tag: 'Sigue explorando', title: 'Recursos <em>relacionados</em>' },
-  nav: { prev: 'Anterior', next: 'Siguiente', index: 'Ver todas las guías' },
-  toc: 'En esta guía',
   cta: {
     title: '¿Hablamos de tu <em>proyecto</em>?',
     sub: 'Propuesta personalizada en menos de 24 horas, sin costo ni compromiso. Atención bilingüe en Houston y Miami.',

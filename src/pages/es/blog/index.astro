@@ -66,10 +66,11 @@ const postRefs = posts.map((p) => ({
           <p class="bloglist__empty">{b.empty}</p>
         ) : (
           <ul class="bloglist__grid">
-            {posts.map((p) => (
-              <li>
-                <Card href={`/es/blog/${p.id}`} class="postcard">
+            {posts.map((p, i) => (
+              <li class:list={[i === 0 && 'bloglist__feat-li']}>
+                <Card href={`/es/blog/${p.id}`} class:list={['postcard', i === 0 && 'postcard--feat']}>
                   <div class="postcard__meta">
+                    {i === 0 && <span class="postcard__recent">Más reciente</span>}
                     <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
                     {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
                   </div>
@@ -112,6 +113,12 @@ const postRefs = posts.map((p) => ({
     letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
   }
   .postcard__tag { color: var(--accent-gold); }
+  .postcard__recent { color: var(--accent-gold); font-weight: 600; }
+  .bloglist__feat-li { grid-column: 1 / -1; }
+  .bloglist__grid .postcard--feat {
+    background: radial-gradient(100% 140% at 0% 0%, var(--accent-gold-dim), transparent 50%), var(--bg-card);
+    border-color: var(--accent-gold-line);
+  }
   .postcard__title {
     font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600;
     line-height: var(--leading-snug); color: var(--fg-primary);
@@ -124,7 +131,10 @@ const postRefs = posts.map((p) => ({
   .postcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
   .postcard:hover .postcard__cta :global(svg) { transform: translateX(3px); }
 
-  @media (--md) { .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); } }
+  @media (--md) {
+    .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+    .postcard--feat .postcard__title { font-size: var(--fluid-h4); }
+  }
   @media (--lg) { .bloglist__grid { grid-template-columns: repeat(3, 1fr); } }
   @media (--motion-reduce) { .postcard:hover .postcard__cta :global(svg) { transform: none; } }
 </style>

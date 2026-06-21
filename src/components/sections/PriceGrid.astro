@@ -107,6 +107,13 @@ const { tag, title, intro, items } = Astro.props;
   .pcard:hover .pcard__cta :global(svg) { transform: translateX(4px); }
 
   @media (--motion-reduce) { .pcard:hover .pcard__cta :global(svg) { transform: none; } }
-  @media (--sm) { .pgrid__grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (--lg) { .pgrid__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); } }
+  @media (--sm) {
+    .pgrid__grid { grid-template-columns: repeat(2, 1fr); }
+    /* catálogo impar → la última tarjeta huérfana abarca el ancho en vez de dejar hueco */
+    .pgrid__grid > .pcard:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  }
+  @media (--lg) {
+    .pgrid__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+    .pgrid__grid > .pcard:last-child:nth-child(odd) { grid-column: auto; }
+  }
 </style>

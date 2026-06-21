@@ -91,7 +91,8 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
   .nav__lang-opt {
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     color: var(--fg-subtle); transition: color var(--duration-fast);
-    min-height: var(--tap-min); display: inline-flex; align-items: center;
+    min-height: var(--tap-min); min-width: var(--tap-min); padding-inline: var(--space-1);
+    display: inline-flex; align-items: center; justify-content: center;
   }
   .nav__lang-opt.is-on { color: var(--accent-gold); }
   a.nav__lang-opt:hover { color: var(--fg-primary); }

@@ -84,6 +84,8 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
   .footer__legal a { color: var(--fg-secondary); transition: color var(--duration-fast); }
   .footer__legal a:hover { color: var(--accent-gold); }
 
+  /* 480-767px: aprovecha el ancho → las 3 columnas de enlaces caben en fila */
+  @media (--sm) { .footer__cols { grid-template-columns: repeat(3, 1fr); } }
   @media (--md) {
     .footer__inner { grid-template-columns: 1.4fr 2fr; gap: var(--space-10); }
     .footer__cols { grid-template-columns: repeat(3, 1fr); }

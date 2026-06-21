@@ -241,12 +241,28 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
       }
     });
 
-    // estado scrolled + barra CTA inferior tras pasar el hero
-    const onScroll = () => {
-      root.classList.toggle('is-scrolled', window.scrollY > 24);
-      if (ctabar) ctabar.classList.toggle('is-visible', window.scrollY > 560);
-    };
+    // estado scrolled de la nav (blur + fondo)
+    const onScroll = () => { root.classList.toggle('is-scrolled', window.scrollY > 24); };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Barra CTA inferior (móvil): aparece al dejar atrás la PRIMERA sección (hero / landing),
+    // no con un umbral fijo — así no convive con el CTA del propio hero. Marca `has-ctabar`
+    // en <body> para que el chat (ChatWidget) suba su FAB por encima de la barra.
+    if (ctabar) {
+      const firstSection = document.querySelector('#main')?.firstElementChild
+        || document.querySelector('[data-hero]');
+      const setBar = (on: boolean) => {
+        ctabar.classList.toggle('is-visible', on);
+        document.body.classList.toggle('has-ctabar', on);
+      };
+      if (firstSection && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([e]) => setBar(!e.isIntersecting)).observe(firstSection);
+      } else {
+        const fb = () => setBar(window.scrollY > 560);
+        fb();
+        window.addEventListener('scroll', fb, { passive: true });
+      }
+    }
   }
 </script>

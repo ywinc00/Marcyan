@@ -240,6 +240,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 <style>
   .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); }
 
+  /* Cuando la barra CTA inferior del nav está visible (móvil), sube el chat por encima de ella. */
+  @media (--lt-md) {
+    :global(body.has-ctabar) .mrc-chat { bottom: calc(var(--tap-min) + var(--space-3) * 4 + env(safe-area-inset-bottom)); }
+  }
+
   /* ── Burbuja de atención ────────────────────────────────── */
   .mrc-nudge {
     position: absolute; right: 66px; bottom: 14px; white-space: nowrap;

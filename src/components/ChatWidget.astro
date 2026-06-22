@@ -399,6 +399,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   /* ── Estado BIENVENIDA ──────────────────────────────────── */
   .mrc-welcome {
     flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    scrollbar-width: thin; scrollbar-color: var(--accent-teal-line) transparent;
     display: flex; flex-direction: column; align-items: center; text-align: center;
     gap: var(--space-2); padding: var(--space-3) var(--space-4);
   }
@@ -406,7 +407,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     margin-top: 0;
     filter: drop-shadow(0 10px 22px rgba(var(--accent-teal-rgb), 0.20));
   }
-  .mrc-hero-avatar :global(.marcy img) { height: clamp(72px, 16vw, 88px); width: auto; max-width: none; }
+  .mrc-hero-avatar :global(.marcy img) { height: 76px; width: auto; max-width: none; }
   .mrc-welcome-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
   .mrc-welcome-sub { font-size: var(--text-sm); color: var(--fg-secondary); margin-top: calc(-1 * var(--space-1)); }
   .mrc-welcome-hint { font-size: var(--text-xs); color: var(--fg-subtle); }
@@ -414,11 +415,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   /* Lista de canales (tarjetas) */
   .mrc-options {
     width: 100%; max-width: 360px; margin-top: var(--space-2);
-    display: flex; flex-direction: column; gap: var(--space-3);
+    display: flex; flex-direction: column; gap: var(--space-2);
   }
   .mrc-opt {
     width: 100%; display: flex; align-items: center; gap: var(--space-3);
-    padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); min-height: 56px;
+    padding: 10px var(--space-4); border-radius: var(--radius-lg); min-height: 52px;
     background: var(--bg-elevated); border: 1px solid var(--border); text-align: left; font-family: var(--font-body);
     transition: border-color var(--duration-fast), background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
   }
@@ -543,6 +544,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
     .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
     .mrc-options { max-width: 460px; }
+    .mrc-hero-avatar :global(.marcy img) { height: clamp(92px, 24vw, 112px); }
   }
 
   @media (--motion-reduce) {

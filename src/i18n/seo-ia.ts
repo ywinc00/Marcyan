@@ -104,7 +104,7 @@ export const seoIaPage = {
     badgeIcon: 'lucide:map-pin',
     kicker: 'SEO para IA · Visibilidad en IA',
     h1: 'Que ChatGPT te <em>recomiende</em> a ti',
-    sub: 'Tus clientes ya le preguntan a ChatGPT, a Gemini y a la IA de su WhatsApp por negocios como el tuyo. Hacemos que la IA te encuentre, te entienda y te recomiende — en español. Empieza con un diagnóstico gratis.',
+    sub: 'Tus clientes ya le preguntan a ChatGPT, a Gemini y a la IA de su WhatsApp por negocios como el tuyo. Hacemos que la IA te encuentre, te entienda y te recomiende, en español. Empieza con un diagnóstico gratis.',
     primary: { label: 'Pide tu diagnóstico gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo empezar', href: '#precios' },
     chips: ['Diagnóstico gratis', 'Te lo implementamos', 'Menos competencia en español'],
@@ -112,7 +112,7 @@ export const seoIaPage = {
   },
   answer: {
     q: '¿Cómo hago que ChatGPT y Gemini recomienden mi negocio?',
-    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Importa hacerlo ya — según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
+    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Importa hacerlo ya. Según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
     source: 'SOCi · Índice de Visibilidad Local 2026',
   },
   // Distinción CLAVE — IA que te recomienda ≠ IA que atiende (cruza-enlace inline).
@@ -120,7 +120,7 @@ export const seoIaPage = {
     tag: 'No te confundas',
     title: 'IA que te <em>recomienda</em> ≠ IA que <em>atiende</em>',
     paragraphs: [
-      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7 — eso es nuestra <a href="/es/houston/ia-conversacional">IA Conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
+      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7. Esa es nuestra <a href="/es/houston/ia-conversacional">IA Conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
       'Tus clientes ya le preguntan a ChatGPT y a Gemini (la IA que ya aparece en las búsquedas de Google) «¿qué taller, abogado o restaurante me recomiendas?». La pregunta es simple: <strong>¿apareces tú o aparece tu competencia?</strong> El SEO para IA (también llamado AEO o GEO) hace que seas tú.',
     ],
     tone: 'teal' as const,
@@ -136,12 +136,12 @@ export const seoIaPage = {
     title: 'Cómo te preparamos para que la <em>IA te cite</em>',
     tone: 'teal' as const,
     items: [
-      { icon: 'lucide:search', title: 'Bing Places (la base de ChatGPT)', desc: 'ChatGPT consulta Bing, no Google. Damos de alta y optimizamos tu Bing Places — el paso fácil que casi nadie da.' },
+      { icon: 'lucide:search', title: 'Bing Places (la base de ChatGPT)', desc: 'ChatGPT consulta Bing, no Google. Damos de alta y optimizamos tu Bing Places: el paso fácil que casi nadie da.' },
       { icon: 'lucide:braces', title: 'Datos estructurados (schema)', desc: 'Marcamos tu información en JSON-LD para que los asistentes entiendan quién eres, qué ofreces y a qué precio.' },
       { icon: 'marcyan-ai', title: 'Respuestas listas para citar', desc: 'Preguntas y respuestas claras en español e inglés, en el formato corto de 40-60 palabras (answer-first) que la IA cita textualmente.' },
-      { icon: 'lucide:list-checks', title: 'NAP consistente y directorios', desc: 'Tu nombre, dirección y teléfono iguales en todas partes — la IA saca buena parte de sus datos locales de ahí.' },
+      { icon: 'lucide:list-checks', title: 'NAP consistente y directorios', desc: 'Tu nombre, dirección y teléfono iguales en todas partes: la IA saca buena parte de sus datos locales de ahí.' },
       { icon: 'lucide:gauge', title: 'HTML que la IA sí lee', desc: 'Los rastreadores de IA no ejecutan JavaScript. Construimos en HTML estático (Astro), legible para ellos; si un sitio depende de JavaScript para mostrar su contenido, la IA puede no verlo.' },
-      { icon: 'lucide:line-chart', title: 'Medición y ajuste', desc: 'Seguimos cómo te ven y te mencionan los asistentes, y ajustamos. La visibilidad en IA es volátil — por eso se cuida mes a mes.' },
+      { icon: 'lucide:line-chart', title: 'Medición y ajuste', desc: 'Seguimos cómo te ven y te mencionan los asistentes, y ajustamos. La visibilidad en IA es volátil: por eso se cuida mes a mes.' },
     ],
   },
   // Caso #0 + done-for-you + wedge bilingüe (Prose).
@@ -149,8 +149,8 @@ export const seoIaPage = {
     tag: 'Caso #0',
     title: 'Lo aplicamos a <em>nuestro propio sitio</em>',
     paragraphs: [
-      'No es teoría: este mismo sitio está construido para que la IA lo lea — HTML estático, datos estructurados, contenido answer-first y precios públicos que ChatGPT puede citar. Somos nuestro propio Caso #0.',
-      'Y no te entregamos un PDF de recomendaciones para que te arregles solo: <strong>lo implementamos por ti</strong>, en español y para tu mercado local. El SEO para IA en español tiene mucha menos competencia que en inglés — una ventaja real para un negocio hispano que se mueve hoy.',
+      'No es teoría: este mismo sitio está construido para que la IA lo lea: HTML estático, datos estructurados, contenido answer-first y precios públicos que ChatGPT puede citar. Somos nuestro propio Caso #0.',
+      'Y no te entregamos un PDF de recomendaciones para que te arregles solo: <strong>lo implementamos por ti</strong>, en español y para tu mercado local. El SEO para IA en español tiene mucha menos competencia que en inglés: una ventaja real para un negocio hispano que se mueve hoy.',
     ],
     tone: 'teal' as const,
   },
@@ -158,10 +158,10 @@ export const seoIaPage = {
     tag: 'Preguntas frecuentes',
     title: 'SEO para IA, <em>sin rodeos</em>',
     items: [
-      { q: '¿Qué es el SEO para IA (AEO/GEO)?', a: 'Es el trabajo de optimización para que los asistentes de IA — ChatGPT, Gemini, Meta AI — puedan encontrarte, entenderte y recomendarte cuando alguien pregunta por un servicio como el tuyo. También se le llama AEO (optimización para motores de respuesta) o GEO. En corto: que la IA te cite a ti, no solo a tu competencia.' },
+      { q: '¿Qué es el SEO para IA (AEO/GEO)?', a: 'Es el trabajo de optimización para que los asistentes de IA (ChatGPT, Gemini, Meta AI) puedan encontrarte, entenderte y recomendarte cuando alguien pregunta por un servicio como el tuyo. También se le llama AEO (optimización para motores de respuesta) o GEO. En corto: que la IA te cite a ti, no solo a tu competencia.' },
       { q: '¿Es lo mismo que el SEO de toda la vida?', a: 'No, pero se complementan. El SEO clásico busca posicionarte en la lista de resultados de Google; el SEO para IA busca que los asistentes te mencionen en su respuesta directa. Comparten cimientos (un sitio rápido, legible y con buena información), pero la IA usa señales propias, como Bing y los datos estructurados.' },
       { q: '¿Cuánto cuesta?', a: 'El diagnóstico de visibilidad en IA es gratis, sin compromiso. Si quieres que trabajemos los cimientos (Bing, datos estructurados, preguntas frecuentes y un archivo que guía a la IA) es desde $500 una sola vez, y el monitoreo mensual desde $200 al mes. Todo publicado, sin letra pequeña.' },
-      { q: '¿En cuánto tiempo se ven resultados?', a: 'Es difícil dar una fecha exacta, y desconfía de quien te la prometa. Como referencia —no garantía—, las primeras señales suelen tomar semanas y una presencia más sólida, varios meses. Además, las respuestas de la IA cambian solas: por eso es un trabajo continuo, no un interruptor que se enciende una vez.' },
+      { q: '¿En cuánto tiempo se ven resultados?', a: 'Es difícil dar una fecha exacta, y desconfía de quien te la prometa. Como referencia, no garantía, las primeras señales suelen tomar semanas y una presencia más sólida, varios meses. Además, las respuestas de la IA cambian solas: por eso es un trabajo continuo, no un interruptor que se enciende una vez.' },
       { q: '¿Garantizan que ChatGPT me recomiende?', a: 'No, y desconfía de quien lo prometa. Nadie controla qué recomienda la IA y sus respuestas son volátiles. Lo que sí hacemos es prepararte correctamente para tener las mejores probabilidades, y medirlo con honestidad. ChatGPT tampoco acepta pago por recomendaciones locales.' },
       { q: '¿Funciona en español?', a: 'Sí, y es nuestra ventaja: el SEO para IA en español tiene mucha menos competencia que en inglés. Preparamos tu información en español e inglés, para que aparezcas cuando tu cliente pregunta en su idioma.' },
     ] as FaqItem[],

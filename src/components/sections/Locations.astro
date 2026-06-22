@@ -1,11 +1,22 @@
 ---
-// Sección Ubicaciones — Houston y Miami (Service-Area Business, sin dirección pública).
+// Sección Ubicaciones — "Ficha de ciudad" (Houston / Miami). Service-Area Business,
+// sin dirección pública. Cada tarjeta: identidad local (tagline + ilustración line-art),
+// datos (estado + coordenadas en pills mono), teléfono y sub-navegación de servicios.
+// Las ilustraciones (skyline / palmera) y las siluetas de estado son SVG propios,
+// decorativos (aria-hidden), en oro a baja opacidad. Recreación de la guía aprobada.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { locations: any }
 const { locations } = Astro.props;
 const tel = (s: string) => s.replace(/[^\d+]/g, '');
+
+// Siluetas de estado — geográficamente correctas (derivadas de GeoJSON público,
+// PublicaMundi/MappingAPI, con lat invertida para el eje-y de SVG). Decorativas.
+const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
+  TX: { viewBox: '0 0 100 93.4', path: 'M100 49.6L98.7 54L96.4 60.8L91 61.3L89.7 60.9L89.4 62.4L88.1 65.8L81.3 70.4L78.1 71.9L75 73.8L69.4 82.6L69.9 84.7L69.9 86.8L68.6 93.4L62.3 91.6L56.2 86.1L55 83.1L53.7 79L47.6 70.6L44.6 64.7L36.5 59.7L32.4 60L29.2 62.2L27.9 65.2L23.8 65.7L15 58.6L9.5 50.3L0 41L27.3 31.2L27.8 0L50.6 17.3L53.9 18.6L58.4 20.3L63.1 20.9L65.2 22.3L68.2 22.5L74.7 23.7L80 23.7L89 23.5L95 25.9L96.1 31L97.7 42.1Z' },
+  FL: { viewBox: '0 0 100 86.4', path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z' },
+};
 ---
 <section class="section locations" id="ciudades" data-fx="gold">
   <div class="container">
@@ -16,20 +27,62 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
     <div class="locations__grid">
       {locations.items.map((c: any) => (
         <article class="loc">
-          <div class="loc__top">
-            <span class="loc__pin"><Icon name="lucide:map-pin" /></span>
-            <span class="loc__badge"><span class="loc__badge-dot"></span>{c.badge}</span>
-          </div>
-          <h3 class="loc__city">{c.city} <span class="loc__state">{c.state}</span></h3>
-          <p class="loc__area">{c.area}</p>
-          <a class="loc__tel" href={`tel:${tel(c.tel)}`}>{c.tel}</a>
-          {c.links && c.links.length > 0 && (
-            <ul class="loc__links">
-              {c.links.map((l: any) => (
-                <li><a href={l.href}>{l.label} <Icon name="lucide:arrow-right" /></a></li>
-              ))}
-            </ul>
+          {c.illo && (
+            <div class="loc__illo" aria-hidden="true">
+              <img src={`/assets/cities/${c.illo}.svg`} alt="" loading="lazy" decoding="async" />
+            </div>
           )}
+
+          <div class="loc__body">
+            <div class="loc__top">
+              <span class="loc__pin"><Icon name="lucide:map-pin" /></span>
+              <span class="loc__badge"><span class="loc__badge-dot"></span>{c.badge}</span>
+            </div>
+
+            <h3 class="loc__city">{c.city} <span class="loc__state">{c.state}</span></h3>
+            {c.tagline && (
+              <p class="loc__tagline">{c.taglineIcon && <Icon name={c.taglineIcon} />}{c.tagline}</p>
+            )}
+            <p class="loc__area">{c.area}</p>
+            <a class="loc__tel" href={`tel:${tel(c.tel)}`}>{c.tel}</a>
+
+            {(c.stateFull || c.coords) && (
+              <div class="loc__pills">
+                {c.stateFull && (
+                  <span class="loc__pill">
+                    {STATE_SHAPE[c.state] && (
+                      <svg class="loc__pill-ic" viewBox={STATE_SHAPE[c.state].viewBox} aria-hidden="true"><path d={STATE_SHAPE[c.state].path} fill="currentColor" /></svg>
+                    )}
+                    {c.stateFull}
+                  </span>
+                )}
+                {c.coords && (
+                  <span class="loc__pill"><Icon name="lucide:locate-fixed" class="loc__pill-ic" />{c.coords}</span>
+                )}
+              </div>
+            )}
+
+            {c.links && c.links.length > 0 && (
+              <ul class="loc__links">
+                {c.links.map((l: any) => (
+                  <li>
+                    <a href={l.href}>
+                      <span class="loc__lk-ic"><Icon name={l.icon} /></span>
+                      <span class="loc__lk-tx">
+                        <span class="loc__lk-title">{l.label}</span>
+                        {l.sub && <span class="loc__lk-sub">{l.sub}</span>}
+                      </span>
+                      <Icon name="lucide:arrow-right" class="loc__lk-arr" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {c.connected && (
+              <p class="loc__conn"><span class="loc__conn-dots" aria-hidden="true">···</span> {c.connected}</p>
+            )}
+          </div>
         </article>
       ))}
     </div>
@@ -39,15 +92,28 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
 <style>
   .locations :global(em) { color: var(--accent-gold); font-style: normal; }
   .locations__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
-  .locations__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  .locations__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
 
   .loc {
-    min-width: 0; background: var(--bg-card); border: 1px solid var(--border);
+    position: relative; overflow: hidden; min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
     border-radius: var(--radius-lg); padding: var(--space-6);
-    display: flex; flex-direction: column; gap: var(--space-3);
     transition: border-color var(--duration-base) var(--ease-out-expo);
   }
   .loc:hover { border-color: var(--border-accent); }
+
+  /* Ilustración line-art EXACTA (asset oficial) — decorativa, esquina superior derecha.
+     El PNG ya viene en oro a baja opacidad; solo se posiciona y se difumina al borde izq. */
+  .loc__illo {
+    position: absolute; top: var(--space-5); right: var(--space-5);
+    width: clamp(190px, 52%, 300px); pointer-events: none; z-index: 0;
+    -webkit-mask-image: linear-gradient(255deg, #000 68%, transparent 100%);
+    mask-image: linear-gradient(255deg, #000 68%, transparent 100%);
+  }
+  .loc__illo img { width: 100%; height: auto; display: block; }
+
+  .loc__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+
   .loc__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
   .loc__pin {
     display: inline-flex; align-items: center; justify-content: center;
@@ -60,17 +126,68 @@ const tel = (s: string) => s.replace(/[^\d+]/g, '');
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-teal);
   }
-  .loc__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
-  .loc__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; }
+  .loc__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); }
+
+  .loc__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: 1.05; }
   .loc__state { color: var(--fg-secondary); }
+  .loc__tagline {
+    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    color: var(--accent-gold); margin-top: calc(var(--space-1) * -1);
+  }
+  .loc__tagline :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
   .loc__area { color: var(--fg-secondary); font-size: var(--text-sm); }
-  .loc__tel { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); margin-top: var(--space-1); }
+  .loc__tel { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold); }
   .loc__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
 
-  .loc__links { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); }
-  .loc__links a { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); transition: color var(--duration-fast), gap var(--duration-fast); min-height: var(--tap-min); }
-  .loc__links a:hover { color: var(--accent-gold); }
-  .loc__links :global(svg) { width: 15px; height: 15px; color: var(--accent-teal); flex: 0 0 auto; }
+  /* Pills de dato (estado + coordenadas) */
+  .loc__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+  .loc__pill {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
+  }
+  .loc__pill :global(.loc__pill-ic), .loc__pill .loc__pill-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
 
-  @media (--md) { .locations__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-5); } }
+  /* Sub-navegación de servicios */
+  .loc__links {
+    list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-2);
+    margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);
+  }
+  .loc__links a {
+    display: flex; align-items: center; gap: var(--space-3); min-height: 56px;
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: border-color var(--duration-fast), background var(--duration-fast);
+  }
+  .loc__links a:hover { border-color: var(--border-accent); background: var(--bg-elevated); }
+  .loc__lk-ic {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: var(--radius-md);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
+  }
+  .loc__links a:hover .loc__lk-ic { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .loc__lk-ic :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
+  .loc__lk-tx { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .loc__lk-title { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
+  .loc__lk-sub { font-size: var(--text-xs); color: var(--fg-secondary); }
+  .loc__links :global(.loc__lk-arr) { width: 15px; height: 15px; color: var(--fg-subtle); flex: 0 0 auto; transition: color var(--duration-fast), transform var(--duration-fast); }
+  .loc__links a:hover :global(.loc__lk-arr) { color: var(--accent-gold); transform: translateX(3px); }
+
+  .loc__conn {
+    margin-top: var(--space-3); text-align: right;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold); opacity: 0.85;
+  }
+  .loc__conn-dots { letter-spacing: 0.2em; opacity: 0.7; }
+
+  @media (--sm) {
+    .loc__links { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (--lg) {
+    .locations__grid { grid-template-columns: repeat(2, 1fr); }
+    .loc { padding: var(--space-7); }
+  }
 </style>

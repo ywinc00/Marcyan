@@ -83,7 +83,6 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
               <span class="pf__cat">{p.cat}</span>
               <p class="pf__result">{p.result}</p>
               {p.tags && <div class="pf__tags">{p.tags.map((t: string, ti: number) => <span class={`pf__tag pf__tag--${ti % 3}`}>{t}</span>)}</div>}
-              <span class="pf__url"><Icon name="lucide:globe" />{p.display}</span>
             </div>
           </article>
           );
@@ -186,8 +185,6 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
   .pf__tag { font-size: var(--text-xs); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); border: 1px solid var(--border); color: var(--fg-secondary); background: var(--bg-elevated); }
   .pf__tag--0 { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .pf__tag--2 { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .pf__url { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); }
-  .pf__url :global(svg) { width: 14px; height: 14px; }
 
   /* ── flechitas sutiles izq/der ─────────────────────────── */
   .pf__arrow {

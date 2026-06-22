@@ -104,7 +104,7 @@ export const catalog: CatalogProduct[] = [
       { key: 'webLanding', name: 'Landing Page', value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding), anchor: true,
         blurb: 'Una sola página enfocada en convertir: ideal para una promoción, un servicio o validar tu negocio.', href: '/es/houston/diseno-web' },
       { key: 'webRedesign', name: 'Rediseño de sitio', value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
-        blurb: 'Renovamos tu sitio actual — diseño, velocidad y textos — sin empezar de cero.', href: '/es/houston/diseno-web' },
+        blurb: 'Renovamos tu sitio actual (diseño, velocidad y textos) sin empezar de cero.', href: '/es/houston/diseno-web' },
       { key: 'web', name: 'Sitio a medida completo', value: PRICE_ANCHORS.web, display: tierDisplay(PRICE_ANCHORS.web),
         blurb: 'Varias páginas a medida y bilingües, con SEO base y listo para la IA.', href: '/es/houston/diseno-web' },
     ],
@@ -304,7 +304,7 @@ export const preciosPage = {
   hero: {
     kicker: 'Precios públicos',
     h1: 'Precios <em>claros</em>, sin letra pequeña',
-    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento — lo que la mayoría de agencias te esconde hasta venderte una llamada. Así de transparente trabajamos.',
+    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de agencias te esconde hasta venderte una llamada. Así de transparente trabajamos.',
     primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye cada servicio', href: '#precios' },
     chips: ['Desde $400 · diagnóstico IA gratis', 'Sin contratos forzados', 'Propuesta gratis en 24h'],
@@ -312,14 +312,14 @@ export const preciosPage = {
   },
   answer: {
     q: '¿Cuánto cuesta trabajar con Marcyan?',
-    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente — SEO mensual y mantenimiento — está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto recibe un alcance y un precio claros por escrito, sin compromiso.',
+    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto recibe un alcance y un precio claros por escrito, sin compromiso.',
   },
   transparency: {
     tag: 'Por qué lo publicamos',
     title: 'La mayoría te <em>esconde</em> el precio recurrente',
     paragraphs: [
       'En este mercado es normal que te muestren un precio de arranque atractivo y te oculten lo que de verdad pesa con el tiempo: la mensualidad del SEO, el mantenimiento, las renovaciones. Te enteras cuando ya estás adentro.',
-      'Nosotros hacemos lo contrario. <strong>Publicamos todas nuestras tarifas de arranque</strong>, incluido lo recurrente, para que decidas con la información completa. Cada servicio empieza con una opción accesible y crece según lo que necesites. El precio final depende del alcance real de tu proyecto y siempre te lo damos por escrito antes de que decidas — sin sorpresas.',
+      'Nosotros hacemos lo contrario. <strong>Publicamos todas nuestras tarifas de arranque</strong>, incluido lo recurrente, para que decidas con la información completa. Cada servicio empieza con una opción accesible y crece según lo que necesites. El precio final depende del alcance real de tu proyecto y siempre te lo damos por escrito antes de que decidas. Sin sorpresas.',
     ],
     tone: 'gold' as const,
   },
@@ -358,7 +358,7 @@ export const preciosPage = {
     items: [
       {
         q: '¿Por qué muestran los precios si casi nadie lo hace?',
-        a: 'Porque esconder el precio suele ser esconder algo. Publicar nuestras tarifas de arranque — incluido el SEO mensual y el mantenimiento — te deja comparar con calma y llegar a la conversación con confianza, no a que te «vendan». Es el tipo de trato que a nosotros nos gustaría recibir.',
+        a: 'Porque esconder el precio suele ser esconder algo. Publicar nuestras tarifas de arranque, incluido el SEO mensual y el mantenimiento, te deja comparar con calma y llegar a la conversación con confianza, no a que te «vendan». Es el tipo de trato que a nosotros nos gustaría recibir.',
       },
       {
         q: '¿El precio más bajo es el mismo servicio que el completo?',

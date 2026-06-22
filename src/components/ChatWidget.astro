@@ -28,6 +28,10 @@ const { lang = 'es' } = Astro.props;
 
 const telHref = (p: string) => 'tel:' + p.replace(/[^\d+]/g, '');
 
+// Canales directos (tarjeta "Mensaje directo") — derivados del NAP de Houston.
+const waHref = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;        // WhatsApp
+const smsHref = `sms:${nap.houston.replace(/[^\d+]/g, '')}`;             // iMessage / SMS
+
 const STR = {
   es: {
     open: 'Abrir el chat de ayuda',
@@ -36,13 +40,14 @@ const STR = {
     status: 'Responde al instante',
     greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento — y si quieres, te preparamos una muestra gratis de tu sitio.',
     welcomeTitle: 'Hola, soy Marcy',
-    welcomeSub: '¿En qué te ayudo hoy?',
+    welcomeSub: '¿Cómo prefieres contactarnos?',
+    welcomeHint: 'Elige la opción que mejor se adapte a ti.',
     fabNudge: '¿Necesitas ayuda?',
     placeholder: 'Escribe tu mensaje…',
     send: 'Enviar mensaje',
     typing: 'Escribiendo…',
     error: 'No pude responder ahora. Cuéntanos tu proyecto en /formulario.',
-    privacy: 'Asistente informativo. No guardamos tus mensajes.',
+    privacy: 'Asistente informativo. Tus mensajes se tratan con privacidad.',
     leaveData: 'Dejar mis datos',
     fullForm: 'formulario completo',
     // Captura inline
@@ -66,6 +71,14 @@ const STR = {
     capHandoffOk: 'Listo, le avisamos a una persona. Te contacta por email o WhatsApp pronto. 🙌',
     ctaFree: 'Diagnóstico gratis',
     ctaFreeMsg: 'Quiero un diagnóstico gratis de mi visibilidad en IA.',
+    // Selector de canal (pantalla de bienvenida)
+    optChatTitle: 'Chat con Marcy',
+    optChatSub: 'Te guío y respondo en tiempo real.',
+    optDirectTitle: 'Mensaje directo',
+    optDirectSub: 'Habla con nosotros por tu canal favorito.',
+    optFormTitle: 'Formulario de contacto',
+    optFormSub: 'Cuéntanos sobre tu proyecto y te responderemos.',
+    optDiagSub: 'Revisamos tu web, SEO o presencia online.',
   },
   en: {
     open: 'Open the help chat',
@@ -74,13 +87,14 @@ const STR = {
     status: 'Replies instantly',
     greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you — and if you like, we’ll prepare a free sample of your site.',
     welcomeTitle: 'Hi, I’m Marcy',
-    welcomeSub: 'How can I help you today?',
+    welcomeSub: 'How would you like to reach us?',
+    welcomeHint: 'Pick the option that suits you best.',
     fabNudge: 'Need a hand?',
     placeholder: 'Type your message…',
     send: 'Send message',
     typing: 'Typing…',
     error: 'I couldn’t reply right now. Tell us about your project at /formulario.',
-    privacy: 'Informational assistant. We don’t store your messages.',
+    privacy: 'Informational assistant. Your messages are handled privately.',
     leaveData: 'Leave my details',
     fullForm: 'full form',
     capTitleSample: 'We’ll prepare a free sample for you',
@@ -103,6 +117,13 @@ const STR = {
     capHandoffOk: 'Done — we notified a person. They’ll reach out by email or WhatsApp soon. 🙌',
     ctaFree: 'Free diagnosis',
     ctaFreeMsg: 'I’d like a free diagnosis of my AI visibility.',
+    optChatTitle: 'Chat with Marcy',
+    optChatSub: 'I’ll guide you and reply in real time.',
+    optDirectTitle: 'Direct message',
+    optDirectSub: 'Reach us on your favorite channel.',
+    optFormTitle: 'Contact form',
+    optFormSub: 'Tell us about your project and we’ll reply.',
+    optDiagSub: 'We’ll review your site, SEO, or online presence.',
   },
 };
 
@@ -182,23 +203,64 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       </button>
     </header>
 
-    <!-- Estado BIENVENIDA -->
+    <!-- Estado BIENVENIDA — selector de canal de contacto -->
     <div class="mrc-welcome" data-mrc-welcome>
       <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer /></span>
       <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
       <p class="mrc-welcome-sub">{t.welcomeSub}</p>
-      <div class="mrc-topics" data-mrc-topics>
-        {topics.map((tp) => (
-          <button type="button" class="mrc-topic" data-msg={tp.msg}>
-            <span class="mrc-topic-ic"><Icon name={tp.icon} /></span>
-            <span class="mrc-topic-tx">{tp.label}</span>
-          </button>
-        ))}
+      <p class="mrc-welcome-hint">{t.welcomeHint}</p>
+
+      <div class="mrc-options">
+        <!-- Chat con Marcy → entra a la conversación -->
+        <button type="button" class="mrc-opt" data-act="chat">
+          <span class="mrc-opt-ic"><Icon name="lucide:message-circle" /></span>
+          <span class="mrc-opt-tx">
+            <span class="mrc-opt-title">{t.optChatTitle}</span>
+            <span class="mrc-opt-sub">{t.optChatSub}</span>
+          </span>
+          <span class="mrc-opt-arrow" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
+        </button>
+
+        <!-- Mensaje directo → canales externos (no es botón: contiene enlaces) -->
+        <div class="mrc-opt mrc-opt--channels">
+          <span class="mrc-opt-ic"><Icon name="lucide:send" /></span>
+          <span class="mrc-opt-tx">
+            <span class="mrc-opt-title">{t.optDirectTitle}</span>
+            <span class="mrc-opt-sub">{t.optDirectSub}</span>
+            <span class="mrc-opt-pills">
+              <a class="mrc-pill" href={waHref} target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.43.78 3.04 1.19 4.66 1.19h.004c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15h-.003a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.82 2.42a8.16 8.16 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.48-.01a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
+                WhatsApp
+              </a>
+              <a class="mrc-pill" href={smsHref}>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3C6.9 3 2.75 6.36 2.75 10.5c0 2.36 1.36 4.47 3.48 5.85-.17 1.2-.77 2.35-1.69 3.26a.5.5 0 0 0 .44.85c1.9-.32 3.39-1.03 4.49-1.79.78.2 1.6.31 2.53.31 5.1 0 9.25-3.36 9.25-7.5S17.1 3 12 3z"/></svg>
+                iMessage
+              </a>
+            </span>
+          </span>
+          <span class="mrc-opt-arrow" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
+        </div>
+
+        <!-- Formulario de contacto → captura inline -->
+        <button type="button" class="mrc-opt" data-act="form">
+          <span class="mrc-opt-ic"><Icon name="lucide:file-pen-line" /></span>
+          <span class="mrc-opt-tx">
+            <span class="mrc-opt-title">{t.optFormTitle}</span>
+            <span class="mrc-opt-sub">{t.optFormSub}</span>
+          </span>
+          <span class="mrc-opt-arrow" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
+        </button>
+
+        <!-- Diagnóstico gratis (acción dominante) → siembra el mensaje de diagnóstico -->
+        <button type="button" class="mrc-opt mrc-opt--gold" data-msg={t.ctaFreeMsg}>
+          <span class="mrc-opt-ic"><Icon name="lucide:sparkles" /></span>
+          <span class="mrc-opt-tx">
+            <span class="mrc-opt-title">{t.ctaFree}</span>
+            <span class="mrc-opt-sub">{t.optDiagSub}</span>
+          </span>
+          <span class="mrc-opt-arrow" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
+        </button>
       </div>
-      <button type="button" class="mrc-cta-free" data-msg={t.ctaFreeMsg}>
-        <span class="mrc-cta-ic"><Icon name="lucide:sparkles" /></span>
-        <span>{t.ctaFree}</span>
-      </button>
     </div>
 
     <!-- Estado CONVERSACIÓN -->
@@ -227,7 +289,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     </form>
 
     <p class="mrc-foot">
-      <span>{t.privacy}</span>
+      <span class="mrc-foot-note"><Icon name="lucide:shield-check" />{t.privacy}</span>
       <span class="mrc-foot-actions">
         <button type="button" class="mrc-foot-link" data-mrc-leave>{t.leaveData}</button>
       </span>
@@ -281,7 +343,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-panel {
     position: absolute; right: 0; bottom: calc(58px + var(--space-3));
     display: flex; flex-direction: column;
-    width: min(384px, calc(100vw - 24px)); height: min(600px, calc(100vh - 100px));
+    width: min(384px, calc(100vw - 24px)); height: min(760px, calc(100vh - 88px));
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
     box-shadow: var(--shadow-modal); overflow: hidden;
     animation: mrc-in var(--duration-base) var(--ease-out-expo);
@@ -341,43 +403,66 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-welcome {
     flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
     display: flex; flex-direction: column; align-items: center; text-align: center;
-    gap: var(--space-2); padding: var(--space-4) var(--space-4) var(--space-3);
+    gap: var(--space-2); padding: var(--space-3) var(--space-4);
   }
   .mrc-hero-avatar {
     margin-top: 0;
     filter: drop-shadow(0 10px 22px rgba(var(--accent-teal-rgb), 0.20));
   }
-  .mrc-hero-avatar :global(.marcy img) { height: clamp(96px, 23vw, 108px); width: auto; max-width: none; }
+  .mrc-hero-avatar :global(.marcy img) { height: clamp(72px, 16vw, 88px); width: auto; max-width: none; }
   .mrc-welcome-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }
   .mrc-welcome-sub { font-size: var(--text-sm); color: var(--fg-secondary); margin-top: calc(-1 * var(--space-1)); }
-  .mrc-topics {
+  .mrc-welcome-hint { font-size: var(--text-xs); color: var(--fg-subtle); }
+
+  /* Lista de canales (tarjetas) */
+  .mrc-options {
     width: 100%; max-width: 360px; margin-top: var(--space-2);
-    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);
+    display: flex; flex-direction: column; gap: var(--space-3);
   }
-  .mrc-topic {
-    display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2);
-    padding: var(--space-3); border-radius: var(--radius-md); min-height: 56px; min-width: 0;
-    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); cursor: pointer;
-    text-align: left; font-family: var(--font-body); font-size: var(--text-sm);
-    transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast), transform var(--duration-fast);
+  .mrc-opt {
+    width: 100%; display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); min-height: 56px;
+    background: var(--bg-elevated); border: 1px solid var(--border); text-align: left; font-family: var(--font-body);
+    transition: border-color var(--duration-fast), background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
   }
-  .mrc-topic:hover { border-color: var(--accent-teal-line); background: var(--accent-teal-dim); transform: translateY(-1px); }
-  .mrc-topic:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-topic-ic { display: inline-flex; color: var(--accent-teal); }
-  .mrc-topic-ic :global(svg) { width: 20px; height: 20px; }
-  .mrc-topic-tx { font-weight: 500; overflow-wrap: anywhere; }
-  .mrc-cta-free {
-    width: 100%; max-width: 360px;
-    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
-    padding: 12px var(--space-4); min-height: var(--tap-min); border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-    font-family: var(--font-display); font-weight: 600; font-size: var(--text-sm); cursor: pointer;
-    transition: color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+  button.mrc-opt { cursor: pointer; color: var(--fg-primary); }
+  button.mrc-opt:hover { border-color: var(--accent-teal-line); background: var(--accent-teal-dim); transform: translateY(-1px); }
+  button.mrc-opt:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-opt-ic {
+    flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
   }
-  .mrc-cta-free:hover { background: var(--accent-gold); color: var(--fg-inverse); box-shadow: var(--shadow-gold); transform: translateY(-1px); }
-  .mrc-cta-free:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
-  .mrc-cta-ic { display: inline-flex; }
-  .mrc-cta-ic :global(svg) { width: 18px; height: 18px; }
+  .mrc-opt-ic :global(svg) { width: 20px; height: 20px; }
+  .mrc-opt-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .mrc-opt-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
+  .mrc-opt-sub { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); overflow-wrap: anywhere; }
+  .mrc-opt-arrow {
+    flex: 0 0 auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); color: var(--accent-teal);
+  }
+  .mrc-opt-arrow :global(svg) { width: 16px; height: 16px; }
+
+  /* "Mensaje directo": no es botón; lleva pills de canal */
+  .mrc-opt--channels { cursor: default; }
+  .mrc-opt-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .mrc-pill {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: 7px var(--space-3); border-radius: var(--radius-md);
+    background: var(--bg-card); border: 1px solid var(--accent-teal-line); color: var(--fg-primary);
+    font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500; text-decoration: none;
+    transition: border-color var(--duration-fast), background var(--duration-fast);
+  }
+  .mrc-pill:hover { background: var(--accent-teal-dim); border-color: var(--accent-teal); }
+  .mrc-pill:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-pill svg { width: 16px; height: 16px; flex: 0 0 auto; fill: var(--accent-teal); }
+
+  /* "Diagnóstico gratis": acción dominante en oro */
+  .mrc-opt--gold { background: var(--accent-gold-dim); border-color: var(--accent-gold-line); }
+  .mrc-opt--gold .mrc-opt-ic { background: var(--accent-gold-dim); border-color: var(--accent-gold-line); color: var(--accent-gold); }
+  .mrc-opt--gold .mrc-opt-title { color: var(--accent-gold); }
+  .mrc-opt--gold .mrc-opt-arrow { border-color: var(--accent-gold-line); color: var(--accent-gold); }
+  button.mrc-opt--gold:hover { border-color: var(--accent-gold); background: var(--accent-gold-dim); box-shadow: var(--shadow-gold); }
+  button.mrc-opt--gold:focus-visible { outline-color: var(--accent-gold); }
 
   /* ── Estado CONVERSACIÓN ────────────────────────────────── */
   .mrc-log {
@@ -398,6 +483,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   /* Cambio de estado: bienvenida ↔ conversación */
   .mrc-chat[data-stage="welcome"] .mrc-log,
   .mrc-chat[data-stage="welcome"] .mrc-chips,
+  .mrc-chat[data-stage="welcome"] .mrc-form,
   .mrc-chat[data-stage="welcome"] .mrc-head-id,
   .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
   .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
@@ -435,6 +521,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
     padding: 0 var(--space-4) var(--space-3); font-size: var(--text-xs); color: var(--fg-subtle);
   }
+  .mrc-foot-note { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; }
+  .mrc-foot-note :global(svg) { width: 14px; height: 14px; color: var(--accent-teal); flex: 0 0 auto; }
   .mrc-foot-link {
     background: transparent; border: none; cursor: pointer; padding: 2px 0;
     font-size: var(--text-xs); color: var(--fg-secondary); text-decoration: underline; font-family: var(--font-body);
@@ -456,12 +544,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       border-radius: 0; border: none;
     }
     .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
-    .mrc-topics, .mrc-cta-free { max-width: 420px; }
-    .mrc-welcome { justify-content: center; }
+    .mrc-options { max-width: 460px; }
   }
 
   @media (--motion-reduce) {
-    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-topic, .mrc-cta-free { animation: none !important; transition: none !important; }
+    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
   }
   @media print { .mrc-chat { display: none !important; } }
 </style>
@@ -824,10 +911,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (nudge) nudge.hidden = true;
       syncViewport();
       requestAnimationFrame(() => {
-        // En bienvenida NO enfocamos el input (en móvil abriría el teclado y
-        // taparía el grid); enfocamos el primer tema. En conversación, el input.
+        // En bienvenida NO enfocamos el input (en móvil abriría el teclado);
+        // enfocamos la primera tarjeta de canal. En conversación, el input.
         if (root.getAttribute('data-stage') === 'chat' && input) { input.focus(); return; }
-        const first = panel.querySelector('[data-mrc-topics] .mrc-topic');
+        const first = panel.querySelector('[data-mrc-welcome] button, [data-mrc-welcome] a[href]');
         (first || closeBtn || panel).focus();
       });
     }
@@ -856,8 +943,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
       });
     }
-    // Grid de temas (bienvenida) y chips de respuesta rápida (conversación):
-    // ambos SIEMBRAN un mensaje de usuario.
+    // Chips de respuesta rápida (conversación): SIEMBRAN un mensaje de usuario.
     function seedFrom(container) {
       if (!container) return;
       container.addEventListener('click', (e) => {
@@ -865,8 +951,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (btn) send(btn.getAttribute('data-msg'));
       });
     }
-    seedFrom(welcomeEl);
     seedFrom(chipRow);
+    // Selector de canal (bienvenida): cada tarjeta enruta a su acción. Los enlaces
+    // de canal (WhatsApp/iMessage) son <a href> nativos → no necesitan JS aquí.
+    if (welcomeEl) welcomeEl.addEventListener('click', (e) => {
+      const el = e.target && e.target.closest ? e.target.closest('[data-act], [data-msg]') : null;
+      if (!el) return;
+      const act = el.getAttribute('data-act');
+      if (act === 'chat') { ensureChat(); if (input) input.focus(); return; }
+      if (act === 'form') { openCapture('contacto'); return; }
+      const msg = el.getAttribute('data-msg');
+      if (msg) send(msg);
+    });
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
 
     // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.

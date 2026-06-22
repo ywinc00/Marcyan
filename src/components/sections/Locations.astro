@@ -46,19 +46,14 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
             <p class="loc__area">{c.area}</p>
             <a class="loc__tel" href={`tel:${tel(c.tel)}`}>{c.tel}</a>
 
-            {(c.stateFull || c.coords) && (
+            {c.stateFull && (
               <div class="loc__pills">
-                {c.stateFull && (
-                  <span class="loc__pill">
-                    {STATE_SHAPE[c.state] && (
-                      <svg class="loc__pill-ic" viewBox={STATE_SHAPE[c.state].viewBox} aria-hidden="true"><path d={STATE_SHAPE[c.state].path} fill="currentColor" /></svg>
-                    )}
-                    {c.stateFull}
-                  </span>
-                )}
-                {c.coords && (
-                  <span class="loc__pill"><Icon name="lucide:locate-fixed" class="loc__pill-ic" />{c.coords}</span>
-                )}
+                <span class="loc__pill">
+                  {STATE_SHAPE[c.state] && (
+                    <svg class="loc__pill-ic" viewBox={STATE_SHAPE[c.state].viewBox} aria-hidden="true"><path d={STATE_SHAPE[c.state].path} fill="currentColor" /></svg>
+                  )}
+                  {c.stateFull}
+                </span>
               </div>
             )}
 
@@ -96,6 +91,7 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
 
   .loc {
     position: relative; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column;
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: var(--radius-lg); padding: var(--space-6);
     transition: border-color var(--duration-base) var(--ease-out-expo);
@@ -105,14 +101,14 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   /* Ilustración line-art EXACTA (asset oficial) — decorativa, esquina superior derecha.
      El PNG ya viene en oro a baja opacidad; solo se posiciona y se difumina al borde izq. */
   .loc__illo {
-    position: absolute; top: var(--space-5); right: var(--space-5);
-    width: clamp(190px, 52%, 300px); pointer-events: none; z-index: 0;
-    -webkit-mask-image: linear-gradient(255deg, #000 68%, transparent 100%);
-    mask-image: linear-gradient(255deg, #000 68%, transparent 100%);
+    position: absolute; top: 84px; right: var(--space-5);
+    width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
+    -webkit-mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+    mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
   }
   .loc__illo img { width: 100%; height: auto; display: block; }
 
-  .loc__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+  .loc__body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 
   .loc__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
   .loc__pin {
@@ -152,24 +148,24 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
 
   /* Sub-navegación de servicios */
   .loc__links {
-    list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-2);
-    margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);
+    list-style: none; display: grid; grid-template-columns: 1fr; gap: 2px;
+    margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);
   }
   .loc__links a {
-    display: flex; align-items: center; gap: var(--space-3); min-height: 56px;
-    padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);
+    display: flex; align-items: center; gap: var(--space-3); min-height: 40px;
+    padding: var(--space-1) var(--space-2); border-radius: var(--radius-md);
     border: 1px solid transparent;
     transition: border-color var(--duration-fast), background var(--duration-fast);
   }
   .loc__links a:hover { border-color: var(--border-accent); background: var(--bg-elevated); }
   .loc__lk-ic {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: var(--radius-md);
+    width: 30px; height: 30px; border-radius: var(--radius-sm);
     background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
     transition: color var(--duration-fast), border-color var(--duration-fast);
   }
   .loc__links a:hover .loc__lk-ic { color: var(--accent-gold); border-color: var(--accent-gold-line); }
-  .loc__lk-ic :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
+  .loc__lk-ic :global(svg) { width: 16px; height: 16px; stroke-width: 1.5; }
   .loc__lk-tx { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
   .loc__lk-title { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
   .loc__lk-sub { font-size: var(--text-xs); color: var(--fg-secondary); }
@@ -177,7 +173,7 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   .loc__links a:hover :global(.loc__lk-arr) { color: var(--accent-gold); transform: translateX(3px); }
 
   .loc__conn {
-    margin-top: var(--space-3); text-align: right;
+    margin-top: auto; padding-top: var(--space-4); text-align: right;
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-gold); opacity: 0.85;
   }
@@ -188,6 +184,5 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   }
   @media (--lg) {
     .locations__grid { grid-template-columns: repeat(2, 1fr); }
-    .loc { padding: var(--space-7); }
   }
 </style>

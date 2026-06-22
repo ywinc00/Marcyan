@@ -59,7 +59,7 @@ export const serviciosPage = {
       { icon: 'lucide:languages', title: 'Bilingüe de verdad', desc: 'Tu sitio en español e inglés real, no un botón de Google Translate. Nuestro propio sitio es bilingüe.' },
       { icon: 'marcyan-ai', title: 'Te encuentra la IA', desc: 'Construimos en HTML rápido que ChatGPT, Gemini y Meta AI sí pueden leer, para que aparezcas cuando preguntan por lo que ofreces.' },
       { icon: 'lucide:tag', title: 'Precios públicos', desc: 'Publicamos todo, hasta el SEO mensual y el mantenimiento. Sin letra pequeña ni sorpresas en la factura.' },
-      { icon: 'lucide:map-pin', title: 'Presencia local real', desc: 'Te atendemos en Houston y Miami, en tu idioma y tu zona horaria — no una operación remota anónima.' },
+      { icon: 'lucide:map-pin', title: 'Presencia local real', desc: 'Te atendemos en Houston y Miami, en tu idioma y tu zona horaria, no una operación remota anónima.' },
     ],
     tone: 'gold' as const,
   },

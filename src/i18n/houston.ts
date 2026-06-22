@@ -26,7 +26,7 @@ export const houstonHub = {
     badgeIcon: 'lucide:map-pin',
     kicker: 'Agencia local',
     h1: 'Diseño de páginas web en <em>Houston</em>',
-    sub: 'Una sola agencia hispana para tu sitio, tu IA y tu SEO local — a medida, bilingüe y con precios públicos. Hecho para cómo busca de verdad tu cliente en Houston.',
+    sub: 'Una sola agencia hispana para tu sitio, tu IA y tu SEO local, a medida, bilingüe y con precios públicos. Hecho para cómo busca de verdad tu cliente en Houston.',
     primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver precios y planes', href: '/es/precios' },
     chips: ['Bilingüe ES/EN', 'Precios públicos', 'Área metro de Houston'],
@@ -61,7 +61,7 @@ export const houstonHub = {
     tag: 'Houston',
     title: 'Conocemos el <em>mercado de Houston</em>',
     paragraphs: [
-      'Houston es la cuarta ciudad más grande de Estados Unidos y una de las de mayor población hispana. Es un mercado enorme y competido, donde aparecer primero — en Google, en Maps y en los asistentes de IA — marca la diferencia entre una llamada y un cliente perdido.',
+      'Houston es la cuarta ciudad más grande de Estados Unidos y una de las de mayor población hispana. Es un mercado enorme y competido, donde aparecer primero, en Google, en Maps y en los asistentes de IA, marca la diferencia entre una llamada y un cliente perdido.',
       'Trabajamos toda el área metropolitana de Houston como negocio de área de servicio, en español e inglés. <strong>No somos una agencia remota que «también cubre» Houston:</strong> diseñamos, escribimos y posicionamos pensando en cómo busca de verdad tu cliente aquí.',
     ],
     tone: 'gold' as const,
@@ -80,7 +80,7 @@ export const houstonHub = {
     title: 'Agencia en Houston, <em>sin rodeos</em>',
     items: [
       { q: '¿Qué servicios ofrecen en Houston?', a: 'Diseño y desarrollo web a medida, SEO local, IA conversacional (asistentes que atienden 24/7), tiendas en línea, branding y mantenimiento. Todo bilingüe en español e inglés, y pensado para el mercado hispano de Houston. Puedes tomar un solo servicio o un paquete coordinado.' },
-      { q: '¿Tienen oficina en Houston?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina — todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
+      { q: '¿Tienen oficina en Houston?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
       { q: '¿Trabajan en español e inglés?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. Diseñamos, escribimos y posicionamos en español e inglés, porque en Houston tus clientes buscan en ambos idiomas.' },
       { q: '¿Atienden solo a Houston o también el área metropolitana?', a: 'Cubrimos Houston y toda su área metropolitana (Katy, Sugar Land, The Woodlands, Pearland y más). Al ser negocio de área de servicio, podemos atenderte en las zonas donde realmente operas, sin necesidad de una dirección pública.' },
       { q: '¿Cuánto cuestan sus servicios en Houston?', a: 'Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.' },

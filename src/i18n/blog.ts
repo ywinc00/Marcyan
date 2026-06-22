@@ -16,7 +16,7 @@ export const blogIndex = {
     badgeIcon: 'lucide:book-open',
     kicker: 'Blog de Marcyan',
     h1: 'Guías honestas para <em>hacer crecer</em> tu negocio en línea',
-    sub: 'Diseño web, inteligencia artificial y SEO explicados sin tecnicismos y sin letra pequeña — para dueños de negocios hispanos en Houston y Miami.',
+    sub: 'Diseño web, inteligencia artificial y SEO explicados sin tecnicismos y sin letra pequeña, para dueños de negocios hispanos en Houston y Miami.',
     primary: { label: 'Ver precios', href: '/es/precios' },
     secondary: { label: 'Cuéntanos tu proyecto', href: '#contacto' },
     tone: 'gold' as const,

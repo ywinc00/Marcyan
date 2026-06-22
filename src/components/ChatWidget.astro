@@ -38,11 +38,11 @@ const STR = {
     close: 'Cerrar el chat',
     title: 'Marcy',
     status: 'Responde al instante',
-    greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento — y si quieres, te preparamos una muestra gratis de tu sitio.',
+    greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento. Y si quieres, te preparamos una muestra gratis de tu sitio.',
     welcomeTitle: 'Hola, soy Marcy',
     welcomeSub: '¿Cómo prefieres contactarnos?',
     welcomeHint: 'Elige la opción que mejor se adapte a ti.',
-    fabNudge: '¿Necesitas ayuda?',
+    fabNudge: 'Respuesta en vivo',
     placeholder: 'Escribe tu mensaje…',
     send: 'Enviar mensaje',
     typing: 'Escribiendo…',
@@ -85,11 +85,11 @@ const STR = {
     close: 'Close the chat',
     title: 'Marcy',
     status: 'Replies instantly',
-    greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you — and if you like, we’ll prepare a free sample of your site.',
+    greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you. And if you like, we’ll prepare a free sample of your site.',
     welcomeTitle: 'Hi, I’m Marcy',
     welcomeSub: 'How would you like to reach us?',
     welcomeHint: 'Pick the option that suits you best.',
-    fabNudge: 'Need a hand?',
+    fabNudge: 'Live reply',
     placeholder: 'Type your message…',
     send: 'Send message',
     typing: 'Typing…',
@@ -114,7 +114,7 @@ const STR = {
     human: 'Talk to a person',
     capTitleHuman: 'I’ll connect you with a person',
     capSubHuman: 'Leave your contact and an advisor will reach out. (Not live chat.)',
-    capHandoffOk: 'Done — we notified a person. They’ll reach out by email or WhatsApp soon. 🙌',
+    capHandoffOk: 'Done. We notified a person. They’ll reach out by email or WhatsApp soon. 🙌',
     ctaFree: 'Free diagnosis',
     ctaFreeMsg: 'I’d like a free diagnosis of my AI visibility.',
     optChatTitle: 'Chat with Marcy',
@@ -171,7 +171,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     aria-controls="mrc-chat-panel"
     aria-label={t.open}
   >
-    <span class="mrc-fab-ic mrc-fab-ic--open"><MarcyAvatar variant="mini" class="mrc-fab-marcy" /></span>
+    <span class="mrc-fab-ic mrc-fab-ic--open"><Icon name="lucide:message-circle" /></span>
     <span class="mrc-fab-ic mrc-fab-ic--close"><Icon name="lucide:x" /></span>
   </button>
 
@@ -238,7 +238,6 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
               </a>
             </span>
           </span>
-          <span class="mrc-opt-arrow" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
         </div>
 
         <!-- Formulario de contacto → captura inline -->
@@ -319,21 +318,19 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   @keyframes mrc-nudge-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
 
-  /* ── Botón flotante (Marcy mini) ────────────────────────── */
+  /* ── Botón flotante (icono de mensaje, verde/teal — alta jerarquía) ── */
   .mrc-fab {
     position: relative; display: inline-flex; align-items: center; justify-content: center;
     width: 58px; height: 58px; min-width: var(--tap-min); min-height: var(--tap-min);
     border-radius: 50%; cursor: pointer;
-    background: radial-gradient(circle at 50% 32%, var(--bg-elevated), var(--bg-base));
-    color: var(--fg-primary); border: 1px solid var(--accent-teal-line);
+    background: var(--accent-teal); color: var(--fg-inverse); border: none;
     box-shadow: var(--shadow-teal), 0 6px 24px rgba(0, 0, 0, 0.5);
     transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
   }
   .mrc-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-teal), 0 10px 32px rgba(0, 0, 0, 0.6); }
   .mrc-fab:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; }
   .mrc-fab-ic { position: absolute; display: inline-flex; align-items: center; justify-content: center; transition: opacity var(--duration-base), transform var(--duration-base); }
-  .mrc-fab-ic :global(svg) { width: 22px; height: 22px; stroke-width: 2; }
-  .mrc-fab-ic--open :global(.marcy img) { width: 40px; height: 40px; }
+  .mrc-fab-ic :global(svg) { width: 24px; height: 24px; stroke-width: 2; }
   .mrc-fab-ic--close { opacity: 0; transform: rotate(-90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--open { opacity: 0; transform: rotate(90deg) scale(0.6); }
   .mrc-chat[data-open] .mrc-fab-ic--close { opacity: 1; transform: none; }
@@ -444,8 +441,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
   /* "Mensaje directo": no es botón; lleva pills de canal */
   .mrc-opt--channels { cursor: default; }
-  .mrc-opt-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .mrc-opt-pills { display: flex; flex-wrap: nowrap; gap: var(--space-2); margin-top: var(--space-2); }
   .mrc-pill {
+    flex: 1 1 0; min-width: 0; justify-content: center;
     display: inline-flex; align-items: center; gap: var(--space-2);
     padding: 7px var(--space-3); border-radius: var(--radius-md);
     background: var(--bg-card); border: 1px solid var(--accent-teal-line); color: var(--fg-primary);

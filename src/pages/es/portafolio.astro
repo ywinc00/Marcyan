@@ -1,0 +1,75 @@
+---
+// PORTAFOLIO · /es/portafolio — proof real (4 clientes) + E-E-A-T (Lane 2).
+// Reusa los componentes del DS (LandingHero, AnswerBlock, RelatedLinks, Faq,
+// CtaBand, Contact) + PortfolioGrid (maquetas de dispositivo con capturas reales).
+// Schema: CollectionPage + ItemList (CreativeWork) + BreadcrumbList. ES (hasEn=false).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import PortfolioGrid from '../../components/sections/PortfolioGrid.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import Faq from '../../components/sections/Faq.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import CollectionPageLd from '../../components/seo/CollectionPageLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { portfolioPage as p, portfolioProjects } from '../../i18n/portfolio';
+
+const c = content.es;
+// CollectionPage items desde los proyectos (CreativeWork con captura real; sin URL externa por privacidad).
+const works = portfolioProjects.map((w) => ({
+  name: w.name,
+  description: w.did,
+  about: w.cat,
+  image: `/Galeria/${w.slug}-pc.webp`,
+}));
+---
+<Layout
+  title={p.meta.title}
+  description={p.meta.description}
+  lang="es"
+  path="portafolio"
+  hasEn={false}
+>
+  <CollectionPageLd slot="head" name={p.meta.title} description={p.meta.description} path={p.path} items={works} />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LandingHero
+      kicker={p.hero.kicker}
+      h1={p.hero.h1}
+      sub={p.hero.sub}
+      primary={p.hero.primary}
+      secondary={p.hero.secondary}
+      chips={p.hero.chips}
+      tone={p.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={p.answer.q} a={p.answer.a} />
+
+    <PortfolioGrid tag={p.worksHead.tag} title={p.worksHead.title} intro={p.worksHead.intro} projects={portfolioProjects} />
+
+    <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
+
+    <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
+
+    <CtaBand
+      title={p.cta.title}
+      sub={p.cta.sub}
+      primary={p.cta.primary}
+      secondary={p.cta.secondary}
+      tone={p.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

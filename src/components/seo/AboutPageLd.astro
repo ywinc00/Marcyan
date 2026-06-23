@@ -1,0 +1,13 @@
+---
+// Emite el JSON-LD AboutPage de /es/sobre-nosotros (apunta a la Organization).
+// Co-localizado; complementa el BreadcrumbList y el @graph base del Layout.
+import { aboutPage } from '../../lib/schema';
+
+interface Props {
+  name: string;
+  description: string;
+  path: string;
+}
+const ld = aboutPage(Astro.props);
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

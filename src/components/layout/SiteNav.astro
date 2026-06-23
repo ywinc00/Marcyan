@@ -143,16 +143,19 @@ const isActive = (href: string) =>
 
   /* ── ≥ md: barra completa ─────────────────────────────── */
   @media (--md) {
-    .nav__links { display: flex; align-items: center; gap: var(--space-6); }
+    /* gap ajustado para que 6 enlaces + marca + lang + CTA quepan a 768px */
+    .nav__links { display: flex; align-items: center; gap: var(--space-4); }
     .nav__links a {
       font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg-secondary);
-      padding: var(--space-2) 0; transition: color var(--duration-fast);
+      padding: var(--space-2) 0; transition: color var(--duration-fast); white-space: nowrap;
     }
     .nav__links a:hover { color: var(--fg-primary); }
     .nav__lang { display: inline-flex; }
     .nav__cta { display: inline-flex; }
     .nav__toggle { display: none; }
   }
+  /* ≥ lg: hay espacio de sobra → respira más entre enlaces */
+  @media (--lg) { .nav__links { gap: var(--space-6); } }
 
   /* ── Drawer (off-canvas) ──────────────────────────────── */
   .nav__overlay {

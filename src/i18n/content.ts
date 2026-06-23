@@ -26,8 +26,10 @@ export const content = {
       // Nav plana unificada (home + páginas internas vía clusterNav): páginas REALES.
       links: [
         { label: 'Servicios', href: '/es/servicios' },
+        { label: 'Portafolio', href: '/es/portafolio' },
         { label: 'Precios', href: '/es/precios' },
         { label: 'Ciudades', href: '/es/ciudades' },
+        { label: 'Nosotros', href: '/es/sobre-nosotros' },
         { label: 'Blog', href: '/es/blog' },
       ] as Link[],
       cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
@@ -213,8 +215,9 @@ export const content = {
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [
+          { label: 'Sobre nosotros', href: '/es/sobre-nosotros' },
+          { label: 'Portafolio', href: '/es/portafolio' },
           { label: 'Blog', href: '/es/blog' },
-          { label: 'Proyectos', href: '/es/#proyectos' },
           { label: 'Privacidad', href: '/privacidad' },
           { label: 'Términos', href: '/terminos' },
         ] },

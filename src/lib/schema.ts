@@ -364,3 +364,78 @@ export function aggregateRating(input: RatingInput) {
     bestRating: input.bestRating ?? '5',
   };
 }
+
+// ─────────────────────────────────────────────────────────────
+// CollectionPage / AboutPage — para /es/portafolio y /es/sobre-nosotros.
+// Complementan el @graph base del Layout (Organization + 2 ProfessionalService).
+// Honestidad: cada CreativeWork es un proyecto REAL (captura real); NO se emite
+// AggregateRating/Review aquí hasta tener reseñas reales con consentimiento.
+// ─────────────────────────────────────────────────────────────
+export interface WorkItem {
+  name: string;
+  description: string;
+  /** Categoría/rubro del proyecto (p.ej. "Junk Removal · Houston, TX"). */
+  about?: string;
+  /** Ruta interna o URL del proyecto (opcional; se omite por privacidad del cliente). */
+  url?: string;
+  /** Imagen de la captura (path interno o URL absoluta). */
+  image?: string;
+}
+
+/** CollectionPage con un ItemList de CreativeWork (los proyectos del portafolio). */
+export function collectionPage(input: {
+  name: string;
+  description: string;
+  path: string;
+  inLanguage?: string;
+  items: WorkItem[];
+}) {
+  const url = abs(input.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: input.name,
+    description: input.description,
+    url,
+    inLanguage: input.inLanguage ?? 'es',
+    isPartOf: { '@id': ORG_ID },
+    about: { '@id': ORG_ID },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: input.items.map((it, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: it.name,
+          ...(it.description ? { description: it.description } : {}),
+          ...(it.about ? { about: it.about } : {}),
+          ...(it.url ? { url: abs(it.url) } : {}),
+          ...(absAsset(it.image) ? { image: absAsset(it.image) } : {}),
+          creator: { '@id': ORG_ID },
+        },
+      })),
+    },
+  };
+}
+
+/** AboutPage que apunta a la Organization del @graph (E-E-A-T). */
+export function aboutPage(input: {
+  name: string;
+  description: string;
+  path: string;
+  inLanguage?: string;
+}) {
+  const url = abs(input.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: input.name,
+    description: input.description,
+    url,
+    inLanguage: input.inLanguage ?? 'es',
+    isPartOf: { '@id': ORG_ID },
+    about: { '@id': ORG_ID },
+    mainEntity: { '@id': ORG_ID },
+  };
+}

@@ -1,0 +1,14 @@
+---
+// Emite el JSON-LD CollectionPage (+ ItemList de CreativeWork) del portafolio.
+// Co-localizado; complementa el BreadcrumbList y el @graph base del Layout.
+import { collectionPage, type WorkItem } from '../../lib/schema';
+
+interface Props {
+  name: string;
+  description: string;
+  path: string;
+  items: WorkItem[];
+}
+const ld = collectionPage(Astro.props);
+---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

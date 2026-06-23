@@ -1,0 +1,100 @@
+---
+// SOBRE NOSOTROS · /es/sobre-nosotros — E-E-A-T honesto (Lane 2).
+// quiénes somos · cómo trabajamos (proceso) · enfoque/valores · Clientes Fundadores ·
+// ciudades (SAB) · trabajo real (→ portafolio). Reusa componentes del DS.
+// Schema: AboutPage (→ Organization del @graph) + BreadcrumbList. ES (hasEn=false).
+// ⚠️ HONESTIDAD: NO se inventa fundador. El nodo Person + sameAs + foundingDate se
+// añaden DESPUÉS, cuando el dueño dé el dato real (ver bloque comentado abajo).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import Prose from '../../components/sections/Prose.astro';
+import FeatureGrid from '../../components/sections/FeatureGrid.astro';
+import Process from '../../components/sections/Process.astro';
+import Locations from '../../components/sections/Locations.astro';
+import RelatedLinks from '../../components/sections/RelatedLinks.astro';
+import Faq from '../../components/sections/Faq.astro';
+import CtaBand from '../../components/sections/CtaBand.astro';
+import Contact from '../../components/sections/Contact.astro';
+import AboutPageLd from '../../components/seo/AboutPageLd.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { sobreNosotros as a } from '../../i18n/sobre-nosotros';
+
+const c = content.es;
+---
+<Layout
+  title={a.meta.title}
+  description={a.meta.description}
+  lang="es"
+  path="sobre-nosotros"
+  hasEn={false}
+>
+  <AboutPageLd slot="head" name={a.meta.title} description={a.meta.description} path={a.path} />
+
+  {/*
+    TODO E-E-A-T (cuando el dueño entregue los datos reales): añadir el nodo Person
+    del fundador + foto, y enriquecer la Organization con foundingDate y sameAs.
+    PROHIBIDO inventarlos. Plantilla lista para descomentar y completar:
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'Person',
+      name: 'NOMBRE_REAL_DEL_FUNDADOR',
+      jobTitle: 'Fundador',
+      worksFor: { '@id': 'https://marcyanstudio.com/#organization' },
+      image: 'https://marcyanstudio.com/assets/team/fundador.jpg',
+      sameAs: ['https://www.linkedin.com/in/...', 'https://instagram.com/...'],
+    })} />
+
+    También: AggregateRating (cruce desocupado vs competencia) está listo en
+    lib/schema.ts (aggregateRating) pero NO se emite hasta tener reseñas reales
+    con consentimiento. No inventar reseñas.
+  */}
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LandingHero
+      kicker={a.hero.kicker}
+      h1={a.hero.h1}
+      sub={a.hero.sub}
+      primary={a.hero.primary}
+      secondary={a.hero.secondary}
+      chips={a.hero.chips}
+      tone={a.hero.tone}
+    >
+      <Breadcrumb slot="breadcrumb" items={a.breadcrumb} lang="es" />
+    </LandingHero>
+
+    <AnswerBlock q={a.answer.q} a={a.answer.a} />
+
+    <Prose tag={a.story.tag} title={a.story.title} paragraphs={a.story.paragraphs} tone={a.story.tone} />
+
+    <FeatureGrid tag={a.values.tag} title={a.values.title} intro={a.values.intro} items={a.values.items} tone={a.values.tone} />
+
+    <Process process={c.process} />
+
+    <Prose tag={a.founders.tag} title={a.founders.title} paragraphs={a.founders.paragraphs} tone={a.founders.tone} />
+
+    <Locations locations={c.locations} />
+
+    <RelatedLinks tag={a.proof.tag} title={a.proof.title} links={a.proof.links} />
+
+    <Faq tag={a.faq.tag} title={a.faq.title} items={a.faq.items} />
+
+    <CtaBand
+      title={a.cta.title}
+      sub={a.cta.sub}
+      primary={a.cta.primary}
+      secondary={a.cta.secondary}
+      tone={a.cta.tone}
+    />
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

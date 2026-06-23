@@ -64,8 +64,10 @@ export const clusterNav = {
   // Nav plana unificada — misma que la home (content.es.nav), páginas REALES.
   links: [
     { label: 'Servicios', href: '/es/servicios' },
+    { label: 'Portafolio', href: '/es/portafolio' },
     { label: 'Precios', href: '/es/precios' },
     { label: 'Ciudades', href: '/es/ciudades' },
+    { label: 'Nosotros', href: '/es/sobre-nosotros' },
     { label: 'Blog', href: '/es/blog' },
   ],
   cta: { label: 'Pedir propuesta gratis', href: '#contacto' },

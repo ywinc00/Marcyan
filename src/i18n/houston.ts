@@ -55,6 +55,11 @@ export const houstonHub = {
     links: [
       { label: 'Abogados de inmigración', href: '/es/houston/abogados-inmigracion', desc: 'Capta y agenda consultas 24/7 con IA, en español. Sin promesas de resultados.', icon: 'lucide:scale' },
       { label: 'Bienes raíces', href: '/es/houston/bienes-raices', desc: 'Sitio con tus propiedades, captación y SEO local por zona.', icon: 'lucide:home' },
+      { label: 'Restaurantes', href: '/es/houston/restaurantes', desc: 'Menú QR y pedidos por WhatsApp sin comisiones para tu restaurante. Desde $1,500.', icon: 'lucide:utensils' },
+      { label: 'Contratistas', href: '/es/houston/contratistas', desc: 'Sitio + SEO local + IA que rescata llamadas perdidas en la obra. Desde $1,500.', icon: 'lucide:hard-hat' },
+      { label: 'Talleres mecánicos', href: '/es/houston/talleres-mecanicos', desc: 'Sitio con tus servicios y horario, SEO «cerca de mí» e IA que contesta. Desde $1,500.', icon: 'lucide:car' },
+      { label: 'Salones de belleza', href: '/es/houston/salon-belleza', desc: 'Salón, barbería, uñas y spa: reservas 24/7 y galería. Desde $1,500.', icon: 'lucide:scissors' },
+      { label: 'Clínicas dentales', href: '/es/houston/clinicas-dentales', desc: 'Sitio bilingüe que da confianza + agenda citas 24/7. Desde $1,500.', icon: 'lucide:stethoscope' },
     ] as RelatedLink[],
   },
   local: {
@@ -102,5 +107,10 @@ export const houstonHub = {
     { name: 'SEO para IA en Houston', path: '/es/houston/seo-para-ia' },
     { name: 'Tienda en Línea en Houston', path: '/es/houston/ecommerce' },
     { name: 'Branding e Identidad en Houston', path: '/es/houston/branding' },
+    { name: 'Páginas Web para Restaurantes en Houston', path: '/es/houston/restaurantes' },
+    { name: 'Sitios Web para Contratistas en Houston', path: '/es/houston/contratistas' },
+    { name: 'Sitios Web para Talleres Mecánicos en Houston', path: '/es/houston/talleres-mecanicos' },
+    { name: 'Sitios Web con Reservas para Salones de Belleza en Houston', path: '/es/houston/salon-belleza' },
+    { name: 'Sitios Web para Clínicas Dentales en Houston', path: '/es/houston/clinicas-dentales' },
   ] as ListLink[],
 };

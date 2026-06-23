@@ -1886,6 +1886,587 @@ const houstonBienesRaices: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// OLA 3 · INDUSTRIAS × HOUSTON (5 verticales web-led). Copy genuino por
+// industria, honestidad dura (Cliente Fundador donde no hay cliente real,
+// proof etiquetado por su rubro/ciudad real). Reusa la plantilla ClusterLanding.
+// ═══════════════════════════════════════════════════════════════
+const houstonRestaurantes: ClusterPage = {
+  meta: {
+    title: 'Páginas Web para Restaurantes en Houston | Marcyan',
+    description:
+      'Sitio web con menú digital y QR para restaurantes y food trucks en Houston. Pedidos y reservas por WhatsApp, sin comisiones. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/restaurantes',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Restaurantes', path: '/es/houston/restaurantes' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Restaurantes · Houston',
+    h1: 'Páginas web para <em>restaurantes</em> en Houston',
+    sub: 'Tu propio sitio con menú digital y código QR en la mesa, fotos que dan hambre y pedidos o reservas por WhatsApp. Recibes pedidos directos, sin pagar comisión a las apps de terceros, todo en español y bilingüe.',
+    primary: { label: 'Quiero el sitio de mi restaurante', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Menú con código QR', 'Pedidos por WhatsApp', 'Sin comisiones'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cómo puede un restaurante o food truck en Houston recibir pedidos sin pagar comisiones?',
+    a: 'Con tu propio sitio web: un menú digital con código QR en la mesa, fotos de tus platillos y un botón para pedir o reservar por WhatsApp. El cliente te escribe directo, sin la comisión del 25% al 30% que cobran las apps de delivery. El 53% abandona una página móvil que tarda más de 3 segundos en cargar.',
+    source: 'Think with Google (2017)',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que <em>llena tu cocina</em>',
+    items: [
+      { icon: 'lucide:utensils', title: 'Menú digital con código QR', desc: 'Tu carta en línea, lista para abrirse desde un código QR en la mesa o desde el celular, con secciones, precios y fotos.' },
+      { icon: 'marcyan-ai', title: 'Pedidos por WhatsApp', desc: 'El cliente arma su pedido y te llega directo por WhatsApp, sin apps de terceros que se queden con una tajada de cada venta.' },
+      { icon: 'lucide:calendar-check', title: 'Reservas por WhatsApp', desc: 'Quien quiere mesa te escribe y reserva al instante. Un asistente con IA responde lo general mientras estás en la plancha.' },
+      { icon: 'lucide:image', title: 'Fotos que dan hambre', desc: 'Tus tacos, pupusas, ceviches y postres bien presentados. Una buena foto vende un platillo mejor que cualquier descripción.' },
+      { icon: 'lucide:map-pin', title: 'Ubicación del día (food trucks)', desc: '¿Tu camión se mueve? Mostramos dónde estás hoy para que tus clientes te encuentren sin perder ventas.' },
+      { icon: 'lucide:languages', title: 'Menú actualizable y bilingüe', desc: 'Cambias precios o quitas un platillo agotado sin reimprimir nada, en español e inglés, para todos tus comensales.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, tu taquería vive del <em>WhatsApp, no de una app cara</em>',
+    paragraphs: [
+      'Houston tiene una de las comunidades hispanas más grandes del país, con un comensal hispano que crece sobre todo en el corazón mexicano de Magnolia Park y el Segundo Barrio (East End) y entre los centroamericanos de Gulfton y Spring Branch, donde abundan las pupuserías. Pero la mayoría de las taquerías y food trucks no tienen sitio propio: viven de una ficha en Yelp o Facebook, a veces armada por un directorio de terceros con el nombre mal escrito y fotos viejas.',
+      'El golpe más duro lo dan las apps de delivery: se llevan del 25% al 30% de cada pedido, un mordisco que arruina el margen de un taco o una pupusa. Por eso construimos tu propio sitio, en español, con menú QR, fotos que dan hambre y pedidos o reservas directas por WhatsApp, para que cobres completo. <strong>Tú eres el dueño del sitio y de tu menú:</strong> lo actualizas cuando suben los precios o se acaba un platillo, sin reimprimir cartas ni pagar comisión por venta.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio para tu restaurante, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del tamaño del menú, las fotos y las funciones de pedido o reserva.',
+    features: [
+      'Menú digital con código QR',
+      'Pedidos y reservas por WhatsApp',
+      'Galería de fotos de tus platillos',
+      'Versión en español e inglés',
+      'Menú que tú actualizas',
+      'Rápido en el celular y listo para Google',
+    ],
+    cta: { label: 'Quiero el sitio de mi restaurante', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional con menú. Un asistente con IA que responde y toma pedidos por WhatsApp 24/7 (desde $900) y el SEO local para aparecer en Google y Maps (desde $600/mes) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Sitios a medida reales, y <em>buscamos tu restaurante</em>',
+    cta: { label: 'Sé nuestro primer caso en restaurantes', href: '#contacto' },
+    items: proj('Rosy Nails & Care', "Julio's Landscape TX", 'Texas Rush Remove'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'El sitio de tu restaurante en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta el sitio web para un restaurante o food truck?', a: 'Un sitio profesional a medida con menú digital empieza en $1,500. El precio final depende del tamaño de tu menú, cuántas fotos prepares y si quieres pedidos o reservas por WhatsApp con un asistente. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Cómo recibo pedidos sin pagar comisión a Uber Eats o DoorDash?', a: 'Tu sitio incluye un botón para que el cliente arme su pedido y te lo mande directo por WhatsApp. El pedido te llega a ti, no a una app que se queda con el 25% al 30% de la venta. Tú cobras completo y atiendes en tu idioma. Es tu canal directo, no el de un tercero.' },
+      { q: '¿Tienen clientes en restaurantes?', a: 'Seremos honestos: aún no publicamos un caso de un restaurante o food truck. Sí tenemos sitios a medida reales y verificables en otros rubros (con enlaces que puedes visitar), como una web app de reservas para un salón, un paralelo honesto a pedir y reservar en línea. Por eso ofrecemos cupos de Cliente Fundador para restaurantes, con condiciones especiales.' },
+      { q: '¿Puedo cambiar el menú yo mismo cuando suben los precios?', a: 'Sí. Dejamos tu menú fácil de actualizar para que cambies precios o quites un platillo agotado sin reimprimir cartas ni esperarnos. Si prefieres que nosotros lo manejemos, también podemos hacerlo con un plan de mantenimiento (desde $120 al mes). El menú es tuyo.' },
+      { q: '¿Sirve para un food truck que se mueve de lugar?', a: 'Sí. Para los food trucks mostramos la ubicación del día y los horarios, para que tus clientes sepan dónde encontrarte hoy sin tener que adivinar. Así dejas de perder ventas por no poder avisar a tiempo dónde estás.' },
+      { q: '¿El menú y el sitio son bilingües?', a: 'Sí. En Houston tus comensales buscan en español e inglés, así que diseñamos el menú y el sitio en ambos idiomas desde el inicio. Le hablas a tu cliente hispano en su idioma y amplías tu alcance en inglés, todo en la misma página.' },
+    ],
+  },
+  cta: {
+    title: 'El sitio de tu <em>restaurante</em> empieza aquí',
+    sub: 'Cuéntanos qué cocinas y cómo quieres recibir pedidos, y recibe una propuesta de sitio con menú en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que toma pedidos y reservas por WhatsApp 24/7.', icon: 'marcyan-ai' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu restaurante aparezca en Google y en Maps.', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Páginas Web para Restaurantes en Houston',
+    serviceType: 'Diseño web para restaurantes y food trucks',
+    description:
+      'Diseño y desarrollo de sitios web para restaurantes, taquerías y food trucks en Houston: menú digital con código QR, fotos de platillos, pedidos y reservas por WhatsApp sin comisiones, bilingües y rápidos en móvil.',
+    path: '/es/houston/restaurantes',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonContratistas: ClusterPage = {
+  meta: {
+    title: 'Sitios Web para Contratistas en Houston | Marcyan',
+    description:
+      'Diseño web y SEO local para contratistas en Houston: sitio bilingüe con fotos de antes y después, presupuesto gratis, y una IA que rescata las llamadas que pierdes en la obra. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/contratistas',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Contratistas', path: '/es/houston/contratistas' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Contratistas · Houston',
+    h1: 'Sitios web para <em>contratistas</em> en Houston',
+    sub: 'Un sitio propio que salga en Google cuando buscan «contratista cerca de mí», con tus fotos de antes y después y presupuesto gratis. Y una IA que contesta por ti cuando estás en la obra, para que no se te escape el siguiente trabajo.',
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Fotos de antes y después', 'Presupuesto gratis', 'Bilingüe ES/EN'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita el sitio web de un contratista en Houston?',
+    a: 'Lo más importante es un sitio propio que salga en Google cuando buscan «contratista cerca de mí» o «remodelación en Houston», con tus fotos de antes y después, reseñas y presupuesto gratis. Súmale una IA que rescata las llamadas que pierdes en la obra: responder en 5 minutos lo hace hasta 21 veces más probable de calificar.',
+    source: 'Lead Response Management Study (MIT)',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que te <em>consigue trabajos</em>',
+    items: [
+      { icon: 'lucide:search', title: 'SEO local por oficio y zona', desc: 'Apareces cuando buscan «contratista cerca de mí», «remodelación en Houston» o «roofing en español», en Google y en la IA.' },
+      { icon: 'lucide:image', title: 'Fotos de antes y después', desc: 'Tu mejor trabajo al frente: galería de proyectos terminados que demuestra calidad y rompe la desconfianza del rubro.' },
+      { icon: 'lucide:phone-missed', title: 'Rescata llamadas perdidas', desc: 'Cuando estás en el techo o bajo el fregadero y no puedes contestar, una IA responde por mensaje al instante para que el cliente no llame al siguiente.' },
+      { icon: 'lucide:clipboard-list', title: 'Solicitud de presupuesto', desc: 'Formularios claros para «estimado gratis» que llegan ordenados a tu correo, aunque el prospecto escriba de noche o entre obras.' },
+      { icon: 'lucide:badge-check', title: 'Confianza: licencia y reseñas', desc: 'Mostramos tu «con licencia y asegurado», tus reseñas reales y tus garantías, lo que el cliente necesita para llamarte a ti.' },
+      { icon: 'lucide:smartphone', title: 'Rápido y bilingüe en el celular', desc: 'Tu cliente busca desde el teléfono y en español. Tu sitio carga al instante y le habla en su idioma, sin depender de directorios.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, el trabajo se lo lleva <em>quien contesta primero</em>',
+    paragraphs: [
+      'Houston tiene una de las comunidades hispanas más grandes del país, concentrada en barrios como East End, Gulfton, Spring Branch, Pasadena y Alief, donde el cliente del contratista es su propia comunidad. La gente busca «contratista que hable español», «con licencia y asegurado» y «presupuesto gratis», pero casi siempre termina en directorios y clasificados, donde apareces mezclado con todos los demás y dependes de las reglas de otro.',
+      'El dolor real del rubro es simple: estás subido en el techo o manejando entre obras y no puedes contestar, y el cliente llama al siguiente. Responder rápido es lo que decide quién gana el trabajo: contestar a un prospecto en los primeros 5 minutos lo hace hasta 21 veces más probable de calificar que esperar 30 (Lead Response Management Study, MIT). <strong>Por eso unimos un sitio propio con SEO local y una IA que responde por ti al instante:</strong> para que el trabajo de $5,000 o $15,000 lo cierres tú, no el contratista que contestó primero.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio para contratistas, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de páginas, la galería de proyectos y las integraciones.',
+    features: [
+      'Diseño a medida con tu marca',
+      'Galería de antes y después',
+      'Solicitud de presupuesto gratis',
+      'Versión en español e inglés',
+      'SEO base y rápido en móvil',
+      'Listo para Google y la IA',
+    ],
+    cta: { label: 'Quiero mi sitio', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional. El SEO local continuo (desde $600/mes) y una IA que rescata llamadas perdidas y responde 24/7 (desde $900) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Negocios locales <em>reales</em> en Houston',
+    cta: { label: 'Sé nuestro primer caso en construcción y remodelación', href: '#contacto' },
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu sitio de contratista en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio web para un contratista?', a: 'Un sitio profesional a medida empieza en $1,500. El precio final depende de cuántas páginas necesites, el tamaño de tu galería de antes y después y qué integraciones quieras (presupuestos, IA para llamadas). Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Cómo me ayuda con las llamadas que pierdo en la obra?', a: 'Sumamos una IA que responde por mensaje al instante cuando no puedes contestar: saluda al cliente, toma sus datos y le dice que ya lo contactarás. Así no llama al siguiente contratista. Responder rápido es la diferencia entre ganar el trabajo o perderlo, sobre todo en un oficio donde estás en la obra y no junto al teléfono.' },
+      { q: '¿Para qué quiero un sitio si ya estoy en los directorios?', a: 'En los directorios y clasificados compites mezclado con todos los demás y dependes de sus reglas. Un sitio propio sale en Google cuando buscan «remodelación en Houston», muestra tu trabajo y tus reseñas, y los prospectos llegan directo a ti, no repartidos entre la competencia.' },
+      { q: '¿Tienen clientes contratistas?', a: 'Seremos honestos: aún no publicamos un caso de un contratista de techos o remodelación. Sí trabajamos con negocios locales reales y verificables en Houston, como un paisajista y un servicio de junk removal, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en construcción y remodelación, con condiciones especiales.' },
+      { q: '¿El sitio es bilingüe?', a: 'Sí. En Houston tu cliente busca en español e inglés, así que diseñamos en ambos idiomas desde el inicio, con el lenguaje de obra y de barrio que de verdad usa la gente: «presupuesto gratis», «con licencia y asegurado», «estimado sin compromiso».' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo. Te damos una base técnica sólida, SEO local honesto, tu trabajo bien presentado y reportes claros; el liderazgo en búsquedas competidas se construye con trabajo constante, no con una garantía imposible.' },
+    ],
+  },
+  cta: {
+    title: 'Tu próximo sitio de <em>contratista</em> empieza aquí',
+    sub: 'Cuéntanos qué trabajos haces y en qué zonas, y recibe una propuesta de sitio, SEO y rescate de llamadas en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas cuando buscan «contratista cerca de mí».', icon: 'lucide:search' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Una IA que rescata las llamadas que pierdes en la obra.', icon: 'marcyan-ai' },
+    ],
+  },
+  service: {
+    name: 'Sitios Web para Contratistas en Houston',
+    serviceType: 'Diseño web y SEO para contratistas y servicios para el hogar',
+    description:
+      'Diseño y desarrollo de sitios web para contratistas y servicios para el hogar en Houston: bilingües, rápidos en móvil, con galería de antes y después, solicitud de presupuesto, SEO local por oficio y zona, y una IA que rescata llamadas perdidas.',
+    path: '/es/houston/contratistas',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonTalleresMecanicos: ClusterPage = {
+  meta: {
+    title: 'Sitios Web para Talleres Mecánicos en Houston | Marcyan',
+    description:
+      'Diseño web y SEO local para talleres mecánicos en Houston: sitio bilingüe con tus servicios, ubicación y horario, más IA que contesta WhatsApp y agenda citas. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/talleres-mecanicos',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Talleres mecánicos', path: '/es/houston/talleres-mecanicos' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Talleres mecánicos · Houston',
+    h1: 'Sitios para <em>talleres mecánicos</em> en Houston',
+    sub: 'Un sitio bilingüe con tus servicios, ubicación y horario, hecho para aparecer cuando buscan «taller mecánico cerca de mí», más un asistente con IA que contesta el WhatsApp y agenda citas mientras tú estás bajo un carro.',
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Tus servicios y horario', 'Aparece «cerca de mí»', 'IA que contesta el WhatsApp'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita el sitio web de un taller mecánico en Houston?',
+    a: 'En Houston, un sitio web profesional a medida para tu taller mecánico cuesta desde $1,500: rápido, bilingüe y geolocalizado para que aparezcas cuando buscan «taller cerca de mí». El 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que <em>trae carros</em> a tu taller',
+    items: [
+      { icon: 'lucide:wrench', title: 'Tus servicios, claros', desc: 'Mecánica general, frenos, A/C, hojalatería y pintura, llantas y más: cada servicio explicado para que el cliente sepa qué haces antes de llamar.' },
+      { icon: 'lucide:map-pin', title: 'Ubicación y horario visibles', desc: 'Tu dirección, mapa y horario al frente, para que sepan si estás abierto y cómo llegar, sin tener que adivinar.' },
+      { icon: 'lucide:search', title: 'SEO local «cerca de mí»', desc: 'Apareces cuando buscan «taller mecánico cerca de mí» o «mecánico en español Houston», en Google Maps y en la IA.' },
+      { icon: 'marcyan-ai', title: 'IA que contesta el WhatsApp', desc: 'Cuando estás bajo un carro y no alcanzas el teléfono, un asistente responde al instante por chat y WhatsApp, en español.' },
+      { icon: 'lucide:calendar-check', title: 'Agenda de citas', desc: 'El cliente reserva su servicio en línea, de día o de noche, y deja de llamar a tres talleres para irse con el primero que conteste.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'Quien tiene el carro varado busca desde el teléfono. Tu sitio carga al instante y se ve impecable en cualquier pantalla.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, el cliente <em>llama al taller que contesta primero</em>',
+    paragraphs: [
+      'En Houston casi nadie sobrevive sin carro: el transporte público es limitado y la gente depende 100% de su vehículo para ir a trabajar, muchas veces uno usado con bastantes millas. Por eso una reparación es urgencia, no lujo, y la búsqueda casi siempre empieza en el celular y en español: «mecánico que hable español», «el A/C del carro no enfría», «hojalatería y pintura». En barrios como East End, Gulfton, Spring Branch y Pasadena, tu cliente busca a alguien que le hable claro y le dé un estimado antes de tocar el carro.',
+      'El problema real del rubro es simple: el dueño está bajo un carro o pintando y no alcanza a contestar el teléfono ni el WhatsApp, así que el cliente se va con el siguiente taller. La mayoría compite en Facebook, TikTok y Nextdoor, sin sitio propio, sin horario ni dirección visibles. <strong>Por eso unimos las dos cosas:</strong> un sitio geolocalizado que te encuentra y un asistente con IA que responde al instante para que ningún carro se te escape.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio para tu taller, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de páginas, tus servicios y las integraciones.',
+    features: [
+      'Diseño a medida con tu marca',
+      'Tus servicios, ubicación y horario',
+      'Versión en español e inglés',
+      'SEO local «cerca de mí»',
+      'Rápido en móvil y listo para la IA',
+      'Formulario y captación de clientes',
+    ],
+    cta: { label: 'Quiero mi sitio', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional. El asistente con IA que contesta el WhatsApp y agenda citas (desde $900) y el SEO local continuo (desde $600/mes) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Sitios a medida reales (y <em>buscamos tu taller</em>)',
+    cta: { label: 'Sé nuestro primer caso en talleres mecánicos', href: '#contacto' },
+    items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu sitio de taller mecánico en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio web para un taller mecánico?', a: 'Un sitio profesional a medida empieza en $1,500. El precio final depende del número de páginas, cuántos servicios muestres y qué integraciones necesites. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿La IA contesta el WhatsApp cuando estoy bajo un carro?', a: 'Sí: ese es justo el problema que resuelve. Cuando no alcanzas el teléfono, el asistente responde al instante por chat y WhatsApp, en español, da información general de tus servicios y agenda la cita. El asistente con IA empieza en $900 y se suma a tu sitio.' },
+      { q: '¿Tienen clientes en talleres mecánicos?', a: 'Seremos honestos: aún no publicamos un caso de un taller mecánico. Sí tenemos sitios a medida reales y verificables en otros rubros (con enlaces que puedes visitar) y nuestro propio sitio como Caso #0. Por eso ofrecemos cupos de Cliente Fundador para talleres, con condiciones especiales.' },
+      { q: '¿El sitio aparece cuando buscan «taller cerca de mí»?', a: 'Esa es la meta. Construimos el sitio con SEO local y lo conectamos a tu Perfil de Google para que tengas la mejor base posible en búsquedas como «mecánico en español Houston». Nadie controla el algoritmo de Google, así que no prometemos el primer lugar, pero sí trabajo honesto y medible.' },
+      { q: '¿El sitio es bilingüe?', a: 'Sí. En Houston tu cliente busca en español e inglés, con términos como «el check engine» o «alineación y balanceo». Diseñamos en ambos idiomas desde el inicio, con el español mexicano y centroamericano que de verdad usan tus clientes.' },
+      { q: '¿Puedo mostrar mi ubicación, horario y precios?', a: 'Sí: tu dirección, mapa, horario (por ejemplo Lun–Sáb) y tus servicios van bien visibles, para que el cliente sepa si estás abierto y qué haces. Si quieres, mostramos estimados o rangos; tú decides qué precios publicar y cuáles dejar para la cita.' },
+    ],
+  },
+  cta: {
+    title: 'Tu próximo sitio de <em>taller mecánico</em> empieza aquí',
+    sub: 'Cuéntanos qué servicios ofreces y en qué zona de Houston estás, y recibe una propuesta de sitio, SEO y asistente con IA en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que contesta el WhatsApp y agenda citas 24/7.', icon: 'marcyan-ai' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas cuando buscan «taller cerca de mí».', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Sitios Web para Talleres Mecánicos en Houston',
+    serviceType: 'Diseño web y SEO local para talleres mecánicos',
+    description:
+      'Diseño y desarrollo de sitios web para talleres mecánicos en Houston: bilingües, rápidos en móvil, con servicios, ubicación y horario, SEO local «cerca de mí» y un asistente con IA que contesta WhatsApp y agenda citas.',
+    path: '/es/houston/talleres-mecanicos',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonSalonBelleza: ClusterPage = {
+  meta: {
+    title: 'Sitios Web con Reservas para Salones de Belleza en Houston | Marcyan',
+    description: 'Diseño web con agenda en línea para salones de belleza en Houston: tus clientas reservan 24/7 y una IA responde WhatsApp. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/salon-belleza',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Salones de belleza', path: '/es/houston/salon-belleza' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Salones de belleza · Houston',
+    h1: 'Sitios con <em>reservas en línea</em> para salones en Houston',
+    sub: 'Un sitio bilingüe con agenda en línea para que tus clientas reserven solas las 24 horas, galería de tus trabajos y una IA que contesta WhatsApp e Instagram. Para salones, barberías, uñas y spa que no quieren perder ni una cita.',
+    primary: { label: 'Quiero mi sitio con reservas', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Reservas 24/7', 'Galería de trabajos', 'Bilingüe ES/EN'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita el sitio web de un salón de belleza en Houston?',
+    a: 'El sitio de un salón en Houston necesita agenda en línea para que tus clientas reserven solas 24/7, galería de tus trabajos y un asistente con IA que responda WhatsApp e Instagram al instante. Responder en 5 minutos hace al prospecto hasta 21 veces más probable de calificar.',
+    source: 'Lead Response Management Study (MIT)',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que <em>llena tu agenda</em> sola',
+    items: [
+      { icon: 'lucide:calendar-check', title: 'Reservas en línea 24/7', desc: 'Tus clientas eligen servicio, estilista y hora desde el celular, sin llamar ni esperar respuesta. Toda reserva cae en un solo lugar.' },
+      { icon: 'marcyan-ai', title: 'IA que responde y agenda', desc: 'Un asistente contesta WhatsApp e Instagram al instante, responde lo básico (horarios, precios, servicios) y guía a la clienta a reservar.' },
+      { icon: 'lucide:image', title: 'Galería de tus trabajos', desc: 'Cortes, color, uñas y barba bien presentados. La clienta nueva ve tu estilo antes de decidir y llega sabiendo qué quiere.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'Casi toda búsqueda de salón empieza en el teléfono. Tu sitio carga al instante y se ve impecable en cualquier pantalla.' },
+      { icon: 'lucide:search', title: 'SEO local por zona', desc: 'Apareces cuando buscan «salón de belleza cerca de mí» o «barbería que hable español» en tu área de Houston, en Google y en la IA.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Le hablas a tu clienta hispana en su idioma, que es justo por lo que muchas eligen el salón: poder explicar el corte que quieren.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, tu clienta busca salón <em>desde el celular y en español</em>',
+    paragraphs: [
+      'Houston tiene una de las comunidades hispanas más grandes del país, y en barrios como Gulfton, Spring Branch, el East End y los corredores de Bellaire Blvd y S Gessner la gente busca su salón en el teléfono y en español: escribe «salón de uñas cerca de mí» o «barbería que hable español» y reserva con quien responde primero. Muchas clientas eligen el salón precisamente porque ahí pueden explicar el corte o el color que quieren en su idioma.',
+      'El dolor del rubro es real: una buena parte de las citas terminan en no-show, y un mensaje de WhatsApp que se queda horas sin leer mientras atiendes a alguien en la silla es una clienta que ya reservó en otro lado. Por eso montamos tu agenda en línea, tu galería y una IA que responde al instante, y lo respaldamos con SEO local. <strong>Sin promesas de posición:</strong> nadie controla el algoritmo de Google; lo que hacemos es darte la mejor base honesta para que dejes de perder citas.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio de salón con reservas, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de páginas, los servicios a reservar y las integraciones de agenda.',
+    features: [
+      'Diseño a medida con tu marca',
+      'Agenda y reservas en línea',
+      'Galería de tus trabajos',
+      'Versión en español e inglés',
+      'SEO base y rápido en móvil',
+      'Listo para Google y la IA',
+    ],
+    cta: { label: 'Quiero mi sitio con reservas', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional con reservas. Un asistente con IA que responda WhatsApp e Instagram 24/7 (desde $900) y el SEO local continuo (desde $600/mes) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas y sin comisión por cita.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Un salón real de Houston ya reserva con su <em>propia web app</em>',
+    cta: { label: 'Quiero algo así para mi salón', href: '#contacto' },
+    items: proj('Rosy Nails & Care', "Julio's Landscape TX", 'Texas Rush Remove'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu salón con reservas en línea, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio con reservas para un salón de belleza?', a: 'Un sitio profesional a medida con agenda en línea empieza en $1,500. El precio final depende del número de páginas, cuántos servicios quieras que se puedan reservar y qué integraciones de calendario necesites. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿Cómo funcionan las reservas en línea?', a: 'Tu clienta entra desde el celular, elige servicio, estilista y hora, y queda agendada sin llamar ni esperar respuesta. Todas las reservas caen en un solo lugar, no repartidas entre llamadas, WhatsApp e Instagram. Adaptamos el flujo a cómo trabaja tu salón.' },
+      { q: '¿Tienen clientes en el rubro de salones?', a: 'Sí. Rosy Nails & Care es un salón de uñas real en Houston para el que construimos una web app a medida donde las clientas agendan sus citas y exploran inspiración de uñas. Es trabajo verificable del mismo sector, no un ejemplo prestado.' },
+      { q: '¿Puedo dejar de pagar comisión por cada cita?', a: 'Esa es justo la idea. Hoy muchos salones reservan en Fresha o Booksy y pagan comisión por cada cita. Con tu propio sitio y tu propia agenda, las reservas llegan directo a ti. Si prefieres seguir usando tu herramienta actual, también podemos conectarla; te decimos qué se puede hacer en tu caso.' },
+      { q: '¿La IA contesta WhatsApp e Instagram?', a: 'Sí, si la sumas. El asistente responde al instante las preguntas comunes (horarios, precios, servicios) y guía a la clienta a reservar, para que ningún mensaje se quede sin contestar mientras atiendes en la silla. El asistente con IA empieza en $900.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo. Te damos una base técnica sólida, SEO local honesto y reportes claros; aparecer arriba en búsquedas competidas se construye con trabajo constante, no con una garantía imposible.' },
+    ],
+  },
+  cta: {
+    title: 'Tu salón con <em>reservas en línea</em> empieza aquí',
+    sub: 'Cuéntanos qué servicios ofreces y cómo trabajas, y recibe una propuesta de sitio con agenda y SEO en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que responde WhatsApp e Instagram y agenda 24/7.', icon: 'marcyan-ai' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas cuando buscan «salón cerca de mí».', icon: 'lucide:search' },
+    ],
+  },
+  service: {
+    name: 'Sitios Web con Reservas para Salones de Belleza en Houston',
+    serviceType: 'Diseño web con reservas en línea para salones de belleza',
+    description: 'Diseño y desarrollo de sitios web con agenda en línea para salones de belleza, barberías, salones de uñas y spa en Houston: bilingües, rápidos en móvil, con reservas 24/7, galería de trabajos, asistente con IA y SEO local.',
+    path: '/es/houston/salon-belleza',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonClinicasDentales: ClusterPage = {
+  meta: {
+    title: 'Sitios Web para Clínicas Dentales en Houston | Marcyan',
+    description:
+      'Sitio web bilingüe para clínicas dentales en Houston: da confianza, aparece en «dentista en español cerca de mí» y agenda citas 24/7. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/clinicas-dentales',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Clínicas dentales', path: '/es/houston/clinicas-dentales' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Clínicas dentales · Houston',
+    h1: 'Sitios web para <em>clínicas dentales</em> en Houston',
+    sub: 'Un sitio bilingüe que da confianza, muestra tus servicios y seguros con claridad, y aparece cuando buscan «dentista en español cerca de mí». Más un asistente que agenda citas y responde lo general (horarios, seguros, cómo llegar) 24/7, en español.',
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['En español de verdad', 'Agenda citas 24/7', 'La IA no da consejo dental'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita el sitio web de una clínica dental en Houston?',
+    a: 'El sitio de una clínica dental en Houston necesita ser bilingüe, rápido en el celular y transmitir confianza, con SEO local para «dentista en español cerca de mí» y un asistente que agende citas 24/7. El 46% de las búsquedas en Google tienen intención local.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio que <em>inspira confianza</em> y agenda',
+    items: [
+      { icon: 'lucide:shield-check', title: 'Confianza desde el primer clic', desc: 'Un sitio limpio y profesional que tranquiliza a un paciente nervioso: tu equipo, tus servicios y tus reseñas, presentados con calidez.' },
+      { icon: 'lucide:calendar-check', title: 'Agenda de citas 24/7', desc: 'Tus pacientes solicitan o reservan su cita de día y de noche, sin tener que llamar en horario de oficina ni esperar a que alguien conteste.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'El español no es un «extra»: es como tu paciente entiende un tratamiento. Le hablamos en su idioma desde la primera pantalla.' },
+      { icon: 'lucide:credit-card', title: 'Seguros y planes de pago claros', desc: 'Mostramos qué seguros aceptas, si atiendes sin seguro o Medicaid y tus planes de pago, para quitar el miedo a la factura sorpresa.' },
+      { icon: 'lucide:search', title: 'SEO local en español', desc: 'Apareces cuando buscan «dentista en español Houston» o «clínica dental cerca de mí», en Google Maps y en los asistentes de IA.' },
+      { icon: 'marcyan-ai', title: 'Asistente que responde lo general', desc: 'Un asistente con IA contesta horarios, servicios, seguros aceptados y cómo llegar, en español. No da diagnóstico ni consejo dental: eso lo das tú.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Houston, tu paciente busca un dentista <em>que le explique en español</em>',
+    paragraphs: [
+      'El paciente hispano de clínica dental en Houston suele ser de primera generación, con dominio limitado del inglés, y se concentra en zonas de altísima densidad latina como Gulfton, Sharpstown, Spring Branch, el East End y el corredor de Hillcroft y Westpark en el Southwest. Para él, el español no es preferencia: es lo que necesita para entender qué le van a hacer en la boca, cuánto cuesta y qué seguro le aceptan, antes de sentarse en la silla.',
+      'Por eso construimos un sitio que da confianza y habla su idioma, con tus servicios, seguros y planes de pago claros, y lo respaldamos con SEO local y un asistente que agenda y responde lo general 24/7 (muchos pacientes trabajan turnos y no pueden llamar de día). <strong>Cuidado ante todo:</strong> la IA nunca da diagnóstico ni consejo dental ni promete resultados clínicos; solo agenda y orienta, y el cuidado profesional siempre lo das tú.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio para tu clínica dental, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. El precio depende del número de páginas, los servicios que muestres y las integraciones.',
+    features: [
+      'Diseño a medida con tu marca',
+      'Servicios, seguros y planes de pago claros',
+      'Solicitud o agenda de citas',
+      'Versión en español e inglés',
+      'SEO base y rápido en móvil',
+      'Listo para Google y la IA',
+    ],
+    cta: { label: 'Quiero mi sitio', href: '#contacto' },
+    note: '$1,500 es el punto de partida de un sitio profesional. El SEO local continuo (desde $600/mes) y un asistente con IA que agenda y responde lo general 24/7 (desde $900) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Trabajo a medida real, y <em>buscamos tu clínica</em> dental',
+    cta: { label: 'Sé nuestra primera clínica dental', href: '#contacto' },
+    // Honestidad: aún no hay clínica dental cliente. Proof real de sitios a medida
+    // (etiquetado por su rubro/ciudad real) + Cliente Fundador. Página web-led (gold):
+    // 3 proyectos reales, SIN caso0 (caso0 se reserva para páginas lideradas por IA).
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu sitio de clínica dental en Houston, <em>claro</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio web para una clínica dental?', a: 'Un sitio profesional a medida empieza en $1,500. El precio final depende del número de páginas, cuántos servicios muestres y qué integraciones necesites (agenda de citas, asistente con IA). Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.' },
+      { q: '¿La IA da consejo dental o diagnóstico a mis pacientes?', a: 'No, y es deliberado. El asistente responde lo general (horarios, servicios, seguros que aceptas, planes de pago, cómo llegar) y ayuda a agendar la cita. Nunca da diagnóstico ni consejo dental: eso lo da tu equipo. Lo dejamos claro al paciente para que sepa cuándo habla con un asistente y cuándo con la clínica.' },
+      { q: '¿El asistente agenda citas de verdad?', a: 'Sí. Según tu flujo, el asistente capta la solicitud de cita (nombre, motivo general, horario preferido) y la deja lista para tu equipo, o se conecta con tu sistema de agenda donde es posible. La idea es que ningún paciente se pierda por llamar fuera de horario, sin prometer integraciones que no existan en tu caso.' },
+      { q: '¿Tienen clínicas dentales como clientes?', a: 'Seremos honestos: aún no publicamos un caso de una clínica dental. Sí tenemos trabajo real y verificable, como una web-app que agenda citas para un salón (Rosy Nails) y sitios a medida en otros rubros, además de nuestro propio sitio como Caso #0. Por eso ofrecemos cupos de Cliente Fundador para clínicas, con condiciones especiales.' },
+      { q: '¿El sitio muestra los seguros y planes de pago?', a: 'Sí, y en Houston es clave. Mostramos con claridad qué seguros aceptas, si atiendes sin seguro o Medicaid y tus planes de pago, para quitarle al paciente el miedo a la factura sorpresa antes de que llame. Tú nos das la información exacta y la presentamos de forma clara y honesta.' },
+      { q: '¿Garantizan más pacientes o el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo ni podemos garantizar resultados clínicos o de negocio. Te damos una base técnica sólida, un sitio que transmite confianza, SEO local honesto y reportes claros; el resto se construye con trabajo constante, no con una garantía imposible.' },
+    ],
+  },
+  cta: {
+    title: 'El próximo sitio de tu <em>clínica dental</em> empieza aquí',
+    sub: 'Cuéntanos qué servicios ofreces y qué seguros aceptas, y recibe una propuesta de sitio, SEO y agenda con IA en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que aparezcas en «dentista en español cerca de mí».', icon: 'lucide:search' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Un asistente que agenda y responde lo general 24/7.', icon: 'marcyan-ai' },
+    ],
+  },
+  service: {
+    name: 'Sitios Web para Clínicas Dentales en Houston',
+    serviceType: 'Diseño web y SEO para clínicas dentales',
+    description:
+      'Diseño y desarrollo de sitios web para clínicas dentales y consultorios en Houston: bilingües, rápidos en móvil, con servicios y seguros claros, agenda de citas, SEO local y un asistente con IA que responde lo general (sin dar consejo dental ni diagnóstico).',
+    path: '/es/houston/clinicas-dentales',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
@@ -1894,6 +2475,11 @@ export const clusters = {
   'houston/branding': houstonBranding,
   'houston/abogados-inmigracion': houstonAbogadosInmigracion,
   'houston/bienes-raices': houstonBienesRaices,
+  'houston/restaurantes': houstonRestaurantes,
+  'houston/contratistas': houstonContratistas,
+  'houston/talleres-mecanicos': houstonTalleresMecanicos,
+  'houston/salon-belleza': houstonSalonBelleza,
+  'houston/clinicas-dentales': houstonClinicasDentales,
   'miami/diseno-web': miamiWeb,
   'miami/ia-conversacional': miamiIa,
   'miami/seo-local': miamiSeo,

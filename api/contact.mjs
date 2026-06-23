@@ -17,6 +17,12 @@ function sanitize(v, max = 5000) {
   return s ? s.slice(0, max) : null;
 }
 
+// Validación de formato server-side (red de seguridad para basura que
+// pase el cliente). Regex simple a propósito.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (e) => EMAIL_RE.test(e);
+const hasEnoughDigits = (p) => (String(p).match(/\d/g) || []).length >= 7;
+
 const withTimeout = (p, ms, label) =>
   Promise.race([
     p,
@@ -52,6 +58,20 @@ export default async function handler(req, res) {
       });
     }
 
+    // Validación de formato (no exigimos ambos; solo validamos lo que llegó).
+    if (email && !isValidEmail(email)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'El email no tiene un formato válido. Revísalo, por favor.',
+      });
+    }
+    if (phone && !hasEnoughDigits(phone)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'El teléfono no parece válido. Incluye al menos 7 dígitos.',
+      });
+    }
+
     const source = body.source === 'chat' ? 'chat' : 'contact';
     const data = {
       name:          sanitize(body.name ?? body.owner_name, 200),
@@ -60,7 +80,7 @@ export default async function handler(req, res) {
       business_name: sanitize(body.business_name, 200),
       city:          sanitize(body.city ?? body.city_state, 200),
       interest:      sanitize(body.interest ?? body.main_objective, 500),
-      message:       sanitize(body.message ?? body.additional_notes, 5000),
+      message:       sanitize(body.message ?? body.additional_notes, 20000),
       source,
       ipAddress:     clientIp(req),
       userAgent:     sanitize(req.headers['user-agent'], 500),

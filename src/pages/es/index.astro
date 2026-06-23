@@ -30,7 +30,7 @@ const c = content.es;
   {/* OfferCatalog con los 6 servicios + precio (Offer/priceSpecification) — munición AEO. */}
   <OfferCatalogLd slot="head" items={offerItems} url="/es/precios" />
 
-  <SiteNav nav={c.nav} lang="es" homeHref="/es/" />
+  <SiteNav nav={c.nav} lang="es" homeHref="/es/" hasEn={true} currentPath={Astro.url.pathname} />
   <main id="main">
     <Hero hero={c.hero} />
     <Services services={c.services} />

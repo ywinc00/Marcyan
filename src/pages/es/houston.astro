@@ -32,7 +32,7 @@ const c = content.es;
 >
   <ItemListLd slot="head" items={h.itemList} name="Servicios de Marcyan en Houston" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -74,7 +74,7 @@ const c = content.es;
       tone={h.cta.tone}
     />
 
-    <Contact contact={c.contact} />
+    <Contact contact={c.contact} defaultCity="Houston, TX" />
   </main>
 
   <SiteFooter footer={c.footer} />

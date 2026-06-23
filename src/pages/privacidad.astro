@@ -18,7 +18,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Iniciar Proyecto', href: '/formu
   canonical="https://marcyanstudio.com/privacidad"
   hasEn={false}
 >
-  <SiteNav nav={pageNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={pageNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main">
     <LegalDoc title="Política de Privacidad" updated="6 de junio de 2026">

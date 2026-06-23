@@ -37,12 +37,12 @@ const STR = {
     open: 'Abrir el chat de ayuda',
     close: 'Cerrar el chat',
     title: 'Marcy',
-    status: 'Responde al instante',
+    status: 'Asistente IA · responde al instante',
     greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento. Y si quieres, te preparamos una muestra gratis de tu sitio.',
     welcomeTitle: 'Hola, soy Marcy',
     welcomeSub: '¿Cómo prefieres contactarnos?',
     welcomeHint: 'Elige la opción que mejor se adapte a ti.',
-    fabNudge: 'Respuesta en vivo',
+    fabNudge: 'Pregunta lo que quieras',
     placeholder: 'Escribe tu mensaje…',
     send: 'Enviar mensaje',
     typing: 'Escribiendo…',
@@ -65,6 +65,12 @@ const STR = {
     capOk: '¡Gracias! Lo recibimos (folio %ID%). El equipo te contacta en menos de 24 horas. 🚀',
     capErr: 'No pudimos enviar tus datos. Intenta de nuevo o escríbenos en /formulario.',
     capRequired: 'Déjanos al menos un email o un teléfono.',
+    capEmailInvalid: 'Revisa tu email: parece que falta algo.',
+    capPhoneInvalid: 'Revisa tu teléfono: necesitamos al menos 7 dígitos.',
+    retry: 'Reintentar',
+    directDesktopNote: 'En el escritorio, escríbenos por WhatsApp o copia nuestro número.',
+    copy: 'Copiar',
+    copied: 'Copiado',
     human: 'Hablar con una persona',
     capTitleHuman: 'Te conecto con una persona',
     capSubHuman: 'Déjanos cómo contactarte y un asesor te escribe. (No es chat en vivo.)',
@@ -84,12 +90,12 @@ const STR = {
     open: 'Open the help chat',
     close: 'Close the chat',
     title: 'Marcy',
-    status: 'Replies instantly',
+    status: 'AI assistant · replies instantly',
     greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you. And if you like, we’ll prepare a free sample of your site.',
     welcomeTitle: 'Hi, I’m Marcy',
     welcomeSub: 'How would you like to reach us?',
     welcomeHint: 'Pick the option that suits you best.',
-    fabNudge: 'Live reply',
+    fabNudge: 'Ask me anything',
     placeholder: 'Type your message…',
     send: 'Send message',
     typing: 'Typing…',
@@ -111,6 +117,12 @@ const STR = {
     capOk: 'Thank you! We got it (ref %ID%). The team will reach out within 24 hours. 🚀',
     capErr: 'We couldn’t send your details. Please try again or reach us at /formulario.',
     capRequired: 'Please leave at least an email or a phone number.',
+    capEmailInvalid: 'Please check your email: something looks off.',
+    capPhoneInvalid: 'Please check your phone: we need at least 7 digits.',
+    retry: 'Retry',
+    directDesktopNote: 'On desktop, message us on WhatsApp or copy our number.',
+    copy: 'Copy',
+    copied: 'Copied',
     human: 'Talk to a person',
     capTitleHuman: 'I’ll connect you with a person',
     capSubHuman: 'Leave your contact and an advisor will reach out. (Not live chat.)',
@@ -154,7 +166,7 @@ const links = [
   { token: nap.houston, href: telHref(nap.houston) },
   { token: nap.miami, href: telHref(nap.miami) },
 ];
-const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)' };
+const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston };
 ---
 
 <div class="mrc-chat" id="mrc-chat" data-mrc-root data-stage="welcome">
@@ -232,11 +244,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.43.78 3.04 1.19 4.66 1.19h.004c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15h-.003a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.82 2.42a8.16 8.16 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.48-.01a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
                 WhatsApp
               </a>
-              <a class="mrc-pill" href={smsHref}>
+              <a class="mrc-pill" href={smsHref} data-mrc-sms>
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3C6.9 3 2.75 6.36 2.75 10.5c0 2.36 1.36 4.47 3.48 5.85-.17 1.2-.77 2.35-1.69 3.26a.5.5 0 0 0 .44.85c1.9-.32 3.39-1.03 4.49-1.79.78.2 1.6.31 2.53.31 5.1 0 9.25-3.36 9.25-7.5S17.1 3 12 3z"/></svg>
                 iMessage
               </a>
             </span>
+            <span class="mrc-direct-desktop" data-mrc-direct-desktop hidden></span>
           </span>
         </div>
 
@@ -312,9 +325,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     padding: 8px var(--space-3); border-radius: var(--radius-pill);
     background: var(--bg-elevated); border: 1px solid var(--accent-teal-line); color: var(--fg-primary);
     font-family: var(--font-body); font-size: var(--text-xs);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-card); cursor: pointer; pointer-events: auto;
     animation: mrc-nudge-in var(--duration-slow) var(--ease-out-expo);
   }
+  .mrc-nudge:hover { border-color: var(--accent-teal); }
   .mrc-nudge[hidden] { display: none; }
   .mrc-nudge::after {
     content: ''; position: absolute; right: -5px; top: 50%; transform: translateY(-50%) rotate(45deg);
@@ -447,6 +461,26 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
   /* "Mensaje directo": no es botón; lleva pills de canal */
   .mrc-opt--channels { cursor: default; }
+  /* Nota/numero copiable en escritorio (cuando el pill SMS no sirve) */
+  .mrc-direct-desktop {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);
+    margin-top: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary);
+    line-height: var(--leading-normal);
+  }
+  .mrc-direct-desktop[hidden] { display: none; }
+  .mrc-direct-num {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono, var(--font-body)); color: var(--fg-primary);
+  }
+  .mrc-copy-btn {
+    display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+    padding: 3px var(--space-2); border-radius: var(--radius-md);
+    background: var(--bg-card); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
+    font-family: var(--font-body); font-size: var(--text-xs);
+    transition: background var(--duration-fast), border-color var(--duration-fast);
+  }
+  .mrc-copy-btn:hover { background: var(--accent-teal-dim); border-color: var(--accent-teal); }
+  .mrc-copy-btn:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
   .mrc-opt-pills { display: flex; flex-wrap: nowrap; gap: var(--space-2); margin-top: var(--space-2); }
   .mrc-pill {
     flex: 1 1 0; min-width: 0; justify-content: center;
@@ -456,6 +490,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500; text-decoration: none;
     transition: border-color var(--duration-fast), background var(--duration-fast);
   }
+  .mrc-pill[hidden] { display: none; }
   .mrc-pill:hover { background: var(--accent-teal-dim); border-color: var(--accent-teal); }
   .mrc-pill:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
   .mrc-pill svg { width: 16px; height: 16px; flex: 0 0 auto; fill: var(--accent-teal); }
@@ -492,6 +527,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
   .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
   .mrc-chat[data-stage="chat"] .mrc-welcome { display: none; }
+  /* En bienvenida, el footer de acción ('Dejar mis datos') duplicaría la tarjeta
+     'Formulario de contacto' del selector → ocultarlo en welcome. */
+  .mrc-chat[data-stage="welcome"] .mrc-foot { display: none; }
+  /* Las chips de respuesta rápida solo tienen sentido antes del primer mensaje
+     del usuario y antes de capturar → colapsarlas después. */
+  .mrc-chat[data-started] .mrc-chips,
+  .mrc-chat[data-captured] .mrc-chips { display: none; }
 
   .mrc-form {
     display: flex; align-items: flex-end; gap: var(--space-2);
@@ -506,6 +548,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-input::placeholder { color: var(--fg-subtle); }
   .mrc-input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  .mrc-input:disabled { opacity: 0.6; cursor: not-allowed; }
   /* iOS hace auto-zoom al enfocar un input con font-size < 16px y descuadra el
      panel fijo en móvil. En táctil subimos el campo a 16px para evitarlo
      (en desktop se queda compacto). */
@@ -567,7 +610,17 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-chat .mrc-ai { align-self: flex-start; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); border-bottom-left-radius: 4px; }
   .mrc-chat .mrc-user { align-self: flex-end; background: var(--accent-teal); color: var(--fg-inverse); border-bottom-right-radius: 4px; }
-  .mrc-chat .mrc-sys { align-self: center; background: transparent; border: 1px dashed var(--border); color: var(--fg-secondary); font-size: var(--text-xs); max-width: 100%; }
+  .mrc-chat .mrc-sys { align-self: center; background: transparent; border: 1px dashed var(--border); color: var(--fg-secondary); font-size: var(--text-xs); max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+  .mrc-chat .mrc-retry {
+    display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+    padding: 5px var(--space-3); border-radius: var(--radius-md);
+    background: var(--bg-card); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
+    font-family: var(--font-body); font-size: var(--text-xs); font-weight: 500;
+  }
+  .mrc-chat .mrc-retry:hover { background: var(--accent-teal-dim); border-color: var(--accent-teal); }
+  .mrc-chat .mrc-retry:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  /* Campo con error de validación en la captura inline */
+  .mrc-chat .mrc-capture input[aria-invalid="true"] { border-color: var(--color-error); box-shadow: 0 0 0 2px var(--accent-error-dim, rgba(239, 68, 68, 0.18)); }
   .mrc-chat .mrc-link { color: var(--accent-teal); text-decoration: underline; }
   .mrc-chat .mrc-user .mrc-link { color: var(--fg-inverse); }
 
@@ -631,6 +684,30 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     const LINKS = Array.isArray(cfg.links) ? cfg.links : [];
     const lang = cfg.lang === 'en' ? 'en' : 'es';
     const REFERRED_BY = cfg.referredBy || 'chatbot';
+    const NAP_PHONE = typeof cfg.phone === 'string' ? cfg.phone : '';
+
+    // Validación de formato de contacto (Chat-F01 / Lead-F1).
+    const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmail = (v) => EMAIL_RX.test(v);
+    const isValidPhone = (v) => (String(v).match(/\d/g) || []).length >= 7;
+
+    // ¿Dispositivo táctil? El pill sms:/iMessage solo sirve en táctil; en
+    // escritorio falla en silencio → lo ocultamos y mostramos el número copiable.
+    const isCoarse = (() => {
+      try {
+        if (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) return true;
+      } catch (_) {}
+      return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+    })();
+
+    // Timeout de red (Lead-F6): aborta fetch colgados.
+    const NET_TIMEOUT = 15000;
+    function fetchWithTimeout(url, opts) {
+      const ctrl = new AbortController();
+      const id = setTimeout(() => ctrl.abort(), NET_TIMEOUT);
+      return fetch(url, Object.assign({}, opts, { signal: ctrl.signal }))
+        .finally(() => clearTimeout(id));
+    }
 
     const fab = root.querySelector('[data-mrc-fab]');
     const panel = document.getElementById('mrc-chat-panel');
@@ -707,7 +784,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       log.appendChild(ty); log.scrollTop = log.scrollHeight;
     }
     function hideTyping() { const ty = log.querySelector('[data-mrc-typing]'); if (ty) ty.remove(); }
-    function setBusy(v) { busy = v; if (sendBtn) sendBtn.disabled = v; if (input) input.disabled = v; }
+    function setBusy(v) {
+      busy = v;
+      if (input) input.disabled = v;
+      // Al liberar, el botón sigue deshabilitado si el input quedó vacío (Chat-F07).
+      if (sendBtn) sendBtn.disabled = v || !(input && input.value.trim());
+    }
 
     async function send(textRaw) {
       const text = (textRaw || '').trim();
@@ -715,6 +797,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       lastUserText = text;
       setBusy(true);
       ensureChat();
+      if (root) root.setAttribute('data-started', '');  // colapsa las chips de respuesta rápida
       appendBubble('user', text);
       if (input) input.value = '';
       autoGrow();
@@ -723,7 +806,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const recent = history.slice(-18);
       const reqMessages = recent.concat([{ role: 'user', content: text }]);
       try {
-        const res = await fetch('/api/chat', {
+        const res = await fetchWithTimeout('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages: reqMessages, sessionId: sid, lang }),
@@ -741,15 +824,41 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             openCapture('contacto');
           }
         } else {
-          appendBubble('sys', (data && data.error) || T.error);
+          appendError((data && data.error) || T.error, text);
         }
       } catch (_) {
+        // Incluye AbortError (timeout) y fallos de red: NO perder el mensaje.
         hideTyping();
-        appendBubble('sys', T.error);
+        appendError(T.error, text);
       } finally {
         setBusy(false);
         if (opened && input) input.focus();
       }
+    }
+
+    // Burbuja de error de red con botón 'Reintentar' (A4 / Chat-F02). Restaura
+    // el texto del usuario en el input para que no se pierda.
+    function appendError(msg, failedText) {
+      const b = document.createElement('div');
+      b.className = 'mrc-bub mrc-sys';
+      const tx = document.createElement('span');
+      tx.textContent = msg || T.error;
+      b.appendChild(tx);
+      if (failedText) {
+        // Restaura el input con el mensaje fallido (y reajusta su alto).
+        if (input && !input.value.trim()) { input.value = failedText; autoGrow(); if (sendBtn) sendBtn.disabled = !input.value.trim(); }
+        const retry = document.createElement('button');
+        retry.type = 'button'; retry.className = 'mrc-retry'; retry.textContent = T.retry || 'Retry';
+        retry.addEventListener('click', () => {
+          b.remove();
+          if (input && input.value.trim() === failedText.trim()) input.value = '';
+          autoGrow();
+          send(failedText);
+        });
+        b.appendChild(retry);
+      }
+      log.appendChild(b);
+      log.scrollTop = log.scrollHeight;
     }
 
     function autoGrow() {
@@ -790,9 +899,16 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
       card.querySelector('.mrc-cap-sub').textContent = variant === 'handoff' ? (T.capSubHuman || T.capSub) : T.capSub;
-      card.querySelector('#mrc-c-name').placeholder = T.capName;
-      card.querySelector('#mrc-c-email').placeholder = T.capEmail;
-      card.querySelector('#mrc-c-phone').placeholder = T.capPhone;
+      const nameInput = card.querySelector('#mrc-c-name');
+      const emailInput = card.querySelector('#mrc-c-email');
+      const phoneInput = card.querySelector('#mrc-c-phone');
+      nameInput.placeholder = T.capName;
+      emailInput.placeholder = T.capEmail;
+      phoneInput.placeholder = T.capPhone;
+      // Labels accesibles (Chat-F04): los inputs no tienen <label> visible.
+      if (T.capName) nameInput.setAttribute('aria-label', T.capName);
+      if (T.capEmail) emailInput.setAttribute('aria-label', T.capEmail);
+      if (T.capPhone) phoneInput.setAttribute('aria-label', T.capPhone);
       card.querySelector('[data-mrc-capsend]').textContent = T.capSend;
       card.querySelector('[data-mrc-capdismiss]').textContent = T.capDismiss;
       const consent = card.querySelector('.mrc-cap-consent');
@@ -809,67 +925,106 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const nameEl = card.querySelector('#mrc-c-name'); if (nameEl) nameEl.focus();
     }
 
+    // Serializa los últimos turnos del historial como transcript legible, aplicando
+    // stripMarkdown a cada línea. Solo pares user/assistant (sin PII; la PII vive en
+    // los campos del formulario, no en el chat). Recorta a ~6-8 turnos por seguridad.
+    function buildTranscript() {
+      const turns = history.slice(-8);
+      if (!turns.length) return '';
+      const youES = 'Usuario'; const meES = 'Marcy';
+      const youEN = 'You'; const meEN = 'Marcy';
+      const you = lang === 'en' ? youEN : youES;
+      const me = lang === 'en' ? meEN : meES;
+      const lines = turns.map((m) => {
+        const who = m.role === 'assistant' ? me : you;
+        return who + ': ' + stripMarkdown(m.content || '');
+      });
+      return lines.join('\n');
+    }
+
     async function submitCapture(card, variant, need) {
       const get = (id) => { const el = card.querySelector(id); return el ? el.value.trim() : ''; };
+      const emailEl = card.querySelector('#mrc-c-email');
+      const phoneEl = card.querySelector('#mrc-c-phone');
       const email = get('#mrc-c-email');
       const phone = get('#mrc-c-phone');
       const result = card.querySelector('[data-mrc-capresult]');
       const sendB = card.querySelector('[data-mrc-capsend]');
-      if (!email && !phone) {
-        if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capRequired; }
-        return;
+      const showErr = (txt) => { if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = txt; } };
+
+      // Limpia estado de validación previo.
+      if (emailEl) emailEl.removeAttribute('aria-invalid');
+      if (phoneEl) phoneEl.removeAttribute('aria-invalid');
+
+      // 1) Presencia: al menos uno.
+      if (!email && !phone) { showErr(T.capRequired); return; }
+      // 2) Formato (Chat-F01 / Lead-F1): si hay email, regex; si hay teléfono, >=7 dígitos.
+      if (email && !isValidEmail(email)) {
+        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.focus(); }
+        showErr(T.capEmailInvalid || T.capRequired); return;
       }
+      if (phone && !isValidPhone(phone)) {
+        if (phoneEl) { phoneEl.setAttribute('aria-invalid', 'true'); phoneEl.focus(); }
+        showErr(T.capPhoneInvalid || T.capRequired); return;
+      }
+
+      const onSuccess = (okText) => {
+        captured = true;
+        if (root) root.setAttribute('data-captured', '');  // colapsa las chips
+        card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
+        card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
+        if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = okText; }
+      };
+      const onFail = () => {
+        if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
+        showErr(T.capErr);
+      };
+
       // Handoff: pedir hablar con una persona → /api/handoff (no crea lead; avisa al fundador).
       if (variant === 'handoff') {
         if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
         if (result) result.hidden = true;
         try {
-          const res = await fetch('/api/handoff', {
+          const res = await fetchWithTimeout('/api/handoff', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: get('#mrc-c-name'), contact: email || phone, message: need, lang, website_hp: get('#mrc-c-hp') }),
           });
           let data = null; try { data = await res.json(); } catch (_) {}
-          if (res.ok && data && data.ok) {
-            captured = true;
-            card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
-            card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
-            if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = T.capHandoffOk || T.capOk; }
-          } else { throw new Error('bad response'); }
-        } catch (_) {
-          if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
-          if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capErr; }
-        }
+          if (res.ok && data && data.ok) { onSuccess(T.capHandoffOk || T.capOk); }
+          else { throw new Error('bad response'); }
+        } catch (_) { onFail(); }  // incl. AbortError (timeout)
         return;
       }
 
+      // Adjuntar transcript al lead (A10 / seam-03): objetivo corto en main_objective/interest,
+      // y notas = resumen + transcript de los últimos turnos.
+      const objective = (need || '').slice(0, 280);
       const note = variant === 'muestra_gratis' ? 'Solicitó una muestra gratis vía el asistente del sitio.' : 'Pidió que lo contacten vía el asistente del sitio.';
+      const transcript = buildTranscript();
+      const convoLabel = lang === 'en' ? '--- Conversation ---' : '--- Conversación ---';
+      let notes = note + (objective ? ' Objetivo: ' + objective : '');
+      if (transcript) notes += '\n\n' + convoLabel + '\n' + transcript;
       const body = {
         source: 'chat',
         owner_name: get('#mrc-c-name'),
         email,
         phone,
-        main_objective: need,
-        additional_notes: note + (need ? ' Mensaje: ' + need : ''),
+        main_objective: objective,
+        additional_notes: notes,
         referred_by: REFERRED_BY,
         website_hp: get('#mrc-c-hp'),
       };
       if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
       if (result) result.hidden = true;
       try {
-        const res = await fetch('/api/contact', {
+        const res = await fetchWithTimeout('/api/contact', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
         });
         let data = null; try { data = await res.json(); } catch (_) {}
         if (res.ok && data && data.ok) {
-          captured = true;
-          card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
-          card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
-          if (result) { result.hidden = false; result.className = 'mrc-cap-result ok'; result.textContent = (T.capOk || 'OK').replace('%ID%', data.refId || data.projectId || '—'); }
+          onSuccess((T.capOk || 'OK').replace('%ID%', data.refId || data.projectId || '—'));
         } else { throw new Error('bad response'); }
-      } catch (_) {
-        if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
-        if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = T.capErr; }
-      }
+      } catch (_) { onFail(); }  // incl. AbortError (timeout)
     }
 
     // ── Teclado móvil: ajusta el panel al área visible (VisualViewport) ──
@@ -937,13 +1092,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     // ── Eventos ──
     fab.addEventListener('click', toggle);
+    // Nudge clicable (Chat-F06): abre el panel.
+    if (nudge) nudge.addEventListener('click', () => { nudge.hidden = true; if (!opened) openPanel(); });
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
     const humanBtn = root.querySelector('[data-mrc-human]');
     if (humanBtn) humanBtn.addEventListener('click', () => openCapture('handoff'));
     if (form) form.addEventListener('submit', (e) => { e.preventDefault(); send(input && input.value); });
     if (sendBtn) sendBtn.addEventListener('click', () => send(input && input.value));
     if (input) {
-      input.addEventListener('input', autoGrow);
+      // Estado inicial del botón enviar: deshabilitado si el input está vacío (Chat-F07).
+      if (sendBtn) sendBtn.disabled = !input.value.trim();
+      input.addEventListener('input', () => {
+        autoGrow();
+        if (sendBtn && !busy) sendBtn.disabled = !input.value.trim();
+      });
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); }
       });
@@ -970,11 +1132,48 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     });
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
 
+    // Mensaje directo en escritorio (Chat-F05): el pill sms:/iMessage solo
+    // funciona en táctil; en escritorio falla en silencio. En escritorio lo
+    // ocultamos y mostramos el número del NAP como texto copiable junto a
+    // WhatsApp (que degrada bien). WhatsApp se deja intacto.
+    if (!isCoarse) {
+      const smsPill = root.querySelector('[data-mrc-sms]');
+      if (smsPill) smsPill.hidden = true;
+      const slot = root.querySelector('[data-mrc-direct-desktop]');
+      if (slot && NAP_PHONE) {
+        slot.hidden = false;
+        const note = document.createElement('span');
+        note.className = 'mrc-direct-note';
+        note.textContent = T.directDesktopNote || '';
+        const num = document.createElement('span');
+        num.className = 'mrc-direct-num';
+        const numTx = document.createElement('span');
+        numTx.textContent = NAP_PHONE;
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button'; copyBtn.className = 'mrc-copy-btn'; copyBtn.textContent = T.copy || 'Copy';
+        copyBtn.addEventListener('click', () => {
+          const done = () => {
+            const prev = T.copy || 'Copy';
+            copyBtn.textContent = T.copied || 'Copied';
+            setTimeout(() => { copyBtn.textContent = prev; }, 1800);
+          };
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(NAP_PHONE).then(done, () => {});
+          } catch (_) {}
+        });
+        num.appendChild(numTx); num.appendChild(copyBtn);
+        slot.appendChild(note); slot.appendChild(num);
+      }
+    }
+
     // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.
+    // Suprimida cuando la barra CTA móvil está visible (body.has-ctabar) para no
+    // solapar FAB + barra + nudge en la esquina (seam-12).
     try {
       if (nudge && !sessionStorage.getItem('mrcNudge')) {
         setTimeout(() => {
-          if (!opened && nudge) {
+          const ctaBar = document.body && document.body.classList.contains('has-ctabar');
+          if (!opened && !ctaBar && nudge) {
             nudge.hidden = false;
             try { sessionStorage.setItem('mrcNudge', '1'); } catch (_) {}
             setTimeout(() => { if (nudge && !opened) nudge.hidden = true; }, 9000);

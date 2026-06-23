@@ -23,7 +23,7 @@ const c = content.en;
   lang="en"
   path="/"
 >
-  <SiteNav nav={c.nav} lang="en" homeHref="/en/" />
+  <SiteNav nav={c.nav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} />
   <main id="main">
     <Hero hero={c.hero} />
     <Services services={c.services} />

@@ -19,6 +19,13 @@ function sanitize(v, max = 2000) {
   return s ? s.slice(0, max) : null;
 }
 
+// Validación de formato server-side (red de seguridad). El campo `contact`
+// es libre: puede ser email o teléfono. Si parece email (lleva @) lo
+// validamos como email; si no, y trae dígitos, exigimos >=7 dígitos.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (e) => EMAIL_RE.test(e);
+const hasEnoughDigits = (p) => (String(p).match(/\d/g) || []).length >= 7;
+
 const withTimeout = (p, ms, label) =>
   Promise.race([
     p,
@@ -49,6 +56,24 @@ export default async function handler(req, res) {
       message: sanitize(body.message, 2000),
       lang,
     };
+
+    // Validación de formato: no exigimos contacto, pero si lo dan, debe
+    // tener pinta de email o de teléfono (red de seguridad anti-basura).
+    if (data.contact) {
+      if (data.contact.includes('@')) {
+        if (!isValidEmail(data.contact)) {
+          return res.status(400).json({
+            ok: false,
+            error: 'El email no tiene un formato válido. Revísalo, por favor.',
+          });
+        }
+      } else if (!hasEnoughDigits(data.contact)) {
+        return res.status(400).json({
+          ok: false,
+          error: 'El contacto no parece válido. Deja un email o un teléfono con al menos 7 dígitos.',
+        });
+      }
+    }
 
     // No exigimos PII (el visitante puede pedir humano sin dar datos),
     // pero registramos IP/UA para contexto del fundador.

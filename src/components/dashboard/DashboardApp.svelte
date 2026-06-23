@@ -741,7 +741,21 @@
                       </div>
                     </td>
                     <td><span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : 'contacto'}</span></td>
-                    <td class="msg">{lead.interest || lead.message || '—'}</td>
+                    <td class="msg">
+                      {#if lead.interest || lead.message}
+                        {@const full = lead.interest || lead.message}
+                        {#if full.length > 80 || full.includes('\n')}
+                          <details class="msg-det">
+                            <summary class="msg-sum" title={full}>{full}</summary>
+                            <div class="msg-full">{full}</div>
+                          </details>
+                        {:else}
+                          <span class="msg-line" title={full}>{full}</span>
+                        {/if}
+                      {:else}
+                        —
+                      {/if}
+                    </td>
                     <td class="mono dim">{fmtDate(lead.created_at)}</td>
                     <td>
                       <select class="status status--{lead.status}" value={lead.status} onchange={(e) => setStatus(lead, e.currentTarget.value)}>
@@ -974,7 +988,19 @@
   .dim { color: var(--fg-subtle); white-space: nowrap; }
   .c-name { color: var(--fg-primary); }
   .c-sub { font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); margin-top: 2px; }
-  .msg { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .msg { max-width: 320px; vertical-align: top; }
+  /* Texto corto: una línea con elipsis + tooltip nativo (title). */
+  .msg-line { display: block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Texto largo / multilínea: <details> expandible por fila (transcript del chat). */
+  .msg-det { max-width: 320px; }
+  .msg-sum { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; list-style: none; color: var(--fg-secondary); transition: color var(--duration-fast); }
+  .msg-sum::-webkit-details-marker { display: none; }
+  .msg-sum:hover { color: var(--fg-primary); }
+  /* Caret a la izquierda que rota al abrir. */
+  .msg-sum::before { content: '▸'; display: inline-block; margin-right: 6px; color: var(--fg-subtle); transition: transform var(--duration-fast); }
+  .msg-det[open] .msg-sum { white-space: normal; color: var(--accent-gold); }
+  .msg-det[open] .msg-sum::before { transform: rotate(90deg); }
+  .msg-full { margin-top: 8px; padding: 10px 12px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: var(--fg-primary); max-height: 280px; overflow-y: auto; }
   .src { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; }
   .src--chat { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
   .src--contact { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }

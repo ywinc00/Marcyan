@@ -67,7 +67,7 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
   hasEn={false}
   noindex={true}
 >
-  <SiteNav nav={pageNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={pageNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main" class="brief">
     <div class="container brief__inner">

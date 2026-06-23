@@ -34,7 +34,7 @@ const c = content.es;
 >
   <ServiceLd slot="head" {...p.service} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -83,7 +83,7 @@ const c = content.es;
 
     <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
 
-    <Contact contact={c.contact} />
+    <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="SEO para IA (Visibilidad en IA)" />
   </main>
 
   <SiteFooter footer={c.footer} />

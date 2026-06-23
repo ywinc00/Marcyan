@@ -318,6 +318,7 @@ const houstonWeb: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio nuevo aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: 'Diseño web bilingüe', href: '/es/houston/diseno-web-bilingue', desc: 'Tu sitio en español e inglés de verdad, no traducido.', icon: 'lucide:languages' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta y agenda 24/7.', icon: 'marcyan-ai' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Cuando quieras vender en línea, te montamos la tienda.', icon: 'lucide:shopping-bag' },
       { label: 'Sitios para bienes raíces', href: '/es/houston/bienes-raices', desc: '¿Eres agente? Sitio con tus propiedades y SEO por zona.', icon: 'lucide:home' },
@@ -2467,6 +2468,590 @@ const houstonClinicasDentales: ClusterPage = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// OLA 3 · BARRIOS + WEDGE BILINGÜE. Houston: Katy/Sugar Land (lideran con la
+// ZONA, no el head-term) + diseño-web-bilingüe (wedge, cross-link a diseno-web).
+// Miami: Doral (Doralzuela)/Hialeah (Cliente Fundador, diferencian por AEO/
+// bilingüe/barrio, NO precio; proof etiquetado por su ciudad real).
+// ═══════════════════════════════════════════════════════════════
+const houstonKaty: ClusterPage = {
+  meta: {
+    title: 'Diseño Web en Katy, TX: páginas web y SEO local | Marcyan',
+    description:
+      'Diseño web y SEO local para negocios en Katy, TX: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/katy',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Katy', path: '/es/houston/katy' },
+  ],
+  hero: {
+    badge: 'Katy, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Diseño web · Katy',
+    h1: 'Diseño web en <em>Katy</em>, para tu negocio local',
+    sub: 'Un sitio bilingüe, rápido en el celular y diseñado a medida, más SEO local para que las familias de Cinco Ranch, Cross Creek Ranch y todo Katy te encuentren cuando buscan por tu zona y no dentro de resultados genéricos de «Houston».',
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['SEO local por zona', 'Bilingüe ES/EN', 'Rápido en el celular'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué necesita la página web de un negocio en Katy, TX?',
+    a: 'En Katy necesitas un sitio rápido en el celular, bilingüe y con SEO local por tu corredor (Mason Rd, Grand Parkway 99). El 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio pensado para <em>captar clientes de Katy</em>',
+    intro: 'Diseño web a medida y SEO local, en un solo sistema honesto, para negocios de servicios para el hogar y profesionales del oeste de Houston.',
+    items: [
+      { icon: 'lucide:layout-template', title: 'Diseño 100% a medida', desc: 'Tu sitio se diseña desde cero alrededor de tu marca y tus servicios. Sin plantillas recicladas que se ven como las de tu competencia.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'La familia de Cinco Ranch te juzga desde el teléfono. Tu sitio carga al instante y se ve impecable en cualquier pantalla.' },
+      { icon: 'lucide:search', title: 'SEO local por zona', desc: 'Apareces cuando buscan «plomero en Katy» o «remodelación cerca de mí», por tu corredor (Mason Rd, FM 1463, Grand Parkway 99), en Google y en la IA.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Le hablas a la comunidad hispana de Katy en su idioma y a la clientela anglo en el suyo, todo en el mismo sitio.' },
+      { icon: 'lucide:inbox', title: 'Formularios y captación', desc: 'Cada interesado llega a tu correo y queda registrado. En una zona competida, el que responde primero se queda con el trabajo.' },
+      { icon: 'lucide:navigation', title: 'Tu negocio en el mapa de Katy', desc: 'Estructuramos tu información de zona y servicio para que quede claro a quién atiendes y dónde, y se note local de Katy.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'En Katy, el cliente se busca <em>por su zona, no por «Houston»</em>',
+    paragraphs: [
+      'Katy dejó de ser un pueblo ferroviario para convertirse en uno de los polos de comunidades planificadas más buscados del oeste de Houston: Cinco Ranch, Cross Creek Ranch, Cane Island y Elyson atraen miles de familias jóvenes cada año, muchas que llegan «por las escuelas» de Katy ISD. Ese hogar nuevo necesita constantemente servicios (remodelación, climatización, jardinería, limpieza, plomería, comida), y casi siempre empieza buscando en el celular por su zona o por su corredor, no por «Houston» genérico, porque el residente de Katy se identifica con Katy.',
+      'Por eso tu página web debe liderar con Katy y cargar rápido en el móvil, donde se decide la primera impresión, y atender por igual a la clientela bilingüe (familias anglo y una comunidad hispana en expansión). Construimos tu sitio a medida y lo respaldamos con SEO local por zona para que aparezcas en esas búsquedas de Mason Rd, FM 1463 y la Grand Parkway. <strong>Sin promesas de posición:</strong> nadie controla el algoritmo de Google; lo que te damos es la mejor base honesta para competir.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Tu sitio en Katy, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Empezamos por un sitio profesional, bilingüe y a medida. El SEO local y la IA se suman según lo que tu negocio de Katy necesite.',
+    features: [
+      'Diseño 100% a medida',
+      'Versión en español e inglés',
+      'Rápido en el celular y listo para la IA',
+      'Optimización SEO local por zona',
+      'Formulario de contacto integrado',
+      'Orientación con dominio y hospedaje',
+    ],
+    cta: { label: 'Quiero mi sitio', href: '#contacto' },
+    note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) y un asistente con IA (desde $900) son servicios que se suman según lo que tu negocio necesite. Te lo detallamos por escrito en la propuesta gratuita, sin compromiso.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Negocios reales del <em>área metro de Houston</em>',
+    cta: { label: 'Quiero algo así para mi negocio', href: '#contacto' },
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Diseño web en Katy, <em>claro y sin letra chica</em>',
+    items: [
+      { q: '¿Hacen páginas web específicamente para negocios de Katy?', a: 'Sí. Trabajamos el área metropolitana de Houston, y Katy es parte de ese metro, así que diseñamos tu sitio para que lidere con Katy: tu zona, tus corredores (Mason Rd, FM 1463, Grand Parkway 99) y tus comunidades (Cinco Ranch, Cross Creek Ranch). El cliente de Katy se busca por Katy, no por «Houston» genérico.' },
+      { q: '¿Tienen clientes en Katy?', a: 'Seremos honestos: nuestro trabajo publicado es del área metro de Houston y lo etiquetamos por su ciudad real (Houston, TX). No vamos a inventarte un cliente «de Katy» que no existe. Katy es parte de ese mismo mercado de Houston que ya atendemos, y tu sitio se construye con copy 100% específico de tu zona.' },
+      { q: '¿Cuánto cuesta una página web en Katy?', a: 'Un sitio profesional, bilingüe y a medida empieza en $1,500 (proyecto único). El SEO local va desde $600 al mes y un asistente con IA desde $900. Armamos el sistema según tu negocio y te damos un precio claro por escrito en la propuesta gratuita.' },
+      { q: '¿Me garantizan salir #1 en Google en Katy?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo de Google. Lo que sí hacemos es darte un sitio rápido y bilingüe y un SEO local honesto, estructurado por tu zona y tus corredores, para que tengas la mejor base posible para competir en las búsquedas de Katy.' },
+      { q: '¿El sitio funciona en español y en inglés?', a: 'Sí, y en Katy importa: atiendes a familias anglo y a una comunidad hispana que sigue creciendo. Construimos tu sitio en los dos idiomas, escrito para cómo busca de verdad cada cliente, todo en el mismo lugar.' },
+      { q: '¿Por qué es tan importante que cargue rápido en el celular?', a: 'Porque ahí se decide. La familia que se acaba de mudar a Cinco Ranch te busca desde el teléfono y compara dos o tres opciones en segundos. Un sitio lento o que se ve mal en móvil pierde a ese cliente antes de que te llame; por eso construimos en HTML ligero que carga al instante.' },
+    ],
+  },
+  cta: {
+    title: 'Que en Katy te encuentren <em>primero</em>',
+    sub: 'Cuéntanos qué haces y a qué zona de Katy atiendes, y te propondremos un sitio y un plan de SEO local en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio a detalle: a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que te encuentren cuando buscan por tu zona.', icon: 'lucide:search' },
+      { label: 'Houston y sus zonas', href: '/es/houston', desc: 'Todos los servicios y zonas que cubrimos en Houston.', icon: 'lucide:map-pin' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web y SEO Local en Katy, TX',
+    serviceType: 'Diseño web y SEO local para negocios',
+    description:
+      'Diseño web a medida y SEO local para negocios en Katy, Texas: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde $1,500. Sin promesas de posición.',
+    path: '/es/houston/katy',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonSugarLand: ClusterPage = {
+  meta: {
+    title: 'Diseño Web en Sugar Land, TX: sitios premium y bilingües | Marcyan',
+    description:
+      'Diseño web y SEO local para negocios en Sugar Land (Town Square, First Colony, Fort Bend). Sitio premium, rápido y bilingüe español e inglés. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/sugar-land',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Sugar Land', path: '/es/houston/sugar-land' },
+  ],
+  hero: {
+    badge: 'Sugar Land, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Diseño web y SEO · Sugar Land',
+    h1: 'Diseño web premium en <em>Sugar Land</em>',
+    sub: 'Sitios a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend. Un sitio que se ve al nivel de Town Square y First Colony: rápido, profesional y bilingüe español e inglés, listo para un cliente exigente.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Diseño premium a medida', 'Bilingüe ES/EN', 'SEO local por zona'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Cuánto cuesta un sitio web profesional para un negocio en Sugar Land?',
+    a: 'Un sitio profesional a medida en Sugar Land empieza desde $1,500 como proyecto único. Es una inversión que pesa: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, y en un mercado acomodado y profesional como Fort Bend, la primera impresión decide quién recibe la llamada.',
+    source: 'Universidad de Stanford',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sitio a la altura de Sugar Land',
+    intro: 'Diseño premium a medida más SEO local, pensado para un público profesional y multicultural que decide rápido.',
+    items: [
+      { icon: 'lucide:pen-tool', title: 'Diseño premium a medida', desc: 'Cada sitio se diseña desde cero alrededor de tu marca. Sin plantillas recicladas, con el nivel visual que tu clientela de Sugar Land ya espera.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Inglés como idioma principal de negocio y español donde aporta valor real, para una clientela multicultural y exigente.' },
+      { icon: 'lucide:search', title: 'SEO local por zona', desc: 'Te optimizamos para Town Square, First Colony, Riverstone, Telfair y para las búsquedas "cerca de mí" de tu rubro.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'HTML ligero que carga en un par de segundos, impecable en móvil y computadora, porque un profesional no espera.' },
+      { icon: 'lucide:badge-check', title: 'Credibilidad visible', desc: 'Reseñas, certificaciones y señales de confianza bien presentadas, para que el sitio respalde tu reputación local.' },
+      { icon: 'lucide:inbox', title: 'Formularios y captación', desc: 'Formularios que llegan a tu correo y a tu base de datos, para que ningún prospecto se pierda entre consultas.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué este enfoque',
+    title: 'Sugar Land no es un sitio web cualquiera',
+    paragraphs: [
+      'Sugar Land es una ciudad próspera al suroeste de Houston, núcleo del condado de Fort Bend, uno de los condados más diversos de Estados Unidos. Aquí conviven grandes comunidades del sur de Asia, del este asiático e hispana, y el corazón comercial late en Sugar Land Town Square y First Colony. El tejido de negocios es de servicios profesionales y consumo de gama media-alta: clínicas, bufetes, contadores, restaurantes, boutiques e inmobiliarias, donde el cliente juzga la credibilidad por el sitio y espera diseño de nivel.',
+      'Por eso aquí el ángulo no es "más barato", es premium y bilingüe. <strong>Tu sitio compite contra la imagen pulida de todo Sugar Land, donde el SEO local es muy competido.</strong> Lideramos con diseño a medida que comunica con claridad a una clientela multicultural, español e inglés donde aporta valor, y SEO local por zona (Town Square, First Colony, Riverstone, Telfair) para que aparezcas cuando buscan por nombre de área o "cerca de mí".',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio web en Sugar Land, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Un solo pago por un sitio premium, a medida y bilingüe, sin mensualidades atadas al diseño.',
+    features: [
+      'Diseño 100% a medida (sin plantillas)',
+      'Varias páginas según el plan',
+      'Versión en español e inglés',
+      'Optimización SEO local base',
+      'Formulario de contacto integrado',
+      'Listo para móvil y para la IA',
+    ],
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman si los necesitas; las tiendas en línea tienen su propio alcance. Te lo detallamos sin compromiso.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Trabajo real del área metro de Houston',
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Preguntas frecuentes sobre diseño web en Sugar Land',
+    items: [
+      { q: '¿Cuánto cuesta una página web en Sugar Land?', a: 'Un sitio profesional a medida empieza desde $1,500 como proyecto único (un solo pago). El precio final depende del número de páginas y las funciones; te enviamos una propuesta clara y sin compromiso antes de empezar.' },
+      { q: '¿Trabajan con negocios fuera del centro de Sugar Land?', a: 'Sí. Atendemos todo Sugar Land y el condado de Fort Bend: Town Square, First Colony, Riverstone, Telfair y zonas cercanas, además del resto del área metropolitana de Houston.' },
+      { q: '¿El sitio viene en español y en inglés?', a: 'Sí. Trabajamos el inglés como idioma principal de negocio y el español donde aporta valor real para tu clientela. En un mercado tan multicultural como Sugar Land, esa flexibilidad bilingüe marca la diferencia.' },
+      { q: '¿Pueden mejorar mi posición en Google para Sugar Land?', a: 'Optimizamos tu sitio y tu presencia local (Perfil de Google, reseñas, contenido por zona) para que te encuentren. No prometemos el puesto #1: nadie serio puede garantizar una posición exacta en Google, pero sí trabajamos con método y reportes claros.' },
+      { q: '¿Tienen clientes en Sugar Land?', a: 'Mostramos trabajo real del área metropolitana de Houston (Sugar Land es parte de ese metro y de Fort Bend), etiquetado por la ciudad real de cada proyecto. Preferimos ser honestos a inflar un caso que no corresponde.' },
+      { q: '¿Cuánto tardan en entregar el sitio?', a: 'Depende del alcance, pero un sitio típico toma unas pocas semanas desde que tenemos tu contenido y tu visto bueno al diseño. En la propuesta te damos un tiempo estimado realista.' },
+    ],
+  },
+  cta: {
+    title: 'Tu negocio en Sugar Land merece un sitio premium',
+    sub: 'Cuéntanos qué haces y a quién atiendes. Te enviamos una propuesta gratis, bilingüe y sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio de diseño web a detalle: qué incluye, cómo trabajamos y qué entregamos.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google y en Maps cuando tu cliente busca por zona o "cerca de mí".', icon: 'lucide:search' },
+      { label: 'Houston y su área metro', href: '/es/houston', desc: 'Todo lo que hacemos en Houston, Fort Bend y los suburbios como Sugar Land.', icon: 'lucide:building-2' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web y SEO Local en Sugar Land',
+    serviceType: 'Diseño web y SEO local',
+    description:
+      'Diseño web premium a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend: sitio bilingüe español e inglés, rápido en el celular y optimizado por zona (Town Square, First Colony). Desde $1,500.',
+    path: '/es/houston/sugar-land',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const houstonDisenoWebBilingue: ClusterPage = {
+  meta: {
+    title: 'Diseño Web Bilingüe en Houston (Español e Inglés) | Marcyan',
+    description:
+      'Diseño web bilingüe en Houston: tu página en español e inglés escrita como busca tu cliente, no traducida con Google. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/houston/diseno-web-bilingue',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Houston', path: '/es/houston' },
+    { name: 'Diseño web bilingüe', path: '/es/houston/diseno-web-bilingue' },
+  ],
+  hero: {
+    badge: 'Houston, TX',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Diseño web bilingüe · Houston',
+    h1: 'Diseño web <em>bilingüe</em> en Houston (español e inglés)',
+    sub: 'Una página real en dos idiomas para el negocio hispano de Houston: escrita como tu cliente busca de verdad en español y en inglés, no pasada por Google Translate. Con URLs separadas, hreflang y revisión de hablante nativo.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Español e inglés de verdad', 'Sin Google Translate', 'Contacto por WhatsApp'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Qué es una página web bilingüe de verdad y por qué importa en Houston?',
+    a: 'Es un sitio con contenido nativo en español e inglés, escrito como busca cada cliente (no traducido palabra por palabra), con URLs separadas y hreflang para que Google muestre la versión correcta. Importa porque el 75% de las personas juzga la credibilidad de un negocio por su sitio web.',
+    source: 'Universidad de Stanford',
+  },
+  includes: {
+    tag: 'Cómo lo hacemos bilingüe',
+    title: 'Una metodología, no un <em>botón de traducir</em>',
+    intro: 'No pegamos un widget de Google Translate al final. Construimos cada idioma desde el inicio, con la estructura técnica para que Google y la IA entiendan que son dos versiones de tu negocio.',
+    items: [
+      { icon: 'lucide:pen-tool', title: 'Contenido nativo, no traducido', desc: 'Escribimos cada idioma por separado, como habla y busca de verdad tu cliente. Tu cliente hispano nota al instante una frase robótica, y eso resta confianza.' },
+      { icon: 'lucide:search', title: 'Palabras como busca la gente', desc: 'No traducimos el keyword en inglés literal. Tu cliente busca "página web" o términos coloquiales de su país, no la traducción de "web design". Investigamos cómo busca en cada idioma.' },
+      { icon: 'lucide:languages', title: 'URLs separadas y hreflang', desc: 'Una URL por idioma con etiquetas hreflang bien puestas, para que Google sepa cuál versión mostrar y las dos páginas no se canibalicen entre sí.' },
+      { icon: 'lucide:users', title: 'Revisión de hablante nativo', desc: 'Las páginas que convierten las revisa un hablante nativo, para que el español suene natural y el inglés también, sin frases pegadas ni errores de contexto cultural.' },
+      { icon: 'lucide:smartphone', title: 'Cambio de idioma claro en el celular', desc: 'Un selector de idioma visible y fácil en el teléfono, porque la misma persona busca en inglés de día y en español de tarde según el contexto.' },
+      { icon: 'lucide:phone-call', title: 'Cierre por WhatsApp', desc: 'Botón de WhatsApp en los dos idiomas, porque tu clientela prefiere escribir por ahí antes que llenar un formulario o mandar un correo.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué bilingüe en Houston',
+    title: 'Tu cliente de Houston <em>busca en dos idiomas</em>',
+    paragraphs: [
+      'En corredores como East End, Gulfton, Sharpstown, Near Northside, Alief y Spring Branch, tu clientela es genuinamente bilingüe y cambia de idioma según el momento: la misma persona busca en inglés por la mañana y en español por la tarde, navega Instagram en español y Google en inglés. Una web que solo existe en un idioma deja a la mitad de tu mercado sin encontrarte.',
+      'Y hay un hueco real de oportunidad: aparecer en resultados en español en tu ZIP de Houston enfrenta mucha menos competencia que el mismo servicio en inglés. <strong>Un plomero bilingüe en Sharpstown compite con pocos en español frente a cientos en inglés.</strong> Por eso no traducimos el keyword: escribimos cada idioma como busca de verdad la gente y reclamamos ese espacio que casi nadie está trabajando.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio bilingüe, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto, sin mensualidades obligatorias. Los dos idiomas vienen pensados desde el diseño, no como un extra al final.',
+    features: [
+      'Diseño 100% a medida',
+      'Contenido nativo en español e inglés',
+      'URLs separadas por idioma + hreflang',
+      'Revisión de hablante nativo',
+      'SEO base en ambos idiomas',
+      'Botón de WhatsApp y formulario',
+    ],
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    note: '$1,500 es el punto de partida para un sitio bilingüe profesional. El número de páginas y las funciones definen el alcance final. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman si los necesitas.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Negocios de Houston con <em>sitio a medida</em>',
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Diseño web bilingüe, <em>sin letra chica</em>',
+    items: [
+      { q: '¿Qué diferencia hay con poner Google Translate en mi web?', a: 'Mucha. Google Translate genera frases robóticas que tu cliente hispano nota al instante y que le restan credibilidad a tu negocio. Nosotros escribimos cada idioma desde cero, como busca y habla de verdad tu cliente, y un hablante nativo revisa las páginas que convierten.' },
+      { q: '¿Cuánto cuesta una página web bilingüe en Houston?', a: 'Empieza en $1,500 por proyecto, con los dos idiomas pensados desde el diseño. El precio final depende de cuántas páginas necesites y qué funciones quieras (reservas, pagos, blog). Te entregamos un presupuesto claro y por escrito en la propuesta gratuita.' },
+      { q: '¿No basta con traducir el sitio que ya tengo?', a: 'Traducir palabra por palabra casi nunca funciona para Google. La gente no busca la traducción literal del keyword en inglés: busca "página web" o términos coloquiales de su país. Por eso investigamos cómo busca tu cliente en cada idioma y escribimos para eso, no traducimos.' },
+      { q: '¿Cómo evitan que las dos versiones compitan en Google?', a: 'Con URLs separadas por idioma y etiquetas hreflang bien configuradas desde el inicio. Así Google entiende que son dos versiones del mismo negocio y muestra la correcta según el idioma del usuario, sin que se canibalicen entre sí.' },
+      { q: '¿Me garantizan salir primero en Google?', a: 'No. Nadie serio puede garantizar el puesto #1, y desconfía de quien lo prometa. Lo que sí hacemos es darte una base técnica sólida en ambos idiomas y aprovechar que en español hay mucha menos competencia local en tu ZIP, que es una ventaja real.' },
+      { q: '¿Puedo contactar a mis clientes por WhatsApp desde el sitio?', a: 'Sí, y lo recomendamos. Tu clientela suele preferir WhatsApp antes que el correo o el formulario. Ponemos un botón visible en los dos idiomas para que escribirte sea de un toque, sin fricción.' },
+    ],
+  },
+  cta: {
+    title: 'Tu sitio en <em>dos idiomas</em> empieza aquí',
+    sub: 'Cuéntanos tu negocio y recibe una propuesta de sitio bilingüe personalizada en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios relacionados',
+    links: [
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'El servicio de diseño web a detalle: alcance, proceso y todo lo que incluye.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Que tu sitio bilingüe aparezca en Google y en Maps en ambos idiomas.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Suma un asistente que contesta en español e inglés 24/7.', icon: 'marcyan-ai' },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Cuando quieras vender en línea, te montamos la tienda bilingüe.', icon: 'lucide:shopping-bag' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web Bilingüe en Houston (Español e Inglés)',
+    serviceType: 'Diseño web bilingüe',
+    description:
+      'Diseño y desarrollo de sitios web bilingües (español e inglés) para PYMEs hispanas en Houston: contenido nativo en cada idioma, URLs separadas con hreflang y revisión de hablante nativo, en lugar de traducción automática.',
+    path: '/es/houston/diseno-web-bilingue',
+    areaCity: 'Houston',
+    areaRegion: 'Texas',
+    priceValue: '1500',
+    providerId: HOUSTON_ID,
+  },
+};
+
+const miamiDoral: ClusterPage = {
+  meta: {
+    title: 'Diseño Web y SEO en Doral (Doralzuela) | Marcyan',
+    description:
+      'Diseño web, SEO local e IA conversacional para negocios de Doral: areperas, panaderías venezolanas, servicios e import/export. Bilingüe y listo para IA. Desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/miami/doral',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Miami', path: '/es/miami' },
+    { name: 'Doral', path: '/es/miami/doral' },
+  ],
+  hero: {
+    badge: 'Doral, FL',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Doral · Miami-Dade',
+    h1: 'Diseño web y SEO para negocios en <em>Doral</em>',
+    sub: 'Sitios bilingües, SEO local e IA conversacional para los negocios de Doral, la «Doralzuela». Para que tu arepera, panadería, servicio profesional o firma de import/export aparezca en Google y en ChatGPT, y reciba al cliente por WhatsApp, en español y en inglés.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Bilingüe ES/EN', 'Listo para la IA', 'Cliente escribe por WhatsApp'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Por qué un negocio de Doral necesita un sitio web bilingüe y SEO local?',
+    a: 'Porque el cliente de Doral busca y escribe en español, a menudo por WhatsApp. Un sitio bilingüe con SEO local te hace visible cuando alguien busca «cerca de mí»: el 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Un sistema completo para <em>tu negocio en Doral</em>',
+    items: [
+      { icon: 'lucide:layout-template', title: 'Sitio web a medida', desc: 'Diseñado desde cero para tu marca, rápido en el celular y pensado para el cliente venezolano y colombiano de Doral.' },
+      { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'En el español que de verdad se habla en Doral, y en inglés para los corredores EE.UU.-Latinoamérica.' },
+      { icon: 'lucide:search', title: 'SEO local para Doral', desc: 'Optimizamos tu Perfil de Google y tu sitio para «diseño web Doral», «areperas en Doral» y búsquedas cerca de Downtown y CityPlace Doral.' },
+      { icon: 'marcyan-ai', title: 'IA conversacional', desc: 'Un asistente bilingüe que responde y capta clientes las 24 horas, ideal para el cliente de Doral que prefiere escribir por chat.' },
+      { icon: 'lucide:scan-search', title: 'Listo para la IA (AEO)', desc: 'Estructura y schema para que ChatGPT y Gemini puedan leerte y citarte cuando alguien pregunta por opciones en Doral.' },
+      { icon: 'lucide:smartphone', title: 'WhatsApp integrado', desc: 'Botón de WhatsApp visible y formularios que llegan a tu correo, para no perder ningún prospecto.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué Doral',
+    title: 'Doral no es «Miami genérico»: es <em>Doralzuela</em>',
+    paragraphs: [
+      'Doral es una ciudad incorporada al oeste de Miami-Dade, pegada al aeropuerto MIA y conocida como «Doralzuela» por albergar una de las comunidades venezolanas más grandes de Estados Unidos, junto con fuerte presencia colombiana, argentina y cubana. Aquí el español es la lengua del comercio: areperas y panaderías como las de Downtown Doral, servicios profesionales hispanos y firmas de import/export que mueven la carga entre EE.UU., Venezuela y Colombia.',
+      'El cliente de Doral busca en su idioma y contacta por WhatsApp, y valora que entiendas su cultura, no solo «Miami». Por eso el verdadero diferenciador no es el precio: es <strong>un sitio bilingüe real, SEO local por corredor (Downtown Doral, CityPlace Doral) y schema listo para la IA</strong>, escrito para tu cliente venezolano o colombiano y para tu vertical concreta.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Sitio web profesional, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto. La base para que tu negocio de Doral tenga una presencia bilingüe a la altura de su reputación offline.',
+    features: [
+      'Diseño 100% a medida',
+      'Versión en español e inglés',
+      'Optimización SEO base + schema',
+      'Botón de WhatsApp y formulario',
+      'Listo para móvil y para la IA',
+      'Te orientamos con dominio y hospedaje',
+    ],
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman según lo que necesites. Las tiendas en línea y las funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Trabajo real y verificable, y <em>buscamos tu negocio</em> en Doral',
+    cta: { label: 'Sé nuestro primer caso en Doral', href: '#contacto' },
+    // Honestidad: NO hay clientes en Miami/Doral. Proof etiquetado por su ciudad
+    // REAL (Houston / Orlando). El título y el FAQ lo aclaran; nada insinúa Doral.
+    items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Move Junk Away', 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu presencia digital en Doral, sin <em>letra chica</em>',
+    items: [
+      { q: '¿Cuánto cuesta un sitio web para un negocio en Doral?', a: 'Un sitio profesional a medida empieza en $1,500 (pago único). El precio final depende del número de páginas y de las funciones que necesites. El SEO local (desde $600 al mes) y una IA conversacional (desde $900) se cotizan aparte. Te entregamos un alcance y un precio claros en la propuesta gratuita, antes de que decidas.' },
+      { q: '¿Tienen clientes en Doral o en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados en Doral. Sí tenemos trabajo real y verificable, con enlaces que puedes visitar, para negocios en Houston y Orlando. Por eso ofrecemos cupos de Cliente Fundador en Doral, con condiciones especiales.' },
+      { q: '¿El sitio funciona para mi arepera, panadería o restaurante venezolano?', a: 'Sí. Diseñamos para gastronomía: menú claro, fotos que abren apetito, botón de WhatsApp y de pedidos, y SEO local para que aparezcas cuando alguien busca arepas o empanadas en Doral. Escribimos en el español de tu cliente venezolano o colombiano, sin sonar a plantilla genérica en inglés.' },
+      { q: '¿Y si tengo una firma de import/export o un servicio profesional cerca de MIA?', a: 'También. Para freight forwarders, agentes aduanales, contadores, abogados de inmigración y clínicas, construimos un sitio bilingüe profesional que da confianza en los corredores EE.UU.-Venezuela/Colombia. Inglés y español desde el inicio, con la estructura para que te encuentren en Google y en los asistentes de IA.' },
+      { q: '¿Atiende el cliente por WhatsApp?', a: 'Sí, lo dejamos integrado. El cliente de Doral suele preferir escribir por WhatsApp antes que llamar, así que ponemos un botón visible y, si lo deseas, una IA conversacional bilingüe que responde al instante las 24 horas y capta el lead aunque tú estés ocupado.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa: nadie controla el algoritmo de Google. Lo que sí garantizamos es trabajo honesto y medible: un sitio bilingüe correcto, SEO local bien hecho, schema listo para la IA y reportes claros. Nuestro compromiso es con el método y la transparencia, no con un número imposible de asegurar.' },
+    ],
+  },
+  cta: {
+    title: 'Pon a tu negocio de <em>Doral</em> en el mapa digital',
+    sub: 'Buscamos Clientes Fundadores en Doral. Cuéntanos sobre tu negocio (arepera, panadería, servicio o import/export) y recibe una propuesta bilingüe en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'El servicio de diseño web bilingüe a detalle.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Que tu negocio aparezca en Google y en Maps.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Atiende y capta clientes 24/7 con un asistente bilingüe.', icon: 'marcyan-ai' },
+      { label: 'Miami (hub)', href: '/es/miami', desc: 'Todos nuestros servicios para Miami-Dade.', icon: 'lucide:globe' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web y SEO en Doral',
+    serviceType: 'Diseño web, SEO local e IA conversacional',
+    description:
+      'Diseño web bilingüe, SEO local e IA conversacional para negocios en Doral (Miami-Dade): areperas, panaderías y restaurantes venezolanos, servicios profesionales hispanos y firmas de import/export cerca de MIA. En español e inglés, listo para Google y para los asistentes de IA.',
+    path: '/es/miami/doral',
+    areaCity: 'Miami',
+    areaRegion: 'Florida',
+    priceValue: '1500',
+    providerId: MIAMI_ID,
+  },
+};
+
+const miamiHialeah: ClusterPage = {
+  meta: {
+    title: 'Diseño Web y SEO en Hialeah | Negocios locales en español | Marcyan',
+    description:
+      'Diseño web, SEO local e IA en español para negocios de Hialeah: ventanitas, panaderías, talleres, salones y mercados. Web rápida y bilingüe desde $1,500. Propuesta gratis.',
+  },
+  path: '/es/miami/hialeah',
+  breadcrumb: [
+    { name: 'Inicio', path: '/es/' },
+    { name: 'Miami', path: '/es/miami' },
+    { name: 'Hialeah', path: '/es/miami/hialeah' },
+  ],
+  hero: {
+    badge: 'Hialeah, FL',
+    badgeIcon: 'lucide:map-pin',
+    kicker: 'Negocios locales · Hialeah',
+    h1: 'Diseño web y SEO para tu <em>negocio</em> en Hialeah',
+    sub: 'Tu negocio de Hialeah vive en español, por WhatsApp y por la ventanita. Te armamos la web rápida, la ficha de Google y la respuesta inmediata para que el cliente que busca «cerca de mí» te encuentre y te escriba, todo arrancando en español.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver qué incluye', href: '#precios' },
+    chips: ['Todo en español', 'Rápido en el celular', 'Ficha de Google ordenada'],
+    tone: 'gold',
+  },
+  answer: {
+    q: '¿Le conviene a un negocio de Hialeah tener una página web en español?',
+    a: 'Sí, de las mejores inversiones locales para un negocio de Hialeah. El 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. Aquí el cliente busca en español desde el celular, y una web rápida con ficha de Google te pone delante de él.',
+    source: 'Google · BrightLocal, 2025',
+  },
+  includes: {
+    tag: 'Qué incluye',
+    title: 'Tu negocio de Hialeah, <em>bien armado</em> en español',
+    items: [
+      { icon: 'lucide:layout-template', title: 'Web a medida en español', desc: 'Un sitio diseñado desde cero para tu negocio, no una plantilla: cafetería, panadería, taller, salón, botánica o mercado, escrito en el español del barrio.' },
+      { icon: 'lucide:smartphone', title: 'Rápido en el celular', desc: 'HTML ligero que carga en un par de segundos, justo en el dispositivo con el que busca tu clientela. Nada de páginas pesadas que tardan en abrir.' },
+      { icon: 'lucide:map-pin', title: 'Ficha de Google ordenada', desc: 'Creamos u optimizamos tu Perfil de Google de Negocio: categoría, horario, fotos, servicios y descripción en español, para que salgas en Maps cuando te buscan.' },
+      { icon: 'lucide:search', title: 'SEO local del barrio', desc: 'Te posicionamos para «panadería cubana cerca de mí», «taller en Hialeah» y las búsquedas reales de Palm Ave, W 49 St y Hialeah Dr, en español.' },
+      { icon: 'marcyan-ai', title: 'Respuesta inmediata con IA', desc: 'Un asistente que contesta por WhatsApp y en tu web mientras atiendes el mostrador, para que el cliente que escribe no se vaya con el de al lado.' },
+      { icon: 'lucide:languages', title: 'Español primero, inglés si hace falta', desc: 'Todo arranca en español, el idioma del día a día en Hialeah, y sumamos inglés solo donde de verdad lo necesitas. Sin sonar a traducción.' },
+    ],
+    tone: 'gold',
+  },
+  local: {
+    tag: 'Por qué Hialeah',
+    title: 'En Hialeah, el español <em>es el negocio</em>',
+    paragraphs: [
+      'Hialeah es una de las ciudades más cubanas de Estados Unidos, una ciudad de Miami-Dade de clase trabajadora donde el español no es una concesión: es la lengua del día a día. La gente toma su cafecito en la ventanita, compra el pan en la panadería de toda la vida y le escribe al taller o al salón por WhatsApp, casi siempre en español. Tu negocio no necesita una web genérica en inglés: necesita existir bien en el idioma del barrio.',
+      'La oportunidad real no es competir por precio, es <strong>existir bien en español</strong>. Muchísimos negocios de Hialeah viven solo de Facebook, Instagram o del boca a boca, sin web propia ni ficha de Google bien armada, así que el cliente que busca «cerca de mí» en el celular no los encuentra aunque estén a una cuadra. Una web rápida, una ficha ordenada y respuesta inmediata, todo en español, te ponen delante de ese cliente.',
+    ],
+    tone: 'gold',
+  },
+  pricing: {
+    tag: 'Inversión',
+    title: 'Web para tu negocio en Hialeah, <em>desde $1,500</em>',
+    price: '$1,500',
+    unit: 'proyecto único',
+    lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
+    features: webFeatures,
+    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) para posicionarte en el barrio y un asistente con IA (desde $900) para contestar al instante se suman según lo que necesites. Te lo detallamos sin compromiso.',
+    tone: 'gold',
+  },
+  proof: {
+    tag: 'Trabajo real',
+    title: 'Trabajo real y <em>verificable</em>',
+    cta: { label: 'Sé nuestro primer caso en Hialeah', href: '#contacto' },
+    // Honestidad DURA: NO hay clientes en Miami. Proof etiquetado por su ciudad
+    // real (Houston/Orlando). Nunca se insinua que sean de Hialeah ni de Miami.
+    items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
+  },
+  faq: {
+    tag: 'Preguntas frecuentes',
+    title: 'Tu negocio en Hialeah, <em>sin rodeos</em>',
+    items: [
+      { q: '¿Cuánto cuesta una página web para mi negocio en Hialeah?', a: 'Un sitio profesional a medida empieza en $1,500, pago único, sin mensualidades obligatorias. El precio final depende de cuántas páginas necesites y de las funciones (reservas, menú, pagos). Si quieres SEO local para posicionarte en el barrio (desde $600 al mes) o un asistente con IA (desde $900), se cotizan aparte. Todo claro y por escrito en la propuesta gratuita.' },
+      { q: '¿Tienen clientes en Hialeah o en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados de Hialeah ni de Miami. Sí tenemos trabajo real y verificable hecho para negocios en Houston y Orlando, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en Hialeah, con condiciones especiales para nuestros primeros casos locales.' },
+      { q: '¿La web y la atención son de verdad en español?', a: 'Sí, y es nuestra especialidad. En Hialeah el español es la lengua del negocio, así que todo arranca en español: la web, la ficha de Google y el asistente que contesta. Lo escribimos en el español caribeño que de verdad usan tus clientes, no en una traducción robótica. Sumamos inglés solo donde lo necesitas.' },
+      { q: '¿Pueden contestar mi WhatsApp mientras atiendo el mostrador?', a: 'Sí. Un asistente con IA responde por WhatsApp y en tu web al instante, justo cuando estás atendiendo la ventanita o el mostrador y no puedes tomar el teléfono. Así el prospecto que escribe recibe respuesta rápido y no se va con el de al lado. Te decimos con honestidad qué se puede integrar y qué no.' },
+      { q: '¿Garantizan el primer lugar en Google?', a: 'No, y desconfía de quien lo prometa: nadie controla el algoritmo de Google. Lo que sí hacemos es trabajo honesto y medible: web rápida, ficha de Google ordenada, NAP consistente y contenido local en español, para que aparezcas cuando alguien busca tu servicio en Hialeah. El compromiso es con el método y la transparencia.' },
+      { q: '¿Trabajan toda Hialeah y el área de Miami?', a: 'Sí. Trabajamos Hialeah y toda el área de Miami-Dade como negocio de área de servicio, de forma remota y eficiente. No necesitas ir a una oficina: todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
+    ],
+  },
+  cta: {
+    title: 'Sé uno de nuestros primeros <em>casos en Hialeah</em>',
+    sub: 'Buscamos Clientes Fundadores en Hialeah. Cuéntanos sobre tu negocio y recibe una propuesta personalizada, en español, en menos de 24 horas, sin compromiso.',
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+    tone: 'gold',
+  },
+  related: {
+    tag: 'Sigue explorando',
+    title: 'Servicios que componen el sistema',
+    links: [
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'El servicio de diseño web a detalle: proceso, qué incluye y FAQ.', icon: 'lucide:layout-template' },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Que tu negocio aparezca en Google y en Maps por todo Miami-Dade.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Un asistente que contesta tu WhatsApp 24/7, en español.', icon: 'marcyan-ai' },
+      { label: 'Miami y su área', href: '/es/miami', desc: 'Todos nuestros servicios para negocios de Miami-Dade.', icon: 'lucide:map-pin' },
+    ],
+  },
+  service: {
+    name: 'Diseño Web y SEO en Hialeah',
+    serviceType: 'Diseño web, SEO local e IA conversacional',
+    description:
+      'Diseño web a medida, SEO local e IA conversacional en español para negocios de Hialeah (Miami-Dade): cafeterias, panaderias, talleres, salones, botanicas y mercados. Web rapida y bilingue, ficha de Google y respuesta inmediata por WhatsApp.',
+    path: '/es/miami/hialeah',
+    areaCity: 'Miami',
+    areaRegion: 'Florida',
+    priceValue: '1500',
+    providerId: MIAMI_ID,
+  },
+};
+
 export const clusters = {
   'houston/seo-local': houstonSeo,
   'houston/diseno-web': houstonWeb,
@@ -2480,10 +3065,15 @@ export const clusters = {
   'houston/talleres-mecanicos': houstonTalleresMecanicos,
   'houston/salon-belleza': houstonSalonBelleza,
   'houston/clinicas-dentales': houstonClinicasDentales,
+  'houston/katy': houstonKaty,
+  'houston/sugar-land': houstonSugarLand,
+  'houston/diseno-web-bilingue': houstonDisenoWebBilingue,
   'miami/diseno-web': miamiWeb,
   'miami/ia-conversacional': miamiIa,
   'miami/seo-local': miamiSeo,
   'miami/ecommerce': miamiEcommerce,
+  'miami/doral': miamiDoral,
+  'miami/hialeah': miamiHialeah,
   'ia-para-pymes': iaPymes,
   'precios/cuanto-cuesta-una-pagina-web-houston': precioWebHouston,
   'precios/cuanto-cuesta-un-chatbot': precioChatbot,

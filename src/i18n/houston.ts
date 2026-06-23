@@ -42,6 +42,7 @@ export const houstonHub = {
     title: 'Todo para tu negocio, en una <em>sola agencia</em>',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
+      { label: 'Diseño web bilingüe (ES/EN)', href: '/es/houston/diseno-web-bilingue', desc: 'Tu página en español e inglés de verdad, no traducida. Desde $1,500.', icon: 'lucide:languages' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan y agendan 24/7. Desde $900.', icon: 'marcyan-ai' },
       { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden. Diagnóstico gratis.', icon: 'marcyan-ai' },
@@ -60,6 +61,14 @@ export const houstonHub = {
       { label: 'Talleres mecánicos', href: '/es/houston/talleres-mecanicos', desc: 'Sitio con tus servicios y horario, SEO «cerca de mí» e IA que contesta. Desde $1,500.', icon: 'lucide:car' },
       { label: 'Salones de belleza', href: '/es/houston/salon-belleza', desc: 'Salón, barbería, uñas y spa: reservas 24/7 y galería. Desde $1,500.', icon: 'lucide:scissors' },
       { label: 'Clínicas dentales', href: '/es/houston/clinicas-dentales', desc: 'Sitio bilingüe que da confianza + agenda citas 24/7. Desde $1,500.', icon: 'lucide:stethoscope' },
+    ] as RelatedLink[],
+  },
+  zonas: {
+    tag: 'Por zona',
+    title: 'Diseño web por <em>zona de Houston</em>',
+    links: [
+      { label: 'Katy, TX', href: '/es/houston/katy', desc: 'Páginas web y SEO local para negocios de Katy y sus comunidades. Desde $1,500.', icon: 'lucide:map-pin' },
+      { label: 'Sugar Land, TX', href: '/es/houston/sugar-land', desc: 'Diseño web premium y bilingüe + SEO local para negocios de Sugar Land y Fort Bend.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
   local: {
@@ -112,5 +121,8 @@ export const houstonHub = {
     { name: 'Sitios Web para Talleres Mecánicos en Houston', path: '/es/houston/talleres-mecanicos' },
     { name: 'Sitios Web con Reservas para Salones de Belleza en Houston', path: '/es/houston/salon-belleza' },
     { name: 'Sitios Web para Clínicas Dentales en Houston', path: '/es/houston/clinicas-dentales' },
+    { name: 'Diseño Web y SEO Local en Katy, TX', path: '/es/houston/katy' },
+    { name: 'Diseño Web y SEO Local en Sugar Land', path: '/es/houston/sugar-land' },
+    { name: 'Diseño Web Bilingüe en Houston (Español e Inglés)', path: '/es/houston/diseno-web-bilingue' },
   ] as ListLink[],
 };

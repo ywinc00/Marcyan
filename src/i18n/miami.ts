@@ -49,6 +49,14 @@ export const miamiHub = {
       { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
   },
+  barrios: {
+    tag: 'Por barrio',
+    title: 'Soluciones por <em>barrio</em>',
+    links: [
+      { label: 'Doral (Doralzuela)', href: '/es/miami/doral', desc: 'Diseño web, SEO e IA para negocios de Doral. Bilingüe, desde $1,500.', icon: 'lucide:map-pin' },
+      { label: 'Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en español para negocios de Hialeah.', icon: 'lucide:map-pin' },
+    ] as RelatedLink[],
+  },
   local: {
     tag: 'Miami',
     title: 'Conocemos el <em>Miami hispano</em>',
@@ -92,5 +100,7 @@ export const miamiHub = {
     { name: 'SEO Local en Miami', path: '/es/miami/seo-local' },
     { name: 'IA Conversacional en Miami', path: '/es/miami/ia-conversacional' },
     { name: 'Tienda en Línea en Miami', path: '/es/miami/ecommerce' },
+    { name: 'Diseño Web y SEO en Doral', path: '/es/miami/doral' },
+    { name: 'Diseño Web y SEO en Hialeah', path: '/es/miami/hialeah' },
   ] as ListLink[],
 };

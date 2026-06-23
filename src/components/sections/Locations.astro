@@ -189,7 +189,11 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
      ilustración se baja a la altura del divisor (sobre los enlaces) para no quedar
      detrás del título/datos. */
   @media (max-width: 767px) {
-    .loc__illo { top: 282px; width: clamp(150px, 46%, 200px); }
+    /* Anclada por ABAJO: el borde inferior del SVG coincide con la base del pill de
+       estado (~264px del top de la card), sin extenderse a los enlaces. El bottom se
+       fija con calc(100% - 264px) para que funcione con cualquier alto de ilustración
+       (Houston y Miami tienen proporciones distintas). */
+    .loc__illo { top: auto; bottom: calc(100% - 290px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
   }
   @media (--lg) {
     .locations__grid { grid-template-columns: repeat(2, 1fr); }

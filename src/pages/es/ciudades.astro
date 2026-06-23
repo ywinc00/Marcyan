@@ -22,8 +22,8 @@ const hero = {
   kicker: 'Nuestras ciudades',
   h1: 'Houston y <em>Miami</em>',
   sub: 'Atendemos a negocios hispanos en Houston, Texas y Miami, Florida, en español e inglés, con contexto local real de cada mercado. Elige tu ciudad para ver los servicios.',
-  primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
-  secondary: { label: 'Ver servicios', href: '/es/servicios' },
+  primary: { label: 'Ver servicios', href: '/es/servicios' },
+  secondary: { label: 'Pedir propuesta gratis', href: '#contacto' },
   chips: ['Houston, TX', 'Miami, FL', 'Bilingüe ES/EN'],
   tone: 'gold' as const,
 };
@@ -46,8 +46,8 @@ const cities = {
 const cta = {
   title: 'Cuéntanos de tu negocio, <em>te orientamos gratis</em>',
   sub: 'En menos de 24 horas recibes una propuesta con alcance y precio claros, sin compromiso, en tu ciudad y en tu idioma.',
-  primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
-  secondary: { label: 'Ver formulario completo', href: '/formulario' },
+  primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+  secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
   tone: 'gold' as const,
 };
 const itemList = [
@@ -64,7 +64,7 @@ const itemList = [
 >
   <ItemListLd slot="head" items={itemList} name="Ciudades de Marcyan Studio" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero

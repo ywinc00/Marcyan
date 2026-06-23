@@ -18,7 +18,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Iniciar Proyecto', href: '/formu
   canonical="https://marcyanstudio.com/terminos"
   hasEn={false}
 >
-  <SiteNav nav={pageNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={pageNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main">
     <LegalDoc title="Términos del Servicio" updated="6 de junio de 2026">

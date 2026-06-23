@@ -39,7 +39,7 @@ const postRefs = posts.map((p) => ({
 <Layout title={b.meta.title} description={b.meta.description} lang="es" path="blog" hasEn={false}>
   <BlogListingLd slot="head" posts={postRefs} name="Blog de Marcyan Studio" description={b.meta.description} path="/es/blog" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath="/es/blog" />
 
   <main id="main">
     <LandingHero
@@ -65,7 +65,7 @@ const postRefs = posts.map((p) => ({
         {posts.length === 0 ? (
           <p class="bloglist__empty">{b.empty}</p>
         ) : (
-          <ul class="bloglist__grid">
+          <ul id="articulos" class="bloglist__grid">
             {posts.map((p) => (
               <li>
                 <Card href={`/es/blog/${p.id}`} class="postcard">

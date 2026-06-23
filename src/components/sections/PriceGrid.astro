@@ -23,14 +23,18 @@ const { tag, title, intro, items } = Astro.props;
     </header>
 
     <div class="pgrid__grid">
-      {items.map((s) => (
+      {items.map((s) => {
+        const isMonthly = s.monthly === true || (s.displayUnit ?? '').includes('/mes');
+        return (
         <article class:list={['pcard', `pcard--${s.tone}`]}>
           <div class="pcard__top">
             <span class="pcard__icon"><Icon name={s.icon} /></span>
-            <span class="pcard__price">
+            <span class:list={['pcard__price', { 'pcard__price--monthly': isMonthly }]}>
               {!s.free && <span class="pcard__from">desde</span>}
               <span class="pcard__amt">{s.displayPrice}</span>
-              <span class="pcard__unit">{s.displayUnit}</span>
+              {isMonthly
+                ? <span class="pcard__unit pcard__unit--rec">/mes</span>
+                : <span class="pcard__unit">{s.displayUnit}</span>}
             </span>
           </div>
           <h3 class="pcard__name">{s.name}</h3>
@@ -45,7 +49,8 @@ const { tag, title, intro, items } = Astro.props;
             <Icon name="lucide:arrow-right" />
           </a>
         </article>
-      ))}
+        );
+      })}
     </div>
   </div>
 </section>
@@ -57,6 +62,7 @@ const { tag, title, intro, items } = Astro.props;
   .pgrid__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 
   .pcard {
+    position: relative; /* ancla del stretched link del CTA */
     min-width: 0; display: flex; flex-direction: column; gap: var(--space-3);
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
@@ -79,6 +85,14 @@ const { tag, title, intro, items } = Astro.props;
   .pcard__from { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--fg-secondary); }
   .pcard__amt { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; color: var(--tint); }
   .pcard__unit { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
+  /* PRE-07: lo recurrente (/mes) se destaca con un badge para no compararlo con pago único. */
+  .pcard__unit--rec {
+    margin-top: var(--space-1);
+    display: inline-flex; align-items: center;
+    padding: 2px var(--space-2); border-radius: var(--radius-sm);
+    background: var(--tint-dim); border: 1px solid var(--tint-line); color: var(--tint);
+    font-weight: 700; letter-spacing: var(--tracking-wide);
+  }
 
   .pcard__name { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; margin-top: var(--space-1); }
   .pcard__tagline { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
@@ -88,11 +102,16 @@ const { tag, title, intro, items } = Astro.props;
   .pcard__features :global(svg) { width: 16px; height: 16px; color: var(--tint); flex: 0 0 auto; margin-top: 3px; }
 
   .pcard__cta {
+    /* sin position aquí: el ::after se ancla en .pcard (stretched link) */
     display: inline-flex; align-items: center; gap: var(--space-2);
     margin-top: auto; padding-top: var(--space-4);
     min-height: var(--tap-min);
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; color: var(--tint);
   }
+  /* Servicios-F4 / PRE-06: stretched link — toda la tarjeta es clicable. */
+  .pcard__cta::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+  /* El texto/ícono del CTA queda por encima del overlay para conservar su afordancia. */
+  .pcard__cta > * { position: relative; z-index: 2; }
   .pcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
   .pcard:hover .pcard__cta :global(svg) { transform: translateX(4px); }
 

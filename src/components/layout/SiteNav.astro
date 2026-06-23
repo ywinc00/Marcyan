@@ -10,8 +10,26 @@ import Icon from '../ui/Icon.astro';
 import BrandType from '../brand/BrandType.astro';
 import Button from '../ui/Button.astro';
 
-interface Props { nav: any; lang?: string; homeHref?: string }
-const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
+interface Props {
+  nav: any;
+  lang?: string;
+  homeHref?: string;
+  hasEn?: boolean;
+  currentPath?: string;
+  showCtaBar?: boolean;
+}
+const {
+  nav,
+  lang = 'es',
+  homeHref = '/es/',
+  hasEn = true,
+  currentPath,
+  showCtaBar = true,
+} = Astro.props;
+
+// aria-current: marca el link activo (no aplica al ancla de #contacto).
+const isActive = (href: string) =>
+  !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
 ---
 <header class="nav" data-nav>
   <div class="nav__bar container">
@@ -20,7 +38,7 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
     </a>
 
     <nav class="nav__links" aria-label="Principal">
-      {nav.links.map((l: any) => <a href={l.href}>{l.label}</a>)}
+      {nav.links.map((l: any) => <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
 
     <div class="nav__actions">
@@ -31,7 +49,9 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
         <span class="nav__lang-sep" aria-hidden="true"></span>
         {lang === 'en'
           ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
-          : <a class="nav__lang-opt" href={nav.langHref} hreflang="en">EN</a>}
+          : hasEn
+            ? <a class="nav__lang-opt" href={nav.langHref} hreflang="en">EN</a>
+            : <span class="nav__lang-opt is-disabled" aria-disabled="true" title="Disponible próximamente en inglés">EN</span>}
       </div>
       <a class="nav__cta" href={nav.cta.href}>{nav.cta.label}</a>
       <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>
@@ -52,7 +72,7 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
       </button>
     </div>
     <nav class="nav__drawer-links" aria-label="Menú móvil">
-      {nav.links.map((l: any) => <a href={l.href} data-nav-link>{l.label}</a>)}
+      {nav.links.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
     <div class="nav__drawer-foot">
       <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link>{nav.cta.label}</Button>
@@ -60,9 +80,11 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
   </aside>
 </header>
 
-<div class="nav__cta-bar" data-nav-ctabar>
-  <Button href={nav.cta.href} variant="primary" size="lg" class="u-full">{nav.cta.label}</Button>
-</div>
+{showCtaBar && (
+  <div class="nav__cta-bar" data-nav-ctabar>
+    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full">{nav.cta.label}</Button>
+  </div>
+)}
 
 <style>
   .nav {
@@ -94,6 +116,7 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
     min-height: var(--tap-min); display: inline-flex; align-items: center;
   }
   .nav__lang-opt.is-on { color: var(--accent-gold); }
+  .nav__lang-opt.is-disabled { color: var(--fg-subtle); opacity: .5; cursor: default; }
   a.nav__lang-opt:hover { color: var(--fg-primary); }
   .nav__lang-sep { width: 1px; height: 13px; background: var(--border); }
 
@@ -114,6 +137,9 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
     border-radius: var(--radius-md);
   }
   .nav__toggle :global(svg) { width: 26px; height: 26px; stroke-width: 1.75; }
+
+  /* página actual (aria-current) — aplica en barra y drawer, todos los breakpoints */
+  .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] { color: var(--accent-gold); }
 
   /* ── ≥ md: barra completa ─────────────────────────────── */
   @media (--md) {
@@ -224,10 +250,40 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
       lastFocus?.focus();
     }
 
+    // Tras el scroll a #contacto, mover el foco al primer campo del formulario.
+    // Si #contacto no existe en la página, no hace nada (no lanza error).
+    const focusContact = () => {
+      requestAnimationFrame(() => {
+        const t = document.getElementById('contacto');
+        if (t) {
+          t.setAttribute('tabindex', '-1');
+          const f = t.querySelector<HTMLElement>('input,select,textarea');
+          (f || t).focus({ preventScroll: true });
+        }
+      });
+    };
+    const isContactLink = (el: Element | null): el is HTMLAnchorElement =>
+      !!el && el instanceof HTMLAnchorElement &&
+      (el.getAttribute('href') || '').endsWith('#contacto');
+
     toggle.addEventListener('click', open);
     closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', close);
-    links.forEach((l) => l.addEventListener('click', close));
+    // Links del drawer: cerrar primero; si apuntan a #contacto, scroll+focus en el
+    // siguiente frame para evitar el salto a medias mientras el drawer se cierra.
+    links.forEach((l) => l.addEventListener('click', () => {
+      close();
+      if (isContactLink(l)) requestAnimationFrame(focusContact);
+    }));
+
+    // Cualquier otro enlace a #contacto (nav__cta inline, barra CTA inferior):
+    // tras el scroll nativo del ancla, mover el foco al primer campo.
+    document.addEventListener('click', (e) => {
+      const a = (e.target as Element | null)?.closest?.('a[href$="#contacto"]');
+      if (!a) return;
+      if (drawer.contains(a)) return; // ya manejado arriba (con cierre previo)
+      focusContact();
+    });
 
     document.addEventListener('keydown', (e) => {
       if (!drawer.hasAttribute('data-open')) return;

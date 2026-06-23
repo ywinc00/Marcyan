@@ -17,6 +17,7 @@ html {
   text-size-adjust: 100%;
   tab-size: 4;
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + var(--space-4));
 }
 @media (--motion-reduce) { html { scroll-behavior: auto; } }
 

@@ -67,11 +67,12 @@ const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
     keywords={d.tags}
   />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath="/es/blog" />
 
   <main id="main">
     <ArticleHero
       kicker={d.heroKicker ?? 'Blog de Marcyan'}
+      badge={d.heroBadge}
       title={d.title}
       lead={d.description}
       dateISO={dateISO}

@@ -47,5 +47,9 @@ const Tag = href ? 'a' : 'button';
   .btn--ghost { background: transparent; color: var(--fg-secondary); padding-inline: var(--space-2); }
   .btn--ghost:hover { color: var(--accent-gold); }
 
+  /* Estado deshabilitado (feedback de carga "Enviando…") — cubre todas las variantes */
+  .btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; box-shadow: none; }
+  .btn:disabled:hover { transform: none; }
+
   @media (--motion-reduce) { .btn:active { transform: none; } }
 </style>

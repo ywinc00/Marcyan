@@ -305,7 +305,7 @@ export const preciosPage = {
     kicker: 'Precios públicos',
     h1: 'Precios <em>claros</em>, sin letra pequeña',
     sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de agencias te esconde hasta venderte una llamada. Así de transparente trabajamos.',
-    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye cada servicio', href: '#precios' },
     chips: ['Desde $400 · diagnóstico IA gratis', 'Sin contratos forzados', 'Propuesta gratis en 24h'],
     tone: 'gold' as const,
@@ -385,8 +385,8 @@ export const preciosPage = {
   cta: {
     title: 'Pide tu precio <em>exacto</em>, gratis',
     sub: 'Cuéntanos tu proyecto y recibe una propuesta con alcance y precio claros en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Ver formulario completo', href: '/formulario' },
+    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

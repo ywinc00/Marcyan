@@ -33,7 +33,7 @@ const c = content.es;
 >
   <OfferCatalogLd slot="head" items={offerItems} url={p.path} name="Precios — Marcyan Studio" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero

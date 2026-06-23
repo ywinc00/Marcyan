@@ -7,6 +7,8 @@ import Icon from '../ui/Icon.astro';
 
 interface Props {
   kicker?: string;
+  /** Pill secundario opcional junto al kicker (p.ej. categoría o etiqueta destacada). */
+  badge?: string;
   title: string;
   lead?: string;
   /** Fecha en formato máquina YYYY-MM-DD (atributo datetime). */
@@ -17,12 +19,17 @@ interface Props {
   readingLabel?: string;
   tags?: string[];
 }
-const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [] } = Astro.props;
+const { kicker, badge, title, lead, dateISO, dateLabel, readingLabel, tags = [] } = Astro.props;
 ---
 <header class="p-hero">
   <div class="container p-hero__inner">
     <slot name="breadcrumb" />
-    {kicker && <Kicker>{kicker}</Kicker>}
+    {(kicker || badge) && (
+      <div class="p-hero__eyebrow">
+        {kicker && <Kicker>{kicker}</Kicker>}
+        {badge && <span class="p-hero__badge">{badge}</span>}
+      </div>
+    )}
     <h1 class="h1 p-hero__title">{title}</h1>
     {lead && <p class="lead p-hero__lead">{lead}</p>}
     <div class="p-hero__meta">
@@ -49,6 +56,16 @@ const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [] } = Ast
       radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, var(--accent-teal), transparent 90%), transparent 55%);
   }
   .p-hero__inner { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
+
+  .p-hero__eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); }
+  .p-hero__badge {
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+    letter-spacing: var(--tracking-wide); color: var(--accent-teal);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--accent-teal), transparent 88%);
+    border: 1px solid color-mix(in srgb, var(--accent-teal), transparent 70%);
+  }
+
   .p-hero__title { max-width: 22ch; }
   .p-hero__lead { max-width: 64ch; }
 

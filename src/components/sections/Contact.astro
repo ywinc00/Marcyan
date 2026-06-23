@@ -7,9 +7,12 @@ import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import { nap } from '../../i18n/content';
 
-interface Props { contact: any }
-const { contact } = Astro.props;
+interface Props { contact: any; defaultCity?: string; defaultService?: string }
+const { contact, defaultCity, defaultService } = Astro.props;
 const f = contact.form;
+// f.phone lo aporta la i18n (content.es/en.contact.form.phone). Fallback defensivo
+// por si esta lane se renderiza antes de que la de i18n aterrice (no rompe el build).
+const phone = f.phone ?? { label: 'Teléfono (opcional)', ph: 'Tu teléfono o WhatsApp' };
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
 ---
@@ -23,7 +26,8 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 
     <form
       class="contact__form" id="home-contact-form" novalidate
-      data-sending={f.sending} data-success={f.success} data-error={f.error} data-invalid={f.emailInvalid}
+      data-sending={f.sending} data-success={f.success} data-success-next={f.successNext} data-error={f.error} data-invalid={f.emailInvalid}
+      data-brief={f.briefLink} data-href-brief="/formulario"
     >
       <input type="text" name="website_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
@@ -33,30 +37,35 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
           <input type="text" name="owner_name" placeholder={f.name.ph} autocomplete="name" />
         </label>
         <label class="field">
-          <span class="field__lbl">{f.email.label}</span>
-          <input type="email" name="email" placeholder={f.email.ph} autocomplete="email" required />
+          <span class="field__lbl">{f.company.label}</span>
+          <input type="text" name="business_name" placeholder={f.company.ph} autocomplete="organization" />
         </label>
       </div>
 
       <div class="field-row">
         <label class="field">
-          <span class="field__lbl">{f.company.label}</span>
-          <input type="text" name="business_name" placeholder={f.company.ph} autocomplete="organization" />
+          <span class="field__lbl">{f.email.label}</span>
+          <input type="email" name="email" placeholder={f.email.ph} autocomplete="email" />
         </label>
         <label class="field">
-          <span class="field__lbl">{f.city.label}</span>
-          <select name="city_state">
-            <option value="">{f.city.ph}</option>
-            {f.city.opts.map((o: string) => <option value={o}>{o}</option>)}
-          </select>
+          <span class="field__lbl">{phone.label}</span>
+          <input type="tel" name="phone" placeholder={phone.ph} autocomplete="tel" />
         </label>
       </div>
+
+      <label class="field">
+        <span class="field__lbl">{f.city.label}</span>
+        <select name="city_state">
+          <option value="">{f.city.ph}</option>
+          {f.city.opts.map((o: string) => <option value={o} selected={o === defaultCity}>{o}</option>)}
+        </select>
+      </label>
 
       <label class="field">
         <span class="field__lbl">{f.service.label}</span>
         <select name="main_objective">
           <option value="">{f.service.ph}</option>
-          {f.service.opts.map((o: string) => <option value={o}>{o}</option>)}
+          {f.service.opts.map((o: string) => <option value={o} selected={o === defaultService}>{o}</option>)}
         </select>
       </label>
 
@@ -132,8 +141,14 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
   }
 
   .form-status { font-size: var(--text-sm); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+  .form-status:focus { outline: none; }
   .form-status--error { background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); color: #e07a7a; }
+  .form-status--error :global(a) { color: inherit; font-weight: 600; text-decoration: underline; }
+  .form-status--error :global(a:hover) { color: #f0a0a0; }
   .form-status--ok { background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal); }
+  .form-status--ok:focus-visible { box-shadow: 0 0 0 2px var(--accent-teal-line); }
+  .form-status__head { display: block; font-weight: 600; }
+  .form-status__next { display: block; margin-top: var(--space-1); opacity: 0.92; }
 
   @media (--sm) { .field-row { grid-template-columns: 1fr 1fr; } }
   @media (--lg) {
@@ -153,45 +168,122 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     const okBox = document.getElementById('home-form-success') as HTMLElement;
     const S = form.dataset;
     const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const digits = (v: string) => v.replace(/\D/g, '');
+
+    // Pinta el error como NODOS DOM (sin innerHTML). Si la prosa de error contiene
+    // la cadena briefLink, ese tramo se convierte en un <a href="/formulario"> real,
+    // dándole al usuario una salida clicable al fallar.
+    const renderError = (msg: string) => {
+      errorBox.textContent = '';
+      const brief = (S.brief || '').trim();
+      const href = S.hrefBrief || '/formulario';
+      const idx = brief ? msg.indexOf(brief) : -1;
+      if (idx >= 0) {
+        if (idx > 0) errorBox.appendChild(document.createTextNode(msg.slice(0, idx)));
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = brief;
+        errorBox.appendChild(a);
+        const rest = msg.slice(idx + brief.length);
+        if (rest) errorBox.appendChild(document.createTextNode(rest));
+      } else {
+        errorBox.textContent = msg;
+      }
+      errorBox.hidden = false;
+    };
+
+    const fields = () => form.querySelectorAll('input, select, textarea, button');
+    const setBusy = (on: boolean, label?: string) => {
+      btn.disabled = on;
+      if (label !== undefined) btn.textContent = label;
+    };
+    const reenable = (origLabel: string) => {
+      fields().forEach((el) => ((el as HTMLInputElement).disabled = false));
+      setBusy(false, origLabel);
+      delete form.dataset.busy;
+    };
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // Guard de doble envío (la dedup definitiva es server-side).
+      if (form.dataset.busy) return;
+      form.dataset.busy = '1';
+
       errorBox.hidden = true; okBox.hidden = true;
       const emailEl = form.querySelector('[name="email"]') as HTMLInputElement | null;
+      const phoneEl = form.querySelector('[name="phone"]') as HTMLInputElement | null;
       emailEl?.removeAttribute('aria-invalid');
+      phoneEl?.removeAttribute('aria-invalid');
 
       const fd = new FormData(form);
       const data: Record<string, string> = {};
       for (const [k, v] of fd.entries()) data[k] = typeof v === 'string' ? v.trim() : '';
 
-      if (data.website_hp) return; // honeypot
-      if (!isEmail(data.email || '')) {
-        errorBox.textContent = S.invalid || 'Email inválido.'; errorBox.hidden = false;
+      if (data.website_hp) { delete form.dataset.busy; return; } // honeypot
+
+      // Validación email-O-teléfono: si hay email, debe ser válido; si no hay email,
+      // exigir un teléfono con >=7 dígitos. Se puede enviar con SOLO teléfono.
+      const hasEmail = !!(data.email && data.email.length);
+      if (hasEmail && !isEmail(data.email)) {
+        renderError(S.invalid || 'Email inválido.');
         if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.setAttribute('aria-describedby', 'home-form-error'); emailEl.focus(); }
+        delete form.dataset.busy;
+        return;
+      }
+      if (!hasEmail && digits(data.phone || '').length < 7) {
+        renderError(S.invalid || 'Email inválido.');
+        const culprit = phoneEl || emailEl;
+        if (culprit) { culprit.setAttribute('aria-invalid', 'true'); culprit.setAttribute('aria-describedby', 'home-form-error'); culprit.focus(); }
+        delete form.dataset.busy;
         return;
       }
 
-      const orig = btn.textContent;
-      btn.disabled = true; btn.textContent = S.sending || 'Enviando…';
+      const orig = btn.textContent || '';
+      fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
+      setBusy(true, S.sending || 'Enviando…');
+
+      // Timeout de red: aborta el fetch a los ~15s.
+      const ctrl = new AbortController();
+      const timer = window.setTimeout(() => ctrl.abort(), 15000);
       try {
         const res = await fetch('/api/contact', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data), signal: ctrl.signal,
         });
+        window.clearTimeout(timer);
         let payload: any = null;
         try { payload = await res.json(); } catch (_) { /* ignore */ }
 
         if (!res.ok || !payload || !payload.ok) {
-          errorBox.textContent = (payload && payload.error) || S.error || 'Error.';
-          errorBox.hidden = false; btn.disabled = false; btn.textContent = orig;
+          renderError((payload && payload.error) || S.error || 'Error.');
+          reenable(orig);
           return;
         }
-        okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
+        // Éxito: folio en la 1ª línea + siguiente paso en la 2ª (nodos DOM, sin innerHTML).
+        okBox.textContent = '';
+        const line1 = document.createElement('span');
+        line1.className = 'form-status__head';
+        line1.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
+        okBox.appendChild(line1);
+        const lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase();
+        const next = (S.successNext && S.successNext.trim())
+          || (lang === 'en' ? 'We reply in under 24h.' : 'Te respondemos en menos de 24h.');
+        const line2 = document.createElement('span');
+        line2.className = 'form-status__next';
+        line2.textContent = next;
+        okBox.appendChild(line2);
         okBox.hidden = false;
-        form.querySelectorAll('input, select, textarea, button').forEach((el) => ((el as HTMLInputElement).disabled = true));
+        // Éxito visible + foco para lectores de pantalla y scroll a la vista.
+        okBox.setAttribute('tabindex', '-1');
+        okBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        okBox.focus();
+        fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
+        delete form.dataset.busy;
         btn.textContent = S.success || '✓';
       } catch (err) {
-        errorBox.textContent = S.error || 'Error de red.';
-        errorBox.hidden = false; btn.disabled = false; btn.textContent = orig;
+        window.clearTimeout(timer);
+        renderError(S.error || 'Error de red.');
+        reenable(orig);
       }
     });
   }

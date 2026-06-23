@@ -34,6 +34,31 @@ const { cluster } = Astro.props;
 const c = content.es;
 // path sin prefijo de idioma para el Layout (construye canonical + hreflang es).
 const pathNoLocale = cluster.path.replace(/^\/es\//, '');
+
+// ── Derivar prellenado del formulario de contacto desde el cluster ──
+// defaultCity: por la ciudad del Service schema (coincide con las options del select).
+function deriveDefaultCity(city?: string): string | undefined {
+  if (city === 'Houston') return 'Houston, TX';
+  if (city === 'Miami') return 'Miami, FL';
+  return undefined; // sin areaCity (p.ej. ia-para-pymes) → sin ciudad prellenada
+}
+// defaultService: por substring del path (coincide con las options ES del select).
+function deriveDefaultService(path: string): string | undefined {
+  if (path.includes('abogados-inmigracion') || path.includes('bienes-raices')) return 'Diseño Web';
+  if (path.includes('diseno-web') || path.includes('pagina-web')) return 'Diseño Web';
+  if (path.includes('ia-conversacional') || path.includes('chatbot') || path.includes('ia-para-pymes')) return 'IA Conversacional / Chatbot';
+  if (path.includes('ecommerce')) return 'E-Commerce / Tienda Online';
+  if (path.includes('seo-para-ia')) return 'SEO para IA (Visibilidad en IA)';
+  if (path.includes('seo-local')) return 'SEO Local';
+  if (path.includes('branding')) return 'Branding & Identidad';
+  return undefined; // sin match → sin servicio prellenado
+}
+const defaultCity = deriveDefaultCity(cluster.service.areaCity);
+const defaultService = deriveDefaultService(cluster.path);
+
+// Tono de los enlaces relacionados: teal si la landing es de tono teal (p.ej. IA).
+const relatedTone: 'gold' | 'teal' =
+  cluster.hero.tone === 'teal' || cluster.includes.tone === 'teal' ? 'teal' : 'gold';
 ---
 <Layout
   title={cluster.meta.title}
@@ -44,7 +69,7 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
 >
   <ServiceLd slot="head" {...cluster.service} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero {...cluster.hero}>
@@ -94,9 +119,9 @@ const pathNoLocale = cluster.path.replace(/^\/es\//, '');
       tone={cluster.cta.tone}
     />
 
-    <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} />
+    <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} tone={relatedTone} />
 
-    <Contact contact={c.contact} />
+    <Contact contact={c.contact} defaultCity={defaultCity} defaultService={defaultService} />
   </main>
 
   <SiteFooter footer={c.footer} />

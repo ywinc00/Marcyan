@@ -1,0 +1,69 @@
+---
+// Navegación entre artículos del blog: anterior / siguiente + volver al índice.
+// Minimalista (la queja del dueño: no había forma de saltar entre piezas).
+// prev/next se derivan de la colección ordenada por fecha en [slug].astro.
+import Icon from '../ui/Icon.astro';
+
+interface NavLink { title: string; path: string }
+interface Props {
+  prev?: NavLink | null;
+  next?: NavLink | null;
+  indexHref: string;
+  labels: { prev: string; next: string; index: string };
+}
+const { prev, next, indexHref, labels } = Astro.props;
+---
+<nav class="section postnav" aria-label="Más artículos">
+  <div class="container">
+    <div class="postnav__grid">
+      {prev ? (
+        <a class="postnav__item postnav__item--prev" href={prev.path}>
+          <span class="postnav__dir"><Icon name="lucide:arrow-left" /> {labels.prev}</span>
+          <span class="postnav__title">{prev.title}</span>
+        </a>
+      ) : <span class="postnav__item postnav__item--empty" aria-hidden="true"></span>}
+      {next ? (
+        <a class="postnav__item postnav__item--next" href={next.path}>
+          <span class="postnav__dir">{labels.next} <Icon name="lucide:arrow-right" /></span>
+          <span class="postnav__title">{next.title}</span>
+        </a>
+      ) : <span class="postnav__item postnav__item--empty" aria-hidden="true"></span>}
+    </div>
+    <a class="postnav__index" href={indexHref}><Icon name="lucide:arrow-left" /> {labels.index}</a>
+  </div>
+</nav>
+
+<style>
+  .postnav { padding-block: var(--space-7); }
+  .postnav__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
+  .postnav__item {
+    display: flex; flex-direction: column; gap: var(--space-2);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  a.postnav__item:hover { border-color: var(--border-accent); }
+  .postnav__item--empty { display: none; }
+  .postnav__dir {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold);
+  }
+  .postnav__dir :global(svg) { width: 14px; height: 14px; }
+  .postnav__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
+  .postnav__item--next { text-align: right; }
+  .postnav__item--next .postnav__dir { justify-content: flex-end; }
+  .postnav__index {
+    display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+    margin-top: var(--space-4); min-height: var(--tap-min);
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-secondary); transition: color var(--duration-fast);
+  }
+  .postnav__index :global(svg) { width: 15px; height: 15px; }
+  .postnav__index:hover { color: var(--accent-gold); }
+
+  @media (--sm) {
+    .postnav__grid { grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .postnav__item--empty { display: block; background: transparent; border-color: transparent; }
+  }
+</style>

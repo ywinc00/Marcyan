@@ -12,7 +12,9 @@ import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import ArticleHero from '../../../components/sections/ArticleHero.astro';
 import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
 import Article from '../../../components/sections/Article.astro';
+import ArticleToc from '../../../components/sections/ArticleToc.astro';
 import Faq from '../../../components/sections/Faq.astro';
+import PostNav from '../../../components/sections/PostNav.astro';
 import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
 import CtaBand from '../../../components/sections/CtaBand.astro';
 import Contact from '../../../components/sections/Contact.astro';
@@ -22,12 +24,21 @@ import { clusterNav } from '../../../i18n/clusters';
 import { postChrome } from '../../../i18n/blog';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = (await getCollection('blog', ({ data }) => !data.draft))
+    .sort((a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime());
+  const ref = (p: (typeof posts)[number]) => ({ title: p.data.title, path: `/es/blog/${p.id}` });
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prevPost: posts[i + 1] ? ref(posts[i + 1]) : null, // más antiguo
+      nextPost: posts[i - 1] ? ref(posts[i - 1]) : null, // más reciente
+    },
+  }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings } = await render(post);
 
 const c = content.es;
 const d = post.data;
@@ -85,11 +96,15 @@ const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
 
     <AnswerBlock q={d.answer.q} a={d.answer.a} source={d.answer.source} />
 
+    <ArticleToc headings={headings} label={postChrome.toc} />
+
     <Article><Content /></Article>
 
     {d.faq.length > 0 && (
       <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
     )}
+
+    <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
 
     {related.length > 0 && (
       <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />

@@ -299,7 +299,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 </div>
 
 <style>
-  .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); }
+  .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); transition: bottom var(--duration-base) var(--ease-out-expo); }
+  /* móvil: cuando la barra CTA inferior "Iniciar Proyecto" está visible, el FAB sube por
+     encima de ella (altura de la barra + holgura) para que no coincidan. */
+  @media (max-width: 767px) {
+    :global(body.has-ctabar) .mrc-chat { bottom: calc(var(--tap-min) + var(--space-3) * 3 + env(safe-area-inset-bottom)); }
+  }
 
   /* ── Burbuja de atención ────────────────────────────────── */
   .mrc-nudge {

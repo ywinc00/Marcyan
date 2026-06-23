@@ -244,7 +244,10 @@ const { nav, lang = 'es', homeHref = '/es/' } = Astro.props;
     // estado scrolled + barra CTA inferior tras pasar el hero
     const onScroll = () => {
       root.classList.toggle('is-scrolled', window.scrollY > 24);
-      if (ctabar) ctabar.classList.toggle('is-visible', window.scrollY > 560);
+      const showBar = window.scrollY > 560;
+      if (ctabar) ctabar.classList.toggle('is-visible', showBar);
+      // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
+      document.body.classList.toggle('has-ctabar', showBar);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });

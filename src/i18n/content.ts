@@ -209,13 +209,20 @@ export const content = {
         blurb: 'Creamos experiencias web, estrategias de SEO, branding e inteligencia artificial que generan resultados reales y hacen crecer tu negocio.',
         cta: { label: 'Pedir propuesta gratis', href: '/formulario' },
         shortcuts: [
-          { icon: 'lucide:layout-template', label: 'Diseño Web', href: '/es/houston/diseno-web' },
+          { icon: 'lucide:square-code', label: 'Diseño Web', href: '/es/houston/diseno-web' },
           { icon: 'lucide:trending-up', label: 'SEO & IA', href: '/es/houston/seo-para-ia' },
-          { icon: 'lucide:sparkles', label: 'IA para Negocios', href: '/es/ia-para-pymes' },
-          { icon: 'lucide:palette', label: 'Branding', href: '/es/houston/branding' },
+          { icon: 'lucide:bot', label: 'IA para Negocios', href: '/es/ia-para-pymes' },
+          { icon: 'lucide:badge-check', label: 'Branding', href: '/es/houston/branding' },
         ],
       },
       contactTitle: 'Contacto',
+      // Redes: glifos en círculo (copia fiel del mockup). href "#" hasta tener handles reales.
+      social: [
+        { name: 'linkedin', href: '#', label: 'LinkedIn' },
+        { name: 'instagram', href: '#', label: 'Instagram' },
+        { name: 'youtube', href: '#', label: 'YouTube' },
+        { name: 'x', href: '#', label: 'X' },
+      ],
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -439,13 +446,19 @@ export const content = {
         blurb: 'We craft web experiences, SEO strategies, branding, and artificial intelligence that drive real results and grow your business.',
         cta: { label: 'Get a free proposal', href: '/formulario' },
         shortcuts: [
-          { icon: 'lucide:layout-template', label: 'Web Design', href: '/es/houston/diseno-web' },
+          { icon: 'lucide:square-code', label: 'Web Design', href: '/es/houston/diseno-web' },
           { icon: 'lucide:trending-up', label: 'SEO & AI', href: '/es/houston/seo-para-ia' },
-          { icon: 'lucide:sparkles', label: 'AI for Business', href: '/es/ia-para-pymes' },
-          { icon: 'lucide:palette', label: 'Branding', href: '/es/houston/branding' },
+          { icon: 'lucide:bot', label: 'AI for Business', href: '/es/ia-para-pymes' },
+          { icon: 'lucide:badge-check', label: 'Branding', href: '/es/houston/branding' },
         ],
       },
       contactTitle: 'Contact',
+      social: [
+        { name: 'linkedin', href: '#', label: 'LinkedIn' },
+        { name: 'instagram', href: '#', label: 'Instagram' },
+        { name: 'youtube', href: '#', label: 'YouTube' },
+        { name: 'x', href: '#', label: 'X' },
+      ],
       cols: [
         { title: 'Services', links: [
           { label: 'Web Design', href: '#servicios' },

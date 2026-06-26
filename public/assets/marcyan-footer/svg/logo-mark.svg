@@ -1,0 +1,24 @@
+<svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="planetGrad" cx="45%" cy="35%" r="65%">
+      <stop offset="0" stop-color="#F6D77A"/>
+      <stop offset="0.42" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#5C4217"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="10" y1="42" x2="110" y2="42">
+      <stop offset="0" stop-color="#F6D77A" stop-opacity="0.15"/>
+      <stop offset="0.2" stop-color="#F6D77A"/>
+      <stop offset="0.65" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#A97A36" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.83 0 1 0 0 0.62 0 0 1 0 0.22 0 0 0 0.65 0"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="55" cy="40" rx="25" ry="25" fill="url(#planetGrad)" opacity="0.95" filter="url(#glow)"/>
+  <ellipse cx="60" cy="40" rx="48" ry="9" transform="rotate(-6 60 40)" stroke="url(#ringGrad)" stroke-width="2"/>
+  <ellipse cx="98" cy="36" rx="5" ry="5" fill="#00E0C6"/>
+  <path d="M33 38C48 32 65 31 84 35" stroke="#F6D77A" stroke-opacity=".25" stroke-width="1"/>
+</svg>

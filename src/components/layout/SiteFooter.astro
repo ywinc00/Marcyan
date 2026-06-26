@@ -1,371 +1,138 @@
 ---
-// Pie del sitio — COPIA FIEL del mockup del dueño, con la tipografía del DS.
-// Sección superior sobre capa decorativa (glow de amanecer + skyline 2 capas +
-// marca de agua "MARCYAN" + arco orbital) · 4 columnas (Servicios/Empresa/
-// Ciudades/Contacto + redes) · franja (misión + 3 stats + tarjeta de proyecto) ·
-// barra legal con planeta. Iconografía Lucide 1.5px. Redes con href "#" hasta
-// tener handles. Métricas HONESTAS (decisión previa del dueño).
-import LogoWordmark from '../brand/LogoWordmark.astro';
-import Icon from '../ui/Icon.astro';
+// Pie del sitio — COPIA FIEL del kit del dueño (marcyan-footer-assets):
+// estructura del demo + SVGs reales + texturas + CSS del kit. ÚNICA adaptación:
+// la tipografía es la del DS (Space Grotesk / DM Sans), por lo que el wordmark y
+// la marca de agua se renderizan inline (los SVG de texto del kit usan Montserrat
+// y como <img> no podrían tomar nuestra fuente). Contenido data-driven (content.ts)
+// para conservar enlaces reales + i18n. Estilos en src/styles/marcyan-footer.css.
 import { nap } from '../../i18n/content';
+import '../../styles/marcyan-footer.css';
 
 interface Props { footer: any; lang?: 'es' | 'en'; homeHref?: string }
 const { footer, lang = 'es', homeHref = '/es/' } = Astro.props;
 const f = footer;
+const SVG = '/assets/marcyan-footer/svg';
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
-const colsLabel = lang === 'es' ? 'Enlaces del pie' : 'Footer links';
+// Iconos de los 4 atajos (en el orden del kit: web · seo-ai · ai-business · branding).
+const SHORTCUT_ICONS = ['icon-web', 'icon-seo-ai', 'icon-ai-business', 'icon-branding'];
 const homeLabel = lang === 'es' ? 'Marcyan Studio — inicio' : 'Marcyan Studio — home';
-
-// Glifos de marca de redes (monocromos, teñidos con currentColor). Inline para no
-// depender de iconos de marca de Lucide (deprecados) ni añadir dependencias.
-const glyphs: Record<string, string> = {
-  linkedin: '<path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3.25 9h3.5v12h-3.5zM9 9h3.36v1.64h.05c.47-.88 1.6-1.8 3.3-1.8 3.53 0 4.18 2.32 4.18 5.34V21h-3.5v-5.32c0-1.27-.02-2.9-1.77-2.9-1.77 0-2.04 1.38-2.04 2.81V21H9z"/>',
-  instagram: '<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/>',
-  youtube: '<rect x="2.5" y="6" width="19" height="12" rx="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.4 9.1l5.2 2.9-5.2 2.9z" fill="currentColor"/>',
-  x: '<path fill="currentColor" d="M3 3h4.3l4.05 5.7L16.2 3H21l-6.55 7.95L21.5 21H17.1l-4.5-6.15L7.4 21H3l7.05-8.2z"/>',
-};
+// Detecta la columna de Ciudades para insertar el divisor entre Houston y Miami.
+const isCitiesCol = (title: string) => /ciudad|cities/i.test(title);
 ---
-<footer class="footer">
-  <!-- ── Sección superior (sobre capa decorativa) ── -->
-  <div class="footer__hero">
-    <div class="footer__bg" aria-hidden="true">
-      <span class="footer__watermark">MARCYAN</span>
+<footer class="marcyan-footer">
+  <img class="marcyan-footer__orbital-arc" src={`${SVG}/orbital-arc.svg`} alt="" aria-hidden="true" />
+  <img class="marcyan-footer__horizon" src={`${SVG}/planet-horizon.svg`} alt="" aria-hidden="true" />
+  <img class="marcyan-footer__skyline" src={`${SVG}/skyline.svg`} alt="" aria-hidden="true" />
+  <svg class="marcyan-footer__watermark" viewBox="0 0 1200 180" fill="none" aria-hidden="true">
+    <text class="marcyan-footer__watermark-txt" x="0" y="145">MARCYAN</text>
+  </svg>
+  <div class="marcyan-footer__particles" aria-hidden="true"></div>
 
-      <svg class="footer__arc" viewBox="0 0 900 360" fill="none" preserveAspectRatio="xMaxYMin meet">
-        <defs>
-          <linearGradient id="ftArc" x1="0" y1="0" x2="1" y2="0.8">
-            <stop offset="0" stop-color="#c8a96e" stop-opacity="0" />
-            <stop offset="0.45" stop-color="#e7c67a" stop-opacity="0.85" />
-            <stop offset="1" stop-color="#c8a96e" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M30 350 A 520 520 0 0 1 880 30" stroke="url(#ftArc)" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-
-      <img class="footer__skyline" src="/assets/footer/houston-skyline.png" alt="" loading="lazy" decoding="async" width="1104" height="996" />
-    </div>
-
-    <div class="container footer__top">
-      <div class="footer__brand">
-        <a href={homeHref} aria-label={homeLabel} class="footer__logo">
-          <LogoWordmark width={248} />
+  <div class="marcyan-footer__container">
+    <div class="marcyan-footer__top">
+      <section class="marcyan-footer__brand" aria-label="Marcyan Studio">
+        <a class="marcyan-footer__brand-row" href={homeHref} aria-label={homeLabel}>
+          <img class="marcyan-footer__logo-mark" src={`${SVG}/logo-mark.svg`} alt="" width="88" height="88" />
+          <svg class="marcyan-footer__wordmark" viewBox="0 0 260 80" fill="none">
+            <text class="marcyan-footer__wordmark-name" x="0" y="34">MARCYAN</text>
+            <text class="marcyan-footer__wordmark-sub" x="2" y="62">DIGITAL STUDIO</text>
+          </svg>
         </a>
-        <p class="footer__tagline">{f.tagline}</p>
-        <p class="footer__headline">{f.brand.headline} <em>{f.brand.headlineEm}</em></p>
-        <p class="footer__blurb">{f.brand.blurb}</p>
-        <a class="footer__cta" href={f.brand.cta.href}>
-          <span>{f.brand.cta.label}</span>
-          <Icon name="lucide:arrow-right" />
+
+        <p class="marcyan-footer__eyebrow">{f.tagline}</p>
+        <h2 class="marcyan-footer__title">{f.brand.headline} <span>{f.brand.headlineEm}</span></h2>
+        <p class="marcyan-footer__copy">{f.brand.blurb}</p>
+
+        <a class="marcyan-footer__cta" href={f.brand.cta.href}>
+          {f.brand.cta.label}
+          <img src={`${SVG}/cta-arrow.svg`} alt="" width="24" height="24" />
         </a>
-        <ul class="footer__shortcuts">
-          {f.brand.shortcuts.map((s: any) => (
-            <li>
-              <a href={s.href}>
-                <span class="footer__shortcut-ic"><Icon name={s.icon} /></span>
-                <span class="footer__shortcut-lbl">{s.label}</span>
-              </a>
-            </li>
+
+        <div class="marcyan-footer__shortcuts">
+          {f.brand.shortcuts.map((s: any, i: number) => (
+            <a class="marcyan-footer__shortcut" href={s.href}>
+              <img src={`${SVG}/${SHORTCUT_ICONS[i] ?? 'icon-web'}.svg`} alt="" />
+              {s.label}
+            </a>
           ))}
-        </ul>
-      </div>
+        </div>
+      </section>
 
-      <nav class="footer__cols" aria-label={colsLabel}>
-        {f.cols.map((col: any) => (
-          <div class="footer__col">
-            <h2 class="footer__col-title">{col.title}</h2>
-            <ul class="footer__links">
-              {col.links.map((l: any) => (
-                <li>
-                  <a href={l.href}>
-                    <Icon name="lucide:chevron-right" class="footer__chev" />
-                    <span>{l.label}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
+      {f.cols.map((col: any) => (
+        <nav class="marcyan-footer__col" aria-label={col.title}>
+          <h3 class="marcyan-footer__heading">{col.title}</h3>
+          <div class="marcyan-footer__links">
+            {(() => { let dividerDone = false; return col.links.map((l: any) => {
+              const needsDivider = isCitiesCol(col.title) && !dividerDone && /\/miami(\/|$)/.test(l.href);
+              if (needsDivider) dividerDone = true;
+              return (
+                <>
+                  {needsDivider && <div class="marcyan-footer__divider"></div>}
+                  <a href={l.href}>{l.label}</a>
+                </>
+              );
+            }); })()}
           </div>
-        ))}
+        </nav>
+      ))}
 
-        <div class="footer__col footer__col--contact">
-          <h2 class="footer__col-title">{f.contactTitle}</h2>
-          <ul class="footer__contact">
-            <li>
-              <span class="footer__c-ic"><Icon name="lucide:mail" /></span>
-              <a href={`mailto:${nap.email}`}>{nap.email}</a>
-            </li>
-            <li>
-              <span class="footer__c-ic"><Icon name="lucide:phone" /></span>
-              <span class="footer__c-stack"><span class="footer__c-label">Houston</span><a href={`tel:${telHou}`}>{nap.houston}</a></span>
-            </li>
-            <li>
-              <span class="footer__c-ic"><Icon name="lucide:phone" /></span>
-              <span class="footer__c-stack"><span class="footer__c-label">Miami</span><a href={`tel:${telMia}`}>{nap.miami}</a></span>
-            </li>
-            <li>
-              <span class="footer__c-ic"><Icon name="lucide:clock" /></span>
-              <span>{nap.hours}</span>
-            </li>
-          </ul>
-          {f.social && (
-            <ul class="footer__social">
-              {f.social.map((s: any) => (
-                <li>
-                  <a href={s.href} aria-label={s.label} class="footer__social-a">
-                    <svg viewBox="0 0 24 24" set:html={glyphs[s.name]} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+      <section class="marcyan-footer__col" aria-label={f.contactTitle}>
+        <h3 class="marcyan-footer__heading">{f.contactTitle}</h3>
+        <div class="marcyan-footer__contact-list">
+          <div class="marcyan-footer__contact-item">
+            <img src={`${SVG}/icon-email.svg`} alt="" />
+            <span><a href={`mailto:${nap.email}`}>{nap.email}</a></span>
+          </div>
+          <div class="marcyan-footer__contact-item">
+            <img src={`${SVG}/icon-phone.svg`} alt="" />
+            <span><span class="marcyan-footer__contact-label">Houston</span><a href={`tel:${telHou}`}>{nap.houston}</a></span>
+          </div>
+          <div class="marcyan-footer__contact-item">
+            <img src={`${SVG}/icon-phone.svg`} alt="" />
+            <span><span class="marcyan-footer__contact-label">Miami</span><a href={`tel:${telMia}`}>{nap.miami}</a></span>
+          </div>
+          <div class="marcyan-footer__contact-item">
+            <img src={`${SVG}/icon-clock.svg`} alt="" />
+            <span>{nap.hours}</span>
+          </div>
         </div>
-      </nav>
+        {f.social && (
+          <div class="marcyan-footer__socials">
+            {f.social.map((s: any) => (
+              <a href={s.href} aria-label={s.label}><img src={`${SVG}/social-${s.name}.svg`} alt="" /></a>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
-  </div>
 
-  <!-- ── Franja: misión + stats + tarjeta de proyecto ── -->
-  <div class="container footer__lower">
-    <hr class="footer__rule" />
-    <div class="footer__band">
-      <div class="footer__mission">
-        <span class="footer__mission-ic"><Icon name={f.mission.icon} /></span>
+    <div class="marcyan-footer__bottom-strip">
+      <div class="marcyan-footer__mission">
+        <img src={`${SVG}/icon-mission.svg`} alt="" />
+        <div><strong>{f.mission.title}</strong><p>{f.mission.sub}</p></div>
+      </div>
+      <div class="marcyan-footer__stats">
+        {f.stats.map((s: any) => (
+          <div class="marcyan-footer__stat"><strong>{s.value}</strong><span>{s.label}</span></div>
+        ))}
+      </div>
+      <div class="marcyan-footer__project-card">
+        <img src={`${SVG}/icon-project.svg`} alt="" />
         <div>
-          <p class="footer__mission-title">{f.mission.title}</p>
-          <p class="footer__mission-sub">{f.mission.sub}</p>
+          <strong>{f.projectCard.title}</strong>
+          <p>{f.projectCard.sub}</p>
+          <a href={f.projectCard.cta.href}>{f.projectCard.cta.label} →</a>
         </div>
       </div>
-
-      <ul class="footer__stats">
-        {f.stats.map((s: any) => (
-          <li>
-            <span class="footer__stat-dot" aria-hidden="true"></span>
-            <span class="footer__stat-val">{s.value}</span>
-            <span class="footer__stat-lbl">{s.label}</span>
-          </li>
-        ))}
-      </ul>
-
-      <a class="footer__project" href={f.projectCard.cta.href}>
-        <span class="footer__project-dot" aria-hidden="true"></span>
-        <span class="footer__project-ic"><Icon name={f.projectCard.icon} /></span>
-        <div class="footer__project-body">
-          <p class="footer__project-title">{f.projectCard.title}</p>
-          <p class="footer__project-sub">{f.projectCard.sub}</p>
-          <span class="footer__project-cta">{f.projectCard.cta.label}<Icon name="lucide:arrow-right" /></span>
-        </div>
-      </a>
     </div>
-  </div>
 
-  <!-- ── Barra legal con planeta divisor ── -->
-  <div class="footer__legalbar">
-    <div class="container footer__legalbar-inner">
-      <span class="footer__copy">{f.copy}</span>
-      <span class="footer__planet" aria-hidden="true">
-        <span class="footer__hair"></span>
-        <svg viewBox="0 0 56 24" fill="none">
-          <defs>
-            <radialGradient id="ftPlanet" cx="0.4" cy="0.35" r="0.75">
-              <stop offset="0" stop-color="#e7c67a" />
-              <stop offset="0.6" stop-color="#c8a96e" />
-              <stop offset="1" stop-color="#8a6630" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="28" cy="12" rx="14" ry="4.2" stroke="#c8a96e" stroke-width="1.3" opacity="0.85" />
-          <circle cx="28" cy="12" r="6.4" fill="url(#ftPlanet)" />
-          <circle cx="41.5" cy="10" r="1.7" fill="#4fc3a1" />
-        </svg>
-        <span class="footer__hair"></span>
-      </span>
-      <span class="footer__legal">
+    <div class="marcyan-footer__legal">
+      <span>{f.copy}</span>
+      <img src={`${SVG}/divider-planet.svg`} alt="" />
+      <div class="marcyan-footer__legal-links">
         {f.legal.map((l: any) => <a href={l.href}>{l.label}</a>)}
-      </span>
+      </div>
     </div>
   </div>
 </footer>
-
-<style>
-  .footer { position: relative; background: var(--bg-base); margin-top: var(--space-9); }
-
-  /* ── Capa decorativa de la sección superior ── */
-  .footer__hero { position: relative; isolation: isolate; overflow: hidden; border-top: 1px solid var(--border); }
-  .footer__bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-  /* Amanecer (glow inferior izquierdo) */
-  .footer__bg::before {
-    content: ""; position: absolute; inset: 0;
-    background:
-      radial-gradient(22% 30% at 3% 100%, rgba(255,240,205,0.7), transparent 66%),
-      radial-gradient(52% 62% at 6% 104%, rgba(231,198,122,0.5), transparent 62%),
-      radial-gradient(88% 96% at -6% 120%, rgba(168,122,54,0.30), transparent 72%);
-  }
-  .footer__skyline {
-    position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
-    height: clamp(300px, 40vw, 560px);
-    object-fit: cover; object-position: 50% 22%;
-    opacity: 0.92;
-  }
-  .footer__arc { position: absolute; top: -10%; right: -4%; width: min(64%, 760px); height: auto; opacity: 0.7; }
-  .footer__watermark {
-    position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%);
-    font-family: var(--font-display); font-weight: 700; line-height: 1;
-    font-size: clamp(5rem, 17vw, 17rem); letter-spacing: 0.02em; white-space: nowrap;
-    color: rgba(240,237,232,0.045);
-  }
-
-  /* ── Sección superior ── */
-  .footer__top { position: relative; z-index: 1; padding-block: var(--space-9) var(--space-10); display: grid; grid-template-columns: 1fr; gap: var(--space-8); }
-
-  .footer__brand { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); min-width: 0; }
-  .footer__logo { display: inline-flex; width: fit-content; }
-  .footer__tagline { font-family: var(--font-body); font-size: var(--text-sm); color: var(--accent-gold); }
-  .footer__headline {
-    font-family: var(--font-display); font-size: var(--fluid-h1); font-weight: 700;
-    line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);
-    color: var(--fg-primary); max-width: 12ch; margin-top: var(--space-1);
-  }
-  .footer__headline em { color: var(--accent-gold); font-style: normal; }
-  .footer__blurb { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-loose); max-width: 44ch; }
-
-  /* CTA dorado con degradado (glossy) */
-  .footer__cta {
-    display: inline-flex; align-items: center; justify-content: space-between; gap: var(--space-5);
-    width: 100%; max-width: 360px; min-height: 52px; margin-top: var(--space-3);
-    padding: 14px 22px; border-radius: var(--radius-md);
-    background: linear-gradient(180deg, #ecd293 0%, #d6b26a 50%, #b9914a 100%);
-    color: #1a1206; font-family: var(--font-body); font-weight: 700; font-size: var(--text-base);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 10px 30px rgba(200,169,110,0.25);
-    transition: filter var(--duration-fast) var(--ease-out-expo), transform var(--duration-fast);
-  }
-  .footer__cta:hover { filter: brightness(1.06); }
-  .footer__cta:active { transform: scale(0.99); }
-  .footer__cta :global(svg) { width: 20px; height: 20px; stroke-width: 1.6; flex: 0 0 auto; }
-
-  /* Atajos: icono arriba, etiqueta abajo, con separadores sutiles */
-  .footer__shortcuts { list-style: none; display: flex; flex-wrap: nowrap; margin-top: var(--space-4); width: 100%; max-width: 360px; }
-  .footer__shortcuts li { flex: 1 1 0; min-width: 0; }
-  .footer__shortcuts li + li { border-left: 1px solid var(--border); }
-  .footer__shortcuts a {
-    display: flex; flex-direction: column; align-items: center; gap: var(--space-2);
-    padding: var(--space-2) var(--space-2); width: 100%;
-    color: var(--fg-secondary); font-size: var(--text-xs); text-align: center;
-    transition: color var(--duration-fast);
-  }
-  .footer__shortcuts a:hover { color: var(--fg-primary); }
-  .footer__shortcut-ic { display: inline-flex; color: var(--accent-gold); }
-  .footer__shortcut-ic :global(svg) { width: 26px; height: 26px; stroke-width: 1.5; }
-
-  /* ── Columnas ── */
-  .footer__cols { display: grid; grid-template-columns: 1fr; gap: var(--space-7) var(--space-5); }
-  .footer__col { min-width: 0; }
-  .footer__col-title {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
-    letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--accent-gold);
-    margin-bottom: var(--space-4);
-  }
-  .footer__col-title::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
-
-  .footer__links { list-style: none; display: flex; flex-direction: column; }
-  .footer__links a {
-    display: flex; align-items: center; gap: var(--space-2); min-height: 38px;
-    color: var(--fg-secondary); font-size: var(--text-sm); transition: color var(--duration-fast);
-  }
-  .footer__links a:hover { color: var(--accent-gold); }
-  .footer :global(.footer__chev) { width: 14px; height: 14px; flex: 0 0 auto; color: var(--accent-gold); stroke-width: 1.5; opacity: 0.85; }
-
-  /* Contacto */
-  .footer__contact { list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
-  .footer__contact li { display: flex; align-items: center; gap: var(--space-3); color: var(--fg-secondary); font-size: var(--text-sm); }
-  .footer__c-ic {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-  }
-  .footer__c-ic :global(svg) { width: 17px; height: 17px; stroke-width: 1.5; }
-  .footer__contact a { color: var(--fg-primary); transition: color var(--duration-fast); }
-  .footer__contact a:hover { color: var(--accent-gold); }
-  .footer__c-stack { display: flex; flex-direction: column; line-height: 1.3; }
-  .footer__c-label { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--accent-gold); }
-
-  .footer__social { list-style: none; display: flex; flex-wrap: nowrap; gap: var(--space-2); margin-top: var(--space-5); }
-  .footer__social-a {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; border-radius: 50%;
-    border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-    transition: background var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast);
-  }
-  .footer__social-a svg { width: 17px; height: 17px; }
-  .footer__social-a:hover { background: var(--accent-gold-dim); border-color: var(--accent-gold); transform: translateY(-2px); }
-
-  /* ── Franja inferior ── */
-  .footer__lower { position: relative; z-index: 1; }
-  .footer__rule { border: 0; border-top: 1px solid var(--border); margin: 0 0 var(--space-7); }
-  .footer__band { display: grid; grid-template-columns: 1fr; gap: var(--space-7); align-items: center; padding-bottom: var(--space-8); }
-
-  .footer__mission { display: flex; align-items: flex-start; gap: var(--space-4); min-width: 0; }
-  .footer__mission-ic { flex: 0 0 auto; display: inline-flex; color: var(--accent-gold); }
-  .footer__mission-ic :global(svg) { width: 34px; height: 34px; stroke-width: 1.4; }
-  .footer__mission-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
-  .footer__mission-sub { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); margin-top: 4px; max-width: 38ch; }
-
-  .footer__stats { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-6); }
-  .footer__stats li { position: relative; padding-left: var(--space-5); border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .footer__stats li:first-child { border-left: 0; padding-left: var(--space-4); }
-  .footer__stat-dot { position: absolute; left: var(--space-5); top: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
-  .footer__stats li:first-child .footer__stat-dot { left: var(--space-4); }
-  .footer__stat-val { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; color: var(--fg-primary); line-height: 1; white-space: nowrap; padding-left: var(--space-4); }
-  .footer__stat-lbl { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); max-width: 20ch; padding-left: var(--space-4); }
-
-  .footer__project {
-    position: relative; display: flex; align-items: center; gap: var(--space-4);
-    background: var(--bg-card); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg);
-    padding: var(--space-5) var(--space-6);
-    transition: border-color var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base);
-  }
-  .footer__project:hover { border-color: var(--accent-gold); box-shadow: var(--shadow-gold); }
-  .footer__project-dot { position: absolute; top: var(--space-4); left: var(--space-4); width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
-  .footer__project-ic { flex: 0 0 auto; display: inline-flex; color: var(--accent-gold); }
-  .footer__project-ic :global(svg) { width: 26px; height: 26px; stroke-width: 1.5; }
-  .footer__project-body { min-width: 0; }
-  .footer__project-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
-  .footer__project-sub { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: 2px; }
-  .footer__project-cta { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-weight: 600; font-size: var(--text-sm); color: var(--accent-gold); text-decoration: underline; text-decoration-color: var(--accent-gold-line); text-underline-offset: 3px; }
-  .footer :global(.footer__project-cta svg) { width: 16px; height: 16px; stroke-width: 1.6; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .footer__project:hover .footer__project-cta :global(svg) { transform: translateX(3px); }
-
-  /* ── Barra legal ── */
-  .footer__legalbar { border-top: 1px solid var(--border-subtle); }
-  .footer__legalbar-inner {
-    display: flex; flex-direction: column; align-items: center; gap: var(--space-4); text-align: center;
-    padding-block: var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
-    font-size: var(--text-xs); color: var(--fg-secondary);
-  }
-  .footer__planet { display: inline-flex; align-items: center; gap: var(--space-3); }
-  .footer__planet svg { width: 56px; height: 24px; flex: 0 0 auto; }
-  .footer__hair { display: none; }
-  .footer__legal { display: inline-flex; gap: var(--space-5); }
-  .footer__legal a { color: var(--fg-secondary); transition: color var(--duration-fast); }
-  .footer__legal a:hover { color: var(--accent-gold); }
-
-  /* ── Responsive ── */
-  @media (--sm) {
-    .footer__cols { grid-template-columns: repeat(2, 1fr); }
-    .footer__legalbar-inner { flex-direction: row; justify-content: space-between; text-align: left; }
-    .footer__hair { display: block; width: clamp(20px, 5vw, 64px); height: 1px; background: var(--border); }
-  }
-  @media (--md) {
-    .footer__band { grid-template-columns: 1fr 1fr; }
-    .footer__project { grid-column: 1 / -1; }
-  }
-  @media (--lg) {
-    .footer__top { grid-template-columns: 1.25fr 2.75fr; gap: var(--space-10); align-items: start; padding-block: var(--space-10) calc(var(--space-10) + var(--space-7)); }
-    .footer__cols { grid-template-columns: repeat(4, 1fr); gap: var(--space-6) var(--space-4); }
-    .footer__band { grid-template-columns: 1fr auto 1.2fr; gap: var(--space-8); }
-    .footer__project { grid-column: auto; }
-  }
-  @media (--motion-reduce) {
-    .footer__cta:active { transform: none; }
-    .footer__social-a:hover { transform: none; }
-    .footer__project:hover .footer__project-cta :global(svg) { transform: none; }
-  }
-</style>

@@ -1,0 +1,28 @@
+<svg width="1600" height="360" viewBox="0 0 1600 360" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="cityFill" x1="800" y1="80" x2="800" y2="360">
+      <stop offset="0" stop-color="#D6B26A" stop-opacity="0.22"/>
+      <stop offset="0.45" stop-color="#5D4825" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#050505" stop-opacity="0.84"/>
+    </linearGradient>
+    <filter id="cityGlow" x="-20%" y="-20%" width="140%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g fill="url(#cityFill)" filter="url(#cityGlow)">
+    <rect x="0" y="288" width="1600" height="72" opacity=".65"/>
+    <rect x="40" y="246" width="34" height="114"/><rect x="84" y="228" width="52" height="132"/><rect x="150" y="258" width="28" height="102"/>
+    <rect x="210" y="205" width="45" height="155"/><rect x="260" y="236" width="60" height="124"/><rect x="338" y="184" width="70" height="176"/>
+    <path d="M373 122 L408 184 H338 Z"/><rect x="430" y="238" width="35" height="122"/><rect x="488" y="210" width="64" height="150"/>
+    <rect x="580" y="146" width="56" height="214"/><path d="M608 84 L620 146 H596 Z"/><rect x="650" y="236" width="42" height="124"/>
+    <rect x="720" y="190" width="72" height="170"/><rect x="808" y="115" width="62" height="245"/><path d="M840 30 L852 115 H828 Z"/>
+    <rect x="888" y="210" width="58" height="150"/><rect x="965" y="170" width="86" height="190"/><path d="M1008 95 L1034 170 H982 Z"/>
+    <rect x="1070" y="242" width="36" height="118"/><rect x="1126" y="205" width="72" height="155"/><rect x="1210" y="226" width="48" height="134"/>
+    <rect x="1280" y="250" width="72" height="110"/><rect x="1375" y="214" width="56" height="146"/><rect x="1450" y="240" width="48" height="120"/><rect x="1515" y="270" width="70" height="90"/>
+  </g>
+  <g stroke="#D6B26A" stroke-opacity="0.11" stroke-width="1">
+    <path d="M581 146 H636 M809 115 H870 M966 170 H1050 M338 184 H408"/>
+    <path d="M840 30 V360 M608 84 V360 M1008 95 V360"/>
+  </g>
+</svg>

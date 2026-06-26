@@ -43,16 +43,7 @@ const glyphs: Record<string, string> = {
         <path d="M30 350 A 520 520 0 0 1 880 30" stroke="url(#ftArc)" stroke-width="1.5" stroke-linecap="round" />
       </svg>
 
-      <svg class="footer__skyline" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMax slice" fill="none">
-        <defs>
-          <linearGradient id="ftBld" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#0b0805" />
-            <stop offset="1" stop-color="#2c1d0e" />
-          </linearGradient>
-        </defs>
-        <path class="footer__sky-back" d="M0 420 L0 350 L90 350 L90 320 L180 320 L180 362 L260 362 L260 300 L360 300 L360 342 L460 342 L460 292 L560 292 L560 332 L680 332 L680 280 L800 280 L800 322 L920 322 L920 296 L1040 296 L1040 336 L1160 336 L1160 300 L1280 300 L1280 342 L1400 342 L1400 312 L1600 312 L1600 420 Z" />
-        <path fill="url(#ftBld)" d="M0 420 L0 300 L60 300 L60 330 L120 330 L120 250 L175 250 L175 210 L210 210 L210 150 L225 150 L225 210 L260 210 L260 290 L320 290 L320 240 L380 240 L380 180 L430 180 L430 120 L470 120 L470 95 L500 95 L500 60 L515 60 L515 95 L545 95 L545 150 L590 150 L590 110 L650 110 L650 70 L700 70 L700 45 L715 45 L715 110 L760 110 L760 175 L820 175 L820 130 L880 130 L880 90 L930 90 L930 64 L945 64 L945 130 L985 130 L985 200 L1040 200 L1040 160 L1095 160 L1095 230 L1150 230 L1150 190 L1210 190 L1210 280 L1270 280 L1270 240 L1330 240 L1330 310 L1390 310 L1390 270 L1450 270 L1450 330 L1520 330 L1520 300 L1600 300 L1600 420 Z" />
-      </svg>
+      <img class="footer__skyline" src="/assets/footer/houston-skyline.png" alt="" loading="lazy" decoding="async" width="1104" height="996" />
     </div>
 
     <div class="container footer__top">
@@ -203,15 +194,16 @@ const glyphs: Record<string, string> = {
   .footer__bg::before {
     content: ""; position: absolute; inset: 0;
     background:
-      radial-gradient(20% 26% at 4% 100%, rgba(255,236,198,0.55), transparent 70%),
-      radial-gradient(46% 56% at 7% 102%, rgba(231,198,122,0.42), transparent 64%),
-      radial-gradient(70% 80% at 0% 120%, rgba(168,122,54,0.22), transparent 70%);
+      radial-gradient(22% 30% at 3% 100%, rgba(255,240,205,0.7), transparent 66%),
+      radial-gradient(52% 62% at 6% 104%, rgba(231,198,122,0.5), transparent 62%),
+      radial-gradient(88% 96% at -6% 120%, rgba(168,122,54,0.30), transparent 72%);
   }
   .footer__skyline {
     position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
-    height: clamp(220px, 30vw, 460px);
+    height: clamp(300px, 40vw, 560px);
+    object-fit: cover; object-position: 50% 22%;
+    opacity: 0.92;
   }
-  .footer__sky-back { fill: #2a1f12; opacity: 0.5; }
   .footer__arc { position: absolute; top: -10%; right: -4%; width: min(64%, 760px); height: auto; opacity: 0.7; }
   .footer__watermark {
     position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%);

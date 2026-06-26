@@ -55,11 +55,11 @@
    resplandor; no se le suman texturas ni gradientes que la ensucien. */
 .marcyan-footer__illustration {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
   z-index: -2;
   pointer-events: none;
   user-select: none;

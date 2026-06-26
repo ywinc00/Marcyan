@@ -202,6 +202,20 @@ export const content = {
 
     footer: {
       tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
+      // Bloque de marca (hero + CTA + atajos) — copy del spec del dueño.
+      brand: {
+        headline: 'Impulsa tu',
+        headlineEm: 'presencia digital.',
+        blurb: 'Creamos experiencias web, estrategias de SEO, branding e inteligencia artificial que generan resultados reales y hacen crecer tu negocio.',
+        cta: { label: 'Pedir propuesta gratis', href: '/formulario' },
+        shortcuts: [
+          { icon: 'lucide:layout-template', label: 'Diseño Web', href: '/es/houston/diseno-web' },
+          { icon: 'lucide:trending-up', label: 'SEO & IA', href: '/es/houston/seo-para-ia' },
+          { icon: 'lucide:sparkles', label: 'IA para Negocios', href: '/es/ia-para-pymes' },
+          { icon: 'lucide:palette', label: 'Branding', href: '/es/houston/branding' },
+        ],
+      },
+      contactTitle: 'Contacto',
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -231,6 +245,23 @@ export const content = {
           { label: 'IA Conversacional · Miami', href: '/es/miami/ia-conversacional' },
         ] },
       ],
+      // Franja inferior: misión + 3 stats HONESTOS (no inflados) + tarjeta de proyecto.
+      mission: {
+        icon: 'lucide:shield-check',
+        title: 'Tu crecimiento es nuestra misión.',
+        sub: 'Soluciones digitales inteligentes para negocios ambiciosos.',
+      },
+      stats: [
+        { value: '24 h', label: 'Propuesta gratis, sin compromiso' },
+        { value: 'ES · EN', label: 'Bilingües de verdad, sin traducción automática' },
+        { value: '2', label: 'Ciudades clave: Houston y Miami' },
+      ],
+      projectCard: {
+        icon: 'lucide:calendar-clock',
+        title: '¿Tienes un proyecto en mente?',
+        sub: 'Hablemos y llevémoslo al siguiente nivel.',
+        cta: { label: 'Agenda una llamada', href: '/formulario' },
+      },
       legal: [
         { label: 'Privacidad', href: '/privacidad' },
         { label: 'Términos', href: '/terminos' },
@@ -402,6 +433,19 @@ export const content = {
 
     footer: {
       tagline: 'AI-Powered Web Design · Houston & Miami',
+      brand: {
+        headline: 'Power up your',
+        headlineEm: 'digital presence.',
+        blurb: 'We craft web experiences, SEO strategies, branding, and artificial intelligence that drive real results and grow your business.',
+        cta: { label: 'Get a free proposal', href: '/formulario' },
+        shortcuts: [
+          { icon: 'lucide:layout-template', label: 'Web Design', href: '/es/houston/diseno-web' },
+          { icon: 'lucide:trending-up', label: 'SEO & AI', href: '/es/houston/seo-para-ia' },
+          { icon: 'lucide:sparkles', label: 'AI for Business', href: '/es/ia-para-pymes' },
+          { icon: 'lucide:palette', label: 'Branding', href: '/es/houston/branding' },
+        ],
+      },
+      contactTitle: 'Contact',
       cols: [
         { title: 'Services', links: [
           { label: 'Web Design', href: '#servicios' },
@@ -421,6 +465,22 @@ export const content = {
           { label: 'Miami FL', href: '#ciudades' },
         ] },
       ],
+      mission: {
+        icon: 'lucide:shield-check',
+        title: 'Your growth is our mission.',
+        sub: 'Smart digital solutions for ambitious businesses.',
+      },
+      stats: [
+        { value: '24 h', label: 'Free proposal, no commitment' },
+        { value: 'ES · EN', label: 'Truly bilingual, no machine translation' },
+        { value: '2', label: 'Key cities: Houston and Miami' },
+      ],
+      projectCard: {
+        icon: 'lucide:calendar-clock',
+        title: 'Have a project in mind?',
+        sub: "Let's talk and take it to the next level.",
+        cta: { label: 'Schedule a call', href: '/formulario' },
+      },
       legal: [
         { label: 'Privacy', href: '/privacidad' },
         { label: 'Terms', href: '/terminos' },

@@ -1,91 +1,319 @@
 ---
-// Pie del sitio: marca + NAP real + columnas de enlaces + legal.
-// (Social va comentado hasta tener handles — listo para sameAs.)
+// Pie del sitio — rediseño según spec del dueño (2 imágenes), adaptado al DS v2.
+// Estructura: capa decorativa (skyline + arco + glow) · sección superior
+// (marca/hero/CTA/atajos + 4 columnas: Servicios/Empresa/Ciudades/Contacto) ·
+// franja (misión + 3 stats honestos + tarjeta de proyecto) · barra legal con
+// planeta divisor. Iconografía Lucide 1.5px dorada. Social omitido hasta tener
+// handles (no enlazar a perfiles inexistentes).
 import LogoWordmark from '../brand/LogoWordmark.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
 import { nap } from '../../i18n/content';
 
-interface Props { footer: any }
-const { footer } = Astro.props;
+interface Props { footer: any; lang?: 'es' | 'en'; homeHref?: string }
+const { footer, lang = 'es', homeHref = '/es/' } = Astro.props;
+const f = footer;
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
+const colsLabel = lang === 'es' ? 'Enlaces del pie' : 'Footer links';
+const homeLabel = lang === 'es' ? 'Marcyan Studio — inicio' : 'Marcyan Studio — home';
 ---
 <footer class="footer">
-  <div class="container footer__inner">
-    <div class="footer__brand">
-      <a href="#top" aria-label="Marcyan Studio — inicio" class="footer__logo">
-        <LogoWordmark width={188} />
-      </a>
-      <p class="footer__tagline">{footer.tagline}</p>
-      <ul class="footer__contact">
-        <li><a href={`mailto:${nap.email}`}>{nap.email}</a></li>
-        <li><span class="footer__city">Houston</span> <a href={`tel:${telHou}`}>{nap.houston}</a></li>
-        <li><span class="footer__city">Miami</span> <a href={`tel:${telMia}`}>{nap.miami}</a></li>
-      </ul>
-    </div>
-
-    <nav class="footer__cols" aria-label="Enlaces del pie">
-      {footer.cols.map((col: any) => (
-        <div class="footer__col">
-          <h2 class="footer__col-title">{col.title}</h2>
-          <ul>
-            {col.links.map((l: any) => <li><a href={l.href}>{l.label}</a></li>)}
-          </ul>
-        </div>
-      ))}
-    </nav>
+  <div class="footer__decor" aria-hidden="true">
+    <svg class="footer__arc" viewBox="0 0 600 320" fill="none" preserveAspectRatio="xMaxYMin meet">
+      <defs>
+        <linearGradient id="ftArc" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#c8a96e" stop-opacity="0" />
+          <stop offset="0.5" stop-color="#c8a96e" stop-opacity="0.7" />
+          <stop offset="1" stop-color="#c8a96e" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M40 300 A 360 360 0 0 1 580 40" stroke="url(#ftArc)" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <svg class="footer__skyline" viewBox="0 0 1440 200" preserveAspectRatio="xMidYMax meet" fill="currentColor">
+      <path d="M0 200 L0 150 L60 150 L60 120 L110 120 L110 160 L150 160 L150 90 L185 90 L185 70 L205 70 L205 90 L235 90 L235 140 L285 140 L285 110 L330 110 L330 175 L370 175 L370 130 L420 130 L420 60 L445 60 L445 40 L460 40 L460 60 L490 60 L490 145 L540 145 L540 100 L590 100 L590 165 L640 165 L640 115 L690 115 L690 80 L735 80 L735 155 L785 155 L785 125 L835 125 L835 95 L885 95 L885 170 L930 170 L930 135 L985 135 L985 70 L1010 70 L1010 50 L1025 50 L1025 70 L1055 70 L1055 150 L1105 150 L1105 110 L1155 110 L1155 160 L1205 160 L1205 90 L1255 90 L1255 130 L1310 130 L1310 105 L1360 105 L1360 165 L1410 165 L1410 140 L1440 140 L1440 200 Z" />
+    </svg>
   </div>
 
-  <div class="container footer__bottom">
-    <span>{footer.copy}</span>
+  <div class="container footer__inner">
+    <!-- ── Sección superior ── -->
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href={homeHref} aria-label={homeLabel} class="footer__logo">
+          <LogoWordmark width={196} />
+        </a>
+        <p class="footer__tagline">{f.tagline}</p>
+        <p class="footer__headline">{f.brand.headline} <em>{f.brand.headlineEm}</em></p>
+        <p class="footer__blurb">{f.brand.blurb}</p>
+        <Button href={f.brand.cta.href} variant="primary" size="lg" class="footer__cta">
+          {f.brand.cta.label}<Icon name="lucide:arrow-right" />
+        </Button>
+        <ul class="footer__shortcuts">
+          {f.brand.shortcuts.map((s: any) => (
+            <li>
+              <a href={s.href}>
+                <span class="footer__shortcut-ic"><Icon name={s.icon} /></span>
+                <span class="footer__shortcut-lbl">{s.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <nav class="footer__cols" aria-label={colsLabel}>
+        {f.cols.map((col: any) => (
+          <div class="footer__col">
+            <h2 class="footer__col-title">{col.title}</h2>
+            <ul class="footer__links">
+              {col.links.map((l: any) => (
+                <li>
+                  <a href={l.href}>
+                    <Icon name="lucide:chevron-right" class="footer__chev" />
+                    <span>{l.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        <div class="footer__col footer__col--contact">
+          <h2 class="footer__col-title">{f.contactTitle}</h2>
+          <ul class="footer__contact">
+            <li>
+              <Icon name="lucide:mail" class="footer__c-ic" />
+              <a href={`mailto:${nap.email}`}>{nap.email}</a>
+            </li>
+            <li>
+              <Icon name="lucide:phone" class="footer__c-ic" />
+              <span><span class="footer__c-city">Houston</span> <a href={`tel:${telHou}`}>{nap.houston}</a></span>
+            </li>
+            <li>
+              <Icon name="lucide:phone" class="footer__c-ic" />
+              <span><span class="footer__c-city">Miami</span> <a href={`tel:${telMia}`}>{nap.miami}</a></span>
+            </li>
+            <li>
+              <Icon name="lucide:clock" class="footer__c-ic" />
+              <span>{nap.hours}</span>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <hr class="footer__rule" />
+
+    <!-- ── Franja: misión + stats + tarjeta de proyecto ── -->
+    <div class="footer__band">
+      <div class="footer__mission">
+        <span class="footer__mission-ic"><Icon name={f.mission.icon} /></span>
+        <div>
+          <p class="footer__mission-title">{f.mission.title}</p>
+          <p class="footer__mission-sub">{f.mission.sub}</p>
+        </div>
+      </div>
+
+      <ul class="footer__stats">
+        {f.stats.map((s: any) => (
+          <li>
+            <span class="footer__stat-val">{s.value}</span>
+            <span class="footer__stat-lbl">{s.label}</span>
+          </li>
+        ))}
+      </ul>
+
+      <a class="footer__project" href={f.projectCard.cta.href}>
+        <span class="footer__project-ic"><Icon name={f.projectCard.icon} /></span>
+        <div class="footer__project-body">
+          <p class="footer__project-title">{f.projectCard.title}</p>
+          <p class="footer__project-sub">{f.projectCard.sub}</p>
+          <span class="footer__project-cta">{f.projectCard.cta.label}<Icon name="lucide:arrow-right" /></span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Barra legal con planeta divisor ── -->
+  <div class="container footer__legalbar">
+    <span class="footer__copy">{f.copy}</span>
+    <span class="footer__planet" aria-hidden="true">
+      <span class="footer__hair"></span>
+      <svg viewBox="0 0 56 24" fill="none">
+        <defs>
+          <radialGradient id="ftPlanet" cx="0.4" cy="0.35" r="0.75">
+            <stop offset="0" stop-color="#e7c67a" />
+            <stop offset="0.6" stop-color="#c8a96e" />
+            <stop offset="1" stop-color="#8a6630" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="28" cy="12" rx="14" ry="4.2" stroke="#c8a96e" stroke-width="1.3" opacity="0.85" />
+        <circle cx="28" cy="12" r="6.4" fill="url(#ftPlanet)" />
+        <circle cx="41.5" cy="10" r="1.7" fill="#4fc3a1" />
+      </svg>
+      <span class="footer__hair"></span>
+    </span>
     <span class="footer__legal">
-      {footer.legal.map((l: any) => <a href={l.href}>{l.label}</a>)}
+      {f.legal.map((l: any) => <a href={l.href}>{l.label}</a>)}
     </span>
   </div>
 </footer>
 
 <style>
   .footer {
+    position: relative; isolation: isolate; overflow: hidden;
     border-top: 1px solid var(--border);
     background: var(--bg-2);
-    padding-block: var(--space-8) var(--space-6);
     margin-top: var(--space-9);
   }
-  .footer__inner {
-    display: grid; grid-template-columns: 1fr; gap: var(--space-8);
+  /* Glow de horizonte (inferior izq) — sutil, sin sombras pesadas */
+  .footer::before {
+    content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(60% 70% at 6% 100%, var(--accent-gold-glow), transparent 60%),
+      radial-gradient(50% 60% at 100% 0%, color-mix(in srgb, var(--accent-teal), transparent 92%), transparent 60%);
   }
-  .footer__brand { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
-  .footer__logo { display: inline-flex; width: fit-content; }
-  .footer__tagline { color: var(--fg-secondary); font-size: var(--text-sm); max-width: 38ch; }
-  .footer__contact { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
-  .footer__contact a { color: var(--fg-secondary); font-size: var(--text-sm); transition: color var(--duration-fast); }
-  .footer__contact a:hover { color: var(--accent-gold); }
-  .footer__city { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); margin-right: var(--space-1); }
+  .footer__decor { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .footer__skyline {
+    position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: auto;
+    color: var(--accent-gold); opacity: 0.10;
+  }
+  .footer__arc { position: absolute; top: 0; right: 0; width: min(46%, 520px); height: auto; opacity: 0.5; }
 
-  .footer__cols {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-5);
+  .footer__inner { position: relative; z-index: 1; padding-block: var(--space-9) var(--space-7); }
+
+  /* ── Sección superior ── */
+  .footer__top { display: grid; grid-template-columns: 1fr; gap: var(--space-8); }
+
+  .footer__brand { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); min-width: 0; }
+  .footer__logo { display: inline-flex; width: fit-content; }
+  .footer__tagline {
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--fg-secondary);
   }
+  .footer__headline {
+    font-family: var(--font-display); font-size: var(--fluid-h2); font-weight: 600;
+    line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);
+    color: var(--fg-primary); max-width: 14ch; margin-top: var(--space-2);
+  }
+  .footer__headline em { color: var(--accent-gold); font-style: normal; }
+  .footer__blurb { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-loose); max-width: 46ch; }
+  .footer :global(.footer__cta) { margin-top: var(--space-2); }
+  .footer :global(.footer__cta svg) { width: 18px; height: 18px; stroke-width: 1.5; }
+
+  .footer__shortcuts { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
+  .footer__shortcuts a {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--tap-min); padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: var(--bg-card); color: var(--fg-secondary);
+    font-size: var(--text-sm); transition: border-color var(--duration-fast) var(--ease-out-expo), color var(--duration-fast);
+  }
+  .footer__shortcuts a:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .footer__shortcut-ic { display: inline-flex; color: var(--accent-gold); }
+  .footer__shortcut-ic :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
+
+  /* ── Columnas ── */
+  .footer__cols { display: grid; grid-template-columns: 1fr; gap: var(--space-7) var(--space-5); }
+  .footer__col { min-width: 0; }
   .footer__col-title {
-    font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
     letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-secondary);
     margin-bottom: var(--space-4);
   }
-  .footer__col ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
-  .footer__col a { color: var(--fg-secondary); font-size: var(--text-sm); transition: color var(--duration-fast); }
-  .footer__col a:hover { color: var(--fg-primary); }
+  .footer__links { list-style: none; display: flex; flex-direction: column; }
+  .footer__links a {
+    display: flex; align-items: center; gap: var(--space-2); min-height: 40px;
+    color: var(--fg-secondary); font-size: var(--text-sm);
+    transition: color var(--duration-fast);
+  }
+  .footer__links a:hover { color: var(--accent-gold); }
+  .footer :global(.footer__chev) { width: 14px; height: 14px; flex: 0 0 auto; color: var(--accent-gold); stroke-width: 1.5; opacity: 0.8; }
 
-  .footer__bottom {
-    display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
-    justify-content: space-between; align-items: center;
-    margin-top: var(--space-8); padding-top: var(--space-5);
+  .footer__contact { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+  .footer__contact li { display: flex; align-items: center; gap: var(--space-3); color: var(--fg-secondary); font-size: var(--text-sm); }
+  .footer :global(.footer__c-ic) { width: 18px; height: 18px; flex: 0 0 auto; color: var(--accent-gold); stroke-width: 1.5; }
+  .footer__contact a { color: var(--fg-secondary); transition: color var(--duration-fast); }
+  .footer__contact a:hover { color: var(--accent-gold); }
+  .footer__c-city { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--fg-secondary); margin-right: var(--space-1); }
+
+  /* ── Separador entre secciones ── */
+  .footer__rule { border: 0; border-top: 1px solid var(--border); margin-block: var(--space-8); }
+
+  /* ── Franja: misión + stats + proyecto ── */
+  .footer__band { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: stretch; }
+
+  .footer__mission { display: flex; align-items: flex-start; gap: var(--space-4); min-width: 0; }
+  .footer__mission-ic {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  }
+  .footer__mission-ic :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+  .footer__mission-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
+  .footer__mission-sub { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); margin-top: 2px; max-width: 40ch; }
+
+  .footer__stats { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-5); align-items: center; }
+  .footer__stats li {
+    display: flex; flex-direction: column; gap: var(--space-1); min-width: 0;
+    padding-left: var(--space-5); border-left: 1px solid var(--border);
+  }
+  .footer__stats li:first-child { padding-left: 0; border-left: 0; }
+  .footer__stat-val { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; color: var(--fg-primary); line-height: 1; white-space: nowrap; }
+  .footer__stat-lbl { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); max-width: 22ch; }
+
+  .footer__project {
+    display: flex; align-items: center; gap: var(--space-4);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .footer__project:hover { border-color: var(--border-accent); }
+  .footer__project-ic { flex: 0 0 auto; display: inline-flex; color: var(--accent-gold); }
+  .footer__project-ic :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+  .footer__project-body { min-width: 0; }
+  .footer__project-title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
+  .footer__project-sub { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: 2px; }
+  .footer__project-cta {
+    display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3);
+    font-weight: 600; font-size: var(--text-sm); color: var(--accent-gold);
+  }
+  .footer__project-cta :global(svg) { width: 16px; height: 16px; stroke-width: 1.5; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .footer__project:hover .footer__project-cta :global(svg) { transform: translateX(3px); }
+
+  /* ── Barra legal ── */
+  .footer__legalbar {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+    text-align: center;
+    padding-block: var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
     border-top: 1px solid var(--border-subtle);
     font-size: var(--text-xs); color: var(--fg-secondary);
   }
-  .footer__legal { display: inline-flex; gap: var(--space-2); }
+  .footer__planet { display: inline-flex; align-items: center; gap: var(--space-3); }
+  .footer__planet svg { width: 56px; height: 24px; flex: 0 0 auto; }
+  .footer__hair { display: none; }
+  .footer__legal { display: inline-flex; gap: var(--space-4); }
   .footer__legal a { color: var(--fg-secondary); transition: color var(--duration-fast); }
   .footer__legal a:hover { color: var(--accent-gold); }
 
+  /* ── Responsive ── */
+  @media (--sm) {
+    .footer__cols { grid-template-columns: repeat(2, 1fr); }
+    .footer__legalbar { flex-direction: row; justify-content: space-between; text-align: left; }
+    .footer__hair { display: block; width: clamp(24px, 6vw, 72px); height: 1px; background: var(--border); }
+  }
   @media (--md) {
-    .footer__inner { grid-template-columns: 1.4fr 2fr; gap: var(--space-10); }
-    .footer__cols { grid-template-columns: repeat(3, 1fr); }
+    .footer__band { grid-template-columns: 1fr 1fr; align-items: center; }
+    .footer__project { grid-column: 1 / -1; }
+  }
+  @media (--lg) {
+    .footer__top { grid-template-columns: 1.35fr 2.65fr; gap: var(--space-10); align-items: start; }
+    .footer__cols { grid-template-columns: repeat(4, 1fr); gap: var(--space-6) var(--space-5); }
+    .footer__band { grid-template-columns: 1.1fr auto 1.2fr; gap: var(--space-8); }
+    .footer__project { grid-column: auto; }
+    .footer__inner { padding-block: var(--space-10) var(--space-8); }
+  }
+  @media (--motion-reduce) {
+    .footer__project:hover .footer__project-cta :global(svg) { transform: none; }
   }
 </style>

@@ -114,3 +114,63 @@ dominante. PROHIBIDO: tocar hex/tipos, romper el blindaje, pintar texto del mode
    → SÍ una frase de trabajo real por tarjeta (sin em-dash, regla de la sección de arriba).
 
 Sub-agentes invocados: ninguno (mockup aprobado + DS existente cubren la dirección).
+
+---
+
+# Pantalla: FOOTER del sitio (rediseño completo)
+
+```
+Proyecto: Marcyan Web · Página/Vista: SiteFooter.astro (global, todas las páginas)
+Modo: REDISEÑO/IDENTIDAD
+Estado: VALIDADO por: dueño (2 imágenes-spec: handoff de desarrollo + librería SVG) · Fecha: 2026-06-26
+```
+
+**Fuente de verdad:** el dueño entregó una especificación de desarrollo COMPLETA en 2 imágenes
+(estructura/tokens/tipografía/espaciado/layout/componentes + librería de activos SVG) y pidió
+"rígete exactamente por las instrucciones de las imágenes". Se sigue al pie: layout de 2 secciones,
+4 columnas + bloque de marca, franja inferior (misión + 3 stats + tarjeta de proyecto), barra legal
+con planeta central, iconografía lineal 1.5px, capas decorativas (skyline + planeta + arco + horizonte).
+
+**Dos conflictos resueltos con el dueño (AskUserQuestion 2026-06-26):**
+1. **Métricas → NÚMEROS HONESTOS.** El spec mostraba "+150 Proyectos" y "9+ Años" → FALSO (4 clientes
+   reales, agencia joven; regla de honestidad dura). Reemplazados por stats verdaderos: "24 h · propuesta
+   gratis", "ES · EN · bilingües de verdad", "2 · Houston y Miami". (La de "2 ciudades" del spec sí era real.)
+2. **Sistema visual → ADAPTAR AL DS.** El spec traía tokens/fuente propios (oro #D6B26A, #050505, radios
+   10/14/18, Sora) que chocan con el `PROHIBIDO: cambiar hex/tipografías` del DS v2. Se MAPEA al DS vivo:
+   oro #c8a96e, fondos #080808/#141414, radios 4/8/12/20, Space Grotesk/DM Sans/JetBrains Mono. Estructura,
+   copy, layout, iconos y capas decorativas del spec SE RESPETAN; solo cambian los valores de token/fuente.
+
+## Inventario de marca conservada
+```
+CONSERVADO: tokens.css (oro #c8a96e, teal #4fc3a1, #080808/#141414, radios 4/8/12/20/pill), tipos
+  (Space Grotesk/DM Sans/JetBrains Mono), iconografía Lucide outline 1.5px (1 familia), marca planeta.
+ELEVADO: el footer pasa de simple (marca+3 cols+legal) a rico (marca+hero+CTA+atajos · 4 cols ·
+  franja misión/stats/proyecto · barra legal con planeta), según el spec, pero con tokens del DS.
+PROHIBIDO: cambiar hex de marca, sustituir tipografías (NO Sora), inventar stats, enlaces a 404,
+  iconos de redes a perfiles inexistentes.
+```
+
+1) **Dirección visual:** la del spec, traducida al DS — "sala de control espacial, legible", oscuro-cálido,
+   monocromo + oro (acento) con moderación, line-art 1.5px, datos/overlines en mono. Capas decorativas
+   (skyline, glow de horizonte, arco orbital, planeta divisor) a baja opacidad, detrás del contenido,
+   `aria-hidden`, sin sombras pesadas (glow sutil).
+2) **Jerarquía:** (1) bloque de marca con hero "Impulsa tu presencia digital." + 1 CTA oro dominante →
+   (2) columnas de navegación → (3) franja de confianza (misión/stats/proyecto) → (4) barra legal. Una sola
+   acción primaria por zona (CTA oro). H del footer = `.h3`/display; overlines de columna en mono.
+3) **Intención por sección:** Marca+hero = recordar la promesa y dar 1 ruta a conversión (CTA + atajos).
+   Columnas = mapa del sitio (servicios/empresa/ciudades/contacto). Franja = prueba/confianza honesta
+   (misión + 3 datos reales + invitación a agendar). Legal = obligaciones + remate de marca (planeta).
+4) **Estilo de componentes (tokens DS):** enlaces de columna con bullet chevron (lucide:chevron-right 14px
+   oro) + texto `--fg-secondary` hover `--fg-primary`, item ~40px. CTA = Button primario oro existente.
+   Atajos = chip icono+texto (Lucide 1.5px). Contacto = stack con iconos mail/phone/clock 18px. Stat =
+   valor display + label `--fg-secondary`, separador vertical `--border`. Tarjeta proyecto = `--bg-card`,
+   `1px solid --border` (hover `--border-accent`), radius-lg, icono 20px. Planeta divisor = SVG inline
+   (gradiente oro + anillo + punto teal #4fc3a1, no #00E0C6 del spec → se usa el teal del DS). Estados:
+   hover (color/borde acento), focus-visible (outline oro 2px del reset global).
+5) **Errores genéricos evitados (NO → SÍ):** NO Sora/hex del spec → SÍ Space Grotesk + #c8a96e (consistencia
+   de sitio). NO stats inflados → SÍ datos reales. NO iconos de redes a perfiles inexistentes → SÍ se omiten
+   hasta tener handles. NO radios 10/14/18 mezclados → SÍ escala DS 8/12/20. NO sombras pesadas → SÍ glow
+   sutil + bordes. NO enlaces a 404 → SÍ todas las rutas verificadas existen.
+
+Sub-agentes invocados: ninguno (spec del dueño + DS existente cubren la dirección; ilustración decorativa
+inline hecha a mano: skyline + arco + planeta).

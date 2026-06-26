@@ -44,83 +44,32 @@
   overflow: hidden;
   isolation: isolate;
   color: var(--text-secondary);
-  background:
-    radial-gradient(900px 360px at 13% 66%, rgba(214,178,106,.12), transparent 62%),
-    radial-gradient(980px 560px at 82% 42%, rgba(169,122,54,.13), transparent 67%),
-    linear-gradient(180deg, #080808 0%, #050505 52%, #090807 100%);
+  background: linear-gradient(180deg, #080808 0%, #050505 52%, #090807 100%);
   border-top: 1px solid var(--line-soft);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
   min-height: 760px;
 }
 
-.marcyan-footer::before {
-  content: "";
+/* Ilustración del dueño (skyline + arco orbital + flare dorado + destellos),
+   UNA sola capa transparente, a todo el ancho y anclada al fondo. Trae su propio
+   resplandor; no se le suman texturas ni gradientes que la ensucien. */
+.marcyan-footer__illustration {
   position: absolute;
-  inset: 0;
-  z-index: -4;
-  background-image: url('/assets/marcyan-footer/textures/gold-haze.webp'), url('/assets/marcyan-footer/textures/grain-subtle.webp');
-  background-size: cover, 780px 340px;
-  background-position: center bottom, center;
-  background-repeat: no-repeat, repeat;
-  opacity: .52;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-.marcyan-footer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(circle at 50% 30%, transparent 0 42%, rgba(0,0,0,.58) 100%);
-  pointer-events: none;
-}
-
-.marcyan-footer__orbital-arc,
-.marcyan-footer__horizon,
-.marcyan-footer__skyline,
-.marcyan-footer__particles,
-.marcyan-footer__watermark {
-  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: -2;
   pointer-events: none;
   user-select: none;
 }
 
-.marcyan-footer__orbital-arc {
-  z-index: -2;
-  top: 26px;
-  right: -90px;
-  width: min(76vw, 1050px);
-  opacity: .8;
-}
-
-.marcyan-footer__horizon {
-  z-index: -2;
-  left: -120px;
-  bottom: 205px;
-  width: min(62vw, 820px);
-  opacity: .95;
-}
-
-.marcyan-footer__skyline {
-  z-index: -3;
-  right: -20px;
-  bottom: 190px;
-  width: min(76vw, 1150px);
-  opacity: .62;
-  filter: saturate(.75) contrast(1.06);
-}
-
-.marcyan-footer__particles {
-  inset: 0;
-  z-index: -2;
-  background: url('/assets/marcyan-footer/textures/particles-gold.webp') center/cover no-repeat;
-  opacity: .46;
-  mix-blend-mode: screen;
-}
-
 .marcyan-footer__watermark {
-  z-index: -2;
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: -1;
   left: 34%;
   bottom: 205px;
   width: 930px;

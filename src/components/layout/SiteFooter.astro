@@ -21,13 +21,10 @@ const homeLabel = lang === 'es' ? 'Marcyan Studio — inicio' : 'Marcyan Studio 
 const isCitiesCol = (title: string) => /ciudad|cities/i.test(title);
 ---
 <footer class="marcyan-footer">
-  <img class="marcyan-footer__orbital-arc" src={`${SVG}/orbital-arc.svg`} alt="" aria-hidden="true" />
-  <img class="marcyan-footer__horizon" src={`${SVG}/planet-horizon.svg`} alt="" aria-hidden="true" />
-  <img class="marcyan-footer__skyline" src={`${SVG}/skyline.svg`} alt="" aria-hidden="true" />
+  <img class="marcyan-footer__illustration" src="/assets/marcyan-footer/textures/skyline-illustration.webp" alt="" aria-hidden="true" />
   <svg class="marcyan-footer__watermark" viewBox="0 0 1200 180" fill="none" aria-hidden="true">
     <text class="marcyan-footer__watermark-txt" x="0" y="145">MARCYAN</text>
   </svg>
-  <div class="marcyan-footer__particles" aria-hidden="true"></div>
 
   <div class="marcyan-footer__container">
     <div class="marcyan-footer__top">

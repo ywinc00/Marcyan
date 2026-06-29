@@ -1,8 +1,13 @@
 ---
-// Enlaces relacionados (cluster ↔ cluster). Tarjetas-enlace internas que tejen
-// el clúster de servicio+ciudad (clave SEO de arquitectura de enlazado).
+// Enlaces relacionados (cluster ↔ cluster) — "Constelación de rutas".
+// Teje el clúster de servicio+ciudad (clave SEO de arquitectura de enlazado) y,
+// en los hubs de ciudad, ES el conmutador de servicios (N≈7). Rediseño visual:
+// de tarjetas-caja planas a un PANEL de navegación translúcido (la atmósfera
+// SpaceBackdrop se ve detrás) con filas-enlace densas: índice mono + chip de
+// icono tintado + título display + subtítulo + flecha que se desplaza al hover.
+// Una micro-constelación SVG line-art (decorativa) ancla la metáfora.
+// Contrato de props INTACTO (tag, title set:html, links[{label,href,desc,icon}], tone).
 import Icon from '../ui/Icon.astro';
-import Card from '../ui/Card.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface LinkItem { label: string; href: string; desc: string; icon?: string }
@@ -13,24 +18,57 @@ interface Props {
   tone?: 'gold' | 'teal';
 }
 const { tag, title, links, tone = 'gold' } = Astro.props;
+
+const n = links.length;
+// Densidad: con 4+ rutas se reparte en 2 columnas en desktop (el conmutador de
+// servicios de ciudad queda escaneable); con 1–3 se queda en una sola columna
+// cómoda. Aditivo, derivado del propio contenido — sin nuevos props.
+const dense = n >= 4;
+// El icono de marca (filled) NUNCA se re-tinta con el acento de la sección.
+const isBrand = (icon?: string) => icon === 'marcyan-ai';
+const pad = (i: number) => String(i + 1).padStart(2, '0');
 ---
-<section class:list={['section related', `related--${tone}`]}>
+<section class:list={['section related', `related--${tone}`, dense && 'related--dense']}>
   <div class="container">
-    <header class="related__head">
-      <Kicker>{tag}</Kicker>
-      <h2 class="h3" set:html={title} />
-    </header>
-    <div class="related__grid">
-      {links.map((l) => (
-        <Card href={l.href} class="related__item">
-          <span class="related__icon"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span>
-          <div class="related__body">
-            <h3 class="related__title">{l.label}</h3>
-            <p class="related__desc">{l.desc}</p>
-          </div>
-          <Icon name="lucide:arrow-right" class="related__go" />
-        </Card>
-      ))}
+    <div class="related__panel">
+      {/* Micro-constelación line-art — decorativa, esquina superior derecha */}
+      <svg class="related__illo" viewBox="0 0 220 140" aria-hidden="true" focusable="false">
+        <g class="related__illo-lines">
+          <path d="M22 96 L74 58 L118 88 L168 40 L208 70" />
+          <path d="M74 58 L96 110 L160 116" />
+          <path d="M118 88 L168 40" />
+        </g>
+        <g class="related__illo-stars">
+          <circle cx="22" cy="96" r="2.5" /><circle cx="74" cy="58" r="3.5" />
+          <circle cx="118" cy="88" r="2.5" /><circle cx="168" cy="40" r="4" />
+          <circle cx="208" cy="70" r="2" /><circle cx="96" cy="110" r="2" />
+          <circle cx="160" cy="116" r="2.5" />
+        </g>
+      </svg>
+
+      <header class="related__head">
+        <Kicker tone={tone}>{tag}</Kicker>
+        <h2 class="h3 related__title" set:html={title} />
+        <span class="related__count">{n} {n === 1 ? 'ruta' : 'rutas'}</span>
+      </header>
+
+      <ul class="related__list" role="list">
+        {links.map((l, i) => (
+          <li class="related__row">
+            <a class="related__link" href={l.href}>
+              <span class="related__idx" aria-hidden="true">{pad(i)}</span>
+              <span class:list={['related__chip', isBrand(l.icon) && 'related__chip--brand']}>
+                <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+              </span>
+              <span class="related__txt">
+                <span class="related__label">{l.label}</span>
+                <span class="related__desc">{l.desc}</span>
+              </span>
+              <Icon name="lucide:arrow-right" class="related__go" />
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </section>
@@ -38,22 +76,112 @@ const { tag, title, links, tone = 'gold' } = Astro.props;
 <style>
   .related--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); }
   .related--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); }
-  .related__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
-  .related__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 
-  .related__item { display: flex; align-items: center; gap: var(--space-4); }
-  .related__icon {
+  /* El <em> del título (vía set:html) se tiñe con el acento de la sección */
+  .related__title :global(em) { color: var(--tint); font-style: normal; }
+
+  /* Panel translúcido — flota sobre la atmósfera, con acento de esquina (eco svc-hero).
+     No es losa sólida de página: deja ver el SpaceBackdrop detrás. */
+  .related__panel {
+    position: relative; overflow: hidden; min-width: 0;
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--tint-dim), transparent 60%),
+      color-mix(in srgb, var(--bg-card) 72%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+
+  /* Constelación line-art — decorativa */
+  .related__illo {
+    position: absolute; top: var(--space-5); right: var(--space-5);
+    width: clamp(140px, 32%, 220px); height: auto; pointer-events: none; z-index: 0;
+    color: var(--tint); opacity: 0.5;
+    -webkit-mask-image: linear-gradient(245deg, #000 40%, transparent 92%);
+    mask-image: linear-gradient(245deg, #000 40%, transparent 92%);
+  }
+  .related__illo-lines path { fill: none; stroke: currentColor; stroke-width: 1; opacity: 0.4; }
+  .related__illo-stars circle { fill: currentColor; }
+
+  .related__head {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  .related__title { font-family: var(--font-display); line-height: var(--leading-snug); max-width: 22ch; }
+  .related__count {
+    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
+  }
+
+  /* Lista de rutas — filas con hairline, no cajas con sombra */
+  .related__list {
+    position: relative; z-index: 1;
+    list-style: none; display: grid; grid-template-columns: 1fr;
+    column-gap: var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+  .related__row { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
+
+  .related__link {
+    color: inherit; text-decoration: none;
+    display: flex; align-items: center; gap: var(--space-4);
+    min-height: 56px; padding: var(--space-3) var(--space-2);
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--ease-out-expo);
+  }
+  .related__link:hover { background: var(--bg-elevated); }
+  .related__link:focus-visible {
+    outline: 2px solid var(--tint); outline-offset: -2px;
+    background: var(--bg-elevated);
+  }
+
+  .related__idx {
+    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
+    transition: color var(--duration-fast);
+  }
+  .related__link:hover .related__idx,
+  .related__link:focus-visible .related__idx { color: var(--tint); }
+
+  .related__chip {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: var(--radius-md);
+    width: 40px; height: 40px; border-radius: var(--radius-md);
     background: var(--tint-dim); border: 1px solid var(--tint-line); color: var(--tint);
   }
-  .related__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .related__body { min-width: 0; flex: 1; }
-  .related__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .related__desc { color: var(--fg-secondary); font-size: var(--text-sm); margin-top: 2px; }
-  .related__go { flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle); transition: transform var(--duration-base), color var(--duration-base); }
-  .related__item:hover .related__go { color: var(--tint); transform: translateX(3px); }
-  @media (--motion-reduce) { .related__item:hover .related__go { transform: none; } }
+  .related__chip :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  /* Insignia de marca: SIEMPRE oro, nunca se re-tinta con el acento (teal) de la sección.
+     El icono marcyan-ai es mixto (cuerpo con stroke="currentColor" + estrellas/letras con
+     fill); conserva el mismo stroke-width 1.5 que el resto — NO se anula, o desaparecería
+     el contorno del cuerpo. */
+  .related__chip--brand { color: var(--accent-gold); }
 
-  @media (--md) { .related__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); } }
+  .related__txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .related__label {
+    font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug);
+  }
+  .related__desc {
+    color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal);
+  }
+
+  .related__go {
+    flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle);
+    transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
+  }
+  .related__link:hover .related__go,
+  .related__link:focus-visible .related__go { color: var(--tint); transform: translateX(4px); }
+
+  @media (--motion-reduce) {
+    .related__link:hover .related__go,
+    .related__link:focus-visible .related__go { transform: none; }
+  }
+
+  @media (--md) {
+    .related__panel { padding: var(--space-7); }
+    .related__head { margin-bottom: var(--space-6); }
+    /* Conmutador de servicios (4+ rutas): 2 columnas densas. La numeración + el
+       hairline por fila mantienen la legibilidad de "lista de control". */
+    .related--dense .related__list { grid-template-columns: 1fr 1fr; }
+  }
 </style>

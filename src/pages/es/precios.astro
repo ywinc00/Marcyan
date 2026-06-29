@@ -17,6 +17,7 @@ import RelatedLinks from '../../components/sections/RelatedLinks.astro';
 import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
@@ -36,17 +37,39 @@ const c = content.es;
   <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
+    {/* §2: HUB de sección → header COMPACTO (no clona el hero de portada). Las chips
+        de prueba salen del header y se promueven a una "rampa de transparencia"
+        bespoke (abajo) para que respiren y la página tenga carácter propio. */}
     <LandingHero
+      variant="header"
       kicker={p.hero.kicker}
       h1={p.hero.h1}
       sub={p.hero.sub}
       primary={p.hero.primary}
       secondary={p.hero.secondary}
-      chips={p.hero.chips}
       tone={p.hero.tone}
     >
       <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
     </LandingHero>
+
+    {/* ── Rampa de transparencia (bespoke) ──────────────────────────────────
+        Reutiliza VERBATIM las chips honestas de i18n (p.hero.chips). No es el
+        cliché de 3-card icono+título+párrafo: son señales de telemetría con
+        índice mono + línea conectora, leídas como "lo que verás en esta página".
+        Da el remate de confianza justo donde aterriza la vista, sin caja sosa. */}
+    <section class="promise" aria-label="Por qué estos precios">
+      <div class="container">
+        <ul class="promise__rail" role="list">
+          {p.hero.chips.map((ch, i) => (
+            <li class="promise__cell">
+              <span class="promise__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="promise__dot" aria-hidden="true"></span>
+              <span class="promise__txt">{ch}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
 
     <AnswerBlock q={p.answer.q} a={p.answer.a} />
 
@@ -74,5 +97,78 @@ const c = content.es;
     <Contact contact={c.contact} />
   </main>
 
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* ── Rampa de transparencia ─────────────────────────────────────────────
+     Banda escaneable que sirve de puente entre el header compacto y el bloque
+     answer-first. Telemetría (mono + índice + punto de señal oro), filete
+     conector entre celdas. Flota sobre la atmósfera SpaceBackdrop (sin caja
+     sólida). Solo tokens; breakpoints vía @custom-media. */
+  .promise {
+    padding-block: var(--space-6) 0;
+  }
+  .promise__rail {
+    list-style: none; min-width: 0;
+    display: grid; grid-template-columns: 1fr; gap: var(--space-3);
+  }
+  .promise__cell {
+    position: relative; min-width: 0;
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
+    background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  /* filete de acento a la izquierda: señal de "punto verificado" */
+  .promise__cell::before {
+    content: ""; position: absolute; left: 0; top: var(--space-3); bottom: var(--space-3);
+    width: 2px; border-radius: 0 2px 2px 0;
+    background: linear-gradient(180deg, var(--accent-gold), transparent);
+  }
+  .promise__idx {
+    flex: 0 0 auto;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+    letter-spacing: var(--tracking-wide); color: var(--fg-subtle);
+  }
+  .promise__dot {
+    flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold-glow);
+  }
+  .promise__txt {
+    min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    line-height: var(--leading-snug);
+  }
+
+  /* ≥ sm: las tres señales en una fila de telemetría, con filete conector entre ellas */
+  @media (--sm) {
+    .promise { padding-block: var(--space-7) 0; }
+    .promise__rail {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+      overflow: hidden;
+    }
+    .promise__cell {
+      background: transparent; border: 0; border-radius: 0;
+      padding-block: var(--space-5);
+    }
+    .promise__cell + .promise__cell { border-left: 1px solid var(--border-subtle); }
+    .promise__cell::before {
+      top: auto; bottom: 0; left: var(--space-5); right: var(--space-5); width: auto; height: 2px;
+      border-radius: 2px 2px 0 0;
+      background: linear-gradient(90deg, var(--accent-gold), transparent);
+    }
+  }
+
+  @media (--md) {
+    .promise__txt { font-size: var(--text-sm); }
+  }
+</style>

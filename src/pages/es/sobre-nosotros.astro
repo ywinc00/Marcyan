@@ -5,6 +5,12 @@
 // Schema: AboutPage (→ Organization del @graph) + BreadcrumbList. ES (hasEn=false).
 // ⚠️ HONESTIDAD: NO se inventa fundador. El nodo Person + sameAs + foundingDate se
 // añaden DESPUÉS, cuando el dueño dé el dato real (ver bloque comentado abajo).
+//
+// REDISEÑO 2026-06-29 (hub de sección, no landing): header COMPACTO (LandingHero
+// variant="header"), atmósfera SpaceBackdrop (oro) en lugar de losa plana, y una
+// BANDA BESPOKE de "telemetría de confianza" (3 pilares = datos verificables como
+// lectura de instrumentos) en vez de muro de texto, para dar ritmo al E-E-A-T sin
+// tocar el copy honesto de i18n ni el schema/form. Ver design/art-direction.md.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -19,12 +25,22 @@ import RelatedLinks from '../../components/sections/RelatedLinks.astro';
 import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import AboutPageLd from '../../components/seo/AboutPageLd.astro';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { sobreNosotros as a } from '../../i18n/sobre-nosotros';
 
 const c = content.es;
+
+// Banda bespoke "telemetría de confianza": 3 hechos verificables derivados del copy
+// honesto de i18n (chips del hero + valores). NO es contenido nuevo: reformula datos
+// ya presentes como lectura de instrumentos (label mono + valor display + apoyo).
+const trust = [
+  { label: 'Cobertura', value: 'Houston y Miami', note: 'Negocio de área de servicio, atención directa en tu mercado.' },
+  { label: 'Idioma', value: 'Bilingüe ES / EN', note: 'Escrito para cómo busca tu cliente, no Google Translate.' },
+  { label: 'Precios', value: 'Públicos', note: 'Hasta el SEO mensual y el mantenimiento, sin letra chica.' },
+];
 ---
 <Layout
   title={a.meta.title}
@@ -57,6 +73,7 @@ const c = content.es;
   <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
+    {/* Hub de sección → header COMPACTO (DESIGN.md §2), no hero de portada. */}
     <LandingHero
       kicker={a.hero.kicker}
       h1={a.hero.h1}
@@ -65,26 +82,71 @@ const c = content.es;
       secondary={a.hero.secondary}
       chips={a.hero.chips}
       tone={a.hero.tone}
+      variant="header"
     >
       <Breadcrumb slot="breadcrumb" items={a.breadcrumb} lang="es" />
     </LandingHero>
 
+    {/* Definición citable (palanca AEO). */}
     <AnswerBlock q={a.answer.q} a={a.answer.a} />
 
+    {/* Quiénes somos — Prose editorial (rail + columna de lectura). */}
     <Prose tag={a.story.tag} title={a.story.title} paragraphs={a.story.paragraphs} tone={a.story.tone} />
 
+    {/* ── BANDA BESPOKE: telemetría de confianza ──────────────────────────────
+        3 hechos verificables como lectura de instrumentos (E-E-A-T / Trust).
+        Panel translúcido sobre la atmósfera (eco de RelatedLinks), no losa plana.
+        Decorativo line-art aria-hidden; copy reformulado de i18n, sin inventar. */}
+    <section class="section trust" aria-labelledby="trust-h">
+      <div class="container">
+        <div class="trust__panel">
+          {/* órbita line-art de 3 nodos — decorativa, esquina superior derecha */}
+          <svg class="trust__illo" viewBox="0 0 200 120" aria-hidden="true" focusable="false">
+            <ellipse cx="100" cy="60" rx="92" ry="40" transform="rotate(-12 100 60)" />
+            <circle class="trust__illo-node" cx="18" cy="44" r="3.5" />
+            <circle class="trust__illo-node" cx="100" cy="20" r="2.5" />
+            <circle class="trust__illo-node" cx="182" cy="74" r="3" />
+          </svg>
+
+          <header class="trust__head">
+            <span class="trust__tag">
+              <span class="trust__dot" aria-hidden="true"></span>Verificable
+            </span>
+            <h2 class="h3 trust__title" id="trust-h">Lo decimos con <em>datos</em>, no adjetivos</h2>
+          </header>
+
+          <dl class="trust__grid">
+            {trust.map((t) => (
+              <div class="trust__cell">
+                <dt class="trust__label">{t.label}</dt>
+                <dd class="trust__value">{t.value}</dd>
+                <p class="trust__note">{t.note}</p>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    {/* Enfoque / valores — FeatureGrid "manifiesto" (no 3-card). */}
     <FeatureGrid tag={a.values.tag} title={a.values.title} intro={a.values.intro} items={a.values.items} tone={a.values.tone} />
 
+    {/* Cómo trabajamos — timeline de la home (reuso, no se toca). */}
     <Process process={c.process} />
 
+    {/* Clientes Fundadores — Prose editorial. */}
     <Prose tag={a.founders.tag} title={a.founders.title} paragraphs={a.founders.paragraphs} tone={a.founders.tone} />
 
+    {/* Ciudades (SAB). */}
     <Locations locations={c.locations} />
 
+    {/* Trabajo real → portafolio (constelación de rutas). */}
     <RelatedLinks tag={a.proof.tag} title={a.proof.title} links={a.proof.links} />
 
+    {/* FAQ (FAQPage co-localizado, ninguna abierta por defecto). */}
     <Faq tag={a.faq.tag} title={a.faq.title} items={a.faq.items} />
 
+    {/* Remate con 1 acción dominante. */}
     <CtaBand
       title={a.cta.title}
       sub={a.cta.sub}
@@ -93,8 +155,146 @@ const c = content.es;
       tone={a.cta.tone}
     />
 
+    {/* Form de contacto (contrato intacto → /api/contact, /api/brief). */}
     <Contact contact={c.contact} />
   </main>
 
+  {/* Atmósfera de página (una sola vez) — da el fondo de la home a este hub. */}
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* ── Banda bespoke: telemetría de confianza ──────────────────────────────
+     Panel translúcido que flota sobre la atmósfera SpaceBackdrop (no losa
+     sólida). Los 3 pilares se leen como instrumentos: label mono + valor
+     display + apoyo legible, separados por regla fina. Acentos en oro (eco de
+     las chips del hero y del Kicker). Solo tokens. */
+  .trust__panel {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 60%),
+      color-mix(in srgb, var(--bg-card) 72%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+
+  /* órbita line-art decorativa, esquina superior derecha (eco RelatedLinks) */
+  .trust__illo {
+    position: absolute;
+    top: var(--space-5);
+    right: var(--space-5);
+    width: clamp(120px, 28%, 200px);
+    height: auto;
+    pointer-events: none;
+    z-index: 0;
+    color: var(--accent-gold);
+    opacity: 0.4;
+    -webkit-mask-image: linear-gradient(245deg, #000 35%, transparent 92%);
+    mask-image: linear-gradient(245deg, #000 35%, transparent 92%);
+  }
+  .trust__illo ellipse { fill: none; stroke: currentColor; stroke-width: 1; opacity: 0.5; }
+  .trust__illo-node { fill: currentColor; }
+
+  .trust__head {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  /* kicker mono "en vivo" (eco del answer__tag, pero en oro = confianza) */
+  .trust__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    color: var(--accent-gold);
+  }
+  .trust__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: var(--accent-gold);
+    box-shadow: 0 0 8px var(--accent-gold);
+  }
+  .trust__title {
+    font-family: var(--font-display);
+    line-height: var(--leading-snug);
+    max-width: 24ch;
+  }
+  .trust__title :global(em) { color: var(--accent-gold); font-style: normal; }
+
+  /* Grid de pilares = instrumentos. 1 col móvil → 3 col desktop, con regla
+     divisoria entre instrumentos (filete superior por celda). */
+  .trust__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
+  .trust__cell {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .trust__cell:first-child { border-top: 0; }
+
+  .trust__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+  }
+  .trust__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    color: var(--fg-primary);
+  }
+  .trust__note {
+    margin: 0;
+    color: var(--fg-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    max-width: 38ch;
+  }
+
+  @media (--md) {
+    .trust__panel { padding: var(--space-7); }
+  }
+
+  @media (--lg) {
+    /* 3 instrumentos en fila, separados por regla vertical (no horizontal) */
+    .trust__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
+    .trust__cell {
+      padding: 0 var(--space-6) 0 0;
+      border-top: 0;
+      border-left: 1px solid var(--border-subtle);
+      padding-left: var(--space-6);
+    }
+    .trust__cell:first-child { border-left: 0; padding-left: 0; }
+    .trust__cell:last-child { padding-right: 0; }
+  }
+</style>

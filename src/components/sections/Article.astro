@@ -1,18 +1,38 @@
 ---
 // Cuerpo del artículo: estiliza el HTML que produce <Content/> (Markdown).
 // El H1 vive en el hero; aquí los H2 (preguntas, palanca AEO) hacia abajo.
-// Ancho de lectura controlado + tokens del DS. Tablas con scroll propio para
-// no romper la doctrina anti-scroll-x. Estilos a contenido dinámico = :global().
+// Rediseño: columna de lectura editorial con RIEL-MARGEN (filete oro sutil a la
+// izquierda + nodo de constelación en cada H2) que ancla la medida sin ser muro gris.
+// La página lo coloca en su grilla de lectura (junto a la ToC sticky); este componente
+// solo aporta la columna. Estilos a contenido dinámico = :global() acotado bajo .article__body.
 ---
-<section class="section article">
-  <div class="container">
-    <div class="article__body"><slot /></div>
-  </div>
-</section>
+<div class="article">
+  <div class="article__body"><slot /></div>
+</div>
 
 <style>
-  .article { padding-block: var(--space-7); }
-  .article__body { max-width: 72ch; margin-inline: auto; }
+  .article { min-width: 0; }
+  /* Columna de lectura: medida cómoda, riel-margen oro a la izquierda. */
+  .article__body {
+    position: relative;
+    max-width: min(72ch, 100%);
+    padding-inline-start: var(--space-5);
+  }
+  /* Riel continuo (hairline oro muy tenue) — ancla la columna de lectura. */
+  .article__body::before {
+    content: "";
+    position: absolute;
+    inset-block: 4px;
+    inset-inline-start: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent-gold-line), transparent 92%);
+    pointer-events: none;
+  }
+  @media (--lt-sm) {
+    /* En pantallas muy estrechas el riel se retira para ganar ancho de lectura. */
+    .article__body { padding-inline-start: 0; }
+    .article__body::before { display: none; }
+  }
 
   /* Ritmo vertical entre bloques */
   .article__body :global(p),
@@ -40,6 +60,23 @@
   .article__body :global(h3) { font-size: var(--fluid-h4); font-weight: 600; }
   .article__body :global(h4) { font-size: var(--text-lg); font-weight: 600; }
 
+  /* Marcador de constelación en cada H2: nodo oro sobre el riel-margen (eco ArticleHero). */
+  .article__body :global(h2) { position: relative; }
+  .article__body :global(h2)::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: calc(var(--space-5) * -1);
+    inset-block-start: 0.62em;
+    width: 5px; height: 5px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-gold);
+    transform: translate(-2px, -50%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-gold), transparent 82%);
+  }
+  @media (--lt-sm) {
+    .article__body :global(h2)::before { display: none; }
+  }
+
   /* Párrafos y texto (legible == fg-secondary, regla del DS) */
   .article__body :global(p),
   .article__body :global(li) {
@@ -48,6 +85,11 @@
   .article__body :global(strong) { color: var(--fg-primary); font-weight: 600; }
   .article__body :global(em) { font-style: italic; }
 
+  /* Lead editorial: el primer párrafo tras el riel respira un poco más. */
+  .article__body > :global(p:first-of-type) {
+    font-size: var(--fluid-lead); color: var(--fg-primary);
+  }
+
   /* Enlaces internos/externos */
   .article__body :global(a) {
     color: var(--accent-gold); text-decoration: underline;
@@ -55,6 +97,9 @@
     transition: text-decoration-color var(--duration-fast), color var(--duration-fast);
   }
   .article__body :global(a:hover) { text-decoration-color: var(--accent-gold); }
+  .article__body :global(a:focus-visible) {
+    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: var(--radius-sm);
+  }
 
   /* Listas */
   .article__body :global(ul),
@@ -68,6 +113,7 @@
 
   /* Cita */
   .article__body :global(blockquote) {
+    position: relative;
     border-left: 3px solid var(--accent-gold); background: var(--bg-card);
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
     padding: var(--space-4) var(--space-5); color: var(--fg-primary);
@@ -94,8 +140,11 @@
     margin-top: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); text-align: center;
   }
 
-  /* Separador */
-  .article__body :global(hr) { border: 0; border-top: 1px solid var(--border); }
+  /* Separador: filete con nodo central (eco de la constelación) */
+  .article__body :global(hr) {
+    position: relative; border: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border) 18%, var(--border) 82%, transparent);
+  }
 
   /* Tablas (scroll propio → no rompe el ancho de página) */
   .article__body :global(table) {
@@ -113,4 +162,8 @@
     color: var(--fg-primary); background: var(--bg-card); white-space: nowrap;
   }
   .article__body :global(tbody tr:nth-child(even)) { background: var(--bg-2); }
+
+  @media (--motion-reduce) {
+    .article__body :global(a) { transition: none; }
+  }
 </style>

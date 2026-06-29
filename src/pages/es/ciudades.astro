@@ -1,22 +1,54 @@
 ---
 // ÍNDICE DE CIUDADES · /es/ciudades — nodo raíz del silo geográfico (Ola 2 · B3).
-// Resuelve la nav "Ciudades" ahora que hay 2 hubs (Houston + Miami). Mínimo:
-// presenta las 2 ciudades y enlaza a sus hubs. Schema: ItemList (los 2 hubs) +
-// BreadcrumbList. Reusa componentes del DS. ES por ahora (hasEn=false).
+// Resuelve la nav "Ciudades" ahora que hay 2 hubs (Houston + Miami). Schema:
+// ItemList (los 2 hubs) + BreadcrumbList.
+//
+// Rediseño DS v2 "Space-Tech" (DESIGN.md §2/§5): HUB de sección → header COMPACTO
+// (LandingHero variant="header"), NO el hero alto de portada. La energía visual va
+// al CONTENIDO: un showcase de "ficha de ciudad" VIVO que reusa el lenguaje de
+// Locations.astro (skyline line-art, silueta de estado geo-correcta, coords en pills
+// mono, tagline, área, tel y conmutador de servicios). Como Locations.astro es un
+// componente compartido (lo usa la home y trae su propio data-fx/id) NO se importa:
+// se monta una sección bespoke inline con su MISMO craft, alimentada por el mismo
+// contenido honesto (c.locations.items). SpaceBackdrop da la atmósfera de la home.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import Kicker from '../../components/ui/Kicker.astro';
+import Icon from '../../components/ui/Icon.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
-import RelatedLinks from '../../components/sections/RelatedLinks.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 
 const c = content.es;
+const tel = (s: string) => s.replace(/[^\d+]/g, '');
+
+// Hubs reales del silo geográfico, alineados con c.locations.items (mismo contenido
+// honesto). El primer enlace de cada ficha = el hub de ciudad (link primario).
+const cityHubs: Record<string, { href: string; teaser: string }> = {
+  Houston: {
+    href: '/es/houston',
+    teaser: 'Nuestra base de operaciones, con casos reales y verificables.',
+  },
+  Miami: {
+    href: '/es/miami',
+    teaser: 'Diseño, SEO e IA en el español del Caribe. Cupos de Cliente Fundador.',
+  },
+};
+const cities = c.locations.items;
+
+// Siluetas de estado — geográficamente correctas (mismas que Locations.astro,
+// derivadas de GeoJSON público con lat invertida para el eje-y de SVG). Decorativas.
+const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
+  TX: { viewBox: '0 0 100 93.4', path: 'M100 49.6L98.7 54L96.4 60.8L91 61.3L89.7 60.9L89.4 62.4L88.1 65.8L81.3 70.4L78.1 71.9L75 73.8L69.4 82.6L69.9 84.7L69.9 86.8L68.6 93.4L62.3 91.6L56.2 86.1L55 83.1L53.7 79L47.6 70.6L44.6 64.7L36.5 59.7L32.4 60L29.2 62.2L27.9 65.2L23.8 65.7L15 58.6L9.5 50.3L0 41L27.3 31.2L27.8 0L50.6 17.3L53.9 18.6L58.4 20.3L63.1 20.9L65.2 22.3L68.2 22.5L74.7 23.7L80 23.7L89 23.5L95 25.9L96.1 31L97.7 42.1Z' },
+  FL: { viewBox: '0 0 100 86.4', path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z' },
+};
 
 const hero = {
   kicker: 'Nuestras ciudades',
@@ -35,13 +67,9 @@ const answer = {
   q: '¿En qué ciudades trabaja Marcyan?',
   a: 'Marcyan Studio atiende a negocios hispanos en Houston, Texas y Miami, Florida, como negocio de área de servicio (sin oficina pública). En ambas trabajamos diseño web, IA conversacional y SEO local, en español e inglés y con contexto local real. Houston es nuestra base de operaciones, con casos verificables.',
 };
-const cities = {
+const showcase = {
   tag: 'Elige tu ciudad',
   title: 'Dos ciudades, un <em>mismo equipo</em>',
-  links: [
-    { label: 'Agencia en Houston, TX', href: '/es/houston', desc: 'Nuestra base: diseño web, SEO, IA, e-commerce y branding, con casos reales.', icon: 'lucide:map-pin' },
-    { label: 'Agencia en Miami, FL', href: '/es/miami', desc: 'Diseño web, SEO local, IA y tiendas — en el español del Caribe. Cupos de Cliente Fundador.', icon: 'lucide:map-pin' },
-  ],
 };
 const cta = {
   title: 'Cuéntanos de tu negocio, <em>te orientamos gratis</em>',
@@ -75,13 +103,108 @@ const itemList = [
       secondary={hero.secondary}
       chips={hero.chips}
       tone={hero.tone}
+      variant="header"
     >
       <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="es" />
     </LandingHero>
 
     <AnswerBlock q={answer.q} a={answer.a} />
 
-    <RelatedLinks tag={cities.tag} title={cities.title} links={cities.links} />
+    <!-- ── SHOWCASE GEOGRÁFICO: fichas de ciudad vivas (bespoke) ──────────── -->
+    <section class="section cityhub" aria-labelledby="cityhub-title">
+      <div class="container">
+        <header class="cityhub__head">
+          <Kicker>{showcase.tag}</Kicker>
+          <h2 class="h2 cityhub__title" id="cityhub-title" set:html={showcase.title} />
+          <p class="cityhub__lead">Cada ciudad es un mercado distinto. Estas son nuestras dos bases y todo lo que hacemos en cada una.</p>
+        </header>
+
+        <!-- línea de ruta line-art entre las dos ciudades (decorativa) -->
+        <svg class="cityhub__route" viewBox="0 0 1000 60" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+          <path class="cityhub__route-line" d="M70 30 C 300 -6, 700 66, 930 30" />
+          <circle class="cityhub__route-node cityhub__route-node--a" cx="70" cy="30" r="4" />
+          <circle class="cityhub__route-node cityhub__route-node--b" cx="930" cy="30" r="4" />
+        </svg>
+
+        <div class="cityhub__grid">
+          {cities.map((city: any) => {
+            const hub = cityHubs[city.city];
+            const shape = STATE_SHAPE[city.state];
+            return (
+              <article class="citycard">
+                {city.illo && (
+                  <div class="citycard__illo" aria-hidden="true">
+                    <img src={`/assets/cities/${city.illo}.svg`} alt="" loading="lazy" decoding="async" />
+                  </div>
+                )}
+
+                <div class="citycard__body">
+                  <div class="citycard__top">
+                    <span class="citycard__pin"><Icon name="lucide:map-pin" /></span>
+                    <span class="citycard__badge"><span class="citycard__badge-dot" aria-hidden="true"></span>{city.badge}</span>
+                  </div>
+
+                  <h3 class="citycard__city">{city.city} <span class="citycard__state">{city.state}</span></h3>
+                  {city.tagline && (
+                    <p class="citycard__tagline">{city.taglineIcon && <Icon name={city.taglineIcon} />}{city.tagline}</p>
+                  )}
+                  {hub?.teaser && <p class="citycard__teaser">{hub.teaser}</p>}
+
+                  {/* datos: estado + coords en pills mono (telemetría) */}
+                  <ul class="citycard__pills" aria-label="Datos de la ciudad">
+                    {city.stateFull && (
+                      <li class="citycard__pill">
+                        {shape && (
+                          <svg class="citycard__pill-ic" viewBox={shape.viewBox} aria-hidden="true"><path d={shape.path} fill="currentColor" /></svg>
+                        )}
+                        {city.stateFull}
+                      </li>
+                    )}
+                    {city.coords && (
+                      <li class="citycard__pill"><Icon name="lucide:compass" class="citycard__pill-lic" />{city.coords}</li>
+                    )}
+                  </ul>
+
+                  <p class="citycard__area"><Icon name="lucide:radius" class="citycard__area-ic" />{city.area}</p>
+                  <a class="citycard__tel" href={`tel:${tel(city.tel)}`}><Icon name="lucide:phone" class="citycard__tel-ic" />{city.tel}</a>
+
+                  {hub?.href && (
+                    <a class="citycard__hub" href={hub.href}>
+                      <span class="citycard__hub-tx">Agencia en {city.city}</span>
+                      <Icon name="lucide:arrow-right" class="citycard__hub-arr" />
+                    </a>
+                  )}
+
+                  {city.links && city.links.length > 0 && (
+                    <div class="citycard__nav">
+                      <p class="citycard__nav-tag">Servicios en {city.city}</p>
+                      <ul class="citycard__links" role="list">
+                        {city.links.slice(1).map((l: any) => (
+                          <li>
+                            <a href={l.href}>
+                              <span class="citycard__lk-ic"><Icon name={l.icon} /></span>
+                              <span class="citycard__lk-tx">
+                                <span class="citycard__lk-title">{l.label}</span>
+                                {l.sub && <span class="citycard__lk-sub">{l.sub}</span>}
+                              </span>
+                              <Icon name="lucide:arrow-right" class="citycard__lk-arr" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {city.connected && (
+                    <p class="citycard__conn"><span class="citycard__conn-dots" aria-hidden="true">···</span> {city.connected}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
 
     <CtaBand
       title={cta.title}
@@ -94,5 +217,172 @@ const itemList = [
     <Contact contact={c.contact} />
   </main>
 
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* ── encabezado del showcase ──────────────────────────── */
+  .cityhub :global(em) { color: var(--accent-gold); font-style: normal; }
+  .cityhub__head {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    max-width: 52ch; margin-bottom: var(--space-6);
+  }
+  .cityhub__title { font-family: var(--font-display); line-height: var(--leading-snug); }
+  .cityhub__lead { color: var(--fg-secondary); font-size: var(--fluid-lead); max-width: 48ch; }
+
+  /* línea de ruta entre ciudades — decorativa, oro a baja opacidad */
+  .cityhub__route { display: none; }
+  .cityhub__route-line { fill: none; stroke: var(--accent-gold); stroke-width: 1; opacity: 0.3; stroke-dasharray: 2 6; stroke-linecap: round; }
+  .cityhub__route-node { fill: var(--accent-gold); opacity: 0.7; }
+  .cityhub__route-node--b { fill: var(--accent-teal); }
+
+  /* ── grid de fichas ───────────────────────────────────── */
+  .cityhub__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+
+  /* ── ficha de ciudad (eco de Locations.astro, scope propio) ── */
+  .citycard {
+    position: relative; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6);
+    transition: border-color var(--duration-base) var(--ease-out-expo);
+  }
+  .citycard:hover { border-color: var(--border-accent); }
+
+  /* skyline line-art (asset oficial oro) — esquina superior derecha, difuminado al
+     borde izquierdo. mix-blend lighten colapsa el lavado del PNG al color de la card. */
+  .citycard__illo {
+    position: absolute; top: 84px; right: var(--space-5);
+    width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
+    -webkit-mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+    mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+  }
+  .citycard__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
+
+  .citycard__body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .citycard__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .citycard__pin {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  }
+  .citycard__pin :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .citycard__badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-teal);
+  }
+  .citycard__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); }
+
+  .citycard__city { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: 1.05; }
+  .citycard__state { color: var(--fg-secondary); }
+  .citycard__tagline {
+    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    color: var(--accent-gold); margin-top: calc(var(--space-1) * -1);
+  }
+  .citycard__tagline :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
+  .citycard__teaser { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); max-width: 38ch; }
+
+  /* pills de dato (estado + coords) */
+  .citycard__pills { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+  .citycard__pill {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
+  }
+  .citycard__pill .citycard__pill-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; }
+  .citycard__pill :global(.citycard__pill-lic) { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+
+  .citycard__area {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    color: var(--fg-secondary); font-size: var(--text-sm);
+  }
+  .citycard__area :global(.citycard__area-ic) { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+  .citycard__tel {
+    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
+    transition: color var(--duration-fast);
+  }
+  .citycard__tel :global(.citycard__tel-ic) { width: 15px; height: 15px; flex: 0 0 auto; stroke-width: 1.5; }
+  .citycard__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
+
+  /* CTA primaria de la ficha = ir al hub de ciudad (botón oro contorno, ancho) */
+  .citycard__hub {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+    min-height: var(--tap-min); margin-top: var(--space-2);
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
+    color: var(--accent-gold); font-family: var(--font-display); font-weight: 600; font-size: var(--text-md);
+    transition: background var(--duration-fast), border-color var(--duration-fast);
+  }
+  .citycard__hub:hover { background: color-mix(in srgb, var(--accent-gold-dim), var(--accent-gold) 14%); border-color: var(--accent-gold); }
+  .citycard__hub:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .citycard__hub :global(.citycard__hub-arr) { width: 18px; height: 18px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .citycard__hub:hover :global(.citycard__hub-arr) { transform: translateX(3px); }
+
+  /* conmutador de servicios de la ciudad */
+  .citycard__nav { margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); }
+  .citycard__nav-tag {
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--fg-secondary); margin-bottom: var(--space-2);
+  }
+  .citycard__links { list-style: none; display: grid; grid-template-columns: 1fr; gap: 2px; }
+  .citycard__links a {
+    display: flex; align-items: center; gap: var(--space-3); min-height: 44px;
+    padding: var(--space-1) var(--space-2); border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: border-color var(--duration-fast), background var(--duration-fast);
+  }
+  .citycard__links a:hover { border-color: var(--border-accent); background: var(--bg-elevated); }
+  .citycard__links a:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+  .citycard__lk-ic {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: var(--radius-sm);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
+  }
+  .citycard__links a:hover .citycard__lk-ic,
+  .citycard__links a:focus-visible .citycard__lk-ic { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .citycard__lk-ic :global(svg) { width: 16px; height: 16px; stroke-width: 1.5; }
+  .citycard__lk-tx { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .citycard__lk-title { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
+  .citycard__lk-sub { font-size: var(--text-xs); color: var(--fg-secondary); }
+  .citycard__links :global(.citycard__lk-arr) { width: 15px; height: 15px; color: var(--fg-subtle); flex: 0 0 auto; transition: color var(--duration-fast), transform var(--duration-fast); }
+  .citycard__links a:hover :global(.citycard__lk-arr) { color: var(--accent-gold); transform: translateX(3px); }
+  .citycard__links a:focus-visible :global(.citycard__lk-arr) { color: var(--accent-gold); }
+
+  .citycard__conn {
+    margin-top: auto; padding-top: var(--space-4); text-align: right;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold); opacity: 0.85;
+  }
+  .citycard__conn-dots { letter-spacing: 0.2em; opacity: 0.7; }
+
+  /* móvil: el skyline se baja al divisor (sobre los enlaces) para no tapar el título */
+  @media (--lt-md) {
+    .citycard__illo { top: auto; bottom: calc(100% - 296px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
+  }
+
+  @media (--sm) {
+    .citycard__links { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (--md) {
+    .cityhub__head { margin-bottom: var(--space-7); }
+    .cityhub__route { display: block; width: 100%; height: 60px; margin-bottom: var(--space-6); }
+  }
+
+  @media (--lg) {
+    .cityhub__grid { grid-template-columns: repeat(2, 1fr); align-items: start; }
+  }
+
+  @media (--motion-reduce) {
+    .citycard__hub:hover :global(.citycard__hub-arr),
+    .citycard__links a:hover :global(.citycard__lk-arr) { transform: none; }
+  }
+</style>

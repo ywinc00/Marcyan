@@ -1,40 +1,98 @@
 ---
-// Índice "En esta guía" — TOC colapsable de los H2 del artículo (solo si hay ≥3).
-// Las anclas usan el slug que Astro genera para cada heading (rehype-slug);
-// el cuerpo del artículo ya tiene scroll-margin-top para que el salto respire.
+// Índice "En esta guía" de los H2 del artículo (solo si hay ≥3). Dos presentaciones
+// según ancho, en el MISMO bloque (la página las coloca con su grilla de lectura):
+//   · Desktop (--lg): panel PEGAJOSO (position:sticky) con scroll-spy — el H2 visible
+//     se resalta en oro con barra indicadora. Acompaña la lectura sin estorbar.
+//   · Móvil (<lg): <details> colapsable (no roba altura de pantalla).
+// Las anclas usan el slug que Astro genera para cada heading (rehype-slug); el cuerpo
+// ya tiene scroll-margin-top para que el salto respire. Progresivo: sin JS sigue siendo
+// una lista de anclas navegable; el scroll-spy es realce (data-toc-spy).
 interface Heading { depth: number; slug: string; text: string }
 interface Props { headings: Heading[]; label: string }
-const { headings, label } = Astro.props;
-const items = headings.filter((h) => h.depth === 2);
+const { headings, label } = Astro.props as Props;
+const items = headings.filter((h: Heading) => h.depth === 2);
+const pad = (i: number) => String(i + 1).padStart(2, '0');
 ---
 {items.length >= 3 && (
-  <div class="toc-wrap">
-    <div class="container">
-      <details class="toc">
-        <summary class="toc__sum">{label}<span class="toc__chev" aria-hidden="true"></span></summary>
-        <ol class="toc__list">
-          {items.map((h, i) => (
-            <li>
-              <a href={`#${h.slug}`}><span class="toc__n">{String(i + 1).padStart(2, '0')}</span><span>{h.text}</span></a>
-            </li>
-          ))}
-        </ol>
-      </details>
+  <nav class="toc" aria-label={label} data-toc-spy>
+    {/* Móvil: details colapsable */}
+    <details class="toc__m">
+      <summary class="toc__sum">
+        <span>{label}</span>
+        <span class="toc__chev" aria-hidden="true"></span>
+      </summary>
+      <ol class="toc__list">
+        {items.map((h, i) => (
+          <li class="toc__item">
+            <a class="toc__link" href={`#${h.slug}`} data-toc-link={h.slug}>
+              <span class="toc__n" aria-hidden="true">{pad(i)}</span>
+              <span class="toc__t">{h.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </details>
+
+    {/* Desktop: panel sticky con scroll-spy */}
+    <div class="toc__d">
+      <p class="toc__label">{label}</p>
+      <ol class="toc__list">
+        {items.map((h, i) => (
+          <li class="toc__item">
+            <a class="toc__link" href={`#${h.slug}`} data-toc-link={h.slug}>
+              <span class="toc__n" aria-hidden="true">{pad(i)}</span>
+              <span class="toc__t">{h.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
     </div>
-  </div>
+  </nav>
 )}
 
 <style>
-  .toc-wrap { margin-block: var(--space-6); }
-  .toc {
-    max-width: 72ch; margin-inline: auto;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: var(--space-4) var(--space-5);
+  .toc { min-width: 0; }
+
+  /* ── Estructura compartida de lista ─────────────────────────────── */
+  .toc__list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column;
+  }
+  .toc__item { min-width: 0; }
+  .toc__link {
+    position: relative;
+    display: flex; align-items: baseline; gap: var(--space-3);
+    min-height: var(--tap-min);
+    padding-block: var(--space-2);
+    color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-snug);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .toc__n {
+    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .toc__t { min-width: 0; }
+  .toc__link:hover { color: var(--accent-gold); }
+  .toc__link:hover .toc__n { color: var(--accent-gold); }
+  .toc__link:focus-visible {
+    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: var(--radius-sm);
+    color: var(--fg-primary);
+  }
+
+  /* ── Móvil: details colapsable ──────────────────────────────────── */
+  .toc__m {
+    background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-5);
   }
   .toc__sum {
-    cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; list-style: none;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: var(--tap-min);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--accent-gold); min-height: var(--tap-min);
+    text-transform: uppercase; color: var(--accent-gold);
   }
   .toc__sum::-webkit-details-marker { display: none; }
   .toc__chev {
@@ -42,17 +100,110 @@ const items = headings.filter((h) => h.depth === 2);
     border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
     transform: rotate(45deg); transition: transform var(--duration-fast);
   }
-  .toc[open] .toc__chev { transform: rotate(-135deg); }
-  .toc__list {
-    list-style: none; display: flex; flex-direction: column; gap: var(--space-1);
-    margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);
+  .toc__m[open] .toc__chev { transform: rotate(-135deg); }
+  .toc__m .toc__list {
+    margin-top: var(--space-3); padding-top: var(--space-3);
+    border-top: 1px solid var(--border-subtle);
   }
-  .toc__list a {
-    display: flex; align-items: baseline; gap: var(--space-3); min-height: var(--tap-min);
-    color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-snug);
-    transition: color var(--duration-fast);
+
+  /* El panel desktop se oculta bajo --lg */
+  .toc__d { display: none; }
+
+  @media (--lg) {
+    .toc__m { display: none; }
+
+    /* ── Desktop: panel PEGAJOSO con scroll-spy ───────────────────── */
+    .toc__d {
+      display: block;
+      position: sticky; top: calc(var(--nav-h) + var(--space-5));
+      max-height: calc(100vh - var(--nav-h) - var(--space-6));
+      overflow-y: auto; overscroll-behavior: contain;
+      background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .toc__label {
+      margin: 0 0 var(--space-3);
+      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+      letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--accent-gold);
+    }
+    .toc__d .toc__list { gap: 2px; }
+    /* riel del panel: hairline a la izq de la lista; cada link lleva su barra-indicador */
+    .toc__d .toc__link {
+      padding-inline-start: var(--space-4);
+    }
+    .toc__d .toc__link::before {
+      content: ""; position: absolute; inset-block: 6px; inset-inline-start: 0;
+      width: 2px; border-radius: var(--radius-pill);
+      background: var(--border); transition: background var(--duration-fast) var(--ease-out-expo);
+    }
+    .toc__d .toc__link:hover::before { background: var(--accent-gold-line); }
+
+    /* estado ACTIVO (scroll-spy): texto oro, índice oro, barra encendida */
+    .toc__d .toc__link[aria-current="true"] { color: var(--accent-gold); }
+    .toc__d .toc__link[aria-current="true"] .toc__n { color: var(--accent-gold); }
+    .toc__d .toc__link[aria-current="true"]::before {
+      background: var(--accent-gold);
+      box-shadow: 0 0 8px var(--accent-gold-glow);
+    }
   }
-  .toc__list a:hover { color: var(--accent-gold); }
-  .toc__n { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); flex: 0 0 auto; }
-  @media (--motion-reduce) { .toc__chev { transition: none; } }
+
+  @media (--motion-reduce) {
+    .toc__chev,
+    .toc__link,
+    .toc__n,
+    .toc__d .toc__link::before { transition: none; }
+  }
 </style>
+
+<script>
+  // Scroll-spy: resalta en la ToC desktop el H2 actualmente en lectura.
+  // Progresivo: si no hay IntersectionObserver, la ToC sigue siendo lista de anclas.
+  const toc = document.querySelector<HTMLElement>('[data-toc-spy]');
+  if (toc && 'IntersectionObserver' in window) {
+    const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>('.toc__d [data-toc-link]'));
+    const bySlug = new Map(links.map((a) => [a.dataset.tocLink!, a]));
+    const slugs = links.map((a) => a.dataset.tocLink!);
+    const targets = slugs
+      .map((s) => document.getElementById(s))
+      .filter((el): el is HTMLElement => !!el);
+
+    const visible = new Set<string>();
+    let current = '';
+
+    const setCurrent = (slug: string) => {
+      if (slug === current) return;
+      current = slug;
+      for (const [s, a] of bySlug) {
+        if (s === slug) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.target.id) {
+            if (e.isIntersecting) visible.add(e.target.id);
+            else visible.delete(e.target.id);
+          }
+        }
+        // El primer heading visible (en orden de documento) es el "activo".
+        const first = slugs.find((s) => visible.has(s));
+        if (first) {
+          setCurrent(first);
+        } else {
+          // Ninguno visible: marca el último que ya pasamos por encima del viewport.
+          let last = '';
+          for (const t of targets) {
+            if (t.getBoundingClientRect().top < 120) last = t.id;
+            else break;
+          }
+          if (last) setCurrent(last);
+        }
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: 0 }
+    );
+    for (const t of targets) io.observe(t);
+  }
+</script>

@@ -1,6 +1,11 @@
 ---
 // Bloque de texto editorial (p.ej. "por qué en esta ciudad" / contexto local).
-// Párrafos legibles, ancho de lectura controlado. Acepta <em> en los párrafos.
+// Rediseño "bitácora": rail pegajoso (kicker + numeral + H2) a la izquierda y
+// columna de lectura de ancho controlado a la derecha, con filete de acento y
+// primer párrafo a tamaño lead. Conserva el contrato de props.
+//   · title      → set:html (admite <em>)
+//   · paragraphs → set:html (admiten <em>/<strong>) — estilados con :global acotado
+//   · tone       → gold | teal (acento local)
 import Kicker from '../ui/Kicker.astro';
 
 interface Props {
@@ -14,21 +19,90 @@ const { tag, title, paragraphs, tone = 'gold' } = Astro.props;
 ---
 <section class:list={['section prose', `prose--${tone}`]}>
   <div class="container prose__inner">
-    {tag && <Kicker tone={tone}>{tag}</Kicker>}
-    <h2 class="h2" set:html={title} />
+    <header class="prose__rail">
+      {tag && <Kicker tone={tone}>{tag}</Kicker>}
+      <h2 class="h2 prose__title" set:html={title} />
+      <span class="prose__filete" aria-hidden="true"></span>
+    </header>
+
     <div class="prose__body">
-      {paragraphs.map((p) => <p set:html={p} />)}
+      {paragraphs.map((p, i) => <p set:html={p} data-lead={i === 0 ? '' : undefined} />)}
     </div>
   </div>
 </section>
 
 <style>
-  .prose :global(.h2 em), .prose :global(.prose__body em) { font-style: normal; }
-  .prose--gold :global(em) { color: var(--accent-gold); }
-  .prose--teal :global(em) { color: var(--accent-teal); }
-
-  .prose__inner { display: flex; flex-direction: column; gap: var(--space-4); }
-  .prose__body { display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-2); max-width: 70ch; }
-  .prose__body p { color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose); }
+  /* ── Acentos en contenido inyectado (set:html). El <em> se neutraliza de
+       itálica y se usa como realce de color; <strong> queda legible. ── */
+  .prose :global(.prose__title em),
+  .prose :global(.prose__body em) { font-style: normal; }
+  .prose--gold { --pr-accent: var(--accent-gold); --pr-line: var(--accent-gold-line); }
+  .prose--teal { --pr-accent: var(--accent-teal); --pr-line: var(--accent-teal-line); }
+  .prose :global(em) { color: var(--pr-accent); }
   .prose__body :global(strong) { color: var(--fg-primary); font-weight: 600; }
+
+  /* ── Layout ── */
+  .prose__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+
+  /* Rail: kicker + título + filete corto */
+  .prose__rail {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .prose__title { max-width: 18ch; }
+  .prose__filete {
+    display: block;
+    width: var(--space-8);
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(90deg, var(--pr-accent), transparent);
+  }
+
+  /* Cuerpo: ancho de lectura controlado, ritmo editorial, regla marginal */
+  .prose__body {
+    min-width: 0;
+    max-width: 64ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--border);
+  }
+  .prose__body p {
+    margin: 0;
+    color: var(--fg-secondary);
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    text-wrap: pretty;
+  }
+  /* Primer párrafo = entradilla: mayor presencia, un punto más claro */
+  .prose__body p[data-lead] {
+    font-size: var(--fluid-lead);
+    color: var(--fg-primary);
+  }
+
+  @media (--lg) {
+    .prose__inner {
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: var(--space-9);
+    }
+    /* El rail acompaña la lectura sin ocupar todo el alto */
+    .prose__rail {
+      position: sticky;
+      top: calc(var(--nav-h) + var(--space-5));
+    }
+    .prose__filete { width: var(--space-9); }
+    .prose__body {
+      padding-left: var(--space-7);
+      gap: var(--space-6);
+    }
+  }
 </style>

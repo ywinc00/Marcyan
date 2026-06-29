@@ -1,7 +1,10 @@
 ---
 // Navegación entre artículos del blog: anterior / siguiente + volver al índice.
-// Minimalista (la queja del dueño: no había forma de saltar entre piezas).
-// prev/next se derivan de la colección ordenada por fecha en [slug].astro.
+// Rediseño: las dos rutas dejan de ser cajas gemelas planas. Cada una es un panel
+// translúcido (la atmósfera se ve detrás) con una FLECHA-CHIP direccional que se
+// desplaza al hover, dirección en mono y título display. El "volver al índice" es la
+// acción terciaria, centrada bajo un filete de constelación. prev/next se derivan de
+// la colección ordenada por fecha en [slug].astro. Contrato de props INTACTO.
 import Icon from '../ui/Icon.astro';
 
 interface NavLink { title: string; path: string }
@@ -18,52 +21,121 @@ const { prev, next, indexHref, labels } = Astro.props;
     <div class="postnav__grid">
       {prev ? (
         <a class="postnav__item postnav__item--prev" href={prev.path}>
-          <span class="postnav__dir"><Icon name="lucide:arrow-left" /> {labels.prev}</span>
-          <span class="postnav__title">{prev.title}</span>
+          <span class="postnav__chip" aria-hidden="true"><Icon name="lucide:arrow-left" /></span>
+          <span class="postnav__txt">
+            <span class="postnav__dir">{labels.prev}</span>
+            <span class="postnav__title">{prev.title}</span>
+          </span>
         </a>
       ) : <span class="postnav__item postnav__item--empty" aria-hidden="true"></span>}
       {next ? (
         <a class="postnav__item postnav__item--next" href={next.path}>
-          <span class="postnav__dir">{labels.next} <Icon name="lucide:arrow-right" /></span>
-          <span class="postnav__title">{next.title}</span>
+          <span class="postnav__txt">
+            <span class="postnav__dir">{labels.next}</span>
+            <span class="postnav__title">{next.title}</span>
+          </span>
+          <span class="postnav__chip" aria-hidden="true"><Icon name="lucide:arrow-right" /></span>
         </a>
       ) : <span class="postnav__item postnav__item--empty" aria-hidden="true"></span>}
     </div>
-    <a class="postnav__index" href={indexHref}><Icon name="lucide:arrow-left" /> {labels.index}</a>
+
+    <div class="postnav__rule" aria-hidden="true"><span class="postnav__node"></span></div>
+
+    <a class="postnav__index" href={indexHref}>
+      <Icon name="lucide:layout-grid" /> {labels.index}
+    </a>
   </div>
 </nav>
 
 <style>
   .postnav { padding-block: var(--space-7); }
-  .postnav__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
-  .postnav__item {
-    display: flex; flex-direction: column; gap: var(--space-2);
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    transition: border-color var(--duration-base) var(--ease-out-expo);
+
+  .postnav__grid {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-3);
+    min-width: 0;
   }
-  a.postnav__item:hover { border-color: var(--border-accent); }
+
+  /* Panel-ruta translúcido: deja ver la atmósfera (no caja sólida plana). */
+  .postnav__item {
+    position: relative; min-width: 0;
+    display: flex; align-items: center; gap: var(--space-4);
+    background: color-mix(in srgb, var(--bg-card) 78%, transparent);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5); text-decoration: none;
+    transition: border-color var(--duration-base) var(--ease-out-expo),
+                background var(--duration-base) var(--ease-out-expo);
+  }
+  a.postnav__item:hover { border-color: var(--border-accent); background: var(--bg-card); }
+  a.postnav__item:focus-visible {
+    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-color: var(--border-accent);
+  }
   .postnav__item--empty { display: none; }
+
+  /* Flecha-chip direccional: ancla la dirección y se desplaza al hover. */
+  .postnav__chip {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
+    color: var(--accent-gold);
+    transition: transform var(--duration-base) var(--ease-out-expo),
+                background var(--duration-fast) var(--ease-out-expo);
+  }
+  .postnav__chip :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
+  .postnav__item--prev:hover .postnav__chip,
+  .postnav__item--prev:focus-visible .postnav__chip { transform: translateX(-3px); }
+  .postnav__item--next:hover .postnav__chip,
+  .postnav__item--next:focus-visible .postnav__chip { transform: translateX(3px); }
+
+  .postnav__txt { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1; }
   .postnav__dir {
-    display: inline-flex; align-items: center; gap: var(--space-2);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-gold);
   }
-  .postnav__dir :global(svg) { width: 14px; height: 14px; }
-  .postnav__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
+  .postnav__title {
+    font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug);
+    /* No deja crecer la fila a 3+ renglones: máximo 2 líneas. */
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
   .postnav__item--next { text-align: right; }
-  .postnav__item--next .postnav__dir { justify-content: flex-end; }
+
+  /* Filete de constelación + nodo, separa las rutas del "volver al índice". */
+  .postnav__rule {
+    position: relative; height: 1px; margin: var(--space-6) auto var(--space-4);
+    max-width: 220px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold-line), transparent);
+  }
+  .postnav__node {
+    position: absolute; inset-inline-start: 50%; inset-block-start: 50%;
+    width: 4px; height: 4px; border-radius: var(--radius-pill);
+    background: var(--accent-gold); transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-gold), transparent 82%);
+  }
+
+  /* Acción terciaria: volver al índice (mono, discreta). */
   .postnav__index {
     display: flex; align-items: center; justify-content: center; gap: var(--space-2);
-    margin-top: var(--space-4); min-height: var(--tap-min);
+    min-height: var(--tap-min);
     font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
-    color: var(--fg-secondary); transition: color var(--duration-fast);
+    color: var(--fg-secondary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
   }
-  .postnav__index :global(svg) { width: 15px; height: 15px; }
+  .postnav__index :global(svg) { width: 15px; height: 15px; stroke-width: 1.5; color: var(--accent-teal); }
   .postnav__index:hover { color: var(--accent-gold); }
+  .postnav__index:focus-visible {
+    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: var(--radius-sm);
+    color: var(--fg-primary);
+  }
 
   @media (--sm) {
     .postnav__grid { grid-template-columns: 1fr 1fr; gap: var(--space-4); }
     .postnav__item--empty { display: block; background: transparent; border-color: transparent; }
+  }
+
+  @media (--motion-reduce) {
+    .postnav__item,
+    .postnav__chip { transition: none; }
+    .postnav__item--prev:hover .postnav__chip,
+    .postnav__item--next:hover .postnav__chip { transform: none; }
   }
 </style>

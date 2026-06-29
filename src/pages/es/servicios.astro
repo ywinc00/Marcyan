@@ -18,6 +18,7 @@ import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { priceServices, offerItems } from '../../i18n/pricing';
@@ -41,6 +42,7 @@ const c = content.es;
 
   <main id="main">
     <LandingHero
+      variant="header"
       kicker={s.hero.kicker}
       h1={s.hero.h1}
       sub={s.hero.sub}
@@ -71,6 +73,10 @@ const c = content.es;
     />
 
     <Contact contact={c.contact} />
+
+    {/* Atmósfera de la home (§1): una sola capa fija oro/teal + estrellas, para que
+        el hub no se vea como una losa plana de --bg-base. tone="gold" = acento del hub. */}
+    <SpaceBackdrop tone="gold" />
   </main>
 
   <SiteFooter footer={c.footer} />

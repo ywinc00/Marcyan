@@ -25,6 +25,7 @@ import Faq from './sections/Faq.astro';
 import CtaBand from './sections/CtaBand.astro';
 import RelatedLinks from './sections/RelatedLinks.astro';
 import Contact from './sections/Contact.astro';
+import SpaceBackdrop from './SpaceBackdrop.astro';
 import ServiceLd from './seo/ServiceLd.astro';
 import { content } from '../i18n/content';
 import { clusterNav, type ClusterPage } from '../i18n/clusters';
@@ -123,6 +124,9 @@ const relatedTone: 'gold' | 'teal' =
 
     <Contact contact={c.contact} defaultCity={defaultCity} defaultService={defaultService} />
   </main>
+
+  {/* Atmósfera espacial de página (mismo lenguaje visual que la home) — detrás de todo. */}
+  <SpaceBackdrop tone={relatedTone} />
 
   <SiteFooter footer={c.footer} />
 </Layout>

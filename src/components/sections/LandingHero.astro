@@ -1,8 +1,13 @@
 ---
-// Hero de landing de cluster (servicio+ciudad / wedge). Enfocado y ligero:
-// badge de ciudad + H1 con keyword + subtítulo de dolor/beneficio + 1-2 CTA.
-// Sin motor planetario (eso es solo la home); aquí, acento de gradiente estático.
-// tone: gold (servicios/ciudad) | teal (IA).
+// Hero de landing / Header de sección.
+//  · variant 'landing' (DEFAULT): hero potente de aterrizaje — jerarquía clara,
+//    acento de gradiente vivo en esquina, chips de prueba como telemetría mono, y un
+//    motivo orbital line-art (SVG inline, aria-hidden) a la derecha que ECO-a la home
+//    sin ser su motor planetario (es estático, respeta reduced-motion).
+//  · variant 'header' (ADITIVO): header COMPACTO para hubs de sección (DESIGN.md §2):
+//    menos padding vertical, sin 90vh, motivo orbital reducido a un filete de telemetría.
+// Conserva contrato: badge, badgeIcon, kicker, h1 (set:html), sub, primary, secondary,
+// chips, tone (gold|teal). Slot "breadcrumb" arriba. Sin motor planetario (solo la home).
 import Badge from '../ui/Badge.astro';
 import Button from '../ui/Button.astro';
 import Kicker from '../ui/Kicker.astro';
@@ -18,68 +23,163 @@ interface Props {
   secondary?: { label: string; href: string };
   chips?: string[];
   tone?: 'gold' | 'teal';
+  variant?: 'landing' | 'header';
 }
-const { badge, badgeIcon, kicker, h1, sub, primary, secondary, chips = [], tone = 'gold' } = Astro.props;
+const {
+  badge, badgeIcon, kicker, h1, sub, primary, secondary,
+  chips = [], tone = 'gold', variant = 'landing',
+} = Astro.props;
+const uid = 'lh' + Math.random().toString(36).slice(2, 7);
 ---
-<section class:list={['l-hero', `l-hero--${tone}`]}>
+<section class:list={['l-hero', `l-hero--${tone}`, `l-hero--${variant}`]}>
   <div class="container l-hero__inner">
-    <slot name="breadcrumb" />
-    {badge && (
-      <Badge variant={tone}>
-        {badgeIcon && <Icon name={badgeIcon} />}
-        {badge}
-      </Badge>
-    )}
-    {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
-    <h1 class="display l-hero__h1" set:html={h1} />
-    <p class="lead l-hero__sub">{sub}</p>
-    <div class="l-hero__cta">
-      <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
-      {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
+    <div class="l-hero__main">
+      <slot name="breadcrumb" />
+
+      <div class="l-hero__eyebrow">
+        {badge && (
+          <Badge variant={tone}>
+            {badgeIcon && <Icon name={badgeIcon} />}
+            {badge}
+          </Badge>
+        )}
+        {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
+      </div>
+
+      <h1 class="display l-hero__h1" set:html={h1} />
+      <p class="lead l-hero__sub">{sub}</p>
+
+      <div class="l-hero__cta">
+        <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
+        {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
+      </div>
+
+      {chips.length > 0 && (
+        <ul class="l-hero__chips" aria-label="Puntos clave">
+          {chips.map((ch) => (
+            <li><span class="l-hero__chip-dot" aria-hidden="true"></span>{ch}</li>
+          ))}
+        </ul>
+      )}
     </div>
-    {chips.length > 0 && (
-      <ul class="l-hero__chips" aria-label="Puntos clave">
-        {chips.map((ch) => (
-          <li><Icon name="lucide:check" /> {ch}</li>
-        ))}
-      </ul>
-    )}
+
+    {/* Motivo orbital line-art — eco de la home, NO su motor. Decorativo, estático. */}
+    <div class="l-hero__aside" aria-hidden="true">
+      <svg class="l-hero__orbit" viewBox="0 0 320 320" role="presentation" focusable="false">
+        <defs>
+          <radialGradient id={`${uid}-core`} cx="42%" cy="38%" r="64%">
+            <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.55" />
+            <stop offset="60%" stop-color="var(--accent-gold-deep)" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="var(--planet-core)" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        {/* anillos orbitales (line-art, baja opacidad) */}
+        <ellipse class="l-hero__ring l-hero__ring--1" cx="160" cy="160" rx="148" ry="64" transform="rotate(-18 160 160)" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
+        <ellipse class="l-hero__ring l-hero__ring--2" cx="160" cy="160" rx="116" ry="116" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
+        {/* núcleo difuso */}
+        <circle cx="160" cy="160" r="58" fill={`url(#${uid}-core)`} />
+        <circle cx="160" cy="160" r="58" fill="none" stroke="var(--accent-gold-line)" stroke-width="1" />
+        {/* nodos = puntos de dato (oro/teal) */}
+        <circle class="l-hero__node l-hero__node--gold" cx="296" cy="105" r="4.5" fill="var(--accent-gold)" />
+        <circle class="l-hero__node l-hero__node--teal" cx="32" cy="208" r="5.5" fill="var(--accent-teal)" />
+        <circle class="l-hero__node l-hero__node--gold" cx="160" cy="44" r="3.5" fill="var(--accent-gold)" />
+      </svg>
+    </div>
   </div>
 </section>
 
 <style>
+  /* ── base ─────────────────────────────────────────────── */
   .l-hero {
-    position: relative; isolation: isolate; overflow: hidden;
-    padding-block: calc(var(--nav-h) + var(--space-8)) var(--section-gap);
+    position: relative; isolation: isolate; overflow: clip;
+    padding-block: calc(var(--nav-h) + var(--space-7)) var(--section-gap);
   }
+  /* acento de gradiente vivo: glow del tono en la esquina del aside + profundidad inferior */
   .l-hero::before {
     content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background:
-      radial-gradient(70% 90% at 85% 0%, var(--glow), transparent 60%),
-      radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, var(--accent-teal), transparent 90%), transparent 55%);
+      radial-gradient(64% 72% at 88% 8%, var(--glow), transparent 60%),
+      radial-gradient(48% 60% at 4% 96%, color-mix(in srgb, var(--accent-teal), transparent 90%), transparent 58%),
+      radial-gradient(120% 80% at 50% 120%, rgba(0, 0, 0, 0.5), transparent 60%);
   }
-  .l-hero--gold { --glow: var(--accent-gold-glow); }
-  .l-hero--teal { --glow: color-mix(in srgb, var(--accent-teal), transparent 75%); }
+  .l-hero--gold { --glow: var(--accent-gold-glow); --node-accent: var(--accent-gold); }
+  .l-hero--teal { --glow: color-mix(in srgb, var(--accent-teal), transparent 72%); --node-accent: var(--accent-teal); }
   .l-hero--teal :global(.display em) { color: var(--accent-teal); font-style: normal; }
   .l-hero--gold :global(.display em) { color: var(--accent-gold); font-style: normal; }
 
-  .l-hero__inner { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
-  .l-hero__h1 { max-width: 18ch; }
-  .l-hero__sub { max-width: 60ch; }
+  .l-hero__inner {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-7); align-items: center;
+  }
+  .l-hero__main {
+    display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5);
+    min-width: 0; max-width: 42rem;
+  }
+
+  /* badge + kicker en una fila de "encabezado" cuando caben */
+  .l-hero__eyebrow {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4);
+  }
+
+  .l-hero__h1 { max-width: 18ch; margin-block: calc(var(--space-1) * -1) 0; }
+  .l-hero__sub { max-width: 58ch; color: var(--fg-secondary); }
   .l-hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-2); }
 
+  /* chips de prueba = telemetría (mono, con punto de señal, filete superior) */
   .l-hero__chips {
     list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
-    margin-top: var(--space-4);
+    margin-top: var(--space-3); padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle); width: 100%;
   }
   .l-hero__chips li {
-    display: inline-flex; align-items: center; gap: var(--space-2);
+    display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0;
     font-family: var(--font-mono); font-size: var(--text-xs);
     letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
   }
-  .l-hero__chips :global(svg) { width: 15px; height: 15px; color: var(--accent-teal); flex: 0 0 auto; }
+  .l-hero__chip-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--node-accent); box-shadow: 0 0 8px var(--node-accent);
+  }
 
+  /* ── motivo orbital (aside) ───────────────────────────── */
+  .l-hero__aside { display: none; }
+  .l-hero__orbit { display: block; width: 100%; height: auto; overflow: visible; }
+  .l-hero__ring { opacity: 0.22; }
+  .l-hero__ring--2 { opacity: 0.12; }
+  .l-hero__node { opacity: 0.9; }
+  /* rotación lentísima del sistema (un solo elemento, barato); off en reduced-motion */
+  @media (--motion-ok) {
+    .l-hero__orbit { transform-box: view-box; transform-origin: 160px 160px; animation: lh-spin 90s linear infinite; }
+    .l-hero__node--teal { animation: lh-pulse 3.6s ease-in-out infinite; }
+  }
+  @keyframes lh-spin { to { transform: rotate(360deg); } }
+  @keyframes lh-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+  /* ── variant: header (compacto, hubs de sección) ──────── */
+  .l-hero--header { padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-8); }
+  .l-hero--header .l-hero__h1 { max-width: 22ch; }
+  .l-hero--header .l-hero__aside { display: none !important; }
+
+  /* ── ≥ md: telemetría más holgada ─────────────────────── */
   @media (--md) {
     .l-hero__cta { gap: var(--space-4); }
+    .l-hero__chips { gap: var(--space-3) var(--space-6); }
+  }
+
+  /* ── ≥ lg: hero de aterrizaje en 2 columnas con motivo orbital ── */
+  @media (--lg) {
+    .l-hero--landing { padding-block: calc(var(--nav-h) + var(--space-8)) var(--section-gap); }
+    .l-hero--landing .l-hero__inner {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-8); align-items: center;
+    }
+    .l-hero--landing .l-hero__aside {
+      display: block; justify-self: end; width: 100%; max-width: 380px; min-width: 0;
+    }
+    /* el header NO clona la portada: nunca expande a 2 columnas ni muestra el motivo */
+    .l-hero--header .l-hero__inner { grid-template-columns: 1fr; }
+  }
+
+  @media (--motion-reduce) {
+    .l-hero__orbit, .l-hero__node--teal { animation: none; }
   }
 </style>

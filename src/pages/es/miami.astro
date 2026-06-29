@@ -1,12 +1,19 @@
 ---
-// HUB DE CIUDAD · /es/miami — nodo del silo geográfico (Ola 2 · B3).
-// Presenta Miami + enlaza a los servicios ×Miami. Reusa los componentes del DS
-// (patrón /es/houston). Schema: ItemList de los servicios + BreadcrumbList. El
-// @graph base ya da la ProfessionalService de Miami. ES por ahora (hasEn=false).
+// HUB DE CIUDAD · /es/miami — LANDING PRINCIPAL de Miami (Ola 2 · B3).
+// Espejo de Houston en FUERZA: página POTENTE nivel home (DESIGN.md §2/§5).
+// Hero de aterrizaje (variant 'landing') + un SHOWCASE de ciudad bespoke que
+// inyecta identidad local (palmera/skyline + silueta FL + coords + tagline
+// "Magic City"), reusando el LENGUAJE visual de Locations.astro, y el conmutador
+// de servicios ×Miami. Luego: AnswerBlock (AEO), barrios, contexto local (Prose),
+// related, FAQ, CtaBand, Contact. Schema: ItemList de los servicios + Breadcrumb.
+// El @graph base ya da la ProfessionalService de Miami. ES por ahora (hasEn=false).
+// Honestidad DURA: SIN clientes locales en Miami → nada de proof de Miami aquí.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Kicker from '../../components/ui/Kicker.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
 import RelatedLinks from '../../components/sections/RelatedLinks.astro';
@@ -14,12 +21,21 @@ import Prose from '../../components/sections/Prose.astro';
 import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
-import { content } from '../../i18n/content';
+import { content, nap } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { miamiHub as h } from '../../i18n/miami';
 
 const c = content.es;
+const tel = nap.miami.replace(/[^\d+]/g, '');
+
+// Silueta de Florida — geográficamente correcta (misma fuente que Locations.astro,
+// GeoJSON público). Decorativa, aria-hidden.
+const FL_SHAPE = {
+  viewBox: '0 0 100 86.4',
+  path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z',
+};
 ---
 <Layout
   title={h.meta.title}
@@ -47,11 +63,74 @@ const c = content.es;
       <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
     </LandingHero>
 
+    {/* ── SHOWCASE DE CIUDAD (bespoke) ────────────────────────────────
+        Identidad local Miami (silueta FL + coords + "Magic City" + palmera)
+        a la izquierda, conmutador de servicios ×Miami a la derecha. Reusa el
+        lenguaje de Locations.astro pero es una pieza propia de esta landing,
+        para que NO se sienta una pila de paneles de enlaces. */}
+    <section class="section showcase" aria-labelledby="mia-showcase-title">
+      <div class="container showcase__inner">
+        <aside class="mia-id">
+          {/* palmera / skyline oficial — decorativo, esquina inferior */}
+          <div class="mia-id__illo" aria-hidden="true">
+            <img src="/assets/cities/miami.svg" alt="" loading="lazy" decoding="async" width="322" height="235" />
+          </div>
+
+          <div class="mia-id__body">
+            <div class="mia-id__top">
+              <span class="mia-id__pin"><Icon name="lucide:map-pin" /></span>
+              <span class="mia-id__badge"><span class="mia-id__badge-dot" aria-hidden="true"></span>Área de servicio</span>
+            </div>
+
+            <h2 class="mia-id__city" id="mia-showcase-title">Miami <span class="mia-id__state">FL</span></h2>
+            <p class="mia-id__tagline"><Icon name="lucide:waves" />Magic City</p>
+            <p class="mia-id__area">Miami y toda el área metropolitana de Miami-Dade.</p>
+
+            <div class="mia-id__pills">
+              <span class="mia-id__pill">
+                <svg class="mia-id__pill-ic" viewBox={FL_SHAPE.viewBox} aria-hidden="true"><path d={FL_SHAPE.path} fill="currentColor" /></svg>
+                Florida, USA
+              </span>
+              <span class="mia-id__pill"><Icon name="lucide:locate-fixed" class="mia-id__pill-ic" />25.7617° N, 80.1918° W</span>
+            </div>
+
+            <a class="mia-id__tel" href={`tel:${tel}`}>
+              <Icon name="lucide:phone" />{nap.miami}
+            </a>
+          </div>
+        </aside>
+
+        <div class="showcase__nav">
+          <header class="showcase__head">
+            <Kicker>{h.services.tag}</Kicker>
+            <h3 class="h3 showcase__title" set:html={h.services.title} />
+            <span class="showcase__count">{h.services.links.length} servicios · todo Miami-Dade</span>
+          </header>
+
+          <ul class="svc-switch" role="list">
+            {h.services.links.map((l, i) => (
+              <li class="svc-switch__row">
+                <a class="svc-switch__link" href={l.href}>
+                  <span class="svc-switch__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span class:list={['svc-switch__chip', l.icon === 'marcyan-ai' && 'svc-switch__chip--brand']}>
+                    <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+                  </span>
+                  <span class="svc-switch__txt">
+                    <span class="svc-switch__label">{l.label}</span>
+                    <span class="svc-switch__desc">{l.desc}</span>
+                  </span>
+                  <Icon name="lucide:arrow-right" class="svc-switch__go" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
-    <RelatedLinks tag={h.services.tag} title={h.services.title} links={h.services.links} />
-
-    <RelatedLinks tag={h.barrios.tag} title={h.barrios.title} links={h.barrios.links} />
+    <RelatedLinks tag={h.barrios.tag} title={h.barrios.title} links={h.barrios.links} tone="teal" />
 
     <Prose
       tag={h.local.tag}
@@ -75,5 +154,169 @@ const c = content.es;
     <Contact contact={c.contact} defaultCity="Miami, FL" />
   </main>
 
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* ════════════════════════════════════════════════════════════════
+     SHOWCASE DE CIUDAD — pieza bespoke (solo de esta página).
+     Tarjeta de identidad Miami (silueta FL + coords + palmera) + el
+     conmutador de servicios. Lenguaje visual heredado de Locations.astro,
+     solo con tokens del DS. Flota sobre la atmósfera SpaceBackdrop.
+     ════════════════════════════════════════════════════════════════ */
+  .showcase :global(em) { color: var(--accent-gold); font-style: normal; }
+
+  .showcase__inner {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-5);
+    align-items: stretch; min-width: 0;
+  }
+
+  /* ── Tarjeta de identidad ──────────────────────────────────────── */
+  .mia-id {
+    position: relative; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column;
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 58%),
+      var(--bg-card);
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+  /* palmera/skyline oficial — esquina inferior derecha, difuminada hacia la izq.
+     El PNG/SVG ya viene en oro a baja opacidad; mix-blend lighten colapsa su lavado
+     oscuro al color de la tarjeta (igual que Locations.astro). */
+  .mia-id__illo {
+    position: absolute; right: 0; bottom: 0;
+    width: clamp(180px, 56%, 300px); pointer-events: none; z-index: 0;
+    -webkit-mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
+    mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
+  }
+  .mia-id__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
+
+  .mia-id__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .mia-id__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .mia-id__pin {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  }
+  .mia-id__pin :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .mia-id__badge {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-teal);
+  }
+  .mia-id__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); flex: 0 0 auto; }
+
+  .mia-id__city { font-family: var(--font-display); font-size: var(--fluid-h2); font-weight: 600; line-height: 1.04; letter-spacing: var(--tracking-tight); }
+  .mia-id__state { color: var(--fg-secondary); }
+  .mia-id__tagline {
+    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    color: var(--accent-gold); margin-top: calc(var(--space-1) * -1);
+  }
+  .mia-id__tagline :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
+  .mia-id__area { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); max-width: 34ch; }
+
+  .mia-id__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .mia-id__pill {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
+  }
+  .mia-id__pill :global(.mia-id__pill-ic),
+  .mia-id__pill .mia-id__pill-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+
+  .mia-id__tel {
+    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+    margin-top: var(--space-2); min-height: var(--tap-min);
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .mia-id__tel :global(svg) { width: 15px; height: 15px; stroke-width: 1.5; flex: 0 0 auto; }
+  .mia-id__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
+
+  /* ── Conmutador de servicios ───────────────────────────────────── */
+  .showcase__nav {
+    position: relative; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column;
+    background:
+      radial-gradient(120% 90% at 0% 0%, var(--accent-gold-dim), transparent 60%),
+      color-mix(in srgb, var(--bg-card) 72%, transparent);
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: var(--space-6);
+  }
+  .showcase__head {
+    display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5);
+  }
+  .showcase__title { font-family: var(--font-display); line-height: var(--leading-snug); max-width: 22ch; }
+  .showcase__count {
+    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
+  }
+
+  .svc-switch {
+    list-style: none; display: grid; grid-template-columns: 1fr; gap: 2px;
+    border-top: 1px solid var(--border-subtle); margin: 0; padding: 0;
+  }
+  .svc-switch__row { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
+  .svc-switch__link {
+    color: inherit; text-decoration: none;
+    display: flex; align-items: center; gap: var(--space-4);
+    min-height: 60px; padding: var(--space-3) var(--space-2);
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--ease-out-expo);
+  }
+  .svc-switch__link:hover { background: var(--bg-elevated); }
+  .svc-switch__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+
+  .svc-switch__idx {
+    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
+    transition: color var(--duration-fast);
+  }
+  .svc-switch__link:hover .svc-switch__idx,
+  .svc-switch__link:focus-visible .svc-switch__idx { color: var(--accent-gold); }
+
+  .svc-switch__chip {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--radius-md);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  }
+  .svc-switch__chip :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  /* la insignia de marca (marcyan-ai, filled) SIEMPRE oro — ya lo es aquí, pero el
+     comentario fija la intención por si cambia el acento de la sección. */
+  .svc-switch__chip--brand { color: var(--accent-gold); }
+
+  .svc-switch__txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .svc-switch__label { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
+  .svc-switch__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+
+  .svc-switch__go {
+    flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle);
+    transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
+  }
+  .svc-switch__link:hover .svc-switch__go,
+  .svc-switch__link:focus-visible .svc-switch__go { color: var(--accent-gold); transform: translateX(4px); }
+
+  @media (--motion-reduce) {
+    .svc-switch__link:hover .svc-switch__go,
+    .svc-switch__link:focus-visible .svc-switch__go { transform: none; }
+  }
+
+  @media (--md) {
+    .mia-id, .showcase__nav { padding: var(--space-7); }
+    .showcase__head { margin-bottom: var(--space-6); }
+  }
+
+  /* ≥ lg: showcase en 2 columnas (identidad estrecha + conmutador ancho) */
+  @media (--lg) {
+    .showcase__inner {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

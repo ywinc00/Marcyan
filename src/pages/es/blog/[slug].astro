@@ -19,6 +19,7 @@ import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
 import CtaBand from '../../../components/sections/CtaBand.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ArticleLd from '../../../components/seo/ArticleLd.astro';
+import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
 import { content } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
 import { postChrome } from '../../../i18n/blog';
@@ -57,6 +58,11 @@ const readingLabel = `${readingMin} ${postChrome.readingSuffix}`;
 const ogImage = d.ogImage ?? '/assets/og/og-default.png';
 const crumbs = [...postChrome.root, { name: d.title, path: slugPath }];
 const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
+
+// La ToC solo se monta con ≥3 H2 (mismo umbral que ArticleToc). Cuando existe, la
+// lectura usa una grilla [ToC sticky | cuerpo]; si no, el cuerpo va a una sola columna.
+const tocItems = headings.filter((h) => h.depth === 2);
+const hasToc = tocItems.length >= 3;
 ---
 <Layout
   title={`${d.title} | Marcyan Studio`}
@@ -96,9 +102,19 @@ const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
 
     <AnswerBlock q={d.answer.q} a={d.answer.a} source={d.answer.source} />
 
-    <ArticleToc headings={headings} label={postChrome.toc} />
-
-    <Article><Content /></Article>
+    {/* Lectura: en desktop la ToC pegajosa acompaña la columna del artículo. */}
+    <section class="section reader">
+      <div class="container">
+        <div class:list={['reader__grid', hasToc && 'reader__grid--toc']}>
+          {hasToc && (
+            <aside class="reader__aside">
+              <ArticleToc headings={headings} label={postChrome.toc} />
+            </aside>
+          )}
+          <Article><Content /></Article>
+        </div>
+      </div>
+    </section>
 
     {d.faq.length > 0 && (
       <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
@@ -121,5 +137,26 @@ const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
     <Contact contact={c.contact} />
   </main>
 
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* Zona de lectura: ritmo más ceñido que una sección completa (la energía va al texto). */
+  .reader { padding-block: var(--space-7); }
+  .reader__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-6); min-width: 0; }
+
+  /* En móvil la ToC (details) va arriba del cuerpo, ocupando el ancho. */
+  .reader__aside { min-width: 0; }
+
+  @media (--lg) {
+    /* Desktop: aside de ToC pegajosa + columna de lectura. La medida del cuerpo la
+       controla Article (max 72ch); la columna 1fr le deja respirar a la derecha. */
+    .reader__grid--toc {
+      grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+  }
+</style>

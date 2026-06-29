@@ -1,0 +1,170 @@
+---
+// ─────────────────────────────────────────────────────────────
+// SpaceBackdrop — ATMÓSFERA DE PÁGINA (el "fondo de la home" para todo el sitio).
+//
+// Por qué existe: las secciones del sitio (.section) NO pintan fondo propio →
+// muestran lo que haya detrás del contenido. En la home, ese "detrás" lo llenan
+// los StarField por sección + la viñeta del hero. En las landings/secciones no
+// había nada → se veían como losas planas de --bg-base. Este componente pone UNA
+// capa fija, a pantalla completa, con los mismos glows oro/teal + estrellas a la
+// deriva, de modo que CUALQUIER página adopta el lenguaje espacial de la home sin
+// tocar una sola sección. Las tarjetas (--bg-card) siguen opacas y flotan encima.
+//
+//  · Capa fija (no scrollea): ambiente anclado al viewport → cada posición de
+//    scroll se ve intencional (premium), nunca un bloque sólido.
+//  · z-index:-1: detrás del contenido, delante del color base del body.
+//  · Progresivo: sin JS solo quedan los gradientes (igual de válido). El canvas de
+//    estrellas es realce.
+//  · reduced-motion: estrellas quietas (un fotograma), sin fugaces.
+//  · Rendimiento: 1 solo canvas por página (no uno por sección), se pausa con la
+//    pestaña oculta y respeta DPR. Sin scroll-x (canvas fijo, inset:0).
+//
+// Uso: incluir UNA vez por página (al final del <main> o tras él). Props:
+//   tone="gold"|"teal" (glow dominante) · density (mult. de estrellas, def 1).
+// ─────────────────────────────────────────────────────────────
+interface Props { tone?: 'gold' | 'teal'; density?: number }
+const { tone = 'gold', density = 1 } = Astro.props;
+---
+<div class:list={['sky', `sky--${tone}`]} data-sky data-sky-density={density} aria-hidden="true">
+  <canvas class="sky__canvas" data-sky-canvas></canvas>
+</div>
+
+<style>
+  .sky {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    /* Glows oro/teal + viñeta inferior — eco directo de la viñeta del hero de la home.
+       Anclados al viewport para enmarcar cualquier scroll. Muy sutiles (no compiten). */
+    background:
+      radial-gradient(58% 48% at 50% -8%,  var(--sky-1), transparent 60%),
+      radial-gradient(46% 42% at 100% 104%, var(--sky-2), transparent 60%),
+      radial-gradient(40% 38% at 0% 88%,    var(--sky-3), transparent 62%),
+      radial-gradient(120% 90% at 50% 128%, rgba(0, 0, 0, 0.55), transparent 60%);
+  }
+  /* tono dominante: oro arriba + teal de apoyo abajo-dcha (def) o al revés (teal) */
+  .sky--gold { --sky-1: var(--accent-gold-dim); --sky-2: var(--accent-teal-dim); --sky-3: rgba(200, 169, 110, 0.06); }
+  .sky--teal { --sky-1: var(--accent-teal-dim); --sky-2: var(--accent-gold-dim); --sky-3: rgba(79, 195, 161, 0.06); }
+
+  .sky__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Sin JS / reduced-motion el canvas queda vacío; los gradientes ya dan el ambiente. */
+  @media (--motion-reduce) { .sky__canvas { opacity: 0.85; } }
+</style>
+
+<script>
+  // Campo estelar a pantalla completa (1 canvas fijo). Inspirado en StarField pero
+  // para una sola capa de viewport. Progresivo + reduced-motion + pausa por pestaña.
+  const root = document.querySelector<HTMLElement>('[data-sky]');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-sky-canvas]') ?? null;
+  const ctx = canvas?.getContext('2d') ?? null;
+  if (root && canvas && ctx) {
+    const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cs = getComputedStyle(document.documentElement);
+    const tone = root.classList.contains('sky--teal') ? 'teal' : 'gold';
+    const rgbStar = (cs.getPropertyValue('--star-rgb').trim() || '240, 237, 232');
+    const rgbAcc = tone === 'teal'
+      ? (cs.getPropertyValue('--accent-teal-rgb').trim() || '79, 195, 161')
+      : (cs.getPropertyValue('--accent-gold-rgb').trim() || '200, 169, 110');
+    const density = parseFloat(root.dataset.skyDensity || '1') || 1;
+    const TAU = Math.PI * 2;
+
+    interface Star { x: number; y: number; r: number; base: number; amp: number; sp: number; ph: number; drift: number; acc: boolean; }
+    interface Shooter { x: number; y: number; vx: number; vy: number; life: number; max: number; len: number; }
+
+    let W = 0, H = 0, DPR = 1, t0 = 0, prev = 0, nextShoot = 0, raf = 0, running = false;
+    let stars: Star[] = [], shooters: Shooter[] = [];
+
+    function resize() {
+      DPR = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(1, window.innerWidth);
+      H = Math.max(1, window.innerHeight);
+      canvas!.width = W * DPR; canvas!.height = H * DPR;
+      ctx!.setTransform(DPR, 0, 0, DPR, 0, 0);
+      seed(); staticDraw();
+    }
+    function seed() {
+      const per = 9; // estrellas por megapíxel — pocas y sutiles
+      const count = Math.round((W * H / 1e6) * per * density);
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * W, y: Math.random() * H,
+          r: Math.random() * 1.0 + 0.4,
+          base: Math.random() * 0.18 + 0.04,
+          amp: Math.random() * 0.26 + 0.10,
+          sp: Math.random() * 0.0008 + 0.0003,
+          ph: Math.random() * TAU,
+          drift: (Math.random() - 0.5) * 0.008,
+          acc: Math.random() < 0.16, // ~1 de cada 6 estrellas lleva el tinte de acento
+        });
+      }
+    }
+    function scheduleShoot(now: number) {
+      if (REDUCE) { nextShoot = Infinity; return; }
+      const base = 16000; // "de vez en cuando"
+      nextShoot = now + base * (0.7 + Math.random() * 1.2);
+    }
+    function spawnShoot() {
+      const fromLeft = Math.random() < 0.5;
+      const y = Math.random() * H * 0.5 + H * 0.04;
+      const ang = (Math.random() * 0.16 + 0.10) * (fromLeft ? 1 : -1);
+      const speed = 0.45 + Math.random() * 0.30;
+      shooters.push({
+        x: fromLeft ? -30 : W + 30, y,
+        vx: (fromLeft ? 1 : -1) * Math.cos(ang) * speed,
+        vy: Math.sin(Math.abs(ang)) * speed,
+        life: 0, max: 800 + Math.random() * 500, len: 70 + Math.random() * 60,
+      });
+    }
+    function frame(now: number) {
+      let dt = prev ? now - prev : 16; prev = now; if (dt > 48) dt = 48;
+      ctx!.clearRect(0, 0, W, H);
+      for (const s of stars) {
+        const tw = s.base + s.amp * (0.5 + 0.5 * Math.sin((now - t0) * s.sp + s.ph));
+        s.x += s.drift; if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
+        ctx!.beginPath();
+        ctx!.fillStyle = `rgba(${s.acc ? rgbAcc : rgbStar},${tw.toFixed(3)})`;
+        ctx!.arc(s.x, s.y, s.r, 0, TAU); ctx!.fill();
+      }
+      if (now >= nextShoot) { if (shooters.length === 0) spawnShoot(); scheduleShoot(now); }
+      for (let i = shooters.length - 1; i >= 0; i--) {
+        const sh = shooters[i];
+        sh.life += dt; sh.x += sh.vx * dt * 0.9; sh.y += sh.vy * dt * 0.9;
+        const p = sh.life / sh.max;
+        const fade = p < 0.15 ? p / 0.15 : (p > 0.7 ? Math.max(0, (1 - p) / 0.3) : 1);
+        const tx = sh.x - sh.vx * sh.len, ty = sh.y - sh.vy * sh.len;
+        const g = ctx!.createLinearGradient(tx, ty, sh.x, sh.y);
+        g.addColorStop(0, `rgba(${rgbAcc},0)`);
+        g.addColorStop(1, `rgba(${rgbAcc},${(0.5 * fade).toFixed(3)})`);
+        ctx!.strokeStyle = g; ctx!.lineWidth = 1.4; ctx!.lineCap = 'round';
+        ctx!.beginPath(); ctx!.moveTo(tx, ty); ctx!.lineTo(sh.x, sh.y); ctx!.stroke();
+        if (p >= 1 || sh.x < -80 || sh.x > W + 80 || sh.y > H + 80) shooters.splice(i, 1);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    function staticDraw() {
+      ctx!.clearRect(0, 0, W, H);
+      for (const s of stars) {
+        ctx!.beginPath();
+        ctx!.fillStyle = `rgba(${s.acc ? rgbAcc : rgbStar},${(s.base + s.amp * 0.4).toFixed(3)})`;
+        ctx!.arc(s.x, s.y, s.r, 0, TAU); ctx!.fill();
+      }
+    }
+    function start() {
+      if (running || REDUCE) return;
+      running = true; t0 = performance.now(); prev = 0;
+      scheduleShoot(t0); raf = requestAnimationFrame(frame);
+    }
+    function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; }
+
+    resize();
+    if (!REDUCE) {
+      start();
+      document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
+      let rzT: number;
+      window.addEventListener('resize', () => {
+        clearTimeout(rzT);
+        rzT = window.setTimeout(resize, 160);
+      }, { passive: true });
+    }
+  }
+</script>

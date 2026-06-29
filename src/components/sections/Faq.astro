@@ -22,8 +22,10 @@ const ld = faqPage(items);
     </header>
 
     <div class="faq__list">
-      {items.map((it, i) => (
-        <details class="faq__item" open={i === 0}>
+      {/* Todas cerradas por defecto: ningún <details> lleva `open` (fix del bug de la
+          primera pregunta desplegada). El acordeón sigue siendo nativo y accesible. */}
+      {items.map((it) => (
+        <details class="faq__item">
           <summary class="faq__q">
             <span>{it.q}</span>
             <Icon name="lucide:plus" class="faq__icon" />

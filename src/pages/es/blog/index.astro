@@ -1,6 +1,8 @@
 ---
-// ÍNDICE DEL BLOG · /es/blog — lista las piezas en tarjetas (fecha, título,
-// extracto, etiqueta). Reusa el DS v2 (LandingHero, CtaBand, Contact, Card).
+// ÍNDICE DEL BLOG · /es/blog — "bitácora de la nave": header editorial COMPACTO
+// (LandingHero variant="header"), rail de CATEGORÍAS derivado de post.data.tags
+// (filtro por enriquecimiento progresivo: sin JS se ven todas), pieza DESTACADA
+// con micro-ilustración line-art + grid de entradas con jerarquía de log.
 // Schema: Blog (listado) + BreadcrumbList (del Breadcrumb). ES por ahora
 // (hasEn=false); /en/blog queda para la Ola 4.
 import Layout from '../../../layouts/Layout.astro';
@@ -13,6 +15,7 @@ import Contact from '../../../components/sections/Contact.astro';
 import Card from '../../../components/ui/Card.astro';
 import Kicker from '../../../components/ui/Kicker.astro';
 import Icon from '../../../components/ui/Icon.astro';
+import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
 import BlogListingLd from '../../../components/seo/BlogListingLd.astro';
 import { content } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
@@ -28,6 +31,26 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 
 const fmt = (d: Date) => new Intl.DateTimeFormat('es', { dateStyle: 'long', timeZone: 'UTC' }).format(d);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+// id estable por etiqueta (para data-cat / data-filter sin acentos ni espacios)
+const STRIP_DIACRITICS = /[̀-ͯ]/g;
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(STRIP_DIACRITICS, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+// CATEGORÍAS derivadas de los tags reales, con conteo, ordenadas por frecuencia.
+const catCount = new Map<string, number>();
+for (const p of posts) for (const t of p.data.tags) catCount.set(t, (catCount.get(t) ?? 0) + 1);
+const categories = [...catCount.entries()]
+  .sort((a, z) => z[1] - a[1] || a[0].localeCompare(z[0]))
+  .map(([label, count]) => ({ label, count, id: slugify(label) }));
+
+// cada post lleva su lista de ids de categoría (para el filtro por enriquecimiento)
+const withCats = posts.map((p) => ({ post: p, cats: p.data.tags.map(slugify) }));
 
 const postRefs = posts.map((p) => ({
   headline: p.data.title,
@@ -51,6 +74,7 @@ const postRefs = posts.map((p) => ({
       primary={b.hero.primary}
       secondary={b.hero.secondary}
       tone={b.hero.tone}
+      variant="header"
     >
       <Breadcrumb slot="breadcrumb" items={b.breadcrumb} lang="es" />
     </LandingHero>
@@ -65,21 +89,68 @@ const postRefs = posts.map((p) => ({
         {posts.length === 0 ? (
           <p class="bloglist__empty">{b.empty}</p>
         ) : (
-          <ul id="articulos" class="bloglist__grid">
-            {posts.map((p) => (
-              <li>
-                <Card href={`/es/blog/${p.id}`} class="postcard">
-                  <div class="postcard__meta">
-                    <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
-                    {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
-                  </div>
-                  <h3 class="postcard__title">{p.data.title}</h3>
-                  <p class="postcard__excerpt">{p.data.description}</p>
-                  <span class="postcard__cta">{b.cardCta} <Icon name="lucide:arrow-right" /></span>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <div class="bloglist__body" data-blog>
+            {/* ── Rail de categorías (filtro por enriquecimiento progresivo) ── */}
+            {categories.length > 1 && (
+              <nav class="catrail" aria-label="Filtrar por tema">
+                <span class="catrail__label" aria-hidden="true">Temas</span>
+                <ul class="catrail__list" role="list">
+                  <li>
+                    <button type="button" class="catchip is-active" data-filter="all" aria-pressed="true">
+                      <span class="catchip__dot" aria-hidden="true"></span>
+                      Todas
+                      <span class="catchip__count">{posts.length}</span>
+                    </button>
+                  </li>
+                  {categories.map((cat) => (
+                    <li>
+                      <button type="button" class="catchip" data-filter={cat.id} aria-pressed="false">
+                        <span class="catchip__dot" aria-hidden="true"></span>
+                        {cat.label}
+                        <span class="catchip__count">{cat.count}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
+            {/* mensaje cuando un filtro no deja resultados (oculto por defecto) */}
+            <p class="bloglist__none" data-blog-none hidden>No hay guías en este tema todavía.</p>
+
+            <ul id="articulos" class="bloglist__grid">
+              {withCats.map(({ post: p, cats }, i) => (
+                <li
+                  class:list={['bloglist__cell', i === 0 && 'bloglist__cell--feature']}
+                  data-post
+                  data-cats={cats.join(' ')}
+                >
+                  <Card href={`/es/blog/${p.id}`} class="postcard">
+                    {i === 0 && (
+                      <svg class="postcard__motif" viewBox="0 0 240 160" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+                        <circle class="postcard__motif-node" cx="186" cy="44" r="3" fill="var(--accent-teal)" />
+                        <circle cx="120" cy="80" r="34" fill="none" stroke="var(--accent-gold-line)" stroke-width="1" />
+                        <ellipse cx="120" cy="80" rx="88" ry="38" transform="rotate(-16 120 80)" fill="none" stroke="var(--accent-gold)" stroke-width="1" opacity="0.22" />
+                        <ellipse cx="120" cy="80" rx="56" ry="56" fill="none" stroke="var(--accent-gold)" stroke-width="1" opacity="0.12" />
+                        <circle cx="120" cy="80" r="9" fill="var(--accent-gold)" opacity="0.5" />
+                        <circle class="postcard__motif-node" cx="40" cy="118" r="3.5" fill="var(--accent-gold)" />
+                        <circle cx="206" cy="120" r="1.4" fill="var(--fg-primary)" opacity="0.3" />
+                        <circle cx="30" cy="40" r="1.1" fill="var(--fg-primary)" opacity="0.28" />
+                      </svg>
+                    )}
+                    <div class="postcard__meta">
+                      <span class="postcard__num" aria-hidden="true">{String(posts.length - i).padStart(2, '0')}</span>
+                      <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
+                      {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
+                    </div>
+                    <h3 class="postcard__title">{p.data.title}</h3>
+                    <p class="postcard__excerpt">{p.data.description}</p>
+                    <span class="postcard__cta">{b.cardCta} <Icon name="lucide:arrow-right" /></span>
+                  </Card>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>
@@ -96,25 +167,82 @@ const postRefs = posts.map((p) => ({
   </main>
 
   <SiteFooter footer={c.footer} />
+  <SpaceBackdrop tone="gold" />
 </Layout>
 
 <style>
-  .bloglist__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-7); }
+  .bloglist__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
   .bloglist :global(.h2 em) { color: var(--accent-gold); font-style: normal; }
   .bloglist__empty { color: var(--fg-secondary); font-size: var(--text-md); }
+  .bloglist__none { color: var(--fg-secondary); font-size: var(--text-md); margin-bottom: var(--space-6); }
 
+  /* ── rail de categorías = "selector de canal" mono, escaneable ── */
+  .catrail {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
+    margin-bottom: var(--space-7); padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .catrail__label {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg-subtle);
+  }
+  .catrail__list { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); min-width: 0; }
+
+  .catchip {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    min-height: var(--tap-min); padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--border); border-radius: var(--radius-pill);
+    background: var(--bg-card); color: var(--fg-secondary);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-expo),
+                background var(--duration-fast) var(--ease-out-expo);
+  }
+  .catchip__dot {
+    width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--fg-subtle); transition: background var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  .catchip__count {
+    font-size: var(--text-xs); color: var(--fg-subtle); padding-left: var(--space-1);
+    border-left: 1px solid var(--border); margin-left: var(--space-1);
+  }
+  @media (--hover-fine) {
+    .catchip:hover { color: var(--fg-primary); border-color: var(--border-accent); }
+  }
+  .catchip:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .catchip.is-active {
+    color: var(--fg-inverse); background: var(--accent-gold); border-color: var(--accent-gold);
+  }
+  .catchip.is-active .catchip__dot { background: var(--fg-inverse); box-shadow: none; }
+  .catchip.is-active .catchip__count { color: var(--fg-inverse); border-left-color: color-mix(in srgb, var(--fg-inverse), transparent 75%); opacity: 0.75; }
+
+  /* ── grid de entradas ── */
   .bloglist__grid { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+  .bloglist__cell { min-width: 0; display: flex; }
+  /* post oculto por el filtro */
+  .bloglist__cell[hidden] { display: none; }
 
-  .postcard { display: flex; flex-direction: column; gap: var(--space-3); height: 100%; }
+  .postcard { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: var(--space-3); height: 100%; overflow: clip; }
+
+  /* numeral de bitácora */
+  .postcard__num {
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold);
+    letter-spacing: var(--tracking-wide); padding-right: var(--space-3);
+    border-right: 1px solid var(--border); margin-right: var(--space-1);
+  }
   .postcard__meta {
-    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4);
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3);
     font-family: var(--font-mono); font-size: var(--text-xs);
     letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
   }
-  .postcard__tag { color: var(--accent-gold); }
+  .postcard__tag {
+    color: var(--accent-teal); border: 1px solid var(--accent-teal-line);
+    border-radius: var(--radius-pill); padding: 2px var(--space-3);
+  }
   .postcard__title {
     font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600;
-    line-height: var(--leading-snug); color: var(--fg-primary);
+    line-height: var(--leading-snug); color: var(--fg-primary); text-wrap: balance;
   }
   .postcard__excerpt { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); }
   .postcard__cta {
@@ -124,7 +252,71 @@ const postRefs = posts.map((p) => ({
   .postcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
   .postcard:hover .postcard__cta :global(svg) { transform: translateX(3px); }
 
-  @media (--md) { .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); } }
-  @media (--lg) { .bloglist__grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (--motion-reduce) { .postcard:hover .postcard__cta :global(svg) { transform: none; } }
+  /* micro-ilustración line-art en la pieza destacada (decorativa) */
+  .postcard__motif {
+    position: absolute; inset-block-start: 0; inset-inline-end: 0; z-index: -1;
+    width: 240px; max-width: 60%; height: auto; opacity: 0.7; pointer-events: none;
+    -webkit-mask-image: radial-gradient(120% 120% at 100% 0%, #000 35%, transparent 78%);
+    mask-image: radial-gradient(120% 120% at 100% 0%, #000 35%, transparent 78%);
+  }
+  @media (--motion-ok) {
+    .postcard__motif-node { animation: blog-node-pulse 4s ease-in-out infinite; }
+  }
+  @keyframes blog-node-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+  @media (--md) {
+    .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+    /* la pieza destacada ocupa el ancho completo de la fila superior */
+    .bloglist__cell--feature { grid-column: 1 / -1; }
+    .bloglist__cell--feature .postcard__title { font-size: var(--text-2xl); max-width: 28ch; }
+    .bloglist__cell--feature .postcard__excerpt { max-width: 64ch; font-size: var(--text-md); }
+  }
+  @media (--lg) {
+    .bloglist__grid { grid-template-columns: repeat(3, 1fr); }
+    .bloglist__cell--feature .postcard { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: var(--space-7); }
+    .bloglist__cell--feature .postcard__meta { grid-column: 1; }
+    .bloglist__cell--feature .postcard__title,
+    .bloglist__cell--feature .postcard__excerpt,
+    .bloglist__cell--feature .postcard__cta { grid-column: 1; }
+    .bloglist__cell--feature .postcard__motif { max-width: 38%; }
+  }
+
+  @media (--motion-reduce) {
+    .postcard:hover .postcard__cta :global(svg) { transform: none; }
+    .postcard__motif-node { animation: none; }
+  }
 </style>
+
+<script>
+  // Filtro por TEMA — enriquecimiento progresivo. Sin JS: rail estático + todas las
+  // entradas visibles (los <button> simplemente no hacen nada). Con JS: alterna el
+  // atributo [hidden] de cada post según su data-cats; "Todas" reinicia.
+  const root = document.querySelector<HTMLElement>('[data-blog]');
+  if (root) {
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.catchip'));
+    const cells = Array.from(root.querySelectorAll<HTMLElement>('[data-post]'));
+    const none = root.querySelector<HTMLElement>('[data-blog-none]');
+
+    function apply(filter: string) {
+      let shown = 0;
+      for (const cell of cells) {
+        const cats = (cell.dataset.cats || '').split(' ');
+        const match = filter === 'all' || cats.includes(filter);
+        cell.hidden = !match;
+        if (match) shown++;
+      }
+      if (none) none.hidden = shown !== 0;
+    }
+
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        for (const c of chips) {
+          const on = c === chip;
+          c.classList.toggle('is-active', on);
+          c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        }
+        apply(chip.dataset.filter || 'all');
+      });
+    }
+  }
+</script>

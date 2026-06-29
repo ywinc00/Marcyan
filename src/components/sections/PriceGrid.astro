@@ -2,6 +2,13 @@
 // Grid de precios (Fase 0) — N tarjetas "desde $X + qué incluye + CTA".
 // Publicar precio = palanca AEO + confianza. Cada tarjeta lleva su tono (gold |
 // teal). Datos desde i18n/pricing (misma fuente que el OfferCatalog del schema).
+//
+// REDISEÑO "panel de control": numeral display grande con esquina de gradiente por
+// tono, "desde" como dato mono, badge --rec para lo mensual (conservado), y una
+// checklist con RITMO — las viñetas que son una escalera de niveles ("Nombre — $X",
+// generadas en pricing.ts) se parten en nombre + chip de precio mono; las viñetas
+// planas (p.ej. seo-ia.ts) caen a una fila de check normal. La tarjeta entera sigue
+// clicable (stretched-link en .pcard__cta::after, anclado en .pcard).
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import type { PriceService } from '../../i18n/pricing';
@@ -13,6 +20,15 @@ interface Props {
   items: PriceService[];
 }
 const { tag, title, intro, items } = Astro.props;
+
+// Parte una viñeta-escalera "Nombre — $123/mes" en { name, price }. Solo presentación:
+// el string original (copy/schema) no se altera; si no hay precio al final, price = null
+// y la fila se renderiza como check plano. Acepta "—" o " - " como separador.
+function splitTier(raw: string): { name: string; price: string | null } {
+  const m = raw.match(/^(.*?)\s+[—–-]\s+(\$[\d.,]+(?:\s*\/\s*mes)?|Gratis)\s*$/);
+  if (m) return { name: m[1].trim(), price: m[2].trim() };
+  return { name: raw, price: null };
+}
 ---
 <section class="section pgrid" id="precios" data-fx="gold">
   <div class="container">
@@ -25,8 +41,12 @@ const { tag, title, intro, items } = Astro.props;
     <div class="pgrid__grid">
       {items.map((s) => {
         const isMonthly = s.monthly === true || (s.displayUnit ?? '').includes('/mes');
+        const rows = s.includes.map(splitTier);
+        const isLadder = rows.some((r) => r.price !== null);
         return (
-        <article class:list={['pcard', `pcard--${s.tone}`]}>
+        <article class:list={['pcard', `pcard--${s.tone}`, { 'pcard--free': s.free }]}>
+          <span class="pcard__corner" aria-hidden="true"></span>
+
           <div class="pcard__top">
             <span class="pcard__icon"><Icon name={s.icon} /></span>
             <span class:list={['pcard__price', { 'pcard__price--monthly': isMonthly }]}>
@@ -37,13 +57,28 @@ const { tag, title, intro, items } = Astro.props;
                 : <span class="pcard__unit">{s.displayUnit}</span>}
             </span>
           </div>
-          <h3 class="pcard__name">{s.name}</h3>
-          <p class="pcard__tagline">{s.tagline}</p>
-          <ul class="pcard__features">
-            {s.includes.map((f) => (
-              <li><Icon name="lucide:check" /> <span>{f}</span></li>
+
+          <div class="pcard__id">
+            <h3 class="pcard__name">{s.name}</h3>
+            <p class="pcard__tagline">{s.tagline}</p>
+          </div>
+
+          <ul class:list={['pcard__features', { 'pcard__features--ladder': isLadder }]}>
+            {rows.map((r) => (
+              r.price !== null ? (
+                <li class="pcard__tier">
+                  <span class="pcard__tier-name">{r.name}</span>
+                  <span class="pcard__tier-price">{r.price}</span>
+                </li>
+              ) : (
+                <li class="pcard__feat">
+                  <Icon name="lucide:check" />
+                  <span>{r.name}</span>
+                </li>
+              )
             ))}
           </ul>
+
           <a class="pcard__cta" href={s.href}>
             <span>{s.ctaLabel}</span>
             <Icon name="lucide:arrow-right" />
@@ -61,29 +96,63 @@ const { tag, title, intro, items } = Astro.props;
 
   .pgrid__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 
+  /* ── Tarjeta-panel ───────────────────────────────────────────── */
   .pcard {
-    position: relative; /* ancla del stretched link del CTA */
-    min-width: 0; display: flex; flex-direction: column; gap: var(--space-3);
+    position: relative; overflow: hidden; /* ancla del stretched link + recorta el glow de esquina */
+    min-width: 0; display: flex; flex-direction: column; gap: var(--space-5);
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
     padding: var(--space-6); height: 100%;
-    transition: border-color var(--duration-base) var(--ease-out-expo);
+    transition: border-color var(--duration-base) var(--ease-out-expo),
+                box-shadow var(--duration-base) var(--ease-out-expo),
+                transform var(--duration-base) var(--ease-out-expo);
   }
-  .pcard:hover { border-color: var(--border-accent); }
-  .pcard--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); }
-  .pcard--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); }
+  .pcard--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); --tint-glow: var(--accent-gold-glow); }
+  /* OJO: --tint-glow debe ser un COLOR (se inyecta en text-shadow/box-shadow como color).
+     No existe token de glow teal → se usa --accent-teal-line (color teal, alfa .30, paralelo
+     al --accent-gold-glow del oro). Usar --shadow-teal aquí lo rompería: es un box-shadow completo. */
+  .pcard--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); --tint-glow: var(--accent-teal-line); }
 
+  /* Acento de esquina por tono — eco del svc-hero de la home, sutil (no fondo plano). */
+  .pcard__corner {
+    position: absolute; top: 0; right: 0; width: 60%; height: 50%;
+    background: radial-gradient(120% 120% at 100% 0%, var(--tint-dim), transparent 62%);
+    opacity: 0.6; pointer-events: none; z-index: 0;
+    transition: opacity var(--duration-base) var(--ease-out-expo);
+  }
+  .pcard > * { position: relative; z-index: 1; }
+
+  @media (--hover-fine) {
+    .pcard:hover { border-color: var(--tint-line); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+    .pcard:hover .pcard__corner { opacity: 1; }
+  }
+  /* foco por teclado del stretched-link → realza la tarjeta entera */
+  .pcard:focus-within { border-color: var(--tint-line); }
+
+  /* ── Cabecera: icono ◀ ▶ precio ───────────────────────────────── */
   .pcard__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
   .pcard__icon {
     display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
     width: 44px; height: 44px; border-radius: var(--radius-md);
     background: var(--tint-dim); border: 1px solid var(--tint-line); color: var(--tint);
+    transition: box-shadow var(--duration-base) var(--ease-out-expo);
   }
   .pcard__icon :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+  @media (--hover-fine) { .pcard:hover .pcard__icon { box-shadow: 0 0 0 4px var(--tint-dim); } }
 
-  .pcard__price { display: flex; flex-direction: column; align-items: flex-end; text-align: right; line-height: 1.1; }
-  .pcard__from { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--fg-secondary); }
-  .pcard__amt { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; color: var(--tint); }
+  /* Numeral DISPLAY grande, alineado a la derecha; "desde" como dato mono encima. */
+  .pcard__price { display: flex; flex-direction: column; align-items: flex-end; text-align: right; line-height: 1; gap: 2px; }
+  .pcard__from {
+    font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .pcard__amt {
+    font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 700;
+    letter-spacing: var(--tracking-tight); color: var(--tint);
+    text-shadow: 0 0 32px var(--tint-glow);
+  }
+  /* "Gratis" no es una cifra: mismo peso de display pero un punto más bajo, sin "$". */
+  .pcard--free .pcard__amt { font-size: var(--text-2xl); }
   .pcard__unit { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
   /* PRE-07: lo recurrente (/mes) se destaca con un badge para no compararlo con pago único. */
   .pcard__unit--rec {
@@ -94,28 +163,68 @@ const { tag, title, intro, items } = Astro.props;
     font-weight: 700; letter-spacing: var(--tracking-wide);
   }
 
-  .pcard__name { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; margin-top: var(--space-1); }
+  /* ── Identidad ────────────────────────────────────────────────── */
+  .pcard__id { display: flex; flex-direction: column; gap: var(--space-2); }
+  .pcard__name { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; line-height: var(--leading-snug); }
   .pcard__tagline { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  .pcard__features { list-style: none; display: grid; gap: var(--space-2); margin-top: var(--space-1); }
-  .pcard__features li { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-primary); min-width: 0; }
+  /* ── Checklist con ritmo ──────────────────────────────────────── */
+  .pcard__features { list-style: none; display: flex; flex-direction: column; }
+
+  /* Fila de FEATURE plana (check) — usada por viñetas sin precio (p.ej. seo-ia). */
+  .pcard__feat { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-primary); min-width: 0; padding-block: var(--space-2); }
+  .pcard__feat + .pcard__feat { border-top: 1px solid var(--border-subtle); }
   .pcard__features :global(svg) { width: 16px; height: 16px; color: var(--tint); flex: 0 0 auto; margin-top: 3px; }
 
+  /* Fila de NIVEL (escalera de precio): nombre a la izq, chip de precio mono a la der.
+     Marca de tic con filete vertical del tono → lee como "paso" de la escalera. */
+  .pcard__features--ladder { gap: 0; }
+  .pcard__tier {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+    min-width: 0; padding-block: var(--space-3); padding-left: var(--space-4);
+    position: relative;
+  }
+  .pcard__tier + .pcard__tier { border-top: 1px solid var(--border-subtle); }
+  /* tic/conector: punto del tono + filete que enlaza los pasos */
+  .pcard__tier::before {
+    content: ''; position: absolute; left: 3px; top: calc(50% - 3px);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--tint); box-shadow: 0 0 8px var(--tint-glow);
+  }
+  .pcard__features--ladder .pcard__tier:not(:last-child)::after {
+    content: ''; position: absolute; left: 5px; top: calc(50% + 4px); bottom: -3px;
+    width: 1px; background: var(--tint-line);
+  }
+  .pcard__tier-name { font-size: var(--text-sm); color: var(--fg-primary); min-width: 0; line-height: var(--leading-snug); }
+  .pcard__tier-price {
+    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+    color: var(--fg-secondary); white-space: nowrap;
+  }
+  /* el primer nivel es el ANCLA mostrada arriba → su precio se realza en el tono */
+  .pcard__tier:first-child .pcard__tier-name { font-weight: 600; color: var(--fg-primary); }
+  .pcard__tier:first-child .pcard__tier-price { color: var(--tint); }
+
+  /* ── CTA (stretched link) ─────────────────────────────────────── */
   .pcard__cta {
     /* sin position aquí: el ::after se ancla en .pcard (stretched link) */
     display: inline-flex; align-items: center; gap: var(--space-2);
     margin-top: auto; padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
     min-height: var(--tap-min);
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; color: var(--tint);
   }
   /* Servicios-F4 / PRE-06: stretched link — toda la tarjeta es clicable. */
-  .pcard__cta::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+  .pcard__cta::after { content: ''; position: absolute; inset: 0; z-index: 2; }
   /* El texto/ícono del CTA queda por encima del overlay para conservar su afordancia. */
-  .pcard__cta > * { position: relative; z-index: 2; }
+  .pcard__cta > * { position: relative; z-index: 3; }
   .pcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .pcard:hover .pcard__cta :global(svg) { transform: translateX(4px); }
+  @media (--hover-fine) { .pcard:hover .pcard__cta :global(svg) { transform: translateX(4px); } }
 
-  @media (--motion-reduce) { .pcard:hover .pcard__cta :global(svg) { transform: none; } }
+  @media (--motion-reduce) {
+    .pcard, .pcard__corner, .pcard__icon, .pcard__cta :global(svg) { transition: none; }
+    .pcard:hover { transform: none; }
+    .pcard:hover .pcard__cta :global(svg) { transform: none; }
+  }
   @media (--sm) { .pgrid__grid { grid-template-columns: repeat(2, 1fr); } }
   @media (--lg) { .pgrid__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); } }
 </style>

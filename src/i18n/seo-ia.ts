@@ -178,7 +178,7 @@ export const seoIaPage = {
     title: 'Aprende y compara',
     links: [
       { label: 'Guía: cómo aparecer en ChatGPT y Gemini', href: '/es/blog/como-aparecer-en-chatgpt-perplexity', desc: 'La guía paso a paso, si prefieres entender el cómo a fondo.', icon: 'lucide:book-open' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'La otra IA: un asistente que atiende a tus clientes 24/7.', icon: 'marcyan-ai' },
+      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'La otra IA: un asistente que atiende a tus clientes 24/7.', icon: 'lucide:messages-square' },
       { label: 'Precios y planes', href: '/es/precios', desc: 'Todos los servicios con su precio de arranque y qué incluyen.', icon: 'lucide:tag' },
       { label: 'Agencia en Houston', href: '/es/houston', desc: 'Todos nuestros servicios para negocios de Houston.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],

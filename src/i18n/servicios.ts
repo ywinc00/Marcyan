@@ -44,7 +44,7 @@ export const serviciosPage = {
     title: 'Cada servicio en <em>detalle</em>',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Landing, rediseño o sitio completo a medida, rápido y bilingüe.', icon: 'lucide:layout-template' },
-      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7.', icon: 'marcyan-ai' },
+      { label: 'IA para tu negocio', href: '/es/ia-para-pymes', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7.', icon: 'lucide:messages-square' },
       { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden a ti. Diagnóstico gratis.', icon: 'marcyan-ai' },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la búsqueda local de tu zona.', icon: 'lucide:search' },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'Catálogo, carrito y pagos seguros para vender en línea.', icon: 'lucide:shopping-bag' },

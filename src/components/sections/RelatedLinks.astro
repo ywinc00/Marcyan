@@ -85,21 +85,26 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
   .related__panel {
     position: relative; overflow: hidden; min-width: 0;
     background:
-      radial-gradient(120% 90% at 100% 0%, var(--tint-dim), transparent 60%),
+      radial-gradient(120% 90% at 100% 0%, var(--panel-wash, var(--tint-dim)), transparent 60%),
       color-mix(in srgb, var(--bg-card) 72%, transparent);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
   }
+  /* §8.3: el wash teal se lee más "verde" que el oro → se atenúa en teal (esquina limpia);
+     el acento teal queda en el borde/chip/índice nítidos, no en un lavado difuso. */
+  .related--teal .related__panel { --panel-wash: color-mix(in srgb, var(--tint-dim) 55%, transparent); }
 
   /* Constelación line-art — decorativa */
   .related__illo {
     position: absolute; top: var(--space-5); right: var(--space-5);
     width: clamp(140px, 32%, 220px); height: auto; pointer-events: none; z-index: 0;
-    color: var(--tint); opacity: 0.5;
+    color: var(--tint); opacity: var(--illo-opacity, 0.5);
     -webkit-mask-image: linear-gradient(245deg, #000 40%, transparent 92%);
     mask-image: linear-gradient(245deg, #000 40%, transparent 92%);
   }
+  /* §8.3: la constelación teal se contiene un punto para no aportar tinte verde difuso. */
+  .related--teal { --illo-opacity: 0.38; }
   .related__illo-lines path { fill: none; stroke: currentColor; stroke-width: 1; opacity: 0.4; }
   .related__illo-stars circle { fill: currentColor; }
 

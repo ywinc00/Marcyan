@@ -161,3 +161,63 @@ Antes de dar por buena una pieza, verificar item por item:
 5. **Motion:** toda animación se apaga en `@media (--motion-reduce)`.
 6. **Coherencia:** ¿se ve parte de la MISMA nave que la home? Fondo atmosférico, no losa plana;
    nada genérico; jerarquía clara con 1 acción primaria.
+
+---
+
+## 8) Ronda 2 — Afinado del dueño (2026-07-02) · MANDA sobre lo anterior si choca
+
+Fixes concretos tras revisar el preview. UI y UX van **de la mano**, ambos premium.
+
+### 8.1 Hub header = SLIM (no "hero" por sección)
+Aunque los hubs ya usan `LandingHero variant="header"`, éste todavía pinta H1 `display` + 2 CTAs +
+chips + badge → sigue leyéndose como un **hero** y hace que cada sección se sienta "página nueva".
+- **Regla:** `variant="header"` = **franja de título compacta y consistente** en TODOS los hubs:
+  breadcrumb (slot) + kicker mono + **H1 en `.h1` (fluid-h1, NO `.display`)** + **una** línea de bajada.
+  **Elimina en header:** los botones CTA, los chips, el badge y el motivo orbital. Padding vertical
+  mínimo. Un filete/hairline inferior opcional para cerrar la franja. Sin 90vh, sin bloque de hero.
+- `variant="landing"` (Houston/Miami/servicio×ciudad) **NO se toca** — ahí el hero potente es correcto.
+- Contrato aditivo: seguir aceptando `primary/secondary/chips/badge` en los props (los hubs los pasan),
+  pero en modo header simplemente NO se renderizan. Nada se rompe.
+
+### 8.2 CtaBand ("Cuéntanos qué necesitas… te orientamos gratis")
+Defectos: el `.ctaband__orbit` (arco grande) cruza por detrás del **título** (bajo contraste, se pisa)
+y el satélite `offset-path` **se corta** (animación con saltos).
+- **Quita** el arco de órbita que cruza el texto y el satélite animado que tartamudea.
+- **Recréalo con buen contraste, sin colisionar con el texto:** el motivo (si se conserva) va a
+  **espacio negativo** — p. ej. un horizonte/arco anclado al **borde inferior** por debajo del CTA, o
+  una constelación pequeña en una esquina — nunca detrás del titular. Anima solo si es sutil y estable
+  (nada de saltos); si dudas, **déjalo estático** o **elimínalo**. Conserva el filete superior + glow
+  suave. Prioridad: limpio y premium por encima de decoración.
+
+### 8.3 Nada de "reflejo verde" en las tarjetas de IA (tono teal)
+En `servicios`/`precios`, las tarjetas de servicios IA (tono teal) tienen un **glow/halo verde feo**.
+Origen: `PriceGrid` → `.pcard__amt { text-shadow: 0 0 32px var(--tint-glow) }` con `--tint-glow` teal,
++ el `.pcard__corner` (wash teal) + `box-shadow` teal en dots.
+- **Regla:** en tono **teal**, el acento se expresa por **borde/icono/texto nítidos**, **no** por
+  halos/glmore difusos. Elimina o baja drásticamente el `text-shadow` del numeral en teal (el verde
+  saturado "sangra" feo), suaviza el wash de esquina teal, y quita los `box-shadow` de glow teal que
+  se vean sucios. El oro puede conservar un glow muy sutil; el teal debe quedar **limpio**. Revisa
+  también `FeatureGrid`/`RelatedLinks` en teal por el mismo tic. Objetivo: teal se ve premium, no radiactivo.
+
+### 8.4 Convención de iconos (extender la de la home a secciones y landings)
+La home ya resolvió: **un icono = un concepto**; nunca el mismo icono para dos cosas que "parecen lo
+mismo pero no lo son"; `marcyan-ai` (marca, filled) reservado a **un solo** slot insignia (SEO para IA).
+- **Auditar y corregir** los iconos que alimentan las secciones/landings — viven sobre todo en los datos
+  `src/i18n/*.ts` (`clusters.ts`, `servicios.ts`, `houston.ts`, `miami.ts`, `seo-ia.ts`, `pricing.ts`,
+  `blog.ts`, `content.ts`) como `icon: 'lucide:…'`. Donde un mismo icono se reusa para conceptos distintos,
+  asignar el **icono Lucide preciso** de cada concepto (p. ej. automatizaciones `waypoints`; IA
+  conversacional `messages-square`/`bot-message-square`; búsqueda/SEO `scan-search`/`search`; velocidad
+  `gauge`; reseñas `star`; NAP/ficha `map-pinned`; multilingüe `languages`). Una sola familia Lucide 1.5px.
+
+### 8.5 Blog — navegación + ilustraciones PROPIAS
+Referencia de **principios** (no clonar marca/look): onceonceagency.com/blog → tarjetas **image-forward**
+(miniatura arriba + categoría + título + fecha + extracto), categoría única por pieza, filtro/índice claro,
+tarjeta entera clicable.
+- **Ilustraciones propias por tema:** crear un sistema de **ilustración inline SVG line-art** (oro/teal,
+  aria-hidden, estilo de la casa) mapeado por **tag/tema** de cada post (diseño web, IA/chatbot, precios,
+  SEO/AEO, atención al cliente, guía de compra, restaurantes… + fallback). Cada tarjeta del índice lleva su
+  ilustración **arriba** (image-forward), y el artículo la reusa como marca de tema. **Sin binarios/stock.**
+- **Navegación:** conservar y pulir el filtro por categoría (mejor que paginación para pocas piezas);
+  jerarquía real (pieza destacada + grid), tarjeta clicable, foco/estado accesibles.
+- El artículo (`[slug]` + `Article`/`ArticleToc`/`PostNav`/`ArticleHero`) mantiene lectura cómoda + la
+  ilustración de tema; contrato de blog (`render`, `ArticleLd`/FAQPage, `headings`, prev/next) intacto.

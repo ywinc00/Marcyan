@@ -49,8 +49,10 @@ const { tag, title, intro, items, tone = 'gold' } = Astro.props;
   .fgrid--gold :global(.h2 em) { color: var(--accent-gold); }
   .fgrid--teal :global(.h2 em) { color: var(--accent-teal); }
 
-  .fgrid--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); }
-  .fgrid--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); }
+  /* --fx-glow = color del halo difuso en hover. Oro lo conserva (sutil); teal lo anula
+     (§8.3: teal limpio, sin verde radiactivo). El acento teal vive en borde/relleno/color. */
+  .fgrid--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); --fx-glow: var(--accent-gold-line); }
+  .fgrid--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); --fx-glow: transparent; }
 
   .fgrid__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: start; }
 
@@ -114,12 +116,15 @@ const { tag, title, intro, items, tone = 'gold' } = Astro.props;
   .fgrow__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; line-height: var(--leading-snug); }
   .fgrow__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  /* Realce al pasar el ratón (solo punteros finos; nunca dispara en táctil). */
+  /* Realce al pasar el ratón (solo punteros finos; nunca dispara en táctil).
+     §8.3: en TEAL el acento se expresa por borde/relleno/color NÍTIDOS, no por halos
+     difusos → el nodo y el chip se rellenan/perfilan con el tono, pero la parte de GLOW
+     difuso (box-shadow con blur) queda anulada solo en teal (--fx-glow: transparent). */
   @media (--hover-fine) {
     .fgrow { transition: none; }
-    .fgrow:hover .fgrow__node { background: var(--tint); border-color: var(--tint); box-shadow: 0 0 10px var(--tint-line); }
+    .fgrow:hover .fgrow__node { background: var(--tint); border-color: var(--tint); box-shadow: 0 0 10px var(--fx-glow); }
     .fgrow:hover .fgrow__num { opacity: 1; }
-    .fgrow:hover .fgrow__ic { box-shadow: 0 0 0 1px var(--tint-line), 0 0 18px var(--tint-line); }
+    .fgrow:hover .fgrow__ic { box-shadow: 0 0 0 1px var(--tint-line), 0 0 18px var(--fx-glow); }
   }
 
   /* En pantallas estrechas el numeral se apoya sobre el chip para no robar ancho al texto. */

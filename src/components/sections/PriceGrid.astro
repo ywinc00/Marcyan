@@ -108,10 +108,13 @@ function splitTier(raw: string): { name: string; price: string | null } {
                 transform var(--duration-base) var(--ease-out-expo);
   }
   .pcard--gold { --tint: var(--accent-gold); --tint-dim: var(--accent-gold-dim); --tint-line: var(--accent-gold-line); --tint-glow: var(--accent-gold-glow); }
-  /* OJO: --tint-glow debe ser un COLOR (se inyecta en text-shadow/box-shadow como color).
-     No existe token de glow teal → se usa --accent-teal-line (color teal, alfa .30, paralelo
-     al --accent-gold-glow del oro). Usar --shadow-teal aquí lo rompería: es un box-shadow completo. */
-  .pcard--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); --tint-glow: var(--accent-teal-line); }
+  /* --tint-glow debe ser un COLOR (se inyecta en text-shadow/box-shadow como color).
+     §8.3: en TEAL el acento se expresa por borde/icono/texto NÍTIDOS, no por halos difusos
+     (el verde saturado "sangra" feo). Por eso el teal usa un glow TRANSPARENTE → el
+     text-shadow del numeral y el box-shadow de los dots quedan invisibles en teal, sin
+     tocar el oro (que conserva su glow sutil). El acento teal vive en el borde/relleno del
+     icono, el color del texto y la línea del riel (todos nítidos), no en un halo. */
+  .pcard--teal { --tint: var(--accent-teal); --tint-dim: var(--accent-teal-dim); --tint-line: var(--accent-teal-line); --tint-glow: transparent; }
 
   /* Acento de esquina por tono — eco del svc-hero de la home, sutil (no fondo plano). */
   .pcard__corner {
@@ -120,11 +123,16 @@ function splitTier(raw: string): { name: string; price: string | null } {
     opacity: 0.6; pointer-events: none; z-index: 0;
     transition: opacity var(--duration-base) var(--ease-out-expo);
   }
+  /* §8.3: el wash teal se percibe más "radiactivo" que el oro → se atenúa en teal
+     (esquina limpia); el acento teal queda en borde/icono/texto nítidos. */
+  .pcard--teal .pcard__corner { opacity: 0.32; }
   .pcard > * { position: relative; z-index: 1; }
 
   @media (--hover-fine) {
     .pcard:hover { border-color: var(--tint-line); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
     .pcard:hover .pcard__corner { opacity: 1; }
+    /* Mantén el wash teal contenido también en hover (no radiactivo). */
+    .pcard--teal:hover .pcard__corner { opacity: 0.5; }
   }
   /* foco por teclado del stretched-link → realza la tarjeta entera */
   .pcard:focus-within { border-color: var(--tint-line); }

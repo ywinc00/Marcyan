@@ -1,7 +1,9 @@
 ---
 // Banda de CTA final con GRAVEDAD. Panel centrado sobre la atmósfera:
 //  · glow de acento más rico (eco de la viñeta del hero) + filete superior,
-//  · motivo espacial line-art inline (órbita + satélite + estrellas tenues, aria-hidden),
+//  · motivo espacial en ESPACIO NEGATIVO: arco de horizonte anclado al borde INFERIOR
+//    (bajo el CTA) + constelación pequeña en la esquina superior — NUNCA detrás del título;
+//    animación mínima y estable (leve parpadeo de estrellas), sin satélites que tartamudeen.
 //  · jerarquía dura: 1 acción PRIMARIA dominante (oro/teal sólido) + secundaria como
 //    enlace mono discreto (no 2 CTAs gemelos).
 // Contrato de props INTACTO: title(set:html), sub, primary, secondary, tone.
@@ -20,32 +22,35 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
 <section class:list={['section ctaband', `ctaband--${tone}`]}>
   <div class="container">
     <div class="ctaband__inner">
-      <!-- motivo espacial: órbita + satélite + estrellas (decorativo) -->
-      <svg class="ctaband__motif" viewBox="0 0 600 240" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <radialGradient id={`${uid}-h`} cx="50%" cy="0%" r="75%">
-            <stop offset="0%" stop-color="var(--tint)" stop-opacity="0.20" />
-            <stop offset="100%" stop-color="var(--tint)" stop-opacity="0" />
-          </radialGradient>
-        </defs>
-        <rect x="0" y="0" width="600" height="240" fill={`url(#${uid}-h)`} />
+      <!-- constelación pequeña en esquina superior (espacio negativo, lejos del título) -->
+      <svg class="ctaband__constellation" viewBox="0 0 120 80" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
+        <g class="ctaband__lines">
+          <path d="M18 24 L52 14 L86 40 L104 22" />
+          <path d="M52 14 L60 52" />
+        </g>
         <g class="ctaband__stars">
-          <circle cx="78"  cy="44"  r="1.1" />
-          <circle cx="156" cy="88"  r="0.9" />
-          <circle cx="240" cy="34"  r="1.3" />
-          <circle cx="372" cy="60"  r="0.9" />
-          <circle cx="468" cy="40"  r="1.1" />
-          <circle cx="528" cy="92"  r="1.2" />
-          <circle cx="44"  cy="128" r="0.8" />
-          <circle cx="556" cy="150" r="0.9" />
+          <circle cx="18"  cy="24" r="1.4" />
+          <circle cx="52"  cy="14" r="1.8" />
+          <circle cx="86"  cy="40" r="1.4" />
+          <circle cx="104" cy="22" r="1.2" />
+          <circle cx="60"  cy="52" r="1.1" />
         </g>
-        <!-- arco de órbita inclinado, recortado por el viewBox (horizonte) -->
-        <ellipse class="ctaband__orbit" cx="300" cy="250" rx="318" ry="118"
-          transform="rotate(-9 300 250)" />
-        <!-- satélite de IA recorriendo la órbita -->
-        <g class="ctaband__sat" aria-hidden="true">
-          <circle r="4.5" />
-        </g>
+      </svg>
+
+      <!-- arco de horizonte anclado al borde INFERIOR, bajo el CTA (no cruza el texto) -->
+      <svg class="ctaband__horizon" viewBox="0 0 600 120" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMax slice">
+        <defs>
+          <linearGradient id={`${uid}-arc`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="var(--tint)" stop-opacity="0" />
+            <stop offset="50%"  stop-color="var(--tint)" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="var(--tint)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <!-- curva del horizonte: cúpula centrada, borde inferior del panel -->
+        <path class="ctaband__arc" d="M -40 150 Q 300 8 640 150"
+          fill="none" stroke={`url(#${uid}-arc)`} />
+        <!-- satélite ESTÁTICO posado sobre la curva (sin animación de recorrido) -->
+        <circle class="ctaband__dot" cx="300" cy="20" r="3.5" />
       </svg>
 
       <h2 class="h2 ctaband__title" set:html={title} />
@@ -98,34 +103,33 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
       radial-gradient(140% 80% at 50% 130%, rgba(0, 0, 0, 0.5), transparent 60%);
   }
 
-  /* motivo espacial line-art */
-  .ctaband__motif {
-    position: absolute; inset-inline: 0; top: 0; z-index: -1;
-    width: 100%; height: 62%; min-height: 0;
-    pointer-events: none; opacity: 0.85;
-    -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+  /* ── motivo espacial line-art (ESPACIO NEGATIVO — nunca detrás del título) ── */
+
+  /* constelación: esquina superior, discreta, fuera del ancho del texto */
+  .ctaband__constellation {
+    position: absolute; top: var(--space-5); z-index: -1;
+    inset-inline-end: var(--space-5); inset-inline-start: auto;
+    width: clamp(96px, 22%, 140px); height: auto; min-width: 0;
+    pointer-events: none; opacity: 0.6;
   }
-  .ctaband__stars circle { fill: var(--fg-primary); opacity: 0.28; }
-  .ctaband__orbit { fill: none; stroke: var(--line); stroke-width: 1; }
-  .ctaband__sat circle { fill: var(--accent-teal); }
-  .ctaband--gold .ctaband__sat circle { fill: var(--accent-gold); }
-  /* el satélite recorre el arco visible de la órbita (sólo decorativo) */
-  .ctaband__sat {
-    offset-path: path("M 0 145 A 318 118 -9 0 1 600 95");
-    offset-rotate: 0deg;
-    transform: translateX(-300px);
-    animation: cta-orbit 22s linear infinite;
+  .ctaband__lines path { fill: none; stroke: var(--line); stroke-width: 1; }
+  .ctaband__stars circle { fill: var(--fg-primary); opacity: 0.35; }
+  /* la estrella "ancla" toma el color de acento */
+  .ctaband__stars circle:nth-child(2) { fill: var(--tint); opacity: 0.9; }
+
+  /* horizonte: arco anclado al borde INFERIOR del panel (debajo del CTA) */
+  .ctaband__horizon {
+    position: absolute; inset-inline: 0; bottom: 0; z-index: -1;
+    width: 100%; height: clamp(56px, 22%, 100px); min-height: 0;
+    pointer-events: none;
   }
-  @keyframes cta-orbit {
-    from { offset-distance: 0%; }
-    to   { offset-distance: 100%; }
-  }
-  /* fallback si no hay soporte de offset-path: oculta el satélite (la órbita ya da el motivo) */
-  @supports not (offset-path: path("M0 0")) { .ctaband__sat { display: none; } }
-  .ctaband__stars circle:nth-child(2n) { animation: cta-twinkle 4s ease-in-out infinite; }
-  .ctaband__stars circle:nth-child(3n) { animation: cta-twinkle 5.5s ease-in-out 1s infinite; }
-  @keyframes cta-twinkle { 0%, 100% { opacity: 0.16; } 50% { opacity: 0.42; } }
+  .ctaband__arc { stroke-width: 1.25; }
+  .ctaband__dot { fill: var(--tint); opacity: 0.85; }
+
+  /* parpadeo mínimo y estable de un par de estrellas (sin recorridos ni saltos) */
+  .ctaband__stars circle:nth-child(3) { animation: cta-twinkle 5s ease-in-out infinite; }
+  .ctaband__stars circle:nth-child(5) { animation: cta-twinkle 6.5s ease-in-out 1.2s infinite; }
+  @keyframes cta-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
 
   .ctaband__title { max-width: 22ch; }
   .ctaband__sub { max-width: 54ch; color: var(--fg-secondary); margin-top: var(--space-1); }
@@ -153,7 +157,6 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
   }
 
   @media (--motion-reduce) {
-    .ctaband__sat,
     .ctaband__stars circle { animation: none; }
     .ctaband__arrow { transition: none; }
   }

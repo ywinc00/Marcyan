@@ -1,0 +1,310 @@
+---
+// ─────────────────────────────────────────────────────────────
+// BlogIllustration — SISTEMA de ilustración de blog (inline SVG line-art).
+//
+// Por qué existe (DESIGN.md §8.5): el blog necesita tarjetas "image-forward"
+// (miniatura arriba) SIN binarios ni stock. Este componente entrega una
+// ilustración PROPIA line-art (oro/teal, baja opacidad, aria-hidden) por TEMA
+// del post, en el estilo de la casa (skyline/siluetas de Locations.astro). La
+// misma ilustración se usa arriba en la tarjeta del índice y como marca de tema
+// en el artículo.
+//
+// Estilo de la casa: viewBox 0 0 240 160, trazo fino (stroke-width 1.5),
+// acento oro dominante + realces teal para la señal "IA/dato/en vivo", relleno
+// a baja opacidad, decorativo (aria-hidden). Solo tokens para el color. Sin
+// animación por defecto → seguro con reduced-motion (un shimmer opcional
+// muy sutil solo bajo --motion-ok, ver <style>).
+//
+// API (aditiva, clara):
+//   props: { topic?: string; tags?: string[]; class?: string }
+//   → normaliza topic/tags (minúsculas, sin acentos) y ELIGE la ilustración.
+//   → si nada matchea, usa el fallback orbital.
+//
+// Temas cubiertos (clave → sinónimos ES/EN que matchean):
+//   web        · diseño web, web design, sitio, página, e-commerce, tienda
+//   ai         · inteligencia artificial, ia, chatbot, ai, automatización, asistente
+//   pricing    · precios, precio, costo, cuánto cuesta, pricing, presupuesto
+//   seo        · seo, aeo, geo, buscadores, chatgpt, gemini, perplexity, visibilidad
+//   support    · atención al cliente, atención, soporte, llamadas, mensajes, whatsapp
+//   buying     · guía de compra, guía, elegir, comparar, cómo elegir, buying guide
+//   restaurant · restaurantes, restaurante, menú, food truck, comida, delivery
+//   (fallback) · orbital (planeta + órbita + estrellas)  ← cualquier tema no mapeado
+// ─────────────────────────────────────────────────────────────
+interface Props {
+  topic?: string;
+  tags?: string[];
+  class?: string;
+}
+const { topic, tags = [], class: className } = Astro.props;
+
+// Normaliza: minúsculas + sin acentos, para matchear tags ES ("Diseño web") y EN.
+const norm = (s: string) =>
+  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
+// Temas soportados en orden de PRIORIDAD (el primero que matchee gana). El orden
+// resuelve ambigüedades de posts multi-tag: p. ej. "Restaurantes" pesa más que
+// "Diseño web"; "Guía de compra" gana sobre "Diseño web"; "AEO/SEO" gana sobre "IA".
+type Theme = 'restaurant' | 'buying' | 'pricing' | 'seo' | 'support' | 'ai' | 'web';
+
+const MATCHERS: { theme: Theme; keys: string[] }[] = [
+  { theme: 'restaurant', keys: ['restaurante', 'menu', 'food truck', 'comida', 'delivery', 'restaurant'] },
+  { theme: 'buying',     keys: ['guia de compra', 'guia', 'elegir', 'comparar', 'buying guide', 'como elegir', 'checklist'] },
+  { theme: 'pricing',    keys: ['precio', 'costo', 'cuanto cuesta', 'pricing', 'presupuesto', 'tarifa'] },
+  { theme: 'seo',        keys: ['seo', 'aeo', 'geo', 'buscador', 'chatgpt', 'gemini', 'perplexity', 'visibilidad', 'answer engine'] },
+  { theme: 'support',    keys: ['atencion', 'soporte', 'llamada', 'mensaje', 'whatsapp', 'support', 'servicio al cliente', '24/7'] },
+  { theme: 'ai',         keys: ['inteligencia artificial', 'ia', 'chatbot', 'ai', 'automatizacion', 'asistente', 'bot'] },
+  { theme: 'web',        keys: ['diseno web', 'web design', 'sitio', 'pagina', 'website', 'e-commerce', 'ecommerce', 'tienda', 'landing'] },
+];
+
+// Deriva el tema: recolecta topic + tags normalizados, aplica los matchers por
+// prioridad. Si nada matchea → 'fallback' (orbital).
+//
+// Match: el tag CONTIENE la clave (h.includes(k)) — cubre "precios"→"precio",
+// "web design"→"web design", y claves exactas cortas ("aeo", "seo", "ia", "ai").
+// La rama inversa (la clave contiene el tag, k.includes(h)) resuelve variantes
+// como tag="chatbots"… pero se limita a tags de ≥4 letras: sin ese guardia, un
+// tag corto como "IA" (→"ia") sería substring de claves de temas de MAYOR
+// prioridad ("guia", "guia de compra", "inteligencia artificial") y caería en
+// el tema equivocado. Con el guardia, "IA" resuelve correctamente a 'ai'.
+function resolveTheme(): Theme | 'fallback' {
+  const hay = [topic ?? '', ...tags].map(norm).filter(Boolean);
+  if (hay.length === 0) return 'fallback';
+  for (const { theme, keys } of MATCHERS) {
+    if (hay.some((h) => keys.some((k) => h.includes(k) || (h.length >= 4 && k.includes(h))))) return theme;
+  }
+  return 'fallback';
+}
+
+const theme = resolveTheme();
+const VB = '0 0 240 160';
+---
+
+<div class:list={['blogillo', className]} aria-hidden="true" data-theme={theme}>
+  {theme === 'web' && (
+    /* DISEÑO WEB — ventana de navegador con estructura de página */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* marco del navegador */}
+        <rect x="40" y="30" width="160" height="100" rx="6" />
+        <line x1="40" y1="48" x2="200" y2="48" />
+        {/* controles + barra de url */}
+        <circle class="illo-dot" cx="52" cy="39" r="2.4" />
+        <circle class="illo-dot" cx="62" cy="39" r="2.4" />
+        <circle class="illo-dot illo-accent2" cx="72" cy="39" r="2.4" />
+        <rect class="illo-soft" x="92" y="35.5" width="98" height="7" rx="3.5" />
+        {/* layout de página: hero + columnas + líneas de texto */}
+        <rect class="illo-fill" x="52" y="58" width="136" height="24" rx="3" />
+        <rect class="illo-soft" x="52" y="90" width="40" height="30" rx="3" />
+        <line class="illo-soft" x1="104" y1="93" x2="188" y2="93" />
+        <line class="illo-soft" x1="104" y1="103" x2="188" y2="103" />
+        <line class="illo-soft" x1="104" y1="113" x2="164" y2="113" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'ai' && (
+    /* IA / CHATBOT — burbujas de conversación + nodos de red */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* burbuja recibida */}
+        <path class="illo-soft" d="M44 44 h70 a8 8 0 0 1 8 8 v20 a8 8 0 0 1 -8 8 h-52 l-12 12 v-12 h-6 a8 8 0 0 1 -8 -8 v-20 a8 8 0 0 1 8 -8 Z" />
+        <line class="illo-soft" x1="52" y1="56" x2="108" y2="56" />
+        <line class="illo-soft" x1="52" y1="66" x2="92" y2="66" />
+        {/* burbuja respuesta (teal = IA) */}
+        <path class="illo-accent2" d="M196 78 h-70 a8 8 0 0 0 -8 8 v20 a8 8 0 0 0 8 8 h52 l12 12 v-12 h6 a8 8 0 0 0 8 -8 v-20 a8 8 0 0 0 -8 -8 Z" />
+        {/* nodos de red (la "inteligencia") */}
+        <circle class="illo-node illo-accent2" cx="150" cy="94" r="2.6" />
+        <circle class="illo-node illo-accent2" cx="168" cy="90" r="2.6" />
+        <circle class="illo-node illo-accent2" cx="184" cy="98" r="2.6" />
+        <line class="illo-thread illo-accent2" x1="150" y1="94" x2="168" y2="90" />
+        <line class="illo-thread illo-accent2" x1="168" y1="90" x2="184" y2="98" />
+        <line class="illo-thread illo-accent2" x1="150" y1="94" x2="184" y2="98" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'pricing' && (
+    /* PRECIOS — etiqueta de precio + moneda */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* etiqueta (tag) */}
+        <path d="M62 44 h58 a6 6 0 0 1 4.2 1.8 l40 40 a6 6 0 0 1 0 8.4 l-30 30 a6 6 0 0 1 -8.4 0 l-40 -40 a6 6 0 0 1 -1.8 -4.2 v-30 a6 6 0 0 1 6 -6 Z" transform="translate(-6 -6)" />
+        {/* ojal */}
+        <circle cx="72" cy="60" r="6" />
+        <circle class="illo-dot" cx="72" cy="60" r="1.8" />
+        {/* líneas de "desde $" */}
+        <line class="illo-soft" x1="96" y1="76" x2="128" y2="76" />
+        <line class="illo-soft" x1="96" y1="86" x2="118" y2="86" />
+        {/* moneda (teal = dato) */}
+        <circle class="illo-accent2" cx="176" cy="112" r="20" />
+        <path class="illo-accent2 illo-thin" d="M176 100 v24 M170 106 h9 a5 5 0 0 1 0 10 h-9 M170 116 h9 a5 5 0 0 1 0 8 h-11" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'seo' && (
+    /* SEO / AEO — lupa que escanea + señal de resultado */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* documento / resultado indexado */}
+        <rect class="illo-soft" x="46" y="34" width="96" height="92" rx="6" />
+        <line class="illo-soft" x1="58" y1="52" x2="118" y2="52" />
+        <line class="illo-soft" x1="58" y1="64" x2="130" y2="64" />
+        <line class="illo-soft" x1="58" y1="76" x2="112" y2="76" />
+        {/* líneas de escaneo (teal) */}
+        <line class="illo-accent2 illo-thin" x1="58" y1="92" x2="130" y2="92" />
+        <line class="illo-accent2 illo-thin" x1="58" y1="104" x2="122" y2="104" />
+        {/* lupa (oro) sobre el resultado */}
+        <circle cx="158" cy="86" r="30" />
+        <circle class="illo-fill" cx="158" cy="86" r="30" />
+        <line x1="180" y1="108" x2="200" y2="128" stroke-linecap="round" />
+        {/* marca de "hallado" dentro de la lupa */}
+        <path class="illo-accent2 illo-thin" d="M146 86 l8 8 l16 -18" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'support' && (
+    /* ATENCIÓN AL CLIENTE — auriculares (headset) + burbuja de mensaje */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* arco de la diadema */}
+        <path d="M74 96 v-14 a46 46 0 0 1 92 0 v14" stroke-linecap="round" />
+        {/* orejera izq */}
+        <rect x="62" y="92" width="20" height="34" rx="8" />
+        {/* orejera dcha + micrófono */}
+        <rect x="158" y="92" width="20" height="34" rx="8" />
+        <path d="M158 118 h-14 a8 8 0 0 1 -8 -8 v-2" stroke-linecap="round" />
+        {/* burbuja de mensaje en vivo (teal) */}
+        <path class="illo-accent2" d="M112 108 h44 a6 6 0 0 1 6 6 v18 a6 6 0 0 1 -6 6 h-30 l-10 9 v-9 h-4 a6 6 0 0 1 -6 -6 v-18 a6 6 0 0 1 6 -6 Z" />
+        <circle class="illo-node illo-accent2" cx="126" cy="123" r="2.2" />
+        <circle class="illo-node illo-accent2" cx="136" cy="123" r="2.2" />
+        <circle class="illo-node illo-accent2" cx="146" cy="123" r="2.2" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'buying' && (
+    /* GUÍA DE COMPRA — checklist / comparativa (elegir bien) */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* portapapeles */}
+        <rect x="66" y="34" width="108" height="100" rx="8" />
+        <rect class="illo-fill" x="98" y="28" width="44" height="14" rx="5" />
+        {/* fila 1 — check (teal) */}
+        <rect class="illo-soft" x="80" y="58" width="14" height="14" rx="3" />
+        <path class="illo-accent2 illo-thin" d="M83 65 l3.5 3.5 l6 -8" stroke-linecap="round" stroke-linejoin="round" />
+        <line class="illo-soft" x1="104" y1="65" x2="160" y2="65" />
+        {/* fila 2 — check (teal) */}
+        <rect class="illo-soft" x="80" y="84" width="14" height="14" rx="3" />
+        <path class="illo-accent2 illo-thin" d="M83 91 l3.5 3.5 l6 -8" stroke-linecap="round" stroke-linejoin="round" />
+        <line class="illo-soft" x1="104" y1="91" x2="150" y2="91" />
+        {/* fila 3 — pendiente (vacío) */}
+        <rect class="illo-soft" x="80" y="110" width="14" height="14" rx="3" />
+        <line class="illo-soft" x1="104" y1="117" x2="158" y2="117" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'restaurant' && (
+    /* RESTAURANTES — plato con cubiertos + menú QR */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* plato */}
+        <circle cx="106" cy="82" r="42" />
+        <circle class="illo-soft" cx="106" cy="82" r="30" />
+        {/* tenedor */}
+        <path d="M52 46 v20 a6 6 0 0 0 6 6 h4 v46 M56 46 v18 M62 46 v18" stroke-linecap="round" />
+        {/* cuchillo */}
+        <path d="M160 46 c8 4 8 22 0 30 v42 M160 76 v42" stroke-linecap="round" />
+        {/* menú QR (teal = digital) */}
+        <rect class="illo-accent2" x="176" y="98" width="36" height="36" rx="4" />
+        <rect class="illo-accent2 illo-thin" x="182" y="104" width="8" height="8" rx="1.5" />
+        <rect class="illo-accent2 illo-thin" x="198" y="104" width="8" height="8" rx="1.5" />
+        <rect class="illo-accent2 illo-thin" x="182" y="120" width="8" height="8" rx="1.5" />
+        <rect class="illo-accent2 illo-thin illo-fill" x="200" y="122" width="5" height="5" />
+      </g>
+    </svg>
+  )}
+
+  {theme === 'fallback' && (
+    /* FALLBACK — planeta orbital (marca de la casa) + estrellas */
+    <svg class="blogillo__svg" viewBox={VB} xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <g class="illo-line">
+        {/* órbita elíptica */}
+        <ellipse cx="120" cy="82" rx="72" ry="34" transform="rotate(-18 120 82)" />
+        {/* planeta */}
+        <circle cx="120" cy="82" r="26" />
+        <circle class="illo-fill" cx="120" cy="82" r="26" />
+        {/* terminador / atmósfera */}
+        <path class="illo-soft" d="M100 68 a26 26 0 0 0 28 40" />
+        {/* satélite (teal) sobre la órbita */}
+        <circle class="illo-node illo-accent2" cx="177" cy="58" r="4" />
+        {/* estrellas */}
+        <path class="illo-star" d="M54 44 v8 M50 48 h8" stroke-linecap="round" />
+        <path class="illo-star illo-accent2" d="M198 116 v6 M195 119 h6" stroke-linecap="round" />
+        <circle class="illo-dot" cx="72" cy="120" r="1.6" />
+        <circle class="illo-dot illo-accent2" cx="160" cy="34" r="1.6" />
+      </g>
+    </svg>
+  )}
+</div>
+
+<style>
+  .blogillo {
+    display: block;
+    width: 100%;
+    /* espacio de la casa: la miniatura "image-forward" mantiene proporción 3:2 */
+    aspect-ratio: 240 / 160;
+    color: var(--accent-gold);
+  }
+  .blogillo__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Trazo line-art de la casa: fino, oro, sin relleno por defecto (como el skyline). */
+  .illo-line {
+    fill: none;
+    stroke: var(--accent-gold);
+    stroke-width: 1.5;
+    stroke-opacity: 0.75;
+    vector-effect: non-scaling-stroke;
+  }
+  .illo-line :global(*) { vector-effect: non-scaling-stroke; }
+
+  /* trazo más fino para detalle interno */
+  .illo-thin { stroke-width: 1.1; }
+
+  /* líneas/formas atenuadas (estructura secundaria, no protagonista) */
+  .illo-soft { stroke-opacity: 0.38; }
+
+  /* rellenos a MUY baja opacidad (superficies destacadas) — oro tenue */
+  .illo-fill { fill: var(--accent-gold); fill-opacity: 0.07; }
+
+  /* Acento teal = señal "IA / dato / en vivo / digital". Nítido (sin halos, §8.3). */
+  .illo-accent2 { stroke: var(--accent-teal); stroke-opacity: 0.7; }
+  .illo-accent2.illo-fill { fill: var(--accent-teal); fill-opacity: 0.08; }
+
+  /* puntos y nodos = rellenos sólidos pequeños (no trazo) */
+  .illo-dot { fill: var(--accent-gold); fill-opacity: 0.6; stroke: none; }
+  .illo-dot.illo-accent2 { fill: var(--accent-teal); }
+  .illo-node { fill: var(--accent-teal); fill-opacity: 0.85; stroke: none; }
+  .illo-node.illo-accent2 { fill: var(--accent-teal); }
+
+  /* hilos de red / estrellas pequeñas */
+  .illo-thread { stroke-opacity: 0.5; }
+  .illo-star { stroke-opacity: 0.55; }
+
+  /* Shimmer OPCIONAL y muy sutil: solo si el usuario NO pidió menos movimiento.
+     Reduced-motion (default seguro): sin animación, todo estático. */
+  @media (--motion-ok) {
+    @media (--hover-fine) {
+      .blogillo__svg { transition: opacity var(--duration-slow) var(--ease-out-expo); }
+    }
+  }
+  @media (--motion-reduce) {
+    .blogillo__svg { animation: none !important; transition: none !important; }
+  }
+</style>

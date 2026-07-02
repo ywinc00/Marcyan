@@ -16,6 +16,7 @@ import Card from '../../../components/ui/Card.astro';
 import Kicker from '../../../components/ui/Kicker.astro';
 import Icon from '../../../components/ui/Icon.astro';
 import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
+import BlogIllustration from '../../../components/BlogIllustration.astro';
 import BlogListingLd from '../../../components/seo/BlogListingLd.astro';
 import { content } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
@@ -126,26 +127,20 @@ const postRefs = posts.map((p) => ({
                   data-cats={cats.join(' ')}
                 >
                   <Card href={`/es/blog/${p.id}`} class="postcard">
-                    {i === 0 && (
-                      <svg class="postcard__motif" viewBox="0 0 240 160" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
-                        <circle class="postcard__motif-node" cx="186" cy="44" r="3" fill="var(--accent-teal)" />
-                        <circle cx="120" cy="80" r="34" fill="none" stroke="var(--accent-gold-line)" stroke-width="1" />
-                        <ellipse cx="120" cy="80" rx="88" ry="38" transform="rotate(-16 120 80)" fill="none" stroke="var(--accent-gold)" stroke-width="1" opacity="0.22" />
-                        <ellipse cx="120" cy="80" rx="56" ry="56" fill="none" stroke="var(--accent-gold)" stroke-width="1" opacity="0.12" />
-                        <circle cx="120" cy="80" r="9" fill="var(--accent-gold)" opacity="0.5" />
-                        <circle class="postcard__motif-node" cx="40" cy="118" r="3.5" fill="var(--accent-gold)" />
-                        <circle cx="206" cy="120" r="1.4" fill="var(--fg-primary)" opacity="0.3" />
-                        <circle cx="30" cy="40" r="1.1" fill="var(--fg-primary)" opacity="0.28" />
-                      </svg>
-                    )}
-                    <div class="postcard__meta">
-                      <span class="postcard__num" aria-hidden="true">{String(posts.length - i).padStart(2, '0')}</span>
-                      <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
-                      {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
+                    {/* ── Ilustración propia por tema (image-forward, arriba) ── */}
+                    <div class="postcard__media">
+                      <BlogIllustration tags={p.data.tags} class="postcard__illo" />
                     </div>
-                    <h3 class="postcard__title">{p.data.title}</h3>
-                    <p class="postcard__excerpt">{p.data.description}</p>
-                    <span class="postcard__cta">{b.cardCta} <Icon name="lucide:arrow-right" /></span>
+                    <div class="postcard__body">
+                      <div class="postcard__meta">
+                        <span class="postcard__num" aria-hidden="true">{String(posts.length - i).padStart(2, '0')}</span>
+                        <time datetime={iso(p.data.datePublished)}>{fmt(p.data.datePublished)}</time>
+                        {p.data.tags[0] && <span class="postcard__tag">{p.data.tags[0]}</span>}
+                      </div>
+                      <h3 class="postcard__title">{p.data.title}</h3>
+                      <p class="postcard__excerpt">{p.data.description}</p>
+                      <span class="postcard__cta">{b.cardCta} <Icon name="lucide:arrow-right" /></span>
+                    </div>
                   </Card>
                 </li>
               ))}
@@ -223,7 +218,34 @@ const postRefs = posts.map((p) => ({
   /* post oculto por el filtro */
   .bloglist__cell[hidden] { display: none; }
 
-  .postcard { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: var(--space-3); height: 100%; overflow: clip; }
+  /* image-forward: la ilustración va a sangre arriba; el padding del Card se
+     traslada al cuerpo para que la miniatura ocupe todo el ancho. El selector
+     .postcard.card sube la especificidad por encima del .card de Card.astro
+     para neutralizar su padding de forma DETERMINISTA (no depender del orden de
+     bundle entre estilos de página y de componente). Ambas clases van en el mismo
+     <a> (Card pasa `postcard` a class:list), así que el matcher es válido. */
+  .postcard { position: relative; isolation: isolate; display: flex; flex-direction: column; height: 100%; overflow: clip; }
+  .postcard.card { padding: 0; }
+
+  /* ── miniatura (ilustración propia por tema) ── */
+  .postcard__media {
+    position: relative;
+    border-bottom: 1px solid var(--border-subtle);
+    background:
+      radial-gradient(120% 120% at 82% 8%, var(--accent-gold-dim), transparent 60%),
+      var(--bg-2);
+    overflow: clip;
+  }
+  .postcard__media :global(.postcard__illo) {
+    /* la ilustración ya trae aspect-ratio 3:2 + aria-hidden; le damos aire interno */
+    padding: var(--space-5) var(--space-6);
+    opacity: 0.9;
+  }
+
+  .postcard__body {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    padding: var(--space-6); flex: 1 1 auto; min-width: 0;
+  }
 
   /* numeral de bitácora */
   .postcard__num {
@@ -252,18 +274,6 @@ const postRefs = posts.map((p) => ({
   .postcard__cta :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
   .postcard:hover .postcard__cta :global(svg) { transform: translateX(3px); }
 
-  /* micro-ilustración line-art en la pieza destacada (decorativa) */
-  .postcard__motif {
-    position: absolute; inset-block-start: 0; inset-inline-end: 0; z-index: -1;
-    width: 240px; max-width: 60%; height: auto; opacity: 0.7; pointer-events: none;
-    -webkit-mask-image: radial-gradient(120% 120% at 100% 0%, #000 35%, transparent 78%);
-    mask-image: radial-gradient(120% 120% at 100% 0%, #000 35%, transparent 78%);
-  }
-  @media (--motion-ok) {
-    .postcard__motif-node { animation: blog-node-pulse 4s ease-in-out infinite; }
-  }
-  @keyframes blog-node-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
-
   @media (--md) {
     .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
     /* la pieza destacada ocupa el ancho completo de la fila superior */
@@ -273,17 +283,22 @@ const postRefs = posts.map((p) => ({
   }
   @media (--lg) {
     .bloglist__grid { grid-template-columns: repeat(3, 1fr); }
-    .bloglist__cell--feature .postcard { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: var(--space-7); }
-    .bloglist__cell--feature .postcard__meta { grid-column: 1; }
-    .bloglist__cell--feature .postcard__title,
-    .bloglist__cell--feature .postcard__excerpt,
-    .bloglist__cell--feature .postcard__cta { grid-column: 1; }
-    .bloglist__cell--feature .postcard__motif { max-width: 38%; }
+    /* destacada = ilustración a un lado, contenido al otro (jerarquía horizontal) */
+    .bloglist__cell--feature .postcard {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: stretch;
+    }
+    .bloglist__cell--feature .postcard__media {
+      border-bottom: none; border-inline-end: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bloglist__cell--feature .postcard__media :global(.postcard__illo) {
+      padding: var(--space-7); max-width: 480px; margin-inline: auto;
+    }
+    .bloglist__cell--feature .postcard__body { justify-content: center; padding: var(--space-8) var(--space-7); gap: var(--space-4); }
   }
 
   @media (--motion-reduce) {
     .postcard:hover .postcard__cta :global(svg) { transform: none; }
-    .postcard__motif-node { animation: none; }
   }
 </style>
 

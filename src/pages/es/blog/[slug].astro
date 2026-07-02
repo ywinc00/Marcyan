@@ -96,6 +96,7 @@ const hasToc = tocItems.length >= 3;
       dateLabel={fmt(d.datePublished)}
       readingLabel={readingLabel}
       tags={d.tags}
+      topic={d.tags[0]}
     >
       <Breadcrumb slot="breadcrumb" items={crumbs} lang="es" />
     </ArticleHero>

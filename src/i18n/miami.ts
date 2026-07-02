@@ -45,7 +45,7 @@ export const miamiHub = {
     links: [
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
       { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'marcyan-ai' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'lucide:messages-square' },
       { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
   },

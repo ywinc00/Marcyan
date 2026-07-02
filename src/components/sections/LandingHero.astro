@@ -3,9 +3,14 @@
 //  · variant 'landing' (DEFAULT): hero potente de aterrizaje — jerarquía clara,
 //    acento de gradiente vivo en esquina, chips de prueba como telemetría mono, y un
 //    motivo orbital line-art (SVG inline, aria-hidden) a la derecha que ECO-a la home
-//    sin ser su motor planetario (es estático, respeta reduced-motion).
-//  · variant 'header' (ADITIVO): header COMPACTO para hubs de sección (DESIGN.md §2):
-//    menos padding vertical, sin 90vh, motivo orbital reducido a un filete de telemetría.
+//    sin ser su motor planetario (es estático, respeta reduced-motion). Se usa en las
+//    landings de conversión (ciudad, servicio×ciudad, wedge IA) → NO se toca.
+//  · variant 'header' (ADITIVO): FRANJA DE TÍTULO compacta y consistente para hubs de
+//    sección (DESIGN.md §2 + §8.1): breadcrumb + kicker mono + H1 en .h1 (fluid-h1,
+//    NO .display) + UNA línea de bajada. Padding vertical mínimo, hairline inferior.
+//    En header NO se renderizan CTA, chips, badge ni el motivo orbital → ya no se lee
+//    como un "hero" clónico. El contrato es aditivo: los hubs SIGUEN pasando
+//    primary/secondary/chips/badge y nada se rompe; simplemente no se pintan.
 // Conserva contrato: badge, badgeIcon, kicker, h1 (set:html), sub, primary, secondary,
 // chips, tone (gold|teal). Slot "breadcrumb" arriba. Sin motor planetario (solo la home).
 import Badge from '../ui/Badge.astro';
@@ -29,6 +34,7 @@ const {
   badge, badgeIcon, kicker, h1, sub, primary, secondary,
   chips = [], tone = 'gold', variant = 'landing',
 } = Astro.props;
+const isHeader = variant === 'header';
 const uid = 'lh' + Math.random().toString(36).slice(2, 7);
 ---
 <section class:list={['l-hero', `l-hero--${tone}`, `l-hero--${variant}`]}>
@@ -36,55 +42,71 @@ const uid = 'lh' + Math.random().toString(36).slice(2, 7);
     <div class="l-hero__main">
       <slot name="breadcrumb" />
 
-      <div class="l-hero__eyebrow">
-        {badge && (
-          <Badge variant={tone}>
-            {badgeIcon && <Icon name={badgeIcon} />}
-            {badge}
-          </Badge>
-        )}
-        {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
-      </div>
+      {isHeader ? (
+        /* ── header: franja de título compacta (§8.1) ──
+           solo kicker mono + H1 (.h1) + una línea de bajada. Sin badge/CTA/chips/motivo. */
+        <>
+          {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
+          <h1 class="h1 l-hero__h1" set:html={h1} />
+          <p class="lead l-hero__sub">{sub}</p>
+        </>
+      ) : (
+        /* ── landing: hero potente de aterrizaje (sin cambios) ── */
+        <>
+          <div class="l-hero__eyebrow">
+            {badge && (
+              <Badge variant={tone}>
+                {badgeIcon && <Icon name={badgeIcon} />}
+                {badge}
+              </Badge>
+            )}
+            {kicker && <Kicker tone={tone}>{kicker}</Kicker>}
+          </div>
 
-      <h1 class="display l-hero__h1" set:html={h1} />
-      <p class="lead l-hero__sub">{sub}</p>
+          <h1 class="display l-hero__h1" set:html={h1} />
+          <p class="lead l-hero__sub">{sub}</p>
 
-      <div class="l-hero__cta">
-        <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
-        {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
-      </div>
+          <div class="l-hero__cta">
+            <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
+            {secondary && <Button href={secondary.href} variant="secondary" size="lg">{secondary.label}</Button>}
+          </div>
 
-      {chips.length > 0 && (
-        <ul class="l-hero__chips" aria-label="Puntos clave">
-          {chips.map((ch) => (
-            <li><span class="l-hero__chip-dot" aria-hidden="true"></span>{ch}</li>
-          ))}
-        </ul>
+          {chips.length > 0 && (
+            <ul class="l-hero__chips" aria-label="Puntos clave">
+              {chips.map((ch) => (
+                <li><span class="l-hero__chip-dot" aria-hidden="true"></span>{ch}</li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </div>
 
-    {/* Motivo orbital line-art — eco de la home, NO su motor. Decorativo, estático. */}
-    <div class="l-hero__aside" aria-hidden="true">
-      <svg class="l-hero__orbit" viewBox="0 0 320 320" role="presentation" focusable="false">
-        <defs>
-          <radialGradient id={`${uid}-core`} cx="42%" cy="38%" r="64%">
-            <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.55" />
-            <stop offset="60%" stop-color="var(--accent-gold-deep)" stop-opacity="0.18" />
-            <stop offset="100%" stop-color="var(--planet-core)" stop-opacity="0" />
-          </radialGradient>
-        </defs>
-        {/* anillos orbitales (line-art, baja opacidad) */}
-        <ellipse class="l-hero__ring l-hero__ring--1" cx="160" cy="160" rx="148" ry="64" transform="rotate(-18 160 160)" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
-        <ellipse class="l-hero__ring l-hero__ring--2" cx="160" cy="160" rx="116" ry="116" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
-        {/* núcleo difuso */}
-        <circle cx="160" cy="160" r="58" fill={`url(#${uid}-core)`} />
-        <circle cx="160" cy="160" r="58" fill="none" stroke="var(--accent-gold-line)" stroke-width="1" />
-        {/* nodos = puntos de dato (oro/teal) */}
-        <circle class="l-hero__node l-hero__node--gold" cx="296" cy="105" r="4.5" fill="var(--accent-gold)" />
-        <circle class="l-hero__node l-hero__node--teal" cx="32" cy="208" r="5.5" fill="var(--accent-teal)" />
-        <circle class="l-hero__node l-hero__node--gold" cx="160" cy="44" r="3.5" fill="var(--accent-gold)" />
-      </svg>
-    </div>
+    {!isHeader && (
+      /* Motivo orbital line-art — eco de la home, NO su motor. Decorativo, estático.
+         Solo en variant="landing"; los hubs (header) no lo montan (§8.1). */
+      <div class="l-hero__aside" aria-hidden="true">
+        <svg class="l-hero__orbit" viewBox="0 0 320 320" role="presentation" focusable="false">
+          <defs>
+            <radialGradient id={`${uid}-core`} cx="42%" cy="38%" r="64%">
+              <stop offset="0%" stop-color="var(--accent-gold)" stop-opacity="0.55" />
+              <stop offset="60%" stop-color="var(--accent-gold-deep)" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="var(--planet-core)" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          {/* anillos orbitales (line-art, baja opacidad) */}
+          <ellipse class="l-hero__ring l-hero__ring--1" cx="160" cy="160" rx="148" ry="64" transform="rotate(-18 160 160)" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
+          <ellipse class="l-hero__ring l-hero__ring--2" cx="160" cy="160" rx="116" ry="116" fill="none" stroke="var(--accent-gold)" stroke-width="1" />
+          {/* núcleo difuso */}
+          <circle cx="160" cy="160" r="58" fill={`url(#${uid}-core)`} />
+          <circle cx="160" cy="160" r="58" fill="none" stroke="var(--accent-gold-line)" stroke-width="1" />
+          {/* nodos = puntos de dato (oro/teal) */}
+          <circle class="l-hero__node l-hero__node--gold" cx="296" cy="105" r="4.5" fill="var(--accent-gold)" />
+          <circle class="l-hero__node l-hero__node--teal" cx="32" cy="208" r="5.5" fill="var(--accent-teal)" />
+          <circle class="l-hero__node l-hero__node--gold" cx="160" cy="44" r="3.5" fill="var(--accent-gold)" />
+        </svg>
+      </div>
+    )}
   </div>
 </section>
 
@@ -104,8 +126,9 @@ const uid = 'lh' + Math.random().toString(36).slice(2, 7);
   }
   .l-hero--gold { --glow: var(--accent-gold-glow); --node-accent: var(--accent-gold); }
   .l-hero--teal { --glow: color-mix(in srgb, var(--accent-teal), transparent 72%); --node-accent: var(--accent-teal); }
-  .l-hero--teal :global(.display em) { color: var(--accent-teal); font-style: normal; }
-  .l-hero--gold :global(.display em) { color: var(--accent-gold); font-style: normal; }
+  /* acento de color en <em> del H1 (set:html) — cubre .display (landing) y .h1 (header) */
+  .l-hero--teal :global(.display em), .l-hero--teal :global(.h1 em) { color: var(--accent-teal); font-style: normal; }
+  .l-hero--gold :global(.display em), .l-hero--gold :global(.h1 em) { color: var(--accent-gold); font-style: normal; }
 
   .l-hero__inner {
     display: grid; grid-template-columns: 1fr; gap: var(--space-7); align-items: center;
@@ -154,10 +177,16 @@ const uid = 'lh' + Math.random().toString(36).slice(2, 7);
   @keyframes lh-spin { to { transform: rotate(360deg); } }
   @keyframes lh-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
-  /* ── variant: header (compacto, hubs de sección) ──────── */
-  .l-hero--header { padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-8); }
-  .l-hero--header .l-hero__h1 { max-width: 22ch; }
-  .l-hero--header .l-hero__aside { display: none !important; }
+  /* ── variant: header (franja de título compacta, hubs de sección) §8.1 ──
+     padding vertical mínimo, H1 fluid-h1 (no display), UNA línea de bajada,
+     hairline inferior para cerrar la franja. Sin CTA/chips/badge/motivo. */
+  .l-hero--header {
+    padding-block: calc(var(--nav-h) + var(--space-5)) var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .l-hero--header .l-hero__main { gap: var(--space-4); max-width: none; }
+  .l-hero--header .l-hero__h1 { max-width: 24ch; margin-block: 0; }
+  .l-hero--header .l-hero__sub { max-width: 64ch; }
 
   /* ── ≥ md: telemetría más holgada ─────────────────────── */
   @media (--md) {
@@ -175,8 +204,8 @@ const uid = 'lh' + Math.random().toString(36).slice(2, 7);
     .l-hero--landing .l-hero__aside {
       display: block; justify-self: end; width: 100%; max-width: 380px; min-width: 0;
     }
-    /* el header NO clona la portada: nunca expande a 2 columnas ni muestra el motivo */
-    .l-hero--header .l-hero__inner { grid-template-columns: 1fr; }
+    /* el header NO clona la portada: se mantiene compacto a 1 columna */
+    .l-hero--header { padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-7); }
   }
 
   @media (--motion-reduce) {

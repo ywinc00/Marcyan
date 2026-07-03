@@ -42,10 +42,11 @@ interface Props {
   secondaryAnchor: { label: string; href: string };
   /** El riel: 4 celdas (tel · horario · precios · coords). */
   telemetry: CityTelemetryCell[];
-  /** Escenario: asset oficial de la ciudad + pie de foto editorial.
-   *  width/height = dimensiones INTRÍNSECAS del asset (hint de aspect-ratio del
-   *  navegador): Houston 276×249, Miami 322×235 — por eso viajan como dato. */
-  skyline: { src: string; caption: string; width: number; height: number };
+  /** Escenario de horizonte + pie de foto editorial. El skyline (`src`) es
+   *  OPCIONAL: sin él, el escenario queda como horizonte minimalista (línea de
+   *  suelo + atmósfera + sello de ciudad). Con él, se pinta la ilustración
+   *  (width/height = dimensiones intrínsecas del asset, hint de aspect-ratio). */
+  skyline: { caption: string; src?: string; width?: number; height?: number };
   tone?: 'gold' | 'teal';
 }
 const {
@@ -53,7 +54,7 @@ const {
   telemetry, skyline, tone = 'gold',
 } = Astro.props;
 ---
-<section class:list={['cityhero', `cityhero--${tone}`]}>
+<section class:list={['cityhero', `cityhero--${tone}`, !skyline.src && 'cityhero--bare']}>
   {/* ── FILA 1 · CIELO — mensaje centrado, columna compositiva única ── */}
   <div class="container cityhero__skywrap">
     <div class="cityhero__sky">
@@ -89,22 +90,25 @@ const {
   </div>
 
   {/* ── FILA 3 · ESCENARIO DE HORIZONTE — decorativo puro (aria-hidden).
-      Skyline oficial A PLENA LUZ (sin mask), bases apoyadas en la línea de suelo.
-      El fill --bg-base local evita que el mix-blend-mode:lighten del PNG sangre
-      sobre los glows del SpaceBackdrop (mismo truco documentado en Locations). ── */}
+      Horizonte de llegada: línea de suelo + atmósfera + sello de ciudad. Si se
+      pasa `skyline.src`, además se pinta el skyline oficial A PLENA LUZ (sin mask,
+      bases apoyadas en la línea; el fill --bg-base local contiene el
+      mix-blend-mode:lighten del PNG, truco documentado en Locations). ── */}
   <div class="cityhero__stage" aria-hidden="true">
     <div class="cityhero__scene">
-      <div class="cityhero__city">
-        <img
-          class="cityhero__img"
-          src={skyline.src}
-          alt=""
-          width={skyline.width}
-          height={skyline.height}
-          loading="eager"
-          decoding="async"
-        />
-      </div>
+      {skyline.src && (
+        <div class="cityhero__city">
+          <img
+            class="cityhero__img"
+            src={skyline.src}
+            alt=""
+            width={skyline.width}
+            height={skyline.height}
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      )}
     </div>
     <span class="cityhero__caption">{skyline.caption}</span>
   </div>
@@ -212,6 +216,8 @@ const {
       linear-gradient(to top, color-mix(in srgb, var(--accent-gold), transparent 88%), transparent 55%),
       var(--bg-base);
   }
+  /* sin skyline: horizonte más contenido (glow + línea + sello), sin hueco muerto */
+  .cityhero--bare .cityhero__scene { height: clamp(96px, 16vw, 168px); }
   /* LÍNEA DE SUELO: hairline oro a lo ancho, bottom 0 */
   .cityhero__scene::after {
     content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px;
@@ -231,9 +237,10 @@ const {
     mix-blend-mode: lighten;
   }
   @media (--lg) {
-    /* asimetría editorial: la ciudad se corre a la derecha y el "sol bajo" la sigue */
+    /* asimetría editorial: la ciudad se corre a la derecha y el "sol bajo" la sigue.
+       Solo con skyline: sin él, el glow se queda centrado (no hay nada que seguir). */
     .cityhero__city { left: auto; right: 8%; transform: none; }
-    .cityhero__scene {
+    .cityhero:not(.cityhero--bare) .cityhero__scene {
       background:
         radial-gradient(38% 72% at 78% 100%, var(--accent-gold-dim), transparent 72%),
         linear-gradient(to top, color-mix(in srgb, var(--accent-gold), transparent 88%), transparent 55%),

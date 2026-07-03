@@ -52,8 +52,9 @@ export const houstonHub = {
       { label: 'Precios públicos', value: priceChain, href: '#servicios' },
       { label: 'Base', value: '29.7604° N, 95.3698° W' },
     ],
-    // width/height = dimensiones intrínsecas del PNG embebido (hint de aspect-ratio).
-    skyline: { src: '/assets/cities/houston.svg', caption: 'HOUSTON, TX — SPACE CITY', width: 276, height: 249 },
+    // Sin ilustración de skyline: el escenario queda como horizonte minimalista
+    // (línea de suelo + atmósfera + sello de ciudad). `src` opcional para reponerlo.
+    skyline: { caption: 'HOUSTON, TX — SPACE CITY' },
     tone: 'gold' as const,
   },
   answer: {

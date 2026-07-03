@@ -1,0 +1,298 @@
+---
+// HERO DE CIUDAD — "Horizonte de llegada". Bespoke de los hubs de ciudad
+// (/es/houston, luego /es/miami): el hero de la landing #1 del negocio.
+// NO es LandingHero (ese lo usan ~30 landings y no se toca): aquí la composición
+// es UNA columna centrada en 3 filas — cielo (mensaje), riel de telemetría (datos
+// duros NAP/precios en mono) y escenario de horizonte (el skyline oficial a plena
+// luz, apoyado en una línea de suelo). Es El Arribo del footer INVERTIDO: allí
+// llegas a un planeta; aquí llegas a Houston.
+//
+// PARAMETRIZADO para reusarse en Miami: todo entra por props + slot breadcrumb;
+// nada de Houston vive hardcodeado dentro del componente.
+//
+// Disciplina de acento (dictamen del director): el oro dominante del viewport es
+// el CTA + el <em> del H1. Los valores del riel van en --fg-primary (tabular-nums)
+// y solo se doran en hover/focus. El único teal del hero es el dot "en vivo" del
+// teléfono. Nada gira; 1 sola animación de entrada (skyline + línea de suelo).
+import Button from '../../ui/Button.astro';
+import Kicker from '../../ui/Kicker.astro';
+
+/** Celda del riel de telemetría: label mono arriba + valor abajo.
+ *  `href` convierte el valor en enlace (tap ≥44px); `live` añade el dot teal
+ *  pulsante (teléfono). El orden del array ES el orden de lectura en móvil. */
+export interface CityTelemetryCell {
+  label: string;
+  value: string;
+  href?: string;
+  live?: boolean;
+}
+
+interface Props {
+  /** Kicker mono que fusiona badge+kicker, p.ej. "Agencia hispana · Houston, TX". */
+  kicker: string;
+  /** H1 con set:html — la keyword VERBATIM; único <em> oro del viewport. */
+  h1: string;
+  /** Bajada corta (~15 palabras). */
+  sub: string;
+  /** ÚNICO botón del hero (oro, lg). */
+  primary: { label: string; href: string };
+  /** Micro-reaseguro mono bajo el CTA, p.ej. "Respuesta en menos de 24h · Sin compromiso". */
+  microcopy: string;
+  /** Enlace mono discreto de exploración, p.ej. "Ver servicios y precios ↓" → #servicios. */
+  secondaryAnchor: { label: string; href: string };
+  /** El riel: 4 celdas (tel · horario · precios · coords). */
+  telemetry: CityTelemetryCell[];
+  /** Escenario: asset oficial de la ciudad + pie de foto editorial.
+   *  width/height = dimensiones INTRÍNSECAS del asset (hint de aspect-ratio del
+   *  navegador): Houston 276×249, Miami 322×235 — por eso viajan como dato. */
+  skyline: { src: string; caption: string; width: number; height: number };
+  tone?: 'gold' | 'teal';
+}
+const {
+  kicker, h1, sub, primary, microcopy, secondaryAnchor,
+  telemetry, skyline, tone = 'gold',
+} = Astro.props;
+---
+<section class:list={['cityhero', `cityhero--${tone}`]}>
+  {/* ── FILA 1 · CIELO — mensaje centrado, columna compositiva única ── */}
+  <div class="container cityhero__skywrap">
+    <div class="cityhero__sky">
+      <slot name="breadcrumb" />
+      <Kicker tone={tone}>{kicker}</Kicker>
+      <h1 class="display cityhero__h1" set:html={h1} />
+      <p class="lead cityhero__sub">{sub}</p>
+      <div class="cityhero__dock">
+        <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
+        <p class="cityhero__micro">{microcopy}</p>
+        <a class="cityhero__explore" href={secondaryAnchor.href}>{secondaryAnchor.label}</a>
+      </div>
+    </div>
+  </div>
+
+  {/* ── FILA 2 · RIEL DE TELEMETRÍA — datos duros en mono, hairlines arriba/abajo ── */}
+  <div class="cityhero__band">
+    <div class="container">
+      <dl class="cityhero__rail">
+        {telemetry.map((cell) => (
+          <div class="cityhero__cell">
+            <dt class="cityhero__label">{cell.label}</dt>
+            <dd class="cityhero__value">
+              {cell.live && <span class="cityhero__dot" aria-hidden="true"></span>}
+              {cell.href
+                ? <a href={cell.href}>{cell.value}</a>
+                : <span>{cell.value}</span>}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+
+  {/* ── FILA 3 · ESCENARIO DE HORIZONTE — decorativo puro (aria-hidden).
+      Skyline oficial A PLENA LUZ (sin mask), bases apoyadas en la línea de suelo.
+      El fill --bg-base local evita que el mix-blend-mode:lighten del PNG sangre
+      sobre los glows del SpaceBackdrop (mismo truco documentado en Locations). ── */}
+  <div class="cityhero__stage" aria-hidden="true">
+    <div class="cityhero__scene">
+      <div class="cityhero__city">
+        <img
+          class="cityhero__img"
+          src={skyline.src}
+          alt=""
+          width={skyline.width}
+          height={skyline.height}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    </div>
+    <span class="cityhero__caption">{skyline.caption}</span>
+  </div>
+</section>
+
+<style>
+  /* ── esqueleto: 3 filas apiladas; en desktop el hero llena la ventana
+     dejando SIEMPRE visible el riel (min() evita heros kilométricos) ── */
+  .cityhero {
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  @media (--lg) {
+    .cityhero { min-height: min(88vh, 860px); }
+  }
+
+  .cityhero--gold { --tint: var(--accent-gold); }
+  .cityhero--teal { --tint: var(--accent-teal); }
+
+  /* ── FILA 1 · cielo ── */
+  .cityhero__skywrap { flex: 1 0 auto; display: flex; min-width: 0; }
+  .cityhero__sky {
+    width: 100%; max-width: 60rem; margin: auto;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: var(--space-5); min-width: 0;
+    padding-block: calc(var(--nav-h) + var(--space-7)) var(--space-8);
+  }
+  /* único <em> de acento del viewport (junto al CTA) */
+  .cityhero__h1 { max-width: 16ch; }
+  .cityhero__h1 :global(em) { color: var(--tint); font-style: normal; }
+  .cityhero__sub { max-width: 46ch; color: var(--fg-secondary); }
+
+  /* dock del CTA: 1 acción dominante + micro-reaseguro + fuga interna a #servicios */
+  .cityhero__dock {
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--space-3); margin-top: var(--space-2); min-width: 0;
+  }
+  .cityhero__micro {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .cityhero__explore {
+    display: inline-flex; align-items: center; min-height: var(--tap-min);
+    padding-inline: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .cityhero__explore:hover, .cityhero__explore:focus-visible { color: var(--tint); }
+
+  /* ── FILA 2 · riel de telemetría ──
+     patrón label-mono-arriba / valor-abajo. Los valores NO son oro: --fg-primary
+     con tabular-nums; el oro aparece solo en hover/focus de los enlaces. */
+  .cityhero__band { border-block: 1px solid var(--border-subtle); }
+  /* móvil (injerto CRO, ronda de pulido): columna ÚNICA en orden de lectura
+     tel → horario → precios → coords. El teléfono manda arriba y el horario le
+     queda PEGADO debajo ("¿me contestan ahora?" se responde junto al número). */
+  .cityhero__rail {
+    margin: 0;
+    display: grid; grid-template-columns: 1fr;
+    gap: var(--space-4) var(--space-5);
+    padding-block: var(--space-4);
+  }
+  .cityhero__cell { min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+
+  .cityhero__label {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--fg-secondary);
+  }
+  .cityhero__value {
+    margin: 0; min-width: 0;
+    display: flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums; color: var(--fg-primary);
+    overflow-wrap: anywhere;
+  }
+  .cityhero__value a {
+    position: relative; color: inherit; min-width: 0;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  /* zona táctil ≥44px sin inflar la altura visual del riel */
+  .cityhero__value a::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: var(--tap-min); transform: translateY(-50%);
+  }
+  .cityhero__value a:hover, .cityhero__value a:focus-visible { color: var(--tint); }
+
+  /* dot teal "en vivo" del teléfono — ÚNICO teal del hero */
+  .cityhero__dot {
+    width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--accent-teal);
+    animation: cityhero-pulse 2.4s var(--ease-out-expo) infinite;
+  }
+
+  /* ── FILA 3 · escenario de horizonte ── */
+  .cityhero__stage { position: relative; width: 100%; min-width: 0; }
+  .cityhero__scene {
+    position: relative; overflow: hidden; isolation: isolate;
+    height: clamp(150px, 26vw, 300px);
+    /* atmósfera: oro al 12% subiendo desde el suelo + "sol bajo" tras el skyline.
+       El fondo --bg-base es el fill local que contiene el blend del PNG. */
+    background:
+      radial-gradient(42% 70% at 50% 100%, var(--accent-gold-dim), transparent 72%),
+      linear-gradient(to top, color-mix(in srgb, var(--accent-gold), transparent 88%), transparent 55%),
+      var(--bg-base);
+  }
+  /* LÍNEA DE SUELO: hairline oro a lo ancho, bottom 0 */
+  .cityhero__scene::after {
+    content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px;
+    background: var(--accent-gold); opacity: 0.45; z-index: 2;
+  }
+  /* skyline oficial: PNG 276×249 embebido — NO tolera full-bleed. Se contiene en
+     una caja de ancho acotado; object-fit:contain ancla las bases al suelo sin
+     recortar ni deformar. mix-blend-mode:lighten colapsa el lavado oscuro del PNG
+     contra el fondo (truco documentado en Locations.astro). SIN mask: a plena luz. */
+  .cityhero__city {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: clamp(240px, 32vw, 460px); height: 100%; z-index: 1;
+  }
+  .cityhero__img {
+    width: 100%; height: 100%;
+    object-fit: contain; object-position: bottom center;
+    mix-blend-mode: lighten;
+  }
+  @media (--lg) {
+    /* asimetría editorial: la ciudad se corre a la derecha y el "sol bajo" la sigue */
+    .cityhero__city { left: auto; right: 8%; transform: none; }
+    .cityhero__scene {
+      background:
+        radial-gradient(38% 72% at 78% 100%, var(--accent-gold-dim), transparent 72%),
+        linear-gradient(to top, color-mix(in srgb, var(--accent-gold), transparent 88%), transparent 55%),
+        var(--bg-base);
+    }
+  }
+
+  /* pie de foto editorial: en móvil vive en su BANDA propia bajo la línea (el
+     skyline centrado la pisaría); de --md en adelante sube al extremo izquierdo,
+     posado sobre la línea de suelo (el skyline ya no alcanza esa esquina). */
+  .cityhero__caption {
+    display: block; padding: var(--space-2) var(--container-pad);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider); color: var(--fg-secondary);
+  }
+  @media (--md) {
+    .cityhero__caption {
+      position: absolute; left: var(--container-pad); bottom: var(--space-3);
+      padding: 0; z-index: 3;
+    }
+  }
+
+  /* ── motion: UNA entrada (skyline + línea, 600ms, una vez) + pulso del dot.
+     Nada gira. Todo muere en --motion-reduce. ── */
+  @media (--motion-ok) {
+    .cityhero__img { animation: cityhero-arrive 600ms var(--ease-out-expo) both; }
+    .cityhero__scene::after { animation: cityhero-fade 600ms var(--ease-out-expo) 120ms both; }
+  }
+  @keyframes cityhero-arrive {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes cityhero-fade {
+    from { opacity: 0; }
+    to   { opacity: 0.45; }
+  }
+  @keyframes cityhero-pulse {
+    0%   { box-shadow: 0 0 0 0 var(--accent-teal); }
+    70%  { box-shadow: 0 0 0 6px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (--motion-reduce) {
+    .cityhero__img, .cityhero__scene::after, .cityhero__dot { animation: none; }
+  }
+
+  /* ── 768–1023: riel 2×2 en orden de lectura natural ── */
+  @media (--md) {
+    .cityhero__rail {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-6); padding-block: var(--space-5);
+    }
+  }
+
+  /* ── ≥1024: riel en una sola fila, extremos alineados al container ── */
+  @media (--lg) {
+    .cityhero__rail {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: var(--space-6);
+    }
+    .cityhero__cell { flex: 0 1 auto; }
+  }
+</style>

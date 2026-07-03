@@ -1,56 +1,54 @@
 ---
-// HUB DE CIUDAD · /es/houston — LANDING PRINCIPAL de Houston (Ola 2).
-// Página POTENTE nivel-home (DESIGN.md §2/§5): hero fuerte + showcase de ciudad
-// con identidad local (skyline oficial + telemetría TX/coords, lenguaje de
-// Locations.astro) + showcase de servicios con jerarquía (destacados + resto) +
-// contexto local (Prose) + prueba (Projects) + FAQ + CTA. NO es una lista de
-// RelatedLinks apilada. Conserva schema (ItemList + Breadcrumb), Contact con
-// defaultCity Houston y hasEn=false. @graph base ya da la ProfessionalService.
+// HUB DE CIUDAD · /es/houston — LANDING #1 del negocio (rediseño premium
+// "Horizonte de llegada"). Página POTENTE nivel-home (DESIGN.md §2/§5):
+//   1. CityHero bespoke (cielo + riel de telemetría + escenario de horizonte),
+//   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 5 filas),
+//   3. Projects (prueba: "así se ve lo que cuesta"),
+//   4. Ficha Houston (contexto local + riel NAP + zonas como pills-ruta),
+//   5. Directorio por industria (índice denso),
+//   6. AnswerBlock + FAQ (AEO, texto verbatim),
+//   7. Franja "Sigue explorando" slim → CtaBand (secundaria = tel) →
+//      micro-reaseguro → Contact.
+// Los 19 <a> del silo (7 servicios + 7 industrias + 2 zonas + 3 related)
+// sobreviven íntegros. Schema (ItemList + Breadcrumb) y meta INTACTOS.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Kicker from '../../components/ui/Kicker.astro';
 import Icon from '../../components/ui/Icon.astro';
-import LandingHero from '../../components/sections/LandingHero.astro';
+import CityHero from '../../components/sections/city/CityHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
-import RelatedLinks from '../../components/sections/RelatedLinks.astro';
-import Prose from '../../components/sections/Prose.astro';
 import Projects from '../../components/sections/Projects.astro';
 import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
-import { content, nap } from '../../i18n/content';
+import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston';
 
 const c = content.es;
-const telHref = nap.houston.replace(/[^\d+]/g, '');
 
 // Silueta de Texas — geográficamente correcta (misma derivada de GeoJSON público
-// que Locations.astro). Decorativa (aria-hidden).
+// que Locations.astro). En la Ficha va a COLOR PLENO en un pill de dato (14px),
+// nunca como marca de agua. Decorativa (aria-hidden).
 const TX_SHAPE = {
   viewBox: '0 0 100 93.4',
   path: 'M100 49.6L98.7 54L96.4 60.8L91 61.3L89.7 60.9L89.4 62.4L88.1 65.8L81.3 70.4L78.1 71.9L75 73.8L69.4 82.6L69.9 84.7L69.9 86.8L68.6 93.4L62.3 91.6L56.2 86.1L55 83.1L53.7 79L47.6 70.6L44.6 64.7L36.5 59.7L32.4 60L29.2 62.2L27.9 65.2L23.8 65.7L15 58.6L9.5 50.3L0 41L27.3 31.2L27.8 0L50.6 17.3L53.9 18.6L58.4 20.3L63.1 20.9L65.2 22.3L68.2 22.5L74.7 23.7L80 23.7L89 23.5L95 25.9L96.1 31L97.7 42.1Z',
 };
 
-// Telemetría del nodo Houston — datos de localización ya presentes en el sitio
-// (Locations.astro / NAP). Sin inventar cifras.
-const cityMeta = [
-  { ic: 'lucide:map-pin', label: 'Coordenadas', value: '29.7604° N, 95.3698° W' },
-  { ic: 'lucide:radio', label: 'Cobertura', value: 'Área metropolitana' },
-  { ic: 'lucide:languages', label: 'Idiomas', value: 'Español · Inglés' },
-];
-
-// Showcase de servicios: jerarquía real. Los primeros = destacados (tarjetas
-// grandes); el resto = filas densas del mismo panel. Derivado del propio
-// contenido honesto (h.services.links), sin inventar nada.
+// Showcase de servicios con precio: los 2 primeros = tarjetas destacadas
+// (web + IA, los pilares); los 5 restantes = filas densas con columna de precio.
 const svc = h.services.links;
 const svcFeatured = svc.slice(0, 2);
 const svcRest = svc.slice(2);
 const isBrand = (icon?: string) => icon === 'marcyan-ai';
+// Separa "desde" (label xs) de la cifra (numeral mono) del display de precio;
+// los precios sin "desde" (p.ej. "Diagnóstico gratis") se muestran tal cual.
+const splitPrice = (p?: string) =>
+  p && p.startsWith('desde ') ? { pre: 'desde', amt: p.slice(6) } : { pre: '', amt: p ?? '' };
 ---
 <Layout
   title={h.meta.title}
@@ -64,108 +62,152 @@ const isBrand = (icon?: string) => icon === 'marcyan-ai';
   <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main">
-    <LandingHero
-      badge={h.hero.badge}
-      badgeIcon={h.hero.badgeIcon}
+    <CityHero
       kicker={h.hero.kicker}
       h1={h.hero.h1}
       sub={h.hero.sub}
       primary={h.hero.primary}
-      secondary={h.hero.secondary}
-      chips={h.hero.chips}
+      microcopy={h.hero.microcopy}
+      secondaryAnchor={h.hero.explore}
+      telemetry={h.hero.telemetry}
+      skyline={h.hero.skyline}
       tone={h.hero.tone}
     >
       <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
-    </LandingHero>
+    </CityHero>
 
-    {/* ── SHOWCASE DE CIUDAD ── identidad local con peso: skyline oficial + silueta
-        TX + telemetría de coordenadas (lenguaje de Locations.astro). Panel translúcido
-        que flota sobre la atmósfera, no losa plana. */}
-    <section class="section citynode" aria-labelledby="citynode-title">
+    {/* ── SERVICIOS CON PRECIO ── el hero promete "precios públicos"; aquí se
+        cumple: 2 destacadas asimétricas con numeral de precio + 5 filas con
+        columna de precio. Los 7 <a> del silo, intactos. */}
+    <section class="section svcprice" id="servicios" aria-labelledby="svcprice-title">
       <div class="container">
-        <article class="citynode__panel">
-          <div class="citynode__media" aria-hidden="true">
-            <span class="citynode__tx">
-              <svg viewBox={TX_SHAPE.viewBox} role="presentation" focusable="false"><path d={TX_SHAPE.path} fill="currentColor" /></svg>
-            </span>
-            <img class="citynode__sky" src="/assets/cities/houston.svg" alt="" loading="lazy" decoding="async" />
+        <header class="svcprice__head">
+          <Kicker>{h.services.tag}</Kicker>
+          <h2 class="h2 svcprice__title" id="svcprice-title" set:html={h.services.title} />
+        </header>
+
+        <div class="svcprice__feat">
+          {svcFeatured.map((l, i) => {
+            const p = splitPrice(l.price);
+            return (
+              <a class="pcard" href={l.href}>
+                <span class="pcard__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span class:list={['pcard__icon', isBrand(l.icon) && 'pcard__icon--brand']}>
+                  <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+                </span>
+                <h3 class="pcard__label">{l.label}</h3>
+                <p class="pcard__desc">{l.desc}</p>
+                <span class="pcard__price">
+                  {p.pre && <span class="pcard__from">{p.pre}</span>}
+                  <span class="pcard__amt">{p.amt}</span>
+                </span>
+                <span class="pcard__go">Ver servicio <Icon name="lucide:arrow-right" /></span>
+              </a>
+            );
+          })}
+        </div>
+
+        <ul class="svcprice__rest" role="list">
+          {svcRest.map((l, i) => {
+            const p = splitPrice(l.price);
+            return (
+              <li class="svcrow">
+                <a class="svcrow__link" href={l.href}>
+                  <span class="svcrow__idx" aria-hidden="true">{String(i + 3).padStart(2, '0')}</span>
+                  <span class:list={['svcrow__icon', isBrand(l.icon) && 'svcrow__icon--brand']}>
+                    <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+                  </span>
+                  <span class="svcrow__txt">
+                    <span class="svcrow__label">{l.label}</span>
+                    <span class="svcrow__desc">{l.desc}</span>
+                  </span>
+                  <span class="svcrow__price">
+                    {p.pre && <span class="svcrow__from">{p.pre} </span>}{p.amt}
+                  </span>
+                  <Icon name="lucide:arrow-right" class="svcrow__go" />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* única fuga legítima de la sección: el hub de precios completo */}
+        <div class="svcprice__foot">
+          <a class="svcprice__all" href="/es/precios">
+            Ver todos los precios <Icon name="lucide:arrow-right" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    {/* prueba real justo después del precio: "así se ve lo que cuesta" */}
+    <Projects projects={c.projects} />
+
+    {/* ── FICHA HOUSTON ── contexto local con peso + riel NAP (dt/dd con
+        hairlines) + zonas como pills-ruta. Fusión del antiguo citynode + Prose. */}
+    <section class="section ficha" aria-labelledby="ficha-title">
+      <div class="container">
+        <article class="ficha__panel">
+          <div class="ficha__body">
+            <Kicker>{h.local.tag}</Kicker>
+            <h2 class="ficha__title" id="ficha-title" set:html={h.local.title} />
+            {h.local.paragraphs.map((p) => (
+              <p class="ficha__p" set:html={p} />
+            ))}
           </div>
 
-          <div class="citynode__body">
-            <div class="citynode__top">
-              <span class="citynode__pin"><Icon name="lucide:map-pin" /></span>
-              <span class="citynode__live"><span class="citynode__live-dot"></span>Nodo activo</span>
-            </div>
-
-            <Kicker>Houston · Space City</Kicker>
-            <h2 class="citynode__title" id="citynode-title">Tu base de operaciones en <em>Houston</em></h2>
-            <p class="citynode__lede">
-              Operamos toda el área metropolitana como negocio de área de servicio,
-              en español e inglés. Sin oficina pública: el proceso, de la propuesta
-              a la entrega, ocurre en línea y en tu idioma.
-            </p>
-
-            <dl class="citynode__meta">
-              {cityMeta.map((m) => (
-                <div class="citynode__metarow">
+          <aside class="ficha__rail" aria-label="Datos de contacto y cobertura en Houston">
+            <dl class="ficha__meta">
+              {h.ficha.meta.map((m) => (
+                <div class="ficha__row">
                   <dt><Icon name={m.ic} /> {m.label}</dt>
-                  <dd>{m.value}</dd>
+                  <dd>
+                    {m.href ? <a href={m.href}>{m.value}</a> : m.value}
+                  </dd>
                 </div>
               ))}
             </dl>
 
-            <div class="citynode__foot">
-              <a class="citynode__tel" href={`tel:${telHref}`}>
-                <Icon name="lucide:phone" /> {nap.houston}
-              </a>
-              <span class="citynode__pill">
-                <svg class="citynode__pill-ic" viewBox={TX_SHAPE.viewBox} aria-hidden="true"><path d={TX_SHAPE.path} fill="currentColor" /></svg>
-                Texas, USA
+            <div class="ficha__pills">
+              <span class="ficha__state">
+                <svg class="ficha__state-ic" viewBox={TX_SHAPE.viewBox} aria-hidden="true"><path d={TX_SHAPE.path} fill="currentColor" /></svg>
+                {h.ficha.statePill}
               </span>
             </div>
-          </div>
+
+            <h3 class="ficha__zonestitle" set:html={h.zonas.title} />
+            <div class="ficha__zones">
+              {h.zonas.links.map((z) => (
+                <a class="ficha__zone" href={z.href}>
+                  <Icon name={z.icon ?? 'lucide:map-pin'} class="ficha__zone-pin" />
+                  <span>{z.label}</span>
+                  <Icon name="lucide:arrow-right" class="ficha__zone-arr" />
+                </a>
+              ))}
+            </div>
+          </aside>
         </article>
       </div>
     </section>
 
-    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
-
-    {/* ── SHOWCASE DE SERVICIOS ── jerarquía real: 2 destacados (tarjetas grandes)
-        + el resto en filas densas. NO 7 enlaces planos. Contenido = h.services.links. */}
-    <section class="section svcshow" aria-labelledby="svcshow-title">
+    {/* ── DIRECTORIO POR INDUSTRIA ── índice denso: 7 <a> en filas con icono
+        inline (sin caja-chip), sub mono corto y hairlines. */}
+    <section class="section inddir" aria-labelledby="inddir-title">
       <div class="container">
-        <header class="svcshow__head">
-          <Kicker>{h.services.tag}</Kicker>
-          <h2 class="h2 svcshow__title" id="svcshow-title" set:html={h.services.title} />
+        <header class="inddir__head">
+          <Kicker>{h.industries.tag}</Kicker>
+          <h2 class="inddir__title" id="inddir-title">{h.industries.title}</h2>
         </header>
-
-        <div class="svcshow__feat">
-          {svcFeatured.map((l, i) => (
-            <a class="svccard" href={l.href}>
-              <span class="svccard__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <span class:list={['svccard__icon', isBrand(l.icon) && 'svccard__icon--brand']}>
-                <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
-              </span>
-              <h3 class="svccard__label">{l.label}</h3>
-              <p class="svccard__desc">{l.desc}</p>
-              <span class="svccard__go">Ver servicio <Icon name="lucide:arrow-right" /></span>
-            </a>
-          ))}
-        </div>
-
-        <ul class="svcshow__rest" role="list">
-          {svcRest.map((l, i) => (
-            <li class="svcrow">
-              <a class="svcrow__link" href={l.href}>
-                <span class="svcrow__idx" aria-hidden="true">{String(i + 3).padStart(2, '0')}</span>
-                <span class:list={['svcrow__icon', isBrand(l.icon) && 'svcrow__icon--brand']}>
-                  <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+        <ul class="inddir__list" role="list">
+          {h.industries.links.map((l) => (
+            <li class="inddir__item">
+              <a class="inddir__link" href={l.href}>
+                <Icon name={l.icon ?? 'lucide:arrow-up-right'} class="inddir__ic" />
+                <span class="inddir__txt">
+                  <span class="inddir__label">{l.label}</span>
+                  <span class="inddir__sub">{l.desc}</span>
                 </span>
-                <span class="svcrow__txt">
-                  <span class="svcrow__label">{l.label}</span>
-                  <span class="svcrow__desc">{l.desc}</span>
-                </span>
-                <Icon name="lucide:arrow-right" class="svcrow__go" />
+                <Icon name="lucide:arrow-right" class="inddir__arr" />
               </a>
             </li>
           ))}
@@ -173,32 +215,48 @@ const isBrand = (icon?: string) => icon === 'marcyan-ai';
       </div>
     </section>
 
-    <RelatedLinks tag={h.industries.tag} title={h.industries.title} links={h.industries.links} />
-
-    <RelatedLinks tag={h.zonas.tag} title={h.zonas.title} links={h.zonas.links} tone="teal" />
-
-    <Prose
-      tag={h.local.tag}
-      title={h.local.title}
-      paragraphs={h.local.paragraphs}
-      tone={h.local.tone}
-    />
-
-    <Projects projects={c.projects} />
-
-    <RelatedLinks tag={h.related.tag} title={h.related.title} links={h.related.links} />
+    {/* respuesta AEO citable (texto/fuente VERBATIM), adyacente al FAQ */}
+    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
     <Faq tag={h.faq.tag} title={h.faq.title} items={h.faq.items} />
 
-    <CtaBand
-      title={h.cta.title}
-      sub={h.cta.sub}
-      primary={h.cta.primary}
-      secondary={h.cta.secondary}
-      tone={h.cta.tone}
-    />
+    {/* ── SIGUE EXPLORANDO ── franja slim: los 3 related como lista inline
+        (label mono + flecha), sin panel. */}
+    <section class="explore" aria-label={h.related.tag}>
+      <div class="container explore__row">
+        <Kicker>{h.related.tag}</Kicker>
+        <ul class="explore__list" role="list">
+          {h.related.links.map((l) => (
+            <li>
+              <a class="explore__link" href={l.href}>
+                <span>{l.label}</span>
+                <Icon name="lucide:arrow-right" class="explore__arr" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
 
-    <Contact contact={c.contact} defaultCity="Houston, TX" />
+    {/* remate: CTA (secundaria = teléfono) → micro-reaseguro → formulario.
+        El wrapper .finale recorta el gap CtaBand↔Contact a nivel de página. */}
+    <div class="finale">
+      <CtaBand
+        title={h.cta.title}
+        sub={h.cta.sub}
+        primary={h.cta.primary}
+        secondary={h.cta.secondary}
+        tone={h.cta.tone}
+      />
+
+      <section class="reassure" aria-label="Compromisos de servicio">
+        <div class="container">
+          <p class="reassure__txt">{h.reassure}</p>
+        </div>
+      </section>
+
+      <Contact contact={c.contact} defaultCity="Houston, TX" />
+    </div>
 
     <SpaceBackdrop tone="gold" />
   </main>
@@ -207,113 +265,18 @@ const isBrand = (icon?: string) => icon === 'marcyan-ai';
 </Layout>
 
 <style>
-  /* ════════ SHOWCASE DE CIUDAD (bespoke) ════════ */
-  .citynode :global(em) { color: var(--accent-gold); font-style: normal; }
+  /* ════════ SERVICIOS CON PRECIO (bespoke) ════════
+     El precio vive en su propio slot: numeral mono en --fg-primary que solo se
+     dora en hover (disciplina de acento). Chips de icono NEUTROS: el color lo
+     pone el contenido, no la decoración. */
+  .svcprice :global(em) { color: var(--accent-gold); font-style: normal; }
+  .svcprice__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .svcprice__title { max-width: 20ch; }
 
-  .citynode__panel {
-    position: relative; overflow: hidden; min-width: 0; isolation: isolate;
-    display: grid; grid-template-columns: 1fr; gap: var(--space-6);
-    border: 1px solid var(--border); border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    background:
-      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 58%),
-      color-mix(in srgb, var(--bg-card) 78%, transparent);
-  }
+  /* destacadas: asimetría 1.4fr/1fr en desktop (jerarquía real, no gemelas) */
+  .svcprice__feat { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-5); }
 
-  /* media: skyline oficial (mismo tratamiento de máscara/blend que Locations) +
-     silueta TX en marca de agua detrás */
-  .citynode__media {
-    position: relative; min-width: 0; min-height: 160px;
-    display: flex; align-items: flex-end; justify-content: center;
-    padding-block: var(--space-4);
-  }
-  .citynode__tx {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    color: var(--accent-gold); opacity: 0.06; pointer-events: none;
-  }
-  .citynode__tx svg { width: 70%; height: auto; max-height: 100%; }
-  .citynode__sky {
-    position: relative; z-index: 1; width: 100%; max-width: 460px; height: auto; display: block;
-    mix-blend-mode: lighten;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-  }
-
-  .citynode__body { position: relative; z-index: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
-  .citynode__top { display: flex; align-items: center; gap: var(--space-3); }
-  .citynode__pin {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-  }
-  .citynode__pin :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .citynode__live {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--accent-teal);
-  }
-  .citynode__live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); }
-
-  .citynode__title {
-    font-family: var(--font-display); font-weight: 600; font-size: var(--fluid-h3);
-    line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); max-width: 18ch;
-  }
-  .citynode__lede { color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose); max-width: 56ch; }
-
-  /* telemetría de datos en filas (dt/dd) con hairline */
-  .citynode__meta { display: flex; flex-direction: column; gap: 0; margin: 0; }
-  .citynode__metarow {
-    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
-    padding: var(--space-3) 0; border-top: 1px solid var(--border-subtle); min-width: 0;
-  }
-  .citynode__metarow:last-child { border-bottom: 1px solid var(--border-subtle); }
-  .citynode__metarow dt {
-    display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0;
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--fg-secondary);
-  }
-  .citynode__metarow dt :global(svg) { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
-  .citynode__metarow dd {
-    margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
-    text-align: right; min-width: 0; overflow-wrap: anywhere;
-  }
-
-  .citynode__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-1); }
-  .citynode__tel {
-    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min);
-    padding: var(--space-2) var(--space-4); border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
-    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
-    transition: border-color var(--duration-fast), color var(--duration-fast);
-  }
-  .citynode__tel :global(svg) { width: 16px; height: 16px; flex: 0 0 auto; stroke-width: 1.5; }
-  .citynode__tel:hover { border-color: var(--accent-gold); color: color-mix(in srgb, var(--accent-gold), white 12%); }
-  .citynode__pill {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
-  }
-  .citynode__pill-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; }
-
-  @media (--md) {
-    .citynode__panel { padding: var(--space-8); gap: var(--space-8); align-items: center; }
-  }
-  @media (--lg) {
-    .citynode__panel { grid-template-columns: 0.9fr 1.1fr; }
-    .citynode__media { order: 2; min-height: 220px; }
-    .citynode__body { order: 1; }
-  }
-
-  /* ════════ SHOWCASE DE SERVICIOS (bespoke, con jerarquía) ════════ */
-  .svcshow :global(em) { color: var(--accent-gold); font-style: normal; }
-  .svcshow__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
-  .svcshow__title { max-width: 20ch; }
-
-  /* destacados: tarjetas grandes con jerarquía */
-  .svcshow__feat { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
-
-  .svccard {
+  .pcard {
     position: relative; overflow: hidden; min-width: 0;
     display: flex; flex-direction: column; gap: var(--space-3);
     padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -323,74 +286,289 @@ const isBrand = (icon?: string) => icon === 'marcyan-ai';
     text-decoration: none; color: inherit;
     transition: border-color var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo);
   }
-  .svccard:hover { border-color: var(--border-accent); transform: translateY(-3px); }
-  .svccard:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
-  .svccard__idx {
+  .pcard:hover { border-color: var(--border-accent); transform: translateY(-3px); }
+  .pcard:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .pcard__idx {
     position: absolute; top: var(--space-5); right: var(--space-5);
     font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-wide); font-variant-numeric: tabular-nums;
   }
-  .svccard__icon {
+  /* chip NEUTRO: superficie elevada + borde; el icono es secundario hasta el hover */
+  .pcard__icon {
     display: inline-flex; align-items: center; justify-content: center;
     width: 48px; height: 48px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
   }
-  .svccard__icon :global(svg) { width: 24px; height: 24px; stroke-width: 1.5; }
-  .svccard__label {
+  .pcard__icon :global(svg) { width: 24px; height: 24px; stroke-width: 1.5; }
+  .pcard:hover .pcard__icon, .pcard:focus-visible .pcard__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  /* insignia de marca (marcyan-ai): SIEMPRE oro, nunca re-tintada */
+  .pcard__icon--brand, .pcard:hover .pcard__icon--brand { color: var(--accent-gold); }
+  .pcard__label {
     font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
     color: var(--fg-primary); line-height: var(--leading-snug); max-width: 22ch;
   }
-  .svccard__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); max-width: 46ch; }
-  .svccard__go {
-    margin-top: auto; padding-top: var(--space-2);
-    display: inline-flex; align-items: center; gap: var(--space-2);
+  .pcard__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); max-width: 46ch; }
+
+  /* el precio como NUMERAL: "desde" en xs encima, cifra grande en primario */
+  .pcard__price {
+    margin-top: auto; padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .pcard__from {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
+  }
+  .pcard__amt {
+    font-family: var(--font-mono); font-size: var(--text-xl); font-weight: 500;
+    color: var(--fg-primary); font-variant-numeric: tabular-nums;
+    transition: color var(--duration-base) var(--ease-out-expo);
+  }
+  .pcard:hover .pcard__amt, .pcard:focus-visible .pcard__amt { color: var(--accent-gold); }
+  .pcard__go {
+    display: inline-flex; align-items: center; gap: var(--space-2); padding-top: var(--space-2);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-gold);
   }
-  .svccard__go :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .svccard:hover .svccard__go :global(svg) { transform: translateX(4px); }
+  .pcard__go :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .pcard:hover .pcard__go :global(svg) { transform: translateX(4px); }
 
-  /* resto: filas densas, mismo lenguaje que RelatedLinks */
-  .svcshow__rest {
-    list-style: none; display: grid; grid-template-columns: 1fr; gap: 2px;
+  /* filas densas 03–07 con COLUMNA DE PRECIO mono a la derecha */
+  .svcprice__rest {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr; gap: 0;
     border-top: 1px solid var(--border-subtle);
   }
   .svcrow { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
   .svcrow__link {
-    display: flex; align-items: center; gap: var(--space-4); min-height: 56px;
-    padding: var(--space-3) var(--space-2); border-radius: var(--radius-md);
-    text-decoration: none; color: inherit;
+    display: grid; column-gap: var(--space-3); row-gap: 2px; align-items: center;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'idx icon txt'
+      'idx icon price';
+    min-height: 56px; padding: var(--space-3) var(--space-2);
+    border-radius: var(--radius-md); text-decoration: none; color: inherit;
     transition: background var(--duration-fast) var(--ease-out-expo);
   }
   .svcrow__link:hover { background: var(--bg-elevated); }
   .svcrow__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
   .svcrow__idx {
-    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
-    color: var(--fg-subtle); letter-spacing: var(--tracking-wide); transition: color var(--duration-fast);
+    grid-area: idx; font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
+    font-variant-numeric: tabular-nums; transition: color var(--duration-fast);
   }
   .svcrow__link:hover .svcrow__idx, .svcrow__link:focus-visible .svcrow__idx { color: var(--accent-gold); }
   .svcrow__icon {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    grid-area: icon; display: inline-flex; align-items: center; justify-content: center;
     width: 40px; height: 40px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
   }
   .svcrow__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .svcrow__txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .svcrow__link:hover .svcrow__icon, .svcrow__link:focus-visible .svcrow__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .svcrow__icon--brand, .svcrow__link:hover .svcrow__icon--brand { color: var(--accent-gold); }
+  .svcrow__txt { grid-area: txt; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .svcrow__label { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
   .svcrow__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
-  .svcshow__rest :global(.svcrow__go) {
-    flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle);
-    transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
+  .svcrow__price {
+    grid-area: price; justify-self: start; min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    transition: color var(--duration-fast);
   }
-  .svcrow__link:hover :global(.svcrow__go), .svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
+  .svcrow__from { font-size: var(--text-xs); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+  .svcrow__link:hover .svcrow__price, .svcrow__link:focus-visible .svcrow__price { color: var(--accent-gold); }
+  /* flecha solo de --md en adelante (en móvil el precio ya cierra la fila) */
+  .svcprice__rest :global(.svcrow__go) { display: none; }
+
+  .svcprice__foot { display: flex; justify-content: flex-end; padding-top: var(--space-4); }
+  .svcprice__all {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min);
+    padding-inline: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-secondary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .svcprice__all :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .svcprice__all:hover, .svcprice__all:focus-visible { color: var(--accent-gold); }
+  .svcprice__all:hover :global(svg), .svcprice__all:focus-visible :global(svg) { transform: translateX(4px); }
 
   @media (--md) {
-    .svcshow__feat { grid-template-columns: 1fr 1fr; gap: var(--space-5); margin-bottom: var(--space-5); }
+    .svcprice__feat { grid-template-columns: 1.4fr 1fr; gap: var(--space-5); }
+    .svcrow__link {
+      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+      grid-template-areas: 'idx icon txt price arrow';
+      column-gap: var(--space-4);
+    }
+    .svcrow__price { justify-self: end; text-align: right; }
+    .svcprice__rest :global(.svcrow__go) {
+      display: block; grid-area: arrow; width: 18px; height: 18px; color: var(--fg-subtle);
+      transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
+    }
+    .svcrow__link:hover :global(.svcrow__go), .svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
   }
 
+  /* ════════ FICHA HOUSTON (bespoke: contexto + riel NAP) ════════ */
+  .ficha :global(em) { color: var(--accent-gold); font-style: normal; }
+  .ficha__panel {
+    position: relative; overflow: hidden; min-width: 0; isolation: isolate;
+    display: grid; grid-template-columns: 1fr; gap: var(--space-6);
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 58%),
+      color-mix(in srgb, var(--bg-card) 78%, transparent);
+  }
+  .ficha__body { min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+  .ficha__title {
+    font-family: var(--font-display); font-weight: 600; font-size: var(--fluid-h3);
+    line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); max-width: 18ch;
+  }
+  .ficha__p { color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose); max-width: 58ch; }
+  .ficha__p :global(strong) { color: var(--fg-primary); font-weight: 600; }
+
+  /* riel NAP: filas dt/dd con hairlines (patrón heredado del citynode) */
+  .ficha__rail { min-width: 0; display: flex; flex-direction: column; }
+  .ficha__meta { display: flex; flex-direction: column; margin: 0; }
+  .ficha__row {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    padding: var(--space-3) 0; border-top: 1px solid var(--border-subtle); min-width: 0;
+  }
+  .ficha__row:last-child { border-bottom: 1px solid var(--border-subtle); }
+  .ficha__row dt {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; flex: 0 0 auto;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--fg-secondary);
+  }
+  .ficha__row dt :global(svg) { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+  .ficha__row dd {
+    margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    font-variant-numeric: tabular-nums; text-align: right; min-width: 0; overflow-wrap: anywhere;
+  }
+  .ficha__row dd a { position: relative; color: inherit; transition: color var(--duration-fast); }
+  /* zona táctil ≥44px del teléfono sin engordar la fila */
+  .ficha__row dd a::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: var(--tap-min); transform: translateY(-50%);
+  }
+  .ficha__row dd a:hover, .ficha__row dd a:focus-visible { color: var(--accent-gold); }
+
+  /* pill de estado: TX a color pleno (dato, no marca de agua) */
+  .ficha__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+  .ficha__state {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
+  }
+  .ficha__state-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; }
+
+  /* zonas del silo: pills-ruta bajo su propio h3 */
+  .ficha__zonestitle {
+    font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug); margin-top: var(--space-5);
+  }
+  .ficha__zones { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
+  .ficha__zone {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); min-width: 0;
+    padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    text-decoration: none;
+    transition: border-color var(--duration-fast), color var(--duration-fast);
+  }
+  .ficha__zones :global(.ficha__zone-pin) { width: 15px; height: 15px; color: var(--fg-secondary); flex: 0 0 auto; transition: color var(--duration-fast); }
+  .ficha__zones :global(.ficha__zone-arr) { width: 14px; height: 14px; color: var(--fg-subtle); flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-fast); }
+  .ficha__zone:hover, .ficha__zone:focus-visible { border-color: var(--accent-gold-line); color: var(--accent-gold); }
+  .ficha__zone:hover :global(.ficha__zone-pin), .ficha__zone:focus-visible :global(.ficha__zone-pin) { color: var(--accent-gold); }
+  .ficha__zone:hover :global(.ficha__zone-arr), .ficha__zone:focus-visible :global(.ficha__zone-arr) { color: var(--accent-gold); transform: translateX(3px); }
+
+  @media (--md) {
+    .ficha__panel { padding: var(--space-8); gap: var(--space-8); }
+  }
+  @media (--lg) {
+    .ficha__panel { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
+  }
+
+  /* ════════ DIRECTORIO POR INDUSTRIA (índice denso) ════════ */
+  .inddir__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5); }
+  /* H2 degradado a fluid-h3: es un directorio, no un titular de venta */
+  .inddir__title {
+    font-family: var(--font-display); font-weight: 600; font-size: var(--fluid-h3);
+    line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); color: var(--fg-primary);
+  }
+  .inddir__list {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .inddir__item { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
+  .inddir__link {
+    display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap-min);
+    padding: var(--space-2); border-radius: var(--radius-md);
+    text-decoration: none; color: inherit;
+    transition: background var(--duration-fast) var(--ease-out-expo);
+  }
+  .inddir__link:hover { background: var(--bg-elevated); }
+  .inddir__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+  /* icono INLINE 16px, sin caja-chip: densidad de índice */
+  .inddir__list :global(.inddir__ic) { width: 16px; height: 16px; flex: 0 0 auto; color: var(--fg-secondary); stroke-width: 1.5; transition: color var(--duration-fast); }
+  .inddir__link:hover :global(.inddir__ic), .inddir__link:focus-visible :global(.inddir__ic) { color: var(--accent-gold); }
+  .inddir__txt { display: flex; flex-direction: column; gap: 0; min-width: 0; flex: 1; }
+  .inddir__label { font-family: var(--font-display); font-size: var(--text-base); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
+  .inddir__sub { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); color: var(--fg-secondary); }
+  .inddir__list :global(.inddir__arr) { width: 15px; height: 15px; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-fast), transform var(--duration-base) var(--ease-out-expo); }
+  .inddir__link:hover :global(.inddir__arr), .inddir__link:focus-visible :global(.inddir__arr) { color: var(--accent-gold); transform: translateX(3px); }
+
+  @media (--md) {
+    .inddir__list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); }
+  }
+
+  /* ════════ SIGUE EXPLORANDO (franja slim, sin panel) ════════ */
+  .explore { padding-block: var(--space-6); border-block: 1px solid var(--border-subtle); }
+  .explore__row {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: var(--space-3) var(--space-6); min-width: 0;
+  }
+  .explore__list {
+    list-style: none; margin: 0; padding: 0; min-width: 0;
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-6);
+  }
+  .explore__list li { min-width: 0; }
+  .explore__link {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-primary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .explore__list :global(.explore__arr) { width: 15px; height: 15px; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-fast), transform var(--duration-base) var(--ease-out-expo); }
+  .explore__link:hover, .explore__link:focus-visible { color: var(--accent-gold); }
+  .explore__link:hover :global(.explore__arr), .explore__link:focus-visible :global(.explore__arr) { color: var(--accent-gold); transform: translateX(3px); }
+
+  @media (--md) {
+    .explore__row { flex-direction: row; align-items: center; }
+  }
+
+  /* ════════ REMATE: micro-reaseguro + gap CtaBand↔Contact ════════
+     :global() acotado bajo .finale (scope de esta página): recorta los paddings
+     de sección entre la banda de CTA y el formulario para que el reaseguro
+     los cosa sin un océano de aire. */
+  .reassure { padding-block: var(--space-2); }
+  .reassure__txt {
+    text-align: center; font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+  }
+  .finale :global(.ctaband.section) { padding-block-end: var(--space-6); }
+  .finale :global(.contact.section) { padding-block-start: var(--space-6); }
+
   @media (--motion-reduce) {
-    .svccard:hover { transform: none; }
-    .svccard:hover .svccard__go :global(svg),
-    .svcrow__link:hover :global(.svcrow__go) { transform: none; }
+    .pcard:hover { transform: none; }
+    .pcard:hover .pcard__go :global(svg),
+    .svcrow__link:hover :global(.svcrow__go),
+    .ficha__zone:hover :global(.ficha__zone-arr),
+    .inddir__link:hover :global(.inddir__arr),
+    .explore__link:hover :global(.explore__arr),
+    .svcprice__all:hover :global(svg) { transform: none; }
   }
 </style>

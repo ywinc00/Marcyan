@@ -37,7 +37,9 @@ export interface ProjectItem { name: string; cat: string; url: string; display: 
 export interface SectionProof { tag: string; title: string; cta: { label: string; href: string }; items: ProjectItem[] }
 export interface SectionFaq { tag: string; title: string; items: FaqItem[] }
 export interface SectionCta { title: string; sub?: string; primary: { label: string; href: string }; secondary?: { label: string; href: string }; tone?: 'gold' | 'teal' }
-export interface RelatedLink { label: string; href: string; desc: string; icon?: string }
+/** `price` (opcional, aditivo): precio display "desde $X" para vistas que muestran
+    el precio en su propio slot (hub de ciudad); las landings finas lo ignoran. */
+export interface RelatedLink { label: string; href: string; desc: string; icon?: string; price?: string }
 export interface SectionRelated { tag: string; title: string; links: RelatedLink[] }
 
 export interface ClusterPage {

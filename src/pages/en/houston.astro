@@ -1,16 +1,17 @@
 ---
-// HUB DE CIUDAD · /es/houston — LANDING #1 del negocio (rediseño premium
-// "Horizonte de llegada"). Página POTENTE nivel-home (DESIGN.md §2/§5):
-//   1. CityHero bespoke (cielo + riel de telemetría + escenario de horizonte),
-//   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 5 filas),
-//   3. Projects (prueba: "así se ve lo que cuesta"),
-//   4. Ficha Houston (contexto local + riel NAP + zonas como pills-ruta),
-//   5. Directorio por industria (índice denso),
-//   6. AnswerBlock + FAQ (AEO, texto verbatim),
-//   7. Franja "Sigue explorando" slim → CtaBand (secundaria = tel) →
-//      micro-reaseguro → Contact.
-// Los 19 <a> del silo (7 servicios + 7 industrias + 2 zonas + 3 related)
-// sobreviven íntegros. Schema (ItemList + Breadcrumb) y meta INTACTOS.
+// CITY HUB · /en/houston — EN mirror of es/houston.astro (bilingual-total).
+// Business LANDING #1 (premium redesign "Arrival horizon"). Home-level page
+// (DESIGN.md §2/§5):
+//   1. Bespoke CityHero (sky + telemetry rail + horizon stage),
+//   2. Services WITH PRICE (id="servicios": 2 asymmetric featured + 5 rows),
+//   3. Projects (proof: "this is what it costs, made visible"),
+//   4. Houston Card (local context + NAP rail + areas as route-pills),
+//   5. Directory by industry (dense index),
+//   6. AnswerBlock + FAQ (AEO, verbatim text),
+//   7. "Keep exploring" slim strip → CtaBand (secondary = tel) →
+//      micro-reassurance → Contact.
+// The 19 silo <a> (7 services + 7 industries + 2 areas + 3 related) survive
+// intact. Schema (ItemList + Breadcrumb) and meta INTACT.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -26,40 +27,39 @@ import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
-import { houstonHub as h } from '../../i18n/houston';
+import { clusterNavEn } from '../../i18n/clusters';
+import { houstonHub as h } from '../../i18n/houston.en';
 
-const c = content.es;
+const c = content.en;
 
-// Silueta de Texas — geográficamente correcta (misma derivada de GeoJSON público
-// que Locations.astro). En la Ficha va a COLOR PLENO en un pill de dato (14px),
-// nunca como marca de agua. Decorativa (aria-hidden).
+// Texas silhouette — geographically correct (same derivative from public GeoJSON
+// as Locations.astro). In the Card it goes FULL color in a data pill (14px),
+// never as a watermark. Decorative (aria-hidden).
 const TX_SHAPE = {
   viewBox: '0 0 100 93.4',
   path: 'M100 49.6L98.7 54L96.4 60.8L91 61.3L89.7 60.9L89.4 62.4L88.1 65.8L81.3 70.4L78.1 71.9L75 73.8L69.4 82.6L69.9 84.7L69.9 86.8L68.6 93.4L62.3 91.6L56.2 86.1L55 83.1L53.7 79L47.6 70.6L44.6 64.7L36.5 59.7L32.4 60L29.2 62.2L27.9 65.2L23.8 65.7L15 58.6L9.5 50.3L0 41L27.3 31.2L27.8 0L50.6 17.3L53.9 18.6L58.4 20.3L63.1 20.9L65.2 22.3L68.2 22.5L74.7 23.7L80 23.7L89 23.5L95 25.9L96.1 31L97.7 42.1Z',
 };
 
-// Showcase de servicios con precio: los 2 primeros = tarjetas destacadas
-// (web + IA, los pilares); los 5 restantes = filas densas con columna de precio.
+// Priced services showcase: the first 2 = featured cards (web + AI, the
+// pillars); the remaining 5 = dense rows with a price column.
 const svc = h.services.links;
 const svcFeatured = svc.slice(0, 2);
 const svcRest = svc.slice(2);
 const isBrand = (icon?: string) => icon === 'marcyan-ai';
-// Separa "desde" (label xs) de la cifra (numeral mono) del display de precio;
-// los precios sin "desde" (p.ej. "Diagnóstico gratis") se muestran tal cual.
+// Split "from" (xs label) from the figure (mono numeral) of the price display;
+// prices without "from" (e.g. "Free diagnostic") are shown as-is.
 const splitPrice = (p?: string) =>
-  p && p.startsWith('desde ') ? { pre: 'desde', amt: p.slice(6) } : { pre: '', amt: p ?? '' };
+  p && p.startsWith('from ') ? { pre: 'from', amt: p.slice(5) } : { pre: '', amt: p ?? '' };
 ---
 <Layout
   title={h.meta.title}
   description={h.meta.description}
-  lang="es"
+  lang="en"
   path="houston"
-
 >
-  <ItemListLd slot="head" items={h.itemList} name="Servicios de Marcyan en Houston" />
+  <ItemListLd slot="head" items={h.itemList} name="Marcyan services in Houston" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <CityHero
@@ -73,12 +73,12 @@ const splitPrice = (p?: string) =>
       skyline={h.hero.skyline}
       tone={h.hero.tone}
     >
-      <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="en" />
     </CityHero>
 
-    {/* ── SERVICIOS CON PRECIO ── el hero promete "precios públicos"; aquí se
-        cumple: 2 destacadas asimétricas con numeral de precio + 5 filas con
-        columna de precio. Los 7 <a> del silo, intactos. */}
+    {/* ── PRICED SERVICES ── the hero promises "public pricing"; here it is
+        delivered: 2 asymmetric featured cards with a price numeral + 5 rows with
+        a price column. The 7 silo <a>, intact. */}
     <section class="section svcprice" id="servicios" aria-labelledby="svcprice-title">
       <div class="container">
         <header class="svcprice__head">
@@ -101,7 +101,7 @@ const splitPrice = (p?: string) =>
                   {p.pre && <span class="pcard__from">{p.pre}</span>}
                   <span class="pcard__amt">{p.amt}</span>
                 </span>
-                <span class="pcard__go">Ver servicio <Icon name="lucide:arrow-right" /></span>
+                <span class="pcard__go">View service <Icon name="lucide:arrow-right" /></span>
               </a>
             );
           })}
@@ -131,20 +131,20 @@ const splitPrice = (p?: string) =>
           })}
         </ul>
 
-        {/* única fuga legítima de la sección: el hub de precios completo */}
+        {/* the section's only legitimate leak: the full pricing hub */}
         <div class="svcprice__foot">
-          <a class="svcprice__all" href="/es/precios">
-            Ver todos los precios <Icon name="lucide:arrow-right" />
+          <a class="svcprice__all" href="/en/pricing">
+            See all pricing <Icon name="lucide:arrow-right" />
           </a>
         </div>
       </div>
     </section>
 
-    {/* prueba real justo después del precio: "así se ve lo que cuesta" */}
-    <Projects projects={c.projects} />
+    {/* real proof right after the price: "this is what it costs, made visible" */}
+    <Projects lang="en" projects={c.projects} />
 
-    {/* ── FICHA HOUSTON ── contexto local con peso + riel NAP (dt/dd con
-        hairlines) + zonas como pills-ruta. Fusión del antiguo citynode + Prose. */}
+    {/* ── HOUSTON CARD ── local context with weight + NAP rail (dt/dd with
+        hairlines) + areas as route-pills. Merge of the old citynode + Prose. */}
     <section class="section ficha" aria-labelledby="ficha-title">
       <div class="container">
         <article class="ficha__panel">
@@ -156,7 +156,7 @@ const splitPrice = (p?: string) =>
             ))}
           </div>
 
-          <aside class="ficha__rail" aria-label="Datos de contacto y cobertura en Houston">
+          <aside class="ficha__rail" aria-label="Contact details and coverage in Houston">
             <dl class="ficha__meta">
               {h.ficha.meta.map((m) => (
                 <div class="ficha__row">
@@ -190,8 +190,8 @@ const splitPrice = (p?: string) =>
       </div>
     </section>
 
-    {/* ── DIRECTORIO POR INDUSTRIA ── índice denso: 7 <a> en filas con icono
-        inline (sin caja-chip), sub mono corto y hairlines. */}
+    {/* ── DIRECTORY BY INDUSTRY ── dense index: 7 <a> in rows with an inline
+        icon (no chip box), short mono sub and hairlines. */}
     <section class="section inddir" aria-labelledby="inddir-title">
       <div class="container">
         <header class="inddir__head">
@@ -215,13 +215,13 @@ const splitPrice = (p?: string) =>
       </div>
     </section>
 
-    {/* respuesta AEO citable (texto/fuente VERBATIM), adyacente al FAQ */}
-    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
+    {/* citable AEO answer (text/source VERBATIM), adjacent to the FAQ */}
+    <AnswerBlock lang="en" q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
     <Faq tag={h.faq.tag} title={h.faq.title} items={h.faq.items} />
 
-    {/* ── SIGUE EXPLORANDO ── franja slim: los 3 related como lista inline
-        (label mono + flecha), sin panel. */}
+    {/* ── KEEP EXPLORING ── slim strip: the 3 related as an inline list
+        (mono label + arrow), no panel. */}
     <section class="explore" aria-label={h.related.tag}>
       <div class="container explore__row">
         <Kicker>{h.related.tag}</Kicker>
@@ -238,10 +238,10 @@ const splitPrice = (p?: string) =>
       </div>
     </section>
 
-    {/* remate: CTA (secundaria = teléfono) → micro-reaseguro → formulario.
-        El wrapper .finale recorta el gap CtaBand↔Contact a nivel de página. */}
+    {/* close: CTA (secondary = phone) → micro-reassurance → form.
+        The .finale wrapper trims the CtaBand↔Contact gap at page level. */}
     <div class="finale">
-      <CtaBand
+      <CtaBand lang="en"
         title={h.cta.title}
         sub={h.cta.sub}
         primary={h.cta.primary}
@@ -249,7 +249,7 @@ const splitPrice = (p?: string) =>
         tone={h.cta.tone}
       />
 
-      <section class="reassure" aria-label="Compromisos de servicio">
+      <section class="reassure" aria-label="Service commitments">
         <div class="container">
           <p class="reassure__txt">{h.reassure}</p>
         </div>
@@ -261,19 +261,19 @@ const splitPrice = (p?: string) =>
     <SpaceBackdrop tone="gold" />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>
 
 <style>
-  /* ════════ SERVICIOS CON PRECIO (bespoke) ════════
-     El precio vive en su propio slot: numeral mono en --fg-primary que solo se
-     dora en hover (disciplina de acento). Chips de icono NEUTROS: el color lo
-     pone el contenido, no la decoración. */
+  /* ════════ PRICED SERVICES (bespoke) ════════
+     The price lives in its own slot: mono numeral in --fg-primary that only goes
+     gold on hover (accent discipline). NEUTRAL icon chips: color comes from the
+     content, not the decoration. */
   .svcprice :global(em) { color: var(--accent-gold); font-style: normal; }
   .svcprice__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
   .svcprice__title { max-width: 20ch; }
 
-  /* destacadas: asimetría 1.4fr/1fr en desktop (jerarquía real, no gemelas) */
+  /* featured: 1.4fr/1fr asymmetry on desktop (real hierarchy, not twins) */
   .svcprice__feat { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-5); }
 
   .pcard {
@@ -293,7 +293,7 @@ const splitPrice = (p?: string) =>
     font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle);
     letter-spacing: var(--tracking-wide); font-variant-numeric: tabular-nums;
   }
-  /* chip NEUTRO: superficie elevada + borde; el icono es secundario hasta el hover */
+  /* NEUTRAL chip: elevated surface + border; the icon is secondary until hover */
   .pcard__icon {
     display: inline-flex; align-items: center; justify-content: center;
     width: 48px; height: 48px; border-radius: var(--radius-md);
@@ -302,7 +302,7 @@ const splitPrice = (p?: string) =>
   }
   .pcard__icon :global(svg) { width: 24px; height: 24px; stroke-width: 1.5; }
   .pcard:hover .pcard__icon, .pcard:focus-visible .pcard__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
-  /* insignia de marca (marcyan-ai): SIEMPRE oro, nunca re-tintada */
+  /* brand badge (marcyan-ai): ALWAYS gold, never re-tinted */
   .pcard__icon--brand, .pcard:hover .pcard__icon--brand { color: var(--accent-gold); }
   .pcard__label {
     font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
@@ -310,7 +310,7 @@ const splitPrice = (p?: string) =>
   }
   .pcard__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); max-width: 46ch; }
 
-  /* el precio como NUMERAL: "desde" en xs encima, cifra grande en primario */
+  /* the price as a NUMERAL: "from" in xs on top, big figure in primary */
   .pcard__price {
     margin-top: auto; padding-top: var(--space-4);
     border-top: 1px solid var(--border-subtle);
@@ -334,7 +334,7 @@ const splitPrice = (p?: string) =>
   .pcard__go :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
   .pcard:hover .pcard__go :global(svg) { transform: translateX(4px); }
 
-  /* filas densas 03–07 con COLUMNA DE PRECIO mono a la derecha */
+  /* dense rows 03–07 with a mono PRICE COLUMN on the right */
   .svcprice__rest {
     list-style: none; margin: 0; padding: 0;
     display: grid; grid-template-columns: 1fr; gap: 0;
@@ -379,7 +379,7 @@ const splitPrice = (p?: string) =>
   }
   .svcrow__from { font-size: var(--text-xs); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
   .svcrow__link:hover .svcrow__price, .svcrow__link:focus-visible .svcrow__price { color: var(--accent-gold); }
-  /* flecha solo de --md en adelante (en móvil el precio ya cierra la fila) */
+  /* arrow only from --md up (on mobile the price already closes the row) */
   .svcprice__rest :global(.svcrow__go) { display: none; }
 
   .svcprice__foot { display: flex; justify-content: flex-end; padding-top: var(--space-4); }
@@ -409,7 +409,7 @@ const splitPrice = (p?: string) =>
     .svcrow__link:hover :global(.svcrow__go), .svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
   }
 
-  /* ════════ FICHA HOUSTON (bespoke: contexto + riel NAP) ════════ */
+  /* ════════ HOUSTON CARD (bespoke: context + NAP rail) ════════ */
   .ficha :global(em) { color: var(--accent-gold); font-style: normal; }
   .ficha__panel {
     position: relative; overflow: hidden; min-width: 0; isolation: isolate;
@@ -428,7 +428,7 @@ const splitPrice = (p?: string) =>
   .ficha__p { color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose); max-width: 58ch; }
   .ficha__p :global(strong) { color: var(--fg-primary); font-weight: 600; }
 
-  /* riel NAP: filas dt/dd con hairlines (patrón heredado del citynode) */
+  /* NAP rail: dt/dd rows with hairlines (pattern inherited from the citynode) */
   .ficha__rail { min-width: 0; display: flex; flex-direction: column; }
   .ficha__meta { display: flex; flex-direction: column; margin: 0; }
   .ficha__row {
@@ -447,14 +447,14 @@ const splitPrice = (p?: string) =>
     font-variant-numeric: tabular-nums; text-align: right; min-width: 0; overflow-wrap: anywhere;
   }
   .ficha__row dd a { position: relative; color: inherit; transition: color var(--duration-fast); }
-  /* zona táctil ≥44px del teléfono sin engordar la fila */
+  /* ≥44px touch target of the phone without bloating the row */
   .ficha__row dd a::after {
     content: ""; position: absolute; left: 0; right: 0;
     top: 50%; height: var(--tap-min); transform: translateY(-50%);
   }
   .ficha__row dd a:hover, .ficha__row dd a:focus-visible { color: var(--accent-gold); }
 
-  /* pill de estado: TX a color pleno (dato, no marca de agua) */
+  /* state pill: TX full color (data, not watermark) */
   .ficha__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
   .ficha__state {
     display: inline-flex; align-items: center; gap: var(--space-2);
@@ -464,7 +464,7 @@ const splitPrice = (p?: string) =>
   }
   .ficha__state-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; }
 
-  /* zonas del silo: pills-ruta bajo su propio h3 */
+  /* silo areas: route-pills under their own h3 */
   .ficha__zonestitle {
     font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
     color: var(--fg-primary); line-height: var(--leading-snug); margin-top: var(--space-5);
@@ -491,9 +491,9 @@ const splitPrice = (p?: string) =>
     .ficha__panel { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
   }
 
-  /* ════════ DIRECTORIO POR INDUSTRIA (índice denso) ════════ */
+  /* ════════ DIRECTORY BY INDUSTRY (dense index) ════════ */
   .inddir__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5); }
-  /* H2 degradado a fluid-h3: es un directorio, no un titular de venta */
+  /* H2 downgraded to fluid-h3: it is a directory, not a sales headline */
   .inddir__title {
     font-family: var(--font-display); font-weight: 600; font-size: var(--fluid-h3);
     line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); color: var(--fg-primary);
@@ -512,7 +512,7 @@ const splitPrice = (p?: string) =>
   }
   .inddir__link:hover { background: var(--bg-elevated); }
   .inddir__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
-  /* icono INLINE 16px, sin caja-chip: densidad de índice */
+  /* INLINE 16px icon, no chip box: index density */
   .inddir__list :global(.inddir__ic) { width: 16px; height: 16px; flex: 0 0 auto; color: var(--fg-secondary); stroke-width: 1.5; transition: color var(--duration-fast); }
   .inddir__link:hover :global(.inddir__ic), .inddir__link:focus-visible :global(.inddir__ic) { color: var(--accent-gold); }
   .inddir__txt { display: flex; flex-direction: column; gap: 0; min-width: 0; flex: 1; }
@@ -525,7 +525,7 @@ const splitPrice = (p?: string) =>
     .inddir__list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); }
   }
 
-  /* ════════ SIGUE EXPLORANDO (franja slim, sin panel) ════════ */
+  /* ════════ KEEP EXPLORING (slim strip, no panel) ════════ */
   .explore { padding-block: var(--space-6); border-block: 1px solid var(--border-subtle); }
   .explore__row {
     display: flex; flex-direction: column; align-items: flex-start;
@@ -550,10 +550,10 @@ const splitPrice = (p?: string) =>
     .explore__row { flex-direction: row; align-items: center; }
   }
 
-  /* ════════ REMATE: micro-reaseguro + gap CtaBand↔Contact ════════
-     :global() acotado bajo .finale (scope de esta página): recorta los paddings
-     de sección entre la banda de CTA y el formulario para que el reaseguro
-     los cosa sin un océano de aire. */
+  /* ════════ CLOSE: micro-reassurance + CtaBand↔Contact gap ════════
+     :global() scoped under .finale (this page's scope): trims the section
+     paddings between the CTA band and the form so the reassurance stitches them
+     without an ocean of air. */
   .reassure { padding-block: var(--space-2); }
   .reassure__txt {
     text-align: center; font-family: var(--font-mono); font-size: var(--text-xs);

@@ -1,8 +1,8 @@
 ---
-// PORTAFOLIO · /es/portafolio — proof real (4 clientes) + E-E-A-T (Lane 2).
-// Reusa los componentes del DS (LandingHero, AnswerBlock, RelatedLinks, Faq,
-// CtaBand, Contact) + PortfolioGrid (maquetas de dispositivo con capturas reales).
-// Schema: CollectionPage + ItemList (CreativeWork) + BreadcrumbList. ES (hasEn=false).
+// PORTFOLIO · /en/portfolio — real proof (4 clients) + E-E-A-T (Lane 2).
+// Reuses the DS components (LandingHero, AnswerBlock, RelatedLinks, Faq,
+// CtaBand, Contact) + PortfolioGrid (device mockups with real screenshots).
+// Schema: CollectionPage + ItemList (CreativeWork) + BreadcrumbList. EN.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -17,11 +17,11 @@ import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import CollectionPageLd from '../../components/seo/CollectionPageLd.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
-import { portfolioPage as p, portfolioProjects } from '../../i18n/portfolio';
+import { clusterNavEn } from '../../i18n/clusters';
+import { portfolioPage as p, portfolioProjects } from '../../i18n/portfolio.en';
 
-const c = content.es;
-// CollectionPage items desde los proyectos (CreativeWork con captura real; sin URL externa por privacidad).
+const c = content.en;
+// CollectionPage items from the projects (CreativeWork with real screenshot; no external URL for privacy).
 const works = portfolioProjects.map((w) => ({
   name: w.name,
   description: w.did,
@@ -32,13 +32,12 @@ const works = portfolioProjects.map((w) => ({
 <Layout
   title={p.meta.title}
   description={p.meta.description}
-  lang="es"
-  path="portafolio"
-
+  lang="en"
+  path="portfolio"
 >
   <CollectionPageLd slot="head" name={p.meta.title} description={p.meta.description} path={p.path} items={works} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -51,18 +50,18 @@ const works = portfolioProjects.map((w) => ({
       chips={p.hero.chips}
       tone={p.hero.tone}
     >
-      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="en" />
     </LandingHero>
 
-    <AnswerBlock q={p.answer.q} a={p.answer.a} />
+    <AnswerBlock lang="en" q={p.answer.q} a={p.answer.a} />
 
-    <PortfolioGrid tag={p.worksHead.tag} title={p.worksHead.title} intro={p.worksHead.intro} projects={portfolioProjects} />
+    <PortfolioGrid lang="en" tag={p.worksHead.tag} title={p.worksHead.title} intro={p.worksHead.intro} projects={portfolioProjects} />
 
     <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
 
     <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
 
-    <CtaBand
+    <CtaBand lang="en"
       title={p.cta.title}
       sub={p.cta.sub}
       primary={p.cta.primary}
@@ -75,5 +74,5 @@ const works = portfolioProjects.map((w) => ({
 
   <SpaceBackdrop tone="gold" />
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>

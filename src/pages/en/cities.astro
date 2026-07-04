@@ -1,16 +1,16 @@
 ---
-// ÍNDICE DE CIUDADES · /es/ciudades — nodo raíz del silo geográfico (Ola 2 · B3).
-// Resuelve la nav "Ciudades" ahora que hay 2 hubs (Houston + Miami). Schema:
-// ItemList (los 2 hubs) + BreadcrumbList.
+// CITIES INDEX · /en/cities — root node of the geographic silo (Wave 2 · B3).
+// Resolves the "Cities" nav now that there are 2 hubs (Houston + Miami). Schema:
+// ItemList (the 2 hubs) + BreadcrumbList.
 //
-// Rediseño DS v2 "Space-Tech" (DESIGN.md §2/§5): HUB de sección → header COMPACTO
-// (LandingHero variant="header"), NO el hero alto de portada. La energía visual va
-// al CONTENIDO: un showcase de "ficha de ciudad" VIVO que reusa el lenguaje de
-// Locations.astro (skyline line-art, silueta de estado geo-correcta, coords en pills
-// mono, tagline, área, tel y conmutador de servicios). Como Locations.astro es un
-// componente compartido (lo usa la home y trae su propio data-fx/id) NO se importa:
-// se monta una sección bespoke inline con su MISMO craft, alimentada por el mismo
-// contenido honesto (c.locations.items). SpaceBackdrop da la atmósfera de la home.
+// DS v2 "Space-Tech" redesign (DESIGN.md §2/§5): section HUB -> COMPACT header
+// (LandingHero variant="header"), NOT the tall cover hero. The visual energy goes
+// to the CONTENT: a LIVE "city card" showcase that reuses the language of
+// Locations.astro (skyline line-art, geo-correct state silhouette, coords in mono
+// pills, tagline, area, tel and a service switcher). Since Locations.astro is a
+// shared component (used by the home, bringing its own data-fx/id) it is NOT
+// imported: a bespoke inline section is mounted with its SAME craft, fed by the same
+// honest content (c.locations.items). SpaceBackdrop provides the home atmosphere.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -24,75 +24,96 @@ import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
+import { clusterNavEn } from '../../i18n/clusters';
 
-const c = content.es;
+const c = content.en;
 const tel = (s: string) => s.replace(/[^\d+]/g, '');
 
-// Hubs reales del silo geográfico, alineados con c.locations.items (mismo contenido
-// honesto). El primer enlace de cada ficha = el hub de ciudad (link primario).
+// Real hubs of the geographic silo, aligned with c.locations.items (same honest
+// content). The first link of each card = the city hub (primary link).
 const cityHubs: Record<string, { href: string; teaser: string }> = {
   Houston: {
-    href: '/es/houston',
-    teaser: 'Nuestra base de operaciones, con casos reales y verificables.',
+    href: '/en/houston',
+    teaser: 'Our base of operations, with real, verifiable case studies.',
   },
   Miami: {
-    href: '/es/miami',
-    teaser: 'Diseño, SEO e IA en el español del Caribe. Cupos de Cliente Fundador.',
+    href: '/en/miami',
+    teaser: 'Design, SEO and AI in true English and Spanish. Founding Client spots open.',
   },
 };
-const cities = c.locations.items;
 
-// Siluetas de estado — geográficamente correctas (mismas que Locations.astro,
-// derivadas de GeoJSON público con lat invertida para el eje-y de SVG). Decorativas.
+// Per-city service switcher (translated inline; EN content has no per-city links).
+// First entry = the city hub itself; the switcher renders links.slice(1) like the ES page.
+const cityLinks: Record<string, { label: string; sub: string; href: string; icon: string }[]> = {
+  Houston: [
+    { label: 'Studio in Houston', sub: 'Meet our team', href: '/en/houston', icon: 'lucide:users' },
+    { label: 'Web design in Houston', sub: 'Sites that build trust', href: '/en/houston/web-design', icon: 'lucide:monitor' },
+    { label: 'Local SEO in Houston', sub: 'We rank your business', href: '/en/houston/local-seo', icon: 'lucide:globe' },
+    { label: 'Online store in Houston', sub: 'Sell more. No limits', href: '/en/houston/ecommerce', icon: 'lucide:shopping-bag' },
+    { label: 'Conversational AI in Houston', sub: 'Support that converts', href: '/en/houston/conversational-ai', icon: 'lucide:message-square' },
+  ],
+  Miami: [
+    { label: 'Studio in Miami', sub: 'Meet our team', href: '/en/miami', icon: 'lucide:users' },
+    { label: 'Web design in Miami', sub: 'Designs people love', href: '/en/miami/web-design', icon: 'lucide:monitor' },
+    { label: 'Local SEO in Miami', sub: 'More visibility, more clients', href: '/en/miami/local-seo', icon: 'lucide:globe' },
+    { label: 'Online store in Miami', sub: 'Sell more. No limits', href: '/en/miami/ecommerce', icon: 'lucide:shopping-bag' },
+    { label: 'Conversational AI in Miami', sub: 'Support that connects', href: '/en/miami/conversational-ai', icon: 'lucide:message-square' },
+  ],
+};
+const cities = c.locations.items.map((city: any) => ({
+  ...city,
+  links: cityLinks[city.city] ?? city.links,
+}));
+
+// State silhouettes — geographically correct (same as Locations.astro, derived from
+// public GeoJSON with lat flipped for the SVG y-axis). Decorative.
 const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   TX: { viewBox: '0 0 100 93.4', path: 'M100 49.6L98.7 54L96.4 60.8L91 61.3L89.7 60.9L89.4 62.4L88.1 65.8L81.3 70.4L78.1 71.9L75 73.8L69.4 82.6L69.9 84.7L69.9 86.8L68.6 93.4L62.3 91.6L56.2 86.1L55 83.1L53.7 79L47.6 70.6L44.6 64.7L36.5 59.7L32.4 60L29.2 62.2L27.9 65.2L23.8 65.7L15 58.6L9.5 50.3L0 41L27.3 31.2L27.8 0L50.6 17.3L53.9 18.6L58.4 20.3L63.1 20.9L65.2 22.3L68.2 22.5L74.7 23.7L80 23.7L89 23.5L95 25.9L96.1 31L97.7 42.1Z' },
   FL: { viewBox: '0 0 100 86.4', path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z' },
 };
 
 const hero = {
-  kicker: 'Nuestras ciudades',
-  h1: 'Houston y <em>Miami</em>',
-  sub: 'Atendemos a negocios hispanos en Houston, Texas y Miami, Florida, en español e inglés, con contexto local real de cada mercado. Elige tu ciudad para ver los servicios.',
-  primary: { label: 'Ver servicios', href: '/es/servicios' },
-  secondary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-  chips: ['Houston, TX', 'Miami, FL', 'Bilingüe ES/EN'],
+  kicker: 'Our cities',
+  h1: 'Houston and <em>Miami</em>',
+  sub: 'We serve businesses in Houston, Texas and Miami, Florida, in true English and Spanish, with real local context for each market. Pick your city to see the services.',
+  primary: { label: 'View services', href: '/en/services' },
+  secondary: { label: 'Get a free proposal', href: '#contacto' },
+  chips: ['Houston, TX', 'Miami, FL', 'Bilingual EN/ES'],
   tone: 'gold' as const,
 };
 const breadcrumb = [
-  { name: 'Inicio', path: '/es/' },
-  { name: 'Ciudades', path: '/es/ciudades' },
+  { name: 'Home', path: '/en/' },
+  { name: 'Cities', path: '/en/cities' },
 ];
 const answer = {
-  q: '¿En qué ciudades trabaja Marcyan?',
-  a: 'Marcyan Studio atiende a negocios hispanos en Houston, Texas y Miami, Florida, como negocio de área de servicio (sin oficina pública). En ambas trabajamos diseño web, IA conversacional y SEO local, en español e inglés y con contexto local real. Houston es nuestra base de operaciones, con casos verificables.',
+  q: 'What cities does Marcyan work in?',
+  a: 'Marcyan Studio serves businesses in Houston, Texas and Miami, Florida, as a service-area business (no public office). In both we handle web design, conversational AI and local SEO, in true English and Spanish and with real local context. Houston is our base of operations, with verifiable case studies.',
 };
 const showcase = {
-  tag: 'Elige tu ciudad',
-  title: 'Dos ciudades, un <em>mismo equipo</em>',
+  tag: 'Pick your city',
+  title: 'Two cities, one <em>same team</em>',
 };
 const cta = {
-  title: 'Cuéntanos de tu negocio, <em>te orientamos gratis</em>',
-  sub: 'En menos de 24 horas recibes una propuesta con alcance y precio claros, sin compromiso, en tu ciudad y en tu idioma.',
-  primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-  secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
+  title: 'Tell us about your business, <em>we point you in the right direction for free</em>',
+  sub: 'In less than 24 hours you get a proposal with clear scope and price, no commitment, in your city and in your language.',
+  primary: { label: 'Get a free proposal', href: '#contacto' },
+  secondary: { label: 'Detailed project brief', href: '/formulario' },
   tone: 'gold' as const,
 };
 const itemList = [
-  { name: 'Marcyan en Houston, TX', path: '/es/houston' },
-  { name: 'Marcyan en Miami, FL', path: '/es/miami' },
+  { name: 'Marcyan in Houston, TX', path: '/en/houston' },
+  { name: 'Marcyan in Miami, FL', path: '/en/miami' },
 ];
 ---
 <Layout
-  title="Ciudades — Houston y Miami | Agencia hispana bilingüe | Marcyan"
-  description="Marcyan Studio trabaja con negocios hispanos en Houston, TX y Miami, FL: diseño web, IA y SEO local, en español e inglés. Elige tu ciudad."
-  lang="es"
-  path="ciudades"
-
+  title="Cities — Houston and Miami | Bilingual studio | Marcyan"
+  description="Marcyan Studio works with businesses in Houston, TX and Miami, FL: web design, AI and local SEO, in true English and Spanish. Pick your city."
+  lang="en"
+  path="cities"
 >
-  <ItemListLd slot="head" items={itemList} name="Ciudades de Marcyan Studio" />
+  <ItemListLd slot="head" items={itemList} name="Marcyan Studio Cities" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -105,21 +126,21 @@ const itemList = [
       tone={hero.tone}
       variant="header"
     >
-      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="en" />
     </LandingHero>
 
-    <AnswerBlock q={answer.q} a={answer.a} />
+    <AnswerBlock lang="en" q={answer.q} a={answer.a} />
 
-    <!-- ── SHOWCASE GEOGRÁFICO: fichas de ciudad vivas (bespoke) ──────────── -->
+    <!-- ── GEOGRAPHIC SHOWCASE: live city cards (bespoke) ──────────────── -->
     <section class="section cityhub" aria-labelledby="cityhub-title">
       <div class="container">
         <header class="cityhub__head">
           <Kicker>{showcase.tag}</Kicker>
           <h2 class="h2 cityhub__title" id="cityhub-title" set:html={showcase.title} />
-          <p class="cityhub__lead">Cada ciudad es un mercado distinto. Estas son nuestras dos bases y todo lo que hacemos en cada una.</p>
+          <p class="cityhub__lead">Every city is a different market. These are our two bases and everything we do in each one.</p>
         </header>
 
-        <!-- línea de ruta line-art entre las dos ciudades (decorativa) -->
+        <!-- line-art route between the two cities (decorative) -->
         <svg class="cityhub__route" viewBox="0 0 1000 60" aria-hidden="true" focusable="false" preserveAspectRatio="none">
           <path class="cityhub__route-line" d="M70 30 C 300 -6, 700 66, 930 30" />
           <circle class="cityhub__route-node cityhub__route-node--a" cx="70" cy="30" r="4" />
@@ -150,8 +171,8 @@ const itemList = [
                   )}
                   {hub?.teaser && <p class="citycard__teaser">{hub.teaser}</p>}
 
-                  {/* datos: estado + coords en pills mono (telemetría) */}
-                  <ul class="citycard__pills" aria-label="Datos de la ciudad">
+                  {/* data: state + coords in mono pills (telemetry) */}
+                  <ul class="citycard__pills" aria-label="City data">
                     {city.stateFull && (
                       <li class="citycard__pill">
                         {shape && (
@@ -170,14 +191,14 @@ const itemList = [
 
                   {hub?.href && (
                     <a class="citycard__hub" href={hub.href}>
-                      <span class="citycard__hub-tx">Agencia en {city.city}</span>
+                      <span class="citycard__hub-tx">Studio in {city.city}</span>
                       <Icon name="lucide:arrow-right" class="citycard__hub-arr" />
                     </a>
                   )}
 
                   {city.links && city.links.length > 0 && (
                     <div class="citycard__nav">
-                      <p class="citycard__nav-tag">Servicios en {city.city}</p>
+                      <p class="citycard__nav-tag">Services in {city.city}</p>
                       <ul class="citycard__links" role="list">
                         {city.links.slice(1).map((l: any) => (
                           <li>
@@ -206,7 +227,7 @@ const itemList = [
       </div>
     </section>
 
-    <CtaBand
+    <CtaBand lang="en"
       title={cta.title}
       sub={cta.sub}
       primary={cta.primary}
@@ -219,11 +240,11 @@ const itemList = [
 
   <SpaceBackdrop tone="gold" />
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang="en" />
 </Layout>
 
 <style>
-  /* ── encabezado del showcase ──────────────────────────── */
+  /* ── showcase header ──────────────────────────── */
   .cityhub :global(em) { color: var(--accent-gold); font-style: normal; }
   .cityhub__head {
     display: flex; flex-direction: column; gap: var(--space-3);
@@ -232,16 +253,16 @@ const itemList = [
   .cityhub__title { font-family: var(--font-display); line-height: var(--leading-snug); }
   .cityhub__lead { color: var(--fg-secondary); font-size: var(--fluid-lead); max-width: 48ch; }
 
-  /* línea de ruta entre ciudades — decorativa, oro a baja opacidad */
+  /* route line between cities — decorative, low-opacity gold */
   .cityhub__route { display: none; }
   .cityhub__route-line { fill: none; stroke: var(--accent-gold); stroke-width: 1; opacity: 0.3; stroke-dasharray: 2 6; stroke-linecap: round; }
   .cityhub__route-node { fill: var(--accent-gold); opacity: 0.7; }
   .cityhub__route-node--b { fill: var(--accent-teal); }
 
-  /* ── grid de fichas ───────────────────────────────────── */
+  /* ── card grid ───────────────────────────────────── */
   .cityhub__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
 
-  /* ── ficha de ciudad (eco de Locations.astro, scope propio) ── */
+  /* ── city card (echo of Locations.astro, own scope) ── */
   .citycard {
     position: relative; overflow: hidden; min-width: 0;
     display: flex; flex-direction: column;
@@ -251,8 +272,8 @@ const itemList = [
   }
   .citycard:hover { border-color: var(--border-accent); }
 
-  /* skyline line-art (asset oficial oro) — esquina superior derecha, difuminado al
-     borde izquierdo. mix-blend lighten colapsa el lavado del PNG al color de la card. */
+  /* skyline line-art (official gold asset) — top-right corner, faded to the left
+     edge. mix-blend lighten collapses the PNG wash to the card color. */
   .citycard__illo {
     position: absolute; top: 84px; right: var(--space-5);
     width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
@@ -287,7 +308,7 @@ const itemList = [
   .citycard__tagline :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
   .citycard__teaser { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); max-width: 38ch; }
 
-  /* pills de dato (estado + coords) */
+  /* data pills (state + coords) */
   .citycard__pills { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
   .citycard__pill {
     display: inline-flex; align-items: center; gap: var(--space-2);
@@ -311,7 +332,7 @@ const itemList = [
   .citycard__tel :global(.citycard__tel-ic) { width: 15px; height: 15px; flex: 0 0 auto; stroke-width: 1.5; }
   .citycard__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
 
-  /* CTA primaria de la ficha = ir al hub de ciudad (botón oro contorno, ancho) */
+  /* card primary CTA = go to the city hub (outlined gold button, full width) */
   .citycard__hub {
     display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
     min-height: var(--tap-min); margin-top: var(--space-2);
@@ -325,7 +346,7 @@ const itemList = [
   .citycard__hub :global(.citycard__hub-arr) { width: 18px; height: 18px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
   .citycard__hub:hover :global(.citycard__hub-arr) { transform: translateX(3px); }
 
-  /* conmutador de servicios de la ciudad */
+  /* city service switcher */
   .citycard__nav { margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); }
   .citycard__nav-tag {
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
@@ -363,7 +384,7 @@ const itemList = [
   }
   .citycard__conn-dots { letter-spacing: 0.2em; opacity: 0.7; }
 
-  /* móvil: el skyline se baja al divisor (sobre los enlaces) para no tapar el título */
+  /* mobile: the skyline drops to the divider (over the links) so it doesn't cover the title */
   @media (--lt-md) {
     .citycard__illo { top: auto; bottom: calc(100% - 296px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
   }

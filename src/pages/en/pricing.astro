@@ -1,10 +1,10 @@
 ---
-// HUB DE PRECIOS · /es/precios — Fase 0 SEO.
-// "Precios públicos, sin letra pequeña": los 6 servicios con "desde $X" + qué
-// incluye, answer-first AEO, framing de transparencia (publicamos lo recurrente
-// que la competencia esconde) y FAQ con FAQPage. Schema: OfferCatalog con
-// Offer/priceSpecification de los 6 (munición AEO; solo Once Once lo hace).
-// ES por ahora (hasEn=false). /en/precios queda para la Ola 4.
+// PRICING HUB · /en/pricing — SEO Phase 0.
+// "Public pricing, no fine print": the 6 services with "from $X" + what
+// each includes, answer-first AEO, transparency framing (we publish the
+// recurring pricing the competition hides) and an FAQ with FAQPage. Schema:
+// OfferCatalog with Offer/priceSpecification for all 6 (AEO ammunition).
+// EN mirror of the Spanish pricing hub.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -20,26 +20,25 @@ import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
-import { priceServices, offerItems, preciosPage as p } from '../../i18n/pricing';
+import { clusterNavEn } from '../../i18n/clusters';
+import { priceServices, offerItems, preciosPage as p } from '../../i18n/pricing.en';
 
-const c = content.es;
+const c = content.en;
 ---
 <Layout
   title={p.meta.title}
   description={p.meta.description}
-  lang="es"
-  path="precios"
-
+  lang="en"
+  path="pricing"
 >
-  <OfferCatalogLd slot="head" items={offerItems} url={p.path} name="Precios — Marcyan Studio" />
+  <OfferCatalogLd slot="head" items={offerItems} url={p.path} name="Pricing — Marcyan Studio" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    {/* §2: HUB de sección → header COMPACTO (no clona el hero de portada). Las chips
-        de prueba salen del header y se promueven a una "rampa de transparencia"
-        bespoke (abajo) para que respiren y la página tenga carácter propio. */}
+    {/* §2: section HUB → COMPACT header (does not clone the homepage hero). The
+        proof chips leave the header and get promoted to a bespoke "transparency
+        ramp" (below) so they can breathe and the page has its own character. */}
     <LandingHero
       variant="header"
       kicker={p.hero.kicker}
@@ -49,15 +48,15 @@ const c = content.es;
       secondary={p.hero.secondary}
       tone={p.hero.tone}
     >
-      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="en" />
     </LandingHero>
 
-    {/* ── Rampa de transparencia (bespoke) ──────────────────────────────────
-        Reutiliza VERBATIM las chips honestas de i18n (p.hero.chips). No es el
-        cliché de 3-card icono+título+párrafo: son señales de telemetría con
-        índice mono + línea conectora, leídas como "lo que verás en esta página".
-        Da el remate de confianza justo donde aterriza la vista, sin caja sosa. */}
-    <section class="promise" aria-label="Por qué estos precios">
+    {/* ── Transparency ramp (bespoke) ───────────────────────────────────────
+        Reuses the honest chips from i18n VERBATIM (p.hero.chips). Not the
+        3-card icon+title+paragraph cliche: these are telemetry signals with a
+        mono index + connector line, read as "what you will see on this page".
+        Delivers the trust punch right where the eye lands, no dull box. */}
+    <section class="promise" aria-label="Why these prices">
       <div class="container">
         <ul class="promise__rail" role="list">
           {p.hero.chips.map((ch, i) => (
@@ -71,7 +70,7 @@ const c = content.es;
       </div>
     </section>
 
-    <AnswerBlock q={p.answer.q} a={p.answer.a} />
+    <AnswerBlock lang="en" q={p.answer.q} a={p.answer.a} />
 
     <Prose
       tag={p.transparency.tag}
@@ -80,13 +79,13 @@ const c = content.es;
       tone={p.transparency.tone}
     />
 
-    <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={priceServices} />
+    <PriceGrid lang="en" tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={priceServices} />
 
     <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
 
     <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
 
-    <CtaBand
+    <CtaBand lang="en"
       title={p.cta.title}
       sub={p.cta.sub}
       primary={p.cta.primary}
@@ -99,15 +98,15 @@ const c = content.es;
 
   <SpaceBackdrop tone="gold" />
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>
 
 <style>
-  /* ── Rampa de transparencia ─────────────────────────────────────────────
-     Banda escaneable que sirve de puente entre el header compacto y el bloque
-     answer-first. Telemetría (mono + índice + punto de señal oro), filete
-     conector entre celdas. Flota sobre la atmósfera SpaceBackdrop (sin caja
-     sólida). Solo tokens; breakpoints vía @custom-media. */
+  /* ── Transparency ramp ──────────────────────────────────────────────────
+     A scannable band that bridges the compact header and the answer-first
+     block. Telemetry (mono + index + gold signal dot), a connector rule
+     between cells. Floats over the SpaceBackdrop atmosphere (no solid box).
+     Tokens only; breakpoints via @custom-media. */
   .promise {
     padding-block: var(--space-6) 0;
   }
@@ -123,7 +122,7 @@ const c = content.es;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
   }
-  /* filete de acento a la izquierda: señal de "punto verificado" */
+  /* left accent rule: a "verified point" signal */
   .promise__cell::before {
     content: ""; position: absolute; left: 0; top: var(--space-3); bottom: var(--space-3);
     width: 2px; border-radius: 0 2px 2px 0;
@@ -145,7 +144,7 @@ const c = content.es;
     line-height: var(--leading-snug);
   }
 
-  /* ≥ sm: las tres señales en una fila de telemetría, con filete conector entre ellas */
+  /* ≥ sm: the three signals in one telemetry row, with a connector rule between them */
   @media (--sm) {
     .promise { padding-block: var(--space-7) 0; }
     .promise__rail {

@@ -1,9 +1,9 @@
 ---
-// CATÁLOGO DE SERVICIOS · /es/servicios — hub de servicios (Track E).
-// Reúne los 7 productos (con niveles) en una página navegable, reusando los
-// componentes del DS (LandingHero, AnswerBlock, PriceGrid, RelatedLinks,
-// FeatureGrid, Faq, CtaBand, Contact). Schema: OfferCatalog (todos los niveles)
-// + ItemList (los 7 servicios) + BreadcrumbList. ES por ahora (hasEn=false).
+// SERVICES CATALOG · /en/services — services hub (Track E).
+// Gathers the 7 products (with tiers) into one navigable page, reusing the
+// DS components (LandingHero, AnswerBlock, PriceGrid, RelatedLinks,
+// FeatureGrid, Faq, CtaBand, Contact). Schema: OfferCatalog (all tiers)
+// + ItemList (the 7 services) + BreadcrumbList.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -20,25 +20,24 @@ import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
-import { priceServices, offerItems } from '../../i18n/pricing';
-import { serviciosPage as s } from '../../i18n/servicios';
+import { clusterNavEn } from '../../i18n/clusters';
+import { priceServices, offerItems } from '../../i18n/pricing.en';
+import { serviciosPage as s } from '../../i18n/servicios.en';
 
-const c = content.es;
+const c = content.en;
 ---
 <Layout
   title={s.meta.title}
   description={s.meta.description}
-  lang="es"
-  path="servicios"
-
+  lang="en"
+  path="services"
 >
   <Fragment slot="head">
-    <OfferCatalogLd items={offerItems} url={s.path} name="Servicios y precios — Marcyan Studio" />
-    <ItemListLd items={s.itemList} name="Servicios de Marcyan Studio" />
+    <OfferCatalogLd items={offerItems} url={s.path} name="Services and pricing — Marcyan Studio" />
+    <ItemListLd items={s.itemList} name="Marcyan Studio services" />
   </Fragment>
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -51,12 +50,12 @@ const c = content.es;
       chips={s.hero.chips}
       tone={s.hero.tone}
     >
-      <Breadcrumb slot="breadcrumb" items={s.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={s.breadcrumb} lang="en" />
     </LandingHero>
 
-    <AnswerBlock q={s.answer.q} a={s.answer.a} />
+    <AnswerBlock lang="en" q={s.answer.q} a={s.answer.a} />
 
-    <PriceGrid tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
+    <PriceGrid lang="en" tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
 
     <RelatedLinks tag={s.related.tag} title={s.related.title} links={s.related.links} />
 
@@ -64,7 +63,7 @@ const c = content.es;
 
     <Faq tag={s.faq.tag} title={s.faq.title} items={s.faq.items} />
 
-    <CtaBand
+    <CtaBand lang="en"
       title={s.cta.title}
       sub={s.cta.sub}
       primary={s.cta.primary}
@@ -74,10 +73,10 @@ const c = content.es;
 
     <Contact contact={c.contact} />
 
-    {/* Atmósfera de la home (§1): una sola capa fija oro/teal + estrellas, para que
-        el hub no se vea como una losa plana de --bg-base. tone="gold" = acento del hub. */}
+    {/* Home atmosphere (§1): a single fixed gold/teal + stars layer, so the
+        hub does not look like a flat slab of --bg-base. tone="gold" = hub accent. */}
     <SpaceBackdrop tone="gold" />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>

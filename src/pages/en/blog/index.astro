@@ -1,10 +1,12 @@
 ---
-// ÍNDICE DEL BLOG · /es/blog — "bitácora de la nave": header editorial COMPACTO
-// (LandingHero variant="header"), rail de CATEGORÍAS derivado de post.data.tags
-// (filtro por enriquecimiento progresivo: sin JS se ven todas), pieza DESTACADA
-// con micro-ilustración line-art + grid de entradas con jerarquía de log.
-// Schema: Blog (listado) + BreadcrumbList (del Breadcrumb). ES por ahora
-// (hasEn=false); /en/blog queda para la Ola 4.
+// BLOG INDEX · /en/blog — "ship's log": compact editorial header
+// (LandingHero variant="header"), CATEGORY rail derived from post.data.tags
+// (progressive-enhancement filter: without JS all show), FEATURED piece
+// with line-art micro-illustration + entries grid with log hierarchy.
+// Schema: Blog (listing) + BreadcrumbList (from Breadcrumb). EN mirror of
+// /es/blog; posts are filtered to lang === 'en' (none yet -> empty state,
+// while still rendering hero + CTA + Contact). Inline EN index copy below
+// (blog.ts is ES-only; not modified).
 import Layout from '../../../layouts/Layout.astro';
 import SiteNav from '../../../components/layout/SiteNav.astro';
 import SiteFooter from '../../../components/layout/SiteFooter.astro';
@@ -19,21 +21,53 @@ import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
 import BlogIllustration from '../../../components/BlogIllustration.astro';
 import BlogListingLd from '../../../components/seo/BlogListingLd.astro';
 import { content } from '../../../i18n/content';
-import { clusterNav } from '../../../i18n/clusters';
-import { blogIndex } from '../../../i18n/blog';
+import { clusterNavEn } from '../../../i18n/clusters';
+import type { CrumbItem } from '../../../lib/schema';
 import { getCollection } from 'astro:content';
 
-const c = content.es;
-const b = blogIndex;
+const c = content.en;
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang !== 'en')).sort(
-  (a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime(),
-);
+// EN blog index copy (inline; blog.ts stays ES-only and untouched).
+const b = {
+  meta: {
+    title: 'Blog - Web design, AI & SEO guides for small businesses | Marcyan Studio',
+    description:
+      'Clear, honest guides on web design, artificial intelligence, and SEO for small businesses in Houston and Miami. Real prices, sourced data, and zero empty promises.',
+  },
+  hero: {
+    badge: 'Resources',
+    badgeIcon: 'lucide:book-open',
+    kicker: 'Marcyan Blog',
+    h1: 'Honest guides to <em>grow</em> your business online',
+    sub: 'Web design, artificial intelligence, and SEO explained without jargon and without fine print, for small business owners in Houston and Miami.',
+    primary: { label: 'Explore guides', href: '#articulos' },
+    secondary: { label: 'See pricing', href: '/en/pricing' },
+    tone: 'gold' as const,
+  },
+  breadcrumb: [
+    { name: 'Home', path: '/en/' },
+    { name: 'Blog', path: '/en/blog' },
+  ] as CrumbItem[],
+  list: { tag: 'Latest posts', title: 'Recent <em>articles</em>' },
+  cardCta: 'Read guide',
+  empty: 'Our English guides are coming soon.',
+  cta: {
+    title: 'Ready for your business to <em>take off</em>?',
+    sub: 'Tell us your idea and get a personalized proposal in under 24 hours, at no cost and no commitment.',
+    primary: { label: 'Get a free proposal', href: '#contacto' },
+    secondary: { label: 'See pricing', href: '/en/pricing' },
+    tone: 'gold' as const,
+  },
+};
 
-const fmt = (d: Date) => new Intl.DateTimeFormat('es', { dateStyle: 'long', timeZone: 'UTC' }).format(d);
+const posts = (
+  await getCollection('blog', ({ data }) => !data.draft && data.lang === 'en')
+).sort((a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime());
+
+const fmt = (d: Date) => new Intl.DateTimeFormat('en', { dateStyle: 'long', timeZone: 'UTC' }).format(d);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-// id estable por etiqueta (para data-cat / data-filter sin acentos ni espacios)
+// stable id per tag (for data-cat / data-filter without accents or spaces)
 const STRIP_DIACRITICS = /[̀-ͯ]/g;
 const slugify = (s: string) =>
   s
@@ -43,27 +77,27 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
-// CATEGORÍAS derivadas de los tags reales, con conteo, ordenadas por frecuencia.
+// CATEGORIES derived from real tags, with count, ordered by frequency.
 const catCount = new Map<string, number>();
 for (const p of posts) for (const t of p.data.tags) catCount.set(t, (catCount.get(t) ?? 0) + 1);
 const categories = [...catCount.entries()]
   .sort((a, z) => z[1] - a[1] || a[0].localeCompare(z[0]))
   .map(([label, count]) => ({ label, count, id: slugify(label) }));
 
-// cada post lleva su lista de ids de categoría (para el filtro por enriquecimiento)
+// each post carries its list of category ids (for the enhancement filter)
 const withCats = posts.map((p) => ({ post: p, cats: p.data.tags.map(slugify) }));
 
 const postRefs = posts.map((p) => ({
   headline: p.data.title,
-  path: `/es/blog/${p.id}`,
+  path: `/en/blog/${p.id}`,
   description: p.data.description,
   datePublished: iso(p.data.datePublished),
 }));
 ---
-<Layout title={b.meta.title} description={b.meta.description} lang="es" path="blog">
-  <BlogListingLd slot="head" posts={postRefs} name="Blog de Marcyan Studio" description={b.meta.description} path="/es/blog" />
+<Layout title={b.meta.title} description={b.meta.description} lang="en" path="blog">
+  <BlogListingLd slot="head" posts={postRefs} name="Marcyan Studio Blog" description={b.meta.description} path="/en/blog" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath="/es/blog" />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath="/en/blog" />
 
   <main id="main">
     <LandingHero
@@ -77,7 +111,7 @@ const postRefs = posts.map((p) => ({
       tone={b.hero.tone}
       variant="header"
     >
-      <Breadcrumb slot="breadcrumb" items={b.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={b.breadcrumb} lang="en" />
     </LandingHero>
 
     <section class="section bloglist">
@@ -91,15 +125,15 @@ const postRefs = posts.map((p) => ({
           <p class="bloglist__empty">{b.empty}</p>
         ) : (
           <div class="bloglist__body" data-blog>
-            {/* ── Rail de categorías (filtro por enriquecimiento progresivo) ── */}
+            {/* -- Category rail (progressive-enhancement filter) -- */}
             {categories.length > 1 && (
-              <nav class="catrail" aria-label="Filtrar por tema">
-                <span class="catrail__label" aria-hidden="true">Temas</span>
+              <nav class="catrail" aria-label="Filter by topic">
+                <span class="catrail__label" aria-hidden="true">Topics</span>
                 <ul class="catrail__list" role="list">
                   <li>
                     <button type="button" class="catchip is-active" data-filter="all" aria-pressed="true">
                       <span class="catchip__dot" aria-hidden="true"></span>
-                      Todas
+                      All
                       <span class="catchip__count">{posts.length}</span>
                     </button>
                   </li>
@@ -116,8 +150,8 @@ const postRefs = posts.map((p) => ({
               </nav>
             )}
 
-            {/* mensaje cuando un filtro no deja resultados (oculto por defecto) */}
-            <p class="bloglist__none" data-blog-none hidden>No hay guías en este tema todavía.</p>
+            {/* message when a filter yields no results (hidden by default) */}
+            <p class="bloglist__none" data-blog-none hidden>No guides on this topic yet.</p>
 
             <ul id="articulos" class="bloglist__grid">
               {withCats.map(({ post: p, cats }, i) => (
@@ -126,8 +160,8 @@ const postRefs = posts.map((p) => ({
                   data-post
                   data-cats={cats.join(' ')}
                 >
-                  <Card href={`/es/blog/${p.id}`} class="postcard">
-                    {/* ── Ilustración propia por tema (image-forward, arriba) ── */}
+                  <Card href={`/en/blog/${p.id}`} class="postcard">
+                    {/* -- Custom illustration per topic (image-forward, on top) -- */}
                     <div class="postcard__media">
                       <BlogIllustration tags={p.data.tags} class="postcard__illo" />
                     </div>
@@ -150,7 +184,7 @@ const postRefs = posts.map((p) => ({
       </div>
     </section>
 
-    <CtaBand
+    <CtaBand lang="en"
       title={b.cta.title}
       sub={b.cta.sub}
       primary={b.cta.primary}
@@ -161,7 +195,7 @@ const postRefs = posts.map((p) => ({
     <Contact contact={c.contact} />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang="en" />
   <SpaceBackdrop tone="gold" />
 </Layout>
 
@@ -171,7 +205,7 @@ const postRefs = posts.map((p) => ({
   .bloglist__empty { color: var(--fg-secondary); font-size: var(--text-md); }
   .bloglist__none { color: var(--fg-secondary); font-size: var(--text-md); margin-bottom: var(--space-6); }
 
-  /* ── rail de categorías = "selector de canal" mono, escaneable ── */
+  /* -- category rail = mono "channel selector", scannable -- */
   .catrail {
     display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
     margin-bottom: var(--space-7); padding-bottom: var(--space-5);
@@ -212,22 +246,22 @@ const postRefs = posts.map((p) => ({
   .catchip.is-active .catchip__dot { background: var(--fg-inverse); box-shadow: none; }
   .catchip.is-active .catchip__count { color: var(--fg-inverse); border-left-color: color-mix(in srgb, var(--fg-inverse), transparent 75%); opacity: 0.75; }
 
-  /* ── grid de entradas ── */
+  /* -- entries grid -- */
   .bloglist__grid { list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
   .bloglist__cell { min-width: 0; display: flex; }
-  /* post oculto por el filtro */
+  /* post hidden by the filter */
   .bloglist__cell[hidden] { display: none; }
 
-  /* image-forward: la ilustración va a sangre arriba; el padding del Card se
-     traslada al cuerpo para que la miniatura ocupe todo el ancho. El selector
-     .postcard.card sube la especificidad por encima del .card de Card.astro
-     para neutralizar su padding de forma DETERMINISTA (no depender del orden de
-     bundle entre estilos de página y de componente). Ambas clases van en el mismo
-     <a> (Card pasa `postcard` a class:list), así que el matcher es válido. */
+  /* image-forward: the illustration bleeds to the top edge; the Card padding
+     moves to the body so the thumbnail fills the full width. The selector
+     .postcard.card raises specificity above the .card from Card.astro to
+     neutralize its padding DETERMINISTICALLY (not depending on bundle order
+     between page and component styles). Both classes are on the same <a>
+     (Card passes `postcard` into class:list), so the matcher is valid. */
   .postcard { position: relative; isolation: isolate; display: flex; flex-direction: column; height: 100%; overflow: clip; }
   .postcard.card { padding: 0; }
 
-  /* ── miniatura (ilustración propia por tema) ── */
+  /* -- thumbnail (custom illustration per topic) -- */
   .postcard__media {
     position: relative;
     border-bottom: 1px solid var(--border-subtle);
@@ -237,7 +271,7 @@ const postRefs = posts.map((p) => ({
     overflow: clip;
   }
   .postcard__media :global(.postcard__illo) {
-    /* la ilustración ya trae aspect-ratio 3:2 + aria-hidden; le damos aire interno */
+    /* the illustration already ships aspect-ratio 3:2 + aria-hidden; give it inner air */
     padding: var(--space-5) var(--space-6);
     opacity: 0.9;
   }
@@ -247,7 +281,7 @@ const postRefs = posts.map((p) => ({
     padding: var(--space-6); flex: 1 1 auto; min-width: 0;
   }
 
-  /* numeral de bitácora */
+  /* log numeral */
   .postcard__num {
     font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold);
     letter-spacing: var(--tracking-wide); padding-right: var(--space-3);
@@ -276,14 +310,14 @@ const postRefs = posts.map((p) => ({
 
   @media (--md) {
     .bloglist__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
-    /* la pieza destacada ocupa el ancho completo de la fila superior */
+    /* the featured piece spans the full width of the top row */
     .bloglist__cell--feature { grid-column: 1 / -1; }
     .bloglist__cell--feature .postcard__title { font-size: var(--text-2xl); max-width: 28ch; }
     .bloglist__cell--feature .postcard__excerpt { max-width: 64ch; font-size: var(--text-md); }
   }
   @media (--lg) {
     .bloglist__grid { grid-template-columns: repeat(3, 1fr); }
-    /* destacada = ilustración a un lado, contenido al otro (jerarquía horizontal) */
+    /* featured = illustration on one side, content on the other (horizontal hierarchy) */
     .bloglist__cell--feature .postcard {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: stretch;
     }
@@ -303,9 +337,9 @@ const postRefs = posts.map((p) => ({
 </style>
 
 <script>
-  // Filtro por TEMA — enriquecimiento progresivo. Sin JS: rail estático + todas las
-  // entradas visibles (los <button> simplemente no hacen nada). Con JS: alterna el
-  // atributo [hidden] de cada post según su data-cats; "Todas" reinicia.
+  // TOPIC filter -- progressive enhancement. Without JS: static rail + all
+  // entries visible (the <button>s simply do nothing). With JS: toggles the
+  // [hidden] attribute of each post based on its data-cats; "All" resets.
   const root = document.querySelector<HTMLElement>('[data-blog]');
   if (root) {
     const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.catchip'));

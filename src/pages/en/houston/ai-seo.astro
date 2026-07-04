@@ -1,10 +1,10 @@
 ---
-// LANDING · /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
-// El mayor wedge: que ChatGPT/Gemini/Meta AI te RECOMIENDEN a TI. Página
-// bespoke (patrón /es/servicios) que reusa los componentes del DS + PriceGrid
-// para los 3 niveles (diagnóstico gratis · cimientos $500 · monitoreo $200/mes).
-// Schema: Service con Offer×3 (ServiceLd con tiers) + FAQPage (Faq) +
-// BreadcrumbList (Breadcrumb). ES por ahora (hasEn=false).
+// LANDING (EN) - /en/houston/ai-seo - "SEO for AI / AI Visibility" (AEO).
+// The biggest wedge: getting ChatGPT/Gemini/Meta AI to RECOMMEND YOU. Bespoke page
+// (services pattern) that reuses the DS components + PriceGrid for the 3 tiers
+// (free diagnostic - foundations $500 - monitoring $200/mo).
+// Schema: Service with Offer x3 (ServiceLd with tiers) + FAQPage (Faq) +
+// BreadcrumbList (Breadcrumb). EN mirror of /es/houston/seo-para-ia.
 import Layout from '../../../layouts/Layout.astro';
 import SiteNav from '../../../components/layout/SiteNav.astro';
 import SiteFooter from '../../../components/layout/SiteFooter.astro';
@@ -20,21 +20,20 @@ import Contact from '../../../components/sections/Contact.astro';
 import ServiceLd from '../../../components/seo/ServiceLd.astro';
 import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
 import { content } from '../../../i18n/content';
-import { clusterNav } from '../../../i18n/clusters';
-import { seoIaPage as p, aeoTiers } from '../../../i18n/seo-ia';
+import { clusterNavEn } from '../../../i18n/clusters';
+import { seoIaPage as p, aeoTiers } from '../../../i18n/seo-ia.en';
 
-const c = content.es;
+const c = content.en;
 ---
 <Layout
   title={p.meta.title}
   description={p.meta.description}
-  lang="es"
-  path="houston/seo-para-ia"
-
+  lang="en"
+  path="houston/ai-seo"
 >
   <ServiceLd slot="head" {...p.service} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -48,10 +47,10 @@ const c = content.es;
       chips={p.hero.chips}
       tone={p.hero.tone}
     >
-      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="en" />
     </LandingHero>
 
-    <AnswerBlock q={p.answer.q} a={p.answer.a} source={p.answer.source} />
+    <AnswerBlock lang="en" q={p.answer.q} a={p.answer.a} source={p.answer.source} />
 
     <Prose
       tag={p.distinction.tag}
@@ -60,7 +59,7 @@ const c = content.es;
       tone={p.distinction.tone}
     />
 
-    <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={aeoTiers} />
+    <PriceGrid lang="en" tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={aeoTiers} />
 
     <FeatureGrid tag={p.mechanics.tag} title={p.mechanics.title} items={p.mechanics.items} tone={p.mechanics.tone} />
 
@@ -73,7 +72,7 @@ const c = content.es;
 
     <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
 
-    <CtaBand
+    <CtaBand lang="en"
       title={p.cta.title}
       sub={p.cta.sub}
       primary={p.cta.primary}
@@ -83,8 +82,8 @@ const c = content.es;
 
     <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
 
-    <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="SEO para IA (Visibilidad en IA)" />
+    <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="SEO for AI (AI Visibility)" />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>

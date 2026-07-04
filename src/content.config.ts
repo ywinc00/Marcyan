@@ -16,6 +16,9 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    /** Idioma de la pieza. Los 6 posts actuales son ES (default); /en/blog filtra
+     *  por 'en' (aún vacío). Se pone 'en' en el frontmatter al publicar traducciones. */
+    lang: z.enum(['es', 'en']).default('es'),
     /** Fecha de publicación (ISO en el frontmatter, p.ej. 2026-06-10). */
     datePublished: z.coerce.date(),
     /** Última actualización, si difiere de la publicación. */

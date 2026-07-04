@@ -10,7 +10,7 @@ import '@fontsource-variable/dm-sans/index.css';
 import '@fontsource-variable/jetbrains-mono/index.css';
 import '../styles/global.css';
 import { nap } from '../i18n/content';
-import { hasMirror } from '../i18n/routes';
+import { mirrorPath } from '../i18n/routes';
 import ChatWidget from '../components/ChatWidget.astro';
 
 interface Props {
@@ -39,16 +39,26 @@ const {
   hasEn,
 } = Astro.props;
 
-const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;
-const canon = canonical ?? `${SITE}/${lang}${clean}/`;
-// Páginas SIN prefijo de idioma (legales, formulario) pasan `canonical` explícito:
-// el hreflang es/x-default debe apuntar a ESA URL, no a la auto /es/{path}/ (sería 404).
-const esHref = canonical ?? `${SITE}/es${clean}/`;
-const enHref = `${SITE}/en${clean}/`;
+// hreflang/canonical derivados de la RUTA REAL (Astro.url.pathname) + el mapa
+// routes.ts. Esto maneja slugs asimétricos (servicios→services, precios→pricing,
+// privacidad→privacy) y páginas sin prefijo de idioma, sin reconstruir /lang+path
+// (que producía enHref = /en/{slug-ES} → 404 en pares asimétricos).
+const normPath = (p: string) => {
+  const s = (p || '/').replace(/\/+$/, '');
+  return s === '' ? '/' : s;
+};
+const selfPath = normPath(Astro.url.pathname);
+const otherPath = mirrorPath(selfPath, lang); // ruta del espejo en el otro idioma (o null)
+const abs = (p: string) => (p === '/' ? `${SITE}/` : `${SITE}${p}/`);
+// canonical: respeta el explícito (legales); si no, absoluto de la ruta real.
+const canon = canonical ?? abs(selfPath);
+// URLs por idioma para los <link rel=alternate>. La versión propia = canon;
+// la otra sale del mapa (null si aún no hay espejo publicado).
+const esHref = lang === 'es' ? canon : otherPath ? abs(otherPath) : canon;
+const enHref = lang === 'en' ? canon : otherPath ? abs(otherPath) : null;
 const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
-// hasEn: si la página no lo pasa explícito, se deriva del mapa de espejos (routes.ts).
-const fullPath = '/' + lang + clean;
-const hasEnResolved = hasEn ?? (canonical ? false : hasMirror(fullPath));
+// hasEn: explícito, o hay espejo real (o esta misma página ya es EN).
+const hasEnResolved = hasEn ?? (lang === 'en' || otherPath != null);
 
 // JSON-LD @graph (Organization + LocalBusiness por ciudad) — server-rendered,
 // restaura el structured data del Sprint 0. NAP desde i18n/content (DRY).

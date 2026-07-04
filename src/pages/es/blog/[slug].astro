@@ -25,7 +25,7 @@ import { clusterNav } from '../../../i18n/clusters';
 import { postChrome } from '../../../i18n/blog';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang !== 'en'))
     .sort((a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime());
   const ref = (p: (typeof posts)[number]) => ({ title: p.data.title, path: `/es/blog/${p.id}` });
   return posts.map((post, i) => ({

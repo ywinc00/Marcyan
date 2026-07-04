@@ -1,16 +1,16 @@
 ---
-// SOBRE NOSOTROS · /es/sobre-nosotros — E-E-A-T honesto (Lane 2).
-// quiénes somos · cómo trabajamos (proceso) · enfoque/valores · Clientes Fundadores ·
-// ciudades (SAB) · trabajo real (→ portafolio). Reusa componentes del DS.
-// Schema: AboutPage (→ Organization del @graph) + BreadcrumbList. ES (hasEn=false).
-// ⚠️ HONESTIDAD: NO se inventa fundador. El nodo Person + sameAs + foundingDate se
-// añaden DESPUÉS, cuando el dueño dé el dato real (ver bloque comentado abajo).
+// ABOUT · /en/about — honest E-E-A-T (Lane 2).
+// who we are · how we work (process) · approach/values · Founding Clients ·
+// cities (SAB) · real work (→ portfolio). Reuses DS components.
+// Schema: AboutPage (→ Organization in the @graph) + BreadcrumbList. EN.
+// ⚠️ HONESTY: NO invented founder. The Person node + sameAs + foundingDate are
+// added LATER, when the owner provides the real datum (see commented block below).
 //
-// REDISEÑO 2026-06-29 (hub de sección, no landing): header COMPACTO (LandingHero
-// variant="header"), atmósfera SpaceBackdrop (oro) en lugar de losa plana, y una
-// BANDA BESPOKE de "telemetría de confianza" (3 pilares = datos verificables como
-// lectura de instrumentos) en vez de muro de texto, para dar ritmo al E-E-A-T sin
-// tocar el copy honesto de i18n ni el schema/form. Ver design/art-direction.md.
+// REDESIGN 2026-06-29 (section hub, not landing): COMPACT header (LandingHero
+// variant="header"), SpaceBackdrop atmosphere (gold) instead of a flat slab, and a
+// BESPOKE "trust telemetry" band (3 pillars = verifiable data read like instruments)
+// instead of a wall of text, to give rhythm to E-E-A-T without touching the honest
+// i18n copy or the schema/form. See design/art-direction.md.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -28,53 +28,52 @@ import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import AboutPageLd from '../../components/seo/AboutPageLd.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
-import { sobreNosotros as a } from '../../i18n/sobre-nosotros';
+import { clusterNavEn } from '../../i18n/clusters';
+import { sobreNosotros as a } from '../../i18n/sobre-nosotros.en';
 
-const c = content.es;
+const c = content.en;
 
-// Banda bespoke "telemetría de confianza": 3 hechos verificables derivados del copy
-// honesto de i18n (chips del hero + valores). NO es contenido nuevo: reformula datos
-// ya presentes como lectura de instrumentos (label mono + valor display + apoyo).
+// Bespoke "trust telemetry" band: 3 verifiable facts derived from the honest i18n
+// copy (hero chips + values). NOT new content: it reframes data already present as
+// an instrument reading (mono label + display value + support).
 const trust = [
-  { label: 'Cobertura', value: 'Houston y Miami', note: 'Negocio de área de servicio, atención directa en tu mercado.' },
-  { label: 'Idioma', value: 'Bilingüe ES / EN', note: 'Escrito para cómo busca tu cliente, no Google Translate.' },
-  { label: 'Precios', value: 'Públicos', note: 'Hasta el SEO mensual y el mantenimiento, sin letra chica.' },
-  { label: 'Visibilidad IA', value: 'Clientes que la IA ya recomienda', note: 'La IA de Google ya incluye a clientes nuestros en algunas recomendaciones.' },
+  { label: 'Coverage', value: 'Houston and Miami', note: 'Service-area business, direct attention in your market.' },
+  { label: 'Language', value: 'Bilingual EN / ES', note: 'Written for how your customer searches, not Google Translate.' },
+  { label: 'Pricing', value: 'Public', note: 'Down to the monthly SEO and maintenance, no fine print.' },
+  { label: 'AI visibility', value: 'Clients AI already recommends', note: 'Google\'s AI already includes our clients in some recommendations.' },
 ];
 ---
 <Layout
   title={a.meta.title}
   description={a.meta.description}
-  lang="es"
-  path="sobre-nosotros"
-
+  lang="en"
+  path="about"
 >
   <AboutPageLd slot="head" name={a.meta.title} description={a.meta.description} path={a.path} />
 
   {/*
-    TODO E-E-A-T (cuando el dueño entregue los datos reales): añadir el nodo Person
-    del fundador + foto, y enriquecer la Organization con foundingDate y sameAs.
-    PROHIBIDO inventarlos. Plantilla lista para descomentar y completar:
+    TODO E-E-A-T (when the owner delivers the real data): add the founder's Person
+    node + photo, and enrich the Organization with foundingDate and sameAs.
+    FORBIDDEN to invent them. Template ready to uncomment and complete:
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify({
       '@context': 'https://schema.org', '@type': 'Person',
-      name: 'NOMBRE_REAL_DEL_FUNDADOR',
-      jobTitle: 'Fundador',
+      name: 'REAL_FOUNDER_NAME',
+      jobTitle: 'Founder',
       worksFor: { '@id': 'https://marcyanstudio.com/#organization' },
-      image: 'https://marcyanstudio.com/assets/team/fundador.jpg',
+      image: 'https://marcyanstudio.com/assets/team/founder.jpg',
       sameAs: ['https://www.linkedin.com/in/...', 'https://instagram.com/...'],
     })} />
 
-    También: AggregateRating (cruce desocupado vs competencia) está listo en
-    lib/schema.ts (aggregateRating) pero NO se emite hasta tener reseñas reales
-    con consentimiento. No inventar reseñas.
+    Also: AggregateRating (an unoccupied wedge vs the competition) is ready in
+    lib/schema.ts (aggregateRating) but is NOT emitted until we have real reviews
+    with consent. Do not invent reviews.
   */}
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    {/* Hub de sección → header COMPACTO (DESIGN.md §2), no hero de portada. */}
+    {/* Section hub → COMPACT header (DESIGN.md §2), not a cover hero. */}
     <LandingHero
       kicker={a.hero.kicker}
       h1={a.hero.h1}
@@ -85,27 +84,27 @@ const trust = [
       tone={a.hero.tone}
       variant="header"
     >
-      <Breadcrumb slot="breadcrumb" items={a.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={a.breadcrumb} lang="en" />
     </LandingHero>
 
-    {/* Definición citable (palanca AEO). */}
-    <AnswerBlock q={a.answer.q} a={a.answer.a} />
+    {/* Citable definition (AEO lever). */}
+    <AnswerBlock lang="en" q={a.answer.q} a={a.answer.a} />
 
-    {/* Quiénes somos — Prose editorial (rail + columna de lectura). */}
+    {/* Who we are — editorial Prose (rail + reading column). */}
     <Prose tag={a.story.tag} title={a.story.title} paragraphs={a.story.paragraphs} tone={a.story.tone} />
 
-    {/* ── BANDA BESPOKE: telemetría de confianza ──────────────────────────────
-        3 hechos verificables como lectura de instrumentos (E-E-A-T / Trust).
-        Panel translúcido sobre la atmósfera (eco de RelatedLinks), no losa plana.
-        Decorativo line-art aria-hidden; copy reformulado de i18n, sin inventar. */}
+    {/* ── BESPOKE BAND: trust telemetry ───────────────────────────────────────
+        3 verifiable facts read like instruments (E-E-A-T / Trust).
+        Translucent panel over the atmosphere (echo of RelatedLinks), not a flat slab.
+        Decorative line-art aria-hidden; copy reframed from i18n, nothing invented. */}
     <section class="section trust" aria-labelledby="trust-h">
       <div class="container">
         <div class="trust__panel">
           <header class="trust__head">
             <span class="trust__tag">
-              <span class="trust__dot" aria-hidden="true"></span>Verificable
+              <span class="trust__dot" aria-hidden="true"></span>Verifiable
             </span>
-            <h2 class="h3 trust__title" id="trust-h">Lo decimos con <em>datos</em>, no adjetivos</h2>
+            <h2 class="h3 trust__title" id="trust-h">We say it with <em>data</em>, not adjectives</h2>
           </header>
 
           <dl class="trust__grid">
@@ -121,26 +120,26 @@ const trust = [
       </div>
     </section>
 
-    {/* Enfoque / valores — FeatureGrid "manifiesto" (no 3-card). */}
+    {/* Approach / values — "manifesto" FeatureGrid (not 3-card). */}
     <FeatureGrid tag={a.values.tag} title={a.values.title} intro={a.values.intro} items={a.values.items} tone={a.values.tone} />
 
-    {/* Cómo trabajamos — timeline de la home (reuso, no se toca). */}
+    {/* How we work — the home timeline (reused, untouched). */}
     <Process process={c.process} />
 
-    {/* Clientes Fundadores — Prose editorial. */}
+    {/* Founding Clients — editorial Prose. */}
     <Prose tag={a.founders.tag} title={a.founders.title} paragraphs={a.founders.paragraphs} tone={a.founders.tone} />
 
-    {/* Ciudades (SAB). */}
+    {/* Cities (SAB). */}
     <Locations locations={c.locations} />
 
-    {/* Trabajo real → portafolio (constelación de rutas). */}
+    {/* Real work → portfolio (constellation of routes). */}
     <RelatedLinks tag={a.proof.tag} title={a.proof.title} links={a.proof.links} />
 
-    {/* FAQ (FAQPage co-localizado, ninguna abierta por defecto). */}
+    {/* FAQ (co-located FAQPage, none open by default). */}
     <Faq tag={a.faq.tag} title={a.faq.title} items={a.faq.items} />
 
-    {/* Remate con 1 acción dominante. */}
-    <CtaBand
+    {/* Close with 1 dominant action. */}
+    <CtaBand lang="en"
       title={a.cta.title}
       sub={a.cta.sub}
       primary={a.cta.primary}
@@ -148,22 +147,22 @@ const trust = [
       tone={a.cta.tone}
     />
 
-    {/* Form de contacto (contrato intacto → /api/contact, /api/brief). */}
+    {/* Contact form (contract intact → /api/contact, /api/brief). */}
     <Contact contact={c.contact} />
   </main>
 
-  {/* Atmósfera de página (una sola vez) — da el fondo de la home a este hub. */}
+  {/* Page atmosphere (once) — gives this hub the home background. */}
   <SpaceBackdrop tone="gold" />
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter lang="en" footer={c.footer} />
 </Layout>
 
 <style>
-  /* ── Banda bespoke: telemetría de confianza ──────────────────────────────
-     Panel translúcido que flota sobre la atmósfera SpaceBackdrop (no losa
-     sólida). Los 3 pilares se leen como instrumentos: label mono + valor
-     display + apoyo legible, separados por regla fina. Acentos en oro (eco de
-     las chips del hero y del Kicker). Solo tokens. */
+  /* ── Bespoke band: trust telemetry ───────────────────────────────────────
+     Translucent panel floating over the SpaceBackdrop atmosphere (not a solid
+     slab). The 3 pillars read like instruments: mono label + display value +
+     legible support, separated by a thin rule. Gold accents (echo of the hero
+     chips and the Kicker). Tokens only. */
   .trust__panel {
     position: relative;
     overflow: hidden;
@@ -184,7 +183,7 @@ const trust = [
     gap: var(--space-3);
     margin-bottom: var(--space-6);
   }
-  /* kicker mono "en vivo" (eco del answer__tag, pero en oro = confianza) */
+  /* live mono kicker (echo of answer__tag, but in gold = trust) */
   .trust__tag {
     display: inline-flex;
     align-items: center;
@@ -211,8 +210,8 @@ const trust = [
   }
   .trust__title :global(em) { color: var(--accent-gold); font-style: normal; }
 
-  /* Grid de pilares = instrumentos. 1 col móvil → 3 col desktop, con regla
-     divisoria entre instrumentos (filete superior por celda). */
+  /* Grid of pillars = instruments. 1 col mobile → 3 col desktop, with a divider
+     rule between instruments (top rule per cell). */
   .trust__grid {
     position: relative;
     z-index: 1;
@@ -263,7 +262,7 @@ const trust = [
   }
 
   @media (--lg) {
-    /* 3 instrumentos en fila, separados por regla vertical (no horizontal) */
+    /* 3 instruments in a row, separated by a vertical rule (not horizontal) */
     .trust__grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       column-gap: var(--space-7);

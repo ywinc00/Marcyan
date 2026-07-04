@@ -1,0 +1,78 @@
+---
+// /en/privacy — Privacy Policy (EN mirror of /privacidad).
+// Re-skinned to DS v2. Honest content mirrored from the ES page.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import LegalDoc from '../../components/sections/LegalDoc.astro';
+import { content, nap } from '../../i18n/content';
+import { clusterNavEn } from '../../i18n/clusters';
+
+// The nav CTA points to the CONTACT FORM (lead capture), not the brief.
+const pageNav = { ...clusterNavEn, cta: { label: 'Get a free proposal', href: '/en/#contacto' } };
+---
+<Layout
+  title="Privacy Policy · Marcyan Studio"
+  description="How Marcyan Studio collects, uses, and protects your data. Web design, AI, and SEO for small businesses in Houston and Miami."
+  lang="en"
+  path="/en/privacy"
+  canonical="https://marcyanstudio.com/en/privacy"
+  hasEn={true}
+>
+  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
+
+  <main id="main">
+    <LegalDoc title="Privacy Policy" updated="June 6, 2026" updatedLabel="Last updated">
+      <h2>1. Who we are</h2>
+      <p><strong>Marcyan Studio</strong> is a web design, applied artificial intelligence, and SEO agency for small and medium-sized businesses, serving Houston, TX and Miami, FL. This policy explains what data we collect when you use our site <a href="https://marcyanstudio.com">marcyanstudio.com</a>, what we use it for, and what control you have over it. For any question about your privacy, write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+
+      <h2>2. What data we collect</h2>
+      <p>We collect only the data needed to serve you:</p>
+      <ul>
+        <li><strong>Data you provide us</strong> when you complete our forms (for example, the project form): name, email, phone, your company name, and the project details you choose to share.</li>
+        <li><strong>Automatic technical data</strong>: IP address, browser type, and the date/time of the request. We use it only for security and to prevent spam.</li>
+      </ul>
+      <p>We do not collect sensitive data or payment card information through the site.</p>
+
+      <h2>3. What we use your data for</h2>
+      <ul>
+        <li>To respond to your request and prepare a personalized proposal.</li>
+        <li>To communicate with you about your project or inquiry.</li>
+        <li>To improve our site and our services.</li>
+        <li>To comply with legal and accounting obligations.</li>
+      </ul>
+      <p>The basis for this processing is your consent when you send us a form and our legitimate interest in responding to those who contact us.</p>
+
+      <h2>4. Who we share your data with</h2>
+      <p><strong>We do not sell or rent your personal data.</strong> We only share it with providers that keep the site running and that act on our instructions:</p>
+      <ul>
+        <li><strong>Hosting and database</strong> (Vercel and its PostgreSQL database), where the data you send us is stored securely.</li>
+        <li><strong>Email delivery</strong> (Resend), to send you confirmations and communications related to your request.</li>
+      </ul>
+      <p>We may also disclose data if the law requires it or to protect our rights.</p>
+
+      <h2>5. Cookies</h2>
+      <p>The public site <strong>does not use tracking or advertising cookies</strong>. Our internal-use admin panel uses a strictly necessary session cookie to keep our team signed in; that cookie does not apply to visitors of the public site.</p>
+
+      <h2>6. How long we keep your data</h2>
+      <p>We keep the data from your request for as long as it is needed to serve you and for the period required by our legal or accounting obligations. After that, we delete or anonymize it. You can ask us to delete your data at any time.</p>
+
+      <h2>7. Your rights</h2>
+      <p>You have the right to access your data, correct it, request its deletion, and withdraw your consent. To exercise any of these rights, write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a> and we will respond within a reasonable time.</p>
+
+      <h2>8. Security</h2>
+      <p>We apply reasonable measures to protect your information. However, no transmission over the internet or storage system is 100% secure, so we cannot guarantee absolute security.</p>
+
+      <h2>9. Minors</h2>
+      <p>Our site and services are intended for businesses and adults. We do not knowingly collect data from minors.</p>
+
+      <h2>10. Changes to this policy</h2>
+      <p>We may update this policy to reflect changes in our practices or in applicable regulations. We will post the current version here, with its update date.</p>
+
+      <h2>11. Contact</h2>
+      <p>Questions about this policy or about your data? Write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+    </LegalDoc>
+  </main>
+
+  <SiteFooter footer={content.en.footer} lang="en" />
+</Layout>

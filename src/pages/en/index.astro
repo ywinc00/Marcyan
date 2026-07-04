@@ -26,15 +26,15 @@ const c = content.en;
 >
   <SiteNav nav={c.nav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} />
   <main id="main">
-    <Hero hero={c.hero} />
+    <Hero hero={c.hero} lang="en" />
     <Services services={c.services} />
     <AiSection ai={c.ai} />
     <Process process={c.process} />
-    <Projects projects={c.projects} />
+    <Projects projects={c.projects} lang="en" />
     <Guarantees guarantees={c.guarantees} />
     <Locations locations={c.locations} />
     <Contact contact={c.contact} />
     <StarField />
   </main>
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang="en" />
 </Layout>

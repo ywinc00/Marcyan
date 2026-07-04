@@ -53,6 +53,11 @@ const hasEnResolved = hasEn ?? (canonical ? false : hasMirror(fullPath));
 // JSON-LD @graph (Organization + LocalBusiness por ciudad) — server-rendered,
 // restaura el structured data del Sprint 0. NAP desde i18n/content (DRY).
 const tel = (p: string) => p.replace(/[^\d+]/g, '');
+// Descripción de la Organización POR IDIOMA (lo que la IA cita de nosotros).
+const orgDescription =
+  lang === 'en'
+    ? 'Web design agency, local SEO, and artificial-intelligence solutions for small and medium businesses in Houston and Miami. We put AI to work for your business, in English and Spanish.'
+    : 'Agencia de diseño web, SEO local y soluciones de inteligencia artificial para pequeñas y medianas empresas en Houston y Miami. Ponemos la IA a trabajar para tu negocio, en español e inglés.';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -62,8 +67,7 @@ const jsonLd = {
       name: 'Marcyan Studio',
       url: `${SITE}/`,
       email: nap.email,
-      description:
-        'Agencia de diseño web, SEO local y soluciones de inteligencia artificial para pequeñas y medianas empresas en Houston y Miami. Ponemos la IA a trabajar para tu negocio, en español e inglés.',
+      description: orgDescription,
       slogan: 'Diseño web que piensa por ti',
       knowsLanguage: ['es', 'en'],
       areaServed: [

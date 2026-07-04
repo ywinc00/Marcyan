@@ -11,12 +11,14 @@
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
+import { t, type Lang } from '../../i18n/ui';
 
-interface Props { hero: any }
-const { hero } = Astro.props;
+interface Props { hero: any; lang?: Lang }
+const { hero, lang = 'es' } = Astro.props;
+const uih = t(lang).hero;
 const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 ---
-<section class="hero" id="top" data-hero>
+<section class="hero" id="top" data-hero data-hint-tap={uih.tapHint} data-hint-hover={uih.hoverHint}>
   <div class="hero__stars" data-hero-stars aria-hidden="true"></div>
 
   <div class="container hero__inner">
@@ -24,7 +26,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       <Kicker>{hero.tag}</Kicker>
       <h1 class="display hero__h1" set:html={hero.h1} />
       <p class="lead hero__sub">{hero.sub}</p>
-      <nav class="hero__moons" aria-label="Explorar el sitio" data-hero-moons>
+      <nav class="hero__moons" aria-label={uih.exploreSite} data-hero-moons>
         {hero.nodes.map((n: any, i: number) => (
           <a class="moon" href={n.href} data-accent={i % 2 ? 'teal' : 'gold'}>
             {n.icon ? <Icon name={n.icon} class="moon__icon" /> : <span class="moon__dot" aria-hidden="true"></span>}
@@ -35,7 +37,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     </div>
 
     <div class="hero__stage" data-hero-stage>
-      <svg viewBox="0 0 400 400" role="img" aria-label="Marcyan — planeta en órbita" class="hero__svg">
+      <svg viewBox="0 0 400 400" role="img" aria-label={uih.planetLabel} class="hero__svg">
         <defs>
           <radialGradient id={`${uid}-p`} cx="44%" cy="36%" r="62%">
             <stop offset="0%" stop-color="var(--accent-gold)" />
@@ -61,7 +63,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       </svg>
       <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
       <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
-      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>Pasa el cursor sobre el planeta</span></div>
+      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>{uih.hoverHint}</span></div>
     </div>
   </div>
 
@@ -288,7 +290,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.classList.add('hero--orbital');
       isAuto = auto(); lastAuto = isAuto; activated = false;
       target = 0; energy = 0;                       // siempre arranca calmo (móvil: hasta el toque)
-      hintTxt.textContent = isAuto ? 'Toca para explorar' : 'Pasa el cursor sobre el planeta';
+      // Textos por idioma inyectados por el SSR (data-hint-*) — sin español en /en/.
+      const hintTap = hero.dataset.hintTap || 'Toca para explorar';
+      const hintHover = hero.dataset.hintHover || 'Pasa el cursor sobre el planeta';
+      hintTxt.textContent = isAuto ? hintTap : hintHover;
       hint.style.display = 'inline-flex'; hint.style.opacity = '1';
       headline.style.opacity = '';
       measure(); build();

@@ -35,7 +35,7 @@ const {
   canonical,
   noindex = false,
   ogImage = '/assets/og/og-default.png',
-  hasEn = true,
+  hasEn = false,
 } = Astro.props;
 
 const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;

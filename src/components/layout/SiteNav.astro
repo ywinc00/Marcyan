@@ -51,7 +51,7 @@ const isActive = (href: string) =>
           ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
           : hasEn
             ? <a class="nav__lang-opt" href={nav.langHref} hreflang="en">EN</a>
-            : <span class="nav__lang-opt is-disabled" aria-disabled="true" title="Disponible próximamente en inglés">EN</span>}
+            : <a class="nav__lang-opt" href="/en/" hreflang="en" title="English version (home)">EN</a>}
       </div>
       <a class="nav__cta" href={nav.cta.href}>{nav.cta.label}</a>
       <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>

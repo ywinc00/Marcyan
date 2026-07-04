@@ -3,6 +3,7 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [{ "source": "/", "destination": "/es/", "permanent": true }],
   "headers": [
     {
       "source": "/dashboard/sw.js",

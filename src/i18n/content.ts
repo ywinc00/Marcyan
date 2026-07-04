@@ -40,7 +40,7 @@ export const content = {
     },
 
     hero: {
-      tag: 'IA Operativa · Houston & Miami',
+      tag: 'IA para tu negocio · Houston & Miami',
       h1: 'Diseño Web<br>que <em>piensa</em><br>por ti',
       sub: 'Sitios bilingües de verdad, en español e inglés, que cargan rápido y que ChatGPT sí puede leer, para que más clientes te encuentren. Propuesta gratis en menos de 24 horas.',
       primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
@@ -75,7 +75,7 @@ export const content = {
         { n: '05', icon: 'lucide:search', title: 'SEO Local', price: 'desde $300', href: '/es/houston/seo-local',
           desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, puntual o mes a mes.' },
         { n: '06', icon: 'lucide:palette', title: 'Branding & Identidad', price: 'desde $150', href: '/es/houston/branding',
-          desc: 'Desde solo tu logo hasta una identidad completa: paleta, tipografías y guía de uso, generadas con IA y afinadas con criterio humano.' },
+          desc: 'Desde solo tu logo hasta una identidad completa: paleta, tipografías y guía de uso, hecha a la medida de tu negocio.' },
         { n: '07', icon: 'lucide:wrench', title: 'Mantenimiento Continuo', price: 'desde $120/mes', href: '#contacto',
           desc: 'Mantenemos tu sitio sano: disponibilidad, seguridad, respaldos periódicos y soporte bilingüe en Houston y Miami.' },
       ] as ServiceItem[],
@@ -84,10 +84,10 @@ export const content = {
     ai: {
       tag: 'Tecnología Marcyan',
       title: 'La IA que<br>trabaja para<br><em>tu negocio</em>',
-      desc: 'El asistente que te responde aquí mismo es el producto que construimos para ti: usamos la IA primero en nosotros, para entregar tu web más rápido y para que ChatGPT y Gemini puedan encontrarte.',
+      desc: 'El asistente que te responde aquí mismo es el mismo producto que instalamos en tu negocio: atiende a tus clientes, responde sus preguntas y capta prospectos las 24 horas — y tu web queda lista para que ChatGPT y Gemini te encuentren.',
       features: [
         { icon: 'lucide:scan-search', title: 'Que la IA te encuentre', desc: 'Construimos en HTML estático y rápido que asistentes como ChatGPT y Gemini sí pueden leer, para que tu negocio aparezca cuando les preguntan.' },
-        { icon: 'lucide:pen-tool', title: 'Contenido y textos', desc: 'Páginas y textos enfocados en SEO, redactados con IA y afinados a mano. Bilingüe español e inglés, escritos para tu mercado local.' },
+        { icon: 'lucide:pen-tool', title: 'Contenido y textos', desc: 'Páginas y textos enfocados en SEO, escritos para tu mercado local y hechos para vender. Bilingüe de verdad, en español e inglés.' },
         { icon: 'lucide:bot-message-square', title: 'Asistentes conversacionales', desc: 'Asistentes de chat que atienden a tus clientes, califican prospectos y agendan citas las 24 horas, en su idioma.' },
         { icon: 'lucide:waypoints', title: 'Automatizaciones', desc: 'Conectamos tu sitio con las herramientas que ya usas, para que los nuevos prospectos, avisos y seguimientos ocurran solos.' },
       ],
@@ -127,8 +127,8 @@ export const content = {
       more: 'Ver Proyectos',
       shotAlt: { pc: 'vista de escritorio', movil: 'vista móvil' },
       items: [
-        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: 'Reconstruido desde cero más SEO local. Ya posiciona.', accent: 'gold', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
-        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', result: 'Reconstruido desde cero más SEO local. Ya posiciona.', accent: 'teal', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: 'Reconstruido desde cero más SEO local. Ya posiciona y la IA de Google ya lo recomienda.', accent: 'gold', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
+        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', result: 'Reconstruido desde cero más SEO local. Ya posiciona en su zona.', accent: 'teal', badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local'] },
         { name: "Julio's Landscape TX", cat: 'Paisajismo · Houston, TX', result: 'Marca, identidad y sitio web creados desde cero.', accent: 'gold', badge: 'Marca + Sitio', tags: ['Identidad de marca', 'Sitio a medida'] },
         { name: 'Rosy Nails & Care', cat: 'Salón de uñas · Houston, TX', result: 'Web app a medida: las clientas agendan citas y exploran inspiración de uñas.', accent: 'teal', badge: 'Web app', tags: ['Agenda de citas', 'A medida'] },
       ],
@@ -142,7 +142,7 @@ export const content = {
       items: [
         { icon: 'lucide:zap', title: 'Propuesta en 24h', desc: 'Cuéntanos tu idea y recibe una propuesta personalizada en menos de 24 horas, sin costo ni compromiso.' },
         { icon: 'lucide:ruler', title: 'Todo a medida', desc: 'Sin plantillas. Cada sitio se diseña y programa desde cero alrededor de tu negocio y tus objetivos.' },
-        { icon: 'lucide:radar', title: 'Listo para IA y buscadores', desc: 'HTML rápido que Google y los asistentes de IA pueden leer, para que tu negocio aparezca donde la gente busca hoy.' },
+        { icon: 'lucide:radar', title: 'Listo para IA y buscadores', desc: 'HTML rápido que Google y los asistentes de IA pueden leer, para que tu negocio aparezca donde la gente busca hoy. Clientes nuestros ya aparecen en recomendaciones de la IA de Google.' },
         { icon: 'lucide:languages', title: 'Bilingüe y local', desc: 'Trabajamos contigo en español e inglés, con contexto local real de Houston y Miami.' },
       ],
     },
@@ -201,7 +201,7 @@ export const content = {
     },
 
     footer: {
-      tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
+      tagline: 'Web, IA y SEO para tu negocio · Houston & Miami',
       cta: { label: 'Pedir propuesta gratis', href: '/es/#contacto' },
       cols: [
         { title: 'Servicios', links: [
@@ -258,7 +258,7 @@ export const content = {
     },
 
     hero: {
-      tag: 'Operational AI · Houston & Miami',
+      tag: 'AI for your business · Houston & Miami',
       h1: 'Web Design<br>that <em>thinks</em><br>for you',
       sub: 'Truly bilingual sites, in Spanish and English, that load fast and that ChatGPT can actually read, so more customers find you. Free proposal in under 24 hours.',
       primary: { label: 'Get a free proposal', href: '#contacto' },
@@ -291,7 +291,7 @@ export const content = {
         { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '#contacto',
           desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, one-time or monthly.' },
         { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '#contacto',
-          desc: 'From just your logo to a full identity: palette, typography, and usage guide, generated with AI and refined with expert human judgment.' },
+          desc: 'From just your logo to a full identity: palette, typography, and usage guide, made to measure for your business.' },
         { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
           desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
       ] as ServiceItem[],
@@ -300,10 +300,10 @@ export const content = {
     ai: {
       tag: 'Marcyan Technology',
       title: 'The AI that<br>works for<br><em>your business</em>',
-      desc: 'The assistant answering you right here is the product we build for you: we put AI to work on ourselves first, to ship your site faster and help ChatGPT and Gemini find you.',
+      desc: 'The assistant answering you right here is the same product we install in your business: it serves your customers, answers their questions, and captures leads 24/7 — and your site ships ready for ChatGPT and Gemini to find you.',
       features: [
         { icon: 'lucide:scan-search', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Gemini can actually read, so your business shows up when people ask them.' },
-        { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, drafted with AI and refined by hand. Bilingual Spanish and English, written for your local market.' },
+        { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, written for your local market and made to sell. Truly bilingual, Spanish and English.' },
         { icon: 'lucide:bot-message-square', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
         { icon: 'lucide:waypoints', title: 'Automations', desc: 'We connect your site to the tools you already use, so new leads, notifications, and follow-ups happen on their own.' },
       ],
@@ -342,8 +342,8 @@ export const content = {
       more: 'View Projects',
       shotAlt: { pc: 'desktop view', movil: 'mobile view' },
       items: [
-        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: 'Full rebuild from scratch plus local SEO. Now ranking.', accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
-        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', result: 'Full rebuild from scratch plus local SEO. Now ranking.', accent: 'teal', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: "Rebuilt from scratch plus local SEO. Already ranking — and Google's AI already recommends it.", accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
+        { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', result: 'Rebuilt from scratch plus local SEO. Already ranking in its area.', accent: 'teal', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
         { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', result: 'Brand, identity, and website created from zero.', accent: 'gold', badge: 'Brand + Site', tags: ['Brand identity', 'Custom site'] },
         { name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', result: 'Custom web app: clients book appointments and browse nail inspiration.', accent: 'teal', badge: 'Web app', tags: ['Appointment booking', 'Custom'] },
       ],
@@ -357,7 +357,7 @@ export const content = {
       items: [
         { icon: 'lucide:zap', title: 'Proposal in 24h', desc: "Tell us your idea and you'll get a personalized proposal in under 24 hours, no cost, no commitment." },
         { icon: 'lucide:ruler', title: 'Built to measure', desc: 'No templates. Every site is designed and coded from scratch around your business and your goals.' },
-        { icon: 'lucide:radar', title: 'Ready for AI & search', desc: 'Fast HTML that Google and AI assistants can read, so your business gets found where people are now searching.' },
+        { icon: 'lucide:radar', title: 'Ready for AI & search', desc: 'Fast HTML that Google and AI assistants can read, so your business gets found where people are now searching. Our clients already show up in Google AI recommendations.' },
         { icon: 'lucide:languages', title: 'Bilingual & local', desc: 'We work with you in Spanish and English, with real local context for Houston and Miami.' },
       ],
     },
@@ -402,7 +402,7 @@ export const content = {
     },
 
     footer: {
-      tagline: 'AI-Powered Web Design · Houston & Miami',
+      tagline: 'Web, AI & SEO for your business · Houston & Miami',
       cta: { label: 'Get a free proposal', href: '/en/#contacto' },
       cols: [
         { title: 'Services', links: [

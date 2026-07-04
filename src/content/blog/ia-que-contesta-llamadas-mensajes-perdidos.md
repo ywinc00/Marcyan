@@ -17,7 +17,7 @@ faq:
   - q: "¿Cuánto cuesta un asistente con IA?"
     a: "En Marcyan, un asistente con IA arranca desde 900 dólares como pago único, como servicio gestionado. Las apps por suscripción suelen empezar más baratas al mes, pero suben rápido al añadir funciones de IA y volumen. Aparte va el costo de mensajería de Meta por la API de WhatsApp, que cobra Meta, no la agencia."
   - q: "¿La IA reemplaza a mi recepcionista o a mi equipo?"
-    a: "No es ese el objetivo. La IA cubre lo repetitivo y los horarios en que nadie puede contestar (de noche, fines de semana, o cuando estás ocupado). Tu equipo se queda con lo que requiere criterio humano: cerrar la venta, atender un caso delicado, dar el toque personal. La IA filtra y prepara; las personas cierran."
+    a: "No es ese el objetivo. La IA cubre lo repetitivo y los horarios en que nadie puede contestar (de noche, fines de semana, o cuando estás ocupado). Tu equipo se queda con lo que requiere una persona: cerrar la venta, atender un caso delicado, dar el toque personal. La IA filtra y prepara; las personas cierran."
   - q: "¿Puede agendar citas sola?"
     a: "Sí. Un asistente puede tomar los datos del cliente, mostrar horarios disponibles y reservar la cita directo en un calendario, sin que tú muevas un dedo. Es justo lo que hicimos para Rosy Nails, una web que agenda citas de uñas en automático. Lo puedes ver en nuestro portafolio."
   - q: "¿Funciona bien en español?"

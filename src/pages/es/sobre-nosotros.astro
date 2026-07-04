@@ -40,6 +40,7 @@ const trust = [
   { label: 'Cobertura', value: 'Houston y Miami', note: 'Negocio de área de servicio, atención directa en tu mercado.' },
   { label: 'Idioma', value: 'Bilingüe ES / EN', note: 'Escrito para cómo busca tu cliente, no Google Translate.' },
   { label: 'Precios', value: 'Públicos', note: 'Hasta el SEO mensual y el mantenimiento, sin letra chica.' },
+  { label: 'Visibilidad IA', value: 'Clientes que la IA ya recomienda', note: 'La IA de Google ya incluye a clientes nuestros en algunas recomendaciones.' },
 ];
 ---
 <Layout
@@ -257,10 +258,14 @@ const trust = [
     .trust__panel { padding: var(--space-7); }
   }
 
+  @media (--sm) {
+    .trust__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-6); }
+  }
+
   @media (--lg) {
     /* 3 instrumentos en fila, separados por regla vertical (no horizontal) */
     .trust__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       column-gap: var(--space-7);
     }
     .trust__cell {

@@ -146,10 +146,11 @@ export const seoIaPage = {
   },
   // Caso #0 + done-for-you + wedge bilingüe (Prose).
   caso0: {
-    tag: 'Caso #0',
-    title: 'Lo aplicamos a <em>nuestro propio sitio</em>',
+    tag: 'Casos reales',
+    title: 'Lo aplicamos en <em>nuestro sitio</em> y en el de <em>nuestros clientes</em>',
     paragraphs: [
-      'No es teoría: este mismo sitio está construido para que la IA lo lea: HTML estático, datos estructurados, contenido answer-first y precios públicos que ChatGPT puede citar. Somos nuestro propio Caso #0.',
+      'No es teoría. Este mismo sitio está construido para que la IA lo lea — HTML claro, respuestas directas, datos estructurados. Somos nuestro propio Caso #0, pero ya no somos el único.',
+      'Dos clientes reales lo prueban: las páginas de Texas Rush Remove (Houston) y Move Junk Away (Orlando) ya posicionan en sus zonas, y la IA de Google ya los incluye en sus recomendaciones para algunas búsquedas de su servicio. Texas Rush Remove, además, ya recibe visitas que llegan directamente desde ChatGPT. Sin trucos: información clara, bien estructurada y honesta, del tipo que la IA puede citar.',
       'Y no te entregamos un PDF de recomendaciones para que te arregles solo: <strong>lo implementamos por ti</strong>, en español y para tu mercado local. El SEO para IA en español tiene mucha menos competencia que en inglés: una ventaja real para un negocio hispano que se mueve hoy.',
     ],
     tone: 'teal' as const,

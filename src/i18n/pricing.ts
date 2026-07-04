@@ -193,15 +193,15 @@ export const catalog: CatalogProduct[] = [
     name: 'Branding & Identidad',
     serviceType: 'Diseño de marca (branding)',
     description:
-      'Identidad visual a medida con criterio humano: desde solo el logo hasta un sistema de marca completo (paleta, tipografías y guía de uso).',
-    tagline: 'Logo, colores y tipografía con criterio humano experto.',
+      'Identidad visual a medida: desde solo el logo hasta un sistema de marca completo (paleta, tipografías y guía de uso).',
+    tagline: 'Logo, colores y tipografía pensados para tu negocio.',
     anchorUnit: 'proyecto',
     href: '/es/houston/branding',
     ctaLabel: 'Ver branding',
     tone: 'gold',
     tiers: [
       { key: 'brandingLogo', name: 'Diseño de Logo', value: PRICE_ANCHORS.brandingLogo, display: tierDisplay(PRICE_ANCHORS.brandingLogo), anchor: true,
-        blurb: 'Solo el logo y sus variantes, con criterio humano. El arranque más accesible de tu marca.', href: '/es/houston/branding' },
+        blurb: 'Solo el logo y sus variantes. El arranque más accesible de tu marca.', href: '/es/houston/branding' },
       { key: 'branding', name: 'Branding completo', value: PRICE_ANCHORS.branding, display: tierDisplay(PRICE_ANCHORS.branding),
         blurb: 'Logo, paleta, tipografías y guía de uso: identidad lista para usar.', href: '/es/houston/branding' },
     ],

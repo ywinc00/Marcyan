@@ -10,9 +10,9 @@ import type { SectionFeatures, RelatedLink } from './clusters';
 
 export const sobreNosotros = {
   meta: {
-    title: 'Sobre Marcyan: agencia hispana de diseño web e IA | Marcyan',
+    title: 'Sobre Marcyan: agencia hispana de web, IA y SEO | Marcyan',
     description:
-      'Marcyan Studio: agencia hispana de diseño web impulsado por IA para Houston y Miami. Bilingüe de verdad, precios públicos y trabajo real verificable. Conócenos.',
+      'Marcyan Studio: la agencia hispana que pone la IA a trabajar para tu negocio. Web, asistentes y SEO local en Houston y Miami. Bilingüe, precios públicos y trabajo verificable.',
   },
   path: '/es/sobre-nosotros',
   breadcrumb: [
@@ -21,8 +21,8 @@ export const sobreNosotros = {
   ] as CrumbItem[],
   hero: {
     kicker: 'Sobre nosotros',
-    h1: 'La agencia hispana que <em>piensa con IA</em>',
-    sub: 'Somos Marcyan Studio: diseño web impulsado por inteligencia artificial para el negocio hispano de Estados Unidos. Bilingües de verdad, con precios públicos y trabajo real que puedes verificar.',
+    h1: 'La agencia hispana que <em>pone la IA a trabajar para ti</em>',
+    sub: 'Somos Marcyan Studio: web, IA y SEO local para el negocio hispano de Estados Unidos. Ponemos las últimas tecnologías a trabajar para tu negocio — bilingüe de verdad, con precios públicos y trabajo real que puedes verificar.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver portafolio', href: '/es/portafolio' },
     chips: ['Houston y Miami', 'Bilingüe ES/EN', 'Precios públicos'],
@@ -30,14 +30,14 @@ export const sobreNosotros = {
   },
   answer: {
     q: '¿Qué es Marcyan Studio?',
-    a: 'Marcyan Studio es una agencia hispana de diseño web impulsado por IA para negocios de Estados Unidos, con base en Houston y presencia en Miami. Combinamos diseño a medida, inteligencia artificial y SEO, en español e inglés de verdad, con precios públicos y trabajo real verificable, no plantillas ni promesas vacías.',
+    a: 'Marcyan Studio es una agencia hispana de diseño web con base en Houston y presencia en Miami que hace la inteligencia artificial accesible para los negocios de Estados Unidos: sitios a medida, asistentes de IA que atienden clientes y SEO, en español e inglés de verdad, con precios públicos y trabajo real verificable, no plantillas ni promesas vacías.',
   },
   story: {
     tag: 'Quiénes somos',
     title: 'Un estudio <em>joven</em>, con trabajo real',
     paragraphs: [
-      'Marcyan nació para cerrar un hueco claro: el negocio hispano de Estados Unidos merece sitios tan buenos como los de las grandes agencias, pero hechos en su idioma, con su contexto y a un precio honesto. Usamos la inteligencia artificial primero en nosotros, para diseñar y entregar más rápido, y para que tu negocio aparezca cuando alguien le pregunta a ChatGPT, Gemini o Meta AI.',
-      'Seremos transparentes: somos un estudio joven y en crecimiento, pero no partimos de cero. Ya trabajamos con negocios reales en Houston y Orlando, con sitios, SEO, marca y web apps en vivo que puedes ver en nuestro portafolio. <strong>Preferimos enseñarte trabajo real antes que prometer lo que no podemos cumplir.</strong>',
+      'Marcyan nació para cerrar un hueco claro: el negocio hispano de Estados Unidos merece sitios tan buenos como los de las grandes agencias, pero hechos en su idioma, con su contexto y a un precio honesto. Nuestra apuesta es simple: ponemos las últimas tecnologías a trabajar para tu negocio — desde un sitio que carga rápido hasta la IA que atiende a tus clientes — para que siempre esté actualizado y aparezca cuando alguien le pregunta a ChatGPT, Gemini o Meta AI.',
+      'Seremos transparentes: somos un estudio joven y en crecimiento, pero no partimos de cero. Ya trabajamos con negocios reales en Houston y Orlando, con sitios, SEO, marca y web apps en vivo que puedes ver en nuestro portafolio. Y ya hay señales que no dependen de nuestra palabra: la IA de Google ya incluye a clientes nuestros en sus recomendaciones para algunas búsquedas, y uno de ellos ya recibe visitas que llegan desde ChatGPT. <strong>Preferimos enseñarte trabajo real antes que prometer lo que no podemos cumplir.</strong>',
     ],
     tone: 'gold' as const,
   },
@@ -46,7 +46,7 @@ export const sobreNosotros = {
     title: 'Lo que nos hace <em>distintos</em>',
     intro: 'No es un solo truco: es la combinación que casi nadie ejecuta junta para el mercado hispano.',
     items: [
-      { icon: 'marcyan-ai', title: 'IA operativa, no de adorno', desc: 'Usamos IA para diseñar y escribir más rápido y, sobre todo, para que la IA te encuentre: construimos en HTML que ChatGPT y Gemini sí pueden leer.' },
+      { icon: 'marcyan-ai', title: 'La IA, al alcance de tu negocio', desc: 'Hacemos la IA accesible: un asistente que atiende a tus clientes por ti y un sitio en HTML que ChatGPT y Gemini sí pueden leer, para que la IA te encuentre y te recomiende.' },
       { icon: 'lucide:languages', title: 'Bilingüe de verdad', desc: 'Español e inglés escritos para cómo busca tu cliente, no un botón de Google Translate. Conocemos el contexto hispano de EE.UU.' },
       { icon: 'lucide:tag', title: 'Precios públicos', desc: 'Publicamos hasta el precio del SEO mensual y el mantenimiento. Sin letra chica ni una llamada de ventas para enterarte de cuánto cuesta.' },
       { icon: 'lucide:map-pin', title: 'Local y cercano', desc: 'Houston y Miami como negocio de área de servicio. Atención directa, sin call center, en tu idioma y con contexto de tu mercado.' },
@@ -76,7 +76,7 @@ export const sobreNosotros = {
     title: 'Sobre Marcyan, <em>sin rodeos</em>',
     items: [
       { q: '¿Tienen oficina en Houston o Miami?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston, Miami y sus áreas metropolitanas de forma remota y eficiente, sin una dirección pública. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
-      { q: '¿Son una agencia nueva? ¿Puedo confiar?', a: 'Somos un estudio joven y lo decimos de frente, pero con trabajo real y verificable: sitios, SEO local que ya posiciona, marca y una web app en vivo para clientes en Houston y Orlando. Puedes ver las capturas en nuestro portafolio, y con gusto te mostramos los sitios en una llamada.' },
+      { q: '¿Son una agencia nueva? ¿Puedo confiar?', a: 'Somos un estudio joven y lo decimos de frente, pero con trabajo real y verificable: sitios, SEO local que ya posiciona, marca y una web app en vivo para clientes en Houston y Orlando, y la IA de Google ya incluye a algunos en sus recomendaciones. Puedes ver las capturas en nuestro portafolio, y con gusto te mostramos los sitios en una llamada.' },
       { q: '¿Quién está detrás de Marcyan?', a: 'Un equipo hispano y bilingüe enfocado en el mercado de Estados Unidos, que combina diseño, desarrollo e inteligencia artificial. Trabajas directo con quien hace tu proyecto, sin intermediarios ni call center.' },
       { q: '¿En qué se diferencian de otras agencias?', a: 'En la combinación: diseño a medida, IA que de verdad te hace visible en buscadores y asistentes, bilingüe real con hreflang, precios públicos y presencia local. Cada pieza la tiene alguien; juntas, casi nadie en el nicho hispano.' },
       { q: '¿Trabajan en español e inglés?', a: 'Sí, es nuestra especialidad. Diseñamos, escribimos y te atendemos en español e inglés, con el contexto cultural correcto del mercado hispano de Houston y Miami.' },

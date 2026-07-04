@@ -33,7 +33,7 @@ related:
     icon: "lucide:layout-template"
   - label: "Diseño web bilingüe en Houston"
     href: "/es/houston/diseno-web-bilingue"
-    desc: "Español e inglés redactados para tu cliente, no traducidos a máquina."
+    desc: "Español e inglés escritos para tu cliente, no traducidos a máquina."
     icon: "lucide:languages"
   - label: "Diseño web en Houston"
     href: "/es/houston/diseno-web"

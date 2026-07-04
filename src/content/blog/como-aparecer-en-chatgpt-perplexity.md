@@ -17,7 +17,7 @@ faq:
   - q: "¿Sirve de algo marcar mi sitio con schema?"
     a: "Sí, pero no es magia. El 71% de las páginas que ChatGPT cita incluyen datos estructurados (SE Ranking, 2026), aunque correlación no es causa: un estudio de Search/Atlas no halló relación directa entre schema y citas. El schema es infraestructura de legibilidad —ayuda a que te entiendan y puede mejorar tu aparición en buscadores—, no un botón mágico para ser citado."
   - q: "¿Cuánto tarda en aparecer mi negocio en la IA?"
-    a: "Depende de tu punto de partida y del motor. Las primeras señales suelen tomar de semanas a unos meses, y el liderazgo varios meses más. Además, las respuestas de la IA son volátiles: cambian solas. Por eso nadie serio puede garantizarte el primer lugar; lo honesto es trabajar de forma continua y medir."
+    a: "Depende de tu punto de partida y del motor. Las primeras señales suelen tomar de semanas a unos meses, y el liderazgo varios meses más. Además, las respuestas de la IA son volátiles: cambian solas. Por eso nadie serio puede garantizarte el primer lugar; lo honesto es trabajar de forma continua y medir. Ya lo hemos visto pasar con clientes reales — la IA de Google los incluye en recomendaciones y uno ya recibe visitas desde ChatGPT — pero los tiempos varían y nadie puede garantizarlos con honestidad."
   - q: "¿Necesito un sitio nuevo para que la IA me lea?"
     a: "No siempre, pero importa cómo está construido. Los rastreadores de IA no ejecutan JavaScript (Vercel y MERJ, 2025), así que los sitios que dependen de JS para mostrar su contenido —muchos hechos en Wix o React— quedan prácticamente invisibles para la IA. Si tu sitio es lento o se arma con JavaScript, conviene revisarlo."
 related:
@@ -83,6 +83,10 @@ Aquí hay una ventaja real: **el español tiene mucha menos competencia en la IA
 ## ¿En cuánto tiempo se ven resultados? (y qué NO te podemos prometer)
 
 Seamos claros, porque abunda la promesa fácil: **nadie puede garantizarte el primer lugar en la IA, y desconfía de quien lo haga.** Las primeras señales suelen tomar de semanas a unos meses; el liderazgo, varios meses más. Las respuestas de la IA cambian solas: lo que hoy te cita, mañana puede mostrar a otro. Por eso el AEO es un trabajo continuo de medición y ajuste, no un interruptor que se enciende una vez.
+
+## Casos reales: negocios que ya aparecen en la IA
+
+No solo lo aplicamos a nuestro propio sitio. Dos clientes nuestros — Texas Rush Remove en Houston y Move Junk Away en Orlando — tienen páginas que ya posicionan en sus zonas, y la IA de Google ya los incluye en sus recomendaciones para algunas búsquedas relacionadas con su servicio. Texas Rush Remove ya registra visitas que llegan desde ChatGPT. No publicamos cifras infladas ni prometemos resultados: contamos lo que ya pasó, y lo que hicimos fue exactamente lo de la lista de arriba.
 
 ## Caso #0: nosotros lo practicamos
 

@@ -465,7 +465,7 @@ const iaPymes: ClusterPage = {
     { name: 'IA para tu Negocio', path: '/es/ia-para-pymes' },
   ],
   hero: {
-    badge: 'IA Operativa',
+    badge: 'IA para tu negocio',
     badgeIcon: 'marcyan-ai',
     kicker: 'IA para PYMEs',
     h1: 'IA para tu <em>Negocio</em>',
@@ -1168,7 +1168,7 @@ const precioSeoHouston: ClusterPage = {
 // 10 · HOUSTON — BRANDING E IDENTIDAD ($750)  [Ola 2 · B2]
 //   Keyword "diseño de logo / branding houston". SERVICIO profesional (NO DIY).
 //   PROOF REAL: Julio's Landscape TX (marca+identidad+sitio desde cero). Ángulo
-//   honesto "¿usan IA?": IA para explorar, criterio humano para decidir. Stat
+//   honesto sobre el rol de la IA: exploración amplia, decisiones de diseñador. Stat
 //   académico real (Lindgaard et al. 2006, primera impresión visual = 50 ms).
 // ═══════════════════════════════════════════════════════════════
 const houstonBranding: ClusterPage = {
@@ -1208,15 +1208,15 @@ const houstonBranding: ClusterPage = {
       { icon: 'lucide:type', title: 'Tipografías', desc: 'La selección de fuentes que le da voz y coherencia a todo lo que comunicas.' },
       { icon: 'lucide:book-open', title: 'Guía de uso', desc: 'Un documento claro de cómo usar tu marca, para que se vea consistente en todos lados.' },
       { icon: 'lucide:folder', title: 'Archivos listos', desc: 'Tu logo en todos los formatos que necesitas (vectorial, PNG, PDF), listos para usar.' },
-      { icon: 'lucide:sparkles', title: 'IA para explorar, criterio humano para decidir', desc: 'Usamos IA para proponer ideas rápido, pero cada decisión la toma un diseñador. La estrategia no la deja a la máquina.' },
+      { icon: 'lucide:sparkles', title: 'Marca pensada, no plantilla', desc: 'Exploramos muchas direcciones para tu marca y un diseñador define y refina la final. Estrategia y criterio en cada decisión.' },
     ],
     tone: 'gold',
   },
   local: {
     tag: 'Cómo lo hacemos',
-    title: 'IA para <em>explorar</em>, criterio humano para decidir',
+    title: 'Exploración amplia, decisiones de <em>diseñador</em>',
     paragraphs: [
-      'La inteligencia artificial es excelente para generar muchas ideas rápido y barato, pero una marca que aguante el tiempo necesita estrategia y criterio. Por eso usamos la IA para acelerar la exploración y proponer caminos, y un diseñador define la dirección, refina cada detalle y se asegura de que tu marca diga lo correcto.',
+      'Las herramientas de hoy nos permiten explorar muchas más direcciones creativas en menos tiempo. Lo que no cambia es quién decide: un diseñador define la dirección, refina cada detalle y se asegura de que tu marca diga lo correcto. Recibes una marca con estrategia, no una plantilla generada al azar.',
       'Y si lo que necesitas es marca <strong>y</strong> sitio web, lo hacemos junto: tu identidad y tu página nacen coherentes desde el primer día. Diseñamos para el mercado hispano de Houston, en español, con el tono que conecta con tu cliente.',
     ],
     tone: 'gold',
@@ -1253,7 +1253,7 @@ const houstonBranding: ClusterPage = {
       { q: '¿Cuánto cuesta el diseño de un logo profesional en Houston?', a: 'Empieza en $750 e incluye el logo a medida con sus variantes, paleta de color, tipografías y una guía de uso. El precio final depende del alcance: desde lo esencial de un logo hasta un sistema de marca completo. Te damos un presupuesto claro en la propuesta gratuita.' },
       { q: '¿Qué incluye un paquete de identidad de marca?', a: 'Logo y sus variantes, paleta de color, selección de tipografías, una guía de uso para que tu marca se vea consistente, y los archivos finales en todos los formatos que necesitas. Si quieres, sumamos tu página web para que todo nazca coherente.' },
       { q: '¿Cuál es la diferencia entre un logo y la identidad de marca?', a: 'El logo es el símbolo de tu negocio; la identidad de marca es todo el sistema visual a su alrededor: colores, tipografías, estilo y las reglas para usarlos. Un logo solo te identifica; una identidad completa hace que tu negocio se vea profesional y coherente en todos lados.' },
-      { q: '¿Usan inteligencia artificial o lo hace un diseñador?', a: 'Las dos cosas, en su justo lugar. Usamos IA para explorar ideas rápido, pero las decisiones de estrategia y el refinamiento los hace un diseñador. La IA acelera; el criterio humano decide. Así obtienes una marca pensada, no una plantilla generada al azar.' },
+      { q: '¿Cómo se aseguran de que mi marca no parezca una plantilla?', a: 'Exploramos una gama amplia de direcciones y un diseñador toma todas las decisiones de estrategia y refinamiento, con tu negocio y tu cliente en mente. Recibes una marca pensada, con guía de uso, no un logo genérico.' },
       { q: '¿El diseño de marca incluye la página web?', a: 'Puede incluirla. El branding y el sitio web son servicios distintos, pero los combinamos a menudo porque juntos quedan coherentes desde el inicio. Si quieres marca y sitio, te damos un alcance y un precio claros para todo el proyecto.' },
       { q: '¿Atienden a negocios hispanos y en español?', a: 'Sí, es nuestra especialidad. Trabajamos enfocados en el mercado hispano de Houston: diseñamos y te acompañamos en español, con el contexto cultural correcto para que tu marca conecte con tu cliente.' },
     ],

@@ -116,8 +116,8 @@ const relatedTone: 'gold' | 'teal' =
       title={cluster.cta.title}
       sub={cluster.cta.sub}
       primary={cluster.cta.primary}
-      secondary={cluster.cta.secondary}
       tone={cluster.cta.tone}
+      city={cluster.service.areaCity === 'Miami' ? 'miami' : 'houston'}
     />
 
     <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} tone={relatedTone} />

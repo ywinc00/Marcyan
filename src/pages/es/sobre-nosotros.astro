@@ -100,14 +100,6 @@ const trust = [
     <section class="section trust" aria-labelledby="trust-h">
       <div class="container">
         <div class="trust__panel">
-          {/* órbita line-art de 3 nodos — decorativa, esquina superior derecha */}
-          <svg class="trust__illo" viewBox="0 0 200 120" aria-hidden="true" focusable="false">
-            <ellipse cx="100" cy="60" rx="92" ry="40" transform="rotate(-12 100 60)" />
-            <circle class="trust__illo-node" cx="18" cy="44" r="3.5" />
-            <circle class="trust__illo-node" cx="100" cy="20" r="2.5" />
-            <circle class="trust__illo-node" cx="182" cy="74" r="3" />
-          </svg>
-
           <header class="trust__head">
             <span class="trust__tag">
               <span class="trust__dot" aria-hidden="true"></span>Verificable
@@ -182,23 +174,6 @@ const trust = [
     border-radius: var(--radius-xl);
     padding: var(--space-6);
   }
-
-  /* órbita line-art decorativa, esquina superior derecha (eco RelatedLinks) */
-  .trust__illo {
-    position: absolute;
-    top: var(--space-5);
-    right: var(--space-5);
-    width: clamp(120px, 28%, 200px);
-    height: auto;
-    pointer-events: none;
-    z-index: 0;
-    color: var(--accent-gold);
-    opacity: 0.4;
-    -webkit-mask-image: linear-gradient(245deg, #000 35%, transparent 92%);
-    mask-image: linear-gradient(245deg, #000 35%, transparent 92%);
-  }
-  .trust__illo ellipse { fill: none; stroke: currentColor; stroke-width: 1; opacity: 0.5; }
-  .trust__illo-node { fill: currentColor; }
 
   .trust__head {
     position: relative;

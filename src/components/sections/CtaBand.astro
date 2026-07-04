@@ -1,13 +1,21 @@
 ---
 // Banda de CTA final con GRAVEDAD. Panel centrado sobre la atmósfera:
-//  · glow de acento más rico (eco de la viñeta del hero) + filete superior,
-//  · motivo espacial en ESPACIO NEGATIVO: arco de horizonte anclado al borde INFERIOR
-//    (bajo el CTA) + constelación pequeña en la esquina superior — NUNCA detrás del título;
-//    animación mínima y estable (leve parpadeo de estrellas), sin satélites que tartamudeen.
-//  · jerarquía dura: 1 acción PRIMARIA dominante (oro/teal sólido) + secundaria como
-//    enlace mono discreto (no 2 CTAs gemelos).
-// Contrato de props INTACTO: title(set:html), sub, primary, secondary, tone.
-import Button from '../ui/Button.astro';
+//  · glow de acento (eco de la viñeta del hero) + filete superior de "remate".
+//  · SIN decoración de arco/constelación (retiradas a pedido del dueño): limpio.
+//  · CONVERSIÓN = 3 canales reales, NUNCA el brief (/formulario). El brief es para
+//    un cliente que YA quiere el servicio y nos da datos de su negocio, no para captar.
+//      - Formulario de contacto (#contacto, la sección de abajo)
+//      - WhatsApp (wa.me del número de la ciudad)
+//      - Llamar (tel: del número de la ciudad)
+//    Prioridad por dispositivo (dictado del dueño):
+//      · Móvil  → LLAMAR domina, luego WhatsApp, luego formulario.
+//      · PC/desktop → FORMULARIO domina, luego WhatsApp, luego llamar.
+// Contrato de props: title(set:html), sub, primary(=acción de formulario), tone,
+// + `city` (opcional, 'houston' por defecto) para el número. `secondary` se mantiene
+// en la interfaz por compatibilidad con las páginas, pero YA NO se renderiza (era el
+// enlace al brief que el dueño pidió eliminar como método de captación).
+import Icon from '../ui/Icon.astro';
+import { nap } from '../../i18n/content';
 
 interface Props {
   title: string;
@@ -15,65 +23,47 @@ interface Props {
   primary: { label: string; href: string };
   secondary?: { label: string; href: string };
   tone?: 'gold' | 'teal';
+  city?: 'houston' | 'miami';
 }
-const { title, sub, primary, secondary, tone = 'gold' } = Astro.props;
-const uid = 'cta' + Math.random().toString(36).slice(2, 7);
+const { title, sub, primary, tone = 'gold', city = 'houston' } = Astro.props;
+
+// Número por ciudad (Houston por defecto = sede/línea principal).
+const tel = nap[city];
+const telHref = 'tel:' + tel.replace(/[^\d+]/g, '');
+const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
+// El formulario de contacto vive al final de la propia página (#contacto). Se respeta
+// el href de `primary` si la página lo define; si no, ancla a la sección de contacto.
+const formHref = primary.href || '#contacto';
 ---
 <section class:list={['section ctaband', `ctaband--${tone}`]}>
   <div class="container">
     <div class="ctaband__inner">
-      <!-- constelación pequeña en esquina superior (espacio negativo, lejos del título) -->
-      <svg class="ctaband__constellation" viewBox="0 0 120 80" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
-        <g class="ctaband__lines">
-          <path d="M18 24 L52 14 L86 40 L104 22" />
-          <path d="M52 14 L60 52" />
-        </g>
-        <g class="ctaband__stars">
-          <circle cx="18"  cy="24" r="1.4" />
-          <circle cx="52"  cy="14" r="1.8" />
-          <circle cx="86"  cy="40" r="1.4" />
-          <circle cx="104" cy="22" r="1.2" />
-          <circle cx="60"  cy="52" r="1.1" />
-        </g>
-      </svg>
-
-      <!-- arco de horizonte anclado al borde INFERIOR, bajo el CTA (no cruza el texto) -->
-      <svg class="ctaband__horizon" viewBox="0 0 600 120" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMax slice">
-        <defs>
-          <linearGradient id={`${uid}-arc`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stop-color="var(--tint)" stop-opacity="0" />
-            <stop offset="50%"  stop-color="var(--tint)" stop-opacity="0.85" />
-            <stop offset="100%" stop-color="var(--tint)" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <!-- curva del horizonte: cúpula centrada, borde inferior del panel -->
-        <path class="ctaband__arc" d="M -40 150 Q 300 8 640 150"
-          fill="none" stroke={`url(#${uid}-arc)`} />
-        <!-- satélite ESTÁTICO posado sobre la curva (sin animación de recorrido) -->
-        <circle class="ctaband__dot" cx="300" cy="20" r="3.5" />
-      </svg>
-
       <h2 class="h2 ctaband__title" set:html={title} />
       {sub && <p class="lead ctaband__sub">{sub}</p>}
 
-      <div class="ctaband__cta">
-        <Button href={primary.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg">{primary.label}</Button>
-        {secondary && (
-          <a class="ctaband__alt" href={secondary.href}>
-            <span>{secondary.label}</span>
-            <svg class="ctaband__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <path d="M3 8h9M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-        )}
+      {/* Trío de conversión. El orden/énfasis se invierte por dispositivo vía CSS:
+          móvil = Llamar dominante · desktop = Formulario dominante. */}
+      <div class="ctaband__actions">
+        <a class="ctaband__act ctaband__act--form" href={formHref}>
+          <Icon name="lucide:arrow-right" />
+          <span>{primary.label}</span>
+        </a>
+        <a class="ctaband__act ctaband__act--wa" href={waHref}>
+          <Icon name="lucide:message-circle" />
+          <span>WhatsApp</span>
+        </a>
+        <a class="ctaband__act ctaband__act--call" href={telHref}>
+          <Icon name="lucide:phone" />
+          <span>Llamar</span>
+        </a>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .ctaband--gold { --tint: var(--accent-gold); --glow: var(--accent-gold-glow); --line: var(--accent-gold-line); }
-  .ctaband--teal { --tint: var(--accent-teal); --glow: color-mix(in srgb, var(--accent-teal), transparent 74%); --line: var(--accent-teal-line); }
+  .ctaband--gold { --tint: var(--accent-gold); --glow: var(--accent-gold-glow); }
+  .ctaband--teal { --tint: var(--accent-teal); --glow: color-mix(in srgb, var(--accent-teal), transparent 74%); }
 
   /* acento del titular inyectado por set:html (scope acotado) */
   .ctaband__title :global(em) { color: var(--tint); font-style: normal; }
@@ -95,7 +85,7 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
     background: linear-gradient(90deg, transparent, var(--tint), transparent);
     opacity: 0.7;
   }
-  /* glow más rico — eco de la viñeta del hero, anclado arriba */
+  /* glow — eco de la viñeta del hero, anclado arriba + profundidad inferior */
   .ctaband__inner::after {
     content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background:
@@ -103,53 +93,66 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
       radial-gradient(140% 80% at 50% 130%, rgba(0, 0, 0, 0.5), transparent 60%);
   }
 
-  /* ── motivo espacial line-art (ESPACIO NEGATIVO — nunca detrás del título) ── */
-
-  /* constelación: esquina superior, discreta, fuera del ancho del texto */
-  .ctaband__constellation {
-    position: absolute; top: var(--space-5); z-index: -1;
-    inset-inline-end: var(--space-5); inset-inline-start: auto;
-    width: clamp(96px, 22%, 140px); height: auto; min-width: 0;
-    pointer-events: none; opacity: 0.6;
-  }
-  .ctaband__lines path { fill: none; stroke: var(--line); stroke-width: 1; }
-  .ctaband__stars circle { fill: var(--fg-primary); opacity: 0.35; }
-  /* la estrella "ancla" toma el color de acento */
-  .ctaband__stars circle:nth-child(2) { fill: var(--tint); opacity: 0.9; }
-
-  /* horizonte: arco anclado al borde INFERIOR del panel (debajo del CTA) */
-  .ctaband__horizon {
-    position: absolute; inset-inline: 0; bottom: 0; z-index: -1;
-    width: 100%; height: clamp(56px, 22%, 100px); min-height: 0;
-    pointer-events: none;
-  }
-  .ctaband__arc { stroke-width: 1.25; }
-  .ctaband__dot { fill: var(--tint); opacity: 0.85; }
-
-  /* parpadeo mínimo y estable de un par de estrellas (sin recorridos ni saltos) */
-  .ctaband__stars circle:nth-child(3) { animation: cta-twinkle 5s ease-in-out infinite; }
-  .ctaband__stars circle:nth-child(5) { animation: cta-twinkle 6.5s ease-in-out 1.2s infinite; }
-  @keyframes cta-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
-
   .ctaband__title { max-width: 22ch; }
   .ctaband__sub { max-width: 54ch; color: var(--fg-secondary); margin-top: var(--space-1); }
 
-  /* jerarquía: primaria sólida domina; secundaria = enlace mono discreto */
-  .ctaband__cta {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-    gap: var(--space-3) var(--space-6); margin-top: var(--space-5); min-width: 0;
+  /* ── Trío de conversión ──────────────────────────────────────────────
+     Móvil: apilado full-width, LLAMAR dominante (sólido). Desktop: fila,
+     FORMULARIO dominante. WhatsApp siempre en medio, contorno. */
+  .ctaband__actions {
+    display: flex; flex-direction: column; align-items: stretch; gap: var(--space-3);
+    width: 100%; max-width: 22rem; margin: var(--space-6) auto 0; min-width: 0;
   }
-  .ctaband__alt {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    min-height: var(--tap-min); padding-inline: var(--space-2);
-    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
-    color: var(--fg-secondary); text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out-expo);
+  .ctaband__act {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    min-height: var(--tap-min); padding: 13px 24px; border-radius: var(--radius-md);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-base);
+    text-decoration: none; white-space: nowrap; min-width: 0;
+    background: transparent; color: var(--fg-primary); border: 1px solid var(--border-accent);
+    transition: background var(--duration-fast) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-expo),
+                color var(--duration-fast), box-shadow var(--duration-base), transform var(--duration-fast);
   }
-  .ctaband__arrow { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .ctaband__alt:hover { color: var(--tint); }
-  .ctaband__alt:hover .ctaband__arrow,
-  .ctaband__alt:focus-visible .ctaband__arrow { transform: translateX(3px); }
+  .ctaband__act :global(svg) { width: 18px; height: 18px; flex: 0 0 auto; stroke-width: 1.5; }
+  .ctaband__act:hover { border-color: var(--tint); color: var(--tint); }
+  .ctaband__act:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; }
+  .ctaband__act:active { transform: scale(0.98); }
+
+  /* ── MÓVIL: LLAMAR domina (sólido). Orden: llamar · WhatsApp · formulario ── */
+  .ctaband__act--call {
+    order: 1; background: var(--tint); color: var(--fg-inverse); border-color: var(--tint);
+  }
+  .ctaband__act--call:hover {
+    background: color-mix(in srgb, var(--tint), white 10%); color: var(--fg-inverse);
+    border-color: var(--tint); box-shadow: 0 8px 30px -12px var(--glow);
+  }
+  .ctaband__act--wa { order: 2; }
+  .ctaband__act--form { order: 3; }
+
+  /* ── DESKTOP: FORMULARIO domina (sólido); LLAMAR vuelve a contorno.
+     Fila centrada. Orden: formulario · WhatsApp · llamar ── */
+  @media (--md) {
+    .ctaband__actions {
+      flex-direction: row; flex-wrap: wrap; justify-content: center;
+      align-items: center; max-width: none;
+    }
+    .ctaband__act { width: auto; }
+
+    .ctaband__act--call {
+      order: 3; background: transparent; color: var(--fg-primary); border-color: var(--border-accent);
+    }
+    .ctaband__act--call:hover {
+      background: transparent; color: var(--tint); border-color: var(--tint); box-shadow: none;
+    }
+    .ctaband__act--wa { order: 2; }
+    .ctaband__act--form {
+      order: 1; background: var(--tint); color: var(--fg-inverse); border-color: var(--tint);
+    }
+    .ctaband__act--form:hover {
+      background: color-mix(in srgb, var(--tint), white 10%); color: var(--fg-inverse);
+      border-color: var(--tint); box-shadow: 0 8px 30px -12px var(--glow);
+    }
+  }
 
   @media (--md) {
     .ctaband__inner { padding: var(--space-10) var(--space-8) var(--space-9); }
@@ -157,7 +160,7 @@ const uid = 'cta' + Math.random().toString(36).slice(2, 7);
   }
 
   @media (--motion-reduce) {
-    .ctaband__stars circle { animation: none; }
-    .ctaband__arrow { transition: none; }
+    .ctaband__act { transition: color var(--duration-fast), border-color var(--duration-fast); }
+    .ctaband__act:active { transform: none; }
   }
 </style>

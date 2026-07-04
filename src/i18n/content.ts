@@ -202,7 +202,7 @@ export const content = {
 
     footer: {
       tagline: 'Diseño Web Impulsado por IA · Houston & Miami',
-      cta: { label: 'Pedir propuesta gratis', href: '/formulario' },
+      cta: { label: 'Pedir propuesta gratis', href: '/es/#contacto' },
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -403,7 +403,7 @@ export const content = {
 
     footer: {
       tagline: 'AI-Powered Web Design · Houston & Miami',
-      cta: { label: 'Get a free proposal', href: '/formulario' },
+      cta: { label: 'Get a free proposal', href: '/en/#contacto' },
       cols: [
         { title: 'Services', links: [
           { label: 'Web Design', href: '#servicios' },

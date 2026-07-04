@@ -8,7 +8,8 @@ import LegalDoc from '../components/sections/LegalDoc.astro';
 import { content, nap } from '../i18n/content';
 import { clusterNav } from '../i18n/clusters';
 
-const pageNav = { ...clusterNav, cta: { label: 'Iniciar Proyecto', href: '/formulario' } };
+// El CTA del nav lleva al FORMULARIO DE CONTACTO (captación), no al brief.
+const pageNav = { ...clusterNav, cta: { label: 'Pedir propuesta gratis', href: '/es/#contacto' } };
 ---
 <Layout
   title="Términos del Servicio · Marcyan Studio"

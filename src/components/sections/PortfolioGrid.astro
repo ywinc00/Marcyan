@@ -6,14 +6,17 @@
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import type { PortfolioProject } from '../../i18n/portfolio';
+import { t, type Lang } from '../../i18n/ui';
 
 interface Props {
   tag: string;
   title: string;
   intro?: string;
   projects: PortfolioProject[];
+  lang?: Lang;
 }
-const { tag, title, intro, projects } = Astro.props;
+const { tag, title, intro, projects, lang = 'es' } = Astro.props;
+const uipf = t(lang);
 ---
 <section class="section pwf" data-fx="gold">
   <div class="container">
@@ -34,7 +37,7 @@ const { tag, title, intro, projects } = Astro.props;
                 <img
                   class="dvp-shot"
                   src={`/Galeria/${p.slug}-pc.webp`}
-                  alt={`${p.name} — vista de escritorio del sitio`}
+                  alt={`${p.name} — ${uipf.shot.pc}`}
                   width="1920" height="1080" loading="lazy" decoding="async"
                 />
               </div>
@@ -47,7 +50,7 @@ const { tag, title, intro, projects } = Astro.props;
                 <img
                   class="dvp-pshot"
                   src={`/Galeria/${p.slug}-movil.webp`}
-                  alt={`${p.name} — vista móvil del sitio`}
+                  alt={`${p.name} — ${uipf.shot.movil}`}
                   width="1320" height={p.mh} loading="lazy" decoding="async"
                 />
               </div>

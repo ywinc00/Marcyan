@@ -5,9 +5,11 @@
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import { t, type Lang } from '../../i18n/ui';
 
-interface Props { projects: any }
-const { projects } = Astro.props;
+interface Props { projects: any; lang?: Lang }
+const { projects, lang = 'es' } = Astro.props;
+const uipr = t(lang);
 const items = projects.items;
 
 // Capturas reales por proyecto (webp en /public/Galeria). Mapeadas por nombre de
@@ -30,7 +32,7 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
     </header>
 
     <div class="pf" data-projects role="group" aria-label={projects.tag}>
-      <button class="pf__arrow pf__arrow--prev" type="button" data-prev aria-label="Trabajo anterior"><Icon name="lucide:chevron-left" /></button>
+      <button class="pf__arrow pf__arrow--prev" type="button" data-prev aria-label={uipr.projects.prev}><Icon name="lucide:chevron-left" /></button>
 
       <div class="pf__stage">
         {items.map((p: any, idx: number) => {
@@ -89,7 +91,7 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
         })}
       </div>
 
-      <button class="pf__arrow pf__arrow--next" type="button" data-next aria-label="Trabajo siguiente"><Icon name="lucide:chevron-right" /></button>
+      <button class="pf__arrow pf__arrow--next" type="button" data-next aria-label={uipr.projects.next}><Icon name="lucide:chevron-right" /></button>
 
       <button class="pf__more" type="button" data-more aria-expanded="false">
         <span>{projects.more ?? 'Ver Proyectos'}</span>

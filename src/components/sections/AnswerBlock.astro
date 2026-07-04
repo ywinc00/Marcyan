@@ -12,13 +12,16 @@
 // y la fuente como chip de dato mono con su icono bar-chart.
 // NO se altera el texto de q / a / source (contenido citable verbatim).
 import Icon from '../ui/Icon.astro';
+import { t, type Lang } from '../../i18n/ui';
 interface Props {
   q: string;
   a: string;
   /** Fuente del dato citado, p.ej. "Google" o "SOCi, 2026". */
   source?: string;
+  lang?: Lang;
 }
-const { q, a, source } = Astro.props;
+const { q, a, source, lang = 'es' } = Astro.props;
+const ui = t(lang);
 ---
 <section class="section answer" aria-labelledby="answer-q">
   <div class="container">
@@ -28,7 +31,7 @@ const { q, a, source } = Astro.props;
         <path d="M27 18c-8 2-13 8-13 17 0 6 4 11 10 11 5 0 9-4 9-9s-4-9-9-9c-1 0-2 0-3 .3 1-4 4-7 9-8.3L27 18zM52 18c-8 2-13 8-13 17 0 6 4 11 10 11 5 0 9-4 9-9s-4-9-9-9c-1 0-2 0-3 .3 1-4 4-7 9-8.3L52 18z"/>
       </svg>
 
-      <p class="answer__tag"><span class="answer__dot" aria-hidden="true"></span>Respuesta directa</p>
+      <p class="answer__tag"><span class="answer__dot" aria-hidden="true"></span>{ui.answer.directAnswer}</p>
       <h2 class="answer__q" id="answer-q">{q}</h2>
 
       <div class="answer__readout">
@@ -37,7 +40,7 @@ const { q, a, source } = Astro.props;
 
       {source && (
         <p class="answer__src">
-          <Icon name="lucide:bar-chart-3" /> <span>Fuente: {source}</span>
+          <Icon name="lucide:bar-chart-3" /> <span>{ui.answer.source}: {source}</span>
         </p>
       )}
     </article>

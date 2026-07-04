@@ -9,6 +9,8 @@
 import Icon from '../ui/Icon.astro';
 import BrandType from '../brand/BrandType.astro';
 import Button from '../ui/Button.astro';
+import { toggleHref } from '../../i18n/routes';
+import { t, type Lang } from '../../i18n/ui';
 
 interface Props {
   nav: any;
@@ -26,6 +28,8 @@ const {
   currentPath,
   showCtaBar = true,
 } = Astro.props;
+const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
+const uin = t(lang as Lang);
 
 // aria-current: marca el link activo (no aplica al ancla de #contacto).
 const isActive = (href: string) =>
@@ -37,7 +41,7 @@ const isActive = (href: string) =>
       <BrandType />
     </a>
 
-    <nav class="nav__links" aria-label="Principal">
+    <nav class="nav__links" aria-label={uin.nav.primary}>
       {nav.links.map((l: any) => <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
 
@@ -45,13 +49,11 @@ const isActive = (href: string) =>
       <div class="nav__lang" aria-label="Idioma">
         {lang === 'es'
           ? <span class="nav__lang-opt is-on" aria-current="true">ES</span>
-          : <a class="nav__lang-opt" href={nav.langHref} hreflang="es">ES</a>}
+          : <a class="nav__lang-opt" href={otherHref} hreflang="es">ES</a>}
         <span class="nav__lang-sep" aria-hidden="true"></span>
         {lang === 'en'
           ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
-          : hasEn
-            ? <a class="nav__lang-opt" href={nav.langHref} hreflang="en">EN</a>
-            : <a class="nav__lang-opt" href="/en/" hreflang="en" title="English version (home)">EN</a>}
+          : <a class="nav__lang-opt" href={otherHref} hreflang="en" title={lang === 'es' ? 'English version' : 'Versión en español'}>EN</a>}
       </div>
       <a class="nav__cta" href={nav.cta.href}>{nav.cta.label}</a>
       <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>
@@ -63,7 +65,7 @@ const isActive = (href: string) =>
 
   <div class="nav__overlay" data-nav-overlay></div>
 
-  <aside id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label="Menú" aria-hidden="true" inert>
+  <aside id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label={uin.nav.menu} aria-hidden="true" inert>
     <div class="nav__drawer-head">
       <BrandType />
       <button class="nav__close" type="button" data-nav-close>
@@ -71,7 +73,7 @@ const isActive = (href: string) =>
         <Icon name="lucide:x" />
       </button>
     </div>
-    <nav class="nav__drawer-links" aria-label="Menú móvil">
+    <nav class="nav__drawer-links" aria-label={uin.nav.mobileMenu}>
       {nav.links.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
     <div class="nav__drawer-foot">

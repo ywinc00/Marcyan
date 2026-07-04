@@ -1,15 +1,11 @@
 ---
-// PLANTILLA de las landings de cluster (Ola 1 SEO). Ensambla la página completa
-// a partir de un objeto ClusterPage. Cada ruta (/es/houston/seo-local, etc.) es
-// un archivo fino que solo pasa su slice de contenido aquí.
+// PLANTILLA de las landings de cluster (Ola 1 SEO), BILINGÜE (prop `lang`).
+// Cada ruta (/es/houston/seo-local, /en/houston/local-seo, …) es un archivo fino
+// que pasa su slice de contenido (ClusterPage) + lang aquí.
 //
 // Estructura (mobile-first, DS v2): Nav · Hero+Breadcrumb · AnswerBlock (AEO) ·
 // Qué incluye · Proceso · Contexto local · Precio · Proof · FAQ · CTA · Relacionados
-// · Contacto (form → /api/brief) · Footer.
-//
-// Reutiliza componentes de la home (Process, Projects, Contact, SiteNav, SiteFooter)
-// y los nuevos (LandingHero, AnswerBlock, FeatureGrid, Prose, Pricing, Faq, CtaBand,
-// RelatedLinks, Breadcrumb, ServiceLd). Solo ES (hasEn=false).
+// · Contacto (form → /api/brief) · Footer. hasEn se deriva en el Layout (routes.ts).
 import Layout from '../layouts/Layout.astro';
 import SiteNav from './layout/SiteNav.astro';
 import SiteFooter from './layout/SiteFooter.astro';
@@ -28,56 +24,55 @@ import Contact from './sections/Contact.astro';
 import SpaceBackdrop from './SpaceBackdrop.astro';
 import ServiceLd from './seo/ServiceLd.astro';
 import { content } from '../i18n/content';
-import { clusterNav, type ClusterPage } from '../i18n/clusters';
+import { clusterNav, clusterNavEn, type ClusterPage } from '../i18n/clusters';
 
-interface Props { cluster: ClusterPage }
-const { cluster } = Astro.props;
-const c = content.es;
-// path sin prefijo de idioma para el Layout (construye canonical + hreflang es).
-const pathNoLocale = cluster.path.replace(/^\/es\//, '');
+interface Props { cluster: ClusterPage; lang?: 'es' | 'en' }
+const { cluster, lang = 'es' } = Astro.props;
+const c = content[lang];
+const nav = lang === 'en' ? clusterNavEn : clusterNav;
+// path sin prefijo de idioma para el Layout (construye canonical + hreflang).
+const pathNoLocale = cluster.path.replace(/^\/(es|en)\//, '');
 
-// ── Derivar prellenado del formulario de contacto desde el cluster ──
-// defaultCity: por la ciudad del Service schema (coincide con las options del select).
+// ── Prellenado del formulario de contacto desde el cluster ──
 function deriveDefaultCity(city?: string): string | undefined {
   if (city === 'Houston') return 'Houston, TX';
   if (city === 'Miami') return 'Miami, FL';
-  return undefined; // sin areaCity (p.ej. ia-para-pymes) → sin ciudad prellenada
+  return undefined;
 }
-// defaultService: por substring del path (coincide con las options ES del select).
-function deriveDefaultService(path: string): string | undefined {
-  if (path.includes('abogados-inmigracion') || path.includes('bienes-raices')) return 'Diseño Web';
-  if (path.includes('diseno-web') || path.includes('pagina-web')) return 'Diseño Web';
-  if (path.includes('ia-conversacional') || path.includes('chatbot') || path.includes('ia-para-pymes')) return 'IA Conversacional / Chatbot';
-  if (path.includes('ecommerce')) return 'E-Commerce / Tienda Online';
-  if (path.includes('seo-para-ia')) return 'SEO para IA (Visibilidad en IA)';
-  if (path.includes('seo-local')) return 'SEO Local';
-  if (path.includes('branding')) return 'Branding & Identidad';
-  return undefined; // sin match → sin servicio prellenado
+// defaultService: por substring del path (ES o EN); coincide con las options del select por idioma.
+function deriveDefaultService(path: string, lang: 'es' | 'en'): string | undefined {
+  const es = lang === 'es';
+  if (/abogados-inmigracion|bienes-raices|immigration-lawyers|real-estate/.test(path)) return es ? 'Diseño Web' : 'Web Design';
+  if (/diseno-web|pagina-web|web-design|website-cost/.test(path)) return es ? 'Diseño Web' : 'Web Design';
+  if (/ia-conversacional|chatbot|ia-para-pymes|conversational-ai|ai-for-small-business/.test(path)) return es ? 'IA Conversacional / Chatbot' : 'Conversational AI / Chatbot';
+  if (/ecommerce/.test(path)) return es ? 'E-Commerce / Tienda Online' : 'E-Commerce / Online Store';
+  if (/seo-para-ia|ai-seo/.test(path)) return es ? 'SEO para IA (Visibilidad en IA)' : 'AI Visibility (AEO)';
+  if (/seo-local|local-seo/.test(path)) return es ? 'SEO Local' : 'Local SEO';
+  if (/branding/.test(path)) return es ? 'Branding & Identidad' : 'Branding & Identity';
+  return undefined;
 }
 const defaultCity = deriveDefaultCity(cluster.service.areaCity);
-const defaultService = deriveDefaultService(cluster.path);
+const defaultService = deriveDefaultService(cluster.path, lang);
 
-// Tono de los enlaces relacionados: teal si la landing es de tono teal (p.ej. IA).
 const relatedTone: 'gold' | 'teal' =
   cluster.hero.tone === 'teal' || cluster.includes.tone === 'teal' ? 'teal' : 'gold';
 ---
 <Layout
   title={cluster.meta.title}
   description={cluster.meta.description}
-  lang="es"
+  lang={lang}
   path={pathNoLocale}
-  hasEn={false}
 >
   <ServiceLd slot="head" {...cluster.service} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" hasEn={false} currentPath={Astro.url.pathname} />
+  <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en/' : '/es/'} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero {...cluster.hero}>
-      <Breadcrumb slot="breadcrumb" items={cluster.breadcrumb} lang="es" />
+      <Breadcrumb slot="breadcrumb" items={cluster.breadcrumb} lang={lang} />
     </LandingHero>
 
-    <AnswerBlock q={cluster.answer.q} a={cluster.answer.a} source={cluster.answer.source} />
+    <AnswerBlock q={cluster.answer.q} a={cluster.answer.a} source={cluster.answer.source} lang={lang} />
 
     <FeatureGrid
       tag={cluster.includes.tag}
@@ -106,9 +101,10 @@ const relatedTone: 'gold' | 'teal' =
       cta={cluster.pricing.cta}
       note={cluster.pricing.note}
       tone={cluster.pricing.tone}
+      lang={lang}
     />
 
-    <Projects projects={cluster.proof} />
+    <Projects projects={cluster.proof} lang={lang} />
 
     <Faq tag={cluster.faq.tag} title={cluster.faq.title} items={cluster.faq.items} />
 
@@ -118,6 +114,7 @@ const relatedTone: 'gold' | 'teal' =
       primary={cluster.cta.primary}
       tone={cluster.cta.tone}
       city={cluster.service.areaCity === 'Miami' ? 'miami' : 'houston'}
+      lang={lang}
     />
 
     <RelatedLinks tag={cluster.related.tag} title={cluster.related.title} links={cluster.related.links} tone={relatedTone} />
@@ -128,5 +125,5 @@ const relatedTone: 'gold' | 'teal' =
   {/* Atmósfera espacial de página (mismo lenguaje visual que la home) — detrás de todo. */}
   <SpaceBackdrop tone={relatedTone} />
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang={lang} />
 </Layout>

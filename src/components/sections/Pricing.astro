@@ -6,6 +6,7 @@
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import { t, type Lang } from '../../i18n/ui';
 
 interface Props {
   tag: string;
@@ -20,13 +21,15 @@ interface Props {
   /** Nota fina (p.ej. honestidad sobre alcance). */
   note?: string;
   tone?: 'gold' | 'teal';
+  lang?: Lang;
 }
-const { tag, title, price, unit, lead, features, cta, note, tone = 'gold' } = Astro.props;
+const { tag, title, price, unit, lead, features, cta, note, tone = 'gold', lang = 'es' } = Astro.props;
+const uip = t(lang);
 ---
 <section class:list={['section pricing', `pricing--${tone}`]}>
   <div class="container">
     <div class="pricing__card">
-      <span class="pricing__stamp" aria-hidden="true">// OFERTA</span>
+      <span class="pricing__stamp" aria-hidden="true">// {uip.price.offer}</span>
       <span class="pricing__corner" aria-hidden="true"></span>
 
       <div class="pricing__intro">
@@ -35,7 +38,7 @@ const { tag, title, price, unit, lead, features, cta, note, tone = 'gold' } = As
         {lead && <p class="pricing__lead">{lead}</p>}
 
         <p class="pricing__price">
-          <span class="pricing__from">desde</span>
+          <span class="pricing__from">{uip.price.from}</span>
           <span class="pricing__amt">{price}</span>
           {unit && <span class="pricing__unit">{unit}</span>}
         </p>
@@ -45,7 +48,7 @@ const { tag, title, price, unit, lead, features, cta, note, tone = 'gold' } = As
       </div>
 
       <div class="pricing__panel">
-        <span class="pricing__panel-label">Incluye</span>
+        <span class="pricing__panel-label">{uip.price.includes}</span>
         <ul class="pricing__features">
           {features.map((f) => (
             <li>

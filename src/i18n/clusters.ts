@@ -79,6 +79,23 @@ export const clusterNav = {
   closeMenu: 'Cerrar menú',
 };
 
+// Nav EN — espejo de clusterNav con rutas EN (ver routes.ts). Toggle a /es/.
+export const clusterNavEn = {
+  links: [
+    { label: 'Services', href: '/en/services' },
+    { label: 'Portfolio', href: '/en/portfolio' },
+    { label: 'Pricing', href: '/en/pricing' },
+    { label: 'Cities', href: '/en/cities' },
+    { label: 'About', href: '/en/about' },
+    { label: 'Blog', href: '/en/blog' },
+  ],
+  cta: { label: 'Get a free proposal', href: '#contacto' },
+  langLabel: 'ES',
+  langHref: '/es/',
+  openMenu: 'Open menu',
+  closeMenu: 'Close menu',
+};
+
 // ── Reutilización de proof: elige proyectos REALES de la home por nombre ──
 const homeProjects = content.es.projects.items as unknown as ProjectItem[];
 const proj = (...names: string[]): ProjectItem[] =>

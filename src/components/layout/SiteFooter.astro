@@ -7,9 +7,11 @@
 import { nap } from '../../i18n/content';
 import LogoWordmark from '../brand/LogoWordmark.astro';
 import StarField from '../StarField.astro';
+import { t, type Lang } from '../../i18n/ui';
 
-interface Props { footer: any }
-const { footer } = Astro.props;
+interface Props { footer: any; lang?: Lang }
+const { footer, lang = 'es' } = Astro.props;
+const uif = t(lang);
 const f = footer;
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
@@ -30,21 +32,21 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       <ul class="footer__contact">
         <li>
           <a href={`mailto:${nap.email}`}>{nap.email}</a>
-          <button type="button" class="footer__copy" data-copy={nap.email} aria-label="Copiar correo">
+          <button type="button" class="footer__copy" data-copy={nap.email} data-copied={uif.footer.copied} aria-label={uif.footer.copyEmail}>
             <svg class="footer__copy-ic footer__copy-ic--copy" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             <svg class="footer__copy-ic footer__copy-ic--ok" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
           </button>
         </li>
         <li>
           <span class="footer__city">Houston</span><a href={`tel:${telHou}`}>{nap.houston}</a>
-          <button type="button" class="footer__copy" data-copy={nap.houston} aria-label="Copiar teléfono de Houston">
+          <button type="button" class="footer__copy" data-copy={nap.houston} data-copied={uif.footer.copied} aria-label={uif.footer.copyHouston}>
             <svg class="footer__copy-ic footer__copy-ic--copy" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             <svg class="footer__copy-ic footer__copy-ic--ok" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
           </button>
         </li>
         <li>
           <span class="footer__city">Miami</span><a href={`tel:${telMia}`}>{nap.miami}</a>
-          <button type="button" class="footer__copy" data-copy={nap.miami} aria-label="Copiar teléfono de Miami">
+          <button type="button" class="footer__copy" data-copy={nap.miami} data-copied={uif.footer.copied} aria-label={uif.footer.copyMiami}>
             <svg class="footer__copy-ic footer__copy-ic--copy" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             <svg class="footer__copy-ic footer__copy-ic--ok" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
           </button>
@@ -161,7 +163,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
   .footer__copy.is-copied .footer__copy-ic--copy { display: none; }
   .footer__copy.is-copied .footer__copy-ic--ok { display: block; }
   .footer__copy.is-copied::after {
-    content: "¡Copiado!"; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    content: attr(data-copied); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
     background: var(--bg-elevated); color: var(--fg-primary); border: 1px solid var(--border);
     padding: 3px 8px; border-radius: var(--radius-sm); font-family: var(--font-body);
     font-size: var(--text-xs); line-height: 1; white-space: nowrap; pointer-events: none;

@@ -16,6 +16,7 @@
 // enlace al brief que el dueño pidió eliminar como método de captación).
 import Icon from '../ui/Icon.astro';
 import { nap } from '../../i18n/content';
+import { t, type Lang } from '../../i18n/ui';
 
 interface Props {
   title: string;
@@ -24,8 +25,10 @@ interface Props {
   secondary?: { label: string; href: string };
   tone?: 'gold' | 'teal';
   city?: 'houston' | 'miami';
+  lang?: Lang;
 }
-const { title, sub, primary, tone = 'gold', city = 'houston' } = Astro.props;
+const { title, sub, primary, tone = 'gold', city = 'houston', lang = 'es' } = Astro.props;
+const uic = t(lang);
 
 // Número por ciudad (Houston por defecto = sede/línea principal).
 const tel = nap[city];
@@ -54,7 +57,7 @@ const formHref = primary.href || '#contacto';
         </a>
         <a class="ctaband__act ctaband__act--call" href={telHref}>
           <Icon name="lucide:phone" />
-          <span>Llamar</span>
+          <span>{uic.cta.call}</span>
         </a>
       </div>
     </div>

@@ -10,6 +10,7 @@ import '@fontsource-variable/dm-sans/index.css';
 import '@fontsource-variable/jetbrains-mono/index.css';
 import '../styles/global.css';
 import { nap } from '../i18n/content';
+import { hasMirror } from '../i18n/routes';
 import ChatWidget from '../components/ChatWidget.astro';
 
 interface Props {
@@ -35,7 +36,7 @@ const {
   canonical,
   noindex = false,
   ogImage = '/assets/og/og-default.png',
-  hasEn = false,
+  hasEn,
 } = Astro.props;
 
 const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`;
@@ -45,6 +46,9 @@ const canon = canonical ?? `${SITE}/${lang}${clean}/`;
 const esHref = canonical ?? `${SITE}/es${clean}/`;
 const enHref = `${SITE}/en${clean}/`;
 const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
+// hasEn: si la página no lo pasa explícito, se deriva del mapa de espejos (routes.ts).
+const fullPath = '/' + lang + clean;
+const hasEnResolved = hasEn ?? (canonical ? false : hasMirror(fullPath));
 
 // JSON-LD @graph (Organization + LocalBusiness por ciudad) — server-rendered,
 // restaura el structured data del Sprint 0. NAP desde i18n/content (DRY).
@@ -109,7 +113,7 @@ const jsonLd = {
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="alternate" hreflang="es" href={esHref} />
-    {hasEn && <link rel="alternate" hreflang="en" href={enHref} />}
+    {hasEnResolved && <link rel="alternate" hreflang="en" href={enHref} />}
     <link rel="alternate" hreflang="x-default" href={esHref} />
 
     <meta name="theme-color" content="#080808" />
@@ -123,7 +127,7 @@ const jsonLd = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={ogLocale} />
-    {hasEn && <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />}
+    {hasEnResolved && <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={`${SITE}${ogImage}`} />
 

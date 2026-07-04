@@ -12,20 +12,23 @@
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import type { PriceService } from '../../i18n/pricing';
+import { t, type Lang } from '../../i18n/ui';
 
 interface Props {
   tag: string;
   title: string;
   intro?: string;
   items: PriceService[];
+  lang?: Lang;
 }
-const { tag, title, intro, items } = Astro.props;
+const { tag, title, intro, items, lang = 'es' } = Astro.props;
+const ui = t(lang);
 
 // Parte una viñeta-escalera "Nombre — $123/mes" en { name, price }. Solo presentación:
 // el string original (copy/schema) no se altera; si no hay precio al final, price = null
 // y la fila se renderiza como check plano. Acepta "—" o " - " como separador.
 function splitTier(raw: string): { name: string; price: string | null } {
-  const m = raw.match(/^(.*?)\s+[—–-]\s+(\$[\d.,]+(?:\s*\/\s*mes)?|Gratis)\s*$/);
+  const m = raw.match(/^(.*?)\s+[—–-]\s+(\$[\d.,]+(?:\s*\/\s*(?:mes|mo))?|Gratis|Free)\s*$/);
   if (m) return { name: m[1].trim(), price: m[2].trim() };
   return { name: raw, price: null };
 }
@@ -50,10 +53,10 @@ function splitTier(raw: string): { name: string; price: string | null } {
           <div class="pcard__top">
             <span class="pcard__icon"><Icon name={s.icon} /></span>
             <span class:list={['pcard__price', { 'pcard__price--monthly': isMonthly }]}>
-              {!s.free && <span class="pcard__from">desde</span>}
+              {!s.free && <span class="pcard__from">{ui.price.from}</span>}
               <span class="pcard__amt">{s.displayPrice}</span>
               {isMonthly
-                ? <span class="pcard__unit pcard__unit--rec">/mes</span>
+                ? <span class="pcard__unit pcard__unit--rec">{ui.price.perMonth}</span>
                 : <span class="pcard__unit">{s.displayUnit}</span>}
             </span>
           </div>

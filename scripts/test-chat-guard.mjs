@@ -4,9 +4,9 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS } from '../api/chat.mjs';
 import { brandPostFilter, pricePostFilter } from '../lib/chat-kb.mjs';
-import { stripMarkdown, invitesContact } from '../src/lib/chat-format.mjs';
+import { stripMarkdown, invitesContact, extractContact, contactFlags } from '../src/lib/chat-format.mjs';
 
 let pass = 0;
 const fails = [];
@@ -125,6 +125,51 @@ check('respuesta vacía → text null sin action', () => {
   const r = parseToolResponse([], 'es');
   assert.equal(r.text, null);
   assert.equal(r.action, null);
+});
+
+// ── v3: config de modelo (control de costo — Sonnet 5) ──
+check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));
+check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
+check('ALLOWED_MODELS conserva fallback sonnet-4-6', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-4-6'), true));
+check('modelo desconocido NO está en allowlist (se coacciona a default)', () => assert.equal(ALLOWED_MODELS.has('gpt-4o'), false));
+
+// ── v3: extractContact (memoria de contacto — SOLO cliente, valores bien formados) ──
+check('extrae email bien formado', () => assert.equal(extractContact('mi correo es juan@ejemplo.com, gracias').email, 'juan@ejemplo.com'));
+check('recorta puntuación final del email', () => assert.equal(extractContact('escríbeme a ana@test.co.').email, 'ana@test.co'));
+check('email malformado → vacío', () => assert.equal(extractContact('mi correo es juan@ ejemplo').email, ''));
+check('extrae teléfono con >=7 dígitos', () => assert.equal(extractContact('llámame al 713-823-9144').phone, '713-823-9144'));
+check('4 dígitos (año) NO son teléfono', () => assert.equal(extractContact('lo lancé en 2026').phone, ''));
+check('rango de años 2020-2024 NO es teléfono', () => assert.equal(extractContact('operamos desde el 2020-2024').phone, ''));
+check('rango de años 1990–1999 NO es teléfono', () => assert.equal(extractContact('entre 1990–1999 crecimos').phone, ''));
+check('teléfono real (10 díg) sí se extrae pese a años cercanos', () => assert.equal(extractContact('llámame al 713-823-9144, abrí en 2020').phone, '713-823-9144'));
+check('no toma los dígitos del email como teléfono', () => {
+  const r = extractContact('mi correo juan1234@x.com');
+  assert.equal(r.email, 'juan1234@x.com');
+  assert.equal(r.phone, '');
+});
+check('extrae nombre de "me llamo X"', () => assert.equal(extractContact('hola, me llamo Carla').name, 'Carla'));
+check('nombre no arrastra palabra vacía ("y")', () => assert.equal(extractContact('me llamo Carla y quiero un sitio').name, 'Carla'));
+check('extrae nombre EN "my name is X"', () => assert.equal(extractContact('hi, my name is John').name, 'John'));
+check('"soy dueño" NO inventa nombre', () => assert.equal(extractContact('soy dueño de un taller').name, ''));
+check('"me llamo de vacaciones" NO captura palabra vacía', () => assert.equal(extractContact('me llamo de vacaciones la semana que viene').name, ''));
+check('nombre corta en conector ("maria del carmen" → "maria")', () => {
+  const n = extractContact('me llamo maria del carmen').name;
+  assert.ok(n && !/\bdel\b/i.test(n));
+});
+check('sin datos → todo vacío', () => assert.deepEqual(extractContact('¿cuánto cuesta una tienda en línea?'), { name: '', email: '', phone: '' }));
+
+// ── v3: contactFlags (señal NO-PII al modelo — solo si/no, JAMÁS el valor) ──
+check('flags: todo "no" con memoria vacía', () => assert.equal(contactFlags({}), '[contacto_ya_dado: nombre=no email=no telefono=no]'));
+check('flags: email=si cuando hay email', () => assert.equal(contactFlags({ email: 'a@b.com' }), '[contacto_ya_dado: nombre=no email=si telefono=no]'));
+check('flags: NUNCA incluye el valor real (frontera PII)', () => {
+  const f = contactFlags({ name: 'Carla', email: 'carla@x.com', phone: '7138239144' });
+  assert.equal(f, '[contacto_ya_dado: nombre=si email=si telefono=si]');
+  assert.ok(!f.includes('Carla') && !f.includes('carla@x.com') && !f.includes('7138239144'));
+});
+check('mensaje con banderas + texto sigue pasando validateMessages', () => {
+  const wire = contactFlags({ email: 'a@b.com' }) + '\n¿Cuánto cuesta una landing?';
+  const r = validateMessages([u(wire)]);
+  assert.ok(r && r.length === 1 && r[0].role === 'user');
 });
 
 if (fails.length) {

@@ -674,7 +674,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 </style>
 
 <script>
-  import { stripMarkdown, invitesContact } from '../lib/chat-format.mjs';
+  import { stripMarkdown, invitesContact, extractContact, contactFlags } from '../lib/chat-format.mjs';
 
   const root = document.getElementById('mrc-chat');
   const cfgEl = root && root.querySelector('[data-mrc-config]');
@@ -732,6 +732,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let started = false;   // ya pasó de bienvenida a conversación
     let captured = false;  // ya envió sus datos
 
+    // Memoria de contacto (SOLO cliente): lo que el visitante mencionó en el chat.
+    // Se usa para PRE-RELLENAR la captura y quitar fricción. Sus valores NUNCA se
+    // envían a /api/chat ni al modelo (solo van a /api/contact al enviar la captura);
+    // al modelo solo le llega la línea de banderas booleanas (contactFlags).
+    const known = { name: '', email: '', phone: '' };
+
+    // ¿El usuario pidió reducir movimiento? → sin animación de tecleo (pinta al instante).
+    let reduceMotion = false;
+    try { reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (_) {}
+
+    // Typewriter activo (para poder "vaciarlo" al instante si el usuario actúa).
+    let activeTyper = null;
+    function flushTyper() { if (activeTyper) { const f = activeTyper; activeTyper = null; f(); } }
+
     // Cambia de estado bienvenida → conversación; inyecta el saludo de Marcy
     // como primera burbuja (display-only, NO entra al historial del modelo).
     function setStage(s) { if (root) root.setAttribute('data-stage', s); }
@@ -766,11 +780,86 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       return frag;
     }
 
-    function appendBubble(role, text) {
+    // Deja el INICIO (parte de arriba) de una burbuja a la vista, en lugar de
+    // saltar al fondo. Así, si la respuesta es larga, el visitante no tiene que
+    // subir para leerla desde el principio. Se hace UNA sola vez al insertar.
+    function anchorTop(el) {
+      if (!el || !log) return;
+      const pad = 12;
+      log.scrollTop = Math.max(0, el.offsetTop - pad);
+    }
+
+    // Animación de "tecleo" sobre el fragmento YA FILTRADO (linkify(stripMarkdown)).
+    // Nunca usa innerHTML ni re-parsea texto del modelo: revela caracteres dentro
+    // de nodos de texto y añade los enlaces (tokens seguros) enteros. Se puede
+    // vaciar al instante (flush) si el usuario envía otro mensaje / abre captura.
+    function typeInto(bubble, frag) {
+      const tokens = [];
+      Array.prototype.forEach.call(frag.childNodes, (n) => {
+        if (n.nodeType === 3) tokens.push({ t: 'text', v: n.nodeValue || '' });
+        else tokens.push({ t: 'node', v: n });
+      });
+      let ti = 0, ci = 0, live = null, timer = null, done = false;
+      const STEP = 14, PER = 2; // ms por tick, chars por tick
+
+      const ensureLive = () => { if (!live) { live = document.createTextNode(''); bubble.appendChild(live); } return live; };
+      function flush() {
+        if (done) return; done = true;
+        if (timer) { clearTimeout(timer); timer = null; }
+        // Anexa TODO lo que falte: completa el nodo de texto en curso y añade los
+        // tokens restantes (incluidos enlaces, que van enteros).
+        for (let j = ti; j < tokens.length; j++) {
+          const tk = tokens[j];
+          if (j === ti && tk.t === 'text') ensureLive().nodeValue = tk.v;
+          else bubble.appendChild(tk.t === 'text' ? document.createTextNode(tk.v) : tk.v);
+        }
+        live = null;
+        bubble.style.minHeight = ''; // libera la reserva de altura
+        if (activeTyper === flush) activeTyper = null;
+      }
+      function tick() {
+        if (done) return;
+        if (ti >= tokens.length) { flush(); return; }
+        const tk = tokens[ti];
+        if (tk.t === 'node') { bubble.appendChild(tk.v); ti++; ci = 0; live = null; timer = setTimeout(tick, STEP); return; }
+        ci = Math.min(tk.v.length, ci + PER);
+        ensureLive().nodeValue = tk.v.slice(0, ci);
+        if (ci >= tk.v.length) { ti++; ci = 0; live = null; }
+        timer = setTimeout(tick, STEP);
+      }
+      activeTyper = flush;
+      tick();
+    }
+
+    function appendBubble(role, text, opts) {
+      const wantsAnchor = !!(opts && opts.animate) && role === 'ai'; // respuestas de Marcy
+      const animate = wantsAnchor && !reduceMotion;
       const b = document.createElement('div');
       b.className = 'mrc-bub mrc-' + role;
-      if (role === 'ai') b.appendChild(linkify(stripMarkdown(text)));
-      else b.textContent = text;
+      if (role === 'ai') {
+        const frag = linkify(stripMarkdown(text)); // fragmento YA filtrado y seguro (sin innerHTML)
+        if (animate) {
+          // Reserva la altura final ANTES de animar: una burbuja vacía al fondo no
+          // se puede "subir" (falta contenido debajo para generar scroll y el navegador
+          // recorta el scrollTop). Medimos con un clon, fijamos min-height, vaciamos,
+          // y recién entonces anclamos arriba y tecleamos.
+          b.appendChild(frag.cloneNode(true));
+          log.appendChild(b);
+          b.style.minHeight = b.offsetHeight + 'px';
+          while (b.firstChild) b.removeChild(b.firstChild);
+          anchorTop(b);        // el inicio del mensaje queda arriba; el texto se escribe hacia abajo
+          typeInto(b, frag);
+          return;
+        }
+        b.appendChild(frag);
+        log.appendChild(b);
+        // Reduced-motion: pinta al instante PERO igual ancla arriba (mismo beneficio
+        // de lectura sin subir). El saludo/errores (sin animate) van al fondo.
+        if (wantsAnchor) anchorTop(b);
+        else log.scrollTop = log.scrollHeight;
+        return;
+      }
+      b.textContent = text;
       log.appendChild(b);
       log.scrollTop = log.scrollHeight;
     }
@@ -794,7 +883,22 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     async function send(textRaw) {
       const text = (textRaw || '').trim();
       if (!text || busy) return;
+      flushTyper();          // completa cualquier respuesta que aún se esté "escribiendo"
       lastUserText = text;
+
+      // Memoria de contacto (solo cliente): recuerda datos que el visitante escriba
+      // para pre-rellenar la captura. NO se envían al modelo (solo banderas si/no).
+      const found = extractContact(text);
+      if (found.name && !known.name) known.name = found.name;
+      if (found.email) known.email = found.email;
+      // Teléfono: no degradar uno ya capturado por otro con MENOS dígitos (evita que
+      // un número suelto posterior pise un teléfono completo dado antes).
+      if (found.phone) {
+        const nd = (found.phone.match(/\d/g) || []).length;
+        const kd = (known.phone.match(/\d/g) || []).length;
+        if (!known.phone || nd >= kd) known.phone = found.phone;
+      }
+
       setBusy(true);
       ensureChat();
       if (root) root.setAttribute('data-started', '');  // colapsa las chips de respuesta rápida
@@ -804,7 +908,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       showTyping();
 
       const recent = history.slice(-18);
-      const reqMessages = recent.concat([{ role: 'user', content: text }]);
+      // Antepone banderas NO-PII (solo si ya tenemos algún dato) para que Marcy pida
+      // únicamente lo que falta. El valor real NUNCA viaja; `history` guarda el texto crudo.
+      const hasKnown = !!(known.name || known.email || known.phone);
+      const wireContent = hasKnown ? (contactFlags(known) + '\n' + text) : text;
+      const reqMessages = recent.concat([{ role: 'user', content: wireContent }]);
       try {
         const res = await fetchWithTimeout('/api/chat', {
           method: 'POST',
@@ -814,8 +922,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         let data = null; try { data = await res.json(); } catch (_) {}
         hideTyping();
         if (data && data.reply) {
-          appendBubble('ai', data.reply);
-          history = reqMessages.concat([{ role: 'assistant', content: data.reply }]);
+          appendBubble('ai', data.reply, { animate: true });
+          // `history` = SOLO texto crudo (sin banderas, sin PII) → alternancia válida y transcript limpio.
+          history = recent.concat([{ role: 'user', content: text }, { role: 'assistant', content: data.reply }]);
           if (data.action && data.action.type === 'capture') {
             openCapture(data.action.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
           } else if (!captured && invitesContact(data.reply)) {
@@ -832,7 +941,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         appendError(T.error, text);
       } finally {
         setBusy(false);
-        if (opened && input) input.focus();
+        // No robar el foco si Marcy acaba de abrir la captura: deja el cursor en el
+        // campo que falta (mejor con el pre-rellenado). Si no, re-enfoca el input.
+        if (opened && input && !log.querySelector('[data-mrc-capture]')) input.focus();
       }
     }
 
@@ -869,6 +980,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/contact|/api/handoff) ──
     function openCapture(variant) {
+      flushTyper();     // que no quede una respuesta a medio "escribir" al abrir la captura
       ensureChat();
       if (captured) return;
       if (log.querySelector('[data-mrc-capture]')) { // ya hay una abierta → enfocar
@@ -916,13 +1028,21 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const cl = document.createElement('a'); cl.href = '/privacidad'; cl.textContent = T.capConsentLink || 'privacidad';
       consent.appendChild(cl); consent.appendChild(document.createTextNode('.'));
 
+      // Pre-rellena desde la memoria de conversación (solo cliente; nunca tocó el
+      // modelo). Solo valores bien formados; el servidor revalida en /api/contact.
+      if (known.name) nameInput.value = known.name;
+      if (known.email && isValidEmail(known.email)) emailInput.value = known.email;
+      if (known.phone && isValidPhone(known.phone)) phoneInput.value = known.phone;
+
       log.appendChild(card);
       log.scrollTop = log.scrollHeight;
 
       const need = (lastUserText || '').slice(0, 1000);
       card.querySelector('[data-mrc-capdismiss]').addEventListener('click', () => card.remove());
       card.querySelector('[data-mrc-capsend]').addEventListener('click', () => submitCapture(card, variant, need));
-      const nameEl = card.querySelector('#mrc-c-name'); if (nameEl) nameEl.focus();
+      // Enfoca el primer campo VACÍO (si ya prellenamos algo, el cursor cae donde falta).
+      const firstEmpty = [nameInput, emailInput, phoneInput].find((el) => el && !el.value);
+      (firstEmpty || nameInput).focus();
     }
 
     // Serializa los últimos turnos del historial como transcript legible, aplicando
@@ -1039,7 +1159,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       root.style.setProperty('--mrc-kb', kb + 'px');
       root.style.setProperty('--mrc-vvh', Math.round(vv.height) + 'px');
       root.style.setProperty('--mrc-vvtop', Math.round(vv.offsetTop) + 'px');
-      if (opened && log) log.scrollTop = log.scrollHeight;
+      // Fijar al fondo SOLO cuando el teclado móvil está abierto (kb>0), para que
+      // el input quede por encima del teclado. En escritorio (kb=0) NO fijamos:
+      // pisaría el anclaje-arriba de la respuesta de Marcy (que el visitante lea
+      // desde el principio sin tener que subir).
+      if (opened && log && kb > 0) log.scrollTop = log.scrollHeight;
     }
     if (vv) {
       vv.addEventListener('resize', syncViewport);
@@ -1079,6 +1203,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       });
     }
     function closePanel() {
+      flushTyper();
       panel.hidden = true;
       root.removeAttribute('data-open');
       fab.setAttribute('aria-expanded', 'false');

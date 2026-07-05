@@ -8,7 +8,11 @@
 //
 //  SEGURIDAD (el servidor enforce; el modelo NO decide seguridad):
 //   · El input del usuario vive SOLO en `messages` (data), nunca en system.
-//   · Sin tools → sin mutación de estado ni canal de exfiltración.
+//   · La PII (nombre/email/teléfono) NUNCA llega aquí: se captura en el cliente
+//     y se postea a /api/contact. Al modelo solo puede llegar una línea de
+//     banderas booleanas (contacto_ya_dado: si/no), jamás los valores.
+//   · Única tool = SOLO-UI (solicitar_datos_contacto): sin tool_result ni 2ª
+//     llamada → no muta estado ni abre canal de exfiltración de PII.
 //   · La API key vive en process.env.ANTHROPIC_API_KEY (solo servidor).
 //   · CERO acceso a Postgres / briefs / admin / Resend. NO importamos
 //     lib/auth.mjs (arrastra @vercel/postgres) → clientIp propio abajo.
@@ -21,9 +25,12 @@ import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONT
 // Da hasta 30s a la función (Haiku responde en 1-3s; headroom para reintentos).
 export const config = { maxDuration: 30 };
 
-const DEFAULT_MODEL = 'claude-sonnet-4-6';
+// Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
+// Exportados para que el guard test bloquee el id y la allowlist (control de costo).
+export const DEFAULT_MODEL = 'claude-sonnet-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
-const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6']);
+// Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
+export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
 // resto (< 32) y DEL (127). Hecho con codePointAt para no meter bytes de
@@ -225,9 +232,14 @@ export default async function handler(req, res) {
         // tool_choice = auto (omitido) → el modelo decide cuándo; NO enviamos
         // tool_result ni hacemos 2ª llamada: leemos el tool_use de esta respuesta.
         tools: [CONTACT_TOOL],
+        // Sonnet 5 activa "thinking" adaptativo por defecto; lo DESACTIVAMOS para
+        // mantener la latencia baja (carrera de 22s) y el costo/comportamiento
+        // predecibles, cercanos al perfil actual. El razonamiento base de Sonnet 5
+        // basta para este chat de ventas.
+        thinking: { type: 'disabled' },
         // El ÚNICO lugar donde vive el input del usuario.
         messages,
-        // SIN temperature/top_p/top_k/thinking → seguro en sonnet-4-6 / haiku-4-5.
+        // SIN temperature/top_p/top_k → Sonnet 5 rechaza valores no-default (400).
       }),
       22000,
       'anthropic'

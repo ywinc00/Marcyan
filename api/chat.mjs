@@ -157,9 +157,12 @@ const OUR_TOOLS = new Set([CONTACT_TOOL.name, CHANNELS_TOOL.name, LINK_TOOL.name
 function toolOnlyFallback(action, lang) {
   const en = lang === 'en';
   if (action.type === 'capture') {
+    // Neutro a propósito: el formulario ya viene PRE-RELLENADO con lo que el
+    // visitante dio en el chat, así que no listamos campos (evita pedir de nuevo
+    // un dato que ya tenemos). Solo invita a completar lo que falte.
     return en
-      ? 'Happy to set this up — just leave your name and the best email or phone, and the team will send it over.'
-      : 'Con gusto lo preparamos — déjame tu nombre y el mejor email o teléfono, y el equipo te lo envía.';
+      ? 'Perfect — just fill in whatever’s missing below and we’ll get it going. 🚀'
+      : 'Perfecto. Completa aquí abajo lo que falte y lo dejamos en marcha. 🚀';
   }
   if (action.type === 'channels') {
     return en ? 'Here are the ways to reach us directly. 👇' : 'Aquí tienes las formas de escribirnos directo. 👇';

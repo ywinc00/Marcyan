@@ -64,7 +64,7 @@ const PHONE_FIND_RX = /\+?\d[\d\s().\-]{5,}\d/g;
 //  · WEAK: "soy X" / saludo + X ("Hola Juan", "soy Juan") → exigen MAYÚSCULA
 //    inicial y que no sea una palabra común (rol/saludo/"Marcy"), para captar el
 //    nombre sin tragarse "soy realtor" ni "Hola Marcy".
-const NAME_STRONG_RX = /(?:me\s+llamo|mi\s+nombre\s+es|my\s+name\s+is|i\s*am\s+called|i'?m\s+called|les\s+habla|me\s+dicen)\s+([a-záéíóúñü][\wáéíóúñü'’.-]*(?:\s+[a-záéíóúñü][\wáéíóúñü'’.-]+)?)/i;
+const NAME_STRONG_RX = /(?:me\s+llamo|mi\s+nombre\s+es|my\s+name(?:\s+is|'?s)|i\s*am\s+called|i'?m\s+called|les\s+habla|le\s+habla|me\s+dicen)\s+([a-záéíóúñü][\wáéíóúñü'’.-]*(?:\s+[a-záéíóúñü][\wáéíóúñü'’.-]+)?)/i;
 const NAME_SOY_RX = /(?:\b[Ss]oy|\b[Ii]\s*'?[Aa]?m)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
 const NAME_GREET_RX = /(?:^|[¡!¿?,.]\s*)(?:[Hh]ola|[Hh]ey|[Hh]i|[Hh]ello|[Bb]uenas|[Bb]uenos\s+d[íi]as|[Qq]u[eé]\s+tal)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
 // Palabras que NO son nombre: cortan la captura (p. ej. "me llamo de vacaciones").
@@ -132,4 +132,30 @@ export function contactFlags(known) {
   const k = known || {};
   const f = (v) => (v && String(v).trim() ? 'si' : 'no');
   return '[contacto_ya_dado: nombre=' + f(k.name) + ' email=' + f(k.email) + ' telefono=' + f(k.phone) + ']';
+}
+
+// Fusiona lo ya conocido (`known`) con un nuevo `found` (de extractContact), sin
+// perder datos: no pisa un nombre ya guardado, y no degrada un teléfono por otro
+// con MENOS dígitos (evita que un número suelto posterior pise uno completo). Pura
+// y reusable: el widget la llama turno a turno Y al reescanear toda la conversación
+// antes de prellenar el formulario, para que ese prellenado casi nunca salga vacío.
+export function mergeContact(known, found) {
+  const k = {
+    name:  (known && known.name)  || '',
+    email: (known && known.email) || '',
+    phone: (known && known.phone) || '',
+  };
+  if (found) {
+    if (found.name && !k.name) k.name = found.name;
+    // No pisar un email ya guardado: el primero que da el visitante es el más
+    // confiable; un email posterior (typo o de un tercero mencionado) NO lo debe
+    // reemplazar (el reescaneo cronológico haría ganar al último, no al bueno).
+    if (found.email && !k.email) k.email = found.email;
+    if (found.phone) {
+      const nd = (found.phone.match(/\d/g) || []).length;
+      const kd = (k.phone.match(/\d/g) || []).length;
+      if (!k.phone || nd >= kd) k.phone = found.phone;
+    }
+  }
+  return k;
 }

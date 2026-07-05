@@ -20,7 +20,7 @@
 //     de Anthropic. El rate-limit en memoria es solo la primera línea.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
 
 // Da hasta 30s a la función (Haiku responde en 1-3s; headroom para reintentos).
 export const config = { maxDuration: 30 };
@@ -150,24 +150,48 @@ export function validSessionId(sid) {
   return typeof sid === 'string' && /^[\w-]{1,64}$/.test(sid);
 }
 
-// Extrae { text, action } de la respuesta de Anthropic (con o sin tool_use).
-// Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
-// Un solo turno: NO se envía tool_result ni hay 2ª llamada.
-export function parseToolResponse(content, lang = 'es') {
-  const blocks = Array.isArray(content) ? content : [];
-  let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
-  const toolUse = blocks.find((b) => b && b.type === 'tool_use' && b.name === CONTACT_TOOL.name);
-  let action = null;
-  if (toolUse) {
-    const motivo = toolUse.input && toolUse.input.motivo;
-    const variant = motivo === 'muestra_gratis' ? 'muestra_gratis' : 'contacto'; // allowlist, default seguro
-    action = { type: 'capture', variant };
-  }
-  if (!text && action) {
-    text = lang === 'en'
+// Herramientas de SOLO-UI que reconocemos (una acción por turno; default seguro).
+const OUR_TOOLS = new Set([CONTACT_TOOL.name, CHANNELS_TOOL.name, LINK_TOOL.name]);
+
+// Texto de respaldo cuando el modelo solo llama una herramienta sin texto.
+function toolOnlyFallback(action, lang) {
+  const en = lang === 'en';
+  if (action.type === 'capture') {
+    return en
       ? 'Happy to set this up — just leave your name and the best email or phone, and the team will send it over.'
       : 'Con gusto lo preparamos — déjame tu nombre y el mejor email o teléfono, y el equipo te lo envía.';
   }
+  if (action.type === 'channels') {
+    return en ? 'Here are the ways to reach us directly. 👇' : 'Aquí tienes las formas de escribirnos directo. 👇';
+  }
+  return en ? 'Here’s the link. 👇' : 'Aquí te dejo el enlace. 👇';
+}
+
+// Extrae { text, action } de la respuesta de Anthropic (con o sin tool_use).
+// Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
+// Un solo turno: NO se envía tool_result ni hay 2ª llamada. Toma el PRIMER tool_use
+// de una de NUESTRAS herramientas (Marcy usa como máximo una por mensaje).
+export function parseToolResponse(content, lang = 'es') {
+  const blocks = Array.isArray(content) ? content : [];
+  let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
+  // El prompt pide una herramienta por turno, pero si el modelo emitiera varias, la
+  // CAPTURA (cierre) manda; si no, la primera reconocida. Así nunca se pierde el form.
+  const toolUses = blocks.filter((b) => b && b.type === 'tool_use' && OUR_TOOLS.has(b.name));
+  const tool = toolUses.find((b) => b.name === CONTACT_TOOL.name) || toolUses[0] || null;
+  let action = null;
+  if (tool) {
+    if (tool.name === CONTACT_TOOL.name) {
+      const motivo = tool.input && tool.input.motivo;
+      const variant = motivo === 'muestra_gratis' ? 'muestra_gratis' : 'contacto'; // allowlist, default seguro
+      action = { type: 'capture', variant };
+    } else if (tool.name === CHANNELS_TOOL.name) {
+      action = { type: 'channels' };
+    } else if (tool.name === LINK_TOOL.name) {
+      const pagina = tool.input && tool.input.pagina;
+      if (LINK_PAGES.has(pagina)) action = { type: 'link', page: pagina }; // fuera del allowlist → sin acción
+    }
+  }
+  if (!text && action) text = toolOnlyFallback(action, lang);
   return { text: text || null, action };
 }
 
@@ -228,10 +252,10 @@ export default async function handler(req, res) {
         max_tokens: LIMITS.MAX_TOKENS,
         // Bloque estable (instrucciones + KB) → cache de prompt + a prueba de inyección.
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
-        // Herramienta de SOLO-UI para disparar la captura de contacto.
+        // Herramientas de SOLO-UI (captura, canales directos, enlazar página).
         // tool_choice = auto (omitido) → el modelo decide cuándo; NO enviamos
         // tool_result ni hacemos 2ª llamada: leemos el tool_use de esta respuesta.
-        tools: [CONTACT_TOOL],
+        tools: CHAT_TOOLS,
         // Sonnet 5 activa "thinking" adaptativo por defecto; lo DESACTIVAMOS para
         // mantener la latencia baja (carrera de 22s) y el costo/comportamiento
         // predecibles, cercanos al perfil actual. El razonamiento base de Sonnet 5

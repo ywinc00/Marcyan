@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS } from '../api/chat.mjs';
 import { brandPostFilter, pricePostFilter } from '../lib/chat-kb.mjs';
-import { stripMarkdown, invitesContact, extractContact, contactFlags } from '../src/lib/chat-format.mjs';
+import { stripMarkdown, invitesContact, extractContact, contactFlags, mergeContact } from '../src/lib/chat-format.mjs';
 
 let pass = 0;
 const fails = [];
@@ -132,6 +132,61 @@ check('respuesta vacía → text null sin action', () => {
   assert.equal(r.action, null);
 });
 
+// ── v4: toolbox — mostrar_canales_directos + enlazar_pagina ──
+const TUC = () => ({ type: 'tool_use', name: 'mostrar_canales_directos', input: {} });
+const TUL = (pagina) => ({ type: 'tool_use', name: 'enlazar_pagina', input: { pagina } });
+check('texto + canales directos → action channels', () => {
+  const r = parseToolResponse([TX('Te dejo cómo escribirnos.'), TUC()], 'es');
+  assert.equal(r.text, 'Te dejo cómo escribirnos.');
+  assert.deepEqual(r.action, { type: 'channels' });
+});
+check('solo canales → texto sintetizado + action channels', () => {
+  const r = parseToolResponse([TUC()], 'es');
+  assert.ok(r.text && r.text.length > 0);
+  assert.equal(r.action.type, 'channels');
+});
+check('texto + enlazar precios → action link page=precios', () => {
+  const r = parseToolResponse([TX('Mira los precios.'), TUL('precios')], 'es');
+  assert.deepEqual(r.action, { type: 'link', page: 'precios' });
+});
+check('enlazar cada página del allowlist', () => {
+  for (const p of ['precios', 'servicios', 'houston', 'miami', 'formulario']) {
+    assert.deepEqual(parseToolResponse([TX('x'), TUL(p)], 'es').action, { type: 'link', page: p });
+  }
+});
+check('página fuera del allowlist → SIN action (default seguro)', () => {
+  const r = parseToolResponse([TX('ok'), TUL('../admin')], 'es');
+  assert.equal(r.action, null);
+  assert.equal(r.text, 'ok');
+});
+check('página vacía/ausente → SIN action', () => {
+  assert.equal(parseToolResponse([TX('ok'), TUL(undefined)], 'es').action, null);
+});
+check('solo enlazar → texto sintetizado + action link', () => {
+  const r = parseToolResponse([TUL('servicios')], 'es');
+  assert.ok(r.text && r.text.length > 0);
+  assert.deepEqual(r.action, { type: 'link', page: 'servicios' });
+});
+check('tool desconocida → ignorada (sin action)', () => {
+  const r = parseToolResponse([TX('hola'), { type: 'tool_use', name: 'rm_rf', input: {} }], 'es');
+  assert.equal(r.action, null);
+  assert.equal(r.text, 'hola');
+});
+// v4: si el modelo emitiera VARIAS herramientas, la captura (cierre) manda.
+check('captura gana sobre enlazar cuando hay varias tool_use', () => {
+  const r = parseToolResponse([TX('Te dejo el formulario.'), TUL('precios'), TU('contacto')], 'es');
+  assert.deepEqual(r.action, { type: 'capture', variant: 'contacto' });
+});
+check('captura gana sobre canales cuando hay varias tool_use', () => {
+  const r = parseToolResponse([TUC(), TU('muestra_gratis')], 'es');
+  assert.equal(r.action.type, 'capture');
+  assert.equal(r.action.variant, 'muestra_gratis');
+});
+check('sin captura, gana la primera reconocida (link antes que canales)', () => {
+  const r = parseToolResponse([TX('x'), TUL('miami'), TUC()], 'es');
+  assert.deepEqual(r.action, { type: 'link', page: 'miami' });
+});
+
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
 check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
@@ -168,6 +223,31 @@ check('extrae nombre EN "I\'m John"', () => assert.equal(extractContact("hey, I'
 check('"soy realtor" (rol en minúscula) NO es nombre', () => assert.equal(extractContact('soy realtor y vendo casas').name, ''));
 check('"Hola Marcy" NO captura a Marcy', () => assert.equal(extractContact('Hola Marcy, cómo estás?').name, ''));
 check('sin datos → todo vacío', () => assert.deepEqual(extractContact('¿cuánto cuesta una tienda en línea?'), { name: '', email: '', phone: '' }));
+// v4: extracción de nombre reforzada
+check('extrae nombre EN "my name\'s Ana"', () => assert.equal(extractContact("my name's Ana").name, 'Ana'));
+check('extrae nombre "le habla Pedro"', () => assert.equal(extractContact('buenas, le habla Pedro').name, 'Pedro'));
+
+// ── v4: mergeContact (fusión sin perder datos — turno a turno y al reescanear) ──
+check('merge: agrega nombre cuando falta', () => assert.equal(mergeContact({ name: '' }, { name: 'Ana' }).name, 'Ana'));
+check('merge: NO pisa un nombre ya guardado', () => assert.equal(mergeContact({ name: 'Ana' }, { name: 'Beto' }).name, 'Ana'));
+check('merge: email nuevo actualiza (memoria vacía)', () => assert.equal(mergeContact({ email: '' }, { email: 'a@b.com' }).email, 'a@b.com'));
+check('merge: NO pisa un email ya guardado (no gana el último/tercero)', () => assert.equal(mergeContact({ email: 'ana@x.com' }, { email: 'otro@y.com' }).email, 'ana@x.com'));
+check('merge: teléfono NO se degrada a menos dígitos', () => {
+  const r = mergeContact({ phone: '713-823-9144' }, { phone: '9144' });
+  assert.equal(r.phone, '713-823-9144');
+});
+check('merge: teléfono más completo sí actualiza', () => {
+  const r = mergeContact({ phone: '9144' }, { phone: '713-823-9144' });
+  assert.equal(r.phone, '713-823-9144');
+});
+check('merge: found nulo → copia de known', () => assert.deepEqual(mergeContact({ name: 'Ana', email: '', phone: '' }, null), { name: 'Ana', email: '', phone: '' }));
+check('merge: acumula sobre conversación (rescan simulado)', () => {
+  let k = { name: '', email: '', phone: '' };
+  k = mergeContact(k, extractContact('Hola, soy Juan'));
+  k = mergeContact(k, extractContact('mi correo es juan@x.com'));
+  k = mergeContact(k, extractContact('y mi cel 713-823-9144'));
+  assert.deepEqual(k, { name: 'Juan', email: 'juan@x.com', phone: '713-823-9144' });
+});
 
 // ── v3: contactFlags (señal NO-PII al modelo — solo si/no, JAMÁS el valor) ──
 check('flags: todo "no" con memoria vacía', () => assert.equal(contactFlags({}), '[contacto_ya_dado: nombre=no email=no telefono=no]'));

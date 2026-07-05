@@ -86,6 +86,14 @@ const STR = {
     optFormTitle: 'Formulario de contacto',
     optFormSub: 'Cuéntanos sobre tu proyecto y te responderemos.',
     optDiagSub: 'Revisamos tu web, SEO o presencia online.',
+    // Tarjetas de acción que Marcy inserta en el chat (canales directos / enlace)
+    channelsTitle: 'Escríbenos por tu canal favorito',
+    directCall: 'Llamar',
+    pgPrecios: 'Ver precios',
+    pgServicios: 'Ver servicios',
+    pgHouston: 'Marcyan en Houston',
+    pgMiami: 'Marcyan en Miami',
+    pgFormulario: 'Abrir el formulario completo',
   },
   en: {
     open: 'Open the help chat',
@@ -138,6 +146,13 @@ const STR = {
     optFormTitle: 'Contact form',
     optFormSub: 'Tell us about your project and we’ll reply.',
     optDiagSub: 'We’ll review your site, SEO, or online presence.',
+    channelsTitle: 'Reach us on your favorite channel',
+    directCall: 'Call',
+    pgPrecios: 'See pricing',
+    pgServicios: 'See services',
+    pgHouston: 'Marcyan in Houston',
+    pgMiami: 'Marcyan in Miami',
+    pgFormulario: 'Open the full form',
   },
 };
 
@@ -168,7 +183,17 @@ const links = [
   { token: nap.houston, href: telHref(nap.houston) },
   { token: nap.miami, href: telHref(nap.miami) },
 ];
-const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston };
+// Canales directos + páginas que Marcy puede insertar en el chat vía herramienta
+// (enlaces/hrefs NUESTROS, nunca texto del modelo → seguros). Bilingüe por routes.
+const channels = { wa: waHref, sms: smsHref, tel: telHref(nap.houston) };
+const pages = {
+  precios:    { href: lang === 'en' ? '/en/pricing'  : '/es/precios',   label: t.pgPrecios },
+  servicios:  { href: lang === 'en' ? '/en/services' : '/es/servicios', label: t.pgServicios },
+  houston:    { href: lang === 'en' ? '/en/houston'  : '/es/houston',   label: t.pgHouston },
+  miami:      { href: lang === 'en' ? '/en/miami'    : '/es/miami',     label: t.pgMiami },
+  formulario: { href: '/formulario', label: t.pgFormulario },
+};
+const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston, channels, pages };
 ---
 
 <div class="mrc-chat" id="mrc-chat" data-mrc-root data-stage="welcome">
@@ -677,10 +702,38 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat .mrc-cap-result { font-size: var(--text-sm); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-result.ok { color: var(--accent-teal); }
   .mrc-chat .mrc-cap-result.err { color: var(--color-error); }
+
+  /* Tarjeta de acción que Marcy inserta (canales directos / enlace a página).
+     Los .mrc-pill de aquí los crea el JS → no reciben el scope de Astro; se estilan
+     completos en este bloque global. */
+  .mrc-chat .mrc-actioncard {
+    align-self: stretch; background: var(--bg-elevated); border: 1px solid var(--accent-teal-line);
+    border-radius: var(--radius-md); padding: var(--space-3) var(--space-4);
+    display: flex; flex-direction: column; gap: var(--space-2);
+  }
+  .mrc-chat .mrc-ac-title { font-size: var(--text-xs); color: var(--fg-secondary); }
+  .mrc-chat .mrc-ac-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .mrc-chat .mrc-actioncard .mrc-pill {
+    flex: 1 1 auto; justify-content: center;
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: 8px var(--space-3); border-radius: var(--radius-md);
+    background: var(--bg-card); border: 1px solid var(--accent-teal-line); color: var(--fg-primary);
+    font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500; text-decoration: none;
+  }
+  .mrc-chat .mrc-actioncard .mrc-pill:hover { background: var(--accent-teal-dim); border-color: var(--accent-teal); }
+  .mrc-chat .mrc-actioncard .mrc-pill:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-chat .mrc-pagelink {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    padding: 9px var(--space-4); border-radius: var(--radius-md);
+    background: var(--accent-teal); color: var(--fg-inverse); text-decoration: none;
+    font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600;
+  }
+  .mrc-chat .mrc-pagelink:hover { filter: brightness(1.06); }
+  .mrc-chat .mrc-pagelink:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
 </style>
 
 <script>
-  import { stripMarkdown, invitesContact, extractContact, contactFlags } from '../lib/chat-format.mjs';
+  import { stripMarkdown, invitesContact, extractContact, contactFlags, mergeContact } from '../lib/chat-format.mjs';
 
   const root = document.getElementById('mrc-chat');
   const cfgEl = root && root.querySelector('[data-mrc-config]');
@@ -691,6 +744,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     const lang = cfg.lang === 'en' ? 'en' : 'es';
     const REFERRED_BY = cfg.referredBy || 'chatbot';
     const NAP_PHONE = typeof cfg.phone === 'string' ? cfg.phone : '';
+    const CH = cfg.channels || {};   // { wa, sms, tel } — canales directos
+    const PAGES = cfg.pages || {};   // { precios, servicios, houston, miami, formulario }
 
     // Validación de formato de contacto (Chat-F01 / Lead-F1).
     const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -909,16 +964,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       // Memoria de contacto (solo cliente): recuerda datos que el visitante escriba
       // para pre-rellenar la captura. NO se envían al modelo (solo banderas si/no).
-      const found = extractContact(text);
-      if (found.name && !known.name) known.name = found.name;
-      if (found.email) known.email = found.email;
-      // Teléfono: no degradar uno ya capturado por otro con MENOS dígitos (evita que
-      // un número suelto posterior pise un teléfono completo dado antes).
-      if (found.phone) {
-        const nd = (found.phone.match(/\d/g) || []).length;
-        const kd = (known.phone.match(/\d/g) || []).length;
-        if (!known.phone || nd >= kd) known.phone = found.phone;
-      }
+      // mergeContact no pisa un nombre ya guardado ni degrada un teléfono completo.
+      Object.assign(known, mergeContact(known, extractContact(text)));
 
       setBusy(true);
       ensureChat();
@@ -946,8 +993,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           appendBubble('ai', data.reply, { animate: true });
           // `history` = SOLO texto crudo (sin banderas, sin PII) → alternancia válida y transcript limpio.
           history = recent.concat([{ role: 'user', content: text }, { role: 'assistant', content: data.reply }]);
-          if (data.action && data.action.type === 'capture') {
-            openCapture(data.action.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
+          const act = data.action;
+          if (act && act.type === 'capture') {
+            openCapture(act.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
+          } else if (act && act.type === 'channels') {
+            renderActionCard('channels');
+          } else if (act && act.type === 'link') {
+            renderActionCard('link', act.page);
           } else if (!captured && invitesContact(data.reply)) {
             // El bot invitó a dejar datos pero no disparó la herramienta → abrimos
             // la captura igual, para que el formulario prometido SÍ aparezca.
@@ -999,6 +1051,50 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     }
 
+    // ── Tarjeta de acción que Marcy inserta en el chat (canales directos / enlace) ──
+    // Se dispara cuando el modelo llama mostrar_canales_directos o enlazar_pagina.
+    // Todos los textos y hrefs son NUESTROS (config del servidor), nunca texto del
+    // modelo → sin innerHTML de datos ajenos, seguro contra XSS. No toca PII.
+    function renderActionCard(kind, page) {
+      flushTyper();     // completa la respuesta que se esté "escribiendo" antes de anexar
+      ensureChat();
+      const card = document.createElement('div');
+      card.className = 'mrc-actioncard';
+      if (kind === 'channels') {
+        const title = document.createElement('p');
+        title.className = 'mrc-ac-title';
+        title.textContent = T.channelsTitle || '';
+        card.appendChild(title);
+        const row = document.createElement('div');
+        row.className = 'mrc-ac-row';
+        if (CH.wa) {
+          const a = document.createElement('a');
+          a.className = 'mrc-pill'; a.href = CH.wa; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          a.textContent = 'WhatsApp'; row.appendChild(a);
+        }
+        // iMessage/SMS solo sirve en táctil; en escritorio se omite (falla en silencio).
+        if (isCoarse && CH.sms) {
+          const a = document.createElement('a');
+          a.className = 'mrc-pill'; a.href = CH.sms; a.textContent = 'iMessage'; row.appendChild(a);
+        }
+        if (CH.tel) {
+          const a = document.createElement('a');
+          a.className = 'mrc-pill'; a.href = CH.tel;
+          a.textContent = (T.directCall || 'Call') + (NAP_PHONE ? ' ' + NAP_PHONE : '');
+          row.appendChild(a);
+        }
+        card.appendChild(row);
+      } else { // 'link'
+        const p = PAGES[page];
+        if (!p || !p.href) return;   // página fuera del allowlist → no pintar nada
+        const a = document.createElement('a');
+        a.className = 'mrc-pagelink'; a.href = p.href; a.textContent = p.label || p.href;
+        card.appendChild(a);
+      }
+      log.appendChild(card);
+      log.scrollTop = log.scrollHeight;
+    }
+
     // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/contact|/api/handoff) ──
     function openCapture(variant) {
       flushTyper();     // que no quede una respuesta a medio "escribir" al abrir la captura
@@ -1048,6 +1144,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       consent.appendChild(document.createTextNode((T.capConsentPre || '') + ' '));
       const cl = document.createElement('a'); cl.href = '/privacidad'; cl.textContent = T.capConsentLink || 'privacidad';
       consent.appendChild(cl); consent.appendChild(document.createTextNode('.'));
+
+      // Red de seguridad del prellenado: reescanea TODA la conversación (turnos del
+      // usuario + último texto) por si la extracción turno a turno se perdió algún
+      // dato que el visitante ya dio. 100% cliente; nada de esto viaja al modelo.
+      try {
+        const texts = history.filter((m) => m.role === 'user').map((m) => m.content);
+        if (lastUserText) texts.push(lastUserText);
+        for (const tx of texts) Object.assign(known, mergeContact(known, extractContact(tx)));
+      } catch (_) {}
 
       // Pre-rellena desde la memoria de conversación (solo cliente; nunca tocó el
       // modelo). Solo valores bien formados; el servidor revalida en /api/contact.

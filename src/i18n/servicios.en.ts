@@ -95,7 +95,6 @@ export const serviciosPage = {
     title: 'Tell us what you need, <em>we advise you free</em>',
     sub: 'In under 24 hours you get a proposal with the service (or the combination) that best fits you, with clear scope and price, no commitment.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'See the full brief', href: '/formulario' },
     tone: 'gold' as const,
   },
   // ItemList schema — the 7 services pointing to their real page (or the hub).

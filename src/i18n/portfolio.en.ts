@@ -109,7 +109,6 @@ export const portfolioPage = {
     title: 'The next case <em>could be yours</em>',
     sub: 'Tell us about your business and get a personalized proposal in under 24 hours, no strings attached.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

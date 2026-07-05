@@ -171,7 +171,6 @@ export const seoIaPage = {
     title: 'Descubre si la IA te <em>recomienda</em> — gratis',
     sub: 'Pídenos el diagnóstico de visibilidad en IA: revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y te decimos con honestidad cómo estás. Sin costo ni compromiso.',
     primary: { label: 'Pedir diagnóstico gratis', href: '#contacto' },
-    secondary: { label: 'Ver formulario completo', href: '/formulario' },
     tone: 'teal' as const,
   },
   related: {

@@ -87,7 +87,6 @@ export const sobreNosotros = {
     title: 'Let\'s talk about <em>your project</em>',
     sub: 'Tell us about your business and get a personalized proposal in under 24 hours, no commitment.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

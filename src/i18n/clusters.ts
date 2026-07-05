@@ -226,7 +226,6 @@ const houstonSeo: ClusterPage = {
     title: '¿Listo para que Houston te <em>encuentre</em>?',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de SEO local personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -331,7 +330,6 @@ const houstonWeb: ClusterPage = {
     title: 'Tu próximo sitio web <em>empieza aquí</em>',
     sub: 'Cuéntanos tu proyecto y recibe una propuesta de diseño web personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -441,7 +439,6 @@ const miamiWeb: ClusterPage = {
     title: 'Sé uno de nuestros primeros <em>casos en Miami</em>',
     sub: 'Buscamos Clientes Fundadores en Miami. Cuéntanos tu proyecto y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -560,7 +557,6 @@ const iaPymes: ClusterPage = {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'Cuéntanos cuál es tu mayor dolor y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -664,7 +660,6 @@ const precioWebHouston: ClusterPage = {
     title: 'Pide el precio <em>exacto</em> de tu sitio',
     sub: 'Cuéntanos cuántas páginas y qué funciones necesitas, y recibe una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -789,7 +784,6 @@ const houstonIa: ClusterPage = {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'Cuéntanos cuál es tu mayor dolor (llamadas perdidas, WhatsApp sin responder, citas que no se agendan) y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -915,7 +909,6 @@ const houstonEcommerce: ClusterPage = {
     title: 'Empieza a vender en línea en <em>Houston</em>',
     sub: 'Cuéntanos qué vendes y cuántos productos tienes, y recibe una propuesta de tienda en línea en menos de 24 horas, sin compromiso.',
     primary: { label: 'Cotizar mi tienda gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1036,7 +1029,6 @@ const precioChatbot: ClusterPage = {
     title: 'Pon un asistente a <em>contestar por ti</em>',
     sub: 'Cuéntanos qué quieres que conteste y agende, y te damos una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -1155,7 +1147,6 @@ const precioSeoHouston: ClusterPage = {
     title: 'Aparece en Houston, mes <em>a mes</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de SEO local con alcance y precio claros en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1279,7 +1270,6 @@ const houstonBranding: ClusterPage = {
     title: 'Dale a tu negocio una <em>marca a su altura</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de branding personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1405,7 +1395,6 @@ const miamiIa: ClusterPage = {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'En Miami, el cliente que te escribe por WhatsApp y no recibe respuesta se va con otro. Cuéntanos tu mayor dolor y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -1522,7 +1511,6 @@ const miamiSeo: ClusterPage = {
     title: 'Sé uno de nuestros primeros <em>casos en Miami</em>',
     sub: 'Buscamos Clientes Fundadores en Miami. Cuéntanos sobre tu negocio y recibe una propuesta de SEO local en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1640,7 +1628,6 @@ const miamiEcommerce: ClusterPage = {
     title: 'Empieza a vender en línea en <em>Miami</em>',
     sub: 'En Miami, una tienda en línea bilingüe te abre la comunidad local y la región. Cuéntanos qué vendes y cuántos productos tienes, y recibe una propuesta en menos de 24 horas, sin compromiso.',
     primary: { label: 'Cotizar mi tienda gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1765,7 +1752,6 @@ const houstonAbogadosInmigracion: ClusterPage = {
     title: 'Que ninguna consulta de inmigración <em>se enfríe</em>',
     sub: 'Cuéntanos cómo llegan hoy tus consultas y te propondremos un sistema de captación con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -1883,7 +1869,6 @@ const houstonBienesRaices: ClusterPage = {
     title: 'Tu próximo sitio de <em>bienes raíces</em> empieza aquí',
     sub: 'Cuéntanos cómo trabajas y qué zonas cubres, y recibe una propuesta de sitio y SEO en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2003,7 +1988,6 @@ const houstonRestaurantes: ClusterPage = {
     title: 'El sitio de tu <em>restaurante</em> empieza aquí',
     sub: 'Cuéntanos qué cocinas y cómo quieres recibir pedidos, y recibe una propuesta de sitio con menú en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2118,7 +2102,6 @@ const houstonContratistas: ClusterPage = {
     title: 'Tu próximo sitio de <em>contratista</em> empieza aquí',
     sub: 'Cuéntanos qué trabajos haces y en qué zonas, y recibe una propuesta de sitio, SEO y rescate de llamadas en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2233,7 +2216,6 @@ const houstonTalleresMecanicos: ClusterPage = {
     title: 'Tu próximo sitio de <em>taller mecánico</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y en qué zona de Houston estás, y recibe una propuesta de sitio, SEO y asistente con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2347,7 +2329,6 @@ const houstonSalonBelleza: ClusterPage = {
     title: 'Tu salón con <em>reservas en línea</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y cómo trabajas, y recibe una propuesta de sitio con agenda y SEO en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2464,7 +2445,6 @@ const houstonClinicasDentales: ClusterPage = {
     title: 'El próximo sitio de tu <em>clínica dental</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y qué seguros aceptas, y recibe una propuesta de sitio, SEO y agenda con IA en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2586,7 +2566,6 @@ const houstonKaty: ClusterPage = {
     title: 'Que en Katy te encuentren <em>primero</em>',
     sub: 'Cuéntanos qué haces y a qué zona de Katy atiendes, y te propondremos un sitio y un plan de SEO local en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2702,7 +2681,6 @@ const houstonSugarLand: ClusterPage = {
     title: 'Tu negocio en Sugar Land merece un sitio premium',
     sub: 'Cuéntanos qué haces y a quién atiendes. Te enviamos una propuesta gratis, bilingüe y sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2818,7 +2796,6 @@ const houstonDisenoWebBilingue: ClusterPage = {
     title: 'Tu sitio en <em>dos idiomas</em> empieza aquí',
     sub: 'Cuéntanos tu negocio y recibe una propuesta de sitio bilingüe personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2936,7 +2913,6 @@ const miamiDoral: ClusterPage = {
     title: 'Pon a tu negocio de <em>Doral</em> en el mapa digital',
     sub: 'Buscamos Clientes Fundadores en Doral. Cuéntanos sobre tu negocio (arepera, panadería, servicio o import/export) y recibe una propuesta bilingüe en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -3047,7 +3023,6 @@ const miamiHialeah: ClusterPage = {
     title: 'Sé uno de nuestros primeros <em>casos en Hialeah</em>',
     sub: 'Buscamos Clientes Fundadores en Hialeah. Cuéntanos sobre tu negocio y recibe una propuesta personalizada, en español, en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold',
   },
   related: {

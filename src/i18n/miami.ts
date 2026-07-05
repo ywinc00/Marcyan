@@ -91,7 +91,6 @@ export const miamiHub = {
     title: '¿Listo para crecer en <em>Miami</em>?',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Ver formulario completo', href: '/formulario' },
     tone: 'gold' as const,
   },
   // ItemList (schema) — los servicios ofrecidos en Miami, cada uno a su landing.

@@ -92,7 +92,6 @@ export const miamiHub = {
     title: 'Ready to grow in <em>Miami</em>?',
     sub: 'Tell us about your business and get a personalized proposal in under 24 hours, with no commitment.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'See the full form', href: '/formulario' },
     tone: 'gold' as const,
   },
   // ItemList (schema) — the services offered in Miami, each linking to its landing.

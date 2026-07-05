@@ -386,7 +386,6 @@ export const preciosPage = {
     title: 'Pide tu precio <em>exacto</em>, gratis',
     sub: 'Cuéntanos tu proyecto y recibe una propuesta con alcance y precio claros en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

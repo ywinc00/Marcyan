@@ -93,7 +93,6 @@ export const serviciosPage = {
     title: 'Cuéntanos qué necesitas, <em>te orientamos gratis</em>',
     sub: 'En menos de 24 horas recibes una propuesta con el servicio (o la combinación) que mejor te conviene, con alcance y precio claros, sin compromiso.',
     primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Ver formulario completo', href: '/formulario' },
     tone: 'gold' as const,
   },
   // Schema ItemList — los 7 servicios apuntando a su página real (o al hub).

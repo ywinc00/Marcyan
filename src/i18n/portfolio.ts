@@ -109,7 +109,6 @@ export const portfolioPage = {
     title: 'El siguiente caso <em>puede ser el tuyo</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Brief detallado del proyecto', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

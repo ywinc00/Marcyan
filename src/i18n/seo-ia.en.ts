@@ -170,7 +170,6 @@ export const seoIaPage = {
     title: 'Find out whether AI <em>recommends</em> you - free',
     sub: 'Ask us for the AI visibility diagnostic: we check whether ChatGPT, Gemini and Meta AI can find you and we tell you honestly where you stand. No cost, no commitment.',
     primary: { label: 'Get a free diagnostic', href: '#contacto' },
-    secondary: { label: 'See the full form', href: '/formulario' },
     tone: 'teal' as const,
   },
   related: {

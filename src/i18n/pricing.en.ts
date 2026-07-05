@@ -310,7 +310,6 @@ export const preciosPage = {
     title: 'Get your <em>exact</em> price, free',
     sub: 'Tell us about your project and get a proposal with clear scope and price in under 24 hours, no commitment.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold' as const,
   },
 };

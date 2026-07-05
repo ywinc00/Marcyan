@@ -136,7 +136,6 @@ const enHoustonSeo: ClusterPage = {
     title: 'Ready for Houston to <em>find you</em>?',
     sub: 'Tell us about your business and get a personalized local SEO proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -238,7 +237,6 @@ const enHoustonWeb: ClusterPage = {
     title: 'Your next website <em>starts here</em>',
     sub: 'Tell us about your project and get a personalized web design proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -356,7 +354,6 @@ const enHoustonIa: ClusterPage = {
     title: 'Stop losing customers because <em>no one answered</em>',
     sub: 'Tell us your biggest pain point (missed calls, unanswered WhatsApp, appointments that never get booked) and we will propose an AI solution in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -474,7 +471,6 @@ const enHoustonEcommerce: ClusterPage = {
     title: 'Start selling online in <em>Houston</em>',
     sub: 'Tell us what you sell and how many products you have, and get an online store proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get my free store quote', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -590,7 +586,6 @@ const enHoustonBranding: ClusterPage = {
     title: 'Give your business a <em>brand that measures up</em>',
     sub: 'Tell us about your business and get a personalized branding proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -708,7 +703,6 @@ const enHoustonImmigration: ClusterPage = {
     title: 'Never let an immigration consultation <em>go cold</em>',
     sub: 'Tell us how your consultations come in today and we\'ll propose an AI lead-capture system in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -826,7 +820,6 @@ const enHoustonRealEstate: ClusterPage = {
     title: 'Your next <em>real estate</em> site starts here',
     sub: 'Tell us how you work and which areas you cover, and get a site and SEO proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -941,7 +934,6 @@ const enHoustonRestaurants: ClusterPage = {
     title: 'Your <em>restaurant</em> website starts here',
     sub: 'Tell us what you cook and how you want to take orders, and get a proposal for a site with a menu in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1056,7 +1048,6 @@ const enHoustonContractors: ClusterPage = {
     title: 'Your next <em>contractor</em> site starts here',
     sub: 'Tell us what work you do and which areas you serve, and get a proposal for a site, SEO, and missed-call rescue in under 24 hours, no obligation.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1171,7 +1162,6 @@ const enHoustonAutoRepair: ClusterPage = {
     title: 'Your next <em>auto repair</em> website starts here',
     sub: 'Tell us what services you offer and which part of Houston you are in, and get a proposal for the site, SEO and AI assistant in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1285,7 +1275,6 @@ const enHoustonBeautySalons: ClusterPage = {
     title: 'Your salon with <em>online booking</em> starts here',
     sub: 'Tell us what services you offer and how you work, and get a proposal for a site with scheduling and SEO in under 24 hours, no strings attached.',
     primary: { label: 'Request a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1402,7 +1391,6 @@ const enHoustonDentalClinics: ClusterPage = {
     title: 'Your <em>dental clinic</em> next site starts here',
     sub: 'Tell us what services you offer and what insurance you accept, and get a proposal for a site, SEO and AI booking in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1518,7 +1506,6 @@ const enHoustonKaty: ClusterPage = {
     title: 'Make Katy find you <em>first</em>',
     sub: 'Tell us what you do and which part of Katy you serve, and we’ll propose a site and a local SEO plan in under 24 hours, with no commitment.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1634,7 +1621,6 @@ const enHoustonSugarLand: ClusterPage = {
     title: 'Your Sugar Land business deserves a premium site',
     sub: 'Tell us what you do and who you serve. We will send you a free, bilingual, no-obligation proposal.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1750,7 +1736,6 @@ const enHoustonBilingual: ClusterPage = {
     title: 'Your site in <em>two languages</em> starts here',
     sub: 'Tell us about your business and get a personalized bilingual site proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1853,7 +1838,6 @@ const enMiamiWeb: ClusterPage = {
     title: 'Be one of our first <em>cases in Miami</em>',
     sub: 'We’re looking for Founding Clients in Miami. Tell us about your project and get a personalized proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -1969,7 +1953,6 @@ const enMiamiIa: ClusterPage = {
     title: 'Stop losing customers because <em>no one answered</em>',
     sub: 'In Miami, the customer who messages you on WhatsApp and gets no reply goes to someone else. Tell us your biggest pain point and we\'ll propose an AI solution in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -2086,7 +2069,6 @@ const enMiamiSeo: ClusterPage = {
     title: 'Be one of our first <em>cases in Miami</em>',
     sub: 'We\'re looking for Founding Clients in Miami. Tell us about your business and get a local SEO proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2204,7 +2186,6 @@ const enMiamiEcommerce: ClusterPage = {
     title: 'Start selling online in <em>Miami</em>',
     sub: 'In Miami, a bilingual online store opens up the local market and the region. Tell us what you sell and how many products you have, and get a proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free quote for my store', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2321,7 +2302,6 @@ const enMiamiDoral: ClusterPage = {
     title: 'Put your <em>Doral</em> business on the digital map',
     sub: 'We are looking for Founding Clients in Doral. Tell us about your business (arepa spot, bakery, service or import/export) and get a bilingual proposal in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2432,7 +2412,6 @@ const enMiamiHialeah: ClusterPage = {
     title: 'Be one of our first <em>cases in Hialeah</em>',
     sub: 'We are looking for Founding Clients in Hialeah. Tell us about your business and get a personalized proposal, in your language, in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2549,7 +2528,6 @@ const enIaPymes: ClusterPage = {
     title: 'Stop losing customers because you <em>couldn\'t answer</em>',
     sub: 'Tell us your biggest pain point and we\'ll propose an AI solution in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -2647,7 +2625,6 @@ const enPriceWebHouston: ClusterPage = {
     title: 'Get the <em>exact</em> price of your site',
     sub: 'Tell us how many pages and what features you need, and get a proposal with the locked-in price in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {
@@ -2761,7 +2738,6 @@ const enPriceChatbot: ClusterPage = {
     title: 'Put an assistant to <em>answer for you</em>',
     sub: 'Tell us what you want it to answer and schedule, and we give you a proposal with a locked-in price in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'teal',
   },
   related: {
@@ -2873,7 +2849,6 @@ const enPriceSeoHouston: ClusterPage = {
     title: 'Show up in Houston, month <em>after month</em>',
     sub: 'Tell us about your business and get a local SEO proposal with clear scope and price in under 24 hours, no strings attached.',
     primary: { label: 'Get a free proposal', href: '#contacto' },
-    secondary: { label: 'Detailed project brief', href: '/formulario' },
     tone: 'gold',
   },
   related: {

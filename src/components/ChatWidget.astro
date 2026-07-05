@@ -36,6 +36,7 @@ const STR = {
   es: {
     open: 'Abrir el chat de ayuda',
     close: 'Cerrar el chat',
+    back: 'Volver al inicio',
     title: 'Marcy',
     status: 'Asistente IA · responde al instante',
     greeting: '¡Hola! 👋 Soy Marcy, el asistente de Marcyan. Cuéntame de tu negocio o qué quieres lograr en línea y te oriento. Y si quieres, te preparamos una muestra gratis de tu sitio.',
@@ -89,6 +90,7 @@ const STR = {
   en: {
     open: 'Open the help chat',
     close: 'Close the chat',
+    back: 'Back to start',
     title: 'Marcy',
     status: 'AI assistant · replies instantly',
     greeting: 'Hi! 👋 I’m Marcy, Marcyan’s assistant. Tell me about your business or what you want to achieve online and I’ll guide you. And if you like, we’ll prepare a free sample of your site.',
@@ -209,6 +211,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       </span>
       <button type="button" class="mrc-human" data-mrc-human aria-label={t.human} title={t.human}>
         <Icon name="lucide:user-round" />
+      </button>
+      <button type="button" class="mrc-back" data-mrc-back aria-label={t.back} title={t.back}>
+        <Icon name="lucide:arrow-left" />
       </button>
       <button type="button" class="mrc-close" data-mrc-close aria-label={t.close}>
         <Icon name="lucide:x" />
@@ -402,18 +407,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary); }
   .mrc-live { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: mrc-pulse 2s ease-out infinite; }
   @keyframes mrc-pulse { 0% { box-shadow: 0 0 0 0 var(--accent-teal-line); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  .mrc-close, .mrc-human {
+  .mrc-close, .mrc-human, .mrc-back {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
     background: transparent; border: none; cursor: pointer;
     transition: color var(--duration-fast), background var(--duration-fast);
   }
-  .mrc-close { color: var(--fg-secondary); }
-  .mrc-close:hover { color: var(--fg-primary); background: var(--bg-elevated); }
+  .mrc-close, .mrc-back { color: var(--fg-secondary); }
+  .mrc-close:hover, .mrc-back:hover { color: var(--fg-primary); background: var(--bg-elevated); }
   .mrc-human { color: var(--accent-gold); }
   .mrc-human:hover { background: var(--accent-gold-dim); }
-  .mrc-close:focus-visible, .mrc-human:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-  .mrc-human :global(svg), .mrc-close :global(svg) { width: 18px; height: 18px; }
+  .mrc-close:focus-visible, .mrc-human:focus-visible, .mrc-back:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  .mrc-human :global(svg), .mrc-close :global(svg), .mrc-back :global(svg) { width: 18px; height: 18px; }
 
   /* ── Estado BIENVENIDA ──────────────────────────────────── */
   .mrc-welcome {
@@ -524,6 +529,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-stage="welcome"] .mrc-chips,
   .mrc-chat[data-stage="welcome"] .mrc-form,
   .mrc-chat[data-stage="welcome"] .mrc-head-id,
+  .mrc-chat[data-stage="welcome"] .mrc-back,
   .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
   .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
   .mrc-chat[data-stage="chat"] .mrc-welcome { display: none; }
@@ -750,15 +756,30 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // como primera burbuja (display-only, NO entra al historial del modelo).
     function setStage(s) { if (root) root.setAttribute('data-stage', s); }
     function ensureChat() {
-      if (started) return;
-      started = true;
+      // Siempre pasa a la conversación (también al RE-entrar tras usar "Volver"),
+      // pero el saludo se inyecta UNA sola vez (no se duplica).
+      const first = !started;
       setStage('chat');
-      appendBubble('ai', T.greeting || '');
-      // El elemento activado (tema/CTA de bienvenida) se oculta al cambiar de
-      // estado → mover el foco a un elemento estable DENTRO del diálogo para no
-      // perder el focus-trap/ESC mientras /api/chat responde (el input está
-      // deshabilitado por setBusy; el finally lo re-enfoca al terminar).
-      if (opened && closeBtn) closeBtn.focus();
+      if (first) {
+        started = true;
+        appendBubble('ai', T.greeting || '');
+        // El elemento activado (tema/CTA de bienvenida) se oculta al cambiar de
+        // estado → mover el foco a un elemento estable DENTRO del diálogo para no
+        // perder el focus-trap/ESC mientras /api/chat responde (el input está
+        // deshabilitado por setBusy; el finally lo re-enfoca al terminar).
+        if (opened && closeBtn) closeBtn.focus();
+      }
+    }
+
+    // Vuelve al selector de canal (pantalla de bienvenida). La conversación y el
+    // historial se conservan; al reentrar por "Chat con Marcy" se ven de nuevo.
+    function backToWelcome() {
+      flushTyper();
+      setStage('welcome');
+      requestAnimationFrame(() => {
+        const firstOpt = panel.querySelector('[data-mrc-welcome] button, [data-mrc-welcome] a[href]');
+        (firstOpt || closeBtn || panel).focus();
+      });
     }
 
     // ── Linkify SEGURO: solo tokens conocidos → nodos DOM ──
@@ -1222,6 +1243,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
     const humanBtn = root.querySelector('[data-mrc-human]');
     if (humanBtn) humanBtn.addEventListener('click', () => openCapture('handoff'));
+    const backBtn = root.querySelector('[data-mrc-back]');
+    if (backBtn) backBtn.addEventListener('click', backToWelcome);
     if (form) form.addEventListener('submit', (e) => { e.preventDefault(); send(input && input.value); });
     if (sendBtn) sendBtn.addEventListener('click', () => send(input && input.value));
     if (input) {

@@ -90,11 +90,14 @@ check('"#1" se reemplaza', () => assert.notEqual(brandPostFilter('Somos #1 en Ho
 check('"garantizamos" se reemplaza', () => assert.notEqual(brandPostFilter('Garantizamos la primera página', 'es'), 'Garantizamos la primera página'));
 check('"la mejor agencia" se reemplaza', () => assert.notEqual(brandPostFilter('Somos la mejor agencia', 'es'), 'Somos la mejor agencia'));
 
-// ── v2: pricePostFilter (allowlist de precios) ──
+// ── v3: pricePostFilter (banda de plausibilidad — Marcy cotiza en vivo) ──
 check('precio publicado $1,500 pasa', () => assert.ok(pricePostFilter('Un sitio desde $1,500.', 'es').includes('$1,500')));
 check('landing ~$400 pasa', () => assert.ok(pricePostFilter('Una landing desde ~$400.', 'es').includes('$400')));
 check('mensual $120 pasa', () => assert.ok(pricePostFilter('Mantenimiento $120/mes.', 'es').includes('$120')));
-check('cifra inventada $850 → deriva', () => assert.ok(!pricePostFilter('Eso cuesta $850.', 'es').includes('$850')));
+check('estimado en banda $850 pasa (cotización en vivo)', () => assert.ok(pricePostFilter('Para tu caso calculo unos $850.', 'es').includes('$850')));
+check('rango/combo $2,000 pasa', () => assert.ok(pricePostFilter('Un paquete completo ronda los $2,000.', 'es').includes('$2,000')));
+check('cifra regalada $5 → deriva', () => assert.ok(!pricePostFilter('Te lo hago por $5.', 'es').includes('$5')));
+check('cifra absurda $45,000 → deriva', () => assert.ok(!pricePostFilter('Eso cuesta $45,000.', 'es').includes('45,000')));
 check('"24 horas" no se marca', () => assert.equal(pricePostFilter('Te respondo en 24 horas.', 'es'), 'Te respondo en 24 horas.'));
 check('teléfono no se marca', () => assert.equal(pricePostFilter('Llama al +1 713-823-9144.', 'es'), 'Llama al +1 713-823-9144.'));
 check('folio MRC no se marca', () => assert.equal(pricePostFilter('Tu folio es MRC-204.', 'es'), 'Tu folio es MRC-204.'));

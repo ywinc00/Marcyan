@@ -107,26 +107,27 @@ check('teléfono no se marca', () => assert.equal(pricePostFilter('Llama al +1 7
 check('folio MRC no se marca', () => assert.equal(pricePostFilter('Tu folio es MRC-204.', 'es'), 'Tu folio es MRC-204.'));
 
 // ── v2: parseToolResponse (texto + tool_use → {text, action}) ──
-const TU = (motivo) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { motivo } });
+const TU = (destino) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino } });
 const TX = (t) => ({ type: 'text', text: t });
-check('texto + tool muestra_gratis', () => {
-  const r = parseToolResponse([TX('Te preparo la muestra.'), TU('muestra_gratis')], 'es');
-  assert.equal(r.text, 'Te preparo la muestra.');
-  assert.deepEqual(r.action, { type: 'capture', variant: 'muestra_gratis' });
+check('texto + tool destino proyecto', () => {
+  const r = parseToolResponse([TX('Te armo la propuesta.'), TU('proyecto')], 'es');
+  assert.equal(r.text, 'Te armo la propuesta.');
+  assert.equal(r.action.type, 'capture');
+  assert.equal(r.action.destino, 'proyecto');
 });
 check('solo tool → texto sintetizado + action', () => {
   const r = parseToolResponse([TU('contacto')], 'es');
   assert.ok(r.text && r.text.length > 0);
-  assert.equal(r.action.variant, 'contacto');
+  assert.equal(r.action.destino, 'contacto');
 });
 check('solo texto → sin action', () => {
   const r = parseToolResponse([TX('Hola, ¿en qué te ayudo?')], 'es');
   assert.equal(r.text, 'Hola, ¿en qué te ayudo?');
   assert.equal(r.action, null);
 });
-check('motivo inválido → contacto', () => {
+check('destino inválido → contacto (default seguro)', () => {
   const r = parseToolResponse([TX('ok'), TU('../etc/passwd')], 'es');
-  assert.equal(r.action.variant, 'contacto');
+  assert.equal(r.action.destino, 'contacto');
 });
 check('respuesta vacía → text null sin action', () => {
   const r = parseToolResponse([], 'es');
@@ -177,12 +178,13 @@ check('tool desconocida → ignorada (sin action)', () => {
 // v4: si el modelo emitiera VARIAS herramientas, la captura (cierre) manda.
 check('captura gana sobre enlazar cuando hay varias tool_use', () => {
   const r = parseToolResponse([TX('Te dejo el formulario.'), TUL('precios'), TU('contacto')], 'es');
-  assert.deepEqual(r.action, { type: 'capture', variant: 'contacto' });
+  assert.equal(r.action.type, 'capture');
+  assert.equal(r.action.destino, 'contacto');
 });
 check('captura gana sobre canales cuando hay varias tool_use', () => {
-  const r = parseToolResponse([TUC(), TU('muestra_gratis')], 'es');
+  const r = parseToolResponse([TUC(), TU('proyecto')], 'es');
   assert.equal(r.action.type, 'capture');
-  assert.equal(r.action.variant, 'muestra_gratis');
+  assert.equal(r.action.destino, 'proyecto');
 });
 check('sin captura, gana la primera reconocida (link antes que canales)', () => {
   const r = parseToolResponse([TX('x'), TUL('miami'), TUC()], 'es');
@@ -190,10 +192,12 @@ check('sin captura, gana la primera reconocida (link antes que canales)', () => 
 });
 
 // v5: nombre para PRE-RELLENAR (el modelo lo pasa; saneado server-side)
-const TUN = (motivo, nombre) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { motivo, nombre } });
+const TUN = (destino, nombre) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino, nombre } });
 check('captura con nombre → action.name prellenado', () => {
   const r = parseToolResponse([TX('¡Listo, Yulier!'), TUN('contacto', 'Yulier')], 'es');
-  assert.deepEqual(r.action, { type: 'capture', variant: 'contacto', name: 'Yulier' });
+  assert.equal(r.action.type, 'capture');
+  assert.equal(r.action.destino, 'contacto');
+  assert.equal(r.action.name, 'Yulier');
 });
 check('captura sin nombre → action sin name', () => {
   const r = parseToolResponse([TU('contacto')], 'es');
@@ -211,6 +215,31 @@ check('nombre saneado: acepta acentos/apóstrofo/guion', () => {
 check('nombre saneado: cap 40 chars', () => {
   const r = parseToolResponse([TX('x'), TUN('contacto', 'A'.repeat(60))], 'es');
   assert.ok(r.action.name.length <= 40);
+});
+
+// ── v6: destino proyecto (brief) + extras de negocio + saneo de PII en campos del modelo ──
+const TUP = (fields) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: Object.assign({ destino: 'proyecto' }, fields) });
+check('destino proyecto → extras con campos de negocio', () => {
+  const r = parseToolResponse([TX('Va.'), TUP({ negocio: 'Taller Yulier', ciudad: 'Houston', objetivo: 'mas clientes', presupuesto: '1500', plazo: '1 mes' })], 'es');
+  assert.equal(r.action.destino, 'proyecto');
+  assert.equal(r.action.extras.negocio, 'Taller Yulier');
+  assert.equal(r.action.extras.ciudad, 'Houston');
+  assert.equal(r.action.extras.objetivo, 'mas clientes');
+  assert.equal(r.action.extras.presupuesto, '1500');
+  assert.equal(r.action.extras.plazo, '1 mes');
+});
+check('extras/nota: NUNCA llevan email ni teléfono (defensa PII → solo por la cajita)', () => {
+  const r = parseToolResponse([TX('ok'), TUP({ nota: 'martes 3pm, correo juan@x.com tel 713-823-9144' })], 'es');
+  const n = r.action.extras.nota;
+  assert.ok(!/@/.test(n) && !/713.?823.?9144/.test(n) && /martes/.test(n));
+});
+check('extras/negocio: quita email incrustado por el modelo', () => {
+  const r = parseToolResponse([TX('ok'), TUP({ negocio: 'Barberia El Corte contacto ana@barber.com' })], 'es');
+  assert.ok(!/@/.test(r.action.extras.negocio) && /Barberia/.test(r.action.extras.negocio));
+});
+check('destino contacto: siempre trae objeto extras', () => {
+  const r = parseToolResponse([TU('contacto')], 'es');
+  assert.ok(r.action.extras && typeof r.action.extras === 'object');
 });
 
 // ── v3: config de modelo (control de costo — Sonnet 5) ──

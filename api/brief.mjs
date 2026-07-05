@@ -83,6 +83,11 @@ export default async function handler(req, res) {
     const pages    = sanitizeArray(body.pages_required);
     const features = sanitizeArray(body.features_required);
 
+    // Origen del brief (allowlist): 'web' (formulario /formulario) o 'chat' (el asistente
+    // Marcy arma el brief por el cliente). Default seguro a 'web'.
+    const SOURCE_ALLOW = new Set(['web', 'chat']);
+    const source = SOURCE_ALLOW.has(body.source) ? body.source : 'web';
+
     // Generar project_id atómico
     const idResult = await sql`SELECT next_project_id() AS id`;
     const projectId = idResult.rows[0].id;
@@ -118,7 +123,7 @@ export default async function handler(req, res) {
         ${data.has_photos}, ${data.has_copy}, ${data.has_video}, ${data.language},
         ${data.budget_range}, ${data.timeline}, ${data.deadline},
         ${data.additional_notes}, ${data.referred_by}, ${data.previous_agency},
-        ${clientIp(req)}, ${sanitize(req.headers['user-agent'], 500)}, 'web'
+        ${clientIp(req)}, ${sanitize(req.headers['user-agent'], 500)}, ${source}
       )
     `;
 

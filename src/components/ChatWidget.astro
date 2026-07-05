@@ -53,8 +53,10 @@ const STR = {
     fullForm: 'formulario completo',
     // Captura inline
     capTitleSample: 'Te preparamos una muestra gratis',
-    capTitleContact: 'Últimos datos para tu propuesta',
+    capTitleContact: 'Déjanos cómo contactarte',
+    capTitleProject: 'Últimos datos para tu propuesta a medida',
     capSub: 'Confirma tu nombre y el mejor email o teléfono. Sin compromiso.',
+    capSubProject: 'Confírmalos y un miembro de Marcyan te arma la propuesta gratis.',
     capName: 'Nombre',
     capEmail: 'Email',
     capPhone: 'Teléfono',
@@ -114,8 +116,10 @@ const STR = {
     leaveData: 'Leave my details',
     fullForm: 'full form',
     capTitleSample: 'We’ll prepare a free sample for you',
-    capTitleContact: 'Last details for your proposal',
+    capTitleContact: 'How should we reach you?',
+    capTitleProject: 'Last details for your custom proposal',
     capSub: 'Confirm your name and the best email or phone. No strings attached.',
+    capSubProject: 'Confirm them and a Marcyan member sends you the free proposal.',
     capName: 'Name',
     capEmail: 'Email',
     capPhone: 'Phone',
@@ -999,7 +1003,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             // (fraseo raro tipo "con Yulier"), usa el que el modelo ya conoce de la
             // conversación. Solo el nombre; email/tel siguen viniendo del cliente.
             if (act.name && !known.name) known.name = act.name;
-            openCapture(act.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
+            openCapture(act.destino === 'proyecto' ? 'proyecto' : 'contacto', act.extras || {});
           } else if (act && act.type === 'channels') {
             renderActionCard('channels');
           } else if (act && act.type === 'link') {
@@ -1100,7 +1104,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // ── Captura inline (HTML estático; valores vía .value; PII solo → /api/contact|/api/handoff) ──
-    function openCapture(variant) {
+    function openCapture(kind, extras) {
       flushTyper();     // que no quede una respuesta a medio "escribir" al abrir la captura
       ensureChat();
       if (captured) return;
@@ -1108,8 +1112,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         const n = log.querySelector('#mrc-c-name'); if (n) n.focus();
         return;
       }
-      const title = variant === 'handoff' ? (T.capTitleHuman || T.capTitleContact)
-        : variant === 'muestra_gratis' ? T.capTitleSample : T.capTitleContact;
+      const title = kind === 'handoff' ? (T.capTitleHuman || T.capTitleContact)
+        : kind === 'proyecto' ? (T.capTitleProject || T.capTitleContact) : T.capTitleContact;
       const card = document.createElement('div');
       card.className = 'mrc-capture';
       card.setAttribute('data-mrc-capture', '');
@@ -1131,7 +1135,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         '<p class="mrc-cap-result" data-mrc-capresult hidden></p>';
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
-      card.querySelector('.mrc-cap-sub').textContent = variant === 'handoff' ? (T.capSubHuman || T.capSub) : T.capSub;
+      card.querySelector('.mrc-cap-sub').textContent = kind === 'handoff' ? (T.capSubHuman || T.capSub)
+        : kind === 'proyecto' ? (T.capSubProject || T.capSub) : T.capSub;
       const nameInput = card.querySelector('#mrc-c-name');
       const emailInput = card.querySelector('#mrc-c-email');
       const phoneInput = card.querySelector('#mrc-c-phone');
@@ -1169,7 +1174,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       const need = (lastUserText || '').slice(0, 1000);
       card.querySelector('[data-mrc-capdismiss]').addEventListener('click', () => card.remove());
-      card.querySelector('[data-mrc-capsend]').addEventListener('click', () => submitCapture(card, variant, need));
+      card.querySelector('[data-mrc-capsend]').addEventListener('click', () => submitCapture(card, kind, need, extras || {}));
       // Enfoca el primer campo VACÍO (si ya prellenamos algo, el cursor cae donde falta).
       const firstEmpty = [nameInput, emailInput, phoneInput].find((el) => el && !el.value);
       (firstEmpty || nameInput).focus();
@@ -1192,7 +1197,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       return lines.join('\n');
     }
 
-    async function submitCapture(card, variant, need) {
+    async function submitCapture(card, kind, need, extras) {
       const get = (id) => { const el = card.querySelector(id); return el ? el.value.trim() : ''; };
       const emailEl = card.querySelector('#mrc-c-email');
       const phoneEl = card.querySelector('#mrc-c-phone');
@@ -1231,7 +1236,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       };
 
       // Handoff: pedir hablar con una persona → /api/handoff (no crea lead; avisa al fundador).
-      if (variant === 'handoff') {
+      if (kind === 'handoff') {
         if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
         if (result) result.hidden = true;
         try {
@@ -1246,28 +1251,58 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         return;
       }
 
-      // Adjuntar transcript al lead (A10 / seam-03): objetivo corto en main_objective/interest,
-      // y notas = resumen + transcript de los últimos turnos.
-      const objective = (need || '').slice(0, 280);
-      const note = variant === 'muestra_gratis' ? 'Solicitó una muestra gratis vía el asistente del sitio.' : 'Pidió que lo contacten vía el asistente del sitio.';
+      // Notas comunes (nota/disponibilidad del modelo + transcript) y enrutamiento por destino.
+      // Los campos del modelo (extras) NO son PII sensible (info del negocio, disponibilidad);
+      // el email/teléfono viven SOLO en los inputs de la cajita. La PII no viaja por el modelo.
+      const ex = extras || {};
+      const objective = ((ex.objetivo || need) || '').slice(0, 280);
       const transcript = buildTranscript();
       const convoLabel = lang === 'en' ? '--- Conversation ---' : '--- Conversación ---';
-      let notes = note + (objective ? ' Objetivo: ' + objective : '');
-      if (transcript) notes += '\n\n' + convoLabel + '\n' + transcript;
-      const body = {
-        source: 'chat',
-        owner_name: get('#mrc-c-name'),
-        email,
-        phone,
-        main_objective: objective,
-        additional_notes: notes,
-        referred_by: REFERRED_BY,
-        website_hp: get('#mrc-c-hp'),
-      };
+      const availLabel = lang === 'en' ? 'Availability/note: ' : 'Disponibilidad/nota: ';
+      let endpoint, body;
+
+      if (kind === 'proyecto') {
+        // Cliente encaminado/cerró → BRIEF de proyecto (/api/brief, crea MRC-XXX). El
+        // asistente lo arma con lo que reunió; un miembro de Marcyan manda la propuesta.
+        let notes = lang === 'en' ? 'Brief assembled by the Marcy assistant.' : 'Brief armado por el asistente Marcy.';
+        if (ex.nota) notes += '\n' + availLabel + ex.nota;
+        if (transcript) notes += '\n\n' + convoLabel + '\n' + transcript;
+        endpoint = '/api/brief';
+        body = {
+          source: 'chat',
+          business_name: ex.negocio || '',
+          owner_name: get('#mrc-c-name'),
+          city_state: ex.ciudad || '',
+          main_objective: objective,
+          budget_range: ex.presupuesto || '',
+          timeline: ex.plazo || '',
+          email, phone,
+          additional_notes: notes,
+          referred_by: REFERRED_BY,
+          website_hp: get('#mrc-c-hp'),
+        };
+      } else {
+        // No se cerró / lo pidió / sin tiempo → LEAD ligero (/api/contact, crea LEAD-XXX).
+        let notes = lang === 'en' ? 'Asked to be contacted via the site assistant.' : 'Pidió que lo contacten vía el asistente del sitio.';
+        if (ex.nota) notes += '\n' + availLabel + ex.nota;
+        if (objective) notes += (lang === 'en' ? ' Goal: ' : ' Objetivo: ') + objective;
+        if (transcript) notes += '\n\n' + convoLabel + '\n' + transcript;
+        endpoint = '/api/contact';
+        body = {
+          source: 'chat',
+          owner_name: get('#mrc-c-name'),
+          email, phone,
+          main_objective: objective,
+          additional_notes: notes,
+          referred_by: REFERRED_BY,
+          website_hp: get('#mrc-c-hp'),
+        };
+      }
+
       if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
       if (result) result.hidden = true;
       try {
-        const res = await fetchWithTimeout('/api/contact', {
+        const res = await fetchWithTimeout(endpoint, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
         });
         let data = null; try { data = await res.json(); } catch (_) {}

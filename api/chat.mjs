@@ -163,13 +163,32 @@ function sanitizeName(v) {
   return v.replace(/[^\p{L}\p{M} .'’-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 40);
 }
 
+// Sanea los campos de TEXTO que el modelo pasa (nota/negocio/ciudad/objetivo/…). NO son
+// PII sensible (info del negocio, disponibilidad), pero como DEFENSA quitamos cualquier
+// email o secuencia telefónica: la PII de contacto SOLO entra por la cajita del cliente,
+// jamás por el modelo. Quita control chars y limita la longitud. El widget los pinta con
+// .value/.textContent (sin innerHTML) → sin XSS.
+function sanitizeField(v, max = 400) {
+  if (typeof v !== 'string') return '';
+  return stripControl(v)
+    .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, ' ')       // fuera emails
+    .replace(/\+?\d[\d\s().\-]{6,}\d/g, ' ')          // fuera secuencias telefónicas
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
 // Texto de respaldo cuando el modelo solo llama una herramienta sin texto.
 function toolOnlyFallback(action, lang) {
   const en = lang === 'en';
   if (action.type === 'capture') {
-    // Neutro a propósito: el formulario ya viene PRE-RELLENADO con lo que el
-    // visitante dio en el chat, así que no listamos campos (evita pedir de nuevo
-    // un dato que ya tenemos). Solo invita a completar lo que falte.
+    // Neutro a propósito: la cajita ya viene PRE-RELLENADA con lo que el visitante
+    // dio, así que no listamos campos. Mensaje según el destino.
+    if (action.destino === 'proyecto') {
+      return en
+        ? 'Perfect — confirm your contact below and we’ll put your custom proposal together. 🚀'
+        : 'Perfecto. Confírmame tu contacto aquí abajo y te armamos la propuesta a la medida. 🚀';
+    }
     return en
       ? 'Perfect — just fill in whatever’s missing below and we’ll get it going. 🚀'
       : 'Perfecto. Completa aquí abajo lo que falte y lo dejamos en marcha. 🚀';
@@ -194,10 +213,19 @@ export function parseToolResponse(content, lang = 'es') {
   let action = null;
   if (tool) {
     if (tool.name === CONTACT_TOOL.name) {
-      const motivo = tool.input && tool.input.motivo;
-      const variant = motivo === 'muestra_gratis' ? 'muestra_gratis' : 'contacto'; // allowlist, default seguro
-      const name = sanitizeName(tool.input && tool.input.nombre); // prellenado robusto (nombre de pila)
-      action = name ? { type: 'capture', variant, name } : { type: 'capture', variant };
+      const inp = tool.input || {};
+      const destino = inp.destino === 'proyecto' ? 'proyecto' : 'contacto'; // allowlist, default seguro
+      const name = sanitizeName(inp.nombre); // prellenado robusto (nombre de pila)
+      const extras = {
+        nota: sanitizeField(inp.nota),
+        negocio: sanitizeField(inp.negocio, 200),
+        ciudad: sanitizeField(inp.ciudad, 120),
+        objetivo: sanitizeField(inp.objetivo, 400),
+        presupuesto: sanitizeField(inp.presupuesto, 120),
+        plazo: sanitizeField(inp.plazo, 120),
+      };
+      action = { type: 'capture', destino, extras };
+      if (name) action.name = name;
     } else if (tool.name === CHANNELS_TOOL.name) {
       action = { type: 'channels' };
     } else if (tool.name === LINK_TOOL.name) {

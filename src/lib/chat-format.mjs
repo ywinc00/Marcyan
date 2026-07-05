@@ -67,6 +67,10 @@ const PHONE_FIND_RX = /\+?\d[\d\s().\-]{5,}\d/g;
 const NAME_STRONG_RX = /(?:me\s+llamo|mi\s+nombre\s+es|my\s+name(?:\s+is|'?s)|i\s*am\s+called|i'?m\s+called|les\s+habla|le\s+habla|me\s+dicen)\s+([a-záéíóúñü][\wáéíóúñü'’.-]*(?:\s+[a-záéíóúñü][\wáéíóúñü'’.-]+)?)/i;
 const NAME_SOY_RX = /(?:\b[Ss]oy|\b[Ii]\s*'?[Aa]?m)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
 const NAME_GREET_RX = /(?:^|[¡!¿?,.]\s*)(?:[Hh]ola|[Hh]ey|[Hh]i|[Hh]ello|[Bb]uenas|[Bb]uenos\s+d[íi]as|[Qq]u[eé]\s+tal)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
+// Auto-presentación telefónica muy común en LatAm: "con Yulier", "Hola con Yulier"
+// (= "habla Yulier"). Solo al inicio o tras un saludo, con "con" seguido de un
+// nombre en MAYÚSCULA (evita "trabajo con Google" o "con gusto").
+const NAME_CON_RX = /(?:^|[¡!]\s*|[Hh]ola\s+|[Bb]uenas\s+|[Bb]uenos\s+d[íi]as\s+|[Hh]ey\s+|[Hh]i\s+|[Hh]ello\s+)[Cc]on\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
 // Palabras que NO son nombre: cortan la captura (p. ej. "me llamo de vacaciones").
 const NAME_STOP = new Set(['de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'o', 'u', 'en', 'un', 'una', 'que', 'mi', 'tu', 'su', 'por', 'para', 'con', 'sin', 'a', 'al', 'me', 'no', 'si', 'and', 'the', 'of', 'my', 'is', 'am', 'to']);
 // Palabras que, aunque vengan en mayúscula tras "soy"/saludo, NO son un nombre.
@@ -105,7 +109,12 @@ export function extractContact(text) {
       nameRaw = soy[1];
     } else {
       const gr = s.match(NAME_GREET_RX);
-      if (gr && gr[1] && !NAME_BLOCK.has(gr[1].toLowerCase())) nameRaw = gr[1];
+      if (gr && gr[1] && !NAME_BLOCK.has(gr[1].toLowerCase())) {
+        nameRaw = gr[1];
+      } else {
+        const con = s.match(NAME_CON_RX);
+        if (con && con[1] && !NAME_BLOCK.has(con[1].toLowerCase())) nameRaw = con[1];
+      }
     }
   }
   if (nameRaw) {

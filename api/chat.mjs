@@ -153,6 +153,16 @@ export function validSessionId(sid) {
 // Herramientas de SOLO-UI que reconocemos (una acción por turno; default seguro).
 const OUR_TOOLS = new Set([CONTACT_TOOL.name, CHANNELS_TOOL.name, LINK_TOOL.name]);
 
+// Sanea el nombre de pila que el modelo pasa para PRE-RELLENAR el formulario. El
+// nombre ya está en la conversación que el modelo ve (lo escribió el visitante), así
+// que no expone PII nueva; el email/teléfono NUNCA vienen por aquí. Deja solo letras/
+// espacios/.'- (sin dígitos, sin <>@, sin control chars) y lo limita a 40 chars. El
+// widget lo pinta con .value/textContent (no innerHTML) → sin riesgo de XSS.
+function sanitizeName(v) {
+  if (typeof v !== 'string') return '';
+  return v.replace(/[^\p{L}\p{M} .'’-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+}
+
 // Texto de respaldo cuando el modelo solo llama una herramienta sin texto.
 function toolOnlyFallback(action, lang) {
   const en = lang === 'en';
@@ -186,7 +196,8 @@ export function parseToolResponse(content, lang = 'es') {
     if (tool.name === CONTACT_TOOL.name) {
       const motivo = tool.input && tool.input.motivo;
       const variant = motivo === 'muestra_gratis' ? 'muestra_gratis' : 'contacto'; // allowlist, default seguro
-      action = { type: 'capture', variant };
+      const name = sanitizeName(tool.input && tool.input.nombre); // prellenado robusto (nombre de pila)
+      action = name ? { type: 'capture', variant, name } : { type: 'capture', variant };
     } else if (tool.name === CHANNELS_TOOL.name) {
       action = { type: 'channels' };
     } else if (tool.name === LINK_TOOL.name) {

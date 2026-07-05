@@ -189,6 +189,30 @@ check('sin captura, gana la primera reconocida (link antes que canales)', () => 
   assert.deepEqual(r.action, { type: 'link', page: 'miami' });
 });
 
+// v5: nombre para PRE-RELLENAR (el modelo lo pasa; saneado server-side)
+const TUN = (motivo, nombre) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { motivo, nombre } });
+check('captura con nombre → action.name prellenado', () => {
+  const r = parseToolResponse([TX('¡Listo, Yulier!'), TUN('contacto', 'Yulier')], 'es');
+  assert.deepEqual(r.action, { type: 'capture', variant: 'contacto', name: 'Yulier' });
+});
+check('captura sin nombre → action sin name', () => {
+  const r = parseToolResponse([TU('contacto')], 'es');
+  assert.equal(r.action.name, undefined);
+});
+check('nombre saneado: sin dígitos, @, < ni > (anti-inyección/PII)', () => {
+  const r = parseToolResponse([TX('ok'), TUN('contacto', 'Yulier99 <b> a@b')], 'es');
+  const n = r.action.name;
+  assert.ok(!/[<>@0-9]/.test(n) && /Yulier/.test(n));
+});
+check('nombre saneado: acepta acentos/apóstrofo/guion', () => {
+  const r = parseToolResponse([TX('ok'), TUN('contacto', "José O'Neil-Pérez")], 'es');
+  assert.equal(r.action.name, "José O'Neil-Pérez");
+});
+check('nombre saneado: cap 40 chars', () => {
+  const r = parseToolResponse([TX('x'), TUN('contacto', 'A'.repeat(60))], 'es');
+  assert.ok(r.action.name.length <= 40);
+});
+
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
 check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
@@ -228,6 +252,12 @@ check('sin datos → todo vacío', () => assert.deepEqual(extractContact('¿cuá
 // v4: extracción de nombre reforzada
 check('extrae nombre EN "my name\'s Ana"', () => assert.equal(extractContact("my name's Ana").name, 'Ana'));
 check('extrae nombre "le habla Pedro"', () => assert.equal(extractContact('buenas, le habla Pedro').name, 'Pedro'));
+// v5: auto-presentación "con X" (el caso real que falló: "Hola con Yulier, soy mecanico")
+check('extrae nombre "Hola con Yulier, soy mecanico"', () => assert.equal(extractContact('Hola con Yulier , soy mecanico como pueden ayudarme').name, 'Yulier'));
+check('extrae nombre "con Marta" al inicio', () => assert.equal(extractContact('con Marta, tengo una tienda').name, 'Marta'));
+check('"trabajo con Google" NO es nombre (con mid-frase)', () => assert.equal(extractContact('trabajo con Google Ads').name, ''));
+check('"Hola con gusto" NO inventa nombre (minúscula)', () => assert.equal(extractContact('Hola con gusto te ayudo').name, ''));
+check('"soy mecanico" (rol minúscula) sigue sin ser nombre', () => assert.equal(extractContact('Hola, soy mecanico').name, ''));
 
 // ── v4: mergeContact (fusión sin perder datos — turno a turno y al reescanear) ──
 check('merge: agrega nombre cuando falta', () => assert.equal(mergeContact({ name: '' }, { name: 'Ana' }).name, 'Ana'));

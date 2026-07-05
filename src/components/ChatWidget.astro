@@ -53,8 +53,8 @@ const STR = {
     fullForm: 'formulario completo',
     // Captura inline
     capTitleSample: 'Te preparamos una muestra gratis',
-    capTitleContact: 'Déjanos tus datos y te contactamos',
-    capSub: 'Solo tu nombre y el mejor email o teléfono. Sin compromiso.',
+    capTitleContact: 'Últimos datos para tu propuesta',
+    capSub: 'Confirma tu nombre y el mejor email o teléfono. Sin compromiso.',
     capName: 'Nombre',
     capEmail: 'Email',
     capPhone: 'Teléfono',
@@ -114,8 +114,8 @@ const STR = {
     leaveData: 'Leave my details',
     fullForm: 'full form',
     capTitleSample: 'We’ll prepare a free sample for you',
-    capTitleContact: 'Leave your details and we’ll reach out',
-    capSub: 'Just your name and the best email or phone. No strings attached.',
+    capTitleContact: 'Last details for your proposal',
+    capSub: 'Confirm your name and the best email or phone. No strings attached.',
     capName: 'Name',
     capEmail: 'Email',
     capPhone: 'Phone',
@@ -995,6 +995,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           history = recent.concat([{ role: 'user', content: text }, { role: 'assistant', content: data.reply }]);
           const act = data.action;
           if (act && act.type === 'capture') {
+            // Prellenado robusto: si el extractor del cliente no agarró el nombre
+            // (fraseo raro tipo "con Yulier"), usa el que el modelo ya conoce de la
+            // conversación. Solo el nombre; email/tel siguen viniendo del cliente.
+            if (act.name && !known.name) known.name = act.name;
             openCapture(act.variant === 'muestra_gratis' ? 'muestra_gratis' : 'contacto');
           } else if (act && act.type === 'channels') {
             renderActionCard('channels');

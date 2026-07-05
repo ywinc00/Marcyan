@@ -241,6 +241,20 @@ check('destino contacto: siempre trae objeto extras', () => {
   const r = parseToolResponse([TU('contacto')], 'es');
   assert.ok(r.action.extras && typeof r.action.extras === 'object');
 });
+// v6.1: brief RICO — el modelo razona y rellena el formulario completo desde el contexto
+check('brief rico: rubro/descripcion/tipo_sitio/idioma/web_actual/audiencia/detalles', () => {
+  const r = parseToolResponse([TX('Va.'), TUP({ rubro: 'Roofing', descripcion: 'Techos residenciales en Houston', web_actual: 'no tiene', tipo_sitio: 'sitio a medida', audiencia: 'dueños de casa', idioma: 'bilingüe', detalles: '12 landing pages por barrio, calculadora de precio' })], 'es');
+  const e = r.action.extras;
+  assert.equal(e.rubro, 'Roofing');
+  assert.equal(e.tipo_sitio, 'sitio a medida');
+  assert.equal(e.idioma, 'bilingüe');
+  assert.ok(/12 landing/.test(e.detalles) && /no tiene/.test(e.web_actual) && /dueños/.test(e.audiencia));
+});
+check('brief rico: descripcion/detalles también quitan email/teléfono (defensa PII)', () => {
+  const r = parseToolResponse([TX('ok'), TUP({ descripcion: 'Roofing, escribe a owner@roof.com o 713-555-1212' })], 'es');
+  const d = r.action.extras.descripcion;
+  assert.ok(!/@/.test(d) && !/555.?1212/.test(d) && /Roofing/.test(d));
+});
 
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
 check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));

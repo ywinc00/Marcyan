@@ -1263,8 +1263,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       if (kind === 'proyecto') {
         // Cliente encaminado/cerró → BRIEF de proyecto (/api/brief, crea MRC-XXX). El
-        // asistente lo arma con lo que reunió; un miembro de Marcyan manda la propuesta.
+        // asistente lo arma RAZONANDO sobre la conversación y rellena el formulario
+        // completo; un miembro de Marcyan manda la propuesta.
         let notes = lang === 'en' ? 'Brief assembled by the Marcy assistant.' : 'Brief armado por el asistente Marcy.';
+        if (ex.detalles) notes += '\n' + (lang === 'en' ? 'Details: ' : 'Detalles: ') + ex.detalles;
         if (ex.nota) notes += '\n' + availLabel + ex.nota;
         if (transcript) notes += '\n\n' + convoLabel + '\n' + transcript;
         endpoint = '/api/brief';
@@ -1272,10 +1274,16 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           source: 'chat',
           business_name: ex.negocio || '',
           owner_name: get('#mrc-c-name'),
+          industry: ex.rubro || '',
+          business_description: ex.descripcion || '',
           city_state: ex.ciudad || '',
+          current_website: ex.web_actual || '',
+          website_type: ex.tipo_sitio || '',
+          target_audience: ex.audiencia || '',
           main_objective: objective,
           budget_range: ex.presupuesto || '',
           timeline: ex.plazo || '',
+          language: ex.idioma || '',
           email, phone,
           additional_notes: notes,
           referred_by: REFERRED_BY,

@@ -216,13 +216,22 @@ export function parseToolResponse(content, lang = 'es') {
       const inp = tool.input || {};
       const destino = inp.destino === 'proyecto' ? 'proyecto' : 'contacto'; // allowlist, default seguro
       const name = sanitizeName(inp.nombre); // prellenado robusto (nombre de pila)
+      // El modelo RAZONA sobre la conversación y rellena el brief de proyecto; aquí
+      // saneamos cada campo (sanitizeField quita emails/teléfonos → PII solo por la cajita).
       const extras = {
         nota: sanitizeField(inp.nota),
         negocio: sanitizeField(inp.negocio, 200),
+        rubro: sanitizeField(inp.rubro, 120),
+        descripcion: sanitizeField(inp.descripcion, 500),
         ciudad: sanitizeField(inp.ciudad, 120),
+        web_actual: sanitizeField(inp.web_actual, 200),
+        tipo_sitio: sanitizeField(inp.tipo_sitio, 160),
+        audiencia: sanitizeField(inp.audiencia, 300),
         objetivo: sanitizeField(inp.objetivo, 400),
         presupuesto: sanitizeField(inp.presupuesto, 120),
         plazo: sanitizeField(inp.plazo, 120),
+        idioma: sanitizeField(inp.idioma, 60),
+        detalles: sanitizeField(inp.detalles, 800),
       };
       action = { type: 'capture', destino, extras };
       if (name) action.name = name;

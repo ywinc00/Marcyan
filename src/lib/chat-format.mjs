@@ -29,11 +29,13 @@ export function stripMarkdown(s) {
     .trim();
 }
 
-// ¿El texto del bot OFRECE/PROMETE el formulario de contacto? Red de seguridad
-// para abrir la captura cuando el modelo escribió la invitación pero NO llamó a
-// la herramienta (sin `action`). Matchea frases de oferta de captura; NO matchea
-// el simple enlace a /formulario.
-const INVITE_RX = /(mostrar\w*|abrir|abro|muestro|despliego|ense[ñn]ar\w*)\s+(un|el|tu|la)?\s*formulario|formulario\s+(r[áa]pido|breve|seguro|ahora|aqu[íi]|de\s+contacto)|d[eé]j\w*\s+(tus|tu)\s+(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero)|show\s+(you\s+)?(a|the)?\s*(quick\s+|brief\s+)?form|leave\s+your\s+(details|name|info|email|phone|contact|number)|drop\s+your\s+(name|email|phone|details|info)/i;
+// ¿El texto del bot PIDE explícitamente los datos del visitante? Red de seguridad
+// para abrir la captura cuando el modelo pidió datos pero NO llamó a la herramienta
+// (sin `action`). SOLO matchea frases inequívocas de "deja TUS datos/correo/etc" en
+// 2ª persona (la INTENCIÓN de captar), no el sustantivo "formulario". Marcy VENDE
+// sitios con "formulario de contacto", así que esa palabra es PRODUCTO, no una
+// invitación a capturar → así evitamos el falso positivo que abría la captura sola.
+const INVITE_RX = /d[eé]j\w*\s+(tus|tu)\s+(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero|nombre)|leave\s+your\s+(details|info|email|phone|contact|number|name)|drop\s+your\s+(name|email|phone|details|info)/i;
 
 export function invitesContact(text) {
   return typeof text === 'string' && INVITE_RX.test(text);
@@ -56,10 +58,19 @@ const EMAIL_FIND_RX = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 // Secuencias telefónicas: dígitos con separadores comunes; se valida por
 // conteo de dígitos (7–15) para no confundir años/precios/folios.
 const PHONE_FIND_RX = /\+?\d[\d\s().\-]{5,}\d/g;
-// Nombre: SOLO frases de presentación explícitas (evita "soy dueño de…").
-const NAME_FIND_RX = /(?:me\s+llamo|mi\s+nombre\s+es|my\s+name\s+is|i\s*am\s+called|i'?m\s+called)\s+([a-záéíóúñü][\wáéíóúñü'’.-]*(?:\s+[a-záéíóúñü][\wáéíóúñü'’.-]+)?)/i;
-// Palabras que NO son nombre: corta la captura (p. ej. "me llamo de vacaciones").
+// Nombre — dos vías:
+//  · STRONG: frases de presentación explícitas ("me llamo X", "my name is X"),
+//    de alta confianza → aceptan cualquier caso.
+//  · WEAK: "soy X" / saludo + X ("Hola Juan", "soy Juan") → exigen MAYÚSCULA
+//    inicial y que no sea una palabra común (rol/saludo/"Marcy"), para captar el
+//    nombre sin tragarse "soy realtor" ni "Hola Marcy".
+const NAME_STRONG_RX = /(?:me\s+llamo|mi\s+nombre\s+es|my\s+name\s+is|i\s*am\s+called|i'?m\s+called|les\s+habla|me\s+dicen)\s+([a-záéíóúñü][\wáéíóúñü'’.-]*(?:\s+[a-záéíóúñü][\wáéíóúñü'’.-]+)?)/i;
+const NAME_SOY_RX = /(?:\b[Ss]oy|\b[Ii]\s*'?[Aa]?m)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
+const NAME_GREET_RX = /(?:^|[¡!¿?,.]\s*)(?:[Hh]ola|[Hh]ey|[Hh]i|[Hh]ello|[Bb]uenas|[Bb]uenos\s+d[íi]as|[Qq]u[eé]\s+tal)\s+([A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20}(?:\s+[A-ZÁÉÍÓÚÑ][a-zñáéíóúü'’.-]{1,20})?)/;
+// Palabras que NO son nombre: cortan la captura (p. ej. "me llamo de vacaciones").
 const NAME_STOP = new Set(['de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'o', 'u', 'en', 'un', 'una', 'que', 'mi', 'tu', 'su', 'por', 'para', 'con', 'sin', 'a', 'al', 'me', 'no', 'si', 'and', 'the', 'of', 'my', 'is', 'am', 'to']);
+// Palabras que, aunque vengan en mayúscula tras "soy"/saludo, NO son un nombre.
+const NAME_BLOCK = new Set(['marcy', 'marcyan', 'realtor', 'riactor', 'agente', 'agent', 'broker', 'dueño', 'dueno', 'owner', 'corredor', 'corredora', 'vendedor', 'vendedora', 'cliente', 'gracias', 'hola', 'buenas', 'buenos', 'señor', 'senor', 'señora', 'senora', 'amigo', 'amiga', 'sr', 'sra']);
 
 export function extractContact(text) {
   const s = String(text == null ? '' : text);
@@ -82,14 +93,28 @@ export function extractContact(text) {
     }
   }
 
-  // Nombre (frases explícitas). Corta en la primera palabra que no parezca nombre
-  // (de, la, que, en…) para no capturar continuaciones ("me llamo de vacaciones").
-  const nm = s.match(NAME_FIND_RX);
-  if (nm && nm[1]) {
-    const words = nm[1].trim().split(/\s+/);
+  // Nombre: primero frases explícitas (STRONG, cualquier caso); si no, señales
+  // débiles "soy X" y luego saludo "Hola X" (exigen mayúscula + no palabra común).
+  let nameRaw = '';
+  const strong = s.match(NAME_STRONG_RX);
+  if (strong && strong[1]) {
+    nameRaw = strong[1];
+  } else {
+    const soy = s.match(NAME_SOY_RX);
+    if (soy && soy[1] && !NAME_BLOCK.has(soy[1].toLowerCase())) {
+      nameRaw = soy[1];
+    } else {
+      const gr = s.match(NAME_GREET_RX);
+      if (gr && gr[1] && !NAME_BLOCK.has(gr[1].toLowerCase())) nameRaw = gr[1];
+    }
+  }
+  if (nameRaw) {
+    // Corta en la primera palabra que no parezca nombre (de, la, que, rol…) y limita.
+    const words = nameRaw.trim().split(/\s+/);
     const nameWords = [];
     for (const w of words) {
-      if (NAME_STOP.has(w.toLowerCase().replace(/[.,;:!?]+$/, ''))) break;
+      const wl = w.toLowerCase().replace(/[.,;:!?]+$/, '');
+      if (NAME_STOP.has(wl) || NAME_BLOCK.has(wl)) break;
       nameWords.push(w);
       if (nameWords.length >= 3) break; // nombre + apellidos, sin desbordarse
     }

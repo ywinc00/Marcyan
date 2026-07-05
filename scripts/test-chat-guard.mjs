@@ -71,12 +71,14 @@ check('deja email/teléfono intactos', () => {
   assert.ok(out.includes('contact@marcyanstudio.com') && out.includes('+1 713-823-9144'));
 });
 
-// ── v2.1: invitesContact (red de seguridad si el modelo no llamó la tool) ──
-check('invite: "mostrarte un formulario" → true', () => assert.equal(invitesContact('Déjame mostrarte un formulario rápido y seguro.'), true));
-check('invite: "mostrar el formulario ahora" → true', () => assert.equal(invitesContact('Déjame mostrar el formulario ahora mismo.'), true));
+// ── v3.1: invitesContact (dispara por la INTENCIÓN "deja TUS datos", no por "formulario") ──
 check('invite: "déjame tus datos" → true', () => assert.equal(invitesContact('Con gusto, déjame tus datos y te contactamos.'), true));
 check('invite: "deja tu correo" → true', () => assert.equal(invitesContact('Solo deja tu correo o teléfono.'), true));
+check('invite: "déjame tu nombre y teléfono" → true', () => assert.equal(invitesContact('Perfecto, déjame tu nombre y el mejor teléfono.'), true));
 check('invite EN: "leave your details" → true', () => assert.equal(invitesContact('Just leave your details and we’ll reach out.'), true));
+check('NO invita: "formulario de contacto" (feature del sitio) → false', () => assert.equal(invitesContact('Tu sitio llevará catálogo, formulario de contacto y SEO base.'), false));
+check('NO invita: "te muestro un formulario" (producto) → false', () => assert.equal(invitesContact('Te puedo mostrar un formulario de contacto en tu web.'), false));
+check('NO invita: "dejan su correo" (3ª persona) → false', () => assert.equal(invitesContact('Tus clientes dejan su correo en el formulario.'), false));
 check('NO invita: enlace /formulario → false', () => assert.equal(invitesContact('Si prefieres, escríbenos en /formulario.'), false));
 check('NO invita: pregunta de seguimiento → false', () => assert.equal(invitesContact('¿Ya tienes sitio web o estás empezando desde cero?'), false));
 check('NO invita: precio → false', () => assert.equal(invitesContact('Un sitio a medida arranca desde $1,500.'), false));
@@ -159,6 +161,12 @@ check('nombre corta en conector ("maria del carmen" → "maria")', () => {
   const n = extractContact('me llamo maria del carmen').name;
   assert.ok(n && !/\bdel\b/i.test(n));
 });
+// v3.1: nombre desde saludo / "soy X" (exige mayúscula, evita roles/"Marcy")
+check('extrae nombre de saludo "Hola Juan soy..."', () => assert.equal(extractContact('Hola Juan soy realtor en Houston').name, 'Juan'));
+check('extrae nombre de "soy Juan"', () => assert.equal(extractContact('mira, soy Juan y busco un sitio').name, 'Juan'));
+check('extrae nombre EN "I\'m John"', () => assert.equal(extractContact("hey, I'm John from Miami").name, 'John'));
+check('"soy realtor" (rol en minúscula) NO es nombre', () => assert.equal(extractContact('soy realtor y vendo casas').name, ''));
+check('"Hola Marcy" NO captura a Marcy', () => assert.equal(extractContact('Hola Marcy, cómo estás?').name, ''));
 check('sin datos → todo vacío', () => assert.deepEqual(extractContact('¿cuánto cuesta una tienda en línea?'), { name: '', email: '', phone: '' }));
 
 // ── v3: contactFlags (señal NO-PII al modelo — solo si/no, JAMÁS el valor) ──

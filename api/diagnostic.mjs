@@ -75,7 +75,47 @@ function rateLimited(kind, ip) {
 }
 
 // ── Guardia SSRF (rechaza IPs privadas / loopback / hosts internos) ──
-const PRIVATE_RE = /^(0\.|10\.|127\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|::1$|f[cd])/i;
+// ¿IPv4 dotted privada/reservada? Malformado → se bloquea por defecto.
+function isPrivateV4(ip) {
+  const p = ip.split('.');
+  if (p.length !== 4) return true;
+  const n = p.map((x) => Number(x));
+  if (n.some((x) => !Number.isInteger(x) || x < 0 || x > 255)) return true;
+  const [a, b] = n;
+  if (a === 0 || a === 10 || a === 127) return true;         // this-host / privada / loopback
+  if (a === 169 && b === 254) return true;                   // link-local (metadata 169.254.169.254)
+  if (a === 172 && b >= 16 && b <= 31) return true;          // privada
+  if (a === 192 && b === 168) return true;                   // privada
+  if (a === 100 && b >= 64 && b <= 127) return true;         // CGNAT
+  if (a >= 224) return true;                                 // multicast / reservado
+  return false;
+}
+
+// ¿Dirección IP (v4 o v6, literal o resuelta) que hay que bloquear? Cubre las
+// codificaciones IPv6 que un regex sobre string dejaba pasar (IPv4-mapped,
+// link-local, unique-local, loopback), extrayendo el IPv4 embebido cuando aplica.
+function isBlockedIp(ip) {
+  const fam = isIP(ip);
+  if (fam === 4) return isPrivateV4(ip);
+  if (fam === 6) {
+    const l = ip.toLowerCase();
+    // IPv4-mapped / -compat en notación dotted: ::ffff:a.b.c.d  o  ::a.b.c.d
+    let m = l.match(/(?:::ffff:|::)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+    if (m) return isPrivateV4(m[1]);
+    // IPv4-mapped en notación hex: ::ffff:7f00:0001 → decodifica los últimos 32 bits
+    m = l.match(/::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+    if (m) {
+      const hi = parseInt(m[1], 16), lo = parseInt(m[2], 16);
+      return isPrivateV4([(hi >> 8) & 255, hi & 255, (lo >> 8) & 255, lo & 255].join('.'));
+    }
+    if (l === '::1' || l === '::') return true;               // loopback / unspecified
+    if (/^f[cd]/.test(l)) return true;                        // fc00::/7 unique-local
+    if (/^fe[89ab]/.test(l)) return true;                     // fe80::/10 link-local
+    if (/^ff/.test(l)) return true;                           // multicast
+    return false;
+  }
+  return true;                                                // no es IP válida → bloquear (defensivo)
+}
 
 async function ssrfGuard(raw) {
   let u;
@@ -83,13 +123,20 @@ async function ssrfGuard(raw) {
   catch { return { ok: false, reason: 'invalid' }; }
   if (!/^https?:$/.test(u.protocol)) return { ok: false, reason: 'protocol' };
   if (u.port && !['80', '443', ''].includes(u.port)) return { ok: false, reason: 'port' };
-  const host = u.hostname.toLowerCase();
-  if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) return { ok: false, reason: 'host' };
-  if (isIP(host)) { if (PRIVATE_RE.test(host)) return { ok: false, reason: 'ip' }; }
-  else {
+  // hostname de un literal IPv6 llega entre corchetes ("[::1]") → quitarlos para isIP.
+  let host = u.hostname.toLowerCase();
+  if (host.startsWith('[') && host.endsWith(']')) host = host.slice(1, -1);
+  if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.localhost') || host.endsWith('.internal')) return { ok: false, reason: 'host' };
+  if (isIP(host)) {
+    if (isBlockedIp(host)) return { ok: false, reason: 'ip' };
+  } else {
     try {
       const addrs = await lookup(host, { all: true });
-      if (!addrs.length || addrs.some((a) => PRIVATE_RE.test(a.address))) return { ok: false, reason: 'dns' };
+      // NOTA (limitación conocida, riesgo BAJO): validamos aquí lo que resuelve el
+      // DNS, pero fetch() vuelve a resolver por su cuenta → hay una ventana TOCTOU /
+      // DNS-rebinding. Cerrarla requiere fijar la IP (dispatcher propio, dep nueva),
+      // fuera de alcance del MVP; el timeout de 8s y el re-guardado por salto acotan.
+      if (!addrs.length || addrs.some((a) => isBlockedIp(a.address))) return { ok: false, reason: 'dns' };
     } catch { return { ok: false, reason: 'dns' }; }
   }
   return { ok: true, url: u };
@@ -343,13 +390,28 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
     userAgent: sanitize(req.headers['user-agent'], 500),
   });
 
-  // Reporte: IA (sin PII) o fallback determinista. El email SIEMPRE sale.
+  // Enlace ATÓMICO: cierra la carrera de doble-claim durante la ventana lenta del
+  // reporte IA (~22s). El chequeo de row.lead_ref de arriba es solo el camino rápido;
+  // esta condición `lead_ref IS NULL` es el guard real. Si perdemos la carrera (otra
+  // petición ya enlazó un lead), devolvemos ESE y NO generamos/duplicamos reporte,
+  // notificación ni email (el lead que acabamos de crear queda como duplicado benigno,
+  // que el dedup de createLead colapsa en el caso mismo-contacto).
+  const linked = await sql`
+    UPDATE diagnostics SET lead_ref = ${leadRef}
+     WHERE ref_id = ${ref} AND lead_ref IS NULL
+    RETURNING id`;
+  if (!linked.rowCount) {
+    const ex = await sql`SELECT lead_ref FROM diagnostics WHERE ref_id = ${ref} LIMIT 1`;
+    return res.status(200).json({ ok: true, leadRef: (ex.rowCount && ex.rows[0].lead_ref) || leadRef });
+  }
+
+  // Ganamos el enlace → reporte: IA (sin PII) o fallback determinista. El email SIEMPRE sale.
   const reportText = (await generateReport({ lang, businessName, city, industry, scores, findings, recommended }))
     || fallbackReport({ businessName, lang, findings, recommended });
 
   try {
-    await sql`UPDATE diagnostics SET lead_ref = ${leadRef}, report_full = ${reportText} WHERE ref_id = ${ref}`;
-  } catch (e) { console.error('[diagnostic] update lead_ref falló:', e && e.message); }
+    await sql`UPDATE diagnostics SET report_full = ${reportText} WHERE ref_id = ${ref}`;
+  } catch (e) { console.error('[diagnostic] update report_full falló:', e && e.message); }
 
   await createNotification({
     type: 'new_lead',

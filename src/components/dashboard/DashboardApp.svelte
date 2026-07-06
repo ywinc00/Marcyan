@@ -687,7 +687,7 @@
                 <div class="recent__row">
                   <span class="mono-av sm" style="background:{monoColor(lead.name || lead.email || lead.ref_id)}">{initials(lead.name || lead.email || lead.ref_id)}</span>
                   <span class="recent__name">{lead.name || lead.email || lead.phone || '—'}</span>
-                  <span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : 'contacto'}</span>
+                  <span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : lead.source === 'diagnostic' ? 'diagnóstico' : 'contacto'}</span>
                   <span class="mono dim">{fmtDate(lead.created_at)}</span>
                 </div>
               {/each}
@@ -740,7 +740,7 @@
                         </div>
                       </div>
                     </td>
-                    <td><span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : 'contacto'}</span></td>
+                    <td><span class="src src--{lead.source}">{lead.source === 'chat' ? 'chatbot' : lead.source === 'diagnostic' ? 'diagnóstico' : 'contacto'}</span></td>
                     <td class="msg">
                       {#if lead.interest || lead.message}
                         {@const full = lead.interest || lead.message}
@@ -1003,7 +1003,8 @@
   .msg-full { margin-top: 8px; padding: 10px 12px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: var(--fg-primary); max-height: 280px; overflow-y: auto; }
   .src { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; }
   .src--chat { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .src--contact { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .src--contact,
+  .src--diagnostic { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   /* Estado como píldora tintada (Orbit) — sigue siendo un <select> editable */
   .status { appearance: none; -webkit-appearance: none; background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); color: var(--accent-gold); padding: 5px 12px; font-size: 11px; font-weight: 600; letter-spacing: .02em; cursor: pointer; transition: filter var(--duration-fast), box-shadow var(--duration-fast); }
   .status:hover { filter: brightness(1.12); }

@@ -1,0 +1,547 @@
+---
+// Wizard del Diagnóstico digital (Growth OS). Estados: form(3 pasos) → scan →
+// result(ScoreRing+ScoreBars+señales+ruta+disclaimer+captura) → success(check+CtaBand).
+// Bilingüe por `lang`; todo el copy de src/i18n/growth-os.ts. La PII (email/tel/nombre)
+// se captura aquí y se postea a /api/diagnostic; nunca toca el modelo del reporte.
+import { GOS } from '../../i18n/growth-os';
+import Icon from '../ui/Icon.astro';
+import ScoreRing from './ScoreRing.astro';
+import ScoreBars from './ScoreBars.astro';
+import ScanSequence from './ScanSequence.astro';
+import Faq from '../sections/Faq.astro';
+import CtaBand from '../sections/CtaBand.astro';
+
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+const t = GOS[lang].page;
+const e = GOS[lang].errors;
+const contactHref = lang === 'en' ? '/en/#contacto' : '/es/#contacto';
+const scoreLabel = lang === 'en' ? 'Score' : 'Puntaje';
+const ctaTitle = lang === 'en' ? 'Prefer to talk now?' : '¿Prefieres hablar ahora?';
+const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
+---
+<section class="dgw" data-dgw data-lang={lang} aria-label={t.h1.replace(/<[^>]+>/g, '')}>
+  <div class="container">
+    <div class="dgw__stage">
+
+      <!-- ── FORM (wizard 3 pasos) ─────────────────────────────── -->
+      <div class="dgw__panel" data-view="form">
+        <div class="dgw__progress">
+          <span class="dgw__steplbl">{t.stepLabel} <b data-step-n>1</b>/3</span>
+          <span class="dgw__steptitle" data-step-title>{t.steps[0]}</span>
+          <span class="dgw__track" aria-hidden="true"><i class="dgw__trackfill" data-progress style="--p:33%"></i></span>
+        </div>
+
+        <form class="dgw__form" data-analyze-form novalidate>
+          <div class="dgw__hp" aria-hidden="true">
+            <label>Website<input type="text" name="website_hp" tabindex="-1" autocomplete="off" /></label>
+          </div>
+
+          <fieldset class="dgw__fs" data-fs="0">
+            <legend class="dgw__legend">{t.steps[0]}</legend>
+            <label class="dgw__field">
+              <span class="dgw__lbl">{t.fields.business}</span>
+              <input type="text" name="businessName" required maxlength="120" autocomplete="organization" />
+            </label>
+            <div class="dgw__row2">
+              <label class="dgw__field">
+                <span class="dgw__lbl">{t.fields.industry}</span>
+                <select name="industry">
+                  {t.fields.industries.map((o) => <option value={o.value}>{o.label}</option>)}
+                </select>
+              </label>
+              <label class="dgw__field">
+                <span class="dgw__lbl">{t.fields.city}</span>
+                <input type="text" name="city" maxlength="80" autocomplete="address-level2" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="dgw__fs" data-fs="1" hidden>
+            <legend class="dgw__legend">{t.steps[1]}</legend>
+            <label class="dgw__field">
+              <span class="dgw__lbl">{t.fields.url}</span>
+              <input type="text" name="url" inputmode="url" maxlength="200" placeholder="minegocio.com" autocomplete="url" />
+              <span class="dgw__hint">{t.fields.urlHint}</span>
+            </label>
+            <fieldset class="dgw__field dgw__pills" role="radiogroup" aria-label={t.fields.reviews}>
+              <span class="dgw__lbl">{t.fields.reviews}</span>
+              <div class="dgw__pillrow">
+                {t.fields.reviewsOpts.map((o, i) => {
+                  const v = ['0', '1-9', '10-29', '30+', 'ns'][i];
+                  return (
+                    <label class="dgw__pill">
+                      <input type="radio" name="reviews" value={v} checked={v === 'ns'} />
+                      <span>{o}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+          </fieldset>
+
+          <fieldset class="dgw__fs" data-fs="2" hidden>
+            <legend class="dgw__legend">{t.steps[2]}</legend>
+            <fieldset class="dgw__field dgw__chips" role="radiogroup" aria-label={t.fields.problem}>
+              <span class="dgw__lbl">{t.fields.problem}</span>
+              <div class="dgw__chiprow">
+                {t.fields.problems.map((p, i) => (
+                  <label class="dgw__chip">
+                    <input type="radio" name="problem" value={p} checked={i === 0} />
+                    <span>{p}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </fieldset>
+
+          <p class="dgw__err" data-err role="alert" hidden></p>
+
+          <div class="dgw__nav">
+            <button type="button" class="dgw__btn dgw__btn--ghost" data-back hidden>{t.back}</button>
+            <button type="button" class="dgw__btn dgw__btn--gold" data-next>{t.next}</button>
+            <button type="submit" class="dgw__btn dgw__btn--gold" data-analyze hidden>{t.analyze}</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── SCANNING ──────────────────────────────────────────── -->
+      <div class="dgw__panel" data-view="scan" hidden>
+        <ScanSequence lang={lang} />
+      </div>
+
+      <!-- ── RESULT ────────────────────────────────────────────── -->
+      <div class="dgw__panel" data-view="result" hidden>
+        <div class="dgw__rhead">
+          <p class="dgw__rkick">{t.resultTitle} <b data-biz></b></p>
+          <p class="dgw__risk" data-risk></p>
+        </div>
+
+        <div class="dgw__rgrid">
+          <div class="dgw__ring"><ScoreRing label={scoreLabel} live /></div>
+          <ScoreBars lang={lang} />
+        </div>
+
+        <div class="dgw__findings">
+          <h2 class="dgw__fh">{t.findingsTitle}</h2>
+          <ul class="dgw__flist" data-findings></ul>
+        </div>
+
+        <a class="dgw__rec" data-rec href="#" hidden>
+          <span class="dgw__rec-lbl">{t.recommendedLabel}</span>
+          <span class="dgw__rec-svc" data-rec-svc></span>
+          <Icon name="lucide:arrow-right" />
+        </a>
+
+        <p class="dgw__disclaimer">{t.disclaimer}</p>
+
+        <div class="dgw__claim">
+          <h2 class="dgw__claimh">{t.claimTitle}</h2>
+          <p class="dgw__claimsub">{t.claimSub}</p>
+          <form class="dgw__claimform" data-claim-form novalidate>
+            <div class="dgw__hp" aria-hidden="true">
+              <label>Website<input type="text" name="website_hp" tabindex="-1" autocomplete="off" /></label>
+            </div>
+            <label class="dgw__field">
+              <span class="dgw__lbl">{t.name}</span>
+              <input type="text" name="name" maxlength="120" autocomplete="name" />
+            </label>
+            <div class="dgw__row2">
+              <label class="dgw__field">
+                <span class="dgw__lbl">{t.email}</span>
+                <input type="email" name="email" maxlength="200" autocomplete="email" inputmode="email" />
+              </label>
+              <label class="dgw__field">
+                <span class="dgw__lbl">{t.phone}</span>
+                <input type="tel" name="phone" maxlength="50" autocomplete="tel" inputmode="tel" />
+              </label>
+            </div>
+            <p class="dgw__err" data-claim-err role="alert" hidden></p>
+            <button type="submit" class="dgw__btn dgw__btn--gold dgw__btn--wide" data-claim-btn>{t.claimBtn}</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── SUCCESS ───────────────────────────────────────────── -->
+      <div class="dgw__panel dgw__panel--success" data-view="success" hidden>
+        <span class="dgw__check"><Icon name="lucide:check" /></span>
+        <p class="dgw__donetext">{t.done}</p>
+        <button type="button" class="dgw__restart" data-restart>{t.restart}</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CtaBand del cierre (trío de canales) — solo visible en success -->
+  <div data-view="success-cta" hidden>
+    <CtaBand
+      title={ctaTitle}
+      primary={{ label: contactLabel, href: contactHref }}
+      tone="gold"
+      city="houston"
+      lang={lang}
+    />
+  </div>
+
+  <!-- FAQ (siempre visible; emite FAQPage JSON-LD) -->
+  <Faq tag={t.faqTitle} title={t.faqTitle} items={GOS[lang].faq.map((f) => ({ q: f.q, a: f.a }))} />
+</section>
+
+<style>
+  .dgw { padding-block: var(--section-gap); }
+  .dgw__stage { max-width: 680px; margin-inline: auto; }
+  .dgw__panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-card); padding: clamp(var(--space-5), 4vw, var(--space-7)); }
+  /* Varios elementos con display propio (--success grid, botones inline-flex,
+     .dgw__rec flex) sobrescribirían el display:none del atributo [hidden] (regla
+     UA de baja especificidad). Forzamos el ocultado para TODO lo que togglea hidden. */
+  [hidden] { display: none !important; }
+
+  /* Progreso (telemetría) */
+  .dgw__progress { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-4);
+                   align-items: center; margin-bottom: var(--space-6); }
+  .dgw__steplbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wider);
+                  text-transform: uppercase; color: var(--accent-gold); }
+  .dgw__steplbl b { color: var(--fg-primary); }
+  .dgw__steptitle { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+                    text-transform: uppercase; color: var(--fg-subtle); text-align: right; }
+  .dgw__track { grid-column: 1 / -1; height: 4px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
+  .dgw__trackfill { display: block; height: 100%; width: var(--p, 33%); border-radius: inherit;
+                    background: linear-gradient(90deg, var(--accent-gold-deep), var(--accent-gold));
+                    transition: width var(--duration-base) var(--ease-out-expo); }
+
+  .dgw__fs { border: 0; margin: 0; padding: 0; min-inline-size: 0; }
+  .dgw__legend { padding: 0; font-family: var(--font-display); font-size: var(--text-lg); color: var(--fg-primary);
+                 letter-spacing: var(--tracking-tight); margin-bottom: var(--space-5); }
+  .dgw__field { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); border: 0; padding: 0; min-inline-size: 0; }
+  .dgw__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .dgw__lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+              text-transform: uppercase; color: var(--fg-secondary); }
+  .dgw__hint { font-size: var(--text-sm); color: var(--fg-subtle); }
+  .dgw input[type="text"], .dgw input[type="email"], .dgw input[type="tel"], .dgw select {
+    width: 100%; min-height: var(--tap-min); padding: 0 var(--space-4); font-family: var(--font-body);
+    font-size: 16px; color: var(--fg-primary); background: var(--bg-elevated);
+    border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color var(--duration-base) var(--ease); }
+  .dgw select { appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, var(--fg-secondary) 50%), linear-gradient(135deg, var(--fg-secondary) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: var(--space-8); }
+  .dgw input:focus-visible, .dgw select:focus-visible { outline: none; border-color: var(--accent-teal);
+    box-shadow: 0 0 0 2px var(--accent-teal-line); }
+  .dgw input[aria-invalid="true"] { border-color: #c96e6e; }
+
+  /* Pills (reseñas) + chips (problema) */
+  .dgw__pillrow, .dgw__chiprow { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .dgw__pill, .dgw__chip { position: relative; }
+  .dgw__pill input, .dgw__chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .dgw__pill span, .dgw__chip span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--space-4);
+    font-size: var(--text-sm); color: var(--fg-secondary); background: var(--bg-elevated);
+    border: 1px solid var(--border); border-radius: var(--radius-pill); cursor: pointer;
+    transition: border-color var(--duration-base) var(--ease), color var(--duration-base) var(--ease), background var(--duration-base) var(--ease); }
+  .dgw__pill input:checked + span, .dgw__chip input:checked + span {
+    color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .dgw__pill input:focus-visible + span, .dgw__chip input:focus-visible + span { box-shadow: 0 0 0 2px var(--accent-teal-line); }
+
+  .dgw__nav { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-6); }
+  .dgw__btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap-min);
+    padding: 0 var(--space-6); border-radius: var(--radius-md); border: 1px solid transparent; font-weight: 600;
+    font-family: var(--font-body); font-size: var(--text-sm); cursor: pointer;
+    transition: transform var(--duration-base) var(--ease), box-shadow var(--duration-base) var(--ease), border-color var(--duration-base) var(--ease); }
+  .dgw__btn--gold { background: var(--accent-gold); color: var(--fg-inverse); margin-left: auto; }
+  .dgw__btn--gold:hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+  .dgw__btn--ghost { background: transparent; color: var(--fg-secondary); border-color: var(--border); }
+  .dgw__btn--ghost:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .dgw__btn--wide { width: 100%; margin-left: 0; }
+  .dgw__btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--accent-teal-line); }
+
+  .dgw__err { margin: var(--space-4) 0 0; color: #d98b8b; font-size: var(--text-sm); }
+
+  /* Resultado */
+  .dgw__rhead { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); align-items: baseline;
+                justify-content: space-between; margin-bottom: var(--space-6); }
+  .dgw__rkick { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+                text-transform: uppercase; color: var(--fg-secondary); margin: 0; }
+  .dgw__rkick b { color: var(--fg-primary); }
+  .dgw__risk { margin: 0; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+               text-transform: uppercase; padding: 4px 12px; border-radius: var(--radius-pill); border: 1px solid var(--border); }
+  .dgw__risk[data-level="high"] { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
+  .dgw__risk[data-level="med"]  { color: var(--fg-secondary); }
+  .dgw__risk[data-level="low"]  { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .dgw__rgrid { display: grid; grid-template-columns: auto 1fr; gap: var(--space-7); align-items: center;
+                justify-items: center; margin-bottom: var(--space-7); }
+  .dgw__findings { margin-bottom: var(--space-6); }
+  .dgw__fh { font-family: var(--font-display); font-size: var(--text-lg); color: var(--fg-primary); margin: 0 0 var(--space-4); }
+  .dgw__flist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  /* Las filas de hallazgo se inyectan por JS (innerHTML) → sin atributo de scope
+     de Astro; se estilizan con :global() bajo el contenedor scopeado. */
+  .dgw__flist :global(li) { display: grid; grid-template-columns: 20px 1fr; gap: var(--space-3); align-items: start;
+                   padding-bottom: var(--space-3); border-bottom: 1px solid var(--border-subtle);
+                   color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+  .dgw__flist :global(li:last-child) { border-bottom: 0; padding-bottom: 0; }
+  .dgw__flist :global(svg) { width: 18px; height: 18px; color: var(--accent-gold); margin-top: 1px; flex-shrink: 0; }
+
+  .dgw__rec { display: flex; align-items: center; gap: var(--space-3); text-decoration: none;
+    padding: var(--space-4) var(--space-5); margin-bottom: var(--space-5);
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-md);
+    transition: box-shadow var(--duration-base) var(--ease); }
+  .dgw__rec:hover { box-shadow: var(--shadow-gold); }
+  .dgw__rec-lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+                  text-transform: uppercase; color: var(--fg-subtle); }
+  .dgw__rec-svc { color: var(--accent-gold); font-weight: 600; }
+  .dgw__rec svg { width: 18px; height: 18px; color: var(--accent-gold); margin-left: auto; }
+
+  .dgw__disclaimer { font-size: var(--text-sm); color: var(--fg-subtle); line-height: var(--leading-normal);
+                     margin: 0 0 var(--space-6); }
+
+  .dgw__claim { border-top: 1px solid var(--border); padding-top: var(--space-6); }
+  .dgw__claimh { font-family: var(--font-display); font-size: var(--text-lg); color: var(--fg-primary); margin: 0 0 var(--space-2); }
+  .dgw__claimsub { color: var(--fg-secondary); font-size: var(--text-sm); margin: 0 0 var(--space-5); line-height: var(--leading-normal); }
+
+  /* Éxito */
+  .dgw__panel--success { text-align: center; display: grid; justify-items: center; gap: var(--space-4); }
+  .dgw__check { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); }
+  .dgw__check svg { width: 28px; height: 28px; color: var(--accent-teal); }
+  .dgw__donetext { color: var(--fg-primary); font-size: var(--text-lg); font-family: var(--font-display); max-width: 40ch; margin: 0; }
+  .dgw__restart { background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono);
+    font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; cursor: pointer; text-decoration: underline; }
+  .dgw__restart:hover { color: var(--accent-gold); }
+
+  .dgw__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  @media (max-width: 599px) {
+    .dgw__row2 { grid-template-columns: 1fr; }
+    .dgw__rgrid { grid-template-columns: 1fr; gap: var(--space-5); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dgw__trackfill, .dgw__btn { transition: none; }
+  }
+</style>
+
+<script>
+  import { track } from '../../lib/track.js';
+
+  const root = document.querySelector('[data-dgw]');
+  if (root) initWizard(root);
+
+  function initWizard(root) {
+    const lang = root.dataset.lang === 'en' ? 'en' : 'es';
+    const ERR = {
+      es: { net: 'No pudimos completar el análisis. Revisa tu conexión e inténtalo de nuevo.',
+            rate: 'Hiciste varios análisis seguidos. Espera unos minutos e inténtalo otra vez.',
+            contact: 'Necesitamos al menos un email o un teléfono para enviarte el reporte.' },
+      en: { net: "We couldn't finish the analysis. Check your connection and try again.",
+            rate: 'You ran several analyses in a row. Wait a few minutes and try again.',
+            contact: 'We need at least an email or a phone number to send your report.' },
+    }[lang];
+    const RISK = {
+      es: { high: 'Prioridad: alta', med: 'Prioridad: media', low: 'Vas bien — hay margen de mejora' },
+      en: { high: 'Priority: high', med: 'Priority: medium', low: "You're doing well — room to grow" },
+    }[lang];
+
+    const panels = {};
+    root.querySelectorAll('[data-view]').forEach((el) => { panels[el.dataset.view] = el; });
+    const fieldsets = [...root.querySelectorAll('.dgw__fs')];
+    const stepN = root.querySelector('[data-step-n]');
+    const stepTitle = root.querySelector('[data-step-title]');
+    const progress = root.querySelector('[data-progress]');
+    const backBtn = root.querySelector('[data-back]');
+    const nextBtn = root.querySelector('[data-next]');
+    const goBtn = root.querySelector('[data-analyze]');
+    const analyzeForm = root.querySelector('[data-analyze-form]');
+    const errEl = root.querySelector('[data-err]');
+    const stepTitles = [...root.querySelectorAll('.dgw__legend')].map((l) => l.textContent);
+
+    let step = 0;
+    let started = false;
+    let ref = null;
+    let recommended = null;
+
+    function sid() {
+      try {
+        let s = localStorage.getItem('mrc_sid');
+        if (!s) { s = crypto.randomUUID(); localStorage.setItem('mrc_sid', s); }
+        return s;
+      } catch { return 'anon'; }
+    }
+
+    function showView(name) {
+      for (const k of ['form', 'scan', 'result', 'success']) {
+        if (panels[k]) panels[k].hidden = (k !== name);
+      }
+      if (panels['success-cta']) panels['success-cta'].hidden = (name !== 'success');
+    }
+
+    function showStep(i) {
+      step = i;
+      fieldsets.forEach((fs, idx) => { fs.hidden = idx !== i; });
+      stepN.textContent = String(i + 1);
+      stepTitle.textContent = stepTitles[i] || '';
+      progress.style.setProperty('--p', ((i + 1) / 3 * 100) + '%');
+      backBtn.hidden = i === 0;
+      nextBtn.hidden = i === 2;
+      goBtn.hidden = i !== 2;
+      const first = fieldsets[i].querySelector('input, select');
+      if (first) try { first.focus({ preventScroll: true }); } catch {}
+      if (!started) { started = true; track('diagnostic_started'); }
+      track('diagnostic_step', { step: i + 1 });
+    }
+
+    function fail(el, msg) { el.textContent = msg; el.hidden = false; }
+    function clearErr(el) { el.hidden = true; el.textContent = ''; }
+
+    nextBtn.addEventListener('click', () => {
+      clearErr(errEl);
+      if (step === 0) {
+        const biz = analyzeForm.businessName;
+        if (!biz.value.trim()) { biz.setAttribute('aria-invalid', 'true'); biz.reportValidity(); biz.focus(); return; }
+        biz.removeAttribute('aria-invalid');
+      }
+      if (step < 2) showStep(step + 1);
+    });
+    backBtn.addEventListener('click', () => { clearErr(errEl); if (step > 0) showStep(step - 1); });
+
+    analyzeForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      clearErr(errEl);
+      const fd = new FormData(analyzeForm);
+      if (fd.get('website_hp')) return; // honeypot
+      const payload = {
+        action: 'analyze', lang, sid: sid(), website_hp: '',
+        businessName: (fd.get('businessName') || '').toString().trim(),
+        city: (fd.get('city') || '').toString().trim(),
+        industry: fd.get('industry') || 'otro',
+        url: (fd.get('url') || '').toString().trim(),
+        reviews: fd.get('reviews') || 'ns',
+        problem: fd.get('problem') || '',
+      };
+      const scanStart = performance.now();
+      showView('scan');
+      runScanAnimation();
+
+      let data = null, status = 0;
+      try {
+        const r = await fetch('/api/diagnostic', {
+          method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
+        });
+        status = r.status;
+        data = await r.json().catch(() => null);
+      } catch {}
+
+      // Duración mínima de escaneo 2.4s (percepción de trabajo real).
+      const elapsed = performance.now() - scanStart;
+      if (elapsed < 2400) await new Promise((res) => setTimeout(res, 2400 - elapsed));
+
+      if (!data || !data.ok || !data.scores) {
+        showView('form');
+        showStep(2);
+        fail(errEl, status === 429 ? ERR.rate : ERR.net);
+        return;
+      }
+      ref = data.ref;
+      recommended = data.recommended;
+      renderResult(payload.businessName, data);
+    });
+
+    function runScanAnimation() {
+      const steps = [...root.querySelectorAll('.scan__steps li')];
+      const scanBox = root.querySelector('[data-scan]');
+      if (scanBox) scanBox.hidden = false;
+      steps.forEach((li) => li.classList.remove('is-on', 'is-done'));
+      let i = 0;
+      const advance = () => {
+        if (i > 0 && steps[i - 1]) { steps[i - 1].classList.remove('is-on'); steps[i - 1].classList.add('is-done'); }
+        if (i < steps.length) { steps[i].classList.add('is-on'); i++; setTimeout(advance, 600); }
+        else if (steps[steps.length - 1]) { steps[steps.length - 1].classList.remove('is-on'); steps[steps.length - 1].classList.add('is-done'); }
+      };
+      advance();
+    }
+
+    function renderResult(biz, data) {
+      root.querySelector('[data-biz]').textContent = biz || '';
+      const s = data.scores;
+      // Riesgo por score total.
+      const riskEl = root.querySelector('[data-risk]');
+      const level = s.total < 50 ? 'high' : s.total < 75 ? 'med' : 'low';
+      riskEl.textContent = RISK[level]; riskEl.dataset.level = level;
+      // Barras.
+      paintBars(root.querySelector('[data-sbars]'), s);
+      // Hallazgos (máx 5).
+      const ul = root.querySelector('[data-findings]');
+      ul.innerHTML = '';
+      const ALERT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+      (data.findings || []).slice(0, 5).forEach((f) => {
+        const li = document.createElement('li');
+        const text = lang === 'en' ? f.en : f.es;
+        li.innerHTML = ALERT + '<span></span>';
+        li.querySelector('span').textContent = text;
+        ul.appendChild(li);
+      });
+      // Ruta sugerida.
+      const rec = root.querySelector('[data-rec]');
+      if (data.recommended && data.recommended.href) {
+        rec.href = data.recommended.href;
+        root.querySelector('[data-rec-svc]').textContent = data.recommended.service || '';
+        rec.hidden = false;
+      }
+      showView('result');
+      // Dispara el count-up del anillo.
+      const ring = root.querySelector('[data-sring]');
+      if (ring) ring.dispatchEvent(new CustomEvent('sring:set', { detail: s.total }));
+      const head = root.querySelector('.dgw__rkick');
+      if (head) try { head.setAttribute('tabindex', '-1'); head.focus({ preventScroll: false }); } catch {}
+      track('diagnostic_completed_preview', { total: s.total });
+    }
+
+    function paintBars(rootEl, scores) {
+      if (!rootEl) return;
+      for (const row of rootEl.querySelectorAll('[data-cat]')) {
+        const v = scores[row.dataset.cat] ?? 0;
+        row.querySelector('.sbars__fill').style.setProperty('--w', v + '%');
+        row.querySelector('[data-val]').textContent = v;
+      }
+    }
+
+    // ── Captura (claim) ──────────────────────────────────────────
+    const claimForm = root.querySelector('[data-claim-form]');
+    const claimErr = root.querySelector('[data-claim-err]');
+    const claimBtn = root.querySelector('[data-claim-btn]');
+    claimForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      clearErr(claimErr);
+      const fd = new FormData(claimForm);
+      if (fd.get('website_hp')) return;
+      const email = (fd.get('email') || '').toString().trim();
+      const phone = (fd.get('phone') || '').toString().trim();
+      if (!email && !phone) { fail(claimErr, ERR.contact); return; }
+      claimBtn.disabled = true;
+      let data = null, status = 0;
+      try {
+        const r = await fetch('/api/diagnostic', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'claim', ref, lang, sid: sid(), website_hp: '',
+            name: (fd.get('name') || '').toString().trim(), email, phone,
+          }),
+        });
+        status = r.status;
+        data = await r.json().catch(() => null);
+      } catch {}
+      claimBtn.disabled = false;
+      if (!data || !data.ok) { fail(claimErr, status === 429 ? ERR.rate : (status === 400 ? ERR.contact : ERR.net)); return; }
+      track('diagnostic_claimed');
+      showView('success');
+      const done = root.querySelector('.dgw__donetext');
+      if (done) try { done.setAttribute('tabindex', '-1'); done.focus(); } catch {}
+    });
+
+    // Reiniciar.
+    const restart = root.querySelector('[data-restart]');
+    if (restart) restart.addEventListener('click', () => {
+      try { analyzeForm.reset(); claimForm.reset(); } catch {}
+      ref = null; recommended = null; started = false;
+      showView('form'); showStep(0);
+    });
+
+    showStep(0);
+  }
+</script>

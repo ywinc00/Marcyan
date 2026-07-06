@@ -1,0 +1,59 @@
+---
+// FREE DIGITAL CHECKUP · /en/checkup (ES mirror: /es/diagnostico).
+// Compact header (LandingHero variant="header") + DiagnosticWizard (3-step wizard
+// → scan → result → capture → success + FAQ). Schema: Service (price 0) + FAQPage
+// (inside the wizard) + BreadcrumbList. hreflang/canonical resolved by Layout via
+// routes.ts (pair /es/diagnostico↔/en/checkup already in ROUTE_PAIRS).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import ServiceLd from '../../components/seo/ServiceLd.astro';
+import DiagnosticWizard from '../../components/growthos/DiagnosticWizard.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { GOS } from '../../i18n/growth-os';
+import { GROWTH_OS } from '../../flags';
+
+if (!GROWTH_OS) return Astro.redirect('/en/');
+
+const c = content.en;
+const t = GOS.en.page;
+const service = {
+  name: 'Free digital checkup',
+  serviceType: 'Digital presence audit',
+  description: t.metaDesc,
+  path: '/en/checkup',
+  priceValue: '0',
+};
+const breadcrumb = [
+  { name: 'Home', path: '/en' },
+  { name: 'Digital checkup', path: '/en/checkup' },
+];
+---
+<Layout title={t.metaTitle} description={t.metaDesc} lang="en" path="checkup">
+  <ServiceLd slot="head" {...service} />
+
+  <SiteNav nav={clusterNav} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LandingHero
+      variant="header"
+      tone="gold"
+      kicker={GOS.en.teaser.kicker}
+      h1={t.h1}
+      sub={t.sub}
+      primary={{ label: t.analyze, href: '#diagnostico-form' }}
+    >
+      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="en" />
+    </LandingHero>
+
+    <DiagnosticWizard lang="en" />
+
+    <SpaceBackdrop tone="gold" />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

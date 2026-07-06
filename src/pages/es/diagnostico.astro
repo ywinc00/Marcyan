@@ -1,0 +1,59 @@
+---
+// DIAGNÓSTICO DIGITAL GRATIS · /es/diagnostico (espejo EN: /en/checkup).
+// Header compacto (LandingHero variant="header") + DiagnosticWizard (wizard 3
+// pasos → escaneo → resultado → captura → éxito + FAQ). Schema: Service (precio
+// 0) + FAQPage (dentro del wizard) + BreadcrumbList. hreflang/canonical los
+// resuelve Layout vía routes.ts (par /es/diagnostico↔/en/checkup ya en ROUTE_PAIRS).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import ServiceLd from '../../components/seo/ServiceLd.astro';
+import DiagnosticWizard from '../../components/growthos/DiagnosticWizard.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { GOS } from '../../i18n/growth-os';
+import { GROWTH_OS } from '../../flags';
+
+if (!GROWTH_OS) return Astro.redirect('/es/');
+
+const c = content.es;
+const t = GOS.es.page;
+const service = {
+  name: 'Diagnóstico digital gratis',
+  serviceType: 'Diagnóstico de presencia digital',
+  description: t.metaDesc,
+  path: '/es/diagnostico',
+  priceValue: '0',
+};
+const breadcrumb = [
+  { name: 'Inicio', path: '/es' },
+  { name: 'Diagnóstico digital', path: '/es/diagnostico' },
+];
+---
+<Layout title={t.metaTitle} description={t.metaDesc} lang="es" path="diagnostico">
+  <ServiceLd slot="head" {...service} />
+
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LandingHero
+      variant="header"
+      tone="gold"
+      kicker={GOS.es.teaser.kicker}
+      h1={t.h1}
+      sub={t.sub}
+      primary={{ label: t.analyze, href: '#diagnostico-form' }}
+    >
+      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="es" />
+    </LandingHero>
+
+    <DiagnosticWizard lang="es" />
+
+    <SpaceBackdrop tone="gold" />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

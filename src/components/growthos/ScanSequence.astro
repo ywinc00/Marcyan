@@ -1,0 +1,42 @@
+---
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+import { GOS } from '../../i18n/growth-os';
+const t = GOS[lang].scan; // { steps: [4 strings], done }
+---
+<div class="scan" data-scan hidden>
+  <svg class="scan__orbit" viewBox="0 0 120 120" aria-hidden="true">
+    <circle cx="60" cy="60" r="52" class="scan__ring scan__ring--dash"/>
+    <circle cx="60" cy="60" r="38" class="scan__ring"/>
+    <circle cx="60" cy="60" r="5"  class="scan__core"/>
+    <g class="scan__sat"><circle cx="60" cy="8" r="4"/></g>
+  </svg>
+  <ol class="scan__steps" role="status" aria-live="polite">
+    {t.steps.map((s) => <li>{s}</li>)}
+  </ol>
+</div>
+
+<style>
+  .scan { display: grid; justify-items: center; gap: var(--space-5); padding: var(--space-7) 0; }
+  .scan__orbit { width: 120px; }
+  .scan__ring { fill: none; stroke: var(--border); stroke-width: 1.5; }
+  .scan__ring--dash { stroke: var(--accent-gold-line); stroke-dasharray: 4 7;
+                      transform-origin: 60px 60px; animation: scanSpin 9s linear infinite; }
+  .scan__core { fill: var(--accent-teal); animation: scanPulse 1.6s var(--ease-in-out) infinite; }
+  .scan__sat  { transform-origin: 60px 60px; animation: scanSpin 2.8s linear infinite; }
+  .scan__sat circle { fill: var(--accent-gold); }
+  .scan__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2);
+                 font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle); }
+  .scan__steps li { opacity: 0; transform: translateY(4px);
+                    transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo), color .4s; }
+  .scan__steps li.is-on   { opacity: 1; transform: none; color: var(--fg-secondary); }
+  .scan__steps li.is-done { opacity: 1; transform: none; color: var(--accent-teal); }
+  .scan__steps li.is-done::before { content: '✓ '; }
+  .scan__steps li.is-on::before   { content: '▸ '; color: var(--accent-gold); }
+  @keyframes scanSpin  { to { transform: rotate(360deg); } }
+  @keyframes scanPulse { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .scan__ring--dash, .scan__sat, .scan__core { animation: none; }
+    .scan__steps li { transition: none; }
+  }
+</style>

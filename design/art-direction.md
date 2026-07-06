@@ -356,3 +356,72 @@ honestos (estudio joven, SAB, sin fundador inventado) → la dirección les da r
    bloque Person sigue comentado, sin AggregateRating.
 
 Sub-agentes: ninguno (ilustración = órbita/nodo/regla inline, sin assets).
+
+---
+
+## Growth OS: Diagnóstico digital + Herramientas + Teaser — 2026-07-05
+
+```
+Página/Vista: /es/diagnostico + /en/checkup (wizard), /es/herramientas + /en/tools (hub),
+  GrowthTeaser (home tras AiSection). Componentes nuevos en src/components/growthos/.
+Modo: REDISEÑO/IDENTIDAD · deriva de la entrada raíz VALIDADA 2026-06-29 + DESIGN.md + docs/growth-os/PLAN.md §6
+Estado: VALIDADO (sub-dirección bajo entrada raíz firmada por el dueño; los componentes y sus
+  tokens/CSS/SVG están PRESCRITOS verbatim en PLAN.md §6) · Fecha: 2026-07-05
+Contrato: nav intacta (no añadir items); páginas nuevas = header compacto (no hero clónico);
+  SpaceBackdrop tone="gold"; cierre canónico = CtaBand (trío de canales). PII fuera del modelo.
+```
+
+**Por qué:** el "Diagnóstico gratis" era un CTA sin herramienta detrás. Ahora es una pieza real.
+El riesgo genérico: "formulario SaaS de 3 pasos + medidor tipo dashboard morado". Se evita
+tratándolo como un INSTRUMENTO de la misma nave (telemetría espacial), no un widget de app.
+
+Inventario de marca conservada — CONSERVADO: tokens DS v2 (oro/teal, fondos, radios, mono),
+tipos (Space Grotesk/DM Sans/JetBrains Mono), acentos con moderación (oro primario ~7%, teal =
+señal IA/"en vivo"), atmósfera SpaceBackdrop, avatar `marcy-mini` (solo en el teaser vía
+`<picture>`, sin replicar el planeta del hero). ELEVADO: 3 componentes de dato nuevos (ScoreRing
+= dial de instrumento, ScoreBars = telemetría de 5 categorías, ScanSequence = órbita de escaneo)
+ya especificados en PLAN.md §6. PROHIBIDO: colores de la propuesta externa (#4DE7FF/#9B5CFF/--mx-*),
+medidor con glow morado, hero clónico, "Growth OS" en copy público, em-dash de muletilla,
+número fabricado en resultados (solo la calculadora produce cifras, con inputs del usuario y "≈").
+
+1) **Dirección visual:** "consola de diagnóstico / telemetría de escaneo" — misma sala de control
+   espacial. El escaneo y el score se leen como INSTRUMENTOS: dial oro con count-up (ScoreRing),
+   barras de telemetría por categoría (ScoreBars, la de IA en teal), órbita de escaneo con satélite
+   (ScanSequence). Acento del tono: oro = la oferta/score/CTA; teal = la señal "lectura por IA / en
+   vivo" (barra AI, core del escaneo). Fondo = SpaceBackdrop tone="gold". Todo con tokens reales
+   (PLAN.md §6); cero hex de la propuesta externa. Referencia de principio (no se clona): panel de
+   telemetría (dial + barras + log de pasos), ya el lenguaje de la home. Contraste fg/bg ≥ 13:1.
+2) **Jerarquía (wizard):** (1) header compacto kicker `scan-search` → H1 con `<em>` oro → 1 bajada;
+   (2) el PANEL del wizard con progreso mono "PASO 1/3" (telemetría) y 1 acción dominante oro
+   ("Analizar mi negocio"); (3) al analizar → ScanSequence (instrumento trabajando, mín 2.4s);
+   (4) RESULTADO: ScoreRing (foco nº1, dial oro) + ScoreBars + lista de "señales detectadas" +
+   disclaimer quieto + ruta sugerida (chip → link); (5) captura (email/tel, honeypot) con 1 botón
+   oro; (6) éxito = check + CtaBand (cierre canónico). Un solo `<h1>`, una sola acción primaria por
+   estado. Salto duro: numeral del ring `--text-3xl`/mono vs labels mono `--text-xs`.
+3) **Intención por bloque:** header = fija la promesa (revisar gratis dónde pierdes clientes) sin
+   vender de más. Wizard = fricción mínima (3 pasos, sin login), pide solo lo necesario para el
+   scan. ScanSequence = percepción de trabajo real (no fingir más de lo hecho; mín 2.4s). Resultado
+   = valor ANTES del contacto (score + señales verificables + disclaimer honesto). Captura =
+   desbloquea SOLO el reporte completo (no el preview). CtaBand = conversión canónica (llamar/WA/
+   #contacto). Herramientas: cada calculadora = instrumento (sliders oro + resultado count-up "≈")
+   que pone número a una sospecha; la 3ª card enruta al diagnóstico. Teaser = gancho en la home con
+   un "EJEMPLO" honesto (badge), Marcy explica en el chat.
+4) **Componentes (tokens):** ScoreRing/ScanSequence/ScoreBars/sliders = CSS/SVG verbatim de PLAN.md
+   §6 (dial con `--accent-gold`→`--accent-gold-deep`, drop-shadow `--accent-gold-glow`; barra AI en
+   teal; sliders thumb oro con `--shadow-gold`). Wizard: `fieldset` por paso, inputs `--bg-elevated`
+   + `1px solid --border`, radius-md, focus-visible anillo teal (`--accent-teal-line`), tap ≥44px.
+   Hallazgo = fila (no card) icono `lucide:alert-triangle` (oro) / `lucide:check` (teal) + texto;
+   chip de ruta sugerida = `--accent-gold-dim`/`--accent-gold-line`. Header = LandingHero
+   variant="header" (compacto, sin CTA/chips/badge). Motion: count-up rAF + arco; todo off en
+   `--motion-reduce`. Sin radios al azar (md inputs / lg tarjetas / pill chips).
+5) **Errores evitados (NO → SÍ):** NO medidor dashboard con glow morado → SÍ dial oro de instrumento
+   sobre la atmósfera; NO formulario SaaS de 3 pasos genérico → SÍ panel-instrumento con progreso
+   mono y 1 acción; NO 3-card icono+título+párrafo en herramientas → SÍ paneles de calculadora
+   interactivos + 1 card-enlace de constelación; NO hero clónico de portada → SÍ header compacto
+   §2; NO fondo sólido plano → SÍ SpaceBackdrop gold + tarjetas translúcidas; NO número inventado en
+   el resultado → SÍ solo score/señales verificables (cifra en $ solo en la calculadora con inputs
+   del usuario y "≈"); NO em-dash de muletilla en copy nuevo (i18n growth-os.ts) → SÍ comas/puntos;
+   NO 2ª familia de iconos → SÍ Lucide outline 1.5px; NO "Growth OS" en pantalla → SÍ "Diagnóstico
+   digital gratis" / "Free digital checkup".
+
+Sub-agentes: ninguno (visuales prescritos en PLAN.md §6; ilustración = SVG inline del propio plan).

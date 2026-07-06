@@ -1,0 +1,9 @@
+/* Sliders de calculadora (Growth OS) — thumb oro sobre riel fino, DS v2. */
+.gos-range { appearance: none; -webkit-appearance: none; width: 100%; height: 4px; border-radius: var(--radius-pill);
+             background: var(--bg-elevated); outline: none; }
+.gos-range::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent-gold); border: 3px solid var(--bg-base);
+  box-shadow: var(--shadow-gold); cursor: pointer; }
+.gos-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent-gold); border: 3px solid var(--bg-base); cursor: pointer; }
+.gos-range:focus-visible { box-shadow: 0 0 0 2px var(--accent-teal-line); }

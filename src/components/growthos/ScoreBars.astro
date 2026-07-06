@@ -1,0 +1,29 @@
+---
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+import { GOS } from '../../i18n/growth-os';
+const cats = GOS[lang].cats; // [{key:'web',label:'Web móvil'},{key:'seo',...},{key:'ai',...},{key:'conv',...},{key:'rep',...}]
+---
+<div class="sbars" data-sbars>
+  {cats.map((c) => (
+    <div class="sbars__row" data-cat={c.key}>
+      <span class="sbars__label">{c.label}</span>
+      <span class="sbars__track"><i class="sbars__fill" style="--w:0%"></i></span>
+      <b class="sbars__val" data-val>—</b>
+    </div>
+  ))}
+</div>
+
+<style>
+  .sbars { display: grid; gap: var(--space-3); width: 100%; max-width: 420px; }
+  .sbars__row { display: grid; grid-template-columns: 110px 1fr 44px; gap: var(--space-3); align-items: center; }
+  .sbars__label { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+                  letter-spacing: var(--tracking-wide); color: var(--fg-secondary); }
+  .sbars__track { height: 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
+  .sbars__fill  { display: block; height: 100%; width: var(--w); border-radius: inherit;
+                  background: linear-gradient(90deg, var(--accent-gold-deep), var(--accent-gold));
+                  transition: width 1.1s var(--ease-out-expo); }
+  .sbars__row[data-cat="ai"] .sbars__fill { background: linear-gradient(90deg, #2e6e5b, var(--accent-teal)); }
+  .sbars__val { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary); text-align: right; }
+  @media (prefers-reduced-motion: reduce) { .sbars__fill { transition: none; } }
+</style>

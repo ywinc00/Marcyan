@@ -41,6 +41,8 @@ export const ROUTE_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['/es/precios/cuanto-cuesta-un-chatbot', '/en/pricing/chatbot-cost'],
   ['/es/precios/cuanto-cuesta-seo-local-houston', '/en/pricing/local-seo-cost-houston'],
   ['/es/blog', '/en/blog'],
+  ['/es/diagnostico', '/en/checkup'],
+  ['/es/herramientas', '/en/tools'],
   ['/privacidad', '/en/privacy'],
   ['/terminos', '/en/terms'],
 ];

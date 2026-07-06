@@ -630,11 +630,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
      El JS expone --mrc-vvh (alto visible real), --mrc-vvtop (desplazamiento del
      viewport visual) y --mrc-kb (alto del teclado, VisualViewport) para que el
      panel ocupe el área visible y el input quede SIEMPRE por encima del teclado. */
-  @media (--lt-sm) {
+  @media (--lt-md) {
     .mrc-panel {
       position: fixed; left: 0; right: 0; bottom: auto;
       top: var(--mrc-vvtop, 0px);
-      width: auto; height: var(--mrc-vvh, 100dvh);
+      width: auto; height: var(--mrc-vvh, 100svh);
       border-radius: 0; border: none;
     }
     .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
@@ -806,6 +806,30 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let lastUserText = '';
     let busy = false;
     let opened = false;
+    let savedScrollY = 0;
+    let bodyFrozen = false;
+    // Bloqueo de scroll del body SOLO cuando el panel es pantalla completa (móvil).
+    // Patrón iOS-safe: position:fixed + top:-scrollY (overflow:hidden no basta en Safari).
+    // Idempotente (guard bodyFrozen): evita pisar savedScrollY en dobles llamadas.
+    const isMobileFull = () => { try { return window.matchMedia('(max-width: 767.98px)').matches; } catch (_) { return false; } };
+    function freezeBody() {
+      if (bodyFrozen) return;
+      bodyFrozen = true;
+      savedScrollY = window.scrollY || window.pageYOffset || 0;
+      const b = document.body.style;
+      b.position = 'fixed'; b.top = `-${savedScrollY}px`; b.left = '0'; b.right = '0'; b.width = '100%';
+    }
+    function unfreezeBody() {
+      if (!bodyFrozen) return;
+      bodyFrozen = false;
+      const b = document.body.style;
+      b.position = ''; b.top = ''; b.left = ''; b.right = ''; b.width = '';
+      // Salto instantáneo (sin animar por el scroll-behavior:smooth global).
+      const html = document.documentElement, prevSB = html.style.scrollBehavior;
+      html.style.scrollBehavior = 'auto';
+      window.scrollTo(0, savedScrollY);
+      html.style.scrollBehavior = prevSB;
+    }
     let started = false;   // ya pasó de bienvenida a conversación
     let captured = false;  // ya envió sus datos
 
@@ -1339,7 +1363,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // viewport visual) que el CSS de pantalla completa usa.
     const vv = window.visualViewport;
     function syncViewport() {
-      if (!vv || !root) return;
+      if (!vv || !root || !opened) return;
       const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
       root.style.setProperty('--mrc-kb', kb + 'px');
       root.style.setProperty('--mrc-vvh', Math.round(vv.height) + 'px');
@@ -1354,6 +1378,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       vv.addEventListener('resize', syncViewport);
       vv.addEventListener('scroll', syncViewport);
     }
+    // Rotación/resize entre móvil y desktop con el panel abierto: congela/descongela
+    // el body según el breakpoint para no dejar el fondo bloqueado al pasar a ≥768px.
+    try {
+      const mqFull = window.matchMedia('(max-width: 767.98px)');
+      const onBpChange = () => {
+        if (!opened) return;
+        if (isMobileFull()) freezeBody(); else unfreezeBody();
+        syncViewport();
+      };
+      if (mqFull.addEventListener) mqFull.addEventListener('change', onBpChange);
+      else if (mqFull.addListener) mqFull.addListener(onBpChange);
+    } catch (_) {}
 
     // El asset grande del avatar (héroe) está diferido (data-src) para no
     // descargarlo en el render inicial del sitio. Se activa al abrir el chat.
@@ -1373,12 +1409,17 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // ── Abrir / cerrar panel ──
     function openPanel() {
       loadDeferredAssets();
+      // Congela el documento de fondo para que el teclado no arrastre la página
+      // por detrás del panel a pantalla completa (solo móvil).
+      if (isMobileFull()) freezeBody();
       panel.hidden = false;
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
       if (nudge) nudge.hidden = true;
       syncViewport();
+      // Re-sincroniza tras la animación del teclado/viewport (evita franjas de fondo).
+      requestAnimationFrame(() => requestAnimationFrame(syncViewport));
       requestAnimationFrame(() => {
         // En bienvenida NO enfocamos el input (en móvil abriría el teclado);
         // enfocamos la primera tarjeta de canal. En conversación, el input.
@@ -1396,6 +1437,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (input) input.blur();         // cierra el teclado
       root.style.setProperty('--mrc-kb', '0px');
       root.style.setProperty('--mrc-vvtop', '0px');
+      unfreezeBody();   // restaura el scroll del documento si lo congelamos al abrir
       fab.focus();
     }
     function toggle() { (opened ? closePanel : openPanel)(); }

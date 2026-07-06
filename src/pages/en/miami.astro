@@ -2,7 +2,7 @@
 // CITY HUB · /en/miami — Miami MAIN LANDING (Wave 2 · B3). EN mirror of es/miami.astro.
 // Houston mirror in STRENGTH: a POWERFUL, home-level page (DESIGN.md §2/§5).
 // Landing hero (variant 'landing') + a bespoke city SHOWCASE that injects local
-// identity (palm/skyline + FL silhouette + coords + "Magic City" tagline),
+// identity (FL silhouette in vector + coords + "Magic City" tagline),
 // reusing the visual LANGUAGE of Locations.astro, and the ×Miami service switch.
 // Then: AnswerBlock (AEO), neighborhoods, local context (Prose), related, FAQ,
 // CtaBand, Contact. Schema: ItemList of the services + Breadcrumb.
@@ -65,17 +65,19 @@ const FL_SHAPE = {
     </LandingHero>
 
     {/* ── CITY SHOWCASE (bespoke) ─────────────────────────────────────
-        Local Miami identity (FL silhouette + coords + "Magic City" + palm)
+        Local Miami identity (FL silhouette + coords + "Magic City")
         on the left, ×Miami service switch on the right. Reuses the language
         of Locations.astro but is a piece of its own on this landing, so it
         does NOT feel like a stack of link panels. */}
     <section class="section showcase" aria-labelledby="mia-showcase-title">
       <div class="container showcase__inner">
         <aside class="mia-id">
-          {/* official palm / skyline — decorative, bottom corner */}
-          <div class="mia-id__illo" aria-hidden="true">
-            <img src="/assets/cities/miami.svg" alt="" loading="lazy" decoding="async" width="322" height="235" />
-          </div>
+          {/* Florida silhouette (geo-correct vector) — watermark, bottom corner */}
+          {FL_SHAPE && (
+            <div class="mia-id__illo" aria-hidden="true">
+              <svg viewBox={FL_SHAPE.viewBox} preserveAspectRatio="xMidYMid meet"><path d={FL_SHAPE.path} /></svg>
+            </div>
+          )}
 
           <div class="mia-id__body">
             <div class="mia-id__top">
@@ -171,7 +173,7 @@ const FL_SHAPE = {
 <style>
   /* ════════════════════════════════════════════════════════════════
      CITY SHOWCASE — bespoke piece (this page only).
-     Miami identity card (FL silhouette + coords + palm) + the service
+     Miami identity card (FL silhouette + coords) + the service
      switch. Visual language inherited from Locations.astro, only with DS
      tokens. Floats over the SpaceBackdrop atmosphere.
      ════════════════════════════════════════════════════════════════ */
@@ -192,16 +194,16 @@ const FL_SHAPE = {
     border: 1px solid var(--border); border-radius: var(--radius-xl);
     padding: var(--space-6);
   }
-  /* official palm/skyline — bottom-right corner, faded toward the left.
-     The PNG/SVG already ships in gold at low opacity; mix-blend lighten
-     collapses its dark wash to the card color (same as Locations.astro). */
+  /* Florida silhouette — real geo-correct VECTOR, gold at low opacity as a watermark
+     in the bottom-right corner. Crisp on retina, no PNG raster nor fragile
+     mix-blend-mode; clipped by the card's overflow:hidden. */
   .mia-id__illo {
     position: absolute; right: 0; bottom: 0;
     width: clamp(180px, 56%, 300px); pointer-events: none; z-index: 0;
-    -webkit-mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
-    mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
+    opacity: 0.08;
   }
-  .mia-id__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
+  .mia-id__illo svg { width: 100%; height: auto; display: block; }
+  .mia-id__illo path { fill: var(--accent-gold); }
 
   .mia-id__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 

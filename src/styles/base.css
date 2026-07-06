@@ -104,6 +104,12 @@ a { color: inherit; text-decoration: none; }
 
 .section { padding-block: var(--section-gap); }
 
+/* Páginas SIN hero full-bleed (legales, etc.): el primer bloque de contenido es una
+   .section directa de <main> y debe reservar la nav fija para no quedar tapado.
+   Los heroes NO usan .section como raíz (usan .hero/.l-hero/.cityhero/.p-hero),
+   así que esta regla no los afecta ni duplica su espaciado. */
+main > .section:first-child { padding-top: calc(var(--nav-h) + var(--space-7)); }
+
 /* ── Tipografía utilitaria (consume tokens; headings = fluida) ── */
 .display, .h1, .h2, .h3, .h4 {
   font-family: var(--font-display);

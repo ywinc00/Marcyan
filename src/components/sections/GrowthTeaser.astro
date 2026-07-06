@@ -1,17 +1,21 @@
 ---
-interface Props { lang: 'es' | 'en' }
-const { lang } = Astro.props;
+interface Props { lang: 'es' | 'en'; city?: 'houston' | 'miami' }
+const { lang, city } = Astro.props;
 import { GOS } from '../../i18n/growth-os';
 import Icon from '../ui/Icon.astro';
 const t = GOS[lang].teaser;
+// En hubs de ciudad, el título/bajada se especializan a la ciudad (mismo componente).
+const ov = city ? t.cityOverrides[city] : null;
+const title = ov?.title ?? t.title;
+const sub = ov?.sub ?? t.sub;
 const href = lang === 'en' ? '/en/checkup' : '/es/diagnostico';
 ---
 <section class="gost" id="diagnostico" data-fx>
   <div class="gost__inner">
     <div class="gost__copy">
       <p class="gost__kicker"><Icon name="lucide:scan-search" /> {t.kicker}</p>
-      <h2 class="gost__title" set:html={t.title} />
-      <p class="gost__sub">{t.sub}</p>
+      <h2 class="gost__title" set:html={title} />
+      <p class="gost__sub">{sub}</p>
       <div class="gost__actions">
         <a class="gost__cta" href={href} data-track="growth_teaser_clicked">{t.cta}</a>
         <span class="gost__meta">{t.meta}</span>

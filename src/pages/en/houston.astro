@@ -26,6 +26,8 @@ import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
+import GrowthTeaser from '../../components/sections/GrowthTeaser.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import { content } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston.en';
@@ -140,6 +142,12 @@ const splitPrice = (p?: string) =>
       </div>
     </section>
 
+    <GrowthCta
+      text="Sound familiar? Calls you can't answer, appointments that never show. Put a number on it in 30 seconds."
+      linkLabel="Free calculators"
+      href="/en/tools"
+    />
+
     {/* real proof right after the price: "this is what it costs, made visible" */}
     <Projects lang="en" projects={c.projects} />
 
@@ -214,6 +222,8 @@ const splitPrice = (p?: string) =>
         </ul>
       </div>
     </section>
+
+    <GrowthTeaser lang="en" city="houston" />
 
     {/* citable AEO answer (text/source VERBATIM), adjacent to the FAQ */}
     <AnswerBlock lang="en" q={h.answer.q} a={h.answer.a} source={h.answer.source} />

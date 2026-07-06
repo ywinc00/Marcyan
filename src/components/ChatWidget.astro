@@ -97,6 +97,9 @@ const STR = {
     pgMiami: 'Marcyan en Miami',
     pgFormulario: 'Abrir el formulario completo',
     pgDiagnostico: 'Hacer el diagnóstico gratis',
+    pgHerramientas: 'Ver herramientas gratis',
+    pgCalcLlamadas: 'Calcular llamadas perdidas',
+    pgCalcCitas: 'Calcular citas perdidas',
   },
   en: {
     open: 'Open the help chat',
@@ -159,6 +162,9 @@ const STR = {
     pgMiami: 'Marcyan in Miami',
     pgFormulario: 'Open the full form',
     pgDiagnostico: 'Take the free checkup',
+    pgHerramientas: 'See the free tools',
+    pgCalcLlamadas: 'Calculate missed calls',
+    pgCalcCitas: 'Calculate no-shows',
   },
 };
 
@@ -199,6 +205,9 @@ const pages = {
   miami:      { href: lang === 'en' ? '/en/miami'    : '/es/miami',     label: t.pgMiami },
   formulario: { href: '/formulario', label: t.pgFormulario },
   diagnostico: { href: lang === 'en' ? '/en/checkup' : '/es/diagnostico', label: t.pgDiagnostico },
+  herramientas: { href: lang === 'en' ? '/en/tools' : '/es/herramientas', label: t.pgHerramientas },
+  'calculadora-llamadas': { href: lang === 'en' ? '/en/tools#calls' : '/es/herramientas#llamadas', label: t.pgCalcLlamadas },
+  'calculadora-citas': { href: lang === 'en' ? '/en/tools#appointments' : '/es/herramientas#citas', label: t.pgCalcCitas },
 };
 const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston, channels, pages };
 ---

@@ -23,6 +23,8 @@ import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
+import GrowthTeaser from '../../components/sections/GrowthTeaser.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import { content, nap } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { miamiHub as h } from '../../i18n/miami';
@@ -128,6 +130,12 @@ const FL_SHAPE = {
       </div>
     </section>
 
+    <GrowthCta
+      text="¿Te suena? Llamadas que no alcanzas a contestar, citas que no llegan. Ponle número en 30 segundos."
+      linkLabel="Calculadoras gratis"
+      href="/es/herramientas"
+    />
+
     <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
     <RelatedLinks tag={h.barrios.tag} title={h.barrios.title} links={h.barrios.links} tone="teal" />
@@ -138,6 +146,8 @@ const FL_SHAPE = {
       paragraphs={h.local.paragraphs}
       tone={h.local.tone}
     />
+
+    <GrowthTeaser lang="es" city="miami" />
 
     <RelatedLinks tag={h.related.tag} title={h.related.title} links={h.related.links} />
 

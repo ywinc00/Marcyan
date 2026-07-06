@@ -214,6 +214,7 @@ export const content = {
           { label: 'SEO Local', href: '/es/houston/seo-local' },
           { label: 'Branding', href: '/es/houston/branding' },
           { label: 'Diagnóstico digital', href: '/es/diagnostico' },
+          { label: 'Herramientas gratis', href: '/es/herramientas' },
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [
@@ -413,6 +414,7 @@ export const content = {
           { label: 'Local SEO', href: '#servicios' },
           { label: 'Branding', href: '#servicios' },
           { label: 'Digital checkup', href: '/en/checkup' },
+          { label: 'Free tools', href: '/en/tools' },
           { label: 'Project Form', href: '/formulario' },
         ] },
         { title: 'Company', links: [

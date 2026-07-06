@@ -13,6 +13,16 @@ export const GOS = {
       demoLabel: 'Marcy te lo explica en el chat',
       demoBadge: 'EJEMPLO',
       demoCats: ['Web móvil', 'SEO local', 'Lectura por IA'],
+      cityOverrides: {
+        houston: {
+          title: 'Descubre dónde está <em>perdiendo clientes</em> tu negocio en Houston',
+          sub: 'En 2 minutos, la IA revisa tu presencia digital — web, Google, lectura por IA y conversión — y te dice qué priorizar para competir en Houston. Gratis y sin compromiso.',
+        },
+        miami: {
+          title: 'Descubre dónde está <em>perdiendo clientes</em> tu negocio en Miami',
+          sub: 'En 2 minutos, la IA revisa tu presencia digital — web, Google, lectura por IA y conversión — y te dice qué priorizar para competir en Miami. Gratis y sin compromiso.',
+        },
+      },
     },
     cats: [
       { key: 'web',  label: 'Web móvil' },
@@ -103,6 +113,16 @@ export const GOS = {
       demoLabel: 'Marcy walks you through it in the chat',
       demoBadge: 'SAMPLE',
       demoCats: ['Mobile site', 'Local SEO', 'AI readability'],
+      cityOverrides: {
+        houston: {
+          title: 'Find out where your Houston business is <em>losing customers</em>',
+          sub: 'In 2 minutes, AI reviews your digital presence — mobile site, Google, AI readability, and conversion — and shows you what to fix first to compete in Houston. Free, no strings.',
+        },
+        miami: {
+          title: 'Find out where your Miami business is <em>losing customers</em>',
+          sub: 'In 2 minutes, AI reviews your digital presence — mobile site, Google, AI readability, and conversion — and shows you what to fix first to compete in Miami. Free, no strings.',
+        },
+      },
     },
     cats: [
       { key: 'web',  label: 'Mobile site' },

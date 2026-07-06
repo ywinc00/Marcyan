@@ -43,6 +43,8 @@ export interface RelatedLink { label: string; href: string; desc: string; icon?:
 export interface SectionRelated { tag: string; title: string; links: RelatedLink[] }
 
 export interface ClusterPage {
+  /** CTA opcional hacia una calculadora de herramientas (Growth OS, etapa de implicación). */
+  tool?: { text: string; linkLabel: string; href: string };
   meta: { title: string; description: string };
   path: string;
   breadcrumb: CrumbItem[];
@@ -694,6 +696,7 @@ const precioWebHouston: ClusterPage = {
 //   stats de blogs de vendors NO se citan como datos (solo el de HBR/MIT, real).
 // ═══════════════════════════════════════════════════════════════
 const houstonIa: ClusterPage = {
+  tool: { text: 'Tu asistente contesta lo que hoy se te escapa. Mira cuánto vale eso al mes.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'IA Conversacional en Houston | Asistente que contesta 24/7 | Marcyan',
     description:
@@ -1305,6 +1308,7 @@ const houstonBranding: ClusterPage = {
 //   Fundador + proof etiquetado por su ciudad real (Houston/Orlando), nunca Miami.
 // ═══════════════════════════════════════════════════════════════
 const miamiIa: ClusterPage = {
+  tool: { text: 'Tu asistente contesta lo que hoy se te escapa. Mira cuánto vale eso al mes.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'IA Conversacional en Miami | Asistente que contesta 24/7 | Marcyan',
     description:
@@ -1660,6 +1664,7 @@ const miamiEcommerce: ClusterPage = {
 // un caso ni "visa garantizada". Sin "#1".
 // ═══════════════════════════════════════════════════════════════
 const houstonAbogadosInmigracion: ClusterPage = {
+  tool: { text: 'Cada llamada sin contestar puede ser un caso que se va con otro despacho. Ponle número.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'Marketing con IA para Abogados de Inmigración en Houston | Marcyan',
     description:
@@ -1777,6 +1782,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
 };
 
 const houstonBienesRaices: ClusterPage = {
+  tool: { text: '¿Cuántos prospectos se enfrían por no responder a tiempo? Ponle número en 30 segundos.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'Sitios Web para Agentes de Bienes Raíces en Houston | Marcyan',
     description:
@@ -1899,6 +1905,7 @@ const houstonBienesRaices: ClusterPage = {
 // proof etiquetado por su rubro/ciudad real). Reusa la plantilla ClusterLanding.
 // ═══════════════════════════════════════════════════════════════
 const houstonRestaurantes: ClusterPage = {
+  tool: { text: '¿Cuántas reservas y pedidos se pierden cuando nadie contesta? Ponle número en 30 segundos.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'Páginas Web para Restaurantes en Houston | Marcyan',
     description:
@@ -2013,6 +2020,7 @@ const houstonRestaurantes: ClusterPage = {
 };
 
 const houstonContratistas: ClusterPage = {
+  tool: { text: '¿Cuántos trabajos pierdes por llamadas sin contestar? Ponle número en 30 segundos.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'Sitios Web para Contratistas en Houston | Marcyan',
     description:
@@ -2127,6 +2135,7 @@ const houstonContratistas: ClusterPage = {
 };
 
 const houstonTalleresMecanicos: ClusterPage = {
+  tool: { text: '¿Cuántas reparaciones se van al taller de al lado por no contestar el teléfono? Ponle número.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
     title: 'Sitios Web para Talleres Mecánicos en Houston | Marcyan',
     description:
@@ -2241,6 +2250,7 @@ const houstonTalleresMecanicos: ClusterPage = {
 };
 
 const houstonSalonBelleza: ClusterPage = {
+  tool: { text: '¿Cuánto te cuestan las citas que no llegan? Ponle número en 30 segundos.', linkLabel: 'Calculadora de citas perdidas', href: '/es/herramientas#citas' },
   meta: {
     title: 'Sitios Web con Reservas para Salones de Belleza en Houston | Marcyan',
     description: 'Diseño web con agenda en línea para salones de belleza en Houston: tus clientas reservan 24/7 y una IA responde WhatsApp. Desde $1,500. Propuesta gratis.',
@@ -2353,6 +2363,7 @@ const houstonSalonBelleza: ClusterPage = {
 };
 
 const houstonClinicasDentales: ClusterPage = {
+  tool: { text: '¿Cuánto pierde tu clínica por los no-shows? Ponle número en 30 segundos.', linkLabel: 'Calculadora de citas perdidas', href: '/es/herramientas#citas' },
   meta: {
     title: 'Sitios Web para Clínicas Dentales en Houston | Marcyan',
     description:

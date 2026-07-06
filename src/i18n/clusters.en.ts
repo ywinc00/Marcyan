@@ -264,6 +264,7 @@ const enHoustonWeb: ClusterPage = {
 };
 
 const enHoustonIa: ClusterPage = {
+  tool: { text: 'Your assistant answers what slips away today. See what that is worth per month.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Conversational AI in Houston | An Assistant That Answers 24/7 | Marcyan',
     description:
@@ -611,6 +612,7 @@ const enHoustonBranding: ClusterPage = {
 };
 
 const enHoustonImmigration: ClusterPage = {
+  tool: { text: 'Every unanswered call can be a case walking to another firm. Put a number on it.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'AI Marketing for Immigration Lawyers in Houston | Marcyan',
     description:
@@ -728,6 +730,7 @@ const enHoustonImmigration: ClusterPage = {
 };
 
 const enHoustonRealEstate: ClusterPage = {
+  tool: { text: 'How many leads go cold because the reply came late? Put a number on it in 30 seconds.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Websites for Real Estate Agents in Houston | Marcyan',
     description:
@@ -845,6 +848,7 @@ const enHoustonRealEstate: ClusterPage = {
 };
 
 const enHoustonRestaurants: ClusterPage = {
+  tool: { text: 'How many reservations and orders slip away when nobody answers? Put a number on it in 30 seconds.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Restaurant Websites in Houston | Marcyan',
     description:
@@ -959,6 +963,7 @@ const enHoustonRestaurants: ClusterPage = {
 };
 
 const enHoustonContractors: ClusterPage = {
+  tool: { text: 'How many jobs do you lose to unanswered calls? Put a number on it in 30 seconds.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Websites for Contractors in Houston | Marcyan',
     description:
@@ -1073,6 +1078,7 @@ const enHoustonContractors: ClusterPage = {
 };
 
 const enHoustonAutoRepair: ClusterPage = {
+  tool: { text: 'How many repairs end up at the shop next door because nobody picked up? Put a number on it.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Websites for Auto Repair Shops in Houston | Marcyan',
     description:
@@ -1187,6 +1193,7 @@ const enHoustonAutoRepair: ClusterPage = {
 };
 
 const enHoustonBeautySalons: ClusterPage = {
+  tool: { text: 'What are no-show appointments costing you? Put a number on it in 30 seconds.', linkLabel: 'No-show calculator', href: '/en/tools#appointments' },
   meta: {
     title: 'Booking Websites for Beauty Salons in Houston | Marcyan',
     description: 'Web design with online booking for beauty salons in Houston: your clients book 24/7 and an AI answers WhatsApp. From $1,500. Free proposal.',
@@ -1299,6 +1306,7 @@ const enHoustonBeautySalons: ClusterPage = {
 };
 
 const enHoustonDentalClinics: ClusterPage = {
+  tool: { text: 'What do no-shows cost your practice every month? Put a number on it in 30 seconds.', linkLabel: 'No-show calculator', href: '/en/tools#appointments' },
   meta: {
     title: 'Websites for Dental Clinics in Houston | Marcyan',
     description:
@@ -1863,6 +1871,7 @@ const enMiamiWeb: ClusterPage = {
 };
 
 const enMiamiIa: ClusterPage = {
+  tool: { text: 'Your assistant answers what slips away today. See what that is worth per month.', linkLabel: 'Missed-calls calculator', href: '/en/tools#calls' },
   meta: {
     title: 'Conversational AI in Miami | An assistant that answers 24/7 | Marcyan',
     description:

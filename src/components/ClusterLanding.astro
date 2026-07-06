@@ -22,6 +22,7 @@ import CtaBand from './sections/CtaBand.astro';
 import RelatedLinks from './sections/RelatedLinks.astro';
 import Contact from './sections/Contact.astro';
 import SpaceBackdrop from './SpaceBackdrop.astro';
+import GrowthCta from './growthos/GrowthCta.astro';
 import ServiceLd from './seo/ServiceLd.astro';
 import { content } from '../i18n/content';
 import { clusterNav, clusterNavEn, type ClusterPage } from '../i18n/clusters';
@@ -106,6 +107,7 @@ const relatedTone: 'gold' | 'teal' =
 
     <Projects projects={cluster.proof} lang={lang} />
 
+    {cluster.tool && <GrowthCta {...cluster.tool} />}
     <Faq tag={cluster.faq.tag} title={cluster.faq.title} items={cluster.faq.items} />
 
     <CtaBand

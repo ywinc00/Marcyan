@@ -153,7 +153,7 @@ check('texto + enlazar precios → action link page=precios', () => {
   assert.deepEqual(r.action, { type: 'link', page: 'precios' });
 });
 check('enlazar cada página del allowlist', () => {
-  for (const p of ['precios', 'servicios', 'houston', 'miami', 'formulario', 'diagnostico']) {
+  for (const p of ['precios', 'servicios', 'houston', 'miami', 'formulario', 'diagnostico', 'herramientas', 'calculadora-llamadas', 'calculadora-citas']) {
     assert.deepEqual(parseToolResponse([TX('x'), TUL(p)], 'es').action, { type: 'link', page: p });
   }
 });

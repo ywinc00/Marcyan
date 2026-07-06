@@ -383,6 +383,9 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
 </Layout>
 
 <style>
+  /* El brief NO arranca con un hero full-bleed, así que reserva la altura de la nav
+     fija para que el título no quede tapado por la barra de navegación. */
+  .brief { padding-top: calc(var(--nav-h) + var(--space-7)); }
   .brief em { color: var(--accent-gold); font-style: normal; }
   .brief__inner { max-width: 920px; }
   .brief__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-8); }

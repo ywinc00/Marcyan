@@ -630,11 +630,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
      El JS expone --mrc-vvh (alto visible real), --mrc-vvtop (desplazamiento del
      viewport visual) y --mrc-kb (alto del teclado, VisualViewport) para que el
      panel ocupe el área visible y el input quede SIEMPRE por encima del teclado. */
-  @media (--lt-sm) {
+  @media (--lt-md) {
     .mrc-panel {
       position: fixed; left: 0; right: 0; bottom: auto;
       top: var(--mrc-vvtop, 0px);
-      width: auto; height: var(--mrc-vvh, 100dvh);
+      width: auto; height: var(--mrc-vvh, 100svh);
       border-radius: 0; border: none;
     }
     .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
@@ -806,6 +806,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let lastUserText = '';
     let busy = false;
     let opened = false;
+    let savedScrollY = 0;
+    // Bloqueo de scroll del body SOLO cuando el panel es pantalla completa (móvil).
+    const isMobileFull = () => { try { return window.matchMedia('(max-width: 767.98px)').matches; } catch (_) { return false; } };
     let started = false;   // ya pasó de bienvenida a conversación
     let captured = false;  // ya envió sus datos
 
@@ -1373,12 +1376,24 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // ── Abrir / cerrar panel ──
     function openPanel() {
       loadDeferredAssets();
+      // Congela el documento de fondo (iOS-safe: overflow:hidden NO basta en Safari)
+      // para que el teclado no arrastre la página por detrás del panel a pantalla completa.
+      if (isMobileFull()) {
+        savedScrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+      }
       panel.hidden = false;
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
       if (nudge) nudge.hidden = true;
       syncViewport();
+      // Re-sincroniza tras la animación del teclado/viewport (evita franjas de fondo).
+      requestAnimationFrame(() => requestAnimationFrame(syncViewport));
       requestAnimationFrame(() => {
         // En bienvenida NO enfocamos el input (en móvil abriría el teclado);
         // enfocamos la primera tarjeta de canal. En conversación, el input.
@@ -1396,6 +1411,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (input) input.blur();         // cierra el teclado
       root.style.setProperty('--mrc-kb', '0px');
       root.style.setProperty('--mrc-vvtop', '0px');
+      // Restaura el scroll del documento si lo habíamos congelado al abrir.
+      if (document.body.style.position === 'fixed') {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        window.scrollTo(0, savedScrollY);
+      }
       fab.focus();
     }
     function toggle() { (opened ? closePanel : openPanel)(); }

@@ -1,0 +1,94 @@
+---
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+import { GOS } from '../../i18n/growth-os';
+import Icon from '../ui/Icon.astro';
+const t = GOS[lang].teaser;
+const href = lang === 'en' ? '/en/checkup' : '/es/diagnostico';
+---
+<section class="gost" id="diagnostico" data-fx>
+  <div class="gost__inner">
+    <div class="gost__copy">
+      <p class="gost__kicker"><Icon name="lucide:scan-search" /> {t.kicker}</p>
+      <h2 class="gost__title" set:html={t.title} />
+      <p class="gost__sub">{t.sub}</p>
+      <div class="gost__actions">
+        <a class="gost__cta" href={href} data-track="growth_teaser_clicked">{t.cta}</a>
+        <span class="gost__meta">{t.meta}</span>
+      </div>
+    </div>
+
+    <a class="gost__demo" href={href} aria-label={t.cta} data-track="growth_teaser_clicked">
+      <div class="gost__demo-head">
+        <picture class="gost__marcy">
+          <source srcset="/assets/bot/marcy-mini.webp" type="image/webp" />
+          <img src="/assets/bot/marcy-mini.png" alt="" width="36" height="36" loading="lazy" />
+        </picture>
+        <span>{t.demoLabel}</span>
+        <b class="gost__demo-badge">{t.demoBadge}</b>
+      </div>
+      <div class="gost__demo-body">
+        <div class="gost__demo-ring" aria-hidden="true">
+          <svg viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="40" fill="none" stroke="var(--border)" stroke-width="7"/>
+            <circle cx="48" cy="48" r="40" fill="none" stroke="var(--accent-gold)" stroke-width="7"
+                    stroke-linecap="round" stroke-dasharray="251.3"
+                    stroke-dashoffset="95.5" transform="rotate(-90 48 48)"/>
+          </svg>
+          <strong>62</strong>
+        </div>
+        <div class="gost__demo-bars" aria-hidden="true">
+          <div><span>{t.demoCats[0]}</span><i style="--w:64%"></i></div>
+          <div><span>{t.demoCats[1]}</span><i style="--w:41%"></i></div>
+          <div><span>{t.demoCats[2]}</span><i style="--w:28%" class="is-teal"></i></div>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<style>
+  .gost { padding: var(--section-gap) 0; }
+  .gost__inner { width: min(var(--container-max), 100% - var(--container-pad) * 2); margin-inline: auto;
+                 display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); align-items: center; }
+  .gost__kicker { display: inline-flex; align-items: center; gap: var(--space-2);
+                  font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+                  letter-spacing: var(--tracking-wider); color: var(--accent-gold); margin: 0 0 var(--space-4); }
+  .gost__kicker svg { width: 14px; height: 14px; }
+  .gost__title { font-family: var(--font-display); font-size: var(--fluid-h2); line-height: var(--leading-tight);
+                 letter-spacing: var(--tracking-tight); color: var(--fg-primary); margin: 0 0 var(--space-4); }
+  .gost__title :global(em) { color: var(--accent-gold); font-style: normal; }
+  .gost__sub { color: var(--fg-secondary); line-height: var(--leading-normal); max-width: 46ch; margin: 0 0 var(--space-5); }
+  .gost__actions { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .gost__cta { display: inline-flex; align-items: center; min-height: var(--tap-min); padding: 0 var(--space-5);
+               border-radius: var(--radius-md); background: var(--accent-gold); color: var(--fg-inverse);
+               font-weight: 600; text-decoration: none; transition: transform var(--duration-base) var(--ease),
+               box-shadow var(--duration-base) var(--ease); }
+  .gost__cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+  .gost__meta { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); }
+  .gost__demo { display: block; border: 1px solid var(--border); border-radius: var(--radius-xl);
+                background: var(--bg-card); box-shadow: var(--shadow-card); text-decoration: none;
+                padding: var(--space-5); transition: border-color var(--duration-base) var(--ease),
+                box-shadow var(--duration-base) var(--ease); }
+  .gost__demo:hover { border-color: var(--border-accent); box-shadow: var(--shadow-hover); }
+  .gost__demo-head { display: flex; align-items: center; gap: var(--space-3);
+                     padding-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); }
+  .gost__marcy img { border-radius: 50%; display: block; }
+  .gost__demo-head span { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .gost__demo-badge { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-xs);
+                      color: var(--accent-teal); border: 1px solid var(--accent-teal-line);
+                      border-radius: var(--radius-pill); padding: 2px 10px; font-weight: 500; }
+  .gost__demo-body { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-5);
+                     align-items: center; padding-top: var(--space-5); }
+  .gost__demo-ring { position: relative; width: 96px; }
+  .gost__demo-ring strong { position: absolute; inset: 0; display: grid; place-items: center;
+                            font-family: var(--font-mono); font-size: var(--text-lg); color: var(--fg-primary); }
+  .gost__demo-bars { display: grid; gap: var(--space-3); }
+  .gost__demo-bars > div { display: grid; gap: 4px; }
+  .gost__demo-bars span { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+                          letter-spacing: var(--tracking-wide); color: var(--fg-subtle); }
+  .gost__demo-bars i { display: block; height: 5px; width: var(--w); border-radius: var(--radius-pill);
+                       background: var(--accent-gold); }
+  .gost__demo-bars i.is-teal { background: var(--accent-teal); }
+  @media (max-width: 1023px) { .gost__inner { grid-template-columns: 1fr; gap: var(--space-6); } }
+</style>

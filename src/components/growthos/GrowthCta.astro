@@ -1,0 +1,25 @@
+---
+// Línea CTA utilitaria hacia el diagnóstico (Growth OS §8). NO es una banda de
+// conversión (esa sigue siendo CtaBand): es una línea de texto + link oro, modelada
+// sobre .hero__dock-link. Se inserta en hubs (precios/portafolio/servicios).
+interface Props { text: string; linkLabel: string; href: string }
+const { text, linkLabel, href } = Astro.props;
+---
+<div class="gcta">
+  <div class="container gcta__inner">
+    <p class="gcta__text">{text}</p>
+    <a class="gcta__link" href={href} data-track="tool_cta_clicked">{linkLabel} →</a>
+  </div>
+</div>
+
+<style>
+  .gcta { padding-block: var(--space-6); }
+  .gcta__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+                 gap: var(--space-2) var(--space-4); text-align: center; }
+  .gcta__text { margin: 0; color: var(--fg-secondary); font-size: var(--text-sm); }
+  .gcta__link { display: inline-flex; align-items: center; min-height: var(--tap-min);
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--accent-gold); text-decoration: none; transition: color var(--duration-base) var(--ease); }
+  .gcta__link:hover { color: var(--accent-gold-deep); text-decoration: underline; text-underline-offset: 3px; }
+  .gcta__link:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; border-radius: var(--radius-sm); }
+</style>

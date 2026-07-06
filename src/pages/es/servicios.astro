@@ -9,6 +9,7 @@ import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
 import PriceGrid from '../../components/sections/PriceGrid.astro';
 import RelatedLinks from '../../components/sections/RelatedLinks.astro';
@@ -57,6 +58,12 @@ const c = content.es;
     <AnswerBlock q={s.answer.q} a={s.answer.a} />
 
     <PriceGrid tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
+
+    <GrowthCta
+      text="¿Dudas entre web, SEO o IA?"
+      linkLabel="El diagnóstico gratis te da la prioridad en 2 minutos"
+      href="/es/diagnostico"
+    />
 
     <RelatedLinks tag={s.related.tag} title={s.related.title} links={s.related.links} />
 

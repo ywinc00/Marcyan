@@ -96,6 +96,7 @@ const STR = {
     pgHouston: 'Marcyan en Houston',
     pgMiami: 'Marcyan en Miami',
     pgFormulario: 'Abrir el formulario completo',
+    pgDiagnostico: 'Hacer el diagnóstico gratis',
   },
   en: {
     open: 'Open the help chat',
@@ -157,6 +158,7 @@ const STR = {
     pgHouston: 'Marcyan in Houston',
     pgMiami: 'Marcyan in Miami',
     pgFormulario: 'Open the full form',
+    pgDiagnostico: 'Take the free checkup',
   },
 };
 
@@ -196,6 +198,7 @@ const pages = {
   houston:    { href: lang === 'en' ? '/en/houston'  : '/es/houston',   label: t.pgHouston },
   miami:      { href: lang === 'en' ? '/en/miami'    : '/es/miami',     label: t.pgMiami },
   formulario: { href: '/formulario', label: t.pgFormulario },
+  diagnostico: { href: lang === 'en' ? '/en/checkup' : '/es/diagnostico', label: t.pgDiagnostico },
 };
 const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston, channels, pages };
 ---

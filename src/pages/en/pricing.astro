@@ -10,6 +10,7 @@ import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
 import Prose from '../../components/sections/Prose.astro';
 import PriceGrid from '../../components/sections/PriceGrid.astro';
@@ -77,6 +78,12 @@ const c = content.en;
       title={p.transparency.title}
       paragraphs={p.transparency.paragraphs}
       tone={p.transparency.tone}
+    />
+
+    <GrowthCta
+      text="Not sure which package you need?"
+      linkLabel="Take the free checkup and we'll tell you where to start"
+      href="/en/checkup"
     />
 
     <PriceGrid lang="en" tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={priceServices} />

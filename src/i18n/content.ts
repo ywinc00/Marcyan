@@ -213,6 +213,7 @@ export const content = {
           { label: 'IA para Negocios', href: '/es/ia-para-pymes' },
           { label: 'SEO Local', href: '/es/houston/seo-local' },
           { label: 'Branding', href: '/es/houston/branding' },
+          { label: 'Diagnóstico digital', href: '/es/diagnostico' },
           { label: 'Formulario de Proyecto', href: '/formulario' },
         ] },
         { title: 'Empresa', links: [
@@ -411,6 +412,7 @@ export const content = {
           { label: 'Conversational AI', href: '#ia' },
           { label: 'Local SEO', href: '#servicios' },
           { label: 'Branding', href: '#servicios' },
+          { label: 'Digital checkup', href: '/en/checkup' },
           { label: 'Project Form', href: '/formulario' },
         ] },
         { title: 'Company', links: [

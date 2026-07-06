@@ -1,0 +1,47 @@
+---
+// HERRAMIENTAS GRATIS · /es/herramientas (espejo EN: /en/tools).
+// Hub con 2 calculadoras client-side (llamadas perdidas / citas perdidas) + card
+// al diagnóstico. Header compacto + BreadcrumbList. Par en ROUTE_PAIRS (hreflang auto).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import LandingHero from '../../components/sections/LandingHero.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import ToolsHub from '../../components/growthos/ToolsHub.astro';
+import { content } from '../../i18n/content';
+import { clusterNav } from '../../i18n/clusters';
+import { GOS } from '../../i18n/growth-os';
+import { GROWTH_OS } from '../../flags';
+
+if (!GROWTH_OS) return Astro.redirect('/es/');
+
+const c = content.es;
+const tt = GOS.es.tools;
+const breadcrumb = [
+  { name: 'Inicio', path: '/es' },
+  { name: 'Herramientas', path: '/es/herramientas' },
+];
+---
+<Layout title={tt.metaTitle} description={tt.metaDesc} lang="es" path="herramientas">
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LandingHero
+      variant="header"
+      tone="gold"
+      kicker="Herramientas"
+      h1={tt.h1}
+      sub={tt.sub}
+      primary={{ label: tt.calcCta, href: '#' }}
+    >
+      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="es" />
+    </LandingHero>
+
+    <ToolsHub lang="es" />
+
+    <SpaceBackdrop tone="gold" />
+  </main>
+
+  <SiteFooter footer={c.footer} />
+</Layout>

@@ -9,6 +9,7 @@ import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
 import PriceGrid from '../../components/sections/PriceGrid.astro';
 import RelatedLinks from '../../components/sections/RelatedLinks.astro';
@@ -56,6 +57,12 @@ const c = content.en;
     <AnswerBlock lang="en" q={s.answer.q} a={s.answer.a} />
 
     <PriceGrid lang="en" tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
+
+    <GrowthCta
+      text="Torn between web, SEO, or AI?"
+      linkLabel="The free checkup gives you your priority in 2 minutes"
+      href="/en/checkup"
+    />
 
     <RelatedLinks tag={s.related.tag} title={s.related.title} links={s.related.links} />
 

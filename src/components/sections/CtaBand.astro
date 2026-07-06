@@ -51,11 +51,11 @@ const formHref = primary.href || '#contacto';
           <Icon name="lucide:arrow-right" />
           <span>{primary.label}</span>
         </a>
-        <a class="ctaband__act ctaband__act--wa" href={waHref}>
+        <a class="ctaband__act ctaband__act--wa" href={waHref} data-track="whatsapp_clicked">
           <Icon name="lucide:message-circle" />
           <span>WhatsApp</span>
         </a>
-        <a class="ctaband__act ctaband__act--call" href={telHref}>
+        <a class="ctaband__act ctaband__act--call" href={telHref} data-track="call_clicked">
           <Icon name="lucide:phone" />
           <span>{uic.cta.call}</span>
         </a>

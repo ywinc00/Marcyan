@@ -11,6 +11,7 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import LandingHero from '../../components/sections/LandingHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
+import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import Prose from '../../components/sections/Prose.astro';
 import PriceGrid from '../../components/sections/PriceGrid.astro';
 import RelatedLinks from '../../components/sections/RelatedLinks.astro';
@@ -78,6 +79,12 @@ const c = content.es;
       title={p.transparency.title}
       paragraphs={p.transparency.paragraphs}
       tone={p.transparency.tone}
+    />
+
+    <GrowthCta
+      text="¿No sabes qué paquete necesitas?"
+      linkLabel="Haz el diagnóstico gratis y te decimos por dónde empezar"
+      href="/es/diagnostico"
     />
 
     <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={priceServices} />

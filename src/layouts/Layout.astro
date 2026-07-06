@@ -159,5 +159,17 @@ const jsonLd = {
     <a href="#main" class="skip-link">{lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}</a>
     <slot />
     <ChatWidget lang={lang} />
+
+    <script>
+      // Tracking first-party delegado: cualquier elemento con [data-track] dispara
+      // un evento (Growth OS). Passive, sin cookies ni PII (ver src/lib/track.js).
+      // Instrumenta CtaBand (whatsapp/call), el teaser y las CTAs de herramientas
+      // sin que cada página tenga que importar track.
+      import { track } from '../lib/track.js';
+      document.addEventListener('click', (e) => {
+        const el = e.target && e.target.closest && e.target.closest('[data-track]');
+        if (el && el.dataset.track) track(el.dataset.track);
+      }, true);
+    </script>
   </body>
 </html>

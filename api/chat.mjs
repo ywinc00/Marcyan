@@ -70,7 +70,7 @@ const SESSION_HITS = new Map(); // sid → { count }
 // resulte bloqueada por SSRF (limita el sondeo de IPs internas en una sesión).
 const SITE_SESSION = new Map(); // sid → ts (ya revisó)
 const SITE_IP = new Map();      // ip  → [ts]
-function siteReviewAllowed(sid, ip) {
+export function siteReviewAllowed(sid, ip) {
   const now = Date.now();
   if (sid && SITE_SESSION.has(sid)) return false;      // 1 por sesión
   if (ip) {
@@ -286,17 +286,20 @@ const FAIL_RESULT = { content: JSON.stringify({ ok: false }), extraAllow: [] };
 
 // calcular_perdida — puro y testeable. Los números van a las fórmulas de la fuente
 // única (clamp interno defensivo). NUNCA pasan por sanitizeField (borraría dígitos).
+// Gate: si falta modo, o los 2 números ESENCIALES del modo (volumen + valor) no son
+// positivos y finitos, NO computa (ok:false) — evita citar "$0" o computar basura.
+const isPos = (v) => Number.isFinite(Number(v)) && Number(v) > 0;
 export function computeLossToolResult(input) {
-  const modo = input && input.modo;
-  if (modo === 'llamadas') {
-    const { monthly, yearly } = computeMissedCalls(input);
+  const inp = input || {};
+  if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
+    const { monthly, yearly } = computeMissedCalls(inp);
     return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [String(monthly), String(yearly)] };
   }
-  if (modo === 'citas') {
-    const { monthly, yearly } = computeNoShows(input);
+  if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
+    const { monthly, yearly } = computeNoShows(inp);
     return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [String(monthly), String(yearly)] };
   }
-  return FAIL_RESULT; // modo ausente/ inválido → no computa
+  return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
 
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo

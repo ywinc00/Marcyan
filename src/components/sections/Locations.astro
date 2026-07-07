@@ -1,9 +1,9 @@
 ---
 // Sección Ubicaciones — "Ficha de ciudad" (Houston / Miami). Service-Area Business,
-// sin dirección pública. Cada tarjeta: identidad local (tagline + marca de agua),
-// datos (estado en pill mono), teléfono y sub-navegación de servicios.
-// La ilustración de fondo es la SILUETA DEL ESTADO (TX/FL), SVG vectorial geo-correcto
-// (aria-hidden), en oro a baja opacidad. Nítida en retina, sin PNG raster ni blend.
+// sin dirección pública. Cada tarjeta: identidad local (tagline + ilustración line-art),
+// datos (estado + coordenadas en pills mono), teléfono y sub-navegación de servicios.
+// Las ilustraciones (skyline / palmera) y las siluetas de estado son SVG propios,
+// decorativos (aria-hidden), en oro a baja opacidad. Recreación de la guía aprobada.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
@@ -27,9 +27,9 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
     <div class="locations__grid">
       {locations.items.map((c: any) => (
         <article class="loc">
-          {STATE_SHAPE[c.state] && (
+          {c.illo && (
             <div class="loc__illo" aria-hidden="true">
-              <svg viewBox={STATE_SHAPE[c.state].viewBox} preserveAspectRatio="xMidYMid meet"><path d={STATE_SHAPE[c.state].path} /></svg>
+              <img src={`/assets/cities/${c.illo}.svg`} alt="" loading="lazy" decoding="async" />
             </div>
           )}
 
@@ -98,16 +98,18 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   }
   .loc:hover { border-color: var(--border-accent); }
 
-  /* Ilustración de fondo = silueta del estado (TX/FL), VECTOR real geo-correcto,
-     en oro a baja opacidad como marca de agua. Nítida en retina, sin PNG raster ni
-     mix-blend-mode frágil; se recorta con el overflow:hidden de la tarjeta. */
+  /* Ilustración line-art EXACTA (asset oficial) — decorativa, esquina superior derecha.
+     El PNG ya viene en oro a baja opacidad; solo se posiciona y se difumina al borde izq. */
   .loc__illo {
-    position: absolute; top: var(--space-6); right: var(--space-5);
-    width: clamp(120px, 34%, 176px); pointer-events: none; z-index: 0;
-    opacity: 0.08;
+    position: absolute; top: 84px; right: var(--space-5);
+    width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
+    -webkit-mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+    mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
   }
-  .loc__illo svg { width: 100%; height: auto; display: block; }
-  .loc__illo path { fill: var(--accent-gold); }
+  /* mix-blend-mode: lighten → el lavado oscuro semitransparente del PNG colapsa al
+     color exacto de la tarjeta (max(card, wash)=card), borrando el rectángulo; las
+     líneas oro (más claras) siguen visibles. */
+  .loc__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
 
   .loc__body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 
@@ -183,10 +185,15 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
   @media (--sm) {
     .loc__links { grid-template-columns: repeat(2, 1fr); }
   }
-  /* Móvil: la marca de agua del estado se mantiene arriba-derecha, algo menor y más
-     tenue, detrás del área libre junto al título (no estorba a los enlaces). */
+  /* Móvil: la tarjeta es de una columna y el texto ocupa todo el ancho, así que la
+     ilustración se baja a la altura del divisor (sobre los enlaces) para no quedar
+     detrás del título/datos. */
   @media (max-width: 767px) {
-    .loc__illo { top: var(--space-5); right: var(--space-4); width: clamp(96px, 28%, 132px); opacity: 0.07; }
+    /* Anclada por ABAJO: el borde inferior del SVG coincide con la base del pill de
+       estado (~264px del top de la card), sin extenderse a los enlaces. El bottom se
+       fija con calc(100% - 264px) para que funcione con cualquier alto de ilustración
+       (Houston y Miami tienen proporciones distintas). */
+    .loc__illo { top: auto; bottom: calc(100% - 290px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
   }
   @media (--lg) {
     .locations__grid { grid-template-columns: repeat(2, 1fr); }

@@ -6,7 +6,7 @@
 // Rediseño DS v2 "Space-Tech" (DESIGN.md §2/§5): HUB de sección → header COMPACTO
 // (LandingHero variant="header"), NO el hero alto de portada. La energía visual va
 // al CONTENIDO: un showcase de "ficha de ciudad" VIVO que reusa el lenguaje de
-// Locations.astro (silueta de estado geo-correcta en vector, coords en pills
+// Locations.astro (skyline line-art, silueta de estado geo-correcta, coords en pills
 // mono, tagline, área, tel y conmutador de servicios). Como Locations.astro es un
 // componente compartido (lo usa la home y trae su propio data-fx/id) NO se importa:
 // se monta una sección bespoke inline con su MISMO craft, alimentada por el mismo
@@ -131,9 +131,9 @@ const itemList = [
             const shape = STATE_SHAPE[city.state];
             return (
               <article class="citycard">
-                {shape && (
+                {city.illo && (
                   <div class="citycard__illo" aria-hidden="true">
-                    <svg viewBox={shape.viewBox} preserveAspectRatio="xMidYMid meet"><path d={shape.path} /></svg>
+                    <img src={`/assets/cities/${city.illo}.svg`} alt="" loading="lazy" decoding="async" />
                   </div>
                 )}
 
@@ -249,16 +249,15 @@ const itemList = [
   }
   .citycard:hover { border-color: var(--border-accent); }
 
-  /* Ilustración de fondo = silueta del estado (TX/FL), VECTOR real geo-correcto,
-     en oro a baja opacidad como marca de agua. Nítida en retina, sin PNG raster ni
-     mix-blend-mode frágil; se recorta con el overflow:hidden de la tarjeta. */
+  /* skyline line-art (asset oficial oro) — esquina superior derecha, difuminado al
+     borde izquierdo. mix-blend lighten colapsa el lavado del PNG al color de la card. */
   .citycard__illo {
     position: absolute; top: 84px; right: var(--space-5);
     width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
-    opacity: 0.08;
+    -webkit-mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+    mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
   }
-  .citycard__illo svg { width: 100%; height: auto; display: block; }
-  .citycard__illo path { fill: var(--accent-gold); }
+  .citycard__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
 
   .citycard__body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 
@@ -362,9 +361,9 @@ const itemList = [
   }
   .citycard__conn-dots { letter-spacing: 0.2em; opacity: 0.7; }
 
-  /* móvil: la marca de agua del estado se mantiene arriba-derecha, algo menor y más tenue */
+  /* móvil: el skyline se baja al divisor (sobre los enlaces) para no tapar el título */
   @media (--lt-md) {
-    .citycard__illo { top: var(--space-5); right: var(--space-4); width: clamp(96px, 28%, 132px); opacity: 0.07; }
+    .citycard__illo { top: auto; bottom: calc(100% - 296px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
   }
 
   @media (--sm) {

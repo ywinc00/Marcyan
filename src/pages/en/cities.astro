@@ -6,7 +6,7 @@
 // DS v2 "Space-Tech" redesign (DESIGN.md §2/§5): section HUB -> COMPACT header
 // (LandingHero variant="header"), NOT the tall cover hero. The visual energy goes
 // to the CONTENT: a LIVE "city card" showcase that reuses the language of
-// Locations.astro (geo-correct state silhouette in vector, coords in mono
+// Locations.astro (skyline line-art, geo-correct state silhouette, coords in mono
 // pills, tagline, area, tel and a service switcher). Since Locations.astro is a
 // shared component (used by the home, bringing its own data-fx/id) it is NOT
 // imported: a bespoke inline section is mounted with its SAME craft, fed by the same
@@ -152,9 +152,9 @@ const itemList = [
             const shape = STATE_SHAPE[city.state];
             return (
               <article class="citycard">
-                {shape && (
+                {city.illo && (
                   <div class="citycard__illo" aria-hidden="true">
-                    <svg viewBox={shape.viewBox} preserveAspectRatio="xMidYMid meet"><path d={shape.path} /></svg>
+                    <img src={`/assets/cities/${city.illo}.svg`} alt="" loading="lazy" decoding="async" />
                   </div>
                 )}
 
@@ -270,16 +270,15 @@ const itemList = [
   }
   .citycard:hover { border-color: var(--border-accent); }
 
-  /* Background illustration = state silhouette (TX/FL), real geo-correct VECTOR,
-     gold at low opacity as a watermark. Crisp on retina, no PNG raster nor fragile
-     mix-blend-mode; clipped by the card's overflow:hidden. */
+  /* skyline line-art (official gold asset) — top-right corner, faded to the left
+     edge. mix-blend lighten collapses the PNG wash to the card color. */
   .citycard__illo {
     position: absolute; top: 84px; right: var(--space-5);
     width: clamp(158px, 42%, 224px); pointer-events: none; z-index: 0;
-    opacity: 0.08;
+    -webkit-mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
+    mask-image: linear-gradient(250deg, #000 56%, transparent 100%);
   }
-  .citycard__illo svg { width: 100%; height: auto; display: block; }
-  .citycard__illo path { fill: var(--accent-gold); }
+  .citycard__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
 
   .citycard__body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 
@@ -383,9 +382,9 @@ const itemList = [
   }
   .citycard__conn-dots { letter-spacing: 0.2em; opacity: 0.7; }
 
-  /* mobile: the state watermark stays top-right, a bit smaller and fainter */
+  /* mobile: the skyline drops to the divider (over the links) so it doesn't cover the title */
   @media (--lt-md) {
-    .citycard__illo { top: var(--space-5); right: var(--space-4); width: clamp(96px, 28%, 132px); opacity: 0.07; }
+    .citycard__illo { top: auto; bottom: calc(100% - 296px); right: var(--space-1); width: clamp(150px, 46%, 200px); }
   }
 
   @media (--sm) {

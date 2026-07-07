@@ -287,17 +287,34 @@ const FAIL_RESULT = { content: JSON.stringify({ ok: false }), extraAllow: [] };
 // calcular_perdida — puro y testeable. Los números van a las fórmulas de la fuente
 // única (clamp interno defensivo). NUNCA pasan por sanitizeField (borraría dígitos).
 // Gate: si falta modo, o los 2 números ESENCIALES del modo (volumen + valor) no son
-// positivos y finitos, NO computa (ok:false) — evita citar "$0" o computar basura.
+// positivos y finitos, o la pérdida sale nula, NO computa (ok:false) — evita citar "$0".
 const isPos = (v) => Number.isFinite(Number(v)) && Number(v) > 0;
+
+// Variantes de una cifra computada para el allowlist DINÁMICO del filtro de precios. El
+// prompt le pide a Marcy CITAR REDONDEADO ("≈$X", "unos $X", "Cita el resultado redondeado"),
+// así que además del entero exacto admitimos su redondeo a la centena y al millar (piso y
+// techo). Sin esto, una pérdida ANUAL redondeada > $25k (p.ej. "casi $27,000") caería fuera
+// de la banda [10,25000] y el filtro nukearía la respuesta entera (rompía QA #7). Filtra
+// < PRICE_MIN (10) para NO desbloquear cifras de "regalo" $0-9. Todas quedan en la vecindad
+// del valor real computado con los números del cliente → no abren la puerta a cifras ajenas.
+function priceAllowVariants(v) {
+  const s = new Set([Math.round(v)]);
+  if (v >= 100) s.add(Math.round(v / 100) * 100);
+  if (v >= 1000) { s.add(Math.floor(v / 1000) * 1000); s.add(Math.ceil(v / 1000) * 1000); }
+  return [...s].filter((n) => n >= 10).map(String); // >= PRICE_MIN del filtro (chat-kb.mjs)
+}
+
 export function computeLossToolResult(input) {
   const inp = input || {};
   if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
     const { monthly, yearly } = computeMissedCalls(inp);
-    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [String(monthly), String(yearly)] };
+    if (monthly < 1) return FAIL_RESULT; // pérdida nula → no computa (no cites $0)
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
   }
   if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
     const { monthly, yearly } = computeNoShows(inp);
-    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [String(monthly), String(yearly)] };
+    if (monthly < 1) return FAIL_RESULT;
+    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
   }
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
@@ -418,12 +435,13 @@ export default async function handler(req, res) {
       const out = await runInternalTool(internal, { lang, ip, sid });
       extraAllow = out.extraAllow || [];
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
-      // ejecutado lleva resultado real; cualquier otra tool del mismo turno (raro, contra
-      // el prompt) lleva un stub ok:false — no se ejecuta (cap 1 iteración).
+      // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
+      // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
+      // otra interna NO se ejecuta (cap 1 iteración) → ok:false.
       const toolResults = toolUses.map((b) => ({
         type: 'tool_result',
         tool_use_id: b.id,
-        content: b.id === internal.id ? out.content : JSON.stringify({ ok: false }),
+        content: b.id === internal.id ? out.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }),
       }));
       // 2ª llamada (≤14s): mismo prefijo system+tools; el modelo redacta con el resultado.
       finalResp = await withTimeout(
@@ -442,7 +460,16 @@ export default async function handler(req, res) {
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
-    const { text, action } = parseToolResponse(finalResp.content, lang);
+    const parsed = parseToolResponse(finalResp.content, lang);
+    let text = parsed.text;
+    let action = parsed.action;
+    // RESCATE: si el turno 1 mezcló una tool interna con una de UI y el modelo NO re-emitió
+    // la de UI en la 2ª respuesta, recupera la acción de UI de r1 (si no, se perdería la
+    // tarjeta/cajita — perder la CAPTURA sería el "error grave" que advierte el prompt).
+    if (internal && !action) {
+      const fromR1 = parseToolResponse(r1.content, lang).action;
+      if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
+    }
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
     return res.status(200).json(action ? { reply, action } : { reply });

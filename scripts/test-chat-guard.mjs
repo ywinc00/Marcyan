@@ -412,6 +412,27 @@ check('dinámico: extraAllow vacío → comportamiento idéntico (deriva $45,000
 check('dinámico: extraAllow no-array → tratado como vacío (defensivo)', () => {
   assert.equal(pricePostFilter('Un sitio desde $1,500.', 'es', null).includes('$1,500'), true);
 });
+// v7.3b — la cita REDONDEADA de una pérdida > $25k sobrevive (fix F3: extraAllow computado
+// incluye variantes redondeadas; el prompt le pide a Marcy citar "≈$X" / "unos $X").
+check('dinámico F3: pérdida ANUAL redondeada > $25k con extraAllow COMPUTADO → pasa (QA #7)', () => {
+  const el = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 100, pct_sin_contestar: 50, ticket: 500, tasa_cierre: 40 }).extraAllow;
+  assert.ok(pricePostFilter('Con tus números, casi $43,000 al mes.', 'es', el).includes('$43,000'));   // redondeo a millar
+  assert.ok(pricePostFilter('Al año, unos $520,000.', 'es', el).includes('520,000'));                  // redondeo a millar
+  assert.ok(pricePostFilter('Son $43,300 al mes exactos.', 'es', el).includes('43,300'));              // exacto
+});
+check('dinámico F3: extraAllow computado NO deja pasar una cifra AJENA grande', () => {
+  const el = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 100, pct_sin_contestar: 50, ticket: 500, tasa_cierre: 40 }).extraAllow;
+  assert.ok(!pricePostFilter('Eso cuesta $99,000.', 'es', el).includes('99,000'));
+});
+// v7.1b — el gate no cita $0 y extraAllow nunca relaja el piso $0-9 (fix F4).
+check('calc F4: pérdida nula (0) → ok:false (no cita $0)', () => {
+  assert.equal(jr(computeLossToolResult({ modo: 'llamadas', llamadas_semana: 1, pct_sin_contestar: 1, ticket: 10, tasa_cierre: 30 })).ok, false);
+});
+check('calc F4: extraAllow nunca incluye cifras < PRICE_MIN (10); un "$5" de regalo sigue derivando', () => {
+  const el = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 5, pct_sin_contestar: 20, ticket: 10, tasa_cierre: 30 }).extraAllow;
+  for (const s of el) assert.ok(Number(s) >= 10);
+  assert.ok(!pricePostFilter('Te hago el logo por $5.', 'es', el).includes('$5'));
+});
 
 // ── v7.5: LÍMITES de revisar_sitio (1/sesión + 5/10min por IP), sin fetch ──
 check('límite: 1ª revisión de la sesión permitida, 2ª NO (misma sid)', () => {

@@ -20,10 +20,17 @@
 //     de Anthropic. El rate-limit en memoria es solo la primera línea.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL } from '../lib/chat-kb.mjs';
+import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
+// SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
+// ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
+// la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
+import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
+import { analyzeSite, recommendService } from '../lib/diagnostic-checks.mjs';
 
-// Da hasta 30s a la función (Haiku responde en 1-3s; headroom para reintentos).
-export const config = { maxDuration: 30 };
+// maxDuration 60: un turno con herramienta interna hace 2 llamadas al modelo con
+// una revisión de sitio en medio (llamada1 ≤10s · fetch ≤6s · llamada2 ≤14s).
+export const config = { maxDuration: 60 };
 
 // Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
 // Exportados para que el guard test bloquee el id y la allowlist (control de costo).
@@ -58,6 +65,23 @@ function clientIp(req) {
 const IP_HITS = new Map();      // ip  → { count, resetAt }
 const SESSION_HITS = new Map(); // sid → { count }
 
+// ── Límites de revisar_sitio (tool interna con efecto de red) ──────
+// 1 revisión por SESIÓN + 5 / 10min por IP. Se CONSUME el cupo aunque la URL
+// resulte bloqueada por SSRF (limita el sondeo de IPs internas en una sesión).
+const SITE_SESSION = new Map(); // sid → ts (ya revisó)
+const SITE_IP = new Map();      // ip  → [ts]
+export function siteReviewAllowed(sid, ip) {
+  const now = Date.now();
+  if (sid && SITE_SESSION.has(sid)) return false;      // 1 por sesión
+  if (ip) {
+    const arr = (SITE_IP.get(ip) || []).filter((t) => now - t < 600_000); // 10 min
+    if (arr.length >= 5) { SITE_IP.set(ip, arr); return false; }
+    arr.push(now); SITE_IP.set(ip, arr);
+  }
+  if (sid) SITE_SESSION.set(sid, now);
+  return true;
+}
+
 function rateLimit(ip, sid) {
   const now = Date.now();
   // Por IP: ventana deslizante simple.
@@ -90,6 +114,8 @@ function sweep() {
     for (const [k, v] of IP_HITS) if (v.resetAt < now) IP_HITS.delete(k);
   }
   if (SESSION_HITS.size > 5000) SESSION_HITS.clear();
+  if (SITE_SESSION.size > 5000) SITE_SESSION.clear();
+  if (SITE_IP.size > 5000) { for (const [k, v] of SITE_IP) if (!v.some((t) => now - t < 600_000)) SITE_IP.delete(k); }
 }
 
 // ── Origin allowlist (fail-closed) ────────────────────────────────
@@ -252,6 +278,86 @@ const withTimeout = (p, ms, label) =>
     new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timeout (${ms}ms)`)), ms)),
   ]);
 
+// ── Herramientas INTERNAS (tool_result computado por el SERVIDOR) ──────────
+// tool_result estándar: siempre string. FAIL = degradación silenciosa (no revela
+// el motivo del bloqueo). `extraAllow` son las cifras que el servidor computó en
+// ESTE request, normalizadas (solo dígitos) para el allowlist dinámico del filtro.
+const FAIL_RESULT = { content: JSON.stringify({ ok: false }), extraAllow: [] };
+
+// calcular_perdida — puro y testeable. Los números van a las fórmulas de la fuente
+// única (clamp interno defensivo). NUNCA pasan por sanitizeField (borraría dígitos).
+// Gate: si falta modo, o los 2 números ESENCIALES del modo (volumen + valor) no son
+// positivos y finitos, o la pérdida sale nula, NO computa (ok:false) — evita citar "$0".
+const isPos = (v) => Number.isFinite(Number(v)) && Number(v) > 0;
+
+// Variantes de una cifra computada para el allowlist DINÁMICO del filtro de precios. El
+// prompt le pide a Marcy CITAR REDONDEADO ("≈$X", "unos $X", "Cita el resultado redondeado"),
+// así que además del entero exacto admitimos su redondeo a la centena y al millar (piso y
+// techo). Sin esto, una pérdida ANUAL redondeada > $25k (p.ej. "casi $27,000") caería fuera
+// de la banda [10,25000] y el filtro nukearía la respuesta entera (rompía QA #7). Filtra
+// < PRICE_MIN (10) para NO desbloquear cifras de "regalo" $0-9. Todas quedan en la vecindad
+// del valor real computado con los números del cliente → no abren la puerta a cifras ajenas.
+function priceAllowVariants(v) {
+  const s = new Set([Math.round(v)]);
+  if (v >= 100) s.add(Math.round(v / 100) * 100);
+  if (v >= 1000) { s.add(Math.floor(v / 1000) * 1000); s.add(Math.ceil(v / 1000) * 1000); }
+  return [...s].filter((n) => n >= 10).map(String); // >= PRICE_MIN del filtro (chat-kb.mjs)
+}
+
+export function computeLossToolResult(input) {
+  const inp = input || {};
+  if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
+    const { monthly, yearly } = computeMissedCalls(inp);
+    if (monthly < 1) return FAIL_RESULT; // pérdida nula → no computa (no cites $0)
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+  }
+  if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
+    const { monthly, yearly } = computeNoShows(inp);
+    if (monthly < 1) return FAIL_RESULT;
+    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+  }
+  return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
+}
+
+// revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
+// (lib/diagnostic-checks.mjs). REGLA DE ORO: JAMÁS title/meta/texto del sitio ajeno.
+// Puro y testeable (recibe el output ya calculado de analyzeSite).
+export function buildSiteToolResult({ scores, findings }, lang = 'es') {
+  const en = lang === 'en';
+  const rec = recommendService({ scores });
+  return JSON.stringify({
+    ok: true,
+    scores: { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep },
+    hallazgos: (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es })),
+    recomendado: en ? rec.service_en : rec.service_es,
+  });
+}
+
+// Descarga + analiza el sitio (SSRF-safe). El network se acota con withTimeout.
+async function reviewSite(url, lang) {
+  const g = await ssrfGuard(url);
+  if (!g.ok) return FAIL_RESULT; // bloqueada (IP privada/host interno/esquema) → sin revelar motivo
+  const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
+  const hasSite = !!(site && site.ok && site.html && site.html.length > 0);
+  if (!hasSite) return FAIL_RESULT;
+  const { scores, findings } = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
+  return { content: buildSiteToolResult({ scores, findings }, lang), extraAllow: [] };
+}
+
+// Ejecuta la tool interna pedida y devuelve { content, extraAllow }. Solo UNA por
+// request (cap 1 iteración): la llama el handler con el primer tool_use interno.
+async function runInternalTool(toolUse, { lang, ip, sid }) {
+  if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
+  if (toolUse.name === SITE_TOOL.name) {
+    if (!siteReviewAllowed(sid, ip)) return FAIL_RESULT;            // límites primero
+    const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
+    if (!url) return FAIL_RESULT;
+    try { return await withTimeout(reviewSite(url, lang), 7000, 'site review'); }
+    catch { return FAIL_RESULT; }                                   // timeout/error → silencioso
+  }
+  return FAIL_RESULT;
+}
+
 export default async function handler(req, res) {
   const lang = pickLang(typeof req.body === 'object' ? req.body : {});
   const M = MESSAGES[lang];
@@ -297,33 +403,75 @@ export default async function handler(req, res) {
   try {
     const client = new Anthropic({ maxRetries: 1, timeout: 20000 }); // lee ANTHROPIC_API_KEY del env
 
-    const r = await withTimeout(
-      client.messages.create({
-        model,
-        max_tokens: LIMITS.MAX_TOKENS,
-        // Bloque estable (instrucciones + KB) → cache de prompt + a prueba de inyección.
-        system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
-        // Herramientas de SOLO-UI (captura, canales directos, enlazar página).
-        // tool_choice = auto (omitido) → el modelo decide cuándo; NO enviamos
-        // tool_result ni hacemos 2ª llamada: leemos el tool_use de esta respuesta.
-        tools: CHAT_TOOLS,
-        // Sonnet 5 activa "thinking" adaptativo por defecto; lo DESACTIVAMOS para
-        // mantener la latencia baja (carrera de 22s) y el costo/comportamiento
-        // predecibles, cercanos al perfil actual. El razonamiento base de Sonnet 5
-        // basta para este chat de ventas.
-        thinking: { type: 'disabled' },
-        // El ÚNICO lugar donde vive el input del usuario.
-        messages,
-        // SIN temperature/top_p/top_k → Sonnet 5 rechaza valores no-default (400).
-      }),
-      22000,
+    // Parámetros comunes a las 2 llamadas (mismo prefijo system+tools → cache-friendly).
+    const baseParams = {
+      model,
+      max_tokens: LIMITS.MAX_TOKENS,
+      // Bloque estable (instrucciones + KB) → cache de prompt + a prueba de inyección.
+      system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+      // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
+      // tool_choice = auto (omitido) → el modelo decide cuándo.
+      tools: CHAT_TOOLS,
+      // Sonnet 5 activa "thinking" adaptativo por defecto; lo DESACTIVAMOS para latencia
+      // baja y costo/comportamiento predecibles. SIN temperature/top_p → Sonnet 5 los rechaza.
+      thinking: { type: 'disabled' },
+    };
+
+    // 1ª llamada (≤10s). El input del usuario vive SOLO en `messages`.
+    const r1 = await withTimeout(
+      client.messages.create({ ...baseParams, messages }),
+      10000,
       'anthropic'
     );
 
-    // Un solo turno: leemos texto + tool_use de ESTA respuesta (sin tool_result).
-    const { text, action } = parseToolResponse(r.content, lang);
-    let reply = brandPostFilter(text || M.fallback, lang); // honestidad de marca
-    reply = pricePostFilter(reply, lang);                   // cifras fuera del allowlist
+    let finalResp = r1;
+    let extraAllow = [];
+
+    // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
+    // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
+    const toolUses = (Array.isArray(r1.content) ? r1.content : []).filter((b) => b && b.type === 'tool_use');
+    const internal = toolUses.find((b) => INTERNAL_TOOLS.has(b.name));
+    if (internal) {
+      const out = await runInternalTool(internal, { lang, ip, sid });
+      extraAllow = out.extraAllow || [];
+      // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
+      // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
+      // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
+      // otra interna NO se ejecuta (cap 1 iteración) → ok:false.
+      const toolResults = toolUses.map((b) => ({
+        type: 'tool_result',
+        tool_use_id: b.id,
+        content: b.id === internal.id ? out.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }),
+      }));
+      // 2ª llamada (≤14s): mismo prefijo system+tools; el modelo redacta con el resultado.
+      finalResp = await withTimeout(
+        client.messages.create({
+          ...baseParams,
+          messages: [
+            ...messages,
+            { role: 'assistant', content: r1.content },
+            { role: 'user', content: toolResults },
+          ],
+        }),
+        14000,
+        'anthropic2'
+      );
+    }
+
+    // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
+    // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
+    const parsed = parseToolResponse(finalResp.content, lang);
+    let text = parsed.text;
+    let action = parsed.action;
+    // RESCATE: si el turno 1 mezcló una tool interna con una de UI y el modelo NO re-emitió
+    // la de UI en la 2ª respuesta, recupera la acción de UI de r1 (si no, se perdería la
+    // tarjeta/cajita — perder la CAPTURA sería el "error grave" que advierte el prompt).
+    if (internal && !action) {
+      const fromR1 = parseToolResponse(r1.content, lang).action;
+      if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
+    }
+    let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
+    reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
     return res.status(200).json(action ? { reply, action } : { reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.

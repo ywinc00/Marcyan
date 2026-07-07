@@ -777,8 +777,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
     })();
 
-    // Timeout de red (Lead-F6): aborta fetch colgados.
-    const NET_TIMEOUT = 15000;
+    // Timeout de red (Lead-F6): aborta fetch colgados. DEBE cubrir el presupuesto COMPLETO
+    // del server en un turno con herramienta interna (topes por fase: llamada1 10s + red 7s
+    // + llamada2 14s = 31s peor caso), o el cliente abortaría con error+Retry mientras el
+    // server sigue y factura las 2 llamadas (y el cupo de 1 revisión/sesión ya se consumió).
+    // Invariante: sum(topes fase) 31s < NET_TIMEOUT 33s < maxDuration server 60s. El
+    // diagnóstico y la captura responden en 1-3s; esto solo importa en la cola de latencia.
+    const NET_TIMEOUT = 33000;
     function fetchWithTimeout(url, opts) {
       const ctrl = new AbortController();
       const id = setTimeout(() => ctrl.abort(), NET_TIMEOUT);

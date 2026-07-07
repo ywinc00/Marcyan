@@ -31,11 +31,13 @@ export function stripMarkdown(s) {
 
 // ¿El texto del bot PIDE explícitamente los datos del visitante? Red de seguridad
 // para abrir la captura cuando el modelo pidió datos pero NO llamó a la herramienta
-// (sin `action`). SOLO matchea frases inequívocas de "deja TUS datos/correo/etc" en
-// 2ª persona (la INTENCIÓN de captar), no el sustantivo "formulario". Marcy VENDE
+// (sin `action`). SOLO matchea frases inequívocas de "deja/confirma TUS datos/correo/etc"
+// en 2ª persona (la INTENCIÓN de captar), no el sustantivo "formulario". Marcy VENDE
 // sitios con "formulario de contacto", así que esa palabra es PRODUCTO, no una
 // invitación a capturar → así evitamos el falso positivo que abría la captura sola.
-const INVITE_RX = /d[eé]j\w*\s+(tus|tu)\s+(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero|nombre)|leave\s+your\s+(details|info|email|phone|contact|number|name)|drop\s+your\s+(name|email|phone|details|info)/i;
+// v7: el cierre canónico ahora dice "confírmame aquí tu mejor correo o teléfono", así
+// que la red también matchea "confirma(me) tu(s) correo/teléfono/datos…" (ES + EN).
+const INVITE_RX = /d[eé]j\w*\s+(tus|tu)\s+(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero|nombre)|conf[íi]rma\w*\s+(?:aqu[íi]\s+)?(tus|tu)\s+(?:mejor\s+)?(datos|informaci[óo]n|contacto|correo|email|tel[ée]fono|n[úu]mero|nombre)|leave\s+your\s+(details|info|email|phone|contact|number|name)|confirm\s+your\s+(?:best\s+)?(details|info|email|phone|contact|number|name)|drop\s+your\s+(name|email|phone|details|info)/i;
 
 export function invitesContact(text) {
   return typeof text === 'string' && INVITE_RX.test(text);

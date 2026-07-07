@@ -4,6 +4,7 @@
 // usuario y prefijo "≈" (nunca una cifra fabricada). Fórmulas documentadas abajo.
 import { GOS } from '../../i18n/growth-os';
 import Icon from '../ui/Icon.astro';
+import { computeMissedCalls, computeNoShows } from '../../../lib/tools-formulas.mjs';
 import './range.css';
 
 interface Props { lang: 'es' | 'en' }
@@ -31,8 +32,9 @@ const apptSliders = [
   { role: 'noShow',    label: tt.inNoShow,    min: 5, max: 40,  step: 1, val: 15, fmt: 'pct' },
   { role: 'apptValue', label: tt.inApptValue, min: 20, max: 500, step: 1, val: 65, fmt: 'cur' },
 ];
-const initCalls = Math.round(25 * 4.33 * 0.20 * 350 * 0.30);
-const initAppt = Math.round(40 * 4.33 * 0.15 * 65 * 0.4);
+// Valores iniciales desde la fuente única (mismos defaults que los sliders).
+const initCalls = computeMissedCalls({ llamadas_semana: 25, pct_sin_contestar: 20, ticket: 350, tasa_cierre: 30 }).monthly;
+const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita: 65 }).monthly;
 ---
 <section class="gtool">
   <div class="container">
@@ -131,6 +133,7 @@ const initAppt = Math.round(40 * 4.33 * 0.15 * 65 * 0.4);
 
 <script>
   import { track } from '../../lib/track.js';
+  import { computeMissedCalls, computeNoShows } from '../../../lib/tools-formulas.mjs';
 
   const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
   const nf = new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'es-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -149,8 +152,8 @@ const initAppt = Math.round(40 * 4.33 * 0.15 * 65 * 0.4);
     function numFromOut(el) { const m = (el.textContent || '').replace(/[^\d.]/g, ''); return Number(m) || 0; }
 
     function compute() {
-      if (type === 'calls') return get('callsWeek') * 4.33 * (get('missed') / 100) * get('ticket') * (get('close') / 100);
-      return get('apptWeek') * 4.33 * (get('noShow') / 100) * get('apptValue') * 0.4;
+      if (type === 'calls') return computeMissedCalls({ llamadas_semana: get('callsWeek'), pct_sin_contestar: get('missed'), ticket: get('ticket'), tasa_cierre: get('close') }).monthly;
+      return computeNoShows({ citas_semana: get('apptWeek'), pct_no_show: get('noShow'), valor_cita: get('apptValue') }).monthly;
     }
 
     function fmtLabel(input) {

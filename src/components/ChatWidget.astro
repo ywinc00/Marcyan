@@ -777,8 +777,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
     })();
 
-    // Timeout de red (Lead-F6): aborta fetch colgados.
-    const NET_TIMEOUT = 15000;
+    // Timeout de red (Lead-F6): aborta fetch colgados. 28s para dar margen al turno
+    // con herramienta interna del chat (2 llamadas al modelo + revisión de sitio en
+    // medio; maxDuration server = 60s). El diagnóstico y la captura responden mucho antes.
+    const NET_TIMEOUT = 28000;
     function fetchWithTimeout(url, opts) {
       const ctrl = new AbortController();
       const id = setTimeout(() => ctrl.abort(), NET_TIMEOUT);

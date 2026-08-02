@@ -49,7 +49,9 @@ const normPath = (p: string) => {
 };
 const selfPath = normPath(Astro.url.pathname);
 const otherPath = mirrorPath(selfPath, lang); // ruta del espejo en el otro idioma (o null)
-const abs = (p: string) => (p === '/' ? `${SITE}/` : `${SITE}${p}/`);
+// SIN barra final: Vercel (`cleanUrls` + `trailingSlash:false`) sirve /es con
+// 200 y redirige /es/ con 308 — el canonical debe ser la URL que responde 200.
+const abs = (p: string) => (p === '/' ? `${SITE}/` : `${SITE}${p}`);
 // canonical: respeta el explícito (legales); si no, absoluto de la ruta real.
 const canon = canonical ?? abs(selfPath);
 // URLs por idioma para los <link rel=alternate>. La versión propia = canon;

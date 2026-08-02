@@ -14,11 +14,13 @@ export const ORG_ID = `${SITE}/#organization`;
 export const HOUSTON_ID = `${SITE}/#houston`;
 export const MIAMI_ID = `${SITE}/#miami`;
 
-/** Une path (con prefijo de idioma, sin dominio) al sitio, normalizando barras. */
+/** Une path (con prefijo de idioma, sin dominio) al sitio, normalizando barras.
+ *  SIN barra final: Vercel (cleanUrls+trailingSlash:false) sirve /es con 200 y
+ *  /es/ con 308 — el JSON-LD debe citar las URLs que responden 200 (= canonical). */
 export function abs(path: string): string {
   if (/^https?:\/\//.test(path)) return path;
   const clean = `/${String(path).replace(/^\/+|\/+$/g, '')}`;
-  return clean === '/' ? `${SITE}/` : `${SITE}${clean}/`;
+  return clean === '/' ? `${SITE}/` : `${SITE}${clean}`;
 }
 
 export interface FaqItem {

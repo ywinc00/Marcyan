@@ -45,12 +45,14 @@ export const content = {
       sub: 'Sitios bilingües de verdad, en español e inglés, que cargan rápido y que ChatGPT sí puede leer, para que más clientes te encuentren. Propuesta gratis en menos de 24 horas.',
       primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
       secondary: { label: 'Ver Proyectos', href: '#proyectos' },
-      // nodos en órbita = enlaces reales (la home no es la única navegación)
+      // nodos en órbita = MAPA DE CONVERSIÓN (estaciones fijas, siempre clicables).
+      // Orden = prioridad; el CTA #contacto vive en el dock, no se duplica aquí.
       nodes: [
-        { label: 'Servicios', href: '#servicios', icon: 'lucide:layers' },
-        { label: 'IA', href: '#ia', icon: 'lucide:brain-circuit' },
+        { label: 'Diagnóstico gratis', href: '/es/diagnostico', icon: 'lucide:scan-search' },
+        { label: 'Calculadoras gratis', href: '/es/herramientas', icon: 'lucide:calculator' },
+        { label: 'Precios claros', href: '/es/precios', icon: 'lucide:tag' },
         { label: 'Proyectos', href: '#proyectos', icon: 'lucide:folder' },
-        { label: 'Ciudades', href: '#ciudades', icon: 'lucide:map-pin' },
+        { label: 'Servicios', href: '#servicios', icon: 'lucide:layers' },
       ],
     },
 
@@ -266,10 +268,11 @@ export const content = {
       primary: { label: 'Get a free proposal', href: '#contacto' },
       secondary: { label: 'View Projects', href: '#proyectos' },
       nodes: [
-        { label: 'Services', href: '#servicios', icon: 'lucide:layers' },
-        { label: 'AI', href: '#ia', icon: 'lucide:brain-circuit' },
+        { label: 'Free checkup', href: '/en/checkup', icon: 'lucide:scan-search' },
+        { label: 'Free calculators', href: '/en/tools', icon: 'lucide:calculator' },
+        { label: 'Clear pricing', href: '/en/pricing', icon: 'lucide:tag' },
         { label: 'Projects', href: '#proyectos', icon: 'lucide:folder' },
-        { label: 'Cities', href: '#ciudades', icon: 'lucide:map-pin' },
+        { label: 'Services', href: '#servicios', icon: 'lucide:layers' },
       ],
     },
 

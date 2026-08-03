@@ -1,13 +1,15 @@
 ---
-// HERO de la home — acercado a la muestra (Hero PC Marcyan).
-//  · SSR / fallback (siempre): titular + nodos "lunas" como <a> reales (chips) + CTA.
+// HERO de la home — planeta 2.5D como MAPA DE CONVERSIÓN.
+//  · SSR / fallback (siempre): titular + chips "lunas" como <a> reales + CTA dock.
 //    Funciona sin JS, en móvil y con prefers-reduced-motion.
-//  · Realce: motor planetario 2.5D (SVG + DOM + CSS + rAF, sin WebGL).
-//      Escritorio (puntero fino): arranca CALMO → el hover energiza el sistema (rápido y
-//        natural); los nodos se iluminan al pasar el cursor y una luz sutil sigue el mouse
-//        recorriendo el camino. El titular cede foco y el "Caso 0" se escribe abajo-dcha.
-//      Táctil / móvil: el planeta es el MAPA DE NAVEGACIÓN, pero NO orbita hasta el primer
-//        toque (calmo con pista "Toca para explorar"). Sin parallax. Resize NO reinicia.
+//  · Desktop (puntero fino, ≥lg): los enlaces orbitan como ESTACIONES FIJAS —
+//    ángulo base fijo + balanceo de ±3° con fases distintas. Reglas duras (dueño,
+//    2026-08-02): los nodos NUNCA se superponen entre sí (separación 360°/n ≫
+//    amplitud) y son clicables TODO el tiempo (visibles desde el load, pointer-events
+//    permanentes, z-index sobre el SVG, sin capas que intercepten). El hover solo
+//    energiza la decoración (tilt + partículas), no es compuerta de nada.
+//  · Táctil/<lg: el mapa son los chips SSR bajo el titular (en 375px las etiquetas
+//    orbitales se recortarían); el planeta conserva solo partículas ambientales.
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
@@ -18,7 +20,7 @@ const { hero, lang = 'es' } = Astro.props;
 const uih = t(lang).hero;
 const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 ---
-<section class="hero" id="top" data-hero data-hint-tap={uih.tapHint} data-hint-hover={uih.hoverHint}>
+<section class="hero" id="top" data-hero>
   <div class="hero__stars" data-hero-stars aria-hidden="true"></div>
 
   <div class="container hero__inner">
@@ -61,9 +63,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
         {/* satélite = IA */}
         <circle cx="371" cy="144" r="8" fill="var(--accent-teal)" />
       </svg>
-      <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
-      <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
-      <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>{uih.hoverHint}</span></div>
+      {/* Mapa orbital (desktop): navegación real — NUNCA aria-hidden (lleva <a> reales). */}
+      <nav class="hero__orbit" data-hero-orbit aria-label={uih.exploreSite}></nav>
     </div>
   </div>
 
@@ -106,22 +107,14 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .moon :global(.moon__icon), .moon :global(svg) { width: 16px; height: 16px; color: var(--accent-teal); flex: 0 0 auto; }
   .moon[data-accent="gold"] :global(svg) { color: var(--accent-gold); }
   .moon:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  /* Los chips SSR solo se ocultan cuando el mapa ORBITAL está montado (desktop). */
   .hero--orbital .hero__moons { display: none; }
 
   /* ── escenario del planeta ─────────────────────────────── */
   .hero__stage { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin-inline: auto; will-change: transform; }
   .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
-  .hero__orbit { position: absolute; inset: 0; z-index: 3; }
-  .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; cursor: pointer; }
-  .hero__hint {
-    position: absolute; left: 50%; bottom: -8px; transform: translate(-50%, 100%); z-index: 5;
-    display: none; align-items: center; gap: var(--space-2);
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--fg-secondary); white-space: nowrap; pointer-events: none;
-  }
-  .hero__hint-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); box-shadow: 0 0 0 0 var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
-  @keyframes hpulse { 0% { box-shadow: 0 0 0 0 var(--accent-gold-glow); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  @media (--motion-reduce) { .hero__hint-dot { animation: none; } }
+  /* El mapa SIEMPRE por encima del SVG: nada tapa un enlace. */
+  .hero__orbit { position: absolute; inset: 0; z-index: 4; }
 
   /* ── CTA dock — abajo, centro ──────────────────────────── */
   .hero__dock { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
@@ -132,7 +125,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   }
   .hero__dock-link:hover { color: var(--accent-gold); }
 
-  /* ── ≥ lg: titular izq · planeta der · Caso0 abajo-dcha · dock abajo-centro ── */
+  /* ── ≥ lg: titular izq · planeta der · dock abajo-centro ── */
   @media (--lg) {
     .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: 92svh; }
     .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); }
@@ -145,21 +138,27 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 <style is:global>
   .hero__orbit .hero-node {
     position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 8px;
-    padding: 7px 14px 7px 12px; border-radius: var(--radius-pill); white-space: nowrap; text-decoration: none;
+    min-height: var(--tap-min); padding: 7px 14px 7px 12px; border-radius: var(--radius-pill);
+    white-space: nowrap; text-decoration: none;
     background: rgba(18, 18, 18, 0.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     border: 1px solid var(--accent-gold-line); color: var(--fg-primary);
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; line-height: 1;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5); opacity: 0; will-change: transform, opacity;
-    transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
+    /* Clicable SIEMPRE: nace transparente solo durante la entrada escalonada. */
+    pointer-events: auto; opacity: 0; will-change: transform;
+    transition: opacity 0.45s var(--ease-out-expo), border-color var(--duration-fast),
+                box-shadow var(--duration-fast), background var(--duration-fast);
   }
+  .hero__orbit .hero-node.is-on { opacity: 1; }
   .hero__orbit .hero-node.teal { border-color: var(--accent-teal-line); }
   .hero__orbit .hero-node svg { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
   .hero__orbit .hero-node .moon__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal .moon__dot { background: var(--accent-teal); }
-  /* hover sutil del nodo (sin halo de "linterna") */
   .hero__orbit .hero-node:hover { border-color: var(--accent-gold); color: var(--fg-primary); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
   .hero__orbit .hero-node.teal:hover { border-color: var(--accent-teal); }
+  .hero__orbit .hero-node:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .hero__orbit .hero-node.teal:focus-visible { outline-color: var(--accent-teal); }
   .hero__orbit .hero-amb {
     position: absolute; left: 0; top: 0; width: 5px; height: 5px; border-radius: 50%;
     background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold);
@@ -173,14 +172,11 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     const stage = hero.querySelector('[data-hero-stage]') as HTMLElement;
     const orbit = hero.querySelector('[data-hero-orbit]') as HTMLElement;
     const moons = hero.querySelector('[data-hero-moons]') as HTMLElement;
-    const headline = hero.querySelector('[data-hero-headline]') as HTMLElement;
-    const hint = hero.querySelector('[data-hero-hint]') as HTMLElement;
-    const hintTxt = hero.querySelector('[data-hero-hint-txt]') as HTMLElement;
     const starsEl = hero.querySelector('[data-hero-stars]') as HTMLElement;
 
     const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const auto = () => !mqFine.matches || window.innerWidth < 1024; // táctil / apilado (<lg) → toque-activado
+    const auto = () => !mqFine.matches || window.innerWidth < 1024; // táctil / apilado (<lg)
 
     // campo estelar sutil
     (function fillStars() {
@@ -204,9 +200,13 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     })();
 
     const ROLL = -18 * Math.PI / 180, COS = Math.cos(ROLL), SIN = Math.sin(ROLL), FLATTEN = 0.42;
+    // Estaciones: carril único + balanceo acotado. Separación base = 2π/n ≫ 2·SWAY
+    // → dos nodos NO pueden tocarse (garantía por construcción, no por tuning).
+    const LANE = 0.94, SWAY = 0.052, START = -0.55;
     let bodies: any[] = [];
-    let cx = 0, cy = 0, maxR = 0, isAuto = auto(), lastAuto = isAuto, activated = false;
+    let cx = 0, cy = 0, maxR = 0, isAuto = auto(), lastAuto = isAuto;
     let energy = 0, target = 0;
+    const BASE = 0.35; // vida mínima sin hover (el hover energiza, no habilita)
     let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
     let rafId = 0, last = 0, running = false;
     let ro: ResizeObserver | null = null;
@@ -221,21 +221,30 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       return { x: cx + (ux * COS - uy * SIN), y: cy + (ux * SIN + uy * COS), depth: Math.sin(ang) };
     }
     function build() {
-      const links = Array.from(moons.querySelectorAll('a'));
       orbit.innerHTML = '';
       bodies = [];
-      const n = links.length;
-      const lanes = isAuto ? [0.84, 1.0] : [0.72, 0.92];
-      links.forEach((a, idx) => {
-        const teal = a.getAttribute('data-accent') === 'teal';
-        const el = document.createElement('a');
-        el.className = 'hero-node' + (teal ? ' teal' : '');
-        el.href = a.getAttribute('href') || '#';
-        el.innerHTML = a.innerHTML; // conserva icono + etiqueta
-        orbit.appendChild(el);
-        bodies.push({ el, R: lanes[idx % lanes.length], ang: (idx / n) * Math.PI * 2 + 0.3, speed: 0.06 + 0.015 * (idx % 3), node: true });
-      });
-      const ambN = isAuto ? 3 : 6;
+      // Nodos-estación: SOLO en desktop (en táctil el mapa son los chips SSR).
+      if (!isAuto) {
+        const links = Array.from(moons.querySelectorAll('a'));
+        const n = links.length;
+        links.forEach((a, idx) => {
+          const teal = a.getAttribute('data-accent') === 'teal';
+          const el = document.createElement('a');
+          el.className = 'hero-node' + (teal ? ' teal' : '');
+          el.href = a.getAttribute('href') || '#';
+          el.innerHTML = a.innerHTML; // conserva icono + etiqueta
+          orbit.appendChild(el);
+          bodies.push({
+            el, node: true, R: LANE,
+            base: START + (idx / n) * Math.PI * 2,
+            w: 0.32 + 0.11 * (idx % 3), ph: idx * 1.7,
+          });
+          // entrada escalonada; después opacity queda en 1 para siempre
+          window.setTimeout(() => el.classList.add('is-on'), 120 + 80 * idx);
+        });
+      }
+      // Partículas ambientales (decorativas, no interactivas) — en todos los modos.
+      const ambN = isAuto ? 3 : 5;
       for (let i = 0; i < ambN; i++) {
         const el = document.createElement('span');
         el.className = 'hero-amb';
@@ -245,63 +254,52 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     }
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      energy += (target - energy) * Math.min(1, dt * 8); // emergencia rápida y natural
-      // en reposo total no tocamos el DOM (ahorra CPU/batería); el loop sigue barato
-      if (energy < 0.004 && target < 0.004) { rafId = requestAnimationFrame(frame); return; }
+      energy += (target - energy) * Math.min(1, dt * 8);
       if (!isAuto) {
         tiltX += (tTiltX - tiltX) * Math.min(1, dt * 5);
         tiltY += (tTiltY - tiltY) * Math.min(1, dt * 5);
         stage.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
       }
+      const t = now / 1000;
       for (const b of bodies) {
-        b.ang += b.speed * dt * (0.5 + 0.9 * energy);
-        const p = project(b.R * maxR * (0.6 + 0.4 * energy), b.ang);
-        const front = (p.depth + 1) / 2;
         if (b.node) {
-          const sc = 0.85 + 0.15 * p.depth;
+          // Estación fija + balanceo: posición estable, orden inmutable, clic seguro.
+          const ang = b.base + SWAY * (0.55 + 0.45 * energy) * Math.sin(t * b.w + b.ph);
+          const p = project(b.R * maxR, ang);
+          const sc = 0.92 + 0.08 * ((p.depth + 1) / 2);
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${sc})`;
-          b.el.style.opacity = (energy * (0.2 + 0.8 * front)).toFixed(3);
-          b.el.style.zIndex = p.depth > 0 ? '6' : '1';
-          b.el.style.pointerEvents = (energy > 0.5 && p.depth > -0.35) ? 'auto' : 'none';
         } else {
+          b.ang += b.speed * dt * (0.4 + 1.2 * energy);
+          const p = project(b.R * maxR, b.ang);
+          const front = (p.depth + 1) / 2;
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${b.sz})`;
-          b.el.style.opacity = (energy * (0.2 + 0.4 * front)).toFixed(3);
-          b.el.style.zIndex = p.depth > 0 ? '5' : '0';
+          b.el.style.opacity = (Math.max(energy, 0.5) * (0.2 + 0.4 * front)).toFixed(3);
+          b.el.style.zIndex = p.depth > 0 ? '3' : '0';
         }
       }
-      hint.style.opacity = Math.max(0, 1 - energy * 2.4).toFixed(3);
       rafId = requestAnimationFrame(frame);
     }
 
     const onEnter = () => { if (!isAuto) target = 1; };
-    const onLeave = () => { if (!isAuto) target = 0; };
+    const onLeave = () => { if (!isAuto) target = BASE; };
     const onMove = (e: PointerEvent) => {
       if (isAuto) return;
       const hr = hero.getBoundingClientRect();
       tTiltY = ((e.clientX - hr.left) / hr.width - 0.5) * 6;
       tTiltX = -((e.clientY - hr.top) / hr.height - 0.5) * 4;
     };
-    // primer toque (móvil): recién entonces sale la órbita
-    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; } };
 
     function enable() {
       if (running) return;
       running = true;
-      hero.classList.add('hero--orbital');
-      isAuto = auto(); lastAuto = isAuto; activated = false;
-      target = 0; energy = 0;                       // siempre arranca calmo (móvil: hasta el toque)
-      // Textos por idioma inyectados por el SSR (data-hint-*) — sin español en /en/.
-      const hintTap = hero.dataset.hintTap || 'Toca para explorar';
-      const hintHover = hero.dataset.hintHover || 'Pasa el cursor sobre el planeta';
-      hintTxt.textContent = isAuto ? hintTap : hintHover;
-      hint.style.display = 'inline-flex'; hint.style.opacity = '1';
-      headline.style.opacity = '';
+      isAuto = auto(); lastAuto = isAuto;
+      // Solo desktop reemplaza los chips por el mapa orbital.
+      hero.classList.toggle('hero--orbital', !isAuto);
+      target = BASE; energy = BASE;
       measure(); build();
       hero.addEventListener('pointerenter', onEnter);
       hero.addEventListener('pointerleave', onLeave);
       hero.addEventListener('pointermove', onMove);
-      hero.addEventListener('pointerdown', onActivate);
-      hero.addEventListener('click', onActivate);
       ro = new ResizeObserver(() => measure());
       ro.observe(stage);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (running) measure(); });
@@ -315,13 +313,9 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.classList.remove('hero--orbital');
       orbit.innerHTML = '';
       stage.style.transform = '';
-      hint.style.display = 'none';
-      headline.style.opacity = '';
       hero.removeEventListener('pointerenter', onEnter);
       hero.removeEventListener('pointerleave', onLeave);
       hero.removeEventListener('pointermove', onMove);
-      hero.removeEventListener('pointerdown', onActivate);
-      hero.removeEventListener('click', onActivate);
       if (ro) { ro.disconnect(); ro = null; }
     }
     function sync() {
@@ -330,9 +324,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     }
     mqReduce.addEventListener('change', sync);
     mqFine.addEventListener('change', sync);
-    // En resize NO reiniciamos la animación (eso causaba el bug del scroll en móvil:
-    // la barra del navegador dispara resize → sólo re-medimos. Sólo si cruza el umbral
-    // (apilado ↔ desktop) reconstruimos.)
+    // En resize NO reiniciamos (bug histórico del scroll móvil): solo re-medimos;
+    // reconstruimos únicamente si cruza el umbral táctil↔desktop.
     let rt: number;
     window.addEventListener('resize', () => {
       clearTimeout(rt);

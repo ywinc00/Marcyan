@@ -8,13 +8,13 @@
 // ya tiene scroll-margin-top para que el salto respire. Progresivo: sin JS sigue siendo
 // una lista de anclas navegable; el scroll-spy es realce (data-toc-spy).
 interface Heading { depth: number; slug: string; text: string }
-interface Props { headings: Heading[]; label: string }
-const { headings, label } = Astro.props as Props;
+interface Props { headings: Heading[]; label: string; embedded?: boolean }
+const { headings, label, embedded = false } = Astro.props as Props;
 const items = headings.filter((h: Heading) => h.depth === 2);
 const pad = (i: number) => String(i + 1).padStart(2, '0');
 ---
 {items.length >= 3 && (
-  <nav class="toc" aria-label={label} data-toc-spy>
+  <nav class:list={['toc', embedded && 'toc--embedded']} aria-label={label} data-toc-spy>
     {/* Móvil: details colapsable */}
     <details class="toc__m">
       <summary class="toc__sum">
@@ -145,6 +145,14 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
     .toc__d .toc__link[aria-current="true"]::before {
       background: var(--accent-gold);
       box-shadow: 0 0 8px var(--accent-gold-glow);
+    }
+
+    /* Embebida en ArticleRail: el raíl es quien pega y hace scroll; el panel
+       de la ToC se queda estático y crece natural (evita scrollbars anidadas). */
+    .toc--embedded .toc__d {
+      position: static;
+      max-height: none;
+      overflow-y: visible;
     }
   }
 

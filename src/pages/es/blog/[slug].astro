@@ -12,7 +12,8 @@ import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import ArticleHero from '../../../components/sections/ArticleHero.astro';
 import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
 import Article from '../../../components/sections/Article.astro';
-import ArticleToc from '../../../components/sections/ArticleToc.astro';
+import ArticleRail from '../../../components/sections/ArticleRail.astro';
+import RailTools from '../../../components/sections/RailTools.astro';
 import Faq from '../../../components/sections/Faq.astro';
 import PostNav from '../../../components/sections/PostNav.astro';
 import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
@@ -103,16 +104,25 @@ const hasToc = tocItems.length >= 3;
 
     <AnswerBlock q={d.answer.q} a={d.answer.a} source={d.answer.source} />
 
-    {/* Lectura: en desktop la ToC pegajosa acompaña la columna del artículo. */}
+    {/* Lectura: el texto corre; el raíl (ToC + conversión + herramientas) acompaña
+        pegado en desktop. En móvil: ToC colapsable arriba + herramientas inline abajo. */}
     <section class="section reader">
       <div class="container">
-        <div class:list={['reader__grid', hasToc && 'reader__grid--toc']}>
-          {hasToc && (
-            <aside class="reader__aside">
-              <ArticleToc headings={headings} label={postChrome.toc} />
-            </aside>
-          )}
-          <Article><Content /></Article>
+        <div class="reader__grid">
+          <aside class="reader__aside">
+            <ArticleRail
+              headings={headings}
+              tocLabel={postChrome.toc}
+              rail={postChrome.rail}
+              postTitle={d.title}
+            />
+          </aside>
+          <div class="reader__body">
+            <Article><Content /></Article>
+            <div class="reader__tools-m">
+              <RailTools t={postChrome.rail.tools} />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -147,16 +157,25 @@ const hasToc = tocItems.length >= 3;
   .reader { padding-block: var(--space-7); }
   .reader__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-6); min-width: 0; }
 
-  /* En móvil la ToC (details) va arriba del cuerpo, ocupando el ancho. */
+  /* En móvil el raíl solo pinta la ToC (details) arriba del cuerpo. */
   .reader__aside { min-width: 0; }
+  .reader__body { min-width: 0; }
+
+  /* Herramientas inline: solo móvil (en desktop viven en el raíl). */
+  .reader__tools-m { margin-top: var(--space-7); }
 
   @media (--lg) {
-    /* Desktop: aside de ToC pegajosa + columna de lectura. La medida del cuerpo la
-       controla Article (max 72ch); la columna 1fr le deja respirar a la derecha. */
-    .reader__grid--toc {
-      grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+    /* Desktop: texto a la IZQUIERDA (medida la manda Article, max 72ch) + raíl
+       pegajoso a la DERECHA. El aside va primero en el DOM (ToC móvil arriba +
+       lectores de pantalla reciben el índice antes del cuerpo); visualmente
+       se coloca a la derecha vía grid-column. */
+    .reader__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 19.5rem);
       gap: var(--space-8);
       align-items: start;
     }
+    .reader__aside { grid-column: 2; grid-row: 1; }
+    .reader__body  { grid-column: 1; grid-row: 1; }
+    .reader__tools-m { display: none; }
   }
 </style>

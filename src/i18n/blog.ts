@@ -47,6 +47,39 @@ export const postChrome = {
   related: { tag: 'Sigue explorando', title: 'Recursos <em>relacionados</em>' },
   nav: { prev: 'Anterior', next: 'Siguiente', index: 'Ver todas las guías' },
   toc: 'En esta guía',
+  rail: {
+    cta: {
+      aria: 'Pide tu propuesta',
+      kicker: 'Hablemos de tu proyecto',
+      title: '¿Listo para que tu negocio <em>despegue</em>?',
+      // {web}/{ia}/{seo} los rellena RailCta desde PRICE_ANCHORS (fuente única).
+      priceNote: 'Precios públicos: web desde {web} · asistente con IA desde {ia} · SEO local desde {seo}.',
+      chip: 'Diagnóstico de visibilidad en IA — gratis',
+      chipHref: '/es/diagnostico',
+      form: {
+        name: { label: 'Nombre', ph: 'Tu nombre' },
+        contact: { label: 'Email o WhatsApp', ph: 'tu@email.com o tu número' },
+        submit: 'Pedir propuesta gratis',
+        sending: 'Enviando…',
+        success: 'Recibido. Te respondemos en menos de 24h.',
+        error: 'No se pudo enviar. Escríbenos por WhatsApp o inténtalo de nuevo.',
+        invalid: 'Déjanos un email válido o un teléfono con al menos 7 dígitos.',
+      },
+      or: 'o si prefieres:',
+      call: 'Llamar',
+    },
+    tools: {
+      aria: 'Herramientas gratis',
+      kicker: 'Herramientas gratis',
+      intro: 'Ponle número a lo que estás perdiendo, en segundos y sin registro:',
+      items: [
+        { label: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas', icon: 'lucide:phone-missed' },
+        { label: 'Calculadora de citas perdidas', href: '/es/herramientas#citas', icon: 'lucide:calendar-x' },
+        { label: 'Diagnóstico digital gratis', href: '/es/diagnostico', icon: 'lucide:scan-search' },
+      ],
+      all: { label: 'Ver todas las herramientas', href: '/es/herramientas' },
+    },
+  },
   cta: {
     title: '¿Hablamos de tu <em>proyecto</em>?',
     sub: 'Propuesta personalizada en menos de 24 horas, sin costo ni compromiso. Atención bilingüe en Houston y Miami.',

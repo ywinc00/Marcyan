@@ -127,11 +127,12 @@ const hasToc = tocItems.length >= 3;
       </div>
     </section>
 
+    {/* El menú de post anterior/siguiente va ANTES que las preguntas frecuentes. */}
+    <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
+
     {d.faq.length > 0 && (
       <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
     )}
-
-    <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
 
     {related.length > 0 && (
       <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />
@@ -174,7 +175,9 @@ const hasToc = tocItems.length >= 3;
       gap: var(--space-8);
       align-items: start;
     }
-    .reader__aside { grid-column: 2; grid-row: 1; }
+    /* El aside se estira al alto de la fila (= alto del artículo) para que las
+       tarjetas del raíl puedan fijarse (sticky) durante toda la lectura. */
+    .reader__aside { grid-column: 2; grid-row: 1; align-self: stretch; }
     .reader__body  { grid-column: 1; grid-row: 1; }
     .reader__tools-m { display: none; }
   }

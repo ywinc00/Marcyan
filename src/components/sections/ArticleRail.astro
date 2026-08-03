@@ -1,10 +1,10 @@
 ---
-// Raíl de lectura del blog — patrón "solo el texto se mueve" (ver
-// docs/blog/PLAN-rail-conversion.md). En desktop (--lg) es UNA columna sticky
-// con scroll interno: ToC + tarjeta de conversión + tarjeta de herramientas
-// siempre a la vista mientras corre el artículo. En móvil solo aporta la ToC
-// colapsable (las tarjetas se ocultan; la conversión móvil sigue siendo
-// CtaBand/Contact según la política de CTAs).
+// Raíl de lectura del blog. En desktop (--lg) el raíl fluye con la página SIN
+// scroll interno: la ToC y las 2 tarjetas (conversión + herramientas) se ven
+// completas, una debajo de otra. Al bajar, la ToC se desplaza normal y, cuando
+// la primera tarjeta llega arriba, las 2 tarjetas se FIJAN (sticky) y quedan
+// siempre visibles mientras se lee. En móvil solo aporta la ToC colapsable (las
+// tarjetas se ocultan; la conversión móvil sigue siendo CtaBand/Contact).
 import ArticleToc from './ArticleToc.astro';
 import RailCta from './RailCta.astro';
 import RailTools from './RailTools.astro';
@@ -28,15 +28,16 @@ const { headings, tocLabel, rail, postTitle } = Astro.props;
   .rail__cards { display: none; }
 
   @media (--lg) {
-    .rail {
+    /* El raíl ocupa todo el alto del aside (que se estira al alto del artículo)
+       para que las tarjetas puedan fijarse a lo largo de toda la lectura. No hay
+       scroll interno: la ToC y las tarjetas se ven completas. */
+    .rail { height: 100%; }
+    /* La ToC (arriba) se desplaza normal con la página. Las 2 tarjetas se fijan
+       cuando la primera llega arriba y quedan siempre visibles. */
+    .rail__cards {
+      display: flex; flex-direction: column; gap: var(--space-4);
       position: sticky;
-      top: calc(var(--nav-h) + var(--space-5));
-      max-height: calc(100vh - var(--nav-h) - var(--space-6));
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      /* aire inferior para que el borde de la última tarjeta no se corte */
-      padding-bottom: var(--space-2);
+      top: calc(var(--nav-h) + var(--space-3));
     }
-    .rail__cards { display: flex; flex-direction: column; gap: var(--space-5); }
   }
 </style>

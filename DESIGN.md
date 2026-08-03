@@ -221,3 +221,14 @@ tarjeta entera clicable.
   jerarquía real (pieza destacada + grid), tarjeta clicable, foco/estado accesibles.
 - El artículo (`[slug]` + `Article`/`ArticleToc`/`PostNav`/`ArticleHero`) mantiene lectura cómoda + la
   ilustración de tema; contrato de blog (`render`, `ArticleLd`/FAQPage, `headings`, prev/next) intacto.
+
+### 8.6 Hero home — el planeta es MAPA DE CONVERSIÓN (2026-08-02)
+Los nodos orbitales del hero son navegación real hacia el flujo de conversión
+(diagnóstico gratis, calculadoras, precios, proyectos, servicios) — no decoración.
+Reglas duras (dueño): (1) los nodos NUNCA se superponen entre sí → estaciones de
+ángulo fijo en un solo carril, balanceo máx ±3°, separación 360°/n; (2) clicables
+TODO el tiempo → visibles desde el load, pointer-events permanentes, z-index sobre
+el SVG, sin capas interceptoras, tap-target ≥44px; (3) en táctil/<lg el mapa son
+los chips SSR bajo el titular (los nodos orbitales no se montan); (4) el CTA
+principal (#contacto) vive en el dock y no se duplica en el mapa. Cualquier cambio
+futuro del hero debe conservar estas 4 reglas.

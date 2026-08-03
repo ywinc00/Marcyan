@@ -10,13 +10,13 @@ import RailCta from './RailCta.astro';
 import RailTools from './RailTools.astro';
 
 interface Heading { depth: number; slug: string; text: string }
-interface Props { headings: Heading[]; tocLabel: string; rail: any }
-const { headings, tocLabel, rail } = Astro.props;
+interface Props { headings: Heading[]; tocLabel: string; rail: any; postTitle: string }
+const { headings, tocLabel, rail, postTitle } = Astro.props;
 ---
 <div class="rail">
   <ArticleToc headings={headings} label={tocLabel} embedded />
   <div class="rail__cards">
-    <RailCta t={rail.cta} />
+    <RailCta t={rail.cta} postTitle={postTitle} />
     <RailTools t={rail.tools} />
   </div>
 </div>
@@ -32,14 +32,11 @@ const { headings, tocLabel, rail } = Astro.props;
       position: sticky;
       top: calc(var(--nav-h) + var(--space-5));
       max-height: calc(100vh - var(--nav-h) - var(--space-6));
-      /* El raíl NO scrollea: las 2 tarjetas quedan fijas abajo, siempre visibles;
-         la ToC (arriba) toma el espacio restante y hace su propio scroll si es
-         larga, sin empujar las tarjetas fuera del viewport. */
-      overflow: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       /* aire inferior para que el borde de la última tarjeta no se corte */
       padding-bottom: var(--space-2);
     }
-    /* Las tarjetas conservan su alto natural y no se comprimen (flex 0 0 auto). */
-    .rail__cards { display: flex; flex-direction: column; gap: var(--space-5); flex: 0 0 auto; }
+    .rail__cards { display: flex; flex-direction: column; gap: var(--space-5); }
   }
 </style>

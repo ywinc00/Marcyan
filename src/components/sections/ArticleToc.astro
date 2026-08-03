@@ -147,15 +147,12 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       box-shadow: 0 0 8px var(--accent-gold-glow);
     }
 
-    /* Embebida en ArticleRail: el raíl fija las tarjetas abajo; la ToC ocupa el
-       espacio restante y hace su PROPIO scroll si es más larga que ese hueco, para
-       que las tarjetas queden SIEMPRE visibles (nunca las empuja fuera del raíl). */
-    .toc--embedded { flex: 1 1 auto; min-height: 0; display: flex; }
+    /* Embebida en ArticleRail: el raíl es quien pega y hace scroll; el panel
+       de la ToC se queda estático y crece natural (evita scrollbars anidadas). */
     .toc--embedded .toc__d {
       position: static;
-      flex: 1 1 auto;
-      min-height: 0;
       max-height: none;
+      overflow-y: visible;
     }
   }
 

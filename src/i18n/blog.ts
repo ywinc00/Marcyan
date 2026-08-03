@@ -49,12 +49,24 @@ export const postChrome = {
   toc: 'En esta guía',
   rail: {
     cta: {
-      // Sin formulario propio en el blog: un solo botón que lleva al formulario
-      // de contacto de la propia página (#contacto), donde viven form + WhatsApp
-      // + llamar. El brief (/formulario) nunca capta.
       aria: 'Pide tu propuesta',
+      kicker: 'Hablemos de tu proyecto',
       title: '¿Listo para que tu negocio <em>despegue</em>?',
-      button: { label: 'Pedir propuesta gratis', href: '#contacto' },
+      // {web}/{ia}/{seo} los rellena RailCta desde PRICE_ANCHORS (fuente única).
+      priceNote: 'Precios públicos: web desde {web} · asistente con IA desde {ia} · SEO local desde {seo}.',
+      chip: 'Diagnóstico de visibilidad en IA — gratis',
+      chipHref: '/es/diagnostico',
+      form: {
+        name: { label: 'Nombre', ph: 'Tu nombre' },
+        contact: { label: 'Email o WhatsApp', ph: 'tu@email.com o tu número' },
+        submit: 'Pedir propuesta gratis',
+        sending: 'Enviando…',
+        success: 'Recibido. Te respondemos en menos de 24h.',
+        error: 'No se pudo enviar. Escríbenos por WhatsApp o inténtalo de nuevo.',
+        invalid: 'Déjanos un email válido o un teléfono con al menos 7 dígitos.',
+      },
+      or: 'o si prefieres:',
+      call: 'Llamar',
     },
     tools: {
       aria: 'Herramientas gratis',

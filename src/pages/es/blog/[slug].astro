@@ -114,7 +114,6 @@ const hasToc = tocItems.length >= 3;
               headings={headings}
               tocLabel={postChrome.toc}
               rail={postChrome.rail}
-              postTitle={d.title}
             />
           </aside>
           <div class="reader__body">
@@ -127,15 +126,16 @@ const hasToc = tocItems.length >= 3;
       </div>
     </section>
 
+    {/* Relacionados ANTES que las preguntas frecuentes (a pedido del dueño). */}
+    {related.length > 0 && (
+      <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />
+    )}
+
     {d.faq.length > 0 && (
       <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
     )}
 
     <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
-
-    {related.length > 0 && (
-      <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />
-    )}
 
     <CtaBand
       title={postChrome.cta.title}

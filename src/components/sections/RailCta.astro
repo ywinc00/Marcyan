@@ -1,71 +1,28 @@
 ---
 // Tarjeta de conversión del raíl del blog (superficie DESKTOP — el raíl la
-// oculta en móvil). Política de CTAs: mini-form → /api/contact (LEAD) como canal
-// dominante de desktop + WhatsApp/Llamar como alternativas. NUNCA /formulario.
-// Números de precio desde PRICE_ANCHORS (fuente única) — jamás hardcodeados.
+// oculta en móvil). SIN formulario propio: el blog no debe ser un formulario de
+// contacto más. Un solo botón que lleva al formulario de contacto de la propia
+// página (#contacto), donde viven el formulario, WhatsApp y llamar. El brief
+// (/formulario) nunca capta.
 import Icon from '../ui/Icon.astro';
-import { nap } from '../../i18n/content';
-import { PRICE_ANCHORS } from '../../i18n/pricing';
 
-interface Props { t: any; postTitle: string }
-const { t, postTitle } = Astro.props;
-
-const usd = (n: number) => '$' + n.toLocaleString('en-US');
-const priceNote = (t.priceNote as string)
-  .replace('{web}', usd(PRICE_ANCHORS.webLanding))
-  .replace('{ia}', usd(PRICE_ANCHORS.iaBasic))
-  .replace('{seo}', usd(PRICE_ANCHORS.seoInitial));
-
-const tel = nap.houston;
-const telHref = 'tel:' + tel.replace(/[^\d+]/g, '');
-const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
+interface Props { t: any }
+const { t } = Astro.props;
 ---
 <aside class="rcta" aria-label={t.aria}>
-  <p class="rcta__kicker">{t.kicker}</p>
   <h2 class="rcta__title" set:html={t.title} />
-  <p class="rcta__prices">{priceNote}</p>
-
-  <a class="rcta__chip" href={t.chipHref} data-track="tool_cta_clicked">
-    <Icon name="lucide:scan-search" />
-    <span>{t.chip}</span>
+  <a class="rcta__btn" href={t.button.href}>
+    <span>{t.button.label}</span>
+    <Icon name="lucide:arrow-right" />
   </a>
-
-  <form class="rcta__form" id="rail-cta-form" novalidate
-    data-objective={`Blog: ${postTitle}`}
-    data-sending={t.form.sending} data-success={t.form.success}
-    data-error={t.form.error} data-invalid={t.form.invalid}
-  >
-    <input type="text" name="website_hp" class="rcta__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-    <label class="rcta__field">
-      <span class="rcta__lbl">{t.form.name.label}</span>
-      <input type="text" name="owner_name" placeholder={t.form.name.ph} autocomplete="name" />
-    </label>
-    <label class="rcta__field">
-      <span class="rcta__lbl">{t.form.contact.label}</span>
-      <input type="text" name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
-    </label>
-    <button class="rcta__submit" type="submit" data-submit>{t.form.submit}</button>
-    <p class="rcta__status rcta__status--err" role="alert" hidden></p>
-    <p class="rcta__status rcta__status--ok" role="status" hidden></p>
-  </form>
-
-  <div class="rcta__alt">
-    <span class="rcta__alt-lbl">{t.or}</span>
-    <a class="rcta__alt-link" href={waHref} data-track="whatsapp_clicked">
-      <Icon name="lucide:message-circle" /><span>WhatsApp</span>
-    </a>
-    <a class="rcta__alt-link" href={telHref} data-track="call_clicked">
-      <Icon name="lucide:phone" /><span>{t.call}</span>
-    </a>
-  </div>
 </aside>
 
 <style>
   .rcta {
     position: relative; isolation: isolate; overflow: hidden;
-    display: flex; flex-direction: column; gap: var(--space-3);
+    display: flex; flex-direction: column; gap: var(--space-4);
     background:
-      radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent-gold), transparent 94%), transparent 55%),
+      radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent-gold), transparent 92%), transparent 60%),
       var(--bg-card);
     border: 1px solid var(--border); border-radius: var(--radius-lg);
     padding: var(--space-5);
@@ -77,145 +34,22 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
     opacity: 0.7;
   }
 
-  .rcta__kicker {
-    margin: 0; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
-    letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--accent-gold);
+  .rcta__title {
+    margin: 0; font-family: var(--font-display); font-size: var(--text-lg);
+    line-height: var(--leading-snug); color: var(--fg-primary);
   }
-  .rcta__title { margin: 0; font-family: var(--font-display); font-size: var(--text-lg); line-height: var(--leading-snug); color: var(--fg-primary); }
   .rcta__title :global(em) { color: var(--accent-gold); font-style: normal; }
-  .rcta__prices { margin: 0; font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); }
 
-  .rcta__chip {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    min-height: var(--tap-min); padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--accent-teal-line); border-radius: var(--radius-pill);
-    background: var(--accent-teal-dim); color: var(--accent-teal);
-    font-size: var(--text-xs); font-weight: 600; text-decoration: none;
-    transition: border-color var(--duration-fast), color var(--duration-fast);
-  }
-  .rcta__chip :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; stroke-width: 1.5; }
-  .rcta__chip:hover { border-color: var(--accent-teal); }
-  .rcta__chip:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
-
-  .rcta__form { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-2); }
-  .rcta__hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  .rcta__field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
-  .rcta__lbl { font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .rcta__field input {
-    width: 100%; min-width: 0; min-height: var(--tap-min);
-    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md);
-    color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm);
-    padding: 9px 12px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
-  }
-  .rcta__field input::placeholder { color: var(--fg-subtle); }
-  .rcta__field input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
-
-  .rcta__submit {
-    display: inline-flex; align-items: center; justify-content: center;
+  .rcta__btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
     min-height: var(--tap-min); padding: 11px 18px; border-radius: var(--radius-md);
     background: var(--accent-gold); color: var(--fg-inverse); border: 1px solid var(--accent-gold);
-    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); cursor: pointer;
-    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base), gap var(--duration-fast);
   }
-  .rcta__submit:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: 0 8px 30px -12px var(--accent-gold-glow); }
-  .rcta__submit:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
-  .rcta__submit:disabled { opacity: 0.7; cursor: default; }
+  .rcta__btn :global(svg) { width: 16px; height: 16px; flex: 0 0 auto; }
+  .rcta__btn:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: 0 8px 30px -12px var(--accent-gold-glow); gap: var(--space-3); }
+  .rcta__btn:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
 
-  .rcta__status { margin: 0; font-size: var(--text-xs); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); }
-  .rcta__status--err { background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); color: #e07a7a; }
-  .rcta__status--ok { background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal); }
-
-  .rcta__alt { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-3); margin-top: var(--space-1); }
-  .rcta__alt-lbl { font-size: var(--text-xs); color: var(--fg-subtle); }
-  .rcta__alt-link {
-    display: inline-flex; align-items: center; gap: var(--space-1);
-    min-height: var(--tap-min); color: var(--fg-secondary); font-size: var(--text-xs); font-weight: 600;
-    text-decoration: none; transition: color var(--duration-fast);
-  }
-  .rcta__alt-link :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
-  .rcta__alt-link:hover { color: var(--accent-gold); }
-  .rcta__alt-link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: var(--radius-sm); }
-
-  @media (--motion-reduce) {
-    .rcta__chip, .rcta__submit, .rcta__alt-link, .rcta__field input { transition: none; }
-  }
+  @media (--motion-reduce) { .rcta__btn { transition: none; } }
 </style>
-
-<script>
-  // Mini-form del raíl → /api/contact (LEAD). Mismo contrato del form del sitio
-  // (owner_name/email/phone/main_objective/website_hp); el campo único "contact"
-  // se mapea a email si lleva @, si no a phone. Validación email-O-teléfono
-  // idéntica a Contact.astro. Sin innerHTML. Timeout 15s. Guard anti doble envío.
-  const form = document.getElementById('rail-cta-form') as HTMLFormElement | null;
-  if (form) {
-    const btn = form.querySelector('[data-submit]') as HTMLButtonElement;
-    const errBox = form.querySelector('.rcta__status--err') as HTMLElement;
-    const okBox = form.querySelector('.rcta__status--ok') as HTMLElement;
-    const S = form.dataset;
-    const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-    const digits = (v: string) => v.replace(/\D/g, '');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (form.dataset.busy) return;
-      form.dataset.busy = '1';
-      errBox.hidden = true; okBox.hidden = true;
-
-      const fd = new FormData(form);
-      const name = String(fd.get('owner_name') || '').trim();
-      const contact = String(fd.get('contact') || '').trim();
-      const hp = String(fd.get('website_hp') || '');
-      if (hp) { delete form.dataset.busy; return; }
-
-      const data: Record<string, string> = {
-        owner_name: name,
-        main_objective: S.objective || 'Blog',
-      };
-      if (contact.includes('@')) data.email = contact;
-      else data.phone = contact;
-
-      const contactEl = form.querySelector('[name="contact"]') as HTMLInputElement | null;
-      contactEl?.removeAttribute('aria-invalid');
-      const valid = data.email ? isEmail(data.email) : digits(data.phone || '').length >= 7;
-      if (!valid) {
-        errBox.textContent = S.invalid || 'Revisa tu email o teléfono.';
-        errBox.hidden = false;
-        if (contactEl) { contactEl.setAttribute('aria-invalid', 'true'); contactEl.focus(); }
-        delete form.dataset.busy;
-        return;
-      }
-
-      const orig = btn.textContent || '';
-      btn.disabled = true; btn.textContent = S.sending || 'Enviando…';
-      const ctrl = new AbortController();
-      const timer = window.setTimeout(() => ctrl.abort(), 15000);
-      try {
-        const res = await fetch('/api/contact', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data), signal: ctrl.signal,
-        });
-        window.clearTimeout(timer);
-        let payload: any = null;
-        try { payload = await res.json(); } catch (_) { /* ignore */ }
-        if (!res.ok || !payload || !payload.ok) {
-          errBox.textContent = (payload && payload.error) || S.error || 'Error.';
-          errBox.hidden = false;
-          btn.disabled = false; btn.textContent = orig;
-          delete form.dataset.busy;
-          return;
-        }
-        okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
-        okBox.hidden = false;
-        form.querySelectorAll('input').forEach((el) => (el.disabled = true));
-        btn.textContent = '✓';
-        delete form.dataset.busy;
-      } catch (_) {
-        window.clearTimeout(timer);
-        errBox.textContent = S.error || 'Error de red.';
-        errBox.hidden = false;
-        btn.disabled = false; btn.textContent = orig;
-        delete form.dataset.busy;
-      }
-    });
-  }
-</script>

@@ -53,6 +53,8 @@ export const content = {
         { label: 'IA', href: '#ia', icon: 'lucide:brain-circuit' },
         { label: 'Calculadoras gratis', href: '/es/herramientas', icon: 'lucide:calculator' },
         { label: 'Precios claros', href: '/es/precios', icon: 'lucide:tag' },
+        { label: 'Proyectos', href: '#proyectos', icon: 'lucide:folder' },
+        { label: 'Servicios', href: '#servicios', icon: 'lucide:layers' },
       ],
     },
 
@@ -272,6 +274,8 @@ export const content = {
         { label: 'AI', href: '#ia', icon: 'lucide:brain-circuit' },
         { label: 'Free calculators', href: '/en/tools', icon: 'lucide:calculator' },
         { label: 'Clear pricing', href: '/en/pricing', icon: 'lucide:tag' },
+        { label: 'Projects', href: '#proyectos', icon: 'lucide:folder' },
+        { label: 'Services', href: '#servicios', icon: 'lucide:layers' },
       ],
     },
 

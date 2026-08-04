@@ -112,7 +112,9 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .hero__stage { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin-inline: auto; will-change: transform; }
   .hero__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
   .hero__orbit { position: absolute; inset: 0; z-index: 3; }
-  .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; cursor: pointer; }
+  /* Zona central decorativa: pointer-events:none para que NUNCA robe el clic a un
+     nodo que pasa por delante del planeta (la activación táctil escucha en el hero entero). */
+  .hero__hit { position: absolute; left: 50%; top: 50%; width: 64%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: 6; pointer-events: none; }
   .hero__hint {
     position: absolute; left: 50%; bottom: -8px; transform: translate(-50%, 100%); z-index: 5;
     display: none; align-items: center; gap: var(--space-2);
@@ -262,7 +264,9 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${sc})`;
           b.el.style.opacity = (energy * (0.2 + 0.8 * front)).toFixed(3);
           b.el.style.zIndex = p.depth > 0 ? '6' : '1';
-          b.el.style.pointerEvents = (energy > 0.5 && p.depth > -0.35) ? 'auto' : 'none';
+          // Clicables en CUALQUIER punto del recorrido mientras se ven: sin zona
+          // muerta por profundidad (detrás del planeta) ni por energía a media subida.
+          b.el.style.pointerEvents = energy > 0.12 ? 'auto' : 'none';
         } else {
           b.el.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${b.sz})`;
           b.el.style.opacity = (energy * (0.2 + 0.4 * front)).toFixed(3);

@@ -1,0 +1,74 @@
+/* ─────────────────────────────────────────────────────────────
+   Fallbacks con métricas CALIBRADAS a las fuentes reales (fix CLS).
+   Mientras las webfonts cargan, Arial/Courier AJUSTADAS ocupan el mismo
+   espacio que la fuente final; al llegar (font-display: swap) el texto no
+   cambia de altura ni de envoltura → el planeta del hero deja de saltar.
+   El look final NO cambia: las fuentes reales siguen mandando.
+
+   Calibración medida por canvas sobre los .woff2 reales del sitio:
+   · vertical (ascent/descent) constante por familia;
+   · size-adjust POR PESO, porque Arial engorda en bold mucho más que
+     Space Grotesk/DM Sans (p.ej. SG/Arial = 107.11% @400 pero 100.92% @700;
+     con un solo ratio el H1 700 del hero se envolvía a una línea extra y
+     reintroducía el salto). Varios @font-face de la misma familia con
+     font-weight distinto: el navegador elige la cara según el peso usado.
+   ───────────────────────────────────────────────────────────── */
+
+/* Space Grotesk (display) — 98/29 vertical; 107.11% @≤500 · 100.92% @≥550 */
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial');
+  font-weight: 100 549;
+  size-adjust: 107.11%;
+  ascent-override: 98%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial');
+  font-weight: 550 900;
+  size-adjust: 100.92%;
+  ascent-override: 98%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+
+/* DM Sans (body) — 99/31 vertical; 103.31% @≤500 · 100.4% @600 · 101.74% @≥650 */
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  font-weight: 100 500;
+  size-adjust: 103.31%;
+  ascent-override: 99%;
+  descent-override: 31%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  font-weight: 501 649;
+  size-adjust: 100.4%;
+  ascent-override: 99%;
+  descent-override: 31%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  font-weight: 650 900;
+  size-adjust: 101.74%;
+  ascent-override: 99%;
+  descent-override: 31%;
+  line-gap-override: 0%;
+}
+
+/* JetBrains Mono — 102/30 vertical; el paso (pitch) ya coincide con Courier (≈100%) */
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}

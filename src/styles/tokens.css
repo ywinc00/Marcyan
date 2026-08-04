@@ -83,9 +83,9 @@
   --space-10: 128px;
 
   /* ── Familias (auto-hospedadas vía Fontsource) ── */
-  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
-  --font-body:    'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', 'Space Grotesk Fallback', system-ui, sans-serif;
+  --font-body:    'DM Sans Variable', 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
 
   /* ── Escala de tipo FIJA (UI, cuerpo, datos) ── */
   --text-xs:   11px;

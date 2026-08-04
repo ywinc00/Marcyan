@@ -29,7 +29,7 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
         <article class="loc">
           {c.illo && (
             <div class="loc__illo" aria-hidden="true">
-              <img src={`/assets/cities/${c.illo}.svg`} alt="" loading="lazy" decoding="async" />
+              <img src={`/assets/cities/${c.illo}.svg`} alt="" width={c.illo === 'miami' ? 322 : 276} height={c.illo === 'miami' ? 235 : 249} loading="lazy" decoding="async" />
             </div>
           )}
 

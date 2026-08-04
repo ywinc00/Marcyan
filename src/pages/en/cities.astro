@@ -154,7 +154,7 @@ const itemList = [
               <article class="citycard">
                 {city.illo && (
                   <div class="citycard__illo" aria-hidden="true">
-                    <img src={`/assets/cities/${city.illo}.svg`} alt="" loading="lazy" decoding="async" />
+                    <img src={`/assets/cities/${city.illo}.svg`} alt="" width={city.illo === 'miami' ? 322 : 276} height={city.illo === 'miami' ? 235 : 249} loading="lazy" decoding="async" />
                   </div>
                 )}
 

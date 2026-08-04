@@ -37,7 +37,6 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
       <div class="pf__stage">
         {items.map((p: any, idx: number) => {
           const shot = SHOTS[p.name];
-          const eager = idx === 0;
           return (
           <article class={`pf__slide${idx === 0 ? ' is-active' : ''}`} data-slide data-accent={p.accent} aria-hidden={idx === 0 ? 'false' : 'true'}>
             <div class="pf__devices">
@@ -49,9 +48,11 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
                     <img
                       class="dv-shot"
                       src={`/Galeria/${shot.slug}-pc.webp`}
+                      srcset={`/Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc.webp 1920w`}
+                      sizes="(min-width: 1024px) 440px, 92vw"
                       alt={`${p.name} — ${projects.shotAlt?.pc ?? 'escritorio'}`}
                       width="1920" height="1080"
-                      loading={eager ? 'eager' : 'lazy'} decoding="async"
+                      loading="lazy" decoding="async"
                     />
                   ) : (
                     <div class="dv-wire" aria-hidden="true"><span style="width:74%"></span><span style="width:48%"></span><span style="width:62%"></span><span style="width:36%"></span></div>
@@ -68,9 +69,11 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
                     <img
                       class="dv-pshot"
                       src={`/Galeria/${shot.slug}-movil.webp`}
+                      srcset={`/Galeria/${shot.slug}-movil-520.webp 520w, /Galeria/${shot.slug}-movil.webp 1320w`}
+                      sizes="(min-width: 1024px) 160px, 40vw"
                       alt={`${p.name} — ${projects.shotAlt?.movil ?? 'móvil'}`}
                       width="1320" height={shot.mh}
-                      loading={eager ? 'eager' : 'lazy'} decoding="async"
+                      loading="lazy" decoding="async"
                     />
                   ) : (
                     <div class="dv-pwire" aria-hidden="true"></div>

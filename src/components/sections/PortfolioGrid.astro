@@ -37,6 +37,8 @@ const uipf = t(lang);
                 <img
                   class="dvp-shot"
                   src={`/Galeria/${p.slug}-pc.webp`}
+                  srcset={`/Galeria/${p.slug}-pc-900.webp 900w, /Galeria/${p.slug}-pc.webp 1920w`}
+                  sizes="(min-width: 1024px) 440px, 92vw"
                   alt={`${p.name} — ${uipf.shot.pc}`}
                   width="1920" height="1080" loading="lazy" decoding="async"
                 />
@@ -50,6 +52,8 @@ const uipf = t(lang);
                 <img
                   class="dvp-pshot"
                   src={`/Galeria/${p.slug}-movil.webp`}
+                  srcset={`/Galeria/${p.slug}-movil-520.webp 520w, /Galeria/${p.slug}-movil.webp 1320w`}
+                  sizes="(min-width: 1024px) 160px, 40vw"
                   alt={`${p.name} — ${uipf.shot.movil}`}
                   width="1320" height={p.mh} loading="lazy" decoding="async"
                 />

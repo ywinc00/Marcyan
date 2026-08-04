@@ -42,7 +42,7 @@ export default defineConfig({
     }),
   ],
   trailingSlash: 'ignore',
-  build: { format: 'directory' },
+  build: { format: 'directory', inlineStylesheets: 'always' },
   redirects: {
     '/': '/es',
   },

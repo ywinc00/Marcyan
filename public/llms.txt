@@ -1,61 +1,35 @@
 # Marcyan Studio
 
-> Agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas (PYMEs) hispanas en Estados Unidos. Atendemos a negocios en Houston, TX y Miami, FL, en español e inglés.
+> Agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas (PYMEs) hispanas en Estados Unidos. Atendemos a negocios en Houston, TX y Miami, FL, en español e inglés. / Bilingual web design, applied AI, and SEO studio for small businesses in Houston, TX and Miami, FL.
 
 Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitios que convierten, posicionan en Google y en los asistentes de IA (ChatGPT, Gemini, Meta AI), y asistentes de IA que ahorran tiempo al dueño del negocio (contestar mensajes, agendar citas, calificar clientes). Trabajo real y verificable: clientes nuestros ya aparecen en las recomendaciones de la IA de Google para algunas búsquedas.
 
-## Servicios
-- Diseño y desarrollo web premium (sitios a la medida, rápidos y optimizados).
-- Tiendas en línea / e-commerce.
-- IA conversacional: asistentes y chatbots que atienden 24/7, califican clientes y agendan citas.
-- SEO y SEO Local (Houston y Miami), incluyendo visibilidad en asistentes de IA (AEO/GEO).
-- Branding e identidad visual.
-- Mantenimiento y soporte continuo, bilingüe.
+## Páginas principales (español)
 
-## Cobertura
-- Houston, TX y su área metropolitana.
-- Miami, FL y su área metropolitana.
-- Atención bilingüe español / inglés.
+- [Inicio](https://marcyanstudio.com/es): qué hacemos y para quién.
+- [Servicios](https://marcyanstudio.com/es/servicios): catálogo completo con precios de arranque.
+- [Precios](https://marcyanstudio.com/es/precios): tarifas públicas, sin letra pequeña.
+- [Diseño web en Houston](https://marcyanstudio.com/es/houston/diseno-web): servicio insignia.
+- [SEO para IA](https://marcyanstudio.com/es/houston/seo-para-ia): que ChatGPT y Gemini te recomienden; diagnóstico gratis.
+- [IA para PYMEs](https://marcyanstudio.com/es/ia-para-pymes): asistentes que atienden 24/7.
+- [Houston](https://marcyanstudio.com/es/houston) y [Miami](https://marcyanstudio.com/es/miami): cobertura por ciudad.
+- [Diagnóstico digital gratis](https://marcyanstudio.com/es/diagnostico): escaneo de tu presencia digital en 60 segundos.
+- [Herramientas gratis](https://marcyanstudio.com/es/herramientas): calculadoras de llamadas y citas perdidas.
+- [Blog](https://marcyanstudio.com/es/blog): guías honestas con datos y fuentes.
+- [Política de privacidad](https://marcyanstudio.com/privacidad) · [Términos](https://marcyanstudio.com/terminos)
 
-## Enlaces
-- Sitio principal: https://marcyanstudio.com/
-- Iniciar un proyecto (brief): https://marcyanstudio.com/formulario
-- Política de privacidad: https://marcyanstudio.com/privacidad
-- Términos del servicio: https://marcyanstudio.com/terminos
+## Main pages (English)
 
-## Contacto
-- Correo: contact@marcyanstudio.com
+- [Home](https://marcyanstudio.com/en): what we do and who we serve.
+- [Services](https://marcyanstudio.com/en/services) · [Pricing](https://marcyanstudio.com/en/pricing): public rates, no fine print.
+- [Houston web design](https://marcyanstudio.com/en/houston/web-design) · [AI SEO](https://marcyanstudio.com/en/houston/ai-seo)
+- [AI for small business](https://marcyanstudio.com/en/ai-for-small-business)
+- [Houston](https://marcyanstudio.com/en/houston) · [Miami](https://marcyanstudio.com/en/miami) · [Cities](https://marcyanstudio.com/en/cities)
+- [Free digital checkup](https://marcyanstudio.com/en/checkup) · [Free tools](https://marcyanstudio.com/en/tools)
+- [Portfolio](https://marcyanstudio.com/en/portfolio) · [About](https://marcyanstudio.com/en/about)
+- [Privacy policy](https://marcyanstudio.com/en/privacy) · [Terms](https://marcyanstudio.com/en/terms)
 
----
+## Contacto / Contact
 
-# Marcyan Studio (English)
-
-> Bilingual web design, applied AI, and SEO studio for small and medium businesses in Houston, TX and Miami, FL. We build in true English and Spanish, so you reach both sides of your market — and we put AI to work for your business.
-
-Marcyan Studio is a bilingual studio: most agencies hand you a Google Translate button; we design your site in real English and Spanish, optimize it for Google and for AI assistants (ChatGPT, Gemini, Meta AI), and set up AI assistants that answer, book, and qualify leads 24/7. Real, verifiable work: our clients already show up in Google's AI recommendations for some searches.
-
-## Services
-- Premium web design and development (custom, fast, optimized sites).
-- Online stores / e-commerce.
-- Conversational AI: assistants and chatbots that serve customers 24/7, qualify leads, and book appointments.
-- SEO and Local SEO (Houston and Miami), including AI-assistant visibility (AEO/GEO).
-- Branding and visual identity.
-- Ongoing bilingual maintenance and support.
-
-## Coverage
-- Houston, TX and its metro area.
-- Miami, FL and its metro area.
-- Bilingual English / Spanish service.
-
-## Links (English)
-- Home: https://marcyanstudio.com/en/
-- Services: https://marcyanstudio.com/en/services
-- Pricing: https://marcyanstudio.com/en/pricing
-- Cities: https://marcyanstudio.com/en/cities
-- Portfolio: https://marcyanstudio.com/en/portfolio
-- About: https://marcyanstudio.com/en/about
-- Privacy policy: https://marcyanstudio.com/en/privacy
-- Terms of service: https://marcyanstudio.com/en/terms
-
-## Contact
 - Email: contact@marcyanstudio.com
+- [Formulario de contacto](https://marcyanstudio.com/es/#contacto)

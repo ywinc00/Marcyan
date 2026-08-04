@@ -61,7 +61,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
         {/* satélite = IA */}
         <circle cx="371" cy="144" r="8" fill="var(--accent-teal)" />
       </svg>
-      <div class="hero__orbit" data-hero-orbit aria-hidden="true"></div>
+      <nav class="hero__orbit" data-hero-orbit aria-label={uih.exploreSite}></nav>
       <div class="hero__hit" data-hero-hit aria-hidden="true"></div>
       <div class="hero__hint" data-hero-hint aria-hidden="true"><span class="hero__hint-dot"></span><span data-hero-hint-txt>{uih.hoverHint}</span></div>
     </div>

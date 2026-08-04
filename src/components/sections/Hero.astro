@@ -73,6 +73,25 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   </div>
 </section>
 
+<script is:inline>
+  // Pre-pintado anti-CLS: si el motor orbital va a activarse (JS vivo, sin
+  // reduced-motion), oculta los chips SSR ANTES del primer frame. Antes, el
+  // módulo (deferred) los ocultaba tras pintar → parpadeo de chips y salto del
+  // planeta de ~176px = el 0.10 de CLS móvil restante. El motor confirma con
+  // data-hero-ready; si no arranca en 3s (JS roto), los chips se restauran.
+  (function () {
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var hero = document.querySelector('[data-hero]');
+      if (!hero) return;
+      hero.classList.add('hero--orbital');
+      window.setTimeout(function () {
+        if (!hero.hasAttribute('data-hero-ready')) hero.classList.remove('hero--orbital');
+      }, 3000);
+    } catch (e) { /* sin matchMedia: quedan los chips SSR, como sin JS */ }
+  })();
+</script>
+
 <style>
   .hero {
     position: relative; overflow: clip;
@@ -292,6 +311,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       if (running) return;
       running = true;
       hero.classList.add('hero--orbital');
+      hero.setAttribute('data-hero-ready', '1'); // confirma al pre-pintado anti-CLS
       isAuto = auto(); lastAuto = isAuto; activated = false;
       target = 0; energy = 0;                       // siempre arranca calmo (móvil: hasta el toque)
       // Textos por idioma inyectados por el SSR (data-hint-*) — sin español en /en/.

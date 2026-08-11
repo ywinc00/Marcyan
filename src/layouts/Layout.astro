@@ -118,6 +118,11 @@ const jsonLd = {
     },
   ],
 };
+
+// Google Analytics 4. El snippet init va como string (set:html en el <head>)
+// para que las llaves del snippet no las procese el JSX de Astro.
+const GA_ID = 'G-4GJPX4PTRV';
+const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -154,6 +159,19 @@ const jsonLd = {
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    {/* Google Analytics 4 (gtag.js) — async, is:inline para que Astro NO lo
+        bundlee. Va al final del <head>: al ser async no bloquea el render y
+        deja que fuentes/CSS críticos se descubran primero (cuida el PSI).
+        NO se emite en páginas noindex (panel/kit/formulario): sin ruido de
+        analytics en zonas privadas. El init va con set:html para que las {}
+        del snippet no las interprete el JSX de Astro. */}
+    {!noindex && (
+      <>
+        <script async is:inline src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script is:inline set:html={gaInit} />
+      </>
+    )}
 
     <slot name="head" />
   </head>

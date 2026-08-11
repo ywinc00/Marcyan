@@ -44,7 +44,7 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
               <p class="loc__tagline">{c.taglineIcon && <Icon name={c.taglineIcon} />}{c.tagline}</p>
             )}
             <p class="loc__area">{c.area}</p>
-            <a class="loc__tel" href={`tel:${tel(c.tel)}`}>{c.tel}</a>
+            <a class="loc__tel" href={`tel:${tel(c.tel)}`} data-track="call_clicked">{c.tel}</a>
 
             {c.stateFull && (
               <div class="loc__pills">

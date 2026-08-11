@@ -43,7 +43,7 @@ const uip = t(lang);
           {unit && <span class="pricing__unit">{unit}</span>}
         </p>
 
-        <Button href={cta.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg" class="pricing__cta">{cta.label}</Button>
+        <Button href={cta.href} variant={tone === 'teal' ? 'teal' : 'primary'} size="lg" class="pricing__cta" data-track="pricing_cta_clicked">{cta.label}</Button>
         {note && <p class="pricing__note">{note}</p>}
       </div>
 

@@ -47,7 +47,7 @@ const formHref = primary.href || '#contacto';
       {/* Trío de conversión. El orden/énfasis se invierte por dispositivo vía CSS:
           móvil = Llamar dominante · desktop = Formulario dominante. */}
       <div class="ctaband__actions">
-        <a class="ctaband__act ctaband__act--form" href={formHref}>
+        <a class="ctaband__act ctaband__act--form" href={formHref} data-track="proposal_requested">
           <Icon name="lucide:arrow-right" />
           <span>{primary.label}</span>
         </a>

@@ -82,7 +82,7 @@ function splitTier(raw: string): { name: string; price: string | null } {
             ))}
           </ul>
 
-          <a class="pcard__cta" href={s.href}>
+          <a class="pcard__cta" href={s.href} data-track="pricing_card_clicked">
             <span>{s.ctaLabel}</span>
             <Icon name="lucide:arrow-right" />
           </a>

@@ -186,7 +186,7 @@ const itemList = [
                   </ul>
 
                   <p class="citycard__area"><Icon name="lucide:radius" class="citycard__area-ic" />{city.area}</p>
-                  <a class="citycard__tel" href={`tel:${tel(city.tel)}`}><Icon name="lucide:phone" class="citycard__tel-ic" />{city.tel}</a>
+                  <a class="citycard__tel" href={`tel:${tel(city.tel)}`} data-track="call_clicked"><Icon name="lucide:phone" class="citycard__tel-ic" />{city.tel}</a>
 
                   {hub?.href && (
                     <a class="citycard__hub" href={hub.href}>

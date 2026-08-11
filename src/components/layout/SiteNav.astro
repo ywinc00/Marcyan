@@ -55,7 +55,7 @@ const isActive = (href: string) =>
           ? <span class="nav__lang-opt is-on" aria-current="true">EN</span>
           : <a class="nav__lang-opt" href={otherHref} hreflang="en" title={lang === 'es' ? 'English version' : 'Versión en español'}>EN</a>}
       </div>
-      <a class="nav__cta" href={nav.cta.href}>{nav.cta.label}</a>
+      <a class="nav__cta" href={nav.cta.href} data-track="proposal_requested">{nav.cta.label}</a>
       <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" data-nav-toggle>
         <span class="sr-only">{nav.openMenu}</span>
         <Icon name="lucide:menu" />
@@ -77,14 +77,14 @@ const isActive = (href: string) =>
       {nav.links.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
     <div class="nav__drawer-foot">
-      <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link>{nav.cta.label}</Button>
+      <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track="proposal_requested">{nav.cta.label}</Button>
     </div>
   </aside>
 </header>
 
 {showCtaBar && (
   <div class="nav__cta-bar" data-nav-ctabar>
-    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full">{nav.cta.label}</Button>
+    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-track="proposal_requested">{nav.cta.label}</Button>
   </div>
 )}
 

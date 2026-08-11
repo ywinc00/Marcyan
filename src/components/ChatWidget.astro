@@ -286,11 +286,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             <span class="mrc-opt-title">{t.optDirectTitle}</span>
             <span class="mrc-opt-sub">{t.optDirectSub}</span>
             <span class="mrc-opt-pills">
-              <a class="mrc-pill" href={waHref} target="_blank" rel="noopener noreferrer">
+              <a class="mrc-pill" href={waHref} target="_blank" rel="noopener noreferrer" data-track="whatsapp_clicked">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.43.78 3.04 1.19 4.66 1.19h.004c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15h-.003a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.82 2.42a8.16 8.16 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.48-.01a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
                 WhatsApp
               </a>
-              <a class="mrc-pill" href={smsHref} data-mrc-sms>
+              <a class="mrc-pill" href={smsHref} data-mrc-sms data-track="imessage_clicked">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3C6.9 3 2.75 6.36 2.75 10.5c0 2.36 1.36 4.47 3.48 5.85-.17 1.2-.77 2.35-1.69 3.26a.5.5 0 0 0 .44.85c1.9-.32 3.39-1.03 4.49-1.79.78.2 1.6.31 2.53.31 5.1 0 9.25-3.36 9.25-7.5S17.1 3 12 3z"/></svg>
                 iMessage
               </a>
@@ -750,6 +750,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
 <script>
   import { stripMarkdown, invitesContact, extractContact, contactFlags, mergeContact } from '../lib/chat-format.mjs';
+  import { track } from '../lib/track.js';
 
   const root = document.getElementById('mrc-chat');
   const cfgEl = root && root.querySelector('[data-mrc-config]');
@@ -1004,6 +1005,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     async function send(textRaw) {
       const text = (textRaw || '').trim();
       if (!text || busy) return;
+      try { track('chat_message_sent'); } catch {}
       flushTyper();          // completa cualquier respuesta que aún se esté "escribiendo"
       lastUserText = text;
 
@@ -1286,7 +1288,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             body: JSON.stringify({ name: get('#mrc-c-name'), contact: email || phone, message: need, lang, website_hp: get('#mrc-c-hp') }),
           });
           let data = null; try { data = await res.json(); } catch (_) {}
-          if (res.ok && data && data.ok) { onSuccess(T.capHandoffOk || T.capOk); }
+          if (res.ok && data && data.ok) { try { track('chat_handoff_submitted'); } catch {} onSuccess(T.capHandoffOk || T.capOk); }
           else { throw new Error('bad response'); }
         } catch (_) { onFail(); }  // incl. AbortError (timeout)
         return;
@@ -1356,6 +1358,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         });
         let data = null; try { data = await res.json(); } catch (_) {}
         if (res.ok && data && data.ok) {
+          try { track('generate_lead', { source: 'chat', kind: endpoint.indexOf('brief') >= 0 ? 'brief' : 'lead' }); } catch {}
           onSuccess((T.capOk || 'OK').replace('%ID%', data.refId || data.projectId || '—'));
         } else { throw new Error('bad response'); }
       } catch (_) { onFail(); }  // incl. AbortError (timeout)
@@ -1413,6 +1416,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     // ── Abrir / cerrar panel ──
     function openPanel() {
+      try { track('chat_opened'); } catch {}
       loadDeferredAssets();
       // Congela el documento de fondo para que el teclado no arrastre la página
       // por detrás del panel a pantalla completa (solo móvil).
@@ -1484,10 +1488,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const el = e.target && e.target.closest ? e.target.closest('[data-act], [data-msg]') : null;
       if (!el) return;
       const act = el.getAttribute('data-act');
-      if (act === 'chat') { ensureChat(); if (input) input.focus(); return; }
-      if (act === 'form') { openCapture('contacto'); return; }
+      if (act === 'chat') { try { track('chat_channel_selected', { channel: 'chat' }); } catch {} ensureChat(); if (input) input.focus(); return; }
+      if (act === 'form') { try { track('chat_channel_selected', { channel: 'form' }); } catch {} openCapture('contacto'); return; }
       const msg = el.getAttribute('data-msg');
-      if (msg) send(msg);
+      if (msg) { try { track('chat_channel_selected', { channel: 'diagnostic' }); } catch {} send(msg); }
     });
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
 

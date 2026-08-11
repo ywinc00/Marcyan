@@ -204,6 +204,9 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
           delete form.dataset.busy;
           return;
         }
+        // Conversión: LEAD desde el raíl del blog → GA4 (import dinámico para no
+        // cargar track.js salvo al convertir). El lead ya se guardó en /api/contact.
+        try { import('../../lib/track.js').then((m) => m.track('generate_lead', { source: 'blog_rail', ref: payload.refId || '' })).catch(() => {}); } catch {}
         okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
         okBox.hidden = false;
         form.querySelectorAll('input').forEach((el) => (el.disabled = true));

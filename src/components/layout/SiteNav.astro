@@ -168,10 +168,20 @@ const isActive = (href: string) =>
      sube un escalón para taparlo, y el drawer otro más para quedar sobre el velo. */
   .nav__overlay {
     position: fixed; inset: 0; z-index: calc(var(--z-drawer) + 1);
-    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+    background: var(--bg-scrim);
     opacity: 0; pointer-events: none; transition: opacity var(--duration-base) var(--ease-out-expo);
   }
-  .nav__overlay[data-open] { opacity: 1; pointer-events: auto; }
+  /* Bloqueo de scroll con el drawer abierto. Va por clase, no por estilo inline, para
+     que el propio CSS lo levante al pasar a ≥md: si se rota a horizontal con el menú
+     abierto, el drawer se oculta y la página quedaría sin scroll y sin salida. */
+  :global(body.has-drawer-open) { overflow: hidden; }
+  @media (--md) { :global(body.has-drawer-open) { overflow: visible; } }
+  /* El desenfoque solo mientras está abierto: en la regla base dejaría una capa de
+     composición a pantalla completa en cada página móvil, aunque no se vea. */
+  .nav__overlay[data-open] {
+    opacity: 1; pointer-events: auto;
+    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  }
 
   .nav__drawer {
     position: fixed; inset: 0 0 0 auto; z-index: calc(var(--z-drawer) + 2);
@@ -234,9 +244,24 @@ const isActive = (href: string) =>
   const drawer = document.querySelector('[data-nav-drawer]') as HTMLElement;
   const overlay = document.querySelector('[data-nav-overlay]') as HTMLElement;
   const closeBtn = document.querySelector('[data-nav-close]') as HTMLButtonElement;
-  if (root && toggle && drawer && overlay && closeBtn) {
-    const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
+  // Estado "scrolled" de la barra + barra CTA inferior. Va en su propio guard porque
+  // no depende del drawer: así un cambio en el menú no puede dejar la nav sin fondo
+  // ni sin barra CTA en todo el sitio.
+  if (root) {
     const ctabar = document.querySelector('[data-nav-ctabar]') as HTMLElement;
+    const onScroll = () => {
+      root.classList.toggle('is-scrolled', window.scrollY > 24);
+      const showBar = window.scrollY > 560;
+      if (ctabar) ctabar.classList.toggle('is-visible', showBar);
+      // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
+      document.body.classList.toggle('has-ctabar', showBar);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (toggle && drawer && overlay && closeBtn) {
+    const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
     let lastFocus: HTMLElement | null = null;
 
     const focusables = () =>
@@ -250,7 +275,7 @@ const isActive = (href: string) =>
       drawer.removeAttribute('inert');
       drawer.setAttribute('aria-hidden', 'false');
       toggle.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('has-drawer-open');
       focusables()[0]?.focus();
     }
     function close() {
@@ -259,8 +284,10 @@ const isActive = (href: string) =>
       drawer.setAttribute('inert', '');
       drawer.setAttribute('aria-hidden', 'true');
       toggle.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-      lastFocus?.focus();
+      document.body.classList.remove('has-drawer-open');
+      // Safari (iOS/macOS) no da foco a un <button> al tocarlo, así que lastFocus suele
+      // ser el <body> y devolverle el foco lo mandaría al inicio del documento.
+      (lastFocus && lastFocus !== document.body ? lastFocus : toggle).focus();
     }
 
     // Tras el scroll a #contacto, mover el foco al primer campo del formulario.
@@ -310,15 +337,12 @@ const isActive = (href: string) =>
       }
     });
 
-    // estado scrolled + barra CTA inferior tras pasar el hero
-    const onScroll = () => {
-      root.classList.toggle('is-scrolled', window.scrollY > 24);
-      const showBar = window.scrollY > 560;
-      if (ctabar) ctabar.classList.toggle('is-visible', showBar);
-      // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
-      document.body.classList.toggle('has-ctabar', showBar);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    // Al rotar a horizontal (o ensanchar) el drawer pasa a display:none y con él
+    // desaparecen el velo y la hamburguesa: sin esto nadie llamaría a close() y el
+    // body se quedaría con el scroll bloqueado y sin manera visible de cerrarlo.
+    // Se consulta el display real para no duplicar aquí el breakpoint de media.css.
+    window.addEventListener('resize', () => {
+      if (drawer.hasAttribute('data-open') && getComputedStyle(drawer).display === 'none') close();
+    }, { passive: true });
   }
 </script>

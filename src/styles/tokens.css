@@ -16,6 +16,7 @@
   --bg-card:     #141414;   /* tarjetas, paneles */
   --bg-elevated: #1c1c1c;   /* superficies elevadas, dropdowns */
   --bg-overlay:  rgba(8, 8, 8, 0.85);
+  --bg-scrim:    rgba(0, 0, 0, 0.6);   /* velo modal tras el drawer (más claro que --bg-overlay) */
 
   /* ── Acento: Oro (acento primario — usar con MODERACIÓN, ~7%) ── */
   --accent-gold:      #c8a96e;

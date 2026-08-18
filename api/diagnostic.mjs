@@ -26,6 +26,7 @@ import { clientIp } from '../lib/auth.mjs';
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import {
   analyzeSite, recommendService, plainSummary, fallbackReport,
+  findContactHref, mergeContactSignals,
   INDUSTRIES, REVIEW_BUCKETS,
 } from '../lib/diagnostic-checks.mjs';
 
@@ -198,7 +199,25 @@ async function handleAnalyze({ req, res, body, lang, E, ip }) {
     };
     findings = Array.isArray(cachedRow.findings) ? cachedRow.findings : [];
   } else {
-    const out = analyzeSite({ html: site.html || '', https: !!site.https, hasSite, city: city || '', reviewsBucket: reviews });
+    let out = analyzeSite({ html: site.html || '', https: !!site.https, hasSite, city: city || '', reviewsBucket: reviews });
+    // Follow-up de contacto: si la home no muestra formulario/teléfono pero enlaza a
+    // una página de contacto, la bajamos también (UN fetch extra, mismo ssrfGuard,
+    // presupuesto corto) y fusionamos las señales. Evita el falso "no tiene
+    // formulario" en sitios que lo tienen en /contacto. Best-effort: cualquier
+    // fallo deja el análisis de la home tal cual.
+    if (hasSite && (out.checks.C3 !== 'pass' || out.checks.C1 !== 'pass')) {
+      try {
+        const href = findContactHref(site.html);
+        if (href) {
+          const contactUrl = new URL(href, site.finalUrl || finalUrl);
+          const g2 = await ssrfGuard(contactUrl.href);
+          if (g2.ok) {
+            const contact = await fetchSite(g2.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
+            if (contact.ok && contact.html) out = mergeContactSignals(out, contact.html);
+          }
+        }
+      } catch (e) { console.error('[diagnostic] contact follow-up falló:', e && e.message); }
+    }
     scores = out.scores;
     findings = out.findings;
   }

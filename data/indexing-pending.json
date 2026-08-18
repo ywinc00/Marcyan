@@ -1,0 +1,63 @@
+{
+  "builtAt": "2026-08-18T00:26:04.174Z",
+  "property": "sc-domain:marcyanstudio.com",
+  "cooldownDays": 7,
+  "maxPerDay": 8,
+  "totals": {
+    "total": 84,
+    "indexed": 53,
+    "notIndexed": 14,
+    "skipped": 17
+  },
+  "candidates": 14,
+  "pending": [
+    {
+      "url": "https://marcyanstudio.com/es/miami",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/precios",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/houston/contractors",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/houston/restaurants",
+      "coverageState": "URL is unknown to Google",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/branding",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/ecommerce",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/ia-conversacional",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/seo-local",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    }
+  ]
+}

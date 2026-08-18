@@ -74,7 +74,7 @@ export const clusterNav = {
     { label: 'Nosotros', href: '/es/sobre-nosotros' },
     { label: 'Blog', href: '/es/blog' },
   ],
-  cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+  cta: { label: 'Propuesta gratis', href: '#contacto' },
   langLabel: 'EN',
   langHref: '/en/',
   openMenu: 'Abrir menú',
@@ -91,7 +91,7 @@ export const clusterNavEn = {
     { label: 'About', href: '/en/about' },
     { label: 'Blog', href: '/en/blog' },
   ],
-  cta: { label: 'Get a free proposal', href: '#contacto' },
+  cta: { label: 'Get my free proposal', href: '#contacto' },
   langLabel: 'ES',
   langHref: '/es/',
   openMenu: 'Open menu',
@@ -118,7 +118,7 @@ const caso0: ProjectItem = {
 // ── Contenido compartido entre las dos landings de diseño web ──
 const webIncludesItems: FeatureItem[] = [
   { icon: 'lucide:pen-tool', title: 'Diseño a medida', desc: 'Cada sitio se diseña desde cero alrededor de tu marca y tus objetivos. Sin plantillas recicladas.' },
-  { icon: 'lucide:gauge', title: 'Rápido y móvil primero', desc: 'HTML ligero que carga en un par de segundos, impecable en celular y en computadora.' },
+  { icon: 'lucide:gauge', title: 'Rápido y hecho para el celular', desc: 'HTML ligero que carga en un par de segundos, impecable en celular y en computadora.' },
   { icon: 'lucide:languages', title: 'Bilingüe español e inglés', desc: 'Tu sitio en los dos idiomas, escrito para cómo busca de verdad tu cliente.' },
   { icon: 'lucide:search', title: 'SEO y listo para IA', desc: 'Estructura optimizada para Google y para que ChatGPT y Gemini puedan leerte.' },
   { icon: 'lucide:inbox', title: 'Formularios y captación', desc: 'Formularios que llegan a tu correo y a tu base de datos, para que no se escape ningún prospecto.' },
@@ -140,7 +140,7 @@ const webPriceNote =
 // ═══════════════════════════════════════════════════════════════
 const houstonSeo: ClusterPage = {
   meta: {
-    title: 'SEO Local en Houston: posiciona tu negocio en Google | Marcyan',
+    title: 'SEO local en Houston: posiciona tu negocio en Google | Marcyan',
     description:
       'Agencia de SEO local en Houston para PYMEs hispanas. Optimizamos tu Perfil de Google, tu sitio y tus reseñas para que te encuentren. Propuesta gratis en 24h.',
   },
@@ -148,15 +148,15 @@ const houstonSeo: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Houston', path: '/es/houston' },
-    { name: 'SEO Local', path: '/es/houston/seo-local' },
+    { name: 'SEO local', path: '/es/houston/seo-local' },
   ],
   hero: {
     badge: 'Houston, TX',
     badgeIcon: 'lucide:map-pin',
     kicker: 'SEO Local',
-    h1: 'SEO Local en <em>Houston</em>',
+    h1: 'SEO local en <em>Houston</em>',
     sub: 'Aparece cuando tus clientes buscan en Google Maps y en los asistentes de IA. Optimizamos tu presencia local para que tu negocio en Houston gane más llamadas, visitas y reseñas, en español e inglés.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo trabajamos', href: '#proceso' },
     chips: ['Bilingüe ES/EN', 'Sin contratos eternos', 'Reportes claros'],
     tone: 'gold',
@@ -202,14 +202,14 @@ const houstonSeo: ClusterPage = {
       'Reporte mensual claro',
       'Soporte bilingüe',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: 'El precio final depende del estado actual de tu negocio y de tu competencia. Te damos un alcance honesto en la propuesta, sin sorpresas.',
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Negocios de Houston que <em>ya posicionan</em>',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX"),
   },
   faq: {
@@ -227,7 +227,7 @@ const houstonSeo: ClusterPage = {
   cta: {
     title: '¿Listo para que Houston te <em>encuentre</em>?',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de SEO local personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -274,7 +274,7 @@ const houstonWeb: ClusterPage = {
     kicker: 'Diseño Web',
     h1: 'Diseño Web en <em>Houston</em>',
     sub: 'Sitios web a medida, rápidos y bilingües para negocios de Houston. Diseñados para verse increíbles, cargar al instante y convertir visitas en clientes, listos para Google y para la IA.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver trabajo real', href: '#proyectos' },
     chips: ['A medida, sin plantillas', 'Bilingüe ES/EN', 'Listo para IA y SEO'],
     tone: 'gold',
@@ -306,14 +306,14 @@ const houstonWeb: ClusterPage = {
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Negocios de Houston con <em>sitio nuevo</em>',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
   },
   faq: {
@@ -331,7 +331,7 @@ const houstonWeb: ClusterPage = {
   cta: {
     title: 'Tu próximo sitio web <em>empieza aquí</em>',
     sub: 'Cuéntanos tu proyecto y recibe una propuesta de diseño web personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -382,7 +382,7 @@ const miamiWeb: ClusterPage = {
     kicker: 'Diseño Web',
     h1: 'Diseño Web en <em>Miami</em>',
     sub: 'Sitios web a medida, rápidos y bilingües para negocios de Miami y su área metropolitana. Diseño de élite que carga al instante, convierte visitas en clientes y te prepara para Google y la IA.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver trabajo real', href: '#proyectos' },
     chips: ['A medida, sin plantillas', 'Bilingüe ES/EN', 'Cupos de Cliente Fundador'],
     tone: 'gold',
@@ -402,7 +402,7 @@ const miamiWeb: ClusterPage = {
     tag: 'Por qué Miami',
     title: 'Miami es <em>bilingüe por naturaleza</em>',
     paragraphs: [
-      'Miami es uno de los mercados más hispanos de Estados Unidos, cerca del 69% de Miami-Dade, de Hialeah a Doral y de Brickell a Kendall, y el español no es un «extra»: es el idioma de tus clientes. Un sitio que no habla su idioma, y que no carga rápido en el celular, deja dinero sobre la mesa.',
+      'Miami es uno de los mercados más hispanos de Estados Unidos, con cerca del 69% de la población de Miami-Dade, de Hialeah a Doral y de Brickell a Kendall, y el español no es un «extra»: es el idioma de tus clientes. Un sitio que no habla su idioma, y que no carga rápido en el celular, pierde ventas todos los días.',
       '<strong>Seamos transparentes:</strong> apenas estamos abriendo nuestra operación de diseño en Miami, así que todavía no mostramos casos locales aquí. Lo que sí mostramos es trabajo real y verificable que ya hicimos para otros negocios (en Houston y Orlando), y buscamos a nuestros primeros Clientes Fundadores de Miami para sumar casos de esta ciudad.',
     ],
     tone: 'gold',
@@ -414,7 +414,7 @@ const miamiWeb: ClusterPage = {
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
@@ -440,7 +440,7 @@ const miamiWeb: ClusterPage = {
   cta: {
     title: 'Sé uno de nuestros primeros <em>casos en Miami</em>',
     sub: 'Buscamos Clientes Fundadores en Miami. Cuéntanos tu proyecto y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -486,7 +486,7 @@ const iaPymes: ClusterPage = {
     kicker: 'IA para PYMEs',
     h1: 'IA para tu <em>Negocio</em>',
     sub: '¿Tu negocio pierde clientes por no contestar a tiempo? Ponemos la inteligencia artificial a trabajar para ti: asistentes que responden, agendan citas y captan prospectos a toda hora, en español, sin que tengas que saber de tecnología.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo funciona', href: '#faq' },
     chips: ['En español', 'Sin saber de tecnología', 'Se integra con lo que ya usas'],
     tone: 'teal',
@@ -545,7 +545,7 @@ const iaPymes: ClusterPage = {
   },
   faq: {
     tag: 'Preguntas frecuentes',
-    title: 'IA para tu negocio, en <em>simple</em>',
+    title: 'IA para tu negocio, en <em>palabras simples</em>',
     items: [
       { q: '¿Qué tan caro es esto para un negocio pequeño?', a: 'Más accesible de lo que crees. Una automatización inicial empieza en $900 y se paga sola rápido cuando dejas de perder clientes por no contestar a tiempo. Empezamos con una sola solución a tu mayor dolor, no con un proyecto gigante, y crecemos desde ahí.' },
       { q: '¿Necesito saber de tecnología?', a: 'No, y esa es justamente la idea. Nosotros configuramos todo y te lo dejamos funcionando, con una capacitación sencilla para tu equipo. Tú te dedicas a tu negocio; de la parte técnica nos encargamos la IA y nosotros.' },
@@ -558,7 +558,7 @@ const iaPymes: ClusterPage = {
   cta: {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'Cuéntanos cuál es tu mayor dolor y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -636,14 +636,14 @@ const precioWebHouston: ClusterPage = {
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Sitios reales que <em>ya están en vivo</em>',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
   },
   faq: {
@@ -661,7 +661,7 @@ const precioWebHouston: ClusterPage = {
   cta: {
     title: 'Pide el precio <em>exacto</em> de tu sitio',
     sub: 'Cuéntanos cuántas páginas y qué funciones necesitas, y recibe una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -714,14 +714,14 @@ const houstonIa: ClusterPage = {
     kicker: 'IA Conversacional',
     h1: 'Asistente de IA para tu <em>negocio</em> en Houston',
     sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta llamadas y mensajes perdidos, agenda citas y atiende en español las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo funciona', href: '#faq' },
     chips: ['En español de verdad', 'Te lo instalamos y mantenemos', 'Siempre te pasa con una persona'],
     tone: 'teal',
   },
   answer: {
     q: '¿Cómo puede un asistente de IA ayudar a un negocio en Houston?',
-    a: 'Un asistente de IA contesta al instante, justo cuando más importa: atiende llamadas y mensajes perdidos, agenda citas y responde preguntas en español las 24 horas. Responder a un prospecto en los primeros 5 minutos lo hace hasta 21 veces más probable de calificar que esperar 30, según el Lead Response Management Study del MIT.',
+    a: 'Un asistente de IA contesta al instante, justo cuando más importa: atiende llamadas y mensajes perdidos, agenda citas y responde preguntas en español las 24 horas. Responder a un prospecto en los primeros 5 minutos multiplica hasta por 21 las probabilidades de calificarlo, frente a esperar 30, según el Lead Response Management Study del MIT.',
     source: 'Lead Response Management Study (MIT)',
   },
   includes: {
@@ -786,7 +786,7 @@ const houstonIa: ClusterPage = {
   cta: {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'Cuéntanos cuál es tu mayor dolor (llamadas perdidas, WhatsApp sin responder, citas que no se agendan) y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -947,7 +947,7 @@ const precioChatbot: ClusterPage = {
   meta: {
     title: '¿Cuánto cuesta un chatbot de WhatsApp con IA? Precio real | Marcyan',
     description:
-      'Un asistente con IA con Marcyan cuesta desde $900, pago único, e incluye instalación, entrenamiento y mantenimiento — no es una suscripción que crece cada mes. Propuesta gratis en 24h.',
+      'Con Marcyan, un asistente con IA cuesta desde $900, pago único, e incluye instalación, entrenamiento y mantenimiento. No es una suscripción que crece cada mes. Propuesta gratis en 24h.',
   },
   path: '/es/precios/cuanto-cuesta-un-chatbot',
   breadcrumb: [
@@ -961,7 +961,7 @@ const precioChatbot: ClusterPage = {
     kicker: 'Precio · IA conversacional',
     h1: 'Cuánto cuesta un <em>chatbot</em> con IA',
     sub: 'Respuesta directa: cuánto invertir en un asistente con IA para tu WhatsApp y tu sitio, qué incluye y por qué un servicio hecho por nosotros no es lo mismo que una suscripción de software que crece cada mes.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver IA conversacional en Houston', href: '/es/houston/ia-conversacional' },
     chips: ['Desde $900, pago único', 'Instalación + entrenamiento', 'Te lo mantenemos'],
     tone: 'teal',
@@ -985,7 +985,7 @@ const precioChatbot: ClusterPage = {
   },
   local: {
     tag: 'Cómo se cobra',
-    title: 'Un servicio hecho por ti, no una <em>suscripción que crece</em>',
+    title: 'Un servicio hecho para ti, no una <em>suscripción que crece</em>',
     paragraphs: [
       'En el mercado abundan las apps de chatbot por suscripción: empiezan baratas (unos $15 a $30 al mes) pero el precio sube al sumar la IA, las plantillas y los cobros por uso, y la configuras tú. Al otro extremo, un desarrollo totalmente a la medida puede costar miles de dólares. Nuestro punto medio: $900 una sola vez, hecho por nosotros.',
       '<strong>Seamos claros con un detalle técnico:</strong> si se usa la API oficial de WhatsApp, Meta cobra algunas conversaciones (hay un volumen gratis al mes y luego un costo por conversación). Ese cobro es de Meta, no nuestro: te lo explicamos por adelantado para que no haya sorpresas. Nosotros cobramos por dejarte el asistente funcionando, no por cada mensaje.',
@@ -1031,7 +1031,7 @@ const precioChatbot: ClusterPage = {
   cta: {
     title: 'Pon un asistente a <em>contestar por ti</em>',
     sub: 'Cuéntanos qué quieres que conteste y agende, y te damos una propuesta con el precio cerrado en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -1079,7 +1079,7 @@ const precioSeoHouston: ClusterPage = {
     kicker: 'Precio · SEO local',
     h1: 'Cuánto cuesta el <em>SEO local</em> en Houston',
     sub: 'Respuesta directa, con la tarifa mensual publicada: cuánto invertir en SEO local en Houston, qué incluye y en cuánto tiempo se ven resultados, sin que tengas que pedir una llamada para conocer el precio.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver SEO local en Houston', href: '/es/houston/seo-local' },
     chips: ['Desde $600/mes', 'Sin contratos largos forzados', 'Reportes claros'],
     tone: 'gold',
@@ -1124,14 +1124,14 @@ const precioSeoHouston: ClusterPage = {
       'Reporte mensual claro',
       'Soporte bilingüe',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: 'El precio final depende del estado actual de tu negocio, de tu competencia y de cuántas páginas o ubicaciones trabajemos. Te damos un alcance y un precio claros en la propuesta gratuita, antes de que decidas. No prometemos el primer lugar: nadie controla el algoritmo de Google.',
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Negocios de Houston que <em>ya posicionan</em>',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX"),
   },
   faq: {
@@ -1149,7 +1149,7 @@ const precioSeoHouston: ClusterPage = {
   cta: {
     title: 'Aparece en Houston, mes <em>a mes</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de SEO local con alcance y precio claros en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1200,7 +1200,7 @@ const houstonBranding: ClusterPage = {
     kicker: 'Branding e identidad',
     h1: 'Diseño de logo y marca en <em>Houston</em>',
     sub: 'Una identidad que se ve profesional y se siente tuya: logo, colores, tipografía y un sistema visual coherente. Diseñada a medida, en español, para que tu negocio en Houston cause una excelente primera impresión.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver todos los precios', href: '/es/precios' },
     chips: ['Desde $750', 'A medida, no plantillas', 'Archivos listos para usar'],
     tone: 'gold',
@@ -1272,7 +1272,7 @@ const houstonBranding: ClusterPage = {
   cta: {
     title: 'Dale a tu negocio una <em>marca a su altura</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta de branding personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1326,14 +1326,14 @@ const miamiIa: ClusterPage = {
     kicker: 'IA Conversacional',
     h1: 'Asistente de IA para tu <em>negocio</em> en Miami',
     sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en el español de tus clientes las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo funciona', href: '#faq' },
     chips: ['En español de verdad', 'Te lo instalamos y mantenemos', 'Siempre te pasa con una persona'],
     tone: 'teal',
   },
   answer: {
     q: '¿Cómo puede un asistente de IA ayudar a un negocio en Miami?',
-    a: 'En Miami tus clientes te escriben por WhatsApp, y el que contesta primero se queda con la venta. Un asistente de IA responde al instante, agenda citas y atiende en español las 24 horas. Responder en los primeros 5 minutos hace 21 veces más probable calificar un prospecto que esperar 30, según el Lead Response Management Study del MIT.',
+    a: 'En Miami tus clientes te escriben por WhatsApp, y el que contesta primero se queda con la venta. Un asistente de IA responde al instante, agenda citas y atiende en español las 24 horas. Responder en los primeros 5 minutos multiplica por 21 las probabilidades de calificar un prospecto, frente a esperar 30, según el Lead Response Management Study del MIT.',
     source: 'Lead Response Management Study (MIT)',
   },
   includes: {
@@ -1354,7 +1354,7 @@ const miamiIa: ClusterPage = {
     title: 'Una agencia hispana que <em>te lo instala</em>, no un software que peleas solo',
     paragraphs: [
       'En internet hay decenas de apps de IA que te venden una suscripción y te dejan solo para configurarla. Para un negocio ocupado, eso casi siempre termina olvidado. Nosotros trabajamos distinto: te lo instalamos, lo entrenamos con tu negocio y le damos mantenimiento; tú no tocas nada.',
-      'En Miami eso pesa todavía más: aquí el primer contacto pasa por WhatsApp, desde la cafetería de Hialeah hasta la clínica de Brickell, y casi siempre en español. Configuramos el asistente para que hable como tus clientes (cubano, venezolano, colombiano) y conteste al toque. <strong>Tú te dedicas a tu negocio; de la tecnología nos encargamos nosotros.</strong>',
+      'En Miami eso pesa todavía más: aquí el primer contacto pasa por WhatsApp, desde la cafetería de Hialeah hasta la clínica de Brickell, y casi siempre en español. Configuramos el asistente para que hable como tus clientes (cubano, venezolano, colombiano) y conteste al instante. <strong>Tú te dedicas a tu negocio; de la tecnología nos encargamos nosotros.</strong>',
     ],
     tone: 'teal',
   },
@@ -1398,7 +1398,7 @@ const miamiIa: ClusterPage = {
   cta: {
     title: 'Deja de perder clientes por <em>no contestar</em>',
     sub: 'En Miami, el cliente que te escribe por WhatsApp y no recibe respuesta se va con otro. Cuéntanos tu mayor dolor y te propondremos una solución con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -1441,7 +1441,7 @@ const miamiSeo: ClusterPage = {
     kicker: 'SEO Local',
     h1: 'SEO Local en <em>Miami</em>',
     sub: 'Aparece cuando tus clientes buscan en Google Maps y en los asistentes de IA. Optimizamos tu presencia local para que tu negocio en Miami gane más llamadas, visitas y reseñas, en español e inglés.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo trabajamos', href: '#proceso' },
     chips: ['Bilingüe ES/EN', 'Sin contratos eternos', 'Reportes claros'],
     tone: 'gold',
@@ -1487,13 +1487,13 @@ const miamiSeo: ClusterPage = {
       'Reporte mensual claro',
       'Soporte bilingüe',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: 'El precio final depende del estado actual de tu negocio y de tu competencia. Te damos un alcance honesto en la propuesta, sin sorpresas.',
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
-    title: 'SEO real y verificable — y <em>buscamos tu negocio</em> en Miami',
+    title: 'SEO real y verificable, y <em>buscamos tu negocio</em> en Miami',
     cta: { label: 'Sé nuestro primer caso en Miami', href: '#contacto' },
     // Honestidad: NO hay cliente de SEO en Miami. Proof etiquetado por su ciudad
     // real (Houston). NO se insinúa que sea de Miami; el título y el FAQ lo aclaran.
@@ -1514,7 +1514,7 @@ const miamiSeo: ClusterPage = {
   cta: {
     title: 'Sé uno de nuestros primeros <em>casos en Miami</em>',
     sub: 'Buscamos Clientes Fundadores en Miami. Cuéntanos sobre tu negocio y recibe una propuesta de SEO local en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1689,7 +1689,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
   },
   answer: {
     q: '¿Cómo consigue más clientes un abogado de inmigración en Houston?',
-    a: 'Llegando primero y en español: la mayoría de las consultas de inmigración entran fuera de horario y se van con quien responde antes. Responder en 5 minutos hace a un prospecto 21 veces más probable de calificar que en 30, según el Lead Response Management Study del MIT. Un asistente con IA capta y agenda consultas 24/7.',
+    a: 'Llegando primero y en español: la mayoría de las consultas de inmigración entran fuera de horario y se van con quien responde antes. Responder en 5 minutos multiplica por 21 las probabilidades de calificar a un prospecto, frente a responder en 30, según el Lead Response Management Study del MIT. Un asistente con IA capta y agenda consultas 24/7.',
     source: 'Lead Response Management Study (MIT)',
   },
   includes: {
@@ -1756,7 +1756,7 @@ const houstonAbogadosInmigracion: ClusterPage = {
   cta: {
     title: 'Que ninguna consulta de inmigración <em>se enfríe</em>',
     sub: 'Cuéntanos cómo llegan hoy tus consultas y te propondremos un sistema de captación con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -1852,7 +1852,7 @@ const houstonBienesRaices: ClusterPage = {
   },
   proof: {
     tag: 'Trabajo real',
-    title: 'Sitios a medida reales — y <em>buscamos tu marca</em> inmobiliaria',
+    title: 'Sitios a medida reales, y <em>buscamos tu marca</em> inmobiliaria',
     cta: { label: 'Sé nuestro primer caso en bienes raíces', href: '#contacto' },
     // Honestidad: aún no hay agente inmobiliario cliente. Proof real de sitios a
     // medida (etiquetado por su rubro/ciudad real) + Cliente Fundador. Sin insinuar
@@ -1874,7 +1874,7 @@ const houstonBienesRaices: ClusterPage = {
   cta: {
     title: 'Tu próximo sitio de <em>bienes raíces</em> empieza aquí',
     sub: 'Cuéntanos cómo trabajas y qué zonas cubres, y recibe una propuesta de sitio y SEO en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1923,7 +1923,7 @@ const houstonRestaurantes: ClusterPage = {
     kicker: 'Restaurantes · Houston',
     h1: 'Páginas web para <em>restaurantes</em> en Houston',
     sub: 'Tu propio sitio con menú digital y código QR en la mesa, fotos que dan hambre y pedidos o reservas por WhatsApp. Recibes pedidos directos, sin pagar comisión a las apps de terceros, todo en español y bilingüe.',
-    primary: { label: 'Quiero el sitio de mi restaurante', href: '#contacto' },
+    primary: { label: 'Quiero mi sitio', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
     chips: ['Menú con código QR', 'Pedidos por WhatsApp', 'Sin comisiones'],
     tone: 'gold',
@@ -1994,7 +1994,7 @@ const houstonRestaurantes: ClusterPage = {
   cta: {
     title: 'El sitio de tu <em>restaurante</em> empieza aquí',
     sub: 'Cuéntanos qué cocinas y cómo quieres recibir pedidos, y recibe una propuesta de sitio con menú en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2045,7 +2045,7 @@ const houstonContratistas: ClusterPage = {
   },
   answer: {
     q: '¿Qué necesita el sitio web de un contratista en Houston?',
-    a: 'Lo más importante es un sitio propio que salga en Google cuando buscan «contratista cerca de mí» o «remodelación en Houston», con tus fotos de antes y después, reseñas y presupuesto gratis. Súmale una IA que rescata las llamadas que pierdes en la obra: responder en 5 minutos lo hace hasta 21 veces más probable de calificar.',
+    a: 'Lo más importante es un sitio propio que salga en Google cuando buscan «contratista cerca de mí» o «remodelación en Houston», con tus fotos de antes y después, reseñas y presupuesto gratis. Súmale una IA que rescata las llamadas que pierdes en la obra: responder en 5 minutos multiplica hasta por 21 las probabilidades de calificar a ese prospecto.',
     source: 'Lead Response Management Study (MIT)',
   },
   includes: {
@@ -2066,7 +2066,7 @@ const houstonContratistas: ClusterPage = {
     title: 'En Houston, el trabajo se lo lleva <em>quien contesta primero</em>',
     paragraphs: [
       'Houston tiene una de las comunidades hispanas más grandes del país, concentrada en barrios como East End, Gulfton, Spring Branch, Pasadena y Alief, donde el cliente del contratista es su propia comunidad. La gente busca «contratista que hable español», «con licencia y asegurado» y «presupuesto gratis», pero casi siempre termina en directorios y clasificados, donde apareces mezclado con todos los demás y dependes de las reglas de otro.',
-      'El dolor real del rubro es simple: estás subido en el techo o manejando entre obras y no puedes contestar, y el cliente llama al siguiente. Responder rápido es lo que decide quién gana el trabajo: contestar a un prospecto en los primeros 5 minutos lo hace hasta 21 veces más probable de calificar que esperar 30 (Lead Response Management Study, MIT). <strong>Por eso unimos un sitio propio con SEO local y una IA que responde por ti al instante:</strong> para que el trabajo de $5,000 o $15,000 lo cierres tú, no el contratista que contestó primero.',
+      'El dolor real del rubro es simple: estás subido en el techo o manejando entre obras y no puedes contestar, y el cliente llama al siguiente. Responder rápido es lo que decide quién gana el trabajo: contestar a un prospecto en los primeros 5 minutos multiplica hasta por 21 las probabilidades de calificarlo, frente a esperar 30 (Lead Response Management Study, MIT). <strong>Por eso unimos un sitio propio con SEO local y una IA que responde por ti al instante:</strong> para que el trabajo de $5,000 o $15,000 lo cierres tú, no el contratista que contestó primero.',
     ],
     tone: 'gold',
   },
@@ -2091,7 +2091,7 @@ const houstonContratistas: ClusterPage = {
   proof: {
     tag: 'Trabajo real',
     title: 'Negocios locales <em>reales</em> en Houston',
-    cta: { label: 'Sé nuestro primer caso en construcción y remodelación', href: '#contacto' },
+    cta: { label: 'Sé nuestro primer caso', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
@@ -2109,7 +2109,7 @@ const houstonContratistas: ClusterPage = {
   cta: {
     title: 'Tu próximo sitio de <em>contratista</em> empieza aquí',
     sub: 'Cuéntanos qué trabajos haces y en qué zonas, y recibe una propuesta de sitio, SEO y rescate de llamadas en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2224,7 +2224,7 @@ const houstonTalleresMecanicos: ClusterPage = {
   cta: {
     title: 'Tu próximo sitio de <em>taller mecánico</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y en qué zona de Houston estás, y recibe una propuesta de sitio, SEO y asistente con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2274,7 +2274,7 @@ const houstonSalonBelleza: ClusterPage = {
   },
   answer: {
     q: '¿Qué necesita el sitio web de un salón de belleza en Houston?',
-    a: 'El sitio de un salón en Houston necesita agenda en línea para que tus clientas reserven solas 24/7, galería de tus trabajos y un asistente con IA que responda WhatsApp e Instagram al instante. Responder en 5 minutos hace al prospecto hasta 21 veces más probable de calificar.',
+    a: 'El sitio de un salón en Houston necesita agenda en línea para que tus clientas reserven solas 24/7, galería de tus trabajos y un asistente con IA que responda WhatsApp e Instagram al instante. Responder en 5 minutos multiplica hasta por 21 las probabilidades de calificar al prospecto.',
     source: 'Lead Response Management Study (MIT)',
   },
   includes: {
@@ -2338,7 +2338,7 @@ const houstonSalonBelleza: ClusterPage = {
   cta: {
     title: 'Tu salón con <em>reservas en línea</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y cómo trabajas, y recibe una propuesta de sitio con agenda y SEO en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2455,7 +2455,7 @@ const houstonClinicasDentales: ClusterPage = {
   cta: {
     title: 'El próximo sitio de tu <em>clínica dental</em> empieza aquí',
     sub: 'Cuéntanos qué servicios ofreces y qué seguros aceptas, y recibe una propuesta de sitio, SEO y agenda con IA en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2530,7 +2530,7 @@ const houstonKaty: ClusterPage = {
   },
   local: {
     tag: 'Por qué este enfoque',
-    title: 'En Katy, el cliente se busca <em>por su zona, no por «Houston»</em>',
+    title: 'En Katy, el cliente busca <em>por su zona, no por «Houston»</em>',
     paragraphs: [
       'Katy dejó de ser un pueblo ferroviario para convertirse en uno de los polos de comunidades planificadas más buscados del oeste de Houston: Cinco Ranch, Cross Creek Ranch, Cane Island y Elyson atraen miles de familias jóvenes cada año, muchas que llegan «por las escuelas» de Katy ISD. Ese hogar nuevo necesita constantemente servicios (remodelación, climatización, jardinería, limpieza, plomería, comida), y casi siempre empieza buscando en el celular por su zona o por su corredor, no por «Houston» genérico, porque el residente de Katy se identifica con Katy.',
       'Por eso tu página web debe liderar con Katy y cargar rápido en el móvil, donde se decide la primera impresión, y atender por igual a la clientela bilingüe (familias anglo y una comunidad hispana en expansión). Construimos tu sitio a medida y lo respaldamos con SEO local por zona para que aparezcas en esas búsquedas de Mason Rd, FM 1463 y la Grand Parkway. <strong>Sin promesas de posición:</strong> nadie controla el algoritmo de Google; lo que te damos es la mejor base honesta para competir.',
@@ -2565,7 +2565,7 @@ const houstonKaty: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Diseño web en Katy, <em>claro y sin letra chica</em>',
     items: [
-      { q: '¿Hacen páginas web específicamente para negocios de Katy?', a: 'Sí. Trabajamos el área metropolitana de Houston, y Katy es parte de ese metro, así que diseñamos tu sitio para que lidere con Katy: tu zona, tus corredores (Mason Rd, FM 1463, Grand Parkway 99) y tus comunidades (Cinco Ranch, Cross Creek Ranch). El cliente de Katy se busca por Katy, no por «Houston» genérico.' },
+      { q: '¿Hacen páginas web específicamente para negocios de Katy?', a: 'Sí. Trabajamos el área metropolitana de Houston, y Katy es parte de ese metro, así que diseñamos tu sitio para que lidere con Katy: tu zona, tus corredores (Mason Rd, FM 1463, Grand Parkway 99) y tus comunidades (Cinco Ranch, Cross Creek Ranch). El cliente de Katy busca por Katy, no por «Houston» genérico.' },
       { q: '¿Tienen clientes en Katy?', a: 'Seremos honestos: nuestro trabajo publicado es del área metro de Houston y lo etiquetamos por su ciudad real (Houston, TX). No vamos a inventarte un cliente «de Katy» que no existe. Katy es parte de ese mismo mercado de Houston que ya atendemos, y tu sitio se construye con copy 100% específico de tu zona.' },
       { q: '¿Cuánto cuesta una página web en Katy?', a: 'Un sitio profesional, bilingüe y a medida empieza en $1,500 (proyecto único). El SEO local va desde $600 al mes y un asistente con IA desde $900. Armamos el sistema según tu negocio y te damos un precio claro por escrito en la propuesta gratuita.' },
       { q: '¿Me garantizan salir #1 en Google en Katy?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo de Google. Lo que sí hacemos es darte un sitio rápido y bilingüe y un SEO local honesto, estructurado por tu zona y tus corredores, para que tengas la mejor base posible para competir en las búsquedas de Katy.' },
@@ -2576,7 +2576,7 @@ const houstonKaty: ClusterPage = {
   cta: {
     title: 'Que en Katy te encuentren <em>primero</em>',
     sub: 'Cuéntanos qué haces y a qué zona de Katy atiendes, y te propondremos un sitio y un plan de SEO local en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2619,7 +2619,7 @@ const houstonSugarLand: ClusterPage = {
     kicker: 'Diseño web y SEO · Sugar Land',
     h1: 'Diseño web premium en <em>Sugar Land</em>',
     sub: 'Sitios a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend. Un sitio que se ve al nivel de Town Square y First Colony: rápido, profesional y bilingüe español e inglés, listo para un cliente exigente.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
     chips: ['Diseño premium a medida', 'Bilingüe ES/EN', 'SEO local por zona'],
     tone: 'gold',
@@ -2645,7 +2645,7 @@ const houstonSugarLand: ClusterPage = {
   },
   local: {
     tag: 'Por qué este enfoque',
-    title: 'Sugar Land no es un sitio web cualquiera',
+    title: 'Sugar Land no es un mercado cualquiera',
     paragraphs: [
       'Sugar Land es una ciudad próspera al suroeste de Houston, núcleo del condado de Fort Bend, uno de los condados más diversos de Estados Unidos. Aquí conviven grandes comunidades del sur de Asia, del este asiático e hispana, y el corazón comercial late en Sugar Land Town Square y First Colony. El tejido de negocios es de servicios profesionales y consumo de gama media-alta: clínicas, bufetes, contadores, restaurantes, boutiques e inmobiliarias, donde el cliente juzga la credibilidad por el sitio y espera diseño de nivel.',
       'Por eso aquí el ángulo no es "más barato", es premium y bilingüe. <strong>Tu sitio compite contra la imagen pulida de todo Sugar Land, donde el SEO local es muy competido.</strong> Lideramos con diseño a medida que comunica con claridad a una clientela multicultural, español e inglés donde aporta valor, y SEO local por zona (Town Square, First Colony, Riverstone, Telfair) para que aparezcas cuando buscan por nombre de área o "cerca de mí".',
@@ -2666,14 +2666,14 @@ const houstonSugarLand: ClusterPage = {
       'Formulario de contacto integrado',
       'Listo para móvil y para la IA',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman si los necesitas; las tiendas en línea tienen su propio alcance. Te lo detallamos sin compromiso.',
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Trabajo real del área metro de Houston',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
@@ -2691,7 +2691,7 @@ const houstonSugarLand: ClusterPage = {
   cta: {
     title: 'Tu negocio en Sugar Land merece un sitio premium',
     sub: 'Cuéntanos qué haces y a quién atiendes. Te enviamos una propuesta gratis, bilingüe y sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2734,7 +2734,7 @@ const houstonDisenoWebBilingue: ClusterPage = {
     kicker: 'Diseño web bilingüe · Houston',
     h1: 'Diseño web <em>bilingüe</em> en Houston (español e inglés)',
     sub: 'Una página real en dos idiomas para el negocio hispano de Houston: escrita como tu cliente busca de verdad en español y en inglés, no pasada por Google Translate. Con URLs separadas, hreflang y revisión de hablante nativo.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
     chips: ['Español e inglés de verdad', 'Sin Google Translate', 'Contacto por WhatsApp'],
     tone: 'gold',
@@ -2781,14 +2781,14 @@ const houstonDisenoWebBilingue: ClusterPage = {
       'SEO base en ambos idiomas',
       'Botón de WhatsApp y formulario',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: '$1,500 es el punto de partida para un sitio bilingüe profesional. El número de páginas y las funciones definen el alcance final. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman si los necesitas.',
     tone: 'gold',
   },
   proof: {
     tag: 'Trabajo real',
     title: 'Negocios de Houston con <em>sitio a medida</em>',
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
@@ -2806,7 +2806,7 @@ const houstonDisenoWebBilingue: ClusterPage = {
   cta: {
     title: 'Tu sitio en <em>dos idiomas</em> empieza aquí',
     sub: 'Cuéntanos tu negocio y recibe una propuesta de sitio bilingüe personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2850,9 +2850,9 @@ const miamiDoral: ClusterPage = {
     kicker: 'Doral · Miami-Dade',
     h1: 'Diseño web y SEO para negocios en <em>Doral</em>',
     sub: 'Sitios bilingües, SEO local e IA conversacional para los negocios de Doral, la «Doralzuela». Para que tu arepera, panadería, servicio profesional o firma de import/export aparezca en Google y en ChatGPT, y reciba al cliente por WhatsApp, en español y en inglés.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
-    chips: ['Bilingüe ES/EN', 'Listo para la IA', 'Cliente escribe por WhatsApp'],
+    chips: ['Bilingüe ES/EN', 'Listo para la IA', 'Atención por WhatsApp'],
     tone: 'gold',
   },
   answer: {
@@ -2896,7 +2896,7 @@ const miamiDoral: ClusterPage = {
       'Listo para móvil y para la IA',
       'Te orientamos con dominio y hospedaje',
     ],
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) y una IA conversacional (desde $900) se suman según lo que necesites. Las tiendas en línea y las funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.',
     tone: 'gold',
   },
@@ -2923,7 +2923,7 @@ const miamiDoral: ClusterPage = {
   cta: {
     title: 'Pon a tu negocio de <em>Doral</em> en el mapa digital',
     sub: 'Buscamos Clientes Fundadores en Doral. Cuéntanos sobre tu negocio (arepera, panadería, servicio o import/export) y recibe una propuesta bilingüe en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2967,14 +2967,14 @@ const miamiHialeah: ClusterPage = {
     kicker: 'Negocios locales · Hialeah',
     h1: 'Diseño web y SEO para tu <em>negocio</em> en Hialeah',
     sub: 'Tu negocio de Hialeah vive en español, por WhatsApp y por la ventanita. Te armamos la web rápida, la ficha de Google y la respuesta inmediata para que el cliente que busca «cerca de mí» te encuentre y te escriba, todo arrancando en español.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye', href: '#precios' },
     chips: ['Todo en español', 'Rápido en el celular', 'Ficha de Google ordenada'],
     tone: 'gold',
   },
   answer: {
     q: '¿Le conviene a un negocio de Hialeah tener una página web en español?',
-    a: 'Sí, de las mejores inversiones locales para un negocio de Hialeah. El 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. Aquí el cliente busca en español desde el celular, y una web rápida con ficha de Google te pone delante de él.',
+    a: 'Sí: es una de las mejores inversiones locales para un negocio de Hialeah. El 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. Aquí el cliente busca en español desde el celular, y una web rápida con ficha de Google te pone delante de él.',
     source: 'Google · BrightLocal, 2025',
   },
   includes: {
@@ -3006,7 +3006,7 @@ const miamiHialeah: ClusterPage = {
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
-    cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    cta: { label: 'Propuesta gratis', href: '#contacto' },
     note: '$1,500 es el punto de partida para un sitio profesional. El SEO local (desde $600/mes) para posicionarte en el barrio y un asistente con IA (desde $900) para contestar al instante se suman según lo que necesites. Te lo detallamos sin compromiso.',
     tone: 'gold',
   },
@@ -3033,7 +3033,7 @@ const miamiHialeah: ClusterPage = {
   cta: {
     title: 'Sé uno de nuestros primeros <em>casos en Hialeah</em>',
     sub: 'Buscamos Clientes Fundadores en Hialeah. Cuéntanos sobre tu negocio y recibe una propuesta personalizada, en español, en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -3050,7 +3050,7 @@ const miamiHialeah: ClusterPage = {
     name: 'Diseño Web y SEO en Hialeah',
     serviceType: 'Diseño web, SEO local e IA conversacional',
     description:
-      'Diseño web a medida, SEO local e IA conversacional en español para negocios de Hialeah (Miami-Dade): cafeterias, panaderias, talleres, salones, botanicas y mercados. Web rapida y bilingue, ficha de Google y respuesta inmediata por WhatsApp.',
+      'Diseño web a medida, SEO local e IA conversacional en español para negocios de Hialeah (Miami-Dade): cafeterías, panaderías, talleres, salones, botánicas y mercados. Web rápida y bilingüe, ficha de Google y respuesta inmediata por WhatsApp.',
     path: '/es/miami/hialeah',
     areaCity: 'Miami',
     areaRegion: 'Florida',

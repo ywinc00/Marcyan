@@ -26,8 +26,8 @@ export const serviciosPage = {
   hero: {
     kicker: 'Services',
     h1: 'Everything your brand <em>needs</em>',
-    sub: 'Seven services to grow your business in Houston and Miami: web design, AI, AI SEO so AI finds you, online stores, local SEO, branding and maintenance. Each one starts with an accessible option and grows with what you need.',
-    primary: { label: 'I want my free proposal', href: '#contacto' },
+    sub: 'Seven services to grow your business in Houston and Miami: web design, conversational AI, AI SEO so assistants can find you, online stores, local SEO, branding and maintenance. Each one starts with an accessible option and grows with what you need.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See detailed pricing', href: '/en/pricing' },
     chips: ['7 services, from $150', 'Free AI diagnosis', 'Public pricing'],
     tone: 'gold' as const,
@@ -39,7 +39,7 @@ export const serviciosPage = {
   grid: {
     tag: 'The catalog',
     title: 'Every service, with its <em>starting point</em>',
-    intro: 'We show the most accessible option of each service first. Tap any of them to see the detail, or ask us for a free proposal with your exact scope.',
+    intro: 'We show the most accessible option of each service first. Tap any one for the details, or ask us for a free proposal with your exact scope.',
   },
   related: {
     tag: 'Explore in depth',
@@ -67,7 +67,7 @@ export const serviciosPage = {
   },
   faq: {
     tag: 'Frequently asked questions',
-    title: 'About our services, <em>no runaround</em>',
+    title: 'About our services, <em>straight up</em>',
     items: [
       {
         q: 'Which service do I need to get started?',
@@ -92,9 +92,9 @@ export const serviciosPage = {
     ] as FaqItem[],
   },
   cta: {
-    title: 'Tell us what you need, <em>we advise you free</em>',
+    title: 'Tell us what you need, <em>get free guidance</em>',
     sub: 'In under 24 hours you get a proposal with the service (or the combination) that best fits you, with clear scope and price, no commitment.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
   // ItemList schema — the 7 services pointing to their real page (or the hub).

@@ -37,7 +37,7 @@ export const catalog: CatalogProduct[] = [
     name: 'Web Design',
     serviceType: 'Web design',
     description:
-      'Custom, fast, bilingual websites (English and Spanish) with baseline SEO and readable by AI assistants. From a one-page landing to a complete site.',
+      'Custom, fast, bilingual websites (English and Spanish) with baseline SEO, easy for AI assistants to read. From a one-page landing page to a complete site.',
     tagline: 'Custom, fast, bilingual sites, ready for Google and AI.',
     anchorUnit: 'project',
     href: '/en/houston/web-design',
@@ -49,7 +49,7 @@ export const catalog: CatalogProduct[] = [
       { key: 'webRedesign', name: 'Site redesign', value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
         blurb: 'We refresh your current site (design, speed and copy) without starting from scratch.', href: '/en/houston/web-design' },
       { key: 'web', name: 'Complete custom site', value: PRICE_ANCHORS.web, display: tierDisplay(PRICE_ANCHORS.web),
-        blurb: 'Several custom, bilingual pages, with baseline SEO and ready for AI.', href: '/en/houston/web-design' },
+        blurb: 'A multi-page custom, bilingual site with baseline SEO, ready for AI.', href: '/en/houston/web-design' },
     ],
   },
   {
@@ -58,8 +58,8 @@ export const catalog: CatalogProduct[] = [
     name: 'Conversational AI',
     serviceType: 'AI automation and conversational assistants',
     description:
-      'AI assistants that serve YOUR customers: they reply, book appointments and capture leads 24/7, set up in Spanish and integrated with your tools.',
-    tagline: 'Assistants that reply, book and capture leads 24/7, in Spanish.',
+      'AI assistants that serve YOUR customers: they reply, book appointments and capture leads 24/7, set up in English and Spanish and integrated with your tools.',
+    tagline: 'Assistants that reply, book and capture leads 24/7, in English and Spanish.',
     anchorUnit: 'project',
     href: '/en/ai-for-small-business',
     ctaLabel: 'See AI for your business',
@@ -77,8 +77,8 @@ export const catalog: CatalogProduct[] = [
     name: 'AI SEO (AI Visibility)',
     serviceType: 'Answer engine optimization (AEO)',
     description:
-      'So ChatGPT, Gemini and Meta AI recommend YOU when someone asks about your service. Different from Conversational AI (which serves your customers): here the goal is for AI to find and cite you.',
-    tagline: 'So AI recommends you when people ask about your service.',
+      'Get ChatGPT, Gemini and Meta AI to recommend YOU when someone asks about your service. Different from Conversational AI (which serves your customers): here the goal is for AI to find and cite you.',
+    tagline: 'Get AI to recommend you when people ask about your service.',
     anchorUnit: 'diagnosis',
     href: '/en/houston/ai-seo',
     ctaLabel: 'Get a free diagnosis',
@@ -144,7 +144,7 @@ export const catalog: CatalogProduct[] = [
     tone: 'gold',
     tiers: [
       { key: 'brandingLogo', name: 'Logo Design', value: PRICE_ANCHORS.brandingLogo, display: tierDisplay(PRICE_ANCHORS.brandingLogo), anchor: true,
-        blurb: 'Just the logo and its variants. The most accessible start for your brand.', href: '/en/houston/branding' },
+        blurb: 'Just the logo and its variants. The most affordable way to start your brand.', href: '/en/houston/branding' },
       { key: 'branding', name: 'Complete branding', value: PRICE_ANCHORS.branding, display: tierDisplay(PRICE_ANCHORS.branding),
         blurb: 'Logo, palette, typography and usage guide: a ready-to-use identity.', href: '/en/houston/branding' },
     ],
@@ -156,10 +156,10 @@ export const catalog: CatalogProduct[] = [
     serviceType: 'Website maintenance',
     description:
       'Monthly site maintenance: uptime checks, security updates, regular backups and bilingual support.',
-    tagline: 'Your site healthy: backups, security and bilingual support.',
+    tagline: 'Keep your site healthy: backups, security and bilingual support.',
     anchorUnit: '/mo',
     href: '#contacto',
-    ctaLabel: 'I want maintenance',
+    ctaLabel: 'Get maintenance',
     tone: 'gold',
     cardBullets: [
       'Uptime checks and security updates',
@@ -228,8 +228,8 @@ export const preciosPage = {
   hero: {
     kicker: 'Public pricing',
     h1: '<em>Clear</em> pricing, no fine print',
-    sub: 'We publish it all: from a landing at $400 to monthly SEO and maintenance, the very things most agencies hide until they sell you a call. That is how transparent we work.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    sub: 'We publish it all: from a $400 landing page to monthly SEO and maintenance, the very things most agencies hide until they get you on a call. That is how transparent we are.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what each service includes', href: '#precios' },
     chips: ['From $400 · free AI diagnosis', 'No forced contracts', 'Free proposal in 24h'],
     tone: 'gold' as const,
@@ -240,17 +240,17 @@ export const preciosPage = {
   },
   transparency: {
     tag: 'Why we publish it',
-    title: 'Most hide the <em>recurring</em> price',
+    title: 'Most agencies hide the <em>recurring</em> price',
     paragraphs: [
-      'In this market it is normal to be shown an attractive starting price while what really adds up over time is hidden: the monthly SEO fee, maintenance, renewals. You find out once you are already in.',
-      'We do the opposite. <strong>We publish all our starting rates</strong>, recurring ones included, so you can decide with the full picture. Every service starts with an accessible option and grows with what you need. The final price depends on the real scope of your project and we always put it in writing before you decide. No surprises.',
+      'In this market it is normal to get an attractive starting price while the costs that really add up over time stay hidden: the monthly SEO fee, maintenance, renewals. You only find out once you are locked in.',
+      'We do the opposite. <strong>We publish all our starting rates</strong>, recurring ones included, so you can decide with the full picture. Every service starts with an affordable option and grows with what you need. The final price depends on the real scope of your project and we always put it in writing before you decide. No surprises.',
     ],
     tone: 'gold' as const,
   },
   grid: {
     tag: 'Our pricing',
     title: 'What it costs and what it <em>includes</em>',
-    intro: 'Every price is a real starting point, "from $". We show the most accessible option of each service first; the final scope we define together in a free, honest proposal.',
+    intro: 'Every price is a real starting point, "from $". We show the most affordable option for each service first; we define the final scope together in a free, honest proposal.',
   },
   related: {
     tag: 'Pricing guides',
@@ -282,7 +282,7 @@ export const preciosPage = {
     items: [
       {
         q: 'Why do you show prices when almost no one does?',
-        a: 'Because hiding the price usually means hiding something. Publishing our starting rates, monthly SEO and maintenance included, lets you compare calmly and come to the conversation with confidence, not to be "sold" to. It is the kind of deal we would want to receive ourselves.',
+        a: 'Because hiding the price usually means hiding something. Publishing our starting rates, monthly SEO and maintenance included, lets you compare at your own pace and walk into the conversation with confidence instead of a sales pitch. It is the way we would want to be treated ourselves.',
       },
       {
         q: 'Is the lowest price the same service as the complete one?',
@@ -298,7 +298,7 @@ export const preciosPage = {
       },
       {
         q: 'Can the "from $" price go up a lot?',
-        a: 'The "from $" is the real starting point for that product. It goes up if you ask for more pages, more features (store, bookings, integrations) or more languages. We never change it on you midway: the scope and agreed total are in writing before you decide.',
+        a: 'The "from $" is the real starting point for that product. It goes up if you ask for more pages, more features (store, bookings, integrations) or more languages. We never change it on you mid-project: the scope and agreed total are in writing before you decide.',
       },
       {
         q: 'Does the proposal cost anything?',
@@ -309,7 +309,7 @@ export const preciosPage = {
   cta: {
     title: 'Get your <em>exact</em> price, free',
     sub: 'Tell us about your project and get a proposal with clear scope and price in under 24 hours, no commitment.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
 };

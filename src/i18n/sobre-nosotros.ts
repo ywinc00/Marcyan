@@ -22,8 +22,8 @@ export const sobreNosotros = {
   hero: {
     kicker: 'Sobre nosotros',
     h1: 'La agencia hispana que <em>pone la IA a trabajar para ti</em>',
-    sub: 'Somos Marcyan Studio: web, IA y SEO local para el negocio hispano de Estados Unidos. Ponemos las últimas tecnologías a trabajar para tu negocio — bilingüe de verdad, con precios públicos y trabajo real que puedes verificar.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    sub: 'Somos Marcyan Studio: web, IA y SEO local para el negocio hispano de Estados Unidos. Ponemos las últimas tecnologías a trabajar para tu negocio. Bilingüe de verdad, con precios públicos y trabajo real que puedes verificar.',
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver portafolio', href: '/es/portafolio' },
     chips: ['Houston y Miami', 'Bilingüe ES/EN', 'Precios públicos'],
     tone: 'gold' as const,
@@ -36,7 +36,7 @@ export const sobreNosotros = {
     tag: 'Quiénes somos',
     title: 'Un estudio <em>joven</em>, con trabajo real',
     paragraphs: [
-      'Marcyan nació para cerrar un hueco claro: el negocio hispano de Estados Unidos merece sitios tan buenos como los de las grandes agencias, pero hechos en su idioma, con su contexto y a un precio honesto. Nuestra apuesta es simple: ponemos las últimas tecnologías a trabajar para tu negocio — desde un sitio que carga rápido hasta la IA que atiende a tus clientes — para que siempre esté actualizado y aparezca cuando alguien le pregunta a ChatGPT, Gemini o Meta AI.',
+      'Marcyan nació para cerrar un hueco claro: el negocio hispano de Estados Unidos merece sitios tan buenos como los de las grandes agencias, pero hechos en su idioma, con su contexto y a un precio honesto. Nuestra apuesta es simple: ponemos las últimas tecnologías a trabajar para tu negocio, desde un sitio que carga rápido hasta la IA que atiende a tus clientes, para que siempre esté actualizado y aparezca cuando alguien le pregunta a ChatGPT, Gemini o Meta AI.',
       'Seremos transparentes: somos un estudio joven y en crecimiento, pero no partimos de cero. Ya trabajamos con negocios reales en Houston y Orlando, con sitios, SEO, marca y web apps en vivo que puedes ver en nuestro portafolio. Y ya hay señales que no dependen de nuestra palabra: la IA de Google ya incluye a clientes nuestros en sus recomendaciones para algunas búsquedas, y uno de ellos ya recibe visitas que llegan desde ChatGPT. <strong>Preferimos enseñarte trabajo real antes que prometer lo que no podemos cumplir.</strong>',
     ],
     tone: 'gold' as const,
@@ -48,7 +48,7 @@ export const sobreNosotros = {
     items: [
       { icon: 'marcyan-ai', title: 'La IA, al alcance de tu negocio', desc: 'Hacemos la IA accesible: un asistente que atiende a tus clientes por ti y un sitio en HTML que ChatGPT y Gemini sí pueden leer, para que la IA te encuentre y te recomiende.' },
       { icon: 'lucide:languages', title: 'Bilingüe de verdad', desc: 'Español e inglés escritos para cómo busca tu cliente, no un botón de Google Translate. Conocemos el contexto hispano de EE.UU.' },
-      { icon: 'lucide:tag', title: 'Precios públicos', desc: 'Publicamos hasta el precio del SEO mensual y el mantenimiento. Sin letra chica ni una llamada de ventas para enterarte de cuánto cuesta.' },
+      { icon: 'lucide:tag', title: 'Precios públicos', desc: 'Publicamos hasta el precio del SEO mensual y el mantenimiento. Sin letra pequeña ni una llamada de ventas para enterarte de cuánto cuesta.' },
       { icon: 'lucide:map-pin', title: 'Local y cercano', desc: 'Houston y Miami como negocio de área de servicio. Atención directa, sin call center, en tu idioma y con contexto de tu mercado.' },
     ],
     tone: 'gold' as const,
@@ -68,7 +68,7 @@ export const sobreNosotros = {
     links: [
       { label: 'Ver el portafolio completo', href: '/es/portafolio', desc: 'Texas Rush Remove, Move Junk Away, Julio\'s Landscape y Rosy Nails: sitios, SEO, marca y app en vivo.', icon: 'lucide:folder' },
       { label: 'Nuestras ciudades', href: '/es/ciudades', desc: 'Houston y Miami, como negocio de área de servicio.', icon: 'lucide:map-pin' },
-      { label: 'Precios y planes', href: '/es/precios', desc: 'El precio de arranque de cada servicio, sin letra chica.', icon: 'lucide:tag' },
+      { label: 'Precios y planes', href: '/es/precios', desc: 'El precio de arranque de cada servicio, sin letra pequeña.', icon: 'lucide:tag' },
     ] as RelatedLink[],
   },
   faq: {
@@ -86,7 +86,7 @@ export const sobreNosotros = {
   cta: {
     title: 'Hablemos de <em>tu proyecto</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold' as const,
   },
 };

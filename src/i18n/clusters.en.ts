@@ -64,7 +64,7 @@ const enHoustonSeo: ClusterPage = {
     kicker: 'Local SEO',
     h1: 'Local SEO in <em>Houston</em>',
     sub: 'Show up when your customers search on Google Maps and ask AI assistants. We tune your local presence so your Houston business earns more calls, visits and reviews, in English and Spanish, and we put AI to work for your business.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See how we work', href: '#proceso' },
     chips: ['Bilingual EN/ES', 'No long lock-in contracts', 'Clear reporting'],
     tone: 'gold',
@@ -110,14 +110,14 @@ const enHoustonSeo: ClusterPage = {
       'Clear monthly report',
       'Bilingual support',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: 'The final price depends on where your business stands today and on your competition. We give you an honest scope in the proposal, with no surprises.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Houston businesses that <em>already rank</em>',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX"),
   },
   faq: {
@@ -135,7 +135,7 @@ const enHoustonSeo: ClusterPage = {
   cta: {
     title: 'Ready for Houston to <em>find you</em>?',
     sub: 'Tell us about your business and get a personalized local SEO proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -179,7 +179,7 @@ const enHoustonWeb: ClusterPage = {
     kicker: 'Web Design',
     h1: 'Web Design in <em>Houston</em>',
     sub: 'Custom, fast, bilingual websites for Houston businesses. Built to look incredible, load instantly and turn visits into customers, ready for Google and for AI.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See real work', href: '#proyectos' },
     chips: ['Custom, no templates', 'Bilingual EN/ES', 'Ready for AI and SEO'],
     tone: 'gold',
@@ -211,14 +211,14 @@ const enHoustonWeb: ClusterPage = {
     unit: 'one-time project',
     lead: 'Pay per project, no mandatory monthly fees. The price depends on the scope.',
     features: webFeatures,
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Houston businesses with a <em>new site</em>',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
   },
   faq: {
@@ -236,7 +236,7 @@ const enHoustonWeb: ClusterPage = {
   cta: {
     title: 'Your next website <em>starts here</em>',
     sub: 'Tell us about your project and get a personalized web design proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -281,8 +281,8 @@ const enHoustonIa: ClusterPage = {
     badgeIcon: 'lucide:map-pin',
     kicker: 'Conversational AI',
     h1: 'An AI assistant for your <em>business</em> in Houston',
-    sub: 'Losing customers because you can not answer in time? We put an AI assistant to work for your business: it catches missed calls and messages, books appointments, and answers in both English and Spanish around the clock. We set it up, train it on your business, and maintain it.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    sub: 'Losing customers because you can\'t answer in time? We put an AI assistant to work for your business: it catches missed calls and messages, books appointments, and answers in both English and Spanish around the clock. We set it up, train it on your business, and maintain it.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See how it works', href: '#faq' },
     chips: ['Real English and Spanish', 'We set it up and maintain it', 'Always hands off to a real person'],
     tone: 'teal',
@@ -328,7 +328,7 @@ const enHoustonIa: ClusterPage = {
       'Training for your team',
       'Setup and maintenance included',
     ],
-    cta: { label: 'I want to automate my business', href: '#contacto' },
+    cta: { label: 'Automate my business', href: '#contacto' },
     note: '$900 is the starting point for an initial automation (for example, an assistant or an appointment booker). Unlike a software subscription you set up yourself, this includes the setup, the training on your business, and the maintenance. More complete projects are quoted based on scope.',
     tone: 'teal',
   },
@@ -354,7 +354,7 @@ const enHoustonIa: ClusterPage = {
   cta: {
     title: 'Stop losing customers because <em>no one answered</em>',
     sub: 'Tell us your biggest pain point (missed calls, unanswered WhatsApp, appointments that never get booked) and we will propose an AI solution in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -425,7 +425,7 @@ const enHoustonEcommerce: ClusterPage = {
     title: 'Shopify, WooCommerce or <em>custom</em>?',
     paragraphs: [
       'We do not force a single platform on you. If you want to launch fast and sell simply, Shopify is often ideal; if you need more control or already use WordPress, WooCommerce is a better fit; and for special needs, we build custom. We choose it with you, honestly, based on your product, your volume and your budget.',
-      'To sell in the United States there are requirements that are yours: an account to receive payments and, depending on your case, your EIN from the IRS. <strong>We guide you step by step through the whole process.</strong> And because most agencies just hand you a Google Translate button, we build your store in true English and Spanish from day one, so you capture the Spanish-speaking side of your Houston market: an edge few competitors use.',
+      'To sell in the United States, a few requirements fall on you: an account to receive payments and, depending on your case, your EIN from the IRS. <strong>We guide you step by step through the whole process.</strong> And because most agencies just hand you a Google Translate button, we build your store in true English and Spanish from day one, so you capture the Spanish-speaking side of your Houston market: an edge few competitors use.',
     ],
     tone: 'gold',
   },
@@ -449,7 +449,7 @@ const enHoustonEcommerce: ClusterPage = {
   },
   proof: {
     tag: 'Real work',
-    title: 'We build custom, and we are <em>looking for your store</em>',
+    title: 'We build custom, and <em>your store could be next</em>',
     cta: { label: 'Be our first e-commerce case', href: '#contacto' },
     // Honesty: there is NO e-commerce client yet. We show real capability (custom
     // web app for Rosy Nails + live sites), labeled for what it is. No implying
@@ -514,7 +514,7 @@ const enHoustonBranding: ClusterPage = {
     kicker: 'Branding & identity',
     h1: 'Logo &amp; brand design in <em>Houston</em>',
     sub: 'An identity that looks professional and feels like yours: logo, colors, typography and a coherent visual system. Designed from scratch and built to speak to both the English- and Spanish-speaking sides of your Houston market, so your business makes a great first impression with every customer.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See all pricing', href: '/en/pricing' },
     chips: ['From $750', 'Custom, not templates', 'Ready-to-use files'],
     tone: 'gold',
@@ -542,7 +542,7 @@ const enHoustonBranding: ClusterPage = {
     title: 'Broad exploration, <em>designer-led</em> decisions',
     paragraphs: [
       "Today's tools let us explore many more creative directions in less time. What doesn't change is who decides: a designer sets the direction, refines every detail and makes sure your brand says the right thing. You get a brand built with strategy, not a template spun up at random.",
-      'And if you need both a brand <strong>and</strong> a website, we build them together, so your identity and your site are coherent from day one. We design for Houston, in true English and Spanish, so your brand connects with every side of your market, including the Spanish-speaking customers most shops never reach.',
+      'And if you need both a brand <strong>and</strong> a website, we build them together, so your identity and your site stay consistent from day one. We design for Houston, in true English and Spanish, so your brand connects with every side of your market, including the Spanish-speaking customers most shops never reach.',
     ],
     tone: 'gold',
   },
@@ -586,7 +586,7 @@ const enHoustonBranding: ClusterPage = {
   cta: {
     title: 'Give your business a <em>brand that measures up</em>',
     sub: 'Tell us about your business and get a personalized branding proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -645,8 +645,8 @@ const enHoustonImmigration: ClusterPage = {
     title: 'A system so you <em>never lose a consultation</em>',
     items: [
       { icon: 'lucide:bot-message-square', title: 'AI that captures consultations 24/7', desc: 'Answers and books the first consultation in Spanish at any hour, even in the middle of the night or on weekends. Not a single one goes cold.' },
-      { icon: 'lucide:clipboard-list', title: 'Basic intake (consultation details)', desc: 'The AI gathers the general case details (name, contact, type of matter) and hands them to you ready to go. You decide who to attend to and how.' },
-      { icon: 'lucide:shield-check', title: 'Bilingual site that builds trust', desc: 'A firm is chosen on trust. A professional site in English and Spanish, fast, with your practice areas and clear calls to action.' },
+      { icon: 'lucide:clipboard-list', title: 'Basic intake (consultation details)', desc: 'The AI gathers the general case details (name, contact, type of matter) and hands them to you ready to go. You decide who to follow up with and how.' },
+      { icon: 'lucide:shield-check', title: 'Bilingual site that builds trust', desc: 'People choose a firm on trust. A professional site in English and Spanish, fast, with your practice areas and clear calls to action.' },
       { icon: 'lucide:search', title: 'Immigration local SEO', desc: 'You show up when someone searches "immigration lawyer near me" in Houston, on Google Maps and with AI assistants.' },
       { icon: 'lucide:star', title: 'Reviews and reputation', desc: 'Trust is built on real reviews. We help you request and reply to them, in each client\'s language.' },
       { icon: 'lucide:scale', title: 'No automated legal advice', desc: 'The AI books and answers the general questions (hours, location, practice areas). The legal advice comes from you: clear, ethical and with no promises.' },
@@ -683,7 +683,7 @@ const enHoustonImmigration: ClusterPage = {
   proof: {
     tag: 'Real automation',
     title: 'Automated booking that\'s <em>already live</em>',
-    cta: { label: 'I want something like this for my firm', href: '#contacto' },
+    cta: { label: 'I want this for my firm', href: '#contacto' },
     // Honesty: no client immigration firm yet. Rosy Nails = real web app that books
     // appointments (an honest parallel to "booking consultations") + Case #0. It is not
     // implied to be a law firm; the FAQ clarifies the Founding Client framing.
@@ -704,7 +704,7 @@ const enHoustonImmigration: ClusterPage = {
   cta: {
     title: 'Never let an immigration consultation <em>go cold</em>',
     sub: 'Tell us how your consultations come in today and we\'ll propose an AI lead-capture system in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -800,7 +800,7 @@ const enHoustonRealEstate: ClusterPage = {
   },
   proof: {
     tag: 'Real work',
-    title: 'Real custom sites — and <em>we\'re looking for your</em> real estate brand',
+    title: 'Real custom sites, and <em>your real estate brand</em> could be next',
     cta: { label: 'Be our first real estate case', href: '#contacto' },
     // Honesty: no real estate agent client yet. Real proof of custom sites
     // (labeled by their actual niche/city) + Founding Client. Without implying
@@ -822,7 +822,7 @@ const enHoustonRealEstate: ClusterPage = {
   cta: {
     title: 'Your next <em>real estate</em> site starts here',
     sub: 'Tell us how you work and which areas you cover, and get a site and SEO proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -937,7 +937,7 @@ const enHoustonRestaurants: ClusterPage = {
   cta: {
     title: 'Your <em>restaurant</em> website starts here',
     sub: 'Tell us what you cook and how you want to take orders, and get a proposal for a site with a menu in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1034,7 +1034,7 @@ const enHoustonContractors: ClusterPage = {
   proof: {
     tag: 'Real work',
     title: '<em>Real</em> local businesses in Houston',
-    cta: { label: 'Be our first construction and remodeling case', href: '#contacto' },
+    cta: { label: 'Be our first contractor case', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
@@ -1052,7 +1052,7 @@ const enHoustonContractors: ClusterPage = {
   cta: {
     title: 'Your next <em>contractor</em> site starts here',
     sub: 'Tell us what work you do and which areas you serve, and get a proposal for a site, SEO, and missed-call rescue in under 24 hours, no obligation.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1167,7 +1167,7 @@ const enHoustonAutoRepair: ClusterPage = {
   cta: {
     title: 'Your next <em>auto repair</em> website starts here',
     sub: 'Tell us what services you offer and which part of Houston you are in, and get a proposal for the site, SEO and AI assistant in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1281,7 +1281,7 @@ const enHoustonBeautySalons: ClusterPage = {
   cta: {
     title: 'Your salon with <em>online booking</em> starts here',
     sub: 'Tell us what services you offer and how you work, and get a proposal for a site with scheduling and SEO in under 24 hours, no strings attached.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1323,7 +1323,7 @@ const enHoustonDentalClinics: ClusterPage = {
     badgeIcon: 'lucide:map-pin',
     kicker: 'Dental clinics · Houston',
     h1: 'Websites for <em>dental clinics</em> in Houston',
-    sub: 'A bilingual site that builds trust, shows your services and insurance clearly, and shows up when people search for a Spanish-speaking dentist near them. Plus an assistant that books appointments and answers the general questions (hours, insurance, directions) 24/7, in Spanish.',
+    sub: 'A bilingual site that builds trust, shows your services and insurance clearly, and shows up when people search for a Spanish-speaking dentist near them. Plus an assistant that books appointments and answers common questions (hours, insurance, directions) 24/7, in Spanish.',
     primary: { label: 'I want my site', href: '#contacto' },
     secondary: { label: 'See what it includes', href: '#precios' },
     chips: ['True Spanish, not translated', 'Books appointments 24/7', 'The AI never gives dental advice'],
@@ -1396,9 +1396,9 @@ const enHoustonDentalClinics: ClusterPage = {
     ],
   },
   cta: {
-    title: 'Your <em>dental clinic</em> next site starts here',
+    title: 'Your next <em>dental clinic</em> site starts here',
     sub: 'Tell us what services you offer and what insurance you accept, and get a proposal for a site, SEO and AI booking in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1513,7 +1513,7 @@ const enHoustonKaty: ClusterPage = {
   cta: {
     title: 'Make Katy find you <em>first</em>',
     sub: 'Tell us what you do and which part of Katy you serve, and we’ll propose a site and a local SEO plan in under 24 hours, with no commitment.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1556,7 +1556,7 @@ const enHoustonSugarLand: ClusterPage = {
     kicker: 'Web design and SEO · Sugar Land',
     h1: 'Premium web design in <em>Sugar Land</em>',
     sub: 'Custom-built sites and local SEO for businesses in Sugar Land and Fort Bend County. A site that looks the part next to Town Square and First Colony: fast, professional and bilingual in English and Spanish, ready for a demanding customer.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what it includes', href: '#precios' },
     chips: ['Custom premium design', 'Bilingual EN/ES', 'Local SEO by area'],
     tone: 'gold',
@@ -1582,7 +1582,7 @@ const enHoustonSugarLand: ClusterPage = {
   },
   local: {
     tag: 'Why this approach',
-    title: 'Sugar Land is not just any website',
+    title: 'In Sugar Land, not just any site will do',
     paragraphs: [
       'Sugar Land is a thriving city southwest of Houston, the hub of Fort Bend County, one of the most diverse counties in the United States. Large South Asian, East Asian and Spanish-speaking communities live side by side here, and the commercial heart beats at Sugar Land Town Square and First Colony. The business fabric is professional services and mid-to-upper-tier consumer spending: clinics, law firms, accountants, restaurants, boutiques and real estate offices, where the customer judges credibility by the site and expects top-tier design.',
       'That is why the angle here is not "cheaper," it is premium and bilingual. <strong>Your site competes against the polished image of all of Sugar Land, where local SEO is fiercely contested.</strong> We lead with custom design that communicates clearly to a multicultural clientele, English and Spanish where it adds value, and local SEO by area (Town Square, First Colony, Riverstone, Telfair) so you show up when they search by area name or "near me." Most agencies hand English-speaking owners a Google Translate button; we build your presence in true English and Spanish so you capture the Spanish-speaking side of your Fort Bend market.',
@@ -1603,19 +1603,19 @@ const enHoustonSugarLand: ClusterPage = {
       'Integrated contact form',
       'Ready for mobile and for AI',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: '$1,500 is the starting point for a professional site. Local SEO (from $600/mo) and a conversational AI (from $900) are added if you need them; online stores have their own scope. We detail it all for you, no strings attached.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Real work from the Houston metro area',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
     tag: 'Frequently asked questions',
-    title: 'Frequently asked questions about web design in Sugar Land',
+    title: 'Web design in Sugar Land, <em>made clear</em>',
     items: [
       { q: 'How much does a website cost in Sugar Land?', a: 'A custom professional site starts from $1,500 as a one-time project (a single payment). The final price depends on the number of pages and features; we send you a clear, no-obligation proposal before we start.' },
       { q: 'Do you work with businesses outside downtown Sugar Land?', a: 'Yes. We serve all of Sugar Land and Fort Bend County: Town Square, First Colony, Riverstone, Telfair and nearby areas, plus the rest of the Houston metro area.' },
@@ -1628,7 +1628,7 @@ const enHoustonSugarLand: ClusterPage = {
   cta: {
     title: 'Your Sugar Land business deserves a premium site',
     sub: 'Tell us what you do and who you serve. We will send you a free, bilingual, no-obligation proposal.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1671,7 +1671,7 @@ const enHoustonBilingual: ClusterPage = {
     kicker: 'Bilingual web design · Houston',
     h1: 'Bilingual <em>web design</em> in Houston (English and Spanish)',
     sub: 'A real site in two languages for your Houston business: written the way your customers actually search in English and in Spanish, not run through Google Translate. With separate URLs, hreflang and native-speaker review.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what it includes', href: '#precios' },
     chips: ['True English and Spanish', 'No Google Translate', 'Contact by WhatsApp'],
     tone: 'gold',
@@ -1718,14 +1718,14 @@ const enHoustonBilingual: ClusterPage = {
       'Base SEO in both languages',
       'WhatsApp button and form',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: '$1,500 is the starting point for a professional bilingual site. The number of pages and features define the final scope. Local SEO (from $600/mo) and a conversational AI (from $900) are added if you need them.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Houston businesses with a <em>custom site</em>',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj("Julio's Landscape TX", 'Texas Rush Remove', 'Rosy Nails & Care'),
   },
   faq: {
@@ -1743,7 +1743,7 @@ const enHoustonBilingual: ClusterPage = {
   cta: {
     title: 'Your site in <em>two languages</em> starts here',
     sub: 'Tell us about your business and get a personalized bilingual site proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1787,7 +1787,7 @@ const enMiamiWeb: ClusterPage = {
     kicker: 'Web Design',
     h1: 'Web Design in <em>Miami</em>',
     sub: 'Custom, fast, bilingual websites for Miami businesses and the metro area. Elite design that loads instantly, turns visits into customers and gets you ready for Google and AI.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See real work', href: '#proyectos' },
     chips: ['Custom, no templates', 'Bilingual EN/ES', 'Founding Client spots'],
     tone: 'gold',
@@ -1819,7 +1819,7 @@ const enMiamiWeb: ClusterPage = {
     unit: 'one-time project',
     lead: 'Pay per project, no mandatory monthly fees. The price depends on the scope.',
     features: webFeatures,
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
@@ -1845,7 +1845,7 @@ const enMiamiWeb: ClusterPage = {
   cta: {
     title: 'Be one of our first <em>cases in Miami</em>',
     sub: 'We’re looking for Founding Clients in Miami. Tell us about your project and get a personalized proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -1889,7 +1889,7 @@ const enMiamiIa: ClusterPage = {
     kicker: 'Conversational AI',
     h1: 'An AI assistant for your <em>business</em> in Miami',
     sub: 'Losing customers because you can\'t answer in time? We put an AI assistant to work for you: it answers WhatsApp and missed calls, books appointments and helps your Spanish-speaking customers around the clock. We install it, train it on your business and keep it running.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See how it works', href: '#faq' },
     chips: ['True Spanish, not a translation', 'We install and maintain it', 'It always hands off to a person'],
     tone: 'teal',
@@ -1961,7 +1961,7 @@ const enMiamiIa: ClusterPage = {
   cta: {
     title: 'Stop losing customers because <em>no one answered</em>',
     sub: 'In Miami, the customer who messages you on WhatsApp and gets no reply goes to someone else. Tell us your biggest pain point and we\'ll propose an AI solution in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -2004,7 +2004,7 @@ const enMiamiSeo: ClusterPage = {
     kicker: 'Local SEO',
     h1: 'Local SEO in <em>Miami</em>',
     sub: 'Show up when your customers search on Google Maps and ask AI assistants. We tune your local presence so your Miami business earns more calls, visits and reviews, in English and Spanish, and we put AI to work for your business.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See how we work', href: '#proceso' },
     chips: ['Bilingual EN/ES', 'No long lock-in contracts', 'Clear reporting'],
     tone: 'gold',
@@ -2050,13 +2050,13 @@ const enMiamiSeo: ClusterPage = {
       'Clear monthly report',
       'Bilingual support',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: 'The final price depends on where your business stands today and on your competition. We give you an honest scope in the proposal, with no surprises.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
-    title: 'Real, verifiable SEO — and <em>we want your business</em> in Miami',
+    title: 'Real, verifiable SEO, and <em>we want your business</em> in Miami',
     cta: { label: 'Be our first case in Miami', href: '#contacto' },
     // Honesty: there is NO Miami SEO client. Proof is labeled by its real
     // city (Houston). We never imply it is from Miami; the title and FAQ make it clear.
@@ -2077,7 +2077,7 @@ const enMiamiSeo: ClusterPage = {
   cta: {
     title: 'Be one of our first <em>cases in Miami</em>',
     sub: 'We\'re looking for Founding Clients in Miami. Tell us about your business and get a local SEO proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2194,7 +2194,7 @@ const enMiamiEcommerce: ClusterPage = {
   cta: {
     title: 'Start selling online in <em>Miami</em>',
     sub: 'In Miami, a bilingual online store opens up the local market and the region. Tell us what you sell and how many products you have, and get a proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free quote for my store', href: '#contacto' },
+    primary: { label: 'Get my store quote', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2237,7 +2237,7 @@ const enMiamiDoral: ClusterPage = {
     kicker: 'Doral · Miami-Dade',
     h1: 'Web design and SEO for businesses in <em>Doral</em>',
     sub: 'Bilingual sites, local SEO and conversational AI for Doral businesses, the "Doralzuela." So your arepa spot, bakery, professional service or import/export firm shows up on Google and in ChatGPT, and welcomes customers over WhatsApp, in Spanish and English.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what it includes', href: '#precios' },
     chips: ['Bilingual EN/ES', 'AI-ready', 'Customers reach you on WhatsApp'],
     tone: 'gold',
@@ -2283,13 +2283,13 @@ const enMiamiDoral: ClusterPage = {
       'Mobile-ready and AI-ready',
       'We guide you on domain and hosting',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: '$1,500 is the starting point for a professional site. Local SEO (from $600/mo) and a conversational AI (from $900) add on based on what you need. Online stores and special features have their own scope: we spell it out for you, no strings attached.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
-    title: 'Real, verifiable work, and <em>we go find your business</em> in Doral',
+    title: 'Real, verifiable work, and <em>we want your business</em> in Doral',
     cta: { label: 'Be our first case in Doral', href: '#contacto' },
     // Honesty: NO clients in Miami/Doral. Proof labeled by its REAL city
     // (Houston / Orlando). The title and FAQ make it clear; nothing implies Doral.
@@ -2301,7 +2301,7 @@ const enMiamiDoral: ClusterPage = {
     items: [
       { q: 'How much does a website cost for a Doral business?', a: 'A custom professional site starts at $1,500 (one-time payment). The final price depends on the number of pages and the features you need. Local SEO (from $600 a month) and a conversational AI (from $900) are quoted separately. We give you a clear scope and price in the free proposal, before you decide.' },
       { q: 'Do you have clients in Doral or Miami?', a: 'We will be honest: we are just starting our operation in Miami, so we do not have published cases in Doral yet. We do have real, verifiable work, with links you can visit, for businesses in Houston and Orlando. That is why we offer Founding Client spots in Doral, with special terms.' },
-      { q: 'Does the site work for my arepa spot, bakery or Venezuelan restaurant?', a: 'Yes. We design for food and hospitality: a clear menu, photos that build appetite, a WhatsApp and ordering button, and local SEO so you show up when someone searches for arepas or empanadas in Doral. We write in the Spanish of your Venezuelan or Colombian customer, without sounding like a generic English template.' },
+      { q: 'Does the site work for my arepa spot, bakery or Venezuelan restaurant?', a: 'Yes. We design for food and hospitality: a clear menu, photos that make people hungry, a WhatsApp and ordering button, and local SEO so you show up when someone searches for arepas or empanadas in Doral. We write in the Spanish of your Venezuelan or Colombian customer, without sounding like a generic English template.' },
       { q: 'What if I run an import/export firm or a professional service near MIA?', a: 'That too. For freight forwarders, customs brokers, accountants, immigration lawyers and clinics, we build a professional bilingual site that builds trust across the U.S.-Venezuela/Colombia corridors. English and Spanish from the start, with the structure to be found on Google and in AI assistants.' },
       { q: 'Do customers get helped over WhatsApp?', a: 'Yes, we leave it integrated. The Doral customer usually prefers to message on WhatsApp rather than call, so we add a visible button and, if you want, a bilingual conversational AI that replies instantly 24/7 and captures the lead even when you are busy.' },
       { q: 'Do you guarantee the #1 spot on Google?', a: 'No, and be wary of anyone who promises it: nobody controls Google\'s algorithm. What we do guarantee is honest, measurable work: a correct bilingual site, local SEO done well, AI-ready schema and clear reports. Our commitment is to the method and to transparency, not to a number nobody can promise.' },
@@ -2310,7 +2310,7 @@ const enMiamiDoral: ClusterPage = {
   cta: {
     title: 'Put your <em>Doral</em> business on the digital map',
     sub: 'We are looking for Founding Clients in Doral. Tell us about your business (arepa spot, bakery, service or import/export) and get a bilingual proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2354,7 +2354,7 @@ const enMiamiHialeah: ClusterPage = {
     kicker: 'Local businesses · Hialeah',
     h1: 'Web design and SEO for your <em>business</em> in Hialeah',
     sub: 'Your Hialeah business runs on Spanish, on WhatsApp and at the walk-up window. We build you a fast site, an organized Google listing and instant replies so the customer searching "near me" finds you and messages you, in the language your neighborhood actually speaks.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what it includes', href: '#precios' },
     chips: ['True English and Spanish', 'Fast on mobile', 'Organized Google listing'],
     tone: 'gold',
@@ -2393,7 +2393,7 @@ const enMiamiHialeah: ClusterPage = {
     unit: 'one-time project',
     lead: 'Pay per project, no mandatory monthly fees. The price depends on scope.',
     features: webFeatures,
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: '$1,500 is the starting point for a professional site. Local SEO (from $600/mo) to rank you in the neighborhood and an AI assistant (from $900) to reply instantly are added on based on what you need. We spell it out with no obligation.',
     tone: 'gold',
   },
@@ -2420,7 +2420,7 @@ const enMiamiHialeah: ClusterPage = {
   cta: {
     title: 'Be one of our first <em>cases in Hialeah</em>',
     sub: 'We are looking for Founding Clients in Hialeah. Tell us about your business and get a personalized proposal, in your language, in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2455,16 +2455,16 @@ const enIaPymes: ClusterPage = {
   path: '/en/ai-for-small-business',
   breadcrumb: [
     { name: 'Home', path: '/en/' },
-    { name: 'Services', path: '/en/#services' },
+    { name: 'Services', path: '/en/#servicios' },
     { name: 'AI for Your Business', path: '/en/ai-for-small-business' },
   ],
   hero: {
     badge: 'AI for your business',
     badgeIcon: 'marcyan-ai',
     kicker: 'AI for small business',
-    h1: 'AI for your <em>Business</em>',
+    h1: 'AI for your <em>business</em>',
     sub: 'Is your business losing customers because you can\'t answer in time? We put artificial intelligence to work for you: assistants that reply, book appointments and capture leads around the clock, in true English and Spanish, without you having to know a thing about technology.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See how it works', href: '#faq' },
     chips: ['English and Spanish', 'No tech knowledge needed', 'Works with what you already use'],
     tone: 'teal',
@@ -2526,7 +2526,7 @@ const enIaPymes: ClusterPage = {
     title: 'AI for your business, in <em>plain terms</em>',
     items: [
       { q: 'How expensive is this for a small business?', a: 'More affordable than you think. An initial automation starts at $900 and pays for itself quickly once you stop losing customers because you couldn\'t answer in time. We start with a single solution to your biggest pain point, not a giant project, and we grow from there.' },
-      { q: 'Do I need to know about technology?', a: 'No, and that\'s exactly the point. We set everything up and hand it to you working, with simple training for your team. You focus on your business; the AI and we handle the technical side.' },
+      { q: 'Do I need to know about technology?', a: 'No, and that\'s exactly the point. We set everything up and hand it over ready to use, with simple training for your team. You focus on your business; we handle the technical side.' },
       { q: 'Does it work in Spanish?', a: 'Yes, and it\'s our specialty. We\'re a bilingual studio, so we set up assistants and automations in your customers\' Spanish, with the right tone, and in true English too. Most agencies hand you a Google Translate button; we build it in real English and Spanish so you capture the Spanish-speaking side of your market.' },
       { q: 'Does it integrate with the tools I already use?', a: 'In most cases, yes. We connect AI with your site, your WhatsApp, your calendar and many of the tools you already use. In the proposal we tell you honestly what can and can\'t be integrated, with no empty promises.' },
       { q: 'What\'s this about showing up in ChatGPT?', a: 'More and more people ask ChatGPT or Gemini for recommendations instead of searching the old-fashioned way. Right now those assistants recommend very few local businesses. We prepare your information so you have a better chance of showing up when someone asks for your kind of service.' },
@@ -2536,7 +2536,7 @@ const enIaPymes: ClusterPage = {
   cta: {
     title: 'Stop losing customers because you <em>couldn\'t answer</em>',
     sub: 'Tell us your biggest pain point and we\'ll propose an AI solution in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -2608,14 +2608,14 @@ const enPriceWebHouston: ClusterPage = {
     unit: 'one-time project',
     lead: 'Pay per project, with no mandatory monthly fees. The price depends on the scope.',
     features: webFeatures,
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: webPriceNote,
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Real sites that are <em>already live</em>',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX", 'Rosy Nails & Care'),
   },
   faq: {
@@ -2632,8 +2632,8 @@ const enPriceWebHouston: ClusterPage = {
   },
   cta: {
     title: 'Get the <em>exact</em> price of your site',
-    sub: 'Tell us how many pages and what features you need, and get a proposal with the locked-in price in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    sub: 'Tell us how many pages and what features you need, and get a proposal with a firm price in under 24 hours, no strings attached.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {
@@ -2662,7 +2662,7 @@ const enPriceChatbot: ClusterPage = {
   meta: {
     title: 'How much does a WhatsApp AI chatbot cost? The real price | Marcyan',
     description:
-      'An AI assistant with Marcyan starts at $900, a one-time payment, and includes setup, training and maintenance — not a subscription that grows every month. Free proposal in 24h.',
+      'An AI assistant with Marcyan starts at $900, a one-time payment, and includes setup, training and maintenance, not a subscription that grows every month. Free proposal in 24h.',
   },
   path: '/en/pricing/chatbot-cost',
   breadcrumb: [
@@ -2674,16 +2674,16 @@ const enPriceChatbot: ClusterPage = {
     badge: 'AI assistant',
     badgeIcon: 'marcyan-ai',
     kicker: 'Price · Conversational AI',
-    h1: 'How much a <em>chatbot</em> with AI costs',
+    h1: 'How much an AI <em>chatbot</em> costs',
     sub: 'The direct answer: how much to invest in an AI assistant for your WhatsApp and your site, what it includes, and why a service we build for you is not the same as a software subscription that grows every month.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See conversational AI in Houston', href: '/en/houston/conversational-ai' },
     chips: ['From $900, one-time payment', 'Setup + training', 'We maintain it for you'],
     tone: 'teal',
   },
   answer: {
     q: 'How much does a WhatsApp chatbot cost for your business?',
-    a: 'With Marcyan, an AI assistant for your WhatsApp and your site starts at $900 as a one-time payment, and it includes the setup, the training with your business information and the maintenance. It is not a software subscription you configure yourself: it is a service we build for you, with a clear price up front.',
+    a: 'With Marcyan, an AI assistant for your WhatsApp and your site starts at $900 as a one-time payment, and it includes setup, training with your business information and maintenance. It is not a software subscription you configure yourself: it is a service we build for you, with a clear price up front.',
   },
   includes: {
     tag: 'What it includes',
@@ -2746,7 +2746,7 @@ const enPriceChatbot: ClusterPage = {
   cta: {
     title: 'Put an assistant to <em>answer for you</em>',
     sub: 'Tell us what you want it to answer and schedule, and we give you a proposal with a locked-in price in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'teal',
   },
   related: {
@@ -2787,7 +2787,7 @@ const enPriceSeoHouston: ClusterPage = {
     kicker: 'Price · Local SEO',
     h1: 'How much <em>local SEO</em> costs in Houston',
     sub: 'A straight answer, with the monthly rate published: how much to invest in local SEO in Houston, what it includes and how long until you see results, without having to book a call just to learn the price.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See local SEO in Houston', href: '/en/houston/local-seo' },
     chips: ['From $600/mo', 'No long lock-in contracts', 'Clear reporting'],
     tone: 'gold',
@@ -2832,14 +2832,14 @@ const enPriceSeoHouston: ClusterPage = {
       'Clear monthly report',
       'Bilingual support',
     ],
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     note: 'The final price depends on where your business stands today, on your competition and on how many pages or locations we work on. We give you a clear scope and price in the free proposal, before you decide. We don\'t promise the #1 spot: nobody controls Google\'s algorithm.',
     tone: 'gold',
   },
   proof: {
     tag: 'Real work',
     title: 'Houston businesses that <em>already rank</em>',
-    cta: { label: 'Get a free proposal', href: '#contacto' },
+    cta: { label: 'Get my free proposal', href: '#contacto' },
     items: proj('Texas Rush Remove', "Julio's Landscape TX"),
   },
   faq: {
@@ -2857,7 +2857,7 @@ const enPriceSeoHouston: ClusterPage = {
   cta: {
     title: 'Show up in Houston, month <em>after month</em>',
     sub: 'Tell us about your business and get a local SEO proposal with clear scope and price in under 24 hours, no strings attached.',
-    primary: { label: 'Get a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold',
   },
   related: {

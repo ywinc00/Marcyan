@@ -32,7 +32,7 @@ export const content = {
         { label: 'Nosotros', href: '/es/sobre-nosotros' },
         { label: 'Blog', href: '/es/blog' },
       ] as Link[],
-      cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+      cta: { label: 'Propuesta gratis', href: '#contacto' },
       langLabel: 'EN',
       langHref: '/en/',
       openMenu: 'Abrir menú',
@@ -43,8 +43,8 @@ export const content = {
       tag: 'IA para tu negocio · Houston & Miami',
       h1: 'Diseño Web<br>que <em>piensa</em><br>por ti',
       sub: 'Sitios bilingües de verdad, en español e inglés, que cargan rápido y que ChatGPT sí puede leer, para que más clientes te encuentren. Propuesta gratis en menos de 24 horas.',
-      primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
-      secondary: { label: 'Ver Proyectos', href: '#proyectos' },
+      primary: { label: 'Propuesta gratis', href: '#contacto' },
+      secondary: { label: 'Ver proyectos', href: '#proyectos' },
       // nodos en órbita = enlaces reales al flujo de conversión actual
       // (diagnóstico gratis, calculadoras, precios). IA se conserva (clave).
       // El CTA #contacto vive en el dock, no se duplica aquí.
@@ -59,7 +59,7 @@ export const content = {
     },
 
     services: {
-      tag: 'Nuestros Servicios',
+      tag: 'Nuestros servicios',
       title: 'Todo lo que tu<br>marca <em>necesita</em>',
       note: 'Precios públicos, sin letra pequeña, incluido el SEO mensual y el mantenimiento.',
       explore: 'Explorar',
@@ -77,7 +77,7 @@ export const content = {
         { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Tiendas', price: 'desde $900', href: '/es/houston/ecommerce',
           desc: 'Tiendas en línea para vender de verdad: catálogo, carrito y pagos seguros, en experiencia bilingüe, desde una tienda esencial hasta una a medida.' },
         { n: '05', icon: 'lucide:search', title: 'SEO Local', price: 'desde $300', href: '/es/houston/seo-local',
-          desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, puntual o mes a mes.' },
+          desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, una sola vez o mes a mes.' },
         { n: '06', icon: 'lucide:palette', title: 'Branding & Identidad', price: 'desde $150', href: '/es/houston/branding',
           desc: 'Desde solo tu logo hasta una identidad completa: paleta, tipografías y guía de uso, hecha a la medida de tu negocio.' },
         { n: '07', icon: 'lucide:wrench', title: 'Mantenimiento Continuo', price: 'desde $120/mes', href: '#contacto',
@@ -88,7 +88,7 @@ export const content = {
     ai: {
       tag: 'Tecnología Marcyan',
       title: 'La IA que<br>trabaja para<br><em>tu negocio</em>',
-      desc: 'El asistente que te responde aquí mismo es el mismo producto que instalamos en tu negocio: atiende a tus clientes, responde sus preguntas y capta prospectos las 24 horas — y tu web queda lista para que ChatGPT y Gemini te encuentren.',
+      desc: 'El asistente que te responde aquí mismo es el mismo producto que instalamos en tu negocio: atiende a tus clientes, responde sus preguntas y capta prospectos las 24 horas. Y tu web queda lista para que ChatGPT y Gemini te encuentren.',
       features: [
         { icon: 'lucide:scan-search', title: 'Que la IA te encuentre', desc: 'Construimos en HTML estático y rápido que asistentes como ChatGPT y Gemini sí pueden leer, para que tu negocio aparezca cuando les preguntan.' },
         { icon: 'lucide:pen-tool', title: 'Contenido y textos', desc: 'Páginas y textos enfocados en SEO, escritos para tu mercado local y hechos para vender. Bilingüe de verdad, en español e inglés.' },
@@ -112,7 +112,7 @@ export const content = {
     },
 
     process: {
-      tag: 'Cómo Trabajamos',
+      tag: 'Cómo trabajamos',
       title: 'Del concepto al<br><em>lanzamiento</em>',
       launch: { kicker: '¿Listo para despegar?', label: 'Lanza tu proyecto ahora', href: '#contacto' },
       steps: [
@@ -127,7 +127,7 @@ export const content = {
     projects: {
       tag: 'Portafolio',
       title: 'Trabajo real, negocios<br><em>reales</em>',
-      cta: { label: 'Pedir propuesta gratis', href: '#contacto' },
+      cta: { label: 'Propuesta gratis', href: '#contacto' },
       more: 'Ver Proyectos',
       shotAlt: { pc: 'vista de escritorio', movil: 'vista móvil' },
       items: [
@@ -152,7 +152,7 @@ export const content = {
     },
 
     locations: {
-      tag: 'Nuestras Ciudades',
+      tag: 'Nuestras ciudades',
       title: 'Presentes donde<br>tu negocio <em>crece</em>',
       items: [
         { city: 'Houston', state: 'TX', badge: 'Área de servicio',
@@ -193,11 +193,11 @@ export const content = {
         company: { label: 'Empresa', ph: 'Nombre de tu empresa' },
         city: { label: 'Ciudad', ph: 'Seleccionar', opts: ['Houston, TX', 'Miami, FL', 'Otra ciudad'] },
         phone: { label: 'Teléfono (opcional)', ph: 'Tu teléfono o WhatsApp' },
-        service: { label: 'Servicio de Interés', ph: '¿Qué necesitas?', opts: ['Diseño Web', 'Rediseño de Sitio Actual', 'E-Commerce / Tienda Online', 'IA Conversacional / Chatbot', 'SEO Local', 'SEO para IA (Visibilidad en IA)', 'Branding & Identidad', 'Mantenimiento Continuo', 'Paquete Completo'] },
+        service: { label: 'Servicio de interés', ph: '¿Qué necesitas?', opts: ['Diseño Web', 'Rediseño de sitio actual', 'E-Commerce / Tienda en línea', 'IA Conversacional / Chatbot', 'SEO Local', 'SEO para IA (Visibilidad en IA)', 'Branding & Identidad', 'Mantenimiento Continuo', 'Paquete completo'] },
         message: { label: 'Cuéntanos tu proyecto', ph: 'Describe brevemente lo que necesitas...' },
-        submit: 'Enviar Mensaje',
+        submit: 'Enviar mensaje',
         sending: 'Enviando…',
-        success: 'Recibido. Te contactamos en menos de 24h. Tu folio:',
+        success: 'Recibido. Te contactamos en menos de 24h. Tu número de referencia:',
         error: 'Algo salió mal. Intenta de nuevo o usa nuestro formulario de proyecto completo.',
         emailInvalid: 'Ingresa un email válido para que podamos contactarte.',
         briefLink: 'formulario de proyecto completo',
@@ -206,7 +206,7 @@ export const content = {
 
     footer: {
       tagline: 'Web, IA y SEO para tu negocio · Houston & Miami',
-      cta: { label: 'Pedir propuesta gratis', href: '/es/#contacto' },
+      cta: { label: 'Propuesta gratis', href: '/es/#contacto' },
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -251,12 +251,14 @@ export const content = {
 
     nav: {
       links: [
-        { label: 'Services', href: '#servicios' },
-        { label: 'AI', href: '#ia' },
-        { label: 'Projects', href: '#proyectos' },
-        { label: 'Cities', href: '#ciudades' },
+        { label: 'Services', href: '/en/services' },
+        { label: 'Portfolio', href: '/en/portfolio' },
+        { label: 'Pricing', href: '/en/pricing' },
+        { label: 'Cities', href: '/en/cities' },
+        { label: 'About', href: '/en/about' },
+        { label: 'Blog', href: '/en/blog' },
       ] as Link[],
-      cta: { label: 'Get a free proposal', href: '#contacto' },
+      cta: { label: 'Get my free proposal', href: '#contacto' },
       langLabel: 'ES',
       langHref: '/es/',
       openMenu: 'Open menu',
@@ -267,7 +269,7 @@ export const content = {
       tag: 'AI for your business · Houston & Miami',
       h1: 'Web Design<br>that <em>thinks</em><br>for you',
       sub: 'Truly bilingual sites, in Spanish and English, that load fast and that ChatGPT can actually read, so more customers find you. Free proposal in under 24 hours.',
-      primary: { label: 'Get a free proposal', href: '#contacto' },
+      primary: { label: 'Get my free proposal', href: '#contacto' },
       secondary: { label: 'View Projects', href: '#proyectos' },
       nodes: [
         { label: 'Free checkup', href: '/en/checkup', icon: 'lucide:scan-search' },
@@ -282,23 +284,23 @@ export const content = {
     services: {
       tag: 'Our Services',
       title: 'Everything your<br>brand <em>needs</em>',
-      note: 'Public pricing, no fine print, down to monthly SEO and maintenance.',
+      note: 'Public pricing, no fine print, including monthly SEO and maintenance.',
       explore: 'Explore',
       featuredBadge: 'Featured service',
-      cta: { label: 'Tell us your project', href: '#contacto' },
+      cta: { label: 'See all services', href: '/en/services' },
       // Teaser: leads with each product's low anchor. Mirror of src/i18n/pricing.ts.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '#contacto',
+        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston/web-design',
           desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
-        { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: 'from $500', href: '#contacto',
+        { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: 'from $500', href: '/en/ai-for-small-business',
           desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock, in their language and built into your site.' },
-        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '#contacto',
+        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/houston/ai-seo',
           desc: 'Get recommended by ChatGPT, Gemini, and Meta AI when people search for what you offer. Starts with a free AI-visibility audit.' },
-        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '#contacto',
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston/ecommerce',
           desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience, from an essential store to a custom one.' },
-        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '#contacto',
+        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston/local-seo',
           desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, one-time or monthly.' },
-        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '#contacto',
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston/branding',
           desc: 'From just your logo to a full identity: palette, typography, and usage guide, made to measure for your business.' },
         { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
           desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
@@ -308,21 +310,22 @@ export const content = {
     ai: {
       tag: 'Marcyan Technology',
       title: 'The AI that<br>works for<br><em>your business</em>',
-      desc: 'The assistant answering you right here is the same product we install in your business: it serves your customers, answers their questions, and captures leads 24/7 — and your site ships ready for ChatGPT and Gemini to find you.',
+      desc: 'The assistant answering you right here is the same product we install in your business: it serves your customers, answers their questions, and captures leads 24/7. And your site ships ready for ChatGPT and Gemini to find you.',
       features: [
         { icon: 'lucide:scan-search', title: 'Found by AI', desc: 'We build in fast static HTML that AI assistants like ChatGPT and Gemini can actually read, so your business shows up when people ask them.' },
         { icon: 'lucide:pen-tool', title: 'Content & Copy', desc: 'SEO-focused pages and copy, written for your local market and made to sell. Truly bilingual, Spanish and English.' },
         { icon: 'lucide:bot-message-square', title: 'Conversational Assistants', desc: 'Chat assistants that answer your customers, qualify leads, and book appointments around the clock, in their language.' },
         { icon: 'lucide:waypoints', title: 'Automations', desc: 'We connect your site to the tools you already use, so new leads, notifications, and follow-ups happen on their own.' },
       ],
+      cta: { label: 'Explore our AI', href: '/en/ai-for-small-business' },
       // Illustrative assistant demo (sample text, editable). Not business copy.
       demo: {
         title: 'Marcyan Assistant', status: 'Online', lang: 'ES · EN',
         messages: [
           { who: 'user', text: 'Hi, do you build websites for restaurants?' },
-          { who: 'ai', text: 'Absolutely! We design sites with menus, reservations and ordering. What is your business called?', meta: 'Replies instantly' },
+          { who: 'ai', text: "Absolutely! We design sites with menus, reservations, and ordering. What's your business called?", meta: 'Replies instantly' },
           { who: 'user', text: 'Tacos El Güero, in Houston.' },
-          { who: 'ai', text: 'Perfect 🌮 I will prepare a free proposal within 24 h. What email should we send it to?', meta: 'Qualifies the lead' },
+          { who: 'ai', text: "Perfect 🌮 I'll prepare a free proposal within 24 hours. What email should we send it to?", meta: 'Qualifies the lead' },
           { who: 'user', text: 'gerardo@tacoselguero.com' },
         ],
         flow: ['Message', 'AI replies', 'Lead saved', 'We notify you'],
@@ -346,13 +349,13 @@ export const content = {
     projects: {
       tag: 'Portfolio',
       title: 'Real work, real<br><em>businesses</em>',
-      cta: { label: 'Get a free proposal', href: '#contacto' },
+      cta: { label: 'Get my free proposal', href: '#contacto' },
       more: 'View Projects',
       shotAlt: { pc: 'desktop view', movil: 'mobile view' },
       items: [
-        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: "Rebuilt from scratch plus local SEO. Already ranking — and Google's AI already recommends it.", accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
+        { name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', result: "Rebuilt from scratch plus local SEO. Already ranking, and Google's AI now recommends it.", accent: 'gold', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
         { name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', result: 'Rebuilt from scratch plus local SEO. Already ranking in its area.', accent: 'teal', badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO'] },
-        { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', result: 'Brand, identity, and website created from zero.', accent: 'gold', badge: 'Brand + Site', tags: ['Brand identity', 'Custom site'] },
+        { name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', result: 'Brand, identity, and website created from scratch.', accent: 'gold', badge: 'Brand + Site', tags: ['Brand identity', 'Custom site'] },
         { name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', result: 'Custom web app: clients book appointments and browse nail inspiration.', accent: 'teal', badge: 'Web app', tags: ['Appointment booking', 'Custom'] },
       ],
     },
@@ -372,18 +375,32 @@ export const content = {
 
     locations: {
       tag: 'Our Cities',
-      title: 'Present where<br>your business <em>grows</em>',
+      title: 'Right where<br>your business <em>grows</em>',
       items: [
         { city: 'Houston', state: 'TX', badge: 'Service Area',
           tagline: 'Space City', taglineIcon: 'lucide:sparkle', illo: 'houston',
           area: 'Houston & greater metro area', tel: nap.houston,
           stateFull: 'Texas, USA', coords: '29.7604° N, 95.3698° W',
-          connected: 'Connected with Houston' },
+          connected: 'Connected with Houston',
+          links: [
+            { label: 'Houston agency', sub: 'Meet the team', href: '/en/houston', icon: 'lucide:users' },
+            { label: 'Web design in Houston', sub: 'Sites that build trust', href: '/en/houston/web-design', icon: 'lucide:monitor' },
+            { label: 'Local SEO in Houston', sub: 'Get found on Google', href: '/en/houston/local-seo', icon: 'lucide:globe' },
+            { label: 'Online store in Houston', sub: 'Sell more, no limits', href: '/en/houston/ecommerce', icon: 'lucide:shopping-bag' },
+            { label: 'Conversational AI in Houston', sub: 'Service that converts', href: '/en/houston/conversational-ai', icon: 'lucide:message-square' },
+          ] },
         { city: 'Miami', state: 'FL', badge: 'Service Area',
           tagline: 'Magic City', taglineIcon: 'lucide:waves', illo: 'miami',
           area: 'Miami & greater metro area', tel: nap.miami,
           stateFull: 'Florida, USA', coords: '25.7617° N, 80.1918° W',
-          connected: 'Connected with Miami' },
+          connected: 'Connected with Miami',
+          links: [
+            { label: 'Miami agency', sub: 'Meet the team', href: '/en/miami', icon: 'lucide:users' },
+            { label: 'Web design in Miami', sub: 'Designs that win clients', href: '/en/miami/web-design', icon: 'lucide:monitor' },
+            { label: 'Local SEO in Miami', sub: 'More visibility, more clients', href: '/en/miami/local-seo', icon: 'lucide:globe' },
+            { label: 'Online store in Miami', sub: 'Sell more, no limits', href: '/en/miami/ecommerce', icon: 'lucide:shopping-bag' },
+            { label: 'Conversational AI in Miami', sub: 'Service that connects', href: '/en/miami/conversational-ai', icon: 'lucide:message-square' },
+          ] },
       ],
     },
 
@@ -398,7 +415,7 @@ export const content = {
         company: { label: 'Company', ph: 'Your company name' },
         city: { label: 'City', ph: 'Select', opts: ['Houston, TX', 'Miami, FL', 'Other city'] },
         phone: { label: 'Phone (optional)', ph: 'Phone or WhatsApp' },
-        service: { label: 'Service of Interest', ph: 'What do you need?', opts: ['Web Design', 'Website Redesign', 'E-Commerce / Online Store', 'Conversational AI / Chatbot', 'Local SEO', 'AI Visibility (AEO)', 'Branding & Identity', 'Ongoing Maintenance', 'Complete Package'] },
+        service: { label: 'Service of Interest', ph: 'What do you need?', opts: ['Web Design', 'Website Redesign', 'E-Commerce / Online Store', 'Conversational AI / Chatbot', 'Local SEO', 'AI SEO (AI Visibility)', 'Branding & Identity', 'Ongoing Maintenance', 'Complete Package'] },
         message: { label: 'Tell us about your project', ph: 'Briefly describe what you need...' },
         submit: 'Send Message',
         sending: 'Sending…',
@@ -411,31 +428,41 @@ export const content = {
 
     footer: {
       tagline: 'Web, AI & SEO for your business · Houston & Miami',
-      cta: { label: 'Get a free proposal', href: '/en/#contacto' },
+      cta: { label: 'Get my free proposal', href: '/en/#contacto' },
       cols: [
         { title: 'Services', links: [
-          { label: 'Web Design', href: '#servicios' },
-          { label: 'E-Commerce', href: '#servicios' },
-          { label: 'Conversational AI', href: '#ia' },
-          { label: 'Local SEO', href: '#servicios' },
-          { label: 'Branding', href: '#servicios' },
+          { label: 'All services', href: '/en/services' },
+          { label: 'Pricing', href: '/en/pricing' },
+          { label: 'Web Design', href: '/en/houston/web-design' },
+          { label: 'AI SEO', href: '/en/houston/ai-seo' },
+          { label: 'E-Commerce', href: '/en/houston/ecommerce' },
+          { label: 'AI for Business', href: '/en/ai-for-small-business' },
+          { label: 'Local SEO', href: '/en/houston/local-seo' },
+          { label: 'Branding', href: '/en/houston/branding' },
           { label: 'Digital checkup', href: '/en/checkup' },
           { label: 'Free tools', href: '/en/tools' },
           { label: 'Project Form', href: '/formulario' },
         ] },
         { title: 'Company', links: [
-          { label: 'Projects', href: '#proyectos' },
-          { label: 'Privacy', href: '/privacidad' },
-          { label: 'Terms', href: '/terminos' },
+          { label: 'About us', href: '/en/about' },
+          { label: 'Portfolio', href: '/en/portfolio' },
+          { label: 'Blog', href: '/en/blog' },
+          { label: 'Privacy', href: '/en/privacy' },
+          { label: 'Terms', href: '/en/terms' },
         ] },
         { title: 'Cities', links: [
-          { label: 'Houston TX', href: '#ciudades' },
-          { label: 'Miami FL', href: '#ciudades' },
+          { label: 'Houston & Miami', href: '/en/cities' },
+          { label: 'Houston agency', href: '/en/houston' },
+          { label: 'Web Design · Houston', href: '/en/houston/web-design' },
+          { label: 'Conversational AI · Houston', href: '/en/houston/conversational-ai' },
+          { label: 'Miami agency', href: '/en/miami' },
+          { label: 'Web Design · Miami', href: '/en/miami/web-design' },
+          { label: 'Conversational AI · Miami', href: '/en/miami/conversational-ai' },
         ] },
       ],
       legal: [
-        { label: 'Privacy', href: '/privacidad' },
-        { label: 'Terms', href: '/terminos' },
+        { label: 'Privacy', href: '/en/privacy' },
+        { label: 'Terms', href: '/en/terms' },
       ],
       copy: '© 2026 Marcyan Studio · All rights reserved',
     },

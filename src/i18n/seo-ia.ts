@@ -112,7 +112,7 @@ export const seoIaPage = {
   },
   answer: {
     q: '¿Cómo hago que ChatGPT y Gemini recomienden mi negocio?',
-    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Importa hacerlo ya. Según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
+    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Conviene hacerlo ya. Según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
     source: 'SOCi · Índice de Visibilidad Local 2026',
   },
   // Distinción CLAVE — IA que te recomienda ≠ IA que atiende (cruza-enlace inline).
@@ -149,7 +149,7 @@ export const seoIaPage = {
     tag: 'Casos reales',
     title: 'Lo aplicamos en <em>nuestro sitio</em> y en el de <em>nuestros clientes</em>',
     paragraphs: [
-      'No es teoría. Este mismo sitio está construido para que la IA lo lea — HTML claro, respuestas directas, datos estructurados. Somos nuestro propio Caso #0, pero ya no somos el único.',
+      'No es teoría. Este mismo sitio está construido para que la IA lo lea: HTML claro, respuestas directas, datos estructurados. Somos nuestro propio Caso #0, pero ya no somos el único.',
       'Dos clientes reales lo prueban: las páginas de Texas Rush Remove (Houston) y Move Junk Away (Orlando) ya posicionan en sus zonas, y la IA de Google ya los incluye en sus recomendaciones para algunas búsquedas de su servicio. Texas Rush Remove, además, ya recibe visitas que llegan directamente desde ChatGPT. Sin trucos: información clara, bien estructurada y honesta, del tipo que la IA puede citar.',
       'Y no te entregamos un PDF de recomendaciones para que te arregles solo: <strong>lo implementamos por ti</strong>, en español y para tu mercado local. El SEO para IA en español tiene mucha menos competencia que en inglés: una ventaja real para un negocio hispano que se mueve hoy.',
     ],
@@ -168,7 +168,7 @@ export const seoIaPage = {
     ] as FaqItem[],
   },
   cta: {
-    title: 'Descubre si la IA te <em>recomienda</em> — gratis',
+    title: 'Descubre si la IA te <em>recomienda</em>, gratis',
     sub: 'Pídenos el diagnóstico de visibilidad en IA: revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y te decimos con honestidad cómo estás. Sin costo ni compromiso.',
     primary: { label: 'Pedir diagnóstico gratis', href: '#contacto' },
     tone: 'teal' as const,

@@ -29,7 +29,7 @@ export const portfolioProjects: PortfolioProject[] = [
     name: 'Texas Rush Remove', cat: 'Junk Removal · Houston, TX', slug: 'trr', mh: 2431, accent: 'gold',
     badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO', 'Bilingual'],
     did: 'We rebuilt their site from scratch, fast and bilingual, and set up their local SEO: Google Business Profile, consistent NAP and per-service pages for their Houston area.',
-    result: 'It already ranks in its Houston area, Google\'s AI already includes it in its recommendations for some searches, and it gets visits arriving from ChatGPT.',
+    result: 'It already ranks in its Houston service area, Google\'s AI already includes it in its recommendations for some searches, and it gets visits arriving straight from ChatGPT.',
     serviceLabel: 'Local SEO in Houston', serviceHref: '/en/houston/local-seo',
   },
   {
@@ -43,7 +43,7 @@ export const portfolioProjects: PortfolioProject[] = [
     name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', slug: 'jls', mh: 2397, accent: 'gold',
     badge: 'Brand + Site', tags: ['Brand identity', 'Custom site', 'From scratch'],
     did: 'We created their brand from scratch (logo, palette and typography) and their custom website, consistent from start to finish, for a Houston landscaper.',
-    result: 'A new brand identity and website, built to measure from scratch.',
+    result: 'A new brand identity and website, custom-built from scratch.',
     serviceLabel: 'Branding and identity', serviceHref: '/en/houston/branding',
   },
   {
@@ -69,8 +69,8 @@ export const portfolioPage = {
   hero: {
     kicker: 'Portfolio',
     h1: 'Real work, <em>real</em> businesses',
-    sub: 'We do not show catalog mockups: these are real clients we designed sites, SEO, brand and web apps for. Real screenshots of every project, in true English and Spanish, with no inflated metrics.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    sub: 'We do not show catalog mockups: these are real clients we designed sites, SEO, branding and web apps for. Real screenshots of every project, in true English and Spanish, with no inflated metrics.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'View services', href: '/en/services' },
     chips: ['4 real businesses', 'Houston and Orlando', 'Real screenshots'],
     tone: 'gold' as const,
@@ -83,7 +83,7 @@ export const portfolioPage = {
     tag: 'Real work',
     title: 'Four clients, <em>four solutions</em>',
     intro:
-      'Every project was designed to measure around the business. Out of respect for our clients\' privacy we show the screenshots, not the links; we are happy to walk you through them on a call.',
+      'Every project was custom-designed around the business. Out of respect for our clients\' privacy we show the screenshots, not the links; we are happy to walk you through them on a call.',
   },
   related: {
     tag: 'Keep exploring',
@@ -96,19 +96,19 @@ export const portfolioPage = {
   },
   faq: {
     tag: 'Frequently asked questions',
-    title: 'About our portfolio, <em>clearly</em>',
+    title: 'About our portfolio, <em>straight up</em>',
     items: [
       { q: 'Are these real clients?', a: 'Yes. All four are real businesses we worked for: Texas Rush Remove and Move Junk Away (junk removal), Julio\'s Landscape (landscaping) and Rosy Nails & Care (nail salon). The screenshots you see are of their real sites and app, not catalog mockups.' },
       { q: 'Why don\'t you show the links to the sites?', a: 'Out of respect for our clients\' privacy we do not publish their domains here. If you want to see them live, we are happy to show you on a call or in the proposal.' },
       { q: 'Do you have cases in my industry or city?', a: 'We work mainly in Houston and also in Orlando, in niches like home services, landscaping and beauty. If we do not yet have a published case in your industry or city (for example, Miami), we offer you a Founding Client spot with special terms.' },
       { q: 'Do you publish metrics or result numbers?', a: 'We only say what we can back up honestly: that we rebuild sites, set up local SEO that already ranks, and deliver custom brands and apps. Today that includes something new: Google\'s AI already includes our clients in its recommendations for some searches, and one of them already gets visits arriving from ChatGPT. When we have metrics with the client\'s permission, we will publish them; in the meantime, we do not inflate percentages or invent figures.' },
-      { q: 'How long does a project like these take?', a: 'A custom site usually takes between 2 and 4 weeks depending on scope and how quickly we receive your content; a web app or a store take longer. We give you a realistic timeline in the free proposal.' },
+      { q: 'How long does a project like these take?', a: 'A custom site usually takes between 2 and 4 weeks depending on scope and how quickly we receive your content; a web app or an online store takes longer. We give you a realistic timeline in the free proposal.' },
     ] as FaqItem[],
   },
   cta: {
     title: 'The next case <em>could be yours</em>',
     sub: 'Tell us about your business and get a personalized proposal in under 24 hours, no strings attached.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
 };

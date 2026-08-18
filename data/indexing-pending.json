@@ -1,22 +1,16 @@
 {
-  "builtAt": "2026-08-18T00:26:04.174Z",
+  "builtAt": "2026-08-18T16:46:48.311Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 53,
-    "notIndexed": 14,
+    "indexed": 54,
+    "notIndexed": 13,
     "skipped": 17
   },
-  "candidates": 14,
+  "candidates": 13,
   "pending": [
-    {
-      "url": "https://marcyanstudio.com/es/miami",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
     {
       "url": "https://marcyanstudio.com/es/precios",
       "coverageState": "Discovered - currently not indexed",
@@ -31,7 +25,7 @@
     },
     {
       "url": "https://marcyanstudio.com/en/houston/restaurants",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
@@ -56,6 +50,12 @@
     {
       "url": "https://marcyanstudio.com/es/houston/seo-local",
       "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/seo-para-ia",
+      "coverageState": "Crawled - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     }

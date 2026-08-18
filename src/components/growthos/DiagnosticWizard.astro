@@ -133,6 +133,18 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
           <Icon name="lucide:arrow-right" />
         </a>
 
+        <!-- Puente al chat: cumple la promesa del teaser "Marcy te lo explica en el chat".
+             Dispara `mrc:ask` con el resultado (puntaje + señales del catálogo, sin PII);
+             el ChatWidget lo envía por su flujo normal. -->
+        <button type="button" class="dgw__marcy" data-marcy>
+          <span class="dgw__marcy-ic"><Icon name="lucide:messages-square" /></span>
+          <span class="dgw__marcy-tx">
+            <span class="dgw__marcy-lbl">{t.marcyBtn}</span>
+            <span class="dgw__marcy-sub">{t.marcySub}</span>
+          </span>
+          <Icon name="lucide:arrow-right" />
+        </button>
+
         <p class="dgw__disclaimer">{t.disclaimer}</p>
 
         <div class="dgw__claim">
@@ -288,6 +300,20 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
                   text-transform: uppercase; color: var(--fg-subtle); }
   .dgw__rec-svc { color: var(--accent-gold); font-weight: 600; }
   .dgw__rec svg { width: 18px; height: 18px; color: var(--accent-gold); margin-left: auto; }
+
+  /* Puente a Marcy: tarjeta hermana de .dgw__rec, en teal (el color de Marcy). */
+  .dgw__marcy { display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left;
+    padding: var(--space-4) var(--space-5); margin-bottom: var(--space-5); cursor: pointer;
+    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line);
+    border-radius: var(--radius-md); font: inherit;
+    transition: box-shadow var(--duration-base) var(--ease), border-color var(--duration-base) var(--ease); }
+  .dgw__marcy:hover { border-color: var(--accent-teal); box-shadow: var(--shadow-card); }
+  .dgw__marcy-ic { display: grid; place-items: center; flex-shrink: 0; }
+  .dgw__marcy-ic :global(svg) { width: 22px; height: 22px; color: var(--accent-teal); }
+  .dgw__marcy-tx { display: flex; flex-direction: column; gap: 2px; }
+  .dgw__marcy-lbl { color: var(--fg-primary); font-weight: 600; font-size: var(--text-sm); }
+  .dgw__marcy-sub { color: var(--fg-secondary); font-size: var(--text-xs); line-height: var(--leading-normal); }
+  .dgw__marcy > :global(svg:last-child) { width: 18px; height: 18px; color: var(--accent-teal); margin-left: auto; flex-shrink: 0; }
 
   .dgw__disclaimer { font-size: var(--text-sm); color: var(--fg-subtle); line-height: var(--leading-normal);
                      margin: 0 0 var(--space-6); }
@@ -458,6 +484,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
 
     function renderResult(biz, data) {
       root.querySelector('[data-biz]').textContent = biz || '';
+      lastResult = data;   // para el puente a Marcy (solo scores + labels del catálogo)
       const s = data.scores;
       // Riesgo por score total.
       const riskEl = root.querySelector('[data-risk]');
@@ -491,6 +518,25 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
       if (head) try { head.setAttribute('tabindex', '-1'); head.focus({ preventScroll: false }); } catch {}
       track('diagnostic_completed_preview', { total: s.total });
     }
+
+    // ── Puente a Marcy ───────────────────────────────────────────
+    // Construye el mensaje 100% en el cliente con datos NO sensibles (puntaje +
+    // señales del CATÁLOGO, nunca el nombre/email del visitante) y lo manda al
+    // ChatWidget vía `mrc:ask`; el widget lo envía por su flujo normal.
+    let lastResult = null;
+    const marcyBtn = root.querySelector('[data-marcy]');
+    if (marcyBtn) marcyBtn.addEventListener('click', () => {
+      if (!lastResult || !lastResult.scores) return;
+      const en = lang === 'en';
+      const s = lastResult.scores;
+      const sig = (lastResult.findings || []).slice(0, 3)
+        .map((f, i) => (i + 1) + ') ' + (en ? f.en : f.es)).join(' ');
+      const msg = en
+        ? 'I just ran the free digital checkup on this site. My score: ' + s.total + '/100 (mobile site ' + s.web + ', local SEO ' + s.seo + ', AI readability ' + s.ai + ', conversion ' + s.conv + ').' + (sig ? ' Signals detected: ' + sig : '') + ' Can you tell me what this means and what I should fix first?'
+        : 'Acabo de hacer el diagnóstico digital gratis en este sitio. Mi puntaje: ' + s.total + '/100 (web móvil ' + s.web + ', SEO local ' + s.seo + ', lectura por IA ' + s.ai + ', conversión ' + s.conv + ').' + (sig ? ' Señales detectadas: ' + sig : '') + ' ¿Me explicas qué significa y qué me conviene arreglar primero?';
+      track('diag_marcy_opened', { total: s.total });
+      window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text: msg } }));
+    });
 
     function paintBars(rootEl, scores) {
       if (!rootEl) return;

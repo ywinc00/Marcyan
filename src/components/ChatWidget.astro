@@ -1496,6 +1496,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     });
     if (leaveBtn) leaveBtn.addEventListener('click', () => { if (!opened) openPanel(); openCapture('contacto'); });
 
+    // ── Puente herramientas → Marcy (evento global `mrc:ask`) ──────
+    // El diagnóstico y las calculadoras disparan `mrc:ask` con un texto construido
+    // 100% en el CLIENTE y SIN PII (puntaje + señales del catálogo, o los números
+    // que el propio visitante puso en la calculadora). El widget abre el panel,
+    // entra a la conversación y lo envía por el flujo normal de send(): mismo
+    // saneo, mismos límites y misma validación del servidor que un mensaje tecleado.
+    window.addEventListener('mrc:ask', (e) => {
+      const text = e && e.detail && typeof e.detail.text === 'string' ? e.detail.text.trim() : '';
+      if (!text || busy) return;
+      if (!opened) openPanel();
+      ensureChat();
+      requestAnimationFrame(() => send(text.slice(0, 1500)));
+    });
+
     // Mensaje directo en escritorio (Chat-F05): el pill sms:/iMessage solo
     // funciona en táctil; en escritorio falla en silencio. En escritorio lo
     // ocultamos y mostramos el número del NAP como texto copiable junto a

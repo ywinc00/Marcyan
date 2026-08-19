@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-08-18T16:46:48.311Z",
+  "builtAt": "2026-08-19T15:22:21.999Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -43,7 +43,7 @@
     },
     {
       "url": "https://marcyanstudio.com/es/houston/ia-conversacional",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },

@@ -1,0 +1,52 @@
+month,tier,query,impressions,clicks,ctr,position,topPage,expectedPath
+2026-08,P0,marcyan,2,0,0,9,/en/terms,/es
+2026-08,P0,marcyan studio,0,0,0,,,/es
+2026-08,P0,web para vender en miami,16,0,0,24.25,/es/miami/ecommerce,/es/miami/ecommerce
+2026-08,P0,agencia de servicios seo bilingüe,4,0,0,20.75,/es/houston,/es/servicios
+2026-08,P0,houston spanish website design,12,0,0,26.5,/en/houston,/en/houston/bilingual-web-design
+2026-08,P0,bilingual seo miami,7,0,0,29.428571428571427,/en/miami,/en/miami/local-seo
+2026-08,P0,conversational ai miami,5,0,0,23.6,/en/miami/conversational-ai,/en/miami/conversational-ai
+2026-08,P0,ai chatbot for small business houston,0,0,0,,,/en/houston/conversational-ai
+2026-08,P1,cuanto cuesta una pagina web en houston,0,0,0,,,/es/precios/cuanto-cuesta-una-pagina-web-houston
+2026-08,P0,cuanto cuesta un chatbot de whatsapp,0,0,0,,,/es/precios/cuanto-cuesta-un-chatbot
+2026-08,P0,cuanto cuesta el seo local en houston,0,0,0,,,/es/precios/cuanto-cuesta-seo-local-houston
+2026-08,P1,chatbot con inteligencia artificial en español houston,0,0,0,,,/es/houston/ia-conversacional
+2026-08,P0,chatbot para negocios en miami,0,0,0,,,/es/miami/ia-conversacional
+2026-08,P0,paginas web para restaurantes en houston,0,0,0,,,/es/houston/restaurantes
+2026-08,P0,paginas web para contratistas en houston,0,0,0,,,/es/houston/contratistas
+2026-08,P0,pagina web para abogado de inmigracion houston,0,0,0,,,/es/houston/abogados-inmigracion
+2026-08,P0,paginas web para agentes de bienes raices houston,0,0,0,,,/es/houston/bienes-raices
+2026-08,P0,pagina web para salon de belleza houston,0,0,0,,,/es/houston/salon-belleza
+2026-08,P0,pagina web para taller mecanico houston,0,0,0,,,/es/houston/talleres-mecanicos
+2026-08,P0,diseño web en katy tx,0,0,0,,,/es/houston/katy
+2026-08,P0,diseño web en sugar land tx,0,0,0,,,/es/houston/sugar-land
+2026-08,P0,diseño de paginas web en hialeah,0,0,0,,,/es/miami/hialeah
+2026-08,P1,diseño de sitios web en houston,18,0,0,16.666666666666664,/es/houston,/es/houston/diseno-web
+2026-08,P1,seo local houston,0,0,0,,,/es/houston/seo-local
+2026-08,P1,tienda en linea houston,0,0,0,,,/es/houston/ecommerce
+2026-08,P1,diseño de logo en houston,0,0,0,,,/es/houston/branding
+2026-08,P1,pagina web para clinica dental houston,0,0,0,,,/es/houston/clinicas-dentales
+2026-08,P1,agencia de diseño web bilingüe houston,0,0,0,,,/es/houston/diseno-web-bilingue
+2026-08,P1,seo para ia en houston,0,0,0,,,/es/houston/seo-para-ia
+2026-08,P1,recepcionista virtual con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
+2026-08,P1,automatizar whatsapp con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
+2026-08,P1,diseño de paginas web en doral,0,0,0,,,/es/miami/doral
+2026-08,P1,tienda en linea en miami,0,0,0,,,/es/miami/ecommerce
+2026-08,P1,creadores de paginas web cerca de mi,10,0,0,16.9,/es/houston,/es
+2026-08,P1,bilingual web design houston,0,0,0,,,/en/houston/bilingual-web-design
+2026-08,P1,ai seo houston,0,0,0,,,/en/houston/ai-seo
+2026-08,P1,how much does a website cost in houston,0,0,0,,,/en/pricing/website-cost-houston
+2026-08,P0,how much does a chatbot cost,0,0,0,,,/en/pricing/chatbot-cost
+2026-08,P0,website for restaurants houston,0,0,0,,,/en/houston/restaurants
+2026-08,P0,immigration lawyer website design houston,0,0,0,,,/en/houston/immigration-lawyers
+2026-08,P0,real estate agent website houston,0,0,0,,,/en/houston/real-estate
+2026-08,P1,how much does local seo cost in houston,0,0,0,,,/en/pricing/local-seo-cost-houston
+2026-08,P1,website for contractors houston,0,0,0,,,/en/houston/contractors
+2026-08,P2,diseño web miami,36,0,0,41.916666666666664,/es/miami,/es/miami/diseno-web
+2026-08,P2,agencia diseño web miami,22,0,0,36.95454545454545,/es/miami,/es/miami/diseno-web
+2026-08,P2,diseño web houston,0,0,0,,,/es/houston/diseno-web
+2026-08,P2,seo local miami,0,0,0,,,/es/miami/seo-local
+2026-08,P2,como aparecer en chatgpt,0,0,0,,,/es/blog/como-aparecer-en-chatgpt-perplexity
+2026-08,P2,web design houston,0,0,0,,,/en/houston/web-design
+2026-08,P2,web design miami,0,0,0,,,/en/miami/web-design
+2026-08,P2,local seo houston,0,0,0,,,/en/houston/local-seo

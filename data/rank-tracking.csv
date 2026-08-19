@@ -1,7 +1,7 @@
 month,tier,query,impressions,clicks,ctr,position,topPage,expectedPath
 2026-08,P0,marcyan,2,0,0,9,/en/terms,/es
 2026-08,P0,marcyan studio,0,0,0,,,/es
-2026-08,P0,web para vender en miami,16,0,0,24.25,/es/miami/ecommerce,/es/miami/ecommerce
+2026-08,P0,web para vender en miami,14,0,0,19.285714285714285,/es/miami/ecommerce,/es/miami/ecommerce
 2026-08,P0,agencia de servicios seo bilingüe,4,0,0,20.75,/es/houston,/es/servicios
 2026-08,P0,houston spanish website design,12,0,0,26.5,/en/houston,/en/houston/bilingual-web-design
 2026-08,P0,bilingual seo miami,7,0,0,29.428571428571427,/en/miami,/en/miami/local-seo

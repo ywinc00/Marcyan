@@ -304,24 +304,31 @@ const pct = (v, dec = 1) => `${(Number(v) * 100).toFixed(dec)}%`;
    · 4-10  = ya en página 1 pero bajo el pliegue, ganar 3 puestos multiplica CTR
    · 11-20 = página 2, el clásico "un empujón y entra"
    Por encima de 20 no es un empujón, es trabajo de fondo, y se trata aparte. */
-function buildStrikingDistance(queryPageRows, { minImpressions = 3, limit = 15 } = {}) {
-  const byQuery = new Map();
+/* IMPORTANTE: las métricas salen de queryRows (dimensión consulta sola), no de
+   queryPageRows. La vista consulta+página cuenta una impresión por cada URL
+   nuestra que aparece en la misma búsqueda, así que infla las impresiones y
+   desplaza la posición ponderada. Con la vista inflada, "web para vender en
+   miami" salía en 24.3 aquí y en 19.3 en la sección de mercado: dos números
+   distintos para la misma consulta dentro del mismo reporte. queryPageRows se
+   usa SOLO para saber qué página rankea. */
+function buildStrikingDistance(queryRows, queryPageRows, { minImpressions = 3, limit = 15 } = {}) {
+  const topPageByQuery = new Map();
   for (const r of queryPageRows) {
     const q = r.keys[0];
-    const page = normalizePath(r.keys[1]);
-    if (!byQuery.has(q)) byQuery.set(q, { query: q, impressions: 0, clicks: 0, posWeighted: 0, pages: new Map() });
-    const e = byQuery.get(q);
-    e.impressions += r.impressions;
-    e.clicks += r.clicks;
-    e.posWeighted += r.position * r.impressions;
-    e.pages.set(page, (e.pages.get(page) ?? 0) + r.impressions);
+    const cur = topPageByQuery.get(q);
+    if (!cur || r.impressions > cur.impressions) {
+      topPageByQuery.set(q, { page: normalizePath(r.keys[1]), impressions: r.impressions });
+    }
   }
-  const rows = [...byQuery.values()].map(e => {
-    const position = e.impressions ? e.posWeighted / e.impressions : 0;
-    const topPage = [...e.pages.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+  const rows = queryRows.map(r => {
+    const position = r.position ?? 0;
     return {
-      query: e.query, impressions: e.impressions, clicks: e.clicks,
-      ctr: e.impressions ? e.clicks / e.impressions : 0, position, topPage,
+      query: r.keys[0],
+      impressions: r.impressions,
+      clicks: r.clicks,
+      ctr: r.impressions ? r.clicks / r.impressions : 0,
+      position,
+      topPage: topPageByQuery.get(r.keys[0])?.page ?? '—',
       band: position < 4 ? 'top3' : position <= 10 ? 'p1-bajo' : position <= 20 ? 'p2' : 'fondo',
     };
   });
@@ -1660,18 +1667,28 @@ async function main() {
   const prevTotalsRow = await gscQuery(token, SITE, { startDate: prevStart, endDate: prevEnd, dimensions: [], rowLimit: 1 });
   const prevSiteTotals = prevTotalsRow[0] && prevTotalsRow[0].impressions > 0 ? prevTotalsRow[0] : null;
 
-  // ── palabras clave objetivo ──
+  /* Palabras clave objetivo. Métricas de queryRows (dimensión consulta sola,
+     que es la cifra real) y página de queryPageRows. Sumar las filas de
+     consulta+página aquí inflaría impresiones y posición respecto de la
+     sección de mercado, que sí usa la vista limpia. */
+  const queryByName = new Map(queryRows.map(r => [r.keys[0].toLowerCase(), r]));
+  const topPageByQuery = new Map();
+  for (const r of queryPageRows) {
+    const q = r.keys[0].toLowerCase();
+    const cur = topPageByQuery.get(q);
+    if (!cur || r.impressions > cur.impressions) topPageByQuery.set(q, { page: r.keys[1], impressions: r.impressions });
+  }
   const keywordRows = config.keywords.map(k => {
-    const matches = queryPageRows.filter(r => r.keys[0].toLowerCase() === k.query.toLowerCase());
-    if (!matches.length) return { ...k, impressions: 0, clicks: 0, ctr: 0, position: null, topPage: null };
-    const top = [...matches].sort((a, b) => b.impressions - a.impressions)[0];
-    const impressions = matches.reduce((a, b) => a + b.impressions, 0);
-    const clicks = matches.reduce((a, b) => a + b.clicks, 0);
+    const key = k.query.toLowerCase();
+    const r = queryByName.get(key);
+    if (!r) return { ...k, impressions: 0, clicks: 0, ctr: 0, position: null, topPage: null };
     return {
-      ...k, impressions, clicks,
-      ctr: impressions ? clicks / impressions : 0,
-      position: matches.reduce((a, b) => a + b.position * b.impressions, 0) / Math.max(impressions, 1),
-      topPage: top.keys[1],
+      ...k,
+      impressions: r.impressions,
+      clicks: r.clicks,
+      ctr: r.impressions ? r.clicks / r.impressions : 0,
+      position: r.position,
+      topPage: topPageByQuery.get(key)?.page ?? null,
     };
   });
 
@@ -1680,7 +1697,7 @@ async function main() {
 
   // ── striking distance ──
   const MIN_STRIKING_IMPR = 3;
-  const strikingData = buildStrikingDistance(queryPageRows, { minImpressions: MIN_STRIKING_IMPR, limit: 15 });
+  const strikingData = buildStrikingDistance(queryRows, queryPageRows, { minImpressions: MIN_STRIKING_IMPR, limit: 15 });
 
   // ── marca vs no marca ──
   const BRAND_RE = /marcyan|marcy\s*an|marcyanstudio/i;

@@ -813,6 +813,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let lastUserText = '';
     let busy = false;
     let opened = false;
+    let pendingAsk = null;      // mensaje del puente (mrc:ask) encolado mientras busy
+    let bridgeOpening = false;  // apertura vía puente: el foco va al botón cerrar, no al input
     let savedScrollY = 0;
     let bodyFrozen = false;
     // Bloqueo de scroll del body SOLO cuando el panel es pantalla completa (móvil).
@@ -1019,7 +1021,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       ensureChat();
       if (root) root.setAttribute('data-started', '');  // colapsa las chips de respuesta rápida
       appendBubble('user', text);
-      if (input) input.value = '';
+      // Limpia el composer SOLO si lo enviado salió de ahí: un envío vía puente
+      // (mrc:ask) o chip no debe borrar un borrador a medio escribir.
+      if (input && input.value.trim() === text) input.value = '';
       autoGrow();
       showTyping();
 
@@ -1069,6 +1073,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         // No robar el foco si Marcy acaba de abrir la captura: deja el cursor en el
         // campo que falta (mejor con el pre-rellenado). Si no, re-enfoca el input.
         if (opened && input && !log.querySelector('[data-mrc-capture]')) input.focus();
+        // Puente encolado mientras Marcy respondía → sale ahora (un nivel, sin bucle:
+        // pendingAsk se vacía antes de reenviar).
+        if (pendingAsk) { const t = pendingAsk; pendingAsk = null; requestAnimationFrame(() => send(t)); }
       }
     }
 
@@ -1431,6 +1438,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // Re-sincroniza tras la animación del teclado/viewport (evita franjas de fondo).
       requestAnimationFrame(() => requestAnimationFrame(syncViewport));
       requestAnimationFrame(() => {
+        // Apertura vía puente (mrc:ask): el send() inmediato va a deshabilitar el
+        // input (setBusy) — enfocarlo aquí solo provoca foco→disabled→blur y un
+        // flash de teclado en Android. El foco va al botón cerrar, como en el
+        // primer turno de ensureChat.
+        if (bridgeOpening) { bridgeOpening = false; (closeBtn || panel).focus(); return; }
         // En bienvenida NO enfocamos el input (en móvil abriría el teclado);
         // enfocamos la primera tarjeta de canal. En conversación, el input.
         if (root.getAttribute('data-stage') === 'chat' && input) { input.focus(); return; }
@@ -1502,12 +1514,16 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // que el propio visitante puso en la calculadora). El widget abre el panel,
     // entra a la conversación y lo envía por el flujo normal de send(): mismo
     // saneo, mismos límites y misma validación del servidor que un mensaje tecleado.
+    // Si Marcy está respondiendo (busy), el mensaje se ENCOLA y sale al liberarse
+    // el turno: descartarlo en silencio hacía parecer muerto el botón del puente.
     window.addEventListener('mrc:ask', (e) => {
       const text = e && e.detail && typeof e.detail.text === 'string' ? e.detail.text.trim() : '';
-      if (!text || busy) return;
-      if (!opened) openPanel();
+      if (!text) return;
+      const clipped = text.slice(0, 1500);
+      if (!opened) { bridgeOpening = true; openPanel(); }
       ensureChat();
-      requestAnimationFrame(() => send(text.slice(0, 1500)));
+      if (busy) { pendingAsk = clipped; return; }
+      requestAnimationFrame(() => send(clipped));
     });
 
     // Mensaje directo en escritorio (Chat-F05): el pill sms:/iMessage solo

@@ -4,7 +4,7 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, computeLossToolResult, buildSiteToolResult, siteReviewAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, buildSiteToolResult, siteReviewAllowed } from '../api/chat.mjs';
 import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -267,6 +267,19 @@ check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'clau
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
 check('ALLOWED_MODELS conserva fallback sonnet-4-6', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-4-6'), true));
 check('modelo desconocido NO está en allowlist (se coacciona a default)', () => assert.equal(ALLOWED_MODELS.has('gpt-4o'), false));
+// v8: los parámetros de thinking van CONDICIONADOS al modelo — Haiku 4.5 no soporta
+// adaptive/effort (400): mandárselos mataría la palanca de reversión CHAT_MODEL.
+check('modelTuning: sonnet-5 lleva thinking adaptativo + effort low', () => {
+  const t = modelTuning('claude-sonnet-5');
+  assert.equal(t.thinking.type, 'adaptive');
+  assert.equal(t.output_config.effort, 'low');
+});
+check('modelTuning: sonnet-4-6 también los soporta', () => assert.equal(modelTuning('claude-sonnet-4-6').thinking.type, 'adaptive'));
+check('modelTuning: haiku-4-5 NO lleva thinking ni output_config (reversión segura)', () => {
+  const t = modelTuning('claude-haiku-4-5');
+  assert.equal(t.thinking, undefined);
+  assert.equal(t.output_config, undefined);
+});
 
 // ── v3: extractContact (memoria de contacto — SOLO cliente, valores bien formados) ──
 check('extrae email bien formado', () => assert.equal(extractContact('mi correo es juan@ejemplo.com, gracias').email, 'juan@ejemplo.com'));

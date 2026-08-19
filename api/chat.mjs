@@ -29,7 +29,9 @@ import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
 
 // maxDuration 60: un turno con herramienta interna hace 2 llamadas al modelo con
-// una revisión de sitio en medio (llamada1 ≤10s · fetch ≤6s · llamada2 ≤14s).
+// una revisión de sitio en medio. Invariante v8 de presupuestos por fase:
+// llamada1 ≤14s · revisión ≤9s · llamada2 ≤16s = 39s < NET_TIMEOUT 42s del
+// widget (ChatWidget.astro) < maxDuration 60. Si cambias un tope, recalcula los tres.
 export const config = { maxDuration: 60 };
 
 // Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
@@ -38,6 +40,16 @@ export const DEFAULT_MODEL = 'claude-sonnet-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 // Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
 export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
+
+// Parámetros de razonamiento por MODELO (v8). Sonnet 5/4.6 soportan thinking
+// adaptativo + effort; Haiku 4.5 NO (ambos parámetros devuelven 400 en ese modelo):
+// mandárselos igual convertiría la palanca de reversión CHAT_MODEL=claude-haiku-4-5
+// en un chat muerto en silencio (todas las llamadas 400 → fallback genérico).
+// Pura y exportada para el guard test.
+export function modelTuning(model) {
+  if (model === 'claude-haiku-4-5') return {};
+  return { thinking: { type: 'adaptive' }, output_config: { effort: 'low' } };
+}
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
 // resto (< 32) y DEL (127). Hecho con codePointAt para no meter bytes de
@@ -343,17 +355,20 @@ async function reviewSite(url, lang) {
   let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
   // Follow-up de /contacto (mismo criterio que api/diagnostic.mjs, presupuesto MÁS corto):
   // sin esto, Marcy afirmaría "no tiene formulario" contra sitios que lo tienen en su
-  // página de contacto (falso negativo verificado contra movejunkaway.com). Best-effort.
+  // página de contacto (falso negativo verificado contra movejunkaway.com). Best-effort
+  // DE VERDAD: con withTimeout PROPIO (3s), para que un /contacto lento caiga a este
+  // catch y devolvamos el análisis de la home ya calculado — nunca al race externo de
+  // 9s, que descartaría TODO y quemaría el cupo de 1 revisión por sesión.
   if (out.checks.C3 !== 'pass' || out.checks.C1 !== 'pass') {
     try {
-      const href = findContactHref(site.html);
-      if (href) {
+      out = await withTimeout((async () => {
+        const href = findContactHref(site.html, new URL(site.finalUrl).hostname);
+        if (!href) return out;
         const g2 = await ssrfGuard(new URL(href, site.finalUrl).href);
-        if (g2.ok) {
-          const contact = await fetchSite(g2.url, { timeoutMs: 2500, maxBytes: 200_000, maxRedirects: 1 });
-          if (contact && contact.ok && contact.html) out = mergeContactSignals(out, contact.html);
-        }
-      }
+        if (!g2.ok) return out;
+        const contact = await fetchSite(g2.url, { timeoutMs: 2500, maxBytes: 200_000, maxRedirects: 1 });
+        return (contact && contact.ok && contact.html) ? mergeContactSignals(out, contact.html) : out;
+      })(), 3000, 'contact follow-up');
     } catch { /* el análisis de la home queda tal cual */ }
   }
   return { content: buildSiteToolResult({ scores: out.scores, findings: out.findings }, lang), extraAllow: [] };
@@ -432,9 +447,9 @@ export default async function handler(req, res) {
       // thinking apagado el modelo dispara menos las herramientas y lee peor el turno
       // — exactamente los síntomas reportados (no detecta al cliente decidido, repite
       // preguntas). effort 'low' mantiene el thinking breve (~1-3s y unos cientos de
-      // tokens por turno); el coste extra por turno es de centavos al precio actual.
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'low' },
+      // tokens por turno); coste extra por turno de centavos. Condicionado por modelo
+      // (modelTuning): Haiku 4.5 no soporta estos parámetros.
+      ...modelTuning(model),
     };
 
     // 1ª llamada (≤14s: incluye el thinking adaptativo). El input del usuario vive SOLO en `messages`.

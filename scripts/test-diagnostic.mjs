@@ -171,6 +171,51 @@ check('sitio sano → sin hallazgos fail relevantes', () => {
   assert.equal(r.findings.length, 0, JSON.stringify(r.findings.map((f) => f.id)));
 });
 
+// ── Endurecimientos de la revisión adversarial (2026-08-18) ──────
+check('findContactHref: asset del <head> (contacto.css) NO gana al anchor real', () => {
+  const html = '<head><link rel="stylesheet" href="/_astro/contacto.B2x.css"></head><body><nav><a href="/contact">Contact</a></nav></body>';
+  assert.equal(findContactHref(html), '/contact');
+});
+check('findContactHref: chunk JS contact-page-*.js se ignora (extensión de asset)', () => {
+  assert.equal(findContactHref('<script src="/x.js"></script><a href="/_next/static/chunks/contact-page-abc.js">x</a>'), null);
+});
+check('findContactHref: /ebook-gratis NO matchea "book"; /contacto exacto gana', () => {
+  assert.equal(findContactHref('<a href="/ebook-gratis">e</a><a href="/contacto">c</a>'), '/contacto');
+  assert.equal(findContactHref('<a href="/ebook-gratis">e</a>'), null);
+});
+check('findContactHref: /book (agenda) anclado a segmento sí cuenta', () => {
+  assert.equal(findContactHref('<a href="/book">agenda</a>'), '/book');
+});
+check('findContactHref: absoluto del MISMO host cuenta con baseHost (WordPress)', () => {
+  assert.equal(findContactHref('<a href="https://mybiz.com/contact/">Contact</a>', 'mybiz.com'), 'https://mybiz.com/contact/');
+  assert.equal(findContactHref('<a href="https://www.mybiz.com/contact/">Contact</a>', 'mybiz.com'), 'https://www.mybiz.com/contact/');
+});
+check('findContactHref: absoluto de OTRO host sigue fuera aunque haya baseHost', () => {
+  assert.equal(findContactHref('<a href="https://otro.com/contact">d</a>', 'mybiz.com'), null);
+});
+check('findContactHref: exacto /contact gana sobre substring anterior (contact-lens)', () => {
+  assert.equal(findContactHref('<a href="/productos/contact-lens">l</a><a href="/contact">c</a>'), '/contact');
+});
+check('C3: enlace legal de vendor (legal.hubspot.com en href) NO es formulario', () => {
+  assert.equal(run(BASE('<a href="https://legal.hubspot.com/privacy">Privacy</a>')).checks.C3, 'fail');
+});
+check('C3: mención de vendor en texto plano NO es formulario', () => {
+  assert.equal(run(BASE('<p>We use HubSpot and Typeform internally.</p>')).checks.C3, 'fail');
+});
+check('C3: enlace DIRECTO a form alojado (forms.gle) SÍ cuenta', () => {
+  assert.equal(run(BASE('<a href="https://forms.gle/abc123">Escríbenos</a>')).checks.C3, 'pass');
+});
+check('S3: config JS inline con telephone/address NO aprueba (solo dentro de ld+json)', () => {
+  const html = BASE('<p>hola</p>',
+    '<script type="application/ld+json">{"@type":"WebSite"}</script>' +
+    '<script>var cfg={"telephone":"713","address":"123 Main"};</script>');
+  assert.equal(run(html).checks.S3, 'partial');
+});
+check('S3: telephone+address DENTRO del ld+json sigue aprobando', () => {
+  const html = BASE('<p>hola</p>', '<script type="application/ld+json">{"@type":"X","telephone":"+1713","address":{"streetAddress":"x"}}</script>');
+  assert.equal(run(html).checks.S3, 'pass');
+});
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) del diagnóstico fallaron:\n - ` + fails.join('\n - '));
   process.exit(1);

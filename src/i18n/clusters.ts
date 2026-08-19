@@ -153,7 +153,7 @@ const houstonSeo: ClusterPage = {
   hero: {
     badge: 'Houston, TX',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'SEO Local',
+    kicker: 'SEO local',
     h1: 'SEO local en <em>Houston</em>',
     sub: 'Aparece cuando tus clientes buscan en Google Maps y en los asistentes de IA. Optimizamos tu presencia local para que tu negocio en Houston gane más llamadas, visitas y reseñas, en español e inglés.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
@@ -240,7 +240,7 @@ const houstonSeo: ClusterPage = {
     ],
   },
   service: {
-    name: 'SEO Local en Houston',
+    name: 'SEO local en Houston',
     serviceType: 'SEO local',
     description:
       'Optimización de SEO local para PYMEs en Houston: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe, gestión de reseñas y preparación para asistentes de IA.',
@@ -258,7 +258,7 @@ const houstonSeo: ClusterPage = {
 // ═══════════════════════════════════════════════════════════════
 const houstonWeb: ClusterPage = {
   meta: {
-    title: 'Diseño Web en Houston | Páginas a medida y bilingües | Marcyan',
+    title: 'Diseño web en Houston | Páginas a medida y bilingües | Marcyan',
     description:
       'Diseño web profesional en Houston para PYMEs hispanas. Sitios rápidos, a medida y bilingües, listos para Google y la IA. Propuesta gratis en menos de 24 horas.',
   },
@@ -266,13 +266,13 @@ const houstonWeb: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Houston', path: '/es/houston' },
-    { name: 'Diseño Web', path: '/es/houston/diseno-web' },
+    { name: 'Diseño web', path: '/es/houston/diseno-web' },
   ],
   hero: {
     badge: 'Houston, TX',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'Diseño Web',
-    h1: 'Diseño Web en <em>Houston</em>',
+    kicker: 'Diseño web',
+    h1: 'Diseño web en <em>Houston</em>',
     sub: 'Sitios web a medida, rápidos y bilingües para negocios de Houston. Diseñados para verse increíbles, cargar al instante y convertir visitas en clientes, listos para Google y para la IA.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver trabajo real', href: '#proyectos' },
@@ -346,7 +346,7 @@ const houstonWeb: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web en Houston',
+    name: 'Diseño web en Houston',
     serviceType: 'Diseño web',
     description:
       'Diseño y desarrollo de sitios web a medida para PYMEs en Houston: rápidos, bilingües (español e inglés), optimizados para SEO y legibles por asistentes de IA.',
@@ -366,7 +366,7 @@ const houstonWeb: ClusterPage = {
 // ═══════════════════════════════════════════════════════════════
 const miamiWeb: ClusterPage = {
   meta: {
-    title: 'Diseño Web en Miami | Páginas a medida y bilingües | Marcyan',
+    title: 'Diseño web en Miami | Páginas a medida y bilingües | Marcyan',
     description:
       'Diseño web profesional para negocios de Miami y su área metropolitana. Sitios a medida, rápidos y bilingües, listos para Google y la IA. Propuesta gratis en 24h.',
   },
@@ -374,13 +374,13 @@ const miamiWeb: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Miami', path: '/es/miami' },
-    { name: 'Diseño Web', path: '/es/miami/diseno-web' },
+    { name: 'Diseño web', path: '/es/miami/diseno-web' },
   ],
   hero: {
     badge: 'Miami, FL',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'Diseño Web',
-    h1: 'Diseño Web en <em>Miami</em>',
+    kicker: 'Diseño web',
+    h1: 'Diseño web en <em>Miami</em>',
     sub: 'Sitios web a medida, rápidos y bilingües para negocios de Miami y su área metropolitana. Diseño de élite que carga al instante, convierte visitas en clientes y te prepara para Google y la IA.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver trabajo real', href: '#proyectos' },
@@ -453,7 +453,7 @@ const miamiWeb: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web en Miami',
+    name: 'Diseño web en Miami',
     serviceType: 'Diseño web',
     description:
       'Diseño y desarrollo de sitios web a medida para negocios de Miami y su área metropolitana: rápidos, bilingües (español e inglés), optimizados para SEO y legibles por asistentes de IA.',
@@ -674,7 +674,7 @@ const precioWebHouston: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web en Houston',
+    name: 'Diseño web en Houston',
     serviceType: 'Diseño web',
     description:
       'Diseño y desarrollo de páginas web a medida para negocios en Houston: rápidas, bilingües (español e inglés), con SEO base, desde $1,500.',
@@ -698,7 +698,7 @@ const precioWebHouston: ClusterPage = {
 const houstonIa: ClusterPage = {
   tool: { text: 'Tu asistente contesta lo que hoy se te escapa. Mira cuánto vale eso al mes.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
-    title: 'IA Conversacional en Houston | Asistente que contesta 24/7 | Marcyan',
+    title: 'IA conversacional en Houston | Asistente que contesta 24/7 | Marcyan',
     description:
       'Asistente con IA para negocios en Houston: contesta llamadas y WhatsApp perdidos, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde $900.',
   },
@@ -706,12 +706,12 @@ const houstonIa: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Houston', path: '/es/houston' },
-    { name: 'IA Conversacional', path: '/es/houston/ia-conversacional' },
+    { name: 'IA conversacional', path: '/es/houston/ia-conversacional' },
   ],
   hero: {
     badge: 'Houston, TX',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'IA Conversacional',
+    kicker: 'IA conversacional',
     h1: 'Asistente de IA para tu <em>negocio</em> en Houston',
     sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta llamadas y mensajes perdidos, agenda citas y atiende en español las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
@@ -799,7 +799,7 @@ const houstonIa: ClusterPage = {
     ],
   },
   service: {
-    name: 'IA Conversacional en Houston',
+    name: 'IA conversacional en Houston',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
       'Asistentes conversacionales con IA para negocios en Houston: rescate de llamadas y mensajes perdidos, atención por WhatsApp, agenda de citas y soporte 24/7 en español. Instalación y mantenimiento incluidos.',
@@ -821,7 +821,7 @@ const houstonIa: ClusterPage = {
 // ═══════════════════════════════════════════════════════════════
 const houstonEcommerce: ClusterPage = {
   meta: {
-    title: 'Diseño de Tienda en Línea en Houston | E-Commerce bilingüe | Marcyan',
+    title: 'Diseño de Tienda en línea en Houston | E-commerce bilingüe | Marcyan',
     description:
       'Diseño de tienda en línea en Houston para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde $2,900. Propuesta gratis en 24h.',
   },
@@ -829,7 +829,7 @@ const houstonEcommerce: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Houston', path: '/es/houston' },
-    { name: 'Tienda en Línea', path: '/es/houston/ecommerce' },
+    { name: 'Tienda en línea', path: '/es/houston/ecommerce' },
   ],
   hero: {
     badge: 'Houston, TX',
@@ -924,7 +924,7 @@ const houstonEcommerce: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño de Tienda en Línea en Houston',
+    name: 'Diseño de Tienda en línea en Houston',
     serviceType: 'Diseño de tienda en línea (e-commerce)',
     description:
       'Diseño y desarrollo de tiendas en línea a medida para negocios en Houston: catálogo, carrito, pagos seguros, bilingüe (español e inglés), en Shopify, WooCommerce o a medida.',
@@ -1044,7 +1044,7 @@ const precioChatbot: ClusterPage = {
     ],
   },
   service: {
-    name: 'Chatbot e IA Conversacional',
+    name: 'Chatbot e IA conversacional',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
       'Servicio gestionado de asistente con IA para negocios: instalación, entrenamiento con la información del negocio, conexión con WhatsApp y sitio web, y mantenimiento. En español, desde $900 (pago único).',
@@ -1162,7 +1162,7 @@ const precioSeoHouston: ClusterPage = {
     ],
   },
   service: {
-    name: 'SEO Local en Houston',
+    name: 'SEO local en Houston',
     serviceType: 'SEO local',
     description:
       'SEO local mensual para PYMEs en Houston: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe, gestión de reseñas y reporte mensual. Desde $600 al mes, sin contratos largos forzados.',
@@ -1192,7 +1192,7 @@ const houstonBranding: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Houston', path: '/es/houston' },
-    { name: 'Branding e Identidad', path: '/es/houston/branding' },
+    { name: 'Branding e identidad', path: '/es/houston/branding' },
   ],
   hero: {
     badge: 'Houston, TX',
@@ -1285,7 +1285,7 @@ const houstonBranding: ClusterPage = {
     ],
   },
   service: {
-    name: 'Branding e Identidad en Houston',
+    name: 'Branding e identidad en Houston',
     serviceType: 'Diseño de marca (branding)',
     description:
       'Diseño de logo e identidad de marca a medida para negocios en Houston: logo y variantes, paleta de color, tipografías, guía de uso y archivos finales. En español, con opción de sumar el sitio web.',
@@ -1310,7 +1310,7 @@ const houstonBranding: ClusterPage = {
 const miamiIa: ClusterPage = {
   tool: { text: 'Tu asistente contesta lo que hoy se te escapa. Mira cuánto vale eso al mes.', linkLabel: 'Calculadora de llamadas perdidas', href: '/es/herramientas#llamadas' },
   meta: {
-    title: 'IA Conversacional en Miami | Asistente que contesta 24/7 | Marcyan',
+    title: 'IA conversacional en Miami | Asistente que contesta 24/7 | Marcyan',
     description:
       'Asistente con IA para negocios de Miami: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde $900.',
   },
@@ -1318,12 +1318,12 @@ const miamiIa: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Miami', path: '/es/miami' },
-    { name: 'IA Conversacional', path: '/es/miami/ia-conversacional' },
+    { name: 'IA conversacional', path: '/es/miami/ia-conversacional' },
   ],
   hero: {
     badge: 'Miami, FL',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'IA Conversacional',
+    kicker: 'IA conversacional',
     h1: 'Asistente de IA para tu <em>negocio</em> en Miami',
     sub: '¿Pierdes clientes por no contestar a tiempo? Ponemos un asistente con IA a trabajar para ti: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en el español de tus clientes las 24 horas. Nosotros te lo instalamos, lo entrenamos con tu negocio y lo mantenemos.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
@@ -1411,7 +1411,7 @@ const miamiIa: ClusterPage = {
     ],
   },
   service: {
-    name: 'IA Conversacional en Miami',
+    name: 'IA conversacional en Miami',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
       'Asistentes conversacionales con IA para negocios en Miami: rescate de WhatsApp y llamadas perdidas, agenda de citas y soporte 24/7 en el español de los clientes de Miami. Instalación y mantenimiento incluidos.',
@@ -1425,7 +1425,7 @@ const miamiIa: ClusterPage = {
 
 const miamiSeo: ClusterPage = {
   meta: {
-    title: 'SEO Local en Miami: posiciona tu negocio en Google | Marcyan',
+    title: 'SEO local en Miami: posiciona tu negocio en Google | Marcyan',
     description:
       'Agencia de SEO local en Miami para negocios hispanos. Optimizamos tu Perfil de Google, tu sitio y tus reseñas para que te encuentren en Miami-Dade. Propuesta gratis en 24h.',
   },
@@ -1433,13 +1433,13 @@ const miamiSeo: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Miami', path: '/es/miami' },
-    { name: 'SEO Local', path: '/es/miami/seo-local' },
+    { name: 'SEO local', path: '/es/miami/seo-local' },
   ],
   hero: {
     badge: 'Miami, FL',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'SEO Local',
-    h1: 'SEO Local en <em>Miami</em>',
+    kicker: 'SEO local',
+    h1: 'SEO local en <em>Miami</em>',
     sub: 'Aparece cuando tus clientes buscan en Google Maps y en los asistentes de IA. Optimizamos tu presencia local para que tu negocio en Miami gane más llamadas, visitas y reseñas, en español e inglés.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver cómo trabajamos', href: '#proceso' },
@@ -1527,7 +1527,7 @@ const miamiSeo: ClusterPage = {
     ],
   },
   service: {
-    name: 'SEO Local en Miami',
+    name: 'SEO local en Miami',
     serviceType: 'SEO local',
     description:
       'Optimización de SEO local para negocios en Miami: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe, gestión de reseñas y preparación para asistentes de IA.',
@@ -1542,7 +1542,7 @@ const miamiSeo: ClusterPage = {
 
 const miamiEcommerce: ClusterPage = {
   meta: {
-    title: 'Diseño de Tienda en Línea en Miami | E-Commerce bilingüe | Marcyan',
+    title: 'Diseño de Tienda en línea en Miami | E-commerce bilingüe | Marcyan',
     description:
       'Diseño de tienda en línea en Miami para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde $2,900. Propuesta gratis en 24h.',
   },
@@ -1550,7 +1550,7 @@ const miamiEcommerce: ClusterPage = {
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
     { name: 'Miami', path: '/es/miami' },
-    { name: 'Tienda en Línea', path: '/es/miami/ecommerce' },
+    { name: 'Tienda en línea', path: '/es/miami/ecommerce' },
   ],
   hero: {
     badge: 'Miami, FL',
@@ -1644,7 +1644,7 @@ const miamiEcommerce: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño de Tienda en Línea en Miami',
+    name: 'Diseño de Tienda en línea en Miami',
     serviceType: 'Diseño de tienda en línea (e-commerce)',
     description:
       'Diseño y desarrollo de tiendas en línea a medida para negocios en Miami: catálogo, carrito, pagos seguros, bilingüe (español e inglés), en Shopify, WooCommerce o a medida.',
@@ -2488,7 +2488,7 @@ const houstonClinicasDentales: ClusterPage = {
 // ═══════════════════════════════════════════════════════════════
 const houstonKaty: ClusterPage = {
   meta: {
-    title: 'Diseño Web en Katy, TX: páginas web y SEO local | Marcyan',
+    title: 'Diseño web en Katy, TX: páginas web y SEO local | Marcyan',
     description:
       'Diseño web y SEO local para negocios en Katy, TX: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde $1,500. Propuesta gratis.',
   },
@@ -2589,7 +2589,7 @@ const houstonKaty: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web y SEO Local en Katy, TX',
+    name: 'Diseño web y SEO local en Katy, TX',
     serviceType: 'Diseño web y SEO local para negocios',
     description:
       'Diseño web a medida y SEO local para negocios en Katy, Texas: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde $1,500. Sin promesas de posición.',
@@ -2603,7 +2603,7 @@ const houstonKaty: ClusterPage = {
 
 const houstonSugarLand: ClusterPage = {
   meta: {
-    title: 'Diseño Web en Sugar Land, TX: sitios premium y bilingües | Marcyan',
+    title: 'Diseño web en Sugar Land, TX: sitios premium y bilingües | Marcyan',
     description:
       'Diseño web y SEO local para negocios en Sugar Land (Town Square, First Colony, Fort Bend). Sitio premium, rápido y bilingüe español e inglés. Desde $1,500. Propuesta gratis.',
   },
@@ -2704,7 +2704,7 @@ const houstonSugarLand: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web y SEO Local en Sugar Land',
+    name: 'Diseño web y SEO local en Sugar Land',
     serviceType: 'Diseño web y SEO local',
     description:
       'Diseño web premium a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend: sitio bilingüe español e inglés, rápido en el celular y optimizado por zona (Town Square, First Colony). Desde $1,500.',
@@ -2718,7 +2718,7 @@ const houstonSugarLand: ClusterPage = {
 
 const houstonDisenoWebBilingue: ClusterPage = {
   meta: {
-    title: 'Diseño Web Bilingüe en Houston (Español e Inglés) | Marcyan',
+    title: 'Diseño web Bilingüe en Houston (Español e Inglés) | Marcyan',
     description:
       'Diseño web bilingüe en Houston: tu página en español e inglés escrita como busca tu cliente, no traducida con Google. Desde $1,500. Propuesta gratis.',
   },
@@ -2820,7 +2820,7 @@ const houstonDisenoWebBilingue: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web Bilingüe en Houston (Español e Inglés)',
+    name: 'Diseño web Bilingüe en Houston (Español e Inglés)',
     serviceType: 'Diseño web bilingüe',
     description:
       'Diseño y desarrollo de sitios web bilingües (español e inglés) para PYMEs hispanas en Houston: contenido nativo en cada idioma, URLs separadas con hreflang y revisión de hablante nativo, en lugar de traducción automática.',
@@ -2834,7 +2834,7 @@ const houstonDisenoWebBilingue: ClusterPage = {
 
 const miamiDoral: ClusterPage = {
   meta: {
-    title: 'Diseño Web y SEO en Doral (Doralzuela) | Marcyan',
+    title: 'Diseño web y SEO en Doral (Doralzuela) | Marcyan',
     description:
       'Diseño web, SEO local e IA conversacional para negocios de Doral: areperas, panaderías venezolanas, servicios e import/export. Bilingüe y listo para IA. Desde $1,500. Propuesta gratis.',
   },
@@ -2937,7 +2937,7 @@ const miamiDoral: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web y SEO en Doral',
+    name: 'Diseño web y SEO en Doral',
     serviceType: 'Diseño web, SEO local e IA conversacional',
     description:
       'Diseño web bilingüe, SEO local e IA conversacional para negocios en Doral (Miami-Dade): areperas, panaderías y restaurantes venezolanos, servicios profesionales hispanos y firmas de import/export cerca de MIA. En español e inglés, listo para Google y para los asistentes de IA.',
@@ -2951,7 +2951,7 @@ const miamiDoral: ClusterPage = {
 
 const miamiHialeah: ClusterPage = {
   meta: {
-    title: 'Diseño Web y SEO en Hialeah | Negocios locales en español | Marcyan',
+    title: 'Diseño web y SEO en Hialeah | Negocios locales en español | Marcyan',
     description:
       'Diseño web, SEO local e IA en español para negocios de Hialeah: ventanitas, panaderías, talleres, salones y mercados. Web rápida y bilingüe desde $1,500. Propuesta gratis.',
   },
@@ -3047,7 +3047,7 @@ const miamiHialeah: ClusterPage = {
     ],
   },
   service: {
-    name: 'Diseño Web y SEO en Hialeah',
+    name: 'Diseño web y SEO en Hialeah',
     serviceType: 'Diseño web, SEO local e IA conversacional',
     description:
       'Diseño web a medida, SEO local e IA conversacional en español para negocios de Hialeah (Miami-Dade): cafeterías, panaderías, talleres, salones, botánicas y mercados. Web rápida y bilingüe, ficha de Google y respuesta inmediata por WhatsApp.',

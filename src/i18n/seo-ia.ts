@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // CONTENIDO · Landing /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
 // El mayor wedge del negocio: que ChatGPT/Gemini/Meta AI te RECOMIENDEN a TI.
-// Distinto de IA Conversacional (que atiende a TUS clientes). Página bespoke que
+// Distinto de IA conversacional (que atiende a TUS clientes). Página bespoke que
 // reusa los componentes del DS (patrón /es/servicios) + PriceGrid para los 3
 // niveles (Diagnóstico GRATIS · Cimientos $500 · Monitoreo $200/mes).
 //
@@ -23,7 +23,7 @@ export const aeoTiers: PriceService[] = [
   {
     id: 'aeo-diagnostico',
     icon: 'lucide:radar',
-    name: 'Diagnóstico de Visibilidad en IA',
+    name: 'Diagnóstico de visibilidad en IA',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
       'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.',
@@ -120,7 +120,7 @@ export const seoIaPage = {
     tag: 'No te confundas',
     title: 'IA que te <em>recomienda</em> ≠ IA que <em>atiende</em>',
     paragraphs: [
-      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7. Esa es nuestra <a href="/es/houston/ia-conversacional">IA Conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
+      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7. Esa es nuestra <a href="/es/houston/ia-conversacional">IA conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
       'Tus clientes ya le preguntan a ChatGPT y a Gemini (la IA que ya aparece en las búsquedas de Google) «¿qué taller, abogado o restaurante me recomiendas?». La pregunta es simple: <strong>¿apareces tú o aparece tu competencia?</strong> El SEO para IA (también llamado AEO o GEO) hace que seas tú.',
     ],
     tone: 'teal' as const,
@@ -185,7 +185,7 @@ export const seoIaPage = {
   },
   // Schema: Service con un Offer por nivel (diagnóstico gratis price "0").
   service: {
-    name: 'SEO para IA en Houston (Visibilidad en IA)',
+    name: 'SEO para IA en Houston (visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
       'Optimización para que los asistentes de IA (ChatGPT, Gemini, Meta AI) encuentren, entiendan y recomienden tu negocio: Bing Places, datos estructurados, contenido answer-first, NAP y monitoreo. En español, para Houston.',
@@ -195,7 +195,7 @@ export const seoIaPage = {
     priceValue: '0',
     providerId: HOUSTON_ID,
     tiers: [
-      { name: 'Diagnóstico de Visibilidad en IA', priceValue: '0' },
+      { name: 'Diagnóstico de visibilidad en IA', priceValue: '0' },
       { name: 'Cimientos AEO', priceValue: '500' },
       { name: 'Monitoreo en IA', priceValue: '200', monthly: true },
     ],

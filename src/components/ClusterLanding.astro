@@ -43,13 +43,13 @@ function deriveDefaultCity(city?: string): string | undefined {
 // defaultService: por substring del path (ES o EN); coincide con las options del select por idioma.
 function deriveDefaultService(path: string, lang: 'es' | 'en'): string | undefined {
   const es = lang === 'es';
-  if (/abogados-inmigracion|bienes-raices|immigration-lawyers|real-estate/.test(path)) return es ? 'Diseño Web' : 'Web Design';
-  if (/diseno-web|pagina-web|web-design|website-cost/.test(path)) return es ? 'Diseño Web' : 'Web Design';
-  if (/ia-conversacional|chatbot|ia-para-pymes|conversational-ai|ai-for-small-business/.test(path)) return es ? 'IA Conversacional / Chatbot' : 'Conversational AI / Chatbot';
+  if (/abogados-inmigracion|bienes-raices|immigration-lawyers|real-estate/.test(path)) return es ? 'Diseño web' : 'Web Design';
+  if (/diseno-web|pagina-web|web-design|website-cost/.test(path)) return es ? 'Diseño web' : 'Web Design';
+  if (/ia-conversacional|chatbot|ia-para-pymes|conversational-ai|ai-for-small-business/.test(path)) return es ? 'IA conversacional / Chatbot' : 'Conversational AI / Chatbot';
   if (/ecommerce/.test(path)) return es ? 'E-Commerce / Tienda Online' : 'E-Commerce / Online Store';
-  if (/seo-para-ia|ai-seo/.test(path)) return es ? 'SEO para IA (Visibilidad en IA)' : 'AI Visibility (AEO)';
-  if (/seo-local|local-seo/.test(path)) return es ? 'SEO Local' : 'Local SEO';
-  if (/branding/.test(path)) return es ? 'Branding & Identidad' : 'Branding & Identity';
+  if (/seo-para-ia|ai-seo/.test(path)) return es ? 'SEO para IA (visibilidad en IA)' : 'AI Visibility (AEO)';
+  if (/seo-local|local-seo/.test(path)) return es ? 'SEO local' : 'Local SEO';
+  if (/branding/.test(path)) return es ? 'Branding e identidad' : 'Branding & Identity';
   return undefined;
 }
 const defaultCity = deriveDefaultCity(cluster.service.areaCity);

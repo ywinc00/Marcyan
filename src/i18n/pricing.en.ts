@@ -79,12 +79,12 @@ export const catalog: CatalogProduct[] = [
     description:
       'Get ChatGPT, Gemini and Meta AI to recommend YOU when someone asks about your service. Different from Conversational AI (which serves your customers): here the goal is for AI to find and cite you.',
     tagline: 'Get AI to recommend you when people ask about your service.',
-    anchorUnit: 'diagnosis',
+    anchorUnit: 'checkup',
     href: '/en/houston/ai-seo',
-    ctaLabel: 'Get a free diagnosis',
+    ctaLabel: 'Get my free checkup',
     tone: 'teal',
     tiers: [
-      { key: 'aeoDiagnostic', name: 'AI Visibility Diagnosis', value: null, display: tierDisplay(null), anchor: true,
+      { key: 'aeoDiagnostic', name: 'AI Visibility Checkup', value: null, display: tierDisplay(null), anchor: true,
         blurb: 'We check whether ChatGPT, Gemini and Meta AI can find and recommend you. No cost, no commitment.', href: '/en/houston/ai-seo' },
       { key: 'aeoFoundations', name: 'AEO Foundations', value: PRICE_ANCHORS.aeoFoundations, display: tierDisplay(PRICE_ANCHORS.aeoFoundations),
         blurb: 'We get you ready for AI: Bing Places, schema, FAQ and llms.txt so assistants can read and cite you.', href: '/en/houston/ai-seo' },
@@ -127,7 +127,7 @@ export const catalog: CatalogProduct[] = [
       { key: 'seoInitial', name: 'Initial optimization', value: PRICE_ANCHORS.seoInitial, display: tierDisplay(PRICE_ANCHORS.seoInitial), anchor: true,
         blurb: 'A tune-up of your Google Business Profile and local presence. One-time payment, no lock-in.', href: '/en/houston/local-seo' },
       { key: 'seoLocal', name: 'Ongoing Local SEO', value: PRICE_ANCHORS.seoLocal, monthly: true, display: tierDisplay(PRICE_ANCHORS.seoLocal, true),
-        blurb: 'Monthly work: profile, NAP, local content and reviews, month to month with no forced contracts.', href: '/en/houston/local-seo' },
+        blurb: 'Monthly work: profile, NAP, local content and reviews, month to month with no long-term contracts.', href: '/en/houston/local-seo' },
     ],
   },
   {
@@ -197,7 +197,7 @@ export const priceServices: PriceService[] = catalog.map((p) => {
 });
 
 // ── Mapping to OfferItem (schema) — ALL tiers (AEO ammunition). ──
-// The free diagnosis is emitted as Offer price "0" (an AEO "free" signal).
+// The free checkup is emitted as Offer price "0" (an AEO "free" signal).
 // url without fragment (#) and only if it is a real /en/ page, or the pricing hub.
 export const offerItems: OfferItem[] = catalog.flatMap((p) =>
   p.tiers.map((t) => {
@@ -218,7 +218,7 @@ export const preciosPage = {
   meta: {
     title: 'Pricing — Web design, AI and SEO in Houston and Miami | Marcyan',
     description:
-      'Public, clear pricing: web design from $400, AI from $500, local SEO from $300 and a free AI visibility diagnosis. No fine print, no hidden costs.',
+      'Public, clear pricing: web design from $400, AI from $500, local SEO from $300 and a free AI visibility checkup. No fine print, no hidden costs.',
   },
   path: '/en/pricing',
   breadcrumb: [
@@ -231,12 +231,12 @@ export const preciosPage = {
     sub: 'We publish it all: from a $400 landing page to monthly SEO and maintenance, the very things most agencies hide until they get you on a call. That is how transparent we are.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what each service includes', href: '#precios' },
-    chips: ['From $400 · free AI diagnosis', 'No forced contracts', 'Free proposal in 24h'],
+    chips: ['From $400 · free AI checkup', 'No long-term contracts', 'Free proposal in 24h'],
     tone: 'gold' as const,
   },
   answer: {
     q: 'How much does it cost to work with Marcyan?',
-    a: 'It depends on the service, which is exactly why we publish it all: a website starts from $400 (a complete custom site from $1,500), an AI assistant from $500, local SEO from $300 and a logo from $150. Even the recurring pricing (monthly SEO and maintenance) is published, and the AI visibility diagnosis is free. Every project gets a clear scope and price in writing, with no commitment.',
+    a: 'It depends on the service, which is exactly why we publish it all: a website starts from $400 (a complete custom site from $1,500), an AI assistant from $500, local SEO from $300 and a logo from $150. Even the recurring pricing (monthly SEO and maintenance) is published, and the AI visibility checkup is free. Every project gets a clear scope and price in writing, with no commitment.',
   },
   transparency: {
     tag: 'Why we publish it',
@@ -271,7 +271,7 @@ export const preciosPage = {
       {
         label: 'How much does local SEO cost in Houston?',
         href: '/en/pricing/local-seo-cost-houston',
-        desc: 'The published monthly rate, with no long forced contracts.',
+        desc: 'The published monthly rate, with no long-term contracts.',
         icon: 'lucide:search',
       },
     ],
@@ -289,11 +289,11 @@ export const preciosPage = {
         a: 'No: it is a smaller, real product. A one-page landing, a redesign or just the logo cost less because they are less work than a full site or a whole brand, not because they are a stripped-down, low-quality version. You start where it makes sense for your business and grow when you need to.',
       },
       {
-        q: 'Is the AI visibility diagnosis really free?',
-        a: 'Yes, no cost and no commitment. We check whether ChatGPT, Gemini and Meta AI can find and recommend you, and we tell you honestly where you stand. If you then want us to work on the foundations or monitoring, those do have a published price; the diagnosis does not.',
+        q: 'Is the AI visibility checkup really free?',
+        a: 'Yes, no cost and no commitment. We check whether ChatGPT, Gemini and Meta AI can find and recommend you, and we tell you honestly where you stand. If you then want us to work on the foundations or monitoring, those do have a published price; the checkup does not.',
       },
       {
-        q: 'Are there forced contracts or lock-in?',
+        q: 'Are there long-term contracts or lock-in?',
         a: 'No. Recurring services like local SEO and maintenance are month to month; you can pause or cancel with reasonable notice. We do not believe in tying clients down with long contracts: we would rather you stay for the results, not because of a clause.',
       },
       {

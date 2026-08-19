@@ -97,12 +97,12 @@ export const serviciosPage = {
   },
   // Schema ItemList — los 7 servicios apuntando a su página real (o al hub).
   itemList: [
-    { name: 'Diseño Web', path: '/es/houston/diseno-web' },
-    { name: 'IA Conversacional', path: '/es/ia-para-pymes' },
-    { name: 'SEO para IA (Visibilidad en IA)', path: '/es/houston/seo-para-ia' },
-    { name: 'E-Commerce & Tiendas', path: '/es/houston/ecommerce' },
-    { name: 'SEO Local', path: '/es/houston/seo-local' },
-    { name: 'Branding & Identidad', path: '/es/houston/branding' },
-    { name: 'Mantenimiento Continuo', path: '/es/servicios' },
+    { name: 'Diseño web', path: '/es/houston/diseno-web' },
+    { name: 'IA conversacional', path: '/es/ia-para-pymes' },
+    { name: 'SEO para IA (visibilidad en IA)', path: '/es/houston/seo-para-ia' },
+    { name: 'E-commerce y tiendas', path: '/es/houston/ecommerce' },
+    { name: 'SEO local', path: '/es/houston/seo-local' },
+    { name: 'Branding e identidad', path: '/es/houston/branding' },
+    { name: 'Mantenimiento continuo', path: '/es/servicios' },
   ] as ListLink[],
 };

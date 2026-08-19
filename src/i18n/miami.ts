@@ -95,11 +95,11 @@ export const miamiHub = {
   },
   // ItemList (schema) — los servicios ofrecidos en Miami, cada uno a su landing.
   itemList: [
-    { name: 'Diseño Web en Miami', path: '/es/miami/diseno-web' },
-    { name: 'SEO Local en Miami', path: '/es/miami/seo-local' },
-    { name: 'IA Conversacional en Miami', path: '/es/miami/ia-conversacional' },
-    { name: 'Tienda en Línea en Miami', path: '/es/miami/ecommerce' },
-    { name: 'Diseño Web y SEO en Doral', path: '/es/miami/doral' },
-    { name: 'Diseño Web y SEO en Hialeah', path: '/es/miami/hialeah' },
+    { name: 'Diseño web en Miami', path: '/es/miami/diseno-web' },
+    { name: 'SEO local en Miami', path: '/es/miami/seo-local' },
+    { name: 'IA conversacional en Miami', path: '/es/miami/ia-conversacional' },
+    { name: 'Tienda en línea en Miami', path: '/es/miami/ecommerce' },
+    { name: 'Diseño web y SEO en Doral', path: '/es/miami/doral' },
+    { name: 'Diseño web y SEO en Hialeah', path: '/es/miami/hialeah' },
   ] as ListLink[],
 };

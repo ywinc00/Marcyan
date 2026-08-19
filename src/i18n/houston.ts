@@ -27,7 +27,7 @@ const priceChain = `Web desde ${usd(PRICE_ANCHORS.web)} · Landing desde ${usd(P
 
 export const houstonHub = {
   meta: {
-    title: 'Diseño de Páginas Web en Houston | Agencia bilingüe: web, IA y SEO | Marcyan',
+    title: 'Diseño de páginas web en Houston | Agencia bilingüe: web, IA y SEO | Marcyan',
     description:
       'Agencia hispana de diseño de páginas web en Houston: sitios a medida, IA conversacional y SEO local. Bilingüe y con precios públicos. Propuesta gratis en 24h.',
   },
@@ -42,8 +42,8 @@ export const houstonHub = {
   hero: {
     kicker: 'Agencia hispana · Houston, TX',
     h1: 'Diseño de páginas web en <em>Houston</em>',
-    sub: 'La agencia hispana que junta tu web, tu IA y tu SEO, con precios públicos.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    sub: 'La agencia hispana que une tu web, tu IA y tu SEO, con precios públicos.',
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     microcopy: 'Respuesta en menos de 24h · Sin compromiso',
     explore: { label: 'Ver servicios y precios ↓', href: '#servicios' },
     telemetry: [
@@ -59,7 +59,7 @@ export const houstonHub = {
   },
   answer: {
     q: '¿Por qué elegir una agencia de diseño web en Houston?',
-    a: 'Una agencia local entiende tu mercado: el 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. En Houston, una agencia hispana y bilingüe te ayuda a aparecer en Google y en la IA, y a hablarle a tus clientes en su idioma.',
+    a: 'Una agencia local entiende tu mercado: el 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. En Houston, una agencia hispana y bilingüe te ayuda a aparecer en Google y en la IA, y a hablarles a tus clientes en su idioma.',
     source: 'Google · BrightLocal, 2025',
   },
   // Servicios con PRECIO: el precio vive en su propio campo `price` (display,
@@ -140,20 +140,20 @@ export const houstonHub = {
     tag: 'Preguntas frecuentes',
     title: 'Agencia en Houston, <em>sin rodeos</em>',
     items: [
-      { q: '¿Qué servicios ofrecen en Houston?', a: 'Diseño y desarrollo web a medida, SEO local, IA conversacional (asistentes que atienden 24/7), tiendas en línea, branding y mantenimiento. Todo bilingüe en español e inglés, y pensado para el mercado hispano de Houston. Puedes tomar un solo servicio o un paquete coordinado.' },
+      { q: '¿Qué servicios ofrecen en Houston?', a: 'Diseño y desarrollo web a medida, SEO local, IA conversacional (asistentes que atienden 24/7), tiendas en línea, branding y mantenimiento. Todo bilingüe en español e inglés, y pensado para el mercado hispano de Houston. Puedes contratar un solo servicio o un paquete coordinado.' },
       { q: '¿Tienen oficina en Houston?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
       { q: '¿Trabajan en español e inglés?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. Diseñamos, escribimos y posicionamos en español e inglés, porque en Houston tus clientes buscan en ambos idiomas.' },
       { q: '¿Atienden solo a Houston o también el área metropolitana?', a: 'Cubrimos Houston y toda su área metropolitana (Katy, Sugar Land, The Woodlands, Pearland y más). Al ser negocio de área de servicio, podemos atenderte en las zonas donde realmente operas, sin necesidad de una dirección pública.' },
       { q: '¿Cuánto cuestan sus servicios en Houston?', a: 'Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.' },
-      { q: '¿Por qué una agencia hispana local y no una grande?', a: 'Porque hablamos tu idioma, conocemos a tu cliente hispano y te damos atención cercana, con precios públicos y sin contratos forzados. Reunimos algo que pocos ofrecen en conjunto: diseño web, IA conversacional y SEO, todo bilingüe y bajo un mismo equipo.' },
+      { q: '¿Por qué una agencia hispana local y no una grande?', a: 'Porque hablamos tu idioma, conocemos a tu cliente hispano y te damos atención cercana, con precios públicos y sin contratos que te aten. Reunimos algo que pocos ofrecen en conjunto: diseño web, IA conversacional y SEO, todo bilingüe y bajo un mismo equipo.' },
     ] as FaqItem[],
   },
-  // CTA final: verbo unificado con el hero ("Pedir propuesta gratis") y la
+  // CTA final: verbo unificado con el hero ("Propuesta gratis") y la
   // secundaria es el TELÉFONO (marcado directo) — muere la fuga a /formulario.
   cta: {
     title: '¿Listo para crecer en <em>Houston</em>?',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: `Llámanos: ${nap.houston}`, href: telHref },
     tone: 'gold' as const,
   },
@@ -162,19 +162,19 @@ export const houstonHub = {
   reassure: 'Respuesta en menos de 24h · Sin compromiso · Precio por escrito antes de empezar',
   // ItemList (schema) — los servicios ofrecidos en Houston, cada uno a su landing.
   itemList: [
-    { name: 'Diseño Web en Houston', path: '/es/houston/diseno-web' },
-    { name: 'SEO Local en Houston', path: '/es/houston/seo-local' },
-    { name: 'IA Conversacional en Houston', path: '/es/houston/ia-conversacional' },
+    { name: 'Diseño web en Houston', path: '/es/houston/diseno-web' },
+    { name: 'SEO local en Houston', path: '/es/houston/seo-local' },
+    { name: 'IA conversacional en Houston', path: '/es/houston/ia-conversacional' },
     { name: 'SEO para IA en Houston', path: '/es/houston/seo-para-ia' },
-    { name: 'Tienda en Línea en Houston', path: '/es/houston/ecommerce' },
-    { name: 'Branding e Identidad en Houston', path: '/es/houston/branding' },
+    { name: 'Tienda en línea en Houston', path: '/es/houston/ecommerce' },
+    { name: 'Branding e identidad en Houston', path: '/es/houston/branding' },
     { name: 'Páginas Web para Restaurantes en Houston', path: '/es/houston/restaurantes' },
     { name: 'Sitios Web para Contratistas en Houston', path: '/es/houston/contratistas' },
     { name: 'Sitios Web para Talleres Mecánicos en Houston', path: '/es/houston/talleres-mecanicos' },
     { name: 'Sitios Web con Reservas para Salones de Belleza en Houston', path: '/es/houston/salon-belleza' },
     { name: 'Sitios Web para Clínicas Dentales en Houston', path: '/es/houston/clinicas-dentales' },
-    { name: 'Diseño Web y SEO Local en Katy, TX', path: '/es/houston/katy' },
-    { name: 'Diseño Web y SEO Local en Sugar Land', path: '/es/houston/sugar-land' },
-    { name: 'Diseño Web Bilingüe en Houston (Español e Inglés)', path: '/es/houston/diseno-web-bilingue' },
+    { name: 'Diseño web y SEO local en Katy, TX', path: '/es/houston/katy' },
+    { name: 'Diseño web y SEO local en Sugar Land', path: '/es/houston/sugar-land' },
+    { name: 'Diseño web Bilingüe en Houston (Español e Inglés)', path: '/es/houston/diseno-web-bilingue' },
   ] as ListLink[],
 };

@@ -26,10 +26,12 @@ import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
 // la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
-import { analyzeSite, recommendService } from '../lib/diagnostic-checks.mjs';
+import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
 
 // maxDuration 60: un turno con herramienta interna hace 2 llamadas al modelo con
-// una revisión de sitio en medio (llamada1 ≤10s · fetch ≤6s · llamada2 ≤14s).
+// una revisión de sitio en medio. Invariante v8 de presupuestos por fase:
+// llamada1 ≤14s · revisión ≤9s · llamada2 ≤16s = 39s < NET_TIMEOUT 42s del
+// widget (ChatWidget.astro) < maxDuration 60. Si cambias un tope, recalcula los tres.
 export const config = { maxDuration: 60 };
 
 // Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
@@ -38,6 +40,16 @@ export const DEFAULT_MODEL = 'claude-sonnet-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 // Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
 export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
+
+// Parámetros de razonamiento por MODELO (v8). Sonnet 5/4.6 soportan thinking
+// adaptativo + effort; Haiku 4.5 NO (ambos parámetros devuelven 400 en ese modelo):
+// mandárselos igual convertiría la palanca de reversión CHAT_MODEL=claude-haiku-4-5
+// en un chat muerto en silencio (todas las llamadas 400 → fallback genérico).
+// Pura y exportada para el guard test.
+export function modelTuning(model) {
+  if (model === 'claude-haiku-4-5') return {};
+  return { thinking: { type: 'adaptive' }, output_config: { effort: 'low' } };
+}
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
 // resto (< 32) y DEL (127). Hecho con codePointAt para no meter bytes de
@@ -340,8 +352,26 @@ async function reviewSite(url, lang) {
   const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
   const hasSite = !!(site && site.ok && site.html && site.html.length > 0);
   if (!hasSite) return FAIL_RESULT;
-  const { scores, findings } = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
-  return { content: buildSiteToolResult({ scores, findings }, lang), extraAllow: [] };
+  let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
+  // Follow-up de /contacto (mismo criterio que api/diagnostic.mjs, presupuesto MÁS corto):
+  // sin esto, Marcy afirmaría "no tiene formulario" contra sitios que lo tienen en su
+  // página de contacto (falso negativo verificado contra movejunkaway.com). Best-effort
+  // DE VERDAD: con withTimeout PROPIO (3s), para que un /contacto lento caiga a este
+  // catch y devolvamos el análisis de la home ya calculado — nunca al race externo de
+  // 9s, que descartaría TODO y quemaría el cupo de 1 revisión por sesión.
+  if (out.checks.C3 !== 'pass' || out.checks.C1 !== 'pass') {
+    try {
+      out = await withTimeout((async () => {
+        const href = findContactHref(site.html, new URL(site.finalUrl).hostname);
+        if (!href) return out;
+        const g2 = await ssrfGuard(new URL(href, site.finalUrl).href);
+        if (!g2.ok) return out;
+        const contact = await fetchSite(g2.url, { timeoutMs: 2500, maxBytes: 200_000, maxRedirects: 1 });
+        return (contact && contact.ok && contact.html) ? mergeContactSignals(out, contact.html) : out;
+      })(), 3000, 'contact follow-up');
+    } catch { /* el análisis de la home queda tal cual */ }
+  }
+  return { content: buildSiteToolResult({ scores: out.scores, findings: out.findings }, lang), extraAllow: [] };
 }
 
 // Ejecuta la tool interna pedida y devuelve { content, extraAllow }. Solo UNA por
@@ -352,7 +382,7 @@ async function runInternalTool(toolUse, { lang, ip, sid }) {
     if (!siteReviewAllowed(sid, ip)) return FAIL_RESULT;            // límites primero
     const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
     if (!url) return FAIL_RESULT;
-    try { return await withTimeout(reviewSite(url, lang), 7000, 'site review'); }
+    try { return await withTimeout(reviewSite(url, lang), 9000, 'site review'); }
     catch { return FAIL_RESULT; }                                   // timeout/error → silencioso
   }
   return FAIL_RESULT;
@@ -412,15 +442,20 @@ export default async function handler(req, res) {
       // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
       // tool_choice = auto (omitido) → el modelo decide cuándo.
       tools: CHAT_TOOLS,
-      // Sonnet 5 activa "thinking" adaptativo por defecto; lo DESACTIVAMOS para latencia
-      // baja y costo/comportamiento predecibles. SIN temperature/top_p → Sonnet 5 los rechaza.
-      thinking: { type: 'disabled' },
+      // Thinking ADAPTATIVO con esfuerzo bajo (v8). Antes iba 'disabled' por latencia,
+      // pero la doc oficial de Sonnet 5 lo desaconseja para harneses con tools: con
+      // thinking apagado el modelo dispara menos las herramientas y lee peor el turno
+      // — exactamente los síntomas reportados (no detecta al cliente decidido, repite
+      // preguntas). effort 'low' mantiene el thinking breve (~1-3s y unos cientos de
+      // tokens por turno); coste extra por turno de centavos. Condicionado por modelo
+      // (modelTuning): Haiku 4.5 no soporta estos parámetros.
+      ...modelTuning(model),
     };
 
-    // 1ª llamada (≤10s). El input del usuario vive SOLO en `messages`.
+    // 1ª llamada (≤14s: incluye el thinking adaptativo). El input del usuario vive SOLO en `messages`.
     const r1 = await withTimeout(
       client.messages.create({ ...baseParams, messages }),
-      10000,
+      14000,
       'anthropic'
     );
 
@@ -443,7 +478,9 @@ export default async function handler(req, res) {
         tool_use_id: b.id,
         content: b.id === internal.id ? out.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }),
       }));
-      // 2ª llamada (≤14s): mismo prefijo system+tools; el modelo redacta con el resultado.
+      // 2ª llamada (≤16s: thinking + redacción con el resultado): mismo prefijo
+      // system+tools (cache-friendly). r1.content se pasa VERBATIM (incluye los bloques
+      // de thinking de la 1ª respuesta, requisito de la API para continuar con tools).
       finalResp = await withTimeout(
         client.messages.create({
           ...baseParams,
@@ -453,7 +490,7 @@ export default async function handler(req, res) {
             { role: 'user', content: toolResults },
           ],
         }),
-        14000,
+        16000,
         'anthropic2'
       );
     }

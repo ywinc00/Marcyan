@@ -16,7 +16,7 @@ export const serviciosPage = {
   meta: {
     title: 'Services — Web design, AI and SEO in Houston and Miami | Marcyan',
     description:
-      'The complete Marcyan catalog: web design from $400, conversational AI from $500, AI SEO with a free diagnosis, e-commerce, local SEO, branding and maintenance. Public pricing.',
+      'The complete Marcyan catalog: web design from $400, conversational AI from $500, AI SEO with a free checkup, e-commerce, local SEO, branding and maintenance. Public pricing.',
   },
   path: '/en/services',
   breadcrumb: [
@@ -26,20 +26,20 @@ export const serviciosPage = {
   hero: {
     kicker: 'Services',
     h1: 'Everything your brand <em>needs</em>',
-    sub: 'Seven services to grow your business in Houston and Miami: web design, AI, AI SEO so AI finds you, online stores, local SEO, branding and maintenance. Each one starts with an accessible option and grows with what you need.',
-    primary: { label: 'I want my free proposal', href: '#contacto' },
+    sub: 'Seven services to grow your business in Houston and Miami: web design, conversational AI, AI SEO so assistants can find you, online stores, local SEO, branding and maintenance. Each one starts with an accessible option and grows with what you need.',
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See detailed pricing', href: '/en/pricing' },
-    chips: ['7 services, from $150', 'Free AI diagnosis', 'Public pricing'],
+    chips: ['7 services, from $150', 'Free AI checkup', 'Public pricing'],
     tone: 'gold' as const,
   },
   answer: {
     q: 'What services does Marcyan offer?',
-    a: 'Marcyan offers seven services for small businesses in Houston and Miami: web design (from $400), conversational AI (from $500), AI SEO with a free diagnosis, online stores (from $900), local SEO (from $300), branding (from $150) and maintenance (from $120 a month). Each one starts with an accessible option and grows with what you need, always with the price in writing.',
+    a: 'Marcyan offers seven services for small businesses in Houston and Miami: web design (from $400), conversational AI (from $500), AI SEO with a free checkup, online stores (from $900), local SEO (from $300), branding (from $150) and maintenance (from $120 a month). Each one starts with an accessible option and grows with what you need, always with the price in writing.',
   },
   grid: {
     tag: 'The catalog',
     title: 'Every service, with its <em>starting point</em>',
-    intro: 'We show the most accessible option of each service first. Tap any of them to see the detail, or ask us for a free proposal with your exact scope.',
+    intro: 'We show the most accessible option of each service first. Tap any one for the details, or ask us for a free proposal with your exact scope.',
   },
   related: {
     tag: 'Explore in depth',
@@ -47,7 +47,7 @@ export const serviciosPage = {
     links: [
       { label: 'Web design in Houston', href: '/en/houston/web-design', desc: 'Landing, redesign or a complete custom site, fast and bilingual.', icon: 'lucide:layout-template' },
       { label: 'AI for your business', href: '/en/ai-for-small-business', desc: 'Assistants that reply, book appointments and capture leads 24/7.', icon: 'lucide:messages-square' },
-      { label: 'AI SEO in Houston', href: '/en/houston/ai-seo', desc: 'So ChatGPT and Gemini recommend you. Free diagnosis.', icon: 'marcyan-ai' },
+      { label: 'AI SEO in Houston', href: '/en/houston/ai-seo', desc: 'So ChatGPT and Gemini recommend you. Free checkup.', icon: 'marcyan-ai' },
       { label: 'Local SEO in Houston', href: '/en/houston/local-seo', desc: 'Show up on Google Maps and in local search in your area.', icon: 'lucide:search' },
       { label: 'Online store in Houston', href: '/en/houston/ecommerce', desc: 'Catalog, cart and secure payments to sell online.', icon: 'lucide:shopping-bag' },
       { label: 'Branding in Houston', href: '/en/houston/branding', desc: 'From just the logo to a complete brand identity.', icon: 'lucide:palette' },
@@ -67,7 +67,7 @@ export const serviciosPage = {
   },
   faq: {
     tag: 'Frequently asked questions',
-    title: 'About our services, <em>no runaround</em>',
+    title: 'About our services, <em>straight up</em>',
     items: [
       {
         q: 'Which service do I need to get started?',
@@ -92,9 +92,9 @@ export const serviciosPage = {
     ] as FaqItem[],
   },
   cta: {
-    title: 'Tell us what you need, <em>we advise you free</em>',
+    title: 'Tell us what you need, <em>get free guidance</em>',
     sub: 'In under 24 hours you get a proposal with the service (or the combination) that best fits you, with clear scope and price, no commitment.',
-    primary: { label: 'Request a free proposal', href: '#contacto' },
+    primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
   // ItemList schema — the 7 services pointing to their real page (or the hub).

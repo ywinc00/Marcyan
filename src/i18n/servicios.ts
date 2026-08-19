@@ -25,8 +25,8 @@ export const serviciosPage = {
     kicker: 'Servicios',
     h1: 'Todo lo que tu marca <em>necesita</em>',
     sub: 'Siete servicios para hacer crecer tu negocio en Houston y Miami: diseño web, IA, SEO para que te encuentre la IA, tiendas en línea, SEO local, branding y mantenimiento. Cada uno empieza con una opción accesible y crece según lo que necesites.',
-    primary: { label: 'Quiero mi propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Ver precios a detalle', href: '/es/precios' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
+    secondary: { label: 'Ver precios', href: '/es/precios' },
     chips: ['7 servicios, desde $150', 'Diagnóstico de IA gratis', 'Precios públicos'],
     tone: 'gold' as const,
   },
@@ -37,7 +37,7 @@ export const serviciosPage = {
   grid: {
     tag: 'El catálogo',
     title: 'Cada servicio, con su <em>punto de partida</em>',
-    intro: 'Mostramos primero la opción más accesible de cada servicio. Toca cualquiera para ver el detalle, o pídenos una propuesta gratis con tu alcance exacto.',
+    intro: 'Mostramos primero la opción más accesible de cada servicio. Entra a cualquiera para ver el detalle, o pídenos una propuesta gratis con tu alcance exacto.',
   },
   related: {
     tag: 'Explora a fondo',
@@ -92,17 +92,17 @@ export const serviciosPage = {
   cta: {
     title: 'Cuéntanos qué necesitas, <em>te orientamos gratis</em>',
     sub: 'En menos de 24 horas recibes una propuesta con el servicio (o la combinación) que mejor te conviene, con alcance y precio claros, sin compromiso.',
-    primary: { label: 'Solicitar propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold' as const,
   },
   // Schema ItemList — los 7 servicios apuntando a su página real (o al hub).
   itemList: [
-    { name: 'Diseño Web', path: '/es/houston/diseno-web' },
-    { name: 'IA Conversacional', path: '/es/ia-para-pymes' },
-    { name: 'SEO para IA (Visibilidad en IA)', path: '/es/houston/seo-para-ia' },
-    { name: 'E-Commerce & Tiendas', path: '/es/houston/ecommerce' },
-    { name: 'SEO Local', path: '/es/houston/seo-local' },
-    { name: 'Branding & Identidad', path: '/es/houston/branding' },
-    { name: 'Mantenimiento Continuo', path: '/es/servicios' },
+    { name: 'Diseño web', path: '/es/houston/diseno-web' },
+    { name: 'IA conversacional', path: '/es/ia-para-pymes' },
+    { name: 'SEO para IA (visibilidad en IA)', path: '/es/houston/seo-para-ia' },
+    { name: 'E-commerce y tiendas', path: '/es/houston/ecommerce' },
+    { name: 'SEO local', path: '/es/houston/seo-local' },
+    { name: 'Branding e identidad', path: '/es/houston/branding' },
+    { name: 'Mantenimiento continuo', path: '/es/servicios' },
   ] as ListLink[],
 };

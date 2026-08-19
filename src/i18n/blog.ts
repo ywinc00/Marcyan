@@ -31,7 +31,7 @@ export const blogIndex = {
   cta: {
     title: '¿Listo para que tu negocio <em>despegue</em>?',
     sub: 'Cuéntanos tu idea y recibe una propuesta personalizada en menos de 24 horas, sin costo ni compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver precios', href: '/es/precios' },
     tone: 'gold' as const,
   },
@@ -54,12 +54,12 @@ export const postChrome = {
       title: '¿Listo para que tu negocio <em>despegue</em>?',
       // {web}/{ia}/{seo} los rellena RailCta desde PRICE_ANCHORS (fuente única).
       priceNote: 'Precios públicos: web desde {web} · asistente con IA desde {ia} · SEO local desde {seo}.',
-      chip: 'Diagnóstico de visibilidad en IA — gratis',
+      chip: 'Diagnóstico de visibilidad en IA, gratis',
       chipHref: '/es/diagnostico',
       form: {
         name: { label: 'Nombre', ph: 'Tu nombre' },
         contact: { label: 'Email o WhatsApp', ph: 'tu@email.com o tu número' },
-        submit: 'Pedir propuesta gratis',
+        submit: 'Propuesta gratis',
         sending: 'Enviando…',
         success: 'Recibido. Te respondemos en menos de 24h.',
         error: 'No se pudo enviar. Escríbenos por WhatsApp o inténtalo de nuevo.',
@@ -83,7 +83,7 @@ export const postChrome = {
   cta: {
     title: '¿Hablamos de tu <em>proyecto</em>?',
     sub: 'Propuesta personalizada en menos de 24 horas, sin costo ni compromiso. Atención bilingüe en Houston y Miami.',
-    primary: { label: 'Explorar más guías', href: '/es/blog' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver precios', href: '/es/precios' },
     tone: 'gold' as const,
   },

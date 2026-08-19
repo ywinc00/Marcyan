@@ -15,11 +15,11 @@ export const ui = {
     footer: { copyEmail: 'Copiar correo', copyHouston: 'Copiar teléfono de Houston', copyMiami: 'Copiar teléfono de Miami', copied: '¡Copiado!' },
     nav: { primary: 'Principal', menu: 'Menú', mobileMenu: 'Menú móvil' },
     postnav: { more: 'Más artículos' },
-    projects: { prev: 'Trabajo anterior', next: 'Trabajo siguiente' },
+    projects: { prev: 'Proyecto anterior', next: 'Proyecto siguiente' },
     shot: { pc: 'vista de escritorio del sitio', movil: 'vista móvil del sitio' },
   },
   en: {
-    answer: { directAnswer: 'Straight answer', source: 'Source' },
+    answer: { directAnswer: 'Direct answer', source: 'Source' },
     price: { from: 'from', perMonth: '/mo', includes: 'Includes', offer: 'OFFER' },
     cta: { call: 'Call' },
     hero: { tapHint: 'Tap to explore', hoverHint: 'Hover over the planet', planetLabel: 'Marcyan — planet in orbit', exploreSite: 'Explore the site' },

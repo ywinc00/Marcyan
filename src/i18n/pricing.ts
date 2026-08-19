@@ -91,7 +91,7 @@ export const catalog: CatalogProduct[] = [
   {
     id: 'diseno-web',
     icon: 'lucide:layout-template',
-    name: 'Diseño Web',
+    name: 'Diseño web',
     serviceType: 'Diseño web',
     description:
       'Sitios a medida, rápidos y bilingües (español e inglés), con SEO base y legibles por asistentes de IA. Desde una landing de una página hasta un sitio completo.',
@@ -112,7 +112,7 @@ export const catalog: CatalogProduct[] = [
   {
     id: 'ia-conversacional',
     icon: 'lucide:messages-square',
-    name: 'IA Conversacional',
+    name: 'IA conversacional',
     serviceType: 'Automatización con IA y asistentes conversacionales',
     description:
       'Asistentes con IA que atienden a TUS clientes: contestan, agendan citas y captan prospectos 24/7, configurados en español e integrados con tus herramientas.',
@@ -125,23 +125,23 @@ export const catalog: CatalogProduct[] = [
       { key: 'iaBasic', name: 'Asistente básico', value: PRICE_ANCHORS.iaBasic, display: tierDisplay(PRICE_ANCHORS.iaBasic), anchor: true,
         blurb: 'Un asistente con un flujo principal (contestar y captar prospectos), configurado en español.', href: '/es/ia-para-pymes' },
       { key: 'ia', name: 'Asistente completo', value: PRICE_ANCHORS.ia, display: tierDisplay(PRICE_ANCHORS.ia),
-        blurb: 'Done-for-you: lo instalamos, lo entrenamos con tu negocio, lo integramos y lo mantenemos.', href: '/es/ia-para-pymes' },
+        blurb: 'Llave en mano: lo instalamos, lo entrenamos con tu negocio, lo integramos y lo mantenemos.', href: '/es/ia-para-pymes' },
     ],
   },
   {
     id: 'seo-ia',
     icon: 'marcyan-ai',
-    name: 'SEO para IA (Visibilidad en IA)',
+    name: 'SEO para IA (visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
-      'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA Conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
+      'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
     tagline: 'Que la IA te recomiende cuando preguntan por tu servicio.',
     anchorUnit: 'diagnóstico',
     href: '/es/houston/seo-para-ia',
     ctaLabel: 'Pedir diagnóstico gratis',
     tone: 'teal',
     tiers: [
-      { key: 'aeoDiagnostic', name: 'Diagnóstico de Visibilidad en IA', value: null, display: tierDisplay(null), anchor: true,
+      { key: 'aeoDiagnostic', name: 'Diagnóstico de visibilidad en IA', value: null, display: tierDisplay(null), anchor: true,
         blurb: 'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.', href: '/es/houston/seo-para-ia' },
       { key: 'aeoFoundations', name: 'Cimientos AEO', value: PRICE_ANCHORS.aeoFoundations, display: tierDisplay(PRICE_ANCHORS.aeoFoundations),
         blurb: 'Te preparamos para la IA: Bing Places, schema, FAQ y llms.txt para que los asistentes te lean y te citen.', href: '/es/houston/seo-para-ia' },
@@ -152,17 +152,17 @@ export const catalog: CatalogProduct[] = [
   {
     id: 'ecommerce',
     icon: 'lucide:shopping-bag',
-    name: 'E-Commerce & Tiendas',
+    name: 'E-commerce y tiendas',
     serviceType: 'Diseño de tienda en línea (e-commerce)',
     description:
-      'Tiendas en línea optimizadas para vender: catálogo, carrito y pagos seguros, en experiencia bilingüe. Desde una tienda esencial hasta una a medida.',
+      'Tiendas en línea optimizadas para vender: catálogo, carrito y pagos seguros, en una experiencia bilingüe. Desde una tienda esencial hasta una a medida.',
     tagline: 'Tiendas en línea optimizadas para vender, con catálogo y pagos.',
     anchorUnit: 'proyecto',
     href: '/es/houston/ecommerce',
     ctaLabel: 'Ver tienda en línea',
     tone: 'gold',
     tiers: [
-      { key: 'ecommerceEssential', name: 'Tienda Esencial', value: PRICE_ANCHORS.ecommerceEssential, display: tierDisplay(PRICE_ANCHORS.ecommerceEssential), anchor: true,
+      { key: 'ecommerceEssential', name: 'Tienda esencial', value: PRICE_ANCHORS.ecommerceEssential, display: tierDisplay(PRICE_ANCHORS.ecommerceEssential), anchor: true,
         blurb: 'Catálogo simple con carrito y pagos, para empezar a vender en línea sin complicarte.', href: '/es/houston/ecommerce' },
       { key: 'ecommerce', name: 'Tienda a medida', value: PRICE_ANCHORS.ecommerce, display: tierDisplay(PRICE_ANCHORS.ecommerce),
         blurb: 'Tienda completa a medida, optimizada para conversión y bilingüe.', href: '/es/houston/ecommerce' },
@@ -171,10 +171,10 @@ export const catalog: CatalogProduct[] = [
   {
     id: 'seo-local',
     icon: 'lucide:search',
-    name: 'SEO Local',
+    name: 'SEO local',
     serviceType: 'SEO local',
     description:
-      'Aparece en Google Maps y en la búsqueda local: Perfil de Google de Negocio, consistencia NAP, contenido local bilingüe y gestión de reseñas. Puntual o mes a mes.',
+      'Aparece en Google Maps y en la búsqueda local: Perfil de Negocio de Google, consistencia NAP, contenido local bilingüe y gestión de reseñas. Pago único o mes a mes.',
     tagline: 'Aparece en Google Maps y en la búsqueda local de tu zona.',
     anchorUnit: 'pago único',
     href: '/es/houston/seo-local',
@@ -183,14 +183,14 @@ export const catalog: CatalogProduct[] = [
     tiers: [
       { key: 'seoInitial', name: 'Optimización inicial', value: PRICE_ANCHORS.seoInitial, display: tierDisplay(PRICE_ANCHORS.seoInitial), anchor: true,
         blurb: 'Puesta a punto de tu Perfil de Google y tu presencia local. Pago único, sin permanencia.', href: '/es/houston/seo-local' },
-      { key: 'seoLocal', name: 'SEO Local continuo', value: PRICE_ANCHORS.seoLocal, monthly: true, display: tierDisplay(PRICE_ANCHORS.seoLocal, true),
-        blurb: 'Trabajo mensual: ficha, NAP, contenido local y reseñas, mes a mes y sin contratos forzados.', href: '/es/houston/seo-local' },
+      { key: 'seoLocal', name: 'SEO local continuo', value: PRICE_ANCHORS.seoLocal, monthly: true, display: tierDisplay(PRICE_ANCHORS.seoLocal, true),
+        blurb: 'Trabajo mensual: ficha, NAP, contenido local y reseñas, mes a mes y sin permanencia.', href: '/es/houston/seo-local' },
     ],
   },
   {
     id: 'branding',
     icon: 'lucide:palette',
-    name: 'Branding & Identidad',
+    name: 'Branding e identidad',
     serviceType: 'Diseño de marca (branding)',
     description:
       'Identidad visual a medida: desde solo el logo hasta un sistema de marca completo (paleta, tipografías y guía de uso).',
@@ -200,7 +200,7 @@ export const catalog: CatalogProduct[] = [
     ctaLabel: 'Ver branding',
     tone: 'gold',
     tiers: [
-      { key: 'brandingLogo', name: 'Diseño de Logo', value: PRICE_ANCHORS.brandingLogo, display: tierDisplay(PRICE_ANCHORS.brandingLogo), anchor: true,
+      { key: 'brandingLogo', name: 'Diseño de logo', value: PRICE_ANCHORS.brandingLogo, display: tierDisplay(PRICE_ANCHORS.brandingLogo), anchor: true,
         blurb: 'Solo el logo y sus variantes. El arranque más accesible de tu marca.', href: '/es/houston/branding' },
       { key: 'branding', name: 'Branding completo', value: PRICE_ANCHORS.branding, display: tierDisplay(PRICE_ANCHORS.branding),
         blurb: 'Logo, paleta, tipografías y guía de uso: identidad lista para usar.', href: '/es/houston/branding' },
@@ -209,7 +209,7 @@ export const catalog: CatalogProduct[] = [
   {
     id: 'mantenimiento',
     icon: 'lucide:wrench',
-    name: 'Mantenimiento Continuo',
+    name: 'Mantenimiento continuo',
     serviceType: 'Mantenimiento de sitios web',
     description:
       'Mantenimiento mensual del sitio: chequeos de disponibilidad, actualizaciones de seguridad, respaldos periódicos y soporte bilingüe.',
@@ -304,15 +304,15 @@ export const preciosPage = {
   hero: {
     kicker: 'Precios públicos',
     h1: 'Precios <em>claros</em>, sin letra pequeña',
-    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de agencias te esconde hasta venderte una llamada. Así de transparente trabajamos.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de las agencias te esconde hasta tenerte en una llamada de ventas. Así de transparentes somos.',
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye cada servicio', href: '#precios' },
-    chips: ['Desde $400 · diagnóstico IA gratis', 'Sin contratos forzados', 'Propuesta gratis en 24h'],
+    chips: ['Desde $400 · diagnóstico IA gratis', 'Sin permanencia', 'Propuesta gratis en 24h'],
     tone: 'gold' as const,
   },
   answer: {
     q: '¿Cuánto cuesta trabajar con Marcyan?',
-    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto recibe un alcance y un precio claros por escrito, sin compromiso.',
+    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto tiene un alcance y un precio claros por escrito, sin compromiso.',
   },
   transparency: {
     tag: 'Por qué lo publicamos',
@@ -326,7 +326,7 @@ export const preciosPage = {
   grid: {
     tag: 'Nuestros precios',
     title: 'Lo que cuesta y lo que <em>incluye</em>',
-    intro: 'Cada precio es un punto de partida real, "desde $". Mostramos primero la opción más accesible de cada servicio; el alcance final lo definimos juntos en una propuesta gratuita y honesta.',
+    intro: 'Cada precio es un punto de partida real, «desde $». Mostramos primero la opción más accesible de cada servicio; el alcance final lo definimos juntos en una propuesta gratuita y honesta.',
   },
   related: {
     tag: 'Guías de precio',
@@ -358,7 +358,7 @@ export const preciosPage = {
     items: [
       {
         q: '¿Por qué muestran los precios si casi nadie lo hace?',
-        a: 'Porque esconder el precio suele ser esconder algo. Publicar nuestras tarifas de arranque, incluido el SEO mensual y el mantenimiento, te deja comparar con calma y llegar a la conversación con confianza, no a que te «vendan». Es el tipo de trato que a nosotros nos gustaría recibir.',
+        a: 'Porque esconder el precio suele ser esconder algo. Publicar nuestras tarifas de arranque, incluido el SEO mensual y el mantenimiento, te deja comparar con calma y llegar a la conversación con confianza, sin que nadie te «venda» nada. Es el tipo de trato que a nosotros nos gustaría recibir.',
       },
       {
         q: '¿El precio más bajo es el mismo servicio que el completo?',
@@ -369,12 +369,12 @@ export const preciosPage = {
         a: 'Sí, sin costo ni compromiso. Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte, y te decimos con honestidad cómo estás. Si quieres que trabajemos los cimientos o el monitoreo después, esos sí tienen precio publicado; el diagnóstico no.',
       },
       {
-        q: '¿Hay contratos forzados o permanencia?',
+        q: '¿Hay contratos de permanencia?',
         a: 'No. Los servicios recurrentes como el SEO local y el mantenimiento son mes a mes; puedes pausar o cancelar avisando con una anticipación razonable. No creemos en amarrar clientes con contratos largos: preferimos que te quedes por los resultados, no por una cláusula.',
       },
       {
         q: '¿El precio «desde $» puede subir mucho?',
-        a: 'El «desde $» es el punto de partida real para ese producto. Sube si pides más páginas, más funciones (tienda, reservas, integraciones) o más idiomas. Nunca te lo cambiamos a mitad del camino: el alcance y el total acordado quedan por escrito antes de que decidas.',
+        a: 'El «desde $» es el punto de partida real para ese producto. Sube si pides más páginas, más funciones (tienda, reservas, integraciones) o más idiomas. Nunca te lo cambiamos a mitad de camino: el alcance y el total acordado quedan por escrito antes de que decidas.',
       },
       {
         q: '¿La propuesta tiene costo?',
@@ -385,7 +385,7 @@ export const preciosPage = {
   cta: {
     title: 'Pide tu precio <em>exacto</em>, gratis',
     sub: 'Cuéntanos tu proyecto y recibe una propuesta con alcance y precio claros en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold' as const,
   },
 };

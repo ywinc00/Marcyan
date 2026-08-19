@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // CONTENIDO · Landing /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
 // El mayor wedge del negocio: que ChatGPT/Gemini/Meta AI te RECOMIENDEN a TI.
-// Distinto de IA Conversacional (que atiende a TUS clientes). Página bespoke que
+// Distinto de IA conversacional (que atiende a TUS clientes). Página bespoke que
 // reusa los componentes del DS (patrón /es/servicios) + PriceGrid para los 3
 // niveles (Diagnóstico GRATIS · Cimientos $500 · Monitoreo $200/mes).
 //
@@ -23,7 +23,7 @@ export const aeoTiers: PriceService[] = [
   {
     id: 'aeo-diagnostico',
     icon: 'lucide:radar',
-    name: 'Diagnóstico de Visibilidad en IA',
+    name: 'Diagnóstico de visibilidad en IA',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
       'Revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y recomendarte. Sin costo ni compromiso.',
@@ -112,7 +112,7 @@ export const seoIaPage = {
   },
   answer: {
     q: '¿Cómo hago que ChatGPT y Gemini recomienden mi negocio?',
-    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Importa hacerlo ya. Según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
+    a: 'Preparando tu información para que la IA pueda leerte, entenderte y citarte: Bing Places, datos estructurados (schema), preguntas frecuentes y NAP consistente. Conviene hacerlo ya. Según el Índice de Visibilidad Local de SOCi 2026, ChatGPT recomienda apenas el 1.2% de los negocios locales. El que aparece se lleva la conversación.',
     source: 'SOCi · Índice de Visibilidad Local 2026',
   },
   // Distinción CLAVE — IA que te recomienda ≠ IA que atiende (cruza-enlace inline).
@@ -120,7 +120,7 @@ export const seoIaPage = {
     tag: 'No te confundas',
     title: 'IA que te <em>recomienda</em> ≠ IA que <em>atiende</em>',
     paragraphs: [
-      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7. Esa es nuestra <a href="/es/houston/ia-conversacional">IA Conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
+      'Hay dos cosas distintas que la IA puede hacer por tu negocio. Una es <strong>atender a tus clientes</strong>: un asistente que contesta, agenda y capta prospectos 24/7. Esa es nuestra <a href="/es/houston/ia-conversacional">IA conversacional</a>. La otra, de la que trata esta página, es <strong>que la IA te recomiende a TI</strong> cuando alguien le pregunta por un servicio como el tuyo.',
       'Tus clientes ya le preguntan a ChatGPT y a Gemini (la IA que ya aparece en las búsquedas de Google) «¿qué taller, abogado o restaurante me recomiendas?». La pregunta es simple: <strong>¿apareces tú o aparece tu competencia?</strong> El SEO para IA (también llamado AEO o GEO) hace que seas tú.',
     ],
     tone: 'teal' as const,
@@ -149,7 +149,7 @@ export const seoIaPage = {
     tag: 'Casos reales',
     title: 'Lo aplicamos en <em>nuestro sitio</em> y en el de <em>nuestros clientes</em>',
     paragraphs: [
-      'No es teoría. Este mismo sitio está construido para que la IA lo lea — HTML claro, respuestas directas, datos estructurados. Somos nuestro propio Caso #0, pero ya no somos el único.',
+      'No es teoría. Este mismo sitio está construido para que la IA lo lea: HTML claro, respuestas directas, datos estructurados. Somos nuestro propio Caso #0, pero ya no somos el único.',
       'Dos clientes reales lo prueban: las páginas de Texas Rush Remove (Houston) y Move Junk Away (Orlando) ya posicionan en sus zonas, y la IA de Google ya los incluye en sus recomendaciones para algunas búsquedas de su servicio. Texas Rush Remove, además, ya recibe visitas que llegan directamente desde ChatGPT. Sin trucos: información clara, bien estructurada y honesta, del tipo que la IA puede citar.',
       'Y no te entregamos un PDF de recomendaciones para que te arregles solo: <strong>lo implementamos por ti</strong>, en español y para tu mercado local. El SEO para IA en español tiene mucha menos competencia que en inglés: una ventaja real para un negocio hispano que se mueve hoy.',
     ],
@@ -168,7 +168,7 @@ export const seoIaPage = {
     ] as FaqItem[],
   },
   cta: {
-    title: 'Descubre si la IA te <em>recomienda</em> — gratis',
+    title: 'Descubre si la IA te <em>recomienda</em>, gratis',
     sub: 'Pídenos el diagnóstico de visibilidad en IA: revisamos si ChatGPT, Gemini y Meta AI pueden encontrarte y te decimos con honestidad cómo estás. Sin costo ni compromiso.',
     primary: { label: 'Pedir diagnóstico gratis', href: '#contacto' },
     tone: 'teal' as const,
@@ -185,7 +185,7 @@ export const seoIaPage = {
   },
   // Schema: Service con un Offer por nivel (diagnóstico gratis price "0").
   service: {
-    name: 'SEO para IA en Houston (Visibilidad en IA)',
+    name: 'SEO para IA en Houston (visibilidad en IA)',
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
       'Optimización para que los asistentes de IA (ChatGPT, Gemini, Meta AI) encuentren, entiendan y recomienden tu negocio: Bing Places, datos estructurados, contenido answer-first, NAP y monitoreo. En español, para Houston.',
@@ -195,7 +195,7 @@ export const seoIaPage = {
     priceValue: '0',
     providerId: HOUSTON_ID,
     tiers: [
-      { name: 'Diagnóstico de Visibilidad en IA', priceValue: '0' },
+      { name: 'Diagnóstico de visibilidad en IA', priceValue: '0' },
       { name: 'Cimientos AEO', priceValue: '500' },
       { name: 'Monitoreo en IA', priceValue: '200', monthly: true },
     ],

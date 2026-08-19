@@ -26,6 +26,7 @@ import { clientIp } from '../lib/auth.mjs';
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import {
   analyzeSite, recommendService, plainSummary, fallbackReport,
+  findContactHref, mergeContactSignals,
   INDUSTRIES, REVIEW_BUCKETS,
 } from '../lib/diagnostic-checks.mjs';
 
@@ -77,7 +78,12 @@ function rateLimited(kind, ip) {
 // (compartidas con la tool interna del chat). fetchSite(guard.url) usa los
 // mismos presupuestos por defecto que antes (8s · 500KB · 3 redirects).
 
-const urlHash = (u) => createHash('sha256').update(`${u.hostname.toLowerCase()}${u.pathname.replace(/\/+$/, '')}`).digest('hex');
+// Versión del MOTOR dentro de la clave de cache: al recalibrar los checks (v2 =
+// calibración 2026-08 contra sitios reales), los resultados viejos dejan de ser
+// candidatos y el fix aplica de inmediato — sin salt, un URL consultado a diario
+// serviría indefinidamente los hallazgos del motor viejo.
+const ENGINE_VERSION = 'v2';
+const urlHash = (u) => createHash('sha256').update(`${u.hostname.toLowerCase()}${u.pathname.replace(/\/+$/, '')}|${ENGINE_VERSION}`).digest('hex');
 
 // ── Reporte con IA (único uso de IA). Sin PII: al modelo solo van
 //    hallazgos verificados + negocio/ciudad/industria. Fallback determinista. ──
@@ -198,14 +204,38 @@ async function handleAnalyze({ req, res, body, lang, E, ip }) {
     };
     findings = Array.isArray(cachedRow.findings) ? cachedRow.findings : [];
   } else {
-    const out = analyzeSite({ html: site.html || '', https: !!site.https, hasSite, city: city || '', reviewsBucket: reviews });
+    let out = analyzeSite({ html: site.html || '', https: !!site.https, hasSite, city: city || '', reviewsBucket: reviews });
+    // Follow-up de contacto: si la home no muestra formulario/teléfono pero enlaza a
+    // una página de contacto, la bajamos también (UN fetch extra, mismo ssrfGuard,
+    // presupuesto corto) y fusionamos las señales. Evita el falso "no tiene
+    // formulario" en sitios que lo tienen en /contacto. Best-effort: cualquier
+    // fallo deja el análisis de la home tal cual.
+    if (hasSite && (out.checks.C3 !== 'pass' || out.checks.C1 !== 'pass')) {
+      try {
+        // Presupuesto PROPIO para el follow-up (withTimeout): su lentitud jamás debe
+        // costarle el análisis de la home ya calculado ni acercarse al maxDuration.
+        out = await withTimeout((async () => {
+          const baseHost = new URL(site.finalUrl || finalUrl).hostname;
+          const href = findContactHref(site.html, baseHost);
+          if (!href) return out;
+          const contactUrl = new URL(href, site.finalUrl || finalUrl);
+          const g2 = await ssrfGuard(contactUrl.href);
+          if (!g2.ok) return out;
+          const contact = await fetchSite(g2.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
+          return (contact.ok && contact.html) ? mergeContactSignals(out, contact.html) : out;
+        })(), 8000, 'contact follow-up');
+      } catch (e) { console.error('[diagnostic] contact follow-up falló:', e && e.message); }
+    }
     scores = out.scores;
     findings = out.findings;
   }
 
   const recommended = recommendService({ scores, industry });
   const ref = await mintDiagnostic({
-    sid, lang, businessName, city, industry, rawUrl, uHash, reviews, problem,
+    // Una fila servida DESDE cache no debe volver a ser candidata de cache (guardaría
+    // los scores viejos con created_at fresco y renovaría la cadena para siempre):
+    // solo los cómputos frescos llevan url_hash.
+    sid, lang, businessName, city, industry, rawUrl, uHash: cachedRow ? null : uHash, reviews, problem,
     scores, findings, ip, userAgent: sanitize(req.headers['user-agent'], 500),
   });
 

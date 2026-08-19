@@ -56,7 +56,10 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
           <strong class="gtcard__num" data-out>≈ {nf.format(initCalls)}</strong>
         </div>
         <p class="gtcard__disc">{tt.calcDisclaimer}</p>
-        <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
+        <div class="gtcard__actions">
+          <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
+          <button type="button" class="gtcard__cta gtcard__cta--marcy" data-marcy>{tt.calcMarcy} <Icon name="lucide:messages-square" /></button>
+        </div>
       </div>
 
       <div class="gtcard" data-calc="appt" id={ids.appt}>
@@ -75,7 +78,10 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
           <strong class="gtcard__num" data-out>≈ {nf.format(initAppt)}</strong>
         </div>
         <p class="gtcard__disc">{tt.calcDisclaimer}</p>
-        <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
+        <div class="gtcard__actions">
+          <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
+          <button type="button" class="gtcard__cta gtcard__cta--marcy" data-marcy>{tt.calcMarcy} <Icon name="lucide:messages-square" /></button>
+        </div>
       </div>
 
       <a class="gtcard gtcard--diag" href={diagHref} data-track="tool_cta_clicked">
@@ -117,6 +123,9 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
                  transition: gap var(--duration-base) var(--ease); }
   .gtcard__cta svg { width: 16px; height: 16px; }
   .gtcard__cta:hover { gap: var(--space-3); }
+  .gtcard__actions { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+  /* Puente a Marcy: mismo lenguaje que el CTA, en teal (el color de Marcy). */
+  .gtcard__cta--marcy { background: none; border: 0; padding: 0; cursor: pointer; color: var(--accent-teal); }
 
   .gtcard--diag { grid-column: 1 / -1; text-decoration: none; align-items: flex-start;
                   transition: border-color var(--duration-base) var(--ease), box-shadow var(--duration-base) var(--ease); }
@@ -184,6 +193,27 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
         clearTimeout(doneTimer);
         doneTimer = setTimeout(() => track('calculator_completed', { type, loss_bucket: bucket(compute()) }), 700);
       });
+    });
+
+    // Puente a Marcy: manda al chat los números que el propio visitante puso (sin
+    // PII) vía `mrc:ask`; el ChatWidget lo envía por su flujo normal y Marcy los
+    // confirma con su calculadora interna antes de proponer.
+    const marcyBtn = card.querySelector('[data-marcy]');
+    if (marcyBtn) marcyBtn.addEventListener('click', () => {
+      const v = nf.format(Math.round(compute()));
+      const en = lang === 'en';
+      let msg;
+      if (type === 'calls') {
+        msg = en
+          ? 'I just used the missed-calls calculator: about ' + get('callsWeek') + ' calls a week, I miss ' + get('missed') + '%, my average ticket is $' + get('ticket') + ' and I close ' + get('close') + '%. It says I could be losing ' + v + ' a month. What should I do about it?'
+          : 'Acabo de usar la calculadora de llamadas perdidas: recibo unas ' + get('callsWeek') + ' llamadas por semana, se me escapa el ' + get('missed') + '%, mi ticket promedio es $' + get('ticket') + ' y cierro el ' + get('close') + '%. Me sale que podría estar perdiendo ' + v + ' al mes. ¿Qué me conviene hacer?';
+      } else {
+        msg = en
+          ? 'I just used the no-show calculator: about ' + get('apptWeek') + ' appointments a week, ' + get('noShow') + '% no-shows, and each appointment is worth $' + get('apptValue') + '. It says I could recover ' + v + ' a month. What should I do about it?'
+          : 'Acabo de usar la calculadora de citas perdidas: tengo unas ' + get('apptWeek') + ' citas por semana, el ' + get('noShow') + '% no llega, y cada cita vale $' + get('apptValue') + '. Me sale que podría recuperar ' + v + ' al mes. ¿Qué me conviene hacer?';
+      }
+      track('calc_marcy_opened', { type });
+      window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text: msg } }));
     });
   });
 </script>

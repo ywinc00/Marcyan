@@ -70,7 +70,7 @@ export const portfolioPage = {
     kicker: 'Portafolio',
     h1: 'Trabajo real, negocios <em>reales</em>',
     sub: 'No mostramos maquetas de catálogo: estos son clientes reales para los que diseñamos sitios, SEO, marca y web apps. Capturas reales de cada proyecto, en español e inglés, sin métricas infladas.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver servicios', href: '/es/servicios' },
     chips: ['4 negocios reales', 'Houston y Orlando', 'Capturas reales'],
     tone: 'gold' as const,
@@ -96,7 +96,7 @@ export const portfolioPage = {
   },
   faq: {
     tag: 'Preguntas frecuentes',
-    title: 'Sobre nuestro portafolio, <em>claro</em>',
+    title: 'Sobre nuestro portafolio, <em>hablando claro</em>',
     items: [
       { q: '¿Estos son clientes reales?', a: 'Sí. Los cuatro son negocios reales para los que trabajamos: Texas Rush Remove y Move Junk Away (junk removal), Julio\'s Landscape (paisajismo) y Rosy Nails & Care (salón de uñas). Las capturas que ves son de sus sitios y app reales, no maquetas de catálogo.' },
       { q: '¿Por qué no muestran los enlaces a los sitios?', a: 'Por respeto a la privacidad de nuestros clientes no publicamos sus dominios aquí. Si quieres verlos en vivo, te los mostramos con gusto en una llamada o en la propuesta.' },
@@ -108,7 +108,7 @@ export const portfolioPage = {
   cta: {
     title: 'El siguiente caso <em>puede ser el tuyo</em>',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
-    primary: { label: 'Pedir propuesta gratis', href: '#contacto' },
+    primary: { label: 'Propuesta gratis', href: '#contacto' },
     tone: 'gold' as const,
   },
 };

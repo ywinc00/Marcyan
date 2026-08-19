@@ -360,6 +360,116 @@ function buildStrikingSection({ candidates, all }, minImpressions) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// INVENTARIO COMPLETO: TODAS LAS PÁGINAS Y TODAS LAS CONSULTAS
+// ═══════════════════════════════════════════════════════════════════════
+/* Sin tope. Un top 25 esconde justo lo que hay que ver: las páginas que están
+   dentro del índice y no reciben ni una impresión. Esas filas en cero son el
+   dato, no el relleno. */
+function buildAllPagesSection({ pageRows, indexingUrls, lastFullCheck }) {
+  const metrics = new Map(pageRows.map(p => [p.page, p]));
+  const filas = [];
+  const seen = new Set();
+
+  for (const [url, info] of Object.entries(indexingUrls ?? {})) {
+    const p = normalizePath(url);
+    seen.add(p);
+    const m = metrics.get(p);
+    const { cohort, lang } = classifyCohort(p);
+    filas.push({
+      page: p,
+      cohorte: COHORT_LABELS[cohort] ?? cohort,
+      lang: lang.toUpperCase(),
+      estado: coverageLabel(info?.coverageState || 'Sin estado registrado'),
+      enSitemap: true,
+      impressions: m?.impressions ?? 0,
+      clicks: m?.clicks ?? 0,
+      ctr: m?.ctr ?? 0,
+      position: m?.position ?? null,
+    });
+  }
+  /* Páginas con impresiones que NO están en el sitemap vivo: URLs viejas,
+     variantes o rutas retiradas. Google las sigue mostrando y conviene verlas. */
+  const fuera = [];
+  for (const p of pageRows) {
+    if (seen.has(p.page)) continue;
+    const { cohort, lang } = classifyCohort(p.page);
+    fuera.push({
+      page: p.page,
+      cohorte: COHORT_LABELS[cohort] ?? cohort,
+      lang: lang.toUpperCase(),
+      estado: 'fuera del sitemap',
+      enSitemap: false,
+      impressions: p.impressions, clicks: p.clicks, ctr: p.ctr, position: p.position,
+    });
+  }
+
+  const orden = (a, b) => b.impressions - a.impressions || a.page.localeCompare(b.page);
+  filas.sort(orden);
+  fuera.sort(orden);
+
+  const conImpr = filas.filter(f => f.impressions > 0).length;
+  const sinImpr = filas.length - conImpr;
+
+  const L = [];
+  L.push(`## 📄 Todas las páginas, una por una\n`);
+  L.push(`Las ${filas.length} URLs del sitemap con su estado en Google y sus cifras del período. Sin recortar: **${conImpr} recibieron al menos una impresión y ${sinImpr} ninguna**. Una página dentro del índice y con cero impresiones no está compitiendo, Google la conoce y no la considera para ninguna búsqueda. Esas filas son el trabajo pendiente.\n`);
+  L.push(`| # | Página | Cohorte | Idioma | Estado en Google | Impresiones | Clicks | CTR | Posición |`);
+  L.push(`|---|---|---|---|---|---|---|---|---|`);
+  filas.forEach((f, i) => {
+    L.push(['', i + 1, `\`${f.page}\``, f.cohorte, f.lang, f.estado, f.impressions, f.clicks,
+      f.impressions ? pct(f.ctr) : '—', f.position == null ? '—' : f.position.toFixed(1), ''].join('|'));
+  });
+  L.push('');
+  if (fuera.length) {
+    L.push(`### Páginas con impresiones que no están en el sitemap\n`);
+    L.push(`Google las muestra y el sitemap no las declara: rutas viejas, variantes o páginas retiradas. Vale revisar si deberían volver al sitemap o redirigirse.\n`);
+    L.push(`| Página | Impresiones | Clicks | CTR | Posición |`);
+    L.push(`|---|---|---|---|---|`);
+    for (const f of fuera) {
+      L.push(['', `\`${f.page}\``, f.impressions, f.clicks, pct(f.ctr), f.position.toFixed(1), ''].join('|'));
+    }
+    L.push('');
+  }
+  L.push(`> **Estado en Google** sale de \`data/indexing-status.json\`${lastFullCheck ? `, del barrido del ${String(lastFullCheck).split('T')[0]}` : ''}. *Variante canónica* significa que la página SÍ está indexada, bajo su URL con barra final: no es un fallo.`);
+  L.push(`> **Posición "—"** quiere decir que Google no nos mostró ni una vez para ninguna búsqueda en el período, no que estemos en el puesto 100.`);
+  L.push(`> Las cifras están agregadas por ruta canónica, así que la variante con barra final y la que no se suman en una sola fila.\n`);
+  return L;
+}
+
+function buildAllQueriesSection({ queryRows, queryPageRows, config }) {
+  const seguidas = new Set(config.keywords.map(k => k.query.toLowerCase()));
+  const topPageByQuery = new Map();
+  for (const r of queryPageRows) {
+    const q = r.keys[0].toLowerCase();
+    const cur = topPageByQuery.get(q);
+    if (!cur || r.impressions > cur.impressions) topPageByQuery.set(q, normalizePath(r.keys[1]));
+  }
+  const filas = [...queryRows]
+    .map(r => ({
+      query: r.keys[0], impressions: r.impressions, clicks: r.clicks,
+      ctr: r.ctr, position: r.position,
+      seguida: seguidas.has(r.keys[0].toLowerCase()),
+      page: topPageByQuery.get(r.keys[0].toLowerCase()) ?? '—',
+    }))
+    .sort((a, b) => b.impressions - a.impressions || a.query.localeCompare(b.query));
+
+  const nuevas = filas.filter(f => !f.seguida).length;
+  const L = [];
+  L.push(`## 🔤 Todas las búsquedas en las que aparecemos\n`);
+  L.push(`Las ${filas.length} consultas que Google reportó en el período, sin recortar, con la página nuestra que salió para cada una. ${nuevas} de ellas no están en \`scripts/tracked-keywords.json\`: son candidatas a entrar si se repiten.\n`);
+  L.push(`| # | Búsqueda | Impresiones | Clicks | CTR | Posición | Banda | Página que sale | ¿La seguimos? |`);
+  L.push(`|---|---|---|---|---|---|---|---|---|`);
+  filas.forEach((f, i) => {
+    L.push(['', i + 1, f.query, f.impressions, f.clicks, pct(f.ctr), fmtPos(f.position),
+      bandOf(f.position)?.label ?? 'sin datos', `\`${f.page}\``, f.seguida ? 'sí' : '—', ''].join('|'));
+  });
+  L.push('');
+  L.push(`> **Esta lista no es el mercado.** Google solo reporta las búsquedas donde ya salimos, y oculta las de bajo volumen. Una consulta enorme donde estamos en el puesto 89 aparece aquí con pocas impresiones o no aparece: el orden de la tabla es el orden de nuestra visibilidad, no el del tamaño de la demanda.`);
+  L.push(`> Las impresiones y la posición salen de la dimensión de consulta sola, que es la cifra limpia. La columna de página viene de la vista consulta más página y solo dice cuál de nuestras URLs salió más veces para esa búsqueda.\n`);
+  return L;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // GEOGRAFÍA Y DISPOSITIVO
 // ═══════════════════════════════════════════════════════════════════════
 /* Marcyan vende en Houston y Miami. Impresiones desde fuera de Estados Unidos
@@ -797,15 +907,8 @@ function buildMarketSection({ queryRows, pageRows, countries, devices, totals, i
       L.push('');
       L.push(`> La posición de Search Console es la más alta que ocupa una página nuestra en cada búsqueda, promediada. Google cuenta como una posición cada bloque del resultado (mapa, imágenes, respuesta de IA), así que la banda es una aproximación de dónde aparecemos, **no** un recuento de cuántos competidores tenemos delante.\n`);
 
-      L.push(`#### Consultas de cabecera por impresiones\n`);
-      L.push(`| Consulta | Impresiones | Clicks | Posición | Banda | Confianza |`);
-      L.push(`|---|---|---|---|---|---|`);
-      for (const q of queries.slice(0, cfg.topQueries)) {
-        L.push(['', q.query, q.impressions, q.clicks, fmtPos(q.position), bandOf(q.position)?.label ?? 'sin datos', confidence(q.impressions), ''].join('|'));
-      }
-      L.push('');
       if (queries.every(q => q.impressions < 100)) {
-        L.push(`> Con ${siteImpr.toLocaleString('es')} impresiones en el período ninguna fila alcanza confianza alta. Es una foto de arranque, no una base para decidir contenido.\n`);
+        L.push(`> Con ${siteImpr.toLocaleString('es')} impresiones en el período ninguna consulta alcanza confianza alta. Es una foto de arranque, no una base para decidir contenido. El detalle consulta por consulta está en la sección "Todas las búsquedas en las que aparecemos".\n`);
       }
     }
 
@@ -1498,7 +1601,7 @@ function buildFunnelSection({ funnel, gsc, range, mesTag }) {
 function buildReport(ctx) {
   const {
     tag, range, keywordRows, priorMonthRows, pageRows, summary, alerts,
-    cohorts, striking, market, funnelSection, hasFunnel, config,
+    cohorts, striking, market, funnelSection, hasFunnel, config, allPages, allQueries,
   } = ctx;
   const priorByQuery = Object.fromEntries(priorMonthRows.map(r => [r.query, r]));
   const L = [];
@@ -1569,17 +1672,13 @@ function buildReport(ctx) {
   // ── striking distance ──
   if (striking) L.push(...striking);
 
-  // ── páginas ──
-  L.push(`## 📋 Posicionamiento por página\n`);
-  L.push(`Las ${Math.min(pageRows.length, 25)} páginas con más impresiones del período, de ${pageRows.length} con al menos una.\n`);
-  L.push(`| Página | Impresiones | Clicks | CTR | Posición |`);
-  L.push(`|---|---|---|---|---|`);
-  for (const r of pageRows.slice(0, 25)) {
-    L.push(['', `\`${r.page}\``, r.impressions, r.clicks, pct(r.ctr), r.position.toFixed(1), ''].join('|'));
-  }
-  L.push('');
-  L.push(`> **Nota metodológica.** Las filas están agregadas por ruta canónica: Search Console devuelve por separado la misma página con y sin barra final y con parámetros UTM, y aquí se suman${summary.collapsedVariants ? ` (este período se fusionaron ${summary.collapsedVariants} variantes)` : ''}. La posición es el promedio ponderado por impresiones.`);
-  L.push(`> La suma de esta tabla puede superar el total del TL;DR y eso NO es un error: la API deduplica a nivel de sitio (una búsqueda donde salen dos URLs nuestras cuenta como una impresión de sitio) pero cuenta una por cada URL en la vista por página. Comportamiento documentado de Search Console.\n`);
+  // ── inventario completo de páginas ──
+  if (allPages) L.push(...allPages);
+  L.push(`> **Nota metodológica de las dos tablas de arriba.** Las filas están agregadas por ruta canónica: Search Console devuelve por separado la misma página con y sin barra final y con parámetros UTM, y aquí se suman${summary.collapsedVariants ? ` (este período se fusionaron ${summary.collapsedVariants} variantes)` : ''}. La posición es el promedio ponderado por impresiones.`);
+  L.push(`> La suma de impresiones por página puede superar el total del TL;DR y eso NO es un error: la API deduplica a nivel de sitio (una búsqueda donde salen dos URLs nuestras cuenta como una impresión de sitio) pero cuenta una por cada URL en la vista por página. Comportamiento documentado de Search Console.\n`);
+
+  // ── inventario completo de consultas ──
+  if (allQueries) L.push(...allQueries);
 
   // ── cohortes ──
   if (cohorts) L.push(...cohorts);
@@ -1792,6 +1891,12 @@ async function main() {
   const report = buildReport({
     tag: target.tag, range: target, keywordRows, priorMonthRows, pageRows: topPages,
     summary, alerts, cohorts, striking, market, funnelSection, hasFunnel: !!funnelData, config,
+    allPages: buildAllPagesSection({
+      pageRows: topPages,
+      indexingUrls: indexingStatus?.urls ?? {},
+      lastFullCheck: indexingStatus?.lastFullCheck ?? null,
+    }),
+    allQueries: buildAllQueriesSection({ queryRows, queryPageRows, config }),
   });
 
   if (dryRun) {

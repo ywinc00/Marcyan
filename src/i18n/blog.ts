@@ -61,7 +61,10 @@ export const postChrome = {
         contact: { label: 'Email o WhatsApp', ph: 'tu@email.com o tu número' },
         submit: 'Propuesta gratis',
         sending: 'Enviando…',
-        success: 'Recibido. Te respondemos en menos de 24h.',
+        // Rótulo corto del botón en estado completado (BtnStates). El acuse largo
+        // con folio va en `success`, dentro del cuadro de estado.
+        done: 'Recibido',
+        success: 'Recibido. Te respondemos en menos de 1 hora hábil.',
         error: 'No se pudo enviar. Escríbenos por WhatsApp o inténtalo de nuevo.',
         invalid: 'Déjanos un email válido o un teléfono con al menos 7 dígitos.',
       },

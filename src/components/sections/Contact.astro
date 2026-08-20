@@ -5,6 +5,7 @@
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import BtnStates from '../ui/BtnStates.astro';
 import { nap } from '../../i18n/content';
 
 interface Props { contact: any; defaultCity?: string; defaultService?: string }
@@ -13,6 +14,13 @@ const f = contact.form;
 // f.phone lo aporta la i18n (content.es/en.contact.form.phone). Fallback defensivo
 // por si esta lane se renderiza antes de que la de i18n aterrice (no rompe el build).
 const phone = f.phone ?? { label: 'Teléfono (opcional)', ph: 'Tu teléfono o WhatsApp' };
+// Rótulo del botón completado y las tres líneas del acuse de recibo. Mismos
+// fallbacks defensivos que arriba: la fuente real es content.es/en.contact.form.
+const doneLbl = f.done ?? 'Recibido';
+const okHead = f.success ?? 'Mensaje recibido.';
+const okRef = f.successRef ?? 'Tu referencia:';
+const okNext = f.successNext ?? 'Te respondemos en menos de 1 hora hábil.';
+const okUrgent = f.successUrgent ?? '¿Es urgente? Llámanos al';
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
 ---
@@ -26,8 +34,11 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 
     <form
       class="contact__form" id="home-contact-form" novalidate
-      data-sending={f.sending} data-success={f.success} data-success-next={f.successNext} data-error={f.error} data-invalid={f.emailInvalid}
+      data-sending={f.sending} data-success={okHead} data-success-ref={okRef} data-success-next={okNext}
+      data-success-urgent={okUrgent} data-error={f.error} data-invalid={f.emailInvalid}
       data-brief={f.briefLink} data-href-brief="/formulario"
+      data-tel-hou={telHou} data-tel-hou-label={nap.houston}
+      data-tel-mia={telMia} data-tel-mia-label={nap.miami}
     >
       <input type="text" name="website_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
@@ -74,7 +85,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
         <textarea name="additional_notes" rows="4" placeholder={f.message.ph}></textarea>
       </label>
 
-      <Button type="submit" variant="primary" size="lg" class="u-full" data-submit>{f.submit}</Button>
+      <Button type="submit" variant="primary" size="lg" class="u-full bstate" data-submit>
+        <BtnStates sending={f.sending} done={doneLbl}>{f.submit}</BtnStates>
+      </Button>
 
       <p class="form-status form-status--error" id="home-form-error" role="alert" hidden></p>
       <p class="form-status form-status--ok" id="home-form-success" role="status" hidden></p>
@@ -149,6 +162,10 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
   .form-status--ok:focus-visible { box-shadow: 0 0 0 2px var(--accent-teal-line); }
   .form-status__head { display: block; font-weight: 600; }
   .form-status__next { display: block; margin-top: var(--space-1); opacity: 0.92; }
+  /* Salida inmediata: al que no quiere esperar se le da el teléfono ahí mismo. */
+  .form-status__urgent { display: block; margin-top: var(--space-2); }
+  .form-status--ok :global(a) { color: inherit; font-weight: 600; text-decoration: underline; }
+  .form-status--ok :global(a:hover) { color: var(--fg-primary); }
 
   @media (--sm) { .field-row { grid-template-columns: 1fr 1fr; } }
   @media (--lg) {
@@ -194,13 +211,17 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     };
 
     const fields = () => form.querySelectorAll('input, select, textarea, button');
-    const setBusy = (on: boolean, label?: string) => {
-      btn.disabled = on;
-      if (label !== undefined) btn.textContent = label;
+    // El botón se conmuta SOLO por atributo: su rótulo lo pintan los tres spans
+    // de BtnStates. Escribirle textContent borraría ese marcado (y era lo que
+    // metía la frase entera de éxito dentro del botón).
+    const setState = (state: '' | 'sending' | 'done') => {
+      if (state) btn.dataset.state = state;
+      else delete btn.dataset.state;
     };
-    const reenable = (origLabel: string) => {
+    const reenable = () => {
       fields().forEach((el) => ((el as HTMLInputElement).disabled = false));
-      setBusy(false, origLabel);
+      btn.disabled = false;
+      setState('');
       delete form.dataset.busy;
     };
 
@@ -239,11 +260,13 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
         return;
       }
 
-      const orig = btn.textContent || '';
       fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
-      setBusy(true, S.sending || 'Enviando…');
+      btn.disabled = true;
+      setState('sending');
 
-      // Timeout de red: aborta el fetch a los ~15s.
+      // Timeout de red: aborta el fetch a los ~15s. Se cancela en el `finally`, no
+      // al resolver el fetch: si se cancelara ahí, la guarda cubriría solo la llegada
+      // de las cabeceras y un cuerpo estancado dejaría el botón en "Enviando…".
       const ctrl = new AbortController();
       const timer = window.setTimeout(() => ctrl.abort(), 15000);
       try {
@@ -251,28 +274,43 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data), signal: ctrl.signal,
         });
-        window.clearTimeout(timer);
         let payload: any = null;
         try { payload = await res.json(); } catch (_) { /* ignore */ }
 
         if (!res.ok || !payload || !payload.ok) {
           renderError((payload && payload.error) || S.error || 'Error.');
-          reenable(orig);
+          reenable();
           return;
         }
-        // Éxito: folio en la 1ª línea + siguiente paso en la 2ª (nodos DOM, sin innerHTML).
+        // Éxito: acuse + folio en la 1ª línea, plazo de respuesta en la 2ª y la
+        // salida inmediata en la 3ª (nodos DOM, sin innerHTML).
         okBox.textContent = '';
+        const lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase();
         const line1 = document.createElement('span');
         line1.className = 'form-status__head';
-        line1.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
+        line1.textContent = [S.success, payload.refId ? S.successRef : '', payload.refId || '']
+          .filter(Boolean).join(' ');
         okBox.appendChild(line1);
-        const lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase();
-        const next = (S.successNext && S.successNext.trim())
-          || (lang === 'en' ? 'We reply in under 24h.' : 'Te respondemos en menos de 24h.');
         const line2 = document.createElement('span');
         line2.className = 'form-status__next';
-        line2.textContent = next;
+        line2.textContent = (S.successNext && S.successNext.trim())
+          || (lang === 'en' ? 'We reply within 1 business hour.' : 'Te respondemos en menos de 1 hora hábil.');
         okBox.appendChild(line2);
+        // Teléfono de la ciudad que eligió, para no mandar a Houston a un cliente de Miami.
+        const mia = /miami/i.test(data.city_state || '');
+        const tel = mia ? S.telMia : S.telHou;
+        const telLbl = (mia ? S.telMiaLabel : S.telHouLabel) || tel;
+        if (tel && S.successUrgent) {
+          const line3 = document.createElement('span');
+          line3.className = 'form-status__urgent';
+          line3.appendChild(document.createTextNode(S.successUrgent + ' '));
+          const a = document.createElement('a');
+          a.href = 'tel:' + tel;
+          a.textContent = telLbl;
+          a.setAttribute('data-track', 'call_clicked');
+          line3.appendChild(a);
+          okBox.appendChild(line3);
+        }
         okBox.hidden = false;
         // Conversión real: LEAD creado → GA4 (generate_lead). El lead ya quedó
         // en la BD vía /api/contact; esto solo marca la conversión en Analytics.
@@ -283,11 +321,12 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
         okBox.focus();
         fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
         delete form.dataset.busy;
-        btn.textContent = S.success || '✓';
+        setState('done');
       } catch (err) {
-        window.clearTimeout(timer);
         renderError(S.error || 'Error de red.');
-        reenable(orig);
+        reenable();
+      } finally {
+        window.clearTimeout(timer);
       }
     });
   }

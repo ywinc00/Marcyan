@@ -36,7 +36,7 @@ interface Props {
   sub: string;
   /** ÚNICO botón del hero (oro, lg). */
   primary: { label: string; href: string };
-  /** Micro-reaseguro mono bajo el CTA, p.ej. "Respuesta en menos de 24h · Sin compromiso". */
+  /** Micro-reaseguro mono bajo el CTA, p.ej. "Respuesta en menos de 1 hora hábil · Sin compromiso". */
   microcopy: string;
   /** Enlace mono discreto de exploración, p.ej. "Ver servicios y precios ↓" → #servicios. */
   secondaryAnchor: { label: string; href: string };
@@ -149,6 +149,10 @@ const {
   .cityhero__micro {
     font-family: var(--font-mono); font-size: var(--text-xs);
     letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    /* `balance` en vez del `pretty` global de los <p>: si en móvil no cabe en una
+       línea, parte en dos mitades parejas en lugar de dejar "Sin compromiso"
+       huérfano debajo. Va above the fold en la landing principal. */
+    text-wrap: balance;
   }
   .cityhero__explore {
     display: inline-flex; align-items: center; min-height: var(--tap-min);

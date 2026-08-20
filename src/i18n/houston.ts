@@ -44,7 +44,7 @@ export const houstonHub = {
     h1: 'Diseño de páginas web en <em>Houston</em>',
     sub: 'La agencia hispana que une tu web, tu IA y tu SEO, con precios públicos.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
-    microcopy: 'Respuesta en menos de 24h · Sin compromiso',
+    microcopy: 'Respuesta en 1 hora hábil · Sin compromiso',
     explore: { label: 'Ver servicios y precios ↓', href: '#servicios' },
     telemetry: [
       { label: 'Línea directa', value: nap.houston, href: telHref, live: true },
@@ -157,9 +157,13 @@ export const houstonHub = {
     secondary: { label: `Llámanos: ${nap.houston}`, href: telHref },
     tone: 'gold' as const,
   },
-  // Micro-reaseguro (fila slim entre el CTA y el formulario) — claims verbatim
-  // del FAQ de esta página, sin inventar garantías nuevas.
-  reassure: 'Respuesta en menos de 24h · Sin compromiso · Precio por escrito antes de empezar',
+  // Micro-reaseguro (fila slim entre el CTA y el formulario). "Precio por escrito"
+  // sale verbatim del FAQ de esta página; el plazo de respuesta es el compromiso
+  // de contacto de todo el sitio (mismo que los correos y el chat), no un claim
+  // propio de esta landing. Nombra los DOS plazos a propósito: justo encima, el
+  // cta.sub promete la propuesta en 24 horas, y sin desambiguar se leían como
+  // números contradictorios. Respuesta = contacto · Propuesta = entregable.
+  reassure: 'Respuesta en 1 hora hábil · Propuesta gratis en 24h · Precio por escrito antes de empezar',
   // ItemList (schema) — los servicios ofrecidos en Houston, cada uno a su landing.
   itemList: [
     { name: 'Diseño web en Houston', path: '/es/houston/diseno-web' },

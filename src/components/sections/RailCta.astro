@@ -4,6 +4,7 @@
 // dominante de desktop + WhatsApp/Llamar como alternativas. NUNCA /formulario.
 // Números de precio desde PRICE_ANCHORS (fuente única) — jamás hardcodeados.
 import Icon from '../ui/Icon.astro';
+import BtnStates from '../ui/BtnStates.astro';
 import { nap } from '../../i18n/content';
 import { PRICE_ANCHORS } from '../../i18n/pricing';
 
@@ -32,7 +33,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
 
   <form class="rcta__form" id="rail-cta-form" novalidate
     data-objective={`Blog: ${postTitle}`}
-    data-sending={t.form.sending} data-success={t.form.success}
+    data-success={t.form.success}
     data-error={t.form.error} data-invalid={t.form.invalid}
   >
     <input type="text" name="website_hp" class="rcta__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -44,8 +45,14 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
       <span class="rcta__lbl">{t.form.contact.label}</span>
       <input type="text" name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
     </label>
-    <button class="rcta__submit" type="submit" data-submit>{t.form.submit}</button>
+    <button class="rcta__submit bstate" type="submit" data-submit>
+      <BtnStates sending={t.form.sending} done={t.form.done}>{t.form.submit}</BtnStates>
+    </button>
     <p class="rcta__status rcta__status--err" role="alert" hidden></p>
+    <!-- role="status" (aria-live polite) basta para anunciar el acuse. NO se le
+         mueve el foco: al ser región viva ya se lee al revelarlo, enfocarlo lo
+         haría sonar dos veces, y con el techo de 15s de la petición el tirón de
+         foco podría llegar cuando el lector ya está en otra parte del artículo. -->
     <p class="rcta__status rcta__status--ok" role="status" hidden></p>
   </form>
 
@@ -120,6 +127,18 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
   .rcta__submit:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: 0 8px 30px -12px var(--accent-gold-glow); }
   .rcta__submit:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .rcta__submit:disabled { opacity: 0.7; cursor: default; }
+  /* Estado completado: el botón pasa a ser el acuse de recibo. Teal limpio (borde
+     de un píxel por sombra interior, sin halo difuso) y a plena opacidad, porque
+     sigue deshabilitado pero ya no es un estado "apagado". El borde oro se apaga
+     para que no queden dos anillos. La pila de rótulos y el trazo del check los
+     aporta BtnStates. El duplicado con `:disabled` es redundante (empata con la
+     regla de arriba y ya gana por orden de fuente); se deja como blindaje. */
+  .rcta__submit[data-state='done'],
+  .rcta__submit[data-state='done']:disabled {
+    background: var(--accent-teal-dim); color: var(--accent-teal);
+    border-color: transparent; box-shadow: inset 0 0 0 1px var(--accent-teal-line);
+    opacity: 1; cursor: default;
+  }
 
   .rcta__status { margin: 0; font-size: var(--text-xs); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); }
   .rcta__status--err { background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); color: #e07a7a; }
@@ -185,8 +204,9 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
         return;
       }
 
-      const orig = btn.textContent || '';
-      btn.disabled = true; btn.textContent = S.sending || 'Enviando…';
+      // Los rótulos del botón los pinta BtnStates: aquí SOLO se conmuta el
+      // atributo. Reescribir textContent borraría el marcado del componente.
+      btn.disabled = true; btn.dataset.state = 'sending';
       const ctrl = new AbortController();
       const timer = window.setTimeout(() => ctrl.abort(), 15000);
       try {
@@ -194,13 +214,12 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data), signal: ctrl.signal,
         });
-        window.clearTimeout(timer);
         let payload: any = null;
         try { payload = await res.json(); } catch (_) { /* ignore */ }
         if (!res.ok || !payload || !payload.ok) {
           errBox.textContent = (payload && payload.error) || S.error || 'Error.';
           errBox.hidden = false;
-          btn.disabled = false; btn.textContent = orig;
+          btn.disabled = false; delete btn.dataset.state;
           delete form.dataset.busy;
           return;
         }
@@ -210,14 +229,18 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
         okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
         okBox.hidden = false;
         form.querySelectorAll('input').forEach((el) => (el.disabled = true));
-        btn.textContent = '✓';
+        // El botón queda deshabilitado y con la piel del estado completado.
+        btn.dataset.state = 'done';
         delete form.dataset.busy;
       } catch (_) {
-        window.clearTimeout(timer);
         errBox.textContent = S.error || 'Error de red.';
         errBox.hidden = false;
-        btn.disabled = false; btn.textContent = orig;
+        btn.disabled = false; delete btn.dataset.state;
         delete form.dataset.busy;
+      } finally {
+        // En el `finally`, no al resolver el fetch: así la guarda cubre también la
+        // lectura del cuerpo y un stream estancado no deja el botón en "Enviando…".
+        window.clearTimeout(timer);
       }
     });
   }

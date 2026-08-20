@@ -8,6 +8,7 @@ import Layout from '../layouts/Layout.astro';
 import SiteNav from '../components/layout/SiteNav.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import Kicker from '../components/ui/Kicker.astro';
+import BtnStates from '../components/ui/BtnStates.astro';
 import { content } from '../i18n/content';
 import { clusterNav } from '../i18n/clusters';
 
@@ -360,22 +361,23 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
 
         <!-- ═══ SUBMIT ═══ -->
         <div class="brief-submit-bar">
-          <button type="submit" class="brief-submit" id="brief-submit">
-            <span class="brief-submit__label">Enviar Brief</span>
-            <span class="brief-submit__loading">Enviando…</span>
+          <button type="submit" class="brief-submit bstate" id="brief-submit">
+            <BtnStates sending="Enviando…" done="Recibido">Enviar Brief</BtnStates>
           </button>
         </div>
 
         <div class="brief-result brief-result--ok" id="brief-success" hidden role="status" aria-live="polite">
           <p class="brief-result__title">¡Brief recibido!</p>
-          <p>Tu brief fue registrado con el ID <strong id="brief-success-id">MRC-XXX</strong>. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+          <!-- La frase del folio vive en su propio <span> y arranca oculta: si la API no
+               devuelve projectId, se queda fuera y no deja un hueco en medio del texto. -->
+          <p><span id="brief-success-ref" hidden>Tu brief fue registrado con el ID <strong id="brief-success-id"></strong>. </span>Un asesor de Marcyan te contactará en menos de 1 hora hábil.</p>
         </div>
         <div class="brief-result brief-result--err" id="brief-error" hidden role="alert" aria-live="assertive">
           <p id="brief-error-msg">Hubo un error al enviar el formulario. Intenta de nuevo.</p>
         </div>
       </form>
 
-      <p class="brief__note">Tu información es completamente confidencial. Este brief nos permite crear una propuesta personalizada sin compromisos. Un asesor de Marcyan te contactará en menos de 24 horas.</p>
+      <p class="brief__note">Tu información es completamente confidencial. Este brief nos permite crear una propuesta personalizada sin compromisos. Un asesor de Marcyan te contactará en menos de 1 hora hábil.</p>
     </div>
   </main>
 
@@ -481,9 +483,16 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
   .brief-submit:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }
   .brief-submit:active { transform: scale(0.99); }
   .brief-submit:disabled { opacity: 0.7; cursor: default; }
-  .brief-submit__loading { display: none; }
-  .brief-submit.is-loading .brief-submit__label { display: none; }
-  .brief-submit.is-loading .brief-submit__loading { display: inline; }
+  /* Piel del estado completado (la mecánica de los tres rótulos la pone BtnStates).
+     El duplicado con :disabled es redundante: empata en especificidad con la regla
+     :disabled de arriba y ya ganaría por orden de fuente. Se deja como blindaje
+     explícito por si algún día se reordena el bloque. */
+  .brief-submit[data-state='done'],
+  .brief-submit[data-state='done']:disabled {
+    background: var(--accent-teal-dim); color: var(--accent-teal);
+    box-shadow: inset 0 0 0 1px var(--accent-teal-line);
+    opacity: 1; cursor: default;
+  }
 
   /* ── Mensajes ── */
   .brief-result { padding: var(--space-5); border-radius: var(--radius-md); font-size: var(--text-sm); }
@@ -518,6 +527,7 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
 
     const button = document.getElementById('brief-submit') as HTMLButtonElement | null;
     const success = document.getElementById('brief-success') as HTMLElement | null;
+    const successRef = document.getElementById('brief-success-ref') as HTMLElement | null;
     const successId = document.getElementById('brief-success-id') as HTMLElement | null;
     const errorBox = document.getElementById('brief-error') as HTMLElement | null;
     const errorMsg = document.getElementById('brief-error-msg') as HTMLElement | null;
@@ -557,10 +567,19 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
       }
     }
 
+    // Un solo atributo manda sobre el botón: data-state ("" | sending | done).
+    // Nada de textContent, que borraría el marcado interno de <BtnStates>.
     function setLoading(on: boolean) {
       if (!button) return;
       button.disabled = on;
-      button.classList.toggle('is-loading', on);
+      if (on) button.dataset.state = 'sending';
+      else delete button.dataset.state;
+    }
+
+    function setDone() {
+      if (!button) return;
+      button.dataset.state = 'done';
+      button.disabled = true;
     }
 
     form.addEventListener('submit', async (ev) => {
@@ -575,11 +594,23 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
       if (err) { showError(err); return; }
 
       setLoading(true);
+
+      // Timeout de red. Sin esto, un endpoint colgado dejaba el botón en "Enviando…"
+      // para siempre, sin salida para el usuario.
+      // 30s, no 15s: /api/brief espera DOS envíos de Resend (con tope propio de 8s
+      // cada uno) más cuatro consultas a Neon y el posible arranque en frío. Cortar
+      // por debajo de su peor caso es peor que no cortar, porque el servidor ya
+      // insertó el brief y ya mandó los correos: el reenvío duplicaría el folio.
+      // El clearTimeout va en el `finally` para que la guarda cubra también la
+      // lectura del cuerpo, no solo la llegada de las cabeceras.
+      const ctrl = new AbortController();
+      const timer = window.setTimeout(() => ctrl.abort(), 30000);
       try {
         const res = await fetch('/api/brief', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
+          signal: ctrl.signal,
         });
 
         let payload: any = null;
@@ -591,19 +622,34 @@ const previousAgency = [{ v: 'si', l: 'Sí' }, { v: 'no', l: 'No, primera vez' }
           return;
         }
 
-        // Éxito — mostrar mensaje y bloquear el form
+        // Éxito. Mostrar mensaje y bloquear el form.
         if (errorBox) errorBox.hidden = true;
         if (success) {
-          if (successId) successId.textContent = payload.projectId || '';
+          // El folio solo se pinta si la API lo devolvió; si no, la frase entera se
+          // queda oculta y el mensaje pasa directo a la promesa de contacto.
+          const ref = String(payload.projectId ?? '').trim();
+          if (successId) successId.textContent = ref;
+          if (successRef) successRef.hidden = !ref;
           success.hidden = false;
           success.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         form.querySelectorAll('input, textarea, select, button').forEach((el) => {
           (el as HTMLInputElement).disabled = true;
         });
-      } catch (e) {
-        showError('No pudimos conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        // Cierra el estado del botón: sin esto se quedaba en "Enviando…" indefinidamente
+        // mientras el cuadro verde ya decía "¡Brief recibido!".
+        setDone();
+      } catch (e: any) {
+        // Un abort NO es un fallo de conexión: para cuando salta, el servidor pudo
+        // haber guardado el brief y mandado los correos. Decirle "intenta de nuevo"
+        // le crearía un segundo folio MRC y un segundo par de correos, así que aquí
+        // se le pide justo lo contrario.
+        showError(e && e.name === 'AbortError'
+          ? 'Está tardando más de lo normal. Si te llega el correo de confirmación, tu brief ya quedó registrado: no lo envíes otra vez. Si no llega, llámanos o escríbenos.'
+          : 'No pudimos conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
         setLoading(false);
+      } finally {
+        window.clearTimeout(timer);
       }
     });
   }

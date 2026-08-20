@@ -51,5 +51,17 @@ const Tag = href ? 'a' : 'button';
   .btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; box-shadow: none; }
   .btn:disabled:hover { transform: none; }
 
+  /* Estado completado: el botón se convierte en el acuse de recibo. Teal limpio
+     (borde de un píxel por sombra interior, sin halo difuso) y a plena opacidad,
+     porque sigue deshabilitado pero ya no es un estado "apagado". La pila de
+     rótulos y el trazo del check los aporta BtnStates. Va al final del bloque
+     para ganarle a las variantes por orden de fuente. */
+  .btn[data-state='done'],
+  .btn[data-state='done']:disabled {
+    background: var(--accent-teal-dim); color: var(--accent-teal);
+    box-shadow: inset 0 0 0 1px var(--accent-teal-line);
+    opacity: 1; cursor: default;
+  }
+
   @media (--motion-reduce) { .btn:active { transform: none; } }
 </style>

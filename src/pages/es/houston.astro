@@ -567,6 +567,9 @@ const splitPrice = (p?: string) =>
   .reassure__txt {
     text-align: center; font-family: var(--font-mono); font-size: var(--text-xs);
     letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    /* `balance` para que en móvil las líneas queden parejas y no caiga una
+       última línea con una sola palabra suelta. */
+    text-wrap: balance;
   }
   .finale :global(.ctaband.section) { padding-block-end: var(--space-6); }
   .finale :global(.contact.section) { padding-block-start: var(--space-6); }

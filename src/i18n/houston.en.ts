@@ -45,7 +45,7 @@ export const houstonHub = {
     h1: 'Web design in <em>Houston</em>',
     sub: 'One bilingual studio for your website, your AI, and your SEO, with public pricing.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
-    microcopy: 'Reply in under 24h · No commitment',
+    microcopy: 'Reply in 1 business hour · No commitment',
     explore: { label: 'See services and pricing ↓', href: '#servicios' },
     telemetry: [
       { label: 'Direct line', value: nap.houston, href: telHref, live: true },
@@ -158,9 +158,13 @@ export const houstonHub = {
     secondary: { label: `Call us: ${nap.houston}`, href: telHref },
     tone: 'gold' as const,
   },
-  // Micro-reassurance (slim row between the CTA and the form) — claims verbatim
-  // from this page's FAQ, no new guarantees invented.
-  reassure: 'Reply in under 24h · No commitment · Price in writing before we start',
+  // Micro-reassurance (slim row between the CTA and the form). "Price in writing"
+  // is verbatim from this page's FAQ; the reply window is the site-wide contact
+  // commitment (same as the emails and the chat), not a claim specific to this
+  // landing. It names BOTH windows on purpose: the cta.sub right above promises
+  // the proposal in 24 hours, and without disambiguating they read as
+  // contradictory numbers. Reply = contact · Proposal = deliverable.
+  reassure: 'Reply in 1 business hour · Free proposal in 24h · Price in writing before we start',
   // ItemList (schema) — the services offered in Houston, each to its landing.
   itemList: [
     { name: 'Web Design in Houston', path: '/en/houston/web-design' },

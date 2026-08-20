@@ -1,0 +1,78 @@
+---
+// Pila de estados para un botón de envío: reposo → enviando → completado.
+//
+// CONTRATO: el botón anfitrión lleva la clase `bstate` y se conmuta con un solo
+// atributo, `data-state` ("" | "sending" | "done"). Nada de textContent: el JS
+// que reescribía la etiqueta borraba el marcado interno y llegó a meter la frase
+// entera de éxito dentro del botón.
+//
+// Los tres rótulos se apilan en la MISMA celda de grid, así que el botón nunca
+// cambia de ancho ni de alto al cambiar de estado: solo animan opacity, transform
+// y el trazo del check. Cero reflow.
+//
+// Exactamente un rótulo está `visible` a la vez; los otros van en
+// `visibility: hidden`, que además los saca del árbol de accesibilidad. Por eso
+// el nombre accesible del botón siempre es el del estado actual, y por eso los
+// rótulos NO llevan aria-hidden (solo lo lleva el svg, que es decorativo).
+//
+// Los estilos van en `is:global` scopeados a mano bajo `.bstate` porque el
+// anfitrión puede ser el componente Button (otro scope de Astro) o un <button>
+// propio de la página. Misma convención documentada en ChatWidget.
+interface Props {
+  /** Rótulo mientras la petición está en vuelo. */
+  sending: string;
+  /** Rótulo corto del estado completado. El folio va en el mensaje, no aquí. */
+  done: string;
+}
+const { sending, done } = Astro.props;
+---
+<span class="bst">
+  <span class="bst__s bst__s--idle"><slot /></span>
+  <span class="bst__s bst__s--sending">{sending}</span>
+  <span class="bst__s bst__s--done">
+    <svg class="bst__check" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5" /></svg>{done}
+  </span>
+</span>
+
+<style is:global>
+  .bst { display: grid; align-items: center; justify-items: center; }
+
+  .bst__s {
+    grid-area: 1 / 1;
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    opacity: 0; transform: translateY(4px); visibility: hidden;
+    /* `visibility` NO se transiciona a propósito: es lo que saca al rótulo del
+       árbol de accesibilidad, y si dependiera del reloj de animación (un retardo
+       para encadenar el fundido de salida) bastaría con que el navegador no
+       produjera fotogramas para dejar dos rótulos expuestos a la vez y que el
+       nombre accesible del botón acabara siendo "Enviando… Recibido".
+       Entra el rótulo nuevo con fundido, el viejo se retira en seco. */
+    transition: opacity var(--duration-base) var(--ease-out-expo),
+                transform var(--duration-base) var(--ease-out-expo);
+  }
+
+  /* Exactamente un rótulo visible. El reposo es "sin atributo" porque el JS
+     hace `delete btn.dataset.state`; se acepta también la cadena vacía. */
+  .bstate:not([data-state]) .bst__s--idle,
+  .bstate[data-state=''] .bst__s--idle,
+  .bstate[data-state='sending'] .bst__s--sending,
+  .bstate[data-state='done'] .bst__s--done {
+    opacity: 1; transform: none; visibility: visible;
+  }
+
+  /* El check se dibuja solo: longitud del trazo ≈ 23 unidades del viewBox.
+     Mismo patrón que ScoreRing (transición sobre stroke-dashoffset, sin keyframes). */
+  .bst__check { flex: 0 0 auto; }
+  .bst__check path {
+    fill: none; stroke: currentColor; stroke-width: 2.25;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 23; stroke-dashoffset: 23;
+    transition: stroke-dashoffset var(--duration-slow) var(--ease-out-expo) var(--duration-fast);
+  }
+  .bstate[data-state='done'] .bst__check path { stroke-dashoffset: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bst__s { transition: none; }
+    .bst__check path { transition: none; stroke-dashoffset: 0; }
+  }
+</style>

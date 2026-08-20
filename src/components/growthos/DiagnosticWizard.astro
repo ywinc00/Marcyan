@@ -5,6 +5,7 @@
 // se captura aquí y se postea a /api/diagnostic; nunca toca el modelo del reporte.
 import { GOS } from '../../i18n/growth-os';
 import Icon from '../ui/Icon.astro';
+import BtnStates from '../ui/BtnStates.astro';
 import ScoreRing from './ScoreRing.astro';
 import ScoreBars from './ScoreBars.astro';
 import ScanSequence from './ScanSequence.astro';
@@ -169,7 +170,12 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
               </label>
             </div>
             <p class="dgw__err" data-claim-err role="alert" hidden></p>
-            <button type="submit" class="dgw__btn dgw__btn--gold dgw__btn--wide" data-claim-btn>{t.claimBtn}</button>
+            <!-- `done` es obligatorio en BtnStates, pero este botón NUNCA llega a ese
+                 estado: al tener éxito se sustituye el panel entero por el de éxito, así
+                 que el check no se vería. Le pasamos el mismo rótulo de reposo. -->
+            <button type="submit" class="dgw__btn dgw__btn--gold dgw__btn--wide bstate" data-claim-btn>
+              <BtnStates sending={t.claimBtnSending} done={t.claimBtn}>{t.claimBtn}</BtnStates>
+            </button>
           </form>
         </div>
       </div>
@@ -259,11 +265,25 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
     font-family: var(--font-body); font-size: var(--text-sm); cursor: pointer;
     transition: transform var(--duration-base) var(--ease), box-shadow var(--duration-base) var(--ease), border-color var(--duration-base) var(--ease); }
   .dgw__btn--gold { background: var(--accent-gold); color: var(--fg-inverse); margin-left: auto; }
-  .dgw__btn--gold:hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+  /* La guarda :not(:disabled) es la que impide que el botón se "levante" al pasar
+     el ratón mientras está inerte enviando. */
+  .dgw__btn--gold:not(:disabled):hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
   .dgw__btn--ghost { background: transparent; color: var(--fg-secondary); border-color: var(--border); }
-  .dgw__btn--ghost:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .dgw__btn--ghost:not(:disabled):hover { border-color: var(--border-accent); color: var(--fg-primary); }
   .dgw__btn--wide { width: 100%; margin-left: 0; }
-  .dgw__btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--accent-teal-line); }
+
+  /* Estado deshabilitado — mismo lenguaje que Button.astro. Sin esto el botón oro se
+     veía IDÉNTICO deshabilitado que habilitado (pinta su propio fondo, así que el gris
+     por defecto del navegador nunca se aplicaba) y en red lenta el visitante pulsaba
+     dos veces creyendo que no había pasado nada. */
+  .dgw__btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; box-shadow: none; }
+
+  /* El foco se pinta con `outline`, no con `box-shadow`. Con box-shadow, la regla
+     de hover (más específica desde que lleva `:not(:disabled)`) le pisaba la sombra
+     al anillo y el botón se quedaba SIN indicador de foco visible cuando estaba
+     enfocado por teclado y el puntero descansaba encima. `outline` no compite con
+     `box-shadow`, así que el anillo es inmune a esa pelea de especificidad. */
+  .dgw__btn:focus-visible { outline: 2px solid var(--accent-teal-line); outline-offset: 2px; }
 
   .dgw__err { margin: var(--space-4) 0 0; color: #d98b8b; font-size: var(--text-sm); }
 
@@ -560,6 +580,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
       const phone = (fd.get('phone') || '').toString().trim();
       if (!email && !phone) { fail(claimErr, ERR.contact); return; }
       claimBtn.disabled = true;
+      claimBtn.dataset.state = 'sending';
       let data = null, status = 0;
       try {
         const r = await fetch('/api/diagnostic', {
@@ -572,7 +593,11 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
         status = r.status;
         data = await r.json().catch(() => null);
       } catch {}
+      // Volvemos a reposo siempre, no solo al fallar. Al tener éxito el cambio de panel
+      // ocurre en esta misma tarea, sin repintado intermedio, así que no se ve parpadeo;
+      // y si el visitante reinicia el diagnóstico el botón no se queda en "Enviando…".
       claimBtn.disabled = false;
+      delete claimBtn.dataset.state;
       if (!data || !data.ok) { fail(claimErr, status === 429 ? ERR.rate : (status === 400 ? ERR.contact : ERR.net)); return; }
       track('diagnostic_claimed');
       showView('success');

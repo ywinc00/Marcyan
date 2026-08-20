@@ -1,49 +1,25 @@
 {
-  "builtAt": "2026-08-19T15:22:21.999Z",
+  "builtAt": "2026-08-20T14:31:40.867Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 54,
-    "notIndexed": 13,
-    "skipped": 17
+    "indexed": 59,
+    "notIndexed": 9,
+    "skipped": 16
   },
-  "candidates": 13,
+  "candidates": 9,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/precios",
-      "coverageState": "Discovered - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/en/houston/contractors",
-      "coverageState": "Discovered - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/en/houston/restaurants",
-      "coverageState": "Discovered - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/es/houston/branding",
-      "coverageState": "Discovered - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
       "url": "https://marcyanstudio.com/es/houston/ecommerce",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
     {
       "url": "https://marcyanstudio.com/es/houston/ia-conversacional",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
@@ -56,6 +32,30 @@
     {
       "url": "https://marcyanstudio.com/es/houston/seo-para-ia",
       "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/ia-para-pymes",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/privacidad",
+      "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/terminos",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     }

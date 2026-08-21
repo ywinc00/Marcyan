@@ -1,0 +1,444 @@
+---
+// HERO DE CIUDAD · "Aproximación" — bespoke del hub /es/miami.
+// Torre de control MIA: una mesa de aproximación inclinada en perspectiva CSS
+// real (cuadrícula + anillos + silueta FL + barrido de radar) sobre la que se
+// levantan "señales" (búsquedas en español, decorativas). El H1 entra línea a
+// línea con máscara (overflow hidden), técnica adaptada de la referencia del
+// dueño; la voz terminal/glitch de esa referencia NO se copia (identidad ajena).
+//
+// COMPÁS DE SCROLL (solo ≥lg y con motion-ok): la sección mide 132vh y el
+// interior es sticky 100vh. Un listener rAF escribe --p (0→1) y el CSS lo usa
+// para asentar la mesa y acoplar el riel de telemetría. Degradación honesta:
+// sin JS, en móvil o con reduced-motion, --p=1 → estado final estable, sin pin
+// raro ni contenido oculto. (Trampa conocida: nada de transform/backdrop-filter
+// en ancestros del sticky — ver memoria del menú móvil.)
+//
+// Todo decorativo va aria-hidden; las señales NO son datos en vivo (son
+// ejemplos de búsqueda) y por eso viven en la capa decorativa.
+import Button from '../../ui/Button.astro';
+import Kicker from '../../ui/Kicker.astro';
+import type { CityTelemetryCell } from './CityHero.astro';
+
+export interface MiaSignal {
+  /** búsqueda de ejemplo, con comillas angulares incluidas. */
+  q: string;
+  /** meta mono corta, p.ej. "Doral · hace 1 min". */
+  meta: string;
+}
+
+interface Props {
+  /** Kicker mono, p.ej. "Agencia hispana · Miami, FL". */
+  kicker: string;
+  /** H1 partido en líneas VISUALES (máscara). OJO: la 1ª línea lleva espacio
+   *  final para que el textContent concatenado siga siendo la keyword exacta. */
+  h1Lines: string[];
+  sub: string;
+  primary: { label: string; href: string };
+  microcopy: string;
+  explore: { label: string; href: string };
+  telemetry: CityTelemetryCell[];
+  senales: MiaSignal[];
+}
+const { kicker, h1Lines, sub, primary, microcopy, explore, telemetry, senales } = Astro.props;
+
+// Silueta de Florida — misma derivada de GeoJSON público que Locations.astro.
+const FL_SHAPE = {
+  viewBox: '0 0 100 86.4',
+  path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z',
+};
+---
+<section class="miahero" id="miahero">
+  <div class="miahero__pin">
+    {/* ── ESCENA (decorativa pura) ─────────────────────────────── */}
+    <div class="miahero__scene" aria-hidden="true">
+      {/* circuitos de aproximación: trazos angulares fluyendo hacia la mesa */}
+      <svg class="miahero__traces" viewBox="0 0 1280 880" preserveAspectRatio="xMidYMid slice">
+        <path class="miahero__trace miahero__trace--g1" d="M0 190 H240 L300 250 H520" />
+        <path class="miahero__trace miahero__trace--g2" d="M1280 150 H1020 L950 220 H790" />
+        <path class="miahero__trace miahero__trace--t1" d="M0 620 H180 L260 540 H430" />
+        <path class="miahero__trace miahero__trace--t2" d="M1280 660 H1080 L990 580 H840" />
+        <path class="miahero__trace miahero__trace--g3" d="M0 420 H150 L210 470 H340" />
+      </svg>
+
+      {/* mesa de aproximación en perspectiva */}
+      <div class="miahero__persp">
+        <div class="miahero__table">
+          <div class="miahero__grid"></div>
+          <div class="miahero__ring miahero__ring--1"></div>
+          <div class="miahero__ring miahero__ring--2"></div>
+          <div class="miahero__ring miahero__ring--3"></div>
+          <svg class="miahero__fl" viewBox={FL_SHAPE.viewBox}><path d={FL_SHAPE.path} /></svg>
+          <div class="miahero__sweep">
+            <div class="miahero__cone"></div>
+            <div class="miahero__beam"></div>
+          </div>
+          <div class="miahero__core"></div>
+        </div>
+      </div>
+
+      {/* señales: búsquedas de ejemplo levantándose de la mesa */}
+      <div class="miahero__signals">
+        {senales.map((s, i) => (
+          <div class={`miahero__sig miahero__sig--${i + 1}`}>
+            <span class="miahero__sigcard">
+              <span class="miahero__sigq">{s.q}</span>
+              <span class="miahero__sigmeta">{s.meta}</span>
+            </span>
+            <span class="miahero__stalk"></span>
+          </div>
+        ))}
+      </div>
+
+      {/* viñeta de legibilidad tras el copy */}
+      <div class="miahero__veil"></div>
+
+      {/* HUD de esquinas */}
+      <span class="miahero__hud miahero__hud--tl">APROXIMACIÓN · MIA</span>
+      <span class="miahero__hud miahero__hud--tr">25.7617° N · 80.1918° W</span>
+      <span class="miahero__hud miahero__hud--bl">BARRIDO · 8.0 S</span>
+      <span class="miahero__hud miahero__hud--br">MIAMI-DADE · ÁREA DE SERVICIO</span>
+    </div>
+
+    {/* ── CIELO: mensaje ───────────────────────────────────────── */}
+    <div class="container miahero__skywrap">
+      <div class="miahero__sky">
+        <slot name="breadcrumb" />
+        <Kicker>{kicker}</Kicker>
+        <h1 class="display miahero__h1">
+          {h1Lines.map((line) => (
+            <span class="miahero__mask"><span class="miahero__line" set:html={line} /></span>
+          ))}
+        </h1>
+        <p class="lead miahero__sub">{sub}</p>
+        <div class="miahero__dock">
+          <span class="miahero__ctawrap">
+            <span class="miahero__ctaring" aria-hidden="true"></span>
+            <Button href={primary.href} variant="primary" size="lg">{primary.label}</Button>
+          </span>
+          <p class="miahero__micro">{microcopy}</p>
+          <a class="miahero__explore" href={explore.href}>{explore.label}</a>
+        </div>
+      </div>
+    </div>
+
+    {/* ── RIEL DE TELEMETRÍA (se acopla con el compás de scroll) ── */}
+    <div class="miahero__band">
+      <div class="container">
+        <dl class="miahero__rail">
+          {telemetry.map((cell) => (
+            <div class="miahero__cell">
+              <dt class="miahero__label">{cell.label}</dt>
+              <dd class="miahero__value">
+                {cell.live && <span class="miahero__dot" aria-hidden="true"></span>}
+                {cell.href
+                  ? <a href={cell.href}>{cell.value}</a>
+                  : <span>{cell.value}</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── esqueleto + compás ── --p: 0 = recién llegado, 1 = asentado.
+     Default 1 (sin JS / móvil / reduced-motion ven el estado final). */
+  .miahero { position: relative; --p: 1; }
+  .miahero__pin {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  @media (--lg) {
+    .miahero { height: 132vh; }
+    .miahero__pin { position: sticky; top: 0; height: 100vh; }
+  }
+
+  /* ── escena ── */
+  .miahero__scene { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+
+  .miahero__traces { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .miahero__trace { fill: none; stroke-width: 1.2; stroke-dasharray: 7 11; }
+  .miahero__trace--g1 { stroke: rgba(var(--accent-gold-rgb), 0.28); }
+  .miahero__trace--g2 { stroke: rgba(var(--accent-gold-rgb), 0.22); }
+  .miahero__trace--g3 { stroke: rgba(var(--accent-gold-rgb), 0.16); stroke-width: 1; }
+  .miahero__trace--t1 { stroke: rgba(var(--accent-teal-rgb), 0.26); stroke-dasharray: 6 10; }
+  .miahero__trace--t2 { stroke: rgba(var(--accent-teal-rgb), 0.20); stroke-dasharray: 6 10; }
+
+  .miahero__persp {
+    position: absolute; inset: 0;
+    perspective: 900px; perspective-origin: 50% 30%;
+  }
+  .miahero__table {
+    position: absolute; left: 50%; top: 58%;
+    width: min(980px, 150vw); aspect-ratio: 7 / 5;
+    /* rotateX se asienta 62°→72° con el compás; translate centra. */
+    transform: translate(-50%, -50%) rotateX(calc(62deg + var(--p) * 10deg));
+    transform-style: preserve-3d;
+  }
+  .miahero__grid {
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(var(--accent-gold-rgb), 0.10) 0 1px, transparent 1px 69px),
+      repeating-linear-gradient(90deg, rgba(var(--accent-gold-rgb), 0.10) 0 1px, transparent 1px 69px);
+    -webkit-mask-image: radial-gradient(58% 58% at 50% 50%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(58% 58% at 50% 50%, #000 30%, transparent 78%);
+  }
+  .miahero__ring {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%; border: 1px solid var(--accent-gold-line);
+  }
+  .miahero__ring--1 { width: 63%; height: 88%; opacity: 0.7; }
+  .miahero__ring--2 { width: 44%; height: 61%; }
+  .miahero__ring--3 { width: 24%; height: 34%; }
+  .miahero__fl {
+    position: absolute; left: 50%; top: 50%; width: 31%;
+    transform: translate(-50%, -50%);
+  }
+  .miahero__fl path { fill: rgba(var(--accent-gold-rgb), 0.05); stroke: var(--accent-gold); stroke-width: 0.7; opacity: 0.5; }
+  .miahero__sweep {
+    position: absolute; left: 50%; top: 50%;
+    width: 63%; height: 88%; margin: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%; overflow: hidden;
+  }
+  .miahero__cone {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg at 50% 50%,
+      rgba(var(--accent-teal-rgb), 0.16) 0deg,
+      rgba(var(--accent-teal-rgb), 0.03) 40deg,
+      transparent 72deg, transparent 360deg);
+  }
+  .miahero__beam {
+    position: absolute; left: 50%; top: 0; width: 1px; height: 50%;
+    background: linear-gradient(to top, rgba(var(--accent-teal-rgb), 0.65), rgba(var(--accent-teal-rgb), 0.05));
+  }
+  .miahero__core {
+    position: absolute; left: 50%; top: 50%; width: 8px; height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%; background: var(--accent-gold);
+    box-shadow: 0 0 14px var(--accent-gold-glow);
+  }
+
+  /* señales: tarjeta mono + tallo que cae hacia la mesa */
+  .miahero__signals { position: absolute; inset: 0; }
+  .miahero__sig { position: absolute; display: flex; flex-direction: column; align-items: flex-start; opacity: 0; }
+  .miahero__sig--1 { left: 24%; top: 60%; }
+  .miahero__sig--2 { left: 60%; top: 55%; }
+  .miahero__sig--3 { left: 43%; top: 67%; }
+  .miahero__sigcard {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: var(--space-2) var(--space-3);
+    background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+    border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md);
+  }
+  .miahero__sigq { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary); white-space: nowrap; }
+  .miahero__sigmeta {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-teal);
+  }
+  .miahero__stalk {
+    width: 1px; height: 44px; margin-left: var(--space-4);
+    background: linear-gradient(to bottom, rgba(var(--accent-teal-rgb), 0.5), transparent);
+  }
+  .miahero__sig--2 .miahero__stalk { height: 52px; }
+  .miahero__sig--3 .miahero__stalk { height: 36px; }
+
+  .miahero__veil {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 46% 38% at 50% 38%,
+      color-mix(in srgb, var(--bg-base) 82%, transparent) 0%,
+      color-mix(in srgb, var(--bg-base) 55%, transparent) 46%,
+      transparent 72%);
+  }
+
+  .miahero__hud {
+    position: absolute; font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: var(--tracking-wider); color: var(--fg-subtle);
+  }
+  .miahero__hud--tl { left: var(--container-pad); top: calc(var(--nav-h) + var(--space-4)); }
+  .miahero__hud--tr { right: var(--container-pad); top: calc(var(--nav-h) + var(--space-4)); text-align: right; }
+  .miahero__hud--bl { left: var(--container-pad); bottom: var(--space-4); }
+  .miahero__hud--br { right: var(--container-pad); bottom: var(--space-4); text-align: right; }
+
+  /* ── cielo ── */
+  .miahero__skywrap { position: relative; z-index: 1; flex: 1 0 auto; display: flex; min-width: 0; }
+  .miahero__sky {
+    width: 100%; max-width: 60rem; margin: auto;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: var(--space-5); min-width: 0;
+    padding-block: calc(var(--nav-h) + var(--space-8)) var(--space-8);
+  }
+  .miahero__h1 { max-width: 16ch; }
+  .miahero__h1 :global(em) { color: var(--accent-gold); font-style: normal; }
+  .miahero__mask { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .miahero__line { display: block; }
+  .miahero__sub { max-width: 46ch; color: var(--fg-secondary); }
+
+  .miahero__dock {
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--space-3); margin-top: var(--space-2); min-width: 0;
+  }
+  .miahero__ctawrap { position: relative; display: inline-flex; }
+  .miahero__ctaring {
+    position: absolute; inset: 0; border-radius: var(--radius-md);
+    border: 1px solid rgba(var(--accent-gold-rgb), 0.55); opacity: 0;
+  }
+  .miahero__micro {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    text-wrap: balance;
+  }
+  .miahero__explore {
+    display: inline-flex; align-items: center; min-height: var(--tap-min);
+    padding-inline: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .miahero__explore:hover, .miahero__explore:focus-visible { color: var(--accent-gold); }
+
+  /* ── riel de telemetría (patrón CityHero) — se acopla con --p ── */
+  .miahero__band {
+    position: relative; z-index: 1;
+    border-block: 1px solid var(--border-subtle);
+    background: color-mix(in srgb, var(--bg-base) 72%, transparent);
+    opacity: calc(0.25 + var(--p) * 0.75);
+    transform: translateY(calc((1 - var(--p)) * 24px));
+  }
+  .miahero__rail {
+    margin: 0;
+    display: grid; grid-template-columns: 1fr;
+    gap: var(--space-4) var(--space-5);
+    padding-block: var(--space-4);
+  }
+  .miahero__cell { min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+  .miahero__label {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--fg-secondary);
+  }
+  .miahero__value {
+    margin: 0; min-width: 0;
+    display: flex; align-items: center; gap: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums; color: var(--fg-primary);
+    overflow-wrap: anywhere;
+  }
+  .miahero__value a {
+    position: relative; color: inherit; min-width: 0;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .miahero__value a::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: var(--tap-min); transform: translateY(-50%);
+  }
+  .miahero__value a:hover, .miahero__value a:focus-visible { color: var(--accent-gold); }
+  .miahero__dot {
+    width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--accent-teal);
+  }
+
+  /* ── responsive de la escena ── */
+  @media (--lt-md) {
+    .miahero__table { top: 66%; width: 170vw; }
+    .miahero__sig--3 { display: none; }
+    .miahero__sig--1 { left: 6%; top: 62%; }
+    .miahero__sig--2 { left: 52%; top: 56%; }
+    .miahero__sigq { font-size: var(--text-xs); }
+    .miahero__hud--tr, .miahero__hud--bl { display: none; }
+  }
+  @media (--md) {
+    .miahero__rail {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-6); padding-block: var(--space-5);
+    }
+  }
+  @media (--lg) {
+    .miahero__rail {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: var(--space-6);
+    }
+    .miahero__cell { flex: 0 1 auto; }
+  }
+
+  /* ── motion: entrada UNA vez + bucles suaves; todo muere en reduce ── */
+  @media (--motion-ok) {
+    .miahero__line { transform: translateY(115%); animation: miahero-rise 700ms var(--ease-out-expo) both; }
+    .miahero__mask:nth-child(2) .miahero__line { animation-delay: 100ms; }
+    .miahero__mask:nth-child(3) .miahero__line { animation-delay: 230ms; }
+    .miahero__sub { animation: miahero-in 600ms var(--ease-out-expo) 420ms both; }
+    .miahero__dock { animation: miahero-in 600ms var(--ease-out-expo) 560ms both; }
+    .miahero__scene { animation: miahero-fade 1200ms var(--ease-out-expo) 300ms both; }
+    .miahero__sweep { animation: miahero-spin 8s linear infinite; }
+    .miahero__trace { animation: miahero-flow 9s linear infinite; }
+    .miahero__trace--g2 { animation-duration: 11s; }
+    .miahero__trace--t1 { animation-duration: 8s; }
+    .miahero__trace--t2 { animation-duration: 10s; }
+    .miahero__trace--g3 { animation-duration: 13s; }
+    .miahero__sig { animation: miahero-blip 8s linear infinite; }
+    .miahero__sig--1 { animation-delay: 1.2s; }
+    .miahero__sig--2 { animation-delay: 3.9s; }
+    .miahero__sig--3 { animation-delay: 6.4s; }
+    .miahero__ctaring { animation: miahero-ring 2.6s var(--ease-out-expo) 1.4s infinite; }
+    .miahero__dot { animation: miahero-pulse 2.4s var(--ease-out-expo) infinite; }
+  }
+  @keyframes miahero-rise { from { transform: translateY(115%); } to { transform: translateY(0); } }
+  @keyframes miahero-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes miahero-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes miahero-spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes miahero-flow { to { stroke-dashoffset: -800px; } }
+  @keyframes miahero-blip {
+    0% { opacity: 0; transform: translateY(6px); }
+    4% { opacity: 1; transform: translateY(0); }
+    46% { opacity: 1; }
+    56% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  @keyframes miahero-ring {
+    0% { opacity: 0.45; transform: scale(1); }
+    70% { opacity: 0; transform: scale(1.14); }
+    100% { opacity: 0; transform: scale(1.14); }
+  }
+  @keyframes miahero-pulse {
+    0% { box-shadow: 0 0 0 0 var(--accent-teal); }
+    70% { box-shadow: 0 0 0 6px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (--motion-reduce) {
+    .miahero { --p: 1 !important; }
+    .miahero__line, .miahero__sub, .miahero__dock, .miahero__scene,
+    .miahero__sweep, .miahero__trace, .miahero__ctaring, .miahero__dot { animation: none; }
+    /* sin bucle, las señales quedan visibles como composición fija */
+    .miahero__sig { animation: none; opacity: 1; }
+    .miahero__sig--3 { opacity: 0; }
+  }
+</style>
+
+<script>
+  // Compás de scroll: escribe --p (0→1) mientras el hero fijado se recorre.
+  // Solo actúa en ≥1024px con motion-ok; en el resto el CSS ya está en --p:1.
+  // Lectura en rAF (1 getBoundingClientRect por frame como mucho); passive.
+  const hero = document.getElementById('miahero');
+  if (hero) {
+    const mqLg = window.matchMedia('(min-width: 1024px)');
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if (!mqLg.matches || mqReduce.matches) { hero.style.removeProperty('--p'); return; }
+      const total = hero.offsetHeight - window.innerHeight;
+      if (total <= 0) { hero.style.removeProperty('--p'); return; }
+      const p = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
+      hero.style.setProperty('--p', p.toFixed(4));
+    };
+    const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    mqLg.addEventListener('change', queue);
+    mqReduce.addEventListener('change', queue);
+  }
+</script>

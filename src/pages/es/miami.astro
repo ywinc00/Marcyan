@@ -1,23 +1,27 @@
 ---
-// HUB DE CIUDAD · /es/miami — LANDING PRINCIPAL de Miami (Ola 2 · B3).
-// Espejo de Houston en FUERZA: página POTENTE nivel home (DESIGN.md §2/§5).
-// Hero de aterrizaje (variant 'landing') + un SHOWCASE de ciudad bespoke que
-// inyecta identidad local (palmera/skyline + silueta FL + coords + tagline
-// "Magic City"), reusando el LENGUAJE visual de Locations.astro, y el conmutador
-// de servicios ×Miami. Luego: AnswerBlock (AEO), barrios, contexto local (Prose),
-// related, FAQ, CtaBand, Contact. Schema: ItemList de los servicios + Breadcrumb.
-// El @graph base ya da la ProfessionalService de Miami. ES por ahora (hasEn=false).
-// Honestidad DURA: SIN clientes locales en Miami → nada de proof de Miami aquí.
+// HUB DE CIUDAD · /es/miami — LANDING PRINCIPAL de Miami (rediseño "Aproximación").
+// Espejo en FUERZA del patrón premium de Houston (DESIGN.md §2/§5), con hero
+// bespoke propio:
+//   1. MiamiApproachHero (torre de control MIA: mesa en perspectiva + radar +
+//      señales + H1 por líneas + compás de scroll + riel de telemetría),
+//   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 2 filas),
+//   3. GrowthCta (calculadoras) — Growth OS integrado,
+//   4. Ficha Miami (contexto local honesto + riel NAP + barrios como pills-ruta
+//      + palmera oficial en la esquina),
+//   5. GrowthTeaser (diagnóstico gratis),
+//   6. AnswerBlock + FAQ (AEO, texto verbatim),
+//   7. Franja "Sigue explorando" slim → CtaBand → micro-reaseguro → Contact.
+// Silo intacto: 4 servicios + 2 barrios (ahora en la Ficha) + 3 related.
+// Schema (ItemList + Breadcrumb) y meta INTACTOS. Honestidad DURA: SIN clientes
+// locales en Miami → sin Projects y sin proof local inventado.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
-import Icon from '../../components/ui/Icon.astro';
 import Kicker from '../../components/ui/Kicker.astro';
-import LandingHero from '../../components/sections/LandingHero.astro';
+import Icon from '../../components/ui/Icon.astro';
+import MiamiApproachHero from '../../components/sections/city/MiamiApproachHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
-import RelatedLinks from '../../components/sections/RelatedLinks.astro';
-import Prose from '../../components/sections/Prose.astro';
 import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
@@ -25,19 +29,28 @@ import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import GrowthTeaser from '../../components/sections/GrowthTeaser.astro';
 import GrowthCta from '../../components/growthos/GrowthCta.astro';
-import { content, nap } from '../../i18n/content';
+import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { miamiHub as h } from '../../i18n/miami';
 
 const c = content.es;
-const tel = nap.miami.replace(/[^\d+]/g, '');
 
-// Silueta de Florida — geográficamente correcta (misma fuente que Locations.astro,
-// GeoJSON público). Decorativa, aria-hidden.
+// Silueta de Florida — geográficamente correcta (misma fuente que Locations).
+// En la Ficha va a COLOR PLENO en un pill de dato (14px). Decorativa.
 const FL_SHAPE = {
   viewBox: '0 0 100 86.4',
   path: 'M100 62.6L97.3 78.6L93.9 86.4L85 86L80.3 75.9L76.7 73.1L72.9 64.6L71.8 60.8L66.6 55.1L68.9 47.1L65.2 38.2L64 29.8L61 27.1L55.5 19.8L47.5 13.3L41.9 15.9L30.7 17.7L13.2 9L3.5 8.5L0 1.9L28.1 0L36.4 4.2L73.5 9.5L77.8 3.7L82.2 10.8L92.7 38.5L95.4 48.6Z',
 };
+
+// Showcase de servicios con precio: los 2 primeros = tarjetas destacadas
+// (web + IA, los pilares); los 2 restantes = filas densas con columna de precio.
+const svc = h.services.links;
+const svcFeatured = svc.slice(0, 2);
+const svcRest = svc.slice(2);
+const isBrand = (icon?: string) => icon === 'marcyan-ai';
+// Separa "desde" (label xs) de la cifra (numeral mono) del display de precio.
+const splitPrice = (p?: string) =>
+  p && p.startsWith('desde ') ? { pre: 'desde', amt: p.slice(6) } : { pre: '', amt: p ?? '' };
 ---
 <Layout
   title={h.meta.title}
@@ -51,81 +64,79 @@ const FL_SHAPE = {
   <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    <LandingHero
-      badge={h.hero.badge}
-      badgeIcon={h.hero.badgeIcon}
+    <MiamiApproachHero
       kicker={h.hero.kicker}
-      h1={h.hero.h1}
+      h1Lines={h.hero.h1Lines}
       sub={h.hero.sub}
       primary={h.hero.primary}
-      secondary={h.hero.secondary}
-      chips={h.hero.chips}
-      tone={h.hero.tone}
+      microcopy={h.hero.microcopy}
+      explore={h.hero.explore}
+      telemetry={h.hero.telemetry}
+      senales={h.hero.senales}
     >
       <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
-    </LandingHero>
+    </MiamiApproachHero>
 
-    {/* ── SHOWCASE DE CIUDAD (bespoke) ────────────────────────────────
-        Identidad local Miami (silueta FL + coords + "Magic City" + palmera)
-        a la izquierda, conmutador de servicios ×Miami a la derecha. Reusa el
-        lenguaje de Locations.astro pero es una pieza propia de esta landing,
-        para que NO se sienta una pila de paneles de enlaces. */}
-    <section class="section showcase" aria-labelledby="mia-showcase-title">
-      <div class="container showcase__inner">
-        <aside class="mia-id">
-          {/* palmera / skyline oficial — decorativo, esquina inferior */}
-          <div class="mia-id__illo" aria-hidden="true">
-            <img src="/assets/cities/miami.svg" alt="" loading="lazy" decoding="async" width="322" height="235" />
-          </div>
+    {/* ── SERVICIOS CON PRECIO ── el riel promete "precios públicos"; aquí se
+        cumple: 2 destacadas asimétricas con numeral + 2 filas con columna de
+        precio. Los 4 <a> del silo de servicios, intactos. */}
+    <section class="section svcprice" id="servicios" aria-labelledby="svcprice-title">
+      <div class="container">
+        <header class="svcprice__head">
+          <Kicker>{h.services.tag}</Kicker>
+          <h2 class="h2 svcprice__title" id="svcprice-title" set:html={h.services.title} />
+        </header>
 
-          <div class="mia-id__body">
-            <div class="mia-id__top">
-              <span class="mia-id__pin"><Icon name="lucide:map-pin" /></span>
-              <span class="mia-id__badge"><span class="mia-id__badge-dot" aria-hidden="true"></span>Área de servicio</span>
-            </div>
+        <div class="svcprice__feat">
+          {svcFeatured.map((l, i) => {
+            const p = splitPrice(l.price);
+            return (
+              <a class="pcard" href={l.href}>
+                <span class="pcard__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span class:list={['pcard__icon', isBrand(l.icon) && 'pcard__icon--brand']}>
+                  <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
+                </span>
+                <h3 class="pcard__label">{l.label}</h3>
+                <p class="pcard__desc">{l.desc}</p>
+                <span class="pcard__price">
+                  {p.pre && <span class="pcard__from">{p.pre}</span>}
+                  <span class="pcard__amt">{p.amt}</span>
+                </span>
+                <span class="pcard__go">Ver servicio <Icon name="lucide:arrow-right" /></span>
+              </a>
+            );
+          })}
+        </div>
 
-            <h2 class="mia-id__city" id="mia-showcase-title">Miami <span class="mia-id__state">FL</span></h2>
-            <p class="mia-id__tagline"><Icon name="lucide:waves" />Magic City</p>
-            <p class="mia-id__area">Miami y toda el área metropolitana de Miami-Dade.</p>
-
-            <div class="mia-id__pills">
-              <span class="mia-id__pill">
-                <svg class="mia-id__pill-ic" viewBox={FL_SHAPE.viewBox} aria-hidden="true"><path d={FL_SHAPE.path} fill="currentColor" /></svg>
-                Florida, USA
-              </span>
-              <span class="mia-id__pill"><Icon name="lucide:locate-fixed" class="mia-id__pill-ic" />25.7617° N, 80.1918° W</span>
-            </div>
-
-            <a class="mia-id__tel" href={`tel:${tel}`} data-track="call_clicked">
-              <Icon name="lucide:phone" />{nap.miami}
-            </a>
-          </div>
-        </aside>
-
-        <div class="showcase__nav">
-          <header class="showcase__head">
-            <Kicker>{h.services.tag}</Kicker>
-            <h3 class="h3 showcase__title" set:html={h.services.title} />
-            <span class="showcase__count">{h.services.links.length} servicios · todo Miami-Dade</span>
-          </header>
-
-          <ul class="svc-switch" role="list">
-            {h.services.links.map((l, i) => (
-              <li class="svc-switch__row">
-                <a class="svc-switch__link" href={l.href}>
-                  <span class="svc-switch__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span class:list={['svc-switch__chip', l.icon === 'marcyan-ai' && 'svc-switch__chip--brand']}>
+        <ul class="svcprice__rest" role="list">
+          {svcRest.map((l, i) => {
+            const p = splitPrice(l.price);
+            return (
+              <li class="svcrow">
+                <a class="svcrow__link" href={l.href}>
+                  <span class="svcrow__idx" aria-hidden="true">{String(i + 3).padStart(2, '0')}</span>
+                  <span class:list={['svcrow__icon', isBrand(l.icon) && 'svcrow__icon--brand']}>
                     <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
                   </span>
-                  <span class="svc-switch__txt">
-                    <span class="svc-switch__label">{l.label}</span>
-                    <span class="svc-switch__desc">{l.desc}</span>
+                  <span class="svcrow__txt">
+                    <span class="svcrow__label">{l.label}</span>
+                    <span class="svcrow__desc">{l.desc}</span>
                   </span>
-                  <Icon name="lucide:arrow-right" class="svc-switch__go" />
+                  <span class="svcrow__price">
+                    {p.pre && <span class="svcrow__from">{p.pre} </span>}{p.amt}
+                  </span>
+                  <Icon name="lucide:arrow-right" class="svcrow__go" />
                 </a>
               </li>
-            ))}
-          </ul>
+            );
+          })}
+        </ul>
+
+        {/* única fuga legítima de la sección: el hub de precios completo */}
+        <div class="svcprice__foot">
+          <a class="svcprice__all" href="/es/precios">
+            Ver todos los precios <Icon name="lucide:arrow-right" />
+          </a>
         </div>
       </div>
     </section>
@@ -136,197 +147,377 @@ const FL_SHAPE = {
       href="/es/herramientas"
     />
 
-    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
+    {/* ── FICHA MIAMI ── contexto local honesto (Cliente Fundador) + riel NAP
+        (dt/dd con hairlines) + barrios como pills-ruta + palmera oficial. */}
+    <section class="section ficha" aria-labelledby="ficha-title">
+      <div class="container">
+        <article class="ficha__panel">
+          {/* palmera/skyline oficial — decorativa, esquina inferior derecha */}
+          <div class="ficha__illo" aria-hidden="true">
+            <img src="/assets/cities/miami.svg" alt="" loading="lazy" decoding="async" width="322" height="235" />
+          </div>
 
-    <RelatedLinks tag={h.barrios.tag} title={h.barrios.title} links={h.barrios.links} tone="teal" />
+          <div class="ficha__body">
+            <Kicker>{h.local.tag}</Kicker>
+            <h2 class="ficha__title" id="ficha-title" set:html={h.local.title} />
+            {h.local.paragraphs.map((p) => (
+              <p class="ficha__p" set:html={p} />
+            ))}
+          </div>
 
-    <Prose
-      tag={h.local.tag}
-      title={h.local.title}
-      paragraphs={h.local.paragraphs}
-      tone={h.local.tone}
-    />
+          <aside class="ficha__rail" aria-label="Datos de contacto y cobertura en Miami">
+            <dl class="ficha__meta">
+              {h.ficha.meta.map((m) => (
+                <div class="ficha__row">
+                  <dt><Icon name={m.ic} /> {m.label}</dt>
+                  <dd>
+                    {m.href ? <a href={m.href} data-track="call_clicked">{m.value}</a> : m.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <div class="ficha__pills">
+              <span class="ficha__state">
+                <svg class="ficha__state-ic" viewBox={FL_SHAPE.viewBox} aria-hidden="true"><path d={FL_SHAPE.path} fill="currentColor" /></svg>
+                {h.ficha.statePill}
+              </span>
+            </div>
+
+            <h3 class="ficha__zonestitle" set:html={h.ficha.zonesTitle} />
+            <div class="ficha__zones">
+              {h.ficha.zones.map((z) => (
+                <a class="ficha__zone" href={z.href}>
+                  <Icon name={z.icon ?? 'lucide:map-pin'} class="ficha__zone-pin" />
+                  <span>{z.label}</span>
+                  <Icon name="lucide:arrow-right" class="ficha__zone-arr" />
+                </a>
+              ))}
+            </div>
+          </aside>
+        </article>
+      </div>
+    </section>
 
     <GrowthTeaser lang="es" city="miami" />
 
-    <RelatedLinks tag={h.related.tag} title={h.related.title} links={h.related.links} />
+    {/* respuesta AEO citable (texto/fuente VERBATIM), adyacente al FAQ */}
+    <AnswerBlock q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
     <Faq tag={h.faq.tag} title={h.faq.title} items={h.faq.items} />
 
-    <CtaBand
-      title={h.cta.title}
-      sub={h.cta.sub}
-      primary={h.cta.primary}
-      tone={h.cta.tone}
-      city="miami"
-    />
+    {/* ── SIGUE EXPLORANDO ── franja slim: los 3 related como lista inline. */}
+    <section class="explore" aria-label={h.related.tag}>
+      <div class="container explore__row">
+        <Kicker>{h.related.tag}</Kicker>
+        <ul class="explore__list" role="list">
+          {h.related.links.map((l) => (
+            <li>
+              <a class="explore__link" href={l.href}>
+                <span>{l.label}</span>
+                <Icon name="lucide:arrow-right" class="explore__arr" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
 
-    <Contact contact={c.contact} defaultCity="Miami, FL" />
+    {/* remate: CTA → micro-reaseguro → formulario (ciudad preseleccionada). */}
+    <div class="finale">
+      <CtaBand
+        title={h.cta.title}
+        sub={h.cta.sub}
+        primary={h.cta.primary}
+        tone={h.cta.tone}
+        city="miami"
+      />
+
+      <section class="reassure" aria-label="Compromisos de servicio">
+        <div class="container">
+          <p class="reassure__txt">{h.reassure}</p>
+        </div>
+      </section>
+
+      <Contact contact={c.contact} defaultCity="Miami, FL" />
+    </div>
+
+    <SpaceBackdrop tone="gold" />
   </main>
-
-  <SpaceBackdrop tone="gold" />
 
   <SiteFooter footer={c.footer} />
 </Layout>
 
 <style>
-  /* ════════════════════════════════════════════════════════════════
-     SHOWCASE DE CIUDAD — pieza bespoke (solo de esta página).
-     Tarjeta de identidad Miami (silueta FL + coords + palmera) + el
-     conmutador de servicios. Lenguaje visual heredado de Locations.astro,
-     solo con tokens del DS. Flota sobre la atmósfera SpaceBackdrop.
-     ════════════════════════════════════════════════════════════════ */
-  .showcase :global(em) { color: var(--accent-gold); font-style: normal; }
+  /* ════════ SERVICIOS CON PRECIO (bespoke, patrón Houston) ════════
+     El precio vive en su propio slot: numeral mono en --fg-primary que solo se
+     dora en hover (disciplina de acento). Chips de icono NEUTROS. */
+  .svcprice :global(em) { color: var(--accent-gold); font-style: normal; }
+  .svcprice__head { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .svcprice__title { max-width: 20ch; }
 
-  .showcase__inner {
-    display: grid; grid-template-columns: 1fr; gap: var(--space-5);
-    align-items: stretch; min-width: 0;
+  /* destacadas: asimetría 1.4fr/1fr en desktop (jerarquía real, no gemelas) */
+  .svcprice__feat { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-5); }
+
+  .pcard {
+    position: relative; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column; gap: var(--space-3);
+    padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    background:
+      radial-gradient(120% 100% at 0% 0%, var(--accent-gold-dim), transparent 52%),
+      var(--bg-card);
+    text-decoration: none; color: inherit;
+    transition: border-color var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo);
+  }
+  .pcard:hover { border-color: var(--border-accent); transform: translateY(-3px); }
+  .pcard:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .pcard__idx {
+    position: absolute; top: var(--space-5); right: var(--space-5);
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle);
+    letter-spacing: var(--tracking-wide); font-variant-numeric: tabular-nums;
+  }
+  .pcard__icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; border-radius: var(--radius-md);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
+  }
+  .pcard__icon :global(svg) { width: 24px; height: 24px; stroke-width: 1.5; }
+  .pcard:hover .pcard__icon, .pcard:focus-visible .pcard__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .pcard__icon--brand, .pcard:hover .pcard__icon--brand { color: var(--accent-gold); }
+  .pcard__label {
+    font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug); max-width: 22ch;
+  }
+  .pcard__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); max-width: 46ch; }
+
+  .pcard__price {
+    margin-top: auto; padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .pcard__from {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
+  }
+  .pcard__amt {
+    font-family: var(--font-mono); font-size: var(--text-xl); font-weight: 500;
+    color: var(--fg-primary); font-variant-numeric: tabular-nums;
+    transition: color var(--duration-base) var(--ease-out-expo);
+  }
+  .pcard:hover .pcard__amt, .pcard:focus-visible .pcard__amt { color: var(--accent-gold); }
+  .pcard__go {
+    display: inline-flex; align-items: center; gap: var(--space-2); padding-top: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-gold);
+  }
+  .pcard__go :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .pcard:hover .pcard__go :global(svg) { transform: translateX(4px); }
+
+  /* filas densas 03–04 con COLUMNA DE PRECIO mono a la derecha */
+  .svcprice__rest {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr; gap: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .svcrow { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
+  .svcrow__link {
+    display: grid; column-gap: var(--space-3); row-gap: 2px; align-items: center;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'idx icon txt'
+      'idx icon price';
+    min-height: 56px; padding: var(--space-3) var(--space-2);
+    border-radius: var(--radius-md); text-decoration: none; color: inherit;
+    transition: background var(--duration-fast) var(--ease-out-expo);
+  }
+  .svcrow__link:hover { background: var(--bg-elevated); }
+  .svcrow__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+  .svcrow__idx {
+    grid-area: idx; font-family: var(--font-mono); font-size: var(--text-xs);
+    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
+    font-variant-numeric: tabular-nums; transition: color var(--duration-fast);
+  }
+  .svcrow__link:hover .svcrow__idx, .svcrow__link:focus-visible .svcrow__idx { color: var(--accent-gold); }
+  .svcrow__icon {
+    grid-area: icon; display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--radius-md);
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
+  }
+  .svcrow__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .svcrow__icon--brand, .svcrow__link:hover .svcrow__icon--brand { color: var(--accent-gold); }
+  .svcrow__link:hover .svcrow__icon, .svcrow__link:focus-visible .svcrow__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .svcrow__txt { grid-area: txt; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .svcrow__label { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
+  .svcrow__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+  .svcrow__price {
+    grid-area: price; justify-self: start; min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    transition: color var(--duration-fast);
+  }
+  .svcrow__from { font-size: var(--text-xs); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+  .svcrow__link:hover .svcrow__price, .svcrow__link:focus-visible .svcrow__price { color: var(--accent-gold); }
+  .svcprice__rest :global(.svcrow__go) { display: none; }
+
+  .svcprice__foot { display: flex; justify-content: flex-end; padding-top: var(--space-4); }
+  .svcprice__all {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min);
+    padding-inline: var(--space-2);
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-secondary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .svcprice__all :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .svcprice__all:hover, .svcprice__all:focus-visible { color: var(--accent-gold); }
+  .svcprice__all:hover :global(svg), .svcprice__all:focus-visible :global(svg) { transform: translateX(4px); }
+
+  @media (--md) {
+    .svcprice__feat { grid-template-columns: 1.4fr 1fr; gap: var(--space-5); }
+    .svcrow__link {
+      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+      grid-template-areas: 'idx icon txt price arrow';
+      column-gap: var(--space-4);
+    }
+    .svcrow__price { justify-self: end; text-align: right; }
+    .svcprice__rest :global(.svcrow__go) {
+      display: block; grid-area: arrow; width: 18px; height: 18px; color: var(--fg-subtle);
+      transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
+    }
+    .svcrow__link:hover :global(.svcrow__go), .svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
   }
 
-  /* ── Tarjeta de identidad ──────────────────────────────────────── */
-  .mia-id {
-    position: relative; overflow: hidden; min-width: 0;
-    display: flex; flex-direction: column;
-    background:
-      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 58%),
-      var(--bg-card);
+  /* ════════ FICHA MIAMI (bespoke: contexto + riel NAP + palmera) ════════ */
+  .ficha :global(em) { color: var(--accent-gold); font-style: normal; }
+  .ficha__panel {
+    position: relative; overflow: hidden; min-width: 0; isolation: isolate;
+    display: grid; grid-template-columns: 1fr; gap: var(--space-6);
     border: 1px solid var(--border); border-radius: var(--radius-xl);
     padding: var(--space-6);
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--accent-gold-dim), transparent 58%),
+      color-mix(in srgb, var(--bg-card) 78%, transparent);
   }
-  /* palmera/skyline oficial — esquina inferior derecha, difuminada hacia la izq.
-     El PNG/SVG ya viene en oro a baja opacidad; mix-blend lighten colapsa su lavado
-     oscuro al color de la tarjeta (igual que Locations.astro). */
-  .mia-id__illo {
-    position: absolute; right: 0; bottom: 0;
-    width: clamp(180px, 56%, 300px); pointer-events: none; z-index: 0;
-    -webkit-mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
-    mask-image: linear-gradient(300deg, #000 48%, transparent 100%);
+  /* palmera oficial: esquina inferior derecha, difuminada hacia la izquierda.
+     mix-blend lighten colapsa su lavado oscuro (truco documentado en Locations). */
+  .ficha__illo {
+    position: absolute; right: 0; bottom: 0; z-index: -1;
+    width: clamp(160px, 34%, 280px); pointer-events: none;
+    -webkit-mask-image: linear-gradient(300deg, #000 42%, transparent 100%);
+    mask-image: linear-gradient(300deg, #000 42%, transparent 100%);
   }
-  .mia-id__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
+  .ficha__illo img { width: 100%; height: auto; display: block; mix-blend-mode: lighten; }
 
-  .mia-id__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--space-3); }
-
-  .mia-id__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-  .mia-id__pin {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
+  .ficha__body { min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+  .ficha__title {
+    font-family: var(--font-display); font-weight: 600; font-size: var(--fluid-h3);
+    line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); max-width: 18ch;
   }
-  .mia-id__pin :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .mia-id__badge {
-    display: inline-flex; align-items: center; gap: var(--space-2);
+  .ficha__p { color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose); max-width: 58ch; }
+  .ficha__p :global(strong) { color: var(--fg-primary); font-weight: 600; }
+
+  .ficha__rail { min-width: 0; display: flex; flex-direction: column; }
+  .ficha__meta { display: flex; flex-direction: column; margin: 0; }
+  .ficha__row {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    padding: var(--space-3) 0; border-top: 1px solid var(--border-subtle); min-width: 0;
+  }
+  .ficha__row:last-child { border-bottom: 1px solid var(--border-subtle); }
+  .ficha__row dt {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; flex: 0 0 auto;
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    text-transform: uppercase; color: var(--accent-teal);
+    text-transform: uppercase; color: var(--fg-secondary);
   }
-  .mia-id__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); flex: 0 0 auto; }
-
-  .mia-id__city { font-family: var(--font-display); font-size: var(--fluid-h2); font-weight: 600; line-height: 1.04; letter-spacing: var(--tracking-tight); }
-  .mia-id__state { color: var(--fg-secondary); }
-  .mia-id__tagline {
-    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    color: var(--accent-gold); margin-top: calc(var(--space-1) * -1);
+  .ficha__row dt :global(svg) { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+  .ficha__row dd {
+    margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    font-variant-numeric: tabular-nums; text-align: right; min-width: 0; overflow-wrap: anywhere;
   }
-  .mia-id__tagline :global(svg) { width: 14px; height: 14px; stroke-width: 1.5; }
-  .mia-id__area { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); max-width: 34ch; }
+  .ficha__row dd a { position: relative; color: inherit; transition: color var(--duration-fast); }
+  .ficha__row dd a::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: var(--tap-min); transform: translateY(-50%);
+  }
+  .ficha__row dd a:hover, .ficha__row dd a:focus-visible { color: var(--accent-gold); }
 
-  .mia-id__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
-  .mia-id__pill {
+  .ficha__pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+  .ficha__state {
     display: inline-flex; align-items: center; gap: var(--space-2);
     padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill);
     background: var(--bg-elevated); border: 1px solid var(--border);
     font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); white-space: nowrap;
   }
-  .mia-id__pill :global(.mia-id__pill-ic),
-  .mia-id__pill .mia-id__pill-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; stroke-width: 1.5; }
+  .ficha__state-ic { width: 14px; height: 14px; color: var(--accent-gold); flex: 0 0 auto; }
 
-  .mia-id__tel {
-    display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
-    margin-top: var(--space-2); min-height: var(--tap-min);
-    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--accent-gold);
-    transition: color var(--duration-fast) var(--ease-out-expo);
+  .ficha__zonestitle {
+    font-family: var(--font-display); font-size: var(--text-md); font-weight: 600;
+    color: var(--fg-primary); line-height: var(--leading-snug); margin-top: var(--space-5);
   }
-  .mia-id__tel :global(svg) { width: 15px; height: 15px; stroke-width: 1.5; flex: 0 0 auto; }
-  .mia-id__tel:hover { color: color-mix(in srgb, var(--accent-gold), white 12%); }
-
-  /* ── Conmutador de servicios ───────────────────────────────────── */
-  .showcase__nav {
-    position: relative; overflow: hidden; min-width: 0;
-    display: flex; flex-direction: column;
-    background:
-      radial-gradient(120% 90% at 0% 0%, var(--accent-gold-dim), transparent 60%),
-      color-mix(in srgb, var(--bg-card) 72%, transparent);
-    border: 1px solid var(--border); border-radius: var(--radius-xl);
-    padding: var(--space-6);
+  .ficha__zonestitle :global(em) { color: var(--accent-gold); font-style: normal; }
+  .ficha__zones { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
+  .ficha__zone {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); min-width: 0;
+    padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-primary);
+    text-decoration: none;
+    transition: border-color var(--duration-fast), color var(--duration-fast);
   }
-  .showcase__head {
-    display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5);
-  }
-  .showcase__title { font-family: var(--font-display); line-height: var(--leading-snug); max-width: 22ch; }
-  .showcase__count {
-    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary);
-  }
-
-  .svc-switch {
-    list-style: none; display: grid; grid-template-columns: 1fr; gap: 2px;
-    border-top: 1px solid var(--border-subtle); margin: 0; padding: 0;
-  }
-  .svc-switch__row { min-width: 0; border-bottom: 1px solid var(--border-subtle); }
-  .svc-switch__link {
-    color: inherit; text-decoration: none;
-    display: flex; align-items: center; gap: var(--space-4);
-    min-height: 60px; padding: var(--space-3) var(--space-2);
-    border-radius: var(--radius-md);
-    transition: background var(--duration-fast) var(--ease-out-expo);
-  }
-  .svc-switch__link:hover { background: var(--bg-elevated); }
-  .svc-switch__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
-
-  .svc-switch__idx {
-    flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
-    color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
-    transition: color var(--duration-fast);
-  }
-  .svc-switch__link:hover .svc-switch__idx,
-  .svc-switch__link:focus-visible .svc-switch__idx { color: var(--accent-gold); }
-
-  .svc-switch__chip {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-  }
-  .svc-switch__chip :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  /* la insignia de marca (marcyan-ai, filled) SIEMPRE oro — ya lo es aquí, pero el
-     comentario fija la intención por si cambia el acento de la sección. */
-  .svc-switch__chip--brand { color: var(--accent-gold); }
-
-  .svc-switch__txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
-  .svc-switch__label { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
-  .svc-switch__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
-
-  .svc-switch__go {
-    flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle);
-    transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
-  }
-  .svc-switch__link:hover .svc-switch__go,
-  .svc-switch__link:focus-visible .svc-switch__go { color: var(--accent-gold); transform: translateX(4px); }
-
-  @media (--motion-reduce) {
-    .svc-switch__link:hover .svc-switch__go,
-    .svc-switch__link:focus-visible .svc-switch__go { transform: none; }
-  }
+  .ficha__zones :global(.ficha__zone-pin) { width: 15px; height: 15px; color: var(--fg-secondary); flex: 0 0 auto; transition: color var(--duration-fast); }
+  .ficha__zones :global(.ficha__zone-arr) { width: 14px; height: 14px; color: var(--fg-subtle); flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-fast); }
+  .ficha__zone:hover, .ficha__zone:focus-visible { border-color: var(--accent-gold-line); color: var(--accent-gold); }
+  .ficha__zone:hover :global(.ficha__zone-pin), .ficha__zone:focus-visible :global(.ficha__zone-pin) { color: var(--accent-gold); }
+  .ficha__zone:hover :global(.ficha__zone-arr), .ficha__zone:focus-visible :global(.ficha__zone-arr) { color: var(--accent-gold); transform: translateX(3px); }
 
   @media (--md) {
-    .mia-id, .showcase__nav { padding: var(--space-7); }
-    .showcase__head { margin-bottom: var(--space-6); }
+    .ficha__panel { padding: var(--space-8); gap: var(--space-8); }
+  }
+  @media (--lg) {
+    .ficha__panel { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
   }
 
-  /* ≥ lg: showcase en 2 columnas (identidad estrecha + conmutador ancho) */
-  @media (--lg) {
-    .showcase__inner {
-      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-      gap: var(--space-6);
-    }
+  /* ════════ SIGUE EXPLORANDO (franja slim, sin panel) ════════ */
+  .explore { padding-block: var(--space-6); border-block: 1px solid var(--border-subtle); }
+  .explore__row {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: var(--space-3) var(--space-6); min-width: 0;
+  }
+  .explore__list {
+    list-style: none; margin: 0; padding: 0; min-width: 0;
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-6);
+  }
+  .explore__list li { min-width: 0; }
+  .explore__link {
+    display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); min-width: 0;
+    font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide);
+    color: var(--fg-primary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .explore__list :global(.explore__arr) { width: 15px; height: 15px; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-fast), transform var(--duration-base) var(--ease-out-expo); }
+  .explore__link:hover, .explore__link:focus-visible { color: var(--accent-gold); }
+  .explore__link:hover :global(.explore__arr), .explore__link:focus-visible :global(.explore__arr) { color: var(--accent-gold); transform: translateX(3px); }
+
+  @media (--md) {
+    .explore__row { flex-direction: row; align-items: center; }
+  }
+
+  /* ════════ REMATE: micro-reaseguro + gap CtaBand↔Contact ════════ */
+  .reassure { padding-block: var(--space-2); }
+  .reassure__txt {
+    text-align: center; font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); color: var(--fg-secondary);
+    text-wrap: balance;
+  }
+  .finale :global(.ctaband.section) { padding-block-end: var(--space-6); }
+  .finale :global(.contact.section) { padding-block-start: var(--space-6); }
+
+  @media (--motion-reduce) {
+    .pcard:hover { transform: none; }
+    .pcard:hover .pcard__go :global(svg),
+    .svcrow__link:hover :global(.svcrow__go),
+    .ficha__zone:hover :global(.ficha__zone-arr),
+    .explore__link:hover :global(.explore__arr),
+    .svcprice__all:hover :global(svg) { transform: none; }
   }
 </style>

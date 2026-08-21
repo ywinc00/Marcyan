@@ -11,6 +11,20 @@
 
 import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
+import { PRICE_ANCHORS } from './pricing';
+import { nap } from './content';
+
+// Formato display de las cifras canónicas (mismo criterio que houston.ts:
+// las CIFRAS salen SIEMPRE de PRICE_ANCHORS; aquí solo se formatean).
+const usd = (n: number): string => '$' + n.toLocaleString('en-US');
+
+// href de marcado directo derivado del NAP real (fuente única en content.ts).
+const telHref = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
+
+// Cadena canónica de precios del riel — coherente con el FAQ de esta página.
+// OJO: seoLocal ($600/mes) es la mensualidad; seoInitial es pago único y está
+// PROHIBIDO mostrarlo como mensualidad.
+const priceChain = `Web desde ${usd(PRICE_ANCHORS.web)} · IA desde ${usd(PRICE_ANCHORS.ia)} · SEO desde ${usd(PRICE_ANCHORS.seoLocal)}/mes`;
 
 export const miamiHub = {
   meta: {
@@ -23,38 +37,64 @@ export const miamiHub = {
     { name: 'Inicio', path: '/es/' },
     { name: 'Miami', path: '/es/miami' },
   ] as CrumbItem[],
+  // Hero "Aproximación" (MiamiApproachHero): kicker fusiona badge+kicker, H1
+  // partido en líneas VISUALES para la máscara (la 1ª lleva espacio final para
+  // que el textContent siga siendo la keyword exacta), UN solo CTA +
+  // micro-reaseguro, riel de telemetría y señales decorativas del radar.
   hero: {
-    badge: 'Miami, FL',
-    badgeIcon: 'lucide:map-pin',
-    kicker: 'Agencia local',
-    h1: 'Diseño de páginas web en <em>Miami</em>',
-    sub: 'Una sola agencia hispana para tu sitio, tu IA y tu SEO local en Miami, a medida, bilingüe y con precios públicos. Todo pensado para cómo busca de verdad tu cliente cubano, venezolano o colombiano.',
+    kicker: 'Agencia hispana · Miami, FL',
+    h1Lines: ['Diseño de páginas ', 'web en <em>Miami</em>'],
+    sub: 'Tu cliente ya está en el radar, buscando en español. Tu web, tu IA y tu SEO local hacen que aterrice en tu negocio.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
-    secondary: { label: 'Ver precios y planes', href: '/es/precios' },
-    chips: ['El español de Miami', 'Precios públicos', 'Todo Miami-Dade'],
-    tone: 'gold' as const,
+    microcopy: 'Respuesta en 1 hora hábil · Sin compromiso',
+    explore: { label: 'Ver servicios y precios ↓', href: '#servicios' },
+    telemetry: [
+      { label: 'Línea directa', value: nap.miami, href: telHref, live: true },
+      { label: 'Horario', value: nap.hours },
+      { label: 'Precios públicos', value: priceChain, href: '#servicios' },
+      { label: 'Base', value: '25.7617° N, 80.1918° W' },
+    ],
+    // Señales del radar: BÚSQUEDAS DE EJEMPLO (decorativas, aria-hidden en el
+    // componente). No son datos en vivo y no deben presentarse como métrica.
+    senales: [
+      { q: '«páginas web en miami»', meta: 'ahora' },
+      { q: '«ia que conteste whatsapp»', meta: 'Doral · hace 1 min' },
+      { q: '«seo local en español»', meta: 'Hialeah · hace 2 min' },
+    ],
   },
   answer: {
     q: '¿Por qué elegir una agencia hispana de diseño web en Miami?',
     a: 'Porque en Miami el español es la lengua del comercio: cerca del 69% de Miami-Dade es hispano, según el U.S. Census Bureau. Necesitas una agencia que hable el español de tus clientes, cubano, venezolano, colombiano, y que construya tu sitio para que te encuentren en Google y en la IA. Eso te conecta con tu mercado mejor que una agencia genérica.',
     source: 'U.S. Census Bureau, ACS 2023',
   },
+  // Servicios con PRECIO (patrón Houston): el precio vive en su campo `price`
+  // (display, cifras desde PRICE_ANCHORS) y las descs van a dieta. Orden: los 2
+  // primeros = tarjetas destacadas del hub (web + IA, los dos pilares).
   services: {
     tag: 'Servicios en Miami',
     title: 'Todo para tu negocio, en una <em>sola agencia</em>',
     links: [
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
-      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'lucide:messages-square' },
-      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües, listos para Google y la IA.', icon: 'lucide:layout-template', price: `desde ${usd(PRICE_ANCHORS.web)}` },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7, en español.', icon: 'lucide:messages-square', price: `desde ${usd(PRICE_ANCHORS.ia)}` },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA de tus clientes.', icon: 'lucide:search', price: `desde ${usd(PRICE_ANCHORS.seoLocal)}/mes` },
+      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo bilingüe.', icon: 'lucide:shopping-bag', price: `desde ${usd(PRICE_ANCHORS.ecommerce)}` },
     ] as RelatedLink[],
   },
-  barrios: {
-    tag: 'Por barrio',
-    title: 'Soluciones por <em>barrio</em>',
-    links: [
-      { label: 'Doral (Doralzuela)', href: '/es/miami/doral', desc: 'Diseño web, SEO e IA para negocios de Doral. Bilingüe, desde $1,500.', icon: 'lucide:map-pin' },
-      { label: 'Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en español para negocios de Hialeah.', icon: 'lucide:map-pin' },
+  // Ficha Miami (patrón Houston): riel NAP dt/dd + pill de estado FL + los
+  // barrios del silo como pills-ruta (los 2 <a> de Doral y Hialeah viven AQUÍ).
+  ficha: {
+    meta: [
+      { ic: 'lucide:phone', label: 'Línea directa', value: nap.miami, href: telHref },
+      { ic: 'lucide:clock', label: 'Horario', value: nap.hours },
+      { ic: 'lucide:map-pinned', label: 'Cobertura', value: 'Doral, Hialeah, Kendall, Brickell, Aventura' },
+      { ic: 'lucide:languages', label: 'Idiomas', value: 'Español · Inglés' },
+      { ic: 'lucide:locate-fixed', label: 'Coordenadas', value: '25.7617° N, 80.1918° W' },
+    ],
+    statePill: 'Florida, USA',
+    zonesTitle: 'Diseño web por <em>barrio de Miami</em>',
+    zones: [
+      { label: 'Doral', href: '/es/miami/doral', desc: 'Web, SEO e IA para negocios de Doral', icon: 'lucide:map-pin' },
+      { label: 'Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en Hialeah', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
   local: {
@@ -91,8 +131,12 @@ export const miamiHub = {
     title: '¿Listo para crecer en <em>Miami</em>?',
     sub: 'Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
+    secondary: { label: `Llámanos: ${nap.miami}`, href: telHref },
     tone: 'gold' as const,
   },
+  // Micro-reaseguro (fila slim entre el CTA y el formulario), espejo de Houston:
+  // CONTACTO = 1 hora hábil · ENTREGABLE = propuesta en 24h. No fusionar.
+  reassure: 'Respuesta en 1 hora hábil · Propuesta gratis en 24h · Precio por escrito antes de empezar',
   // ItemList (schema) — los servicios ofrecidos en Miami, cada uno a su landing.
   itemList: [
     { name: 'Diseño web en Miami', path: '/es/miami/diseno-web' },

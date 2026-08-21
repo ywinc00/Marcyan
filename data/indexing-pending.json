@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-08-20T14:31:40.867Z",
+  "builtAt": "2026-08-21T17:06:48.518Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -13,7 +13,7 @@
   "pending": [
     {
       "url": "https://marcyanstudio.com/es/houston/ecommerce",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
@@ -49,7 +49,7 @@
     },
     {
       "url": "https://marcyanstudio.com/privacidad",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },

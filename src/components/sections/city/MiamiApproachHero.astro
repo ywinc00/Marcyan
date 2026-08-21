@@ -151,8 +151,12 @@ const FL_SHAPE = {
     display: flex; flex-direction: column;
   }
   @media (--lg) {
-    .miahero { height: 132vh; }
-    .miahero__pin { position: sticky; top: 0; height: 100vh; }
+    .miahero { min-height: 132vh; }
+    /* min-height (no height fija): en laptops de poca altura el contenido del
+       pin supera 100vh y una altura fija + overflow hidden RECORTABA el riel
+       (medido a 1024×700: contenido 826px). El pin crece con su contenido y
+       el compás mide el recorrido real (hero − pin) en el script. */
+    .miahero__pin { position: sticky; top: 0; min-height: 100vh; }
   }
 
   /* ── escena ── */
@@ -224,10 +228,20 @@ const FL_SHAPE = {
 
   /* señales: tarjeta mono + tallo que cae hacia la mesa */
   .miahero__signals { position: absolute; inset: 0; }
+  /* posiciones ANCLADAS A LOS BORDES, en la franja baja lateral: es la única
+     zona libre en TODOS los viewports de escritorio (a 1024×700 el bloque de
+     copy centrado ocupa hasta el 79% del ancho y del 27% al 63% del alto —
+     medido; un chip en esa banda siempre pisa texto). Hallazgo de la captura
+     en Chrome real: una señal tocaba el sub del hero. */
   .miahero__sig { position: absolute; display: flex; flex-direction: column; align-items: flex-start; opacity: 0; }
-  .miahero__sig--1 { left: 24%; top: 60%; }
-  .miahero__sig--2 { left: 60%; top: 55%; }
-  .miahero__sig--3 { left: 43%; top: 67%; }
+  .miahero__sig--1 { left: 4%; top: 66%; }
+  .miahero__sig--2 { right: 4%; top: 62%; align-items: flex-end; }
+  .miahero__sig--3 { right: 10%; top: 74%; align-items: flex-end; }
+  .miahero__sig--2 .miahero__stalk, .miahero__sig--3 .miahero__stalk { margin-left: 0; margin-right: var(--space-4); }
+  /* laptops de poca altura: la franja baja se encoge; fuera la 3ª señal */
+  @media (max-height: 700px) {
+    .miahero__sig--3 { display: none; }
+  }
   .miahero__sigcard {
     display: flex; flex-direction: column; gap: 2px;
     padding: var(--space-2) var(--space-3);
@@ -306,7 +320,9 @@ const FL_SHAPE = {
     border-block: 1px solid var(--border-subtle);
     background: color-mix(in srgb, var(--bg-base) 72%, transparent);
     opacity: calc(0.25 + var(--p) * 0.75);
-    transform: translateY(calc((1 - var(--p)) * 24px));
+    /* se acopla DESDE ARRIBA (−16px → 0): hacia abajo se salía del clip del
+       pin (overflow hidden) y el riel aparecía recortado en reposo. */
+    transform: translateY(calc((var(--p) - 1) * 16px));
   }
   .miahero__rail {
     margin: 0;
@@ -345,8 +361,11 @@ const FL_SHAPE = {
   @media (--lt-md) {
     .miahero__table { top: 66%; width: 170vw; }
     .miahero__sig--3 { display: none; }
-    .miahero__sig--1 { left: 6%; top: 62%; }
-    .miahero__sig--2 { left: 52%; top: 56%; }
+    /* en móvil el copy centrado ocupa casi todo el ancho: las señales bajan a
+       la franja de la mesa (bajo el dock) y pasan por DETRÁS del contenido
+       (skywrap lleva z-index 1), nunca encima del CTA. */
+    .miahero__sig--1 { left: 4%; top: 72%; }
+    .miahero__sig--2 { left: 48%; top: 80%; }
     .miahero__sigq { font-size: var(--text-xs); }
     .miahero__hud--tr, .miahero__hud--bl { display: none; }
   }
@@ -422,14 +441,18 @@ const FL_SHAPE = {
   // Solo actúa en ≥1024px con motion-ok; en el resto el CSS ya está en --p:1.
   // Lectura en rAF (1 getBoundingClientRect por frame como mucho); passive.
   const hero = document.getElementById('miahero');
-  if (hero) {
+  const pin = hero?.querySelector('.miahero__pin') as HTMLElement | null;
+  if (hero && pin) {
     const mqLg = window.matchMedia('(min-width: 1024px)');
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     let raf = 0;
     const update = () => {
       raf = 0;
       if (!mqLg.matches || mqReduce.matches) { hero.style.removeProperty('--p'); return; }
-      const total = hero.offsetHeight - window.innerHeight;
+      // Recorrido REAL del pin (hero − pin), no hero − viewport: en laptops de
+      // poca altura el pin es más alto que 100vh y el viejo cálculo dejaba
+      // --p a medias justo cuando el hero suelta.
+      const total = hero.offsetHeight - pin.offsetHeight;
       if (total <= 0) { hero.style.removeProperty('--p'); return; }
       const p = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
       hero.style.setProperty('--p', p.toFixed(4));

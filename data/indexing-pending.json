@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-08-21T17:06:48.518Z",
+  "builtAt": "2026-08-22T17:09:26.589Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -13,19 +13,19 @@
   "pending": [
     {
       "url": "https://marcyanstudio.com/es/houston/ecommerce",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
     {
       "url": "https://marcyanstudio.com/es/houston/ia-conversacional",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
     {
       "url": "https://marcyanstudio.com/es/houston/seo-local",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
@@ -37,13 +37,13 @@
     },
     {
       "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
     {
       "url": "https://marcyanstudio.com/es/ia-para-pymes",
-      "coverageState": "Discovered - currently not indexed",
+      "coverageState": "URL is unknown to Google",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },

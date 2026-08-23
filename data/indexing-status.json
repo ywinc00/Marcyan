@@ -1,5 +1,5 @@
 {
-  "lastFullCheck": "2026-08-22T17:09:26.589Z",
+  "lastFullCheck": "2026-08-23T17:31:50.805Z",
   "urls": {
     "https://marcyanstudio.com/en": {
       "coverageState": "Submitted and indexed",
@@ -10,20 +10,20 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en",
       "userCanonical": "https://marcyanstudio.com/en",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/en/about": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-05T20:46:04Z",
+      "lastCrawlTime": "2026-08-23T00:22:41Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/about",
-      "userCanonical": "https://marcyanstudio.com/en/about/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/about",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -36,7 +36,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/ai-for-small-business",
       "userCanonical": "https://marcyanstudio.com/en/ai-for-small-business/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -49,7 +49,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/blog",
       "userCanonical": "https://marcyanstudio.com/en/blog/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -62,7 +62,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/checkup",
       "userCanonical": "https://marcyanstudio.com/en/checkup/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -75,7 +75,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/cities",
       "userCanonical": "https://marcyanstudio.com/en/cities/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -88,20 +88,20 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston",
       "userCanonical": "https://marcyanstudio.com/en/houston",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/en/houston/ai-seo": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-05T20:42:45Z",
+      "lastCrawlTime": "2026-08-23T08:13:00Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/ai-seo",
-      "userCanonical": "https://marcyanstudio.com/en/houston/ai-seo/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/houston/ai-seo",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -114,7 +114,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/auto-repair",
       "userCanonical": "https://marcyanstudio.com/en/houston/auto-repair/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -127,7 +127,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/beauty-salons",
       "userCanonical": "https://marcyanstudio.com/en/houston/beauty-salons/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -140,7 +140,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/bilingual-web-design",
       "userCanonical": "https://marcyanstudio.com/en/houston/bilingual-web-design/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -153,7 +153,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/branding",
       "userCanonical": "https://marcyanstudio.com/en/houston/branding",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -166,7 +166,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/contractors",
       "userCanonical": "https://marcyanstudio.com/en/houston/contractors",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-20T14:31:40.867Z",
       "lastIndexRequestAt": "2026-08-19T15:38:02.720Z",
@@ -177,13 +177,13 @@
     "https://marcyanstudio.com/en/houston/conversational-ai": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-05T20:46:16Z",
+      "lastCrawlTime": "2026-08-23T05:00:17Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/conversational-ai",
-      "userCanonical": "https://marcyanstudio.com/en/houston/conversational-ai/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/houston/conversational-ai",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -196,20 +196,20 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/dental-clinics",
       "userCanonical": "https://marcyanstudio.com/en/houston/dental-clinics/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/en/houston/ecommerce": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-06T00:41:01Z",
+      "lastCrawlTime": "2026-08-23T08:17:49Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/ecommerce",
-      "userCanonical": "https://marcyanstudio.com/en/houston/ecommerce/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/houston/ecommerce",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -222,7 +222,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/immigration-lawyers",
       "userCanonical": "https://marcyanstudio.com/en/houston/immigration-lawyers/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -235,20 +235,20 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/katy",
       "userCanonical": "https://marcyanstudio.com/en/houston/katy",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/en/houston/local-seo": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-05T13:21:19Z",
+      "lastCrawlTime": "2026-08-23T08:22:15Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/local-seo",
-      "userCanonical": "https://marcyanstudio.com/en/houston/local-seo/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/houston/local-seo",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -261,7 +261,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/real-estate",
       "userCanonical": "https://marcyanstudio.com/en/houston/real-estate/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -274,7 +274,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/restaurants",
       "userCanonical": "https://marcyanstudio.com/en/houston/restaurants",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-20T14:31:40.867Z",
       "lastIndexRequestAt": "2026-08-19T15:39:24.922Z",
@@ -291,7 +291,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/sugar-land",
       "userCanonical": "https://marcyanstudio.com/en/houston/sugar-land/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -304,7 +304,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/houston/web-design",
       "userCanonical": "https://marcyanstudio.com/en/houston/web-design/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -317,7 +317,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami",
       "userCanonical": "https://marcyanstudio.com/en/miami",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -330,20 +330,20 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/conversational-ai",
       "userCanonical": "https://marcyanstudio.com/en/miami/conversational-ai/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/en/miami/doral": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-07-06T03:34:19Z",
+      "lastCrawlTime": "2026-08-22T17:57:31Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/doral",
-      "userCanonical": "https://marcyanstudio.com/en/miami/doral/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/en/miami/doral",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -356,7 +356,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/ecommerce",
       "userCanonical": "https://marcyanstudio.com/en/miami/ecommerce",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -369,7 +369,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/hialeah",
       "userCanonical": "https://marcyanstudio.com/en/miami/hialeah/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -382,7 +382,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/local-seo",
       "userCanonical": "https://marcyanstudio.com/en/miami/local-seo/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -395,7 +395,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/miami/web-design",
       "userCanonical": "https://marcyanstudio.com/en/miami/web-design/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -408,7 +408,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/portfolio",
       "userCanonical": "https://marcyanstudio.com/en/portfolio/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -421,7 +421,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/pricing",
       "userCanonical": "https://marcyanstudio.com/en/pricing",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -434,7 +434,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/pricing/chatbot-cost",
       "userCanonical": "https://marcyanstudio.com/en/pricing/chatbot-cost/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -447,7 +447,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston",
       "userCanonical": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -460,7 +460,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/pricing/website-cost-houston",
       "userCanonical": "https://marcyanstudio.com/en/pricing/website-cost-houston/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -473,7 +473,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/privacy",
       "userCanonical": "https://marcyanstudio.com/en/privacy",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -486,7 +486,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/services",
       "userCanonical": "https://marcyanstudio.com/en/services",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -499,7 +499,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/terms",
       "userCanonical": "https://marcyanstudio.com/en/terms",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -512,7 +512,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/en/tools",
       "userCanonical": "https://marcyanstudio.com/en/tools/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -525,7 +525,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es",
       "userCanonical": "https://marcyanstudio.com/es",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -538,7 +538,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog",
       "userCanonical": "https://marcyanstudio.com/es/blog",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -551,7 +551,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
       "userCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -564,7 +564,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana/",
       "userCanonical": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -577,7 +577,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia/",
       "userCanonical": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -590,7 +590,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp",
       "userCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -603,7 +603,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos/",
       "userCanonical": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -616,7 +616,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia/",
       "userCanonical": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -629,7 +629,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/ciudades",
       "userCanonical": "https://marcyanstudio.com/es/ciudades",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -642,7 +642,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/diagnostico",
       "userCanonical": "https://marcyanstudio.com/es/diagnostico/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -655,7 +655,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/herramientas/",
       "userCanonical": "https://marcyanstudio.com/es/herramientas/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -668,7 +668,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston",
       "userCanonical": "https://marcyanstudio.com/es/houston",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -681,7 +681,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
       "userCanonical": "https://marcyanstudio.com/es/houston/abogados-inmigracion/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -694,7 +694,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/bienes-raices",
       "userCanonical": "https://marcyanstudio.com/es/houston/bienes-raices/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -707,7 +707,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/branding",
       "userCanonical": "https://marcyanstudio.com/es/houston/branding",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-20T14:31:40.867Z",
       "lastIndexRequestAt": "2026-08-19T15:40:49.275Z",
@@ -724,7 +724,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/clinicas-dentales/",
       "userCanonical": "https://marcyanstudio.com/es/houston/clinicas-dentales/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -737,7 +737,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/contratistas",
       "userCanonical": "https://marcyanstudio.com/es/houston/contratistas",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -750,7 +750,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
       "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -763,39 +763,39 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/diseno-web-bilingue/",
       "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web-bilingue/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
     "https://marcyanstudio.com/es/houston/ecommerce": {
-      "coverageState": "URL is unknown to Google",
-      "verdict": "NEUTRAL",
-      "lastCrawlTime": null,
-      "indexingState": "INDEXING_STATE_UNSPECIFIED",
-      "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
-      "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
-      "googleCanonical": null,
-      "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "coverageState": "Submitted and indexed",
+      "verdict": "PASS",
+      "lastCrawlTime": "2026-08-22T17:21:46Z",
+      "indexingState": "INDEXING_ALLOWED",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
+      "userCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
-      "indexedAt": null,
+      "indexedAt": "2026-08-23T17:31:50.805Z",
       "lastIndexRequestAt": "2026-08-22T17:21:10.228Z",
       "indexRequestHistory": [
         "2026-08-22T17:21:10.228Z"
       ]
     },
     "https://marcyanstudio.com/es/houston/ia-conversacional": {
-      "coverageState": "URL is unknown to Google",
-      "verdict": "NEUTRAL",
-      "lastCrawlTime": null,
-      "indexingState": "INDEXING_STATE_UNSPECIFIED",
-      "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
-      "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
-      "googleCanonical": null,
-      "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "coverageState": "Submitted and indexed",
+      "verdict": "PASS",
+      "lastCrawlTime": "2026-08-22T17:23:24Z",
+      "indexingState": "INDEXING_ALLOWED",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
+      "userCanonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
-      "indexedAt": null,
+      "indexedAt": "2026-08-23T17:31:50.805Z",
       "lastIndexRequestAt": "2026-08-22T17:22:19.344Z",
       "indexRequestHistory": [
         "2026-08-22T17:22:19.344Z"
@@ -810,7 +810,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/katy/",
       "userCanonical": "https://marcyanstudio.com/es/houston/katy/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -823,7 +823,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/restaurantes",
       "userCanonical": "https://marcyanstudio.com/es/houston/restaurantes",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-20T14:31:40.867Z"
     },
@@ -836,39 +836,39 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/salon-belleza",
       "userCanonical": "https://marcyanstudio.com/es/houston/salon-belleza/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/es/houston/seo-local": {
-      "coverageState": "URL is unknown to Google",
-      "verdict": "NEUTRAL",
-      "lastCrawlTime": null,
-      "indexingState": "INDEXING_STATE_UNSPECIFIED",
-      "robotsTxtState": "ROBOTS_TXT_STATE_UNSPECIFIED",
-      "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
-      "googleCanonical": null,
-      "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "coverageState": "Submitted and indexed",
+      "verdict": "PASS",
+      "lastCrawlTime": "2026-08-22T17:23:24Z",
+      "indexingState": "INDEXING_ALLOWED",
+      "robotsTxtState": "ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "googleCanonical": "https://marcyanstudio.com/es/houston/seo-local",
+      "userCanonical": "https://marcyanstudio.com/es/houston/seo-local",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
-      "indexedAt": null,
+      "indexedAt": "2026-08-23T17:31:50.805Z",
       "lastIndexRequestAt": "2026-08-22T17:23:28.015Z",
       "indexRequestHistory": [
         "2026-08-22T17:23:28.015Z"
       ]
     },
     "https://marcyanstudio.com/es/houston/seo-para-ia": {
-      "coverageState": "Crawled - currently not indexed",
-      "verdict": "NEUTRAL",
-      "lastCrawlTime": "2026-06-14T04:06:34Z",
+      "coverageState": "Submitted and indexed",
+      "verdict": "PASS",
+      "lastCrawlTime": "2026-08-22T17:25:29Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia",
-      "userCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "userCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
-      "indexedAt": null,
+      "indexedAt": "2026-08-23T17:31:50.805Z",
       "lastIndexRequestAt": "2026-08-22T17:24:36.733Z",
       "indexRequestHistory": [
         "2026-08-22T17:24:36.733Z"
@@ -883,7 +883,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/sugar-land/",
       "userCanonical": "https://marcyanstudio.com/es/houston/sugar-land/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -896,7 +896,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
       "userCanonical": "https://marcyanstudio.com/es/houston/talleres-mecanicos/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -909,20 +909,20 @@
       "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
       "googleCanonical": null,
       "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
     "https://marcyanstudio.com/es/miami": {
       "coverageState": "Submitted and indexed",
       "verdict": "PASS",
-      "lastCrawlTime": "2026-08-18T00:42:39Z",
+      "lastCrawlTime": "2026-08-23T16:44:51Z",
       "indexingState": "INDEXING_ALLOWED",
       "robotsTxtState": "ALLOWED",
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami",
       "userCanonical": "https://marcyanstudio.com/es/miami",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T16:46:48.311Z",
       "lastIndexRequestAt": "2026-08-18T00:42:08.795Z",
@@ -939,7 +939,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/diseno-web/",
       "userCanonical": "https://marcyanstudio.com/es/miami/diseno-web/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -952,7 +952,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/doral/",
       "userCanonical": "https://marcyanstudio.com/es/miami/doral/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -965,7 +965,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
       "userCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -978,7 +978,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/hialeah/",
       "userCanonical": "https://marcyanstudio.com/es/miami/hialeah/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -991,7 +991,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional/",
       "userCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -1004,7 +1004,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/miami/seo-local/",
       "userCanonical": "https://marcyanstudio.com/es/miami/seo-local/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -1017,7 +1017,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/portafolio",
       "userCanonical": "https://marcyanstudio.com/es/portafolio/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -1030,7 +1030,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/precios",
       "userCanonical": "https://marcyanstudio.com/es/precios",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-20T14:31:40.867Z",
       "lastIndexRequestAt": "2026-08-19T15:36:24.299Z",
@@ -1047,7 +1047,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston/",
       "userCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -1060,12 +1060,12 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot/",
       "userCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
     "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston": {
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "verdict": "NEUTRAL",
       "lastCrawlTime": null,
       "indexingState": "INDEXING_STATE_UNSPECIFIED",
@@ -1073,7 +1073,7 @@
       "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
       "googleCanonical": null,
       "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -1086,7 +1086,7 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/servicios",
       "userCanonical": "https://marcyanstudio.com/es/servicios",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
@@ -1099,12 +1099,12 @@
       "pageFetchState": "SUCCESSFUL",
       "googleCanonical": "https://marcyanstudio.com/es/sobre-nosotros",
       "userCanonical": "https://marcyanstudio.com/es/sobre-nosotros/",
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": "2026-08-18T00:26:04.174Z"
     },
     "https://marcyanstudio.com/privacidad": {
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "verdict": "NEUTRAL",
       "lastCrawlTime": null,
       "indexingState": "INDEXING_STATE_UNSPECIFIED",
@@ -1112,7 +1112,7 @@
       "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
       "googleCanonical": null,
       "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     },
@@ -1125,7 +1125,7 @@
       "pageFetchState": "PAGE_FETCH_STATE_UNSPECIFIED",
       "googleCanonical": null,
       "userCanonical": null,
-      "lastChecked": "2026-08-22T17:09:26.589Z",
+      "lastChecked": "2026-08-23T17:31:50.805Z",
       "lastError": null,
       "indexedAt": null
     }

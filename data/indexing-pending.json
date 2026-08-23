@@ -1,43 +1,19 @@
 {
-  "builtAt": "2026-08-22T17:09:26.589Z",
+  "builtAt": "2026-08-23T17:31:50.805Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 59,
-    "notIndexed": 9,
+    "indexed": 63,
+    "notIndexed": 5,
     "skipped": 16
   },
-  "candidates": 9,
+  "candidates": 5,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/houston/ecommerce",
-      "coverageState": "URL is unknown to Google",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/es/houston/ia-conversacional",
-      "coverageState": "URL is unknown to Google",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/es/houston/seo-local",
-      "coverageState": "URL is unknown to Google",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
-      "url": "https://marcyanstudio.com/es/houston/seo-para-ia",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    },
-    {
       "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
@@ -49,13 +25,19 @@
     },
     {
       "url": "https://marcyanstudio.com/privacidad",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },
     {
       "url": "https://marcyanstudio.com/terminos",
       "coverageState": "Discovered - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
+      "coverageState": "Crawled - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     }

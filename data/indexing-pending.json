@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-08-23T17:31:50.805Z",
+  "builtAt": "2026-08-24T14:31:17.905Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -19,7 +19,7 @@
     },
     {
       "url": "https://marcyanstudio.com/es/ia-para-pymes",
-      "coverageState": "URL is unknown to Google",
+      "coverageState": "Discovered - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
     },

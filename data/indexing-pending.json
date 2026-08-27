@@ -1,21 +1,14 @@
 {
-  "builtAt": "2026-08-26T18:52:20.824Z",
+  "builtAt": "2026-08-27T20:45:14.620Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 68,
-    "notIndexed": 1,
+    "indexed": 69,
+    "notIndexed": 0,
     "skipped": 15
   },
-  "candidates": 1,
-  "pending": [
-    {
-      "url": "https://marcyanstudio.com/es/miami",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-18T00:42:08.795Z",
-      "requestCount": 1
-    }
-  ]
+  "candidates": 0,
+  "pending": []
 }

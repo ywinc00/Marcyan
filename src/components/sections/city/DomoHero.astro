@@ -411,3 +411,27 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     .domo__cta:active { transform: none; }
   }
 </style>
+
+<script>
+  // Seguro de PINTADO (no es animacion): Chrome en Windows compositaba la capa
+  // mix-blend-mode:color antes de que llegara la textura de la foto y el hero
+  // quedaba NEGRO congelado hasta cualquier repaint (race reproducido en frio
+  // contra el preview de Vercel; translateZ solo, no basta). Cuando la foto
+  // termina de DECODIFICAR, se fuerza un re-compositado de las capas de tinte
+  // (el mismo toggle que lo corrige a mano). Sin JS: el race es posible pero
+  // el hero queda oscuro-legible, CTA y texto intactos.
+  const domo = document.querySelector('.domo');
+  const foto = domo?.querySelector<HTMLImageElement>('.domo__photo img');
+  if (domo && foto) {
+    const nudge = () => {
+      const capas = domo.querySelectorAll<HTMLElement>('.domo__tint, .domo__tint2');
+      capas.forEach((el) => { el.style.display = 'none'; });
+      requestAnimationFrame(() => capas.forEach((el) => { el.style.display = ''; }));
+    };
+    const decoded = foto.complete
+      ? foto.decode().catch(() => {})
+      : new Promise<void>((r) => foto.addEventListener('load', () => r(), { once: true }))
+          .then(() => foto.decode().catch(() => {}));
+    decoded.then(nudge);
+  }
+</script>

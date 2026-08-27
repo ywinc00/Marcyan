@@ -80,7 +80,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
         H1 (el LCP real es el titular) a la descarga+decode de la foto y
         hundia el LCP simulado de 2.0 a 3.7s. */}
     <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w" sizes="100vw" />
-    <source type="image/webp" srcset="/assets/heros/houston-domo-movil-780.webp" />
+    <source type="image/webp" srcset="/assets/heros/houston-domo-movil-941.webp" />
     <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" fetchpriority="high" decoding="async" />
   </picture>
 
@@ -176,13 +176,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background: radial-gradient(56% 8% at 70% 74%, rgba(var(--hst-sage), 0.95), transparent 72%);
     mix-blend-mode: color;
-    /* capa de composición propia: sin esto, Chrome (Windows) compositaba el
-       blend ANTES de que llegara la textura de la foto y el hero quedaba
-       NEGRO congelado hasta cualquier repaint (reproducido en el preview de
-       Vercel con red real; en localhost solo asomaba con AVIF por timing). */
-    transform: translateZ(0);
   }
-  .domo__photo img { transform: translateZ(0); }
   .domo__tint2 {
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background: radial-gradient(48% 6% at 70% 74%, rgba(var(--hst-sage-soft), 0.1), transparent 70%);
@@ -354,13 +348,19 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     .domo__sub { font-size: 16.5px; line-height: 1.65; color: #a8a49c; text-shadow: none; }
     .domo__dock { align-self: flex-start; gap: 12px; margin-top: 6px; }
     /* CTA + explore en fila; micro debajo, alineado a la izquierda */
-    .domo__dock { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 18px; row-gap: 12px; }
-    .domo__cta { align-self: auto; grid-column: 1; padding: 16px 28px; }
-    .domo__explore { grid-column: 2; align-self: center; margin-top: 0; font-size: 12.5px; text-shadow: none; }
-    .domo__micro { grid-column: 1 / -1; text-align: left; font-size: 10.5px; letter-spacing: 0.22em; color: rgba(var(--star-rgb), 0.38); text-shadow: none; }
+    .domo__dock { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 18px; row-gap: 12px; justify-content: start; }
+    /* filas EXPLICITAS: sin esto el auto-placement mandaba el explore a una
+       tercera fila bajo el micro (queja del dueno; el artboard los quiere
+       CTA + explore JUNTOS en la fila 1 y el micro debajo). */
+    .domo__cta { align-self: auto; grid-row: 1; grid-column: 1; padding: 16px 28px; }
+    .domo__explore { grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0; font-size: 12.5px; text-shadow: none; }
+    .domo__micro { grid-row: 2; grid-column: 1 / -1; text-align: left; font-size: 10.5px; letter-spacing: 0.22em; color: rgba(var(--star-rgb), 0.38); text-shadow: none; }
 
     .domo__card {
-      position: absolute; right: clamp(24px, 6vw, 96px); bottom: 170px;
+      /* bottom proporcional: 170px sobre 860 del artboard = 19.8%. Con px
+         fijos la card flotaba a media altura en pantallas bajas (queja del
+         dueno: "nada que ver la posicion"). */
+      position: absolute; right: clamp(24px, 6vw, 96px); bottom: 19.8%;
       width: 300px; margin: 0;
       padding: 22px 24px; gap: 12px; border-radius: 14px;
     }
@@ -413,20 +413,30 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
 </style>
 
 <script>
-  // Seguro de PINTADO (no es animacion): Chrome en Windows compositaba la capa
-  // mix-blend-mode:color antes de que llegara la textura de la foto y el hero
-  // quedaba NEGRO congelado hasta cualquier repaint (race reproducido en frio
-  // contra el preview de Vercel; translateZ solo, no basta). Cuando la foto
-  // termina de DECODIFICAR, se fuerza un re-compositado de las capas de tinte
-  // (el mismo toggle que lo corrige a mano). Sin JS: el race es posible pero
-  // el hero queda oscuro-legible, CTA y texto intactos.
+  // Seguro de PINTADO (no es animacion): Chrome en Windows a veces composita
+  // el hero ANTES de que llegue la textura de la foto y queda NEGRO congelado
+  // hasta cualquier repaint (race reproducido en frio contra el preview de
+  // Vercel; promover capas con translateZ lo EMPEORABA). Al terminar el decode
+  // de la foto se ocultan foto+tintes un frame pintado y se restauran: la
+  // invalidacion real que lo cura siempre. Sin JS: el race es raro y el hero
+  // queda oscuro pero legible, texto y CTA intactos.
   const domo = document.querySelector('.domo');
   const foto = domo?.querySelector<HTMLImageElement>('.domo__photo img');
   if (domo && foto) {
+    // SINCRONO a proposito: display none -> reflow forzado -> restaurar, todo
+    // en la misma tarea. Nada de rAF: en pestana de fondo rAF no corre y el
+    // toggle quedaba a medias (capas apagadas). El toggle invalida el stacking
+    // del hero y Chrome re-rasteriza la textura que llego tarde.
     const nudge = () => {
-      const capas = domo.querySelectorAll<HTMLElement>('.domo__tint, .domo__tint2');
+      const capas = domo.querySelectorAll<HTMLElement>('.domo__photo, .domo__tint, .domo__tint2');
       capas.forEach((el) => { el.style.display = 'none'; });
-      requestAnimationFrame(() => capas.forEach((el) => { el.style.display = ''; }));
+      // doble rAF: garantiza un frame PINTADO sin las capas antes de
+      // restaurarlas (un toggle en el mismo task no repinta nada). En pestana
+      // de fondo los rAF esperan a que vuelva a ser visible: se restaura justo
+      // cuando alguien mira, que es lo que importa.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        capas.forEach((el) => { el.style.display = ''; });
+      }));
     };
     const decoded = foto.complete
       ? foto.decode().catch(() => {})

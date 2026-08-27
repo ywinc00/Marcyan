@@ -19,14 +19,16 @@ const JOBS = [
   // se sirve al ancho NATIVO (1672) y withoutEnlargement lo garantiza.
   ['houston-domo.png', 1440, 'houston-domo-1440'],
   ['houston-domo.png', 1672, 'houston-domo-1672'],
-  ['houston-domo-movil-2.png', 780, 'houston-domo-movil-780'],
+  ['houston-domo-movil-2.png', 941, 'houston-domo-movil-941'],
 ];
 
 const kb = (p) => (statSync(p).size / 1024).toFixed(0);
 
 async function fit(src, width, out, fmt) {
   // Calidad descendente hasta caber en presupuesto (la foto es oscura: sobra margen).
-  const steps = fmt === 'avif' ? [60, 52, 45, 38, 32, 26] : [78, 70, 62, 54, 46, 38];
+  // Calidad ALTA primero: a q78 la foto oscura mostraba banding y pixelado
+  // (queja del dueno). El presupuesto es 150KB, no 25: usarlo.
+  const steps = fmt === 'avif' ? [75, 68, 60, 52] : [92, 88, 84, 80, 75];
   for (const quality of steps) {
     const img = sharp(join(SRC, src)).resize({ width, withoutEnlargement: true });
     if (fmt === 'avif') await img.avif({ quality }).toFile(out);

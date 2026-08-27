@@ -73,14 +73,21 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
 <section class="domo">
   {/* ── 1 · FOTO (el LCP del hub: eager + fetchpriority high, jamás lazy) ── */}
   <picture class="domo__photo">
-    <source media="(min-width: 768px)" type="image/avif" srcset="/assets/heros/houston-domo-1440.avif 1440w, /assets/heros/houston-domo-2200.avif 2200w" sizes="100vw" />
-    <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-2200.webp 2200w" sizes="100vw" />
-    <source type="image/avif" srcset="/assets/heros/houston-domo-movil-780.avif" />
+    {/* Solo WebP: el AVIF de sharp daba primer pintado NEGRO en Chrome real
+        (la foto solo aparecía tras forzar un repaint) y reportaba dimensiones
+        falsas (1536×864 por 1672×941). El WebP pesa casi igual (24-30KB) y
+        pinta bien a la primera. decoding=async: sync acoplaba el pintado del
+        H1 (el LCP real es el titular) a la descarga+decode de la foto y
+        hundia el LCP simulado de 2.0 a 3.7s. */}
+    <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w" sizes="100vw" />
     <source type="image/webp" srcset="/assets/heros/houston-domo-movil-780.webp" />
-    <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="860" fetchpriority="high" decoding="async" />
+    <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" fetchpriority="high" decoding="async" />
   </picture>
 
-  {/* ── 2-4 · tinte salvia + oscurecedores + glow que respira ── */}
+  {/* ── 2-4 · tinte salvia + oscurecedores + glow que respira (capas VERBATIM
+      del canvas del dueño, encima de la foto retocada: así las aprobó).
+      Nota de QA: un primer diagnóstico culpó a estas capas de "apagar" la foto
+      y era falso; el negro era el primer pintado roto del AVIF (ver picture). */}
   <div class="domo__tint" aria-hidden="true"></div>
   <div class="domo__tint2" aria-hidden="true"></div>
   <div class="domo__shade" aria-hidden="true"></div>
@@ -179,7 +186,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     .domo__tint2 { background: radial-gradient(46% 22% at 74% 47%, rgba(var(--hst-sage-soft), 0.1), transparent 70%); }
   }
 
-  /* ── 3 · oscurecedores de contraste (el texto no se debilita: se oscurece el velo) ── */
+  /* ── 3 · oscurecedores de contraste (valores del canvas) ── */
   .domo__shade {
     position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background:
@@ -248,6 +255,9 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     text-transform: uppercase; color: #98948b;
     text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
   }
+  /* 700 como el canvas. El swap tardio de la fuente re-emitia la entrada LCP
+     (LCP simulado 3.5-3.7s); el fix real es el PRELOAD de la woff2 en las dos
+     paginas Houston: la fuente llega antes del primer paint del H1. */
   .domo__h1 {
     margin: 0; font-family: var(--font-display); font-weight: 700;
     font-size: 34px; line-height: 1.12; letter-spacing: -0.02em;
@@ -329,9 +339,12 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       flex-direction: row; align-items: flex-start;
       padding-top: calc(var(--nav-h) + clamp(72px, 14vh, 150px));
     }
-    .domo__sky { gap: 22px; }
+    .domo__sky { gap: 22px; max-width: 720px; }
     .domo__kicker { font-size: 11.5px; letter-spacing: 0.24em; text-shadow: none; }
-    .domo__h1 { font-size: 56px; line-height: 1.08; text-shadow: none; }
+    /* rotura del artboard ("Diseño de páginas web / en Houston"): se anula el
+       text-wrap:balance global (partía en mitades parejas) y el ancho corta
+       justo después de "web" sin dejar caer "en" a la primera línea. */
+    .domo__h1 { font-size: 56px; line-height: 1.08; text-shadow: none; max-width: 640px; text-wrap: wrap; }
     .domo__sub { font-size: 16.5px; line-height: 1.65; color: #a8a49c; text-shadow: none; }
     .domo__dock { align-self: flex-start; gap: 12px; margin-top: 6px; }
     /* CTA + explore en fila; micro debajo, alineado a la izquierda */

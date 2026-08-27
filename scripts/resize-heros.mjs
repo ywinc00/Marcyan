@@ -14,8 +14,11 @@ const BUDGET = 150 * 1024;
 
 const JOBS = [
   // [fuente, ancho de salida, nombre base de salida]
+  // La spec pedía un tramo 2200, pero la fuente real mide 1672px de ancho:
+  // agrandarla serviría un archivo más pesado y más borroso. El tramo grande
+  // se sirve al ancho NATIVO (1672) y withoutEnlargement lo garantiza.
   ['houston-domo.png', 1440, 'houston-domo-1440'],
-  ['houston-domo.png', 2200, 'houston-domo-2200'],
+  ['houston-domo.png', 1672, 'houston-domo-1672'],
   ['houston-domo-movil-2.png', 780, 'houston-domo-movil-780'],
 ];
 
@@ -25,7 +28,7 @@ async function fit(src, width, out, fmt) {
   // Calidad descendente hasta caber en presupuesto (la foto es oscura: sobra margen).
   const steps = fmt === 'avif' ? [60, 52, 45, 38, 32, 26] : [78, 70, 62, 54, 46, 38];
   for (const quality of steps) {
-    const img = sharp(join(SRC, src)).resize({ width });
+    const img = sharp(join(SRC, src)).resize({ width, withoutEnlargement: true });
     if (fmt === 'avif') await img.avif({ quality }).toFile(out);
     else await img.webp({ quality }).toFile(out);
     if (statSync(out).size <= BUDGET) return { quality, size: kb(out) };
@@ -41,7 +44,7 @@ if (missing.length) {
 
 mkdirSync(OUT, { recursive: true });
 for (const [src, width, base] of JOBS) {
-  for (const fmt of ['avif', 'webp']) {
+  for (const fmt of ['webp']) {
     const out = join(OUT, `${base}.${fmt}`);
     const r = await fit(src, width, out, fmt);
     console.log(`${out} · q${r.quality} · ${r.size}KB`);

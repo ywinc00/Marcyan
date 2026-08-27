@@ -27,3 +27,9 @@ Thumbs.db
 
 # dev-only dashboard mock backend (never shipped)
 public/dev/
+
+# Material de trabajo local: fuentes pesadas y piezas de marketing.
+# No forma parte del build ni del sitio; los planes en docs/*.md si se versionan.
+_reel/
+docs/galeria-src/
+docs/redes/

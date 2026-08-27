@@ -56,6 +56,18 @@ export const houstonHub = {
     // (línea de suelo + atmósfera + sello de ciudad). `src` opcional para reponerlo.
     skyline: { caption: 'HOUSTON, TX — SPACE CITY' },
     tone: 'gold' as const,
+    // ── Campos ADITIVOS del hero "El Domo" (DomoHero; spec en
+    // docs/landings/SPEC-hero-houston-domo.md). telemetry/skyline se CONSERVAN:
+    // CityHero sigue existiendo y el rollback es revertir el import.
+    // El body va con coma, no em-dash (regla de copy del dueño, E-07).
+    aiCard: {
+      title: 'Cero llamadas perdidas',
+      body: 'Un agente de IA contesta tu teléfono y tu WhatsApp 24/7, en inglés y español, agenda citas mientras tú descansas.',
+      linkLabel: 'Ver cómo funciona →',
+      href: '/es/houston/ia-conversacional',
+    },
+    builtWithLabel: 'Construimos con',
+    builtWith: ['OpenAI', 'Google', 'WhatsApp', 'Shopify', 'Stripe'],
   },
   answer: {
     q: '¿Por qué elegir una agencia de diseño web en Houston?',

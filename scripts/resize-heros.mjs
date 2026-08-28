@@ -1,43 +1,50 @@
-// Genera las variantes del hero "El Domo" (LCP de los hubs de Houston) desde
-// las fuentes pesadas de docs/galeria-src/ (gitignoradas; las exporta el dueño
-// del proyecto Claude Design). Patrón de resize-galeria.mjs + presupuesto PSI:
-// cada variante servida above-the-fold debe pesar ≤150KB (spec del hero); el
-// script BAJA la calidad hasta cumplir y falla en voz alta si no puede.
-// One-off: se corre a mano y las variantes de public/ se comitean.
+// Genera las variantes del hero "El Domo" (hubs de Houston) desde las fuentes
+// pesadas de docs/galeria-src/ (gitignoradas; las exporta el dueño del proyecto
+// Claude Design). Patrón de resize-galeria.mjs. One-off: se corre a mano y las
+// variantes de public/ se comitean.
+//
+// Nitidez (queja del dueño, dos veces): la fuente PC mide 1672px y la móvil
+// 941px; en pantallas de DPR alto el navegador las estiraba con resampling
+// pobre y la foto se veía "de baja calidad". Los tramos 2200 (PC) y 1170
+// (móvil) se REESCALAN AQUÍ con Lanczos3 + un pase de sharpen suave: mucho
+// mejor que dejárselo al navegador. El presupuesto del tramo alto sube a
+// propósito (regla del dueño: primero calidad; además la foto va lazy y fuera
+// del camino crítico del LCP, medido en el gate PSI del encargo).
 import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 
 const SRC = 'docs/galeria-src';
 const OUT = 'public/assets/heros';
-const BUDGET = 150 * 1024;
 
 const JOBS = [
-  // [fuente, ancho de salida, nombre base de salida]
-  // La spec pedía un tramo 2200, pero la fuente real mide 1672px de ancho:
-  // agrandarla serviría un archivo más pesado y más borroso. El tramo grande
-  // se sirve al ancho NATIVO (1672) y withoutEnlargement lo garantiza.
-  ['houston-domo.png', 1440, 'houston-domo-1440'],
-  ['houston-domo.png', 1672, 'houston-domo-1672'],
-  ['houston-domo-movil-2.png', 941, 'houston-domo-movil-941', 84],
+  // [fuente, ancho, base de salida, { q, budgetKB, upscale }]
+  ['houston-domo.png', 1440, 'houston-domo-1440', { q: 92, budgetKB: 150 }],
+  ['houston-domo.png', 1672, 'houston-domo-1672', { q: 92, budgetKB: 150 }],
+  ['houston-domo.png', 2200, 'houston-domo-2200', { q: 90, budgetKB: 280, upscale: true }],
+  ['houston-domo-movil-2.png', 941, 'houston-domo-movil-941', { q: 88, budgetKB: 120 }],
+  ['houston-domo-movil-2.png', 1170, 'houston-domo-movil-1170', { q: 88, budgetKB: 170, upscale: true }],
 ];
 
 const kb = (p) => (statSync(p).size / 1024).toFixed(0);
 
-async function fit(src, width, out, fmt, qMax) {
-  // Calidad descendente hasta caber en presupuesto (la foto es oscura: sobra margen).
-  // Calidad ALTA primero: a q78 la foto oscura mostraba banding y pixelado
-  // (queja del dueno). El presupuesto es 150KB, no 25: usarlo.
-  let steps = fmt === 'avif' ? [75, 68, 60, 52] : [92, 88, 84, 80, 75];
-  // qMax por trabajo: la móvil (390px CSS) no necesita q92 y pesa un tercio menos
-  if (qMax) steps = steps.filter((s) => s <= qMax);
+async function fit(src, width, out, { q, budgetKB, upscale }) {
+  const budget = budgetKB * 1024;
+  // Calidad descendente desde q hasta caber en el presupuesto del trabajo.
+  const steps = [92, 90, 88, 84, 80, 75].filter((s) => s <= q);
   for (const quality of steps) {
-    const img = sharp(join(SRC, src)).resize({ width, withoutEnlargement: true });
-    if (fmt === 'avif') await img.avif({ quality }).toFile(out);
-    else await img.webp({ quality }).toFile(out);
-    if (statSync(out).size <= BUDGET) return { quality, size: kb(out) };
+    let img = sharp(join(SRC, src)).resize({
+      width,
+      kernel: 'lanczos3',
+      withoutEnlargement: !upscale,
+    });
+    // sharpen SOLO en los tramos reescalados hacia arriba (recupera el borde
+    // que difumina la ampliación; sigma bajo para no meter halos).
+    if (upscale) img = img.sharpen({ sigma: 1.1, m1: 0.6, m2: 1.4 });
+    await img.webp({ quality }).toFile(out);
+    if (statSync(out).size <= budget) return { quality, size: kb(out) };
   }
-  throw new Error(`${out} no cabe en ${BUDGET / 1024}KB ni a la calidad mínima`);
+  throw new Error(`${out} no cabe en ${budgetKB}KB ni a la calidad mínima`);
 }
 
 const missing = JOBS.map(([s]) => s).filter((s, i, a) => a.indexOf(s) === i && !existsSync(join(SRC, s)));
@@ -47,11 +54,9 @@ if (missing.length) {
 }
 
 mkdirSync(OUT, { recursive: true });
-for (const [src, width, base, qMax] of JOBS) {
-  for (const fmt of ['webp']) {
-    const out = join(OUT, `${base}.${fmt}`);
-    const r = await fit(src, width, out, fmt, qMax);
-    console.log(`${out} · q${r.quality} · ${r.size}KB`);
-  }
+for (const [src, width, base, opts] of JOBS) {
+  const out = join(OUT, `${base}.webp`);
+  const r = await fit(src, width, out, opts);
+  console.log(`${out} · q${r.quality} · ${r.size}KB`);
 }
-console.log('variantes del domo listas (presupuesto ≤150KB cumplido)');
+console.log('variantes del domo listas');

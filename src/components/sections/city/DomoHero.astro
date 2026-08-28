@@ -79,8 +79,8 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
         pinta bien a la primera. decoding=async: sync acoplaba el pintado del
         H1 (el LCP real es el titular) a la descarga+decode de la foto y
         hundia el LCP simulado de 2.0 a 3.7s. */}
-    <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w" sizes="100vw" />
-    <source type="image/webp" srcset="/assets/heros/houston-domo-movil-941.webp" />
+    <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w, /assets/heros/houston-domo-2200.webp 2200w" sizes="100vw" />
+    <source type="image/webp" srcset="/assets/heros/houston-domo-movil-941.webp 941w, /assets/heros/houston-domo-movil-1170.webp 1170w" sizes="100vw" />
     <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" loading="lazy" decoding="async" />
   </picture>
 
@@ -242,12 +242,15 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
 
   /* ── 8 · mensaje ── */
   .domo__inner {
-    position: relative; z-index: 3; width: 100%;
+    /* SIN position: si el inner fuera el containing block, el bottom % de la
+       card (>=md) se mediría contra una caja que termina antes del riel y la
+       card quedaba 78px alta (medido). El apilado lo llevan sky y card. */
+    z-index: 3; width: 100%;
     flex: 1 0 auto;
     display: flex; flex-direction: column;
     padding-top: calc(var(--nav-h) + var(--space-7));
   }
-  .domo__sky { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; max-width: 680px; }
+  .domo__sky { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; max-width: 680px; }
   .domo__crumb { opacity: 0.85; }
   .domo__crumb :global(*) { font-size: var(--text-xs); }
   .domo__kicker {
@@ -360,7 +363,14 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       /* bottom proporcional: 170px sobre 860 del artboard = 19.8%. Con px
          fijos la card flotaba a media altura en pantallas bajas (queja del
          dueno: "nada que ver la posicion"). */
-      position: absolute; right: clamp(24px, 6vw, 96px); bottom: 19.8%;
+      /* EXACTO al artboard 11a (lienzo 1440x860: right 96px, bottom 170px):
+         horizontal anclada al MARCO DE COMPOSICION de 1440 centrado, no al
+         borde del viewport (1440 - 2*96 = 1248 -> a 1440px da 96 clavados y
+         en pantallas mas anchas la card se queda CON la escena, no huerfana
+         en la esquina). Vertical: 170/860 = 19.8%, con tope 176px para que
+         en ventanas altas no suba de mas. */
+      position: absolute; right: max(24px, calc((100% - 1248px) / 2));
+      bottom: clamp(120px, 19.8%, 176px);
       width: 300px; margin: 0;
       padding: 22px 24px; gap: 12px; border-radius: 14px;
     }

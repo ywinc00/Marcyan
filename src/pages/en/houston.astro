@@ -15,6 +15,7 @@
 // The 19 silo <a> (7 services + 7 industries + 2 areas + 3 related) survive
 // intact. Schema (ItemList + Breadcrumb) and meta INTACT.
 import Layout from '../../layouts/Layout.astro';
+import '../../styles/houston-hub.css';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
@@ -69,7 +70,7 @@ const splitPrice = (p?: string) =>
 
   <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} skin="glass" />
 
-  <main id="main">
+  <main id="main" class="hst">
     <DomoHero
       kicker={h.hero.kicker}
       h1={h.hero.h1}

@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════════════════════════
+   PIEL "EL DOMO" — SOLO hubs de Houston (esqueleto global, piel por página).
+   Gate: design/houston-hub-domo.md (VALIDADO por el dueño 2026-08-28).
+   TODO va bajo `main.hst`: el resto del sitio no ve nada de esto.
+
+   La jugada central es E-14 (paleta como sistema): se REDEFINEN los tokens
+   de la familia oro dentro del scope de la página y todos los componentes
+   globales (kickers, hovers, numerales, em, botones oro) se re-pielan solos.
+   Superficies al lenguaje glass del hero: translúcido oscuro + hairline
+   rgba(240,237,232,0.09) + radius 14. blur SOLO donde ya existía (nav/card
+   del hero): aquí glass "seco", cero coste de composición (E-08: sobriedad).
+   ═══════════════════════════════════════════════════════════════ */
+
+main.hst {
+  /* familia oro del hub (el #BDA36E del domo) — sistema, no hex sueltos */
+  --accent-gold: #BDA36E;
+  --accent-gold-deep: #8f7845;
+  --accent-gold-dim: rgba(189, 163, 110, 0.15);
+  --accent-gold-line: rgba(189, 163, 110, 0.30);
+  --accent-gold-glow: rgba(189, 163, 110, 0.25);
+  --accent-gold-rgb: 189, 163, 110;
+  --border-accent: rgba(189, 163, 110, 0.30);
+  /* lenguaje de superficie del domo */
+  --hst-line: rgba(240, 237, 232, 0.09);
+  --hst-surface: rgba(10, 12, 10, 0.66);
+  --hst-hover: rgba(240, 237, 232, 0.04);
+  --hst-sage: 118, 152, 138;
+}
+
+/* ── Tarjetas de primer nivel → glass seco del domo ─────────────── */
+main.hst .pcard,
+main.hst .ficha__panel,
+main.hst .answer__card,
+main.hst .gost__demo {
+  background: var(--hst-surface);
+  border-color: var(--hst-line);
+  border-radius: 14px;
+}
+/* el pcard conserva su respiración de esquina, re-tintada por token */
+main.hst .pcard {
+  background:
+    radial-gradient(120% 100% at 0% 0%, var(--accent-gold-dim), transparent 52%),
+    var(--hst-surface);
+}
+/* ecos salvia (≤0.10, solo fondo, nunca compitiendo con el oro del contenido) */
+main.hst .ficha__panel {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(var(--hst-sage), 0.10), transparent 58%),
+    var(--hst-surface);
+}
+main.hst .gost__demo {
+  background:
+    radial-gradient(110% 90% at 50% 0%, rgba(var(--hst-sage), 0.08), transparent 60%),
+    var(--hst-surface);
+}
+
+/* ── Filas e ítems: hover al lenguaje hairline del domo ─────────── */
+main.hst .svcrow { border-color: var(--hst-line); }
+main.hst .svcprice__rest { border-top-color: var(--hst-line); }
+main.hst .svcrow__link:hover,
+main.hst .svcrow__link:focus-visible,
+main.hst .inddir__link:hover,
+main.hst .inddir__link:focus-visible { background: var(--hst-hover); }
+main.hst .inddir__list { border-top-color: var(--hst-line); }
+main.hst .inddir__item { border-bottom-color: var(--hst-line); }
+main.hst .svcrow__icon,
+main.hst .pcard__icon {
+  background: rgba(240, 237, 232, 0.05);
+  border-color: var(--hst-line);
+}
+main.hst .explore { border-block-color: var(--hst-line); }
+main.hst .ficha__row,
+main.hst .ficha__row:last-child { border-color: var(--hst-line); }
+main.hst .ficha__state,
+main.hst .ficha__zone,
+main.hst .ficha__pills .ficha__state {
+  background: rgba(240, 237, 232, 0.05);
+  border-color: var(--hst-line);
+}
+
+/* ── FAQ y bloques de respuesta: hairlines del domo ─────────────── */
+main.hst .faq__item { border-color: var(--hst-line); }
+
+/* ── Cierre: el CTA de conversión rima con el pill claro del hero ──
+   (excepción de CTA aprobada por el dueño para ESTE hub; misma anatomía
+   que el CTA del domo: claro, radius 99, halo suave). Solo la acción
+   PRIMARIA de la banda; las secundarias conservan su jerarquía. */
+main.hst .ctaband__act--form {
+  background: #f0ede8;
+  color: #0a0c0a;
+  border-radius: 99px;
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(240, 237, 232, 0.16), 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+main.hst .ctaband__act--form:hover {
+  background: #ffffff;
+  color: #0a0c0a;
+}
+
+/* GrowthCta (franja fina): hairline + acento por token (ya re-tintado) */
+main.hst .gcta { border-color: var(--hst-line); }

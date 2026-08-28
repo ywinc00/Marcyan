@@ -81,7 +81,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
         hundia el LCP simulado de 2.0 a 3.7s. */}
     <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w" sizes="100vw" />
     <source type="image/webp" srcset="/assets/heros/houston-domo-movil-941.webp" />
-    <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" fetchpriority="high" decoding="async" />
+    <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" loading="lazy" decoding="async" />
   </picture>
 
   {/* ── 2-4 · tinte salvia + oscurecedores + glow que respira (capas VERBATIM
@@ -412,36 +412,3 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
   }
 </style>
 
-<script>
-  // Seguro de PINTADO (no es animacion): Chrome en Windows a veces composita
-  // el hero ANTES de que llegue la textura de la foto y queda NEGRO congelado
-  // hasta cualquier repaint (race reproducido en frio contra el preview de
-  // Vercel; promover capas con translateZ lo EMPEORABA). Al terminar el decode
-  // de la foto se ocultan foto+tintes un frame pintado y se restauran: la
-  // invalidacion real que lo cura siempre. Sin JS: el race es raro y el hero
-  // queda oscuro pero legible, texto y CTA intactos.
-  const domo = document.querySelector('.domo');
-  const foto = domo?.querySelector<HTMLImageElement>('.domo__photo img');
-  if (domo && foto) {
-    // SINCRONO a proposito: display none -> reflow forzado -> restaurar, todo
-    // en la misma tarea. Nada de rAF: en pestana de fondo rAF no corre y el
-    // toggle quedaba a medias (capas apagadas). El toggle invalida el stacking
-    // del hero y Chrome re-rasteriza la textura que llego tarde.
-    const nudge = () => {
-      const capas = domo.querySelectorAll<HTMLElement>('.domo__photo, .domo__tint, .domo__tint2');
-      capas.forEach((el) => { el.style.display = 'none'; });
-      // doble rAF: garantiza un frame PINTADO sin las capas antes de
-      // restaurarlas (un toggle en el mismo task no repinta nada). En pestana
-      // de fondo los rAF esperan a que vuelva a ser visible: se restaura justo
-      // cuando alguien mira, que es lo que importa.
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        capas.forEach((el) => { el.style.display = ''; });
-      }));
-    };
-    const decoded = foto.complete
-      ? foto.decode().catch(() => {})
-      : new Promise<void>((r) => foto.addEventListener('load', () => r(), { once: true }))
-          .then(() => foto.decode().catch(() => {}));
-    decoded.then(nudge);
-  }
-</script>

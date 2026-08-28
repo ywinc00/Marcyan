@@ -66,9 +66,6 @@ const splitPrice = (p?: string) =>
   {/* LCP preload (the dome photo), one slice per viewport — hero spec. The
       media queries are mutually exclusive: only the variant <picture> will
       actually use gets preloaded. */}
-  <link slot="head" rel="preload" as="image" type="image/webp" href="/assets/heros/houston-domo-movil-941.webp" media="(max-width: 767px)" fetchpriority="high" />
-  <link slot="head" rel="preload" as="image" type="image/webp" imagesrcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w" imagesizes="100vw" media="(min-width: 768px)" fetchpriority="high" />
-  <link slot="head" rel="preload" as="font" type="font/woff2" href={sgWoff2} crossorigin />
 
   <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} skin="glass" />
 

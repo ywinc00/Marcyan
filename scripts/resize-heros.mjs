@@ -19,16 +19,18 @@ const JOBS = [
   // se sirve al ancho NATIVO (1672) y withoutEnlargement lo garantiza.
   ['houston-domo.png', 1440, 'houston-domo-1440'],
   ['houston-domo.png', 1672, 'houston-domo-1672'],
-  ['houston-domo-movil-2.png', 941, 'houston-domo-movil-941'],
+  ['houston-domo-movil-2.png', 941, 'houston-domo-movil-941', 84],
 ];
 
 const kb = (p) => (statSync(p).size / 1024).toFixed(0);
 
-async function fit(src, width, out, fmt) {
+async function fit(src, width, out, fmt, qMax) {
   // Calidad descendente hasta caber en presupuesto (la foto es oscura: sobra margen).
   // Calidad ALTA primero: a q78 la foto oscura mostraba banding y pixelado
   // (queja del dueno). El presupuesto es 150KB, no 25: usarlo.
-  const steps = fmt === 'avif' ? [75, 68, 60, 52] : [92, 88, 84, 80, 75];
+  let steps = fmt === 'avif' ? [75, 68, 60, 52] : [92, 88, 84, 80, 75];
+  // qMax por trabajo: la móvil (390px CSS) no necesita q92 y pesa un tercio menos
+  if (qMax) steps = steps.filter((s) => s <= qMax);
   for (const quality of steps) {
     const img = sharp(join(SRC, src)).resize({ width, withoutEnlargement: true });
     if (fmt === 'avif') await img.avif({ quality }).toFile(out);
@@ -45,10 +47,10 @@ if (missing.length) {
 }
 
 mkdirSync(OUT, { recursive: true });
-for (const [src, width, base] of JOBS) {
+for (const [src, width, base, qMax] of JOBS) {
   for (const fmt of ['webp']) {
     const out = join(OUT, `${base}.${fmt}`);
-    const r = await fit(src, width, out, fmt);
+    const r = await fit(src, width, out, fmt, qMax);
     console.log(`${out} · q${r.quality} · ${r.size}KB`);
   }
 }

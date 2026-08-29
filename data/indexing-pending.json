@@ -1,14 +1,21 @@
 {
-  "builtAt": "2026-08-28T14:46:31.577Z",
+  "builtAt": "2026-08-29T15:26:41.055Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 69,
-    "notIndexed": 0,
+    "indexed": 68,
+    "notIndexed": 1,
     "skipped": 15
   },
-  "candidates": 0,
-  "pending": []
+  "candidates": 1,
+  "pending": [
+    {
+      "url": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    }
+  ]
 }

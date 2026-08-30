@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-08-29T15:26:41.055Z",
+  "builtAt": "2026-08-30T14:47:03.350Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -12,7 +12,7 @@
   "candidates": 1,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
+      "url": "https://marcyanstudio.com/en/pricing/chatbot-cost",
       "coverageState": "Crawled - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0

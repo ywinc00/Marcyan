@@ -34,6 +34,7 @@ import sgWoff2 from '@fontsource-variable/space-grotesk/files/space-grotesk-lati
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston';
+import heroImgs from '../../data/hero-domo.json';
 
 const c = content.es;
 
@@ -67,6 +68,8 @@ const splitPrice = (p?: string) =>
   {/* Preload del LCP (la foto del domo), un tramo por viewport — spec del hero.
       Los media queries se excluyen entre sí: solo se precarga la variante que
       el <picture> va a usar. */}
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImgs.srcset.mobileAvif} imagesizes="100vw" media="(max-width: 767px)" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImgs.srcset.desktopAvif} imagesizes="100vw" media="(min-width: 768px)" fetchpriority="high" />
 
   <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} skin="glass" />
 

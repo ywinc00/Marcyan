@@ -12,6 +12,7 @@
 // (fórmulas por índice copiadas del canvas, renderizadas en build: cero JS en
 // cliente, solo CSS compositable). TODO muere en @media (--motion-reduce).
 import Icon from '../../ui/Icon.astro';
+import heroImgs from '../../../data/hero-domo.json';
 
 export interface DomoAiCard {
   title: string;
@@ -71,23 +72,28 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
 }));
 ---
 <section class="domo">
-  {/* ── 1 · FOTO (el LCP del hub: eager + fetchpriority high, jamás lazy) ── */}
+  {/* ── 1 · FOTO — pieza visual del hub y candidata LCP: eager +
+      fetchpriority=high, JAMÁS lazy (la regla del encargo; el lazy que se
+      coló en la ronda de PSI retrasaba el pintado y en pestañas de fondo ni
+      cargaba). Art direction real: master horizontal para desktop y master
+      vertical propio para móvil. Los srcset salen del manifiesto que genera
+      scripts/resize-heros.mjs: cuando el dueño exporte masters más grandes,
+      la escalera crece sola sin tocar este componente. AVIF principal + WebP
+      fallback. El alto lo fija el CSS del hero (absolute inset + cover), así
+      que width/height del fallback no gobiernan layout: CLS 0 garantizado
+      por diseño. */}
   <picture class="domo__photo">
-    {/* Solo WebP: el AVIF de sharp daba primer pintado NEGRO en Chrome real
-        (la foto solo aparecía tras forzar un repaint) y reportaba dimensiones
-        falsas (1536×864 por 1672×941). El WebP pesa casi igual (24-30KB) y
-        pinta bien a la primera. decoding=async: sync acoplaba el pintado del
-        H1 (el LCP real es el titular) a la descarga+decode de la foto y
-        hundia el LCP simulado de 2.0 a 3.7s. */}
-    <source media="(min-width: 768px)" type="image/webp" srcset="/assets/heros/houston-domo-1440.webp 1440w, /assets/heros/houston-domo-1672.webp 1672w, /assets/heros/houston-domo-2200.webp 2200w" sizes="100vw" />
-    <source type="image/webp" srcset="/assets/heros/houston-domo-movil-941.webp 941w, /assets/heros/houston-domo-movil-1170.webp 1170w" sizes="100vw" />
-    <img src="/assets/heros/houston-domo-1440.webp" alt="" width="1440" height="810" loading="lazy" decoding="async" />
+    <source media="(max-width: 767px)" type="image/avif" srcset={heroImgs.srcset.mobileAvif} sizes="100vw" />
+    <source media="(max-width: 767px)" type="image/webp" srcset={heroImgs.srcset.mobileWebp} sizes="100vw" />
+    <source type="image/avif" srcset={heroImgs.srcset.desktopAvif} sizes="100vw" />
+    <source type="image/webp" srcset={heroImgs.srcset.desktopWebp} sizes="100vw" />
+    <img src={heroImgs.fallback.src} alt="" width={heroImgs.fallback.w} height={heroImgs.fallback.h} fetchpriority="high" decoding="async" />
   </picture>
 
   {/* ── 2-4 · tinte salvia + oscurecedores + glow que respira (capas VERBATIM
       del canvas del dueño, encima de la foto retocada: así las aprobó).
       Nota de QA: un primer diagnóstico culpó a estas capas de "apagar" la foto
-      y era falso; el negro era el primer pintado roto del AVIF (ver picture). */}
+      y era falso (el fantasma era del arnés de capturas, no de usuarios). */}
   <div class="domo__tint" aria-hidden="true"></div>
   <div class="domo__tint2" aria-hidden="true"></div>
   <div class="domo__shade" aria-hidden="true"></div>

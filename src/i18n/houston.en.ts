@@ -46,7 +46,7 @@ export const houstonHub = {
     sub: 'One bilingual studio for your website, your AI, and your SEO, with public pricing.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
     microcopy: 'Reply in 1 business hour · No commitment',
-    explore: { label: 'See services and pricing ↓', href: '#servicios' },
+    explore: { label: 'See services', href: '#servicios' },
     telemetry: [
       { label: 'Direct line', value: nap.houston, href: telHref, live: true },
       { label: 'Hours', value: nap.hours },
@@ -66,7 +66,9 @@ export const houstonHub = {
       linkLabel: 'See how it works →',
       href: '/en/houston/conversational-ai',
     },
-    builtWithLabel: 'We build with',
+    // Brand voice (owner rule 2026-08-31): we never say we "build with" AI —
+    // we master it. Hence "We master".
+    builtWithLabel: 'We master',
     builtWith: ['OpenAI', 'Google', 'WhatsApp', 'Shopify', 'Stripe'],
   },
   answer: {

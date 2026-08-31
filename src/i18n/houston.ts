@@ -45,7 +45,7 @@ export const houstonHub = {
     sub: 'La agencia hispana que une tu web, tu IA y tu SEO, con precios públicos.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     microcopy: 'Respuesta en 1 hora hábil · Sin compromiso',
-    explore: { label: 'Ver servicios y precios ↓', href: '#servicios' },
+    explore: { label: 'Ver servicios', href: '#servicios' },
     telemetry: [
       { label: 'Línea directa', value: nap.houston, href: telHref, live: true },
       { label: 'Horario', value: nap.hours },
@@ -66,7 +66,9 @@ export const houstonHub = {
       linkLabel: 'Ver cómo funciona →',
       href: '/es/houston/ia-conversacional',
     },
-    builtWithLabel: 'Construimos con',
+    // Voz de marca (regla del dueño 2026-08-31): NUNCA "construimos con" IA —
+    // la dominamos / la usamos para el cliente. De ahí "Dominamos".
+    builtWithLabel: 'Dominamos',
     builtWith: ['OpenAI', 'Google', 'WhatsApp', 'Shopify', 'Stripe'],
   },
   answer: {

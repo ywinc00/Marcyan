@@ -134,7 +134,8 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     {/* ── 9 · card IA (glass) ── */}
     <aside class="domo__card" aria-label={aiCard.title}>
       <div class="domo__card-head">
-        <img class="domo__card-iso" src="/logos/marcyan-isotipo-mono-claro.png" alt="" width="18" height="18" loading="lazy" decoding="async" />
+        {/* icono de puntos de la referencia del dueno (2026-08-31), inline SVG */}
+        <svg class="domo__card-iso" viewBox="0 0 18 18" aria-hidden="true"><g fill="currentColor"><circle cx="3.2" cy="3.2" r="1.7" /><circle cx="3.2" cy="9" r="1.7" /><circle cx="3.2" cy="14.8" r="1.7" /><circle cx="9" cy="3.2" r="1.7" /><circle cx="9" cy="9" r="1.7" /><circle cx="9" cy="14.8" r="1.7" /><circle cx="14.8" cy="6.1" r="1.7" /><circle cx="14.8" cy="11.9" r="1.7" /></g></svg>
         <h2 class="domo__card-title">{aiCard.title}</h2>
       </div>
       <p class="domo__card-body">{aiCard.body}</p>
@@ -286,7 +287,8 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     font-family: var(--font-display); font-weight: 600; font-size: 15px;
     color: #0a0c0a; background: var(--fg-primary);
     border-radius: var(--radius-pill); padding: 16px 24px;
-    box-shadow: 0 0 0 3px rgba(var(--star-rgb), 0.16), 0 14px 34px rgba(0, 0, 0, 0.45);
+    /* anillo bezel de la referencia del dueno (2026-08-31): mas grueso y visible */
+    box-shadow: 0 0 0 4px rgba(var(--star-rgb), 0.24), 0 14px 34px rgba(0, 0, 0, 0.45);
     text-decoration: none;
     transition: background var(--duration-fast) var(--ease-out-expo);
   }
@@ -298,14 +300,24 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     text-transform: uppercase; color: rgba(var(--star-rgb), 0.42);
     text-align: center; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); white-space: nowrap;
   }
+  /* secundario PILL CONTORNO (sistema de botones de la referencia del dueno,
+     2026-08-31: primario blanco con anillo + secundario transparente con
+     hairline, mismo alto). El label i18n no cambia. */
   .domo__explore {
-    align-self: center; display: inline-flex; align-items: center; min-height: var(--tap-min);
-    padding-inline: var(--space-2); margin-top: 2px;
-    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em;
-    color: var(--hst-gold); text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out-expo);
+    align-self: center; display: inline-flex; align-items: center; justify-content: center;
+    min-height: var(--tap-min); margin-top: 2px;
+    padding: 15px 26px; border-radius: var(--radius-pill);
+    border: 1px solid rgba(var(--star-rgb), 0.35);
+    font-family: var(--font-display); font-weight: 500; font-size: 15px;
+    color: var(--fg-primary); text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out-expo),
+                background var(--duration-fast) var(--ease-out-expo);
   }
-  .domo__explore:hover, .domo__explore:focus-visible { color: #d8c391; }
+  .domo__explore:hover, .domo__explore:focus-visible {
+    border-color: rgba(var(--star-rgb), 0.6);
+    background: rgba(var(--star-rgb), 0.06);
+  }
+  .domo__explore:focus-visible { outline: 2px solid var(--hst-gold); outline-offset: 3px; }
 
   /* ── 9 · card IA (glass) ── */
   .domo__card {
@@ -317,7 +329,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
   }
   .domo__card-head { display: flex; align-items: center; gap: 10px; }
-  .domo__card-iso { width: 17px; height: 17px; object-fit: contain; flex: 0 0 auto; }
+  .domo__card-iso { width: 17px; height: 17px; flex: 0 0 auto; color: var(--fg-primary); }
   .domo__card-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; }
   .domo__card-body { font-size: 13px; line-height: 1.6; color: #a8a49c; }
   .domo__card-link {
@@ -362,7 +374,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
        tercera fila bajo el micro (queja del dueno; el artboard los quiere
        CTA + explore JUNTOS en la fila 1 y el micro debajo). */
     .domo__cta { align-self: auto; grid-row: 1; grid-column: 1; padding: 16px 28px; }
-    .domo__explore { grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0; font-size: 12.5px; text-shadow: none; }
+    .domo__explore { grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0; }
     .domo__micro { grid-row: 2; grid-column: 1 / -1; text-align: left; font-size: 10.5px; letter-spacing: 0.22em; color: rgba(var(--star-rgb), 0.38); text-shadow: none; }
 
     .domo__card {

@@ -1,18 +1,18 @@
 {
-  "builtAt": "2026-08-30T14:47:03.350Z",
+  "builtAt": "2026-09-01T16:13:32.275Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 68,
+    "indexed": 71,
     "notIndexed": 1,
-    "skipped": 15
+    "skipped": 12
   },
   "candidates": 1,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/en/pricing/chatbot-cost",
+      "url": "https://marcyanstudio.com/en/miami/conversational-ai",
       "coverageState": "Crawled - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0

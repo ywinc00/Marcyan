@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-09-01T16:13:32.275Z",
+  "builtAt": "2026-09-02T17:18:50.810Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
@@ -9,13 +9,6 @@
     "notIndexed": 1,
     "skipped": 12
   },
-  "candidates": 1,
-  "pending": [
-    {
-      "url": "https://marcyanstudio.com/en/miami/conversational-ai",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": null,
-      "requestCount": 0
-    }
-  ]
+  "candidates": 0,
+  "pending": []
 }

@@ -155,7 +155,8 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
 <style>
   /* ── tokens LOCALES del hub (la expresión, no la paleta global) ── */
   .domo {
-    --hst-gold: #BDA36E;
+    /* un solo oro en todo el sitio (2026-09-02): el hub ya no tiene el suyo */
+    --hst-gold: var(--accent-gold);
     --hst-sage: 118, 152, 138;
     --hst-sage-soft: 152, 178, 166;
     --hst-sage-glow: 172, 216, 192;
@@ -279,20 +280,21 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     text-wrap: pretty; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
   }
   .domo__dock { display: flex; flex-direction: column; gap: 11px; margin-top: 4px; align-self: stretch; }
-  /* CTA pill CLARO: expresión aprobada del dueño para este hub (excepción
-     consciente al CTA oro del DS; ver spec y design/expresiones.md cuando exista). */
+  /* CTA primario = el boton primario del SITIO (oro, tipografia de cuerpo,
+     mismos paddings que .btn--lg) con la forma pill + anillo que el dueno
+     eligio (2026-09-02: la forma del hero pasa al sitio; el color del sitio
+     pasa al hero). El pill claro anterior queda descartado. */
   .domo__cta {
     display: inline-flex; align-items: center; justify-content: center;
     align-self: stretch; min-height: var(--tap-min);
-    font-family: var(--font-display); font-weight: 600; font-size: 15px;
-    color: #0a0c0a; background: var(--fg-primary);
-    border-radius: var(--radius-pill); padding: 16px 24px;
-    /* anillo bezel de la referencia del dueno (2026-08-31): mas grueso y visible */
-    box-shadow: 0 0 0 4px rgba(var(--star-rgb), 0.24), 0 14px 34px rgba(0, 0, 0, 0.45);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-base); letter-spacing: 0.01em;
+    color: var(--fg-inverse); background: var(--accent-gold);
+    border-radius: var(--radius-pill); padding: 14px 28px;
+    box-shadow: 0 0 0 4px var(--accent-gold-dim), 0 14px 34px rgba(0, 0, 0, 0.45);
     text-decoration: none;
-    transition: background var(--duration-fast) var(--ease-out-expo);
+    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base);
   }
-  .domo__cta:hover { background: #ffffff; }
+  .domo__cta:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: 0 0 0 4px var(--accent-gold-dim), var(--shadow-gold); }
   .domo__cta:focus-visible { outline: 2px solid var(--hst-gold); outline-offset: 3px; }
   .domo__cta:active { transform: scale(0.98); }
   .domo__micro {
@@ -300,33 +302,36 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     text-transform: uppercase; color: rgba(var(--star-rgb), 0.42);
     text-align: center; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); white-space: nowrap;
   }
-  /* secundario PILL CONTORNO (sistema de botones de la referencia del dueno,
-     2026-08-31: primario blanco con anillo + secundario transparente con
-     hairline, mismo alto). El label i18n no cambia. */
+  /* secundario: en MOVIL es un enlace ghost (decision del dueno 2026-09-02:
+     dos pills apilados pesan; que respire). En >=md pasa a pill contorno del
+     sistema (ver bloque md). El label i18n no cambia. */
   .domo__explore {
     align-self: center; display: inline-flex; align-items: center; justify-content: center;
-    min-height: var(--tap-min); margin-top: 2px;
-    padding: 15px 26px; border-radius: var(--radius-pill);
-    border: 1px solid rgba(var(--star-rgb), 0.35);
-    font-family: var(--font-display); font-weight: 500; font-size: 15px;
-    color: var(--fg-primary); text-decoration: none;
-    transition: border-color var(--duration-fast) var(--ease-out-expo),
-                background var(--duration-fast) var(--ease-out-expo);
+    min-height: var(--tap-min); margin-top: 2px; padding-inline: var(--space-2);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
+    color: var(--fg-secondary); text-decoration: none;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+    transition: color var(--duration-fast) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-expo);
   }
-  .domo__explore:hover, .domo__explore:focus-visible {
-    border-color: rgba(var(--star-rgb), 0.6);
-    background: rgba(var(--star-rgb), 0.06);
-  }
-  .domo__explore:focus-visible { outline: 2px solid var(--hst-gold); outline-offset: 3px; }
+  .domo__explore:hover, .domo__explore:focus-visible { color: var(--accent-gold); }
+  .domo__explore:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
 
-  /* ── 9 · card IA (glass) ── */
-  .domo__card {
-    position: relative; z-index: 3;
-    margin-top: auto; margin-bottom: var(--space-4);
-    background: rgba(8, 10, 9, 0.55);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(var(--star-rgb), 0.09); border-radius: 14px;
-    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+  /* ── 9 · card IA — superficie del SISTEMA (tarjeta opaca --bg-card, borde y
+     radio lg, sin blur): la personalidad la ponen la foto y el copy, no una
+     superficie ajena (decision del dueno 2026-09-02). En MOVIL no existe:
+     tapaba al astronauta y comprimia el hero; el gancho de IA sigue vivo en
+     la seccion de servicios y en el GrowthCta. ── */
+  .domo__card { display: none; }
+  @media (--md) {
+    .domo__card {
+      position: relative; z-index: 3;
+      margin-top: auto; margin-bottom: var(--space-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: var(--shadow-card);
+    }
   }
   .domo__card-head { display: flex; align-items: center; gap: 10px; }
   .domo__card-iso { width: 17px; height: 17px; flex: 0 0 auto; color: var(--fg-primary); }
@@ -373,8 +378,15 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     /* filas EXPLICITAS: sin esto el auto-placement mandaba el explore a una
        tercera fila bajo el micro (queja del dueno; el artboard los quiere
        CTA + explore JUNTOS en la fila 1 y el micro debajo). */
-    .domo__cta { align-self: auto; grid-row: 1; grid-column: 1; padding: 16px 28px; }
-    .domo__explore { grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0; }
+    .domo__cta { align-self: auto; grid-row: 1; grid-column: 1; }
+    /* secundario del sistema (= .btn--secondary .btn--lg) en pill */
+    .domo__explore {
+      grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0;
+      padding: 14px 28px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border-accent); color: var(--fg-primary);
+      font-size: var(--text-base); text-shadow: none;
+    }
+    .domo__explore:hover, .domo__explore:focus-visible { border-color: var(--accent-gold); color: var(--accent-gold); }
     .domo__micro { grid-row: 2; grid-column: 1 / -1; text-align: left; font-size: 10.5px; letter-spacing: 0.22em; color: rgba(var(--star-rgb), 0.38); text-shadow: none; }
 
     .domo__card {
@@ -390,7 +402,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       position: absolute; right: max(24px, calc((100% - 1248px) / 2));
       bottom: clamp(120px, 19.8%, 176px);
       width: 300px; margin: 0;
-      padding: 22px 24px; gap: 12px; border-radius: 14px;
+      padding: 22px 24px; gap: 12px;
     }
     .domo__card-iso { width: 18px; height: 18px; }
     .domo__card-title { font-size: 16.5px; }

@@ -68,3 +68,28 @@ radius 99, halo 0 0 0 3px rgba(240,237,232,0.16).
 Sub-agentes invocados: ninguno (dirección dada por el hero del dueño; sin material nuevo).
 Estado: VALIDADO por: el dueño (orden directa 2026-08-28: "vas a tomar el resto de la
 landing y vas a adaptar el diseño para que encaje con el hero"). Fecha: 2026-08-28
+
+
+## Resolucion 2026-09-02 · expresion vs sistema (revision del dueno en movil y PC)
+
+Hallazgo del dueno: el hero competia con el resto del sitio (forma y color de
+botones distintos, nav distinta) y al pasar de Houston a Servicios "parecia otro
+sitio"; en movil todo iba comprimido. Causa: encajamos la PAGINA al hero (piel
+`main.hst`, oro propio, superficies glass) en vez del hero al sitio.
+
+Decisiones del dueno:
+- La **nav glass** y la **forma pill** de los botones pasan a ser del SITIO
+  (SiteNav `skin` default `glass`; `Button.astro` radio pill). El color de los
+  botones es el del DS (oro). Se prueba; si no funciona, se revisa.
+- **Un solo oro** (`--accent-gold`); el `#BDA36E` del hub desaparece.
+- **Fuera la piel de pagina** `houston-hub.css`: servicios, ficha, FAQ y cierre
+  vuelven al Houston Premium global.
+- **Card "Cero llamadas"**: en PC se queda con superficie del sistema
+  (`--bg-card`, borde, radio lg, sin blur); en MOVIL no existe (tapaba al
+  astronauta).
+- Secundario del hero: pill contorno del sistema en PC, **enlace ghost** en movil.
+
+Leccion de doctrina: una referencia externa aporta atmosfera y composicion
+(foto, tinte, particulas, riel, copy); su sistema de botones, nav y superficies
+NUNCA se importa. La personalidad vive en la expresion; la gramatica de
+interaccion es del sistema.

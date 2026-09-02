@@ -24,7 +24,11 @@ interface Props {
    *  SOLO presentación: destinos, CTA, drawer, tracking y wordmark, intactos.
    *  El blur va en .nav__bar (SIN fixed dentro): la trampa del containing block
    *  (fix 8711117+c688eb2) no se reintroduce. */
-  skin?: 'glass';
+  /** Piel de la barra. 'glass' es el estilo del SITIO (decision del dueno
+   *  2026-09-02: la nav flotante de cristal deja de ser expresion de Houston
+   *  y pasa a ser la del sitio). 'solid' = la barra plana anterior, por si
+   *  hay que volver. */
+  skin?: 'glass' | 'solid';
 }
 const {
   nav,
@@ -42,7 +46,7 @@ const uin = t(lang as Lang);
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
 ---
-<header class:list={['nav', skin === 'glass' && 'nav--glass']} data-nav>
+<header class:list={['nav', skin !== 'solid' && 'nav--glass']} data-nav>
   <div class="nav__bar container">
     <a class="nav__logo" href={homeHref} aria-label="Marcyan Studio — inicio">
       <BrandType />
@@ -178,14 +182,14 @@ const isActive = (href: string) =>
     border: 1px solid rgba(var(--star-rgb), 0.12);
     border-radius: 12px;
   }
-  /* CTA pill CLARO del hub (expresión aprobada; mismo href/label/tracking) */
+  /* CTA de la nav: el boton primario del sitio (oro) con la FORMA pill +
+     anillo que el dueno eligio del hero (2026-09-02: forma si, color del sitio). */
   .nav--glass .nav__cta {
-    color: #0a0c0a; background: var(--fg-primary); border: none;
+    color: var(--fg-inverse); background: var(--accent-gold); border: none;
     border-radius: var(--radius-pill);
-    font-family: var(--font-display);
-    box-shadow: 0 0 0 3px rgba(var(--star-rgb), 0.16);
+    box-shadow: 0 0 0 3px var(--accent-gold-dim);
   }
-  .nav--glass .nav__cta:hover { background: #ffffff; color: #0a0c0a; }
+  .nav--glass .nav__cta:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); color: var(--fg-inverse); }
   @media (--md) {
     .nav--glass .nav__bar { margin-top: 22px; border-radius: 18px; }
   }

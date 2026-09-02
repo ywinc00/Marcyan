@@ -1,7 +1,7 @@
 month,tier,query,impressions,clicks,ctr,position,topPage,expectedPath
 2026-08,P0,marcyan,3,0,0,7.666666666666667,/en/terms,/es
 2026-08,P0,marcyan studio,0,0,0,,,/es
-2026-08,P0,web para vender en miami,27,1,0.037037037037037035,22.22222222222222,/es/miami/ecommerce,/es/miami/ecommerce
+2026-08,P0,web para vender en miami,29,1,0.034482758620689655,22.93103448275862,/es/miami/ecommerce,/es/miami/ecommerce
 2026-08,P0,agencia de servicios seo bilingüe,4,0,0,20.75,/es/houston,/es/servicios
 2026-08,P0,houston spanish website design,13,1,0.07692307692307693,24.692307692307693,/en/houston,/en/houston/bilingual-web-design
 2026-08,P0,bilingual seo miami,8,0,0,25.875,/en/miami,/en/miami/local-seo
@@ -42,8 +42,8 @@ month,tier,query,impressions,clicks,ctr,position,topPage,expectedPath
 2026-08,P0,real estate agent website houston,0,0,0,,,/en/houston/real-estate
 2026-08,P1,how much does local seo cost in houston,0,0,0,,,/en/pricing/local-seo-cost-houston
 2026-08,P1,website for contractors houston,0,0,0,,,/en/houston/contractors
-2026-08,P2,diseño web miami,100,1,0.01,35.91,/es/miami,/es/miami/diseno-web
-2026-08,P2,agencia diseño web miami,47,1,0.02127659574468085,31.106382978723403,/es/miami,/es/miami/diseno-web
+2026-08,P2,diseño web miami,109,1,0.009174311926605505,35.75229357798165,/es/miami,/es/miami/diseno-web
+2026-08,P2,agencia diseño web miami,51,1,0.0196078431372549,30.627450980392158,/es/miami,/es/miami/diseno-web
 2026-08,P2,diseño web houston,0,0,0,,,/es/houston/diseno-web
 2026-08,P2,seo local miami,0,0,0,,,/es/miami/seo-local
 2026-08,P2,como aparecer en chatgpt,0,0,0,,,/es/blog/como-aparecer-en-chatgpt-perplexity

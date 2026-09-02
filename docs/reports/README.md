@@ -2,7 +2,8 @@
 
 Cada fichero `YYYY-MM.md` de esta carpeta es el reporte de ese mes, generado por
 `scripts/track-rankings.mjs` y disparado por la rutina `marcyan-monthly-seo-report`
-(primer lunes de cada mes, 08:00 local). Es la misma mecánica que ya corre para
+(día 4 de cada mes, 08:12 local: Search Console publica con 2 o 3 días de retraso, así
+que el día 4 el mes anterior ya está completo y consolidado). Es la misma mecánica que ya corre para
 Texas Rush & Remove y Move Junk Away, con dos secciones que esos no tienen:
 posición de mercado y embudo de conversión con datos propios.
 

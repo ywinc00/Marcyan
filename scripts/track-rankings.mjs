@@ -5,8 +5,10 @@
  * Réplica del script que ya corre para MJA y TRR (scripts/track-rankings.mjs en
  * esos repos), adaptado a Marcyan y ampliado con lo que solo nosotros podemos
  * medir: el embudo de conversión first-party (Neon) y la lectura de posición de
- * mercado. Lo lanza la rutina `marcyan-monthly-seo-report` (primer lunes de cada
- * mes, 08:00 local).
+ * mercado. Lo lanza la rutina `marcyan-monthly-seo-report` el día 4 de cada mes a
+ * las 08:12 local: Search Console publica con 2 o 3 días de retraso, así que el día 4
+ * el mes anterior ya está completo. (El cron anterior, primer lunes con rango 1-7,
+ * disparaba cada día del 1 al 7 y produjo dos reportes de agosto 2026.)
  *
  * Qué hace: baja Search Analytics del mes objetivo, lo cruza con el estado de
  * indexación del sweep diario y con los eventos/leads de la base, escribe
@@ -1214,6 +1216,7 @@ SELECT l.source,
   COUNT(*) FILTER (WHERE l.status <> 'archived')::int AS historico_activos,
   MAX(l.created_at) AS ultimo
 FROM leads l
+WHERE NOT (COALESCE(l.ip_address, '') = ANY ($3::text[]))
 GROUP BY l.source
 ORDER BY mes DESC, historico DESC, l.source`,
 
@@ -1227,7 +1230,8 @@ SELECT
   COUNT(*)::int AS historico,
   COUNT(*) FILTER (WHERE d.lead_ref IS NOT NULL)::int AS historico_reclamados,
   MAX(d.created_at) AS ultimo
-FROM diagnostics d`,
+FROM diagnostics d
+WHERE NOT (COALESCE(d.ip_address, '') = ANY ($3::text[]))`,
 
   briefs: `
 SELECT
@@ -1242,6 +1246,7 @@ SELECT d.ref_id, d.created_at, d.lead_ref, l.status AS lead_status
 FROM diagnostics d
 LEFT JOIN leads l ON l.ref_id = d.lead_ref
 WHERE d.lead_ref IS NOT NULL
+  AND NOT (COALESCE(d.ip_address, '') = ANY ($3::text[]))
   AND d.created_at >= ($1::date) AT TIME ZONE 'UTC'
   AND d.created_at <  (($2::date) + 1) AT TIME ZONE 'UTC'
 ORDER BY d.created_at`,
@@ -1314,10 +1319,10 @@ async function loadFunnelData({ startDate, endDate }) {
     const embudo = await run('embudo', FUNNEL_SQL.embudo, [...base, FUNNEL_INTENT, FUNNEL_TOOL, FUNNEL_SIGNAL, FUNNEL_NAVCTA]);
     const paginasRaw = await run('paginas', FUNNEL_SQL.paginas, base);
     const origenes = await run('origenes', FUNNEL_SQL.origenes, [startDate, endDate]);
-    const leads = await run('leads', FUNNEL_SQL.leads, [startDate, endDate]);
-    const diagnosticos = await run('diagnosticos', FUNNEL_SQL.diagnosticos, [startDate, endDate]);
+    const leads = await run('leads', FUNNEL_SQL.leads, [startDate, endDate, ips]);
+    const diagnosticos = await run('diagnosticos', FUNNEL_SQL.diagnosticos, [startDate, endDate, ips]);
     const briefs = await run('briefs', FUNNEL_SQL.briefs, [startDate, endDate]);
-    const cadena = await run('cadena', FUNNEL_SQL.cadena, [startDate, endDate]);
+    const cadena = await run('cadena', FUNNEL_SQL.cadena, [startDate, endDate, ips]);
 
     if (fallos.length) console.warn(`⚠ Embudo: ${fallos.length} consulta(s) fallaron y su bloque se degrada. ${fallos.join(' · ')}`);
     if (![eventos, embudo, paginasRaw, origenes, leads, diagnosticos, briefs, cadena].some(Boolean)) return null;
@@ -1422,7 +1427,7 @@ function buildFunnelSection({ funnel, gsc, range, mesTag }) {
 
   L.push(`**Ventana:** ${range.startDate} a ${range.endDate} en los dos lados. Search Console publica con unos días de atraso, así que la consulta a Neon se recorta al mismo rango que Google alcanza a cubrir. Si no, se compararían menos días de búsqueda contra más días de base y el embudo se vería mejor de lo que es. Google cierra sus días en hora del Pacífico y nosotros en UTC, así que los bordes pueden moverse un día: se documenta, no se corrige.`);
   L.push(funnel.exclusion.ips || funnel.exclusion.sids
-    ? `**Exclusión de tráfico interno:** activa (${funnel.exclusion.ips} IP y ${funnel.exclusion.sids} sesión en la lista). Solo aplica a \`events\`.`
+    ? `**Exclusión de tráfico interno:** activa (${funnel.exclusion.ips} IP y ${funnel.exclusion.sids} sesión en la lista). Aplica a \`events\`, \`leads\` y \`diagnostics\` (\`briefs\` no guarda IP).`
     : `**Exclusión de tráfico interno:** NO ACTIVA. No hay ninguna IP ni sesión en la lista, así que todo lo de abajo incluye nuestras propias visitas de desarrollo y prueba.`);
   L.push('');
 
@@ -1612,7 +1617,7 @@ function buildReport(ctx) {
   L.push(`**Fuente:** Google Search Console API (datos oficiales de Google)${hasFunnel ? ' más la base de datos propia (Neon)' : ''}`);
   L.push(`**Generado:** ${new Date().toISOString()} · rutina \`marcyan-monthly-seo-report\`\n`);
   if (range.partial) {
-    L.push(`> ⚠️ **Reporte parcial.** Cubre ${summary.daysWithData} días del mes, no el mes entero. Search Console publica con unos 2 días de retraso, así que el último día disponible es ${summary.lastDayWithData ?? range.endDate}. Las cifras NO son comparables con un mes completo. El reporte definitivo de ${tag} se regenera solo el primer lunes del mes siguiente y sustituye a este.\n`);
+    L.push(`> ⚠️ **Reporte parcial.** Cubre ${summary.daysWithData} días del mes, no el mes entero. Search Console publica con unos 2 días de retraso, así que el último día disponible es ${summary.lastDayWithData ?? range.endDate}. Las cifras NO son comparables con un mes completo. El reporte definitivo de ${tag} se regenera solo el día 4 del mes siguiente y sustituye a este.\n`);
   }
   L.push(`---\n`);
 
@@ -1708,7 +1713,7 @@ function buildReport(ctx) {
   L.push(`**Qué NO mide este reporte.** Search Console solo ve nuestro propio sitio. No hay datos de competidores, de volumen de búsqueda absoluto ni de quién ocupa los puestos por delante nuestro. Lo que aparece como "mercado" son inferencias sobre nuestra propia posición, señaladas como tales.\n`);
   L.push(`---\n`);
   L.push(`> Generado por \`scripts/track-rankings.mjs\` desde la rutina \`marcyan-monthly-seo-report\`.`);
-  L.push(`> Próximo reporte automático: primer lunes del mes siguiente, 08:00 local.`);
+  L.push(`> Próximo reporte automático: día 4 del mes siguiente, 08:12 local.`);
 
   return L.join('\n') + '\n';
 }

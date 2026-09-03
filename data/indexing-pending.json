@@ -1,14 +1,21 @@
 {
-  "builtAt": "2026-09-02T17:18:50.810Z",
+  "builtAt": "2026-09-03T16:23:56.135Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 71,
-    "notIndexed": 1,
+    "indexed": 70,
+    "notIndexed": 2,
     "skipped": 12
   },
-  "candidates": 0,
-  "pending": []
+  "candidates": 1,
+  "pending": [
+    {
+      "url": "https://marcyanstudio.com/es/houston/branding",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": "2026-08-19T15:40:49.275Z",
+      "requestCount": 1
+    }
+  ]
 }

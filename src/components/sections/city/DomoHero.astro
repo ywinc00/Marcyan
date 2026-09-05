@@ -1,0 +1,454 @@
+---
+// HERO "EL DOMO" — bespoke de los hubs de Houston (/es/houston + /en/houston).
+// Concepto del DUEÑO (Claude Design cbbd48c2, artboards 12a móvil / 11a PC; los
+// artboards MANDAN). Astronauta sentado en el pasto bajo el domo: foto realista
+// + tinte salvia + ambiente animado (estrellas, fugaces, motas, glow que respira)
+// + card de IA glass + riel "construimos con". Spec turnkey:
+// docs/landings/SPEC-hero-houston-domo.md.
+//
+// CityHero.astro NO se toca (rollback = revertir el import en las 2 páginas).
+// Todo el copy entra por props desde houston.ts / houston.en.ts: cero literales.
+// Las capas decorativas van aria-hidden; las partículas son DETERMINISTAS
+// (fórmulas por índice copiadas del canvas, renderizadas en build: cero JS en
+// cliente, solo CSS compositable). TODO muere en @media (--motion-reduce).
+import Icon from '../../ui/Icon.astro';
+import heroImgs from '../../../data/hero-domo.json';
+
+export interface DomoAiCard {
+  title: string;
+  body: string;
+  linkLabel: string;
+  href: string;
+}
+
+interface Props {
+  /** Kicker mono, p.ej. "Agencia hispana · Houston, TX". */
+  kicker: string;
+  /** H1 con set:html — keyword VERBATIM; el <em> va en oro del hub. */
+  h1: string;
+  sub: string;
+  /** ÚNICO CTA del hero (pill CLARO, expresión aprobada del hub). */
+  primary: { label: string; href: string };
+  microcopy: string;
+  explore: { label: string; href: string };
+  /** Card "Cero llamadas perdidas" (glass, isotipo + link a IA×ciudad). */
+  aiCard: DomoAiCard;
+  /** Riel del pie: label + wordmarks en texto plano (sin logos de terceros). */
+  builtWithLabel: string;
+  builtWith: string[];
+}
+const { kicker, h1, sub, primary, microcopy, explore, aiCard, builtWithLabel, builtWith } = Astro.props;
+
+// ── Partículas deterministas (fórmulas VERBATIM del script del canvas) ──
+// PC: 7 twinkle + 3 fugaces + 16 motas · Móvil: 7 twinkle + 2 fugaces + 12 motas.
+const twPc = Array.from({ length: 7 }, (_, i) => ({
+  top: `${6 + (i * 13) % 52}px`, left: `${24 + (i * 9) % 54}%`,
+  dur: `${(3.4 + (i % 4) * 0.9).toFixed(1)}s`, del: `${((i * 0.9) % 4).toFixed(1)}s`,
+}));
+const twMv = Array.from({ length: 7 }, (_, i) => ({
+  top: `${8 + (i * 29) % 170}px`, left: `${12 + (i * 13) % 74}%`,
+  dur: `${(3.4 + (i % 4) * 0.9).toFixed(1)}s`, del: `${((i * 0.9) % 4).toFixed(1)}s`,
+}));
+const shPc = [
+  { top: '26px', left: '30%', d: '11s', del: '2s', w: '86px' },
+  { top: '12px', left: '52%', d: '15s', del: '8.5s', w: '70px' },
+  { top: '38px', left: '40%', d: '19s', del: '14s', w: '96px' },
+];
+const shMv = [
+  { top: '34px', left: '8%', d: '12s', del: '3s', w: '64px' },
+  { top: '84px', left: '-12%', d: '17s', del: '10s', w: '54px' },
+];
+const motePc = Array.from({ length: 16 }, (_, i) => ({
+  sz: `${(1.6 + (i % 4) * 0.7).toFixed(1)}px`,
+  left: `${(i * 61) % 92 + 4}%`, top: `${38 + (i * 37) % 48}%`,
+  glow: `${4 + (i % 3) * 3}px`,
+  dur: `${(9 + (i % 6) * 2.4).toFixed(1)}s`, del: `${((i * 1.7) % 12).toFixed(1)}s`,
+}));
+const moteMv = Array.from({ length: 12 }, (_, i) => ({
+  sz: `${(1.5 + (i % 4) * 0.6).toFixed(1)}px`,
+  left: `${(i * 67) % 88 + 6}%`, top: `${46 + (i * 31) % 42}%`,
+  glow: `${4 + (i % 3) * 3}px`,
+  dur: `${(9 + (i % 6) * 2.4).toFixed(1)}s`, del: `${((i * 1.7) % 12).toFixed(1)}s`,
+}));
+---
+<section class="domo">
+  {/* ── 1 · FOTO — pieza visual del hub y candidata LCP: eager +
+      fetchpriority=high, JAMÁS lazy (la regla del encargo; el lazy que se
+      coló en la ronda de PSI retrasaba el pintado y en pestañas de fondo ni
+      cargaba). Art direction real: master horizontal para desktop y master
+      vertical propio para móvil. Los srcset salen del manifiesto que genera
+      scripts/resize-heros.mjs: cuando el dueño exporte masters más grandes,
+      la escalera crece sola sin tocar este componente. AVIF principal + WebP
+      fallback. El alto lo fija el CSS del hero (absolute inset + cover), así
+      que width/height del fallback no gobiernan layout: CLS 0 garantizado
+      por diseño. */}
+  <picture class="domo__photo">
+    <source media="(max-width: 767px)" type="image/avif" srcset={heroImgs.srcset.mobileAvif} sizes="100vw" />
+    <source media="(max-width: 767px)" type="image/webp" srcset={heroImgs.srcset.mobileWebp} sizes="100vw" />
+    <source type="image/avif" srcset={heroImgs.srcset.desktopAvif} sizes="100vw" />
+    <source type="image/webp" srcset={heroImgs.srcset.desktopWebp} sizes="100vw" />
+    <img src={heroImgs.fallback.src} alt="" width={heroImgs.fallback.w} height={heroImgs.fallback.h} fetchpriority="high" decoding="async" />
+  </picture>
+
+  {/* ── 2-4 · tinte salvia + oscurecedores + glow que respira (capas VERBATIM
+      del canvas del dueño, encima de la foto retocada: así las aprobó).
+      Nota de QA: un primer diagnóstico culpó a estas capas de "apagar" la foto
+      y era falso (el fantasma era del arnés de capturas, no de usuarios). */}
+  <div class="domo__tint" aria-hidden="true"></div>
+  <div class="domo__tint2" aria-hidden="true"></div>
+  <div class="domo__shade" aria-hidden="true"></div>
+  <div class="domo__glow" aria-hidden="true"></div>
+
+  {/* ── 5 · cielo: estrellas + fugaces (recortadas a la cúpula) ── */}
+  <div class="domo__stars domo__stars--pc" aria-hidden="true">
+    {twPc.map((s) => <span class="domo__tw" style={`top:${s.top}; left:${s.left}; animation-duration:${s.dur}; animation-delay:${s.del};`}></span>)}
+    {shPc.map((s) => <span class="domo__shoot" style={`top:${s.top}; left:${s.left}; width:${s.w}; animation-duration:${s.d}; animation-delay:${s.del};`}></span>)}
+  </div>
+  <div class="domo__stars domo__stars--mv" aria-hidden="true">
+    {twMv.map((s) => <span class="domo__tw" style={`top:${s.top}; left:${s.left}; animation-duration:${s.dur}; animation-delay:${s.del};`}></span>)}
+    {shMv.map((s) => <span class="domo__shoot domo__shoot--mv" style={`top:${s.top}; left:${s.left}; width:${s.w}; animation-duration:${s.d}; animation-delay:${s.del};`}></span>)}
+  </div>
+
+  {/* ── 6 · motas flotantes sobre el pasto ── */}
+  <div class="domo__motes domo__motes--pc" aria-hidden="true">
+    {motePc.map((m) => <span class="domo__mote" style={`width:${m.sz}; height:${m.sz}; left:${m.left}; top:${m.top}; box-shadow:0 0 ${m.glow} rgba(190,220,200,0.5); animation-duration:${m.dur}; animation-delay:${m.del};`}></span>)}
+  </div>
+  <div class="domo__motes domo__motes--mv" aria-hidden="true">
+    {moteMv.map((m) => <span class="domo__mote" style={`width:${m.sz}; height:${m.sz}; left:${m.left}; top:${m.top}; box-shadow:0 0 ${m.glow} rgba(190,220,200,0.5); animation-duration:${m.dur}; animation-delay:${m.del};`}></span>)}
+  </div>
+
+  {/* ── 8 · columna de mensaje ── */}
+  <div class="container domo__inner">
+    <div class="domo__sky">
+      <div class="domo__crumb"><slot name="breadcrumb" /></div>
+      <p class="domo__kicker">{kicker}</p>
+      <h1 class="domo__h1" set:html={h1} />
+      <p class="domo__sub">{sub}</p>
+      <div class="domo__dock">
+        <a class="domo__cta" href={primary.href}>{primary.label}</a>
+        <p class="domo__micro">{microcopy}</p>
+        <a class="domo__explore" href={explore.href}>{explore.label}</a>
+      </div>
+    </div>
+
+    {/* ── 9 · card IA (glass) ── */}
+    <aside class="domo__card" aria-label={aiCard.title}>
+      <div class="domo__card-head">
+        {/* icono de puntos de la referencia del dueno (2026-08-31), inline SVG */}
+        <svg class="domo__card-iso" viewBox="0 0 18 18" aria-hidden="true"><g fill="currentColor"><circle cx="3.2" cy="3.2" r="1.7" /><circle cx="3.2" cy="9" r="1.7" /><circle cx="3.2" cy="14.8" r="1.7" /><circle cx="9" cy="3.2" r="1.7" /><circle cx="9" cy="9" r="1.7" /><circle cx="9" cy="14.8" r="1.7" /><circle cx="14.8" cy="6.1" r="1.7" /><circle cx="14.8" cy="11.9" r="1.7" /></g></svg>
+        <h2 class="domo__card-title">{aiCard.title}</h2>
+      </div>
+      <p class="domo__card-body">{aiCard.body}</p>
+      <a class="domo__card-link" href={aiCard.href}>{aiCard.linkLabel}</a>
+    </aside>
+  </div>
+
+  {/* ── 10 · riel "construimos con" ── */}
+  <div class="domo__rail">
+    <span class="domo__rail-label">{builtWithLabel}</span>
+    <div class="domo__rail-marks">
+      {builtWith.map((w, i) => <span class:list={['domo__mark', i % 2 === 0 && 'domo__mark--sg']}>{w}</span>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── tokens LOCALES del hub (la expresión, no la paleta global) ── */
+  .domo {
+    /* un solo oro en todo el sitio (2026-09-02): el hub ya no tiene el suyo */
+    --hst-gold: var(--accent-gold);
+    --hst-sage: 118, 152, 138;
+    --hst-sage-soft: 152, 178, 166;
+    --hst-sage-glow: 172, 216, 192;
+    --hst-ink: 4, 6, 5;
+
+    position: relative; overflow: hidden; isolation: isolate;
+    display: flex; flex-direction: column;
+    min-height: 100svh;
+    background-color: #060807;
+    color: var(--fg-primary);
+  }
+  @media (--lg) {
+    .domo { min-height: min(100vh, 920px); }
+  }
+
+  /* ── 1 · foto ── */
+  .domo__photo { position: absolute; inset: 0; z-index: 0; }
+  .domo__photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: saturate(0.92);
+  }
+
+  /* ── 2 · tinte del domo (salvia, mix-blend color) + radial suave ── */
+  .domo__tint {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(56% 8% at 70% 74%, rgba(var(--hst-sage), 0.95), transparent 72%);
+    mix-blend-mode: color;
+  }
+  .domo__tint2 {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(48% 6% at 70% 74%, rgba(var(--hst-sage-soft), 0.1), transparent 70%);
+  }
+  @media (--md) {
+    .domo__tint { background: radial-gradient(52% 28% at 74% 47%, rgba(var(--hst-sage), 0.95), transparent 72%); }
+    .domo__tint2 { background: radial-gradient(46% 22% at 74% 47%, rgba(var(--hst-sage-soft), 0.1), transparent 70%); }
+  }
+
+  /* ── 3 · oscurecedores de contraste (valores del canvas) ── */
+  .domo__shade {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(var(--hst-ink), 0.5) 0%, rgba(var(--hst-ink), 0.24) 42%, rgba(var(--hst-ink), 0) 60%),
+      rgba(var(--hst-ink), 0.2);
+  }
+  @media (--md) {
+    .domo__shade {
+      background: linear-gradient(100deg, rgba(var(--hst-ink), 0.62) 0%, rgba(var(--hst-ink), 0.26) 38%, rgba(var(--hst-ink), 0) 62%);
+    }
+  }
+
+  /* ── 4 · glow que respira ── */
+  .domo__glow {
+    position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+    width: 520px; height: 200px; z-index: 1; pointer-events: none;
+    background: radial-gradient(50% 62% at 50% 20%, rgba(var(--hst-sage-glow), 0.5), transparent 72%);
+    filter: blur(30px); opacity: 0.16;
+  }
+  @media (--md) {
+    .domo__glow { top: -60px; width: 980px; height: 280px; filter: blur(34px); }
+  }
+
+  /* ── 5 · cielo (clip a la cúpula) ── */
+  .domo__stars { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; z-index: 2; }
+  .domo__stars--mv { height: 400px; clip-path: ellipse(62% 380px at 50% 0%); }
+  .domo__stars--pc { display: none; height: 220px; clip-path: ellipse(46% 152px at 50% 0%); }
+  @media (--md) {
+    .domo__stars--mv { display: none; }
+    .domo__stars--pc { display: block; }
+  }
+  .domo__tw {
+    position: absolute; border-radius: 50%; width: 1.8px; height: 1.8px;
+    background: var(--fg-primary); opacity: 0.15;
+  }
+  .domo__shoot {
+    position: absolute; height: 1.5px; border-radius: 2px; opacity: 0;
+    background: linear-gradient(90deg, rgba(var(--star-rgb), 0), rgba(var(--star-rgb), 0.9));
+  }
+  .domo__shoot--mv { height: 1.4px; }
+
+  /* ── 6 · motas ── */
+  .domo__motes { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+  .domo__motes--pc { display: none; }
+  @media (--md) {
+    .domo__motes--mv { display: none; }
+    .domo__motes--pc { display: block; }
+  }
+  .domo__mote {
+    position: absolute; border-radius: 50%;
+    background: rgba(216, 232, 222, 0.85); opacity: 0;
+  }
+
+  /* ── 8 · mensaje ── */
+  .domo__inner {
+    /* SIN position: si el inner fuera el containing block, el bottom % de la
+       card (>=md) se mediría contra una caja que termina antes del riel y la
+       card quedaba 78px alta (medido). El apilado lo llevan sky y card. */
+    z-index: 3; width: 100%;
+    flex: 1 0 auto;
+    display: flex; flex-direction: column;
+    padding-top: calc(var(--nav-h) + var(--space-7));
+  }
+  .domo__sky { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; max-width: 680px; }
+  .domo__crumb { opacity: 0.85; }
+  .domo__crumb :global(*) { font-size: var(--text-xs); }
+  .domo__kicker {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: #98948b;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  }
+  /* 700 como el canvas. El swap tardio de la fuente re-emitia la entrada LCP
+     (LCP simulado 3.5-3.7s); el fix real es el PRELOAD de la woff2 en las dos
+     paginas Houston: la fuente llega antes del primer paint del H1. */
+  .domo__h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: 34px; line-height: 1.12; letter-spacing: -0.02em;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); max-width: 640px;
+  }
+  .domo__h1 :global(em) { color: var(--hst-gold); font-style: normal; }
+  .domo__sub {
+    font-size: 15px; line-height: 1.6; color: #c6c2ba; max-width: 470px;
+    text-wrap: pretty; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  }
+  .domo__dock { display: flex; flex-direction: column; gap: 11px; margin-top: 4px; align-self: stretch; }
+  /* CTA primario = el boton primario del SITIO (oro, tipografia de cuerpo,
+     mismos paddings que .btn--lg) con la forma pill + anillo que el dueno
+     eligio (2026-09-02: la forma del hero pasa al sitio; el color del sitio
+     pasa al hero). El pill claro anterior queda descartado. */
+  .domo__cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    align-self: stretch; min-height: var(--tap-min);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-base); letter-spacing: 0.01em;
+    color: var(--fg-inverse); background: var(--accent-gold);
+    border-radius: var(--radius-pill); padding: 14px 28px;
+    box-shadow: 0 0 0 4px var(--accent-gold-dim), 0 14px 34px rgba(0, 0, 0, 0.45);
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base);
+  }
+  .domo__cta:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: 0 0 0 4px var(--accent-gold-dim), var(--shadow-gold); }
+  .domo__cta:focus-visible { outline: 2px solid var(--hst-gold); outline-offset: 3px; }
+  .domo__cta:active { transform: scale(0.98); }
+  .domo__micro {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: rgba(var(--star-rgb), 0.42);
+    text-align: center; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); white-space: nowrap;
+  }
+  /* secundario: en MOVIL es un enlace ghost (decision del dueno 2026-09-02:
+     dos pills apilados pesan; que respire). En >=md pasa a pill contorno del
+     sistema (ver bloque md). El label i18n no cambia. */
+  .domo__explore {
+    align-self: center; display: inline-flex; align-items: center; justify-content: center;
+    min-height: var(--tap-min); margin-top: 2px; padding-inline: var(--space-2);
+    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
+    color: var(--fg-secondary); text-decoration: none;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+    transition: color var(--duration-fast) var(--ease-out-expo),
+                border-color var(--duration-fast) var(--ease-out-expo);
+  }
+  .domo__explore:hover, .domo__explore:focus-visible { color: var(--accent-gold); }
+  .domo__explore:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+
+  /* ── 9 · card IA — superficie del SISTEMA (tarjeta opaca --bg-card, borde y
+     radio lg, sin blur): la personalidad la ponen la foto y el copy, no una
+     superficie ajena (decision del dueno 2026-09-02). En MOVIL no existe:
+     tapaba al astronauta y comprimia el hero; el gancho de IA sigue vivo en
+     la seccion de servicios y en el GrowthCta. ── */
+  .domo__card { display: none; }
+  @media (--md) {
+    .domo__card {
+      position: relative; z-index: 3;
+      margin-top: auto; margin-bottom: var(--space-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: var(--shadow-card);
+    }
+  }
+  .domo__card-head { display: flex; align-items: center; gap: 10px; }
+  .domo__card-iso { width: 17px; height: 17px; flex: 0 0 auto; color: var(--fg-primary); }
+  .domo__card-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; }
+  .domo__card-body { font-size: 13px; line-height: 1.6; color: #a8a49c; }
+  .domo__card-link {
+    display: inline-flex; align-items: center; min-height: var(--tap-min);
+    font-size: 12.5px; font-weight: 500; color: var(--fg-primary); text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+  .domo__card-link:hover, .domo__card-link:focus-visible { color: #ffffff; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── 10 · riel "construimos con" ── */
+  .domo__rail {
+    position: relative; z-index: 4;
+    display: flex; flex-direction: column; align-items: center; gap: 9px;
+    padding: 44px 20px calc(16px + var(--space-3));
+    background: linear-gradient(180deg, rgba(4, 6, 4, 0), rgba(4, 6, 4, 0.72));
+  }
+  .domo__rail-label {
+    font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.26em;
+    text-transform: uppercase; color: #8d897f;
+  }
+  .domo__rail-marks { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .domo__mark { font-weight: 600; font-size: 13px; color: rgba(var(--star-rgb), 0.58); }
+  .domo__mark--sg { font-family: var(--font-display); font-size: 12.5px; }
+
+  /* ── ≥ md: composición del artboard 11a ── */
+  @media (--md) {
+    .domo__inner {
+      flex-direction: row; align-items: flex-start;
+      padding-top: calc(var(--nav-h) + clamp(72px, 14vh, 150px));
+    }
+    .domo__sky { gap: 22px; max-width: 720px; }
+    .domo__kicker { font-size: 11.5px; letter-spacing: 0.24em; text-shadow: none; }
+    /* rotura del artboard ("Diseño de páginas web / en Houston"): se anula el
+       text-wrap:balance global (partía en mitades parejas) y el ancho corta
+       justo después de "web" sin dejar caer "en" a la primera línea. */
+    .domo__h1 { font-size: 56px; line-height: 1.08; text-shadow: none; max-width: 640px; text-wrap: wrap; }
+    .domo__sub { font-size: 16.5px; line-height: 1.65; color: #a8a49c; text-shadow: none; }
+    .domo__dock { align-self: flex-start; gap: 12px; margin-top: 6px; }
+    /* CTA + explore en fila; micro debajo, alineado a la izquierda */
+    .domo__dock { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 18px; row-gap: 12px; justify-content: start; }
+    /* filas EXPLICITAS: sin esto el auto-placement mandaba el explore a una
+       tercera fila bajo el micro (queja del dueno; el artboard los quiere
+       CTA + explore JUNTOS en la fila 1 y el micro debajo). */
+    .domo__cta { align-self: auto; grid-row: 1; grid-column: 1; }
+    /* secundario del sistema (= .btn--secondary .btn--lg) en pill */
+    .domo__explore {
+      grid-row: 1; grid-column: 2; align-self: center; justify-self: start; margin-top: 0;
+      padding: 14px 28px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border-accent); color: var(--fg-primary);
+      font-size: var(--text-base); text-shadow: none;
+    }
+    .domo__explore:hover, .domo__explore:focus-visible { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .domo__micro { grid-row: 2; grid-column: 1 / -1; text-align: left; font-size: 10.5px; letter-spacing: 0.22em; color: rgba(var(--star-rgb), 0.38); text-shadow: none; }
+
+    .domo__card {
+      /* bottom proporcional: 170px sobre 860 del artboard = 19.8%. Con px
+         fijos la card flotaba a media altura en pantallas bajas (queja del
+         dueno: "nada que ver la posicion"). */
+      /* EXACTO al artboard 11a (lienzo 1440x860: right 96px, bottom 170px):
+         horizontal anclada al MARCO DE COMPOSICION de 1440 centrado, no al
+         borde del viewport (1440 - 2*96 = 1248 -> a 1440px da 96 clavados y
+         en pantallas mas anchas la card se queda CON la escena, no huerfana
+         en la esquina). Vertical: 170/860 = 19.8%, con tope 176px para que
+         en ventanas altas no suba de mas. */
+      position: absolute; right: max(24px, calc((100% - 1248px) / 2));
+      bottom: clamp(120px, 19.8%, 176px);
+      width: 300px; margin: 0;
+      padding: 22px 24px; gap: 12px;
+    }
+    .domo__card-iso { width: 18px; height: 18px; }
+    .domo__card-title { font-size: 16.5px; }
+    .domo__card-body { font-size: 13.5px; }
+    .domo__card-link { font-size: 13px; }
+
+    .domo__rail {
+      flex-direction: row; justify-content: center; gap: 52px;
+      padding: 46px var(--container-pad) 26px;
+      background: linear-gradient(180deg, rgba(4, 6, 4, 0), rgba(4, 6, 4, 0.62));
+    }
+    .domo__rail-label { font-size: 9.5px; }
+    .domo__mark { font-size: 17px; }
+    .domo__mark--sg { font-size: 16.5px; }
+  }
+
+  /* ── motion: bucles suaves compositables (opacity/transform), cero JS ── */
+  @media (--motion-ok) {
+    .domo__glow { animation: domo-breathe 9s ease-in-out infinite; }
+    .domo__tw { animation-name: domo-twinkle; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+    .domo__shoot { animation-name: domo-shoot; animation-timing-function: linear; animation-iteration-count: infinite; }
+    .domo__mote { animation-name: domo-mote; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+  }
+  @keyframes domo-twinkle {
+    0%, 100% { opacity: 0.12; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes domo-shoot {
+    0% { transform: translate3d(0, 0, 0) rotate(25deg); opacity: 0; }
+    1% { opacity: 0.95; }
+    6% { transform: translate3d(340px, 158px, 0) rotate(25deg); opacity: 0; }
+    100% { transform: translate3d(340px, 158px, 0) rotate(25deg); opacity: 0; }
+  }
+  @keyframes domo-mote {
+    0% { transform: translateY(0); opacity: 0; }
+    14% { opacity: 0.7; }
+    80% { opacity: 0.22; }
+    100% { transform: translateY(-130px); opacity: 0; }
+  }
+  @keyframes domo-breathe {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.3; }
+  }
+  @media (--motion-reduce) {
+    .domo__glow, .domo__tw, .domo__shoot, .domo__mote { animation: none; }
+    .domo__cta:active { transform: none; }
+  }
+</style>
+

@@ -45,7 +45,7 @@ export const houstonHub = {
     sub: 'La agencia hispana que une tu web, tu IA y tu SEO, con precios públicos.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     microcopy: 'Respuesta en 1 hora hábil · Sin compromiso',
-    explore: { label: 'Ver servicios y precios ↓', href: '#servicios' },
+    explore: { label: 'Ver servicios', href: '#servicios' },
     telemetry: [
       { label: 'Línea directa', value: nap.houston, href: telHref, live: true },
       { label: 'Horario', value: nap.hours },
@@ -56,6 +56,20 @@ export const houstonHub = {
     // (línea de suelo + atmósfera + sello de ciudad). `src` opcional para reponerlo.
     skyline: { caption: 'HOUSTON, TX — SPACE CITY' },
     tone: 'gold' as const,
+    // ── Campos ADITIVOS del hero "El Domo" (DomoHero; spec en
+    // docs/landings/SPEC-hero-houston-domo.md). telemetry/skyline se CONSERVAN:
+    // CityHero sigue existiendo y el rollback es revertir el import.
+    // El body va con coma, no em-dash (regla de copy del dueño, E-07).
+    aiCard: {
+      title: 'Cero llamadas perdidas',
+      body: 'Un agente de IA contesta tu teléfono y tu WhatsApp 24/7, en inglés y español, agenda citas mientras tú descansas.',
+      linkLabel: 'Ver cómo funciona →',
+      href: '/es/houston/ia-conversacional',
+    },
+    // Voz de marca (regla del dueño 2026-08-31): NUNCA "construimos con" IA —
+    // la dominamos / la usamos para el cliente. De ahí "Dominamos".
+    builtWithLabel: 'Dominamos',
+    builtWith: ['OpenAI', 'Google', 'WhatsApp', 'Shopify', 'Stripe'],
   },
   answer: {
     q: '¿Por qué elegir una agencia de diseño web en Houston?',

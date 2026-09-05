@@ -164,6 +164,16 @@ y el efecto del rediseño se miden por separado y no se contaminan.
 
 ---
 
+### 0.6 · FASE TRANSVERSAL (añadida 2026-09-03): aperturas de página + sistema de motion
+Diagnóstico del dueño ("cada sección abre con un texto enorme; el sitio se ve poco
+tecnológico") verificado en producción: el AnswerBlock "Respuesta directa" como 2.º bloque +
+bajadas de 30-42 palabras suman 117-252 palabras antes del primer visual, y no existe ningún
+scroll-reveal en el sitio. Spec completa: `docs/landings/SPEC-aperturas-motion.md`
+(reglas de apertura A1-A6, vocabulario de 10 patrones de motion CSS-first, primitivos,
+3 pasos; revisada por 3 adversariales el 2026-09-04, 36 hallazgos corregidos). **Decisiones del dueño:** dirección aprobada; AnswerBlock compacto y más abajo;
+**se activa cuando el hero Houston (PR #33) quede RESUELTO (merge o descarte explícito) y el PR #34 esté mergeado, ANTES del piloto**, que hereda
+los primitivos. `ClusterLanding` sigue congelado: las landings la reciben vía el piloto.
+
 ## FASE 1 — Piloto: grupo **diseño web** (recomendado por datos; confirma el dueño)
 
 **Por qué este grupo** (expectativa en DOS niveles, sin inflar):

@@ -1,13 +1,13 @@
 {
-  "builtAt": "2026-09-04T17:55:41.752Z",
+  "builtAt": "2026-09-05T16:21:41.027Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 71,
+    "indexed": 72,
     "notIndexed": 1,
-    "skipped": 12
+    "skipped": 11
   },
   "candidates": 0,
   "pending": []

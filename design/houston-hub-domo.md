@@ -93,3 +93,18 @@ Leccion de doctrina: una referencia externa aporta atmosfera y composicion
 (foto, tinte, particulas, riel, copy); su sistema de botones, nav y superficies
 NUNCA se importa. La personalidad vive en la expresion; la gramatica de
 interaccion es del sistema.
+
+## Resolucion 2026-09-06 · la tipografia tambien es gramatica
+
+Queja del dueno sobre el preview: "cambiaste completamente toda la tipografia en
+Houston". Diagnostico medido en vivo (preview vs produccion, 375 y 1440): mismas
+familias, distinta ESCALA. El hero llevaba los px del canvas (H1 34/56, sub
+15/16.5, kicker 10.5 gris, micro 9 en mayusculas, riel 8.5, card 15.5/13/12.5)
+mientras el sitio titula a 36-64 fluido, lee a 17-20 y etiqueta a 11.
+
+Correccion: el hero usa las piezas tipograficas del sistema (Kicker, .h1, .lead,
+micro de CityHero, tokens --text-* y --space-*). Solo quedan como expresion las
+sombras de texto sobre la foto en movil. Doctrina ampliada: la lista de gramatica
+intocable es botones + nav + superficies + **escala tipografica**; de una
+referencia o canvas se toman composicion, foto, tinte, particulas y copy, nunca
+sus tamanos de texto.

@@ -80,53 +80,66 @@ resolverlo editando las constantes: cambiaría la nav de las 46 páginas no migr
 **wordmark `BrandType` del navbar es intocable** en todos los grupos (regla de logos del
 dueño: los 3 artefactos de marca nunca se fusionan ni se sustituyen).
 
-### 0.3 · ENCARGO EJECUTOR (tras Decisión 0): aviso de idioma `LangNotice`
+### 0.3 · ENCARGO EJECUTOR (tras Decisión 0): pista de idioma `LangNotice`
 Verificado en código: la raíz `/`→308→`/es` es incondicional (`vercel.json`), x-default=ES,
 y NO existe ninguna lógica de `navigator.language`/Accept-Language en el sitio. La trampa
 de MJA no existe aquí; el hueco real es el visitante EN que entra directo a una URL ES.
 
-Spec (verificada contra el código actual):
-- **Componente nuevo** `src/components/layout/LangNotice.astro`, montado desde
-  `Layout.astro` entre `<slot />` y `<ChatWidget>`. Renderizado condicional en build:
-  solo si existe espejo (`otherPath != null`, que Layout YA calcula con `mirrorPath()` de
-  `routes.ts`, el mismo mapa del conmutador de la nav). La URL destino viaja en un
-  data-attribute; el DOM visible se construye client-side tras DOMContentLoaded.
-- **AVISO EXPLÍCITO: al montarse en Layout, el aviso aparecerá también en la HOME.** Esta
-  es la excepción sancionada a "la home no se toca" (una sola línea en Layout, cero
-  cambios en secciones). Por eso el QA de este encargo incluye capturas de la home ES en
-  móvil y desktop con el aviso visible, verificadas en el **Chrome real** (elemento
-  `position:fixed` con offsets móviles, lección E-09), y el **OK del dueño antes de merge**.
+**Revisión del dueño 2026-09-05 (ledger E-19, "integrar, no añadir"):** la primera versión
+(banner fijo con icono, enlace y botón de cierre) se descartó por añadir un control más.
+La función vive en su ANFITRIÓN: el conmutador ES|EN de `SiteNav` (`.nav__lang`, visible
+en móvil y PC). Spec vigente (PR #37):
+- **Componente** `src/components/layout/LangNotice.astro`, montado desde `Layout.astro`
+  entre `<slot />` y `<ChatWidget>`, solo si existe espejo (`otherPath != null`, que Layout
+  YA calcula con `mirrorPath()` de `routes.ts`, el mismo mapa del conmutador). El servidor
+  emite ÚNICAMENTE un `<template>` vacío con datos (dirección, idioma destino, texto): cero
+  píxeles, cero CLS, nada visible sin JS.
+- **Forma:** el script crea client-side, dentro de `.nav__lang`, un
+  `<span class="nav__lang-hint" role="status" lang={target}>` con el texto "Prefer English?"
+  (en páginas EN, si la dirección está activa: "¿Prefieres español?"). Posición bajo el
+  conmutador, alineado al lado de la opción destino, con caret apuntándola; superficie
+  `--bg-elevated`, borde `--border`, radio `--radius-md`, `--font-mono` `--text-xs`,
+  `--fg-primary`, padding 6px 10px, `white-space: nowrap`. Mientras la pista es visible,
+  `a.nav__lang-opt[hreflang=target]` recibe `.is-hinted` (oro + filete inferior de 1px):
+  **esa opción existente ES la acción.** Cero botones nuevos, cero cierre, cero icono.
+  Estilos en `LangNotice.astro` con `:global()` acotado a `.nav__lang-hint` y
+  `.nav__lang-opt.is-hinted`; la posición la calcula el script respecto al `<header>`
+  fijo. **No se toca el marcado ni el CSS de `SiteNav`** (evita el choque con el PR #33).
+- **Tiempos:** aparece a los 1200 ms tras load (`requestIdleCallback` con fallback a
+  `setTimeout`), se va a los 6000 ms con fundido (opacity + translateY 4px, 300 ms,
+  `--ease-out-expo`); antes si scroll > 40 px, `pointerdown` o `keydown`; en hover del
+  conmutador se oculta la pista pero `.is-hinted` se mantiene hasta `pointerleave`.
+  Bajo `@media (--motion-reduce)`: sin animación.
+- **AVISO EXPLÍCITO: al montarse en Layout, la pista aparece también en la HOME.** Es la
+  excepción sancionada a "la home no se toca" (una sola línea en Layout, cero cambios en
+  secciones). QA de la home en 360/390/1440 en el **Chrome real** (lección E-09) y **OK del
+  dueño antes de merge**.
 - **Direcciones**: ES→EN ("Prefer English?") es la acordada. La simétrica EN→ES
-  ("¿Prefieres español?") se implementa en el mismo componente **pero es un punto a
-  validar por el dueño en el preview**: se enseña funcionando y él decide si sale
-  activada, apagada tras un flag, o fuera.
-- **Display**: idioma del navegador empieza por el idioma contrario + hay espejo + no fue
-  descartado + nunca eligió idioma. `position:fixed` (CLS 0). **Tope de apilado en móvil**:
-  la landing ya lleva la barra CTA inferior fija y el FAB del chat; la cobertura combinada
-  de elementos fijos no supera el 25% del viewport en el primer render; si el aviso no
-  cabe, se muestra tras el primer scroll o colapsado a una línea. Decisión consciente
-  documentada: para el render de Googlebot (locale en-US, sin storage) el aviso ES→EN
-  formará parte del DOM indexado de todas las páginas ES; por eso es texto corto, un solo
-  enlace (al alternate ya declarado en hreflang) y `role="status"`.
+  ("¿Prefieres español?") existe en el mismo componente tras el flag `DIRECTIONS.en`,
+  **apagada por defecto**; el dueño decide en el preview si sale activada.
+- **Display**: idioma primario del navegador empieza por el idioma contrario + hay espejo
+  + no hay elección explícita + nunca se mostró. **Una sola vez por navegador.** Decisión
+  consciente documentada: para el render de Googlebot (locale en-US, sin storage) la pista
+  ES→EN aparece 1,2 s y desaparece a los 6 s; es texto corto en `role="status"` y no añade
+  ningún enlace (el del conmutador ya está en el HTML estático y en el hreflang).
 - **Storage** (convención `mrc_` existente, siempre en try/catch como `track.js`):
-  `mrc_lang_pref` ('es'|'en', cualquier elección explícita silencia el aviso para siempre
-  en AMBAS direcciones; el conmutador de la nav también la escribe) y
-  `mrc_lang_notice_dismissed` ('1', cierre sin elegir).
-- **A11y**: `<aside role="status">` (nunca `role="alert"`), acción principal = `<a>` real,
-  botón de cierre con `aria-label`, ambos ≥44px (`--tap-min`), `:focus-visible` con tokens,
-  sin autofocus, Esc cierra solo si el foco está dentro.
-- **Tracking**: eventos `lang_notice_shown` / `lang_notice_accepted` /
-  `lang_notice_dismissed` con prop de dirección, vía el `track()` first-party existente.
-  **Requiere la excepción sancionada en api/**: añadir los 3 nombres al Set `EVENTS` de
-  `api/events.mjs` (línea aditiva; sin ella el endpoint devuelve 400 silencioso). También
-  se toca `SiteNav.astro` para que el conmutador escriba `mrc_lang_pref`.
+  `mrc_lang_pref` (es|en, elección explícita: silencia la pista para siempre en AMBAS
+  direcciones; la escribe el conmutador de la nav) y `mrc_lang_hint_shown` (1, ya se
+  mostró). La clave `mrc_lang_notice_dismissed` de la primera versión desaparece.
+- **A11y**: `role="status"` (nunca `role="alert"`), sin autofocus, sin controles nuevos;
+  la acción es el enlace existente del conmutador (≥44px, `:focus-visible` del sistema).
+- **Tracking**: `lang_notice_shown` al mostrar; `lang_notice_accepted` si se pulsa la
+  opción resaltada mientras lo está o en los 10 s siguientes; ambos con prop de dirección
+  vía el `track()` first-party existente. `lang_notice_dismissed` ya no se emite (queda
+  en el allowlist). **Excepción sancionada en api/**: los 3 nombres añadidos al Set
+  `EVENTS` de `api/events.mjs` (línea aditiva). `SiteNav.astro` solo suma, en su script,
+  la escritura de `mrc_lang_pref` al pulsar el conmutador.
 - **Por qué es SEO-safe**: sin redirect, HTML idéntico para todos (estático), canonical y
-  hreflang intactos (server-side en Layout), aviso pequeño fijo y descartable dentro de
-  las excepciones documentadas de Google para banners.
+  hreflang intactos (server-side en Layout), sin enlaces nuevos, pista efímera.
 - **Acotación de precedente**: LangNotice es la ÚNICA lógica de display por visitante
   sancionada en todo el sitio (excepción explícita de la resolución de idiomas). No sirve
   de precedente para ninguna otra personalización client-side.
-- **Retirada por datos**: si en 4-6 semanas una dirección solo genera cierres, se apaga.
+- **Retirada por datos**: si en 4-6 semanas una dirección no genera aceptaciones, se apaga.
 
 ### 0.4 · ENCARGO EJECUTOR (mismo encargo que 0.3): verificador de contratos post-build
 Script `scripts/verify-landing-contracts.mjs` (node sobre `dist/`): para cada URL migrada

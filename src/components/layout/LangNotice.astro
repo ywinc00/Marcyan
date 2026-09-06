@@ -1,211 +1,214 @@
 ---
 // ─────────────────────────────────────────────────────────────
-// LangNotice — aviso de idioma ES↔EN SIN redirección (plan maestro, Fase 0.3).
+// LangNotice — "pista de idioma" ES↔EN SIN redirección (plan maestro 0.3;
+// revisión del dueño 2026-09-05, ledger E-19: integrar, no añadir).
 //
 // Qué hace: si el navegador del visitante prefiere el OTRO idioma y esta página
-// tiene espejo publicado, muestra una nota pequeña y fija ("Prefer English?")
-// con UN enlace al espejo (la misma URL que ya declara el hreflang) y un cierre.
+// tiene espejo publicado, resalta durante unos segundos la opción destino del
+// conmutador ES|EN que YA existe en la nav (oro + filete) y muestra bajo ella un
+// rótulo efímero ("Prefer English?") con un caret apuntándola. La acción es el
+// propio enlace del conmutador: cero botones nuevos, cero cierre, cero icono.
 // Nunca redirige: el HTML es idéntico para todos y canonical/hreflang no cambian.
 //
 // Montaje: Layout.astro lo renderiza solo cuando `mirrorPath()` devuelve espejo
-// (misma fuente que el conmutador de la nav). El servidor emite ÚNICAMENTE un
-// <template> inerte (cero píxeles, cero CLS); el DOM visible lo construye el
-// script client-side cuando se cumplen las condiciones de display.
+// (misma fuente que el conmutador). El servidor emite ÚNICAMENTE un <template>
+// vacío con datos (cero píxeles, cero CLS, nada visible sin JS); el DOM lo
+// construye el script client-side dentro de `.nav__lang`, sin tocar el marcado
+// ni el CSS de SiteNav (evita choques con el PR del hero).
 //
 // Display (todas a la vez): idioma primario del navegador empieza por el idioma
-// contrario · no fue descartado (`mrc_lang_notice_dismissed`) · nunca eligió
-// idioma (`mrc_lang_pref`, la escribe también el conmutador de la nav) · y cabe
-// en el presupuesto de apilado móvil (fijos combinados ≤25% del viewport en el
-// primer render; si no cabe, aparece tras el primer scroll).
+// contrario · no hay elección explícita (`mrc_lang_pref`, la escribe el
+// conmutador) · nunca se mostró en este navegador (`mrc_lang_hint_shown`).
 //
-// Decisión consciente: Googlebot renderiza con locale en-US y sin storage, así
-// que en las páginas ES el aviso ES→EN formará parte del DOM indexado. Por eso es
-// texto corto, un solo enlace al alternate ya declarado, y role="status".
+// Tiempos: aparece a los 1200 ms tras load (requestIdleCallback con fallback),
+// se va a los 6000 ms con fundido, o antes con scroll > 40 px, pointerdown o
+// keydown. En hover del conmutador se oculta el rótulo pero el resalte se
+// mantiene hasta pointerleave. Reduced-motion: sin animación.
+//
+// Tracking: lang_notice_shown al mostrar; lang_notice_accepted si se pulsa la
+// opción resaltada mientras lo está o en los 10 s siguientes.
 //
 // Acotación de precedente: esta es la ÚNICA lógica de display por visitante
 // sancionada en el sitio. No sirve de precedente para otra personalización.
 // ─────────────────────────────────────────────────────────────
-import Icon from '../ui/Icon.astro';
-
 interface Props {
-  /** Idioma de la PÁGINA actual. El aviso invita al otro. */
+  /** Idioma de la PÁGINA actual. La pista invita al otro. */
   lang: 'es' | 'en';
-  /** Ruta del espejo (sale de mirrorPath en Layout). */
-  href: string;
+  /** Ruta del espejo (la calcula Layout). La acción es el enlace del conmutador,
+   *  que ya apunta ahí; se acepta la prop para no tocar el contrato de Layout. */
+  href?: string;
 }
-const { lang, href } = Astro.props;
+const { lang } = Astro.props;
 
-// Direcciones activas, por idioma de la página en la que aparece el aviso.
-//   es: true → en páginas ES se ofrece inglés ("Prefer English?"). ACORDADA.
-//   en: true → en páginas EN se ofrece español ("¿Prefieres español?"). Se enseña
-//              funcionando en el preview y el DUEÑO decide si sale activada.
-//              Para apagarla: en → false (una línea, sin tocar nada más).
-const DIRECTIONS: Record<'es' | 'en', boolean> = { es: true, en: true };
+// Direcciones activas, por idioma de la página en la que aparece la pista.
+//   es: true  → en páginas ES se sugiere inglés ("Prefer English?"). ACORDADA.
+//   en: false → en páginas EN se sugeriría español ("¿Prefieres español?").
+//               Apagada por defecto; el DUEÑO decide en el preview (una línea).
+const DIRECTIONS: Record<'es' | 'en', boolean> = { es: true, en: false };
 
 const target: 'es' | 'en' = lang === 'es' ? 'en' : 'es';
 // El texto va en el idioma del VISITANTE (el destino), no en el de la página.
-const copy =
-  target === 'en'
-    ? { q: 'Prefer English?', action: 'View in English', close: 'Close', region: 'Language' }
-    : { q: '¿Prefieres español?', action: 'Ver en español', close: 'Cerrar', region: 'Idioma' };
+const text = target === 'en' ? 'Prefer English?' : '¿Prefieres español?';
 ---
 {DIRECTIONS[lang] && (
-  <template data-lang-notice data-dir={`${lang}-${target}`} data-target={target}>
-    <aside class="langnotice" role="status" lang={target} aria-label={copy.region}>
-      <span class="langnotice__ic" aria-hidden="true"><Icon name="lucide:languages" /></span>
-      <div class="langnotice__body">
-        <p class="langnotice__q">{copy.q}</p>
-        <a class="langnotice__go" href={href} hreflang={target} data-lang-accept>
-          <span>{copy.action}</span>
-          <Icon name="lucide:arrow-right" />
-        </a>
-      </div>
-      <button type="button" class="langnotice__close" aria-label={copy.close} data-lang-dismiss>
-        <Icon name="lucide:x" />
-      </button>
-    </aside>
-  </template>
+  <template data-lang-notice data-dir={`${lang}-${target}`} data-target={target} data-text={text}></template>
 )}
 
-<style>
-  /* Nota pequeña abajo a la izquierda. Deja libre la zona del FAB del chat
-     (58px + márgenes, a la derecha) en todos los anchos: el ancho máximo se
-     resta esa franja. z-index --z-nav: por debajo del FAB (--z-drawer), del
-     velo/drawer del menú y del panel del chat; misma capa que la barra CTA. */
-  .langnotice {
-    position: fixed; left: var(--space-3);
-    bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
-    z-index: var(--z-nav);
-    width: max-content;
-    max-width: min(360px, calc(100vw - var(--space-3) - 96px));
-    display: flex; align-items: flex-start; gap: var(--space-3);
-    padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
+<style is:global>
+  /* Rótulo efímero bajo el conmutador. Se inyecta dentro de .nav__lang; su
+     posición (top/left/right) la calcula el script respecto al <header> fijo,
+     así no hace falta tocar ni una regla de SiteNav. */
+  .nav__lang-hint {
+    position: absolute; z-index: 1; pointer-events: none; white-space: nowrap;
+    padding: 6px 10px;
     background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-    opacity: 0; transform: translateY(8px);
-    transition: opacity var(--duration-base) var(--ease-out-expo),
-                transform var(--duration-base) var(--ease-out-expo),
-                bottom var(--duration-base) var(--ease-out-expo);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); line-height: 1.2; color: var(--fg-primary);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 300ms var(--ease-out-expo), transform 300ms var(--ease-out-expo);
   }
-  .langnotice.is-in { opacity: 1; transform: none; }
-
-  /* Móvil: cuando la barra CTA inferior está visible, sube por encima de ella
-     (mismo offset que usa el FAB del chat, así los dos quedan alineados). */
-  @media (--lt-md) {
-    :global(body.has-ctabar) .langnotice {
-      bottom: calc(var(--tap-min) + var(--space-3) * 3 + env(safe-area-inset-bottom));
-    }
+  .nav__lang-hint.is-visible { opacity: 1; transform: none; }
+  /* caret que apunta a la opción destino (--caret-x lo fija el script) */
+  .nav__lang-hint::before {
+    content: ""; position: absolute; top: -5px; left: var(--caret-x, 50%);
+    width: 8px; height: 8px; margin-left: -4px; transform: rotate(45deg);
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border); border-top: 1px solid var(--border);
   }
-
-  .langnotice__ic { color: var(--accent-gold); flex: 0 0 auto; margin-top: 3px; display: inline-flex; }
-  .langnotice__ic :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
-
-  .langnotice__body { display: flex; flex-direction: column; min-width: 0; }
-  .langnotice__q {
-    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
-    line-height: var(--leading-snug); color: var(--fg-primary);
-    padding-top: 2px;
+  /* La opción destino del conmutador, mientras dura la pista: oro + filete de 1px.
+     Selector con etiqueta para ganar por especificidad al color base de SiteNav. */
+  a.nav__lang-opt.is-hinted {
+    color: var(--accent-gold);
+    text-decoration: underline; text-decoration-thickness: 1px;
+    text-decoration-color: var(--accent-gold); text-underline-offset: 4px;
   }
-  /* Acción principal = enlace real (no un botón nuevo: la gramática de botones
-     es del sitio). Oro, 44px de alto para el pulgar, flecha que se desplaza. */
-  .langnotice__go {
-    display: inline-flex; align-items: center; gap: var(--space-1);
-    /* 44px de zona táctil, pero la caja visual se recoge con margen negativo
-       para que la tarjeta no quede alta y hueca; align-self para que la flecha
-       abrace al texto en vez de irse al borde derecho de la tarjeta. */
-    align-self: flex-start; min-height: var(--tap-min); margin: -6px 0 -10px;
-    font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
-    color: var(--accent-gold); text-decoration: none;
-    transition: color var(--duration-fast);
-  }
-  .langnotice__go :global(svg) {
-    width: 16px; height: 16px; stroke-width: 1.5; flex: 0 0 auto;
-    transition: transform var(--duration-fast) var(--ease-out-expo);
-  }
-  .langnotice__go:hover { color: var(--fg-primary); }
-  .langnotice__go:hover :global(svg) { transform: translateX(3px); }
-
-  /* Cierre: mismo patrón que .nav__close (44×44, secundario → primario). */
-  .langnotice__close {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: var(--tap-min); height: var(--tap-min); flex: 0 0 auto;
-    margin: calc(var(--space-2) * -1) 0 calc(var(--space-2) * -1) 0;
-    color: var(--fg-secondary); border-radius: var(--radius-md);
-    transition: color var(--duration-fast);
-  }
-  .langnotice__close:hover { color: var(--fg-primary); }
-  .langnotice__close :global(svg) { width: 20px; height: 20px; stroke-width: 1.75; }
-
   @media (--motion-reduce) {
-    .langnotice, .langnotice__go, .langnotice__go :global(svg), .langnotice__close { transition: none; }
-    .langnotice__go:hover :global(svg) { transform: none; }
+    .nav__lang-hint { transition: none; transform: none; }
   }
-  @media print { .langnotice { display: none; } }
+  @media print { .nav__lang-hint { display: none; } }
 </style>
 
 <script>
   import { track } from '../../lib/track.js';
 
-  const KEY_PREF = 'mrc_lang_pref';                 // 'es' | 'en' · elección explícita (silencia ambas direcciones)
-  const KEY_DISMISS = 'mrc_lang_notice_dismissed';  // '1' · cierre sin elegir
-  // Presupuesto de apilado en el primer render (móvil): fijos combinados ≤ 25%.
-  const STACK_BUDGET = 0.25;
+  const KEY_PREF = 'mrc_lang_pref';        // 'es' | 'en' · elección explícita (la escribe el conmutador)
+  const KEY_SHOWN = 'mrc_lang_hint_shown'; // '1' · la pista ya se mostró en este navegador
+  const SHOW_DELAY = 1200, HIDE_AFTER = 6000, ACCEPT_WINDOW = 10000, FADE_MS = 300, SCROLL_MAX = 40;
 
   const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
   const write = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch {} };
-
-  const tpl = document.querySelector<HTMLTemplateElement>('template[data-lang-notice]');
 
   function wants(target: string): boolean {
     const primary = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
     return primary.startsWith(target);
   }
 
-  function mount(tpl: HTMLTemplateElement) {
-    const dir = tpl.dataset.dir || '';
-    const target = tpl.dataset.target || '';
-    const node = tpl.content.firstElementChild?.cloneNode(true) as HTMLElement | null;
-    if (!node) return;
-    document.body.appendChild(node);
+  /** Coloca el rótulo bajo la opción destino, alineado a su lado, con el caret centrado en ella. */
+  function place(hint: HTMLElement, host: HTMLElement, opt: HTMLElement) {
+    const base = (hint.offsetParent || document.body).getBoundingClientRect();
+    const o = opt.getBoundingClientRect();
+    const h = host.getBoundingClientRect();
+    hint.style.top = `${Math.round(o.bottom - base.top + 6)}px`;
+    const rightSide = o.left + o.width / 2 > h.left + h.width / 2;
+    if (rightSide) { hint.style.right = `${Math.round(base.right - o.right)}px`; hint.style.left = 'auto'; }
+    else { hint.style.left = `${Math.round(o.left - base.left)}px`; hint.style.right = 'auto'; }
+    const r = hint.getBoundingClientRect();
+    hint.style.setProperty('--caret-x', `${Math.round(o.left + o.width / 2 - r.left)}px`);
+  }
 
-    // Tope de apilado: nav fija + este aviso (el FAB comparte su misma franja
-    // inferior, no suma). Si no cabe en el 25% del viewport, se retira y vuelve
-    // a intentarlo tras el primer scroll del visitante.
-    // (innerHeight 0 = pestaña aún sin viewport medible: no se juzga, se muestra.)
-    const navH = document.querySelector<HTMLElement>('[data-nav]')?.offsetHeight || 0;
-    if (window.innerHeight > 0 && window.scrollY < 24 && navH + node.offsetHeight > window.innerHeight * STACK_BUDGET) {
-      node.remove();
-      window.addEventListener('scroll', () => mount(tpl), { once: true, passive: true });
-      return;
-    }
-
-    requestAnimationFrame(() => requestAnimationFrame(() => node.classList.add('is-in')));
-    track('lang_notice_shown', { dir });
-
-    const onKey = (e: KeyboardEvent) => {
-      // Esc cierra SOLO si el foco está dentro del aviso (no roba el Esc del menú/chat).
-      if (e.key === 'Escape' && node.contains(document.activeElement)) dismiss();
-    };
-    const teardown = () => { document.removeEventListener('keydown', onKey); node.remove(); };
-    const dismiss = () => { write(KEY_DISMISS, '1'); track('lang_notice_dismissed', { dir }); teardown(); };
-
-    node.querySelector('[data-lang-dismiss]')?.addEventListener('click', dismiss);
-    node.querySelector('[data-lang-accept]')?.addEventListener('click', () => {
-      write(KEY_PREF, target);                      // elección explícita → silencio permanente
-      track('lang_notice_accepted', { dir });       // sendBeacon sobrevive a la navegación
+  function show(host: HTMLElement, opt: HTMLAnchorElement, dir: string, target: string, text: string) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hint = document.createElement('span');
+    hint.className = 'nav__lang-hint';
+    hint.setAttribute('role', 'status');
+    hint.lang = target;
+    host.appendChild(hint);
+    // el texto entra tras insertar el nodo: así la región live lo anuncia
+    requestAnimationFrame(() => {
+      hint.textContent = text;
+      place(hint, host, opt);
+      requestAnimationFrame(() => hint.classList.add('is-visible'));
     });
-    document.addEventListener('keydown', onKey);
+    opt.classList.add('is-hinted');
+    write(KEY_SHOWN, '1');
+    track('lang_notice_shown', { dir });
+    const shownAt = Date.now();
+
+    let hintGone = false, ended = false, hovering = false;
+    const hideHint = () => {
+      if (hintGone) return;
+      hintGone = true;
+      hint.classList.remove('is-visible');
+      setTimeout(() => hint.remove(), reduce ? 0 : FADE_MS + 30);
+    };
+    const unhint = () => opt.classList.remove('is-hinted');
+    const off = () => {
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('pointerdown', onAny);
+      document.removeEventListener('keydown', onAny);
+      window.removeEventListener('resize', onResize);
+    };
+    // fin de la pista: rótulo fuera; el resalte se queda solo si el puntero está encima
+    const end = () => {
+      if (ended) return;
+      ended = true;
+      clearTimeout(timer);
+      hideHint();
+      off();
+      if (!hovering) unhint();
+    };
+    const onScroll = () => { if (window.scrollY > SCROLL_MAX) end(); };
+    const onAny = () => end();
+    const onResize = () => { if (!hintGone) place(hint, host, opt); };
+    const onEnter = () => { hovering = true; hideHint(); };
+    const onLeave = () => {
+      hovering = false;
+      end();
+      unhint();
+      host.removeEventListener('pointerenter', onEnter);
+      host.removeEventListener('pointerleave', onLeave);
+    };
+    const timer = setTimeout(end, HIDE_AFTER);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('pointerdown', onAny, { passive: true });
+    document.addEventListener('keydown', onAny);
+    window.addEventListener('resize', onResize, { passive: true });
+    host.addEventListener('pointerenter', onEnter);
+    host.addEventListener('pointerleave', onLeave);
+
+    // Aceptación = clic en la opción resaltada (o en los 10 s siguientes a mostrarla).
+    // SiteNav ya escribe mrc_lang_pref en ese clic; sendBeacon sobrevive a la navegación.
+    opt.addEventListener('click', () => {
+      if (opt.classList.contains('is-hinted') || Date.now() - shownAt < ACCEPT_WINDOW) {
+        track('lang_notice_accepted', { dir });
+      }
+    });
   }
 
   function init() {
+    const tpl = document.querySelector<HTMLTemplateElement>('template[data-lang-notice]');
     if (!tpl) return;
     const target = tpl.dataset.target || '';
+    const dir = tpl.dataset.dir || '';
+    const text = tpl.dataset.text || '';
     if (!wants(target)) return;
     if (read(KEY_PREF)) return;
-    if (read(KEY_DISMISS) === '1') return;
-    mount(tpl);
+    if (read(KEY_SHOWN) === '1') return;
+    const host = document.querySelector<HTMLElement>('.nav__lang');
+    const opt = host?.querySelector<HTMLAnchorElement>(`a.nav__lang-opt[hreflang="${target}"]`) ?? null;
+    if (!host || !opt) return;
+
+    const start = () => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(() => show(host, opt, dir, target, text), { timeout: 800 });
+      else show(host, opt, dir, target, text);
+    };
+    const arm = () => setTimeout(start, SHOW_DELAY);
+    if (document.readyState === 'complete') arm();
+    else window.addEventListener('load', arm, { once: true });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  init();
 </script>

@@ -1,0 +1,214 @@
+---
+// ─────────────────────────────────────────────────────────────
+// LangNotice — "pista de idioma" ES↔EN SIN redirección (plan maestro 0.3;
+// revisión del dueño 2026-09-05, ledger E-19: integrar, no añadir).
+//
+// Qué hace: si el navegador del visitante prefiere el OTRO idioma y esta página
+// tiene espejo publicado, resalta durante unos segundos la opción destino del
+// conmutador ES|EN que YA existe en la nav (oro + filete) y muestra bajo ella un
+// rótulo efímero ("Prefer English?") con un caret apuntándola. La acción es el
+// propio enlace del conmutador: cero botones nuevos, cero cierre, cero icono.
+// Nunca redirige: el HTML es idéntico para todos y canonical/hreflang no cambian.
+//
+// Montaje: Layout.astro lo renderiza solo cuando `mirrorPath()` devuelve espejo
+// (misma fuente que el conmutador). El servidor emite ÚNICAMENTE un <template>
+// vacío con datos (cero píxeles, cero CLS, nada visible sin JS); el DOM lo
+// construye el script client-side dentro de `.nav__lang`, sin tocar el marcado
+// ni el CSS de SiteNav (evita choques con el PR del hero).
+//
+// Display (todas a la vez): idioma primario del navegador empieza por el idioma
+// contrario · no hay elección explícita (`mrc_lang_pref`, la escribe el
+// conmutador) · nunca se mostró en este navegador (`mrc_lang_hint_shown`).
+//
+// Tiempos: aparece a los 1200 ms tras load (requestIdleCallback con fallback),
+// se va a los 6000 ms con fundido, o antes con scroll > 40 px, pointerdown o
+// keydown. En hover del conmutador se oculta el rótulo pero el resalte se
+// mantiene hasta pointerleave. Reduced-motion: sin animación.
+//
+// Tracking: lang_notice_shown al mostrar; lang_notice_accepted si se pulsa la
+// opción resaltada mientras lo está o en los 10 s siguientes.
+//
+// Acotación de precedente: esta es la ÚNICA lógica de display por visitante
+// sancionada en el sitio. No sirve de precedente para otra personalización.
+// ─────────────────────────────────────────────────────────────
+interface Props {
+  /** Idioma de la PÁGINA actual. La pista invita al otro. */
+  lang: 'es' | 'en';
+  /** Ruta del espejo (la calcula Layout). La acción es el enlace del conmutador,
+   *  que ya apunta ahí; se acepta la prop para no tocar el contrato de Layout. */
+  href?: string;
+}
+const { lang } = Astro.props;
+
+// Direcciones activas, por idioma de la página en la que aparece la pista.
+//   es: true  → en páginas ES se sugiere inglés ("Prefer English?"). ACORDADA.
+//   en: false → en páginas EN se sugeriría español ("¿Prefieres español?").
+//               Apagada por defecto; el DUEÑO decide en el preview (una línea).
+const DIRECTIONS: Record<'es' | 'en', boolean> = { es: true, en: false };
+
+const target: 'es' | 'en' = lang === 'es' ? 'en' : 'es';
+// El texto va en el idioma del VISITANTE (el destino), no en el de la página.
+const text = target === 'en' ? 'Prefer English?' : '¿Prefieres español?';
+---
+{DIRECTIONS[lang] && (
+  <template data-lang-notice data-dir={`${lang}-${target}`} data-target={target} data-text={text}></template>
+)}
+
+<style is:global>
+  /* Rótulo efímero bajo el conmutador. Se inyecta dentro de .nav__lang; su
+     posición (top/left/right) la calcula el script respecto al <header> fijo,
+     así no hace falta tocar ni una regla de SiteNav. */
+  .nav__lang-hint {
+    position: absolute; z-index: 1; pointer-events: none; white-space: nowrap;
+    padding: 6px 10px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide); line-height: 1.2; color: var(--fg-primary);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 300ms var(--ease-out-expo), transform 300ms var(--ease-out-expo);
+  }
+  .nav__lang-hint.is-visible { opacity: 1; transform: none; }
+  /* caret que apunta a la opción destino (--caret-x lo fija el script) */
+  .nav__lang-hint::before {
+    content: ""; position: absolute; top: -5px; left: var(--caret-x, 50%);
+    width: 8px; height: 8px; margin-left: -4px; transform: rotate(45deg);
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border); border-top: 1px solid var(--border);
+  }
+  /* La opción destino del conmutador, mientras dura la pista: oro + filete de 1px.
+     Selector con etiqueta para ganar por especificidad al color base de SiteNav. */
+  a.nav__lang-opt.is-hinted {
+    color: var(--accent-gold);
+    text-decoration: underline; text-decoration-thickness: 1px;
+    text-decoration-color: var(--accent-gold); text-underline-offset: 4px;
+  }
+  @media (--motion-reduce) {
+    .nav__lang-hint { transition: none; transform: none; }
+  }
+  @media print { .nav__lang-hint { display: none; } }
+</style>
+
+<script>
+  import { track } from '../../lib/track.js';
+
+  const KEY_PREF = 'mrc_lang_pref';        // 'es' | 'en' · elección explícita (la escribe el conmutador)
+  const KEY_SHOWN = 'mrc_lang_hint_shown'; // '1' · la pista ya se mostró en este navegador
+  const SHOW_DELAY = 1200, HIDE_AFTER = 6000, ACCEPT_WINDOW = 10000, FADE_MS = 300, SCROLL_MAX = 40;
+
+  const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const write = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch {} };
+
+  function wants(target: string): boolean {
+    const primary = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+    return primary.startsWith(target);
+  }
+
+  /** Coloca el rótulo bajo la opción destino, alineado a su lado, con el caret centrado en ella. */
+  function place(hint: HTMLElement, host: HTMLElement, opt: HTMLElement) {
+    const base = (hint.offsetParent || document.body).getBoundingClientRect();
+    const o = opt.getBoundingClientRect();
+    const h = host.getBoundingClientRect();
+    hint.style.top = `${Math.round(o.bottom - base.top + 6)}px`;
+    const rightSide = o.left + o.width / 2 > h.left + h.width / 2;
+    if (rightSide) { hint.style.right = `${Math.round(base.right - o.right)}px`; hint.style.left = 'auto'; }
+    else { hint.style.left = `${Math.round(o.left - base.left)}px`; hint.style.right = 'auto'; }
+    const r = hint.getBoundingClientRect();
+    hint.style.setProperty('--caret-x', `${Math.round(o.left + o.width / 2 - r.left)}px`);
+  }
+
+  function show(host: HTMLElement, opt: HTMLAnchorElement, dir: string, target: string, text: string) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hint = document.createElement('span');
+    hint.className = 'nav__lang-hint';
+    hint.setAttribute('role', 'status');
+    hint.lang = target;
+    host.appendChild(hint);
+    // el texto entra tras insertar el nodo: así la región live lo anuncia
+    requestAnimationFrame(() => {
+      hint.textContent = text;
+      place(hint, host, opt);
+      requestAnimationFrame(() => hint.classList.add('is-visible'));
+    });
+    opt.classList.add('is-hinted');
+    write(KEY_SHOWN, '1');
+    track('lang_notice_shown', { dir });
+    const shownAt = Date.now();
+
+    let hintGone = false, ended = false, hovering = false;
+    const hideHint = () => {
+      if (hintGone) return;
+      hintGone = true;
+      hint.classList.remove('is-visible');
+      setTimeout(() => hint.remove(), reduce ? 0 : FADE_MS + 30);
+    };
+    const unhint = () => opt.classList.remove('is-hinted');
+    const off = () => {
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('pointerdown', onAny);
+      document.removeEventListener('keydown', onAny);
+      window.removeEventListener('resize', onResize);
+    };
+    // fin de la pista: rótulo fuera; el resalte se queda solo si el puntero está encima
+    const end = () => {
+      if (ended) return;
+      ended = true;
+      clearTimeout(timer);
+      hideHint();
+      off();
+      if (!hovering) unhint();
+    };
+    const onScroll = () => { if (window.scrollY > SCROLL_MAX) end(); };
+    const onAny = () => end();
+    const onResize = () => { if (!hintGone) place(hint, host, opt); };
+    const onEnter = () => { hovering = true; hideHint(); };
+    const onLeave = () => {
+      hovering = false;
+      end();
+      unhint();
+      host.removeEventListener('pointerenter', onEnter);
+      host.removeEventListener('pointerleave', onLeave);
+    };
+    const timer = setTimeout(end, HIDE_AFTER);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('pointerdown', onAny, { passive: true });
+    document.addEventListener('keydown', onAny);
+    window.addEventListener('resize', onResize, { passive: true });
+    host.addEventListener('pointerenter', onEnter);
+    host.addEventListener('pointerleave', onLeave);
+
+    // Aceptación = clic en la opción resaltada (o en los 10 s siguientes a mostrarla).
+    // SiteNav ya escribe mrc_lang_pref en ese clic; sendBeacon sobrevive a la navegación.
+    opt.addEventListener('click', () => {
+      if (opt.classList.contains('is-hinted') || Date.now() - shownAt < ACCEPT_WINDOW) {
+        track('lang_notice_accepted', { dir });
+      }
+    });
+  }
+
+  function init() {
+    const tpl = document.querySelector<HTMLTemplateElement>('template[data-lang-notice]');
+    if (!tpl) return;
+    const target = tpl.dataset.target || '';
+    const dir = tpl.dataset.dir || '';
+    const text = tpl.dataset.text || '';
+    if (!wants(target)) return;
+    if (read(KEY_PREF)) return;
+    if (read(KEY_SHOWN) === '1') return;
+    const host = document.querySelector<HTMLElement>('.nav__lang');
+    const opt = host?.querySelector<HTMLAnchorElement>(`a.nav__lang-opt[hreflang="${target}"]`) ?? null;
+    if (!host || !opt) return;
+
+    const start = () => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(() => show(host, opt, dir, target, text), { timeout: 800 });
+      else show(host, opt, dir, target, text);
+    };
+    const arm = () => setTimeout(start, SHOW_DELAY);
+    if (document.readyState === 'complete') arm();
+    else window.addEventListener('load', arm, { once: true });
+  }
+
+  init();
+</script>

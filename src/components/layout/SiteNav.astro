@@ -260,6 +260,11 @@ const isActive = (href: string) =>
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  // Elección EXPLÍCITA de idioma (plan maestro 0.3): el conmutador ES|EN escribe
+  // mrc_lang_pref y con ello silencia el aviso LangNotice en ambas direcciones.
+  document.querySelectorAll<HTMLAnchorElement>('a.nav__lang-opt[hreflang]').forEach((a) =>
+    a.addEventListener('click', () => { try { localStorage.setItem('mrc_lang_pref', a.hreflang); } catch {} }));
+
   if (toggle && drawer && overlay && closeBtn) {
     const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
     let lastFocus: HTMLElement | null = null;

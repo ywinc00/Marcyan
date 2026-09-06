@@ -12,6 +12,7 @@ import '../styles/global.css';
 import { nap } from '../i18n/content';
 import { mirrorPath } from '../i18n/routes';
 import ChatWidget from '../components/ChatWidget.astro';
+import LangNotice from '../components/layout/LangNotice.astro';
 
 interface Props {
   title: string;
@@ -178,6 +179,11 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
   <body>
     <a href="#main" class="skip-link">{lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}</a>
     <slot />
+    {/* Aviso de idioma sin redirección (plan maestro 0.3): solo donde hay espejo
+        publicado (mismo mapa routes.ts que el conmutador de la nav). Emite un
+        <template> inerte; el DOM visible lo decide el cliente. Aparece también
+        en la home: excepción sancionada, con QA de home y OK del dueño. */}
+    {otherPath && <LangNotice lang={lang} href={otherPath} />}
     <ChatWidget lang={lang} />
 
     <script>

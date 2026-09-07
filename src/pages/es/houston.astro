@@ -1,7 +1,9 @@
 ---
 // HUB DE CIUDAD · /es/houston — LANDING #1 del negocio (rediseño premium
 // "Horizonte de llegada"). Página POTENTE nivel-home (DESIGN.md §2/§5):
-//   1. CityHero bespoke (cielo + riel de telemetría + escenario de horizonte),
+//   1. DomoHero bespoke "El Domo" (foto astronauta + ambiente animado + card IA
+//      + riel "construimos con"; nav con piel glass; concepto del dueño en
+//      Claude Design 12a/11a, spec docs/landings/SPEC-hero-houston-domo.md),
 //   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 5 filas),
 //   3. Projects (prueba: "así se ve lo que cuesta"),
 //   4. Ficha Houston (contexto local + riel NAP + zonas como pills-ruta),
@@ -17,7 +19,7 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Kicker from '../../components/ui/Kicker.astro';
 import Icon from '../../components/ui/Icon.astro';
-import CityHero from '../../components/sections/city/CityHero.astro';
+import DomoHero from '../../components/sections/city/DomoHero.astro';
 import AnswerBlock from '../../components/sections/AnswerBlock.astro';
 import Projects from '../../components/sections/Projects.astro';
 import Faq from '../../components/sections/Faq.astro';
@@ -27,9 +29,11 @@ import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import GrowthTeaser from '../../components/sections/GrowthTeaser.astro';
 import GrowthCta from '../../components/growthos/GrowthCta.astro';
+import sgWoff2 from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston';
+import heroImgs from '../../data/hero-domo.json';
 
 const c = content.es;
 
@@ -60,23 +64,28 @@ const splitPrice = (p?: string) =>
 
 >
   <ItemListLd slot="head" items={h.itemList} name="Servicios de Marcyan en Houston" />
+  {/* Preload del LCP (la foto del domo), un tramo por viewport — spec del hero.
+      Los media queries se excluyen entre sí: solo se precarga la variante que
+      el <picture> va a usar. */}
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImgs.srcset.mobileAvif} imagesizes="100vw" media="(max-width: 767px)" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={heroImgs.srcset.desktopAvif} imagesizes="100vw" media="(min-width: 768px)" fetchpriority="high" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} skin="glass" />
 
   <main id="main">
-    <CityHero
+    <DomoHero
       kicker={h.hero.kicker}
       h1={h.hero.h1}
       sub={h.hero.sub}
       primary={h.hero.primary}
       microcopy={h.hero.microcopy}
-      secondaryAnchor={h.hero.explore}
-      telemetry={h.hero.telemetry}
-      skyline={h.hero.skyline}
-      tone={h.hero.tone}
+      explore={h.hero.explore}
+      aiCard={h.hero.aiCard}
+      builtWithLabel={h.hero.builtWithLabel}
+      builtWith={h.hero.builtWith}
     >
       <Breadcrumb slot="breadcrumb" items={h.breadcrumb} lang="es" />
-    </CityHero>
+    </DomoHero>
 
     {/* ── SERVICIOS CON PRECIO ── el hero promete "precios públicos"; aquí se
         cumple: 2 destacadas asimétricas con numeral de precio + 5 filas con

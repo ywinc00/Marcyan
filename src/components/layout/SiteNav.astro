@@ -19,6 +19,16 @@ interface Props {
   hasEn?: boolean;
   currentPath?: string;
   showCtaBar?: boolean;
+  /** Piel ADITIVA por página (decisión de nav del plan maestro: esqueleto global,
+   *  piel por página). 'glass' = barra flotante de cristal (hero El Domo, Houston).
+   *  SOLO presentación: destinos, CTA, drawer, tracking y wordmark, intactos.
+   *  El blur va en .nav__bar (SIN fixed dentro): la trampa del containing block
+   *  (fix 8711117+c688eb2) no se reintroduce. */
+  /** Piel de la barra. 'glass' es el estilo del SITIO (decision del dueno
+   *  2026-09-02: la nav flotante de cristal deja de ser expresion de Houston
+   *  y pasa a ser la del sitio). 'solid' = la barra plana anterior, por si
+   *  hay que volver. */
+  skin?: 'glass' | 'solid';
 }
 const {
   nav,
@@ -27,6 +37,7 @@ const {
   hasEn = true,
   currentPath,
   showCtaBar = true,
+  skin,
 } = Astro.props;
 const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
 const uin = t(lang as Lang);
@@ -35,7 +46,7 @@ const uin = t(lang as Lang);
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
 ---
-<header class="nav" data-nav>
+<header class:list={['nav', skin !== 'solid' && 'nav--glass']} data-nav>
   <div class="nav__bar container">
     <a class="nav__logo" href={homeHref} aria-label="Marcyan Studio — inicio">
       <BrandType />
@@ -146,6 +157,42 @@ const isActive = (href: string) =>
 
   /* página actual (aria-current) — aplica en barra y drawer, todos los breakpoints */
   .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] { color: var(--accent-gold); }
+
+  /* ── PIEL "glass" (aditiva; hero El Domo) ─────────────────────────
+     La barra interior flota como pill de cristal con margen; el header sigue
+     siendo el host fixed transparente. El blur vive en .nav__bar, que NO tiene
+     descendientes position:fixed (drawer/velo/barra CTA son hermanos del
+     header), así que la trampa del containing block no aplica.
+     Valores del canvas del dueño (12a/11a); hairlines con --star-rgb (#f0ede8). */
+  .nav--glass, .nav--glass.is-scrolled {
+    background: transparent;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
+  }
+  .nav--glass .nav__bar {
+    margin-top: 14px;
+    background: rgba(8, 11, 9, 0.42);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(var(--star-rgb), 0.09);
+    border-radius: 16px;
+  }
+  /* hamburguesa como caja de cristal (artboard 12a) */
+  .nav--glass .nav__toggle {
+    background: rgba(var(--star-rgb), 0.05);
+    border: 1px solid rgba(var(--star-rgb), 0.12);
+    border-radius: 12px;
+  }
+  /* CTA de la nav: el boton primario del sitio (oro) con la FORMA pill +
+     anillo que el dueno eligio del hero (2026-09-02: forma si, color del sitio). */
+  .nav--glass .nav__cta {
+    color: var(--fg-inverse); background: var(--accent-gold); border: none;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 0 3px var(--accent-gold-dim);
+  }
+  .nav--glass .nav__cta:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); color: var(--fg-inverse); }
+  @media (--md) {
+    .nav--glass .nav__bar { margin-top: 22px; border-radius: 18px; }
+  }
 
   /* ── ≥ md: barra completa ─────────────────────────────── */
   @media (--md) {

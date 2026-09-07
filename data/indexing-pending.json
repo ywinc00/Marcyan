@@ -1,20 +1,26 @@
 {
-  "builtAt": "2026-09-06T15:35:26.341Z",
+  "builtAt": "2026-09-07T17:30:47.820Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
     "indexed": 73,
-    "notIndexed": 2,
-    "skipped": 9
+    "notIndexed": 3,
+    "skipped": 8
   },
-  "candidates": 1,
+  "candidates": 2,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/houston/seo-local",
+      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
       "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-22T17:23:28.015Z",
+      "lastIndexRequestAt": "2026-08-24T14:44:53.649Z",
+      "requestCount": 1
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": "2026-08-31T16:04:46.755Z",
       "requestCount": 1
     }
   ]

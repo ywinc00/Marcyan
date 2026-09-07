@@ -470,7 +470,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
   .mrc-hero-avatar {
     margin-top: 0;
-    filter: drop-shadow(0 10px 22px rgba(var(--accent-teal-rgb), 0.20));
+    /* Halo teal (ojos) + ribete dorado sutil: el cuerpo blanco lo pide (retoque aprobado 2026-09-06). */
+    filter: drop-shadow(0 10px 22px rgba(var(--accent-teal-rgb), 0.20)) drop-shadow(0 0 12px rgba(var(--accent-gold-rgb), 0.22));
   }
   .mrc-hero-avatar :global(.marcy img) { height: 76px; width: auto; max-width: none; }
   .mrc-welcome-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; color: var(--fg-primary); letter-spacing: var(--tracking-tight); }

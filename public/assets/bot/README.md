@@ -9,9 +9,9 @@ imagen optimizada con **fondo transparente**.
 
 | Archivo            | Uso                                          | Tamaño        |
 |--------------------|----------------------------------------------|---------------|
-| `marcy-hero.webp`  | pose completa — pantalla de bienvenida        | 360×512, ~35KB |
-| `marcy-hero.png`   | fallback PNG del héroe                         | 360×512, ~265KB |
-| `marcy-mini.webp`  | busto (anillo + cabeza + cascos) — header/FAB | 256×256, ~16KB |
+| `marcy-hero.webp`  | pose completa — pantalla de bienvenida        | 364×512, ~35KB |
+| `marcy-hero.png`   | fallback PNG del héroe                         | 364×512, ~265KB |
+| `marcy-mini.webp`  | busto (anillo + cabeza + cascos + planeta) — header/FAB | 256×256, ~16KB |
 | `marcy-mini.png`   | fallback PNG del mini                          | 256×256, ~110KB |
 
 `MarcyAvatar.astro` usa `<picture>` (WebP + PNG fallback). El **héroe carga
@@ -31,18 +31,23 @@ Master transparente (no se sirve): `docs/galeria-src/marcy-blanco-master-transpa
    `truststore.inject_into_ssl()` antes de importar `rembg` (o bajar los `.onnx`
    a `~/.u2net/` con Node). Verificado 2026-09-06: recorte limpio, sin halo.
 2. **Generar los 4 archivos** con `sharp` (ya en `node_modules`), midiendo el
-   bbox opaco automáticamente:
-   - HERO: recorte al bbox opaco del cuerpo y escala a **512 de alto**
+   bbox opaco del cuerpo automáticamente y aplicando el ENCUADRE DE PARIDAD con
+   la versión negra original (regla del dueño: los recortes no cambian entre
+   colorways). Con `t` = bbox opaco del cuerpo en el master:
+   - HERO: `t` ampliado con el mismo aire relativo que el original (7 px de
+     512 de alto y 7 px de 364 de ancho, es decir `mx = t.width·7/350`,
+     `my = t.height·7/498`), escalado a **512 de alto** → 364×512
      (WebP q84 alpha 100 + PNG nivel 9).
-   - MINI: cuadrado centrado horizontalmente en el cuerpo, **lado = 0.86 × ancho
-     opaco**, arrancando en la parte superior del bbox (anillo + cabeza + cascos,
-     barbilla completa), escalado a **256²**. Se probaron 3 encuadres a 96/58/38
-     px: este es el más legible a 38 px y conserva la firma del anillo; incluir
-     el planeta del pecho encoge demasiado la cabeza.
+   - MINI: cuadrado con `left = t.left + t.width·16/769`,
+     `top = t.top + t.height·30/1081`, `lado = t.width·730/769` (anillo + cabeza
+     + cascos + planeta del pecho; el busto llena el cuadrado), escalado a **256²**.
+     Estas fracciones son los bboxes del README original (hero {123,176,769,1081},
+     mini {139,206,730,730}) expresados en relativo, verificados en una hoja
+     viejo/nuevo a 96/58/38 px (busto) y 112/76 px (héroe).
 3. Comprobar en una hoja de contacto a tamaños REALES (héroe 76/112 px, mini
    38/58 px) sobre el fondo del panel (`--bg-elevated`), no a tamaño completo.
 4. Si cambia el alto/ancho resultante del héroe, actualizar `dims` en
-   `MarcyAvatar.astro` (hoy 360×512) para no distorsionar.
+   `MarcyAvatar.astro` (hoy 364×512) para no distorsionar.
 
 El cableado del widget (clases, tamaños, animación de flotar, halos) no cambia:
 solo se sustituyen estos 4 archivos.

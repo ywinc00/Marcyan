@@ -184,13 +184,15 @@ cuando ese archivo se cree). Texto y muted usan los tokens globales existentes.
 El dueño, al revisar el preview: «cambiaste completamente toda la tipografía en
 Houston». Verificado en vivo: las familias eran las mismas (Space Grotesk, DM Sans,
 JetBrains Mono), pero el hero hablaba con la ESCALA del canvas, no con la del sitio:
-H1 34/56px (el sitio: 36→64 fluido, y 80 en el hub anterior), sub 15/16.5px (el
-sitio: 17→20), kicker 10.5px 400 gris (el sitio: Kicker 11px 500 oro con línea),
+H1 34/56px (el sitio: `.display` 40→80 fluido, el del hub anterior y la home),
+sub 15/16.5px (el sitio: 17→20), kicker 10.5px 400 gris (el sitio: Kicker 11px 500 oro con línea),
 micro 9px MAYÚSCULAS (el sitio: 11px sin mayúsculas), riel 8.5px, card 15.5/13/12.5.
 
-Resolución: el punto 8 y el 10 de "Anatomía" quedan SUPERADOS. La tipografía del
-hero es la del sistema, sin excepción: `Kicker` (componente), `<h1 class="h1">`,
-`<p class="lead">`, micro = el de CityHero (mono `--text-xs`, `--tracking-wide`),
+Resolución: del punto 8 y el 10 de "Anatomía" quedan SUPERADOS los tamaños,
+pesos, colores y tracking de texto (el orden de la columna y las sombras en
+móvil siguen vigentes). La tipografía del
+hero es la del sistema, sin excepción: `Kicker` (componente), `<h1 class="display">`
+(hub = hero potente nivel home, DESIGN.md §2; ancho 16ch como CityHero), `<p class="lead">`, micro = el de CityHero (mono `--text-xs`, `--tracking-wide`),
 card título `--text-md` / cuerpo y link `--text-sm`, riel label = etiqueta mono
 `--text-xs` 500 `--tracking-widest`, marcas `--text-sm`/`--text-base`. Del canvas
 sobreviven solo las sombras de texto sobre la foto en móvil y la mezcla de luz del

@@ -124,11 +124,13 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       <div class="domo__crumb"><slot name="breadcrumb" /></div>
       {/* TIPOGRAFIA = la del SITIO (correccion del dueno 2026-09-06: el hero
           hablaba con la escala del canvas, 34/56px y monos de 8.5-10.5px, y
-          "cambiaba toda la tipografia de Houston"). Kicker, .h1 y .lead son las
-          mismas piezas que usan CityHero, LandingHero y la home; aqui solo se
-          anaden sombras para leer sobre la foto en movil. */}
+          "cambiaba toda la tipografia de Houston"). Kicker, .display y .lead
+          son las mismas piezas que llevan CityHero (el hub anterior), la home
+          y las landings con visual (DESIGN.md: hub = hero potente nivel home).
+          De la expresion del canvas quedan solo las sombras sobre la foto en
+          movil y la mezcla de luz del lead, tambien solo en movil. */}
       <div class="domo__kicker"><Kicker>{kicker}</Kicker></div>
-      <h1 class="h1 domo__h1" set:html={h1} />
+      <h1 class="display domo__h1" set:html={h1} />
       <p class="lead domo__sub">{sub}</p>
       <div class="domo__dock">
         <a class="domo__cta" href={primary.href}>{primary.label}</a>
@@ -264,16 +266,17 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     display: flex; flex-direction: column;
     padding-top: calc(var(--nav-h) + var(--space-7));
   }
-  .domo__sky { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); max-width: 720px; }
+  .domo__sky { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); max-width: 720px; }
   .domo__crumb { opacity: 0.85; }
   .domo__crumb :global(*) { font-size: var(--text-xs); }
   /* Kicker del sistema (mono xs, 500, tracking-widest, linea oro). En movil va
      sobre la foto: sombra (text-shadow se hereda al span del componente). */
   .domo__kicker { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5); }
-  /* .h1 del sistema (escala fluida 36-64px, 700, tracking-tight, balance): la
-     misma pieza que LandingHero usa cuando el titulo comparte escena con un
-     visual. Aqui solo margen, ancho y sombra sobre la foto. */
-  .domo__h1 { margin: 0; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); }
+  /* .display del sistema (escala fluida 40-80px, 700, tracking-tight,
+     balance): la pieza de hero nivel home que llevan CityHero, la home y las
+     landings con visual. Aqui solo margen, ancho (16ch, como CityHero) y
+     sombra sobre la foto. */
+  .domo__h1 { margin: 0; max-width: 16ch; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); }
   .domo__h1 :global(em) { color: var(--hst-gold); font-style: normal; }
   /* .lead del sistema (17-20px, leading-loose). Sobre la foto en movil sube un
      punto de luz (mezcla de tokens, no un hex propio) y lleva sombra. */
@@ -310,7 +313,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
      sistema (ver bloque md). El label i18n no cambia. */
   .domo__explore {
     align-self: center; display: inline-flex; align-items: center; justify-content: center;
-    min-height: var(--tap-min); margin-top: 2px; padding-inline: var(--space-2);
+    min-height: var(--tap-min); padding-inline: var(--space-2);
     font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm);
     color: var(--fg-secondary); text-decoration: none;
     text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
@@ -336,7 +339,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       box-shadow: var(--shadow-card);
     }
   }
-  .domo__card-head { display: flex; align-items: center; gap: 10px; }
+  .domo__card-head { display: flex; align-items: center; gap: var(--space-3); }
   .domo__card-iso { width: 17px; height: 17px; flex: 0 0 auto; color: var(--fg-primary); }
   .domo__card-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--text-md); line-height: var(--leading-snug); }
   .domo__card-body { font-size: var(--text-sm); line-height: var(--leading-normal); color: var(--fg-secondary); }
@@ -351,7 +354,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
   .domo__rail {
     position: relative; z-index: 4;
     display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
-    padding: var(--space-7) var(--container-pad) calc(var(--space-4) + var(--space-3));
+    padding: var(--space-7) var(--container-pad) var(--space-5);
     background: linear-gradient(180deg, rgba(4, 6, 4, 0), rgba(4, 6, 4, 0.72));
   }
   .domo__rail-label {
@@ -359,7 +362,7 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
     letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--fg-secondary);
   }
   .domo__rail-marks { display: flex; align-items: center; justify-content: center; gap: var(--space-4); flex-wrap: wrap; }
-  .domo__mark { font-weight: 600; font-size: var(--text-sm); color: rgba(var(--star-rgb), 0.58); }
+  .domo__mark { font-weight: 600; font-size: var(--text-sm); color: var(--fg-secondary); }
   .domo__mark--sg { font-family: var(--font-display); }
 
   /* ── ≥ md: composición del artboard 11a ── */
@@ -368,15 +371,15 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
       flex-direction: row; align-items: flex-start;
       padding-top: calc(var(--nav-h) + clamp(72px, 14vh, 150px));
     }
-    .domo__sky { gap: var(--space-5); max-width: 720px; }
+    .domo__sky { gap: var(--space-5); max-width: 840px; }
     /* en PC el oscurecedor lateral ya da el contraste: fuera sombras y el
        lead vuelve al color del sistema */
     .domo__kicker { text-shadow: none; }
-    .domo__h1 { text-shadow: none; max-width: 720px; }
+    .domo__h1 { text-shadow: none; }
     .domo__sub { color: var(--fg-secondary); text-shadow: none; }
     .domo__dock { align-self: flex-start; gap: var(--space-3); margin-top: var(--space-2); }
     /* CTA + explore en fila; micro debajo, alineado a la izquierda */
-    .domo__dock { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 18px; row-gap: 12px; justify-content: start; }
+    .domo__dock { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: var(--space-4); row-gap: var(--space-3); justify-content: start; }
     /* filas EXPLICITAS: sin esto el auto-placement mandaba el explore a una
        tercera fila bajo el micro (queja del dueno; el artboard los quiere
        CTA + explore JUNTOS en la fila 1 y el micro debajo). */
@@ -401,14 +404,14 @@ const moteMv = Array.from({ length: 12 }, (_, i) => ({
          en pantallas mas anchas la card se queda CON la escena, no huerfana
          en la esquina). Vertical: 170/860 = 19.8%, con tope 176px para que
          en ventanas altas no suba de mas. */
-      position: absolute; right: max(24px, calc((100% - 1248px) / 2));
+      position: absolute; right: max(var(--container-pad), calc((100% - 1248px) / 2));
       bottom: clamp(120px, 19.8%, 176px);
       width: 300px; margin: 0;
     }
     .domo__card-iso { width: 18px; height: 18px; }
 
     .domo__rail {
-      flex-direction: row; justify-content: center; gap: 52px;
+      flex-direction: row; justify-content: center; gap: var(--space-7);
       padding: var(--space-7) var(--container-pad) var(--space-5);
       background: linear-gradient(180deg, rgba(4, 6, 4, 0), rgba(4, 6, 4, 0.62));
     }

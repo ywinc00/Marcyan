@@ -1,27 +1,63 @@
 {
-  "builtAt": "2026-09-07T17:30:47.820Z",
+  "builtAt": "2026-09-08T17:07:27.044Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 73,
-    "notIndexed": 3,
-    "skipped": 8
+    "indexed": 0,
+    "notIndexed": 74,
+    "skipped": 10
   },
-  "candidates": 2,
+  "candidates": 72,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
+      "url": "https://marcyanstudio.com/en",
       "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-24T14:44:53.649Z",
-      "requestCount": 1
+      "lastIndexRequestAt": null,
+      "requestCount": 0
     },
     {
-      "url": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
+      "url": "https://marcyanstudio.com/en/houston",
       "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-31T16:04:46.755Z",
-      "requestCount": 1
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/miami",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/pricing",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/services",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/servicios",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": null,
+      "requestCount": 0
     }
   ]
 }

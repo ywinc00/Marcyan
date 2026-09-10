@@ -1,33 +1,21 @@
 {
-  "builtAt": "2026-09-09T18:41:48.676Z",
+  "builtAt": "2026-09-10T16:42:52.086Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 73,
-    "notIndexed": 3,
-    "skipped": 8
+    "indexed": 76,
+    "notIndexed": 1,
+    "skipped": 7
   },
-  "candidates": 3,
+  "candidates": 1,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
+      "url": "https://marcyanstudio.com/es/miami",
       "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-31T16:04:46.755Z",
-      "requestCount": 1
-    },
-    {
-      "url": "https://marcyanstudio.com/en/miami/conversational-ai",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-09-01T16:25:23.532Z",
-      "requestCount": 1
-    },
-    {
-      "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
-      "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-24T14:56:10.326Z",
-      "requestCount": 1
+      "lastIndexRequestAt": "2026-08-26T19:05:22.403Z",
+      "requestCount": 2
     }
   ]
 }

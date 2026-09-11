@@ -1,21 +1,21 @@
 {
-  "builtAt": "2026-09-10T16:42:52.086Z",
+  "builtAt": "2026-09-11T16:35:23.271Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 76,
+    "indexed": 77,
     "notIndexed": 1,
-    "skipped": 7
+    "skipped": 6
   },
   "candidates": 1,
   "pending": [
     {
-      "url": "https://marcyanstudio.com/es/miami",
+      "url": "https://marcyanstudio.com/es/miami/diseno-web",
       "coverageState": "Crawled - currently not indexed",
-      "lastIndexRequestAt": "2026-08-26T19:05:22.403Z",
-      "requestCount": 2
+      "lastIndexRequestAt": null,
+      "requestCount": 0
     }
   ]
 }

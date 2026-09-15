@@ -46,7 +46,7 @@ export const houstonHub = {
     sub: 'One bilingual studio for your website, your AI, and your SEO, with public pricing.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
     microcopy: 'Reply in 1 business hour · No commitment',
-    explore: { label: 'See services and pricing ↓', href: '#servicios' },
+    explore: { label: 'See services', href: '#servicios' },
     telemetry: [
       { label: 'Direct line', value: nap.houston, href: telHref, live: true },
       { label: 'Hours', value: nap.hours },
@@ -57,6 +57,19 @@ export const houstonHub = {
     // atmosphere + city seal). `src` optional to restore it.
     skyline: { caption: 'HOUSTON, TX — SPACE CITY' },
     tone: 'gold' as const,
+    // ── ADDITIVE fields for the "El Domo" hero (DomoHero; spec in
+    // docs/landings/SPEC-hero-houston-domo.md). telemetry/skyline are KEPT:
+    // CityHero still exists and rollback = reverting the import.
+    aiCard: {
+      title: 'Zero missed calls',
+      body: 'An AI agent answers your phone and your WhatsApp 24/7, in English and Spanish, and books appointments while you rest.',
+      linkLabel: 'See how it works →',
+      href: '/en/houston/conversational-ai',
+    },
+    // Brand voice (owner rule 2026-08-31): we never say we "build with" AI —
+    // we master it. Hence "We master".
+    builtWithLabel: 'We master',
+    builtWith: ['OpenAI', 'Google', 'WhatsApp', 'Shopify', 'Stripe'],
   },
   answer: {
     q: 'Why choose a web design studio in Houston?',

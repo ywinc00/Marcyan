@@ -1,21 +1,27 @@
 {
-  "builtAt": "2026-09-20T16:29:17.064Z",
+  "builtAt": "2026-09-21T15:57:02.999Z",
   "property": "sc-domain:marcyanstudio.com",
   "cooldownDays": 7,
   "maxPerDay": 8,
   "totals": {
     "total": 84,
-    "indexed": 77,
-    "notIndexed": 1,
+    "indexed": 76,
+    "notIndexed": 2,
     "skipped": 6
   },
-  "candidates": 1,
+  "candidates": 2,
   "pending": [
     {
       "url": "https://marcyanstudio.com/en/houston/beauty-salons",
       "coverageState": "Crawled - currently not indexed",
       "lastIndexRequestAt": null,
       "requestCount": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/houston/seo-local",
+      "coverageState": "Crawled - currently not indexed",
+      "lastIndexRequestAt": "2026-09-06T15:47:07.953Z",
+      "requestCount": 2
     }
   ]
 }

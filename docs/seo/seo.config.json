@@ -6,39 +6,119 @@
   "sitemap": "https://marcyanstudio.com/sitemap-index.xml",
   "gscPropiedad": "sc-domain:marcyanstudio.com",
   "idiomaBase": "es",
-  "idiomas": { "en": "^/en(/|$)" },
+  "idiomas": {
+    "en": "^/en(/|$)"
+  },
   "idiomaApi": "en-US",
-  "marca": ["marcyan"],
-  "grupos": [
-    { "id": "home", "patron": "^/(es|en)/?$" },
-    { "id": "ciudades", "patron": "^/(es|en)/(houston|miami)(/(katy|sugar-land|doral|hialeah))?/?$" },
-    { "id": "landings", "patron": "^/(es|en)/(houston|miami)/" },
-    { "id": "precios", "patron": "^/(es/precios|en/pricing)" },
-    { "id": "blog", "patron": "^/(es|en)/blog" },
-    { "id": "servicios", "patron": "^/(es/(servicios|ia-para-pymes)|en/(services|ai-for-small-business))" },
-    { "id": "herramientas", "patron": "^/(es/(diagnostico|herramientas)|en/(checkup|tools))" }
+  "marca": [
+    "marcyan"
   ],
-  "prioridadGrupos": ["landings", "ciudades", "servicios", "precios", "home"],
-  "indexacion": { "maxPeticionesDia": 8, "reintentoDias": 14, "diasNueva": 60 },
-  "alertas": { "diasSinRastreo": 30 },
-  "umbrales": { "impresionesMinimas": 30 },
-  "ficha": { "placeId": null, "claveEnv": "GOOGLE_PLACES_API_KEY", "idioma": "es" },
+  "grupos": [
+    {
+      "id": "home",
+      "patron": "^/(es|en)/?$"
+    },
+    {
+      "id": "ciudades",
+      "patron": "^/(es|en)/(houston|miami)(/(katy|sugar-land|doral|hialeah))?/?$"
+    },
+    {
+      "id": "landings",
+      "patron": "^/(es|en)/(houston|miami)/"
+    },
+    {
+      "id": "precios",
+      "patron": "^/(es/precios|en/pricing)"
+    },
+    {
+      "id": "blog",
+      "patron": "^/(es|en)/blog"
+    },
+    {
+      "id": "servicios",
+      "patron": "^/(es/(servicios|ia-para-pymes)|en/(services|ai-for-small-business))"
+    },
+    {
+      "id": "herramientas",
+      "patron": "^/(es/(diagnostico|herramientas)|en/(checkup|tools))"
+    }
+  ],
+  "prioridadGrupos": [
+    "landings",
+    "ciudades",
+    "servicios",
+    "precios",
+    "home"
+  ],
+  "indexacion": {
+    "maxPeticionesDia": 8,
+    "reintentoDias": 14,
+    "diasNueva": 60
+  },
+  "alertas": {
+    "diasSinRastreo": 30
+  },
+  "umbrales": {
+    "impresionesMinimas": 30
+  },
+  "ficha": {
+    "placeId": null,
+    "claveEnv": "GOOGLE_PLACES_API_KEY",
+    "idioma": "es"
+  },
   "competidores": [],
-  "ga4": { "propertyId": "549587864", "eventoContacto": "generate_lead" },
+  "ga4": {
+    "propertyId": "549587864",
+    "eventoContacto": "generate_lead"
+  },
   "ia": {
-    "ubicacion": { "ciudad": "Houston", "region": "Texas", "pais": "US" },
+    "ubicacion": {
+      "ciudad": "Houston",
+      "region": "Texas",
+      "pais": "US"
+    },
     "repeticiones": 3,
     "preguntas": [
-      { "idioma": "es", "texto": "agencia de diseño web para negocios hispanos en Houston" },
-      { "idioma": "es", "texto": "cuánto cuesta una página web en Houston" },
-      { "idioma": "es", "texto": "agencia de SEO local en Miami para negocios latinos" },
-      { "idioma": "es", "texto": "quién hace chatbots de WhatsApp para negocios en Houston" },
-      { "idioma": "es", "texto": "diseño web bilingüe en Houston" },
-      { "idioma": "en", "texto": "best bilingual web design agency in Houston" },
-      { "idioma": "en", "texto": "web design agency for Hispanic small businesses in Houston" },
-      { "idioma": "en", "texto": "local SEO agency in Miami for small businesses" },
-      { "idioma": "en", "texto": "how much does a website cost in Houston" },
-      { "idioma": "en", "texto": "AI chatbot for small business in Houston" }
+      {
+        "idioma": "es",
+        "texto": "agencia de diseño web para negocios hispanos en Houston"
+      },
+      {
+        "idioma": "es",
+        "texto": "cuánto cuesta una página web en Houston"
+      },
+      {
+        "idioma": "es",
+        "texto": "agencia de SEO local en Miami para negocios latinos"
+      },
+      {
+        "idioma": "es",
+        "texto": "quién hace chatbots de WhatsApp para negocios en Houston"
+      },
+      {
+        "idioma": "es",
+        "texto": "diseño web bilingüe en Houston"
+      },
+      {
+        "idioma": "en",
+        "texto": "best bilingual web design agency in Houston"
+      },
+      {
+        "idioma": "en",
+        "texto": "web design agency for Hispanic small businesses in Houston"
+      },
+      {
+        "idioma": "en",
+        "texto": "local SEO agency in Miami for small businesses"
+      },
+      {
+        "idioma": "en",
+        "texto": "how much does a website cost in Houston"
+      },
+      {
+        "idioma": "en",
+        "texto": "AI chatbot for small business in Houston"
+      }
     ]
   },
   "envArchivo": ".env.local",

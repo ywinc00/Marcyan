@@ -1,0 +1,39 @@
+{
+  "serie": {
+    "ChIJbzQE8VmzR0YR6VIeU4zic64": [
+      {
+        "fecha": "2026-09-25",
+        "rating": null,
+        "total": 0,
+        "nombre": "Marcyan Studio"
+      }
+    ],
+    "ChIJlRelt6jCQIYRy-WoirFsObc": [
+      {
+        "fecha": "2026-09-25",
+        "rating": 4.9,
+        "total": 117,
+        "nombre": "True Digital Marketing Inc"
+      }
+    ],
+    "ChIJTXnIqNfDQIYRT3WrAPp3sIs": [
+      {
+        "fecha": "2026-09-25",
+        "rating": 5,
+        "total": 103,
+        "nombre": "Webnhubs"
+      }
+    ],
+    "ChIJCwAq4-jDQIYRlk-bdpZOAvs": [
+      {
+        "fecha": "2026-09-25",
+        "rating": 5,
+        "total": 95,
+        "nombre": "Artisticore Graphic Design Agency"
+      }
+    ]
+  },
+  "vistas": {
+    "ChIJbzQE8VmzR0YR6VIeU4zic64": []
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-09-25",
+  "primeraEjecucion": true,
+  "sitemap": 84,
+  "inspeccion": true,
+  "indexadas": 78,
+  "inspeccionadas": 84,
+  "porEstado": {
+    "Submitted and indexed": 78,
+    "Alternate page with proper canonical tag": 6
+  },
+  "porGrupo": {
+    "home·en": {
+      "total": 1,
+      "indexadas": 1
+    },
+    "otras·en": {
+      "total": 5,
+      "indexadas": 5
+    },
+    "servicios·en": {
+      "total": 2,
+      "indexadas": 2
+    },
+    "blog·en": {
+      "total": 1,
+      "indexadas": 1
+    },
+    "herramientas·en": {
+      "total": 2,
+      "indexadas": 2
+    },
+    "ciudades·en": {
+      "total": 6,
+      "indexadas": 6
+    },
+    "landings·en": {
+      "total": 18,
+      "indexadas": 18
+    },
+    "precios·en": {
+      "total": 4,
+      "indexadas": 4
+    },
+    "home·es": {
+      "total": 1,
+      "indexadas": 1
+    },
+    "blog·es": {
+      "total": 7,
+      "indexadas": 6
+    },
+    "otras·es": {
+      "total": 5,
+      "indexadas": 5
+    },
+    "herramientas·es": {
+      "total": 2,
+      "indexadas": 1
+    },
+    "ciudades·es": {
+      "total": 6,
+      "indexadas": 4
+    },
+    "landings·es": {
+      "total": 18,
+      "indexadas": 16
+    },
+    "servicios·es": {
+      "total": 2,
+      "indexadas": 2
+    },
+    "precios·es": {
+      "total": 4,
+      "indexadas": 4
+    }
+  },
+  "sinRastreoReciente": 37,
+  "sinEnlacesInternosVistosPorGoogle": [],
+  "certificadoDias": 49,
+  "google": {
+    "enCurso": [
+      {
+        "nombre": "September 2026 spam update",
+        "inicio": "2026-09-24T16:15:00+00:00",
+        "fin": null,
+        "url": "https://status.search.google.com/incidents/XhUDXP7A67iHCD2kmbVu",
+        "interpretableDesde": null
+      }
+    ],
+    "recientes": []
+  },
+  "alertas": {
+    "alta": [],
+    "media": [
+      {
+        "fecha": "2026-09-25",
+        "cliente": "marcyan",
+        "nivel": "media",
+        "tipo": "rastreo",
+        "detalle": "37 páginas indexadas llevan más de 30 días sin visita de Google",
+        "url": null
+      }
+    ],
+    "info": [
+      {
+        "fecha": "2026-09-25",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "google",
+        "detalle": "Actualización en curso: September 2026 spam update. No interpretar movimientos hasta una semana después de que termine.",
+        "url": null
+      }
+    ]
+  },
+  "alertasNuevas": [],
+  "pedirIndexacion": [],
+  "colaPendiente": 0,
+  "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
+}

@@ -1,0 +1,3277 @@
+{
+  "urls": {
+    "https://marcyanstudio.com/en": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-08",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-12T22:29:38Z",
+        "googleCanonical": "https://marcyanstudio.com/en",
+        "userCanonical": "https://marcyanstudio.com/en",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Marcyan Studio — Web Design, AI & Local SEO · Houston & Miami",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es"
+        }
+      ],
+      "hash": "301741328fb34370"
+    },
+    "https://marcyanstudio.com/en/about": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-23T00:22:41Z",
+        "googleCanonical": "https://marcyanstudio.com/en/about",
+        "userCanonical": "https://marcyanstudio.com/en/about",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "About Marcyan: bilingual web, AI and SEO studio | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/sobre-nosotros"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/about"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/sobre-nosotros"
+        }
+      ],
+      "hash": "b22be077949558a5"
+    },
+    "https://marcyanstudio.com/en/ai-for-small-business": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-25T04:41:38Z",
+        "googleCanonical": "https://marcyanstudio.com/en/ai-for-small-business",
+        "userCanonical": "https://marcyanstudio.com/en/ai-for-small-business",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Artificial Intelligence for Your Business (Small Business) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/ia-para-pymes"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/ai-for-small-business"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/ia-para-pymes"
+        }
+      ],
+      "hash": "008d8f4bceef0aec"
+    },
+    "https://marcyanstudio.com/en/blog": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-05T21:46:38Z",
+        "googleCanonical": "https://marcyanstudio.com/en/blog",
+        "userCanonical": "https://marcyanstudio.com/en/blog/",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Blog - Web design, AI & SEO guides for small businesses | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/blog"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog"
+        }
+      ],
+      "hash": "4264b8613026e51c"
+    },
+    "https://marcyanstudio.com/en/checkup": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-16T01:28:26Z",
+        "googleCanonical": "https://marcyanstudio.com/en/checkup",
+        "userCanonical": "https://marcyanstudio.com/en/checkup",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Free digital checkup for your business | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/diagnostico"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/checkup"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/diagnostico"
+        }
+      ],
+      "hash": "b142d3fe6069a01f"
+    },
+    "https://marcyanstudio.com/en/cities": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T14:53:58Z",
+        "googleCanonical": "https://marcyanstudio.com/en/cities",
+        "userCanonical": "https://marcyanstudio.com/en/cities",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Cities — Houston and Miami | Bilingual studio | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/ciudades"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/cities"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/ciudades"
+        }
+      ],
+      "hash": "c4f255485147f3a7"
+    },
+    "https://marcyanstudio.com/en/houston": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-08",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-08T17:23:17Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston",
+        "userCanonical": "https://marcyanstudio.com/en/houston",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Houston | Bilingual studio: web, AI and SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston"
+        }
+      ],
+      "hash": "36d480e164238be6"
+    },
+    "https://marcyanstudio.com/en/houston/ai-seo": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-23T08:13:00Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/ai-seo",
+        "userCanonical": "https://marcyanstudio.com/en/houston/ai-seo",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "SEO for AI in Houston - Get ChatGPT to recommend you | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/seo-para-ia"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/ai-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/seo-para-ia"
+        }
+      ],
+      "hash": "5f9c190c00322b3a"
+    },
+    "https://marcyanstudio.com/en/houston/auto-repair": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T00:37:54Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/auto-repair",
+        "userCanonical": "https://marcyanstudio.com/en/houston/auto-repair",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Websites for Auto Repair Shops in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/auto-repair"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+        }
+      ],
+      "hash": "b66a3be1f71a24dc"
+    },
+    "https://marcyanstudio.com/en/houston/beauty-salons": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-21",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-22",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-21T16:13:23Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/beauty-salons",
+        "userCanonical": "https://marcyanstudio.com/en/houston/beauty-salons",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Booking Websites for Beauty Salons in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/salon-belleza"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/beauty-salons"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/salon-belleza"
+        }
+      ],
+      "hash": "ec900857b998e398"
+    },
+    "https://marcyanstudio.com/en/houston/bilingual-web-design": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T13:44:09Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/bilingual-web-design",
+        "userCanonical": "https://marcyanstudio.com/en/houston/bilingual-web-design",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Bilingual Web Design in Houston (English and Spanish) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/bilingual-web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+        }
+      ],
+      "hash": "0f2887c8406fe6a4"
+    },
+    "https://marcyanstudio.com/en/houston/branding": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-20T08:41:40Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/branding",
+        "userCanonical": "https://marcyanstudio.com/en/houston/branding",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Logo & Brand Design in Houston | Bilingual Branding | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/branding"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/branding"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/branding"
+        }
+      ],
+      "hash": "aec23f9cfb76c6f7"
+    },
+    "https://marcyanstudio.com/en/houston/contractors": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-19",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-19T15:38:22Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/contractors",
+        "userCanonical": "https://marcyanstudio.com/en/houston/contractors",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Websites for Contractors in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/contratistas"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/contractors"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/contratistas"
+        }
+      ],
+      "hash": "7499222c7d9eb8a2"
+    },
+    "https://marcyanstudio.com/en/houston/conversational-ai": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-23T05:00:17Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/conversational-ai",
+        "userCanonical": "https://marcyanstudio.com/en/houston/conversational-ai",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Conversational AI in Houston | An Assistant That Answers 24/7 | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/ia-conversacional"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/conversational-ai"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/ia-conversacional"
+        }
+      ],
+      "hash": "a00226cab6a86fc2"
+    },
+    "https://marcyanstudio.com/en/houston/dental-clinics": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-27T08:04:41Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/dental-clinics",
+        "userCanonical": "https://marcyanstudio.com/en/houston/dental-clinics",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Websites for Dental Clinics in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/dental-clinics"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+        }
+      ],
+      "hash": "3af6b12fca43897f"
+    },
+    "https://marcyanstudio.com/en/houston/ecommerce": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-23T08:17:49Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/ecommerce",
+        "userCanonical": "https://marcyanstudio.com/en/houston/ecommerce",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Online Store Design in Houston | Bilingual E-Commerce | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/ecommerce"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/ecommerce"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/ecommerce"
+        }
+      ],
+      "hash": "6f25663a971d82f9"
+    },
+    "https://marcyanstudio.com/en/houston/immigration-lawyers": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-01T16:00:05Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/immigration-lawyers",
+        "userCanonical": "https://marcyanstudio.com/en/houston/immigration-lawyers",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "AI Marketing for Immigration Lawyers in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/immigration-lawyers"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
+        }
+      ],
+      "hash": "f24f32f69861709d"
+    },
+    "https://marcyanstudio.com/en/houston/katy": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-20T13:20:41Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/katy",
+        "userCanonical": "https://marcyanstudio.com/en/houston/katy",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Katy, TX: websites and local SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/katy"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/katy"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/katy"
+        }
+      ],
+      "hash": "6bf3fe7604c848b8"
+    },
+    "https://marcyanstudio.com/en/houston/local-seo": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-23T08:22:15Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/local-seo",
+        "userCanonical": "https://marcyanstudio.com/en/houston/local-seo",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Local SEO in Houston: get your business found on Google | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/seo-local"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/local-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/seo-local"
+        }
+      ],
+      "hash": "9fafe1cfafdcf378"
+    },
+    "https://marcyanstudio.com/en/houston/real-estate": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T15:27:37Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/real-estate",
+        "userCanonical": "https://marcyanstudio.com/en/houston/real-estate",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Websites for Real Estate Agents in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/bienes-raices"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/real-estate"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/bienes-raices"
+        }
+      ],
+      "hash": "7e946a21f9325cbe"
+    },
+    "https://marcyanstudio.com/en/houston/restaurants": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-19",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-19T15:40:25Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/restaurants",
+        "userCanonical": "https://marcyanstudio.com/en/houston/restaurants",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Restaurant Websites in Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/restaurantes"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/restaurants"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/restaurantes"
+        }
+      ],
+      "hash": "c4fdbddb7230f4c3"
+    },
+    "https://marcyanstudio.com/en/houston/sugar-land": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-31T02:16:38Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/sugar-land",
+        "userCanonical": "https://marcyanstudio.com/en/houston/sugar-land",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Sugar Land, TX: premium, bilingual sites | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/sugar-land"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/sugar-land"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/sugar-land"
+        }
+      ],
+      "hash": "dcc1e964dc90c574"
+    },
+    "https://marcyanstudio.com/en/houston/web-design": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T15:03:06Z",
+        "googleCanonical": "https://marcyanstudio.com/en/houston/web-design",
+        "userCanonical": "https://marcyanstudio.com/en/houston/web-design",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Houston | Custom, bilingual websites | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web"
+        }
+      ],
+      "hash": "5b852166a3aa7d4a"
+    },
+    "https://marcyanstudio.com/en/miami": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-08",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-08T17:25:31Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami",
+        "userCanonical": "https://marcyanstudio.com/en/miami",
+        "referringUrls": 3,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Miami | Bilingual studio: web, AI and SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami"
+        }
+      ],
+      "hash": "8e73ba44a56757fa"
+    },
+    "https://marcyanstudio.com/en/miami/conversational-ai": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-09",
+      "peticiones": 2,
+      "indexadaDesde": "2026-09-10",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-09T18:54:58Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/conversational-ai",
+        "userCanonical": "https://marcyanstudio.com/en/miami/conversational-ai",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Conversational AI in Miami | An assistant that answers 24/7 | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/ia-conversacional"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/conversational-ai"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/ia-conversacional"
+        }
+      ],
+      "hash": "5f571afd4ee93f28"
+    },
+    "https://marcyanstudio.com/en/miami/doral": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-22T17:57:31Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/doral",
+        "userCanonical": "https://marcyanstudio.com/en/miami/doral",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design and SEO in Doral (Doralzuela) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/doral"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/doral"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/doral"
+        }
+      ],
+      "hash": "acf4649045fc0a32"
+    },
+    "https://marcyanstudio.com/en/miami/ecommerce": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-09T04:53:23Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/ecommerce",
+        "userCanonical": "https://marcyanstudio.com/en/miami/ecommerce",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Online Store Design in Miami | Bilingual E-Commerce | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/ecommerce"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/ecommerce"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/ecommerce"
+        }
+      ],
+      "hash": "7bca324273844ef6"
+    },
+    "https://marcyanstudio.com/en/miami/hialeah": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-06T20:40:54Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/hialeah",
+        "userCanonical": "https://marcyanstudio.com/en/miami/hialeah",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design and SEO in Hialeah | Bilingual local businesses | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/hialeah"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/hialeah"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/hialeah"
+        }
+      ],
+      "hash": "96fcd67a5a6fd2e9"
+    },
+    "https://marcyanstudio.com/en/miami/local-seo": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-07T13:31:07Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/local-seo",
+        "userCanonical": "https://marcyanstudio.com/en/miami/local-seo",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Local SEO in Miami: get your business found on Google | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/seo-local"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/local-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/seo-local"
+        }
+      ],
+      "hash": "cd7396e06bffbe59"
+    },
+    "https://marcyanstudio.com/en/miami/web-design": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-06T00:29:16Z",
+        "googleCanonical": "https://marcyanstudio.com/en/miami/web-design",
+        "userCanonical": "https://marcyanstudio.com/en/miami/web-design",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Web Design in Miami | Custom, bilingual sites | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/diseno-web"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/diseno-web"
+        }
+      ],
+      "hash": "94cbad45f4a7a3e8"
+    },
+    "https://marcyanstudio.com/en/portfolio": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-31T01:54:11Z",
+        "googleCanonical": "https://marcyanstudio.com/en/portfolio",
+        "userCanonical": "https://marcyanstudio.com/en/portfolio",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Portfolio: real work, real businesses | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/portafolio"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/portfolio"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/portafolio"
+        }
+      ],
+      "hash": "e69bd5091841cda1"
+    },
+    "https://marcyanstudio.com/en/pricing": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-08",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-08T17:25:31Z",
+        "googleCanonical": "https://marcyanstudio.com/en/pricing",
+        "userCanonical": "https://marcyanstudio.com/en/pricing",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Pricing — Web design, AI and SEO in Houston and Miami | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios"
+        }
+      ],
+      "hash": "bb28f5e26214d6b5"
+    },
+    "https://marcyanstudio.com/en/pricing/chatbot-cost": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-30",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T15:00:40Z",
+        "googleCanonical": "https://marcyanstudio.com/en/pricing/chatbot-cost",
+        "userCanonical": "https://marcyanstudio.com/en/pricing/chatbot-cost",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "How much does a WhatsApp AI chatbot cost? The real price | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+        }
+      ],
+      "hash": "957795dfdbec49ee"
+    },
+    "https://marcyanstudio.com/en/pricing/local-seo-cost-houston": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T12:17:20Z",
+        "googleCanonical": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston",
+        "userCanonical": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "How much does local SEO cost in Houston? Real monthly price | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+        }
+      ],
+      "hash": "ab44c63bbad65c6e"
+    },
+    "https://marcyanstudio.com/en/pricing/website-cost-houston": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T02:37:10Z",
+        "googleCanonical": "https://marcyanstudio.com/en/pricing/website-cost-houston",
+        "userCanonical": "https://marcyanstudio.com/en/pricing/website-cost-houston",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "How much does a website cost in Houston? Real 2026 pricing | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/website-cost-houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
+        }
+      ],
+      "hash": "55cc93f7ee448285"
+    },
+    "https://marcyanstudio.com/en/privacy": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-25T06:25:55Z",
+        "googleCanonical": "https://marcyanstudio.com/en/privacy",
+        "userCanonical": "https://marcyanstudio.com/en/privacy",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Privacy Policy · Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/privacidad"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/privacy"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/privacidad"
+        }
+      ],
+      "hash": "66740db9e7950bc9"
+    },
+    "https://marcyanstudio.com/en/services": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-04T09:37:34Z",
+        "googleCanonical": "https://marcyanstudio.com/en/services",
+        "userCanonical": "https://marcyanstudio.com/en/services",
+        "referringUrls": 3,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Services — Web design, AI and SEO in Houston and Miami | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/servicios"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/services"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/servicios"
+        }
+      ],
+      "hash": "f05d6d528159c829"
+    },
+    "https://marcyanstudio.com/en/terms": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-03T12:28:45Z",
+        "googleCanonical": "https://marcyanstudio.com/en/terms",
+        "userCanonical": "https://marcyanstudio.com/en/terms",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Terms of Service · Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/terminos"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/terms"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/terminos"
+        }
+      ],
+      "hash": "48c840eb058970db"
+    },
+    "https://marcyanstudio.com/en/tools": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T10:52:12Z",
+        "googleCanonical": "https://marcyanstudio.com/en/tools",
+        "userCanonical": "https://marcyanstudio.com/en/tools",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Free tools for your business | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/herramientas"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/tools"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/herramientas"
+        }
+      ],
+      "hash": "c01a4b0d89c71104"
+    },
+    "https://marcyanstudio.com/es": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-17T15:23:34Z",
+        "googleCanonical": "https://marcyanstudio.com/es",
+        "userCanonical": "https://marcyanstudio.com/es",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Marcyan Studio — Diseño web, IA y SEO local · Houston & Miami",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es"
+        }
+      ],
+      "hash": "f7551467ee2444e9"
+    },
+    "https://marcyanstudio.com/es/blog": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-21T19:22:20Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog",
+        "userCanonical": "https://marcyanstudio.com/es/blog",
+        "referringUrls": 4,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Blog · Guías de diseño web, IA y SEO para PYMEs | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/blog"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog"
+        }
+      ],
+      "hash": "240b3950cd3b47b0"
+    },
+    "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-09",
+      "peticiones": 2,
+      "indexadaDesde": "2026-09-10",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-09T18:56:58Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
+        "userCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Cómo lograr que ChatGPT y Gemini recomienden tu negocio (guía AEO en español) | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+        }
+      ],
+      "hash": "279471e7881411ea"
+    },
+    "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-06T00:25:05Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana",
+        "userCanonical": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Cómo elegir agencia de diseño web para tu negocio hispano (sin que te escondan el precio) | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana"
+        }
+      ],
+      "hash": "152eaf8b49ab9750"
+    },
+    "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-07T02:16:50Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+        "userCanonical": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "¿Cuánto cuesta un chatbot de WhatsApp para tu negocio? Guía 2026 | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia"
+        }
+      ],
+      "hash": "2fb85c0cff22f0a6"
+    },
+    "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T03:15:34Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp",
+        "userCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web para restaurantes: menú QR, pedidos y reservas por WhatsApp | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp"
+        }
+      ],
+      "hash": "c710559dd3326b4c"
+    },
+    "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-06T15:09:23Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos/",
+        "userCanonical": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos/",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "IA que contesta tus llamadas y mensajes perdidos (guía práctica en español) | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos"
+        }
+      ],
+      "hash": "368daeb5b0903a24"
+    },
+    "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T22:26:53Z",
+        "googleCanonical": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia",
+        "userCanonical": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "¿Cuánto cuesta una página web en Houston? Precios reales 2026 | Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia"
+        }
+      ],
+      "hash": "40c6c2c7e91b2b09"
+    },
+    "https://marcyanstudio.com/es/ciudades": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-21T20:50:37Z",
+        "googleCanonical": "https://marcyanstudio.com/es/ciudades",
+        "userCanonical": "https://marcyanstudio.com/es/ciudades",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Ciudades — Houston y Miami | Agencia hispana bilingüe | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/ciudades"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/cities"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/ciudades"
+        }
+      ],
+      "hash": "636d2a2a35d5f850"
+    },
+    "https://marcyanstudio.com/es/diagnostico": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-06T14:54:19Z",
+        "googleCanonical": "https://marcyanstudio.com/es/diagnostico",
+        "userCanonical": "https://marcyanstudio.com/es/diagnostico/",
+        "referringUrls": 3,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diagnóstico digital gratis para tu negocio | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/diagnostico"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/checkup"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/diagnostico"
+        }
+      ],
+      "hash": "197b60b2068f6d24"
+    },
+    "https://marcyanstudio.com/es/herramientas": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-06T16:21:44Z",
+        "googleCanonical": "https://marcyanstudio.com/es/herramientas/",
+        "userCanonical": "https://marcyanstudio.com/es/herramientas/",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Herramientas gratis para tu negocio | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/herramientas"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/tools"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/herramientas"
+        }
+      ],
+      "hash": "d7e25561e2c051a2"
+    },
+    "https://marcyanstudio.com/es/houston": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-02T21:49:23Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston",
+        "userCanonical": "https://marcyanstudio.com/es/houston",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño de páginas web en Houston | Agencia bilingüe: web, IA y SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston"
+        }
+      ],
+      "hash": "92f88cd09a384d58"
+    },
+    "https://marcyanstudio.com/es/houston/abogados-inmigracion": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-09",
+      "peticiones": 2,
+      "indexadaDesde": "2026-09-10",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-09T18:54:57Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
+        "userCanonical": "https://marcyanstudio.com/es/houston/abogados-inmigracion",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Marketing con IA para Abogados de Inmigración en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/immigration-lawyers"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
+        }
+      ],
+      "hash": "00d96d28d03f5db0"
+    },
+    "https://marcyanstudio.com/es/houston/bienes-raices": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-08-18",
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-07T02:20:50Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/bienes-raices/",
+        "userCanonical": "https://marcyanstudio.com/es/houston/bienes-raices/",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sitios Web para Agentes de Bienes Raíces en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/bienes-raices"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/real-estate"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/bienes-raices"
+        }
+      ],
+      "hash": "c515cc64936f581d"
+    },
+    "https://marcyanstudio.com/es/houston/branding": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-03",
+      "peticiones": 2,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-03T16:35:59Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/branding",
+        "userCanonical": "https://marcyanstudio.com/es/houston/branding",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño de Logo y Marca en Houston | Branding bilingüe | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/branding"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/branding"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/branding"
+        }
+      ],
+      "hash": "a1ef716a60d69dfc"
+    },
+    "https://marcyanstudio.com/es/houston/clinicas-dentales": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-06T15:34:24Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/clinicas-dentales",
+        "userCanonical": "https://marcyanstudio.com/es/houston/clinicas-dentales/",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sitios Web para Clínicas Dentales en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/dental-clinics"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+        }
+      ],
+      "hash": "816b99534e6b5f23"
+    },
+    "https://marcyanstudio.com/es/houston/contratistas": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-04T00:54:58Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/contratistas",
+        "userCanonical": "https://marcyanstudio.com/es/houston/contratistas",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sitios Web para Contratistas en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/contratistas"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/contractors"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/contratistas"
+        }
+      ],
+      "hash": "f0afb493b6982035"
+    },
+    "https://marcyanstudio.com/es/houston/diseno-web": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-05T00:00:14Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
+        "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web en Houston | Páginas a medida y bilingües | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web"
+        }
+      ],
+      "hash": "c6d1cfbd72390672"
+    },
+    "https://marcyanstudio.com/es/houston/diseno-web-bilingue": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T15:30:28Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/diseno-web-bilingue",
+        "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web-bilingue",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web Bilingüe en Houston (Español e Inglés) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/bilingual-web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+        }
+      ],
+      "hash": "6327994c28526058"
+    },
+    "https://marcyanstudio.com/es/houston/ecommerce": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-22",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-22T17:21:46Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
+        "userCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño de Tienda en línea en Houston | E-commerce bilingüe | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/ecommerce"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/ecommerce"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/ecommerce"
+        }
+      ],
+      "hash": "d5311fe94e823ec5"
+    },
+    "https://marcyanstudio.com/es/houston/ia-conversacional": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-22",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-16T15:44:13Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
+        "userCanonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "IA conversacional en Houston | Asistente que contesta 24/7 | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/ia-conversacional"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/conversational-ai"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/ia-conversacional"
+        }
+      ],
+      "hash": "f6490a1f6ee640e9"
+    },
+    "https://marcyanstudio.com/es/houston/katy": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-05T12:53:05Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/katy",
+        "userCanonical": "https://marcyanstudio.com/es/houston/katy",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web en Katy, TX: páginas web y SEO local | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/katy"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/katy"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/katy"
+        }
+      ],
+      "hash": "2be9aa03d14fa961"
+    },
+    "https://marcyanstudio.com/es/houston/restaurantes": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-20T08:41:54Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/restaurantes",
+        "userCanonical": "https://marcyanstudio.com/es/houston/restaurantes",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Páginas Web para Restaurantes en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/restaurantes"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/restaurants"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/restaurantes"
+        }
+      ],
+      "hash": "47ec97cd87cdcfc3"
+    },
+    "https://marcyanstudio.com/es/houston/salon-belleza": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-07T15:51:12Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/salon-belleza",
+        "userCanonical": "https://marcyanstudio.com/es/houston/salon-belleza",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sitios Web con Reservas para Salones de Belleza en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/salon-belleza"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/beauty-salons"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/salon-belleza"
+        }
+      ],
+      "hash": "74fa223e230de43c"
+    },
+    "https://marcyanstudio.com/es/houston/seo-local": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-21",
+      "peticiones": 3,
+      "indexadaDesde": "2026-09-22",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-21T16:11:07Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/seo-local",
+        "userCanonical": "https://marcyanstudio.com/es/houston/seo-local",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "SEO local en Houston: posiciona tu negocio en Google | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/seo-local"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/local-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/seo-local"
+        }
+      ],
+      "hash": "8991c4e59654f1b9"
+    },
+    "https://marcyanstudio.com/es/houston/seo-para-ia": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-22",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-22T17:25:29Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia",
+        "userCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "SEO para IA en Houston — Que ChatGPT te recomiende | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/seo-para-ia"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/ai-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/seo-para-ia"
+        }
+      ],
+      "hash": "2d85880024f86dd6"
+    },
+    "https://marcyanstudio.com/es/houston/sugar-land": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-07T04:45:40Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/sugar-land/",
+        "userCanonical": "https://marcyanstudio.com/es/houston/sugar-land/",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web en Sugar Land, TX: sitios premium y bilingües | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/sugar-land"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/sugar-land"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/sugar-land"
+        }
+      ],
+      "hash": "948554f3224dd9d8"
+    },
+    "https://marcyanstudio.com/es/houston/talleres-mecanicos": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-29",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-29T15:39:53Z",
+        "googleCanonical": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
+        "userCanonical": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sitios Web para Talleres Mecánicos en Houston | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/houston/auto-repair"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+        }
+      ],
+      "hash": "571793f870ecc3e5"
+    },
+    "https://marcyanstudio.com/es/ia-para-pymes": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-24",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T14:55:18Z",
+        "googleCanonical": "https://marcyanstudio.com/es/ia-para-pymes",
+        "userCanonical": "https://marcyanstudio.com/es/ia-para-pymes",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Inteligencia Artificial para tu Negocio (PYMEs) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/ia-para-pymes"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/ai-for-small-business"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/ia-para-pymes"
+        }
+      ],
+      "hash": "c252ac683edcd7bd"
+    },
+    "https://marcyanstudio.com/es/miami": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-10",
+      "peticiones": 3,
+      "indexadaDesde": "2026-09-11",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-10T16:07:24Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami",
+        "userCanonical": "https://marcyanstudio.com/es/miami",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño de páginas web en Miami | Agencia hispana: web, IA y SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami"
+        }
+      ],
+      "hash": "754b9e34cb751df3"
+    },
+    "https://marcyanstudio.com/es/miami/diseno-web": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-09-11",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-12",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-25T05:39:23Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/diseno-web",
+        "userCanonical": "https://marcyanstudio.com/es/miami/diseno-web",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web en Miami | Páginas a medida y bilingües | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/diseno-web"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/web-design"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/diseno-web"
+        }
+      ],
+      "hash": "521bfa81381d6ab4"
+    },
+    "https://marcyanstudio.com/es/miami/doral": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-07-09T05:08:10Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/doral/",
+        "userCanonical": "https://marcyanstudio.com/es/miami/doral/",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web y SEO en Doral (Doralzuela) | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/doral"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/doral"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/doral"
+        }
+      ],
+      "hash": "8ad117f57aa2f862"
+    },
+    "https://marcyanstudio.com/es/miami/ecommerce": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-25T23:21:19Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
+        "userCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño de Tienda en línea en Miami | E-commerce bilingüe | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/ecommerce"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/ecommerce"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/ecommerce"
+        }
+      ],
+      "hash": "92c5eb1f7a2949f4"
+    },
+    "https://marcyanstudio.com/es/miami/hialeah": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-05T21:11:02Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/hialeah",
+        "userCanonical": "https://marcyanstudio.com/es/miami/hialeah",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Diseño web y SEO en Hialeah | Negocios locales en español | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/hialeah"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/hialeah"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/hialeah"
+        }
+      ],
+      "hash": "7a94e4491d553a21"
+    },
+    "https://marcyanstudio.com/es/miami/ia-conversacional": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-10",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-10T05:59:26Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional",
+        "userCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional",
+        "referringUrls": 3,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "IA conversacional en Miami | Asistente que contesta 24/7 | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/ia-conversacional"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/conversational-ai"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/ia-conversacional"
+        }
+      ],
+      "hash": "c286d7ec522205db"
+    },
+    "https://marcyanstudio.com/es/miami/seo-local": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "gsc": {
+        "verdict": "NEUTRAL",
+        "coverageState": "Alternate page with proper canonical tag",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-06-14T03:54:29Z",
+        "googleCanonical": "https://marcyanstudio.com/es/miami/seo-local/",
+        "userCanonical": "https://marcyanstudio.com/es/miami/seo-local/",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "SEO local en Miami: posiciona tu negocio en Google | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/miami/seo-local"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/miami/local-seo"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/miami/seo-local"
+        }
+      ],
+      "hash": "e1ff151d1757fa1e"
+    },
+    "https://marcyanstudio.com/es/portafolio": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-06-27T12:14:30Z",
+        "googleCanonical": "https://marcyanstudio.com/es/portafolio",
+        "userCanonical": "https://marcyanstudio.com/es/portafolio/",
+        "referringUrls": 4,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Portafolio: trabajo real, negocios reales | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/portafolio"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/portfolio"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/portafolio"
+        }
+      ],
+      "hash": "f5338a96c99190bc"
+    },
+    "https://marcyanstudio.com/es/precios": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-19",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-19T15:36:32Z",
+        "googleCanonical": "https://marcyanstudio.com/es/precios",
+        "userCanonical": "https://marcyanstudio.com/es/precios",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Precios — Diseño web, IA y SEO en Houston y Miami | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios"
+        }
+      ],
+      "hash": "a07d3c087ab97229"
+    },
+    "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-30T00:34:44Z",
+        "googleCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston",
+        "userCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston",
+        "referringUrls": 1,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "¿Cuánto cuesta el SEO local en Houston? Precio mensual real | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+        }
+      ],
+      "hash": "a78a123b2f0a46b5"
+    },
+    "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-09-02T05:52:59Z",
+        "googleCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot",
+        "userCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot",
+        "referringUrls": 3,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "¿Cuánto cuesta un chatbot de WhatsApp con IA? Precio real | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+        }
+      ],
+      "hash": "a54f2521e6d7d198"
+    },
+    "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-24",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T14:46:39Z",
+        "googleCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
+        "userCanonical": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston",
+        "referringUrls": 1,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "¿Cuánto cuesta una página web en Houston? Precio real 2026 | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/pricing/website-cost-houston"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
+        }
+      ],
+      "hash": "de110e085dce9016"
+    },
+    "https://marcyanstudio.com/es/servicios": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-05T09:33:38Z",
+        "googleCanonical": "https://marcyanstudio.com/es/servicios",
+        "userCanonical": "https://marcyanstudio.com/es/servicios",
+        "referringUrls": 4,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Servicios — Diseño web, IA y SEO en Houston y Miami | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/servicios"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/services"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/servicios"
+        }
+      ],
+      "hash": "41364d9bb9b42dd2"
+    },
+    "https://marcyanstudio.com/es/sobre-nosotros": {
+      "primeraVez": null,
+      "peticiones": 0,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-06-27T15:03:50Z",
+        "googleCanonical": "https://marcyanstudio.com/es/sobre-nosotros",
+        "userCanonical": "https://marcyanstudio.com/es/sobre-nosotros/",
+        "referringUrls": 2,
+        "enSitemap": false,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Sobre Marcyan: agencia hispana de web, IA y SEO | Marcyan",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/es/sobre-nosotros"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/about"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/es/sobre-nosotros"
+        }
+      ],
+      "hash": "b6d9ce972fc92239"
+    },
+    "https://marcyanstudio.com/privacidad": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-24",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T14:48:38Z",
+        "googleCanonical": "https://marcyanstudio.com/privacidad",
+        "userCanonical": "https://marcyanstudio.com/privacidad",
+        "referringUrls": 2,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Política de Privacidad · Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/privacidad"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/privacy"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/privacidad"
+        }
+      ],
+      "hash": "fd044340f600dd67"
+    },
+    "https://marcyanstudio.com/terminos": {
+      "primeraVez": null,
+      "ultimaPeticion": "2026-08-24",
+      "peticiones": 1,
+      "indexadaDesde": "2026-09-09",
+      "gsc": {
+        "verdict": "PASS",
+        "coverageState": "Submitted and indexed",
+        "indexingState": "INDEXING_ALLOWED",
+        "robotsTxtState": "ALLOWED",
+        "pageFetchState": "SUCCESSFUL",
+        "lastCrawlTime": "2026-08-24T14:50:42Z",
+        "googleCanonical": "https://marcyanstudio.com/terminos",
+        "userCanonical": "https://marcyanstudio.com/terminos",
+        "referringUrls": 3,
+        "enSitemap": true,
+        "fecha": "2026-09-25"
+      },
+      "enSitemap": true,
+      "alternos": [],
+      "status": 200,
+      "noindex": false,
+      "canonicalPropio": true,
+      "titulo": "Términos del Servicio · Marcyan Studio",
+      "hreflangHtml": [
+        {
+          "hreflang": "es",
+          "href": "https://marcyanstudio.com/terminos"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://marcyanstudio.com/en/terms"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://marcyanstudio.com/terminos"
+        }
+      ],
+      "hash": "1395fff7de855581"
+    }
+  },
+  "actualizado": "2026-09-25",
+  "robotsHash": "64c4d6727ceab8b3"
+}

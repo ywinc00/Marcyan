@@ -62,7 +62,7 @@
     "impresionesMinimas": 30
   },
   "ficha": {
-    "placeId": null,
+    "placeId": "ChIJbzQE8VmzR0YR6VIeU4zic64",
     "claveEnv": "GOOGLE_PLACES_API_KEY",
     "idioma": "es"
   },

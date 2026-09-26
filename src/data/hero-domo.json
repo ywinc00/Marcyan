@@ -1,0 +1,42 @@
+{
+  "note": "GENERADO por scripts/resize-heros.mjs — no editar a mano",
+  "desktop": [
+    {
+      "w": 1440,
+      "h": 810,
+      "avif": "/hero/houston-desktop-1440.avif",
+      "webp": "/hero/houston-desktop-1440.webp"
+    },
+    {
+      "w": 1672,
+      "h": 941,
+      "avif": "/hero/houston-desktop-1672.avif",
+      "webp": "/hero/houston-desktop-1672.webp"
+    }
+  ],
+  "mobile": [
+    {
+      "w": 828,
+      "h": 1471,
+      "avif": "/hero/houston-mobile-828.avif",
+      "webp": "/hero/houston-mobile-828.webp"
+    },
+    {
+      "w": 941,
+      "h": 1672,
+      "avif": "/hero/houston-mobile-941.avif",
+      "webp": "/hero/houston-mobile-941.webp"
+    }
+  ],
+  "srcset": {
+    "desktopAvif": "/hero/houston-desktop-1440.avif 1440w, /hero/houston-desktop-1672.avif 1672w",
+    "desktopWebp": "/hero/houston-desktop-1440.webp 1440w, /hero/houston-desktop-1672.webp 1672w",
+    "mobileAvif": "/hero/houston-mobile-828.avif 828w, /hero/houston-mobile-941.avif 941w",
+    "mobileWebp": "/hero/houston-mobile-828.webp 828w, /hero/houston-mobile-941.webp 941w"
+  },
+  "fallback": {
+    "src": "/hero/houston-desktop-1440.webp",
+    "w": 1440,
+    "h": 810
+  }
+}

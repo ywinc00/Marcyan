@@ -82,6 +82,11 @@ no pintan fondo propio** → basta poner una atmósfera detrás del contenido.
   y guiones en titulares). Sin copy de relleno ("soluciones innovadoras"): claims reales con cifra/entregable.
 - **NO** stock / imágenes nuevas binarias → **SÍ** **ilustración inline SVG** line-art (oro/teal,
   baja opacidad, `aria-hidden`), en la línea del skyline/siluetas de `Locations.astro`.
+  **Enmienda (2026-08-27, Decisión 1 del plan maestro, resuelta por el dueño):** binarios
+  permitidos SOLO para fotos/capturas reales del negocio o **arte hero encargado y aprobado
+  por el dueño** (p. ej. el domo de Houston), optimizados vía pipeline (AVIF/WebP,
+  `width`/`height` explícitos, presupuesto PSI ≤150KB por variante above-the-fold, fuentes
+  pesadas en `docs/galeria-src/` fuera de git). El stock genérico sigue prohibido.
 
 ---
 

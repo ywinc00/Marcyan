@@ -1,0 +1,561 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-09-26",
+  "estado": "ok",
+  "motores": [
+    "gemini"
+  ],
+  "repeticiones": 3,
+  "porcentajeApariciones": {
+    "gemini": {
+      "marcyan": 0,
+      "True Digital Marketing": 0,
+      "Webnhubs": 0,
+      "Artisticore": 0
+    }
+  },
+  "fuentesSinCliente": [
+    {
+      "dominio": "vertexaisearch.cloud.google.com",
+      "veces": 267
+    }
+  ],
+  "detalle": [
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEcp_Wvbv5mc8FAmIiyO67GnWpjNne3_iylwhGJpRiV7T3y9JO58bMQ4hWf_ZPJr6E-nwrrUadbG_UQCbHffJrBs8uWcYx8R6q-CVXOO7noKJwAR_Ko",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGF9fcJ3-XonwTeVv8mdwWJVnF_HlbPNiCiu-TqFnhghrKhxhATtSOC-f9Sj6oLt1J7KF1sZfb_Bmt2GN2ZvnnWRc14Y6NJx7MkkXWFXyrnZGY383vK2InPA4UD1YV-XZ8O50U9M6ZZ9zADh8y1Pdv0f3i99RzjYx0eAOiB93cihGjOFradO0dOM6e-b5HxD1sMZN1DouqWoGkgHWFO7dCxbNoEw-5CnArrooE8LiHN7jt49u1izPbWq0nW",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEn0RC46yWL3dcT1uX3X-DWYrP74kDRwH6xZi_eibc-4BLbefAYjQ_nzYiCBWk-sYRKgWy0twnxEfe8IIW1-yRD2UmGz93ZGS-iUK9drSSyJEe2AbIZCPiOyPw4ZGgUXeu7yAwIZtMES0LTOEqXKfUL6Gtsrgdr",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEVUKs3nwXtmsejPjg4FUvB0H7VaKcS704qA1zTuTBf5KNBg1HZt5FvC721LUOxEJX2v-aC76UTQ6GJTF9uLm2wNMTbmrzNnk4FFAMhpNpS9vInt6wDQTzGHX372uXCewer7-bJZ0irq4af8A4PYf7R",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGEDrIEkMMPGy1T0W6CPYmq-r0k0BXnEwgqjWV_bFMe1Hqj9TL4dZMf2V_ERVZU5lAQEShpHccnPhcnWpJYn20eVaGhd7_KXnJx8d-eUB3X_DMol3hXFSLVDwpFQA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFTx0O5yoNq9dkmo-zi3NMxRFmgUPbhCycWTHeAaevsKP1-nvSzJrj1417Ln7R8PRCHyCqeJyEAYQNJ7FX5rZn90aFJt_RexD5Fd_bnjsqioYEXipNyINPl0Q==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHFM_qOfRNcOXw_y-sEPBflC2j0ENM-L5ZnAzppqD3jMaYfRHIJYhy-lB0Xg01GWmzpicw8SVD1032K7ksjkoOkvC3uU_3diTNqShXzxepDTIuoI3HmQTUI4lXRuNi6Cs8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0n_Ycw5Gw4Lk71m2ihPDkUvlsf2yonC2qxoOglwLzGgVyQzgTK-5ONHTQIPuAfX0gxR0cQxV5z_mlbqwlF9vMISdDPBj6SwRN_vINlkjb9ix7IoXQxLqDsixSRS-VhYyvaeCdM20kVpEN",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH1rIDfKuamG3q251fSMQeKW5F-3XGE__Tm3sxGZaVql88TFndoF-R_z5KVGiU7SGiaVWd5DtXiS2ZoclB3zo1FRvsaKZJEkn5I7qcbU8VL6teD2h5fOawk9WjTd9_nXOv45gqvd6TnDMOM8RNs7BpjKa8LPwI=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHGcn6hx8wOXL_BaAF5VN7qtVy4PMEq98v3FjdJoLaTV0_dv1uJEhZUEtBLwGT-yOK-38hNJFIgxE6ZBO6j43J_Zk-Y8DABrm3s4xIKsSBfjQit8NZ6MZO6Fr-cLbrZFoM="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-0o5UftWQe0ElF6OR3370zBuenh2855TdqsLBcNQkpc-VUONl6Jkcc5OnK_8SSvKL2VIOOJAvHCaV5oqRm47fy8kL_Zz9uRdZs4aAlbqt7W6sNerMI9OYK4-3bw69FaufRfnDpLugnVGts0LBXxKxrgsE-A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEBTxcqQ6ws_vNB_K4zlZfPSp3ybB3V_jZyXDoxLA258WzRn7uPGFsr7sd0NNQn0L_0ISQK8ckbSisl3xmgP51HCIDg3wrDI-MEjLrqepZG2OSamfAbREhhpvJiJuRBZQiDSG8R8v8bmyePoE6kC_eKc-leuFw=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGNVE-PUgmu46CvPF6ke9VvtxMRyU0o9x0b-yXKc_NK51O4QTITy7wfOM0iJ-qE5SS-rFPYgonl_IvmhgW2isiW5tblMx8qp80Za5D5_L7LIX5ycMPwF8ugx0u9NEfh8p_r7D4hf6YM7ld50y3cYNXESTBJ0UYjyVHOFw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGhF-CTwVqKT6udZztyBBZHoHEkwaWs_t4RrR1gXM2lIrD9oQqFlqyKZSG31kTeu3N2bNegbsX0iGOD1WQfudAaxHfRr4GZOsXXadnh4G5o1MIb76vLzm3Q",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHQXzpblRnNKQLN2BM-N4DQBPyAt23tDTroPwlEFdlq7Y4_ummd2-SRq8pPaSFkKwRYLzHlIZ0JcOwpDq7bMz1gX_UydaqifUFbhTlvlopnmVdFtcI=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGZ6FCEIrQOFAcSTbQcvFRGCDGNnZq0pl9pldMnHoxcldmksmvnVpnk9MJA5hEkX0MQL7IOhNWz5DIjs5n-d9LEjwhUjF6BYpDgpbj1nfuNHbAdZNTT8sNnpT0drXAvVg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHiqghWQrvNUDGXx07T3_fbZZMBtucGyxFc-yMgchlK4L-1tw8L7pCfZXzzjWUBoAEVLz3SD30DXLUS-81k2K4r-8vC62mjpWVwrA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFF5v-ESsubphWffch-UbBu53AFxGg1UM50M_XYpmBr2s0_YKO7QOpP78--Uutghn0SvQqZXaWLoOcKPHkR_Aqr0_vOm8_KRal0u4oOj_Lncv09ysG3yQDtwh8aggU-e1BW9Z_Fjxu6aa-R",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQELuYEV4RRs1BBtkVmdmBmnpYfk0RD4Ypstq1xHbQX4VQn0iGWTzbPS2FxdlTjSYVlyIGJRvSpblcL_XivV82NLORTltM-xjx7YhH6fY6TSuDHHqM01-cyVZ7Hrgv5_SIIcvbis6KfH8hr37jERwg9HEqg="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEoFrYVzdFTyN5tpLj-FDqaaYRYxJjSCOJ6d4Tiy1VqTlSQz9tlyBVr0Yz5ocENe-N_qOF-IFoKKrdQnczl1qlIvLt6YbxEeYK5TXox2SnD1lLkxl8m",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE__1pXisSGZAhQURWC4M95yA-3VhN6Ja1RuNgXwt3n5thpA-IlapJbPJFhNdaJ_v1ArRFd9cuN5unQZQhG3_RZfqUq0pohhT3BHZBaZSvm1P7CzIy9xLj8dbr0jzn1ggpNTiS9qXzHJmCSR-az-5Ct",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGSuOuU4RPPs1XDqxPYZHnwQPRJsbQgasEpXRQUJzDzrKxrhEstjjcke9qsDbyGR_XVHW1VuLtvGxC422tUl07jJqcFOnp2KZWR3iRzTZKdQCE0d68m1k1MCAryY7L_Ldj3iq1jUjMbWYIWKXO8chPqaj2ZnU7D",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEBlOK2ZNY9nIw-9Tp7Ua3CwWZ_LPeMxtEqmfM-W9JHjNSSONf3w1K10dLl-Dg-l2f6WXG8vN_JDftjRZ_OAZiqXIpT5W7fBMqZ0gmHNOql49wfaqvI_9PwLwbGlSo3clE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGErbqSZxAEI7S3NULqDin35JITfN8C1WzDxMiW7r7iNxkCrlgI49T0z0YOb_fxDIlYanp00Q8cJg5FZgplvILDZjEdizRxCHmKehLBMVTjZnepQXyn822IJjNmpA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEPnfAWZqpIva1npTjN8-uCij9rJuqWakDGiG_fua7BiCHGHJQcSk5ftFXyeQ_rS0KFViG_wQwpKfhwdFNNW5woYswADrahHUn8ntMBqmky4CTriO_EV2zyNw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHj8OTLdojL2W4L_jX0q6zzVZI59PM1xs6J2riA9sdh8r0a8nnsALWFwmcuCLJ8lbzIEHCbV76nCNg-hskwls-i396S1oNo33sr-_eXZ9COO7iep8B8Ehf_5UK7MY2-vDdEzg-e2uc2hRo=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGj-DMcgCkMrsvpSTl72ZMcFPBxYlMkJY46d_IweG98Ji0_Sm1LHuFszSKXzL3trO6yJRBLaL2ly2YJriSeQSlOMCwjXO3jttmkZRJ1qqwGMpyRJRjn73bJKjLC7ZMwImcI8yks2XY69FDx58ZG9AuYdT4oh4c=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEvB8hlsqYQB7HIotIkdbpmoMw7xrV2cZRYtrs1TvF0o9gyBlJLEDVcnf1hPa0jXOXb0heD_ViHNUYeuTsP_pmb7n70S8zY1T4nbKScO7fNVVGCWCuygLgsg3NnyGmqOmQJZe94RUy9CFjtcXiRSrvaPXmN"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5LxaJjcUDm-oA8TEb7LW-9PmAg1uYplczptiKOxgV8b4QL7EWyZ9Slg-hrfdBnFQmCNBFyIqRL0Um1W9pFLi01mlekQvuRF44xpJi2eWDpFTE7w9H7gtaRmZZisq0pWuZeVWjcSFCrgbJ93km9PRZYLj8L2JpOtMKX3XRPVid2TWscPdJyehu3xZXPl2D_ypf",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEbAL-EOcxoVFD7oyXrQlNY8EpWfjUtw9q88EPpYOkp3p103a50pkoy0eYWk-v0XePolKZMSMqACYfK_KwUT25Ipth8BLugNs9tPUd5sl7CFxXX6J_7EbfEJDIupAlaOwhtcg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFZJAHWXwgHldRdI_69p0ptzrs49PQIW1Xe2yUq3OwM4vk4rCh7xdW7JEHCQQJnc3r6QQXFazOdDL_MPE1Lx3xqnx1JdhrVzCksIeO0Bq00ypyDfbLTKG7obYMFCIDRV_6WAb5ci-_LhSghOmGZEFSSF5Tq2w5CjZVi5mcofuZTCR5u",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHi_6VpZ9PSEaPC2Vab3KqzNOLKguvqneI2ZN5lc3nPQX68zxcVdTw1U3fnVQa8vY02QTAYsGjIl1u5uf7KRP0qt_MUo00xkI3TTPBnfyLjtxZdTXbPei9FzgPQdau4Przl4btxG2e-hTxD2j-b73mQn03ptMKSebgaq-C3X_RSJOKPoVhT2WeNctUSi-jGq-LmWNHBfXsWvEAtck-tWRMXllo=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-84Ujbl1fIDg7B81KAbemwnsKpJS77ehlaLpJAQQfLzj6-I4PKNFmWS7EgdCvEkBQAXB0HNsUm-avxvFpXyCidadzd4Io2LozAbu1aC1ZQr3rFvBIhYZ2tBC-4gWsgLW48VE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGnyZoepkJ57hdyRSIYkSKs2D1t6Gdqr3gAjqgx8_paUAayEoPzM6uQzcLPZVLaq7iY-37Ne8p5Q5V4mrD7z__TIcZ1LxAYT4ggq0ZJqjAqz84wpKLmYHV4t8r5waTZitw6u95FxADijJEbIf5g",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGjNWCUl61Y2EaBimvlNTzG4xb6FFhpIwqe2_wl_9k9K_Yi7656sutpc78-s3VOaYGE6Tuj69R2obQ_NIFjQdjxfJ1pJ4M6JPEFCZY3KLeRPizLK-1ydYYiCHIf-VnZxT7zc2otrZ2jAVS-5zmZwWvkEdUyZ64lqRXAK5c=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEyai03mSJXpWzRn3Lx_68O5_cu-qTepRYoNKvXCdGFMfFisjnrDSBXSaDLHd4PtYkBh2CPLVJH9Rp0OKiKJESnpjDiEYUcocT_We0kKiO1ByX7xAINJPp7EJQ8hfgo2Rizs00e8NNgFHBuufrSpSnf"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHEiPdbvjKPx5DYFb-4cdZ0e719LCt59YudQMH4LAJz4i1p-lKrja_xrcneLwMZPor418I_AKLMiwhVTkDrqrO8m1CZeYWmiJ8DBaPRLRfy2HmNfMUgRG4J0qWo-1mJwVxs3WyN5op-Nf1YmWW4orEckH6Ooj9Edw1e04qEfi8apESkRSF7dobM1y1f6hkwns4wefszLBqJ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGUSDCZx4_U-1kL4mX1fo9-HwStj4LekTT-ZRGW0KDBvfil4_ok9Qw45x8LX1O_X3HDpRgJNYujX2TvCtqynZYko9zD36_YiJ30cDx1rJyx0o8NzC9zFIzvlAev4uMqN0G2UFOtLChfpQLajycGe11rx-9N7WRN1aL4HsP6",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-2kAxSB_FxP6OtwRTPMmgG-Mq5Dca0P2WjoLT3spKOC2QKCj3r2bKWR8nJcsj7_3eM47lo8NYAmyHnNt3bNNqTUWtfGgXauxi6g1AwmwYAhDfk6n38E5paJRfpYfAYx_oNYWgu1yephgQjTk-UWlnNdqqhPwLHOtJVsABnr4spXgCednnZg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHiLpOn6_Xx6akNnyOTeAB6t-axZaGAIZdzBHqF0GBINkkYp0HBLVHNpEcdvVBMmcHmci5DG1hNyYbiD607lb4OI3mjS1jFAaZM2vInrmzyTZVzTMOs6w_XEK2I5Mx38Sk=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGUSDCZx4_U-1kL4mX1fo9-HwStj4LekTT-ZRGW0KDBvfil4_ok9Qw45x8LX1O_X3HDpRgJNYujX2TvCtqynZYko9zD36_YiJ30cDx1rJyx0o8NzC9zFIzvlAev4uMqN0G2UFOtLChfpQLajycGe11rx-9N7WRN1aL4HsP6",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgtLi_r7QhgtHG4ehgmKSj08RiIOGryFBu72jiKHTOKEn3ebTSgkePxOSklL4Yio_xt7p-c4WOjVnVHMp8dJELBZvFlPHZPlbryHksbDURAWdL8bE_whcOBwZXWcorR_M2Bh5y71I56AftvR955aMQ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFSVE2YEVTbbmKgV2fGGB8lap-EtHYwnymsOi8kLFNuwxbwlKWG7Y4LpzY9EUd0VCbyDtGhisyqPNVKnYH4SFUDNuZUwKY9mK-7gf60KJrqsE_dWJ0Uf9EFVY0z2K_tvoI8Qk_hc8DVmFSG-ZDK3P4CKzW-EdED0vr42B43jJopRdG_Jxo=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDCJJUqEahRPo_p9sUnsXniTBvTnY4FTDySeIqAMU03HKUEw8rAiQHi6d3iURlmmY5-qwYe8WrNQaVdYMc1cXrjrk9z1zwxL0ZBm7mx8Ig-evxfQXgq-296paDfa_Xm788PoYDOwikhDUoSd2Os-uC4PwZONxtUtPAR-Nw-Q==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHls0cZm4GpXTQNik-OJvUZqM4bJ9Bly2jGavWBRLjvvWirnIUfrkFmcCFP-MuDAmBRkHfRAO0RvnGkwux1-TYif9DDrqsGJ8oOyJUWHIx1laSbMi1r4zcc4Ucm9F1aYZi3L5gM_dssBN2boqJa",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEjE2FTW-vkBWS2WbCfA9jkj--kPczdW76F09fkfcp7JuXvp74ogQjBVBYFILrZ212ECUxxj1ACgXJj0tUX3ELorHGcEgWSGY4d1tCb9SBTL_PPOw_wut9-u8DAkbiAO-6U90WzMNUwdF5slzZKFE655KZZVB4="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF3cJv8CDhcagS9HiE9sdl7ke2KYpE5kfYsLYfoTNMOPDfzj44kE-_6uvz-GOWQUYX2Kz6yJwgB_nY03LdE75l7ary1UYiYrffb9jDkp3w8CS6IMW3WAN5ShG27S8rz9pGcUHO3SplDgSE2_y3KCtymPJeuJYBdRIgZgsOxwt9IBVqlSdZYSJteUjrNx6rg1B1v3NfS7gmC",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHph2C14Fs9SWXGO12ZO2T1P6Gow4l53BsK13kT_psgWhEfU3PVJDSOFWyn-PAdH-j31JebL9UFuKBq4hA_PXmV81eKSRA6NxuhUQyI9wf73cHC0sg0C9CbmpNnOOfeYJmwW0QHhwia86vVRt3Oc3upyWesnhjKjLxmnjAw",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFAfZiFxDg8Y2bRvVuP9VCU4f2nskRW0ARKH9lagwHubiMaiK-EVxMn9jE-3Ev7PZPqUMv-Z_HnK0ZeFNLKRU4OVLN45KSzz-YKb-F2y9F4-Hy6gk_1bw1iw4VrtSjrD0pPeW0=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE9DbuNY5ibdBgVYo2jAwzJe1et6N6NFYfI0rJGXv2lSZ9EmbYf_JjOM5MQYHATHgZPOz_LHBsCiOMSjT7ugIqxQYS5En239IVNbJQGg_fSaTztZ3iog3mDH7yJrSS1yAc=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHb-hoD_9p32PTgVjh3i51zzbmVuOUJ0W1cP_k1ePa4yhNEp_O2arDk4sVP9-64umjRLWEgt1qpSAiFII1g2Wkd-ckWGQ-ZoIKc2LI0fCdEhu1WnqGGfxrKv19v6oBIxssEZzMYH91iC-5k4yBA2MJTDihK00dddgpvQs1ydiT33ZWJqpA=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHkjtuiguB2o3P7-3Ur8VlQwD7lGikAjTueh-h7neKjel9MfNLcJ9yhMKDgGp8BW89XaKasYbTbvRyENk441gY1Vai1Dsq3x2Sm0BpWsAtOEtMPvD_K6TlrJTF3JNJy_idez_QENU3F09MEjxV2QzTQnJZ72lEBx97A8Og5EmCxlaAUjM2Udebt",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGd03li87c1XnBzj2nWrlTdwd9j9-3t3Ek5LBPmpe62-1ZnGUgypok535HUMs81wYTTLEUlnkQZr-8CTQO0IyDbd7PzaC1gw0jbnxUR4r3xsTdH9TOCzcUV-40sPdGcpgPvEjflGoKDe5cH4VdsQsmkZQDzdUs=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEEpgoWs8zUFqzHIoBqL0KlJZQPZvYfZWdWrGbjQfbPDHUlfZhHBA-UawR8GsdFwBOWWfkU5_mjRgaMRy_oIxDGG5-WKBa731L_vNXIni4Maw3UzayJHGWFlmg8LVVJUFPTBdDBF5nGX-PHgcpMxTTTqOQRcNf7jPO41T4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFYlnuH6xUI02EgFlxTHcW_IBn8iDqlz2cg0-I8It-RDMRSaQ0aUzbudg4jICMn9Q2sBEdzGmUe1I85h_ndRxIr8CFiy_YKMjTXTLFUIT2c9yjM126e5lQt9X0-S3qtl3W6xff6vGE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHPZoEAyPpI5-SYBv6yK0CTlYknW5dJ97KvxmZOuk0jnn1qWIQXeH8efrGOybsBp2O5QYwMBkVSaka3vAtmju_i2SDkfjhJEBy51LN6Jyxoi8hQyj1DmqHdSim1EhXh4zTVTFZd"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de SEO local en Miami para negocios latinos",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEzvcrZzilaVPMoDhAaF8WNaeD0iY35gsPd7CbO9WfLeT6KgfnC4QH5AxIoqcHu24D3j1jqVrLKxtkjHNqF8a4S3meJ56odcdZHCVGExJb_FnqkOisvXRtjFW9wxcOINoVCgpKITEkcxkk=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGB5acFj8ed3ngJKbCP_Kg_maGERaWUJRghodePRgCSYzVPDr7NoE8a2m-7OhEZsaYOCgDvaERwZ7YxkluUkRKVuH3oLf_tsEu3Uh6-o5M0QXVPnqPxmw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFA8Dns_wUXl1dVKTYBqTIXrlZM5esHEbhmyRllSX82yYDpW6jkOL29wmUjB7FSMDSvxV3ykEHA3sS-VUB4_3O2ox7T6-CpYoRoB4Ziq16i3rDTPu_s4q138CSbnx8kio7UuWjLGt97TQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGjEEpM5JOIgqttEKrnZ_y59HLmbuPPeE9Ijrqo5XQqBCHTNKmWvUVyLRdq0d40z_4mmDQGDr7S760C31NLrnkWJU5v_O1duUamVCPRzjaVzJUbFjHZ0Bi_9J33sup36hm8Jt2n8puItVfsBbtlRhQ=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFCJBOIbPUpnn8V81fGzjJ2SSY1mRDOAOjqq8VKnrjZL9PPRPmCb-6Zuv1N3QjUGZ22CHw5bJAFRUed1y3J_IWwypzrjTIck9Qqg6aArMrH-6Tz2ZH2BXm-waCNOpIp-HSd6DncrOuPU-L4gIqSw0I6F2Ii89QmU-C7VVNypgJcbPM=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGYDudJlPEoMC4bvd-jRiImb9nZK9VTxGMEcbO11_O4mK85Ni09brOdzbbfJd8YUUfJ_NrAmB-M_QEVymEBLr1EMaYJ28HSZar8PlQ8xz1s-OCZIVDlrhcioWlxHPu2CWqhXX0b",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEdgYddasdHg8X6pTe5MIYBm4H19c5VZTJDC5umlfGS8p8FQBCDHH4ZjCJ-sKc671zGFutm9gtJVs__aDUCpljSJu7k5ed3xGFi0-Q-OBLjwhSdZhwQ9pM=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHtIdwXeXKln4mC1Pp-tWiq7VjTjEGIs-RVZ_1qJ5zQp3Bkh2nPxGWDI0WaIxuKeJOcHWzkn8PnCtnKOWy6L_wXsxFttal0VComxdcQsSY9ZGDl47_zPrl3putV7KYLZj064A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQddLboKRbaNsI3tUaHtdbkx-4_5Xbd6ql1hWjhrDmzIvs36jKy3L7CsjJg2Xq8lGjqgb4NyAg502sbX3jyBw1ewm4y0P1uD6EcTa9jS-HqqcPgrBFrOZdT9_cXnfKT9XV5tzcRlznYH5u1K56d_jWZjIz6AqFgofe",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEiXAhB-gxYbiQCra4UxaMPt3wxXjFhDjyh2jXQfQ9HdyHx3SCDO64oUgxMXL9v6G9Gvf59yJAdT4ftWMRV03Dm2NbNHgAfdCilfhYUBB49-SZ0uzdBzlrVed0NsW-f0CgugLg="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de SEO local en Miami para negocios latinos",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQENn7VxTTp1QCD-raOfcjJRbShB5Za-9VpbRp5HjL0ITPgD5M2BhpUlwV5Pe80Q6MRuaPCWnkRxaunCZ7B5yNyh0Bnl4l5ng-AH5Fhvk_yF-2HlBjlVVJ_o07ky3fYv6LbtafxjA40Xnu0x4rsClFU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF36fkLesuW8JkwxUiHkBaNhNxViZz50UV4Xb2aiAxPe72DfcFdGBKbJcqgjMeXb_B2-KldgK6aFfvRDu0zW-O8_iqH9bnn51PCdXdw-fB7dmommJ6hJQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH2lRWeYMjWxbblAxKuJmZAhrwf0suIqFgt8DWLmyj4LHjnXOi4HeY-XwkSbdGfY6R5YKtqwk894hj0cTIP3M_3GyBnzShl01drRxx98hRYxdQpt1s0CohZkepAiLoxFwbNYQnKlywcOo4Dl-LLbdYvb1I=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEjRhkX1DP2Tr4hO83SRaN2K9YFb2NQ2ThPNLKZfX4f1doul1OhY0MXo9GhHFeH4ZOeUlHuDT3sM2GLNqjMnYDl80AbEJWa3GtRD0n_G7MKVQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEalVmo5EIELHavnzLmze-l4gbvKLEkMYVIJ71NKXk85CMhFrn4QCe7Ts9cvTLFvzHJvHUwS8nl_cBE_VDkcXoRrCri8_U82zGQ7mVuOtfb46E2YHOo3sLCjbHNoPgUoA-5JPS6",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFnAXBnlHjdxCiJSrdPzzO6GnKkMZvKBooeq5i8m4QyU6VUlCve4784gC7hx8A-YnO5D0QbjH24KrCbBCyRLGOnNvFii2OA3XId6X2U57OqnH8t-HvmKcCkZ1MvSjZRuGYkMFwcLnGLKsoUh2qg_W2vpHGUDLo8UQNvgTFNMKzj0U0=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQENn7VxTTp1QCD-raOfcjJRbShB5Za-9VpbRp5HjL0ITPgD5M2BhpUlwV5Pe80Q6MRuaPCWnkRxaunCZ7B5yNyh0Bnl4l5ng-AH5Fhvk_yF-2HlBjlVVJ_o07ky3fYv6LbtafxjA40Xnu0x4rsClFU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFUF-8-Sy4c4txxNf_Hb5rPxGHRIuRihw9YBANNwMKa0qcs97nvZvrfu_qD6UF46FgUJY64wguSaqdiPo7Ipvv5dsI57BEZ6pl8ieu91FKlSIV63LdnmISBwQ1B",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHY1civZsgu8pmtXYqhrJ1Xl3nu6GrA9n0WMYalVEQWF-8gssqCFJEY7oHsygJSCPm54bo7FgSw-2DpYUXtpd7OqkZau6wMlSmy3apzd3vGwkHiei9S4VyCgdeGrntzJ9s6OtOSKTgrYnSFiSIHYRQyRX_W",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHbeh5oBbwcjGsqOXoQieR0fcTMlhj3uqS9Ph0cHpK6cxWYe0bqC8Q6Vp69q5lUF1DySHANQBWlKrRhzEgQU0MkyrGGcXyZcGo0igGqupxF5Bh4GZOZOeQU6JTDR4WogI1I_w1KipVhVxUDGeo14PaC"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de SEO local en Miami para negocios latinos",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFi1pOS7d__sjFrs6kbkFGiQcEt_XwUWFlq1itY7Vkr7WNXapfNdtKRpvfMlfUJnwCm2NBVrGiGR763A4Gk7JrIvS9TgkWMTJGRQO9eFmpkYssEr32yAbpZx3oR6c4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0_fT8PDzloaC7bOaSZUVrnQYsRarUx-BkvciEWHE3E9fvBTj8sqMbtVWLJJZ7YhORdTb_Z0N9S-y7gzn5BIkzxvD63J-AjO6neLa2QFk2dMuLEa1pYdkrVvPiE7QEdMr5xOY8lAr89dUZ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEL7Buwkmeb9GQIAkMeBIXSZ7tBviOap7ZpuC4lpS-TpMJJ2-OLr4VMY2RHbrs3TxLafw-uDrOz0xlplBkLkA8ettlFyxvBP9haV7Txwlx4ST83e7jNCh_gM9Jsq-SpW4KDRnCZvUfx99E=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGnj_cGaIV2U0OE-emDV14EVGhtsqbjnT4nwFIgZAcbpy_6eUmX3ar8kNpFA7PjPA8M3bRyzP0HYRDuWbsYrHJnWIC8UgVDco8RpvY21jL6ommdts1y8XUwt0Z99tL19Qv7COgSU_R0XFUm8Gxk8g==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVkzim0sTkzJctn_2QSkRDoqJ9mNFGZhrtrFX4riMf5CRLAQw7r5uW7beh8g5NA7oZbXHIEIrR2kVWVu7Mcq6DHENN8MkoBSrrRGjCkDFSu1f0ATqiuGmR",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFk8d9LslQbE_J4i5N7MbbWLVEGmGx6TAvPvsNEDIgOxlK-Mq1tJD6lxcenepvfjmHjMzToH5B58wBJiVXLlyaw_aqMMeF_hJQ1YCloo0JQKlOcCkDKjVH6XI1nuExPcS3xtVVLZxFhrLLXIGDPhk_0",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGCwlWL2KNnYCcOWXTNxWRPwkE6FaYp6mZr1etxiOSQHjntm9EJHxhM2ETAU303AjnHtOy98t5Js0ufEVDOosP0I_Yi12E5wDPE_mDXVwL5syL9-eKbnWjLPgLBzIRCbzt7hWdF9w==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGdRJUxtPeBcV16xcOUJW0soeIfDNSzsaB4PbRs01-vgprofmWmGKnXwQZ7lUliIGih_6QB3XXV7X3mksMJPS24kRqwRUQTDRSrTJfcLvJkk-XIy2PRjlxpoIGFnZy0ZeqKeF29YrprvgdUnKTfE3DvowB_0zsZd1UAGG4FpFMaLbMKeguVwkiO5pS-_MhhlRJvSWqCCzKaR4xCoQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFUbXnWGL_I9L75P3i8ftV1ba82VQ26xNSwFsqUL3e7sFyLJudBQXHiESzoD4W6LNF9sypQU94koEVAM24ea3pWDc_lmgvCHhEsXSOK209EvbHhDVL5fy-lzv3Jf6x5EGKPc-kZaFcS0Ji8fe6Sn0P8n80tGlEBd-yJGy3yyvVLfKHx",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEGXDXAKllyHR6IEPmSnkh-5BDr3Z9wuc3JkhENFY2kXM6tRePONYIwUmnESVE3AyaiS2V-doL0LSXEA8_qm2JtF76T8Qg4NBK-E1w9uYJ6XSb4-Uc5KWAuMKEaValvXWTuAeTP"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "quién hace chatbots de WhatsApp para negocios en Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF-_6rCfvPgHtme1Ro--vyOhHAZi9V1r0fGa1T0DBKt5ULFrw_DLG28_r0c8Zh_v045zRTXrlM82_v49b8pvBb07Apa5XO4cWZmoZuXwlrkrAGn6tmADAE-u1w1OznUy5JHY9ZMxfYeEDoFGz4LNYk8QF0G",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGlFlOJyeg8LG_idFsbdZR4nY7A6tN22fZEzgeGK9VGebUkQZzEsnbdqpamfgMhQECqMe_QsJI4NZd3GUDEVoK1PLJsn-Xc_RE5GdNVf8Yob0cxou1B",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH7VxsIK-q3tUU5vNRMmDJnxKaJ2ZtkdZS3Q66UrMz9YvcpglLmHFjf-_-bZJ9xwTgQUFOuWo3c2bL9TwpOlhZNTJsGYO77Z4NViHuh6IVS5wbdT99YsWmq9dohP4SoyJoZ8YKdCIJaa0c=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH7VxsIK-q3tUU5vNRMmDJnxKaJ2ZtkdZS3Q66UrMz9YvcpglLmHFjf-_-bZJ9xwTgQUFOuWo3c2bL9TwpOlhZNTJsGYO77Z4NViHuh6IVS5wbdT99YsWmq9dohP4SoyJoZ8YKdCIJaa0c=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGD8wfycsZkJYL2EbLSxWGCTgLeYAOc2wlgNR6NVoyVy-vhTWa6cypbmAzu3-xm6b2uMbu0paQbwi8ZnMv5dRsGpcRV5F6arOdSPawX9vcDNLL-yOLPkns-AQZi_F_f9-W-vWMU",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE0HJkHriR_XMQPAmTJDYU9FkQ84o7Om6Mr_rf51iXv3mRYmzOKOhmrY7zRELeKNecfPCD30n51MN-4TTxucpq2j3eCOUtIOnvjS97b_GZT_QjZTdXJZGvM-iXMsnEdmaM8Slp3Knthipeb8JQqOYm1F5y4",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGL2vzG4MJrj1eXTsAjjWBzViMrkMh4fl9jrTDb8n9GqZYjiZ8hhG942NqmtS1mqT40Wk4omGCpqO89vxnOAIFo8cmizT9BHxfsRATASKSWKbkQvjCbgAnCYx3GJNFPldWNiQkr7llrUTSrWOcY",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG7u6SeOXBQ2ipOHclTyH1Y5nEnxSgBZtUP-FGl-hdEMMgG84g3fp_F9_XdezvopyxjClBaxDKXQz4EK71i2mvWpEkA5jq2pFXivNr8fjeFmPuT3hAuBHg1cEVHrNWOkMx0xVA_ZTmoFe7DZ1dkvd7m",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE5yvL4nXOzV0Xr1-6sHEd5PXaU8nBEoL8ZN-qaJag3NherAiihnHesv5vyXB6D9ZwRG3MKymF5snnDcOKS2wpYw-0bPwAS7pMldCAM3dfyN4FExAxzV8wR2PEhezwImjWUQQALXdmIPjFBp325b6n3yA5kP0tEprfv"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "quién hace chatbots de WhatsApp para negocios en Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHR-GGNB_oQxqE_tm0w1RLalD1y89hWJxk9MXHdqhDVWtKin_WPvTCTN96bxGA6b09KI6NBJcybC0_zsvrjh-kXx-yEKbw3GXaiDFFQrXr2SMhMgLdw2vjtB5Z3Ew6DFTPFF9Clr5Oa6KQ9",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGTgYc72Dgdq60272JUTBA-Z77-J5JcsFiZFME3nnvsJhiXbtq1lAn_J7JBYoXOQU9Tgw1PsrkoTohg-DWwlpX2TH3CVF2LmnCYjQjuJwSiuf0YCK5RwMUiEmhMThu9S8tVO5wH",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHDudcGrA5AIgmSaUet5zNAmKWuWN14OSDPeo4ljDvPrl-Xgjn6HrF7krilyYj9FLt0R8GQ38obq4LkBjVDfMbQgyYk63aoAeJAyq-dUrM5NwdY6xtQuT4IiiXRYJLvqMuJ9lb4NHi-DV48tzvpVCo8",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG4Kz2MZEeScdXqOIj4SRsxnnSRY8XykuRBCDFXGGslu3zlaXvVNU4vYA_ZL-hJMrityvfW2ddQbVsIhv5J1MpMW5Z1-Vj8GhpYl4romynbKD8dEELQ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF7Pr8uOz0MyOHfwXDcmouRJt6BKEKiaUFlhCWPpz7_duD03UEXeFfX3dzT6cTbRHkLm6A7n6Xr6t60EF7mHJev28AQVKheZ7kRlc1SDikPM8bOEWY-M6_Mq2wb2tlBImUfnx_8wfwxHANyJetb",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGgIJ1e86GxstkV9S4U42vxaTyxy7YlmhyGnW33dQ0rdnldVIVRCOMXA-dktFK71Rq0GFmeyXeAy0aGmXCPCWJrrSeVBJqL6VxSeEMM84hQemuAXJIj2tolFzr-mEdl",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGKUtm99_wwvNQ4k-ltLnwgwgqVzsXT080TtQXRYLRZSDNHt_7Tzu7UgBJeCqNhyLmWhkqbWkCv443yTM71w2G705fTpJSjvIDsUnQJRwimC8bCJXWZwLp8QamTJ_3AgeChsDv6uZv-uTB_k3nnHbKvQ_I7",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwiAJszH9TMoZwyy3UIVw-rgqZHHo3kcwrazrUqVsAco0iSZ0uG3rik0GRvJWvTQvfA5XApASuvPHdatPKvLOZHplk9YzHOf7IJK-GnlWS2XsZtpgWpzS9nLkP_ZiInN4biC_GPgQP98w=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFd81n6W7X4CXjigt4eoDN-Gn7_qAtiHjH04r39o8qk2MhCFkAz0Sz6bhIZD94h_jIT1odX21y44tB-VRlpUSsq7dFBfNyB6kT0oI73n6pf8TDURW7p3K_THeh2MLjqcLL9",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGhn4ID9Hq2-os0-CP_H7ytdby2GIvIMWcfpo8LF7TRaTrX2gWDK-9VtA0VUwt3P4T_6yFRRdoePwMKq8NBtQLVIMgPuurg2HBm_sTvOf_SSrVWwPm3haQxn6KpsjNfoZUmDOXUjMsHAqs52bI="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "quién hace chatbots de WhatsApp para negocios en Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF5sKiShimrscU_fOp2rzRvyiykbM2GE9Zfsgk8tvOzMRKKPIgaD7eURK1AzNuz-8n5VnKOc_GWckbEoWVxI5eV2teDLB0pGkVc-eS7YLTTCkf24gm3VnubRzh8fwR1bA0AqpmfB9VN2romS_v4eSPhX4Wy",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEKuBKlMiUf7Nal0bvFS5IBzN8T9yBmwhIBCEfeMpKD0g4Rcy6kLddeF1xVeygArhtEAAozQiIE0m5812Taf0Fvi3Xq3uiJxwSYjXMXWXF8RWYamsOO7ru3PKNZh6BqrMb5-i3l",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgv0zALyDFf4Gng6EYblim_NbN6fKXYjCr92hFbp0rbT676DaOsfqwf582GvzYFaua88KqQ0_StVwtoIpaDgo_1PaEmW_D0KD9yk6qj2nqmksg4T8Q",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHzIGwpzEnSGzhoR9x-1lKnBXLkvcnX0mM1XH3TfXVZwmzHHd3894FS89YMbQviSKiy1ljkYGvVMEhxE0bi5qIgnbAawbzYCF7Q0esCMZWvDIrWQ3BeuwNwVSquVggs77hNa-aUsNJvNOU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH1RWmq68N8f_FUA_lXkUbm6bzrM2V4_b0bCBhqnT1tXPcLWUcnnrnvnimkzocEFOiIdY3CJK9F_j_mlouQ8pWcxrNiwMVioG49IPLbGLRXFT9fXfzn21tZAU6orfqw",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHYn_W_0iRGUPkhJR_B_pl3izlOW1ZQq4J0zVH1HjufkUicL9gtuezE43KdnlIRQTYKF7KcRTtFHMmxWFIHJVgOLWLs8AUPyVpgg5rfU7hYcfRPAkjLfsi29NpHMu4OBUFNjBLiUXAsYWztjMXT7GAyzw_T",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGO31tnPRLX5JUkz67gVyqWKFTyTHFPXtusf2RAli8OLWcWqwZZTVwIErk1nw_CwDDRj89eVy78mBZX2t4YtmWnIr5Sm5UdjIWJ6hbcH5hYKPFYhgCXU4anyRWIfr9c5oy0XB7nUKTMKA9FzgqQ1kShBx9J6Lzv84NBbjtOyaoAjEpviN1ZIy4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHYn_W_0iRGUPkhJR_B_pl3izlOW1ZQq4J0zVH1HjufkUicL9gtuezE43KdnlIRQTYKF7KcRTtFHMmxWFIHJVgOLWLs8AUPyVpgg5rfU7hYcfRPAkjLfsi29NpHMu4OBUFNjBLiUXAsYWztjMXT7GAyzw_T",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6WLGAZ1LtmUpg5hLEnSQW9YW5xSxrRMIbLOUOEnN_BT91XhiQK0926FGZFNa496wuW9Hvp8v0QSp5xbPeuBqax_dFHsZW-z60SIwECd9e851aouzbordACwNFbb2nTIgg-xeIEq4SzDXSfXlVKsSLINoJelmz4Dh6",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFU_bBnvlOEXi45fntTSfstTk3f9TEPLBmxmZPAVOet9TfRjXnE5-vZ0cpmtpOpJ-xZAHClM0-VChRRuY8a-USRDZRcfVmisCCAXYX-xrOdkb-cp4PgBsHErd-NMCyDHEd7HS8eGgA9AcWU90CHVKdo"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "diseño web bilingüe en Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQES-NybYQ3Hnq7pYlALyKtk1w3SxjOxcyvOWwOfXFQQStTwCuJgB7lyPF7naC10kqwRbXnMdP8Tk1oDalH7BomKyb1Xq6M7loZydWkKT6qzPnSlHmg5rmlCuU36Kl4Ldo4xQS5IlTjRPzz0vWsXR5ju",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHG2lc28mM-Do2djnETx1IwbCYSgniTiNxZhM5GsL4J5fCUs5jTYtC9naNo-1SGw7XAlm-XG4WuJjYEnOb0kzXtYOWzrc17vlPHgG_-eQa72s-f8DtU",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFTI9cUUg2T73P-Ux7M1SgYuuI4z_sMF-9TE7ZAT_F2RCthTKz3UdpBGUDnyX8tg5UKsuRnUMaZfqBav4O6iqiotfDm1ttKJPfcUTaMw0jcyFjY2kPUmxdLXrPmY4ORduFMvOWgBPpO0fKm1j4-qw_UH1dh5Pg=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFEjUA5VW-_Wz4Ew2VsdqxiCBYCxoO7tDrN2G4Mnq35DGwhlQ5sQkmVxej5Jv1qW9pa0Lsv_7HR0J7dd-EONiDRwZKjK-ACgFV3S8SwrtL3ImDIeSeuImcL9XtBtw8axlnL2v_xVRvtacNMP_M=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGd3vnTQtC9TwkDNb7smlnG3wJJxy1K4EBAnmD8b0xcIsO2ez7jEdSLe4AT-eZL8wE-C8xC2xcE80aqwF_1nkuR6vUpiek6X3kNx2Kw3TwUqbUaJVjipufSLcBc2iOeEZZKbmcYRpKDvVpB7eU-WeGxVO5apSJv",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHF--GbvO3WwVuBSIiPpb6m458pDqAVWcXtjlPOB8dO0ZyaxRvQXe1x75BbY-I1XMDEeye5Z5u4hzhhMAyTkSOp5UJbyPkQgNzpSYKPPSXXATALTJZVl8oiyXKV2w-MQCSyQ9MIRAzHXfocntt506ZVkZlf",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGJk73KHm6uQZtS3V8l5ICCWhWi3o4f-8hXnIRmwX-Y398DbSa_nUdpE99SCiJ_9N6gyrMbBMehUhD2bIJgkpezMNF2-0dJmL3ISCJv6tg1JxTRZP_37q6mdAcyDzTThWnRmisNQSCfL480KZLEJOmJrf3kEOrCMYlzqg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQER9MsvnArXgHpXOqkmaVrSOMdWmIQzYVAo9xUSXaDD8dkTJw7omPlfZTv33iQvmcWdvhD_NuflT1go7018aelszv1SpbZgCotIOwdlC_0ZVzFhLsxTxGiRcP8_KNyfypiV-reUPrVdbFm-_cMs8j8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHG2lc28mM-Do2djnETx1IwbCYSgniTiNxZhM5GsL4J5fCUs5jTYtC9naNo-1SGw7XAlm-XG4WuJjYEnOb0kzXtYOWzrc17vlPHgG_-eQa72s-f8DtU",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG0U4Igg-tbM20I5wXyz83MkvdaP7LaFhVjY-GGd2-Ca__pNlNPj4uVWpFuFjJu7MMnn_XpsLk6B6yyP7IDFxBi-r_KARjrF1Cqmal1wFHAA-49DwifbhymCoNxNO9UbuVhrUKcVKm-rcxdWxIwY88="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "diseño web bilingüe en Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEBu0GvQEBCq6p_RFeHUrYW64lnCLCYQ-FRqmmuEPZj5EgRbTqL-EXQm_-bvO-nJ1Q0KFa3lOiSpi0LUKzq0RJyG2IgH4V8sbGc9pVaSMB-nh8NZswAVUDkfeyzE7Ot-Jrp7TjlvQa7jYxBPWuHJS2FDu1Tow==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEB5XMZnSqJVpieESgasHajuDdku0dN8E9SyvXx6cDFfG7XaPl6bRwvIPK9fbXwMVAgd3ny_l2EOKo0j5DR2O4sB2OKM17chY_-E_dco5Dmd2ENos8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFCzyyHFIQxhgbVIPBhhNqIkoeaRrNY3q0KLqFaqSoZNxtXruo2qAZ_nRbXZodq4J3BlCpGlocipPqGoD9ERAWe8ZvhX4nbRkRzBmgISYrpfxph-da2C_8q2BQOjEQZ5i3LO3x9iDAfiw8AEJYwtQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHbBcLT5hgy6TaE5f3ryJmx7QX0E0rwq03X5rHzV1j7oqkO3_0Gug72ueaybu_ojYFSuRS2gxVfSN6rNKoDzm1trvF8EVD2kUC-20FFfiRzgr0SjCkfUp5sj1TwJiAWMdxTBna09Bc1yOZ1u9aVXvIO0IAKWXL9cHv2",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHuBQIR1jrbo98sa3Cc0SCBZC48W4OtWQQRYOvaU-45FvcNUGKcV7DDJyT3qhbTXJLouFWNmN0TOQIfYk-mFD8psD7u8GSxrqw9f8Wi4MMl8nKcW49hcScwalGoM5oBLd2GOgOhZtWShtLajzy-FdNHlPngvdM=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEGIkI66uOulG5DPLQF_IUq5tei4v1Z0-VEYaa47LKgNmsS586DTvgiuqwqndtY2MKxatwx53I5C_ceASU04C_nvMkqeHaWwC6UR_abNZ0B263izhw9_LDrNe3QnCvXjWo4zIomXYMUu-yuuxJmukA1azu0Vlh0i1AK",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHh7U78D9ysVF9ZKdYs5p40XlXpjokWj_WLIGYTcfZhAe4Hxp-AufZ-s--f-9-U7M85VUpFZEN443TyNiq2_jNu4XsrSZDJIi1Zh_AwXJq-oIY28NpfdS1iTE8BT1hObFYOicQY7Eo0H6xiRGyZaSjCnOA=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEGIkI66uOulG5DPLQF_IUq5tei4v1Z0-VEYaa47LKgNmsS586DTvgiuqwqndtY2MKxatwx53I5C_ceASU04C_nvMkqeHaWwC6UR_abNZ0B263izhw9_LDrNe3QnCvXjWo4zIomXYMUu-yuuxJmukA1azu0Vlh0i1AK",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHOH0L0uNTyJD10U9K2t5b1OkhEptvlVfvh-Moh57VSZAQnaBAnbW-nUbClv9VxWHhACXqQa_Id60tYX3Uxl0DYtG8ZN6m1D76feoFP_big38IMJ8IPaofA",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH5Q0iZpvQqS_sMYeQF982MZyRJusJ2K82EMes1E_tRv1-vPkxPEyFGy5ARx8bTJLFGnfYdF8ASFele5aHpMZZ5lA2LsGoLdvFcPAFRg8owNoaIpaYOL4zRKrogFPRc9kewdXr6AfFkONLo"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "diseño web bilingüe en Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGZFoEsu4qJI5MMCce_vGCbqUiDyULegp2nTBwojnGY6jog-nmELDlJQsrcUiHG00SyUBL1xS_vWtNkQ-pui2hcVGVPRw_g_7qkbQl38FZCNqw8bygyCObkLH8T-wUCG8_O-SQJfcps6YDen5-rY29lXSgTc40b45k=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEhaY1VEG7NbiIGvPuV2XY0WXnKZaGwtxlbUcaFk9xPJOq2aw5LlKu90JeBeU-DVi_Q27pCuwgaJwQWupJsZWeKGn7fSRgVulU6sUwIEgZll2lK4In8U4hlTpgt82vyJEGMgNmEykULRhWKWRxEHzzI_JKDsV_fCJ2J",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHf-0nDBpSe-sgxKjTDVZsN7Kf3CPcXqe7inlthAUmZWY4AC3xjlJ6iRY3-V4b9cEx1a7QL2-pye9ZqjqrJ6LFbIYX6ent7BmrgwXRuW-gIatTmzrdNy8ye5wpPykyaJzxkRyv69fHVe3nvZ1Zp8gmuwZFAsyk=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFVRWKVyxUoa3jaICgTzWTq9XbEosp45inPtI5IQZ7I1h7mIbBsTvzNz3Ue9s8SapUi7euBx_mOYDUL5il0L23Dwn_wFoKO0dnHPeNdW7u3bNzmHD0=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEnCgcTY3iCZbxVijaOB0YuztV4xEofkNev4tvqau_qzXZvqpMFD7Q5D-8MXW4LJ7EHjN2VVcENr6C7_dCkWX_N8-RsdPg8rQTlAJmCwtxCy2CRgxESLpe4oP9J_Szu8T-SXaGiMjqUyZwGiV1pS3p9RaukTa7ZTXHG",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF2O9SNiIKO_4klEk5Vt68N1eW0CzMUWttLtNws4ky6iZZEhF5UOcXmVNtvMiP5JsGfhI-ZXgH8QC28gC0YrlL_G6qEvdvfK6px3PEF29Mx2opTt5EO6NccdnylKMMzHNw=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE5DtNvhdsWD-IAvBBU1a6Wyg6R0NsZiSWtO5i2kLECpQrMy0t9Rrz3LI7kv-m7QP8nVrnnr5L7bNHHbLKG1dpIbUiJOYc2L1xHQKLwIeT9yWpPRVyWKyku7JeIcOIZDGDyaJR-TyVLNe0SYguxOBMRoS4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFff4zslTQDj2hBQGCx2-Qy0oTw9FVnrB_WL28IUDNbXUbH4Jg6kbiGOlOxvE3xCnbDyMskR5_INRWcJmkr9wFCTQBCAqsivy8HqcMULcfDDV1J0IIwoLrC6bix9by7QMrz9ZcID_xjgFU3"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHi4HdFpcwdyCINkVnCgzseAJuqb1Oy5Rfx5PzNTEkkWtGiiy-RjzOiRnDBgQAluv8DTVofi-9X62ojMXzwAIRm0CC0ZTK469efj_PUQBtZDmZnjT9Qz6gFXT6ikvvxdC5umKLCho8coiKOIvFUL5Obmma4qzMN2HHijg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFBJO1n1tiQZcF_CYYsNmTpnIbPghvGL4SItzX2fKVTvY2l3BAFP6iv4e_dvMURaTUfHn1u_9Tf9Kof_fbQjhXPBj5N3M0xIVQeui5GREYSZIizuaR_n8MJfRQhCQYdIv7kIxta",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5BnmK6SHUPOl99EYk9nSb2ZQVxV_xaDCj9EMqY2n7GUj40SPnHUEDMSEViyDzYbbFxyvLZP7IADwLX0H3HgFq9P84PUAFP_wNxDPYoClTE4Jk_prhPy_y106J-oAVplskDsTRMTYDkj0jL9ZZKWLGIz2uyEji",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH0k1IFh9Sl-mTDHqrbQ3ikTudyD41jewnzrIJyNhzj33MfsnXJbk31DblI2OJVH0o4aMj9F33m_n4mQzblEBNJaixD0NKTE5fPOzdfAq8LWzCDVeEjSyoMMUbBEdAdSM637LhfuTqeKi-6EA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH1GSIDIHXiTAA3k0piP3xfkS6nQO-QpueneLi_CayXFlSnUC0xqAgzxo9FXjhrrng3vPcegCD2HadY3j5JGbO5ZUOTrZ4-BDEgHRR-L5EAq9YR2hD7ZNCRMm-SkDVe6VA5",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQUR5S_qnTiptKSEYRY6mjeZZqC_t9RZl7m0PtalpHOordAh93NtqyVjo5y6GG-4wLf1QdFe6nKoABvb0xN9tI8Q5dWgWQ0xYN4sNg4Q7dXXZlcSQtaClP",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFF1oHtapjnLgWGhd8w02AGDBsNRX74q6zomIW1qRn2j5rus9XmRx_srYW-oGxaYm98yUam-9DAmM9XNkGTYBmOX70uS0D1WmED7YRjfC9z0e9FqNLNKJ9JF3hdMVkimlZUT_lXoEOpkBQn3xU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGoNqKMJBeqZIX8MqB6zn_ib1ZTx5XLn6Axef5leq0eFVTWHQrTFxqbNg0UL-G-tmNuedzLxlqDk0H2xtXULe-B0esbbd2nQp1aN018QFCEil8sizRRkXpRGserOWeNyJZzbYOUNyxeVfmi-jrmRfs="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEninj-hV42eLHFmvFVnz87kb8ijxJmyfZKj6cRdGNKrNZVYbn0E_slQD6-WFuGWwSTQ8pVKE839vSxVXCqEomLv8sNancW4KGtxTEFpcaIQw-2eK-YNAVmJPpe1vd6WWXmvunj01yFMoQXqIaktsetUTEQkabgJ3puNQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGATbbMqz0GItd_OkQIJXHR4mzIOW0vtL643mz4L6WPntuTXQcL3y9gPfIdp7nqrEALMY4UjAgcJO1X1WwTtqh8xlrybWJhABGYPduqzmqJDK0HEQcspaSTGLzquyxwj0J9KIPXvxvNF1hUzeOD3ZE5",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEninj-hV42eLHFmvFVnz87kb8ijxJmyfZKj6cRdGNKrNZVYbn0E_slQD6-WFuGWwSTQ8pVKE839vSxVXCqEomLv8sNancW4KGtxTEFpcaIQw-2eK-YNAVmJPpe1vd6WWXmvunj01yFMoQXqIaktsetUTEQkabgJ3puNQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGD-aPiAN8eZeN5EhZwh06DFfrhR61XImrlQDWLy5OR2jb3FOek8igyFMTCMuBJf4NYz0oQM_bka2wz0gWUea5bufThw3nv5NhjxczYb3sdMoRYSAEkPHaUXzdlAo_-ODAhxtLVRBaN_SCwT3gEQu3Cs-qPlY_O",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHhk2gDW714EMtZo_2TuoR0UqBOHRgZq97argRL6M2H6zyCIz_LL3GVnD4zytwA68Pj3sJgZNE90qcrU0T38RB6-D0vWlkR4okw_x-UnZf5B-xds1_a_L_DYVAYPf-9U_0keqtSEyQrf1Bgog==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHhk2gDW714EMtZo_2TuoR0UqBOHRgZq97argRL6M2H6zyCIz_LL3GVnD4zytwA68Pj3sJgZNE90qcrU0T38RB6-D0vWlkR4okw_x-UnZf5B-xds1_a_L_DYVAYPf-9U_0keqtSEyQrf1Bgog==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGLQhrWgH6A9B4c8UWLAG2jjpctavOy6oJfnvTNCzJBnG9FD5Vn---9RFW1pGXnT2UZauwcyjI4C9QiInJTFvTjDmf5GPw3sokI4j-paICO4d6Aqppfdgc56A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEYoS6GdQujNU7HY23GWPYIAp-plw1gpZ30QVaTZhs1PsMs0uQ_yA8WwRbTNRP21zUwdFQoJEgmL9zcijGup2DjlAG2YB5nqEvQtg8YJIVapi5jbsh7WnZeBL6p9cuPckQog-WU835_CC7JD2uuJes="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG6rpG6_KR13og8HjgLV0Bm9rCZOYHTwNoq_IYTe4AUm1jZCd_ip6H3NoBbKt_nH4zcovKlD8ux2_H4zTlaGapdn9OW6qyqceYNTe_aMaZ0MEm5h0qDLFdOdcfOF_QKVPRAxwih0y5sNgrBhcjpBI8kHjNGNKOSiwKjkw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEJ6RZl5ANxDAx2NiIkMenjRWM8qA972eSn4lTX1ZfKx2x2DfJkLIHHx6kkl4XUcDrasI7gb3ZEisiNnam6SPqeIrtEp-ZHcWCeOlPYjGspJQrWQHPHN4LYlJAJs3dVfuvpEMZ1",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHTdSO1qKdn46ywaWxFyhQtWRAv-GX6otke3VVagHq7UaHJbCd0o0xbPQQlOA0Um6ZKZ-QC7OmrMYcXqZNXlZj5nCeFkWWinhqGhinXGlYEWxC7hpwm1czVAvDxZZFEmIsDuk2kSwQYyItA8M3sHecqL7lo1mB7",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEaeRC4fqWGipINWanDqtFnWgJtI3JPLgRwRZYiaNDMe9hfKMzNnFY1QuISiHEoFJQ2GdFplFy2NYQKzrhs1oHS-FgUQFp1ghpEQeb89FfNMbX0z9pYILfgOfR2sZczSC3LUmf6Ay1ySWAG2w==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFg39M94X53nQIWsy3CPIF9cQfQoj5PBMlwLR2jtoAB83xNtQtovJRmmERKwZTRn6yw72viT4R1ylLf3HzCempMSyIP8WVe4lzigkDZ7oz-RlPk0M5xpMMeleNeQDDB1x-k",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHcoQ7gLWPrrXiB2rFU-OA6nLnpCOJ911SYGckrWtg0kROhlMW2DOkHyMFZkEFoI-RJwGC25nbLMDDr7lguYvKPxCbeoNyCEp7wmW_XXWsoZdaqnnAUEFNA",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFEBt_pKVs-2LYqzDfdxSyARl44OWZFN3RJDRPYh5B09BAymKTzeSaIVhmIrel6gL6c6-ReVSZsS2ADpx1LqNNs5vCfSeLFI5P_tcNHrxXG34Pz7Nc9eNsOAcNioSYZDwi5XmstyxpT9qLbNt8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEhaSVPruMPQkl0KpOwJPdpr0aN6MoaxA8DpcvzhrsG3nrr66sLLuGyjwQVNh-D6pR5nlALtR6i60Nr2wDRzz4nGfmnQanIyMCiLsfUKKCmiPmXRgCbBp4qauyQiwbiDmSE5c30sYLkpFT9a-XlyJw=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG_gVc6WAXGCFZMO0wfAbttD3r46McgKJpDo-Y2YbJNgPsMG2XjbuTFiWrriY8SabGi9rp6iy4-vAgacWCkoE_XeLxqGRi0hmbFr4Fnzzj_AJWVgscT3OGCqj2FOg=="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHoy65Iy9FznRVllhb_8UW5oQjh1L4qZCLdnwV4Ig__jirFWqq8fbsspFI0oiE8WRhXdvfFHTy4ZeRkykV9gHKPCCHcauT2JDIN8t5AroeBvTlNlY6dCeqPJLkeyzVDcSejVqIonl66FtPZYj7JddU3OhrO_48=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHps-7YmOZ8Bn2-RpKQo6jfvVP_n0atacz1fzYpletS3NtqsTjqK8MthcClLe5iZoI9GlIaroMTRhirSBqPQibVouV6eP4v62CB9SVT_gg4MiGb2n_Q",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEhb9pQZwWRGKSbCSGJC38-fFEdD7nmODgvgx0psyrD-CRRgRZj3cfQCGiMDEAtG3BiN2zPVzCxZWVn-MMeZM_GKTzy_GslSQi039IaJ22RsE01-r7d-aA-eQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHC1OIRJmY26uE3sMhQOBk-xR0uscSvuhMAt3T3fripxloeUcbtm0Tq50NQgftIwG_d-XYuP3mafD7n0uiOIV8NPGJQ4ZRON48C8tY6_53CNPNbXOvnoj7i8VeHuxyN2NGVmUc1ioeriYGRmfUvsbKKOs8DfF2io115e2Y=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF9M4txinaUErWbT9rIO1kUHKRP0-v8BudcVPutOBWLVTe4BAfdK-5b43ZLQeS1Hnh7Tb1STzbQh8yCsQ1K28Q_rim8KBZ-HmRKgWrnNGEBdJBCNr_PDuuSJVwQyi8e2BPJ_vcRavAecNIiciSUZr_MVMygxyHfTz-47A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEYzRSmA5vzid9hytG92JZV98r31bpmin_ZBLpTFbjHAT8WEoQgr6IPwRghl_737sF3oSZbzd3nshLwXohSNMPIcfzESqP3s2lx4sito2qpwujkYi9FE-IrZPeAWisbINXH0Aike2ZOzaKEe1eCi4YU",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHps-7YmOZ8Bn2-RpKQo6jfvVP_n0atacz1fzYpletS3NtqsTjqK8MthcClLe5iZoI9GlIaroMTRhirSBqPQibVouV6eP4v62CB9SVT_gg4MiGb2n_Q",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHi1ESISIgq6RIycwEbaarjytZ_XFac84U7FRp8jjwsfmKdyH7bTR4GHryWeaW-yYC54i7vRK985IWgnU0fOooQN7_i-OXTcTUEV8AItcKvb561vWE1VVhVUB40odR0qMy5yOxOlQtlUsisGMG03BQXH-voGMhx",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE4dW_ZgWPRrrKorPgBx1xpvtcHYrwXn7DrW09Vj7OknifI_mkVNNw8-pJqKfXmIy7mGAPBvVhaTwCWmXeuDIxgCb0kXQsOk0hdvc2pkM2aHCdONL7wPdn8xSX5IknePjiHApvLDi1SSSk=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFB5QwwSMcrK5P6OA20k9qYldR-zXF3QCrk-E-LvuOprdnvRADszetxcR1n7jlO3HveJQrQILltKtKzj82FvmA0Lq4o5_8kgev-6jRJjQe2mmgEjJvpu6yx"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": []
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEaWnbldd3e1uTOjMRjPaFjyTdoZ8dfCtxMQj38O6QGp_aaVclZ1QcRFZm00lQa_dAWsWKv8buhcWscPhYIFHgKaxjj7eUfM1eSZWboX63Ql3jwrgovr35pohbmK5pbJW4Th9p1MTCjyA1a8bY5J0CedUvfMmEZiGK3Og==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEaWnbldd3e1uTOjMRjPaFjyTdoZ8dfCtxMQj38O6QGp_aaVclZ1QcRFZm00lQa_dAWsWKv8buhcWscPhYIFHgKaxjj7eUfM1eSZWboX63Ql3jwrgovr35pohbmK5pbJW4Th9p1MTCjyA1a8bY5J0CedUvfMmEZiGK3Og==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFbsEVgS_JDN8yuI6_tXoNcZqlWEpd8FaLLqlszVCfPm29G3CIiPlaAPFLn5mFAoh0DzmqfRPik4ykGXBdRkGnAd3UykBhl7CMfIXvB3fXgCjHAscu6DvXI5A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFbsEVgS_JDN8yuI6_tXoNcZqlWEpd8FaLLqlszVCfPm29G3CIiPlaAPFLn5mFAoh0DzmqfRPik4ykGXBdRkGnAd3UykBhl7CMfIXvB3fXgCjHAscu6DvXI5A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE7siacJAEoO764R3M5vtgAtc6nOlW9RygVnmBUa09w2nTjM1atmTCP1EPXjVvG0icjpk795wvMO1wTNNgjEJXIm0jML57HbHVDRem00Mmtl3uW7k8Jaef_wtinHCNLdp2D",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEvQjCfgYSdbfaVYPko-YhmJHc-XCGngthHMdVZ1UsGBfagKbGywm-kxsWudtJ7sKbROabC3YIOJsbRY9I3Pg4eVNSDiYm61NyteZHByse1qjNfiMAD45ulKZ9i7j4KgtseYin-rgFEF9MzJg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEvWfMVDhB4IXO-G0j-iHLFQ500TS7VXPkxRZ71uBX34ZUgsXHXhm1IQuRS8oYv_5GtbAByTexUnQo11YPkkCd8JJ7xtEDVKB7Sn43iBPi1LjKMzQI-66oZ08puNKHhxY5GPOOJB5-A7aE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHkM3V6Q2mf6pEGO8D9T8ZuYZRA5qlUB7L8eOs8saoMdD5mnl8K9xs5Yihs9FfEv45-_PlowjH2Fb4rdIvElpxg940bMI6GMd2z2ob9Npwq-ttXdmnN2Egmn5_-tBAFGVzwMyXoNEmjGj-uti8X0V2DRvs9Yidq",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH-E7AHDLhzu4ewHewJuew26u5Dl_RqWxzqbYH1myGtnPLhDmSKRQYUzFHzlT0TLlDA8nfKb78h2zuh4Ede-3O61ylXIrgDwC1qjx_M_0kMuTnWxZEJ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQiXrX1Q3WwDhty9Tk5NMfOrlI6qzaRd7lbF3XAtQcaaMcZNuJx3B4m5ZiqxIu9l3fR3dm2dDwMz2NsY7WnXv2pi83Te-zXu4_ZjJj4w1eDQoiwYQl8mbS"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHxWBIpRtwFlUBHDu8xUxogni_XIYO-ht3IbaPRu8vUUYNKthYOk_pLec2MD52-wHb9LzJsfXqm45R0vy-SIxnkt-3ljtr4BpQ1mtkWJBGHbL0qSxxX-n8QBkJomsbjJ6EDO2UNMSjy5UDw_JXjaEHHZz58fWo=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFpI6Mh3Z-zrANgfCuzAnwvB6mesdBtAVxnDoryzCO86hF-1RSbTuMA_rXiWH2-ugvb8MSmMVeIHz-ks3eV1qWcmqL93H8E_j8Yi-x6R5LKOtWtUiJOMyxxU85vbT5zP8nmwf3pA7H-uc7M8MWZ",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGRngCI12pEE4cy_lm6D0vYziDFrxhGwVlAOQuNw1-U7gLadulvgb5Coy4fpEPkpfHjf989eYEHFiVyiEvNfD5CF8QuEcn5Q1bBcXeAoXRVD-teGqjgCJkYdWvFQ1-at03YCM9-EGa12g==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEk1Ec4SUGmyWACxcV4U1gl2eby07Mh0bvGV1ZFPo_Pe6nCRybswzXqv3aLs7uDbwpfFvkdhhZV-6el9bTYgWpBObBUFoyAOF-dpS6gOzkZY-np8kEK8hNkaa4RkpHXg0ndmIYA4gKBx9xS",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFSWhfWlnKUFWQD-8cDSWKV1F9h2zMPZ8RVxSzreBOwxUnzVj3_Uz6g4ul-s4RbzfD6u_idZ9ZJBdgwzJkTRw0P4wzJ0ofAXW8rDef1mr2tX4TnUKUToNGopyFUTdI=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEG41OzgLagWN_Qrf2KsRTkbfPL0gVc2tz-jqf6u-rgaSwhoekJvwG_xh2K5J_pJOqaZ-dPyKtJxlGyhKydutw0WSq6d_TqGHdJGS81TfkR2JKYIs1L70Dffz1zJCCKq5w798wIlVL2bOuILofWTw_mrh3quaY3Ai9Uy_Y=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEPM6mfUwn7b3yuZHKkxrqKpqnmZpjG112Qf5IBuEuw3UIvyETn1eX8hU5ERW4HBj1TRvc-SJmkF7oqhKDMshWNvgPcRALYTagQFherxNSsvMg_Pdc2z9djCilxHCcNxQ8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHSEQ25ZH0redPKoP9JqkqbPywelLKrFVkjZ-VGlMnw-eMpk-jAI9ihLrtF7pssHANCmx7ITz5Yx8qLJyhZGBr5Bt8-cTvax1MdEcIBV7p5DSdFXl5vCJGpL1v7D0JQJxJSXk1qC16fkI8PF2E120A="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGy6kmFLm5dIIWYwjY7iLCWQbfM2T4xB70sjqAgKW2YS7UZvKSaSjCS42QWklDm_p_d3ponVhKlP6Izm0_P8ZuS2Do4X76sBZhWC4crtI26tGpV1tOrSLgZAQDaiaAxj3a70o9NoC4bSYU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE3ua3s4LUjm4oKOjtAliNa0J7MRmHxY2YoOIJxu9icYONcupzLeJVrsUr4Zwu8FBVDQbiZcxg7zzkqMrR97AXTsVDEePHUvjYXcUf7GPYUBgvn6Rcn73pcaZEsZHY=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEWZGmY6g7SmKb1AVUnVm5DRbPVIuP0bXiWxQ5TIrGOsho0wFcEoGRAdcizZt3IsQF5A1a1DGHpYBqHRvs9joQLVjPlRFst4vHsFwd0wdh4tmrcDC_zKqGVq82h6epIQPxVxhMR2nJHs0pRIC7Rscinq4CDV5FWHlvBCSrIAtHSQg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH9G-Sxi8WNgoEcgnzERpszJ6vta-2vlC7kaFRJWFHK8YviVZ4C5-W-nvb4vfSyIrr1rYbQLH9TGq9UUC9SkSiyhDt5sMPKQ2pKX2tuyeqWX_pO4DtgWqPsuubWwYdHFkuYghw180EM",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFefqY38oPz5uc4xuH8YxiQLZKwLuVVs4i5-u3A8aagu2bSeFpF0s6UU_96hmlxjpY7rO19moXJu06VL9Pn88xn48-Zm7_Ywa-nzKay9z-YtGcCHRwXwrjsJ28EKQ1l8UgZJcE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHaOdjHdZzig1UAp55qhyNOjLBloloCOdcAROTUxKPOyAT8peyw8FpwbBICKRbigo8QcALKD1wMoJZTSnZG96W8b4b_QQyrROmLARQV1-lTx1NPY6hLw99XE2XKZ0UZbu37rS4bfZg8wbjSUVQZzg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGp_3bSUo6X8ra500sY1NLGnF81TE8Ya26I_i1OwqrosViyqF_YWTc4B4oK5MDtSSggEdCdCgrhH9mYl5w_68y5Pvn6msBLOjPpgKi9-_Ph_Z5Sk5vRfniN79bWKdBCGqdSOADpl-s8msTDqE8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFib5j_TZw8UfNa3TsQccNlHWmMqcpHzqvbahmubR1G0zMnUlSA317-Sjee0P-Gv6LNq2HTAbekoOxwnNOfGIA8oRybwokSfmNM1lDqVEai-pAXH521aKPFTtEKn1OImYqbqQZFsKBvIU5wenCNJOFDp_VSrPrDsVhwKw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHnnimHW57e8FdqPXfO87tBEAZrvD1cFYVJIhRaH8yFV7KBRygqIxc7bmebKY6T-5o4cIWfgIpziolb4kBIksiy1TIPzny9q5Zp_9mwPGAoiQXN7FUfAg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQExExTLPGSUcvtBbP-OXU0hUcRMRN-efXKZhuAt0aS_Vv2UH_OHJ3_jBlJFnUmmG6ABzNDXLTtfPr87tMeB3spdq96Q9NSNHW9d6ezrshAQp1Ln6pBRbartqnjtL0tTRrtcyz3E"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGgJkKE_BkS5vnBZ_wmYl3DNDGICRE8pVob14SaB8jJWHfmjAFdyAwqsI_JnGtZoRMXBbcrtKyUiKlFfbwiryd_Yw3F3nzizFGr0oZiMbDCU2NivWYFU9kWYpwtUVMzDNjOvB6Z2528ym4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGU7qA1pufyRXaVVw4sg8rNZFt0XU703eTUjUjwW9-vvKf4bcsp2vNt5DsgVGGEsLfOdjz5iIYg7iBxbMrD7KheTyo-_wBGVy0YdI_jXrW1_DRidSV2_WBqk4rhBdMj5KwsJ2VEdNZd35nVTSeAJMgP3gmRKQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEyAu6o5XZuBC9-h3f8L8Lda9pGVzFlMIiAXSqJEyBE5OeNuv6RuB8P-jWpXsxsgaBmKOB0HaMnJmGp2du11RkY7bIXKL-IRlWKU98HZOxG05miyGBv0G3Vo9u_OdfMNBG7CpsDotIu3H-uXUY=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHPPcMYbFNLhkaQN4Lpi6ZusBj8oryvGm6xFBIjntk7r5Z1La5mZurOy0N2gJOyj4IFqdwLxtNwzzFLYtLXf4QUb9p_V2cta9ERjDw3tZ6LWKcdf3AdgD17LKWO6A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHXjPsLpqji4nWmzHn8TOQUJaOsH0tB5C5Jb62sOFoNONMAnrTT4Z3BXhSSNCCzD68173gYKMObsIeVIDflIg7v-0dhTvVpg4VHuClm21ubD0135Ai9va3sa3n9sRhByNTafl9D0TfDGa73LnBOyH34UCS5cVjpnIZRUQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEsjrIUj7G2YVovTGVobeKM2XR5p8SswIWIV4UuI332VNuswlKiZQtns-ARZM2hJivJ1qXYIzKTXx8uGsIWIzgw7ukm2yM5oSEPnFh1o2TJBmvEDL6egg==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE_8FxFyFw7ocGQI49VOQWFpcMiD8iBZMntxJS0tgv15fqOV7f43O6rjfs7CqSWMTfWwa2zyFMqy_sfn82Qfqz5DwUnemZXgxIkBwGUoVlqFwOqn8nsTKkPxfmmk_yxciHg7w3bCThtBWZqqbGkhA=="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "how much does a website cost in Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHzLVc72SuyxMcvxUE9WHTcUwl8mNqeFeAzDWD4L3ajvXVmpPPQWiDCpSKEG3EzHLg20Ax9JijPNqNgxIfxu9dqZtzb4re3V20PIAFonxhmZfIBAWM50bKEuqhnVA-1zv-lc1I=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFDgfWbvpN1IQq7qCEliallXExVgY4ddBRfWmgYg8z39XgMHawDPD33r7X706t9kcNIdfXboKpIPicOtihHAzsKiWatxn4YwoCtTp8WWqc525PlcUqyqmWPf96dK3_4ukLRqWE3waTPiOQ4wGe5534x1ydF_WuI4BbyNs3pniEj81yPtEyy9cVblAXgr1bzH-Sy6KQ6fVbO",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHGxmZA9NNYWKBBdL-TPu3-NcnA9oeMSZibz0LUkCTA5ZnmKKxJDbt1k4N664paH9Z95YmOaViNt3SLnf1zLs43xXrltcgg22sUeoqwCZYTXmsXH0LhDFtV-XmLSlRwUveUO3lBT1fddO_UzkLF9tPyYRjeJd8T_E_WGzRm",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQESxngYmF3BgyIwyePxFdjvyUMg3WKgqLiX8ibqCSgpzul64-2g_fXWHfVMz8nAFDh0eYiFrxPf6AL_DOb9hzhzRnmxcO8QIuqpq96MglklWF78dATOPzXXSLfJi2mOCqW9mmXnCDDUNZZdv2xy_hewax6mlKPOwItP2ro7q_WTn54=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGC4viqh21ZeTcRZCJUiLaIEgwf6putVTZ0_bC-BjKbATnsWhwAb8Sw_IQJ_Uz4pP_7C-kwqexCYa3B6G3RfJ6yCwM3nE6MES4yHLrbmCHpnYgcey3cnEYdFzoAMvTME16q5h6lPkNpZyG7la4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH67TlqMHNj5em1jc4aTEtblTDO_P6e-5oaZ68BTWLz89ST7UIq-mxDSY8YbgAOSvLcsfA8B-cuSGRlFxZB8WdyKio0SW7G3znfePE3dw_r3X47o8zEgE3DHx5B04dG9Xo=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEwHA9Q6XOXqDAPRSme8IhOmf5_7lcz1QunQUiuVqJ3_XeQwkbA_r6ygUwRZ3Sy6yE5Qc0UL82c61_yIerAMVrHUUOeUztpk4z1_6A4Ao-aew==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGLNnpB3IiESGmLMtT77vEufVZIuFYPfpvWJ1a5aSQz8f9MOMMSwaZpXHg9Q9HBxZSBkIpDTzqzT3pxm_VqhmR24UXUs7BfTl-ydvVcY3kAENh_Tex1x24pKks=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHT2u9wBcZ_vIWljTXVjrHOexT7IJsPOJZV5TdkiZK9tqkDjVo5TaHz4dUH7RkgE_rP86ERmy1deemTVK_rShUzxHOA2J7N6wKVUZuYlJtVzwNLXLZrdOYzGW_4AShB6xJvrPD7n5Rurz8K0B109gv6dA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEAtm0ggvh-dsbQGseQWz1UbT6TjBVBkH4rPiCN0ICs9uNCHPQpBB8ouiwxDtBzkDbCEZJHLtXO_FLQ7Ds4wMU27bshW_3a-URUZmaeO7RbwUoOi0VP8j5zPT_s6won0GCPBJgaKRX6-5uYEXzE7cGo"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "how much does a website cost in Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF6Imzopnc8aSc2GE4LWb8ekAwbb_kxyMu02bcwKw_mPxqyp4JlzJUEw3qndANxNhcbh7d60DyUUz-habycIqL98CtEaXissbJKFlXfIFihfP02F730X79pZPWfHjFNxpWO5z9ZrPV1qhZPvzvHANciNNBD4BZBvmVzdAaphb7Fq9maV1Y_b3eD1HUH0645kUnCg9QVgTHV",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHYpOjyISB2loi0bhoXlAgziVGJMoHhAwJ0xIq0DboYkzIeHGIl6bDWWc1LlOaN6XSIshxGnJCPRp167oazY2TQElV3sw5yEHt4sF_lFPRKjmiVK_BM3a9i7XKPEdFgPRKr9b_YT0rMR0nQhdgH5iHYWA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6Mz_GlOqc3IpxrAV1oJeNskw_aCJU1qZMUOxoYWq3jrhTe0aHxJCGkMgE02tRHIiI0PV-hCafN4IjJlYev-rLZmSrU9KeqrxjRajN3RvXchfb6dVsW9wfCFbw89FGjhx6OJM=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgbTY9IFjZMPNuxWspwiq20P6pkmYaxyYuvj5rnFsQehSKXzuFZxVEwN_wPtqYqzR_1zeeH4rwshzSgqDbE_x89vCsxkwMgMl_Rio__evLs4aCNrNBAvq3mMO80qu2DlL_OlbjBKJDtKqiyHEZ1cDGX8z2IH7cmi3Oo0gOO7SlH0_j3ho=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEmCgW1KmiAxYAVmkDAo4feVr-K0ZkHzO9T47GaecpViiWeAUken2iupdxCTFw_TYP0NxJYiSaVt3eC_1DJ7gNYnNdM4RJUCO8YEGMiYo4qKuADzjaD21e56x7W3sny23s=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5XafVo-1KgfF1vrHtIDU-AkNP3isy9H1bVfSTVjMQiKI8XQJQepH_vj3-Jpgny1mNg-QBRZf0NkM_Mh-uGEQRRhY7jL8J8eMqirZatQQ8sOeeLXundPQECxE=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9HjxOVKjzcclsjFrxsKOP55ne3M_DuYCy9jc9pV6AWJ4FsPQuM28bRkKOcFMNV89TQ32t_n6-z03RP2zECyouK9EUHrAaWSzBf26m5gSCsKyZXCIifsEGbEYG",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEvRdJqjNhQEoXC6ac8QkZ-zJSWpx74GV6nIZaagbLODVmS1Efa84HrGafpEtMUB7AwFm4aqkDBJksLYog0ncqYCEb7V7us2U3lXBFUmXvDjyxqJHhphNk_xzhCt9EPOeme-T1UX4wwLAYfJ7qTIB1vIno5znKEMostr7-Mr_zQwnJM5kBS6H_5",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF10u6b_FwMvHJ2oqKSHSm3zLWN4SGFCjcohLiwkKmDICySelAqeo67Ah85CiktoB6pg4z2IL1C9gzfsz-_pA7BGpxQx9NMzYBHUPaP1P_pAvy2bhCV3YOMTq0YuGHx6TbQueCX2MbJBF4LSHmTAe9kG0d22j8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHuGnahwmvgTaM--AqY5N8OBrp9aiD0iTnRia61Xt6555gb4TPmXWx1FApYdEeum8wMT_nrHh82XxGclLvuSo0VCp_MGkWg4e4BPq5GHe9uX1aIx0iMEthaufZqMXEU"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "how much does a website cost in Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE8sgYErh2J7l0stUlYMBHXriRomCjwYoojQT7gxJjwMrWrs8fFKEZJ1IBqfBWdnzjMAkN82BY9pMiF3Mg1z3dNenYAaJe3Z7ONWhCQlO475YmwDvVMM0Tcck_3zCyNVMRhCs97_soVDD6B0Ujbst_l",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGixWRIvXqYjj5sd3FH_iayoUSkvSAGWGXrjuKIV1eqdFJSKLUtDpJW-4HBpgxmKQEO5wK0vxzDuqBfSRTaAq5ZJsZv7SNWYt9QmtDCL4s6mIj0-R2mVgFsfjAM9JPhKvPPG_abNeDiWxOqPBEaKkouhsHDLvdMN2vjPAYw",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGElQVyL4wnEDia0oUY3ZPE8vKPBdFI7w6HyjAlokHA9AfCWLzYj4hM41cXSe4XZkfmmuanofsn8clsmjpZz9n8HNjMEgVcFF3oFol39RLuwExOYGf6HOu55RiRPdai4w==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH0lTi2nnnh1O_jhdT2kEVS-0apTn1aZn8X6XPWzB-I98rsDhLRfMabncYmihgjf02CsaIeXXf0Sps-P4lz0EI6eX91l9iRZjPeepC323-IW_tekMgtDqvj3ylYohSBQjPxiA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFKsmlSHuvzX5uWuCc4PJWbVkbdAlpEf1Oi9Heni_ITtrdorHBl7YrZHZChJ8ph7dq6WUJix7bFd82jjeM7rLmdGO91iBUY75t5LfL0z3pDzUdzrGdhVNw2ZFhaDsZaqTErOQ3yce_NQb8GN7ImXw8TxpRFdWTr8AzNCDQ=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFx38QursNVgcnwUt60QFcCYAYr5nFFf8xA_jbJbGNle6X7ckkrzIyTXkySGfXcBMb5o2Yd4bow_n6up5T0jERPhCeQMm-caqw0CWVwq2ROqtZlYtLx83WzVRveLEa4gUOIKsNwPdNXQ8m_8uuIEt8b94Ar9f0z7bmp9M_Zo4aV4EsrAEkqJn6F2hiodlzbiIeV2T9GcGc=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHIqQyDP0D6UakmG1GepJxRCe_pwEPHHIKoU-ApBXC7kIfxP-0Sq09XWhmGdj2sD_xMGAWoSb0HTBF-TvPJpHeHQbpGJ9HN0gZPofHDfdr9JhGPaqFeCL-Bml5fohTWbJokSp5UZUVtSz2u68cXrUkuJCvXgQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE1NSTIpoqs3ln3I69OYFnPYYoIDH6HpMUShQBIpnCAwoyyyakX8qbXs3AmZ5Elkp9UT2aSglWemF4Pc6WygrIA6PRQKNESvFLsZwzoQT-j6GnYMD3Q3LAcWrSpaGcL-g8kCqgpTeQOg6jDXlHmm6LDWmOoZ93OmDf_oKTxebdgpSgUoyezNCk=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHAYAjJaXDRUdYupO6D1atlqIghcjsmczdE9VayZtCOgWvbzcbShA1ZOBeGqYdRVnYHWlVI49WyY88OZ5Dx3ZFmAnmwSySm21OnFTF-TmN7eRjXtpYsNN2I55BoqZMMgzu__FtqBx7bWpJpQC1Bd-8KYBuNo2mSiBKWDBaQJmw79A==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEAVffHk2wOzV_vdTvCFrcZvEXWmdfhw5Bdk3x0-AgVs05X6LEOBhs_62r7NFrNNuAhK_DUhwPajUJAbS078uQ7B5bEM2svGXYOeFoueP1wq6b5nUKOllU0RE84Iw=="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "AI chatbot for small business in Houston",
+      "repeticion": 1,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHvNX4G70ga-9P8PVpWlm-M7hWX1hYXXqKOd97Z69NUUKz-pCk0v56498_IZwh9CDidDNI0SyG2YEVPDHC2wCSILos6ebANGrOlXTHJMhfN1WpsOxslsGvbZR7Ly0vCKm0Z3K-vdGfWjqA=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEibJVJKenImk3zT_bfu8PXr4tEMMX39KVVfj2O5o2hUrK_y6hvV0I88iVX-bPce-jlmnZ3zUcwcww0LUkEXb1U8dmVNr7Q2034JUzRBuwL04-XvusgvYcPGyjISrZcZ8tJe6Ag",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH3rd_vZDTPW7_nXvGgoN5CKWd2n92Bi7vZKO8XGC_FpljDrvyL_kBJ7SFqLOv78KCGu0oL2pH8uvYzdBSSiIcqyIOgfNH0oAojAUbkXsnscFLI7edDMKaKCYHm06CMpORNLfTORNOD2VHQ6QcElhU1z1UD",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFyAEldYDWyN85mx7EK-hyGREJbkUQA5JL8QvMIcztoJi9U15RiibUmRHcKnzbx1ZvbLJizHnpKWLblGogzCPPxArL8ILDvwfVsFWGpQnXeImgluSUWfP5sOsNEyhSSC2P__GEcKN9DSSSiPjU=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH3rd_vZDTPW7_nXvGgoN5CKWd2n92Bi7vZKO8XGC_FpljDrvyL_kBJ7SFqLOv78KCGu0oL2pH8uvYzdBSSiIcqyIOgfNH0oAojAUbkXsnscFLI7edDMKaKCYHm06CMpORNLfTORNOD2VHQ6QcElhU1z1UD",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGfMq0cRZ61AFsUHIK3VnVcUyeR_Bnfsnz6IMWXQuLyVaOcS2HwFkeb3SxE6Mo_m1c9uwVaoP1Js5CJ-YBn4V__iBr6nSCQn7KHk67ukm7MXuysXiD0Pfhju3fDYxm0pvvlNKGkD8UvJ0ZsKQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQECS8J_pzaT49kDdj2RMaXpzqMLAtRu8Xrsw7naKQ1X3Z4cQQ4jqXaT7bPtmLQchPwQ1KIa-VgmkUI78nLopmYR_JYqlf7_42v0XhfWKAYms3EkO5B-qTcNtw==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFi4QMKShqprO-0kRu2oYlqVjzRlnI0qpaXy5K1YtHB8SkLimpF7EQJtTVoBRJtZr13IWt2EPQxqth1PRIbqIkFo3q1duqq1rSQTxIs-vbMnAjcajoonqqtoxk9RGykc_2-SwCtjTshW_Eu3VsTTpUz"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "AI chatbot for small business in Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH9rzEY7QK1uCR3u-yHCH0PK1YP5u1IoVCVLT8bxLsn9HVufEC6myT0Y99ZJVuq0DwPbMUU8b_MZWIr6yQwsdu95mpJ4zAYQ2xb4LGrNOIQO4hdboTDhx_PHYwIN2ipoRzCrFDt__C96AcTRelosU8=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfHytnT0jwAmhKMKxP-RzMZe1bpBHPOVbYq7cqJkmsNO-4OjfJMqXkWoub9N_WKJ_dLxcN1XqgEyAAyakdG2KnJUvyTi4kUSabKK76oCmR3FX5hH81OAy9Pke9wUWNYA-MtGZltIqLHA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE99dIbInsZktn0Q4xNL5kA1liPR03v7MuCnF_YO4IkCt6JaBRZTANsSALcL-ToFgc7IYfXXqkIDu9Gur7DQUnvu1SJv9Ao6QNh7C5PTBBSyS0zCzak1RajGp7Ec7aoP_f67S4=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHOtm4yk821X6IdegbAlfBqYTgh3P16neSnVZgcl_-DS10udJlm99aTaf5bKIPM3unQm7NdtfnEWflRiNRX3hDK3Sw1dyBsPC1k13yuyiJ4sOG-kSHtp07UPK37Nrs1ZmeWQBbyfwAHC1VYce9zvxTWIk6fZmlrS_s1eYRk959BFKtpHGW1lA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHhx-6wfDFkT94iWZJ9ce3VZtyPYVoSIjUnmKk4tsevytup3tXvikxVSTkatkZEYRlWwp8DqCdNBKufBo3WLISjd7dekFNhfARs-QjKYS41JWDKNqvhDwcOTkKsl8HJHhWm3Wn58IuIR9Ci",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHMasD998Me1T2LtvmuZ9E0dfveaZkQv4j3aiOElwpF-XBzj44IDH8CTNBGvIENxce9Q_ebvXuvufBj_W9eytFA1ULNRWwRBodzucH17QoHyqfasi4LyzyDN71vGIwy-wBLI-O8h4YZ6SSJN1T4MhxHfRXlxaa-32k=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFJ5BjF4QvVEshol_AD6O_sM8TeDJdXfL6BAoV9lL8mOxYNIDkX9iX1f1juDH4o8HXHX7AvIvtRrcsF_LtdFkkBdJA23a3MfaRDqvKNFQeEl8dJcDdBBcLq0A8EYJWblvvW5-_IEy1oNuZogvq9K8kumMw=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0QwuodfphNGRawgJDaokDCj2bPQC8BTQYGHlHhb89-eciEMfUvtDz9twoQuro5Y5fj6DwGSXXdRMEIBuhpr4iZ5kt11IOF8jxmaL69X8W3nRA52G-LfQdkN0sKRLjBkfglr3aSo_kHMvZeQ==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGk07LkzMu02JfhrcbHLzXFrLPy_GO3WBazKEYuUlOHclWcwV7sFb529klDKZRcbt0zme5t7y_WJXmf-xuzb1hMLLflBqmcijHBDrSC-44y8YHx7pRNy1E8mBw9_ZWuKXw_z2veF9FdA5AOnUQnVZI="
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "AI chatbot for small business in Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGEy17yGYXP5uogiIlx7TLIyxZ96NaSjZqBRJzKUuINS_abBuCFTiVlsn0lXNNO7nCsaNdKCeSdyD82ExQCeKKQYi8TCx79wMhvZJED_HBHTH7AkpA-WNZvR7LqPZrsnsi_",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFrI8dmryK40tNytSLaKkgM9oAUhXKuipC0_g2o1FgAxf6MYW_ehh4ji4vK4d85b4PnzaGRDy2bJxjx6f-NEyfzvcfuC3JRKBkFudcDH_7i15UjYgF4LFfHyCU8z4lMxnYmGlO88Vj_PCDBhTu3FoITnxnH",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFoAql9upOidNVj6tUkkK06_CK1ItrpgmbIsBGgHD7ymLbZG5rskg4tpkzMVEg1HfrNskTeNymtN0FJOLgUKwN2jYI31H3GaF5dts5-74Fxzq_q_hbLPXmWZrM3RAOhYNzbGNsK7PkaELcRePHj8nStjHWXw5iRaJa57W6ySYe5__rKsWYIXXw=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEjYSusWuGNV_8pEiQs8Aavdi6VutIyooJHMw0hO0xPlT0aFaJHS7fpW5RPkG5AsDe829XCiTZLqyjMlfwtpQGxwtElKaU3KtQE82b-20CgSyfmZUs6g4r9f3Dp7Vvj3gqVmS_k",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF_gF02Ka5Y_GSNLjYbbgSM-AtMZouxUQcg6BK_gCIvG-iZxSdVX0suC5cO40curzgcmmLdeoW8gIrW8uJTYlA_voq_f0XmeyKVK_f6qWVeMQquH82Wymq3r3w=",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEfxACVIm6MXjoslU5BVn6erzAkJvyO2KpCi6AH6WFQKrs-1yrlPDsL0aWEyF6j_ri6BdafK67dHPwjacFyoBjFOBrDN2NX9mkdfdqJ64-c8KpjQMy1LI3pz0z2q2Y9XipknRFnbcRrRlVltA==",
+        "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEfxACVIm6MXjoslU5BVn6erzAkJvyO2KpCi6AH6WFQKrs-1yrlPDsL0aWEyF6j_ri6BdafK67dHPwjacFyoBjFOBrDN2NX9mkdfdqJ64-c8KpjQMy1LI3pz0z2q2Y9XipknRFnbcRrRlVltA=="
+      ]
+    }
+  ]
+}

@@ -147,5 +147,13 @@
     ]
   },
   "envArchivo": ".env.local",
-  "carpetaDatos": "data/seo"
+  "carpetaDatos": "data/seo",
+  "contacto": {
+    "paginas": [
+      "/",
+      "/en/"
+    ],
+    "endpoint": "https://marcyanstudio.com/api/contact"
+  },
+  "dueno": null
 }

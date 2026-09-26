@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-09-25",
+  "fecha": "2026-09-26",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 78,
+  "indexadas": 79,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 78,
-    "Alternate page with proper canonical tag": 6
+    "Submitted and indexed": 79,
+    "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
     "home·en": {
@@ -61,7 +61,7 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 4
+      "indexadas": 5
     },
     "landings·es": {
       "total": 18,
@@ -95,7 +95,7 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-09-25",
+        "fecha": "2026-09-26",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -105,7 +105,15 @@
     ],
     "info": [
       {
-        "fecha": "2026-09-25",
+        "fecha": "2026-09-26",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/houston/sugar-land"
+      },
+      {
+        "fecha": "2026-09-26",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",

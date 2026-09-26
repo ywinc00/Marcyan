@@ -20,6 +20,12 @@
         "rating": 4.9,
         "total": 117,
         "nombre": "True Digital Marketing Inc"
+      },
+      {
+        "fecha": "2026-09-26",
+        "rating": 4.9,
+        "total": 117,
+        "nombre": "True Digital Marketing Inc"
       }
     ],
     "ChIJTXnIqNfDQIYRT3WrAPp3sIs": [
@@ -28,11 +34,23 @@
         "rating": 5,
         "total": 103,
         "nombre": "Webnhubs"
+      },
+      {
+        "fecha": "2026-09-26",
+        "rating": 5,
+        "total": 103,
+        "nombre": "Webnhubs"
       }
     ],
     "ChIJCwAq4-jDQIYRlk-bdpZOAvs": [
       {
         "fecha": "2026-09-25",
+        "rating": 5,
+        "total": 95,
+        "nombre": "Artisticore Graphic Design Agency"
+      },
+      {
+        "fecha": "2026-09-26",
         "rating": 5,
         "total": 95,
         "nombre": "Artisticore Graphic Design Agency"

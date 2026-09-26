@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-09-26",
+  "roto": [],
+  "externosRotos": [],
+  "huerfanas": [],
+  "aRedireccion": [
+    {
+      "destino": "https://marcyanstudio.com/",
+      "redirigeA": "https://marcyanstudio.com/es",
+      "status": 308,
+      "paginasQueEnlazan": 4,
+      "ejemplo": "https://marcyanstudio.com/en/privacy"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "ChIJbzQE8VmzR0YR6VIeU4zic64": {
+    "fecha": "2026-09-26",
+    "negocio": "Marcyan Studio",
+    "foto": {
+      "nombre": "Marcyan Studio",
+      "categoria": "Servicios",
+      "tipos": "establishment,service",
+      "telefono": "(713) 823-9144",
+      "web": "https://marcyanstudio.com/es/houston/diseno-web",
+      "direccion": null,
+      "horario": "lunes: 9:00–18:00 | martes: 9:00–18:00 | miércoles: 9:00–18:00 | jueves: 9:00–18:00 | viernes: 9:00–18:00 | sábado: Cerrado | domingo: Cerrado",
+      "estado": "OPERATIONAL",
+      "soloZona": true
+    }
+  },
+  "ChIJlRelt6jCQIYRy-WoirFsObc": {
+    "fecha": "2026-09-26",
+    "negocio": "True Digital Marketing",
+    "foto": {
+      "nombre": "True Digital Marketing Inc",
+      "categoria": "Servicios",
+      "tipos": "consultant,establishment,marketing_consultant,point_of_interest,service",
+      "telefono": "(832) 934-4436",
+      "web": "http://www.truedigitalmktg.com",
+      "direccion": "10333 Harwin Dr. Ste.#320, Houston, TX 77036, EE. UU.",
+      "horario": "lunes: 8:00–18:00 | martes: 8:00–18:00 | miércoles: 8:00–18:00 | jueves: 8:00–18:00 | viernes: 8:00–18:00 | sábado: 8:00–12:00 | domingo: Cerrado",
+      "estado": "OPERATIONAL",
+      "soloZona": false
+    }
+  },
+  "ChIJTXnIqNfDQIYRT3WrAPp3sIs": {
+    "fecha": "2026-09-26",
+    "negocio": "Webnhubs",
+    "foto": {
+      "nombre": "Webnhubs",
+      "categoria": "Servicios",
+      "tipos": "establishment,point_of_interest,service",
+      "telefono": "(832) 384-8844",
+      "web": "https://webnhubs.com",
+      "direccion": "10333 Richmond Ave Ste 1000, Houston, TX 77042, EE. UU.",
+      "horario": "lunes: 9:00–17:00 | martes: 9:00–17:00 | miércoles: 9:00–17:00 | jueves: 9:00–17:00 | viernes: 9:00–17:00 | sábado: Cerrado | domingo: Cerrado",
+      "estado": "OPERATIONAL",
+      "soloZona": false
+    }
+  },
+  "ChIJCwAq4-jDQIYRlk-bdpZOAvs": {
+    "fecha": "2026-09-26",
+    "negocio": "Artisticore",
+    "foto": {
+      "nombre": "Artisticore Graphic Design Agency",
+      "categoria": "Servicios",
+      "tipos": "establishment,point_of_interest,service",
+      "telefono": "(832) 369-6822",
+      "web": "https://www.artisticore.com/?utm_source=google-maps&utm_medium=organic&utm_campaign=gbp-click-tracking&utm_id=gbp",
+      "direccion": "10333 Richmond Ave Ste 1000, Houston, TX 77042, EE. UU.",
+      "horario": "lunes: 9:00–18:00 | martes: 9:00–18:00 | miércoles: 9:00–18:00 | jueves: 9:00–18:00 | viernes: 9:00–18:00 | sábado: Cerrado | domingo: Cerrado",
+      "estado": "OPERATIONAL",
+      "soloZona": false
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-09-26",
+  "fecha": "2026-09-27",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
@@ -76,9 +76,64 @@
       "indexadas": 4
     }
   },
-  "sinRastreoReciente": 37,
+  "sinRastreoReciente": 38,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 49,
+  "certificadoDias": 47,
+  "medicion": {
+    "idsEnSitio": {
+      "G-4GJPX4PTRV": 84
+    },
+    "idsGa4": [
+      "G-4GJPX4PTRV"
+    ],
+    "base": [
+      "G-4GJPX4PTRV"
+    ],
+    "paginasSinEtiqueta": 0
+  },
+  "formulario": {
+    "paginas": [
+      {
+        "pagina": "/",
+        "status": 200,
+        "formularios": 2
+      },
+      {
+        "pagina": "/en/",
+        "status": 200,
+        "formularios": 2
+      }
+    ],
+    "endpoint": {
+      "url": "https://marcyanstudio.com/api/contact",
+      "status": 405,
+      "sano": true
+    }
+  },
+  "pulso": {
+    "evento": "generate_lead",
+    "sesionesUltimos3Dias": 5,
+    "sesionesDiaHabitual": 4.1,
+    "contactosSemanaHabitual": null,
+    "diasSinContactos": 38,
+    "probabilidadAzar": null
+  },
+  "lectoresIa": {
+    "bloqueadosPorRobots": {},
+    "respuesta": {
+      "navegador": 200,
+      "Googlebot": 200,
+      "Bingbot": 200,
+      "OAI-SearchBot": 200,
+      "ChatGPT-User": 200,
+      "PerplexityBot": 200,
+      "Perplexity-User": 200,
+      "Claude-SearchBot": 200,
+      "Claude-User": 200,
+      "Applebot": 200
+    },
+    "entrenamientoBloqueado": []
+  },
   "google": {
     "enCurso": [
       {
@@ -95,25 +150,17 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-09-26",
+        "fecha": "2026-09-27",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "37 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "38 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-09-26",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/houston/sugar-land"
-      },
-      {
-        "fecha": "2026-09-26",
+        "fecha": "2026-09-27",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",

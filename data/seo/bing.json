@@ -1,0 +1,28 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-09-28",
+  "estado": "ok",
+  "siteUrl": "https://marcyanstudio.com/",
+  "busquedas": {
+    "ultimos28": {
+      "clics": 0,
+      "impresiones": 0
+    },
+    "anteriores28": {
+      "clics": 0,
+      "impresiones": 0
+    }
+  },
+  "consultasSinMarca": [],
+  "consultasMarca": [],
+  "problemasRastreo": {
+    "total": 0,
+    "errores": []
+  },
+  "enlacesEntrantes": {
+    "paginasConEnlaces": 0,
+    "total": 0,
+    "top": []
+  },
+  "iaMicrosoft": "Informe \"AI Performance\" solo en el navegador: https://www.bing.com/webmasters/aiperformance?siteUrl=https%3A%2F%2Fmarcyanstudio.com%2F"
+}

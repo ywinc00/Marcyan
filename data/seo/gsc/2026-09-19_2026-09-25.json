@@ -1,0 +1,195 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-09-19",
+    "hasta": "2026-09-25"
+  },
+  "anterior": {
+    "desde": "2026-09-12",
+    "hasta": "2026-09-18"
+  },
+  "anioPasado": {
+    "desde": "2025-09-20",
+    "hasta": "2025-09-26"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 2,
+      "impresiones": 119,
+      "ctr": 1.68,
+      "posicion": 23.3
+    },
+    "anterior": {
+      "clicks": 1,
+      "impresiones": 197,
+      "ctr": 0.51,
+      "posicion": 25.4
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 1,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 1,
+        "ctr": 0,
+        "posicion": 7
+      },
+      "sinMarca": {
+        "clicks": 1,
+        "impresiones": 57,
+        "ctr": 1.75,
+        "posicion": 36.4
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 107,
+        "ctr": 0,
+        "posicion": 37.2
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "landings",
+      "clicks": 1,
+      "impresiones": 66,
+      "ctr": 1.52,
+      "posicion": 25.8,
+      "dClicks": 1,
+      "dImpresiones": -49,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "servicios",
+      "clicks": 1,
+      "impresiones": 1,
+      "ctr": 100,
+      "posicion": 1,
+      "dClicks": 1,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 32,
+      "ctr": 0,
+      "posicion": 22.5,
+      "dClicks": -1,
+      "dImpresiones": -11,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 18,
+      "ctr": 0,
+      "posicion": 30.4,
+      "dClicks": 0,
+      "dImpresiones": -7,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 7,
+      "ctr": 0,
+      "posicion": 6.7,
+      "dClicks": 0,
+      "dImpresiones": -15,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "home",
+      "clicks": 0,
+      "impresiones": 1,
+      "ctr": 0,
+      "posicion": 7,
+      "dClicks": 0,
+      "dImpresiones": 0,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 1,
+      "ctr": 0,
+      "posicion": 9,
+      "dClicks": 0,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "es",
+      "clicks": 1,
+      "impresiones": 87,
+      "ctr": 1.15,
+      "posicion": 26.1,
+      "dClicks": 0,
+      "dImpresiones": -44,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "en",
+      "clicks": 1,
+      "impresiones": 39,
+      "ctr": 2.56,
+      "posicion": 19.6,
+      "dClicks": 1,
+      "dImpresiones": -38,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/es/miami/diseno-web",
+      "clicks": 1,
+      "impresiones": 35,
+      "ctr": 2.86,
+      "posicion": 30.9,
+      "dClicks": 1,
+      "dImpresiones": -23,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/en/ai-for-small-business",
+      "clicks": 1,
+      "impresiones": 1,
+      "ctr": 100,
+      "posicion": 1,
+      "dClicks": 1,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [
+    {
+      "clave": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "clicks": 0,
+      "impresiones": 15,
+      "ctr": 0,
+      "posicion": 18,
+      "dClicks": -1,
+      "dImpresiones": -9,
+      "clicksAnioPasado": null
+    }
+  ],
+  "candidatasRefresco": [],
+  "demandaSinPagina": [],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

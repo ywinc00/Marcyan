@@ -1,15 +1,15 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-09-29",
+  "fecha": "2026-09-30",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 77,
+  "indexadas": 76,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 77,
-    "Alternate page with proper canonical tag": 5,
-    "Crawled - currently not indexed": 2
+    "Submitted and indexed": 76,
+    "Crawled - currently not indexed": 3,
+    "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
     "home·en": {
@@ -38,7 +38,7 @@
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 18
+      "indexadas": 17
     },
     "precios·en": {
       "total": 4,
@@ -77,9 +77,9 @@
       "indexadas": 4
     }
   },
-  "sinRastreoReciente": 39,
+  "sinRastreoReciente": 49,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 46,
+  "certificadoDias": 44,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -116,7 +116,7 @@
     "sesionesUltimos3Dias": 3,
     "sesionesDiaHabitual": 4.2,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 40,
+    "diasSinContactos": 41,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,35 +150,27 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-09-29",
+        "fecha": "2026-09-30",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
-      },
-      {
-        "fecha": "2026-09-29",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/miami/diseno-web"
+        "url": "https://marcyanstudio.com/en/miami/conversational-ai"
       }
     ],
     "media": [
       {
-        "fecha": "2026-09-29",
+        "fecha": "2026-09-30",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "39 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "49 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-09-29",
+        "fecha": "2026-09-30",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -189,20 +181,12 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-09-29",
+      "fecha": "2026-09-30",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/abogados-inmigracion"
-    },
-    {
-      "fecha": "2026-09-29",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/miami/diseno-web"
+      "url": "https://marcyanstudio.com/en/miami/conversational-ai"
     }
   ],
   "pedirIndexacion": [],

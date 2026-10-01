@@ -3,7 +3,8 @@
 Proyecto: Marcyan Web  ·  Página/Vista: hub de ciudad de Houston, rediseño completo
 Modo: **REDISEÑO / LANDING-CON-IDENTIDAD**
 Estado: **PROPUESTO** — tres direcciones a elegir. Fecha: 2026-10-01.
-Lienzo de decisión (artifact): "Tres caminos para Houston".
+Lienzo de decisión (artifact): "Houston, tres bocetos" (segunda vuelta). La primera
+tanda, "Tres caminos para Houston", fue rechazada entera por el dueño.
 
 > Punto de partida: **lo que está vivo en producción**. El hero "El Domo" queda descartado
 > por el dueño (2026-10-01): obligaba a cambiar la barra de navegación principal y la
@@ -70,51 +71,65 @@ enseña un caso de cuatro.
 
 ## Referencias miradas (en imagen, no leídas)
 
-Regla dura de `refero-design`: una referencia que no se ha mirado no cuenta. El MCP de Refero
-no conectó en esta sesión (error de red del servidor), así que se miraron a mano en Chrome real.
+Regla dura de `refero-design`: una referencia que no se ha mirado no cuenta (E-28).
 
-| Referencia | Fuera del nicho | Qué se toma | Qué NO se toma |
+**Nota de herramienta (2026-10-01).** El MCP de Refero no conecta en esta sesión: el servidor
+responde con una codificación HTTP inválida y el cliente la rechaza (`InvalidHTTPResponse`
+sobre `api.refero.design`). Comprobado a mano: `refero.design` responde 200 y el endpoint del
+MCP con la clave del dueño también devuelve 200, pero sin ella contesta con un cuerpo troceado
+mal formado, que es lo que rompe la conexión. No es la clave ni la suscripción. La biblioteca
+se consultó entonces **por la web de Refero**, que es la misma fuente: se buscaron estilos con
+tres consultas (tema, estética y mecanismo), se descargaron las vistas previas, se montaron en
+una hoja de contacto y se miraron una a una.
+
+Consultas usadas en `styles.refero.design`: `local service`, `dark gold`, `pricing services`.
+
+| Estilo en Refero | id | Qué se toma | Qué NO se toma |
 |---|---|---|---|
-| Linear (portada) | Sí | Que el producto entre en la primera pantalla cortado por el borde inferior; el cambio de superficie que separa capítulos; la declaración a dos tonos de texto | Su paleta, su tipografía, su nav |
-| Ramp (portada) | Sí | La franja de contadores en mono con etiqueta y procedencia; la rejilla donde conviven marcas y un caso real con su cifra | Su fondo claro, su acento amarillo |
-| Basecamp (precios) | Sí | La lista maestro-detalle con lo que incluye **y lo que no**; la honestidad como argumento visual | Su trazo de rotulador, su azul |
-| Land-book, resultados "agency dark" | No | Que las landings de agencia que funcionan tienen el primer viewport lleno de materia | Nada formal: es un muestrario |
-| `/es/houston` en producción | No | El catálogo con precio (lo mejor que tiene la página) y el riel de dato bajo el hero | El vacío entre bloques |
+| **Atoms** | `4433dfe7-315a-4459-bfd7-f59ccdc09bad` | Un objeto construido en el centro sobre negro, el texto respirando alrededor, el oro como única luz | Su silencio de marca de producto: aquí cada nodo lleva nombre y precio |
+| **Studio Oker** | `e045b276-ae8d-442e-98de-fa8650e284de` | La rejilla desigual donde cada celda enseña algo distinto: foto, cifra, muestra, dato | Su rojo y su blanco de galería |
+| **Mollie** | `73ec75d6-edec-4ed2-bc09-debb261b6ee0` | Píldoras de estado flotando sobre material real | Su fondo claro y su foto de banco |
+| **Retool** | `c45b115b-dcb5-446d-8952-85aef740f8e4` | Que la materia entre justo debajo del titular, cortada por el borde inferior | Sus capturas de producto propio |
 
----
+También miradas y descartadas para este encargo, con su id por si sirven más adelante:
+Worth Agency `906ef782-4be7-45ee-9800-0514d46e7518` (tipografía gigante sobre rosa, choca con
+la paleta), Caserne `c2702938-b670-414c-ba47-94618212085e` (foto de rótulo real, no tenemos ese
+material), Warp `79714b4e-c89a-44b3-8da4-931daa9a466f` y Runway `874aaea0-c718-454e-8a58-f3beed1284ec`
+(misma composición que Retool, sin aportar nada nuevo), Lama Lama `8e26bf8a-44b8-4fe1-9b4b-188dd5827c0f`.
 
-## Las tres direcciones
+**Qué falló en la primera tanda.** Salió de mirar cuatro sitios muy conocidos de la biblioteca
+local y las tres direcciones acabaron siendo variantes de la misma composición: texto a la
+izquierda y algo a la derecha. El dueño las rechazó en bloque. La diferencia ahora no es la
+herramienta, es que cada dirección parte de una composición distinta y queda atada a la
+referencia que la justifica.
 
-Se presentan en el lienzo con maqueta de escritorio y de móvil. El dueño elige una, o una
-mezcla. Las piezas van nombradas por su código del `design-catalog`.
+## Las tres direcciones (segunda vuelta, con referencia al lado)
 
-### A · Consola Houston
-La página se comporta como el panel de control de un negocio de Houston: donde hay hueco, hay
-dato. Primera pantalla partida, con el diagnóstico funcionando sobre un caso real a la derecha,
-y debajo una franja de cifras defendibles.
-**Piezas:** A-01 hero partido · C-06 cifras con procedencia · G-10 profundidad por capas ·
-B-01 lista tabla (se conserva del actual) · D-07 objeciones bajo el precio.
-**Gana:** mata el vacío y demuestra producto en los primeros 800 px.
-**Arriesga:** enfría si se carga de datos; el panel exige un caso real detrás, siempre.
+Se presentan en el lienzo "Houston, tres bocetos", cada una junto a la vista previa de Refero
+que la inspira. El dueño elige una, o una mezcla.
 
-### B · Expediente Houston
-No se abre vendiendo, se abre sabiendo. La página es un informe corto sobre cómo se compra en
-Houston, con capítulos numerados en un raíl, y cada servicio aparece como respuesta al hallazgo
-que acaba de leerse, con su precio al lado.
-**Piezas:** A-06 apertura editorial · E-05 índice lateral pegajoso · C-06 cifras ·
-B-12 prueba incrustada en el servicio · D-01 ancla "desde $X".
-**Gana:** posición de autoridad; el precio llega después del motivo, lo que sostiene cifras altas.
-**Arriesga:** pide leer; en móvil se alarga y el que viene a por precio baja más.
+### 1 · La constelación  ← Atoms `4433dfe7`
+Un solo objeto en el centro, construido por nosotros: los siete servicios como nodos unidos al
+núcleo de Houston, cada uno con su nombre y su precio. El texto respira alrededor. Al bajar, la
+constelación se despliega en el catálogo con precio que ya existe.
+**Piezas:** A-07 fondo atmosférico · G-09 motivo propio · B-01 lista tabla · D-01 ancla desde $X.
+**Gana:** un gesto propio que nadie puede copiar, con los precios dentro del gesto.
+**Arriesga:** si los nodos no se tocan, es decoración; cada uno tiene que llevar a su página.
 
-### C · La prueba primero
-Lo primero que se ve es el trabajo: cuatro sitios reales, tres de ellos de negocios de Houston,
-en pantalla. Servicios y precios cuelgan de lo que acaba de verse.
-**Piezas:** A-08 mosaico de trabajo real · G-07 maqueta de dispositivo mínima ·
-C-01 casos con resultado ancla · C-10 andamio de confianza.
-**Gana:** credibilidad inmediata, nada que inventar, y rescata el portafolio.
-**Arriesga:** vive de las capturas; con cuatro aguanta, crecer exige fotografiar cada entrega.
+### 2 · El mosaico  ← Studio Oker `e045b276`
+La primera pantalla es el negocio entero en celdas desiguales: titular, una web nuestra de
+verdad, el precio más bajo, el teléfono con su horario, las zonas y el dato del diagnóstico.
+**Piezas:** B-03 bento con celda dominante · C-01 caso con resultado · D-01 · G-10 capas.
+**Gana:** se entiende todo sin bajar, y mata el vacío de la página actual de una vez.
+**Arriesga:** si dos celdas enseñan lo mismo, es ruido. Cada una tiene un trabajo distinto.
 
----
+### 3 · Funcionando  ← Mollie `73ec75d6` + Retool `c45b115b`
+No se enseña el servicio, se enseña lo que pasa cuando está puesto: una web nuestra ocupando el
+ancho y, encima, píldoras con lo que hizo esta semana (contestó a las 21:40, agendó una cita,
+subió al tercer puesto del mapa).
+**Piezas:** A-05 producto vivo · G-04 foto con velo · G-07 maqueta mínima · C-06 cifras con procedencia.
+**Gana:** es el argumento más difícil de discutir, porque es resultado y no promesa.
+**Arriesga:** cada píldora tiene que ser verdad comprobable; si no, es humo (E-10).
 
 ## 2 · Jerarquía (común a las tres)
 

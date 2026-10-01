@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-09-30",
+  "fecha": "2026-10-01",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
@@ -77,9 +77,9 @@
       "indexadas": 4
     }
   },
-  "sinRastreoReciente": 49,
+  "sinRastreoReciente": 51,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 44,
+  "certificadoDias": 43,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 3,
+    "sesionesUltimos3Dias": 7,
     "sesionesDiaHabitual": 4.2,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 41,
+    "diasSinContactos": 42,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -148,29 +148,20 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [
-      {
-        "fecha": "2026-09-30",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/miami/conversational-ai"
-      }
-    ],
+    "alta": [],
     "media": [
       {
-        "fecha": "2026-09-30",
+        "fecha": "2026-10-01",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "49 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "51 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-09-30",
+        "fecha": "2026-10-01",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -179,16 +170,7 @@
       }
     ]
   },
-  "alertasNuevas": [
-    {
-      "fecha": "2026-09-30",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/miami/conversational-ai"
-    }
-  ],
+  "alertasNuevas": [],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

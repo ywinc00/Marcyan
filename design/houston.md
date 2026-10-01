@@ -3,8 +3,9 @@
 Proyecto: Marcyan Web  ·  Página/Vista: hub de ciudad de Houston, rediseño completo
 Modo: **REDISEÑO / LANDING-CON-IDENTIDAD**
 Estado: **PROPUESTO** — tres direcciones a elegir. Fecha: 2026-10-01.
-Lienzo de decisión (artifact): "Houston, tres bocetos" (segunda vuelta). La primera
-tanda, "Tres caminos para Houston", fue rechazada entera por el dueño.
+Lienzo de decisión (artifact): "Houston desde Refero" (tercera vuelta, con el MCP de Refero
+ya conectado). Las dos tandas anteriores, "Tres caminos para Houston" y "Houston, tres
+bocetos", fueron rechazadas enteras por el dueño.
 
 > Punto de partida: **lo que está vivo en producción**. El hero "El Domo" queda descartado
 > por el dueño (2026-10-01): obligaba a cambiar la barra de navegación principal y la
@@ -69,67 +70,65 @@ enseña un caso de cuatro.
 
 ---
 
-## Referencias miradas (en imagen, no leídas)
+## Referencias miradas (en imagen, no leídas) — con el MCP de Refero conectado
 
 Regla dura de `refero-design`: una referencia que no se ha mirado no cuenta (E-28).
 
-**Nota de herramienta (2026-10-01).** El MCP de Refero no conecta en esta sesión: el servidor
-responde con una codificación HTTP inválida y el cliente la rechaza (`InvalidHTTPResponse`
-sobre `api.refero.design`). Comprobado a mano: `refero.design` responde 200 y el endpoint del
-MCP con la clave del dueño también devuelve 200, pero sin ella contesta con un cuerpo troceado
-mal formado, que es lo que rompe la conexión. No es la clave ni la suscripción. La biblioteca
-se consultó entonces **por la web de Refero**, que es la misma fuente: se buscaron estilos con
-tres consultas (tema, estética y mecanismo), se descargaron las vistas previas, se montaron en
-una hoja de contacto y se miraron una a una.
+**Historial de la herramienta.** En las dos primeras vueltas el MCP de Refero no conectaba
+(el servidor devolvía una respuesta HTTP mal formada). El dueño lo resolvió el 2026-10-01 y
+desde entonces `refero_search_styles` y `refero_get_style` responden. Las direcciones de abajo
+salen de ahí.
 
-Consultas usadas en `styles.refero.design`: `local service`, `dark gold`, `pricing services`.
+**Método seguido:** tres consultas (tema, estética, mecanismo), nueve vistas previas
+descargadas y miradas en una hoja de contacto, tres estilos elegidos y leídos completos con
+`refero_get_style`.
 
-| Estilo en Refero | id | Qué se toma | Qué NO se toma |
+Consultas: `bilingual local agency city landing page, services with public prices, phone-first
+conversion` · `dark near-black page with warm gold accent, atmospheric space mood, premium
+restrained` · `service catalog page with visible prices per row and real client work as proof`.
+
+| Estilo | id | Qué se toma | Qué NO se toma |
 |---|---|---|---|
-| **Atoms** | `4433dfe7-315a-4459-bfd7-f59ccdc09bad` | Un objeto construido en el centro sobre negro, el texto respirando alrededor, el oro como única luz | Su silencio de marca de producto: aquí cada nodo lleva nombre y precio |
-| **Studio Oker** | `e045b276-ae8d-442e-98de-fa8650e284de` | La rejilla desigual donde cada celda enseña algo distinto: foto, cifra, muestra, dato | Su rojo y su blanco de galería |
-| **Mollie** | `73ec75d6-edec-4ed2-bc09-debb261b6ee0` | Píldoras de estado flotando sobre material real | Su fondo claro y su foto de banco |
-| **Retool** | `c45b115b-dcb5-446d-8952-85aef740f8e4` | Que la materia entre justo debajo del titular, cortada por el borde inferior | Sus capturas de producto propio |
+| **Agence K72** | `6b6d1ab7-6f40-409d-bfeb-5c418af13c64` | Velo pesado sobre una escena a sangre, titular mandando encima, accesos como pastillas de contorno grueso sin relleno, superficies planas sin sombra | Su negro puro `#000`, su verde lima, su tipografía Lausanne y su decisión de no tener botón principal de color |
+| **Empower** | `14edc470-fa1c-47f9-9efa-d44194be4aec` | Fichas de trabajo flotando alrededor del titular, giradas un grado, con una etiqueta de valor pegada a cada una; tarjetas de 24px sin sombra | Su amarillo, su display condensado y sus retratos de banco |
+| **David Kirschberg** | `3ce811a6-5b93-4542-91d5-62b2f1379d24` | Cabecera corta en vez de hero alto, fila de fichas de 24px donde el color lo pone el trabajo, separación de sección compacta | Su renuncia al botón de acción y su Inter |
 
-También miradas y descartadas para este encargo, con su id por si sirven más adelante:
-Worth Agency `906ef782-4be7-45ee-9800-0514d46e7518` (tipografía gigante sobre rosa, choca con
-la paleta), Caserne `c2702938-b670-414c-ba47-94618212085e` (foto de rótulo real, no tenemos ese
-material), Warp `79714b4e-c89a-44b3-8da4-931daa9a466f` y Runway `874aaea0-c718-454e-8a58-f3beed1284ec`
-(misma composición que Retool, sin aportar nada nuevo), Lama Lama `8e26bf8a-44b8-4fe1-9b4b-188dd5827c0f`.
+Mirados y descartados, con su id por si sirven más adelante: Suno
+`9844e7bf-4bff-48e6-8efc-e45002ce5226` (el campo de entrada como protagonista, se guarda para
+el diagnóstico), OHZI `7524da9c-904a-458a-9d46-999772061d83`, Krea `3a63b3fa-dc79-4dc3-935e-3f8f4ab447a7`,
+Hyper Foundation `54511793-579d-4406-a389-4d83b7ade0f9`, Pipe `c00d3961-a100-4c22-91fe-75f6e488e579`,
+Drepute `aa138c1f-2b42-4b10-9a3d-bdb09c216c99`.
 
-**Qué falló en la primera tanda.** Salió de mirar cuatro sitios muy conocidos de la biblioteca
-local y las tres direcciones acabaron siendo variantes de la misma composición: texto a la
-izquierda y algo a la derecha. El dueño las rechazó en bloque. La diferencia ahora no es la
-herramienta, es que cada dirección parte de una composición distinta y queda atada a la
-referencia que la justifica.
+**Qué falló en las dos vueltas anteriores.** Sin Refero se miraron sitios muy conocidos y las
+direcciones acabaron siendo variantes de la misma composición. El dueño las rechazó en bloque
+las dos veces. La lección queda escrita: sin la biblioteca de referencia, no se entrega
+dirección visual; se avisa de que la herramienta no conecta y se para.
 
-## Las tres direcciones (segunda vuelta, con referencia al lado)
+## Las tres direcciones (tercera vuelta, desde Refero)
 
-Se presentan en el lienzo "Houston, tres bocetos", cada una junto a la vista previa de Refero
-que la inspira. El dueño elige una, o una mezcla.
+Lienzo "Houston desde Refero": cada boceto al lado del estilo del que sale.
 
-### 1 · La constelación  ← Atoms `4433dfe7`
-Un solo objeto en el centro, construido por nosotros: los siete servicios como nodos unidos al
-núcleo de Houston, cada uno con su nombre y su precio. El texto respira alrededor. Al bajar, la
-constelación se despliega en el catálogo con precio que ya existe.
-**Piezas:** A-07 fondo atmosférico · G-09 motivo propio · B-01 lista tabla · D-01 ancla desde $X.
-**Gana:** un gesto propio que nadie puede copiar, con los precios dentro del gesto.
-**Arriesga:** si los nodos no se tocan, es decoración; cada uno tiene que llevar a su página.
+### 1 · El escenario  ← Agence K72 `6b6d1ab7`
+Una escena a toda pantalla muy oscurecida y desenfocada (el trabajo de un cliente de Houston
+sirve de telón), el titular enorme encima, y abajo dos accesos en pastilla de contorno grueso.
+Cierra con la franja de cifras defendibles.
+**Piezas:** A-03 apertura a sangre · G-04 foto con velo · C-06 cifras con procedencia · D-10 acción con salida.
+**Gana:** autoridad inmediata y no necesita material nuevo.
+**Arriesga:** el telón tiene que estar lo bastante apagado para que no compita con nuestro texto.
 
-### 2 · El mosaico  ← Studio Oker `e045b276`
-La primera pantalla es el negocio entero en celdas desiguales: titular, una web nuestra de
-verdad, el precio más bajo, el teléfono con su horario, las zonas y el dato del diagnóstico.
-**Piezas:** B-03 bento con celda dominante · C-01 caso con resultado · D-01 · G-10 capas.
-**Gana:** se entiende todo sin bajar, y mata el vacío de la página actual de una vez.
-**Arriesga:** si dos celdas enseñan lo mismo, es ruido. Cada una tiene un trabajo distinto.
+### 2 · Rodeado de clientes  ← Empower `14edc470`
+La promesa en el centro y los cuatro negocios reales flotando alrededor como fichas giradas,
+cada una con la etiqueta de lo que ganó. La prueba enmarca el mensaje sin bajar.
+**Piezas:** A-08 mosaico de trabajo · C-01 casos con resultado · C-10 andamio de confianza · G-10 capas.
+**Gana:** promesa y prueba se leen a la vez, y el portafolio deja de estar escondido.
+**Arriesga:** con fichas de fondo claro la composición se ensucia; hay que vigilar el equilibrio.
 
-### 3 · Funcionando  ← Mollie `73ec75d6` + Retool `c45b115b`
-No se enseña el servicio, se enseña lo que pasa cuando está puesto: una web nuestra ocupando el
-ancho y, encima, píldoras con lo que hizo esta semana (contestó a las 21:40, agendó una cita,
-subió al tercer puesto del mapa).
-**Piezas:** A-05 producto vivo · G-04 foto con velo · G-07 maqueta mínima · C-06 cifras con procedencia.
-**Gana:** es el argumento más difícil de discutir, porque es resultado y no promesa.
-**Arriesga:** cada píldora tiene que ser verdad comprobable; si no, es humo (E-10).
+### 3 · El taller  ← David Kirschberg `3ce811a6`
+Cabecera corta con la promesa, el precio ancla y las dos acciones, y justo debajo la fila de
+cuatro trabajos a todo color, cada uno con su resultado en una línea.
+**Piezas:** A-04 cabecera compacta · C-01 casos con resultado · B-01 lista tabla debajo · D-01 ancla desde $X.
+**Gana:** la que más contenido útil mete en la primera pantalla, y el negro deja de pesar.
+**Arriesga:** sin hero alto pierde teatro; el trabajo tiene que aguantar solo.
 
 ## 2 · Jerarquía (común a las tres)
 

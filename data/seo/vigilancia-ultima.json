@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-01",
+  "fecha": "2026-10-03",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 76,
+  "indexadas": 75,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 76,
-    "Crawled - currently not indexed": 3,
+    "Submitted and indexed": 75,
+    "Crawled - currently not indexed": 4,
     "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
@@ -50,7 +50,7 @@
     },
     "blog·es": {
       "total": 7,
-      "indexadas": 6
+      "indexadas": 5
     },
     "otras·es": {
       "total": 5,
@@ -77,9 +77,9 @@
       "indexadas": 4
     }
   },
-  "sinRastreoReciente": 51,
+  "sinRastreoReciente": 53,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 43,
+  "certificadoDias": 41,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 7,
-    "sesionesDiaHabitual": 4.2,
+    "sesionesUltimos3Dias": 12,
+    "sesionesDiaHabitual": 4.3,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 42,
+    "diasSinContactos": 44,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -148,20 +148,29 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [],
+    "alta": [
+      {
+        "fecha": "2026-10-03",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+      }
+    ],
     "media": [
       {
-        "fecha": "2026-10-01",
+        "fecha": "2026-10-03",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "51 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "53 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-10-01",
+        "fecha": "2026-10-03",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -170,7 +179,16 @@
       }
     ]
   },
-  "alertasNuevas": [],
+  "alertasNuevas": [
+    {
+      "fecha": "2026-10-03",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+    }
+  ],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

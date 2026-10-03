@@ -3,9 +3,8 @@
 Proyecto: Marcyan Web  ·  Página/Vista: hub de ciudad de Houston, rediseño completo
 Modo: **REDISEÑO / LANDING-CON-IDENTIDAD**
 Estado: **PROPUESTO** — tres direcciones a elegir. Fecha: 2026-10-01.
-Lienzo de decisión (artifact): "Houston desde Refero" (tercera vuelta, con el MCP de Refero
-ya conectado). Las dos tandas anteriores, "Tres caminos para Houston" y "Houston, tres
-bocetos", fueron rechazadas enteras por el dueño.
+Lienzo de decisión (artifact): "Houston, arte propio" (cuarta vuelta: arte dibujado en código,
+sin capturas de clientes). Las tres tandas anteriores fueron rechazadas por el dueño.
 
 > Punto de partida: **lo que está vivo en producción**. El hero "El Domo" queda descartado
 > por el dueño (2026-10-01): obligaba a cambiar la barra de navegación principal y la
@@ -70,65 +69,80 @@ enseña un caso de cuatro.
 
 ---
 
-## Referencias miradas (en imagen, no leídas) — con el MCP de Refero conectado
+## Referencias miradas (en imagen, no leídas) — cuarta vuelta, con Refero
 
-Regla dura de `refero-design`: una referencia que no se ha mirado no cuenta (E-28).
+**Lección que manda esta vuelta (E-32).** El dueño tumbó la tercera tanda: las capturas de las
+webs de clientes "funcionan como prueba pero no como arte visual; tenemos que ser más
+creativos". Las capturas van a la sección de casos. El arte de la apertura se construye en
+código con los tokens del sitio: luz, órbitas, ondas y tipografía. Material propio del que se
+parte: el isotipo (planeta con anillo y luna), el hero planetario de la home y el cielo con
+estrellas de `SpaceBackdrop`. Houston es Space City; las ideas salen de ahí sin casco de
+astronauta.
 
-**Historial de la herramienta.** En las dos primeras vueltas el MCP de Refero no conectaba
-(el servidor devolvía una respuesta HTTP mal formada). El dueño lo resolvió el 2026-10-01 y
-desde entonces `refero_search_styles` y `refero_get_style` responden. Las direcciones de abajo
-salen de ahí.
+**Estado de la herramienta (2026-10-03).** El MCP de Refero conecta: `refero_get_style`,
+`refero_search_screens` y `refero_get_screen_image` responden. El buscador de estilos
+(`refero_search_styles`) devuelve vacío para cualquier consulta, incluida la que funcionó el
+2026-10-01; se consultó por pantallas, que es la misma biblioteca, y se avisó al dueño.
 
-**Método seguido:** tres consultas (tema, estética, mecanismo), nueve vistas previas
-descargadas y miradas en una hoja de contacto, tres estilos elegidos y leídos completos con
-`refero_get_style`.
+**Método:** cinco búsquedas de pantallas (ilustración propia sobre oscuro, objeto abstracto u
+orbe, tipografía gigante, espacio y órbitas, partículas y redes de líneas), doce vistas previas
+descargadas y miradas en una hoja de contacto, cuatro referencias elegidas por tema.
 
-Consultas: `bilingual local agency city landing page, services with public prices, phone-first
-conversion` · `dark near-black page with warm gold accent, atmospheric space mood, premium
-restrained` · `service catalog page with visible prices per row and real client work as proof`.
-
-| Estilo | id | Qué se toma | Qué NO se toma |
+| Pantalla en Refero | id | Qué se toma | Qué NO se toma |
 |---|---|---|---|
-| **Agence K72** | `6b6d1ab7-6f40-409d-bfeb-5c418af13c64` | Velo pesado sobre una escena a sangre, titular mandando encima, accesos como pastillas de contorno grueso sin relleno, superficies planas sin sombra | Su negro puro `#000`, su verde lima, su tipografía Lausanne y su decisión de no tener botón principal de color |
-| **Empower** | `14edc470-fa1c-47f9-9efa-d44194be4aec` | Fichas de trabajo flotando alrededor del titular, giradas un grado, con una etiqueta de valor pegada a cada una; tarjetas de 24px sin sombra | Su amarillo, su display condensado y sus retratos de banco |
-| **David Kirschberg** | `3ce811a6-5b93-4542-91d5-62b2f1379d24` | Cabecera corta en vez de hero alto, fila de fichas de 24px donde el color lo pone el trabajo, separación de sección compacta | Su renuncia al botón de acción y su Inter |
+| **Curater TasteScope** | `aec3147c-41f5-473b-8c3f-62b204a880f1` | Un haz vertical como única composición, un objeto diminuto bajo la luz, texto en columna | Su azul frío y su esfera de alambre |
+| **Cosmos** | `35ec8dcc-75ef-456e-9b56-e84dd5bca15a` | Todo orbita alrededor del nombre; centro nítido, periferia apagada | Sus fotos borrosas |
+| **Wrike (carga)** | `8de89787-c6b1-4d1c-b9f2-6f454a60896c` | Planeta y órbitas en línea fina | Su azul y su contexto de app |
+| **Lovable (publicar)** | `fdb0e691-99ed-41b5-b1dd-81a7625b6dbb` | Ondas de luz cruzando el fondo detrás del titular; palabra marcada en el titular | Su naranja y su densidad |
+| **Washington Post Advertising** | `624305fb-6307-48bb-b3ac-9cdf57e4daa1` | La palabra como objeto, recortada por los bordes; texto pequeño conviviendo encima | Su serif de prensa y las fotos incrustadas en las letras |
 
-Mirados y descartados, con su id por si sirven más adelante: Suno
-`9844e7bf-4bff-48e6-8efc-e45002ce5226` (el campo de entrada como protagonista, se guarda para
-el diagnóstico), OHZI `7524da9c-904a-458a-9d46-999772061d83`, Krea `3a63b3fa-dc79-4dc3-935e-3f8f4ab447a7`,
-Hyper Foundation `54511793-579d-4406-a389-4d83b7ade0f9`, Pipe `c00d3961-a100-4c22-91fe-75f6e488e579`,
-Drepute `aa138c1f-2b42-4b10-9a3d-bdb09c216c99`.
+Miradas y descartadas, con id: Luma Genie `b8fefcc6-3c59-4496-b37b-56e01c52e5fd` (3D),
+Suno about `f07f2d1b-a8f5-4eb5-aa0e-7ae18e776b29`, Clay Nexus `c0a68710-aed2-48e2-a01a-278c47bcb676`,
+Apollo Odyssey `01779620-d272-4aa3-9759-fc13793a7ccb`, Skyscanner astro `dfc78aee-06b9-4b30-b17d-18f64aae186b`,
+fal.ai about `f9950530-a4a1-46ee-9507-a730cefde3de`, Kitchen `a6ec05d7-9cbb-4966-b152-e8f34f463f0d`.
 
-**Qué falló en las dos vueltas anteriores.** Sin Refero se miraron sitios muy conocidos y las
-direcciones acabaron siendo variantes de la misma composición. El dueño las rechazó en bloque
-las dos veces. La lección queda escrita: sin la biblioteca de referencia, no se entrega
-dirección visual; se avisa de que la herramienta no conecta y se para.
+Vueltas anteriores (rechazadas por el dueño, se conservan como historial): 1ª sin Refero
+(biblioteca local, tres variantes de la misma composición); 2ª por la web de Refero (estilos
+Atoms `4433dfe7`, Studio Oker `e045b276`, Mollie `73ec75d6`, Retool `c45b115b`); 3ª con el MCP
+de estilos (Agence K72 `6b6d1ab7`, Empower `14edc470`, David Kirschberg `3ce811a6`), tumbada
+por usar capturas de clientes como arte.
 
-## Las tres direcciones (tercera vuelta, desde Refero)
+## Las cuatro direcciones (cuarta vuelta, arte propio)
 
-Lienzo "Houston desde Refero": cada boceto al lado del estilo del que sale.
+Lienzo "Houston, arte propio": cada boceto junto a la pantalla de Refero que lo inspira,
+escritorio 1440 y móvil 390. **El H1 es el de posicionamiento en las cuatro**; la frase
+creativa va en la bajada.
 
-### 1 · El escenario  ← Agence K72 `6b6d1ab7`
-Una escena a toda pantalla muy oscurecida y desenfocada (el trabajo de un cliente de Houston
-sirve de telón), el titular enorme encima, y abajo dos accesos en pastilla de contorno grueso.
-Cierra con la franja de cifras defendibles.
-**Piezas:** A-03 apertura a sangre · G-04 foto con velo · C-06 cifras con procedencia · D-10 acción con salida.
-**Gana:** autoridad inmediata y no necesita material nuevo.
-**Arriesga:** el telón tiene que estar lo bastante apagado para que no compita con nuestro texto.
+### 1 · El haz  ← Curater `aec3147c`
+Un foco de luz dorada cae desde arriba sobre el planeta del isotipo, pequeño, posado en el
+suelo. Texto en columna a la izquierda. Debajo arranca el catálogo con precio.
+**Piezas:** A-07 fondo atmosférico · G-09 motivo propio · H-08 gradiente como atmósfera · B-01 lista tabla.
+**Gana:** la escena no explica nada y por eso se recuerda; coste de carga casi cero.
+**Arriesga:** si la luz se exagera, se vuelve efecto; el haz es una capa, no tres.
 
-### 2 · Rodeado de clientes  ← Empower `14edc470`
-La promesa en el centro y los cuatro negocios reales flotando alrededor como fichas giradas,
-cada una con la etiqueta de lo que ganó. La prueba enmarca el mensaje sin bajar.
-**Piezas:** A-08 mosaico de trabajo · C-01 casos con resultado · C-10 andamio de confianza · G-10 capas.
-**Gana:** promesa y prueba se leen a la vez, y el portafolio deja de estar escondido.
-**Arriesga:** con fichas de fondo claro la composición se ensucia; hay que vigilar el equilibrio.
+### 2 · La órbita  ← Cosmos `35ec8dcc` + Wrike `8de89787`
+El titular en el centro y, girando despacio, los siete servicios como satélites con su precio
+sobre tres elipses de línea fina; las zonas (Katy, Sugar Land, The Woodlands, Pearland) como
+lunas lejanas. Posiciones calculadas sobre las elipses, no a ojo. Misma mecánica que la home.
+**Piezas:** G-09 ilustración propia · F-06 bucle ambiental · D-01 ancla desde $X · A-07.
+**Gana:** los precios viven dentro del arte; continuidad con el planeta de la home.
+**Arriesga:** en móvil caben cinco satélites, no siete; el giro se apaga con reduced-motion.
 
-### 3 · El taller  ← David Kirschberg `3ce811a6`
-Cabecera corta con la promesa, el precio ancla y las dos acciones, y justo debajo la fila de
-cuatro trabajos a todo color, cada uno con su resultado en una línea.
-**Piezas:** A-04 cabecera compacta · C-01 casos con resultado · B-01 lista tabla debajo · D-01 ancla desde $X.
-**Gana:** la que más contenido útil mete en la primera pantalla, y el negro deja de pesar.
-**Arriesga:** sin hero alto pierde teatro; el trabajo tiene que aguantar solo.
+### 3 · La señal  ← Lovable `fdb0e691`
+Ondas de luz dorada cruzan el fondo detrás del titular, una teal para la IA, rejilla técnica
+que se desvanece abajo a la derecha y grano fino. Bajada: "Que te encuentren en Google y en la IA".
+**Piezas:** G-01 aurora · G-03 rejilla técnica · G-02 grano · H-03 palabra de otra voz.
+**Gana:** la más técnica y la que mejor casa con el discurso de SEO e IA.
+**Arriesga:** las ondas "de tecnología" son el cliché más cercano; se salvan por ser cuatro
+líneas finas en oro y una en teal, no una nube de neón.
+
+### 4 · El monumento  ← Washington Post Advertising `624305fb`
+HOUSTON a tamaño de edificio, cortado por los bordes, con una franja de luz dorada que lo
+recorre; encima el mensaje y la acción. Cero imágenes.
+**Piezas:** H-04 texto como imagen · H-08 gradiente como atmósfera · A-06 apertura editorial · D-10.
+**Gana:** nadie más en la ciudad lo tiene y carga al instante.
+**Arriesga:** H-04 avisa que en páginas donde la gente viene a por precio y teléfono puede
+leerse como moda; por eso el precio y el teléfono van arriba desde el principio.
 
 ## 2 · Jerarquía (común a las tres)
 

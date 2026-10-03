@@ -107,42 +107,51 @@ Atoms `4433dfe7`, Studio Oker `e045b276`, Mollie `73ec75d6`, Retool `c45b115b`);
 de estilos (Agence K72 `6b6d1ab7`, Empower `14edc470`, David Kirschberg `3ce811a6`), tumbada
 por usar capturas de clientes como arte.
 
-## Las cuatro direcciones (cuarta vuelta, arte propio)
+## Las tres direcciones (cuarta vuelta, arte propio, tras crítica interna)
 
 Lienzo "Houston, arte propio": cada boceto junto a la pantalla de Refero que lo inspira,
-escritorio 1440 y móvil 390. **El H1 es el de posicionamiento en las cuatro**; la frase
-creativa va en la bajada.
+escritorio 1440 y móvil 390. **El H1 es el de posicionamiento en las tres**; la frase creativa
+va en la bajada.
+
+**Crítica interna antes de enseñar (protocolo Ojos, 2026-10-03).** Tres jueces independientes
+(dirección de arte, cumplimiento del sistema y del ledger, olfato de plantilla) sobre las
+capturas reales. Ranking unánime: el haz primero, el monumento segundo. Se **retira la
+órbita** (titular centrado = cambio de gramática global; en estático es el hero de
+"integraciones orbitando" de cualquier producto de IA; en móvil no cabe y además giraría
+produciendo choques nuevos) y la **señal se reduce a una sola línea** (la versión de ondas +
+rejilla + grano apilaba cuatro técnicas, E-08, y era el kit de landing de IA de 2024, E-15).
+Arreglos aplicados al haz: un solo cono centrado sobre el planeta, planeta de 300 px con
+volumen, bordes disueltos, móvil con el texto desde el 47 % y el oro al 14 % de alfa. Al
+monumento: letras base al 12 %, luz blanca en vez de oro (un solo acento), H sangrando por la
+izquierda, texto sobre fondo limpio, sin bloque de coordenadas. Fuera de las tres: "Space
+City" y las coordenadas en mono (E-13, contraste 2,1:1).
 
 ### 1 · El haz  ← Curater `aec3147c`
-Un foco de luz dorada cae desde arriba sobre el planeta del isotipo, pequeño, posado en el
-suelo. Texto en columna a la izquierda. Debajo arranca el catálogo con precio.
+Un foco de luz dorada cae desde arriba sobre el planeta del isotipo, con la cara iluminada
+hacia la luz y un charco de luz en el suelo. Texto en columna a la izquierda. Debajo arranca
+el catálogo con precio.
 **Piezas:** A-07 fondo atmosférico · G-09 motivo propio · H-08 gradiente como atmósfera · B-01 lista tabla.
-**Gana:** la escena no explica nada y por eso se recuerda; coste de carga casi cero.
-**Arriesga:** si la luz se exagera, se vuelve efecto; el haz es una capa, no tres.
+**Gana:** la única cuya idea sobrevive entera al teléfono y la que menos se parece a una plantilla.
+**Arriesga:** el esqueleto "texto a la izquierda, arte a la derecha" es el más común; lo salva
+que el arte sea el isotipo bajo una luz y no un efecto.
 
-### 2 · La órbita  ← Cosmos `35ec8dcc` + Wrike `8de89787`
-El titular en el centro y, girando despacio, los siete servicios como satélites con su precio
-sobre tres elipses de línea fina; las zonas (Katy, Sugar Land, The Woodlands, Pearland) como
-lunas lejanas. Posiciones calculadas sobre las elipses, no a ojo. Misma mecánica que la home.
-**Piezas:** G-09 ilustración propia · F-06 bucle ambiental · D-01 ancla desde $X · A-07.
-**Gana:** los precios viven dentro del arte; continuidad con el planeta de la home.
-**Arriesga:** en móvil caben cinco satélites, no siete; el giro se apaga con reduced-motion.
+### 2 · La señal  ← Lovable `fdb0e691`
+Una sola línea de luz dorada nace en un punto a la derecha (origen con el teal de la IA y la
+etiqueta "IA que contesta · 24/7") y recorre la pantalla sin cruzar la columna de texto.
+**Piezas:** G-09 motivo propio · H-08 gradiente como atmósfera · F-06 bucle ambiental.
+**Gana:** la más técnica, casa con "que te encuentren en Google y en la IA".
+**Arriesga:** una línea de luz sigue siendo territorio de plantilla si se engorda; se mantiene fina.
 
-### 3 · La señal  ← Lovable `fdb0e691`
-Ondas de luz dorada cruzan el fondo detrás del titular, una teal para la IA, rejilla técnica
-que se desvanece abajo a la derecha y grano fino. Bajada: "Que te encuentren en Google y en la IA".
-**Piezas:** G-01 aurora · G-03 rejilla técnica · G-02 grano · H-03 palabra de otra voz.
-**Gana:** la más técnica y la que mejor casa con el discurso de SEO e IA.
-**Arriesga:** las ondas "de tecnología" son el cliché más cercano; se salvan por ser cuatro
-líneas finas en oro y una en teal, no una nube de neón.
-
-### 4 · El monumento  ← Washington Post Advertising `624305fb`
-HOUSTON a tamaño de edificio, cortado por los bordes, con una franja de luz dorada que lo
-recorre; encima el mensaje y la acción. Cero imágenes.
+### 3 · El monumento  ← Washington Post Advertising `624305fb`
+HOUSTON a tamaño de edificio, sangrando por la izquierda y cortado por abajo, con una franja
+de luz blanca que lo recorre; encima el mensaje y la acción sobre fondo limpio. Cero imágenes.
 **Piezas:** H-04 texto como imagen · H-08 gradiente como atmósfera · A-06 apertura editorial · D-10.
-**Gana:** nadie más en la ciudad lo tiene y carga al instante.
-**Arriesga:** H-04 avisa que en páginas donde la gente viene a por precio y teléfono puede
-leerse como moda; por eso el precio y el teléfono van arriba desde el principio.
+**Gana:** la apuesta más valiente y la que un dueño recuerda a los tres días.
+**Arriesga:** H-04 avisa que en páginas de precio y teléfono puede leerse como moda; por eso
+el oro se queda solo en el botón y en la palabra Houston del titular, y la franja es blanca.
+
+**Pendiente al construir:** los precios de las filas y las bajadas se toman de `pricing.ts`
+(fuente única) con "desde" y sus anclas; los jueces señalaron que los bocetos mezclan tramos.
 
 ## 2 · Jerarquía (común a las tres)
 

@@ -1,52 +1,103 @@
 month,tier,query,impressions,clicks,ctr,position,topPage,expectedPath
-2026-08,P0,marcyan,3,0,0,7.666666666666667,/en/terms,/es
-2026-08,P0,marcyan studio,0,0,0,,,/es
-2026-08,P0,web para vender en miami,29,1,0.034482758620689655,22.93103448275862,/es/miami/ecommerce,/es/miami/ecommerce
-2026-08,P0,agencia de servicios seo bilingüe,4,0,0,20.75,/es/houston,/es/servicios
-2026-08,P0,houston spanish website design,13,1,0.07692307692307693,24.692307692307693,/en/houston,/en/houston/bilingual-web-design
-2026-08,P0,bilingual seo miami,8,0,0,25.875,/en/miami,/en/miami/local-seo
-2026-08,P0,conversational ai miami,5,0,0,23.6,/en/miami/conversational-ai,/en/miami/conversational-ai
-2026-08,P0,ai chatbot for small business houston,0,0,0,,,/en/houston/conversational-ai
-2026-08,P1,cuanto cuesta una pagina web en houston,0,0,0,,,/es/precios/cuanto-cuesta-una-pagina-web-houston
-2026-08,P0,cuanto cuesta un chatbot de whatsapp,0,0,0,,,/es/precios/cuanto-cuesta-un-chatbot
-2026-08,P0,cuanto cuesta el seo local en houston,0,0,0,,,/es/precios/cuanto-cuesta-seo-local-houston
-2026-08,P1,chatbot con inteligencia artificial en español houston,0,0,0,,,/es/houston/ia-conversacional
-2026-08,P0,chatbot para negocios en miami,0,0,0,,,/es/miami/ia-conversacional
-2026-08,P0,paginas web para restaurantes en houston,0,0,0,,,/es/houston/restaurantes
-2026-08,P0,paginas web para contratistas en houston,0,0,0,,,/es/houston/contratistas
-2026-08,P0,pagina web para abogado de inmigracion houston,0,0,0,,,/es/houston/abogados-inmigracion
-2026-08,P0,paginas web para agentes de bienes raices houston,0,0,0,,,/es/houston/bienes-raices
-2026-08,P0,pagina web para salon de belleza houston,0,0,0,,,/es/houston/salon-belleza
-2026-08,P0,pagina web para taller mecanico houston,0,0,0,,,/es/houston/talleres-mecanicos
-2026-08,P0,diseño web en katy tx,0,0,0,,,/es/houston/katy
-2026-08,P0,diseño web en sugar land tx,0,0,0,,,/es/houston/sugar-land
-2026-08,P0,diseño de paginas web en hialeah,0,0,0,,,/es/miami/hialeah
-2026-08,P1,diseño de sitios web en houston,18,0,0,16.666666666666664,/es/houston,/es/houston/diseno-web
-2026-08,P1,seo local houston,0,0,0,,,/es/houston/seo-local
-2026-08,P1,tienda en linea houston,0,0,0,,,/es/houston/ecommerce
-2026-08,P1,diseño de logo en houston,0,0,0,,,/es/houston/branding
-2026-08,P1,pagina web para clinica dental houston,0,0,0,,,/es/houston/clinicas-dentales
-2026-08,P1,agencia de diseño web bilingüe houston,0,0,0,,,/es/houston/diseno-web-bilingue
-2026-08,P1,seo para ia en houston,0,0,0,,,/es/houston/seo-para-ia
-2026-08,P1,recepcionista virtual con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
-2026-08,P1,automatizar whatsapp con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
-2026-08,P1,diseño de paginas web en doral,0,0,0,,,/es/miami/doral
-2026-08,P1,tienda en linea en miami,0,0,0,,,/es/miami/ecommerce
-2026-08,P1,creadores de paginas web cerca de mi,11,0,0,23.181818181818183,/es/houston,/es
-2026-08,P1,bilingual web design houston,0,0,0,,,/en/houston/bilingual-web-design
-2026-08,P1,ai seo houston,0,0,0,,,/en/houston/ai-seo
-2026-08,P1,how much does a website cost in houston,0,0,0,,,/en/pricing/website-cost-houston
-2026-08,P0,how much does a chatbot cost,0,0,0,,,/en/pricing/chatbot-cost
-2026-08,P0,website for restaurants houston,0,0,0,,,/en/houston/restaurants
-2026-08,P0,immigration lawyer website design houston,0,0,0,,,/en/houston/immigration-lawyers
-2026-08,P0,real estate agent website houston,0,0,0,,,/en/houston/real-estate
-2026-08,P1,how much does local seo cost in houston,0,0,0,,,/en/pricing/local-seo-cost-houston
-2026-08,P1,website for contractors houston,0,0,0,,,/en/houston/contractors
-2026-08,P2,diseño web miami,109,1,0.009174311926605505,35.75229357798165,/es/miami,/es/miami/diseno-web
-2026-08,P2,agencia diseño web miami,51,1,0.0196078431372549,30.627450980392158,/es/miami,/es/miami/diseno-web
-2026-08,P2,diseño web houston,0,0,0,,,/es/houston/diseno-web
-2026-08,P2,seo local miami,0,0,0,,,/es/miami/seo-local
-2026-08,P2,como aparecer en chatgpt,0,0,0,,,/es/blog/como-aparecer-en-chatgpt-perplexity
-2026-08,P2,web design houston,0,0,0,,,/en/houston/web-design
-2026-08,P2,web design miami,0,0,0,,,/en/miami/web-design
-2026-08,P2,local seo houston,0,0,0,,,/en/houston/local-seo
+2026-08,P0,marcyan,3,0,0,7.666666666666667,/en/terms,
+2026-08,P0,marcyan studio,0,0,0,,,
+2026-08,P0,web para vender en miami,29,1,0.034482758620689655,22.93103448275862,/es/miami/ecommerce,
+2026-08,P0,agencia de servicios seo bilingüe,4,0,0,20.75,/es/houston,
+2026-08,P0,houston spanish website design,13,1,0.07692307692307693,24.692307692307693,/en/houston,
+2026-08,P0,bilingual seo miami,8,0,0,25.875,/en/miami,
+2026-08,P0,conversational ai miami,5,0,0,23.6,/en/miami/conversational-ai,
+2026-08,P0,ai chatbot for small business houston,0,0,0,,,
+2026-08,P1,cuanto cuesta una pagina web en houston,0,0,0,,,
+2026-08,P0,cuanto cuesta un chatbot de whatsapp,0,0,0,,,
+2026-08,P0,cuanto cuesta el seo local en houston,0,0,0,,,
+2026-08,P1,chatbot con inteligencia artificial en español houston,0,0,0,,,
+2026-08,P0,chatbot para negocios en miami,0,0,0,,,
+2026-08,P0,paginas web para restaurantes en houston,0,0,0,,,
+2026-08,P0,paginas web para contratistas en houston,0,0,0,,,
+2026-08,P0,pagina web para abogado de inmigracion houston,0,0,0,,,
+2026-08,P0,paginas web para agentes de bienes raices houston,0,0,0,,,
+2026-08,P0,pagina web para salon de belleza houston,0,0,0,,,
+2026-08,P0,pagina web para taller mecanico houston,0,0,0,,,
+2026-08,P0,diseño web en katy tx,0,0,0,,,
+2026-08,P0,diseño web en sugar land tx,0,0,0,,,
+2026-08,P0,diseño de paginas web en hialeah,0,0,0,,,
+2026-08,P1,diseño de sitios web en houston,18,0,0,16.666666666666664,/es/houston,
+2026-08,P1,seo local houston,0,0,0,,,
+2026-08,P1,tienda en linea houston,0,0,0,,,
+2026-08,P1,diseño de logo en houston,0,0,0,,,
+2026-08,P1,pagina web para clinica dental houston,0,0,0,,,
+2026-08,P1,agencia de diseño web bilingüe houston,0,0,0,,,
+2026-08,P1,seo para ia en houston,0,0,0,,,
+2026-08,P1,recepcionista virtual con inteligencia artificial,0,0,0,,,
+2026-08,P1,automatizar whatsapp con inteligencia artificial,0,0,0,,,
+2026-08,P1,diseño de paginas web en doral,0,0,0,,,
+2026-08,P1,tienda en linea en miami,0,0,0,,,
+2026-08,P1,creadores de paginas web cerca de mi,11,0,0,23.181818181818183,/es/houston,
+2026-08,P1,bilingual web design houston,0,0,0,,,
+2026-08,P1,ai seo houston,0,0,0,,,
+2026-08,P1,how much does a website cost in houston,0,0,0,,,
+2026-08,P0,how much does a chatbot cost,0,0,0,,,
+2026-08,P0,website for restaurants houston,0,0,0,,,
+2026-08,P0,immigration lawyer website design houston,0,0,0,,,
+2026-08,P0,real estate agent website houston,0,0,0,,,
+2026-08,P1,how much does local seo cost in houston,0,0,0,,,
+2026-08,P1,website for contractors houston,0,0,0,,,
+2026-08,P2,diseño web miami,109,1,0.009174311926605505,35.75229357798165,/es/miami,
+2026-08,P2,agencia diseño web miami,51,1,0.0196078431372549,30.627450980392158,/es/miami,
+2026-08,P2,diseño web houston,0,0,0,,,
+2026-08,P2,seo local miami,0,0,0,,,
+2026-08,P2,como aparecer en chatgpt,0,0,0,,,
+2026-08,P2,web design houston,0,0,0,,,
+2026-08,P2,web design miami,0,0,0,,,
+2026-08,P2,local seo houston,0,0,0,,,
+2026-09,P0,marcyan,1,0,0,7,/en,/es
+2026-09,P0,marcyan studio,0,0,0,,,/es
+2026-09,P0,web para vender en miami,11,0,0,28.272727272727273,/es/miami,/es/miami/ecommerce
+2026-09,P0,agencia de servicios seo bilingüe,0,0,0,,,/es/servicios
+2026-09,P0,houston spanish website design,0,0,0,,,/en/houston/bilingual-web-design
+2026-09,P0,bilingual seo miami,7,0,0,25.285714285714285,/en/miami,/en/miami/local-seo
+2026-09,P0,conversational ai miami,16,0,0,8.0625,/en/miami/conversational-ai,/en/miami/conversational-ai
+2026-09,P0,ai chatbot for small business houston,0,0,0,,,/en/houston/conversational-ai
+2026-09,P1,cuanto cuesta una pagina web en houston,0,0,0,,,/es/precios/cuanto-cuesta-una-pagina-web-houston
+2026-09,P0,cuanto cuesta un chatbot de whatsapp,0,0,0,,,/es/precios/cuanto-cuesta-un-chatbot
+2026-09,P0,cuanto cuesta el seo local en houston,0,0,0,,,/es/precios/cuanto-cuesta-seo-local-houston
+2026-09,P1,chatbot con inteligencia artificial en español houston,0,0,0,,,/es/houston/ia-conversacional
+2026-09,P0,chatbot para negocios en miami,0,0,0,,,/es/miami/ia-conversacional
+2026-09,P0,paginas web para restaurantes en houston,0,0,0,,,/es/houston/restaurantes
+2026-09,P0,paginas web para contratistas en houston,0,0,0,,,/es/houston/contratistas
+2026-09,P0,pagina web para abogado de inmigracion houston,0,0,0,,,/es/houston/abogados-inmigracion
+2026-09,P0,paginas web para agentes de bienes raices houston,0,0,0,,,/es/houston/bienes-raices
+2026-09,P0,pagina web para salon de belleza houston,0,0,0,,,/es/houston/salon-belleza
+2026-09,P0,pagina web para taller mecanico houston,0,0,0,,,/es/houston/talleres-mecanicos
+2026-09,P0,diseño web en katy tx,0,0,0,,,/es/houston/katy
+2026-09,P0,diseño web en sugar land tx,0,0,0,,,/es/houston/sugar-land
+2026-09,P0,diseño de paginas web en hialeah,0,0,0,,,/es/miami/hialeah
+2026-09,P1,diseño de sitios web en houston,0,0,0,,,/es/houston/diseno-web
+2026-09,P1,seo local houston,0,0,0,,,/es/houston/seo-local
+2026-09,P1,tienda en linea houston,0,0,0,,,/es/houston/ecommerce
+2026-09,P1,diseño de logo en houston,0,0,0,,,/es/houston/branding
+2026-09,P1,pagina web para clinica dental houston,0,0,0,,,/es/houston/clinicas-dentales
+2026-09,P1,agencia de diseño web bilingüe houston,0,0,0,,,/es/houston/diseno-web-bilingue
+2026-09,P1,seo para ia en houston,0,0,0,,,/es/houston/seo-para-ia
+2026-09,P1,recepcionista virtual con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
+2026-09,P1,automatizar whatsapp con inteligencia artificial,0,0,0,,,/es/ia-para-pymes
+2026-09,P1,diseño de paginas web en doral,0,0,0,,,/es/miami/doral
+2026-09,P1,tienda en linea en miami,0,0,0,,,/es/miami/ecommerce
+2026-09,P1,creadores de paginas web cerca de mi,2,0,0,92,/es/miami,/es
+2026-09,P1,bilingual web design houston,0,0,0,,,/en/houston/bilingual-web-design
+2026-09,P1,ai seo houston,0,0,0,,,/en/houston/ai-seo
+2026-09,P1,how much does a website cost in houston,0,0,0,,,/en/pricing/website-cost-houston
+2026-09,P0,how much does a chatbot cost,0,0,0,,,/en/pricing/chatbot-cost
+2026-09,P0,website for restaurants houston,0,0,0,,,/en/houston/restaurants
+2026-09,P0,immigration lawyer website design houston,0,0,0,,,/en/houston/immigration-lawyers
+2026-09,P0,real estate agent website houston,0,0,0,,,/en/houston/real-estate
+2026-09,P1,how much does local seo cost in houston,0,0,0,,,/en/pricing/local-seo-cost-houston
+2026-09,P1,website for contractors houston,0,0,0,,,/en/houston/contractors
+2026-09,P2,diseño web miami,77,1,0.012987012987012988,30.662337662337663,/es/miami,/es/miami/diseno-web
+2026-09,P2,agencia diseño web miami,22,0,0,25.545454545454547,/es/miami,/es/miami/diseno-web
+2026-09,P2,diseño web houston,0,0,0,,,/es/houston/diseno-web
+2026-09,P2,seo local miami,0,0,0,,,/es/miami/seo-local
+2026-09,P2,como aparecer en chatgpt,0,0,0,,,/es/blog/como-aparecer-en-chatgpt-perplexity
+2026-09,P2,web design houston,0,0,0,,,/en/houston/web-design
+2026-09,P2,web design miami,0,0,0,,,/en/miami/web-design
+2026-09,P2,local seo houston,1,0,0,48,/es/houston/seo-local,/en/houston/local-seo

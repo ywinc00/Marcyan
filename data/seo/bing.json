@@ -1,19 +1,27 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-09-28",
+  "fecha": "2026-10-04",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
       "clics": 0,
-      "impresiones": 0
+      "impresiones": 1
     },
     "anteriores28": {
       "clics": 0,
       "impresiones": 0
     }
   },
-  "consultasSinMarca": [],
+  "consultasSinMarca": [
+    {
+      "consulta": "cómo activar que la ia contesta mis llamadas",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 4,
+      "marca": false
+    }
+  ],
   "consultasMarca": [],
   "problemasRastreo": {
     "total": 0,

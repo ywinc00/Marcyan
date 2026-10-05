@@ -1,0 +1,16 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-10-05",
+  "periodo": {
+    "desde": "2026-09-05",
+    "hasta": "2026-10-02"
+  },
+  "estado": "ok",
+  "nota": "Menos de 3 páginas en el top 10 con impresiones suficientes: todavía no hay referencia propia; solo se marcan las páginas del top 20 con 100 o más impresiones y ningún clic.",
+  "referenciaCtr": {
+    "1-3": null,
+    "4-6": null,
+    "7-10": null
+  },
+  "titulosQueNoConvencen": []
+}

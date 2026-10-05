@@ -28,6 +28,8 @@
 
 > Revisión 2026-10-04 (informe de septiembre): la ficha ya se lee a diario (0 reseñas); la tanda de W40 se mantiene y entran el enlazado interno hacia las desindexadas y la marca a su casa. La señal local pasa a la trimestral.
 
+> Revisión 2026-W41 (5-oct): sin reordenar (semana impar). Tanda de la semana: tareas 2 y 4 (la guía del blog sobre ChatGPT entró al índice el 4-oct; quedan 3 páginas) y tarea 3 (ficha previa lista: `docs/seo/briefs/es-miami-diseno-web-2026-10-05.md`). Espera OK de Yan.
+
 ## En espera (sin responsable o bloqueadas)
 
 - Anchors de Houston (misma mecánica que Miami): esperan a que el rediseño de la landing de Houston tenga dirección elegida.

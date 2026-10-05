@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-04",
+  "fecha": "2026-10-05",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 76,
+  "indexadas": 72,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 76,
-    "Crawled - currently not indexed": 3,
+    "Submitted and indexed": 72,
+    "Crawled - currently not indexed": 7,
     "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
@@ -38,7 +38,7 @@
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 17
+      "indexadas": 14
     },
     "precios·en": {
       "total": 4,
@@ -66,7 +66,7 @@
     },
     "landings·es": {
       "total": 18,
-      "indexadas": 14
+      "indexadas": 13
     },
     "servicios·es": {
       "total": 2,
@@ -77,9 +77,9 @@
       "indexadas": 4
     }
   },
-  "sinRastreoReciente": 53,
+  "sinRastreoReciente": 50,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 40,
+  "certificadoDias": 39,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 7,
-    "sesionesDiaHabitual": 4.3,
+    "sesionesUltimos3Dias": 0,
+    "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 45,
+    "diasSinContactos": 46,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -148,28 +148,61 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [],
+    "alta": [
+      {
+        "fecha": "2026-10-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/houston/beauty-salons"
+      },
+      {
+        "fecha": "2026-10-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/houston/conversational-ai"
+      },
+      {
+        "fecha": "2026-10-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/houston/dental-clinics"
+      },
+      {
+        "fecha": "2026-10-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+      },
+      {
+        "fecha": "2026-10-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "medicion",
+        "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~4 al día): la medición puede estar rota",
+        "url": null
+      }
+    ],
     "media": [
       {
-        "fecha": "2026-10-04",
+        "fecha": "2026-10-05",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "53 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "50 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-10-04",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
-      },
-      {
-        "fecha": "2026-10-04",
+        "fecha": "2026-10-05",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -178,7 +211,48 @@
       }
     ]
   },
-  "alertasNuevas": [],
+  "alertasNuevas": [
+    {
+      "fecha": "2026-10-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/houston/beauty-salons"
+    },
+    {
+      "fecha": "2026-10-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/houston/conversational-ai"
+    },
+    {
+      "fecha": "2026-10-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/houston/dental-clinics"
+    },
+    {
+      "fecha": "2026-10-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+    },
+    {
+      "fecha": "2026-10-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "medicion",
+      "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~4 al día): la medición puede estar rota",
+      "url": null
+    }
+  ],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

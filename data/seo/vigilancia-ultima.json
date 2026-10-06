@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-05",
+  "fecha": "2026-10-06",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 72,
+  "indexadas": 62,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 72,
-    "Crawled - currently not indexed": 7,
+    "Submitted and indexed": 62,
+    "Crawled - currently not indexed": 17,
     "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
@@ -22,7 +22,7 @@
     },
     "servicios·en": {
       "total": 2,
-      "indexadas": 2
+      "indexadas": 1
     },
     "blog·en": {
       "total": 1,
@@ -34,15 +34,15 @@
     },
     "ciudades·en": {
       "total": 6,
-      "indexadas": 6
+      "indexadas": 4
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 14
+      "indexadas": 12
     },
     "precios·en": {
       "total": 4,
-      "indexadas": 4
+      "indexadas": 2
     },
     "home·es": {
       "total": 1,
@@ -66,20 +66,20 @@
     },
     "landings·es": {
       "total": 18,
-      "indexadas": 13
+      "indexadas": 12
     },
     "servicios·es": {
       "total": 2,
-      "indexadas": 2
+      "indexadas": 1
     },
     "precios·es": {
       "total": 4,
-      "indexadas": 4
+      "indexadas": 3
     }
   },
-  "sinRastreoReciente": 50,
+  "sinRastreoReciente": 43,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 39,
+  "certificadoDias": 38,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 0,
+    "sesionesUltimos3Dias": 3,
     "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 46,
+    "diasSinContactos": 47,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,59 +150,99 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/beauty-salons"
+        "url": "https://marcyanstudio.com/en/ai-for-small-business"
       },
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/conversational-ai"
+        "url": "https://marcyanstudio.com/en/houston/katy"
       },
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/dental-clinics"
+        "url": "https://marcyanstudio.com/en/houston/local-seo"
       },
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+        "url": "https://marcyanstudio.com/en/miami/doral"
       },
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "alta",
-        "tipo": "medicion",
-        "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~4 al día): la medición puede estar rota",
-        "url": null
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/miami/ecommerce"
+      },
+      {
+        "fecha": "2026-10-06",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston"
+      },
+      {
+        "fecha": "2026-10-06",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/pricing/website-cost-houston"
+      },
+      {
+        "fecha": "2026-10-06",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+      },
+      {
+        "fecha": "2026-10-06",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+      },
+      {
+        "fecha": "2026-10-06",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/servicios"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "50 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "43 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-10-05",
+        "fecha": "2026-10-06",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -213,44 +253,84 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-05",
+      "fecha": "2026-10-06",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/beauty-salons"
+      "url": "https://marcyanstudio.com/en/ai-for-small-business"
     },
     {
-      "fecha": "2026-10-05",
+      "fecha": "2026-10-06",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/conversational-ai"
+      "url": "https://marcyanstudio.com/en/houston/katy"
     },
     {
-      "fecha": "2026-10-05",
+      "fecha": "2026-10-06",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/dental-clinics"
+      "url": "https://marcyanstudio.com/en/houston/local-seo"
     },
     {
-      "fecha": "2026-10-05",
+      "fecha": "2026-10-06",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/clinicas-dentales"
+      "url": "https://marcyanstudio.com/en/miami/doral"
     },
     {
-      "fecha": "2026-10-05",
+      "fecha": "2026-10-06",
       "cliente": "marcyan",
       "nivel": "alta",
-      "tipo": "medicion",
-      "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~4 al día): la medición puede estar rota",
-      "url": null
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/miami/ecommerce"
+    },
+    {
+      "fecha": "2026-10-06",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/pricing/local-seo-cost-houston"
+    },
+    {
+      "fecha": "2026-10-06",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/pricing/website-cost-houston"
+    },
+    {
+      "fecha": "2026-10-06",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/talleres-mecanicos"
+    },
+    {
+      "fecha": "2026-10-06",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston"
+    },
+    {
+      "fecha": "2026-10-06",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/servicios"
     }
   ],
   "pedirIndexacion": [],

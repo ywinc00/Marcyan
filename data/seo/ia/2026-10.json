@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-04",
+  "fecha": "2026-10-06",
   "estado": "ok",
   "motores": [
     "gemini"
@@ -8,7 +8,7 @@
   "repeticiones": 3,
   "porcentajeApariciones": {
     "gemini": {
-      "marcyan": 0,
+      "marcyan": 17,
       "True Digital Marketing": 0,
       "Webnhubs": 0,
       "Artisticore": 0
@@ -16,47 +16,43 @@
   },
   "fuentesSinCliente": [
     {
-      "dominio": "lvbranding.com",
-      "veces": 20
-    },
-    {
-      "dominio": "bigbitemarketers.com",
+      "dominio": "gomuchisimo.com",
       "veces": 13
     },
     {
       "dominio": "imaginacommunications.com",
-      "veces": 9
-    },
-    {
-      "dominio": "hispanicmarketingfirm.com",
       "veces": 8
     },
     {
-      "dominio": "wallstreetwebdesigns.com",
+      "dominio": "alphacomarketing.com",
       "veces": 7
     },
     {
-      "dominio": "aglegacy.com",
+      "dominio": "bigbitemarketers.com",
       "veces": 7
     },
     {
-      "dominio": "singularityedge.com",
+      "dominio": "hispanicmarketingfirm.com",
       "veces": 6
     },
     {
-      "dominio": "thervo.com",
+      "dominio": "primewebdesign.com",
       "veces": 6
     },
     {
-      "dominio": "heydaymarketing.com",
+      "dominio": "maxefeed.com",
       "veces": 6
     },
     {
-      "dominio": "gomuchisimo.com",
+      "dominio": "is-t.net",
+      "veces": 6
+    },
+    {
+      "dominio": "onceonceagency.com",
       "veces": 5
     },
     {
-      "dominio": "oakinteractive.com",
+      "dominio": "webdesignerfactory.com",
       "veces": 5
     },
     {
@@ -64,16 +60,20 @@
       "veces": 5
     },
     {
-      "dominio": "thedomaindesigners.com",
+      "dominio": "reddit.com",
       "veces": 5
     },
     {
-      "dominio": "britomarketing.com",
+      "dominio": "houstonitdevelopers.com",
       "veces": 5
     },
     {
-      "dominio": "maxefeed.com",
+      "dominio": "heydaymarketing.com",
       "veces": 5
+    },
+    {
+      "dominio": "codewcg.com",
+      "veces": 4
     }
   ],
   "detalle": [
@@ -84,16 +84,16 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://aurin.mx/diseno-web-houston",
+        "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
         "https://hispanicmarketingfirm.com/about-2/",
-        "https://aurin.mx/en/web-design-houston",
-        "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/",
-        "https://gomuchisimo.com/es/houston-tx/",
         "https://codewcg.com/es/servicios/diseno-web-houston/",
-        "https://codewcg.com/es/servicios/",
+        "https://aurin.mx/en/web-design-houston",
+        "https://codewcg.com/es/servicios/diseno-web-houston/",
         "https://vitaliza.agency/agencia-de-marketing-digital-houston/",
-        "https://www.singularityedge.com/mercados/estados-unidos/houston"
+        "https://www.disenoweb.agency/diseno-web-houston.html"
       ]
     },
     {
@@ -104,14 +104,14 @@
       "aparecen": [],
       "fuentes": [
         "https://onceonceagency.com/agencia-seo-houston/",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://aurin.mx/diseno-web-houston",
-        "https://hispanicmarketingfirm.com/about-2/",
-        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
         "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/",
-        "https://wallstreetwebdesigns.com/website-designs-more",
-        "https://www.singularityedge.com/mercados/estados-unidos/houston",
-        "https://disenowebusa.com/diseno-web-texas/"
+        "https://gomuchisimo.com/houston-tx/",
+        "https://hispanicmarketingfirm.com/about-2/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
+        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://imaginacommunications.com/digital-marketing",
+        "https://codewcg.com/es/servicios/diseno-web-houston/",
+        "https://vitaliza.agency/agencia-de-marketing-digital-houston/"
       ]
     },
     {
@@ -121,16 +121,16 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://hispanosmarketing.online/",
-        "https://hispanicmarketingfirm.com/",
-        "https://hispanicmarketingfirm.com/about-2/",
-        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://onceonceagency.com/agencia-seo-houston/",
         "https://oakinteractive.com/about/",
-        "https://neoaistudio.com/houston",
-        "https://vitaliza.agency/agencia-de-marketing-digital-houston/",
-        "https://www.singularityedge.com/mercados/estados-unidos/houston",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
-        "https://codewcg.com/es/servicios/diseno-web-houston/"
+        "https://hispanicmarketingfirm.com/about-2/",
+        "https://hispanicmarketingfirm.com/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
+        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://imaginacommunications.com/",
+        "https://imaginacommunications.com/digital-marketing",
+        "https://webdesigninhouston.com/index.php?language=spanish",
+        "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/"
       ]
     },
     {
@@ -140,32 +140,34 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://www.stephenscode.dev/pricing",
-        "https://thervo.com/costs/website-design-costs",
-        "https://www.thedomaindesigners.com/pricing",
-        "https://codevix.com/web-design/web-design-cost",
-        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
-        "https://www.bark.com/en/us/web-design/texas/houston/",
-        "https://prowebsitedesigns.com/pricing"
-      ]
-    },
-    {
-      "motor": "gemini",
-      "idioma": "es",
-      "pregunta": "cuánto cuesta una página web en Houston",
-      "repeticion": 2,
-      "aparecen": [],
-      "fuentes": [
-        "https://thervo.com/costs/website-design-costs",
-        "https://tecnesio.com/cuanto-cuesta-una-pagina-web/",
-        "https://www.thedomaindesigners.com/pricing",
-        "https://www.stephenscode.dev/pricing",
         "https://creadorwebs.com/desarrollo-web/cuanto-cuesta-hacer-una-pagina-web-en-estados-unidos/",
+        "https://officialcystudio.com/blog/cuanto-cuesta-una-pagina-web-en-houston/",
         "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
-        "https://www.webwize.com/services/web-design",
-        "https://www.godaddy.com/resources/latam/stories/cuanto-cuesta-una-pagina-web-en-dolares",
+        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
+        "https://thervo.com/costs/website-design-costs",
+        "https://millermedia7.com/blog/how-much-do-agencies-charge-for-website-design/",
+        "https://www.stephenscode.dev/pricing",
         "https://es.squarespace.com/blog/cuanto-cuesta-un-sitio-web",
-        "https://es.wix.com/blog/precio-de-pagina-web"
+        "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
+        "https://tecnesio.com/cuanto-cuesta-una-pagina-web/",
+        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
+        "https://www.stephenscode.dev/pricing",
+        "https://wintrabiz.com/guides/best-website-designer-houston/",
+        "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/",
+        "https://design.bripemedia.com/diseno-web/texas",
+        "https://onelittleweb.com/top-agencies/houston-web-design-agencies/",
+        "https://rawcutcreative.com/cities/web-design-houston-tx/pricing",
+        "https://www.webyking.com/blog/website-design-cost/"
       ]
     },
     {
@@ -175,14 +177,16 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
+        "https://hexwebdesign.com/insights/houston-website-cost-2026",
         "https://creadorwebs.com/desarrollo-web/cuanto-cuesta-hacer-una-pagina-web-en-estados-unidos/",
-        "https://thervo.com/costs/website-design-costs",
-        "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/",
-        "https://www.stephenscode.dev/pricing",
-        "https://codevix.com/web-design/web-design-cost",
-        "https://www.2pointagency.com/glossary/pricing-for-e-commerce-web-design-in-houston-what-you-need-to-know/",
-        "https://es.squarespace.com/blog/cuanto-cuesta-un-sitio-web"
+        "https://unlimited.pe/usa/cuanto-cuesta-una-pagina-web-en-houston/",
+        "https://officialcystudio.com/blog/cuanto-cuesta-una-pagina-web-en-houston/",
+        "https://design.bripemedia.com/blog/cuanto-cuesta-pagina-web-en-estados-unidos",
+        "https://northtexas-webdesign.com/custom-website-costs-texas-guide-2026/",
+        "https://www.houstonitdevelopers.com/services/web-design/houston",
+        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
+        "https://www.godaddy.com/resources/latam/stories/cuanto-cuesta-una-pagina-web-en-dolares",
+        "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/?tl=es-419"
       ]
     },
     {
@@ -192,35 +196,34 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://onceonceagency.com/bilingual-seo-agency-miami/",
-        "https://www.egochi.com/miami-digital-marketing-agency/",
+        "https://www.xn--diseowebmiami-lkb.com/ciudades/doral",
+        "https://agenciamarketboost.com/agencia-marketing-digital-miami",
         "https://www.subeagenciadigital.com/contacto/agencia-marketing-digital-miami/",
-        "https://marketing4ecommerce.net/en/top-best-digital-marketing-agencies-in-miami-for-spanish-speakers/",
-        "https://britomarketing.com/marketing-seo-miami/",
-        "https://britomarketing.com/services/",
-        "https://themanifest.com/seo-firms/international/miami",
-        "https://agencies.semrush.com/list/local-seo/miami/small-business/",
-        "https://btodigital.com/agencia-de-marketing-digital-miami/",
-        "https://seolatam.com/agencia-seo-miami/"
-      ]
-    },
-    {
-      "motor": "gemini",
-      "idioma": "es",
-      "pregunta": "agencia de SEO local en Miami para negocios latinos",
-      "repeticion": 2,
-      "aparecen": [],
-      "fuentes": [
-        "https://www.singularityedge.com/mercados/estados-unidos/miami",
-        "https://www.egochi.com/miami-seo/",
-        "https://britomarketing.com/marketing-seo-miami/",
-        "https://britomarketing.com/services/",
         "https://www.subeagenciadigital.com/contacto/agencia-marketing-digital-miami/",
-        "https://gomuchisimo.com/miami-fl/",
-        "https://gomuchisimo.com/es/miami-fl/",
         "https://marketingdigitalbravo.com/",
-        "https://www.go-globe.com/usa/miami/seo/",
-        "https://togrowagencia.com/estrategia-seo-local-negocios-hispanos/"
+        "https://britomarketing.com/marketing-seo-miami/",
+        "https://britomarketing.com/marketing-seo-miami/",
+        "https://www.laboratorioweb.com.co/agencia-seo/",
+        "https://btodigital.com/agencia-de-marketing-digital-miami/"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "es",
+      "pregunta": "agencia de SEO local en Miami para negocios latinos",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://www.egochi.com/miami-seo/",
+        "https://onceonceagency.com/bilingual-seo-agency-miami/",
+        "https://www.subeagenciadigital.com/contacto/agencia-marketing-digital-miami/",
+        "https://marketingdigitalbravo.com/",
+        "https://www.miamiseocompany.net/bilingual-seo-miami",
+        "https://britomarketing.com/en",
+        "https://btodigital.com/agencia-de-marketing-digital-miami/",
+        "https://www.facebook.com/HispanicMarketAdvisors/posts/-connect-with-more-hispanic-consumers-through-spanish-seoyour-potential-customer/1733007405500561/",
+        "https://agencies.semrush.com/list/local-seo/miami/small-business/",
+        "https://www.xn--diseowebmiami-lkb.com/ciudades/doral"
       ]
     },
     {
@@ -230,15 +233,14 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://onceonceagency.com/bilingual-seo-agency-miami/",
-        "https://www.egochi.com/miami-seo/",
+        "https://www.xn--diseowebmiami-lkb.com/ciudades/doral",
+        "https://promeseoagency.com/seo-miami/",
+        "https://onceonceagency.com/agencia-seo-miami/",
         "https://www.subeagenciadigital.com/contacto/agencia-marketing-digital-miami/",
         "https://britomarketing.com/marketing-seo-miami/",
+        "https://marketingdigitalbravo.com/",
         "https://btodigital.com/agencia-de-marketing-digital-miami/",
-        "https://agencies.semrush.com/list/local-seo/miami/small-business/",
-        "https://themanifest.com/seo/multilingual/agencies/miami",
-        "https://www.miamiseocompany.net/bilingual-seo-miami",
-        "https://heydaymarketing.com/services/miami-search-engine-optimization"
+        "https://thinktic.co/agencia-seo-miami/"
       ]
     },
     {
@@ -248,16 +250,14 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://maxefeed.com/ai-chatbot-development-houston",
         "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
+        "https://maxefeed.com/ai-chatbot-development-houston",
+        "https://davarion.com/en/whatsapp-automation-houston/",
+        "https://agenciamarketboost.com/chatbot-whatsapp-houston",
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
         "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
-        "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
-        "https://davarion.com/en/ai-automation-houston/",
         "https://speedxmarketing.com/blog/top-8-ai-chatbot-development-services-in-houston",
-        "https://feynixsolution.com/houstons-leading-trusted-ai-chatbot-development-agency-for-smart-business-solutions/",
-        "https://feynixsolution.com/houstons-leading-trusted-ai-chatbot-development-agency-for-smart-business-solutions/",
-        "https://www.rybo.ai/whatsapp-ai-agent-automation/",
-        "https://clutch.co/developers/artificial-intelligence/chatbots/houston"
+        "https://banao.tech/en-us/ai-chatbots-virtual-assistants-houston-usa"
       ]
     },
     {
@@ -267,12 +267,12 @@
       "repeticion": 2,
       "aparecen": [],
       "fuentes": [
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
         "https://maxefeed.com/ai-chatbot-development-houston",
-        "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
         "https://davarion.com/en/ai-automation-houston/",
-        "https://feynixsolution.com/houstons-leading-trusted-ai-chatbot-development-agency-for-smart-business-solutions/",
-        "https://www.rybo.ai/whatsapp-ai-agent-automation/",
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/"
+        "https://zaptatech.com/insights/top-chatbot-development-companies-in-houston-revolutionizing-cx-2026/",
+        "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
+        "https://agenciamarketboost.com/chatbot-whatsapp-houston"
       ]
     },
     {
@@ -282,16 +282,14 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
-        "https://maxefeed.com/ai-chatbot-development-houston",
         "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
-        "https://davarion.com/en/ai-automation-houston/",
-        "https://feynixsolution.com/houstons-leading-trusted-ai-chatbot-development-agency-for-smart-business-solutions/",
-        "https://www.rybo.ai/whatsapp-ai-agent-automation/",
-        "https://speedxmarketing.com/blog/top-8-ai-chatbot-development-services-in-houston",
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
+        "https://maxefeed.com/ai-chatbot-development-houston",
+        "https://themanifest.com/artificial-intelligence/chatbot/companies/houston",
         "https://clutch.co/developers/artificial-intelligence/chatbots/houston",
-        "https://chatbot.pezetasolutions.com/"
+        "https://ztabs.co/services/whatsapp-api-development-in-houston",
+        "https://agenciamarketboost.com/chatbot-whatsapp-houston",
+        "https://togrowagencia.com/agencias-de-redes-sociales-en-houston-texas/"
       ]
     },
     {
@@ -301,12 +299,13 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://www.singularityedge.com/mercados/estados-unidos/houston",
+        "https://onceonceagency.com/agencia-seo-houston/",
+        "https://codewcg.com/es/servicios/diseno-web-houston/",
         "https://creativemario.com/es/",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://disenoweb.agency/web-design-houston.html",
+        "https://gomuchisimo.com/es/servicios/paginas-web-negocios/houston-tx/",
         "https://vitaliza.agency/agencia-de-marketing-digital-houston/",
-        "https://codewcg.com/es/servicios/diseno-web-houston/"
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency"
       ]
     },
     {
@@ -314,18 +313,18 @@
       "idioma": "es",
       "pregunta": "diseño web bilingüe en Houston",
       "repeticion": 2,
-      "aparecen": [],
+      "aparecen": [
+        "marcyan"
+      ],
       "fuentes": [
-        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://creativemario.com/",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency",
+        "https://creativemario.com/es/",
+        "https://codewcg.com/es/servicios/diseno-web-houston/",
         "https://aurin.mx/en/web-design-houston",
-        "https://www.designrush.com/agency/website-design-development/texas/houston",
+        "https://disenoweb.agency/web-design-houston.html",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://wallstreetwebdesigns.com/website-designs-more",
-        "https://wallstreetwebdesigns.com/website-designs-more",
-        "https://www.creativehtx.com/houston-web-design/"
+        "https://marcyanstudio.com/en/houston"
       ]
     },
     {
@@ -333,16 +332,19 @@
       "idioma": "es",
       "pregunta": "diseño web bilingüe en Houston",
       "repeticion": 3,
-      "aparecen": [],
+      "aparecen": [
+        "marcyan"
+      ],
       "fuentes": [
+        "https://codewcg.com/es/servicios/diseno-web-houston/",
+        "https://neoaistudio.com/blog/diseno-web-negocios-latinos-houston-tx-hub-hispano",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency",
+        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://disenoweb.agency/web-design-houston.html",
         "https://creativemario.com/es/",
-        "https://www.singularityedge.com/mercados/estados-unidos/houston",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://www.creativehtx.com/houston-web-design/",
-        "https://www.designrush.com/agency/website-design-development/texas/houston",
-        "https://vitaliza.agency/agencia-de-marketing-digital-houston/",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston"
+        "https://marcyanstudio.com/en/houston",
+        "https://aurin.mx/en/web-design-houston",
+        "https://gomuchisimo.com/houston-tx/"
       ]
     },
     {
@@ -350,15 +352,19 @@
       "idioma": "en",
       "pregunta": "best bilingual web design agency in Houston",
       "repeticion": 1,
-      "aparecen": [],
+      "aparecen": [
+        "marcyan"
+      ],
       "fuentes": [
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://marketingbyneffy.com/bilingual-seo-houston/",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://themanifest.com/web-design/agencies/houston",
-        "https://wallstreetwebdesigns.com/website-designs-more",
-        "https://imaginacommunications.com/spanish-translations"
+        "https://hispanicmarketingfirm.com/about-2/",
+        "https://imaginacommunications.com/digital-marketing",
+        "https://imaginacommunications.com/",
+        "https://hispanicmarketingfirm.com/",
+        "https://marcyanstudio.com/en/houston",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency"
       ]
     },
     {
@@ -366,15 +372,14 @@
       "idioma": "en",
       "pregunta": "best bilingual web design agency in Houston",
       "repeticion": 2,
-      "aparecen": [],
+      "aparecen": [
+        "marcyan"
+      ],
       "fuentes": [
-        "https://marketingbyneffy.com/bilingual-seo-houston/",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://imaginacommunications.com/spanish-translations",
-        "https://wallstreetwebdesigns.com/website-designs-more"
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
+        "https://imaginacommunications.com/digital-marketing",
+        "https://marcyanstudio.com/en/houston"
       ]
     },
     {
@@ -382,18 +387,18 @@
       "idioma": "en",
       "pregunta": "best bilingual web design agency in Houston",
       "repeticion": 3,
-      "aparecen": [],
+      "aparecen": [
+        "marcyan"
+      ],
       "fuentes": [
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
         "https://imaginacommunications.com/",
         "https://imaginacommunications.com/digital-marketing",
-        "https://wallstreetwebdesigns.com/website-designs-more",
-        "https://ebrownlaw.com/",
-        "https://www.ridenowtoday.com/about-us"
+        "https://hispanicmarketingfirm.com/about-2/",
+        "https://hispanicmarketingfirm.com/",
+        "https://marcyanstudio.com/en/houston",
+        "https://gomuchisimo.com/houston-tx/"
       ]
     },
     {
@@ -403,12 +408,16 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
+        "https://www.boralagency.com/hispanic-2/",
+        "https://hispanicmarketingfirm.com/",
+        "https://hispanicmarketingfirm.com/about-2/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://oakinteractive.com/about/",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://www.lvbranding.com/services/digital-marketing-paid-media-houston",
-        "https://imaginacommunications.com/digital-marketing",
-        "https://wallstreetwebdesigns.com/website-designs-more"
+        "https://bigbitemarketers.com/bilingual-marketing-agency-services",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://imaginacommunications.com/digital-marketing"
       ]
     },
     {
@@ -418,16 +427,16 @@
       "repeticion": 2,
       "aparecen": [],
       "fuentes": [
-        "https://serendipdigital.com/about.html",
-        "https://hispanicmarketingfirm.com/",
-        "https://hispanicmarketingfirm.com/about-2/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
-        "https://creativemario.com/",
-        "https://imaginacommunications.com/digital-marketing",
-        "https://imaginacommunications.com/spanish-translations",
-        "https://imaginacommunications.com/",
         "https://oakinteractive.com/about/",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston"
+        "https://gomuchisimo.com/houston-tx/",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://imaginacommunications.com/",
+        "https://imaginacommunications.com/digital-marketing",
+        "https://imaginacommunications.com/",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency"
       ]
     },
     {
@@ -437,14 +446,12 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://oakinteractive.com/about/",
-        "https://oakinteractive.com/about/",
-        "https://hispanicmarketingfirm.com/about-2/",
-        "https://hispanicmarketingfirm.com/",
+        "https://alphacomarketing.com/bilingual-marketing-agency/",
+        "https://www.poppymarketingandconsulting.com/houston-marketing-agency",
+        "https://gomuchisimo.com/houston-tx/",
+        "https://gomuchisimo.com/houston-tx/",
         "https://bigbitemarketers.com/bilingual-marketing-agency-services",
         "https://imaginacommunications.com/digital-marketing",
-        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
-        "https://creativemario.com/",
         "https://marketingbyneffy.com/bilingual-seo-houston/"
       ]
     },
@@ -455,16 +462,12 @@
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://simplythebestdigital.com/locations/miami-fl/",
-        "https://dndseoservices.com/locations/miami-fl-local-seo-agency/",
-        "https://www.bluelinks.agency/seo/listicles/seo-agencies-in-miami-fl/",
-        "https://www.localmiamiseo.com/services/",
-        "https://www.esasson.com/local-seo-miami-small-businesses/",
+        "https://www.miamiseocompany.net/local-seo-miami",
         "https://koretechx.com/us/best-miami-seo-companies/",
         "https://heydaymarketing.com/services/miami-search-engine-optimization",
-        "https://builtin.com/articles/seo-agency-miami",
-        "https://skyseodigital.com/top-20-seo-agencies-in-miami/",
-        "https://wpseomarketer.com/best-local-seo-services-for-small-businesses-in-north-miami-beach/"
+        "https://heydaymarketing.com/services/miami-search-engine-optimization",
+        "https://unifiedmktg.com/best-local-seo-agencies-in-miami-2026/",
+        "https://www.esasson.com/local-seo-miami-small-businesses/"
       ]
     },
     {
@@ -474,30 +477,10 @@
       "repeticion": 2,
       "aparecen": [],
       "fuentes": [
-        "https://koretechx.com/us/best-miami-seo-companies/",
-        "https://koretechx.com/us/best-miami-seo-companies/",
-        "https://www.esasson.com/local-seo-miami-small-businesses/",
         "https://www.egochi.com/miami-seo/",
-        "https://thriveagency.com/news/best-miami-seo-companies/",
-        "https://heydaymarketing.com/services/miami-search-engine-optimization",
-        "https://heydaymarketing.com/services/miami-search-engine-optimization",
-        "https://www.webdesignrankings.com/top-seo-companies-miami/",
-        "https://wpseomarketer.com/best-local-seo-services-for-small-businesses-in-north-miami-beach/"
-      ]
-    },
-    {
-      "motor": "gemini",
-      "idioma": "en",
-      "pregunta": "local SEO agency in Miami for small businesses",
-      "repeticion": 3,
-      "aparecen": [],
-      "fuentes": [
-        "https://simplythebestdigital.com/locations/miami-fl/",
-        "https://dndseoservices.com/locations/miami-fl-local-seo-agency/",
-        "https://thriveagency.com/news/best-miami-seo-companies/",
         "https://koretechx.com/us/best-miami-seo-companies/",
         "https://www.esasson.com/local-seo-miami-small-businesses/",
-        "https://www.localmiamiseo.com/services/",
+        "https://unifiedmktg.com/best-local-seo-agencies-in-miami-2026/",
         "https://heydaymarketing.com/services/miami-search-engine-optimization",
         "https://heydaymarketing.com/services/miami-search-engine-optimization"
       ]
@@ -505,70 +488,88 @@
     {
       "motor": "gemini",
       "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://www.egochi.com/miami-seo/",
+        "https://unifiedmktg.com/best-local-seo-agencies-in-miami-2026/",
+        "https://wpseomarketer.com/best-local-seo-services-for-small-businesses-in-north-miami-beach/",
+        "https://koretechx.com/us/best-miami-seo-companies/",
+        "https://www.esasson.com/local-seo-miami-small-businesses/",
+        "https://heydaymarketing.com/services/miami-search-engine-optimization",
+        "https://agencies.semrush.com/list/seo/miami/"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
       "pregunta": "how much does a website cost in Houston",
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
-        "https://214web.com/pricing",
-        "https://thervo.com/costs/website-design-costs",
-        "https://www.thedomaindesigners.com/pricing",
-        "https://securetechie.com/blog/custom-website-cost/",
-        "https://www.stephenscode.dev/service-areas/houston",
-        "https://www.naveck.com/blog/web-development-cost-texas/",
-        "https://millermedia7.com/blog/how-much-do-agencies-charge-for-website-design/",
-        "https://projectcostestimator.com/freelance-website-cost",
-        "https://theedenscode.com/pricing"
-      ]
-    },
-    {
-      "motor": "gemini",
-      "idioma": "en",
-      "pregunta": "how much does a website cost in Houston",
-      "repeticion": 2,
-      "aparecen": [],
-      "fuentes": [
+        "https://www.webyking.com/blog/website-design-cost/",
         "https://hexwebdesign.com/insights/houston-website-cost-2026",
-        "https://talo.com/costs/how-much-does-a-website-cost",
-        "https://www.thedomaindesigners.com/pricing",
-        "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
-        "https://www.stephenscode.dev/pricing",
-        "https://thervo.com/costs/website-design-costs",
-        "https://millermedia7.com/blog/how-much-do-agencies-charge-for-website-design/",
-        "https://prowebsitedesigns.com/pricing"
-      ]
-    },
-    {
-      "motor": "gemini",
-      "idioma": "en",
-      "pregunta": "how much does a website cost in Houston",
-      "repeticion": 3,
-      "aparecen": [],
-      "fuentes": [
         "https://www.primewebdesign.com/learning/web-design/cost/texas/",
-        "https://www.thedomaindesigners.com/pricing",
-        "https://thervo.com/costs/website-design-costs",
         "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
-        "https://millermedia7.com/blog/how-much-do-agencies-charge-for-website-design/",
-        "https://www.2pointagency.com/glossary/pricing-for-e-commerce-web-design-in-houston-what-you-need-to-know/",
+        "https://northtexas-webdesign.com/custom-website-costs-texas-guide-2026/",
+        "https://www.stephenscode.dev/pricing",
+        "https://improzinternetmarketing.com/affordable-web-design/",
+        "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
+        "https://texomamarketing.com/how-much-does-a-website-cost-small-business-texas/",
         "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/"
       ]
     },
     {
       "motor": "gemini",
       "idioma": "en",
+      "pregunta": "how much does a website cost in Houston",
+      "repeticion": 2,
+      "aparecen": [],
+      "fuentes": [
+        "https://www.primewebdesign.com/learning/web-design/cost/texas/",
+        "https://webdesignerfactory.com/small-business-website-cost-texas-2026/",
+        "https://thervo.com/costs/website-design-costs",
+        "https://wintrabiz.com/guides/best-website-designer-houston/",
+        "https://www.thedomaindesigners.com/pricing",
+        "https://www.stephenscode.dev/pricing",
+        "https://northtexas-webdesign.com/custom-website-costs-texas-guide-2026/",
+        "https://www.naveck.com/blog/web-development-cost-texas/",
+        "https://rawcutcreative.com/cities/web-design-houston-tx/pricing",
+        "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
+      "pregunta": "how much does a website cost in Houston",
+      "repeticion": 3,
+      "aparecen": [],
+      "fuentes": [
+        "https://thervo.com/costs/website-design-costs",
+        "https://northtexas-webdesign.com/custom-website-costs-texas-guide-2026/",
+        "https://214web.com/pricing",
+        "https://www.primewebdesign.com/learning/web-design/cost/comparing-web-design-prices-across-texas/",
+        "https://www.webyking.com/blog/website-design-cost/",
+        "https://www.stephenscode.dev/pricing",
+        "https://www.webyking.com/blog/website-design-cost/",
+        "https://talo.com/costs/website-design-cost",
+        "https://www.reddit.com/r/webhosting/comments/1j7cr81/whats_the_average_price_to_build_a_website_in/",
+        "https://techbehemoths.com/blog/texas-web-design-prices"
+      ]
+    },
+    {
+      "motor": "gemini",
+      "idioma": "en",
       "pregunta": "AI chatbot for small business in Houston",
       "repeticion": 1,
       "aparecen": [],
       "fuentes": [
-        "https://maxefeed.com/ai-chatbot-development-houston",
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
+        "https://speedxmarketing.com/blog/top-8-ai-chatbot-development-services-in-houston",
         "https://nathandynamics.com/ai-automation-houston.html",
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
-        "https://davarion.com/en/ai-automation-houston/",
         "https://theautomators.ai/ai-agency-houston/",
-        "https://www.faridimarketinggroup.com/services/ai-automations/ai-chatbot",
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
-        "https://defcor.us/services/ai-automation-services/ai-chat-automation/"
+        "https://maxefeed.com/ai-chatbot-development-houston"
       ]
     },
     {
@@ -578,12 +579,15 @@
       "repeticion": 2,
       "aparecen": [],
       "fuentes": [
-        "https://theautomators.ai/ai-agency-houston/",
-        "https://feynixsolution.com/houstons-leading-trusted-ai-chatbot-development-agency-for-smart-business-solutions/",
+        "https://nathandynamics.com/ai-automation-houston.html",
         "https://speedxmarketing.com/blog/top-8-ai-chatbot-development-services-in-houston",
-        "https://zenintech.com/ai-automation/",
-        "https://talosautomation.ai/locations",
-        "https://nathandynamics.com/ai-automation-houston.html"
+        "https://theautomators.ai/ai-agency-houston/",
+        "https://maxefeed.com/ai-chatbot-development-houston",
+        "https://davarion.com/en/ai-automation-houston/",
+        "https://www.aiproconsultants.com/blog/ai-automation-agency-houston-tx/",
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
+        "https://talosautomation.ai/",
+        "https://www.faridimarketinggroup.com/services/ai-automations/ai-chatbot"
       ]
     },
     {
@@ -593,12 +597,16 @@
       "repeticion": 3,
       "aparecen": [],
       "fuentes": [
-        "https://nathandynamics.com/ai-automation-houston.html",
-        "https://aglegacy.com/ai-chatbots-local-businesses-houston/",
+        "https://www.faridimarketinggroup.com/services/ai-automations/ai-chatbot",
+        "https://essential-it.com/services/ai-integration/",
         "https://theautomators.ai/ai-agency-houston/",
         "https://maxefeed.com/ai-chatbot-development-houston",
         "https://davarion.com/en/ai-automation-houston/",
-        "https://www.faridimarketinggroup.com/services/ai-automations/ai-chatbot"
+        "https://www.houstonitdevelopers.com/services/ai-chatbot-development",
+        "https://www.is-t.net/design/ai-chatbot-development-in-houston",
+        "https://speedxmarketing.com/blog/top-8-ai-chatbot-development-services-in-houston",
+        "https://zenintech.com/ai-automation/",
+        "https://www.bigsplashwebdesign.com/ai-chatbot-development/"
       ]
     }
   ]

@@ -1,12 +1,12 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-05",
+  "fecha": "2026-10-06",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
       "clics": 0,
-      "impresiones": 1
+      "impresiones": 2
     },
     "anteriores28": {
       "clics": 0,

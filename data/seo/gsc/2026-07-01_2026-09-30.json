@@ -1,0 +1,306 @@
+{
+  "cliente": "marcyan",
+  "tipo": "rango",
+  "periodo": {
+    "desde": "2026-07-01",
+    "hasta": "2026-09-30"
+  },
+  "anterior": {
+    "desde": "2026-03-31",
+    "hasta": "2026-06-30"
+  },
+  "anioPasado": {
+    "desde": "2025-07-02",
+    "hasta": "2025-10-01"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 16,
+      "impresiones": 1673,
+      "ctr": 0.96,
+      "posicion": 30.3
+    },
+    "anterior": {
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 16,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 4,
+        "ctr": 0,
+        "posicion": 7.5
+      },
+      "sinMarca": {
+        "clicks": 7,
+        "impresiones": 1101,
+        "ctr": 0.64,
+        "posicion": 40.3
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "landings",
+      "clicks": 8,
+      "impresiones": 526,
+      "ctr": 1.52,
+      "posicion": 18.3,
+      "dClicks": 8,
+      "dImpresiones": 526,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 6,
+      "impresiones": 926,
+      "ctr": 0.65,
+      "posicion": 37.5,
+      "dClicks": 6,
+      "dImpresiones": 926,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 1,
+      "impresiones": 223,
+      "ctr": 0.45,
+      "posicion": 22,
+      "dClicks": 1,
+      "dImpresiones": 223,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "home",
+      "clicks": 1,
+      "impresiones": 26,
+      "ctr": 3.85,
+      "posicion": 3,
+      "dClicks": 1,
+      "dImpresiones": 26,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "servicios",
+      "clicks": 1,
+      "impresiones": 22,
+      "ctr": 4.55,
+      "posicion": 56.3,
+      "dClicks": 1,
+      "dImpresiones": 22,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 98,
+      "ctr": 0,
+      "posicion": 23.3,
+      "dClicks": 0,
+      "dImpresiones": 98,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 50,
+      "ctr": 0,
+      "posicion": 4.9,
+      "dClicks": 0,
+      "dImpresiones": 50,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "es",
+      "clicks": 12,
+      "impresiones": 1459,
+      "ctr": 0.82,
+      "posicion": 31.1,
+      "dClicks": 12,
+      "dImpresiones": 1459,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "en",
+      "clicks": 5,
+      "impresiones": 412,
+      "ctr": 1.21,
+      "posicion": 18.9,
+      "dClicks": 5,
+      "dImpresiones": 412,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/es/miami",
+      "clicks": 5,
+      "impresiones": 737,
+      "ctr": 0.68,
+      "posicion": 41.6,
+      "dClicks": 5,
+      "dImpresiones": 737,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/miami/ecommerce",
+      "clicks": 2,
+      "impresiones": 27,
+      "ctr": 7.41,
+      "posicion": 15.9,
+      "dClicks": 2,
+      "dImpresiones": 27,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/houston/talleres-mecanicos",
+      "clicks": 1,
+      "impresiones": 124,
+      "ctr": 0.81,
+      "posicion": 9.8,
+      "dClicks": 1,
+      "dImpresiones": 124,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/miami/diseno-web",
+      "clicks": 1,
+      "impresiones": 102,
+      "ctr": 0.98,
+      "posicion": 28.4,
+      "dClicks": 1,
+      "dImpresiones": 102,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "clicks": 1,
+      "impresiones": 61,
+      "ctr": 1.64,
+      "posicion": 21.5,
+      "dClicks": 1,
+      "dImpresiones": 61,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/houston",
+      "posicion": 15.6,
+      "impresiones": 56,
+      "ctr": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/en/miami/conversational-ai",
+      "posicion": 13.6,
+      "impresiones": 49,
+      "ctr": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos/",
+      "posicion": 6.6,
+      "impresiones": 34,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [
+    {
+      "query": "diseño web miami",
+      "pagina": "https://marcyanstudio.com/es/miami/diseno-web",
+      "posicion": 27.4,
+      "impresiones": 186
+    },
+    {
+      "query": "agencia diseño web miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 29.1,
+      "impresiones": 73
+    },
+    {
+      "query": "agencia seo miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 66.5,
+      "impresiones": 62
+    },
+    {
+      "query": "diseño de paginas web en miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 28.1,
+      "impresiones": 53
+    },
+    {
+      "query": "hacer web en miami",
+      "pagina": "https://marcyanstudio.com/es/miami/diseno-web",
+      "posicion": 35.5,
+      "impresiones": 37
+    },
+    {
+      "query": "diseño de sitios web en miami",
+      "pagina": "https://marcyanstudio.com/es/miami/diseno-web",
+      "posicion": 25.2,
+      "impresiones": 33
+    },
+    {
+      "query": "empresa de diseño web miami",
+      "pagina": "https://marcyanstudio.com/es/miami/diseno-web",
+      "posicion": 17,
+      "impresiones": 33
+    },
+    {
+      "query": "empresa de desarrollo web miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 44.2,
+      "impresiones": 32
+    },
+    {
+      "query": "consultor seo miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 60.4,
+      "impresiones": 31
+    },
+    {
+      "query": "cómo aparecer en chatgpt, gemini y ai overviews",
+      "pagina": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
+      "posicion": 91.5,
+      "impresiones": 31
+    },
+    {
+      "query": "diseño web en miami",
+      "pagina": "https://marcyanstudio.com/es/miami/diseno-web",
+      "posicion": 26.9,
+      "impresiones": 27
+    },
+    {
+      "query": "diseñadores web miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 30.8,
+      "impresiones": 26
+    }
+  ],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

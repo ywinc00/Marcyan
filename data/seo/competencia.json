@@ -1,0 +1,530 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-10-06",
+  "estado": "ok",
+  "nota": "Orden de Places = aproximación al del mapa, sin depender de la ubicación de quien busca.",
+  "resultados": [
+    {
+      "busqueda": "web design in Houston, Texas",
+      "clienteEnPuesto": null,
+      "top": [
+        {
+          "orden": 1,
+          "nombre": "Luxurious Web Design",
+          "resenas": 54,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://luxuriouswebdesign.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ9cBi_v7BQIYRjPkd4ByYEh0"
+        },
+        {
+          "orden": 2,
+          "nombre": "Web Developers Firm",
+          "resenas": 53,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://wdftx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJIwAvyEUgQYYRPWUdIbwDNGA"
+        },
+        {
+          "orden": 3,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 4,
+          "nombre": "Webnhubs",
+          "resenas": 103,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://webnhubs.com/",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJTXnIqNfDQIYRT3WrAPp3sIs"
+        },
+        {
+          "orden": 5,
+          "nombre": "WEB BONAFIDE : Web Design Company | E-Commerce Website | Logo Design | SEO & Digital Marketing in Houston",
+          "resenas": 18,
+          "nota": 4.8,
+          "categoria": "Servicios",
+          "web": "https://webbonafide.com/houston-web-design-company/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJMeFpKs3EQIYRN5ZsBr1EN1o"
+        },
+        {
+          "orden": 6,
+          "nombre": "True Digital Marketing Inc",
+          "resenas": 117,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "http://www.truedigitalmktg.com/",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJlRelt6jCQIYRy-WoirFsObc"
+        },
+        {
+          "orden": 7,
+          "nombre": "Artisticore Graphic Design Agency",
+          "resenas": 95,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.artisticore.com/?utm_source=google-maps&utm_medium=organic&utm_campaign=gbp-click-tracking&utm_id=gbp",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJCwAq4-jDQIYRlk-bdpZOAvs"
+        },
+        {
+          "orden": 8,
+          "nombre": "Creativity Design Group",
+          "resenas": 50,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://creativitydesigngroup.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJi4wy51DCQIYRG7yxJEC3_Ic"
+        },
+        {
+          "orden": 9,
+          "nombre": "Nimbus Media",
+          "resenas": 74,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.nimbusmedia.io/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJe5Q6u7fRQIYR4GJgXa6dslc"
+        }
+      ],
+      "fuertesNoSeguidos": [
+        {
+          "orden": 1,
+          "nombre": "Luxurious Web Design",
+          "resenas": 54,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://luxuriouswebdesign.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ9cBi_v7BQIYRjPkd4ByYEh0"
+        },
+        {
+          "orden": 2,
+          "nombre": "Web Developers Firm",
+          "resenas": 53,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://wdftx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJIwAvyEUgQYYRPWUdIbwDNGA"
+        },
+        {
+          "orden": 3,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 5,
+          "nombre": "WEB BONAFIDE : Web Design Company | E-Commerce Website | Logo Design | SEO & Digital Marketing in Houston",
+          "resenas": 18,
+          "nota": 4.8,
+          "categoria": "Servicios",
+          "web": "https://webbonafide.com/houston-web-design-company/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJMeFpKs3EQIYRN5ZsBr1EN1o"
+        }
+      ]
+    },
+    {
+      "busqueda": "website design for small business in Houston, Texas",
+      "clienteEnPuesto": null,
+      "top": [
+        {
+          "orden": 1,
+          "nombre": "Webnhubs",
+          "resenas": 103,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://webnhubs.com/",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJTXnIqNfDQIYRT3WrAPp3sIs"
+        },
+        {
+          "orden": 2,
+          "nombre": "Luxurious Web Design",
+          "resenas": 54,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://luxuriouswebdesign.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ9cBi_v7BQIYRjPkd4ByYEh0"
+        },
+        {
+          "orden": 3,
+          "nombre": "Web Theory Designs",
+          "resenas": 34,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://webtheorydesigns.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJnYagRJrmQIYRqPoR-IYjoQ4"
+        },
+        {
+          "orden": 4,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 5,
+          "nombre": "Web Developers Firm",
+          "resenas": 53,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://wdftx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJIwAvyEUgQYYRPWUdIbwDNGA"
+        },
+        {
+          "orden": 6,
+          "nombre": "ThrillX Design - Web Design Houston",
+          "resenas": 18,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://thrillxdesign.com/web-design-houston/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJfb9Keq6VQIYR2whsZaTGHpU"
+        },
+        {
+          "orden": 7,
+          "nombre": "Nimbus Media",
+          "resenas": 74,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.nimbusmedia.io/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJe5Q6u7fRQIYR4GJgXa6dslc"
+        },
+        {
+          "orden": 8,
+          "nombre": "Artisticore Graphic Design Agency",
+          "resenas": 95,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.artisticore.com/?utm_source=google-maps&utm_medium=organic&utm_campaign=gbp-click-tracking&utm_id=gbp",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJCwAq4-jDQIYRlk-bdpZOAvs"
+        },
+        {
+          "orden": 9,
+          "nombre": "Logo In Hours LLC. Custom Logo Design Houston",
+          "resenas": 202,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://logoinhours.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJJ1hWfNbDQIYRsdhW8P_rEP0"
+        }
+      ],
+      "fuertesNoSeguidos": [
+        {
+          "orden": 2,
+          "nombre": "Luxurious Web Design",
+          "resenas": 54,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://luxuriouswebdesign.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ9cBi_v7BQIYRjPkd4ByYEh0"
+        },
+        {
+          "orden": 3,
+          "nombre": "Web Theory Designs",
+          "resenas": 34,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://webtheorydesigns.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJnYagRJrmQIYRqPoR-IYjoQ4"
+        },
+        {
+          "orden": 4,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 5,
+          "nombre": "Web Developers Firm",
+          "resenas": 53,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://wdftx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJIwAvyEUgQYYRPWUdIbwDNGA"
+        }
+      ]
+    },
+    {
+      "busqueda": "seo services in Houston, Texas",
+      "clienteEnPuesto": null,
+      "top": [
+        {
+          "orden": 1,
+          "nombre": "Red Houston SEO Company",
+          "resenas": 94,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.redhoustonseocompany.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ27VDch2_QIYRr8N255XHUYM"
+        },
+        {
+          "orden": 2,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 3,
+          "nombre": "Lewis SEO Houston",
+          "resenas": 14,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://lewisseohouston.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJh3MnMCfDQIYREPGfmjQUCHo"
+        },
+        {
+          "orden": 4,
+          "nombre": "Actual SEO Media, Inc.",
+          "resenas": 36,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "https://actualseomedia.com/our-locations/houston-dairy-ashford/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJvZFrRH_dQIYR-_qP9Szl0Y4"
+        },
+        {
+          "orden": 5,
+          "nombre": "Angel SEO Services, LLC",
+          "resenas": 14,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.angelseoservices.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJb_6_X8jJQIYRgoQMbQFYjFI"
+        },
+        {
+          "orden": 6,
+          "nombre": "True Digital Marketing Inc",
+          "resenas": 117,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "http://www.truedigitalmktg.com/",
+          "esCliente": false,
+          "loSeguimos": true,
+          "placeId": "ChIJlRelt6jCQIYRy-WoirFsObc"
+        },
+        {
+          "orden": 7,
+          "nombre": "SEO Houston Pros - Houston SEO Expert and Search Engine Optimization Consultant",
+          "resenas": 14,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://seohoustonpros.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJL4OoY5HFQIYRcArdKctxWOs"
+        },
+        {
+          "orden": 8,
+          "nombre": "ASTOUNDZ SEO | WEB | PPC | SOCIAL",
+          "resenas": 104,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "https://astoundz.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ9dNzR9vGQIYRUgrE_pEbze4"
+        },
+        {
+          "orden": 9,
+          "nombre": "EWR Digital SEO",
+          "resenas": 147,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "https://www.ewrdigital.com/service-areas/houston-marketing-agency",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ1-ItZn_GQIYRxwYSTfsIuiw"
+        },
+        {
+          "orden": 10,
+          "nombre": "OuterBox",
+          "resenas": 198,
+          "nota": 4.8,
+          "categoria": "Servicios",
+          "web": "https://www.outerboxdesign.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJOy3a4k3BQIYR-3SJdbnEp8w"
+        }
+      ],
+      "fuertesNoSeguidos": [
+        {
+          "orden": 1,
+          "nombre": "Red Houston SEO Company",
+          "resenas": 94,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.redhoustonseocompany.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJ27VDch2_QIYRr8N255XHUYM"
+        },
+        {
+          "orden": 2,
+          "nombre": "WebSolution",
+          "resenas": 33,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://websolutiontx.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE"
+        },
+        {
+          "orden": 3,
+          "nombre": "Lewis SEO Houston",
+          "resenas": 14,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://lewisseohouston.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJh3MnMCfDQIYREPGfmjQUCHo"
+        },
+        {
+          "orden": 4,
+          "nombre": "Actual SEO Media, Inc.",
+          "resenas": 36,
+          "nota": 4.9,
+          "categoria": "Servicios",
+          "web": "https://actualseomedia.com/our-locations/houston-dairy-ashford/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJvZFrRH_dQIYR-_qP9Szl0Y4"
+        },
+        {
+          "orden": 5,
+          "nombre": "Angel SEO Services, LLC",
+          "resenas": 14,
+          "nota": 5,
+          "categoria": "Servicios",
+          "web": "https://www.angelseoservices.com/",
+          "esCliente": false,
+          "loSeguimos": false,
+          "placeId": "ChIJb_6_X8jJQIYRgoQMbQFYjFI"
+        }
+      ]
+    }
+  ],
+  "competidoresNuevosCandidatos": [
+    {
+      "placeId": "ChIJUfI-Q6nDQIYRDa7GwVh5_eE",
+      "nombre": "WebSolution",
+      "resenas": 33,
+      "nota": 5,
+      "categoria": "Servicios",
+      "web": "https://websolutiontx.com/",
+      "apariciones": 3
+    },
+    {
+      "placeId": "ChIJ9cBi_v7BQIYRjPkd4ByYEh0",
+      "nombre": "Luxurious Web Design",
+      "resenas": 54,
+      "nota": 5,
+      "categoria": "Servicios",
+      "web": "https://luxuriouswebdesign.com/",
+      "apariciones": 2
+    },
+    {
+      "placeId": "ChIJIwAvyEUgQYYRPWUdIbwDNGA",
+      "nombre": "Web Developers Firm",
+      "resenas": 53,
+      "nota": 5,
+      "categoria": "Servicios",
+      "web": "https://wdftx.com/",
+      "apariciones": 2
+    },
+    {
+      "placeId": "ChIJ27VDch2_QIYRr8N255XHUYM",
+      "nombre": "Red Houston SEO Company",
+      "resenas": 94,
+      "nota": 5,
+      "categoria": "Servicios",
+      "web": "https://www.redhoustonseocompany.com/",
+      "apariciones": 1
+    },
+    {
+      "placeId": "ChIJvZFrRH_dQIYR-_qP9Szl0Y4",
+      "nombre": "Actual SEO Media, Inc.",
+      "resenas": 36,
+      "nota": 4.9,
+      "categoria": "Servicios",
+      "web": "https://actualseomedia.com/our-locations/houston-dairy-ashford/",
+      "apariciones": 1
+    }
+  ]
+}

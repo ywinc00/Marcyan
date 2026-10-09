@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-07",
+  "fecha": "2026-10-09",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 58,
+  "indexadas": 50,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 58,
-    "Crawled - currently not indexed": 21,
+    "Submitted and indexed": 50,
+    "Crawled - currently not indexed": 29,
     "Alternate page with proper canonical tag": 5
   },
   "porGrupo": {
@@ -18,7 +18,7 @@
     },
     "otras·en": {
       "total": 5,
-      "indexadas": 5
+      "indexadas": 4
     },
     "servicios·en": {
       "total": 2,
@@ -38,7 +38,7 @@
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 9
+      "indexadas": 6
     },
     "precios·en": {
       "total": 4,
@@ -50,7 +50,7 @@
     },
     "blog·es": {
       "total": 7,
-      "indexadas": 5
+      "indexadas": 4
     },
     "otras·es": {
       "total": 5,
@@ -62,11 +62,11 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 5
+      "indexadas": 4
     },
     "landings·es": {
       "total": 18,
-      "indexadas": 12
+      "indexadas": 10
     },
     "servicios·es": {
       "total": 2,
@@ -77,9 +77,9 @@
       "indexadas": 3
     }
   },
-  "sinRastreoReciente": 41,
+  "sinRastreoReciente": 38,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 37,
+  "certificadoDias": 35,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 3,
+    "sesionesUltimos3Dias": 0,
     "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 48,
+    "diasSinContactos": 50,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -136,129 +136,176 @@
     "entrenamientoBloqueado": []
   },
   "google": {
-    "enCurso": [
+    "enCurso": [],
+    "recientes": [
       {
         "nombre": "September 2026 spam update",
         "inicio": "2026-09-24T16:15:00+00:00",
-        "fin": null,
+        "fin": "2026-10-08T08:00:00+00:00",
         "url": "https://status.search.google.com/incidents/XhUDXP7A67iHCD2kmbVu",
-        "interpretableDesde": null
+        "interpretableDesde": "2026-10-15"
       }
-    ],
-    "recientes": []
+    ]
   },
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/auto-repair"
+        "url": "https://marcyanstudio.com/en/houston/bilingual-web-design"
       },
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/ecommerce"
+        "url": "https://marcyanstudio.com/en/houston/immigration-lawyers"
       },
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/real-estate"
+        "url": "https://marcyanstudio.com/en/houston/web-design"
       },
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia"
+        "url": "https://marcyanstudio.com/en/portfolio"
       },
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/seo-para-ia"
+        "url": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp"
+      },
+      {
+        "fecha": "2026-10-09",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston"
+      },
+      {
+        "fecha": "2026-10-09",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+      },
+      {
+        "fecha": "2026-10-09",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/miami/ecommerce"
+      },
+      {
+        "fecha": "2026-10-09",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "medicion",
+        "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~5 al día): la medición puede estar rota",
+        "url": null
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-07",
+        "fecha": "2026-10-09",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "41 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "38 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
-    "info": [
-      {
-        "fecha": "2026-10-07",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/miami/diseno-web"
-      },
-      {
-        "fecha": "2026-10-07",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "google",
-        "detalle": "Actualización en curso: September 2026 spam update. No interpretar movimientos hasta una semana después de que termine.",
-        "url": null
-      }
-    ]
+    "info": []
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-07",
+      "fecha": "2026-10-09",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/auto-repair"
+      "url": "https://marcyanstudio.com/en/houston/bilingual-web-design"
     },
     {
-      "fecha": "2026-10-07",
+      "fecha": "2026-10-09",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/ecommerce"
+      "url": "https://marcyanstudio.com/en/houston/immigration-lawyers"
     },
     {
-      "fecha": "2026-10-07",
+      "fecha": "2026-10-09",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/real-estate"
+      "url": "https://marcyanstudio.com/en/houston/web-design"
     },
     {
-      "fecha": "2026-10-07",
+      "fecha": "2026-10-09",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia"
+      "url": "https://marcyanstudio.com/en/portfolio"
     },
     {
-      "fecha": "2026-10-07",
+      "fecha": "2026-10-09",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/seo-para-ia"
+      "url": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp"
+    },
+    {
+      "fecha": "2026-10-09",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston"
+    },
+    {
+      "fecha": "2026-10-09",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/diseno-web-bilingue"
+    },
+    {
+      "fecha": "2026-10-09",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/miami/ecommerce"
+    },
+    {
+      "fecha": "2026-10-09",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "medicion",
+      "detalle": "GA4 no registra visitas en los últimos 3 días (antes ~5 al día): la medición puede estar rota",
+      "url": null
     }
   ],
   "pedirIndexacion": [],

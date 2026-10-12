@@ -6,4 +6,5 @@
 
 | Fecha | Recurso (URL o ficha) | Cambio | Palanca | Métrica esperada | Revisión | Resultado |
 |---|---|---|---|---|---|---|
-
+| 2026-10-12 | /privacidad, /terminos, /en/privacy, /en/terms | El enlace "marcyanstudio.com" del texto legal apuntaba a la raíz (308 a /es); ahora /es en las páginas en español y /en en las de inglés. Sin cambio visual. Tanda 2026-W42, tarea 3 (plan, tarea 2) | §2.7 higiene (§7) | `data/seo/enlaces.json` del lunes sin enlaces internos a redirección (hoy 4) | 2026-10-19 (brief W43) | pendiente |
+| 2026-10-12 | /es/miami/seo-local, /es/sobre-nosotros, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices, /es/miami/doral | Google las tiene como "variante con barra final" por rastreos de junio y julio, anteriores al arreglo de agosto (hoy la canónica sin barra es única en página, sitemap y redirecciones; comprobado en vivo). Una petición de rastreo por URL, la primera tras ese cambio real. **El 12-oct el cupo diario ya estaba agotado ("Quota Exceeded" en la primera): se piden el 13-oct.** /es/herramientas se excluye: está propuesta para retirar del índice en el triage | §7 indexación (petición única por cambio real) | Las 5 pasan a "indexada" en `data/seo/vigilancia-ultima.json` | 2026-10-26 | pendiente |

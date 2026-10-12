@@ -1,0 +1,121 @@
+# Triage de indexación · Marcyan Studio · 12-oct-2026 (tanda 2026-W42, tarea 1)
+
+> Lista para la decisión de Yan del 15-oct, cuando los movimientos de la actualización de Google (24-sep a 8-oct) se puedan interpretar. **Hasta esa decisión no se toca ninguna página.** Datos: inspección de Google del 12-oct (`data/seo/estado-urls.json`), Search Console del 14-jul al 10-oct (90 días), palabras y enlaces internos del sitio construido hoy. Reglas: doctrina §5 prueba 7 (sin apariciones a los 3 o 4 meses se fusiona) y §7 (mayoría "rastreada, sin indexar" = calidad o duplicación; menos páginas y más fuertes).
+
+## 1. Qué pasó
+
+- Hoy: **44 indexadas, 34 rastreadas sin indexar y 6 variantes con barra final** de 84. El 26-sep estaban las 84 visibles; el 9-oct salieron 26 de golpe y el 12-oct otras 5.
+- De las 34 rastreadas sin indexar, **34 no fueron rastreadas de nuevo** antes de salir (último rastreo en agosto o antes). Google las sacó del índice sin volver a mirarlas, el día siguiente al fin de su actualización contra spam. Entre ellas están el hub /es/houston (46 enlaces internos, 57 apariciones), /en/services, /en/about y /en/portfolio: no es un problema página a página, es una reevaluación del sitio en conjunto (doctrina §7; Mueller, jul 2025 y jul 2026).
+- Lo que sí es de cada página: hay un grupo con **0 apariciones en 90 días** (sector en inglés, ciudad secundaria en el idioma que no se busca, herramientas), que es exactamente lo que la prueba 7 manda fusionar. Ese grupo pesa en la evaluación del sitio entero.
+
+## 2. Segmentación: plantilla × idioma × estado (las 40 no indexadas)
+
+| Plantilla | Idioma | Rastreada sin indexar | Variante | Total fuera | De cuántas |
+|---|---|---|---|---|---|
+| blog | ES | 3 | 1 | **4** | 7 |
+| ciudades | ES | 1 | 1 | **2** | 6 |
+| ciudades | EN | 3 | 0 | **3** | 6 |
+| herramientas | ES | 0 | 1 | **1** | 2 |
+| landings | ES | 7 | 2 | **9** | 18 |
+| landings | EN | 12 | 0 | **12** | 18 |
+| otras | ES | 0 | 1 | **1** | 5 |
+| otras | EN | 2 | 0 | **2** | 5 |
+| precios | ES | 1 | 0 | **1** | 4 |
+| precios | EN | 2 | 0 | **2** | 4 |
+| servicios | ES | 1 | 0 | **1** | 2 |
+| servicios | EN | 2 | 0 | **2** | 2 |
+
+Lectura: el inglés pierde más (landings EN 12 de 18 fuera, servicios EN 2 de 2, precios EN 2 de 4) y las páginas de sector en inglés casi no reciben apariciones. El español pierde el hub de Houston, tres artículos del blog con buena posición y la tienda de Miami, que tenía clics.
+
+## 3. Veredicto por página (48: las 40 fuera del índice y las 8 indexadas sin ninguna aparición en 90 días)
+
+**Reglas aplicadas**, en este orden: (R1) herramienta o índice de navegación con 0 apariciones → retirar del índice, sigue viva; (R2) landing de sector o ciudad secundaria con 0 apariciones en 90 días → fusionar en su hub con redirección; (R3) página con demanda real que Google no distingue de su hub o de su par → diferenciar (contenido propio, enlaces); (R4) todo lo demás que salió en la ola y tiene apariciones → mantener, esperar al 15-oct y enlazar desde páginas rastreadas; si en enero sigue con 5 apariciones o menos, pasa a fusión.
+
+Resumen: **5 retirar · 11 fusionar · 4 diferenciar · 28 mantener.** Las que quitan páginas (fusionar y retirar, 16) se enseñan antes de aplicarse.
+
+### Retirar del índice (5)
+
+| Página | Estado hoy | Apariciones 90 d | Clics | Puesto | Palabras | Enlaces internos (los que ve Google) | Par en el otro idioma | Destino | Por qué |
+|---|---|---|---|---|---|---|---|---|---|
+| `/en/checkup` | indexada | 0 | 0 | — | 404 | 40 (1) | `/es/diagnostico` (indexada, 0) | — | Página de herramienta o de navegación (404 palabras) con 0 apariciones en 90 días. Sigue viva y enlazada para los visitantes; sale del sitemap y lleva noindex. No compite con nada. |
+| `/en/tools` | indexada | 0 | 0 | — | 151 | 40 (1) | `/es/herramientas` (variante, 0) | — | Página de herramienta o de navegación (151 palabras) con 0 apariciones en 90 días. Sigue viva y enlazada para los visitantes; sale del sitemap y lleva noindex. No compite con nada. |
+| `/en/cities` | indexada | 0 | 0 | — | 391 | 40 (1) | `/es/ciudades` (indexada, 9) | — | Página de herramienta o de navegación (391 palabras) con 0 apariciones en 90 días. Sigue viva y enlazada para los visitantes; sale del sitemap y lleva noindex. No compite con nada. |
+| `/es/diagnostico` | indexada | 0 | 0 | — | 393 | 46 (3) | `/en/checkup` (indexada, 0) | — | Página de herramienta o de navegación (393 palabras) con 0 apariciones en 90 días. Sigue viva y enlazada para los visitantes; sale del sitemap y lleva noindex. No compite con nada. |
+| `/es/herramientas` | variante | 0 | 0 | — | 162 | 46 (2) | `/en/tools` (indexada, 0) | — | Página de herramienta o de navegación (162 palabras) con 0 apariciones en 90 días. Sigue viva y enlazada para los visitantes; sale del sitemap y lleva noindex. No compite con nada. |
+
+### Fusionar (11)
+
+| Página | Estado hoy | Apariciones 90 d | Clics | Puesto | Palabras | Enlaces internos (los que ve Google) | Par en el otro idioma | Destino | Por qué |
+|---|---|---|---|---|---|---|---|---|---|
+| `/en/miami/hialeah` | indexada | 0 | 0 | — | 1537 | 2 (1) | `/es/miami/hialeah` (indexada, 2) | `/en/miami` | Ciudad secundaria sin ninguna aparición en 90 días en este idioma (el par recibe 2). Se fusiona en /en/miami como zona atendida, con redirección. |
+| `/en/miami/local-seo` | indexada | 0 | 0 | — | 1218 | 9 (2) | `/es/miami/seo-local` (variante, 0) | `/en/miami` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par tampoco recibe. Prueba 7: se fusiona en su hub /en/miami como sección, con redirección, y el par pierde su hreflang. |
+| `/en/houston/conversational-ai` | rastreada sin indexar | 0 | 0 | — | 1339 | 40 (2) | `/es/houston/ia-conversacional` (indexada, 4) | `/en/houston` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par en el otro idioma sí recibe 4. Prueba 7: se fusiona en su hub /en/houston como sección, con redirección, y el par pierde su hreflang. |
+| `/en/houston/dental-clinics` | rastreada sin indexar | 0 | 0 | — | 1465 | 2 (1) | `/es/houston/clinicas-dentales` (rastreada sin indexar, 7) | `/en/houston` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par en el otro idioma sí recibe 7. Prueba 7: se fusiona en su hub /en/houston como sección, con redirección, y el par pierde su hreflang. |
+| `/en/houston/ecommerce` | rastreada sin indexar | 0 | 0 | — | 1299 | 40 (2) | `/es/houston/ecommerce` (indexada, 4) | `/en/houston` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par en el otro idioma sí recibe 4. Prueba 7: se fusiona en su hub /en/houston como sección, con redirección, y el par pierde su hreflang. |
+| `/en/houston/immigration-lawyers` | rastreada sin indexar | 0 | 0 | — | 1380 | 3 (2) | `/es/houston/abogados-inmigracion` (rastreada sin indexar, 4) | `/en/houston` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par en el otro idioma sí recibe 4. Prueba 7: se fusiona en su hub /en/houston como sección, con redirección, y el par pierde su hreflang. |
+| `/en/miami/ecommerce` | rastreada sin indexar | 0 | 0 | — | 1372 | 5 (2) | `/es/miami/ecommerce` (rastreada sin indexar, 46) | `/en/miami` | 0 apariciones en 90 días (publicada hace más de 3 meses); su par en el otro idioma sí recibe 46. Prueba 7: se fusiona en su hub /en/miami como sección, con redirección, y el par pierde su hreflang. |
+| `/en/pricing/local-seo-cost-houston` | rastreada sin indexar | 2 | 0 | 5 | 1297 | 5 (1) | `/es/precios/cuanto-cuesta-seo-local-houston` (rastreada sin indexar, 0) | `/en/houston/local-seo` | 2 apariciones en 90 días y su par en español 0. Fusionar en /en/houston/local-seo con redirección. |
+| `/es/houston/sugar-land` | indexada | 0 | 0 | — | 1323 | 2 (1) | `/en/houston/sugar-land` (rastreada sin indexar, 7) | `/es/houston` | Ciudad secundaria sin ninguna aparición en 90 días en este idioma (el par recibe 7). Se fusiona en /es/houston como zona atendida, con redirección. |
+| `/es/precios/cuanto-cuesta-un-chatbot` | indexada | 0 | 0 | — | 1258 | 8 (3) | `/en/pricing/chatbot-cost` (indexada, 66) | `/es/precios` | Indexada con 0 apariciones en 90 días mientras su par en inglés (/en/pricing/chatbot-cost) suma 66: la demanda de precio del chatbot llega en inglés. Fusionar en /es/precios (sección "cuánto cuesta un chatbot") con redirección. |
+| `/es/precios/cuanto-cuesta-seo-local-houston` | rastreada sin indexar | 0 | 0 | — | 1236 | 5 (1) | `/en/pricing/local-seo-cost-houston` (rastreada sin indexar, 2) | `/es/houston/seo-local` | 0 apariciones en 90 días y su par en inglés solo 2. Fusionar en /es/houston/seo-local (la página del servicio ya lleva el precio) con redirección. |
+
+### Diferenciar (4)
+
+| Página | Estado hoy | Apariciones 90 d | Clics | Puesto | Palabras | Enlaces internos (los que ve Google) | Par en el otro idioma | Destino | Por qué |
+|---|---|---|---|---|---|---|---|---|---|
+| `/en/miami/conversational-ai` | rastreada sin indexar | 49 | 0 | 13.6 | 1378 | 40 (2) | `/es/miami/ia-conversacional` (indexada, 11) | — | 49 apariciones y "conversational ai miami" en el puesto 8: demanda real en inglés. Salió del índice en la ola del 8-oct. Refresco previsto en el plan (Siguiente 5): prueba real, enlaces desde el hub y el blog. |
+| `/en/houston/beauty-salons` | rastreada sin indexar | 28 | 0 | 29.1 | 1424 | 3 (2) | `/es/houston/salon-belleza` (indexada, 1) | — | 28 apariciones, todas genéricas y sin ciudad ("beauty salon booking website", puesto 41). Falta señal local: Houston en título y H1, prueba local. Si en enero sigue sin aparecer con Houston, se fusiona en /en/houston. |
+| `/es/houston/talleres-mecanicos` | rastreada sin indexar | 124 | 1 | 9.8 | 1416 | 2 (1) | `/en/houston/auto-repair` (rastreada sin indexar, 1) | — | 124 apariciones pero casi todas de gente buscando un mecánico ("talleres mecánicos cerca de mí"), no una página web. Reenfocar título, H1 y apertura hacia "página web para talleres mecánicos en Houston" y quitar lo que la hace parecer un taller. Ficha previa antes de escribir. |
+| `/es/miami/seo-local` | variante | 0 | 0 | — | 1200 | 9 (2) | `/en/miami/local-seo` (indexada, 0) | — | Es la dueña natural de "agencia seo miami" (35 apariciones en septiembre, 62 en el trimestre) y hoy esa búsqueda cae en el hub /es/miami. Contenido propio de SEO local para Miami y enlaces desde el hub y el blog; Google además la tiene como variante con barra final (petición de rastreo hecha el 12-oct). |
+
+### Mantener (28)
+
+| Página | Estado hoy | Apariciones 90 d | Clics | Puesto | Palabras | Enlaces internos (los que ve Google) | Par en el otro idioma | Destino | Por qué |
+|---|---|---|---|---|---|---|---|---|---|
+| `/en/houston/sugar-land` | rastreada sin indexar | 7 | 0 | 11.9 | 1346 | 2 (1) | `/es/houston/sugar-land` (indexada, 0) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-31). 7 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/en/miami/doral` | rastreada sin indexar | 6 | 0 | 5.5 | 1424 | 2 (1) | `/es/miami/doral` (variante, 1) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-22). 6 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/en/houston/katy` | rastreada sin indexar | 2 | 0 | 7 | 1453 | 2 (1) | `/es/houston/katy` (indexada, 4) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-20). 2 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/houston/bilingual-web-design` | rastreada sin indexar | 15 | 1 | 7.8 | 1417 | 3 (2) | `/es/houston/diseno-web-bilingue` (rastreada sin indexar, 4) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-30). 15 apariciones en 90 días y 1 clic(s). Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/en/houston/web-design` | rastreada sin indexar | 12 | 1 | 10.2 | 1156 | 40 (1) | `/es/houston/diseno-web` (indexada, 13) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-30). 12 apariciones en 90 días y 1 clic(s). Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/en/houston/real-estate` | rastreada sin indexar | 4 | 0 | 57.8 | 1324 | 3 (2) | `/es/houston/bienes-raices` (variante, 3) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-30). 4 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/houston/auto-repair` | rastreada sin indexar | 1 | 0 | 3 | 1482 | 2 (1) | `/es/houston/talleres-mecanicos` (rastreada sin indexar, 124) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-24). 1 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/houston/local-seo` | rastreada sin indexar | 1 | 0 | 7 | 1177 | 40 (2) | `/es/houston/seo-local` (indexada, 24) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-23). 1 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/about` | rastreada sin indexar | 3 | 0 | 4 | 1324 | 40 (1) | `/es/sobre-nosotros` (variante, 9) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-23). 3 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/portfolio` | rastreada sin indexar | 3 | 0 | 5.3 | 833 | 40 (1) | `/es/portafolio` (indexada, 11) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-31). 3 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/pricing/website-cost-houston` | rastreada sin indexar | 12 | 0 | 2.1 | 1209 | 5 (1) | `/es/precios/cuanto-cuesta-una-pagina-web-houston` (indexada, 14) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-24). 12 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/en/services` | rastreada sin indexar | 2 | 0 | 2.5 | 980 | 40 (3) | `/es/servicios` (rastreada sin indexar, 2) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-04). 2 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/en/ai-for-small-business` | rastreada sin indexar | 1 | 1 | 1 | 1198 | 40 (2) | `/es/ia-para-pymes` (indexada, 17) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-25). 1 apariciones en 90 días y 1 clic(s). Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/es/blog/ia-que-contesta-llamadas-mensajes-perdidos` | variante | 41 | 0 | 7 | 1890 | 3 (1) | — | — | Indexada bajo su variante con barra final (rastreo viejo, 2026-07-06); la canónica real ya es sin barra y el sitemap la lleva. Petición de rastreo hecha el 12-oct. 41 apariciones en 90 días. |
+| `/es/blog/precio-pagina-web-houston-guia` | rastreada sin indexar | 17 | 0 | 5.6 | 1748 | 2 (1) | — | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-24). 17 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/blog/como-elegir-agencia-diseno-web-hispana` | rastreada sin indexar | 9 | 0 | 3.6 | 2045 | 2 (1) | — | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-09-06). 9 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp` | rastreada sin indexar | 9 | 0 | 3.6 | 1929 | 3 (2) | — | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-30). 9 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/houston` | rastreada sin indexar | 57 | 0 | 15.4 | 1115 | 46 (1) | `/en/houston` (indexada, 60) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-02). 57 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/miami/doral` | variante | 1 | 0 | 4 | 1418 | 2 (1) | `/en/miami/doral` (rastreada sin indexar, 6) | — | Indexada bajo su variante con barra final (rastreo viejo, 2026-07-09); la canónica real ya es sin barra y el sitemap la lleva. Petición de rastreo hecha el 12-oct. 1 apariciones en 90 días. |
+| `/es/miami/ecommerce` | rastreada sin indexar | 46 | 3 | 13.6 | 1372 | 5 (2) | `/en/miami/ecommerce` (rastreada sin indexar, 0) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-25). 46 apariciones en 90 días y 3 clic(s). Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/houston/seo-para-ia` | rastreada sin indexar | 8 | 0 | 83.5 | 1286 | 46 (2) | `/en/houston/ai-seo` (indexada, 7) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-22). 8 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/houston/clinicas-dentales` | rastreada sin indexar | 7 | 0 | 18.6 | 1459 | 2 (1) | `/en/houston/dental-clinics` (rastreada sin indexar, 0) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-07-06). 7 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/houston/restaurantes` | rastreada sin indexar | 7 | 0 | 6.4 | 1455 | 3 (2) | `/en/houston/restaurants` (indexada, 31) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-20). 7 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/houston/abogados-inmigracion` | rastreada sin indexar | 4 | 0 | 4.5 | 1356 | 3 (1) | `/en/houston/immigration-lawyers` (rastreada sin indexar, 0) | — | Indexada desde el 2026-09-10 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-10-04). 4 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/es/houston/diseno-web-bilingue` | rastreada sin indexar | 4 | 0 | 1.3 | 1406 | 4 (2) | `/en/houston/bilingual-web-design` (rastreada sin indexar, 15) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-30). 4 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/es/houston/bienes-raices` | variante | 3 | 0 | 5.3 | 1283 | 3 (1) | `/en/houston/real-estate` (rastreada sin indexar, 4) | — | Indexada desde el 2026-08-18 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-07-07). 3 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+| `/es/sobre-nosotros` | variante | 9 | 0 | 4.9 | 1333 | 48 (2) | `/en/about` (rastreada sin indexar, 3) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-07-24). 9 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. |
+| `/es/servicios` | rastreada sin indexar | 2 | 0 | 8.5 | 966 | 48 (4) | `/en/services` (rastreada sin indexar, 2) | — | Indexada desde el 2026-09-09 y fuera desde la ola del 9 al 12 de octubre sin que Google la volviera a rastrear (último rastreo 2026-08-05). 2 apariciones en 90 días. Se espera al 15-oct; enlaces contextuales desde páginas rastreadas. Si en enero sigue con 5 o menos apariciones, pasa a fusión. |
+
+## 4. Cómo se aplicaría cada veredicto (después del 15-oct, solo lo que Yan apruebe)
+
+- **Retirar del índice**: `noindex` en la página, fuera del sitemap y del `ItemList`; se mantienen la URL y los enlaces del menú; el par de idioma deja de declarar `hreflang` hacia ella. Nada visible cambia.
+- **Fusionar**: el contenido útil pasa como sección a la página destino (hub o página de servicio), la URL vieja redirige con 301 a esa sección, sale del sitemap y de los enlaces internos, y su par de idioma deja de apuntar `hreflang` a ella. El verificador `scripts/verify-landing-contracts.mjs` se adapta para no exigir el par. Se enseña el destino antes de publicar.
+- **Diferenciar**: ficha previa (`kit/brief-pagina.mjs`) y texto nuevo con lo que esa página tiene y el hub no (prueba local, precio, casos); título y H1 con la ciudad; enlaces contextuales desde el hub, el blog y la página de servicio. Es cambio de texto: protocolo de cambio y, si toca diseño, `design-director` y OK de Yan sobre el render.
+- **Mantener**: sin cambio de contenido. Enlaces contextuales desde páginas que Google sí rastrea (portada, servicios, blog) hacia ellas (tarea 4 del plan) y revisión el 26-oct. No se pide indexación: "rastreada, sin indexar" no mejora con reenvíos (doctrina §7).
+
+## 5. Decisiones que necesita Yan el 15-oct
+
+1. **Las 11 fusiones y las 5 retiradas**: sí, no, o cuáles. Son las únicas que quitan páginas.
+2. **Las 4 diferenciaciones**: trabajo de texto con ficha previa; confirmar que entran en la tanda de la semana que viene.
+3. **Umbral de enero**: las 13 páginas de "mantener" con 5 apariciones o menos pasan a fusión en la revisión de enero si no suben. Confirmar el umbral.
+
+## 6. Métrica y revisión
+
+- Métrica de la tanda (brief W42): 60 o más páginas indexadas 4 semanas después de aplicar las fusiones. Hoy 44 de 84; tras retirar 5 y fusionar 11, el sitio queda en 68 URL y la meta pasa a 60 de 68.
+- Revisión: 26-oct (14 días tras la decisión) en la vigilancia diaria, y en el reporte del 4-nov.
+

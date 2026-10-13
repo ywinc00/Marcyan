@@ -51,3 +51,7 @@
 {"fecha":"2026-10-12","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Crawled - currently not indexed","url":"https://marcyanstudio.com/es/houston/restaurantes"}
 {"fecha":"2026-10-12","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Alternate page with proper canonical tag","url":"https://marcyanstudio.com/es/sobre-nosotros"}
 {"fecha":"2026-10-12","cliente":"marcyan","nivel":"media","tipo":"rastreo","detalle":"35 páginas indexadas llevan más de 30 días sin visita de Google","url":null}
+{"fecha":"2026-10-13","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Crawled - currently not indexed","url":"https://marcyanstudio.com/en/miami/web-design"}
+{"fecha":"2026-10-13","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Crawled - currently not indexed","url":"https://marcyanstudio.com/es/miami/hialeah"}
+{"fecha":"2026-10-13","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Alternate page with proper canonical tag","url":"https://marcyanstudio.com/es/portafolio"}
+{"fecha":"2026-10-13","cliente":"marcyan","nivel":"media","tipo":"rastreo","detalle":"32 páginas indexadas llevan más de 30 días sin visita de Google","url":null}

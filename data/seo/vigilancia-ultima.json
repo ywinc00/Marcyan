@@ -1,15 +1,15 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-12",
+  "fecha": "2026-10-13",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 44,
+  "indexadas": 41,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 44,
-    "Crawled - currently not indexed": 34,
-    "Alternate page with proper canonical tag": 6
+    "Submitted and indexed": 41,
+    "Crawled - currently not indexed": 36,
+    "Alternate page with proper canonical tag": 7
   },
   "porGrupo": {
     "home·en": {
@@ -38,7 +38,7 @@
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 6
+      "indexadas": 5
     },
     "precios·en": {
       "total": 4,
@@ -54,7 +54,7 @@
     },
     "otras·es": {
       "total": 5,
-      "indexadas": 4
+      "indexadas": 3
     },
     "herramientas·es": {
       "total": 2,
@@ -62,7 +62,7 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 4
+      "indexadas": 3
     },
     "landings·es": {
       "total": 18,
@@ -77,9 +77,9 @@
       "indexadas": 3
     }
   },
-  "sinRastreoReciente": 35,
+  "sinRastreoReciente": 32,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 32,
+  "certificadoDias": 31,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -116,7 +116,7 @@
     "sesionesUltimos3Dias": 3,
     "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 53,
+    "diasSinContactos": 54,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,61 +150,37 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-12",
+        "fecha": "2026-10-13",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/about"
+        "url": "https://marcyanstudio.com/en/miami/web-design"
       },
       {
-        "fecha": "2026-10-12",
+        "fecha": "2026-10-13",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/houston/sugar-land"
+        "url": "https://marcyanstudio.com/es/miami/hialeah"
       },
       {
-        "fecha": "2026-10-12",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/services"
-      },
-      {
-        "fecha": "2026-10-12",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana"
-      },
-      {
-        "fecha": "2026-10-12",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/restaurantes"
-      },
-      {
-        "fecha": "2026-10-12",
+        "fecha": "2026-10-13",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Alternate page with proper canonical tag",
-        "url": "https://marcyanstudio.com/es/sobre-nosotros"
+        "url": "https://marcyanstudio.com/es/portafolio"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-12",
+        "fecha": "2026-10-13",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "35 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "32 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
@@ -212,52 +188,28 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-12",
+      "fecha": "2026-10-13",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/about"
+      "url": "https://marcyanstudio.com/en/miami/web-design"
     },
     {
-      "fecha": "2026-10-12",
+      "fecha": "2026-10-13",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/houston/sugar-land"
+      "url": "https://marcyanstudio.com/es/miami/hialeah"
     },
     {
-      "fecha": "2026-10-12",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/services"
-    },
-    {
-      "fecha": "2026-10-12",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana"
-    },
-    {
-      "fecha": "2026-10-12",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/restaurantes"
-    },
-    {
-      "fecha": "2026-10-12",
+      "fecha": "2026-10-13",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Alternate page with proper canonical tag",
-      "url": "https://marcyanstudio.com/es/sobre-nosotros"
+      "url": "https://marcyanstudio.com/es/portafolio"
     }
   ],
   "pedirIndexacion": [],

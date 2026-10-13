@@ -1,0 +1,150 @@
+{
+  "actualizado": "2026-10-12",
+  "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
+  "acciones": {
+    "marcyan-triage-paginas-sin-indexar": {
+      "ref": "marcyan-triage-paginas-sin-indexar",
+      "tipo": "web",
+      "titulo": "Triage de las páginas rastreadas sin indexar",
+      "estado": "hecha",
+      "primeraVez": "2026-10-12",
+      "ultimaVez": "2026-10-12",
+      "propuestas": 1,
+      "historial": [
+        {
+          "fecha": "2026-10-12",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-12",
+          "estado": "hecha",
+          "nota": "tanda W42; falta la decisión de Yan del 15-oct"
+        }
+      ]
+    },
+    "marcyan-medicion-ga4": {
+      "ref": "marcyan-medicion-ga4",
+      "tipo": "web",
+      "titulo": "Comprobar que GA4 recibe visitas de producción",
+      "estado": "hecha",
+      "primeraVez": "2026-10-12",
+      "ultimaVez": "2026-10-12",
+      "propuestas": 1,
+      "historial": [
+        {
+          "fecha": "2026-10-12",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-12",
+          "estado": "hecha",
+          "nota": "tanda W42"
+        }
+      ]
+    },
+    "marcyan-higiene-canonicas": {
+      "ref": "marcyan-higiene-canonicas",
+      "tipo": "web",
+      "titulo": "Enlaces a la raíz hacia /es y URL canónica única",
+      "estado": "hecha",
+      "primeraVez": "2026-09-28",
+      "ultimaVez": "2026-10-12",
+      "propuestas": 1,
+      "historial": [
+        {
+          "fecha": "2026-09-28",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-12",
+          "estado": "hecha",
+          "nota": "tanda W42, main 5a5b0af (propuesta desde W40)"
+        }
+      ]
+    },
+    "marcyan-miami-diseno-web": {
+      "ref": "marcyan-miami-diseno-web",
+      "tipo": "web",
+      "titulo": "Refresco de /es/miami/diseno-web (ficha previa del 5-oct)",
+      "estado": "encargada",
+      "primeraVez": "2026-10-05",
+      "ultimaVez": "2026-10-05",
+      "propuestas": 1,
+      "historial": [
+        {
+          "fecha": "2026-10-05",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-05",
+          "estado": "encargada",
+          "nota": "espera el OK de Yan al PR #36 de anchors"
+        }
+      ]
+    },
+    "marcyan-resenas-clientes": {
+      "ref": "marcyan-resenas-clientes",
+      "tipo": "dueno",
+      "titulo": "Pedir las primeras reseñas a clientes con trabajo entregado",
+      "estado": "pedida",
+      "primeraVez": "2026-09-26",
+      "ultimaVez": "2026-09-26",
+      "propuestas": 1,
+      "vence": "2026-10-16",
+      "historial": [
+        {
+          "fecha": "2026-09-26",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-ok-pr36": {
+      "ref": "marcyan-ok-pr36",
+      "tipo": "dueno",
+      "titulo": "Dar el OK al PR #36 (anchors de Miami)",
+      "estado": "pedida",
+      "primeraVez": "2026-10-05",
+      "ultimaVez": "2026-10-05",
+      "propuestas": 1,
+      "vence": "2026-10-09",
+      "historial": [
+        {
+          "fecha": "2026-10-05",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-senal-local-es": {
+      "ref": "marcyan-senal-local-es",
+      "tipo": "dueno",
+      "titulo": "Decidir la señal local en las páginas genéricas en español",
+      "estado": "pedida",
+      "primeraVez": "2026-10-05",
+      "ultimaVez": "2026-10-05",
+      "propuestas": 1,
+      "vence": "2026-10-10",
+      "historial": [
+        {
+          "fecha": "2026-10-05",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-decision-paginas": {
+      "ref": "marcyan-decision-paginas",
+      "tipo": "dueno",
+      "titulo": "Decidir qué hacer con las páginas que Google dejó fuera",
+      "estado": "pedida",
+      "primeraVez": "2026-10-12",
+      "ultimaVez": "2026-10-12",
+      "propuestas": 1,
+      "vence": "2026-10-15",
+      "historial": [
+        {
+          "fecha": "2026-10-12",
+          "estado": "pedida"
+        }
+      ]
+    }
+  }
+}

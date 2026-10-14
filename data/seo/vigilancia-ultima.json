@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-13",
+  "fecha": "2026-10-14",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 41,
+  "indexadas": 40,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 41,
-    "Crawled - currently not indexed": 36,
+    "Submitted and indexed": 40,
+    "Crawled - currently not indexed": 37,
     "Alternate page with proper canonical tag": 7
   },
   "porGrupo": {
@@ -74,10 +74,10 @@
     },
     "precios·es": {
       "total": 4,
-      "indexadas": 3
+      "indexadas": 2
     }
   },
-  "sinRastreoReciente": 32,
+  "sinRastreoReciente": 31,
   "sinEnlacesInternosVistosPorGoogle": [],
   "certificadoDias": 31,
   "medicion": {
@@ -116,7 +116,7 @@
     "sesionesUltimos3Dias": 3,
     "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 54,
+    "diasSinContactos": 55,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,37 +150,21 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-13",
+        "fecha": "2026-10-14",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/miami/web-design"
-      },
-      {
-        "fecha": "2026-10-13",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/miami/hialeah"
-      },
-      {
-        "fecha": "2026-10-13",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Alternate page with proper canonical tag",
-        "url": "https://marcyanstudio.com/es/portafolio"
+        "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-13",
+        "fecha": "2026-10-14",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "32 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "31 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
@@ -188,28 +172,12 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-13",
+      "fecha": "2026-10-14",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/miami/web-design"
-    },
-    {
-      "fecha": "2026-10-13",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/miami/hialeah"
-    },
-    {
-      "fecha": "2026-10-13",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Alternate page with proper canonical tag",
-      "url": "https://marcyanstudio.com/es/portafolio"
+      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
     }
   ],
   "pedirIndexacion": [],

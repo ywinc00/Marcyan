@@ -44,8 +44,8 @@ export const miamiHub = {
     tag: 'Services in Miami',
     title: 'Everything for your business, in <em>one studio</em>',
     links: [
-      { label: 'Web design in Miami', href: '/en/miami/web-design', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template' },
-      { label: 'Local SEO in Miami', href: '/en/miami/local-seo', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search' },
+      { label: 'Web design in Miami', href: '/en/miami/web-design', desc: 'Custom web design by a bilingual studio in Miami. From $1,500.', icon: 'lucide:layout-template' },
+      { label: 'Bilingual local SEO in Miami', href: '/en/miami/local-seo', desc: 'Spanish and English SEO: show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search' },
       { label: 'Conversational AI in Miami', href: '/en/miami/conversational-ai', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square' },
       { label: 'Online store in Miami', href: '/en/miami/ecommerce', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
@@ -54,8 +54,8 @@ export const miamiHub = {
     tag: 'By neighborhood',
     title: 'Solutions by <em>neighborhood</em>',
     links: [
-      { label: 'Doral (Doralzuela)', href: '/en/miami/doral', desc: 'Web design, SEO and AI for Doral businesses. Bilingual, from $1,500.', icon: 'lucide:map-pin' },
-      { label: 'Hialeah', href: '/en/miami/hialeah', desc: 'Web, local SEO and Spanish-language AI for Hialeah businesses.', icon: 'lucide:map-pin' },
+      { label: 'Web design in Doral', href: '/en/miami/doral', desc: 'Doralzuela: web design, SEO and AI for Doral businesses. Bilingual, from $1,500.', icon: 'lucide:map-pin' },
+      { label: 'Web design in Hialeah', href: '/en/miami/hialeah', desc: 'Web, local SEO and Spanish-language AI for Hialeah businesses.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
   local: {
@@ -97,10 +97,10 @@ export const miamiHub = {
   // ItemList (schema) — the services offered in Miami, each linking to its landing.
   itemList: [
     { name: 'Web Design in Miami', path: '/en/miami/web-design' },
-    { name: 'Local SEO in Miami', path: '/en/miami/local-seo' },
+    { name: 'Bilingual Local SEO in Miami', path: '/en/miami/local-seo' },
     { name: 'Conversational AI in Miami', path: '/en/miami/conversational-ai' },
     { name: 'Online Store in Miami', path: '/en/miami/ecommerce' },
-    { name: 'Web Design and SEO in Doral', path: '/en/miami/doral' },
-    { name: 'Web Design and SEO in Hialeah', path: '/en/miami/hialeah' },
+    { name: 'Web Design in Doral', path: '/en/miami/doral' },
+    { name: 'Web Design in Hialeah', path: '/en/miami/hialeah' },
   ] as ListLink[],
 };

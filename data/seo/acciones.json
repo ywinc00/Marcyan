@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-12",
+  "actualizado": "2026-10-13",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -143,6 +143,125 @@
         {
           "fecha": "2026-10-12",
           "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-indexacion-fase-a": {
+      "ref": "marcyan-indexacion-fase-a",
+      "tipo": "web",
+      "titulo": "Fase A del triage: fusionar en su hub 7 páginas que Google ya soltó (más 4 en inglés opcionales), un hub por semana desde el 30-oct",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-10-15",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-metas-t4-cobertura": {
+      "ref": "marcyan-metas-t4-cobertura",
+      "tipo": "meta",
+      "titulo": "Cambiar la meta de indexación del trimestre a cobertura sobre URL vivas: deja de caer el 4-nov, 60 % el 4-dic, 80 % en enero",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-10-15",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-peticiones-variantes": {
+      "ref": "marcyan-peticiones-variantes",
+      "tipo": "dueno",
+      "titulo": "Permiso o mano del dueño para una petición de rastreo a 5 páginas el 16 o 17-oct antes de las 09:05",
+      "estado": "pedida",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-10-15",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-honestidad-textos": {
+      "ref": "marcyan-honestidad-textos",
+      "tipo": "web",
+      "titulo": "Quitar de los textos lo que no se puede demostrar (IA de Google ya lo recomienda, enlaces que puedes visitar, oferta de 400, precios del blog) en un solo cambio",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-10-31",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-bing-sitemap": {
+      "ref": "marcyan-bing-sitemap",
+      "tipo": "dueno",
+      "titulo": "Bing Webmaster: registrar /sitemap-index.xml, quitar /sitemap.xml (404) y activar IndexNow solo con cambios de contenido",
+      "estado": "pedida",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-10-30",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-senales-externas": {
+      "ref": "marcyan-senales-externas",
+      "tipo": "dueno",
+      "titulo": "Señales externas reales: Bing Places, Apple, Yelp, 2 perfiles de agencia, cámara hispana de Houston y créditos con enlace en webs de clientes con permiso",
+      "estado": "pedida",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-11-30",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-diferenciar-4": {
+      "ref": "marcyan-diferenciar-4",
+      "tipo": "web",
+      "titulo": "Reescribir con ficha previa y prueba real 4 páginas (talleres Houston, conversational AI Miami, beauty salons Houston, SEO local Miami), una por semana",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-13",
+      "ultimaVez": "2026-10-13",
+      "propuestas": 1,
+      "vence": "2026-11-21",
+      "origen": "diagnostico-2026-10-13",
+      "historial": [
+        {
+          "fecha": "2026-10-13",
+          "estado": "propuesta"
         }
       ]
     }

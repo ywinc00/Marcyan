@@ -304,7 +304,7 @@
       "ref": "marcyan-fase-a-orden-nuevo",
       "tipo": "web",
       "titulo": "Fase A con orden nuevo: empezar el 17-nov por /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local; la tanda de /en/houston espera al 4-dic porque /en/houston salió del índice",
-      "estado": "propuesta",
+      "estado": "aprobada",
       "primeraVez": "2026-10-18",
       "ultimaVez": "2026-10-18",
       "propuestas": 1,
@@ -314,6 +314,11 @@
         {
           "fecha": "2026-10-18",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },

@@ -1,0 +1,219 @@
+{
+ "mrc": {
+  "ultimoDia": "2026-10-16",
+  "antes": {
+   "dias": 8,
+   "impr": 153,
+   "imprDia": 19.1,
+   "clics": 3,
+   "top20Dia": 1.13,
+   "paginasConImpr": 25,
+   "miami": 4
+  },
+  "durante": {
+   "dias": 14,
+   "impr": 143,
+   "imprDia": 10.2,
+   "clics": 1,
+   "top20Dia": 1.5,
+   "paginasConImpr": 32,
+   "miami": 14
+  },
+  "despues": {
+   "dias": 9,
+   "impr": 80,
+   "imprDia": 8.9,
+   "clics": 0,
+   "top20Dia": 1,
+   "paginasConImpr": 20,
+   "miami": 12
+  },
+  "diario": [
+   [
+    "09-28",
+    16,
+    0
+   ],
+   [
+    "09-29",
+    9,
+    0
+   ],
+   [
+    "09-30",
+    3,
+    0
+   ],
+   [
+    "10-01",
+    9,
+    0
+   ],
+   [
+    "10-02",
+    7,
+    0
+   ],
+   [
+    "10-03",
+    4,
+    0
+   ],
+   [
+    "10-04",
+    6,
+    0
+   ],
+   [
+    "10-05",
+    11,
+    0
+   ],
+   [
+    "10-06",
+    6,
+    0
+   ],
+   [
+    "10-07",
+    4,
+    0
+   ],
+   [
+    "10-08",
+    8,
+    0
+   ],
+   [
+    "10-09",
+    8,
+    0
+   ],
+   [
+    "10-10",
+    5,
+    0
+   ],
+   [
+    "10-11",
+    4,
+    0
+   ],
+   [
+    "10-12",
+    9,
+    0
+   ],
+   [
+    "10-13",
+    13,
+    0
+   ],
+   [
+    "10-14",
+    10,
+    0
+   ],
+   [
+    "10-15",
+    13,
+    0
+   ],
+   [
+    "10-16",
+    10,
+    0
+   ]
+  ]
+ },
+ "trr": {
+  "ultimoDia": "2026-10-16",
+  "antes": {
+   "dias": 8,
+   "impr": 1684,
+   "imprDia": 210.5,
+   "clics": 5,
+   "top20Dia": 106.63,
+   "paginasConImpr": 28,
+   "miami": 0
+  },
+  "durante": {
+   "dias": 14,
+   "impr": 3586,
+   "imprDia": 256.1,
+   "clics": 23,
+   "top20Dia": 125.5,
+   "paginasConImpr": 25,
+   "miami": 0
+  },
+  "despues": {
+   "dias": 9,
+   "impr": 2495,
+   "imprDia": 277.2,
+   "clics": 21,
+   "top20Dia": 100.67,
+   "paginasConImpr": 33,
+   "miami": 0
+  }
+ },
+ "jlx": {
+  "ultimoDia": "2026-10-16",
+  "antes": {
+   "dias": 8,
+   "impr": 61,
+   "imprDia": 7.6,
+   "clics": 3,
+   "top20Dia": 0.13,
+   "paginasConImpr": 9,
+   "miami": 0
+  },
+  "durante": {
+   "dias": 14,
+   "impr": 250,
+   "imprDia": 17.9,
+   "clics": 2,
+   "top20Dia": 0.86,
+   "paginasConImpr": 11,
+   "miami": 0
+  },
+  "despues": {
+   "dias": 9,
+   "impr": 271,
+   "imprDia": 30.1,
+   "clics": 4,
+   "top20Dia": 3.56,
+   "paginasConImpr": 13,
+   "miami": 0
+  }
+ },
+ "mja": {
+  "ultimoDia": "2026-10-16",
+  "antes": {
+   "dias": 8,
+   "impr": 1154,
+   "imprDia": 144.3,
+   "clics": 9,
+   "top20Dia": 32,
+   "paginasConImpr": 47,
+   "miami": 0
+  },
+  "durante": {
+   "dias": 14,
+   "impr": 1742,
+   "imprDia": 124.4,
+   "clics": 7,
+   "top20Dia": 21.21,
+   "paginasConImpr": 58,
+   "miami": 0
+  },
+  "despues": {
+   "dias": 9,
+   "impr": 1572,
+   "imprDia": 174.7,
+   "clics": 5,
+   "top20Dia": 31.67,
+   "paginasConImpr": 61,
+   "miami": 0
+  }
+ }
+}

@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-13",
+  "actualizado": "2026-10-18",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -150,7 +150,7 @@
       "ref": "marcyan-indexacion-fase-a",
       "tipo": "web",
       "titulo": "Fase A del triage: fusionar en su hub 7 páginas que Google ya soltó (más 4 en inglés opcionales), un hub por semana desde el 30-oct",
-      "estado": "propuesta",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -160,6 +160,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -167,7 +172,7 @@
       "ref": "marcyan-metas-t4-cobertura",
       "tipo": "meta",
       "titulo": "Cambiar la meta de indexación del trimestre a cobertura sobre URL vivas: deja de caer el 4-nov, 60 % el 4-dic, 80 % en enero",
-      "estado": "propuesta",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -177,6 +182,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -184,7 +194,7 @@
       "ref": "marcyan-peticiones-variantes",
       "tipo": "dueno",
       "titulo": "Permiso o mano del dueño para una petición de rastreo a 5 páginas el 16 o 17-oct antes de las 09:05",
-      "estado": "pedida",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -194,6 +204,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -201,7 +216,7 @@
       "ref": "marcyan-honestidad-textos",
       "tipo": "web",
       "titulo": "Quitar de los textos lo que no se puede demostrar (IA de Google ya lo recomienda, enlaces que puedes visitar, oferta de 400, precios del blog) en un solo cambio",
-      "estado": "propuesta",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -211,6 +226,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -218,7 +238,7 @@
       "ref": "marcyan-bing-sitemap",
       "tipo": "dueno",
       "titulo": "Bing Webmaster: registrar /sitemap-index.xml, quitar /sitemap.xml (404) y activar IndexNow solo con cambios de contenido",
-      "estado": "pedida",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -228,6 +248,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -235,7 +260,7 @@
       "ref": "marcyan-senales-externas",
       "tipo": "dueno",
       "titulo": "Señales externas reales: Bing Places, Apple, Yelp, 2 perfiles de agencia, cámara hispana de Houston y créditos con enlace en webs de clientes con permiso",
-      "estado": "pedida",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -245,6 +270,11 @@
         {
           "fecha": "2026-10-13",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
         }
       ]
     },
@@ -252,7 +282,7 @@
       "ref": "marcyan-diferenciar-4",
       "tipo": "web",
       "titulo": "Reescribir con ficha previa y prueba real 4 páginas (talleres Houston, conversational AI Miami, beauty salons Houston, SEO local Miami), una por semana",
-      "estado": "propuesta",
+      "estado": "aprobada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -261,6 +291,62 @@
       "historial": [
         {
           "fecha": "2026-10-13",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-18",
+          "estado": "aprobada",
+          "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        }
+      ]
+    },
+    "marcyan-fase-a-orden-nuevo": {
+      "ref": "marcyan-fase-a-orden-nuevo",
+      "tipo": "web",
+      "titulo": "Fase A con orden nuevo: empezar el 17-nov por /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local; la tanda de /en/houston espera al 4-dic porque /en/houston salió del índice",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-18",
+      "ultimaVez": "2026-10-18",
+      "propuestas": 1,
+      "vence": "2026-11-04",
+      "origen": "lectura-2026-10-18",
+      "historial": [
+        {
+          "fecha": "2026-10-18",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-bing-apple-places": {
+      "ref": "marcyan-bing-apple-places",
+      "tipo": "dueno",
+      "titulo": "Alta en Bing Places (2 ubicaciones) y Apple Business Connect, adelantada a octubre, con nombre y teléfono idénticos",
+      "estado": "pedida",
+      "primeraVez": "2026-10-18",
+      "ultimaVez": "2026-10-18",
+      "propuestas": 1,
+      "vence": "2026-10-31",
+      "origen": "lectura-2026-10-18",
+      "historial": [
+        {
+          "fecha": "2026-10-18",
+          "estado": "pedida"
+        }
+      ]
+    },
+    "marcyan-houston-diseno-web-reescribir": {
+      "ref": "marcyan-houston-diseno-web-reescribir",
+      "tipo": "web",
+      "titulo": "Reescribir /es/houston/diseno-web con ficha previa y prueba real (toda la familia de diseño web de Houston está fuera y es el enlace de la ficha)",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-18",
+      "ultimaVez": "2026-10-18",
+      "propuestas": 1,
+      "vence": "2026-11-04",
+      "origen": "lectura-2026-10-18",
+      "historial": [
+        {
+          "fecha": "2026-10-18",
           "estado": "propuesta"
         }
       ]

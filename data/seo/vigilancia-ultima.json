@@ -1,15 +1,15 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-14",
+  "fecha": "2026-10-18",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 40,
+  "indexadas": 35,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 40,
-    "Crawled - currently not indexed": 37,
-    "Alternate page with proper canonical tag": 7
+    "Submitted and indexed": 35,
+    "Crawled - currently not indexed": 43,
+    "Alternate page with proper canonical tag": 6
   },
   "porGrupo": {
     "home·en": {
@@ -34,11 +34,11 @@
     },
     "ciudades·en": {
       "total": 6,
-      "indexadas": 3
+      "indexadas": 1
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 5
+      "indexadas": 4
     },
     "precios·en": {
       "total": 4,
@@ -50,7 +50,7 @@
     },
     "blog·es": {
       "total": 7,
-      "indexadas": 3
+      "indexadas": 4
     },
     "otras·es": {
       "total": 5,
@@ -62,11 +62,11 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 3
+      "indexadas": 2
     },
     "landings·es": {
       "total": 18,
-      "indexadas": 9
+      "indexadas": 7
     },
     "servicios·es": {
       "total": 2,
@@ -77,9 +77,9 @@
       "indexadas": 2
     }
   },
-  "sinRastreoReciente": 31,
+  "sinRastreoReciente": 27,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 31,
+  "certificadoDias": 88,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -114,9 +114,9 @@
   "pulso": {
     "evento": "generate_lead",
     "sesionesUltimos3Dias": 3,
-    "sesionesDiaHabitual": 4.5,
+    "sesionesDiaHabitual": 4.4,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 55,
+    "diasSinContactos": 59,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,34 +150,123 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-14",
+        "fecha": "2026-10-18",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+        "url": "https://marcyanstudio.com/en/houston"
+      },
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/houston/branding"
+      },
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/miami/hialeah"
+      },
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/diseno-web"
+      },
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/katy"
+      },
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/salon-belleza"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-14",
+        "fecha": "2026-10-18",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "31 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "27 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
-    "info": []
+    "info": [
+      {
+        "fecha": "2026-10-18",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos"
+      }
+    ]
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-14",
+      "fecha": "2026-10-18",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-un-chatbot"
+      "url": "https://marcyanstudio.com/en/houston"
+    },
+    {
+      "fecha": "2026-10-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/houston/branding"
+    },
+    {
+      "fecha": "2026-10-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/miami/hialeah"
+    },
+    {
+      "fecha": "2026-10-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/diseno-web"
+    },
+    {
+      "fecha": "2026-10-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/katy"
+    },
+    {
+      "fecha": "2026-10-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/salon-belleza"
     }
   ],
   "pedirIndexacion": [],

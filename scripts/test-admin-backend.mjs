@@ -181,6 +181,12 @@ await check('inicio: revenue_this_month sigue en null (el panel actual lo pinta 
   assert.match(src, /revenue_this_month_cents:\s*revenue\.thisMonth/);
 });
 
+await check('documento del brief: fechas en hora de Houston', () => {
+  const src = fs.readFileSync(new URL('../api/admin/briefs/[id]/document.mjs', import.meta.url), 'utf8');
+  assert.match(src, /formatHoustonDateTime\(d\)/);
+  assert.ok(!/toLocaleString\(/.test(src), 'document.mjs aún fecha sin zona horaria');
+});
+
 // ── Filtro de leads (lista y CSV) ────────────────────────────────
 await check('leads: filtro vacío no añade WHERE', () => {
   const f = buildLeadFilter({});

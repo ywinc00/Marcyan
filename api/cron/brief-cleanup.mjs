@@ -3,7 +3,8 @@
 //  Autorización: header Authorization: Bearer <CRON_SECRET> (Vercel lo
 //  manda solo en sus crons). Sin el secreto configurado no hace nada.
 //    1) Borradores sin enviar y caducados (brief: 48 h · kit: 30 días) y sus
-//       blobs; conserva lo ya enlazado a un brief.
+//       blobs, por tandas hasta vaciar la cola (tope de 180 s); conserva lo
+//       ya enlazado a un brief.
 //    2) Verificación de tipo real de archivos pendientes (si la del envío no
 //       terminó a tiempo).
 //    3) Ventanas viejas del límite de envíos (más de 2 días).
@@ -38,7 +39,7 @@ export default async function handler(req, res) {
   if (!bearerOk(req)) return res.status(401).json({ ok: false, error: 'No autorizado' });
 
   const blob = blobConfigured();
-  const drafts = blob ? await step('borradores', () => cleanupExpiredDrafts({ limit: 50 })) : { ok: false, error: 'almacén no configurado' };
+  const drafts = blob ? await step('borradores', () => cleanupExpiredDrafts({ limit: 50, budgetMs: 180000 })) : { ok: false, error: 'almacén no configurado' };
   const verify = blob ? await step('verificación', () => verifyPendingFiles({ limit: 40 })) : { ok: false, error: 'almacén no configurado' };
   const hits = await step('límite de envíos', async () => ({ deleted: await purgeOldHits() }));
 

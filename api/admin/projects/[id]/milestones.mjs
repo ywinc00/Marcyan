@@ -89,7 +89,14 @@ export default async function handler(req, res) {
         if (!MILESTONE_STATUSES.includes(body.status)) {
           return res.status(400).json({ ok: false, error: 'Elige un estado válido para el hito.' });
         }
-        const milestone = await upsertMilestone(id, { stage: body.stage, label: body.label, status: body.status });
+        // El nombre, si viene, pasa las mismas reglas que al renombrar (A5-R4).
+        let label;
+        if (body.label !== undefined && body.label !== null) {
+          const n = normalizeMilestonePatch({ label: body.label });
+          if (n.error) return res.status(400).json({ ok: false, error: n.error });
+          label = n.fields.label;
+        }
+        const milestone = await upsertMilestone(id, { stage: body.stage, label, status: body.status });
         return await withList(200, { milestone });
       }
 

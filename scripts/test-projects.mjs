@@ -302,6 +302,19 @@ await check('PATCH hito: compatibilidad { milestoneId, status }', async () => {
   const r = await call(msHandler, { method: 'PATCH', query: { id: '42' }, body: { milestoneId: 102, status: 'in_progress' } });
   assert.equal(r.status, 200);
 });
+await check('PATCH por etapa: etapa inexistente sin nombre → 404 claro, no 500 (A5-R4)', async () => {
+  db([[/SELECT id FROM project_milestones WHERE project_id = \$1 AND stage/, []], ...BASE]);
+  const r = await call(msHandler, { method: 'PATCH', query: { id: '42' }, body: { stage: 'qa', status: 'done' } });
+  assert.equal(r.status, 404);
+  assert.match(r.body.error, /etapa «qa»/);
+  assert.ok(!log().some((q) => /INSERT/.test(q.text)));
+});
+await check('PATCH por etapa: nombre demasiado largo → 400 sin tocar la base (A5-R4)', async () => {
+  db(BASE);
+  const r = await call(msHandler, { method: 'PATCH', query: { id: '42' }, body: { stage: 'design', status: 'done', label: 'x'.repeat(P.MAX_LABEL + 1) } });
+  assert.equal(r.status, 400);
+  assert.ok(!log().some((q) => /project_milestones WHERE project_id = \$1 AND stage|UPDATE|INSERT/.test(q.text)));
+});
 await check('PATCH hito: sin cambios o fecha mala → 400', async () => {
   db(BASE);
   assert.equal((await call(msHandler, { method: 'PATCH', query: { id: '42' }, body: { milestoneId: '101' } })).status, 400);

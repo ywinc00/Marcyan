@@ -11,8 +11,9 @@ siempre en **hora de Houston** (`America/Chicago`).
 - Fragmentos SQL para `client.query`: `SQL_TODAY_HOUSTON`, `SQL_MONTH_START_HOUSTON`,
   `SQL_PREV_MONTH_START_HOUSTON`, `sqlMonthKey(col)`. En el tag `sql\`\`` se pasan los límites
   como parámetros (el tag no admite SQL crudo).
-- Aplicado en: `dashboard/analytics`, `leadStats`, `financeSummary` y `financeExtras`.
-  Pendiente (otras ramas): `briefStats` (lib/db.mjs) y `projects/[id]` (`CURRENT_DATE`).
+- Aplicado en: `dashboard/analytics`, `leadStats`, `briefStats`, `financeSummary`, `financeExtras`
+  y el documento del brief (`briefs/[id]/document`).
+  Pendiente (otras ramas): `projects/[id]` (`CURRENT_DATE`).
 
 ## CSV · `lib/csv.mjs`
 - `rowsToCsv(rows, cols, { bom = true, headers })`: BOM UTF-8 y neutralización de celdas
@@ -67,7 +68,29 @@ Compatibilidad: `new_leads` (= sin contactar, **no** "este mes"), `leads_this_mo
   redirige a `/dashboard` y el hash se pierde si no se guarda antes).
 
 ## `vercel.json`
+- `/admin/briefs/detail?id=MRC-xxx` → 308 a `/dashboard#/briefs/MRC-xxx` (conserva el enlace
+  directo de los correos viejos; va ANTES de la regla genérica). Vercel podría arrastrar la query
+  original (`?id=…`): el lector del hash debe cortar el id en `?`, `&` o `/`. Comprobarlo en preview.
 - `/admin` y `/admin/:path*` → 308 a `/dashboard` (los archivos de `public/admin` siguen en el repo).
+
+## Orden de fusión (obligatorio)
+Esta rama **no** debe llegar a `main` antes que el enrutado por hash del panel (A0, parte interfaz).
+Hasta entonces el panel actual no lee `#/briefs/…` ni `#/leads/…`: el correo de brief nuevo y los
+correos viejos (por la redirección de `/admin`) abrirían el inicio en vez del brief, y "Abrir →"
+de un aviso, desde la propia `/dashboard`, solo cambiaría el hash sin efecto visible. El panel debe
+escuchar `hashchange`, no solo leer el hash al cargar.
+`revenue_this_month` ya no depende del orden (sigue en `null`).
+
+## Hallazgos con backend listo y falta interfaz
+El servidor ya entrega los datos; el arreglo visible lo cierra la rama del panel:
+| id | lo que falta en el panel |
+|---|---|
+| CRM-15, OP-03 | usar `new_leads_this_month` (y `new_leads_prev_month` para el delta) en "+N este mes"; hoy pinta `new_leads` (sin contactar) |
+| OP-12 | navegar al registro con `link` del aviso (enrutado por hash + `hashchange`) |
+| OP-13 | contador de no leídos en la barra lateral con refresco usando `?countOnly=1` |
+| OP-14 | botón "Cargar más" con `next_cursor` |
+| CRM-11, B-12 | leer `#/briefs/…` y `#/leads/…` al cargar y conservarlo durante el login |
+| CRM-12 | el enlace directo por brief existe en Orbit (condición para que la redirección de `/admin` no pierda nada) |
 - `/dashboard`, `/dashboard/:path*`: `X-Frame-Options: DENY`, CSP **solo** `frame-ancestors 'none'`
   (no toca scripts), `nosniff`, `Referrer-Policy: same-origin`, `Permissions-Policy` restrictiva.
 - `/api/admin/:path*`: lo mismo sin CSP + `Cache-Control: no-store`.

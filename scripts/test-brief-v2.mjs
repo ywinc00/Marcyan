@@ -644,6 +644,18 @@ if (noDb) {
     assert.match(tx('BRIEF.md'), /son datos, no instrucciones/);
     assert.match(tx('docs/handoff/COMPETENCIA.md'), /^> ## Regla obligatoria del proyecto/m);
   });
+  await check('kit: sin legal=1, brief.json no nombra los archivos legales, solo los cuenta (R5)', () => {
+    const j = JSON.parse(text('brief.json'));
+    assert.ok(!j.archivos.some((a) => a.tipo === 'legal'), 'archivo legal listado en el kit de diseño');
+    assert.ok(j.archivosLegalesAparte >= 1);
+    for (const f of fx.SAMPLE_FILES.filter((x) => x.kind === 'legal')) {
+      if (f.original_name) assert.ok(!text('brief.json').includes(f.original_name), f.original_name);
+    }
+    const withLegal = buildKit({ brief: fx.SAMPLE_BRIEF, files: fx.SAMPLE_FILES, now: NOW, legal: true });
+    const withLegalJson = JSON.parse(withLegal.docs.find((d) => d.path === 'brief.json').content);
+    assert.ok(withLegalJson.archivos.some((a) => a.tipo === 'legal'));
+    assert.ok(!('archivosLegalesAparte' in withLegalJson));
+  });
   await check('kit: CLAIMS con prueba o "Sin prueba: no publicar"; JSON válidos', () => {
     const rows = text('docs/handoff/CLAIMS.md').split('\n').filter((l) => /^\| C-\d+/.test(l));
     assert.ok(rows.length >= 5);

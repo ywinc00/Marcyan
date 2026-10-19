@@ -128,13 +128,6 @@ export default async function handler(req, res) {
     const lang = isV2 && body.lang === 'en' ? 'en' : 'es';
     const ip = clientIp(req);
 
-    // Límite de envíos persistente por IP (B-03). Degrada a memoria sin la migración.
-    const rl = await rateLimit({ bucket: 'brief', key: ip, limits: LIMITS.brief });
-    if (!rl.ok) {
-      res.setHeader('Retry-After', String(rl.retryAfter));
-      return res.status(429).json({ ok: false, error: MSG.rate[lang] });
-    }
-
     // Origen del brief (allowlist): 'web' (formulario /formulario) o 'chat' (el asistente
     // Marcy arma el brief por el cliente). Default seguro a 'web'.
     const SOURCE_ALLOW = new Set(['web', 'chat']);
@@ -175,6 +168,15 @@ export default async function handler(req, res) {
     if (phone && !hasEnoughDigits(phone) && !email) return res.status(400).json({ ok: false, error: MSG.phone[lang] });
     columns.email = email;
     columns.phone = phone;
+
+    // Límite de envíos persistente por IP (B-03). Degrada a memoria sin la
+    // migración. Va DESPUÉS de validar: un cliente que corrige errores del
+    // formulario varias veces no gasta su cupo (solo cuentan envíos válidos).
+    const rl = await rateLimit({ bucket: 'brief', key: ip, limits: LIMITS.brief });
+    if (!rl.ok) {
+      res.setHeader('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({ ok: false, error: MSG.rate[lang] });
+    }
 
     // Borrador de archivos (opcional, solo v2): se valida ANTES del INSERT; si
     // no vale, el brief entra igual y los archivos se ignoran (log breve).

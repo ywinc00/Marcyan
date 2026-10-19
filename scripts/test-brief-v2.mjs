@@ -424,6 +424,12 @@ if (noDb) {
     assert.equal(r.body.error, 'Please check the highlighted fields.');
     assert.ok(r.body.fields.services && r.body.fields.business_name && r.body.fields.main_objective);
   });
+  await check('/api/brief: corregir errores varias veces no agota el límite de envíos (R10)', async () => {
+    for (let i = 0; i < 8; i++) {
+      const r = await call('POST', { schema_version: 2, lang: 'es', services: [], email: 'x@y.co' });
+      assert.equal(r.statusCode, 400, `intento ${i + 1}: ${r.statusCode}`);
+    }
+  });
 } else {
   console.warn('· pruebas del handler omitidas: hay una base de datos configurada en el entorno');
 }

@@ -10,7 +10,6 @@
 //   error 'not_configured' por proyecto, sin romper.
 import { requireAdmin, readCookie, getSession, safeEqual } from '../../../lib/auth.mjs';
 import { getSeoProject, syncProject, syncAll, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
-import { notifySeoSyncFailures, notifySystem } from '../../../lib/notifications.mjs';
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -74,9 +73,6 @@ export default async function handler(req, res) {
       }
     }
     console.log(`[admin/seo/sync] ${results.length} proyecto(s) por ${actor} — configured=${configured} ok=${ok}`);
-    // El cron corre sin nadie mirando: sus fallos llegan como aviso al panel
-    // (uno por proyecto y día como mucho). Desde el panel el error ya se ve.
-    if (isCron && !ok) await notifySeoSyncFailures(results);
     return res.status(200).json({
       ok,
       configured,
@@ -85,15 +81,6 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('[admin/seo/sync] error:', err);
-    if (isCron) {
-      await notifySystem({
-        key: 'seo-sync:all',
-        title: 'La sincronización diaria de SEO no pudo terminar',
-        body: 'Los datos de Google de hoy no se actualizaron. Si se repite mañana, revisa la conexión en la sección SEO.',
-        url: '/dashboard#/seo',
-        windowHours: 20,
-      });
-    }
     return res.status(500).json({ ok: false, error: err.message || 'Error al sincronizar' });
   }
 }

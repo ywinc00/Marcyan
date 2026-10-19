@@ -86,6 +86,28 @@ export function listParams({ tipo = '', estado = '' } = {}, { limit = 30, before
 }
 
 /**
+ * "Marcar todas como leídas" respeta el filtro de tipo (A7-07): con
+ * #/avisos?tipo=lead solo marca los leads, que es lo que el dueño ve.
+ * Devuelve el texto del botón y el cuerpo del PATCH (undefined = todas).
+ */
+const MARK_LABELS = {
+  lead: 'Marcar leads como leídos',
+  brief: 'Marcar briefs como leídos',
+  persona: 'Marcar solicitudes como leídas',
+  sistema: 'Marcar avisos de sistema como leídos',
+};
+export function markAllAction(tipo = '') {
+  const t = TYPE_FILTERS.find((f) => f.id && f.id === tipo);
+  if (!t) return { label: 'Marcar todas como leídas', body: undefined, type: null };
+  return { label: MARK_LABELS[t.id], body: { type: t.type }, type: t.type };
+}
+
+/** ¿Clic que el navegador debe abrir aparte (pestaña nueva, ventana)? */
+export function isModifiedClick(e) {
+  return !!(e && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || (e.button != null && e.button !== 0)));
+}
+
+/**
  * Destino de "Abrir" a partir del enlace del aviso ('/dashboard#/leads/LEAD-012').
  * Devuelve el hash ('#/leads/LEAD-012') o null si no lleva a ningún registro
  * (sin enlace, la portada a secas o la propia bandeja de avisos).

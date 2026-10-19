@@ -9,6 +9,7 @@
 //      de "Abrir", contador y el ciclo de refresco solo con la pestaña visible.
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
 
 import * as N from '../lib/notifications.mjs';
 import * as A from '../src/components/dashboard/lib/avisos.js';
@@ -123,6 +124,23 @@ await check('unreadCount y markAllRead excluyen los archivados', async () => {
   assert.deepEqual(upd.params, ['new_lead']);
 });
 
+await check('A7-03: si la BD falla, lista, contador y conteos LANZAN (nada de ceros falsos)', async () => {
+  const db = fakeDb(() => new Error('conexión caída'));
+  N.__setDbForTests(db);
+  await assert.rejects(() => N.listNotifications({}), /conexión caída/);
+  await assert.rejects(() => N.unreadCount(), /conexión caída/);
+  await assert.rejects(() => N.notificationCounts(), /conexión caída/);
+  assert.equal(await N.unreadCountOrNull(), null, 'tras un cambio ya guardado: null, el panel conserva el último valor');
+});
+await check('A7-07: markAllRead con un tipo desconocido no marca nada y lanza invalid_type', async () => {
+  const db = fakeDb(() => ({ rows: [{ id: 1 }], rowCount: 1 }));
+  N.__setDbForTests(db);
+  await assert.rejects(() => N.markAllRead('DROP TABLE'), (e) => e.code === 'invalid_type');
+  assert.equal(db.calls.length, 0, 'no llega a la BD');
+  assert.equal(await N.markAllRead(null), 1);
+  assert.doesNotMatch(db.calls[0].text, /type =/, 'sin tipo: todas las de la bandeja');
+});
+
 await check('markUnread, setArchived (archiva y marca leído) e ids inválidos', async () => {
   const db = fakeDb(() => ({ rows: [row({ read_at: null, archived_at: '2026-10-19T13:00:00Z' })], rowCount: 1 }));
   N.__setDbForTests(db);
@@ -186,9 +204,11 @@ await check('emailFailureNotice: textos en llano y enlace al brief; claves disti
   const c = N.emailFailureNotice({ projectId: 'MRC-017', who: 'client', businessName: 'Acme' });
   assert.equal(a.url, '/dashboard#/briefs/MRC-017');
   assert.notEqual(a.key, c.key);
-  assert.match(c.title, /cliente no recibió la confirmación del brief MRC-017, Acme/);
+  assert.match(c.title, /No pudimos confirmar que salió la confirmación del brief MRC-017, Acme/);
   for (const n of [a, c]) {
     assert.doesNotMatch(n.title + n.body, /[—–]|Resend|timeout|API|SMTP/i, 'sin jerga ni guion largo');
+    // A7-04: con el corte de 8 s el correo puede salir igual; no se afirma que no llegó.
+    assert.doesNotMatch(n.title, /no recibió|no llegó|no salió/i, 'el título no afirma lo que no sabemos');
   }
 });
 
@@ -208,6 +228,50 @@ await check('seoSyncFailureNotices: ignora "no configurado", explica el 403 y en
   for (const n of out) assert.doesNotMatch(n.title + n.body, /[—–]|403|fetch failed/, 'sin códigos crudos');
 });
 
+await check('seoSyncFailureNotices: también entiende la forma de A6 (status, códigos y textos en español)', () => {
+  const err = (code, title) => ({ code, title, action: '', detail: '' });
+  const out = N.seoSyncFailureNotices([
+    { project_id: '5', name: 'TRR', ok: false, status: 'error', error: 'Google no está conectado', error_detail: err('not_configured', 'Google no está conectado'),
+      gsc: { error: 'Google no está conectado' }, ga4: { error: null },
+      sources: { gsc: { status: 'error', error: err('not_configured', 'x') }, ga4: { status: 'off', error: null } } },
+    { project_id: '6', name: 'MJA', ok: false, status: 'partial', error: 'Search Console no dio permiso', error_detail: err('gsc_forbidden', 'Search Console no dio permiso'),
+      gsc: { error: 'Search Console no dio permiso' }, ga4: { error: null },
+      sources: { gsc: { status: 'error', error: err('gsc_forbidden', 'x') }, ga4: { status: 'ok', error: null } } },
+    { project_id: '7', name: 'Sin ids', ok: false, status: 'error', error: 'Faltan los datos', error_detail: err('no_ids', 'Faltan'),
+      gsc: { error: null }, ga4: { error: null }, sources: { gsc: { status: 'off', error: null }, ga4: { status: 'off', error: null } } },
+  ]);
+  assert.equal(out.length, 1, '"no configurado" y "sin identificadores" no avisan');
+  assert.equal(out[0].key, 'seo-sync:6');
+  assert.match(out[0].body, /de Search Console\./);
+  assert.match(out[0].body, /no dio permiso/);
+});
+await check('notifySeoSyncCrash: aviso del día con clave fija y enlace a SEO', async () => {
+  const db = fakeDb((t) => (t.startsWith('SELECT 1') ? { rows: [], rowCount: 0 } : { rows: [row({ type: 'system', ref: 'seo-sync:all', url: '/dashboard#/seo' })], rowCount: 1 }));
+  N.__setDbForTests(db);
+  const r = await N.notifySeoSyncCrash();
+  assert.deepEqual(db.calls[0].params, ['system', 'seo-sync:all', 1200]);
+  assert.equal(r.link, '/dashboard#/seo');
+});
+
+// A7-01/A7-02: el aviso de SEO solo tiene sentido desde el cron que de verdad
+// se programa. Ese cron llega con A6 (api/cron/seo-sync.mjs). En cuanto ese
+// archivo exista en la rama (fusión A6 + A7), su handler TIENE que llamar a
+// notifySeoSyncFailures y a notifySeoSyncCrash: si no, esta prueba falla y
+// la fusión no se da por buena sin volver a colocar el aviso.
+await check('A7-01/02: el cron de SEO (si existe) avisa al panel de sus fallos', () => {
+  const cron = new URL('../api/cron/seo-sync.mjs', import.meta.url);
+  if (!existsSync(cron)) {
+    console.log('  · pendiente: el cron de SEO aún no existe en esta rama (llega con A6); al fusionar, esta prueba exige el aviso');
+    return;
+  }
+  const src = readFileSync(cron, 'utf8');
+  assert.match(src, /from ['"][./]+lib\/notifications\.mjs['"]/, 'el cron importa lib/notifications.mjs');
+  assert.match(src, /notifySeoSyncFailures\(/, 'el cron llama a notifySeoSyncFailures(results)');
+  assert.match(src, /notifySeoSyncCrash\(/, 'el cron llama a notifySeoSyncCrash() en su catch');
+  const sync = readFileSync(new URL('../api/admin/seo/sync.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(sync, /notifySeoSyncFailures/, 'el botón del panel no avisa: el error ya se ve en pantalla');
+});
+
 N.__setDbForTests(null);
 
 // ── Panel: lib/avisos.js ─────────────────────────────────────────
@@ -224,6 +288,23 @@ await check('readFilters + listParams: valores legibles en la URL, códigos al s
   assert.equal(p.get('before'), '41');
   const q = new URLSearchParams(A.listParams({ tipo: '', estado: 'archivados' }));
   assert.equal(q.get('archived'), '1'); assert.equal(q.get('type'), null);
+});
+await check('A7-07: "Marcar todas" respeta el filtro de tipo', () => {
+  assert.deepEqual(A.markAllAction(''), { label: 'Marcar todas como leídas', body: undefined, type: null });
+  const l = A.markAllAction('lead');
+  assert.equal(l.label, 'Marcar leads como leídos');
+  assert.deepEqual(l.body, { type: 'new_lead' });
+  assert.deepEqual(A.markAllAction('persona').body, { type: 'chat_handoff' });
+  assert.equal(A.markAllAction('raro').body, undefined);
+  for (const t of A.TYPE_FILTERS) assert.doesNotMatch(A.markAllAction(t.id).label, /[—–]/);
+});
+await check('A7-05: Ctrl, Cmd, Mayús o la rueda no navegan en la pestaña actual', () => {
+  assert.equal(A.isModifiedClick({ button: 0 }), false);
+  assert.equal(A.isModifiedClick({ button: 0, ctrlKey: true }), true);
+  assert.equal(A.isModifiedClick({ button: 0, metaKey: true }), true);
+  assert.equal(A.isModifiedClick({ button: 0, shiftKey: true }), true);
+  assert.equal(A.isModifiedClick({ button: 1 }), true);
+  assert.equal(A.isModifiedClick(undefined), false);
 });
 await check('openTarget: al registro concreto; nada si no lleva a ningún sitio', () => {
   assert.equal(A.openTarget('/dashboard#/leads/LEAD-012'), '#/leads/LEAD-012');

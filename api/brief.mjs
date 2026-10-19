@@ -296,7 +296,9 @@ export default async function handler(req, res) {
 
       await Promise.all([adminP, clientP, verifyP]);
 
-      // Aviso 'system' en el panel si un correo no salió (dedup por brief).
+      // Aviso 'system' en el panel si no se pudo confirmar que un correo
+      // salió (error o corte de 8 s; dedup por brief). El texto lo dice
+      // como duda: un correo lento puede salir después del corte.
       if (!emailAdminOk) await notifyEmailFailure({ projectId, who: 'admin', businessName: data.business_name });
       if (data.email && confirm.ok && !emailClientOk) await notifyEmailFailure({ projectId, who: 'client', businessName: data.business_name });
 

@@ -3,7 +3,8 @@
 --
 --  1) notifications.archived_at → archivar un aviso (sale de la bandeja y
 --     del contador; se puede desarchivar). NULL = en la bandeja.
---  2) Índice parcial para la bandeja (no archivados, más nuevos primero).
+--  2) Índice parcial para la bandeja (no archivados, por id descendente,
+--     que es como se ordena y pagina la lista).
 --  3) Avisos viejos: la url '/dashboard' a secas pasa al enlace profundo
 --     según type+ref (la lectura ya lo calculaba; esto lo deja guardado).
 --  4) Títulos viejos con guion largo ("Nuevo brief — Acme") pasan a coma
@@ -25,8 +26,10 @@ SELECT pg_advisory_xact_lock(91123775);
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
 
 -- ── 2) Índice de la bandeja (no archivados) ───────────────────
+-- Mismas columnas que el ORDER BY real de la lista (lib/notifications.mjs:
+-- ORDER BY id DESC, cursor id < $n), para que lo use de verdad.
 CREATE INDEX IF NOT EXISTS idx_notifications_inbox
-  ON notifications (created_at DESC, id DESC)
+  ON notifications (id DESC)
   WHERE archived_at IS NULL;
 
 -- Contador de no leídos de la barra lateral (?countOnly=1).

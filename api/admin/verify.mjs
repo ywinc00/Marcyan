@@ -1,12 +1,13 @@
 // GET /api/admin/verify?token=...
-// Consume el magic token, crea sesión, set cookie y redirige al panel.
+// Consume el magic token (un solo uso, 15 min), crea sesión, set cookie y
+// redirige al panel. El token se guarda en BD como hash (lib/auth.mjs).
 import {
   consumeMagicToken, isAllowed, createSession,
-  buildCookie, clientIp,
+  buildCookie, clientIp, isWellFormedToken,
 } from '../../lib/auth.mjs';
 
-// Tras autenticar, el destino por defecto es el dashboard nuevo.
-// El panel viejo sigue accesible directo en /admin/briefs.
+// Tras autenticar, el destino es Orbit (/dashboard). El panel viejo /admin
+// ya redirige aquí (vercel.json); sus archivos se conservan sin publicarse.
 const REDIRECT_OK    = '/dashboard';
 const REDIRECT_FAIL  = '/dashboard?error=invalid';
 
@@ -16,9 +17,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
+  // La URL lleva el token: que ni se cachee ni viaje como Referer.
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+
   try {
     const token = (req.query?.token || '').toString();
-    if (!token) {
+    if (!token || !isWellFormedToken(token)) {
       return res.redirect(302, REDIRECT_FAIL);
     }
 

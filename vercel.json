@@ -3,11 +3,51 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [{ "source": "/", "destination": "/es", "permanent": true }],
+  "redirects": [
+    { "source": "/", "destination": "/es", "permanent": true },
+    {
+      "source": "/admin/briefs/detail",
+      "has": [{ "type": "query", "key": "id", "value": "(?<id>.+)" }],
+      "destination": "/dashboard#/briefs/:id",
+      "permanent": true
+    },
+    { "source": "/admin", "destination": "/dashboard", "permanent": true },
+    { "source": "/admin/:path*", "destination": "/dashboard", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/dashboard/sw.js",
       "headers": [{ "key": "Service-Worker-Allowed", "value": "/dashboard" }]
+    },
+    {
+      "source": "/dashboard",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" }
+      ]
+    },
+    {
+      "source": "/dashboard/:path*",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" }
+      ]
+    },
+    {
+      "source": "/api/admin/:path*",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
   ]
 }

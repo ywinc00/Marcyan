@@ -4,6 +4,7 @@
 //   - Si no → text/html inline con window.print() automático para "Guardar como PDF"
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import { getBriefByProjectId } from '../../../../lib/db.mjs';
+import { formatHoustonDateTime } from '../../../../lib/dates.mjs';
 
 const SECTIONS = [
   ['01 · Información del negocio', [
@@ -69,9 +70,11 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Fechas en hora de Houston (B-17): Vercel corre en UTC y sin zona un brief
+// recibido a las 19:30 CDT salía fechado a las 0:30 del día siguiente.
 function fmtDate(d) {
   if (!d) return '';
-  return new Date(d).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+  return formatHoustonDateTime(d);
 }
 
 function statusLabel(s) {

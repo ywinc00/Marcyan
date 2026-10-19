@@ -1,714 +1,293 @@
 <script>
-  import { onMount } from 'svelte';
-  import KpiArt from './KpiArt.svelte';
-
+  // ═══ Progreso ═══ (Orbit v2 · A5)
+  // Lista de proyectos con KPIs GLOBALES (no los de pantalla, OP-11), filtros
+  // en pastillas con su número y la búsqueda en la URL (E-06):
+  //   #/progreso?estado=activo&q=web&pagina=2
+  // y la ficha de cada proyecto en #/progreso/PRJ-003 (progreso/ProjectDetail).
+  // Recargar, Atrás y los enlaces de avisos y correos abren lo mismo.
+  import { untrack } from 'svelte';
   import { api } from './lib/api.js';
-  import { toastError } from './lib/toast.svelte.js';
-  import { fmtDay, fmtDateTime } from './lib/dates.js';
+  import { toast } from './lib/toast.svelte.js';
+  import { route, href, setQuery, navigate } from './lib/router.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
+  import KpiGrid from './ui/KpiGrid.svelte';
+  import Kpi from './ui/Kpi.svelte';
+  import StatusChip from './ui/StatusChip.svelte';
+  import EmptyState from './ui/EmptyState.svelte';
+  import LoadingState from './ui/LoadingState.svelte';
+  import ErrorState from './ui/ErrorState.svelte';
+  import Modal from './ui/Modal.svelte';
+  import Icon from './ui/Icon.svelte';
+  import ProjectDetail from './progreso/ProjectDetail.svelte';
+  import ProjectForm from './progreso/ProjectForm.svelte';
+  import {
+    P_STATUSES, pStatus, statusFromSlug, slugFromStatus, serviceLabel,
+    fmtMoney, monoColor, initials, TONE_COLOR,
+  } from './progreso/format.js';
 
-  // ── Helpers ──────────────────────────────────────────────────
-  // HTTP y fechas vienen de lib/ (A0). started_at, completed_at y el
-  // vencimiento de los hitos son columnas DATE → fmtDay (sin desfase, OP-06).
-  function fmtMoney(cents) {
-    if (cents == null || cents === '') return '—';
-    const n = Number(cents);
-    if (!Number.isFinite(n)) return '—';
-    return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n / 100);
-  }
+  const LIMIT = 24;
 
-  const P_STATUSES = [
-    { id: 'active', label: 'Activo' }, { id: 'on_hold', label: 'En pausa' },
-    { id: 'completed', label: 'Completado' }, { id: 'cancelled', label: 'Cancelado' },
-  ];
-  function pStatusLabel(s) { return (P_STATUSES.find((x) => x.id === s) || {}).label || s; }
-  const P_FILTERS = [{ id: '', label: 'Todos' }, ...P_STATUSES];
+  // ── Ruta ─────────────────────────────────────────────────────
+  const detailRef = $derived(route.section === 'progreso' ? (route.sub[0] || '') : '');
+  const status = $derived(statusFromSlug(route.query.estado || ''));
+  const q = $derived((route.query.q || '').trim());
+  const page = $derived(Math.max(1, parseInt(route.query.pagina, 10) || 1));
+  const offset = $derived((page - 1) * LIMIT);
 
-  const M_STATUSES = [
-    { id: 'pending', label: 'Pendiente' }, { id: 'in_progress', label: 'En curso' }, { id: 'done', label: 'Hecho' },
-  ];
-  function mStatusLabel(s) { return (M_STATUSES.find((x) => x.id === s) || {}).label || s; }
-
-  // ── Estado lista ─────────────────────────────────────────────
+  // ── Lista ────────────────────────────────────────────────────
   let rows = $state([]);
   let total = $state(0);
-  let filter = $state('');
-  let search = $state('');
-  let offset = $state(0);
-  const LIMIT = 50;
-  let loading = $state(false);
+  let summary = $state(null);
+  let loading = $state(true);
   let error = $state('');
-  let searchTimer;
+  let reqSeq = 0;
 
-  // ── Estado detalle ───────────────────────────────────────────
-  let selected = $state(null);
-  let milestones = $state([]);
-  let progress = $state(null);
-  let detailLoading = $state(false);
-  let statusSel = $state('');
-  let saveMsg = $state('');
-  let saveOk = $state(false);
-
-  // ── Estado "nuevo proyecto" ─────────────────────────────────
-  let showNew = $state(false);
-  let nf = $state({ name: '', briefProjectId: '', serviceType: '', amount: '', status: 'active' });
-  let creating = $state(false);
-  let newMsg = $state('');
-
-  // ── Estado "nuevo hito" ─────────────────────────────────────
-  let newMsLabel = $state('');
-  let addingMs = $state(false);
-
-  // ── Estado "eliminar proyecto" ──────────────────────────────
-  let showDelete = $state(false);
-  let deleting = $state(false);
-
-  // ── Monograma de cliente/proyecto (avatar con iniciales) ────
-  // Color de fondo determinista hasheado del nombre (paleta sobria).
-  const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
-  function monoColor(n) {
-    let h = 0; const s = n || '?';
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return MONO_PALETTE[Math.abs(h) % MONO_PALETTE.length];
-  }
-  function initials(n) {
-    const parts = (n || '').trim().split(/\s+/).filter(Boolean);
-    if (!parts.length) return '—';
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-
-  // ── Derivados ────────────────────────────────────────────────
-  const percent = $derived(progress ? progress.percent : 0);
-
-  // Resumen rápido (KPI chips) derivado de las filas cargadas.
-  const summary = $derived.by(() => {
-    const c = { active: 0, on_hold: 0, completed: 0, cancelled: 0 };
-    for (const r of rows) if (c[r.status] != null) c[r.status] += 1;
-    return c;
-  });
-
-  // Suma de montos acordados (cents) de las filas en pantalla, para el KPI de valor.
-  const totalAgreedCents = $derived.by(() => {
-    let t = 0;
-    for (const r of rows) { const n = Number(r.agreed_amount_cents); if (Number.isFinite(n)) t += n; }
-    return t;
-  });
-
-  // ── Hover del stepper (detalle): índice del nodo bajo el cursor ──
-  let hoverStep = $state(-1);
-
-  // ── Carga lista ──────────────────────────────────────────────
   async function loadList() {
+    const seq = ++reqSeq;
     loading = true; error = '';
     const p = new URLSearchParams();
-    if (filter) p.set('status', filter);
-    if (search) p.set('search', search);
+    if (status) p.set('status', status);
+    if (q) p.set('search', q);
     p.set('limit', LIMIT); p.set('offset', offset);
     try {
       const j = await api('/api/admin/projects?' + p.toString());
-      rows = j.rows || []; total = j.total || 0;
-    } catch (e) { error = e.message || 'Error al cargar'; }
-    finally { loading = false; }
-  }
-  function setFilter(s) { filter = s; offset = 0; loadList(); }
-  function onSearchInput(e) {
-    search = e.currentTarget.value;
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => { offset = 0; loadList(); }, 300);
-  }
-  function nextPage() { if (offset + LIMIT < total) { offset += LIMIT; loadList(); } }
-  function prevPage() { if (offset > 0) { offset = Math.max(0, offset - LIMIT); loadList(); } }
-
-  // ── Detalle ──────────────────────────────────────────────────
-  async function openProject(id) {
-    detailLoading = true; selected = null; milestones = []; progress = null;
-    saveMsg = ''; newMsLabel = ''; hoverStep = -1;
-    try {
-      const j = await api('/api/admin/projects/' + encodeURIComponent(id));
-      selected = j.project; milestones = j.milestones || []; progress = j.progress; statusSel = j.project.status;
-    } catch (e) { toastError(e, 'No se pudo abrir el proyecto.'); }
-    finally { detailLoading = false; }
-  }
-  function closeProject() { selected = null; loadList(); }
-
-  // ── Guardar estado del proyecto ──────────────────────────────
-  async function saveStatus() {
-    if (!selected) return;
-    if (statusSel === selected.status) { saveOk = false; saveMsg = 'Sin cambios'; return; }
-    saveMsg = 'Guardando…'; saveOk = false;
-    try {
-      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id),
-        { method: 'PATCH', body: JSON.stringify({ status: statusSel }) });
-      selected = j.project; progress = j.progress; saveOk = true; saveMsg = '✓ Guardado';
-    } catch (e) { saveOk = false; saveMsg = e.message || 'Error al guardar'; }
-  }
-
-  // ── Cambiar estado de un hito ────────────────────────────────
-  // Ciclo al hacer clic: pending → in_progress → done → pending
-  function nextMsStatus(s) {
-    if (s === 'pending') return 'in_progress';
-    if (s === 'in_progress') return 'done';
-    return 'pending';
-  }
-  async function setMilestoneStatus(ms, status) {
-    const prev = ms.status;
-    ms.status = status; milestones = [...milestones];
-    try {
-      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
-        { method: 'PATCH', body: JSON.stringify({ milestoneId: ms.id, status }) });
-      milestones = j.milestones || milestones; progress = j.progress;
+      if (seq !== reqSeq) return;          // llegó tarde: hay otra búsqueda más nueva
+      rows = j.rows || []; total = j.total || 0; summary = j.summary || null;
     } catch (e) {
-      ms.status = prev; milestones = [...milestones];
-      toastError(e, 'No se pudo cambiar el hito.');
-    }
-  }
-  function cycleMilestone(ms) { setMilestoneStatus(ms, nextMsStatus(ms.status)); }
-
-  // ── Añadir hito ──────────────────────────────────────────────
-  async function addMilestone() {
-    const label = newMsLabel.trim();
-    if (!label) return;
-    addingMs = true;
-    try {
-      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
-        { method: 'POST', body: JSON.stringify({ label }) });
-      if (j.milestone) milestones = [...milestones, j.milestone];
-      progress = j.progress; newMsLabel = '';
-    } catch (e) { toastError(e, 'No se pudo añadir el hito.'); }
-    finally { addingMs = false; }
+      if (seq !== reqSeq) return;
+      error = e?.message || 'No se pudieron cargar los proyectos.';
+    } finally { if (seq === reqSeq) loading = false; }
   }
 
-  // ── Eliminar proyecto ────────────────────────────────────────
-  // selected.id es STRING (BIGINT) — se pasa tal cual, sin parseInt.
-  async function doDelete() {
-    if (!selected) return;
-    deleting = true;
-    try {
-      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id), { method: 'DELETE' });
-      showDelete = false; selected = null;
-      loadList();
-    } catch (e) { saveOk = false; saveMsg = e.message || 'Error al eliminar'; showDelete = false; }
-    finally { deleting = false; }
-  }
+  // Carga al entrar en la lista y cada vez que cambian filtro, búsqueda o página.
+  $effect(() => {
+    if (detailRef) return;
+    status; q; offset;
+    untrack(() => loadList());
+  });
 
-  // ── Crear proyecto ───────────────────────────────────────────
-  function openNew() { showNew = true; newMsg = ''; nf = { name: '', briefProjectId: '', serviceType: '', amount: '', status: 'active' }; }
-  async function createProject() {
-    if (!nf.name.trim()) { newMsg = 'El nombre es requerido'; return; }
-    creating = true; newMsg = 'Creando…';
-    const amountCents = nf.amount !== '' && nf.amount != null
-      ? Math.round(Number(nf.amount) * 100) : null;
+  // ── Búsqueda (escribe en la URL con una pequeña espera) ──────
+  let searchText = $state(untrack(() => route.query.q || ''));
+  let searchTimer;
+  $effect(() => {
+    // Atrás/Adelante cambian q: el campo lo refleja.
+    const fromUrl = route.query.q || '';
+    untrack(() => { if (document.activeElement?.id !== 'prj-search') searchText = fromUrl; });
+  });
+  function onSearch(e) {
+    searchText = e.currentTarget.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => setQuery({ q: searchText.trim(), pagina: '' }), 300);
+  }
+  function setFilter(id) { setQuery({ estado: slugFromStatus(id), pagina: '' }); }
+  function clearFilters() { searchText = ''; setQuery({ estado: '', q: '', pagina: '' }); }
+  function goPage(n) { setQuery({ pagina: n > 1 ? String(n) : '' }, { replace: false }); }
+
+  // ── KPIs globales ────────────────────────────────────────────
+  const by = $derived(summary?.by_status || { active: 0, on_hold: 0, completed: 0, cancelled: 0 });
+  const kpiCount = $derived(by.cancelled ? 5 : 4);
+  const onHoldCents = $derived(Number(summary?.on_hold_cents) || 0);
+  const filtered = $derived(!!(status || q));
+
+  // ── Nuevo proyecto ───────────────────────────────────────────
+  let showNew = $state(false);
+  let creating = $state(false);
+  let createError = $state('');
+  function openNew() { createError = ''; showNew = true; }
+  async function create(payload) {
+    creating = true; createError = '';
     try {
-      const j = await api('/api/admin/projects', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: nf.name.trim(),
-          briefProjectId: nf.briefProjectId.trim() || null,
-          serviceType: nf.serviceType.trim() || null,
-          agreedAmountCents: amountCents,
-          status: nf.status,
-        }),
-      });
+      const j = await api('/api/admin/projects', { method: 'POST', body: payload });
       showNew = false;
-      loadList();
-      if (j.project) openProject(j.project.id);
-    } catch (e) { newMsg = e.message || 'Error al crear'; }
-    finally { creating = false; }
+      toast(`Proyecto ${j.project?.project_code || ''} creado`);
+      if (j.project?.project_code) navigate('progreso', [j.project.project_code]);
+      else loadList();
+    } catch (e) {
+      createError = e?.message || 'No se pudo crear el proyecto.';
+    } finally { creating = false; }
   }
 
-  onMount(() => { loadList(); });
+  const cardHref = (r) => href('progreso', [r.project_code || String(r.id)], route.query);
 </script>
 
-{#if !selected}
-  <!-- ═══ LISTA ═══ -->
+{#if detailRef}
+  <ProjectDetail ref={detailRef} />
+{:else}
   <PageHeader title="Progreso por proyecto">
     {#snippet actions()}
-      <button class="b b--primary" onclick={openNew}>Nuevo proyecto</button>
+      <button type="button" class="b b--primary" onclick={openNew}><Icon name="plus" size={16} />Nuevo proyecto</button>
     {/snippet}
   </PageHeader>
 
-  {#if rows.length}
-    <!-- Strip de KPI estilo Orbit "stats": 4 columnas iguales, label arriba,
-         número grande, delta abajo + ilustración glossy compartida (KpiArt)
-         en la esquina. Mapas semánticos: activos→rocket, en pausa→pause,
-         completados→check (verde), valor→coins (verde). -->
-    <section class="kpis">
-      <article class="kpi">
-        <p class="kpi__l">Activos</p>
-        <div class="kpi__row">
-          <span class="kpi__n">{summary.active}</span>
-          <KpiArt kind="rocket" size={56} />
-        </div>
-        <p class="kpi__delta"><span class="muted">en curso ahora</span></p>
-      </article>
-
-      <article class="kpi">
-        <p class="kpi__l">En pausa</p>
-        <div class="kpi__row">
-          <span class="kpi__n">{summary.on_hold}</span>
-          <KpiArt kind="pause" size={56} />
-        </div>
-        <p class="kpi__delta"><span class="muted">esperando insumos</span></p>
-      </article>
-
-      <article class="kpi">
-        <p class="kpi__l">Completados</p>
-        <div class="kpi__row">
-          <span class="kpi__n">{summary.completed}</span>
-          <KpiArt kind="check" size={56} />
-        </div>
-        <p class="kpi__delta"><span class="muted">entregados</span></p>
-      </article>
-
-      <article class="kpi">
-        <p class="kpi__l">Valor en cartera</p>
-        <div class="kpi__row">
-          <span class="kpi__n kpi__n--money">{fmtMoney(totalAgreedCents)}</span>
-          <KpiArt kind="coins" size={56} />
-        </div>
-        <p class="kpi__delta"><span class="muted">{rows.length} {rows.length === 1 ? 'proyecto' : 'proyectos'} en pantalla</span></p>
-      </article>
-
-      {#if summary.cancelled}
-        <article class="kpi">
-          <p class="kpi__l">Cancelados</p>
-          <div class="kpi__row">
-            <span class="kpi__n">{summary.cancelled}</span>
-            <KpiArt kind="warning" size={56} />
-          </div>
-          <p class="kpi__delta"><span class="down">archivados</span></p>
-        </article>
+  {#if summary && summary.total > 0}
+    <div class="pl-kpis">
+    <KpiGrid count={kpiCount} label="Resumen de proyectos">
+      <Kpi label="Activos" value={by.active} art="rocket" note="en curso ahora" href={href('progreso', [], { estado: 'activo' })} />
+      <Kpi label="En pausa" value={by.on_hold} art="pause" note="detenidos por ahora" href={href('progreso', [], { estado: 'pausa' })} />
+      <Kpi label="Completados" value={by.completed} art="check" note="entregados" href={href('progreso', [], { estado: 'completado' })} />
+      <Kpi label="Valor en cartera" value={fmtMoney(summary.active_cents)} art="coins" tone="data"
+           note={onHoldCents ? `solo activos, + ${fmtMoney(onHoldCents)} en pausa` : 'solo proyectos activos'} />
+      {#if by.cancelled}
+        <Kpi label="Cancelados" value={by.cancelled} art="warning" note="archivados" href={href('progreso', [], { estado: 'cancelado' })} />
       {/if}
-    </section>
+    </KpiGrid>
+    </div>
   {/if}
 
-  <div class="chips">
-    {#each P_FILTERS as f}
-      <button class="chip" class:on={filter === f.id} onclick={() => setFilter(f.id)}>{f.label}</button>
-    {/each}
-  </div>
-
-  <input class="search" type="search" placeholder="Buscar por nombre, código, MRC, cliente…" oninput={onSearchInput} />
-
-  {#if loading}
-    <div class="empty">Cargando…</div>
-  {:else if error}
-    <div class="empty err">{error}</div>
-  {:else if rows.length === 0}
-    <div class="empty empty--big">
-      <div class="empty__icon" aria-hidden="true">📁</div>
-      <p class="empty__title">
-        {#if filter || search}Sin proyectos que coincidan{:else}Aún no hay proyectos{/if}
-      </p>
-      <p class="empty__sub">
-        {#if filter || search}Probá otro filtro o limpiá la búsqueda.{:else}Creá el primero para empezar a seguir su avance.{/if}
-      </p>
-      {#if !filter && !search}
-        <button class="b b--primary" onclick={openNew}>+ Nuevo proyecto</button>
-      {/if}
-    </div>
-  {:else}
-    <div class="cards">
-      {#each rows as r (r.id)}
-        {@const done = (r.progress || 0) >= 100}
-        <button class="pcard" onclick={() => openProject(r.id)}>
-          <div class="pcard__top">
-            <span class="pmono pmono--card" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`}>{initials(r.client_name || r.name)}</span>
-            <div class="pcard__hd">
-              <span class="pcard__id mono gold">{r.project_code || ('PRJ-' + r.id)}</span>
-              <span class="pcard__name">{r.name || '— sin nombre —'}</span>
-            </div>
-            <span class="badge badge--{r.status}">{pStatusLabel(r.status)}</span>
-          </div>
-
-          <div class="pcard__sub mono">
-            <svg class="pcard__usr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg>
-            <span class="pcard__client">{r.client_name || 'Sin cliente'}</span>
-            {#if r.brief_project_id}<span class="dot">·</span><span>{r.brief_project_id}</span>{/if}
-          </div>
-
-          <!-- Barra de progreso (SVG a mano) — naranja en curso / verde al 100% -->
-          <div class="pcard__prog">
-            <svg class="pbar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <linearGradient id={`pg-${r.id}`} x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color={done ? '#6ee7c2' : '#fdba74'}/>
-                  <stop offset="1" stop-color={done ? 'var(--accent-teal)' : 'var(--accent-gold)'}/>
-                </linearGradient>
-              </defs>
-              <rect x="0" y="0" width="100" height="8" rx="4" fill="var(--bg-elevated)" />
-              <rect x="0" y="0" width={Math.max(r.progress || 0, r.progress ? 3 : 0)} height="8" rx="4" fill={`url(#pg-${r.id})`} />
-            </svg>
-            <span class="pcard__pct mono" class:teal={done}>{r.progress || 0}%</span>
-          </div>
-
-          <div class="pcard__foot">
-            <span class="pcard__hit mono">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
-              {r.milestones_done || 0}/{r.milestones_total || 0} hitos
-            </span>
-            {#if r.agreed_amount_cents != null}<span class="pcard__amt mono teal">{fmtMoney(r.agreed_amount_cents)}</span>{/if}
-          </div>
+  {#if !summary || summary.total > 0 || error}
+    <div class="pl-tools">
+      <div class="pl-pills" role="group" aria-label="Filtrar por estado">
+        <button type="button" class="pl-pill" aria-pressed={!status} onclick={() => setFilter('')}>
+          Todos{#if summary}<span class="pl-pill__n">{summary.total}</span>{/if}
         </button>
-      {/each}
-    </div>
-    {#if total > LIMIT}
-      <div class="pager">
-        <span class="dim mono">{offset + 1}–{Math.min(offset + LIMIT, total)} de {total}</span>
-        <span>
-          <button class="b b--ghost" disabled={offset === 0} onclick={prevPage}>‹ Anterior</button>
-          <button class="b b--ghost" disabled={offset + LIMIT >= total} onclick={nextPage}>Siguiente ›</button>
-        </span>
+        {#each P_STATUSES as s (s.id)}
+          <button type="button" class="pl-pill" aria-pressed={status === s.id} onclick={() => setFilter(s.id)}>
+            {s.label}{#if summary}<span class="pl-pill__n">{by[s.id] || 0}</span>{/if}
+          </button>
+        {/each}
       </div>
+      <div class="pl-search">
+        <Icon name="search" size={16} />
+        <label class="sr-only" for="prj-search">Buscar proyectos</label>
+        <input id="prj-search" class="ui-input" type="search" placeholder="Buscar proyecto, cliente o MRC"
+               value={searchText} oninput={onSearch} />
+      </div>
+    </div>
+  {/if}
+
+  <LoadingState {loading}>
+    {#snippet skeleton()}
+      <div class="pl-cards">{#each Array(6) as _, i (i)}<div class="ui-skel" style="height:150px;border-radius:var(--radius-lg)"></div>{/each}</div>
+    {/snippet}
+    {#if error}
+      <ErrorState title="No se pudieron cargar los proyectos" message={error} onretry={loadList} />
+    {:else if !rows.length}
+      {#if filtered}
+        <EmptyState art="folder" title="Ningún proyecto coincide" text="Prueba con otro estado o quita la búsqueda.">
+          {#snippet action()}<button type="button" class="b" onclick={clearFilters}>Quitar filtros</button>{/snippet}
+        </EmptyState>
+      {:else}
+        <EmptyState art="rocket" title="Aún no hay proyectos"
+          text="Crea el primero con el botón Nuevo proyecto y sigue su avance por hitos: brief, propuesta, diseño, desarrollo y entrega." />
+      {/if}
+    {:else}
+      <p class="sr-only" aria-live="polite">{total} {total === 1 ? 'proyecto' : 'proyectos'}</p>
+      <div class="pl-cards">
+        {#each rows as r (r.id)}
+          {@const st = pStatus(r.status)}
+          {@const pct = r.progress || 0}
+          {@const tone = pct >= 100 ? 'success' : st.tone}
+          <a class="pcard" href={cardHref(r)}>
+            <div class="pcard__top">
+              <span class="pcard__mono" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`} aria-hidden="true">{initials(r.client_name || r.name)}</span>
+              <div class="pcard__hd">
+                <span class="pcard__id">{r.project_code || ('PRJ-' + r.id)}{#if r.service_type}<span class="pcard__svc">{' · ' + serviceLabel(r.service_type)}</span>{/if}</span>
+                <span class="pcard__name">{r.name || 'Proyecto sin nombre'}</span>
+              </div>
+              <StatusChip tone={st.tone} label={st.label} />
+            </div>
+            <div class="pcard__sub">
+              <span class="pcard__client">{r.client_name || 'Sin cliente'}</span>
+              {#if r.brief_project_id}<span class="pcard__dot" aria-hidden="true">·</span><span>{r.brief_project_id}</span>{/if}
+            </div>
+            <div class="pcard__prog">
+              <div class="pcard__bar" aria-hidden="true"><span style={`width:${Math.max(pct, pct ? 3 : 0)}%;background:${TONE_COLOR[tone]}`}></span></div>
+              <span class="pcard__pct" style={`color:${TONE_COLOR[tone]}`}>{pct}%</span>
+            </div>
+            <div class="pcard__foot">
+              <span class="pcard__hit">{r.milestones_done || 0} de {r.milestones_total || 0} hitos</span>
+              <span class="pcard__amt">{fmtMoney(r.agreed_amount_cents)}</span>
+            </div>
+          </a>
+        {/each}
+      </div>
+      {#if total > LIMIT}
+        <nav class="pl-pager" aria-label="Páginas de proyectos">
+          <span class="pl-pager__txt">{offset + 1} a {Math.min(offset + LIMIT, total)} de {total}</span>
+          <span class="pl-pager__btns">
+            <button type="button" class="b b--ghost" disabled={page <= 1} onclick={() => goPage(page - 1)}>Anterior</button>
+            <button type="button" class="b b--ghost" disabled={offset + LIMIT >= total} onclick={() => goPage(page + 1)}>Siguiente</button>
+          </span>
+        </nav>
+      {/if}
     {/if}
-  {/if}
-
-{:else}
-  <!-- ═══ DETALLE ═══ -->
-  <button class="back" onclick={closeProject}>← Volver a proyectos</button>
-
-  {#if detailLoading}
-    <div class="empty">Cargando…</div>
-  {:else}
-    <div class="detail">
-      <div class="detail__main">
-        <div class="d-head">
-          <span class="pmono pmono--lg" style={`background:${monoColor(selected.client_name || selected.name || selected.project_code)}`}>{initials(selected.client_name || selected.name)}</span>
-          <div class="d-head__txt">
-            <h1 class="d-id">{selected.project_code || ('PRJ-' + selected.id)}</h1>
-            <p class="d-biz">{selected.name || '— sin nombre —'}</p>
-            <div class="d-meta mono">
-              <span>{selected.client_name || 'Sin cliente'}</span>
-              {#if selected.brief_project_id}<span>· Brief {selected.brief_project_id}</span>{/if}
-              {#if selected.service_type}<span>· {selected.service_type}</span>{/if}
-              {#if selected.started_at}<span>· Inicio {fmtDay(selected.started_at)}</span>{/if}
-              {#if selected.completed_at}<span>· Fin {fmtDay(selected.completed_at)}</span>{/if}
-            </div>
-          </div>
-        </div>
-
-        <!-- Stepper de hitos (SVG a mano: nodos por hito) -->
-        <section class="block">
-          <div class="block__head">
-            <h2 class="block__title">Avance · {percent}%</h2>
-            <span class="prog-sum mono">{progress ? progress.done : 0}/{progress ? progress.total : 0} hechos</span>
-          </div>
-
-          {#if milestones.length}
-            {@const W = Math.max(milestones.length * 120, 120)}
-            <div class="stepper-wrap" role="presentation" onmouseleave={() => (hoverStep = -1)}>
-              <svg class="stepper" viewBox="0 0 {W} 84" role="img" aria-label="Stepper de hitos">
-                <!-- línea base -->
-                <line x1="60" y1="30" x2={W - 60} y2="30" stroke="var(--border)" stroke-width="2" />
-                {#each milestones as ms, i}
-                  {@const cx = 60 + i * 120}
-                  {@const isDone = ms.status === 'done'}
-                  {@const isCurrent = ms.status === 'in_progress'}
-                  {@const hot = hoverStep === i}
-                  <!-- segmento coloreado hasta el último hito hecho -->
-                  {#if i > 0}
-                    <line x1={60 + (i - 1) * 120} y1="30" x2={cx} y2="30"
-                          stroke={milestones[i - 1].status === 'done' ? 'var(--accent-gold)' : 'var(--border)'}
-                          stroke-width="2" />
-                  {/if}
-                  <!-- guía vertical punteada al hover (estilo Orbit) -->
-                  {#if hot}
-                    <line x1={cx} y1="14" x2={cx} y2="74" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="2 3" />
-                    <circle cx={cx} cy="30" r="15" fill="none" stroke={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--border-strong)'} stroke-opacity=".55" stroke-width="1.5" />
-                  {/if}
-                  <circle cx={cx} cy="30" r="11"
-                          fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal-dim)' : 'var(--bg-elevated)'}
-                          stroke={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--border)'}
-                          stroke-width="2" />
-                  {#if isDone}
-                    <path d="M{cx - 4.5} 30 l3 3 l6 -6.5" fill="none" stroke="var(--fg-inverse)" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                  {:else if isCurrent}
-                    <circle cx={cx} cy="30" r="3.5" fill="var(--accent-teal)" />
-                  {/if}
-                  <text x={cx} y="58" text-anchor="middle" class="step__lbl">{ms.label}</text>
-                  <text x={cx} y="72" text-anchor="middle"
-                        class="step__st" fill={isDone ? 'var(--accent-gold)' : isCurrent ? 'var(--accent-teal)' : 'var(--fg-subtle)'}>
-                    {mStatusLabel(ms.status)}
-                  </text>
-                  <!-- zona de hover invisible y ancha por nodo -->
-                  <rect x={cx - 58} y="0" width="116" height="84" fill="transparent"
-                        onmouseenter={() => (hoverStep = i)} role="presentation" />
-                {/each}
-              </svg>
-              {#if hoverStep >= 0 && milestones[hoverStep]}
-                {@const cx = 60 + hoverStep * 120}
-                <span class="chart-tip" style={`left:${(cx / W) * 100}%;top:18px`}>
-                  {milestones[hoverStep].label} · {mStatusLabel(milestones[hoverStep].status)}
-                </span>
-              {/if}
-            </div>
-          {:else}
-            <div class="muted">— este proyecto no tiene hitos —</div>
-          {/if}
-        </section>
-
-        <!-- Lista editable de hitos -->
-        <section class="block">
-          <h2 class="block__title">Hitos</h2>
-          <ul class="mslist">
-            {#each milestones as ms (ms.id)}
-              <li class="ms ms--{ms.status}">
-                <button class="ms__dot ms__dot--{ms.status}" title="Cambiar estado" onclick={() => cycleMilestone(ms)} aria-label="Cambiar estado del hito">
-                  {#if ms.status === 'done'}✓{:else if ms.status === 'in_progress'}●{:else}○{/if}
-                </button>
-                <span class="ms__label">{ms.label}</span>
-                {#if ms.due_date}<span class="ms__due mono">vence {fmtDay(ms.due_date)}</span>{/if}
-                <span class="ms__pill ms__pill--{ms.status}">{mStatusLabel(ms.status)}</span>
-                <select class="ms__sel" value={ms.status} onchange={(e) => setMilestoneStatus(ms, e.currentTarget.value)} aria-label="Estado del hito">
-                  {#each M_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
-                </select>
-              </li>
-            {/each}
-          </ul>
-          <div class="ms-add">
-            <input class="inp" type="text" placeholder="Añadir hito…" bind:value={newMsLabel}
-                   onkeydown={(e) => { if (e.key === 'Enter') addMilestone(); }} />
-            <button class="b b--ghost" disabled={!newMsLabel.trim() || addingMs} onclick={addMilestone}>
-              {addingMs ? '…' : '+ Añadir'}
-            </button>
-          </div>
-        </section>
-      </div>
-
-      <aside class="detail__aside">
-        <div class="card">
-          <h3 class="card__t">Estado del proyecto</h3>
-          <select class="inp" bind:value={statusSel}>
-            {#each P_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
-          </select>
-          <button class="b b--primary full" style="margin-top:10px" onclick={saveStatus}>Guardar estado</button>
-          {#if saveMsg}<div class="msg" class:ok={saveOk}>{saveMsg}</div>{/if}
-        </div>
-
-        <div class="card">
-          <h3 class="card__t">Resumen</h3>
-          <div class="kv"><span class="kv__k">Monto acordado</span><span class="kv__v teal">{fmtMoney(selected.agreed_amount_cents)}</span></div>
-          <div class="kv"><span class="kv__k">Hitos hechos</span><span class="kv__v">{progress ? progress.done : 0} / {progress ? progress.total : 0}</span></div>
-          <div class="kv"><span class="kv__k">En curso</span><span class="kv__v">{progress ? progress.in_progress : 0}</span></div>
-          <div class="kv"><span class="kv__k">Pendientes</span><span class="kv__v">{progress ? progress.pending : 0}</span></div>
-          {#if selected.brief_project_id}<div class="kv"><span class="kv__k">Brief</span><span class="kv__v mono gold">{selected.brief_project_id}</span></div>{/if}
-          <div class="kv"><span class="kv__k">Creado</span><span class="kv__v mono">{fmtDateTime(selected.created_at)}</span></div>
-        </div>
-
-        <div class="card card--danger">
-          <h3 class="card__t card__t--danger">Zona de riesgo</h3>
-          <p class="danger-note">Eliminar borra el proyecto y todos sus hitos. No se puede deshacer.</p>
-          <button class="b b--danger full" onclick={() => showDelete = true}>🗑 Eliminar proyecto</button>
-        </div>
-      </aside>
-    </div>
-  {/if}
+  </LoadingState>
 {/if}
 
-{#if showNew}
-  <div class="backdrop" role="presentation" tabindex="-1"
-       onclick={(e) => { if (e.target === e.currentTarget) showNew = false; }}
-       onkeydown={(e) => { if (e.key === 'Escape') showNew = false; }}>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="new-proj-title">
-      <h3 class="modal__t" id="new-proj-title">Nuevo proyecto</h3>
-      <label class="fl" for="np-name">Nombre del proyecto *</label>
-      <input id="np-name" class="inp" type="text" placeholder="Sitio web — Negocio X" bind:value={nf.name} autocomplete="off" />
-      <label class="fl" for="np-brief">Brief vinculado (opcional)</label>
-      <input id="np-brief" class="inp" type="text" placeholder="MRC-001" bind:value={nf.briefProjectId} autocomplete="off" />
-      <label class="fl" for="np-service">Tipo de servicio (opcional)</label>
-      <input id="np-service" class="inp" type="text" placeholder="Landing, sitio completo, AEO…" bind:value={nf.serviceType} autocomplete="off" />
-      <label class="fl" for="np-amount">Monto acordado USD (opcional)</label>
-      <input id="np-amount" class="inp" type="number" min="0" step="1" placeholder="400" bind:value={nf.amount} />
-      <label class="fl" for="np-status">Estado inicial</label>
-      <select id="np-status" class="inp" bind:value={nf.status}>
-        {#each P_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
-      </select>
-      {#if newMsg}<div class="msg">{newMsg}</div>{/if}
-      <div class="modal__act">
-        <button class="b b--ghost" onclick={() => showNew = false}>Cancelar</button>
-        <button class="b b--primary" disabled={creating || !nf.name.trim()} onclick={createProject}>
-          {creating ? 'Creando…' : 'Crear proyecto'}
-        </button>
-      </div>
-    </div>
-  </div>
-{/if}
-
-{#if showDelete && selected}
-  <div class="backdrop" role="presentation" tabindex="-1"
-       onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}
-       onkeydown={(e) => { if (e.key === 'Escape') showDelete = false; }}>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-proj-title">
-      <h3 class="modal__t modal__t--danger" id="del-proj-title">Eliminar proyecto</h3>
-      <p class="modal__b">
-        Se borra <strong class="mono gold">{selected.project_code || ('PRJ-' + selected.id)}</strong>
-        y sus hitos. Esta acción es <strong>irreversible</strong>.
-      </p>
-      <div class="modal__act">
-        <button class="b b--ghost" onclick={() => showDelete = false}>Cancelar</button>
-        <button class="b b--danger" disabled={deleting} onclick={doDelete}>{deleting ? 'Eliminando…' : 'Eliminar'}</button>
-      </div>
-    </div>
-  </div>
-{/if}
+<Modal bind:open={showNew} title="Nuevo proyecto" size="md">
+  <ProjectForm mode="create" formId="np-form" busy={creating} serverError={createError} onsubmit={create} />
+  {#snippet footer()}
+    <button type="button" class="b" onclick={() => (showNew = false)} disabled={creating}>Cancelar</button>
+    <button type="submit" form="np-form" class="b b--primary" disabled={creating}>{creating ? 'Creando…' : 'Crear proyecto'}</button>
+  {/snippet}
+</Modal>
 
 <style>
+  /* Filtros en pastillas (E-06): estado activo neutro y claro, sin naranja
+     (presupuesto del acento, H-07); cada pastilla dice cuántos hay. */
+  .pl-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin: 0 0 var(--space-4); }
+  .pl-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pl-pill {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent;
+    color: var(--fg-secondary); font: inherit; font-size: var(--dash-small); font-weight: 500; cursor: pointer;
+    transition: background-color var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
+  }
+  .pl-pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
+  .pl-pill[aria-pressed="true"] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
+  .pl-pill__n { font-size: var(--dash-caption); color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
+  .pl-pill[aria-pressed="true"] .pl-pill__n { color: var(--fg-secondary); }
+  .pl-search { position: relative; flex: 0 1 340px; min-width: 220px; color: var(--fg-subtle); }
+  .pl-search :global(.ui-icon) { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .pl-search .ui-input { padding-left: 36px; }
+  @media (pointer: coarse) { .pl-pill { min-height: var(--tap-min); } }
 
-  /* KPI cards (resumen de la lista) — tratamiento Orbit "stats" 1:1:
-     4 columnas iguales (gap 14px), label arriba, número grande + KpiArt
-     en la fila, delta debajo. Mismas proporciones que .stat de Orbit y
-     que el .strip/.kcard del resto del panel para que el set sea unísono. */
-  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: var(--space-2) 0 var(--space-4); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; transition: border-color var(--duration-fast); }
-  .kpi:hover { border-color: var(--border-strong); }
-  .kpi__l { margin: 0 0 10px; font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
-  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-  .kpi__n { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; color: var(--fg-primary); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums; }
-  .kpi__n--money { font-size: 26px; }
-  .kpi__delta { margin: 12px 0 0; font-size: var(--text-sm); }
-  .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
-  .kpi__delta .down { color: var(--color-error); font-weight: 600; }
-  .kpi__delta .muted { color: var(--fg-subtle); }
-
-  /* En pantallas estrechas la rejilla de 4 colapsa a 2 (igual que el
-     resto del panel), para que las tarjetas no se aplasten. */
-  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
-  .chip:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .chip.on { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); }
-
-  .search { width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-size: var(--text-base); outline: none; margin-bottom: var(--space-4); }
-  .search:focus { border-color: var(--accent-gold); }
-
-  /* Tarjetas de proyecto — densas, con monograma de cliente.
-     Look Orbit: hairline 1px, radio 14px, SIN sombra pesada; el hover
-     solo sube el borde a strong + bg elevado + lift sutil (no glow gold). */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
-  .pcard { display: flex; flex-direction: column; gap: 9px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: transform var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast); }
-  .pcard:hover { border-color: var(--border-strong); background: var(--bg-elevated); transform: translateY(-1px); }
+  /* Tarjetas de proyecto (gramática Orbit conservada: hairline, radio 14,
+     monograma; el hover sube borde y superficie). Ahora son enlaces reales
+     a la ficha (#/progreso/PRJ-…): se abren en otra pestaña y se comparten. */
+  .pl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .pcard {
+    display: flex; flex-direction: column; gap: 10px; min-width: 0;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 16px; color: inherit; text-decoration: none;
+    transition: border-color var(--duration-fast), background-color var(--duration-fast);
+  }
+  .pcard:hover { border-color: var(--border-strong); background: var(--bg-elevated); }
   .pcard__top { display: flex; align-items: flex-start; gap: 10px; }
-  .pcard__hd { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
-  .pcard__id { font-size: 10px; letter-spacing: .04em; }
-  .pcard__name { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pmono--card { width: 34px; height: 34px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; letter-spacing: -.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
-  .pcard__sub { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fg-subtle); overflow: hidden; }
-  .pcard__usr { width: 13px; height: 13px; flex: 0 0 auto; color: var(--fg-subtle); }
+  .pcard__mono {
+    width: 34px; height: 34px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md); color: #fff; font-weight: 700; font-size: 13px; line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  .pcard__hd { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .pcard__id { font-size: var(--dash-caption); color: var(--fg-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pcard__svc { color: var(--fg-subtle); }
+  .pcard__name {
+    font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); line-height: 1.3; letter-spacing: -0.01em;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .pcard__sub { display: flex; align-items: center; gap: 6px; font-size: var(--dash-small); color: var(--fg-subtle); min-width: 0; }
   .pcard__client { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pcard__prog { display: flex; align-items: center; gap: 10px; margin-top: 1px; }
-  .pbar { flex: 1; height: 8px; display: block; }
-  .pcard__pct { font-size: 11px; font-weight: 600; color: var(--accent-gold); width: 34px; text-align: right; flex: 0 0 auto; }
-  .pcard__pct.teal { color: var(--accent-teal); }
-  .pcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 9px; border-top: 1px solid var(--border-subtle); }
-  .pcard__hit { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--fg-secondary); }
-  .pcard__hit svg { width: 13px; height: 13px; color: var(--fg-subtle); }
-  .pcard__amt { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .dot { color: var(--fg-subtle); }
+  .pcard__dot { color: var(--fg-subtle); }
+  .pcard__prog { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+  .pcard__bar { flex: 1; height: 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
+  .pcard:hover .pcard__bar { background: var(--surface-3); }
+  .pcard__bar span { display: block; height: 100%; border-radius: inherit; }
+  .pcard__pct { font-size: var(--dash-caption); font-weight: 600; width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+  .pcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+  .pcard__hit { font-size: var(--dash-small); color: var(--fg-secondary); }
+  .pcard__amt { font-size: var(--dash-small); font-weight: 600; color: var(--accent-teal); font-variant-numeric: tabular-nums; }
 
-  .badge { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid; white-space: nowrap; }
-  .badge--active { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .badge--on_hold { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .badge--completed { color: var(--accent-teal); border-color: rgba(var(--accent-teal-rgb),.22); background: rgba(var(--accent-teal-rgb),.07); }
-  .badge--cancelled { color: var(--color-error); border-color: rgba(var(--color-error-rgb),.35); background: rgba(var(--color-error-rgb),.06); }
+  /* Móvil: en media columna la cifra de dinero no cabe junto a la ilustración;
+     se oculta solo esa ilustración (la cifra manda). */
+  @media (max-width: 520px) { .pl-kpis :global(.ui-kpi:nth-child(4) .ui-kpi__row > :not(.ui-kpi__num)) { display: none; } }
 
-  .pager { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); font-size: 11px; }
+  .pl-pager { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-4); }
+  .pl-pager__txt { font-size: var(--dash-small); color: var(--fg-subtle); }
+  .pl-pager__btns { display: flex; gap: 8px; }
 
-  .empty, .muted { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
-  .empty.err { color: var(--color-error); }
-  .muted { padding: var(--space-4); font-style: italic; }
-
-  /* Empty state centrado (Orbit) */
-  .empty--big { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-9) var(--space-6); font-style: normal; }
-  .empty__icon { font-size: 32px; opacity: .65; margin-bottom: var(--space-1); }
-  .empty__title { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); color: var(--fg-primary); margin: 0; }
-  .empty__sub { font-size: var(--text-sm); color: var(--fg-subtle); margin: 0 0 var(--space-2); }
-
-  /* Detalle */
-  .back { background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 10px; letter-spacing: .15em; text-transform: uppercase; cursor: pointer; margin: var(--space-4) 0; padding: 4px 0; }
-  .back:hover { color: var(--accent-gold); }
-  .detail { display: grid; grid-template-columns: minmax(0,1fr) 296px; gap: 18px; align-items: start; }
-  .detail__main { min-width: 0; }
-  .d-head { display: flex; align-items: flex-start; gap: var(--space-3); border-bottom: 1px solid var(--border); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
-  .d-head__txt { min-width: 0; flex: 1; }
-  .pmono--lg { width: 46px; height: 46px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1; letter-spacing: -.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
-  .d-id { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); letter-spacing: var(--tracking-tight); color: var(--accent-gold); margin: 0; }
-  .d-biz { font-family: var(--font-display); font-style: italic; color: var(--fg-secondary); margin: 4px 0; }
-  .d-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: .1em; }
-
-  .block { margin-bottom: var(--space-4); }
-  .block__head { display: flex; align-items: baseline; justify-content: space-between; }
-  .block__title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-md); letter-spacing: normal; text-transform: none; color: var(--fg-primary); margin: 0 0 var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); flex: 1; }
-  .prog-sum { font-size: 11px; color: var(--fg-subtle); margin-left: 12px; }
-
-  /* Stepper SVG interactivo */
-  .stepper-wrap { position: relative; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 10px; }
-  .stepper { width: 100%; height: auto; display: block; max-width: 100%; }
-  .stepper rect[role="presentation"] { cursor: pointer; }
-  .step__lbl { fill: var(--fg-primary); font-family: var(--font-display); font-size: 11px; font-weight: 600; }
-  .step__st  { font-family: var(--font-mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
-
-  /* Lista de hitos */
-  .mslist { list-style: none; margin: 0 0 var(--space-3); padding: 0; }
-  .ms { display: flex; align-items: center; gap: var(--space-3); padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
-  .ms:last-child { border-bottom: 0; }
-  .ms__dot { width: 24px; height: 24px; flex: 0 0 auto; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg-elevated); color: var(--fg-subtle); font-size: 12px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all var(--duration-fast); }
-  .ms__dot--done { background: var(--accent-gold); border-color: var(--accent-gold); color: var(--fg-inverse); }
-  .ms__dot--in_progress { border-color: var(--accent-teal); color: var(--accent-teal); background: var(--accent-teal-dim); }
-  .ms__label { flex: 1; color: var(--fg-primary); font-size: var(--text-sm); }
-  .ms--done .ms__label { color: var(--fg-secondary); }
-  .ms__due { font-size: 10px; color: var(--fg-subtle); }
-  /* Pill de estado tintada (se oculta en pantallas estrechas a favor del select) */
-  .ms__pill { padding: 2px 9px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; border: 1px solid; white-space: nowrap; flex: 0 0 auto; }
-  .ms__pill--pending { color: var(--fg-subtle); border-color: var(--border); background: var(--bg-elevated); }
-  .ms__pill--in_progress { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .ms__pill--done { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  /* El caret (background-image) lo aplica la regla global .ms__sel en dashboard.css. */
-  .ms__sel { background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); padding: 6px 26px 6px 8px; font-size: var(--text-xs); cursor: pointer; flex: 0 0 auto; background-position: right 8px center; }
-  .ms__sel:focus { outline: none; border-color: var(--accent-gold); }
-
-  .ms-add { display: flex; gap: 8px; }
-  .ms-add .inp { flex: 1; }
-
-  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; }
-  .inp:focus { border-color: var(--accent-gold); }
-  /* Reserva espacio para el caret del select (la imagen viene del global). */
-  select.inp { padding-right: 30px; }
-
-  .detail__aside { position: sticky; top: var(--space-3); display: flex; flex-direction: column; gap: 14px; }
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
-  .card__t { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 0 0 var(--space-3); }
-  .card--danger { border-color: rgba(var(--color-error-rgb),.28); }
-  .card__t--danger { color: var(--color-error); }
-  .danger-note { font-size: var(--text-xs); color: var(--fg-subtle); margin: 0 0 var(--space-3); line-height: 1.4; }
-  .kv { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border-subtle); }
-  .kv:last-child { border-bottom: 0; }
-  .kv__k { font-size: var(--text-xs); color: var(--fg-secondary); }
-  .kv__v { font-size: var(--text-sm); color: var(--fg-primary); text-align: right; }
-
-  /* La definición canónica de .b/.b--primary/.b--danger/.b.full
-     vive en dashboard.css (global). */
-
-  .mono { font-family: var(--font-mono); }
-  .gold { color: var(--accent-gold); }
-  .teal { color: var(--accent-teal); }
-  .err { color: var(--color-error); }
-  .dim { color: var(--fg-subtle); white-space: nowrap; }
-
-  .msg { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--color-error); min-height: 12px; }
-  .msg.ok { color: var(--accent-teal); }
-
-  /* Modal nuevo proyecto */
-  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
-  .modal { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-lg); padding: var(--space-5); }
-  .modal__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--accent-gold); margin: 0 0 var(--space-3); }
-  .modal__t--danger { color: var(--color-error); }
-  .modal__b { font-size: var(--text-sm); color: var(--fg-secondary); line-height: 1.5; margin: 0 0 var(--space-2); }
-  .fl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: 10px 0 4px; }
-  .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
-
-  @media (max-width: 880px) { .detail { grid-template-columns: 1fr; } .detail__aside { position: static; } }
-  @media (max-width: 560px) { .ms__pill { display: none; } }
+  @media (max-width: 720px) {
+    .pl-search { flex: 1 1 100%; }
+    .pl-cards { grid-template-columns: 1fr; }
+  }
 </style>

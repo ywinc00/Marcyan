@@ -26,6 +26,14 @@
     check:     'M5 12.5l4.5 4.5L19 7.5',
     wifiOff:   'M2 2l20 20M8.5 16.4a5 5 0 017 0M5 12.9a10 10 0 015.2-2.8M19 12.9a10 10 0 00-2.1-1.6M2 8.8a15 15 0 014.2-2.7M22 8.8A15 15 0 0010.7 5M12 20h.01',
     build:     'M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.5 2.5-2.8-.7-.7-2.8z',
+    // A5 · Progreso (hitos): misma familia, trazo 1,6.
+    arrowUp:   'M12 19V5M6 11l6-6 6 6',
+    arrowDown: 'M12 5v14M6 13l6 6 6-6',
+    trash:     'M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3',
+    plus:      'M12 5v14M5 12h14',
+    calendar:  'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    pencil:    'M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4',
+    back:      'M15 6l-6 6 6 6',
   };
 </script>
 

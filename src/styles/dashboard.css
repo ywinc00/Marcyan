@@ -442,6 +442,7 @@ select.inp,
 }
 .ui-kpi__num.is-accent { color: var(--accent-gold); }
 .ui-kpi__num.is-data { color: var(--accent-teal); }
+.ui-kpi__num.is-error { color: var(--color-error); } /* A4: Vencido / Neto negativo */
 .ui-kpi__note { margin: 12px 0 0; font-size: var(--dash-small); color: var(--fg-subtle); line-height: 1.4; }
 .ui-kpi__note .is-data { color: var(--accent-teal); font-weight: 600; }
 @media (max-width: 719px) {

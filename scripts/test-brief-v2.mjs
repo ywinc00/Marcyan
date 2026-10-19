@@ -8,6 +8,8 @@
 //    · límite de envíos con un almacén falso (lib/ratelimit.mjs)
 //    · reglas de onBeforeGenerateToken, nombres seguros y tipo real por
 //      bytes mágicos (lib/brief-upload-rules.mjs + file-type)
+//    · kit .zip para Claude Code (lib/kit/*) y ficha HTML con etiquetas
+//      del esquema (api/admin/briefs/[id]/document.mjs)
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
 import { fileTypeFromBuffer } from 'file-type';
@@ -390,6 +392,241 @@ if (noDb) {
   });
 } else {
   console.warn('· pruebas del handler omitidas: hay una base de datos configurada en el entorno');
+}
+
+// ── 11) Kit .zip para Claude Code (lib/kit/build.mjs + lib/kit/zip.mjs) ──
+// Brief de ejemplo inventado + archivos falsos en memoria → zip en memoria →
+// se descomprime con fflate y se revisa lo que sale.
+{
+  const { unzipSync, strFromU8 } = await import('fflate');
+  const yaml = (await import('js-yaml')).default;
+  const { buildKit, isSafeKitPath, slugify, designMode } = await import('../lib/kit/build.mjs');
+  const { kitZipToBuffer } = await import('../lib/kit/zip.mjs');
+  const { FILE_TAG_DEFS: FILE_TAG_DEFS_ALL } = await import('../lib/brief-schema.mjs');
+  const { renderHtml } = await import('../api/admin/briefs/[id]/document.mjs');
+  const fx = await import('./fixtures/kit-muestra.mjs');
+  const NOW = new Date('2026-10-19T12:00:00Z');
+
+  const makeZip = async (brief, files, opts = {}) => {
+    const kit = buildKit({ brief, files, now: NOW, ...opts });
+    const { zip, results } = await kitZipToBuffer(kit, { readAsset: fx.readFakeAsset, mtime: NOW });
+    return { kit, zip, results, entries: unzipSync(zip) };
+  };
+  const mdOf = (entries) => Object.entries(entries).filter(([p]) => p.endsWith('.md')).map(([p, u8]) => [p, strFromU8(u8)]);
+  const frontMatter = (text) => {
+    const m = /^---\n([\s\S]*?)\n---\n/.exec(text);
+    assert.ok(m, 'sin front matter');
+    return yaml.load(m[1]);
+  };
+  // Método de compresión de cada entrada (cabeceras locales del zip).
+  const methods = (zip) => {
+    const out = {};
+    const dv = new DataView(zip.buffer, zip.byteOffset, zip.byteLength);
+    for (let i = 0; i + 30 < zip.length; i++) {
+      if (dv.getUint32(i, true) !== 0x04034b50) continue;
+      const method = dv.getUint16(i + 8, true);
+      const nameLen = dv.getUint16(i + 26, true);
+      out[strFromU8(zip.subarray(i + 30, i + 30 + nameLen))] = method;
+    }
+    return out;
+  };
+
+  const base = await makeZip(fx.SAMPLE_BRIEF, fx.SAMPLE_FILES);
+  const R = base.kit.root;
+  const has = (p) => Object.prototype.hasOwnProperty.call(base.entries, `${R}/${p}`);
+  const text = (p) => strFromU8(base.entries[`${R}/${p}`]);
+
+  if (process.env.KIT_SAMPLE_OUT) {
+    const { writeFileSync, mkdirSync } = await import('node:fs');
+    mkdirSync(process.env.KIT_SAMPLE_OUT, { recursive: true });
+    writeFileSync(`${process.env.KIT_SAMPLE_OUT}/kit-muestra.zip`, base.zip);
+    const lines = Object.entries(base.entries).map(([p, u8]) => `${p}  (${u8.length} B)`).sort();
+    writeFileSync(`${process.env.KIT_SAMPLE_OUT}/kit-arbol.txt`, `${base.kit.filename}\n\n${lines.join('\n')}\n`);
+  }
+
+  await check('kit: nombre del zip y carpeta raíz kit-MRC-0XX-<negocio>', () => {
+    assert.equal(base.kit.filename, 'kit-MRC-099-limpiezas-aurora.zip');
+    assert.equal(R, 'kit-MRC-099-limpiezas-aurora');
+    assert.equal(slugify('Ñandú & Cía. — Servicios'), 'nandu-cia-servicios');
+  });
+  await check('kit: estructura completa (raíz, docs/handoff, docs/seo, data, design, assets)', () => {
+    for (const p of [
+      'LEEME.md', 'CLAUDE.md', 'DESIGN.md', 'BRIEF.md', 'brief.json', 'data/site.json',
+      'design/art-direction.md', 'design/decisiones/_TEMPLATE.md', '.claude/rules/frontend-design.md',
+      'docs/handoff/NEGOCIO.md', 'docs/handoff/SERVICIOS.md', 'docs/handoff/precios.json', 'docs/handoff/CLAIMS.md',
+      'docs/handoff/FOTOS.md', 'docs/handoff/CUENTAS.md', 'docs/handoff/PLACEHOLDERS.md', 'docs/handoff/COMPETENCIA.md',
+      'docs/handoff/OBJETIVOS.md', 'docs/handoff/OPERACION.md', 'docs/seo/seo.config.json', 'assets/MANIFEST.md',
+      'assets/logo/01-logo-aurora-final.svg', 'assets/logo/02-logo-blanco.png', 'assets/fotos/04-img-0755.jpg',
+      'assets/docs/01-lista-de-precios-2026.pdf', 'assets/video/01-obra.mp4',
+    ]) assert.ok(has(p), `falta ${p}`);
+  });
+  await check('kit: ninguna ruta peligrosa (todo bajo la raíz, ASCII, sin "..", sin barra invertida)', () => {
+    for (const p of Object.keys(base.entries)) {
+      assert.ok(p.startsWith(`${R}/`), p);
+      assert.ok(isSafeKitPath(p.slice(R.length + 1)), p);
+      assert.ok(!p.split('/').includes('..') && !p.includes('\\') && /^[\x20-\x7e]+$/.test(p), p);
+    }
+    assert.ok(!isSafeKitPath('../x.md') && !isSafeKitPath('/etc/x') && !isSafeKitPath('a/../b') && !isSafeKitPath('a\\b') && !isSafeKitPath('fotos/ñ.jpg'));
+  });
+  await check('kit: los documentos legales NO entran por defecto; con legal=1 van a LEGAL-CONFIDENCIAL/', async () => {
+    assert.ok(!Object.keys(base.entries).some((p) => /LEGAL|legal|seguro/i.test(p.slice(R.length))), 'legal dentro del kit de diseño');
+    const withLegal = await makeZip(fx.SAMPLE_BRIEF, fx.SAMPLE_FILES, { legal: true });
+    const lr = withLegal.kit.root;
+    assert.ok(withLegal.entries[`${lr}/LEGAL-CONFIDENCIAL/01-certificado-seguro.pdf`], 'falta el legal con legal=1');
+    assert.ok(withLegal.entries[`${lr}/LEGAL-CONFIDENCIAL/LEEME.md`]);
+    assert.deepEqual(withLegal.entries[`${lr}/LEGAL-CONFIDENCIAL/01-certificado-seguro.pdf`], fx.FAKE_BYTES['briefs/d2/legal/seguro-AbC9.pdf']);
+  });
+  await check('kit: front matter válido en BRIEF.md y DESIGN.md (YAML)', () => {
+    const b = frontMatter(text('BRIEF.md'));
+    assert.equal(b.mrc, 'MRC-099');
+    assert.equal(b.negocio, 'Limpiezas Aurora');
+    assert.equal(b.ciudad, 'Houston, TX');
+    assert.equal(b.idioma, 'Español');
+    assert.deepEqual(b.servicios, ['Diseño web', 'SEO local']);
+    assert.equal(b.presupuesto, 'De $1,000 a $2,500');
+    assert.equal(b.plazo, 'En 2 a 4 semanas');
+    assert.equal(b.fecha, '2026-10-01');
+    const d = frontMatter(text('DESIGN.md'));
+    assert.equal(d.name, 'Limpiezas Aurora · Sistema de diseño · Marcyan');
+    assert.equal(d.colors.accent, '#E8604C');
+    assert.equal(d.colors['surface-dark'], '#14213D');
+    assert.equal(d.colors.paper, '#FBF6EE');
+    assert.equal(d.cliente.modo, 'REDISEÑO-IDENTIDAD');
+    assert.equal(d.cliente.colores_marca.length, 3);
+    assert.match(text('DESIGN.md'), /# EDITAR/);
+  });
+  await check('kit: sin guion largo en ningún .md generado', () => {
+    for (const [p, t] of mdOf(base.entries)) assert.ok(!t.includes('—'), `guion largo en ${p}`);
+  });
+  await check('kit: ningún código crudo de opción en los .md (solo etiquetas)', () => {
+    const codes = new Set();
+    const collect = (fd) => {
+      for (const o of fd.options || []) {
+        const v = String(o.value);
+        if (v === o.label.es || v === o.label.en || /\s/.test(v)) continue;
+        if (/[_+\d-]|[a-z][A-Z]/.test(v)) codes.add(v);
+      }
+      if (fd.item) fd.item.fields.forEach(collect);
+    };
+    for (const fd of FIELDS.values()) collect(fd);
+    for (const k of Object.keys(FILE_TAG_DEFS_ALL)) FILE_TAG_DEFS_ALL[k].forEach(collect);
+    for (const id of SERVICE_IDS) if (/-/.test(id)) codes.add(id);
+    ['biling', 'luxury', 'noSe'].forEach((c) => codes.add(c));
+    assert.ok(codes.has('2-4sem') && codes.has('before_after') && codes.has('dark_bg'), 'la lista de códigos no se armó');
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    for (const [p, t] of mdOf(base.entries)) {
+      for (const c of codes) {
+        assert.ok(!new RegExp(`(^|[^\\p{L}\\p{N}_+-])${esc(c)}([^\\p{L}\\p{N}_+-]|$)`, 'u').test(t), `código crudo "${c}" en ${p}`);
+      }
+    }
+  });
+  await check('kit: sin IP, navegador ni hash del enlace en ningún archivo', () => {
+    for (const [p, u8] of Object.entries(base.entries)) {
+      const t = strFromU8(u8);
+      for (const bad of ['203.0.113.77', 'Navegador de prueba', 'hash-que-nunca-debe-salir-en-el-kit']) assert.ok(!t.includes(bad), `${bad} en ${p}`);
+    }
+    const j = JSON.parse(text('brief.json'));
+    assert.ok(!('ip_address' in j) && !('user_agent' in j) && !('ip_address' in j.datos));
+    assert.equal(j.datos.budget_range, '1000-2500');
+    assert.equal(j.legible.budget_range.valor, 'De $1,000 a $2,500');
+  });
+  await check('kit: los archivos llegan íntegros y el sha256 del MANIFEST coincide', async () => {
+    const { createHash } = await import('node:crypto');
+    const png = base.entries[`${R}/assets/logo/02-logo-blanco.png`];
+    assert.deepEqual(png, fx.FAKE_BYTES['briefs/d1/logo/logo-blanco-AbC2.png']);
+    const sha = createHash('sha256').update(png).digest('hex');
+    assert.ok(text('assets/MANIFEST.md').includes(sha));
+    assert.deepEqual(base.entries[`${R}/assets/video/01-obra.mp4`], fx.FAKE_BYTES['briefs/d2/video/obra-AbC8.mp4']);
+  });
+  await check('kit: sin compresión para jpg/png/pdf/mp4 y deflate para texto y SVG', () => {
+    const m = methods(base.zip);
+    assert.equal(m[`${R}/assets/fotos/04-img-0755.jpg`], 0);
+    assert.equal(m[`${R}/assets/logo/02-logo-blanco.png`], 0);
+    assert.equal(m[`${R}/assets/docs/01-lista-de-precios-2026.pdf`], 0);
+    assert.equal(m[`${R}/assets/video/01-obra.mp4`], 0);
+    assert.equal(m[`${R}/BRIEF.md`], 8);
+    assert.equal(m[`${R}/assets/logo/01-logo-aurora-final.svg`], 8);
+  });
+  await check('kit: un blob que falla no corta el zip y queda en PLACEHOLDERS, FOTOS y MANIFEST', () => {
+    assert.equal(base.results.get('assets/fotos/03-perdida.jpg').ok, false);
+    assert.ok(!has('assets/fotos/03-perdida.jpg'));
+    assert.ok(has('assets/fotos/04-img-0755.jpg') && has('assets/MANIFEST.md'));
+    assert.match(text('docs/handoff/PLACEHOLDERS.md'), /perdida\.jpg/);
+    assert.match(text('docs/handoff/FOTOS.md'), /03-perdida\.jpg.*NO está en el kit/);
+    assert.match(text('assets/MANIFEST.md'), /03-perdida\.jpg.*no se pudo leer/);
+  });
+  await check('kit: rechazados fuera, nombres hostiles saneados y prefijos estables', () => {
+    assert.ok(!Object.keys(base.entries).some((p) => p.includes('factura')));
+    assert.match(text('docs/handoff/PLACEHOLDERS.md'), /factura\.jpg/);
+    const again = buildKit({ brief: fx.SAMPLE_BRIEF, files: fx.SAMPLE_FILES.slice().reverse(), now: NOW });
+    assert.deepEqual(again.assets.map((a) => a.path), base.kit.assets.map((a) => a.path));
+    assert.match(text('assets/MANIFEST.md'), /Sí \| Sí \| Brief inicial \| IMG_0755\.HEIC/); // convertida de HEIC
+  });
+  await check('kit: modo desde-cero / rediseño según "marca cerrada, ajustable o rehacer"', () => {
+    assert.equal(designMode({ brand_status: 'closed' }).mode, 'REDISEÑO-IDENTIDAD');
+    assert.equal(designMode({ brand_status: 'adjustable' }).mode, 'REDISEÑO-IDENTIDAD');
+    assert.equal(designMode({ brand_status: 'redo', has_logo: 'si' }).mode, 'DESDE-CERO');
+    assert.equal(designMode({ has_logo: 'no' }).mode, 'DESDE-CERO');
+    assert.equal(designMode({}).sure, false);
+    assert.match(text('LEEME.md'), /\*\*REDISEÑO-IDENTIDAD\*\*/);
+  });
+  await check('kit: CLAUDE.md con idiomas, tono, lo que no quiere, reglas de copy y roadmap', () => {
+    const t = text('CLAUDE.md');
+    assert.match(t, /bilingüe/);
+    assert.match(t, /Amigable y cálida/);
+    assert.match(t, /Fondos negros/);
+    assert.match(t, /Sin guiones largos/);
+    assert.match(t, /_cerebro\/limpiezas-aurora\/roadmap\.md/);
+    assert.match(t, /Método de la agencia/);
+  });
+  await check('kit: CLAIMS con prueba o "Sin prueba: no publicar"; JSON válidos', () => {
+    const rows = text('docs/handoff/CLAIMS.md').split('\n').filter((l) => /^\| C-\d+/.test(l));
+    assert.ok(rows.length >= 5);
+    for (const l of rows) assert.ok(/Con prueba|Sin prueba: no publicar/.test(l), l);
+    assert.match(text('docs/handoff/CLAIMS.md'), /Desde 2019.*Sin prueba: no publicar/);
+    const site = JSON.parse(text('data/site.json'));
+    assert.equal(site.whatsapp.enlace, 'https://wa.me/15550100199');
+    assert.equal(site.direccion.publicable, false);
+    const seo = JSON.parse(text('docs/seo/seo.config.json'));
+    assert.equal(seo.tipo, 'sab');
+    assert.equal(seo.gscPropiedad, 'sc-domain:aurora-limpiezas.example.com');
+    assert.equal(JSON.parse(text('docs/handoff/precios.json')).servicios[0].desde, 180);
+  });
+  await check('kit: brief en inglés = contenido en inglés, títulos en español', async () => {
+    const en = await makeZip({ ...fx.SAMPLE_BRIEF, lang: 'en' }, fx.SAMPLE_FILES);
+    const b = strFromU8(en.entries[`${en.kit.root}/BRIEF.md`]);
+    assert.match(b, /- \*\*Idioma\*\*: Bilingual/);
+    assert.match(b, /## Kit de arranque/);
+    assert.match(strFromU8(en.entries[`${en.kit.root}/docs/handoff/CLAIMS.md`]), /In business since 2019/);
+  });
+  await check('kit: brief v1 del chat (sin kit, sin archivos, presupuesto en texto libre) también arma kit', async () => {
+    const v1 = {
+      id: 7, project_id: 'MRC-041', status: 'pending', source: 'chat', created_at: '2026-08-01T10:00:00Z',
+      business_name: 'Taller Ejemplo', owner_name: 'Luis', email: 'luis@example.com', budget_range: 'unos $1,500',
+      timeline: 'urgente', language: 'es', has_logo: 'no', main_objective: 'Una landing',
+    };
+    const k = await makeZip(v1, []);
+    const kr = k.kit.root;
+    assert.equal(kr, 'kit-MRC-041-taller-ejemplo');
+    const b = strFromU8(k.entries[`${kr}/BRIEF.md`]);
+    assert.match(b, /unos \$1,500/);
+    assert.match(b, /Lo antes posible/);
+    assert.match(strFromU8(k.entries[`${kr}/docs/handoff/PLACEHOLDERS.md`]), /no ha completado el kit de arranque/);
+    assert.equal(k.kit.mode, 'DESDE-CERO');
+    assert.ok(k.entries[`${kr}/assets/MANIFEST.md`]);
+  });
+  await check('ficha HTML (document.mjs): etiquetas del esquema, sin guion largo, tipografía del DS v2', () => {
+    const html = renderHtml(fx.SAMPLE_BRIEF, { autoPrint: false });
+    assert.match(html, /Bilingüe/);
+    assert.match(html, /En 2 a 4 semanas/);
+    assert.match(html, /Space Grotesk/);
+    assert.ok(!html.includes('2-4sem') && !html.includes('>biling<') && !html.includes('—'));
+    assert.ok(!html.includes('Cormorant'));
+  });
+  await check('/api/admin/briefs/:id/kit carga y exporta el handler', async () => {
+    const m = await import('../api/admin/briefs/[id]/kit.mjs');
+    assert.equal(typeof m.default, 'function');
+  });
 }
 
 if (fails.length) {

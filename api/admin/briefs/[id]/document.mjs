@@ -2,66 +2,50 @@
 //   Genera un documento HTML imprimible del brief.
 //   - Si download=1 → Content-Disposition: attachment (.html)
 //   - Si no → text/html inline con window.print() automático para "Guardar como PDF"
+//   Desde Orbit v2 es la "Ver ficha": la salida principal del brief es el kit
+//   .zip (kit.mjs). Etiquetas del esquema único (B-08) y tipografía del DS v2 (B-18).
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import { getBriefByProjectId } from '../../../../lib/db.mjs';
+import { sectionsFor, labelFor, shortLabel, isActive } from '../../../../lib/brief-schema.mjs';
+import { briefData } from '../../../../lib/kit/build.mjs';
 
-const SECTIONS = [
-  ['01 · Información del negocio', [
-    ['Nombre del negocio', 'business_name'],
-    ['Propietario / contacto', 'owner_name'],
-    ['Industria', 'industry'],
-    ['Años en el mercado', 'years_in_market'],
-    ['Descripción del negocio', 'business_description', true],
-    ['Productos / Servicios', 'products_services', true],
-  ]],
-  ['02 · Contacto e información digital', [
-    ['Teléfono', 'phone'],
-    ['Email', 'email'],
-    ['Ciudad / Estado', 'city_state'],
-    ['Web actual', 'current_website'],
-    ['Instagram', 'instagram'],
-    ['Facebook', 'facebook'],
-    ['Otras redes', 'other_socials'],
-    ['Google Business', 'google_business'],
-  ]],
-  ['03 · Tipo de sitio', [
-    ['Tipo de sitio', 'website_type'],
-    ['¿Dominio propio?', 'has_domain'],
-    ['¿Hosting?', 'has_hosting'],
-    ['Páginas requeridas', 'pages_required', false, 'tags'],
-    ['Funcionalidades', 'features_required', false, 'tags'],
-  ]],
-  ['04 · Audiencia y objetivos', [
-    ['Audiencia', 'target_audience', true],
-    ['Objetivo principal', 'main_objective', true],
-    ['Acción del visitante', 'visitor_action'],
-    ['Competidores', 'competitors', true],
-  ]],
-  ['05 · Identidad de marca', [
-    ['¿Logo existente?', 'has_logo'],
-    ['Colores', 'brand_colors'],
-    ['Tipografías', 'brand_fonts'],
-    ['Personalidad', 'brand_personality'],
-    ['Inspiración', 'inspiration_sites', true],
-    ['No le gusta', 'design_dislikes', true],
-  ]],
-  ['06 · Contenido del sitio', [
-    ['Fotos', 'has_photos'],
-    ['Textos', 'has_copy'],
-    ['Video', 'has_video'],
-    ['Idioma', 'language'],
-  ]],
-  ['07 · Presupuesto y tiempos', [
-    ['Inversión estimada', 'budget_range'],
-    ['Tiempo de entrega', 'timeline'],
-    ['Fecha límite', 'deadline'],
-  ]],
-  ['08 · Notas adicionales', [
-    ['Notas adicionales', 'additional_notes', true],
-    ['¿Cómo se enteró?', 'referred_by'],
-    ['Agencia previa', 'previous_agency'],
-  ]],
-];
+// Secciones y etiquetas desde el esquema único (B-08): la ficha muestra
+// "No sé", "Bilingüe" o "De 2 a 4 semanas", nunca los códigos guardados.
+// Sale todo lo que tiene dato; del brief inicial también lo que quedó sin
+// responder (para verlo de un vistazo). Los archivos se ven en el panel.
+const isEmptyVal = (v) => v === null || v === undefined || v === '' || v === false
+  || (Array.isArray(v) && v.length === 0)
+  || (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0);
+const LONG_TYPES = new Set(['textarea', 'repeater', 'hours', 'zones']);
+const TAG_TYPES = new Set(['checkbox', 'services']);
+
+function buildSections(brief) {
+  const data = briefData(brief);
+  const services = data.services || [];
+  const out = [];
+  let n = 0;
+  for (const s of sectionsFor(null, null, { includeHidden: true })) {
+    const rows = [];
+    for (const fd of s.fields) {
+      if (fd.type === 'file') continue;
+      const v = data[fd.key];
+      const empty = isEmptyVal(v);
+      if (empty && (fd.hidden || fd.moment !== 'inicial' || !isActive(fd, services))) continue;
+      const kind = TAG_TYPES.has(fd.type) && Array.isArray(v) && fd.options ? 'tags' : null;
+      rows.push({
+        label: shortLabel(fd, 'es') || fd.label.es,
+        span: LONG_TYPES.has(fd.type),
+        kind,
+        value: empty ? null : (kind ? v.map((x) => labelFor(fd, [x], 'es')) : labelFor(fd, v, 'es')),
+      });
+    }
+    if (!rows.length || rows.every((r) => r.value === null && s.moment !== 'inicial')) continue;
+    n += 1;
+    const title = `${String(n).padStart(2, '0')} · ${s.moment === 'arranque' ? 'Kit · ' : ''}${s.short.es}`;
+    out.push([title, rows]);
+  }
+  return out;
+}
 
 function escapeHtml(s) {
   return String(s == null ? '' : s)
@@ -83,25 +67,25 @@ function statusLabel(s) {
 
 function renderValue(val, kind) {
   if (val === null || val === undefined || val === '') {
-    return '<span class="empty">—</span>';
+    return '<span class="empty">Sin dato</span>';
   }
   if (kind === 'tags') {
     const arr = Array.isArray(val) ? val : [];
-    if (!arr.length) return '<span class="empty">—</span>';
+    if (!arr.length) return '<span class="empty">Sin dato</span>';
     return arr.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join(' ');
   }
   return escapeHtml(val).replace(/\n/g, '<br>');
 }
 
-function renderHtml(brief, { autoPrint = true } = {}) {
-  const sectionsHtml = SECTIONS.map(([title, rows]) => `
+export function renderHtml(brief, { autoPrint = true } = {}) {
+  const sectionsHtml = buildSections(brief).map(([title, rows]) => `
     <section class="section">
       <h2>${escapeHtml(title)}</h2>
       <dl class="grid">
-        ${rows.map(([label, key, span, kind]) => `
+        ${rows.map(({ label, span, kind, value }) => `
           <div class="field${span ? ' span' : ''}">
             <dt>${escapeHtml(label)}</dt>
-            <dd>${renderValue(brief[key], kind)}</dd>
+            <dd>${renderValue(value, kind)}</dd>
           </div>
         `).join('')}
       </dl>
@@ -118,13 +102,15 @@ function renderHtml(brief, { autoPrint = true } = {}) {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Brief ${escapeHtml(brief.project_id)} — Marcyan</title>
+<title>Brief ${escapeHtml(brief.project_id)} · Marcyan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   @page { size: Letter; margin: 18mm 16mm; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
     font-size: 11pt;
     line-height: 1.5;
     color: #1a1a1a;
@@ -139,7 +125,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     margin-bottom: 22px;
   }
   .brand {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
     font-size: 22pt;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -152,6 +138,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     color: #b59964;
   }
   .tagline {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
     font-size: 9pt;
     letter-spacing: 0.2em;
     color: #666;
@@ -167,7 +154,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     margin-top: 14px;
   }
   h1.project-id {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
     font-size: 24pt;
     margin: 0;
     letter-spacing: 0.12em;
@@ -179,6 +166,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     color: #444;
   }
   .meta-line {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
     font-size: 9pt;
     letter-spacing: 0.1em;
     color: #777;
@@ -186,6 +174,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     margin-top: 4px;
   }
   .badge {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
     display: inline-block;
     padding: 2px 10px;
     border: 1px solid #c8a96e;
@@ -197,7 +186,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
   }
   .section { margin-bottom: 18px; page-break-inside: avoid; }
   .section h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
     font-size: 13pt;
     letter-spacing: 0.08em;
     color: #1a1a1a;
@@ -215,6 +204,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
   .field { display: flex; flex-direction: column; gap: 2px; }
   .field.span { grid-column: 1 / -1; }
   dt {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
     font-size: 8pt;
     letter-spacing: 0.16em;
     color: #c8a96e;
@@ -246,6 +236,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     font-size: 10.5pt;
   }
   footer.doc-foot {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
     margin-top: 28px;
     padding-top: 12px;
     border-top: 1px solid #ddd;
@@ -268,7 +259,7 @@ function renderHtml(brief, { autoPrint = true } = {}) {
     <div class="doc-meta">
       <div>
         <h1 class="project-id">${escapeHtml(brief.project_id)}</h1>
-        <div class="business">${escapeHtml(brief.business_name || '— sin nombre de negocio —')}</div>
+        <div class="business">${escapeHtml(brief.business_name || 'Sin nombre de negocio')}</div>
         <div class="meta-line">
           Recibido ${escapeHtml(fmtDate(brief.created_at))}
           ${brief.contacted_at ? ` · Contactado ${escapeHtml(fmtDate(brief.contacted_at))}` : ''}

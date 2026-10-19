@@ -5,7 +5,8 @@
   //     al crear, la opción "auto" usa el cliente del brief o, sin brief, la
   //     cuenta genérica "Directo" (lo dice tal cual).
   //   · Brief: código MRC con sugerencias; se avisa junto al campo si no
-  //     existe (OP-09), y el servidor lo vuelve a comprobar.
+  //     existe (OP-09), y el servidor lo vuelve a comprobar. Si la lista vino
+  //     recortada (más de 200 briefs), decide solo el servidor (A5-R2).
   //   · Monto: acepta "1500", "1,500", "1.500" o "$1,500.50"; vacío = $0 (MOCK-06).
   // onsubmit(payload) recibe solo lo que hay que mandar (en edición, solo lo
   // que cambió). serverError = error del último guardado (se pinta arriba).
@@ -77,7 +78,7 @@
     if (mode === 'edit' && !f.clientId) e.clientId = 'El proyecto necesita un cliente.';
     if (briefTyped) {
       if (!/^MRC-\d{1,6}$/.test(briefTyped)) e.briefId = 'Escribe el código completo, por ejemplo MRC-017.';
-      else if (opts.loaded && !briefMatch && briefTyped !== (project?.brief_project_id || '')) e.briefId = `No encontramos el brief ${briefTyped}. Revisa el código.`;
+      else if (opts.loaded && opts.briefsComplete && !briefMatch && briefTyped !== (project?.brief_project_id || '')) e.briefId = `No encontramos el brief ${briefTyped}. Revisa el código.`;
     }
     const m = parseMoneyToCents(f.amount);
     if (m.error) e.amount = m.error;

@@ -9,6 +9,9 @@ import { api, errorMessage, isSessionError } from '../lib/api.js';
 
 export const opts = $state({
   clients: [], briefs: [],
+  // false si la lista de briefs vino recortada (tope de 200 del servidor):
+  // entonces un código que no aparece puede existir y lo decide el servidor.
+  briefsComplete: true,
   loading: false, loaded: false, error: '',
 });
 
@@ -29,6 +32,7 @@ export function loadOptions({ force = false } = {}) {
         (x.status === 'archived') - (y.status === 'archived')
         || String(x.business_name || '').localeCompare(String(y.business_name || ''), 'es'));
       opts.briefs = b.rows || [];
+      opts.briefsComplete = b.total == null ? opts.briefs.length < 200 : Number(b.total) <= opts.briefs.length;
       opts.loaded = true;
     } catch (e) {
       if (!isSessionError(e)) opts.error = errorMessage(e, 'No se pudieron cargar los clientes y los briefs.');

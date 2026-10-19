@@ -15,6 +15,7 @@
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
+    "test:inicio": "node scripts/test-inicio.mjs",
     "gen:brief-services": "node scripts/build-brief-services.mjs"
   },
   "dependencies": {

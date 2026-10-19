@@ -394,6 +394,15 @@ await check('kit: el envío final cuenta lo guardado antes por partes (R4)', () 
   assert.equal(kitForSubmit(brief, { leads_email: 'c@d.co' }).leads_email, 'c@d.co');
 });
 
+await check('correo del kit: asunto y texto sin entidades HTML; el HTML sí escapa (R7)', async () => {
+  const { kitLinkEmail } = await import('../lib/email.mjs');
+  const m = kitLinkEmail({ url: 'https://example.com/es/kit/t', projectId: 'MRC-099', ownerName: '<b>Ana', businessName: 'Tacos & Más', lang: 'es' });
+  assert.equal(m.subject, 'Tu kit de arranque para Tacos & Más · Marcyan · MRC-099');
+  assert.ok(!m.text.includes('&amp;') && !m.text.includes('&lt;'));
+  assert.ok(m.html.includes('Hola &lt;b&gt;Ana:'));
+  assert.ok(!m.html.includes('<b>Ana'));
+});
+
 // ── 10) /api/brief: rutas que responden ANTES de tocar la base ─────
 // Solo sin conexión configurada: así es imposible escribir en una base real.
 const noDb = !process.env.POSTGRES_URL && !process.env.DATABASE_URL && !process.env.POSTGRES_PRISMA_URL;

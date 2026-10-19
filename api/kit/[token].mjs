@@ -10,7 +10,8 @@
 //           draftId?, secret?, files?: [{ pathname, tags?, originalName?, convertedFrom?, contentType? }],
 //           lang? }
 //         'save' guarda por partes (sin exigir obligatorios); 'submit' valida
-//         todo, cierra el kit y avisa en el panel. Los archivos usan el mismo
+//         todo el kit (lo guardado antes + lo que llega), lo cierra y avisa
+//         en el panel. Los archivos usan el mismo
 //         sistema de borradores (POST /api/brief/draft con purpose 'kit').
 // ════════════════════════════════════════════════════════════════
 import { clientIp } from '../../lib/auth.mjs';
@@ -18,7 +19,7 @@ import { logEvent } from '../../lib/db.mjs';
 import { createNotification } from '../../lib/notifications.mjs';
 import { rateLimit, LIMITS } from '../../lib/ratelimit.mjs';
 import { validate, splitByStorage, sectionsFor } from '../../lib/brief-schema.mjs';
-import { findBriefByKitToken, kitPrefill, saveKit } from '../../lib/brief-kit.mjs';
+import { findBriefByKitToken, kitPrefill, kitForSubmit, saveKit } from '../../lib/brief-kit.mjs';
 import {
   getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, listFilesForBrief, blobConfigured, isMissingSchema,
   closeKitDrafts,
@@ -95,10 +96,17 @@ export default async function handler(req, res) {
     if (JSON.stringify(body).length > 500000) return res.status(413).json({ ok: false, error: 'Payload demasiado grande' });
     const submit = body.action === 'submit';
 
-    const v = validate('arranque', body.data || {}, {
-      partial: !submit, services: services.length ? services : null, optionMode: 'keep',
-    });
+    // Se guarda lo que llega (por partes, sin exigir obligatorios). Al enviar,
+    // los obligatorios se comprueban sobre TODO el kit: lo ya guardado antes
+    // (columnas + briefs.kit) más lo que llega ahora; el navegador no tiene
+    // que reenviar lo que guardó en otra sesión.
+    const valOpts = { services: services.length ? services : null, optionMode: 'keep' };
+    const v = validate('arranque', body.data || {}, { ...valOpts, partial: true });
     if (!v.ok) return res.status(400).json({ ok: false, error: T.fields[lang], fields: v.errors });
+    if (submit) {
+      const whole = validate('arranque', kitForSubmit(brief, body.data), { ...valOpts, partial: false });
+      if (!whole.ok) return res.status(400).json({ ok: false, error: T.fields[lang], fields: whole.errors });
+    }
     const split = splitByStorage(v.data);
 
     // Archivos del kit: borrador purpose 'kit' ligado a ESTE brief.

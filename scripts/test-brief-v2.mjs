@@ -24,7 +24,7 @@ import {
   parseClientPayload, checkUploadRequest, isAllowedRealType, dispositionFor, hashSecret, secretMatches,
   looksLikeSvg, cleanOriginalName, splitReconcile,
 } from '../lib/brief-upload-rules.mjs';
-import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill } from '../lib/brief-kit.mjs';
+import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill, kitForSubmit } from '../lib/brief-kit.mjs';
 
 let pass = 0;
 const fails = [];
@@ -382,6 +382,16 @@ await check('kit: token largo, solo su hash, URL por idioma y precarga sin PII',
   assert.equal(pre.business_name, 'X');
   assert.equal(pre.target_audience, 'familias');
   for (const k of ['email', 'phone', 'ip_address', 'budget_range', 'summary']) assert.ok(!(k in pre), k);
+});
+
+await check('kit: el envío final cuenta lo guardado antes por partes (R4)', () => {
+  const brief = { business_name: 'X', kit: { leads_email: 'a@b.co' } };
+  const solo = validate('arranque', { kit_notes: 'listo' }, { partial: false, optionMode: 'keep' });
+  assert.ok(solo.errors.leads_email, 'sin lo guardado, el correo de pedidos falta');
+  const all = validate('arranque', kitForSubmit(brief, { kit_notes: 'listo' }), { partial: false, optionMode: 'keep' });
+  assert.ok(!all.errors.leads_email, JSON.stringify(all.errors));
+  // Lo que llega ahora gana a lo guardado.
+  assert.equal(kitForSubmit(brief, { leads_email: 'c@d.co' }).leads_email, 'c@d.co');
 });
 
 // ── 10) /api/brief: rutas que responden ANTES de tocar la base ─────

@@ -165,7 +165,7 @@
   .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-small); font-variant-numeric: tabular-nums; }
-  .none { color: var(--fg-faint); }
+  .none { color: var(--fg-subtle); }   /* texto legible: AA sobre la tarjeta (--fg-faint es solo decoración) */
 
   /* Texto corto: una línea con elipsis + tooltip nativo (title). */
   .msg-line { display: block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

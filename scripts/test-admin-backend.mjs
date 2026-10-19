@@ -230,6 +230,17 @@ await check('correos: enlazan a Orbit, nunca al panel viejo /admin', () => {
   assert.ok(!/\/admin\/briefs/.test(src), 'lib/email.mjs aún enlaza a /admin/briefs');
 });
 
+await check('vercel: /admin/briefs/detail?id= conserva el brief y va antes de la regla genérica', () => {
+  const cfg = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+  const r = cfg.redirects || [];
+  const i = r.findIndex((x) => x.source === '/admin/briefs/detail');
+  const g = r.findIndex((x) => x.source === '/admin/:path*');
+  assert.ok(i >= 0, 'falta la regla específica del detalle de brief');
+  assert.ok(g < 0 || i < g, 'la regla específica debe ir antes de /admin/:path*');
+  assert.equal(r[i].destination, '/dashboard#/briefs/:id');
+  assert.deepEqual(r[i].has, [{ type: 'query', key: 'id', value: '(?<id>.+)' }]);
+});
+
 // ── Auth (sin BD) ────────────────────────────────────────────────
 await check('auth: hash SHA-256 hex de 64, distinto del token', () => {
   const t = randomToken();

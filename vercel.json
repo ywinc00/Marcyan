@@ -5,6 +5,12 @@
   "trailingSlash": false,
   "redirects": [
     { "source": "/", "destination": "/es", "permanent": true },
+    {
+      "source": "/admin/briefs/detail",
+      "has": [{ "type": "query", "key": "id", "value": "(?<id>.+)" }],
+      "destination": "/dashboard#/briefs/:id",
+      "permanent": true
+    },
     { "source": "/admin", "destination": "/dashboard", "permanent": true },
     { "source": "/admin/:path*", "destination": "/dashboard", "permanent": true }
   ],

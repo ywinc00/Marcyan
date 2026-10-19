@@ -40,13 +40,13 @@ Campos nuevos en `kpis`:
 | `uncontacted_leads` | leads en estado `new` de cualquier fecha |
 | `active_projects` | proyectos con `status='active'` (null si falla la consulta) |
 | `briefs_this_month` | briefs recibidos este mes |
-| `revenue_this_month` / `revenue_prev_month` | cobrado (centavos) desde `financeSummary()`; null si Finanzas falla |
-| `revenue_this_month_cents` / `revenue_prev_month_cents` | alias explícitos |
+| `revenue_this_month_cents` / `revenue_prev_month_cents` | cobrado (centavos) desde `financeSummary()`; null si Finanzas falla |
+| `revenue_this_month` / `revenue_prev_month` | siempre `null` (compatibilidad, ver abajo) |
 | `leads_from_contact` / `leads_from_diagnostic` | por origen |
 
 Compatibilidad: `new_leads` (= sin contactar, **no** "este mes"), `leads_this_month`,
 `projects_this_month` (= briefs), `pending_briefs`, `in_progress_briefs`, `leads_from_chat`.
-**Ojo:** `revenue_this_month` pasó de `null` a número en centavos; formatear con `money()`.
+**Ojo:** `revenue_this_month` sigue en `null` a propósito: el panel actual lo pinta en crudo y con centavos mostraría una cifra 100 veces mayor. El panel nuevo lee `revenue_this_month_cents` y lo formatea con `money()`.
 `funnel.pipeline` = new + contacted (para "en pipeline"; `total` incluye archivados).
 `meta = { tz, month, prev_month }`.
 

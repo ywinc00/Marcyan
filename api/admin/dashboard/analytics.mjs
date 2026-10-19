@@ -14,17 +14,17 @@
 //   uncontacted_leads         leads en estado 'new' de cualquier fecha (sin contactar)
 //   active_projects           proyectos con status 'active' (tabla projects) ← "Proyectos activos"
 //   briefs_this_month         briefs recibidos este mes
-//   revenue_this_month        cobrado este mes, centavos (pagos por paid_at) | null si Finanzas no responde
-//   revenue_prev_month        cobrado el mes anterior, centavos | null
-//   revenue_this_month_cents  alias explícito de revenue_this_month
-//   revenue_prev_month_cents  alias explícito de revenue_prev_month
+//   revenue_this_month_cents  cobrado este mes, centavos (pagos por paid_at) | null si Finanzas no responde
+//   revenue_prev_month_cents  cobrado el mes anterior, centavos | null
 //   pending_briefs, in_progress_briefs, leads_from_chat, leads_from_contact, leads_from_diagnostic
 //   ── Compatibilidad (no quitar; el panel actual los lee):
 //   new_leads            = uncontacted_leads (NO es "este mes")
 //   leads_this_month     = new_leads_this_month
 //   projects_this_month  = briefs_this_month (son BRIEFS, no proyectos)
-//   ⚠ revenue_this_month antes era siempre null; ahora es un número en centavos:
-//     el panel debe formatearlo con money(), nunca pintarlo crudo.
+//   revenue_this_month / revenue_prev_month = null SIEMPRE (compatibilidad):
+//     el panel actual pinta revenue_this_month en crudo; si llevara centavos
+//     mostraría una cifra 100 veces mayor sin formato. La cifra vive SOLO en
+//     los campos *_cents, que el panel nuevo formatea con money().
 //
 // funnel: { new, contacted, converted, archived, total, pipeline }
 //   pipeline = new + contacted (los vivos). total incluye archivados y
@@ -117,8 +117,9 @@ export default async function handler(req, res) {
       uncontacted_leads:        leads.new,
       active_projects:          projectsActive,
       briefs_this_month:        briefs.this_month,
-      revenue_this_month:       revenue.thisMonth,
-      revenue_prev_month:       revenue.prevMonth,
+      // null a propósito: el panel actual lo pinta crudo (ver cabecera).
+      revenue_this_month:       null,
+      revenue_prev_month:       null,
       revenue_this_month_cents: revenue.thisMonth,
       revenue_prev_month_cents: revenue.prevMonth,
       leads_from_contact:       leads.from_contact,

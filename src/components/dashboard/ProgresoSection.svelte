@@ -128,7 +128,7 @@
       <Kpi label="Valor en cartera" value={fmtMoney(summary.active_cents)} art="coins" tone="data"
            note={onHoldCents ? `solo activos, + ${fmtMoney(onHoldCents)} en pausa` : 'solo proyectos activos'} />
       {#if by.cancelled}
-        <Kpi label="Cancelados" value={by.cancelled} art="warning" note="archivados" href={href('progreso', [], { estado: 'cancelado' })} />
+        <Kpi label="Cancelados" value={by.cancelled} art="folder" note="archivados" href={href('progreso', [], { estado: 'cancelado' })} />
       {/if}
     </KpiGrid>
     </div>

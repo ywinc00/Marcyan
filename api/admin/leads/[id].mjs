@@ -1,24 +1,34 @@
 // /api/admin/leads/:id   (id = ref_id LEAD-XXX)
-//   GET    → detalle del lead
-//   PATCH  → { status } actualiza el estado
-//   DELETE → elimina el lead
+//   GET    → ficha: { lead, events, client, brief, client_matches, crm_ready }
+//            · lead con todo lo guardado (incluidos IP y navegador)
+//            · events: historial (migración 011; [] sin ella)
+//            · client / brief: a qué se convirtió (o null)
+//            · client_matches: clientes con el mismo correo o teléfono
+//   PATCH  → { status?, notes? } (las notas necesitan la migración 011)
+//            Respuesta: { lead } (compatible con el PATCH de antes)
+//   DELETE → elimina el lead (su historial se va con él; el cliente y el
+//            brief creados a partir de él se conservan)
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
-  getLeadByRefId, updateLeadStatus, deleteLead, LEAD_STATUSES,
+  getLeadByRefId, getLeadDetail, updateLead, deleteLead, LEAD_STATUSES,
 } from '../../../lib/leads.mjs';
+import { CrmError } from '../../../lib/finance.mjs';
+
+// El ref se acepta sin distinguir mayúsculas ("lead-031").
+const normRef = (v) => String(v || '').trim().toUpperCase().slice(0, 40);
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
 
-  const id = (req.query?.id || '').toString();
+  const id = normRef(req.query?.id);
   if (!id) return res.status(400).json({ ok: false, error: 'ID requerido' });
 
   if (req.method === 'GET') {
     try {
-      const lead = await getLeadByRefId(id);
-      if (!lead) return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
-      return res.status(200).json({ ok: true, lead });
+      const detail = await getLeadDetail(id);
+      if (!detail) return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
+      return res.status(200).json({ ok: true, ...detail });
     } catch (err) {
       console.error('[admin/leads/:id GET] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al obtener lead' });
@@ -28,18 +38,23 @@ export default async function handler(req, res) {
   if (req.method === 'PATCH') {
     try {
       const body = (typeof req.body === 'object' && req.body) ? req.body : {};
-      const newStatus = typeof body.status === 'string' ? body.status.trim() : null;
-      if (!newStatus || !LEAD_STATUSES.includes(newStatus)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${LEAD_STATUSES.join(', ')}`,
-        });
+      const fields = {};
+      if (body.status !== undefined) {
+        const newStatus = typeof body.status === 'string' ? body.status.trim() : null;
+        if (!newStatus || !LEAD_STATUSES.includes(newStatus)) {
+          return res.status(400).json({ ok: false, error: 'Elige un estado válido para el lead.' });
+        }
+        fields.status = newStatus;
       }
-      const updated = await updateLeadStatus(id, newStatus);
-      if (!updated) return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
-      const lead = await getLeadByRefId(id);
+      if (body.notes !== undefined) fields.notes = body.notes;
+      if (!Object.keys(fields).length) {
+        return res.status(400).json({ ok: false, error: 'No hay cambios que guardar.' });
+      }
+      const lead = await updateLead(id, fields, session.email);
+      if (!lead) return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
       return res.status(200).json({ ok: true, lead });
     } catch (err) {
+      if (err instanceof CrmError) return res.status(err.status).json({ ok: false, error: err.message, ...err.extra });
       console.error('[admin/leads/:id PATCH] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al actualizar lead' });
     }

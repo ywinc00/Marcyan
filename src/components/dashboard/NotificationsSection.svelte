@@ -7,13 +7,16 @@
   //     de la página cargada.
   //   · Marcar como no leído y archivar (OP-15). El contador de la barra
   //     lateral se actualiza con el `unread` que devuelve cada cambio.
+  //   · Si el contador del menú cambia mientras estás aquí (refresco de 60 s),
+  //     los KPIs se ponen al día y la lista ofrece mostrar los nuevos (A7-09).
+  import { tick, untrack } from 'svelte';
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { fmtDateTime, rel } from './lib/dates.js';
   import { route, href, setQuery, parseHash, navigate } from './lib/router.svelte.js';
   import { toast, toastError } from './lib/toast.svelte.js';
   import {
-    setUnread, readFilters, listParams, openTarget, visibleRef, cleanTitle,
-    TYPE_FILTERS, STATE_FILTERS,
+    avisos, setUnread, readFilters, listParams, openTarget, visibleRef, cleanTitle,
+    markAllAction, isModifiedClick, TYPE_FILTERS, STATE_FILTERS,
   } from './lib/avisos.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
@@ -51,8 +54,14 @@
   let moreError = $state('');
   let busyAll = $state(false);
   let busy = $state({});          // id → true mientras se guarda un cambio
+  let hasNew = $state(false);     // llegaron avisos nuevos desde la última carga
+  let feedEl = $state(null);
+  let emptyEl = $state(null);
 
   const unread = $derived(counts.unread || 0);
+  // "Marcar todas" respeta el filtro de tipo (A7-07).
+  const markAction = $derived(markAllAction(filters.tipo));
+  const markPending = $derived(markAction.type ? ((counts.by_type[markAction.type] || {}).unread || 0) : unread);
   const typeLabel = $derived((TYPE_FILTERS.find((f) => f.id === filters.tipo) || TYPE_FILTERS[0]).label);
 
   function applyCounts(j) {
@@ -69,6 +78,7 @@
     try {
       const j = await api('/api/admin/notifications?' + listParams(filters, { limit: PAGE }));
       if (my !== seq) return;
+      hasNew = false;
       rows = j.rows || [];
       total = Number(j.total) || 0;
       nextCursor = j.has_more ? j.next_cursor : null;
@@ -118,10 +128,26 @@
     if (filters.estado === 'archivados') return !!n.archived_at;
     return !n.archived_at;
   }
+  // Devuelve true si la fila salió de la lista (ya no encaja en el filtro).
   function replaceRow(n) {
-    if (fits(n)) rows = rows.map((x) => (String(x.id) === String(n.id) ? n : x));
-    else { rows = rows.filter((x) => String(x.id) !== String(n.id)); total = Math.max(0, total - 1); }
+    if (fits(n)) { rows = rows.map((x) => (String(x.id) === String(n.id) ? n : x)); return false; }
+    rows = rows.filter((x) => String(x.id) !== String(n.id)); total = Math.max(0, total - 1);
+    return true;
   }
+
+  // Tras quitar una fila (archivar, o leer con el filtro "Sin leer") el foco
+  // no se pierde en la página: pasa a la fila que ocupa su lugar, o a la
+  // anterior si era la última, o al vacío si ya no queda ninguna (A7-05).
+  async function keepFocus(index) {
+    await tick();
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
+    if (active && active !== document.body && document.contains(active)) return;
+    const items = feedEl ? feedEl.querySelectorAll(':scope > li') : [];
+    const li = items.length ? items[Math.min(Math.max(index, 0), items.length - 1)] : null;
+    const el = li ? li.querySelector('a[href], button:not([disabled])') : emptyEl;
+    if (el) el.focus();
+  }
+  function rowIndex(n) { return rows.findIndex((x) => String(x.id) === String(n.id)); }
 
   // PATCH de un aviso. Devuelve la fila nueva o null si falló (con toast).
   async function patch(n, body, fallback) {
@@ -145,38 +171,47 @@
   // ── Acciones ─────────────────────────────────────────────────
   // Abrir: marca leída (sin esperar a que el usuario vuelva) y navega al
   // registro con el router, sin recargar la página.
-  function openNote(n) {
+  // Ctrl/Cmd/Mayús + clic o la rueda: el navegador lo abre aparte como un
+  // enlace normal y aquí solo se marca como leído, sin navegar (A7-05).
+  function openNote(n, e) {
     const target = openTarget(n.link || n.url);
     if (!target) return;
+    const aside = isModifiedClick(e);
+    if (e && !aside) e.preventDefault();
     if (!n.read_at) {
       patch(n, undefined, 'No se pudo marcar el aviso como leído.').then((u) => {
         if (u) { replaceRow(u); refreshCounts(); }
       });
     }
+    if (aside) return;
     const r = parseHash(target);
     navigate(r.section, r.sub, r.query);
   }
 
   async function toggleRead(n) {
+    const i = rowIndex(n);
     const u = await patch(n, n.read_at ? { read: false } : undefined,
       n.read_at ? 'No se pudo marcar como no leído.' : 'No se pudo marcar como leído.');
-    if (u) { replaceRow(u); refreshCounts(); }
+    if (!u) return;
+    if (replaceRow(u)) keepFocus(i);
+    refreshCounts();
   }
 
   async function setArchived(n, archived) {
+    const i = rowIndex(n);
     const u = await patch(n, { archived }, archived ? 'No se pudo archivar el aviso.' : 'No se pudo devolver el aviso a la bandeja.');
     if (!u) return;
-    replaceRow(u);
+    if (replaceRow(u)) keepFocus(i);
     refreshCounts();
     toast(archived ? 'Aviso archivado. Está en Archivados.' : 'Aviso devuelto a la bandeja.');
   }
 
   async function markAll() {
-    if (busyAll || unread === 0) return;
+    if (busyAll || markPending === 0) return;
     busyAll = true;
     try {
-      const j = await api('/api/admin/notifications', { method: 'PATCH' });
-      setUnread(j.unread ?? 0);
+      const j = await api('/api/admin/notifications', { method: 'PATCH', body: markAction.body });
+      setUnread(j.unread);   // null (no se pudo contar) conserva el último valor bueno
       toast(j.affected === 1 ? '1 aviso marcado como leído.' : `${j.affected || 0} avisos marcados como leídos.`);
       await load();
     } catch (e) {
@@ -202,6 +237,21 @@
   }
   $effect(() => () => clearTimeout(countsTimer));
 
+  // El contador del menú se refresca solo (cada 60 s). Si cambia y no
+  // coincide con el de esta vista, los KPIs se ponen al día; si subió, la
+  // lista ofrece mostrar los nuevos sin recargarse por sorpresa (A7-09).
+  $effect(() => {
+    const n = avisos.unread;
+    untrack(() => {
+      if (!loaded || loading || n == null || n === counts.unread) return;
+      if (n > counts.unread) {
+        if (rows.length === 0) { load(); return; }
+        hasNew = true;
+      }
+      refreshCounts();
+    });
+  });
+
   // Texto del vacío: repite el filtro para que se entienda qué quitar (E-06/E-08).
   const emptyCopy = $derived.by(() => {
     const filtered = filters.tipo || filters.estado;
@@ -226,8 +276,8 @@
 <PageHeader title="Avisos" subtitle="Lo que pasó en el sitio y en el panel. Cada aviso te lleva a su registro.">
   {#snippet actions()}
     <button type="button" class="b b--ghost" onclick={load} disabled={loading}><Icon name="refresh" size={16} />Actualizar</button>
-    <button type="button" class="b b--primary" disabled={busyAll || unread === 0} onclick={markAll}>
-      <Icon name="check" size={16} />{busyAll ? 'Marcando…' : 'Marcar todas como leídas'}
+    <button type="button" class="b b--primary" disabled={busyAll || markPending === 0} onclick={markAll}>
+      <Icon name="check" size={16} />{busyAll ? 'Marcando…' : markAction.label}
     </button>
   {/snippet}
 </PageHeader>
@@ -280,7 +330,7 @@
     {/snippet}
 
     {#if rows.length === 0}
-      <div class="ui-card">
+      <div class="ui-card empty-card" tabindex="-1" bind:this={emptyEl}>
         <EmptyState title={emptyCopy.title} text={emptyCopy.text} art="bell">
           {#snippet action()}
             {#if filters.tipo || filters.estado}
@@ -290,10 +340,13 @@
         </EmptyState>
       </div>
     {:else}
-      <p class="count" aria-live="polite">
-        {rows.length === total ? (total === 1 ? '1 aviso' : `${total} avisos`) : `Mostrando ${rows.length} de ${total} avisos`}
-      </p>
-      <ul class="feed" aria-busy={loading}>
+      <div class="count" aria-live="polite">
+        <span>{rows.length === total ? (total === 1 ? '1 aviso' : `${total} avisos`) : `Mostrando ${rows.length} de ${total} avisos`}</span>
+        {#if hasNew}
+          <button type="button" class="note__act count__new" onclick={load} disabled={loading}>Hay avisos nuevos, mostrarlos</button>
+        {/if}
+      </div>
+      <ul class="feed" aria-busy={loading} bind:this={feedEl}>
         {#each rows as n (n.id)}
           {@const tm = typeMeta(n.type)}
           {@const target = openTarget(n.link || n.url)}
@@ -325,17 +378,20 @@
               {#if n.body}<p class="note__text">{n.body}</p>{/if}
               <div class="note__foot">
                 {#if target}
-                  <a class="note__open" href={target} onclick={(e) => { e.preventDefault(); openNote(n); }}>
+                  <a class="note__open" href={target} aria-label={`Abrir: ${cleanTitle(n.title)}`}
+                     onclick={(e) => openNote(n, e)} onauxclick={(e) => { if (e.button === 1) openNote(n, e); }}>
                     Abrir<Icon name="chevron" size={14} />
                   </a>
                 {/if}
                 {#if !n.archived_at}
-                  <button type="button" class="note__act" disabled={isBusy} onclick={() => toggleRead(n)}>
+                  <button type="button" class="note__act" disabled={isBusy} onclick={() => toggleRead(n)}
+                          aria-label={`${n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}: ${cleanTitle(n.title)}`}>
                     {n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}
                   </button>
                 {/if}
                 {#if archiveAvailable}
-                  <button type="button" class="note__act" disabled={isBusy} onclick={() => setArchived(n, !n.archived_at)}>
+                  <button type="button" class="note__act" disabled={isBusy} onclick={() => setArchived(n, !n.archived_at)}
+                          aria-label={`${n.archived_at ? 'Devolver a la bandeja' : 'Archivar'}: ${cleanTitle(n.title)}`}>
                     {n.archived_at ? 'Devolver a la bandeja' : 'Archivar'}
                   </button>
                 {/if}
@@ -373,9 +429,13 @@
   .pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
   .pill:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .pill[aria-pressed='true'] { background: var(--surface-3); border-color: var(--fg-subtle); color: var(--fg-primary); font-weight: 600; }
-  .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--accent-gold-dim); color: var(--accent-gold); font-size: var(--dash-caption); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
+  /* Numerito neutro: el dato destacado en naranja ya es el KPI "Sin leer" (H-07, A7-06). */
+  .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--fg-primary); font-size: var(--dash-caption); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
 
-  .count { margin: 0 0 8px; font-size: var(--dash-small); color: var(--fg-subtle); }
+  .count { display: flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-3); margin: 0 0 8px; font-size: var(--dash-small); color: var(--fg-subtle); }
+  .count .count__new { color: var(--accent-teal); font-weight: 600; }
+  .empty-card:focus { outline: none; }
+  .empty-card:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
 
   /* ── Esqueleto con la geometría del aviso (E-09) ── */
   .skel-note { display: flex; gap: var(--space-3); padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
@@ -386,9 +446,9 @@
   .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .note { display: flex; gap: var(--space-3); padding: 14px var(--space-4) 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), background-color var(--duration-fast); }
   .note:hover { border-color: var(--border-strong); }
-  /* Sin leer: sube un nivel de superficie y lleva la barra del acento
-     (lo pendiente es el dato destacado de esta vista). */
-  .note.unread { background: var(--bg-elevated); border-left: 3px solid var(--accent-gold); padding-left: 11px; }
+  /* Sin leer: sube un nivel de superficie y lleva el punto junto a la hora
+     (OP-28). Una sola señal en la fila, sin barra naranja (H-07, A7-06). */
+  .note.unread { background: var(--bg-elevated); border-color: var(--border-strong); }
 
   /* Icono: glifo SVG en una losa teñida por tipo. */
   .note__icon { flex: 0 0 auto; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--fg-secondary); background: var(--surface-3); }
@@ -432,7 +492,6 @@
   @media (max-width: 719px) {
     .filters { flex-direction: column; align-items: stretch; }
     .note { padding: 12px 12px 10px 11px; gap: 10px; }
-    .note.unread { padding-left: 9px; }
     .note__icon { width: 32px; height: 32px; }
     .note__meta { margin-left: 0; width: 100%; }
   }

@@ -13,6 +13,7 @@
   import Kpi from './ui/Kpi.svelte';
   import Card from './ui/Card.svelte';
   import DataTable from './ui/DataTable.svelte';
+  import { untrack } from 'svelte';
   import EmptyState from './ui/EmptyState.svelte';
   import ErrorState from './ui/ErrorState.svelte';
   import LoadingState from './ui/LoadingState.svelte';
@@ -86,6 +87,12 @@
     try {
       const j = await api('/api/admin/invoices?' + p.toString());
       invoices = j.rows || []; invTotal = j.total || 0; counts = j.counts || null;
+      // Página fuera de rango (enlace viejo o tras borrar la última factura de
+      // la página): se salta a la última página que sí tiene facturas.
+      if (!invoices.length && invTotal > 0 && page > 1) {
+        const last = Math.ceil(invTotal / PAGE);
+        setQuery({ pag: last > 1 ? String(last) : '' });
+      }
     } catch (e) {
       if (!isSessionError(e)) invError = errorMessage(e, 'No se pudieron cargar las facturas.');
     } finally { invLoading = false; }
@@ -94,8 +101,13 @@
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
   $effect(() => { if (!detailRef) { filter; search; page; loadInvoices(); } });
   $effect(() => { if (!detailRef) loadSummary(); });
-  // El buscador refleja la URL (al llegar por enlace o con Atrás).
-  $effect(() => { searchText = search; });
+  // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
+  // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
+  // siempre, el espacio que se acaba de escribir desaparecería del campo.
+  $effect(() => {
+    const s = search;
+    if (untrack(() => searchText.trim()) !== s) searchText = s;
+  });
 
   function onSearch(e) {
     searchText = e.currentTarget.value;

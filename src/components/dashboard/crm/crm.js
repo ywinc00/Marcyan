@@ -169,7 +169,7 @@ export function deleteImpactText(impact) {
 // ── Monograma (mismo criterio que Briefs) ────────────────────
 const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
 export function initials(s) {
-  const parts = String(s || '?').trim().split(/\s+/).filter(Boolean);
+  const parts = String(s || '?').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[1][0]).toUpperCase();

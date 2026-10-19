@@ -147,15 +147,22 @@
   });
 
   // ── Exportar leads a CSV (cliente) ──────────────────────────
+  // Mismas dos protecciones que el serializador del servidor (lib/csv.mjs):
+  //  · los datos vienen de formularios PÚBLICOS: un texto que empieza por
+  //    = + - @ tabulador o retorno de carro se ejecutaría como fórmula en
+  //    Excel/Sheets (=HYPERLINK(…)); se le antepone una comilla simple.
+  //  · BOM UTF-8 al inicio para que Excel de Windows lea bien las tildes.
+  const CSV_BOM = '﻿';
   function csvCell(v) {
-    const s = v == null ? '' : String(v);
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    let s = v == null ? '' : String(v);
+    if (typeof v !== 'number' && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   }
   function exportLeads() {
     const cols = ['ref_id', 'name', 'email', 'phone', 'source', 'status', 'created_at'];
     const head = cols.join(',');
-    const body = (leads || []).map((l) => cols.map((c) => csvCell(l[c])).join(',')).join('\n');
-    const blob = new Blob([head + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+    const body = (leads || []).map((l) => cols.map((c) => csvCell(l[c])).join(',')).join('\r\n');
+    const blob = new Blob([CSV_BOM + head + '\r\n' + body + '\r\n'], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

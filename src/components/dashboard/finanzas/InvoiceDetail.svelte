@@ -134,7 +134,10 @@
   <PageHeader title={inv.invoice_number} subtitle={[inv.client_name, inv.description].filter(Boolean).join(' · ')}>
     {#snippet badge()}<StatusChip tone={STATUS_TONE[inv.status]} label={INVOICE_STATUS_LABELS[inv.status]} />{/snippet}
     {#snippet actions()}
-      <button type="button" class="b b--danger" onclick={askDestroy}>{hasPayments ? 'Anular' : 'Borrar'}</button>
+      <!-- Anulada con pagos: ya no hay nada que anular ni se puede borrar. -->
+      {#if !(inv.status === 'void' && hasPayments)}
+        <button type="button" class="b b--danger" onclick={askDestroy}>{hasPayments ? 'Anular' : 'Borrar'}</button>
+      {/if}
       <button type="button" class="b" onclick={() => (editOpen = true)}><Icon name="edit" size={16} />Editar</button>
       {#if isPayable(inv)}
         <button type="button" class="b b--primary" onclick={openPay}>Registrar pago</button>

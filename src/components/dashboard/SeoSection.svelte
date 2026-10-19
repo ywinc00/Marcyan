@@ -224,7 +224,11 @@
     let okFlag = false, msg = '';
     try {
       // acceptErrors: la sincronización parcial trae el detalle en el cuerpo del error.
-      const j = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }), acceptErrors: true });
+      // timeout largo: la sincronización encadena Google (GSC, GA4, sitemaps,
+      // inspección) y decenas de escrituras; con arranque en frío pasa de los
+      // 15 s por defecto y el aviso de "tardó demasiado" invitaría a repetirla
+      // (gasto doble de cuota) aunque el servidor termine bien.
+      const j = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }), acceptErrors: true, timeout: 120000 });
       if (j.configured === false) {
         msg = 'Conecta Google para sincronizar datos reales.';
       } else if (!j.ok) {

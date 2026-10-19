@@ -3,6 +3,7 @@
   //   · UN solo control de estado por hito (selector con forma de chip).
   //   · Renombrar en línea (clic en el nombre; Intro guarda, Escape cancela).
   //   · Fecha objetivo: poner, cambiar o quitar; vencida se marca en ámbar.
+  //     Con el calendario se guarda al elegir; escrita, con Intro o al salir.
   //   · Reordenar con botones Subir/Bajar (teclado y táctil; sin arrastrar).
   //   · Borrar con confirmación que dice qué se pierde.
   //   · Añadir al final.
@@ -16,7 +17,7 @@
   import Icon from '../ui/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
   import ConfirmDialog from '../ui/ConfirmDialog.svelte';
-  import { M_STATUSES, mStatus, moveItem } from './format.js';
+  import { M_STATUSES, mStatus, moveItem, isCompleteDay } from './format.js';
 
   let { projectId, milestones = [], onchange } = $props();
 
@@ -26,6 +27,8 @@
   let editLabel = $state(null);       // id del hito que se renombra
   let labelDraft = $state('');
   let editDate = $state(null);        // id del hito cuya fecha se edita
+  let dateTyped = false;              // la fecha en edición se está escribiendo con el teclado
+  let saving = false;                 // guardado de fecha en curso (evita dobles envíos)
   let newLabel = $state('');
   let adding = $state(false);
   let addError = $state('');
@@ -86,20 +89,47 @@
   async function startDate(ms) {
     editLabel = null;
     editDate = ms.id;
+    dateTyped = false;
     await tick();
     const el = listEl?.querySelector(`[data-date="${ms.id}"]`);
     el?.focus();
     try { el?.showPicker?.(); } catch (_) { /* algunos navegadores no lo permiten sin gesto: el campo ya tiene el foco */ }
   }
+  // Una fecha escrita a medias con el teclado (Chromium dispara `change` con
+  // cada cifra: año 0002, 0020…) no es una fecha que el dueño quiera guardar.
   async function saveDate(ms, value) {
+    if (saving) return;
     const v = value || '';
+    if (v && !isCompleteDay(v)) { toast('Escribe la fecha completa, con el año de cuatro cifras.', { tone: 'error' }); return; }
     if (v === dayISO(ms.due_date)) { editDate = null; return; }
-    const ok = await patch(ms, { dueDate: v || null }, 'No se pudo guardar la fecha del hito.');
-    if (ok) { editDate = null; toast(v ? 'Fecha guardada' : 'Fecha quitada'); }
+    saving = true;
+    try {
+      const ok = await patch(ms, { dueDate: v || null }, 'No se pudo guardar la fecha del hito.');
+      if (ok) { editDate = null; toast(v ? 'Fecha guardada' : 'Fecha quitada'); }
+    } finally { saving = false; }
   }
+  // Teclado: se escribe con calma y se guarda con Intro o al salir del campo.
+  // Calendario (o selector nativo del móvil): se guarda al elegir el día.
   function dateKey(e, ms) {
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); editDate = null; focusRow(ms.id, 'date'); }
     else if (e.key === 'Enter') { e.preventDefault(); saveDate(ms, e.currentTarget.value); }
+    else if (e.key !== 'Tab') dateTyped = true;
+  }
+  function dateChange(e, ms) {
+    const v = e.currentTarget.value;
+    if (!dateTyped && v) saveDate(ms, v);
+  }
+  function dateBlur(e, ms) {
+    const el = e.currentTarget;
+    // Pequeña espera: el botón Quitar y el calendario no deben cerrar el editor.
+    setTimeout(() => {
+      if (editDate !== ms.id || busyId === ms.id || saving) return;
+      if (dateTyped && el.value && el.value !== dayISO(ms.due_date)) {
+        if (isCompleteDay(el.value)) { saveDate(ms, el.value); return; }
+        toast('La fecha no se guardó porque le faltaba el año completo.', { tone: 'error' });
+      }
+      editDate = null;
+    }, 150);
   }
 
   // ── Orden ─────────────────────────────────────────────────
@@ -186,7 +216,7 @@
             <input class="ui-input msl__rename" data-rename={ms.id} maxlength="120" aria-label="Nuevo nombre del hito"
                    bind:value={labelDraft} onkeydown={(e) => renameKey(e, ms)} onblur={() => commitRename(ms)} disabled={busyId === ms.id} />
           {:else}
-            <button type="button" class="msl__name" data-focus="{ms.id}:label" title="Renombrar" onclick={() => startRename(ms)}>
+            <button type="button" class="msl__name" data-focus="{ms.id}:label" title="Renombrar" aria-label="Renombrar {ms.label}" onclick={() => startRename(ms)}>
               <span class="msl__name-txt">{ms.label}</span>
               <span class="msl__pencil"><Icon name="pencil" size={14} /></span>
             </button>
@@ -196,18 +226,19 @@
         <div class="msl__due">
           {#if editDate === ms.id}
             <input class="ui-input msl__date" type="date" data-date={ms.id} value={dayISO(ms.due_date)} aria-label="Fecha objetivo de {ms.label}"
-                   onchange={(e) => { if (e.currentTarget.value) saveDate(ms, e.currentTarget.value); }}
-                   onkeydown={(e) => dateKey(e, ms)} onblur={() => setTimeout(() => { if (editDate === ms.id && busyId !== ms.id) editDate = null; }, 150)} />
+                   onpointerdown={() => (dateTyped = false)} onchange={(e) => dateChange(e, ms)}
+                   onkeydown={(e) => dateKey(e, ms)} onblur={(e) => dateBlur(e, ms)} />
             {#if ms.due_date}
-              <button type="button" class="b b--mini b--ghost" onmousedown={(e) => e.preventDefault()} onclick={() => saveDate(ms, '')}>Quitar</button>
+              <button type="button" class="b b--mini b--ghost" aria-label="Quitar la fecha de {ms.label}" onmousedown={(e) => e.preventDefault()} onclick={() => saveDate(ms, '')}>Quitar</button>
             {/if}
           {:else if ms.due_date}
             <button type="button" class="msl__date-btn" class:is-late={overdue(ms)} data-focus="{ms.id}:date" onclick={() => startDate(ms)}
-                    title="Cambiar la fecha">
+                    title="Cambiar la fecha"
+                    aria-label="Cambiar la fecha de {ms.label}, {overdue(ms) ? 'venció el ' : ''}{fmtDay(ms.due_date, { day: 'numeric', month: 'long' })}">
               <Icon name="calendar" size={14} />{overdue(ms) ? 'Venció ' : ''}{fmtDay(ms.due_date, { day: 'numeric', month: 'short' })}
             </button>
           {:else}
-            <button type="button" class="msl__date-btn msl__date-btn--empty" data-focus="{ms.id}:date" onclick={() => startDate(ms)}>
+            <button type="button" class="msl__date-btn msl__date-btn--empty" data-focus="{ms.id}:date" aria-label="Poner fecha a {ms.label}" onclick={() => startDate(ms)}>
               <Icon name="calendar" size={14} />Fecha
             </button>
           {/if}

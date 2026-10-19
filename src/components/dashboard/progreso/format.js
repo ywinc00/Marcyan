@@ -142,3 +142,12 @@ export function initials(n) {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
+/**
+ * ¿Es una fecha completa que se puede guardar? Un campo de fecha escrito con
+ * el teclado pasa por valores a medias (año 0002, 0020, 0202…) que el
+ * navegador ya da por válidos; esos no se guardan (A5-R1).
+ */
+export function isCompleteDay(v) {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && v >= '2000-01-01';
+}

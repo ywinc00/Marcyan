@@ -354,6 +354,13 @@ await check('format: filtros legibles en la URL y servicios con nombre', () => {
   assert.equal(F.serviceLabel('aeo'), 'SEO para IA');
   assert.equal(F.serviceLabel('Mantenimiento'), 'Mantenimiento');
 });
+await check('format: la fecha escrita a medias no se guarda (A5-R1)', () => {
+  assert.ok(F.isCompleteDay('2026-10-25'));
+  assert.ok(!F.isCompleteDay('0002-10-19'), 'primera cifra del año');
+  assert.ok(!F.isCompleteDay('0202-10-19'));
+  assert.ok(!F.isCompleteDay(''));
+  assert.ok(!F.isCompleteDay(undefined));
+});
 await check('format: mover hitos y recortar etiquetas', () => {
   assert.deepEqual(F.moveItem([1, 2, 3], 2, 0), [3, 1, 2]);
   assert.deepEqual(F.moveItem([1, 2, 3], 0, 5), [1, 2, 3]);

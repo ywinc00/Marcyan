@@ -74,7 +74,16 @@
     }
     return list;
   });
-  const projectOptions = $derived(projects.filter((p) =>
+  // Igual con su proyecto: la lista llega con un tope y puede no traerlo.
+  // Sin esto, el efecto de abajo lo soltaría al guardar cualquier otro cambio.
+  const allProjects = $derived.by(() => {
+    const list = projects.slice();
+    if (invoice && invoice.project_id && !list.some((p) => String(p.id) === String(invoice.project_id))) {
+      list.unshift({ id: invoice.project_id, client_id: invoice.client_id, project_code: invoice.project_code, name: invoice.project_name });
+    }
+    return list;
+  });
+  const projectOptions = $derived(allProjects.filter((p) =>
     String(p.client_id) === String(form.client_id)
     && (p.status !== 'cancelled' || String(p.id) === String(form.project_id))));
   // Cambiar de cliente suelta un proyecto que ya no es suyo.

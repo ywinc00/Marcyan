@@ -228,12 +228,15 @@ export default async function handler(req, res) {
     });
 
     // Archivos: cerrar el borrador (el secreto deja de valer) y conciliar con
-    // lo que hay en Blob (el webhook no llega en local).
+    // lo que hay en Blob (el webhook no llega en local). Solo concilia quien
+    // cierra el borrador: con un doble envío simultáneo, el segundo brief
+    // entra sin archivos en vez de quitárselos al primero.
     let fileRows = [];
     if (draft) {
       try {
-        await markDraftSubmitted(draft.id, inserted.id);
-        if (blobConfigured()) fileRows = await reconcileDraft({ draftId: draft.id, briefId: inserted.id, filesMeta: body.files });
+        const claimed = await markDraftSubmitted(draft.id, inserted.id);
+        if (!claimed) console.warn(`[brief] ${projectId} el borrador de archivos ya se envió con otro brief; este entra sin archivos`);
+        else if (blobConfigured()) fileRows = await reconcileDraft({ draftId: draft.id, briefId: inserted.id, filesMeta: body.files });
       } catch (err) {
         console.error(`[brief] ${projectId} conciliación de archivos falló:`, err && err.message);
       }

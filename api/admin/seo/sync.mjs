@@ -1,15 +1,27 @@
 // POST /api/admin/seo/sync
-//   Sincroniza métricas de Google (GSC + GA4) hacia seo_metrics.
-//   Body opcional: { id?: number, days?: number }
-//     · id presente  → sincroniza solo ese proyecto
-//     · sin id        → sincroniza todos los proyectos activos
+//   Sincroniza métricas de Google (Search Console, Analytics e indexación)
+//   hacia seo_metrics y guarda el estado por fuente (SEO-07).
+//   Body opcional: { id?: string, days?: number }
+//     · id presente  → sincroniza solo ese proyecto ("Actualizar ahora")
+//     · sin id        → todos los proyectos activos, por lotes y con tope de
+//                       tiempo (los que no caben vuelven en `skipped`)
+//     · days          → rango que se quiere ver (7, 28, 90…); se pide a Google
+//                       ese rango y su período previo para la comparación.
 //   Autorización (cualquiera de las dos):
-//     · sesión de admin (cookie) — uso desde el dashboard ("Actualizar ahora")
-//     · header Authorization: Bearer <CRON_SECRET> — uso desde el cron de Vercel
-//   Degrada con gracia: si falta la config WIF, responde ok:false con
-//   error 'not_configured' por proyecto, sin romper.
-import { requireAdmin, readCookie, getSession, safeEqual } from '../../../lib/auth.mjs';
-import { getSeoProject, syncProject, syncAll, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
+//     · sesión de admin (cookie): uso desde el panel
+//     · Authorization: Bearer <CRON_SECRET> (compatibilidad; el cron diario
+//       usa GET /api/cron/seo-sync)
+//   Respuesta: { ok, configured, error, results:[…], skipped:[…] }
+//     results[i] = { project_id, name, ok, status: ok|partial|error, error,
+//                    gsc|ga4|indexation:{ synced, error }, sources:{…}, sync_state, persisted }
+//   Los errores de Google llegan explicados en español (lib/seo-core.mjs).
+import { requireAdmin, safeEqual } from '../../../lib/auth.mjs';
+import { getSeoProject, syncProject, syncActiveProjects, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
+import { clampDays, DEFAULT_DAYS } from '../../../lib/seo-core.mjs';
+
+// Una sincronización de un proyecto encadena 4 o 5 llamadas a Google en
+// paralelo y 3 escrituras; la de todos va por lotes con tope de 50 s.
+export const config = { maxDuration: 60 };
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -20,20 +32,13 @@ function bearerOk(req) {
   return Boolean(m && safeEqual(m[1].trim(), secret));
 }
 
-async function sessionOk(req) {
-  const sid = readCookie(req);
-  if (!sid) return false;
-  const s = await getSession(sid);
-  return Boolean(s);
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
-  // Cron (Bearer) — corta antes de requireAdmin para no exigir cookie.
+  // Cron (Bearer): corta antes de requireAdmin para no exigir cookie.
   const isCron = bearerOk(req);
   let actor = 'cron';
   if (!isCron) {
@@ -49,38 +54,42 @@ export default async function handler(req, res) {
 
   try {
     const body = (typeof req.body === 'object' && req.body) ? req.body : {};
-    const days = body.days ? Math.min(Math.max(parseInt(body.days, 10) || 28, 1), 365) : 28;
+    const days = body.days ? clampDays(body.days) : DEFAULT_DAYS;
+    const trigger = isCron ? 'cron' : 'manual';
 
     let results;
+    let skipped = [];
     if (body.id != null && body.id !== '') {
       // id BIGINT → string (ver nota en projects/[id].mjs); parseInt corrompía ids grandes.
       const id = String(body.id).trim();
       if (!/^\d+$/.test(id)) return res.status(400).json({ ok: false, error: 'ID inválido' });
       const project = await getSeoProject(id);
       if (!project) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
-      results = [await syncProject(project, days)];
+      results = [await syncProject(project, days, { trigger })];
     } else {
-      results = await syncAll(days);
+      ({ results, skipped } = await syncActiveProjects({ days, trigger, concurrency: 3, budgetMs: 50000 }));
     }
 
     const configured = isConfigured();
-    const ok = configured && results.every((r) => r.ok);
-    // Diagnóstico: los errores por proyecto solo viajan en el body; los logueamos
-    // también para verlos en los runtime logs de Vercel (WIF vs 403 de GA4/GSC).
+    const ok = configured && results.every((r) => r.ok) && skipped.length === 0;
+    // Los errores por proyecto viajan en el cuerpo y quedan guardados en
+    // sync_state; aquí solo el código, para los logs de Vercel.
     for (const r of results) {
       if (r && !r.ok) {
-        console.error(`[admin/seo/sync] proyecto ${r.project_id} (${r.name || '?'}) — gsc=${(r.gsc && r.gsc.error) || 'ok'} · ga4=${(r.ga4 && r.ga4.error) || 'ok'}`);
+        const code = (k) => (r.sources && r.sources[k] && r.sources[k].error && r.sources[k].error.code) || r.sources?.[k]?.status || '-';
+        console.error(`[admin/seo/sync] proyecto ${r.project_id} (${r.name || '?'}) ${r.status}: gsc=${code('gsc')} ga4=${code('ga4')} indexación=${code('indexation')}`);
       }
     }
-    console.log(`[admin/seo/sync] ${results.length} proyecto(s) por ${actor} — configured=${configured} ok=${ok}`);
+    console.log(`[admin/seo/sync] ${results.length} proyecto(s) por ${actor}; configurado=${configured} ok=${ok} pendientes=${skipped.length}`);
     return res.status(200).json({
       ok,
       configured,
-      error: configured ? null : 'Google no conectado (Workload Identity Federation)',
+      error: configured ? null : 'El acceso a Google no está configurado en el servidor.',
       results,
+      skipped,
     });
   } catch (err) {
     console.error('[admin/seo/sync] error:', err);
-    return res.status(500).json({ ok: false, error: err.message || 'Error al sincronizar' });
+    return res.status(500).json({ ok: false, error: 'No se pudo sincronizar. Inténtalo de nuevo en un momento.' });
   }
 }

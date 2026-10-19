@@ -15,7 +15,8 @@
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
-    "gen:brief-services": "node scripts/build-brief-services.mjs"
+    "gen:brief-services": "node scripts/build-brief-services.mjs",
+    "test:avisos": "node scripts/test-avisos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

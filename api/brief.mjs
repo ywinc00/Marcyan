@@ -17,7 +17,7 @@
 // ════════════════════════════════════════════════════════════════
 import { sql } from '@vercel/postgres';
 import { logEvent } from '../lib/db.mjs';
-import { createNotification } from '../lib/notifications.mjs';
+import { createNotification, notifyEmailFailure } from '../lib/notifications.mjs';
 import {
   emailAdminNewBrief, emailClientConfirmation, resend,
 } from '../lib/email.mjs';
@@ -295,6 +295,10 @@ export default async function handler(req, res) {
         : Promise.resolve();
 
       await Promise.all([adminP, clientP, verifyP]);
+
+      // Aviso 'system' en el panel si un correo no salió (dedup por brief).
+      if (!emailAdminOk) await notifyEmailFailure({ projectId, who: 'admin', businessName: data.business_name });
+      if (data.email && confirm.ok && !emailClientOk) await notifyEmailFailure({ projectId, who: 'client', businessName: data.business_name });
 
       console.log(`[brief] ${projectId} insertado · adminEmail=${emailAdminOk} · clientEmail=${emailClientOk}${data.email && !confirm.ok ? ' (confirmación ya enviada hoy)' : ''} · archivos=${fileRows.length}`);
     } else {

@@ -10,9 +10,24 @@
   let typed = $state('');
   const canConfirm = $derived(!busy && (!requireText || typed.trim() === requireText));
   $effect(() => { if (!open) typed = ''; });
+
+  // oncancel solo para un cierre SIN confirmar (Cancelar, Escape, velo o la
+  // X). Si el padre cierra tras confirmar con éxito, no es una cancelación.
+  // onconfirm puede devolver su promesa: si falla y el diálogo sigue
+  // abierto, un cierre posterior vuelve a contar como cancelación.
+  let confirmed = false;
+  async function doConfirm() {
+    confirmed = true;
+    try { await onconfirm?.(); }
+    finally { if (open) confirmed = false; }
+  }
+  function handleClose() {
+    if (confirmed) { confirmed = false; return; }
+    oncancel?.();
+  }
 </script>
 
-<Modal bind:open {title} size="sm" onclose={() => oncancel?.()}>
+<Modal bind:open {title} size="sm" onclose={handleClose}>
   {#if message}<p class="ui-confirm__msg">{message}</p>{/if}
   {#if requireText}
     <label class="ui-field">
@@ -22,7 +37,7 @@
   {/if}
   {#snippet footer()}
     <button type="button" class="b" onclick={() => (open = false)} disabled={busy}>Cancelar</button>
-    <button type="button" class="b {danger ? 'b--danger' : 'b--primary'}" disabled={!canConfirm} onclick={() => onconfirm?.()}>
+    <button type="button" class="b {danger ? 'b--danger' : 'b--primary'}" disabled={!canConfirm} onclick={doConfirm}>
       {busy ? 'Un momento…' : confirmLabel}
     </button>
   {/snippet}

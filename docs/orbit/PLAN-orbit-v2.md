@@ -1,6 +1,6 @@
 # Plan: Orbit v2 (panel) + Brief v2 (formulario y kit para Claude Code)
 
-> **Estado:** PROPUESTO 2026-10-19, esperando las decisiones del dueño (sección 7).
+> **Estado:** APROBADO por el dueño 2026-10-19 (decisiones en la sección 7). En ejecución.
 > **Rama base:** `feat/orbit-v2` (worktree `.claude/worktrees/orbit`, sobre `origin/main`@`1b514e4`).
 > **Encargo del dueño (2026-10-19):** reencaminar el panel (funciones a medias o mal hechas y diseño sin pulir:
 > **arreglar, no eliminar**), actualizar a la par el brief del cliente (subir fotos, logos y documentos; salida
@@ -239,18 +239,19 @@ construir: 2 o 3 direcciones en baja fidelidad para que el dueño elija (E-28, E
 **Lo que hace el dueño:** decisiones de la sección 7; aplicar la migración 010 (o autorizar que la aplique yo
 por el editor de Neon con su sesión, como la 008); OK visual; probar la subida de fotos desde su iPhone.
 
-## 7. Decisiones pendientes del dueño
+## 7. Decisiones del dueño (2026-10-19)
 
-1. **Cómo pedimos la información:** dos momentos (brief corto al pedir propuesta + kit de arranque privado al
-   contratar) / un solo formulario completo / brief corto y el resto por llamada.
-2. **Fotos:** reducidas a calidad web (~3.000 px, sin GPS) / originales siempre. Logos y documentos siempre
-   originales.
-3. **Almacén de archivos:** lo crea Claude en la cuenta de Vercel / lo crea el dueño. Antes se confirma el plan
-   de Vercel (en Hobby, pasar de 1 GB bloquea el almacén 30 días).
-4. **Facturas enviables al cliente** (PDF con la marca, correo y estado de pago): en esta tanda / después.
+1. **Dos momentos.** Brief corto público al pedir propuesta (logo y fotos opcionales) + **Kit de arranque**
+   privado que el panel envía al cliente cuando contrata (enlace único, sin cuenta), con todo lo pesado.
+   El zip junta los dos.
+2. **Fotos a calidad web** en el navegador (~3.000 px de lado largo, JPEG ~0,85, sin EXIF ni GPS). Logos y
+   documentos siempre originales, nunca se recodifican.
+3. **Almacén creado** por Claude: Vercel Blob privado `marcyan-brief-files` (`store_EAo4e4wc4oDQbPtf`, iad1),
+   conectado a Production, Preview y Development (`BLOB_READ_WRITE_TOKEN`). Plan del equipo: **Pro** activo.
+4. **Facturas enviables al cliente: después**, como encargo aparte cuando esta tanda esté en producción.
 
-Valores por defecto si no se dice otra cosa: borradores sin enviar se borran a las 48 h; archivos de proyecto
-se conservan 12 meses tras completarse; topes de 60 archivos y 300 MB por brief.
+Valores por defecto: borradores sin enviar se borran a las 48 h; archivos de proyecto se conservan 12 meses
+tras completarse; topes de 60 archivos y 300 MB por brief (el kit de arranque tiene su propio cupo igual).
 
 ## 8. Riesgos
 - Subida anónima: sin borrador + secreto + cupos, cualquiera llena el almacén. Por eso B0 va antes que B1.

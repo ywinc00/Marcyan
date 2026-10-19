@@ -4,6 +4,8 @@
   // botón), el foco vuelve al disparador al cerrar, y clic en el velo cierra.
   // open es bindable: <Modal bind:open title="…">…</Modal>
   import Icon from './Icon.svelte';
+  import Toast from './Toast.svelte';
+  import { pushLayer, popLayer } from '../lib/toast.svelte.js';
   let { open = $bindable(false), title = '', size = 'md', onclose, children, footer, dismissable = true } = $props();
 
   let dlg = $state(null);
@@ -15,6 +17,7 @@
     if (open && !dlg.open) {
       returnTo = document.activeElement;
       dlg.showModal();
+      pushLayer(titleId);   // los avisos pasan a pintarse dentro de este diálogo
       queueMicrotask(() => {
         const first = dlg.querySelector('[autofocus], input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
           || dlg.querySelector('.ui-modal__body button:not(:disabled), .ui-modal__foot button:not(:disabled)');
@@ -24,9 +27,12 @@
       dlg.close();
     }
   });
+  // Si el modal se desmonta abierto, su capa no puede quedarse en la pila.
+  $effect(() => () => popLayer(titleId));
 
   function handleClose() {
     // Se dispara tras dlg.close() (programático, Escape o el botón cerrar).
+    popLayer(titleId);
     if (open) open = false;
     onclose?.();
     if (returnTo && typeof returnTo.focus === 'function' && document.contains(returnTo)) returnTo.focus();
@@ -48,4 +54,5 @@
     <div class="ui-modal__body">{@render children?.()}</div>
     {#if footer}<footer class="ui-modal__foot">{@render footer()}</footer>{/if}
   </div>
+  <Toast layer={titleId} />
 </dialog>

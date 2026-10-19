@@ -5,9 +5,23 @@
 //   · que NINGÚN error quede mudo: lo que antes era un `catch {}` vacío
 //     ahora termina aquí con un texto legible.
 // ─────────────────────────────────────────────────────────────
+import { untrack } from 'svelte';
 import { errorMessage, isSessionError } from './api.js';
 
 export const toasts = $state([]);
+
+// Capas modales abiertas (<dialog> con showModal), de abajo arriba. Un
+// diálogo modal deja inerte todo lo que no lleva dentro y queda por encima
+// de cualquier z-index: un aviso pintado fuera quedaría tapado y sin poder
+// cerrarse. Por eso cada diálogo lleva su propia región (<Toast layer=…>)
+// y los avisos se pintan solo en la de la capa de más arriba.
+export const layers = $state([]);
+export function pushLayer(id) {
+  untrack(() => { if (!layers.includes(id)) layers.push(id); });
+}
+export function popLayer(id) {
+  untrack(() => { const i = layers.lastIndexOf(id); if (i >= 0) layers.splice(i, 1); });
+}
 let seq = 0;
 const MAX = 3;
 

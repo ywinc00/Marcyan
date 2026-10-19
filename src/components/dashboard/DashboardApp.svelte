@@ -18,7 +18,7 @@
   import Icon from './ui/Icon.svelte';
   import Toast from './ui/Toast.svelte';
   import { api, MSG, errorMessage, onUnauthorized, onMutation, onNetwork } from './lib/api.js';
-  import { toast } from './lib/toast.svelte.js';
+  import { toast, pushLayer, popLayer } from './lib/toast.svelte.js';
   import { route, href, navigate, startRouter } from './lib/router.svelte.js';
   import { data, loadAll, loadHome, loadLeads, refreshShell, clearData } from './lib/store.svelte.js';
   import { fmtTime } from './lib/dates.js';
@@ -165,8 +165,10 @@
 
   // ── Menú móvil ───────────────────────────────────────────────
   $effect(() => {
-    if (!menuEl) return;
-    if (menuOpen && !menuEl.open) menuEl.showModal();
+    // Sin menú (la carcasa se desmontó, p. ej. sesión caducada con el menú
+    // abierto) su capa de avisos no puede quedarse en la pila.
+    if (!menuEl) { popLayer('menu'); return; }
+    if (menuOpen && !menuEl.open) { menuEl.showModal(); pushLayer('menu'); }
     else if (!menuOpen && menuEl.open) menuEl.close();
   });
   function onMenuBackdrop(e) { if (e.target === menuEl) menuOpen = false; }
@@ -369,7 +371,7 @@
       </button>
     </header>
 
-    <dialog bind:this={menuEl} class="mnav" aria-label="Menú" onclose={() => (menuOpen = false)} onclick={onMenuBackdrop}>
+    <dialog bind:this={menuEl} class="mnav" aria-label="Menú" onclose={() => { menuOpen = false; popLayer('menu'); }} onclick={onMenuBackdrop}>
       <div class="mnav__panel">
         <div class="mnav__head">
           {@render brandMark(false)}
@@ -386,6 +388,8 @@
           <button class="b b--ghost" onclick={logout} disabled={loggingOut}><Icon name="logout" size={16} />{loggingOut ? 'Saliendo…' : 'Salir'}</button>
         </div>
       </div>
+      <!-- Avisos mientras el menú está abierto (fuera quedarían tapados e inertes). -->
+      <Toast layer="menu" />
     </dialog>
 
     <main class="main" bind:this={mainEl} tabindex="-1">

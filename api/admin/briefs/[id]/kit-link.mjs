@@ -7,11 +7,12 @@
 //     · reopen: true → permite reabrir un kit ya enviado por el cliente.
 //   Respuesta: { ok, url, kitStatus, lang, emailSent, emailError? }
 //   El token solo se devuelve aquí, una vez; en la base queda su hash.
-//   Regenerar invalida el enlace anterior.
+//   Regenerar invalida el enlace anterior y cierra sus borradores de
+//   archivos abiertos: un enlace filtrado deja de servir también para subir.
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import { getBriefByProjectId, logEvent } from '../../../../lib/db.mjs';
 import { issueKitLink, kitUrl } from '../../../../lib/brief-kit.mjs';
-import { isMissingSchema } from '../../../../lib/brief-files.mjs';
+import { isMissingSchema, closeKitDrafts } from '../../../../lib/brief-files.mjs';
 import { emailClientKitLink, resend } from '../../../../lib/email.mjs';
 
 export default async function handler(req, res) {
@@ -44,6 +45,8 @@ export default async function handler(req, res) {
     if (!issued) {
       return res.status(409).json({ ok: false, error: 'El cliente ya envió el kit. Para reabrirlo, confirma la reapertura.' });
     }
+    // Revoca las subidas del enlace anterior (borradores de kit abiertos).
+    const closedDrafts = await closeKitDrafts(issued.briefId);
     const url = kitUrl(issued.token, lang);
 
     let emailSent = false;
@@ -71,7 +74,7 @@ export default async function handler(req, res) {
       projectId: id,
       type: 'kit_link_created',
       actorEmail: session.email,
-      data: { lang, status: issued.status, emailSent, reopen: body.reopen === true },
+      data: { lang, status: issued.status, emailSent, reopen: body.reopen === true, closedDrafts },
     });
 
     res.setHeader('Cache-Control', 'private, no-store');

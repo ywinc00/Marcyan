@@ -21,6 +21,7 @@ import { validate, splitByStorage, sectionsFor } from '../../lib/brief-schema.mj
 import { findBriefByKitToken, kitPrefill, saveKit } from '../../lib/brief-kit.mjs';
 import {
   getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, listFilesForBrief, blobConfigured, isMissingSchema,
+  closeKitDrafts,
 } from '../../lib/brief-files.mjs';
 import { secretMatches } from '../../lib/brief-upload-rules.mjs';
 
@@ -106,6 +107,7 @@ export default async function handler(req, res) {
     if (body.draftId && body.secret) {
       const d = await getDraft(String(body.draftId));
       if (d && d.purpose === 'kit' && String(d.brief_id) === String(brief.id) && !d.submitted_at
+          && new Date(d.expires_at).getTime() > Date.now()
           && secretMatches(String(body.secret), d.secret_hash)) draft = d;
       else console.warn('[kit] borrador de archivos no válido; se ignoran los archivos');
     }
@@ -116,6 +118,8 @@ export default async function handler(req, res) {
 
     const saved = await saveKit(brief.id, { columns: split.columns, kit: split.kit }, { submit });
     if (!saved) return res.status(409).json({ ok: false, error: T.done[lang] });
+    // Kit enviado: ningún otro borrador de este kit sigue aceptando subidas.
+    if (submit) await closeKitDrafts(brief.id).catch((err) => console.warn('[kit] no se pudieron cerrar los borradores:', err && err.message));
 
     let check = null;
     if (submit) {

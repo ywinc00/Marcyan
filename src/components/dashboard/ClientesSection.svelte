@@ -42,6 +42,16 @@
   const filters = $derived(clientFiltersFromQuery(route.query));
   const filterKey = $derived(JSON.stringify(filters));
 
+  // En pantallas estrechas el texto de ayuda del buscador se cortaba: allí va uno corto.
+  let narrow = $state(false);
+  $effect(() => {
+    const mq = window.matchMedia('(max-width: 719px)');
+    narrow = mq.matches;
+    const on = (e) => { narrow = e.matches; };
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  });
+
   let rows = $state([]);
   let total = $state(0);
   let summary = $state(null);
@@ -130,7 +140,7 @@
     <label class="search">
       <span class="sr-only">Buscar clientes</span>
       <span class="search__icon"><Icon name="search" size={16} /></span>
-      <input class="ui-input search__input" type="search" placeholder="Buscar por negocio, persona, correo, teléfono, ciudad o código"
+      <input class="ui-input search__input" type="search" placeholder={narrow ? 'Buscar clientes' : 'Buscar por negocio, persona, correo, teléfono, ciudad o código'}
         value={searchText} oninput={onSearchInput} autocomplete="off" />
     </label>
   </div>

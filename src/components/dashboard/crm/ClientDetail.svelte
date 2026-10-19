@@ -99,8 +99,9 @@
   async function doDelete() {
     deleting = true;
     try {
-      const typed = name;
-      await api('/api/admin/clients/' + encodeURIComponent(clientId) + '?confirm=' + encodeURIComponent(typed), { method: 'DELETE' });
+      // La confirmación va en el cuerpo, no en la URL: así el nombre del
+      // cliente no queda en los registros de acceso (A2-R4).
+      await api('/api/admin/clients/' + encodeURIComponent(clientId), { method: 'DELETE', body: { confirm: name } });
       confirmDelete = false;
       toast(`${client.client_code} borrado definitivamente`);
       onchanged?.();
@@ -140,7 +141,7 @@
   </PageHeader>
 
   {#if archived}
-    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en las listas ni en los selectores. Sus proyectos, facturas y pagos se conservan.</p>
+    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en la lista de Clientes ni al elegir cliente para un lead. Sus proyectos, facturas y pagos se conservan.</p>
   {/if}
 
   {#if related}
@@ -251,7 +252,7 @@
   <ConfirmDialog
     bind:open={confirmArchive}
     title={`Archivar ${name}`}
-    message="Dejará de salir en las listas y en los selectores de cliente. Sus proyectos, facturas y pagos se conservan tal cual y puedes reactivarlo cuando quieras."
+    message="Dejará de salir en la lista de Clientes y al elegir cliente para un lead. Sus proyectos, facturas y pagos se conservan tal cual y puedes reactivarlo cuando quieras."
     confirmLabel="Archivar"
     danger={false}
     busy={archiving}

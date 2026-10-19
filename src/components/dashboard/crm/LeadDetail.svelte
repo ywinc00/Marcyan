@@ -198,7 +198,7 @@
           <div><dt>Teléfono</dt><dd>{#if phoneHref(lead.phone)}<a href={'tel:' + phoneHref(lead.phone)}>{lead.phone}</a>{:else}{lead.phone || 'Sin dato'}{/if}</dd></div>
           <div><dt>Ciudad</dt><dd>{lead.city || 'Sin dato'}</dd></div>
           <div><dt>Origen</dt><dd><StatusChip tone={leadSource(lead.source).tone} label={leadSource(lead.source).label} /></dd></div>
-          {#if lead.page_url}<div><dt>Página de origen</dt><dd><a href={lead.page_url} target="_blank" rel="noopener noreferrer">{lead.page_url.replace(/^https?:\/\//, '')}</a></dd></div>{/if}
+          {#if lead.page_url}<div><dt>Página de origen</dt><dd>{#if /^https?:\/\//i.test(lead.page_url)}<a href={lead.page_url} target="_blank" rel="noopener noreferrer">{lead.page_url.replace(/^https?:\/\//i, '')}</a>{:else}{lead.page_url}{/if}</dd></div>{/if}
           <div><dt>Actualizado</dt><dd>{fmtDateTime(lead.updated_at)}</dd></div>
           <div class="dl__st"><dt>Estado</dt><dd><LeadStatusSelect {lead} {crmReady} onsaved={onStatusSaved} onconvert={() => (convertOpen = true)} label="Estado del lead" /></dd></div>
         </dl>

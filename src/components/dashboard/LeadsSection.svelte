@@ -48,6 +48,16 @@
   const filterKey = $derived(JSON.stringify(filters));
   const filtered = $derived(!!(filters.status || filters.source || filters.search));
 
+  // En pantallas estrechas el texto de ayuda del buscador se cortaba: allí va uno corto.
+  let narrow = $state(false);
+  $effect(() => {
+    const mq = window.matchMedia('(max-width: 719px)');
+    narrow = mq.matches;
+    const on = (e) => { narrow = e.matches; };
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  });
+
   // ── Lista ────────────────────────────────────────────────────
   let rows = $state([]);
   let total = $state(0);
@@ -173,7 +183,7 @@
       <label class="search">
         <span class="sr-only">Buscar leads</span>
         <span class="search__icon"><Icon name="search" size={16} /></span>
-        <input class="ui-input search__input" type="search" placeholder="Buscar por nombre, correo, teléfono, negocio, ciudad o mensaje"
+        <input class="ui-input search__input" type="search" placeholder={narrow ? 'Buscar leads' : 'Buscar por nombre, correo, teléfono, negocio, ciudad o mensaje'}
           value={searchText} oninput={onSearchInput} autocomplete="off" />
       </label>
       <label class="origin">
@@ -209,9 +219,14 @@
         <DataTable columns={COLUMNS} {rows} rowKey="ref_id" caption="Leads">
           {#snippet cell(lead, col)}
             {#if col.key === 'contact'}
-              {@const who = lead.name || lead.business_name || lead.email || lead.ref_id}
+              {@const who = lead.name || lead.business_name || lead.email}
               <a class="c-cell" href={href('leads', [lead.ref_id], route.query)}>
-                <span class="mono-av" style="background:{monoColor(who)}" aria-hidden="true">{initials(who)}</span>
+                {#if who}
+                  <span class="mono-av" style="background:{monoColor(who)}" aria-hidden="true">{initials(who)}</span>
+                {:else}
+                  <!-- Sin nombre, negocio ni correo: icono neutro, nunca letras sacadas del código (A2-R8) -->
+                  <span class="mono-av mono-av--anon" aria-hidden="true"><Icon name="clientes" size={14} /></span>
+                {/if}
                 <span class="c-text">
                   <span class="c-name">{lead.name || 'Sin nombre'}</span>
                   <span class="c-sub">{[lead.business_name, lead.email || lead.phone].filter(Boolean).join(' · ') || lead.ref_id}</span>
@@ -263,6 +278,7 @@
   .c-name { color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
+  .mono-av--anon { background: var(--bg-elevated); color: var(--fg-secondary); border: 1px solid var(--border-strong); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-small); font-variant-numeric: tabular-nums; }
   .none { color: var(--fg-subtle); }
 

@@ -166,6 +166,21 @@ await check('dates: fragmentos SQL usan la zona de Houston', () => {
     "to_char(date_trunc('month', created_at AT TIME ZONE 'America/Chicago'), 'YYYY-MM')");
 });
 
+await check('briefs: "este mes" se corta en hora de Houston, no en UTC', () => {
+  const src = fs.readFileSync(new URL('../lib/db.mjs', import.meta.url), 'utf8');
+  const fn = src.slice(src.indexOf('export async function briefStats'),
+                       src.indexOf('export async function updateBriefStatus'));
+  assert.ok(fn.length > 0, 'no encontré briefStats');
+  assert.ok(!/date_trunc\(\s*'month'\s*,\s*NOW\(\)\s*\)/i.test(fn), 'briefStats aún corta el mes en UTC');
+  assert.match(fn, /monthRange\(0\)/);
+});
+await check('inicio: revenue_this_month sigue en null (el panel actual lo pinta crudo)', () => {
+  const src = fs.readFileSync(new URL('../api/admin/dashboard/analytics.mjs', import.meta.url), 'utf8');
+  assert.match(src, /revenue_this_month:\s*null,/);
+  assert.match(src, /revenue_prev_month:\s*null,/);
+  assert.match(src, /revenue_this_month_cents:\s*revenue\.thisMonth/);
+});
+
 // ── Filtro de leads (lista y CSV) ────────────────────────────────
 await check('leads: filtro vacío no añade WHERE', () => {
   const f = buildLeadFilter({});

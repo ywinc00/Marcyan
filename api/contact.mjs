@@ -10,6 +10,7 @@ import { createLead } from '../lib/leads.mjs';
 import { createNotification } from '../lib/notifications.mjs';
 import { emailAdminNewLead, emailClientLeadConfirmation, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
+import { rateLimit, LIMITS } from '../lib/ratelimit.mjs';
 
 function sanitize(v, max = 5000) {
   if (v === null || v === undefined) return null;
@@ -44,6 +45,16 @@ export default async function handler(req, res) {
     // Honeypot anti-spam
     if (body.website_hp) {
       return res.status(200).json({ ok: true, refId: 'LEAD-000' });
+    }
+
+    // Límite de envíos persistente por IP (B-03; degrada a memoria sin la migración 010).
+    const rl = await rateLimit({ bucket: 'contact', key: clientIp(req), limits: LIMITS.contact });
+    if (!rl.ok) {
+      res.setHeader('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({
+        ok: false,
+        error: 'Recibimos varios mensajes seguidos desde tu conexión. Espera unos minutos y vuelve a intentarlo.',
+      });
     }
 
     // Acepta tanto los nombres "de leads" como los del form de contacto

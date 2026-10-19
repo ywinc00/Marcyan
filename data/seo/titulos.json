@@ -1,9 +1,9 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-12",
+  "fecha": "2026-10-19",
   "periodo": {
-    "desde": "2026-09-12",
-    "hasta": "2026-10-09"
+    "desde": "2026-09-19",
+    "hasta": "2026-10-16"
   },
   "estado": "ok",
   "nota": "Menos de 3 páginas en el top 10 con impresiones suficientes: todavía no hay referencia propia; solo se marcan las páginas del top 20 con 100 o más impresiones y ningún clic.",

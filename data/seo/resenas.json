@@ -102,6 +102,12 @@
         "rating": null,
         "total": 0,
         "nombre": "Marcyan Studio"
+      },
+      {
+        "fecha": "2026-10-19",
+        "rating": null,
+        "total": 0,
+        "nombre": "Marcyan Studio"
       }
     ],
     "ChIJlRelt6jCQIYRy-WoirFsObc": [
@@ -139,6 +145,12 @@
         "fecha": "2026-10-12",
         "rating": 4.9,
         "total": 117,
+        "nombre": "True Digital Marketing Inc"
+      },
+      {
+        "fecha": "2026-10-19",
+        "rating": 4.9,
+        "total": 118,
         "nombre": "True Digital Marketing Inc"
       }
     ],
@@ -178,6 +190,12 @@
         "rating": 5,
         "total": 103,
         "nombre": "Webnhubs"
+      },
+      {
+        "fecha": "2026-10-19",
+        "rating": 5,
+        "total": 103,
+        "nombre": "Webnhubs"
       }
     ],
     "ChIJCwAq4-jDQIYRlk-bdpZOAvs": [
@@ -213,6 +231,12 @@
       },
       {
         "fecha": "2026-10-12",
+        "rating": 5,
+        "total": 95,
+        "nombre": "Artisticore Graphic Design Agency"
+      },
+      {
+        "fecha": "2026-10-19",
         "rating": 5,
         "total": 95,
         "nombre": "Artisticore Graphic Design Agency"

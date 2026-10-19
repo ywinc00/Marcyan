@@ -1,12 +1,12 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-12",
+  "fecha": "2026-10-19",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
-      "clics": 0,
-      "impresiones": 3
+      "clics": 1,
+      "impresiones": 12
     },
     "anteriores28": {
       "clics": 0,
@@ -14,6 +14,13 @@
     }
   },
   "consultasSinMarca": [
+    {
+      "consulta": "diseño web en miami",
+      "clics": 0,
+      "impresiones": 4,
+      "posicionMedia": 2,
+      "marca": false
+    },
     {
       "consulta": "cómo activar que la ia contesta mis llamadas",
       "clics": 0,
@@ -26,6 +33,34 @@
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 10,
+      "marca": false
+    },
+    {
+      "consulta": "poner una ia para que conteste las llamadas y los whatsapp cuando yo no puedo",
+      "clics": 1,
+      "impresiones": 1,
+      "posicionMedia": 2,
+      "marca": false
+    },
+    {
+      "consulta": "diseño web para negocios en miami",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 3,
+      "marca": false
+    },
+    {
+      "consulta": "poner una ia para que conteste las llamadas y los whatsapp",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 4,
+      "marca": false
+    },
+    {
+      "consulta": "páginas web houston",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 2,
       "marca": false
     }
   ],

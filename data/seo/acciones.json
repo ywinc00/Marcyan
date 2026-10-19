@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-18",
+  "actualizado": "2026-10-19",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -345,8 +345,8 @@
       "titulo": "Reescribir /es/houston/diseno-web con ficha previa y prueba real (toda la familia de diseño web de Houston está fuera y es el enlace de la ficha)",
       "estado": "propuesta",
       "primeraVez": "2026-10-18",
-      "ultimaVez": "2026-10-18",
-      "propuestas": 1,
+      "ultimaVez": "2026-10-19",
+      "propuestas": 2,
       "vence": "2026-11-04",
       "origen": "lectura-2026-10-18",
       "historial": [

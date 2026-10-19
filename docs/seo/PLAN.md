@@ -47,6 +47,8 @@
 
 > Revisión 2026-W42 (12-oct, semana par): reordenado por puntos (los números de las tareas son identificadores estables). Indexación 76 → 50 de 84 (29 rastreadas sin indexar; 8 salieron el 9-oct, entre ellas /es/houston y /es/miami/ecommerce): la fusión prevista para enero (Siguiente 6) se adelanta como triage de las 29, con decisión de Yan el 15-oct, cuando se pueda interpretar. Tanda de la semana: triage, medición de GA4 (alerta del 9-oct: 3 días sin visitas) y tarea 2 (tercera semana esperando OK). Tarea 3 sigue esperando el OK a PR #36. Espera OK de Yan.
 
+> Revisión 2026-W43 (19-oct): sin reordenar (semana impar) y sin tareas nuevas: la cola aprobada el 18-oct ocupa al chat del proyecto. Enlaces legales ✓ en CAMBIOS.md. Salieron 6 páginas del índice el 18-oct (entre ellas /es/houston/diseno-web); la reescritura de esa página sigue esperando OK. Velocidad de portada y /en/houston/ai-seo en observación.
+
 ## En espera (sin responsable o bloqueadas)
 
 - Anchors de Houston (misma mecánica que Miami): esperan a que el rediseño de la landing de Houston tenga dirección elegida.

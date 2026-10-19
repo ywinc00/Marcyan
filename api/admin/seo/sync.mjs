@@ -8,7 +8,7 @@
 //     · header Authorization: Bearer <CRON_SECRET> — uso desde el cron de Vercel
 //   Degrada con gracia: si falta la config WIF, responde ok:false con
 //   error 'not_configured' por proyecto, sin romper.
-import { requireAdmin, readCookie, getSession } from '../../../lib/auth.mjs';
+import { requireAdmin, readCookie, getSession, safeEqual } from '../../../lib/auth.mjs';
 import { getSeoProject, syncProject, syncAll, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
 
 function bearerOk(req) {
@@ -16,7 +16,8 @@ function bearerOk(req) {
   if (!secret) return false;
   const h = req.headers['authorization'] || req.headers['Authorization'] || '';
   const m = /^Bearer\s+(.+)$/i.exec(String(h).trim());
-  return Boolean(m && m[1].trim() === secret);
+  // Comparación en tiempo constante (no revela cuántos caracteres coinciden).
+  return Boolean(m && safeEqual(m[1].trim(), secret));
 }
 
 async function sessionOk(req) {

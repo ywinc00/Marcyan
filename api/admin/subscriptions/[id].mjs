@@ -1,9 +1,11 @@
 // /api/admin/subscriptions/:id   (id = subscriptions.id BIGINT → string)
-//   PATCH  → { active, name, amount_cents, cycle, ... } toggle/editar {ok, subscription}
+//   PATCH  → { active, name, amount_cents, cycle, category, next_charge_at, notes }
+//            toggle/editar {ok, subscription} (monto > 0; next_charge_at sale avanzado)
 //   DELETE → elimina la suscripción {ok, deleted}
 // Protegido con requireAdmin. Montos en CENTAVOS USD.
 import { requireAdmin } from '../../../lib/auth.mjs';
 import { getSubscription, updateSubscription, deleteSubscription } from '../../../lib/expenses.mjs';
+import { isBusinessError } from '../../../lib/finance-rules.mjs';
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -22,6 +24,7 @@ export default async function handler(req, res) {
       if (!subscription) return res.status(404).json({ ok: false, error: 'Suscripción no encontrada' });
       return res.status(200).json({ ok: true, subscription });
     } catch (err) {
+      if (isBusinessError(err)) return res.status(err.status).json({ ok: false, error: err.message });
       console.error('[admin/subscriptions/:id PATCH] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al actualizar suscripción' });
     }

@@ -4,8 +4,11 @@
 //    · lib/finance-rules.mjs  montos ("1.500" y "1,500"), estado derivado,
 //      estados manuales, pagos ≤ saldo, próximo cargo, categorías.
 //    · lib/finance.mjs y lib/expenses.mjs con una base FALSA en memoria
-//      (@vercel/postgres sustituido con mock.module): numeración atómica
-//      (FIN-19), transacciones de pagos, reglas de edición y borrado.
+//      (@vercel/postgres sustituido con mock.module): reglas de edición y
+//      borrado, y que el SQL ENVIADO use next_*_id() dentro del INSERT
+//      (FIN-19) y BEGIN/FOR UPDATE en los pagos. Eso comprueba el texto que
+//      se manda, NO la atomicidad real: no hay un Postgres detrás.
+//    · El CASE de estado en SQL traducido a JS y comparado con la regla JS.
 //    · Handlers de api/admin con la sesión simulada: mensajes en español
 //      llano y códigos (400/404/409) que el panel enseña tal cual.
 //  Necesita --experimental-test-module-mocks (lo pone el script de npm).
@@ -118,6 +121,59 @@ await check('estado: borradores y anuladas no vencen', () => {
 await check('estado guardado nunca es "vencida"', () => {
   assert.equal(rules.baseInvoiceStatus({ status: 'overdue', amount_cents: 1000, paid_cents: 0 }), 'sent');
   assert.equal(rules.baseInvoiceStatus({ status: 'sent', amount_cents: 0, paid_cents: 0 }), 'paid');
+});
+// El CASE de sqlEffectiveStatus() es el ESPEJO en SQL de effectiveInvoiceStatus().
+// Sin Postgres en las pruebas, se traduce el CASE generado a una expresión JS
+// (CASE→paréntesis, WHEN/THEN/ELSE→ternarios) y se compara caso por caso con
+// la función JS. Si alguien reordena o cambia un WHEN, esta prueba falla.
+const { SQL_TODAY_HOUSTON } = await import('../lib/dates.mjs');
+function caseToJs(sqlText) {
+  let s = sqlText.split(SQL_TODAY_HOUSTON).join('r.today')
+    .replace(/\bi\.status\b/g, 'r.status')
+    .replace(/\bi\.amount_cents\b/g, 'r.amount')
+    .replace(/\bi\.due_date\b/g, 'r.due')
+    .replace(/\bPAID\b/g, 'r.paid')
+    .replace(/\bIS NOT NULL\b/g, '!= null')
+    .replace(/\bAND\b/g, '&&')
+    .replace(/ = /g, ' === ')
+    .replace(/\bCASE\s+WHEN\b/g, '((')
+    .replace(/\bWHEN\b/g, ': (')
+    .replace(/\bTHEN\b/g, ') ?')
+    .replace(/\bELSE\b/g, ':')
+    .replace(/\bEND\b/g, ')');
+  // Lo que quede de SQL sin traducir haría fallar la prueba (no se adivina).
+  assert.ok(!/\b(CASE|WHEN|THEN|COALESCE|now|::)\b/.test(s), 'CASE con sintaxis nueva sin traducir: ' + s);
+  return new Function('r', 'return ' + s + ';');
+}
+await check('estado: el CASE de SQL da lo mismo que effectiveInvoiceStatus (espejo)', () => {
+  const evalSql = caseToJs(norm(fin.sqlEffectiveStatus('i', 'PAID')));
+  let n = 0;
+  for (const status of ['draft', 'sent', 'paid', 'partial', 'overdue', 'void'])
+    for (const amount of [0, 1000])
+      for (const paid of [0, 400, 1000, 1200])
+        for (const due of [null, '2026-10-01', T, '2026-12-01']) {
+          const js = rules.effectiveInvoiceStatus({ status, amount_cents: amount, paid_cents: paid, due_date: due }, T);
+          const sqlSt = evalSql({ status, amount, paid, due, today: T });
+          assert.equal(sqlSt, js, `status=${status} monto=${amount} pagado=${paid} vence=${due}`);
+          n++;
+        }
+  assert.equal(n, 192);
+});
+const { niceAxisMax } = await import('../src/components/dashboard/finanzas/fin.js');
+await check('gráfico: el eje Y usa topes redondos (1, 2, 2.5 o 5 × 10^n por tramo)', () => {
+  assert.equal(niceAxisMax(137000), 150000);   // $1,370 → $0 / $500 / $1K / $1.5K
+  assert.equal(niceAxisMax(300000), 300000);   // $3,000 → tramos de $1K
+  assert.equal(niceAxisMax(500001), 600000);   // $5,000.01 → tramos de $2K
+  assert.equal(niceAxisMax(700000), 750000);   // $7,000 → tramos de $2.5K
+  assert.equal(niceAxisMax(1000), 1500);       // $10 → tramos de $5
+  assert.equal(niceAxisMax(1), 300);           // nunca tramos de centavos
+  for (const m of [1, 999, 45700, 137000, 999999, 123456789]) {
+    const top = niceAxisMax(m);
+    assert.ok(top >= m, 'el tope cubre el máximo ' + m);
+    const stepDollars = top / 3 / 100;
+    const mant = stepDollars / Math.pow(10, Math.floor(Math.log10(stepDollars)));
+    assert.ok([1, 2, 2.5, 5].some((x) => Math.abs(x - mant) < 1e-9), 'tramo redondo ' + stepDollars);
+  }
 });
 await check('estado manual: solo Borrador, Enviada o Anulada; borrador sin pagos', () => {
   assert.equal(rules.manualStatusProblem('sent', 0), null);

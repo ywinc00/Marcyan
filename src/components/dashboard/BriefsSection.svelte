@@ -2,36 +2,15 @@
   import { onMount } from 'svelte';
   import KpiArt from './KpiArt.svelte';
 
+  import { api } from './lib/api.js';
+  import { toastError } from './lib/toast.svelte.js';
+  import { fmtDate, fmtDateTime, rel } from './lib/dates.js';
+  import PageHeader from './ui/PageHeader.svelte';
+  import Icon from './ui/Icon.svelte';
+
   // ── Helpers ──────────────────────────────────────────────────
-  // Timeout de cliente (~12s) vía AbortController: una función colgada o un
-  // cold-start ya no deja un spinner infinito — surface el error.
-  async function api(url, opts = {}) {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12000);
-    try {
-      return await fetch(url, {
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        signal: ctrl.signal,
-        ...opts,
-      });
-    } catch (e) {
-      if (e && e.name === 'AbortError') throw new Error('La petición tardó demasiado. Reintenta.');
-      throw e;
-    } finally {
-      clearTimeout(t);
-    }
-  }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
-  function fmtDateTime(d) { return d ? new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
-  function rel(d) {
-    if (!d) return '';
-    const diff = (Date.now() - new Date(d).getTime()) / 1000;
-    if (diff < 3600) return Math.floor(diff / 60) + 'm';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h';
-    if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
-    return fmtDate(d);
-  }
+  // HTTP (timeout, errores legibles, sesión caducada) y fechas en hora de
+  // Houston vienen de lib/ (A0). Las columnas de briefs son timestamps.
   // Monograma determinista: iniciales del negocio + color estable por hash.
   const AVATAR_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
   function initials(s) {
@@ -145,7 +124,8 @@
 
   // ── Carga lista ──────────────────────────────────────────────
   async function loadStats() {
-    try { const r = await api('/api/admin/stats'); const j = await r.json(); if (j.ok) stats = j.stats; } catch (_) {}
+    try { const j = await api('/api/admin/stats'); stats = j.stats; }
+    catch (e) { toastError(e, 'No se pudieron cargar las cifras de briefs.'); }
   }
   async function loadList() {
     loading = true; error = '';
@@ -154,9 +134,7 @@
     if (search) p.set('search', search);
     p.set('limit', LIMIT); p.set('offset', offset);
     try {
-      const r = await api('/api/admin/briefs?' + p.toString());
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/briefs?' + p.toString());
       rows = j.rows || []; total = j.total || 0;
     } catch (e) { error = e.message || 'Error al cargar'; }
     finally { loading = false; }
@@ -183,10 +161,7 @@
     detailError = ''; openingId = pid;
     saveMsg = ''; emailMsg = ''; emailSubject = ''; emailBody = ''; showDelete = false; deleteConfirm = '';
     try {
-      const r = await api('/api/admin/briefs/' + encodeURIComponent(pid));
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'No encontrado');
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(pid));
       selected = j.brief; statusSel = j.brief.status; summaryVal = j.brief.summary || '';
       loadEvents(pid);
     } catch (e) {
@@ -197,7 +172,8 @@
   }
   function closeBrief() { selected = null; editMode = false; detailError = ''; openingId = ''; detailLoading = false; loadList(); loadStats(); }
   async function loadEvents(pid) {
-    try { const r = await api('/api/admin/briefs/' + encodeURIComponent(pid) + '/events'); const j = await r.json(); if (j.ok) events = j.events || []; } catch (_) {}
+    try { const j = await api('/api/admin/briefs/' + encodeURIComponent(pid) + '/events'); events = j.events || []; }
+    catch (e) { toastError(e, 'No se pudo cargar el historial del brief.'); }
   }
 
   const EVENT_LABELS = {
@@ -213,10 +189,8 @@
     if (!changed) { saveOk = false; saveMsg = 'Sin cambios'; return; }
     saveMsg = 'Guardando…'; saveOk = false;
     try {
-      const r = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id),
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id),
         { method: 'PATCH', body: JSON.stringify({ status: statusSel, summary: summaryVal }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       selected = j.brief; saveOk = true; saveMsg = '✓ Guardado'; loadEvents(selected.project_id);
     } catch (e) { saveOk = false; saveMsg = e.message || 'Error al guardar'; }
   }
@@ -237,10 +211,8 @@
   async function saveEdit() {
     saveMsg = 'Guardando…'; saveOk = false;
     try {
-      const r = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id),
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id),
         { method: 'PATCH', body: JSON.stringify({ fields: { ...edited } }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       selected = j.brief; editMode = false; saveOk = true;
       const n = (j.changes && j.changes.fields) ? j.changes.fields.length : 0;
       saveMsg = n ? `✓ ${n} campo${n === 1 ? '' : 's'} actualizado${n === 1 ? '' : 's'}` : '✓ Sin cambios';
@@ -254,10 +226,8 @@
     if (!confirm('¿Enviar email a ' + (selected.email || 'el cliente') + '?')) return;
     emailMsg = 'Enviando…'; emailOk = false;
     try {
-      const r = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id) + '/email',
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id) + '/email',
         { method: 'POST', body: JSON.stringify({ subject: emailSubject, body: emailBody }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       emailOk = true; emailMsg = '✓ Email enviado'; emailSubject = ''; emailBody = ''; loadEvents(selected.project_id);
     } catch (e) { emailOk = false; emailMsg = e.message || 'Error al enviar'; }
   }
@@ -273,9 +243,7 @@
     if (deleteConfirm !== selected.project_id) return;
     deleting = true;
     try {
-      const r = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id), { method: 'DELETE' });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(selected.project_id), { method: 'DELETE' });
       showDelete = false; selected = null; loadList(); loadStats();
     } catch (e) { saveOk = false; saveMsg = e.message || 'Error al eliminar'; showDelete = false; }
     finally { deleting = false; }
@@ -286,10 +254,11 @@
 
 {#if !selected && !detailLoading && !detailError}
   <!-- ═══ LISTA ═══ -->
-  <div class="sec-head">
-    <h1 class="greet">Briefs</h1>
-    <button class="b b--ghost" onclick={exportCsv}>⬇ CSV</button>
-  </div>
+  <PageHeader title="Briefs">
+    {#snippet actions()}
+      <button class="b b--ghost" onclick={exportCsv}><Icon name="download" size={16} />Exportar CSV</button>
+    {/snippet}
+  </PageHeader>
 
   {#if stats}
     <!-- KPI strip + embudo: densidad Orbit. Grid = 3 KPIs (iguales) + 1
@@ -552,8 +521,6 @@
 {/if}
 
 <style>
-  .sec-head { display: flex; align-items: center; justify-content: space-between; }
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
   /* ── KPI strip (Orbit stats) ───────────────────────────────────
      Orbit: 4 columnas, gap 14px, card radius 14px sin sombra. Aquí 3

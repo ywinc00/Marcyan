@@ -2,17 +2,14 @@
   import { onMount } from 'svelte';
   import KpiArt from './KpiArt.svelte';
 
-  // ── Helpers (autosuficiente, mismo patrón que BriefsSection) ──
-  async function api(url, opts = {}) {
-    return fetch(url, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
-  }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
-  function fmtDateTime(d) { return d ? new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
-  function shortDay(d) {
-    if (!d) return '';
-    const dt = new Date(d);
-    return `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}`;
-  }
+  import { api } from './lib/api.js';
+  import { fmtDateTime, fmtDayShort } from './lib/dates.js';
+  import PageHeader from './ui/PageHeader.svelte';
+
+  // ── Helpers ──────────────────────────────────────────────────
+  // HTTP y fechas vienen de lib/ (A0). metric_date es una columna DATE:
+  // las etiquetas del eje salían un día antes con getDate() (MOCK-01).
+  const shortDay = fmtDayShort;
   function nfmt(n) {
     if (n == null || !Number.isFinite(+n)) return '0';
     return new Intl.NumberFormat('es-ES').format(Math.round(+n));
@@ -186,9 +183,7 @@
   async function loadProjects(selectFirst = false) {
     loading = true; error = '';
     try {
-      const r = await api('/api/admin/seo/projects');
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/seo/projects');
       projects = j.projects || [];
       connected = j.connected !== false;
       if (selectFirst && projects.length && selectedId == null) {
@@ -207,9 +202,7 @@
     // `detail` en éxito. `detailLoading` sigue manejando el estado "Cargando…".
     selectedId = id; detailLoading = true; syncMsg = '';
     try {
-      const r = await api('/api/admin/seo/projects/' + encodeURIComponent(id) + '?days=28');
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(id) + '?days=28');
       detail = { project: j.project, metrics: j.metrics, range: j.range };
       connected = j.connected !== false;
     } catch (e) { syncMsg = e.message || 'Error al cargar el proyecto'; syncOk = false; }
@@ -230,14 +223,14 @@
     syncing = true; syncMsg = 'Sincronizando con Google…'; syncOk = false;
     let okFlag = false, msg = '';
     try {
-      const r = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }) });
-      const j = await r.json();
+      // acceptErrors: la sincronización parcial trae el detalle en el cuerpo del error.
+      const j = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }), acceptErrors: true });
       if (j.configured === false) {
-        msg = 'Conectá Google (Workload Identity Federation) para sincronizar datos reales.';
+        msg = 'Conecta Google para sincronizar datos reales.';
       } else if (!j.ok) {
         const res0 = j.results && j.results[0];
         const detailErr = res0 ? [res0.gsc?.error, res0.ga4?.error].filter(Boolean).join(' · ') : '';
-        msg = 'Sincronización parcial: ' + (detailErr || j.error || 'revisá la conexión');
+        msg = 'Sincronización parcial: ' + (detailErr || j.error || 'revisa la conexión');
       } else {
         const res0 = j.results && j.results[0];
         const total = res0 ? (res0.gsc.synced + res0.ga4.synced + ((res0.indexation && res0.indexation.synced) || 0)) : 0;
@@ -258,9 +251,7 @@
     if (!form.name.trim()) { addMsg = 'El nombre es obligatorio'; return; }
     saving = true; addMsg = '';
     try {
-      const r = await api('/api/admin/seo/projects', { method: 'POST', body: JSON.stringify(form) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/seo/projects', { method: 'POST', body: JSON.stringify(form) });
       showAdd = false;
       await loadProjects();
       selectProject(j.project.id);
@@ -288,12 +279,10 @@
     if (!editForm.name.trim()) { editMsg = 'El nombre es obligatorio'; return; }
     editSaving = true; editMsg = '';
     try {
-      const r = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), {
+      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), {
         method: 'PATCH',
         body: JSON.stringify(editForm),
       });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       showEdit = false;
       // Refrescar el detalle (nuevos identificadores) y la lista (nombre/cliente).
       await selectProject(selectedId);
@@ -307,9 +296,7 @@
     if (!selectedId) return;
     deleting = true;
     try {
-      const r = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), { method: 'DELETE' });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), { method: 'DELETE' });
       showDelete = false; selectedId = null; detail = null;
       await loadProjects();
     } catch (e) { syncOk = false; syncMsg = e.message || 'Error al eliminar'; showDelete = false; }
@@ -319,17 +306,16 @@
   onMount(() => { loadProjects(true); });
 </script>
 
-<div class="sec-head">
-  <h1 class="greet">SEO</h1>
-  <div class="head-actions">
+<PageHeader title="SEO">
+  {#snippet actions()}
     {#if !connected}
       <span class="conn conn--off" title="Falta configurar Workload Identity Federation">● Google no conectado</span>
     {:else}
       <span class="conn conn--on">● Google conectado</span>
     {/if}
-    <button class="b b--primary" onclick={openAdd}>+ Proyecto</button>
-  </div>
-</div>
+    <button class="b b--primary" onclick={openAdd}>Nuevo proyecto</button>
+  {/snippet}
+</PageHeader>
 
 {#if !connected}
   <div class="notice">
@@ -716,9 +702,6 @@
 {/if}
 
 <style>
-  .sec-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
-  .head-actions { display: flex; align-items: center; gap: var(--space-3); }
   .conn { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
   .conn--on { color: var(--accent-teal); }
   .conn--off { color: var(--color-warning); }

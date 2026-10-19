@@ -4,7 +4,7 @@
 // Estrategia: navegación (HTML) NETWORK-FIRST → el shell siempre fresco tras un
 // deploy (antes era cache-first y mostraba la versión vieja una carga); estáticos
 // hasheados cache-first con revalidación; /api/* SIEMPRE a la red (nunca cachear).
-const CACHE = 'mrc-dash-v2';
+const CACHE = 'mrc-dash-v3';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -46,7 +46,12 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Estáticos hasheados (JS/CSS/img): cache-first con revalidación en segundo plano.
+  // Cache-first SOLO para estáticos con hash (/_astro/*) y fuentes; el resto
+  // va siempre a la red. Antes cacheaba cualquier GET del mismo origen (SH-16).
+  const cacheable = url.pathname.startsWith('/_astro/') || /\.(woff2?|ttf|otf)$/.test(url.pathname);
+  if (!cacheable) return;
+
+  // Estáticos hasheados (JS/CSS/fuentes): cache-first con revalidación en segundo plano.
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
       const cached = await cache.match(req);

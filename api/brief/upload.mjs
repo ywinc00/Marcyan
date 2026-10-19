@@ -4,10 +4,11 @@
 //  El navegador sube el archivo DIRECTO a Vercel Blob (privado) con
 //  upload() de '@vercel/blob/client'; esta función solo:
 //    1) 'blob.generate-client-token': valida borrador + secreto, que no esté
-//       caducado ni enviado, la ruta briefs/<draftId>/<kind>/<nombre>, el tipo
-//       y el tamaño por clase, y reserva el cupo (60 archivos / 300 MB por
-//       borrador) de forma atómica. Emite un token de un solo uso, 10 min,
-//       con addRandomSuffix y sin sobrescribir.
+//       caducado ni enviado, la ruta briefs/<draftId>/<kind>/<uid>-<nombre>,
+//       el tipo y el tamaño por clase, y reserva el cupo (60 archivos / 300 MB
+//       por borrador) Y la ruta de forma atómica. Emite un token de 10 min
+//       para esa ruta exacta, sin sufijo aleatorio y sin sobrescribir: un
+//       segundo PUT con el mismo token falla porque la ruta ya existe.
 //    2) 'blob.upload-completed' (webhook firmado de Vercel Blob): inserta la
 //       fila en brief_files. No llega en local: al enviar se concilia.
 //
@@ -19,7 +20,7 @@ import { handleUpload } from '@vercel/blob/client';
 import { clientIp } from '../../lib/auth.mjs';
 import { rateLimit, LIMITS } from '../../lib/ratelimit.mjs';
 import {
-  getDraft, reserveUpload, recordUploadedBlob, blobConfigured, isMissingSchema,
+  getDraft, reserveUpload, pathnameTaken, recordUploadedBlob, blobConfigured, isMissingSchema,
 } from '../../lib/brief-files.mjs';
 import { parseClientPayload, checkUploadRequest, isUuid } from '../../lib/brief-upload-rules.mjs';
 
@@ -31,6 +32,7 @@ const T = {
   rate: { es: 'Demasiadas subidas seguidas. Espera unos minutos.', en: 'Too many uploads in a row. Please wait a few minutes.' },
   off: { es: 'Las subidas no están disponibles ahora mismo.', en: 'Uploads are not available right now.' },
   quota: { es: 'Llegaste al máximo de archivos o de espacio para este formulario.', en: 'You reached the file or space limit for this form.' },
+  taken: { es: 'Este archivo ya se subió. Si quieres cambiarlo, elígelo otra vez.', en: 'This file was already uploaded. To replace it, choose it again.' },
   error: { es: 'No pudimos subir el archivo. Vuelve a intentarlo.', en: 'We could not upload the file. Please try again.' },
 };
 
@@ -61,9 +63,17 @@ export default async function handler(req, res) {
         const check = checkUploadRequest({ pathname, payload, draft });
         if (!check.ok) throw new UploadRefused(check.status, check.message);
 
-        // Reserva atómica del cupo (la comprobación de arriba es orientativa;
-        // esta es la que manda si llegan muchas peticiones a la vez).
-        if (!(await reserveUpload(draft.id, check.size))) throw new UploadRefused(429, T.quota);
+        // Reserva atómica del cupo y de la ruta (la comprobación de arriba es
+        // orientativa; esta es la que manda si llegan muchas peticiones a la vez).
+        const reserved = await reserveUpload({
+          draftId: draft.id, size: check.size, pathname, kind: check.kind,
+          contentType: payload.contentType, originalName: payload.originalName,
+          convertedFrom: payload.convertedFrom, tags: payload.tags,
+        });
+        if (!reserved) {
+          if (await pathnameTaken(pathname)) throw new UploadRefused(409, T.taken);
+          throw new UploadRefused(429, T.quota);
+        }
 
         return { ...check.tokenOptions, tokenPayload: check.tokenPayload };
       },

@@ -22,7 +22,7 @@ import { rateLimit, memoryStore, hashKey, windowStart, LIMITS } from '../lib/rat
 import {
   KIND_RULES, DRAFT_LIMITS, UPLOAD_TOKEN_TTL_MS, safeFileName, buildPathname, parseBlobPathname,
   parseClientPayload, checkUploadRequest, isAllowedRealType, dispositionFor, hashSecret, secretMatches,
-  looksLikeSvg, cleanOriginalName,
+  looksLikeSvg, cleanOriginalName, splitReconcile,
 } from '../lib/brief-upload-rules.mjs';
 import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill } from '../lib/brief-kit.mjs';
 
@@ -267,9 +267,9 @@ const SECRET = 'secreto-de-prueba-largo-1234567890';
 const DRAFT = { id: DRAFT_ID, secret_hash: hashSecret(SECRET), purpose: 'brief', expires_at: new Date(Date.now() + 3600e3).toISOString(), submitted_at: null, files_count: 0, bytes_total: 0 };
 const payload = (o = {}) => parseClientPayload(JSON.stringify({ draftId: DRAFT_ID, secret: SECRET, kind: 'photo', size: 2_000_000, contentType: 'image/jpeg', originalName: 'IMG_0755.jpeg', tags: { shot: 'team' }, ...o }));
 await check('pathname: se construye y se valida (sin traversal ni kind ajeno)', () => {
-  const p = buildPathname(DRAFT_ID, 'photo', 'IMG 0755.jpeg');
-  assert.equal(p, `briefs/${DRAFT_ID}/photo/IMG-0755.jpeg`);
-  assert.deepEqual(parseBlobPathname(p), { draftId: DRAFT_ID, kind: 'photo', name: 'IMG-0755.jpeg' });
+  const p = buildPathname(DRAFT_ID, 'photo', 'IMG 0755.jpeg', 'a1b2c3d4e5f6');
+  assert.equal(p, `briefs/${DRAFT_ID}/photo/a1b2c3d4e5f6-IMG-0755.jpeg`);
+  assert.deepEqual(parseBlobPathname(p), { draftId: DRAFT_ID, kind: 'photo', name: 'a1b2c3d4e5f6-IMG-0755.jpeg' });
   assert.equal(parseBlobPathname(`briefs/${DRAFT_ID}/photo/../x.jpg`), null);
   assert.equal(parseBlobPathname(`briefs/${DRAFT_ID}/exe/x.jpg`), null);
   assert.equal(parseBlobPathname(`briefs/_test/photo/x.jpg`), null);
@@ -281,7 +281,9 @@ await check('token OK: tipo y tamaño exactos, 10 min, sufijo aleatorio, sin sob
   assert.deepEqual(r.tokenOptions.allowedContentTypes, ['image/jpeg']);
   assert.equal(r.tokenOptions.maximumSizeInBytes, 2_000_000);
   assert.equal(r.tokenOptions.validUntil, now + UPLOAD_TOKEN_TTL_MS);
-  assert.equal(r.tokenOptions.addRandomSuffix, true);
+  // Sin sufijo aleatorio y sin sobrescribir: el token solo vale para la ruta
+  // reservada y un segundo PUT con él falla (revisión R1).
+  assert.equal(r.tokenOptions.addRandomSuffix, false);
   assert.equal(r.tokenOptions.allowOverwrite, false);
   assert.ok(!r.tokenPayload.includes(SECRET), 'el secreto no viaja al webhook');
   assert.equal(JSON.parse(r.tokenPayload).kind, 'photo');
@@ -301,6 +303,28 @@ await check('token rechazado: secreto, enviado, caducado, tipo, tamaño, ruta y 
   assert.equal(code({ draft: { ...DRAFT, bytes_total: DRAFT_LIMITS.maxBytes - 1000 } }), 'quota_bytes');
   assert.equal(checkUploadRequest({ pathname: p, payload: null, draft: DRAFT }).code, 'bad_payload');
   assert.equal(parseClientPayload('no es json'), null);
+});
+await check('pathname: cada subida tiene ruta propia aunque el archivo se llame igual', () => {
+  const a = buildPathname(DRAFT_ID, 'photo', 'foto.jpg');
+  const b = buildPathname(DRAFT_ID, 'photo', 'foto.jpg');
+  assert.notEqual(a, b);
+  for (const p of [a, b]) assert.ok(parseBlobPathname(p), p);
+  // Nombre muy largo: la ruta construida sigue siendo la que el servidor acepta.
+  assert.ok(parseBlobPathname(buildPathname(DRAFT_ID, 'doc', 'x'.repeat(300) + '.pdf')));
+});
+await check('conciliación: solo rutas reservadas y dentro del cupo del borrador', () => {
+  const MB = 1024 * 1024;
+  const P = (n) => `briefs/${DRAFT_ID}/video/${n}.mp4`;
+  // Mismo token reutilizado con sufijo aleatorio (lo que R1 permitía): 50 blobs, 1 reserva.
+  const blobs = Array.from({ length: 50 }, (_, i) => ({ pathname: P(`v-${i}`), size: 200 * MB }));
+  const one = splitReconcile({ blobs, reserved: new Set([P('v-0')]) });
+  assert.deepEqual(one.keep.map((b) => b.pathname), [P('v-0')]);
+  assert.equal(one.drop.length, 49);
+  // Aunque todo estuviera reservado, nunca más de 300 MB ni de 60 archivos.
+  const all = splitReconcile({ blobs, reserved: new Set(blobs.map((b) => b.pathname)) });
+  assert.equal(all.keep.length, 1);
+  const small = Array.from({ length: 70 }, (_, i) => ({ pathname: P(`s-${String(i).padStart(2, '0')}`), size: 1000 }));
+  assert.equal(splitReconcile({ blobs: small, reserved: new Set(small.map((b) => b.pathname)) }).keep.length, DRAFT_LIMITS.maxFiles);
 });
 await check('límites por clase: logo 20 MB, foto 15, documento 25, legal 15', () => {
   assert.equal(KIND_RULES.logo.maxBytes, 20 * 1024 * 1024);

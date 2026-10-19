@@ -72,7 +72,6 @@
         {#each [0, 1, 2, 3] as g}
           {@const gy = TOP + (PLOT / 3) * g}
           <line x1="0" y1={gy} x2={CW} y2={gy} class={g === 3 ? 'rc-base' : 'rc-grid'} />
-          <text x="2" y={gy - 5} class="rc-axis">{fmtUsdShort(axisMax - (axisMax / 3) * g)}</text>
         {/each}
         {#if activeRow}
           <line x1="0" y1={barY(activeRow.total_cents)} x2={CW} y2={barY(activeRow.total_cents)} class="rc-guide" />
@@ -84,6 +83,10 @@
             fill={active ? 'url(#finBarActive)' : undefined}
             filter={active ? 'url(#finBarGlow)' : undefined} />
           <text x={barCx(i)} y={CH - 5} text-anchor="middle" class="rc-lbl" class:is-active={active}>{monthShort(a.month)}</text>
+        {/each}
+        <!-- Cifras del eje DESPUÉS de las barras: en móvil la primera barra las tapaba. -->
+        {#each [0, 1, 2, 3] as g}
+          <text x="2" y={TOP + (PLOT / 3) * g - 5} class="rc-axis">{fmtUsdShort(axisMax - (axisMax / 3) * g)}</text>
         {/each}
         {#if activeRow}
           <circle cx={barCx(activeIdx)} cy={barY(activeRow.total_cents)} r="4" class="rc-dot" />

@@ -6,13 +6,15 @@
   // también al dedo (pointer events), no solo al ratón.
   import Card from '../ui/Card.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
-  import { formatUsd, fmtUsdShort, monthShort, monthLong } from './fin.js';
+  import { formatUsd, fmtUsdShort, monthShort, monthLong, niceAxisMax } from './fin.js';
 
   // revenue: [{ month:'YYYY-MM', total_cents }] · delta: % vs el mismo tramo del mes anterior (o null)
   let { revenue = [], delta = null, prevLabel = '' } = $props();
 
   const hasRevenue = $derived(revenue.some((r) => Number(r.total_cents) > 0));
   const chartMax = $derived(Math.max(1, ...revenue.map((r) => Math.max(0, +r.total_cents || 0))));
+  // Tope redondo del eje: marcas legibles ($500, $1K, $1.5K), no tercios sueltos.
+  const axisMax = $derived(niceAxisMax(chartMax, 3));
 
   let hoverIdx = $state(-1);
   const CW = 560, CH = 200, TOP = 38, BASE = 160, PLOT = BASE - TOP;
@@ -21,7 +23,7 @@
   const barW = () => Math.min(bandW() * 0.5, BAR_MAX);
   const barCx = (i) => i * bandW() + bandW() / 2;
   const barX = (i) => barCx(i) - barW() / 2;
-  const barH = (c) => Math.max(0, (Number(c || 0) / chartMax) * PLOT);
+  const barH = (c) => Math.max(0, (Number(c || 0) / axisMax) * PLOT);
   const barY = (c) => BASE - barH(c);
 
   function onMove(e) {
@@ -70,7 +72,7 @@
         {#each [0, 1, 2, 3] as g}
           {@const gy = TOP + (PLOT / 3) * g}
           <line x1="0" y1={gy} x2={CW} y2={gy} class={g === 3 ? 'rc-base' : 'rc-grid'} />
-          <text x="2" y={gy - 5} class="rc-axis">{fmtUsdShort(chartMax - (chartMax / 3) * g)}</text>
+          <text x="2" y={gy - 5} class="rc-axis">{fmtUsdShort(axisMax - (axisMax / 3) * g)}</text>
         {/each}
         {#if activeRow}
           <line x1="0" y1={barY(activeRow.total_cents)} x2={CW} y2={barY(activeRow.total_cents)} class="rc-guide" />

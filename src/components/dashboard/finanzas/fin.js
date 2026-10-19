@@ -22,6 +22,18 @@ export function fmtUsdShort(cents) {
   return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
+/**
+ * Tope del eje Y del gráfico, en centavos, para que las marcas den cifras
+ * redondas: cada tramo es 1, 2, 2.5 o 5 × 10^n dólares (mínimo $1) y el
+ * tope = tramo × marcas, siempre ≥ maxCents. Ej.: $1,370 → $1.5K ($500/tramo).
+ */
+export function niceAxisMax(maxCents, ticks = 3) {
+  const raw = Math.max(100, Number(maxCents || 0) / ticks);
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+  return step * ticks;
+}
+
 /** Centavos → texto para un campo de monto ("1500.00"). */
 export function centsToInput(cents) {
   const n = Number(cents || 0);

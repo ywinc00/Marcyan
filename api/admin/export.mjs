@@ -1,8 +1,20 @@
 // GET /api/admin/export?status=...&search=...
-// Descarga CSV con los briefs filtrados.
+// Descarga CSV con los briefs filtrados (comportamiento de siempre).
+//
+// GET /api/admin/export?type=leads&status=...&source=...&search=...&from=YYYY-MM-DD&to=YYYY-MM-DD
+// Descarga CSV con TODOS los leads que cumplen los filtros (OP-18), no solo
+// los cargados en pantalla. Columnas: LEAD_EXPORT_COLUMNS (sin IP ni navegador).
+// from/to en hora de Houston, inclusivos.
+//
+// Ambos CSV salen de lib/csv.mjs: BOM UTF-8 (tildes en Excel) y celdas que
+// empiezan por = + - @ tab o CR neutralizadas (vienen de formularios públicos).
 import { requireAdmin } from '../../lib/auth.mjs';
 import { listBriefs, BRIEF_STATUSES } from '../../lib/db.mjs';
-import { rowsToCsv } from '../../lib/csv.mjs';
+import { rowsToCsv, sendCsv } from '../../lib/csv.mjs';
+import {
+  listLeadsForExport, LEAD_EXPORT_COLUMNS, LEAD_STATUSES, LEAD_SOURCES,
+} from '../../lib/leads.mjs';
+import { houstonDate } from '../../lib/dates.mjs';
 
 const COLUMNS = [
   'project_id', 'status', 'created_at', 'contacted_at', 'completed_at',
@@ -31,6 +43,19 @@ export default async function handler(req, res) {
 
   try {
     const q = req.query || {};
+
+    if (q.type === 'leads') {
+      const rows = await listLeadsForExport({
+        status: q.status && LEAD_STATUSES.includes(q.status) ? q.status : null,
+        source: q.source && LEAD_SOURCES.includes(q.source) ? q.source : null,
+        search: q.search ? String(q.search).slice(0, 200) : null,
+        from:   q.from ? String(q.from).slice(0, 40) : null,
+        to:     q.to   ? String(q.to).slice(0, 40)   : null,
+      });
+      const csv = rowsToCsv(rows, LEAD_EXPORT_COLUMNS);
+      return sendCsv(res, `marcyan-leads-${houstonDate()}.csv`, csv);
+    }
+
     const status = q.status && BRIEF_STATUSES.includes(q.status) ? q.status : null;
     const search = q.search ? String(q.search).slice(0, 200) : null;
 
@@ -67,11 +92,7 @@ export default async function handler(req, res) {
     }
 
     const csv = rowsToCsv(rows, COLUMNS);
-    const fname = `marcyan-briefs-${new Date().toISOString().slice(0, 10)}.csv`;
-
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${fname}"`);
-    return res.status(200).send(csv);
+    return sendCsv(res, `marcyan-briefs-${houstonDate()}.csv`, csv);
   } catch (err) {
     console.error('[admin/export] error:', err);
     return res.status(500).json({ ok: false, error: 'Error al exportar' });

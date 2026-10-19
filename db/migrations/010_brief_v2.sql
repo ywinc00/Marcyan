@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS brief_drafts (
 CREATE INDEX IF NOT EXISTS brief_drafts_expires_idx ON brief_drafts (expires_at) WHERE submitted_at IS NULL;
 CREATE INDEX IF NOT EXISTS brief_drafts_brief_idx   ON brief_drafts (brief_id);
 
--- ── 3) Archivos (Vercel Blob privado: briefs/<draftId>/<kind>/<nombre>) ──
+-- ── 3) Archivos (Vercel Blob privado: briefs/<draftId>/<kind>/<uid>-<nombre>) ──
 CREATE TABLE IF NOT EXISTS brief_files (
   id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   draft_id        UUID REFERENCES brief_drafts(id) ON DELETE SET NULL,

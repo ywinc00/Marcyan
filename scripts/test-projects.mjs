@@ -192,6 +192,31 @@ await check('POST: con cliente elegido usa ese cliente y fecha de inicio de Hous
   assert.equal(inserted[1], '7', 'client_id');
   assert.match(inserted[6], /^\d{4}-\d{2}-\d{2}$/, 'started_at como día');
 });
+await check('POST: creado como completado lleva inicio y entrega (A5-R3)', async () => {
+  let inserted;
+  db([
+    [/SELECT id FROM clients WHERE id/, [{ id: '7' }]],
+    [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
+    [/seed_default_milestones/, [{}]],
+    ...BASE,
+  ]);
+  const r = await call(listHandler, { method: 'POST', body: { name: 'Sitio', clientId: '7', status: 'completed' } });
+  assert.equal(r.status, 201);
+  assert.match(inserted[6], /^\d{4}-\d{2}-\d{2}$/, 'started_at');
+  assert.equal(inserted[7], inserted[6], 'completed_at = mismo día');
+});
+await check('POST: en pausa no lleva fechas', async () => {
+  let inserted;
+  db([
+    [/SELECT id FROM clients WHERE id/, [{ id: '7' }]],
+    [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
+    [/seed_default_milestones/, [{}]],
+    ...BASE,
+  ]);
+  await call(listHandler, { method: 'POST', body: { name: 'Sitio', clientId: '7', status: 'on_hold' } });
+  assert.equal(inserted[6], null);
+  assert.equal(inserted[7], null);
+});
 
 // ── Ficha ────────────────────────────────────────────────────────
 await check('GET ficha por código PRJ (enlace profundo)', async () => {

@@ -16,10 +16,11 @@ import { fileURLToPath } from 'node:url';
 
 import {
   validateClientInput, normalizeEmail, phoneKey, buildClientFilter, clientDisplayName,
-  deleteConfirmationMatches, CrmError, DUPLICATE_SQL,
+  deleteConfirmationMatches, CrmError, DUPLICATE_SQL, MIGRATION_011_MSG,
 } from '../lib/finance.mjs';
 import {
   convertLead, leadToClientData, leadToBriefColumns, packFacet, buildLeadFilter,
+  safeHttpUrl, statusChangeError,
 } from '../lib/leads.mjs';
 import {
   leadFiltersFromQuery, leadQueryPatch, leadApiParams, leadFilterPhrase,
@@ -339,6 +340,65 @@ await check('textos: copy sin em-dash ni voseo en crm.js', () => {
   const src = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/crm.js'), 'utf8');
   const strings = src.match(/'[^'\n]*'|`[^`\n]*`/g) || [];
   for (const s of strings) assert.ok(!/—/.test(s), 'em-dash en ' + s);
+});
+
+// ── Revisión adversarial (A2-R1…R8) ─────────────────────────────
+await check('R1/R2: el evento del brief dice si el cliente es nuevo o ya existía', async () => {
+  const nuevo = fakeDb();
+  await convertLead('LEAD-031', { client: { mode: 'new' }, brief: true }, { connect: async () => nuevo });
+  const e1 = JSON.parse(nuevo.calls.find((c) => /'converted_to_client'/.test(c.t) && /brief_events/.test(c.t)).params[2]);
+  assert.equal(e1.created, true);
+  assert.equal(e1.client_code, 'CLI-009');
+  const exist = fakeDb({ existing: { id: '5', client_code: 'CLI-005', business_name: 'Bufete', status: 'active', source_brief_id: 'MRC-001' } });
+  await convertLead('LEAD-031', { client: { mode: 'existing', id: '5' }, brief: true }, { connect: async () => exist });
+  const e2 = JSON.parse(exist.calls.find((c) => /'converted_to_client'/.test(c.t) && /brief_events/.test(c.t)).params[2]);
+  assert.equal(e2.created, false);
+  assert.equal(e2.business_name, 'Bufete');
+});
+await check('R1: brief → cliente reconoce el vínculo a un cliente que ya existía y la ficha lo muestra', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'lib/finance.mjs'), 'utf8');
+  const conv = src.slice(src.indexOf('export async function convertBriefToClient'), src.indexOf('export async function createClientFromBrief'));
+  assert.match(conv, /event_type = 'converted_to_client'/);
+  assert.ok(conv.indexOf("'converted_to_client'") < conv.indexOf('createClient('), 'busca el vínculo antes de crear');
+  const rel = src.slice(src.indexOf('export async function getClientRelated'));
+  assert.match(rel, /DISTINCT ON \(project_id\)/);
+});
+await check('R3: solo se guardan URLs de origen http(s)', () => {
+  assert.equal(safeHttpUrl('https://marcyan.com/es/'), 'https://marcyan.com/es/');
+  assert.equal(safeHttpUrl(' http://x.example/a '), 'http://x.example/a');
+  assert.equal(safeHttpUrl('javascript:alert(1)'), null);
+  assert.equal(safeHttpUrl('JavaScript:alert(1)'), null);
+  assert.equal(safeHttpUrl('data:text/html,hola'), null);
+  assert.equal(safeHttpUrl('/es/contacto'), null);
+  assert.equal(safeHttpUrl(''), null);
+  assert.equal(safeHttpUrl(null), null);
+  const ficha = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/LeadDetail.svelte'), 'utf8');
+  assert.match(ficha, /\/\^https\?:\\\/\\\/\/i\.test\(lead\.page_url\)/, 'la ficha solo enlaza http(s)');
+});
+await check('R4: el borrado definitivo manda la confirmación en el cuerpo, no en la URL', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/ClientDetail.svelte'), 'utf8');
+  assert.ok(!/\?confirm=/.test(src));
+  assert.match(src, /method: 'DELETE', body: \{ confirm:/);
+});
+await check('R6: "Convertido" sin cliente ni brief se rechaza con la migración aplicada', () => {
+  const base = { status: 'new', converted_client_id: null, converted_brief_id: null };
+  const e = statusChangeError(base, 'converted');
+  assert.ok(e instanceof CrmError && e.status === 409 && e.extra.reason === 'use_convert');
+  assert.equal(statusChangeError({ ...base, converted_client_id: 3 }, 'converted'), null, 'con cliente sí');
+  assert.equal(statusChangeError({ ...base, converted_brief_id: 'MRC-020' }, 'converted'), null, 'con brief sí');
+  assert.equal(statusChangeError({ status: 'new' }, 'converted'), null, 'sin la migración, como antes');
+  assert.equal(statusChangeError({ ...base, status: 'converted' }, 'converted'), null, 'ya convertido de antes');
+  assert.equal(statusChangeError(base, 'contacted'), null);
+});
+await check('R7: la búsqueda de leads mira también el interés', () => {
+  const f = buildLeadFilter({ search: 'brincolines' });
+  assert.match(f.text, /interest ILIKE \$1/);
+  assert.deepEqual(f.params, ['%brincolines%']);
+});
+await check('R8: aviso sin migración sin siglas ni "quien mantiene el panel"', () => {
+  assert.ok(!/\(CRM\)|mantiene el panel/.test(MIGRATION_011_MSG));
+  const lista = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/LeadsSection.svelte'), 'utf8');
+  assert.ok(!/lead\.email \|\| lead\.ref_id\}/.test(lista), 'el monograma no sale del código del lead');
 });
 
 // ── Migración 011 ──────────────────────────────────────────────

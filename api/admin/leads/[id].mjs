@@ -6,6 +6,9 @@
 //            · client_matches: clientes con el mismo correo o teléfono
 //   PATCH  → { status?, notes? } (las notas necesitan la migración 011)
 //            Respuesta: { lead } (compatible con el PATCH de antes)
+//            409 { reason: 'use_convert' } si se pide 'converted' para un lead
+//            sin cliente ni brief y la migración 011 está aplicada: eso se
+//            hace con POST /api/admin/leads/:id/convert.
 //   DELETE → elimina el lead (su historial se va con él; el cliente y el
 //            brief creados a partir de él se conservan)
 import { requireAdmin } from '../../../lib/auth.mjs';

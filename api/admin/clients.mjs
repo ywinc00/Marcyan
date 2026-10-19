@@ -15,6 +15,10 @@
 //   POST { from_brief: 'MRC-XXX' }  (sin distinguir mayúsculas)
 //        → 201 { client, created: true } o 200 { client, created: false } si ya
 //          existía un cliente de ese brief (CRM-04). 404 si el brief no existe.
+//          "Ya existía" incluye el brief vinculado a un cliente anterior desde
+//          la ficha del brief (evento converted_to_client). Vincular un brief a
+//          un cliente que ya existe NO se hace aquí: es POST /api/admin/briefs/:id
+//          { action: 'convert_to_client', client_id } (A3), para no tener dos caminos.
 //   POST { from_lead: 'LEAD-XXX', ...datos corregidos?, allow_duplicate? }
 //        → atajo de POST /api/admin/leads/:id/convert con { client: { mode: 'new' } }.
 // Protegido con requireAdmin.

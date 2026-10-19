@@ -227,7 +227,8 @@ await check('correos: enlazan a Orbit, nunca al panel viejo /admin', () => {
   assert.match(orbitLink('lead', 'LEAD-012'), /\/dashboard#\/leads\/LEAD-012$/);
   assert.match(orbitLink('avisos'), /\/dashboard#\/avisos$/);
   const src = fs.readFileSync(new URL('../lib/email.mjs', import.meta.url), 'utf8');
-  assert.ok(!/\/admin\/briefs/.test(src), 'lib/email.mjs aún enlaza a /admin/briefs');
+  // /api/admin/briefs/... (endpoints) sí puede aparecer; lo prohibido es el panel viejo /admin/briefs.
+  assert.ok(!/(?<!\/api)\/admin\/briefs/.test(src), 'lib/email.mjs aún enlaza a /admin/briefs');
 });
 
 await check('vercel: /admin/briefs/detail?id= conserva el brief y va antes de la regla genérica', () => {

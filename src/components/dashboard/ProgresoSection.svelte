@@ -2,12 +2,14 @@
   import { onMount } from 'svelte';
   import KpiArt from './KpiArt.svelte';
 
-  // ── Helpers (autosuficiente, igual que BriefsSection) ────────
-  async function api(url, opts = {}) {
-    return fetch(url, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
-  }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
-  function fmtDateTime(d) { return d ? new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
+  import { api } from './lib/api.js';
+  import { toastError } from './lib/toast.svelte.js';
+  import { fmtDay, fmtDateTime } from './lib/dates.js';
+  import PageHeader from './ui/PageHeader.svelte';
+
+  // ── Helpers ──────────────────────────────────────────────────
+  // HTTP y fechas vienen de lib/ (A0). started_at, completed_at y el
+  // vencimiento de los hitos son columnas DATE → fmtDay (sin desfase, OP-06).
   function fmtMoney(cents) {
     if (cents == null || cents === '') return '—';
     const n = Number(cents);
@@ -104,9 +106,7 @@
     if (search) p.set('search', search);
     p.set('limit', LIMIT); p.set('offset', offset);
     try {
-      const r = await api('/api/admin/projects?' + p.toString());
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/projects?' + p.toString());
       rows = j.rows || []; total = j.total || 0;
     } catch (e) { error = e.message || 'Error al cargar'; }
     finally { loading = false; }
@@ -125,11 +125,9 @@
     detailLoading = true; selected = null; milestones = []; progress = null;
     saveMsg = ''; newMsLabel = ''; hoverStep = -1;
     try {
-      const r = await api('/api/admin/projects/' + encodeURIComponent(id));
-      const j = await r.json();
-      if (j.ok) { selected = j.project; milestones = j.milestones || []; progress = j.progress; statusSel = j.project.status; }
-      else error = j.error || 'No encontrado';
-    } catch (_) {}
+      const j = await api('/api/admin/projects/' + encodeURIComponent(id));
+      selected = j.project; milestones = j.milestones || []; progress = j.progress; statusSel = j.project.status;
+    } catch (e) { toastError(e, 'No se pudo abrir el proyecto.'); }
     finally { detailLoading = false; }
   }
   function closeProject() { selected = null; loadList(); }
@@ -140,10 +138,8 @@
     if (statusSel === selected.status) { saveOk = false; saveMsg = 'Sin cambios'; return; }
     saveMsg = 'Guardando…'; saveOk = false;
     try {
-      const r = await api('/api/admin/projects/' + encodeURIComponent(selected.id),
+      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id),
         { method: 'PATCH', body: JSON.stringify({ status: statusSel }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       selected = j.project; progress = j.progress; saveOk = true; saveMsg = '✓ Guardado';
     } catch (e) { saveOk = false; saveMsg = e.message || 'Error al guardar'; }
   }
@@ -159,13 +155,12 @@
     const prev = ms.status;
     ms.status = status; milestones = [...milestones];
     try {
-      const r = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
+      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
         { method: 'PATCH', body: JSON.stringify({ milestoneId: ms.id, status }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       milestones = j.milestones || milestones; progress = j.progress;
-    } catch (_) {
+    } catch (e) {
       ms.status = prev; milestones = [...milestones];
+      toastError(e, 'No se pudo cambiar el hito.');
     }
   }
   function cycleMilestone(ms) { setMilestoneStatus(ms, nextMsStatus(ms.status)); }
@@ -176,13 +171,11 @@
     if (!label) return;
     addingMs = true;
     try {
-      const r = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
+      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id) + '/milestones',
         { method: 'POST', body: JSON.stringify({ label }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       if (j.milestone) milestones = [...milestones, j.milestone];
       progress = j.progress; newMsLabel = '';
-    } catch (_) {}
+    } catch (e) { toastError(e, 'No se pudo añadir el hito.'); }
     finally { addingMs = false; }
   }
 
@@ -192,9 +185,7 @@
     if (!selected) return;
     deleting = true;
     try {
-      const r = await api('/api/admin/projects/' + encodeURIComponent(selected.id), { method: 'DELETE' });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/projects/' + encodeURIComponent(selected.id), { method: 'DELETE' });
       showDelete = false; selected = null;
       loadList();
     } catch (e) { saveOk = false; saveMsg = e.message || 'Error al eliminar'; showDelete = false; }
@@ -209,7 +200,7 @@
     const amountCents = nf.amount !== '' && nf.amount != null
       ? Math.round(Number(nf.amount) * 100) : null;
     try {
-      const r = await api('/api/admin/projects', {
+      const j = await api('/api/admin/projects', {
         method: 'POST',
         body: JSON.stringify({
           name: nf.name.trim(),
@@ -219,8 +210,6 @@
           status: nf.status,
         }),
       });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       showNew = false;
       loadList();
       if (j.project) openProject(j.project.id);
@@ -233,10 +222,11 @@
 
 {#if !selected}
   <!-- ═══ LISTA ═══ -->
-  <div class="sec-head">
-    <h1 class="greet">Progreso por proyecto</h1>
-    <button class="b b--primary" onclick={openNew}>+ Nuevo proyecto</button>
-  </div>
+  <PageHeader title="Progreso por proyecto">
+    {#snippet actions()}
+      <button class="b b--primary" onclick={openNew}>Nuevo proyecto</button>
+    {/snippet}
+  </PageHeader>
 
   {#if rows.length}
     <!-- Strip de KPI estilo Orbit "stats": 4 columnas iguales, label arriba,
@@ -392,8 +382,8 @@
               <span>{selected.client_name || 'Sin cliente'}</span>
               {#if selected.brief_project_id}<span>· Brief {selected.brief_project_id}</span>{/if}
               {#if selected.service_type}<span>· {selected.service_type}</span>{/if}
-              {#if selected.started_at}<span>· Inicio {fmtDate(selected.started_at)}</span>{/if}
-              {#if selected.completed_at}<span>· Fin {fmtDate(selected.completed_at)}</span>{/if}
+              {#if selected.started_at}<span>· Inicio {fmtDay(selected.started_at)}</span>{/if}
+              {#if selected.completed_at}<span>· Fin {fmtDay(selected.completed_at)}</span>{/if}
             </div>
           </div>
         </div>
@@ -469,7 +459,7 @@
                   {#if ms.status === 'done'}✓{:else if ms.status === 'in_progress'}●{:else}○{/if}
                 </button>
                 <span class="ms__label">{ms.label}</span>
-                {#if ms.due_date}<span class="ms__due mono">vence {fmtDate(ms.due_date)}</span>{/if}
+                {#if ms.due_date}<span class="ms__due mono">vence {fmtDay(ms.due_date)}</span>{/if}
                 <span class="ms__pill ms__pill--{ms.status}">{mStatusLabel(ms.status)}</span>
                 <select class="ms__sel" value={ms.status} onchange={(e) => setMilestoneStatus(ms, e.currentTarget.value)} aria-label="Estado del hito">
                   {#each M_STATUSES as s}<option value={s.id}>{s.label}</option>{/each}
@@ -565,8 +555,6 @@
 {/if}
 
 <style>
-  .sec-head { display: flex; align-items: center; justify-content: space-between; }
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
   /* KPI cards (resumen de la lista) — tratamiento Orbit "stats" 1:1:
      4 columnas iguales (gap 14px), label arriba, número grande + KpiArt

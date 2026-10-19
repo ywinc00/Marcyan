@@ -11,7 +11,8 @@
     "astro": "astro",
     "check:kb": "node scripts/verify-chat-kb.mjs",
     "test:chat": "node scripts/test-chat-guard.mjs",
-    "test:diag": "node scripts/test-diagnostic.mjs"
+    "test:diag": "node scripts/test-diagnostic.mjs",
+    "test:dash": "node scripts/test-dashboard-lib.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

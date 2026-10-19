@@ -27,13 +27,26 @@ const { title = 'Marcyan · Panel' } = Astro.props;
     <link rel="manifest" href="/dashboard/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/dashboard/icon.svg" />
     {import.meta.env.DEV && <script is:inline src="/dev/dash-mock.js"></script>}
-    <script is:inline>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/dashboard/sw.js', { scope: '/dashboard' }).catch(function () {});
-        });
-      }
-    </script>
+    {/* Service worker SOLO en producción (SH-16): en desarrollo cacheaba los
+        módulos de Vite y se veía código viejo. En dev, además, se da de baja
+        cualquier registro que quedara de antes. */}
+    {import.meta.env.DEV ? (
+      <script is:inline>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+        }
+      </script>
+    ) : (
+      <script is:inline>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/dashboard/sw.js', { scope: '/dashboard' }).catch(function (e) {
+              console.warn('[panel] no se pudo registrar el service worker', e);
+            });
+          });
+        }
+      </script>
+    )}
   </head>
   <body>
     <slot />

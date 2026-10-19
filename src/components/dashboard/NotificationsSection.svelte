@@ -2,47 +2,15 @@
   import { onMount } from 'svelte';
   import KpiArt from './KpiArt.svelte';
 
-  // ── Helpers (autosuficiente, igual que BriefsSection) ─────────
-  // api() con timeout vía AbortController: si una Function se cuelga
-  // (cold-start lento, deploy a medias), abortamos a los ~12s para que
-  // la UI muestre el estado de error en vez de un "Cargando…" infinito.
-  async function api(url, opts = {}) {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12000);
-    try {
-      return await fetch(url, {
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        signal: ctrl.signal,
-        ...opts,
-      });
-    } finally {
-      clearTimeout(t);
-    }
-  }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
-  function fmtDateTime(d) { return d ? new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''; }
-  function rel(d) {
-    if (!d) return '';
-    const diff = (Date.now() - new Date(d).getTime()) / 1000;
-    if (diff < 60) return 'ahora';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h';
-    if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
-    return fmtDate(d);
-  }
+  import { api } from './lib/api.js';
+  import { fmtDateTime, rel } from './lib/dates.js';
+  import PageHeader from './ui/PageHeader.svelte';
+  import Icon from './ui/Icon.svelte';
 
-  // Traduce fallos de red/timeout (AbortError, TypeError "Failed to fetch")
-  // a un mensaje en español accionable. Cualquier otro error conserva su texto.
-  function friendlyError(e) {
-    if (e && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
-      return 'La conexión tardó demasiado. Pulsa Actualizar para reintentar.';
-    }
-    if (e instanceof TypeError) {
-      return 'No se pudo conectar. Revisa tu conexión y pulsa Actualizar.';
-    }
-    return (e && e.message) || 'Error al cargar';
-  }
+  // ── Helpers ──────────────────────────────────────────────────
+  // HTTP (timeout de 15 s, errores en español legibles, sesión caducada) y
+  // fechas en hora de Houston vienen de lib/ (A0).
+  function friendlyError(e) { return (e && e.message) || 'No se pudieron cargar los avisos.'; }
 
   // type → etiqueta + clase de color. El glifo se dibuja como un pequeño
   // objeto SVG en capas (depth + glow) por tipo, no como un icono plano.
@@ -78,9 +46,7 @@
     p.set('limit', LIMIT);
     if (onlyUnread) p.set('unreadOnly', 'true');
     try {
-      const r = await api('/api/admin/notifications?' + p.toString());
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/notifications?' + p.toString());
       rows = j.rows || [];
       unread = j.unread || 0;
     } catch (e) { error = friendlyError(e); }
@@ -93,9 +59,7 @@
   async function markOne(n) {
     if (n.read_at) return;
     try {
-      const r = await api('/api/admin/notifications/' + encodeURIComponent(n.id), { method: 'PATCH' });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/notifications/' + encodeURIComponent(n.id), { method: 'PATCH' });
       rows = rows.map((x) => (x.id === n.id ? j.notification : x));
       unread = j.unread ?? Math.max(0, unread - 1);
       if (onlyUnread) rows = rows.filter((x) => !x.read_at);
@@ -106,9 +70,7 @@
     if (busyAll || unread === 0) return;
     busyAll = true;
     try {
-      const r = await api('/api/admin/notifications', { method: 'PATCH' });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/notifications', { method: 'PATCH' });
       unread = j.unread ?? 0;
       await load();
     } catch (e) { error = friendlyError(e); }
@@ -118,15 +80,15 @@
   onMount(load);
 </script>
 
-<div class="sec-head">
-  <h1 class="greet">Avisos {#if unread}<span class="hcount">{unread}</span>{/if}</h1>
-  <span class="head-act">
-    <button class="b b--ghost" onclick={load}>↻ Actualizar</button>
+<PageHeader title="Avisos">
+  {#snippet badge()}{#if unread}<span class="hcount">{unread}</span>{/if}{/snippet}
+  {#snippet actions()}
+    <button class="b b--ghost" onclick={load}><Icon name="refresh" size={16} />Actualizar</button>
     <button class="b b--primary" disabled={busyAll || unread === 0} onclick={markAll}>
-      {busyAll ? 'Marcando…' : '✓ Marcar todas'}
+      <Icon name="check" size={16} />{busyAll ? 'Marcando…' : 'Marcar todas'}
     </button>
-  </span>
-</div>
+  {/snippet}
+</PageHeader>
 
 <!-- Strip superior denso: KPI de no-leídos (con ilustración esquinera) +
      desglose por tipo, en una fila de 4 tarjetas estilo Orbit "stats".
@@ -184,7 +146,7 @@
 {#if error}
   <div class="empty empty--err" role="alert">
     <p class="empty__msg">{error}</p>
-    <button class="b b--primary" onclick={load}>↻ Actualizar</button>
+    <button class="b b--primary" onclick={load}><Icon name="refresh" size={16} />Reintentar</button>
   </div>
 {:else if loading}
   <div class="empty"><span class="spin" aria-hidden="true"></span>Cargando…</div>
@@ -232,13 +194,9 @@
 {/if}
 
 <style>
-  .sec-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-  /* Título estilo Orbit ".hello": 28px peso 700 tracking -0.025em, márgenes apretados. */
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: 28px; letter-spacing: -0.025em; margin: 4px 0 12px; display: inline-flex; align-items: center; gap: 10px; }
   /* Pill Orbit: el conteo de no-leídos junto al título usa el acento (naranja)
      para llamar la atención, igual que el borde de las tarjetas no leídas. */
   .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: 2px 9px; }
-  .head-act { display: inline-flex; gap: 6px; }
 
   /* ── Strip superior: 4 KPI cards (Orbit "stats", proporciones exactas) ──
      Orbit: padding 16 16 14, radio 14, hairline; label 13px peso 500

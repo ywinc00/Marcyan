@@ -3,11 +3,16 @@
   import BrandLogo from './BrandLogo.svelte';
   import KpiArt from './KpiArt.svelte';
 
+  import { api } from './lib/api.js';
+  import { toastError } from './lib/toast.svelte.js';
+  import { fmtDay, todayISO } from './lib/dates.js';
+  import PageHeader from './ui/PageHeader.svelte';
+  import Icon from './ui/Icon.svelte';
+
   // ── Helpers ──────────────────────────────────────────────────
-  async function api(url, opts = {}) {
-    return fetch(url, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
-  }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; }
+  // HTTP y fechas vienen de lib/ (A0). Todas las fechas de Finanzas son
+  // columnas DATE (vence, gasto, próximo cargo): se pintan con fmtDay, sin
+  // desfase de zona; "hoy" es el día de Houston (FIN-03, MOCK-11).
   // Centavos (BIGINT) → USD para mostrar. Toda la matemática de dinero
   // vive en centavos; aquí SOLO formateamos.
   function fmtUsd(cents) {
@@ -32,7 +37,6 @@
     if (!Number.isFinite(n) || n < 0) return 0;
     return Math.min(Math.round(n * 100), MAX_CENTS);
   }
-  const todayISO = () => new Date().toISOString().slice(0, 10);
 
   const MONTH_LABELS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
   function monthLabel(m) { return MONTH_LABELS[parseInt(m.slice(5, 7), 10) - 1] || m; }
@@ -175,10 +179,12 @@
 
   // ── Carga ────────────────────────────────────────────────────
   async function loadSummary() {
-    try { const r = await api('/api/admin/finance/summary'); const j = await r.json(); if (j.ok) summary = j.summary; } catch (_) {}
+    try { const j = await api('/api/admin/finance/summary'); summary = j.summary; }
+    catch (e) { toastError(e, 'No se pudo cargar el resumen de Finanzas.'); }
   }
   async function loadClients() {
-    try { const r = await api('/api/admin/clients?limit=200'); const j = await r.json(); if (j.ok) clients = j.rows || []; } catch (_) {}
+    try { const j = await api('/api/admin/clients?limit=200'); clients = j.rows || []; }
+    catch (e) { toastError(e, 'No se pudo cargar la lista de clientes.'); }
   }
   async function loadInvoices() {
     loading = true; error = '';
@@ -187,18 +193,18 @@
     if (invSearch) p.set('search', invSearch);
     p.set('limit', LIMIT); p.set('offset', invOffset);
     try {
-      const r = await api('/api/admin/invoices?' + p.toString());
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/invoices?' + p.toString());
       invoices = j.rows || []; invTotal = j.total || 0;
     } catch (e) { error = e.message || 'Error al cargar'; }
     finally { loading = false; }
   }
   async function loadExpenses() {
-    try { const r = await api('/api/admin/expenses?limit=100'); const j = await r.json(); if (j.ok) expenses = j.rows || []; } catch (_) {}
+    try { const j = await api('/api/admin/expenses?limit=100'); expenses = j.rows || []; }
+    catch (e) { toastError(e, 'No se pudieron cargar los gastos.'); }
   }
   async function loadSubs() {
-    try { const r = await api('/api/admin/subscriptions'); const j = await r.json(); if (j.ok) subs = j.rows || []; } catch (_) {}
+    try { const j = await api('/api/admin/subscriptions'); subs = j.rows || []; }
+    catch (e) { toastError(e, 'No se pudieron cargar las suscripciones.'); }
   }
   function setInvFilter(s) { invFilter = s; invOffset = 0; loadInvoices(); }
   function onSearchInput(e) {
@@ -218,9 +224,7 @@
     }
     cliFormMsg = 'Guardando…'; cliFormOk = false;
     try {
-      const r = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ ...cliForm }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ ...cliForm }) });
       cliFormOk = true; cliFormMsg = `${j.client.client_code} creado`;
       cliForm = { business_name: '', owner_name: '', email: '', phone: '', city_state: '', notes: '' };
       await loadClients();
@@ -234,9 +238,7 @@
     if (!pid) { convOk = false; convMsg = 'Escribe un ID de brief (MRC-XXX)'; return; }
     convMsg = 'Convirtiendo…'; convOk = false;
     try {
-      const r = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ from_brief: pid }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
+      const j = await api('/api/admin/clients', { method: 'POST', body: JSON.stringify({ from_brief: pid }) });
       convOk = true; convMsg = `${j.client.client_code} — ${j.client.business_name || 'cliente'}`;
       convBrief = '';
       await loadClients();
@@ -251,7 +253,7 @@
     if (cents < 0) { invFormOk = false; invFormMsg = 'Monto inválido'; return; }
     invFormMsg = 'Guardando…'; invFormOk = false;
     try {
-      const r = await api('/api/admin/invoices', { method: 'POST', body: JSON.stringify({
+      const j = await api('/api/admin/invoices', { method: 'POST', body: JSON.stringify({
         client_id: parseInt(invForm.client_id, 10),
         amount_cents: cents,
         description: invForm.description || null,
@@ -259,8 +261,6 @@
         due_date: invForm.due_date || null,
         status: invForm.status,
       }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       invFormOk = true; invFormMsg = `${j.invoice.invoice_number} creada`;
       invForm = { client_id: '', amount: '', description: '', issued_at: todayISO(), due_date: '', status: 'sent' };
       invOffset = 0;
@@ -274,11 +274,9 @@
     const prev = inv.status;
     inv.status = status; invoices = [...invoices];
     try {
-      const r = await api('/api/admin/invoices/' + inv.id, { method: 'PATCH', body: JSON.stringify({ status }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error();
+      const j = await api('/api/admin/invoices/' + inv.id, { method: 'PATCH', body: JSON.stringify({ status }) });
       await loadInvoices(); await loadSummary();
-    } catch (_) { inv.status = prev; invoices = [...invoices]; }
+    } catch (e) { inv.status = prev; invoices = [...invoices]; toastError(e, 'No se pudo cambiar el estado de la factura.'); }
   }
 
   // ── Registrar pago ───────────────────────────────────────────
@@ -294,15 +292,13 @@
     if (cents <= 0) { payOk = false; payMsg = 'El monto debe ser mayor a 0'; return; }
     paying = true; payMsg = 'Registrando…'; payOk = false;
     try {
-      const r = await api('/api/admin/payments', { method: 'POST', body: JSON.stringify({
+      const j = await api('/api/admin/payments', { method: 'POST', body: JSON.stringify({
         invoice_id: payInvoice.id,
         amount_cents: cents,
         method: payForm.method,
         paid_at: payForm.paid_at || null,
         reference: payForm.reference || null,
       }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       payOk = true; payMsg = 'Pago registrado';
       await loadInvoices(); await loadSummary();
       setTimeout(() => { payInvoice = null; payMsg = ''; }, 900);
@@ -318,15 +314,13 @@
     if (cents <= 0) { expOk = false; expMsg = 'El monto debe ser mayor a 0'; return; }
     expBusy = true; expMsg = 'Guardando…'; expOk = false;
     try {
-      const r = await api('/api/admin/expenses', { method: 'POST', body: JSON.stringify({
+      const j = await api('/api/admin/expenses', { method: 'POST', body: JSON.stringify({
         label,
         category: expForm.category || null,
         amount_cents: cents,
         spent_at: expForm.spent_at || null,
         vendor: expForm.vendor || null,
       }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       expOk = true; expMsg = 'Gasto añadido';
       expForm = { label: '', category: '', amount: '', spent_at: todayISO(), vendor: '' };
       await loadExpenses(); await loadSummary();
@@ -338,11 +332,9 @@
     const prev = expenses;
     expenses = expenses.filter((e) => e.id !== exp.id);
     try {
-      const r = await api('/api/admin/expenses/' + exp.id, { method: 'DELETE' });
-      const j = await r.json();
-      if (!j.ok) throw new Error();
+      const j = await api('/api/admin/expenses/' + exp.id, { method: 'DELETE' });
       await loadSummary();
-    } catch (_) { expenses = prev; }
+    } catch (e) { expenses = prev; toastError(e, 'No se pudo borrar el gasto.'); }
   }
 
   // ── Suscripciones ────────────────────────────────────────────
@@ -353,15 +345,13 @@
     if (cents <= 0) { subOk = false; subMsg = 'El monto debe ser mayor a 0'; return; }
     subBusy = true; subMsg = 'Guardando…'; subOk = false;
     try {
-      const r = await api('/api/admin/subscriptions', { method: 'POST', body: JSON.stringify({
+      const j = await api('/api/admin/subscriptions', { method: 'POST', body: JSON.stringify({
         name,
         category: subForm.category || null,
         amount_cents: cents,
         cycle: subForm.cycle,
         next_charge_at: subForm.next_charge_at || null,
       }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'Error');
       subOk = true; subMsg = 'Suscripción añadida';
       subForm = { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '' };
       await loadSubs(); await loadSummary();
@@ -373,31 +363,28 @@
     const prev = sub.active;
     sub.active = !sub.active; subs = [...subs];
     try {
-      const r = await api('/api/admin/subscriptions/' + sub.id, { method: 'PATCH', body: JSON.stringify({ active: sub.active }) });
-      const j = await r.json();
-      if (!j.ok) throw new Error();
+      const j = await api('/api/admin/subscriptions/' + sub.id, { method: 'PATCH', body: JSON.stringify({ active: sub.active }) });
       await loadSummary();
-    } catch (_) { sub.active = prev; subs = [...subs]; }
+    } catch (e) { sub.active = prev; subs = [...subs]; toastError(e, 'No se pudo cambiar la suscripción.'); }
   }
   async function deleteSub(sub) {
     const prev = subs;
     subs = subs.filter((s) => s.id !== sub.id);
     try {
-      const r = await api('/api/admin/subscriptions/' + sub.id, { method: 'DELETE' });
-      const j = await r.json();
-      if (!j.ok) throw new Error();
+      const j = await api('/api/admin/subscriptions/' + sub.id, { method: 'DELETE' });
       await loadSummary();
-    } catch (_) { subs = prev; }
+    } catch (e) { subs = prev; toastError(e, 'No se pudo borrar la suscripción.'); }
   }
 
   onMount(() => { refreshAll(); });
 </script>
 
 <!-- ═══ Encabezado ═══ -->
-<div class="sec-head">
-  <h1 class="greet">Finanzas</h1>
-  <button class="b b--ghost" onclick={refreshAll}>Actualizar</button>
-</div>
+<PageHeader title="Finanzas">
+  {#snippet actions()}
+    <button class="b b--ghost" onclick={refreshAll}><Icon name="refresh" size={16} />Actualizar</button>
+  {/snippet}
+</PageHeader>
 
 <!-- ═══ KPIs — tarjetas Orbit con arte 3D de esquina + delta ═══ -->
 <div class="kpis">
@@ -684,7 +671,7 @@
             </td>
             <td class="mono num">{fmtUsd(inv.amount_cents)}</td>
             <td class="mono num" class:teal={Number(inv.balance_cents) <= 0} class:gold={Number(inv.balance_cents) > 0}>{fmtUsd(inv.balance_cents)}</td>
-            <td class="mono dim">{inv.due_date ? fmtDate(inv.due_date) : '—'}</td>
+            <td class="mono dim">{inv.due_date ? fmtDay(inv.due_date) : '—'}</td>
             <td>
               <div class="pill-select pill--{inv.status}">
                 <span class="pill__dot"></span>
@@ -752,7 +739,7 @@
                 <td class="t-name">{exp.label}{#if exp.vendor}<span class="sub-meta"> · {exp.vendor}</span>{/if}</td>
                 <td>{#if exp.category}<span class="tag">{exp.category}</span>{:else}<span class="dim">—</span>{/if}</td>
                 <td class="mono num">{fmtUsd(exp.amount_cents)}</td>
-                <td class="mono dim">{fmtDate(exp.spent_at)}</td>
+                <td class="mono dim">{fmtDay(exp.spent_at)}</td>
                 <td class="t-act"><button class="icon-del" title="Eliminar gasto" aria-label="Eliminar gasto" onclick={() => deleteExpense(exp)}>×</button></td>
               </tr>
             {/each}
@@ -804,7 +791,7 @@
               <span class="sub-row__name">{sub.name}</span>
               <span class="sub-row__meta">
                 {#if sub.category}<span class="tag tag--xs">{sub.category}</span>{/if}
-                <span class="dim">próx. {sub.next_charge_at ? fmtDate(sub.next_charge_at) : '—'}</span>
+                <span class="dim">próx. {sub.next_charge_at ? fmtDay(sub.next_charge_at) : '—'}</span>
               </span>
             </div>
             <div class="sub-row__price">
@@ -852,8 +839,6 @@
 {/if}
 
 <style>
-  .sec-head { display: flex; align-items: center; justify-content: space-between; }
-  .greet { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); letter-spacing: var(--tracking-tight); margin: var(--space-5) 0 var(--space-4); }
 
   .dimtxt { color: var(--fg-subtle); }
   .up { color: var(--accent-teal); font-weight: 600; }

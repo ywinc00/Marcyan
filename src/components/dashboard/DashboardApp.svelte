@@ -261,8 +261,10 @@
 {/snippet}
 
 {#snippet navList(items)}
+  <!-- onclick cierra el menú móvil también al tocar la sección en la que ya
+       se está (sin cambio de sección el efecto de ruta no lo cerraría). -->
   {#each items as item (item.id)}
-    <a class="nav__item" class:active={section === item.id} href={href(item.id)} aria-current={section === item.id ? 'page' : undefined}>
+    <a class="nav__item" class:active={section === item.id} href={href(item.id)} aria-current={section === item.id ? 'page' : undefined} onclick={() => (menuOpen = false)}>
       <Icon name={item.id} size={18} />
       <span>{item.label}</span>
     </a>
@@ -295,7 +297,7 @@
         <span class="runrate__num">{money(monthlyRunRate)}</span>
       </div>
     {:else}
-      <p class="subs__hint">Agrega tus suscripciones en <a href={href('finanzas')}>Finanzas</a>.</p>
+      <p class="subs__hint">Agrega tus suscripciones en <a href={href('finanzas')} onclick={() => (menuOpen = false)}>Finanzas</a>.</p>
     {/if}
   </div>
 {/snippet}

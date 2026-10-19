@@ -17,12 +17,16 @@
   let saving = $state(false);
   let formError = $state('');
   let tried = $state(false);
+  // Fecha que se mostró al abrir (ya avanzada). Si no se toca, no se manda:
+  // así el día de referencia guardado (p. ej. el 31) no se pierde al editar.
+  let shownCharge = '';
   const legacyCategory = $derived(subscription && subscription.category && !EXPENSE_CATEGORIES.some((c) => c.id === subscription.category) ? subscription.category : '');
 
   $effect(() => {
     if (!open) return;
     formError = ''; tried = false;
     const s = subscription;
+    shownCharge = s ? dayISO(s.next_charge_at) : '';
     form = s
       ? { name: s.name || '', category: s.category || '', amount: centsToInput(s.amount_cents), cycle: s.cycle || 'monthly', next_charge_at: dayISO(s.next_charge_at), notes: s.notes || '', active: !!s.active }
       : { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true };
@@ -36,8 +40,9 @@
     saving = true;
     const body = {
       name: form.name.trim(), amount_cents: cents, cycle: form.cycle,
-      next_charge_at: form.next_charge_at || null, notes: form.notes.trim() || null, active: form.active,
+      notes: form.notes.trim() || null, active: form.active,
     };
+    if (!editing || form.next_charge_at !== shownCharge) body.next_charge_at = form.next_charge_at || null;
     if (!legacyCategory || form.category !== legacyCategory) body.category = form.category || null;
     try {
       const j = editing

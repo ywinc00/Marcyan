@@ -14,6 +14,7 @@ const EVENTS = new Set([
   'calculator_started', 'calculator_completed', 'tool_cta_clicked',
   'whatsapp_clicked', 'call_clicked', 'proposal_requested', 'growth_teaser_clicked',
   'lang_notice_shown', 'lang_notice_accepted', 'lang_notice_dismissed',   // aviso de idioma (plan maestro 0.3)
+  'brief_submitted',                                                       // envío del brief v2 (B1)
 ]);
 const hits = new Map();                                   // rate-limit en memoria: 60/min por IP
 

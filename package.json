@@ -15,6 +15,7 @@
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
+    "test:brief-form": "node scripts/test-brief-form.mjs",
     "gen:brief-services": "node scripts/build-brief-services.mjs"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "astro-icon": "^1.1.5",
     "fflate": "0.8.3",
     "file-type": "22.1.1",
+    "heic-to": "1.5.2",
     "resend": "^4.0.1",
     "svelte": "^5.56.3"
   },

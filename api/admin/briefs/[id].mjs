@@ -1,13 +1,14 @@
 // /api/admin/briefs/:id
 //   GET    → detalle completo del brief
 //   PATCH  → { status?, summary?, fields? } actualiza estado, resumen y/o campos editables
-//   DELETE → elimina el brief (cascade a brief_events)
+//   DELETE → elimina el brief (cascade a brief_events) y antes sus archivos en Blob
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
   getBriefByProjectId, updateBriefStatus, updateBriefSummary,
   updateBriefFields, deleteBrief,
   logEvent, BRIEF_STATUSES, BRIEF_EDITABLE_FIELDS,
 } from '../../../lib/db.mjs';
+import { deleteBriefBlobs } from '../../../lib/brief-files.mjs';
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -97,11 +98,23 @@ export default async function handler(req, res) {
     try {
       const before = await getBriefByProjectId(id);
       if (!before) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
+      // Primero los archivos del cliente en Vercel Blob (privacidad y coste):
+      // si el almacén falla, NO se borra el brief para no dejar huérfanos.
+      let filesDeleted = 0;
+      try {
+        filesDeleted = await deleteBriefBlobs(before.id);
+      } catch (err) {
+        console.error(`[admin/briefs/:id DELETE] ${id} archivos no borrados:`, err && err.message);
+        return res.status(502).json({
+          ok: false,
+          error: 'No se pudieron borrar los archivos del brief. No se borró nada; inténtalo de nuevo en un momento.',
+        });
+      }
       const ok = await deleteBrief(id);
       if (!ok) return res.status(500).json({ ok: false, error: 'No se pudo eliminar' });
       // No logEvent: el FK ON DELETE CASCADE ya limpió brief_events para este project_id.
-      console.log(`[admin/briefs/:id DELETE] ${id} eliminado por ${session.email}`);
-      return res.status(200).json({ ok: true, deleted: id });
+      console.log(`[admin/briefs/:id DELETE] ${id} eliminado por ${session.email} · archivos=${filesDeleted}`);
+      return res.status(200).json({ ok: true, deleted: id, filesDeleted });
     } catch (err) {
       console.error('[admin/briefs/:id DELETE] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al eliminar brief' });

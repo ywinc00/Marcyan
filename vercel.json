@@ -9,5 +9,14 @@
       "source": "/dashboard/sw.js",
       "headers": [{ "key": "Service-Worker-Allowed", "value": "/dashboard" }]
     }
+  ],
+  "functions": {
+    "api/brief.mjs": { "maxDuration": 60 },
+    "api/brief/upload.mjs": { "maxDuration": 30 },
+    "api/kit/*.mjs": { "maxDuration": 60 },
+    "api/cron/*.mjs": { "maxDuration": 300 }
+  },
+  "crons": [
+    { "path": "/api/cron/brief-cleanup", "schedule": "40 9 * * *" }
   ]
 }

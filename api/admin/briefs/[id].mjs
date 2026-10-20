@@ -1,14 +1,44 @@
 // /api/admin/briefs/:id
-//   GET    → detalle completo del brief
-//   PATCH  → { status?, summary?, fields? } actualiza estado, resumen y/o campos editables
+//   GET    → { brief, data, client }
+//            brief: la fila completa (como siempre).
+//            data:  valores combinados de columnas + extra + kit (briefData, la
+//                   misma lectura que el documento y el kit), con los servicios.
+//            client: { id, client_code, business_name, status } si el brief ya
+//                   es cliente (CRM-04), o null.
+//   PATCH  → { status?, summary?, fields? } actualiza estado, resumen y/o campos.
+//            fields: SOLO lo que cambió (CRM-09). Cada valor se valida con el
+//            esquema único (B-22). El historial registra campo por campo el
+//            valor anterior y el nuevo. Respuesta: { brief, data, changes }
+//            con changes.fields = las claves que de verdad cambiaron.
+//            400 { errors: { clave: mensaje } } si algún valor no vale.
+//   POST   → { action: 'convert_to_client', client_id? }
+//            Sin client_id crea el cliente con los datos del brief; con
+//            client_id lo vincula a uno que ya existe. Deja el evento
+//            'converted_to_client' en el historial del brief.
+//            Respuesta: { client, created, linked, already } (201 si se creó).
+//            409 si el brief ya es de OTRO cliente (no se cambia por aquí).
 //   DELETE → elimina el brief (cascade a brief_events) y antes sus archivos en Blob
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
-  getBriefByProjectId, updateBriefStatus, updateBriefSummary,
-  updateBriefFields, deleteBrief,
-  logEvent, BRIEF_STATUSES, BRIEF_EDITABLE_FIELDS,
+  getBriefByProjectId, updateBriefStatus, updateBriefSummary, deleteBrief,
+  logEvent, BRIEF_STATUSES, prepareBriefEdits, applyBriefEdits,
+  getBriefClient, linkBriefToClient,
 } from '../../../lib/db.mjs';
-import { deleteBriefBlobs } from '../../../lib/brief-files.mjs';
+import { createClientFromBrief } from '../../../lib/finance.mjs';
+import { deleteBriefBlobs, isMissingSchema } from '../../../lib/brief-files.mjs';
+import { briefData } from '../../../lib/kit/build.mjs';
+
+const asObj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+
+// El cliente vinculado nunca debe romper la ficha: si la consulta falla
+// (tabla de clientes sin crear en un entorno nuevo), la ficha sale sin él.
+async function safeClient(id) {
+  try { return await getBriefClient(id); }
+  catch (err) {
+    console.error('[admin/briefs/:id] cliente vinculado no disponible:', err && err.message);
+    return null;
+  }
+}
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -21,7 +51,8 @@ export default async function handler(req, res) {
     try {
       const brief = await getBriefByProjectId(id);
       if (!brief) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
-      return res.status(200).json({ ok: true, brief });
+      const client = await safeClient(id);
+      return res.status(200).json({ ok: true, brief, data: briefData(brief), client });
     } catch (err) {
       console.error('[admin/briefs/:id GET] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al obtener brief' });
@@ -33,13 +64,13 @@ export default async function handler(req, res) {
       const body = (typeof req.body === 'object' && req.body) ? req.body : {};
       const newStatus  = typeof body.status  === 'string' ? body.status.trim()  : null;
       const newSummary = typeof body.summary === 'string' ? body.summary        : null;
-      const fieldsObj  = (body.fields && typeof body.fields === 'object') ? body.fields : null;
+      const fieldsObj  = (body.fields && typeof body.fields === 'object' && !Array.isArray(body.fields)) ? body.fields : null;
 
       if (newStatus !== null && !BRIEF_STATUSES.includes(newStatus)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${BRIEF_STATUSES.join(', ')}`,
-        });
+        return res.status(400).json({ ok: false, error: 'Ese estado no existe. Elige uno de la lista.' });
+      }
+      if (newSummary !== null && newSummary.length > 10000) {
+        return res.status(400).json({ ok: false, error: 'El resumen es demasiado largo (máximo 10.000 caracteres).' });
       }
 
       const before = await getBriefByProjectId(id);
@@ -48,19 +79,33 @@ export default async function handler(req, res) {
       const changes = {};
 
       if (fieldsObj) {
-        const filtered = {};
-        for (const k of Object.keys(fieldsObj)) {
-          if (BRIEF_EDITABLE_FIELDS.includes(k)) filtered[k] = fieldsObj[k];
+        const data = briefData(before);
+        const plan = prepareBriefEdits({
+          data, extra: asObj(before.extra), kit: asObj(before.kit),
+          fields: fieldsObj, services: data.services || [],
+        });
+        if (Object.keys(plan.errors).length) {
+          return res.status(400).json({ ok: false, error: 'Revisa los campos marcados.', errors: plan.errors });
         }
-        const updatedKeys = await updateBriefFields(id, filtered);
-        if (updatedKeys.length) {
-          changes.fields = updatedKeys;
+        const keys = Object.keys(plan.changes);
+        if (keys.length) {
+          try {
+            await applyBriefEdits(id, plan.writes);
+          } catch (err) {
+            if (isMissingSchema(err)) {
+              return res.status(503).json({ ok: false, error: 'Algunos de estos campos necesitan la actualización 010 de la base de datos. Los demás se pueden guardar por separado.' });
+            }
+            throw err;
+          }
+          changes.fields = keys;
           await logEvent({
             projectId: id,
             type: 'brief_edited',
             actorEmail: session.email,
-            data: { fields: updatedKeys },
+            data: { fields: keys, changes: plan.changes },
           });
+        } else {
+          changes.fields = [];
         }
       }
 
@@ -87,10 +132,75 @@ export default async function handler(req, res) {
       }
 
       const after = await getBriefByProjectId(id);
-      return res.status(200).json({ ok: true, brief: after, changes });
+      return res.status(200).json({ ok: true, brief: after, data: briefData(after), changes });
     } catch (err) {
       console.error('[admin/briefs/:id PATCH] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al actualizar brief' });
+    }
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const body = (typeof req.body === 'object' && req.body) ? req.body : {};
+      if (body.action !== 'convert_to_client') {
+        return res.status(400).json({ ok: false, error: 'Acción no reconocida.' });
+      }
+      const brief = await getBriefByProjectId(id);
+      if (!brief) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
+
+      const current = await getBriefClient(id);
+      const wanted = body.client_id === undefined || body.client_id === null || body.client_id === ''
+        ? null : Number(body.client_id);
+      if (wanted !== null && (!Number.isInteger(wanted) || wanted <= 0)) {
+        return res.status(400).json({ ok: false, error: 'Elige un cliente de la lista.' });
+      }
+      // Ya es cliente (y no se pide otro): no se duplica, se avisa.
+      if (current && (wanted === null || Number(current.id) === wanted)) {
+        return res.status(200).json({ ok: true, client: current, created: false, linked: false, already: true });
+      }
+      // Ya es de OTRO cliente: no se cambia por aquí (la ficha seguiría
+      // mostrando el primero y el vínculo quedaría a medias). Revisión A3-04.
+      if (current) {
+        return res.status(409).json({
+          ok: false, client: current,
+          error: current.client_code
+            ? `Este brief ya está vinculado al cliente ${current.client_code}.`
+            : 'Este brief ya está vinculado a otro cliente.',
+        });
+      }
+
+      let client;
+      let created = false;
+      let linked = false;
+      if (wanted === null) {
+        client = await createClientFromBrief(id);
+        if (!client) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
+        created = true;
+      } else {
+        // El vínculo y su evento van juntos en una sola sentencia.
+        const r = await linkBriefToClient(id, wanted, session.email);
+        if (!r) return res.status(404).json({ ok: false, error: 'Ese cliente ya no existe. Búscalo de nuevo.' });
+        client = r.client;
+        linked = true;
+      }
+      const slim = {
+        id: client.id, client_code: client.client_code,
+        business_name: client.business_name, status: client.status,
+      };
+      if (created) {
+        // El cliente nuevo ya queda unido al brief por source_brief_id: si el
+        // evento fallara, la ficha lo seguiría mostrando.
+        await logEvent({
+          projectId: id,
+          type: 'converted_to_client',
+          actorEmail: session.email,
+          data: { client_id: Number(slim.id), client_code: slim.client_code, business_name: slim.business_name, created, linked },
+        });
+      }
+      return res.status(created ? 201 : 200).json({ ok: true, client: slim, created, linked, already: false });
+    } catch (err) {
+      console.error('[admin/briefs/:id POST] error:', err);
+      return res.status(500).json({ ok: false, error: 'No se pudo convertir el brief en cliente' });
     }
   }
 
@@ -121,6 +231,6 @@ export default async function handler(req, res) {
     }
   }
 
-  res.setHeader('Allow', 'GET, PATCH, DELETE');
+  res.setHeader('Allow', 'GET, PATCH, POST, DELETE');
   return res.status(405).json({ ok: false, error: 'Method not allowed' });
 }

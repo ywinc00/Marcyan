@@ -15,23 +15,38 @@ import {
   listLeadsForExport, LEAD_EXPORT_COLUMNS, LEAD_STATUSES, LEAD_SOURCES,
 } from '../../lib/leads.mjs';
 import { houstonDate } from '../../lib/dates.mjs';
+import { LEGACY_COLUMNS, labelFor } from '../../lib/brief-schema.mjs';
+import { briefData } from '../../lib/kit/build.mjs';
 
-const COLUMNS = [
-  'project_id', 'status', 'created_at', 'contacted_at', 'completed_at',
-  'business_name', 'owner_name', 'industry', 'years_in_market',
-  'business_description', 'products_services',
-  'phone', 'email', 'city_state', 'current_website',
-  'instagram', 'facebook', 'other_socials', 'google_business',
-  'website_type', 'has_domain', 'has_hosting',
-  'pages_required', 'features_required',
-  'target_audience', 'main_objective', 'visitor_action', 'competitors',
-  'has_logo', 'brand_colors', 'brand_fonts', 'brand_personality',
-  'inspiration_sites', 'design_dislikes',
-  'has_photos', 'has_copy', 'has_video', 'language',
-  'budget_range', 'timeline', 'deadline',
-  'additional_notes', 'referred_by', 'previous_agency',
-  'summary',
-];
+// Columnas del CSV de briefs derivadas del esquema único (CRM-20): mismo
+// orden de siempre (identidad, las 39 claves históricas y el resumen) y, al
+// final, lo nuevo del brief v2 para no mover columnas que alguien ya use.
+// Los valores salen con su etiqueta legible (B-08): "Bilingüe", no "biling".
+const META_COLUMNS = ['project_id', 'status', 'created_at', 'contacted_at', 'completed_at'];
+const V2_COLUMNS = ['source', 'lang', 'services', 'preferred_contact', 'kit_status'];
+const COLUMNS = [...META_COLUMNS, ...LEGACY_COLUMNS, 'summary', ...V2_COLUMNS];
+const STATUS_LABEL = {
+  pending: 'Pendiente', contacted: 'Contactado', in_progress: 'En curso',
+  completed: 'Completado', archived: 'Archivado',
+};
+const SOURCE_LABEL = { web: 'Formulario', chat: 'Chat del sitio' };
+const KIT_LABEL = { none: 'Sin enviar', sent: 'Enviado', in_progress: 'En curso', submitted: 'Recibido' };
+const LANG_LABEL = { es: 'Español', en: 'Inglés' };
+
+export function briefCsvRow(row) {
+  const data = briefData(row);
+  const out = {};
+  for (const c of COLUMNS) {
+    if (c === 'status') out[c] = STATUS_LABEL[row.status] || row.status;
+    else if (c === 'source') out[c] = SOURCE_LABEL[row.source] || row.source || null;
+    else if (c === 'lang') out[c] = LANG_LABEL[row.lang] || row.lang || null;
+    else if (c === 'kit_status') out[c] = KIT_LABEL[row.kit_status] || row.kit_status || null;
+    else if (META_COLUMNS.includes(c) || c === 'summary') out[c] = row[c];
+    else out[c] = labelFor(c, data[c], 'es');
+  }
+  return out;
+}
+
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -91,7 +106,7 @@ export default async function handler(req, res) {
       rows = r.rows;
     }
 
-    const csv = rowsToCsv(rows, COLUMNS);
+    const csv = rowsToCsv(rows.map(briefCsvRow), COLUMNS);
     return sendCsv(res, `marcyan-briefs-${houstonDate()}.csv`, csv);
   } catch (err) {
     console.error('[admin/export] error:', err);

@@ -114,3 +114,18 @@ Pendientes (fuera de esta rama): límite de intentos del login en memoria y resp
 revela si el email está autorizado cuando falla el envío (`login.mjs`, rama del brief);
 limpieza periódica de tokens y sesiones caducadas; tope absoluto de vida de la sesión;
 lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET.
+
+## Briefs ↔ clientes (A3, revisión)
+- `POST /api/admin/briefs/:id { action: 'convert_to_client', client_id? }`: 201 si crea el cliente,
+  200 si vincula (`linked`) o si ya era ese cliente (`already`), **409 si el brief ya es de OTRO
+  cliente** (no se cambia por aquí), 404 si el brief o el cliente no existen.
+- Vincular a un cliente existente (`linkBriefToClient`) escribe el `source_brief_id` (solo si el
+  cliente no tenía brief de origen) y el evento `converted_to_client` en UNA sentencia.
+- Si el cliente ya tenía otro brief de origen, el vínculo vive solo en el evento del brief: la ficha
+  del brief lo muestra (`getBriefClient`), pero la ficha del cliente de A2 lista sus briefs por
+  `source_brief_id` y `projects.brief_project_id`, así que no lo verá. Al integrar la ola 2 hay que
+  decidir si A2 lee también los eventos `converted_to_client` o si se crea un vínculo real.
+- La tarjeta Cliente de la ficha del brief enlaza a `#/clientes/<id numérico>` (el formato que lee
+  `ClientesSection` de A2 y `/api/admin/clients/:id`), no al código CLI.
+- Al fusionar con A2: su `createClientFromBrief` pasa a registrar él mismo `converted_to_client`;
+  el handler del brief también lo registra al crear. Hay que quitar uno de los dos para no duplicar.

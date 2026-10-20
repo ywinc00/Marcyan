@@ -16,7 +16,10 @@
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
     "test:inicio": "node scripts/test-inicio.mjs",
-    "gen:brief-services": "node scripts/build-brief-services.mjs"
+    "test:briefs-panel": "node scripts/test-briefs-panel.mjs",
+    "test:briefs-handlers": "node scripts/test-briefs-handlers.mjs",
+    "gen:brief-services": "node scripts/build-brief-services.mjs",
+    "test:crm": "node scripts/test-crm.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

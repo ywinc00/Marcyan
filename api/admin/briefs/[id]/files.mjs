@@ -6,15 +6,21 @@
 //            e `inline` (true solo si el panel puede mostrarlo en <img>).
 //            retention: { purgeOn, daysLeft, lastPurge } (lib/brief-retention.mjs)
 //              purgeOn   'YYYY-MM-DD' en que se borran solos (12 meses después
-//                        de terminar el proyecto) o null si no está terminado.
+//                        de terminar el proyecto y nunca antes de 7 días desde
+//                        el aviso del panel) o null si no está terminado o su
+//                        proyecto de Progreso sigue en marcha.
 //              lastPurge { at, files, reason, actor } del último borrado o null.
-//   DELETE → borra TODOS los archivos del brief a petición del cliente (blobs
-//            y filas); el brief y su historial se quedan. Deja el evento
-//            'files_purged' con el actor. { files } (0 si no quedaba ninguno).
-//            502 si el almacén falla (no se borra nada de la base).
+//   DELETE → borra TODOS los archivos enlazados al brief a petición del
+//            cliente (blobs y filas); el brief y su historial se quedan. Deja
+//            el evento 'files_purged' con el actor. { files } (0 si no
+//            quedaba ninguno). 502 si el almacén falla (no se borró nada) o
+//            si los archivos ya salieron del almacén pero la ficha no se
+//            actualizó (repetir el borrado lo termina); el texto dice cuál.
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import { getBriefByProjectId } from '../../../../lib/db.mjs';
-import { listFilesForBrief, retentionEvents, purgeBriefFiles, blobConfigured, isMissingSchema } from '../../../../lib/brief-files.mjs';
+import {
+  listFilesForBrief, retentionEvents, retentionProjects, effectiveRetention, purgeBriefFiles, blobConfigured, isMissingSchema,
+} from '../../../../lib/brief-files.mjs';
 import { purgeDate, daysUntil, lastPurge } from '../../../../lib/brief-retention.mjs';
 
 const INLINE = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -23,8 +29,8 @@ const INLINE = new Set(['image/jpeg', 'image/png', 'image/webp']);
 // la sección sale sin fecha.
 async function retentionFor(brief) {
   try {
-    const events = await retentionEvents(brief.project_id);
-    const purgeOn = purgeDate(brief, events);
+    const [events, projects] = await Promise.all([retentionEvents(brief.project_id), retentionProjects(brief.project_id)]);
+    const { purgeOn } = await effectiveRetention({ projectId: brief.project_id, policyDay: purgeDate(brief, events, projects) });
     return { purgeOn, daysLeft: purgeOn ? daysUntil(purgeOn) : null, lastPurge: lastPurge(events) };
   } catch (err) {
     console.error('[admin/briefs/:id/files] plazo no disponible:', err && err.message);
@@ -55,7 +61,10 @@ export default async function handler(req, res) {
       } catch (err) {
         if (isMissingSchema(err)) return res.status(200).json({ ok: true, files: 0 });
         console.error(`[admin/briefs/:id/files DELETE] ${id} archivos no borrados:`, err && err.message);
-        return res.status(502).json({ ok: false, error: 'No se pudieron borrar los archivos. No se borró nada; inténtalo de nuevo en un momento.' });
+        const error = err && err.phase === 'records'
+          ? 'Los archivos ya se borraron, pero la ficha no se pudo actualizar. Vuelve a pulsar Borrar archivos en un momento para terminar.'
+          : 'No se pudieron borrar los archivos. No se borró nada; inténtalo de nuevo en un momento.';
+        return res.status(502).json({ ok: false, error });
       }
       console.log(`[admin/briefs/:id/files DELETE] ${id} archivos borrados por ${session.email} · archivos=${out ? out.files : 0}`);
       return res.status(200).json({ ok: true, files: out ? out.files : 0 });

@@ -10,9 +10,11 @@
 //       con lo que mandó el navegador (enlaza lo que dejó, borra lo que quitó).
 //    3) Plazo de conservación (lib/brief-retention.mjs): los archivos de un
 //       proyecto terminado se borran a los 12 meses. 30 días antes deja un
-//       aviso en el panel (uno por brief y fecha) y, llegada la fecha, borra
-//       sus archivos y lo apunta en el historial del brief ('files_purged').
-//       Por tandas y con tope de 45 s; nunca toca un brief sin terminar.
+//       aviso en el panel (uno por brief y fecha) y, llegada la fecha y con
+//       el aviso fuera hace 7 días o más, borra sus archivos y lo apunta en
+//       el historial del brief ('files_purged'). Por tandas y con tope de
+//       45 s; nunca toca un brief sin terminar ni con su proyecto de
+//       Progreso en marcha. Si algo falla, avisa en el panel.
 //    4) Verificación de tipo real de archivos pendientes (si la del envío no
 //       terminó a tiempo).
 //    5) Ventanas viejas del límite de envíos (más de 2 días).
@@ -52,6 +54,9 @@ export default async function handler(req, res) {
   // Sin la migración 016 este paso se salta: no cuenta como fallo del cron.
   const sweep = blob ? await step('reintentos', () => sweepQueuedDrafts({ limit: 25 })) : { ok: false, error: 'almacén no configurado' };
   const retention = blob ? await step('conservación', () => runFileRetention({ limit: 25, budgetMs: 45000 })) : { ok: false, error: 'almacén no configurado' };
+  // Un brief que no se pudo avisar o borrar cuenta como fallo del paso (y ya
+  // dejó un aviso en el panel): los archivos siguen ahí más allá del plazo.
+  if (retention.failed) retention.ok = false;
   const verify = blob ? await step('verificación', () => verifyPendingFiles({ limit: 40 })) : { ok: false, error: 'almacén no configurado' };
   const hits = await step('límite de envíos', async () => ({ deleted: await purgeOldHits() }));
   const sweepOk = sweep.ok || sweep.error === 'migración 016 sin aplicar';

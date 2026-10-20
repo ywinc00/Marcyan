@@ -25,7 +25,7 @@ async function check(name, fn) {
 
 // ── Base falsa: brief_files y brief_drafts en memoria ─────────────
 const norm = (t) => String(t).replace(/\s+/g, ' ').trim();
-const db = { files: [], drafts: [], nextId: 1, briefs: [], events: [], notifications: [], candidateCalls: 0 };
+const db = { files: [], drafts: [], nextId: 1, briefs: [], events: [], notifications: [], projects: [], candidateCalls: 0, failRecords: 0 };
 const log = [];
 function run(text, p) {
   const t = norm(text);
@@ -77,7 +77,8 @@ function run(text, p) {
         for (const f of db.files) if (f.brief_id === b.id) by[f.kind] = (by[f.kind] || 0) + 1;
         const events = db.events.filter((e) => e.project_id === b.project_id && e.event_type === 'status_changed')
           .sort((x, y) => (x.created_at < y.created_at ? -1 : 1));
-        return { id: b.id, project_id: b.project_id, business_name: b.business_name, status: b.status, completed_at: b.completed_at, events, by_kind: by };
+        const projects = db.projects.filter((x) => x.brief_project_id === b.project_id).map((x) => ({ status: x.status, completed_at: x.completed_at }));
+        return { id: b.id, project_id: b.project_id, business_name: b.business_name, status: b.status, completed_at: b.completed_at, events, projects, by_kind: by };
       });
     return ok(rows);
   }
@@ -87,10 +88,20 @@ function run(text, p) {
   if (t.startsWith('SELECT id FROM brief_drafts WHERE brief_id = $1 AND (submitted_at IS NOT NULL OR expires_at <= NOW())')) {
     return ok(db.drafts.filter((d) => d.brief_id === p[0] && (d.submitted_at || (d.expires_at && d.expires_at <= Date.now()))).map((d) => ({ id: d.id })));
   }
-  if (t === 'DELETE FROM brief_files WHERE brief_id = $1 AND id::text = ANY($2) RETURNING id') {
+  // Borrado de filas + evento en UNA sentencia (RET-06): si falla, no cambia nada.
+  if (t.startsWith('WITH gone AS ( DELETE FROM brief_files WHERE brief_id = $1 AND id::text = ANY($2) RETURNING id ) INSERT INTO brief_events')) {
+    if (db.failRecords > 0) { db.failRecords--; return Promise.reject(new Error('Base caída')); }
     const gone = db.files.filter((f) => f.brief_id === p[0] && p[1].includes(String(f.id)));
     db.files = db.files.filter((f) => !gone.includes(f));
-    return ok(gone.map((f) => ({ id: f.id })));
+    db.events.push({ project_id: p[2], event_type: 'files_purged', actor_email: p[3], data: { files: gone.length, reason: p[4] }, created_at: new Date().toISOString() });
+    return ok([{ files: gone.length }]);
+  }
+  if (t === 'SELECT status, completed_at FROM projects WHERE brief_project_id = $1') {
+    return ok(db.projects.filter((x) => x.brief_project_id === p[0]).map((x) => ({ status: x.status, completed_at: x.completed_at })));
+  }
+  if (t === "SELECT MIN(created_at) AS at FROM notifications WHERE type = 'system' AND ref = $1") {
+    const at = db.notifications.filter((n) => n.type === 'system' && n.ref === p[0]).map((n) => n.at).sort((a, b) => a - b)[0];
+    return ok([{ at: at ? new Date(at).toISOString() : null }]);
   }
   if (t === 'DELETE FROM brief_files WHERE brief_id IS NULL AND draft_id::text = ANY($1)') {
     db.files = db.files.filter((f) => !(f.brief_id === null && p[0].includes(f.draft_id)));
@@ -101,7 +112,10 @@ function run(text, p) {
     return ok();
   }
   if (t.startsWith('SELECT event_type, actor_email, data, created_at FROM brief_events WHERE project_id = $1')) {
-    return ok(db.events.filter((e) => e.project_id === p[0] && ['status_changed', 'files_purged'].includes(e.event_type)));
+    const rows = db.events.filter((e) => e.project_id === p[0] && ['status_changed', 'files_purged'].includes(e.event_type))
+      .sort((x, y) => (x.created_at < y.created_at ? 1 : -1));
+    assert.ok(/ORDER BY created_at DESC LIMIT 500$/.test(t), 'lee los 500 más recientes');
+    return ok(rows.slice(0, 500));
   }
   if (t.startsWith('SELECT f.id, f.kind, f.pathname')) {
     return ok(db.files.filter((f) => f.brief_id === p[0]).map((f) => ({ ...f, purpose: 'brief', created_at: new Date().toISOString() })));
@@ -122,7 +136,27 @@ function sqlTag(strings, ...values) {
   return run(text, values);
 }
 sqlTag.query = (text, params) => run(text, params);
-mock.module('@vercel/postgres', { namedExports: { sql: sqlTag } });
+// Conexión con transacción (lib/db.mjs updateBriefStatus): registra las
+// consultas y puede fallar en el INSERT del evento.
+const tx = { log: [], failInsert: false, status: 'completed', released: 0 };
+const fakeDb = {
+  connect: async () => ({
+    query: async (text, params = []) => {
+      const t = norm(text);
+      tx.log.push(t);
+      if (t.startsWith('SELECT status FROM briefs WHERE project_id = $1 FOR UPDATE')) return { rows: [{ status: tx.status }], rowCount: 1 };
+      if (t.startsWith('UPDATE briefs SET status = $1')) return { rows: [{ status: params[0], contacted_at: null, completed_at: '2025-03-01T15:00:00Z' }], rowCount: 1 };
+      if (t.startsWith('INSERT INTO brief_events')) {
+        if (tx.failInsert) throw new Error('Base caída');
+        tx.inserted = params;
+        return { rows: [], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    },
+    release: () => { tx.released++; },
+  }),
+};
+mock.module('@vercel/postgres', { namedExports: { sql: sqlTag, db: fakeDb } });
 
 // ── Almacén falso ─────────────────────────────────────────────────
 const blob = { items: new Map(), failDel: 0, deleted: [] };
@@ -155,6 +189,7 @@ process.env.CRON_SECRET = 'secreto-de-prueba';
 
 const { reconcileDraft, queueDraftSweep, sweepQueuedDrafts, runFileRetention, purgeBriefFiles } = await import('../lib/brief-files.mjs');
 const R = await import('../lib/brief-retention.mjs');
+const { houstonDate: houstonDay } = await import('../lib/dates.mjs');
 const filesHandler = (await import('../api/admin/briefs/[id]/files.mjs')).default;
 const cronHandler = (await import('../api/cron/brief-cleanup.mjs')).default;
 
@@ -162,7 +197,7 @@ const DRAFT = '6f1c2d3e-4b5a-4c7d-8e9f-0a1b2c3d4e5f';
 const KIT = '7a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
 const P = (d, n) => `briefs/${d}/photo/${n}.jpg`;
 function reset() {
-  db.files = []; db.drafts = []; db.nextId = 1; db.briefs = []; db.events = []; db.notifications = []; db.candidateCalls = 0; SESSION = null; blob.items.clear(); blob.failDel = 0; blob.deleted = []; log.length = 0;
+  db.files = []; db.drafts = []; db.nextId = 1; db.briefs = []; db.events = []; db.notifications = []; db.projects = []; db.candidateCalls = 0; db.failRecords = 0; SESSION = null; blob.items.clear(); blob.failDel = 0; blob.deleted = []; log.length = 0;
 }
 // Reserva (como reserveUpload) y, si llegó, el blob.
 function seed(draftId, name, { uploaded = true, briefId = null } = {}) {
@@ -363,6 +398,17 @@ function seedBrief(id, status, events = [], { files = 2, kind = 'photo', complet
   }
   return pid;
 }
+// Aviso del panel ya enviado hace `daysAgo` días para cada brief sembrado
+// (el cron solo borra con un aviso de 7 días o más, RET-02).
+function noticeAll(daysAgo = 10) {
+  for (const b of db.briefs) {
+    const ev = db.events.filter((e) => e.project_id === b.project_id && e.event_type === 'status_changed');
+    const day = R.purgeDate(b, ev, db.projects.filter((x) => x.brief_project_id === b.project_id));
+    if (!day) continue;
+    const at = Date.now() - daysAgo * DAY;
+    db.notifications.push({ id: db.notifications.length + 1, type: 'system', ref: R.purgeNotice({ projectId: b.project_id, purgeOn: day }).key, title: 'aviso', at, created_at: new Date(at).toISOString() });
+  }
+}
 
 await check('cron: aviso 30 días antes, uno solo aunque el cron corra cada día', async () => {
   reset();
@@ -403,6 +449,7 @@ await check('cron: borra por tandas los briefs vencidos, deja el evento y nunca 
   seedBrief(3, 'in_progress', [SC('completed', ago(400)), SC('in_progress', ago(399), 'completed')], { files: 2 });
   seedBrief(4, 'completed', [SC('completed', ago(100))], { files: 2 });
   seedBrief(5, 'completed', [], { files: 1, completed_at: ago(370) });
+  noticeAll(10);
   const out = await runFileRetention({ limit: 2, budgetMs: 5000 });
   assert.equal(out.purged, 3);
   assert.equal(out.files, 5);
@@ -418,11 +465,16 @@ await check('cron: borra por tandas los briefs vencidos, deja el evento y nunca 
 await check('cron: si el almacén falla, no se toca la base y se reintenta al día siguiente', async () => {
   reset();
   seedBrief(1, 'completed', [SC('completed', ago(400))], { files: 2 });
+  noticeAll(10);
   blob.failDel = 1;
   const out = await quiet(() => runFileRetention({ limit: 10, budgetMs: 5000 }));
   assert.equal(out.failed, 1);
   assert.equal(db.files.length, 2, 'las filas siguen');
   assert.ok(!db.events.some((e) => e.event_type === 'files_purged'));
+  const alert = db.notifications.filter((n) => n.ref === 'files-purge-failed');
+  assert.equal(alert.length, 1, 'el fallo deja un aviso en el panel (RET-03)');
+  assert.match(alert[0].title, /No se pudo completar el borrado de archivos de 1 brief/);
+  assert.ok(!/[—–]/.test(alert[0].title + alert[0].body), 'sin guion largo');
   const again = await runFileRetention({ limit: 10, budgetMs: 5000 });
   assert.equal(again.purged, 1);
   assert.equal(db.files.length, 0);
@@ -447,6 +499,7 @@ await check('borrado del cron: re-comprueba que el brief siga terminado', async 
 await check('cron completo: el handler sigue exigiendo el secreto e incluye el paso de conservación', async () => {
   reset();
   seedBrief(1, 'completed', [SC('completed', ago(400))]);
+  noticeAll(10);
   const no = resCap();
   await cronHandler({ method: 'GET', headers: { authorization: 'Bearer otro' } }, no);
   assert.equal(no.statusCode, 401);
@@ -505,6 +558,147 @@ await check('endpoint: GET de un brief terminado trae la fecha prevista; si el a
   await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-001' }, headers: {} }, del));
   assert.equal(del.statusCode, 502);
   assert.equal(db.files.length, 2);
+});
+
+// ── Revisión adversarial (RET-01 a RET-08) ──────────────────────
+await check('RET-01: reabierto y vuelto a cerrar sin su evento, la fecha nunca sale de la PRIMERA terminación', () => {
+  const b = { status: 'completed', completed_at: '2025-03-01T15:00:00Z' };
+  const ev = [SC('completed', '2025-03-01T15:00:00Z'), SC('in_progress', '2026-09-01T15:00:00Z', 'completed')];
+  const day = R.purgeDate(b, ev);
+  assert.equal(day, '2027-09-01', 'cuenta desde el último cambio registrado, no desde 2025');
+  assert.equal(R.retentionStage(day, Date.parse('2026-10-20T15:00:00Z')), 'keep');
+  // Archivado tras reabrir, sin paso a Completado registrado: sin fecha.
+  assert.equal(R.purgeDate({ status: 'archived', completed_at: '2025-03-01T15:00:00Z' }, ev), null);
+});
+
+await check('RET-01: el cambio de estado y su evento van en la misma transacción', async () => {
+  const { updateBriefStatus } = await import('../lib/db.mjs');
+  tx.log.length = 0; tx.failInsert = false; tx.status = 'in_progress'; tx.released = 0;
+  const r = await updateBriefStatus('MRC-001', 'completed', 'equipo@marcyan.test');
+  assert.equal(r.from, 'in_progress');
+  assert.equal(tx.log[0], 'BEGIN');
+  assert.ok(tx.log.some((q) => q.startsWith('INSERT INTO brief_events')), 'deja el evento');
+  assert.equal(tx.log[tx.log.length - 1], 'COMMIT');
+  assert.deepEqual(JSON.parse(tx.inserted[2]), { from: 'in_progress', to: 'completed' });
+  assert.equal(tx.inserted[1], 'equipo@marcyan.test');
+  // Si el evento falla, se deshace el cambio de estado.
+  tx.log.length = 0; tx.failInsert = true;
+  await assert.rejects(() => updateBriefStatus('MRC-001', 'completed', 'equipo@marcyan.test'), /Base caída/);
+  assert.ok(tx.log.includes('ROLLBACK') && !tx.log.includes('COMMIT'), 'sin evento no hay cambio');
+  assert.equal(tx.released, 2, 'la conexión siempre se suelta');
+  // Mismo estado: no se inventa un evento.
+  tx.log.length = 0; tx.failInsert = false; tx.status = 'completed';
+  await updateBriefStatus('MRC-001', 'completed', 'equipo@marcyan.test');
+  assert.ok(!tx.log.some((q) => q.startsWith('INSERT INTO brief_events')));
+});
+
+await check('RET-02: sin aviso previo el cron nunca borra; avisa hoy y borra a los 7 días', async () => {
+  reset();
+  const pid = seedBrief(1, 'completed', [], { files: 2, completed_at: ago(395) }); // 13 meses, sin eventos
+  const first = await runFileRetention({ limit: 10, budgetMs: 5000 });
+  assert.equal(first.purged, 0, 'el primer día no borra');
+  assert.equal(first.notices, 1);
+  assert.equal(db.files.length, 2);
+  const n = db.notifications[0];
+  const policy = R.purgeDate(db.briefs[0], []);
+  assert.equal(n.ref, `files-purge:${pid}:${policy}`, 'la clave es la fecha de la política');
+  const shown = R.addDaysDay(houstonDay(Date.now()), 7);
+  assert.ok(n.title.includes(R.fmtLongDay(shown)), 'dice el día real del borrado');
+  assert.match(n.body, /^Ya se cumplieron 12 meses/);
+  assert.ok(!/[—–]/.test(n.title + n.body), 'sin guion largo');
+  // La ficha dice la misma fecha.
+  SESSION = { email: 'equipo@marcyan.test' };
+  const get = resCap();
+  await filesHandler({ method: 'GET', query: { id: pid }, headers: {} }, get);
+  assert.equal(get.body.retention.purgeOn, shown);
+  assert.equal(get.body.retention.daysLeft, 7);
+  const six = await runFileRetention({ limit: 10, budgetMs: 5000, now: Date.now() + 6 * DAY });
+  assert.equal(six.purged, 0, 'a los 6 días aún no');
+  assert.equal(six.notices, 0, 'no repite el aviso');
+  const seven = await runFileRetention({ limit: 10, budgetMs: 5000, now: Date.now() + 7 * DAY });
+  assert.equal(seven.purged, 1, 'a los 7 días sí');
+  assert.equal(db.files.length, 0);
+});
+
+await check('RET-02: el aviso normal (30 días antes) deja borrar el día de la política', () => {
+  const day = '2027-10-19';
+  const noticeAt = Date.parse('2027-09-19T09:40:00Z');
+  assert.equal(R.effectivePurgeDay(day, noticeAt, Date.parse('2027-10-19T09:40:00Z')), day);
+  assert.equal(R.effectivePurgeDay(day, Date.parse('2027-10-15T09:40:00Z')), '2027-10-22', 'aviso tardío: 7 días desde el aviso');
+  assert.equal(R.effectivePurgeDay(null, null), null);
+});
+
+await check('RET-03: con el almacén caído el paso del cron sale en falso y avisa', async () => {
+  reset();
+  seedBrief(1, 'completed', [SC('completed', ago(400))]);
+  noticeAll(10);
+  blob.failDel = 1;
+  const res = resCap();
+  await quiet(() => cronHandler({ method: 'GET', headers: { authorization: 'Bearer secreto-de-prueba' } }, res));
+  assert.equal(res.body.retention.failed, 1);
+  assert.equal(res.body.retention.ok, false);
+  assert.equal(res.body.ok, false);
+  assert.ok(db.notifications.some((x) => x.ref === 'files-purge-failed'));
+});
+
+await check('RET-04: con su proyecto de Progreso en marcha no hay fecha; completado, cuenta su cierre', async () => {
+  const b = { status: 'completed', completed_at: '2026-01-10T15:00:00Z' };
+  const ev = [SC('completed', '2026-01-10T15:00:00Z')];
+  assert.equal(R.purgeDate(b, ev, [{ status: 'active', completed_at: null }]), null);
+  assert.equal(R.purgeDate(b, ev, [{ status: 'on_hold', completed_at: null }]), null);
+  assert.equal(R.purgeDate(b, ev, [{ status: 'completed', completed_at: '2026-06-01T15:00:00Z' }]), '2027-06-01');
+  assert.equal(R.purgeDate(b, ev, [{ status: 'completed', completed_at: '2025-12-01T15:00:00Z' }]), '2027-01-10', 'lo último de los dos');
+  assert.equal(R.purgeDate(b, ev, [{ status: 'cancelled', completed_at: null }]), '2027-01-10');
+  assert.equal(R.purgeDate(b, ev, []), '2027-01-10');
+  // El cron no toca un brief vencido con su proyecto activo, y la ficha no da fecha.
+  reset();
+  seedBrief(1, 'completed', [SC('completed', ago(400))]);
+  db.projects.push({ brief_project_id: 'MRC-001', status: 'active', completed_at: null });
+  const out = await runFileRetention({ limit: 10, budgetMs: 5000 });
+  assert.deepEqual([out.notices, out.purged], [0, 0]);
+  assert.equal(db.files.length, 2);
+  SESSION = { email: 'equipo@marcyan.test' };
+  const get = resCap();
+  await filesHandler({ method: 'GET', query: { id: 'MRC-001' }, headers: {} }, get);
+  assert.equal(get.body.retention.purgeOn, null);
+});
+
+await check('RET-06: si falla la base tras borrar del almacén, el 502 lo dice y un segundo intento termina', async () => {
+  reset();
+  seedBrief(1, 'contacted', [], { files: 2 });
+  SESSION = { email: 'equipo@marcyan.test' };
+  db.failRecords = 1;
+  const bad = resCap();
+  await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-001' }, headers: {} }, bad));
+  assert.equal(bad.statusCode, 502);
+  assert.match(bad.body.error, /ya se borraron/);
+  assert.ok(!/No se borró nada/.test(bad.body.error));
+  assert.equal(db.files.length, 2, 'filas y evento van juntos: ninguno se escribió');
+  assert.ok(!db.events.some((e) => e.event_type === 'files_purged'));
+  const ok2 = resCap();
+  await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-001' }, headers: {} }, ok2));
+  assert.equal(ok2.statusCode, 200);
+  assert.equal(ok2.body.files, 2);
+  assert.equal(db.files.length, 0);
+  assert.equal(db.events.filter((e) => e.event_type === 'files_purged').length, 1);
+  // Con el almacén caído el texto sigue diciendo que no se borró nada.
+  seedBrief(2, 'contacted', [], { files: 1 });
+  blob.failDel = 1;
+  const st = resCap();
+  await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-002' }, headers: {} }, st));
+  assert.equal(st.statusCode, 502);
+  assert.match(st.body.error, /No se borró nada/);
+});
+
+await check('RET-08: con más de 500 eventos la ficha usa los más recientes', async () => {
+  reset();
+  seedBrief(1, 'completed', [], { files: 1 });
+  for (let i = 0; i < 520; i++) db.events.push({ project_id: 'MRC-001', event_type: 'files_purged', actor_email: null, data: { files: i, reason: 'request' }, created_at: new Date(Date.parse('2026-01-01T00:00:00Z') + i * 60000).toISOString() });
+  const { retentionEvents } = await import('../lib/brief-files.mjs');
+  const ev = await retentionEvents('MRC-001');
+  assert.equal(ev.length, 500);
+  assert.ok(ev[0].created_at < ev[ev.length - 1].created_at, 'en orden de llegada');
+  assert.equal(R.lastPurge(ev).files, 519, 'el último borrado está');
 });
 
 if (fails.length) {

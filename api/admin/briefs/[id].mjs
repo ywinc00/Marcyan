@@ -115,14 +115,11 @@ export default async function handler(req, res) {
       }
 
       if (newStatus !== null && newStatus !== before.status) {
-        await updateBriefStatus(id, newStatus, session.email);
-        changes.status = { from: before.status, to: newStatus };
-        await logEvent({
-          projectId: id,
-          type: 'status_changed',
-          actorEmail: session.email,
-          data: { from: before.status, to: newStatus },
-        });
+        // El evento 'status_changed' se escribe en la misma transacción que
+        // el cambio (lib/db.mjs): el plazo de conservación de archivos depende
+        // de ese historial (RET-01).
+        const st = await updateBriefStatus(id, newStatus, session.email);
+        changes.status = { from: (st && st.from) || before.status, to: newStatus };
       }
 
       if (newSummary !== null && newSummary !== (before.summary || '')) {

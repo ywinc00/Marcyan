@@ -44,8 +44,11 @@
   const filter = $derived(STATUS_FILTERS.find((f) => f.id === (route.query.estado || '')) || STATUS_FILTERS[0]);
   const search = $derived((route.query.q || '').slice(0, 200));
   const page = $derived(Math.max(1, parseInt(route.query.pag, 10) || 1));
+  // Facturas de un proyecto (CT-03): llega desde la ficha del proyecto como
+  // ?proyecto=<id> y se ve como una píldora activa que se puede quitar.
+  const projectFilter = $derived(/^\d{1,12}$/.test(route.query.proyecto || '') ? route.query.proyecto : '');
   // La lista vuelve con sus filtros (la ficha conserva la query del hash).
-  const listQuery = $derived(Object.fromEntries(Object.entries(route.query).filter(([k]) => ['estado', 'q', 'pag', 'mes', 'cat'].includes(k))));
+  const listQuery = $derived(Object.fromEntries(Object.entries(route.query).filter(([k]) => ['estado', 'q', 'pag', 'mes', 'cat', 'proyecto'].includes(k))));
   const backHref = $derived(href('finanzas', [], listQuery));
 
   // ── Resumen ───────────────────────────────────────────────────
@@ -85,6 +88,7 @@
     const p = new URLSearchParams({ limit: String(PAGE), offset: String((page - 1) * PAGE) });
     if (filter.api) p.set('status', filter.api);
     if (search) p.set('search', search);
+    if (projectFilter) p.set('projectId', projectFilter);
     try {
       const j = await api('/api/admin/invoices?' + p.toString());
       invoices = j.rows || []; invTotal = j.total || 0; counts = j.counts || null;
@@ -100,7 +104,7 @@
   }
 
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
-  $effect(() => { if (!detailRef) { filter; search; page; loadInvoices(); } });
+  $effect(() => { if (!detailRef) { filter; search; page; projectFilter; loadInvoices(); } });
   $effect(() => { if (!detailRef) loadSummary(); });
   // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
   // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
@@ -210,6 +214,13 @@
               {f.label}{#if counts}<span class="fin-pill__n">{counts[f.count] ?? 0}</span>{/if}
             </button>
           {/each}
+          {#if projectFilter}
+            <button type="button" class="fin-pill" aria-pressed="true" onclick={() => setQuery({ proyecto: '', pag: '' })}>
+              Proyecto {invoices[0] && invoices[0].project_code ? invoices[0].project_code : `#${projectFilter}`}
+              <span class="sr-only">(quitar este filtro)</span>
+              <Icon name="close" size={14} />
+            </button>
+          {/if}
         </div>
         <label class="fin-search">
           <span class="fin-search__icon"><Icon name="search" size={16} /></span>
@@ -224,9 +235,9 @@
       {:else}
         <LoadingState loading={invLoading && !invoices.length} rows={4}>
           {#if !invoices.length}
-            {#if filter.id || search}
+            {#if filter.id || search || projectFilter}
               <EmptyState compact title="Ninguna factura con estos filtros" text={search ? `No hay resultados para "${search}".` : `No hay facturas en estado ${filter.label.toLowerCase()}.`}>
-                {#snippet action()}<button type="button" class="b b--mini" onclick={() => setQuery({ estado: '', q: '', pag: '' })}>Quitar filtros</button>{/snippet}
+                {#snippet action()}<button type="button" class="b b--mini" onclick={() => setQuery({ estado: '', q: '', pag: '', proyecto: '' })}>Quitar filtros</button>{/snippet}
               </EmptyState>
             {:else}
               <EmptyState art="invoice" title="Aún no hay facturas" text="Crea la primera con Nueva factura. Si el cliente no existe, créalo antes con Nuevo cliente." />

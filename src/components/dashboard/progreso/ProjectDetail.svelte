@@ -152,7 +152,7 @@
               {#if project.brief_project_id}<a href={href('briefs', [project.brief_project_id])}>{project.brief_project_id}</a>{:else}Sin brief{/if}
             </dd></div>
             <div><dt>Facturas</dt><dd>
-              {#if Number(project.invoices_count)}<a href={href('finanzas')}>{project.invoices_count} vinculada{Number(project.invoices_count) === 1 ? '' : 's'}</a>{:else}Ninguna{/if}
+              {#if Number(project.invoices_count)}<a href={href('finanzas', [], { proyecto: project.id })}>{project.invoices_count} vinculada{Number(project.invoices_count) === 1 ? '' : 's'}</a>{:else}Ninguna{/if}
             </dd></div>
             <div><dt>Inicio</dt><dd>{project.started_at ? fmtDay(project.started_at, DAY) : 'Aún no empieza'}</dd></div>
             {#if project.completed_at}<div><dt>Entregado</dt><dd>{fmtDay(project.completed_at, DAY)}</dd></div>{/if}

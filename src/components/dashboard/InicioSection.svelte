@@ -252,9 +252,9 @@
         {:else if leadsDelta && leadsThisMonth > 0}<span class="sep">·</span>igual que en {prevLabel}{/if}
       {/if}
     </Kpi>
-    <Kpi label="Briefs pendientes" value={num(kpis.pending_briefs) ?? '—'} art="docs" href={href('briefs')}
+    <Kpi label="Briefs pendientes" value={num(kpis.pending_briefs) ?? '—'} art="docs" href={href('briefs', [], { estado: 'pendiente' })}
       note={num(kpis.pending_briefs) === null ? 'Sin dato de briefs' : 'en cola de revisión'} />
-    <Kpi label="Proyectos activos" value={activeProjects ?? '—'} art="clock" href={href('progreso')}
+    <Kpi label="Proyectos activos" value={activeProjects ?? '—'} art="clock" href={href('progreso', [], { estado: 'activo' })}
       note={activeProjects === null ? 'No se pudieron contar' : activeProjects === 1 ? 'proyecto en curso' : 'proyectos en curso'} />
     <div class="kpi-box" bind:this={revenueBox}>
     <Kpi label="Cobrado este mes" value={revenueShort} art="coins" tone={revenue ? 'data' : ''} href={href('finanzas')}>

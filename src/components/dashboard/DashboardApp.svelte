@@ -19,7 +19,8 @@
   import Toast from './ui/Toast.svelte';
   import { api, MSG, errorMessage, onUnauthorized, onMutation, onNetwork } from './lib/api.js';
   import { toast, pushLayer, popLayer } from './lib/toast.svelte.js';
-  import { route, href, navigate, startRouter } from './lib/router.svelte.js';
+  import { route, href, navigate, startRouter, parseHash } from './lib/router.svelte.js';
+  import { rememberReturn, takeReturn } from './lib/return-hash.js';
   import { data, loadAll, loadHome, loadLeads, refreshShell, clearData } from './lib/store.svelte.js';
   import { fmtTime } from './lib/dates.js';
   import { avisos, startUnreadPolling, badgeText } from './lib/avisos.svelte.js';
@@ -106,14 +107,23 @@
   }
 
   // ── Sesión ───────────────────────────────────────────────────
+  // Sin sesión se recuerda la ficha pedida (enlace de un correo) y, al entrar
+  // con el enlace mágico, se vuelve a ella en vez de caer en Inicio (CT-02).
+  function restoreReturn() {
+    const h = takeReturn(window.location.hash);
+    if (!h) return;
+    const r = parseHash(h);
+    navigate(r.section, r.sub, r.query, { replace: true });
+  }
   async function checkSession() {
     phase = 'loading';
     try {
       const j = await api('/api/admin/me', { auth: false });
-      if (j && j.email) { user = j.email; phase = 'app'; loadAll(); return; }
+      if (j && j.email) { restoreReturn(); user = j.email; phase = 'app'; loadAll(); return; }
+      rememberReturn(window.location.hash);
       phase = 'login';
     } catch (e) {
-      if (e && e.status === 401) { phase = 'login'; return; }
+      if (e && e.status === 401) { rememberReturn(window.location.hash); phase = 'login'; return; }
       // Sin red o servidor caído: NO es "perdiste la sesión" (SH-16).
       unreachableMsg = errorMessage(e, MSG.network);
       phase = 'unreachable';
@@ -217,6 +227,7 @@
       menuOpen = false;
       loginTone = 'info';
       loginMsg = MSG.session;
+      rememberReturn(window.location.hash);
       phase = 'login';
     });
 

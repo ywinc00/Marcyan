@@ -129,7 +129,7 @@
   {#if summary}
     <KpiGrid count={3} label="Resumen de clientes">
       <Kpi label="Clientes activos" value={summary.active} note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
-      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} tone="data" href={href('progreso')} note="Ver el avance en Progreso" />
+      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} tone="data" href={href('progreso', [], { estado: 'activo' })} note="Ver el avance en Progreso" />
       <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} note="Facturas emitidas sin pagar, sin borradores" />
     </KpiGrid>
   {/if}

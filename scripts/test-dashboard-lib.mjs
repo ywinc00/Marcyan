@@ -133,5 +133,32 @@ await t('204 sin cuerpo es éxito', async () => {
   assert.equal(j.ok, true);
 });
 
+console.log('\nVuelta a la ficha tras el login (lib/return-hash.js, CT-02)');
+const rh = await import('../src/components/dashboard/lib/return-hash.js');
+const memStore = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
+await t('se recuerda la ficha del correo y se restaura una sola vez al entrar sin destino propio', () => {
+  const st = memStore();
+  rh.rememberReturn('#/briefs/MRC-017', st);
+  assert.equal(rh.takeReturn('#/inicio', st), '#/briefs/MRC-017');
+  assert.equal(rh.takeReturn('#/inicio', st), null, 'solo una vez');
+});
+await t('Inicio no se recuerda; un destino propio de la pestaña manda; caduca a los 30 min', () => {
+  const st = memStore();
+  rh.rememberReturn('#/inicio', st);
+  assert.equal(st.getItem(rh.RETURN_KEY), null);
+  rh.rememberReturn('#/leads/LEAD-005', st);
+  assert.equal(rh.takeReturn('#/clientes/4', st), null);
+  const now = Date.now();
+  assert.equal(rh.pickReturn({ h: '#/leads/LEAD-005', t: now - rh.RETURN_TTL_MS - 1 }, '#/inicio', now), null);
+  assert.equal(rh.pickReturn({ h: '#/leads/LEAD-005', t: now - 1000 }, '', now), '#/leads/LEAD-005');
+});
+await t('solo rutas internas #/…; nada externo ni javascript:', () => {
+  const now = Date.now();
+  for (const bad of ['https://x.example/#/briefs', 'javascript:alert(1)', '//x.example', '#//x.example', '#/<script>']) {
+    assert.equal(rh.pickReturn({ h: bad, t: now }, '#/inicio', now), null, bad);
+  }
+  assert.equal(rh.takeReturn('#/inicio', { getItem() { throw new Error('bloqueado'); }, removeItem() {} }), null);
+});
+
 console.log(`\n${pass} ok · ${fail} fallos`);
 process.exit(fail ? 1 : 0);

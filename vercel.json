@@ -58,6 +58,7 @@
     "api/admin/briefs/*/kit.mjs": { "maxDuration": 300, "includeFiles": "lib/kit/templates/**" }
   },
   "crons": [
-    { "path": "/api/cron/brief-cleanup", "schedule": "40 9 * * *" }
+    { "path": "/api/cron/brief-cleanup", "schedule": "40 9 * * *" },
+    { "path": "/api/cron/seo-sync", "schedule": "0 9 * * *" }
   ]
 }

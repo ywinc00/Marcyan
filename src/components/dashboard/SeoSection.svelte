@@ -1,844 +1,484 @@
 <script>
-  import { onMount } from 'svelte';
-  import KpiArt from './KpiArt.svelte';
-
-  import { api } from './lib/api.js';
-  import { fmtDateTime, fmtDayShort } from './lib/dates.js';
+  // ─────────────────────────────────────────────────────────────
+  // Sección SEO del panel (A6). "¿Funciona Google y qué traen las páginas?"
+  //   · Ruta: #/seo/<id>?dias=7|28|90 (recargar, Atrás y los enlaces abren
+  //     el proyecto y el rango concretos).
+  //   · Estado real de Google por proyecto y por fuente (SEO-03, SEO-07) y
+  //     "Estado de Google" con el diagnóstico y la sincronización de todos
+  //     (SEO-01, SEO-17), en seo/SeoStatusDialog.svelte.
+  //   · KPIs contra el período previo de verdad, posición ponderada,
+  //     "sin configurar" en vez de ceros (SEO-13, SEO-14, SEO-18, SEO-19).
+  //   · Gráficos con eje Y, días reales y toque (seo/SeoChart.svelte).
+  //   · Sin carreras al cambiar de proyecto (SEO-22).
+  // La lógica pura (validación, ventanas, errores en español) está en
+  // lib/seo-core.mjs, compartida con el servidor.
+  // ─────────────────────────────────────────────────────────────
+  import { untrack } from 'svelte';
+  import { api, errorMessage, isSessionError } from './lib/api.js';
+  import { route, setSub, setQuery } from './lib/router.svelte.js';
+  import { toast } from './lib/toast.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
+  import KpiGrid from './ui/KpiGrid.svelte';
+  import Kpi from './ui/Kpi.svelte';
+  import Card from './ui/Card.svelte';
+  import DataTable from './ui/DataTable.svelte';
+  import EmptyState from './ui/EmptyState.svelte';
+  import LoadingState from './ui/LoadingState.svelte';
+  import ErrorState from './ui/ErrorState.svelte';
+  import ConfirmDialog from './ui/ConfirmDialog.svelte';
+  import Icon from './ui/Icon.svelte';
+  import SeoChart from './seo/SeoChart.svelte';
+  import SeoIndexation from './seo/SeoIndexation.svelte';
+  import SeoSources from './seo/SeoSources.svelte';
+  import SeoProjectForm from './seo/SeoProjectForm.svelte';
+  import SeoStatusDialog from './seo/SeoStatusDialog.svelte';
+  import { nfmt, pct, pos, dayShort } from './seo/format.js';
+  import { RANGE_OPTIONS, DEFAULT_DAYS, delta, buildSeries, globalHealth } from '../../../lib/seo-core.mjs';
 
-  // ── Helpers ──────────────────────────────────────────────────
-  // HTTP y fechas vienen de lib/ (A0). metric_date es una columna DATE:
-  // las etiquetas del eje salían un día antes con getDate() (MOCK-01).
-  const shortDay = fmtDayShort;
-  function nfmt(n) {
-    if (n == null || !Number.isFinite(+n)) return '0';
-    return new Intl.NumberFormat('es-ES').format(Math.round(+n));
-  }
-  function pct(n) { return (n == null || !Number.isFinite(+n)) ? '0%' : (Math.round(+n * 1000) / 10) + '%'; }
-  function pctOf(part, whole) {
-    const p = +part, w = +whole;
-    if (!Number.isFinite(p) || !Number.isFinite(w) || w <= 0) return '0%';
-    return (Math.round((p / w) * 1000) / 10) + '%';
-  }
-  // Mapea el estado de cobertura de GSC a una clase de pill (verde=ok, etc.).
-  function idxStateClass(state) {
-    const s = String(state || '').toLowerCase();
-    if (s.includes('submitted and indexed') || s === 'pass' || s.includes('indexed, not submitted')) return 'ok';
-    if (s.includes('excluded') || s.includes('not indexed') || s.includes('fail') || s.includes('error')) return 'err';
-    if (s.includes('crawled') || s.includes('discovered') || s.includes('neutral')) return 'warn';
-    return 'neutral';
-  }
-
-  // ── Estado ───────────────────────────────────────────────────
+  // ── Lista de proyectos ──
   let projects = $state([]);
-  let connected = $state(true);   // ¿WIF configurado (GOOGLE_WIF_AUDIENCE + GOOGLE_SA_EMAIL)?
-  let loading = $state(false);
-  let error = $state('');
+  let configured = $state(true);
+  let listLoading = $state(true);
+  let listError = $state('');
+  let listLoaded = $state(false);
 
-  let selectedId = $state(null);
-  let detail = $state(null);      // { project, metrics, range }
+  // ── Detalle ──
+  let detail = $state(null);          // { project, metrics, range, summary, today }
   let detailLoading = $state(false);
-  let syncing = $state(false);
-  let syncMsg = $state('');
-  let syncOk = $state(false);
+  let detailError = $state('');
+  let seq = 0;                        // SEO-22: solo vale la última respuesta pedida
 
-  // Alta de proyecto
-  let showAdd = $state(false);
-  let form = $state({ name: '', client_name: '', ga4_property_id: '', gsc_site_url: '', domain: '' });
-  let saving = $state(false);
-  let addMsg = $state('');
+  // ── Sincronización de esta sesión (por si la 014 no está aplicada) ──
+  let syncingId = $state('');
+  let lastState = $state({});         // { [id]: sync_state del último intento }
 
-  // Eliminar
-  let showDelete = $state(false);
+  // ── Modales ──
+  let formOpen = $state(false);
+  let formProject = $state(null);
+  let statusOpen = $state(false);
+  let delOpen = $state(false);
   let deleting = $state(false);
 
-  // Editar (corrige campos sin borrar/recrear; usa el PATCH ya existente)
-  let showEdit = $state(false);
-  let editForm = $state({ name: '', client_name: '', ga4_property_id: '', gsc_site_url: '', domain: '', active: true });
-  let editSaving = $state(false);
-  let editMsg = $state('');
+  // ── Ruta ──
+  const routeId = $derived(route.sub[0] ? String(route.sub[0]) : '');
+  const days = $derived(RANGE_OPTIONS.includes(+route.query.dias) ? +route.query.dias : DEFAULT_DAYS);
+  const selected = $derived(projects.find((p) => String(p.id) === routeId) || null);
+  const missing = $derived(listLoaded && routeId && !selected);
 
-  // ── Derivados de métricas ────────────────────────────────────
-  const gscDaily = $derived(
-    detail && detail.metrics && detail.metrics.gsc
-      ? detail.metrics.gsc
-          .filter((r) => r.kind !== 'top_queries' && r.clicks != null)
-          .map((r) => ({ date: r.date, clicks: +r.clicks || 0, impressions: +r.impressions || 0, ctr: +r.ctr || 0, position: +r.position || 0 }))
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
-      : []
-  );
-  const topQueries = $derived.by(() => {
-    if (!detail || !detail.metrics || !detail.metrics.gsc) return [];
-    const snap = detail.metrics.gsc.find((r) => r.kind === 'top_queries');
-    return snap && Array.isArray(snap.queries) ? snap.queries : [];
-  });
-  const ga4Daily = $derived(
-    detail && detail.metrics && detail.metrics.ga4
-      ? detail.metrics.ga4
-          .map((r) => ({ date: r.date, sessions: +r.sessions || 0, totalUsers: +r.totalUsers || 0, engagementRate: +r.engagementRate || 0, conversions: +r.conversions || 0 }))
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
-      : []
-  );
-
-  const kpis = $derived.by(() => {
-    const clicks = gscDaily.reduce((s, r) => s + r.clicks, 0);
-    const impressions = gscDaily.reduce((s, r) => s + r.impressions, 0);
-    const posRows = gscDaily.filter((r) => r.position > 0);
-    const avgPos = posRows.length ? posRows.reduce((s, r) => s + r.position, 0) / posRows.length : 0;
-    const sessions = ga4Daily.reduce((s, r) => s + r.sessions, 0);
-    const conversions = ga4Daily.reduce((s, r) => s + r.conversions, 0);
-    return { clicks, impressions, avgPos, sessions, conversions };
-  });
-
-  // Delta por serie: compara la suma de la 2ª mitad vs la 1ª mitad del rango.
-  // Devuelve { dir: 'up'|'down'|'flat', txt: '+12%' } o null si no hay base.
-  // Para "posición media" un número MENOR es mejor → invertimos el signo (better).
-  function trend(values, lowerIsBetter = false) {
-    const v = (values || []).filter((x) => Number.isFinite(+x)).map((x) => +x);
-    if (v.length < 4) return null;
-    const mid = Math.floor(v.length / 2);
-    const a = v.slice(0, mid).reduce((s, x) => s + x, 0);
-    const b = v.slice(mid).reduce((s, x) => s + x, 0);
-    if (a <= 0) return null;
-    const change = ((b - a) / a) * 100;
-    const rounded = Math.round(change * 10) / 10;
-    if (Math.abs(rounded) < 0.1) return { dir: 'flat', txt: '0%', better: true };
-    const better = lowerIsBetter ? rounded < 0 : rounded > 0;
-    return { dir: rounded > 0 ? 'up' : 'down', txt: (rounded > 0 ? '+' : '') + rounded + '%', better };
-  }
-  const tClicks = $derived(trend(gscDaily.map((r) => r.clicks)));
-  const tImpr   = $derived(trend(gscDaily.map((r) => r.impressions)));
-  const tPos    = $derived(trend(gscDaily.filter((r) => r.position > 0).map((r) => r.position), true));
-  const tSess   = $derived(trend(ga4Daily.map((r) => r.sessions)));
-
-  const hasData = $derived(gscDaily.length > 0 || ga4Daily.length > 0);
-
-  // Snapshot de indexación (objeto, no serie). El backend lo expone bajo
-  // metrics.indexation: { indexed, not_indexed, total, checked_at, issues, pages }.
-  const indexation = $derived(detail && detail.metrics ? (detail.metrics.indexation || null) : null);
-  // Geometría del donut de indexación (circunferencia para stroke-dasharray).
-  const DONUT_R = 34, DONUT_C = 2 * Math.PI * 34;
-  const idxRatio = $derived(
-    indexation && indexation.total ? Math.max(0, Math.min(1, indexation.indexed / indexation.total)) : 0
-  );
-
-  // ── Construcción de path de línea SVG (a mano, sin librerías) ──
-  // points: array de números (la serie). Devuelve { line, area, pts } en
-  // coordenadas del viewBox W×H con padding inferior para etiquetas.
-  function linePath(values, W, H, padTop = 12, padBottom = 24, padX = 10) {
-    const n = values.length;
-    if (n === 0) return { line: '', area: '', pts: [], max: 1 };
-    const max = Math.max(1, ...values);
-    const innerW = W - padX * 2;
-    const innerH = H - padTop - padBottom;
-    const x = (i) => (n === 1 ? W / 2 : padX + (i * innerW) / (n - 1));
-    const y = (v) => padTop + innerH - (v / max) * innerH;
-    const pts = values.map((v, i) => ({ x: x(i), y: y(v), v }));
-    const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-    const area = `${line} L${pts[pts.length - 1].x.toFixed(1)},${(padTop + innerH).toFixed(1)} L${pts[0].x.toFixed(1)},${(padTop + innerH).toFixed(1)} Z`;
-    return { line, area, pts, max };
-  }
-  const VBW = 560, VBH = 200, PAD_BOTTOM = 24;
-  // Líneas de cuadrícula horizontales (dashed): 4 niveles dentro del plot.
-  const gridLines = [24, 64, 104, 144];
-  const clicksChart = $derived(linePath(gscDaily.map((r) => r.clicks), VBW, VBH));
-  const imprChart   = $derived(linePath(gscDaily.map((r) => r.impressions), VBW, VBH));
-  // Etiquetas X: primera, media, última (para no saturar)
-  function axisLabels(rows) {
-    if (!rows.length) return [];
-    if (rows.length === 1) return [{ i: 0, t: shortDay(rows[0].date) }];
-    const mid = Math.floor((rows.length - 1) / 2);
-    return [
-      { i: 0, t: shortDay(rows[0].date) },
-      { i: mid, t: shortDay(rows[mid].date) },
-      { i: rows.length - 1, t: shortDay(rows[rows.length - 1].date) },
-    ];
-  }
-  const xLabels = $derived(axisLabels(gscDaily));
-  function labelX(i, n) {
-    const padX = 10, innerW = VBW - padX * 2;
-    return n === 1 ? VBW / 2 : padX + (i * innerW) / (n - 1);
-  }
-
-  // ── Interactividad de los gráficos (hover → tip + guía + punto) ──
-  // Guardamos el índice apuntado por cada gráfico. onmousemove encuentra el
-  // punto más cercano en X dentro del viewBox (convertimos px → coord SVG).
-  let hoverClicks = $state(-1);
-  let hoverImpr = $state(-1);
-  function nearestIndex(evt, pts) {
-    if (!pts.length) return -1;
-    const svg = evt.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    if (!rect.width) return -1;
-    const xSvg = ((evt.clientX - rect.left) / rect.width) * VBW;
-    let best = 0, bestD = Infinity;
-    for (let i = 0; i < pts.length; i++) {
-      const d = Math.abs(pts[i].x - xSvg);
-      if (d < bestD) { bestD = d; best = i; }
-    }
-    return best;
-  }
-
-  // ── Carga de proyectos ───────────────────────────────────────
-  async function loadProjects(selectFirst = false) {
-    loading = true; error = '';
+  async function loadProjects() {
+    listError = '';
     try {
       const j = await api('/api/admin/seo/projects');
       projects = j.projects || [];
-      connected = j.connected !== false;
-      if (selectFirst && projects.length && selectedId == null) {
-        selectProject(projects[0].id);
-      } else if (selectedId != null && !projects.some((p) => String(p.id) === String(selectedId))) {
-        selectedId = null; detail = null;
-      }
-    } catch (e) { error = e.message || 'Error al cargar'; }
-    finally { loading = false; }
+      configured = j.configured !== false && j.connected !== false;
+      listLoaded = true;
+    } catch (e) {
+      if (!isSessionError(e)) listError = errorMessage(e, 'No se pudieron cargar los proyectos de SEO.');
+    } finally { listLoading = false; }
   }
+  loadProjects();
 
-  async function selectProject(id) {
-    // NO limpiamos `detail` por adelantado: si el fetch falla (404 transitorio,
-    // red, etc.) queremos conservar el detalle anterior y mostrar el error, en
-    // vez de colapsar al placeholder dejando solo el selector. Solo reemplazamos
-    // `detail` en éxito. `detailLoading` sigue manejando el estado "Cargando…".
-    selectedId = id; detailLoading = true; syncMsg = '';
+  // Sin proyecto en la ruta: el último sincronizado (el que tiene datos), sin
+  // ensuciar el historial.
+  $effect(() => {
+    if (!listLoaded || routeId || !projects.length) return;
+    const best = projects.slice().filter((p) => p.active !== false)
+      .sort((a, b) => String(b.last_synced_at || '').localeCompare(String(a.last_synced_at || '')))[0] || projects[0];
+    untrack(() => setSub([String(best.id)], { replace: true }));
+  });
+
+  async function loadDetail(id, d) {
+    const my = ++seq;
+    detailLoading = true; detailError = '';
     try {
-      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(id) + '?days=28');
-      detail = { project: j.project, metrics: j.metrics, range: j.range };
-      connected = j.connected !== false;
-    } catch (e) { syncMsg = e.message || 'Error al cargar el proyecto'; syncOk = false; }
-    finally { detailLoading = false; }
+      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(id) + '?days=' + d);
+      if (my !== seq) return;            // llegó tarde: ya se pidió otro proyecto o rango
+      detail = { project: j.project, metrics: j.metrics, range: j.range, summary: j.summary || {}, today: j.today };
+      if (j.configured === false || j.connected === false) configured = false;
+    } catch (e) {
+      if (my !== seq) return;
+      if (!isSessionError(e)) detailError = errorMessage(e, 'No se pudieron cargar los datos del proyecto.');
+    } finally { if (my === seq) detailLoading = false; }
   }
 
-  function onSelectChange(e) {
-    const v = e.currentTarget.value;
-    // Los IDs vienen como string (columna BIGINT de Postgres); NO usar parseInt
-    // o el value del <select> (número) no matchea las <option value> (string)
-    // y deja de verse el proyecto seleccionado.
-    if (v) selectProject(v);
-  }
+  $effect(() => {
+    const id = selected ? String(selected.id) : '';
+    const d = days;
+    if (!id) return;
+    untrack(() => {
+      // Al cambiar de proyecto no se enseña el anterior bajo el nombre nuevo.
+      if (detail && String(detail.project.id) !== id) detail = null;
+      loadDetail(id, d);
+    });
+  });
 
-  // ── Sincronizar ──────────────────────────────────────────────
-  async function syncNow() {
-    if (!selectedId) return;
-    syncing = true; syncMsg = 'Sincronizando con Google…'; syncOk = false;
-    let okFlag = false, msg = '';
+  function pickProject(e) { const v = e.currentTarget.value; if (v) setSub([v]); }
+  function pickDays(n) { setQuery({ dias: n === DEFAULT_DAYS ? '' : n }); }
+
+  // ── Sincronizar un proyecto ("Actualizar ahora") ──
+  // A6-R2: si llega otra petición mientras una sync está en curso (p. ej. al
+  // guardar una propiedad nueva), no se descarta: se hace al terminar.
+  let queuedSync = '';
+  async function syncNow(id = selected && selected.id) {
+    if (!id) return;
+    if (syncingId) { queuedSync = String(id); return; }
+    syncingId = String(id);
     try {
-      // acceptErrors: la sincronización parcial trae el detalle en el cuerpo del error.
-      // timeout largo: la sincronización encadena Google (GSC, GA4, sitemaps,
-      // inspección) y decenas de escrituras; con arranque en frío pasa de los
-      // 15 s por defecto y el aviso de "tardó demasiado" invitaría a repetirla
-      // (gasto doble de cuota) aunque el servidor termine bien.
-      const j = await api('/api/admin/seo/sync', { method: 'POST', body: JSON.stringify({ id: selectedId, days: 28 }), acceptErrors: true, timeout: 120000 });
-      if (j.configured === false) {
-        msg = 'Conecta Google para sincronizar datos reales.';
-      } else if (!j.ok) {
-        const res0 = j.results && j.results[0];
-        const detailErr = res0 ? [res0.gsc?.error, res0.ga4?.error].filter(Boolean).join(' · ') : '';
-        msg = 'Sincronización parcial: ' + (detailErr || j.error || 'revisa la conexión');
-      } else {
-        const res0 = j.results && j.results[0];
-        const total = res0 ? (res0.gsc.synced + res0.ga4.synced + ((res0.indexation && res0.indexation.synced) || 0)) : 0;
-        okFlag = true; msg = `✓ ${total} registro(s) actualizados`;
-      }
-      // Refrescar datos ANTES de fijar el mensaje: selectProject() resetea syncMsg,
-      // así que si lo seteáramos antes, se borraría y el usuario no vería nada
-      // (era el bug de "clic y no pasa nada").
-      await selectProject(selectedId);
+      const j = await api('/api/admin/seo/sync', { method: 'POST', body: { id: String(id), days }, acceptErrors: true, timeout: 120000 });
+      const r = j.results && j.results[0];
+      if (r && r.sync_state) lastState = { ...lastState, [String(id)]: r.sync_state };
+      if (!r) toast(j.error || 'No se pudo sincronizar.', { tone: 'error', timeout: 6500 });
+      else if (r.status === 'ok') toast('Datos actualizados.');
+      else if (r.status === 'partial') toast('Actualizado a medias: una fuente falló. Mira el detalle debajo.', { tone: 'info', timeout: 6500 });
+      else toast(r.error || 'La sincronización falló. Mira el detalle debajo.', { tone: 'error', timeout: 6500 });
+    } catch (e) {
+      if (!isSessionError(e)) toast(errorMessage(e, 'No se pudo sincronizar.'), { tone: 'error', timeout: 6500 });
+    } finally {
+      syncingId = '';
       await loadProjects();
-    } catch (e) { okFlag = false; msg = e.message || 'Error al sincronizar'; }
-    finally { syncing = false; syncMsg = msg; syncOk = okFlag; }
+      if (selected && String(selected.id) === String(id)) await loadDetail(String(id), days);
+      const next = queuedSync;
+      queuedSync = '';
+      if (next) syncNow(next);
+    }
   }
 
-  // ── Alta de proyecto ─────────────────────────────────────────
-  function openAdd() { showAdd = true; addMsg = ''; form = { name: '', client_name: '', ga4_property_id: '', gsc_site_url: '', domain: '' }; }
-  async function createProject() {
-    if (!form.name.trim()) { addMsg = 'El nombre es obligatorio'; return; }
-    saving = true; addMsg = '';
-    try {
-      const j = await api('/api/admin/seo/projects', { method: 'POST', body: JSON.stringify(form) });
-      showAdd = false;
-      await loadProjects();
-      selectProject(j.project.id);
-    } catch (e) { addMsg = e.message || 'Error al crear'; }
-    finally { saving = false; }
+  // ── Alta / edición ──
+  function openAdd() { formProject = null; formOpen = true; }
+  function openEdit() { if (selected) { formProject = selected; formOpen = true; } }
+  async function onSaved(p, { cleared, created, syncNow: doSync }) {
+    if (cleared && cleared.length && p) { const c = { ...lastState }; delete c[String(p.id)]; lastState = c; }
+    await loadProjects();
+    if (p && created) setSub([String(p.id)]);
+    else if (p) await loadDetail(String(p.id), days);
+    if (p && doSync) syncNow(p.id);
   }
 
-  // ── Editar proyecto ──────────────────────────────────────────
-  function openEdit() {
-    if (!detail) return;
-    const p = detail.project;
-    editForm = {
-      name: p.name || '',
-      client_name: p.client_name || '',
-      ga4_property_id: p.ga4_property_id || '',
-      gsc_site_url: p.gsc_site_url || '',
-      domain: p.domain || '',
-      active: p.active !== false,
-    };
-    editMsg = '';
-    showEdit = true;
-  }
-  async function saveEdit() {
-    if (!selectedId) return;
-    if (!editForm.name.trim()) { editMsg = 'El nombre es obligatorio'; return; }
-    editSaving = true; editMsg = '';
-    try {
-      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), {
-        method: 'PATCH',
-        body: JSON.stringify(editForm),
-      });
-      showEdit = false;
-      // Refrescar el detalle (nuevos identificadores) y la lista (nombre/cliente).
-      await selectProject(selectedId);
-      await loadProjects();
-    } catch (e) { editMsg = e.message || 'Error al guardar'; }
-    finally { editSaving = false; }
-  }
-
-  // ── Eliminar proyecto ────────────────────────────────────────
+  // ── Borrar ──
   async function doDelete() {
-    if (!selectedId) return;
+    if (!selected) return;
     deleting = true;
     try {
-      const j = await api('/api/admin/seo/projects/' + encodeURIComponent(selectedId), { method: 'DELETE' });
-      showDelete = false; selectedId = null; detail = null;
+      await api('/api/admin/seo/projects/' + encodeURIComponent(selected.id), { method: 'DELETE' });
+      toast('Proyecto eliminado.');
+      delOpen = false;
+      detail = null;
       await loadProjects();
-    } catch (e) { syncOk = false; syncMsg = e.message || 'Error al eliminar'; showDelete = false; }
-    finally { deleting = false; }
+      setSub([], { replace: true });
+    } catch (e) {
+      if (!isSessionError(e)) toast(errorMessage(e, 'No se pudo eliminar el proyecto.'), { tone: 'error', timeout: 6500 });
+    } finally { deleting = false; }
   }
 
-  onMount(() => { loadProjects(true); });
+  // ── Derivados del detalle ──
+  const proj = $derived(detail ? detail.project : selected);
+  const hasGsc = $derived(Boolean(proj && proj.gsc_site_url));
+  const hasGa4 = $derived(Boolean(proj && proj.ga4_property_id));
+  const sumG = $derived(detail && detail.summary ? detail.summary.gsc : null);
+  const sumA = $derived(detail && detail.summary ? detail.summary.ga4 : null);
+  const syncState = $derived(proj ? (proj.sync_state || lastState[String(proj.id)] || null) : null);
+  const syncing = $derived(Boolean(proj) && syncingId === String(proj.id));
+  // Si la lista no cargó no se sabe el estado: no se pinta ni verde ni rojo.
+  const health = $derived(listError ? { tone: 'neutral', label: 'Estado de Google' } : globalHealth(projects, { configured }));
+
+  const gscDaily = $derived(detail ? (detail.metrics.gsc || []).filter((r) => r.kind !== 'top_queries') : []);
+  const chartStart = $derived(detail ? detail.range.startDate : '');
+  const chartEnd = $derived(detail ? detail.range.endDate : '');
+  const clicksSeries = $derived(detail ? buildSeries(gscDaily, 'clicks', chartStart, chartEnd, sumG && sumG.through) : []);
+  const imprSeries = $derived(detail ? buildSeries(gscDaily, 'impressions', chartStart, chartEnd, sumG && sumG.through) : []);
+  // Días que Search Console aún no publica (normal: 2 o 3) o que faltan por sincronizar.
+  const stale = $derived(Boolean(sumG && sumG.lag_days != null && sumG.lag_days > 5));
+  const pendingLabel = $derived(stale ? 'Sin sincronizar' : 'Google aún no publica estos días');
+
+  const topQ = $derived(detail && detail.metrics.top_queries ? detail.metrics.top_queries : null);
+  const queries = $derived(topQ ? topQ.queries.map((q, i) => ({ ...q, rank: i + 1 })) : []);
+
+  // KPIs
+  const prevTxt = $derived(`vs ${days} días anteriores`);
+  const dClicks = $derived(sumG ? delta(sumG.current.clicks, sumG.previous && sumG.previous.clicks) : null);
+  const dImpr = $derived(sumG ? delta(sumG.current.impressions, sumG.previous && sumG.previous.impressions) : null);
+  const dPos = $derived(sumG ? delta(sumG.current.position, sumG.previous && sumG.previous.position, { lowerIsBetter: true }) : null);
+  const dSess = $derived(sumA ? delta(sumA.current.sessions, sumA.previous && sumA.previous.sessions) : null);
+  const showKeyEvents = $derived(Boolean(hasGa4 && sumA && sumA.current.key_events != null && (sumA.current.key_events > 0 || (sumA.previous && sumA.previous.key_events > 0))));
+  const dKey = $derived(showKeyEvents ? delta(sumA.current.key_events, sumA.previous && sumA.previous.key_events) : null);
+  const kpiCount = $derived(showKeyEvents ? 5 : 4);
+  // Sin datos: ¿porque falló la fuente o porque aún no se ha sincronizado?
+  const srcFailed = (k) => Boolean(syncState && syncState.sources && syncState.sources[k] && syncState.sources[k].status === 'error');
+  const gscEmptyTxt = $derived(srcFailed('gsc') ? 'sin datos: Search Console falló' : 'sin datos todavía');
+  const ga4EmptyTxt = $derived(srcFailed('ga4') ? 'sin datos: Analytics falló' : 'sin datos todavía');
+  const gscErr = $derived(srcFailed('gsc') ? syncState.sources.gsc.error : null);
+
+  const windowTxt = $derived(sumG ? `${dayShort(sumG.current.start)} al ${dayShort(sumG.current.end)}` : '');
+  // A6-R1: si lo guardado no cubre todo el rango, el total es de menos días y se dice.
+  const partialG = $derived(Boolean(sumG && sumG.current.complete === false && sumG.current.data_from));
+  const partialA = $derived(Boolean(sumA && sumA.current.complete === false && sumA.current.data_from));
+  const partialTxt = $derived.by(() => {
+    const tail = `: los totales no cubren los ${days} días. Con Actualizar ahora se traen los que faltan.`;
+    if (partialG && partialA && sumG.current.data_from === sumA.current.data_from) {
+      return `Search Console y Analytics solo tienen datos guardados desde el ${dayShort(sumG.current.data_from)}` + tail;
+    }
+    const parts = [];
+    if (partialG) parts.push(`Search Console solo tiene datos guardados desde el ${dayShort(sumG.current.data_from)}`);
+    if (partialA) parts.push(`Analytics desde el ${dayShort(sumA.current.data_from)}`);
+    return parts.length ? parts.join(' y ') + tail : '';
+  });
+  // Título del gráfico: los días que de verdad pinta.
+  const chartCap = $derived(sumG ? (partialG ? `Del ${dayShort(sumG.current.data_from)} al ${dayShort(sumG.through)}` : `${days} días hasta el ${dayShort(sumG.through)}`) : '');
+  const qCols = [
+    { key: 'query', label: 'Búsqueda', primary: true },
+    { key: 'clicks', label: 'Clics', align: 'end' },
+    { key: 'impressions', label: 'Impresiones', align: 'end' },
+    { key: 'ctr', label: 'CTR', align: 'end' },
+    { key: 'position', label: 'Posición', align: 'end' },
+  ];
 </script>
 
 <PageHeader title="SEO">
   {#snippet actions()}
-    {#if !connected}
-      <span class="conn conn--off" title="Falta configurar Workload Identity Federation">● Google no conectado</span>
-    {:else}
-      <span class="conn conn--on">● Google conectado</span>
-    {/if}
-    <button class="b b--primary" onclick={openAdd}>Nuevo proyecto</button>
+    <button type="button" class="b seo-health seo-health--{health.tone}" onclick={() => (statusOpen = true)} aria-haspopup="dialog">
+      <span class="seo-health__dot" aria-hidden="true"></span>{health.label}
+    </button>
+    <button type="button" class="b b--primary" onclick={openAdd}>Nuevo proyecto</button>
   {/snippet}
 </PageHeader>
 
-{#if !connected}
-  <div class="notice">
-    <strong>Conectá Google para ver datos.</strong>
-    Falta configurar el acceso a Google sin clave (<code>Workload Identity Federation</code>: envs
-    <code>GOOGLE_WIF_AUDIENCE</code> + <code>GOOGLE_SA_EMAIL</code> y OIDC habilitado en Vercel). Podés crear
-    proyectos y guardar sus IDs de GA4 / Search Console ahora; en cuanto se den los permisos por cliente,
-    el botón "Actualizar ahora" traerá las métricas reales.
-  </div>
-{/if}
+{#snippet kpiNote(d, okTxt, offTxt, isOff)}
+  {#if isOff}
+    {offTxt}
+  {:else if d}
+    <span class={d.dir === 'flat' ? '' : d.better ? 'is-data' : 'seo-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> {prevTxt}
+  {:else}
+    {okTxt}
+  {/if}
+{/snippet}
 
-{#if loading}
-  <div class="empty">Cargando proyectos…</div>
-{:else if error}
-  <div class="empty err">{error}</div>
-{:else if projects.length === 0}
-  <div class="empty">
-    Sin proyectos SEO todavía. Creá el primero con el botón <strong>+ Proyecto</strong> y guardá su
-    ID de propiedad GA4 y su URL de Search Console.
-  </div>
-{:else}
-  <!-- Selector de proyecto -->
-  <div class="picker">
-    <label class="picker__lbl" for="seo-project">Proyecto</label>
-    <select id="seo-project" class="inp" value={selectedId ?? ''} onchange={onSelectChange}>
-      <option value="" disabled>Elegí un proyecto…</option>
-      {#each projects as p (p.id)}
-        <option value={p.id}>{p.name}{p.client_name ? ` — ${p.client_name}` : ''}{p.active ? '' : ' (inactivo)'}</option>
-      {/each}
-    </select>
-    {#if detail}
-      <button class="b b--ghost" onclick={syncNow} disabled={syncing}>{syncing ? 'Sincronizando…' : '↻ Actualizar ahora'}</button>
-    {/if}
-  </div>
-
-  {#if !detail && detailLoading}
-    <!-- Solo bloqueamos toda la vista cuando aún no hay detalle previo. -->
-    <div class="empty">Cargando datos…</div>
-  {:else if detail}
-    <div class="proj-meta mono" class:is-reloading={detailLoading}>
-      {#if detail.project.domain}<span>{detail.project.domain}</span>{/if}
-      {#if detail.project.gsc_site_url}<span>· GSC: {detail.project.gsc_site_url}</span>{/if}
-      {#if detail.project.ga4_property_id}<span>· GA4: {detail.project.ga4_property_id}</span>{/if}
-      {#if detail.project.last_synced_at}<span>· Última sync: {fmtDateTime(detail.project.last_synced_at)}</span>{:else}<span>· Sin sincronizar</span>{/if}
-      {#if detailLoading}<span class="reloading">· Actualizando…</span>{/if}
-    </div>
-    {#if syncMsg}<div class="msg" class:ok={syncOk}>{syncMsg}</div>{/if}
-
-    <!-- KPIs (Orbit: label + número grande + delta + arte 3D en la esquina) -->
-    <div class="kpis">
-      <!-- Clics -->
-      <div class="kpi">
-        <span class="kpi__lbl">Clics (GSC)</span>
-        <div class="kpi__row">
-          <span class="kpi__num gold">{nfmt(kpis.clicks)}</span>
-          <KpiArt kind="cursor" size={52} />
-        </div>
-        {#if tClicks}
-          <p class="kpi__delta"><span class={tClicks.better ? 'up' : 'down'}>{tClicks.txt} {tClicks.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
-        {:else}
-          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} día{gscDaily.length === 1 ? '' : 's'}</span></p>
-        {/if}
+<LoadingState loading={listLoading} rows={3} height={64} label="Cargando proyectos de SEO…">
+  {#if listError}
+    <ErrorState title="No se pudieron cargar los proyectos" message={listError} onretry={loadProjects} />
+  {:else if !projects.length}
+    <Card>
+      <EmptyState art="medal" title="Todavía no hay proyectos de SEO"
+        text="Un proyecto es un sitio que se sigue en Google: guarda su propiedad de Search Console y el ID de Analytics, y cada madrugada se traen sus datos.">
+        {#snippet action()}<button type="button" class="b" onclick={openAdd}>Crear el primero</button>{/snippet}
+      </EmptyState>
+    </Card>
+  {:else}
+    <!-- Barra de trabajo: proyecto, rango y actualizar -->
+    <div class="seo-bar">
+      <label class="seo-bar__pick">
+        <span class="sr-only">Proyecto</span>
+        <select class="ui-input" value={routeId} onchange={pickProject}>
+          {#if missing}<option value={routeId} disabled>Proyecto no encontrado</option>{/if}
+          {#each projects as p (p.id)}
+            <option value={String(p.id)}>{p.name}{p.client_name && p.client_name !== p.name ? ` · ${p.client_name}` : ''}{p.active === false ? ' (pausado)' : ''}</option>
+          {/each}
+        </select>
+      </label>
+      <div class="seo-range" role="group" aria-label="Rango de fechas">
+        {#each RANGE_OPTIONS as n (n)}
+          <button type="button" class="seo-range__b" aria-pressed={days === n} onclick={() => pickDays(n)}>{n} días</button>
+        {/each}
       </div>
-
-      <!-- Impresiones -->
-      <div class="kpi">
-        <span class="kpi__lbl">Impresiones (GSC)</span>
-        <div class="kpi__row">
-          <span class="kpi__num">{nfmt(kpis.impressions)}</span>
-          <KpiArt kind="eye" size={52} />
-        </div>
-        {#if tImpr}
-          <p class="kpi__delta"><span class={tImpr.better ? 'up' : 'down'}>{tImpr.txt} {tImpr.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
-        {:else}
-          <p class="kpi__delta"><span class="muted">últimos {gscDaily.length} día{gscDaily.length === 1 ? '' : 's'}</span></p>
-        {/if}
-      </div>
-
-      <!-- Posición media -->
-      <div class="kpi">
-        <span class="kpi__lbl">Posición media</span>
-        <div class="kpi__row">
-          <span class="kpi__num">{kpis.avgPos ? (Math.round(kpis.avgPos * 10) / 10) : '—'}</span>
-          <KpiArt kind="medal" size={52} />
-        </div>
-        {#if tPos}
-          <p class="kpi__delta"><span class={tPos.better ? 'up' : 'down'}>{tPos.txt} {tPos.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">menor = mejor</span></p>
-        {:else}
-          <p class="kpi__delta"><span class="muted">promedio del rango</span></p>
-        {/if}
-      </div>
-
-      <!-- Sesiones -->
-      <div class="kpi">
-        <span class="kpi__lbl">Sesiones (GA4)</span>
-        <div class="kpi__row">
-          <span class="kpi__num teal">{nfmt(kpis.sessions)}</span>
-          <KpiArt kind="users" size={52} />
-        </div>
-        {#if tSess}
-          <p class="kpi__delta"><span class={tSess.better ? 'up' : 'down'}>{tSess.txt} {tSess.dir === 'down' ? '↓' : '↑'}</span> <span class="muted">vs período previo</span></p>
-        {:else}
-          <p class="kpi__delta"><span class="muted">últimos {ga4Daily.length} día{ga4Daily.length === 1 ? '' : 's'}</span></p>
-        {/if}
-      </div>
-    </div>
-
-    <!-- Indexación (Orbit: donut + barra/leyenda + issues funnel + tabla) -->
-    <div class="panel">
-      <div class="panel__lbl">Indexación <span class="panel__sub">Search Console</span></div>
-      {#if indexation}
-        <div class="idx">
-          <!-- Donut + ratio -->
-          <div class="idx__donut-wrap">
-            <svg class="idx__donut" viewBox="0 0 88 88" role="img" aria-label="{nfmt(indexation.indexed)} de {nfmt(indexation.total)} páginas indexadas">
-              <defs>
-                <linearGradient id="seoDonut" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/>
-                </linearGradient>
-              </defs>
-              <circle cx="44" cy="44" r={DONUT_R} fill="none" stroke="var(--bg-elevated)" stroke-width="11" />
-              <circle
-                cx="44" cy="44" r={DONUT_R} fill="none" stroke="url(#seoDonut)" stroke-width="11"
-                stroke-linecap="round"
-                stroke-dasharray="{(idxRatio * DONUT_C).toFixed(1)} {DONUT_C.toFixed(1)}"
-                transform="rotate(-90 44 44)"
-                style="transition: stroke-dasharray var(--duration-base) var(--ease)"
-              />
-              <text x="44" y="41" text-anchor="middle" class="idx__donut-pct">{indexation.total ? pctOf(indexation.indexed, indexation.total) : '0%'}</text>
-              <text x="44" y="55" text-anchor="middle" class="idx__donut-cap">indexado</text>
-            </svg>
-          </div>
-          <!-- Bignum + barra + leyenda -->
-          <div class="idx__body">
-            <div class="idx__bignum">
-              <span class="idx__ratio"><span class="gold">{nfmt(indexation.indexed)}</span> / {nfmt(indexation.total)}</span>
-              <span class="idx__cap">páginas indexadas</span>
-            </div>
-            <div class="idx__bar" role="img" aria-label="{indexation.indexed} de {indexation.total} páginas indexadas">
-              <div class="idx__fill" style="width:{indexation.total ? Math.round((indexation.indexed / indexation.total) * 100) : 0}%"></div>
-            </div>
-            <div class="idx__legend mono">
-              <span><span class="dot dot--gold"></span>Indexadas {nfmt(indexation.indexed)}</span>
-              <span><span class="dot dot--track"></span>Sin indexar {nfmt(indexation.not_indexed)}</span>
-              {#if indexation.checked_at}<span class="dim">· revisado {fmtDateTime(indexation.checked_at)}</span>{/if}
-            </div>
-          </div>
-        </div>
-
-        {#if indexation.issues && indexation.issues.length}
-          <div class="idx__issues-lbl">Motivos de exclusión</div>
-          <ul class="issues">
-            {#each indexation.issues as it}
-              <li class="issue"><span class="issue__reason">{it.reason}</span><span class="issue__count mono">{nfmt(it.count)}</span></li>
-            {/each}
-          </ul>
-        {/if}
-
-        {#if indexation.pages && indexation.pages.length}
-          <div class="table-wrap idx__pages">
-            <table class="table">
-              <thead><tr><th>URL</th><th>Estado</th><th>Último rastreo</th></tr></thead>
-              <tbody>
-                {#each indexation.pages as pg}
-                  <tr>
-                    <td class="t-name idx__url">{pg.url || '—'}</td>
-                    <td><span class="pill pill--{idxStateClass(pg.state)}">{pg.state || 'Desconocido'}</span></td>
-                    <td class="mono dim">{pg.last_crawl ? fmtDateTime(pg.last_crawl) : '—'}</td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
-        {/if}
-      {:else}
-        <div class="muted-box">
-          {#if connected}
-            Sin datos de indexación todavía. Tocá <strong>↻ Actualizar ahora</strong> para consultar las páginas enviadas e indexadas en Search Console.
-          {:else}
-            Conectá Google para ver la indexación de las páginas.
-          {/if}
-        </div>
+      {#if selected}
+        <button type="button" class="b seo-bar__sync" onclick={() => syncNow()} disabled={Boolean(syncingId) || !configured || !(selected.gsc_site_url || selected.ga4_property_id)}>
+          <span class:seo-spin={syncing}><Icon name="refresh" size={16} /></span>{syncing ? 'Actualizando…' : 'Actualizar ahora'}
+        </button>
       {/if}
     </div>
 
-    {#if !hasData}
-      <div class="empty">
-        {#if connected}
-          Sin datos cacheados todavía. Tocá <strong>↻ Actualizar ahora</strong> para traer las métricas de los últimos 28 días.
-        {:else}
-          Conectá Google para ver datos. Una vez configurada la cuenta de servicio, sincronizá para poblar los gráficos.
-        {/if}
-      </div>
-    {:else}
-      <!-- Gráficos de línea INTERACTIVOS (clics e impresiones) -->
-      <div class="charts">
-        <!-- ── Clics (naranja) ── -->
-        <div class="panel">
-          <div class="panel__lbl">Clics en el tiempo <span class="panel__sub">últimos {gscDaily.length} días</span></div>
-          {#if gscDaily.length}
-            <div class="chart-box">
-              {#if hoverClicks >= 0 && clicksChart.pts[hoverClicks]}
-                <span class="chart-tip" style="left:{(clicksChart.pts[hoverClicks].x / VBW) * 100}%;top:{(clicksChart.pts[hoverClicks].y / VBH) * 100}%">
-                  <strong>{nfmt(clicksChart.pts[hoverClicks].v)}</strong> clics
-                  <span class="chart-tip__d">{shortDay(gscDaily[hoverClicks].date)}</span>
-                </span>
-              {/if}
-              <svg
-                class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Clics en el tiempo"
-                onmousemove={(e) => hoverClicks = nearestIndex(e, clicksChart.pts)}
-                onmouseleave={() => hoverClicks = -1}
-              >
-                <defs>
-                  <linearGradient id="seoClicksFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="var(--accent-gold)" stop-opacity="0.30"/>
-                    <stop offset="1" stop-color="var(--accent-gold)" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
-                <path d={clicksChart.area} fill="url(#seoClicksFill)" stroke="none" />
-                <path d={clicksChart.line} fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-                {#if hoverClicks >= 0 && clicksChart.pts[hoverClicks]}
-                  <line x1={clicksChart.pts[hoverClicks].x} y1="6" x2={clicksChart.pts[hoverClicks].x} y2={VBH - PAD_BOTTOM} class="chart__guide" />
-                  <circle cx={clicksChart.pts[hoverClicks].x} cy={clicksChart.pts[hoverClicks].y} r="5" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
-                {:else}
-                  <circle cx={clicksChart.pts[clicksChart.pts.length - 1].x} cy={clicksChart.pts[clicksChart.pts.length - 1].y} r="3.5" fill="var(--accent-gold)" />
-                {/if}
-                {#each xLabels as l}
-                  <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
-                {/each}
-              </svg>
-            </div>
-          {:else}<div class="muted">Sin datos de GSC.</div>{/if}
-        </div>
+    {#if missing}
+      <EmptyState title="Ese proyecto ya no existe" text="Puede que se haya eliminado. Elige otro en la lista.">
+        {#snippet action()}<button type="button" class="b" onclick={() => setSub([], { replace: true })}>Ver el más reciente</button>{/snippet}
+      </EmptyState>
+    {:else if selected}
+      {#if proj}
+        <p class="seo-meta">
+          {#if proj.domain}<span>{proj.domain}</span>{/if}
+          <span>Search Console: {proj.gsc_site_url || 'sin configurar'}</span>
+          <span>Analytics: {proj.ga4_property_id || 'sin configurar'}</span>
+          {#if proj.active === false}<span>Pausado: no entra en la sincronización automática</span>{/if}
+        </p>
+      {/if}
 
-        <!-- ── Impresiones (verde) ── -->
-        <div class="panel">
-          <div class="panel__lbl">Impresiones en el tiempo <span class="panel__sub">últimos {gscDaily.length} días</span></div>
-          {#if gscDaily.length}
-            <div class="chart-box">
-              {#if hoverImpr >= 0 && imprChart.pts[hoverImpr]}
-                <span class="chart-tip" style="left:{(imprChart.pts[hoverImpr].x / VBW) * 100}%;top:{(imprChart.pts[hoverImpr].y / VBH) * 100}%">
-                  <strong>{nfmt(imprChart.pts[hoverImpr].v)}</strong> impr.
-                  <span class="chart-tip__d">{shortDay(gscDaily[hoverImpr].date)}</span>
-                </span>
+      {#if detailError && !detail}
+        <ErrorState title="No se pudieron cargar los datos" message={detailError} onretry={() => loadDetail(String(selected.id), days)} />
+      {:else}
+        <LoadingState loading={detailLoading && !detail} rows={4} height={96} label="Cargando datos del proyecto…">
+          {#if detail}
+            <div class="seo-stack" class:is-reloading={detailLoading}>
+              {#if detailError}
+                <ErrorState compact title="No se pudo actualizar la vista" message={detailError} onretry={() => loadDetail(String(selected.id), days)} />
               {/if}
-              <svg
-                class="chart" viewBox="0 0 {VBW} {VBH}" role="img" aria-label="Impresiones en el tiempo"
-                onmousemove={(e) => hoverImpr = nearestIndex(e, imprChart.pts)}
-                onmouseleave={() => hoverImpr = -1}
-              >
-                <defs>
-                  <linearGradient id="seoImprFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="var(--accent-teal)" stop-opacity="0.30"/>
-                    <stop offset="1" stop-color="var(--accent-teal)" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                {#each gridLines as gy}<line x1="0" y1={gy} x2={VBW} y2={gy} class="chart__grid" />{/each}
-                <path d={imprChart.area} fill="url(#seoImprFill)" stroke="none" />
-                <path d={imprChart.line} fill="none" stroke="var(--accent-teal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
-                {#if hoverImpr >= 0 && imprChart.pts[hoverImpr]}
-                  <line x1={imprChart.pts[hoverImpr].x} y1="6" x2={imprChart.pts[hoverImpr].x} y2={VBH - PAD_BOTTOM} class="chart__guide" />
-                  <circle cx={imprChart.pts[hoverImpr].x} cy={imprChart.pts[hoverImpr].y} r="5" fill="var(--accent-teal)" stroke="var(--bg-card)" stroke-width="2" />
-                {:else}
-                  <circle cx={imprChart.pts[imprChart.pts.length - 1].x} cy={imprChart.pts[imprChart.pts.length - 1].y} r="3.5" fill="var(--accent-teal)" />
-                {/if}
-                {#each xLabels as l}
-                  <text x={labelX(l.i, gscDaily.length)} y={VBH - 6} text-anchor="middle" class="chart__lbl">{l.t}</text>
-                {/each}
-              </svg>
-            </div>
-          {:else}<div class="muted">Sin datos de GSC.</div>{/if}
-        </div>
-      </div>
 
-      <!-- Top queries -->
-      <div class="panel">
-        <div class="panel__lbl">Top búsquedas <span class="panel__sub">Search Console</span></div>
-        {#if topQueries.length}
-          <div class="table-wrap">
-            <table class="table">
-              <thead><tr><th>Consulta</th><th class="num">Clics</th><th class="num">Impr.</th><th class="num">CTR</th><th class="num">Pos.</th></tr></thead>
-              <tbody>
-                {#each topQueries as q, i}
-                  <tr>
-                    <td class="t-name">
-                      <span class="q-cell">
-                        <span class="rank">{i + 1}</span>
-                        <span class="q-text">{q.query || '—'}</span>
-                      </span>
-                    </td>
-                    <td class="num mono gold">{nfmt(q.clicks)}</td>
-                    <td class="num mono">{nfmt(q.impressions)}</td>
-                    <td class="num mono dim">{pct(q.ctr)}</td>
-                    <td class="num mono dim">{q.position ? (Math.round(q.position * 10) / 10) : '—'}</td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
-        {:else}<div class="muted">Sin búsquedas registradas en el rango.</div>{/if}
-      </div>
+              {#if !hasGsc && !hasGa4}
+                <Card>
+                  <EmptyState art="folder" title="Este proyecto aún no está conectado a Google"
+                    text="Añade su propiedad de Search Console, su ID de Analytics o los dos. Después se traen sus datos cada madrugada.">
+                    {#snippet action()}<button type="button" class="b" onclick={openEdit}>Añadir los identificadores</button>{/snippet}
+                  </EmptyState>
+                </Card>
+              {:else}
+              <SeoSources project={proj} state={syncState} {configured} {syncing}
+                through={{ gsc: sumG && sumG.through, ga4: sumA && sumA.through }}
+                onedit={openEdit} onstatus={() => (statusOpen = true)} />
+
+              <KpiGrid count={kpiCount} label="Resumen del período">
+                <Kpi label="Clics" value={hasGsc && sumG ? nfmt(sumG.current.clicks) : '—'} art="cursor" tone="accent">
+                  {@render kpiNote(dClicks, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo para comparar') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
+                </Kpi>
+                <Kpi label="Impresiones" value={hasGsc && sumG ? nfmt(sumG.current.impressions) : '—'} art="eye">
+                  {@render kpiNote(dImpr, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo para comparar') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
+                </Kpi>
+                <Kpi label="Posición media" value={hasGsc && sumG ? pos(sumG.current.position) : '—'} art="medal">
+                  {@render kpiNote(dPos, sumG ? 'ponderada por impresiones' : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
+                </Kpi>
+                <Kpi label="Sesiones" value={hasGa4 && sumA ? nfmt(sumA.current.sessions) : '—'} art="users" tone="data">
+                  {@render kpiNote(dSess, sumA ? (sumA.previous ? 'sin cambios' : 'sin período previo para comparar') : ga4EmptyTxt, 'Analytics sin configurar.', !hasGa4)}
+                </Kpi>
+                {#if showKeyEvents}
+                  <Kpi label="Eventos clave" value={nfmt(sumA.current.key_events)} art="check">
+                    {@render kpiNote(dKey, 'contactos y objetivos de Analytics', '', false)}
+                  </Kpi>
+                {/if}
+              </KpiGrid>
+              {#if sumG || sumA}
+                <p class="seo-window">
+                  {#if sumG}Search Console: {windowTxt} (publica con 2 o 3 días de retraso).{/if}
+                  {#if sumA}Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}, sin el día de hoy.{/if}
+                </p>
+                {#if partialTxt}
+                  <p class="seo-window seo-window--warn" role="note">{partialTxt}</p>
+                {/if}
+              {/if}
+
+              {#if hasGsc}
+                {#if gscDaily.length}
+                  <div class="seo-charts">
+                    <Card title="Clics por día" caption="Search Console">
+                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
+                      <SeoChart series={clicksSeries} tone="accent" unit="clics" unitOne="clic" label="Clics por día" {pendingLabel} />
+                    </Card>
+                    <Card title="Impresiones por día" caption="Search Console">
+                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
+                      <SeoChart series={imprSeries} tone="data" unit="impresiones" unitOne="impresión" label="Impresiones por día" {pendingLabel} />
+                    </Card>
+                  </div>
+                {:else}
+                  <Card title="Clics e impresiones" caption="Search Console">
+                    {#if gscErr}
+                      <EmptyState compact title="No se pudieron leer los datos de Search Console" text="El motivo y qué hacer están arriba, en Search Console.">
+                        {#snippet action()}<button type="button" class="b" onclick={() => (statusOpen = true)}>Ver estado de Google</button>{/snippet}
+                      </EmptyState>
+                    {:else}
+                      <EmptyState compact title="Aún no hay datos de Search Console"
+                        text={configured ? 'Se traen cada madrugada. Si no quieres esperar, actualiza ahora.' : 'Cuando el acceso a Google esté configurado, aquí verás los clics e impresiones de cada día.'}>
+                        {#snippet action()}{#if configured}<button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId)}>{syncing ? 'Actualizando…' : 'Actualizar ahora'}</button>{/if}{/snippet}
+                      </EmptyState>
+                    {/if}
+                  </Card>
+                {/if}
+              {/if}
+
+              <SeoIndexation indexation={detail.metrics.indexation} {hasGsc} state={syncState && syncState.sources ? syncState.sources.indexation : null}
+                {syncing} gscFailed={Boolean(gscErr)} onsync={() => syncNow()} onedit={openEdit} onstatus={() => (statusOpen = true)} />
+
+              {#if hasGsc && (topQ || gscDaily.length)}
+                <Card title="Top búsquedas" caption="Search Console">
+                  {#snippet actions()}
+                    {#if topQ && topQ.range}<span class="seo-cap">{dayShort(topQ.range.startDate)} al {dayShort(topQ.range.endDate)}</span>{/if}
+                  {/snippet}
+                  {#if queries.length}
+                    <div class="seo-q"><DataTable columns={qCols} rows={queries} rowKey="rank" caption="Búsquedas con más clics">
+                      {#snippet cell(row, col)}
+                        {#if col.key === 'query'}
+                          <span class="q"><span class="q__rank">{row.rank}</span><span class="q__text">{row.query || '—'}</span></span>
+                        {:else if col.key === 'clicks'}<span class="num num--hi">{nfmt(row.clicks)}</span>
+                        {:else if col.key === 'impressions'}<span class="num">{nfmt(row.impressions)}</span>
+                        {:else if col.key === 'ctr'}<span class="num num--dim">{pct(row.ctr)}</span>
+                        {:else}<span class="num num--dim">{pos(row.position)}</span>{/if}
+                      {/snippet}
+                    </DataTable></div>
+                  {:else}
+                    <EmptyState compact title="Sin búsquedas registradas"
+                      text={topQ ? 'Google no registró búsquedas con clics o impresiones en ese período.' : 'El resumen de búsquedas se guarda en cada sincronización.'} />
+                  {/if}
+                </Card>
+              {/if}
+
+              {/if}
+
+              <div class="seo-foot">
+                {#if hasGsc || hasGa4}<button type="button" class="b" onclick={openEdit}>Editar proyecto</button>{:else}<span></span>{/if}
+                <button type="button" class="b b--danger" onclick={() => (delOpen = true)}>Eliminar proyecto</button>
+              </div>
+            </div>
+          {/if}
+        </LoadingState>
+      {/if}
     {/if}
-
-    <div class="proj-foot">
-      <button class="b b--ghost" onclick={openEdit}>✎ Editar proyecto</button>
-      <button class="b b--danger" onclick={() => showDelete = true}>🗑 Eliminar proyecto</button>
-    </div>
   {/if}
-{/if}
+</LoadingState>
 
-<!-- Modal: alta de proyecto -->
-{#if showAdd}
-  <div class="backdrop" role="presentation" tabindex="-1"
-       onclick={(e) => { if (e.target === e.currentTarget) showAdd = false; }}
-       onkeydown={(e) => { if (e.key === 'Escape') showAdd = false; }}>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-add-title">
-      <h3 class="modal__t" id="seo-add-title">Nuevo proyecto SEO</h3>
-      <p class="modal__b">Guardá el nombre del proyecto y los identificadores de Google. Los datos se sincronizan después.</p>
-      <label class="f-lbl" for="np-name">Nombre del proyecto *</label>
-      <input id="np-name" class="inp" type="text" bind:value={form.name} placeholder="Sitio principal" />
-      <label class="f-lbl" for="np-client">Cliente</label>
-      <input id="np-client" class="inp" type="text" bind:value={form.client_name} placeholder="(opcional)" />
-      <label class="f-lbl" for="np-domain">Dominio</label>
-      <input id="np-domain" class="inp" type="text" bind:value={form.domain} placeholder="ejemplo.com" />
-      <label class="f-lbl" for="np-ga4">ID de propiedad GA4</label>
-      <input id="np-ga4" class="inp" type="text" bind:value={form.ga4_property_id} placeholder="123456789" inputmode="numeric" />
-      <label class="f-lbl" for="np-gsc">URL de Search Console</label>
-      <input id="np-gsc" class="inp" type="text" bind:value={form.gsc_site_url} placeholder="https://ejemplo.com/ o sc-domain:ejemplo.com" />
-      {#if addMsg}<div class="msg">{addMsg}</div>{/if}
-      <div class="modal__act">
-        <button class="b b--ghost" onclick={() => showAdd = false}>Cancelar</button>
-        <button class="b b--primary" disabled={saving || !form.name.trim()} onclick={createProject}>{saving ? 'Creando…' : 'Crear proyecto'}</button>
-      </div>
-    </div>
-  </div>
-{/if}
-
-<!-- Modal: editar proyecto -->
-{#if showEdit && detail}
-  <div class="backdrop" role="presentation" tabindex="-1"
-       onclick={(e) => { if (e.target === e.currentTarget) showEdit = false; }}
-       onkeydown={(e) => { if (e.key === 'Escape') showEdit = false; }}>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-edit-title">
-      <h3 class="modal__t" id="seo-edit-title">Editar proyecto SEO</h3>
-      <p class="modal__b">Corregí el nombre, el dominio o los identificadores de Google. En Search Console usá la propiedad sobre la que la cuenta de servicio TIENE permiso: el <strong>prefijo</strong> (<code>https://ejemplo.com/</code>) o el <strong>dominio</strong> (<code>sc-domain:ejemplo.com</code>).</p>
-      <label class="f-lbl" for="ep-name">Nombre del proyecto *</label>
-      <input id="ep-name" class="inp" type="text" bind:value={editForm.name} placeholder="Sitio principal" />
-      <label class="f-lbl" for="ep-client">Cliente</label>
-      <input id="ep-client" class="inp" type="text" bind:value={editForm.client_name} placeholder="(opcional)" />
-      <label class="f-lbl" for="ep-domain">Dominio</label>
-      <input id="ep-domain" class="inp" type="text" bind:value={editForm.domain} placeholder="ejemplo.com" />
-      <label class="f-lbl" for="ep-ga4">ID de propiedad GA4</label>
-      <input id="ep-ga4" class="inp" type="text" bind:value={editForm.ga4_property_id} placeholder="123456789" inputmode="numeric" />
-      <label class="f-lbl" for="ep-gsc">URL de Search Console</label>
-      <input id="ep-gsc" class="inp" type="text" bind:value={editForm.gsc_site_url} placeholder="https://ejemplo.com/ o sc-domain:ejemplo.com" />
-      <label class="f-check">
-        <input type="checkbox" bind:checked={editForm.active} />
-        <span>Proyecto activo (se incluye en la sincronización masiva)</span>
-      </label>
-      {#if editMsg}<div class="msg">{editMsg}</div>{/if}
-      <div class="modal__act">
-        <button class="b b--ghost" onclick={() => showEdit = false}>Cancelar</button>
-        <button class="b b--primary" disabled={editSaving || !editForm.name.trim()} onclick={saveEdit}>{editSaving ? 'Guardando…' : 'Guardar cambios'}</button>
-      </div>
-    </div>
-  </div>
-{/if}
-
-<!-- Modal: eliminar -->
-{#if showDelete && detail}
-  <div class="backdrop" role="presentation" tabindex="-1"
-       onclick={(e) => { if (e.target === e.currentTarget) showDelete = false; }}
-       onkeydown={(e) => { if (e.key === 'Escape') showDelete = false; }}>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="seo-del-title">
-      <h3 class="modal__t" id="seo-del-title">Eliminar proyecto</h3>
-      <p class="modal__b">Se borra <strong>{detail.project.name}</strong> y todas sus métricas cacheadas. Esta acción es <strong>irreversible</strong>.</p>
-      <div class="modal__act">
-        <button class="b b--ghost" onclick={() => showDelete = false}>Cancelar</button>
-        <button class="b b--danger" disabled={deleting} onclick={doDelete}>{deleting ? 'Eliminando…' : 'Eliminar'}</button>
-      </div>
-    </div>
-  </div>
-{/if}
+<SeoProjectForm bind:open={formOpen} project={formProject} {configured} onsaved={onSaved} />
+<SeoStatusDialog bind:open={statusOpen} {projects} {configured} {days}
+  onchanged={async () => { await loadProjects(); if (selected) await loadDetail(String(selected.id), days); }}
+  onopenproject={(id) => setSub([String(id)])} />
+<ConfirmDialog bind:open={delOpen} title="Eliminar proyecto de SEO" confirmLabel="Eliminar proyecto" busy={deleting}
+  message={selected ? `Se elimina «${selected.name}» con todos sus datos guardados: clics, impresiones, sesiones, indexación y búsquedas. En Google no se borra nada; si lo creas de nuevo, los datos se vuelven a traer.` : ''}
+  onconfirm={doDelete} />
 
 <style>
-  .conn { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
-  .conn--on { color: var(--accent-teal); }
-  .conn--off { color: var(--color-warning); }
+  /* Indicador de estado de Google: botón secundario con un punto de color
+     (el color nunca va solo: el texto dice el estado). */
+  .seo-health__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--fg-subtle); flex: 0 0 auto; }
+  .seo-health--success .seo-health__dot { background: var(--color-success); }
+  .seo-health--warning .seo-health__dot { background: var(--color-warning); }
+  .seo-health--error .seo-health__dot { background: var(--color-error); }
 
-  .notice { background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg); padding: var(--space-4); color: var(--fg-secondary); font-size: var(--text-sm); line-height: 1.55; margin-bottom: var(--space-4); }
-  .notice strong { color: var(--fg-primary); display: inline; }
-  .notice code, code { font-family: var(--font-mono); font-size: 12px; color: var(--accent-gold); background: rgba(255,255,255,.04); padding: 1px 5px; border-radius: var(--radius-sm); }
+  .seo-bar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
+  .seo-bar__pick { flex: 1 1 260px; max-width: 420px; min-width: 0; }
+  .seo-bar__pick select { width: 100%; }
+  .seo-bar__sync { margin-left: auto; }
+  .seo-spin { display: inline-flex; animation: seo-spin 1s linear infinite; }
+  @keyframes seo-spin { to { transform: rotate(360deg); } }
 
-  .picker { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
-  .picker__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
-  .picker .inp { width: auto; min-width: 240px; flex: 1; max-width: 420px; }
+  /* Rango: pastillas segmentadas (E-06) con el estado en la URL. Neutras:
+     el naranja queda para la acción principal (H-07). */
+  .seo-range { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-pill); }
+  .seo-range__b { all: unset; box-sizing: border-box; cursor: pointer; padding: 6px 12px; min-height: 30px; display: inline-flex; align-items: center; border-radius: var(--radius-pill); font-size: var(--dash-small); font-weight: 500; color: var(--fg-secondary); white-space: nowrap; transition: background-color var(--duration-fast), color var(--duration-fast); }
+  .seo-range__b:hover { color: var(--fg-primary); }
+  .seo-range__b[aria-pressed='true'] { background: var(--surface-3); color: var(--fg-primary); box-shadow: inset 0 0 0 1px var(--border-strong); }
+  .seo-range__b:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  @media (pointer: coarse) { .seo-range__b { min-height: 38px; } }
 
-  .proj-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px; color: var(--fg-subtle); text-transform: none; letter-spacing: .04em; margin-bottom: var(--space-3); transition: opacity var(--duration-fast); }
-  .proj-meta.is-reloading { opacity: .65; }
-  .reloading { color: var(--accent-gold); }
+  .seo-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 var(--space-4); font-size: var(--dash-caption); color: var(--fg-subtle); }
+  .seo-meta span { overflow-wrap: anywhere; }
 
-  /* ── KPIs (Orbit stat cards: label · número grande · delta · arte 3D) ──
-     Proporciones 1:1 con Orbit: padding 16px, número 36px/700/-0.025em,
-     label 13px/500 secundario, arte ~52px en la esquina, grid 4 cols
-     iguales gap 14px (auto-fit ≥184px → degrada a 2/1 col si falta sitio
-     o si solo hay datos esparcidos). */
-  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
-  .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-4) 13px; display: flex; flex-direction: column; gap: 8px; min-width: 0; transition: border-color var(--duration-fast); }
-  .kpi:hover { border-color: var(--border-strong); }
-  .kpi__lbl { font-family: var(--font-body); font-weight: 500; font-size: var(--text-sm); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); }
-  .kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; }
-  .kpi__num { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .kpi__num.gold { color: var(--accent-gold); }
-  .kpi__num.teal { color: var(--accent-teal); }
-  .kpi__delta { margin: 4px 0 0; font-size: 11.5px; }
-  .kpi__delta .up { color: var(--accent-teal); font-weight: 600; }
-  .kpi__delta .down { color: var(--color-error); font-weight: 600; }
-  .kpi__delta .muted { color: var(--fg-subtle); }
-  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 480px) { .kpis { grid-template-columns: 1fr; } }
+  .seo-stack { display: flex; flex-direction: column; gap: var(--space-4); transition: opacity var(--duration-fast); }
+  .seo-stack.is-reloading { opacity: .7; }
+  .seo-window { margin: -6px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
+  .seo-window--warn { color: var(--color-warning); }
+  .seo-down { color: var(--color-error); font-weight: 600; }
 
-  /* ── Indexación ── */
-  .idx { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
-  .idx__donut-wrap { flex: 0 0 auto; }
-  .idx__donut { width: 96px; height: 96px; display: block; }
-  .idx__donut-pct { fill: var(--fg-primary); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: var(--tracking-tight); }
-  .idx__donut-cap { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 8px; letter-spacing: .12em; text-transform: uppercase; }
-  .idx__body { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: var(--space-3); }
-  .idx__bignum { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .idx__ratio { font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
-  .idx__cap { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
-  .idx__bar { height: 14px; background: var(--bg-elevated); border-radius: var(--radius-pill); overflow: hidden; }
-  .idx__fill { height: 100%; background: linear-gradient(90deg, var(--accent-gold-hover), var(--accent-gold-deep)); border-radius: var(--radius-pill); min-width: 2px; transition: width var(--duration-base) var(--ease); }
-  .idx__legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 10px; color: var(--fg-secondary); letter-spacing: .04em; }
-  .idx__legend .dim { color: var(--fg-subtle); }
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
-  .dot--gold { background: var(--accent-gold); }
-  .dot--track { background: var(--surface-3, var(--bg-elevated)); border: 1px solid var(--border-strong); }
+  .seo-charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .seo-cap { font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; }
 
-  .idx__issues-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); margin: var(--space-4) 0 8px; }
-  .issues { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
-  .issue { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 9px 12px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
-  .issue__reason { font-size: var(--text-sm); color: var(--fg-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .issue__count { font-size: var(--text-xs); color: var(--color-warning); }
-  .idx__pages { margin-top: var(--space-4); }
-  .idx__url { max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .q { display: inline-flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
+  .q__rank { flex: 0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); }
+  .q__text { color: var(--fg-primary); overflow-wrap: anywhere; }
+  .num { font-variant-numeric: tabular-nums; color: var(--fg-secondary); }
+  .num--hi { color: var(--fg-primary); font-weight: 600; }
+  .num--dim { color: var(--fg-subtle); }
 
-  .pill { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-pill); border: 1px solid; white-space: nowrap; }
-  .pill--ok { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .pill--err { color: var(--color-error); border-color: rgba(var(--color-error-rgb),.4); background: rgba(var(--color-error-rgb),.1); }
-  .pill--warn { color: var(--color-warning); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .pill--neutral { color: var(--fg-subtle); border-color: var(--border-strong); background: var(--bg-elevated); }
+  .seo-foot { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-2); }
 
-  .muted-box { color: var(--fg-secondary); font-size: var(--text-sm); line-height: 1.55; text-align: center; padding: var(--space-5) var(--space-4); }
-  .muted-box strong { color: var(--fg-primary); }
-
-  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-4); }
-  /* Dentro de .charts los paneles ya van en el grid → sin margin propio. */
-  .charts .panel { margin-top: 0; }
-  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); margin-top: var(--space-4); }
-  .panel__lbl { font-family: var(--font-body); font-weight: 600; font-size: var(--text-sm); letter-spacing: normal; color: var(--fg-secondary); margin-bottom: var(--space-4); }
-  .panel__sub { color: var(--fg-subtle); margin-left: 6px; }
-
-  /* Contenedor relativo para posicionar la .chart-tip con left/top en %. */
-  .chart-box { position: relative; }
-  .chart { width: 100%; height: auto; display: block; }
-  .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
-  .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
-  .chart__guide { stroke: rgba(255, 255, 255, 0.22); stroke-dasharray: 3 4; stroke-width: 1; }
-  .chart-tip__d { display: block; font-weight: 400; color: var(--fg-subtle); font-size: 10px; margin-top: 2px; }
-  .muted { color: var(--fg-subtle); font-size: var(--text-sm); font-style: normal; padding: var(--space-4) 0; }
-
-  .table-wrap { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-  .table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-  .table th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .table td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--fg-secondary); }
-  .table tbody tr { transition: background var(--duration-fast); }
-  .table tbody tr:hover { background: var(--bg-elevated); }
-  .table tr:last-child td { border-bottom: 0; }
-  .table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .t-name { color: var(--fg-primary); }
-  /* Celda de consulta con monograma de rango (estilo tabla Orbit:
-     glifo/avatar de cabeza + nombre). El rango da jerarquía sin ruido. */
-  .q-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .rank { flex: 0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); }
-  .q-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
-  .gold { color: var(--accent-gold); }
-  .dim { color: var(--fg-subtle); }
-
-  .proj-foot { margin-top: var(--space-5); display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-
-  .empty { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); margin-top: var(--space-3); line-height: 1.6; }
-  .empty.err { color: var(--color-error); }
-  .empty strong { color: var(--fg-primary); }
-
-  .inp { width: 100%; padding: 9px 12px; background-color: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-sm); outline: none; transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
-  .inp:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
-  /* Select del picker: misma piel de input. El caret (gris sutil) lo aplica
-     la regla global select.inp en dashboard.css; aquí solo reservamos espacio. */
-  select.inp { padding-right: 30px; cursor: pointer; }
-  select.inp:hover { border-color: var(--border-strong); }
-  .f-lbl { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--text-xs); letter-spacing: normal; text-transform: none; color: var(--fg-secondary); margin: var(--space-3) 0 4px; }
-  .f-check { display: flex; align-items: center; gap: 8px; margin-top: var(--space-4); font-size: var(--text-sm); color: var(--fg-secondary); cursor: pointer; }
-  .f-check input { accent-color: var(--accent-gold); width: 15px; height: 15px; flex: 0 0 auto; }
-
-  /* La definición canónica de .b/.b--primary/.b--ghost/.b--danger
-     vive en dashboard.css (global). */
-
-  .msg { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--color-error); min-height: 12px; }
-  .msg.ok { color: var(--accent-teal); }
-
-  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
-  .modal { width: 100%; max-width: 460px; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-lg); padding: var(--space-5); max-height: 90vh; overflow-y: auto; }
-  .modal__t { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); color: var(--accent-gold); margin: 0 0 10px; }
-  .modal__b { color: var(--fg-secondary); font-size: var(--text-sm); line-height: 1.55; margin: 0 0 10px; }
-  .modal__b strong { color: var(--fg-primary); }
-  .modal__act { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
-
-  @media (max-width: 880px) { .charts { grid-template-columns: 1fr; } .idx { gap: var(--space-4); } }
+  @media (max-width: 1023px) { .seo-charts { grid-template-columns: 1fr; } }
+  @media (max-width: 719px) {
+    /* Búsquedas en el teléfono: las 4 cifras en 2 columnas (media tarjeta). */
+    .seo-q :global(.ui-table tr) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 20px; }
+    .seo-q :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
+    .seo-q :global(.ui-table td:not(.is-primary):not(.is-action)) { grid-column: auto; }
+    .seo-bar__pick { flex-basis: 100%; max-width: none; }
+    .seo-bar__sync { margin-left: 0; }
+  }
 </style>

@@ -14,8 +14,15 @@ const EVENTS = new Set([
   'calculator_started', 'calculator_completed', 'tool_cta_clicked',
   'whatsapp_clicked', 'call_clicked', 'proposal_requested', 'growth_teaser_clicked',
   'lang_notice_shown', 'lang_notice_accepted', 'lang_notice_dismissed',   // aviso de idioma (plan maestro 0.3)
+  'brief_submitted',                                                       // envío del brief v2 (B1)
 ]);
 const hits = new Map();                                   // rate-limit en memoria: 60/min por IP
+
+// La ruta del kit lleva el enlace secreto del cliente (/es/kit/<token>):
+// se guarda sin él, para que no acabe en la tabla ni en reportes.
+export function cleanPage(page) {
+  return String(page || '').replace(/^\/(es|en)\/kit\/[^/?#]+/, '/$1/kit').slice(0, 200);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return res.status(405).end(); }
@@ -36,7 +43,7 @@ export default async function handler(req, res) {
       ? JSON.stringify(body.props).slice(0, 2000) : null;
     await sql`
       INSERT INTO events (session_id, event_name, page, language, properties, ip_address)
-      VALUES (${String(body.sid || '').slice(0, 64)}, ${event}, ${String(body.page || '').slice(0, 200)},
+      VALUES (${String(body.sid || '').slice(0, 64)}, ${event}, ${cleanPage(body.page)},
               ${body.lang === 'en' ? 'en' : 'es'}, ${props}, ${ip})`;
     return res.status(200).json({ ok: true });
   } catch { return res.status(200).json({ ok: true }); }   // el tracking jamás rompe UX

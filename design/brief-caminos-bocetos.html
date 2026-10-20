@@ -1,0 +1,390 @@
+<title>Brief v2, tres caminos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Lienzo de bocetos en la gramática del sitio Marcyan (DS v2 Space-Tech): una sola apariencia oscura, a propósito.
+   Columnas: cada camino es una franja con su idea, su compromiso honesto y dos marcos (escritorio y teléfono). */
+:root{
+  color-scheme:dark;
+  --bg:#080808; --bg-2:#0e0e0d; --card:#141414; --elev:#1c1c1c; --sunk:#0b0b0b;
+  --line:rgba(240,237,232,.09); --line-2:rgba(240,237,232,.16);
+  --fg:#f0ede8; --fg-2:#9a9590; --fg-3:#6f6a65;
+  --gold:#c8a96e; --gold-dim:rgba(200,169,110,.15); --gold-line:rgba(200,169,110,.32); --gold-ink:#16120a;
+  --teal:#4fc3a1; --teal-dim:rgba(79,195,161,.13); --teal-line:rgba(79,195,161,.30);
+  --disp:'Space Grotesk',system-ui,sans-serif; --body:'DM Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);
+  background-image:radial-gradient(900px 480px at 88% -8%,rgba(200,169,110,.08),transparent 62%),radial-gradient(700px 520px at -8% 40%,rgba(79,195,161,.05),transparent 58%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:clamp(24px,5vw,56px)}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:clamp(36px,5vw,64px)}
+.kick{font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+h1{font:600 clamp(28px,4.4vw,44px)/1.08 var(--disp);margin:10px 0 12px;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 clamp(22px,2.6vw,28px)/1.15 var(--disp);margin:6px 0 8px;text-wrap:balance}
+p{margin:0}
+.lead{color:var(--fg-2);max-width:68ch;font-size:16px}
+.intro{display:grid;gap:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.tag{font:500 11.5px/1 var(--mono);color:var(--fg-2);border:1px solid var(--line-2);border-radius:100px;padding:6px 10px}
+.tag b{color:var(--gold);font-weight:500}
+
+/* Franja de cada camino */
+.way{display:grid;gap:22px;padding-top:28px;border-top:1px solid var(--line)}
+.way-hd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:end}
+.num{font:500 12px/1 var(--mono);color:var(--fg-3)}
+.reco{display:inline-flex;gap:6px;align-items:center;font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:100px;padding:6px 10px;margin-left:10px;vertical-align:middle}
+.trade{display:grid;gap:8px;font-size:14px;color:var(--fg-2)}
+.trade div{display:grid;grid-template-columns:76px 1fr;gap:10px}
+.trade dt,.trade .k{font:500 11px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)}
+.refs{font:12px var(--mono);color:var(--fg-3)}
+.frames{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
+
+/* Marcos */
+.frame{background:var(--bg-2);border:1px solid var(--line-2);border-radius:14px;overflow:hidden;min-width:0}
+.bar{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--line);font:11px var(--mono);color:var(--fg-3)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--elev)}
+.bar span{margin-left:8px}
+.scr{position:relative;padding:22px;min-height:420px;background:var(--bg);
+  background-image:radial-gradient(520px 260px at 90% 0,rgba(200,169,110,.07),transparent 65%)}
+.phone{border-radius:30px;max-width:300px;justify-self:center;width:100%}
+.phone .scr{padding:18px 16px 26px;min-height:0}
+.notch{width:90px;height:20px;border-radius:0 0 12px 12px;background:var(--elev);margin:0 auto}
+
+/* Piezas de interfaz del boceto (gramática del sitio) */
+.ui-kick{font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.ui-h{font:600 22px/1.15 var(--disp);margin:8px 0 6px;text-wrap:balance}
+.ui-p{font-size:13px;color:var(--fg-2)}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13.5px}
+.opt.on{border-color:var(--gold-line);background:linear-gradient(0deg,var(--gold-dim),var(--gold-dim)),var(--card)}
+.radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-2);flex:none}
+.opt.on .radio{border-color:var(--gold);box-shadow:inset 0 0 0 3px var(--card),inset 0 0 0 8px var(--gold)}
+.chk{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--line-2);flex:none}
+.opt.on .chk{background:var(--gold);border-color:var(--gold)}
+.from{font:12px var(--mono);color:var(--fg-3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:600 13px/1 var(--body);border-radius:8px;padding:11px 16px;border:1px solid transparent}
+.btn-p{background:var(--gold);color:var(--gold-ink)}
+.btn-g{border-color:var(--line-2);color:var(--fg)}
+.row{display:flex;gap:10px;align-items:center}
+.sp{flex:1}
+.seg{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.seg i{height:3px;border-radius:3px;background:var(--elev)}
+.seg i.on{background:var(--gold)}
+.field{display:grid;gap:6px}
+.lbl{font-size:12.5px;color:var(--fg-2)}
+.inp{background:var(--sunk);border:1px solid var(--line-2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--fg)}
+.inp.ph{color:var(--fg-3)}
+.note{font-size:12px;color:var(--fg-3)}
+.hint{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--teal)}
+.hint::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+
+/* Camino 1 */
+.w1{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:18px}
+.w1 .q{display:grid;gap:10px;align-content:start}
+.ficha{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;align-content:start}
+.ficha dl{margin:0;display:grid;gap:8px;font-size:12.5px}
+.ficha dt{font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3)}
+.ficha dd{margin:3px 0 0}
+.ficha .pend{color:var(--fg-3);font-style:italic}
+
+/* Camino 2 */
+.w2{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px}
+.rail{display:grid;gap:12px;align-content:start;border-right:1px solid var(--line);padding-right:18px}
+.time{display:inline-flex;font:500 11px/1 var(--mono);color:var(--fg-2);border:1px solid var(--line-2);border-radius:100px;padding:6px 9px;width:max-content}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.steps li{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--fg-3);padding:7px 0}
+.steps li b{font:500 10px/1 var(--mono);width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-2);color:var(--fg-3);flex:none}
+.steps li.done{color:var(--fg-2)} .steps li.done b{background:var(--teal-dim);border-color:var(--teal-line);color:var(--teal)}
+.steps li.now{color:var(--fg)} .steps li.now b{border-color:var(--gold);color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.drop{border:1px dashed var(--line-2);border-radius:12px;padding:14px;display:grid;gap:10px;background:var(--sunk)}
+.file{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;font-size:12.5px}
+.thumb{width:34px;height:34px;border-radius:6px;background:linear-gradient(135deg,#2a2622,#3a332a)}
+.prog{height:3px;border-radius:3px;background:var(--elev);margin-top:5px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--gold)}
+.ok{font:11px var(--mono);color:var(--teal)}
+
+/* Camino 3 */
+.chat{display:grid;gap:10px;align-content:start;max-width:560px}
+.bub{max-width:78%;font-size:13px;padding:10px 13px;border-radius:14px}
+.bub.m{background:var(--card);border:1px solid var(--line);border-top-left-radius:4px}
+.bub.u{justify-self:end;background:var(--gold-dim);border:1px solid var(--gold-line);border-top-right-radius:4px}
+.who{display:flex;gap:8px;align-items:center;font:500 11px var(--mono);color:var(--fg-3)}
+.ava{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f5f2ec,#bdb6aa)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px solid var(--line-2);border-radius:100px;padding:6px 10px;color:var(--fg-2)}
+.chip.on{border-color:var(--gold-line);color:var(--gold);background:var(--gold-dim)}
+.att{display:flex;gap:6px}
+.att .thumb{width:46px;height:46px}
+.compose{display:flex;gap:8px;align-items:center;border:1px solid var(--line-2);border-radius:12px;padding:8px 8px 8px 12px;font-size:12.5px;color:var(--fg-3);background:var(--sunk)}
+
+/* Kit de arranque */
+.kit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.list{display:grid;gap:8px}
+.item{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px}
+.st{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-2)}
+.st.done{background:var(--teal);border-color:var(--teal)}
+.st.half{border-color:var(--gold);background:conic-gradient(var(--gold) 0 50%,transparent 0)}
+.meta{font:11px var(--mono);color:var(--fg-3)}
+.bigbar{height:6px;border-radius:6px;background:var(--elev);overflow:hidden}
+.bigbar i{display:block;height:100%;width:58%;background:var(--gold)}
+.shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.shot{border:1px dashed var(--line-2);border-radius:10px;padding:10px;display:grid;gap:6px;align-content:start;font-size:11.5px;color:var(--fg-2);min-height:92px}
+.shot.has{border-style:solid;border-color:var(--teal-line)}
+.shot .thumb{width:100%;height:38px;border-radius:6px}
+.shot .from{font-size:10.5px}
+
+.ask{display:grid;gap:10px;background:var(--card);border:1px solid var(--gold-line);border-radius:14px;padding:20px 22px}
+.ask ul{margin:0;padding-left:18px;color:var(--fg-2);display:grid;gap:6px}
+.foot{font:12px var(--mono);color:var(--fg-3)}
+
+@media (max-width:960px){
+  .way-hd,.frames,.kit{grid-template-columns:minmax(0,1fr)}
+  .w1,.w2{grid-template-columns:minmax(0,1fr)}
+  .rail{border-right:0;border-bottom:1px solid var(--line);padding:0 0 12px}
+}
+@media (max-width:520px){ .grid2{grid-template-columns:minmax(0,1fr)} .shots{grid-template-columns:repeat(2,minmax(0,1fr))} .scr{padding:16px} }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <span class="kick">Brief v2 · elegir camino</span>
+    <h1>¿Cómo se ve el brief que llena el cliente?</h1>
+    <p class="lead">Tres caminos para el brief corto (el que se llena al pedir propuesta). Los tres piden lo mismo: negocio, qué necesita según nuestro catálogo, su marca, logo y fotos opcionales, plazo y presupuesto. Cambia cómo se recorre. Debajo, el Kit de arranque que recibe el cliente cuando contrata, igual para los tres.</p>
+    <div class="legend">
+      <span class="tag">Bocetos en baja fidelidad con los colores y letras del sitio</span>
+      <span class="tag">Datos de ejemplo, no son de un cliente real</span>
+      <span class="tag">Se guarda solo y se puede retomar <b>en los tres</b></span>
+    </div>
+  </header>
+
+  <!-- CAMINO 1 -->
+  <section class="way" aria-labelledby="c1">
+    <div class="way-hd">
+      <div>
+        <span class="num">Camino 1</span>
+        <h2 id="c1">Una pregunta a la vez</h2>
+        <p class="lead">Cada pantalla hace una sola pregunta con opciones grandes. Al lado se va armando su ficha con lo que ya contestó, para que vea que avanza.</p>
+      </div>
+      <dl class="trade">
+        <div><dt class="k">Gana</dt><dd style="margin:0">El más fácil en el teléfono. Se siente como una conversación tranquila.</dd></div>
+        <div><dt class="k">Cuesta</dt><dd style="margin:0">Unas 12 pantallas. Para revisar o cambiar una respuesta hay que volver atrás.</dd></div>
+        <div><dt class="k">Mirado</dt><dd style="margin:0" class="refs">GlossGenius onboarding (Refero eb58772c) · Typeform setup (e7202af7)</dd></div>
+      </dl>
+    </div>
+    <div class="frames">
+      <div class="frame" role="img" aria-label="Boceto de escritorio del camino 1">
+        <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>marcyanstudio.com/es/brief</span></div>
+        <div class="scr">
+          <div class="w1">
+            <div class="q">
+              <span class="ui-kick">Paso 3 de 12 · Qué necesitas</span>
+              <div class="ui-h">¿Qué quieres que hagamos por tu negocio?</div>
+              <p class="ui-p">Elige todo lo que aplique. Los precios son nuestros precios publicados.</p>
+              <div class="opt on"><span>Sitio web nuevo</span><span class="row"><span class="from">desde $400</span><i class="chk"></i></span></div>
+              <div class="opt on"><span>Aparecer en Google Maps (SEO local)</span><span class="row"><span class="from">desde $300</span><i class="chk"></i></span></div>
+              <div class="opt"><span>Chatbot que contesta por ti</span><span class="row"><span class="from">desde $500</span><i class="chk"></i></span></div>
+              <div class="opt"><span>Tienda en línea</span><span class="row"><span class="from">desde $900</span><i class="chk"></i></span></div>
+              <div class="seg" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+              <div class="row"><span class="btn btn-g">Atrás</span><span class="sp"></span><span class="btn btn-p">Siguiente</span></div>
+            </div>
+            <aside class="ficha">
+              <span class="ui-kick">Tu ficha</span>
+              <dl>
+                <div><dt>Negocio</dt><dd>Taquería Los Compadres · Houston, TX</dd></div>
+                <div><dt>Contacto</dt><dd>(713) 555-0142 · WhatsApp</dd></div>
+                <div><dt>Servicios</dt><dd>Sitio web nuevo, SEO local</dd></div>
+                <div><dt>Tu marca</dt><dd class="pend">pendiente</dd></div>
+                <div><dt>Plazo</dt><dd class="pend">pendiente</dd></div>
+              </dl>
+              <p class="hint">Guardado hace un momento</p>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="frame phone" role="img" aria-label="Boceto de teléfono del camino 1">
+        <div class="notch"></div>
+        <div class="scr" style="display:grid;gap:10px;align-content:start">
+          <span class="ui-kick">Paso 3 de 12</span>
+          <div class="ui-h" style="font-size:20px">¿Qué quieres que hagamos por tu negocio?</div>
+          <div class="opt on"><span>Sitio web nuevo</span><i class="chk"></i></div>
+          <div class="opt on"><span>Aparecer en Google Maps</span><i class="chk"></i></div>
+          <div class="opt"><span>Chatbot que contesta por ti</span><i class="chk"></i></div>
+          <div class="opt"><span>Tienda en línea</span><i class="chk"></i></div>
+          <div class="seg" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="row"><span class="btn btn-g">Atrás</span><span class="sp"></span><span class="btn btn-p">Siguiente</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAMINO 2 -->
+  <section class="way" aria-labelledby="c2">
+    <div class="way-hd">
+      <div>
+        <span class="num">Camino 2</span>
+        <h2 id="c2">Expediente por pasos <span class="reco">Recomendado</span></h2>
+        <p class="lead">Seis pasos con nombre a la izquierda y el tiempo que lleva. Cada paso agrupa sus preguntas en una sola pantalla; las fotos y el logo suben ahí mismo con su barra de progreso. El último paso enseña todo para revisar antes de enviar.</p>
+      </div>
+      <dl class="trade">
+        <div><dt class="k">Gana</dt><dd style="margin:0">Se ve todo el recorrido y cuánto falta. Revisar y corregir es inmediato. Encaja con la seriedad de "propuesta en 24 horas".</dd></div>
+        <div><dt class="k">Cuesta</dt><dd style="margin:0">Pantallas más densas. En el teléfono la lista de pasos pasa a una barra arriba.</dd></div>
+        <div><dt class="k">Mirado</dt><dd style="margin:0" class="refs">Metaview onboarding (Refero 97ccfcc6) · Mercury subida de imágenes (bade88f7)</dd></div>
+      </dl>
+    </div>
+    <div class="frames">
+      <div class="frame" role="img" aria-label="Boceto de escritorio del camino 2">
+        <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>marcyanstudio.com/es/brief</span></div>
+        <div class="scr">
+          <div class="w2">
+            <div class="rail">
+              <span class="ui-kick">Tu brief</span>
+              <span class="time">unos 10 minutos</span>
+              <ol class="steps">
+                <li class="done"><b>✓</b>Tu negocio</li>
+                <li class="done"><b>✓</b>Qué necesitas</li>
+                <li class="now"><b>3</b>Tu marca</li>
+                <li><b>4</b>Plazo y presupuesto</li>
+                <li><b>5</b>Cómo te contactamos</li>
+                <li><b>6</b>Revisar y enviar</li>
+              </ol>
+              <p class="hint">Se guarda solo</p>
+            </div>
+            <div style="display:grid;gap:14px;align-content:start">
+              <div><div class="ui-h" style="margin-top:0">Tu marca</div><p class="ui-p">Si ya tienes logo, súbelo. Si no, lo hacemos juntos.</p></div>
+              <div class="drop">
+                <div class="file"><i class="thumb"></i><div>logo-compadres.png<div class="prog"><i style="width:100%;background:var(--teal)"></i></div></div><span class="ok">listo</span></div>
+                <div class="file"><i class="thumb"></i><div>taqueria-frente.jpg<div class="prog"><i style="width:64%"></i></div></div><span class="from">64 %</span></div>
+                <div class="row note"><span>Arrastra aquí o</span><span class="btn btn-g" style="padding:7px 10px">Elegir archivos</span><span class="sp"></span><span>fotos del iPhone sí sirven</span></div>
+              </div>
+              <div class="grid2">
+                <div class="field"><span class="lbl">Colores de tu marca</span><div class="inp">Rojo #B3261E · Crema #F3E9D2</div></div>
+                <div class="field"><span class="lbl">¿Tu marca se puede ajustar?</span><div class="inp">Sí, ajustarla un poco</div></div>
+              </div>
+              <div class="row"><span class="btn btn-g">Atrás</span><span class="sp"></span><span class="btn btn-p">Siguiente: plazo y presupuesto</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame phone" role="img" aria-label="Boceto de teléfono del camino 2">
+        <div class="notch"></div>
+        <div class="scr" style="display:grid;gap:12px;align-content:start">
+          <div class="row"><span class="ui-kick">Paso 3 de 6 · Tu marca</span><span class="sp"></span><span class="from">10 min</span></div>
+          <div class="seg" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="ui-h" style="font-size:20px;margin:0">Tu marca</div>
+          <div class="drop">
+            <div class="file"><i class="thumb"></i><div>logo-compadres.png<div class="prog"><i style="width:100%;background:var(--teal)"></i></div></div><span class="ok">listo</span></div>
+            <span class="btn btn-g">Subir logo o fotos</span>
+          </div>
+          <div class="field"><span class="lbl">Colores de tu marca</span><div class="inp">Rojo #B3261E · Crema</div></div>
+          <div class="field"><span class="lbl">¿Tu marca se puede ajustar?</span><div class="inp">Sí, ajustarla un poco</div></div>
+          <div class="row"><span class="btn btn-g">Atrás</span><span class="sp"></span><span class="btn btn-p">Siguiente</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAMINO 3 -->
+  <section class="way" aria-labelledby="c3">
+    <div class="way-hd">
+      <div>
+        <span class="num">Camino 3</span>
+        <h2 id="c3">Lo arma Marcy contigo</h2>
+        <p class="lead">El brief es una conversación con Marcy. Ella pregunta, el cliente contesta con botones o escribe, y sube logo y fotos como adjuntos del chat. Al final Marcy enseña el resumen para confirmar.</p>
+      </div>
+      <dl class="trade">
+        <div><dt class="k">Gana</dt><dd style="margin:0">Lo más propio de Marcyan: ya tenemos a Marcy. Se siente atendido por alguien.</dd></div>
+        <div><dt class="k">Cuesta</dt><dd style="margin:0">Corregir una respuesta es incómodo, cuesta saber cuánto falta, y quien no quiere chatear se va. Usa la IA en cada brief.</dd></div>
+        <div><dt class="k">Mirado</dt><dd style="margin:0" class="refs">Jasper onboarding conversacional (Refero 2fd69a75)</dd></div>
+      </dl>
+    </div>
+    <div class="frames">
+      <div class="frame" role="img" aria-label="Boceto de escritorio del camino 3">
+        <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>marcyanstudio.com/es/brief</span></div>
+        <div class="scr">
+          <div class="chat">
+            <div class="who"><i class="ava"></i>Marcy</div>
+            <div class="bub m">¡Hola! Para preparar tu propuesta, ¿qué quieres que hagamos por tu negocio?</div>
+            <div class="chips"><span class="chip on">Sitio web nuevo</span><span class="chip on">Aparecer en Google Maps</span><span class="chip">Chatbot</span><span class="chip">Tienda en línea</span></div>
+            <div class="bub u">Sitio web nuevo y aparecer en Google Maps</div>
+            <div class="bub m">Perfecto. ¿Tienes logo? Si quieres, súbelo aquí junto con fotos de tu negocio.</div>
+            <div class="bub u"><div class="att"><i class="thumb"></i><i class="thumb"></i><i class="thumb"></i></div></div>
+            <div class="compose">Escribe tu respuesta…<span class="sp"></span><span class="btn btn-p" style="padding:8px 12px">Enviar</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame phone" role="img" aria-label="Boceto de teléfono del camino 3">
+        <div class="notch"></div>
+        <div class="scr" style="display:grid;gap:10px;align-content:start">
+          <div class="who"><i class="ava"></i>Marcy</div>
+          <div class="bub m">¿Qué quieres que hagamos por tu negocio?</div>
+          <div class="chips"><span class="chip on">Sitio web</span><span class="chip on">Google Maps</span><span class="chip">Chatbot</span></div>
+          <div class="bub u">Sitio web y Google Maps</div>
+          <div class="bub m">¿Tienes logo? Súbelo aquí.</div>
+          <div class="bub u"><div class="att"><i class="thumb"></i><i class="thumb"></i></div></div>
+          <div class="compose">Escribe…<span class="sp"></span><span class="btn btn-p" style="padding:8px 10px">Enviar</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KIT DE ARRANQUE -->
+  <section class="way" aria-labelledby="k1">
+    <div class="way-hd">
+      <div>
+        <span class="num">Segundo momento, igual en los tres caminos</span>
+        <h2 id="k1">Kit de arranque: una lista que se completa en días</h2>
+        <p class="lead">Cuando el cliente contrata, le mandas desde el panel su enlace privado. Ve una lista de bloques con su estado y lo completa en el orden que quiera, cuando tenga los datos. Las fotos se piden por tomas concretas: así llega exactamente lo que necesitamos para construir.</p>
+      </div>
+      <dl class="trade">
+        <div><dt class="k">Pieza nueva</dt><dd style="margin:0">"Subida guiada por tomas": cada foto que necesitamos tiene su casilla. La propongo para el catálogo.</dd></div>
+        <div><dt class="k">Mirado</dt><dd style="margin:0" class="refs">DocuSign lista de inicio (Refero d197ffa5) · Unsplash etiquetas por foto (7c5bf646)</dd></div>
+      </dl>
+    </div>
+    <div class="frame" role="img" aria-label="Boceto del kit de arranque">
+      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>marcyanstudio.com/es/kit/••••••</span></div>
+      <div class="scr">
+        <div class="kit">
+          <div style="display:grid;gap:12px;align-content:start">
+            <span class="ui-kick">Kit de arranque · Taquería Los Compadres</span>
+            <div class="ui-h" style="margin:0">Todo lo que necesitamos para construir tu sitio</div>
+            <div class="row note"><span>7 de 12 bloques</span><span class="sp"></span><span>Puedes dejarlo y volver con este mismo enlace</span></div>
+            <div class="bigbar"><i></i></div>
+            <div class="list">
+              <div class="item"><i class="st done"></i><span>Datos exactos del negocio</span><span class="meta">listo</span></div>
+              <div class="item"><i class="st done"></i><span>Horario y zonas donde trabajas</span><span class="meta">listo</span></div>
+              <div class="item"><i class="st half"></i><span>Servicios y precios</span><span class="meta">3 de 5</span></div>
+              <div class="item"><i class="st half"></i><span>Fotos de tu trabajo</span><span class="meta">4 de 8 tomas</span></div>
+              <div class="item"><i class="st"></i><span>Accesos: dominio, Google y redes</span><span class="meta">sin contraseñas</span></div>
+              <div class="item"><i class="st"></i><span>Seguro, licencias y garantías</span><span class="meta">opcional</span></div>
+            </div>
+          </div>
+          <div style="display:grid;gap:10px;align-content:start">
+            <span class="ui-kick">Fotos de tu trabajo</span>
+            <p class="ui-p">Sube desde la galería del teléfono, no por WhatsApp: llegan con mejor calidad.</p>
+            <div class="shots">
+              <div class="shot has"><i class="thumb"></i>Tú o tu equipo<span class="from">listo</span></div>
+              <div class="shot has"><i class="thumb"></i>Tu local por fuera<span class="from">listo</span></div>
+              <div class="shot has"><i class="thumb"></i>Tu plato estrella<span class="from">listo</span></div>
+              <div class="shot has"><i class="thumb"></i>Tu cocina trabajando<span class="from">listo</span></div>
+              <div class="shot">Tu letrero o menú<span class="from">subir</span></div>
+              <div class="shot">Un evento o catering<span class="from">subir</span></div>
+            </div>
+            <div class="field"><span class="lbl">De la foto "Tu plato estrella": ¿qué es y dónde?</span><div class="inp">Tacos al pastor · Houston, agosto 2026</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ask" aria-labelledby="q">
+    <span class="kick">Lo que decides</span>
+    <h2 id="q" style="margin:0">Elige un camino para el brief corto</h2>
+    <ul>
+      <li>Recomiendo el <b>camino 2</b>: el cliente ve cuánto le falta, corrige sin perderse y las subidas se sienten seguras. En el teléfono queda casi como el camino 1.</li>
+      <li>Se puede mezclar: el camino 2 con una pregunta por pantalla solo en el teléfono.</li>
+      <li>El Kit de arranque se construye como lista en cualquier caso.</li>
+    </ul>
+    <p class="foot">Piezas del catálogo: D-09 formulario por pasos con reanudación · D-10 acción principal con reaseguro · E-10 error con rescate · pieza nueva: subida guiada por tomas.</p>
+  </section>
+</div>

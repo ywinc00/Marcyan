@@ -3,22 +3,11 @@
 // Siempre responde 200 (no revela si el email está autorizado).
 import { isAllowed, createMagicToken, clientIp } from '../../lib/auth.mjs';
 import { emailAdminMagicLink } from '../../lib/email.mjs';
+import { rateLimit, LIMITS } from '../../lib/ratelimit.mjs';
 
-const SIMPLE_RATE_LIMIT = new Map(); // ip → { count, resetAt }
-const MAX_PER_15MIN = 5;
-
-function rateLimit(ip) {
-  if (!ip) return true;
-  const now = Date.now();
-  const slot = SIMPLE_RATE_LIMIT.get(ip);
-  if (!slot || slot.resetAt < now) {
-    SIMPLE_RATE_LIMIT.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
-    return true;
-  }
-  if (slot.count >= MAX_PER_15MIN) return false;
-  slot.count++;
-  return true;
-}
+// Límite de intentos: 5 por 15 min por IP, ahora PERSISTENTE en Neon
+// (lib/ratelimit.mjs, B-03). Antes era un Map en memoria por instancia; si la
+// migración 010 aún no está aplicada, la librería vuelve a ese mismo contador.
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -27,7 +16,9 @@ export default async function handler(req, res) {
   }
 
   const ip = clientIp(req);
-  if (!rateLimit(ip)) {
+  const rl = await rateLimit({ bucket: 'login', key: ip, limits: LIMITS.login });
+  if (!rl.ok) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
     return res.status(429).json({ ok: false, error: 'Demasiados intentos. Espera 15 min.' });
   }
 

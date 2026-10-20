@@ -26,7 +26,8 @@ export default defineConfig({
     // · NO usamos la opción i18n: las landings de cluster son solo-ES por ahora;
     //   el hreflang lo emite cada página en su <head> (Layout). Así evitamos
     //   alternates /en/… que aún devuelven 404.
-    // · filter: fuera la galería interna /kit, el /formulario (ambos noindex)
+    // · filter: fuera /es|en/kit (kit de arranque privado) y /es/kit-diseno (galería
+    //   interna), el /formulario y /en/project-brief (todos noindex)
     //   y /dashboard (panel privado, noindex — no debe anunciarse en el sitemap).
     // · /privacidad y /terminos ya son páginas Astro (src/pages/*.astro) → el
     //   sitemap las incluye solo; por eso ya NO van en customPages (evita duplicar).
@@ -34,7 +35,7 @@ export default defineConfig({
     //   sirve /es con 200 y /es/ con 308; el sitemap debe listar las que dan 200.
     sitemap({
       filter: (page) =>
-        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/dashboard'),
+        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/project-brief') && !page.includes('/dashboard'),
       serialize: (item) => {
         item.url = item.url.replace(/\/$/, '');
         return item;

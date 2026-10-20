@@ -189,8 +189,11 @@ const t = STR[lang];
 const topics = TOPICS[lang];
 
 // Tokens seguros que el cliente puede convertir en enlaces (nunca innerHTML del modelo).
+// El texto puede decir "/formulario" (también en inglés, viene del servidor);
+// en la versión EN el enlace lleva al brief en inglés (B-07).
+const briefHref = lang === 'en' ? '/en/project-brief' : '/formulario';
 const links = [
-  { token: '/formulario', href: '/formulario' },
+  { token: '/formulario', href: briefHref },
   { token: nap.email, href: 'mailto:' + nap.email },
   { token: nap.houston, href: telHref(nap.houston) },
   { token: nap.miami, href: telHref(nap.miami) },
@@ -203,7 +206,7 @@ const pages = {
   servicios:  { href: lang === 'en' ? '/en/services' : '/es/servicios', label: t.pgServicios },
   houston:    { href: lang === 'en' ? '/en/houston'  : '/es/houston',   label: t.pgHouston },
   miami:      { href: lang === 'en' ? '/en/miami'    : '/es/miami',     label: t.pgMiami },
-  formulario: { href: '/formulario', label: t.pgFormulario },
+  formulario: { href: briefHref, label: t.pgFormulario },
   diagnostico: { href: lang === 'en' ? '/en/checkup' : '/es/diagnostico', label: t.pgDiagnostico },
   herramientas: { href: lang === 'en' ? '/en/tools' : '/es/herramientas', label: t.pgHerramientas },
   'calculadora-llamadas': { href: lang === 'en' ? '/en/tools#calls' : '/es/herramientas#llamadas', label: t.pgCalcLlamadas },

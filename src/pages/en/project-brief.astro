@@ -1,0 +1,67 @@
+---
+// /en/project-brief — Project brief (EN). Same data model as /formulario
+// (ES): the BriefForm island sends `lang: 'en'` and the same keys/values, so
+// the dashboard, the email and the kit read both the same way (B-07).
+// noindex and kept out of the sitemap (astro.config.mjs filter).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import Kicker from '../../components/ui/Kicker.astro';
+import BtnStates from '../../components/ui/BtnStates.astro';
+import BriefForm from '../../components/brief/BriefForm.svelte';
+import { content, nap } from '../../i18n/content';
+import { clusterNavEn } from '../../i18n/clusters';
+
+// The nav CTA can't point back to this page (B-25): offer WhatsApp instead.
+const wa = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;
+const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa, track: 'whatsapp_clicked' } };
+---
+<Layout
+  title="Project brief · Marcyan Studio"
+  description="Tell us about your business in six steps and we'll have a proposal ready within 24 hours. Web design, AI and SEO in Houston and Miami."
+  lang="en"
+  path="/en/project-brief"
+  canonical="https://marcyanstudio.com/en/project-brief"
+  hasEn={true}
+  noindex={true}
+>
+  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
+
+  <main id="main" class="brief">
+    <div class="container brief__inner">
+      <header class="brief__head">
+        <Kicker>Project brief</Kicker>
+        <h1 class="brief__h1">Tell us about your <em>project</em></h1>
+        <p class="brief__lead">Six steps, 5 to 15 minutes depending on what you need. With your answers we'll have a proposal ready within 24 hours.</p>
+      </header>
+
+      <BriefForm client:load lang="en" phone={nap.houston} />
+
+      <noscript>
+        <p class="brief__nojs">You need JavaScript turned on to fill out the brief. You can also call us at <a href={`tel:${nap.houston.replace(/[^\d+]/g, '')}`}>{nap.houston}</a> or message us on <a href={wa}>WhatsApp</a>.</p>
+      </noscript>
+    </div>
+  </main>
+
+  <SpaceBackdrop tone="gold" density={0.8} />
+  <SiteFooter footer={content.en.footer} lang="en" />
+
+  <!-- Loads BtnStates' global styles once (the island's send button uses its .bstate/.bst contract). Not rendered. -->
+  <template><button class="bstate" type="button"><BtnStates sending="" done="">.</BtnStates></button></template>
+  {import.meta.env.DEV && <script is:inline src="/dev/brief-mock.js"></script>}
+</Layout>
+
+<style>
+  .brief { padding-top: calc(var(--nav-h) + var(--space-7)); padding-bottom: var(--space-9); }
+  .brief__inner { max-width: 1080px; }
+  .brief__head { display: grid; gap: var(--space-3); margin-bottom: var(--space-6); max-width: 680px; }
+  .brief__h1 { margin: 0; font-family: var(--font-display); font-size: var(--fluid-h3); font-weight: 700; line-height: var(--leading-tight); letter-spacing: var(--tracking-tight); color: var(--fg-primary); }
+  .brief__h1 em { color: var(--accent-gold); font-style: normal; }
+  .brief__lead { margin: 0; color: var(--fg-secondary); font-size: var(--fluid-lead); line-height: var(--leading-normal); }
+  .brief__nojs { margin-top: var(--space-5); color: var(--fg-secondary); }
+  .brief__nojs a { color: var(--accent-gold); }
+  @media (--lg) {
+    .brief__head { margin-left: calc(216px + var(--space-7)); }
+  }
+</style>

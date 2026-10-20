@@ -1,86 +1,127 @@
-// /api/admin/projects/:id/milestones   (id = projects.id numérico)
-//   GET   → lista de hitos del proyecto + progreso
-//   POST  { label, stage?, status?, dueDate? }            → crea un hito al final
-//   PATCH { milestoneId, status }                          → cambia el estado de un hito
-//         (también acepta { milestoneId, label } / { stage, status } vía upsert)
+// /api/admin/projects/:id/milestones   (id = projects.id, o el código PRJ-003)
+//   GET    → lista de hitos del proyecto + progreso
+//   POST   { label, stage?, status?, dueDate? }          → crea un hito al final
+//   PATCH  { milestoneId, label?, dueDate?, status? }    → edita un hito (renombrar,
+//          fecha: '' o null la quita, estado). Solo cambia lo que viene.
+//          { order: [milestoneId, …] }                   → reordena TODOS los hitos
+//          (la lista tiene que ser exactamente la del proyecto; si cambió, 409).
+//          { stage, status }                             → compatibilidad: upsert por etapa.
+//   DELETE ?milestoneId=  (o { milestoneId } en el cuerpo) → borra un hito.
+// PATCH y DELETE comprueban que el hito sea DEL proyecto de la URL (OP-26,
+// MOCK-07): un id de otro proyecto responde 404 sin tocar nada.
+// Todas las escrituras devuelven { milestones, progress } actualizados.
 // Protegida con requireAdmin.
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import {
-  getProject, listMilestones, projectProgress,
-  createMilestone, upsertMilestone, updateMilestoneStatus,
-  MILESTONE_STATUSES,
+  getProject, listMilestones, projectProgress, parseProjectRef,
+  createMilestone, upsertMilestone, updateMilestone, deleteMilestoneOf, reorderMilestones,
+  normalizeMilestonePatch, ProjectInputError, MILESTONE_STATUSES, MAX_LABEL,
 } from '../../../../lib/projects.mjs';
+
+const ID_RE = /^\d{1,19}$/;
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
 
-  const id = parseInt((req.query?.id || '').toString(), 10);
-  if (!Number.isFinite(id)) return res.status(400).json({ ok: false, error: 'ID de proyecto inválido' });
+  const ref = (req.query?.id ?? '').toString().trim();
+  if (!parseProjectRef(ref)) return res.status(400).json({ ok: false, error: 'Proyecto inválido' });
 
-  // Aseguramos que el proyecto existe antes de tocar sus hitos.
-  const project = await getProject(id);
+  let project;
+  try {
+    // Aseguramos que el proyecto existe antes de tocar sus hitos.
+    project = await getProject(ref);
+  } catch (err) {
+    console.error('[admin/projects/:id/milestones] error:', err);
+    return res.status(500).json({ ok: false, error: 'Error al leer el proyecto' });
+  }
   if (!project) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
+  const id = String(project.id);
+  const body = (typeof req.body === 'object' && req.body) ? req.body : {};
+
+  const withList = async (status, extra = {}) => {
+    const milestones = await listMilestones(id);
+    const progress = await projectProgress(id);
+    return res.status(status).json({ ok: true, ...extra, milestones, progress });
+  };
+  const fail = (err, where, msg) => {
+    if (err instanceof ProjectInputError) return res.status(err.status).json({ ok: false, error: err.message });
+    console.error(`[admin/projects/:id/milestones ${where}] error:`, err);
+    return res.status(500).json({ ok: false, error: msg });
+  };
 
   if (req.method === 'GET') {
     try {
-      const milestones = await listMilestones(id);
-      const progress = await projectProgress(id);
-      return res.status(200).json({ ok: true, milestones, progress });
-    } catch (err) {
-      console.error('[admin/projects/:id/milestones GET] error:', err);
-      return res.status(500).json({ ok: false, error: 'Error al listar hitos' });
-    }
+      return await withList(200);
+    } catch (err) { return fail(err, 'GET', 'Error al listar hitos'); }
   }
 
   if (req.method === 'POST') {
     try {
-      const body = (typeof req.body === 'object' && req.body) ? req.body : {};
       const label = typeof body.label === 'string' ? body.label.trim() : '';
-      if (!label) return res.status(400).json({ ok: false, error: 'La etiqueta es requerida' });
+      if (!label) return res.status(400).json({ ok: false, error: 'El hito necesita un nombre.' });
+      if (label.length > MAX_LABEL) {
+        return res.status(400).json({ ok: false, error: `El nombre del hito admite hasta ${MAX_LABEL} caracteres.` });
+      }
       if (body.status && !MILESTONE_STATUSES.includes(body.status)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${MILESTONE_STATUSES.join(', ')}`,
-        });
+        return res.status(400).json({ ok: false, error: 'Elige un estado válido para el hito.' });
       }
       // Si trae `stage`, hacemos upsert (idempotente por etapa); si no, append.
       const milestone = body.stage
         ? await upsertMilestone(id, { stage: body.stage, label, status: body.status, dueDate: body.dueDate })
         : await createMilestone(id, { label, status: body.status, dueDate: body.dueDate });
-      const progress = await projectProgress(id);
-      return res.status(201).json({ ok: true, milestone, progress });
-    } catch (err) {
-      console.error('[admin/projects/:id/milestones POST] error:', err);
-      return res.status(500).json({ ok: false, error: 'Error al crear hito' });
-    }
+      return await withList(201, { milestone });
+    } catch (err) { return fail(err, 'POST', 'Error al crear hito'); }
   }
 
   if (req.method === 'PATCH') {
     try {
-      const body = (typeof req.body === 'object' && req.body) ? req.body : {};
-      const milestoneId = parseInt(body.milestoneId, 10);
-      if (!Number.isFinite(milestoneId)) {
-        return res.status(400).json({ ok: false, error: 'milestoneId requerido' });
+      // Reordenar
+      if (body.order !== undefined) {
+        await reorderMilestones(id, body.order);
+        return await withList(200);
       }
-      const newStatus = typeof body.status === 'string' ? body.status.trim() : null;
-      if (!newStatus || !MILESTONE_STATUSES.includes(newStatus)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${MILESTONE_STATUSES.join(', ')}`,
-        });
+
+      const milestoneId = (body.milestoneId ?? '').toString().trim();
+
+      // Compatibilidad: { stage, status } sin milestoneId → upsert por etapa.
+      if (!milestoneId && body.stage) {
+        if (!MILESTONE_STATUSES.includes(body.status)) {
+          return res.status(400).json({ ok: false, error: 'Elige un estado válido para el hito.' });
+        }
+        // El nombre, si viene, pasa las mismas reglas que al renombrar (A5-R4).
+        let label;
+        if (body.label !== undefined && body.label !== null) {
+          const n = normalizeMilestonePatch({ label: body.label });
+          if (n.error) return res.status(400).json({ ok: false, error: n.error });
+          label = n.fields.label;
+        }
+        const milestone = await upsertMilestone(id, { stage: body.stage, label, status: body.status });
+        return await withList(200, { milestone });
       }
-      const updated = await updateMilestoneStatus(milestoneId, newStatus);
-      if (!updated) return res.status(404).json({ ok: false, error: 'Hito no encontrado' });
-      const milestones = await listMilestones(id);
-      const progress = await projectProgress(id);
-      return res.status(200).json({ ok: true, milestone: updated, milestones, progress });
-    } catch (err) {
-      console.error('[admin/projects/:id/milestones PATCH] error:', err);
-      return res.status(500).json({ ok: false, error: 'Error al actualizar hito' });
-    }
+
+      if (!ID_RE.test(milestoneId)) return res.status(400).json({ ok: false, error: 'Falta el hito a cambiar.' });
+      const { fields, error } = normalizeMilestonePatch(body);
+      if (error) return res.status(400).json({ ok: false, error });
+      if (!Object.keys(fields).length) return res.status(400).json({ ok: false, error: 'No hay cambios que guardar.' });
+
+      const milestone = await updateMilestone(id, milestoneId, fields);
+      if (!milestone) return res.status(404).json({ ok: false, error: 'Ese hito no es de este proyecto o ya se borró.' });
+      return await withList(200, { milestone });
+    } catch (err) { return fail(err, 'PATCH', 'Error al actualizar hito'); }
   }
 
-  res.setHeader('Allow', 'GET, POST, PATCH');
+  if (req.method === 'DELETE') {
+    try {
+      const milestoneId = (req.query?.milestoneId ?? body.milestoneId ?? '').toString().trim();
+      if (!ID_RE.test(milestoneId)) return res.status(400).json({ ok: false, error: 'Falta el hito a borrar.' });
+      const ok = await deleteMilestoneOf(id, milestoneId);
+      if (!ok) return res.status(404).json({ ok: false, error: 'Ese hito no es de este proyecto o ya se borró.' });
+      console.log(`[admin/projects/:id/milestones DELETE] hito ${milestoneId} de ${id} borrado por ${session.email}`);
+      return await withList(200, { deleted: milestoneId });
+    } catch (err) { return fail(err, 'DELETE', 'Error al borrar hito'); }
+  }
+
+  res.setHeader('Allow', 'GET, POST, PATCH, DELETE');
   return res.status(405).json({ ok: false, error: 'Method not allowed' });
 }

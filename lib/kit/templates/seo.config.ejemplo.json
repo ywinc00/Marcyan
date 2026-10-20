@@ -1,0 +1,50 @@
+{
+  "id": "codigo-corto-del-cliente",
+  "nombre": "Nombre comercial exacto",
+  "tipo": "sab",
+  "sitio": "https://www.dominio-del-cliente.com",
+  "sitemap": "https://www.dominio-del-cliente.com/sitemap.xml",
+  "gscPropiedad": "sc-domain:dominio-del-cliente.com",
+  "idiomaBase": "en",
+  "idiomas": { "es": "^/es(/|$)" },
+  "idiomaApi": "en-US",
+  "marca": ["nombre comercial", "nombrecomercial"],
+  "grupos": [
+    { "id": "home", "patron": "^/(es/?)?$" },
+    { "id": "servicios", "patron": "^/(es/)?services?/" },
+    { "id": "ciudades", "patron": "^/(es/)?(areas|service-areas|locations)/" },
+    { "id": "guias", "patron": "^/(es/)?(guides|blog)/" },
+    { "id": "contacto", "patron": "^/(es/)?(contact|quote|pricing)" }
+  ],
+  "prioridadGrupos": ["servicios", "ciudades", "home"],
+  "indexacion": { "maxPeticionesDia": 10, "reintentoDias": 14, "diasNueva": 60 },
+  "alertas": { "diasSinRastreo": 30 },
+  "umbrales": { "impresionesMinimas": 50 },
+  "ficha": { "placeId": null, "claveEnv": "GOOGLE_PLACES_API_KEY", "idioma": "en" },
+  "competidores": [
+    { "nombre": "Competidor 1", "placeId": null, "dominio": null, "terminos": ["competidor 1"] },
+    { "nombre": "Competidor 2", "placeId": null, "dominio": null, "terminos": ["competidor 2"] },
+    { "nombre": "Competidor 3", "placeId": null, "dominio": null, "terminos": ["competidor 3"] }
+  ],
+  "ga4": { "propertyId": null, "eventoContacto": "generate_lead" },
+  "contacto": {
+    "paginas": ["/contact"],
+    "endpoint": null,
+    "nota": "paginas = las que llevan el formulario en su HTML (si se monta en el navegador, lista vacía). endpoint = a dónde envía; ANTES de ponerlo, leer su código y comprobar que un GET devuelve 405 o 400 sin enviar nada."
+  },
+  "dueno": { "nombre": null, "idioma": "es" },
+  "velocidad": { "paginas": [] },
+  "ia": {
+    "ubicacion": { "ciudad": "Ciudad principal", "region": "Estado", "pais": "US" },
+    "repeticiones": 3,
+    "preguntas": [
+      { "idioma": "en", "texto": "best <servicio> company in <ciudad>" },
+      { "idioma": "en", "texto": "who can <tarea concreta> near <ciudad> today" },
+      { "idioma": "en", "texto": "how much does <servicio> cost in <ciudad>" },
+      { "idioma": "es", "texto": "mejor empresa de <servicio> en <ciudad>" },
+      { "idioma": "es", "texto": "quién hace <tarea concreta> en <ciudad> y cuánto cobra" }
+    ]
+  },
+  "envArchivo": ".env.local",
+  "carpetaDatos": "data/seo"
+}

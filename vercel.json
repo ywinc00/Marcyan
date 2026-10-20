@@ -3,11 +3,82 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [{ "source": "/", "destination": "/es", "permanent": true }],
+  "redirects": [
+    { "source": "/", "destination": "/es", "permanent": true },
+    {
+      "source": "/admin/briefs/detail",
+      "has": [{ "type": "query", "key": "id", "value": "(?<id>.+)" }],
+      "destination": "/dashboard#/briefs/:id",
+      "permanent": true
+    },
+    { "source": "/admin", "destination": "/dashboard", "permanent": true },
+    { "source": "/admin/:path*", "destination": "/dashboard", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/es/kit/:token", "destination": "/es/kit" },
+    { "source": "/en/kit/:token", "destination": "/en/kit" }
+  ],
   "headers": [
+    {
+      "source": "/es/kit/:token",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/en/kit/:token",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
     {
       "source": "/dashboard/sw.js",
       "headers": [{ "key": "Service-Worker-Allowed", "value": "/dashboard" }]
+    },
+    {
+      "source": "/dashboard",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" }
+      ]
+    },
+    {
+      "source": "/dashboard/:path*",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" }
+      ]
+    },
+    {
+      "source": "/api/admin/:path*",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
+  ],
+  "functions": {
+    "api/brief.mjs": { "maxDuration": 60 },
+    "api/brief/upload.mjs": { "maxDuration": 30 },
+    "api/kit/*.mjs": { "maxDuration": 60 },
+    "api/cron/*.mjs": { "maxDuration": 300 },
+    "api/admin/briefs/*/kit.mjs": { "maxDuration": 300, "includeFiles": "lib/kit/templates/**" }
+  },
+  "crons": [
+    { "path": "/api/cron/brief-cleanup", "schedule": "40 9 * * *" },
+    { "path": "/api/cron/seo-sync", "schedule": "0 9 * * *" }
   ]
 }

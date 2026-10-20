@@ -505,6 +505,18 @@ await check('PATCH /expenses/:id con monto inválido → 400 legible', async () 
   assert.equal(res.statusCode, 400);
   assert.match(res.body.error, /mayor que \$0/);
 });
+await check('estático: la ficha del cliente usa el estado derivado y "este mes" tiene tope (CT-01, DM-04)', async () => {
+  const fs = await import('node:fs');
+  const url = (p) => new URL(`../${p}`, import.meta.url);
+  const fin = fs.readFileSync(url('lib/finance.mjs'), 'utf8');
+  const rel = fin.slice(fin.indexOf('export async function getClientRelated'), fin.indexOf('export function deleteConfirmationMatches'));
+  assert.match(rel, /sqlEffectiveStatus\('i', 'COALESCE\(pp\.paid, 0\)'\)\} AS status/);
+  assert.match(rel, /i\.status AS stored_status/);
+  const sum = fin.slice(fin.indexOf('export async function financeSummary'));
+  assert.match(sum, /paid_at <  date_trunc\('month', \$\{today\}\) \+ INTERVAL '1 month'/);
+  const exp = fs.readFileSync(url('lib/expenses.mjs'), 'utf8');
+  assert.match(exp, /spent_at <  date_trunc\('month', \(now\(\) AT TIME ZONE 'America\/Chicago'\)::date\) \+ INTERVAL '1 month'/);
+});
 
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) de Finanzas fallaron:\n - ` + fails.join('\n - '));

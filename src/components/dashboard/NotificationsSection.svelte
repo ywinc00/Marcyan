@@ -1,283 +1,498 @@
 <script>
-  import { onMount } from 'svelte';
-  import KpiArt from './KpiArt.svelte';
-
-  import { api } from './lib/api.js';
+  // Avisos (#/avisos): "no perder nada, cada aviso lleva a su registro".
+  //   · "Abrir" navega por el router al lead, brief, proyecto, factura o
+  //     cliente concreto y marca el aviso como leído (OP-12).
+  //   · Filtros por tipo y estado en la URL: #/avisos?tipo=lead&estado=sin-leer
+  //   · "Cargar más" con cursor (OP-14); KPIs con conteos del servidor, no
+  //     de la página cargada.
+  //   · Marcar como no leído y archivar (OP-15). El contador de la barra
+  //     lateral se actualiza con el `unread` que devuelve cada cambio.
+  //   · Si el contador del menú cambia mientras estás aquí (refresco de 60 s),
+  //     los KPIs se ponen al día y la lista ofrece mostrar los nuevos (A7-09).
+  import { tick, untrack } from 'svelte';
+  import { api, errorMessage, isSessionError } from './lib/api.js';
   import { fmtDateTime, rel } from './lib/dates.js';
+  import { route, href, setQuery, parseHash, navigate } from './lib/router.svelte.js';
+  import { toast, toastError } from './lib/toast.svelte.js';
+  import {
+    avisos, setUnread, readFilters, listParams, openTarget, visibleRef, cleanTitle,
+    markAllAction, isModifiedClick, TYPE_FILTERS, STATE_FILTERS,
+  } from './lib/avisos.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
+  import KpiGrid from './ui/KpiGrid.svelte';
+  import Kpi from './ui/Kpi.svelte';
+  import StatusChip from './ui/StatusChip.svelte';
+  import EmptyState from './ui/EmptyState.svelte';
+  import LoadingState from './ui/LoadingState.svelte';
+  import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
 
-  // ── Helpers ──────────────────────────────────────────────────
-  // HTTP (timeout de 15 s, errores en español legibles, sesión caducada) y
-  // fechas en hora de Houston vienen de lib/ (A0).
-  function friendlyError(e) { return (e && e.message) || 'No se pudieron cargar los avisos.'; }
-
-  // type → etiqueta + clase de color. El glifo se dibuja como un pequeño
-  // objeto SVG en capas (depth + glow) por tipo, no como un icono plano.
+  // type → etiqueta legible + tono del chip (sin naranja: el acento queda
+  // para la acción principal y lo pendiente, H-07).
   const TYPES = {
-    new_lead:     { label: 'Nuevo lead',  cls: 'lead' },
-    new_brief:    { label: 'Nuevo brief', cls: 'brief' },
-    chat_handoff: { label: 'Handoff',     cls: 'handoff' },
-    system:       { label: 'Sistema',     cls: 'system' },
+    new_lead:     { label: 'Nuevo lead',    tone: 'info',    cls: 'lead' },
+    new_brief:    { label: 'Nuevo brief',   tone: 'data',    cls: 'brief' },
+    chat_handoff: { label: 'Quiere hablar', tone: 'warning', cls: 'handoff' },
+    system:       { label: 'Sistema',       tone: 'neutral', cls: 'system' },
   };
   function typeMeta(t) { return TYPES[t] || TYPES.system; }
 
+  const PAGE = 30;
+  const EMPTY_COUNTS = { total: 0, unread: 0, archived: 0, by_type: { new_lead: { total: 0, unread: 0 }, new_brief: { total: 0, unread: 0 }, chat_handoff: { total: 0, unread: 0 }, system: { total: 0, unread: 0 } } };
+
   // ── Estado ───────────────────────────────────────────────────
+  const filters = $derived(readFilters(route.query));
   let rows = $state([]);
-  let unread = $state(0);
-  let onlyUnread = $state(false);
-  let loading = $state(false);
+  let counts = $state(EMPTY_COUNTS);
+  let total = $state(0);
+  let nextCursor = $state(null);
+  let archiveAvailable = $state(true);
+  let loading = $state(true);
+  let loaded = $state(false);
   let error = $state('');
+  let loadingMore = $state(false);
+  let moreError = $state('');
   let busyAll = $state(false);
-  const LIMIT = 50;
+  let busy = $state({});          // id → true mientras se guarda un cambio
+  let hasNew = $state(false);     // llegaron avisos nuevos desde la última carga
+  let feedEl = $state(null);
+  let emptyEl = $state(null);
 
-  // Conteos por tipo para el desglose del strip superior (solo lectura,
-  // derivado de las filas ya cargadas — no toca los endpoints).
-  const counts = $derived.by(() => {
-    const c = { new_lead: 0, new_brief: 0, chat_handoff: 0, system: 0 };
-    for (const n of rows) { if (c[n.type] != null) c[n.type]++; else c.system++; }
-    return c;
-  });
+  const unread = $derived(counts.unread || 0);
+  // "Marcar todas" respeta el filtro de tipo (A7-07).
+  const markAction = $derived(markAllAction(filters.tipo));
+  const markPending = $derived(markAction.type ? ((counts.by_type[markAction.type] || {}).unread || 0) : unread);
+  const typeLabel = $derived((TYPE_FILTERS.find((f) => f.id === filters.tipo) || TYPE_FILTERS[0]).label);
 
-  // ── Carga ────────────────────────────────────────────────────
-  async function load() {
-    loading = true; error = '';
-    const p = new URLSearchParams();
-    p.set('limit', LIMIT);
-    if (onlyUnread) p.set('unreadOnly', 'true');
-    try {
-      const j = await api('/api/admin/notifications?' + p.toString());
-      rows = j.rows || [];
-      unread = j.unread || 0;
-    } catch (e) { error = friendlyError(e); }
-    finally { loading = false; }
+  function applyCounts(j) {
+    if (j && j.counts) counts = { ...EMPTY_COUNTS, ...j.counts, by_type: { ...EMPTY_COUNTS.by_type, ...(j.counts.by_type || {}) } };
+    if (j && j.unread != null) { counts = { ...counts, unread: Number(j.unread) || 0 }; setUnread(j.unread); }
   }
 
-  function setFilter(v) { onlyUnread = v; load(); }
-
-  // ── Mutaciones ───────────────────────────────────────────────
-  async function markOne(n) {
-    if (n.read_at) return;
+  // ── Carga ────────────────────────────────────────────────────
+  // seq evita que una respuesta lenta de un filtro anterior pise la actual.
+  let seq = 0;
+  async function load() {
+    const my = ++seq;
+    loading = true; error = ''; moreError = '';
     try {
-      const j = await api('/api/admin/notifications/' + encodeURIComponent(n.id), { method: 'PATCH' });
-      rows = rows.map((x) => (x.id === n.id ? j.notification : x));
-      unread = j.unread ?? Math.max(0, unread - 1);
-      if (onlyUnread) rows = rows.filter((x) => !x.read_at);
-    } catch (e) { error = friendlyError(e); }
+      const j = await api('/api/admin/notifications?' + listParams(filters, { limit: PAGE }));
+      if (my !== seq) return;
+      hasNew = false;
+      rows = j.rows || [];
+      total = Number(j.total) || 0;
+      nextCursor = j.has_more ? j.next_cursor : null;
+      archiveAvailable = j.archive_available !== false;
+      applyCounts(j);
+      loaded = true;
+    } catch (e) {
+      if (my !== seq) return;
+      if (!isSessionError(e)) error = errorMessage(e, 'No se pudieron cargar los avisos.');
+    } finally {
+      if (my === seq) loading = false;
+    }
+  }
+
+  async function loadMore() {
+    if (loadingMore || nextCursor == null) return;
+    const my = seq;
+    loadingMore = true; moreError = '';
+    try {
+      const j = await api('/api/admin/notifications?' + listParams(filters, { limit: PAGE, before: nextCursor }));
+      if (my !== seq) return;
+      const seen = new Set(rows.map((r) => String(r.id)));
+      rows = [...rows, ...(j.rows || []).filter((r) => !seen.has(String(r.id)))];
+      nextCursor = j.has_more ? j.next_cursor : null;
+      total = Number(j.total) || total;
+      applyCounts(j);
+    } catch (e) {
+      if (my === seq && !isSessionError(e)) moreError = errorMessage(e, 'No se pudieron cargar más avisos.');
+    } finally {
+      loadingMore = false;
+    }
+  }
+
+  // Recarga al cambiar de filtro (y la primera vez).
+  $effect(() => {
+    filters.tipo; filters.estado;   // dependencias
+    load();
+  });
+
+  function setTipo(id) { setQuery({ tipo: id || null }); }
+  function setEstado(id) { setQuery({ estado: id || null }); }
+  function clearFilters() { setQuery({ tipo: null, estado: null }); }
+
+  // ¿Sigue el aviso dentro del filtro actual tras un cambio?
+  function fits(n) {
+    if (filters.estado === 'sin-leer') return !n.read_at && !n.archived_at;
+    if (filters.estado === 'archivados') return !!n.archived_at;
+    return !n.archived_at;
+  }
+  // Devuelve true si la fila salió de la lista (ya no encaja en el filtro).
+  function replaceRow(n) {
+    if (fits(n)) { rows = rows.map((x) => (String(x.id) === String(n.id) ? n : x)); return false; }
+    rows = rows.filter((x) => String(x.id) !== String(n.id)); total = Math.max(0, total - 1);
+    return true;
+  }
+
+  // Tras quitar una fila (archivar, o leer con el filtro "Sin leer") el foco
+  // no se pierde en la página: pasa a la fila que ocupa su lugar, o a la
+  // anterior si era la última, o al vacío si ya no queda ninguna (A7-05).
+  async function keepFocus(index) {
+    await tick();
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
+    if (active && active !== document.body && document.contains(active)) return;
+    const items = feedEl ? feedEl.querySelectorAll(':scope > li') : [];
+    const li = items.length ? items[Math.min(Math.max(index, 0), items.length - 1)] : null;
+    const el = li ? li.querySelector('a[href], button:not([disabled])') : emptyEl;
+    if (el) el.focus();
+  }
+  function rowIndex(n) { return rows.findIndex((x) => String(x.id) === String(n.id)); }
+
+  // PATCH de un aviso. Devuelve la fila nueva o null si falló (con toast).
+  async function patch(n, body, fallback) {
+    const id = String(n.id);
+    if (busy[id]) return null;
+    busy = { ...busy, [id]: true };
+    try {
+      const j = await api('/api/admin/notifications/' + encodeURIComponent(id), { method: 'PATCH', body });
+      if (j.unread != null) { setUnread(j.unread); counts = { ...counts, unread: Number(j.unread) || 0 }; }
+      return j.notification || null;
+    } catch (e) {
+      toastError(e, fallback);
+      if (e && e.data && e.data.code === 'archive_unavailable') archiveAvailable = false;
+      return null;
+    } finally {
+      const { [id]: _, ...rest } = busy;
+      busy = rest;
+    }
+  }
+
+  // ── Acciones ─────────────────────────────────────────────────
+  // Abrir: marca leída (sin esperar a que el usuario vuelva) y navega al
+  // registro con el router, sin recargar la página.
+  // Ctrl/Cmd/Mayús + clic o la rueda: el navegador lo abre aparte como un
+  // enlace normal y aquí solo se marca como leído, sin navegar (A7-05).
+  function openNote(n, e) {
+    const target = openTarget(n.link || n.url);
+    if (!target) return;
+    const aside = isModifiedClick(e);
+    if (e && !aside) e.preventDefault();
+    if (!n.read_at) {
+      patch(n, undefined, 'No se pudo marcar el aviso como leído.').then((u) => {
+        if (u) { replaceRow(u); refreshCounts(); }
+      });
+    }
+    if (aside) return;
+    const r = parseHash(target);
+    navigate(r.section, r.sub, r.query);
+  }
+
+  async function toggleRead(n) {
+    const i = rowIndex(n);
+    const u = await patch(n, n.read_at ? { read: false } : undefined,
+      n.read_at ? 'No se pudo marcar como no leído.' : 'No se pudo marcar como leído.');
+    if (!u) return;
+    if (replaceRow(u)) keepFocus(i);
+    refreshCounts();
+  }
+
+  async function setArchived(n, archived) {
+    const i = rowIndex(n);
+    const u = await patch(n, { archived }, archived ? 'No se pudo archivar el aviso.' : 'No se pudo devolver el aviso a la bandeja.');
+    if (!u) return;
+    if (replaceRow(u)) keepFocus(i);
+    refreshCounts();
+    toast(archived ? 'Aviso archivado. Está en Archivados.' : 'Aviso devuelto a la bandeja.');
   }
 
   async function markAll() {
-    if (busyAll || unread === 0) return;
+    if (busyAll || markPending === 0) return;
     busyAll = true;
     try {
-      const j = await api('/api/admin/notifications', { method: 'PATCH' });
-      unread = j.unread ?? 0;
+      const j = await api('/api/admin/notifications', { method: 'PATCH', body: markAction.body });
+      setUnread(j.unread);   // null (no se pudo contar) conserva el último valor bueno
+      toast(j.affected === 1 ? '1 aviso marcado como leído.' : `${j.affected || 0} avisos marcados como leídos.`);
       await load();
-    } catch (e) { error = friendlyError(e); }
-    finally { busyAll = false; }
+    } catch (e) {
+      toastError(e, 'No se pudieron marcar los avisos.');
+    } finally {
+      busyAll = false;
+    }
   }
 
-  onMount(load);
+  // Conteos por tipo tras un cambio suelto (barato; si falla, se quedan los
+  // de antes y el contador ya vino en la respuesta del cambio).
+  let countsTimer = null;
+  function refreshCounts() {
+    clearTimeout(countsTimer);
+    countsTimer = setTimeout(async () => {
+      try {
+        const j = await api('/api/admin/notifications?limit=1');
+        applyCounts(j);
+      } catch (e) {
+        if (!isSessionError(e)) console.warn('[avisos] conteos sin actualizar:', e && e.message);
+      }
+    }, 600);
+  }
+  $effect(() => () => clearTimeout(countsTimer));
+
+  // El contador del menú se refresca solo (cada 60 s). Si cambia y no
+  // coincide con el de esta vista, los KPIs se ponen al día; si subió, la
+  // lista ofrece mostrar los nuevos sin recargarse por sorpresa (A7-09).
+  $effect(() => {
+    const n = avisos.unread;
+    untrack(() => {
+      if (!loaded || loading || n == null || n === counts.unread) return;
+      if (n > counts.unread) {
+        if (rows.length === 0) { load(); return; }
+        hasNew = true;
+      }
+      refreshCounts();
+    });
+  });
+
+  // Texto del vacío: repite el filtro para que se entienda qué quitar (E-06/E-08).
+  const emptyCopy = $derived.by(() => {
+    const filtered = filters.tipo || filters.estado;
+    if (filters.estado === 'archivados') {
+      if (!archiveAvailable) return { title: 'Archivar todavía no está disponible', text: 'Cuando se active, los avisos que archives quedarán aquí.' };
+      return { title: 'No hay avisos archivados', text: filters.tipo ? `Ningún aviso de ${typeLabel.toLowerCase()} está archivado.` : 'Los avisos que archives quedarán aquí, por si los necesitas.' };
+    }
+    if (filters.estado === 'sin-leer') return { title: 'Todo leído', text: filters.tipo ? `No quedan avisos de ${typeLabel.toLowerCase()} sin leer.` : 'No tienes avisos sin leer.' };
+    if (filtered) return { title: `Sin avisos de ${typeLabel.toLowerCase()}`, text: 'Prueba con otro tipo o quita el filtro.' };
+    return { title: 'Sin avisos todavía', text: 'Cuando llegue un lead, un brief o alguien pida hablar con una persona, aparecerá aquí.' };
+  });
+
+  // Sin datos (primera carga fallida) los KPIs no fingen ceros.
+  const kv = (n) => (loaded ? String(n) : '—');
+  const kpiNote = (t) => {
+    if (!loaded) return 'Sin datos';
+    const c = counts.by_type[t] || { total: 0, unread: 0 };
+    return c.unread ? `${c.unread} sin leer` : (c.total ? 'Todo leído' : 'Ninguno en la bandeja');
+  };
 </script>
 
-<PageHeader title="Avisos">
-  {#snippet badge()}{#if unread}<span class="hcount">{unread}</span>{/if}{/snippet}
+<PageHeader title="Avisos" subtitle="Lo que pasó en el sitio y en el panel. Cada aviso te lleva a su registro.">
   {#snippet actions()}
-    <button class="b b--ghost" onclick={load}><Icon name="refresh" size={16} />Actualizar</button>
-    <button class="b b--primary" disabled={busyAll || unread === 0} onclick={markAll}>
-      <Icon name="check" size={16} />{busyAll ? 'Marcando…' : 'Marcar todas'}
+    <button type="button" class="b b--ghost" onclick={load} disabled={loading}><Icon name="refresh" size={16} />Actualizar</button>
+    <button type="button" class="b b--primary" disabled={busyAll || markPending === 0} onclick={markAll}>
+      <Icon name="check" size={16} />{busyAll ? 'Marcando…' : markAction.label}
     </button>
   {/snippet}
 </PageHeader>
 
-<!-- Strip superior denso: KPI de no-leídos (con ilustración esquinera) +
-     desglose por tipo, en una fila de 4 tarjetas estilo Orbit "stats".
-     La ilustración esquinera usa <KpiArt> compartido (mismo lenguaje
-     glossy en todas las secciones). Mapas semánticos:
-       sin leer → bell · leads → inbox · briefs → docs · handoffs → users. -->
-<section class="strip">
-  <article class="kcard kcard--accent">
-    <p class="kcard__label">Sin leer</p>
-    <div class="kcard__row">
-      <span class="kcard__num">{String(unread).padStart(2, '0')}</span>
-      <KpiArt kind="bell" size={48} />
-    </div>
-    <p class="kcard__delta">
-      {#if unread}<span class="warn">{unread} {unread === 1 ? 'aviso pendiente' : 'avisos pendientes'}</span>
-      {:else}<span class="ok">Todo al día</span>{/if}
-    </p>
-  </article>
+<!-- KPIs con conteos del servidor (la bandeja entera, sin archivados).
+     Los de tipo filtran la lista: el KPI es el anfitrión del atajo (E-19). -->
+<KpiGrid count={4} label="Resumen de avisos">
+  <Kpi label="Sin leer" value={kv(unread)} art="bell" tone={unread ? 'accent' : ''}
+       href={href('avisos', [], { tipo: filters.tipo, estado: 'sin-leer' })}
+       note={!loaded ? 'Sin datos' : unread ? (unread === 1 ? '1 aviso pendiente' : `${unread} avisos pendientes`) : 'Todo al día'} />
+  <Kpi label="Leads" value={kv(counts.by_type.new_lead.total)} art="inbox"
+       href={href('avisos', [], { tipo: 'lead', estado: filters.estado })} note={kpiNote('new_lead')} />
+  <Kpi label="Briefs" value={kv(counts.by_type.new_brief.total)} art="docs"
+       href={href('avisos', [], { tipo: 'brief', estado: filters.estado })} note={kpiNote('new_brief')} />
+  <Kpi label="Quieren hablar" value={kv(counts.by_type.chat_handoff.total)} art="users"
+       href={href('avisos', [], { tipo: 'persona', estado: filters.estado })} note={kpiNote('chat_handoff')} />
+</KpiGrid>
 
-  <article class="kcard">
-    <p class="kcard__label">Leads</p>
-    <div class="kcard__row">
-      <span class="kcard__num">{counts.new_lead}</span>
-      <KpiArt kind="inbox" size={48} />
-    </div>
-    <p class="kcard__delta"><span class="muted">en este feed</span></p>
-  </article>
-
-  <article class="kcard">
-    <p class="kcard__label">Briefs</p>
-    <div class="kcard__row">
-      <span class="kcard__num">{counts.new_brief}</span>
-      <KpiArt kind="docs" size={48} />
-    </div>
-    <p class="kcard__delta"><span class="muted">en este feed</span></p>
-  </article>
-
-  <article class="kcard">
-    <p class="kcard__label">Handoffs</p>
-    <div class="kcard__row">
-      <span class="kcard__num">{counts.chat_handoff}</span>
-      <KpiArt kind="users" size={48} />
-    </div>
-    <p class="kcard__delta"><span class="muted">pidieron persona</span></p>
-  </article>
-</section>
-
-<div class="chips">
-  <button class="chip" class:on={!onlyUnread} onclick={() => setFilter(false)}>Todos</button>
-  <button class="chip" class:on={onlyUnread} onclick={() => setFilter(true)}>
-    No leídos <span class="chip__n">{unread}</span>
-  </button>
+<!-- Filtros en pastillas con el estado en la URL (E-06). -->
+<div class="filters">
+  <div class="pills" role="group" aria-label="Tipo de aviso">
+    {#each TYPE_FILTERS as f (f.id)}
+      <button type="button" class="pill" aria-pressed={filters.tipo === f.id} onclick={() => setTipo(f.id)}>{f.label}</button>
+    {/each}
+  </div>
+  <div class="pills" role="group" aria-label="Estado">
+    {#each STATE_FILTERS as f (f.id)}
+      <button type="button" class="pill" aria-pressed={filters.estado === f.id} onclick={() => setEstado(f.id)}>
+        {f.label}{#if f.id === 'sin-leer' && unread}<span class="pill__n">{unread}</span>{/if}
+      </button>
+    {/each}
+  </div>
 </div>
 
 {#if error}
-  <div class="empty empty--err" role="alert">
-    <p class="empty__msg">{error}</p>
-    <button class="b b--primary" onclick={load}><Icon name="refresh" size={16} />Reintentar</button>
-  </div>
-{:else if loading}
-  <div class="empty"><span class="spin" aria-hidden="true"></span>Cargando…</div>
-{:else if rows.length === 0}
-  <div class="empty">
-    {onlyUnread ? 'No tienes avisos sin leer.' : 'Sin avisos todavía. Cuando llegue un lead, un brief o alguien pida hablar con una persona, aparecerá aquí.'}
-  </div>
+  <ErrorState title="No se pudieron cargar los avisos" message={error} onretry={load} />
 {:else}
-  <ul class="feed">
-    {#each rows as n (n.id)}
-      {@const tm = typeMeta(n.type)}
-      <li class="note note--{tm.cls}" class:unread={!n.read_at}>
-        <span class="note__icon note__icon--{tm.cls}" aria-hidden="true">
-          {#if tm.cls === 'lead'}
-            <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6" width="17" height="12" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 7.5L12 13l7.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          {:else if tm.cls === 'brief'}
-            <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          {:else if tm.cls === 'handoff'}
-            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17h-9l-5 4v-4H4a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 4 6z" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="9" cy="11.5" r="1" fill="currentColor"/><circle cx="12" cy="11.5" r="1" fill="currentColor"/><circle cx="15" cy="11.5" r="1" fill="currentColor"/></svg>
-          {:else}
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4.5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          {/if}
-        </span>
-        <div class="note__body">
-          <div class="note__top">
-            <span class="note__pill note__pill--{tm.cls}">{tm.label}</span>
-            {#if n.ref}<span class="note__ref mono">{n.ref}</span>{/if}
-            <span class="note__when mono dim" title={fmtDateTime(n.created_at)}>{rel(n.created_at)}</span>
-          </div>
-          <div class="note__title">{n.title}</div>
-          {#if n.body}<div class="note__text">{n.body}</div>{/if}
-          <div class="note__foot">
-            {#if n.url}<a class="note__link" href={n.url}>Abrir →</a>{/if}
-            {#if !n.read_at}
-              <button class="note__mark" onclick={() => markOne(n)}>Marcar leída</button>
-            {:else}
-              <span class="note__read mono dim">leída {rel(n.read_at)}</span>
-            {/if}
+  <LoadingState loading={loading && !loaded} label="Cargando avisos…">
+    {#snippet skeleton()}
+      {#each Array(4) as _, i (i)}
+        <div class="skel-note">
+          <div class="ui-skel skel-note__icon"></div>
+          <div class="skel-note__lines">
+            <div class="ui-skel" style="height:12px;width:22%"></div>
+            <div class="ui-skel" style="height:14px;width:56%"></div>
+            <div class="ui-skel" style="height:12px;width:40%"></div>
           </div>
         </div>
-        {#if !n.read_at}<span class="note__dot" aria-hidden="true"></span>{/if}
-      </li>
-    {/each}
-  </ul>
+      {/each}
+    {/snippet}
+
+    {#if rows.length === 0}
+      <div class="ui-card empty-card" tabindex="-1" bind:this={emptyEl}>
+        <EmptyState title={emptyCopy.title} text={emptyCopy.text} art="bell">
+          {#snippet action()}
+            {#if filters.tipo || filters.estado}
+              <button type="button" class="b" onclick={clearFilters}>Ver toda la bandeja</button>
+            {/if}
+          {/snippet}
+        </EmptyState>
+      </div>
+    {:else}
+      <div class="count" aria-live="polite">
+        <span>{rows.length === total ? (total === 1 ? '1 aviso' : `${total} avisos`) : `Mostrando ${rows.length} de ${total} avisos`}</span>
+        {#if hasNew}
+          <button type="button" class="note__act count__new" onclick={load} disabled={loading}>Hay avisos nuevos, mostrarlos</button>
+        {/if}
+      </div>
+      <ul class="feed" aria-busy={loading} bind:this={feedEl}>
+        {#each rows as n (n.id)}
+          {@const tm = typeMeta(n.type)}
+          {@const target = openTarget(n.link || n.url)}
+          {@const ref = visibleRef(n.ref)}
+          {@const isBusy = !!busy[String(n.id)]}
+          <li class="note note--{tm.cls}" class:unread={!n.read_at && !n.archived_at}>
+            <span class="note__icon note__icon--{tm.cls}" aria-hidden="true">
+              {#if tm.cls === 'lead'}
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6" width="17" height="12" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 7.5L12 13l7.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {:else if tm.cls === 'brief'}
+                <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              {:else if tm.cls === 'handoff'}
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17h-9l-5 4v-4H4a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 4 6z" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="9" cy="11.5" r="1" fill="currentColor"/><circle cx="12" cy="11.5" r="1" fill="currentColor"/><circle cx="15" cy="11.5" r="1" fill="currentColor"/></svg>
+              {:else}
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4.5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              {/if}
+            </span>
+            <div class="note__body">
+              <div class="note__top">
+                <StatusChip tone={tm.tone} label={tm.label} />
+                {#if ref}<span class="note__ref">{ref}</span>{/if}
+                <!-- El punto de no leído va EN la fila, antes de la hora (OP-28). -->
+                <span class="note__when" title={fmtDateTime(n.created_at)}>
+                  {#if !n.read_at && !n.archived_at}<span class="note__dot" aria-hidden="true"></span><span class="sr-only">Sin leer, </span>{/if}
+                  <time datetime={n.created_at}>{rel(n.created_at)}</time>
+                </span>
+              </div>
+              <p class="note__title">{cleanTitle(n.title)}</p>
+              {#if n.body}<p class="note__text">{n.body}</p>{/if}
+              <div class="note__foot">
+                {#if target}
+                  <a class="note__open" href={target} aria-label={`Abrir: ${cleanTitle(n.title)}`}
+                     onclick={(e) => openNote(n, e)} onauxclick={(e) => { if (e.button === 1) openNote(n, e); }}>
+                    Abrir<Icon name="chevron" size={14} />
+                  </a>
+                {/if}
+                {#if !n.archived_at}
+                  <button type="button" class="note__act" disabled={isBusy} onclick={() => toggleRead(n)}
+                          aria-label={`${n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}: ${cleanTitle(n.title)}`}>
+                    {n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}
+                  </button>
+                {/if}
+                {#if archiveAvailable}
+                  <button type="button" class="note__act" disabled={isBusy} onclick={() => setArchived(n, !n.archived_at)}
+                          aria-label={`${n.archived_at ? 'Devolver a la bandeja' : 'Archivar'}: ${cleanTitle(n.title)}`}>
+                    {n.archived_at ? 'Devolver a la bandeja' : 'Archivar'}
+                  </button>
+                {/if}
+                {#if n.archived_at}
+                  <span class="note__meta">Archivado {rel(n.archived_at)}</span>
+                {:else if n.read_at}
+                  <span class="note__meta">Leído {rel(n.read_at)}</span>
+                {/if}
+              </div>
+            </div>
+          </li>
+        {/each}
+      </ul>
+
+      {#if moreError}
+        <div class="more"><ErrorState compact title="No se pudieron cargar más avisos" message={moreError} onretry={loadMore} /></div>
+      {:else if nextCursor != null}
+        <div class="more">
+          <button type="button" class="b" onclick={loadMore} disabled={loadingMore}>
+            {loadingMore ? 'Cargando…' : 'Cargar más'}
+          </button>
+        </div>
+      {/if}
+    {/if}
+  </LoadingState>
 {/if}
 
 <style>
-  /* Pill Orbit: el conteo de no-leídos junto al título usa el acento (naranja)
-     para llamar la atención, igual que el borde de las tarjetas no leídas. */
-  .hcount { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill); padding: 2px 9px; }
+  /* ── Filtros (E-06): pastillas neutras; la activa sube de superficie y de
+     texto, sin naranja (H-07). Dos grupos: tipo a la izquierda, estado a la
+     derecha; en móvil se apilan y envuelven (nunca se pisan, E-30). */
+  .filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px var(--space-4); margin-bottom: var(--space-4); }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font: inherit; font-size: var(--dash-small); font-weight: 500; cursor: pointer; transition: background-color var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast); }
+  .pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
+  .pill:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .pill[aria-pressed='true'] { background: var(--surface-3); border-color: var(--fg-subtle); color: var(--fg-primary); font-weight: 600; }
+  /* Numerito neutro: el dato destacado en naranja ya es el KPI "Sin leer" (H-07, A7-06). */
+  .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--fg-primary); font-size: var(--dash-caption); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
 
-  /* ── Strip superior: 4 KPI cards (Orbit "stats", proporciones exactas) ──
-     Orbit: padding 16 16 14, radio 14, hairline; label 13px peso 500
-     mb 10; número 36px peso 700 tracking -0.025em; arte esquinero ~44-48
-     con leve opacidad; delta 13px mt 12; grid de 4 col gap 14.
-     La primera resalta los no-leídos con borde de acento + glow; el resto
-     desglosa el feed por tipo. El arte usa <KpiArt> compartido (glossy 3D). */
-  .strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: var(--space-4); }
-  .kcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 16px 14px; transition: border-color var(--duration-fast); }
-  .kcard:hover { border-color: var(--border-strong); }
-  .kcard--accent { border-color: var(--accent-gold-line); box-shadow: var(--shadow-gold); background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), .07), transparent 60%), var(--bg-card); }
-  .kcard__label { margin: 0 0 10px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
-  .kcard__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; }
-  .kcard__num { font-family: var(--font-display); font-weight: 700; font-size: 36px; line-height: 1; letter-spacing: -0.025em; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
-  /* El arte esquinero respira ligeramente atenuado, como en Orbit. */
-  .kcard__row :global(.kpi-art) { opacity: 0.92; }
-  .kcard__delta { margin: 12px 0 0; font-size: 13px; }
-  .kcard__delta .warn { color: var(--accent-gold); font-weight: 600; }
-  .kcard__delta .ok { color: var(--accent-teal); font-weight: 600; }
-  .kcard__delta .muted { color: var(--fg-subtle); }
+  .count { display: flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-3); margin: 0 0 8px; font-size: var(--dash-small); color: var(--fg-subtle); }
+  .count .count__new { color: var(--accent-teal); font-weight: 600; }
+  .empty-card:focus { outline: none; }
+  .empty-card:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-4); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all var(--duration-fast); }
-  .chip:hover { border-color: var(--accent-gold); color: var(--fg-primary); }
-  .chip.on { background: var(--accent-gold-dim); border-color: var(--accent-gold); color: var(--accent-gold); }
-  .chip__n { padding: 1px 6px; min-width: 16px; text-align: center; background: var(--surface-3); border-radius: var(--radius-pill); font-size: 9px; color: var(--fg-secondary); }
-  .chip.on .chip__n { background: var(--accent-gold); color: var(--fg-inverse); }
+  /* ── Esqueleto con la geometría del aviso (E-09) ── */
+  .skel-note { display: flex; gap: var(--space-3); padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .skel-note__icon { width: 36px; height: 36px; flex: 0 0 auto; }
+  .skel-note__lines { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; }
 
-  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; color: var(--fg-secondary); line-height: 1.55; }
-  .empty--err { border-color: var(--border-accent); }
-  .empty__msg { margin: 0; color: var(--fg-primary); font-size: var(--text-sm); line-height: 1.55; max-width: 38ch; }
-  .spin { width: 16px; height: 16px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin .7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Feed denso: el orden es importante, así que mantenemos una columna
-     pero con tarjetas compactas y de alta densidad de información. */
+  /* ── Feed: una columna de avisos compactos (aspecto aprobado) ── */
   .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .note { display: flex; gap: var(--space-3); padding: 14px var(--space-4) 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), background-color var(--duration-fast); }
+  .note:hover { border-color: var(--border-strong); }
+  /* Sin leer: sube un nivel de superficie y lleva el punto junto a la hora
+     (OP-28). Una sola señal en la fila, sin barra naranja (H-07, A7-06). */
+  .note.unread { background: var(--bg-elevated); border-color: var(--border-strong); }
 
-  .note { position: relative; display: flex; gap: var(--space-3); padding: 12px var(--space-4) 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color var(--duration-fast), background var(--duration-fast); }
-  .note:hover { border-color: var(--border-accent); background: var(--bg-elevated); }
-  .note.unread { background: var(--bg-elevated); border-left: 3px solid var(--accent-gold); padding-left: 11px; }
-  .note--handoff.unread { border-left-color: var(--accent-teal); }
-
-  /* Icono = glifo SVG nítido en un tile redondeado teñido por tipo. */
-  .note__icon { flex: 0 0 auto; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--fg-secondary); }
+  /* Icono: glifo SVG en una losa teñida por tipo. */
+  .note__icon { flex: 0 0 auto; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--fg-secondary); background: var(--surface-3); }
   .note__icon svg { width: 20px; height: 20px; }
-  .note__icon--lead, .note__icon--brief { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .note__icon--handoff { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .note__icon--system { color: var(--fg-subtle); background: var(--surface-3); }
+  /* Mismo color que su chip (StatusChip): mezcla al 10 % / 28 %. */
+  .note__icon--lead    { --tint: var(--color-info); }
+  .note__icon--brief   { --tint: var(--accent-teal); }
+  .note__icon--handoff { --tint: var(--color-warning); }
+  .note__icon--lead, .note__icon--brief, .note__icon--handoff {
+    color: var(--tint);
+    border-color: color-mix(in srgb, var(--tint) 28%, transparent);
+    background: color-mix(in srgb, var(--tint) 10%, transparent);
+  }
+  .note__icon--system  { color: var(--fg-subtle); }
 
   .note__body { min-width: 0; flex: 1 1 auto; }
-  .note__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
-  /* Etiqueta de tipo como PILL teñida (no texto suelto): lead/brief
-     naranja, handoff verde, sistema neutro. */
-  .note__pill { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; border-radius: var(--radius-pill); padding: 2px 8px; border: 1px solid transparent; }
-  .note__pill--lead, .note__pill--brief { color: var(--accent-gold); background: var(--accent-gold-dim); border-color: var(--accent-gold-line); }
-  .note__pill--handoff { color: var(--accent-teal); background: var(--accent-teal-dim); border-color: var(--accent-teal-line); }
-  .note__pill--system { color: var(--fg-subtle); background: var(--surface-3); border-color: var(--border); }
-  .note__ref { font-size: 10px; color: var(--accent-gold); letter-spacing: .04em; }
-  .note__when { font-size: 10px; margin-left: auto; }
+  .note__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .note__ref { font-size: var(--dash-caption); font-weight: 500; color: var(--fg-secondary); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+  .note__when { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .note__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
 
-  .note__title { font-size: 13.5px; color: var(--fg-primary); line-height: 1.45; font-weight: 500; }
-  .note__text { font-size: 12.5px; color: var(--fg-secondary); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
+  .note__title { margin: 0; font-size: var(--dash-body); color: var(--fg-primary); line-height: 1.45; font-weight: 500; overflow-wrap: anywhere; }
+  .note__text { margin: 2px 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 
-  .note__foot { display: flex; align-items: center; gap: var(--space-4); margin-top: 7px; }
-  .note__link { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-teal); text-decoration: none; }
-  .note__link:hover { color: var(--accent-gold); }
-  .note__mark { background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-subtle); }
-  .note__mark:hover { color: var(--accent-gold); }
-  .note__read { font-size: 10px; }
+  .note__foot { display: flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-4); margin-top: 8px; }
+  .note__open { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; font-size: var(--dash-small); font-weight: 600; color: var(--accent-teal); text-decoration: none; border-radius: var(--radius-sm, 6px); }
+  .note__open:hover { color: var(--fg-primary); }
+  .note__act { min-height: 28px; padding: 0; background: transparent; border: 0; cursor: pointer; font: inherit; font-size: var(--dash-small); color: var(--fg-secondary); border-radius: var(--radius-sm, 6px); }
+  .note__act:hover:not(:disabled) { color: var(--fg-primary); text-decoration: underline; text-underline-offset: 3px; }
+  .note__act:disabled { opacity: .45; cursor: progress; }
+  .note__open:focus-visible, .note__act:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .note__meta { margin-left: auto; font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; }
 
-  .note__dot { position: absolute; top: 13px; right: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); box-shadow: var(--shadow-gold); }
-  .note--handoff .note__dot { background: var(--accent-teal); box-shadow: var(--shadow-teal); }
+  .more { display: flex; justify-content: center; margin-top: var(--space-4); }
+  .more :global(.ui-error) { width: 100%; }
 
-  .mono { font-family: var(--font-mono); }
-  .dim { color: var(--fg-subtle); white-space: nowrap; }
-
-  /* Responsive: el strip colapsa a 2 columnas en pantallas estrechas. */
-  @media (max-width: 720px) {
-    .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Táctil: objetivos de 44 px (solo crecen, E-30). */
+  @media (pointer: coarse) {
+    .pill, .note__open, .note__act { min-height: var(--tap-min); }
   }
-
-  /* La definición canónica de .b/.b--primary/.b--ghost vive en dashboard.css (global). */
+  @media (max-width: 719px) {
+    .filters { flex-direction: column; align-items: stretch; }
+    .note { padding: 12px 12px 10px 11px; gap: 10px; }
+    .note__icon { width: 32px; height: 32px; }
+    .note__meta { margin-left: 0; width: 100%; }
+  }
 </style>

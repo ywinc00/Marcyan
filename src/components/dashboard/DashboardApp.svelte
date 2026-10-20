@@ -22,6 +22,7 @@
   import { route, href, navigate, startRouter } from './lib/router.svelte.js';
   import { data, loadAll, loadHome, loadLeads, refreshShell, clearData } from './lib/store.svelte.js';
   import { fmtTime } from './lib/dates.js';
+  import { avisos, startUnreadPolling, badgeText } from './lib/avisos.svelte.js';
 
   // ── Estado ───────────────────────────────────────────────────
   let phase = $state('loading');      // loading | login | unreachable | app
@@ -177,11 +178,22 @@
   let firstRoute = true;
   $effect(() => {
     const s = section;   // dependencia
-    if (typeof document !== 'undefined') document.title = 'Marcyan · ' + sectionTitle;
     if (firstRoute) { firstRoute = false; return; }
     menuOpen = false;
     window.scrollTo(0, 0);
     if (mainEl && s) mainEl.focus({ preventScroll: true });
+  });
+
+  // Título de pestaña con los avisos sin leer (OP-13): "(3) Marcyan · Leads".
+  const unreadBadge = $derived(phase === 'app' ? badgeText(avisos.unread) : '');
+  $effect(() => {
+    if (typeof document !== 'undefined') document.title = (unreadBadge ? `(${unreadBadge}) ` : '') + 'Marcyan · ' + sectionTitle;
+  });
+  // Contador de Avisos: solo con sesión, cada 60 s con la pestaña visible y
+  // al volver a ella (lib/avisos.svelte.js).
+  $effect(() => {
+    if (phase !== 'app') return;
+    return startUnreadPolling();
   });
 
   onMount(() => {
@@ -267,6 +279,9 @@
     <a class="nav__item" class:active={section === item.id} href={href(item.id)} aria-current={section === item.id ? 'page' : undefined} onclick={() => (menuOpen = false)}>
       <Icon name={item.id} size={18} />
       <span>{item.label}</span>
+      {#if item.id === 'avisos' && unreadBadge}
+        <span class="nav__count"><span aria-hidden="true">{unreadBadge}</span><span class="sr-only">, {avisos.unread === 1 ? '1 sin leer' : `${unreadBadge} sin leer`}</span></span>
+      {/if}
     </a>
   {/each}
 {/snippet}
@@ -484,6 +499,7 @@
   .nav__cap { font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); padding: 0 10px var(--space-2); }
   .nav__item { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 10px; border-radius: var(--radius-md); color: var(--fg-secondary); font-size: var(--dash-body); text-decoration: none; transition: background-color var(--duration-fast), color var(--duration-fast); }
   .nav__item:hover { background: var(--bg-elevated); color: var(--fg-primary); }
+  .nav__count { margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold); font-size: var(--dash-caption); font-weight: 600; line-height: 1.5; text-align: center; font-variant-numeric: tabular-nums; }
   .nav__item.active { background: var(--bg-elevated); color: var(--accent-gold); box-shadow: inset 2px 0 0 var(--accent-gold), 0 0 0 1px var(--border); font-weight: 600; }
   .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 7px; font-size: var(--dash-caption); color: var(--accent-teal); padding: 8px 10px; border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md); }
   .sidebar__foot.is-off { color: var(--color-warning); border-color: color-mix(in srgb, var(--color-warning) 32%, transparent); }

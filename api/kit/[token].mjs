@@ -135,7 +135,7 @@ export default async function handler(req, res) {
     if (draft && blobConfigured()) {
       const claimed = submit ? await markDraftSubmitted(draft.id, brief.id) : false;
       try {
-        fileRows = await reconcileDraft({ draftId: draft.id, briefId: brief.id, filesMeta: body.files });
+        fileRows = await reconcileDraft({ draftId: draft.id, briefId: brief.id, filesMeta: body.files, final: submit });
       } catch (err) {
         // Borrador ya cerrado y sin conciliar: el cron lo termina (enlaza lo
         // que el cliente dejó y borra lo que quitó) en vez de dejarlo así.

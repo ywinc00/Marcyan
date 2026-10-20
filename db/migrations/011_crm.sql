@@ -7,7 +7,8 @@
 --       notes               → notas internas del dueño (nunca se envían al cliente)
 --       page_url            → página del sitio desde la que llegó (opcional; la llena
 --                             createLead cuando el formulario o el chat la mandan)
---     converted_brief_id ya existía (003) y pasa a escribirse.
+--     converted_brief_id ya existía (003) y pasa a escribirse; gana FK a
+--     briefs(project_id) con SET NULL (solo si no hay huérfanos, DM-01).
 --  2) clients.source_lead_id: el lead de origen (como source_brief_id para briefs).
 --     FK a leads(ref_id) con SET NULL: borrar un lead nunca borra un cliente.
 --  3) lead_events: historial de la ficha del lead (estado, conversión, notas).
@@ -37,6 +38,27 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'leads_converted_client_fk') THEN
     ALTER TABLE leads ADD CONSTRAINT leads_converted_client_fk
       FOREIGN KEY (converted_client_id) REFERENCES clients(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+-- converted_brief_id → briefs(project_id) (revisión final DM-01): al borrar el
+-- brief el lead se desvincula solo, y un folio MRC reutilizado (next_project_id
+-- es MAX+1) nunca queda pegado a un lead ajeno. Solo se añade si no hay
+-- valores huérfanos: no se toca ningún dato existente; si los hubiera, se avisa
+-- y se deja sin clave (el DELETE del brief limpia igual el enlace por código).
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'leads_converted_brief_fk') THEN
+    IF EXISTS (
+      SELECT 1 FROM leads l
+       WHERE l.converted_brief_id IS NOT NULL
+         AND NOT EXISTS (SELECT 1 FROM briefs b WHERE b.project_id = l.converted_brief_id)
+    ) THEN
+      RAISE NOTICE 'leads_converted_brief_fk no se creó: hay leads con converted_brief_id sin brief. Revisarlos a mano.';
+    ELSE
+      ALTER TABLE leads ADD CONSTRAINT leads_converted_brief_fk
+        FOREIGN KEY (converted_brief_id) REFERENCES briefs(project_id) ON DELETE SET NULL ON UPDATE CASCADE;
+    END IF;
   END IF;
 END $$;
 

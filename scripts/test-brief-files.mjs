@@ -133,6 +133,22 @@ await check('kit: lo ya enlazado se conserva aunque no venga en la lista; lo qui
   assert.ok(blob.items.has(antes));
 });
 
+await check('kit: un guardado intermedio no borra la subida que terminó mientras viajaba (DM-02); el envío sí decide', async () => {
+  reset();
+  db.drafts.push({ id: KIT, brief_id: 20 });
+  const vista = seed(KIT, 'vista');
+  const recien = seed(KIT, 'recien'); // el put terminó, el navegador aún no la declara
+  const quitado = seed(KIT, 'quitado');
+  const rows = await reconcileDraft({ draftId: KIT, briefId: 20, filesMeta: [{ pathname: vista }, { pathname: quitado, removed: true }], final: false });
+  assert.deepEqual(rows.map((r) => r.pathname), [vista]);
+  assert.ok(blob.items.has(recien), 'la subida recién terminada sigue en el almacén');
+  assert.equal(db.files.find((f) => f.pathname === recien).brief_id, null, 'su reserva sigue, sin enlazar');
+  assert.ok(!blob.items.has(quitado), 'lo quitado sí se borra');
+  // El siguiente guardado ya la declara: entra.
+  const after = await reconcileDraft({ draftId: KIT, briefId: 20, filesMeta: [{ pathname: vista }, { pathname: recien }] });
+  assert.deepEqual(after.map((r) => r.pathname).sort(), [recien, vista].sort());
+});
+
 await check('sin lista del navegador: todo lo reservado entra, como antes', async () => {
   reset();
   db.drafts.push({ id: DRAFT, brief_id: 10 });

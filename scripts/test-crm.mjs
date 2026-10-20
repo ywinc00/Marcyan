@@ -428,6 +428,18 @@ await check('migración 011: transacción, advisory lock propio e idempotente', 
     assert.ok(!fs.readFileSync(path.join(ROOT, 'db/migrations', other), 'utf8').includes('91123770'), 'clave de lock repetida en ' + other);
   }
 });
+await check('DM-01: borrar un brief desvincula el lead convertido (clave SET NULL en la 011 y limpieza en deleteBrief)', () => {
+  const sql = fs.readFileSync(path.join(ROOT, 'db/migrations/011_crm.sql'), 'utf8');
+  assert.match(sql, /IF NOT EXISTS \(SELECT 1 FROM pg_constraint WHERE conname = 'leads_converted_brief_fk'\)/);
+  assert.match(sql, /FOREIGN KEY \(converted_brief_id\) REFERENCES briefs\(project_id\) ON DELETE SET NULL ON UPDATE CASCADE/);
+  // Con huérfanos no se añade la clave ni se toca ningún dato.
+  assert.match(sql, /NOT EXISTS \(SELECT 1 FROM briefs b WHERE b\.project_id = l\.converted_brief_id\)[\s\S]*RAISE NOTICE/);
+  assert.ok(!/UPDATE leads/.test(sql), 'la migración no reescribe leads');
+  const db = fs.readFileSync(path.join(ROOT, 'lib/db.mjs'), 'utf8');
+  const fn = db.slice(db.indexOf('export async function deleteBrief'), db.indexOf('export async function deleteBrief') + 900);
+  assert.ok(fn.indexOf('UPDATE leads SET converted_brief_id = NULL') > 0 && fn.indexOf('UPDATE leads') < fn.indexOf('DELETE FROM briefs'));
+  assert.match(fn, /BEGIN[\s\S]*COMMIT[\s\S]*ROLLBACK/);
+});
 await check('estático: el endpoint de conversión exige sesión antes de nada', () => {
   const src = fs.readFileSync(path.join(ROOT, 'api/admin/leads/[id]/convert.mjs'), 'utf8');
   const i = src.indexOf('await requireAdmin(');

@@ -83,7 +83,11 @@
     const v = validateKit(data, services, true, blocks);
     if (Object.keys(errorsForBlock(b, v.errors)).length) return; // con errores no se guarda a ciegas
     try {
-      const { res, json } = await post('save', blockData(b, data));
+      // Con una subida en curso se guarda solo el texto, sin la lista de
+      // archivos: una foto que termina mientras viaja este guardado no puede
+      // darse por descartada en el servidor (DM-02). La lista va en el
+      // siguiente guardado o en el envío.
+      const { res, json } = await post('save', blockData(b, data), { withFiles: !(uploads && uploads.busy) });
       if (res.ok && json && json.ok) { markSaved(b); saved = new Set([...saved, b.key]); persistLocal(); }
     } catch { console.warn('[kit] no se pudo guardar el bloque al salir; queda en pantalla hasta guardarlo'); }
   }
@@ -146,8 +150,8 @@
   }
 
   // ── Guardar un bloque ──────────────────────────────────────
-  async function post(action, payload) {
-    const draft = uploads && uploads.draft;
+  async function post(action, payload, { withFiles = true } = {}) {
+    const draft = withFiles && uploads && uploads.draft;
     const filesMeta = uploads ? uploads.meta() : [];
     const res = await fetch(`/api/kit/${encodeURIComponent(token)}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },

@@ -452,6 +452,12 @@ await check('conciliación: solo entra lo que el navegador declara o ya estaba e
   // Sin lista del navegador (cron sin datos): como antes, todo lo reservado.
   assert.equal(declaredFromMeta(undefined, DRAFT_ID), null);
   assert.equal(splitReconcile({ blobs, reserved, declared: null }).keep.length, 4);
+  // Guardado intermedio del kit (DM-02): lo reservado sin declarar se queda
+  // en espera, sin enlazar ni borrar; lo quitado sí se borra.
+  const save = splitReconcile({ blobs, reserved, removed: removedFromMeta(meta, DRAFT_ID), declared, linked: new Set([P('kit-antes')]), final: false });
+  assert.deepEqual(save.keep.map((b) => b.pathname), [P('a'), P('kit-antes')]);
+  assert.deepEqual(save.drop.map((b) => b.pathname), [P('b')]);
+  assert.deepEqual(save.pending.map((b) => b.pathname), [P('huerfana')], 'la subida recién terminada no se borra en un guardado');
 });
 await check('cola de reintento: copia acotada de lo que mandó el navegador (R4)', () => {
   const P = (n) => `briefs/${DRAFT_ID}/photo/${n}.jpg`;

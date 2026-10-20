@@ -21,6 +21,7 @@ import {
   classifyGoogleError, explainCode, overallStatus, mergeSyncState, projectHealth, globalHealth,
   summarizeGsc, summarizeGa4, delta, buildSeries, niceScale, explainDiagProject,
   addDays, spanDays, eachDay, lookbackDays, clampDays, bareDomain, ymd,
+  coverageOf, invalidateSyncState, sameField, canonicalField,
 } from '../lib/seo-core.mjs';
 import { dedupeByDate, sourcesInvalidatedBy, shapeProject, defaultRange } from '../lib/seo.mjs';
 
@@ -103,6 +104,19 @@ await check('validateProjectFields: edición parcial solo toca lo enviado', () =
   assert.deepEqual(w.values, { active: false });
 });
 
+// ── Voseo (A6-R5) ────────────────────────────────────────────────
+// \b no sirve: en una regex de JS la vocal con tilde no cuenta como letra de
+// palabra, así que /\btocá\b/ nunca coincide. Límites explícitos con \p{L}.
+const VOSEO = /(^|[^\p{L}])(tocá|revisá|conectá|podés|elegí|guardá|corregí|creá|usá|tenés|querés|sabés|mirá|pulsá|escribí|probá|andá|fijate)(?=$|[^\p{L}])/iu;
+await check('voseo: la regex detecta las formas que vigila (caso positivo)', () => {
+  for (const s of ['Tocá aquí', 'revisá el campo', 'Podés ver', 'conectá la cuenta.', '¿Guardá?', 'usá', 'Elegí otro']) {
+    assert.match(s, VOSEO, s);
+  }
+  for (const s of ['Toca aquí', 'Revisa el campo', 'Puedes ver', 'usado', 'creación', 'guardado']) {
+    assert.doesNotMatch(s, VOSEO, s);
+  }
+});
+
 // ── Errores en español (SEO-02) ──────────────────────────────────
 await check('errores: 403 de Search Console → permiso de la propiedad', () => {
   const e = classifyGoogleError('gsc', { status: 403, message: 'GSC query falló (403): User does not have sufficient permission' });
@@ -123,12 +137,13 @@ await check('errores: not_configured, auth, cuota, caída, desconocido', () => {
   assert.equal(classifyGoogleError('indexation', { status: 403 }).code, 'index_forbidden');
 });
 await check('errores: ningún título ni acción con jerga, voseo ni em-dash', () => {
-  const codes = ['not_configured', 'auth_failed', 'no_ids', 'gsc_forbidden', 'gsc_not_found', 'ga4_forbidden', 'ga4_bad_id', 'quota', 'unavailable', 'no_sitemaps', 'index_forbidden', 'index_empty', 'db_failed', 'unknown'];
+  const codes = ['not_configured', 'auth_failed', 'no_ids', 'gsc_forbidden', 'gsc_not_found', 'ga4_forbidden', 'ga4_bad_id', 'quota', 'unavailable', 'no_sitemaps', 'index_forbidden', 'index_empty', 'ids_changed', 'db_failed', 'unknown'];
   for (const c of codes) {
     const e = explainCode(c);
+    assert.equal(e.code, c, c + ' sin texto propio');
     const txt = e.title + ' ' + e.action;
     assert.doesNotMatch(txt, /—|–/, c + ' con em-dash');
-    assert.doesNotMatch(txt, /\b(tocá|revisá|conectá|podés|elegí|guardá|corregí|creá|usá)\b/i, c + ' con voseo');
+    assert.doesNotMatch(txt, VOSEO, c + ' con voseo');
     assert.doesNotMatch(txt, /\b(WIF|OIDC|STS|GOOGLE_[A-Z_]+|not_configured|403|404)\b/, c + ' con jerga');
   }
 });
@@ -207,6 +222,121 @@ await check('delta: dirección, mejora con posición menor y sin base', () => {
   assert.equal(delta(100, 100).dir, 'flat');
 });
 
+// ── Cobertura guardada, no la de la última sync (A6-R1) ──────────
+await check('cobertura: una sync manual corta no borra la comparación de 28 ni de 90 días', () => {
+  // 184 días guardados por el cron; después, "Actualizar ahora" con 7 días.
+  const rows = gscRows('2026-04-15', '2026-10-16', () => ({ clicks: 1, impressions: 10, position: 10 }));
+  let st = mergeSyncState(null, { at: 'T1', status: 'ok', sources: { gsc: { status: 'ok', at: 'T1', range: { startDate: '2026-04-15', endDate: '2026-10-19' } } } });
+  st = mergeSyncState(st, { at: 'T2', status: 'ok', sources: { gsc: { status: 'ok', at: 'T2', range: { startDate: '2026-10-02', endDate: '2026-10-19' } } } });
+  assert.equal(st.sources.gsc.covered_from, '2026-04-15');
+  for (const days of [28, 90]) {
+    const s = summarizeGsc(rows, { days, today: '2026-10-19', synced: coverageOf(st.sources.gsc) });
+    assert.ok(s.previous, `${days} días sin período previo`);
+    assert.equal(s.current.complete, true);
+  }
+});
+await check('cobertura: un intento fallido conserva lo guardado; uno de otra propiedad no', () => {
+  const ok = mergeSyncState(null, { at: 'T1', status: 'ok', sources: { ga4: { status: 'ok', at: 'T1', range: { startDate: '2026-04-15' } } } });
+  const failed = mergeSyncState(ok, { at: 'T2', status: 'error', sources: { ga4: { status: 'error', at: 'T2', range: { startDate: '2026-10-01' }, error: { code: 'quota' } } } });
+  assert.equal(failed.sources.ga4.covered_from, '2026-04-15');
+  const moved = mergeSyncState(ok, { at: 'T3', status: 'error', sources: { ga4: { status: 'error', at: 'T3', error: { code: 'ids_changed' } } } });
+  assert.equal(moved.sources.ga4.covered_from, null);
+  assert.equal(moved.sources.ga4.ok_at, null);
+  // Estados de antes de covered_from: el rango vale solo si aquel intento fue bien.
+  assert.deepEqual(coverageOf({ status: 'ok', range: { startDate: '2026-05-01' } }), { startDate: '2026-05-01' });
+  assert.equal(coverageOf({ status: 'error', range: { startDate: '2026-05-01' } }), null);
+});
+await check('cobertura: la vista de 90 días con menos guardado se marca incompleta', () => {
+  const rows = gscRows('2026-09-01', '2026-10-16', () => ({ clicks: 1, impressions: 10, position: 10 }));
+  const s = summarizeGsc(rows, { days: 90, today: '2026-10-19', synced: { startDate: '2026-09-01' } });
+  assert.equal(s.current.complete, false);
+  assert.equal(s.current.data_from, '2026-09-01');
+  assert.equal(s.previous, null);
+  const full = summarizeGsc(rows, { days: 28, today: '2026-10-19', synced: { startDate: '2026-09-01' } });
+  assert.equal(full.current.complete, true);
+  const a = summarizeGa4(eachDay('2026-10-01', '2026-10-19').map((d) => ({ date: d, sessions: 1 })), { days: 28, today: '2026-10-19' });
+  assert.equal(a.current.complete, false);
+  assert.equal(a.current.data_from, '2026-10-01');
+});
+await check('sync: el diario se pide siempre para el rango mayor y su previo', () => {
+  const src = read('lib/seo.mjs');
+  assert.match(src, /lookbackDays\(Math\.max\(clampDays\(days\), CRON_DAYS\)\)/);
+  const det = read('api/admin/seo/projects/[id].mjs');
+  assert.match(det, /coverageOf\(srcs\.gsc\)/);
+  assert.match(det, /complete === false \? gsc\.current\.data_from/, 'el gráfico no pinta como ceros los días no guardados');
+  assert.match(read('src/components/dashboard/SeoSection.svelte'), /los totales no cubren los/);
+});
+
+// ── Cambio de propiedad: estado y escrituras (A6-R2, A6-R3) ─────
+await check('cambio de propiedad: el estado deja de decir "Al día" y last_synced_at se reinicia', () => {
+  const state = { status: 'ok', at: 'T1', error: null, sources: { gsc: { status: 'ok', at: 'T1' }, ga4: { status: 'ok', at: 'T1' }, indexation: { status: 'ok', at: 'T1' } } };
+  // GA4 nuevo: aún sin datos → sin estado global.
+  const a = invalidateSyncState(state, ['ga4'], { gsc_site_url: 'sc-domain:a.com', ga4_property_id: '412345678' });
+  assert.equal(a.status, null);
+  assert.equal(a.clearSynced, true);
+  assert.ok(!('ga4' in a.sync_state.sources));
+  assert.equal(a.sync_state.sources.gsc.status, 'ok');
+  const p = shapeProject({ id: '1', gsc_site_url: 'sc-domain:a.com', ga4_property_id: '412345678', sync_state: a.sync_state, last_synced_at: null });
+  assert.ok(p.sync_state, 'se conservan las fuentes que siguen valiendo');
+  assert.equal(projectHealth(p).label, 'Sin sincronizar');
+  // GA4 quitado: el global sale de lo que queda y last_synced_at se conserva.
+  const b = invalidateSyncState(state, ['ga4'], { gsc_site_url: 'sc-domain:a.com', ga4_property_id: null });
+  assert.equal(b.status, 'ok');
+  assert.equal(b.clearSynced, false);
+});
+await check('cambio de propiedad: PATCH en una transacción y escrituras de la sync con guarda', () => {
+  const src = read('lib/seo.mjs');
+  assert.match(src, /export async function updateSeoProjectAndSources/);
+  assert.match(src, /BEGIN/);
+  assert.match(src, /FOR UPDATE/);
+  assert.match(src, /FOR SHARE\)/);
+  assert.match(src, /upsertMetrics\(project\.id, 'gsc', dateRows, guard\)/);
+  assert.match(src, /upsertMetrics\(project\.id, 'ga4', ga\.rows, idsGuard\(project, 'ga4'\)\)/);
+  assert.match(src, /upsertMetric\(project\.id, 'indexation', today, r\.data, idsGuard\(project, 'gsc'\)\)/);
+  assert.match(read('api/admin/seo/projects/[id].mjs'), /updateSeoProjectAndSources\(id, v\.values\)/);
+  const ui = read('src/components/dashboard/SeoSection.svelte');
+  assert.match(ui, /queuedSync = String\(id\)/, 'la sync pedida durante otra no se descarta');
+});
+await check('cambio de propiedad: la guarda se explica en español y no es "fallo de la base"', () => {
+  const e = classifyGoogleError('ga4', { code: 'ids_changed', message: 'x' });
+  assert.equal(e.code, 'ids_changed');
+  assert.match(e.action, /Actualizar ahora/);
+});
+
+// ── Tiempo límite de las llamadas a Google (A6-R4) ──────────────
+await check('Google: todas las llamadas con tope de tiempo y el tope se explica', () => {
+  const src = read('lib/seo.mjs');
+  assert.doesNotMatch(src.replace(/function gfetch[\s\S]*?\n}/, ''), /[^g]fetch\(/, 'queda un fetch sin tope');
+  assert.match(src, /AbortSignal\.timeout\(GOOGLE_TIMEOUT_MS\)/);
+  const t = new Error('The operation was aborted due to timeout'); t.name = 'TimeoutError';
+  assert.equal(classifyGoogleError('gsc', t).code, 'unavailable');
+  const ab = new Error('This operation was aborted'); ab.name = 'AbortError';
+  assert.equal(classifyGoogleError('ga4', ab).code, 'unavailable');
+});
+await check('Google: entre el presupuesto de los lotes y maxDuration cabe un proyecto entero', async () => {
+  const { GOOGLE_PROJECT_WORST_MS } = await import('../lib/seo.mjs');
+  const sync = read('api/admin/seo/sync.mjs');
+  const maxD = Number(/maxDuration: (\d+)/.exec(sync)[1]) * 1000;
+  assert.match(sync, /BULK_BUDGET_MS = 120000 - GOOGLE_PROJECT_WORST_MS - 10000/);
+  assert.ok(maxD - (120000 - GOOGLE_PROJECT_WORST_MS - 10000) >= GOOGLE_PROJECT_WORST_MS);
+  assert.ok(maxD >= GOOGLE_PROJECT_WORST_MS + 10000, 'una sync de un proyecto cabe');
+  assert.match(read('api/cron/seo-sync.mjs'), /300000 - GOOGLE_PROJECT_WORST_MS - 10000/);
+});
+
+// ── Identificadores equivalentes (A6-R7) ────────────────────────
+await check('identificadores: la barra final no es otra propiedad ni borra datos', () => {
+  assert.equal(sameField('gsc_site_url', 'https://www.x.com', 'https://www.x.com/'), true);
+  assert.equal(sameField('gsc_site_url', 'https://www.x.com/', 'sc-domain:x.com'), false);
+  assert.equal(sameField('ga4_property_id', 'properties/412345678', '412345678'), true);
+  assert.equal(canonicalField('name', '  A  '), 'A');
+  const before = { gsc_site_url: 'https://www.x.com', ga4_property_id: '412345678' };
+  assert.deepEqual(sourcesInvalidatedBy(before, { ...before, gsc_site_url: 'https://www.x.com/' }), []);
+  const form = read('src/components/dashboard/seo/SeoProjectForm.svelte');
+  assert.match(form, /onblur=\{\(\) => validateField\('name'\)\}/, 'el nombre se valida al salir');
+  assert.match(form, /sameField\('gsc_site_url'/);
+  assert.match(form, /body: changed/, 'la edición solo envía lo que cambió');
+});
+
 // ── Serie y eje (SEO-10) ─────────────────────────────────────────
 await check('serie: todos los días, ceros reales y días pendientes como hueco', () => {
   const s = buildSeries([{ date: '2026-10-10', clicks: 4 }, { date: '2026-10-12', clicks: 2 }], 'clicks', '2026-10-10', '2026-10-14', '2026-10-12');
@@ -219,6 +349,19 @@ await check('eje Y: escala redonda con 3 marcas que cubren el máximo', () => {
   const a = niceScale(37); assert.ok(a.max >= 37 && a.ticks.length === 3);
   const b = niceScale(1234); assert.ok(b.max >= 1234 && b.max <= 2500);
   assert.equal(niceScale(3).max, 4);
+});
+await check('eje Y: los miles caben (rótulo compacto desde 10 mil) y el eje X dice "3 oct"', async () => {
+  const { axisNum, dayShort } = await import('../src/components/dashboard/seo/format.js');
+  assert.equal(axisNum(2000), '2,000');
+  assert.equal(axisNum(10000), '10 mil');
+  for (const m of [5432, 12000, 87000, 4200000]) {
+    const sc = niceScale(m);
+    for (const t of sc.ticks) assert.ok(axisNum(t).length <= 7, `${t} → "${axisNum(t)}" demasiado largo`);
+  }
+  assert.equal(dayShort('2026-10-03'), '3 oct');
+  const chart = read('src/components/dashboard/seo/SeoChart.svelte');
+  assert.doesNotMatch(chart, /fmtDayShort/, 'el eje X no usa DD\/MM');
+  assert.match(chart, /const PAD_L = \$derived\(/, 'el margen izquierdo se mide con el rótulo');
 });
 
 // ── Diagnóstico (SEO-01) ─────────────────────────────────────────
@@ -330,7 +473,7 @@ await check('panel: sin voseo ni emojis en la sección SEO', () => {
   const files = ['src/components/dashboard/SeoSection.svelte', ...(fs.existsSync(dir) ? fs.readdirSync(dir).map((f) => 'src/components/dashboard/seo/' + f) : [])];
   for (const f of files) {
     const src = read(f);
-    assert.doesNotMatch(src, /\b(Tocá|Conectá|Podés|Elegí|Guardá|Corregí|Creá|revisá|usá)\b/, f + ' con voseo');
+    assert.doesNotMatch(src, VOSEO, f + ' con voseo');
     assert.doesNotMatch(src, /[\u{1F300}-\u{1FAFF}✎]/u, f + ' con emoji');
   }
 });

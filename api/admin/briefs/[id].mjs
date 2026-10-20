@@ -15,7 +15,8 @@
 //            Sin client_id crea el cliente con los datos del brief; con
 //            client_id lo vincula a uno que ya existe. Deja el evento
 //            'converted_to_client' en el historial del brief.
-//            Respuesta: { client, created, linked, already }.
+//            Respuesta: { client, created, linked, already } (201 si se creó).
+//            409 si el brief ya es de OTRO cliente (no se cambia por aquí).
 //   DELETE → elimina el brief (cascade a brief_events) y antes sus archivos en Blob
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
@@ -157,6 +158,16 @@ export default async function handler(req, res) {
       if (current && (wanted === null || Number(current.id) === wanted)) {
         return res.status(200).json({ ok: true, client: current, created: false, linked: false, already: true });
       }
+      // Ya es de OTRO cliente: no se cambia por aquí (la ficha seguiría
+      // mostrando el primero y el vínculo quedaría a medias). Revisión A3-04.
+      if (current) {
+        return res.status(409).json({
+          ok: false, client: current,
+          error: current.client_code
+            ? `Este brief ya está vinculado al cliente ${current.client_code}.`
+            : 'Este brief ya está vinculado a otro cliente.',
+        });
+      }
 
       let client;
       let created = false;
@@ -166,7 +177,8 @@ export default async function handler(req, res) {
         if (!client) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
         created = true;
       } else {
-        const r = await linkBriefToClient(id, wanted);
+        // El vínculo y su evento van juntos en una sola sentencia.
+        const r = await linkBriefToClient(id, wanted, session.email);
         if (!r) return res.status(404).json({ ok: false, error: 'Ese cliente ya no existe. Búscalo de nuevo.' });
         client = r.client;
         linked = true;
@@ -175,12 +187,16 @@ export default async function handler(req, res) {
         id: client.id, client_code: client.client_code,
         business_name: client.business_name, status: client.status,
       };
-      await logEvent({
-        projectId: id,
-        type: 'converted_to_client',
-        actorEmail: session.email,
-        data: { client_id: Number(slim.id), client_code: slim.client_code, business_name: slim.business_name, created, linked },
-      });
+      if (created) {
+        // El cliente nuevo ya queda unido al brief por source_brief_id: si el
+        // evento fallara, la ficha lo seguiría mostrando.
+        await logEvent({
+          projectId: id,
+          type: 'converted_to_client',
+          actorEmail: session.email,
+          data: { client_id: Number(slim.id), client_code: slim.client_code, business_name: slim.business_name, created, linked },
+        });
+      }
       return res.status(created ? 201 : 200).json({ ok: true, client: slim, created, linked, already: false });
     } catch (err) {
       console.error('[admin/briefs/:id POST] error:', err);

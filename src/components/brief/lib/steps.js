@@ -110,6 +110,17 @@ export function itemsForStep(index, services) {
 // cerrada; con "No tengo colores definidos" no se pide la lista.
 export const isHidden = (key, data) => isSkipped(key, data);
 
+// Minutos estimados del brief con los servicios elegidos: unos 20 s por
+// pregunta visible, nunca menos de 5. Con un servicio sale ~6-7 min y con
+// todos ~12: el raíl dice la verdad en vez de un "10 minutos" fijo.
+export function estimateMinutes(services, data = {}) {
+  let n = 0;
+  for (let i = 0; i < REVIEW_STEP; i++) {
+    n += fieldsForStep(i, services).filter((f) => !isSkipped(f.key, data)).length;
+  }
+  return Math.max(5, Math.round(n / 3));
+}
+
 // Lo que de verdad se valida y se envía: sin lo oculto y sin las respuestas
 // de servicios que el cliente ya no eligió.
 export function effectiveData(data) {

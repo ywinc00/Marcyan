@@ -19,7 +19,7 @@
   import Exits from './Exits.svelte';
   import Ico from './Ico.svelte';
   import { strings, pick } from './lib/strings.js';
-  import { STEPS, REVIEW_STEP, itemsForStep, isHidden, groupOf, validateStep, validateAll, errorsForStep, firstStepWithErrors } from './lib/steps.js';
+  import { STEPS, REVIEW_STEP, itemsForStep, isHidden, groupOf, validateStep, validateAll, errorsForStep, firstStepWithErrors, estimateMinutes } from './lib/steps.js';
   import { saveBrief, loadBrief, clearBrief, storageAvailable } from './lib/persist.js';
   import { Uploads } from './lib/uploads.svelte.js';
   import { fmtBytes } from './lib/sniff.js';
@@ -54,6 +54,7 @@
 
   const services = $derived(Array.isArray(data.services) ? data.services : []);
   const items = $derived(itemsForStep(step, services));
+  const minutes = $derived(estimateMinutes(services, data));
   const stepValid = $derived(STEPS.map((_, i) => i === REVIEW_STEP || Object.keys(validateStep(i, data)).length === 0));
   const svcField = fieldByKey('services');
   const chosen = $derived(svcField.options.filter((o) => services.includes(o.value)));
@@ -254,7 +255,7 @@
     <!-- Raíl (escritorio) -->
     <aside class="rail" aria-label={t.railTitle}>
       <span class="rail__title">{t.railTitle}</span>
-      <span class="rail__time"><Ico name="clock" size={14} />{t.time}</span>
+      <span class="rail__time"><Ico name="clock" size={14} />{t.time(minutes)}</span>
       <ol class="rail__steps">
         {#each STEPS as s, i (s.key)}
           {@const done = i !== step && i <= visited && stepValid[i] && i !== REVIEW_STEP}
@@ -274,7 +275,7 @@
       <div class="mbar">
         <div class="mbar__row">
           <span class="mbar__k">{t.stepOf(step + 1, TOTAL, pick(STEPS[step].label, lang))}</span>
-          <span class="mbar__t">{t.timeShort}</span>
+          <span class="mbar__t">{t.timeShort(minutes)}</span>
         </div>
         <div class="mbar__seg" role="progressbar" aria-valuemin="1" aria-valuemax={TOTAL} aria-valuenow={step + 1} aria-label={t.stepOf(step + 1, TOTAL, pick(STEPS[step].label, lang))}>
           {#each STEPS as _, i}<i class:on={i <= step}></i>{/each}

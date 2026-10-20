@@ -10,8 +10,8 @@
 
 const ES = {
   railTitle: 'Tu brief',
-  time: 'unos 10 minutos',
-  timeShort: '10 min',
+  time: (m) => `unos ${m} minutos`,
+  timeShort: (m) => `${m} min`,
   autosave: 'Se guarda solo',
   noStorage: 'Este navegador no deja guardar el avance.',
   stepOf: (n, total, name) => `Paso ${n} de ${total} · ${name}`,
@@ -144,8 +144,8 @@ const ES = {
 
 const EN = {
   railTitle: 'Your brief',
-  time: 'about 10 minutes',
-  timeShort: '10 min',
+  time: (m) => `about ${m} minutes`,
+  timeShort: (m) => `${m} min`,
   autosave: 'Saves as you go',
   noStorage: "This browser won't let us save your progress.",
   stepOf: (n, total, name) => `Step ${n} of ${total} · ${name}`,

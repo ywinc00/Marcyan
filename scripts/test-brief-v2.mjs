@@ -22,7 +22,7 @@ import { rateLimit, memoryStore, hashKey, windowStart, LIMITS } from '../lib/rat
 import {
   KIND_RULES, DRAFT_LIMITS, UPLOAD_TOKEN_TTL_MS, safeFileName, buildPathname, parseBlobPathname,
   parseClientPayload, checkUploadRequest, isAllowedRealType, dispositionFor, hashSecret, secretMatches,
-  looksLikeSvg, cleanOriginalName, splitReconcile,
+  looksLikeSvg, cleanOriginalName, splitReconcile, removedFromMeta,
 } from '../lib/brief-upload-rules.mjs';
 import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill, kitForSubmit } from '../lib/brief-kit.mjs';
 
@@ -84,10 +84,22 @@ await check('copy visible sin em-dash ni voseo', () => {
 await check('brief inicial corto: pocos campos visibles, lo pesado en arranque', () => {
   const ini = sectionsFor('inicial', null).flatMap((s) => s.fields);
   const arr = sectionsFor('arranque', null).flatMap((s) => s.fields);
-  assert.ok(ini.length <= 22, `inicial tiene ${ini.length} campos`);
-  assert.ok(arr.length > ini.length * 3, 'el arranque debe llevar lo pesado');
-  for (const k of ['leads_email', 'zones', 'hours', 'client_services', 'legal_name', 'brand_color_list', 'kit_photo_files', 'socials'])
+  // Unos 10 minutos: lo que ve todo cliente, más 1 a 3 preguntas por servicio elegido.
+  const general = ini.filter((f) => !f.when);
+  assert.ok(general.length <= 26, `el brief corto pregunta ${general.length} campos a todos`);
+  for (const id of SERVICE_IDS) {
+    const n = ini.filter((f) => f.when && f.when.services.includes(id)).length;
+    assert.ok(n <= 3, `${id} añade ${n} preguntas (máximo 3)`);
+  }
+  for (const id of ['diseno-web', 'seo-local', 'seo-ia', 'ia-conversacional', 'ecommerce', 'branding'])
+    assert.ok(ini.some((f) => f.when && f.when.services.includes(id)), `${id} tiene su bloque en el brief corto`);
+  assert.ok(arr.length > ini.length * 2, 'el arranque debe llevar lo pesado');
+  for (const k of ['leads_email', 'zones', 'hours', 'client_services', 'legal_name', 'kit_photo_files', 'socials', 'bot_handoff', 'payment_provider'])
     assert.equal(FIELDS.get(k).moment, 'arranque', k);
+  // Gate design/brief.md §3: colores, estado de la marca e idioma de contacto, en el brief corto.
+  for (const k of ['brand_color_list', 'brand_colors_none', 'brand_status', 'contact_language'])
+    assert.equal(FIELDS.get(k).moment, 'inicial', k);
+  assert.equal(FIELDS.get('brand_status').storage, 'extra');
 });
 await check('sectionsFor filtra por servicio (sitio y tienda solo con esos servicios)', () => {
   const onlyBrand = sectionsFor('arranque', ['branding']).map((s) => s.key);
@@ -143,18 +155,38 @@ await check('arranque: repeater, horario, zonas, mes y número', () => {
     hours: { mon: { open: '08:00', close: '17:00' }, sun: { closed: true } },
     zones: [{ place: 'Orlando', zip: '32801', frequency: 'often' }, 'Kissimmee'],
     start_month: '2019-03',
-    brand_color_list: [{ name: 'Rojo', hex: '#E11D2E' }, { name: 'Malo', hex: 'rojo' }],
     employees: '4.5',
   });
   assert.equal(v.data.client_services[0].price_from, 1500);
   assert.ok(v.errors['client_services.1.name'], 'nombre obligatorio en la fila');
   assert.ok(v.errors['client_services.1.unit'], 'unidad fuera de la lista');
-  assert.ok(v.errors['brand_color_list.1.hex'], 'hex inválido');
   assert.ok(v.errors.employees, 'entero');
   assert.equal(v.data.zones.length, 2);
   assert.ok(!v.errors.hours && !v.errors.zones && !v.errors.start_month);
   assert.ok(validate('arranque', { start_month: '2019-13' }, { partial: true }).errors.start_month);
   assert.ok(validate('arranque', { hours: { mon: { open: '8am', close: '5pm' } } }, { partial: true }).errors.hours);
+});
+
+await check('inicial: colores de marca con código válido o solo con nombre', () => {
+  const v = validate('inicial', { brand_color_list: [{ name: 'Rojo', hex: '#E11D2E' }, { name: 'Malo', hex: 'rojo' }, { name: 'Azul', hex: '' }] }, { partial: true });
+  assert.ok(v.errors['brand_color_list.1.hex'], 'hex inválido');
+  assert.ok(!v.errors['brand_color_list.2.hex'], 'el nombre solo, sin código, vale');
+  assert.equal(v.data.brand_color_list.length, 3);
+  const ok = validate('inicial', { brand_status: 'adjustable', contact_language: 'en', brand_colors_none: true }, { partial: true });
+  assert.ok(ok.ok, JSON.stringify(ok.errors));
+  assert.deepEqual(splitByStorage(ok.data).extra, { brand_status: 'adjustable', contact_language: 'en', brand_colors_none: true });
+  assert.ok(validate('inicial', { brand_status: 'otra' }, { partial: true }).errors.brand_status, 'estado fuera de la lista');
+});
+await check('inicial: bloques por servicio solo con su servicio', () => {
+  const keys = (svc) => sectionsFor('inicial', svc).flatMap((s) => s.fields.map((f) => f.key));
+  assert.ok(keys(['ia-conversacional']).includes('bot_channels') && !keys(['branding']).includes('bot_channels'));
+  assert.ok(keys(['ecommerce']).includes('product_count') && keys(['ecommerce']).includes('shipping'));
+  assert.ok(keys(['seo-local']).includes('seo_scope') && !keys(['seo-ia']).includes('seo_scope'));
+  assert.ok(keys(['seo-ia']).includes('aeo_scope') && keys(['branding']).includes('brand_scope'));
+  assert.ok(keys(['diseno-web']).includes('web_extras'));
+  // Un campo de un servicio no elegido no se valida (aunque venga con basura).
+  assert.ok(validate('inicial', { services: ['branding'], seo_scope: 'xx' }, { partial: true }).ok);
+  assert.ok(validate('inicial', { services: ['seo-local'], seo_scope: 'xx' }, { partial: true }).errors.seo_scope);
 });
 
 // ── 4) Compatibilidad v1 (payloads reales) ────────────────────────
@@ -325,6 +357,25 @@ await check('conciliación: solo rutas reservadas y dentro del cupo del borrador
   assert.equal(all.keep.length, 1);
   const small = Array.from({ length: 70 }, (_, i) => ({ pathname: P(`s-${String(i).padStart(2, '0')}`), size: 1000 }));
   assert.equal(splitReconcile({ blobs: small, reserved: new Set(small.map((b) => b.pathname)) }).keep.length, DRAFT_LIMITS.maxFiles);
+});
+await check('conciliación: lo que el cliente quitó se borra y no llega al brief (B1-R04)', () => {
+  const P = (n) => `briefs/${DRAFT_ID}/photo/${n}.jpg`;
+  const OTHER = `briefs/${'0'.repeat(8)}-0000-4000-8000-${'0'.repeat(12)}/photo/ajeno.jpg`;
+  const meta = [
+    { pathname: P('a'), tags: { field: 'photo_files' } },
+    { pathname: P('b'), removed: true },
+    { pathname: P('c'), removed: 'true' }, // solo removed === true cuenta
+    { pathname: OTHER, removed: true },    // de otro borrador: nunca se toca
+    { pathname: '../../x', removed: true },
+  ];
+  const removed = removedFromMeta(meta, DRAFT_ID);
+  assert.deepEqual([...removed], [P('b')]);
+  const blobs = ['a', 'b', 'c'].map((n) => ({ pathname: P(n), size: 1000 }));
+  const out = splitReconcile({ blobs, reserved: new Set(blobs.map((b) => b.pathname)), removed });
+  assert.deepEqual(out.keep.map((b) => b.pathname), [P('a'), P('c')]);
+  assert.deepEqual(out.drop.map((b) => b.pathname), [P('b')], 'lo quitado se borra del almacén');
+  assert.equal(removedFromMeta(null, DRAFT_ID).size, 0);
+  assert.equal(removedFromMeta(meta, DRAFT_ID.toUpperCase()).size, 1, 'el id del borrador no distingue mayúsculas');
 });
 await check('límites por clase: logo 20 MB, foto 15, documento 25, legal 15', () => {
   assert.equal(KIND_RULES.logo.maxBytes, 20 * 1024 * 1024);
@@ -618,6 +669,38 @@ if (noDb) {
     assert.equal(designMode({ has_logo: 'no' }).mode, 'DESDE-CERO');
     assert.equal(designMode({}).sure, false);
     assert.match(text('LEEME.md'), /\*\*REDISEÑO-IDENTIDAD\*\*/);
+  });
+  // B1-R03: lo que ahora pregunta el brief corto (guardado en extra) llega al kit.
+  const shortBrief = (extra, kitDrop = []) => {
+    const kit = { ...fx.SAMPLE_BRIEF.kit };
+    for (const k of ['brand_status', 'brand_color_list', 'approver_language', ...kitDrop]) delete kit[k];
+    return { ...fx.SAMPLE_BRIEF, services: ['diseno-web', 'ia-conversacional', 'branding'], extra: { ...fx.SAMPLE_BRIEF.extra, ...extra }, kit };
+  };
+  await check('kit: estado de marca y colores del brief corto (extra) llegan a LEEME y DESIGN.md', async () => {
+    const z = await makeZip(shortBrief({
+      brand_status: 'closed', contact_language: 'en',
+      brand_color_list: [{ name: 'Vino', hex: '7a1f2b' }, { name: 'Dorado', hex: '' }],
+      bot_channels: ['web', 'whatsapp'], web_extras: ['book'], brand_scope: 'full',
+    }), fx.SAMPLE_FILES);
+    const T = (p) => strFromU8(z.entries[`${z.kit.root}/${p}`]);
+    assert.match(T('LEEME.md'), /\*\*REDISEÑO-IDENTIDAD\*\*/);
+    assert.match(T('LEEME.md'), /marca está cerrada/);
+    const d = frontMatter(T('DESIGN.md'));
+    assert.deepEqual(d.cliente.colores_marca, [{ nombre: 'Vino', hex: '#7A1F2B' }]);
+    assert.match(T('DESIGN.md'), /también nombró "Dorado" sin código/);
+    const b = T('BRIEF.md');
+    for (const s of ['Estado de la marca', 'Cerrada: se respeta tal cual', 'Idioma de contacto', 'Inglés', 'Canales del asistente', 'WhatsApp',
+      'Funciones del sitio', 'Agendar citas', 'Alcance de marca']) assert.ok(b.includes(s), `BRIEF.md sin "${s}"`);
+    assert.equal(JSON.parse(T('docs/seo/seo.config.json')).dueno.idioma, 'en', 'idioma de contacto como idioma del dueño');
+  });
+  await check('kit: "no tengo colores definidos" se dice en DESIGN.md y en PLACEHOLDERS', async () => {
+    const z = await makeZip(shortBrief({ brand_status: 'redo', brand_colors_none: true, brand_color_list: [{ name: 'Rojo', hex: '#E11D2E' }] }), fx.SAMPLE_FILES);
+    const T = (p) => strFromU8(z.entries[`${z.kit.root}/${p}`]);
+    assert.match(T('LEEME.md'), /\*\*DESDE-CERO\*\*/);
+    const d = frontMatter(T('DESIGN.md'));
+    assert.deepEqual(d.cliente.colores_marca, [], 'con "no tengo colores" la lista oculta no cuenta');
+    assert.match(T('DESIGN.md'), /no tiene colores definidos/);
+    assert.match(T('docs/handoff/PLACEHOLDERS.md'), /no tiene colores definidos: proponer la paleta/);
   });
   await check('kit: CLAUDE.md con idiomas, tono, lo que no quiere, reglas de copy y roadmap', () => {
     const t = text('CLAUDE.md');

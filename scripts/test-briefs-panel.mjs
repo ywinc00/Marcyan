@@ -157,6 +157,23 @@ await check('panel: las secciones salen del esquema con etiquetas internas', () 
   assert.ok(!s.some((x) => x.moment === 'arranque'));
   assert.ok(!s.some((x) => x.key === 'servicios'));
 });
+await check('panel: la ficha enseña lo nuevo del brief corto (marca, colores, idioma, bloques por servicio)', () => {
+  const s = P.viewSections({
+    services: ['ia-conversacional', 'branding'], brand_status: 'adjustable', contact_language: 'en',
+    brand_color_list: [{ name: 'Vino', hex: '#7A1F2B' }], bot_channels: ['whatsapp'], brand_scope: 'full',
+  });
+  const rows = Object.fromEntries(s.flatMap((x) => x.rows.map((r) => [r.key, { ...r, moment: x.moment }])));
+  assert.equal(P.valueText(rows.brand_status.fd, rows.brand_status.value), 'Se puede ajustar');
+  assert.equal(rows.brand_status.label, 'Estado de la marca');
+  assert.equal(P.valueText(rows.contact_language.fd, rows.contact_language.value), 'Inglés');
+  assert.match(P.valueText(rows.brand_color_list.fd, rows.brand_color_list.value), /Vino/);
+  assert.deepEqual(P.valuePills(rows.bot_channels.fd, rows.bot_channels.value), ['WhatsApp']);
+  assert.equal(P.valueText(rows.brand_scope.fd, rows.brand_scope.value), 'Identidad completa: logo, colores, tipografías y guía');
+  for (const k of ['brand_status', 'contact_language', 'brand_color_list', 'bot_channels', 'brand_scope']) assert.equal(rows[k].moment, 'inicial', k);
+  // Lo de servicios no elegidos no sale como "Sin dato"; una casilla sin marcar, tampoco.
+  assert.ok(!rows.seo_scope && !rows.product_count && !rows.brand_colors_none);
+  assert.ok(rows.bot_tasks && rows.bot_tasks.value === null, 'lo del servicio elegido sin responder sí sale como Sin dato');
+});
 await check('panel: en edición salen todas las columnas históricas (se podían editar antes)', () => {
   const s = P.viewSections({}, { edit: true });
   const keys = s.flatMap((x) => x.rows.map((r) => r.key));

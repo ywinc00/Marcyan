@@ -40,6 +40,11 @@ const MSG = {
   token: L('No pudimos preparar la subida. Vuelve a intentarlo.', 'We could not prepare the upload. Please try again.'),
   off: L('Las subidas no están disponibles ahora mismo. Puedes enviar el formulario sin archivos.', 'Uploads are not available right now. You can send the form without files.'),
   read: L('No pudimos leer este archivo.', 'We could not read this file.'),
+  // Foto que el navegador no pudo convertir: el original no se sube (B1-R02).
+  noConvert: (heic, kit) => L(
+    `No pudimos convertir esta foto en tu navegador y no subimos el original, porque puede llevar tu ubicación. ${heic ? 'Súbela desde tu iPhone eligiéndola en Fotos, que la convierte sola, o sube' : 'Sube'} una captura de pantalla de la foto.${kit ? '' : ' También puedes mandarla después en el kit de arranque.'}`,
+    `We could not convert this photo in your browser, and we do not upload the original because it may include your location. ${heic ? 'Upload it from your iPhone by picking it in Photos, which converts it for you, or upload' : 'Upload'} a screenshot of the photo instead.${kit ? '' : ' You can also send it later in your getting started kit.'}`,
+  ),
 };
 
 const CONCURRENCY = 3;
@@ -71,6 +76,8 @@ export class Uploads {
   files = $state([]);
   draft = $state(null);
   unavailable = $state('');
+  // Rutas de intentos cortados o fallidos (pueden haber llegado al almacén).
+  discarded = [];
 
   #lang; #purpose; #kitToken; #onDraft; #onChange;
   #running = 0;
@@ -93,14 +100,15 @@ export class Uploads {
     if (opts.draft && opts.draft.draftId && opts.draft.secret) this.draft = opts.draft;
   }
 
+  get purpose() { return this.#purpose; }
   get limits() { return (this.draft && this.draft.limits) || DEFAULT_LIMITS; }
   get busy() { return this.files.some((f) => ['checking', 'preparing', 'uploading', 'queued'].includes(f.status)); }
   // Filas que cuentan para el cupo (lo reservado en el servidor también).
   get active() { return this.files.filter((f) => !f.removed && !['error', 'canceled'].includes(f.status)); }
   get usedBytes() { return this.active.reduce((n, f) => n + (Number(f.size) || 0), 0); }
   forField(field) { return this.files.filter((f) => f.field === field && !f.removed); }
-  // Ya subidos y quitados por el cliente (de un campo o de todos): viajan
-  // marcados al enviar, así que la interfaz lo dice y el éxito no los cuenta.
+  // Ya subidos y quitados por el cliente (de un campo o de todos): se borran
+  // al enviar o guardar, y la zona lo dice.
   removedCount(field) { return this.files.filter((f) => f.removed && !f.fromServer && (!field || f.field === field)).length; }
 
   // Filas restauradas (sesión) o ya recibidas por el servidor (kit).
@@ -184,14 +192,14 @@ export class Uploads {
       const real = await sniffFile(src.file);
       if (!this.#live(id, turn)) return;
       if (!allowedFor(r.kind, real)) return this.#fail(id, MSG.type[r.kind][lang]);
-      let blob = src.file, name = src.file.name, contentType = real, convertedFrom = null, note = '';
+      let blob = src.file, name = src.file.name, contentType = real, convertedFrom = null;
       if (r.kind === 'photo') {
         if (src.file.size > PHOTO_SOURCE_MAX) return this.#fail(id, MSG.tooBig(PHOTO_SOURCE_MAX, lang));
         r.status = 'preparing';
         const p = await preparePhoto(src.file, real);
         if (!this.#live(id, turn)) return;
+        if (p.failed) return this.#fail(id, MSG.noConvert(p.heic, this.#purpose === 'kit')[lang]);
         blob = p.blob; name = p.name; contentType = p.contentType; convertedFrom = p.convertedFrom;
-        if (p.original) note = p.note || '';
       }
       if (rules && blob.size > rules.maxBytes) return this.#fail(id, MSG.tooBig(rules.maxBytes, lang));
       // Topes del borrador (el servidor los vuelve a comprobar de forma atómica).
@@ -199,8 +207,7 @@ export class Uploads {
       if (others.length + 1 > this.limits.maxFiles) return this.#fail(id, MSG.quotaFiles(this.limits.maxFiles)[lang]);
       if (others.reduce((n, f) => n + (Number(f.size) || 0), 0) + blob.size > this.limits.maxBytes) return this.#fail(id, MSG.quotaBytes[lang]);
       src.blob = blob;
-      Object.assign(r, { name, size: blob.size, contentType, convertedFrom, note, status: 'queued' });
-      if (note) r.tags = { ...r.tags, note };
+      Object.assign(r, { name, size: blob.size, contentType, convertedFrom, status: 'queued' });
       if (contentType.startsWith('image/') && contentType !== 'image/svg+xml' && !contentType.includes('hei')) {
         try { r.thumb = URL.createObjectURL(blob); } catch { r.thumb = null; }
       }
@@ -229,6 +236,7 @@ export class Uploads {
     const ctrl = new AbortController();
     this.#ctrl.set(id, ctrl);
     r.status = 'uploading'; r.progress = 0; r.error = '';
+    let attempt = null;
     try {
       const draft = await this.ensureDraft();
       // Ruta nueva en cada intento: el servidor reserva cada ruta una sola vez.
@@ -243,6 +251,7 @@ export class Uploads {
         type: 'blob.generate-client-token', payload: { pathname, clientPayload, multipart },
       }, lang);
       if (!tok.clientToken) throw new UploadError(MSG.token[lang]);
+      attempt = pathname; // reservada: si este intento no termina, se descarta al enviar
       if (ctrl.signal.aborted) throw new DOMException('Abort', 'AbortError');
       const mock = import.meta.env.DEV && typeof window !== 'undefined' && window.__briefMock && window.__briefMock.put;
       const put = mock || (await import('@vercel/blob/client')).put;
@@ -254,6 +263,9 @@ export class Uploads {
       r.pathname = pathname; r.status = 'done'; r.progress = 100;
       this.#onChange();
     } catch (err) {
+      // Un intento cortado o fallido puede haber llegado al almacén igual: su
+      // ruta viaja como quitada para que el servidor la borre (B1-R04).
+      if (attempt && !this.discarded.includes(attempt)) this.discarded.push(attempt);
       if (ctrl.signal.aborted) { r.status = 'canceled'; r.progress = 0; this.#onChange(); return; }
       console.warn('[brief] subida fallida', err && err.message);
       // 503: subidas apagadas; el aviso ya está en la zona, la fila no lo repite.
@@ -286,7 +298,8 @@ export class Uploads {
   }
 
   // Quitar: lo que no se subió desaparece; lo ya subido queda fuera de la
-  // lista y viaja marcado al enviar (el servidor guarda todo lo reservado).
+  // lista y viaja con removed:true al enviar, y el servidor lo BORRA del
+  // almacén y de brief_files al conciliar (B1-R04).
   remove(id) {
     const r = this.#row(id);
     if (!r || r.fromServer) return;
@@ -294,7 +307,6 @@ export class Uploads {
     if (r.thumb) { try { URL.revokeObjectURL(r.thumb); } catch { /* ya liberada */ } }
     if (r.status === 'done' && r.pathname) {
       r.removed = true;
-      r.tags = { ...r.tags, note: 'Quitado por el cliente antes de enviar' };
     } else {
       this.files = this.files.filter((f) => f.id !== id);
       this.#sources.delete(id);
@@ -312,11 +324,18 @@ export class Uploads {
   }
 
   // Metadatos para el envío (brief o kit): solo lo subido en ESTE borrador.
+  // Lo quitado y los intentos descartados van con removed:true: el servidor
+  // los borra y no los enlaza al brief.
   meta() {
-    return this.files.filter((f) => f.status === 'done' && f.pathname && !f.fromServer).map((f) => ({
-      pathname: f.pathname, originalName: f.originalName || f.name, contentType: f.contentType,
-      convertedFrom: f.convertedFrom || undefined, tags: f.tags || {},
-    }));
+    const out = this.files.filter((f) => f.status === 'done' && f.pathname && !f.fromServer).map((f) => (f.removed
+      ? { pathname: f.pathname, removed: true }
+      : {
+        pathname: f.pathname, originalName: f.originalName || f.name, contentType: f.contentType,
+        convertedFrom: f.convertedFrom || undefined, tags: f.tags || {},
+      }));
+    const kept = new Set(out.map((m) => m.pathname));
+    for (const p of this.discarded) if (!kept.has(p)) out.push({ pathname: p, removed: true });
+    return out;
   }
 }
 

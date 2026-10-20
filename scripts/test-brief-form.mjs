@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { compileModule } from 'svelte/compiler';
 import { cleanPage } from '../api/events.mjs';
-import { STEPS, REVIEW_STEP, INITIAL_FIELDS, stepOfField, fieldsForStep, validateStep, validateAll, errorsForStep, firstStepWithErrors } from '../src/components/brief/lib/steps.js';
+import { STEPS, REVIEW_STEP, INITIAL_FIELDS, stepOfField, fieldsForStep, itemsForStep, groupOf, isHidden, effectiveData, validateStep, validateAll, errorsForStep, firstStepWithErrors } from '../src/components/brief/lib/steps.js';
 import { sniffBytes, CLIENT_KINDS, allowedFor, fmtBytes, withExt, DEFAULT_LIMITS } from '../src/components/brief/lib/sniff.js';
 import { fitWithin, PHOTO_MAX_SIDE, PHOTO_QUALITY } from '../src/components/brief/lib/images.js';
 import { splitForStorage, CONTACT_KEYS, loadBrief } from '../src/components/brief/lib/persist.js';
@@ -43,6 +43,40 @@ const s2none = fieldsForStep(1, ['seo-local']).map((f) => f.key);
 const s2web = fieldsForStep(1, ['diseno-web']).map((f) => f.key);
 ok(!s2none.includes('website_type'), 'sin servicio web no se pregunta el tipo de sitio');
 ok(s2web.includes('website_type'), 'con diseño web se pregunta el tipo de sitio');
+
+// Gate §3 (B1-R03): marca con colores y estado, idioma de contacto en el paso 5,
+// y bloques cortos por servicio en "Qué necesitas".
+eq(stepOfField('brand_status'), 2, 'el estado de la marca va en "Tu marca"');
+eq(stepOfField('brand_color_list'), 2, 'los colores van en "Tu marca"');
+eq(stepOfField('brand_colors_none'), 2, '"no tengo colores definidos" va en "Tu marca"');
+eq(stepOfField('contact_language'), 4, 'el idioma de contacto va en "Cómo te contactamos"');
+for (const k of ['web_extras', 'seo_scope', 'seo_areas', 'aeo_scope', 'aeo_tested', 'bot_channels', 'bot_tasks', 'product_count', 'shipping', 'brand_scope', 'brand_uses'])
+  eq(stepOfField(k), 1, `${k} va en "Qué necesitas"`);
+{
+  const all = ['diseno-web', 'ia-conversacional', 'seo-ia', 'ecommerce', 'seo-local', 'branding'];
+  const items = itemsForStep(1, all);
+  const heads = items.filter((x) => x.head).map((x) => x.head);
+  eq(heads, all, 'un encabezado por servicio elegido, en el orden del catálogo');
+  eq(items.slice(0, 3).map((x) => x.fd.key), ['services', 'main_objective', 'language'], 'lo general va antes de los bloques');
+  ok(items.every((x, i) => !x.head || i === 0 || groupOf(items[i - 1].fd, all) !== x.head), 'cada servicio abre su bloque una sola vez');
+  eq(itemsForStep(1, ['branding']).filter((x) => x.head).map((x) => x.fd.key), ['brand_scope'], 'solo branding: un bloque, sin tipo de sitio');
+  eq(itemsForStep(1, ['ecommerce']).filter((x) => groupOf(x.fd, ['ecommerce'])).map((x) => x.fd.key), ['website_type', 'product_count', 'shipping'], 'tienda sola: el tipo de sitio va en su bloque');
+  eq(itemsForStep(1, []).filter((x) => x.head).length, 0, 'sin servicios elegidos no hay bloques');
+  for (const id of all) ok(fieldsForStep(1, [id]).filter((f) => f.when).length <= 3, `${id}: de 1 a 3 preguntas`);
+}
+// Preguntas que dependen de otra respuesta: ocultas, no se validan ni se envían, y no se borran.
+ok(isHidden('brand_status', { has_logo: 'no' }) && !isHidden('brand_status', { has_logo: 'si' }), 'sin logo no se pregunta si la marca está cerrada');
+ok(isHidden('brand_color_list', { brand_colors_none: true }) && !isHidden('brand_color_list', {}), '"no tengo colores" oculta la lista');
+{
+  const d = { services: ['branding'], brand_colors_none: true, brand_color_list: [{ name: 'Rojo', hex: 'malo' }], seo_scope: 'xx', bot_channels: ['web'], brand_scope: 'logo' };
+  const eff = effectiveData(d);
+  ok(!('brand_color_list' in eff) && !('seo_scope' in eff) && !('bot_channels' in eff), 'lo oculto y lo de servicios no elegidos no se envía');
+  eq(eff.brand_scope, 'logo', 'lo del servicio elegido sí');
+  ok(d.brand_color_list && d.seo_scope, 'y nada se borra de lo que escribió el cliente');
+  eq(Object.keys(validateStep(2, d)), [], 'un hex malo en una lista oculta no bloquea el paso');
+  ok(validateStep(2, { brand_color_list: [{ name: 'Rojo', hex: 'malo' }] })['brand_color_list.0.hex'], 'con la lista visible, el hex malo se marca junto al campo');
+  eq(Object.keys(validateStep(2, { brand_color_list: [{ name: 'Rojo', hex: '' }] })), [], 'el nombre solo, sin código, vale');
+}
 
 // ── 2. Validación por paso (mensajes ES/EN junto al campo) ────
 const e0 = validateStep(0, {});
@@ -291,14 +325,17 @@ async function loadUploads() {
   eq(puts.length, 3, 'un intento nuevo, no dos');
   ok(puts[1] !== puts[2], 'cada intento usa una ruta nueva');
 
-  // e) Quitar algo ya subido: sale de la lista, viaja marcado y se cuenta aparte.
-  const kept = u.meta().length;
+  // e) Quitar algo ya subido: sale de la lista y viaja con removed:true para
+  //    que el servidor lo BORRE (B1-R04). El intento cortado de (d) también.
+  eq(u.discarded, [puts[1]], 'el intento cortado queda apuntado para borrarlo');
+  ok(u.meta().some((m) => m.pathname === row.pathname && !m.removed), 'antes de quitarlo, viaja como enviado');
   u.remove(row.id);
   eq(u.forField('doc_files').length, 0, 'lo quitado desaparece de la lista');
   eq(u.removedCount('doc_files'), 1, 'y la zona sabe cuántos quitó el cliente');
-  eq(u.removedCount(), 1, 'también en total, para el mensaje de éxito');
-  eq(u.meta().length, kept, 'sigue viajando al enviar (el servidor guarda lo reservado)');
-  ok(u.meta()[0].tags.note === 'Quitado por el cliente antes de enviar', 'marcado como quitado');
+  const sent = u.meta();
+  eq(sent.find((m) => m.pathname === row.pathname), { pathname: row.pathname, removed: true }, 'lo quitado viaja solo con removed:true, sin nombre ni etiquetas');
+  eq(sent.find((m) => m.pathname === puts[1]), { pathname: puts[1], removed: true }, 'el intento cortado también se manda a borrar');
+  ok(sent.every((m) => m.removed === true), 'nada quitado llega como archivo enviado');
   eq(u.active.length, 0, 'lo quitado no cuenta para el cupo');
 
   // f) Quitar algo que aún no se subió: desaparece del todo.
@@ -310,6 +347,28 @@ async function loadUploads() {
   await wait(40);
   ok(!u.files.some((f) => f.id === row.id), 'quitar en "Preparando" borra la fila');
   eq(puts.length, 3, 'y no se sube');
+
+  // g) Foto que el navegador no pudo convertir: NO se sube el original (B1-R02).
+  for (const [purpose, heic] of [['brief', true], ['brief', false], ['kit', true]]) {
+    const before = puts.length;
+    globalThis.__prep = async () => ({ failed: true, heic });
+    u = new Uploads({ lang: 'es', purpose });
+    u.add([png(heic ? 'IMG_0001.HEIC' : 'rara.png')], { field: 'photo_files', kind: 'photo' });
+    row = u.files[0];
+    ok(await until(() => row.status === 'error'), `${purpose}/${heic ? 'HEIC' : 'otra'}: la fila queda en error`);
+    eq(puts.length, before, `${purpose}/${heic ? 'HEIC' : 'otra'}: el original no se sube`);
+    ok(!row.retryable, 'reintentar no tiene sentido: se ofrece otra vía');
+    ok(/no subimos el original/.test(row.error) && /ubicación/.test(row.error), 'explica por qué no se subió');
+    ok(/captura de pantalla/.test(row.error), 'ofrece la captura de pantalla');
+    eq(/Fotos/.test(row.error), heic, 'a un HEIC le dice que la elija desde Fotos del iPhone');
+    eq(/kit de arranque/.test(row.error), purpose === 'brief', 'en el brief ofrece mandarla en el kit; en el kit, no');
+    ok(!u.meta().length, 'nada que enviar');
+  }
+  u = new Uploads({ lang: 'en' });
+  u.add([png('IMG_0002.HEIC')], { field: 'photo_files', kind: 'photo' });
+  row = u.files[0];
+  await until(() => row.status === 'error');
+  ok(/do not upload the original/.test(row.error) && /screenshot/.test(row.error), 'mismo aviso en inglés');
 
   console.warn = consoleWarn;
   delete globalThis.window;

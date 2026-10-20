@@ -128,7 +128,7 @@
       </li>
     {/each}
   </ul>
-  {#if removed}<p class="shots__off" role="status">{t.removedNote(removed)}</p>{/if}
+  {#if removed}<p class="shots__off" role="status">{t.removedNote(removed, uploads.purpose === 'kit')}</p>{/if}
   {#if uploads.unavailable}
     <p class="shots__off" role="status">{uploads.unavailable}</p>
   {:else if quota && uploads.active.length}

@@ -277,7 +277,7 @@
     {#if Array.isArray(value)}
       <div class="rep">
         {#each value as row, i (i)}
-          <div class="rep__row">
+          <div class="rep__row" class:rep__row--pair={field.key === 'brand_color_list'}>
             {#each field.item.fields as sub (sub.key)}
               <SchemaField field={sub} bind:value={row[sub.key]} {lang} {errors} path={`${path}.${i}.${sub.key}`} {idPrefix} compact />
             {/each}
@@ -405,6 +405,8 @@
     .svc { grid-template-columns: 1fr 1fr; }
     .rep__row--zone { grid-template-columns: minmax(0, 1.3fr) minmax(0, .8fr) minmax(0, 1.3fr); align-items: end; }
     .rep__row--zone .rep__rm { grid-column: 1 / -1; }
+    /* Colores de marca: nombre y código en una línea, Quitar al final. */
+    .rep__row--pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; }
   }
   @media (--md) {
     .hrs__row { grid-template-columns: 120px auto 1fr auto 1fr; }

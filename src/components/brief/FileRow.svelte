@@ -18,7 +18,6 @@
   );
   const detail = $derived(
     row.status === 'error' ? ''
-      : row.note ? t.originalKept
       : row.convertedFrom && row.convertedFrom.includes('hei') ? t.converted
       : row.kind === 'photo' && row.status === 'done' && !row.fromServer ? t.reduced
       : ''

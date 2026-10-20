@@ -117,7 +117,8 @@ export function viewSections(data = {}, { edit = false, kitReceived = false } = 
       const editable = EDITABLE_TYPES.has(fd.type);
       const inicialActive = fd.moment === 'inicial' && isActive(fd, services);
       const show = !empty
-        || (edit ? editable && (fd.storage === 'column' || inicialActive) : inicialActive && !fd.hidden);
+        // Una casilla sí/no sin marcar ("No tengo colores definidos") no es un dato que falte.
+        || (edit ? editable && (fd.storage === 'column' || inicialActive) : inicialActive && !fd.hidden && !(fd.type === 'checkbox' && !fd.options));
       if (!show) continue;
       rows.push({
         fd, key: fd.key, label: fieldLabel(fd), value: empty ? null : value,

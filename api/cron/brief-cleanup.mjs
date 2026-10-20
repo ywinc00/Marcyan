@@ -15,13 +15,14 @@
 // ════════════════════════════════════════════════════════════════
 import { cleanupExpiredDrafts, sweepQueuedDrafts, verifyPendingFiles, blobConfigured, isMissingSchema } from '../../lib/brief-files.mjs';
 import { purgeOldHits } from '../../lib/ratelimit.mjs';
+import { safeEqual } from '../../lib/auth.mjs';
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
   if (!secret) return false;
   const h = req.headers['authorization'] || '';
   const m = /^Bearer\s+(.+)$/i.exec(String(h).trim());
-  return Boolean(m && m[1].trim() === secret);
+  return Boolean(m && safeEqual(m[1].trim(), secret)); // tiempo constante, igual que seo-sync
 }
 
 async function step(name, fn) {

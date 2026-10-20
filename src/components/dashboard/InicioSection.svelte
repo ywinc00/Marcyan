@@ -22,7 +22,7 @@
   import { data, loadHome, loadLeads, loadProjects } from './lib/store.svelte.js';
   import { fmtDate, fmtTime, hourInHouston } from './lib/dates.js';
   import { href } from './lib/router.svelte.js';
-  import { num, money, delta, monthShort, hasActivity, axisScale, leadStates, cumulative } from './lib/inicio.js';
+  import { num, money, moneyFits, delta, monthShort, hasActivity, axisScale, leadStates, cumulative, activityLabel } from './lib/inicio.js';
 
   let { user = '' } = $props();
 
@@ -34,7 +34,9 @@
   // Mes anterior para las comparaciones ("vs. sep"), en hora de Houston (meta del servidor).
   const prevLabel = $derived(monthShort(home?.meta?.prev_month));
 
-  // ── KPI 1 · Leads nuevos de este mes (CRM-15, OP-03, MOCK-03) ──
+  // ── KPI 1 · Leads recibidos este mes (CRM-15, OP-03, MOCK-03) ──
+  // Rótulo "Leads recibidos", no "nuevos": "Nuevos" es el ESTADO de la
+  // tarjeta de Leads por estado (sin contactar, de cualquier fecha). A1-02.
   const leadsThisMonth = $derived(num(kpis?.new_leads_this_month ?? kpis?.leads_this_month));
   const leadsDelta = $derived(delta(leadsThisMonth, kpis?.new_leads_prev_month));
   const uncontacted = $derived(num(kpis?.uncontacted_leads ?? kpis?.new_leads));
@@ -47,6 +49,43 @@
   // ── KPI 4 · Cobrado este mes desde Finanzas (OP-02, MOCK-02). null = Finanzas no respondió.
   const revenue = $derived(num(kpis?.revenue_this_month_cents));
   const revenueDelta = $derived(delta(revenue, kpis?.revenue_prev_month_cents, (n) => money(n)));
+  // A1-01: la tarjeta corta con "…" lo que no cabe, y el hueco junto a la
+  // ilustración va de ~72 px (móvil de 360) a más de 120 (escritorio). Se
+  // pinta la forma más precisa que CABE en la tarjeta real ("$12,841",
+  // luego "$12.8k", luego "$13k"); la cifra exacta va en la nota si la de
+  // arriba está redondeada. Medido, no adivinado por el ancho de pantalla:
+  // entre 1100 y 1279 px las 4 columnas son más estrechas que en el móvil.
+  const revenueForms = $derived(revenue === null ? [] : moneyFits(revenue));
+  const revenueKey = $derived(revenueForms.join('|'));
+  let revenueFit = $state({ key: '', i: 0 });   // forma elegida para ESTA cifra
+  const revenueIdx = $derived(revenueFit.key === revenueKey ? revenueFit.i : 0);
+  const revenueShort = $derived(revenue === null ? '—' : revenueForms[revenueIdx] ?? '—');
+  const revenueExact = $derived(revenue === null ? '' : money(revenue));
+  const revenueRounded = $derived(revenue !== null && revenueShort !== revenueExact);
+  let revenueBox = $state();   // envoltorio sin caja (display: contents) del KPI
+  $effect(() => {
+    // Tras pintar una forma: si no cabe, se prueba la siguiente más corta.
+    const i = revenueIdx, key = revenueKey, n = revenueForms.length;
+    const el = revenueBox?.querySelector('.ui-kpi__num');
+    if (!el || i >= n - 1) return;
+    if (el.scrollWidth > el.clientWidth + 0.5) revenueFit = { key, i: i + 1 };
+  });
+  $effect(() => {
+    // Si la tarjeta cambia de ancho (giro, ventana), se vuelve a la más precisa.
+    const card = revenueBox?.firstElementChild;
+    if (!card || typeof ResizeObserver === 'undefined') return;
+    let w = card.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (card.clientWidth === w) return;
+      w = card.clientWidth;
+      revenueFit = { key: '', i: 0 };
+    });
+    ro.observe(card);
+    // La tipografía de la cifra llega después: se mide de nuevo con ella.
+    let alive = true;
+    document.fonts?.ready.then(() => { if (alive) revenueFit = { key: '', i: 0 }; });
+    return () => { alive = false; ro.disconnect(); };
+  });
 
   // ── Gráfico de actividad por mes ─────────────────────────────
   const activity = $derived(home && Array.isArray(home.activity) ? home.activity : []);
@@ -159,11 +198,11 @@
   const EXPORT_LEADS_URL = '/api/admin/export?type=leads';
   const leadTotal = $derived(num(home?.funnel?.total) ?? (data.leadsLoaded ? leads.length : null));
 
-  // "Se muestran las de las 6:11 p.m." sin doble punto (la hora ya acaba en "p.m.").
+  // "Se muestran las cifras de las 6:11 p.m." sin doble punto (la hora ya acaba en "p.m.").
   const staleMessage = $derived.by(() => {
     if (!data.loadedAt) return data.homeError;
     const t = fmtTime(data.loadedAt);
-    return `Se muestran las de las ${t}${t.endsWith('.') ? '' : '.'} ${data.homeError}`;
+    return `Se muestran las cifras de las ${t}${t.endsWith('.') ? '' : '.'} ${data.homeError}`;
   });
 
   // Al volver al inicio con datos ya cargados, se refrescan en silencio
@@ -207,9 +246,9 @@
     </div>
   {/if}
   <KpiGrid count={4} label="Resumen">
-    <Kpi label="Leads nuevos" value={leadsThisMonth ?? '—'} art="inbox" tone="accent" href={href('leads')}>
+    <Kpi label="Leads recibidos" value={leadsThisMonth ?? '—'} art="inbox" tone={leadsThisMonth > 0 ? 'accent' : ''} href={href('leads')}>
       {#if leadsThisMonth === null}Sin dato de este mes
-      {:else}este mes{#if leadsDelta && leadsDelta.dir !== 'same'}<span class="sep">·</span><span class:is-data={leadsDelta.dir === 'up'} class:is-down={leadsDelta.dir === 'down'}>{leadsDelta.text}</span> vs. {prevLabel}
+      {:else}este mes{#if leadsDelta && leadsDelta.dir !== 'same'}<span class="sep">·</span><wbr><span class="nw" class:is-data={leadsDelta.dir === 'up'} class:is-down={leadsDelta.dir === 'down'}>{leadsDelta.text}</span> vs. {prevLabel}
         {:else if leadsDelta && leadsThisMonth > 0}<span class="sep">·</span>igual que en {prevLabel}{/if}
       {/if}
     </Kpi>
@@ -217,12 +256,14 @@
       note={num(kpis.pending_briefs) === null ? 'Sin dato de briefs' : 'en cola de revisión'} />
     <Kpi label="Proyectos activos" value={activeProjects ?? '—'} art="clock" href={href('progreso')}
       note={activeProjects === null ? 'No se pudieron contar' : activeProjects === 1 ? 'proyecto en curso' : 'proyectos en curso'} />
-    <Kpi label="Cobrado este mes" value={revenue === null ? '—' : money(revenue)} art="coins" tone={revenue ? 'data' : ''} href={href('finanzas')}>
+    <div class="kpi-box" bind:this={revenueBox}>
+    <Kpi label="Cobrado este mes" value={revenueShort} art="coins" tone={revenue ? 'data' : ''} href={href('finanzas')}>
       {#if revenue === null}Finanzas no respondió
-      {:else if revenueDelta && revenueDelta.dir !== 'same'}<span class:is-data={revenueDelta.dir === 'up'} class:is-down={revenueDelta.dir === 'down'}>{revenueDelta.text}</span> vs. {prevLabel}
+      {:else}{#if revenueRounded}<span class="exact">{revenueExact}</span><span class="sep">·</span><wbr>{/if}{#if revenueDelta && revenueDelta.dir !== 'same'}<span class="nw" class:is-data={revenueDelta.dir === 'up'} class:is-down={revenueDelta.dir === 'down'}>{revenueDelta.text}</span> vs. {prevLabel}
       {:else if revenue === 0}Sin cobros registrados este mes
-      {:else}igual que en {prevLabel}{/if}
+      {:else}igual que en {prevLabel}{/if}{/if}
     </Kpi>
+    </div>
   </KpiGrid>
 {/if}
 
@@ -256,7 +297,7 @@
             </span>
           {/if}
           <svg class="chart" viewBox="0 0 {VW} {VH}" width={VW} height={VH} role="img"
-            aria-label={'Actividad por mes: ' + activity.map((a) => `${monthShort(a.month)} ${num(a.total) || 0}`).join(', ')}
+            aria-label={activityLabel(activity)}
             onmouseleave={() => (hoverBar = -1)}>
             <defs>
               <linearGradient id="barActive" x1="0" y1="0" x2="0" y2="1">
@@ -489,6 +530,12 @@
   .sep { margin: 0 6px; color: var(--fg-faint); }
   .is-data { color: var(--accent-teal); font-weight: 600; }
   .is-down { color: var(--fg-secondary); font-weight: 600; }
+  /* Envoltorio del KPI de dinero para medirlo: sin caja, la rejilla no lo ve. */
+  .kpi-box { display: contents; }
+  .exact { color: var(--fg-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* El monto de la comparación no se parte (el signo "−" quedaba solo al final de
+     línea); el <wbr> tras el "·" le deja bajar entero a la línea siguiente. */
+  .nw { white-space: nowrap; }
 
   /* ── Gráfico de barras ── */
   .plot { position: relative; }
@@ -513,7 +560,8 @@
   }
   .st:hover .st__track { border-color: var(--border-strong); }
   .st__fill {
-    position: absolute; inset: 0 auto 0 0; min-width: 38px;
+    /* A1-04: 6 px = marca de "hay alguno", sin inflar la proporción real. */
+    position: absolute; inset: 0 auto 0 0; min-width: 6px;
     border-radius: var(--radius-pill); background: var(--surface-3); border-right: 1px solid var(--border-strong);
     transition: width .4s var(--ease);
   }
@@ -573,8 +621,13 @@
   }
   .spark-axis { display: flex; justify-content: space-between; margin-top: 8px; color: var(--fg-subtle); font-size: var(--dash-caption); }
 
+  /* A1-07: el gráfico se apila antes (necesita ancho); las dos listas
+     caben lado a lado hasta ~900 px (portátil pequeño, iPad horizontal). */
   @media (max-width: 1099px) {
-    .row--chart, .row--lists { grid-template-columns: minmax(0, 1fr); }
+    .row--chart { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 899px) {
+    .row--lists { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 719px) {
     .m-amount { font-size: 26px; }

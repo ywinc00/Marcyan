@@ -80,6 +80,36 @@ await t('centavos BIGINT (string) a dinero', () => {
   assert.equal(m.money(-95000), '−$950');
 });
 
+await t('cifra del KPI de dinero: formas de la más precisa a la más corta (A1-01)', () => {
+  assert.deepEqual(m.moneyFits(42000), ['$420']);
+  assert.deepEqual(m.moneyFits('180050'), ['$1,801', '$1.8k', '$2k']);   // nunca centavos
+  assert.deepEqual(m.moneyFits(1284050), ['$12,841', '$12.8k', '$13k']);
+  assert.deepEqual(m.moneyFits(1000000), ['$10,000', '$10k']);          // sin repetir formas
+  assert.deepEqual(m.moneyFits(9996000), ['$99,960', '$100k']);         // no "$100.0k"
+  assert.deepEqual(m.moneyFits(12840500), ['$128,405', '$128k']);
+  assert.deepEqual(m.moneyFits(99960000), ['$999,600', '$1M']);         // no "$1000k"
+  assert.deepEqual(m.moneyFits(128405000), ['$1,284,050', '$1.3M', '$1M']);
+  assert.deepEqual(m.moneyFits(99960), ['$1,000', '$1k']);
+  assert.deepEqual(m.moneyFits(0), ['$0']);
+  assert.deepEqual(m.moneyFits(-180050), ['−$1,801', '−$1.8k', '−$2k']);
+  assert.deepEqual(m.moneyFits(null), []);
+  // La forma más corta nunca pasa de 5 caracteres (lo que cabe en un móvil de 375).
+  for (const c of [1, 99, 42000, 180050, 999949, 1284050, 9996000, 12840500, 99960000, 128405000, 9990000000]) {
+    const f = m.moneyFits(c);
+    assert.ok(f[f.length - 1].length <= 5, `${c} → ${f}`);
+  }
+});
+
+await t('etiqueta accesible del gráfico con el desglose por mes (A1-03)', () => {
+  const s = m.activityLabel([
+    { month: '2026-05', leads: 2, briefs: 1, total: 3 },
+    { month: '2026-06', leads: 0, briefs: 0, total: 0 },
+    { month: '2026-07', leads: '1', briefs: 0, total: 1 },
+  ]);
+  assert.equal(s, 'Actividad por mes. may: 2 leads y 1 brief; jun: sin actividad; jul: 1 lead y 0 briefs');
+  assert.equal(m.activityLabel(null), 'Actividad por mes');
+});
+
 await t('num: null es "sin dato", no cero', () => {
   assert.equal(m.num(null), null);
   assert.equal(m.num(undefined), null);

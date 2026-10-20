@@ -33,6 +33,37 @@ export function money(cents) {
 }
 
 /**
+ * Formas de la cifra del KPI de dinero, de la más precisa a la más corta
+ * (A1-01). La tarjeta corta con "…" lo que no cabe, y el hueco junto a la
+ * ilustración va de ~72 px (móvil de 360) a más de 120: la vista pinta la
+ * primera que cabe. Nunca centavos (la cifra exacta va en la nota).
+ *   $1,800.50  → ['$1,801', '$1.8k', '$2k']
+ *   $12,840.50 → ['$12,841', '$12.8k', '$13k']
+ *   $420       → ['$420']
+ */
+export function moneyFits(cents) {
+  const n = num(cents);
+  if (n === null) return [];
+  const sign = n < 0 ? '−$' : '$';
+  const d = Math.abs(n) / 100;
+  const whole = Math.round(d);
+  const out = [sign + whole.toLocaleString('en-US')];
+  if (whole < 1000) return out;
+  // dec = decimales como máximo; con 100 o más, entero ("$128k", no "$128.4k").
+  const show = (v, dec) => {
+    const x = Math.round(v * 10 ** dec) / 10 ** dec;
+    return x < 100 ? x : Math.round(v);
+  };
+  const compact = (dec) => {
+    let v = d / 1e3, unit = 'k';
+    if (show(v, dec) >= 1000) { v = d / 1e6; unit = 'M'; }   // nunca "$1000k"
+    return sign + String(show(v, dec)) + unit;
+  };
+  for (const s of [compact(1), compact(0)]) if (!out.includes(s)) out.push(s);
+  return out;
+}
+
+/**
  * Comparación real contra el mes anterior.
  * Devuelve null si falta cualquiera de los dos datos (no hay comparación
  * que enseñar). dir: 'up' | 'down' | 'same'.
@@ -89,6 +120,21 @@ export function leadStates(funnel) {
     pipeline: pipeline === null ? n('new') + n('contacted') : pipeline,
     archived: n('archived'),
   };
+}
+
+/**
+ * Etiqueta accesible del gráfico de actividad con el desglose de cada mes
+ * (A1-03): el globo solo sale con ratón o toque, así que el lector de
+ * pantalla recibe aquí lo mismo. "may: 2 leads y 1 brief; jun: sin actividad".
+ */
+export function activityLabel(activity) {
+  const p = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const parts = (Array.isArray(activity) ? activity : []).map((a) => {
+    const l = num(a && a.leads) || 0, b = num(a && a.briefs) || 0;
+    const what = l || b ? `${p(l, 'lead', 'leads')} y ${p(b, 'brief', 'briefs')}` : 'sin actividad';
+    return `${monthShort(a && a.month)}: ${what}`;
+  });
+  return parts.length ? 'Actividad por mes. ' + parts.join('; ') : 'Actividad por mes';
 }
 
 /** Totales acumulados de la actividad (curva de "Actividad acumulada"). */

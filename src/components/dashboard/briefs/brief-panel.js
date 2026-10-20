@@ -290,8 +290,11 @@ export function fileCheck(f = {}) {
 //   { kind: 'scheduled', day, soon, overdue, legal, cause } con archivos y fecha,
 //   { kind: 'purged', at, files, reason, cause } sin archivos tras un borrado,
 //   o null (sin fecha ni borrado: no se dice nada).
-// cause: 'completed' (se terminó el proyecto, por defecto) o 'archived' (se
-// archivó sin llegar a ser proyecto).
+// cause (scheduled): 'completed' (se terminó el proyecto, por defecto),
+// 'archived' (se archivó sin llegar a ser proyecto) o 'archived_after_work'
+// (se archivó sin completarse, pero se trabajó). cause (purged): la causa
+// con la que SE BORRÓ (lastPurge.cause, RET-A4), no la de hoy; null si el
+// borrado es anterior a guardarla (el texto sale neutro).
 export function retentionView(retention, files = []) {
   const r = retention || {};
   const n = Array.isArray(files) ? files.length : 0;
@@ -305,23 +308,28 @@ export function retentionView(retention, files = []) {
     };
   }
   if (!n && r.lastPurge && r.lastPurge.at) {
-    return { kind: 'purged', at: r.lastPurge.at, files: Number(r.lastPurge.files) || 0, reason: r.lastPurge.reason === 'retention' ? 'retention' : 'request', cause: retentionCauseOf(r) };
+    const reason = r.lastPurge.reason === 'retention' ? 'retention' : 'request';
+    const cause = reason === 'retention' && ARCHIVED_CAUSES.concat('completed').includes(r.lastPurge.cause) ? r.lastPurge.cause : null;
+    return { kind: 'purged', at: r.lastPurge.at, files: Number(r.lastPurge.files) || 0, reason, cause };
   }
   return null;
 }
-const retentionCauseOf = (r) => (r && r.cause === 'archived' ? 'archived' : 'completed');
+const ARCHIVED_CAUSES = ['archived', 'archived_after_work'];
+const retentionCauseOf = (r) => (r && ARCHIVED_CAUSES.includes(r.cause) ? r.cause : 'completed');
 /** Frases del plazo según la causa: "12 meses después de …" y "12 meses desde que …". */
 export function retentionPhrases(cause = 'completed') {
-  return cause === 'archived'
+  return ARCHIVED_CAUSES.includes(cause)
     ? { after: '12 meses después de archivarlo', since: '12 meses desde que se archivó el brief' }
     : { after: '12 meses después de terminar el proyecto', since: '12 meses desde que se terminó el proyecto' };
 }
 const filesCount = (n) => (n === 1 ? '1 archivo' : `${n} archivos`);
-/** Texto del estado vacío tras un borrado. */
+/** Texto del estado vacío tras un borrado. Por plazo, con la causa con la
+ *  que se borró; sin causa guardada (borrados anteriores), texto neutro. */
 export function purgedText(v = {}) {
   const n = Number(v.files) || 0;
   const what = n ? (n === 1 ? 'Se borró 1 archivo' : `Se borraron ${n} archivos`) : 'Se borraron los archivos';
-  const why = v.reason === 'retention' ? ` al cumplirse ${retentionPhrases(v.cause).since}` : ' desde el panel';
+  const why = v.reason !== 'retention' ? ' desde el panel'
+    : v.cause ? ` al cumplirse ${retentionPhrases(v.cause).since}` : ' al cumplirse el plazo de 12 meses';
   return `${what}${why}. El brief y su historial se conservan.`;
 }
 /** Mensaje de la confirmación de "Borrar archivos": cuántos y qué. */

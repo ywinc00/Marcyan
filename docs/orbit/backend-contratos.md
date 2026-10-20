@@ -179,7 +179,7 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
 
 - **Regla.** Los archivos de un brief se borran solos 12 meses después de terminar el proyecto,
   con aviso en el panel 30 días antes; a petición del cliente se borran antes desde la ficha. Sin
-  migración nueva: se calcula con `brief_events`. Decisión del dueño 2026-10-20: los de un
+  migración nueva: se calcula con `brief_events`. Decisión del dueño 2026-10-19: los de un
   prospecto que nunca llegó a ser proyecto (brief archivado sin completar) se borran 12 meses
   después de archivarlo, con el mismo aviso y el mismo mínimo de 7 días.
 - **`lib/brief-retention.mjs` (puro).** `purgeDate(brief, events, projects)` → `'YYYY-MM-DD'`
@@ -194,9 +194,19 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
   frena (RET-04). Archivado sin terminación vigente (el reloj de Completado es `null`): cuenta el
   ÚLTIMO paso a `archived` del historial (volver luego a un estado de trabajo lo anula); archivado
   sin historial de estados y nunca completado → `null` (conservador); un proyecto de Progreso
-  activo o en pausa también lo frena. `retentionCause(brief, events, projects)` → `'completed'` |
-  `'archived'` | `null`, misma lógica que `finishedAt` (un solo cálculo interno); un proyecto de
-  Progreso completado deja la causa en `'completed'`. `retentionStage(day, now)` → `keep` | `notice` (≤ 30 días) | `purge`.
+  activo o en pausa también lo frena. `retentionCause(brief, events, projects, opts)` →
+  `'completed'` | `'archived'` | `'archived_after_work'` | `null`, misma lógica que `finishedAt`
+  (un solo cálculo interno); un proyecto de Progreso completado deja la causa en `'completed'`.
+  `'archived_after_work'` = archivado sin completarse, pero el brief se completó alguna vez
+  (`completed_at` o un paso a `completed` en el historial): el texto no dice "sin llegar a ser
+  proyecto" (RET-A2). **Brief que ya es cliente (RET-A1).** `opts.isClient` = existe un cliente
+  con `source_brief_id` = el brief o un evento `converted_to_client`. Cada proyecto trae `via`:
+  `'brief'` (por `brief_project_id`) o `'client'` (por `client_id` del cliente del brief); sin
+  `via` cuenta como `'brief'`. Si el brief es cliente y está archivado sin terminación vigente,
+  mandan TODOS los proyectos de ese cliente: alguno `active`/`on_hold`, o ninguno `completed`
+  → `null`; si no, cuenta lo último entre el archivado y sus cierres. Los de `'client'` no pesan
+  en ningún otro caso (un brief Completado sigue su reloj aunque el cliente tenga otra
+  mensualidad). `retentionStage(day, now)` → `keep` | `notice` (≤ 30 días) | `purge`.
   `effectivePurgeDay(day, noticeAt, now)` → la fecha de la política, pero nunca antes de 7 días
   desde el aviso (sin aviso, desde hoy) (RET-02).
 - **Cambio de estado + evento atómicos.** `updateBriefStatus` (`lib/db.mjs`) escribe el cambio y
@@ -208,9 +218,11 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
   días; el tope de `createNotification` sube de 7 a 60 días) que dice el día REAL del borrado; si
   sale tarde (primer despliegue, cron caído) lo dice ("Ya se cumplieron 12 meses…"). El texto
   sigue la causa (`purgeNotice({ …, cause })`): "desde que se terminó el proyecto" o "desde que se
-  archivó este brief sin llegar a ser proyecto". Solo con el
+  archivó este brief sin llegar a ser proyecto" ("desde que se archivó este brief" con
+  `'archived_after_work'`). Solo con el
   aviso fuera hace 7 días o más y la fecha efectiva cumplida → `purgeBriefFiles`, que
-  re-comprueba que siga terminado y deja `files_purged { files, reason: 'retention' }` sin actor.
+  re-comprueba que siga terminado y deja `files_purged { files, reason: 'retention', cause }` sin
+  actor (`cause` = la causa con la que se borró, RET-A4).
   Si algún brief falla: aviso `system` `files-purge-failed` (uno al día) y `retention.ok = false`
   en la respuesta del cron (RET-03).
 - **`purgeBriefFiles`.** Borra los blobs (si Blob falla, lanza con `phase: 'storage'` sin tocar la
@@ -219,15 +231,16 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
   repetir el borrado lo termina (RET-06). Borra TODO lo enlazado al brief, también lo que un kit
   aún abierto ya guardó por partes; de ese kit solo quedan las subidas aún sin enlazar (RET-07).
 - **`/api/admin/briefs/:id/files`** (requireAdmin). `GET` añade
-  `retention { purgeOn, daysLeft, cause, lastPurge { at, files, reason, actor } }`, con `purgeOn` = la
-  fecha efectiva (la misma que usa el cron) y `cause` = `'completed'` | `'archived'` (`null` sin
-  fecha). El historial se lee con los 500 eventos MÁS
+  `retention { purgeOn, daysLeft, cause, lastPurge { at, files, reason, cause, actor } }`, con
+  `purgeOn` = la fecha efectiva (la misma que usa el cron) y `cause` = `'completed'` |
+  `'archived'` | `'archived_after_work'` (`null` sin fecha). `lastPurge.cause` es la causa
+  guardada en el evento (`null` a petición o en borrados anteriores a guardarla). El historial se lee con los 500 eventos MÁS
   RECIENTES (RET-08). `DELETE` borra todos los archivos enlazados (blobs bajo los borradores
   cerrados incluidos), responde `{ files }` y deja `files_purged { files, reason: 'request' }` con
   el actor; 502 con texto distinto si falla el almacén ("No se borró nada") o si falló la ficha
   tras borrar del almacén ("Los archivos ya se borraron… vuelve a pulsar").
-- **RET-05 (resuelto en parte el 2026-10-20).** Los archivados sin completar (el prospecto
-  descartado) ya tienen plazo: 12 meses desde que se archivaron. Siguen sin plazo los briefs que
+- **RET-05 (resuelto en parte el 2026-10-19).** Los archivados sin completar (el prospecto
+  descartado, que no es cliente) ya tienen plazo: 12 meses desde que se archivaron. Siguen sin plazo los briefs que
   se quedan en Pendiente, Contactado o En curso (la política dice "mientras sean necesarios para
   atenderte"); un tope por inactividad sería un borrado irreversible nuevo y no se implementa sin
   su OK. RET-04 se resolvió en la versión
@@ -236,5 +249,7 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
 - **Panel.** Sección Archivos: "Se borrarán el <fecha>, 12 meses después de terminar el proyecto |
   de archivarlo" (según `retention.cause`; aviso amarillo a 30 días o menos),
   "Borrar archivos" (secundaria de peligro con confirmación que dice cuántos y qué) y vacío
-  "Archivos borrados el <fecha>". Historial: "Archivos borrados · Desde el panel | Plazo de 12
+  "Archivos borrados el <fecha>" con la causa con la que se borró ("al cumplirse el plazo de 12
+  meses" si el evento no la guarda). Política: "se conservan hasta 12 meses después de cerrar la
+  solicitud y después se eliminan" (ES y EN, misma forma que la de proyectos). Historial: "Archivos borrados · Desde el panel | Plazo de 12
   meses cumplido". Probado en `npm run test:brief-files` y `npm run test:briefs-panel`.

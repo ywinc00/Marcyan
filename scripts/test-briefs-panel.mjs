@@ -406,7 +406,7 @@ await check('archivos: plazo de conservación, borrado a mano y su rastro en el 
   const gone = P.retentionView({ purgeOn: null, lastPurge: { at: '2026-10-19T15:00:00Z', files: 4, reason: 'request' } }, []);
   assert.equal(gone.kind, 'purged');
   assert.equal(P.purgedText(gone), 'Se borraron 4 archivos desde el panel. El brief y su historial se conservan.');
-  assert.match(P.purgedText({ files: 1, reason: 'retention' }), /^Se borró 1 archivo al cumplirse 12 meses/);
+  assert.match(P.purgedText({ files: 1, reason: 'retention' }), /^Se borró 1 archivo al cumplirse el plazo de 12 meses/);
   assert.equal(P.purgeConfirmMessage(files), 'Se borran los 4 archivos de este brief: 1 logo, 2 fotos y 1 documento legal. El brief y su historial se quedan. No se puede deshacer.');
   assert.match(P.purgeConfirmMessage([{ kind: 'logo' }]), /^Se borra el único archivo de este brief: 1 logo\./);
   const ev = P.describeEvent({ event_type: 'files_purged', data: { files: 4, reason: 'request' } });
@@ -422,14 +422,28 @@ await check('archivos: el plazo se explica según su causa (proyecto terminado o
   assert.deepEqual(P.retentionPhrases(arch.cause), { after: '12 meses después de archivarlo', since: '12 meses desde que se archivó el brief' });
   assert.deepEqual(P.retentionPhrases('completed'), { after: '12 meses después de terminar el proyecto', since: '12 meses desde que se terminó el proyecto' });
   assert.deepEqual(P.retentionPhrases(), P.retentionPhrases('completed'));
-  const gone = P.retentionView({ purgeOn: '2027-03-01', cause: 'archived', lastPurge: { at: '2027-03-01T10:00:00Z', files: 2, reason: 'retention' } }, []);
+  // RET-A2: archivado tras haber trabajado, mismas frases de archivado.
+  const after = P.retentionView({ purgeOn: '2027-03-01', daysLeft: 200, cause: 'archived_after_work' }, files);
+  assert.equal(after.cause, 'archived_after_work');
+  assert.deepEqual(P.retentionPhrases(after.cause), P.retentionPhrases('archived'));
+  // RET-A4: el borrado se explica con la causa con la que SE BORRÓ (lastPurge.cause), no la de hoy.
+  const gone = P.retentionView({ purgeOn: null, cause: null, lastPurge: { at: '2027-03-01T10:00:00Z', files: 2, reason: 'retention', cause: 'archived' } }, []);
+  assert.equal(gone.cause, 'archived');
   assert.equal(P.purgedText(gone), 'Se borraron 2 archivos al cumplirse 12 meses desde que se archivó el brief. El brief y su historial se conservan.');
-  assert.equal(P.purgedText({ files: 1, reason: 'retention' }), 'Se borró 1 archivo al cumplirse 12 meses desde que se terminó el proyecto. El brief y su historial se conservan.');
+  const reopened = P.retentionView({ purgeOn: null, cause: 'completed', lastPurge: { at: '2027-03-01T10:00:00Z', files: 2, reason: 'retention', cause: 'archived' } }, []);
+  assert.match(P.purgedText(reopened), /desde que se archivó el brief/, 'la causa actual no pisa la del borrado');
+  const done = P.retentionView({ lastPurge: { at: '2027-03-01T10:00:00Z', files: 1, reason: 'retention', cause: 'completed' } }, []);
+  assert.equal(P.purgedText(done), 'Se borró 1 archivo al cumplirse 12 meses desde que se terminó el proyecto. El brief y su historial se conservan.');
+  // Borrado antiguo sin causa guardada: texto neutro, aunque hoy haya una causa.
+  const old = P.retentionView({ purgeOn: null, cause: 'archived', lastPurge: { at: '2027-03-01T10:00:00Z', files: 1, reason: 'retention' } }, []);
+  assert.equal(old.cause, null);
+  assert.equal(P.purgedText(old), 'Se borró 1 archivo al cumplirse el plazo de 12 meses. El brief y su historial se conservan.');
+  assert.equal(P.purgedText({ files: 1, reason: 'retention' }), 'Se borró 1 archivo al cumplirse el plazo de 12 meses. El brief y su historial se conservan.');
   // La ficha usa las frases de la causa, no un texto fijo.
   const s = read('src/components/dashboard/briefs/BriefFiles.svelte');
   assert.match(s, /retentionPhrases\(keep\?\.cause\)/);
   assert.ok(!/12 meses después de terminar el proyecto\.<\/p>/.test(s), 'sin la frase fija');
-  for (const t of Object.values(P.retentionPhrases('archived')).concat(P.purgedText(gone))) assert.ok(!/[—–]/.test(t), 'sin guion largo');
+  for (const t of Object.values(P.retentionPhrases('archived')).concat(P.purgedText(gone), P.purgedText(old))) assert.ok(!/[—–]/.test(t), 'sin guion largo');
 });
 
 if (fails.length) {

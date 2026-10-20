@@ -27,8 +27,21 @@ async function check(name, fn) {
 
 // ── Base falsa: brief_files y brief_drafts en memoria ─────────────
 const norm = (t) => String(t).replace(/\s+/g, ' ').trim();
-const db = { files: [], drafts: [], nextId: 1, briefs: [], events: [], notifications: [], projects: [], candidateCalls: 0, failRecords: 0 };
+const db = { files: [], drafts: [], nextId: 1, briefs: [], events: [], notifications: [], projects: [], clients: [], candidateCalls: 0, failRecords: 0 };
 const log = [];
+// Cliente del brief (RET-A1): el que nació de él o el de un 'converted_to_client'.
+function clientIdsOf(pid) {
+  const ids = db.clients.filter((c) => c.source_brief_id === pid).map((c) => String(c.id));
+  for (const e of db.events) if (e.project_id === pid && e.event_type === 'converted_to_client' && e.data) ids.push(String(e.data.client_id));
+  return ids;
+}
+const isClientOf = (pid) => db.clients.some((c) => c.source_brief_id === pid) || db.events.some((e) => e.project_id === pid && e.event_type === 'converted_to_client');
+function projectsOf(pid) {
+  const ids = clientIdsOf(pid);
+  return db.projects
+    .filter((x) => x.brief_project_id === pid || (x.client_id != null && ids.includes(String(x.client_id))))
+    .map((x) => ({ status: x.status, completed_at: x.completed_at, via: x.brief_project_id === pid ? 'brief' : 'client' }));
+}
 function run(text, p) {
   const t = norm(text);
   log.push(t);
@@ -79,8 +92,7 @@ function run(text, p) {
         for (const f of db.files) if (f.brief_id === b.id) by[f.kind] = (by[f.kind] || 0) + 1;
         const events = db.events.filter((e) => e.project_id === b.project_id && e.event_type === 'status_changed')
           .sort((x, y) => (x.created_at < y.created_at ? -1 : 1));
-        const projects = db.projects.filter((x) => x.brief_project_id === b.project_id).map((x) => ({ status: x.status, completed_at: x.completed_at }));
-        return { id: b.id, project_id: b.project_id, business_name: b.business_name, status: b.status, completed_at: b.completed_at, events, projects, by_kind: by };
+        return { id: b.id, project_id: b.project_id, business_name: b.business_name, status: b.status, completed_at: b.completed_at, events, is_client: isClientOf(b.project_id), projects: projectsOf(b.project_id), by_kind: by };
       });
     return ok(rows);
   }
@@ -95,11 +107,18 @@ function run(text, p) {
     if (db.failRecords > 0) { db.failRecords--; return Promise.reject(new Error('Base caída')); }
     const gone = db.files.filter((f) => f.brief_id === p[0] && p[1].includes(String(f.id)));
     db.files = db.files.filter((f) => !gone.includes(f));
-    db.events.push({ project_id: p[2], event_type: 'files_purged', actor_email: p[3], data: { files: gone.length, reason: p[4] }, created_at: new Date().toISOString() });
+    const data = { files: gone.length, reason: p[4] };
+    if (p[5] !== null && p[5] !== undefined) data.cause = p[5];
+    db.events.push({ project_id: p[2], event_type: 'files_purged', actor_email: p[3], data, created_at: new Date().toISOString() });
     return ok([{ files: gone.length }]);
   }
-  if (t === 'SELECT status, completed_at FROM projects WHERE brief_project_id = $1') {
-    return ok(db.projects.filter((x) => x.brief_project_id === p[0]).map((x) => ({ status: x.status, completed_at: x.completed_at })));
+  if (t.startsWith("SELECT p.status, p.completed_at, CASE WHEN p.brief_project_id = $1 THEN 'brief' ELSE 'client' END AS via FROM projects p")) {
+    assert.ok(/source_brief_id = \$3/.test(t) && /'converted_to_client'/.test(t), 'trae también los proyectos del cliente');
+    return ok(projectsOf(p[0]));
+  }
+  if (t.startsWith('SELECT (EXISTS (SELECT 1 FROM clients c WHERE c.source_brief_id = $1)')) {
+    assert.ok(/'converted_to_client'/.test(t));
+    return ok([{ is_client: isClientOf(p[0]) }]);
   }
   if (t === "SELECT MIN(created_at) AS at FROM notifications WHERE type = 'system' AND ref = $1") {
     const at = db.notifications.filter((n) => n.type === 'system' && n.ref === p[0]).map((n) => n.at).sort((a, b) => a - b)[0];
@@ -199,7 +218,7 @@ const DRAFT = '6f1c2d3e-4b5a-4c7d-8e9f-0a1b2c3d4e5f';
 const KIT = '7a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
 const P = (d, n) => `briefs/${d}/photo/${n}.jpg`;
 function reset() {
-  db.files = []; db.drafts = []; db.nextId = 1; db.briefs = []; db.events = []; db.notifications = []; db.projects = []; db.candidateCalls = 0; db.failRecords = 0; SESSION = null; blob.items.clear(); blob.failDel = 0; blob.deleted = []; log.length = 0;
+  db.files = []; db.drafts = []; db.nextId = 1; db.briefs = []; db.events = []; db.notifications = []; db.projects = []; db.clients = []; db.candidateCalls = 0; db.failRecords = 0; SESSION = null; blob.items.clear(); blob.failDel = 0; blob.deleted = []; log.length = 0;
 }
 // Reserva (como reserveUpload) y, si llegó, el blob.
 function seed(draftId, name, { uploaded = true, briefId = null } = {}) {
@@ -353,12 +372,12 @@ await check('fecha: archivar un proyecto terminado no para el reloj; archivar si
   const ev = [SC('completed', '2026-01-10T15:00:00Z'), SC('archived', '2026-03-01T15:00:00Z', 'completed')];
   assert.equal(R.purgeDate({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, ev), '2027-01-10');
   assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, ev), 'completed');
-  // Decisión del dueño 2026-10-20: archivado sin completar = 12 meses desde que se archivó.
+  // Decisión del dueño 2026-10-19: archivado sin completar = 12 meses desde que se archivó.
   assert.equal(R.purgeDate({ status: 'archived' }, [SC('archived', '2026-03-01T15:00:00Z', 'contacted')]), '2027-03-01');
   // Reabierto tras completarse y archivado sin volver a completarse: cuenta el archivado.
   const reopened = [SC('completed', '2026-01-10T15:00:00Z'), SC('contacted', '2026-02-01T15:00:00Z', 'completed'), SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
   assert.equal(R.purgeDate({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), '2027-03-01');
-  assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), 'archived');
+  assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), 'archived_after_work', 'se completó alguna vez: no es un prospecto (RET-A2)');
 });
 
 await check('archivado sin completar: 12 meses desde el archivado, en día de Houston', () => {
@@ -804,6 +823,122 @@ await check('RET-08: con más de 500 eventos la ficha usa los más recientes', a
   assert.equal(ev.length, 500);
   assert.ok(ev[0].created_at < ev[ev.length - 1].created_at, 'en orden de llegada');
   assert.equal(R.lastPurge(ev).files, 519, 'el último borrado está');
+});
+
+// ── Revisión adversarial (RET-A1 a RET-A6) ──────────────────────
+await check('RET-A1: archivado y ya cliente, sin proyecto enlazado: sin fecha', () => {
+  const b = { status: 'archived', completed_at: null };
+  const ev = [SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
+  const opts = { isClient: true };
+  assert.equal(R.purgeDate(b, ev, [], opts), null, 'es cliente y no hay proyecto completado');
+  assert.equal(R.retentionCause(b, ev, [], opts), null);
+  assert.equal(R.finishedAt(b, ev, null, opts), null);
+  // Sin cliente sigue siendo el prospecto descartado.
+  assert.equal(R.purgeDate(b, ev, [], { isClient: false }), '2027-03-01');
+  // Un proyecto del cliente cancelado tampoco lo convierte en terminado.
+  assert.equal(R.purgeDate(b, ev, [{ status: 'cancelled', completed_at: null, via: 'client' }], opts), null);
+});
+
+await check('RET-A1: archivado y ya cliente: los proyectos del cliente (por client_id) mandan', () => {
+  const b = { status: 'archived', completed_at: null };
+  const ev = [SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
+  const opts = { isClient: true };
+  assert.equal(R.purgeDate(b, ev, [{ status: 'active', completed_at: null, via: 'client' }], opts), null, 'proyecto activo enlazado solo por cliente');
+  assert.equal(R.purgeDate(b, ev, [{ status: 'on_hold', completed_at: null, via: 'client' }], opts), null);
+  assert.equal(R.purgeDate(b, ev, [{ status: 'completed', completed_at: '2026-01-01', via: 'client' }, { status: 'active', completed_at: null, via: 'client' }], opts), null, 'basta uno en marcha');
+  // Todos terminados y uno completado: cuenta lo último entre el archivado y el cierre.
+  const done = [{ status: 'completed', completed_at: '2026-06-01T15:00:00Z', via: 'client' }];
+  assert.equal(R.purgeDate(b, ev, done, opts), '2027-06-01');
+  assert.equal(R.retentionCause(b, ev, done, opts), 'completed');
+  const before = [{ status: 'completed', completed_at: '2026-01-15T15:00:00Z', via: 'client' }];
+  assert.equal(R.purgeDate(b, ev, before, opts), '2027-03-01');
+  assert.equal(R.retentionCause(b, ev, before, opts), 'archived_after_work', 'cuenta desde el archivado, sin decir que no fue proyecto');
+  // Un brief Completado sigue su reloj aunque el cliente tenga otra mensualidad en marcha.
+  const c = { status: 'completed', completed_at: '2026-01-10T15:00:00Z' };
+  assert.equal(R.purgeDate(c, [SC('completed', '2026-01-10T15:00:00Z')], [{ status: 'active', completed_at: null, via: 'client' }], opts), '2027-01-10');
+});
+
+await check('RET-A1: el cron no avisa ni borra un archivado que ya es cliente; la ficha no da fecha', async () => {
+  reset();
+  // MRC-001: un cliente nació de él; su proyecto se creó sin el código MRC.
+  seedBrief(1, 'archived', [SC('archived', ago(400), 'contacted')], { files: 2 });
+  db.clients.push({ id: 7, source_brief_id: 'MRC-001' });
+  db.projects.push({ client_id: 7, brief_project_id: null, status: 'active', completed_at: null });
+  // MRC-002: se vinculó a un cliente que ya existía, sin proyecto todavía.
+  seedBrief(2, 'archived', [SC('archived', ago(400), 'contacted'), { event_type: 'converted_to_client', data: { client_id: 9, created: false, linked: true }, created_at: ago(390) }], { files: 1 });
+  // MRC-003: prospecto de verdad, sin cliente: sí se borra.
+  seedBrief(3, 'archived', [SC('archived', ago(400), 'contacted')], { files: 1 });
+  noticeAll(10);
+  const out = await runFileRetention({ limit: 10, budgetMs: 5000 });
+  assert.equal(out.purged, 1);
+  assert.deepEqual([...new Set(db.files.map((f) => f.brief_id))].sort(), [1, 2], 'los que ya son cliente conservan sus archivos');
+  SESSION = { email: 'equipo@marcyan.test' };
+  for (const pid of ['MRC-001', 'MRC-002']) {
+    const get = resCap();
+    await filesHandler({ method: 'GET', query: { id: pid }, headers: {} }, get);
+    assert.deepEqual([get.body.retention.purgeOn, get.body.retention.cause], [null, null], pid);
+  }
+  // Cuando el proyecto del cliente se completa, el reloj vuelve a correr.
+  db.projects[0].status = 'completed';
+  db.projects[0].completed_at = ago(10);
+  const get = resCap();
+  await filesHandler({ method: 'GET', query: { id: 'MRC-001' }, headers: {} }, get);
+  assert.match(get.body.retention.purgeOn, /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(get.body.retention.cause, 'completed');
+});
+
+await check('RET-A2: completado, reabierto y archivado: el aviso no dice que no fue proyecto', () => {
+  const b = { status: 'archived', completed_at: '2026-01-10T15:00:00Z' };
+  const ev = [SC('completed', '2026-01-10T15:00:00Z'), SC('contacted', '2026-02-01T15:00:00Z', 'completed'), SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
+  assert.equal(R.purgeDate(b, ev), '2027-03-01');
+  const cause = R.retentionCause(b, ev);
+  assert.equal(cause, 'archived_after_work');
+  // El paso a Completado quedó fuera del historial leído, pero completed_at existe.
+  assert.equal(R.retentionCause(b, ev.slice(1)), 'archived_after_work');
+  assert.equal(R.retentionCause({ status: 'archived', completed_at: null }, ev.slice(1)), 'archived', 'nunca completado: prospecto');
+  const n = R.purgeNotice({ projectId: 'MRC-020', purgeOn: '2027-03-01', byKind: { photo: 1 }, cause });
+  assert.match(n.body, /^Ese día se cumplen 12 meses desde que se archivó este brief y se borran sus archivos: 1 foto\./);
+  assert.ok(!/sin llegar a ser proyecto|terminó el proyecto/.test(n.body));
+  const late = R.purgeNotice({ projectId: 'MRC-020', purgeOn: '2027-03-01', deleteOn: '2027-03-09', cause });
+  assert.match(late.body, /^Ya se cumplieron 12 meses desde que se archivó este brief\. Sus archivos/);
+  assert.ok(!/[—–]/.test(n.body + late.body), 'sin guion largo');
+});
+
+await check('RET-A4: el borrado por plazo guarda su causa y la ficha la recupera', async () => {
+  reset();
+  const pid = seedBrief(1, 'archived', [SC('archived', ago(400), 'contacted')], { files: 2 });
+  noticeAll(10);
+  const out = await runFileRetention({ limit: 10, budgetMs: 5000 });
+  assert.equal(out.purged, 1);
+  const ev = db.events.find((e) => e.event_type === 'files_purged');
+  assert.deepEqual(ev.data, { files: 2, reason: 'retention', cause: 'archived' });
+  // Aunque el brief se reabra después, la ficha explica el borrado tal como fue.
+  db.briefs[0].status = 'contacted';
+  db.events.push({ project_id: pid, event_type: 'status_changed', data: { from: 'archived', to: 'contacted' }, created_at: new Date(Date.now() + 1000).toISOString() });
+  SESSION = { email: 'equipo@marcyan.test' };
+  const get = resCap();
+  await filesHandler({ method: 'GET', query: { id: pid }, headers: {} }, get);
+  assert.equal(get.body.retention.purgeOn, null);
+  assert.equal(get.body.retention.lastPurge.cause, 'archived');
+  // A petición del cliente no lleva causa; los eventos antiguos sin causa dan null.
+  seedBrief(2, 'contacted', [], { files: 1 });
+  await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-002' }, headers: {} }, resCap()));
+  const req = db.events.find((e) => e.event_type === 'files_purged' && e.project_id === 'MRC-002');
+  assert.ok(!('cause' in req.data), 'sin causa a petición');
+  assert.equal(R.lastPurge([{ event_type: 'files_purged', data: { files: 1, reason: 'retention' }, created_at: ago(1) }]).cause, null);
+  assert.equal(R.lastPurge([{ event_type: 'files_purged', data: { files: 1, reason: 'request', cause: 'archived' }, created_at: ago(1) }]).cause, null);
+  assert.equal(R.lastPurge([{ event_type: 'files_purged', data: { files: 1, reason: 'retention', cause: 'otra' }, created_at: ago(1) }]).cause, null);
+});
+
+await check('RET-A5: el aviso de fallo del cron vale para proyectos y prospectos', async () => {
+  reset();
+  seedBrief(1, 'archived', [SC('archived', ago(400), 'contacted')], { files: 1 });
+  noticeAll(10);
+  blob.failDel = 1;
+  await quiet(() => runFileRetention({ limit: 10, budgetMs: 5000 }));
+  const alert = db.notifications.find((n) => n.ref === 'files-purge-failed');
+  assert.match(alert.body, /archivos de briefs que ya cumplieron su plazo de 12 meses/);
+  assert.ok(!/de proyectos que/.test(alert.body));
 });
 
 if (fails.length) {

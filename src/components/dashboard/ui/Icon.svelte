@@ -44,6 +44,12 @@
     eye:       'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
     back:      'M15 18l-6-6 6-6',
     lock:      'M5 11h14v10H5zM8 11V7a4 4 0 018 0v4',
+    // A5 · Progreso (hitos): misma familia, trazo 1,6.
+    arrowUp:   'M12 19V5M6 11l6-6 6 6',
+    arrowDown: 'M12 5v14M6 13l6 6 6-6',
+    plus:      'M12 5v14M5 12h14',
+    calendar:  'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    pencil:    'M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4',
   };
 </script>
 

@@ -1,10 +1,13 @@
 // /api/admin/projects
 //   GET  ?status=&search=&limit=50&offset=0  → lista con progreso (% por hitos)
+//        + summary GLOBAL (conteo por estado y cartera de activos), que no
+//        depende del filtro ni de la página (OP-11).
 //   POST { name, clientId?, briefProjectId?, serviceType?, agreedAmountCents?, status? }
-//        → crea proyecto + siembra hitos por defecto
+//        → crea proyecto + siembra hitos por defecto.
+//        clientId o brief inexistentes → 400 con mensaje claro (CRM-05, OP-09).
 // Protegida con requireAdmin.
 import { requireAdmin } from '../../lib/auth.mjs';
-import { listProjects, createProject, PROJECT_STATUSES } from '../../lib/projects.mjs';
+import { listProjects, createProject, PROJECT_STATUSES, ProjectInputError } from '../../lib/projects.mjs';
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -32,10 +35,7 @@ export default async function handler(req, res) {
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       if (!name) return res.status(400).json({ ok: false, error: 'El nombre es requerido' });
       if (body.status && !PROJECT_STATUSES.includes(body.status)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${PROJECT_STATUSES.join(', ')}`,
-        });
+        return res.status(400).json({ ok: false, error: 'Elige un estado válido para el proyecto.' });
       }
       const project = await createProject({
         name,
@@ -48,6 +48,9 @@ export default async function handler(req, res) {
       console.log(`[admin/projects POST] proyecto ${project?.id} creado por ${session.email}`);
       return res.status(201).json({ ok: true, project });
     } catch (err) {
+      if (err instanceof ProjectInputError) {
+        return res.status(err.status).json({ ok: false, error: err.message });
+      }
       console.error('[admin/projects POST] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al crear proyecto' });
     }

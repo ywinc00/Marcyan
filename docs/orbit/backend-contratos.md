@@ -174,3 +174,29 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
   y pinta el cuerpo con `manualBodyHtml(text)`: saltos como `<br>` y SIN `white-space:pre-wrap`
   (con los dos, cada salto llegaba doble). El texto plano del correo va con los saltos ya
   normalizados. Probado en `npm run test:briefs-panel`.
+
+## Plazo de conservación de archivos (rama `orbit/ret`, decisión del dueño 2026-10-19)
+
+- **Regla.** Los archivos de un brief se borran solos 12 meses después de terminar el proyecto,
+  con aviso en el panel 30 días antes; a petición del cliente se borran antes desde la ficha. Sin
+  migración nueva: se calcula con `brief_events`.
+- **`lib/brief-retention.mjs` (puro).** `purgeDate(brief, events)` → `'YYYY-MM-DD'` (día de Houston)
+  o `null`. Cuenta la ÚLTIMA vez que el brief pasó a `completed` (eventos `status_changed`);
+  volver a `pending`/`contacted`/`in_progress` anula el reloj; archivar desde Completado lo
+  mantiene (el proyecto sigue terminado). Sin historial de estados usa `completed_at`.
+  `retentionStage(day, now)` → `keep` | `notice` (≤ 30 días) | `purge` (el día llegó).
+- **Cron** `api/cron/brief-cleanup.mjs` (mismo secreto y horario): paso `conservación` =
+  `runFileRetention({ limit: 25, budgetMs: 45000 })`, por tandas con cursor por id. `notice` →
+  aviso `system` con clave `files-purge:<MRC>:<fecha>` y ventana de 40 días (uno por brief y
+  fecha; el tope de `createNotification` sube de 7 a 60 días). `purge` → `purgeBriefFiles`
+  re-comprueba que siga terminado, borra blobs (si Blob falla, no toca la base) y filas, y deja
+  `files_purged { files, reason: 'retention' }` sin actor.
+- **`/api/admin/briefs/:id/files`** (requireAdmin). `GET` añade
+  `retention { purgeOn, daysLeft, lastPurge { at, files, reason, actor } }`. `DELETE` borra todos
+  los archivos (blobs bajo los borradores cerrados incluidos; un kit aún abierto no se toca),
+  responde `{ files }` y deja `files_purged { files, reason: 'request' }` con el actor; 502 si
+  el almacén falla (no se borra nada).
+- **Panel.** Sección Archivos: "Se borrarán el <fecha>" (aviso amarillo a 30 días o menos),
+  "Borrar archivos" (secundaria de peligro con confirmación que dice cuántos y qué) y vacío
+  "Archivos borrados el <fecha>". Historial: "Archivos borrados · Desde el panel | Plazo de 12
+  meses cumplido". Probado en `npm run test:brief-files` y `npm run test:briefs-panel`.

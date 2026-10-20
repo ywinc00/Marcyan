@@ -396,6 +396,24 @@ await check('panel: la ficha nunca pinta un archivo que el servidor no marcó en
   assert.match(s, /\{#if f\.inline && !broken\[f\.id\]\}/);
   assert.ok(!/\{@html/.test(s));
 });
+await check('archivos: plazo de conservación, borrado a mano y su rastro en el historial', () => {
+  const files = [{ kind: 'logo' }, { kind: 'photo' }, { kind: 'photo' }, { kind: 'legal' }];
+  const far = P.retentionView({ purgeOn: '2027-10-19', daysLeft: 200 }, files);
+  assert.deepEqual([far.kind, far.day, far.soon, far.overdue, far.legal], ['scheduled', '2027-10-19', false, false, true]);
+  assert.equal(P.retentionView({ purgeOn: '2027-10-19', daysLeft: 30 }, files).soon, true);
+  assert.equal(P.retentionView({ purgeOn: '2027-10-19', daysLeft: 0 }, files).overdue, true);
+  assert.equal(P.retentionView({ purgeOn: null, daysLeft: null }, files), null, 'sin terminar: no se dice nada');
+  const gone = P.retentionView({ purgeOn: null, lastPurge: { at: '2026-10-19T15:00:00Z', files: 4, reason: 'request' } }, []);
+  assert.equal(gone.kind, 'purged');
+  assert.equal(P.purgedText(gone), 'Se borraron 4 archivos desde el panel. El brief y su historial se conservan.');
+  assert.match(P.purgedText({ files: 1, reason: 'retention' }), /^Se borró 1 archivo al cumplirse 12 meses/);
+  assert.equal(P.purgeConfirmMessage(files), 'Se borran los 4 archivos de este brief: 1 logo, 2 fotos y 1 documento legal. El brief y su historial se quedan. No se puede deshacer.');
+  assert.match(P.purgeConfirmMessage([{ kind: 'logo' }]), /^Se borra el único archivo de este brief: 1 logo\./);
+  const ev = P.describeEvent({ event_type: 'files_purged', data: { files: 4, reason: 'request' } });
+  assert.deepEqual([ev.title, ev.detail], ['Archivos borrados', '4 archivos · Desde el panel']);
+  assert.equal(P.describeEvent({ event_type: 'files_purged', data: { files: 1, reason: 'retention' } }).detail, '1 archivo · Plazo de 12 meses cumplido');
+  for (const t of [P.purgedText(gone), P.purgeConfirmMessage(files), ev.detail]) assert.ok(!/[—–]/.test(t), 'sin guion largo');
+});
 
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) fallaron:\n  - ` + fails.join('\n  - '));

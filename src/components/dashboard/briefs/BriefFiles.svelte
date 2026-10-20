@@ -3,22 +3,32 @@
   // individual. Solo se pintan en línea JPG/PNG/WebP VERIFICADOS (lo dice el
   // servidor con `inline`); un SVG nunca se pinta: miniatura genérica y
   // descarga. Los documentos legales van aparte: no viajan en el kit.
+  // Plazo de conservación: 12 meses después de terminar el proyecto los
+  // archivos se borran solos ("Se borrarán el…", aviso 30 días antes) y,
+  // si el cliente lo pide, "Borrar archivos" los borra antes.
   import { untrack } from 'svelte';
   import { api } from '../lib/api.js';
+  import { toast, toastError } from '../lib/toast.svelte.js';
+  import { fmtDate, fmtDay } from '../lib/dates.js';
   import Icon from '../ui/Icon.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
   import LoadingState from '../ui/LoadingState.svelte';
   import ErrorState from '../ui/ErrorState.svelte';
-  import { groupFiles, fileTypeLabel, fmtSize, fileTags, fileCheck } from './brief-panel.js';
+  import ConfirmDialog from '../ui/ConfirmDialog.svelte';
+  import {
+    groupFiles, fileTypeLabel, fmtSize, fileTags, fileCheck,
+    retentionView, purgedText, purgeConfirmMessage,
+  } from './brief-panel.js';
 
-  let { pid, onloaded } = $props();
+  let { pid, onloaded, onpurged } = $props();
 
   let files = $state([]);
   let available = $state(true);
   let loading = $state(true);
   let error = $state('');
   let broken = $state({});   // miniaturas que no cargaron → genérica
+  let retention = $state(null);
 
   async function load() {
     loading = true; error = '';
@@ -26,6 +36,7 @@
       const j = await api('/api/admin/briefs/' + encodeURIComponent(pid) + '/files');
       files = j.files || [];
       available = j.available !== false;
+      retention = j.retention || null;
       onloaded?.(files);
     } catch (e) { error = e.message; }
     finally { loading = false; }
@@ -34,13 +45,36 @@
 
   const groups = $derived(groupFiles(files));
   const pending = $derived(files.filter((f) => f.verified === null || f.verified === undefined).length);
+  const keep = $derived(retentionView(retention, files));
+
+  // ── Borrar archivos (a petición del cliente) ─────────────────
+  let purgeOpen = $state(false);
+  let purging = $state(false);
+  async function doPurge() {
+    purging = true;
+    try {
+      const j = await api('/api/admin/briefs/' + encodeURIComponent(pid) + '/files', { method: 'DELETE' });
+      purgeOpen = false;
+      const n = Number(j.files) || 0;
+      toast(n ? (n === 1 ? '1 archivo borrado' : `${n} archivos borrados`) : 'Este brief ya no tenía archivos');
+      await load();
+      onpurged?.();
+    } catch (e) { toastError(e, 'No se pudieron borrar los archivos.'); }
+    finally { purging = false; }
+  }
+
   const iconFor = (f) => (f.kind === 'video' ? 'video' : f.kind === 'photo' || f.kind === 'logo' ? 'image' : 'file');
 </script>
 
 <section class="ui-card files" aria-labelledby="files-title">
   <header class="files__head">
     <h2 class="files__title" id="files-title">Archivos</h2>
-    {#if files.length}<span class="files__count">{files.length} {files.length === 1 ? 'archivo' : 'archivos'}</span>{/if}
+    {#if files.length}
+      <span class="files__tools">
+        <span class="files__count">{files.length} {files.length === 1 ? 'archivo' : 'archivos'}</span>
+        <button class="b b--mini b--danger" type="button" onclick={() => (purgeOpen = true)}><Icon name="trash" size={14} />Borrar archivos</button>
+      </span>
+    {/if}
   </header>
 
   {#if error}
@@ -52,10 +86,21 @@
   {:else if !available}
     <EmptyState compact title="Los archivos aún no están activados"
       text="Falta aplicar la actualización 010 de la base de datos. El brief y el kit funcionan igual, sin archivos." />
+  {:else if !files.length && keep?.kind === 'purged'}
+    <EmptyState compact title={`Archivos borrados el ${fmtDate(keep.at)}`} text={purgedText(keep)} />
   {:else if !files.length}
     <EmptyState compact title="Sin archivos"
       text="El cliente no subió logo ni fotos con el brief. Puedes pedírselos con el kit de arranque." />
   {:else}
+    {#if keep?.kind === 'scheduled'}
+      {#if keep.soon}
+        <p class="notice" role="status"><Icon name="alert" size={16} />
+          <span>{keep.overdue ? 'Ya se cumplieron 12 meses desde que se terminó el proyecto: se borrarán en la próxima limpieza diaria.' : `Se borrarán el ${fmtDay(keep.day)}, 12 meses después de terminar el proyecto.`}
+          Si quieres conservarlos, descarga el kit antes{keep.legal ? '; los documentos legales se descargan uno a uno' : ''}.</span></p>
+      {:else}
+        <p class="keep"><Icon name="calendar" size={15} />Se borrarán el {fmtDay(keep.day)}, 12 meses después de terminar el proyecto.</p>
+      {/if}
+    {/if}
     {#if pending}
       <p class="notice" role="status"><Icon name="alert" size={16} />
         {pending === 1 ? 'Un archivo aún no se ha verificado' : `${pending} archivos aún no se han verificado`}: se pueden descargar, pero no se muestran hasta comprobar que su contenido es lo que dice ser.</p>
@@ -100,11 +145,17 @@
   {/if}
 </section>
 
+<ConfirmDialog bind:open={purgeOpen} title="¿Borrar los archivos?" confirmLabel="Borrar archivos"
+  message={purgeConfirmMessage(files)} busy={purging} onconfirm={doPurge} />
+
 <style>
   .files { margin-bottom: 14px; }
   .files__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
   .files__title { margin: 0; font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); letter-spacing: -0.01em; }
   .files__count { font-size: var(--dash-small); color: var(--fg-subtle); }
+  .files__tools { display: inline-flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: flex-end; }
+  .keep { display: flex; gap: 8px; align-items: flex-start; margin: calc(-1 * var(--space-2)) 0 var(--space-4); font-size: var(--dash-small); line-height: 1.45; color: var(--fg-secondary); }
+  .keep :global(.ui-icon) { color: var(--fg-subtle); flex: 0 0 auto; margin-top: 2px; }
   .notice { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 var(--space-4); padding: 10px 12px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-warning) 9%, transparent); border: 1px solid color-mix(in srgb, var(--color-warning) 28%, transparent); font-size: var(--dash-small); line-height: 1.45; color: var(--fg-secondary); }
   .notice :global(.ui-icon) { color: var(--color-warning); flex: 0 0 auto; margin-top: 1px; }
 

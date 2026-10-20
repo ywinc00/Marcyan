@@ -9,6 +9,7 @@ import {
   SECTIONS, FIELDS, FILE_TAG_DEFS, BRIEF_SERVICES,
   labelFor, shortLabel, isActive, isMissing, isLegacyBrief,
 } from '../../../../lib/brief-schema.mjs';
+import { filesSummary, NOTICE_DAYS } from '../../../../lib/brief-retention.mjs';
 
 export { FIELDS, BRIEF_SERVICES, labelFor, isLegacyBrief };
 
@@ -283,6 +284,46 @@ export function fileCheck(f = {}) {
   return { id: 'pending', label: 'Sin verificar', tone: 'warning' };
 }
 
+// ── Plazo de conservación de los archivos ────────────────────
+// El servidor manda retention { purgeOn, daysLeft, lastPurge } (ver
+// lib/brief-retention.mjs). Devuelve qué pintar en la sección Archivos:
+//   { kind: 'scheduled', day, soon, overdue, legal } con archivos y fecha,
+//   { kind: 'purged', at, files, reason } sin archivos tras un borrado,
+//   o null (sin fecha ni borrado: no se dice nada).
+export function retentionView(retention, files = []) {
+  const r = retention || {};
+  const n = Array.isArray(files) ? files.length : 0;
+  if (n && r.purgeOn) {
+    const left = Number.isFinite(r.daysLeft) ? r.daysLeft : null;
+    return {
+      kind: 'scheduled', day: r.purgeOn,
+      soon: left !== null && left <= NOTICE_DAYS, overdue: left !== null && left <= 0,
+      legal: files.some((f) => f.kind === 'legal'),
+    };
+  }
+  if (!n && r.lastPurge && r.lastPurge.at) {
+    return { kind: 'purged', at: r.lastPurge.at, files: Number(r.lastPurge.files) || 0, reason: r.lastPurge.reason === 'retention' ? 'retention' : 'request' };
+  }
+  return null;
+}
+const filesCount = (n) => (n === 1 ? '1 archivo' : `${n} archivos`);
+/** Texto del estado vacío tras un borrado. */
+export function purgedText(v = {}) {
+  const n = Number(v.files) || 0;
+  const what = n ? (n === 1 ? 'Se borró 1 archivo' : `Se borraron ${n} archivos`) : 'Se borraron los archivos';
+  const why = v.reason === 'retention' ? ' al cumplirse 12 meses desde que se terminó el proyecto' : ' desde el panel';
+  return `${what}${why}. El brief y su historial se conservan.`;
+}
+/** Mensaje de la confirmación de "Borrar archivos": cuántos y qué. */
+export function purgeConfirmMessage(files = []) {
+  const by = {};
+  for (const f of files) by[f.kind] = (by[f.kind] || 0) + 1;
+  const n = files.length;
+  const what = filesSummary(by);
+  return `${n === 1 ? 'Se borra el único archivo' : `Se borran los ${n} archivos`} de este brief${what ? `: ${what}` : ''}. `
+    + 'El brief y su historial se quedan. No se puede deshacer.';
+}
+
 // ── Historial ────────────────────────────────────────────────
 const EVENT_TITLE = {
   brief_received: 'Brief recibido',
@@ -296,6 +337,7 @@ const EVENT_TITLE = {
   kit_submitted: 'El cliente envió el kit de arranque',
   converted_to_client: 'Convertido en cliente',
   client_edited: 'El cliente corrigió su brief',
+  files_purged: 'Archivos borrados',
 };
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
@@ -347,6 +389,11 @@ export function describeEvent(ev = {}) {
     }
     case 'kit_submitted':
       return { title, detail: Number(d.files) ? plural(Number(d.files), 'archivo', 'archivos') : '' };
+    case 'files_purged': {
+      const n = Number(d.files) || 0;
+      const why = d.reason === 'retention' ? 'Plazo de 12 meses cumplido' : 'Desde el panel';
+      return { title, detail: n ? `${filesCount(n)} · ${why}` : why };
+    }
     case 'converted_to_client': {
       const who = [d.client_code, d.business_name].filter(Boolean).join(' · ');
       return { title, detail: `${d.created ? 'Cliente nuevo' : 'Vinculado a un cliente existente'}${who ? ': ' + who : ''}` };

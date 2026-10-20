@@ -423,7 +423,7 @@
 
       <BriefFields sections={inicial} {edit} bind:draft errors={fieldErrors} />
 
-      <BriefFiles {pid} onloaded={(f) => (fileCount = f.length)} />
+      <BriefFiles {pid} onloaded={(f) => (fileCount = f.length)} onpurged={() => history?.reload()} />
 
       {#if anterior.length}
         <h2 class="part">Más datos del brief <span class="part__s">{anteriorNote}</span></h2>

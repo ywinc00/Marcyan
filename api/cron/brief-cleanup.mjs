@@ -8,12 +8,17 @@
 //    2) Cola de reintento (migración 016): borradores ya enviados cuya
 //       conciliación o cuyo borrado de archivos quitados falló; se repite
 //       con lo que mandó el navegador (enlaza lo que dejó, borra lo que quitó).
-//    3) Verificación de tipo real de archivos pendientes (si la del envío no
+//    3) Plazo de conservación (lib/brief-retention.mjs): los archivos de un
+//       proyecto terminado se borran a los 12 meses. 30 días antes deja un
+//       aviso en el panel (uno por brief y fecha) y, llegada la fecha, borra
+//       sus archivos y lo apunta en el historial del brief ('files_purged').
+//       Por tandas y con tope de 45 s; nunca toca un brief sin terminar.
+//    4) Verificación de tipo real de archivos pendientes (si la del envío no
 //       terminó a tiempo).
-//    4) Ventanas viejas del límite de envíos (más de 2 días).
+//    5) Ventanas viejas del límite de envíos (más de 2 días).
 //  Cada paso es independiente: si uno falla, los demás siguen.
 // ════════════════════════════════════════════════════════════════
-import { cleanupExpiredDrafts, sweepQueuedDrafts, verifyPendingFiles, blobConfigured, isMissingSchema } from '../../lib/brief-files.mjs';
+import { cleanupExpiredDrafts, sweepQueuedDrafts, runFileRetention, verifyPendingFiles, blobConfigured, isMissingSchema } from '../../lib/brief-files.mjs';
 import { purgeOldHits } from '../../lib/ratelimit.mjs';
 import { safeEqual } from '../../lib/auth.mjs';
 
@@ -46,10 +51,11 @@ export default async function handler(req, res) {
   const drafts = blob ? await step('borradores', () => cleanupExpiredDrafts({ limit: 50, budgetMs: 180000 })) : { ok: false, error: 'almacén no configurado' };
   // Sin la migración 016 este paso se salta: no cuenta como fallo del cron.
   const sweep = blob ? await step('reintentos', () => sweepQueuedDrafts({ limit: 25 })) : { ok: false, error: 'almacén no configurado' };
+  const retention = blob ? await step('conservación', () => runFileRetention({ limit: 25, budgetMs: 45000 })) : { ok: false, error: 'almacén no configurado' };
   const verify = blob ? await step('verificación', () => verifyPendingFiles({ limit: 40 })) : { ok: false, error: 'almacén no configurado' };
   const hits = await step('límite de envíos', async () => ({ deleted: await purgeOldHits() }));
   const sweepOk = sweep.ok || sweep.error === 'migración 016 sin aplicar';
 
-  console.log(`[cron/brief-cleanup] borradores=${drafts.drafts ?? '-'} blobs=${drafts.blobs ?? '-'} reintentos=${sweep.swept ?? '-'} verificados=${verify.verified ?? '-'} rechazados=${verify.rejected ?? '-'} ventanas=${hits.deleted ?? '-'}`);
-  return res.status(200).json({ ok: drafts.ok && sweepOk && verify.ok && hits.ok, drafts, sweep, verify, hits });
+  console.log(`[cron/brief-cleanup] borradores=${drafts.drafts ?? '-'} blobs=${drafts.blobs ?? '-'} reintentos=${sweep.swept ?? '-'} avisos_borrado=${retention.notices ?? '-'} briefs_borrados=${retention.purged ?? '-'} archivos_borrados=${retention.files ?? '-'} verificados=${verify.verified ?? '-'} rechazados=${verify.rejected ?? '-'} ventanas=${hits.deleted ?? '-'}`);
+  return res.status(200).json({ ok: drafts.ok && sweepOk && retention.ok && verify.ok && hits.ok, drafts, sweep, retention, verify, hits });
 }

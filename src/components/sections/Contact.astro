@@ -23,6 +23,9 @@ const okNext = f.successNext ?? 'Te respondemos en menos de 1 hora hábil.';
 const okUrgent = f.successUrgent ?? '¿Es urgente? Llámanos al';
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
+// Brief completo en el idioma de la página (PUB-01): /en/* va al brief en inglés.
+const pathEn = Astro.url.pathname === '/en' || Astro.url.pathname.startsWith('/en/');
+const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
 ---
 <section class="section contact" id="contacto" data-fx="gold">
   <div class="container contact__inner">
@@ -36,7 +39,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       class="contact__form" id="home-contact-form" novalidate
       data-sending={f.sending} data-success={okHead} data-success-ref={okRef} data-success-next={okNext}
       data-success-urgent={okUrgent} data-error={f.error} data-invalid={f.emailInvalid}
-      data-brief={f.briefLink} data-href-brief="/formulario"
+      data-brief={f.briefLink} data-href-brief={hrefBrief}
       data-tel-hou={telHou} data-tel-hou-label={nap.houston}
       data-tel-mia={telMia} data-tel-mia-label={nap.miami}
     >
@@ -189,12 +192,13 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     const digits = (v: string) => v.replace(/\D/g, '');
 
     // Pinta el error como NODOS DOM (sin innerHTML). Si la prosa de error contiene
-    // la cadena briefLink, ese tramo se convierte en un <a href="/formulario"> real,
+    // la cadena briefLink, ese tramo se convierte en un <a> real al brief (en su idioma),
     // dándole al usuario una salida clicable al fallar.
     const renderError = (msg: string) => {
       errorBox.textContent = '';
       const brief = (S.brief || '').trim();
-      const href = S.hrefBrief || '/formulario';
+      const href = S.hrefBrief
+        || ((document.documentElement.lang || 'es').slice(0, 2).toLowerCase() === 'en' ? '/en/project-brief' : '/formulario');
       const idx = brief ? msg.indexOf(brief) : -1;
       if (idx >= 0) {
         if (idx > 0) errorBox.appendChild(document.createTextNode(msg.slice(0, idx)));
@@ -240,6 +244,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       const fd = new FormData(form);
       const data: Record<string, string> = {};
       for (const [k, v] of fd.entries()) data[k] = typeof v === 'string' ? v.trim() : '';
+      data.lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase() === 'en' ? 'en' : 'es';
 
       if (data.website_hp) { delete form.dataset.busy; return; } // honeypot
 

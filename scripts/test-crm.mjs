@@ -377,6 +377,17 @@ await check('R1: brief → cliente reconoce el vínculo a un cliente que ya exis
   const rel = src.slice(src.indexOf('export async function getClientRelated'));
   assert.match(rel, /DISTINCT ON \(project_id\)/);
 });
+await check('PUB-01/02: contacto en inglés lleva al brief en inglés y el aviso de límite sale en su idioma', async () => {
+  const { contactLang } = await import('../api/contact.mjs');
+  assert.equal(contactLang({ headers: {} }, { lang: 'en' }), 'en');
+  assert.equal(contactLang({ headers: { referer: 'https://marcyan.com/en/about/' } }, {}), 'en');
+  assert.equal(contactLang({ headers: { referer: 'https://marcyan.com/es/houston/' } }, {}), 'es');
+  assert.equal(contactLang({ headers: { referer: 'https://marcyan.com/english' } }, {}), 'es');
+  assert.equal(contactLang({ headers: {} }, {}), 'es');
+  const src = fs.readFileSync(path.join(ROOT, 'src/components/sections/Contact.astro'), 'utf8');
+  assert.ok(!src.includes('data-href-brief="/formulario"'), 'el enlace al brief no va fijo en español');
+  assert.match(src, /pathEn \? '\/en\/project-brief' : '\/formulario'/);
+});
 await check('R3: solo se guardan URLs de origen http(s)', () => {
   assert.equal(safeHttpUrl('https://marcyan.com/es/'), 'https://marcyan.com/es/');
   assert.equal(safeHttpUrl(' http://x.example/a '), 'http://x.example/a');

@@ -32,6 +32,19 @@ const withTimeout = (p, ms, label) =>
     ),
   ]);
 
+// Idioma del aviso de límite (PUB-02): el que manda el formulario en `lang`;
+// si no viene (chat, raíl), el de la página desde la que se envió.
+const RATE_MSG = {
+  es: 'Recibimos varios mensajes seguidos desde tu conexión. Espera unos minutos y vuelve a intentarlo.',
+  en: 'We received several messages in a row from your connection. Please wait a few minutes and try again.',
+};
+export function contactLang(req, body) {
+  if (body && (body.lang === 'en' || body.lang === 'es')) return body.lang;
+  let path = '';
+  try { path = new URL(String((req.headers && (req.headers.referer || req.headers.referrer)) || ''), 'https://x.invalid').pathname; } catch { path = ''; }
+  return path === '/en' || path.startsWith('/en/') ? 'en' : 'es';
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -51,10 +64,7 @@ export default async function handler(req, res) {
     const rl = await rateLimit({ bucket: 'contact', key: clientIp(req), limits: LIMITS.contact });
     if (!rl.ok) {
       res.setHeader('Retry-After', String(rl.retryAfter));
-      return res.status(429).json({
-        ok: false,
-        error: 'Recibimos varios mensajes seguidos desde tu conexión. Espera unos minutos y vuelve a intentarlo.',
-      });
+      return res.status(429).json({ ok: false, error: RATE_MSG[contactLang(req, body)] });
     }
 
     // Acepta tanto los nombres "de leads" como los del form de contacto

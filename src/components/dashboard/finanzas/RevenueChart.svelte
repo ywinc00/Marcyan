@@ -17,7 +17,12 @@
   const axisMax = $derived(niceAxisMax(chartMax, 3));
 
   let hoverIdx = $state(-1);
-  const CW = 560, CH = 200, TOP = 38, BASE = 160, PLOT = BASE - TOP;
+  // El ancho del dibujo sigue al de la tarjeta (1 unidad = 1 px), como en
+  // Inicio: así las etiquetas miden lo mismo en escritorio y en el móvil en
+  // vez de agrandarse con el ancho de la pantalla.
+  let wrapW = $state(0);
+  const CW = $derived(Math.max(280, Math.round(wrapW || 560)));
+  const CH = 200, TOP = 38, BASE = 160, PLOT = BASE - TOP;
   const BAR_MAX = 56;
   const bandW = () => CW / Math.max(1, revenue.length);
   const barW = () => Math.min(bandW() * 0.5, BAR_MAX);
@@ -57,7 +62,7 @@
       </div>
       <span class="rc-legend"><span class="rc-legend__dot"></span>Mes activo</span>
     </div>
-    <div class="rc-wrap">
+    <div class="rc-wrap" bind:clientWidth={wrapW}>
       <svg class="rc" viewBox="0 0 {CW} {CH}" role="img" aria-label="Ingresos de los últimos 6 meses"
         onpointermove={onMove} onpointerdown={onMove} onpointerleave={onLeave}>
         <defs>
@@ -111,16 +116,14 @@
   .rc-wrap { position: relative; }
   .rc { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: pan-y; }
   .rc-bar { fill: var(--chart-idle-top); transition: y .18s ease, height .18s ease; }
-  .rc-lbl { fill: var(--fg-subtle); font-size: 11px; }
+  .rc-lbl { fill: var(--fg-subtle); font-size: 12px; }
   .rc-lbl.is-active { fill: var(--fg-primary); font-weight: 700; }
-  .rc-axis { fill: var(--fg-subtle); font-size: 9px; }
+  .rc-axis { fill: var(--fg-subtle); font-size: 11px; }
   .rc-grid { stroke: var(--border); stroke-dasharray: 3 4; }
   .rc-base { stroke: var(--border-strong); }
   .rc-guide { stroke: var(--accent-gold-line); stroke-dasharray: 4 4; }
   .rc-dot { fill: var(--accent-gold); stroke: var(--bg-card); stroke-width: 2.5; }
   @media (max-width: 719px) {
     .rc-amount { font-size: 26px; }
-    .rc-lbl { font-size: 15px; }
-    .rc-axis { font-size: 13px; }
   }
 </style>

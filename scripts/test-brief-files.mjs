@@ -9,7 +9,9 @@
 //      cron la repite con lo que mandó el navegador (R4)
 //    · plazo de conservación (lib/brief-retention.mjs): fecha de borrado a
 //      12 meses de terminar (la última vez que pasó a Completado; se anula
-//      si se reabre), aviso 30 días antes deduplicado, borrado por tandas
+//      si se reabre) o de archivar sin completar (el último archivado),
+//      con la causa en el aviso y en la ficha (retentionCause), aviso 30
+//      días antes deduplicado, borrado por tandas
 //      que nunca toca briefs sin terminar, evento 'files_purged', y el
 //      endpoint DELETE /api/admin/briefs/:id/files detrás de requireAdmin
 //  Necesita --experimental-test-module-mocks (lo pone el script de npm).
@@ -347,12 +349,72 @@ await check('fecha: si el brief se reabre, el reloj se anula (null)', () => {
   assert.equal(R.purgeDate(null, ev), null);
 });
 
-await check('fecha: archivar un proyecto terminado no para el reloj; archivar sin terminar no lo arranca', () => {
+await check('fecha: archivar un proyecto terminado no para el reloj; archivar sin terminar arranca el suyo', () => {
   const ev = [SC('completed', '2026-01-10T15:00:00Z'), SC('archived', '2026-03-01T15:00:00Z', 'completed')];
   assert.equal(R.purgeDate({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, ev), '2027-01-10');
-  assert.equal(R.purgeDate({ status: 'archived' }, [SC('archived', '2026-03-01T15:00:00Z', 'contacted')]), null);
+  assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, ev), 'completed');
+  // Decisión del dueño 2026-10-20: archivado sin completar = 12 meses desde que se archivó.
+  assert.equal(R.purgeDate({ status: 'archived' }, [SC('archived', '2026-03-01T15:00:00Z', 'contacted')]), '2027-03-01');
+  // Reabierto tras completarse y archivado sin volver a completarse: cuenta el archivado.
   const reopened = [SC('completed', '2026-01-10T15:00:00Z'), SC('contacted', '2026-02-01T15:00:00Z', 'completed'), SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
-  assert.equal(R.purgeDate({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), null);
+  assert.equal(R.purgeDate({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), '2027-03-01');
+  assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, reopened), 'archived');
+});
+
+await check('archivado sin completar: 12 meses desde el archivado, en día de Houston', () => {
+  const b = { status: 'archived', completed_at: null };
+  // 03:00 UTC del 5-mar = 21:00 del 4-mar en Houston.
+  const ev = [SC('contacted', '2026-02-01T15:00:00Z', 'pending'), SC('archived', '2026-03-05T03:00:00Z', 'contacted')];
+  assert.equal(R.purgeDate(b, ev), '2027-03-04');
+  assert.equal(R.finishedAt(b, ev).toISOString(), '2026-03-05T03:00:00.000Z');
+  assert.equal(R.retentionCause(b, ev), 'archived');
+});
+
+await check('archivado, reabierto y vuelto a archivar: cuenta el ÚLTIMO archivado', () => {
+  const b = { status: 'archived' };
+  const ev = [
+    SC('archived', '2026-01-10T15:00:00Z', 'pending'),
+    SC('contacted', '2026-04-01T15:00:00Z', 'archived'),
+    SC('archived', '2026-06-20T15:00:00Z', 'contacted'),
+  ];
+  assert.equal(R.purgeDate(b, ev), '2027-06-20');
+  assert.equal(R.purgeDate(b, ev.slice().reverse()), '2027-06-20', 'el orden de llegada no importa');
+  assert.equal(R.retentionCause(b, ev), 'archived');
+  // Si se reabre y sigue abierto, no hay fecha ni causa.
+  const open = ev.slice(0, 2);
+  assert.equal(R.purgeDate({ status: 'contacted' }, open), null);
+  assert.equal(R.retentionCause({ status: 'contacted' }, open), null);
+  // Archivado otra vez pero sin ese paso registrado: conservador, sin fecha.
+  assert.equal(R.purgeDate(b, open), null);
+});
+
+await check('completado y luego archivado: cuenta el completado, no el archivado', () => {
+  const b = { status: 'archived', completed_at: '2026-01-10T15:00:00Z' };
+  const ev = [SC('completed', '2026-01-10T15:00:00Z'), SC('archived', '2026-08-01T15:00:00Z', 'completed')];
+  assert.equal(R.purgeDate(b, ev), '2027-01-10');
+  assert.equal(R.retentionCause(b, ev), 'completed');
+});
+
+await check('archivado sin historial de estados y nunca completado: sin fecha (conservador)', () => {
+  assert.equal(R.purgeDate({ status: 'archived', completed_at: null }, []), null);
+  assert.equal(R.finishedAt({ status: 'archived' }, []), null);
+  assert.equal(R.retentionCause({ status: 'archived' }, []), null);
+  // Sin historial pero con completed_at: cuenta como terminado.
+  assert.equal(R.retentionCause({ status: 'archived', completed_at: '2026-01-10T15:00:00Z' }, []), 'completed');
+});
+
+await check('archivado sin completar con su proyecto de Progreso activo o en pausa: sin fecha', () => {
+  const b = { status: 'archived' };
+  const ev = [SC('archived', '2026-03-01T15:00:00Z', 'contacted')];
+  assert.equal(R.purgeDate(b, ev, [{ status: 'active', completed_at: null }]), null);
+  assert.equal(R.purgeDate(b, ev, [{ status: 'on_hold', completed_at: null }]), null);
+  assert.equal(R.retentionCause(b, ev, [{ status: 'active', completed_at: null }]), null);
+  // Cancelado no frena: sigue el reloj del archivado.
+  assert.equal(R.purgeDate(b, ev, [{ status: 'cancelled', completed_at: null }]), '2027-03-01');
+  assert.equal(R.retentionCause(b, ev, [{ status: 'cancelled', completed_at: null }]), 'archived');
+  // Si su proyecto se completó, sí llegó a ser proyecto: manda su cierre.
+  assert.equal(R.purgeDate(b, ev, [{ status: 'completed', completed_at: '2026-05-01T15:00:00Z' }]), '2027-05-01');
+  assert.equal(R.retentionCause(b, ev, [{ status: 'completed', completed_at: '2026-05-01T15:00:00Z' }]), 'completed');
 });
 
 await check('fecha: sin historial de estados usa completed_at; fin de mes sin desbordar', () => {
@@ -382,6 +444,18 @@ await check('aviso: dice qué se borra, cuándo y que se puede descargar el kit;
   assert.match(n.body, /descarga el kit/);
   assert.match(n.body, /documentos legales no van en el kit/);
   assert.ok(!/[—–]/.test(n.title + n.body), 'sin guion largo');
+  assert.match(n.body, /^Ese día se cumplen 12 meses desde que se terminó el proyecto/, 'por defecto, la causa es el proyecto terminado');
+});
+
+await check('aviso: con causa archivado dice que se archivó sin llegar a ser proyecto (también tarde)', () => {
+  const n = R.purgeNotice({ projectId: 'MRC-018', businessName: 'Beta', purgeOn: '2027-03-01', byKind: { photo: 2 }, cause: 'archived' });
+  assert.equal(n.key, 'files-purge:MRC-018:2027-03-01', 'la clave no cambia con la causa');
+  assert.match(n.body, /^Ese día se cumplen 12 meses desde que se archivó este brief sin llegar a ser proyecto y se borran sus archivos: 2 fotos\./);
+  assert.ok(!/terminó el proyecto/.test(n.body));
+  const late = R.purgeNotice({ projectId: 'MRC-018', purgeOn: '2027-03-01', deleteOn: '2027-03-09', cause: 'archived' });
+  assert.match(late.body, /^Ya se cumplieron 12 meses desde que se archivó este brief sin llegar a ser proyecto\. Sus archivos se borran ese día/);
+  assert.match(late.title, /se borrarán el 9 de marzo de 2027/);
+  assert.ok(!/[—–]/.test(n.title + n.body + late.title + late.body), 'sin guion largo');
 });
 
 // Siembra de un brief con archivos (borrador ya enviado).
@@ -558,6 +632,37 @@ await check('endpoint: GET de un brief terminado trae la fecha prevista; si el a
   await quiet(() => filesHandler({ method: 'DELETE', query: { id: 'MRC-001' }, headers: {} }, del));
   assert.equal(del.statusCode, 502);
   assert.equal(db.files.length, 2);
+});
+
+await check('cron y ficha: el prospecto archivado sin completar avisa con su causa y se borra a su plazo', async () => {
+  reset();
+  const pid = seedBrief(1, 'archived', [SC('contacted', ago(400), 'pending'), SC('archived', ago(365 - 20), 'contacted')], { files: 2 });
+  seedBrief(2, 'archived', [SC('archived', ago(300), 'pending')], { files: 1 });  // aún lejos
+  const out = await runFileRetention({ limit: 10, budgetMs: 5000 });
+  assert.equal(out.notices, 1);
+  const n = db.notifications[0];
+  assert.equal(n.url, `/dashboard#/briefs/${pid}`);
+  assert.match(n.body, /desde que se archivó este brief sin llegar a ser proyecto/);
+  assert.equal(db.files.length, 3, 'avisar no borra nada');
+  SESSION = { email: 'equipo@marcyan.test' };
+  const get = resCap();
+  await filesHandler({ method: 'GET', query: { id: pid }, headers: {} }, get);
+  assert.equal(get.body.retention.cause, 'archived');
+  assert.match(get.body.retention.purgeOn, /^\d{4}-\d{2}-\d{2}$/);
+  const later = await runFileRetention({ limit: 10, budgetMs: 5000, now: Date.now() + 25 * DAY });
+  assert.equal(later.purged, 1);
+  assert.deepEqual([...new Set(db.files.map((f) => f.brief_id))], [2], 'el archivado reciente sigue');
+  // Un brief completado trae causa 'completed'; sin fecha, causa null.
+  reset();
+  seedBrief(1, 'completed', [SC('completed', ago(10))]);
+  seedBrief(2, 'contacted', [SC('contacted', ago(10), 'pending')]);
+  SESSION = { email: 'equipo@marcyan.test' };
+  const g1 = resCap();
+  await filesHandler({ method: 'GET', query: { id: 'MRC-001' }, headers: {} }, g1);
+  assert.equal(g1.body.retention.cause, 'completed');
+  const g2 = resCap();
+  await filesHandler({ method: 'GET', query: { id: 'MRC-002' }, headers: {} }, g2);
+  assert.deepEqual([g2.body.retention.purgeOn, g2.body.retention.cause], [null, null]);
 });
 
 // ── Revisión adversarial (RET-01 a RET-08) ──────────────────────

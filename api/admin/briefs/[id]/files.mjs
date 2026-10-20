@@ -4,11 +4,13 @@
 //            legales) del brief inicial y del kit de arranque. Cada archivo
 //            trae `url` (GET /api/admin/files/:id) para miniatura o descarga
 //            e `inline` (true solo si el panel puede mostrarlo en <img>).
-//            retention: { purgeOn, daysLeft, lastPurge } (lib/brief-retention.mjs)
+//            retention: { purgeOn, daysLeft, cause, lastPurge } (lib/brief-retention.mjs)
 //              purgeOn   'YYYY-MM-DD' en que se borran solos (12 meses después
-//                        de terminar el proyecto y nunca antes de 7 días desde
-//                        el aviso del panel) o null si no está terminado o su
-//                        proyecto de Progreso sigue en marcha.
+//                        de terminar el proyecto, o de archivarlo si no llegó
+//                        a ser proyecto, y nunca antes de 7 días desde el
+//                        aviso del panel) o null si no está terminado ni
+//                        archivado o su proyecto de Progreso sigue en marcha.
+//              cause     'completed' | 'archived' (por qué corre el plazo) o null.
 //              lastPurge { at, files, reason, actor } del último borrado o null.
 //   DELETE → borra TODOS los archivos enlazados al brief a petición del
 //            cliente (blobs y filas); el brief y su historial se quedan. Deja
@@ -21,7 +23,7 @@ import { getBriefByProjectId } from '../../../../lib/db.mjs';
 import {
   listFilesForBrief, retentionEvents, retentionProjects, effectiveRetention, purgeBriefFiles, blobConfigured, isMissingSchema,
 } from '../../../../lib/brief-files.mjs';
-import { purgeDate, daysUntil, lastPurge } from '../../../../lib/brief-retention.mjs';
+import { purgeDate, retentionCause, daysUntil, lastPurge } from '../../../../lib/brief-retention.mjs';
 
 const INLINE = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
@@ -31,10 +33,15 @@ async function retentionFor(brief) {
   try {
     const [events, projects] = await Promise.all([retentionEvents(brief.project_id), retentionProjects(brief.project_id)]);
     const { purgeOn } = await effectiveRetention({ projectId: brief.project_id, policyDay: purgeDate(brief, events, projects) });
-    return { purgeOn, daysLeft: purgeOn ? daysUntil(purgeOn) : null, lastPurge: lastPurge(events) };
+    return {
+      purgeOn,
+      daysLeft: purgeOn ? daysUntil(purgeOn) : null,
+      cause: purgeOn ? retentionCause(brief, events, projects) : null,
+      lastPurge: lastPurge(events),
+    };
   } catch (err) {
     console.error('[admin/briefs/:id/files] plazo no disponible:', err && err.message);
-    return { purgeOn: null, daysLeft: null, lastPurge: null };
+    return { purgeOn: null, daysLeft: null, cause: null, lastPurge: null };
   }
 }
 

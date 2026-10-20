@@ -3,9 +3,10 @@
   // individual. Solo se pintan en línea JPG/PNG/WebP VERIFICADOS (lo dice el
   // servidor con `inline`); un SVG nunca se pinta: miniatura genérica y
   // descarga. Los documentos legales van aparte: no viajan en el kit.
-  // Plazo de conservación: 12 meses después de terminar el proyecto los
-  // archivos se borran solos ("Se borrarán el…", aviso 30 días antes) y,
-  // si el cliente lo pide, "Borrar archivos" los borra antes.
+  // Plazo de conservación: 12 meses después de terminar el proyecto (o de
+  // archivarlo, si no llegó a ser proyecto: retention.cause) los archivos
+  // se borran solos ("Se borrarán el…", aviso 30 días antes) y, si el
+  // cliente lo pide, "Borrar archivos" los borra antes.
   import { untrack } from 'svelte';
   import { api } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
@@ -18,7 +19,7 @@
   import ConfirmDialog from '../ui/ConfirmDialog.svelte';
   import {
     groupFiles, fileTypeLabel, fmtSize, fileTags, fileCheck,
-    retentionView, purgedText, purgeConfirmMessage,
+    retentionView, retentionPhrases, purgedText, purgeConfirmMessage,
   } from './brief-panel.js';
 
   let { pid, onloaded, onpurged } = $props();
@@ -46,6 +47,7 @@
   const groups = $derived(groupFiles(files));
   const pending = $derived(files.filter((f) => f.verified === null || f.verified === undefined).length);
   const keep = $derived(retentionView(retention, files));
+  const keepWhy = $derived(retentionPhrases(keep?.cause));
 
   // ── Borrar archivos (a petición del cliente) ─────────────────
   let purgeOpen = $state(false);
@@ -95,10 +97,10 @@
     {#if keep?.kind === 'scheduled'}
       {#if keep.soon}
         <p class="notice" role="status"><Icon name="alert" size={16} />
-          <span>{keep.overdue ? 'Ya se cumplieron 12 meses desde que se terminó el proyecto: se borrarán en la próxima limpieza diaria.' : `Se borrarán el ${fmtDay(keep.day)}, 12 meses después de terminar el proyecto.`}
+          <span>{keep.overdue ? `Ya se cumplieron ${keepWhy.since}: se borrarán en la próxima limpieza diaria.` : `Se borrarán el ${fmtDay(keep.day)}, ${keepWhy.after}.`}
           Si quieres conservarlos, descarga el kit antes{keep.legal ? '; los documentos legales se descargan uno a uno' : ''}.</span></p>
       {:else}
-        <p class="keep"><Icon name="calendar" size={15} />Se borrarán el {fmtDay(keep.day)}, 12 meses después de terminar el proyecto.</p>
+        <p class="keep"><Icon name="calendar" size={15} />Se borrarán el {fmtDay(keep.day)}, {keepWhy.after}.</p>
       {/if}
     {/if}
     {#if pending}

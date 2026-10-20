@@ -414,6 +414,23 @@ await check('archivos: plazo de conservación, borrado a mano y su rastro en el 
   assert.equal(P.describeEvent({ event_type: 'files_purged', data: { files: 1, reason: 'retention' } }).detail, '1 archivo · Plazo de 12 meses cumplido');
   for (const t of [P.purgedText(gone), P.purgeConfirmMessage(files), ev.detail]) assert.ok(!/[—–]/.test(t), 'sin guion largo');
 });
+await check('archivos: el plazo se explica según su causa (proyecto terminado o brief archivado)', () => {
+  const files = [{ kind: 'photo' }];
+  assert.equal(P.retentionView({ purgeOn: '2027-10-19', daysLeft: 200 }, files).cause, 'completed', 'sin causa: proyecto terminado');
+  const arch = P.retentionView({ purgeOn: '2027-03-01', daysLeft: 200, cause: 'archived' }, files);
+  assert.equal(arch.cause, 'archived');
+  assert.deepEqual(P.retentionPhrases(arch.cause), { after: '12 meses después de archivarlo', since: '12 meses desde que se archivó el brief' });
+  assert.deepEqual(P.retentionPhrases('completed'), { after: '12 meses después de terminar el proyecto', since: '12 meses desde que se terminó el proyecto' });
+  assert.deepEqual(P.retentionPhrases(), P.retentionPhrases('completed'));
+  const gone = P.retentionView({ purgeOn: '2027-03-01', cause: 'archived', lastPurge: { at: '2027-03-01T10:00:00Z', files: 2, reason: 'retention' } }, []);
+  assert.equal(P.purgedText(gone), 'Se borraron 2 archivos al cumplirse 12 meses desde que se archivó el brief. El brief y su historial se conservan.');
+  assert.equal(P.purgedText({ files: 1, reason: 'retention' }), 'Se borró 1 archivo al cumplirse 12 meses desde que se terminó el proyecto. El brief y su historial se conservan.');
+  // La ficha usa las frases de la causa, no un texto fijo.
+  const s = read('src/components/dashboard/briefs/BriefFiles.svelte');
+  assert.match(s, /retentionPhrases\(keep\?\.cause\)/);
+  assert.ok(!/12 meses después de terminar el proyecto\.<\/p>/.test(s), 'sin la frase fija');
+  for (const t of Object.values(P.retentionPhrases('archived')).concat(P.purgedText(gone))) assert.ok(!/[—–]/.test(t), 'sin guion largo');
+});
 
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) fallaron:\n  - ` + fails.join('\n  - '));

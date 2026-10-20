@@ -1,10 +1,16 @@
 // ════════════════════════════════════════════════════════════════
 //  scripts/test-brief-form.mjs — Pruebas del formulario nuevo y del kit
-//  (Orbit v2 · B1). Solo lógica pura: pasos, bytes mágicos, guardado,
-//  bloques del kit, textos y el cableado del sitio (rutas, sitemap, pie).
+//  (Orbit v2 · B1). Lógica sin navegador: pasos, bytes mágicos, guardado,
+//  bloques del kit, textos, el cableado del sitio (rutas, sitemap, pie) y
+//  la clase de subidas con red y fotos simuladas (cancelar, reintentar, quitar).
 //  npm run test:brief-form
 // ════════════════════════════════════════════════════════════════
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { compileModule } from 'svelte/compiler';
+import { cleanPage } from '../api/events.mjs';
 import { STEPS, REVIEW_STEP, INITIAL_FIELDS, stepOfField, fieldsForStep, validateStep, validateAll, errorsForStep, firstStepWithErrors } from '../src/components/brief/lib/steps.js';
 import { sniffBytes, CLIENT_KINDS, allowedFor, fmtBytes, withExt, DEFAULT_LIMITS } from '../src/components/brief/lib/sniff.js';
 import { fitWithin, PHOTO_MAX_SIDE, PHOTO_QUALITY } from '../src/components/brief/lib/images.js';
@@ -147,10 +153,13 @@ eq(Object.keys(errorsForBlock(canales, { leads_email: {}, legal_name: {}, 'respo
 // ── 8. Textos: mismas claves ES/EN, sin em-dash ni voseo ─────
 eq(Object.keys(STRINGS_ES).sort(), Object.keys(STRINGS_EN).sort(), 'mismas claves en ES y EN');
 const flat = (o) => Object.values(o).flatMap((v) => (typeof v === 'string' ? [v] : typeof v === 'function' ? [String(v(1, 2, 'x'))] : typeof v === 'object' ? flat(v) : []));
-for (const s of [...flat(STRINGS_ES), ...flat(STRINGS_EN)]) {
-  ok(!/[—–]/.test(s), `sin em-dash: "${s.slice(0, 40)}"`);
-}
-for (const s of flat(STRINGS_ES)) ok(!/\b(tenés|podés|querés|sabés|vos)\b/i.test(s), `sin voseo: "${s.slice(0, 40)}"`);
+// Una comprobación por regla (no una por texto) que nombra los culpables.
+const dashed = [...flat(STRINGS_ES), ...flat(STRINGS_EN)].filter((s) => /[—–]/.test(s));
+ok(!dashed.length, `sin em-dash: ${dashed.map((s) => `"${s.slice(0, 40)}"`).join(', ')}`);
+const VOSEO = /(?<![\p{L}])(tenés|podés|querés|sabés|necesitás|elegís|subís|sos|vos|hacé|mirá|usá|poné|escribinos|contanos|decinos|fijate|avisanos)(?![\p{L}])/iu;
+const voseo = flat(STRINGS_ES).filter((s) => VOSEO.test(s));
+ok(!voseo.length, `sin voseo: ${voseo.map((s) => `"${s.slice(0, 40)}"`).join(', ')}`);
+ok(VOSEO.test('Si querés, escribinos') && !VOSEO.test('Si quieres, escríbenos'), 'el detector de voseo distingue tú de vos');
 ok(flat(STRINGS_ES).some((s) => s.includes('1 hora hábil')) && flat(STRINGS_ES).some((s) => s.includes('24 horas')), 'plazos del sitio: 1 hora hábil y 24 horas');
 ok(flat(STRINGS_EN).some((s) => s.includes('1 business hour')) && flat(STRINGS_EN).some((s) => s.includes('24 hours')), 'plazos en inglés');
 // "Siguiente: <paso>" lo fija el gate validado (design/brief.md §2), por eso no entra aquí.
@@ -177,6 +186,133 @@ ok(/^\d+\.\d+\.\d+$/.test(pkg.dependencies['heic-to'] || ''), 'heic-to con versi
 for (const p of ['src/pages/privacidad.astro', 'src/pages/en/privacy.astro']) {
   const src = read(p);
   ok(src.includes('48') && src.includes('12') && src.includes('heic-to') && src.includes('LGPL'), `${p}: conservación de archivos y atribución LGPL`);
+}
+
+// ── 10. Subidas: cancelar, reintentar y quitar (clase Uploads) ──
+// La clase usa runas: se compila con Svelte en modo servidor (estado plano)
+// y se cargan simulados fetch, la subida (put) y la preparación de fotos.
+eq(cleanPage(`/es/kit/${TOK}`), '/es/kit', 'el token del kit no se guarda en los eventos');
+eq(cleanPage(`/en/kit/${TOK}/`), '/en/kit/', 'ni en inglés');
+eq(cleanPage('/es/kit-diseno'), '/es/kit-diseno', 'las demás rutas quedan igual');
+
+async function loadUploads() {
+  const abs = (p) => new URL(`../${p}`, import.meta.url).href;
+  let code = compileModule(read('src/components/brief/lib/uploads.svelte.js'), { generate: 'server', filename: 'uploads.svelte.js' }).js.code;
+  const dir = mkdtempSync(join(tmpdir(), 'brief-uploads-'));
+  writeFileSync(join(dir, 'images-fake.mjs'), 'export const preparePhoto = (...a) => globalThis.__prep(...a);\n');
+  code = code
+    .replace(`'svelte/internal/server'`, `'${import.meta.resolve('svelte/internal/server')}'`)
+    .replace(`'../../../../lib/brief-filename.mjs'`, `'${abs('lib/brief-filename.mjs')}'`)
+    .replace(`'./sniff.js'`, `'${abs('src/components/brief/lib/sniff.js')}'`)
+    .replace(`'./images.js'`, `'./images-fake.mjs'`)
+    .replace(/import\.meta\.env\.DEV/g, 'true');
+  const file = join(dir, 'uploads.mjs');
+  writeFileSync(file, code);
+  return import(pathToFileURL(file).href);
+}
+
+{
+  const { Uploads } = await loadUploads();
+  const wait = (ms = 0) => new Promise((r) => setTimeout(r, ms));
+  const until = async (fn, ms = 2000) => { const t0 = Date.now(); while (!fn()) { if (Date.now() - t0 > ms) return false; await wait(5); } return true; };
+  const deferred = () => { let res; const p = new Promise((r) => { res = r; }); return { p, res }; };
+  const png = (name = 'foto.png') => new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, ...new Array(64).fill(1)])], name, { type: 'image/png' });
+  const pdf = (name = 'doc.pdf') => new File([A('%PDF-1.7', 64)], name, { type: 'application/pdf' });
+
+  // Simulados: borrador, token y subida directa.
+  const puts = [];
+  let holdPut = false;
+  globalThis.fetch = async (url) => {
+    const body = String(url).endsWith('/api/brief/draft') ? { ok: true, draftId, secret: 's3cr3t' } : { ok: true, clientToken: 'tok' };
+    return new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  globalThis.window = { __briefMock: { put: (pathname, blob, opts) => new Promise((resolve, reject) => {
+    puts.push(pathname);
+    const done = () => resolve({ pathname });
+    if (opts.abortSignal) opts.abortSignal.addEventListener('abort', () => reject(new DOMException('Abort', 'AbortError')));
+    if (!holdPut) setTimeout(done, 5);
+  }) } };
+  const preps = [];
+  globalThis.__prep = (file) => { const d = deferred(); preps.push(d); return d.p.then(() => ({ blob: file, name: 'foto.jpg', contentType: 'image/jpeg', convertedFrom: 'image/png', original: false })); };
+  const consoleWarn = console.warn; console.warn = () => {};
+
+  // a) Cancelar mientras dice "Preparando": no se sube nada.
+  let u = new Uploads({ lang: 'es' });
+  u.add([png()], { field: 'photo_files', kind: 'photo' });
+  let row = u.files[0];
+  ok(await until(() => row.status === 'preparing'), 'la foto pasa a "Preparando"');
+  ok(u.busy, 'mientras prepara, el envío espera (busy)');
+  u.cancel(row.id);
+  preps.at(-1).res();
+  await wait(40);
+  eq(row.status, 'canceled', 'cancelar en "Preparando" deja la fila cancelada');
+  eq(puts.length, 0, 'y el archivo NO se sube (B1-R01)');
+  ok(!u.busy, 'una fila cancelada no bloquea el envío');
+
+  // b) Reintentar tras cancelar, con la preparación vieja aún en marcha: una sola subida.
+  u = new Uploads({ lang: 'es' });
+  u.add([png()], { field: 'photo_files', kind: 'photo' });
+  row = u.files[0];
+  await until(() => row.status === 'preparing');
+  const oldPrep = preps.at(-1);
+  u.cancel(row.id);
+  u.retry(row.id);
+  await until(() => preps.at(-1) !== oldPrep);
+  oldPrep.res();
+  preps.at(-1).res();
+  ok(await until(() => row.status === 'done'), 'reintentar tras cancelar termina la subida');
+  await wait(30);
+  eq(puts.length, 1, 'el mismo archivo se sube una sola vez');
+  u.retry(row.id);
+  await wait(20);
+  eq(puts.length, 1, 'reintentar algo ya subido no hace nada');
+
+  // c) Cancelar mientras dice "Revisando" (documento, sin preparación).
+  u = new Uploads({ lang: 'es' });
+  u.add([pdf()], { field: 'doc_files', kind: 'doc' });
+  row = u.files[0];
+  eq(row.status, 'checking', 'el documento empieza en "Revisando"');
+  u.cancel(row.id);
+  await wait(40);
+  eq(row.status, 'canceled', 'cancelar en "Revisando" deja la fila cancelada');
+  eq(puts.length, 1, 'y no se sube');
+
+  // d) Cancelar durante la subida y reintentar: ruta nueva en el segundo intento.
+  holdPut = true;
+  u = new Uploads({ lang: 'es' });
+  u.add([pdf()], { field: 'doc_files', kind: 'doc' });
+  row = u.files[0];
+  ok(await until(() => row.status === 'uploading' && puts.length === 2), 'el documento llega a "Subiendo"');
+  u.cancel(row.id);
+  ok(await until(() => row.status === 'canceled'), 'cancelar en "Subiendo" corta la subida');
+  holdPut = false;
+  u.retry(row.id);
+  ok(await until(() => row.status === 'done'), 'reintentar después de cortar la subida la completa');
+  eq(puts.length, 3, 'un intento nuevo, no dos');
+  ok(puts[1] !== puts[2], 'cada intento usa una ruta nueva');
+
+  // e) Quitar algo ya subido: sale de la lista, viaja marcado y se cuenta aparte.
+  const kept = u.meta().length;
+  u.remove(row.id);
+  eq(u.forField('doc_files').length, 0, 'lo quitado desaparece de la lista');
+  eq(u.removedCount('doc_files'), 1, 'y la zona sabe cuántos quitó el cliente');
+  eq(u.removedCount(), 1, 'también en total, para el mensaje de éxito');
+  eq(u.meta().length, kept, 'sigue viajando al enviar (el servidor guarda lo reservado)');
+  ok(u.meta()[0].tags.note === 'Quitado por el cliente antes de enviar', 'marcado como quitado');
+  eq(u.active.length, 0, 'lo quitado no cuenta para el cupo');
+
+  // f) Quitar algo que aún no se subió: desaparece del todo.
+  u.add([png()], { field: 'photo_files', kind: 'photo' });
+  row = u.files.at(-1);
+  await until(() => row.status === 'preparing');
+  u.remove(row.id);
+  preps.at(-1).res();
+  await wait(40);
+  ok(!u.files.some((f) => f.id === row.id), 'quitar en "Preparando" borra la fila');
+  eq(puts.length, 3, 'y no se sube');
+
+  console.warn = consoleWarn;
+  delete globalThis.window;
 }
 
 console.log(`\ntest:brief-form · ${pass} OK · ${fail} fallos`);

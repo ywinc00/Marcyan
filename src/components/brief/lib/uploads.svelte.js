@@ -78,6 +78,10 @@ export class Uploads {
   #ctrl = new Map();
   #sources = new Map();   // id → { file, blob } (no se guarda en storage)
   #draftP = null;
+  // Turno de revisión por fila: cancelar, quitar o reintentar lo cambia, y
+  // una revisión que vuelve de un await con un turno viejo no encola nada
+  // (si no, cancelar mientras dice "Preparando" acababa subiendo el archivo).
+  #turn = new Map();
 
   // opts: { lang, purpose: 'brief'|'kit', kitToken?, draft?, onDraft?(draft), onChange?() }
   constructor(opts = {}) {
@@ -95,6 +99,9 @@ export class Uploads {
   get active() { return this.files.filter((f) => !f.removed && !['error', 'canceled'].includes(f.status)); }
   get usedBytes() { return this.active.reduce((n, f) => n + (Number(f.size) || 0), 0); }
   forField(field) { return this.files.filter((f) => f.field === field && !f.removed); }
+  // Ya subidos y quitados por el cliente (de un campo o de todos): viajan
+  // marcados al enviar, así que la interfaz lo dice y el éxito no los cuenta.
+  removedCount(field) { return this.files.filter((f) => f.removed && !f.fromServer && (!field || f.field === field)).length; }
 
   // Filas restauradas (sesión) o ya recibidas por el servidor (kit).
   restore(rows = [], { fromServer = false } = {}) {
@@ -157,21 +164,32 @@ export class Uploads {
     this.#onChange();
   }
 
+  #bump(id) { const n = (this.#turn.get(id) || 0) + 1; this.#turn.set(id, n); return n; }
+  // ¿Sigue vigente esta revisión? (la fila existe, no se canceló ni se quitó
+  // y nadie lanzó otra revisión después).
+  #live(id, turn) {
+    const r = this.#row(id);
+    return !!r && this.#turn.get(id) === turn && !r.removed && r.status !== 'canceled' && this.#sources.has(id);
+  }
+
   async #check(id) {
     const r = this.#row(id);
     const src = this.#sources.get(id);
     if (!r || !src) return;
+    const turn = this.#bump(id);
     const lang = this.#lang;
     const rules = this.limits.kinds?.[r.kind] || DEFAULT_LIMITS.kinds[r.kind];
     try {
       if (!src.file.size) return this.#fail(id, MSG.empty[lang]);
       const real = await sniffFile(src.file);
+      if (!this.#live(id, turn)) return;
       if (!allowedFor(r.kind, real)) return this.#fail(id, MSG.type[r.kind][lang]);
       let blob = src.file, name = src.file.name, contentType = real, convertedFrom = null, note = '';
       if (r.kind === 'photo') {
         if (src.file.size > PHOTO_SOURCE_MAX) return this.#fail(id, MSG.tooBig(PHOTO_SOURCE_MAX, lang));
         r.status = 'preparing';
         const p = await preparePhoto(src.file, real);
+        if (!this.#live(id, turn)) return;
         blob = p.blob; name = p.name; contentType = p.contentType; convertedFrom = p.convertedFrom;
         if (p.original) note = p.note || '';
       }
@@ -188,6 +206,7 @@ export class Uploads {
       }
       this.#enqueue(id);
     } catch (err) {
+      if (!this.#live(id, turn)) return; // ya cancelada o quitada: no se pisa su estado
       console.warn('[brief] no se pudo leer el archivo', err && err.message);
       this.#fail(id, MSG.read[lang], true);
     }
@@ -250,6 +269,7 @@ export class Uploads {
   cancel(id) {
     const r = this.#row(id);
     if (!r) return;
+    this.#bump(id); // una revisión en curso ya no encola
     this.#queue = this.#queue.filter((q) => q !== id);
     const c = this.#ctrl.get(id);
     if (c) c.abort();
@@ -259,7 +279,8 @@ export class Uploads {
   retry(id) {
     const r = this.#row(id);
     const src = this.#sources.get(id);
-    if (!r || !src) return;
+    // Solo lo fallado o cancelado: una fila en marcha no se lanza dos veces.
+    if (!r || !src || !['error', 'canceled'].includes(r.status) || this.#ctrl.has(id)) return;
     r.error = ''; r.progress = 0;
     if (src.blob) { r.status = 'queued'; this.#enqueue(id); } else { r.status = 'checking'; this.#check(id); }
   }

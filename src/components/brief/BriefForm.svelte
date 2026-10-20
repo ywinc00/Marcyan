@@ -63,11 +63,17 @@
 
   // ── Guardado automático ─────────────────────────────────────
   let timer = 0;
+  // Solo se guarda (y se ofrece retomar) si hay algo escrito, elegido o subido:
+  // abrir el formulario y salir no debe dejar un "Retomaste tu brief" vacío.
+  const hasAnswers = (d) => Object.values(d || {}).some((v) =>
+    Array.isArray(v) ? v.length > 0 : (v !== null && v !== undefined && v !== false && String(v).trim() !== ''));
   function schedule() {
     if (!hydrated || phase !== 'form') return;
     clearTimeout(timer);
     timer = setTimeout(() => {
-      const ok = saveBrief({ data: $state.snapshot(data), step, lang, visited, files: $state.snapshot(uploads.files), draft: $state.snapshot(uploads.draft), carriedFiles: resumedFiles ? carried : 0 });
+      const files = $state.snapshot(uploads.files);
+      if (!hasAnswers($state.snapshot(data)) && !(files && files.length) && !uploads.draft && !resumedFiles) { clearBrief(); return; }
+      const ok = saveBrief({ data: $state.snapshot(data), step, lang, visited, files, draft: $state.snapshot(uploads.draft), carriedFiles: resumedFiles ? carried : 0 });
       canStore = ok;
     }, 300);
   }
@@ -195,7 +201,9 @@
 
   onMount(() => {
     canStore = storageAvailable();
-    const saved = loadBrief();
+    let saved = loadBrief();
+    // Un guardado sin respuestas ni archivos (de una visita anterior que no escribió nada) no se retoma.
+    if (saved && !hasAnswers(saved.data) && !(saved.files && saved.files.length) && !(saved.filesCount > 0) && !saved.draft) { clearBrief(); saved = null; }
     if (saved) {
       data = { services: [], ...saved.data };
       visited = Math.max(0, Math.min(REVIEW_STEP, saved.visited || saved.step || 0));

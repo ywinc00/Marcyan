@@ -11,12 +11,15 @@
 //            valor anterior y el nuevo. Respuesta: { brief, data, changes }
 //            con changes.fields = las claves que de verdad cambiaron.
 //            400 { errors: { clave: mensaje } } si algún valor no vale.
-//   POST   → { action: 'convert_to_client', client_id? }
+//   POST   → { action: 'convert_to_client', client_id?, allow_duplicate? }
 //            Sin client_id crea el cliente con los datos del brief; con
-//            client_id lo vincula a uno que ya existe. Deja el evento
-//            'converted_to_client' en el historial del brief.
+//            client_id lo vincula a uno que ya existe. Deja UN evento
+//            'converted_to_client' (con el actor) en el historial del brief.
 //            Respuesta: { client, created, linked, already } (201 si se creó).
 //            409 si el brief ya es de OTRO cliente (no se cambia por aquí).
+//            409 { reason: 'duplicate', matches } si al crear ya hay un
+//            cliente con su correo o teléfono: se vincula a uno de ellos
+//            (client_id) o se repite con allow_duplicate: true.
 //   DELETE → elimina el brief (cascade a brief_events) y antes sus archivos en Blob
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
@@ -24,7 +27,7 @@ import {
   logEvent, BRIEF_STATUSES, prepareBriefEdits, applyBriefEdits,
   getBriefClient, linkBriefToClient,
 } from '../../../lib/db.mjs';
-import { createClientFromBrief } from '../../../lib/finance.mjs';
+import { convertBriefToClient, CrmError } from '../../../lib/finance.mjs';
 import { deleteBriefBlobs, isMissingSchema } from '../../../lib/brief-files.mjs';
 import { briefData } from '../../../lib/kit/build.mjs';
 
@@ -173,9 +176,12 @@ export default async function handler(req, res) {
       let created = false;
       let linked = false;
       if (wanted === null) {
-        client = await createClientFromBrief(id);
-        if (!client) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
-        created = true;
+        // convertBriefToClient escribe el evento 'converted_to_client' con el
+        // actor; aquí no se repite (antes quedaba dos veces en el historial).
+        const r = await convertBriefToClient(id, session.email, { checkDuplicates: body.allow_duplicate !== true });
+        if (!r) return res.status(404).json({ ok: false, error: 'Brief no encontrado' });
+        client = r.client;
+        created = r.created;
       } else {
         // El vínculo y su evento van juntos en una sola sentencia.
         const r = await linkBriefToClient(id, wanted, session.email);
@@ -187,18 +193,9 @@ export default async function handler(req, res) {
         id: client.id, client_code: client.client_code,
         business_name: client.business_name, status: client.status,
       };
-      if (created) {
-        // El cliente nuevo ya queda unido al brief por source_brief_id: si el
-        // evento fallara, la ficha lo seguiría mostrando.
-        await logEvent({
-          projectId: id,
-          type: 'converted_to_client',
-          actorEmail: session.email,
-          data: { client_id: Number(slim.id), client_code: slim.client_code, business_name: slim.business_name, created, linked },
-        });
-      }
-      return res.status(created ? 201 : 200).json({ ok: true, client: slim, created, linked, already: false });
+      return res.status(created ? 201 : 200).json({ ok: true, client: slim, created, linked, already: !created && !linked });
     } catch (err) {
+      if (err instanceof CrmError) return res.status(err.status).json({ ok: false, error: err.message, ...err.extra });
       console.error('[admin/briefs/:id POST] error:', err);
       return res.status(500).json({ ok: false, error: 'No se pudo convertir el brief en cliente' });
     }

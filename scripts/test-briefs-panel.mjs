@@ -300,20 +300,40 @@ await check('handlers: notas por POST con tipo note y límite de largo', () => {
   assert.match(s, /NOTE_MAX/);
   assert.ok(s.indexOf('requireAdmin(req, res)') < s.indexOf('getBriefByProjectId(id)'));
 });
-await check('handlers: convertir en cliente deja el evento converted_to_client', () => {
+await check('handlers: convertir en cliente deja UN evento converted_to_client', () => {
   const s = read('api/admin/briefs/[id].mjs');
   assert.match(s, /convert_to_client/);
-  assert.match(s, /type: 'converted_to_client'/);
   assert.match(s, /already: true/);
+  // Integración CRM: al crear lo escribe convertBriefToClient (con el actor) y
+  // al vincular linkBriefToClient; el handler ya no lo repite.
+  assert.match(s, /convertBriefToClient\(id, session\.email/);
+  assert.ok(!/type: 'converted_to_client'/.test(s));
+  const fin = read('lib/finance.mjs');
+  const conv = fin.slice(fin.indexOf('export async function convertBriefToClient'), fin.indexOf('export async function createClientFromBrief'));
+  assert.match(conv, /'converted_to_client', \$\{actorEmail\}/);
 });
 await check('handlers: el correo al cliente guarda su cuerpo en el historial', () => {
   assert.match(read('api/admin/briefs/[id]/email.mjs'), /body: text/);
 });
 await check('correo manual: sin pre-wrap junto a <br> (B-21)', () => {
   const s = read('lib/email.mjs');
-  const fn = s.slice(s.indexOf('export async function emailManualToClient'), s.indexOf('// ── Sección reutilizable'));
+  const fn = s.slice(s.indexOf('export function manualBodyHtml'), s.indexOf('// ── Sección reutilizable'));
   assert.ok(fn.length > 0);
   assert.ok(!/white-space:\s*pre-wrap/.test(fn));
+  assert.match(fn, /html: manualBodyHtml\(text\)/);
+});
+await check('correo manual (A3-11): cada salto llega una vez, también con saltos de Windows', async () => {
+  const { manualBodyHtml, emailManualToClient } = await import('../lib/email.mjs');
+  const one = (body) => manualBodyHtml(body).match(/font-size:14px;line-height:1\.7;color:[^"]*">([\s\S]*?)<\/div>/)[1];
+  assert.equal(one('Hola Ana,\n\nTe mando el kit.\nUn saludo'), 'Hola Ana,<br><br>Te mando el kit.<br>Un saludo');
+  assert.equal(one('<b>x</b> & "y"'), '&lt;b&gt;x&lt;/b&gt; &amp; &quot;y&quot;');
+  assert.ok(!/pre-wrap/.test(manualBodyHtml('a\nb')));
+  // Los \r\n y \r sueltos se normalizan antes de pintar (sin \r, ningún salto doble).
+  const src = read('lib/email.mjs');
+  const fn = src.slice(src.indexOf('export async function emailManualToClient'), src.indexOf('// ── Sección reutilizable'));
+  assert.match(fn, /String\(body \?\? ''\)\.replace\(\/\\r\\n\?\/g, '\\n'\)/);
+  assert.equal(one('Hola\r\n\r\nGracias\rAdiós'.replace(/\r\n?/g, '\n')), 'Hola<br><br>Gracias<br>Adiós');
+  assert.equal(typeof emailManualToClient, 'function');
 });
 await check('panel: la ficha nunca pinta un archivo que el servidor no marcó en línea', () => {
   const s = read('src/components/dashboard/briefs/BriefFiles.svelte');

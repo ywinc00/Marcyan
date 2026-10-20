@@ -122,10 +122,43 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
 - Vincular a un cliente existente (`linkBriefToClient`) escribe el `source_brief_id` (solo si el
   cliente no tenía brief de origen) y el evento `converted_to_client` en UNA sentencia.
 - Si el cliente ya tenía otro brief de origen, el vínculo vive solo en el evento del brief: la ficha
-  del brief lo muestra (`getBriefClient`), pero la ficha del cliente de A2 lista sus briefs por
-  `source_brief_id` y `projects.brief_project_id`, así que no lo verá. Al integrar la ola 2 hay que
-  decidir si A2 lee también los eventos `converted_to_client` o si se crea un vínculo real.
+  del brief lo muestra (`getBriefClient`) y la ficha del cliente también, porque `getClientRelated`
+  lee los eventos `converted_to_client` (resuelto en la integración, ver abajo).
 - La tarjeta Cliente de la ficha del brief enlaza a `#/clientes/<id numérico>` (el formato que lee
   `ClientesSection` de A2 y `/api/admin/clients/:id`), no al código CLI.
-- Al fusionar con A2: su `createClientFromBrief` pasa a registrar él mismo `converted_to_client`;
-  el handler del brief también lo registra al crear. Hay que quitar uno de los dos para no duplicar.
+
+## Integración CRM (rama `orbit/int1`)
+- **Un solo `converted_to_client` por conversión.** Al CREAR un cliente desde un brief lo escribe
+  `convertBriefToClient(pid, actorEmail, { checkDuplicates })` (`lib/finance.mjs`), con el actor y
+  `data = { client_id, client_code, business_name, created: true, linked: false }`. El handler
+  `POST /api/admin/briefs/:id` ya no lo repite. Al VINCULAR lo escribe `linkBriefToClient` (con
+  `linked: true`); desde un lead, `convertLead` (con `lead`). `createClientFromBrief` sigue como
+  compatibilidad y no comprueba duplicados.
+- **Duplicados en el alta desde un brief.** `POST /api/admin/briefs/:id { action:'convert_to_client',
+  allow_duplicate? }` y `POST /api/admin/clients { from_brief, allow_duplicate? }` responden
+  **409 `{ reason:'duplicate', matches[] }`** si ya hay un cliente con el correo (sin mayúsculas) o
+  el teléfono (10 últimos dígitos) del brief. El panel ofrece "Usar este" (vincula con `client_id`)
+  o "No es el mismo, crear uno nuevo igualmente" (repite con `allow_duplicate: true`). Un brief ya
+  vinculado responde antes 200 `already` / `created:false`, sin mirar duplicados.
+  Los demás puntos de alta ya lo hacían: `POST /api/admin/clients` (alta manual),
+  `POST /api/admin/leads/:id/convert` y `{ from_lead }`.
+- **Ficha del cliente sin briefs repetidos.** `related.briefs` reúne, sin repetir, el brief de
+  origen (`source_brief_id`), los de sus proyectos, los vinculados por su último evento
+  `converted_to_client` y los de sus leads convertidos.
+- **Lead que deja "Convertido"** (con la 011 aplicada): `PATCH /api/admin/leads/:id { status }`
+  conserva `converted_client_id`, `converted_brief_id` y `converted_at` (solo escribe `status`), y
+  el evento `status_changed` lleva `kept: { client_id, brief_id }`. Los recuentos (`stats.converted`,
+  pastillas, embudo) cuentan por **estado**, así que deja de contar como convertido y todo cuadra;
+  volver a marcarlo Convertido lo acepta porque tiene vínculos. El panel avisa antes con un
+  ConfirmDialog. Sin vínculos sigue el 409 `use_convert` de A2-R6; sin la 011, como siempre.
+- **Selector de cliente único:** `crm/ClientPicker.svelte` (`GET /api/admin/clients?search=&limit=8&active=1`,
+  nunca archivados) en conversión de lead y de brief, factura (alta y edición) y proyecto. Props
+  nuevas: sin `oncreate`, `allowCreate` abre el alta (`NewClientDialog`) y elige el cliente creado o
+  el existente; `autoOption` + `auto`/`onauto` para la opción "cliente del brief / cuenta Directo"
+  de Progreso. `NewClientDialog` acepta `onuse(match)` ("Usar este" en vez de "Abrir ficha").
+  El "Nuevo cliente" de Finanzas es ese mismo alta; "Cliente desde brief" queda en
+  `finanzas/ClientForm.svelte` con el aviso de duplicados.
+- **Correo manual al cliente (A3-11, B-21).** `emailManualToClient` normaliza `\r\n` y `\r` a `\n`
+  y pinta el cuerpo con `manualBodyHtml(text)`: saltos como `<br>` y SIN `white-space:pre-wrap`
+  (con los dos, cada salto llegaba doble). El texto plano del correo va con los saltos ya
+  normalizados. Probado en `npm run test:briefs-panel`.

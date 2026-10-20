@@ -12,9 +12,12 @@
 //        → 400 { error, fields }  sin nombre, correo o teléfono no válidos (CRM-16)
 //        → 409 { error, reason: 'duplicate', matches }  ya hay un cliente con ese
 //          correo o teléfono (se repite con allow_duplicate: true para crearlo igual)
-//   POST { from_brief: 'MRC-XXX' }  (sin distinguir mayúsculas)
+//   POST { from_brief: 'MRC-XXX', allow_duplicate? }  (sin distinguir mayúsculas)
 //        → 201 { client, created: true } o 200 { client, created: false } si ya
 //          existía un cliente de ese brief (CRM-04). 404 si el brief no existe.
+//          409 { reason: 'duplicate', matches } si ya hay un cliente con el
+//          correo o el teléfono del brief (repetir con allow_duplicate: true, o
+//          vincularlo con POST /api/admin/briefs/:id { client_id }).
 //          "Ya existía" incluye el brief vinculado a un cliente anterior desde
 //          la ficha del brief (evento converted_to_client). Vincular un brief a
 //          un cliente que ya existe NO se hace aquí: es POST /api/admin/briefs/:id
@@ -58,7 +61,7 @@ export default async function handler(req, res) {
       // Conversión brief → cliente
       if (body.from_brief) {
         const pid = String(body.from_brief).trim().toUpperCase();
-        const r = await convertBriefToClient(pid, session.email);
+        const r = await convertBriefToClient(pid, session.email, { checkDuplicates: body.allow_duplicate !== true });
         if (!r) return res.status(404).json({ ok: false, error: `No existe el brief ${pid}.` });
         return res.status(r.created ? 201 : 200).json({ ok: true, client: r.client, created: r.created });
       }

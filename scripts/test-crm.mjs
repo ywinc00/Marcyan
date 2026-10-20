@@ -8,11 +8,18 @@
 //                       duplicados (409), ya convertido, sin migración (503).
 //    · crm/crm.js       filtros de la URL ↔ API, textos y formato.
 //    · Estático: la migración 011 es idempotente y lleva advisory lock.
+//    · Integración CRM (int1): brief → cliente con UN solo evento y con
+//      duplicados (409), briefs de la ficha sin repetir, lead que deja
+//      "Convertido" conservando sus vínculos, y selector de cliente único.
+//      Lo que usa la base corre sobre una copia de lib/finance.mjs y
+//      lib/leads.mjs con @vercel/postgres sustituido por un doble en memoria
+//      (nunca toca la base real).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { register } from 'node:module';
 
 import {
   validateClientInput, normalizeEmail, phoneKey, buildClientFilter, clientDisplayName,
@@ -20,12 +27,12 @@ import {
 } from '../lib/finance.mjs';
 import {
   convertLead, leadToClientData, leadToBriefColumns, packFacet, buildLeadFilter,
-  safeHttpUrl, statusChangeError,
+  safeHttpUrl, statusChangeError, keptConversionLinks,
 } from '../lib/leads.mjs';
 import {
   leadFiltersFromQuery, leadQueryPatch, leadApiParams, leadFilterPhrase,
   clientFiltersFromQuery, clientApiParams, clientQueryPatch, money, phoneHref, whatsappHref,
-  deleteImpactText, leadEventText, leadStatus, leadSource,
+  deleteImpactText, leadEventText, leadStatus, leadSource, leavingConvertedMessage,
 } from '../src/components/dashboard/crm/crm.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -418,6 +425,165 @@ await check('estático: el endpoint de conversión exige sesión antes de nada',
   const src = fs.readFileSync(path.join(ROOT, 'api/admin/leads/[id]/convert.mjs'), 'utf8');
   const i = src.indexOf('await requireAdmin(');
   assert.ok(i > 0 && i < src.indexOf('convertLead(id'));
+});
+
+// ── Integración CRM (int1) ──────────────────────────────────────
+// Doble de @vercel/postgres SOLO para las copias "?crmfake" de los módulos.
+const PG_FAKE = `
+const run = (text, params) => {
+  const f = globalThis.__crmSql;
+  if (typeof f !== 'function') throw new Error('[prueba] sin doble de la base');
+  (globalThis.__crmSqlLog ||= []).push({ text, params });
+  return Promise.resolve(f(text, params) || []).then((rows) => ({ rows, rowCount: rows.length }));
+};
+export function sql(strings, ...values) { return run(strings.reduce((a, s, i) => a + '$' + i + s), values); }
+sql.query = run;
+export const db = { connect() { throw new Error('[prueba] connect() no disponible'); } };
+`;
+const PG_HOOK = `
+const FAKE = ${JSON.stringify('data:text/javascript,' + encodeURIComponent(PG_FAKE))};
+export async function resolve(specifier, context, next) {
+  if (specifier === '@vercel/postgres' && (context.parentURL || '').includes('crmfake')) return { url: FAKE, shortCircuit: true };
+  return next(specifier, context);
+}`;
+register('data:text/javascript,' + encodeURIComponent(PG_HOOK), import.meta.url);
+const FIN = await import(pathToFileURL(path.join(ROOT, 'lib/finance.mjs')).href + '?crmfake');
+const LEADS = await import(pathToFileURL(path.join(ROOT, 'lib/leads.mjs')).href + '?crmfake');
+function fakeSql(handler) { globalThis.__crmSqlLog = []; globalThis.__crmSql = handler; return () => globalThis.__crmSqlLog; }
+
+const BRIEF_ROW = { project_id: 'MRC-021', business_name: 'Tacos Sol', owner_name: 'Rosa', email: 'Rosa@Sol.test', phone: '(713) 555-0118', city_state: 'Houston, TX', summary: null };
+function briefDb({ dup = false } = {}) {
+  return (text) => {
+    if (/FROM briefs WHERE project_id/.test(text)) return [BRIEF_ROW];
+    if (/FROM clients WHERE source_brief_id/.test(text)) return [];
+    if (/FROM brief_events/.test(text) && /JOIN/.test(text)) return [];
+    if (/LOWER\(email\)/.test(text)) return dup ? [{ id: 3, client_code: 'CLI-003', business_name: 'Tacos Sol Centro', email: 'rosa@sol.test', status: 'active' }] : [];
+    if (/INSERT INTO clients/.test(text)) return [{ id: 9, client_code: 'CLI-009', business_name: 'Tacos Sol', status: 'active' }];
+    if (/INSERT INTO brief_events/.test(text)) return [];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  };
+}
+
+await check('int1: brief → cliente con duplicado por correo o teléfono → 409 con coincidencias y sin crear', async () => {
+  const log = fakeSql(briefDb({ dup: true }));
+  await assert.rejects(
+    () => FIN.convertBriefToClient('mrc-021', 'equipo@marcyan.test', { checkDuplicates: true }),
+    (e) => e.status === 409 && e.extra.reason === 'duplicate' && e.extra.matches[0].client_code === 'CLI-003' && /CLI-003/.test(e.message));
+  assert.ok(!log().some((c) => /INSERT/.test(c.text)), 'no crea nada');
+  // El correo del brief se compara en minúsculas y el teléfono por sus 10 dígitos.
+  const dupQ = log().find((c) => /LOWER\(email\)/.test(c.text));
+  assert.deepEqual(dupQ.params.slice(0, 2), ['rosa@sol.test', '7135550118']);
+});
+await check('int1: brief → cliente "crear igualmente" (sin comprobar) crea y deja UN evento con su actor', async () => {
+  const log = fakeSql(briefDb({ dup: true }));
+  const r = await FIN.convertBriefToClient('MRC-021', 'equipo@marcyan.test');
+  assert.equal(r.created, true);
+  assert.equal(r.client.client_code, 'CLI-009');
+  assert.ok(!log().some((c) => /LOWER\(email\)/.test(c.text)), 'por defecto no busca duplicados');
+  const evs = log().filter((c) => /INSERT INTO brief_events/.test(c.text));
+  assert.equal(evs.length, 1, 'un solo converted_to_client');
+  assert.match(evs[0].text, /'converted_to_client'/);
+  assert.equal(evs[0].params[1], 'equipo@marcyan.test');
+  const data = JSON.parse(evs[0].params[2]);
+  assert.deepEqual({ client_id: data.client_id, created: data.created, linked: data.linked }, { client_id: 9, created: true, linked: false });
+});
+await check('int1: brief ya vinculado (por origen o por evento) → created:false y ningún evento nuevo', async () => {
+  const log = fakeSql((text) => {
+    if (/FROM briefs WHERE project_id/.test(text)) return [BRIEF_ROW];
+    if (/FROM clients WHERE source_brief_id/.test(text)) return [];
+    if (/FROM brief_events/.test(text) && /JOIN/.test(text)) return [{ id: 3, client_code: 'CLI-003' }];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  });
+  const r = await FIN.convertBriefToClient('MRC-021', 'equipo@marcyan.test', { checkDuplicates: true });
+  assert.equal(r.created, false);
+  assert.equal(r.client.client_code, 'CLI-003');
+  assert.ok(!log().some((c) => /INSERT/.test(c.text)));
+});
+await check('int1: el handler del brief ya no escribe su propio converted_to_client', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'api/admin/briefs/[id].mjs'), 'utf8');
+  const post = src.slice(src.indexOf("req.method === 'POST'"), src.indexOf("req.method === 'DELETE'"));
+  assert.ok(!/type: 'converted_to_client'/.test(post), 'sin logEvent duplicado');
+  assert.match(post, /convertBriefToClient\(id, session\.email, \{ checkDuplicates: body\.allow_duplicate !== true \}\)/);
+  const cli = fs.readFileSync(path.join(ROOT, 'api/admin/clients.mjs'), 'utf8');
+  assert.match(cli, /convertBriefToClient\(pid, session\.email, \{ checkDuplicates: body\.allow_duplicate !== true \}\)/);
+});
+await check('int1: la ficha del cliente lista cada brief una vez (origen, proyecto, evento y lead)', async () => {
+  const log = fakeSql((text) => {
+    if (/FROM projects WHERE client_id/.test(text)) return [{ id: 1, brief_project_id: 'MRC-021' }];
+    if (/FROM invoices i/.test(text)) return [];
+    if (/AS projects/.test(text)) return [{ projects: 1, milestones: 0, invoices: 0, payments: 0, payments_cents: 0 }];
+    if (/DISTINCT ON \(project_id\)/.test(text)) return [{ project_id: 'MRC-021' }, { project_id: 'MRC-030' }];
+    if (/FROM leads/.test(text)) return [{ ref_id: 'LEAD-031', converted_brief_id: 'MRC-030' }];
+    if (/FROM briefs WHERE project_id = ANY/.test(text)) return [];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  });
+  await FIN.getClientRelated({ id: 3, source_brief_id: 'MRC-021', source_lead_id: null });
+  const q = log().find((c) => /FROM briefs WHERE project_id = ANY/.test(c.text));
+  assert.deepEqual([...q.params[0]].sort(), ['MRC-021', 'MRC-030']);
+});
+await check('int1: lead que deja "Convertido" conserva cliente y brief y lo dice el historial', async () => {
+  const lead = { ref_id: 'LEAD-031', status: 'converted', notes: null, converted_client_id: 9, converted_brief_id: 'MRC-030', converted_at: '2026-10-01' };
+  const log = fakeSql((text) => {
+    if (/SELECT \* FROM leads WHERE ref_id/.test(text)) return [lead];
+    if (/^UPDATE leads/.test(text.trim())) return [];
+    if (/INSERT INTO lead_events/.test(text)) return [];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  });
+  await LEADS.updateLead('LEAD-031', { status: 'contacted' }, 'equipo@marcyan.test');
+  const up = log().find((c) => /^UPDATE leads/.test(c.text.trim()));
+  assert.match(up.text, /SET status = \$1 WHERE/);
+  assert.ok(!/converted_/.test(up.text), 'no toca los vínculos de la conversión');
+  const ev = log().find((c) => /INSERT INTO lead_events/.test(c.text));
+  assert.deepEqual(JSON.parse(ev.params[3]), { from: 'converted', to: 'contacted', kept: { client_id: 9, brief_id: 'MRC-030' } });
+});
+await check('int1: KPI y pastillas cuentan por estado (un lead que deja Convertido deja de contar)', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'lib/leads.mjs'), 'utf8');
+  const stats = src.slice(src.indexOf('export async function leadStats'), src.indexOf('// ── Mutaciones'));
+  assert.match(stats, /FILTER \(WHERE status = 'converted'\)::int\s+AS converted/);
+  assert.ok(!/converted_client_id/.test(stats));
+});
+await check('int1: keptConversionLinks y el aviso del panel', () => {
+  const conv = { ref_id: 'LEAD-031', status: 'converted', converted_client_id: 9, converted_brief_id: 'MRC-030' };
+  assert.deepEqual(keptConversionLinks(conv, 'new'), { client_id: 9, brief_id: 'MRC-030' });
+  assert.equal(keptConversionLinks(conv, 'converted'), null);
+  assert.equal(keptConversionLinks({ ...conv, status: 'contacted' }, 'new'), null);
+  assert.equal(keptConversionLinks({ ...conv, converted_client_id: null, converted_brief_id: null }, 'new'), null, 'convertido de etiqueta (antes de la 011)');
+  const msg = leavingConvertedMessage(conv, 'contacted');
+  assert.match(msg, /conservará su cliente y el brief MRC-030/);
+  assert.match(msg, /Dejará de contar en Convertidos/);
+  assert.ok(!/—/.test(msg));
+  assert.match(leavingConvertedMessage({ ...conv, converted_brief_id: null }, 'archived'), /conservará su cliente:/);
+  assert.equal(leavingConvertedMessage(conv, 'converted'), null);
+  assert.equal(leavingConvertedMessage({ ...conv, converted_client_id: null, converted_brief_id: null }, 'new'), null);
+  assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'converted', to: 'new', kept: { client_id: 9, brief_id: 'MRC-030' } } }),
+    'Estado: Convertido → Nuevo (conserva su cliente y el brief MRC-030)');
+  const sel = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/LeadStatusSelect.svelte'), 'utf8');
+  assert.match(sel, /ConfirmDialog/);
+  assert.match(sel, /crmReady && leavingConvertedMessage\(lead, next\)/, 'solo con la migración 011');
+});
+await check('int1: ClientPicker es el único selector de cliente y no ofrece archivados', () => {
+  const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
+  for (const f of ['briefs/ConvertDialog.svelte', 'finanzas/InvoiceForm.svelte', 'progreso/ProjectForm.svelte', 'crm/ConvertLeadDialog.svelte']) {
+    const src = read(f);
+    assert.match(src, /import ClientPicker from '(\.\.\/crm|\.)\/ClientPicker\.svelte'/, f + ' usa ClientPicker');
+    assert.ok(!/\/api\/admin\/clients\?/.test(src), f + ' no busca clientes por su cuenta');
+  }
+  assert.ok(!/\/api\/admin\/clients/.test(read('progreso/options.svelte.js')));
+  const picker = read('crm/ClientPicker.svelte');
+  assert.match(picker, /if \(!includeArchived\) p\.set\('active', '1'\)/);
+  // Alta desde el selector: el envío del alta no se propaga al formulario de fuera.
+  assert.match(picker, /<NewClientDialog bind:open=\{newOpen\}[^>]*onuse=\{pick\}/);
+  assert.match(read('crm/NewClientDialog.svelte'), /e\.preventDefault\(\); e\.stopPropagation\(\);/);
+});
+await check('int1: todos los puntos de alta ofrecen "usar el existente" o "crear igualmente"', () => {
+  const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
+  for (const f of ['crm/NewClientDialog.svelte', 'crm/ConvertLeadDialog.svelte', 'briefs/ConvertDialog.svelte', 'finanzas/ClientForm.svelte']) {
+    const src = read(f);
+    assert.match(src, /reason === 'duplicate'/, f + ' entiende el 409');
+    assert.match(src, /<DuplicateNotice[^>]*onuse=/, f + ' ofrece usar el existente');
+    assert.match(src, /onforce=/, f + ' ofrece crear igualmente');
+  }
+  assert.match(read('FinanzasSection.svelte'), /<NewClientDialog bind:open=\{newClientOpen\}/, 'el Nuevo cliente de Finanzas es el alta única');
 });
 
 if (fails.length) {

@@ -5,7 +5,9 @@
   //
   //  · GET /api/kit/:token precarga lo que ya sabemos y lo guardado antes.
   //  · Lista de bloques (secciones del momento 'arranque') con estado
-  //    (listo, a medias, pendiente, opcional) y progreso total.
+  //    (listo, a medias, pendiente, opcional) y progreso total. Si el brief
+  //    no traía preguntas del brief corto (chat o formulario anterior), van
+  //    primero en el bloque "Lo que nos falta de tu brief" (revisión R1).
   //  · Cada bloque abre su panel; se guarda por bloque (POST action 'save')
   //    y al final se envía todo (action 'submit').
   //  · Fotos por tomas guiadas (ShotUploads); el resto de archivos en su zona.
@@ -22,7 +24,7 @@
   import Ico from './Ico.svelte';
   import { strings, pick } from './lib/strings.js';
   import { Uploads } from './lib/uploads.svelte.js';
-  import { kitTokenFrom, kitBlocks, blockStatus, errorsForBlock, validateKit, blockData, shotsDone, SHOTS_TOTAL } from './lib/kit.js';
+  import { kitTokenFrom, kitBlocks, blockStatus, errorsForBlock, validateKit, blockData, visibleFields, shotsDone, SHOTS_TOTAL } from './lib/kit.js';
   import { loadKitLocal, saveKitLocal, clearKitLocal } from './lib/persist.js';
   import { fmtBytes } from './lib/sniff.js';
 
@@ -46,14 +48,14 @@
   let panel = $state();
 
   const services = $derived(meta && Array.isArray(meta.services) ? meta.services : []);
-  const blocks = $derived(meta ? kitBlocks(services, meta.sections) : []);
+  const blocks = $derived(meta ? kitBlocks(services, meta.sections, meta.catchup) : []);
   const files = $derived(uploads ? uploads.files : []);
   const statuses = $derived(Object.fromEntries(blocks.map((b) => [b.key, blockStatus(b, data, files, saved)])));
   const doneCount = $derived(blocks.filter((b) => statuses[b.key] && statuses[b.key].status === 'done').length);
   const current = $derived(blocks.find((b) => b.key === open) || null);
   const missing = $derived.by(() => {
     if (!meta) return [];
-    const v = validateKit(collectAll(), services, false);
+    const v = validateKit(collectAll(), services, false, blocks);
     const keys = new Set(Object.keys(v.errors).map((k) => k.split('.')[0]));
     return blocks.filter((b) => b.fields.some((f) => keys.has(f.key)));
   });
@@ -78,7 +80,7 @@
   function markSaved(b) { lastSaved[b.key] = snap(b); }
   async function saveQuietly(b) {
     if (!b || phase !== 'ready' || lastSaved[b.key] === snap(b)) return;
-    const v = validateKit(data, services, true);
+    const v = validateKit(data, services, true, blocks);
     if (Object.keys(errorsForBlock(b, v.errors)).length) return; // con errores no se guarda a ciegas
     try {
       const { res, json } = await post('save', blockData(b, data));
@@ -160,7 +162,7 @@
     if (!current) return;
     saveError = ''; saveNote = '';
     if (uploads && uploads.busy) { saveError = t.busyUploads; return; }
-    const v = validateKit(data, services, true);
+    const v = validateKit(data, services, true, blocks);
     const errs = errorsForBlock(current, v.errors);
     errors = errs;
     if (Object.keys(errs).length) { focusFirstError(); return; }
@@ -205,7 +207,7 @@
   async function submitKit() {
     sendError = '';
     if (uploads && uploads.busy) { sendError = t.busyUploads; return; }
-    if (missing.length) { await openBlock(missing[0].key); const v = validateKit(collectAll(), services, false); errors = errorsForBlock(missing[0], v.errors); focusFirstError(); return; }
+    if (missing.length) { await openBlock(missing[0].key); const v = validateKit(collectAll(), services, false, blocks); errors = errorsForBlock(missing[0], v.errors); focusFirstError(); return; }
     sendState = 'sending';
     try {
       const { res, json } = await post('submit', collectAll());
@@ -323,7 +325,7 @@
         <h2 class="panel__title" tabindex="-1" data-block-title>{pick(current.label, lang)}</h2>
         {#if current.help}<p class="panel__help">{pick(current.help, lang)}</p>{/if}
         <form class="panel__fields" novalidate onsubmit={(e) => { e.preventDefault(); saveBlock(); }}>
-          {#each current.fields as fd (fd.key)}
+          {#each visibleFields(current, data) as fd (fd.key)}
             {#if fd.type === 'file'}
               {#if fd.key === 'kit_photo_files'}
                 <ShotUploads {uploads} field={fd} {lang} quota={false} />

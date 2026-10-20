@@ -7,10 +7,10 @@
 // ─────────────────────────────────────────────────────────────
 import {
   SECTIONS, FIELDS, FILE_TAG_DEFS, BRIEF_SERVICES,
-  labelFor, shortLabel, isActive,
+  labelFor, shortLabel, isActive, isMissing, isLegacyBrief,
 } from '../../../../lib/brief-schema.mjs';
 
-export { FIELDS, BRIEF_SERVICES, labelFor };
+export { FIELDS, BRIEF_SERVICES, labelFor, isLegacyBrief };
 
 // ── Estados del brief ────────────────────────────────────────
 // slug = cómo se escribe en la URL (#/briefs?estado=en-curso).
@@ -104,7 +104,7 @@ export function valuePills(fd, v) {
  * → [{ key, title, moment, rows: [{ fd, key, label, value, span, pills, editable }] }]
  *   moment: 'inicial' | 'anterior' | 'arranque'
  */
-export function viewSections(data = {}, { edit = false, kitReceived = false } = {}) {
+export function viewSections(data = {}, { edit = false, kitReceived = false, legacy = false } = {}) {
   const services = Array.isArray(data.services) ? data.services : [];
   const out = [];
   for (const s of SECTIONS) {
@@ -117,8 +117,12 @@ export function viewSections(data = {}, { edit = false, kitReceived = false } = 
       const editable = EDITABLE_TYPES.has(fd.type);
       const inicialActive = fd.moment === 'inicial' && isActive(fd, services);
       const show = !empty
-        // Una casilla sí/no sin marcar ("No tengo colores definidos") no es un dato que falte.
-        || (edit ? editable && (fd.storage === 'column' || inicialActive) : inicialActive && !fd.hidden && !(fd.type === 'checkbox' && !fd.options));
+        // En lectura, "Sin dato" solo si de verdad falta (isMissing, la misma
+        // regla que el documento y BRIEF.md): un sí/no sin marcar, lo que otra
+        // respuesta descarta, lo de servicios en un brief sin servicios y las
+        // preguntas nuevas en un brief histórico no faltan.
+        || (edit ? editable && (fd.storage === 'column' || inicialActive)
+          : fd.moment === 'inicial' && isMissing(fd, data, { services, legacy }));
       if (!show) continue;
       rows.push({
         fd, key: fd.key, label: fieldLabel(fd), value: empty ? null : value,

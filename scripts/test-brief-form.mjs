@@ -15,7 +15,7 @@ import { STEPS, REVIEW_STEP, INITIAL_FIELDS, stepOfField, fieldsForStep, itemsFo
 import { sniffBytes, CLIENT_KINDS, allowedFor, fmtBytes, withExt, DEFAULT_LIMITS } from '../src/components/brief/lib/sniff.js';
 import { fitWithin, PHOTO_MAX_SIDE, PHOTO_QUALITY } from '../src/components/brief/lib/images.js';
 import { splitForStorage, CONTACT_KEYS, loadBrief } from '../src/components/brief/lib/persist.js';
-import { kitTokenFrom, kitBlocks, blockStatus, cleanForSend, blockData, isFilled, shotsDone, SHOTS_TOTAL, errorsForBlock } from '../src/components/brief/lib/kit.js';
+import { kitTokenFrom, kitBlocks, blockStatus, cleanForSend, blockData, isFilled, shotsDone, SHOTS_TOTAL, errorsForBlock, visibleFields, validateKit } from '../src/components/brief/lib/kit.js';
 import { STRINGS_ES, STRINGS_EN } from '../src/components/brief/lib/strings.js';
 import { KIND_RULES, DRAFT_LIMITS, buildPathname, parseBlobPathname } from '../lib/brief-upload-rules.mjs';
 import { sectionsFor, fieldByKey, SECTIONS } from '../lib/brief-schema.mjs';
@@ -128,6 +128,9 @@ ok(allowedFor('logo', 'image/svg+xml') && allowedFor('photo', 'image/heic'), 'SV
 ok(CLIENT_KINDS.photo.accept.startsWith('image/jpeg'), 'accept de fotos pide image/jpeg primero');
 for (const [k, r] of Object.entries(CLIENT_KINDS)) {
   ok(KIND_RULES[k], `clase ${k} existe en el servidor`);
+  // Fotos: el cliente elige HEIC, PNG o WebP, pero lo que sube es SIEMPRE el
+  // JPEG redibujado en el navegador (R5); el servidor solo acepta ese.
+  if (k === 'photo') { eq(KIND_RULES.photo.declared, ['image/jpeg'], 'foto: el servidor solo acepta el JPEG del navegador'); continue; }
   for (const t of r.types) ok(KIND_RULES[k].declared.includes(t), `${k}: ${t} lo acepta el servidor`);
 }
 eq(DEFAULT_LIMITS.maxFiles, DRAFT_LIMITS.maxFiles, 'tope de archivos igual al del servidor');
@@ -183,6 +186,18 @@ ok(!isFilled(fieldByKey('responders'), [{ channel: '', person: '', languages: []
 const ubic = SECTIONS.find((s) => s.key === 'ubicacion');
 ok(!('legal_name' in blockData(ubic, { legal_name: 'X', address: 'Y' })), 'guardar un bloque manda solo sus campos');
 eq(Object.keys(errorsForBlock(canales, { leads_email: {}, legal_name: {}, 'responders.0.person': {} })), ['leads_email', 'responders.0.person'], 'errores del kit filtrados por bloque');
+// Bloque "Lo que nos falta de tu brief" (R1): va primero, oculta lo que otra
+// respuesta descarta, se manda y se valida con las reglas del brief corto.
+const CATCH = ['contact_language', 'bot_channels', 'brand_status', 'brand_color_list', 'brand_colors_none'];
+const withPend = kitBlocks(['ia-conversacional'], null, CATCH);
+eq(withPend[0].key, 'pendientes', 'lo que falta del brief va primero');
+eq(withPend[0].fields.map((f) => f.key), CATCH, 'con las claves que anuncia el servidor, en orden del esquema');
+ok(!kitBlocks(['ia-conversacional'], null, []).some((b) => b.catchup), 'sin pendientes no hay bloque');
+ok(!visibleFields(withPend[0], { brand_colors_none: true }).some((f) => f.key === 'brand_color_list'), '"No tengo colores" oculta la lista');
+eq(Object.keys(blockData(withPend[0], { brand_colors_none: true, brand_color_list: [{ name: 'rojo', hex: '' }], contact_language: 'en' })).sort(), ['brand_colors_none', 'contact_language'], 'lo oculto no se manda');
+ok(validateKit({ contact_language: 'fr' }, ['ia-conversacional'], true, withPend).errors.contact_language, 'se valida con las opciones del brief');
+ok(validateKit({ contact_language: 'en', bot_channels: ['web'] }, ['ia-conversacional'], true, withPend).ok, 'respuestas válidas pasan');
+ok(!validateKit({ contact_language: 'fr' }, ['ia-conversacional'], true, kitBlocks(['ia-conversacional'], null)).errors.contact_language, 'sin el bloque, la clave no es del kit');
 
 // ── 8. Textos: mismas claves ES/EN, sin em-dash ni voseo ─────
 eq(Object.keys(STRINGS_ES).sort(), Object.keys(STRINGS_EN).sort(), 'mismas claves en ES y EN');

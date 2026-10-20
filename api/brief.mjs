@@ -27,7 +27,7 @@ import {
 } from '../lib/brief-schema.mjs';
 import { rateLimit, LIMITS } from '../lib/ratelimit.mjs';
 import {
-  getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, blobConfigured, isMissingSchema,
+  getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, blobConfigured, isMissingSchema, queueDraftSweep,
 } from '../lib/brief-files.mjs';
 import { secretMatches } from '../lib/brief-upload-rules.mjs';
 
@@ -235,12 +235,17 @@ export default async function handler(req, res) {
     // entra sin archivos en vez de quitárselos al primero.
     let fileRows = [];
     if (draft) {
+      let claimed = false;
       try {
-        const claimed = await markDraftSubmitted(draft.id, inserted.id);
+        claimed = await markDraftSubmitted(draft.id, inserted.id);
         if (!claimed) console.warn(`[brief] ${projectId} el borrador de archivos ya se envió con otro brief; este entra sin archivos`);
         else if (blobConfigured()) fileRows = await reconcileDraft({ draftId: draft.id, briefId: inserted.id, filesMeta: body.files });
       } catch (err) {
         console.error(`[brief] ${projectId} conciliación de archivos falló:`, err && err.message);
+        // El borrador ya está cerrado y el cron de limpieza no lo vería: entra
+        // en la cola de reintento (enlaza lo que el cliente dejó y borra lo
+        // que quitó). R4.
+        if (claimed) await queueDraftSweep(draft.id, body.files);
       }
     }
 

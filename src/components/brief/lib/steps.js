@@ -8,7 +8,7 @@
 //  sección (FALLBACK) y test:brief-form avisa.
 //  Puro (sin DOM): lo prueba scripts/test-brief-form.mjs.
 // ════════════════════════════════════════════════════════════════
-import { sectionsFor, validate, fieldByKey, isActive, SERVICE_IDS } from '../../../../lib/brief-schema.mjs';
+import { sectionsFor, validate, fieldByKey, isActive, isSkipped, SERVICE_IDS } from '../../../../lib/brief-schema.mjs';
 
 const L = (es, en) => ({ es, en });
 
@@ -105,12 +105,10 @@ export function itemsForStep(index, services) {
 // Preguntas que dependen de otra respuesta del mismo paso. Ocultas no se
 // borran (nada se pierde si el cliente cambia de idea), pero no se validan
 // ni se envían.
-export function isHidden(key, data) {
-  const d = data || {};
-  if (key === 'brand_status') return d.has_logo === 'no'; // sin logo: la marca es nueva
-  if (key === 'brand_color_list') return d.brand_colors_none === true;
-  return false;
-}
+// La regla vive en el esquema (SKIP_IF): la misma para el kit, la ficha del
+// panel, el documento y BRIEF.md. Sin logo no se pregunta si la marca está
+// cerrada; con "No tengo colores definidos" no se pide la lista.
+export const isHidden = (key, data) => isSkipped(key, data);
 
 // Lo que de verdad se valida y se envía: sin lo oculto y sin las respuestas
 // de servicios que el cliente ya no eligió.

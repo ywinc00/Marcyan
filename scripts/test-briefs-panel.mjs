@@ -174,6 +174,20 @@ await check('panel: la ficha enseña lo nuevo del brief corto (marca, colores, i
   assert.ok(!rows.seo_scope && !rows.product_count && !rows.brand_colors_none);
   assert.ok(rows.bot_tasks && rows.bot_tasks.value === null, 'lo del servicio elegido sin responder sí sale como Sin dato');
 });
+await check('panel: sin "Sin dato" de lo que nunca se preguntó (brief sin servicios, histórico, dependencias) (R2/R3)', () => {
+  const keysOf = (s) => new Set(s.flatMap((x) => x.rows.map((r) => r.key)));
+  // Brief del chat o v1: sin servicios y sin las preguntas nuevas.
+  const v1 = keysOf(P.viewSections({ business_name: 'Chat SA', email: 'a@b.co', main_objective: 'x' }, { legacy: true }));
+  for (const k of ['web_extras', 'seo_scope', 'bot_channels', 'product_count', 'brand_status', 'brand_color_list', 'contact_language']) assert.ok(!v1.has(k), k);
+  assert.ok(v1.has('business_name') && v1.has('city_state') && v1.has('has_logo'), 'lo de siempre sigue saliendo (también como Sin dato)');
+  // Sin servicios (aunque no sea histórico): nada de "Por servicio".
+  const s0 = P.viewSections({ business_name: 'X' });
+  assert.ok(!s0.some((x) => x.key === 'por_servicio'));
+  // "No tengo colores" marcado: la lista no falta. Sin logo: el estado de la marca tampoco.
+  const v2 = keysOf(P.viewSections({ services: ['branding'], brand_colors_none: true, has_logo: 'no' }));
+  assert.ok(v2.has('brand_colors_none') && !v2.has('brand_color_list') && !v2.has('brand_status'));
+  assert.equal(P.isLegacyBrief({ schema_version: 1 }), true);
+});
 await check('panel: en edición salen todas las columnas históricas (se podían editar antes)', () => {
   const s = P.viewSections({}, { edit: true });
   const keys = s.flatMap((x) => x.rows.map((r) => r.key));

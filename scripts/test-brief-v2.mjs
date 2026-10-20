@@ -17,14 +17,15 @@ import { checkGenerated } from './build-brief-services.mjs';
 import {
   SECTIONS, FIELDS, FIELD_TYPES, LEGACY_COLUMNS, SERVICE_IDS, BRIEF_SERVICES,
   validate, normalize, labelFor, sectionsFor, splitByStorage, normalizeFileTags, shortLabel,
+  catchupKeys, catchupSection, isMissing, isLegacyBrief, CATCHUP_SECTION,
 } from '../lib/brief-schema.mjs';
 import { rateLimit, memoryStore, hashKey, windowStart, LIMITS } from '../lib/ratelimit.mjs';
 import {
   KIND_RULES, DRAFT_LIMITS, UPLOAD_TOKEN_TTL_MS, safeFileName, buildPathname, parseBlobPathname,
   parseClientPayload, checkUploadRequest, isAllowedRealType, dispositionFor, hashSecret, secretMatches,
-  looksLikeSvg, cleanOriginalName, splitReconcile, removedFromMeta,
+  looksLikeSvg, cleanOriginalName, splitReconcile, removedFromMeta, declaredFromMeta, sweepMeta, jpegHasGps,
 } from '../lib/brief-upload-rules.mjs';
-import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill, kitForSubmit } from '../lib/brief-kit.mjs';
+import { hashKitToken, isKitTokenShape, newKitToken, kitUrl, kitPrefill, kitForSubmit, kitCatchup, catchupData } from '../lib/brief-kit.mjs';
 
 let pass = 0;
 const fails = [];
@@ -94,6 +95,15 @@ await check('brief inicial corto: pocos campos visibles, lo pesado en arranque',
   for (const id of ['diseno-web', 'seo-local', 'seo-ia', 'ia-conversacional', 'ecommerce', 'branding'])
     assert.ok(ini.some((f) => f.when && f.when.services.includes(id)), `${id} tiene su bloque en el brief corto`);
   assert.ok(arr.length > ini.length * 2, 'el arranque debe llevar lo pesado');
+  // Tope del TOTAL que ve el cliente (revisión R7): sin servicios, con uno,
+  // con dos (lo típico) y con los siete. Si crece, se decide, no se cuela.
+  const total = (svc) => sectionsFor('inicial', svc.length ? svc : null).flatMap((s) => s.fields).filter((f) => !f.when || svc.length).length;
+  assert.ok(total([]) <= 24, `sin servicios pregunta ${total([])}`);
+  for (const a of SERVICE_IDS) {
+    assert.ok(total([a]) <= 27, `${a} lleva el brief a ${total([a])} campos`);
+    for (const b of SERVICE_IDS) if (a < b) assert.ok(total([a, b]) <= 29, `${a} + ${b} lleva el brief a ${total([a, b])} campos`);
+  }
+  assert.ok(total(SERVICE_IDS) <= 36, `con todos los servicios pregunta ${total(SERVICE_IDS)}`);
   for (const k of ['leads_email', 'zones', 'hours', 'client_services', 'legal_name', 'kit_photo_files', 'socials', 'bot_handoff', 'payment_provider'])
     assert.equal(FIELDS.get(k).moment, 'arranque', k);
   // Gate design/brief.md §3: colores, estado de la marca e idioma de contacto, en el brief corto.
@@ -176,6 +186,49 @@ await check('inicial: colores de marca con código válido o solo con nombre', (
   assert.ok(ok.ok, JSON.stringify(ok.errors));
   assert.deepEqual(splitByStorage(ok.data).extra, { brand_status: 'adjustable', contact_language: 'en', brand_colors_none: true });
   assert.ok(validate('inicial', { brand_status: 'otra' }, { partial: true }).errors.brand_status, 'estado fuera de la lista');
+});
+await check('kit: pregunta lo del brief corto que el brief no trae (chat, v1, v2 de antes) (R1)', () => {
+  // Brief del chat con tienda y asistente: nada de lo nuevo.
+  const chat = { source: 'chat', schema_version: 1, services: ['ecommerce', 'ia-conversacional'], has_logo: 'si', extra: {}, kit: {} };
+  const keys = kitCatchup(chat);
+  for (const k of ['product_count', 'shipping', 'bot_channels', 'bot_tasks', 'brand_status', 'brand_color_list', 'brand_colors_none', 'contact_language'])
+    assert.ok(keys.includes(k), `falta ${k}`);
+  assert.ok(!keys.includes('seo_scope') && !keys.includes('web_extras'), 'solo lo de sus servicios');
+  // Sin servicios conocidos: solo lo general.
+  assert.deepEqual(kitCatchup({ services: [], extra: {} }).sort(), ['brand_color_list', 'brand_colors_none', 'brand_status', 'contact_language']);
+  // Lo que el brief ya trae no se vuelve a preguntar; lo guardado en el kit SÍ sigue en el bloque.
+  const v2 = { services: ['ecommerce'], has_logo: 'no', extra: { product_count: 40, brand_colors_none: true, contact_language: 'es' }, kit: { shipping: 'ship' } };
+  assert.deepEqual(kitCatchup(v2), ['shipping'], 'sin logo no se pregunta el estado; con "sin colores", ni la lista');
+  assert.ok(!kitCatchup({ services: [], brand_colors: 'rojo y negro', extra: {} }).includes('brand_color_list'), 'colores del formulario anterior');
+  // Bloque del kit con las preguntas en orden del esquema.
+  const sec = catchupSection(keys);
+  assert.equal(sec.key, CATCHUP_SECTION);
+  assert.ok(sec.catchup && sec.fields.every((f) => f.moment === 'inicial'));
+  assert.equal(catchupSection([]), null);
+  assert.equal(catchupSection(['business_name']), null, 'solo claves del bloque de pendientes');
+  // El servidor solo toma esas claves, y sin la lista si marcó "sin colores".
+  const d = catchupData(chat, { bot_channels: ['web'], brand_colors_none: true, brand_color_list: [{ name: 'rojo' }], business_name: 'X', seo_scope: 'setup' });
+  assert.deepEqual(d, { bot_channels: ['web'], brand_colors_none: true });
+  const vp = validate('inicial', catchupData(chat, { shipping: 'teletransporte' }), { services: chat.services, partial: true, optionMode: 'keep' });
+  assert.ok(vp.errors.shipping, 'se valida con las reglas del brief');
+});
+await check('dato que falta: sí/no, dependencias, servicios y briefs históricos (R2/R3)', () => {
+  const F = (k) => FIELDS.get(k);
+  // Brief sin servicios (v1 o chat): nada de "Por servicio" falta.
+  for (const k of ['web_extras', 'seo_scope', 'bot_channels', 'product_count', 'brand_scope']) assert.equal(isMissing(F(k), {}, { services: [] }), false, k);
+  assert.equal(isMissing(F('bot_channels'), {}, { services: ['ia-conversacional'] }), true);
+  assert.equal(isMissing(F('bot_channels'), {}, { services: ['branding'] }), false);
+  // Sí/no sin marcar ya es respuesta; con "sin colores" la lista no falta; sin logo, el estado tampoco.
+  assert.equal(isMissing(F('brand_colors_none'), {}), false);
+  assert.equal(isMissing(F('brand_color_list'), { brand_colors_none: true }), false);
+  assert.equal(isMissing(F('brand_color_list'), {}), true);
+  assert.equal(isMissing(F('brand_status'), { has_logo: 'no' }), false);
+  // Brief histórico: las preguntas nuevas del inicial no faltan; las de siempre, sí.
+  assert.equal(isMissing(F('contact_language'), {}, { legacy: true }), false);
+  assert.equal(isMissing(F('main_objective'), {}, { legacy: true }), true);
+  assert.equal(isLegacyBrief({ schema_version: 1 }), true);
+  assert.equal(isLegacyBrief({ schema_version: 2 }), false);
+  assert.equal(isLegacyBrief({}), false, 'sin la columna no se sabe: se trata como actual');
 });
 await check('inicial: bloques por servicio solo con su servicio', () => {
   const keys = (svc) => sectionsFor('inicial', svc).flatMap((s) => s.fields.map((f) => f.key));
@@ -377,13 +430,40 @@ await check('conciliación: lo que el cliente quitó se borra y no llega al brie
   assert.equal(removedFromMeta(null, DRAFT_ID).size, 0);
   assert.equal(removedFromMeta(meta, DRAFT_ID.toUpperCase()).size, 1, 'el id del borrador no distingue mayúsculas');
 });
+await check('conciliación: solo entra lo que el navegador declara o ya estaba enlazado (R6)', () => {
+  const P = (n) => `briefs/${DRAFT_ID}/photo/${n}.jpg`;
+  const blobs = ['a', 'b', 'huerfana', 'kit-antes'].map((n) => ({ pathname: P(n), size: 1000 }));
+  const reserved = new Set(blobs.map((b) => b.pathname));
+  const meta = [{ pathname: P('a') }, { pathname: P('b'), removed: true }, { pathname: `briefs/${'0'.repeat(8)}-0000-4000-8000-${'0'.repeat(12)}/photo/x.jpg` }];
+  const declared = declaredFromMeta(meta, DRAFT_ID);
+  assert.deepEqual([...declared], [P('a')], 'sin lo quitado ni rutas de otro borrador');
+  const out = splitReconcile({ blobs, reserved, removed: removedFromMeta(meta, DRAFT_ID), declared, linked: new Set([P('kit-antes')]) });
+  assert.deepEqual(out.keep.map((b) => b.pathname), [P('a'), P('kit-antes')]);
+  assert.deepEqual(out.drop.map((b) => b.pathname).sort(), [P('b'), P('huerfana')], 'la subida que el cliente no vio terminar se borra');
+  // Sin lista del navegador (cron sin datos): como antes, todo lo reservado.
+  assert.equal(declaredFromMeta(undefined, DRAFT_ID), null);
+  assert.equal(splitReconcile({ blobs, reserved, declared: null }).keep.length, 4);
+});
+await check('cola de reintento: copia acotada de lo que mandó el navegador (R4)', () => {
+  const P = (n) => `briefs/${DRAFT_ID}/photo/${n}.jpg`;
+  const m = sweepMeta([{ pathname: P('a'), tags: { field: 'photo_files' }, originalName: 'x'.repeat(400), evil: 1 }, { pathname: P('b'), removed: true, tags: { z: 1 } }, null, { pathname: 5 }]);
+  assert.equal(m.length, 2);
+  assert.equal(m[0].originalName.length, 300);
+  assert.ok(!('evil' in m[0]));
+  assert.deepEqual(m[1], { pathname: P('b'), removed: true });
+  assert.equal(sweepMeta(undefined), null);
+  assert.equal(sweepMeta(Array.from({ length: 300 }, (_, i) => ({ pathname: P(`f${i}`) }))).length, 200);
+});
 await check('límites por clase: logo 20 MB, foto 15, documento 25, legal 15', () => {
   assert.equal(KIND_RULES.logo.maxBytes, 20 * 1024 * 1024);
   assert.equal(KIND_RULES.photo.maxBytes, 15 * 1024 * 1024);
   assert.equal(KIND_RULES.doc.maxBytes, 25 * 1024 * 1024);
   assert.equal(KIND_RULES.legal.maxBytes, 15 * 1024 * 1024);
   assert.ok(KIND_RULES.logo.declared.includes('image/svg+xml') && KIND_RULES.logo.declared.includes('application/postscript'));
-  assert.ok(KIND_RULES.photo.declared.includes('image/heic'));
+  // Fotos: solo el JPEG que redibuja el navegador (sin EXIF ni GPS); el
+  // HEIC o PNG original nunca se sube (revisión R5).
+  assert.deepEqual(KIND_RULES.photo.declared, ['image/jpeg']);
+  assert.deepEqual(KIND_RULES.photo.real, ['image/jpeg']);
   assert.equal(DRAFT_LIMITS.maxFiles, 60);
   assert.equal(DRAFT_LIMITS.maxBytes, 300 * 1024 * 1024);
 });
@@ -401,10 +481,28 @@ const SVG = Buffer.from('<?xml version="1.0"?>\n<!-- logo -->\n<svg xmlns="http:
 const real = async (kind, declared, buf) => isAllowedRealType({
   kind, declared, detected: (await fileTypeFromBuffer(buf))?.mime, headText: buf.subarray(0, 1024).toString('utf8'),
 });
-await check('tipo real: PNG y JPEG de verdad pasan como foto', async () => {
-  assert.deepEqual(await real('photo', 'image/png', PNG), { ok: true, realType: 'image/png' });
+// JPEG con EXIF: el primer directorio trae (o no) el puntero al bloque GPS.
+const exifJpeg = (tag, le = true) => {
+  const u16 = (n) => (le ? [n & 255, n >> 8] : [n >> 8, n & 255]);
+  const u32 = (n) => (le ? [n & 255, (n >> 8) & 255, (n >> 16) & 255, n >>> 24] : [n >>> 24, (n >> 16) & 255, (n >> 8) & 255, n & 255]);
+  const tiff = [...(le ? [0x49, 0x49] : [0x4d, 0x4d]), ...u16(42), ...u32(8), ...u16(1), ...u16(tag), ...u16(4), ...u32(1), ...u32(26), ...u32(0)];
+  const body = [...Buffer.from('Exif\0\0', 'binary'), ...tiff];
+  return Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe1, (body.length + 2) >> 8, (body.length + 2) & 255]), Buffer.from(body), Buffer.from('ffdb0004', 'hex'), Buffer.alloc(64)]);
+};
+await check('tipo real: solo JPEG pasa como foto, y nunca con GPS (R5)', async () => {
   assert.deepEqual(await real('photo', 'image/jpeg', JPG), { ok: true, realType: 'image/jpeg' });
-  assert.equal((await real('photo', 'image/jpeg', PNG)).ok, true, 'imagen por imagen se acepta');
+  assert.equal((await real('photo', 'image/png', PNG)).ok, false, 'un PNG original no es lo que sube el navegador');
+  assert.equal((await real('photo', 'image/jpeg', PNG)).ok, false, 'PNG declarado como JPEG tampoco');
+  assert.equal(jpegHasGps(exifJpeg(0x8825)), true, 'EXIF con GPS (Intel)');
+  assert.equal(jpegHasGps(exifJpeg(0x8825, false)), true, 'EXIF con GPS (Motorola)');
+  assert.equal(jpegHasGps(exifJpeg(0x010f)), false, 'EXIF sin GPS (solo la marca de la cámara)');
+  assert.equal(jpegHasGps(JPG), false, 'JPEG del canvas: sin EXIF');
+  assert.equal(jpegHasGps(PNG), false);
+  const withGps = isAllowedRealType({ kind: 'photo', declared: 'image/jpeg', detected: 'image/jpeg', headText: '', head: exifJpeg(0x8825) });
+  assert.equal(withGps.ok, false);
+  assert.equal(isAllowedRealType({ kind: 'photo', declared: 'image/jpeg', detected: 'image/jpeg', headText: '', head: exifJpeg(0x010f) }).ok, true);
+  // Logos y documentos van tal cual: el GPS solo se mira en fotos.
+  assert.equal(isAllowedRealType({ kind: 'logo', declared: 'image/jpeg', detected: 'image/jpeg', headText: '', head: exifJpeg(0x8825) }).ok, true);
 });
 await check('tipo real: un PDF disfrazado de JPEG se rechaza como foto', async () => {
   assert.equal((await real('photo', 'image/jpeg', PDF)).ok, false);
@@ -797,6 +895,25 @@ if (noDb) {
     assert.match(html, /Space Grotesk/);
     assert.ok(!html.includes('2-4sem') && !html.includes('>biling<') && !html.includes('—'));
     assert.ok(!html.includes('Cormorant'));
+  });
+  await check('ficha HTML y BRIEF.md: "Sin dato" solo si de verdad falta (R2/R3)', async () => {
+    const rowOf = (html, label) => new RegExp(`${label}</(?:dt|th|span|div|td)>\\s*<(?:dd|td|span|div)[^>]*>\\s*(?:<[^>]+>\\s*)*Sin dato`).test(html);
+    // Brief del chat sin servicios: nada de "Por servicio" ni de las preguntas nuevas.
+    const chat = { ...fx.SAMPLE_BRIEF, schema_version: 1, source: 'chat', services: [], extra: {}, kit: {} };
+    const html = renderHtml(chat, { autoPrint: false });
+    assert.ok(!html.includes('Por servicio'), 'sin la sección por servicio');
+    for (const l of ['Idioma de contacto', 'Estado de la marca', 'Colores de marca', 'Sin colores definidos']) assert.ok(!html.includes(l), l);
+    // Brief v2 sin marcar "No tengo colores": la casilla no sale como Sin dato.
+    const v2 = { ...fx.SAMPLE_BRIEF, schema_version: 2, extra: { ...(fx.SAMPLE_BRIEF.extra || {}), brand_colors_none: true } };
+    const h2 = renderHtml({ ...v2, extra: { ...v2.extra, brand_colors_none: false } }, { autoPrint: false });
+    assert.ok(!h2.includes('Sin colores definidos'), 'casilla sí/no sin marcar');
+    const h3 = renderHtml({ ...v2, brand_color_list: undefined, extra: { ...v2.extra, brand_color_list: [] } }, { autoPrint: false });
+    assert.ok(!rowOf(h3, 'Colores de marca'), 'con "No tengo colores" la lista no falta');
+    // BRIEF.md del mismo brief del chat: sin "Sin responder" de por servicio.
+    const k = await makeZip(chat, []);
+    const kr = Object.keys(k.entries)[0].split('/')[0];
+    const md = strFromU8(k.entries[`${kr}/BRIEF.md`]);
+    assert.ok(!/Sin responder:[^\n]*(Funciones del sitio|Canales del asistente|Idioma de contacto|Estado de la marca)/.test(md), md.slice(0, 400));
   });
   await check('/api/admin/briefs/:id/kit carga y exporta el handler', async () => {
     const m = await import('../api/admin/briefs/[id]/kit.mjs');

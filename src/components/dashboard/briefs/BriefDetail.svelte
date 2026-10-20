@@ -28,7 +28,7 @@
   import {
     STATUSES, statusLabel, statusTone, SOURCE_LABEL, LANG_LABEL,
     viewSections, editDraft, changedFields, contactLinks, kitState,
-    valuePills, FIELDS, kitReceived, fmtSize,
+    valuePills, FIELDS, kitReceived, fmtSize, isLegacyBrief,
   } from './brief-panel.js';
   import { downloadFile } from './download.js';
 
@@ -85,7 +85,7 @@
   // Origen honesto de cada dato (revisión A3-01): lo del formulario anterior
   // o del chat no se presenta como kit de arranque.
   const fromKit = $derived(kitReceived(brief));
-  const sections = $derived(viewSections(data, { edit, kitReceived: fromKit }));
+  const sections = $derived(viewSections(data, { edit, kitReceived: fromKit, legacy: isLegacyBrief(brief) }));
   const inicial = $derived(sections.filter((s) => s.moment === 'inicial'));
   const anterior = $derived(sections.filter((s) => s.moment === 'anterior'));
   const arranque = $derived(sections.filter((s) => s.moment === 'arranque'));

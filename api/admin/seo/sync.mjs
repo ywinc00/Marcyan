@@ -16,12 +16,17 @@
 //                    gsc|ga4|indexation:{ synced, error }, sources:{…}, sync_state, persisted }
 //   Los errores de Google llegan explicados en español (lib/seo-core.mjs).
 import { requireAdmin, safeEqual } from '../../../lib/auth.mjs';
-import { getSeoProject, syncProject, syncActiveProjects, isConfigured, setOidcToken } from '../../../lib/seo.mjs';
+import { getSeoProject, syncProject, syncActiveProjects, isConfigured, setOidcToken, GOOGLE_PROJECT_WORST_MS } from '../../../lib/seo.mjs';
 import { clampDays, DEFAULT_DAYS } from '../../../lib/seo-core.mjs';
 
 // Una sincronización de un proyecto encadena 4 o 5 llamadas a Google en
-// paralelo y 3 escrituras; la de todos va por lotes con tope de 50 s.
-export const config = { maxDuration: 60 };
+// paralelo y 3 escrituras. Cada llamada tiene 15 s de tope (A6-R4), así que
+// un proyecto tarda como mucho GOOGLE_PROJECT_WORST_MS (60 s). La de todos va
+// por lotes y no empieza un proyecto nuevo pasado BULK_BUDGET_MS: entre ese
+// tope y maxDuration cabe un proyecto entero en el peor caso, más margen
+// para guardar.
+export const config = { maxDuration: 120 };
+const BULK_BUDGET_MS = 120000 - GOOGLE_PROJECT_WORST_MS - 10000;
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -67,7 +72,7 @@ export default async function handler(req, res) {
       if (!project) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
       results = [await syncProject(project, days, { trigger })];
     } else {
-      ({ results, skipped } = await syncActiveProjects({ days, trigger, concurrency: 3, budgetMs: 50000 }));
+      ({ results, skipped } = await syncActiveProjects({ days, trigger, concurrency: 3, budgetMs: BULK_BUDGET_MS }));
     }
 
     const configured = isConfigured();

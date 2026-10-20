@@ -16,11 +16,11 @@
 //   DELETE → elimina el proyecto (CASCADE borra sus métricas)
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import {
-  getSeoProject, updateSeoProject, deleteSeoProject, getMetrics, isConfigured,
-  sourcesInvalidatedBy, clearProjectSources,
+  getSeoProject, updateSeoProjectAndSources, deleteSeoProject, getMetrics, isConfigured,
 } from '../../../../lib/seo.mjs';
 import {
   clampDays, lookbackDays, addDays, ymd, summarizeGsc, summarizeGa4, validateProjectFields, DEFAULT_DAYS,
+  coverageOf,
 } from '../../../../lib/seo-core.mjs';
 import { houstonDate } from '../../../../lib/dates.mjs';
 
@@ -51,12 +51,15 @@ export default async function handler(req, res) {
 
       const srcs = (project.sync_state && project.sync_state.sources) || {};
       const daily = metrics.gsc.filter((r) => r.kind !== 'top_queries');
-      const gsc = summarizeGsc(daily, { days, today, synced: srcs.gsc && srcs.gsc.range });
-      const ga4 = summarizeGa4(metrics.ga4, { days, today, synced: srcs.ga4 && srcs.ga4.range });
+      // Cobertura = lo guardado de verdad, no lo que pidió la última sync (A6-R1).
+      const gsc = summarizeGsc(daily, { days, today, synced: coverageOf(srcs.gsc) });
+      const ga4 = summarizeGa4(metrics.ga4, { days, today, synced: coverageOf(srcs.ga4) });
 
       // El gráfico pinta la ventana actual y, detrás, los días que Google
-      // todavía no publica (hasta ayer). Sin datos: los últimos `days`.
-      const start = gsc ? gsc.current.start : addDays(today, -(days - 1));
+      // todavía no publica (hasta ayer). Sin datos: los últimos `days`. Si lo
+      // guardado empieza después del inicio de la ventana, el gráfico empieza
+      // ahí: los días que no se trajeron no se pintan como ceros (A6-R1).
+      const start = gsc ? (gsc.current.complete === false ? gsc.current.data_from : gsc.current.start) : addDays(today, -(days - 1));
       const end = addDays(today, -1);
       const inChart = (r) => { const d = ymd(r.date); return d >= start && d <= today; };
       const out = {
@@ -86,11 +89,10 @@ export default async function handler(req, res) {
       if (!v.ok) {
         return res.status(400).json({ ok: false, error: v.errors.name || 'Revisa los campos marcados.', fields: v.errors });
       }
-      let project = await updateSeoProject(id, v.values);
-      const cleared = sourcesInvalidatedBy(before, project);
+      // Cambio y borrado de los datos invalidados en una sola transacción (A6-R3).
+      const { project, cleared } = await updateSeoProjectAndSources(id, v.values);
+      if (!project) return res.status(404).json({ ok: false, error: 'Proyecto no encontrado' });
       if (cleared.length) {
-        await clearProjectSources(id, cleared);
-        project = await getSeoProject(id);
         console.log(`[admin/seo/projects/:id PATCH] ${id}: identificadores cambiados, datos borrados de ${cleared.join(', ')}`);
       }
       return res.status(200).json({ ok: true, project, cleared });

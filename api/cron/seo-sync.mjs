@@ -7,15 +7,19 @@
 //  sus crons), comparado en tiempo constante. Sin el secreto no hace nada.
 //  Qué hace: sincroniza TODOS los proyectos SEO activos (SEO-04), por lotes
 //  de 3 en paralelo, primero los que llevan más tiempo sin intentarse, y no
-//  empieza ninguno nuevo pasados 240 s (maxDuration 300 de api/cron/* en
-//  vercel.json). Trae 90 días y su período previo para que cualquier rango de
+//  empieza ninguno nuevo pasados 230 s (maxDuration 300 de api/cron/* en
+//  vercel.json, menos el peor caso de un proyecto). Trae 90 días y su período previo para que cualquier rango de
 //  la interfaz (7, 28, 90) tenga datos y comparación. El resultado de cada
 //  proyecto, con su error en español si lo hubo, queda guardado en
 //  seo_projects.sync_state y se ve en el panel (SEO-07).
 // ════════════════════════════════════════════════════════════════
 import { safeEqual } from '../../lib/auth.mjs';
-import { syncActiveProjects, isConfigured, setOidcToken } from '../../lib/seo.mjs';
+import { syncActiveProjects, isConfigured, setOidcToken, GOOGLE_PROJECT_WORST_MS } from '../../lib/seo.mjs';
 import { CRON_DAYS } from '../../lib/seo-core.mjs';
+
+// No se empieza un proyecto nuevo cuando ya no cabe entero en el peor caso
+// (cada llamada a Google tiene 15 s de tope, A6-R4) antes de los 300 s.
+const CRON_BUDGET_MS = 300000 - GOOGLE_PROJECT_WORST_MS - 10000;
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -37,7 +41,7 @@ export default async function handler(req, res) {
 
   try {
     const started = Date.now();
-    const { results, skipped } = await syncActiveProjects({ days: CRON_DAYS, trigger: 'cron', concurrency: 3, budgetMs: 240000 });
+    const { results, skipped } = await syncActiveProjects({ days: CRON_DAYS, trigger: 'cron', concurrency: 3, budgetMs: CRON_BUDGET_MS });
     const count = (s) => results.filter((r) => r.status === s).length;
     const summary = {
       ok: count('ok'), partial: count('partial'), error: count('error'), skipped: skipped.length,

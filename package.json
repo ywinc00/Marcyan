@@ -23,7 +23,8 @@
     "test:finance": "node --experimental-test-module-mocks --no-warnings scripts/test-finance.mjs",
     "test:projects": "node scripts/test-projects.mjs",
     "test:seo": "node scripts/test-seo.mjs",
-    "test:avisos": "node scripts/test-avisos.mjs"
+    "test:avisos": "node scripts/test-avisos.mjs",
+    "test:brief-form": "node scripts/test-brief-form.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -39,6 +40,7 @@
     "astro-icon": "^1.1.5",
     "fflate": "0.8.3",
     "file-type": "22.1.1",
+    "heic-to": "1.5.2",
     "resend": "^4.0.1",
     "svelte": "^5.56.3"
   },

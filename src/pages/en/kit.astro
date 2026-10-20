@@ -1,0 +1,64 @@
+---
+// /en/kit/<token> — Private getting started kit (second moment of the brief,
+// Orbit v2 · B1). vercel.json rewrites /en/kit/:token to this page; the KitApp
+// island reads the token from the path (locally also ?t=<token>) and talks to
+// /api/kit/:token. noindex and kept out of the sitemap.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import BtnStates from '../../components/ui/BtnStates.astro';
+import KitApp from '../../components/brief/KitApp.svelte';
+import { content, nap } from '../../i18n/content';
+import { clusterNavEn } from '../../i18n/clusters';
+
+const wa = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;
+const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa, track: 'whatsapp_clicked' } };
+---
+<Layout
+  title="Getting started kit · Marcyan Studio"
+  description="Your private link to send us what we need to get your project going."
+  lang="en"
+  path="/en/kit"
+  hasEn={false}
+  noindex={true}
+>
+  <!-- The link carries a token: don't send it as a Referer to other sites. -->
+  <meta slot="head" name="referrer" content="same-origin" />
+  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
+
+  <main id="main" class="kitp">
+    <div class="container kitp__inner">
+      <KitApp client:load lang="en" phone={nap.houston} />
+      <noscript>
+        <p class="kitp__nojs">You need JavaScript turned on to fill out your kit. You can also call us at <a href={`tel:${nap.houston.replace(/[^\d+]/g, '')}`}>{nap.houston}</a> or message us on <a href={wa}>WhatsApp</a>.</p>
+      </noscript>
+    </div>
+  </main>
+
+  <SpaceBackdrop tone="teal" density={0.8} />
+  <SiteFooter footer={content.en.footer} lang="en" />
+
+  <!-- Loads BtnStates' global styles once (the island buttons use its .bstate/.bst contract). Not rendered. -->
+  <template><button class="bstate" type="button"><BtnStates sending="" done="">.</BtnStates></button></template>
+  <script is:inline>
+    // The language switch keeps the link token (otherwise it would land on /es/ with no kit).
+    (function () {
+      var m = /\/(?:es|en)\/kit\/([^/?#]+)/.exec(location.pathname);
+      var tok = m ? m[1] : new URLSearchParams(location.search).get('t');
+      if (!tok) return;
+      document.querySelectorAll('a.nav__lang-opt[hreflang]').forEach(function (a) {
+        var l = a.getAttribute('hreflang');
+        a.setAttribute('href', m ? '/' + l + '/kit/' + tok : '/' + l + '/kit?t=' + encodeURIComponent(tok));
+      });
+    })();
+  </script>
+  {import.meta.env.DEV && <script is:inline src="/dev/brief-mock.js"></script>}
+</Layout>
+
+<style>
+  .kitp { padding-top: calc(var(--nav-h) + var(--space-7)); padding-bottom: var(--space-9); }
+  .kitp__inner { max-width: 1160px; }
+  .kitp__nojs { color: var(--fg-secondary); }
+  .kitp__nojs a { color: var(--accent-gold); }
+</style>

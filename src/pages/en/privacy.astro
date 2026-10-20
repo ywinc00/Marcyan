@@ -22,7 +22,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
   <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main">
-    <LegalDoc title="Privacy Policy" updated="June 6, 2026" updatedLabel="Last updated">
+    <LegalDoc title="Privacy Policy" updated="October 19, 2026" updatedLabel="Last updated">
       <h2>1. Who we are</h2>
       <p><strong>Marcyan Studio</strong> is a web design, applied artificial intelligence, and SEO agency for small and medium-sized businesses, serving Houston, TX and Miami, FL. This policy explains what data we collect when you use our site <a href="/en">marcyanstudio.com</a>, what we use it for, and what control you have over it. For any question about your privacy, write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
 
@@ -30,6 +30,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
       <p>We collect only the data needed to serve you:</p>
       <ul>
         <li><strong>Data you provide us</strong> when you complete our forms (for example, the project form): name, email, phone, your company name, and the project details you choose to share.</li>
+        <li><strong>Files you send us</strong> when you fill out the project brief or the getting started kit: logo, photos and documents. Photos are resized for the web in your browser before they upload, which strips their embedded data, like GPS location. If a photo cannot be converted (for example, some iPhone HEIC photos opened on a computer), the original is stored as is, with that data, and we tell you next to the file. Logos and documents are stored exactly as you send them.</li>
         <li><strong>Automatic technical data</strong>: IP address, browser type, and the date/time of the request. We use it only for security and to prevent spam.</li>
       </ul>
       <p>We do not collect sensitive data or payment card information through the site.</p>
@@ -48,6 +49,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
       <ul>
         <li><strong>Hosting and database</strong> (Vercel and its PostgreSQL database), where the data you send us is stored securely.</li>
         <li><strong>Email delivery</strong> (Resend), to send you confirmations and communications related to your request.</li>
+        <li><strong>File storage</strong> (Vercel Blob, private mode): your files are not public and don't show up in search engines; only the Marcyan team can see them when signed in.</li>
       </ul>
       <p>We may also disclose data if the law requires it or to protect our rights.</p>
 
@@ -56,6 +58,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
 
       <h2>6. How long we keep your data</h2>
       <p>We keep the data from your request for as long as it is needed to serve you and for the period required by our legal or accounting obligations. After that, we delete or anonymize it. You can ask us to delete your data at any time.</p>
+      <p><strong>Files.</strong> If you start uploading files and don't send the form, they are deleted automatically after 48 hours. Project files are kept for up to 12 months after the project is finished and then deleted. If you want us to delete them sooner, email us at <a href={`mailto:${nap.email}`}>{nap.email}</a> with your business name or your reference number (for example, MRC-042); we'll delete them and confirm by email.</p>
 
       <h2>7. Your rights</h2>
       <p>You have the right to access your data, correct it, request its deletion, and withdraw your consent. To exercise any of these rights, write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a> and we will respond within a reasonable time.</p>
@@ -71,6 +74,9 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
 
       <h2>11. Contact</h2>
       <p>Questions about this policy or about your data? Write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+
+      <h2>12. Third-party software</h2>
+      <p>To convert iPhone HEIC photos in your browser we use the <strong>heic-to</strong> library (LGPL-3.0 license, built on libheif), unmodified and only when you upload a photo in that format. Its source code is published at <a href="https://github.com/hoppergee/heic-to" rel="noopener">github.com/hoppergee/heic-to</a>.</p>
     </LegalDoc>
   </main>
 

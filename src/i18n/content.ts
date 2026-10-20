@@ -451,7 +451,7 @@ export const content = {
           { label: 'Branding', href: '/en/houston/branding' },
           { label: 'Digital checkup', href: '/en/checkup' },
           { label: 'Free tools', href: '/en/tools' },
-          { label: 'Project Form', href: '/formulario' },
+          { label: 'Project Form', href: '/en/project-brief' },
         ] },
         { title: 'Company', links: [
           { label: 'About us', href: '/en/about' },

@@ -14,7 +14,27 @@
     { "source": "/admin", "destination": "/dashboard", "permanent": true },
     { "source": "/admin/:path*", "destination": "/dashboard", "permanent": true }
   ],
+  "rewrites": [
+    { "source": "/es/kit/:token", "destination": "/es/kit" },
+    { "source": "/en/kit/:token", "destination": "/en/kit" }
+  ],
   "headers": [
+    {
+      "source": "/es/kit/:token",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/en/kit/:token",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
     {
       "source": "/dashboard/sw.js",
       "headers": [{ "key": "Service-Worker-Allowed", "value": "/dashboard" }]

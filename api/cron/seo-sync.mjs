@@ -16,6 +16,7 @@
 import { safeEqual } from '../../lib/auth.mjs';
 import { syncActiveProjects, isConfigured, setOidcToken, GOOGLE_PROJECT_WORST_MS } from '../../lib/seo.mjs';
 import { CRON_DAYS } from '../../lib/seo-core.mjs';
+import { notifySeoSyncFailures, notifySeoSyncCrash } from '../../lib/notifications.mjs';
 
 // No se empieza un proyecto nuevo cuando ya no cabe entero en el peor caso
 // (cada llamada a Google tiene 15 s de tope, A6-R4) antes de los 300 s.
@@ -51,6 +52,8 @@ export default async function handler(req, res) {
       if (!r.ok) console.error(`[cron/seo-sync] ${r.project_id} (${r.name || '?'}) ${r.status}: ${(r.error_detail && r.error_detail.code) || '-'}`);
     }
     console.log(`[cron/seo-sync] bien=${summary.ok} parcial=${summary.partial} fallo=${summary.error} pendientes=${summary.skipped} ${summary.ms} ms`);
+    // Un aviso en el panel por proyecto que falló (deduplicado; nunca rompe la respuesta).
+    await notifySeoSyncFailures(results);
     return res.status(200).json({
       ok: summary.error === 0 && summary.partial === 0 && skipped.length === 0,
       summary,
@@ -59,6 +62,7 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('[cron/seo-sync] error:', err && err.message);
+    try { await notifySeoSyncCrash(); } catch (e) { console.error('[cron/seo-sync] aviso no creado:', e && e.message); }
     return res.status(500).json({ ok: false, error: 'La sincronización diaria falló.' });
   }
 }

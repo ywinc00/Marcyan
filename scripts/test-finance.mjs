@@ -236,7 +236,8 @@ await check('FIN-19: clientes y proyectos también numeran dentro del INSERT', a
   reset(() => ({ rows: [{ id: '1' }] }));
   await fin.createClient({ business_name: 'X' });
   await fin.createProject({ client_id: '1', name: 'Y' });
-  assert.ok(has(/INSERT INTO clients .* VALUES \( next_client_id\(\)/));
+  // createClient (A2) arma el INSERT con columnas dinámicas: VALUES (next_client_id(), $1, ...).
+  assert.ok(has(/INSERT INTO clients[\s\S]*VALUES \(\s*next_client_id\(\)/));
   assert.ok(has(/INSERT INTO projects .* VALUES \( next_project_code\(\)/));
   assert.ok(!has(/^SELECT next_(client_id|project_code)/));
 });

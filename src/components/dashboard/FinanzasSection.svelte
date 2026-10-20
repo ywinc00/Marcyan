@@ -24,6 +24,7 @@
   import InvoiceForm from './finanzas/InvoiceForm.svelte';
   import PaymentForm from './finanzas/PaymentForm.svelte';
   import ClientForm from './finanzas/ClientForm.svelte';
+  import NewClientDialog from './crm/NewClientDialog.svelte';
   import ExpensesCard from './finanzas/ExpensesCard.svelte';
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
 
@@ -123,10 +124,9 @@
   let payOpen = $state(false);
   let payInvoice = $state(null);
   let clientFormOpen = $state(false);
-  let clientMode = $state('new');
+  let newClientOpen = $state(false);
 
   function openPay(inv) { payInvoice = inv; payOpen = true; }
-  function openClient(mode) { clientMode = mode; clientFormOpen = true; }
   function invoiceCreated(inv) {
     navigate('finanzas', ['facturas', inv.invoice_number], listQuery);
   }
@@ -199,8 +199,8 @@
   <div class="fin-block">
     <Card title="Facturas">
       {#snippet actions()}
-        <button type="button" class="b b--ghost b--mini" onclick={() => openClient('new')}>Nuevo cliente</button>
-        <button type="button" class="b b--ghost b--mini" onclick={() => openClient('brief')}>Cliente desde brief</button>
+        <button type="button" class="b b--ghost b--mini" onclick={() => (newClientOpen = true)}>Nuevo cliente</button>
+        <button type="button" class="b b--ghost b--mini" onclick={() => (clientFormOpen = true)}>Cliente desde brief</button>
       {/snippet}
 
       <div class="fin-tools">
@@ -287,7 +287,8 @@
 
   <InvoiceForm bind:open={invoiceFormOpen} onsaved={invoiceCreated} />
   <PaymentForm bind:open={payOpen} invoice={payInvoice} onsaved={afterChange} />
-  <ClientForm bind:open={clientFormOpen} mode={clientMode} />
+  <NewClientDialog bind:open={newClientOpen} />
+  <ClientForm bind:open={clientFormOpen} />
 {/if}
 </div>
 

@@ -17,7 +17,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { register } from 'node:module';
 
 import { LEGACY_COLUMNS, FIELDS } from '../lib/brief-schema.mjs';
 import {
@@ -300,20 +301,64 @@ await check('handlers: notas por POST con tipo note y límite de largo', () => {
   assert.match(s, /NOTE_MAX/);
   assert.ok(s.indexOf('requireAdmin(req, res)') < s.indexOf('getBriefByProjectId(id)'));
 });
-await check('handlers: convertir en cliente deja el evento converted_to_client', () => {
+await check('handlers: convertir en cliente deja UN evento converted_to_client', () => {
   const s = read('api/admin/briefs/[id].mjs');
   assert.match(s, /convert_to_client/);
-  assert.match(s, /type: 'converted_to_client'/);
   assert.match(s, /already: true/);
+  // Integración CRM: al crear lo escribe convertBriefToClient (con el actor) y
+  // al vincular linkBriefToClient; el handler ya no lo repite.
+  assert.match(s, /convertBriefToClient\(id, session\.email/);
+  assert.ok(!/type: 'converted_to_client'/.test(s));
+  const fin = read('lib/finance.mjs');
+  const conv = fin.slice(fin.indexOf('export async function convertBriefToClient'), fin.indexOf('export async function createClientFromBrief'));
+  assert.match(conv, /'converted_to_client', \$\{actorEmail\}/);
 });
 await check('handlers: el correo al cliente guarda su cuerpo en el historial', () => {
   assert.match(read('api/admin/briefs/[id]/email.mjs'), /body: text/);
 });
 await check('correo manual: sin pre-wrap junto a <br> (B-21)', () => {
   const s = read('lib/email.mjs');
-  const fn = s.slice(s.indexOf('export async function emailManualToClient'), s.indexOf('// ── Sección reutilizable'));
+  const fn = s.slice(s.indexOf('export function manualBodyHtml'), s.indexOf('// ── Sección reutilizable'));
   assert.ok(fn.length > 0);
   assert.ok(!/white-space:\s*pre-wrap/.test(fn));
+  assert.match(fn, /html: manualBodyHtml\(text\)/);
+});
+await check('correo manual (A3-11): cada salto llega una vez, también con saltos de Windows', async () => {
+  const { manualBodyHtml, emailManualToClient } = await import('../lib/email.mjs');
+  const one = (body) => manualBodyHtml(body).match(/font-size:14px;line-height:1\.7;color:[^"]*">([\s\S]*?)<\/div>/)[1];
+  assert.equal(one('Hola Ana,\n\nTe mando el kit.\nUn saludo'), 'Hola Ana,<br><br>Te mando el kit.<br>Un saludo');
+  assert.equal(one('<b>x</b> & "y"'), '&lt;b&gt;x&lt;/b&gt; &amp; &quot;y&quot;');
+  assert.ok(!/pre-wrap/.test(manualBodyHtml('a\nb')));
+  assert.equal(typeof emailManualToClient, 'function');
+});
+await check('correo manual (A3-11): emailManualToClient con saltos de Windows envía cada salto una vez', async () => {
+  // Revisión int1, F3: se llama a la función real con el envío sustituido por
+  // un doble (una copia del módulo cuyo paquete de correo es falso; nunca sale
+  // a la red) y se mira lo que de verdad se mandaría, html y texto.
+  const FAKE_RESEND = 'export class Resend { constructor() { this.emails = { send: async (m) => { (globalThis.__mailSent ||= []).push(m); return { data: { id: "prueba" } }; } }; } }';
+  const HOOK = `
+const FAKE = ${JSON.stringify('data:text/javascript,' + encodeURIComponent(FAKE_RESEND))};
+export async function resolve(specifier, context, next) {
+  if (specifier === 'resend' && (context.parentURL || '').includes('mailfake')) return { url: FAKE, shortCircuit: true };
+  return next(specifier, context);
+}`;
+  register('data:text/javascript,' + encodeURIComponent(HOOK), import.meta.url);
+  const prev = process.env.RESEND_API_KEY;
+  process.env.RESEND_API_KEY = 'clave-de-prueba';
+  globalThis.__mailSent = [];
+  try {
+    const mail = await import(pathToFileURL(path.join(ROOT, 'lib/email.mjs')).href + '?mailfake');
+    await mail.emailManualToClient({ to: 'ana@aurora.test', subject: 'Kit', body: 'Hola\r\n\r\nGracias\rAdiós', fromAdminEmail: 'equipo@marcyan.test' });
+  } finally {
+    if (prev === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = prev;
+  }
+  assert.equal(globalThis.__mailSent.length, 1);
+  const m = globalThis.__mailSent[0];
+  assert.equal(m.text, 'Hola\n\nGracias\nAdiós', 'texto sin \\r');
+  const body = m.html.match(/font-size:14px;line-height:1\.7;color:[^"]*">([\s\S]*?)<\/div>/)[1];
+  assert.equal(body, 'Hola<br><br>Gracias<br>Adiós', 'cada salto una vez, sin \\r');
+  assert.ok(!/\r/.test(m.html));
+  assert.equal(m.replyTo, 'equipo@marcyan.test');
 });
 await check('panel: la ficha nunca pinta un archivo que el servidor no marcó en línea', () => {
   const s = read('src/components/dashboard/briefs/BriefFiles.svelte');

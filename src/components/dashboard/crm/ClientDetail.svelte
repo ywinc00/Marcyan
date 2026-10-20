@@ -141,7 +141,7 @@
   </PageHeader>
 
   {#if archived}
-    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en la lista de Clientes ni al elegir cliente para un lead. Sus proyectos, facturas y pagos se conservan.</p>
+    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en la lista de Clientes ni al elegir cliente en ninguna sección. Sus proyectos, facturas y pagos se conservan.</p>
   {/if}
 
   {#if related}
@@ -230,7 +230,7 @@
         <form onsubmit={(e) => { e.preventDefault(); save(false); }}>
           <ClientFields bind:values {errors} status={!archived} idPrefix="cd" disabled={saving} />
           {#if dupMatches.length}
-            <div class="dup"><DuplicateNotice matches={dupMatches} title="Ese correo o teléfono ya es de otro cliente" useLabel="Abrir ficha"
+            <div class="dup"><DuplicateNotice matches={dupMatches} title="Ese correo o teléfono ya es de otro cliente" useLabel="Abrir ficha" archivedUsable
               onuse={(m) => navigate('clientes', [m.id])} onforce={() => save(true)} busy={saving} /></div>
           {/if}
           <div class="form-foot">
@@ -252,7 +252,7 @@
   <ConfirmDialog
     bind:open={confirmArchive}
     title={`Archivar ${name}`}
-    message="Dejará de salir en la lista de Clientes y al elegir cliente para un lead. Sus proyectos, facturas y pagos se conservan tal cual y puedes reactivarlo cuando quieras."
+    message="Dejará de salir en la lista de Clientes y al elegir cliente en cualquier sección. Sus proyectos, facturas y pagos se conservan tal cual y puedes reactivarlo cuando quieras."
     confirmLabel="Archivar"
     danger={false}
     busy={archiving}

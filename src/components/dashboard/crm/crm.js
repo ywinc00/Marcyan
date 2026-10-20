@@ -181,10 +181,31 @@ export function monoColor(s) {
 }
 
 // ── Historial del lead ───────────────────────────────────────
+/** Coletilla del historial cuando un lead deja "Convertido" y conserva sus vínculos. */
+function keptText(k) {
+  const parts = [k.client_id ? 'su cliente' : '', k.brief_id ? `el brief ${k.brief_id}` : ''].filter(Boolean);
+  return parts.length ? ` (conserva ${parts.join(' y ')})` : '';
+}
+
+/**
+ * Texto del aviso al sacar de "Convertido" un lead que tiene cliente o brief
+ * (integración CRM, A2-R6). null si no hace falta avisar.
+ */
+export function leavingConvertedMessage(lead, nextStatus) {
+  if (!lead || lead.status !== 'converted' || nextStatus === 'converted') return null;
+  const hasClient = !!lead.converted_client_id;
+  const brief = lead.converted_brief_id || '';
+  if (!hasClient && !brief) return null;
+  const what = hasClient && brief ? `su cliente y el brief ${brief}`
+    : hasClient ? 'su cliente' : `el brief ${brief}`;
+  return `${lead.ref_id} pasará a ${leadStatus(nextStatus).label} y conservará ${what}: no se borra nada. `
+    + 'Dejará de contar en Convertidos. Para volver a contarlo, márcalo otra vez como Convertido.';
+}
+
 export function leadEventText(ev) {
   const d = ev?.data || {};
   switch (ev?.event_type) {
-    case 'status_changed': return `Estado: ${leadStatus(d.from).label} → ${leadStatus(d.to).label}`;
+    case 'status_changed': return `Estado: ${leadStatus(d.from).label} → ${leadStatus(d.to).label}${d.kept ? keptText(d.kept) : ''}`;
     case 'converted_to_client': return d.created ? `Convertido en cliente nuevo ${d.client_code || ''}`.trim() : `Vinculado al cliente ${d.client_code || ''}`.trim();
     case 'converted_to_brief': return `Brief creado ${d.project_id || ''}`.trim();
     case 'note_updated': return 'Notas actualizadas';

@@ -174,7 +174,7 @@ await check('POST: brief inexistente → 400 claro y SIN insertar nada (OP-09)',
   assert.ok(!log().some((q) => /INSERT/.test(q.text)), 'no debe insertar');
 });
 await check('POST: cliente inexistente → 400, ya no cae en "Directo" (CRM-05)', async () => {
-  db([[/SELECT id FROM clients WHERE id/, []]]);
+  db([[/SELECT id, status FROM clients WHERE id/, []]]);
   const r = await call(listHandler, { method: 'POST', body: { name: 'X', clientId: '999' } });
   assert.equal(r.status, 400);
   assert.ok(!log().some((q) => /Directo|INSERT/.test(q.text)));
@@ -182,7 +182,7 @@ await check('POST: cliente inexistente → 400, ya no cae en "Directo" (CRM-05)'
 await check('POST: con cliente elegido usa ese cliente y fecha de inicio de Houston', async () => {
   let inserted;
   db([
-    [/SELECT id FROM clients WHERE id/, [{ id: '7' }]],
+    [/SELECT id, status FROM clients WHERE id/, [{ id: '7' }]],
     [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
     [/seed_default_milestones/, [{}]],
     ...BASE,
@@ -195,7 +195,7 @@ await check('POST: con cliente elegido usa ese cliente y fecha de inicio de Hous
 await check('POST: creado como completado lleva inicio y entrega (A5-R3)', async () => {
   let inserted;
   db([
-    [/SELECT id FROM clients WHERE id/, [{ id: '7' }]],
+    [/SELECT id, status FROM clients WHERE id/, [{ id: '7' }]],
     [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
     [/seed_default_milestones/, [{}]],
     ...BASE,
@@ -208,7 +208,7 @@ await check('POST: creado como completado lleva inicio y entrega (A5-R3)', async
 await check('POST: en pausa no lleva fechas', async () => {
   let inserted;
   db([
-    [/SELECT id FROM clients WHERE id/, [{ id: '7' }]],
+    [/SELECT id, status FROM clients WHERE id/, [{ id: '7' }]],
     [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
     [/seed_default_milestones/, [{}]],
     ...BASE,
@@ -216,6 +216,75 @@ await check('POST: en pausa no lleva fechas', async () => {
   await call(listHandler, { method: 'POST', body: { name: 'Sitio', clientId: '7', status: 'on_hold' } });
   assert.equal(inserted[6], null);
   assert.equal(inserted[7], null);
+});
+
+// ── Cliente del brief (revisión int1, F1) y archivados (F2) ──────
+// El brief MRC-021 llegó con el correo de CLI-003, que nació de MRC-010; en la
+// ficha del brief se eligió "Usar este" (vínculo SOLO por evento).
+const BRIEF21 = { project_id: 'MRC-021', business_name: 'Tacos Sol', owner_name: 'Rosa', email: 'rosa@sol.test', phone: '(713) 555-0118', city_state: 'Houston, TX', summary: null };
+const CLI3 = { id: '3', client_code: 'CLI-003', business_name: 'Tacos Sol Centro', email: 'rosa@sol.test', status: 'active', source_brief_id: 'MRC-010' };
+function briefRules({ linked = null, dup = [], onInsert } = {}) {
+  return [
+    [/SELECT 1 FROM briefs WHERE project_id/, [{ '?column?': 1 }]],
+    [/SELECT \* FROM briefs WHERE project_id/, [BRIEF21]],
+    [/FROM clients WHERE source_brief_id/, []],
+    [/FROM brief_events[\s\S]*converted_to_client/, linked ? [linked] : []],
+    [/LOWER\(email\)/, dup],
+    [/INSERT INTO clients/, (v, t) => { onInsert?.(v, t); return [{ id: '9', client_code: 'CLI-009', business_name: 'Tacos Sol', status: 'active' }]; }],
+    [/INSERT INTO brief_events/, []],
+  ];
+}
+await check('POST con "cliente del brief": si el brief se vinculó por evento usa ESE cliente y no crea otro', async () => {
+  let inserted;
+  db([
+    ...briefRules({ linked: CLI3 }),
+    [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
+    [/seed_default_milestones/, [{}]],
+    ...BASE,
+  ]);
+  const r = await call(listHandler, { method: 'POST', body: { name: 'Segundo sitio', briefProjectId: 'mrc-021' } });
+  assert.equal(r.status, 201);
+  assert.equal(inserted[1], '3', 'el proyecto queda con CLI-003, el de la ficha del brief');
+  assert.ok(!log().some((q) => /INSERT INTO clients/.test(q.text)), 'sin cliente duplicado');
+  assert.ok(!log().some((q) => /INSERT INTO brief_events/.test(q.text)), 'sin evento nuevo: ya estaba vinculado');
+});
+await check('POST con "cliente del brief": correo o teléfono de otro cliente → 409 con coincidencias y sin crear nada', async () => {
+  db([...briefRules({ dup: [CLI3] }), ...BASE]);
+  const r = await call(listHandler, { method: 'POST', body: { name: 'Sitio', briefProjectId: 'MRC-021' } });
+  assert.equal(r.status, 409);
+  assert.equal(r.body.reason, 'duplicate');
+  assert.equal(r.body.matches[0].client_code, 'CLI-003');
+  assert.ok(!log().some((q) => /INSERT/.test(q.text)), 'ni cliente ni proyecto');
+});
+await check('POST con "cliente del brief" y "crear igualmente": crea el cliente con su evento y su autor', async () => {
+  let client, inserted;
+  db([
+    ...briefRules({ dup: [CLI3], onInsert: (v) => { client = v; } }),
+    [/INSERT INTO projects/, (v) => { inserted = v; return [{ id: '42' }]; }],
+    [/seed_default_milestones/, [{}]],
+    ...BASE,
+  ]);
+  const r = await call(listHandler, { method: 'POST', body: { name: 'Sitio', briefProjectId: 'MRC-021', allow_duplicate: true } });
+  assert.equal(r.status, 201);
+  assert.ok(client.includes('MRC-021'), 'el cliente nuevo nace del brief');
+  assert.equal(inserted[1], '9');
+  assert.ok(!log().some((q) => /LOWER\(email\)/.test(q.text)), 'no vuelve a mirar duplicados');
+  const ev = log().find((q) => /INSERT INTO brief_events/.test(q.text));
+  assert.ok(ev, 'deja el converted_to_client');
+  assert.equal(ev.values[1], 'prueba@marcyan.test', 'con el autor');
+});
+await check('POST con cliente archivado → 409 en texto llano y sin crear el proyecto', async () => {
+  db([[/SELECT id, status FROM clients WHERE id/, [{ id: '5', status: 'archived' }]], ...BASE]);
+  const r = await call(listHandler, { method: 'POST', body: { name: 'Sitio', clientId: '5' } });
+  assert.equal(r.status, 409);
+  assert.match(r.body.error, /archivado\. Reactívalo en su ficha/);
+  assert.ok(!log().some((q) => /INSERT/.test(q.text)));
+});
+await check('PATCH: pasar el proyecto a un cliente archivado → 409 sin tocar el proyecto', async () => {
+  db([[/SELECT status FROM clients WHERE id/, [{ status: 'archived' }]], ...BASE]);
+  const r = await call(idHandler, { method: 'PATCH', query: { id: '42' }, body: { clientId: '5' } });
+  assert.equal(r.status, 409);
+  assert.ok(!log().some((q) => /UPDATE/.test(q.text)));
 });
 
 // ── Ficha ────────────────────────────────────────────────────────
@@ -250,7 +319,7 @@ await check('PATCH: brief inexistente → 400 claro', async () => {
 await check('PATCH: cambiar cliente y desvincular brief', async () => {
   let upd;
   db([
-    [/SELECT 1 FROM clients WHERE id/, [{ '?column?': 1 }]],
+    [/SELECT status FROM clients WHERE id/, [{ status: 'active' }]],
     [/UPDATE projects/, (v) => { upd = v; return [{ id: '42' }]; }],
     ...BASE,
   ]);

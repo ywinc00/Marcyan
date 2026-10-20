@@ -7,9 +7,13 @@
   // tiene conversión, elegirlo abre la conversión (onconvert) en vez de
   // poner solo la etiqueta. Sin la migración 011 (crmReady=false) se guarda
   // como antes.
+  // Sacar de "Convertido" un lead que ya tiene cliente o brief pide
+  // confirmación: dice que conserva sus vínculos y que deja de contar en
+  // Convertidos (integración CRM, A2-R6).
   import { api } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
-  import { LEAD_STATUSES, leadStatus } from './crm.js';
+  import ConfirmDialog from '../ui/ConfirmDialog.svelte';
+  import { LEAD_STATUSES, leadStatus, leavingConvertedMessage } from './crm.js';
 
   let { lead, crmReady = true, onsaved, onconvert, label = '' } = $props();
   let saving = $state(false);
@@ -19,7 +23,13 @@
   const hasConversion = $derived(!!(lead?.converted_client_id || lead?.converted_brief_id));
   const tone = $derived(leadStatus(shown).tone);
 
-  async function change(e) {
+  // Confirmación al sacar de "Convertido" (se monta la primera vez que hace falta).
+  let askMounted = $state(false);
+  let askOpen = $state(false);
+  let askNext = $state('');
+  const askMessage = $derived(askNext ? leavingConvertedMessage(lead, askNext) : '');
+
+  function change(e) {
     const next = e.currentTarget.value;
     const prev = lead.status;
     if (next === prev) return;
@@ -29,6 +39,25 @@
       onconvert(lead);
       return;
     }
+    if (crmReady && leavingConvertedMessage(lead, next)) {
+      e.currentTarget.value = prev;
+      shown = prev;
+      askNext = next;
+      askMounted = true;
+      askOpen = true;
+      return;
+    }
+    save(next);
+  }
+
+  async function confirmLeave() {
+    const next = askNext;
+    askOpen = false;
+    await save(next);
+  }
+
+  async function save(next) {
+    const prev = lead.status;
     shown = next;
     saving = true;
     try {
@@ -48,6 +77,12 @@
   aria-label={label || ('Estado de ' + (lead?.name || lead?.email || lead?.ref_id))} onchange={change}>
   {#each LEAD_STATUSES as s (s.id)}<option value={s.id}>{s.label}</option>{/each}
 </select>
+
+{#if askMounted}
+  <ConfirmDialog bind:open={askOpen} title="¿Sacarlo de Convertidos?" message={askMessage}
+    confirmLabel={askNext ? 'Pasar a ' + leadStatus(askNext).label : 'Cambiar estado'} danger={false} busy={saving}
+    onconfirm={confirmLeave} />
+{/if}
 
 <style>
   .st {

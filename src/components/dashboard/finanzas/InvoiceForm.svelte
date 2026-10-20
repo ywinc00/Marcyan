@@ -1,7 +1,7 @@
 <script>
   // Alta y edición de factura (FIN-01, FIN-02, FIN-04, FIN-08) en un modal.
-  //   · Cliente: selector simple de clientes activos (A2 construye un
-  //     ClientPicker común; se unificará cuando exista).
+  //   · Cliente: el selector único del panel (crm/ClientPicker, integración
+  //     CRM): búsqueda sin archivados y alta de un cliente nuevo desde ahí.
   //   · Proyecto: opcional, solo los del cliente elegido.
   //   · Monto con lectura en vivo; nunca $0.
   //   · Estado: a mano solo Borrador, Enviada o Anulada. Pagada, Parcial y
@@ -9,6 +9,7 @@
   import Modal from '../ui/Modal.svelte';
   import Field from '../ui/Field.svelte';
   import MoneyInput from './MoneyInput.svelte';
+  import ClientPicker from '../crm/ClientPicker.svelte';
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { toast } from '../lib/toast.svelte.js';
   import { todayISO, dayISO } from '../lib/dates.js';
@@ -19,7 +20,7 @@
   const editing = $derived(!!invoice);
   let form = $state(blank());
   let cents = $state(null);
-  let clients = $state([]);
+  let pickedClient = $state(null);
   let projects = $state([]);
   let loadingLists = $state(false);
   let listsError = $state('');
@@ -46,8 +47,12 @@
         description: invoice.description || '',
         status: manual ? invoice.stored_status : 'auto',
       };
+      pickedClient = invoice.client_id
+        ? { id: invoice.client_id, client_code: invoice.client_code, business_name: invoice.client_name }
+        : null;
     } else {
       form = blank();
+      pickedClient = null;
     }
     loadLists();
   });
@@ -55,25 +60,13 @@
   async function loadLists() {
     loadingLists = true; listsError = '';
     try {
-      const [c, p] = await Promise.all([
-        api('/api/admin/clients?limit=200&status=active'),
-        api('/api/admin/projects?limit=200'),
-      ]);
-      clients = c.rows || [];
+      const p = await api('/api/admin/projects?limit=200');
       projects = p.rows || [];
     } catch (e) {
-      if (!isSessionError(e)) listsError = errorMessage(e, 'No se pudo cargar la lista de clientes.');
+      if (!isSessionError(e)) listsError = errorMessage(e, 'No se pudo cargar la lista de proyectos.');
     } finally { loadingLists = false; }
   }
 
-  // La factura que se edita puede ser de un cliente ya inactivo: se añade a la lista.
-  const clientOptions = $derived.by(() => {
-    const list = clients.slice();
-    if (invoice && invoice.client_id && !list.some((c) => String(c.id) === String(invoice.client_id))) {
-      list.unshift({ id: invoice.client_id, client_code: invoice.client_code, business_name: invoice.client_name });
-    }
-    return list;
-  });
   // Igual con su proyecto: la lista llega con un tope y puede no traerlo.
   // Sin esto, el efecto de abajo lo soltaría al guardar cualquier otro cambio.
   const allProjects = $derived.by(() => {
@@ -133,18 +126,11 @@
   <form class="fin-form" id="fin-invoice-form" onsubmit={submit} novalidate>
     {#if listsError}<p class="fin-form__err" role="alert">{listsError}</p>{/if}
     <div class="fin-grid">
-      <Field label="Cliente" required error={tried && !form.client_id ? 'Elige un cliente.' : ''}
-        hint={editing && hasPayments ? 'Tiene pagos: el cliente ya no se puede cambiar.' : ''}>
-        {#snippet children(f)}
-          <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.client_id}
-            disabled={loadingLists || (editing && hasPayments)}>
-            <option value="">{loadingLists ? 'Cargando clientes…' : 'Elige un cliente'}</option>
-            {#each clientOptions as c (c.id)}
-              <option value={String(c.id)}>{c.business_name || c.owner_name || 'Sin nombre'} · {c.client_code}</option>
-            {/each}
-          </select>
-        {/snippet}
-      </Field>
+      <ClientPicker bind:value={pickedClient} label="Cliente" required id="fin-inv-client" allowCreate
+        error={tried && !form.client_id ? 'Elige un cliente.' : ''}
+        hint={editing && hasPayments ? 'Tiene pagos: el cliente ya no se puede cambiar.' : ''}
+        disabled={editing && hasPayments}
+        onchange={(c) => { form.client_id = c ? String(c.id) : ''; }} />
       <Field label="Proyecto" hint={form.client_id && !projectOptions.length ? 'Este cliente no tiene proyectos.' : 'Opcional.'}>
         {#snippet children(f)}
           <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.project_id}

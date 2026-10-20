@@ -10,7 +10,10 @@
 //    · PATCH  400 por campo, 400 de estado, 404, 503 sin la 010, 200 con
 //             cambios y evento 'brief_edited'.
 //    · POST   400 acción, 400 cliente, 404 brief, 201 creado, 200 'already',
-//             409 otro cliente, 404 cliente inexistente, 200 vinculado.
+//             409 otro cliente, 404 cliente inexistente, 200 vinculado,
+//             409 duplicado y "crear igualmente" (integración CRM), 409 al
+//             vincular un cliente archivado (revisión int1), y un solo
+//             evento 'converted_to_client' al crear (lo escribe finance).
 //    · events POST de notas (400, 201 con { event }) y GET.
 //    · email  el cuerpo queda en el historial.
 //    · 401 sin sesión antes de leer nada.
@@ -27,7 +30,7 @@ const OVERRIDES = {
   'lib/db.mjs': ['getBriefByProjectId', 'updateBriefStatus', 'updateBriefSummary', 'deleteBrief', 'logEvent',
     'applyBriefEdits', 'getBriefClient', 'linkBriefToClient', 'listEvents'],
   'lib/auth.mjs': ['requireAdmin'],
-  'lib/finance.mjs': ['createClientFromBrief'],
+  'lib/finance.mjs': ['convertBriefToClient'],
   'lib/brief-files.mjs': ['deleteBriefBlobs'],
   'lib/email.mjs': ['emailManualToClient'],
 };
@@ -74,7 +77,7 @@ const BRIEF = () => ({
 });
 let calls;
 function stubs(over = {}) {
-  calls = { logEvent: [], applyBriefEdits: [], link: [], email: [] };
+  calls = { logEvent: [], applyBriefEdits: [], link: [], email: [], convert: [] };
   globalThis.__briefStubs = {
     requireAdmin: async () => SESSION,
     getBriefByProjectId: async (id) => (id === 'MRC-007' ? BRIEF() : null),
@@ -87,7 +90,10 @@ function stubs(over = {}) {
       calls.link.push({ pid, cid, actor });
       return cid === 12 ? { client: { id: 12, client_code: 'CLI-012', business_name: 'Aurora', status: 'active' }, sourceSet: true } : null;
     },
-    createClientFromBrief: async () => ({ id: 30, client_code: 'CLI-030', business_name: 'Limpiezas Aurora', status: 'active' }),
+    convertBriefToClient: async (pid, actor, opts) => {
+      calls.convert.push({ pid, actor, opts });
+      return { client: { id: 30, client_code: 'CLI-030', business_name: 'Limpiezas Aurora', status: 'active' }, created: true };
+    },
     listEvents: async () => [{ id: 1, event_type: 'note', actor_email: SESSION.email, data: { text: 'Llamó' }, created_at: '2026-10-19T15:00:00Z' }],
     emailManualToClient: async (m) => { calls.email.push(m); },
     deleteBriefBlobs: async () => 0,
@@ -186,14 +192,32 @@ await check('POST: brief inexistente → 404', async () => {
   const r = await call(briefHandler, { method: 'POST', id: 'MRC-999', body: { action: 'convert_to_client' } });
   assert.equal(r.statusCode, 404);
 });
-await check('POST: crear cliente → 201, created y evento converted_to_client', async () => {
+await check('POST: crear cliente → 201 y UN solo converted_to_client (lo escribe finance con el actor)', async () => {
   const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client' } });
   assert.equal(r.statusCode, 201);
   assert.equal(r.body.created, true);
   assert.equal(r.body.client.client_code, 'CLI-030');
-  const ev = calls.logEvent.find((e) => e.type === 'converted_to_client');
-  assert.equal(ev.data.client_id, 30);
-  assert.equal(ev.data.created, true);
+  assert.deepEqual(calls.convert, [{ pid: 'MRC-007', actor: SESSION.email, opts: { checkDuplicates: true } }]);
+  assert.equal(calls.logEvent.filter((e) => e.type === 'converted_to_client').length, 0, 'el handler no lo repite');
+});
+await check('POST: crear con correo o teléfono de otro cliente → 409 duplicate con coincidencias', async () => {
+  const fin = await import('../lib/finance.mjs');
+  stubs({ convertBriefToClient: async () => { throw new fin.CrmError(409, 'Ya existe un cliente con el correo o el teléfono de este brief: CLI-003 Aurora.', { reason: 'duplicate', matches: [{ id: 3, client_code: 'CLI-003' }] }); } });
+  const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client' } });
+  assert.equal(r.statusCode, 409);
+  assert.equal(r.body.reason, 'duplicate');
+  assert.equal(r.body.matches[0].client_code, 'CLI-003');
+});
+await check('POST: "crear igualmente" (allow_duplicate) no comprueba duplicados', async () => {
+  const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client', allow_duplicate: true } });
+  assert.equal(r.statusCode, 201);
+  assert.deepEqual(calls.convert[0].opts, { checkDuplicates: false });
+});
+await check('POST: si al crear ya existía (carrera) → 200 already, sin crear otro', async () => {
+  stubs({ convertBriefToClient: async () => ({ client: { id: 30, client_code: 'CLI-030' }, created: false }) });
+  const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client' } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.already, true);
 });
 await check('POST: ya es cliente y no se pide otro → 200 already, sin evento', async () => {
   stubs({ getBriefClient: async () => ({ id: 30, client_code: 'CLI-030' }) });
@@ -220,8 +244,28 @@ await check('POST: vincular → 200 linked; el evento lo escribe la misma senten
   assert.deepEqual(calls.link, [{ pid: 'MRC-007', cid: 12, actor: SESSION.email }]);
   assert.equal(calls.logEvent.length, 0);
 });
+await check('POST: vincular a un cliente ARCHIVADO → 409 en texto llano (revisión int1, F2)', async () => {
+  stubs({ linkBriefToClient: async (pid, cid, actor) => {
+    calls.link.push({ pid, cid, actor });
+    return { client: { id: 5, client_code: 'CLI-005', business_name: 'Ana', status: 'archived' }, sourceSet: false, archived: true };
+  } });
+  const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client', client_id: 5 } });
+  assert.equal(r.statusCode, 409);
+  assert.equal(r.body.reason, 'archived');
+  assert.match(r.body.error, /archivado\. Reactívalo en su ficha/);
+});
+await check('linkBriefToClient: con el cliente archivado la sentencia no escribe vínculo ni evento', async () => {
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(path.join(ROOT, 'lib/db.mjs'), 'utf8');
+  const fn = src.slice(src.indexOf('export async function linkBriefToClient'));
+  const body = fn.slice(0, fn.indexOf('\n}\n'));
+  assert.match(body, /ok AS \(\s*SELECT \* FROM c WHERE status IS DISTINCT FROM 'archived'/);
+  assert.match(body, /WHERE id = \(SELECT id FROM ok\) AND source_brief_id IS NULL/);
+  assert.match(body, /FROM ok\s+RETURNING id/);
+  assert.match(body, /archived: client\.status === 'archived'/);
+});
 await check('POST: fallo inesperado → 500 con texto llano', async () => {
-  stubs({ createClientFromBrief: async () => { throw new Error('boom'); } });
+  stubs({ convertBriefToClient: async () => { throw new Error('boom'); } });
   const r = await quiet(() => call(briefHandler, { method: 'POST', body: { action: 'convert_to_client' } }));
   assert.equal(r.statusCode, 500);
   assert.match(r.body.error, /cliente/);

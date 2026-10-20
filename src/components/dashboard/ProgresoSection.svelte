@@ -6,7 +6,7 @@
   // y la ficha de cada proyecto en #/progreso/PRJ-003 (progreso/ProjectDetail).
   // Recargar, Atrás y los enlaces de avisos y correos abren lo mismo.
   import { untrack } from 'svelte';
-  import { api } from './lib/api.js';
+  import { api, ApiError } from './lib/api.js';
   import { toast } from './lib/toast.svelte.js';
   import { route, href, setQuery, navigate } from './lib/router.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
@@ -93,9 +93,14 @@
   let showNew = $state(false);
   let creating = $state(false);
   let createError = $state('');
-  function openNew() { createError = ''; showNew = true; }
+  // Cliente del brief que ya existe con su correo o teléfono (409 duplicate,
+  // revisión int1, F1): el formulario lo enseña y deja usarlo o crear igualmente.
+  let dupMatches = $state([]);
+  let lastPayload = null;
+  function openNew() { createError = ''; dupMatches = []; showNew = true; }
   async function create(payload) {
-    creating = true; createError = '';
+    creating = true; createError = ''; dupMatches = [];
+    lastPayload = payload;
     try {
       const j = await api('/api/admin/projects', { method: 'POST', body: payload });
       showNew = false;
@@ -103,7 +108,9 @@
       if (j.project?.project_code) navigate('progreso', [j.project.project_code]);
       else loadList();
     } catch (e) {
-      createError = e?.message || 'No se pudo crear el proyecto.';
+      const d = e instanceof ApiError ? e.data : null;
+      if (d?.reason === 'duplicate' && d.matches?.length) dupMatches = d.matches;
+      else createError = e?.message || 'No se pudo crear el proyecto.';
     } finally { creating = false; }
   }
 
@@ -215,7 +222,9 @@
 {/if}
 
 <Modal bind:open={showNew} title="Nuevo proyecto" size="md">
-  <ProjectForm mode="create" formId="np-form" busy={creating} serverError={createError} onsubmit={create} />
+  <ProjectForm mode="create" formId="np-form" busy={creating} serverError={createError} onsubmit={create}
+    {dupMatches} ondupclear={() => (dupMatches = [])}
+    onforce={() => lastPayload && create({ ...lastPayload, allow_duplicate: true })} />
   {#snippet footer()}
     <button type="button" class="b" onclick={() => (showNew = false)} disabled={creating}>Cancelar</button>
     <button type="submit" form="np-form" class="b b--primary" disabled={creating}>{creating ? 'Creando…' : 'Crear proyecto'}</button>

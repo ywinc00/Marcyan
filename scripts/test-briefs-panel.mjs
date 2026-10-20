@@ -112,6 +112,35 @@ await check('edición: correo mal escrito se marca en su campo', () => {
   const r = prepareBriefEdits({ data: DATA, fields: { email: 'no-es-correo' } });
   assert.ok(r.errors.email);
 });
+await check('edición: un campo de otro servicio se valida igual (A3-02)', () => {
+  const data = { ...DATA, services: ['seo-ia'], website_type: 'landing' };
+  const r = prepareBriefEdits({ data, fields: { website_type: 'zzz' }, services: ['seo-ia'] });
+  assert.ok(r.errors.website_type);
+  assert.deepEqual(r.writes.columns, {});
+  const ok = prepareBriefEdits({ data, fields: { website_type: 'ecommerce' }, services: ['seo-ia'] });
+  assert.deepEqual(ok.errors, {});
+});
+await check('edición: un servicio que no está en el catálogo es un error (A3-02)', () => {
+  const r = prepareBriefEdits({ data: DATA, fields: { services: ['seo-local', 'inventado'] } });
+  assert.ok(r.errors.services);
+  assert.equal(r.writes.services, undefined);
+});
+await check('edición: un servicio antiguo que ya tenía el brief se conserva en su orden', () => {
+  const data = { ...DATA, services: ['viejo', 'seo-local'] };
+  const same = prepareBriefEdits({ data, fields: { services: ['viejo', 'seo-local'] } });
+  assert.deepEqual(same.errors, {});
+  assert.deepEqual(same.changes, {});
+  const more = prepareBriefEdits({ data, fields: { services: ['viejo', 'seo-local', 'diseno-web'] } });
+  assert.deepEqual(more.errors, {});
+  assert.deepEqual(more.writes.services, ['viejo', 'seo-local', 'diseno-web']);
+});
+await check('edición: no se pueden vaciar correo y teléfono a la vez (A3-02)', () => {
+  const data = { ...DATA, email: 'a@b.co', phone: '7135550142' };
+  const r = prepareBriefEdits({ data, fields: { email: '', phone: '' } });
+  assert.ok(r.errors.email);
+  const one = prepareBriefEdits({ data, fields: { email: '' } });
+  assert.deepEqual(one.errors, {});
+});
 await check('edición: "" y [] valen lo mismo que vacío', () => {
   assert.ok(sameBriefValue(null, ''));
   assert.ok(sameBriefValue(undefined, []));
@@ -133,6 +162,24 @@ await check('panel: en edición salen todas las columnas históricas (se podían
   const keys = s.flatMap((x) => x.rows.map((r) => r.key));
   for (const k of LEGACY_COLUMNS) assert.ok(keys.includes(k), k);
   assert.ok(keys.includes('services'));
+});
+await check('panel: los datos del formulario anterior no se presentan como kit (A3-01)', () => {
+  const v1 = { instagram: '@aurora', competitors: 'Otra', brand_fonts: 'Lora' };
+  const s = P.viewSections(v1);
+  assert.ok(!s.some((x) => x.moment === 'arranque'));
+  const keys = s.filter((x) => x.moment === 'anterior').flatMap((x) => x.rows.map((r) => r.key));
+  assert.deepEqual(keys.sort(), ['brand_fonts', 'competitors', 'instagram']);
+  // En edición, sin kit recibido, las columnas vacías tampoco forman un bloque de kit.
+  assert.ok(!P.viewSections({}, { edit: true }).some((x) => x.moment === 'arranque'));
+});
+await check('panel: con el kit recibido, lo que pregunta el kit va al kit y lo oculto sigue aparte', () => {
+  const s = P.viewSections({ instagram: '@aurora', brand_fonts: 'Lora', legal_name: 'Aurora LLC' }, { kitReceived: true });
+  const of = (m) => s.filter((x) => x.moment === m).flatMap((x) => x.rows.map((r) => r.key)).sort();
+  assert.deepEqual(of('arranque'), ['brand_fonts', 'legal_name']);
+  assert.deepEqual(of('anterior'), ['instagram']);
+  assert.equal(P.kitReceived({ kit_status: 'submitted' }), true);
+  assert.equal(P.kitReceived({ kit_status: 'sent' }), false);
+  assert.equal(P.kitReceived({}), false);
 });
 await check('panel: un campo del kit con dato se ve aunque no se edite', () => {
   const s = P.viewSections({ hours: { mon: { closed: false, open: '08:00', close: '17:00' } } }, { edit: true });

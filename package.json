@@ -16,6 +16,7 @@
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
     "test:briefs-panel": "node scripts/test-briefs-panel.mjs",
+    "test:briefs-handlers": "node scripts/test-briefs-handlers.mjs",
     "gen:brief-services": "node scripts/build-brief-services.mjs"
   },
   "dependencies": {

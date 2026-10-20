@@ -15,7 +15,7 @@ import { clusterNavEn } from '../../i18n/clusters';
 
 // The nav CTA can't point back to this page (B-25): offer WhatsApp instead.
 const wa = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;
-const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa } };
+const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa, track: 'whatsapp_clicked' } };
 ---
 <Layout
   title="Project brief · Marcyan Studio"

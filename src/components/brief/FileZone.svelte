@@ -13,6 +13,7 @@
   const t = $derived(strings(lang));
   const id = $derived(`${idPrefix}-${field.key}`);
   const rows = $derived(uploads.files.filter((f) => f.field === field.key && !f.removed));
+  const removed = $derived(uploads.removedCount(field.key));
   const kind = $derived(field.kind);
   const hint = $derived(kind === 'photo' ? t.photoHint : kind === 'logo' ? t.logoHint : kind === 'legal' ? t.legalHint : kind === 'video' ? t.videoHint : t.docHint);
   const btn = $derived(kind === 'logo' ? t.chooseLogo : kind === 'photo' ? t.choosePhotos : t.chooseFiles);
@@ -85,6 +86,7 @@
       onchange={(e) => { take(e.currentTarget.files); e.currentTarget.value = ''; }}
     />
   </div>
+  {#if removed}<p class="fz__removed" role="status">{t.removedNote(removed)}</p>{/if}
   {#if uploads.unavailable}
     <p class="fz__off" role="status">{uploads.unavailable}</p>
   {:else if quota && uploads.active.length}
@@ -118,7 +120,7 @@
   .fz__hint { flex: 1 1 100%; font-size: var(--text-xs); color: var(--fg-secondary); }
   .fz__input { display: none; }
   .fz__quota { margin: 0; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
-  .fz__off { margin: 0; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .fz__off, .fz__removed { margin: 0; font-size: var(--text-sm); color: var(--fg-secondary); line-height: var(--leading-normal); }
   .fz__tag { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); min-width: 0; font-size: var(--text-xs); color: var(--fg-secondary); }
   .fz__tag select {
     min-height: var(--tap-min); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);

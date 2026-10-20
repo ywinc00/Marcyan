@@ -18,6 +18,17 @@
   const inputs = $state({});
   const rowsFor = (shot) => uploads.files.filter((f) => f.field === field.key && !f.removed && ((f.tags && f.tags.shot) || 'other') === shot);
   const has = (shot) => rowsFor(shot).some((f) => f.status === 'done');
+  const removed = $derived(uploads.removedCount(field.key));
+  // Mes escrito en un formato que no entendemos: se avisa junto al campo y
+  // se conserva lo último guardado (antes se borraba sin decir nada).
+  const monthBad = $state({});
+  function setMonth(id, raw) {
+    const v = String(raw || '').trim();
+    const m = parseMonth(v);
+    if (v && !m) { monthBad[id] = true; return; }
+    monthBad[id] = false;
+    uploads.setTag(id, 'month', m);
+  }
 
   // Mes de la foto: se escribe como 08/2026 (o 2026-08) y se guarda AAAA-MM.
   function parseMonth(v) {
@@ -82,7 +93,13 @@
                       <input type="text" maxlength="120" value={row.tags.neighborhood || ''} onchange={(e) => uploads.setTag(row.id, 'neighborhood', e.currentTarget.value.trim())} />
                     </label>
                     <label class="tag"><span>{t.shotMonth}</span>
-                      <input type="text" inputmode="numeric" maxlength="7" placeholder="08/2026" value={showMonth(row.tags.month)} onchange={(e) => uploads.setTag(row.id, 'month', parseMonth(e.currentTarget.value))} />
+                      <input
+                        type="text" inputmode="numeric" maxlength="7" placeholder="08/2026" value={showMonth(row.tags.month)}
+                        aria-invalid={monthBad[row.id] ? 'true' : undefined}
+                        aria-describedby={monthBad[row.id] ? `m-${row.id}` : undefined}
+                        onchange={(e) => setMonth(row.id, e.currentTarget.value)}
+                      />
+                      {#if monthBad[row.id]}<span class="tag__err" id={`m-${row.id}`}>{t.shotMonthErr}</span>{/if}
                     </label>
                     <fieldset class="tag tag--set">
                       <legend>{t.shotOrigin}</legend>
@@ -111,6 +128,7 @@
       </li>
     {/each}
   </ul>
+  {#if removed}<p class="shots__off" role="status">{t.removedNote(removed)}</p>{/if}
   {#if uploads.unavailable}
     <p class="shots__off" role="status">{uploads.unavailable}</p>
   {:else if quota && uploads.active.length}
@@ -149,6 +167,8 @@
     width: 100%; min-width: 0; min-height: var(--tap-min); padding: 6px 10px; border-radius: var(--radius-sm);
     border: 1px solid var(--border); background: var(--bg-base); color: var(--fg-primary); font: var(--text-base) var(--font-body);
   }
+  .tag input[aria-invalid='true'] { border-color: var(--color-error); }
+  .tag__err { font-size: var(--text-xs); color: color-mix(in srgb, var(--color-error), white 22%); }
   .tag input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
   .tag legend { padding: 0; margin-bottom: 4px; }
   .seg { display: flex; flex-wrap: wrap; gap: var(--space-2); }
@@ -161,7 +181,7 @@
   .seg__o:has(input:checked) { border-color: var(--accent-gold); background: var(--accent-gold-dim); color: var(--fg-primary); }
   .seg__o:has(input:focus-visible) { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .shots__quota { margin: 0; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
-  .shots__off { margin: 0; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .shots__off { margin: 0; font-size: var(--text-sm); color: var(--fg-secondary); line-height: var(--leading-normal); }
   @media (--sm) { .tags { grid-template-columns: 1fr 1fr; } }
   @media (--md) { .tags { grid-template-columns: 1fr 1fr 1fr; } }
   .tag--set { grid-column: 1 / -1; }

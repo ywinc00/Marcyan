@@ -13,7 +13,7 @@ import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 
 const wa = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;
-const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa } };
+const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa, track: 'whatsapp_clicked' } };
 ---
 <Layout
   title="Getting started kit · Marcyan Studio"

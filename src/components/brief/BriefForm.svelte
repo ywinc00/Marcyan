@@ -218,7 +218,10 @@
 
   const nextLabel = $derived(fromReview ? t.backToReview : (STEPS[step + 1] ? pick(STEPS[step + 1].label, lang) : ''));
   const answer = (fd) => labelFor(fd, data[fd.key], lang);
-  const fileNames = (key) => uploads.files.filter((f) => f.field === key && !f.removed && f.status === 'done').map((f) => f.name);
+  // El servidor enlaza también lo que el cliente quitó tras subirlo (llega
+  // marcado); el éxito cuenta solo lo que el cliente quiso enviar.
+  const keptFiles = $derived(result && result.files ? Math.max(0, (result.files.linked || 0) - uploads.removedCount()) : 0);
+  const fileNames = (key) =>uploads.files.filter((f) => f.field === key && !f.removed && f.status === 'done').map((f) => f.name);
 </script>
 
 {#if phase === 'sent' && result}
@@ -232,8 +235,8 @@
       <li><span class="ok__n">2</span><span>{t.okProposal}</span></li>
       <li><span class="ok__n">3</span><span>{t.okKit}</span></li>
     </ol>
-    {#if result.files && result.files.linked}
-      <p class="ok__files">{t.okFiles(result.files.linked)}{#if result.files.rejected} {t.okFilesRejected(result.files.rejected)}{/if}</p>
+    {#if keptFiles}
+      <p class="ok__files">{t.okFiles(keptFiles)}{#if result.files.rejected} {t.okFilesRejected(result.files.rejected)}{/if}</p>
     {/if}
     <p class="ok__note">{t.okNoResend}</p>
     <div class="ok__talk">
@@ -505,12 +508,14 @@
     .actions :global(.btn--primary) { flex: 0 0 auto; }
     .ok { padding: var(--space-7); }
   }
-  @media (--lg) { .ok { margin-left: calc(216px + var(--space-7)); } }
-  @media (--lg) {
+  /* Raíl desde 900 px: el corte lo fija el gate validado (design/brief.md §2);
+     no hay token de 900, por eso va escrito aquí. */
+  @media (min-width: 900px) {
+    .ok { margin-left: calc(216px + var(--space-7)); }
     .bf { grid-template-columns: 216px minmax(0, 1fr); gap: var(--space-7); }
     .rail { display: grid; gap: var(--space-4); position: sticky; top: calc(var(--nav-h) + var(--space-5)); align-content: start; padding-top: var(--space-2); }
     .mbar { display: none; }
     .card__k { display: block; }
-    .card { padding: var(--space-7); }
   }
+  @media (--lg) { .card { padding: var(--space-7); } }
 </style>

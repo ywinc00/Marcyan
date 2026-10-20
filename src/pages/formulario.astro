@@ -22,7 +22,7 @@ import { clusterNav } from '../i18n/clusters';
 // En esta página el CTA de la nav no puede volver a apuntar aquí (B-25):
 // ofrece la salida humana por WhatsApp.
 const wa = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;
-const pageNav = { ...clusterNav, cta: { label: 'WhatsApp', href: wa } };
+const pageNav = { ...clusterNav, cta: { label: 'WhatsApp', href: wa, track: 'whatsapp_clicked' } };
 ---
 <Layout
   title="Brief de proyecto · Marcyan Studio"

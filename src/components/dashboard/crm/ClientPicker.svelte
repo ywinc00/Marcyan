@@ -1,7 +1,7 @@
 <script>
   // ─────────────────────────────────────────────────────────────
-  // Selector de cliente COMPARTIDO (A2; lo reutilizan Briefs, Finanzas y
-  // Progreso): combobox con búsqueda, sin teclear IDs.
+  // Selector de cliente ÚNICO del panel (A2; integración CRM: lo usan Leads,
+  // Briefs, Finanzas y Progreso): combobox con búsqueda, sin teclear IDs.
   //
   //   <ClientPicker bind:value label="Cliente" />
   //   <ClientPicker clientId={project.client_id} onchange={(c) => …} />
@@ -14,7 +14,13 @@
   //               GET /api/admin/clients/:id?lite=1
   //   label, hint, error, required, disabled, placeholder
   //   includeArchived  (false) los archivados no se ofrecen
-  //   allowCreate      muestra "Crear cliente «texto»" al final (llama a oncreate)
+  //   allowCreate      muestra "Crear cliente «texto»" al final. Con oncreate
+  //                    lo resuelve el padre; sin oncreate abre aquí el alta
+  //                    (NewClientDialog) y elige el cliente creado, o el que ya
+  //                    existía si el dueño prefiere usarlo (409 de duplicado).
+  //   autoOption       { label, sub } opción extra al final de la lista que no
+  //                    es un cliente (p. ej. "cuenta Directo" en Progreso).
+  //   auto, onauto(on) si esa opción está elegida (la guarda el padre).
   //   onchange(client|null)
   // Datos: GET /api/admin/clients?search=<texto>&limit=8&active=1
   // Teclado: ↑ ↓ para moverse, Enter elige, Escape cierra. Patrón ARIA combobox.
@@ -23,12 +29,14 @@
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import Icon from '../ui/Icon.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
+  import NewClientDialog from './NewClientDialog.svelte';
   import { clientName, clientStatus } from './crm.js';
 
   let {
     value = $bindable(null), clientId = null, label = 'Cliente', hint = '', error = '',
     required = false, disabled = false, placeholder = 'Busca por negocio, persona, correo o código',
     includeArchived = false, allowCreate = false, oncreate, onchange, id = '',
+    autoOption = null, auto = false, onauto,
   } = $props();
 
   const uid = id || 'cp-' + Math.random().toString(36).slice(2, 9);
@@ -42,6 +50,10 @@
   let inputEl = $state(null);
   let timer = null;
   let seq = 0;
+  // Alta desde el selector (solo si allowCreate y el padre no la resuelve).
+  let newMounted = $state(false);
+  let newOpen = $state(false);
+  let newName = $state('');
 
   // Hidratar desde clientId (solo número) una vez.
   $effect(() => {
@@ -57,6 +69,7 @@
   const options = $derived([
     ...results.map((c) => ({ kind: 'client', c })),
     ...(allowCreate && text.trim() ? [{ kind: 'create' }] : []),
+    ...(autoOption ? [{ kind: 'auto' }] : []),
   ]);
 
   async function search(q) {
@@ -69,7 +82,7 @@
       const j = await api('/api/admin/clients?' + p.toString());
       if (my !== seq) return;
       results = j.rows || [];
-      active = results.length ? 0 : (allowCreate && q ? 0 : -1);
+      active = results.length || (allowCreate && q) || autoOption ? 0 : -1;
     } catch (e) {
       if (my !== seq) return;
       results = [];
@@ -91,15 +104,31 @@
   function close() { open = false; active = -1; }
   function choose(opt) {
     if (!opt) return;
-    if (opt.kind === 'create') { const t = text.trim(); close(); oncreate?.(t); return; }
-    value = opt.c;
+    if (opt.kind === 'create') {
+      const t = text.trim(); close();
+      if (oncreate) oncreate(t);
+      else { newName = t; newMounted = true; newOpen = true; }
+      return;
+    }
+    if (opt.kind === 'auto') {
+      const was = value;
+      value = null; text = ''; close();
+      if (was) onchange?.(null);
+      onauto?.(true);
+      return;
+    }
+    pick(opt.c);
+  }
+  function pick(c) {
+    value = c;
     text = '';
     close();
-    onchange?.(opt.c);
+    if (auto) onauto?.(false);
+    onchange?.(c);
   }
   function clear() {
-    value = null;
-    onchange?.(null);
+    if (auto) onauto?.(false);
+    else { value = null; onchange?.(null); }
     queueMicrotask(() => inputEl?.focus());
   }
   function onKey(e) {
@@ -120,7 +149,15 @@
 <div class="ui-field cp" class:has-error={!!error}>
   <label class="ui-field__label" for={uid}>{label}{#if required}<span class="ui-field__req" aria-hidden="true"> *</span>{/if}</label>
 
-  {#if value}
+  {#if auto && autoOption && !value}
+    <div class="cp__chosen">
+      <div class="cp__who">
+        <span class="cp__name cp__sub--wrap">{autoOption.label}</span>
+        {#if autoOption.sub}<span class="cp__sub cp__sub--wrap">{autoOption.sub}</span>{/if}
+      </div>
+      {#if !disabled}<button type="button" class="b b--mini" onclick={clear} aria-label="Elegir un cliente">Cambiar</button>{/if}
+    </div>
+  {:else if value}
     <div class="cp__chosen">
       <div class="cp__who">
         <span class="cp__name">{clientName(value)}</span>
@@ -154,7 +191,8 @@
         onkeydown={onKey}
         onblur={onBlur}
       />
-      {#if open}
+    </div>
+    {#if open}
         <ul class="cp__list" id={listId} role="listbox" aria-label="Clientes">
           {#if loading && !results.length}
             <li class="cp__msg" role="presentation">Buscando…</li>
@@ -163,46 +201,55 @@
               {loadError}
               <button type="button" class="b b--mini" onmousedown={(e) => e.preventDefault()} onclick={() => search(text.trim())}>Reintentar</button>
             </li>
-          {:else if !results.length && !(allowCreate && text.trim())}
+          {:else if !results.length && !(allowCreate && text.trim()) && !autoOption}
             <li class="cp__msg" role="presentation">{text.trim() ? `Ningún cliente coincide con «${text.trim()}».` : 'Aún no hay clientes.'}</li>
           {/if}
-          {#each options as opt, i (opt.kind === 'client' ? opt.c.id : 'create')}
+          {#each options as opt, i (opt.kind === 'client' ? opt.c.id : opt.kind)}
             <li id={`${uid}-opt-${i}`} role="option" aria-selected={i === active} class="cp__opt" class:is-active={i === active}
               onmousedown={(e) => e.preventDefault()} onclick={() => choose(opt)} onmousemove={() => (active = i)}>
               {#if opt.kind === 'client'}
                 <span class="cp__name">{clientName(opt.c)}</span>
                 <span class="cp__sub">{opt.c.client_code}{opt.c.email ? ' · ' + opt.c.email : opt.c.phone ? ' · ' + opt.c.phone : ''}{opt.c.status && opt.c.status !== 'active' ? ' · ' + clientStatus(opt.c.status).label : ''}</span>
-              {:else}
+              {:else if opt.kind === 'create'}
                 <span class="cp__name">Crear cliente «{text.trim()}»</span>
                 <span class="cp__sub">Alta nueva con este nombre</span>
+              {:else}
+                <span class="cp__name">{autoOption.label}</span>
+                {#if autoOption.sub}<span class="cp__sub cp__sub--wrap">{autoOption.sub}</span>{/if}
               {/if}
             </li>
           {/each}
         </ul>
-      {/if}
-    </div>
+    {/if}
   {/if}
 
   {#if hint && !error}<p class="ui-field__hint" id={uid + '-hint'}>{hint}</p>{/if}
   {#if error}<p class="ui-field__error" id={uid + '-err'} role="alert">{error}</p>{/if}
 </div>
 
+{#if newMounted}
+  <NewClientDialog bind:open={newOpen} initialName={newName} oncreated={pick} onuse={pick} />
+{/if}
+
 <style>
   .cp { position: relative; }
   .cp__box { position: relative; }
   .cp__icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); display: inline-flex; color: var(--fg-subtle); pointer-events: none; }
   .cp__input { padding-left: 34px; }
+  /* La lista va EN FLUJO bajo el campo (no flotante): el selector vive casi
+     siempre dentro de un modal con scroll propio, que recortaba una lista
+     absoluta (integración CRM). Así el modal crece o hace scroll con ella. */
   .cp__list {
-    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px);
-    margin: 0; padding: 4px; list-style: none;
-    max-height: 288px; overflow-y: auto;
+    position: relative; z-index: 1;
+    margin: 4px 0 0; padding: 4px; list-style: none;
+    max-height: 248px; overflow-y: auto; overscroll-behavior: contain;
     background: var(--surface-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md);
-    box-shadow: var(--shadow-modal);
   }
   .cp__opt { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; justify-content: center; }
   .cp__opt.is-active { background: var(--bg-elevated); outline: 1px solid var(--border-strong); }
   .cp__name { color: var(--fg-primary); font-size: var(--dash-body); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cp__sub { color: var(--fg-subtle); font-size: var(--dash-caption); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp__sub--wrap { white-space: normal; }
   .cp__msg { padding: 10px; font-size: var(--dash-small); color: var(--fg-secondary); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
   .cp__msg--err { color: var(--fg-primary); }
   .cp__chosen {

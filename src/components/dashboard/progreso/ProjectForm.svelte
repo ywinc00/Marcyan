@@ -1,9 +1,10 @@
 <script>
   // Formulario del proyecto: el mismo para crear (modal) y para editar la
   // ficha (OP-04). Campos: nombre, cliente, brief, servicio, monto y estado.
-  //   · Cliente: selector simple con los clientes existentes (CRM-05, OP-10);
-  //     al crear, la opción "auto" usa el cliente del brief o, sin brief, la
-  //     cuenta genérica "Directo" (lo dice tal cual).
+  //   · Cliente: el selector único del panel (crm/ClientPicker, integración
+  //     CRM; CRM-05, OP-10): búsqueda sin archivados y alta desde ahí. Al
+  //     crear, su opción extra "auto" usa el cliente del brief o, sin brief,
+  //     la cuenta genérica "Directo" (lo dice tal cual).
   //   · Brief: código MRC con sugerencias; se avisa junto al campo si no
   //     existe (OP-09), y el servidor lo vuelve a comprobar. Si la lista vino
   //     recortada (más de 200 briefs), decide solo el servidor (A5-R2).
@@ -12,7 +13,8 @@
   // que cambió). serverError = error del último guardado (se pinta arriba).
   import Field from '../ui/Field.svelte';
   import Icon from '../ui/Icon.svelte';
-  import { opts, loadOptions, clientLabel } from './options.svelte.js';
+  import ClientPicker from '../crm/ClientPicker.svelte';
+  import { opts, loadOptions } from './options.svelte.js';
   import {
     P_STATUSES, SERVICE_TYPES, serviceLabel, parseMoneyToCents, centsToInput,
   } from './format.js';
@@ -27,10 +29,17 @@
   // ── Estado del formulario ─────────────────────────────────────
   let f = $state(blank());
   let errors = $state({});
+  let pickedClient = $state(null);
   let lastKey = '';
 
   function blank() {
     return { name: '', clientId: '', briefId: '', serviceType: '', amount: '', status: 'active' };
+  }
+  // Cliente elegido en el selector a partir del proyecto (sin pedirlo otra vez).
+  function clientOf(p) {
+    return mode === 'edit' && p?.client_id != null
+      ? { id: p.client_id, client_code: p.client_code, business_name: p.client_name }
+      : null;
   }
   function fromProject(p) {
     return {
@@ -48,6 +57,7 @@
     if (key !== lastKey) {
       lastKey = key;
       f = mode === 'edit' ? fromProject(project) : blank();
+      pickedClient = clientOf(project);
       errors = {};
     }
   });
@@ -64,10 +74,6 @@
     const known = SERVICE_TYPES.some((s) => s.id === cur.toLowerCase());
     return cur && !known ? [...SERVICE_TYPES, { id: cur, label: serviceLabel(cur) }] : SERVICE_TYPES;
   });
-  // Cliente actual aunque no venga en la lista (más de 200 clientes, o archivado).
-  const clientMissing = $derived(
-    mode === 'edit' && project?.client_id != null && !opts.clients.some((c) => String(c.id) === String(project.client_id)),
-  );
   const briefTyped = $derived((f.briefId || '').trim().toUpperCase());
   const briefMatch = $derived(opts.briefs.find((b) => b.project_id === briefTyped) || null);
 
@@ -120,7 +126,7 @@
   }
 
   /** Vuelve a los valores guardados (botón Descartar del padre). */
-  export function reset() { f = mode === 'edit' ? fromProject(project) : blank(); errors = {}; }
+  export function reset() { f = mode === 'edit' ? fromProject(project) : blank(); pickedClient = clientOf(project); errors = {}; }
 </script>
 
 <form id={formId} class="pf" novalidate onsubmit={submit}>
@@ -134,20 +140,15 @@
     {/snippet}
   </Field>
 
-  <Field label="Cliente" required error={errors.clientId}
-         hint={opts.error ? '' : (mode === 'create' && f.clientId === AUTO ? (briefTyped ? 'Se usa el cliente que ya tenga ese brief o se crea con sus datos.' : 'El proyecto queda en la cuenta genérica "Directo" hasta que lo asignes.') : '')}>
-    {#snippet children(fl)}
-      <select class="ui-input pf__select" id={fl.id} aria-describedby={fl.describedby} aria-invalid={fl.invalid}
-              bind:value={f.clientId} disabled={opts.loading && !opts.loaded}>
-        <option value="" disabled>{opts.loading && !opts.loaded ? 'Cargando clientes…' : 'Elige un cliente'}</option>
-        {#if clientMissing}<option value={String(project.client_id)}>{project.client_name || 'Cliente actual'}{project.client_code ? ' · ' + project.client_code : ''}</option>{/if}
-        {#each opts.clients as c (c.id)}<option value={String(c.id)}>{clientLabel(c)}</option>{/each}
-        {#if mode === 'create'}
-          <option value={AUTO}>{briefTyped ? 'El cliente del brief ' + briefTyped : 'Sin cliente formal (cuenta Directo)'}</option>
-        {/if}
-      </select>
-    {/snippet}
-  </Field>
+  <ClientPicker bind:value={pickedClient} label="Cliente" required id={formId + '-client'} allowCreate
+    error={errors.clientId}
+    auto={mode === 'create' && f.clientId === AUTO}
+    autoOption={mode === 'create' ? {
+      label: briefTyped ? 'El cliente del brief ' + briefTyped : 'Sin cliente formal (cuenta Directo)',
+      sub: briefTyped ? 'Se usa el cliente que ya tenga ese brief o se crea con sus datos.' : 'El proyecto queda en la cuenta genérica "Directo" hasta que lo asignes.',
+    } : null}
+    onauto={(on) => { f.clientId = on ? AUTO : ''; }}
+    onchange={(c) => { f.clientId = c ? String(c.id) : ''; }} />
   {#if opts.error}
     <p class="pf__opts-err" role="alert">{opts.error} <button type="button" class="b b--mini" onclick={() => loadOptions({ force: true })}>Reintentar</button></p>
   {/if}

@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-19",
+  "fecha": "2026-10-20",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 35,
+  "indexadas": 34,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 35,
-    "Crawled - currently not indexed": 43,
+    "Submitted and indexed": 34,
+    "Crawled - currently not indexed": 44,
     "Alternate page with proper canonical tag": 6
   },
   "porGrupo": {
@@ -62,7 +62,7 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 2
+      "indexadas": 1
     },
     "landings·es": {
       "total": 18,
@@ -77,9 +77,9 @@
       "indexadas": 2
     }
   },
-  "sinRastreoReciente": 27,
+  "sinRastreoReciente": 26,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 87,
+  "certificadoDias": 86,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 6,
+    "sesionesUltimos3Dias": 5,
     "sesionesDiaHabitual": 4.4,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 60,
+    "diasSinContactos": 61,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -148,20 +148,38 @@
     ]
   },
   "alertas": {
-    "alta": [],
+    "alta": [
+      {
+        "fecha": "2026-10-20",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/miami"
+      }
+    ],
     "media": [
       {
-        "fecha": "2026-10-19",
+        "fecha": "2026-10-20",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "27 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "26 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": []
   },
-  "alertasNuevas": [],
+  "alertasNuevas": [
+    {
+      "fecha": "2026-10-20",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/miami"
+    }
+  ],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

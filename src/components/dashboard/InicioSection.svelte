@@ -1,113 +1,151 @@
 <script>
   // ─────────────────────────────────────────────────────────────
   // Inicio (#/inicio): "¿qué necesita mi atención hoy?".
-  // Sale de DashboardApp tal cual estaba (A0): misma información, ahora
-  // enchufada al cliente HTTP único, a las fechas de Houston y a las
-  // primitivas. Las cifras veraces (leads de este mes, proyectos activos
-  // reales, cobrado del mes) llegan en A1.
+  // A1: cifras veraces (leads de ESTE mes con comparación real, proyectos
+  // activos de la tabla de proyectos, cobrado del mes desde Finanzas),
+  // error de la analítica con Reintentar en vez de esqueleto eterno,
+  // leads por estado con proporciones reales (archivados aparte), eje Y
+  // del gráfico con enteros que existen, y cada bloque enlazado a su
+  // registro con el router (#/leads/<ref>, #/progreso/<PRJ>, filtros).
+  // La lógica pura vive en lib/inicio.js (probada con npm run test:inicio).
   // ─────────────────────────────────────────────────────────────
   import { onMount } from 'svelte';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
   import Kpi from './ui/Kpi.svelte';
+  import Card from './ui/Card.svelte';
   import StatusChip from './ui/StatusChip.svelte';
   import EmptyState from './ui/EmptyState.svelte';
   import ErrorState from './ui/ErrorState.svelte';
   import LoadingState from './ui/LoadingState.svelte';
   import Icon from './ui/Icon.svelte';
   import { data, loadHome, loadLeads, loadProjects } from './lib/store.svelte.js';
-  import { fmtDate, hourInHouston, todayISO } from './lib/dates.js';
+  import { fmtDate, fmtTime, hourInHouston } from './lib/dates.js';
   import { href } from './lib/router.svelte.js';
+  import { num, money, moneyFits, delta, monthShort, hasActivity, axisScale, leadStates, cumulative, activityLabel } from './lib/inicio.js';
 
   let { user = '' } = $props();
 
   const home = $derived(data.home);
+  const kpis = $derived(home?.kpis || null);
   const leads = $derived(data.leads);
   const projects = $derived(data.projects);
 
-  // Índice de barra resaltada en el gráfico (hover). Por defecto, el mes actual.
-  let hoverBar = $state(-1);
+  // Mes anterior para las comparaciones ("vs. sep"), en hora de Houston (meta del servidor).
+  const prevLabel = $derived(monthShort(home?.meta?.prev_month));
 
-  const MONTH_LABELS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  function monthLabel(m) { return m ? (MONTH_LABELS[parseInt(m.slice(5, 7), 10) - 1] || m) : ''; }
+  // ── KPI 1 · Leads recibidos este mes (CRM-15, OP-03, MOCK-03) ──
+  // Rótulo "Leads recibidos", no "nuevos": "Nuevos" es el ESTADO de la
+  // tarjeta de Leads por estado (sin contactar, de cualquier fecha). A1-02.
+  const leadsThisMonth = $derived(num(kpis?.new_leads_this_month ?? kpis?.leads_this_month));
+  const leadsDelta = $derived(delta(leadsThisMonth, kpis?.new_leads_prev_month));
+  const uncontacted = $derived(num(kpis?.uncontacted_leads ?? kpis?.new_leads));
+
+  // ── KPI 3 · Proyectos activos reales (OP-01). Si el conteo del servidor
+  // falla (null) pero la lista de proyectos sí llegó, se cuenta de ella.
+  const activeFromList = $derived(data.projectsLoaded ? projects.filter((p) => p.status === 'active').length : null);
+  const activeProjects = $derived(num(kpis?.active_projects) ?? activeFromList);
+
+  // ── KPI 4 · Cobrado este mes desde Finanzas (OP-02, MOCK-02). null = Finanzas no respondió.
+  const revenue = $derived(num(kpis?.revenue_this_month_cents));
+  const revenueDelta = $derived(delta(revenue, kpis?.revenue_prev_month_cents, (n) => money(n)));
+  // A1-01: la tarjeta corta con "…" lo que no cabe, y el hueco junto a la
+  // ilustración va de ~72 px (móvil de 360) a más de 120 (escritorio). Se
+  // pinta la forma más precisa que CABE en la tarjeta real ("$12,841",
+  // luego "$12.8k", luego "$13k"); la cifra exacta va en la nota si la de
+  // arriba está redondeada. Medido, no adivinado por el ancho de pantalla:
+  // entre 1100 y 1279 px las 4 columnas son más estrechas que en el móvil.
+  const revenueForms = $derived(revenue === null ? [] : moneyFits(revenue));
+  const revenueKey = $derived(revenueForms.join('|'));
+  let revenueFit = $state({ key: '', i: 0 });   // forma elegida para ESTA cifra
+  const revenueIdx = $derived(revenueFit.key === revenueKey ? revenueFit.i : 0);
+  const revenueShort = $derived(revenue === null ? '—' : revenueForms[revenueIdx] ?? '—');
+  const revenueExact = $derived(revenue === null ? '' : money(revenue));
+  const revenueRounded = $derived(revenue !== null && revenueShort !== revenueExact);
+  let revenueBox = $state();   // envoltorio sin caja (display: contents) del KPI
+  $effect(() => {
+    // Tras pintar una forma: si no cabe, se prueba la siguiente más corta.
+    const i = revenueIdx, key = revenueKey, n = revenueForms.length;
+    const el = revenueBox?.querySelector('.ui-kpi__num');
+    if (!el || i >= n - 1) return;
+    if (el.scrollWidth > el.clientWidth + 0.5) revenueFit = { key, i: i + 1 };
+  });
+  $effect(() => {
+    // Si la tarjeta cambia de ancho (giro, ventana), se vuelve a la más precisa.
+    const card = revenueBox?.firstElementChild;
+    if (!card || typeof ResizeObserver === 'undefined') return;
+    let w = card.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (card.clientWidth === w) return;
+      w = card.clientWidth;
+      revenueFit = { key: '', i: 0 };
+    });
+    ro.observe(card);
+    // La tipografía de la cifra llega después: se mide de nuevo con ella.
+    let alive = true;
+    document.fonts?.ready.then(() => { if (alive) revenueFit = { key: '', i: 0 }; });
+    return () => { alive = false; ro.disconnect(); };
+  });
+
+  // ── Gráfico de actividad por mes ─────────────────────────────
   const activity = $derived(home && Array.isArray(home.activity) ? home.activity : []);
-  // Barra "activa": la que tiene el cursor encima, o el mes actual si no hay hover.
-  // Si no hay datos, queda en -1 (el bloque del gráfico no se renderiza).
+  const anyActivity = $derived(hasActivity(activity));
+  // Barra resaltada: la del cursor/toque, o el mes actual.
+  let hoverBar = $state(-1);
   const activeBar = $derived(
-    activity.length === 0 ? -1
+    !anyActivity ? -1
     : hoverBar >= 0 && hoverBar < activity.length ? hoverBar
     : activity.length - 1
   );
-  // Escala "bonita" del eje Y: ticks redondeados por encima del máximo real
-  // para que las etiquetas del eje derecho sean números limpios (Orbit).
-  const yTop = $derived.by(() => {
-    const m = Math.max(...activity.map((a) => a.total || 0), 0);
-    if (m <= 0) return 4;            // datos vacíos → eje 0..4 (no rompe)
-    const pow = Math.pow(10, Math.floor(Math.log10(m)));
-    const n = Math.ceil(m / pow) * pow;
-    return n === m ? n + pow / 2 : n; // un respiro sobre el pico
-  });
-  // 4 etiquetas de eje (arriba→abajo) — enteras y crecientes.
-  const yTicks = $derived([yTop, yTop * 0.75, yTop * 0.5, yTop * 0.25].map((v) => Math.round(v)));
+  // Eje Y con enteros únicos, el 0 incluido y una cima que existe (SH-13).
+  const scale = $derived(axisScale(Math.max(0, ...activity.map((a) => num(a.total) || 0))));
+  // Geometría del SVG en PÍXELES reales: el viewBox sigue el ancho medido del
+  // contenedor, así los números del eje y los meses se leen a 11-12 px también
+  // en el móvil (antes el SVG se encogía entero y el texto quedaba en ~5 px).
+  // PR = carril de números · PW = zona de barras · BASE = línea base ·
+  // HEAD = respiro sobre la cima · VH = alto total.
+  let plotW = $state(0);
+  const PR = 34, BASE = 150, HEAD = 18, VH = 184;
+  const VW = $derived(Math.max(260, Math.round(plotW) || 600));
+  const PW = $derived(VW - PR);
+  // UNA sola escala para rejilla, barras, guía y tooltip (antes cada una iba por su lado).
+  function plural(n, one, many) { return `${n} ${n === 1 ? one : many}`; }
+  function yOf(v) { return scale.top > 0 ? BASE - (Math.max(0, v) / scale.top) * (BASE - HEAD) : BASE; }
 
-  // ── Embudo (pills decrecientes Orbit) ────────────────────────
-  const funnelRows = $derived(home ? [
-    { name: 'Nuevos',      n: home.funnel.new       },
-    { name: 'Contactados', n: home.funnel.contacted },
-    { name: 'Convertidos', n: home.funnel.converted },
-    { name: 'Archivados',  n: home.funnel.archived  },
-  ] : []);
-  const funnelMax = $derived(home
-    ? Math.max(1, home.funnel.new, home.funnel.contacted, home.funnel.converted, home.funnel.archived)
-    : 1);
-  // Ancho decreciente garantizado (cada etapa nunca más ancha que la anterior),
-  // con piso para que no desaparezca; la pill global aplica además min-width.
-  function funnelW(i) {
-    if (!funnelRows.length) return 100;
-    const raw = funnelRows.map((r) => Math.round((r.n / funnelMax) * 100));
-    let cap = 100;
-    const out = raw.map((v) => { const w = Math.min(v, cap); cap = w; return Math.max(w, 34); });
-    return out[i];
-  }
+  // ── Leads por estado (OP-19, SH-14) ──────────────────────────
+  const states = $derived(leadStates(home?.funnel));
 
-  // ── Sparkline: actividad acumulada en los 6 meses ────────────
-  const sparkPoints = $derived.by(() => {
-    if (!activity.length) return [];
-    let acc = 0;
-    return activity.map((a) => (acc += (a.total || 0)));
-  });
+  // ── Actividad acumulada (curva, 6 meses) ─────────────────────
+  const sparkPoints = $derived(cumulative(activity));
   const sparkTotal = $derived(sparkPoints.length ? sparkPoints[sparkPoints.length - 1] : 0);
-  const SPARK_W = 560, SPARK_H = 150;
-  // Devuelve line/area + coordenadas del último punto (dot final).
-  // n===1 → traza una línea plana en la base para que no quede vacío.
+  const SPARK_W = 560, SPARK_H = 120;
   const sparkPath = $derived.by(() => {
     const n = sparkPoints.length;
-    if (n === 0) return { line: '', area: '', dot: null };
+    if (!anyActivity || n === 0) return { line: '', area: '', dot: null };
     const max = Math.max(1, ...sparkPoints);
-    const yOf = (v) => SPARK_H - 8 - (v / max) * (SPARK_H - 24);
+    const yS = (v) => SPARK_H - 8 - (v / max) * (SPARK_H - 24);
     if (n === 1) {
-      const y = yOf(sparkPoints[0]).toFixed(1);
-      const line = `M0 ${y} L${SPARK_W} ${y}`;
-      const area = `M0 ${SPARK_H} L0 ${y} L${SPARK_W} ${y} L${SPARK_W} ${SPARK_H} Z`;
-      return { line, area, dot: { x: SPARK_W, y: +y } };
+      const y = yS(sparkPoints[0]).toFixed(1);
+      return { line: `M0 ${y} L${SPARK_W} ${y}`, area: `M0 ${SPARK_H} L0 ${y} L${SPARK_W} ${y} L${SPARK_W} ${SPARK_H} Z`, dot: { x: SPARK_W, y: +y } };
     }
     const step = SPARK_W / (n - 1);
-    const xy = sparkPoints.map((v, i) => [i * step, yOf(v)]);
+    const xy = sparkPoints.map((v, i) => [i * step, yS(v)]);
     const line = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
     const area = 'M0 ' + SPARK_H + ' ' + line.replace(/^M/, 'L') + ' L' + SPARK_W + ' ' + SPARK_H + ' Z';
     const last = xy[xy.length - 1];
     return { line, area, dot: { x: last[0], y: last[1] } };
   });
 
-  // ── Proyectos recientes (Orbit table) ────────────────────────
-  const recentProjects = $derived(projects.slice(0, 6));
+  // ── Proyectos recientes ──────────────────────────────────────
+  // 5 filas, igual que leads recientes: los dos bloques miden lo mismo.
+  const recentProjects = $derived(projects.slice(0, 5));
   const PROJECT_STATUS = {
-    active:    { label: 'En curso',   tone: 'accent'  },
-    on_hold:   { label: 'En pausa',   tone: 'neutral' },
-    completed: { label: 'Terminado',  tone: 'data'    },
-    cancelled: { label: 'Cancelado',  tone: 'neutral' },
+    active:    { label: 'En curso',  tone: 'accent'  },
+    on_hold:   { label: 'En pausa',  tone: 'neutral' },
+    completed: { label: 'Terminado', tone: 'data'    },
+    cancelled: { label: 'Cancelado', tone: 'neutral' },   // OP-23, MOCK-12
   };
-  function projStatus(s) { return PROJECT_STATUS[s] || { label: s || 'Sin estado', tone: 'neutral' }; }
+  function projStatus(s) { return PROJECT_STATUS[s] || { label: 'Sin estado', tone: 'neutral' }; }
   function initials(s) {
     const parts = (s || '?').trim().split(/[\s—-]+/).filter(Boolean);
     if (!parts.length) return '?';
@@ -122,18 +160,25 @@
     return MONO_PALETTE[Math.abs(h) % MONO_PALETTE.length];
   }
 
-  // Origen del lead: chip neutro salvo chatbot (dato) y diagnóstico (info).
-  // El naranja ya no se gasta en chips de origen (H-07).
+  // ── Leads recientes ──────────────────────────────────────────
+  // Origen: chip neutro salvo chatbot (dato) y diagnóstico (info). H-07.
   const SOURCES = {
     chat:       { label: 'Chatbot',     tone: 'data'    },
     diagnostic: { label: 'Diagnóstico', tone: 'info'    },
     contact:    { label: 'Contacto',    tone: 'neutral' },
   };
   function sourceMeta(s) { return SOURCES[s] || SOURCES.contact; }
+  function leadTitle(l) { return l.name || l.email || l.phone || 'Sin nombre'; }
+  // Segunda línea: el negocio y la ciudad; si no hay, el contacto que no sea ya el título.
+  function leadDetail(l) {
+    const biz = [l.business_name, l.city].filter(Boolean).join(', ');
+    if (biz) return biz;
+    const t = leadTitle(l);
+    return [l.email, l.phone].find((v) => v && v !== t) || '';
+  }
 
   // ── Saludo según la hora de Houston ──────────────────────────
-  // El nombre solo si la parte local del correo parece un nombre (letras):
-  // "Buenas tardes, ywinc00" no saluda a nadie (SH-21).
+  // El nombre solo si la parte local del correo parece un nombre (SH-21).
   const firstName = $derived.by(() => {
     const local = (user || '').split('@')[0] || '';
     if (!/^[a-záéíóúñü]{2,}$/i.test(local)) return '';
@@ -146,359 +191,446 @@
     return 'Buenas noches';
   });
 
-  // ── Exportar leads a CSV (cliente) ──────────────────────────
-  // Mismas dos protecciones que el serializador del servidor (lib/csv.mjs):
-  //  · los datos vienen de formularios PÚBLICOS: un texto que empieza por
-  //    = + - @ tabulador o retorno de carro se ejecutaría como fórmula en
-  //    Excel/Sheets (=HYPERLINK(…)); se le antepone una comilla simple.
-  //  · BOM UTF-8 al inicio para que Excel de Windows lea bien las tildes.
-  const CSV_BOM = '﻿';
-  function csvCell(v) {
-    let s = v == null ? '' : String(v);
-    if (typeof v !== 'number' && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
-    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  }
-  function exportLeads() {
-    const cols = ['ref_id', 'name', 'email', 'phone', 'source', 'status', 'created_at'];
-    const head = cols.join(',');
-    const body = (leads || []).map((l) => cols.map((c) => csvCell(l[c])).join(',')).join('\r\n');
-    const blob = new Blob([CSV_BOM + head + '\r\n' + body + '\r\n'], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'leads-' + todayISO() + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
+  // ── Exportar leads ───────────────────────────────────────────
+  // Lo serializa el servidor (lib/csv.mjs: BOM y fórmulas neutralizadas) con
+  // TODOS los leads, no solo los 100 cargados en el panel. Es un enlace de
+  // descarga normal: la cookie de sesión viaja sola.
+  const EXPORT_LEADS_URL = '/api/admin/export?type=leads';
+  const leadTotal = $derived(num(home?.funnel?.total) ?? (data.leadsLoaded ? leads.length : null));
 
-  const kpiVal = (v) => (home?.kpis && v != null ? v : '—');
+  // "Se muestran las cifras de las 6:11 p.m." sin doble punto (la hora ya acaba en "p.m.").
+  const staleMessage = $derived.by(() => {
+    if (!data.loadedAt) return data.homeError;
+    const t = fmtTime(data.loadedAt);
+    return `Se muestran las cifras de las ${t}${t.endsWith('.') ? '' : '.'} ${data.homeError}`;
+  });
 
   // Al volver al inicio con datos ya cargados, se refrescan en silencio
   // (las cifras viejas se ven mientras llegan las nuevas; SH-08).
-  onMount(() => { if (data.home) { loadHome(); loadProjects(); } });
+  onMount(() => { if (data.home) { loadHome(); loadProjects(); loadLeads(); } });
 </script>
 
 <PageHeader title={firstName ? `${greeting}, ${firstName}` : greeting}>
   {#snippet actions()}
-    <button class="b" onclick={exportLeads} disabled={!leads.length} title={leads.length ? '' : 'No hay leads para exportar'}>
-      <Icon name="download" size={16} />Exportar leads
-    </button>
+    {#if leadTotal}
+      <a class="b" href={EXPORT_LEADS_URL} download><Icon name="download" size={16} />Exportar leads</a>
+    {:else}
+      <button class="b" disabled title={home || data.leadsLoaded ? 'No hay leads para exportar' : 'Cargando leads'}><Icon name="download" size={16} />Exportar leads</button>
+    {/if}
   {/snippet}
 </PageHeader>
 
-{#if data.homeError && !home}
-  <div class="block"><ErrorState title="No se pudieron cargar las cifras" message={data.homeError} onretry={loadHome} /></div>
+<!-- ── KPIs ── -->
+{#if !home && data.homeError}
+  <!-- La analítica falló sin datos previos: un solo error con Reintentar
+       (SH-06, OP-21). Gráficos y embudo dependen de ella y no se pintan;
+       proyectos y leads tienen su propia llamada y siguen abajo. -->
+  <div class="block">
+    <ErrorState title="No se pudieron cargar las cifras del inicio" message={data.homeError} onretry={loadHome} />
+  </div>
+{:else if !home}
+  <LoadingState loading={true} label="Cargando cifras">
+    {#snippet skeleton()}
+      <KpiGrid count={4} label="Cargando resumen">
+        {#each [0, 1, 2, 3] as i (i)}<div class="ui-skel kpi-skel"></div>{/each}
+      </KpiGrid>
+    {/snippet}
+  </LoadingState>
+{:else}
+  {#if data.homeError}
+    <!-- Hay cifras, pero la última actualización falló: se dice cuáles se ven. -->
+    <div class="block">
+      <ErrorState compact title="No se pudieron actualizar las cifras"
+        message={staleMessage}
+        onretry={loadHome} />
+    </div>
+  {/if}
+  <KpiGrid count={4} label="Resumen">
+    <Kpi label="Leads recibidos" value={leadsThisMonth ?? '—'} art="inbox" tone={leadsThisMonth > 0 ? 'accent' : ''} href={href('leads')}>
+      {#if leadsThisMonth === null}Sin dato de este mes
+      {:else}este mes{#if leadsDelta && leadsDelta.dir !== 'same'}<span class="sep">·</span><wbr><span class="nw" class:is-data={leadsDelta.dir === 'up'} class:is-down={leadsDelta.dir === 'down'}>{leadsDelta.text}</span> vs. {prevLabel}
+        {:else if leadsDelta && leadsThisMonth > 0}<span class="sep">·</span>igual que en {prevLabel}{/if}
+      {/if}
+    </Kpi>
+    <Kpi label="Briefs pendientes" value={num(kpis.pending_briefs) ?? '—'} art="docs" href={href('briefs')}
+      note={num(kpis.pending_briefs) === null ? 'Sin dato de briefs' : 'en cola de revisión'} />
+    <Kpi label="Proyectos activos" value={activeProjects ?? '—'} art="clock" href={href('progreso')}
+      note={activeProjects === null ? 'No se pudieron contar' : activeProjects === 1 ? 'proyecto en curso' : 'proyectos en curso'} />
+    <div class="kpi-box" bind:this={revenueBox}>
+    <Kpi label="Cobrado este mes" value={revenueShort} art="coins" tone={revenue ? 'data' : ''} href={href('finanzas')}>
+      {#if revenue === null}Finanzas no respondió
+      {:else}{#if revenueRounded}<span class="exact">{revenueExact}</span><span class="sep">·</span><wbr>{/if}{#if revenueDelta && revenueDelta.dir !== 'same'}<span class="nw" class:is-data={revenueDelta.dir === 'up'} class:is-down={revenueDelta.dir === 'down'}>{revenueDelta.text}</span> vs. {prevLabel}
+      {:else if revenue === 0}Sin cobros registrados este mes
+      {:else}igual que en {prevLabel}{/if}{/if}
+    </Kpi>
+    </div>
+  </KpiGrid>
 {/if}
 
-<!-- ── KPIs: número grande + nota + arte de esquina glossy (KpiArt) ── -->
-<KpiGrid count={4} label="Resumen">
-  <!-- Sin cifras (cargando o error) las notas callan: no se afirma nada que no se sabe. -->
-  <Kpi label="Leads nuevos" value={kpiVal(home?.kpis?.new_leads)} art="inbox" tone={home ? 'accent' : ''} href={href('leads')}>
-    {#if !home}&nbsp;{:else if home.kpis?.new_leads}<span class="is-data">+{home.kpis.new_leads}</span> este mes
-    {:else}aún sin leads este mes{/if}
-  </Kpi>
-  <Kpi label="Briefs pendientes" value={kpiVal(home?.kpis?.pending_briefs)} art="docs" note={home ? 'en cola de revisión' : ' '} href={href('briefs')} />
-  <Kpi label="En curso (mes)" value={kpiVal(home?.kpis?.projects_this_month)} art="clock" note={home ? 'proyectos activos' : ' '} href={href('progreso')} />
-  <Kpi label="Cobrado (mes)" value={kpiVal(home?.kpis?.revenue_this_month)} art="coins" tone={home ? 'data' : ''} href={href('finanzas')}
-    note={!home ? ' ' : home.kpis?.revenue_this_month != null ? 'cobrado este mes' : 'sin cobros registrados este mes'} />
-</KpiGrid>
-
-<!-- ── Fila 1: gráfico interactivo (ancho) + proyectos recientes ── -->
-<div class="grid-2 grid-2--chart">
-  <article class="ui-card">
-    <header class="card__head">
-      <div>
-        <p class="card__lbl">Actividad por mes</p>
-        <h2 class="card__amount">{!home ? '—' : activeBar >= 0 ? (activity[activeBar]?.total ?? 0) : 0} <span class="muted">{activeBar >= 0 ? monthLabel(activity[activeBar]?.month) : ''}</span></h2>
-      </div>
-      <StatusChip tone="neutral" label="leads + briefs" />
-    </header>
-
-    {#if !home && data.homeError}
-      <EmptyState compact text="Sin datos mientras no carguen las cifras." />
-    {:else if !home}
-      <LoadingState loading={true} label="Cargando actividad">
-        {#snippet skeleton()}<div class="ui-skel" style="height:196px"></div>{/snippet}
-      </LoadingState>
-    {:else if activity.length === 0}
-      <EmptyState art="chart-up" text="Sin actividad todavía. Aparecerá aquí cuando lleguen leads o briefs." />
-    {:else}
-      <!-- VW=viewBox · PR=carril derecho de números · PW=plot útil · PLOT=alto de barras -->
-      {@const N = activity.length}
-      {@const VW = 600}
-      {@const PR = 40}
-      {@const PW = VW - PR}
-      {@const PLOT = 150}
-      {@const slot = PW / N}
-      {@const bw = Math.min(56, slot * 0.5)}
-      <div class="plot">
-        {#if hoverBar >= 0 && hoverBar < N}
-          {@const hx = (hoverBar * slot + slot / 2) / VW * 100}
-          {@const hy = (PLOT - (activity[hoverBar].total / yTop) * (PLOT - 18)) / 196 * 100}
-          <span class="chart-tip" style="left:{hx}%;top:{hy}%">{activity[hoverBar].total}</span>
-        {/if}
-        <svg class="chart" viewBox="0 0 {VW} 196" role="img" aria-label="Actividad por mes" onmouseleave={() => (hoverBar = -1)}>
-          <defs>
-            <linearGradient id="barActive" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" style="stop-color:var(--accent-gold-hover)"/><stop offset="1" style="stop-color:var(--accent-gold-deep)"/>
-            </linearGradient>
-            <linearGradient id="barIdle" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" style="stop-color:var(--chart-idle-top)"/><stop offset="1" style="stop-color:var(--chart-idle-base)"/>
-            </linearGradient>
-            <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
-              <feDropShadow dx="0" dy="6" stdDeviation="7" style="flood-color:var(--accent-gold)" flood-opacity="0.5" />
-            </filter>
-          </defs>
-
-          <!-- gridlines punteadas + números del eje derecho (4 ticks) -->
-          {#each yTicks as t, gi}
-            {@const gy = (gi / 4) * PLOT + 6}
-            <line x1="0" y1={gy} x2={VW} y2={gy} class="chart__grid" />
-            <!-- placa opaca para que la rejilla "pase por detrás" del número (Orbit) -->
-            {@const lw = (String(t).length * 7) + 8}
-            <rect x={VW - lw} y={gy - 8} width={lw} height="16" fill="var(--bg-card)" />
-            <text x={VW} y={gy + 3} text-anchor="end" class="chart__axis">{t}</text>
-          {/each}
-          <line x1="0" y1={PLOT} x2={PW} y2={PLOT} class="chart__base" />
-
-          {#each activity as a, i}
-            {@const cx = i * slot + slot / 2}
-            {@const bx = cx - bw / 2}
-            {@const bh = (Math.max(a.total, 0) / yTop) * (PLOT - 18)}
-            {@const by = PLOT - bh}
-            {@const isActive = i === activeBar}
-            {#if isActive && a.total > 0}
-              <line x1="0" y1={by} x2={PW} y2={by} class="chart__guide" />
-            {/if}
-            <rect
-              x={bx} y={by} width={bw} height={Math.max(bh, 2)} rx="11"
-              fill={isActive ? 'url(#barActive)' : 'url(#barIdle)'}
-              filter={isActive ? 'url(#barGlow)' : undefined} />
-            <!-- brillo especular superior (da volumen a las barras) -->
-            {#if bh > 6}
-              <rect x={bx + 2} y={by + 1.5} width={Math.max(bw - 4, 0)} height="2" rx="1"
-                fill={isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)'} />
-            {/if}
-            <!-- hit area transparente para hover cómodo -->
-            <rect x={i * slot} y="0" width={slot} height={PLOT} fill="transparent"
-              onmouseenter={() => (hoverBar = i)} role="presentation" />
-            {#if isActive && a.total > 0}
-              <circle cx={cx} cy={by} r="4.5" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
-            {/if}
-            <text x={cx} y="174" text-anchor="middle" class="chart__lbl" class:is-active={isActive}>{monthLabel(a.month)}</text>
-          {/each}
-        </svg>
-      </div>
-    {/if}
-  </article>
-
-  <article class="ui-card">
-    <header class="card__head card__head--row">
-      <h2 class="card__title">Proyectos recientes</h2>
-    </header>
-    {#if data.projectsError && !recentProjects.length}
-      <ErrorState compact title="No se pudieron cargar los proyectos" message={data.projectsError} onretry={loadProjects} />
-    {:else if !data.projectsLoaded}
-      <LoadingState loading={true} rows={4} height={50} label="Cargando proyectos" />
-    {:else if recentProjects.length}
-      <div class="ptable">
-        <div class="ptable__head">
-          <span>Proyecto</span>
-          <span>Estado</span>
+<div class="stack">
+{#if home}
+  <!-- ── Fila 1: actividad por mes (ancho) + leads por estado ── -->
+  <div class="row row--chart">
+    <Card tag="article">
+      <header class="m-head">
+        <div>
+          <p class="m-lbl">Actividad por mes</p>
+          <p class="m-amount">{activeBar >= 0 ? (num(activity[activeBar]?.total) ?? 0) : 0} <span class="muted">{activeBar >= 0 ? monthShort(activity[activeBar]?.month) : 'en 6 meses'}</span></p>
         </div>
-        {#each recentProjects as p (p.id)}
-          {@const st = projStatus(p.status)}
-          <div class="prow">
-            <span class="folder" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" style="fill:var(--surface-3);stroke:var(--icon-muted)" stroke-width="1.3"/><path d="M3 9h18" style="stroke:var(--icon-muted)" stroke-width="1.1"/></svg>
+        <StatusChip tone="neutral" label="leads + briefs" />
+      </header>
+
+      {#if !anyActivity}
+        <!-- OP-22: el servidor siempre manda 6 meses; vacío = todos en cero. -->
+        <EmptyState art="chart-up" title="Sin actividad en los últimos 6 meses"
+          text="Cada lead o brief que llegue suma aquí, en su mes." />
+      {:else}
+        {@const N = activity.length}
+        {@const slot = PW / N}
+        {@const bw = Math.min(56, slot * 0.5)}
+        <div class="plot" bind:clientWidth={plotW}>
+          {#if hoverBar >= 0 && hoverBar < N}
+            {@const a = activity[hoverBar]}
+            <!-- en px (el viewBox ya es px); el borde no corta el globo en la primera ni en la última barra -->
+            <span class="chart-tip" style="left:{Math.min(Math.max(hoverBar * slot + slot / 2, 68), VW - 68)}px;top:{yOf(num(a.total) || 0)}px">
+              {plural(num(a.leads) || 0, 'lead', 'leads')} · {plural(num(a.briefs) || 0, 'brief', 'briefs')}
             </span>
-            <div class="prow__main">
-              <span class="prow__name">{p.name}</span>
-              <span class="prow__client">
-                <span class="mono-av" style="background:{monoColor(p.client_name)}">{initials(p.client_name)}</span>
-                {p.client_name || 'Sin cliente'}
-              </span>
-              <span class="prog"><span class="prog__bar" style="width:{p.progress || 0}%"></span></span>
-            </div>
-            <StatusChip tone={st.tone} label={st.label} />
-          </div>
-        {/each}
-      </div>
-      <a class="ptable__more" href={href('progreso')}>Ver todos los proyectos</a>
-    {:else}
-      <EmptyState art="folder" text="Sin proyectos todavía.">
-        {#snippet action()}<a class="b b--mini" href={href('progreso')}>Crear el primero</a>{/snippet}
-      </EmptyState>
-    {/if}
-  </article>
-</div>
+          {/if}
+          <svg class="chart" viewBox="0 0 {VW} {VH}" width={VW} height={VH} role="img"
+            aria-label={activityLabel(activity)}
+            onmouseleave={() => (hoverBar = -1)}>
+            <defs>
+              <linearGradient id="barActive" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--accent-gold-hover)"/><stop offset="1" style="stop-color:var(--accent-gold-deep)"/>
+              </linearGradient>
+              <linearGradient id="barIdle" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--chart-idle-top)"/><stop offset="1" style="stop-color:var(--chart-idle-base)"/>
+              </linearGradient>
+              <filter id="barGlow" x="-60%" y="-60%" width="220%" height="220%">
+                <feDropShadow dx="0" dy="6" stdDeviation="7" style="flood-color:var(--accent-gold)" flood-opacity="0.5" />
+              </filter>
+            </defs>
 
-<!-- ── Fila 2: embudo (pills decrecientes) + sparkline de actividad acumulada ── -->
-<div class="grid-2 grid-2--funnel">
-  <article class="ui-card">
-    <header class="card__head">
-      <div>
-        <p class="card__lbl">Leads por estado</p>
-        <h2 class="card__amount">{home ? (home.funnel.new + home.funnel.contacted + home.funnel.converted + home.funnel.archived) : '—'} <span class="muted">en pipeline</span></h2>
-      </div>
-    </header>
-    {#if !home && data.homeError}
-      <EmptyState compact text="Sin datos mientras no carguen las cifras." />
-    {:else if !home}
-      <LoadingState loading={true} label="Cargando leads por estado">
-        {#snippet skeleton()}<div class="ui-skel" style="height:168px"></div>{/snippet}
-      </LoadingState>
-    {:else}
-      <div class="funnel">
-        {#each funnelRows as row, i}
-          <div class="funnel__row">
-            <span class="funnel__pill" class:funnel__pill--accent={i === 0 && row.n > 0} style="--w:{funnelW(i)}%">{row.name}</span>
-            <span class="funnel__n">{row.n}</span>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </article>
+            <!-- Rejilla y números del eje con LA MISMA escala que las barras. El 0 es la base. -->
+            {#each scale.ticks as t (t)}
+              {@const gy = yOf(t)}
+              {#if t > 0}<line x1="0" y1={gy} x2={PW} y2={gy} class="chart__grid" />{/if}
+              <text x={VW - 4} y={gy + 4} text-anchor="end" class="chart__axis">{t}</text>
+            {/each}
+            <line x1="0" y1={BASE} x2={PW} y2={BASE} class="chart__base" />
 
-  <article class="ui-card">
-    <header class="card__head">
-      <div>
-        <p class="card__lbl">Actividad acumulada</p>
-        <h2 class="card__amount big">{home ? sparkTotal : '—'} <span class="muted">en 6 meses</span></h2>
-      </div>
-    </header>
-    {#if !home && data.homeError}
-      <EmptyState compact text="Sin datos mientras no carguen las cifras." />
-    {:else if !home}
-      <LoadingState loading={true} label="Cargando actividad acumulada">
-        {#snippet skeleton()}<div class="ui-skel" style="height:150px"></div>{/snippet}
-      </LoadingState>
-    {:else if sparkPath.line}
-      <div class="spark-wrap">
-        <svg class="spark" viewBox="0 0 {SPARK_W} {SPARK_H}" preserveAspectRatio="none" role="img" aria-label="Actividad acumulada">
-          <defs>
-            <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" style="stop-color:var(--accent-gold)" stop-opacity="0.42"/>
-              <stop offset="1" style="stop-color:var(--accent-gold)" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <path d={sparkPath.area} fill="url(#sparkFill)" />
-          <path d={sparkPath.line} fill="none" style="stroke:var(--accent-gold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
-        </svg>
-        <!-- Dot final como overlay HTML (no se deforma por preserveAspectRatio=none) -->
-        {#if sparkPath.dot}
-          <span class="spark-dot" style="left:{sparkPath.dot.x / SPARK_W * 100}%;top:{sparkPath.dot.y / SPARK_H * 100}%"></span>
+            {#each activity as a, i (a.month)}
+              {@const v = num(a.total) || 0}
+              {@const cx = i * slot + slot / 2}
+              {@const bx = cx - bw / 2}
+              {@const by = yOf(v)}
+              {@const bh = BASE - by}
+              {@const isActive = i === activeBar}
+              {#if isActive && v > 0}
+                <line x1="0" y1={by} x2={PW} y2={by} class="chart__guide" />
+              {/if}
+              {#if v > 0}
+                <rect x={bx} y={by} width={bw} height={bh} rx={Math.min(11, bh / 2)}
+                  fill={isActive ? 'url(#barActive)' : 'url(#barIdle)'}
+                  filter={isActive ? 'url(#barGlow)' : undefined} />
+                {#if bh > 6}
+                  <rect x={bx + 2} y={by + 1.5} width={Math.max(bw - 4, 0)} height="2" rx="1"
+                    fill={isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)'} />
+                {/if}
+              {/if}
+              {#if isActive && v > 0}
+                <circle cx={cx} cy={by} r="4.5" fill="var(--accent-gold)" stroke="var(--bg-card)" stroke-width="2" />
+              {/if}
+              <!-- zona de hover/toque de todo el mes (ratón y dedo) -->
+              <rect x={i * slot} y="0" width={slot} height={VH} fill="transparent" class="chart__hit"
+                onmouseenter={() => (hoverBar = i)} onclick={() => (hoverBar = i)} role="presentation" />
+              <text x={cx} y={BASE + 22} text-anchor="middle" class="chart__lbl" class:is-active={isActive}>{monthShort(a.month)}</text>
+            {/each}
+          </svg>
+        </div>
+      {/if}
+    </Card>
+
+    <Card tag="article">
+      <div class="states-card">
+        <header class="m-head">
+          <div>
+            <p class="m-lbl">Leads por estado</p>
+            <p class="m-amount">{states.pipeline} <span class="muted">en pipeline</span></p>
+          </div>
+        </header>
+        {#if states.rows.every((r) => r.n === 0) && !states.archived}
+          <EmptyState compact art="users" text="Aún no hay leads. Llegan del formulario de contacto, del chatbot y del diagnóstico." />
+        {:else}
+          <!-- Barras proporcionales de verdad: la pista es el 100 % (el estado con más leads). -->
+          <ul class="states">
+            {#each states.rows as r (r.key)}
+              <li>
+                <a class="st" href={href('leads', [], { estado: r.estado })} aria-label="{r.name}: {r.n}. Ver la lista">
+                  <span class="st__track">
+                    {#if r.n > 0}<span class="st__fill" class:st__fill--accent={r.key === 'new'} style="width:{r.pct}%"></span>{/if}
+                    <span class="st__name" class:is-accent={r.key === 'new' && r.n > 0}>{r.name}</span>
+                  </span>
+                  <span class="st__n">{r.n}</span>
+                </a>
+              </li>
+            {/each}
+          </ul>
+          <a class="states__foot" href={href('leads', [], { estado: 'archivado' })}>
+            <span><strong>{states.archived}</strong> {states.archived === 1 ? 'archivado' : 'archivados'}, fuera del pipeline</span>
+            <Icon name="chevron" size={16} />
+          </a>
         {/if}
       </div>
-    {:else}
-      <EmptyState art="chart-up" text="La curva aparece con el primer mes de datos." />
-    {/if}
-  </article>
+    </Card>
+  </div>
+{:else if !data.homeError}
+  <!-- Mientras llega la analítica se reserva el hueco de la fila del gráfico:
+       las listas de abajo no saltan cuando aparece (E-09). -->
+  <LoadingState loading={true} label="Cargando actividad">
+    {#snippet skeleton()}
+      <div class="row row--chart">
+        <div class="ui-skel chart-skel"></div><div class="ui-skel chart-skel"></div>
+      </div>
+    {/snippet}
+  </LoadingState>
+{/if}
+
+<!-- ── Fila 2: proyectos recientes + leads recientes (misma altura) ── -->
+<div class="row row--lists">
+  <Card tag="article" title="Proyectos recientes">
+    <div class="list-body">
+      {#if data.projectsError && !recentProjects.length}
+        <ErrorState compact title="No se pudieron cargar los proyectos" message={data.projectsError} onretry={loadProjects} />
+      {:else if !data.projectsLoaded}
+        <LoadingState loading={true} rows={5} height={52} label="Cargando proyectos" />
+      {:else if recentProjects.length}
+        <ul class="rows">
+          {#each recentProjects as p (p.id)}
+            {@const st = projStatus(p.status)}
+            <li>
+              <a class="prow" href={href('progreso', [p.project_code || p.id])}>
+                <span class="folder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" style="fill:var(--surface-3);stroke:var(--icon-muted)" stroke-width="1.3"/><path d="M3 9h18" style="stroke:var(--icon-muted)" stroke-width="1.1"/></svg>
+                </span>
+                <span class="prow__main">
+                  <span class="prow__name">{p.name}</span>
+                  <span class="prow__client">
+                    <span class="mono-av" style="background:{monoColor(p.client_name)}">{initials(p.client_name)}</span>
+                    <span class="ellip">{p.client_name || 'Sin cliente'}</span>
+                  </span>
+                  <span class="prog" role="progressbar" aria-label="Avance" aria-valuemin="0" aria-valuemax="100" aria-valuenow={num(p.progress) || 0}><span class="prog__bar" style="width:{num(p.progress) || 0}%"></span></span>
+                </span>
+                <StatusChip tone={st.tone} label={st.label} />
+              </a>
+            </li>
+          {/each}
+        </ul>
+        <a class="list-more" href={href('progreso')}>Ver todos los proyectos <Icon name="chevron" size={16} /></a>
+      {:else}
+        <EmptyState art="folder" title="Sin proyectos todavía" text="Los proyectos se crean al cerrar un brief o desde Progreso.">
+          {#snippet action()}<a class="b b--mini" href={href('progreso')}>Ir a Progreso</a>{/snippet}
+        </EmptyState>
+      {/if}
+    </div>
+  </Card>
+
+  <Card tag="article" title="Leads recientes">
+    <div class="list-body">
+      {#if data.leadsError && !leads.length}
+        <ErrorState compact title="No se pudieron cargar los leads" message={data.leadsError} onretry={loadLeads} />
+      {:else if !data.leadsLoaded}
+        <LoadingState loading={true} rows={5} height={52} label="Cargando leads" />
+      {:else if leads.length}
+        <ul class="rows">
+          {#each leads.slice(0, 5) as lead (lead.ref_id)}
+            {@const src = sourceMeta(lead.source)}
+            {@const detail = leadDetail(lead)}
+            <li>
+              <a class="lrow" href={href('leads', [lead.ref_id])}>
+                <span class="mono-av lg" style="background:{monoColor(leadTitle(lead) + lead.ref_id)}">{initials(lead.name || lead.email || lead.ref_id)}</span>
+                <span class="lrow__main">
+                  <span class="lrow__name">{leadTitle(lead)}</span>
+                  {#if detail}<span class="lrow__detail">{detail}</span>{/if}
+                </span>
+                <span class="lrow__meta">
+                  <StatusChip tone={src.tone} label={src.label} />
+                  <span class="dim">{fmtDate(lead.created_at)}</span>
+                </span>
+              </a>
+            </li>
+          {/each}
+        </ul>
+        <a class="list-more" href={href('leads')}>Ver todos los leads <Icon name="chevron" size={16} /></a>
+      {:else}
+        <EmptyState art="inbox" title="Sin leads todavía" text="Cuando alguien use el formulario de contacto, el chatbot o el diagnóstico, aparecerá aquí." />
+      {/if}
+    </div>
+  </Card>
 </div>
 
-<!-- ── Leads recientes (compacto) ── -->
-<article class="ui-card block-top">
-  <header class="card__head card__head--row">
-    <h2 class="card__title">Leads recientes</h2>
-    <a class="link-btn" href={href('leads')}>Ver todos</a>
-  </header>
-  {#if data.leadsError && !leads.length}
-    <ErrorState compact title="No se pudieron cargar los leads" message={data.leadsError} onretry={loadLeads} />
-  {:else if !data.leadsLoaded}
-    <LoadingState loading={true} rows={3} height={36} label="Cargando leads" />
-  {:else if leads.length}
-    <div class="recent">
-      {#each leads.slice(0, 5) as lead (lead.ref_id)}
-        {@const src = sourceMeta(lead.source)}
-        <div class="recent__row">
-          <span class="mono-av sm" style="background:{monoColor(lead.name || lead.email || lead.ref_id)}">{initials(lead.name || lead.email || lead.ref_id)}</span>
-          <span class="recent__name">{lead.name || lead.email || lead.phone || 'Sin nombre'}</span>
-          <StatusChip tone={src.tone} label={src.label} />
-          <span class="dim">{fmtDate(lead.created_at)}</span>
+{#if home}
+  <!-- ── Fila 3: actividad acumulada (banda ancha y baja) ── -->
+  <div class="row">
+    <Card tag="article">
+      <header class="m-head">
+        <div>
+          <p class="m-lbl">Actividad acumulada</p>
+          <p class="m-amount">{sparkTotal} <span class="muted">leads y briefs en 6 meses</span></p>
         </div>
-      {/each}
-    </div>
-  {:else}
-    <EmptyState compact text="Sin leads todavía. Cuando alguien use el formulario de contacto o el chatbot, aparecerá aquí." />
-  {/if}
-</article>
+      </header>
+      {#if sparkPath.line}
+        <div class="spark-wrap">
+          <svg class="spark" viewBox="0 0 {SPARK_W} {SPARK_H}" preserveAspectRatio="none" role="img" aria-label="Actividad acumulada: {sparkTotal} en 6 meses">
+            <defs>
+              <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color:var(--accent-gold)" stop-opacity="0.42"/>
+                <stop offset="1" style="stop-color:var(--accent-gold)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d={sparkPath.area} fill="url(#sparkFill)" />
+            <path d={sparkPath.line} fill="none" style="stroke:var(--accent-gold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+          </svg>
+          {#if sparkPath.dot}
+            <span class="spark-dot" style="left:{sparkPath.dot.x / SPARK_W * 100}%;top:{sparkPath.dot.y / SPARK_H * 100}%"></span>
+          {/if}
+        </div>
+        <div class="spark-axis" aria-hidden="true">
+          {#each activity as a (a.month)}<span>{monthShort(a.month)}</span>{/each}
+        </div>
+      {:else}
+        <EmptyState compact text="La curva aparece con el primer lead o brief." />
+      {/if}
+    </Card>
+  </div>
+{/if}
+</div>
 
 <style>
   .block { margin-bottom: var(--space-4); }
-  .block-top { margin-top: 18px; }
+  .kpi-skel { height: 142px; border-radius: var(--radius-lg); }
+  .chart-skel { height: 298px; border-radius: var(--radius-lg); }
 
-  /* ── Grids densos de cards (proporciones exactas Orbit) ── */
-  .grid-2 { display: grid; gap: 14px; margin-top: 18px; }
-  .grid-2--chart { grid-template-columns: 1.4fr 1fr; margin-top: 0; }
-  .grid-2--funnel { grid-template-columns: 1fr 1.6fr; }
-  .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: 18px; }
-  .card__head--row { align-items: center; margin-bottom: var(--space-2); }
-  .card__lbl { margin: 0 0 6px; color: var(--fg-secondary); font-size: 13px; font-weight: 500; }
-  .card__title { margin: 0; font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); }
-  .card__amount { margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: 650; letter-spacing: var(--tracking-tight); line-height: 1; }
-  .card__amount.big { font-size: 30px; }
-  .card__amount .muted { font-size: 13px; font-weight: 400; letter-spacing: 0; color: var(--fg-subtle); }
-  .link-btn { display: inline-flex; align-items: center; min-height: 32px; color: var(--fg-secondary); font-size: var(--dash-small); text-decoration: none; padding: 4px 8px; border-radius: var(--radius-sm); transition: color var(--duration-fast), background-color var(--duration-fast); }
-  .link-btn:hover { color: var(--fg-primary); background: var(--bg-elevated); }
+  /* ── Filas de tarjetas ── */
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .row { display: grid; gap: 14px; }
+  .row--chart { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  .row--lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Las tarjetas de una fila miden lo mismo y su contenido llena la altura:
+     el pie ("Ver todos", archivados) se ancla abajo, sin aire muerto. */
+  .row > :global(.ui-card) { display: flex; flex-direction: column; }
 
-  /* ── Gráfico de barras interactivo (Orbit) ── */
+  /* ── Cabecera de métrica (rótulo + cifra) ── */
+  .m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: 14px; }
+  .m-lbl { margin: 0 0 6px; color: var(--fg-secondary); font-size: var(--dash-small); font-weight: 500; }
+  .m-amount { margin: 0; font-family: var(--font-display); font-size: var(--dash-title); font-weight: 650; letter-spacing: var(--tracking-tight); line-height: 1; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
+  .m-amount .muted { font-size: var(--dash-small); font-weight: 400; letter-spacing: 0; color: var(--fg-subtle); }
+
+  /* Notas de los KPIs: comparación real con su signo (verde si sube). */
+  .sep { margin: 0 6px; color: var(--fg-faint); }
+  .is-data { color: var(--accent-teal); font-weight: 600; }
+  .is-down { color: var(--fg-secondary); font-weight: 600; }
+  /* Envoltorio del KPI de dinero para medirlo: sin caja, la rejilla no lo ve. */
+  .kpi-box { display: contents; }
+  .exact { color: var(--fg-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* El monto de la comparación no se parte (el signo "−" quedaba solo al final de
+     línea); el <wbr> tras el "·" le deja bajar entero a la línea siguiente. */
+  .nw { white-space: nowrap; }
+
+  /* ── Gráfico de barras ── */
   .plot { position: relative; }
-  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart { width: 100%; height: 184px; display: block; overflow: visible; touch-action: pan-y; }
   .chart__lbl { fill: var(--fg-secondary); font-family: var(--font-body); font-size: 12px; }
   .chart__lbl.is-active { fill: var(--fg-primary); font-weight: 600; }
-  .chart__axis { fill: var(--fg-subtle); font-family: var(--font-body); font-size: 11px; }
+  .chart__axis { fill: var(--fg-subtle); font-family: var(--font-body); font-size: 11px; font-variant-numeric: tabular-nums; }
   .chart__grid { stroke: rgba(255, 255, 255, 0.06); stroke-dasharray: 3 4; }
   .chart__base { stroke: rgba(255, 255, 255, 0.12); }
   .chart__guide { stroke: rgba(255, 255, 255, 0.22); stroke-dasharray: 4 4; }
-  .chart rect[role="presentation"] { cursor: pointer; }
+  .chart__hit { cursor: pointer; }
+  .chart-tip { white-space: nowrap; }
 
-  /* ── Tabla de proyectos (Orbit) ── */
-  .ptable { display: flex; flex-direction: column; }
-  .ptable__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 8px 7px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); }
-  .prow { display: flex; align-items: center; gap: var(--space-3); padding: 9px 8px; border-top: 1px solid var(--border-subtle); border-radius: var(--radius-sm); transition: background var(--duration-fast); }
-  .prow:first-of-type { border-top: 0; }
-  .prow:hover { background: var(--bg-elevated); }
+  /* ── Leads por estado: pista = 100 %, relleno = proporción real ── */
+  .states-card { display: flex; flex-direction: column; flex: 1; }
+  .states { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .st { display: grid; grid-template-columns: 1fr 32px; align-items: center; gap: 12px; text-decoration: none; color: inherit; border-radius: var(--radius-pill); }
+  .st__track {
+    position: relative; display: flex; align-items: center; min-height: 38px; padding: 0 14px;
+    border-radius: var(--radius-pill); border: 1px solid var(--border-subtle); background: rgba(255, 255, 255, 0.015);
+    overflow: hidden; transition: border-color var(--duration-fast);
+  }
+  .st:hover .st__track { border-color: var(--border-strong); }
+  .st__fill {
+    /* A1-04: 6 px = marca de "hay alguno", sin inflar la proporción real. */
+    position: absolute; inset: 0 auto 0 0; min-width: 6px;
+    border-radius: var(--radius-pill); background: var(--surface-3); border-right: 1px solid var(--border-strong);
+    transition: width .4s var(--ease);
+  }
+  .st__fill--accent { background: rgba(var(--accent-gold-rgb), .16); border-right-color: var(--accent-gold-line); }
+  .st__name { position: relative; font-size: var(--dash-small); color: var(--fg-primary); white-space: nowrap; }
+  .st__name.is-accent { color: var(--accent-gold); }
+  .st__n { text-align: right; font-size: var(--dash-small); color: var(--fg-secondary); font-variant-numeric: tabular-nums; }
+  .states__foot {
+    margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2);
+    min-height: 44px; padding-top: 12px; border-top: 1px solid var(--border-subtle);
+    color: var(--fg-secondary); font-size: var(--dash-small); text-decoration: none;
+  }
+  .states__foot strong { color: var(--fg-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .states__foot:hover { color: var(--fg-primary); }
+  .states { margin-bottom: 16px; }
+
+  /* ── Listas (proyectos y leads recientes) ── */
+  .list-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .rows li + li { border-top: 1px solid var(--border-subtle); }
+  .prow, .lrow {
+    display: flex; align-items: center; gap: var(--space-3); min-height: 70px; padding: 8px;
+    border-radius: var(--radius-sm); color: inherit; text-decoration: none; transition: background var(--duration-fast);
+  }
+  .prow:hover, .lrow:hover { background: var(--bg-elevated); }
   .folder { width: 26px; height: 26px; flex: 0 0 auto; display: inline-flex; }
   .folder svg { width: 100%; height: 100%; }
-  .prow__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-  .prow__name { color: var(--fg-primary); font-size: var(--dash-small); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prow__main, .lrow__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .prow__name, .lrow__name { color: var(--fg-primary); font-size: var(--dash-body); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .prow__client { display: flex; align-items: center; gap: 6px; font-size: var(--dash-caption); color: var(--fg-subtle); min-width: 0; }
+  .lrow__detail { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ellip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lrow__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: 0 0 auto; }
   .prog { display: block; height: 4px; width: 100%; background: var(--bg-elevated); border-radius: var(--radius-pill); overflow: hidden; margin-top: 2px; }
   .prog__bar { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-gold-deep), var(--accent-gold-hover)); border-radius: var(--radius-pill); min-width: 2px; transition: width var(--duration-base) var(--ease); }
-  .ptable__more { display: flex; align-items: center; justify-content: center; min-height: 40px; width: 100%; padding: 10px; margin-top: var(--space-2); border-top: 1px solid var(--border); color: var(--fg-secondary); font-size: var(--dash-small); text-decoration: none; transition: color var(--duration-fast); }
-  .ptable__more:hover { color: var(--fg-primary); }
+  .list-more {
+    margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 4px;
+    min-height: 44px; padding-top: 8px; border-top: 1px solid var(--border);
+    color: var(--fg-secondary); font-size: var(--dash-small); text-decoration: none; transition: color var(--duration-fast);
+  }
+  .list-more:hover { color: var(--fg-primary); }
+  .rows { margin-bottom: 8px; }
 
   /* monograma de iniciales */
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 10px; font-weight: 700; line-height: 1; }
-  .mono-av.sm { width: 24px; height: 24px; }
+  .mono-av.lg { width: 26px; height: 26px; }
+  .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-caption); font-variant-numeric: tabular-nums; }
 
-  /* sparkline */
+  /* ── Curva acumulada ── */
   .spark-wrap { position: relative; }
-  .spark { display: block; width: 100%; height: 150px; }
+  .spark { display: block; width: 100%; height: 120px; }
   .spark-dot {
     position: absolute; width: 11px; height: 11px; border-radius: 50%;
     background: var(--accent-gold); border: 3px solid var(--bg-card);
     transform: translate(-50%, -50%); pointer-events: none;
     box-shadow: 0 0 0 1px var(--accent-gold-line), 0 4px 12px -2px var(--accent-gold-glow);
   }
+  .spark-axis { display: flex; justify-content: space-between; margin-top: 8px; color: var(--fg-subtle); font-size: var(--dash-caption); }
 
-  /* leads recientes compactos */
-  .recent { display: flex; flex-direction: column; }
-  .recent__row { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; padding: 6px 6px; border-top: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: var(--dash-body); transition: background var(--duration-fast); }
-  .recent__row:first-child { border-top: 0; }
-  .recent__row:hover { background: var(--bg-elevated); }
-  .recent__name { flex: 1; min-width: 0; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-caption); font-variant-numeric: tabular-nums; }
-
+  /* A1-07: el gráfico se apila antes (necesita ancho); las dos listas
+     caben lado a lado hasta ~900 px (portátil pequeño, iPad horizontal). */
   @media (max-width: 1099px) {
-    .grid-2--chart, .grid-2--funnel { grid-template-columns: 1fr; }
+    .row--chart { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 899px) {
+    .row--lists { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 719px) {
-    .recent__row { flex-wrap: wrap; row-gap: 4px; }
-    .recent__name { flex-basis: calc(100% - 40px); }
-    .recent__row :global(.ui-chip) { margin-left: 36px; }
-    .dim { margin-left: auto; }
+    .m-amount { font-size: 26px; }
+    .prow, .lrow { gap: 10px; padding: 8px 4px; }
   }
 </style>

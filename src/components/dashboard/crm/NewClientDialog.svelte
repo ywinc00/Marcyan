@@ -68,7 +68,7 @@
     <ClientFields bind:values {errors} idPrefix="nc" disabled={busy} />
   </form>
   {#if dupMatches.length}
-    <div bind:this={dupEl}><DuplicateNotice matches={dupMatches} onuse={useExisting} useLabel={onuse ? 'Usar este' : 'Abrir ficha'} onforce={() => submit(true)} {busy} /></div>
+    <div bind:this={dupEl}><DuplicateNotice matches={dupMatches} onuse={useExisting} useLabel={onuse ? 'Usar este' : 'Abrir ficha'} archivedUsable={!onuse} onforce={() => submit(true)} {busy} /></div>
   {/if}
   {#snippet footer()}
     <button type="button" class="b" onclick={() => (open = false)} disabled={busy}>Cancelar</button>

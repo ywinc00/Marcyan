@@ -231,6 +231,13 @@ await check('convertir: cliente existente no crea otro', async () => {
   assert.ok(!has(db, /^UPDATE clients SET source_brief_id/), 'no pisa el brief de origen que ya tenía');
   assert.deepEqual(db.calls.find((c) => /^UPDATE leads/.test(c.t)).params, ['LEAD-031', '5', 'MRC-020']);
 });
+await check('convertir: cliente existente ARCHIVADO → 409 en texto llano y ROLLBACK (revisión int1, F2)', async () => {
+  const db = fakeDb({ existing: { id: '5', client_code: 'CLI-005', business_name: 'Ana', status: 'archived' } });
+  await assert.rejects(convertLead('LEAD-031', { client: { mode: 'existing', id: '5' } }, { connect: async () => db }),
+    (e) => e instanceof CrmError && e.status === 409 && e.extra.reason === 'archived' && /archivado\. Reactívalo en su ficha/.test(e.message));
+  assert.ok(has(db, /^ROLLBACK/));
+  assert.ok(!has(db, /^UPDATE leads/));
+});
 await check('convertir: cliente existente que ya no existe → 404 y ROLLBACK', async () => {
   const db = fakeDb();
   await assert.rejects(convertLead('LEAD-031', { client: { mode: 'existing', id: '77' } }, { connect: async () => db }),
@@ -438,7 +445,7 @@ const run = (text, params) => {
 };
 export function sql(strings, ...values) { return run(strings.reduce((a, s, i) => a + '$' + i + s), values); }
 sql.query = run;
-export const db = { connect() { throw new Error('[prueba] connect() no disponible'); } };
+export const db = { async connect() { return { query: run, release() {} }; } };
 `;
 const PG_HOOK = `
 const FAKE = ${JSON.stringify('data:text/javascript,' + encodeURIComponent(PG_FAKE))};
@@ -508,18 +515,24 @@ await check('int1: el handler del brief ya no escribe su propio converted_to_cli
   assert.match(cli, /convertBriefToClient\(pid, session\.email, \{ checkDuplicates: body\.allow_duplicate !== true \}\)/);
 });
 await check('int1: la ficha del cliente lista cada brief una vez (origen, proyecto, evento y lead)', async () => {
-  const log = fakeSql((text) => {
+  fakeSql((text, params) => {
     if (/FROM projects WHERE client_id/.test(text)) return [{ id: 1, brief_project_id: 'MRC-021' }];
     if (/FROM invoices i/.test(text)) return [];
     if (/AS projects/.test(text)) return [{ projects: 1, milestones: 0, invoices: 0, payments: 0, payments_cents: 0 }];
     if (/DISTINCT ON \(project_id\)/.test(text)) return [{ project_id: 'MRC-021' }, { project_id: 'MRC-030' }];
     if (/FROM leads/.test(text)) return [{ ref_id: 'LEAD-031', converted_brief_id: 'MRC-030' }];
-    if (/FROM briefs WHERE project_id = ANY/.test(text)) return [];
+    // La base devuelve una fila por cada código que se le pide (como haría
+    // ANY($1)): si la lista llegara con repetidos, la ficha los pintaría.
+    if (/FROM briefs WHERE project_id = ANY/.test(text)) {
+      return params[0].map((pid) => ({ project_id: pid, status: 'won', business_name: 'Tacos Sol', created_at: '2026-10-01' }));
+    }
     throw new Error('consulta inesperada: ' + text.slice(0, 60));
   });
-  await FIN.getClientRelated({ id: 3, source_brief_id: 'MRC-021', source_lead_id: null });
-  const q = log().find((c) => /FROM briefs WHERE project_id = ANY/.test(c.text));
-  assert.deepEqual([...q.params[0]].sort(), ['MRC-021', 'MRC-030']);
+  const related = await FIN.getClientRelated({ id: 3, source_brief_id: 'MRC-021', source_lead_id: null });
+  const ids = related.briefs.map((b) => b.project_id);
+  assert.deepEqual([...ids].sort(), ['MRC-021', 'MRC-030'], 'origen, proyecto, evento y lead: cada brief una vez');
+  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(related.leads.length, 1);
 });
 await check('int1: lead que deja "Convertido" conserva cliente y brief y lo dice el historial', async () => {
   const lead = { ref_id: 'LEAD-031', status: 'converted', notes: null, converted_client_id: 9, converted_brief_id: 'MRC-030', converted_at: '2026-10-01' };
@@ -536,11 +549,41 @@ await check('int1: lead que deja "Convertido" conserva cliente y brief y lo dice
   const ev = log().find((c) => /INSERT INTO lead_events/.test(c.text));
   assert.deepEqual(JSON.parse(ev.params[3]), { from: 'converted', to: 'contacted', kept: { client_id: 9, brief_id: 'MRC-030' } });
 });
-await check('int1: KPI y pastillas cuentan por estado (un lead que deja Convertido deja de contar)', () => {
-  const src = fs.readFileSync(path.join(ROOT, 'lib/leads.mjs'), 'utf8');
-  const stats = src.slice(src.indexOf('export async function leadStats'), src.indexOf('// ── Mutaciones'));
-  assert.match(stats, /FILTER \(WHERE status = 'converted'\)::int\s+AS converted/);
-  assert.ok(!/converted_client_id/.test(stats));
+// La base falsa EVALÚA cada COUNT(*) FILTER (WHERE …) de leadStats sobre unas
+// filas en memoria (revisión int1, F3): si el conteo pasara a mirar los
+// vínculos de la conversión en vez del estado, el resultado cambiaría.
+function evalLeadCond(cond, l) {
+  if (!cond) return true;
+  return cond.split(/\s+AND\s+/).every((part) => {
+    const p = part.trim();
+    let m;
+    if ((m = /^(\w+) = '([^']*)'$/.exec(p))) return l[m[1]] === m[2];
+    if ((m = /^(\w+) IN \(([^)]*)\)$/.exec(p))) return m[2].split(',').map((x) => x.trim().replace(/'/g, '')).includes(l[m[1]]);
+    if ((m = /^(\w+) IS NOT NULL$/.exec(p))) return l[m[1]] != null;
+    if ((m = /^(\w+) IS NULL$/.exec(p))) return l[m[1]] == null;
+    if (/^created_at [<>]=? \$\d+$/.test(p)) return false;
+    throw new Error('condición sin evaluar en la prueba: ' + p);
+  });
+}
+await check('int1: KPI y pastillas cuentan por estado (un lead que deja Convertido deja de contar)', async () => {
+  const rows = [
+    { status: 'converted', source: 'chat', converted_client_id: 9, converted_brief_id: null },
+    { status: 'contacted', source: 'contact', converted_client_id: 9, converted_brief_id: 'MRC-030' }, // salió de Convertido
+    { status: 'new', source: 'chat', converted_client_id: null, converted_brief_id: null },
+  ];
+  fakeSql((text) => {
+    if (!/FROM leads/.test(text)) throw new Error('consulta inesperada: ' + text.slice(0, 60));
+    const out = {};
+    for (const m of text.matchAll(/COUNT\(\*\)(?: FILTER \(WHERE (.*?)\))?::int\s+AS (\w+)/g)) {
+      out[m[2]] = rows.filter((l) => evalLeadCond(m[1], l)).length;
+    }
+    return [out];
+  });
+  const s = await LEADS.leadStats();
+  assert.equal(s.total, 3);
+  assert.equal(s.converted, 1, 'el lead que dejó Convertido ya no cuenta como convertido');
+  assert.equal(s.contacted, 1, 'cuenta en su estado nuevo');
+  assert.equal(s.pipeline, 2);
 });
 await check('int1: keptConversionLinks y el aviso del panel', () => {
   const conv = { ref_id: 'LEAD-031', status: 'converted', converted_client_id: 9, converted_brief_id: 'MRC-030' };
@@ -561,6 +604,41 @@ await check('int1: keptConversionLinks y el aviso del panel', () => {
   assert.match(sel, /ConfirmDialog/);
   assert.match(sel, /crmReady && leavingConvertedMessage\(lead, next\)/, 'solo con la migración 011');
 });
+// Lo que pide el selector (active=1) devuelve de verdad la lista sin
+// archivados: la base falsa aplica el WHERE que recibe sobre filas en memoria
+// y falla si llega una condición que no sabe evaluar (revisión int1, F3).
+const CLIENT_ROWS = [
+  { id: 1, client_code: 'CLI-001', status: 'active' },
+  { id: 2, client_code: 'CLI-002', status: 'archived' },
+  { id: 3, client_code: 'CLI-003', status: 'inactive' },
+];
+function clientListDb(text, params) {
+  if (/^\s*SELECT c\.\*/.test(text)) {
+    const where = (/FROM clients c\s+WHERE ([\s\S]*?)\s+ORDER BY/.exec(text) || [])[1] || '';
+    let out = CLIENT_ROWS;
+    for (const part of where ? where.split(/\s+AND\s+/) : []) {
+      let m;
+      if (/^c\.status <> 'archived'$/.test(part.trim())) out = out.filter((r) => r.status !== 'archived');
+      else if ((m = /^c\.status = \$(\d+)$/.exec(part.trim()))) out = out.filter((r) => r.status === params[m[1] - 1]);
+      else throw new Error('condición sin evaluar en la prueba: ' + part.trim());
+    }
+    return out;
+  }
+  if (/COUNT\(\*\)::int AS n FROM clients c/.test(text)) return [{ n: 0 }];
+  if (/GROUP BY c\.status/.test(text)) return [];
+  if (/SUM\(x\.balance_cents\)/.test(text)) return [{ balance_cents: '0', with_active_projects: 0 }];
+  throw new Error('consulta inesperada: ' + text.slice(0, 60));
+}
+await check('int1: la lista del selector (active=1) no trae archivados; sin el filtro sí', async () => {
+  fakeSql(clientListDb);
+  assert.deepEqual((await FIN.listClients({ active: true, limit: 8 })).rows.map((r) => r.client_code), ['CLI-001', 'CLI-003']);
+  assert.deepEqual((await FIN.listClients({ limit: 8 })).rows.map((r) => r.client_code), ['CLI-001', 'CLI-002', 'CLI-003']);
+  assert.deepEqual((await FIN.listClients({ status: 'archived', active: true })).rows.map((r) => r.client_code), ['CLI-002']);
+  // El endpoint traduce active=1 a esa opción.
+  const api = fs.readFileSync(path.join(ROOT, 'api/admin/clients.mjs'), 'utf8');
+  assert.match(api, /const active = q\.active === '1' \|\| q\.active === 'true';/);
+  assert.match(api, /listClients\(\{ status, active, search, limit, offset \}\)/);
+});
 await check('int1: ClientPicker es el único selector de cliente y no ofrece archivados', () => {
   const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
   for (const f of ['briefs/ConvertDialog.svelte', 'finanzas/InvoiceForm.svelte', 'progreso/ProjectForm.svelte', 'crm/ConvertLeadDialog.svelte']) {
@@ -575,6 +653,45 @@ await check('int1: ClientPicker es el único selector de cliente y no ofrece arc
   assert.match(picker, /<NewClientDialog bind:open=\{newOpen\}[^>]*onuse=\{pick\}/);
   assert.match(read('crm/NewClientDialog.svelte'), /e\.preventDefault\(\); e\.stopPropagation\(\);/);
 });
+// ── Archivados (revisión int1, F2): no se asignan a nada nuevo ────────
+await check('int1: factura nueva para un cliente archivado → 409 en texto llano y sin crearla', async () => {
+  const log = fakeSql((text) => {
+    if (/FROM clients WHERE id/.test(text)) return [{ id: '5', status: 'archived' }];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  });
+  await assert.rejects(() => FIN.createInvoice({ client_id: '5', amount_cents: 50000 }),
+    (e) => e instanceof FIN.FinanceError && e.status === 409 && /archivado\. Reactívalo en su ficha/.test(e.message));
+  assert.ok(!log().some((c) => /INSERT/.test(c.text)));
+});
+await check('int1: pasar una factura a un cliente archivado → 409, ROLLBACK y sin cambios', async () => {
+  const log = fakeSql((text) => {
+    if (/^(BEGIN|COMMIT|ROLLBACK)$/.test(text.trim())) return [];
+    if (/FROM invoices WHERE id = \$1 FOR UPDATE/.test(text)) return [{ id: '1', client_id: '3', project_id: null, status: 'sent', amount_cents: '50000', issued_at: null, due_date: null }];
+    if (/FROM payments WHERE invoice_id/.test(text)) return [{ paid: '0' }];
+    if (/FROM clients WHERE id/.test(text)) return [{ id: '5', status: 'archived' }];
+    throw new Error('consulta inesperada: ' + text.slice(0, 60));
+  });
+  await assert.rejects(() => FIN.updateInvoice('1', { client_id: '5' }),
+    (e) => e instanceof FIN.FinanceError && e.status === 409);
+  assert.ok(log().some((c) => /^ROLLBACK$/.test(c.text.trim())));
+  assert.ok(!log().some((c) => /^UPDATE invoices/.test(c.text.trim())));
+});
+await check('int1: el aviso de duplicados no deja "Usar este" un archivado (solo "Abrir ficha")', () => {
+  const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
+  const dup = read('crm/DuplicateNotice.svelte');
+  assert.match(dup, /\{#if onuse && \(m\.status !== 'archived' \|\| archivedUsable\)\}/);
+  assert.match(dup, /\{#if onuse && m\.status === 'archived' && !archivedUsable\}<span class="dup__note">Reactívalo en su ficha para usarlo\.<\/span>/);
+  // Solo donde el botón abre la ficha se mantiene para archivados.
+  assert.match(read('crm/ClientDetail.svelte'), /useLabel="Abrir ficha" archivedUsable/);
+  assert.match(read('crm/NewClientDialog.svelte'), /archivedUsable=\{!onuse\}/);
+  for (const f of ['crm/ConvertLeadDialog.svelte', 'briefs/ConvertDialog.svelte', 'finanzas/ClientForm.svelte', 'progreso/ProjectForm.svelte']) {
+    assert.ok(!/archivedUsable/.test(read(f)), f + ' no elige archivados');
+  }
+});
+await check('int1: "Usar este" del brief vincula al momento, como en el resto de altas (F4)', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/briefs/ConvertDialog.svelte'), 'utf8');
+  assert.match(src, /function useExisting\(c\) \{ picked = c; mode = 'existing'; dupMatches = \[\]; error = ''; confirm\(\); \}/);
+});
 await check('int1: todos los puntos de alta ofrecen "usar el existente" o "crear igualmente"', () => {
   const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
   for (const f of ['crm/NewClientDialog.svelte', 'crm/ConvertLeadDialog.svelte', 'briefs/ConvertDialog.svelte', 'finanzas/ClientForm.svelte']) {
@@ -584,6 +701,11 @@ await check('int1: todos los puntos de alta ofrecen "usar el existente" o "crear
     assert.match(src, /onforce=/, f + ' ofrece crear igualmente');
   }
   assert.match(read('FinanzasSection.svelte'), /<NewClientDialog bind:open=\{newClientOpen\}/, 'el Nuevo cliente de Finanzas es el alta única');
+  // Progreso, "El cliente del brief" (revisión int1, F1): el 409 lo recoge la
+  // sección y el formulario pinta el mismo aviso.
+  assert.match(read('ProgresoSection.svelte'), /reason === 'duplicate'/);
+  assert.match(read('ProgresoSection.svelte'), /allow_duplicate: true/);
+  assert.match(read('progreso/ProjectForm.svelte'), /<DuplicateNotice[^>]*onuse=\{useExisting\} onforce=\{onforce\}/);
 });
 
 if (fails.length) {

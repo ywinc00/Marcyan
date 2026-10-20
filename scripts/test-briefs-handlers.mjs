@@ -11,7 +11,8 @@
 //             cambios y evento 'brief_edited'.
 //    · POST   400 acción, 400 cliente, 404 brief, 201 creado, 200 'already',
 //             409 otro cliente, 404 cliente inexistente, 200 vinculado,
-//             409 duplicado y "crear igualmente" (integración CRM), y un solo
+//             409 duplicado y "crear igualmente" (integración CRM), 409 al
+//             vincular un cliente archivado (revisión int1), y un solo
 //             evento 'converted_to_client' al crear (lo escribe finance).
 //    · events POST de notas (400, 201 con { event }) y GET.
 //    · email  el cuerpo queda en el historial.
@@ -242,6 +243,26 @@ await check('POST: vincular → 200 linked; el evento lo escribe la misma senten
   assert.equal(r.body.linked, true);
   assert.deepEqual(calls.link, [{ pid: 'MRC-007', cid: 12, actor: SESSION.email }]);
   assert.equal(calls.logEvent.length, 0);
+});
+await check('POST: vincular a un cliente ARCHIVADO → 409 en texto llano (revisión int1, F2)', async () => {
+  stubs({ linkBriefToClient: async (pid, cid, actor) => {
+    calls.link.push({ pid, cid, actor });
+    return { client: { id: 5, client_code: 'CLI-005', business_name: 'Ana', status: 'archived' }, sourceSet: false, archived: true };
+  } });
+  const r = await call(briefHandler, { method: 'POST', body: { action: 'convert_to_client', client_id: 5 } });
+  assert.equal(r.statusCode, 409);
+  assert.equal(r.body.reason, 'archived');
+  assert.match(r.body.error, /archivado\. Reactívalo en su ficha/);
+});
+await check('linkBriefToClient: con el cliente archivado la sentencia no escribe vínculo ni evento', async () => {
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(path.join(ROOT, 'lib/db.mjs'), 'utf8');
+  const fn = src.slice(src.indexOf('export async function linkBriefToClient'));
+  const body = fn.slice(0, fn.indexOf('\n}\n'));
+  assert.match(body, /ok AS \(\s*SELECT \* FROM c WHERE status IS DISTINCT FROM 'archived'/);
+  assert.match(body, /WHERE id = \(SELECT id FROM ok\) AND source_brief_id IS NULL/);
+  assert.match(body, /FROM ok\s+RETURNING id/);
+  assert.match(body, /archived: client\.status === 'archived'/);
 });
 await check('POST: fallo inesperado → 500 con texto llano', async () => {
   stubs({ convertBriefToClient: async () => { throw new Error('boom'); } });

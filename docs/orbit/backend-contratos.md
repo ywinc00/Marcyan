@@ -142,6 +142,18 @@ lectores de enlaces de correo que pudieran consumir el enlace mágico con un GET
   vinculado responde antes 200 `already` / `created:false`, sin mirar duplicados.
   Los demás puntos de alta ya lo hacían: `POST /api/admin/clients` (alta manual),
   `POST /api/admin/leads/:id/convert` y `{ from_lead }`.
+- **Proyecto con "el cliente del brief" (revisión int1, F1).** `POST /api/admin/projects
+  { briefProjectId, allow_duplicate? }` sin `clientId` resuelve el cliente con el mismo criterio que
+  la ficha del brief (`source_brief_id` o el último `converted_to_client`) y, si no tiene, lo crea
+  vía `convertBriefToClient` (evento con el actor). Si ya hay un cliente con su correo o teléfono:
+  **409 `{ reason:'duplicate', matches[] }`**; el formulario de Progreso pinta el mismo aviso
+  ("Usar este" lo elige en el selector, "crear igualmente" repite con `allow_duplicate: true`).
+- **Archivados (revisión int1, F2).** Un cliente archivado no se asigna a nada nuevo: **409** en
+  texto llano ("Ese cliente está archivado. Reactívalo en su ficha para usarlo o elige otro.") al
+  vincularlo a un brief (`reason:'archived'`, sin escribir vínculo ni evento), al convertir un lead
+  a él (`reason:'archived'`), al crear una factura o pasarla a él, y al crear un proyecto o pasarlo
+  a él (también si el cliente del brief está archivado). El aviso de duplicados muestra los
+  archivados como información, con su ficha enlazada, sin "Usar este".
 - **Ficha del cliente sin briefs repetidos.** `related.briefs` reúne, sin repetir, el brief de
   origen (`source_brief_id`), los de sus proyectos, los vinculados por su último evento
   `converted_to_client` y los de sus leads convertidos.

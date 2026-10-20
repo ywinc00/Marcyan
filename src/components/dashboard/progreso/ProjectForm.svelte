@@ -9,11 +9,16 @@
   //     existe (OP-09), y el servidor lo vuelve a comprobar. Si la lista vino
   //     recortada (más de 200 briefs), decide solo el servidor (A5-R2).
   //   · Monto: acepta "1500", "1,500", "1.500" o "$1,500.50"; vacío = $0 (MOCK-06).
+  //   · Duplicado (revisión int1, F1): si el cliente del brief se iba a crear
+  //     y ya hay uno con su correo o teléfono, el padre pasa dupMatches y aquí
+  //     se pinta el mismo aviso que en el resto de altas: "Usar este" lo elige
+  //     en el selector y "crear igualmente" llama a onforce.
   // onsubmit(payload) recibe solo lo que hay que mandar (en edición, solo lo
   // que cambió). serverError = error del último guardado (se pinta arriba).
   import Field from '../ui/Field.svelte';
   import Icon from '../ui/Icon.svelte';
   import ClientPicker from '../crm/ClientPicker.svelte';
+  import DuplicateNotice from '../crm/DuplicateNotice.svelte';
   import { opts, loadOptions } from './options.svelte.js';
   import {
     P_STATUSES, SERVICE_TYPES, serviceLabel, parseMoneyToCents, centsToInput,
@@ -22,7 +27,16 @@
   let {
     mode = 'create', project = null, busy = false, serverError = '',
     formId = 'project-form', onsubmit, ondirty, showSubmit = false, submitLabel = 'Guardar cambios',
+    dupMatches = [], onforce, ondupclear,
   } = $props();
+
+  // "Usar este" del aviso de duplicados: ese cliente queda elegido.
+  function useExisting(m) {
+    pickedClient = m;
+    f.clientId = String(m.id);
+    errors = { ...errors, clientId: undefined };
+    ondupclear?.();
+  }
 
   const AUTO = '__auto';
 
@@ -147,8 +161,12 @@
       label: briefTyped ? 'El cliente del brief ' + briefTyped : 'Sin cliente formal (cuenta Directo)',
       sub: briefTyped ? 'Se usa el cliente que ya tenga ese brief o se crea con sus datos.' : 'El proyecto queda en la cuenta genérica "Directo" hasta que lo asignes.',
     } : null}
-    onauto={(on) => { f.clientId = on ? AUTO : ''; }}
-    onchange={(c) => { f.clientId = c ? String(c.id) : ''; }} />
+    onauto={(on) => { f.clientId = on ? AUTO : ''; if (!on) ondupclear?.(); }}
+    onchange={(c) => { f.clientId = c ? String(c.id) : ''; ondupclear?.(); }} />
+  {#if mode === 'create' && dupMatches.length && f.clientId === AUTO}
+    <DuplicateNotice matches={dupMatches} title={'Ya existe un cliente con el correo o el teléfono del brief ' + briefTyped}
+      onuse={useExisting} onforce={onforce} {busy} />
+  {/if}
   {#if opts.error}
     <p class="pf__opts-err" role="alert">{opts.error} <button type="button" class="b b--mini" onclick={() => loadOptions({ force: true })}>Reintentar</button></p>
   {/if}

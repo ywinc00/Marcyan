@@ -20,6 +20,8 @@
 //            409 { reason: 'duplicate', matches } si al crear ya hay un
 //            cliente con su correo o teléfono: se vincula a uno de ellos
 //            (client_id) o se repite con allow_duplicate: true.
+//            409 { reason: 'archived' } si el client_id es de un cliente
+//            archivado: no se vincula (revisión int1, F2).
 //   DELETE → elimina el brief (cascade a brief_events) y antes sus archivos en Blob
 import { requireAdmin } from '../../../lib/auth.mjs';
 import {
@@ -27,7 +29,7 @@ import {
   logEvent, BRIEF_STATUSES, prepareBriefEdits, applyBriefEdits,
   getBriefClient, linkBriefToClient,
 } from '../../../lib/db.mjs';
-import { convertBriefToClient, CrmError } from '../../../lib/finance.mjs';
+import { convertBriefToClient, CrmError, ARCHIVED_CLIENT_MSG } from '../../../lib/finance.mjs';
 import { deleteBriefBlobs, isMissingSchema } from '../../../lib/brief-files.mjs';
 import { briefData } from '../../../lib/kit/build.mjs';
 
@@ -186,6 +188,8 @@ export default async function handler(req, res) {
         // El vínculo y su evento van juntos en una sola sentencia.
         const r = await linkBriefToClient(id, wanted, session.email);
         if (!r) return res.status(404).json({ ok: false, error: 'Ese cliente ya no existe. Búscalo de nuevo.' });
+        // Archivado: no se vincula nada (revisión int1, F2).
+        if (r.archived) return res.status(409).json({ ok: false, reason: 'archived', error: ARCHIVED_CLIENT_MSG });
         client = r.client;
         linked = true;
       }

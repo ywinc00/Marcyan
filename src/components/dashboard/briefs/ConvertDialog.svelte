@@ -3,7 +3,7 @@
   // datos del brief o vincularlo a uno que ya existe con el selector único
   // del panel (crm/ClientPicker, integración CRM; sin archivados).
   // Si al crear ya hay un cliente con su correo o teléfono (409), se ofrece
-  // usar ese (pasa a "vincular") o crear el nuevo igualmente.
+  // usar ese (lo vincula al momento) o crear el nuevo igualmente.
   import { untrack } from 'svelte';
   import Modal from '../ui/Modal.svelte';
   import Icon from '../ui/Icon.svelte';
@@ -25,7 +25,10 @@
     });
   });
 
-  function useExisting(c) { picked = c; mode = 'existing'; dupMatches = []; error = ''; }
+  // "Usar este" vincula al momento, como en el resto de puntos de alta
+  // (revisión int1, F4): antes solo pasaba a "Vincular" y, si el dueño
+  // cerraba el modal, el brief se quedaba sin cliente.
+  function useExisting(c) { picked = c; mode = 'existing'; dupMatches = []; error = ''; confirm(); }
 
   async function confirm(allowDuplicate = false) {
     if (busy) return;

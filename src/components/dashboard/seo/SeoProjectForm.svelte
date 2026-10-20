@@ -8,7 +8,7 @@
   import Field from '../ui/Field.svelte';
   import { api, ApiError } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
-  import { validateProjectFields } from '../../../../lib/seo-core.mjs';
+  import { validateProjectFields, sameField } from '../../../../lib/seo-core.mjs';
 
   let {
     open = $bindable(false),
@@ -36,8 +36,10 @@
   });
 
   const norm = (v) => String(v ?? '').trim();
-  const gscChanged = $derived(isEdit && norm(form.gsc_site_url) !== norm(project?.gsc_site_url));
-  const ga4Changed = $derived(isEdit && norm(form.ga4_property_id) !== norm(project?.ga4_property_id));
+  // A6-R7: se compara normalizado en los dos lados, igual que el servidor:
+  // 'https://www.x.com' guardado y 'https://www.x.com/' son la misma propiedad.
+  const gscChanged = $derived(isEdit && !sameField('gsc_site_url', form.gsc_site_url, project?.gsc_site_url));
+  const ga4Changed = $derived(isEdit && !sameField('ga4_property_id', form.ga4_property_id, project?.ga4_property_id));
   const hadGsc = $derived(isEdit && Boolean(project?.gsc_site_url));
   const hadGa4 = $derived(isEdit && Boolean(project?.ga4_property_id));
   const willHaveIds = $derived(Boolean(norm(form.gsc_site_url) || norm(form.ga4_property_id)));
@@ -63,7 +65,14 @@
       const body = { ...v.values, active: form.active };
       let res;
       if (isEdit) {
-        res = await api('/api/admin/seo/projects/' + encodeURIComponent(project.id), { method: 'PATCH', body });
+        // A6-R7: en la edición solo viajan los campos que cambiaron de verdad;
+        // un identificador antiguo sin tocar no se reescribe ni borra datos.
+        const changed = {};
+        for (const k of Object.keys(body)) {
+          if (k === 'active') { if (body.active !== (project.active !== false)) changed.active = body.active; continue; }
+          if (!sameField(k, body[k], project[k])) changed[k] = body[k];
+        }
+        res = await api('/api/admin/seo/projects/' + encodeURIComponent(project.id), { method: 'PATCH', body: changed });
       } else {
         res = await api('/api/admin/seo/projects', { method: 'POST', body });
       }
@@ -83,7 +92,7 @@
     <Field label="Nombre del proyecto" required error={errors.name}>
       {#snippet children(f)}
         <input class="ui-input" id={f.id} aria-describedby={f.describedby} aria-invalid={f.invalid} bind:value={form.name}
-          placeholder="Sitio principal" autocomplete="off" onblur={() => touched.name && validateField('name')} />
+          placeholder="Sitio principal" autocomplete="off" onblur={() => validateField('name')} />
       {/snippet}
     </Field>
     <div class="pf__row">

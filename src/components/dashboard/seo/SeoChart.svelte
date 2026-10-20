@@ -8,7 +8,7 @@
   //   · tooltip con ratón, toque (pointer events) y teclado (flechas), que no
   //     se sale por los bordes.
   import { niceScale } from '../../../../lib/seo-core.mjs';
-  import { nfmt, dayShort, fmtDayShort, dayRangeShort } from './format.js';
+  import { nfmt, axisNum, dayShort, dayRangeShort } from './format.js';
 
   let {
     series = [],          // [{ date, v (número | null), pending }]
@@ -24,15 +24,20 @@
   let boxW = $state(560);
   const VBW = $derived(Math.max(260, Math.round(boxW || 560)));
   const VBH = $derived(VBW < 480 ? 180 : 210);
-  const PAD_L = 40, PAD_R = 8, PAD_T = 14, PAD_B = 26;
-  const innerW = $derived(VBW - PAD_L - PAD_R);
-  const innerH = $derived(VBH - PAD_T - PAD_B);
+  const PAD_R = 8, PAD_T = 14, PAD_B = 26;
   const uid = 'sc' + Math.random().toString(36).slice(2, 8);
   const color = $derived(tone === 'data' ? 'var(--accent-teal)' : 'var(--accent-gold)');
 
   const n = $derived(series.length);
   const values = $derived(series.map((p) => p.v).filter((v) => v != null));
   const scale = $derived(niceScale(values.length ? Math.max(...values) : 0));
+  // A6-R6: el margen izquierdo se mide con el rótulo más largo del eje
+  // (mono de 11 px ≈ 6,7 px por carácter + 8 de separación + 4 de aire), con
+  // el mínimo de siempre (40) para no mover los gráficos de números cortos.
+  const yLabels = $derived(scale.ticks.map((t) => ({ t, s: axisNum(t) })));
+  const PAD_L = $derived(Math.max(40, Math.ceil(Math.max(0, ...yLabels.map((l) => l.s.length)) * 6.7) + 12));
+  const innerW = $derived(VBW - PAD_L - PAD_R);
+  const innerH = $derived(VBH - PAD_T - PAD_B);
   const step = $derived(n > 1 ? innerW / (n - 1) : 0);
   function x(i) { return n <= 1 ? PAD_L + innerW / 2 : PAD_L + i * step; }
   function y(v) { return PAD_T + innerH - (v / scale.max) * innerH; }
@@ -63,15 +68,16 @@
     return { x: x0, w: VBW - PAD_R - x0 };
   });
 
-  // Rótulos del eje X: primer día, mitad y último.
+  // Rótulos del eje X: primer día, mitad y último, con el mismo día corto
+  // que el resto de la tarjeta ('3 oct'), no DD/MM (A6-R6).
   const xLabels = $derived.by(() => {
     if (!n) return [];
-    if (n === 1) return [{ i: 0, t: fmtDayShort(series[0].date), a: 'middle' }];
+    if (n === 1) return [{ i: 0, t: dayShort(series[0].date), a: 'middle' }];
     const mid = Math.floor((n - 1) / 2);
     return [
-      { i: 0, t: fmtDayShort(series[0].date), a: 'start' },
-      { i: mid, t: fmtDayShort(series[mid].date), a: 'middle' },
-      { i: n - 1, t: fmtDayShort(series[n - 1].date), a: 'end' },
+      { i: 0, t: dayShort(series[0].date), a: 'start' },
+      { i: mid, t: dayShort(series[mid].date), a: 'middle' },
+      { i: n - 1, t: dayShort(series[n - 1].date), a: 'end' },
     ];
   });
 
@@ -149,9 +155,9 @@
       <rect x={pendingRect.x} y={PAD_T} width={pendingRect.w} height={innerH} class="sc__pending" />
     {/if}
 
-    {#each scale.ticks as t (t)}
-      <line x1={PAD_L} y1={y(t)} x2={VBW - PAD_R} y2={y(t)} class="sc__grid" />
-      <text x={PAD_L - 8} y={y(t) + 4} text-anchor="end" class="sc__lbl">{nfmt(t)}</text>
+    {#each yLabels as l (l.t)}
+      <line x1={PAD_L} y1={y(l.t)} x2={VBW - PAD_R} y2={y(l.t)} class="sc__grid" />
+      <text x={PAD_L - 8} y={y(l.t) + 4} text-anchor="end" class="sc__lbl">{l.s}</text>
     {/each}
 
     {#each areas as d, k (k)}{#if d}<path d={d} fill="url(#{uid}-fill)" stroke="none" />{/if}{/each}

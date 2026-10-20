@@ -116,8 +116,12 @@
   function pickDays(n) { setQuery({ dias: n === DEFAULT_DAYS ? '' : n }); }
 
   // ── Sincronizar un proyecto ("Actualizar ahora") ──
+  // A6-R2: si llega otra petición mientras una sync está en curso (p. ej. al
+  // guardar una propiedad nueva), no se descarta: se hace al terminar.
+  let queuedSync = '';
   async function syncNow(id = selected && selected.id) {
-    if (!id || syncingId) return;
+    if (!id) return;
+    if (syncingId) { queuedSync = String(id); return; }
     syncingId = String(id);
     try {
       const j = await api('/api/admin/seo/sync', { method: 'POST', body: { id: String(id), days }, acceptErrors: true, timeout: 120000 });
@@ -133,6 +137,9 @@
       syncingId = '';
       await loadProjects();
       if (selected && String(selected.id) === String(id)) await loadDetail(String(id), days);
+      const next = queuedSync;
+      queuedSync = '';
+      if (next) syncNow(next);
     }
   }
 
@@ -202,6 +209,21 @@
   const gscErr = $derived(srcFailed('gsc') ? syncState.sources.gsc.error : null);
 
   const windowTxt = $derived(sumG ? `${dayShort(sumG.current.start)} al ${dayShort(sumG.current.end)}` : '');
+  // A6-R1: si lo guardado no cubre todo el rango, el total es de menos días y se dice.
+  const partialG = $derived(Boolean(sumG && sumG.current.complete === false && sumG.current.data_from));
+  const partialA = $derived(Boolean(sumA && sumA.current.complete === false && sumA.current.data_from));
+  const partialTxt = $derived.by(() => {
+    const tail = `: los totales no cubren los ${days} días. Con Actualizar ahora se traen los que faltan.`;
+    if (partialG && partialA && sumG.current.data_from === sumA.current.data_from) {
+      return `Search Console y Analytics solo tienen datos guardados desde el ${dayShort(sumG.current.data_from)}` + tail;
+    }
+    const parts = [];
+    if (partialG) parts.push(`Search Console solo tiene datos guardados desde el ${dayShort(sumG.current.data_from)}`);
+    if (partialA) parts.push(`Analytics desde el ${dayShort(sumA.current.data_from)}`);
+    return parts.length ? parts.join(' y ') + tail : '';
+  });
+  // Título del gráfico: los días que de verdad pinta.
+  const chartCap = $derived(sumG ? (partialG ? `Del ${dayShort(sumG.current.data_from)} al ${dayShort(sumG.through)}` : `${days} días hasta el ${dayShort(sumG.through)}`) : '');
   const qCols = [
     { key: 'query', label: 'Búsqueda', primary: true },
     { key: 'clicks', label: 'Clics', align: 'end' },
@@ -324,17 +346,20 @@
                   {#if sumG}Search Console: {windowTxt} (publica con 2 o 3 días de retraso).{/if}
                   {#if sumA}Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}, sin el día de hoy.{/if}
                 </p>
+                {#if partialTxt}
+                  <p class="seo-window seo-window--warn" role="note">{partialTxt}</p>
+                {/if}
               {/if}
 
               {#if hasGsc}
                 {#if gscDaily.length}
                   <div class="seo-charts">
                     <Card title="Clics por día" caption="Search Console">
-                      {#snippet actions()}<span class="seo-cap">{days} días hasta el {dayShort(sumG.through)}</span>{/snippet}
+                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
                       <SeoChart series={clicksSeries} tone="accent" unit="clics" unitOne="clic" label="Clics por día" {pendingLabel} />
                     </Card>
                     <Card title="Impresiones por día" caption="Search Console">
-                      {#snippet actions()}<span class="seo-cap">{days} días hasta el {dayShort(sumG.through)}</span>{/snippet}
+                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
                       <SeoChart series={imprSeries} tone="data" unit="impresiones" unitOne="impresión" label="Impresiones por día" {pendingLabel} />
                     </Card>
                   </div>
@@ -432,6 +457,7 @@
   .seo-stack { display: flex; flex-direction: column; gap: var(--space-4); transition: opacity var(--duration-fast); }
   .seo-stack.is-reloading { opacity: .7; }
   .seo-window { margin: -6px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
+  .seo-window--warn { color: var(--color-warning); }
   .seo-down { color: var(--color-error); font-weight: 600; }
 
   .seo-charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }

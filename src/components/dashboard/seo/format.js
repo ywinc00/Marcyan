@@ -12,6 +12,19 @@ export function nfmt(n) {
   return NF.format(Math.round(+n));
 }
 
+// Formato compacto propio: el 'compact' de Intl da '10 K' en es-US y cambia
+// según el navegador.
+const NF1 = new Intl.NumberFormat('es-US', { maximumFractionDigits: 1 });
+/** Rótulo del eje Y: '2,000' hasta 9,999; desde ahí compacto ('10 mil',
+ *  '1.5 M') para que quepa a la izquierda del gráfico (A6-R6). */
+export function axisNum(n) {
+  if (n == null || !Number.isFinite(+n)) return '';
+  const v = +n, a = Math.abs(v);
+  if (a < 10000) return nfmt(v);
+  if (a < 1e6) return NF1.format(v / 1000) + ' mil';
+  return NF1.format(v / 1e6) + ' M';
+}
+
 /** Proporción 0..1 → '3,4 %'. */
 export function pct(n) {
   if (n == null || !Number.isFinite(+n)) return '—';

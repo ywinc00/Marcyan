@@ -7,7 +7,7 @@
 import { requireAdmin } from '../../../../lib/auth.mjs';
 import { getBriefByProjectId } from '../../../../lib/db.mjs';
 import { formatHoustonDateTime } from '../../../../lib/dates.mjs';
-import { sectionsFor, labelFor, shortLabel, isActive } from '../../../../lib/brief-schema.mjs';
+import { sectionsFor, labelFor, shortLabel, isMissing, isLegacyBrief } from '../../../../lib/brief-schema.mjs';
 import { briefData } from '../../../../lib/kit/build.mjs';
 
 // Secciones y etiquetas desde el esquema único (B-08): la ficha muestra
@@ -23,6 +23,7 @@ const TAG_TYPES = new Set(['checkbox', 'services']);
 function buildSections(brief) {
   const data = briefData(brief);
   const services = data.services || [];
+  const legacy = isLegacyBrief(brief);
   const out = [];
   let n = 0;
   for (const s of sectionsFor(null, null, { includeHidden: true })) {
@@ -31,7 +32,8 @@ function buildSections(brief) {
       if (fd.type === 'file') continue;
       const v = data[fd.key];
       const empty = isEmptyVal(v);
-      if (empty && (fd.hidden || fd.moment !== 'inicial' || !isActive(fd, services))) continue;
+      // "Sin dato" solo si de verdad falta (misma regla que la ficha y BRIEF.md).
+      if (empty && (fd.moment !== 'inicial' || !isMissing(fd, data, { services, legacy }))) continue;
       const kind = TAG_TYPES.has(fd.type) && Array.isArray(v) && fd.options ? 'tags' : null;
       rows.push({
         label: shortLabel(fd, 'es') || fd.label.es,

@@ -9,8 +9,11 @@
 //     no viajan.
 //   · HEIC: primero se intenta con el decodificador del navegador (Safari lo
 //     abre); si no puede, se carga 'heic-to' BAJO DEMANDA (decodifica en su
-//     propio worker) y solo en ese momento. Si también falla, se sube el
-//     original y queda marcado (content-type image/heic + nota).
+//     propio worker) y solo en ese momento.
+//   · Si no se puede redibujar (HEIC sin conversión, JPEG que el navegador
+//     no abre), NO se sube el original: puede llevar la ubicación GPS
+//     (decisión del dueño "fotos a calidad web, sin GPS", B1-R02). La fila
+//     explica cómo mandarla de otra forma.
 //   · Logos y documentos NUNCA pasan por aquí: se suben tal cual.
 // ════════════════════════════════════════════════════════════════
 import { isHeicType, withExt } from './sniff.js';
@@ -58,8 +61,8 @@ async function encodeJpeg(bitmap) {
 }
 
 // preparePhoto(file, realType) →
-//   { blob, name, contentType, convertedFrom, original:boolean, note? }
-// Nunca lanza: si no se puede convertir, devuelve el original.
+//   { blob, name, contentType, convertedFrom }  o  { failed: true, heic }
+// Nunca lanza. Si no se puede convertir, NUNCA devuelve el original.
 export async function preparePhoto(file, realType) {
   const heic = isHeicType(realType);
   let bitmap = null;
@@ -76,14 +79,10 @@ export async function preparePhoto(file, realType) {
       name: withExt(file.name, 'jpg'),
       contentType: 'image/jpeg',
       convertedFrom: heic ? realType : (realType !== 'image/jpeg' ? realType : null),
-      original: false,
     };
   } catch (err) {
-    console.warn('[brief] no se pudo preparar la foto; se sube el original', err && err.message);
-    return {
-      blob: file, name: file.name, contentType: realType, convertedFrom: null, original: true,
-      note: heic ? 'HEIC original sin convertir' : 'Original sin reducir',
-    };
+    console.warn('[brief] no se pudo preparar la foto; no se sube el original', err && err.message);
+    return { failed: true, heic };
   } finally {
     try { bitmap && bitmap.close && bitmap.close(); } catch { /* ya liberado */ }
   }

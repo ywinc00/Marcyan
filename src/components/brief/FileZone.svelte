@@ -86,7 +86,7 @@
       onchange={(e) => { take(e.currentTarget.files); e.currentTarget.value = ''; }}
     />
   </div>
-  {#if removed}<p class="fz__removed" role="status">{t.removedNote(removed)}</p>{/if}
+  {#if removed}<p class="fz__removed" role="status">{t.removedNote(removed, uploads.purpose === 'kit')}</p>{/if}
   {#if uploads.unavailable}
     <p class="fz__off" role="status">{uploads.unavailable}</p>
   {:else if quota && uploads.active.length}

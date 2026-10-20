@@ -19,7 +19,7 @@
   import Exits from './Exits.svelte';
   import Ico from './Ico.svelte';
   import { strings, pick } from './lib/strings.js';
-  import { STEPS, REVIEW_STEP, fieldsForStep, validateStep, validateAll, errorsForStep, firstStepWithErrors } from './lib/steps.js';
+  import { STEPS, REVIEW_STEP, itemsForStep, isHidden, groupOf, validateStep, validateAll, errorsForStep, firstStepWithErrors } from './lib/steps.js';
   import { saveBrief, loadBrief, clearBrief, storageAvailable } from './lib/persist.js';
   import { Uploads } from './lib/uploads.svelte.js';
   import { fmtBytes } from './lib/sniff.js';
@@ -53,10 +53,12 @@
   const uploads = new Uploads({ lang: untrack(() => lang), purpose: 'brief', onDraft: () => schedule(), onChange: () => schedule() });
 
   const services = $derived(Array.isArray(data.services) ? data.services : []);
-  const fields = $derived(fieldsForStep(step, services));
+  const items = $derived(itemsForStep(step, services));
   const stepValid = $derived(STEPS.map((_, i) => i === REVIEW_STEP || Object.keys(validateStep(i, data)).length === 0));
   const svcField = fieldByKey('services');
   const chosen = $derived(svcField.options.filter((o) => services.includes(o.value)));
+  // Nombre del servicio que encabeza su bloque de preguntas (paso 2 y revisión).
+  const svcName = (id) => { const o = svcField.options.find((x) => x.value === id); return o ? pick(o.label, lang) : id; };
 
   // ── Guardado automático ─────────────────────────────────────
   let timer = 0;
@@ -181,6 +183,7 @@
     errors = {};
     uploads.files = [];
     uploads.draft = null;
+    uploads.discarded = [];
     resumedAt = null; resumedFiles = false; carried = 0; askRestart = false; fromReview = false;
     visited = 0;
     show(0);
@@ -217,10 +220,12 @@
   });
 
   const nextLabel = $derived(fromReview ? t.backToReview : (STEPS[step + 1] ? pick(STEPS[step + 1].label, lang) : ''));
-  const answer = (fd) => labelFor(fd, data[fd.key], lang);
-  // El servidor enlaza también lo que el cliente quitó tras subirlo (llega
-  // marcado); el éxito cuenta solo lo que el cliente quiso enviar.
-  const keptFiles = $derived(result && result.files ? Math.max(0, (result.files.linked || 0) - uploads.removedCount()) : 0);
+  // Una casilla sin marcar no es una respuesta que repasar.
+  const answer = (fd) => (data[fd.key] === false ? null : labelFor(fd, data[fd.key], lang));
+  // En la revisión, el nombre del servicio solo encabeza si su bloque tiene respuestas.
+  const groupAnswered = (fs, g) => fs.some((it) => groupOf(it.fd, services) === g && !isHidden(it.fd.key, data) && (it.fd.type === 'file' ? fileNames(it.fd.key).length : answer(it.fd)));
+  // El servidor borra lo que el cliente quitó (B1-R04): lo enlazado es lo que llegó.
+  const keptFiles = $derived(result && result.files ? Math.max(0, result.files.linked || 0) : 0);
   const fileNames = (key) =>uploads.files.filter((f) => f.field === key && !f.removed && f.status === 'done').map((f) => f.name);
 </script>
 
@@ -302,8 +307,11 @@
 
       {#if step !== REVIEW_STEP}
         <div class="card__fields">
-          {#each fields as fd (fd.key)}
-            {#if fd.type === 'file'}
+          {#each items as { fd, head } (fd.key)}
+            {#if head}<h3 class="blk">{svcName(head)}</h3>{/if}
+            {#if isHidden(fd.key, data)}
+              <!-- depende de otra respuesta: oculto, sin borrar lo escrito -->
+            {:else if fd.type === 'file'}
               {#if (fd.key === 'logo_files' && (['si', 'update'].includes(data.has_logo) || uploads.forField(fd.key).length))
                 || (fd.key === 'photo_files' && (['si', 'pocas'].includes(data.has_photos) || uploads.forField(fd.key).length))
                 || !['logo_files', 'photo_files'].includes(fd.key)}
@@ -323,15 +331,18 @@
       {:else}
         <div class="rev">
           {#each STEPS.slice(0, REVIEW_STEP) as s, i (s.key)}
-            {@const fs = fieldsForStep(i, services)}
+            {@const fs = itemsForStep(i, services)}
             <section class="rev__sec" aria-labelledby={`rev-${s.key}`}>
               <div class="rev__head">
                 <h3 id={`rev-${s.key}`}>{pick(s.label, lang)}</h3>
                 <button type="button" class="linkbtn" onclick={() => edit(i)} aria-label={`${t.edit}: ${pick(s.label, lang)}`}><Ico name="edit" size={14} />{t.edit}</button>
               </div>
               <dl>
-                {#each fs as fd (fd.key)}
-                  {#if fd.type === 'file'}
+                {#each fs as { fd, head } (fd.key)}
+                  {#if head && groupAnswered(fs, head)}<p class="rev__grp">{svcName(head)}</p>{/if}
+                  {#if isHidden(fd.key, data)}
+                    <!-- oculto: no se envía -->
+                  {:else if fd.type === 'file'}
                     {#if fileNames(fd.key).length}<div class="rev__row"><dt>{t.revFiles[fd.kind] || pick(fd.label, lang)}</dt><dd>{fileNames(fd.key).join(', ')}</dd></div>{/if}
                   {:else if answer(fd)}
                     <div class="rev__row"><dt>{pick(fd.label, lang)}</dt><dd>{answer(fd)}</dd></div>
@@ -426,6 +437,8 @@
   .card__title:focus { outline: none; }
   .card__intro { margin: 0; color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); max-width: 60ch; }
   .card__fields { display: grid; gap: var(--space-6); }
+  /* Bloque de preguntas de un servicio elegido (paso 2): su nombre separa el grupo. */
+  .blk { margin: 0 0 calc(-1 * var(--space-3)); padding-top: var(--space-5); border-top: 1px solid var(--border-subtle); font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
   .card__fix { display: flex; align-items: center; gap: var(--space-2); margin: 0; color: color-mix(in srgb, var(--color-error), white 22%); font-size: var(--text-sm); }
 
   /* Barra del teléfono */
@@ -464,6 +477,7 @@
   .rev__head h3 { margin: 0; font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
   .rev dl { margin: 0; display: grid; gap: var(--space-3); }
   .rev__row { display: grid; gap: 2px; }
+  .rev__grp { margin: var(--space-2) 0 0; padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); font-size: var(--text-sm); font-weight: 600; color: var(--fg-primary); }
   .rev dt { font-size: var(--text-sm); color: var(--fg-secondary); }
   .rev dd { margin: 0; font-size: var(--text-base); color: var(--fg-primary); white-space: pre-line; overflow-wrap: anywhere; }
   .rev__empty { color: color-mix(in srgb, var(--color-error), white 22%) !important; font-size: var(--text-sm) !important; }

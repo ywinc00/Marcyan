@@ -3,7 +3,7 @@
 //  (bloques = secciones del momento 'arranque' de lib/brief-schema.mjs).
 //  Lo prueba scripts/test-brief-form.mjs.
 // ════════════════════════════════════════════════════════════════
-import { sectionsFor, validate, PHOTO_SHOTS } from '../../../../lib/brief-schema.mjs';
+import { sectionsFor, validate, PHOTO_SHOTS, catchupSection, isSkipped } from '../../../../lib/brief-schema.mjs';
 
 // Bloques que se pueden dejar en blanco sin que el kit quede "a medias".
 export const OPTIONAL_BLOCKS = new Set(['prueba_social']);
@@ -19,12 +19,22 @@ export function kitTokenFrom(pathname, search = '') {
   return TOKEN_RE.test(t) ? t : '';
 }
 
-// Bloques visibles para estos servicios (y que el servidor anunció).
-export function kitBlocks(services, allowedKeys) {
+// Bloques visibles para estos servicios (y que el servidor anunció). Si el
+// brief no traía preguntas del brief corto (chat, formulario anterior), el
+// servidor las anuncia en `catchup` y van primero, en su propio bloque.
+export function kitBlocks(services, allowedKeys, catchup) {
   const list = sectionsFor('arranque', Array.isArray(services) && services.length ? services : null);
   const allow = Array.isArray(allowedKeys) && allowedKeys.length ? new Set(allowedKeys) : null;
-  return list.filter((s) => !allow || allow.has(s.key));
+  const pend = catchupSection(catchup);
+  return [...(pend ? [pend] : []), ...list.filter((s) => !allow || allow.has(s.key))];
 }
+
+// Campos que se ven de un bloque: en el bloque de lo que faltaba del brief,
+// lo que otra respuesta descarta se oculta (como en el formulario).
+export const visibleFields = (section, data) => (section.catchup
+  ? section.fields.filter((fd) => !isSkipped(fd.key, data))
+  : section.fields);
+const catchupKeysOf = (blocks) => (blocks || []).filter((b) => b.catchup).flatMap((b) => b.fields.map((f) => f.key));
 
 export function isFilled(fd, v) {
   if (v === null || v === undefined) return false;
@@ -49,7 +59,7 @@ export const SHOTS_TOTAL = PHOTO_SHOTS.filter((s) => s.value !== 'other').length
 // blockStatus(sección, datos, archivos, guardados:Set) →
 //   { status: 'done'|'partial'|'pending'|'optional', filled, total }
 export function blockStatus(section, data, files = [], saved = new Set()) {
-  const fields = section.fields;
+  const fields = visibleFields(section, data);
   let filled = 0, missingRequired = false;
   for (const fd of fields) {
     const has = fd.type === 'file'
@@ -73,9 +83,20 @@ export function errorsForBlock(section, errors) {
   return out;
 }
 
-// Validación del kit como la del servidor (parcial al guardar, completa al enviar).
-export const validateKit = (data, services, partial) =>
-  validate('arranque', data, { services: services && services.length ? services : null, optionMode: 'keep', partial });
+// Validación del kit como la del servidor (parcial al guardar, completa al
+// enviar). blocks: los de kitBlocks; si traen el bloque de lo que faltaba del
+// brief, esas claves se validan con las reglas del brief corto (nada obligatorio).
+export function validateKit(data, services, partial, blocks = []) {
+  const opts = { services: services && services.length ? services : null, optionMode: 'keep' };
+  const v = validate('arranque', data, { ...opts, partial });
+  const d = data || {};
+  const pend = {};
+  for (const k of catchupKeysOf(blocks)) if (k in d && !isSkipped(k, d)) pend[k] = d[k];
+  if (!Object.keys(pend).length) return v;
+  const vp = validate('inicial', pend, { ...opts, partial: true });
+  const errors = { ...v.errors, ...vp.errors };
+  return { ok: Object.keys(errors).length === 0, errors, data: { ...v.data, ...vp.data } };
+}
 
 // Quita lo que la interfaz crea vacío (filas en blanco, días sin hora) para
 // no guardar "Lun ? a ?" en el kit.
@@ -99,6 +120,6 @@ export function cleanForSend(fd, v) {
 // Solo los campos de un bloque (lo que se manda al guardar ese bloque).
 export function blockData(section, data) {
   const out = {};
-  for (const fd of section.fields) if (fd.type !== 'file' && fd.key in data) out[fd.key] = cleanForSend(fd, data[fd.key]);
+  for (const fd of visibleFields(section, data)) if (fd.type !== 'file' && fd.key in data) out[fd.key] = cleanForSend(fd, data[fd.key]);
   return out;
 }

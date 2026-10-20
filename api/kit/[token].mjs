@@ -13,16 +13,19 @@
 //         todo el kit (lo guardado antes + lo que llega), lo cierra y avisa
 //         en el panel. Los archivos usan el mismo
 //         sistema de borradores (POST /api/brief/draft con purpose 'kit').
+//         data puede traer también las preguntas del brief corto que el
+//         brief no tenía (GET → catchup); se validan como del brief y se
+//         guardan en briefs.kit (revisión R1).
 // ════════════════════════════════════════════════════════════════
 import { clientIp } from '../../lib/auth.mjs';
 import { logEvent } from '../../lib/db.mjs';
 import { createNotification } from '../../lib/notifications.mjs';
 import { rateLimit, LIMITS } from '../../lib/ratelimit.mjs';
 import { validate, splitByStorage, sectionsFor } from '../../lib/brief-schema.mjs';
-import { findBriefByKitToken, kitPrefill, kitForSubmit, saveKit } from '../../lib/brief-kit.mjs';
+import { findBriefByKitToken, kitPrefill, kitForSubmit, saveKit, kitCatchup, catchupData } from '../../lib/brief-kit.mjs';
 import {
   getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, listFilesForBrief, blobConfigured, isMissingSchema,
-  closeKitDrafts,
+  closeKitDrafts, queueDraftSweep,
 } from '../../lib/brief-files.mjs';
 import { secretMatches } from '../../lib/brief-upload-rules.mjs';
 
@@ -86,6 +89,9 @@ export default async function handler(req, res) {
         firstName: brief.owner_name ? String(brief.owner_name).trim().split(/\s+/)[0].slice(0, 40) : null,
         prefill: { ...kitPrefill(brief), ...(brief.kit || {}) },
         sections: sectionsFor('arranque', services.length ? services : null).map((s) => s.key),
+        // Preguntas del brief corto que este brief no trae (chat, formulario
+        // anterior o v2 de antes): el kit las enseña en su propio bloque.
+        catchup: kitCatchup(brief),
         files,
         uploads: blobConfigured(),
       });
@@ -102,12 +108,19 @@ export default async function handler(req, res) {
     // que reenviar lo que guardó en otra sesión.
     const valOpts = { services: services.length ? services : null, optionMode: 'keep' };
     const v = validate('arranque', body.data || {}, { ...valOpts, partial: true });
-    if (!v.ok) return res.status(400).json({ ok: false, error: T.fields[lang], fields: v.errors });
+    // Lo que faltaba del brief (bloque propio del kit): solo esas claves, con
+    // las reglas del brief corto; nada de eso es obligatorio.
+    const pend = catchupData(brief, body.data);
+    const vp = validate('inicial', pend, { ...valOpts, partial: true });
+    if (!v.ok || !vp.ok) return res.status(400).json({ ok: false, error: T.fields[lang], fields: { ...v.errors, ...vp.errors } });
     if (submit) {
       const whole = validate('arranque', kitForSubmit(brief, body.data), { ...valOpts, partial: false });
       if (!whole.ok) return res.status(400).json({ ok: false, error: T.fields[lang], fields: whole.errors });
     }
     const split = splitByStorage(v.data);
+    // Se guardan junto al kit (briefs.kit): el bloque sigue estable al
+    // recargar y briefData los lee como respaldo del brief inicial.
+    Object.assign(split.kit, vp.data);
 
     // Archivos del kit: borrador purpose 'kit' ligado a ESTE brief.
     let fileRows = [];
@@ -120,8 +133,15 @@ export default async function handler(req, res) {
       else console.warn('[kit] borrador de archivos no válido; se ignoran los archivos');
     }
     if (draft && blobConfigured()) {
-      if (submit) await markDraftSubmitted(draft.id, brief.id);
-      fileRows = await reconcileDraft({ draftId: draft.id, briefId: brief.id, filesMeta: body.files });
+      const claimed = submit ? await markDraftSubmitted(draft.id, brief.id) : false;
+      try {
+        fileRows = await reconcileDraft({ draftId: draft.id, briefId: brief.id, filesMeta: body.files });
+      } catch (err) {
+        // Borrador ya cerrado y sin conciliar: el cron lo termina (enlaza lo
+        // que el cliente dejó y borra lo que quitó) en vez de dejarlo así.
+        if (claimed) await queueDraftSweep(draft.id, body.files);
+        throw err;
+      }
     }
 
     const saved = await saveKit(brief.id, { columns: split.columns, kit: split.kit }, { submit });

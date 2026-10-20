@@ -1,7 +1,8 @@
 <script>
   // Ficha del brief (#/briefs/<MRC>). Una sola acción principal: "Descargar
-  // kit" (el .zip para arrancar el proyecto). "Ver ficha" (el documento HTML)
-  // queda como secundaria. Columna de trabajo: archivos y el brief por
+  // kit" (el .zip para arrancar el proyecto). "Ver ficha" y "Descargar ficha"
+  // (el documento HTML) quedan como secundarias. Las dos descargas pasan por
+  // download.js para que un fallo nunca quede mudo. Columna de trabajo: archivos y el brief por
   // secciones del esquema único; columna lateral: estado, kit de arranque,
   // cliente, correo e historial con notas. En móvil lo operativo va ARRIBA
   // (estado, kit, cliente) y la comunicación al final (CRM-21).
@@ -27,8 +28,9 @@
   import {
     STATUSES, statusLabel, statusTone, SOURCE_LABEL, LANG_LABEL,
     viewSections, editDraft, changedFields, contactLinks, kitState,
-    valuePills, FIELDS,
+    valuePills, FIELDS, kitReceived, fmtSize,
   } from './brief-panel.js';
+  import { downloadFile } from './download.js';
 
   let { pid } = $props();
 
@@ -46,19 +48,23 @@
     loading = true; error = ''; notFound = false;
     try {
       const j = await api('/api/admin/briefs/' + encodeURIComponent(pid));
-      apply(j);
+      apply(j, { keepStatus: false });
     } catch (e) {
       notFound = e.status === 404;
       error = e.message;
     } finally { loading = false; }
   }
-  function apply(j) {
+  // keepStatus: tras guardar campos, lo que el usuario había tocado en
+  // Estado y Resumen sin guardar se conserva (revisión A3-08).
+  function apply(j, { keepStatus = statusDirty } = {}) {
     if (!brief) { const saved = readSavedDraft(); if (saved && saved.changes && Object.keys(saved.changes).length) recovered = saved; }
     brief = j.brief;
     data = j.data || j.brief || {};
     if ('client' in j) client = j.client || null;
-    statusSel = j.brief.status;
-    summaryVal = j.brief.summary || '';
+    if (!keepStatus) {
+      statusSel = j.brief.status;
+      summaryVal = j.brief.summary || '';
+    }
   }
   $effect(() => { if (pid) untrack(load); });
 
@@ -76,16 +82,21 @@
   let original = {};
   let fieldErrors = $state({});
   let saving = $state(false);
-  const sections = $derived(viewSections(data, { edit }));
+  // Origen honesto de cada dato (revisión A3-01): lo del formulario anterior
+  // o del chat no se presenta como kit de arranque.
+  const fromKit = $derived(kitReceived(brief));
+  const sections = $derived(viewSections(data, { edit, kitReceived: fromKit }));
   const inicial = $derived(sections.filter((s) => s.moment === 'inicial'));
-  const arranque = $derived(sections.filter((s) => s.moment !== 'inicial'));
+  const anterior = $derived(sections.filter((s) => s.moment === 'anterior'));
+  const arranque = $derived(sections.filter((s) => s.moment === 'arranque'));
+  const anteriorNote = $derived(brief?.source === 'chat' ? 'lo que contó el cliente en el chat del sitio' : 'lo que contó el cliente en el formulario');
   const changes = $derived(edit ? changedFields(original, draft) : {});
   const changeCount = $derived(Object.keys(changes).length);
   const dirty = $derived(edit && changeCount > 0);
 
   function startEdit() {
     original = { ...data };
-    draft = editDraft(data, viewSections(data, { edit: true }));
+    draft = editDraft(data, viewSections(data, { edit: true, kitReceived: fromKit }));
     fieldErrors = {};
     edit = true;
   }
@@ -179,7 +190,7 @@
     savingStatus = true;
     try {
       const j = await api('/api/admin/briefs/' + encodeURIComponent(pid), { method: 'PATCH', body: { status: statusSel, summary: summaryVal } });
-      apply(j);
+      apply(j, { keepStatus: false });
       toast('Estado guardado');
       history?.reload();
     } catch (e) { toastError(e, 'No se pudo guardar el estado.'); }
@@ -199,8 +210,31 @@
       : j.created ? `Cliente ${j.client?.client_code || ''} creado`.replace('  ', ' ') : `Vinculado a ${j.client?.client_code || 'el cliente'}`);
     history?.reload();
   }
-  function onKitDownload() { setTimeout(() => history?.reload(), 2500); }
   function openDocument() { window.open(docUrl, '_blank', 'noopener'); }
+
+  // ── Descargas (kit .zip y ficha .html) ───────────────────────
+  // Se piden con fetch: si fallan (sesión caducada, brief borrado, error del
+  // servidor o red cortada) el panel lo dice y el botón queda para reintentar.
+  let downloading = $state('');   // '' | 'kit' | 'doc'
+  let downloaded = $state(0);     // bytes recibidos (para el texto del botón)
+  async function download(kind) {
+    if (downloading) return;
+    downloading = kind; downloaded = 0;
+    try {
+      if (kind === 'kit') {
+        await downloadFile(kitUrl, { fallbackName: `kit-${pid}.zip`, onprogress: (n) => (downloaded = n) });
+        toast('Kit descargado');
+        history?.reload();
+      } else {
+        await downloadFile(docUrl + '?download=1', { fallbackName: `brief-${pid}.html` });
+        toast('Ficha descargada');
+      }
+    } catch (e) {
+      toastError(e, kind === 'kit' ? 'No se pudo descargar el kit. Inténtalo de nuevo.' : 'No se pudo descargar la ficha. Inténtalo de nuevo.');
+    } finally { downloading = ''; }
+  }
+  const kitLabel = $derived(downloading !== 'kit' ? 'Descargar kit'
+    : downloaded ? `Descargando ${fmtSize(downloaded)}…` : 'Preparando el kit…');
 
   // ── Correo al cliente ────────────────────────────────────────
   let emailSubject = $state('');
@@ -237,7 +271,8 @@
   }
   const deleteMessage = $derived(
     `Se borran el brief ${pid}, todo su historial y ${fileCount ? (fileCount === 1 ? 'su archivo' : `sus ${fileCount} archivos`) : 'sus archivos'}. `
-    + (client ? `El cliente ${client.client_code || ''} no se borra.` : 'No se puede deshacer.'));
+    + (client ? `El cliente ${client.client_code || ''} no se borra, pero deja de tener este brief vinculado. `.replace('  ', ' ') : '')
+    + 'No se puede deshacer.');
 
   onDestroy(() => {
     window.removeEventListener('beforeunload', onBeforeUnload);
@@ -274,9 +309,10 @@
     {#snippet badge()}<StatusChip tone={statusTone(brief.status)} label={statusLabel(brief.status)} />{/snippet}
     {#snippet actions()}
       <button class="b" type="button" onclick={openDocument}><Icon name="eye" size={16} />Ver ficha</button>
+      <button class="b" type="button" onclick={() => download('doc')} disabled={downloading === 'doc'} aria-busy={downloading === 'doc'} title="Descarga el documento .html"><Icon name="download" size={16} />{downloading === 'doc' ? 'Descargando…' : 'Descargar ficha'}</button>
       {#if !edit}<button class="b" type="button" onclick={startEdit}><Icon name="edit" size={16} />Editar</button>{/if}
-      <button class="b b--danger" type="button" onclick={() => (deleteOpen = true)} aria-label="Eliminar brief"><Icon name="trash" size={16} /><span class="hide-sm">Eliminar</span></button>
-      <a class="b kitbtn" class:b--primary={!edit} href={kitUrl} download onclick={onKitDownload}><Icon name="download" size={16} />Descargar kit</a>
+      <button class="b b--danger" type="button" onclick={() => (deleteOpen = true)} aria-label="Eliminar brief"><Icon name="trash" size={16} />Eliminar</button>
+      <button class="b kitbtn" class:b--primary={!edit} type="button" onclick={() => download('kit')} disabled={downloading === 'kit'} aria-busy={downloading === 'kit'}><Icon name="download" size={16} />{kitLabel}</button>
     {/snippet}
   </PageHeader>
   </div>
@@ -350,7 +386,8 @@
       <section class="ui-card side" aria-labelledby="cli-title">
         <h2 class="side__title" id="cli-title">Cliente</h2>
         {#if client}
-          <a class="clientlink" href={href('clientes', [client.client_code || client.id])}>
+          <!-- Clientes (A2) abre la ficha por su id numérico: #/clientes/<id>. -->
+          <a class="clientlink" href={href('clientes', [client.id])}>
             <Icon name="user" size={16} />
             <span class="clientlink__t"><span class="mono">{client.client_code}</span> {client.business_name || ''}</span>
             <Icon name="chevron" size={16} />
@@ -387,6 +424,11 @@
       <BriefFields sections={inicial} {edit} bind:draft errors={fieldErrors} />
 
       <BriefFiles {pid} onloaded={(f) => (fileCount = f.length)} />
+
+      {#if anterior.length}
+        <h2 class="part">Más datos del brief <span class="part__s">{anteriorNote}</span></h2>
+        <BriefFields sections={anterior} {edit} bind:draft errors={fieldErrors} />
+      {/if}
 
       {#if arranque.length}
         <h2 class="part">Kit de arranque <span class="part__s">lo que completó el cliente al contratar</span></h2>
@@ -494,9 +536,9 @@
   }
   @media (max-width: 719px) {
     .side { padding: 16px; }
-    .hide-sm { display: none; }
-    /* Móvil: la acción principal arriba y a lo ancho; las secundarias debajo. */
-    .head :global(.ui-page-head__actions) { display: grid; grid-template-columns: 1fr 1fr auto; width: 100%; }
+    /* Móvil: la acción principal arriba y a lo ancho; las secundarias debajo
+       en dos columnas (ficha: ver y descargar; luego editar y eliminar). */
+    .head :global(.ui-page-head__actions) { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
     .head :global(.kitbtn) { grid-column: 1 / -1; order: -1; }
     .editbar__a { flex: 1; }
     .editbar__a .b--primary { flex: 1; }

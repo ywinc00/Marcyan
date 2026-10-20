@@ -97,9 +97,14 @@ export function valuePills(fd, v) {
  *  · En edición: además todas las columnas históricas (se podían editar antes)
  *    y nunca lo que el panel no edita si está vacío.
  *  · Los campos de archivo van aparte (tarjeta Archivos).
+ *  · Origen honesto (revisión A3-01): las columnas históricas del momento
+ *    'arranque' las rellenó el cliente en el formulario anterior o en el chat,
+ *    no en el kit. Salen como moment 'anterior' si el kit no se ha recibido
+ *    (kitReceived=false) y siempre si el kit no las pregunta (hidden).
  * → [{ key, title, moment, rows: [{ fd, key, label, value, span, pills, editable }] }]
+ *   moment: 'inicial' | 'anterior' | 'arranque'
  */
-export function viewSections(data = {}, { edit = false } = {}) {
+export function viewSections(data = {}, { edit = false, kitReceived = false } = {}) {
   const services = Array.isArray(data.services) ? data.services : [];
   const out = [];
   for (const s of SECTIONS) {
@@ -122,10 +127,18 @@ export function viewSections(data = {}, { edit = false } = {}) {
       });
     }
     if (!rows.length) continue;
-    out.push({ key: s.key, title: s.short.es, moment: s.moment, rows });
+    if (s.moment === 'inicial') { out.push({ key: s.key, title: s.short.es, moment: s.moment, rows }); continue; }
+    const fromForm = (r) => r.fd.storage === 'column' && (r.fd.hidden || !kitReceived);
+    const anterior = rows.filter(fromForm);
+    const kit = rows.filter((r) => !fromForm(r));
+    if (anterior.length) out.push({ key: s.key, title: s.short.es, moment: 'anterior', rows: anterior });
+    if (kit.length) out.push({ key: s.key, title: s.short.es, moment: 'arranque', rows: kit });
   }
   return out;
 }
+
+/** ¿El cliente ya está rellenando o envió el kit? (decide el origen de los datos). */
+export const kitReceived = (brief) => ['in_progress', 'submitted'].includes(kitState(brief).id);
 
 // ── Edición: solo lo que cambia (CRM-09) ────────────────────
 const canon = (v) => (v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0) ? null : v);

@@ -98,10 +98,12 @@
     {:else if searched && !results.length}
       <p class="soft">Ningún cliente coincide con "{query}". Prueba con otro nombre o crea uno nuevo.</p>
     {:else if results.length}
-      <ul class="results" role="listbox" aria-label="Clientes">
+      <!-- Lista de botones con aria-pressed (no listbox): cada cliente es un
+           botón normal que se marca al elegirlo (revisión A3-10). -->
+      <ul class="results" aria-label="Clientes encontrados">
         {#each results as c (c.id)}
           <li>
-            <button type="button" class="res" role="option" aria-selected={picked && String(picked.id) === String(c.id)} onclick={() => { picked = c; error = ''; }}>
+            <button type="button" class="res" aria-pressed={!!picked && String(picked.id) === String(c.id)} onclick={() => { picked = c; error = ''; }}>
               <span class="res__main">
                 <span class="res__name">{c.business_name || 'Sin nombre'}</span>
                 <span class="res__sub">{[c.client_code, c.owner_name, c.email || c.phone].filter(Boolean).join(' · ')}</span>
@@ -139,8 +141,8 @@
   .results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
   .res { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; padding: 10px 12px; min-height: 52px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); color: inherit; font: inherit; cursor: pointer; }
   .res:hover { border-color: var(--border-strong); }
-  .res[aria-selected="true"] { border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .res[aria-selected="true"] :global(.ui-icon) { color: var(--accent-teal); }
+  .res[aria-pressed="true"] { border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .res[aria-pressed="true"] :global(.ui-icon) { color: var(--accent-teal); }
   .res__main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
   .res__name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .res__sub { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

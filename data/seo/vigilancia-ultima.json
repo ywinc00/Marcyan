@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-20",
+  "fecha": "2026-10-21",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 34,
+  "indexadas": 33,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 34,
-    "Crawled - currently not indexed": 44,
+    "Submitted and indexed": 33,
+    "Crawled - currently not indexed": 45,
     "Alternate page with proper canonical tag": 6
   },
   "porGrupo": {
@@ -74,12 +74,12 @@
     },
     "precios·es": {
       "total": 4,
-      "indexadas": 2
+      "indexadas": 1
     }
   },
-  "sinRastreoReciente": 26,
+  "sinRastreoReciente": 25,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 86,
+  "certificadoDias": 85,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 5,
-    "sesionesDiaHabitual": 4.4,
+    "sesionesUltimos3Dias": 15,
+    "sesionesDiaHabitual": 4.2,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 61,
+    "diasSinContactos": 62,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -150,21 +150,21 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-20",
+        "fecha": "2026-10-21",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/miami"
+        "url": "https://marcyanstudio.com/es/precios"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-20",
+        "fecha": "2026-10-21",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "26 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "25 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
@@ -172,12 +172,12 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-20",
+      "fecha": "2026-10-21",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/miami"
+      "url": "https://marcyanstudio.com/es/precios"
     }
   ],
   "pedirIndexacion": [],

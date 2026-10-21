@@ -23,7 +23,7 @@ import {
   addDays, spanDays, eachDay, lookbackDays, clampDays, bareDomain, ymd,
   coverageOf, invalidateSyncState, sameField, canonicalField,
 } from '../lib/seo-core.mjs';
-import { dedupeByDate, sourcesInvalidatedBy, shapeProject, defaultRange } from '../lib/seo.mjs';
+import { dedupeByDate, sourcesInvalidatedBy, shapeProject, defaultRange, sitemapUrls, pickUrlsToInspect, summarizeIndexation, INSPECT_BATCH, GOOGLE_PROJECT_WORST_MS, fetchIndexationDetailed, setOidcToken } from '../lib/seo.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -475,6 +475,92 @@ await check('panel: sin voseo ni emojis en la sección SEO', () => {
     const src = read(f);
     assert.doesNotMatch(src, VOSEO, f + ' con voseo');
     assert.doesNotMatch(src, /[\u{1F300}-\u{1FAFF}✎]/u, f + ' con emoji');
+  }
+});
+
+// ── Indexación real, URL por URL (2026-10-20: el contador de sitemaps de Google siempre da 0) ──
+await check('sitemapUrls: lee URLs, sigue índices de sitemaps y decodifica &amp;', async () => {
+  const files = {
+    'https://a.com/sitemap-index.xml': '<sitemapindex><sitemap><loc>https://a.com/sitemap-0.xml</loc></sitemap></sitemapindex>',
+    'https://a.com/sitemap-0.xml': '<urlset><url><loc>https://a.com/</loc></url><url><loc> https://a.com/es?x=1&amp;y=2 </loc></url><url><loc>https://a.com/</loc></url></urlset>',
+  };
+  const urls = await sitemapUrls(['https://a.com/sitemap-index.xml'], async (u) => files[u] || '');
+  assert.deepEqual(urls, ['https://a.com/', 'https://a.com/es?x=1&y=2']);
+});
+await check('sitemapUrls: un sitemap que falla no rompe el resto', async () => {
+  const urls = await sitemapUrls(['https://a.com/roto.xml', 'https://a.com/ok.xml'], async (u) => {
+    if (u.includes('roto')) throw new Error('x');
+    return '<urlset><url><loc>https://a.com/b</loc></url></urlset>';
+  });
+  assert.deepEqual(urls, ['https://a.com/b']);
+});
+await check('pickUrlsToInspect: primero las nunca revisadas, luego las más antiguas; la home siempre entra', () => {
+  const urls = Array.from({ length: 100 }, (_, i) => 'https://a.com/p' + i);
+  const prev = urls.slice(0, 70).map((u, i) => ({ url: u, verdict: 'PASS', checked_at: new Date(Date.UTC(2026, 9, 1 + (i % 20))).toISOString() }));
+  const pick = pickUrlsToInspect(urls, prev, 'https://a.com/p0', 40);
+  assert.equal(pick.length, 40);
+  assert.ok(pick.slice(0, 30).every((u) => Number(u.slice('https://a.com/p'.length)) >= 70), 'las 30 nunca revisadas van primero');
+  assert.ok(pick.includes('https://a.com/p0'), 'la home entra aunque se revisara hace poco');
+  assert.equal(INSPECT_BATCH, 60);
+});
+await check('summarizeIndexation: cuenta indexadas de verdad, sin revisar aparte, motivos agrupados', () => {
+  const urls = ['https://a.com/1', 'https://a.com/2', 'https://a.com/3', 'https://a.com/4'];
+  const fresh = new Map([
+    ['https://a.com/1', { verdict: 'PASS', state: 'Submitted and indexed', checked_at: 'T' }],
+    ['https://a.com/2', { verdict: 'NEUTRAL', state: 'Crawled - currently not indexed', checked_at: 'T' }],
+  ]);
+  const prev = [
+    { url: 'https://a.com/3', verdict: 'NEUTRAL', state: 'Crawled - currently not indexed', checked_at: 'S' },
+    { url: 'https://otra.com/x', verdict: 'PASS' },
+  ];
+  const s = summarizeIndexation(urls, fresh, prev);
+  assert.deepEqual([s.total, s.checked, s.indexed, s.not_indexed, s.unchecked], [4, 3, 1, 2, 1]);
+  assert.deepEqual(s.issues, [{ reason: 'Crawled - currently not indexed', count: 2 }]);
+  assert.equal(s.pages[0].verdict, 'NEUTRAL', 'las no indexadas encabezan la tabla');
+  assert.equal(s.pages.find((p) => p.url.endsWith('4')).verdict, null);
+});
+await check('el peor caso de un proyecto incluye la indexación y cabe en la sync manual de 120 s', () => {
+  assert.equal(GOOGLE_PROJECT_WORST_MS, 73000);
+  assert.ok(120000 - GOOGLE_PROJECT_WORST_MS - 10000 > 0);
+});
+
+// fetchIndexationDetailed de punta a punta con Google simulado (fetch falso):
+// permiso (STS + impersonación), lista de sitemaps, sitemap XML e inspección URL por URL.
+await check('fetchIndexationDetailed: revisa URL por URL, reutiliza lo anterior y cuenta de verdad', async () => {
+  const realFetch = globalThis.fetch;
+  const env = { a: process.env.GOOGLE_WIF_AUDIENCE, s: process.env.GOOGLE_SA_EMAIL };
+  process.env.GOOGLE_WIF_AUDIENCE = 'aud-prueba';
+  process.env.GOOGLE_SA_EMAIL = 'sa@prueba.iam.gserviceaccount.com';
+  setOidcToken('oidc-prueba');
+  const inspected = [];
+  const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  globalThis.fetch = async (url, opts = {}) => {
+    const u = String(url);
+    if (u.startsWith('https://sts.googleapis.com')) return json({ access_token: 'fed' });
+    if (u.includes('iamcredentials')) return json({ accessToken: 'tok', expireTime: new Date(Date.now() + 3600e3).toISOString() });
+    if (u.includes('/sitemaps')) return json({ sitemap: [{ path: 'https://www.a.com/sitemap.xml', contents: [{ submitted: '3', indexed: '0' }] }] });
+    if (u === 'https://www.a.com/sitemap.xml') return new Response('<urlset><url><loc>https://www.a.com/</loc></url><url><loc>https://www.a.com/b</loc></url><url><loc>https://www.a.com/c</loc></url></urlset>');
+    if (u.includes('urlInspection')) {
+      const { inspectionUrl } = JSON.parse(opts.body);
+      inspected.push(inspectionUrl);
+      if (inspectionUrl.endsWith('/c')) return json({ inspectionResult: { indexStatusResult: { verdict: 'NEUTRAL', coverageState: 'Crawled - currently not indexed' } } });
+      return json({ inspectionResult: { indexStatusResult: { verdict: 'PASS', coverageState: 'Submitted and indexed', lastCrawlTime: '2026-10-19T10:00:00Z' } } });
+    }
+    return new Response('', { status: 404 });
+  };
+  try {
+    const previous = { pages: [{ url: 'https://www.a.com/b', verdict: 'PASS', state: 'Submitted and indexed', checked_at: new Date().toISOString() }] };
+    const r = await fetchIndexationDetailed({ id: 1, gsc_site_url: 'https://www.a.com/', domain: 'a.com' }, { previous });
+    assert.equal(r.reason, null);
+    assert.equal(r.data.method, 'inspection');
+    assert.deepEqual([r.data.total, r.data.checked, r.data.indexed, r.data.not_indexed, r.data.unchecked], [3, 3, 2, 1, 0]);
+    assert.ok(inspected.includes('https://www.a.com/'), 'la home de una propiedad con www se revisa con www');
+    assert.deepEqual(r.data.issues, [{ reason: 'Crawled - currently not indexed', count: 1 }]);
+  } finally {
+    globalThis.fetch = realFetch;
+    process.env.GOOGLE_WIF_AUDIENCE = env.a ?? '';
+    process.env.GOOGLE_SA_EMAIL = env.s ?? '';
+    setOidcToken(null);
   }
 });
 

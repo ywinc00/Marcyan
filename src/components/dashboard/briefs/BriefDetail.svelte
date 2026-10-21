@@ -191,7 +191,14 @@
     try {
       const j = await api('/api/admin/briefs/' + encodeURIComponent(pid), { method: 'PATCH', body: { status: statusSel, summary: summaryVal } });
       apply(j, { keepStatus: false });
-      toast('Estado guardado');
+      // Al completar, el servidor crea o vincula el cliente solo (changes.client).
+      const auto = j.changes && j.changes.client;
+      if (auto && auto.client) {
+        client = auto.client;
+        toast(`Estado guardado. ${auto.created ? 'Ya es cliente' : 'Vinculado al cliente'} ${auto.client.client_code || ''}`.trim());
+      } else {
+        toast('Estado guardado');
+      }
       history?.reload();
     } catch (e) { toastError(e, 'No se pudo guardar el estado.'); }
     finally { savingStatus = false; }

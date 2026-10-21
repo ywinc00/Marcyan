@@ -3,7 +3,7 @@
   //  BriefForm — brief corto público por pasos (B1, camino 2 "expediente
   //  por pasos", design/brief.md). Momento 'inicial' de lib/brief-schema.mjs.
   //
-  //  · Seis pasos con nombre: raíl a la izquierda (≥1024 px) o barra
+  //  · Cinco pasos con nombre: raíl a la izquierda (≥1024 px) o barra
   //    "Paso N de 6" con progreso segmentado en el teléfono.
   //  · Validación por paso con validate() del esquema: mensaje junto al
   //    campo, foco al primero, nada se borra. Avance SOLO con clic.
@@ -57,7 +57,6 @@
   const minutes = $derived(estimateMinutes(services, data));
   const stepValid = $derived(STEPS.map((_, i) => i === REVIEW_STEP || Object.keys(validateStep(i, data)).length === 0));
   const svcField = fieldByKey('services');
-  const chosen = $derived(svcField.options.filter((o) => services.includes(o.value)));
   // Nombre del servicio que encabeza su bloque de preguntas (paso 2 y revisión).
   const svcName = (id) => { const o = svcField.options.find((x) => x.value === id); return o ? pick(o.label, lang) : id; };
 
@@ -332,9 +331,6 @@
             {#if fd.key === 'photo_files' && uploads.active.length}
               <p class="quota">{t.quota(uploads.active.length, fmtBytes(uploads.usedBytes, lang))}</p>
             {/if}
-            {#if fd.key === 'budget_range' && chosen.length}
-              <p class="from"><span>{t.servicesFrom}:</span> {#each chosen as o, i (o.value)}<span class="from__i">{pick(o.label, lang)} <em>{pick(o.hint, lang)}</em></span>{#if i < chosen.length - 1}<span aria-hidden="true"> · </span>{/if}{/each}</p>
-            {/if}
           {/each}
         </div>
       {:else}
@@ -476,8 +472,6 @@
   .quota { margin: calc(-1 * var(--space-4)) 0 0; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
-  .from { margin: calc(-1 * var(--space-3)) 0 0; font-size: var(--text-sm); color: var(--fg-secondary); line-height: var(--leading-normal); }
-  .from em { font-style: normal; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold); }
 
   /* Revisión */
   .rev { display: grid; gap: var(--space-3); }

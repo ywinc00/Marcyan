@@ -24,10 +24,14 @@ let pass = 0, fail = 0;
 const ok = (cond, name) => { if (cond) pass++; else { fail++; console.error('✗', name); } };
 const eq = (a, b, name) => ok(JSON.stringify(a) === JSON.stringify(b), `${name} → ${JSON.stringify(a)} ≠ ${JSON.stringify(b)}`);
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
+const placed0 = () => STEPS.flatMap((s) => s.fields);
 
-// ── 1. Seis pasos y cada campo inicial en exactamente uno ─────
-eq(STEPS.length, 6, 'seis pasos');
-eq(REVIEW_STEP, 5, 'el último paso es revisar');
+// ── 1. Cinco pasos y cada campo inicial en exactamente uno ────
+eq(STEPS.length, 5, 'cinco pasos');
+eq(REVIEW_STEP, 4, 'el último paso es revisar');
+// 2026-10-21 (decisión del dueño): el formulario ya no pregunta la inversión.
+ok(!placed0().includes('budget_range') && !INITIAL_FIELDS.some((f) => f.key === 'budget_range'), 'la inversión no se pregunta');
+eq(stepOfField('timeline'), 1, 'el plazo va en "Qué necesitas"');
 for (const s of STEPS) ok(s.label.es && s.label.en && s.intro.es && s.intro.en, `paso ${s.key} con nombre e intro ES/EN`);
 const placed = STEPS.flatMap((s) => s.fields);
 eq(placed.length, new Set(placed).size, 'ningún campo repetido entre pasos');
@@ -36,7 +40,7 @@ for (const f of INITIAL_FIELDS) {
 }
 for (const k of placed) ok(fieldByKey(k) && fieldByKey(k).moment === 'inicial', `${k} es del momento inicial`);
 eq(stepOfField('logo_files'), 2, 'el logo se sube en "Tu marca"');
-eq(stepOfField('email'), 4, 'el correo va en "Cómo te contactamos"');
+eq(stepOfField('email'), 3, 'el correo va en "Cómo te contactamos"');
 
 // condicionales: tipo de sitio solo con servicios web
 const s2none = fieldsForStep(1, ['seo-local']).map((f) => f.key);
@@ -49,7 +53,7 @@ ok(s2web.includes('website_type'), 'con diseño web se pregunta el tipo de sitio
 eq(stepOfField('brand_status'), 2, 'el estado de la marca va en "Tu marca"');
 eq(stepOfField('brand_color_list'), 2, 'los colores van en "Tu marca"');
 eq(stepOfField('brand_colors_none'), 2, '"no tengo colores definidos" va en "Tu marca"');
-eq(stepOfField('contact_language'), 4, 'el idioma de contacto va en "Cómo te contactamos"');
+eq(stepOfField('contact_language'), 3, 'el idioma de contacto va en "Cómo te contactamos"');
 for (const k of ['web_extras', 'seo_scope', 'seo_areas', 'aeo_scope', 'aeo_tested', 'bot_channels', 'bot_tasks', 'product_count', 'shipping', 'brand_scope', 'brand_uses'])
   eq(stepOfField(k), 1, `${k} va en "Qué necesitas"`);
 {
@@ -83,9 +87,9 @@ const e0 = validateStep(0, {});
 ok(e0.business_name && e0.business_name.es && e0.business_name.en, 'paso 1 exige el nombre del negocio (ES/EN)');
 ok(!e0.services, 'paso 1 no muestra errores de otros pasos');
 ok(validateStep(1, {}).services, 'paso 2 exige al menos un servicio');
-ok(validateStep(4, {}).email, 'paso 5 exige correo o teléfono');
-eq(Object.keys(validateStep(4, { phone: '832 555 0142', owner_name: 'Julio' })), [], 'con teléfono basta');
-ok(validateStep(4, { email: 'julio@x', owner_name: 'Julio' }).email, 'correo mal escrito se marca');
+ok(validateStep(3, {}).email, 'paso 4 exige correo o teléfono');
+eq(Object.keys(validateStep(3, { phone: '832 555 0142', owner_name: 'Julio' })), [], 'con teléfono basta');
+ok(validateStep(3, { email: 'julio@x', owner_name: 'Julio' }).email, 'correo mal escrito se marca');
 eq(Object.keys(validateStep(2, {})), [], 'el paso de marca es opcional');
 const full = {
   business_name: 'Julio’s Landscape', services: ['diseno-web'], main_objective: 'Más llamadas', owner_name: 'Julio',
@@ -93,7 +97,7 @@ const full = {
 };
 ok(validateAll(full).ok, 'un brief completo valida igual que en el servidor');
 eq(firstStepWithErrors({ email: {}, business_name: {} }), 0, 'el primer paso con errores es el primero');
-eq(Object.keys(errorsForStep(4, { email: {}, business_name: {} })), ['email'], 'errores filtrados por paso');
+eq(Object.keys(errorsForStep(3, { email: {}, business_name: {} })), ['email'], 'errores filtrados por paso');
 ok(!validateAll({ ...full, budget_range: 'cualquier-cosa' }).ok, 'opción de presupuesto inventada no pasa (B-10)');
 
 // ── 3. Presupuesto acorde a los precios publicados ────────────

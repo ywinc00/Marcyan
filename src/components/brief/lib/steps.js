@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-//  src/components/brief/lib/steps.js — Los seis pasos del brief corto
+//  src/components/brief/lib/steps.js — Los cinco pasos del brief corto
 //  (design/brief.md §3, camino 2 "expediente por pasos").
 //
 //  Los CAMPOS salen del esquema (momento 'inicial' de lib/brief-schema.mjs);
@@ -22,18 +22,13 @@ export const STEPS = Object.freeze([
     // Después de lo general, los bloques de cada servicio elegido (por_servicio).
     key: 'necesitas', label: L('Qué necesitas', 'What you need'),
     intro: L('Elige uno o varios servicios. Las preguntas se ajustan a lo que elijas.', 'Pick one or more services. The questions adjust to what you pick.'),
-    fields: ['services', 'main_objective', 'language', 'website_type', 'web_extras', 'seo_scope', 'seo_areas', 'aeo_scope', 'aeo_tested',
+    fields: ['services', 'main_objective', 'language', 'timeline', 'website_type', 'web_extras', 'seo_scope', 'seo_areas', 'aeo_scope', 'aeo_tested',
       'bot_channels', 'bot_tasks', 'product_count', 'shipping', 'brand_scope', 'brand_uses'],
   },
   {
     key: 'marca', label: L('Tu marca', 'Your brand'),
     intro: L('Cómo está tu marca hoy. Si tienes logo o fotos a mano, súbelos aquí; si no, los pedimos después.', 'Where your brand stands today. If you have your logo or photos handy, upload them here; if not, we will ask later.'),
     fields: ['has_logo', 'logo_files', 'brand_status', 'brand_color_list', 'brand_colors_none', 'has_photos', 'photo_files'],
-  },
-  {
-    key: 'plazo', label: L('Plazo y presupuesto', 'Timeline and budget'),
-    intro: L('Un rango nos basta para proponerte lo que de verdad te sirve.', 'A range is enough for us to propose what actually fits.'),
-    fields: ['budget_range', 'timeline'],
   },
   {
     key: 'contacto', label: L('Cómo te contactamos', 'How to reach you'),
@@ -49,7 +44,7 @@ export const STEPS = Object.freeze([
 export const REVIEW_STEP = STEPS.length - 1;
 
 // Sección del esquema → paso, para campos nuevos que nadie colocó.
-const FALLBACK = { servicios: 1, negocio: 0, contacto: 4, proyecto: 1, por_servicio: 1, material: 2, cierre: 4 };
+const FALLBACK = { servicios: 1, negocio: 0, contacto: 3, proyecto: 1, por_servicio: 1, material: 2, cierre: 3 };
 
 // Todos los campos visibles del momento inicial (sin los legados ocultos).
 export const INITIAL_FIELDS = sectionsFor('inicial', null).flatMap((s) => s.fields);

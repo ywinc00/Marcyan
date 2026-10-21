@@ -21,7 +21,7 @@ import { clampDays, DEFAULT_DAYS } from '../../../lib/seo-core.mjs';
 
 // Una sincronización de un proyecto encadena 4 o 5 llamadas a Google en
 // paralelo y 3 escrituras. Cada llamada tiene 15 s de tope (A6-R4), así que
-// un proyecto tarda como mucho GOOGLE_PROJECT_WORST_MS (60 s). La de todos va
+// un proyecto tarda como mucho GOOGLE_PROJECT_WORST_MS (73 s con la indexación URL por URL). La de todos va
 // por lotes y no empieza un proyecto nuevo pasado BULK_BUDGET_MS: entre ese
 // tope y maxDuration cabe un proyecto entero en el peor caso, más margen
 // para guardar.

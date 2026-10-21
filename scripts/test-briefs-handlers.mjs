@@ -308,6 +308,52 @@ await check('correo: sin asunto → 400 y no se envía', async () => {
   assert.equal(calls.email.length, 0);
 });
 
+// ── Completado = cliente (decisión del dueño 2026-10-20) ─────────
+const completar = () => call(briefHandler, { method: 'PATCH', body: { status: 'completed' } });
+const fin = await import('../lib/finance.mjs');
+await check('PATCH a Completado sin cliente → lo crea comprobando duplicados', async () => {
+  const r = await completar();
+  assert.equal(r.statusCode, 200);
+  assert.equal(calls.convert.length, 1);
+  assert.equal(calls.convert[0].opts.checkDuplicates, true);
+  assert.equal(r.body.changes.client.created, true);
+  assert.equal(r.body.changes.client.client.client_code, 'CLI-030');
+});
+await check('PATCH a Completado con cliente ya vinculado → no crea ni vincula nada', async () => {
+  stubs({ getBriefClient: async () => ({ id: 5, client_code: 'CLI-005', business_name: 'Aurora', status: 'active' }) });
+  const r = await completar();
+  assert.equal(r.statusCode, 200);
+  assert.equal(calls.convert.length, 0);
+  assert.equal(calls.link.length, 0);
+  assert.equal(r.body.changes.client, undefined);
+});
+await check('PATCH a Completado con un cliente activo del mismo correo → se vincula a ese', async () => {
+  stubs({ convertBriefToClient: async () => { throw new fin.CrmError(409, 'dup', { reason: 'duplicate', matches: [{ id: 9, status: 'archived' }, { id: 12, status: 'active' }] }); } });
+  const r = await completar();
+  assert.equal(r.statusCode, 200);
+  assert.deepEqual(calls.link.map((l) => l.cid), [12]);
+  assert.equal(r.body.changes.client.linked, true);
+  assert.equal(r.body.changes.client.client.client_code, 'CLI-012');
+});
+await check('PATCH a Completado si solo coincide con archivados → no vincula ni crea', async () => {
+  stubs({ convertBriefToClient: async () => { throw new fin.CrmError(409, 'dup', { reason: 'duplicate', matches: [{ id: 9, status: 'archived' }] }); } });
+  const r = await completar();
+  assert.equal(r.statusCode, 200);
+  assert.equal(calls.link.length, 0);
+  assert.equal(r.body.changes.client, undefined);
+});
+await check('PATCH a Completado: si falla el cliente, el estado se guarda igual', async () => {
+  stubs({ convertBriefToClient: async () => { throw new Error('base caída'); } });
+  const r = await quiet(() => completar());
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.changes.status.to, 'completed');
+});
+await check('PATCH a otro estado (En curso) → no toca clientes', async () => {
+  const r = await call(briefHandler, { method: 'PATCH', body: { status: 'in_progress' } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(calls.convert.length, 0);
+});
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) fallaron:\n  - ` + fails.join('\n  - '));
   process.exit(1);

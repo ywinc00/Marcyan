@@ -25,6 +25,13 @@
   const pctTxt = $derived(total ? (Math.round(ratio * 1000) / 10).toLocaleString('es-US', { maximumFractionDigits: 1 }) + ' %' : '');
   const reason = $derived(state && state.error ? state.error : null);
   const forbidden = $derived(reason && /forbidden|not_configured|auth_failed/.test(reason.code || ''));
+  // Revisión URL por URL (2026-10-20). Una foto antigua sin `method` viene del
+  // contador de sitemaps de Google, que siempre da 0: no se presenta como dato.
+  const reliable = $derived(Boolean(indexation) && indexation.method === 'inspection');
+  const unchecked = $derived(indexation ? Number(indexation.unchecked) || 0 : 0);
+  const checkedN = $derived(indexation ? Number(indexation.checked) || 0 : 0);
+  const PAGE_LIMIT = 60;
+  const shownPages = $derived(indexation && Array.isArray(indexation.pages) ? indexation.pages.slice(0, PAGE_LIMIT) : []);
 
   const pageCols = [
     { key: 'url', label: 'Página', primary: true },
@@ -58,7 +65,12 @@
       </EmptyState>
     {/if}
   {:else}
-    {#if noSitemaps}
+    {#if !reliable}
+      <div class="ix-note" role="note">
+        <p class="ix-note__t">Este dato de indexación no es fiable</p>
+        <p class="ix-note__a">Venía de un contador de Google que dejó de funcionar y siempre marca 0. Pulsa "Actualizar ahora" y se revisan las páginas una a una; la tarea de cada madrugada lo mantiene al día.</p>
+      </div>
+    {:else if noSitemaps}
       <div class="ix-note" role="note">
         <p class="ix-note__t">No hay sitemaps enviados en Search Console</p>
         <p class="ix-note__a">Sin sitemap no hay un total de páginas con el que comparar. Envíalo en Search Console, Sitemaps. Mientras tanto se revisa solo la página de inicio.</p>
@@ -80,6 +92,7 @@
         <div class="ix__body">
           <p class="ix__ratio"><span class="ix__num">{nfmt(indexed)}</span> <span class="ix__of">de {nfmt(total)}</span></p>
           <p class="ix__cap">URLs del sitemap indexadas</p>
+          {#if unchecked > 0}<p class="ix__cap">Revisadas {nfmt(checkedN)} de {nfmt(total)}. Las {nfmt(unchecked)} restantes se revisan en las próximas actualizaciones.</p>{/if}
           <div class="ix__bar" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs indexadas">
             <div class="ix__fill" style="width:{Math.round(ratio * 100)}%"></div>
           </div>
@@ -95,22 +108,23 @@
       <p class="ix-warn">{reason.title}. {reason.action}</p>
     {/if}
 
-    {#if indexation.issues && indexation.issues.length}
-      <h3 class="ix__sub">Avisos de Search Console</h3>
+    {#if reliable && indexation.issues && indexation.issues.length}
+      <h3 class="ix__sub">Por qué no están indexadas</h3>
       <ul class="ix__issues">
         {#each indexation.issues as it, i (i)}
-          <li class="ix__issue"><span class="ix__reason">{issueLabel(it.reason)}</span><span class="ix__count">{nfmt(it.count)}</span></li>
+          <li class="ix__issue"><span class="ix__reason">{issueLabel(coverageState(it.reason).label)}</span><span class="ix__count">{nfmt(it.count)}</span></li>
         {/each}
       </ul>
     {/if}
 
-    {#if indexation.pages && indexation.pages.length}
-      <h3 class="ix__sub">Página de inicio</h3>
-      <DataTable columns={pageCols} rows={indexation.pages} rowKey="url" caption="Estado de la página de inicio en Google">
+    {#if reliable && shownPages.length}
+      <h3 class="ix__sub">Páginas{#if indexation.pages.length > PAGE_LIMIT} (las primeras {PAGE_LIMIT} de {nfmt(indexation.pages.length)}){/if}</h3>
+      <DataTable columns={pageCols} rows={shownPages} rowKey="url" caption="Estado de cada página del sitemap en Google">
         {#snippet cell(row, col)}
           {#if col.key === 'url'}<span class="ix__url" title={row.url}>{row.url || '—'}</span>
-          {:else if col.key === 'state'}{@const s = coverageState(row.state)}<StatusChip tone={s.tone} label={s.label} />
-          {:else}<span class="ix__date">{row.last_crawl ? fmtDateTime(row.last_crawl) : 'Sin rastrear'}</span>{/if}
+          {:else if col.key === 'state'}
+            {#if row.verdict}{@const s = coverageState(row.state)}<StatusChip tone={s.tone} label={s.label} />{:else}<span class="ix__date">Sin revisar aún</span>{/if}
+          {:else}<span class="ix__date">{row.last_crawl ? fmtDateTime(row.last_crawl) : (row.verdict ? 'Sin rastrear' : '')}</span>{/if}
         {/snippet}
       </DataTable>
     {/if}

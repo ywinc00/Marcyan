@@ -45,6 +45,25 @@ async function safeClient(id) {
   }
 }
 
+// Al pasar a Completado: si el brief ya tiene cliente, nada; si hay un cliente
+// activo con su mismo correo o teléfono, se vincula a ese (es el mismo negocio);
+// si no, se crea desde el brief. Devuelve { client, created, linked } o null.
+export async function clientForCompletedBrief(id, actorEmail) {
+  const slim = (c) => ({ id: c.id, client_code: c.client_code, business_name: c.business_name, status: c.status });
+  const current = await getBriefClient(id);
+  if (current) return null;
+  try {
+    const r = await convertBriefToClient(id, actorEmail, { checkDuplicates: true });
+    return r ? { client: slim(r.client), created: Boolean(r.created), linked: false } : null;
+  } catch (err) {
+    if (!(err instanceof CrmError) || !err.extra || err.extra.reason !== 'duplicate') throw err;
+    const match = (err.extra.matches || []).find((m) => m.status !== 'archived');
+    if (!match) return null; // solo coincide con archivados: lo decide el dueño desde la ficha
+    const l = await linkBriefToClient(id, Number(match.id), actorEmail);
+    return l && !l.archived && l.client ? { client: slim(l.client), created: false, linked: true } : null;
+  }
+}
+
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
@@ -120,6 +139,16 @@ export default async function handler(req, res) {
         // de ese historial (RET-01).
         const st = await updateBriefStatus(id, newStatus, session.email);
         changes.status = { from: (st && st.from) || before.status, to: newStatus };
+        // Un brief completado es un cliente (decisión del dueño 2026-10-20: Julio's
+        // quedó completado sin cliente). Nunca rompe el cambio de estado.
+        if (newStatus === 'completed') {
+          try {
+            const auto = await clientForCompletedBrief(id, session.email);
+            if (auto) changes.client = auto;
+          } catch (err) {
+            console.error('[admin/briefs/:id] cliente automático al completar:', err && err.message);
+          }
+        }
       }
 
       if (newSummary !== null && newSummary !== (before.summary || '')) {

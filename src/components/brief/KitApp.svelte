@@ -48,7 +48,7 @@
   let panel = $state();
 
   const services = $derived(meta && Array.isArray(meta.services) ? meta.services : []);
-  const blocks = $derived(meta ? kitBlocks(services, meta.sections, meta.catchup) : []);
+  const blocks = $derived(meta ? kitBlocks(services, meta.sections, meta.catchup, meta.fromPanel === true) : []);
   const files = $derived(uploads ? uploads.files : []);
   const statuses = $derived(Object.fromEntries(blocks.map((b) => [b.key, blockStatus(b, data, files, saved)])));
   const doneCount = $derived(blocks.filter((b) => statuses[b.key] && statuses[b.key].status === 'done').length);

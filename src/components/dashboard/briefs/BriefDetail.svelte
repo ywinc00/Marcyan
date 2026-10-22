@@ -89,7 +89,8 @@
   const inicial = $derived(sections.filter((s) => s.moment === 'inicial'));
   const anterior = $derived(sections.filter((s) => s.moment === 'anterior'));
   const arranque = $derived(sections.filter((s) => s.moment === 'arranque'));
-  const anteriorNote = $derived(brief?.source === 'chat' ? 'lo que contó el cliente en el chat del sitio' : 'lo que contó el cliente en el formulario');
+  const anteriorNote = $derived(brief?.source === 'chat' ? 'lo que contó el cliente en el chat del sitio'
+    : brief?.source === 'panel' ? 'los datos de la ficha del cliente' : 'lo que contó el cliente en el formulario');
   const changes = $derived(edit ? changedFields(original, draft) : {});
   const changeCount = $derived(Object.keys(changes).length);
   const dirty = $derived(edit && changeCount > 0);

@@ -3,6 +3,8 @@
   // brief, decisión del dueño 2026-10-19). Dos salidas: mandarlo por correo
   // o solo crear el enlace para copiarlo (WhatsApp, SMS). El enlace se ve
   // UNA vez: en la base solo queda su huella.
+  // Desde la ficha de un cliente SIN brief (prop `client`): el mismo diálogo
+  // crea antes su brief con los datos de la ficha y avisa de ello.
   import { untrack } from 'svelte';
   import Modal from '../ui/Modal.svelte';
   import Field from '../ui/Field.svelte';
@@ -11,7 +13,7 @@
   import { toast } from '../lib/toast.svelte.js';
   import { LANG_LABEL } from './brief-panel.js';
 
-  let { open = $bindable(false), pid, email = '', lang = 'es', kit, onissued } = $props();
+  let { open = $bindable(false), pid = '', client = null, email = '', lang = 'es', kit = null, onissued } = $props();
 
   let chosenLang = $state('es');
   let reopen = $state(false);
@@ -23,6 +25,9 @@
   const submitted = $derived(kit?.id === 'submitted');
   const alreadySent = $derived(kit?.id === 'sent' || kit?.id === 'in_progress');
   const canEmail = $derived(!!String(email || '').trim());
+  const endpoint = $derived(client
+    ? '/api/admin/clients/' + encodeURIComponent(client.id) + '/kit-link'
+    : '/api/admin/briefs/' + encodeURIComponent(pid) + '/kit-link');
 
   $effect(() => {
     if (open) untrack(() => { chosenLang = lang === 'en' ? 'en' : 'es'; reopen = false; busy = ''; error = ''; result = null; copied = false; });
@@ -33,7 +38,7 @@
     if (submitted && !reopen) { error = 'Marca la casilla para reabrir el kit antes de crear un enlace nuevo.'; return; }
     busy = sendEmail ? 'email' : 'link'; error = '';
     try {
-      const j = await api('/api/admin/briefs/' + encodeURIComponent(pid) + '/kit-link', {
+      const j = await api(endpoint, {
         method: 'POST', body: { sendEmail, lang: chosenLang, reopen: submitted && reopen },
       });
       result = j;
@@ -59,6 +64,9 @@
 <Modal bind:open title="Enviar kit de arranque al cliente">
   {#if !result}
     <p class="lead">El cliente recibe un enlace privado, sin cuenta, para completar lo que hace falta para arrancar: datos legales, horarios, marca, fotos por tomas y accesos.</p>
+    {#if client}
+      <p class="hint">Como aún no tiene brief, se le crea uno con los datos de su ficha. Lo que falte se lo pregunta el propio kit, sin que sea obligatorio.</p>
+    {/if}
     {#if alreadySent}
       <p class="warn" role="note"><Icon name="alert" size={16} />Ya hay un enlace enviado. Crear uno nuevo anula el anterior; lo que el cliente ya guardó se conserva.</p>
     {/if}
@@ -74,7 +82,7 @@
         </select>
       {/snippet}
     </Field>
-    {#if !canEmail}<p class="hint">Este brief no tiene correo: crea el enlace y envíalo por WhatsApp o mensaje.</p>{/if}
+    {#if !canEmail}<p class="hint">{client ? 'Este cliente no tiene correo en su ficha' : 'Este brief no tiene correo'}: crea el enlace y envíalo por WhatsApp o mensaje.</p>{/if}
     {#if error}<p class="err" role="alert">{error}</p>{/if}
   {:else}
     {#if result.emailSent}
@@ -88,6 +96,9 @@
       <span class="ui-field__label">Enlace del kit</span>
       <input class="ui-input url" readonly value={result.url} onfocus={(e) => e.currentTarget.select()} />
     </label>
+    {#if client && result.projectId}
+      <p class="hint">Se creó el brief {result.projectId} con los datos de la ficha. Desde ahí puedes reenviar el enlace más adelante.</p>
+    {/if}
     {#if error}<p class="err" role="alert">{error}</p>{/if}
   {/if}
 

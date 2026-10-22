@@ -34,7 +34,7 @@ export function statusFromSlug(slug) {
 }
 export const slugFromStatus = (id) => (statusById(id) || {}).slug || '';
 
-export const SOURCE_LABEL = { web: 'Formulario', chat: 'Chat del sitio' };
+export const SOURCE_LABEL = { web: 'Formulario', chat: 'Chat del sitio', panel: 'Creado desde el panel' };
 export const LANG_LABEL = { es: 'Español', en: 'Inglés' };
 
 // ── Kit de arranque ──────────────────────────────────────────
@@ -368,7 +368,8 @@ export function describeEvent(ev = {}) {
   const title = EVENT_TITLE[ev.event_type] || 'Actividad';
   switch (ev.event_type) {
     case 'brief_received':
-      return { title, detail: d.source === 'chat' ? 'Desde el chat del sitio' : (d.source === 'web' ? 'Desde el formulario' : '') };
+      return { title, detail: d.source === 'chat' ? 'Desde el chat del sitio' : (d.source === 'web' ? 'Desde el formulario'
+        : (d.source === 'panel' ? `Creado desde la ficha del cliente${d.client_code ? ' ' + d.client_code : ''}` : '')) };
     case 'status_changed':
       return { title, detail: d.from || d.to ? `${statusLabel(d.from)} → ${statusLabel(d.to)}` : '' };
     case 'summary_updated':

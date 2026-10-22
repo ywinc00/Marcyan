@@ -731,6 +731,129 @@ await check('int1: todos los puntos de alta ofrecen "usar el existente" o "crear
   assert.match(read('progreso/ProjectForm.svelte'), /<DuplicateNotice[^>]*onuse=\{useExisting\} onforce=\{onforce\}/);
 });
 
+// ── Kit de arranque desde la ficha de un cliente sin brief ─────
+const { createKitBriefForClient, clientToBriefColumns, CLIENT_BRIEF_SQL } = await import('../lib/client-kit.mjs');
+const { hashKitToken, isKitTokenShape } = await import('../lib/brief-kit.mjs');
+const CLIENT_17 = { id: '17', client_code: 'CLI-017', business_name: 'Taller Ruiz', owner_name: 'Rosa Ruiz',
+  email: 'Rosa@Taller.test ', phone: '713 555 0199', city_state: 'Houston, TX', status: 'active', source_brief_id: null, source_lead_id: null };
+function kitDb({ client = CLIENT_17, briefs = [], failOn = null, failCode = null } = {}) {
+  const calls = [];
+  let released = false;
+  return {
+    calls,
+    get released() { return released; },
+    release() { released = true; },
+    async query(text, params = []) {
+      const t = String(text).trim();
+      calls.push({ t, params });
+      if (failOn && failOn.test(t)) { const e = new Error('fallo simulado'); if (failCode) e.code = failCode; throw e; }
+      if (/^(BEGIN|COMMIT|ROLLBACK)$/.test(t)) return { rowCount: 0, rows: [] };
+      if (/^SELECT \* FROM clients WHERE id = \$1 FOR UPDATE/.test(t)) return client ? { rowCount: 1, rows: [{ ...client }] } : { rowCount: 0, rows: [] };
+      if (t === CLIENT_BRIEF_SQL.trim()) return { rowCount: briefs.length, rows: briefs };
+      if (/^INSERT INTO briefs/.test(t)) {
+        return { rowCount: 1, rows: [{ id: '44', project_id: 'MRC-044', status: 'in_progress', source: 'panel', lang: params[5],
+          business_name: params[0], owner_name: params[1], email: params[2], kit_status: 'sent', kit_sent_at: '2026-10-21T20:00:00Z' }] };
+      }
+      return { rowCount: 1, rows: [] };
+    },
+  };
+}
+await check('kit desde la ficha: brief mínimo + enlace + vínculo en UNA transacción', async () => {
+  const db = kitDb();
+  const r = await createKitBriefForClient('17', { lang: 'en' }, { connect: async () => db, actorEmail: 'yo@x' });
+  const k = kinds(db);
+  assert.equal(k[0], 'BEGIN');
+  assert.equal(k[k.length - 1], 'COMMIT');
+  assert.ok(!has(db, /^ROLLBACK/));
+  assert.equal(db.released, true);
+  assert.equal(r.brief.project_id, 'MRC-044');
+  assert.equal(r.client.client_code, 'CLI-017');
+  // El token sale una sola vez; en la base solo su huella.
+  assert.ok(isKitTokenShape(r.token));
+  const ins = db.calls.find((c) => /^INSERT INTO briefs/.test(c.t));
+  assert.match(ins.t, /next_project_id\(\)/);
+  assert.match(ins.t, /kit_sent_at/);
+  assert.ok(ins.params.includes(hashKitToken(r.token)), 'guarda la huella del token');
+  assert.ok(!ins.params.includes(r.token), 'nunca el token');
+  const names = ins.t.match(/\(project_id, ([^)]*)\)/)[1].split(', ');
+  const cols = Object.fromEntries(names.map((c, i) => [c, ins.params[i]]));
+  assert.equal(cols.source, 'panel');
+  assert.equal(cols.status, 'in_progress');
+  assert.equal(cols.lang, 'en');
+  assert.equal(cols.kit_status, 'sent');
+  assert.equal(cols.business_name, 'Taller Ruiz');
+  assert.equal(cols.email, 'rosa@taller.test', 'correo limpio');
+  assert.equal(cols.schema_version, 2);
+  // Vinculado: el cliente queda con este brief de origen y el historial lo cuenta.
+  const up = db.calls.find((c) => /^UPDATE clients SET source_brief_id/.test(c.t));
+  assert.deepEqual(up.params, ['MRC-044', 17]);
+  assert.match(up.t, /source_brief_id IS NULL/);
+  const evs = db.calls.filter((c) => /^INSERT INTO brief_events/.test(c.t))
+    .map((c) => ({ type: c.params[1], actor: c.params[2], data: JSON.parse(c.params[3]) }));
+  assert.deepEqual(evs.map((e) => e.type), ['brief_received', 'converted_to_client']);
+  assert.equal(evs[0].data.source, 'panel');
+  assert.deepEqual([evs[1].data.client_id, evs[1].data.created, evs[1].data.linked], [17, false, true]);
+  assert.ok(evs.every((e) => e.actor === 'yo@x'));
+  assert.ok(!JSON.stringify(evs).includes(r.token), 'el token no queda en el historial');
+});
+await check('kit desde la ficha: el cliente se bloquea antes de mirar si ya tiene brief (dos clics, un brief)', async () => {
+  const db = kitDb();
+  await createKitBriefForClient(17, {}, { connect: async () => db });
+  const iLock = db.calls.findIndex((c) => /FOR UPDATE/.test(c.t));
+  const iCheck = db.calls.findIndex((c) => c.t === CLIENT_BRIEF_SQL.trim());
+  const iIns = db.calls.findIndex((c) => /^INSERT INTO briefs/.test(c.t));
+  assert.ok(iLock > 0 && iLock < iCheck && iCheck < iIns);
+  assert.deepEqual(db.calls[iCheck].params, [17, null, '17', null]);
+  assert.equal(db.calls.find((c) => /^INSERT INTO briefs/.test(c.t)).params[5], 'es', 'idioma por defecto');
+});
+await check('kit desde la ficha: si ya tiene brief → 409 con ese brief, sin crear nada', async () => {
+  const db = kitDb({ briefs: [{ project_id: 'MRC-031' }] });
+  await assert.rejects(createKitBriefForClient(17, {}, { connect: async () => db }),
+    (e) => e instanceof CrmError && e.status === 409 && e.extra.reason === 'has_brief' && e.extra.projectId === 'MRC-031' && /MRC-031/.test(e.message));
+  assert.ok(!has(db, /^INSERT/));
+  assert.ok(has(db, /^ROLLBACK/));
+  assert.equal(db.released, true);
+});
+await check('kit desde la ficha: el "ya tiene brief" mira las mismas vías que la ficha', () => {
+  for (const re of [/b\.project_id = \$2/, /FROM projects/, /'converted_to_client'/, /converted_brief_id/, /converted_client_id = \$1 OR ref_id = \$4/]) {
+    assert.match(CLIENT_BRIEF_SQL, re);
+  }
+});
+await check('kit desde la ficha: archivado → 409, inexistente → 404, id raro → 400 sin abrir conexión', async () => {
+  const arch = kitDb({ client: { ...CLIENT_17, status: 'archived' } });
+  await assert.rejects(createKitBriefForClient(17, {}, { connect: async () => arch }), (e) => e.status === 409 && e.extra.reason === 'archived');
+  assert.ok(!has(arch, /^INSERT/) && has(arch, /^ROLLBACK/));
+  const none = kitDb({ client: null });
+  await assert.rejects(createKitBriefForClient(99, {}, { connect: async () => none }), (e) => e.status === 404);
+  let opened = false;
+  await assert.rejects(createKitBriefForClient('abc', {}, { connect: async () => { opened = true; return kitDb(); } }), (e) => e.status === 400);
+  assert.equal(opened, false);
+});
+await check('kit desde la ficha: sin la migración → 503 claro y ROLLBACK; otro fallo → se propaga con ROLLBACK', async () => {
+  const db = kitDb({ failOn: /^INSERT INTO briefs/, failCode: '42703' });
+  await assert.rejects(createKitBriefForClient(17, {}, { connect: async () => db }), (e) => e.status === 503 && e.message === MIGRATION_011_MSG);
+  assert.ok(has(db, /^ROLLBACK/) && db.released);
+  const db2 = kitDb({ failOn: /^INSERT INTO brief_events/ });
+  await assert.rejects(createKitBriefForClient(17, {}, { connect: async () => db2 }), /fallo simulado/);
+  assert.ok(has(db2, /^ROLLBACK/) && !has(db2, /^COMMIT/), 'o todo o nada');
+});
+await check('kit desde la ficha: columnas del brief a partir de la ficha', () => {
+  const c = Object.fromEntries(clientToBriefColumns({ business_name: '  ', owner_name: ' Ana ', email: null, phone: '', city_state: 'Miami, FL' }, 'fr'));
+  assert.deepEqual([c.business_name, c.owner_name, c.email, c.phone, c.city_state, c.lang], [null, 'Ana', null, null, 'Miami, FL', 'es']);
+});
+await check('kit desde la ficha: la ficha ofrece el kit y, con brief, lleva a ese brief (mismo diálogo)', () => {
+  const read = (f) => fs.readFileSync(path.join(ROOT, 'src/components/dashboard', f), 'utf8');
+  const cd = read('crm/ClientDetail.svelte');
+  assert.match(cd, /import KitDialog from '\.\.\/briefs\/KitDialog\.svelte';/, 'reutiliza el diálogo del brief');
+  assert.match(cd, /\{#if lastBrief\}\s*<a class="b" href=\{href\('briefs', \[lastBrief\.project_id\]\)\}/);
+  assert.match(cd, /<KitDialog bind:open=\{kitOpen\} \{client\}/);
+  assert.ok(!/\{#if[^}]*\}\s*<KitDialog/.test(cd), 'el diálogo no se desmonta al aparecer el brief nuevo (el enlace solo se ve una vez)');
+  const kd = read('briefs/KitDialog.svelte');
+  assert.match(kd, /'\/api\/admin\/clients\/' \+ encodeURIComponent\(client\.id\) \+ '\/kit-link'/);
+  assert.match(kd, /'\/api\/admin\/briefs\/' \+ encodeURIComponent\(pid\) \+ '\/kit-link'/);
+  assert.ok(!fs.existsSync(path.join(ROOT, 'src/components/dashboard/crm/KitDialog.svelte')), 'un solo diálogo del kit');
+});
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) de CRM fallaron:\n  - ` + fails.join('\n  - '));
   process.exit(1);

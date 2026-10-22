@@ -208,7 +208,7 @@
           {#if r.website_type}<span class="meta">{label('website_type', r.website_type)}</span>{/if}
           {#if r.budget_range}<span class="meta meta--num">{label('budget_range', r.budget_range)}</span>{/if}
           {#if r.city_state}<span class="meta meta--soft">{r.city_state}</span>{/if}
-          {#if r.source === 'chat'}<span class="meta meta--soft">{SOURCE_LABEL.chat}</span>{/if}
+          {#if r.source === 'chat' || r.source === 'panel'}<span class="meta meta--soft">{SOURCE_LABEL[r.source]}</span>{/if}
         </div>
         <div class="bcard__foot">
           <span class="mono">{r.project_id}</span>

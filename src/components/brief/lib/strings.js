@@ -54,7 +54,6 @@ const ES = {
   whatsapp: 'WhatsApp',
   call: 'Llamar',
   via: { call: 'por llamada', whatsapp: 'por WhatsApp', sms: 'por mensaje de texto', email: 'por correo' },
-  servicesFrom: 'Lo que elegiste empieza en',
   // Subidas
   dropOr: 'Arrastra aquí o',
   choose: 'Elegir archivos',
@@ -188,7 +187,6 @@ const EN = {
   whatsapp: 'WhatsApp',
   call: 'Call',
   via: { call: 'by phone', whatsapp: 'on WhatsApp', sms: 'by text', email: 'by email' },
-  servicesFrom: 'What you picked starts at',
   dropOr: 'Drag files here or',
   choose: 'Choose files',
   chooseLogo: 'Upload logo',

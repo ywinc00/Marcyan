@@ -34,10 +34,11 @@ segmentado y "10 min"; nada fijo abajo salvo la acción si el teclado no está a
 
 ## 3. Intención por paso (brief corto)
 1. Tu negocio: quién eres y dónde (nombre exacto, industria, ciudad, qué vendes). 2. Qué necesitas: servicios del
-catálogo con su "desde" (fuente única `pricing.ts`), con los bloques condicionales de cada servicio. 3. Tu marca:
-logo y fotos opcionales, colores, si la marca es cerrada, ajustable o nueva. 4. Plazo y presupuesto: rangos que
-casan con los precios publicados. 5. Cómo te contactamos: nombre, teléfono y WhatsApp, correo, canal e idioma
-preferidos. 6. Revisar y enviar: todo editable, aviso de privacidad, envío. Tras enviar: qué pasa ahora y cuándo.
+catálogo con su "desde" (fuente única `pricing.ts`), para cuándo lo necesita y los bloques condicionales de cada
+servicio. 3. Tu marca: logo y fotos opcionales, colores, si la marca es cerrada, ajustable o nueva. 4. Cómo te
+contactamos: nombre, teléfono y WhatsApp, correo, canal e idioma preferidos. 5. Revisar y enviar: todo editable,
+aviso de privacidad, envío. Tras enviar: qué pasa ahora y cuándo. (2026-10-21, decisión del dueño: se quitó la
+pregunta de inversión y con ella el paso "Plazo y presupuesto"; el plazo pasó a "Qué necesitas".)
 Kit de arranque: lista de bloques con estado (hecho, a medias, pendiente, opcional) y progreso total; cada bloque
 abre su panel; fotos por tomas guiadas con etiqueta (servicio, barrio, mes, propio o inspiración).
 

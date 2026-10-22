@@ -3,7 +3,7 @@
 // inglés vive en /en/project-brief con el MISMO modelo de datos.
 //
 // Orbit v2 · B1 (camino 2 "expediente por pasos", design/brief.md): el
-// formulario es la isla BriefForm (Svelte), que pinta los seis pasos desde
+// formulario es la isla BriefForm (Svelte), que pinta los cinco pasos desde
 // lib/brief-schema.mjs (momento 'inicial') y envía el brief v2 a POST /api/brief
 // (schema_version 2, lang, servicios del catálogo y archivos subidos).
 // El contrato de los name/value históricos sigue vivo en el esquema: las 39
@@ -26,7 +26,7 @@ const pageNav = { ...clusterNav, cta: { label: 'WhatsApp', href: wa, track: 'wha
 ---
 <Layout
   title="Brief de proyecto · Marcyan Studio"
-  description="Cuéntanos sobre tu negocio en seis pasos y te preparamos una propuesta en 24 horas. Diseño web, IA y SEO en Houston y Miami."
+  description="Cuéntanos sobre tu negocio en cinco pasos y te preparamos una propuesta en 24 horas. Diseño web, IA y SEO en Houston y Miami."
   lang="es"
   path="/formulario"
   canonical="https://marcyanstudio.com/formulario"
@@ -40,7 +40,7 @@ const pageNav = { ...clusterNav, cta: { label: 'WhatsApp', href: wa, track: 'wha
       <header class="brief__head">
         <Kicker>Brief de proyecto</Kicker>
         <h1 class="brief__h1">Cuéntanos sobre tu <em>proyecto</em></h1>
-        <p class="brief__lead">Seis pasos, de 5 a 15 minutos según lo que necesites. Con tus respuestas te preparamos una propuesta en 24 horas.</p>
+        <p class="brief__lead">Cinco pasos, de 5 a 15 minutos según lo que necesites. Con tus respuestas te preparamos una propuesta en 24 horas.</p>
       </header>
 
       <BriefForm client:load lang="es" phone={nap.houston} />

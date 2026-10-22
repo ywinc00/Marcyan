@@ -104,7 +104,15 @@ ok(!validateAll({ ...full, budget_range: 'cualquier-cosa' }).ok, 'opción de pre
 const budget = fieldByKey('budget_range').options.map((o) => o.value);
 ok(budget.includes('menos-500'), 'existe el rango "menos de $500" (landing $400, logo $150)');
 const svc = fieldByKey('services').options;
-ok(svc.length >= 7 && svc.every((o) => o.hint && o.hint.es && o.hint.en), 'cada servicio trae su "desde" (pricing.ts)');
+ok(svc.length >= 7 && svc.every((o) => !o.hint), 'los servicios no enseñan precio: el precio va en la cotización (dueño, 2026-10-21)');
+// Ningún texto visible del formulario corto ni del kit habla de nuestros precios.
+{
+  const t = (x) => (x ? `${x.es} ${x.en}` : '');
+  const priced = SECTIONS.flatMap((s) => s.fields.filter((f) => !f.hidden).map((f) => ({ k: f.key,
+    txt: [t(f.label), t(f.help), ...(f.options || []).map((o) => `${t(o.label)} ${t(o.hint)}`)].join(' ') })))
+    .filter((r) => /\$\s?\d|\bdesde \$|\bfrom \$|\bgratis\b|\bfree\b/i.test(r.txt)).map((r) => r.k);
+  ok(!priced.length, `sin precios en los formularios: ${priced.join(', ')}`);
+}
 
 // ── 4. Bytes mágicos ─────────────────────────────────────────
 const B = (...xs) => new Uint8Array(xs);

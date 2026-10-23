@@ -205,12 +205,47 @@ await check('kit: pregunta lo del brief corto que el brief no trae (chat, v1, v2
   assert.equal(sec.key, CATCHUP_SECTION);
   assert.ok(sec.catchup && sec.fields.every((f) => f.moment === 'inicial'));
   assert.equal(catchupSection([]), null);
-  assert.equal(catchupSection(['business_name']), null, 'solo claves del bloque de pendientes');
+  assert.equal(catchupSection(['industry']), null, 'solo claves del bloque de pendientes');
   // El servidor solo toma esas claves, y sin la lista si marcó "sin colores".
   const d = catchupData(chat, { bot_channels: ['web'], brand_colors_none: true, brand_color_list: [{ name: 'rojo' }], business_name: 'X', seo_scope: 'setup' });
   assert.deepEqual(d, { bot_channels: ['web'], brand_colors_none: true });
   const vp = validate('inicial', catchupData(chat, { shipping: 'teletransporte' }), { services: chat.services, partial: true, optionMode: 'keep' });
   assert.ok(vp.errors.shipping, 'se valida con las reglas del brief');
+});
+await check('kit de un brief creado desde el panel: lo obligatorio del corto que falta va a pendientes, sin exigirlo', () => {
+  // Brief mínimo desde la ficha del cliente: nombre y correo, sin servicios ni objetivo.
+  const panel = { source: 'panel', schema_version: 2, services: [], business_name: 'Taller Ruiz', owner_name: null,
+    email: 'ruiz@taller.test', phone: null, main_objective: null, extra: {}, kit: {} };
+  const keys = kitCatchup(panel);
+  for (const k of ['services', 'owner_name', 'main_objective', 'contact_language', 'brand_status']) assert.ok(keys.includes(k), `falta ${k}`);
+  for (const k of ['business_name', 'email', 'phone']) assert.ok(!keys.includes(k), `${k} ya viene de la ficha`);
+  // Sin correo ni teléfono en la ficha: se preguntan los dos (ninguno obligatorio).
+  const sinContacto = kitCatchup({ ...panel, email: null });
+  assert.ok(sinContacto.includes('email') && sinContacto.includes('phone'));
+  // Con todo lo obligatorio en la ficha, el bloque queda como el de cualquier brief.
+  const lleno = { ...panel, owner_name: 'Rosa', main_objective: 'Más llamadas', services: ['diseno-web'] };
+  assert.deepEqual(kitCatchup(lleno), kitCatchup({ ...lleno, source: 'web' }));
+  // Los briefs de siempre no cambian: un brief del formulario o del chat no recibe estas preguntas.
+  for (const src of ['web', 'chat', 'lead']) {
+    const k = kitCatchup({ ...panel, source: src });
+    assert.ok(!k.includes('services') && !k.includes('main_objective') && !k.includes('owner_name'), src);
+  }
+  // El bloque no exige nada y no habla de "tu brief" a quien no rellenó ninguno.
+  const sec = catchupSection(keys, { panel: true });
+  assert.ok(sec.fields.every((f) => !f.required), 'nada obligatorio en el bloque');
+  assert.deepEqual(sec.fields.slice(0, 2).map((f) => f.key), ['services', 'owner_name'], 'en el orden del formulario');
+  assert.equal(sec.label.es, 'Lo básico de tu proyecto');
+  assert.ok(!/brief|formulario/i.test(sec.label.es + sec.help.es + sec.label.en + sec.help.en + sec.short.es + sec.short.en));
+  assert.equal(catchupSection(keys).label.es, 'Lo que nos falta de tu brief', 'sin panel, el texto de siempre');
+  assert.ok(FIELDS.get('services').required && FIELDS.get('main_objective').required, 'el esquema no cambia: el corto sigue exigiéndolos');
+  // El servidor acepta esas claves en el kit (se validan con las reglas del corto, sin exigir) y nada más.
+  const d = catchupData(panel, { services: ['diseno-web'], main_objective: 'Vender en línea', business_name: 'Otro nombre', industry: 'x' });
+  assert.deepEqual(d, { services: ['diseno-web'], main_objective: 'Vender en línea' });
+  const vp = validate('inicial', catchupData(panel, {}), { partial: true, optionMode: 'keep' });
+  assert.ok(vp.ok, 'vacío no es error');
+  // Enviar el kit no pide lo del corto: solo lo obligatorio del propio kit.
+  const whole = validate('arranque', kitForSubmit(panel, { leads_email: 'ruiz@taller.test' }), { services: null, optionMode: 'keep' });
+  assert.ok(whole.ok, JSON.stringify(whole.errors));
 });
 await check('dato que falta: sí/no, dependencias, servicios y briefs históricos (R2/R3)', () => {
   const F = (k) => FIELDS.get(k);

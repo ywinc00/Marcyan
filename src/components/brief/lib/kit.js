@@ -22,10 +22,11 @@ export function kitTokenFrom(pathname, search = '') {
 // Bloques visibles para estos servicios (y que el servidor anunció). Si el
 // brief no traía preguntas del brief corto (chat, formulario anterior), el
 // servidor las anuncia en `catchup` y van primero, en su propio bloque.
-export function kitBlocks(services, allowedKeys, catchup) {
+// fromPanel: brief creado desde el panel (el cliente no rellenó el corto).
+export function kitBlocks(services, allowedKeys, catchup, fromPanel = false) {
   const list = sectionsFor('arranque', Array.isArray(services) && services.length ? services : null);
   const allow = Array.isArray(allowedKeys) && allowedKeys.length ? new Set(allowedKeys) : null;
-  const pend = catchupSection(catchup);
+  const pend = catchupSection(catchup, { panel: fromPanel === true });
   return [...(pend ? [pend] : []), ...list.filter((s) => !allow || allow.has(s.key))];
 }
 

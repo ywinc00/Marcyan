@@ -22,7 +22,7 @@ import { logEvent } from '../../lib/db.mjs';
 import { createNotification } from '../../lib/notifications.mjs';
 import { rateLimit, LIMITS } from '../../lib/ratelimit.mjs';
 import { validate, splitByStorage, sectionsFor } from '../../lib/brief-schema.mjs';
-import { findBriefByKitToken, kitPrefill, kitForSubmit, saveKit, kitCatchup, catchupData } from '../../lib/brief-kit.mjs';
+import { findBriefByKitToken, kitPrefill, kitForSubmit, saveKit, kitCatchup, catchupData, isPanelBrief } from '../../lib/brief-kit.mjs';
 import {
   getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, listFilesForBrief, blobConfigured, isMissingSchema,
   closeKitDrafts, queueDraftSweep,
@@ -92,6 +92,9 @@ export default async function handler(req, res) {
         // Preguntas del brief corto que este brief no trae (chat, formulario
         // anterior o v2 de antes): el kit las enseña en su propio bloque.
         catchup: kitCatchup(brief),
+        // Brief creado desde el panel: el cliente no rellenó el formulario
+        // corto, así que ese bloque no le habla de "tu brief".
+        fromPanel: isPanelBrief(brief),
         files,
         uploads: blobConfigured(),
       });

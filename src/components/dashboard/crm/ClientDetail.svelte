@@ -4,6 +4,9 @@
   // leads de origen. ARCHIVAR en vez de borrar (CRM-13): el borrado
   // definitivo solo aparece con el cliente archivado, pide escribir su
   // nombre y dice exactamente qué se pierde.
+  // Kit de arranque: a un cliente sin brief se le envía desde aquí (mismo
+  // diálogo que en Briefs; el servidor le crea el brief con su ficha). Con
+  // brief, el botón lleva a ese brief, que es donde vive su kit.
   import { onMount } from 'svelte';
   import PageHeader from '../ui/PageHeader.svelte';
   import KpiGrid from '../ui/KpiGrid.svelte';
@@ -17,6 +20,7 @@
   import Icon from '../ui/Icon.svelte';
   import ClientFields from './ClientFields.svelte';
   import DuplicateNotice from './DuplicateNotice.svelte';
+  import KitDialog from '../briefs/KitDialog.svelte';
   import { api, ApiError, errorMessage, isSessionError } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
   import { href, route, setSub, navigate } from '../lib/router.svelte.js';
@@ -40,12 +44,15 @@
   let archiving = $state(false);
   let confirmDelete = $state(false);
   let deleting = $state(false);
+  let kitOpen = $state(false);
 
   const FIELDS = ['business_name', 'owner_name', 'email', 'phone', 'city_state', 'notes', 'status'];
   const norm = (v) => (v == null ? '' : String(v).trim());
   const dirty = $derived(!!client && FIELDS.some((k) => norm(values[k]) !== norm(client[k])));
   const name = $derived(clientName(client));
   const archived = $derived(client?.status === 'archived');
+  // El brief más reciente del cliente (la lista llega ordenada).
+  const lastBrief = $derived(related?.briefs?.[0] || null);
 
   function resetForm(c) {
     values = Object.fromEntries(FIELDS.map((k) => [k, c[k] ?? '']));
@@ -61,6 +68,16 @@
     } catch (e) {
       if (!isSessionError(e)) error = e?.status === 404 || e?.status === 400 ? 'Este cliente no existe o ya se borró.' : errorMessage(e, 'No se pudo abrir el cliente.');
     } finally { loading = false; }
+  }
+
+  // Tras crear el kit: solo se recarga lo relacionado (el brief nuevo sale en
+  // Origen), sin tocar lo que el dueño esté editando en los datos de contacto.
+  async function onKitIssued() {
+    onchanged?.();
+    try {
+      const j = await api('/api/admin/clients/' + encodeURIComponent(clientId));
+      related = j.related || related;
+    } catch (_) { /* la ficha se queda como estaba; el brief ya existe */ }
   }
 
   async function save(allowDuplicate = false) {
@@ -136,6 +153,11 @@
         <button type="button" class="b" disabled={archiving} onclick={() => setStatus('active')}>{archiving ? 'Un momento…' : 'Reactivar'}</button>
       {:else}
         <button type="button" class="b" onclick={() => (confirmArchive = true)}>Archivar</button>
+        {#if lastBrief}
+          <a class="b" href={href('briefs', [lastBrief.project_id])}><Icon name="send" size={16} />Enviar kit desde su brief</a>
+        {:else if related}
+          <button type="button" class="b" onclick={() => (kitOpen = true)}><Icon name="send" size={16} />Enviar kit de arranque</button>
+        {/if}
       {/if}
     {/snippet}
   </PageHeader>
@@ -213,7 +235,7 @@
               <li>
                 <a class="rows__main" href={href('briefs', [b.project_id])}>
                   <span class="rows__t">Brief {b.project_id}{b.business_name ? ' · ' + b.business_name : ''}</span>
-                  <span class="rows__s">Recibido el {fmtDate(b.created_at)}</span>
+                  <span class="rows__s">{b.source === 'panel' ? 'Creado desde el panel el' : 'Recibido el'} {fmtDate(b.created_at)}</span>
                 </a>
                 <StatusChip tone={(BRIEF_STATUS[b.status] || {}).tone || 'neutral'} label={(BRIEF_STATUS[b.status] || {}).label || 'Sin estado'} />
               </li>
@@ -267,6 +289,9 @@
     busy={deleting}
     onconfirm={doDelete}
   />
+  <!-- Siempre montado: al crear el enlace la ficha ya tiene brief, y el
+       diálogo debe seguir abierto con el enlace, que solo se ve esa vez. -->
+  <KitDialog bind:open={kitOpen} {client} email={client.email || ''} onissued={onKitIssued} />
 {/if}
 
 <style>

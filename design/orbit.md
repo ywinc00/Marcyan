@@ -94,3 +94,13 @@ KPI 30 px/650. Espaciado base 4: 8/12/16/24/32; separación entre bloques 24 px;
 
 Sub-agentes: ninguno (pulido de sistema existente).
 Ledger aplicable: E-01, E-11, E-15, E-16, E-17, E-19, E-20, E-29, E-30.
+
+## Añadido 2026-10-21 · Kit de arranque desde la ficha del cliente
+Estado: PROPUESTO, pendiente del OK visual del dueño sobre capturas reales (escritorio 1440 y móvil 390 táctil).
+- Anfitrión (E-19): la cabecera de la ficha (junto a "Archivar") y el MISMO diálogo del kit de Briefs
+  (`briefs/KitDialog.svelte`); ninguna tarjeta ni componente nuevo.
+- Piezas del catálogo: **D-10** una acción, sin competir con la principal de la vista ("Guardar cambios"
+  sigue siendo el único naranja), **H-07** presupuesto del acento (botón secundario con el icono de enviar),
+  **E-08** vacío que propone la salida (el "Alta manual" de Origen se convierte en el brief creado al enviar).
+- Sin brief: "Enviar kit de arranque" abre el diálogo, que avisa de que se crea su brief con la ficha.
+  Con brief: "Enviar kit desde su brief" lleva a ese brief, donde vive su kit.

@@ -104,7 +104,15 @@ ok(!validateAll({ ...full, budget_range: 'cualquier-cosa' }).ok, 'opción de pre
 const budget = fieldByKey('budget_range').options.map((o) => o.value);
 ok(budget.includes('menos-500'), 'existe el rango "menos de $500" (landing $400, logo $150)');
 const svc = fieldByKey('services').options;
-ok(svc.length >= 7 && svc.every((o) => o.hint && o.hint.es && o.hint.en), 'cada servicio trae su "desde" (pricing.ts)');
+ok(svc.length >= 7 && svc.every((o) => !o.hint), 'los servicios no enseñan precio: el precio va en la cotización (dueño, 2026-10-21)');
+// Ningún texto visible del formulario corto ni del kit habla de nuestros precios.
+{
+  const t = (x) => (x ? `${x.es} ${x.en}` : '');
+  const priced = SECTIONS.flatMap((s) => s.fields.filter((f) => !f.hidden).map((f) => ({ k: f.key,
+    txt: [t(f.label), t(f.help), ...(f.options || []).map((o) => `${t(o.label)} ${t(o.hint)}`)].join(' ') })))
+    .filter((r) => /\$\s?\d|\bdesde \$|\bfrom \$|\bgratis\b|\bfree\b/i.test(r.txt)).map((r) => r.k);
+  ok(!priced.length, `sin precios en los formularios: ${priced.join(', ')}`);
+}
 
 // ── 4. Bytes mágicos ─────────────────────────────────────────
 const B = (...xs) => new Uint8Array(xs);
@@ -202,6 +210,15 @@ eq(Object.keys(blockData(withPend[0], { brand_colors_none: true, brand_color_lis
 ok(validateKit({ contact_language: 'fr' }, ['ia-conversacional'], true, withPend).errors.contact_language, 'se valida con las opciones del brief');
 ok(validateKit({ contact_language: 'en', bot_channels: ['web'] }, ['ia-conversacional'], true, withPend).ok, 'respuestas válidas pasan');
 ok(!validateKit({ contact_language: 'fr' }, ['ia-conversacional'], true, kitBlocks(['ia-conversacional'], null)).errors.contact_language, 'sin el bloque, la clave no es del kit');
+// Brief creado desde el panel (sin formulario corto): lo obligatorio del corto
+// que falta va en el bloque con otro título y sin exigirse ni bloquear el envío.
+const PANEL = ['services', 'owner_name', 'main_objective', 'contact_language'];
+const panelBlocks = kitBlocks([], null, PANEL, true);
+eq(panelBlocks[0].label.es, 'Lo básico de tu proyecto', 'el bloque no habla de "tu brief" a quien no rellenó ninguno');
+eq(kitBlocks([], null, PANEL)[0].label.es, 'Lo que nos falta de tu brief', 'sin panel, el título de siempre');
+ok(panelBlocks[0].fields.every((f) => !f.required), 'nada obligatorio en el bloque');
+ok(validateKit({ leads_email: 'a@b.co' }, [], false, panelBlocks).ok, 'enviar sin servicios ni objetivo no da error');
+eq(blockStatus(panelBlocks[0], { owner_name: 'Rosa', main_objective: 'Más llamadas', contact_language: 'es' }).status, 'done', 'sin servicios el bloque puede quedar listo: no es obligatorio');
 
 // ── 8. Textos: mismas claves ES/EN, sin em-dash ni voseo ─────
 eq(Object.keys(STRINGS_ES).sort(), Object.keys(STRINGS_EN).sort(), 'mismas claves en ES y EN');

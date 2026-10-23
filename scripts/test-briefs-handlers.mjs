@@ -17,6 +17,9 @@
 //    · events POST de notas (400, 201 con { event }) y GET.
 //    · email  el cuerpo queda en el historial.
 //    · 401 sin sesión antes de leer nada.
+//    · kit desde la ficha de un cliente sin brief (api/admin/clients/:id/kit-link):
+//             401/405/400, 200 con el enlace (sin token en el historial), idioma,
+//             correo enviado, sin correo o fallido, 409 con brief o archivado, 500.
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -32,14 +35,18 @@ const OVERRIDES = {
   'lib/auth.mjs': ['requireAdmin'],
   'lib/finance.mjs': ['convertBriefToClient'],
   'lib/brief-files.mjs': ['deleteBriefBlobs'],
-  'lib/email.mjs': ['emailManualToClient'],
+  'lib/email.mjs': ['emailManualToClient', 'emailClientKitLink'],
+  'lib/client-kit.mjs': ['createKitBriefForClient'],
 };
+// Valores (no funciones) que la prueba fija ANTES de cargar los handlers.
+const VALUES = { 'lib/email.mjs': ['resend'] };
 const HOOKS = `
 const OVERRIDES = ${JSON.stringify(OVERRIDES)};
+const VALUES = ${JSON.stringify(VALUES)};
 export async function resolve(specifier, context, next) {
   const r = await next(specifier, context);
   const parent = context.parentURL || '';
-  if (!parent.includes('/api/admin/briefs/')) return r;
+  if (!parent.includes('/api/admin/briefs/') && !parent.includes('/api/admin/clients/')) return r;
   const hit = Object.keys(OVERRIDES).find((m) => r.url.endsWith('/' + m));
   if (!hit) return r;
   return { url: 'stub:' + hit + '?real=' + encodeURIComponent(r.url), shortCircuit: true };
@@ -57,16 +64,23 @@ export async function load(url, context, next) {
     lines.push('export const ' + n + ' = (...a) => { const f = S().' + n
       + '; if (typeof f !== "function") throw new Error("[prueba] falta el doble de ' + n + '"); return f(...a); };');
   }
+  for (const n of VALUES[mod] || []) {
+    lines.push('export const ' + n + ' = (' + JSON.stringify(n) + ' in S()) ? S().' + n + ' : R.' + n + ';');
+  }
   lines.push('void R;');
   return { format: 'module', source: lines.join('\\n'), shortCircuit: true };
 }
 `;
 register('data:text/javascript,' + encodeURIComponent(HOOKS), import.meta.url);
 
+// El correo cuenta como configurado (la prueba nunca llega a Resend: el envío es un doble).
+globalThis.__briefStubs = { resend: { emails: {} } };
 const load = async (rel) => (await import(pathToFileURL(path.join(ROOT, rel)).href)).default;
 const briefHandler = await load('api/admin/briefs/[id].mjs');
 const eventsHandler = await load('api/admin/briefs/[id]/events.mjs');
 const emailHandler = await load('api/admin/briefs/[id]/email.mjs');
+const clientKitHandler = await load('api/admin/clients/[id]/kit-link.mjs');
+const { CrmError } = await import('../lib/finance.mjs');
 
 // ── Dobles y utilidades ──────────────────────────────────────────
 const SESSION = { email: 'equipo@marcyan.test' };
@@ -352,6 +366,107 @@ await check('PATCH a otro estado (En curso) → no toca clientes', async () => {
   const r = await call(briefHandler, { method: 'PATCH', body: { status: 'in_progress' } });
   assert.equal(r.statusCode, 200);
   assert.equal(calls.convert.length, 0);
+});
+
+// ── Kit de arranque desde la ficha de un cliente sin brief ───────
+const KIT_MADE = (lang = 'es', email = 'rosa@taller.test') => ({
+  brief: { id: 44, project_id: 'MRC-044', status: 'in_progress', source: 'panel', lang, business_name: 'Taller Ruiz',
+    owner_name: 'Rosa Ruiz', email, kit_status: 'sent' },
+  client: { id: 17, client_code: 'CLI-017', business_name: 'Taller Ruiz', status: 'active' },
+  token: 'T'.repeat(43),
+});
+function kitStubs(over = {}) {
+  calls.kit = [];
+  calls.kitEmail = [];
+  Object.assign(globalThis.__briefStubs, {
+    createKitBriefForClient: async (id, opts, deps) => { calls.kit.push({ id, opts, deps }); return KIT_MADE(opts.lang); },
+    emailClientKitLink: async (m) => { calls.kitEmail.push(m); return { id: 'em_1' }; },
+    ...over,
+  });
+}
+await check('kit desde la ficha: sin sesión → 401 sin crear nada; otro método → 405; id raro → 400', async () => {
+  let made = false;
+  kitStubs({ createKitBriefForClient: async () => { made = true; return KIT_MADE(); } });
+  globalThis.__briefStubs.requireAdmin = async (req, res) => { res.status(401).json({ ok: false, error: 'No autorizado' }); return null; };
+  assert.equal((await call(clientKitHandler, { method: 'POST', id: '17', body: {} })).statusCode, 401);
+  globalThis.__briefStubs.requireAdmin = async () => SESSION;
+  assert.equal((await call(clientKitHandler, { method: 'GET', id: '17' })).statusCode, 405);
+  assert.equal((await call(clientKitHandler, { method: 'POST', id: 'abc', body: {} })).statusCode, 400);
+  assert.equal(made, false);
+});
+await check('kit desde la ficha: solo enlace → 200 con el enlace y el brief creado; el registro no guarda el token', async () => {
+  kitStubs();
+  const r = await call(clientKitHandler, { method: 'POST', id: '17', body: { lang: 'es' } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.projectId, 'MRC-044');
+  assert.equal(r.body.kitStatus, 'sent');
+  assert.equal(r.body.emailSent, false);
+  assert.ok(!('emailError' in r.body));
+  assert.match(r.body.url, /\/es\/kit\/T{43}$/);
+  assert.equal(r.headers['Cache-Control'], 'private, no-store');
+  assert.deepEqual(calls.kit[0], { id: 17, opts: { lang: 'es' }, deps: { actorEmail: SESSION.email } });
+  assert.equal(calls.kitEmail.length, 0);
+  const ev = calls.logEvent.find((e) => e.type === 'kit_link_created');
+  assert.equal(ev.projectId, 'MRC-044');
+  assert.equal(ev.actorEmail, SESSION.email);
+  assert.equal(ev.data.fromClient, 'CLI-017');
+  assert.ok(!JSON.stringify(calls.logEvent).includes('T'.repeat(43)), 'sin el token en el historial');
+});
+await check('kit desde la ficha: idioma inglés → enlace /en/ y brief en inglés; idioma raro → español', async () => {
+  kitStubs();
+  const r = await call(clientKitHandler, { method: 'POST', id: '17', body: { lang: 'en' } });
+  assert.match(r.body.url, /\/en\/kit\//);
+  assert.equal(r.body.lang, 'en');
+  const r2 = await call(clientKitHandler, { method: 'POST', id: '17', body: { lang: 'fr' } });
+  assert.match(r2.body.url, /\/es\/kit\//);
+  assert.equal(calls.kit[1].opts.lang, 'es');
+});
+await check('kit desde la ficha: por correo → se envía al correo de la ficha con el mismo enlace', async () => {
+  kitStubs();
+  const r = await call(clientKitHandler, { method: 'POST', id: '17', body: { sendEmail: true, lang: 'en' } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.emailSent, true);
+  const m = calls.kitEmail[0];
+  assert.equal(m.to, 'rosa@taller.test');
+  assert.equal(m.url, r.body.url);
+  assert.equal(m.projectId, 'MRC-044');
+  assert.equal(m.lang, 'en');
+  assert.equal(m.replyTo, SESSION.email);
+  assert.equal(calls.logEvent.find((e) => e.type === 'kit_link_created').data.emailSent, true);
+});
+await check('kit desde la ficha: sin correo en la ficha o si el correo falla → 200 con el enlace y el aviso', async () => {
+  kitStubs({ createKitBriefForClient: async (id, opts) => KIT_MADE(opts.lang, null) });
+  const r = await call(clientKitHandler, { method: 'POST', id: '17', body: { sendEmail: true } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.body.emailSent, false);
+  assert.match(r.body.emailError, /no tiene correo/);
+  assert.ok(r.body.url);
+  assert.equal(calls.kitEmail.length, 0);
+  kitStubs({ emailClientKitLink: async () => { throw new Error('Resend caído'); } });
+  const r2 = await quiet(() => call(clientKitHandler, { method: 'POST', id: '17', body: { sendEmail: true } }));
+  assert.equal(r2.statusCode, 200);
+  assert.equal(r2.body.emailSent, false);
+  assert.match(r2.body.emailError, /Copia el enlace/);
+  assert.ok(r2.body.url);
+});
+await check('kit desde la ficha: ya tiene brief o está archivado → 409 con el motivo, sin enlace ni registro', async () => {
+  kitStubs({ createKitBriefForClient: async () => { throw new CrmError(409, 'Este cliente ya tiene el brief MRC-031. El kit de arranque se envía desde ese brief.', { reason: 'has_brief', projectId: 'MRC-031' }); } });
+  const r = await call(clientKitHandler, { method: 'POST', id: '17', body: {} });
+  assert.equal(r.statusCode, 409);
+  assert.equal(r.body.reason, 'has_brief');
+  assert.equal(r.body.projectId, 'MRC-031');
+  assert.ok(!r.body.url);
+  assert.equal(calls.logEvent.length, 0);
+  kitStubs({ createKitBriefForClient: async () => { throw new CrmError(409, 'Archivado', { reason: 'archived' }); } });
+  const r2 = await call(clientKitHandler, { method: 'POST', id: '17', body: {} });
+  assert.equal(r2.statusCode, 409);
+  assert.equal(r2.body.reason, 'archived');
+});
+await check('kit desde la ficha: fallo inesperado → 500 con un mensaje llano', async () => {
+  kitStubs({ createKitBriefForClient: async () => { throw new Error('conexión perdida'); } });
+  const r = await quiet(() => call(clientKitHandler, { method: 'POST', id: '17', body: {} }));
+  assert.equal(r.statusCode, 500);
+  assert.equal(r.body.error, 'No se pudo generar el enlace del kit');
 });
 
 if (fails.length) {

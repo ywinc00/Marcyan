@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-21",
+  "fecha": "2026-10-23",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
@@ -77,9 +77,9 @@
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 25,
+  "sinRastreoReciente": 26,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 85,
+  "certificadoDias": 83,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,10 +113,10 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 15,
-    "sesionesDiaHabitual": 4.2,
+    "sesionesUltimos3Dias": 4,
+    "sesionesDiaHabitual": 4,
     "contactosSemanaHabitual": null,
-    "diasSinContactos": 62,
+    "diasSinContactos": 63,
     "probabilidadAzar": null
   },
   "lectoresIa": {
@@ -148,38 +148,20 @@
     ]
   },
   "alertas": {
-    "alta": [
-      {
-        "fecha": "2026-10-21",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/precios"
-      }
-    ],
+    "alta": [],
     "media": [
       {
-        "fecha": "2026-10-21",
+        "fecha": "2026-10-23",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "25 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "26 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": []
   },
-  "alertasNuevas": [
-    {
-      "fecha": "2026-10-21",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/precios"
-    }
-  ],
+  "alertasNuevas": [],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

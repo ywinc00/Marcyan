@@ -704,7 +704,11 @@
       "userCanonical": "https://marcyanstudio.com/es/houston",
       "lastChecked": "2026-10-23T21:18:47.146Z",
       "lastError": null,
-      "indexedAt": "2026-09-09T18:41:48.676Z"
+      "indexedAt": "2026-09-09T18:41:48.676Z",
+      "lastIndexRequestAt": "2026-10-24T21:17:49.932Z",
+      "indexRequestHistory": [
+        "2026-10-24T21:17:49.932Z"
+      ]
     },
     "https://marcyanstudio.com/es/houston/abogados-inmigracion": {
       "coverageState": "Crawled - currently not indexed",
@@ -735,7 +739,11 @@
       "userCanonical": "https://marcyanstudio.com/es/houston/bienes-raices/",
       "lastChecked": "2026-10-23T21:18:47.146Z",
       "lastError": null,
-      "indexedAt": "2026-08-18T00:26:04.174Z"
+      "indexedAt": "2026-08-18T00:26:04.174Z",
+      "lastIndexRequestAt": "2026-10-24T21:17:49.456Z",
+      "indexRequestHistory": [
+        "2026-10-24T21:17:49.456Z"
+      ]
     },
     "https://marcyanstudio.com/es/houston/branding": {
       "coverageState": "Submitted and indexed",
@@ -1010,7 +1018,11 @@
       "userCanonical": "https://marcyanstudio.com/es/miami/doral/",
       "lastChecked": "2026-10-23T21:18:47.146Z",
       "lastError": null,
-      "indexedAt": null
+      "indexedAt": null,
+      "lastIndexRequestAt": "2026-10-24T21:17:49.684Z",
+      "indexRequestHistory": [
+        "2026-10-24T21:17:49.684Z"
+      ]
     },
     "https://marcyanstudio.com/es/miami/ecommerce": {
       "coverageState": "Crawled - currently not indexed",
@@ -1062,7 +1074,11 @@
       "userCanonical": "https://marcyanstudio.com/es/miami/seo-local/",
       "lastChecked": "2026-10-23T21:18:47.146Z",
       "lastError": null,
-      "indexedAt": null
+      "indexedAt": null,
+      "lastIndexRequestAt": "2026-10-24T21:17:49.225Z",
+      "indexRequestHistory": [
+        "2026-10-24T21:17:49.225Z"
+      ]
     },
     "https://marcyanstudio.com/es/portafolio": {
       "coverageState": "Alternate page with proper canonical tag",

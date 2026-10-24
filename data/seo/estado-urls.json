@@ -1938,7 +1938,7 @@
     },
     "https://marcyanstudio.com/es/houston": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -1973,7 +1973,8 @@
           "href": "https://marcyanstudio.com/es/houston"
         }
       ],
-      "hash": "92f88cd09a384d58"
+      "hash": "92f88cd09a384d58",
+      "ultimaPeticion": "2026-10-24"
     },
     "https://marcyanstudio.com/es/houston/abogados-inmigracion": {
       "primeraVez": null,
@@ -2017,7 +2018,7 @@
     },
     "https://marcyanstudio.com/es/houston/bienes-raices": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "indexadaDesde": "2026-08-18",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -2052,7 +2053,8 @@
           "href": "https://marcyanstudio.com/es/houston/bienes-raices"
         }
       ],
-      "hash": "c515cc64936f581d"
+      "hash": "c515cc64936f581d",
+      "ultimaPeticion": "2026-10-24"
     },
     "https://marcyanstudio.com/es/houston/branding": {
       "primeraVez": null,
@@ -2728,7 +2730,7 @@
     },
     "https://marcyanstudio.com/es/miami/doral": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "gsc": {
         "verdict": "NEUTRAL",
         "coverageState": "Alternate page with proper canonical tag",
@@ -2762,7 +2764,8 @@
           "href": "https://marcyanstudio.com/es/miami/doral"
         }
       ],
-      "hash": "8ad117f57aa2f862"
+      "hash": "8ad117f57aa2f862",
+      "ultimaPeticion": "2026-10-24"
     },
     "https://marcyanstudio.com/es/miami/ecommerce": {
       "primeraVez": null,
@@ -2883,7 +2886,7 @@
     },
     "https://marcyanstudio.com/es/miami/seo-local": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "gsc": {
         "verdict": "NEUTRAL",
         "coverageState": "Alternate page with proper canonical tag",
@@ -2917,7 +2920,8 @@
           "href": "https://marcyanstudio.com/es/miami/seo-local"
         }
       ],
-      "hash": "e1ff151d1757fa1e"
+      "hash": "e1ff151d1757fa1e",
+      "ultimaPeticion": "2026-10-24"
     },
     "https://marcyanstudio.com/es/portafolio": {
       "primeraVez": null,

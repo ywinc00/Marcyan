@@ -2,9 +2,10 @@
 
 Proyecto: Marcyan Web  ·  Página/Vista: hub de ciudad de Houston, rediseño completo
 Modo: **REDISEÑO / LANDING-CON-IDENTIDAD**
-Estado: **PROPUESTO** — tres direcciones a elegir. Fecha: 2026-10-01.
-Lienzo de decisión (artifact): "Houston, arte propio" (cuarta vuelta: arte dibujado en código,
-sin capturas de clientes). Las tres tandas anteriores fueron rechazadas por el dueño.
+Estado: **PROPUESTO**, quinta vuelta: tres portadas a elegir. Fecha: 2026-10-24.
+Lienzo de decisión (artifact): "Portadas de Houston" https://claude.ai/artifact/NJ4MWBRy8AHnEFQjMY8u47
+(cada boceto junto a su referencia de Refero; reposo, historia completa y móvil). Bocetos
+fuente en `design/houston-v5/`. La cuarta vuelta ("arte propio") queda como historial.
 
 > Punto de partida: **lo que está vivo en producción**. El hero "El Domo" queda descartado
 > por el dueño (2026-10-01): obligaba a cambiar la barra de navegación principal y la
@@ -68,6 +69,53 @@ demuestra algo (el portafolio) vive escondido a mitad de scroll, detrás de un c
 enseña un caso de cuatro.
 
 ---
+
+## Quinta vuelta (2026-10-24): la portada cuenta el mecanismo
+
+**Por qué otra vuelta.** El dueño señaló que las ideas del chat "Refero Skill Test" eran mejores.
+Diagnóstico: allí ganó B·Henry porque NARRABA lo que hace el producto (pregunta, la IA buscando,
+la respuesta que nombra tu negocio) sobre la atmósfera de la marca. Las cuatro vueltas de Houston
+fallaron por decorar (haces, líneas, palabra gigante) o por usar capturas de clientes (E-32).
+Regla de esta vuelta: la primera pantalla cuenta lo que Marcyan hace por un negocio de Houston
+(te buscan, te encuentran, te contestan), con datos de ejemplo marcados "EJEMPLO".
+
+**Estado de Refero.** Conecta. `refero_search_styles` devuelve vacío para todo (incluido "Linear");
+`refero_get_style` por código y `refero_search_screens` funcionan. Referencias por pantallas y un
+estilo abierto por código; todas miradas en imagen (hoja de contacto de 16 candidatas).
+
+| Referencia | id | Qué se toma | Qué NO |
+|---|---|---|---|
+| **Cal.ai** (pantalla) | `10196b83-1d61-4497-a029-451cb5244789` | El aparato como escenario y la conversación real al lado como prueba | Morado, botones redondos, teléfono ilustrado |
+| **Raycast Teams** (pantalla) | `e57f7a10-658c-4f1b-9267-3bf2bebac901` | Titular con elementos orbitando sobre el horizonte de un planeta | Azul, avatares, botón blanco |
+| **ai.work, Henry** (estilo, el de la prueba aprobada) | `5e7f709b-2fd6-4243-b419-0816f248e590` | Escena de fondo + tarjetas que cuentan en orden lo que pasa | Foto de montaña, pila centrada, botones |
+
+Miradas y descartadas: Cartesia `ee911f3a` `914f743f` `f95a8c84`, Gladia `9572e997`, Intercom
+`5a60b640` (la portada `96abfa39` resultó ser un menú abierto, no sirve), Krisp `1e7ba7fd`,
+Netflix `de945c5f`, Washington Post `36e69963`, Runway `1744d58a`, DJI `b7b4a0f9`, ElevenLabs
+`267412fe`, Esquire `1ea614d5`, Hume `b37de1ab`, Mercury `a4f2cc10`.
+
+**Las tres portadas** (H1 de posicionamiento intacto en las tres; kicker, CTA "Propuesta gratis",
+teléfono como segunda acción y "Respuesta en 1 hora hábil" de siempre; sin precio en la portada):
+1. **La llamada perdida** ← Cal.ai. Texto a la izquierda, teléfono mínimo a la derecha: 11:41 p. m.,
+   el taller cerró, la IA contesta la llamada perdida por mensaje y aparta cita; al dueño le llega
+   "Nuevo cliente". Piezas A-05, G-07, A-07.
+2. **Las búsquedas en órbita** ← Raycast. Titular centrado; el planeta del isotipo con su aro y
+   búsquedas de clientes de Houston (ES/EN) girando; una se enciende y el aro la lleva a la ficha
+   del negocio que Google, Maps y la IA nombran. Piezas G-09, F-06, A-07. **Ojo E-31:** centrar el
+   titular es gramática nueva (ninguna portada del sitio centra) + las tarjetas claras = dos
+   concesiones; se le planteó al dueño.
+3. **El recorrido del cliente** ← ai.work. Titular a la izquierda y acción a la derecha; el aro se
+   vuelve un camino que sube con tres paradas: te busca, te encuentra, te escribe y tu asistente
+   le aparta cita. Piezas A-05, I-04, A-07.
+
+**Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
+lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
+
+**Protocolo Ojos:** 2 ciclos de captura y crítica en Chrome sin ventana con emulación por
+protocolo de DevTools (móvil 390 con táctil). Corregido en los ciclos: reloj que chocaba con el
+teléfono (D1), tarjeta de cliente que tapaba la cita (D1), tramo encendido del aro que no llegaba
+a la ficha (D2), "Respuesta en 1 hora hábil" pisada por la parada 3 y paradas solapadas en móvil
+(D3). Son bocetos: falta verificación en el Chrome real cuando se construya.
 
 ## Referencias miradas (en imagen, no leídas) — cuarta vuelta, con Refero
 

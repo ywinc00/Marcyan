@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Houston · Las búsquedas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── escena: el planeta de la marca con su aro; las búsquedas de Houston orbitan en el aro ── */
+.scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(ellipse 900px 300px at 720px 720px,rgba(200,169,110,.16),transparent 70%),
+  radial-gradient(ellipse 1400px 700px at 720px 900px,rgba(200,169,110,.07),transparent 75%),
+  linear-gradient(180deg,#090807 0%,#0f0c08 100%)}
+.planet{position:absolute;width:3200px;height:3200px;left:-880px;top:700px;border-radius:50%;
+  background:radial-gradient(ellipse 1000px 260px at 50% 0,rgba(200,169,110,.20),rgba(138,102,48,.10) 45%,transparent 100%),radial-gradient(closest-side,var(--bg-card) 70%,var(--planet-core) 100%)}
+.planet::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse 900px 180px at 50% 0,rgba(240,237,232,.9) 0%,var(--accent-gold) 30%,rgba(200,169,110,.4) 70%,rgba(200,169,110,.14) 100%);
+  -webkit-mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px));mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px))}
+.ring{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:visible}
+
+/* ── texto centrado ── */
+.copy{position:absolute;z-index:3;left:0;right:0;top:150px;text-align:center}
+.copy .display{margin:22px auto 0;max-width:1000px}
+.copy .lead{margin:22px auto 0;max-width:52ch}
+.actions{margin-top:32px;display:flex;justify-content:center;align-items:center;gap:20px}
+.copy .micro{margin-top:14px}
+
+/* ── búsquedas en el aro ── */
+.q{position:absolute;z-index:2;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:var(--radius-pill);
+  font-size:14px;white-space:nowrap;color:var(--fg-primary);
+  background:linear-gradient(180deg,rgba(28,28,28,.78),rgba(14,14,13,.86));border:1px solid rgba(240,237,232,.12);box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45)}
+.q svg{width:14px;height:14px;color:var(--fg-secondary);flex:none}
+.q--back{opacity:.5;transform:translate(-50%,-50%) scale(.88)}
+.q--lit{border-color:var(--accent-gold-line)}
+.is-story .q--lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(46,36,20,.92),rgba(22,18,12,.92));box-shadow:0 0 0 4px rgba(200,169,110,.10),0 12px 30px rgba(0,0,0,.5)}
+.is-story .q--lit svg{color:var(--accent-gold)}
+.lang-tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.16);border-radius:4px;padding:2px 5px}
+
+/* ── resultado: tu negocio, nombrado ── */
+.found{position:absolute;z-index:3;left:720px;top:740px;transform:translateX(-50%);width:400px;padding:14px 16px;display:none}
+.is-story .found{display:block}
+.found__head{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.found__who{flex:1;line-height:1.25}
+.found__who b{display:block;font-size:16px}
+.found__who span{font-size:13px;color:#4a4640}
+.found .pill{color:#3a3833}
+.found__foot{margin-top:12px;padding-top:10px;border-top:1px solid rgba(8,8,8,.1);display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4a4640}
+.tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824;display:inline-flex;align-items:center;gap:4px}
+.tag svg{width:11px;height:11px}
+.hint{position:absolute;z-index:3;left:0;right:0;top:668px;text-align:center;font-family:var(--font-mono);font-size:var(--text-label);letter-spacing:var(--tracking-wider);color:var(--fg-secondary);text-transform:uppercase}
+.is-story .hint{display:none}
+.lit-arc{opacity:0}
+.is-story .lit-arc{opacity:1}
+
+@media (max-width:600px){
+  .copy{top:104px;text-align:left;padding:0 20px}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy .lead{margin-top:16px;font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .copy .micro{text-align:center;margin-top:8px}
+  .sky{background:radial-gradient(ellipse 380px 160px at 50% 780px,rgba(200,169,110,.2),transparent 70%),linear-gradient(180deg,#090807,#0f0c08)}
+  .planet{width:1400px;height:1400px;left:-505px;top:640px}
+  .ring{display:none}
+  .q{font-size:13px;height:32px;padding:0 12px}
+  .q.m-hide{display:none}
+  .q.m1{left:150px!important;top:600px!important}
+  .q.m2{left:250px!important;top:648px!important}
+  .q.m3{left:196px!important;top:706px!important}
+  .found{left:20px;right:20px;width:auto;transform:none;top:740px}
+  .hint{top:752px}
+}
+</style>
+</head>
+<body>
+<header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+<nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+<div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+<div class="scene" aria-hidden="true">
+  <div class="sky"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="80" data-seed="23"></svg>
+  <!-- mitad trasera del aro: detrás del planeta -->
+  <svg class="ring" viewBox="0 0 1440 900">
+    <defs>
+      <linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+        <stop offset="0" stop-color="#c8a96e" stop-opacity=".15"/><stop offset=".5" stop-color="#f0ede8" stop-opacity=".55"/><stop offset="1" stop-color="#c8a96e" stop-opacity=".15"/>
+      </linearGradient>
+    </defs>
+    <g transform="rotate(-2 720 744)" fill="none" stroke="url(#rg)">
+      <path d="M40 744 A680 130 0 0 1 1400 744" stroke-width="10" opacity=".08"/>
+      <path d="M40 744 A680 130 0 0 1 1400 744" stroke-width="1.4"/>
+    </g>
+  </svg>
+  <div class="planet"></div>
+  <!-- mitad delantera del aro: por delante del planeta -->
+  <svg class="ring" viewBox="0 0 1440 900">
+    <g transform="rotate(-2 720 744)" fill="none">
+      <path d="M40 744 A680 130 0 0 0 1400 744" stroke="url(#rg)" stroke-width="10" opacity=".08"/>
+      <path d="M40 744 A680 130 0 0 0 1400 744" stroke="url(#rg)" stroke-width="1.4"/>
+      <!-- tramo que se enciende: de la búsqueda a tu negocio -->
+      <path class="lit-arc" d="M219 832 A680 130 0 0 0 720 874" stroke="#c8a96e" stroke-width="8" opacity=".22"/><path class="lit-arc" d="M219 832 A680 130 0 0 0 720 874" stroke="#e2cfa4" stroke-width="2.4"/>
+    </g>
+  </svg>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <section class="copy">
+    <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    <p class="lead">Que te encuentren cuando te buscan en Google, en Maps y en la IA, en español y en inglés.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+      <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+    </div>
+    <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+  </section>
+
+  <div class="orbit" aria-label="Búsquedas de ejemplo que hacen los clientes en Houston">
+    <span class="q q--back m-hide" style="left:330px;top:637px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>dentista que hable español en Sugar Land</span>
+    <span class="q q--back m1" style="left:1110px;top:637px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>roofing contractor in Katy <span class="lang-tag">EN</span></span>
+    <span class="q q--back m-hide" style="left:1270px;top:742px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>abogado de inmigración</span>
+    <span class="q m2" style="left:1150px;top:842px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>plomero 24 horas en Houston</span>
+    <span class="q q--lit m3" style="left:260px;top:828px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>taller mecánico que hable español cerca de mí</span>
+  </div>
+
+  <p class="hint">Así te buscan en Houston, todos los días</p>
+
+  <article class="found paper" aria-label="Resultado de ejemplo">
+    <div class="found__head">
+      <span class="avatar">T</span>
+      <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto · Habla español</span></span>
+      <span class="pill">EJEMPLO</span>
+    </div>
+    <div class="found__foot">Te nombran
+      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>Google</span>
+      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>Maps</span>
+      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>La IA</span>
+    </div>
+  </article>
+</main>
+<script src="base.js"></script>
+</body>
+</html>

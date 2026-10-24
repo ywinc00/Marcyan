@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Houston · El recorrido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── escena: el aro del logotipo es el camino del cliente, de la búsqueda a tu WhatsApp ── */
+.scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(ellipse 760px 320px at 1180px 560px,rgba(200,169,110,.17),transparent 70%),
+  radial-gradient(ellipse 1500px 520px at 720px 960px,rgba(200,169,110,.10),transparent 75%),
+  linear-gradient(180deg,#090807 0%,#110d08 100%)}
+.planet{position:absolute;width:3400px;height:3400px;left:-980px;top:780px;border-radius:50%;
+  background:radial-gradient(ellipse 1100px 260px at 50% 0,rgba(200,169,110,.18),rgba(138,102,48,.10) 45%,transparent 100%),radial-gradient(closest-side,var(--bg-card) 70%,var(--planet-core) 100%)}
+.planet::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse 1000px 200px at 50% 0,rgba(240,237,232,.85) 0%,var(--accent-gold) 30%,rgba(200,169,110,.4) 70%,rgba(200,169,110,.14) 100%);
+  -webkit-mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px));mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px))}
+.path{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:visible}
+
+/* ── franja de texto: titular a la izquierda, acción a la derecha ── */
+.copy{position:absolute;z-index:3;left:112px;right:112px;top:128px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);column-gap:64px;align-items:center}
+.copy .display{margin-top:20px}
+.copy__side .lead{max-width:40ch}
+.actions{margin-top:28px;display:flex;align-items:center;gap:20px}
+.copy__side .micro{margin-top:12px}
+
+/* ── estaciones del recorrido ── */
+.st{position:absolute;z-index:2;width:300px}
+.st__k{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:var(--font-mono);font-size:var(--text-label);letter-spacing:var(--tracking-wider);color:var(--fg-secondary);text-transform:uppercase}
+.st__n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--accent-gold-line);color:var(--accent-gold);font-size:11px;letter-spacing:0}
+.card{padding:14px 16px}
+.search{display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;font-size:15px}
+.search svg{width:16px;height:16px;color:#6b665e;flex:none}
+.res{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.res__who{flex:1;line-height:1.25}
+.res__who b{display:block;font-size:15px}
+.res__who span{font-size:12.5px;color:#4a4640}
+.paper .pill{color:#3a3833}
+.res__foot{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);font-size:12.5px;color:#4a4640}
+.wa{display:flex;flex-direction:column;gap:8px}
+.wa__msg{align-self:flex-start;max-width:90%;padding:8px 11px;border-radius:12px;border-bottom-left-radius:4px;background:#fbf8f3;border:1px solid rgba(8,8,8,.07);font-size:13.5px;line-height:1.4}
+.wa__ok{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;background:#1c1c1c;color:var(--fg-primary);font-size:13px}
+.wa__ok svg{width:16px;height:16px;color:var(--accent-gold)}
+.wa__meta{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:#6b665e}
+
+/* pendiente: conserva la forma del resultado */
+.ghost{border:1px dashed rgba(240,237,232,.18);border-radius:var(--radius-lg);background:rgba(240,237,232,.02)}
+.ghost i{display:block;height:10px;border-radius:5px;background:rgba(240,237,232,.08);margin:14px 16px}
+.ghost i:first-child{width:55%}.ghost i:nth-child(2){width:80%}
+.s-story{display:none}
+.is-story .s-story{display:block}
+.is-story .s-rest{display:none}
+.is-story .st--2 .st__n,.is-story .st--3 .st__n{background:var(--accent-gold);color:var(--fg-inverse);border-color:var(--accent-gold)}
+.st--1 .st__n{background:var(--accent-gold);color:var(--fg-inverse);border-color:var(--accent-gold)}
+.lit2,.lit3{opacity:0}
+.is-story .lit2,.is-story .lit3{opacity:1}
+
+/* posiciones sobre el aro (escritorio) */
+.st--1{left:146px;top:684px;width:360px}
+.st--2{left:484px;top:577px;width:340px}
+.st--3{left:967px;top:449px;width:320px}
+
+@media (max-width:600px){
+  .copy{left:20px;right:20px;top:104px;display:block}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy__side{margin-top:16px}
+  .copy__side .lead{font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .copy__side .micro{text-align:center;margin-top:8px}
+  .path,.planet{display:none}
+  .sky{background:radial-gradient(ellipse 380px 260px at 50% 820px,rgba(200,169,110,.16),transparent 70%),linear-gradient(180deg,#090807,#110d08)}
+  .steps{position:absolute;left:52px;right:20px;top:574px;display:flex;flex-direction:column;gap:16px}
+  .st{position:static;width:auto!important}
+  .rail{display:block!important}
+}
+.rail{display:none;position:absolute;left:31px;top:586px;width:2px;height:300px;background:linear-gradient(180deg,var(--accent-gold),rgba(200,169,110,.25));z-index:1}
+</style>
+</head>
+<body>
+<header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+<nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+<div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+<div class="scene" aria-hidden="true">
+  <div class="sky"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="70" data-seed="5"></svg>
+  <div class="planet"></div>
+  <!-- el aro como camino: sube de izquierda a derecha y pasa por las tres estaciones -->
+  <svg class="path" viewBox="0 0 1440 900">
+    <defs>
+      <linearGradient id="pg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+        <stop offset="0" stop-color="#c8a96e" stop-opacity=".1"/><stop offset=".5" stop-color="#c8a96e" stop-opacity=".45"/><stop offset="1" stop-color="#f0ede8" stop-opacity=".6"/>
+      </linearGradient>
+    </defs>
+    <path d="M-60 860 C 300 790, 760 700, 1500 600" fill="none" stroke="url(#pg)" stroke-width="10" opacity=".08"/>
+    <path d="M-60 860 C 300 790, 760 700, 1500 600" fill="none" stroke="url(#pg)" stroke-width="1.4"/>
+    <path d="M-60 860 C 300 790, 760 700, 1500 600" fill="none" stroke="#c8a96e" stroke-width="2.2" stroke-dasharray="380 4000"/>
+    <path class="lit2" d="M-60 860 C 300 790, 760 700, 1500 600" fill="none" stroke="#c8a96e" stroke-width="2.2" stroke-dasharray="1250 4000"/>
+    <circle cx="296" cy="791" r="5" fill="#c8a96e"/>
+    <circle cx="654" cy="721" r="4" fill="#c8a96e" opacity=".5"/>
+    <circle class="lit2" cx="654" cy="721" r="5" fill="#c8a96e"/>
+    <circle cx="1127" cy="653" r="4" fill="#c8a96e" opacity=".5"/>
+    <circle class="lit3" cx="1127" cy="653" r="5" fill="#c8a96e"/>
+  </svg>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <section class="copy">
+    <div>
+      <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+      <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    </div>
+    <div class="copy__side">
+      <p class="lead">Te buscan, te encuentran y te escriben. Tu web, tu IA y tu SEO, hechos por un mismo equipo.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+        <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+      </div>
+      <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+    </div>
+  </section>
+
+  <div class="rail" aria-hidden="true"></div>
+  <ol class="steps" aria-label="Recorrido de un cliente, datos de ejemplo">
+    <li class="st st--1">
+      <div class="st__k"><span class="st__n">1</span>Te busca</div>
+      <div class="paper search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>taller que hable español cerca de mí</div>
+    </li>
+    <li class="st st--2">
+      <div class="st__k"><span class="st__n">2</span>Te encuentra</div>
+      <div class="ghost s-rest"><i></i><i></i></div>
+      <div class="paper card s-story">
+        <div class="res"><span class="avatar">T</span><span class="res__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto ahora</span></span><span class="pill">EJEMPLO</span></div>
+        <div class="res__foot">Aparece en Google, en Maps y en la IA</div>
+      </div>
+    </li>
+    <li class="st st--3">
+      <div class="st__k"><span class="st__n">3</span>Te escribe</div>
+      <div class="ghost s-rest"><i></i><i></i></div>
+      <div class="paper card wa s-story">
+        <div class="wa__meta"><span>WHATSAPP · 9:12 P. M.</span><span>CARLOS</span></div>
+        <p class="wa__msg">¿Me pueden revisar los frenos de la troca mañana?</p>
+        <div class="wa__ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>Tu asistente le apartó cita: mañana 8:30</div>
+      </div>
+    </li>
+  </ol>
+</main>
+<script src="base.js"></script>
+</body>
+</html>

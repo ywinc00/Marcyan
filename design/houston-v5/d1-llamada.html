@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Houston · La llamada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── escena: noche, el teléfono es la única fuente de luz cálida ── */
+.scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.night{position:absolute;inset:0;background:
+  radial-gradient(ellipse 560px 460px at 1012px 470px,rgba(200,169,110,.16),transparent 70%),
+  radial-gradient(ellipse 1200px 380px at 1012px 900px,rgba(200,169,110,.10),transparent 75%),
+  linear-gradient(180deg,#0a0907 0%,#0d0b08 100%)}
+.planet{position:absolute;width:3000px;height:3000px;left:-700px;top:798px;border-radius:50%;
+  background:radial-gradient(ellipse 900px 220px at 50% 0,rgba(200,169,110,.14),rgba(138,102,48,.08) 45%,transparent 100%),radial-gradient(closest-side,var(--bg-card) 70%,var(--planet-core) 100%)}
+.planet::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse 820px 160px at 50% 0,rgba(240,237,232,.85) 0%,var(--accent-gold) 30%,rgba(200,169,110,.35) 70%,rgba(200,169,110,.12) 100%);
+  -webkit-mask-image:radial-gradient(closest-side,transparent calc(100% - 2px),#000 calc(100% - 1px));mask-image:radial-gradient(closest-side,transparent calc(100% - 2px),#000 calc(100% - 1px))}
+
+/* ── texto ── */
+.copy{position:absolute;z-index:2;left:112px;top:196px;width:600px}
+.copy .display{margin-top:24px}
+.copy .lead{margin-top:24px;max-width:46ch}
+.actions{margin-top:36px;display:flex;align-items:center;gap:20px}
+.copy .micro{margin-top:14px}
+
+/* ── escenario: teléfono mínimo (G-07) ── */
+.stage{position:absolute;z-index:2;left:858px;top:132px;width:312px}
+.phone{position:relative;width:312px;height:640px;border-radius:46px;padding:10px;
+  background:linear-gradient(160deg,#1f1d19,#121110 60%,#0c0b0a);
+  box-shadow:0 0 0 1px rgba(200,169,110,.22),0 40px 90px rgba(0,0,0,.65),inset 0 1px 0 rgba(240,237,232,.10)}
+.screen{position:relative;height:100%;border-radius:36px;overflow:hidden;background:#efe9df;color:var(--fg-inverse);display:flex;flex-direction:column}
+.screen__top{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:600;color:#3a3833}
+.notch{position:absolute;left:50%;top:9px;width:92px;height:24px;border-radius:14px;background:#0c0b0a;transform:translateX(-50%)}
+.chat__head{display:flex;align-items:center;gap:10px;padding:10px 16px 12px;border-bottom:1px solid rgba(8,8,8,.08)}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.chat__who{flex:1;min-width:0;line-height:1.25}
+.chat__who b{display:block;font-size:14px}
+.chat__who span{font-size:12px;color:#6b665e;display:inline-flex;align-items:center;gap:5px}
+.chat__who span i{width:6px;height:6px;border-radius:50%;background:var(--accent-teal)}
+.chat__head .pill{color:#3a3833}
+.thread{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.4}
+.sys{align-self:center;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:#6b665e;background:rgba(8,8,8,.05);padding:5px 10px;border-radius:var(--radius-pill)}
+.sys svg{width:12px;height:12px}
+.msg{max-width:84%;padding:9px 12px;border-radius:14px}
+.msg--bot{align-self:flex-start;background:#fbf8f3;border:1px solid rgba(8,8,8,.07);border-bottom-left-radius:4px}
+.msg--me{align-self:flex-end;background:#1c1c1c;color:var(--fg-primary);border-bottom-right-radius:4px}
+.typing{align-self:flex-start;display:inline-flex;gap:4px;padding:12px 14px;background:#fbf8f3;border:1px solid rgba(8,8,8,.07);border-radius:14px;border-bottom-left-radius:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#9a958c}
+.typing i:nth-child(2){opacity:.7}.typing i:nth-child(3){opacity:.45}
+.booked{align-self:flex-start;width:84%;padding:10px 12px;border-radius:12px;background:#1c1c1c;color:var(--fg-primary);display:flex;gap:10px;align-items:center}
+.booked svg{width:18px;height:18px;color:var(--accent-gold);flex:none}
+.booked b{display:block;font-size:13.5px}
+.booked span{font-size:12px;color:var(--fg-secondary)}
+.compose{margin:0 10px 12px;height:40px;border-radius:20px;background:#fbf8f3;border:1px solid rgba(8,8,8,.08);display:flex;align-items:center;padding:0 14px;font-size:13px;color:#9a958c}
+
+/* hora y aviso fuera del teléfono */
+.clock{position:absolute;z-index:3;left:262px;top:494px;width:236px;padding:14px 16px;line-height:1.25}
+.clock b{display:block;font-family:var(--font-display);font-weight:500;font-size:26px;letter-spacing:-.01em}
+.clock span{display:block;margin-top:6px;font-size:13px;color:var(--fg-secondary)}
+.is-story .clock{display:none}
+
+/* tarjeta que le llega al dueño */
+.lead-card{position:absolute;left:262px;top:470px;width:236px;padding:14px 16px}
+.lead-card__k{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:var(--tracking-wider);color:#5d5850}
+.lead-card b{display:block;margin-top:8px;font-family:var(--font-display);font-size:18px;letter-spacing:-.01em}
+.lead-card p{margin-top:4px;font-size:13px;color:#4a4640;line-height:1.45}
+.lead-card .src{margin-top:10px;padding-top:10px;border-top:1px solid rgba(8,8,8,.1);font-size:12px;color:#5d5850}
+
+/* reposo vs historia */
+.s-story{display:none}
+.is-story .s-story{display:flex}
+.is-story .s-rest{display:none}
+.is-story .lead-card.s-story{display:block}
+
+/* ── móvil ── */
+@media (max-width:600px){
+  .night{background:radial-gradient(ellipse 360px 300px at 50% 760px,rgba(200,169,110,.18),transparent 70%),linear-gradient(180deg,#0a0907,#0d0b08)}
+  .planet{display:none}
+  .copy{left:20px;right:20px;top:104px;width:auto}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy .lead{margin-top:16px;font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .actions .btn--primary{width:100%}
+  .actions .btn--ghost{justify-content:center}
+  .copy .micro{text-align:center;margin-top:8px}
+  .stage{left:50%;top:auto;bottom:-330px;transform:translateX(-50%) scale(.86);transform-origin:50% 0}
+  .clock,.lead-card{display:none!important}
+}
+</style>
+</head>
+<body>
+<header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+<nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+<div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+<div class="scene" aria-hidden="true">
+  <div class="night"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="60" data-seed="11"></svg>
+  <div class="planet"></div>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <section class="copy">
+    <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    <p class="lead">Tu web, tu IA y tu SEO trabajando juntos. Aunque cierres a las seis, tu negocio sigue contestando.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+      <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+    </div>
+    <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+  </section>
+
+  <figure class="stage" aria-label="Ejemplo: el asistente de un taller contesta una llamada perdida">
+    <div class="clock glass"><b>11:41 p. m.</b><span>El taller ya cerró. Alguien acaba de llamar.</span></div>
+    <div class="phone"><div class="screen">
+      <div class="notch"></div>
+      <div class="screen__top"><span>11:42</span><span>5G</span></div>
+      <div class="chat__head">
+        <span class="avatar">T</span>
+        <span class="chat__who"><b>Taller Ejemplo</b><span><i></i>Asistente, en línea</span></span>
+        <span class="pill">EJEMPLO</span>
+      </div>
+      <div class="thread">
+        <span class="sys"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/><path d="M16 3l5 5M21 3l-5 5"/></svg>Llamada perdida · 11:41 p. m.</span>
+        <p class="msg msg--bot">Hola, soy el asistente de Taller Ejemplo. Vi que nos llamaste. ¿En qué te ayudo?</p>
+        <span class="typing s-rest"><i></i><i></i><i></i></span>
+        <p class="msg msg--me s-story">Mi troca hace un ruido al frenar. ¿Me la revisan mañana temprano?</p>
+        <p class="msg msg--bot s-story">Claro. Mañana a las 8:30 tenemos espacio. ¿Te lo aparto a tu nombre?</p>
+        <p class="msg msg--me s-story">Sí, porfa. Carlos.</p>
+        <div class="booked s-story"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg><span><b>Cita apartada</b><span>Mañana, 8:30 a. m.</span></span></div>
+      </div>
+      <div class="compose">Escribe un mensaje</div>
+    </div></div>
+    <article class="lead-card paper s-story">
+      <div class="lead-card__k"><span>NUEVO CLIENTE · 11:44 P. M.</span><span class="pill">EJEMPLO</span></div>
+      <b>Carlos, mañana 8:30</b>
+      <p>Revisión de frenos. Te escribió mientras dormías y ya tiene cita.</p>
+      <div class="src">Llegó por una llamada perdida</div>
+    </article>
+  </figure>
+</main>
+<script src="base.js"></script>
+</body>
+</html>

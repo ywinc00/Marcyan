@@ -125,13 +125,13 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
 <script src="base.js"></script>
 <script>
 (function () {
-  const GOLD = '#d6ba80', TEAL = '#4fc3a1';
+  const GOLD = '#dcc089', TEAL = '#4fc3a1';
   const HOUSTON = [-95.369, 29.760];
   const ZONES = [
     { name: 'THE WOODLANDS', q: 'plomero 24 horas', at: [-95.489, 30.166], side: 'up', wire: 54, dx: -70 },
-    { name: 'KATY', q: 'roofing contractor near me', en: true, at: [-95.824, 29.786], side: 'up', wire: 86, dx: -90 },
+    { name: 'KATY', q: 'roofing contractor near me', en: true, at: [-95.824, 29.786], side: 'up', wire: 86, dx: -150 },
     { name: 'SUGAR LAND', q: 'dentista que hable español', at: [-95.635, 29.620], side: 'down', wire: 58, dx: -110 },
-    { name: 'PASADENA', q: 'taller que hable español cerca de mí', at: [-95.209, 29.691], side: 'up', wire: 46, dx: -200, lit: true },
+    { name: 'PASADENA', q: 'taller que hable español cerca de mí', at: [-95.209, 29.691], side: 'up', wire: 46, dx: -120, lit: true },
   ];
   const mobile = () => innerWidth <= 600;
 
@@ -142,32 +142,35 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
       return {
         W, H,
         A: { cx: W * 0.62, cy: H * 0.86, R: Math.min(170, W * 0.44), center: [-97, 33] },
-        B: { cx: W * 0.70, cy: H * 0.97, R: W * 0.60, target: [W * 0.577, H * 0.794], kmpx: 1.5 },
+        B: { cx: W * 0.70, cy: H * 0.97, R: W * 0.60, target: [W * 0.60, H * 0.80], kmpx: 1.4 },
       };
     }
     return {
       W: 1440, H: 900,
       A: { cx: 1080, cy: 470, R: 300, center: [-97, 33] },
-      B: { cx: 1250, cy: 520, R: 400, target: [1060, 440], kmpx: 3.6 },
+      B: { cx: 1250, cy: 520, R: 400, target: [1112, 462], kmpx: 3.3 },
     };
   }
 
   const canvas = document.getElementById('globe');
   const ctx = canvas.getContext('2d');
   let F, dpr, dotPattern;
-  const land110 = { type: 'MultiPolygon', coordinates: GEO.land50 };
+  // en el teléfono, el mapa global ligero (la pantalla es pequeña y el procesador más justo)
+  const landGlobal = () => ({ type: 'MultiPolygon', coordinates: mobile() && GEO.land110.length ? GEO.land110 : GEO.land50 });
+  let land110 = landGlobal();
   const land10 = { type: 'MultiPolygon', coordinates: GEO.tx10 };
   const texas = { type: 'MultiPolygon', coordinates: GEO.texas };
 
   function setup() {
     F = frames();
+    land110 = landGlobal();
     const stageScale = mobile() ? 1 : Math.min(innerWidth / 1440, innerHeight / 900);
     dpr = Math.min(1.75, (window.devicePixelRatio || 1) * stageScale);
     canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
     // trama de puntos en pantalla (como el globo de Cosmos)
-    const p = document.createElement('canvas'), step = 6;
+    const p = document.createElement('canvas'), step = 4.5;
     p.width = p.height = Math.round(step * dpr);
-    const pc = p.getContext('2d'); pc.fillStyle = GOLD; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 1.35 * dpr, 0, Math.PI * 2); pc.fill();
+    const pc = p.getContext('2d'); pc.fillStyle = GOLD; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 1.05 * dpr, 0, Math.PI * 2); pc.fill();
     dotPattern = ctx.createPattern(p, 'repeat');
     if (dotPattern.setTransform) dotPattern.setTransform(new DOMMatrix().scale(1 / dpr));
   }
@@ -182,7 +185,9 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
     const cx = lerp(A.cx, B.cx, e), cy = lerp(A.cy, B.cy, e), R = lerp(A.R, B.R, e);
     const SB = 6371 * B.kmpx;                       // escala final del mapa (px por radio terrestre)
     const S = Math.exp(lerp(Math.log(A.R), Math.log(SB), e));
-    const center = d3.geoInterpolate(A.center, HOUSTON)(Math.min(1, e * 1.15));
+    const base = d3.geoInterpolate(A.center, HOUSTON)(Math.min(1, e * 1.15));
+    const spin = 1.6 * (1 - smooth(0.35, 1, e));      // grados de giro que quedan por hacer
+    const center = [base[0] + spin, base[1]];
     // el centro de la proyección se desplaza hacia el punto donde queda Houston, solo cuando el mapa ya es más grande que el disco
     const k = (1 - R / S) / (1 - B.R / SB);
     const tx = lerp(cx, B.target[0] + (cx - B.cx), Math.max(0, Math.min(1, k)));
@@ -218,9 +223,26 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
     ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
     const path = d3.geoPath(s.proj, ctx);
     const hi = smooth(14, 24, s.zoom);                 // detalle fino de la costa de Texas al acercarse
-    ctx.fillStyle = dotPattern;
-    if (hi < 1) { ctx.globalAlpha = 1 - hi; ctx.beginPath(); path(land110); ctx.fill(); }
-    if (hi > 0) { ctx.globalAlpha = hi; ctx.beginPath(); path(land10); ctx.fill(); }
+    const solid = smooth(8, 28, s.zoom);              // de puntos a color sólido al acercarse
+    // cada capa se traza una vez por fotograma y se reutiliza para relleno y contorno
+    const gp = d3.geoPath(s.proj);
+    const P50 = hi < 1 ? new Path2D(gp(land110) || '') : null;
+    const P10 = hi > 0 ? new Path2D(gp(land10) || '') : null;
+    const fillLand = (style, alpha) => {
+      ctx.fillStyle = style;
+      if (P50) { ctx.globalAlpha = alpha * (1 - hi); ctx.fill(P50); }
+      if (P10) { ctx.globalAlpha = alpha * hi; ctx.fill(P10); }
+    };
+    if (solid < 1) fillLand(dotPattern, 1 - solid);
+    if (solid > 0) {
+      const g = ctx.createRadialGradient(s.cx - s.R * 0.5, s.cy - s.R * 0.45, s.R * 0.08, s.cx - s.R * 0.2, s.cy - s.R * 0.1, s.R * 1.35);
+      g.addColorStop(0, '#9e7d47'); g.addColorStop(0.55, '#6f5531'); g.addColorStop(1, '#3a2c17');
+      fillLand(g, solid);
+    }
+    // contorno fino: define la costa a cualquier distancia
+    ctx.strokeStyle = '#e8d6ae'; ctx.lineWidth = lerp(0.6, 1, solid);
+    if (P50) { ctx.globalAlpha = (1 - hi) * lerp(0.38, 0.6, solid); ctx.stroke(P50); }
+    if (P10) { ctx.globalAlpha = hi * 0.6; ctx.stroke(P10); }
     ctx.globalAlpha = 1;
     // sombra: la cara derecha se apaga (media luna, como el isotipo)
     const sh = ctx.createRadialGradient(s.cx - s.R * 0.55, s.cy - s.R * 0.5, s.R * 0.25, s.cx - s.R * 0.2, s.cy - s.R * 0.15, s.R * 1.55);
@@ -233,12 +255,6 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
     if (tx > 0.01) {
       ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
       ctx.globalAlpha = tx; ctx.strokeStyle = 'rgba(226,207,164,.85)'; ctx.lineWidth = 1.2; ctx.beginPath(); d3.geoPath(s.proj, ctx)(texas); ctx.stroke();
-      ctx.restore(); ctx.globalAlpha = 1;
-    }
-    // costa en línea fina cuando el mapa ya está cerca (se lee como mapa, no como trama)
-    if (hi > 0.05) {
-      ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
-      ctx.globalAlpha = hi * 0.55; ctx.strokeStyle = '#e2cfa4'; ctx.lineWidth = 1; ctx.beginPath(); d3.geoPath(s.proj, ctx)(land10); ctx.stroke();
       ctx.restore(); ctx.globalAlpha = 1;
     }
     // filo de luz en el borde iluminado

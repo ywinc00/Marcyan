@@ -166,6 +166,17 @@ aceleración gráfica (la primera versión con capas superpuestas daba 53 ms: ti
 **Al construir:** d3 completo pesa ~280 KB; en producción basta `d3-geo` (~30 KB) cargado tras la
 primera pintura, y la imagen inicial puede ir pre-renderizada para no tocar el LCP.
 
+**v4.1 · afinado del dueño (2026-10-24).** (1) Continente más preciso: mapa de 50 m simplificado
+(Douglas–Peucker 0,05°) en vez del de 110 m, trama más fina (cada 4,5 px, punto de 1,05 px) y contorno
+de costa en línea fina; en el teléfono se usa el de 110 m por rendimiento. (2) Pequeño giro sobre su eje
+al acercarse: el globo gira 1,6° hacia el oeste en la segunda mitad del acercamiento y el encuadre final
+deja Texas algo más centrado (Houston pasa a 1112,462 y la escala a 3,3 px/km). (3) Al acercarse, la
+trama de puntos se funde en color sólido (entre ×8 y ×28 de acercamiento), en un bronce de la familia
+oro más oscuro que el botón (#9e7d47 → #3a2c17) para no apagar el titular ni las etiquetas (E-14).
+Etiquetas de Katy y Pasadena separadas para que cada hilo se lea con su punto. Fluidez: 9 ms por
+fotograma medido sin aceleración gráfica (con aceleración, bastante menos), trazados reutilizados por
+fotograma. Datos: 359 KB en el prototipo; en producción se recortan.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

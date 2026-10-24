@@ -99,7 +99,7 @@ teléfono como segunda acción y "Respuesta en 1 hora hábil" de siempre; sin pr
 1. **La llamada perdida** ← Cal.ai. Texto a la izquierda, teléfono mínimo a la derecha: 11:41 p. m.,
    el taller cerró, la IA contesta la llamada perdida por mensaje y aparta cita; al dueño le llega
    "Nuevo cliente". Piezas A-05, G-07, A-07.
-2. **Las búsquedas en órbita** ← Raycast. Titular centrado; el planeta del isotipo con su aro y
+2. **Las búsquedas en órbita** ← Raycast (sustituida en el repaso, ver abajo). Titular centrado; el planeta del isotipo con su aro y
    búsquedas de clientes de Houston (ES/EN) girando; una se enciende y el aro la lleva a la ficha
    del negocio que Google, Maps y la IA nombran. Piezas G-09, F-06, A-07. **Ojo E-31:** centrar el
    titular es gramática nueva (ninguna portada del sitio centra) + las tarjetas claras = dos
@@ -107,6 +107,27 @@ teléfono como segunda acción y "Respuesta en 1 hora hábil" de siempre; sin pr
 3. **El recorrido del cliente** ← ai.work. Titular a la izquierda y acción a la derecha; el aro se
    vuelve un camino que sube con tres paradas: te busca, te encuentra, te escribe y tu asistente
    le aparta cita. Piezas A-05, I-04, A-07.
+
+**Repaso del mismo día con el buscador de estilos ya funcionando.** 9 búsquedas de estilos por
+tema (llamadas e IA, planeta y órbitas, recorrido del cliente), 36 vistas previas miradas en tres
+hojas de contacto. Cambios:
+- **1 · La llamada perdida → Dimension** (estilo `f2951292-dcf2-48db-af42-4bb3b783eb6e`, "la IA que
+  nunca duerme"): línea con lugar y hora sobre la escena y resumen de la noche. La portada pasa de
+  las 11:41 p. m. (reposo) a las 8:00 a. m. (historia, el cielo amanece) y la tarjeta del dueño es
+  "Mientras dormías: 1 cliente nuevo". El teléfono sigue saliendo de Cal.ai `10196b83`.
+- **2 · Las búsquedas de Houston → Cosmos** (estilo `227f384c-28b0-4195-a94c-d5e9911cd803`): texto
+  a la IZQUIERDA y planeta a la derecha con puntos que laten y etiquetas (zona + búsqueda). **Ya no
+  centra el titular: desaparece la concesión de gramática (E-31).** La búsqueda de Pasadena se
+  enciende y un hilo dorado baja hasta la ficha del negocio.
+- **3 · El recorrido** se queda con ai.work `5e7f709b`: Genway `c770834d` (pasos en la portada),
+  Mintlify `27815973`, Duna `2681e09e` y Portal `7f2e567d` no aportan relato.
+Miradas y descartadas (estilos): Vapi `11db6cab`, Applied Labs `9b153e60` (pide foto de persona),
+Giga `b37d0708`, AIUC `a4aebfee`, Superwhisper `a3afe0c0`, Quo `07447756`, Honk `856297f1`, Textla
+`2eb942b8`, Stocketa `a7a9b702`, Operate `a0f473eb`, Voiceflow `7e979bac`, Rally `37afcd4b`, Circle
+`614a17bc`, Gt-planar `8ac461ad`, Apollo `e7ffa47a`, Eclipse `e16ba0e1`, Galileo `5f1aae03`,
+Geniestudio `5d7ed901`, Balsa `09316ffe`, BlueYard `8f1d3ac2`, Elementor `86351665`, Desktop.fm
+`5b70f172`, TheyDo `9b86f70b`, customer.io `80dfc59f`, Adora `21ec5f01`, Portrait `0a8a4374`,
+Antimetal `d2eb4c56`, Hey Low `f0c45744`, Browserbase `1c88fb20`.
 
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).

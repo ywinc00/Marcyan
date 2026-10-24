@@ -28,7 +28,15 @@
 .copy .micro{margin-top:14px}
 
 /* ── escenario: teléfono mínimo (G-07) ── */
-.stage{position:absolute;z-index:2;left:858px;top:132px;width:312px}
+.stage{position:absolute;z-index:2;left:858px;top:156px;width:312px}
+.when{position:absolute;z-index:2;left:858px;right:0;top:112px;display:flex;align-items:center;gap:14px;font-family:var(--font-mono);font-size:var(--text-label);letter-spacing:var(--tracking-wider);color:var(--fg-secondary);text-transform:uppercase;white-space:nowrap}
+.when::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(240,237,232,.22),transparent)}
+.when b{color:var(--fg-primary);font-weight:500}
+.is-story .when b{color:var(--accent-gold)}
+/* amanecer: la historia termina a las 8 de la mañana */
+.dawn{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse 1100px 380px at 620px 900px,rgba(226,176,104,.50),transparent 72%),radial-gradient(ellipse 1600px 680px at 620px 1000px,rgba(200,169,110,.24),transparent 75%),linear-gradient(180deg,rgba(26,20,13,0) 30%,rgba(40,29,16,.55) 100%)}
+.is-story .dawn{opacity:1}
+.is-story .stars{opacity:.35}
 .phone{position:relative;width:312px;height:640px;border-radius:46px;padding:10px;
   background:linear-gradient(160deg,#1f1d19,#121110 60%,#0c0b0a);
   box-shadow:0 0 0 1px rgba(200,169,110,.22),0 40px 90px rgba(0,0,0,.65),inset 0 1px 0 rgba(240,237,232,.10)}
@@ -73,6 +81,8 @@
 /* reposo vs historia */
 .s-story{display:none}
 .is-story .s-story{display:flex}
+.is-story span.s-story{display:inline}
+.is-story .when .s-story{display:inline}
 .is-story .s-rest{display:none}
 .is-story .lead-card.s-story{display:block}
 
@@ -89,6 +99,7 @@
   .copy .micro{text-align:center;margin-top:8px}
   .stage{left:50%;top:auto;bottom:-330px;transform:translateX(-50%) scale(.86);transform-origin:50% 0}
   .clock,.lead-card{display:none!important}
+  .when{left:20px;right:20px;top:auto;bottom:326px;font-size:11px}
 }
 </style>
 </head>
@@ -99,6 +110,7 @@
 
 <div class="scene" aria-hidden="true">
   <div class="night"></div>
+  <div class="dawn"></div>
   <svg class="stars" viewBox="0 0 1440 640" data-n="60" data-seed="11"></svg>
   <div class="planet"></div>
   <div class="grain"></div>
@@ -108,7 +120,7 @@
   <section class="copy">
     <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
     <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
-    <p class="lead">Tu web, tu IA y tu SEO trabajando juntos. Aunque cierres a las seis, tu negocio sigue contestando.</p>
+    <p class="lead">Tu web, tu IA y tu SEO trabajando juntos. Tú cierras a las seis y tu negocio sigue contestando.</p>
     <div class="actions">
       <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
       <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
@@ -116,11 +128,12 @@
     <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
   </section>
 
+  <p class="when" aria-hidden="true"><span class="s-rest">Houston · <b>11:41 p. m.</b> · el taller cerró</span><span class="s-story">Houston · <b>8:00 a. m.</b> · al abrir</span></p>
   <figure class="stage" aria-label="Ejemplo: el asistente de un taller contesta una llamada perdida">
     <div class="clock glass"><b>11:41 p. m.</b><span>El taller ya cerró. Alguien acaba de llamar.</span></div>
     <div class="phone"><div class="screen">
       <div class="notch"></div>
-      <div class="screen__top"><span>11:42</span><span>5G</span></div>
+      <div class="screen__top"><span><span class="s-rest">11:42</span><span class="s-story">8:00</span></span><span>5G</span></div>
       <div class="chat__head">
         <span class="avatar">T</span>
         <span class="chat__who"><b>Taller Ejemplo</b><span><i></i>Asistente, en línea</span></span>
@@ -138,10 +151,10 @@
       <div class="compose">Escribe un mensaje</div>
     </div></div>
     <article class="lead-card paper s-story">
-      <div class="lead-card__k"><span>NUEVO CLIENTE · 11:44 P. M.</span><span class="pill">EJEMPLO</span></div>
-      <b>Carlos, mañana 8:30</b>
-      <p>Revisión de frenos. Te escribió mientras dormías y ya tiene cita.</p>
-      <div class="src">Llegó por una llamada perdida</div>
+      <div class="lead-card__k"><span>MIENTRAS DORMÍAS</span><span class="pill">EJEMPLO</span></div>
+      <b>1 cliente nuevo</b>
+      <p>Carlos, revisión de frenos. Llamó a las 11:41 p. m. y tiene cita hoy a las 8:30.</p>
+      <div class="src">Tu asistente lo atendió en español</div>
     </article>
   </figure>
 </main>

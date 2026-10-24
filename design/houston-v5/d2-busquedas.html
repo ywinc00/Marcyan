@@ -8,70 +8,75 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="base.css">
 <style>
-/* ── escena: el planeta de la marca con su aro; las búsquedas de Houston orbitan en el aro ── */
+/* ── principio de Cosmos: texto a la izquierda; a la derecha un planeta con puntos que laten
+      y etiquetas colgadas de cada punto. Aquí el planeta es el de la marca y cada punto es una
+      zona de Houston con lo que la gente busca allí. ── */
 .scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .sky{position:absolute;inset:0;background:
-  radial-gradient(ellipse 900px 300px at 720px 720px,rgba(200,169,110,.16),transparent 70%),
-  radial-gradient(ellipse 1400px 700px at 720px 900px,rgba(200,169,110,.07),transparent 75%),
-  linear-gradient(180deg,#090807 0%,#0f0c08 100%)}
-.planet{position:absolute;width:3200px;height:3200px;left:-880px;top:700px;border-radius:50%;
-  background:radial-gradient(ellipse 1000px 260px at 50% 0,rgba(200,169,110,.20),rgba(138,102,48,.10) 45%,transparent 100%),radial-gradient(closest-side,var(--bg-card) 70%,var(--planet-core) 100%)}
-.planet::before{content:"";position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(ellipse 900px 180px at 50% 0,rgba(240,237,232,.9) 0%,var(--accent-gold) 30%,rgba(200,169,110,.4) 70%,rgba(200,169,110,.14) 100%);
-  -webkit-mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px));mask-image:radial-gradient(closest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1px))}
+  radial-gradient(ellipse 620px 520px at 1080px 470px,rgba(200,169,110,.12),transparent 70%),
+  linear-gradient(180deg,#090807 0%,#0d0b08 100%)}
+.world{position:absolute;left:0;top:0;width:1440px;height:900px}
+.planet{position:absolute;left:780px;top:170px;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#2c2318 0%,#17130e 42%,#0b0a08 74%);
+  box-shadow:inset 10px 12px 26px -10px rgba(226,207,164,.55),inset -40px -50px 90px rgba(0,0,0,.6),0 0 120px rgba(200,169,110,.10)}
+.planet::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background-image:radial-gradient(rgba(240,237,232,.30) 1px,transparent 1.5px);background-size:9px 9px;
+  -webkit-mask-image:radial-gradient(circle at 36% 32%,#000 0%,rgba(0,0,0,.55) 45%,transparent 78%);mask-image:radial-gradient(circle at 36% 32%,#000 0%,rgba(0,0,0,.55) 45%,transparent 78%)}
 .ring{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:visible}
 
-/* ── texto centrado ── */
-.copy{position:absolute;z-index:3;left:0;right:0;top:150px;text-align:center}
-.copy .display{margin:22px auto 0;max-width:1000px}
-.copy .lead{margin:22px auto 0;max-width:52ch}
-.actions{margin-top:32px;display:flex;justify-content:center;align-items:center;gap:20px}
+/* ── texto: gramática del sitio, a la izquierda ── */
+.copy{position:absolute;z-index:3;left:112px;top:196px;width:600px}
+.copy .display{margin-top:24px}
+.copy .lead{margin-top:24px;max-width:38ch}
+.actions{margin-top:36px;display:flex;align-items:center;gap:20px}
 .copy .micro{margin-top:14px}
 
-/* ── búsquedas en el aro ── */
-.q{position:absolute;z-index:2;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:var(--radius-pill);
-  font-size:14px;white-space:nowrap;color:var(--fg-primary);
-  background:linear-gradient(180deg,rgba(28,28,28,.78),rgba(14,14,13,.86));border:1px solid rgba(240,237,232,.12);box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45)}
-.q svg{width:14px;height:14px;color:var(--fg-secondary);flex:none}
-.q--back{opacity:.5;transform:translate(-50%,-50%) scale(.88)}
-.q--lit{border-color:var(--accent-gold-line)}
-.is-story .q--lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(46,36,20,.92),rgba(22,18,12,.92));box-shadow:0 0 0 4px rgba(200,169,110,.10),0 12px 30px rgba(0,0,0,.5)}
-.is-story .q--lit svg{color:var(--accent-gold)}
-.lang-tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.16);border-radius:4px;padding:2px 5px}
+/* ── puntos y etiquetas ── */
+.pt{position:absolute;z-index:2;width:0;height:0}
+.pt i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--fg-primary);opacity:.85}
+.pt b{position:absolute;border-radius:50%;border:1px solid rgba(240,237,232,.28);transform:translate(-50%,-50%)}
+.pt b:nth-of-type(1){width:26px;height:26px}.pt b:nth-of-type(2){width:46px;height:46px;opacity:.6}.pt b:nth-of-type(3){width:70px;height:70px;opacity:.3}
+.tag{position:absolute;z-index:3;display:grid;gap:3px;padding:8px 12px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,rgba(28,28,28,.82),rgba(14,14,13,.9));border:1px solid rgba(240,237,232,.12);box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
+.tag small{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--tracking-wider);color:var(--fg-secondary)}
+.tag span{font-size:14px;color:var(--fg-primary);display:inline-flex;align-items:center;gap:8px}
+.tag .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.16);border-radius:4px;padding:1px 5px}
+.wire{position:absolute;z-index:2;background:rgba(240,237,232,.25)}
+/* encendido: el punto de Pasadena y su búsqueda */
+.is-story .pt--lit i{background:var(--accent-gold);opacity:1}
+.is-story .pt--lit b{border-color:rgba(200,169,110,.7)}
+.is-story .tag--lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(46,36,20,.94),rgba(22,18,12,.94))}
+.is-story .tag--lit small{color:var(--accent-gold)}
+.is-story .wire--lit{background:var(--accent-gold)}
+.wire--down{display:none}
+.is-story .wire--down{display:block;background:linear-gradient(180deg,var(--accent-gold),rgba(200,169,110,.35))}
+.tag--dim{opacity:.62}
+.m-only{display:none}
 
-/* ── resultado: tu negocio, nombrado ── */
-.found{position:absolute;z-index:3;left:720px;top:740px;transform:translateX(-50%);width:400px;padding:14px 16px;display:none}
+/* resultado */
+.found{position:absolute;z-index:4;left:988px;top:664px;width:340px;padding:14px 16px;display:none}
 .is-story .found{display:block}
 .found__head{display:flex;align-items:center;gap:10px}
 .avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
 .found__who{flex:1;line-height:1.25}
-.found__who b{display:block;font-size:16px}
-.found__who span{font-size:13px;color:#4a4640}
+.found__who b{display:block;font-size:15px}
+.found__who span{font-size:12.5px;color:#4a4640}
 .found .pill{color:#3a3833}
-.found__foot{margin-top:12px;padding-top:10px;border-top:1px solid rgba(8,8,8,.1);display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4a4640}
-.tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824;display:inline-flex;align-items:center;gap:4px}
-.tag svg{width:11px;height:11px}
-.hint{position:absolute;z-index:3;left:0;right:0;top:668px;text-align:center;font-family:var(--font-mono);font-size:var(--text-label);letter-spacing:var(--tracking-wider);color:var(--fg-secondary);text-transform:uppercase}
-.is-story .hint{display:none}
-.lit-arc{opacity:0}
-.is-story .lit-arc{opacity:1}
+.found__foot{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#4a4640}
+.chk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824}
 
 @media (max-width:600px){
-  .copy{top:104px;text-align:left;padding:0 20px}
+  .copy{left:20px;right:20px;top:104px;width:auto}
   .copy .display{margin-top:16px;font-size:40px}
   .copy .lead{margin-top:16px;font-size:17px}
   .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
   .copy .micro{text-align:center;margin-top:8px}
-  .sky{background:radial-gradient(ellipse 380px 160px at 50% 780px,rgba(200,169,110,.2),transparent 70%),linear-gradient(180deg,#090807,#0f0c08)}
-  .planet{width:1400px;height:1400px;left:-505px;top:640px}
-  .ring{display:none}
-  .q{font-size:13px;height:32px;padding:0 12px}
-  .q.m-hide{display:none}
-  .q.m1{left:150px!important;top:600px!important}
-  .q.m2{left:250px!important;top:648px!important}
-  .q.m3{left:196px!important;top:706px!important}
-  .found{left:20px;right:20px;width:auto;transform:none;top:740px}
-  .hint{top:752px}
+  .world{transform:translate(-400px,470px) scale(.62);transform-origin:0 0}
+  .world .tag,.world .wire{display:none}
+  .m-only{display:grid;left:20px;top:596px}
+  .sky{background:radial-gradient(ellipse 360px 300px at 50% 820px,rgba(200,169,110,.16),transparent 70%),linear-gradient(180deg,#090807,#0d0b08)}
+  .m-hide{display:none}
+  .found{left:20px;right:20px;width:auto;top:676px}
 }
 </style>
 </head>
@@ -82,29 +87,7 @@
 
 <div class="scene" aria-hidden="true">
   <div class="sky"></div>
-  <svg class="stars" viewBox="0 0 1440 640" data-n="80" data-seed="23"></svg>
-  <!-- mitad trasera del aro: detrás del planeta -->
-  <svg class="ring" viewBox="0 0 1440 900">
-    <defs>
-      <linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
-        <stop offset="0" stop-color="#c8a96e" stop-opacity=".15"/><stop offset=".5" stop-color="#f0ede8" stop-opacity=".55"/><stop offset="1" stop-color="#c8a96e" stop-opacity=".15"/>
-      </linearGradient>
-    </defs>
-    <g transform="rotate(-2 720 744)" fill="none" stroke="url(#rg)">
-      <path d="M40 744 A680 130 0 0 1 1400 744" stroke-width="10" opacity=".08"/>
-      <path d="M40 744 A680 130 0 0 1 1400 744" stroke-width="1.4"/>
-    </g>
-  </svg>
-  <div class="planet"></div>
-  <!-- mitad delantera del aro: por delante del planeta -->
-  <svg class="ring" viewBox="0 0 1440 900">
-    <g transform="rotate(-2 720 744)" fill="none">
-      <path d="M40 744 A680 130 0 0 0 1400 744" stroke="url(#rg)" stroke-width="10" opacity=".08"/>
-      <path d="M40 744 A680 130 0 0 0 1400 744" stroke="url(#rg)" stroke-width="1.4"/>
-      <!-- tramo que se enciende: de la búsqueda a tu negocio -->
-      <path class="lit-arc" d="M219 832 A680 130 0 0 0 720 874" stroke="#c8a96e" stroke-width="8" opacity=".22"/><path class="lit-arc" d="M219 832 A680 130 0 0 0 720 874" stroke="#e2cfa4" stroke-width="2.4"/>
-    </g>
-  </svg>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="70" data-seed="31"></svg>
   <div class="grain"></div>
 </div>
 
@@ -120,28 +103,42 @@
     <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
   </section>
 
-  <div class="orbit" aria-label="Búsquedas de ejemplo que hacen los clientes en Houston">
-    <span class="q q--back m-hide" style="left:330px;top:637px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>dentista que hable español en Sugar Land</span>
-    <span class="q q--back m1" style="left:1110px;top:637px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>roofing contractor in Katy <span class="lang-tag">EN</span></span>
-    <span class="q q--back m-hide" style="left:1270px;top:742px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>abogado de inmigración</span>
-    <span class="q m2" style="left:1150px;top:842px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>plomero 24 horas en Houston</span>
-    <span class="q q--lit m3" style="left:260px;top:828px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>taller mecánico que hable español cerca de mí</span>
-  </div>
+  <figure class="world" aria-label="Búsquedas de ejemplo en zonas de Houston">
+    <!-- mitad trasera del aro -->
+    <svg class="ring" viewBox="0 0 1440 900" aria-hidden="true"><g transform="rotate(-13 1080 470)" fill="none" stroke="#c8a96e"><path d="M720 470 A360 80 0 0 1 1440 470" stroke-width="10" opacity=".05"/><path d="M720 470 A360 80 0 0 1 1440 470" stroke-width="1.2" opacity=".45"/></g></svg>
+    <div class="planet"></div>
+    <!-- mitad delantera del aro -->
+    <svg class="ring" viewBox="0 0 1440 900" aria-hidden="true"><g transform="rotate(-13 1080 470)" fill="none" stroke="#c8a96e"><path d="M720 470 A360 80 0 0 0 1440 470" stroke-width="10" opacity=".07"/><path d="M720 470 A360 80 0 0 0 1440 470" stroke-width="1.4" opacity=".7"/></g></svg>
 
-  <p class="hint">Así te buscan en Houston, todos los días</p>
+    <!-- The Woodlands -->
+    <span class="pt m-hide" style="left:1070px;top:262px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire m-hide" style="left:1070px;top:206px;width:1px;height:56px"></span>
+    <span class="tag tag--dim m-hide" style="left:1070px;top:150px"><small>THE WOODLANDS</small><span>plomero 24 horas</span></span>
+    <!-- Katy (inglés) -->
+    <span class="pt" style="left:880px;top:392px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire" style="left:880px;top:330px;width:1px;height:62px"></span>
+    <span class="tag tag--dim" style="left:760px;top:276px"><small>KATY</small><span>roofing contractor near me <span class="en">EN</span></span></span>
+    <!-- Sugar Land -->
+    <span class="pt m-hide" style="left:950px;top:600px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire m-hide" style="left:950px;top:600px;width:1px;height:76px"></span>
+    <span class="tag tag--dim m-hide" style="left:790px;top:676px"><small>SUGAR LAND</small><span>dentista que hable español</span></span>
+    <!-- Pasadena: la que se enciende -->
+    <span class="pt pt--lit" style="left:1196px;top:478px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire wire--lit" style="left:1196px;top:430px;width:1px;height:48px"></span>
+    <span class="wire wire--down" style="left:1196px;top:486px;width:1px;height:178px"></span>
+    <span class="tag tag--lit" style="left:1040px;top:374px"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
 
+
+  </figure>
+  <span class="tag tag--lit m-only"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
   <article class="found paper" aria-label="Resultado de ejemplo">
-    <div class="found__head">
-      <span class="avatar">T</span>
-      <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto · Habla español</span></span>
-      <span class="pill">EJEMPLO</span>
-    </div>
-    <div class="found__foot">Te nombran
-      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>Google</span>
-      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>Maps</span>
-      <span class="tag"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.3l2.2 2.2 4.8-5"/></svg>La IA</span>
-    </div>
-  </article>
+      <div class="found__head">
+        <span class="avatar">T</span>
+        <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto ahora</span></span>
+        <span class="pill">EJEMPLO</span>
+      </div>
+      <div class="found__foot">Te nombran <span class="chk">✓ Google</span><span class="chk">✓ Maps</span><span class="chk">✓ La IA</span></div>
+    </article>
 </main>
 <script src="base.js"></script>
 </body>

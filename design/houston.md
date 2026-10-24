@@ -2,7 +2,7 @@
 
 Proyecto: Marcyan Web  ·  Página/Vista: hub de ciudad de Houston, rediseño completo
 Modo: **REDISEÑO / LANDING-CON-IDENTIDAD**
-Estado: **PROPUESTO**, quinta vuelta: tres portadas a elegir. Fecha: 2026-10-24.
+Estado: **DIRECCIÓN ELEGIDA por el dueño (2026-10-24): la 2, "el planeta de Marcyan sobre Houston"**. Versión trabajada pendiente de su OK para construir la landing entera. Prototipo en movimiento: https://claude.ai/artifact/Lo2sarETumZn9rw7Xt1dKj (fuente `design/houston-v5/d2-houston.html`).
 Lienzo de decisión (artifact): "Portadas de Houston" https://claude.ai/artifact/NJ4MWBRy8AHnEFQjMY8u47
 (cada boceto junto a su referencia de Refero; reposo, historia completa y móvil). Bocetos
 fuente en `design/houston-v5/`. La cuarta vuelta ("arte propio") queda como historial.
@@ -128,6 +128,21 @@ Giga `b37d0708`, AIUC `a4aebfee`, Superwhisper `a3afe0c0`, Quo `07447756`, Honk 
 Geniestudio `5d7ed901`, Balsa `09316ffe`, BlueYard `8f1d3ac2`, Elementor `86351665`, Desktop.fm
 `5b70f172`, TheyDo `9b86f70b`, customer.io `80dfc59f`, Adora `21ec5f01`, Portrait `0a8a4374`,
 Antimetal `d2eb4c56`, Hey Low `f0c45744`, Browserbase `1c88fb20`.
+
+**La 2 trabajada (v3, 2026-10-24).** El dueño la eligió "por ser la que más nos representa y la
+más interesante". Cambios: (1) el planeta es EL MISMO de la portada principal (`Hero.astro`: oro →
+oro hondo → núcleo, media luna en sombra, aro a −18°, satélite teal = IA), a escala de paisaje y
+saliéndose por la derecha (principio de SpaceX, estilo `7f5db065-f181-4612-90e4-9b5dc1bd4e96`);
+(2) cuatro zonas (The Woodlands, Katy en inglés, Sugar Land, Pasadena) con punto que late y etiqueta
+zona + búsqueda (Cosmos `227f384c`); (3) historia en un gesto: entran las etiquetas escalonadas,
+a los 2,3 s se enciende Pasadena, baja el hilo dorado, sube la ficha "Taller Ejemplo" y el satélite
+de la IA da un pulso nítido (sin halo, E-03) junto a "Tu asistente le contesta en español, 24/7";
+después solo laten los puntos. Con movimiento reducido se ve directamente el final. Piezas G-09,
+F-06, F-03. Dos ciclos de captura y crítica: satélite tapado por una etiqueta, etiqueta pegada a la
+ficha, hilos que aparecían antes que su etiqueta y frase partida en móvil, corregidos.
+**Al construir:** convertir el planeta en componente reutilizable con `Hero.astro` (mismo trazo y
+gradientes por token), etiquetas y puntos como datos en `houston.ts`/`houston.en.ts`, y verificar
+movimiento en el Chrome real (E-09).
 
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).

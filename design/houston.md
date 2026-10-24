@@ -144,6 +144,28 @@ ficha, hilos que aparecían antes que su etiqueta y frase partida en móvil, cor
 gradientes por token), etiquetas y puntos como datos en `houston.ts`/`houston.en.ts`, y verificar
 movimiento en el Chrome real (E-09).
 
+**v4 · el planeta que se acerca (encargo del dueño, 2026-10-24).** Mezcla de ideas: (1) al cargar,
+el planeta con el tamaño y encuadre del boceto 2 del lienzo (centro 1080,470, radio 300, aro corto a
+−13°); (2) planeta NEGRO como el globo de Cosmos, con los continentes en trama de puntos DORADOS;
+(3) al primer gesto del visitante (ratón, rueda, toque, tecla; si no hay gesto, a los 3 s) se acerca
+en 2,6 s al encuadre del prototipo v3 (centro 1250,520, radio 400, aro −18°). **El globo solo crece
+hasta ese tamaño; lo que se acerca de verdad es el MAPA** (regla del dueño: si los puntos van sobre un
+mapa lejano de EE. UU. quedan amontonados): pasa por Norteamérica, el contorno de Texas y la costa del
+Golfo, y termina a ~3,6 px por km sobre Houston, con la bahía de Galveston y la costa en línea fina,
+para que The Woodlands, Katy, Sugar Land y Pasadena queden separados 150 a 250 px. (4) Las búsquedas
+SALEN desde el punto de Houston en curva hacia su sitio, se dibujan los hilos y sigue la historia
+(Pasadena, ficha, pulso del satélite de la IA). Móvil: globo abajo, acercamiento a la bahía, puntos sin
+etiquetas y la ficha abajo.
+Técnica: lienzo 2D con proyección ortográfica de d3, escala del mapa interpolada en logaritmo y el
+centro de la proyección desplazado solo cuando el mapa ya supera el disco (nunca se ve el borde del
+hemisferio). Datos abiertos Natural Earth (world-atlas 110m global + 10m recortado a Texas, us-atlas
+para Texas) decodificados con `planeta/geo-prep.mjs` sin ejecutar código descargado: 104 KB. Trama de
+puntos en pantalla rellenando la tierra con un patrón (una pasada): **2 ms por fotograma** medido sin
+aceleración gráfica (la primera versión con capas superpuestas daba 53 ms: tirones). Fuente:
+`design/houston-v5/planeta/`. Prototipo: https://claude.ai/artifact/J51LYU7au8VD9w87mEjZMQ
+**Al construir:** d3 completo pesa ~280 KB; en producción basta `d3-geo` (~30 KB) cargado tras la
+primera pintura, y la imagen inicial puede ir pre-renderizada para no tocar el LCP.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

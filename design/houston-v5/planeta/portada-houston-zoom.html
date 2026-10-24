@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portada de Houston</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Portada de Houston, versión 4 (encargo del dueño, 2026-10-24):
+   1) Al cargar, el planeta con el tamaño y el encuadre del boceto 2 del lienzo.
+   2) Planeta negro como el globo de Cosmos, con los continentes en puntos dorados de la marca.
+   3) Al primer gesto del visitante, se acerca hasta el encuadre del prototipo en movimiento: el globo
+      crece solo hasta ese tamaño, pero el MAPA se acerca mucho más, pasando por EE. UU. y Texas
+      hasta Houston, para que los puntos queden separados.
+   4) Las búsquedas salen desde Houston hacia sus posiciones; sigue la historia (Pasadena, ficha, IA). */
+:root{--ease:cubic-bezier(.22,.61,.36,1)}
+html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
+.stage{position:absolute;left:0;top:0;width:1440px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg-base)}
+.sky{position:absolute;inset:0;background:radial-gradient(ellipse 760px 640px at 1120px 480px,rgba(200,169,110,.08),transparent 70%),linear-gradient(180deg,#090807 0%,#0b0a08 100%)}
+#globe{position:absolute;left:0;top:0;width:1440px;height:900px;z-index:2}
+#wires{position:absolute;left:0;top:0;width:1440px;height:900px;z-index:3;pointer-events:none;overflow:visible}
+#wires line{stroke:rgba(240,237,232,.42);stroke-width:1}
+#wires line.lit{stroke:var(--accent-gold)}
+#wires line.down{stroke:url(#gdown);stroke-width:1.2}
+
+/* texto: gramática del sitio */
+.copy{position:absolute;z-index:5;left:112px;top:196px;width:600px}
+.copy .display{margin-top:24px}
+.copy .lead{margin-top:24px;max-width:38ch}
+.actions{margin-top:36px;display:flex;align-items:center;gap:20px}
+.copy .micro{margin-top:14px}
+
+/* puntos y etiquetas (los coloca el script según el mapa) */
+.pt{position:absolute;z-index:4;width:0;height:0;opacity:0;transition:opacity .4s var(--ease)}
+.pt.on{opacity:1}
+.pt i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:#0b0906;box-shadow:0 0 0 2px rgba(240,237,232,.9);transition:background .4s var(--ease),box-shadow .4s var(--ease)}
+.pt b{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:1px solid rgba(240,237,232,.55);opacity:0}
+.pt.on b{animation:pulse 3.6s var(--ease) infinite}
+.pt.on b+b{animation-delay:1.2s}
+@keyframes pulse{0%{transform:scale(.25);opacity:.9}70%{opacity:.15}100%{transform:scale(1.6);opacity:0}}
+.pt.lit i{background:var(--accent-gold);box-shadow:0 0 0 2px var(--accent-gold),0 0 0 7px rgba(200,169,110,.18)}
+.pt.lit b{border-color:rgba(226,207,164,.9)}
+.tag{position:absolute;z-index:6;display:grid;gap:3px;padding:8px 12px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,rgba(24,22,19,.88),rgba(12,11,10,.94));border:1px solid rgba(240,237,232,.14);
+  box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45);white-space:nowrap;opacity:0;will-change:transform,opacity;
+  transition:border-color .45s var(--ease),background .45s var(--ease)}
+.tag small{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--tracking-wider);color:var(--fg-secondary);transition:color .45s var(--ease)}
+.tag span{font-size:14px;color:var(--fg-primary);display:inline-flex;align-items:center;gap:8px}
+.tag .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 5px}
+.tag.lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(50,39,21,.95),rgba(24,19,12,.95))}
+.tag.lit small{color:var(--accent-gold)}
+
+.found{position:absolute;z-index:7;width:344px;padding:14px 16px;opacity:0;transform:translateY(10px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.found.on{opacity:1;transform:none}
+.found__head{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.found__who{flex:1;min-width:0;line-height:1.25}
+.found__who b{display:block;font-size:15px}
+.found__who span{font-size:12.5px;color:#4a4640}
+.found .pill{color:#3a3833}
+.found__row{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#4a4640}
+.chk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824}
+.found__ai{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#2a2824;opacity:0;transition:opacity .45s var(--ease)}
+.found__ai.on{opacity:1}
+.found__ai i{width:7px;height:7px;border-radius:50%;background:var(--accent-teal);flex:none}
+
+.replay{position:fixed;z-index:20;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font:600 13px var(--font-body);color:var(--fg-primary);background:rgba(20,20,20,.9);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 14px;cursor:pointer}
+.replay:hover{border-color:var(--accent-gold-line);color:var(--accent-gold)}
+
+@media (max-width:600px){
+  .stage{width:100%;height:100%;transform:none!important}
+  #globe,#wires{width:100%;height:100%}
+  .copy{left:20px;right:20px;top:104px;width:auto}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy .lead{margin-top:16px;font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .copy .micro{text-align:center;margin-top:8px}
+  .tag{display:none}
+  .replay{bottom:auto;top:calc(72px + env(safe-area-inset-top,0px))}
+  .found{left:20px!important;right:20px;width:auto}
+}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+  <nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+  <div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+  <div class="sky" aria-hidden="true"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="70" data-seed="31" aria-hidden="true"></svg>
+  <div class="grain" aria-hidden="true"></div>
+
+  <section class="copy">
+    <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    <p class="lead">Que te encuentren cuando te buscan en Google, en Maps y en la IA, en español y en inglés.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+      <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+    </div>
+    <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+  </section>
+
+  <canvas id="globe" aria-hidden="true"></canvas>
+  <svg id="wires" aria-hidden="true"><defs><linearGradient id="gdown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8a96e"/><stop offset="1" stop-color="#c8a96e" stop-opacity=".3"/></linearGradient></defs></svg>
+  <div id="pins" aria-label="Búsquedas de ejemplo en zonas de Houston"></div>
+
+  <article class="found paper" id="found" aria-label="Resultado de ejemplo">
+    <div class="found__head">
+      <span class="avatar">T</span>
+      <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto ahora</span></span>
+      <span class="pill">EJEMPLO</span>
+    </div>
+    <div class="found__row">Te nombran <span class="chk">✓ Google</span><span class="chk">✓ Maps</span><span class="chk">✓ La IA</span></div>
+    <p class="found__ai" id="foundAi"><i></i>Tu asistente le contesta en español, 24/7</p>
+  </article>
+</div>
+<button class="replay" type="button" id="replay">Ver otra vez</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="geo-data.js"></script>
+<script src="base.js"></script>
+<script>
+(function () {
+  const GOLD = '#d6ba80', TEAL = '#4fc3a1';
+  const HOUSTON = [-95.369, 29.760];
+  const ZONES = [
+    { name: 'THE WOODLANDS', q: 'plomero 24 horas', at: [-95.489, 30.166], side: 'up', wire: 54, dx: -70 },
+    { name: 'KATY', q: 'roofing contractor near me', en: true, at: [-95.824, 29.786], side: 'up', wire: 86, dx: -90 },
+    { name: 'SUGAR LAND', q: 'dentista que hable español', at: [-95.635, 29.620], side: 'down', wire: 58, dx: -110 },
+    { name: 'PASADENA', q: 'taller que hable español cerca de mí', at: [-95.209, 29.691], side: 'up', wire: 46, dx: -200, lit: true },
+  ];
+  const mobile = () => innerWidth <= 600;
+
+  // Encuadres: A = boceto 2 del lienzo (globo entero); B = prototipo en movimiento (globo grande, mapa cerca).
+  function frames() {
+    if (mobile()) {
+      const W = innerWidth, H = innerHeight;
+      return {
+        W, H,
+        A: { cx: W * 0.62, cy: H * 0.86, R: Math.min(170, W * 0.44), center: [-97, 33] },
+        B: { cx: W * 0.70, cy: H * 0.97, R: W * 0.60, target: [W * 0.577, H * 0.794], kmpx: 1.5 },
+      };
+    }
+    return {
+      W: 1440, H: 900,
+      A: { cx: 1080, cy: 470, R: 300, center: [-97, 33] },
+      B: { cx: 1250, cy: 520, R: 400, target: [1060, 440], kmpx: 3.6 },
+    };
+  }
+
+  const canvas = document.getElementById('globe');
+  const ctx = canvas.getContext('2d');
+  let F, dpr, dotPattern;
+  const land110 = { type: 'MultiPolygon', coordinates: GEO.land50 };
+  const land10 = { type: 'MultiPolygon', coordinates: GEO.tx10 };
+  const texas = { type: 'MultiPolygon', coordinates: GEO.texas };
+
+  function setup() {
+    F = frames();
+    const stageScale = mobile() ? 1 : Math.min(innerWidth / 1440, innerHeight / 900);
+    dpr = Math.min(1.75, (window.devicePixelRatio || 1) * stageScale);
+    canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
+    // trama de puntos en pantalla (como el globo de Cosmos)
+    const p = document.createElement('canvas'), step = 6;
+    p.width = p.height = Math.round(step * dpr);
+    const pc = p.getContext('2d'); pc.fillStyle = GOLD; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 1.35 * dpr, 0, Math.PI * 2); pc.fill();
+    dotPattern = ctx.createPattern(p, 'repeat');
+    if (dotPattern.setTransform) dotPattern.setTransform(new DOMMatrix().scale(1 / dpr));
+  }
+
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+  // Proyección para un instante t (0 = encuadre A, 1 = encuadre B).
+  function state(t) {
+    const e = ease(t), A = F.A, B = F.B;
+    const cx = lerp(A.cx, B.cx, e), cy = lerp(A.cy, B.cy, e), R = lerp(A.R, B.R, e);
+    const SB = 6371 * B.kmpx;                       // escala final del mapa (px por radio terrestre)
+    const S = Math.exp(lerp(Math.log(A.R), Math.log(SB), e));
+    const center = d3.geoInterpolate(A.center, HOUSTON)(Math.min(1, e * 1.15));
+    // el centro de la proyección se desplaza hacia el punto donde queda Houston, solo cuando el mapa ya es más grande que el disco
+    const k = (1 - R / S) / (1 - B.R / SB);
+    const tx = lerp(cx, B.target[0] + (cx - B.cx), Math.max(0, Math.min(1, k)));
+    const ty = lerp(cy, B.target[1] + (cy - B.cy), Math.max(0, Math.min(1, k)));
+    const proj = d3.geoOrthographic().rotate([-center[0], -center[1]]).scale(S).translate([tx, ty]).clipAngle(90).precision(0.3);
+    return { cx, cy, R, S, proj, zoom: S / R, e };
+  }
+
+  function ringGeo(s) { const e = s.e; return { rx: s.R * lerp(1.2, 1.4, e), ry: s.R * lerp(0.27, 0.35, e), rot: lerp(-13, -18, e) * Math.PI / 180 }; }
+  function ringPath(c, s, half) {
+    const g = ringGeo(s), rx = g.rx, ry = g.ry;
+    c.save(); c.translate(s.cx, s.cy); c.rotate(g.rot);
+    c.beginPath(); c.ellipse(0, 0, rx, ry, 0, half === 'back' ? Math.PI : 0, half === 'back' ? Math.PI * 2 : Math.PI); c.restore();
+  }
+
+  function draw(t, satPing) {
+    const s = state(t);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, F.W, F.H);
+    // halo muy suave
+    const halo = ctx.createRadialGradient(s.cx, s.cy, s.R * 0.9, s.cx, s.cy, s.R * 1.35);
+    halo.addColorStop(0, 'rgba(200,169,110,.10)'); halo.addColorStop(1, 'rgba(200,169,110,0)');
+    ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R * 1.35, 0, Math.PI * 2); ctx.fill();
+    // aro · mitad trasera
+    ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(200,169,110,.72)'; ctx.lineCap = 'round';
+    ringPath(ctx, s, 'back'); ctx.stroke();
+    // cuerpo del planeta: negro
+    const body = ctx.createRadialGradient(s.cx - s.R * 0.45, s.cy - s.R * 0.45, s.R * 0.1, s.cx, s.cy, s.R);
+    body.addColorStop(0, '#16120c'); body.addColorStop(0.55, '#0a0907'); body.addColorStop(1, '#050404');
+    ctx.fillStyle = body; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R, 0, Math.PI * 2); ctx.fill();
+
+    // continentes: se rellenan directamente con la trama de puntos dorados (una sola pasada)
+    ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
+    const path = d3.geoPath(s.proj, ctx);
+    const hi = smooth(14, 24, s.zoom);                 // detalle fino de la costa de Texas al acercarse
+    ctx.fillStyle = dotPattern;
+    if (hi < 1) { ctx.globalAlpha = 1 - hi; ctx.beginPath(); path(land110); ctx.fill(); }
+    if (hi > 0) { ctx.globalAlpha = hi; ctx.beginPath(); path(land10); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    // sombra: la cara derecha se apaga (media luna, como el isotipo)
+    const sh = ctx.createRadialGradient(s.cx - s.R * 0.55, s.cy - s.R * 0.5, s.R * 0.25, s.cx - s.R * 0.2, s.cy - s.R * 0.15, s.R * 1.55);
+    sh.addColorStop(0, 'rgba(5,4,4,0)'); sh.addColorStop(0.45, 'rgba(5,4,4,.22)'); sh.addColorStop(0.8, 'rgba(5,4,4,.72)'); sh.addColorStop(1, 'rgba(5,4,4,.95)');
+    ctx.fillStyle = sh; ctx.fillRect(s.cx - s.R, s.cy - s.R, s.R * 2, s.R * 2);
+    ctx.restore();
+
+    // contorno de Texas mientras el mapa pasa por EE. UU.
+    const tx = smooth(2.2, 5, s.zoom) * (1 - smooth(18, 34, s.zoom));
+    if (tx > 0.01) {
+      ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
+      ctx.globalAlpha = tx; ctx.strokeStyle = 'rgba(226,207,164,.85)'; ctx.lineWidth = 1.2; ctx.beginPath(); d3.geoPath(s.proj, ctx)(texas); ctx.stroke();
+      ctx.restore(); ctx.globalAlpha = 1;
+    }
+    // costa en línea fina cuando el mapa ya está cerca (se lee como mapa, no como trama)
+    if (hi > 0.05) {
+      ctx.save(); ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 1, 0, Math.PI * 2); ctx.clip();
+      ctx.globalAlpha = hi * 0.55; ctx.strokeStyle = '#e2cfa4'; ctx.lineWidth = 1; ctx.beginPath(); d3.geoPath(s.proj, ctx)(land10); ctx.stroke();
+      ctx.restore(); ctx.globalAlpha = 1;
+    }
+    // filo de luz en el borde iluminado
+    const rim = ctx.createLinearGradient(s.cx - s.R, s.cy - s.R, s.cx + s.R * 0.4, s.cy + s.R * 0.4);
+    rim.addColorStop(0, 'rgba(226,207,164,.85)'); rim.addColorStop(0.45, 'rgba(200,169,110,.25)'); rim.addColorStop(1, 'rgba(200,169,110,0)');
+    ctx.strokeStyle = rim; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 0.8, 0, Math.PI * 2); ctx.stroke();
+    // aro · mitad delantera + satélite de la IA
+    ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(200,169,110,.9)'; ringPath(ctx, s, 'front'); ctx.stroke();
+    const a = 100 * Math.PI / 180, g = ringGeo(s), rx = g.rx, ry = g.ry, rot = g.rot;
+    const px = -rx * Math.cos(a), py = ry * Math.sin(a);
+    const sx = s.cx + px * Math.cos(rot) - py * Math.sin(rot), sy = s.cy + px * Math.sin(rot) + py * Math.cos(rot);
+    ctx.fillStyle = TEAL; ctx.beginPath(); ctx.arc(sx, sy, mobile() ? 7 : 9, 0, Math.PI * 2); ctx.fill();
+    if (satPing > 0 && satPing < 1) { ctx.strokeStyle = `rgba(79,195,161,${0.9 * (1 - satPing)})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(sx, sy, 9 + 22 * satPing, 0, Math.PI * 2); ctx.stroke(); }
+    return s;
+  }
+
+  // ── puntos, etiquetas e hilos en su sitio final ──
+  const pinsBox = document.getElementById('pins'), wires = document.getElementById('wires');
+  const found = document.getElementById('found'), foundAi = document.getElementById('foundAi');
+  let items = [], houstonPx;
+  function layout() {
+    pinsBox.innerHTML = ''; [...wires.querySelectorAll('line')].forEach((l) => l.remove()); items = [];
+    const s = state(1);
+    houstonPx = s.proj(HOUSTON);
+    ZONES.forEach((z, i) => {
+      const [x, y] = s.proj(z.at);
+      const pt = document.createElement('span'); pt.className = 'pt'; pt.style.left = x + 'px'; pt.style.top = y + 'px'; pt.innerHTML = '<b></b><b></b><i></i>';
+      pinsBox.appendChild(pt);
+      const tag = document.createElement('span'); tag.className = 'tag';
+      tag.innerHTML = `<small>${z.name}</small><span>${z.q}${z.en ? ' <span class="en">EN</span>' : ''}</span>`;
+      pinsBox.appendChild(tag);
+      const th = 50;
+      let lx, ly, wy1, wy2;
+      if (mobile()) { lx = -999; ly = -999; }
+      else { lx = x + z.dx; ly = z.side === 'up' ? y - z.wire - th : y + z.wire; }
+      tag.style.left = lx + 'px'; tag.style.top = ly + 'px';
+      wy1 = z.side === 'up' ? ly + th : y; wy2 = z.side === 'up' ? y : ly;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x); line.setAttribute('x2', x); line.setAttribute('y1', wy1); line.setAttribute('y2', wy2);
+      line.style.strokeDasharray = Math.abs(wy2 - wy1); line.style.strokeDashoffset = Math.abs(wy2 - wy1);
+      if (mobile()) line.style.display = 'none';
+      wires.appendChild(line);
+      items.push({ z, pt, tag, line, x, y, lx, ly, i });
+    });
+    const P = items.find((it) => it.z.lit);
+    const fx = mobile() ? 20 : Math.min(P.x - 190, 1328 - 344), fy = mobile() ? F.H * 0.843 : P.y + 200;
+    found.style.left = fx + 'px'; found.style.top = fy + 'px';
+    const down = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    down.setAttribute('class', 'down'); down.setAttribute('x1', P.x); down.setAttribute('x2', P.x + 0.01); down.setAttribute('y1', P.y + 8); down.setAttribute('y2', fy);
+    down.style.strokeDasharray = fy - P.y; down.style.strokeDashoffset = fy - P.y;
+    if (mobile()) down.style.display = 'none';
+    wires.appendChild(down); P.down = down;
+  }
+
+  // ── línea de tiempo ──
+  let raf, t0, played = false;
+  const ZOOM_MS = 2600;
+  function resetDom() {
+    items.forEach((it) => { it.pt.className = 'pt'; it.tag.classList.remove('lit'); it.tag.style.opacity = 0; it.tag.style.transform = ''; it.line.style.strokeDashoffset = it.line.style.strokeDasharray; it.line.classList.remove('lit'); });
+    const P = items.find((it) => it.z.lit); if (P) P.down.style.strokeDashoffset = P.down.style.strokeDasharray;
+    found.classList.remove('on'); foundAi.classList.remove('on');
+  }
+  function finalDom() {
+    items.forEach((it) => { it.pt.classList.add('on'); it.tag.style.opacity = 1; it.tag.style.transform = 'none'; it.line.style.strokeDashoffset = 0; if (it.z.lit) { it.pt.classList.add('lit'); it.tag.classList.add('lit'); it.line.classList.add('lit'); it.down.style.strokeDashoffset = 0; } });
+    found.classList.add('on'); foundAi.classList.add('on');
+  }
+  function frame(now) {
+    const el = now - t0;
+    const tz = Math.min(1, el / ZOOM_MS);
+    const T = el - ZOOM_MS;                                   // tiempo desde que termina el acercamiento
+    const ping = T > 3300 ? (T - 3300) / 1400 : 0;
+    draw(tz, ping % 1 && T < 3300 + 2800 ? ping % 1 : 0);
+    if (T > -250) items.forEach((it) => it.pt.classList.add('on'));
+    // las búsquedas salen desde Houston hacia su sitio, con una curva de órbita
+    items.forEach((it) => {
+      const st = T - it.i * 140; if (st < 0) return;
+      const p = Math.min(1, st / 900), e = ease(p);
+      const ox = houstonPx[0] - it.lx - 60, oy = houstonPx[1] - it.ly - 20;
+      const bend = Math.sin(Math.PI * e) * (it.i % 2 ? -70 : 70);
+      it.tag.style.opacity = Math.min(1, p * 1.6);
+      it.tag.style.transform = `translate(${ox * (1 - e) + bend * 0.4}px,${oy * (1 - e) - bend}px) scale(${0.7 + 0.3 * e})`;
+      if (p >= 1) { const len = +it.line.style.strokeDasharray; const wp = Math.min(1, (st - 900) / 380); it.line.style.strokeDashoffset = Math.max(0, len * (1 - wp)); }
+    });
+    if (T > 1900) { const P = items.find((it) => it.z.lit); P.pt.classList.add('lit'); P.tag.classList.add('lit'); P.line.classList.add('lit');
+      const len = +P.down.style.strokeDasharray; P.down.style.strokeDashoffset = Math.max(0, len * (1 - Math.min(1, (T - 2250) / 600))); }
+    if (T > 2850) found.classList.add('on');
+    if (T > 3350) foundAi.classList.add('on');
+    if (T < 3300 + 2900) raf = requestAnimationFrame(frame); else draw(1, 0);
+  }
+  function play() {
+    if (played) return; played = true;
+    cancelAnimationFrame(raf); resetDom(); t0 = performance.now(); raf = requestAnimationFrame(frame);
+  }
+  function rest() { played = false; cancelAnimationFrame(raf); resetDom(); draw(0, 0); }
+
+  function fit() {
+    const st = document.getElementById('stage');
+    if (mobile()) { st.style.transform = 'none'; st.style.left = '0px'; st.style.top = '0px'; return; }
+    const s = Math.min(innerWidth / 1440, innerHeight / 900);
+    st.style.transform = `scale(${s})`; st.style.left = (innerWidth - 1440 * s) / 2 + 'px'; st.style.top = (innerHeight - 900 * s) / 2 + 'px';
+  }
+
+  function init() {
+    fit(); setup(); layout();
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const h = location.hash;
+    if (h === '#final' || reduce) { draw(1, 0); finalDom(); return; }
+    if (/^#t\d+$/.test(h)) {                                  // fotograma fijo para revisar: #t1300 = 1,3 s
+      const ms = +h.slice(2); t0 = performance.now() - ms; played = true; frame(performance.now()); cancelAnimationFrame(raf); return;
+    }
+    rest();
+    if (h === '#inicio') return;
+    // se acerca al primer gesto del visitante; si no hay gesto, a los 3 s
+    const go = () => { play(); ['pointermove', 'wheel', 'touchstart', 'keydown', 'scroll'].forEach((e) => removeEventListener(e, go)); };
+    ['pointermove', 'wheel', 'touchstart', 'keydown', 'scroll'].forEach((e) => addEventListener(e, go, { passive: true }));
+    setTimeout(go, 3000);
+  }
+  addEventListener('resize', () => { fit(); setup(); layout(); if (played) { finalDom(); draw(1, 0); } else draw(0, 0); });
+  document.getElementById('replay').addEventListener('click', () => { played = false; play(); });
+  document.fonts && document.fonts.ready ? document.fonts.ready.then(init) : init();
+})();
+</script>
+</body>
+</html>

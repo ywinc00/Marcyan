@@ -22,14 +22,15 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es/#c
   <SiteNav nav={pageNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main">
-    <LegalDoc title="Política de Privacidad" updated="6 de junio de 2026">
+    <LegalDoc title="Política de Privacidad" updated="19 de octubre de 2026">
       <h2>1. Quiénes somos</h2>
-      <p><strong>Marcyan Studio</strong> es una agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas, con cobertura en Houston, TX y Miami, FL. Esta política explica qué datos recopilamos cuando usas nuestro sitio <a href="https://marcyanstudio.com">marcyanstudio.com</a>, para qué los usamos y qué control tienes sobre ellos. Para cualquier consulta sobre tu privacidad, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+      <p><strong>Marcyan Studio</strong> es una agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas, con cobertura en Houston, TX y Miami, FL. Esta política explica qué datos recopilamos cuando usas nuestro sitio <a href="/es">marcyanstudio.com</a>, para qué los usamos y qué control tienes sobre ellos. Para cualquier consulta sobre tu privacidad, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
 
       <h2>2. Qué datos recopilamos</h2>
       <p>Recopilamos únicamente los datos necesarios para atenderte:</p>
       <ul>
         <li><strong>Datos que nos proporcionas</strong> al completar nuestros formularios (por ejemplo, el formulario de proyecto): nombre, correo electrónico, teléfono, nombre de tu empresa y los detalles del proyecto que decidas compartir.</li>
+        <li><strong>Archivos que nos envías</strong> al llenar el brief de proyecto o el kit de arranque: logo, fotos y documentos. Las fotos se reducen a calidad web en tu navegador antes de subirse y, al hacerlo, pierden sus datos internos, como la ubicación GPS. Si una foto no se puede convertir en tu navegador (por ejemplo, algunas HEIC de iPhone abiertas en una computadora), no la subimos: te explicamos junto al archivo cómo enviarla de otra forma. Los logos, los documentos y los videos se guardan tal cual los envías, sin reducirlos ni quitarles sus datos internos.</li>
         <li><strong>Datos técnicos automáticos</strong>: dirección IP, tipo de navegador y fecha/hora de la solicitud. Los usamos solo por seguridad y para prevenir spam.</li>
       </ul>
       <p>No recopilamos datos sensibles ni información de tarjetas de pago a través del sitio.</p>
@@ -48,6 +49,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es/#c
       <ul>
         <li><strong>Alojamiento y base de datos</strong> (Vercel y su base de datos PostgreSQL), donde se guardan de forma segura los datos que nos envías.</li>
         <li><strong>Envío de correo</strong> (Resend), para enviarte confirmaciones y comunicaciones relacionadas con tu solicitud.</li>
+        <li><strong>Almacenamiento de archivos</strong> (Vercel Blob, en modo privado): tus archivos no son públicos ni aparecen en buscadores; solo el equipo de Marcyan puede verlos con su sesión.</li>
       </ul>
       <p>También podemos divulgar datos si la ley lo exige o para proteger nuestros derechos.</p>
 
@@ -56,6 +58,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es/#c
 
       <h2>6. Cuánto tiempo conservamos tus datos</h2>
       <p>Conservamos los datos de tu solicitud mientras sean necesarios para atenderte y durante el tiempo que exijan nuestras obligaciones legales o contables. Después los eliminamos o anonimizamos. Puedes pedirnos la eliminación de tus datos en cualquier momento.</p>
+      <p><strong>Archivos.</strong> Si empiezas a subir archivos y no envías el formulario, se borran solos a las 48 horas. Si quitas un archivo que ya se había subido, lo borramos al recibir el formulario o el kit y no se guarda con tu proyecto. Los archivos de un proyecto se conservan hasta 12 meses después de terminarlo y después se eliminan. Si no llegamos a trabajar juntos, los archivos se conservan hasta 12 meses después de cerrar la solicitud y después se eliminan. Si quieres que los borremos antes, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a> con el nombre de tu negocio o tu folio (por ejemplo, MRC-042); los borramos y te lo confirmamos por correo.</p>
 
       <h2>7. Tus derechos</h2>
       <p>Tienes derecho a acceder a tus datos, corregirlos, solicitar su eliminación y retirar tu consentimiento. Para ejercer cualquiera de estos derechos, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a> y responderemos en un plazo razonable.</p>
@@ -71,6 +74,9 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es/#c
 
       <h2>11. Contacto</h2>
       <p>¿Preguntas sobre esta política o sobre tus datos? Escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
+
+      <h2>12. Software de terceros</h2>
+      <p>Para convertir en tu navegador las fotos HEIC del iPhone usamos la librería <strong>heic-to</strong> (licencia LGPL-3.0, basada en libheif), sin modificar y solo cuando subes una foto en ese formato. Su código fuente está publicado en <a href="https://github.com/hoppergee/heic-to" rel="noopener">github.com/hoppergee/heic-to</a>.</p>
     </LegalDoc>
   </main>
 

@@ -155,5 +155,17 @@
     ],
     "endpoint": "https://marcyanstudio.com/api/contact"
   },
-  "dueno": null
+  "dueno": null,
+  "palabras": {
+    "semillas": [
+      "web design",
+      "website design for small business",
+      "seo services",
+      "local seo",
+      "diseño web",
+      "diseño de páginas web",
+      "agencia de marketing digital"
+    ],
+    "nota": "Servicios que vende el cliente, en inglés primero (Bing da demanda nacional solo en inglés) y sus equivalentes en español (se miden con Search Console). Las 3 primeras son las búsquedas del mapa de competencia. Se revisan cada trimestre."
+  }
 }

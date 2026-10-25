@@ -1,0 +1,195 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-09-26",
+    "hasta": "2026-10-02"
+  },
+  "anterior": {
+    "desde": "2026-09-19",
+    "hasta": "2026-09-25"
+  },
+  "anioPasado": {
+    "desde": "2025-09-27",
+    "hasta": "2025-10-03"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 1,
+      "impresiones": 80,
+      "ctr": 1.25,
+      "posicion": 23.8
+    },
+    "anterior": {
+      "clicks": 2,
+      "impresiones": 119,
+      "ctr": 1.68,
+      "posicion": 23.3
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": -1,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 34,
+        "ctr": 0,
+        "posicion": 40.8
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 1,
+        "ctr": 0,
+        "posicion": 7
+      },
+      "sinMarca": {
+        "clicks": 1,
+        "impresiones": 57,
+        "ctr": 1.75,
+        "posicion": 36.4
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "landings",
+      "clicks": 1,
+      "impresiones": 40,
+      "ctr": 2.5,
+      "posicion": 26.5,
+      "dClicks": 0,
+      "dImpresiones": -26,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 26,
+      "ctr": 0,
+      "posicion": 16.5,
+      "dClicks": 0,
+      "dImpresiones": -6,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 19,
+      "ctr": 0,
+      "posicion": 28.4,
+      "dClicks": 0,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "home",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 1.5,
+      "dClicks": 0,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 1.5,
+      "dClicks": 0,
+      "dImpresiones": -5,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 3.5,
+      "dClicks": 0,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "servicios",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": -1,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "es",
+      "clicks": 1,
+      "impresiones": 56,
+      "ctr": 1.79,
+      "posicion": 19.3,
+      "dClicks": 0,
+      "dImpresiones": -31,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "en",
+      "clicks": 0,
+      "impresiones": 35,
+      "ctr": 0,
+      "posicion": 27.5,
+      "dClicks": -1,
+      "dImpresiones": -4,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/es/miami/ecommerce",
+      "clicks": 1,
+      "impresiones": 2,
+      "ctr": 50,
+      "posicion": 1.5,
+      "dClicks": 1,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [
+    {
+      "clave": "https://marcyanstudio.com/es/miami/diseno-web",
+      "clicks": 0,
+      "impresiones": 6,
+      "ctr": 0,
+      "posicion": 21.3,
+      "dClicks": -1,
+      "dImpresiones": -29,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/en/ai-for-small-business",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": -1,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "candidatasRefresco": [],
+  "demandaSinPagina": [],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

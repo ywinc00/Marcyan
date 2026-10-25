@@ -1,22 +1,30 @@
-// /api/admin/invoices/:id   (id = invoices.id numérico)
-//   GET    → detalle de la factura (saldo + pagos)
-//   PATCH  → { status } cambia el estado
-//   DELETE → elimina la factura (CASCADE a payments)
+// /api/admin/invoices/:id   (id = invoices.id numérico, o el número INV-XXX en GET)
+//   GET    → detalle de la factura (estado derivado, saldo, pagos y proyecto)
+//   PATCH  → { status?, amount_cents?, due_date?, issued_at?, description?,
+//              client_id?, project_id? } edita la factura. A mano solo se puede
+//              poner Borrador, Enviada o Anulada; Pagada/Parcial/Vencida se
+//              calculan solas. El monto no baja de lo ya cobrado.
+//   DELETE → elimina la factura SOLO si no tiene pagos (409 si los tiene:
+//            hay que anularla para no perder el historial de cobros).
 import { requireAdmin } from '../../../lib/auth.mjs';
-import {
-  getInvoice, updateInvoiceStatus, deleteInvoice, INVOICE_STATUSES,
-} from '../../../lib/finance.mjs';
+import { getInvoice, updateInvoice, deleteInvoice } from '../../../lib/finance.mjs';
+import { isBusinessError } from '../../../lib/finance-rules.mjs';
+
+const EDITABLE = ['status', 'amount_cents', 'due_date', 'issued_at', 'description', 'client_id', 'project_id'];
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
   if (!session) return;
 
-  const id = parseInt((req.query?.id || '').toString(), 10);
-  if (!Number.isFinite(id)) return res.status(400).json({ ok: false, error: 'ID inválido' });
+  const raw = (req.query?.id || '').toString().trim();
+  const isNumber = /^INV-\d+$/i.test(raw);
+  if (!/^\d+$/.test(raw) && !(isNumber && req.method === 'GET')) {
+    return res.status(400).json({ ok: false, error: 'ID inválido' });
+  }
 
   if (req.method === 'GET') {
     try {
-      const invoice = await getInvoice(id);
+      const invoice = await getInvoice(raw);
       if (!invoice) return res.status(404).json({ ok: false, error: 'Factura no encontrada' });
       return res.status(200).json({ ok: true, invoice });
     } catch (err) {
@@ -28,18 +36,16 @@ export default async function handler(req, res) {
   if (req.method === 'PATCH') {
     try {
       const body = (typeof req.body === 'object' && req.body) ? req.body : {};
-      const newStatus = typeof body.status === 'string' ? body.status.trim() : null;
-      if (!newStatus || !INVOICE_STATUSES.includes(newStatus)) {
-        return res.status(400).json({
-          ok: false,
-          error: `Status debe ser uno de: ${INVOICE_STATUSES.join(', ')}`,
-        });
+      const fields = {};
+      for (const k of EDITABLE) if (k in body) fields[k] = body[k];
+      if (!Object.keys(fields).length) {
+        return res.status(400).json({ ok: false, error: 'No hay cambios que guardar.' });
       }
-      const updated = await updateInvoiceStatus(id, newStatus);
-      if (!updated) return res.status(404).json({ ok: false, error: 'Factura no encontrada' });
-      const invoice = await getInvoice(id);
+      const invoice = await updateInvoice(raw, fields);
+      if (!invoice) return res.status(404).json({ ok: false, error: 'Factura no encontrada' });
       return res.status(200).json({ ok: true, invoice });
     } catch (err) {
+      if (isBusinessError(err)) return res.status(err.status).json({ ok: false, error: err.message });
       console.error('[admin/invoices/:id PATCH] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al actualizar factura' });
     }
@@ -47,13 +53,12 @@ export default async function handler(req, res) {
 
   if (req.method === 'DELETE') {
     try {
-      const before = await getInvoice(id);
-      if (!before) return res.status(404).json({ ok: false, error: 'Factura no encontrada' });
-      const ok = await deleteInvoice(id);
-      if (!ok) return res.status(500).json({ ok: false, error: 'No se pudo eliminar' });
-      console.log(`[admin/invoices/:id DELETE] ${before.invoice_number} eliminada por ${session.email}`);
-      return res.status(200).json({ ok: true, deleted: id });
+      const out = await deleteInvoice(raw);
+      if (!out) return res.status(404).json({ ok: false, error: 'Factura no encontrada' });
+      console.log(`[admin/invoices/:id DELETE] ${out.invoice_number} eliminada por ${session.email}`);
+      return res.status(200).json({ ok: true, deleted: Number(raw), invoice_number: out.invoice_number });
     } catch (err) {
+      if (isBusinessError(err)) return res.status(err.status).json({ ok: false, error: err.message });
       console.error('[admin/invoices/:id DELETE] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al eliminar factura' });
     }

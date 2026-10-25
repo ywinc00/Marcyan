@@ -1,0 +1,463 @@
+{
+ "syn": {
+  "conclusionLectura": "La caída sigue y solo afecta a Marcyan. Entre el 13 y el 18-oct la cobertura bajó de 44 a 37 de 84 y el contador de 41 a 35, mientras los controles no se movieron (TRR 33 a 33, JLX 12/13 a 13, MJA 54 a 54). El ritmo baja de 2,5 a 1,4 páginas al día, pero no se para. El mecanismo es el mismo: 7 de las 8 salidas se decidieron sobre copias de julio a septiembre, y entre el 13 y el 18 no cambió el contenido de ninguna página, así que no lo provoca nada nuestro. La actualización de spam terminó hace 10 días y las salidas siguen, lo que refuerza la causa principal: Google reevalúa el sitio entero. En apariciones casi no cuesta nada: las 8 páginas que salieron sumaban unas 8 de 88 del 8 al 16-oct, y el sitio sigue en 8,9 al día con 0 clics y 0 contactos, igual que antes. Hay tres hechos nuevos que obligan a ajustar el plan. (1) /en/houston, la única vía por la que nos citaba Gemini (4 de 30), salió el 18-oct tras una relectura propia de Google el 17-oct. Eso bloquea la tanda 1 de la Fase A y la ampliación inglesa, porque la regla aprobada prohíbe fusionar hacia destinos fuera del índice. (2) Toda la familia de diseño web de Houston está fuera en los dos idiomas, incluida /es/houston/diseno-web, que es el enlace de la ficha de Houston. (3) El dato del diagnóstico de que releer protege («de 6 indexadas releídas salió 1») ya no se sostiene. De las 9 que estaban dentro el 27-sep y Google volvió a leer, 4 están fuera (/en/houston, /en/houston/beauty-salons, /en/miami/conversational-ai y /es/houston/abogados-inmigracion). Entre las 70 sin relectura salieron 39. Releer ni protege ni daña de forma demostrable. Las peticiones no salieron el 16-17 oct porque el cupo compartido se agotó el 18-oct a las 10:35, y pasan al 19-oct. Con todo esto, adelantar cambios en el sitio no aporta nada medible y rompería las lecturas del 2-nov y del 4-nov. Lo que sí admite adelanto es lo que no toca el sitio.",
+  "decision": "adelantar partes",
+  "calendario": [
+   {
+    "cuando": "Lunes 19-oct, 07:45. Si da 'Quota Exceeded', un único reintento el martes 20-oct antes de las 09:05",
+    "accion": "Lanzar la tarea única de 4 peticiones de indexación: /es/miami/seo-local, /es/houston/bienes-raices, /es/miami/doral y /es/houston. No añadir ninguna URL más: ni /en/houston, ni /es/houston/diseno-web, ni las 7 salidas del 13 al 18-oct. Si falla también el 20-oct, se dan por no hechas y no se insiste.",
+    "necesitaOK": false,
+    "porQue": "Ya aprobadas (plan #6). Se movieron de fecha porque el cupo compartido se agotó el 18-oct. La doctrina pide una petición por página con un cambio real; una página 'rastreada, sin indexar' no se reenvía y pedir a diario es humo (§6, §7)."
+   },
+   {
+    "cuando": "19 y 20-oct, en la vigilancia de las 09:05",
+    "accion": "Segunda y tercera lectura del índice antes de mover nada: confirmar las 8 salidas y que /en/houston sigue fuera, y anotarlo en CAMBIOS.md. No leer como recuperación el repunte del 13 al 16-oct (13, 10, 13 y 10 apariciones), que viene de un solo artículo.",
+    "necesitaOK": false,
+    "porQue": "La del 18-oct es una lectura sola tras 3 días sin vigilancia, y el 8-sep oscilaron unas 66 URL en un día. El plan exige dos lecturas seguidas antes de reaccionar."
+   },
+   {
+    "cuando": "Cada mañana del 19-oct al 4-nov",
+    "accion": "Garantizar que corren la tarea de las 07:45 y la vigilancia de las 09:05: o la máquina encendida a esas horas, o la lectura movida a un sitio que no dependa de ella.",
+    "necesitaOK": true,
+    "porQue": "Del 15 al 17-oct no hubo lecturas porque la máquina estuvo apagada. La confirmación de /en/houston, la señal de las peticiones y la meta del 4-nov, que pide dos lecturas semanales, dependen de esas lecturas. Mover la lectura a otro sitio es un cambio de configuración, y lo decide el dueño."
+   },
+   {
+    "cuando": "19 a 21-oct, como primera prioridad del dueño esta semana",
+    "accion": "Recordatorio de una línea al dueño: pedir las reseñas para la ficha de Houston a TRR, JLX y Rosy Nails. Una persona por cliente, desde su propia cuenta, escrita por ellos, sin texto sugerido ni regalo. MJA no va ni en Houston ni en Miami.",
+    "necesitaOK": false,
+    "porQue": "Aprobado el 18-oct; vencía el 16-oct. Es la palanca con evidencia fuerte (§2.3) y la única que acorta el camino a contactos sin esperar a que Google relea el sitio: Houston tiene 0 reseñas frente a 95, 103 y 117 de la competencia. La doctrina §11 permite un recordatorio de una línea cuando la fecha ha vencido."
+   },
+   {
+    "cuando": "19-oct, con la actualización del plan",
+    "accion": "Actualizar PLAN.md y el diagnóstico con lo siguiente. Fechas nuevas: señal de las peticiones el 2-nov, honestidad el 3-nov, higiene el 10-nov. Nuevo orden de la Fase A, marcado como propuesto hasta el OK. Corregir el dato de la relectura: de las 9 indexadas el 27-sep que Google volvió a leer hay 4 fuera, y de las 70 sin relectura, 39; releer ni protege ni daña de forma demostrable. Anotar que /es/houston/diseno-web no se fusiona en la revisión de enero sin decidir antes a qué página apunta la ficha de Houston.",
+    "necesitaOK": false,
+    "porQue": "Así ninguna rutina ni sesión usa peticiones para 'asegurar' las páginas protegidas. Y la regla de enero (5 apariciones o menos en 90 días pasan a fusión) mandaría a fusión la página que enlaza la ficha."
+   },
+   {
+    "cuando": "19 a 23-oct, antes que el resto del paquete del kit",
+    "accion": "Neutralizar la cola automática de peticiones: excluir del cambio detectado el menú, el pie, las tarjetas compartidas y el aviso de idioma, o bajar el tope mientras dure el plan. Probarlo con un cambio simulado en local en los 4 sitios, nunca publicando un texto de prueba, y mantener en paralelo el contador viejo.",
+    "necesitaOK": false,
+    "porQue": "Ya aprobado (plan #7). Es requisito del arreglo de honestidad, de las fusiones y de los créditos en las webs de los clientes. Sin él, un cambio de texto común lanza unas 41 peticiones con el cupo que se comparte con TRR, JLX y MJA. Si el 30-oct no está probado, la honestidad pasa al 10-nov y todo lo siguiente se corre una semana."
+   },
+   {
+    "cuando": "19 a 30-oct",
+    "accion": "Resto de los arreglos del kit, que solo añaden: cobertura que inspecciona la versión con barra; dos lecturas seguidas antes de reaccionar; búsqueda de negocios sin dirección; ficha de Miami en la vigilancia; panel de Gemini con el modelo fijado y el texto guardado; y excluir de la medición los eventos de las pruebas de render del 13-oct.",
+    "necesitaOK": false,
+    "porQue": "Sin cambios respecto a lo aprobado. No romper las series de TRR y JLX antes de la lectura del 4-nov."
+   },
+   {
+    "cuando": "19 a 30-oct",
+    "accion": "Activar IndexNow atado solo a los despliegues que cambian contenido (el mapa del sitio de Bing quedó arreglado el 18-oct). Probar el filtro de tráfico interno de GA4 en modo prueba con una marca en el dispositivo del dueño, y activarlo en una fecha anotada.",
+    "necesitaOK": true,
+    "porQue": "Ya aprobados (plan #8 y #9), pero son configuración de cuentas. Lo que el filtro excluye no se recupera."
+   },
+   {
+    "cuando": "22 a 30-oct, en cuanto el panel tenga el modelo fijado, y otra vez el miércoles 4-nov",
+    "accion": "Pasar el panel de Gemini (10 preguntas × 3) y leerlo pregunta por pregunta, como sí o no. Anotar si sigue citando /en/houston, si pasa a citar /en u otra página, o si nos perdió.",
+    "necesitaOK": false,
+    "porQue": "/en/houston era la única vía de citación y salió el 17-oct. La doctrina dice que la IA de Google solo cita páginas indexadas, pero Gemini citó /es/miami/ecommerce estando fuera, así que hay que medirlo. El resultado alimenta la decisión del 4-dic sobre /en/houston."
+   },
+   {
+    "cuando": "22 a 31-oct, después de pedir las reseñas",
+    "accion": "Bing Places con las 2 ubicaciones y Apple Business Connect, adelantados desde noviembre. Las altas las hace el dueño. Nombre y teléfono idénticos en todas, y la dirección de Miami sigue oculta.",
+    "necesitaOK": true,
+    "porQue": "No tocan el sitio, así que no pueden empeorar el índice ni romper ninguna lectura. Atacan lo que más nos separa de los controles: confianza externa nula. Con /en/houston fuera, son la vía de visibilidad en los asistentes que no depende del índice (ChatGPT usa Bing y Yelp, §3). La evidencia es media (§2.5) y una inconsistencia de nombre o teléfono sí haría daño."
+   },
+   {
+    "cuando": "Lunes 26-oct, y cada lunes hasta diciembre",
+    "accion": "Lectura semanal con el control al lado. Junto al contador de TRR y JLX, anotar cuántas peticiones hizo cada uno esa semana y la fecha en que el arreglo de la cola entró en cada sitio.",
+    "necesitaOK": false,
+    "porQue": "El 18-oct las vigilancias de TRR y JLX también pidieron indexación, y el arreglo de la cola cambia cómo piden los controles. Sin anotarlo, la comparación de la meta del 4-nov deja de ser limpia."
+   },
+   {
+    "cuando": "Antes del 4-nov",
+    "accion": "Cerrar la ficha de Miami con la socia (horario, fotos, servicios), un campo cada vez, con una captura del panel.",
+    "necesitaOK": true,
+    "porQue": "Sin cambios respecto a lo aprobado (plan #10). Toca una ficha."
+   },
+   {
+    "cuando": "Lunes 2-nov (o 3-nov por la mañana si hubo reintento el 20-oct)",
+    "accion": "Lectura semanal y señal de las 4 peticiones a 14 días: si se rastrearon, si la canónica pasó a la versión sin barra y si entraron. Se anota en CAMBIOS.md antes de cualquier cambio en el sitio.",
+    "necesitaOK": false,
+    "porQue": "Es el plan #11 con la fecha movida, porque las peticiones salen el 19-oct y no el 16-17. Se descarta la primera mirada del 30-oct: sería una lectura de un solo día a 11 días, y la vigilancia diaria ya las sigue."
+   },
+   {
+    "cuando": "Martes 3-nov, después de anotar la señal",
+    "accion": "Arreglo de honestidad como borrado mínimo, en un solo cambio: quitar «y la IA de Google ya lo recomienda» de la tarjeta de TRR y «con enlaces que puedes visitar» de las 18 respuestas; revisar la frase de /en/about y «Ya posiciona en su zona» de MJA; corregir la oferta de 400; decir a qué nivel corresponden los precios de los pies del blog. Sin frase común nueva y sin guiones. Solo con la cola neutralizada y probada; si no lo está, el 10-nov. Esa semana no sale ningún otro despliegue visible, tampoco el avatar.",
+    "necesitaOK": true,
+    "porQue": "Está dentro de la ventana aprobada (31-oct a 6-nov) y entra después de la lectura del 2-nov, que es una de las dos que deciden la meta del 4-nov. Cambia texto visible: hace falta el OK del dueño sobre el render."
+   },
+   {
+    "cuando": "Miércoles 4-nov",
+    "accion": "Reporte mensual con las métricas nuevas. (1) Meta «deja de caer» con las lecturas del 26-oct y del 2-nov; si no se cumple, no dispara nada. (2) Segunda lectura de Gemini. (3) Estado de /en/houston y de la familia de diseño web de Houston. (4) Anotar lo que exige la meta del 4-dic: con la Fase A completa, 73 URL vivas y 44 dentro; con solo las 7, 77 y 47; con la tanda de /en/houston en espera, 81 y 49. Hoy hay 37.",
+    "necesitaOK": false,
+    "porQue": "Al ritmo actual lo probable es que no se cumpla. La doctrina no permite adelantar la Fase B ni el replanteo por eso. Y el dueño debe saber que el porcentaje sube sobre todo porque las fusiones quitan del total páginas que ya están fuera, antes de leerlo como recuperación."
+   },
+   {
+    "cuando": "Propuesta el 4-nov; si se aprueba, en una semana libre entre el 21-nov y el 18-dic",
+    "accion": "Proponer /es/houston/diseno-web como diferenciación, como quinta o en lugar de una de las 4 aprobadas: reescritura con ficha previa y prueba real, sin cifras inventadas. No fusionar nada hacia ella mientras esté fuera, y no cambiar el enlace de la ficha de Houston.",
+    "necesitaOK": true,
+    "porQue": "Están fuera las 6 páginas de diseño web de Houston en los dos idiomas. Es el producto principal en la ciudad de la ficha verificada, y la ficha enlaza justo a esta página. Ninguna de las 4 diferenciaciones aprobadas la toca. Reescribir una página que ya está fuera no puede empeorarla. Su valor es de negocio y de ficha, no de búsquedas: 12 apariciones del 1-ago al 17-oct."
+   },
+   {
+    "cuando": "Desde el jueves 5-nov, los tres el mismo día",
+    "accion": "Créditos con enlace en las webs de TRR, JLX y MJA, con permiso de cada cliente, con la cola ya neutralizada en los 4 sitios y anotado en el registro de cambios de cada uno.",
+    "necesitaOK": true,
+    "porQue": "Las tres revisiones coinciden en hacerlo después de la lectura del 4-nov. Cambiar el pie de los controles antes rompería la comparación justo cuando se lee si la caída se detiene. Cambia texto visible en webs de clientes."
+   },
+   {
+    "cuando": "Noviembre, después de Bing Places y Apple",
+    "accion": "Yelp y 2 perfiles de agencia (Clutch, DesignRush o The Manifest); la cámara de comercio hispana de Houston entre noviembre y diciembre.",
+    "necesitaOK": true,
+    "porQue": "Sin cambios respecto a lo aprobado (plan #18). Son cuentas y perfiles, con nombre y teléfono idénticos."
+   },
+   {
+    "cuando": "Martes 10-nov",
+    "accion": "Higiene técnica invisible y lastmod veraz en una misma publicación: logo y migas a /es y /en sin barra (158 enlaces), Organization.url a /es, y lastmod tomado del último cambio del contenido principal.",
+    "necesitaOK": false,
+    "porQue": "Dentro de la ventana aprobada (7 a 13-nov), siete días después de la honestidad. Las dos tocan las 44 páginas y no se juntan en la misma semana."
+   },
+   {
+    "cuando": "Noviembre, un día sin otro cambio en la web",
+    "accion": "Redirigir el alias marcyan.vercel.app al dominio.",
+    "necesitaOK": true,
+    "porQue": "Aprobado con prioridad baja (plan #15). Es configuración del despliegue."
+   },
+   {
+    "cuando": "Martes 17-nov",
+    "accion": "Fase A, tanda 1 (nuevo orden): /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local. Sección breve y útil, redirección permanente, sin hreflang del par y una petición al destino.",
+    "necesitaOK": true,
+    "porQue": "La tanda 1 aprobada apuntaba a /en/houston, que está fuera, y la regla aprobada lo prohíbe. Se empieza por el único destino indexado que no está entre los 6 protegidos y que tuvo 0 apariciones del 8 al 16-oct: si algo sale mal, es la prueba más barata. Cambia el orden aprobado y el texto visible del destino."
+   },
+   {
+    "cuando": "Martes 24-nov",
+    "accion": "Fase A, tanda 2: /en/miami/ecommerce hacia /en/miami, solo si /es/houston/seo-local sigue dentro 7 días después de su tanda. Si salió, se paran las tandas siguientes y se decide el 4-dic.",
+    "necesitaOK": true,
+    "porQue": "/en/miami es protegida y seguía dentro el 18-oct. La comprobación a los 7 días es la condición de riesgo ya aprobada (plan #16)."
+   },
+   {
+    "cuando": "Martes 1-dic",
+    "accion": "Fase A, tanda 3: /en/pricing/local-seo-cost-houston hacia /en/pricing, con el destino ya fijado (se descarta /en/houston). Misma condición sobre /en/miami.",
+    "necesitaOK": true,
+    "porQue": "/en/pricing está dentro (rastreo del 3-oct). /en/houston está fuera, y nunca se fusiona hacia /en/houston/local-seo."
+   },
+   {
+    "cuando": "21-nov a 18-dic y 7 a 20-dic",
+    "accion": "Las 4 diferenciaciones aprobadas, una por semana y con ficha previa. Después, enlaces contextuales y PR #36 en su propia semana de diciembre.",
+    "necesitaOK": true,
+    "porQue": "Sin cambios. Es texto visible y, si toca diseño, pasa por design-director con OK sobre el render."
+   },
+   {
+    "cuando": "Viernes 4-dic",
+    "accion": "Reporte y decisiones con los datos de noviembre. Primera: la tanda de /en/houston (conversational-ai, dental-clinics, ecommerce e immigration-lawyers, más la ampliación de katy, real-estate, auto-repair y local-seo). Entra tal como se aprobó si /en/houston está dentro en dos lecturas semanales seguidas; si sigue fuera, se decide si va como rescate deliberado, con lectura de Gemini antes y después. Además: la Fase B, incluidas /en/miami/hialeah y /es/precios/cuanto-cuesta-un-chatbot, que ya están fuera; la capa en inglés y las herramientas.",
+    "necesitaOK": true,
+    "porQue": "La decisión sobre la capa en inglés ya estaba fijada para esta fecha (plan #20). Para entonces habrá tres lecturas de Gemini y un mes viendo si /en/houston vuelve sola, como volvieron /es/miami/diseno-web y el artículo del blog."
+   }
+  ],
+  "paraElDueno": "Esta semana la caída siguió solo en tu web: pasamos de 44 a 37 páginas en Google, mientras las webs de tus clientes no se movieron, y casi no nos costó visitas porque esas páginas apenas salían en las búsquedas. Mantengo las fechas de los cambios en la web, con una corrección. La página de Houston en inglés, la única por la que nos nombraba el asistente de Google, salió el 17 de octubre, así que lo que iba a juntarse en ella espera al 4 de diciembre, y empezamos por páginas que siguen dentro. Lo que sí adelanto es lo que no toca la web: esta semana te toca pedir las reseñas a los tres clientes que aprobaste, que vencían el 16, y si te da tiempo, dar de alta Bing y Apple antes de fin de mes. Te pediré el visto bueno para ese nuevo orden, para esas altas y para rehacer la página de diseño web de Houston, que se ha quedado toda fuera. Hasta el 4 de noviembre, deja el ordenador encendido por las mañanas, porque las lecturas diarias dependen de él.",
+  "desacuerdos": [
+   "Orden de la Fase A. La revisión 1 empezaba por /en/miami. La 3, en su plan alternativo, juntaba /en/miami y /es/houston/seo-local en la misma semana. Me quedo con el orden de la revisión 2: primero /es/houston/seo-local, que es el único destino indexado fuera de los 6 protegidos y tuvo 0 apariciones del 8 al 16-oct. Las fusiones y las semanas son las mismas; solo cambia el orden. El dato sobre si una relectura daña no es concluyente (4 de 9 fuera frente a 39 de 70), así que el destino más barato va primero como prueba.",
+   "/en/houston. La revisión 3 quería decidir el 4-nov y lanzar desde el 14-nov un refuerzo de /en/houston fusionando en ella las 8 páginas. Lo descarto por cuatro razones. Rompe una regla aprobada (no fusionar hacia destinos fuera del índice). /en/houston tuvo 1 aparición en tres semanas. Google tarda una mediana de 49 días en releer, así que un cambio del 14-nov no se juzgaría antes de finales de diciembre. Y la decisión sobre la capa en inglés ya estaba fijada para el 4-dic, cuando habrá tres lecturas de Gemini. Queda como opción de rescate deliberado para el 4-dic, como propuso la revisión 2.",
+   "Relectura que protege. La revisión 3 afirmaba que 5 de 6 páginas releídas siguen dentro. Lo descarto: e18.json muestra que esa cuenta omite /en/houston/beauty-salons, /en/miami/conversational-ai y /es/houston/abogados-inmigracion, releídas entre el 4 y el 8-oct y hoy fuera. La cuenta completa de la revisión 2 da 4 de 9 fuera frente a 39 de 70 sin relectura. Se corrige el «1 de 6» del diagnóstico, y releer ni protege ni daña de forma demostrable.",
+   "Pasar /en/miami/hialeah y /es/precios/cuanto-cuesta-un-chatbot de la Fase B a la A, como proponía la revisión 1: descartado por ahora. Solo hay una lectura de su salida, tienen casi 0 apariciones (esperar no cuesta nada), una de ellas cargaría /en/miami, que es protegida, y la decisión de la Fase B ya está fijada para el 4-dic.",
+   "Señales fuera del sitio. La revisión 1 solo adelantaba las reseñas; las revisiones 2 y 3 adelantaban también Bing Places y Apple. Adopto el adelanto porque no puede tocar el índice ni ninguna lectura y, con /en/houston fuera, es la única vía de visibilidad en los asistentes que no depende de Google. Va después de las reseñas y con OK, porque son cuentas. Yelp, los perfiles de agencia y la cámara siguen en noviembre, y los créditos en las webs de los clientes van después del 4-nov, en lo que las tres coinciden.",
+   "Diseño web de Houston. La revisión 3 proponía consolidar la familia en una página fuerte por idioma. Lo descarto como fusión, porque el destino natural, /es/houston/diseno-web, está fuera y la regla lo prohíbe. Adopto la versión de la revisión 2: reescritura con ficha previa como diferenciación, propuesta el 4-nov. A eso le sumo la protección de la revisión 1 para la revisión de enero: no se fusiona sin decidir antes el enlace de la ficha.",
+   "Dos condiciones de la revisión 2 que no adopto. Primera, la mirada del 30-oct a las peticiones: sería una lectura de un solo día a 11 días. Segunda, frenar cada tanda de la Fase A si la cobertura cayó esa semana: pararía la fusión de páginas que ya están fuera por una caída que no provocamos. Se mantiene solo la condición aprobada: el destino sigue dentro 7 días después.",
+   "Etiqueta de la decisión. Dos revisiones decían «mantener calendario» y en todo lo que toca el sitio se mantiene. Elijo «adelantar partes» porque se adelantan la neutralización de la cola (al 19-23 oct, dentro de su ventana), las reseñas vencidas, una lectura de Gemini en octubre, y Bing Places y Apple, que pasan de noviembre a octubre."
+  ]
+ },
+ "recs": [
+  {
+   "lente": "Fidelidad a la doctrina y a la medición: qué permite atribuir efectos, qué rompe la lectura y qué dice la doctrina de reaccionar a una caída que sigue.",
+   "lectura": "La caída sigue: la cobertura pasa de 44 a 37 de 84 y el contador de 41 a 35 entre el 13 y el 18-oct, mientras los controles siguen quietos (TRR 33 a 33, JLX 12-13 a 13, MJA 54 a 54). El mecanismo es el mismo de antes. 7 de las 8 salidas nuevas se decidieron sobre copias viejas (último rastreo entre el 9-jul y el 7-sep), igual que 37 de las 40 de la ola. Esto refuerza la causa principal del diagnóstico (Google reevalúa el sitio entero, y solo el nuestro) y debilita la idea de que la actualización de spam bastaba para explicarlo, porque las salidas siguen 10 días después de su fin. El ritmo baja de 2,5 páginas al día (27-sep a 13-oct) a 1,4 (13 a 18-oct), pero no se para.\n\nDoctrina. La semana de espera tras la actualización ya se cumplió (§4) y la caída no es pequeña, así que toca reaccionar. Pero para \"rastreada, sin indexar\" la doctrina solo admite la reacción que ya está en el plan: menos páginas y más fuertes, diferenciar, ganar confianza. Reenviar no sirve y perseguir el 100 % es humo (§6, §7). Además, adelantar cambios en el sitio no da nada que medir:\n- las páginas de la Fase A ya están fuera;\n- las salidas casi no restan apariciones (/en/houston tuvo 1 impresión del 24-sep al 11-oct; /es/houston/diseno-web, 0 desde el 10-sep; el sitio sigue en 8,9 apariciones al día y en 10 a 13 los últimos 4 días);\n- los contactos fueron 0 antes y después.\n\nEn cambio, adelantar sí rompería las dos lecturas que vienen: la señal de las 4 peticiones del 19-oct (a 14 días, el 2-nov) y la meta \"deja de caer\" del 4-nov.\n\nLo nuevo que obliga a ajustar es /en/houston:\n- es la única página de las 8 salidas que Google volvió a leer (17-oct, 16:17 UTC) y sacó después de verla;\n- es la página por la que nos cita Gemini;\n- es el destino de la primera tanda de la Fase A, y la regla aprobada \"no fusionar hacia destinos fuera del índice\" bloquea esa tanda.\n\nCon los dos hubs de Houston fuera, Houston baja de 14 a 9 de 34 páginas indexadas en 5 días. Lo único que conviene acelerar es lo que ya venció y no toca el sitio: las reseñas (la palanca con evidencia fuerte, §2.3), que vencían el 16-oct.\n\nRecomendación: mantener el calendario en todo lo que toca el sitio, fijando días dentro de las ventanas aprobadas, y reordenar la Fase A para que empiece por destinos que siguen indexados.\n\nLo que contradice esta recomendación:\n1. /en/houston salió tras un rastreo nuevo: Google juzgó la versión actual. Esperar al 17-nov es aceptar perder lo único que Gemini citaba (4 de 30).\n2. Con 9 apariciones al día y 0 o 1 clic al mes, ningún cambio llegará a ser concluyente por sí solo; la propia doctrina dice que en sitios pequeños las pruebas no llegan al umbral (§6). Así que el espaciado semanal sirve más para detectar un daño que para atribuir un efecto.\n3. Al ritmo actual, lo probable es que el 4-nov no se cumpla \"deja de caer\", y Google ya está haciendo él solo parte de la Fase B (2 de sus 9 páginas salieron).\n4. Los controles no son del todo limpios: TRR y JLX también pidieron indexación el 18-oct.\n\nAun así la mantengo, porque ninguna de esas objeciones trae una acción con evidencia que funcione más rápido. Reenviar no sirve (§7). Fusionar hacia un /en/houston que está fuera va contra la regla aprobada. Y las palancas de confianza no tocan el sitio y ya están fechadas.",
+   "recomendacion": "mantener calendario",
+   "cambios": [
+    {
+     "accion": "Revisar la señal de las peticiones de indexación (ahora 4 páginas: /es/miami/seo-local, /es/houston/bienes-raices, /es/miami/doral, /es/houston) y anotarla en CAMBIOS.md (plan #11).",
+     "deCuando": "30-oct-2026 (14 días después de unas peticiones previstas para el 16-17 oct)",
+     "aCuando": "Lunes 2-nov-2026 (14 días después de la tarea del 19-oct a las 07:45). Si vuelve a salir 'Quota Exceeded', se reintenta una sola vez el martes 20-oct antes de las 09:05 y la lectura pasa al 3-nov.",
+     "porQue": "Las peticiones no salieron el 16-17 oct: el cupo se agotó el 18-oct a las 10:35 porque TRR, JLX y MJA pidieron antes. Leerlas a los 12 días las mezclaría con el arreglo de honestidad.",
+     "riesgo": "Si tampoco salen el 20-oct, se dan por no hechas: no se insiste a diario (§6, §7) y el resto del calendario no espera por ellas."
+    },
+    {
+     "accion": "Arreglo de honestidad, como borrado mínimo (plan #12).",
+     "deCuando": "31-oct a 6-nov-2026",
+     "aCuando": "Martes 3-nov-2026, siempre que la cola automática esté neutralizada y probada antes del 30-oct.",
+     "porQue": "Así entra después de la lectura semanal y de la señal de las peticiones del 2-nov, sin pisar la lectura del 4-nov (Google tarda una mediana de 49 días en releer). Queda dentro de la ventana aprobada.",
+     "riesgo": "Si la cola no está probada el 30-oct, la honestidad pasa al 10-nov y la higiene y la Fase A se corren una semana detrás. Nunca dos cambios de sitio entero en la misma semana."
+    },
+    {
+     "accion": "Higiene técnica más fechas de actualización veraces en el mapa del sitio (plan #14).",
+     "deCuando": "7 a 13-nov-2026",
+     "aCuando": "Martes 10-nov-2026",
+     "porQue": "Siete días exactos después de la honestidad. Las dos tocan las 44 páginas, y las fechas veraces buscan cambiar el ritmo de rastreo, que un cambio de texto reciente también mueve. Juntas no se podría leer a los 14 días la mediana de días sin rastreo.",
+     "riesgo": "Ninguno nuevo."
+    },
+    {
+     "accion": "Fase A del triage: cambiar el orden de las tandas porque /en/houston salió del índice (plan #16 y decisión de ampliación EN).",
+     "deCuando": "14-nov a 4-dic-2026. Tanda 1: las 4 EN de Houston hacia /en/houston. Tanda 2: /en/miami/ecommerce hacia /en/miami y /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local. Tanda 3: /en/pricing/local-seo-cost-houston más la ampliación EN hacia /en/houston.",
+     "aCuando": "Martes 17-nov: /en/miami/ecommerce hacia /en/miami, más /en/miami/hialeah si sigue fuera en dos lecturas semanales seguidas. Martes 24-nov: /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local, más /es/precios/cuanto-cuesta-un-chatbot hacia /es/precios si sigue fuera. Martes 1-dic: /en/pricing/local-seo-cost-houston hacia /en/pricing. La tanda de /en/houston (conversational-ai, dental-clinics, ecommerce, immigration-lawyers y la ampliación katy, real-estate, auto-repair, local-seo) espera a que /en/houston salga indexada en dos lecturas semanales seguidas; si no, se decide el 4-dic junto con la Fase B.",
+     "porQue": "La regla aprobada prohíbe fusionar hacia destinos fuera del índice, la misma que ya frena /es/houston/sugar-land, y /en/houston está fuera desde el 17-oct. Los destinos nuevos estaban indexados el 18-oct. Hialeah EN y el chatbot ES estaban en la Fase B solo porque Google los conservaba, y ya no los conserva.",
+     "riesgo": "Cambia el orden aprobado y pasa 2 páginas de la Fase B a la A, así que necesita OK del dueño. Cada destino se revisa a los 7 días antes de la tanda siguiente: si sale del índice, su tanda se aplaza."
+    },
+    {
+     "accion": "Créditos con enlace en las webs de TRR, JLX y MJA (parte del plan #18).",
+     "deCuando": "Noviembre a diciembre-2026, sin día fijo",
+     "aCuando": "Después de la lectura del 4-nov, los tres el mismo día, anotado en el registro de cambios de cada sitio.",
+     "porQue": "TRR y JLX son el control limpio. Cambiar el pie de todas sus páginas es un cambio de sitio entero en el control y rompería la comparación justo cuando se lee 'deja de caer'.",
+     "riesgo": "Necesita permiso de cada cliente. Hay que comprobar que, con la cola ya neutralizada en el kit compartido, el cambio de pie no lance peticiones en esos sitios."
+    }
+   ],
+   "nuevas": [
+    {
+     "accion": "Proteger /es/houston/diseno-web en la revisión de enero (prueba 7): no se fusiona sin decidir antes a qué página apunta el enlace de la ficha de Houston.",
+     "cuando": "Se anota ya en el plan y aplica en enero-2027",
+     "porQue": "Es la página que enlaza la ficha de Houston (diagnóstico §10, 1-ago). Salió el 18-oct sobre su copia del 5-sep y lleva 0 impresiones desde el 10-sep, así que en enero tendrá 5 o menos en 90 días y la regla del plan #22 la mandaría a fusión, dejando la ficha apuntando a una redirección.",
+     "necesitaOK": true
+    },
+    {
+     "accion": "Pasar el panel de Gemini con el modelo fijado en cuanto esté el arreglo del kit (antes del 30-oct) y otra vez el 4-nov, anotando si alguna respuesta cita /en/houston.",
+     "cuando": "Entre el 19 y el 30-oct-2026, y el 4-nov-2026",
+     "porQue": "/en/houston era la única vía de citación (4 de 30 el 13-oct) y salió el 17-oct. La doctrina dice que la IA de Google solo cita páginas indexadas (§3), pero Gemini citó /es/miami/ecommerce estando fuera, así que hay que medirlo. Sin modelo fijado no hay comparación válida.",
+     "necesitaOK": false
+    },
+    {
+     "accion": "Anotar cada semana, junto al contador de TRR y JLX, cuántas peticiones de indexación hizo cada uno y la fecha en que el arreglo de la cola entra en cada sitio.",
+     "cuando": "Desde la lectura semanal del 26-oct-2026",
+     "porQue": "El 18-oct las vigilancias de TRR y JLX pidieron y agotaron el cupo antes que Marcyan. MJA dejó de ser control limpio por sus 52 peticiones, y el arreglo de la cola cambia también cómo piden los controles.",
+     "necesitaOK": false
+    }
+   ],
+   "noHacer": [
+    "No pedir indexación de /en/houston ni de /es/houston/diseno-web: 'rastreada, sin indexar' no se reenvía (§7), no tienen cambio real y /en/houston ya se rastreó el 17-oct.",
+    "No reintentar las 4 peticiones a diario: como mucho un reintento el 20-oct (§6, humo).",
+    "No adelantar la Fase A, la honestidad ni la higiene antes del 2-nov: rompería la señal de las peticiones y la lectura del 4-nov, y no aporta nada porque las páginas de la Fase A ya están fuera y casi no tenían apariciones.",
+    "No fusionar nada hacia /en/houston ni hacia /es/houston mientras estén fuera del índice.",
+    "No concluir nada con una sola lectura: el 18-oct es una lectura sola tras 5 días sin vigilancia (15 a 17-oct) y el 8-sep oscilaron 66 páginas. Antes de mover algo, segunda lectura el 19-oct y lectura semanal el 26-oct.",
+    "No leer como recuperación el repunte del 13 al 16-oct (13, 10, 13, 10 al día): son 4 días y los últimos pueden ser provisionales (el 13-oct los datos finales iban 2 días por detrás, ADV-11).",
+    "No tomar el 4-nov como disparador: si la cobertura sigue cayendo, no se adelantan la Fase B ni el replanteamiento de la arquitectura; se deciden el 4-dic y en enero con datos (plan #20, #21 y #24).",
+    "No cambiar el enlace de la ficha de Houston por la caída de /es/houston/diseno-web: la doctrina pide un campo cada vez (§2.1) y no hay dato de que el índice de esa página afecte al mapa.",
+    "No comparar Gemini como tendencia hasta tener el modelo fijado y el texto guardado.",
+    "No juntar dos cambios de sitio entero en la misma semana, ni siquiera para recuperar días perdidos."
+   ],
+   "evidencia": [
+    "Cobertura 44 a 37 de 84 y contador 41 a 35 del 13 al 18-oct; controles TRR 33 a 33, JLX 12-13 a 13, MJA 54 a 54 (lectura-18oct.md; vigilancia f7c824f del 18-oct).",
+    "7 de las 8 salidas nuevas sin rastreo desde entre el 9-jul y el 7-sep; solo /en/houston se rastreó el 17-oct a las 16:17 UTC y pasó a 'Crawled - currently not indexed' (comparación e13.json, e14.json y e18.json de la carpeta lectura).",
+    "Ritmo: 7 páginas en 5 días (1,4 al día) frente a 40 en 16 días (2,5 al día) del 27-sep al 13-oct (lectura-18oct.md; diagnóstico §11).",
+    "Houston, páginas indexadas sin barra: 14 de 34 el 13-oct y 9 de 34 el 18-oct; los dos hubs fuera (/es/houston desde el 9-oct) (e13.json y e18.json).",
+    "/en/houston: 14, 17 y 1 impresiones en 19-ago a 9-sep, 10 a 23-sep y 24-sep a 11-oct; 60 en 90 días; Gemini 4 de 30 el 13-oct, siempre a través de esa página (cronologia/perurl.json; triage del 12-oct; diagnóstico §4).",
+    "/es/houston/diseno-web: último rastreo el 5-sep, 0 impresiones desde el 10-sep, 13 en 90 días; es el enlace de la ficha de Houston desde el 1-ago (perurl.json; triage; diagnóstico §10).",
+    "Apariciones al día: 19,1 antes, 10,2 durante y 8,9 después; diario del 8 al 16-oct 8, 8, 5, 4, 9, 13, 10, 13, 10; en el top 20, 1,13 a 1,00 al día; clics 3, 1 y 0. Los controles suben: TRR 210,5 a 277,2, JLX 7,6 a 30,1, MJA 144,3 a 174,7 (lectura.json, Search Console hasta el 16-oct).",
+    "Destinos alternativos de la Fase A indexados el 18-oct: /en/miami, /en/pricing, /es/precios y /es/houston/seo-local (e18.json).",
+    "2 de las 9 páginas de la Fase B ya están fuera: /en/miami/hialeah y /es/precios/cuanto-cuesta-un-chatbot (lectura-18oct.md; diagnóstico §8).",
+    "Último cambio de código del sitio: 12-oct, 4 enlaces de las páginas legales (fc81574); antes, el archivo de Bing del 26-sep y la pista de idioma del 6-sep. Google juzgó /en/houston sobre un contenido sin cambios desde septiembre (git log de origin/main).",
+    "Peticiones: 'Quota Exceeded' el 18-oct a las 10:35 tras las vigilancias de TRR, JLX y MJA; tarea única el 19-oct a las 07:45 con 4 páginas (lectura-18oct.md).",
+    "Doctrina: §4, esperar al menos una semana tras el fin de la actualización (terminó el 8-oct); §7, 'rastreada, sin indexar' no se reenvía, y según Mueller un sitio sano que apenas se indexa es un sitio del que Google no está convencido; §6, son humo pedir indexación a diario, perseguir el 100 % y las pruebas A/B en sitios pequeños; §2.3, reseñas con evidencia fuerte.",
+    "Reglas del plan: no fusionar hacia destinos fuera del índice; no juntar dos cambios de sitio entero en la misma semana; un cambio de texto común lanzaría unas 41 peticiones automáticas (diagnóstico §6, §7 y §11, ADV-03 y ADV-04).",
+    "Reseñas: 0 en Marcyan frente a 34 en MJA y 38 en TRR; la petición vencía el 16-oct (diagnóstico §3 y §5)."
+   ]
+  },
+  {
+   "lente": "Riesgo de empeorar",
+   "lectura": "La lectura del 18-oct confirma que el recorte sigue y que solo le pasa a Marcyan: la cobertura bajó de 44 a 37 de 84 en cinco días, mientras TRR, JLX y MJA no se movieron. También muestra que casi no cuesta apariciones: de las 88 apariciones por página del 8 al 16-oct, solo 8 venían de las 8 páginas que salieron, y lo que sostiene la cifra son la guía de precios del chatbot (36) y /es/miami (12), que siguen dentro. Entre el 13 y el 18 no cambió el contenido de ninguna página (0 de 84), así que la caída no la provoca nada nuestro.\n\nLo nuevo que importa para el riesgo es que el dato de que un rastreo reciente protege ya no se sostiene. De las 9 páginas indexadas el 27-sep que Google volvió a rastrear, 4 están fuera hoy. Una es /en/houston, rastreada el 17-oct sin ningún cambio nuestro. Entre las 70 sin rastreo nuevo salieron 39. Con 9 casos esto no prueba que rastrear haga daño, pero sí que forzar un rastreo no blinda nada.\n\nPor eso lo que más puede empeorar es obligar a Google a reevaluar ahora páginas que siguen dentro. Eso pasa de tres maneras: pedir rastreos para asegurar las páginas protegidas, fusionar hacia /en/miami o /en/pricing con su petición mientras Google sigue cortando, y publicar un cambio de texto común. Un cambio así hace que la cola automática pida rastreo también de las landings y ciudades indexadas, hasta 8 al día con el cupo que se comparte con los otros tres sitios.\n\nAdemás, la Fase A tal como está escrita ya no se puede aplicar: su semana 1 y la ampliación inglesa van hacia /en/houston, que está fuera desde el 17-oct, y el propio plan prohíbe fusionar hacia páginas fuera del índice.\n\nMi recomendación: no adelantar ningún cambio del sitio, mantener las fechas y corregir dentro del calendario el orden de la Fase A y dos fechas que dependen de las peticiones movidas al 19-oct. Lo único que se puede adelantar sin riesgo para el índice es lo que no toca el sitio.\n\nLo que contradice mi recomendación: si Google decide sobre copias guardadas y corta hagamos lo que hagamos, esperar no compra protección (no tocar /en/houston no la protegió), y la doctrina dice que menos páginas y más fuertes es justo el remedio, así que fusionar hacia /en/houston podría ser lo que la devuelva. Tampoco hay prueba de que rastrear haga daño (salió el 44 % de las rastreadas frente al 56 % de las no rastreadas). No lo descarto: lo dejo para el 4-dic como rescate deliberado, con una lectura de Gemini antes y otra después.",
+   "recomendacion": "mantener calendario",
+   "cambios": [
+    {
+     "accion": "Sacar de la Fase A todas las fusiones hacia /en/houston: conversational-ai, dental-clinics, ecommerce e immigration-lawyers, más la ampliación inglesa aprobada (katy, real-estate, auto-repair y local-seo).",
+     "deCuando": "14 a 20-nov (semana 1) y 28-nov a 4-dic (segunda tanda de /en/houston)",
+     "aCuando": "Se decide en el reporte del 4-dic. Si /en/houston ha vuelto y lleva 2 lecturas semanales dentro, se aplica una tanda por semana. Si sigue fuera, se decide si se usan como rescate deliberado, con lectura de Gemini antes y después.",
+     "porQue": "/en/houston está rastreada y sin indexar desde el rastreo del 17-oct, y el plan prohíbe fusionar hacia destinos fuera del índice (diagnóstico §7 y §8). Es la misma regla que ya impide fusionar /es/houston/sugar-land mientras /es/houston esté fuera.",
+     "riesgo": "Si /en/houston no vuelve sola, la consolidación del inglés de Houston se retrasa hasta diciembre. Las 8 páginas de origen ya están fuera, así que esperar no les quita nada."
+    },
+    {
+     "accion": "Nuevo orden de la Fase A, empezando por un destino que no está entre los protegidos: semana 1, /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local; semana 2, /en/miami/ecommerce hacia /en/miami; semana 3, /en/pricing/local-seo-cost-houston hacia /en/pricing. La opción de mandarla a /en/houston queda descartada.",
+     "deCuando": "Semana 1 hacia /en/houston; semana 2 con /en/miami y /es/houston/seo-local juntas; semana 3 hacia /en/pricing o /en/houston",
+     "aCuando": "14 a 20-nov: /es/houston/seo-local. 21 a 27-nov: /en/miami, solo si /es/houston/seo-local sigue dentro 7 días después de su rastreo y la cobertura no cayó esa semana. 28-nov a 4-dic: /en/pricing, con la misma condición.",
+     "porQue": "Cada fusión lleva una petición al destino y obliga a Google a reevaluarlo, y de las 9 páginas indexadas que volvió a rastrear desde el 27-sep salieron 4. /en/miami y /en/pricing son de las 6 protegidas, las que cita Gemini. /es/houston/seo-local no lo es y tuvo 0 apariciones del 8 al 16-oct, así que es la prueba más barata.",
+     "riesgo": "/es/houston/seo-local puede salir después de su rastreo. Sería una de las 9 páginas de Houston que siguen dentro; si pasa, se paran las otras dos fusiones."
+    },
+    {
+     "accion": "Revisar el resultado de las peticiones de rastreo, que ahora son 4 páginas y se lanzan el 19-oct a las 07:45.",
+     "deCuando": "30-oct (14 días contados desde las peticiones previstas para el 16-17 oct)",
+     "aCuando": "Una primera mirada el 30-oct (11 días) y la lectura que cuenta el 2-nov (14 días).",
+     "porQue": "Las peticiones pasaron al 19-oct porque el 18-oct el cupo estaba agotado. El plan mide su resultado a 14 días y exige anotarlo antes de cualquier cambio en el sitio.",
+     "riesgo": "Ninguno para el índice: las 4 páginas ya están fuera."
+    },
+    {
+     "accion": "Arreglo de honestidad, con el borrado mínimo ya aprobado.",
+     "deCuando": "31-oct a 6-nov",
+     "aCuando": "Martes 3-nov, dentro de la misma ventana. Va después de la lectura semanal del 2-nov y de la revisión de las peticiones, solo si se comprobó que la cola automática quedó neutralizada sin publicar nada, y con el tope diario de peticiones de Marcyan bajado esa semana.",
+     "porQue": "Publicarlo el 31-oct contaminaría la lectura del 2-nov, que es una de las dos que deciden la meta del 4-nov (que la caída se detenga). Aunque la cola ignore las tarjetas compartidas, las 18 respuestas con «enlaces que puedes visitar» son texto propio de cada página y seguirían disparando peticiones, hasta 8 al día con el cupo de TRR, JLX y MJA. Además, la tarjeta de TRR aparece en /es, /en, /es/houston y /en/houston, y /es y /en están protegidas.",
+     "riesgo": "La frase que no podemos demostrar sigue publicada 3 días más. Con 0 clics desde el 27-sep y unas 9 apariciones al día, casi nadie la ve."
+    },
+    {
+     "accion": "Neutralizar la cola automática de peticiones como primera tarea de los arreglos de la vigilancia.",
+     "deCuando": "En cualquier momento del 19 al 30-oct",
+     "aCuando": "Del 19 al 23-oct, comprobada con un cambio simulado en local, nunca con un cambio de texto publicado en el sitio.",
+     "porQue": "Es condición previa del arreglo de honestidad y de las fusiones. La prueba que pide el plan («cola vacía tras un cambio de texto de prueba») lanzaría ella misma las peticiones si ese cambio se publica.",
+     "riesgo": "La vigilancia la comparten los 4 sitios. Si se rompe la serie de los sitios de control, perdemos la forma de saber qué le pasa solo a Marcyan."
+    }
+   ],
+   "nuevas": [
+    {
+     "accion": "Medir Gemini con el modelo fijado en cuanto el panel esté arreglado.",
+     "cuando": "23 a 30-oct",
+     "porQue": "/en/houston era la única página que nos hacía aparecer (4 de 30 respuestas el 13-oct) y la IA de Google solo cita páginas indexadas. Saber si ya perdimos esas apariciones decide si en diciembre conviene usar las fusiones como rescate de /en/houston.",
+     "necesitaOK": false
+    },
+    {
+     "accion": "Corregir en el diagnóstico y en el plan el dato de que un rastreo reciente protege («de 6 indexadas rastreadas salió 1»). El dato de hoy: 4 de 9 fuera, frente a 39 de 70 entre las no rastreadas.",
+     "cuando": "19-oct, junto con la actualización del plan",
+     "porQue": "Para que ninguna rutina ni sesión use peticiones de rastreo para «asegurar» las páginas protegidas.",
+     "necesitaOK": false
+    },
+    {
+     "accion": "Adelantar las altas que no tocan el sitio (Bing Places con las 2 ubicaciones, Apple Business Connect, Yelp y 2 perfiles de agencia).",
+     "cuando": "De noviembre al 19-31 oct",
+     "porQue": "No pueden empeorar el índice y atacan la causa que más nos separa de los sitios de control (0 reseñas, 0 enlaces). El efecto tarda meses, así que dos semanas antes suman poco, pero sin coste. Riesgo propio: el nombre y el teléfono tienen que ser idénticos en todas, y la dirección de Miami debe seguir oculta; una inconsistencia sí haría daño.",
+     "necesitaOK": true
+    },
+    {
+     "accion": "Proponer /es/houston/diseno-web como diferenciación, con su ficha previa, en lugar de una de las 4 aprobadas o como quinta.",
+     "cuando": "Ventana del 21-nov al 18-dic, no antes",
+     "porQue": "Con su salida no queda dentro ninguna de las 6 páginas de Houston de portada o diseño web, en los dos idiomas; solo sigue la de precio de página web. Reescribir una página que ya está fuera no puede empeorarla, pero sin ficha previa sería otro clon, y en octubre competiría por el cupo compartido con las 4 peticiones.",
+     "necesitaOK": true
+    }
+   ],
+   "noHacer": [
+    "No fusionar nada hacia /en/houston mientras esté fuera, ni pedir su rastreo: Google la rastreó el 17-oct y no hay ningún cambio real que enseñarle (doctrina §7).",
+    "No pedir rastreo de las protegidas que siguen dentro (/en, /es, /en/pricing, /en/miami y /es/portafolio) para «asegurarlas»: de las 9 páginas indexadas que Google volvió a rastrear, 4 salieron.",
+    "No añadir a las peticiones del 19-oct las 7 páginas que salieron entre el 13 y el 18: ninguna tiene un cambio real y el cupo se comparte con TRR, JLX y MJA.",
+    "No publicar ningún cambio de texto común (arreglo de honestidad, menú, pie o tarjetas) antes de comprobar que la cola automática está neutralizada, y no comprobarlo publicando un texto de prueba.",
+    "No adelantar a octubre la Fase A, la limpieza de enlaces y fechas del mapa del sitio ni las diferenciaciones: Google sigue cortando y cada cambio con petición pone a reevaluar páginas que hoy están dentro.",
+    "No reescribir con prisa /en/houston ni /es/houston/diseno-web para rescatarlas: sin ficha previa es más plantilla, y ninguna medida de contenido explica qué páginas salen.",
+    "No publicar en la semana del 3-nov el avatar pendiente ni otro despliegue visible. No dispara la cola, porque solo cambia el texto alternativo y los estilos, que la vigilancia no mira, pero mezcla dos cambios en la misma lectura.",
+    "No dar por cumplida la meta del 4-nov con una sola lectura, ni tomar como tendencia los últimos 4 días de apariciones (13, 10, 13 y 10)."
+   ],
+   "evidencia": [
+    "Cobertura de 44 a 37 de 84 entre el 13 y el 18-oct; controles TRR 33 a 33, JLX 13, MJA 54 a 54 (lectura-18oct.md, vigilancia f7c824f).",
+    "Entre el 13 y el 18-oct no cambió la huella de contenido de ninguna página (0 de 84); en main, desde el 13-oct, solo hay commits de vigilancia y de documentación (e13.json frente a e18.json; git log origin/main).",
+    "/en/houston: indexada con la copia del 8-sep, rastreada de nuevo el 17-oct a las 16:17 UTC y «Crawled - currently not indexed» el 18-oct. Apariciones: 9 (16-23 sep), 1 (24-sep a 7-oct) y 1 (8-16 oct) (e13 y e18.json; Search Console por página y día, consulta de solo lectura).",
+    "De las 9 páginas indexadas el 27-sep que Google volvió a rastrear después, el 18-oct hay 4 fuera (/en/houston, /en/houston/beauty-salons, /en/miami/conversational-ai y /es/houston/abogados-inmigracion) y 5 dentro (/en, /es, /en/pricing, /es/houston/branding y /es/miami/diseno-web). De las 70 indexadas sin rastreo nuevo, 39 están fuera (vigilancia 287e7e6 del 27-sep frente a f7c824f del 18-oct). El diagnóstico decía 1 de 6.",
+    "Del 8 al 16-oct hubo 88 apariciones por página. 8 (9 %) son de las 8 páginas que salieron entre el 13 y el 18: /es/sobre-nosotros 5, /en/houston 1, /es/houston/diseno-web 1 y /es/precios/cuanto-cuesta-un-chatbot 1. Otras 36 son de /es/blog/cuanto-cuesta-chatbot-whatsapp-guia y 12 de /es/miami, que siguen dentro (Search Console; último día con datos, 16-oct).",
+    "Destinos de la Fase A el 18-oct: /en/houston fuera; /en/miami dentro (último rastreo 8-sep); /es/houston/seo-local dentro (último rastreo 21-sep; 0 apariciones del 8 al 16-oct); /en/pricing dentro (último rastreo 3-oct) (e18.json).",
+    "La cola automática pide rastreo de las páginas fuera cuyo texto visible cambió y de las indexadas de landings, ciudades y servicios que cambiaron después de su último rastreo, con un tope de 8 al día para Marcyan. Compara solo el texto visible, sin etiquetas ni estilos (kit/lib/vigilancia.mjs y kit/lib/sitio.mjs; seo.config.json, maxPeticionesDia 8).",
+    "La tarjeta de TRR con «la IA de Google ya lo recomienda» sale en la plantilla de las landings y en /es, /en, /es/houston y /en/houston. «Enlaces que puedes visitar» aparece en 18 respuestas de preguntas frecuentes (src/i18n/content.ts:134 y :362; la sección de proyectos va en ClusterLanding y en esas 4 páginas; clusters.ts 8, clusters.en.ts 8, miami.ts 1, miami.en.ts 1).",
+    "/es/houston/diseno-web salió sin rastreo nuevo (último el 5-sep) y tuvo 0, 0 y 1 apariciones en los tres tramos. Fuera están también /es/houston, /en/houston, /en/houston/web-design, /es/houston/diseno-web-bilingue y /en/houston/bilingual-web-design; de lo de diseño web en Houston solo sigue dentro /es/precios/cuanto-cuesta-una-pagina-web-houston (e18.json; Search Console).",
+    "Las páginas vuelven solas a veces: /es/miami/diseno-web volvió el 7-oct y /es/blog/ia-que-contesta-llamadas-mensajes-perdidos tras un rastreo propio de Google el 14-oct (diagnóstico §8; lectura-18oct.md).",
+    "El 18-oct las peticiones dieron «Quota Exceeded» a las 10:35, con el cupo ya gastado por TRR, JLX y MJA; se reprogramaron 4 páginas para el 19-oct a las 07:45 (lectura-18oct.md).",
+    "Doctrina §7: repetir la petición no adelanta el rastreo, una página «rastreada, sin indexar» no necesita reenvío y se hace una petición por página con un cambio real. Doctrina §4: esperar al menos una semana tras el fin de la actualización (terminó el 8-oct, ya cumplido).",
+    "Plan del diagnóstico §7 y §8: no fusionar hacia destinos fuera del índice, /es/houston/sugar-land no se fusiona mientras /es/houston siga fuera, y no se juntan en la misma semana dos cambios que afecten a todo el sitio."
+   ]
+  },
+  {
+   "lente": "Velocidad de recuperación y negocio: qué acorta de verdad el camino a tener páginas fuertes y contactos, qué es esperar sin necesidad, y cómo proteger la visibilidad en Gemini.",
+   "lectura": "Diez días después del fin de la actualización (8-oct), la caída sigue y solo afecta a Marcyan. La cobertura bajó de 44 a 37 de 84 entre el 13 y el 18-oct, mientras TRR, JLX y MJA se quedaron planos. Esto confirma que Google está reevaluando el sitio entero y que no fue ruido de la actualización, así que la espera ya cumplió su función. El ritmo baja (33 salidas en los 8 días hasta el 13-oct, 7 en los 5 siguientes), pero no para, y la meta \"deja de caer el 4-nov\" está en riesgo.\n\nHay dos hechos nuevos que obligan a tocar el plan:\n1. /en/houston, la única página por la que nos citaba Gemini, salió del índice justo después de que Google la releyera el 17-oct. La primera tanda de la Fase A (4 páginas más la ampliación de 4, todas hacia /en/houston) apuntaría ahora a un destino fuera del índice, y eso lo prohíbe el propio plan.\n2. Con la salida de /es/houston/diseno-web, están fuera las 6 páginas de diseño web de Houston, en los dos idiomas. Es el producto principal en la ciudad de la ficha verificada, la ficha enlaza justo a una de ellas, y ninguna de las 4 diferenciaciones aprobadas las toca.\n\nPara el negocio, el número de páginas en Google ya no es lo que nos limita:\n- Del 8 al 17-oct, 79 de 88 apariciones fueron a páginas que siguen dentro.\n- El 41 % fue a un solo artículo, el de precios de chatbot de WhatsApp.\n- /es/miami/diseno-web sigue indexada y aun así pasó de 59 apariciones a 1. Google está frenando también lo que conserva.\n\nIr más rápido con los cambios del sitio no acorta casi nada: Google relee 12 de 84 páginas al mes (mediana de 49 días), así que un cambio se nota en semanas, se publique un lunes o un jueves. Lo que sí acorta el camino a contactos es lo que no depende de esa relectura: reseñas en la ficha de Houston (0 frente a 95, 103 y 117 de la competencia), los directorios principales y Bing. Además, son las fuentes que usan Gemini y ChatGPT para recomendar negocios locales.\n\nMi recomendación:\n- Mantener el orden de los cambios del sitio, con tres ajustes: neutralizar primero la cola automática, leer la señal de las peticiones el 2-nov y hacer el arreglo de honestidad el 3-nov, y reordenar la Fase A con una decisión el 4-nov sobre /en/houston.\n- Adelantar todo lo que pasa fuera del sitio y la medición de Gemini.\n\nLo que contradice mi recomendación:\n- Si Google juzga el sitio entero, ni 3 reseñas ni los directorios tienen por qué mover el índice en meses (evidencia media, doctrina §2.5). Su valor está en Maps y en los asistentes, no en la cobertura.\n- Si /en/houston no vuelve sola, esperar al 4-nov cuesta unas dos semanas. Y reforzarla puede no servir, porque dentro de las landings nada de lo medido explica cuál cae.\n- Si un cambio no se puede medir en una semana, la regla de un cambio grande por semana sirve sobre todo para poder deshacerlo. Juntar el arreglo de honestidad con la higiene técnica ganaría una semana. No lo propongo porque esa semana se ganaría en acciones sin efecto medido y con una página protegida fuera.\n- De las páginas indexadas que Google releyó desde el 26-sep, 5 de 6 siguen dentro y 2 que estaban fuera volvieron. Eso sugiere que releer protege, pero el dato está confundido (Google relee lo que ya valora) y pedir la relectura sin un cambio real no la provoca (doctrina §7).\n- Hubo 0 contactos desde Google incluso con 84 páginas dentro (10 clics en agosto). Nada de este plan trae contactos antes de enero. El camino más corto a un contacto está en la ficha y fuera del SEO.",
+   "recomendacion": "adelantar partes",
+   "cambios": [
+    {
+     "accion": "Neutralizar la cola automática de peticiones (excluir del cambio detectado el menú, el pie, las tarjetas compartidas y la pista de idioma, o bajar el tope) y fijar el modelo del panel de Gemini, como lo primero del paquete de arreglos del kit, con la prueba de cambio de texto hecha en los 4 sitios.",
+     "deCuando": "Cualquier día entre el 19 y el 30-oct (dentro del paquete del kit)",
+     "aCuando": "Del 19 al 23-oct, antes que el resto del paquete",
+     "porQue": "Es el requisito de todo cambio visible: arreglo de honestidad, fusiones de la Fase A y enlaces en las webs de los clientes. Además protege el cupo compartido, que el 18-oct ya se agotó a las 10:35 por las vigilancias de TRR, JLX y MJA. Hacerla primero desbloquea todo lo demás sin adelantar ningún cambio del sitio.",
+     "riesgo": "Son scripts compartidos por los 4 sitios: mantener el contador viejo en paralelo y no romper las series de control (TRR y JLX) antes de la lectura del 4-nov."
+    },
+    {
+     "accion": "Revisión de la señal de las peticiones de rastreo (/es/miami/seo-local, /es/houston/bienes-raices, /es/miami/doral, /es/houston), anotada antes de cualquier cambio del sitio.",
+     "deCuando": "30-oct-2026",
+     "aCuando": "2-nov-2026 (14 días después de las peticiones del 19-oct)",
+     "porQue": "Las peticiones no salieron el 16-17 oct sino que quedaron para el 19-oct a las 07:45 por el Quota Exceeded del 18-oct. El plan (#11) exige leer la señal a 14 días antes de cualquier cambio del sitio.",
+     "riesgo": "Si la tarea del 19-oct falla (máquina apagada, como del 15 al 17-oct, o sin cupo), todo se corre otro día. Repetirla antes de las 09:05."
+    },
+    {
+     "accion": "Arreglo de honestidad como borrado mínimo (la cláusula de la IA de Google, \"con enlaces que puedes visitar\", la frase de /en/about, la oferta de 400 y los precios de los pies del blog), en un solo cambio.",
+     "deCuando": "Entre el 31-oct y el 6-nov",
+     "aCuando": "3-nov-2026 (martes), el día después de anotar la señal, dentro de la ventana aprobada",
+     "porQue": "No se espera que cambie la indexación (diagnóstico §6 #12), así que adelantarlo no acelera nada. Publicarlo antes del 2-nov mezclaría su efecto con el de las peticiones en páginas que llevan la tarjeta afectada. El 3-nov tampoco ensucia la lectura de \"deja de caer\" del 4-nov, porque Google tarda semanas en releer.",
+     "riesgo": "Sin la cola neutralizada lanzaría unas 41 peticiones automáticas. No sustituir la frase quitada por otra común a las 44 páginas."
+    },
+    {
+     "accion": "Fase A: fijar ya el destino de /en/pricing/local-seo-cost-houston en /en/pricing y condicionar la tanda de /en/houston (conversational-ai, dental-clinics, ecommerce, immigration-lawyers y la ampliación katy, real-estate, auto-repair, local-seo) a una decisión el 4-nov. Si /en/houston está dentro en dos lecturas seguidas, sigue como estaba (semana 1, 14-nov). Si sigue fuera, la tanda pasa a ser el refuerzo de /en/houston: las 8 páginas, ya fuera, entran como secciones breves y útiles, con redirección y una sola petición, en la misma semana del 14-nov. Si el dueño no da OK al refuerzo, la semana 1 pasa a /en/miami/ecommerce hacia /en/miami más /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local (destinos dentro), la semana 2 a /en/pricing, y /en/houston espera.",
+     "deCuando": "Semana 1 (14-nov): las 4 EN de Houston hacia /en/houston; semana 3: /en/pricing/local-seo-cost-houston hacia /en/pricing o /en/houston, más la ampliación",
+     "aCuando": "Decisión el 4-nov-2026 y ejecución desde el 14-nov según la rama elegida",
+     "porQue": "/en/houston salió el 18-oct tras ser releída el 17-oct, y el plan prohíbe fusionar hacia destinos fuera del índice (§7 y §8). Las 8 páginas de origen ya están fuera, así que el refuerzo no quita nada indexado. Esperar sin hacer nada no cambia lo que Google ya evaluó, y es la única página por la que Gemini nos citaba (4 de 30 el 13-oct). /en/pricing, /en/miami y /es/houston/seo-local siguen dentro.",
+     "riesgo": "El refuerzo contradice una regla aprobada, así que necesita un OK nuevo. Puede no servir si Google decide por sitio y no por página. /en/houston, /en/miami y /en/pricing están protegidas: revisarlas a los 7 días de cada tanda."
+    },
+    {
+     "accion": "Señales externas que no tocan el sitio: Bing Places (2 ubicaciones) y Apple Business Connect; después Yelp y 2 perfiles de agencia. La cámara de comercio y los enlaces en las webs de TRR, JLX y MJA se quedan en noviembre.",
+     "deCuando": "Noviembre a diciembre-2026",
+     "aCuando": "Bing Places y Apple del 20 al 31-oct; Yelp y perfiles de agencia antes del 14-nov; enlaces de clientes desde el 5-nov, tras la lectura de control del 4-nov y con la cola neutralizada en los 4 sitios",
+     "porQue": "No cambian lo que Google lee del sitio, así que no rompen la regla de un cambio grande por semana. La confianza externa nula es lo que más separa a Marcyan de los controles (0 reseñas y 0 enlaces, frente a 38 de TRR y 34 de MJA). Gemini usa ficha, Maps e índice, y ChatGPT usa Bing y Yelp (doctrina §3). Con /en/houston fuera, son la vía de visibilidad en IA que no depende del índice.",
+     "riesgo": "Evidencia media (doctrina §2.5): ayudan más a Maps y a los asistentes que a la cobertura. Nombre y teléfono idénticos en todas, Miami sin dirección pública. Las cuentas las crea el dueño, que tiene poco tiempo: las reseñas van antes."
+    },
+    {
+     "accion": "Reseñas en la ficha de Houston: un recordatorio de una línea al dueño para pedírselas a TRR, JLX y Rosy Nails (una persona por cliente, desde su propia cuenta, sin texto sugerido ni regalo).",
+     "deCuando": "Vencía el 16-oct-2026",
+     "aCuando": "Del 19 al 21-oct-2026, como primera prioridad de la semana",
+     "porQue": "Es la palanca de evidencia fuerte (doctrina §2.3) y la única que acorta el camino a contactos sin depender de que Google relea el sitio. Houston tiene 0 reseñas frente a 95, 103 y 117 de la competencia. Ya venció, y la doctrina §11 permite un recordatorio de una línea.",
+     "riesgo": "Ninguna desde cuentas o dispositivos que gestione Marcyan ni de alguien con relación societaria. MJA no va en Houston ni en Miami."
+    },
+    {
+     "accion": "Lectura del panel de Gemini (10 preguntas × 3) con el modelo fijado y guardando el texto.",
+     "deCuando": "Dentro del paquete del kit, sin fecha de lectura (mensual desde noviembre)",
+     "aCuando": "22-oct-2026 y otra el 4-nov-2026",
+     "porQue": "/en/houston era la única vía de cita (4 de 30 el 13-oct, siempre a través de ella). Hay que saber si Gemini nos perdió o pasa a citar /en, antes de decidir el 4-nov sobre /en/houston.",
+     "riesgo": "Con 30 respuestas no hay tendencia (plan §7): leerlo pregunta por pregunta como sí o no, no como porcentaje."
+    }
+   ],
+   "nuevas": [
+    {
+     "accion": "Garantizar las lecturas diarias del 19-oct al 4-nov: la tarea de peticiones del 19-oct a las 07:45 y la vigilancia de las 09:05. O la máquina encendida a esas horas, o mover la lectura a un sitio que no dependa de ella.",
+     "cuando": "Desde el 19-oct-2026 hasta el 4-nov-2026",
+     "porQue": "Del 15 al 17-oct no hubo lecturas porque la máquina estuvo apagada. La regla de dos lecturas seguidas, la confirmación de /en/houston (19 y 20-oct) y la meta del 4-nov dependen de ellas. Cada lectura perdida retrasa decisiones un día.",
+     "necesitaOK": true
+    },
+    {
+     "accion": "Incluir en la revisión del 4-nov la familia de diseño web de Houston, hoy entera fuera (/es/houston, /es/houston/diseno-web, /es/houston/diseno-web-bilingue, /en/houston, /en/houston/web-design, /en/houston/bilingual-web-design; solo queda dentro /es/precios/cuanto-cuesta-una-pagina-web-houston). Decidir si una de las 4 diferenciaciones (21-nov a 18-dic) se cambia por consolidar diseño web de Houston en una página fuerte por idioma, con prueba real y sin cifras inventadas.",
+     "cuando": "Decisión el 4-nov-2026; ejecución, si se aprueba, en una semana libre de diferenciaciones entre el 21-nov y el 18-dic",
+     "porQue": "Es el producto principal en la ciudad de la ficha verificada, y la ficha de Houston enlaza a /es/houston/diseno-web desde el 1-ago. Ninguna de las 4 diferenciaciones aprobadas (talleres, IA conversacional Miami, salones EN, SEO local Miami) toca diseño web. En contra: /es/houston/diseno-web solo tuvo 12 apariciones del 1-ago al 17-oct, así que su valor es de negocio y de ficha, no de búsquedas.",
+     "necesitaOK": true
+    },
+    {
+     "accion": "Dejar anotado para el reporte del 4-nov lo que exige la meta del 4-dic: con la Fase A completa (7 + 4) quedan 73 URL vivas y el 60 % pide 44 dentro; con solo las 7, 77 URL y 47 dentro; con la tanda de /en/houston en espera, 81 URL y 49 dentro. Hoy hay 37. Informar el avance contra esa meta sin proponer metas nuevas (doctrina §11).",
+     "cuando": "Reporte mensual del 4-nov-2026",
+     "porQue": "Las fusiones mejoran el porcentaje sobre todo porque quitan del total páginas que ya están fuera. Para llegar al 60 % tienen que volver entre 7 y 12 páginas, y el dueño debe saberlo antes de leer la cifra como recuperación.",
+     "necesitaOK": false
+    }
+   ],
+   "noHacer": [
+    "No pedir indexación de /en/houston: Google la releyó el 17-oct, repetir la petición no adelanta la relectura y una página rastreada sin indexar no necesita reenvío (doctrina §7).",
+    "No añadir /es/houston/diseno-web ni otras URL a la tarea del 19-oct: no han cambiado de verdad desde su último rastreo (5-sep).",
+    "No tocar /en/houston ni ninguna otra página antes de la segunda lectura (19-20 oct) y de neutralizar la cola: el estado de un día oscila (el 8-sep oscilaron unas 66 URL).",
+    "No cambiar el enlace web de la ficha de Houston porque /es/houston/diseno-web haya salido: ningún dato dice que el estado de esa página mueva el mapa, la ficha de Houston no pasó búsquedas a su landing y la ficha se cambia un campo a la vez.",
+    "No comprimir el calendario de cambios del sitio (juntar honestidad e higiene, o adelantar la Fase A al 3-nov): se ganaría una semana en acciones sin efecto medido y se perdería la posibilidad de deshacer con una página protegida fuera.",
+    "No fusionar nada hacia /en/houston antes de la decisión del 4-nov.",
+    "No tocar /es/blog/cuanto-cuesta-chatbot-whatsapp-guia fuera de lo aprobado: es la única página que va hacia el top 20 (36 de 88 apariciones del 8 al 17-oct, posición 17,5).",
+    "No adelantar la Fase B ni el replanteo de la arquitectura: no se cumplen dos lecturas semanales sin caída (37 frente a 44 del 13 al 18-oct).",
+    "No poner enlaces en las webs de TRR, JLX o MJA antes de neutralizar la cola en los 4 sitios: un cambio en el pie dispararía peticiones automáticas en esos sitios con el cupo compartido y movería las series de control.",
+    "No leer el repunte del 13 al 16-oct (11,5 apariciones al día frente a 6,75 del 1 al 12-oct) como recuperación: viene de un artículo, no de páginas que vuelven."
+   ],
+   "evidencia": [
+    "Cobertura 44 (13-oct) a 37 de 84 (18-oct); contador sin barra 41, 40 y 35 (13, 14 y 18-oct). Fuente: lectura-18oct.md, vigilancia f7c824f.",
+    "Control del 13 al 18-oct: TRR 33 a 33, JLX 12/13 a 13, MJA 54 a 54. Fuente: lectura-18oct.md.",
+    "Ritmo: cobertura 77 (5-oct) a 44 (13-oct), 33 salidas en 8 días; 44 a 37 en los 5 días siguientes. Fuente: serie-cobertura.csv y lectura-18oct.md.",
+    "8 salidas del 13 al 18-oct, 7 de ellas sin rastreo desde agosto o septiembre; /en/houston releída el 17-oct y fuera el 18-oct (Crawled - currently not indexed). Fuente: e18.json (lastCrawlTime) y lectura-18oct.md.",
+    "De las páginas que estaban dentro y Google releyó desde el 26-sep (/es, /en, /en/pricing, /es/houston/branding, /es/houston/sugar-land, /en/houston), 5 de 6 siguen dentro; /es/miami/diseno-web y el artículo de la IA que contesta llamadas volvieron tras releerlas. Fuente: e18.json.",
+    "Las 6 URL de diseño web de Houston están fuera el 18-oct; dentro solo queda /es/precios/cuanto-cuesta-una-pagina-web-houston. La ficha de Houston enlaza /es/houston/diseno-web desde el 1-ago. Fuente: e18.json; expediente-ronda1.json.",
+    "Destinos de la Fase A dentro el 18-oct: /en/miami (rastreo 8-sep), /en/pricing (3-oct), /es/houston/seo-local (21-sep). Fuente: e18.json.",
+    "/en/houston: 61 apariciones del 1-ago al 17-oct, posición 23,8; mejor consulta \"houston spanish website design\", 9 apariciones, posición 10,3. /es/houston/diseno-web: 12 apariciones en el mismo periodo. Fuente: consulta de solo lectura a Search Console del 18-oct.",
+    "Gemini: 0, 5 y 4 de 30 respuestas (26-sep, 6-oct, 13-oct), siempre a través de /en/houston y solo en preguntas de diseño web bilingüe. Fuente: diagnóstico §4 y §9.",
+    "Apariciones por página del 8 al 17-oct: 88, de ellas 79 en páginas que hoy siguen dentro. Las 8 que salieron del 13 al 18-oct sumaban 9 del 16 al 23-sep y 3 del 8 al 17-oct. Fuente: Search Console por página cruzado con e13.json y e18.json (el 17-oct puede estar incompleto).",
+    "/es/blog/cuanto-cuesta-chatbot-whatsapp-guia: 36 de 88 apariciones (41 %) del 8 al 17-oct, posición 17,5 (\"chatbot whatsapp precio\" 9, \"precio chatbot whatsapp\" 7). Fuente: Search Console.",
+    "/es/miami/diseno-web, indexada: 59 apariciones del 16-sep al 7-oct (posición 29,6) y 1 del 8 al 17-oct; \"diseño web miami\" ya no sale entre las consultas visibles del 8 al 17-oct. Fuente: Search Console.",
+    "Apariciones al día de Marcyan 19,1 (16-23 sep), 10,2 (24-sep a 7-oct) y 8,9 (8-16 oct), con 0 clics después; TRR de 210,5 a 277,2 y JLX de 7,6 a 30,1. Fuente: lectura-18oct.md y lectura.json.",
+    "Diario del 13 al 16-oct: 13, 10, 13 y 10 apariciones (media 11,5), frente a una media de 6,75 del 1 al 12-oct. Fuente: lectura.json.",
+    "Cupo: Quota Exceeded el 18-oct a las 10:35, gastado antes por las vigilancias de TRR, JLX y MJA; tarea única el 19-oct a las 07:45 con 4 URL. Sin lecturas del 15 al 17-oct por máquina apagada. Fuente: lectura-18oct.md.",
+    "Reseñas: Houston 0 frente a 95, 103 y 117 de la competencia (MISION-DUENO.md); TRR 38 y MJA 34 (diagnóstico §3). La petición vencía el 16-oct (plan #4).",
+    "Google relee despacio: 12 de 84 páginas rastreadas en 30 días, mediana de 49 días desde el último rastreo. Fuente: diagnóstico §9.",
+    "Contactos reales desde Google: 0 en agosto, septiembre y octubre, con 10 clics en agosto y el índice casi completo. Fuente: diagnóstico §9 y §3.",
+    "Doctrina: repetir la petición no adelanta la relectura y una página rastreada sin indexar no necesita reenvío (§7); Gemini usa ficha, Maps e índice y solo cita páginas indexadas, ChatGPT usa Bing y Yelp (§3); las reseñas son evidencia fuerte y los directorios evidencia media (§2.3 y §2.5); al dueño se le recuerda en una línea solo si venció la fecha (§11)."
+   ]
+  }
+ ]
+}

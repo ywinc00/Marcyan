@@ -41,7 +41,9 @@ export default async function handler(req, res) {
       projectId: id,
       type: 'email_sent_to_client',
       actorEmail: session.email,
-      data: { subject, to: brief.email, length: text.length },
+      // El cuerpo se guarda (CRM-18): es texto del propio equipo y así se
+      // puede releer desde el historial qué se le mandó al cliente.
+      data: { subject, to: brief.email, length: text.length, body: text },
     });
 
     return res.status(200).json({ ok: true });

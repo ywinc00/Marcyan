@@ -1,0 +1,1563 @@
+{
+ "respuestaCorta": "No fue algo que rompimos ni un cambio de los últimos dos meses: el sitio funciona bien, Google no nos ha castigado a mano y entre el 7 y el 24 de septiembre no publicamos nada que Google lea. Pasaron dos cosas. El 10 de septiembre Google dejó de mostrar la página principal de Miami, que daba más de la mitad de nuestras apariciones pero casi todas en las páginas 3 a 6 de Google, así que en clics perdimos poco (10 en agosto, 1 desde el 24 de septiembre) y en clientes nada (0 antes y después). Y desde el 29 de septiembre, durante una actualización de Google contra el spam, Google sacó de su lista 40 de nuestras 84 páginas, mientras los otros tres sitios de la cuenta perdían entre 0 y 2; lo más probable es que no le convenzan tantas páginas de plantilla, sobre todo las de servicios en inglés, en un sitio de seis meses sin reseñas, sin enlaces de nadie y con muy poca búsqueda real. El plan es no tocar nada hasta leer los datos el 15 y el 18 de octubre, pedirle a Google una sola vez que relea 5 páginas y, después, con tu visto bueno y un cambio grande por semana, juntar las páginas que ya están fuera dentro de las que siguen, quitar de los textos lo que no podemos demostrar y conseguir reseñas, enlaces y fichas reales. Esto se recupera en meses, no en semanas: la meta razonable es que deje de caer a primeros de noviembre y volver a tener 8 de cada 10 páginas en Google en enero.",
+ "sospechaDelDueno": "Tu intuición apunta a algo real, pero no a un cambio de hace uno o dos meses. Revisamos todo lo que hicimos desde mediados de agosto y nada lo explica. Los arreglos de textos del 18 al 20 de agosto vinieron seguidos de una subida (de 70 a 84 páginas en Google). La rutina que pedía a Google mirar páginas (17 de agosto a 21 de septiembre) añadió 14 páginas y 13 siguen dentro; las peticiones no hicieron ni daño ni bien medible. La ficha de Google de Miami (4 de septiembre) no movió nada en los 6 días siguientes. El aviso de idioma (6 de septiembre) Google lo ve unos segundos en las páginas en español, pero esas cayeron menos que las inglesas, que no lo llevan. Entre el 7 y el 24 de septiembre no publicamos ningún cambio, solo datos internos. La página principal de Miami la soltó Google el 10 de septiembre después de releerla él mismo a las 11:07 de la mañana, hora de Houston; nuestra petición llegó 47 minutos después y ni siquiera hizo que la volviera a leer. Lo que sí es nuestro es más viejo y no es un error puntual: la estructura que montamos en junio y julio, con 84 páginas (44 de ciudad y servicio, con textos de plantilla muy parecidos entre Houston y Miami) y un espejo completo en inglés desde el 4 de julio, en un dominio comprado nuevo el 14 de abril, sin reseñas ni enlaces. Google lo aceptó mientras nos daba el beneficio de la duda y desde el 29 de septiembre lo recorta, empezando por las páginas de servicios en inglés. Queda además un resto pequeño de un fallo de direcciones que tuvimos del 6 de junio al 2 de agosto: 4 páginas que Google guarda con la dirección vieja están fuera.",
+ "aeo": "En los asistentes de inteligencia artificial casi no aparecemos, y la caída en Google todavía no lo ha empeorado. En Gemini, el asistente de Google, con 10 preguntas fijas repetidas 3 veces, salimos en 0 de 30 respuestas el 26 de septiembre, en 5 el 6 de octubre y en 4 hoy, siempre a través de la página de Houston en inglés y solo en las preguntas de diseño web bilingüe; en 7 preguntas reales de clientes salimos 0 de 14 veces, y cuando le preguntan por Marcyan por su nombre nos describe bien. Ninguna de las páginas que Google soltó se citaba antes, así que por ahora no hemos perdido nada ahí, pero si Google suelta la página de Houston en inglés desaparecemos de esas respuestas; por eso esa página y otras cinco quedan protegidas en el plan. Lo que hace que un asistente te cite es que tu propia página sea la que Google o Bing muestran para esa pregunta, y hoy casi ninguna nuestra lo consigue; Bing conoce casi todo el sitio y no lo ha soltado, pero apenas lo muestra (3 apariciones en dos semanas) y tiene registrado un mapa del sitio que no existe, cosa que se arregla en minutos. ChatGPT y Perplexity no se pudieron medir porque no hay claves contratadas, y eso lo decides tú.",
+ "causas": [
+  {
+   "causa": "Google reevalúa el sitio entero y lo recorta a un núcleo (ola de desindexación desde el 29-sep)",
+   "papel": "principal",
+   "confianza": "media",
+   "mecanismo": "Google decide, sobre las copias que ya tenía guardadas, que el sitio no merece tantas páginas y las saca del índice sin releerlas. Selecciona por tipo de página: conserva casi todas las estructurales (portadas, hubs, legales, herramientas) y recorta las de servicio y sector; fuera de las estructurales, estar en el menú protege en español pero no en inglés. Dentro de las landings nada de lo medido explica cuál cae (las gemelas de idioma tienen destinos independientes). Solo le pasa a Marcyan. Es lo que Mueller describe como sitio sano que Google no termina de aceptar (doctrina §7). No requiere ningún cambio nuestro.",
+   "evidenciaClave": [
+    "Control 25-sep → 13-oct: Marcyan 78 → 41 indexadas sin barra; MJA 56 → 54; TRR 35 → 33; JLX 12 → 12 (autoridad/serie-control.json, historial.jsonl de cada repo)",
+    "Cobertura real 84 → 44 (41 sin barra + 3 indexadas por su versión con barra). 13-oct: 36 «rastreada, sin indexar» y 7 «alternativa con canónica correcta» (hueco1/serie-cobertura.csv; REN-03 verificado)",
+    "37 de las 40 salidas sin ningún rastreo posterior al 25-sep, y 38 de las 44 que se quedan tampoco se rastrearon: Google decidió sobre copias guardadas (ING-03 verificado; el dato de rastreo llega con retraso, ver preguntas)",
+    "Por tipo: salen 1 de 14 estructurales, 15 de 22 de sector o ciudad secundaria y 12 de 22 de servicio. No estructurales con menú: salen 2 de 15 en ES y 10 de 15 en EN (ING-01 y ING-02 verificados, r2-verif-capa/resultados.txt)",
+    "Gemelas ES/EN: kappa 0,11 en total y −0,18 en las 22 parejas de landings (ING-04 verificado)",
+    "Técnica sana: 84/84 responden 200, sin noindex, canónicas y hreflang correctos; render limpio con Googlebot móvil y escritorio; sin acción manual (TEC-01/02, REN-01 verificado, Search Console 13-oct)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "El hub /es/miami deja de mostrarse el 10-sep (la mayor parte de la caída de impresiones)",
+   "papel": "principal",
+   "confianza": "alta",
+   "mecanismo": "El hub de Miami concentraba la mayoría de las impresiones del sitio, en posiciones profundas. El 10-sep Google lo rastreó por su cuenta a las 16:07 UTC y dejó de mostrarlo: 8 impresiones ese día, 0 del 11 al 18-sep y un residuo de 1-4 al día desde el 19-sep. Nuestra petición fue a las 16:54 y no provocó rastreo. Parte de sus búsquedas pasaron a /es/miami/diseno-web cuando esta se indexó el 12-sep. Corrección a la ronda 1: no hay un patrón de «cada rastreo orgánico la echa»; en agosto la visibilidad se perdió el 11-ago, antes del rastreo del 15-ago, el rastreo del 23-ago no quitó impresiones y el estado de la herramienta oscila sin rastreos. El porqué del 10-sep sigue sin saberse.",
+   "evidenciaClave": [
+    "/es/miami: 19-41 impresiones al día del 19-ago al 9-sep; 8 el 10-sep; 0 del 11 al 18-sep; 1-4 al día desde el 19-sep (r2-verif-render/miami-daily.txt)",
+    "Explica el 56 % de la caída entre la base y la caída y el 69 % entre el pico y la caída; posición media 41,3 (decomp.txt, CRO-02 verificado)",
+    "Rastreo 16:07:24 UTC, lectura de la rutina 16:42, petición 16:54:29; lastCrawlTime sigue en 10-sep 16:07 el 13-oct (REN-06 verificado)",
+    "Relevo de «diseño web miami» por semana: hub 35 → 19 → 0; landing 0 → 3 → 22 → 6 (r2-verif-render/subst.txt)",
+    "8-sep: unas 66 URL pasan a «rastreada, sin indexar» sin rastreo y vuelven el 9-sep, con /es/miami mostrando 26 y 21 impresiones: el estado de un día no es fiable (REN-07 refutado, exits-hasta-24sep.txt)",
+    "Descartadas como causa la ficha de Miami del 4-sep, el PR #37 y la canibalización (hueco 2, CRO-02)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Confianza externa nula en un dominio joven",
+   "papel": "contribuye",
+   "confianza": "media",
+   "mecanismo": "Google no tiene señales externas con las que respaldar 84 páginas: ni reseñas, ni enlaces, ni apenas búsquedas de marca, y el dominio tiene 6 meses. Es lo que más separa a Marcyan de los controles, pero con tres sitios no se puede separar este factor de la demanda, la plantilla o las peticiones (ING-07 debilitado).",
+   "evidenciaClave": [
+    "Reseñas 13-oct: Marcyan 0 y 0; MJA 34; TRR 38 (resenas.json, AUT-04)",
+    "Dominio comprado nuevo el 14-abr-2026 04:13 UTC, sin transferencia, 0 capturas en Wayback de cualquier subdominio; MJA de mar-2025 (REN-05 verificado)",
+    "0 enlaces externos en Search Console y en Bing. Corrección a la ronda 1: el pie de JLX dice «Web design by Marcyan Studio», sin enlace (AEO-09 verificado)",
+    "Búsquedas de marca: 3, 1 y 1 impresiones en agosto, septiembre y 1-12 oct (gsc-marcyan.json)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Sitio sobredimensionado para su demanda: mucha superficie de plantilla (arquitectura de junio y julio)",
+   "papel": "contribuye",
+   "confianza": "media",
+   "mecanismo": "84 URLs, 44 de ellas landings de ciudad hechas con la misma plantilla y con pares Houston/Miami muy parecidos, para muy poca búsqueda real. Cuando Google reevalúa, recorta esa superficie. Marcyan está igual o más plantillado que los controles, pero los controles también tienen plantilla y no pierden páginas, así que la plantilla sola no basta: pesa junto con la poca demanda y la poca confianza.",
+   "evidenciaClave": [
+    "23 impresiones en 90 días por página indexada, frente a 276 en MJA y 741 en TRR (ctrl-gsc.json, ING-07 verificado)",
+    "Texto compartido medido igual en los tres sitios: Marcyan 57-60 %, TRR 47-50 %, MJA 42-44 % (r2-verif-capa, ING-06 verificado)",
+    "16 páginas de servicio en pares Houston/Miami con similitud 0,41-0,68; política de páginas puerta actualizada el 28-ago-2026 (tabla-84, spam-policies)",
+    "En contra: ninguna medida de plantilla o similitud separa las páginas que salieron una vez descontado el tipo de página (ING-05 verificado)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Capa inglesa: páginas EN de servicio e institucionales",
+   "papel": "contribuye",
+   "confianza": "media",
+   "mecanismo": "El inglés sale más y eso no se explica por rastreo, impresiones, peticiones ni enlaces. El efecto está en las páginas de servicio e institucionales en inglés enlazadas desde el menú y en los clones EN de servicio Houston/Miami; no en las de sector (salen igual en ambos idiomas) ni en las estructurales EN, que siguen todas dentro. TRR, cuya capa espejo es el español, solo perdió 2 páginas de esa capa. El criterio de Google es por URL e idioma, no por el contenido compartido.",
+   "evidenciaClave": [
+    "Salen 22 de 39 en EN y 18 de 45 en ES; OR ajustado 2,4-3,2; sin las 14 estructurales 3,15 [1,10-9,03] (ING-02 verificado)",
+    "No estructurales con menú: 10 de 15 fuera en EN frente a 2 de 15 en ES; sin menú no hay diferencia (12 de 17 frente a 15 de 23)",
+    "Clones de servicio Houston/Miami: salen 7 de 8 en EN y 2 de 8 en ES; sector: 5 de 7 en ambos idiomas",
+    "Las 7 estructurales EN siguen dentro (/en, /en/houston, /en/miami, /en/blog, /en/checkup, /en/tools, /en/privacy)",
+    "Corrección a la ronda 1: el «6 de 6 frente a 0 de 6, p=0,002» estaba confundido por peticiones, rastreo e impresiones",
+    "TRR: pierde solo /es/limpieza-de-propiedades-houston y /es/remocion-de-escombros-houston (ING-08 verificado, n=2)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "La base de impresiones era profunda y frágil (el «pico» estaba en las páginas 3-6)",
+   "papel": "contribuye",
+   "confianza": "alta",
+   "mecanismo": "La caída se mide contra un pico formado casi entero por apariciones en posiciones mayores de 20, sin valor comercial, más dos picos anómalos el 29 y 30-ago. Por eso el gráfico se desploma y los clics y clientes casi no cambian.",
+   "evidenciaClave": [
+    "En el pico (19-ago a 9-sep) el 89 % de las impresiones con consulta visible estaba en posición >20 (CRO-03 verificado)",
+    "Clics: 10 en agosto, 6 en septiembre, 1 entre el 24-sep y el 11-oct; último clic el 27-sep; 0 contactos (reporte mensual, windows.txt)",
+    "GA4 orgánico: 19 sesiones en agosto, 12 en septiembre y 8 del 1 al 12-oct, sin filtro interno (ga4-marcyan.json)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Cambio de medición común a la cuenta (impresiones profundas de escritorio, mediados de septiembre)",
+   "papel": "contribuye",
+   "confianza": "media",
+   "mecanismo": "Desde mediados de septiembre desaparecen en todos los sitios de la cuenta impresiones de escritorio en posiciones profundas, coherente con el bloqueo de rastreadores de posiciones. Explica solo una parte del tramo profundo de Marcyan.",
+   "evidenciaClave": [
+    "Escritorio por semana: MJA 1.352 → 420 y TRR 1.484 → 758, con el móvil plano en MJA (gsc-v.json)",
+    "En Marcyan explica como mucho 85-90 de unas 340 impresiones semanales (EXT-06 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Residuo de las canónicas con barra final (defecto del 6-jun al 2-ago)",
+   "papel": "contribuye",
+   "confianza": "media",
+   "mecanismo": "Google sigue evaluando 7 páginas con copias de junio y julio que declaran la dirección vieja con barra. 3 siguen dentro por esa versión y 4 están fuera en sus dos formas. Un rastreo nuevo cambia la etiqueta pero no protege: de las 13 que se volvieron a rastrear, 7 han salido. Peso marginal.",
+   "evidenciaClave": [
+    "Fuera en sus dos formas: /es/miami/seo-local (último rastreo 14-jun), /es/blog/ia-que-contesta-llamadas-mensajes-perdidos (6-jul), /es/houston/bienes-raices (7-jul), /es/miami/doral (9-jul) (inspect-adv02.txt, ADV-02 verificado)",
+    "Dentro por la versión con barra: /es/portafolio, /es/sobre-nosotros, /es/herramientas",
+    "13 de 13 alternativas rastreadas pasaron a la URL sin barra; 7 de ellas fuera hoy (54 %), igual que el resto (ADV-02)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "La September 2026 spam update como disparador de la ola de desindexación",
+   "papel": "sin determinar",
+   "confianza": "media",
+   "mecanismo": "La ola neta empieza el 29-sep, dentro de la actualización, y su peor tramo cae en días de impacto. La comunidad habla de páginas plantilladas por ciudad. Pero Google no dijo a qué apuntaba, los controles con plantillas de ciudad pierden 0-2, y siguen saliendo páginas después del fin. La caída de impresiones no la explica: empezó el 10-sep con el hub de Miami y siguió sin cortes. Corrección a la ronda 1: el 20-21 sep no es el arranque de nada; las salidas breves sin rastreo empiezan el 26-ago.",
+   "evidenciaClave": [
+    "Actualización del 24-sep 16:15 UTC al 8-oct 08:00 UTC (panel de estado de Google)",
+    "Salidas: 29-sep 1, 30-sep 1, 5-oct 4, 6-oct 10, 7-oct 5, 9-oct 8, 12-oct 6, 13-oct 3 (surv.txt)",
+    "Impresiones semanales de la propiedad (semanas de domingo): 374 → 217 → 199 → 113 → 71 desde la del 30-ago (REN-08 verificado)",
+    "Lectura del índice posible el 15-oct; impresiones completas el 18-oct (ADV-11 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Contenido redactado con IA a escala (plantilla con fórmulas repetidas)",
+   "papel": "sin determinar",
+   "confianza": "baja",
+   "mecanismo": "Las landings salen de una plantilla redactada con asistencia de IA en tandas, con mucho texto y fórmulas comerciales repetidos. Un clasificador de sitio de Google podría pesarlo, pero no es observable, ninguna medida de contenido separa las páginas que salieron y los controles, con marcas de texto generado, no pierden páginas.",
+   "evidenciaClave": [
+    "src/i18n/clusters.ts: 28 de 28 commits coautorizados por Claude; oleadas del 23-jun (941d828, 5167b95) (ING-05 verificado)",
+    "«sin letra pequeña / sin compromiso» 134 veces en 42 de 45 páginas ES; «24 horas» literal 142 veces; «la IA de Google ya lo recomienda» en 22 páginas ES",
+    "Controles: 14,8-16 rayas largas por 1.000 palabras y «not just» en 46 de 47 páginas EN de MJA, sin pérdidas (ING-06 verificado)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Afirmaciones no verificables en los textos (confianza)",
+   "papel": "sin determinar",
+   "confianza": "baja",
+   "mecanismo": "El sitio promete cosas que no muestra. No hay datos que lo liguen a qué páginas cayeron, pero choca con la regla del dueño de no inventar nada y con la guía de contenido útil, que valora la exactitud.",
+   "evidenciaClave": [
+    "«Ya posiciona y la IA de Google ya lo recomienda»: 2 cadenas, 44 páginas (content.ts:134 y :362). Respaldo parcial: TRR aparece en el 27-30 % de las respuestas de Gemini de su panel, pero no se muestra en la página (AEO-09 verificado)",
+    "«con enlaces que puedes visitar»: 18 respuestas (9 ES y 9 EN) y el sitio enlaza a 0 clientes (ADV-10 verificado)",
+    "/en/about: «Google's AI already includes our clients in some recommendations»; oferta de 400 en los datos de la portada apuntando a una página de 1.500"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Copias externas del contenido (scrapers)",
+   "papel": "sin determinar",
+   "confianza": "baja",
+   "mecanismo": "No se encontraron copias, pero la búsqueda disponible no indexa ni el propio sitio, así que no sirve para descartarlas. El único dato fiable va en contra: Google no marca ninguna URL como duplicada de otro host.",
+   "evidenciaClave": [
+    "Google elige marcyanstudio.com como canónica en 84 de 84 URL y ninguna figura como duplicada de otro host (estado-urls.json, REN-03/04)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Consecuencia en IA: la desindexación hundió la visibilidad en asistentes",
+   "papel": "sin determinar",
+   "confianza": "baja",
+   "mecanismo": "No se observa: las páginas que salieron no se citaban antes y la única citada en el set sigue indexada. Con 30 respuestas por lectura y el modelo sin fijar no se puede descartar ni afirmar nada.",
+   "evidenciaClave": [
+    "De 38 páginas salidas desde el 26-sep solo /es/miami/ecommerce se ha citado, hoy y ya fuera del índice (AEO-02 debilitado)",
+    "Gemini 0/30, 5/30, 4/30; p≈0,05-0,11 (AEO-01 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Volatilidad no confirmada de septiembre",
+   "papel": "sin determinar",
+   "confianza": "baja",
+   "mecanismo": "Algunos escalones por página coinciden con días de volatilidad reportados, sin actualización confirmada. No verificable.",
+   "evidenciaClave": [
+    "Search Engine Roundtable: volatilidad 4-13 sep, 15-sep y hacia el 23-sep; nada del 20-21 sep (REN-09 verificado)",
+    "/es/houston/talleres-mecanicos a 0 desde el 15-sep (gone.txt)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Peticiones de indexación (rutina del 17-ago al 21-sep): inflaron el índice, sus rescates no duraron o pedir rastreo hace daño",
+   "papel": "descartada",
+   "confianza": "media",
+   "mecanismo": "La rutina no infló el índice ni lo dañó. A igual frescura de rastreo, pedir no muestra ventaja ni perjuicio. El relevo de búsquedas en Miami es secuela de la pérdida del hub, no de la petición. Corrige a la ronda 1, que la tenía como causa que contribuye con confianza alta.",
+   "evidenciaClave": [
+    "Línea base 17-ago: 70 de 84 (53 + 17 con barra); la rutina añadió 14 páginas y 13 siguen (hueco 1)",
+    "Rescates desde «rastreada, sin indexar» con petición: 11 URL, 6 siguen dentro (corrige «4 de 5 volvieron a caer») (r2-verif-plan/rescue.txt)",
+    "Rastreadas en septiembre: salen 3 de 13 pedidas y 4 de 15 no pedidas; la ventaja bruta (21 % frente a 60 %) viene del rastreo reciente, no de la petición (r2-verif-plan/a01.txt)",
+    "En la ola, de 6 indexadas que Google volvió a rastrear salió de forma duradera 1; de 70 sin rastreo, 35 (ADV-01 verificado)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Enlazado interno débil y rastreo viejo como selectores propios",
+   "papel": "descartada",
+   "confianza": "media",
+   "mecanismo": "Los enlaces entrantes y la antigüedad del rastreo se asocian a la salida en bruto, pero son indicadores del tipo de página. Controlado el tipo, los enlaces dentro del texto y los días sin rastreo no tienen efecto detectable. Corrige a la ronda 1.",
+   "evidenciaClave": [
+    "Enlaces en el cuerpo con el menú controlado: OR 1,03 [0,58-1,81] (ING-01 verificado)",
+    "Días de rastreo: OR 1,08-1,12 por cada 10 días, no significativo; impresiones previas 0,88-0,96 (ING-03 verificado)",
+    "Salieron con 40-70 días sin rastreo, lejos de la regla de 130; TRR conserva 12 páginas con más de 60 días (EXT-D4, AUT-10)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Pista de idioma «Prefer English?» (PR #37) contamina el texto que ve Google",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Google probablemente ve 2 palabras en inglés durante unos segundos en las páginas en español con espejo. Pero esas páginas cayeron menos que las inglesas, que no la muestran.",
+   "evidenciaClave": [
+    "Visible de 2 a 7 s con navigator.language en-US, en Googlebot móvil y escritorio; nunca en páginas EN (REN-02 verificado)",
+    "25-sep → 13-oct: EN sin pista pierden 22 de 39; ES con pista 12 de 34 (lang.mjs)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Cambios de código de septiembre y octubre (PR #37, BingSiteAuth.xml, enlaces legales, despliegues diarios de datos)",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "No cambian nada indexable. Entre el 6-sep 12:00 UTC y el 24-sep solo hubo commits de datos.",
+   "evidenciaClave": [
+    "17 commits «auto(seo)» del 6 al 24-sep, todos solo en data/; último cambio de código a2d7c90 (6-sep 00:56 UTC) (REN-09 verificado)",
+    "Diff 0c9ae95..f1c5778: 0 cambios en title, H1, canonical, hreflang, robots, JSON-LD y texto salvo 4 enlaces legales (CAM-01)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "PR #30 «calidad total» y PR #31 (18-20 ago)",
+   "papel": "descartada",
+   "confianza": "media",
+   "mecanismo": "Cambio de contenido moderado seguido de subida del índice y de impresiones. No se excluye del todo un efecto de sitio con retraso.",
+   "evidenciaClave": [
+    "Vistas con el PR #30: salen 24 de 40 (60 %); nunca vistas: 7 de 11 (64 %) (CAM-04)",
+    "Copia anterior al PR #30 en el modelo ajustado: OR 1,64 [0,48-5,63] (ING-03)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Corrección de canónicas del 2-ago, CSS inline del 4-ago y logo en los datos estructurados",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "La corrección arregló un defecto; el HTML más pesado sigue muy por debajo del límite; el logo no altera tipos.",
+   "evidenciaClave": [
+    "Alternativas con barra: de 17 a 5 entre el 17-ago y el 27-sep (CAM-02)",
+    "HTML mediano de 210 KB, igual en indexadas y no indexadas (TEC-06)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Defecto técnico de indexabilidad o de renderizado",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Todas las señales son correctas en vivo y en el build. El render con Googlebot no tiene errores y el JS no oculta contenido.",
+   "evidenciaClave": [
+    "84/84 con 200, 0 noindex, sitemap sin errores (TEC-01/02)",
+    "Render propio con Googlebot móvil y escritorio: 0 errores de consola, 0 respuestas 4xx/5xx; sin JS hay más texto, no menos; mismo HTML para cualquier agente e idioma (REN-01 verificado). No es el renderizador real de Google"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Copia duplicada en marcyan.vercel.app u otros alias, o el subdominio reports",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "El alias sirve el sitio idéntico pero declara la canónica del dominio y Google elige siempre el dominio. Los demás alias exigen inicio de sesión y llevan noindex. reports es una pantalla de acceso con noindex.",
+   "evidenciaClave": [
+    "md5 idéntico en 7 rutas; canonical a marcyanstudio.com; googleCanonical en el dominio 84/84 (REN-03 verificado)",
+    "reports.marcyanstudio.com: 307 a /sign-in con noindex, nofollow (REN-10 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Dominio caducado reutilizado o historial previo",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Se compró nuevo el 14-abr-2026 y no hay rastro de vida anterior.",
+   "evidenciaClave": [
+    "RDAP y Vercel coinciden al segundo (04:13:24 UTC), registrar «new»; Wayback 0 capturas mientras TRR sí devuelve (REN-05 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "La ficha de Google de Miami (creada el 4-sep)",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Sin efecto medible en los 6 días siguientes; el control de Houston muestra que una ficha no traspasa búsquedas a la página que enlaza.",
+   "evidenciaClave": [
+    "/es/miami: 25,4 impresiones al día antes frente a 23,3 después (hueco 2)",
+    "Ficha operativa, 0 reseñas, fuera del top 20 en 5 búsquedas de categoría (places-rank.json)"
+   ],
+   "esCambioNuestro": true
+  },
+  {
+   "causa": "Acción manual, seguridad o retiradas",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "No existe ninguna; la caída es gradual y selectiva.",
+   "evidenciaClave": [
+    "Search Console 13-oct: ninguna en 6 meses"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Fallo de Search Console o de la herramienta de inspección",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "La ola de octubre es sostenida y cuadra con el informe de páginas. El estado de un día suelto sí es poco fiable (8-sep), por eso se exigen dos lecturas.",
+   "evidenciaClave": [
+    "Informe de páginas del 8-oct: 52 indexadas, coherente con la API (58 el 7-oct, 50 el 9-oct)",
+    "8-sep: los 4 sitios leen 0 y unas 66 URL de Marcyan oscilan sin rastreo (EXT-D2, REN-07)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Otras actualizaciones de Google (August 2026 spam update, actualización principal)",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Tras la de agosto el índice y las impresiones subieron; no hubo principal confirmada después de mayo.",
+   "evidenciaClave": [
+    "August spam update 18-ago a 21-ago; después la cobertura pasó de 70 a 84 (CRO-12)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Contenido fino, relleno de palabras clave, marcado engañoso o traducción automática",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "Las que salieron son más largas; no hay reseñas propias en los datos estructurados; el inglés es traducción curada.",
+   "evidenciaClave": [
+    "Mediana de palabras: 1.354 en las que salieron frente a 1.177 (CC-09)",
+    "0 aggregateRating y 0 Review (CC-07)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Caída de la demanda del mercado, de país o de marca",
+   "papel": "descartada",
+   "confianza": "media",
+   "mecanismo": "La demanda del sector se mantiene y la caída es de búsquedas sin marca.",
+   "evidenciaClave": [
+    "«web design» en Bing EE.UU. +48 % (palabras.json); EE.UU. explica el 75 % de la caída (CRO-07)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "Lectores de IA o Bing no pueden leer el sitio, o Bing también desindexó",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "10 agentes reciben 200 y el mismo HTML; robots.txt los permite. Bing conoce 82 de 84 URL y su índice sube.",
+   "evidenciaClave": [
+    "bots.json: 10 agentes × 10 páginas, mismo hash (AEO-07 verificado)",
+    "Bing: índice 68 → 71 (1-7 oct), 0 bloqueos (AEO-06 verificado)"
+   ],
+   "esCambioNuestro": false
+  },
+  {
+   "causa": "GA4 (11-ago) y alta en el departamento SEO (25-sep)",
+   "papel": "descartada",
+   "confianza": "alta",
+   "mecanismo": "No tocan nada indexable.",
+   "evidenciaClave": [
+    "El alta (6bb0937) solo toca configuración y datos (CRO-14)"
+   ],
+   "esCambioNuestro": true
+  }
+ ],
+ "cronologia": [
+  {
+   "fecha": "24-mar-2026",
+   "evento": "Se crea el proyecto en Vercel con el alias marcyan.vercel.app.",
+   "tipo": "otro"
+  },
+  {
+   "fecha": "14-abr-2026",
+   "evento": "Se compra nuevo el dominio marcyanstudio.com (sin historial previo; 6 meses hoy).",
+   "tipo": "otro"
+  },
+  {
+   "fecha": "6-jun a 2-ago-2026",
+   "evento": "Canonical, hreflang y sitemap apuntan a direcciones con barra final que redirigen (defecto).",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "14-jun-2026",
+   "evento": "Bing descubre las primeras páginas /es.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "23-jun-2026",
+   "evento": "Oleadas de landings de industria y de barrios, redactadas con asistencia de IA (941d828, 5167b95).",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "24 a 26-jun-2026",
+   "evento": "June 2026 spam update.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "29-jun-2026",
+   "evento": "Rediseño Space-Tech de secciones y landings.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "4-jul-2026",
+   "evento": "Bilingüe total: 25 landings EN y hubs EN; el sitio llega a 84 URLs.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "1-ago-2026",
+   "evento": "Primer día con datos en Search Console. Ficha de Google de Houston enlazando /es/houston/diseno-web.",
+   "tipo": "otro"
+  },
+  {
+   "fecha": "2-ago-2026",
+   "evento": "Canónicas sin barra (1021681), 8 peticiones manuales y logo en los datos estructurados.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "4-ago-2026",
+   "evento": "CSS inline, llms.txt e imágenes responsive.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "11-ago-2026",
+   "evento": "Se instala GA4. /es/miami pasa a 0 impresiones del 11 al 17-ago, antes del rastreo del 15-ago.",
+   "tipo": "trafico"
+  },
+  {
+   "fecha": "17-ago-2026",
+   "evento": "Primera foto de la rutina: cobertura 70 de 84 (53 sin barra + 17 con barra).",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "17-ago a 21-sep-2026",
+   "evento": "Rutina de peticiones: 32 peticiones sobre 24 URL; añade 14 páginas (13 siguen).",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "18 a 21-ago-2026",
+   "evento": "August 2026 spam update, sin efecto negativo visible.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "19/20-ago-2026",
+   "evento": "Despliegue del PR #30 «calidad total» y del PR #31.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "26-ago-2026",
+   "evento": "Primera salida breve sin rastreo nuevo (/es/miami), revertida con petición; siguen otras breves el 29-ago, 30-ago, 1-sep, 3-sep y 7-sep.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "27-ago-2026",
+   "evento": "Cobertura 84 de 84 (techo), estable hasta el 27-sep.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "28-ago-2026",
+   "evento": "Google actualiza su política de spam (páginas puerta y contenido a escala).",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "31-ago a 6-sep-2026",
+   "evento": "Semana de máximo: 342 impresiones (212 de /es/miami). 4-sep: máximo de la media de 7 días (54,7 al día) y ficha de Google de Miami creada.",
+   "tipo": "trafico"
+  },
+  {
+   "fecha": "6-sep-2026 00:56 UTC",
+   "evento": "PR #37 (pista de idioma) en producción: último cambio de código hasta el 25-sep.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "8-sep-2026",
+   "evento": "Fallo de Search Console (0 indexadas en los 4 sitios) y oscilación de unas 66 URL de Marcyan sin rastreo; 7 peticiones sobre esa lectura falsa.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "10-sep-2026",
+   "evento": "Google rastrea /es/miami por su cuenta (16:07 UTC) y deja de mostrarla: 8 impresiones ese día y 0 del 11 al 18-sep. Nuestra petición (16:54) no provoca rastreo.",
+   "tipo": "trafico"
+  },
+  {
+   "fecha": "12-sep-2026",
+   "evento": "/es/miami/diseno-web se indexa tras la petición del 11-sep y recoge parte de las búsquedas que el hub perdió.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "13 a 17-sep-2026",
+   "evento": "Bloqueo de rastreadores de posiciones; los controles pierden impresiones profundas de escritorio.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "15-sep-2026",
+   "evento": "/es/houston/talleres-mecanicos pasa a 0 impresiones.",
+   "tipo": "trafico"
+  },
+  {
+   "fecha": "21-sep-2026",
+   "evento": "Última petición de la rutina. (Corrección: el 20-21 sep no es un arranque; la caída de impresiones es continua desde la semana del 31-ago.)",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "24-sep-2026 16:15 UTC",
+   "evento": "Empieza la September 2026 spam update.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "25/26-sep-2026",
+   "evento": "Alta en el departamento SEO; verificación en Bing; Bing registra /sitemap.xml, que da 404. Primera lectura de Gemini (0 de 30). Se pide al dueño gestionar reseñas.",
+   "tipo": "nuestro cambio"
+  },
+  {
+   "fecha": "26/27-sep-2026",
+   "evento": "Máximo del contador: 79 indexadas sin barra.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "29-sep-2026",
+   "evento": "Empieza la ola neta de desindexación.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "5 a 7-oct-2026",
+   "evento": "Peor tramo: 72 → 62 → 58. /es/miami/diseno-web vuelve sola el 7-oct. 6-oct: Gemini 5 de 30; metas del trimestre fijadas.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "8-oct-2026 08:00 UTC",
+   "evento": "Fin de la spam update. Informe de páginas: 52 indexadas.",
+   "tipo": "Google"
+  },
+  {
+   "fecha": "9-oct-2026",
+   "evento": "50 indexadas; sale el hub /es/houston.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "12-oct-2026",
+   "evento": "44 indexadas; triage de 48 páginas; enlaces legales corregidos; cupo de peticiones agotado a las 16:30.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "13-oct-2026",
+   "evento": "41 indexadas sin barra (cobertura real 44). Gemini 4 de 30. Peticiones bloqueadas por permisos. Pruebas de render de 20:25 a 20:45 que pudieron registrar eventos falsos.",
+   "tipo": "indexacion"
+  },
+  {
+   "fecha": "15-oct-2026",
+   "evento": "Lectura del índice tras la actualización y decisiones del dueño.",
+   "tipo": "otro"
+  },
+  {
+   "fecha": "18-oct-2026",
+   "evento": "Lectura de impresiones de la semana posterior al fin de la actualización.",
+   "tipo": "otro"
+  }
+ ],
+ "plan": [
+  {
+   "fase": "Ya",
+   "cuando": "13 a 15-oct-2026",
+   "accion": "Congelar: no publicar cambios en el sitio, no pedir indexación y no tocar el kit compartido hasta las lecturas del 15-oct (índice) y del 18-oct (impresiones).",
+   "palanca": "§4 (esperar una semana tras la actualización) y §7",
+   "porQue": "La actualización terminó el 8-oct. Search Console llega con 2 días de retraso, así que la semana posterior no está completa hasta el 17-18 oct. Cualquier cambio ahora impide saber qué funcionó.",
+   "metrica": "Contador diario y cobertura sin intervenciones nuestras",
+   "requiereOKDueno": false,
+   "riesgo": "Ninguno."
+  },
+  {
+   "fase": "Ya",
+   "cuando": "13 a 15-oct-2026",
+   "accion": "Corregir la lista de peticiones pendientes en CAMBIOS.md: quitar /es/sobre-nosotros (está dentro por su versión con barra), mantener /es/miami/seo-local, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices y /es/miami/doral, añadir /es/houston y pasar la fecha al 16-17 oct. No pedir /es/portafolio, /es/herramientas, /en/blog ni /es/diagnostico.",
+   "palanca": "§7 (una petición por página con cambio real que Google no ha visto)",
+   "porQue": "Las 4 están fuera en sus dos formas con copias de junio y julio (96-121 días sin rastreo) y /es/houston tiene copia del 2-ago, anterior al PR #30. Las demás ya están dentro: pedirlas no recupera nada.",
+   "metrica": "Lista corregida y anotada",
+   "requiereOKDueno": false,
+   "riesgo": "Ninguno."
+  },
+  {
+   "fase": "Ya",
+   "cuando": "13 a 15-oct-2026",
+   "accion": "Escribir en el plan y en el triage que /en/houston, /en, /en/pricing, /en/miami, /es y /es/portafolio no se retiran ni se fusionan.",
+   "palanca": "§3 (la IA de Google solo cita páginas indexadas)",
+   "porQue": "Son las únicas páginas que Gemini cita; /en/houston es la única que nos hace aparecer en el set de preguntas.",
+   "metrica": "Las 6 siguen indexadas en cada lectura",
+   "requiereOKDueno": false,
+   "riesgo": "Ninguno."
+  },
+  {
+   "fase": "Ya",
+   "cuando": "Vence el 16-oct-2026",
+   "accion": "Reseñas: no repetir la petición (pedida el 26-sep). Corregir los destinatarios: TRR, JLX y Rosy Nails en la ficha de Houston, una persona por cliente, desde su propia cuenta, escrita por ellos, sin texto sugerido ni regalo. MJA no va en Houston ni en Miami. En Miami, ninguna hasta tener un cliente allí.",
+   "palanca": "§2.3 Reseñas con ritmo",
+   "porQue": "Las dos fichas tienen 0 reseñas frente a 34-38 de los controles. En los datos de Gemini las reseñas no explican quién aparece, pero siguen siendo la palanca de la doctrina para el mapa y para ChatGPT.",
+   "metrica": "Reseñas en la ficha de Houston (hoy 0)",
+   "requiereOKDueno": true,
+   "riesgo": "Reseñas desde cuentas o dispositivos que gestione Marcyan, o de alguien con relación societaria, violan la política de Google. Confirmar que son clientes independientes."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "15-oct (índice) y 18-oct (impresiones)",
+   "accion": "Leer la actualización con el control al lado: contador y cobertura de Marcyan frente a TRR y JLX el 15-oct; impresiones de la semana 8-15 oct frente a la anterior al 24-sep el 18-oct. MJA no es control limpio (52 peticiones desde el 25-sep).",
+   "palanca": "§1 El reloj y §4 Medición",
+   "porQue": "Si los controles siguen estables y Marcyan sigue bajando, la reevaluación sigue y la respuesta es estructural.",
+   "metrica": "Variación de Marcyan frente a TRR y JLX",
+   "requiereOKDueno": false,
+   "riesgo": "Exigir dos lecturas seguidas antes de concluir: el estado de un día oscila."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "16 o 17-oct-2026, antes de las 09:05",
+   "accion": "Una sola petición de indexación para /es/miami/seo-local, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices, /es/miami/doral y /es/houston. Seguir a diario estado, canónica y fecha de rastreo hasta el 30-oct. Se trata como señal, no como experimento: no hay un grupo de control comparable.",
+   "palanca": "§7 (una petición por página con cambio real)",
+   "porQue": "Google nunca ha visto la corrección del 2-ago en esas 4 páginas ni los textos del PR #30 en /es/houston, y esperar a que las relea solo no tiene fin previsible (solo 12 de 84 se rastrearon en 30 días). Los datos no muestran que un rastreo nuevo haga daño.",
+   "metrica": "A los 14 días: rastreadas sí o no, canónica sin barra, dentro o fuera",
+   "requiereOKDueno": false,
+   "riesgo": "El cupo es por cuenta y día y lo gastan las rutinas de TRR y MJA a las 09:05. El 13-oct la interfaz quedó bloqueada por permisos: hace falta una sesión con permiso o que lo haga Yan. /es/miami/seo-local se reescribirá después; una segunda petición tras reescribirla es legítima."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "19 a 30-oct-2026",
+   "accion": "Arreglos del kit que solo añaden, con el contador viejo en paralelo 2 semanas y probados en TRR, MJA y JLX: cobertura que inspecciona la versión con barra de las alternativas; dos lecturas seguidas antes de reaccionar a una caída; búsqueda de lugares que incluya negocios sin dirección; ficha de Miami en la vigilancia; panel de Gemini con el modelo fijado y guardando el texto. Neutralizar la cola automática de peticiones: excluir del cambio detectado el menú, el pie, las tarjetas compartidas y el aviso de idioma, o bajar el tope mientras dure el plan. Excluir de la medición los eventos de las pruebas de render del 13-oct (20:25-20:45).",
+   "palanca": "§4 Medición y §7",
+   "porQue": "La línea base de 53 era un error de etiqueta, la ficha de Miami no se veía por un fallo del método, y si hoy cambia la tarjeta de TRR la vigilancia lanzaría solas unas 41 peticiones en 6 días.",
+   "metrica": "Serie de cobertura diaria publicada; cola automática vacía tras un cambio de texto de prueba",
+   "requiereOKDueno": false,
+   "riesgo": "Son scripts compartidos por los 4 sitios: no romper las series de los controles."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "19 a 30-oct-2026",
+   "accion": "Bing Webmaster: registrar /sitemap-index.xml y quitar el /sitemap.xml muerto. Activar IndexNow atado solo a los despliegues que cambian contenido, no a los diarios de datos.",
+   "palanca": "§2.7 Salud técnica, §3 (ChatGPT y Copilot usan Bing) y §7 (IndexNow para Bing)",
+   "porQue": "El único mapa del sitio que Bing tiene registrado da 404 desde el 26-sep; en los tres controles está en «Success».",
+   "metrica": "Mapa del sitio en «Success» en Bing; índice de Bing y apariciones",
+   "requiereOKDueno": true,
+   "riesgo": "Cambio de configuración de cuenta. Efecto esperado pequeño: Bing ya descubre 82 de 84 URL."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "19 a 30-oct-2026",
+   "accion": "Filtro de tráfico interno de GA4: comprobarlo en modo prueba, preferir una marca guardada en el dispositivo del dueño frente a la IP y activarlo en una fecha anotada.",
+   "palanca": "§4 Medición",
+   "porQue": "Las sesiones orgánicas (19, 12 y 8) pueden incluir visitas propias. No afecta a Google y ninguna decisión cercana depende de ello.",
+   "metrica": "Visitas propias marcadas en la prueba; fecha de activación en CAMBIOS.md",
+   "requiereOKDueno": true,
+   "riesgo": "Una vez activo, lo excluido no se recupera. La IP del dueño cambia."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "Antes del 4-nov-2026",
+   "accion": "Cerrar la ficha de Miami con la socia: horario coherente con el sitio, fotos de marca y servicios, un campo cada vez, y una captura del panel para revisarla.",
+   "palanca": "§2.1 Ficha de Google",
+   "porQue": "La ficha abre de lunes a sábado en hora del Este y el sitio dice lunes a viernes, hora central; tiene 1 foto de 3-4 y bloquea Bing Places.",
+   "metrica": "Ficha completa y vigilada a diario",
+   "requiereOKDueno": true,
+   "riesgo": "Cambiar varios campos a la vez puede pedir una nueva verificación."
+  },
+  {
+   "fase": "Tras el 15-oct",
+   "cuando": "30-oct-2026",
+   "accion": "Revisar la señal de las 5 peticiones y anotar el resultado en CAMBIOS.md antes de cualquier cambio de sitio.",
+   "palanca": "§4 Medición",
+   "porQue": "Cierra la ventana antes de que el arreglo de textos, el lastmod y las fusiones mezclen efectos.",
+   "metrica": "Estado de las 5 URL a 14 días",
+   "requiereOKDueno": false,
+   "riesgo": "Con 5 páginas solo es una señal."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "31-oct a 6-nov-2026 (un solo cambio, su propio día)",
+   "accion": "Arreglo de honestidad como borrado mínimo, tras neutralizar la cola: quitar la cláusula «y la IA de Google ya lo recomienda» de la tarjeta de TRR (2 cadenas, 44 páginas) sin poner una frase nueva común; quitar «con enlaces que puedes visitar» de las 18 respuestas; revisar la frase de /en/about y «Ya posiciona en su zona» de MJA; corregir la oferta de 400 de los datos de la portada; decir a qué nivel corresponden los precios de los pies del blog. Sin guiones como conector.",
+   "palanca": "Regla del dueño «nada inventado» y §2.4",
+   "porQue": "Son afirmaciones que la página no demuestra. No es un remedio de indexación, es obligatorio por honestidad.",
+   "metrica": "0 afirmaciones sin respaldo en el build; entrada en CAMBIOS.md «sin efecto esperado en indexación»",
+   "requiereOKDueno": true,
+   "riesgo": "Si se publica sin neutralizar la cola, lanza unas 41 peticiones automáticas. Los enlaces a webs de clientes van aparte, con permiso, design-director y OK sobre el render."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "4-nov-2026",
+   "accion": "Reporte mensual con las métricas nuevas: cobertura sobre un conjunto fijo de URL, clics, impresiones en posiciones 1-20, páginas con impresiones, control al lado, Gemini y Bing. Fuera la posición media y las impresiones totales.",
+   "palanca": "§4 Medición",
+   "porQue": "La posición media mejora por composición y las impresiones totales arrastran el cambio de medición de septiembre.",
+   "metrica": "Las del bloque de medición",
+   "requiereOKDueno": false,
+   "riesgo": "Ninguno."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "7 a 13-nov-2026",
+   "accion": "Higiene técnica invisible y lastmod veraz en una misma publicación: logo y migas a /es y /en sin barra (158 enlaces que redirigen), Organization.url a /es, y lastmod en el sitemap tomado de la fecha del último cambio del contenido principal de cada página (sin menú, pie, tarjetas ni aviso de idioma).",
+   "palanca": "§2.7 (higiene) y §7 (sitemap con lastmod veraz)",
+   "porQue": "La higiene tiene un efecto esperado casi nulo (el «presupuesto de rastreo» en sitios pequeños es humo, §6), pero es barata. El lastmod veraz puede ayudar a que Google relea, sin garantía.",
+   "metrica": "0 enlaces internos a redirecciones; lastmod presente; mediana de días sin rastreo a los 14 días",
+   "requiereOKDueno": false,
+   "riesgo": "Un lastmod tomado del build cambiaría a diario (cada commit de datos despliega) y Google lo ignoraría."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "Cualquier semana tras el 30-oct",
+   "accion": "Redirigir marcyan.vercel.app al dominio.",
+   "palanca": "§2.7 Salud técnica",
+   "porQue": "Sirve una copia idéntica; hoy declara la canónica del dominio y Google elige el dominio, así que es prioridad mínima.",
+   "metrica": "El alias responde con redirección",
+   "requiereOKDueno": true,
+   "riesgo": "Cambio de configuración del despliegue."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "14-nov a 4-dic-2026, un hub por semana",
+   "accion": "Fase A del triage, solo con páginas que ya están fuera: semana 1, /en/houston/conversational-ai, /dental-clinics, /ecommerce e /immigration-lawyers a /en/houston; semana 2, /en/miami/ecommerce a /en/miami y /es/precios/cuanto-cuesta-seo-local-houston a /es/houston/seo-local; semana 3, /en/pricing/local-seo-cost-houston directamente a su destino final (/en/pricing, o /en/houston si se aprueba la ampliación) y, si se aprueba, la ampliación EN (katy, real-estate, auto-repair, local-seo) en una segunda tanda de /en/houston. Cada fusión con una sección breve y útil, redirección permanente, sin hreflang del par y una petición por destino cambiado.",
+   "palanca": "§7 (menos páginas y más fuertes) y §5 prueba 7",
+   "porQue": "Reduce superficie donde se concentra la diferencia del inglés (servicios EN y clones Houston/Miami) sin quitar ninguna página que Google conserve. Las respuestas de precio y bilingüe acaban en páginas que siguen indexadas.",
+   "metrica": "Cobertura sobre el conjunto fijo; los destinos siguen indexados 7 días después de cada tanda",
+   "requiereOKDueno": true,
+   "riesgo": "/en/houston es la página que cita Gemini: revisar a los 7 días antes de la siguiente tanda. Nunca fusionar hacia /en/houston/local-seo (está fuera y es candidata: cadena de redirecciones)."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "21-nov a 18-dic-2026, una por semana",
+   "accion": "Las 4 diferenciaciones con ficha previa y prueba real, sin cifras ni casos inventados: /es/houston/talleres-mecanicos reenfocada a «página web para talleres en Houston»; /en/miami/conversational-ai; /en/houston/beauty-salons con Houston en título y H1; /es/miami/seo-local con contenido propio de SEO local en Miami (segunda petición tras publicarla).",
+   "palanca": "§5 pruebas 1, 2 y 5",
+   "porQue": "Son las páginas fuera del índice con demanda o intención real que el hub no cubre.",
+   "metrica": "Indexación y apariciones a las 4 semanas de publicar cada una",
+   "requiereOKDueno": true,
+   "riesgo": "Cambio de texto visible; sin prueba local real se convierten en otro clon. Si toca diseño, design-director y OK sobre el render."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "Noviembre a diciembre-2026",
+   "accion": "Señales externas reales: Bing Places con las 2 ubicaciones, Apple Business Connect, Yelp, 2 perfiles de agencia (Clutch, DesignRush o The Manifest) y la cámara de comercio hispana de Houston. Con permiso de cada cliente, convertir en enlace el crédito del pie de JLX y añadirlo en las webs de TRR y MJA.",
+   "palanca": "§2.5 Directorios núcleo, §2.6 Menciones y enlaces reales y §3",
+   "porQue": "0 enlaces externos y 0 menciones con enlace. ChatGPT usa Bing y Yelp (no medido aquí). Gemini ya usa el pie de JLX como fuente de marca.",
+   "metrica": "Enlaces externos en Search Console y Bing; directorios activos",
+   "requiereOKDueno": true,
+   "riesgo": "Nada de directorios de relleno ni enlaces comprados. Nombre y teléfono idénticos en todos."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "7 a 20-dic-2026 (su propia semana)",
+   "accion": "Enlaces contextuales dentro del texto hacia las páginas que se mantienen y revisión del PR #36 con OK sobre el render.",
+   "palanca": "§7 (enlaces internos contextuales)",
+   "porQue": "Lo respalda la doctrina, pero en estos datos los enlaces del cuerpo no muestran efecto (OR 1,03): baja prioridad y sin esperar que devuelvan páginas.",
+   "metrica": "Páginas mantenidas con enlaces en el cuerpo desde páginas rastreadas",
+   "requiereOKDueno": true,
+   "riesgo": "Anclas forzadas o repetidas suman más plantilla."
+  },
+  {
+   "fase": "4-8 semanas",
+   "cuando": "4-dic-2026",
+   "accion": "Reporte mensual y decisión sobre la Fase B, la capa en inglés y las herramientas de captación con los datos de noviembre.",
+   "palanca": "§4 Medición y §11",
+   "porQue": "Hace falta un mes de datos tras la Fase A.",
+   "metrica": "Cobertura sobre el conjunto fijo frente a la meta del 4-dic",
+   "requiereOKDueno": true,
+   "riesgo": "Ninguno."
+  },
+  {
+   "fase": "3 meses",
+   "cuando": "Enero-2027 (revisión trimestral)",
+   "accion": "Fase B, solo si hay 2 lecturas semanales seguidas sin caída: las 9 páginas que Google hoy conserva (/en/checkup, /en/tools, /en/cities, /es/diagnostico, /es/herramientas, /en/miami/hialeah, /en/miami/local-seo, /es/houston/sugar-land, /es/precios/cuanto-cuesta-un-chatbot). /es/houston/sugar-land no se fusiona mientras /es/houston siga fuera.",
+   "palanca": "§5 prueba 7",
+   "porQue": "Quitar páginas que Google conserva en plena reevaluación no tiene respaldo; perseguir el 100 % de indexación es humo (§6).",
+   "metrica": "Cobertura estable 4 semanas antes de aplicarla",
+   "requiereOKDueno": true,
+   "riesgo": "Quita páginas, incluidas herramientas de captación."
+  },
+  {
+   "fase": "3 meses",
+   "cuando": "Enero-2027",
+   "accion": "Revisión de la prueba 7: las de «mantener» con 5 apariciones o menos pasan a fusión. Ninguna página nueva de ciudad, sector o idioma hasta que la cobertura se estabilice.",
+   "palanca": "§5 prueba 7 y §2.2",
+   "porQue": "Recuperarse de una reevaluación lleva meses y añadir superficie repite el problema.",
+   "metrica": "Apariciones por página en 90 días",
+   "requiereOKDueno": true,
+   "riesgo": "Quita páginas."
+  },
+  {
+   "fase": "3 meses",
+   "cuando": "Diciembre-2026 a enero-2027",
+   "accion": "Confianza propia: una persona real en «sobre nosotros» y como autora del blog, y casos de estudio reales con permiso de cada cliente.",
+   "palanca": "§2.4 y §5 prueba 2",
+   "porQue": "Hoy no hay ningún nombre de persona y el portafolio no enlaza a nadie.",
+   "metrica": "Páginas con autoría y casos con enlace verificable",
+   "requiereOKDueno": true,
+   "riesgo": "Cambio visible y de diseño: design-director y OK sobre el render."
+  },
+  {
+   "fase": "3 meses",
+   "cuando": "Enero-2027",
+   "accion": "Si la cobertura no llega al 80 % de las URL vivas con todo lo anterior, replantear la arquitectura con el tope de la doctrina: un núcleo de servicios y pocas páginas de ciudad con prueba.",
+   "palanca": "§2.2 y §7",
+   "porQue": "Si no mejora, el sitio sigue siendo demasiado grande para lo que respalda.",
+   "metrica": "Cobertura y clics frente a las metas",
+   "requiereOKDueno": true,
+   "riesgo": "Es la decisión más drástica; solo con 3 meses de datos."
+  },
+  {
+   "fase": "3 meses",
+   "cuando": "Mensual desde noviembre; decisión de gasto en enero-2027",
+   "accion": "Medición de IA: panel de Gemini (10 preguntas × 3) con el modelo fijado y el texto guardado; informe de IA de Search Console y AI Performance de Bing leídos a mano; decidir si se pagan las claves para medir ChatGPT y Perplexity.",
+   "palanca": "§3 (cómo se mide)",
+   "porQue": "Hoy solo se mide Gemini, y con 30 respuestas por lectura y modelo sin fijar las diferencias son ruido.",
+   "metrica": "% de apariciones en Gemini sostenido en 3 lecturas",
+   "requiereOKDueno": true,
+   "riesgo": "Gasto de las claves (decide el dueño)."
+  }
+ ],
+ "decisionesDueno": [
+  {
+   "decision": "Triage en dos fases: aprobar la Fase A (7 fusiones de páginas que ya están fuera, con destino indexado) y aplazar las 9 páginas que Google conserva, sin tocar ahora las herramientas.",
+   "recomendacion": "Sí. Aplicar el triage entero quitaría 9 páginas que Google conserva y mandaría dos fusiones a destinos que están fuera del índice.",
+   "cuando": "15-oct-2026"
+  },
+  {
+   "decision": "Ampliación opcional de la capa en inglés: añadir a la Fase A /en/houston/katy, /real-estate, /auto-repair y /local-seo (las 4 fuera, con 1-4 apariciones en 90 días).",
+   "recomendacion": "Sí, en una segunda tanda de /en/houston una semana después de la primera. No podar el inglés en bloque: las 7 páginas estructurales en inglés siguen dentro.",
+   "cuando": "15-oct-2026"
+  },
+  {
+   "decision": "Un único cambio de metas del trimestre, con su motivo (la meta de 80 de 84 se fijó sobre un contador que mezclaba etiquetas y antes de la ola).",
+   "recomendacion": "Cobertura sobre un conjunto fijo de URL vivas: que deje de caer el 4-nov (2 lecturas semanales iguales o mejores), 60 % el 4-dic y 80 % en enero. Reseñas: 3 en Houston al 31-dic más 1 por cada trabajo nuevo. Miami: «ficha completa y vigilada» en lugar de «visible en Maps».",
+   "cuando": "15-oct-2026"
+  },
+  {
+   "decision": "Destinatarios de las reseñas y confirmación de que son clientes independientes.",
+   "recomendacion": "TRR, JLX y Rosy Nails en la ficha de Houston, una persona por cliente, desde su cuenta, sin texto sugerido ni regalo. MJA solo fuera de Google o como testimonio con permiso. Miami, ninguna hasta tener cliente allí.",
+   "cuando": "16-oct-2026 (vence la petición del 26-sep)"
+  },
+  {
+   "decision": "Quién hace las 5 peticiones del 16-17 oct, ya que el 13-oct la interfaz de Search Console quedó bloqueada por permisos.",
+   "recomendacion": "Dar permiso puntual a la sesión o hacerlas tú (unos 5 minutos), antes de las 09:05.",
+   "cuando": "15-oct-2026"
+  },
+  {
+   "decision": "Alcance del arreglo de honestidad, y qué hacer con «la IA de Google ya lo recomienda» en la tarjeta de TRR (TRR sí aparece en el 27-30 % de las respuestas de Gemini de su panel, pero la página no lo demuestra).",
+   "recomendacion": "Borrado mínimo en un solo cambio: quitar la cláusula y «con enlaces que puedes visitar» sin poner frases nuevas comunes. Si quieres conservar el logro de TRR, mostrarlo una sola vez con prueba fechada en su caso del portafolio.",
+   "cuando": "Antes del 31-oct-2026"
+  },
+  {
+   "decision": "Arreglar el mapa del sitio en Bing y activar IndexNow solo con cambios de contenido.",
+   "recomendacion": "Sí. Es configuración de cuenta, cuesta minutos y Bing alimenta a ChatGPT y Copilot.",
+   "cuando": "19 a 30-oct-2026"
+  },
+  {
+   "decision": "Método y fecha del filtro de tráfico interno de GA4.",
+   "recomendacion": "Probarlo primero en modo prueba con una marca en tu dispositivo y activarlo después, con la fecha anotada. No es urgente.",
+   "cuando": "19 a 30-oct-2026"
+  },
+  {
+   "decision": "Cerrar la ficha de Miami con la socia (horario, fotos, servicios) y enviar una captura del panel.",
+   "recomendacion": "Sí, un campo cada vez.",
+   "cuando": "Antes del 4-nov-2026"
+  },
+  {
+   "decision": "Pedir a JLX que su crédito «Web design by Marcyan Studio» lleve enlace, y a TRR y MJA que añadan uno; altas en Bing Places, Apple, Yelp y 2 perfiles de agencia.",
+   "recomendacion": "Sí, con permiso de cada cliente y nombre y teléfono idénticos en todo.",
+   "cuando": "Noviembre-2026"
+  },
+  {
+   "decision": "Redirigir el alias marcyan.vercel.app al dominio.",
+   "recomendacion": "Sí, prioridad baja, cualquier semana tras el 30-oct.",
+   "cuando": "Noviembre-2026"
+  },
+  {
+   "decision": "PR #36 (anclas) y enlaces contextuales, sobre el render.",
+   "recomendacion": "Aprobar tras ver el render, en su propia semana de diciembre, sabiendo que en estos datos no muestran efecto.",
+   "cuando": "Diciembre-2026"
+  },
+  {
+   "decision": "Pagar las claves para medir ChatGPT y Perplexity.",
+   "recomendacion": "Todavía no: con 3 apariciones en Bing en dos semanas la lectura daría casi seguro 0. Revisarlo en enero.",
+   "cuando": "Enero-2027"
+  },
+  {
+   "decision": "Fase B (9 páginas conservadas, incluidas las herramientas de captación), capa en inglés y, si no mejora, replantear la arquitectura.",
+   "recomendacion": "Decidir con los datos de noviembre y diciembre, no antes.",
+   "cuando": "4-dic-2026 y enero-2027"
+  }
+ ],
+ "noHacer": [
+  "No publicar cambios, pedir indexación ni tocar el kit antes de las lecturas del 15-oct (índice) y del 18-oct (impresiones), salvo cambios del kit que solo añadan y mantengan el contador viejo.",
+  "No pedir indexación en bloque ni a diario (doctrina §6 y §7). No porque haga daño, que los datos no lo muestran, sino porque no sirve. Una sola petición por página con un cambio real.",
+  "No pedir /es/portafolio, /es/sobre-nosotros, /es/herramientas, /en/blog ni /es/diagnostico: ya están dentro.",
+  "No publicar ningún cambio de texto visible sin neutralizar antes la cola automática de la vigilancia: lanzaría unas 41 peticiones en 6 días con el cupo que comparten TRR y MJA.",
+  "No aplicar el triage entero ni de golpe: no retirar las 9 páginas que Google conserva antes de que la cobertura se estabilice, no fusionar hacia destinos fuera del índice y no crear cadenas de redirección.",
+  "No retirar ni fusionar /en/houston, /en, /en/pricing, /en/miami, /es ni /es/portafolio: son las únicas que cita la IA.",
+  "No podar el inglés en bloque ni decidir las landings de sector por idioma: salen igual en los dos.",
+  "No juntar en la misma semana dos cambios que afecten a todo el sitio (textos, lastmod, enlaces); los cambios por página pueden ir en paralelo si son páginas distintas, como mucho un hub por semana.",
+  "No sustituir la frase quitada por otra frase común a las 44 páginas: sería más plantilla.",
+  "No inventar casos, cifras, reseñas ni enlaces; no pedir reseñas con incentivo, solo a los satisfechos, desde cuentas que gestione Marcyan, ni poner la de MJA en Houston o Miami.",
+  "No poner un lastmod atado al build o a los despliegues diarios de datos, ni cambiar fechas para parecer fresco.",
+  "No crear páginas nuevas de ciudad, sector o idioma hasta que la cobertura se estabilice.",
+  "No revertir el PR #30, el PR #37 ni la corrección del 2-ago, ni quitar la pista de idioma por motivos de SEO: están descartados.",
+  "No presentar los enlaces internos en el cuerpo como remedio demostrado: en estos datos no muestran efecto.",
+  "No vender ni perseguir humo: llms.txt como palanca, «posición en ChatGPT», datos estructurados como interruptor, listas «los mejores» autopromocionales (aunque Gemini las cite), directorios de relleno, enlaces comprados o servicios de indexación.",
+  "No medir la recuperación con la posición media ni con las impresiones totales, ni sacar conclusiones del estado de inspección de un solo día (el 8-sep oscilaron unas 66 URL).",
+  "No comparar lecturas de Gemini como tendencia con 30 respuestas y el modelo sin fijar.",
+  "No usar MJA como control limpio: pidió 52 indexaciones desde el 25-sep.",
+  "No contar en la medición de la pista de idioma los eventos de las pruebas de render del 13-oct (20:25-20:45).",
+  "No activar el filtro de GA4 sin probarlo: lo excluido no se recupera.",
+  "No tomar decisiones drásticas (eliminar todo el inglés, rediseñar o cambiar de dominio) por el desplome de impresiones: más de la mitad era una sola página en las páginas 3 a 6 de Google."
+ ],
+ "triage12oct": "El triage del 12-oct acierta en la lógica (menos páginas y más fuertes, prueba 7) y en sus 48 veredictos como dirección, pero no debe aplicarse entero ni de golpe. Se decide el 15-oct con estos cambios.\n\nHechos que corregir en el documento: la ola empezó el 29-sep, dentro de la actualización, con su peor tramo del 5 al 7-oct, y siguió el 9, 12 y 13-oct; no fue «el día siguiente al fin». La cobertura real es 44 (41 sin barra más /es/herramientas, /es/portafolio y /es/sobre-nosotros por su versión con barra); /es/miami/seo-local, /es/miami/doral, /es/houston/bienes-raices y /es/blog/ia-que-contesta-llamadas-mensajes-perdidos están fuera en sus dos formas. La línea base del 17-ago es 70 de 84, no 53. /es/miami/diseno-web volvió sola el 7-oct.\n\nFase A (tras el 30-oct, un hub por semana, con OK): solo páginas que ya están fuera y tienen destino indexado. /en/houston/conversational-ai, /dental-clinics, /ecommerce e /immigration-lawyers a /en/houston; /en/miami/ecommerce a /en/miami; /es/precios/cuanto-cuesta-seo-local-houston a /es/houston/seo-local; /en/pricing/local-seo-cost-houston directamente a su destino final (/en/pricing, o /en/houston si se aprueba la ampliación), nunca a /en/houston/local-seo, que está fuera y es candidata a fusión. Cobertura: 44 de 77 en lugar de 35 de 68.\n\nFase B (enero, o antes si hay 2 lecturas semanales sin caída): las 9 que Google conserva (/en/checkup, /en/tools, /en/cities, /es/diagnostico, /es/herramientas, /en/miami/hialeah, /en/miami/local-seo, /es/houston/sugar-land, /es/precios/cuanto-cuesta-un-chatbot). Las herramientas no se tocan ahora. /es/houston/sugar-land no se fusiona mientras /es/houston siga fuera.\n\nProtección: /en/houston, /en, /en/pricing, /en/miami, /es y /es/portafolio no se retiran ni fusionan; son las únicas que cita Gemini.\n\nInglés: la evidencia ajustada sitúa la desventaja del inglés en las páginas de servicio e institucionales del menú (10 de 15 fuera frente a 2 de 15 en español) y en los clones de servicio Houston/Miami (7 de 8 fuera frente a 2 de 8); las de sector salen igual en los dos idiomas (5 de 7), así que esas se deciden por demanda. La ampliación opcional (katy, real-estate, auto-repair y local-seo en inglés, las 4 fuera) puede entrar en la Fase A como segunda tanda de /en/houston. No se poda el inglés en bloque.\n\nDiferenciaciones (4): se mantienen, una por semana, con ficha previa y sin promesas no verificables; /es/miami/seo-local recibe una petición el 16-17 oct y otra tras reescribirla.\n\nEjecución de cada fusión: sección breve y útil (no texto de plantilla copiado), redirección permanente a esa sección, se quita el hreflang del par, una petición por destino cambiado, y antes de publicar se neutraliza la cola automática.\n\nMeta: la de «60 de 68 a las 4 semanas» no cuadra con las otras tres metas vigentes. Se sustituye por un único cambio de meta del trimestre: cobertura sobre un conjunto fijo de URL vivas, que deje de caer el 4-nov, 60 % el 4-dic y 80 % en enero.",
+ "medicion": [
+  {
+   "metrica": "Cobertura sobre un conjunto fijo de URL vivas (sin barra indexada, o alternativa cuya versión con barra está indexada)",
+   "hoy": "44 de 84 (52 %) el 13-oct; 70 de 84 el 17-ago; techo de 84 del 27-ago al 27-sep",
+   "meta": "Deja de caer (2 lecturas semanales seguidas iguales o mejores); 60 %; 80 % (nivel del 17-ago)",
+   "fecha": "4-nov-2026; 4-dic-2026; enero-2027"
+  },
+  {
+   "metrica": "Contador de indexadas sin barra (inspección de Google)",
+   "hoy": "41 (13-oct)",
+   "meta": "Sin nuevas salidas en 2 lecturas seguidas",
+   "fecha": "Lecturas del 15-oct y semanales"
+  },
+  {
+   "metrica": "Variación frente al control limpio (TRR y JLX)",
+   "hoy": "25-sep → 13-oct: Marcyan −47 % (78 → 41), TRR −6 % (35 → 33), JLX 0 % (12 → 12)",
+   "meta": "Marcyan estable mientras los controles lo estén",
+   "fecha": "15-oct, 18-oct y 4-nov-2026"
+  },
+  {
+   "metrica": "Señal de las 5 peticiones (/es/miami/seo-local, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices, /es/miami/doral, /es/houston)",
+   "hoy": "Las 5 fuera; 4 con copias de junio y julio, /es/houston con copia del 2-ago",
+   "meta": "Anotar si se rastrearon, si la canónica pasó a sin barra y si entraron (señal, no meta de éxito)",
+   "fecha": "30-oct-2026"
+  },
+  {
+   "metrica": "Clics de Google al mes",
+   "hoy": "10 en agosto, 6 en septiembre; 1 entre el 24-sep y el 11-oct",
+   "meta": "≥10 al mes",
+   "fecha": "Enero-2027 (control el 4-dic)"
+  },
+  {
+   "metrica": "Impresiones al día en posiciones 1-20",
+   "hoy": "0,5 al día (29-sep a 11-oct)",
+   "meta": "≥2,3 al día; ≥3,6 al día",
+   "fecha": "4-dic-2026; enero-2027"
+  },
+  {
+   "metrica": "Páginas con impresiones por semana",
+   "hoy": "19 (semana del 5-oct); 44 en la del 24-ago",
+   "meta": "≥26 (nivel de la semana del 7-sep)",
+   "fecha": "4-dic-2026"
+  },
+  {
+   "metrica": "Visibilidad de Miami (/es/miami + /es/miami/diseno-web)",
+   "hoy": "8 impresiones del 1 al 12-oct, con ambas indexadas",
+   "meta": "≥5 impresiones al día entre las dos",
+   "fecha": "Enero-2027"
+  },
+  {
+   "metrica": "Mediana de días desde el último rastreo (señal de salud, no selector)",
+   "hoy": "49 días (MJA 10); 12 de 84 rastreadas en 30 días",
+   "meta": "≤30 días",
+   "fecha": "4-dic-2026"
+  },
+  {
+   "metrica": "Reseñas reales en las fichas de Google",
+   "hoy": "Houston 0, Miami 0",
+   "meta": "3 en Houston más 1 por cada trabajo nuevo; Miami tras el primer cliente de allí",
+   "fecha": "31-dic-2026"
+  },
+  {
+   "metrica": "Enlaces externos reales",
+   "hoy": "0 (JLX menciona a Marcyan sin enlace)",
+   "meta": "≥3 (créditos de clientes con permiso, cámara, perfiles de agencia)",
+   "fecha": "Enero-2027"
+  },
+  {
+   "metrica": "Directorios activos",
+   "hoy": "2 fichas de Google (Houston y Miami)",
+   "meta": "Más Bing Places (2), Apple, Yelp y 2 perfiles de agencia",
+   "fecha": "4-dic-2026"
+  },
+  {
+   "metrica": "Bing",
+   "hoy": "Mapa del sitio registrado con 404; 71 páginas en su índice; 3 impresiones y 0 clics desde el 30-sep",
+   "meta": "Mapa en «Success»; impresiones vigiladas en el reporte mensual",
+   "fecha": "31-oct-2026 (mapa); mensual"
+  },
+  {
+   "metrica": "Apariciones en Gemini (10 preguntas × 3, modelo fijado, texto guardado)",
+   "hoy": "4 de 30 (13 %), 3 de 30 nombrando a Marcyan; 0 de 14 en preguntas de cliente; 4 de 4 en preguntas de marca",
+   "meta": "≥17 % sostenido en 3 lecturas y al menos una pregunta distinta de las bilingües",
+   "fecha": "Enero-2027"
+  },
+  {
+   "metrica": "Páginas citadas por la IA que siguen indexadas",
+   "hoy": "6 de 6 (/en/houston, /en, /en/pricing, /en/miami, /es, /es/portafolio por su versión con barra)",
+   "meta": "6 de 6 en cada lectura",
+   "fecha": "Semanal"
+  },
+  {
+   "metrica": "Sesiones orgánicas en GA4 con el filtro interno activo",
+   "hoy": "8 del 1 al 12-oct, sin filtro (cota superior)",
+   "meta": "Línea base limpia desde la activación",
+   "fecha": "4-dic-2026"
+  },
+  {
+   "metrica": "Contactos reales que llegan desde Google",
+   "hoy": "0 en agosto, septiembre y octubre",
+   "meta": "≥1",
+   "fecha": "Enero-2027"
+  }
+ ],
+ "series": {
+  "indexacionDiaria": [
+   {
+    "fecha": "2026-08-17",
+    "indexadas": 53,
+    "cobertura": 70
+   },
+   {
+    "fecha": "2026-08-18",
+    "indexadas": 54,
+    "cobertura": 71
+   },
+   {
+    "fecha": "2026-08-19",
+    "indexadas": 54,
+    "cobertura": 71
+   },
+   {
+    "fecha": "2026-08-20",
+    "indexadas": 59,
+    "cobertura": 75
+   },
+   {
+    "fecha": "2026-08-21",
+    "indexadas": 59,
+    "cobertura": 75
+   },
+   {
+    "fecha": "2026-08-22",
+    "indexadas": 59,
+    "cobertura": 75
+   },
+   {
+    "fecha": "2026-08-23",
+    "indexadas": 63,
+    "cobertura": 79
+   },
+   {
+    "fecha": "2026-08-24",
+    "indexadas": 63,
+    "cobertura": 79
+   },
+   {
+    "fecha": "2026-08-26",
+    "indexadas": 68,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-08-27",
+    "indexadas": 69,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-08-28",
+    "indexadas": 69,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-08-29",
+    "indexadas": 68,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-08-30",
+    "indexadas": 68,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-01",
+    "indexadas": 71,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-02",
+    "indexadas": 71,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-03",
+    "indexadas": 70,
+    "cobertura": 82
+   },
+   {
+    "fecha": "2026-09-04",
+    "indexadas": 71,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-05",
+    "indexadas": 72,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-06",
+    "indexadas": 73,
+    "cobertura": 82
+   },
+   {
+    "fecha": "2026-09-07",
+    "indexadas": 73,
+    "cobertura": 81
+   },
+   {
+    "fecha": "2026-09-09",
+    "indexadas": 73,
+    "cobertura": 81
+   },
+   {
+    "fecha": "2026-09-10",
+    "indexadas": 76,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-11",
+    "indexadas": 77,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-12",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-13",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-14",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-15",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-17",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-18",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-19",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-20",
+    "indexadas": 77,
+    "cobertura": 83
+   },
+   {
+    "fecha": "2026-09-21",
+    "indexadas": 76,
+    "cobertura": 82
+   },
+   {
+    "fecha": "2026-09-22",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-23",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-25",
+    "indexadas": 78,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-26",
+    "indexadas": 79,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-27",
+    "indexadas": 79,
+    "cobertura": 84
+   },
+   {
+    "fecha": "2026-09-29",
+    "indexadas": 77,
+    "cobertura": 82
+   },
+   {
+    "fecha": "2026-09-30",
+    "indexadas": 76,
+    "cobertura": 81
+   },
+   {
+    "fecha": "2026-10-01",
+    "indexadas": 76,
+    "cobertura": 81
+   },
+   {
+    "fecha": "2026-10-03",
+    "indexadas": 75,
+    "cobertura": 80
+   },
+   {
+    "fecha": "2026-10-04",
+    "indexadas": 76,
+    "cobertura": 81
+   },
+   {
+    "fecha": "2026-10-05",
+    "indexadas": 72,
+    "cobertura": 77
+   },
+   {
+    "fecha": "2026-10-06",
+    "indexadas": 62,
+    "cobertura": 67
+   },
+   {
+    "fecha": "2026-10-07",
+    "indexadas": 58,
+    "cobertura": 63
+   },
+   {
+    "fecha": "2026-10-09",
+    "indexadas": 50,
+    "cobertura": 55
+   },
+   {
+    "fecha": "2026-10-12",
+    "indexadas": 44,
+    "cobertura": 50
+   },
+   {
+    "fecha": "2026-10-13",
+    "indexadas": 41,
+    "cobertura": 44
+   }
+  ],
+  "impresionesSemanales": [
+   {
+    "semana": "3-ago",
+    "impresiones": 214,
+    "clics": 1,
+    "miami": 124,
+    "top20": 30
+   },
+   {
+    "semana": "10-ago",
+    "impresiones": 86,
+    "clics": 1,
+    "miami": 14,
+    "top20": 24
+   },
+   {
+    "semana": "17-ago",
+    "impresiones": 153,
+    "clics": 8,
+    "miami": 114,
+    "top20": 19
+   },
+   {
+    "semana": "24-ago",
+    "impresiones": 320,
+    "clics": 0,
+    "miami": 187,
+    "top20": 15
+   },
+   {
+    "semana": "31-ago",
+    "impresiones": 342,
+    "clics": 2,
+    "miami": 212,
+    "top20": 32
+   },
+   {
+    "semana": "7-sep",
+    "impresiones": 210,
+    "clics": 0,
+    "miami": 77,
+    "top20": 25
+   },
+   {
+    "semana": "14-sep",
+    "impresiones": 184,
+    "clics": 2,
+    "miami": 2,
+    "top20": 14
+   },
+   {
+    "semana": "21-sep",
+    "impresiones": 115,
+    "clics": 2,
+    "miami": 7,
+    "top20": 15
+   },
+   {
+    "semana": "28-sep",
+    "impresiones": 54,
+    "clics": 0,
+    "miami": 6,
+    "top20": 9
+   },
+   {
+    "semana": "5-oct",
+    "impresiones": 46,
+    "clics": 0,
+    "miami": 8,
+    "top20": 1
+   }
+  ],
+  "control": [
+   {
+    "sitio": "Marcyan",
+    "antes": 78,
+    "ahora": 41,
+    "fechaAntes": "25-sep-2026",
+    "fechaAhora": "13-oct-2026"
+   },
+   {
+    "sitio": "MJA (no es control limpio: 52 peticiones en la ventana)",
+    "antes": 56,
+    "ahora": 54,
+    "fechaAntes": "25-sep-2026",
+    "fechaAhora": "13-oct-2026"
+   },
+   {
+    "sitio": "TRR",
+    "antes": 35,
+    "ahora": 33,
+    "fechaAntes": "25-sep-2026",
+    "fechaAhora": "13-oct-2026"
+   },
+   {
+    "sitio": "JLX",
+    "antes": 12,
+    "ahora": 12,
+    "fechaAntes": "25-sep-2026",
+    "fechaAhora": "13-oct-2026"
+   }
+  ],
+  "fuente": "indexacionDiaria: diag/hueco1/serie-cobertura.csv (ronda 1; URL Inspection API vía el historial git de data/indexing-status.json). «indexadas» = contador sin barra. «cobertura» = techo (indexadas sin barra + alternativas con canónica con barra, que se suponen indexadas por su versión con barra) hasta el 12-oct; el 13-oct es la cobertura real verificada (44; el techo daba 48). Sin lecturas el 25-ago, 31-ago, 8-sep (fallo), 16-sep, 24-sep, 28-sep, 2-oct, 8-oct, 10-oct y 11-oct. impresionesSemanales: diag/cronologia/gsc-daily.json (ronda 1; Search Analytics de la propiedad de dominio), agregado por semanas completas de lunes a domingo del 3-ago al 11-oct; cuadra con la serie 320/342/210/184/115/54/46 de CAM-07. «impresiones» y «clics» = nivel propiedad por fecha. «miami» = impresiones por página de /es/miami (dimensión página; no suman igual que la propiedad). «top20» = impresiones de consultas visibles con posición media diaria ≤20 (excluye consultas anonimizadas: es un mínimo). Se excluyen las semanas parciales del 27-jul (2 días) y del 12-oct (1 día). control: diag/autoridad/serie-control.json (historial.jsonl de cada repo), contador sin barra del 25-sep frente al 13-oct; el máximo de Marcyan fue 79 el 26/27-sep."
+ },
+ "cifras": [
+  {
+   "nombre": "Contador de indexadas sin barra",
+   "valor": "79 el 26/27-sep → 41 el 13-oct",
+   "fuente": "URL Inspection API, data/seo/historial.jsonl"
+  },
+  {
+   "nombre": "Cobertura real",
+   "valor": "70 de 84 el 17-ago; techo de 84 del 27-ago al 27-sep; 44 de 84 el 13-oct (40 perdidas)",
+   "fuente": "diag/hueco1/serie-cobertura.csv y cobertura.txt; inspección de variantes del 13-oct"
+  },
+  {
+   "nombre": "Estado del 13-oct",
+   "valor": "41 indexadas, 36 «rastreada, sin indexar», 7 alternativas (3 dentro por la barra, 4 fuera en sus dos formas)",
+   "fuente": "estado-urls.json (REN-03 y ADV-02 verificados)"
+  },
+  {
+   "nombre": "Control 25-sep → 13-oct",
+   "valor": "Marcyan 78 → 41; MJA 56 → 54; TRR 35 → 33; JLX 12 → 12",
+   "fuente": "diag/autoridad/serie-control.json"
+  },
+  {
+   "nombre": "Salidas sin rastreo nuevo",
+   "valor": "37 de 40 sin rastreo posterior al 25-sep; 38 de 44 de las que se quedan tampoco se rastrearon",
+   "fuente": "ING-03 verificado (estado-urls.json, lastCrawlTime)"
+  },
+  {
+   "nombre": "Salida por tipo de página",
+   "valor": "Estructurales 1 de 14; sector y secundaria 15 de 22; servicio 12 de 22",
+   "fuente": "r2-capa-ingles-escala/tabla-84 (ING-01 verificado)"
+  },
+  {
+   "nombre": "Efecto del inglés",
+   "valor": "Salen 22 de 39 EN frente a 18 de 45 ES; OR ajustado 2,4-3,2; sin estructurales 3,15 [1,10-9,03]; servicios e institucionales del menú 10 de 15 EN frente a 2 de 15 ES; clones de servicio 7 de 8 EN frente a 2 de 8 ES",
+   "fuente": "ING-02 verificado (r2-verif-capa/resultados.txt)"
+  },
+  {
+   "nombre": "Independencia de las gemelas ES/EN",
+   "valor": "Kappa 0,11 en total; −0,18 en las 22 parejas de landings",
+   "fuente": "ING-04 verificado"
+  },
+  {
+   "nombre": "Enlaces en el cuerpo",
+   "valor": "OR 1,03 [0,58-1,81] con el menú controlado",
+   "fuente": "ING-01 verificado (links.json, lr.mjs)"
+  },
+  {
+   "nombre": "Plantilla frente a controles",
+   "valor": "Texto compartido en landings: Marcyan 57-60 %, TRR 47-50 %, MJA 42-44 %; 28 de 28 commits de clusters.ts coautorizados por Claude",
+   "fuente": "ING-05 e ING-06 verificados"
+  },
+  {
+   "nombre": "Demanda por página indexada (90 días)",
+   "valor": "Marcyan 23, MJA 276, TRR 741 impresiones",
+   "fuente": "r2-capa-ingles-escala/ctrl-gsc.json (ING-07 verificado)"
+  },
+  {
+   "nombre": "Confianza externa",
+   "valor": "0 reseñas (MJA 34, TRR 38); 0 enlaces externos; dominio comprado nuevo el 14-abr-2026, 0 capturas en Wayback; JLX menciona a Marcyan sin enlace",
+   "fuente": "AUT-04, REN-05 y AEO-09 verificados"
+  },
+  {
+   "nombre": "Impresiones semanales (semanas de lunes)",
+   "valor": "320 (24-ago), 342, 210, 184, 115, 54, 46 (5-oct)",
+   "fuente": "cronologia/gsc-daily.json (CAM-07)"
+  },
+  {
+   "nombre": "Peso de /es/miami en la caída de impresiones",
+   "valor": "56 % (base frente a caída) y 69 % (pico frente a caída); posición media 41,3",
+   "fuente": "decomp.txt (CRO-02 verificado)"
+  },
+  {
+   "nombre": "/es/miami tras el 10-sep",
+   "valor": "8 impresiones el 10-sep; 0 del 11 al 18-sep; 1-4 al día desde el 19-sep",
+   "fuente": "r2-verif-render/miami-daily.txt"
+  },
+  {
+   "nombre": "Secuencia del 10-sep",
+   "valor": "Rastreo de Google 16:07:24 UTC; lectura de la rutina 16:42; petición 16:54:29 sin rastreo posterior",
+   "fuente": "indexing-status.json en f68bbe8 y f62769f (REN-06 verificado)"
+  },
+  {
+   "nombre": "Relevo de «diseño web miami» por semana",
+   "valor": "Hub 35 → 19 → 0; landing 0 → 3 → 22 → 6",
+   "fuente": "r2-verif-render/subst.txt"
+  },
+  {
+   "nombre": "Profundidad del pico",
+   "valor": "89 % de las impresiones con consulta visible en posición >20 (19-ago a 9-sep)",
+   "fuente": "CRO-03 verificado"
+  },
+  {
+   "nombre": "Clics y contactos",
+   "valor": "10 en agosto, 6 en septiembre, 1 entre el 24-sep y el 11-oct (último el 27-sep); 0 contactos",
+   "fuente": "Reporte mensual SEO y windows.txt"
+  },
+  {
+   "nombre": "Tráfico orgánico en GA4",
+   "valor": "19 sesiones en agosto, 12 en septiembre, 8 del 1 al 12-oct (sin filtro interno)",
+   "fuente": "GA4 549587864 (ga4-marcyan.json)"
+  },
+  {
+   "nombre": "Peticiones de indexación",
+   "valor": "32 sobre 24 URL (18-ago a 21-sep); +14 páginas, 13 siguen; rescates 11, 6 siguen dentro",
+   "fuente": "Hueco 1 y r2-verif-plan/rescue.txt"
+  },
+  {
+   "nombre": "Peticiones a igual frescura de rastreo",
+   "valor": "Rastreadas en septiembre: salen 3 de 13 pedidas y 4 de 15 no pedidas",
+   "fuente": "r2-verif-plan/a01.txt (ADV-01 verificado)"
+  },
+  {
+   "nombre": "Rastreos frescos durante la ola",
+   "valor": "De 6 indexadas rastreadas, 1 salida duradera; de 70 sin rastreo, salen 35",
+   "fuente": "ADV-01 verificado"
+  },
+  {
+   "nombre": "Cola automática de peticiones",
+   "valor": "Unas 41 de las 44 páginas con la tarjeta de TRR entrarían si cambia su texto; tope de 8 al día, unos 6 días",
+   "fuente": "kit/lib/vigilancia.mjs:321-342 y r2-verif-plan/cola.mjs (ADV-03 verificado)"
+  },
+  {
+   "nombre": "Triage completo frente a Fase A",
+   "valor": "9 de las 16 URL a quitar están hoy cubiertas; triage completo 44/84 → 35/68; solo Fase A 44/77",
+   "fuente": "r2-adversarial-plan/triage-state.txt (ADV-04 verificado)"
+  },
+  {
+   "nombre": "Salidas por fecha",
+   "valor": "29-sep 1, 30-sep 1, 5-oct 4, 6-oct 10, 7-oct 5, 9-oct 8, 12-oct 6, 13-oct 3",
+   "fuente": "surv.txt y fallen.json (ronda 1)"
+  },
+  {
+   "nombre": "Ventana de la September 2026 spam update",
+   "valor": "24-sep 16:15 UTC a 8-oct 08:00 UTC",
+   "fuente": "Panel de estado de Google"
+  },
+  {
+   "nombre": "Gemini (set fijo de 10 preguntas × 3)",
+   "valor": "0 de 30 (26-sep), 5 de 30 (6-oct), 4 de 30 (13-oct); 0 de 14 en preguntas de cliente; 4 de 4 en preguntas de marca; competidores 0 %",
+   "fuente": "data/seo/ia/*.json y r2-aeo/panel-hoy.json (AEO-01 verificado)"
+  },
+  {
+   "nombre": "Bing",
+   "valor": "82 de 84 URL conocidas; índice 68 → 71; 3 impresiones y 0 clics desde el 30-sep; único mapa del sitio registrado /sitemap.xml con 404",
+   "fuente": "r2-aeo/bing-raw.json (AEO-06 verificado)"
+  },
+  {
+   "nombre": "Contenido citable fuera del índice",
+   "valor": "22 de 40 URL (55 %), con el 27-28 % de las impresiones del grupo",
+   "fuente": "r2-aeo/citable.json (AEO-08 verificado)"
+  },
+  {
+   "nombre": "Render con Googlebot",
+   "valor": "0 errores en móvil y escritorio; «Prefer English?» visible de 2 a 7 s en páginas ES; ES con pista pierden 12 de 34 frente a EN 22 de 39",
+   "fuente": "r2-render/render.json y r2-verif-render/myrender2-sum.txt (REN-01/02 verificados)"
+  },
+  {
+   "nombre": "Afirmaciones no verificables",
+   "valor": "Tarjeta de TRR: 2 cadenas en 44 páginas; «con enlaces que puedes visitar» en 18 respuestas; 1 frase en /en/about",
+   "fuente": "content.ts:134 y :362, about.astro:43 (ADV-10 verificado)"
+  },
+  {
+   "nombre": "Retraso de Search Console",
+   "valor": "El 13-oct, datos finales hasta el 11-oct y provisionales hasta el 12-oct",
+   "fuente": "ADV-11 verificado"
+  },
+  {
+   "nombre": "Ruido de medición del 13-oct",
+   "valor": "48 cargas de prueba con 40 envíos a GA abortados y unos 8 eventos falsos de pista de idioma (20:25-20:45 hora local)",
+   "fuente": "REN-11 verificado"
+  }
+ ],
+ "preguntasAbiertas": [
+  "¿Por qué dejó Google de mostrar el hub /es/miami el 10-sep? El patrón de «cada rastreo la echa» quedó refutado y la ficha, el PR #37 y la canibalización están descartados.",
+  "¿Fue la September 2026 spam update el disparador de la ola o coincidió con una reevaluación ordinaria? Lectura del índice el 15-oct y de impresiones el 18-oct, con TRR y JLX al lado.",
+  "¿Ha terminado la caída del índice? El 13-oct seguían saliendo páginas.",
+  "¿Qué separa a Marcyan de los controles: la demanda, la confianza, la plantilla o las peticiones continuas de MJA? Con tres sitios no es identificable.",
+  "¿Por qué, dentro de las landings, unas salen y otras no? Nada de lo medido lo explica y las gemelas de idioma tienen destinos independientes.",
+  "¿Qué ve el renderizador real de Google? Solo la prueba en vivo de la interfaz lo muestra; el render propio está limpio.",
+  "¿Cuánto retrasa el dato de último rastreo? Falta cruzar las 40 salidas con los ejemplos de las estadísticas de rastreo (solo en la interfaz).",
+  "¿Tuvo Google URL de marcyan.vercel.app en su índice entre el 24-mar y el 6-jun, cuando el sitio no tenía canónica?",
+  "¿Hay copias externas del contenido? No se puede comprobar sin buscar frases exactas en Google.",
+  "¿Cuál es la visibilidad en ChatGPT, Perplexity, Copilot, AI Overviews y AI Mode? Sin medir (claves vacías, sin navegador).",
+  "¿Por qué citó Gemini /es/miami/ecommerce estando fuera del índice?",
+  "¿Quién registró /sitemap.xml en Bing el 26-sep y usa Bing la línea del mapa de robots.txt?",
+  "¿Existen fichas de Marcyan en Yelp, Bing Places, Apple o perfiles de agencia?",
+  "¿Qué causó la pérdida común de impresiones profundas de escritorio a mediados de septiembre?",
+  "¿Qué configuró la socia en la ficha de Miami y hubo alguna suspensión temporal en septiembre?",
+  "¿Tienen TRR, JLX o Rosy Nails alguna relación personal o societaria con el dueño (conflicto en reseñas)?",
+  "¿Quita la exclusión de tráfico interno los eventos de las pruebas de render del 13-oct al guardarlos o solo en los informes?",
+  "¿Cuál es la fuente primaria de las cifras 46 % y 76 % atribuidas a «Google · BrightLocal, 2025» en 16 páginas?",
+  "Hueco de la crítica 1 (línea base de 53 y pico inflado): cerrado en la ronda 1; la base real era 70 de 84 y la rutina añadió 14 páginas.",
+  "Hueco 2 (ficha de Miami): cerrado; existe, está operativa y queda descartada como causa; corregidas las métricas a 2 fichas.",
+  "Hueco 3 (sin AEO): cerrado en parte; medidos Gemini, Bing y los lectores de IA; siguen sin medir ChatGPT, Perplexity, AI Overviews, AI Mode y los informes de IA de las consolas.",
+  "Hueco 4 (retirar herramientas y metas contradictorias): cerrado; triage en dos fases, herramientas sin tocar y un único cambio de metas.",
+  "Hueco 5 (pedir rastreo puede empeorar): cerrado; los datos no muestran daño, la lista se corrige y queda como señal de 5 páginas sin control válido.",
+  "Hueco 6 (capa inglesa confundida): cerrado; el efecto ajustado se sostiene en el límite y se concentra en servicios EN del menú y clones Houston/Miami.",
+  "Hueco 7 (contenido con IA a escala): evaluado; el sitio está más plantillado que los controles, pero no separa páginas y a nivel de sitio queda sin determinar.",
+  "Hueco 8 (retraso del rastreo y render de Google): render cerrado con renderizador propio; el cruce con las estadísticas de rastreo sigue abierto.",
+  "Hueco 9 (contradicción del 10-sep): cerrado; Google rastreó primero y nuestra petición no provocó rastreo.",
+  "Hueco 10 (afirmaciones de la síntesis): corregidas; las de sector se explican por tipo de página, la cifra de −91 % se retira por estar dominada por /es/miami y el residuo de la barra baja a confianza media.",
+  "Hueco 11 (reseñas y política): cerrado; destinatarios TRR, JLX y Rosy Nails, sin MJA en Houston o Miami.",
+  "Hueco 12 (arranque del 20-21 sep): cerrado; no es un arranque, la caída de impresiones es continua desde la semana del 31-ago.",
+  "Hueco 13 (historial del dominio y copias): dominio y alias cerrados; las copias externas y la indexación histórica del alias siguen abiertas."
+ ]
+}

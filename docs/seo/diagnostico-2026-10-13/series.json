@@ -1,0 +1,347 @@
+{
+ "indexacionDiaria": [
+  {
+   "fecha": "2026-08-17",
+   "indexadas": 53,
+   "cobertura": 70
+  },
+  {
+   "fecha": "2026-08-18",
+   "indexadas": 54,
+   "cobertura": 71
+  },
+  {
+   "fecha": "2026-08-19",
+   "indexadas": 54,
+   "cobertura": 71
+  },
+  {
+   "fecha": "2026-08-20",
+   "indexadas": 59,
+   "cobertura": 75
+  },
+  {
+   "fecha": "2026-08-21",
+   "indexadas": 59,
+   "cobertura": 75
+  },
+  {
+   "fecha": "2026-08-22",
+   "indexadas": 59,
+   "cobertura": 75
+  },
+  {
+   "fecha": "2026-08-23",
+   "indexadas": 63,
+   "cobertura": 79
+  },
+  {
+   "fecha": "2026-08-24",
+   "indexadas": 63,
+   "cobertura": 79
+  },
+  {
+   "fecha": "2026-08-26",
+   "indexadas": 68,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-08-27",
+   "indexadas": 69,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-08-28",
+   "indexadas": 69,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-08-29",
+   "indexadas": 68,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-08-30",
+   "indexadas": 68,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-01",
+   "indexadas": 71,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-02",
+   "indexadas": 71,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-03",
+   "indexadas": 70,
+   "cobertura": 82
+  },
+  {
+   "fecha": "2026-09-04",
+   "indexadas": 71,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-05",
+   "indexadas": 72,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-06",
+   "indexadas": 73,
+   "cobertura": 82
+  },
+  {
+   "fecha": "2026-09-07",
+   "indexadas": 73,
+   "cobertura": 81
+  },
+  {
+   "fecha": "2026-09-09",
+   "indexadas": 73,
+   "cobertura": 81
+  },
+  {
+   "fecha": "2026-09-10",
+   "indexadas": 76,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-11",
+   "indexadas": 77,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-12",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-13",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-14",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-15",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-17",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-18",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-19",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-20",
+   "indexadas": 77,
+   "cobertura": 83
+  },
+  {
+   "fecha": "2026-09-21",
+   "indexadas": 76,
+   "cobertura": 82
+  },
+  {
+   "fecha": "2026-09-22",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-23",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-25",
+   "indexadas": 78,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-26",
+   "indexadas": 79,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-27",
+   "indexadas": 79,
+   "cobertura": 84
+  },
+  {
+   "fecha": "2026-09-29",
+   "indexadas": 77,
+   "cobertura": 82
+  },
+  {
+   "fecha": "2026-09-30",
+   "indexadas": 76,
+   "cobertura": 81
+  },
+  {
+   "fecha": "2026-10-01",
+   "indexadas": 76,
+   "cobertura": 81
+  },
+  {
+   "fecha": "2026-10-03",
+   "indexadas": 75,
+   "cobertura": 80
+  },
+  {
+   "fecha": "2026-10-04",
+   "indexadas": 76,
+   "cobertura": 81
+  },
+  {
+   "fecha": "2026-10-05",
+   "indexadas": 72,
+   "cobertura": 77
+  },
+  {
+   "fecha": "2026-10-06",
+   "indexadas": 62,
+   "cobertura": 67
+  },
+  {
+   "fecha": "2026-10-07",
+   "indexadas": 58,
+   "cobertura": 63
+  },
+  {
+   "fecha": "2026-10-09",
+   "indexadas": 50,
+   "cobertura": 55
+  },
+  {
+   "fecha": "2026-10-12",
+   "indexadas": 44,
+   "cobertura": 50
+  },
+  {
+   "fecha": "2026-10-13",
+   "indexadas": 41,
+   "cobertura": 44
+  }
+ ],
+ "impresionesSemanales": [
+  {
+   "semana": "3-ago",
+   "impresiones": 214,
+   "clics": 1,
+   "miami": 124,
+   "top20": 30
+  },
+  {
+   "semana": "10-ago",
+   "impresiones": 86,
+   "clics": 1,
+   "miami": 14,
+   "top20": 24
+  },
+  {
+   "semana": "17-ago",
+   "impresiones": 153,
+   "clics": 8,
+   "miami": 114,
+   "top20": 19
+  },
+  {
+   "semana": "24-ago",
+   "impresiones": 320,
+   "clics": 0,
+   "miami": 187,
+   "top20": 15
+  },
+  {
+   "semana": "31-ago",
+   "impresiones": 342,
+   "clics": 2,
+   "miami": 212,
+   "top20": 32
+  },
+  {
+   "semana": "7-sep",
+   "impresiones": 210,
+   "clics": 0,
+   "miami": 77,
+   "top20": 25
+  },
+  {
+   "semana": "14-sep",
+   "impresiones": 184,
+   "clics": 2,
+   "miami": 2,
+   "top20": 14
+  },
+  {
+   "semana": "21-sep",
+   "impresiones": 115,
+   "clics": 2,
+   "miami": 7,
+   "top20": 15
+  },
+  {
+   "semana": "28-sep",
+   "impresiones": 54,
+   "clics": 0,
+   "miami": 6,
+   "top20": 9
+  },
+  {
+   "semana": "5-oct",
+   "impresiones": 46,
+   "clics": 0,
+   "miami": 8,
+   "top20": 1
+  }
+ ],
+ "control": [
+  {
+   "sitio": "Marcyan",
+   "antes": 78,
+   "ahora": 41,
+   "fechaAntes": "25-sep-2026",
+   "fechaAhora": "13-oct-2026"
+  },
+  {
+   "sitio": "MJA (no es control limpio: 52 peticiones en la ventana)",
+   "antes": 56,
+   "ahora": 54,
+   "fechaAntes": "25-sep-2026",
+   "fechaAhora": "13-oct-2026"
+  },
+  {
+   "sitio": "TRR",
+   "antes": 35,
+   "ahora": 33,
+   "fechaAntes": "25-sep-2026",
+   "fechaAhora": "13-oct-2026"
+  },
+  {
+   "sitio": "JLX",
+   "antes": 12,
+   "ahora": 12,
+   "fechaAntes": "25-sep-2026",
+   "fechaAhora": "13-oct-2026"
+  }
+ ],
+ "fuente": "indexacionDiaria: diag/hueco1/serie-cobertura.csv (ronda 1; URL Inspection API vía el historial git de data/indexing-status.json). «indexadas» = contador sin barra. «cobertura» = techo (indexadas sin barra + alternativas con canónica con barra, que se suponen indexadas por su versión con barra) hasta el 12-oct; el 13-oct es la cobertura real verificada (44; el techo daba 48). Sin lecturas el 25-ago, 31-ago, 8-sep (fallo), 16-sep, 24-sep, 28-sep, 2-oct, 8-oct, 10-oct y 11-oct. impresionesSemanales: diag/cronologia/gsc-daily.json (ronda 1; Search Analytics de la propiedad de dominio), agregado por semanas completas de lunes a domingo del 3-ago al 11-oct; cuadra con la serie 320/342/210/184/115/54/46 de CAM-07. «impresiones» y «clics» = nivel propiedad por fecha. «miami» = impresiones por página de /es/miami (dimensión página; no suman igual que la propiedad). «top20» = impresiones de consultas visibles con posición media diaria ≤20 (excluye consultas anonimizadas: es un mínimo). Se excluyen las semanas parciales del 27-jul (2 días) y del 12-oct (1 día). control: diag/autoridad/serie-control.json (historial.jsonl de cada repo), contador sin barra del 25-sep frente al 13-oct; el máximo de Marcyan fue 79 el 26/27-sep."
+}

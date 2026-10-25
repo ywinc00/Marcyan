@@ -1,14 +1,14 @@
 {
   "name": "Marcyan Panel",
   "short_name": "Marcyan",
-  "description": "Panel de operaciones de Marcyan — leads, briefs y proyectos.",
+  "description": "Panel de operaciones de Marcyan: leads, briefs y proyectos.",
   "id": "/dashboard",
   "start_url": "/dashboard",
   "scope": "/dashboard",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#080808",
-  "theme_color": "#080808",
+  "background_color": "#0e0e11",
+  "theme_color": "#0e0e11",
   "lang": "es",
   "dir": "ltr",
   "icons": [

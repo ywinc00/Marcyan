@@ -1,0 +1,160 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-10-10",
+    "hasta": "2026-10-16"
+  },
+  "anterior": {
+    "desde": "2026-10-03",
+    "hasta": "2026-10-09"
+  },
+  "anioPasado": {
+    "desde": "2025-10-11",
+    "hasta": "2025-10-17"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 0,
+      "impresiones": 64,
+      "ctr": 0,
+      "posicion": 14.7
+    },
+    "anterior": {
+      "clicks": 0,
+      "impresiones": 47,
+      "ctr": 0,
+      "posicion": 19.3
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 0,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 29,
+        "ctr": 0,
+        "posicion": 21.6
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 1,
+        "ctr": 0,
+        "posicion": 2
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 17,
+        "ctr": 0,
+        "posicion": 35.7
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 37,
+      "ctr": 0,
+      "posicion": 14.4,
+      "dClicks": 0,
+      "dImpresiones": 19,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 13,
+      "ctr": 0,
+      "posicion": 22.8,
+      "dClicks": 0,
+      "dImpresiones": 2,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 9,
+      "ctr": 0,
+      "posicion": 5.4,
+      "dClicks": 0,
+      "dImpresiones": 7,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "landings",
+      "clicks": 0,
+      "impresiones": 6,
+      "ctr": 0,
+      "posicion": 10.2,
+      "dClicks": 0,
+      "dImpresiones": -7,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 5,
+      "ctr": 0,
+      "posicion": 9.4,
+      "dClicks": 0,
+      "dImpresiones": 4,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "home",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 2,
+      "dClicks": 0,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "es",
+      "clicks": 0,
+      "impresiones": 57,
+      "ctr": 0,
+      "posicion": 15.4,
+      "dClicks": 0,
+      "dImpresiones": 24,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "en",
+      "clicks": 0,
+      "impresiones": 15,
+      "ctr": 0,
+      "posicion": 7.5,
+      "dClicks": 0,
+      "dImpresiones": 0,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [],
+  "paginasBajan": [],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 15.3,
+      "impresiones": 32,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

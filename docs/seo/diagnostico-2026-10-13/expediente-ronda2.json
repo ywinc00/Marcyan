@@ -1,0 +1,1398 @@
+{
+ "lentes": [
+  {
+   "lente": "aeo",
+   "titulo": "Visibilidad en asistentes de IA (AEO)",
+   "investigacion": {
+    "lente": "Visibilidad en asistentes de IA (AEO)",
+    "resumen": "La desindexación de Google todavía no ha reducido la visibilidad de Marcyan en IA, y la causa no es técnica. El cuello de botella es la autoridad y el puesto en Google, no el número de páginas indexadas.\n\n1) Panel de Gemini con búsqueda de Google, set fijo de 10 preguntas con 3 repeticiones: 0 % el 26-sep (79 páginas indexadas), 17 % el 6-oct (62) y 13 % hoy, 13-oct (41). Las apariciones subieron mientras caía el índice. Marcyan solo aparece en las 2 preguntas sobre diseño web bilingüe en Houston, siempre citando /en/houston, que sigue indexada. Solo la nombra en el texto en 3 de 30 respuestas, y en una la confunde con «LV Branding». En 14 respuestas a preguntas reales de cliente fuera del set sale 0 veces. En las 4 preguntas de marca sale siempre y la describe bien. Los 3 competidores seguidos: 0 % en las tres lecturas. Controles: MJA 37→40 % y TRR 30→27 % (34-38 reseñas), JLX 0 % (1 reseña).\n\n2) Ninguna de las 40 páginas que Google soltó fue citada nunca, ni el 26-sep, cuando seguían dentro. Gemini cita sobre todo páginas de ciudad de otras agencias (53-60 % de las fuentes) y casi nunca directorios (1-4 %). Las páginas de Marcyan que responden preguntas están en los puestos 25-92 de Google. Que la página esté indexada es necesario pero no basta: la guía de precios en español está dentro y Gemini cita las de la competencia.\n\n3) Google: del contenido citable (blog, guías de precio, hubs de servicios, landings de servicio) están fuera 22 de 40 páginas (55 %). Esas páginas solo tenían el 27 % de las impresiones del grupo. Las 15 búsquedas con forma de pregunta o de precio siguen teniendo una página indexada. En 6 de las 10 preguntas del panel la página específica está fuera y la cubre un hub.\n\n4) Bing (alimenta a ChatGPT y Copilot): conoce el sitio desde el 14-jun, conoce 82 de 84 URLs y su índice sube de 68 a 71 (2 al 8-oct). No ha desindexado. Pero tiene 3 impresiones en 28 días y 0 clics. El único mapa del sitio registrado en Bing es /sitemap.xml, que da 404. Los controles tienen el suyo en «Success».\n\n5) Lectores de IA: 10 agentes reciben 200 y el mismo HTML. robots.txt los permite y llms.txt no estorba.\n\n6) ChatGPT y Perplexity no se pudieron medir: sus claves están vacías. GA4 registra 0 visitas desde asistentes de IA.\n\nPalancas que aplican según la doctrina: posicionar en Google y Bing, reseñas, menciones de marca y fichas en Bing y Yelp. Humo: llms.txt, la «posición en ChatGPT» y los datos estructurados como interruptor.",
+    "hallazgos": [
+     {
+      "id": "AEO-01",
+      "hipotesis": "¿Aparece Marcyan en las respuestas de IA, y cómo ha evolucionado desde la primera lectura?",
+      "afirmacion": "En Gemini con búsqueda de Google, Marcyan pasa de 0 % (26-sep) a 17 % (6-oct) y a 13 % hoy (13-oct) en el set fijo. Solo aparece en las 2 preguntas de diseño web bilingüe en Houston y siempre a través de /en/houston. Fuera del set no aparece en ninguna pregunta real de cliente. En las preguntas de marca aparece siempre. Los competidores seguidos están en 0 %.",
+      "evidencia": [
+       "data/seo/ia/2026-09.json (26-sep): set fijo 0 de 30, 0 citas a marcyanstudio.com",
+       "data/seo/ia/2026-10.json (6-oct): 5 de 30 (17 %), las 5 con /en/houston como fuente. «diseño web bilingüe en Houston» 2/3 y «best bilingual web design agency in Houston» 3/3",
+       "Lectura de hoy (scratch diag/r2-aeo/panel-hoy.json, 48 respuestas, 0 errores): set fijo 4/30 (13 %). Bilingüe ES 1/3 y EN 3/3. Marcyan se nombra en el texto en 3 de 30, en el resto solo se cita su página",
+       "Preguntas extra de hoy (2 repeticiones cada una): 0 de 14 en 7 preguntas de cliente (agencia hispana Houston, chatbot Miami, diseño web Miami latinos, agencia para aparecer en ChatGPT, AI chatbots Houston, diseñador bilingüe Miami, coste de chatbot de WhatsApp) y 4 de 4 en «¿Qué es Marcyan Studio?» y «What is Marcyan Studio?», con una descripción correcta sacada de /en, /es, /en/pricing y /es/portafolio",
+       "Competidores seguidos (True Digital Marketing, Webnhubs, Artisticore): 0 % en las tres lecturas"
+      ],
+      "evidenciaEnContra": [
+       "Cada lectura son 30 respuestas: la diferencia 17 % → 13 % es ruido (5 frente a 4 apariciones)",
+       "Es la API de Gemini, no las apps de consumo ni AI Overviews/AI Mode (aviso del propio kit en panel-ia.mjs)",
+       "La métrica del kit cuenta una «aparición» aunque solo se cite la URL sin nombrar la marca. Medido por menciones en el texto, la cifra de hoy baja a 10 %"
+      ],
+      "confianza": "alta",
+      "papel": "hallazgo colateral",
+      "arreglos": [
+       "Medir el % de nombrada en el texto además del de citada (el kit no guarda el texto)",
+       "Repetir la lectura dos veces más antes de dar el 17 % como sostenido (meta del PLAN)"
+      ]
+     },
+     {
+      "id": "AEO-02",
+      "hipotesis": "La desindexación de Google (de 79 a 41) ha reducido la visibilidad de Marcyan en los asistentes de IA de Google",
+      "afirmacion": "No se observa. Las apariciones en Gemini subieron mientras el índice caía. Ninguna de las 40 páginas que salieron fue citada nunca, tampoco cuando estaban indexadas. La única página que gana citas (/en/houston) sigue indexada. Por ahora la desindexación no explica la poca visibilidad en IA. Es un riesgo, no una causa observada.",
+      "evidencia": [
+       "Índice frente a Gemini: 26-sep 79 indexadas → 0 %; 6-oct 62 → 17 %; 13-oct 41 → 13 % (historial.jsonl e ia/*.json)",
+       "Citas a marcyanstudio.com en las tres lecturas: 0 el 26-sep, 5 el 6-oct (todas /en/houston) y 17 hoy. De las 17, 16 van a páginas indexadas (/en/houston 4, /en 4, /es/portafolio 4 indexada bajo la barra, /es 2, /en/miami 1, /en/pricing 1) y 1 a /es/miami/ecommerce, que está en «Crawled - currently not indexed» (inspección de hoy, inspect-hoy.json)",
+       "Las páginas que responden a preguntas de IA ya estaban lejos antes de la ola: «cómo aparecer en chatgpt, gemini y ai overviews» en el puesto 91,5, «chatbot whatsapp precio» 52,7, «ia para negocios locales» 68, «whatsapp chatbot pricing» 79,8 (Search Console, página+consulta, 1-jul a 11-oct, gsc-aeo.json)"
+      ],
+      "evidenciaEnContra": [
+       "En 6 de las 10 preguntas del set la página específica ya está fuera (mapa-preguntas.json). Si Google empezara a premiar a Marcyan, esas páginas no podrían citarse",
+       "/en/houston no se rastrea desde el 8-sep. Si saliera en la próxima ola, Marcyan desaparecería del panel",
+       "Gemini citó una página fuera del índice (/es/miami/ecommerce) en una pregunta de marca. Desindexar no la saca del todo de la base que usa Gemini, pero es un solo caso y sin competencia",
+       "No se midieron AI Overviews ni AI Mode de consumo, que según Google solo enlazan páginas indexadas y aptas para fragmento"
+      ],
+      "confianza": "media",
+      "papel": "descartada",
+      "arreglos": [
+       "Proteger /en/houston, /en, /en/pricing y /es/portafolio (las únicas páginas citadas): no tocarlas en el triage y enlazarlas desde páginas que Google sí rastrea"
+      ]
+     },
+     {
+      "id": "AEO-03",
+      "hipotesis": "Lo que decide si Gemini cita a Marcyan es estar en las primeras posiciones de Google, más que estar indexada o figurar en directorios",
+      "afirmacion": "Gemini se apoya en lo que Google pone arriba. Más de la mitad de sus fuentes son páginas de ciudad de otras agencias, y los directorios casi no aparecen. Las guías de precio y de IA de Marcyan, indexadas o no, están en los puestos 25-92 y no se citan. Para las preguntas de precio y de «aparecer en ChatGPT» se citan guías y listas de la competencia.",
+      "evidencia": [
+       "Fuentes de Gemini con Houston o Miami en la ruta: 60 % (26-sep, 161/267), 53 % (6-oct, 133/252) y 58 % hoy (229/397). Directorios, redes y listas (Clutch, The Manifest, Reddit, Facebook, YouTube): 1,1 %, 3,6 % y 3,3 % (fuentes-tipo2.mjs)",
+       "«cuánto cuesta una página web en Houston» (hoy): cita fusionmouse.com, webdesignerfactory.com, naveck.com, thervo.com, proengage.com y officialcystudio.com/blog/cuanto-cuesta-una-pagina-web-en-houston. /es/precios/cuanto-cuesta-una-pagina-web-houston está indexada y no se cita (14 impresiones de jul a oct)",
+       "«qué agencia puede hacer que mi negocio aparezca en ChatGPT en Houston o Miami»: cita listas autopromocionales («best generative engine optimization agencies Miami», webtonic.io y fisherdesignandadvertising.com) y páginas de servicio de GEO. /es/houston/seo-para-ia está fuera y /en/houston/ai-seo está dentro (7 impresiones en 90 días)",
+       "/en/houston se cita para «bilingual» porque su título dice «Bilingual studio» y rankea en el 12 para «diseño web bilingüe texas»"
+      ],
+      "evidenciaEnContra": [
+       "En el set fijo el cliente sale siempre a través de su propia web. Las fichas de Maps no aparecen como fuente en la API, así que el peso de la ficha en AI Overviews o AI Mode no se puede ver aquí",
+       "La competencia que se cita usa justo el formato de página por ciudad que la ronda 1 señala como riesgo, y Gemini la cita. El formato no descalifica para la IA. Lo que pesa es la autoridad del sitio"
+      ],
+      "confianza": "media",
+      "papel": "hallazgo colateral",
+      "arreglos": []
+     },
+     {
+      "id": "AEO-04",
+      "hipotesis": "Los sitios de control con reseñas y antigüedad aparecen más en la IA",
+      "afirmacion": "MJA y TRR, con 34-38 reseñas y más de un año de dominio, salen en el 27-40 % de las respuestas de Gemini. JLX (1 mes, 1 reseña) sale en el 0 %. En todos los casos sale a través de su propia web citada. Encaja con la doctrina: la IA recomienda a quien ya tiene confianza local.",
+      "evidencia": [
+       "MJA: 37 % (26-sep) → 40 % (6-oct), con su web citada en las 12 de 12 apariciones (MJA data/seo/ia)",
+       "TRR: 30 % → 27 %, con su web citada en 8 de 8 (TRR origin/main data/seo/ia)",
+       "JLX: 0 % → 0 %, con 1 reseña (Julio’s Landscape TX data/seo/ia)",
+       "Reseñas el 13-oct: MJA 34, TRR 38, Marcyan 0 (resenas.json, ronda 1 AUT-04)"
+      ],
+      "evidenciaEnContra": [
+       "Sectores, preguntas y ciudades distintos (retirada de escombros frente a agencia). No es un control limpio. La competencia de agencias en Gemini es mucho más densa",
+       "No prueba que las reseñas causen la cita, porque la cita va a la web y no a la ficha"
+      ],
+      "confianza": "baja",
+      "papel": "contribuye",
+      "arreglos": []
+     },
+     {
+      "id": "AEO-05",
+      "hipotesis": "La IA no distingue bien la entidad Marcyan (señales externas débiles)",
+      "afirmacion": "Gemini conoce Marcyan por su propia web, pero la entidad es frágil. En una respuesta la fusiona con otra agencia («LV Branding / Marcyan Studio») y en otra le atribuye presencia en Orlando. La única mención externa que usa es el pie de la web de JLX, que nombra a Marcyan sin enlace. El schema no declara sameAs hacia las fichas o redes. Faltan Yelp, Bing Places y Apple.",
+      "evidencia": [
+       "Hoy, «diseño web bilingüe en Houston», rep. 1: el texto pone «LV Branding / Marcyan Studio: Enfoque en desarrollo web a medida, arquitectura hreflang…» (panel-hoy.json)",
+       "«¿Qué es Marcyan Studio?», rep. 2: «con presencia en ciudades como Houston, Miami y Orlando»",
+       "«¿Qué es Marcyan Studio?», rep. 1: cita https://julioslandscapetx.com/gallery, cuyo pie dice «Web design by Marcyan Studio» sin enlace (curl de hoy). TRR y MJA: 0 menciones",
+       "JSON-LD de dist/es/index.html: Organization y 2 ProfessionalService (713 Houston y 786 Miami) con sameAs nulo"
+      ],
+      "evidenciaEnContra": [
+       "Las 4 respuestas de marca describen bien los servicios, las ciudades y el enfoque bilingüe",
+       "La doctrina (§2.8 y §6) trata los datos estructurados como higiene, no como palanca"
+      ],
+      "confianza": "media",
+      "papel": "hallazgo colateral",
+      "arreglos": [
+       "Pedir a los clientes, con su permiso, que el crédito del pie lleve enlace y que lo tengan TRR y MJA",
+       "Añadir sameAs (fichas de Google, perfiles de agencia) solo como higiene"
+      ]
+     },
+     {
+      "id": "AEO-06",
+      "hipotesis": "Bing también desindexó o no conoce el sitio (afectaría a ChatGPT y Copilot)",
+      "afirmacion": "Bing no desindexó: conoce 82 de 84 URLs y su índice sube de 68 a 71. Rastreó 39 de las 40 páginas que Google soltó. Pero no posiciona el sitio (3 impresiones en 28 días). Además, el único mapa del sitio que tiene registrado es /sitemap.xml, que da 404 desde el alta del 26-sep. Le pasa solo a Marcyan: en los controles ese archivo existe y está en «Success».",
+      "evidencia": [
+       "GetFeeds: https://marcyanstudio.com/sitemap.xml, Status «404 (Not Found)», UrlCount 0, Submitted 26-sep. El real es /sitemap-index.xml (200, declarado en robots.txt). curl: /sitemap.xml 404 (bing-raw.json)",
+       "Controles, GetFeeds: MJA /sitemap.xml Success n=67, TRR Success n=36, JLX Success n=14 (bing-ctrl.json)",
+       "GetCrawlStats: InIndex 68 (2-oct), 70 (3 al 7-oct), 71 (8-oct). Errores 0-4 al día y 0 bloqueos de robots",
+       "GetUrlInfo de las 84: 82 descubiertas. Primera /es el 14-jun-2026. Faltan /en/houston/immigration-lawyers y /en/houston/restaurants. Hay 27 rastreadas desde el 1-oct",
+       "Cruce: Google dentro y Bing rastreada 43; Google fuera y Bing rastreada 39 (bing-vs-google.json)",
+       "Tráfico en 28 días: 3 impresiones, 0 clics (TRR 21, MJA 12, JLX 4). Consultas: «cómo activar que la ia contesta mis llamadas» (puesto 4) y «cuánto podría costar hacer un chatbot de whatsapp» (puesto 10). 0 enlaces entrantes",
+       "Verificado en Bing Webmaster el 26-sep (BingSiteAuth.xml, commit 045d54b). Sin IndexNow"
+      ],
+      "evidenciaEnContra": [
+       "Bing descubre las URLs igualmente (82/84), así que el sitemap roto es un defecto de higiene con poco efecto medible",
+       "GetCrawlStats solo devuelve 7-15 días: no hay historia de Bing anterior a octubre",
+       "El tráfico en Bing es bajísimo en todos los sitios de la cuenta, no solo en Marcyan"
+      ],
+      "confianza": "alta",
+      "papel": "hallazgo colateral",
+      "arreglos": [
+       "Registrar /sitemap-index.xml en Bing Webmaster y quitar el /sitemap.xml muerto (configuración en Bing: requiere OK del dueño)",
+       "IndexNow atado a los despliegues (doctrina §7)"
+      ]
+     },
+     {
+      "id": "AEO-07",
+      "hipotesis": "Los rastreadores de IA o de Bing no pueden leer el sitio (bloqueo, contenido distinto o llms.txt que estorba)",
+      "afirmacion": "Descartado. Los 10 agentes probados reciben 200 y exactamente el mismo HTML en 10 páginas. robots.txt los permite expresamente. No hay nosnippet ni max-snippet. llms.txt responde 200 y no estorba.",
+      "evidencia": [
+       "bots.json: navegador, Googlebot, Google-Extended, Bingbot, GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, ClaudeBot y Applebot reciben 200 con el mismo hash normalizado en /es, /en, /es/miami, /es/houston/diseno-web, /en/houston, /es/precios/cuanto-cuesta-un-chatbot, /es/blog/como-aparecer-en-chatgpt-perplexity, /en/pricing/chatbot-cost, /es/houston/abogados-inmigracion y /llms.txt. 1.221-2.384 palabras y H1 presente",
+       "vigilancia-ultima.json (13-oct) lectoresIa: todos 200, bloqueados por robots ninguno",
+       "dist: 0 de 91 HTML con nosnippet, max-snippet o data-nosnippet",
+       "llms.txt: 2.933 bytes, 29 enlaces, 28 con 200 y 1 (/es/#contacto) con 308"
+      ],
+      "evidenciaEnContra": [
+       "No se comprobó el tráfico real de los bots en los registros de Vercel (solo agentes simulados desde este equipo)"
+      ],
+      "confianza": "alta",
+      "papel": "descartada",
+      "arreglos": []
+     },
+     {
+      "id": "AEO-08",
+      "hipotesis": "La desindexación dejó sin página indexada el contenido que la IA podría citar y las preguntas de los clientes",
+      "afirmacion": "Se perdió la mitad del contenido citable, pero era el que casi no tenía demanda. Las búsquedas con forma de pregunta o de precio siguen todas con página indexada. Las que se quedaron sin página son sobre todo de intención ajena al negocio. En el set de IA, 6 de 10 preguntas perdieron su página específica y quedan cubiertas por hubs o por la página de precios.",
+      "evidencia": [
+       "Contenido citable (artículos de blog, guías de precio, hubs de precios y servicios, SEO para IA, landings de servicio): 40 URLs, 22 fuera (55 %), que tenían 155 de las 568 impresiones del grupo del 1-jul al 11-oct (27 %) (citable.json)",
+       "Por tipo: artículos de blog 2/6 dentro (fuera precio-pagina-web-houston-guia, diseno-web-restaurantes, como-elegir-agencia-diseno-web-hispana e ia-que-contesta-llamadas); guías de precio 3/6 (fuera en/website-cost-houston, en/local-seo-cost-houston y es/cuanto-cuesta-seo-local-houston); hubs de servicios 1/4 (fuera /es/servicios, /en/services y /en/ai-for-small-business); SEO para IA 1/2 (fuera /es/houston/seo-para-ia); landings de servicio 9/20",
+       "Búsquedas tipo pregunta o precio: 15, con 73 impresiones. Las 15 tienen página indexada hoy",
+       "Búsquedas visibles sin ninguna página indexada hoy: 31 de 101 (121 de 1.149 impresiones). Sobre todo «talleres mecánicos cerca de mí» (consumidores buscando taller), «beauty salon booking website» y «diseño de sitios web en houston» (18, hub /es/houston, que está fuera)",
+       "Set del panel: la página específica está fuera en 6/10 (SEO local Miami ES, diseño bilingüe ES y EN, agencia para pymes hispanas EN, coste de web en Houston EN y AI chatbot Houston EN) (mapa-preguntas.json)"
+      ],
+      "evidenciaEnContra": [
+       "La API de Search Console solo ve las búsquedas no anonimizadas: 1.149 de 1.809 impresiones",
+       "Las preguntas que la gente hace a la IA no son las que escribe en Google: el set de 10 es una aproximación"
+      ],
+      "confianza": "media",
+      "papel": "contribuye",
+      "arreglos": [
+       "Si se fusionan landings, que el contenido que responde (precios y bilingüe) acabe en páginas que sigan indexadas, como /en/houston y /en/pricing"
+      ]
+     },
+     {
+      "id": "AEO-09",
+      "hipotesis": "La ronda 1 dice que ninguna web, ni siquiera las de los clientes, menciona a Marcyan, y que «la IA de Google ya lo recomienda» no se puede verificar",
+      "afirmacion": "Hay que matizar la ronda 1 en dos puntos. (1) JLX sí menciona a Marcyan sin enlace («Web design by Marcyan Studio» en el pie), y Gemini ya la usa como fuente de marca. (2) La afirmación de que la IA de Google recomienda a clientes de Marcyan tiene respaldo en los paneles internos (MJA 37-40 %, TRR 27-30 % en Gemini), aunque la página no lo muestra y no es el AI Overview de consumo.",
+      "evidencia": [
+       "curl julioslandscapetx.com/ y /gallery: 1 mención «Web design by Marcyan Studio», 0 enlaces a marcyanstudio.com. TRR y MJA: 0 y 0",
+       "panel-hoy.json: «¿Qué es Marcyan Studio?» cita julioslandscapetx.com/gallery",
+       "Paneles de control del 26-sep y del 6-oct (ver AEO-04). llms.txt del sitio: «clientes nuestros ya aparecen en las recomendaciones de la IA de Google para algunas búsquedas»"
+      ],
+      "evidenciaEnContra": [
+       "Es una mención sin enlace, así que no cuenta en los informes de enlaces de Google ni de Bing",
+       "El panel usa la API con búsqueda de Google, no las apps ni AI Overviews. La frase de la web sigue sin prueba visible en la página"
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "En vez de borrar la afirmación, mostrar la prueba (captura fechada) o suavizarla, sin cifras inventadas"
+      ]
+     },
+     {
+      "id": "AEO-10",
+      "hipotesis": "El plan de recorte (triage del 15-oct) puede dañar la poca visibilidad en IA que existe",
+      "afirmacion": "Bien hecho, el triage no daña la visibilidad en IA e incluso la puede ayudar. Fusiona las landings de sector en inglés dentro de /en/houston, que es justo la página que cita Gemini. El riesgo aparece si el recorte de la capa en inglés llega a los hubs o a las páginas de marca (/en/houston, /en, /en/pricing, /en/miami), que son las únicas citadas por la IA.",
+      "evidencia": [
+       "triage-indexacion-2026-10-12.md: /en/houston/conversational-ai, dental-clinics, ecommerce e immigration-lawyers se fusionan en /en/houston con redirección",
+       "Citas de hoy a Marcyan: /en/houston 4, /en 4, /es/portafolio 4, /es 2, /en/miami 1 y /en/pricing 1. Las de marca citan /en y /en/pricing"
+      ],
+      "evidenciaEnContra": [
+       "El triage no propone tocar los hubs EN, así que hoy es un riesgo hipotético"
+      ],
+      "confianza": "media",
+      "papel": "riesgo del plan",
+      "arreglos": [
+       "Escribir en el plan que /en/houston, /en, /en/pricing, /en/miami y /es/portafolio no se retiran ni se fusionan, y añadir como métrica del plan las apariciones en Gemini (ya está en PLAN.md)"
+      ]
+     },
+     {
+      "id": "AEO-11",
+      "hipotesis": "Se puede medir la visibilidad en ChatGPT, Perplexity, Copilot y AI Overviews con lo que hay",
+      "afirmacion": "No. Desde su primera ejecución el panel solo mide Gemini, porque las claves de OpenAI y Perplexity están vacías en el archivo central. GA4 registra 0 visitas de asistentes de IA. La API de Search Console no separa las apariciones en IA. Los informes de IA de Search Console y de Bing solo existen en la interfaz.",
+      "evidencia": [
+       "seo.env: OPENAI_API_KEY y PERPLEXITY_API_KEY con longitud 0; GEMINI_API_KEY y BING_WEBMASTER_API_KEY presentes (valores no mostrados). Lectura de hoy: motores = [gemini]",
+       "GA4 (data/seo/ga4/*): ia.sesiones 0 en jul-sep, en septiembre y en las semanas del 21-sep al 11-oct",
+       "Search Console searchAppearance del 1-jul al 11-oct: solo PRODUCT_SNIPPETS (13 impresiones)",
+       "bing.mjs: «AI Performance» solo en el navegador (bing.com/webmasters/aiperformance)"
+      ],
+      "evidenciaEnContra": [],
+      "confianza": "alta",
+      "papel": "hallazgo colateral",
+      "arreglos": [
+       "Que el dueño decida el gasto de las claves de OpenAI o Perplexity (doctrina: solo si aprueba el gasto)",
+       "Leer a mano el informe de IA de Search Console y el AI Performance de Bing en el ciclo mensual"
+      ]
+     },
+     {
+      "id": "AEO-12",
+      "hipotesis": "¿Qué palancas AEO de la doctrina aplican a Marcyan y cuáles son humo?",
+      "afirmacion": "Aplican, por este orden: (1) ganar puestos en Google y Bing con menos páginas y más fuertes, porque Gemini cita lo que Google pone arriba y las páginas de Marcyan están en los puestos 25-92; (2) reseñas en la ficha (hoy 0) y altas en Yelp y Bing Places, porque ChatGPT tira de Yelp y de Bing; (3) menciones reales de marca (créditos con enlace en webs de clientes, perfiles de agencia en Clutch, The Manifest o DesignRush, cámara hispana); (4) higiene barata: el mapa del sitio en Bing e IndexNow. Humo para este caso: llms.txt (ya existe y no estorba), la «posición en ChatGPT», los datos estructurados o las FAQ como interruptor de IA, las listas «los mejores» autopromocionales (la competencia las usa y Gemini las cita, pero la doctrina las prohíbe) y un servicio de AEO separado del SEO.",
+      "evidencia": [
+       "doctrina.md §3: Google cita solo páginas indexadas; ChatGPT usa su índice, Bing y Yelp; se mueve con posicionar en Google y Bing, reseñas y menciones",
+       "doctrina.md §6: llms.txt, «posición en ChatGPT», schema como interruptor y listas autopromocionales son humo",
+       "Datos de esta lente: AEO-03 (puestos y fuentes), AEO-04 (controles con reseñas), AEO-05 (entidad), AEO-06 (Bing) y AEO-07 (lectores de IA sin problema)"
+      ],
+      "evidenciaEnContra": [
+       "The Manifest, Clutch y Reddit son el 1-4 % de las fuentes de Gemini: el efecto de los perfiles de agencia en la IA de Google es pequeño en esta muestra (puede pesar más en ChatGPT, sin medir)",
+       "Las cifras de la doctrina sobre Yelp y ChatGPT (96 % de las tarjetas) no se verificaron aquí"
+      ],
+      "confianza": "media",
+      "papel": "hallazgo colateral",
+      "arreglos": []
+     }
+    ],
+    "huecos": [
+     "ChatGPT, Perplexity, Copilot y Claude no se midieron: las claves OPENAI_API_KEY y PERPLEXITY_API_KEY están vacías y no hay clave de Brave. Su visibilidad está sin determinar; Bing (3 impresiones en 28 días) solo sirve de indicio.",
+     "AI Overviews y AI Mode de consumo no se midieron: no hay navegador en esta lente, y la API de Gemini no equivale a AIO.",
+     "El informe de IA generativa de Search Console y el «AI Performance» de Bing solo se pueden ver en la interfaz. No se leyeron.",
+     "El panel de Gemini es una muestra pequeña (30 respuestas por lectura, una por día) y sin ubicación controlada: 17 % frente a 13 % no es una diferencia real.",
+     "No se pudo determinar por qué Gemini citó /es/miami/ecommerce estando en «Crawled - currently not indexed» (posible base distinta o retraso de la inspección). Es un solo caso.",
+     "Bing: GetCrawlStats solo da 7-15 días, así que no hay serie anterior a octubre. No se sabe quién registró /sitemap.xml el 26-sep, ni si Bing usa la línea Sitemap de robots.txt (la API solo lista el feed con 404).",
+     "Las respuestas de Gemini del 26-sep y del 6-oct no guardaron el texto: no se puede saber si en ellas Marcyan se nombraba o solo se citaba.",
+     "No se comprobó si existen fichas de Marcyan en Yelp, Bing Places, Apple Business Connect ni en perfiles de agencia.",
+     "La relación entre reseñas y apariciones en la IA viene de controles de otro sector: es una correlación, no una causa."
+    ],
+    "archivos": [
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\resumen-datos.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\panel-hoy.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\bing-raw.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\bing-ctrl.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\bing-vs-google.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\citable.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\mapa-preguntas.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\gsc-aeo.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\bots.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\inspect-hoy.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-aeo\\google-estado.json"
+    ]
+   },
+   "verificacion": {
+    "veredictos": [
+     {
+      "id": "AEO-01",
+      "veredicto": "confirmada",
+      "razon": "Lo reproduje desde data/seo/ia/2026-09.json, 2026-10.json y panel-hoy.json. Las tres lecturas usan el mismo set de 10 preguntas. Resultados: 0/30, luego 5/30 (las 5 en las 2 preguntas bilingües, con /en/houston citada en los puestos 4 a 8), y hoy 4/30 (1/3 en ES y 3/3 en EN), con 3/30 nombradas en el texto. Fuera del set salen 0/14 en preguntas de cliente y 4/4 en preguntas de marca. Los competidores seguidos están en 0 en las tres lecturas. Hay tres matices que el hallazgo no recoge. (a) La lectura del 26-sep no guardó el texto. Además, sus fuentes se resolvieron después (commit c521e3a) y solo las 10 primeras: 16 de 30 respuestas se cortaron en 10. Por eso el 0 % del 26-sep solo es comparable a medias. (b) El kit usa 'gemini-flash-latest' sin fijar la versión (no hay GEMINI_MODEL en seo.env), así que el modelo pudo cambiar entre lecturas. (c) Las muestras son pequeñas: 0/30 frente a 5/30 da p≈0,05 (Fisher) y 0/30 frente a 4/30 da p≈0,11. Repetí hoy las 2 preguntas bilingües, 2 veces cada una, y salió 2/4 (1/2 en ES y 1/2 en EN). Ese 3/3 en EN no es estable.",
+      "afirmacionCorregida": "En Gemini con búsqueda de Google, Marcyan sale en 0/30 (26-sep, medición sin texto y con fuentes recortadas a 10), 5/30 (6-oct) y 4/30 (13-oct). Siempre sale en las 2 preguntas bilingües de Houston y a través de /en/houston. Esas 2 preguntas oscilan: hoy dieron 4/6 en la lectura principal y 2/4 en una relectura. Fuera del set da 0/14 en preguntas de cliente y 4/4 en las de marca. Los competidores seguidos están en 0 %. Para afirmar que la subida desde 0 es real faltan lecturas y fijar el modelo."
+     },
+     {
+      "id": "AEO-02",
+      "veredicto": "debilitada",
+      "razon": "Comparé estado-urls.json del 26-sep (commit c36f6f5) con el de hoy. Salieron 38 páginas, no 40 (de 79 a 41, sin ninguna entrada nueva). La frase 'ninguna de las páginas que salieron fue citada nunca' es falsa. /es/miami/ecommerce estaba 'Submitted and indexed' el 26-sep y el 6-oct, salió entre el 7 y el 9-oct, y Gemini la citó hoy en '¿Qué es Marcyan Studio?'. El propio hallazgo menciona esa cita, pero no la cuenta como página soltada. La conclusión de fondo sí se sostiene. /en/houston es la única página citada en el set y sigue indexada. /en/houston/bilingual-web-design y /es/houston/diseno-web-bilingue estaban indexadas el 26-sep y el 6-oct y Gemini nunca las citó. En las 4 preguntas del set cuya página específica sigue dentro, Marcyan saca 0. Aun así, la prueba no tiene potencia. Ninguna página soltada se había citado antes en el set. Casi toda la caída ocurre entre el 5 y el 13-oct, días antes de la lectura de hoy, y Gemini todavía cita una página fuera del índice: puede haber retraso. El argumento 'las apariciones subieron mientras el índice caía' no vale como evidencia (n=30, p≈0,05-0,11 y modelo sin fijar).",
+      "afirmacionCorregida": "No se observa que la desindexación haya reducido la visibilidad en Gemini, pero los datos no permiten descartarlo. De las 38 páginas que salieron desde el 26-sep, solo una (/es/miami/ecommerce) se ha citado alguna vez, y fue hoy, ya fuera del índice, en una pregunta de marca. Ninguna se citaba en el set antes de la ola. La única página que gana citas (/en/houston) sigue indexada, y las páginas bilingües específicas no se citaban ni cuando estaban dentro. La correlación entre índice y apariciones (3 puntos, n=30, modelo 'latest') no prueba nada en ningún sentido. Es un riesgo, no una causa observada."
+     },
+     {
+      "id": "AEO-03",
+      "veredicto": "debilitada",
+      "razon": "Reproduje las cifras de fuentes. Las rutas con Houston o Miami son el 61 %, el 50 % y el 58 % de las fuentes, y los directorios, incluso con una lista más amplia (Yelp, BBB, Thervo, Expertise, Forbes…), son el 2,6 %, el 6,0 % y el 4,4 %. Las fuentes citadas en 'cuánto cuesta una página web en Houston' y en la pregunta de 'aparecer en ChatGPT' coinciden con lo que dice el hallazgo. Lo que falla son tres cosas. (1) Entre las 'páginas de ciudad' hay muchas guías de coste, artículos de blog y listas: hoy son 37 de 159. Las páginas de servicio por ciudad de otras agencias son alrededor del 45 % de las fuentes, no 'más de la mitad'. (2) La afirmación 'las guías de precio de Marcyan están en los puestos 25-92' no se sostiene. Repetí la consulta en Search Console (1-jul a 11-oct). /es/precios/cuanto-cuesta-una-pagina-web-houston tiene 14 impresiones con puesto medio 3,6, /en/pricing/website-cost-houston 12 con 2,1 y /es/blog/precio-pagina-web-houston-guia 17 entre 3,4 y 7,2, todas por consultas anonimizadas. El rango 25-92 solo aparece en 4 consultas visibles sobre IA y chatbots. (3) Nunca se comprobó qué puesto ocupan en Google las páginas que Gemini cita. 'Gemini cita lo que Google pone arriba' es una inferencia coherente con la doctrina, no algo medido aquí. La parte sobre 'autoridad del sitio' tampoco se midió.",
+      "afirmacionCorregida": "Gemini cita sobre todo páginas de otras webs pensadas para la pregunta: páginas de servicio por ciudad (alrededor del 45 % de las fuentes) y guías, blogs y listas con la ciudad en la ruta (alrededor del 13 %). Los directorios casi no aparecen (3-6 %). Las páginas de Marcyan sobre IA y chatbot están en los puestos 26-92 en sus consultas visibles. Las guías de precio de Houston tienen puestos medios de 2 a 7, pero solo en un puñado de consultas anonimizadas, y su puesto en la pregunta exacta del panel no se conoce. No se midió que Gemini prefiera lo que está arriba en Google."
+     },
+     {
+      "id": "AEO-04",
+      "veredicto": "debilitada",
+      "razon": "Las cifras se reproducen con los archivos de origin de cada repo de control. MJA: 11/30 (37 %) y 12/30 (40 %), siempre con su web citada. TRR: 9/30 (30 %) y 8/30 (27 %), también con la web citada. JLX: 0 y 0. Reseñas al 13-oct: 34, 38, 1 y 0. Los dominios de MJA y TRR son de 2025-03 y 2025-04. La interpretación por reseñas, en cambio, la contradicen los mismos paneles, que tienen las mismas preguntas y la misma ciudad. Texas Junkers (569 reseñas) está en 0 % en las dos lecturas de TRR. Junk Daddy (200) está en 0 % en MJA. Noble Landscaping (115) y New Leaf (103) están en 0 % en JLX. Los competidores de Marcyan (117, 103 y 95 reseñas) están en 0 %. Junk Removal Rangers (2.101) pasa del 30 % al 3 %. Lo que sí tienen en común todos los que aparecen es que Gemini cita su propia web para esa pregunta. En una relectura de 10 preguntas por control, TRR sale en 3 (nombrada en 2) y MJA en 4 (nombrada en 2).",
+      "afirmacionCorregida": "MJA (37-40 %) y TRR (27-30 %) aparecen en Gemini y JLX no (0 %). En todos los casos aparecen porque Gemini cita su propia web. Las reseñas no separan a quien aparece de quien no: en los mismos paneles, competidores con 95-569 reseñas están en 0 %. Esta muestra no apoya que las reseñas muevan la aparición en Gemini. Las reseñas siguen justificándose por Maps y por la doctrina para ChatGPT y Yelp, que aquí no se midieron."
+     },
+     {
+      "id": "AEO-05",
+      "veredicto": "debilitada",
+      "razon": "Reproduje los textos. Aparece 'LV Branding / Marcyan Studio', aparece 'Houston, Miami y Orlando' en 1 de 4 respuestas de marca, y se cita julioslandscapetx.com/gallery. Comprobé con curl el pie de JLX: 'Web design by Marcyan Studio' sin enlace, y 0 menciones en TRR y MJA. El JSON-LD de dist/es/index.html no tiene la propiedad sameAs (no es 'nula', directamente no existe). Pero la barra 'X / Y' es una forma que tiene Gemini de agrupar dos agencias en un mismo punto, no una confusión de identidad. En la misma respuesta agrupa 'Muchísimo / Poppy Marketing & Consulting', y en mi relectura escribe 'Marcyan / Cabriales Web Studio: Estudios de diseño…', en plural. Diluye la atribución, pero no prueba que la entidad esté fusionada. La frase 'faltan Yelp, Bing Places y Apple' no se comprobó (el propio investigador lo pone en huecos).",
+      "afirmacionCorregida": "Gemini describe bien a Marcyan en las 4 respuestas de marca, apoyándose en su propia web y en el pie de JLX, que la menciona sin enlace. Hay ruido menor: una respuesta habla de presencia en Orlando, y en las respuestas en español Gemini a veces agrupa a Marcyan con otro estudio en el mismo punto ('LV Branding / Marcyan Studio', 'Marcyan / Cabriales Web Studio'), cosa que también hace con otras agencias. El schema no lleva sameAs. No se sabe si existen fichas en Yelp, Bing Places o Apple."
+     },
+     {
+      "id": "AEO-06",
+      "veredicto": "confirmada",
+      "razon": "Repetí las llamadas de solo lectura a la API de Bing Webmaster. GetFeeds devuelve un solo feed, https://marcyanstudio.com/sitemap.xml, con estado '404 (Not Found)', UrlCount 0 y fecha de envío del 26-sep. GetCrawlStats da un InIndex de 68 a 71, con 0 bloqueos de robots y 0-4 errores. GetRankAndTrafficStats suma 3 impresiones y 0 clics. Con curl, /sitemap.xml da 404 y /sitemap-index.xml da 200. En los controles /sitemap.xml responde 200 (tras redirigir a www) y bing-ctrl.json da 'Success' con 67, 36 y 14 URLs. BingSiteAuth.xml entra en el commit 045d54b del 26-sep, y no hay rastro de IndexNow en el repo. Dos matices. La serie de tráfico de Bing empieza el 30-sep, así que son unos 11 días de datos y no 28. Y las '40 páginas que Google soltó' son en realidad 43 fuera hoy, de las que 38 salieron desde el 26-sep. No repetí GetUrlInfo de las 84 URLs.",
+      "afirmacionCorregida": "Bing no ha desindexado: el índice pasa de 68 a 71 entre el 1 y el 7-oct, y la API no da historia anterior. Pero casi no muestra el sitio: 3 impresiones y 0 clics desde el 30-sep, que es cuando empiezan sus datos. El único mapa del sitio registrado en Bing es /sitemap.xml, que da 404 desde el alta del 26-sep. En los tres controles ese archivo existe y figura como 'Success'."
+     },
+     {
+      "id": "AEO-07",
+      "veredicto": "confirmada",
+      "razon": "Lo repetí con curl en /es, /en/houston y /es/precios/cuanto-cuesta-un-chatbot, con 5 agentes (navegador, GPTBot, OAI-SearchBot, PerplexityBot y bingbot). Todos reciben 200 y el mismo hash de HTML. robots.txt permite de forma explícita a GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, Perplexity-User y ClaudeBot. En dist, 0 de 91 HTML llevan nosnippet o max-snippet. Lo único que queda abierto es lo mismo que el hallazgo ya admite: no se miraron los registros reales de bots en Vercel."
+     },
+     {
+      "id": "AEO-08",
+      "veredicto": "confirmada",
+      "razon": "Lo recalculé con mi propia consulta a Search Console y el estado de hoy. El contenido citable son 40 URLs. Con la inspección de hoy, /es/portafolio/ y /es/sobre-nosotros/ están indexadas en su versión con barra, y /es/miami/seo-local/ y /es/blog/ia-que-contesta-llamadas-mensajes-perdidos/ no. Eso deja 22 fuera, con 155/568 impresiones (27 %), o 191/674 (28 %) si se suman las variantes con barra. Las consultas con forma de pregunta o de precio son 15-17 según el filtro, con 73-78 impresiones, y todas tienen una página indexada. Las consultas sin ninguna página indexada son 31 de 101 (121 de 1.149 impresiones). Lo que exagera es la frase 'las que se quedaron sin página son sobre todo de intención ajena'. Las de mecánicos suman unas 57-61 de esas 121 impresiones, cerca de la mitad. El resto incluye consultas de negocio de verdad: 'diseño de sitios web en houston' (18), 'beauty salon booking website' (10, la busca un cliente potencial, no es ajena), 'ai chatbot company miami' (6), 'houston real estate agent website' (4) y 'agencia de servicios seo bilingüe' (4).",
+      "afirmacionCorregida": "Se perdió el 55 % del contenido citable (22 de 40 URLs), que reunía el 27-28 % de sus impresiones. Las 15-17 búsquedas con forma de pregunta o de precio siguen todas con una página indexada. De las 121 impresiones que se quedaron sin página, cerca de la mitad son de gente que busca un mecánico. Al menos un tercio son búsquedas de clientes potenciales, encabezadas por 'diseño de sitios web en houston' (18) a través del hub /es/houston, que está fuera. En 6 de las 10 preguntas del panel la página específica está fuera."
+     },
+     {
+      "id": "AEO-09",
+      "veredicto": "confirmada",
+      "razon": "(1) Lo comprobé con curl en julioslandscapetx.com/ y /gallery: el pie dice 'Web design by Marcyan Studio' y no hay ningún enlace a marcyanstudio.com. Gemini cita /gallery en '¿Qué es Marcyan Studio?'. La ronda 1, en .final.causas[2], dice 'Ninguna mención en la web, ni siquiera en las webs de los clientes', así que la corrección procede. (2) Las cifras de los paneles se reproducen (MJA 37-40 %, TRR 27-30 %). En mi relectura de hoy, TRR aparece en 3 de 10 respuestas y MJA en 4 de 10, y cada uno sale nombrado en el texto en 2 de 10. Hay respaldo para decir que 'aparecen en recomendaciones de la IA de Google', pero el panel mide la API de Gemini, no AI Overviews ni AI Mode de consumo, y parte de las apariciones son solo citas de la web sin nombrar la empresa. La frase está tal cual en public/llms.txt y en la web publicada."
+     },
+     {
+      "id": "AEO-10",
+      "veredicto": "confirmada",
+      "razon": "El triage del 12-oct fusiona en /en/houston, con redirección, las páginas /en/houston/conversational-ai, dental-clinics, ecommerce e immigration-lawyers. Ninguna de las páginas que la IA cita hoy (/en/houston, /en, /en/pricing, /en/miami, /es, /es/portafolio) está en las listas de retirar o fusionar. PLAN.md ya recoge la señal 'Gemini 17 % o más sostenido en tres lecturas'. La idea de que el triage 'puede ayudar' es una suposición sin medir. El riesgo solo existe si se aplica la ampliación opcional de la ronda 1 sobre la capa en inglés."
+     },
+     {
+      "id": "AEO-11",
+      "veredicto": "confirmada",
+      "razon": "En seo.env, OPENAI_API_KEY y PERPLEXITY_API_KEY tienen longitud 0, y GEMINI_API_KEY y BING_WEBMASTER_API_KEY tienen valor (no lo imprimí). Las lecturas del 26-sep y del 6-oct solo tienen el motor gemini. Los 5 archivos de data/seo/ga4 dan ia.sesiones 0 (jul-sep, septiembre y las 3 semanas hasta el 11-oct). Mi consulta de searchAppearance del 1-jul al 11-oct solo devuelve PRODUCT_SNIPPETS, con 13 impresiones."
+     },
+     {
+      "id": "AEO-12",
+      "veredicto": "debilitada",
+      "razon": "Lo que se atribuye a la doctrina es correcto. La §3 dice que Google solo cita páginas indexadas y que ChatGPT usa su índice, Bing y Yelp ('96 % de sus tarjetas'). La §6 pone como humo llms.txt, la 'posición en ChatGPT', el schema como interruptor, las listas 'los mejores' autopromocionales y los retainers de AEO separados. Pero dos premisas que se dicen apoyadas en datos de esta lente no aguantan. (a) 'Las páginas de Marcyan están en los puestos 25-92' solo vale para 4 consultas de IA y chatbot. Las guías de precio de Houston tienen puestos medios de 2 a 7, con pocas impresiones anonimizadas (ver AEO-03). (b) El paso 2, las reseñas, no tiene apoyo en los paneles de Gemini: competidores con 95-569 reseñas están en 0 % (ver AEO-04). Ese paso se apoya solo en la doctrina, y en ChatGPT y Yelp, que no se midieron.",
+      "afirmacionCorregida": "La palanca que más apoyan los datos de esta lente es que la propia web de Marcyan sea la página que Google y Bing muestran para cada pregunta. Hoy solo /en/houston lo consigue, en las preguntas bilingües. Las reseñas, las fichas en Yelp y Bing Places y las menciones reales siguen siendo palancas de la doctrina para Maps y para ChatGPT, pero estos datos de Gemini no las respaldan. El sitemap de Bing e IndexNow son higiene barata. La lista de humo de la doctrina sigue siendo válida."
+     }
+    ],
+    "evidenciaNueva": [
+     "/es/miami/ecommerce estaba indexada el 26-sep y el 6-oct, salió entre el 7 y el 9-oct, y Gemini la citó el 13-oct en '¿Qué es Marcyan Studio?'. Es una de las 38 páginas soltadas (no 40) y sí se citó (estado-urls.json en c36f6f5, 2eeac82 y HEAD; r2-verif-aeo/an3.mjs).",
+     "La lectura de IA del 26-sep no guardó el texto. Sus fuentes se resolvieron después (commit c521e3a) y solo las 10 primeras: 16 de 30 respuestas quedaron cortadas en 10. El kit usa 'gemini-flash-latest' sin fijar el modelo (seo.env no tiene GEMINI_MODEL). Las diferencias 0/30 frente a 5/30 y 4/30 dan p≈0,05 y p≈0,11 (Fisher).",
+     "Relectura de Gemini (r2-verif-aeo/gem-verif.json, 24 llamadas, 0 errores). Marcyan sale en 2 de 4 respuestas a las 2 preguntas bilingües (1/2 en ES y 1/2 en EN). TRR aparece en 3 de 10 y se le nombra en el texto en 2. MJA aparece en 4 de 10 y se le nombra en 2.",
+     "En los mismos paneles de Gemini, tener reseñas no garantiza aparecer. Texas Junkers (569 reseñas) da 0 % en las dos lecturas de TRR. Junk Daddy (200) da 0 % en MJA. Noble (115) y New Leaf (103) dan 0 % en JLX. True Digital (117), Webnhubs (103) y Artisticore (95) dan 0 % en Marcyan. Junk Removal Rangers (2.101) pasa del 30 % al 3 % (data/seo/ia y resenas.json de cada repo en origin).",
+     "Search Console, 1-jul a 11-oct: /es/precios/cuanto-cuesta-una-pagina-web-houston tiene 14 impresiones con puesto medio 3,6 y /en/pricing/website-cost-houston 12 con 2,1, ambas por consultas anonimizadas. El rango 25-92 solo aparece en 4 consultas visibles de IA y chatbot (r2-verif-aeo/gsc-verif.json).",
+     "Gemini escribe 'X / Y' para agrupar dos agencias en un mismo punto: 'Muchísimo / Poppy Marketing & Consulting' y, en la relectura, 'Marcyan / Cabriales Web Studio: Estudios de diseño…'. Lo de 'LV Branding / Marcyan Studio' no prueba una confusión de identidad.",
+     "URL Inspection de hoy (solo lectura). /es/portafolio/ y /es/sobre-nosotros/ están 'Submitted and indexed'. /es/miami/seo-local/ (último rastreo el 14-jun) y /es/blog/ia-que-contesta-llamadas-mensajes-perdidos/ están 'Crawled - currently not indexed' (r2-verif-aeo/inspect-verif.json).",
+     "De las fuentes que Gemini cita con Houston o Miami en la ruta, entre 21 y 37 por lectura son guías de coste, blogs o listas y no páginas de servicio. Con una lista amplia de directorios, estos suman el 2,6 %, el 6,0 % y el 4,4 % (r2-verif-aeo/fuentes-verif.json).",
+     "Bing: la serie de tráfico empieza el 30-sep (unos 11 días), no son 28 días. En los controles, /sitemap.xml redirige a www y responde 200. En Marcyan, /sitemap.xml da 404 y /sitemap-index.xml da 200 (r2-verif-aeo/bing-verif.json).",
+     "De las 121 impresiones de consultas que se quedaron sin página indexada, unas 42 o más son de clientes potenciales: 'diseño de sitios web en houston' 18, 'beauty salon booking website' 10, 'ai chatbot company miami' 6, 'houston real estate agent website' 4 y 'agencia de servicios seo bilingüe' 4.",
+     "Huecos que quedan. No se pudo leer la fecha de registro de julioslandscapetx.com por RDAP desde este equipo (la ronda 1 dio 2026-09-17). No se repitió GetUrlInfo de Bing para las 84 URLs. AI Overviews, AI Mode, ChatGPT y Perplexity siguen sin medirse."
+    ]
+   }
+  },
+  {
+   "lente": "render",
+   "titulo": "Renderizado, duplicados externos e historial del dominio",
+   "investigacion": {
+    "lente": "Renderizado, duplicados externos e historial del dominio (ronda 2)",
+    "resumen": "Ninguna de las tres pistas de esta lente explica la caída.\n\n1) Renderizado. Lancé mi propio Chrome headless (155.0.8059.79, perfil temporal ya cerrado y borrado) con el user-agent de Googlebot smartphone y viewport de 412x915. Cargué 8 páginas en 24 pasadas: en-US con JS, es-US con JS y sin JS. Todas responden 200, sin X-Robots-Tag, con el título y el H1 correctos. No hubo errores de consola, excepciones ni respuestas 4xx/5xx. Lo primero visible después del menú es el contenido principal. El HTML que sirve el servidor es idéntico sea cual sea el user-agent o el idioma. El JS no esconde contenido principal: sin JS se ven 50-58 palabras MÁS, que son los enlaces del pie que el JS pliega en móvil y un CTA. El rótulo «Prefer English?» sí aparece en el texto renderizado de las páginas en español que tienen espejo cuando el idioma del navegador es en-US. Sale a los ~2,6 s y desaparece antes de los 8,6 s. Con es-US no aparece, y «¿Prefieres español?» no sale nunca en las páginas en inglés. Son 2 palabras marcadas lang=en frente a 750-1.330 en español: queda descartado como causa.\n\n2) Duplicados. marcyan.vercel.app sirve HTML idéntico byte a byte (mismo md5 en 6 rutas), con 200 y sin noindex, pero con canonical, hreflang y sitemap apuntando a marcyanstudio.com. Los otros 49 alias de Vercel exigen inicio de sesión de Vercel y llevan noindex. reports.marcyanstudio.com (alta el 30-sep) es un acceso con noindex. En las 84 URL, la canónica que elige Google es marcyanstudio.com (84/84), y ninguna está como «Duplicate, Google chose different canonical». No encontré copias externas, aunque esa prueba es débil.\n\n3) Historial del dominio. Se compró nuevo por Vercel el 14-abr-2026 a las 04:13:24 UTC: boughtAt coincide con el RDAP, registrar «new» y sin transferencia. Wayback tiene 0 capturas de cualquier subdominio en toda su historia, y el CDX funciona porque TRR sí devuelve capturas. No hay rastro de un uso anterior ni de otro dominio del negocio. La política de dominios caducados no aplica: la juventud del dominio es real.\n\n4) /es/miami el 10-sep. La contradicción queda resuelta. El rastreo de las 16:07:24 UTC fue de Google por su cuenta. A las 16:42 el sweep lo vio en CNI con la última petición del 26-ago, y nuestra petición fue a las 16:54:29, después. Esa petición no provocó un rastreo nuevo (lastCrawlTime sigue en 10-sep 16:07 el 13-oct). Aun así volvió a «indexada» el 11-sep y no tuvo ni una impresión más. Se repite el patrón: los 3 rastreos orgánicos (15-ago, 23-ago y 10-sep) acabaron en CNI, y los 2 rastreos provocados por petición (18-ago y 26-ago, de 31 a 92 s después de pedirlos) la readmitieron.\n\n5) El arranque del 20-21 sep es el fin de la «luna de miel» de las peticiones. El 97 % de la bajada de impresiones por página entre 13-19 sep y 20-26 sep sale de URL pedidas (8-11 sep: −57; 18-ago a 6-sep: −31). Las no pedidas pasan de 41 a 38 y suben a 47 la semana siguiente. Entre el 7 y el 24-sep solo hubo commits de datos del sweep y despliegues automáticos, y ninguna fuente reporta volatilidad el 20-21. Las primeras salidas sin rastreo nuevo sí ocurren el 20 y el 21-sep (/en/houston/beauty-salons y /es/houston/seo-local), antes de la spam update.",
+    "hallazgos": [
+     {
+      "id": "REN-01",
+      "hipotesis": "Un fallo de renderizado (JS que oculta o rompe contenido, errores, recursos bloqueados, contenido que solo existe con JS o HTML distinto para Googlebot) hace que Google vea páginas pobres o distintas",
+      "afirmacion": "Con Googlebot smartphone a 412x915, las 8 páginas renderizan limpias: 200, sin noindex, título y H1 correctos, sin errores de consola ni excepciones ni 4xx/5xx. El contenido principal es lo primero tras el menú. Sin JS el texto es un superconjunto del renderizado, y el servidor entrega el mismo HTML a cualquier user-agent o idioma. El renderizado no es causa.",
+      "evidencia": [
+       "24 cargas (8 páginas × en-US con JS, es-US con JS y en-US sin JS): 0 mensajes de consola, 0 excepciones, 0 respuestas ≥400. Los únicos fallos son 20 envíos de GA abortados al cerrar la pestaña (render.json, errs.mjs)",
+       "Títulos y H1 correctos y visibles. El H1 de las landings está a 153-202 px del borde superior y el del blog a 528 px. El primer texto visible es el menú y luego las migas, el kicker y el H1 (render-sum.txt, capturas gb-*.png)",
+       "Palabras sin JS frente a con JS: /es 1.087 vs 1.033; /es/houston 904 vs 854; /es/miami 804 vs 754; /es/miami/diseno-web 1.019 vs 962; /en/houston/web-design 997 vs 944; /en/miami/web-design 1.006 vs 953; blog 1.387 vs 1.337; /en/services 850 vs 804 (render-diff.json)",
+       "Lo que el JS quita del texto visible son los enlaces del pie, porque SiteFooter.astro (líneas 250-256) cierra los <details> en móvil, y el CTA «¿Listo para despegar?» del riel. Los enlaces siguen en el DOM. Lo único exclusivo del JS es la etiqueta del chat («Pregunta lo que quieras» / «Ask me anything») y «TOCA PARA EXPLORAR» en la home",
+       "El md5 del HTML de /es/houston es 072682173a y el de /en/miami/web-design cab8669e9b, idénticos con Googlebot, Chrome y Accept-Language en-US, es-ES, es-MX o vacío. No hay middleware en el repo y vercel.json solo redirige / a /es"
+      ],
+      "evidenciaEnContra": [
+       "No es el renderizador real de Google: no pude ejecutar la prueba en vivo de URL Inspection, y el WRS usa tiempo virtual y un viewport alargado",
+       "Solo probé smartphone, no Googlebot de escritorio"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-02",
+      "hipotesis": "La pista de idioma del PR #37 («Prefer English?» / «¿Prefieres español?») contamina el texto que Google ve y confunde el idioma de las páginas",
+      "afirmacion": "El rótulo «Prefer English?» aparece en el texto renderizado de las páginas en español con espejo en inglés cuando navigator.language es en-US, que es lo que probablemente usa Googlebot. Aparece a ~2,6 s y desaparece antes de 8,6 s. Son 2 palabras marcadas lang=\"en\" frente a 750-1.330 palabras en español, y nunca sale en las páginas en inglés, que son las que más cayeron. No es causa.",
+      "evidencia": [
+       "Con en-US: hasPreferEnglish=true a 2,6 s en /es, /es/houston, /es/miami y /es/miami/diseno-web, dentro de span.nav__lang-hint visible. A 8,6 s es false y el nodo ya no existe (render.json)",
+       "Con es-US no aparece en ninguna página en español (render.json)",
+       "«¿Prefieres español?» no aparece nunca en las páginas en inglés, porque DIRECTIONS.en=false en LangNotice.astro línea 47",
+       "El blog en español sin espejo (/es/blog/precio-pagina-web-houston-guia) no lo muestra ni con en-US",
+       "El script pone hint.lang=target y role=status (LangNotice.astro, líneas 124-125) y lo dispara tras load + 1.200 ms + requestIdleCallback. El WRS no conserva localStorage, así que se mostraría en cada renderizado",
+       "El PR #37 llegó a producción el 6-sep a las ~00:56 UTC (Vercel dpl_Hsw8rGpSRGyBMszy5GMxFBySiPMz). Las landings en inglés, que no muestran rótulo, fueron las que más cayeron"
+      ],
+      "evidenciaEnContra": [
+       "No sé si la instantánea del WRS se toma dentro de la ventana de 1,2 a 7,2 s en que el rótulo existe. Que Google lo vea es probable, no comprobado"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-03",
+      "hipotesis": "El alias marcyan.vercel.app u otros hosts de Vercel sirven copias indexables que compiten con el dominio",
+      "afirmacion": "marcyan.vercel.app sirve el sitio idéntico byte a byte, con 200 y sin noindex, pero con canonical, hreflang y sitemap hacia marcyanstudio.com. Google elige marcyanstudio.com como canónica en las 84 URL. Los otros 49 alias de Vercel exigen inicio de sesión de Vercel y llevan noindex. No es causa: es higiene pendiente.",
+      "evidencia": [
+       "Vercel list_project_domains del proyecto marcyan: marcyanstudio.com (alta el 14-abr-2026), www (308 desde el 2-ago) y marcyan.vercel.app (24-mar-2026, sin redirect)",
+       "md5 idéntico entre el dominio y marcyan.vercel.app en /es (002982a5bd), /es/houston, /es/miami, /en/services, el blog y /sitemap-0.xml. 200 y sin X-Robots-Tag. La canonical es https://marcyanstudio.com/... y las <loc> del sitemap van al dominio (hosts/)",
+       "list_aliases: 52 alias. Los alias de ramas y despliegues, marcyan-yan8.vercel.app y marcyan-git-main-yan8.vercel.app responden 302 a vercel.com/sso-api con X-Robots-Tag: noindex",
+       "estado-urls.json del 13-oct: googleCanonical con host marcyanstudio.com en 84/84. Las 36 no indexadas están como «Crawled - currently not indexed» y ninguna como «Duplicate, Google chose different canonical»",
+       "Wayback CDX de marcyan.vercel.app/*: [] (0 capturas)"
+      ],
+      "evidenciaEnContra": [
+       "No hay propiedad de GSC para vercel.app, así que no se puede saber si Google guardó URL de ese host. WebSearch con site:marcyan.vercel.app no dio nada, pero ese buscador no es Google. Gemini con búsqueda de Google no llegó a ejecutar la búsqueda site:",
+       "Entre el 24-mar y el 6-jun el sitio (un index.html de abril sin canonical, commit 98df770) vivió en vercel.app y luego en el dominio. No se sabe qué indexó Google entonces"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-04",
+      "hipotesis": "Hay copias del contenido en otros sitios (scrapers o plagio) y Google atribuye el original a otro host",
+      "afirmacion": "No encontré copias externas. La prueba es débil porque el buscador disponible no indexa ni siquiera marcyanstudio.com.",
+      "evidencia": [
+       "WebSearch con frases exactas: «La agencia hispana que une tu web, tu IA y tu SEO», «Guía honesta de precios de diseño web en 2026» y «Marcyan offers seven services for small businesses in Houston and Miami». 0 coincidencias en ningún host",
+       "Gemini (gemini-flash-latest con búsqueda de Google) para «Sitios web a medida, rápidos y bilingües para negocios de Miami y su área metropolitana»: la única fuente es marcyanstudio.com/es/miami/diseno-web (gemini-dup.json)",
+       "GSC: las 84 canónicas elegidas por Google están en nuestro dominio y ninguna aparece como duplicada de otra"
+      ],
+      "evidenciaEnContra": [
+       "WebSearch con site:marcyanstudio.com devuelve 0 resultados, así que no indexa el sitio y no puede detectar copias",
+       "En 3 de las 5 consultas a Gemini no se ejecutó ninguna búsqueda. En site:marcyanstudio.com dijo que había 0 resultados y luego inventó URL que no existen, como /brief/",
+       "No pude buscar frases exactas directamente en Google"
+      ],
+      "confianza": "baja",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-05",
+      "hipotesis": "marcyanstudio.com es un dominio caducado reutilizado con historial previo (política de abuso de dominios caducados) o el negocio tuvo otro dominio antes",
+      "afirmacion": "El dominio se compró nuevo por Vercel el 14-abr-2026 y no tiene ningún rastro público de uso anterior. No hubo otro dominio del negocio. La juventud del dominio, 6 meses, es real.",
+      "evidencia": [
+       "RDAP de Verisign: registration 2026-04-14T04:13:24Z, last changed 2026-04-25T01:16:49Z, registrar Name.com, estado «client transfer prohibited» (wayback/rdap.json)",
+       "Vercel get_domain: boughtAt 1776140004000 (=2026-04-14T04:13:24Z, el mismo segundo que el RDAP), registrar «new», transferredAt null, creado por la cuenta del dueño. El dominio se añadió al proyecto 51 s después (createdAt 1776140055584)",
+       "Wayback CDX: 0 capturas para marcyanstudio.com/*, para la raíz, para www y para matchType=domain (todos los subdominios). La API de disponibilidad tampoco devuelve nada. El servicio funcionaba: en la misma tanda TRR devolvió capturas desde el 2025-04-23",
+       "Proyecto de Vercel creado el 2026-03-24 con marcyan.vercel.app. Primer commit del repo: 2026-04-09",
+       "En el repo y en la memoria solo aparece marcyanstudio.com (905 menciones). Los «@marcyan.com» eran emails de relleno que se corrigieron, no un dominio en uso"
+      ],
+      "evidenciaEnContra": [
+       "Un registro previo borrado sin capturas en Wayback no se puede excluir del todo con fuentes públicas. crt.sh devolvió 502 en 3 intentos. Cert Spotter (gratuito) solo devolvió 2 certificados de agosto de 2026. Common Crawl da 0 capturas, pero también da 0 para TRR y MJA, así que no sirve para distinguir"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-06",
+      "hipotesis": "El rastreo de /es/miami del 10-sep lo provocó nuestra propia petición de indexación, así que la salida de ese día sería efecto nuestro",
+      "afirmacion": "Falso. Google rastreó /es/miami por su cuenta a las 16:07:24 UTC. Nuestro sweep la vio en «rastreada, sin indexar» a las 16:42:52, con la última petición del 26-ago, y la pidió a las 16:54:29, 47 minutos después del rastreo. Esa petición no provocó un rastreo nuevo. Se corrige la versión de la ronda 1 que atribuía el rastreo a nuestra petición.",
+      "evidencia": [
+       "indexing-pending.json en f68bbe8 (builtAt 2026-09-10T16:42:52Z): /es/miami en «Crawled - currently not indexed», lastIndexRequestAt 2026-08-26T19:05:22Z",
+       "indexing-status.json en f68bbe8: lastCrawlTime 2026-09-10T16:07:24Z. En f62769f: lastIndexRequestAt 2026-09-10T16:54:29.505Z",
+       "lastCrawlTime sigue en 2026-09-10T16:07:24Z el 11, 12, 13 y 14-sep y en estado-urls.json del 13-oct: la petición no generó rastreo",
+       "El 11-sep a las 16:35 vuelve a «Submitted and indexed» sin rastreo nuevo y no recupera impresiones (0 del 11 al 18-sep según la ronda 1)",
+       "No hay ninguna petición manual registrada el 10-sep en docs/seo ni en data/seo/acciones.json"
+      ],
+      "evidenciaEnContra": [
+       "Una petición manual fuera del sweep anterior a las 16:07 no quedaría registrada. No hay indicios de que existiera"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-07",
+      "hipotesis": "La evaluación propia de Google rechaza /es/miami y las peticiones solo la enmascaraban",
+      "afirmacion": "Las tres salidas de /es/miami siguen el mismo patrón. Cada rastreo orgánico de Google (15-ago, 23-ago y 10-sep) terminó en «rastreada, sin indexar». Los rastreos provocados por nuestra petición (18-ago y 26-ago, de 31 a 92 s después de pedirlos) la readmitían y le daban 2-3 semanas de impresiones. Lo del 10-sep no es un hecho aislado: es la tercera vez que la evaluación ordinaria de Google la rechaza. El 10-sep la petición ya no forzó un rastreo y la readmisión no trajo impresiones. Sigue sin saberse por qué la rechaza.",
+      "evidencia": [
+       "f2bb038 (18-ago 00:26): CNI con rastreo del 15-ago 17:52:45Z → petición 18-ago 00:42:08 → rastreo 00:42:39 → indexada el 18-ago 16:46 (miami-traza.txt)",
+       "50bed6d y a6b72ac: rastreo orgánico del 23-ago 16:44:51Z, sin petición previa porque las del 22-ago eran de otras URL. Sigue indexada el 23 y el 24-ago y está en CNI el 26-ago 18:52 sin rastreo nuevo",
+       "8c002a8 y 44b3cd8: petición el 26-ago 19:05:22 → rastreo 19:06:54 → indexada el 27-ago 20:45",
+       "10-sep: rastreo orgánico 16:07:24 → CNI a las 16:42 → petición 16:54 sin rastreo → «indexada» el 11-sep, con 0 impresiones desde entonces"
+      ],
+      "evidenciaEnContra": [
+       "Son 3 episodios de una sola URL, y el estado se lee con 1 día de resolución, salvo el 10-sep, que tiene una resolución de 35 min",
+       "El «indexada» del 11-sep sin rastreo puede ser un estado de la herramienta y no la página realmente servida"
+      ],
+      "confianza": "media",
+      "papel": "causa principal"
+     },
+     {
+      "id": "REN-08",
+      "hipotesis": "La caída propia de impresiones de Marcyan del 20-21 sep, 3-4 días antes de la spam update, es la primera señal de la reevaluación del sitio entero",
+      "afirmacion": "No. La bajada del 20-26 sep frente al 13-19 sep es el fin de la «luna de miel» de las peticiones. El 97 % sale de URL pedidas entre el 18-ago y el 11-sep, y las no pedidas siguen planas. Lo que sí empieza esos días son las primeras salidas del índice sin rastreo nuevo: 1 el 20-sep y 1 el 21-sep, ambas devueltas por petición el 21-sep.",
+      "evidencia": [
+       "Impresiones por página (todos los dispositivos, gsc-daily.json de la ronda 1): 210 → 119 entre 13-19 sep y 20-26 sep (cohort.txt)",
+       "Cohorte pedida del 8 al 11-sep: 127 → 70 (−57, 63 %). Pedida del 18-ago al 6-sep: 42 → 11 (−31, 34 %). Sin petición: 41 → 38 (−3, 3 %), y 47 en la semana del 27-sep al 3-oct",
+       "Por página: /es/miami/diseno-web 59 → 32 (pedida el 11-sep, posición estable 28,6 → 29,7); /en/miami/conversational-ai 29 → 8 (pedida el 9-sep); /en/pricing/chatbot-cost 21 → 1 (pedida el 30-ago, sigue indexada); /es/houston/talleres-mecanicos 12 → 1 (pedida el 29-ago) (pgab.txt). Los escalones llegan 11-22 días después de la petición",
+       "A nivel de propiedad (API de GSC con fecha × dispositivo): móvil 77 → 35 (11,0 → 5,0 al día), escritorio 121 → 77 (mob.txt, gsc-sep.json)",
+       "Primeras salidas sin rastreo nuevo: /en/houston/beauty-salons el 20-sep (último rastreo el 6-jul) y /es/houston/seo-local el 21-sep (último rastreo el 6-sep). Se pidieron el 21-sep a las 16:09 y 16:11, se rastrearon en minutos y volvieron el 22-sep (sweepdiff-sep12-27.txt)"
+      ],
+      "evidenciaEnContra": [
+       "Fecha × página × dispositivo solo devuelve 103 de 199 impresiones (13-19 sep), así que el reparto por cohortes es de todos los dispositivos, no solo de móvil",
+       "La suma por página (210) no coincide con la de la propiedad (199)",
+       "Las 2 salidas sin rastreo del 20-21 sep sí apuntan a que el mecanismo de la reevaluación arrancó antes de la spam update"
+      ],
+      "confianza": "media",
+      "papel": "contribuye"
+     },
+     {
+      "id": "REN-09",
+      "hipotesis": "Algo que cambiamos o desplegamos entre el 7 y el 24-sep (o una actualización de Google ese día) provocó el arranque del 20-21 sep",
+      "afirmacion": "Del 7 al 24-sep no hubo ningún cambio de código ni de contenido. Los 16 commits y sus despliegues automáticos solo tocan datos del sweep. Ninguna fuente pública reporta volatilidad el 20 o el 21-sep.",
+      "evidencia": [
+       "git log del 6-sep 12:00 al 25-sep: 16 commits, todos «auto(seo): sweep» y todos solo en data/. El último cambio de código fue el PR #37 (a2d7c90, en producción el 6-sep a las ~00:56 UTC)",
+       "Vercel list_deployments del 1 al 22-sep: los despliegues a producción del 7 al 21-sep corresponden todos a esos commits de datos (dpl_YS2BEPD3... a dpl_5mwZo4iJ...)",
+       "El sitemap no tiene lastmod, así que los despliegues diarios no anuncian cambios",
+       "Search Engine Roundtable (24-sep): volatilidad «around September 23rd (maybe the 22nd)», antes el 15-sep y «September 4 through 13». No dice nada del 20-21"
+      ],
+      "evidenciaEnContra": [
+       "No consulté el historial diario de Mozcast ni de Semrush Sensor para el 20-21 sep"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-10",
+      "hipotesis": "El subdominio reports.marcyanstudio.com, dado de alta el 30-sep dentro de la propiedad de dominio, añade páginas pobres o duplicadas que afectan al sitio",
+      "afirmacion": "No. Es una pantalla de acceso con noindex,nofollow y todo lo demás redirige a ella. No ofrece contenido indexable.",
+      "evidencia": [
+       "Vercel: reports.marcyanstudio.com, createdAt 1790733595444 (≈2026-09-30 02:00 UTC), proyecto marcyan-reports",
+       "/ → 307 a /sign-in; /sign-in → 200 con <meta name=\"robots\" content=\"noindex, nofollow\">; /robots.txt y /sitemap.xml → 307 a sign-in (hosts/)",
+       "marcyan-reports-pearl.vercel.app hace lo mismo y marcyan-artifact-runtime.vercel.app da 404"
+      ],
+      "evidenciaEnContra": [
+       "El robots.txt también redirige a sign-in, así que Google lo tratará como inexistente (permite todo). Es inocuo con noindex"
+      ],
+      "confianza": "alta",
+      "papel": "descartada"
+     },
+     {
+      "id": "REN-11",
+      "hipotesis": "Mis pruebas de render ensucian la medición del 13-oct",
+      "afirmacion": "Mis 32 cargas con JS y user-agent de Googlebot (13-oct, ~20:25-20:45 hora local) cargaron gtag. 20 envíos a GA se abortaron, pero algunos pueden haber llegado. Si GA4 muestra visitas raras el 13-oct, salen de aquí.",
+      "evidencia": [
+       "render.json y render-run1.json: 16 cargas con JS en cada pasada. Fallidas: www.google-analytics.com net::ERR_ABORTED ×20 (errs.mjs)"
+      ],
+      "evidenciaEnContra": [
+       "GA4 suele filtrar los bots conocidos, y esta máquina puede estar en la exclusión de tráfico interno"
+      ],
+      "confianza": "media",
+      "papel": "hallazgo colateral"
+     }
+    ],
+    "huecos": [
+     "Sin la prueba en vivo de URL Inspection, que solo existe en la interfaz y no en la API, no pude ver el renderizado real del WRS de Google. Que su instantánea incluya «Prefer English?» es probable pero no está comprobado",
+     "No se puede saber si Google tiene o tuvo URL de marcyan.vercel.app en su índice, sobre todo entre el 24-mar y el 6-jun, cuando el sitio no tenía canonical. No hay propiedad de GSC para ese host, WebSearch no es Google y Gemini no ejecutó la búsqueda site:",
+     "Historial completo de certificados: crt.sh dio 502 en 3 intentos y Cert Spotter gratuito solo devuelve los 2 certificados de agosto de 2026",
+     "La búsqueda de copias o scrapers es débil: el buscador disponible no indexa marcyanstudio.com y no pude buscar frases exactas directamente en Google",
+     "La API de GSC con página × dispositivo devuelve solo unas 52 % de las impresiones (103 de 199 en 13-19 sep), así que el reparto por cohortes de petición no se pudo hacer solo para móvil",
+     "No consulté el historial diario de Mozcast ni de Semrush Sensor para el 20-21 sep; solo los artículos de Search Engine Roundtable",
+     "Sigue sin saberse por qué cada rastreo orgánico de /es/miami acaba en «rastreada, sin indexar»",
+     "No comprobé si los bundles /_astro de agosto que citan las copias guardadas devuelven hoy 404. Su efecto sería nulo porque sin JS el HTML trae todo el contenido",
+     "Solo probé Googlebot smartphone, no la versión de escritorio"
+    ],
+    "archivos": [
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\render.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\render-sum.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\render-diff.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\gb-enUS_es_houston.png",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\render.mjs",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\hosts",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\wayback\\rdap.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\gemini-dup.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\miami-traza.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\sweepdiff-sep12-27.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\cohort.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\pgab.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\mob.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-render\\gsc-sep.json",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\src\\components\\layout\\LangNotice.astro",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\src\\components\\layout\\SiteFooter.astro"
+    ]
+   },
+   "verificacion": {
+    "veredictos": [
+     {
+      "id": "REN-01",
+      "veredicto": "confirmada",
+      "razon": "Lo repetí con un Chrome headless propio (155.0.8059.79, perfil temporal ya borrado), bloqueando GA, GTM y /api/events. Fueron 10 cargas de Googlebot smartphone y también de escritorio, con JS y sin JS, sobre /es/miami, /en/houston/web-design, /es/houston/seo-local y /en/houston/beauty-salons. Resultado: todas 200, sin X-Robots-Tag ni meta robots, 0 mensajes de consola, 0 excepciones, 0 respuestas 4xx/5xx, y título, H1 y canonical correctos. Sin JS siempre hay más palabras: /es/miami 804 sin JS frente a 750-754 con JS en móvil y 795-799 en escritorio; /en/houston/web-design 997 frente a 941-944 en móvil y 984-987 en escritorio. Con curl, el md5 del HTML es idéntico en 7 rutas para Googlebot en-US, Chrome es-MX y sin user-agent (/es 002982a5bd, /es/houston 072682173a, /en/miami/web-design cab8669e9b). SiteFooter.astro, líneas 252-256, pliega los <details> por debajo de 767 px, como decía el investigador. Así queda cubierto también el hueco de escritorio. Sigue sin ser el WRS real de Google. (myrender2.json, myrender2-sum.txt, hosts/md5.txt)"
+     },
+     {
+      "id": "REN-02",
+      "veredicto": "confirmada",
+      "razon": "Mi render lo reproduce. «Prefer English?» aparece a los 2, 3, 5 y 7 s y ya no está a los 8 s, con lang=\"en\", en /es/miami y /es/houston/seo-local. Pasa con Googlebot móvil y también con el de escritorio cuando navigator.language es en-US. No aparece nunca en las páginas en inglés. LangNotice.astro: la línea 47 es DIRECTIONS = { es: true, en: false } y las líneas 124-125 son role=status y hint.lang = target. Además medí qué páginas salieron del índice entre el 25-sep y el 13-oct. En inglés, sin pista, quedaron 17 de 39 (−22, 56 %). En español con pista quedaron 22 de 34 (−12, 35 %). Las que muestran la pista cayeron MENOS, lo que va en contra de que sea la causa. Sigue sin comprobarse si la instantánea del WRS cae dentro de la ventana de 1,2 a 7,2 s. (lang.mjs, myrender2-sum.txt)"
+     },
+     {
+      "id": "REN-03",
+      "veredicto": "confirmada",
+      "razon": "Lo repetí con curl. marcyan.vercel.app devuelve 200 con md5 idéntico al dominio en /es, /es/houston, /es/miami, /en/miami/web-design, /en/services, /sitemap-0.xml y /robots.txt. La canonical apunta a https://marcyanstudio.com/es. marcyan-yan8 y marcyan-git-main-yan8 responden 302 a vercel.com/sso-api con X-Robots-Tag: noindex, y www responde 308. En estado-urls.json del 13-oct, googleCanonical lleva el host marcyanstudio.com en las 84 URL. Un matiz en la evidencia: las 43 no indexadas son 36 «Crawled - currently not indexed» y 7 «Alternate page with proper canonical tag». En esas 7 Google eligió la versión CON barra del mismo host: /es/miami/seo-local, /es/sobre-nosotros, /es/portafolio, /es/herramientas, /es/houston/bienes-raices, /es/miami/doral y el post de IA que contesta llamadas. Además, 3 indexadas tienen la canónica de Google distinta de la declarada solo por la barra (/en/blog, /es/diagnostico, /es/houston/clinicas-dentales). Nada apunta a otro host, así que la conclusión se mantiene.",
+      "afirmacionCorregida": "marcyan.vercel.app sirve el sitio idéntico byte a byte (200, sin noindex), con canonical, hreflang y sitemap hacia marcyanstudio.com. Google elige marcyanstudio.com como canónica en las 84 URL. Las 43 no indexadas el 13-oct son 36 «rastreada, sin indexar» y 7 «página alternativa con canónica correcta», estas por el residuo de la barra final dentro del mismo dominio. Ninguna está como duplicada de otro host. No es causa: es higiene pendiente."
+     },
+     {
+      "id": "REN-04",
+      "veredicto": "debilitada",
+      "razon": "No se puede reproducir como prueba de ausencia. Busqué en WebSearch la frase exacta «Sitios web a medida, rápidos y bilingües para negocios de Miami» y salen 0 coincidencias en otros hosts, pero tampoco sale marcyanstudio.com, que es la fuente. Ese buscador no indexa el sitio y no puede detectar copias. Sin acceso directo a Google, «no hay copias» no está demostrado. Lo único sólido es indirecto: Google no marca ninguna de las 84 URL como duplicada de otra página.",
+      "afirmacionCorregida": "No hay indicios de copias externas, pero la búsqueda no sirve para descartarlas: el buscador disponible no indexa ni el propio sitio. El único dato fiable es que Google no trata ninguna URL como duplicada de otro host. Queda como no comprobado, no como descartado."
+     },
+     {
+      "id": "REN-05",
+      "veredicto": "confirmada",
+      "razon": "El RDAP de Verisign, consultado de nuevo, da registration 2026-04-14T04:13:24Z, last changed 2026-04-25T01:16:49Z, Name.com y client transfer prohibited. Wayback CDX devuelve [] para marcyanstudio.com/*, para la raíz y para matchType=domain. En la misma tanda TRR (texasrushremove.com) devolvió una captura del 2025-04-23, así que el servicio funcionaba, aunque tuve 2 errores de servicio y un 429 antes del resultado bueno. crt.sh volvió a dar 502. Cert Spotter gratuito solo devuelve los 2 certificados de agosto de 2026 y ni siquiera el de abril, así que no sirve como historial. Matiz: que la compra sea «registrar new» con creación el 14-abr no excluye por sí solo un registro anterior caducado y borrado, porque un dominio recapturado también estrena fecha de creación. La prueba de que no tuvo vida anterior es el 0 de Wayback, no el RDAP. La conclusión, juventud real y sin historial público, se sostiene."
+     },
+     {
+      "id": "REN-06",
+      "veredicto": "confirmada",
+      "razon": "El orden de los hechos se reproduce con git. En f68bbe8 lastCrawlTime es 2026-09-10T16:07:24Z, y la petición, en indexRequestHistory, es de las 16:54:29Z. Esa petición no generó un rastreo: el 13-oct lastCrawlTime sigue en 10-sep 16:07:24, y el 11-sep la URL figura como indexada sin rastreo nuevo. Hay dos exageraciones. (1) «No tuvo ni una impresión más» es falso: tuvo 0 del 11 al 18-sep, pero luego 1-4 al día desde el 19-sep (19-sep 1, 20-sep 1, 22-sep 2, 1-oct 4…), con totales semanales de 1, 6, 7 y 7. (2) No corrige a la ronda 1: el resultado final de la ronda 1 ya decía que Google la rastreó por su cuenta el 10-sep a las 16:07 UTC.",
+      "afirmacionCorregida": "Google rastreó /es/miami por su cuenta el 10-sep a las 16:07:24 UTC. Nuestra petición fue a las 16:54:29 y no provocó un rastreo nuevo. Volvió a figurar como indexada el 11-sep sin rastreo, pero no recuperó la visibilidad: pasó de unas 25 impresiones al día a 0 entre el 11 y el 18-sep, y a 1-4 al día desde el 19-sep. Esto coincide con lo que ya establecía la ronda 1."
+     },
+     {
+      "id": "REN-07",
+      "veredicto": "refutada",
+      "razon": "Rehíce la traza de /es/miami día a día con git y la crucé con sus impresiones diarias. El patrón «cada rastreo orgánico la echa y cada rastreo pedido la readmite» no se sostiene. (1) Episodio 1: /es/miami tiene 0 impresiones desde el 11-ago, mientras la propiedad seguía con 3-14 al día, 4 días ANTES del rastreo orgánico del 15-ago. La pérdida de visibilidad precede al único rastreo conocido. (2) Episodio 2: tras el rastreo orgánico del 23-ago siguió indexada el 23 y el 24-ago, y las impresiones no bajaron (24-ago 25, 25-ago 29, 26-ago 28). El «rastreada, sin indexar» del 26-ago llegó sin rastreo nuevo y sin pérdida visible antes de la petición de las 19:05. (3) Su traza omite el commit abe491c. El 8-sep /es/miami estaba en «rastreada, sin indexar» con el último rastreo en el PEDIDO del 26-ago, sin rastreo nuevo, y volvió a «indexada» el 9-sep sin rastreo ni petición. Ese día ~66 URL hicieron lo mismo de golpe y volvieron al día siguiente, mientras /es/miami seguía con 26 y 21 impresiones. El estado de la herramienta de inspección oscila sin rastreos y sin cambios de visibilidad. (4) «Con 0 impresiones desde entonces» es falso: desde el 19-sep tiene 1-4 al día. El único caso limpio de rastreo orgánico seguido de pérdida real es el del 10-sep, que ya estaba en la ronda 1. Uno solo no da para un patrón ni para el papel de «causa principal».",
+      "afirmacionCorregida": "Solo el 10-sep encaja con «rastreo orgánico seguido de pérdida de visibilidad»: rastreo a las 16:07, 8 impresiones ese día y luego 0, hasta un residuo de 1-4 al día desde el 19-sep. En los otros episodios no hay patrón. En agosto la visibilidad se perdió el 11-ago, antes del rastreo del 15-ago. El rastreo orgánico del 23-ago no quitó impresiones. El 8-sep la herramienta la marcó fuera y al día siguiente dentro, sin rastreos, en una oscilación masiva de unas 66 URL. Que el estado diga «indexada» o «rastreada, sin indexar» un día concreto no es fiable para atribuir causas. Sigue sin saberse por qué Google dejó de mostrar el hub el 10-sep."
+     },
+     {
+      "id": "REN-08",
+      "veredicto": "debilitada",
+      "razon": "Las cuentas se reproducen. Por cohortes: 41→38 sin petición, 127→70 pedidas del 8 al 11-sep y 42→11 pedidas del 18-ago al 6-sep, con un 97 % de la bajada en URL pedidas. Por dispositivo: móvil 77→35 y escritorio 121→77. La interpretación no se sostiene. (a) «Las primeras salidas sin rastreo nuevo el 20-21 sep» es FALSO, porque el diff solo miraba del 12 al 27-sep. Hay salidas sin rastreo el 26-ago (/es/miami), 29-ago (/es/houston/talleres-mecanicos), 30-ago (/en/pricing/chatbot-cost), 1-sep (/en/miami/conversational-ai), 3-sep (/es/houston/branding), 7-sep (/es/precios/cuanto-cuesta-una-pagina-web-houston) y la oscilación masiva del 8-sep, con ~66 URL. (b) La pieza más grande de la cohorte del 8 al 11-sep, /es/miami/diseno-web (59→32), no es un efecto de la petición. En 13-19 sep heredó las búsquedas que el hub tenía hasta 6-12 sep: «diseño web miami» pasa de 35 y 19 en el hub a 0, y de 0 y 3 en la landing a 22. Es una secuela de la pérdida del hub, no una «luna de miel». (c) Hay sesgo de selección: las URL pedidas tenían el 80 % de las impresiones de 13-19 sep y se pidieron precisamente porque Google ya las había dejado fuera. (d) Las no pedidas no están planas en un horizonte más largo: 71 (30-ago a 5-sep) → 37 (6-12 sep). (e) Lo del 20-26 sep no es un «arranque». La propiedad cae de forma continua: 374 → 217 → 199 → 113 → 71 por semana desde el 30-ago, y el mayor escalón es el del 30-ago al 12-sep.",
+      "afirmacionCorregida": "La bajada de 20-26 sep frente a 13-19 sep (−86 impresiones de propiedad) no es el inicio de nada. Es un tramo más de una caída continua desde la semana del 30-ago (374 → 217 → 199 → 113 → 71). Se concentra en URL pedidas porque eran las que tenían el 80 % de las impresiones. Su pieza mayor, /es/miami/diseno-web, se explica por las búsquedas heredadas del hub tras perderlo el 10-sep, no por haberla pedido. Las salidas del índice sin rastreo nuevo empiezan el 26-ago, no el 20-21 sep."
+     },
+     {
+      "id": "REN-09",
+      "veredicto": "confirmada",
+      "razon": "El git log de origin/main desde el 6-sep 12:00 UTC hasta el 24-sep da 17 commits, no 16, todos «auto(seo): sweep» y todos solo en data/. Ningún archivo de src/, api/ ni astro.config lee data/indexing-* ni estado-urls. Solo los leen scripts de mantenimiento, que no cambian lo que se publica. El último cambio de código es el PR #37 (a2d7c90, 5-sep 19:56 hora local = 6-sep 00:56 UTC). Los cambios del 25-sep solo tocan docs/seo y datos. La búsqueda confirma el artículo de Search Engine Roundtable del 24-sep: volatilidad hacia el 23-sep, quizá el 22, con menciones previas al 15-sep y al 4-13 sep. No encontré nada del 20-21. No consulté Mozcast ni Semrush Sensor, así que la ausencia de volatilidad externa esos días sigue siendo una prueba débil. Además, el «arranque del 20-21 sep» que esto pretendía explicar no se sostiene (ver REN-08)."
+     },
+     {
+      "id": "REN-10",
+      "veredicto": "confirmada",
+      "razon": "Lo repetí con curl. reports.marcyanstudio.com/ da 307 a /sign-in. /sign-in da 200 con <meta name=\"robots\" content=\"noindex, nofollow\">. /robots.txt y /sitemap.xml dan 307 a /sign-in?redirect_url=…. No hay contenido indexable."
+     },
+     {
+      "id": "REN-11",
+      "veredicto": "confirmada",
+      "razon": "Es cierto, pero se queda corto. Hay dos tandas (render-run1.json y render.json) con 24 cargas cada una: 32 con JS, como dice el investigador, pero con 20 envíos a GA abortados en CADA tanda, 40 en total. Además, en 8 de esas cargas (4 por tanda: /es, /es/houston, /es/miami y /es/miami/diseno-web con en-US) se mostró la pista de idioma. LangNotice llama a track('lang_notice_shown'), y src/lib/track.js manda un sendBeacon a /api/events (la tabla propia de eventos) y además el evento a gtag. No hubo fallos registrados hacia /api/events y api/events.mjs no filtra bots por user-agent. Lo más probable es que la tabla propia tenga unos 8 «lang_notice_shown» falsos del 13-oct (~20:25-20:45 hora local), que ensuciarían la medición de la pista del PR #37. No sé si la exclusión de tráfico interno los quita al guardar o solo en los reportes. Mis renders de verificación bloquearon GA, GTM y /api/events, así que no añaden ruido.",
+      "afirmacionCorregida": "Las pruebas de render del investigador (48 cargas, 32 con JS) cargaron gtag y abortaron 40 envíos a GA. En 8 cargas se disparó además «lang_notice_shown» hacia la tabla propia de eventos (/api/events) y hacia GA4. Si el 13-oct, entre ~20:25 y 20:45 hora local, aparecen visitas o pistas de idioma raras en GA4 o en la tabla de eventos, salen de ahí y hay que excluirlas al medir la pista de idioma."
+     }
+    ],
+    "evidenciaNueva": [
+     "Oscilación masiva del 8-sep (commit abe491c, lastChecked 2026-09-08T17:07Z): unas 66 URL pasan de «indexada» a «rastreada, sin indexar» SIN rastreo nuevo y vuelven casi todas el 9-sep (9f83214) sin rastreo ni petición. /es/miami tuvo 26 y 21 impresiones esos días. El estado de la herramienta de inspección no es fiable día a día (r2-verif-render/exits-hasta-24sep.txt).",
+     "/es/miami tiene 0 impresiones desde el 11-ago, mientras la propiedad seguía con 14, 14, 11, 4, 13, 11 y 3 al día. Eso es 4 días ANTES del rastreo orgánico del 15-ago 17:52Z: la primera pérdida no la explica ese rastreo (miami-daily.txt, gsc-daily.json de la ronda 1).",
+     "/es/miami no se quedó en cero tras el 10-sep. Tuvo 0 del 11 al 18-sep y luego 1-4 impresiones al día desde el 19-sep: 1, 6, 7 y 7 por semana, en posiciones de 6 a 34.",
+     "Sustitución de búsquedas: en 13-19 sep /es/miami/diseno-web recoge las consultas que /es/miami tenía hasta 6-12 sep. «diseño web miami»: hub 35→19→0, landing 0→3→22→6. «diseño de paginas web en miami»: hub 10→5→0, landing 0→0→6→7. El pico de la landing es una secuela del hub, no de la petición del 11-sep (subst.txt).",
+     "Hubo salidas del índice sin rastreo nuevo desde mucho antes del 20-21 sep: 26-ago /es/miami, 29-ago /es/houston/talleres-mecanicos, 30-ago /en/pricing/chatbot-cost, 1-sep /en/miami/conversational-ai, 3-sep /es/houston/branding, 7-sep /es/precios/cuanto-cuesta-una-pagina-web-houston, más la oscilación masiva del 8-sep.",
+     "Las impresiones semanales de la propiedad caen sin cortes desde la semana del 30-ago: 374 → 217 → 199 → 113 → 71 (dailyAll). La cohorte sin petición también se reduce a la mitad antes (71 → 37 entre las semanas del 30-ago y del 6-sep). Por cohortes y semanas en cohort2.txt.",
+     "Estado del 13-oct: 41 indexadas, 36 «rastreada, sin indexar» y 7 «página alternativa con canónica correcta» (versión con barra del mismo host). Hay 3 indexadas con canónica de Google sin barra frente a la declarada con barra (/en/blog, /es/diagnostico, /es/houston/clinicas-dentales). Ningún caso apunta a otro host.",
+     "Render independiente con Googlebot de ESCRITORIO (1366x900), que el investigador no probó: 200, sin errores, H1 y canonical correctos y la pista «Prefer English?» también visible de 2 a 7 s en las páginas en español (myrender2-sum.txt).",
+     "Del 25-sep al 13-oct las páginas en inglés (sin pista) pierden 22 de 39 indexadas. Las españolas con pista pierden 12 de 34 y las españolas sin pista 3 de 5. La pista no se asocia con más pérdida.",
+     "Contaminación de medición que el investigador no vio: sus 8 cargas con la pista visible dispararon track('lang_notice_shown') hacia /api/events (la tabla propia, sin filtro de bots en api/events.mjs) y hacia gtag. Mis renders bloquearon GA, GTM y /api/events. El Chrome propio se cerró y su perfil temporal se borró."
+    ]
+   }
+  },
+  {
+   "lente": "capa",
+   "titulo": "Capa inglesa con control de variables y contenido a escala",
+   "investigacion": {
+    "lente": "Capa inglesa con control de variables y contenido a escala (ronda 2)",
+    "resumen": "Construí una tabla de las 84 URL con estas columnas: idioma, plantilla, si salió (cobertura efectiva del 25-sep frente al 13-oct, con las variantes con barra resueltas: 84 cubiertas, 40 salen), días desde el último rastreo al 25-sep, enlaces internos del dist (en cuerpo y en menú o pie), peticiones, impresiones de 90 días antes del 24-sep (GSC, sumando las variantes con y sin barra), palabras exclusivas, similitud máxima y destino de su gemela de idioma. Sobre ella ajusté varios modelos: logística ML y Firth con bootstrap, Mantel-Haenszel, validación cruzada leave-one-out y logística condicional sobre los 39 pares ES/EN. También repetí las medidas de contenido en TRR y MJA, descargando sus páginas en vivo.\n\nResultados:\n1) Lo que mejor decide qué URL cae es su papel en la arquitectura. Las páginas estructurales (portadas, hubs, legales, herramientas) salen 1 de 14. Pesan también los enlaces internos entrantes: OR 0,53-0,63 por unidad logarítmica, con un IC que excluye el 1 en todos los modelos, y AUC de 0,74.\n2) El inglés NO desaparece al controlar el rastreo, las impresiones, las peticiones y los enlaces. Su OR sube de 1,9 en bruto a 2,5-2,8 ajustado. Pero el intervalo incluye el 1 (0,9-7,5), y en pares la cuenta es 13 frente a 5 (p=0,096). Es probable, no está demostrado.\n3) La antigüedad del rastreo, las impresiones previas y las peticiones no aportan nada una vez controlados la plantilla y los enlaces. Fuera de muestra, solas, predicen peor que el azar.\n4) El destino de una página es casi independiente del de su gemela de idioma (kappa 0,11). La decisión se toma por URL, no por el contenido.\n5) El texto es plantilla redactada con IA en tandas: 28 de 28 commits del archivo de landings coautorizados por Claude, y un 53-57 % de las palabras en secuencias compartidas. Pero lleva datos propios (precios reales y casos). Ni la densidad de fórmulas, ni la similitud, ni el texto exclusivo separan las páginas que salieron de las que siguen. Las páginas que son casi un cambio de ciudad (<20 % de texto exclusivo) salen igual que la media: 6 de 13.\n6) TRR tiene páginas de ciudad más plantilladas que Marcyan y conserva 20 de 20. Las de inglés nunca se pidieron. Lo que separa a los sitios es la demanda y la confianza en relación con el tamaño del índice: 741 impresiones por página indexada en TRR, 276 en MJA y 23 en Marcyan. A eso se suman 34-38 reseñas frente a 0 y un dominio de 18-19 meses frente a 6. MJA, además, sigue pidiendo indexación (52 peticiones desde el 25-sep, frente a 0 de Marcyan).\n\nImplicación para el plan: no podar el inglés en bloque, porque Google conserva las 7 páginas estructurales en inglés y 17 URL EN. Fusionar o retirar sobre todo las landings EN de servicio y sector, que ya están fuera (16 de 22). Fusionar los pares Houston/Miami como reducción de riesgo y concentración de señales, no como remedio probado. Lo que respalda la evidencia es reforzar el enlazado interno hacia las landings que se conserven y la autoridad externa, con un índice proporcional a la demanda real.",
+    "hallazgos": [
+     {
+      "id": "ING-01",
+      "hipotesis": "Qué variable decide qué URL sale: papel en la arquitectura y enlaces internos entrantes",
+      "afirmacion": "Lo que más separa a las páginas que salieron de las que siguen es su posición en el sitio, y después el número de enlaces internos que reciben. No es la frescura del rastreo ni la demanda previa. Son un selector de fondo, no el disparador, porque el grafo de enlaces no cambió desde agosto.",
+      "evidencia": [
+       "Tabla de 84 URL (r2-capa-ingles-escala/tabla-84.tsv). Salen las páginas sin enlace de menú o pie: 27 de 40 (68 %) frente a 13 de 44 (30 %). Salen 1 de 14 portadas, hubs, legales y herramientas (7 %), 15 de 22 sector/secundaria (68 %) y 12 de 22 servicios (55 %) (model.txt)",
+       "Logística Firth (model.txt) con log de enlaces entrantes: OR 0,53 [0,37-0,77] ajustando idioma, rastreo e impresiones (M2) y OR 0,63 [0,43-0,93] añadiendo el tipo estructural (M4). En la sensibilidad sin las 6 Alternate: 0,62 [0,41-0,93] (sens.txt)",
+       "AUC de cada variable sola (model2.txt): enlaces entrantes 0,74, sin enlace de menú 0,69. Idioma 0,58, días desde el rastreo 0,60, impresiones 90d 0,59",
+       "Validación cruzada leave-one-out (model2.txt). Log-loss medio del nulo −0,692. Solo enlaces −0,635. Enlaces más tipo estructural −0,615. Idioma más enlaces más tipo −0,608, con AUC fuera de muestra 0,73 (el mejor)",
+       "Dentro del español, con menú salen 3 de 22 y sin menú 15 de 23. Dentro del inglés, 10 de 22 frente a 12 de 17 (model.txt)"
+      ],
+      "evidenciaEnContra": [
+       "Solo dentro de las 44 landings de ciudad (servicio, sector, secundaria), los enlaces dejan de ser significativos: OR 0,75 [0,46-1,23] (model.txt, L2). Las de sector tienen casi todas 2-3 enlaces, así que no hay variación",
+       "Con el mismo grafo había 78-79 páginas indexadas el 25-sep: explica qué cae, no por qué cae ahora",
+       "Enlaces y tipo de página están muy correlacionados. El efecto aislado de cada uno es impreciso: el tipo estructural da OR 0,17 [0,03-1,11]"
+      ],
+      "confianza": "media",
+      "papel": "contribuye",
+      "arreglos": [
+       "Reforzar los enlaces entrantes en el cuerpo hacia las landings que se conserven, desde hubs, servicios y blog, no solo desde el menú",
+       "No esperar que esto devuelva páginas por sí solo mientras dure la reevaluación del sitio"
+      ]
+     },
+     {
+      "id": "ING-02",
+      "hipotesis": "La capa inglesa cae más por ser inglés, o porque tenía peor rastreo, menos demanda, menos peticiones y menos enlaces (confusión señalada por la crítica)",
+      "afirmacion": "El efecto del inglés no se explica por el rastreo, las impresiones, las peticiones ni los enlaces: al ajustar, el OR sube de 1,9 a 2,5-2,8. Pero el intervalo incluye el 1 en casi todas las especificaciones. Es un efecto secundario probable, de magnitud incierta, concentrado en las landings EN de servicio y sector sin demanda. No afecta a las páginas estructurales en inglés.",
+      "evidencia": [
+       "En bruto salen el 56 % en inglés (22 de 39) y el 40 % en español (18 de 45). OR 1,94 [0,81-4,63] (model.txt, M0)",
+       "Ajustado por rastreo, impresiones y enlaces: OR 2,46 [0,88-6,89]. Añadiendo el tipo estructural: 2,60 [0,91-7,45]. Bootstrap Firth (2.000) del M4: 0,93-10,62 (model.txt)",
+       "Sensibilidades (sens.txt): sin las 6 Alternate 2,45 [0,84-7,10]; con el contador simple de la API 1,94 [0,70-5,39]; sin /es/miami 2,55 [0,89-7,31]; sin blog (solo páginas con gemela EN) 3,26 [1,07-9,99]",
+       "Mantel-Haenszel del inglés: estratificado por plantilla 2,16 [0,84-5,55], por rastreo 1,67 [0,68-4,12], por impresiones 1,88 [0,77-4,56], por petición 1,72 [0,70-4,24] y por menú 2,49 [0,95-6,56] (model.txt)",
+       "Pares ES/EN (39; pares.json). Ambos salen 9, ninguno 12, solo sale la EN 13, solo sale la ES 5. McNemar exacto p=0,096. Logística condicional Firth: OR de EN 2,45 [0,89-6,80]; ajustando rastreo 3,19 [0,98-10,43]; rastreo e impresiones 2,76 [0,77-9,86]; añadiendo la petición 2,64 [0,75-9,29]",
+       "Landings de ciudad: siguen 6 de 22 en inglés (salen 16) y 11 de 22 en español (salen 11). Clones de servicio Houston/Miami: salen 7 de 8 en inglés y 2 de 8 en español",
+       "Demanda por idioma (gsc90.json, 26-jun a 23-sep): EN 375 impresiones en 39 URL (11 con 0); ES 1.392 en 45 URL (6 con 0), 660 sin /es/miami",
+       "Las landings EN salen antes: mediana del 6-oct frente a ES del 9-oct (exitdate.mjs)"
+      ],
+      "evidenciaEnContra": [
+       "Fuera de muestra, el idioma solo predice peor que el nulo: log-loss −0,703 frente a −0,692. Solo aporta combinado con enlaces y tipo (de AUC 0,64 a 0,73)",
+       "El contraste de la ronda 1 «clones EN del menú 6/6 fuera frente a ES 0/6» está confundido. En esos 6 pares la ES tuvo petición 4 de 6 frente a 1 de 6, una mediana de rastreo de 14 días frente a 29 y 138 impresiones frente a 59",
+       "Las 7 páginas estructurales EN (/en, /en/houston, /en/miami, /en/blog, /en/checkup, /en/tools, /en/privacy) siguen dentro (0 de 7) y /en/houston se queda mientras /es/houston sale",
+       "En MJA, cuya base es el inglés, las páginas de ciudad EN son las menos indexadas (5 de 20 frente a 13 de 20 en ES). La desventaja no es intrínseca al inglés: depende de qué se pidió y de qué demanda hay",
+       "Con 84 filas y 40 salidas no hay potencia para confirmar un OR de 2,5. Harían falta unas tres veces más URL"
+      ],
+      "confianza": "media",
+      "papel": "contribuye",
+      "arreglos": [
+       "No podar el inglés en bloque. Mantener las páginas EN estructurales y las de precio con demanda (/en/pricing/chatbot-cost: 65 impresiones en 90 días, sigue dentro)",
+       "Fusionar o retirar sobre todo las landings EN de servicio y sector sin demanda que ya están fuera (16 de 22). Se pierde poco y se reduce superficie"
+      ]
+     },
+     {
+      "id": "ING-03",
+      "hipotesis": "Rastreo viejo, impresiones previas y peticiones de indexación deciden qué páginas caen",
+      "afirmacion": "Controlados la plantilla, los enlaces y el idioma, ni los días desde el último rastreo, ni las impresiones de 90 días, ni haber tenido petición explican la salida. La asociación bivariada de la ronda 1 entre rastreo viejo y salida es sobre todo confusión con el tipo de página.",
+      "evidencia": [
+       "Por cada 10 días de antigüedad del rastreo: OR 1,15-1,17 [0,90-1,51] en M1-M4. log1p(impresiones de 90 días): OR 0,88-0,91 [0,61-1,36]. Petición: OR 0,60 [0,17-2,14] en M3 (model.txt)",
+       "Leave-one-out con una sola variable (model2.txt): días de rastreo −0,707 e impresiones −0,704, ambos peores que el nulo (−0,692). La petición, −0,679, apenas mejora",
+       "Por tramos de rastreo: ≤20 días, sale el 25 %; 21-35 días, el 63 %; más de 35 días, el 45 %. No es monótono (model.txt)",
+       "Por impresiones: 0 → 47 %, 1-5 → 60 %, 6-20 → 39 %, más de 20 → 36 % (model.txt)",
+       "Copia anterior al PR #30 (último rastreo antes del 19-ago): OR 1,64 [0,48-5,63] (M6)"
+      ],
+      "evidenciaEnContra": [
+       "Con el contador simple de la API como resultado, el rastreo pasa a OR 1,34 [1,01-1,78] (sens.txt), arrastrado por las Alternate con barra de junio y julio",
+       "El último rastreo sale de la URL Inspection, que llega con retraso. La medida de antigüedad es imprecisa",
+       "Sin petición sale el 57 % y con petición el 29 % en bruto. La dirección favorece a las peticiones, pero el ajuste no la confirma"
+      ],
+      "confianza": "media",
+      "papel": "descartada",
+      "arreglos": [
+       "No basar el plan en pedir rastreo o indexación para «refrescar» páginas. No hay evidencia de que la antigüedad del rastreo decida la salida una vez controlada la arquitectura"
+      ]
+     },
+     {
+      "id": "ING-04",
+      "hipotesis": "Google juzga el contenido (el mismo texto en dos idiomas) y por eso caen o se quedan juntos los pares",
+      "afirmacion": "El destino de una URL es casi independiente del de su gemela de idioma. La concordancia apenas supera el azar, así que la decisión es por URL (importancia, enlaces, demanda en ese idioma) y no por la calidad del texto compartido.",
+      "evidencia": [
+       "39 pares ES/EN: 21 concordantes (9 salen ambos, 12 se quedan ambos). Concordancia observada 0,54 frente a 0,48 esperada por azar: kappa 0,11 (sens.txt)",
+       "«El par del otro idioma salió»: si salió el par, sale el 50 % (18 de 36); si no salió, el 43 % (18 de 42). AUC 0,54 (model.txt, model2.txt)"
+      ],
+      "evidenciaEnContra": [
+       "La traducción no es idéntica. Una evaluación de calidad por idioma o por mercado podría dar destinos distintos a dos textos equivalentes"
+      ],
+      "confianza": "media",
+      "papel": "hallazgo colateral"
+     },
+     {
+      "id": "ING-05",
+      "hipotesis": "El contenido redactado con IA a escala (plantilla con variables, fórmulas repetidas) explica qué páginas cayeron",
+      "afirmacion": "Las landings son una plantilla de secciones fijas con datos por página, redactada con asistencia de IA en tandas. Hay mucho texto compartido y fórmulas comerciales repetidas. Pero ninguna medida de contenido separa las páginas que salieron de las que siguen: la «escala» no es el selector.",
+      "evidencia": [
+       "Todas las landings salen de src/i18n/clusters.ts (3.090 líneas, esquema fijo: hero, answer, includes, local, pricing, proof, faq, cta, related). 28 de 28 commits que lo tocan llevan Co-Authored-By de Claude. Producción por oleadas: 5 landings de industria en el commit 941d828 y 4 barrios en 5167b95, ambos del 23-jun (git log)",
+       "Texto compartido (secuencias de 6 palabras, ciudad neutralizada; content.txt): en ES el 53 % de las palabras aparece en 2 o más páginas y el 30 % en 5 o más; en EN, 57 % y 33 %. Servicios: 69-73 % en 2 o más páginas. 5 páginas con menos del 10 % de texto exclusivo, todas pares Houston/Miami: los cuatro de SEO local y /es/houston/ecommerce",
+       "Fórmulas repetidas (content.txt): «sin letra pequeña / sin compromiso» 134 veces en 42 de 45 páginas ES; «24 horas» 193 veces en 41 de 45; «seremos honestos» en 21; «cliente fundador» en 16; «la IA de Google ya lo recomienda» en 22 páginas ES. Raya larga casi ausente (regla del dueño)",
+       "Información propia (content.txt): precios en 38 de 45 páginas ES (362 menciones) y 32 de 39 EN (250). Casos reales con nombre (TRR, MJA, Julio's) en 33 de 45 ES y 30 de 39 EN. Las de sector y secundaria tienen una mediana de 650-700 palabras exclusivas",
+       "No separa: fórmulas por 1.000 palabras, ES 11,35 en las que salen frente a 9,99 en las que quedan; EN 9,67 frente a 10,98, en sentido contrario. Páginas con menos del 20 % de texto exclusivo: salen 6 de 13 (46 %, igual que la media del 48 %). Landings con similitud ≥0,5: salen 3 de 8, frente a 18 de 28 con similitud <0,3. Similitud en el modelo: OR 1,25 [0,94-1,67]; palabras exclusivas: OR 1,03 [0,86-1,22] (model.txt)",
+       "Política de Google (spam-policies, actualizada el 28-08-2026): el abuso de contenido a escala es generar muchas páginas con el fin principal de manipular el ranking, con poco o ningún valor para el usuario, sea cual sea el método. La guía de IA generativa (actualizada el 01-10-2026) no prohíbe la IA en sí: el riesgo es generar muchas páginas sin aportar valor"
+      ],
+      "evidenciaEnContra": [
+       "Una clasificación a nivel de sitio afectaría a todas las páginas, y la selección entre ellas la haría la importancia (ING-01). Que no haya diferencias por página no descarta un juicio del sitio entero (ver ING-06)",
+       "La lista de fórmulas es ad hoc. No se usó un detector validado de texto generado, porque esos detectores no son fiables"
+      ],
+      "confianza": "media",
+      "papel": "descartada",
+      "arreglos": [
+       "Quitar de los textos las afirmaciones no demostrables repetidas («la IA de Google ya lo recomienda» en 22 páginas) y reducir las fórmulas idénticas entre páginas. Es higiene de confianza, no un remedio probado de la desindexación"
+      ]
+     },
+     {
+      "id": "ING-06",
+      "hipotesis": "El contenido a escala o la estructura de puertas por ciudad provocó una reevaluación del sitio entero (scaled content abuse o doorway como señal de sitio)",
+      "afirmacion": "No se puede confirmar ni descartar desde fuera. Hay rasgos que encajan con la definición de puertas por ciudad: pares de servicio Houston/Miami que son casi un cambio de ciudad. Pero los sitios de control, con plantillas iguales o más repetitivas y marcas de texto generado, no sufrieron la reevaluación. Eso apunta a que la escala del texto no basta: la diferencia la marca la falta de demanda y de confianza (ING-07).",
+      "evidencia": [
+       "Ejemplo de puertas de la política: dominios o páginas dirigidas a regiones o ciudades concretas que canalizan al usuario a una sola página (spam-policies, 28-08-2026). Marcyan tiene 16 páginas de servicio en pares Houston/Miami con similitud de 0,41-0,68 (tabla-84)",
+       "Comparación (ctrl-text.json): las páginas de ciudad de TRR tienen un 61-63 % del texto en 2 o más páginas y una mediana del 24-27 % de texto exclusivo, más plantilladas que el sector de Marcyan (46-47 %), y conservan 20 de 20. Las de MJA tienen un 54 % compartido y conservan todas las indexadas",
+       "Marcas de texto generado en los controles (content.txt): unas 15 rayas largas por cada 1.000 palabras en TRR y MJA, y «not just» en 46 de 47 páginas EN de MJA. Ninguno pierde páginas de ciudad",
+       "Sin acción manual en Search Console (hecho previo, 13-oct)"
+      ],
+      "evidenciaEnContra": [
+       "La política se actualizó el 28-ago y la ola empieza el 29-sep, dentro de la spam update: una coincidencia temporal que no se puede ignorar",
+       "Los clasificadores de sitio de Google no son observables. Una señal combinada (escala más baja demanda más dominio joven) es indistinguible de una reevaluación ordinaria"
+      ],
+      "confianza": "baja",
+      "papel": "sin determinar"
+     },
+     {
+      "id": "ING-07",
+      "hipotesis": "Por qué TRR y MJA conservan sus páginas de ciudad y Marcyan no",
+      "afirmacion": "No es por tener menos plantilla. Lo que separa a los sitios es la demanda real y la confianza en relación con el tamaño del índice: Marcyan tenía 78 páginas indexadas con 23 impresiones por página en 90 días, frente a 276-741 de los controles. Además tenía 0 reseñas y un dominio de 6 meses. MJA, por su parte, sostiene su índice con peticiones continuas.",
+      "evidencia": [
+       "Impresiones de 90 días, del 26-jun al 23-sep (ctrl-gsc.json): TRR 25.940 (1.232 consultas distintas), MJA 15.483 (827) y Marcyan 1.767 (85). Por página indexada el 25-sep: TRR 741 (35 páginas), MJA 276 (56) y Marcyan 23 (78)",
+       "TRR (ctrl.json): ciudades 20 de 20 indexadas el 25-sep y el 13-oct. Las de ciudad en inglés nunca tuvieron petición, tienen una mediana de 822 impresiones y varias llevaban más de 70 días sin rastreo el 25-sep (/league-city 12-jul, /pearland 13-jul). Las de ciudad en español tienen una mediana de 8 impresiones, como las landings ES de Marcyan (7), y también se quedan",
+       "MJA (ctrl.json): 132 URL; 56 indexadas el 25-sep y 54 el 13-oct; 75 sin rastrear nunca (perfil-control.json). Ciudades 18 de 40 indexadas, sin cambios. 52 peticiones entre el 25-sep y el 13-oct, y las 13 ciudades ES se volvieron a pedir el 3-4 de octubre. Marcyan hizo 0 peticiones en esa ventana y TRR 1",
+       "Peticiones entre el 18-ago y el 24-sep: Marcyan 32, MJA 73, TRR 12 (ctrl.json)",
+       "Reseñas el 13-oct: TRR 38, MJA 34, Marcyan 0. Dominio: MJA registrado el 14-mar-2025 y Marcyan el 14-abr-2026 (RDAP, rdap.json). TRR, abr-2025 según la ronda 1 (AUT-04)"
+      ],
+      "evidenciaEnContra": [
+       "MJA nunca llegó a indexar su cola larga: su «estabilidad» es la de un índice ya pequeño. No es comparable a Marcyan, que llegó a cubrir 84 de 84",
+       "Los controles son negocios de servicio local con ficha y demanda transaccional. Marcyan es una agencia en un mercado nacional muy competido: la demanda no se puede igualar solo con señales",
+       "El texto de los controles se descargó en vivo el 13-oct y el de Marcyan sale del dist. Pueden diferir de las copias que evaluó Google"
+      ],
+      "confianza": "media",
+      "papel": "contribuye",
+      "arreglos": [
+       "Dimensionar el índice a la demanda: menos URL, cada una con un propósito y una consulta real",
+       "Priorizar reseñas y menciones externas antes de volver a ampliar páginas"
+      ]
+     },
+     {
+      "id": "ING-08",
+      "hipotesis": "La capa espejo (el idioma que no es la base) es el margen que Google recorta también en otros sitios",
+      "afirmacion": "En TRR las únicas 2 páginas perdidas son de su capa espejo en español, mientras su base en inglés pierde 0 de 18. Encaja con lo de Marcyan, cuya capa espejo es el inglés, pero son muy pocos casos.",
+      "evidencia": [
+       "TRR (ctrl.json): servicios ES 6 → 4 (/es/limpieza-de-propiedades-houston y /es/remocion-de-escombros-houston) y EN 6 → 6. Ciudades ES y EN, 10 de 10 cada una",
+       "Marcyan: salen 22 de 39 en inglés (capa espejo desde el 4-jul) y 18 de 45 en español (base, x-default)",
+       "MJA: sale 1 combo EN y 1 combo ES"
+      ],
+      "evidenciaEnContra": [
+       "n=2 en TRR. En MJA la capa base (inglés) es la que menos indexa, por falta de peticiones"
+      ],
+      "confianza": "baja",
+      "papel": "hallazgo colateral"
+     },
+     {
+      "id": "ING-09",
+      "hipotesis": "Qué implica para el plan: ¿podar el inglés, fusionar los pares Houston/Miami o reforzar enlaces y autoridad?",
+      "afirmacion": "La evidencia respalda: (1) reforzar el enlazado interno y la autoridad externa; (2) reducir superficie empezando por las landings EN de servicio y sector que ya están fuera; (3) fusionar los pares de servicio Houston/Miami como reducción de riesgo de puertas por ciudad, sobre todo en inglés. No respalda: podar el inglés en bloque, ni esperar que fusionar o pedir rastreo devuelva páginas a corto plazo.",
+      "evidencia": [
+       "Siguen dentro 17 URL EN, entre ellas /en, /en/houston, /en/miami, /en/pricing y /en/pricing/chatbot-cost (65 impresiones en 90 días). /en/houston/restaurants (31) y /en/houston/contractors (17) también siguen (tabla-84)",
+       "Clones de servicio Houston/Miami en ES: siguen 6 de 8. Los clones no caen más que la media en español (ING-05). En EN salen 7 de 8 (tabla-84)",
+       "Las landings de sector y secundaria tienen 2-3 enlaces entrantes y salen 15 de 22. Enlaces: OR 0,53-0,63 con el IC fuera del 1 (ING-01)",
+       "Marcyan tiene 23 impresiones por página indexada frente a 276-741 en los controles (ING-07)"
+      ],
+      "evidenciaEnContra": [
+       "Con el efecto del inglés sin confirmar (IC 0,9-7,5), recortar el inglés es una apuesta razonable, no una corrección demostrada",
+       "Fusionar páginas que hoy están indexadas (las ES de Houston) puede costar visibilidad en plena reevaluación. Empezar por las que ya están fuera"
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Fase 1: consolidar las 16 landings EN de servicio y sector que ya están fuera hacia su hub o servicio EN, y fusionar los clones EN Houston/Miami de servicio. No tocar las páginas EN estructurales ni las indexadas",
+       "Fase 2: enlaces en el cuerpo desde hubs, servicios y blog hacia las landings ES que se conserven",
+       "Fase 3 (en paralelo): reseñas y menciones externas. Revisar la métrica de éxito sobre las URL vivas tras la consolidación"
+      ]
+     }
+    ],
+    "huecos": [
+     "La antigüedad del rastreo sale del lastCrawlTime de la URL Inspection, que llega con retraso. No se cruzó con los ejemplos de las Estadísticas de rastreo de GSC (hace falta la interfaz desde la sesión principal)",
+     "Los enlaces internos se midieron en el dist actual (f1c5778). Google evalúa con sus copias guardadas, aunque la ronda 1 (CAM-12) indica que el grafo no cambió desde el 2-ago",
+     "Potencia estadística baja: 84 filas, 40 salidas y 18 pares discordantes. No se puede confirmar ni descartar un efecto del inglés con OR de 2-3",
+     "No hay forma de observar si Google aplicó un clasificador de contenido a escala o de puertas a nivel de sitio. ING-06 queda sin determinar hasta ver la evolución tras el 15-oct",
+     "La lista de fórmulas de texto generado es ad hoc. No se usó ningún detector validado de IA, porque no son fiables",
+     "El texto de TRR y MJA se descargó en vivo el 13-oct. El de Marcyan sale del dist. Pueden diferir de las copias que evaluó Google en septiembre",
+     "No se re-verificaron la fecha de dominio de TRR (rdap.org devolvió 403; se usa la de la ronda 1) ni el recuento de reseñas propias (se usa AUT-04 de la ronda 1)",
+     "La demanda de búsqueda en español por ciudad y servicio (volúmenes) no se midió. Las impresiones de 90 días son una aproximación pobre en un sitio de posiciones profundas",
+     "El efecto de las peticiones continuas de MJA sobre su estabilidad no se puede separar de su autoridad"
+    ],
+    "archivos": [
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\tabla-84.tsv",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\tabla-84.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\model.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\model2.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\sens.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\pares.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\content.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\ctrl.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\ctrl-text.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\ctrl-gsc.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\gsc90.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\build.mjs",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\model.mjs",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-capa-ingles-escala\\content.mjs"
+    ]
+   },
+   "verificacion": {
+    "veredictos": [
+     {
+      "id": "ING-01",
+      "veredicto": "debilitada",
+      "razon": "Reproduje la tabla de forma independiente: estados del 25-sep y del 13-oct sacados del git de estado-urls.json, enlaces recontados desde dist e impresiones vueltas a pedir a GSC. Salen las mismas 40 URL (0 diferencias) y se repiten las cifras: 1 de 14 estructurales, 15 de 22 sector y secundaria, 12 de 22 servicios, 27 de 40 sin menú frente a 13 de 44 con menú. También salen los mismos OR: log de enlaces 0,53 [0,37-0,76] en M2 y 0,62 [0,42-0,92] en M4. Pero el «número de enlaces» no es una variable distinta del papel de la página. log(enlaces totales) solo distingue a las páginas del menú o pie (39-47 enlaces) de las demás (2-9). Los enlaces en el cuerpo no aportan nada una vez controlado el menú: OR 1,03 [0,58-1,81]. Solos dan 0,69 [0,43-1,11]. Dentro de las landings no son significativos, ni dentro de las landings sin menú. La longitud de la página discrimina igual que los enlaces (AUC 0,74 en su propio model2.txt; OR 8,4 por cada 1.000 palabras, ajustando idioma y estructural), y ambas son indicadores del tipo de página. Además, la «protección» del menú solo se da en español. Entre las páginas no estructurales con menú salen 2 de 15 en ES y 10 de 15 en EN; sin menú, 15 de 23 frente a 12 de 17. En los 22 pares de landings, que comparten papel y plantilla, el kappa es de −0,18: el papel no explica qué sale dentro de las landings.",
+      "afirmacionCorregida": "Lo que separa a las páginas es su tipo. Las 14 estructurales, que son cortas y están enlazadas desde el menú o el pie, se quedan casi todas (13 de 14). Fuera de ellas, estar en el menú o el pie solo se asocia a quedarse en español (salen 2 de 15 frente a 15 de 23), no en inglés (10 de 15 frente a 12 de 17). El número de enlaces en el cuerpo no tiene efecto (OR 1,03 con el menú controlado) y la longitud de la página discrimina igual que los enlaces. Los «enlaces entrantes» indican el papel de la página; no son una palanca demostrada. Dentro de las landings, nada de lo medido explica cuál sale."
+     },
+     {
+      "id": "ING-02",
+      "veredicto": "debilitada",
+      "razon": "Reproduje las cifras en bruto: 22 de 39 frente a 18 de 45, OR 1,91 [0,80-4,56]. Ajustado: 2,41 [0,86-6,78] en M2 y 2,54 [0,88-7,30] en M4. En los pares sale 9/12/13/5 y McNemar da p=0,096. También reproduje la demanda por idioma: EN 375 impresiones con 11 URL en cero; ES 1.392 con 6 en cero, 660 sin /es/miami. Hay cuatro correcciones. (1) Dónde está el efecto. En las landings de sector no hay diferencia de idioma (salen 5 de 7 en EN y 5 de 7 en ES) y en las secundarias salen 3 de 4 frente a 2 de 4. La diferencia está en las páginas no estructurales enlazadas desde el menú: los servicios del menú y las institucionales salen 10 de 15 en EN frente a 2 de 15 en ES. Sin menú no hay diferencia (12 de 17 frente a 15 de 23). Tampoco es cierto que sean páginas «sin demanda»: /en/miami/conversational-ai tenía 46 impresiones y salió. (2) La significación depende de la especificación. Sin las 14 estructurales y controlando el menú, el OR es 3,15 [1,10-9,03]; con estructural y palabras, 2,77 [1,02-7,52]. Está en el límite; no es que el intervalo «incluya el 1 en casi todas». (3) Que fuera de muestra el idioma prediga peor que el nulo es un artefacto. Con una variable binaria, el AUC de la validación leave-one-out cae por debajo de 0,5 incluso con un efecto real: «estructural» (1 de 14 frente a 39 de 70) pasa de 0,64 dentro de la muestra a 0,29 en la validación. (4) 4 de las 18 salidas ES son páginas Alternate cuya variante con barra está en Crawled - not indexed con rastreos de junio y julio, así que no se sabe cuándo salieron. Si se quitan, la diferencia a favor de que sale el inglés crece: OR 2,26 [0,91-5,61]. La diferencia de fechas de salida entre idiomas es de 1 a 3 días sobre lecturas con huecos y no aporta información.",
+      "afirmacionCorregida": "El inglés sale más (22 de 39 frente a 18 de 45), y eso no se explica por el rastreo, las impresiones, las peticiones ni los enlaces: el OR ajustado está entre 2,4 y 3,2. Es significativo o no según la especificación: con las 84 URL el intervalo incluye el 1, y sin las 14 estructurales lo excluye (3,15 [1,10-9,03]). La diferencia no está en las landings de sector (5 de 7 en ambos idiomas). Está en las páginas no estructurales enlazadas desde el menú (servicios e institucionales): salen 10 de 15 en inglés frente a 2 de 15 en español. Las estructurales EN no se ven afectadas."
+     },
+     {
+      "id": "ING-03",
+      "veredicto": "debilitada",
+      "razon": "Reproduje los resultados nulos con el modelo ajustado. Días de rastreo: OR 1,08-1,12 por cada 10 días, no significativo. Impresiones: 0,88-0,96, no significativo. Petición con el menú controlado: 0,42 [0,15-1,18]. Pero «descartada» es demasiado fuerte. La petición sola se asocia de forma significativa con quedarse: OR 0,31 [0,12-0,83], con un 29 % de salidas frente a un 57 %. El efecto se atenúa porque se pidieron sobre todo páginas del menú: es confusión, no ausencia de efecto demostrada. El intervalo del rastreo llega a 1,4-1,5 por cada 10 días, y con el otro resultado (el contador de la API) da 1,34 [1,01-1,78]. Que «solas predigan peor que el azar» fuera de muestra es el sesgo conocido de la validación leave-one-out con predictores débiles; lo comprobé con «estructural», que tiene un efecto real y aun así da AUC 0,29. Dato nuevo: 37 de las 40 salidas ocurrieron sin ningún rastreo después del 25-sep (último rastreo del 13-oct anterior a esa fecha), y tampoco se volvieron a rastrear 38 de las 44 que se quedan. Google decidió sobre sus copias guardadas.",
+      "afirmacionCorregida": "Con 84 URL no se detecta efecto de la antigüedad del rastreo ni de las impresiones previas una vez controlado el tipo de página, aunque no se puede descartar un efecto moderado. Las peticiones se asocian en bruto con quedarse (OR 0,31), pero ese efecto no se separa de que se pidieron sobre todo páginas del menú. 37 de las 40 salidas ocurrieron sin rastreo nuevo después del 25-sep: el rastreo reciente no fue ni el disparador ni una protección en esta ventana."
+     },
+     {
+      "id": "ING-04",
+      "veredicto": "debilitada",
+      "razon": "Reproduje el kappa de 0,11, que es bajo incluso frente al máximo posible con estos marginales (0,60). Sin las estructurales baja a 0,01 y en los 22 pares de landings es de −0,18, así que la independencia entre gemelas se confirma y es más fuerte de lo que se dice. Lo que no se sostiene es la causa atribuida («importancia, enlaces, demanda en ese idioma»). Dentro de las landings, ni los enlaces (OR 0,69-0,76, no significativo) ni las impresiones explican qué gemela sale. La diferencia de marginales entre idiomas basta por sí sola para generar discordancia. No se puede excluir una evaluación de calidad por idioma. De hecho, los clones ES Houston/Miami se parecen más entre sí (similitud 0,45-0,68) y se quedan, mientras que los EN (0,35-0,67) salen.",
+      "afirmacionCorregida": "Los destinos de las gemelas son independientes: kappa 0,11 en total, 0,01 sin las estructurales y −0,18 en las landings. Eso descarta que Google juzgue el «mismo contenido» en bloque para los dos idiomas, pero no identifica el criterio. Dentro de las landings, ni los enlaces ni la demanda explican qué gemela sale."
+     },
+     {
+      "id": "ING-05",
+      "veredicto": "confirmada",
+      "razon": "Reproducido. clusters.ts tiene 3.090 líneas. Los 28 commits que lo tocan llevan la coautoría de Claude, y 941d828 y 5167b95 son del 23-jun. Conté en el texto de <main>, sin el menú ni el pie: «sin letra pequeña / sin compromiso» 134 veces en 42 de 45 páginas ES; «la IA de Google ya lo recomienda» en 22; «cliente fundador» en 16. Hay dos etiquetas imprecisas. «24 horas» literal aparece 142 veces; las 193 incluyen «24/7». «Seremos honestos» literal está en 13 páginas; las 21 incluyen sinónimos. La conclusión de que el contenido no separa a las páginas se sostiene con una medida independiente (contención máxima de 4-gramas sin neutralizar la ciudad): mediana de 0,42 en las que salen frente a 0,43 en las que se quedan, y OR 0,94 [0,67-1,31] en las landings. Matiz: las 13 casi clones (<20 % de texto exclusivo) dan 6 de 13 en conjunto, pero son 4 de 5 en EN frente a 2 de 8 en ES, y una de las ES es una Alternate de fecha incierta. Lo que pesa es el idioma, no ser casi un clon. La longitud total sí separa (AUC 0,74), pero solo a través de las páginas estructurales: entre las no estructurales no es significativa (OR 3,7 [0,48-28,5]).",
+      "afirmacionCorregida": "Igual que la original, con dos correcciones. «24 horas» literal aparece 142 veces en 41 páginas (193 con «24/7»). «Seremos honestos» literal está en 13 páginas (21 con sinónimos). Ninguna medida de plantilla o similitud separa a las páginas una vez descontado el tipo de página."
+     },
+     {
+      "id": "ING-06",
+      "veredicto": "debilitada",
+      "razon": "El veredicto de «sin determinar» es correcto, pero la comparación en que se apoya está elegida a favor. Compara las páginas de ciudad de TRR (61-63 % de texto compartido) con las de sector de Marcyan (52-53 %), cuando los servicios de Marcyan llegan al 69-73 %. Repetí la medida en condiciones iguales: solo landings de cada sitio, la misma extracción y sin neutralizar la ciudad. Resultado: Marcyan 57-60 % compartido, TRR 47-50 % y MJA 42-44 %. El texto que se repite en al menos el 80 % de las páginas es del 17 % en TRR y del 24-26 % en Marcyan. Marcyan no tiene menos plantilla; tiene igual o más, y en más páginas (44 landings frente a 20 de ciudad en TRR). Confirmé las marcas de texto generado en los controles: 14,8-16 rayas largas por cada 1.000 palabras y «not just» en 46 de 47 páginas EN de MJA. Con 2 sitios de control, «la escala del texto no basta» es una inferencia débil.",
+      "afirmacionCorregida": "No se puede confirmar ni descartar desde fuera. Marcyan tiene una plantilla igual o más repetitiva que los controles: 57-60 % de texto compartido en las landings, frente a 47-50 % en TRR y 42-44 % en MJA, medido igual. También tiene más páginas plantilladas y menos demanda. Los controles tienen marcas de texto generado y no pierden páginas, así que el texto generado por sí solo no explica la caída. Con dos controles no se puede aislar si el disparador es la escala, la demanda o la confianza."
+     },
+     {
+      "id": "ING-07",
+      "veredicto": "debilitada",
+      "razon": "Confirmé las cifras volviendo a consultar GSC y los repositorios. Impresiones de 90 días por página: 25.940, 15.483 y 1.767 (a nivel de sitio, 24.574, 14.288 y 1.577, con las mismas proporciones). Indexadas el 25-sep: 35, 56 y 78, lo que da 741, 276 y 23 impresiones por página. Reseñas el 13-oct: 38, 34 y 0 (el 25-sep eran 31, 32 y 0). Registro del dominio por RDAP de Verisign: MJA el 14-mar-2025 y Marcyan el 14-abr-2026. Peticiones del 18-ago al 24-sep: TRR 12, MJA 73 y Marcyan 32; del 25-sep al 13-oct: 1, 52 y 0. MJA: ciudades ES 13 de 20 y EN 5 de 20; las 13 ES se volvieron a pedir el 3-4 de octubre; 75 URL nunca rastreadas. Hay un error y una omisión. Error: no es cierto que las de ciudad EN de TRR «nunca tuvieron petición», porque /bellaire y /cypress tuvieron 1 cada una (8 de 10 nunca la tuvieron). Omisión: las 10 de ciudad ES de TRR (mediana de 8 impresiones) tuvieron todas entre 1 y 3 peticiones, frente a solo 8 de las 22 landings ES de Marcyan. Atribuir la diferencia entre sitios a «la demanda y la confianza» con 3 sitios (nicho distinto, ficha, antigüedad, reseñas, tamaño) no es identificable: es una hipótesis plausible, no un hallazgo.",
+      "afirmacionCorregida": "Marcyan se diferencia de los controles en casi todo a la vez: 23 impresiones por página indexada frente a 276-741, 0 reseñas frente a 34-38, un dominio de 6 meses frente a 18-19, más páginas plantilladas y 0 peticiones tras el 25-sep (MJA hizo 52). Las de ciudad ES de TRR, de baja demanda, se conservan, pero todas habían sido pedidas. Con tres sitios no se puede saber cuál de estos factores pesa. Que lo decisivo sea la demanda y la confianza es una hipótesis razonable, no demostrada."
+     },
+     {
+      "id": "ING-08",
+      "veredicto": "confirmada",
+      "razon": "Reproducido desde el git de TRR, entre la lectura del 25-sep (edb8f83) y la del 13-oct (1da2b99): pasa de 35 a 33 indexadas y las únicas pérdidas son /es/limpieza-de-propiedades-houston y /es/remocion-de-escombros-houston. Los servicios EN se mantienen 6 de 6 y las ciudades 10 de 10 en cada idioma. MJA pierde 1 combo EN y 1 combo ES. Las 2 páginas perdidas de TRR tenían poca demanda (76 y 11 impresiones en 90 días), y /es/remocion-de-escombros-houston no tenía petición y su último rastreo era del 19-may. Con n=2, la confianza baja que se le asigna es la adecuada."
+     },
+     {
+      "id": "ING-09",
+      "veredicto": "debilitada",
+      "razon": "Comprobé los datos de partida. Siguen dentro 17 URL EN. Impresiones de 90 días: /en/pricing/chatbot-cost 65, /en/houston/restaurants 31 y /en/houston/contractors 17. Clones de servicio: salen 7 de 8 en EN y 2 de 8 en ES, y uno de esos dos (/es/miami/seo-local) es una Alternate de fecha incierta. Pero el plan dice que la evidencia respalda reforzar el enlazado interno, y no es así: los enlaces en el cuerpo no tienen efecto con el menú controlado (OR 1,03), no son significativos dentro de las landings, y la protección del menú solo aparece en español. Señalar las landings de sector en inglés no se apoya en un efecto del idioma, porque salen igual en ES y en EN (5 de 7). Lo de fusionar clones como «reducción de riesgo de puertas por ciudad» no tiene apoyo a nivel de página: los clones ES son más parecidos entre sí (0,45-0,68) y se quedan. Es una medida de precaución.",
+      "afirmacionCorregida": "Retirar o consolidar las landings EN de servicio que ya están fuera (7 de 8 clones Houston/Miami), porque es donde se concentra la diferencia de idioma. Las landings de sector salen igual en ambos idiomas (5 de 7): decidir sobre ellas por su demanda real, no por el idioma. No presentar el enlazado interno en el cuerpo como palanca respaldada, porque no muestra efecto en estos datos. Reducir el índice a la demanda y buscar autoridad externa son apuestas razonables, no remedios demostrados. No podar el inglés en bloque: las 7 estructurales EN siguen dentro."
+     }
+    ],
+    "evidenciaNueva": [
+     "La columna 'menu' de tabla-84.json/tsv está mal: usa inChrome>0 y marca como de menú 34 páginas cuyo único enlace de cabecera o pie es el selector de idioma de su gemela. model.mjs la redefine como inChrome>=30, así que los modelos no cambian, pero quien reutilice la tabla obtendrá una variable equivocada.",
+     "4 de las 40 salidas son páginas que ya eran Alternate el 25-sep (/es/miami/seo-local, /es/miami/doral, /es/houston/bienes-raices y /es/blog/ia-que-contesta-llamadas-mensajes-perdidos). Su variante con barra está en Crawled - currently not indexed con último rastreo de junio o julio, así que no se puede saber si salieron dentro de la ventana. Las cuatro son ES.",
+     "37 de las 40 salidas ocurrieron sin ningún rastreo posterior al 25-sep, y tampoco se volvieron a rastrear 38 de las 44 que se quedan: Google decidió sobre copias guardadas (estado-urls.json del 13-oct, campo lastCrawlTime).",
+     "La protección del menú o el pie solo existe en español. Entre las páginas no estructurales con menú salen 2 de 15 en ES y 10 de 15 en EN; sin menú, 15 de 23 frente a 12 de 17. Toda la diferencia de idioma está en las páginas del menú.",
+     "Los enlaces en el cuerpo (dentro de <main>) no se asocian con la salida una vez controlado el menú: OR 1,03 [0,58-1,81]. La longitud de la página discrimina igual que los enlaces (AUC 0,74) y desaparece entre las no estructurales: ambas son indicadores del tipo de página.",
+     "Sin las 14 estructurales y controlando el menú, el OR del inglés es 3,15 [1,10-9,03]: significativo en esa especificación.",
+     "La validación leave-one-out da un AUC por debajo de 0,5 para cualquier predictor binario débil, aunque su efecto sea real: 'estructural' pasa de 0,64 dentro de la muestra a 0,29. No es prueba de que no haya efecto.",
+     "En los 22 pares de landings el kappa es de −0,18, y sin las estructurales de 0,01. Las gemelas, con el mismo papel y la misma plantilla, tienen destinos independientes.",
+     "Medida igual en los tres sitios (solo landings, misma extracción, sin neutralizar la ciudad), Marcyan tiene un 57-60 % de texto compartido, TRR un 47-50 % y MJA un 42-44 %. El texto repetido en al menos el 80 % de las páginas es del 24-26 % en Marcyan y del 17 % en TRR. Marcyan está más plantillado, no menos.",
+     "Los clones de servicio ES Houston/Miami se parecen más entre sí (similitud 0,45-0,68) que los EN (0,35-0,67), pero los ES se quedan y los EN salen.",
+     "TRR: las 10 páginas de ciudad ES (mediana de 8 impresiones) tuvieron todas entre 1 y 3 peticiones, frente a 8 de las 22 landings ES de Marcyan. Las de ciudad EN /bellaire y /cypress tuvieron 1 petición cada una.",
+     "Impresiones de 90 días a nivel de sitio (dimensión fecha): Marcyan 1.577, MJA 14.288 y TRR 24.574. La suma por página da 1.767, 15.483 y 25.940; la comparación entre sitios no cambia.",
+     "Archivos de la verificación: C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-verif-capa\\resultados.txt (salidas), tab.json (tabla independiente de 84 URL), links.json (enlaces recontados desde dist), gscv.json (GSC vuelto a consultar), lr.mjs (regresión logística propia, ML y Firth)."
+    ]
+   }
+  },
+  {
+   "lente": "plan",
+   "titulo": "Revisión adversarial del plan",
+   "investigacion": {
+    "lente": "Revisión adversarial del plan (ronda 2)",
+    "resumen": "El plan de la ronda 1 es prudente en lo general, pero tiene 5 problemas que pueden empeorar las cosas o estropear la medición. Ninguno cambia la causa principal.\n\n1) Peticiones de rastreo. Los datos no apoyan la idea de la crítica de que «un rastreo fresco acaba en rastreada sin indexar». Entre el 25-sep y el 13-oct hubo 20 rastreos sobre 9 URL, ninguno pedido por nosotros. Seis de esas páginas estaban indexadas antes del rastreo: 4 siguen dentro, 1 salió de forma duradera (/es/houston/abogados-inmigracion) y otra salió y volvió (/es/miami/diseno-web). Las indexadas el 27-sep que Google no volvió a rastrear salieron 35 de 70 (50 %). Las páginas pedidas en agosto y septiembre salieron 5 de 24 (21 %), frente a 33 de 55 nunca pedidas (60 %), aunque hay sesgo de selección.\n   Aun así, la lista de peticiones del plan está mal hecha. Incluye 3 páginas que están dentro del índice por su versión con barra (/es/portafolio, /es/sobre-nosotros, /es/herramientas) y 2 indexadas sin ningún residuo (/en/blog, /es/diagnostico). Además choca con su propio congelamiento hasta el 15-oct.\n   Versión corregida: después de la lectura del 15-oct, una sola petición para las 4 páginas fuera del índice en sus dos formas, y /es/houston como experimento con un grupo de control. Esperar a que Google las relea solo no sirve: hay páginas sin rastrear desde el 13-jun.\n\n2) La vigilancia diaria pide indexación por su cuenta, hasta 8 al día, de toda página cuyo texto visible cambie. Nadie lo tuvo en cuenta. La afirmación que hay que quitar está en 44 páginas, pero sale de una sola cadena del código. Al publicarla, la rutina lanzaría unas 44 peticiones automáticas en unos 6 días, justo lo que el plan prohíbe, y con el cupo que comparten TRR y MJA. Hay que neutralizar esa cola antes de cualquier cambio de texto.\n\n3) El triage quita 9 páginas que hoy están dentro del índice. La cobertura queda en 35 de 68 por construcción. Además, dos fusiones mandan a destinos que están fuera del índice (/es/houston y /en/houston/local-seo, que encima es candidata a fusión, así que habría una cadena de redirecciones). Versión corregida: primero solo las 7 fusiones de páginas que ya están fuera y tienen destino indexado. Las 9 cubiertas esperan a que el índice se estabilice o a enero. Las herramientas no se tocan ahora.\n\n4) Las metas no cuadran entre sí: 80 de 84 en la trimestral oficial, 60 de 68 en el triage, y 54 de 68 o 70 de 84 en la ronda 1. Además contradicen el «se recupera en meses». La de reseñas (5) no se puede cumplir con los clientes actuales: como máximo 3, todos de Houston. Según la regla de la doctrina, se propone un único cambio de metas, con su motivo.\n\n5) Reseñas: la petición ya se hizo el 26-sep y vence el 16-oct, así que no se repite. Se corrigen los destinatarios: TRR, JLX y Rosy Nails en Houston. MJA no va en Houston ni en Miami. En Miami no se piden hasta que haya un cliente de Miami.\n\nDel resto: el filtro de GA4 es irreversible una vez activo y la IP del dueño cambia, así que primero hay que probarlo. El lastmod no puede atarse a la fecha de construcción, porque los despliegues son diarios. La higiene de enlaces no debe justificarse con el presupuesto de rastreo (la doctrina lo considera humo). El arreglo de textos es pequeño y obligado, pero no debe meter frases nuevas repetidas.\n\nSe propone un orden por semanas y 5 decisiones concretas para el 15-oct.",
+    "hallazgos": [
+     {
+      "id": "ADV-01",
+      "hipotesis": "La crítica sostiene que en esta etapa un rastreo fresco acaba a menudo en «rastreada, sin indexar» y que pedir rastreo puede empeorar las cosas.",
+      "afirmacion": "No se sostiene con los datos. Las salidas de la ola se concentran en páginas que Google NO volvió a rastrear. Las páginas evaluadas de nuevo (por petición o por rastreo propio) se conservan mejor. Pedir rastreo de una página que ya está fuera no tiene riesgo para el índice. Para una que está dentro el riesgo es bajo pero no nulo: 1 salida duradera de 6.",
+      "evidencia": [
+       "Rastreos con fecha del 25-sep al 13-oct (lastCrawlTime, snapshots git de data/indexing-status.json): 20 eventos en 9 URL y 0 con petición nuestra (las peticiones pararon el 21-sep).",
+       "Indexadas antes de su rastreo en esa ventana (6). Siguen 4: /es, /en, /en/pricing y /es/houston/branding. Hubo 1 salida duradera: /es/houston/abogados-inmigracion, rastreo del 29-sep. Hubo 1 salida revertida: /es/miami/diseno-web salió el 29-sep, 4 días después de su rastreo del 25-sep, y volvió el 7-oct tras el rastreo del 1-oct.",
+       "No indexadas que se rastrearon en la ventana. Entraron 2: /es/houston/sugar-land (Alternate a indexada el 26-sep) y /es/miami/diseno-web. Siguieron fuera 3: /en/miami/conversational-ai (3 rastreos), /en/houston/beauty-salons y /es/houston/abogados-inmigracion (4-oct).",
+       "De las 79 indexadas el 27-sep: las 70 sin rastreo nuevo salieron 35 (50 %); las 9 rastreadas salieron 3, y 2 de esas 3 ya estaban fuera antes del rastreo.",
+       "Retención según la petición de agosto y septiembre (indexadas el 27-sep): pedidas 5 de 24 salen (21 %) y nunca pedidas 33 de 55 (60 %). En landings, 5 de 12 frente a 19 de 29. Con copia posterior al 18-ago, 5 de 24 frente a 26 de 44: la frescura de la copia por sí sola no explica la diferencia.",
+       "Rescates desde «rastreada, sin indexar» con petición: 10 páginas, de las que 5 siguen dentro el 13-oct (/es/miami, /es/blog/como-aparecer-en-chatgpt-perplexity, /en/pricing/chatbot-cost, /es/houston/branding y /es/houston/seo-local). La cifra «4 de 5 volvieron a caer» del noHacer es un subconjunto. La cifra completa es 5 de 10, similar o mejor que el 60 % de salida de las nunca pedidas.",
+       "Fuentes: r2-adversarial-plan/recrawl.txt, requests.txt y reqretention.txt."
+      ],
+      "evidenciaEnContra": [
+       "Sesgo de selección: Google rastrea primero lo que más valora (portadas, /en/pricing), y la rutina pidió sobre todo páginas nuevas, prioritarias o con demanda.",
+       "lastCrawlTime llega con retraso (7 saltos retroactivos; 232 descargas HTML en las estadísticas de rastreo frente a 93 rastreos visibles). Algunas salidas «sin rastreo» pudieron tener un rastreo que aún no se ve.",
+       "Casos individuales que apoyan la crítica: /es/miami salió tras sus rastreos del 15-ago, 23-ago y 10-sep, y abogados-inmigracion tras el del 29-sep.",
+       "Las muestras son pequeñas (6 indexadas rastreadas en la ventana)."
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "En el noHacer, cambiar «4 de 5 rescates volvieron a caer» por «de 10 páginas rescatadas con petición, 5 siguen dentro: lo mismo o mejor que las nunca pedidas (60 % de salida)». La razón para no pedir en bloque sigue siendo la doctrina §6 y §7, no que pedir haga daño."
+      ]
+     },
+     {
+      "id": "ADV-02",
+      "hipotesis": "La acción «Ya, 14-15 oct: una petición de rastreo para las páginas con canónica vieja» es correcta en su lista y en su fecha.",
+      "afirmacion": "Incorrecta en la lista y en la fecha. Mezcla tres casos distintos y contradice el congelamiento del propio plan. Solo hay que pedir las 4 páginas que están fuera en sus dos formas, más el hub /es/houston como experimento con control, y hacerlo después de la lectura del 15-oct. No hay que pedir las 3 que están dentro por su versión con barra ni las 2 indexadas sin residuo. Esperar a que Google las relea solo no funciona.",
+      "evidencia": [
+       "Estado del 13-oct (variantes inspeccionadas). Fuera en sus dos formas, con la versión con barra en «rastreada, sin indexar»: /es/miami/seo-local (último rastreo 13-jun), /es/blog/ia-que-contesta-llamadas-mensajes-perdidos (6-jul), /es/houston/bienes-raices (7-jul) y /es/miami/doral (9-jul).",
+       "Dentro del índice por la versión con barra («Submitted and indexed»): /es/portafolio (barra rastreada el 17-jul), /es/sobre-nosotros (9-jul) y /es/herramientas (6-jul). Pedirlas no recupera nada y las somete a una evaluación nueva. /es/sobre-nosotros figura en la lista pendiente de CAMBIOS.md del 13-oct.",
+       "/en/blog (indexada, canónica de Google sin barra, versión con barra desconocida) y /es/diagnostico (igual) no tienen residuo, así que su inclusión en el plan es un error. /es/houston/clinicas-dentales tampoco es residuo: está en «rastreada, sin indexar» con canónica de Google sin barra.",
+       "Precedente: 13 de las 13 páginas Alternate que Google volvió a rastrear en agosto y septiembre pasaron a su URL sin barra. De esas, han salido 7 (54 %), igual que las indexadas sin barra desde el 17-ago (28 de 53, 53 %). Cambiar de canónica no añade riesgo. /es/houston/sugar-land se arregló así en plena ola (26-sep) y sigue dentro.",
+       "Si se espera a que Google las relea solo: llevan entre 96 y 122 días sin rastreo, la mediana del sitio es de 49 días y solo 12 de 84 se rastrearon en 30 días. La espera no tiene fin previsible.",
+       "El plan congela («no pedir indexación… hasta leer la actualización el 15-oct; si se interviene ahora no se podrá saber qué funcionó») y a la vez programa peticiones el 14-15 oct. La doctrina §4 dice esperar al menos una semana tras el fin de la actualización (8-oct).",
+       "/es/houston está fuera, con copia del 2-ago anterior al PR #30, 57 apariciones y 46 enlaces internos. Es la página de más valor fuera del índice, y pedirla no arriesga nada del índice."
+      ],
+      "evidenciaEnContra": [
+       "/es/miami/seo-local se va a diferenciar en noviembre. Pedirla ahora gasta una evaluación sobre el texto genérico. La doctrina permite una petición por cada cambio real, así que la segunda tras reescribirla también es legítima.",
+       "Con 5 o 6 URL no se puede probar estadísticamente que la petición sirva. Solo da una señal."
+      ],
+      "confianza": "alta",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Mover la acción a «Tras el 15-oct» (16-17 oct), antes de las 09:05 o al día siguiente, porque el cupo es de toda la cuenta y lo gastan las rutinas de TRR y MJA.",
+       "Lista de peticiones: /es/miami/seo-local, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices, /es/miami/doral y /es/houston (experimento). Opcionalmente, /es/houston/clinicas-dentales y /es/servicios (copia anterior al PR #30).",
+       "Grupo de control: 5 páginas fuera, comparables y sin petición (por ejemplo /en/houston/web-design, /en/pricing/website-cost-houston, /es/blog/precio-pagina-web-houston-guia, /es/miami/ecommerce y /en/houston/bilingual-web-design). Seguir a diario estado, canónica y fecha de rastreo durante 14 días (revisión el 30-oct).",
+       "Quitar /es/sobre-nosotros de la lista pendiente de CAMBIOS.md. No pedir /es/portafolio, /es/herramientas, /en/blog ni /es/diagnostico. A las 3 cubiertas por la barra se les deja que Google las cambie solo, y se revisan en enero."
+      ]
+     },
+     {
+      "id": "ADV-03",
+      "hipotesis": "El plan controla cuándo y cuántas peticiones de indexación se hacen.",
+      "afirmacion": "No las controla. La vigilancia diaria encola y ejecuta sola peticiones de indexación (hasta 8 al día) para toda página cuyo texto visible cambie. Publicar el arreglo de textos (una cadena que sale en 44 páginas), las fusiones o los enlaces contextuales lanzaría decenas de peticiones automáticas en pocos días. Eso es justo la petición en bloque que el plan y la doctrina prohíben, gasta el cupo que comparten TRR y MJA y somete a la vez a evaluación nueva a todas las indexadas tocadas.",
+      "evidencia": [
+       "kit/lib/vigilancia.mjs, líneas 321-342. Se encola una página si no está indexada, su estado es Discovered, Crawled o Unknown y su texto cambió desde la última petición. También se encola una indexada de los grupos prioritarios (landings, ciudades, servicios, precios, portada) si su texto cambió después de su último rastreo. Se cortan 8 al día (maxPeticionesDia 8 en seo.config.json) y la cola se reintenta a los 14 días.",
+       "kit/lib/sitio.mjs:124: el cambio se detecta con el sha1 del texto visible (hashContenido), así que basta con cambiar una frase.",
+       "ciclos/diario.md, paso 4: la rutina ejecuta la cola con Chrome y la marca con marcar-peticion.mjs.",
+       "Desde el 25-sep todas las vigilancias dicen «0 peticiones», porque no ha cambiado ningún texto visible (git log de main). El mecanismo está dormido, no apagado.",
+       "La frase de la tarjeta de Texas Rush Remove («Ya posiciona y la IA de Google ya lo recomienda» y «Already ranking, and Google's AI now recommends it») es una sola cadena (src/i18n/content.ts:134 y :362) que aparece en 44 páginas del build.",
+       "El cupo de peticiones es de toda la cuenta y por día. El 12-oct dio «Quota Exceeded» a las 16:30 (memoria seo_tanda_lecciones)."
+      ],
+      "evidenciaEnContra": [
+       "La doctrina §7 permite una petición por cada página con un cambio real, así que una parte de la cola es legítima: los destinos de las fusiones y las páginas diferenciadas.",
+       "Según ADV-01, las evaluaciones frescas no parecen dañinas en la ola, así que el riesgo para el índice es moderado. El riesgo seguro es para el cupo y para la medición."
+      ],
+      "confianza": "alta",
+      "papel": "riesgo del plan",
+      "arreglos": [
+       "Antes de publicar cualquier cambio de texto visible, decidir qué páginas merecen petición: solo los destinos de las fusiones y las páginas diferenciadas. Marcar el resto con marcar-peticion.mjs el mismo día de la publicación, o bajar maxPeticionesDia temporalmente, y anotarlo en CAMBIOS.md.",
+       "Añadir a la acción de arreglar el kit una opción de excluir de la cola los cambios que no son de contenido principal (tarjetas compartidas, pie, aviso de idioma)."
+      ]
+     },
+     {
+      "id": "ADV-04",
+      "hipotesis": "Las 5 retiradas y las 11 fusiones del triage pueden aplicarse a la vez del 16 al 26-oct sin bajar la cobertura ni confundir la medición.",
+      "afirmacion": "No pueden. 9 de las 16 URL que el triage quita están hoy dentro del índice, así que la cobertura cae a 35 de 68 por construcción y la caída no se puede separar de la de Google. Dos fusiones mandan a destinos que están fuera del índice, y una crea una cadena de redirecciones con la ampliación inglesa. Retirar las herramientas aplica fuera de su ámbito la prueba 7, que es de páginas de ciudad, sobre páginas que Google conservó durante toda la ola.",
+      "evidencia": [
+       "Cubiertas el 13-oct y retiradas o fusionadas por el triage (9): /en/checkup, /en/tools, /en/cities, /es/diagnostico (las cuatro indexadas), /es/herramientas (versión con barra indexada), /en/miami/hialeah, /en/miami/local-seo, /es/houston/sugar-land y /es/precios/cuanto-cuesta-un-chatbot (indexadas). Las otras 7 ya estaban fuera.",
+       "Cobertura de hoy: 44 de 84. Con el triage completo queda en 35 de 68 (51 %). Fusionando solo las que están fuera, 44 de 77 (57 %). Fuente: r2-adversarial-plan/triage-state.txt.",
+       "Destinos fuera del índice: /es/houston/sugar-land (indexada) iría a /es/houston, que está en «rastreada, sin indexar». /en/pricing/local-seo-cost-houston iría a /en/houston/local-seo, que está fuera y además figura en la ampliación opcional para fusionarse en /en/houston, lo que daría una cadena de redirecciones.",
+       "/en/checkup se rastreó el 16-sep y siguió indexada. Las herramientas y las legales se quedaron todas (síntesis). La doctrina §5 prueba 7 está en los «guardarraíles de páginas de ciudad», y la §6 llama humo a perseguir el 100 % de indexación: retirar páginas solo para mejorar el porcentaje no tiene respaldo.",
+       "/es/houston/sugar-land entró en el índice sin barra el 26-sep. Sus 0 apariciones en 90 días son casi todas del tiempo en que la indexada era su versión con barra."
+      ],
+      "evidenciaEnContra": [
+       "La guía de contenido útil de Google admite que quitar contenido poco útil puede ayudar al resto del sitio, y la doctrina §7 dice «menos páginas y más fuertes».",
+       "Las 4 landings indexadas con 0 apariciones cumplen la prueba 7 por fecha (publicadas el 23-jun o el 4-jul).",
+       "/es/diagnostico y /en/checkup tienen unas 400 palabras: como página de búsqueda son delgadas."
+      ],
+      "confianza": "alta",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Fase A (tras la lectura y con el OK del dueño): solo las 7 fusiones de páginas fuera del índice. Son /en/houston/conversational-ai, /dental-clinics, /ecommerce y /immigration-lawyers hacia /en/houston, /en/miami/ecommerce hacia /en/miami y /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local. /en/pricing/local-seo-cost-houston va directamente a su destino final (/en/houston si se aprueba la ampliación, o /en/pricing), sin pasar por /en/houston/local-seo. Como mucho un hub por semana, y con una sección breve y útil en lugar de copiar texto de plantilla.",
+       "Fase B (las 9 cubiertas): cuando haya 2 lecturas semanales seguidas sin caída de la cobertura, o en la revisión de enero (prueba 7). No fusionar /es/houston/sugar-land mientras /es/houston siga fuera.",
+       "Herramientas (/es/diagnostico, /en/checkup, /es/herramientas, /en/tools y /en/cities): ninguna acción ahora. Se reconsidera en enero con datos.",
+       "Ampliación EN opcional (katy, real-estate, auto-repair y local-seo, las 4 fuera): puede entrar en la Fase A. Si entra, /en/houston/local-seo deja de ser destino."
+      ]
+     },
+     {
+      "id": "ADV-05",
+      "hipotesis": "La meta de cobertura del plan es coherente con el número de URL tras el triage y con las reglas del proyecto.",
+      "afirmacion": "No lo es. Conviven 4 metas incompatibles y ninguna se presenta como cambio de la meta trimestral vigente, que es lo que exige la doctrina §11. Con el triage completo hay que ganar entre 19 y 25 páginas en 7 semanas, y eso choca con el diagnóstico de que esto se recupera en meses. La meta de «ficha de Miami visible en Maps» viene de un error de medición.",
+      "evidencia": [
+       "Meta oficial del T4, fijada el 6-oct en PLAN.md: «80 de 84 páginas indexadas con /es/miami/diseno-web dentro», más «ficha de Miami visible en Maps» y «reseñas 5 o más».",
+       "El triage del 12-oct (§6) pide 60 de 68 a las 4 semanas. La ronda 1 pide ≥70 de 84, o ≥54 de 68 (meta alta 60 de 68) al 4-dic, y además ≥41 en dos lecturas el 26-oct.",
+       "Tras el triage completo se parte de 35 de 68: llegar a 54 exige +19 páginas y a 60, +25. Y la meta de ≥41 el 26-oct es incompatible con quitar antes 9 cubiertas (ya lo señaló la crítica).",
+       "Doctrina §11: las metas se ponen una vez por trimestre, y un cambio se propone como cambio, con su motivo. Doctrina §4: la indexación es una señal, no un resultado.",
+       "H2-02 (ronda 1): la ficha de Miami sí existe. «No aparece en Maps» era un error del método de búsqueda."
+      ],
+      "evidenciaEnContra": [
+       "El nivel del 17-ago (70 de 84, 83 %) es un buen techo de referencia. El problema es la fecha, no el nivel."
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Proponer al dueño un solo cambio de meta del T4, con este motivo: la meta de 80 de 84 se fijó sobre un contador que mezclaba etiquetas y antes de la ola.",
+       "Nueva métrica: cobertura sobre las URL vivas del sitemap, contando como cubierta la URL sin barra indexada o la Alternate cuya versión con barra está indexada. El conjunto de URL se fija el día de cada fase.",
+       "Metas escalonadas: el 4-nov, que la cobertura deje de caer (2 lecturas semanales seguidas iguales o mejores que la base); el 4-dic, ≥60 % de las URL vivas; en la revisión de enero, ≥80 % (nivel del 17-ago).",
+       "Cambiar «ficha de Miami visible en Maps» por «ficha de Miami completa y vigilada a diario»."
+      ]
+     },
+     {
+      "id": "ADV-06",
+      "hipotesis": "La acción de reseñas del plan (TRR, MJA y JLX y sus dueños en la ficha de Houston, y empezar a pedirlas para Miami, meta de ≥5 entre las dos fichas al 4-dic) es correcta.",
+      "afirmacion": "Hay que corregirla en 4 puntos. (1) Ya se pidió el 26-sep y vence el 16-oct, así que según la doctrina §11 no se vuelve a pedir: solo se corrige en una línea. (2) Los destinatarios correctos en Houston son TRR, JLX y Rosy Nails. MJA es de Orlando y por regla del proyecto no va en Houston ni en Miami. (3) En Miami no hay ningún cliente, así que no se piden reseñas allí hasta que lo haya. (4) Con los clientes actuales la meta de 5 no se puede cumplir: el máximo es 3.",
+      "evidencia": [
+       "data/seo/acciones.json: «marcyan-resenas-clientes», estado «pedida» desde el 26-sep, vence el 16-oct. Es también la tarea 1 del PLAN.md (Yan, 16-oct).",
+       "Memoria marcyan_gbp_offsite.md §8, línea 97: «Houston: Texas Rush Remove, Julio's, Rosy Nails. Move Junk Away es Orlando, sin GBP de Orlando: se puede pedir reseña que mencione el trabajo, pero NO ponerla en Houston/Miami».",
+       "Memoria marcyan_aeo_strategy.md: hay 4 clientes reales (3 en Houston y MJA en Orlando). Memoria project_marcyan.md: «Miami sin claims de clientes locales hasta tenerlos».",
+       "Doctrina §2.3 y §8: la petición se hace a todos, en su idioma, sin filtros, regalos ni palabras sugeridas. La política de contenido de Google en Maps prohíbe los incentivos, pedir reseñas solo a los clientes satisfechos y el conflicto de interés. La regla de la FTC de 2024 prohíbe las reseñas de personas de dentro de la empresa.",
+       "«Y sus dueños»: pedir varias reseñas al mismo cliente infla el recuento. La norma es una por persona que trató de verdad con Marcyan."
+      ],
+      "evidenciaEnContra": [
+       "Que un cliente remoto de Orlando reseñe la sede desde la que se le atendió (Houston) podría ser una experiencia genuina según Google. Aun así, la regla del proyecto lo excluye, y se respeta la regla del dueño.",
+       "No se pudo comprobar si alguno de los clientes tiene una relación personal o societaria con el dueño."
+      ],
+      "confianza": "alta",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Sacar la acción de la fase «Ya» como acción nueva. Queda como «sigue esperando desde el 26-sep (vence el 16-oct)», con los destinatarios corregidos: TRR, JLX y Rosy Nails en la ficha de Houston, una persona por cliente, desde su propia cuenta y escrita por ellos (nunca desde dispositivos o cuentas que gestione Marcyan), sin texto sugerido y sin regalos.",
+       "MJA: una reseña real fuera de Google (perfil de agencia cuando exista, o testimonio con permiso en el sitio, sin marcarlo como reseña propia en los datos estructurados, doctrina §6).",
+       "Miami: ninguna petición hasta el primer cliente de Miami.",
+       "Meta (como cambio, doctrina §11): 3 reseñas en Houston al 4-dic, más 1 por cada trabajo nuevo entregado. El dueño confirma que los 3 son clientes independientes."
+      ]
+     },
+     {
+      "id": "ADV-07",
+      "hipotesis": "Activar ya el filtro de tráfico interno de GA4 es seguro y urgente.",
+      "afirmacion": "No es urgente y no es inocuo. No afecta a Google, pero una vez activo es irreversible: los datos excluidos no se recuperan. Además la regla por IP es frágil, porque la IP del dueño cambia. Hay que probarlo antes y preferir una marca por dispositivo.",
+      "evidencia": [
+       "Memoria seo_tanda_lecciones: el filtro «Internal Traffic» está en modo Testing y no excluye nada. Activarlo es un cambio de cuenta con OK explícito del dueño.",
+       "Memoria marcyan_monthly_seo_report: «La IP rota». El arreglo estable (?mrc_internal=1 más una propiedad interna en track.js) sigue pendiente para Neon.",
+       "Volumen actual: 8 sesiones orgánicas del 1 al 12-oct (síntesis). No hay ninguna decisión de las próximas 3 semanas que dependa de este dato."
+      ],
+      "evidenciaEnContra": [
+       "Sin filtro, las sesiones orgánicas son solo una cota superior. Cuanto antes se limpie, antes hay línea base."
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Mover la acción a «Tras el 15-oct», sin urgencia. Primero se comprueba en modo Testing, con la dimensión de prueba de filtro de datos en Explorar, que las visitas propias quedan marcadas.",
+       "Preferir que el propio sitio marque traffic_type=internal con una marca guardada en el dispositivo del dueño (la misma que el arreglo pendiente ?mrc_internal=1) en lugar de, o además de, la IP.",
+       "Activarlo en una fecha anotada en CAMBIOS.md. Es independiente del resto y no interfiere con la medición de Google."
+      ]
+     },
+     {
+      "id": "ADV-08",
+      "hipotesis": "Añadir lastmod al sitemap es una acción de higiene sin riesgo, sin requisitos de orden.",
+      "afirmacion": "Bien hecho, es útil, e incluso puede sustituir peticiones manuales. Mal hecho, enseña a Google a ignorarlo. Debe salir de la fecha del último cambio del contenido principal, nunca de la fecha de construcción. Su sitio en el orden va después de la higiene de enlaces y antes de las fusiones y del arreglo de textos, en una semana propia.",
+      "evidencia": [
+       "vercel.json no tiene ignoreCommand. Hay 17 commits «auto(seo)» en main desde el 25-sep y cada uno despliega a producción. Un lastmod tomado del build cambiaría a diario y sería falso.",
+       "dist/sitemap-0.xml no tiene ningún lastmod hoy (0 apariciones).",
+       "Las páginas con residuo de la barra llevan entre 96 y 122 días sin rastreo. Un lastmod veraz (corrección del 2-ago y textos del PR #30 del 18-ago) da a Google un motivo para releerlas sin pedírselo.",
+       "Según ADV-01, una relectura fresca no se asocia a más salidas en la ola: de las indexadas rastreadas, 1 de 6 salió de forma duradera, frente a 35 de 70 sin relectura."
+      ],
+      "evidenciaEnContra": [
+       "Al estrenarlo, la mayoría de las páginas tendrá una fecha (18-ago) posterior a su último rastreo. Eso puede provocar relecturas en masa durante la reevaluación y mezclar efectos si coincide con otros cambios.",
+       "Que Google use lastmod solo si es «consistente y verificable» es lo que dice su documentación de sitemaps, citada de memoria: no se volvió a consultar en esta ronda."
+      ],
+      "confianza": "media",
+      "papel": "riesgo del plan",
+      "arreglos": [
+       "Calcular lastmod como la fecha del último cambio del texto principal de cada página, excluyendo menú, pie, tarjetas compartidas y aviso de idioma. No sale del build ni de los commits de datos.",
+       "Publicarlo en su propia semana: después de la higiene de enlaces (para que el cambio de plantilla no mueva todas las fechas) y antes de las fusiones y del arreglo de textos (para que esos cambios lleven señal).",
+       "Anotar en CAMBIOS.md cuántas URL quedaron con una fecha posterior a su último rastreo, y medir la mediana de días sin rastreo a los 14 días."
+      ]
+     },
+     {
+      "id": "ADV-09",
+      "hipotesis": "La higiene técnica (logo y migas a /es y /en, Organization.url, redirigir marcyan.vercel.app) tiene un efecto apreciable y se justifica por el 18 % de redirecciones en el rastreo.",
+      "afirmacion": "La justificación es la que la doctrina llama humo: el presupuesto de rastreo en sitios pequeños. Se mantiene como higiene barata, con efecto esperado de casi cero en la indexación. Puede ir la primera porque no cambia texto visible y por tanto no despierta la cola automática. El alias de vercel.app ya declara la canónica del dominio, así que su redirección es de prioridad mínima y es un cambio de configuración.",
+      "evidencia": [
+       "Doctrina §6: «presupuesto de rastreo en sitios pequeños» está en la lista de humo.",
+       "El hash que vigila los cambios es del texto visible (kit/lib/sitio.mjs:124), así que cambiar destinos de enlaces no genera peticiones automáticas.",
+       "curl del 13-oct: https://marcyan.vercel.app/es responde 200 con <link rel=canonical href=https://marcyanstudio.com/es>. En el repo no hay ninguna referencia a vercel.app (git grep sin datos ni dist)."
+      ],
+      "evidenciaEnContra": [
+       "No se sabe si Google tiene URL de marcyan.vercel.app indexadas (pregunta abierta de la ronda 1). Si las tuviera, la redirección consolidaría mejor que la canónica."
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Reescribir el porqué: «enlaces internos a la URL canónica y un solo host, higiene, sin efecto esperado en la indexación». Medir solo que haya 0 enlaces internos a redirecciones.",
+       "Redirigir vercel.app por host en vercel.json o con el ajuste de dominio, con OK, porque es un cambio de configuración del despliegue. Puede ir en cualquier momento."
+      ]
+     },
+     {
+      "id": "ADV-10",
+      "hipotesis": "Quitar afirmaciones no verificables de «44 páginas» a la vez durante la reevaluación es arriesgado para el índice y debe escalonarse por páginas.",
+      "afirmacion": "Descartado como riesgo de índice y corregido como acción. No son 44 reescrituras. Es una sola frase de una tarjeta compartida (2 cadenas, ES y EN) más unas 16 respuestas de preguntas frecuentes, 1 dato en /en/about y 1 descripción del blog. Su efecto sobre Google será mínimo y es obligatorio por la regla del dueño «nada inventado». Los riesgos reales son otros: la cola automática de peticiones (ADV-03), reescribir con una frase nueva idéntica en muchas páginas (más texto repetido de plantilla) y añadir enlaces de clientes sin permiso ni revisión de diseño.",
+      "evidencia": [
+       "«Reconstruido desde cero más SEO local. Ya posiciona y la IA de Google ya lo recomienda.» está en src/i18n/content.ts:134 y su versión inglesa en :362. Aparece en 44 páginas del build.",
+       "«con enlaces que puedes visitar» y «with links you can visit»: 8 respuestas en español y 8 en inglés en clusters.ts, clusters.en.ts, miami.ts y miami.en.ts. El portafolio no enlaza a ningún cliente (memoria project_marcyan: «sin enlaces a sitios de clientes»).",
+       "/en/about (src/pages/en/about.astro:43): «Google's AI already includes our clients in some recommendations». No hay ningún dato en el repo que lo respalde.",
+       "La crítica de la ronda 1 recuerda la hipótesis de contenido a escala, con fórmulas repetidas como «Seremos honestos» en 27 páginas.",
+       "Reglas del dueño: sin guiones como conector, «dominamos» la IA y nada inventado. Si se añaden enlaces o casos al portafolio, design-director y OK sobre el render."
+      ],
+      "evidenciaEnContra": [
+       "El arreglo es un cambio de texto visible en páginas indexadas durante la reevaluación. Si coincide con fusiones o con lastmod, no se puede atribuir ningún movimiento."
+      ],
+      "confianza": "alta",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Hacerlo como un único cambio, en su propio día y en una semana distinta de las fusiones y del lastmod, después de neutralizar la cola automática (ADV-03).",
+       "Diff mínimo: borrar la cláusula falsa, no sustituirla por una frase nueva común a todas. En la tarjeta de TRR queda «Reconstruido desde cero más SEO local.» salvo prueba enlazable.",
+       "Los enlaces a sitios de clientes y los casos con permiso son un paso aparte y posterior: permiso del cliente, design-director y OK sobre el render.",
+       "Medición: comprobación sobre el build con 0 afirmaciones, y entrada en CAMBIOS.md con «sin efecto esperado en indexación». No se presenta como experimento SEO.",
+       "Incluir la corrección de los datos estructurados (oferta de 400 que apunta a una página de 1.500) en el mismo cambio, porque tampoco es visible."
+      ]
+     },
+     {
+      "id": "ADV-11",
+      "hipotesis": "Arreglar la medición del kit del 14 al 20-oct y leer la actualización el 15-oct son compatibles.",
+      "afirmacion": "No lo son. Cambiar los scripts compartidos por los 4 sitios justo en la ventana de lectura rompe la comparación con los controles. Además, el 15-oct todavía no están completos los datos de impresiones de la semana posterior al fin de la actualización. El 15-oct se puede leer el índice. Las impresiones, el 18-oct.",
+      "evidencia": [
+       "Fin de la actualización: 8-oct, 08:00 UTC. La doctrina §4 manda comparar la semana posterior con la anterior al inicio. Search Console llega con 2-3 días de retraso, así que la semana del 8 al 15-oct no está completa hasta el 17 o 18-oct.",
+       "El propio plan advierte de que las impresiones del 9 al 12-oct pueden estar incompletas, por el retraso del informe del 11-oct.",
+       "El kit (vigilancia.mjs y estado-google.mjs) es el mismo para TRR, MJA y JLX, que son el grupo de control de la lectura."
+      ],
+      "evidenciaEnContra": [
+       "La serie de inspección de URL es diaria y no tiene retraso, así que la lectura del índice del 15-oct sí es válida."
+      ],
+      "confianza": "alta",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Congelar también el kit hasta capturar la lectura del 15-oct (índice) y la del 18-oct (impresiones), con el mismo método en los 4 sitios.",
+       "Cambiar el kit después, con una ejecución de prueba en los 4 sitios y con el contador viejo en paralelo durante 2 semanas para no romper la serie."
+      ]
+     },
+     {
+      "id": "ADV-12",
+      "hipotesis": "El orden del plan permite saber qué funcionó y el dueño sabe qué decidir el 15-oct.",
+      "afirmacion": "No del todo. El plan junta en las mismas semanas (16-26 oct y 16-oct a 2-nov) el triage, el arreglo de textos, la higiene, el lastmod y los enlaces. Así no se puede atribuir ningún efecto, y todo despierta a la vez la cola automática. Se propone un orden por semanas con una sola variable importante en cada una, y 5 decisiones concretas para el 15-oct.",
+      "evidencia": [
+       "Fases del plan: «Tras el 15-oct». Triage del 16 al 26-oct, textos del 16-oct al 2-nov, higiene del 16-oct al 2-nov, enlaces del 16-oct al 9-nov. Todo solapado.",
+       "Pendientes ya pedidos al dueño en data/seo/acciones.json: reseñas (vence el 16-oct), OK al PR #36 (vencía el 9-oct) y la decisión sobre las páginas (vence el 15-oct). Doctrina §11: lo pendiente va en una línea, no como acción nueva.",
+       "ADV-02 a ADV-11."
+      ],
+      "evidenciaEnContra": [
+       "Escalonar retrasa unas 3 semanas el arreglo de textos, aunque es obligatorio por honestidad. Se puede adelantar a la semana 2 si el dueño lo prioriza, siempre en su propio día."
+      ],
+      "confianza": "media",
+      "papel": "correccion del plan",
+      "arreglos": [
+       "Del 13 al 15-oct: nada (sin peticiones, sin páginas y sin tocar el kit).",
+       "15-oct: lectura del índice con TRR y JLX al lado, y decisiones del dueño.",
+       "Del 16 al 19-oct: neutralizar la cola automática; higiene de enlaces, que no cambia texto visible; una sola tanda de peticiones (ADV-02) antes de las 09:05.",
+       "18-oct: lectura de impresiones; después, arreglos del kit en paralelo.",
+       "Del 20 al 26-oct: lastmod veraz. Del 27-oct al 2-nov: Fase A de fusiones, como mucho un hub por semana.",
+       "30-oct: revisión del experimento de peticiones a los 14 días. Del 3 al 9-nov: arreglo de textos de honestidad, en un solo cambio.",
+       "4-nov: reporte mensual y decisión sobre la Fase B y la capa en inglés.",
+       "Noviembre: enlaces contextuales y PR #36 (OK sobre el render), y las 4 diferenciaciones con ficha previa.",
+       "Enero: Fase B y prueba 7.",
+       "Decisiones del dueño el 15-oct: (1) triage en dos fases, con sí o no a la lista de 7 fusiones de páginas fuera y conformidad con aplazar las 9 cubiertas y no tocar las herramientas; (2) un solo cambio de metas del T4 (cobertura sobre URL vivas por escalones, reseñas a 3 en Houston, ficha de Miami completa en lugar de «visible en Maps»); (3) destinatarios de reseñas (TRR, JLX y Rosy Nails) y confirmación de que son clientes independientes; (4) visto bueno al arreglo de textos como borrado mínimo, con los enlaces de clientes aparte; (5) método y fecha del filtro de GA4.",
+       "PR #36 y la ficha de Miami van en una línea cada uno, como pendientes."
+      ]
+     },
+     {
+      "id": "ADV-D1",
+      "hipotesis": "Redirigir marcyan.vercel.app es urgente porque el alias puede estar compitiendo en el índice con el dominio.",
+      "afirmacion": "Descartada como urgencia. El alias sirve todas las páginas con la canónica absoluta al dominio, así que Google tiene la señal para consolidar. Queda como higiene de baja prioridad (ADV-09).",
+      "evidencia": [
+       "curl del 13-oct a https://marcyan.vercel.app/es: 200 y canonical https://marcyanstudio.com/es."
+      ],
+      "evidenciaEnContra": [
+       "No se comprobó con site:marcyan.vercel.app si Google indexa alguna URL del alias."
+      ],
+      "confianza": "media",
+      "papel": "descartada"
+     },
+     {
+      "id": "ADV-D2",
+      "hipotesis": "Las fusiones del triage pueden aplicarse a todas a la vez porque no tienen riesgo de índice.",
+      "afirmacion": "Descartada para las cubiertas (ADV-04). Para las 7 que ya están fuera el riesgo es bajo, pero tocan hubs indexados de valor (/en/houston con 60 apariciones y /en/miami), así que se aplican como mucho un hub por semana.",
+      "evidencia": [
+       "/en/houston recibe 4 de las 7 fusiones de la Fase A y está indexado. /en/miami recibe 1.",
+       "En la ventana del 25-sep al 13-oct, 1 de 6 páginas indexadas que se rastrearon salió de forma duradera (ADV-01)."
+      ],
+      "evidenciaEnContra": [
+       "No hay ningún dato que muestre que añadir una sección a un hub indexado lo saque del índice."
+      ],
+      "confianza": "media",
+      "papel": "descartada"
+     }
+    ],
+    "huecos": [
+     "lastCrawlTime llega con retraso y puede cambiar hacia atrás (7 saltos retroactivos detectados en la ronda 1). Las cifras de «salieron sin rastreo nuevo» y de rastreos en la ventana pueden infravalorar los rastreos reales. No se cruzaron con los ejemplos de las estadísticas de rastreo de Search Console (requieren la interfaz).",
+     "La comparación entre páginas pedidas y no pedidas (21 % frente a 60 % de salida) tiene sesgo de selección: la rutina pedía páginas nuevas y prioritarias. Con estos datos no se puede separar el efecto de la petición del valor previo de la página.",
+     "No se comprobó en la interfaz de GA4 el estado actual del filtro de tráfico interno ni si la regla de IP está definida. Lo que se sabe sale de la memoria del 12-oct.",
+     "No se pudo comprobar si TRR, JLX, Rosy Nails o MJA tienen alguna relación personal o societaria con el dueño (conflicto de interés en reseñas). Lo decide el dueño.",
+     "Las afirmaciones de documentación de Google (uso de lastmod «consistente y verificable», carácter irreversible de los filtros de GA4 y política de reseñas de Maps) se citan de memoria. No se volvieron a consultar las páginas oficiales en esta ronda.",
+     "No se comprobó si Google indexa alguna URL de marcyan.vercel.app (requiere site: en Google con navegador, prohibido a los subagentes).",
+     "No hay forma de verificar desde los datos si «la IA de Google recomienda» Texas Rush Remove. En el repo de TRR no hay datos de visibilidad en IA (no existe data/seo/ia).",
+     "Las metas escalonadas propuestas (≥60 % al 4-dic y ≥80 % en enero) son un criterio razonado, no una predicción basada en un modelo. Google no da plazos.",
+     "El experimento de peticiones con 5 páginas pedidas y 5 de control dará una señal, no una prueba estadística."
+    ],
+    "archivos": [
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\cifras-clave.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\recrawl.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\recrawl-events.json",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\requests.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\reqretention.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\bgroup.txt",
+     "C:\\Users\\Yan\\AppData\\Local\\Temp\\claude\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\ca58c02a-e3cf-4106-944e-f6116eb7d3ab\\scratchpad\\diag\\r2-adversarial-plan\\triage-state.txt",
+     "C:\\Users\\Yan\\.claude\\skills\\posicionamiento\\kit\\lib\\vigilancia.mjs",
+     "C:\\Users\\Yan\\.claude\\skills\\posicionamiento\\kit\\lib\\sitio.mjs",
+     "C:\\Users\\Yan\\.claude\\skills\\posicionamiento\\ciclos\\diario.md",
+     "C:\\Users\\Yan\\.claude\\skills\\posicionamiento\\doctrina.md",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\docs\\seo\\triage-indexacion-2026-10-12.md",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\docs\\seo\\PLAN.md",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\docs\\seo\\CAMBIOS.md",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\data\\seo\\acciones.json",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\src\\i18n\\content.ts",
+     "C:\\Users\\Yan\\Area de Trabajo\\Proyectos\\Personal\\MarcYan\\Marcyan Web\\.claude\\worktrees\\seo-diagnostico\\vercel.json",
+     "C:\\Users\\Yan\\.claude\\projects\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\memory\\marcyan_gbp_offsite.md",
+     "C:\\Users\\Yan\\.claude\\projects\\C--Users-Yan-Area-de-Trabajo-Proyectos-Personal-MarcYan-Marcyan-Web\\memory\\seo_tanda_lecciones.md"
+    ]
+   },
+   "verificacion": {
+    "veredictos": [
+     {
+      "id": "ADV-01",
+      "veredicto": "confirmada",
+      "razon": "Reproducido con mi propia serie (51 copias de data/indexing-status.json sacadas de git). De las 79 indexadas el 27-sep: 9 rastreadas en la ventana, de las que salen 3 (2 ya estaban fuera antes del rastreo); 70 no rastreadas, de las que salen 35. De las 6 indexadas antes de su rastreo: 4 siguen, 1 salida duradera (abogados-inmigracion, rastreo del 29-sep) y 1 que salió y volvió (/es/miami/diseno-web). La última petición fue el 21-sep. Dos matices. (1) En la ventana hay 18 fechas de rastreo distintas, no 20: el método cuenta dos veces algunos saltos retroactivos. (2) Lo más importante: la ventaja de las páginas pedidas (21 % de salida frente a 60 %) desaparece cuando se compara por fecha de rastreo. Entre las rastreadas en septiembre (fecha de rastreo vista el 27-sep, 1-sep o después) salen 3 de 13 pedidas y 4 de 15 no pedidas. El hueco viene casi todo de las rastreadas del 18 al 31-ago: 2 de 11 pedidas frente a 22 de 29 no pedidas. La variable es lo reciente que es el rastreo, no la petición, y la causa puede ir al revés (Google rastrea lo que valora). Rescates desde «rastreada, sin indexar» con la hora de la petición bien alineada: 11 URL y 6 siguen dentro (añade /es/miami/diseno-web a las 10 del investigador). La cifra «4 de 5» de la ronda 1 es el subconjunto de H1-04: páginas indexadas antes de la rutina, soltadas y rescatadas.",
+      "afirmacionCorregida": "Los datos no apoyan que un rastreo nuevo acabe a menudo en «rastreada, sin indexar». En la ola, la mitad (35 de 70) de las indexadas sin rastreo nuevo salió, frente a 1 salida duradera de las 6 indexadas que se rastrearon. A igualdad de rastreo reciente, pedir no muestra beneficio propio (septiembre: 3 de 13 frente a 4 de 15), pero tampoco daño. Rescates con petición: 11 URL, 6 siguen dentro. Para no pedir en bloque sigue valiendo la doctrina §6 y §7, no que pedir haga daño. Todo con muestras pequeñas y sesgo de selección."
+     },
+     {
+      "id": "ADV-02",
+      "veredicto": "confirmada",
+      "razon": "Reproducido con inspección de URL propia del 13-oct, en sus dos formas (inspect-adv02.txt). /es/miami/seo-local, /es/blog/ia-que-contesta-llamadas-mensajes-perdidos, /es/houston/bienes-raices y /es/miami/doral están en Alternate sin barra y en «rastreada, sin indexar» con barra. Sus últimos rastreos son del 14-jun, 6-jul, 7-jul y 9-jul (UTC), entre 96 y 121 días. /es/portafolio, /es/sobre-nosotros y /es/herramientas están indexadas por la versión con barra. /en/blog y /es/diagnostico están indexadas, con la canónica de Google sin barra. /es/houston y /es/servicios están en «rastreada, sin indexar» con copias del 2-ago y del 5-ago. El precedente también se reproduce: las 13 Alternate que se volvieron a rastrear pasaron a su URL sin barra, y 7 han salido (54 %). La mediana de días sin rastreo es de unos 47 a 49 y solo 12 de 84 se rastrearon en 30 días. Tres errores. (1) El plan de la ronda 1 NO incluía /es/herramientas ni /es/diagnostico: las excluía de forma explícita. Lo que sobra en su lista son /es/portafolio y /es/sobre-nosotros (dentro por la barra) y /en/blog (indexada). (2) /en/blog, /es/diagnostico y /es/houston/clinicas-dentales sí guardan la copia vieja con la canónica con barra, aunque Google ya eligió la URL sin barra. No pueden ganar cobertura por ese motivo, pero «sin residuo» no es exacto. (3) El grupo de control no es comparable: son páginas en «rastreada, sin indexar» rastreadas del 24 al 30-ago, con copia posterior al PR #30. Las 4 tratadas son Alternate con copias de junio y julio, y un rastreo nuevo suele resolverlas solo (13 de 13). El congelamiento del plan prohibía pedir las páginas en «rastreada, sin indexar», y la lista apunta sobre todo a URL en Alternate, así que el choque es parcial. Aun así va contra el motivo del congelamiento y contra la doctrina §4.",
+      "afirmacionCorregida": "La lista del plan sobra en 3 URL: /es/portafolio y /es/sobre-nosotros, dentro por su versión con barra, y /en/blog, indexada. /es/herramientas y /es/diagnostico ya estaban excluidas. Lo justificado es una sola petición tras la lectura del 15-oct para las 4 páginas fuera en sus dos formas, más /es/houston como caso aparte. El «experimento» no tendrá un control válido si los controles son páginas con copia fresca en «rastreada, sin indexar»: el control de las 4 Alternate debería ser otra página en Alternate sin petición, y aquí no queda ninguna fuera del índice. Se presenta como señal, no como experimento."
+     },
+     {
+      "id": "ADV-03",
+      "veredicto": "confirmada",
+      "razon": "Leí kit/lib/vigilancia.mjs:321-342 y sitio.mjs:64-73 y 124. El hash es el sha1 de TODO el texto visible: quita scripts, estilos y etiquetas, pero conserva el menú, el pie y las tarjetas. Un cambio fija hashCambio con la fecha del día (línea 155). Entran en la cola las páginas en Discovered, Crawled o Unknown con cambio, y las indexadas de landings, ciudades, servicios, precios y portada con un cambio posterior a su último rastreo. Las Alternate quedan fuera. El tope es de 8 al día (seo.config.json), y diario.md (paso 4) las ejecuta con Chrome. Hoy ninguna de las 84 URL tiene hashCambio y la última vigilancia trae pedirIndexacion vacío: el mecanismo está dormido, no apagado. Con el build: la frase de la tarjeta de TRR está en 44 páginas (22 ES y 22 EN). De ellas, 41 entrarían en la cola (23 no indexadas y 18 indexadas de grupos prioritarios) y 3 Alternate no. Las 18 respuestas de preguntas frecuentes meterían 15 más, casi todas ya entre esas 41. Con el tope de 8, unos 6 días seguidos. Matiz: «se reintenta a los 14 días» solo pasa si la página vuelve a cambiar después de la petición. La cola se calcula de nuevo cada día y lo que no entró en el cupo sale al día siguiente.",
+      "afirmacionCorregida": "Publicar la corrección de la tarjeta de TRR metería unas 41 de esas 44 páginas en la cola automática: 6 días de peticiones con el cupo que comparten TRR y MJA. Hay que decidir antes qué páginas merecen petición y marcar o excluir las demás."
+     },
+     {
+      "id": "ADV-04",
+      "veredicto": "confirmada",
+      "razon": "Reproducido con la serie del 13-oct más las versiones con barra. De las 16 URL del triage, 9 están cubiertas: /en/checkup, /en/tools, /en/cities y /es/diagnostico (indexadas), /es/herramientas (por la barra), /en/miami/hialeah, /en/miami/local-seo, /es/houston/sugar-land y /es/precios/cuanto-cuesta-un-chatbot. Cobertura: 44 de 84 hoy; 35 de 68 con el triage completo; 44 de 77 fusionando solo las 7 que están fuera. /es/houston y /en/houston/local-seo están en «rastreada, sin indexar», y la ampliación opcional de la ronda 1 propone fusionar /en/houston/local-seo, así que habría una cadena. La prueba 7 está en la §5, «Guardarraíles de páginas de ciudad», y la §2.8 y la §6 llaman humo a perseguir el 100 %. Exageración: en porcentaje, la cobertura apenas cambia (de 52,4 % a 51,5 %). Además las 9 retiradas son un conjunto conocido, así que su efecto sí se separa del de Google si se mide sobre un conjunto fijo de URL. Lo que se pierde de verdad son 9 páginas que Google conservaba. Detalle: de las 7 que están fuera, solo 6 tienen hoy un destino indexado. La séptima (/en/pricing/local-seo-cost-houston) necesita otro destino, como ya dice el arreglo.",
+      "afirmacionCorregida": "El triage completo quita 9 páginas que Google conserva (44 a 35 en número; casi igual en porcentaje, 52 % a 51 %). Dos fusiones apuntan a destinos fuera del índice, y una crearía una cadena con la ampliación EN. Primero van las 6 fusiones de páginas fuera con destino indexado, más /en/pricing/local-seo-cost-houston con su destino final. Las cubiertas se aplazan, y la cobertura se mide sobre un conjunto fijo de URL para separar efectos."
+     },
+     {
+      "id": "ADV-05",
+      "veredicto": "confirmada",
+      "razon": "PLAN.md:9 (metas del T4 fijadas el 6-oct): 80 de 84 indexadas con /es/miami/diseno-web dentro, reseñas 5 o más AL 31-DIC y ficha de Miami visible en Maps. El triage (línea 119) pide 60 de 68 cuatro semanas después de las fusiones. La ronda 1 pide ≥70 de 84 o ≥54 de 68 (meta alta 60) al 4-dic, y ≥41 en dos lecturas el 26-oct. La doctrina §11 exige proponer un cambio de meta como cambio, con su motivo. Desde 35 de 68 hacen falta +19 o +25 páginas en unas 6 o 7 semanas, y el propio plan dice que recuperarse lleva meses. H2-02 de la ronda 1 confirma que la ficha de Miami existe y que «no aparece» venía de un error del método (falta includePureServiceAreaBusinesses). Matiz: la meta oficial de reseñas vence el 31-dic, no el 4-dic, y «visible en Maps» podría leerse como posicionamiento: hoy ninguna ficha sale entre las 20 primeras.",
+      "afirmacionCorregida": "Conviven 4 metas de cobertura incompatibles y ninguna se plantea como cambio de la oficial (80 de 84, fijada el 6-oct). Hay que proponer un único cambio de las metas del T4, con su motivo. «Ficha de Miami visible en Maps» se basa en un error de medición: o se cambia por «completa y vigilada», o se redefine como posicionamiento medido con el método corregido."
+     },
+     {
+      "id": "ADV-06",
+      "veredicto": "confirmada",
+      "razon": "data/seo/acciones.json: marcyan-resenas-clientes en estado «pedida» desde el 26-sep, vence el 16-oct (pedida al dueño, no a los clientes). La memoria marcyan_gbp_offsite.md §8 dice: «Houston: Texas Rush Remove, Julio's, Rosy Nails. Move Junk Away es Orlando… NO ponerla en Houston/Miami». marcyan_aeo_strategy confirma 4 clientes reales, 3 en Houston. project_marcyan:122 dice «Miami sin claims de clientes locales hasta tenerlos». Exageración: el tope de 3 solo vale con una persona por cliente y sin clientes nuevos antes del plazo. La meta oficial vence el 31-dic, y si en un cliente tratan con Marcyan dos personas de verdad, cada una puede dejar una reseña legítima. No se comprobó si alguno tiene relación personal o societaria con el dueño.",
+      "afirmacionCorregida": "La acción ya está pedida (vence el 16-oct) y no se repite. Los destinatarios correctos son TRR, JLX y Rosy Nails en la ficha de Houston. MJA no va en Houston ni en Miami, y en Miami no se piden reseñas hasta tener un cliente allí. Con los clientes actuales y una persona por cliente, el realista es 3. Llegar a 5 al 31-dic depende de trabajos nuevos."
+     },
+     {
+      "id": "ADV-07",
+      "veredicto": "confirmada",
+      "razon": "La ayuda oficial de GA4 (answer 10108813) dice que una vez aplicado un filtro de datos, el efecto es permanente y los datos excluidos nunca estarán disponibles. El estado de prueba con la dimensión «Test data filter name» lo describen guías de terceros (no lo encontré en la página oficial consultada). Memoria seo_tanda_lecciones:17: filtro en modo Testing, activarlo requiere OK. marcyan_monthly_seo_report:17: «La IP rota» y el arreglo ?mrc_internal=1 sigue pendiente. Con unas 8 sesiones orgánicas, ninguna decisión cercana depende del dato. Matiz: el filtro no es retroactivo, así que cada semana sin activarlo es una semana más de datos mezclados. Lo irreversible son los datos excluidos mientras está activo, no el filtro, que se puede desactivar.",
+      "afirmacionCorregida": "No es urgente. Hay que probarlo antes en modo Testing, porque lo excluido con el filtro activo no se recupera. Además la regla por IP es frágil y conviene una marca por dispositivo."
+     },
+     {
+      "id": "ADV-08",
+      "veredicto": "confirmada",
+      "razon": "vercel.json no tiene ignoreCommand. Desde el 25-sep hay 17 commits auto(seo) en main, y la API de Vercel muestra 16 despliegues de producción READY desde el 1-oct, incluidas las vigilancias diarias. dist/sitemap-0.xml tiene 84 <loc> y 0 <lastmod>. La documentación de Google (build-sitemap, consultada hoy) dice que usa lastmod si es «consistently and verifiably» exacto y que debe reflejar el último cambio significativo. Dos matices. (1) El motivo para ir después de la higiene de enlaces es incoherente: si lastmod sale del texto principal y excluye menú y pie, el cambio de plantilla no lo mueve. (2) Que «pueda sustituir peticiones manuales» es una hipótesis. La corrección de canónicas del 2-ago es técnica, no de contenido, y no cuenta como «cambio significativo» para lastmod.",
+      "afirmacionCorregida": "lastmod debe salir de la fecha del último cambio del contenido principal, nunca del build, porque cada commit de datos despliega a producción. Puede ayudar a que Google relea, sin garantía. Su orden respecto a la higiene da igual si se excluyen menú y pie, pero no debe coincidir con la ventana de medición de las peticiones."
+     },
+     {
+      "id": "ADV-09",
+      "veredicto": "confirmada",
+      "razon": "La doctrina §6 incluye «presupuesto de rastreo en sitios pequeños» en la lista de humo. textoVisible (sitio.mjs:64-73) quita scripts y etiquetas, así que cambiar destinos de enlaces o Organization.url en el JSON-LD no cambia el hash y no despierta la cola. curl de hoy: https://marcyan.vercel.app/es responde 200 con canonical https://marcyanstudio.com/es. git grep no encuentra vercel.app en el repo, fuera de data y dist."
+     },
+     {
+      "id": "ADV-10",
+      "veredicto": "confirmada",
+      "razon": "content.ts:134 y :362 contienen la frase. Está en 44 páginas del build (22 ES y 22 EN). about.astro:43 contiene «Google's AI already includes our clients in some recommendations». Corrección de cifra: «con enlaces que puedes visitar» y «with links you can visit» aparecen en 9 respuestas ES y 9 EN (18 páginas, como decía la ronda 1), no en 8 y 8. Llamar «falsa» a la cláusula es demasiado: no se puede verificar (el propio investigador lo pone en huecos). Además, en la misma tarjeta, MJA dice «Ya posiciona en su zona», otra afirmación que habría que respaldar o revisar.",
+      "afirmacionCorregida": "Son 2 cadenas de una tarjeta compartida (44 páginas), 18 respuestas de preguntas frecuentes (9 ES y 9 EN), 1 dato en /en/about y la descripción del blog. Se quita la cláusula que no se puede verificar, sin poner una frase nueva común a todas, en su propio día y después de neutralizar la cola automática."
+     },
+     {
+      "id": "ADV-11",
+      "veredicto": "confirmada",
+      "razon": "La consulta propia a Search Console del 13-oct da datos «final» hasta el 11-oct y «all» hasta el 12-oct: 2 días de retraso. La semana del 8 al 15-oct no está completa hasta el 17 o el 18-oct. El kit es la skill global y lo usan las rutinas de los 4 sitios. La lectura del índice por inspección no tiene retraso. Matiz: cambiar el kit no rompe la comparación por fuerza si los cambios solo añaden cosas y el contador viejo sigue igual. Es un riesgo, no algo seguro.",
+      "afirmacionCorregida": "El 15-oct se lee el índice y el 18-oct las impresiones. El kit no se toca hasta tener las dos lecturas, o solo con cambios que añadan algo y dejen el contador viejo en paralelo."
+     },
+     {
+      "id": "ADV-12",
+      "veredicto": "debilitada",
+      "razon": "Los solapes del plan de la ronda 1 son reales: triage del 16 al 26-oct, textos y higiene del 16-oct al 2-nov, enlaces del 16-oct al 9-nov. Los pendientes de acciones.json también: reseñas (vence el 16-oct), PR #36 (vencía el 9-oct) y decisión sobre las páginas (vence el 15-oct). Pero el calendario que propone no cumple su propia regla de «una sola variable importante por semana». (1) El lastmod (20 al 26-oct) cae dentro de la ventana de 14 días del experimento de peticiones (16 al 30-oct). Daría una señal nueva justo a las páginas tratadas (rastreos de junio a agosto, anteriores al 18-ago) y no a los controles (rastreados del 24 al 30-ago). (2) La Fase A empieza el 27-oct y, al fusionar /en/miami/ecommerce, quita el hreflang de /es/miami/ecommerce, que es uno de los controles, antes de la revisión del 30-oct. (3) La semana del 16 al 19-oct junta higiene y peticiones. Las fechas y las 5 decisiones son un criterio razonable, no algo demostrado.",
+      "afirmacionCorregida": "Hay que escalonar, pero el calendario debe cerrar el experimento de peticiones (30-oct) antes del lastmod y de la Fase A, o quitar de los controles las páginas que tocan las fusiones. Las 5 decisiones del 15-oct sirven como propuesta."
+     },
+     {
+      "id": "ADV-D1",
+      "veredicto": "confirmada",
+      "razon": "curl de hoy: el alias responde 200 con canonical absoluto al dominio. Sigue sin comprobarse si Google tiene indexada alguna URL del alias."
+     },
+     {
+      "id": "ADV-D2",
+      "veredicto": "confirmada",
+      "razon": "La serie propia confirma que en la ventana 1 de las 6 indexadas rastreadas salió de forma duradera. /en/houston y /en/miami están indexadas y reciben 4 y 1 de las fusiones de la Fase A. No volví a calcular las 60 apariciones de /en/houston (dato de la ronda 1)."
+     }
+    ],
+    "evidenciaNueva": [
+     "Con la fecha de rastreo controlada, desaparece la ventaja de las páginas pedidas: entre las indexadas el 27-sep y rastreadas en septiembre salen 3 de 13 pedidas y 4 de 15 no pedidas. El hueco de 21 % frente a 60 % viene de las rastreadas del 18 al 31-ago (2 de 11 frente a 22 de 29). Fuente: r2-verif-plan/a01.txt.",
+     "Con la hora de la petición bien alineada (UTC frente a la hora de cada copia), hay 11 rescates desde «rastreada, sin indexar» y 6 siguen dentro el 13-oct. Fuente: r2-verif-plan/rescue.txt.",
+     "El plan de la ronda 1 excluía de forma explícita /es/herramientas y /es/diagnostico de la petición. Lo que sobra en su lista son /es/portafolio y /es/sobre-nosotros (dentro por la barra) y /en/blog (indexada).",
+     "Inspección de URL propia del 13-oct, en sus dos formas, de 12 páginas. El estado coincide con el que dio el investigador (r2-verif-plan/inspect-adv02.txt).",
+     "La cola automática metería 41 de las 44 páginas con la tarjeta de TRR (23 no indexadas y 18 indexadas prioritarias; 3 Alternate quedan fuera). Hoy ninguna de las 84 URL tiene hashCambio. Fuente: r2-verif-plan/cola.mjs.",
+     "Los controles propuestos para el experimento son páginas en «rastreada, sin indexar» rastreadas del 24 al 30-ago, con copia posterior al PR #30. Las 4 tratadas son Alternate con copia de junio y julio: no son comparables.",
+     "Search Console tiene datos «final» hasta el 11-oct y «all» hasta el 12-oct (consulta del 13-oct). Vercel muestra 16 despliegues de producción desde el 1-oct, casi todos commits de datos auto(seo).",
+     "Las 13 páginas en Alternate que Google volvió a rastrear pasaron todas a su URL sin barra. De ellas, 7 están fuera hoy. De las 53 indexadas sin barra el 17-ago han salido 31, no 28.",
+     "La meta oficial de reseñas del T4 vence el 31-dic, no el 4-dic (PLAN.md:9).",
+     "La ayuda de GA4 confirma que el efecto de un filtro de datos aplicado es permanente. La documentación de Google sobre sitemaps confirma que lastmod se usa solo si es «consistently and verifiably» exacto."
+    ]
+   }
+  }
+ ]
+}

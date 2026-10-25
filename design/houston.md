@@ -177,6 +177,23 @@ Etiquetas de Katy y Pasadena separadas para que cada hilo se lea con su punto. F
 fotograma medido sin aceleración gráfica (con aceleración, bastante menos), trazados reutilizados por
 fotograma. Datos: 359 KB en el prototipo; en producción se recortan.
 
+**v4.2 · papel de la página, titular y zonas (2026-10-24).** El dueño fija la estructura: portada global
+(marca) → principal de ciudad (la agencia en Houston / Miami) → landings. Esta página es **la agencia en
+Houston**; "diseño web Houston" pasa a `/es/houston/diseno-web`. El cambio SEO (title, meta, anchors, EN)
+NO lo hace el chat de diseño: queda encargado al chat de SEO en
+`_cerebro/marcyan-web/encargos/2026-10-24-seo-houston-hub-agencia.md`.
+- **Titular propuesto:** "La agencia que pone tu negocio en el mapa de Houston" (escala `.h1` del sitio,
+  36 → 64, la que ya admite `LandingHero`), en tres líneas. Dice "agencia", promete un resultado concreto
+  (que te encuentren, en Maps) y se apoya en lo que se ve: el planeta que se acerca al mapa de Houston.
+  Bajada: "Web, SEO e IA con un solo equipo. Te encuentran en Google, en Maps y en la IA, y tu negocio les
+  contesta en su idioma." (24 palabras).
+- **Zonas por negocio** (sin cifras visibles): The Woodlands (poder de compra; "kitchen remodeling
+  contractor", EN → contratistas), Katy (suburbio de mayor crecimiento; "realtor que hable español" →
+  bienes raíces), Gulfton (corazón de la inmigración centroamericana; "abogado de inmigración en español"
+  → abogados de inmigración), Pasadena (70,5 % hispano, censo 2020; "taller mecánico que hable español" →
+  talleres; la que se enciende). Cada búsqueda es de un sector con página propia. Las zonas del centro
+  (Spring Branch, East End) quedan fuera porque a esta escala se amontonan con Gulfton.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

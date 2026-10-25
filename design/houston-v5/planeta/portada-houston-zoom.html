@@ -27,8 +27,10 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
 
 /* texto: gramática del sitio */
 .copy{position:absolute;z-index:5;left:112px;top:196px;width:600px}
-.copy .display{margin-top:24px}
-.copy .lead{margin-top:24px;max-width:38ch}
+.copy .h1{margin-top:24px}
+.h1{font-family:var(--font-display);font-size:clamp(2.25rem,1.30rem + 4.75vw,4rem);font-weight:700;line-height:1.1;letter-spacing:var(--tracking-tight);text-wrap:balance}
+.h1 em{color:var(--accent-gold);font-style:normal}
+.copy .lead{margin-top:24px;max-width:40ch}
 .actions{margin-top:36px;display:flex;align-items:center;gap:20px}
 .copy .micro{margin-top:14px}
 
@@ -73,7 +75,7 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
   .stage{width:100%;height:100%;transform:none!important}
   #globe,#wires{width:100%;height:100%}
   .copy{left:20px;right:20px;top:104px;width:auto}
-  .copy .display{margin-top:16px;font-size:40px}
+  .copy .h1{margin-top:16px;font-size:36px}
   .copy .lead{margin-top:16px;font-size:17px}
   .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
   .copy .micro{text-align:center;margin-top:8px}
@@ -95,8 +97,8 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
 
   <section class="copy">
     <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
-    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
-    <p class="lead">Que te encuentren cuando te buscan en Google, en Maps y en la IA, en español y en inglés.</p>
+    <h1 class="h1">La agencia que pone tu negocio en el mapa de <em>Houston</em></h1>
+    <p class="lead">Web, SEO e IA con un solo equipo. Te encuentran en Google, en Maps y en la IA, y tu negocio les contesta en su idioma.</p>
     <div class="actions">
       <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
       <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
@@ -127,11 +129,14 @@ html,body{width:100%;height:100%;margin:0;background:#080808;overflow:hidden}
 (function () {
   const GOLD = '#dcc089', TEAL = '#4fc3a1';
   const HOUSTON = [-95.369, 29.760];
+  // Zonas elegidas por negocio: donde se concentra el cliente hispano (Pasadena 70,5 % hispano, censo 2020;
+  // Gulfton, corazón de la inmigración centroamericana) y donde está el poder de compra (Katy, The Woodlands).
+  // Cada búsqueda es de un sector que ya tiene página propia en el sitio.
   const ZONES = [
-    { name: 'THE WOODLANDS', q: 'plomero 24 horas', at: [-95.489, 30.166], side: 'up', wire: 54, dx: -70 },
-    { name: 'KATY', q: 'roofing contractor near me', en: true, at: [-95.824, 29.786], side: 'up', wire: 86, dx: -150 },
-    { name: 'SUGAR LAND', q: 'dentista que hable español', at: [-95.635, 29.620], side: 'down', wire: 58, dx: -110 },
-    { name: 'PASADENA', q: 'taller que hable español cerca de mí', at: [-95.209, 29.691], side: 'up', wire: 46, dx: -120, lit: true },
+    { name: 'THE WOODLANDS', q: 'kitchen remodeling contractor', en: true, at: [-95.489, 30.166], side: 'up', wire: 54, dx: -70 },
+    { name: 'KATY', q: 'realtor que hable español', at: [-95.824, 29.786], side: 'up', wire: 86, dx: -150 },
+    { name: 'GULFTON', q: 'abogado de inmigración en español', at: [-95.478, 29.718], side: 'down', wire: 70, dx: -230 },
+    { name: 'PASADENA', q: 'taller mecánico que hable español', at: [-95.209, 29.691], side: 'up', wire: 70, dx: -120, lit: true },
   ];
   const mobile = () => innerWidth <= 600;
 

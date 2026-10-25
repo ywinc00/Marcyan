@@ -21,7 +21,7 @@ export function initHero(GEO) {
   // por debajo de 900 px la portada se compone en vertical (texto arriba, planeta abajo)
   // teléfono en horizontal (poca altura): composición en horizontal, sin etiquetas (la búsqueda va en la ficha)
   const mobile = () => innerWidth < 900 && innerHeight >= 520;
-  const tagsOff = () => mobile() || innerHeight < 520;
+  const tagsOff = () => innerHeight < 520;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function frames() {
@@ -34,15 +34,43 @@ export function initHero(GEO) {
       const lead = copy && copy.querySelector('.lead');
       let cb = copy ? copy.getBoundingClientRect().bottom - stage.getBoundingClientRect().top : H * 0.62;
       if (short && lead && !stage.classList.contains('zoomed')) cb -= lead.scrollHeight + 16;
-      const ty = Math.min(H * 0.80, Math.max(H * 0.70, cb + 110));
-      const Ra = Math.min(W * 0.44, H * 0.24, 260), k = Ra / 171, Rb = Ra * 1.37;
+      const sr = stage.getBoundingClientRect();
+      const Ra = Math.min(W * 0.44, H * 0.24, 260);
       // al empezar, el planeta asoma por debajo de TODO el texto (nunca detrás del teléfono ni del botón)
-      const full = copy ? copy.getBoundingClientRect().bottom - stage.getBoundingClientRect().top : H * 0.62;
+      const full = copy ? copy.getBoundingClientRect().bottom - sr.top : H * 0.62;
+      const pad = copy ? Math.max(16, copy.getBoundingClientRect().left - sr.left) : 20, navH = 64;
+      // la historia ocupa la franja entre la barra y el botón del chat; la escala del mapa sale de lo que cabe:
+      // de alto (etiquetas arriba, ficha abajo) y de ancho: de Katy (44 km al oeste) hasta que asome la bahía de
+      // Galveston (36 km al este), que es lo que dice "esto es Houston" igual que en escritorio
+      const th = W <= 600 ? 52 : 60, cardH = found.offsetHeight || 130;
+      // de la barra hasta el pie de la pantalla: la ficha nunca llega a la columna del botón del chat (a la derecha)
+      const band = H - navH - 14 - 24;
+      const kW = (W - 2 * pad - 70) / 80;
+      // cuatro etiquetas: The Woodlands arriba, Katy y Pasadena en escalera entre los puntos, Gulfton (a veces en dos
+      // líneas) abajo y la ficha al final. La escalera necesita 52,8 km de alto entre The Woodlands y Pasadena.
+      const kFit = (band - (30 + th + 34 + (th + 22) + 18 + cardH)) / 49.8, kStair = (2 * th + 16 + 36) / 52.8;
+      const lite = Math.min(kFit, kW) < Math.max(2.2, kStair);         // teléfonos bajos: solo la búsqueda encendida
+      let kmpx, up, down;
+      if (!lite) {
+        kmpx = Math.min(5.2, kFit, kW);
+        up = 45.1 * kmpx + 30 + th; down = Math.max(4.7 * kmpx + 34 + th + 22, 7.7 * kmpx + 20) + 18 + cardH;
+      } else {
+        kmpx = Math.max(1.9, Math.min(4.5, kW, (band - 54 - cardH) / 52.8));
+        up = Math.max(45.1 * kmpx + 16, 30 + th - 7.7 * kmpx); down = 7.7 * kmpx + 38 + cardH;
+      }
+      const yh = navH + 14 + up + Math.max(0, (band - up - down) / 2);
+      const xh = Math.max(pad + 20 + 44 * kmpx, Math.min(W - 70 - 36 * kmpx, W / 2 - 10 * kmpx));
+      // la lente llena la pantalla: de la barra hasta pasado el borde de abajo (se ven solo sus curvas)
+      const Rb = (H - navH) / 2 + 20, cyB = (navH + H) / 2, Rm = Math.min(W * 0.42, (H - navH) * 0.3, 300);
+      // el satélite termina en el borde derecho de la pantalla, como en escritorio (no junto a los puntos)
+      const rot = -18 * Math.PI / 180, rx = Rb * 1.4, ry = Rb * 0.35;
+      let satA = 150;
+      for (let a = 100; a <= 150; a++) { const r = a * Math.PI / 180; if (W / 2 - rx * Math.cos(r) * Math.cos(rot) - ry * Math.sin(r) * Math.sin(rot) >= W - 18) { satA = a; break; } }
       return {
-        W, H, ty,
+        W, H, pad, tm: 0.34, lite, satA,
         A: { cx: W * 0.62, cy: Math.max(H * 0.86, full + 20 + Ra), R: Ra, center: [-97, 33] },
-        // la lente baja lo justo para que las cuatro zonas queden dentro del disco
-        B: { cx: W * 0.70, cy: ty + Rb * 0.55, R: Rb, target: [W * 0.60, ty], kmpx: 1.4 * k },
+        M: { cx: W / 2, cy: navH + (H - navH) * 0.48, R: Rm, center: geoInterpolate([-97, 33], HOUSTON)(0.5) },
+        B: { cx: W / 2, cy: cyB, R: Rb, target: [xh, yh], kmpx },
       };
     }
     // Escritorio, a pantalla completa: el texto va alineado con la barra (contenedor del sitio) y el planeta
@@ -74,13 +102,15 @@ export function initHero(GEO) {
   const texas = { type: 'MultiPolygon', coordinates: GEO.texas };
 
   function setup() {
+    if (copyEl) copyEl.style.transform = '';            // se mide el texto en su sitio, sin el desplazamiento de salida
+    if (mobile() && innerHeight >= 520) { found.style.width = ''; const q = document.getElementById('hx-found-q'); if (q) q.hidden = true; }
     F = frames();
     land110 = landGlobal();
     dpr = Math.min(mobile() ? 2 : 1.75, window.devicePixelRatio || 1); patCache.clear();
     // el lienzo es la ventana entera (CSS 100 % × 100 %): el planeta y su brillo nunca se cortan
     canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
     // el resplandor dorado del fondo sigue al planeta
-    const cueEl = document.getElementById('hx-cue'), copyEl = stage.querySelector('.copy');
+    const cueEl = document.getElementById('hx-cue');
     if (cueEl && copyEl) { cueEl.hidden = false; cueEl.hidden = cueEl.getBoundingClientRect().top < copyEl.getBoundingClientRect().bottom + 24; }
     stage.style.setProperty('--pcx', F.A.cx + 'px'); stage.style.setProperty('--pcy', F.A.cy + 'px'); stage.style.setProperty('--pr', F.A.R + 'px');
   }
@@ -102,7 +132,18 @@ export function initHero(GEO) {
   const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
   function state(t) {
-    const e = ease(t), A = F.A, B = F.B;
+    const M = F.M;
+    if (!M) return stateAB(F.A, F.B, t);
+    if (t >= F.tm) return stateAB(M, F.B, (t - F.tm) / (1 - F.tm));
+    // primer tiempo (móvil): el planeta entero sube al centro y crece mientras gira hacia Texas
+    const u = smooth(0.04 / F.tm, 1, t / F.tm), A = F.A;
+    const cx = lerp(A.cx, M.cx, u), cy = lerp(A.cy, M.cy, u), R = lerp(A.R, M.R, u);
+    const c0 = geoInterpolate(A.center, M.center)(u);
+    const proj = geoOrthographic().rotate([-(c0[0] + 1.6), -c0[1]]).scale(R).translate([cx, cy]).clipAngle(90).precision(1);
+    return { cx, cy, R, S: R, proj, zoom: 1, e: 0, t: 0 };
+  }
+  function stateAB(A, B, t) {
+    const e = ease(t);
     const cx = lerp(A.cx, B.cx, e), cy = lerp(A.cy, B.cy, e), R = lerp(A.R, B.R, e);
     const SB = 6371 * B.kmpx;
     const S = Math.exp(lerp(Math.log(A.R), Math.log(SB), e));
@@ -174,7 +215,7 @@ export function initHero(GEO) {
     ctx.strokeStyle = rim; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R - 0.8, 0, Math.PI * 2); ctx.stroke();
     ctx.lineWidth = 4.6; ctx.strokeStyle = 'rgba(8,7,5,.42)'; ringPath(ctx, s, 'front'); ctx.stroke();
     ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(214,186,128,.95)'; ringPath(ctx, s, 'front'); ctx.stroke();
-    const a = 100 * Math.PI / 180, g = ringGeo(s), rx = g.rx, ry = g.ry, rot = g.rot;
+    const a = (F.satA ? lerp(100, F.satA, s.e) : 100) * Math.PI / 180, g = ringGeo(s), rx = g.rx, ry = g.ry, rot = g.rot;
     const px = -rx * Math.cos(a), py = ry * Math.sin(a);
     const sx = s.cx + px * Math.cos(rot) - py * Math.sin(rot), sy = s.cy + px * Math.sin(rot) + py * Math.cos(rot);
     ctx.fillStyle = TEAL; ctx.beginPath(); ctx.arc(sx, sy, mobile() ? 7 : 9, 0, Math.PI * 2); ctx.fill();
@@ -203,16 +244,53 @@ export function initHero(GEO) {
       const tag = document.createElement('span'); tag.className = 'tag';
       tag.innerHTML = `<small>${z.name}</small><span>${z.q}${z.en ? ' <span class="en">EN</span>' : ''}</span>`;
       pinsBox.appendChild(tag);
-      const th = 50;
-      let lx, ly;
-      if (tagsOff()) { lx = -999; ly = -999; } else { lx = x + z.dx; ly = z.side === 'up' ? y - z.wire - th : y + z.wire; }
-      tag.style.left = lx + 'px'; tag.style.top = ly + 'px';
-      const wy1 = z.side === 'up' ? ly + th : y, wy2 = z.side === 'up' ? y : ly;
-      const line = mkWire(x, y, x, z.side === 'up' ? ly + th : ly);
-      line.style.strokeDasharray = Math.abs(wy2 - wy1); line.style.strokeDashoffset = Math.abs(wy2 - wy1);
-      if (tagsOff()) line.style.display = 'none';
-      wires.appendChild(line);
-      items.push({ z, pt, tag, line, x, y, lx, ly, i });
+      items.push({ z, pt, tag, x, y, i, side: z.side, th: 50 });
+    });
+    if (tagsOff()) items.forEach((it) => { it.lx = -999; it.ly = -999; });
+    else if (!mobile()) items.forEach((it) => { it.lx = it.x + it.z.dx; it.ly = it.side === 'up' ? it.y - it.z.wire - it.th : it.y + it.z.wire; });
+    else {
+      // móvil: The Woodlands arriba; Katy debajo de ese punto, a la izquierda; Pasadena debajo de Katy, a la derecha;
+      // Gulfton debajo del grupo. Cada hilo sale de su punto y ninguno cruza otra etiqueta.
+      const cx = (l, w) => Math.max(F.pad, Math.min(F.W - F.pad - w, l));
+      items.forEach((it) => { it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight || 52; });
+      const [wd, ka, gu, pa] = items;
+      // parte una etiqueta en dos líneas equilibradas y ajusta la caja a la línea más larga (sin hueco a la derecha)
+      const wrap = (it, maxW) => {
+        it.tag.style.maxWidth = Math.max(120, maxW) + 'px'; it.tag.style.whiteSpace = 'normal';
+        const tr = it.tag.getBoundingClientRect(), cs = getComputedStyle(it.tag), rg = document.createRange();
+        rg.selectNodeContents(it.tag.querySelector('span'));
+        const right = Math.max(it.tag.querySelector('small').getBoundingClientRect().right, ...[...rg.getClientRects()].map((r) => r.right));
+        it.tag.style.width = Math.ceil(right - tr.left + parseFloat(cs.paddingRight) + 2) + 'px';
+        it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight;
+      };
+      if (F.lite) {
+        // teléfono bajo: los cuatro puntos y solo la búsqueda encendida (Pasadena) con su ficha
+        [wd, ka, gu].forEach((it) => { it.lx = it.ly = -999; it.hide = true; });
+        pa.side = 'up'; pa.lx = cx(pa.x + 22 - pa.tw, pa.tw); pa.ly = pa.y - 30 - pa.th;
+      } else {
+        wd.side = 'up'; wd.lx = cx(wd.x - wd.tw / 2, wd.tw); wd.ly = wd.y - 30 - wd.th;
+        ka.side = 'up'; ka.lx = cx(ka.x - 22, ka.tw); ka.ly = Math.min(wd.y + 18, ka.y - 18 - ka.th);
+        // Pasadena nunca tapa el hilo de Katy ni se despega del suyo: se corre lo justo y, si no cabe, va en dos líneas
+        const minL = ka.x + 14;
+        pa.lx = Math.max(minL, cx(pa.x + 22 - pa.tw, pa.tw));
+        if (pa.lx + pa.tw > F.W - F.pad || pa.lx > pa.x - 14) {
+          wrap(pa, F.W - F.pad - minL);
+          pa.lx = Math.max(minL, Math.min(F.W - F.pad - pa.tw, pa.x + 22 - pa.tw));
+        }
+        pa.side = 'up'; pa.ly = Math.min(ka.ly + ka.th + 16, pa.y - 18 - pa.th);
+        if (pa.ly < ka.ly + ka.th + 12) ka.ly = Math.max(wd.y + 10, pa.ly - 12 - ka.th);
+        // Gulfton no se cruza con el hilo que baja de Pasadena a la ficha: si no cabe a su izquierda, dos líneas
+        if (gu.x + 22 - gu.tw < F.pad && pa.x - 14 - F.pad < gu.tw) wrap(gu, pa.x - 14 - F.pad);
+        gu.side = 'down'; gu.lx = Math.max(F.pad, Math.min(cx(gu.x + 22 - gu.tw, gu.tw), pa.x - 14 - gu.tw)); gu.ly = gu.y + 34;
+      }
+    }
+    items.forEach((it) => {
+      it.tag.style.left = it.lx + 'px'; it.tag.style.top = it.ly + 'px';
+      const end = it.side === 'up' ? it.ly + it.th : it.ly, len = Math.abs(end - it.y);
+      const line = mkWire(it.x, it.y, it.x, end);
+      line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+      if (tagsOff() || it.hide) line.style.display = 'none';
+      wires.appendChild(line); it.line = line;
     });
     const P = items.find((it) => it.z.lit);
     const fq = document.getElementById('hx-found-q');
@@ -220,13 +298,19 @@ export function initHero(GEO) {
     // la ficha cuelga del punto encendido y cabe entera en pantalla, también en portátiles de poca altura
     const drop = Math.min(200, Math.max(120, F.H * 0.22));
     // nunca encima del texto: si no cabe a su lado, la ficha se estrecha (teléfono en horizontal)
-    let fx = 20;
-    if (!mobile()) {
+    let fx = 20, fyM = 0;
+    if (mobile()) {
+      const cw = found.offsetWidth || 284, gu = items[2];
+      // en el teléfono la ficha va a la izquierda para dejar ver la bahía a la derecha
+      fx = F.W <= 600 ? F.pad : Math.max(F.pad, Math.min(F.W - 84 - cw, P.x - cw * 0.62));
+      fyM = F.lite ? P.y + 24 : Math.max(gu.ly + gu.th, P.y + 20) + 18;
+      found.style.width = '';
+    } else {
       const cEl = stage.querySelector('.copy'), cr = cEl ? cEl.getBoundingClientRect().right - stage.getBoundingClientRect().left : 0;
       fx = Math.max(cr + 24, Math.min(P.x - 190, F.W - 112 - 344));
       found.style.width = Math.min(344, F.W - 16 - fx) + 'px';
-    } else found.style.width = '';
-    const fy = mobile() ? F.ty + 30 : Math.min(P.y + drop, F.H - (found.offsetHeight || 140) - 28);
+    }
+    const fy = mobile() ? fyM : Math.min(P.y + drop, F.H - (found.offsetHeight || 140) - 28);
     found.style.left = fx + 'px'; found.style.top = fy + 'px';
     const down = mkWire(P.x, P.y + 9, P.x, fy); down.classList.add('down');
     down.style.strokeDasharray = fy - P.y; down.style.strokeDashoffset = fy - P.y;
@@ -260,6 +344,19 @@ export function initHero(GEO) {
     if (T > 2350) foundAi.classList.add('on');
   }
 
+  // ── móvil: el texto se retira en cuanto empieza el viaje, para que el planeta tenga la pantalla entera ──
+  const copyEl = stage.querySelector('.copy');
+  function copyFade(c) {
+    if (!copyEl) return;
+    if (!F || !F.M) { ['--fb', '--ft'].forEach((k) => copyEl.style.removeProperty(k)); copyEl.style.transform = ''; copyEl.style.pointerEvents = ''; copyEl.inert = false; return; }
+    const fb = smooth(0.003, 0.04, c), ft = smooth(0.012, 0.07, c);
+    copyEl.style.setProperty('--fb', (1 - fb).toFixed(3));
+    copyEl.style.setProperty('--ft', (1 - ft).toFixed(3));
+    copyEl.style.transform = ft > 0 ? `translate3d(0,${(-40 * ft).toFixed(1)}px,0)` : '';
+    copyEl.style.pointerEvents = ft > 0.5 ? 'none' : '';
+    copyEl.inert = ft > 0.98;                            // invisible = sin foco ni toques
+  }
+
   // ── el desplazamiento dirige el acercamiento ──
   let cur = 0, target = 0, raf = 0, lastT = 0, started = false;
   const cue = document.getElementById('hx-cue');
@@ -272,13 +369,13 @@ export function initHero(GEO) {
   function tick(now) {
     const dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
     // suavizado con un límite de velocidad: aunque el visitante baje de golpe, el viaje dura al menos ~1,2 s
-    let step = (target - cur) * (1 - Math.exp(-dt / 150));
-    const maxStep = dt / 1200;
-    step = Math.max(-maxStep * 1.6, Math.min(maxStep, step));
-    cur = Math.abs(target - cur) < 0.0008 ? target : cur + step;
+    let step = reduce ? (target >= 0.3 ? 1 : 0) - cur : (target - cur) * (1 - Math.exp(-dt / 150));
+    const maxStep = dt / (F.M ? 1700 : 1200);           // en móvil el viaje tiene un tiempo más (sube, gira, se acerca)
+    if (!reduce) step = Math.max(-maxStep * 1.6, Math.min(maxStep, step));
+    cur = reduce ? cur + step : Math.abs(target - cur) < 0.0008 ? target : cur + step;
     const zoomed = cur > 0.985;
     stage.classList.toggle('zoomed', zoomed);
-    stage.classList.toggle('zooming', cur > 0.02);
+    copyFade(cur);
     if (cur > 0.02 && cue) cue.classList.add('gone');
     let ping = 0;
     if (zoomed && !storyOn && !storyDone) { storyOn = true; storyT0 = now; }
@@ -289,7 +386,7 @@ export function initHero(GEO) {
       if (T > STORY_MS) { storyOn = false; storyDone = true; }
     }
     draw(cur, ping);
-    if (cur !== target || storyOn) raf = requestAnimationFrame(tick); else { raf = 0; lastT = 0; }
+    if ((!reduce && cur !== target) || storyOn) raf = requestAnimationFrame(tick); else { raf = 0; lastT = 0; }
   }
   const ctabar = document.querySelector('[data-nav-ctabar]');
   function guardBar() {
@@ -316,15 +413,25 @@ export function initHero(GEO) {
   function init() {
     setup(); layout(); lastWH = innerWidth + 'x' + sticky.clientHeight + '@' + devicePixelRatio;
     const h = location.hash;
+    if (mobile() && (reduce || h === '#final')) {
+      // móvil: la portada sigue fija; con movimiento reducido la historia sale entera al bajar, sin animación,
+      // y con #final se empieza en la historia terminada. Al subir, el texto vuelve.
+      storyDone = true; finalDom();
+      cur = target = h === '#final' ? 1 : (progress() >= 0.3 ? 1 : 0);
+      stage.classList.toggle('zoomed', cur > 0.985); copyFade(cur); draw(cur, 0); canvas.classList.add('ready');
+      if (cue) cue.classList.add('gone');
+      addEventListener('scroll', onScroll, { passive: true }); guardBar();
+      return;
+    }
     if (reduce || h === '#final') {
       pin.classList.add('hero-pin--static');
-      cur = target = 1; storyDone = true; stage.classList.add('zoomed'); finalDom(); draw(1, 0); canvas.classList.add('ready');
+      cur = target = 1; storyDone = true; stage.classList.add('zoomed'); finalDom(); copyFade(1); draw(1, 0); canvas.classList.add('ready');
       if (cue) cue.classList.add('gone');
       return;
     }
     cur = target = progress();
     if (cur > 0.985) { storyDone = true; stage.classList.add('zoomed'); finalDom(); }
-    draw(cur, 0);
+    copyFade(cur); draw(cur, 0);
     requestAnimationFrame(() => canvas.classList.add('ready'));
     addEventListener('scroll', onScroll, { passive: true });
     guardBar();
@@ -337,11 +444,19 @@ export function initHero(GEO) {
     // en el teléfono, la barra del navegador que aparece y se esconde no cambia la portada: no se redibuja
     const wh = innerWidth + 'x' + sticky.clientHeight + '@' + devicePixelRatio; if (wh === lastWH) return; lastWH = wh;
     setup(); layout();
-    if (storyDone || storyOn) { storyOn = false; storyDone = true; finalDom(); }
-    target = reduce ? 1 : progress(); if (reduce) cur = 1;
-    draw(cur, 0);
+    if (reduce) {
+      const m = mobile();
+      pin.classList.toggle('hero-pin--static', !m);
+      storyOn = false; storyDone = true; finalDom();
+      cur = target = m ? (progress() >= 0.3 ? 1 : 0) : 1;
+      stage.classList.toggle('zoomed', cur > 0.985);
+    } else {
+      if (storyDone || storyOn) { storyOn = false; storyDone = true; finalDom(); }
+      target = progress();
+    }
+    copyFade(cur); draw(cur, 0);
   });
   init();
   // las etiquetas se recolocan cuando llegan las fuentes (cambian de ancho)
-  document.fonts && document.fonts.ready.then(() => { setup(); layout(); if (storyDone) finalDom(); draw(cur, 0); });
+  document.fonts && document.fonts.ready.then(() => { setup(); layout(); if (storyDone) finalDom(); copyFade(cur); draw(cur, 0); });
 }

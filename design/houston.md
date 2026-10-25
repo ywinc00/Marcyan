@@ -232,6 +232,42 @@ Dos ciclos de captura y crítica (escritorio y móvil con táctil): planeta que 
 cambiar el tamaño de ventana, viñeta del chat cortada en móvil, imagen de proyectos sin cargar y hueco en la
 tercera columna, corregidos.
 
+**Página completa, vuelta 6: "entramos en la atmósfera" (2026-10-24).** Pedido del dueño: al bajar, el
+recorrido se siente como entrar en la atmósfera, con fondos de flujo fluidos y coherentes; animar la parte
+gráfica de las tarjetas de servicios; la portada NO se anima hasta que el visitante baja (los primeros
+segundos de bajar son la animación, luego baja normal); el pulso de los puntos, una sola vez; portafolio
+rehecho para esta página; inspiración de Refero y de la galería. Prototipo:
+https://claude.ai/artifact/A1rsWKMteZNjNfz1X5dcJx (fuente `design/houston-v6/pagina/`, se monta con
+`build4.py`).
+- **Fondo único fijo** (WebGL2 a 0,6 de resolución, 30 fps, pausa en pestaña oculta, CSS de reserva sin
+  WebGL2) con fases leídas de la posición de cada sección (`data-atmo`): espacio con estrellas que suben al
+  bajar → el borde del planeta sube detrás de servicios → atmósfera con corrientes lentas (dominio deformado,
+  calmada mientras dura el panel de proyectos: F-05 y F-06 no compiten) → terreno con curvas de nivel por
+  manchas (Houston y sectores; casi apagado en respuesta y preguntas, zonas de lectura) → amanecer en el
+  cierre: el horizonte sube y asoma el sol, eco del logo de "Tu negocio". Junto al formulario, quieto.
+- **Portada fija** mientras el desplazamiento dirige el acercamiento (suavizado con límite de velocidad:
+  nunca dura menos de ~1,2 s aunque se baje de golpe). Recorrido fijo de 150 vh: el acercamiento ocupa el 65 %
+  y el resto deja ver la historia quieta. Al volver arriba se aleja y oculta las etiquetas; al bajar otra vez
+  aparece el final sin repetir. Pista de desplazamiento mínima que se va al empezar (solo escritorio).
+- **Viñetas de servicios** (una vez al llegar, otra al pasar el ratón): la búsqueda se escribe y aparece "Tu
+  negocio" con Google, Maps y la IA; la web se construye y cambia ES → EN → ES; la conversación de las 11:42 p. m.
+  ocurre delante con "escribiendo" hasta "Cita apartada".
+- **Portafolio** `#proyectos`: panel fijo con navegador y teléfono (G-07) y las capturas reales de los 4
+  clientes, que cambian con una cortina que sube (o baja si se vuelve); a la derecha, por paso: qué hicimos,
+  resultado, etiquetas y enlace al servicio (texto real de `portfolio.ts`). En móvil, tarjetas apiladas.
+- **Reconstruidas en HTML** con su texto congelado: diagnóstico (anillo y barras de la demo EJEMPLO que suben,
+  F-12), respuesta directa (46 % y 76 % con su fuente), preguntas (6, todas cerradas), sigue explorando,
+  cierre y contacto. El pie sigue como captura.
+- Piezas: F-05, G-07, F-04, F-06, F-12, G-01, G-02, F-02. Referencias miradas en imagen: monopo saigon
+  `76c30104` (borde de planeta + flujo líquido), Active Theory `9d795615` (polvo de estrellas a la deriva),
+  Mike Matas `749d923d` (maquetas mínimas presentando trabajo real), Websmith `d9ea7f1e` (proyecto grande con
+  rótulo). Galería: curvas de nivel tipo Haikei (principio, no recurso), cifra que sube tipo Magic UI.
+- **Ojos:** 2 ciclos. Ciclo 1 (Chrome sin ventana): vetas del portafolio tipo mármol, curvas de nivel como
+  papel pintado detrás de la lectura y chat cortado; corregidos. Ciclo 2 en el **Chrome real con GPU** (Intel
+  UHD): portada quieta a los 2,5 s sin bajar, a 400 px va al 36 %, pulso terminado tras la historia (8/8
+  "finished"), al subir se oculta y al volver no repite; 65 fps bajando. Móvil 390 con táctil y movimiento
+  reducido revisados (nada queda invisible). Pendiente: OK del dueño sobre el render.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

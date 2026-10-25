@@ -70,3 +70,5 @@
 {"fecha":"2026-10-21","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Crawled - currently not indexed","url":"https://marcyanstudio.com/es/precios"}
 {"fecha":"2026-10-21","cliente":"marcyan","nivel":"media","tipo":"rastreo","detalle":"25 páginas indexadas llevan más de 30 días sin visita de Google","url":null}
 {"fecha":"2026-10-23","cliente":"marcyan","nivel":"media","tipo":"rastreo","detalle":"26 páginas indexadas llevan más de 30 días sin visita de Google","url":null}
+{"fecha":"2026-10-25","cliente":"marcyan","nivel":"alta","tipo":"indexacion","detalle":"Salió del índice: Crawled - currently not indexed","url":"https://marcyanstudio.com/en/miami/local-seo"}
+{"fecha":"2026-10-25","cliente":"marcyan","nivel":"media","tipo":"rastreo","detalle":"24 páginas indexadas llevan más de 30 días sin visita de Google","url":null}

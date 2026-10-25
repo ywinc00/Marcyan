@@ -242,15 +242,15 @@ a:hover>.arr{color:var(--accent-gold);transform:translateX(3px)}
 #metro{position:absolute;inset:0;width:100%;height:100%}
 .mp{position:absolute;z-index:2;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .5s var(--ease)}
 .local__map.on .mp{opacity:1}
-.mp i{position:relative;width:9px;height:9px;border-radius:50%;background:#0b0906;box-shadow:0 0 0 2px #f3ecdf,0 0 0 3.5px rgba(8,7,5,.5)}
+.mp i{position:relative;width:10px;height:10px;border-radius:50%;background:#0b0906;box-shadow:0 0 0 2px #f3ecdf,0 0 0 3.5px rgba(8,7,5,.5)}
 .mp i::after{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:1.5px solid rgba(243,236,223,.85);opacity:0}
 .local__map.on .mp i::after{animation:blip 1.6s var(--ease) 1 both;animation-delay:var(--d,0s)}
 .mp--hq i{width:11px;height:11px;background:#fbf6ec;box-shadow:0 0 0 2.5px #0b0906,0 0 0 6px rgba(251,246,236,.55),0 0 0 7.5px rgba(8,7,5,.4)}
-.mp span,.mp a{pointer-events:auto;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-primary);background:rgba(10,9,8,.86);border:1px solid rgba(240,237,232,.14);padding:5px 9px;border-radius:6px;white-space:nowrap}
-.mp a{display:inline-flex;align-items:center;gap:6px;border-color:var(--accent-gold-line)}
-.mp a svg{width:12px;height:12px;color:var(--accent-gold)}
+.mp span,.mp a{pointer-events:auto;font-family:var(--font-body);font-size:13.5px;font-weight:600;line-height:1;letter-spacing:0;color:#f6f3ee;background:rgba(9,8,7,.94);border:1px solid rgba(240,237,232,.26);padding:7px 11px;border-radius:6px;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.mp a{display:inline-flex;align-items:center;gap:6px;border-color:var(--accent-gold)}
+.mp a svg{width:13px;height:13px;color:var(--accent-gold)}
 .mp a:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
-.local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-secondary)}
+.local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;background:rgba(9,8,7,.8);padding:5px 8px;border-radius:4px}
 
 /* ── 5 · Sectores ── */
 .sectors__list{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;border-top:1px solid var(--border)}
@@ -452,10 +452,10 @@ a:hover>.arr{color:var(--accent-gold);transform:translateX(3px)}
 /* ── zonas enlazadas bajo el mapa (la lista manda; el mapa ilustra) ── */
 .local__right{min-width:0}
 .zones{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-.zones__z{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 12px;border-radius:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-secondary);background:rgba(12,11,10,.86);border:1px solid rgba(240,237,232,.12);transition:border-color .2s,color .2s}
+.zones__z{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border-radius:var(--radius-md);font-family:var(--font-body);font-size:14.5px;font-weight:500;letter-spacing:0;color:var(--fg-primary);background:rgba(14,13,12,.9);border:1px solid rgba(240,237,232,.16);transition:border-color .2s,color .2s}
 .zones__z--hq{color:var(--fg-primary)}
-.zones__z--link{color:var(--fg-primary);border-color:var(--accent-gold-line)}
-.zones__z--link svg{width:12px;height:12px;color:var(--accent-gold);transition:transform .2s}
+.zones__z--link{color:var(--fg-primary);border-color:var(--accent-gold-line);font-weight:600}
+.zones__z--link svg{width:14px;height:14px;color:var(--accent-gold);transition:transform .2s}
 .zones__z--link:hover,.zones__z--link:focus-visible,.zones__z.hl{border-color:var(--accent-gold);color:var(--accent-gold)}
 .zones__z--link:hover svg{transform:translateX(2px)}
 .mp i{transition:transform .25s var(--ease)}

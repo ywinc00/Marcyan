@@ -153,7 +153,7 @@
       W = plate.clientWidth; H = plate.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1); pats.clear();
       cv.width = W * dpr; cv.height = H * dpr;
       const p = document.createElement('canvas'); p.width = p.height = Math.round(6 * dpr);
-      const pc = p.getContext('2d'); pc.fillStyle = 'rgba(8,7,5,.22)'; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 0.9 * dpr, 0, Math.PI * 2); pc.fill();
+      const pc = p.getContext('2d'); pc.fillStyle = 'rgba(8,7,5,.12)'; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 0.9 * dpr, 0, Math.PI * 2); pc.fill();   // trama más suave: no ensucia los rótulos
       fine = c.createPattern(p, 'repeat'); if (fine.setTransform) fine.setTransform(new DOMMatrix().scale(1 / dpr));
     }
     function projFor(k) {

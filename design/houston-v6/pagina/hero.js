@@ -31,7 +31,7 @@
   const pin = document.getElementById('heroPin'), sticky = document.getElementById('heroSticky'), stage = document.getElementById('stage');
   const canvas = document.getElementById('globe');
   const ctx = canvas.getContext('2d');
-  let F, dpr, scale = 1;
+  let F, dpr, scale = 1, ox = 0, oy = 0;          // ox/oy: margen del lienzo fuera del escenario de 1440×900 (pantallas más anchas o altas)
   const landGlobal = () => ({ type: 'MultiPolygon', coordinates: mobile() && GEO.land110.length ? GEO.land110 : GEO.land50 });
   let land110 = landGlobal();
   const land10 = { type: 'MultiPolygon', coordinates: GEO.tx10 };
@@ -41,7 +41,10 @@
     F = frames();
     land110 = landGlobal();
     dpr = Math.min(1.75, (window.devicePixelRatio || 1) * (mobile() ? 1 : scale)); patCache.clear();
-    canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
+    // el lienzo cubre toda la pantalla, no solo el escenario: así el planeta y su brillo no se cortan en seco
+    canvas.width = Math.round((F.W + 2 * ox) * dpr); canvas.height = Math.round((F.H + 2 * oy) * dpr);
+    if (ox || oy) Object.assign(canvas.style, { left: -ox + 'px', top: -oy + 'px', width: F.W + 2 * ox + 'px', height: F.H + 2 * oy + 'px' });
+    else Object.assign(canvas.style, { left: '', top: '', width: '', height: '' });
   }
 
   const patCache = new Map();
@@ -83,8 +86,8 @@
 
   function draw(t, satPing) {
     const s = state(t);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, F.W, F.H);
+    ctx.setTransform(dpr, 0, 0, dpr, ox * dpr, oy * dpr);
+    ctx.clearRect(-ox, -oy, F.W + 2 * ox, F.H + 2 * oy);
     const halo = ctx.createRadialGradient(s.cx, s.cy, s.R * 0.9, s.cx, s.cy, s.R * 1.35);
     halo.addColorStop(0, 'rgba(200,169,110,.10)'); halo.addColorStop(1, 'rgba(200,169,110,0)');
     ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R * 1.35, 0, Math.PI * 2); ctx.fill();
@@ -244,12 +247,13 @@
   }
 
   function fit() {
-    if (mobile()) { scale = 1; stage.style.transform = 'none'; stage.style.left = '0px'; stage.style.top = '0px'; return; }
+    if (mobile()) { scale = 1; ox = oy = 0; stage.style.transform = 'none'; stage.style.left = '0px'; stage.style.top = '0px'; return; }
     const vw = sticky.clientWidth, vh = sticky.clientHeight;
     scale = Math.min(vw / 1440, vh / 900);
     stage.style.transform = `scale(${scale})`;
     stage.style.left = (vw - 1440 * scale) / 2 + 'px';
     stage.style.top = (vh - 900 * scale) / 2 + 'px';
+    ox = Math.max(0, Math.ceil((vw / scale - 1440) / 2)); oy = Math.max(0, Math.ceil((vh / scale - 900) / 2));
   }
 
   function init() {

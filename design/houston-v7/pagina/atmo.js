@@ -84,13 +84,15 @@ void main(){
   vec3 col = vec3(0.031, 0.031, 0.03);
   float t = uTime * 0.03 * (1.0 - 0.8*uCalm);
   float open = 0.0;
+  vec3 light = vec3(0.0);                              // luz que se suma encima de todo (no se tapa con la transparencia)
+  float pw = 1.0 / uRes.y;                             // un píxel del lienzo, en las unidades de p
 
   // ── borde del planeta a contraluz ──
   float R = 2.6;
   vec2 c = vec2(asp*0.5, uLimbY - R);
   float d = length(p - c) - R;                         // >0 espacio, <0 planeta
   float above = step(0.0, d);
-  float inside = smoothstep(0.004, -0.018, d) * uLimbA;
+  float inside = smoothstep(1.5*pw, -max(0.018, 3.0*pw), d) * uLimbA;
   float glare = 0.0;
   if (uLimbA > 0.004) {
     vec2 sp = vec2(asp*0.5, uLimbY - 0.014);
@@ -101,16 +103,17 @@ void main(){
     col = mix(col, vec3(0.02, 0.019, 0.017) + vec3(0.2, 0.13, 0.06)*scat*(0.12 + 0.5*near), inside);
     // la capa de aire iluminada por detrás: un halo fino que se ensancha cerca del sol
     float air = exp(-max(d, 0.0)*mix(16.0, 4.5, near)) * above;
-    col += vec3(0.55, 0.38, 0.17) * air * (0.1 + 0.6*near) * uLimbA;
-    col += vec3(0.98, 0.88, 0.66) * exp(-abs(d)*240.0) * (0.3 + 1.4*near) * uLimbA;
+    light += vec3(0.55, 0.38, 0.17) * air * (0.1 + 0.6*near) * uLimbA;
+    float lw = max(1.25*pw, 0.0026);                     // la línea nunca más fina que ~1,3 píxeles: así no se escalona
+    light += vec3(0.98, 0.88, 0.66) * exp(-(d*d)/(lw*lw)) * (0.3 + 1.4*near) * uLimbA;
     // el sol asomando por el borde: núcleo, resplandor y una raya horizontal suave
     float sd = length((p - sp)*vec2(1.0, 1.3));
     float core = exp(-sd*34.0) * smoothstep(-0.006, 0.012, d);
     glare = exp(-sd*5.0) * uSun;
     float streak = exp(-abs(p.y - sp.y)*85.0) * exp(-dx*1.4) * above;
-    col += vec3(1.0, 0.95, 0.84) * core * 1.5 * uSun;
-    col += vec3(0.8, 0.6, 0.32) * glare * 0.42 * (0.35 + 0.65*above);
-    col += vec3(0.95, 0.78, 0.48) * streak * 0.5 * uSun;
+    light += vec3(1.0, 0.95, 0.84) * core * 1.5 * uSun;
+    light += vec3(0.8, 0.6, 0.32) * glare * 0.42 * (0.35 + 0.65*above);
+    light += vec3(0.95, 0.78, 0.48) * streak * 0.5 * uSun;
   }
   open = max(open, uSpace * (1.0 - inside) * (1.0 - clamp(glare*1.6, 0.0, 1.0)));
 
@@ -191,7 +194,7 @@ void main(){
   }
 
   float a = 1.0 - clamp(open, 0.0, 1.0)*0.94;
-  o = vec4(col*a, a);
+  o = vec4(col*a + light, a);
 }`;
   const VS = `#version 300 es
 in vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;

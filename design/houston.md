@@ -481,3 +481,20 @@ propuesta en 24 horas. No se fusionan.
 Sub-agentes invocados: auditoría de la landing viva (solo lectura).
 Puerta de salida pendiente: checklist de `design/frontend-design.md` + protocolo Ojos
 (2 ciclos de render, captura y crítica) antes de enseñar la construcción.
+
+
+**Vuelta 9 (2026-10-25).** Correcciones del dueño sobre la 8, en página aparte (v8 intacta):
+https://claude.ai/artifact/8Tm146y57jNrDtBePzLFSQ (fuente `design/houston-v9/pagina/`, `build7.py`).
+- Arco de la atmósfera sin dientes de sierra (también aplicado a v7 y v8): línea con grosor mínimo suavizable y luz sumada por encima.
+- Tarjetas de servicios sin precios (siguen en preguntas frecuentes y en "Ver todos los precios").
+- Proyectos: el paso que se está leyendo se ve entero; solo se apaga en el último tramo antes del siguiente. Las capturas cambian con
+  fundido acelerado por la tarjeta gráfica (antes, cortina con clip-path).
+- Fluidez: la capa fija de grano con mezcla daba tirones (65 fotogramas lentos en un recorrido completo; ahora 3, medido en Chrome real
+  con Intel UHD). El fondo va a todos los fotogramas; el grano vive dentro del fondo.
+- Mapa de zonas: Loop 610, Beltway 8, Grand Parkway, radiales (I-10, I-45, US-59, US-290, SH-288, SH-225), canal de barcos y Lake Houston,
+  comprobados contra OpenStreetMap; visibles desde el primer fotograma. El mapa del hero no se toca.
+- Fondos después del mapa (sectores, diagnóstico, respuesta, preguntas, cierre, contacto): la noche del viaje con nubes en los márgenes
+  (fuera de la columna de texto) y el resplandor de la ciudad bajo el horizonte; fuera las curvas de nivel y el amanecer. Cierre compacto.
+- Pie: silueta calcada de una foto con licencia libre (Wikimedia Commons, "DowntownHouston.jpg", CC BY-SA 2.0, vista desde Buffalo
+  Bayou), comprobada con la foto superpuesta; valor propio por torre, filo de luz solo en las coronas, resplandor detrás, ventanas por
+  plantas y balizas rojas en las más altas. Lecciones E-41 a E-43 al ledger.

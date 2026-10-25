@@ -268,6 +268,29 @@ https://claude.ai/artifact/A1rsWKMteZNjNfz1X5dcJx (fuente `design/houston-v6/pag
   "finished"), al subir se oculta y al volver no repite; 65 fps bajando. Móvil 390 con táctil y movimiento
   reducido revisados (nada queda invisible). Pendiente: OK del dueño sobre el render.
 
+**Vuelta 6, arreglo (comentario del dueño).** "Una línea rara" en la portada: en pantallas más anchas que 1440 el planeta se cortaba
+en seco por la derecha y, al bajar, en una línea horizontal. El lienzo del planeta ahora cubre la ventana entera y el borde inferior
+de la portada se funde. Lección E-36 al ledger. Punto de regreso: etiqueta `houston-v6-atmosfera` y el prototipo
+https://claude.ai/artifact/A1rsWKMteZNjNfz1X5dcJx (versión 2).
+
+**Vuelta 7: "el viaje" (2026-10-24).** El dueño describe la página como un plano continuo: planeta que se acerca a Houston → entrar en la
+atmósfera viendo el borde a contraluz con el sol por el centro (servicios) → dentro, cielo de noche estrellado con algunas nubes
+(proyectos) → la silueta de Houston desde arriba, que se acerca hasta el mapa con las zonas → el resto con fondos parecidos → el pie
+cierra con el skyline lejano, protagonista el cielo con nubes. Prototipo aparte (la vuelta 6 queda intacta):
+https://claude.ai/artifact/V3db8f3ctFNusP7j6QFR45 (fuente `design/houston-v7/pagina/`, `build5.py`).
+- **Servicios:** cabecera centrada sola sobre el horizonte del planeta; debajo, el sol asoma por el borde a contraluz (núcleo, halo de
+  la capa de aire más ancho cerca del sol y una raya horizontal suave); las tarjetas suben sobre la cara de noche del planeta.
+- **Estrellas nítidas por debajo del lienzo:** el lienzo es transparente donde hay cielo abierto, así las nubes y el planeta las tapan.
+- **Proyectos:** noche con nubes cálidas iluminadas por una luna fuera de cuadro; calmadas mientras dura el panel fijo.
+- **Houston desde arriba:** el fondo dibuja la ciudad de noche con sus tres anillos (610, Beltway 8, Grand Parkway) y las radiales,
+  sin la bahía; se acerca al bajar y se apaga al llegar al mapa. El mapa empieza igual (la ciudad iluminada desde lejos) y al entrar
+  vuela 2,6 s hasta el bronce con las zonas, que hacen su pulso una vez. Estilizado, sin detalle de calles.
+- **Pie propio de esta página** (el contenido del pie del sitio intacto): cielo de noche con nubes encendidas por la ciudad y la silueta
+  lejana del centro de Houston y Uptown (JPMorgan Chase, Wells Fargo, Bank of America Center, Pennzoil, Heritage Plaza, Williams
+  Tower), sutil, con algunas ventanas encendidas. Ojo: el pie global "El Arribo" no se toca; esto es solo para esta página, como pidió.
+- Ojos: Chrome real (1440, 1920 y salida de la portada) y móvil 390 con táctil. Corregido en los ciclos: ciudad que parecía polvo dorado,
+  nubes invisibles, ventanas fuera de las torres, borde del brillo del pie y ciudad demasiado intensa detrás del texto.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

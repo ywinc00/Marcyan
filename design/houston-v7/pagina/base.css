@@ -1,0 +1,79 @@
+/* Bocetos Houston, quinta vuelta. Tokens y gramática copiados del sitio vivo
+   (tokens.css, base.css, SiteNav, Button). Nada de esto inventa sistema. */
+:root{
+  color-scheme:dark;
+  --bg-base:#080808; --bg-2:#0e0e0d; --bg-card:#141414; --bg-elevated:#1c1c1c;
+  --accent-gold:#c8a96e; --accent-gold-deep:#8a6630;
+  --accent-gold-dim:rgba(200,169,110,.15); --accent-gold-line:rgba(200,169,110,.30); --accent-gold-glow:rgba(200,169,110,.25);
+  --accent-teal:#4fc3a1;
+  --planet-core:#2e2010;
+  --fg-primary:#f0ede8; --fg-secondary:#9a9590; --fg-subtle:#4a4845; --fg-inverse:#080808;
+  --border:#242420; --border-subtle:#1a1a18;
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-xl:20px; --radius-pill:100px;
+  --font-display:'Space Grotesk',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --text-xs:11px; --text-label:12px; --text-sm:13px; --text-base:16px; --text-md:18px; --text-lg:22px; --text-xl:28px;
+  --fluid-display:clamp(2.5rem,1.30rem + 6.00vw,5rem);
+  --fluid-lead:clamp(1.0625rem,.95rem + .45vw,1.25rem);
+  --tracking-tight:-0.03em; --tracking-wide:.06em; --tracking-wider:.12em;
+  --tap-min:44px;
+  /* superficie de papel para tarjetas de demo: legible, no compite con el titular (aprobada en la prueba Refero) */
+  --surface-paper:#e8e2d8;
+  --edge-light:inset 0 1px 0 rgba(240,237,232,.07);
+  --shadow-float:0 18px 40px rgba(6,5,3,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg-base)}
+body{font-family:var(--font-body);color:var(--fg-primary);position:relative;overflow:hidden;-webkit-font-smoothing:antialiased;width:100vw;height:100vh}
+a{color:inherit;text-decoration:none}
+ol,ul{list-style:none}
+:focus-visible{outline:2px solid var(--accent-gold);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+/* ── barra: gramática de SiteNav ── */
+.nav{position:absolute;z-index:5;left:112px;right:112px;top:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.logo{display:inline-flex;flex-direction:column;gap:2px;line-height:1}
+.logo__word{font-family:var(--font-display);font-weight:700;font-size:var(--text-md);letter-spacing:.16em;color:var(--fg-primary)}
+.logo__word b{font-weight:700;color:var(--accent-gold)}
+.logo__tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;color:var(--fg-secondary)}
+.nav__links{display:flex;align-items:center;gap:32px}
+.nav__links a{font-size:var(--text-sm);color:var(--fg-secondary);padding:8px 0;white-space:nowrap}
+.nav__links a.is-on{color:var(--fg-primary)}
+.nav__actions{display:flex;align-items:center;gap:12px}
+.lang{display:inline-flex;align-items:center;gap:8px}
+.lang__opt{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:var(--tracking-wide);color:var(--fg-secondary);min-height:var(--tap-min);display:inline-flex;align-items:center}
+.lang__opt.is-on{color:var(--accent-gold)}
+.lang__sep{width:1px;height:13px;background:var(--border)}
+.nav__cta{display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap-min);padding:9px 18px;border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:600;color:var(--accent-gold);background:var(--accent-gold-dim);border:1px solid var(--accent-gold-line)}
+.menu{display:none;align-items:center;justify-content:center;width:var(--tap-min);height:var(--tap-min);color:var(--fg-primary)}
+.menu svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+
+/* ── tipografía del sitio ── */
+.kicker{font-family:var(--font-mono);font-size:var(--text-label);letter-spacing:var(--tracking-wider);color:var(--fg-secondary);text-transform:uppercase;display:inline-flex;align-items:center;gap:10px}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--accent-gold);display:inline-block}
+.display{font-family:var(--font-display);font-size:var(--fluid-display);font-weight:700;line-height:1.1;letter-spacing:var(--tracking-tight);text-wrap:balance}
+.display em{color:var(--accent-gold);font-style:normal}
+.lead{font-size:var(--fluid-lead);line-height:1.6;color:var(--fg-secondary);text-wrap:pretty}
+
+/* ── botones: gramática de Button.astro ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 24px;border-radius:var(--radius-md);font-weight:600;font-size:var(--text-base);white-space:nowrap}
+.btn--primary{background:var(--accent-gold);color:var(--fg-inverse)}
+.btn--ghost{color:var(--fg-primary);padding:0 8px}
+.btn--ghost svg{width:18px;height:18px;color:var(--accent-gold)}
+.micro{font-size:var(--text-sm);color:var(--fg-secondary)}
+
+/* ── piezas de demo comunes ── */
+.pill{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:var(--tracking-wider);line-height:1;padding:5px 8px;border-radius:var(--radius-pill);border:1px solid currentColor;opacity:.8;white-space:nowrap}
+.paper{background:var(--surface-paper);color:var(--fg-inverse);border-radius:var(--radius-lg);box-shadow:var(--shadow-float)}
+.glass{background:linear-gradient(180deg,rgba(28,28,28,.72),rgba(14,14,13,.82));border:1px solid rgba(240,237,232,.10);box-shadow:var(--edge-light),0 18px 40px rgba(0,0,0,.45);border-radius:var(--radius-lg)}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.06;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.stars{position:absolute;left:0;top:0;width:100%;height:70%;pointer-events:none}
+
+/* ── móvil (boceto a 390): barra con hamburguesa, como SiteNav < md ── */
+@media (max-width:600px){
+  .nav{left:20px;right:12px;top:8px}
+  .nav__links,.nav__cta{display:none}
+  .menu{display:inline-flex}
+  .btn{height:52px}
+}

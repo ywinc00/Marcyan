@@ -209,6 +209,29 @@ NO lo hace el chat de diseño: queda encargado al chat de SEO en
   hilos nacen del punto hacia la etiqueta y el hilo a la ficha baja con frenada; la ficha entra con leve escala.
   Fluidez: 8,6 ms por fotograma sin aceleración gráfica.
 
+**Página completa, primera versión (2026-10-24).** El dueño da por buena la portada (puntos y etiquetas
+sincronizados: salen a la vez) y pide la página completa "buscando resultados top". Prototipo:
+https://claude.ai/artifact/Ny1GsjAY6qHGBKcNw5xyKq (fuente `design/houston-v5/pagina/`, se monta con
+`build_page.py` sobre `planeta/portada-houston-zoom.html`). Orden y trabajo de cada bloque:
+1. **Portada** (planeta). Sin riel de datos: el precio y el teléfono salen una vez más abajo.
+2. **Servicios** `#servicios`: la historia de la portada servicio a servicio, en tres pasos reales
+   (01 Te encuentran: SEO local $600/mes, SEO para IA diagnóstico gratis · 02 Te eligen: diseño web $1,500,
+   bilingüe $1,500, tienda $2,900, branding $750 · 03 Te contestan: IA conversacional $900), cada paso con
+   una viñeta hecha con las piezas de la portada. **El precio aparece una sola vez en la página.** Los 7
+   enlaces del silo, intactos. Piezas I-04 (pasos en orden real), B-01 (filas con precio), G-09.
+3. **Proyectos** (sección actual, no cambia).
+4. **Houston** (nuevo, fusiona la ficha y la cobertura): los dos párrafos del mercado intactos, datos de
+   contacto (sin coordenadas, E-13) y el mapa del área en plano con las zonas; Katy y Sugar Land enlazan a
+   sus páginas. **La cobertura sale una sola vez.** Piezas G-09, A-07.
+5. **Sectores** (nuevo): los 7 sectores con la búsqueda típica de su cliente, que continúa las búsquedas de
+   la portada. Pieza B-07 (índice editorial).
+6. **Diagnóstico** (actual): **único imán de captación**; desaparece la franja de calculadoras.
+7. Respuesta directa y preguntas frecuentes (actuales, congeladas). 8. Sigue explorando (actual).
+9. Cierre y contacto (actuales); desaparece la franja de "compromisos", que repetía promesas.
+Dos ciclos de captura y crítica (escritorio y móvil con táctil): planeta que volvía al encuadre inicial al
+cambiar el tamaño de ventana, viñeta del chat cortada en móvil, imagen de proyectos sin cargar y hueco en la
+tercera columna, corregidos.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

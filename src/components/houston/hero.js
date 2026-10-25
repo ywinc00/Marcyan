@@ -18,12 +18,15 @@ export function initHero(GEO) {
   if (!pin || !stage) return;
   // nombres y búsquedas vienen del idioma de la página (data-pins); la posición es diseño
   const ZONES = JSON.parse(stage.dataset.pins || '[]').map((z, i) => Object.assign({}, ZONES_POS[i], z));
-  const mobile = () => innerWidth <= 600;
+  // por debajo de 900 px la portada se compone en vertical (texto arriba, planeta abajo)
+  // teléfono en horizontal (poca altura): composición en horizontal, sin etiquetas (la búsqueda va en la ficha)
+  const mobile = () => innerWidth < 900 && innerHeight >= 520;
+  const tagsOff = () => mobile() || innerHeight < 520;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function frames() {
     if (mobile()) {
-      const W = innerWidth, H = sticky.clientHeight || innerHeight;
+      const W = sticky.clientWidth || innerWidth, H = sticky.clientHeight || innerHeight;
       // Houston queda justo debajo del texto (lo mide: el inglés ocupa más) y la ficha cabe entera debajo
       const copy = stage.querySelector('.copy');
       // pantallas cortas: al acercarse, el párrafo de entrada se recoge para dejar sitio a la historia
@@ -31,19 +34,40 @@ export function initHero(GEO) {
       const lead = copy && copy.querySelector('.lead');
       let cb = copy ? copy.getBoundingClientRect().bottom - stage.getBoundingClientRect().top : H * 0.62;
       if (short && lead && !stage.classList.contains('zoomed')) cb -= lead.scrollHeight + 16;
-      const ty = Math.min(H * 0.80, Math.max(H * 0.70, cb + 96));
+      const ty = Math.min(H * 0.80, Math.max(H * 0.70, cb + 110));
+      const Ra = Math.min(W * 0.44, H * 0.24, 260), k = Ra / 171, Rb = Ra * 1.37;
+      // al empezar, el planeta asoma por debajo de TODO el texto (nunca detrás del teléfono ni del botón)
+      const full = copy ? copy.getBoundingClientRect().bottom - stage.getBoundingClientRect().top : H * 0.62;
       return {
         W, H, ty,
-        A: { cx: W * 0.62, cy: H * 0.86, R: Math.min(170, W * 0.44), center: [-97, 33] },
-        B: { cx: W * 0.70, cy: ty + H * 0.21, R: W * 0.60, target: [W * 0.60, ty], kmpx: 1.4 },
+        A: { cx: W * 0.62, cy: Math.max(H * 0.86, full + 20 + Ra), R: Ra, center: [-97, 33] },
+        // la lente baja lo justo para que las cuatro zonas queden dentro del disco
+        B: { cx: W * 0.70, cy: ty + Rb * 0.55, R: Rb, target: [W * 0.60, ty], kmpx: 1.4 * k },
       };
     }
-    return { W: 1440, H: 900, A: { cx: 1080, cy: 470, R: 300, center: [-97, 33] }, B: { cx: 1250, cy: 520, R: 400, target: [1112, 462], kmpx: 3.3 } };
+    // Escritorio, a pantalla completa: el texto va alineado con la barra (contenedor del sitio) y el planeta
+    // se ancla al borde derecho de la ventana, con aire de sobra entre los dos (ya no hay caja central escalada).
+    const W = sticky.clientWidth, H = sticky.clientHeight;
+    const copy = stage.querySelector('.copy'), sr = stage.getBoundingClientRect();
+    const copyRight = copy ? copy.getBoundingClientRect().right - sr.left : W * 0.45;
+    // el planeta entero a la vista al empezar, nunca encima del texto; crece con la altura de la pantalla
+    // el aro (1,17 R hacia la izquierda) nunca se acerca a menos de 48 px del texto; el planeta deja aire al borde
+    const edge = Math.max(24, W * 0.025);
+    const R = Math.min(H * 0.34, W * 0.27, (W - edge - copyRight - 48) / 2.17);
+    const cx = Math.min(W - R - edge, Math.max(W * 0.75, copyRight + 48 + R * 1.17)), cy = H * 0.53;
+    // el acercamiento conserva las proporciones del prototipo aprobado (1440×900: R 300 → lente de 400)
+    // las zonas conservan la separación del prototipo en portátiles, pero siempre caben dentro de la lente
+    const k = Math.min(1.4, Math.max(Math.min(0.95, R / 240), R / 300));
+    return {
+      W, H,
+      A: { cx, cy, R, center: [-97, 33] },
+      B: { cx: cx + R * 0.567, cy: cy + R * 0.167, R: R * 1.333, target: [cx + R * 0.107, cy - R * 0.027], kmpx: 3.3 * k },
+    };
   }
 
   const canvas = document.getElementById('hx-globe');
   const ctx = canvas.getContext('2d');
-  let F, dpr, scale = 1, ox = 0, oy = 0;          // ox/oy: margen del lienzo fuera del escenario de 1440×900 (pantallas más anchas o altas)
+  let F, dpr;
   const landGlobal = () => ({ type: 'MultiPolygon', coordinates: !mobile() && GEO.land50 ? GEO.land50 : GEO.land110 });
   let land110 = landGlobal();
   const land10 = { type: 'MultiPolygon', coordinates: GEO.tx10 };
@@ -52,11 +76,13 @@ export function initHero(GEO) {
   function setup() {
     F = frames();
     land110 = landGlobal();
-    dpr = mobile() ? Math.min(2, window.devicePixelRatio || 1) : Math.min(1.75, (window.devicePixelRatio || 1) * scale); patCache.clear();
-    // el lienzo cubre toda la pantalla, no solo el escenario: así el planeta y su brillo no se cortan en seco
-    canvas.width = Math.round((F.W + 2 * ox) * dpr); canvas.height = Math.round((F.H + 2 * oy) * dpr);
-    if (ox || oy) Object.assign(canvas.style, { left: -ox + 'px', top: -oy + 'px', width: F.W + 2 * ox + 'px', height: F.H + 2 * oy + 'px' });
-    else Object.assign(canvas.style, { left: '', top: '', width: '', height: '' });
+    dpr = Math.min(mobile() ? 2 : 1.75, window.devicePixelRatio || 1); patCache.clear();
+    // el lienzo es la ventana entera (CSS 100 % × 100 %): el planeta y su brillo nunca se cortan
+    canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
+    // el resplandor dorado del fondo sigue al planeta
+    const cueEl = document.getElementById('hx-cue'), copyEl = stage.querySelector('.copy');
+    if (cueEl && copyEl) { cueEl.hidden = false; cueEl.hidden = cueEl.getBoundingClientRect().top < copyEl.getBoundingClientRect().bottom + 24; }
+    stage.style.setProperty('--pcx', F.A.cx + 'px'); stage.style.setProperty('--pcy', F.A.cy + 'px'); stage.style.setProperty('--pr', F.A.R + 'px');
   }
 
   const patCache = new Map();
@@ -98,8 +124,8 @@ export function initHero(GEO) {
 
   function draw(t, satPing) {
     const s = state(t);
-    ctx.setTransform(dpr, 0, 0, dpr, ox * dpr, oy * dpr);
-    ctx.clearRect(-ox, -oy, F.W + 2 * ox, F.H + 2 * oy);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, F.W, F.H);
     const halo = ctx.createRadialGradient(s.cx, s.cy, s.R * 0.9, s.cx, s.cy, s.R * 1.35);
     halo.addColorStop(0, 'rgba(200,169,110,.10)'); halo.addColorStop(1, 'rgba(200,169,110,0)');
     ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(s.cx, s.cy, s.R * 1.35, 0, Math.PI * 2); ctx.fill();
@@ -179,21 +205,32 @@ export function initHero(GEO) {
       pinsBox.appendChild(tag);
       const th = 50;
       let lx, ly;
-      if (mobile()) { lx = -999; ly = -999; } else { lx = x + z.dx; ly = z.side === 'up' ? y - z.wire - th : y + z.wire; }
+      if (tagsOff()) { lx = -999; ly = -999; } else { lx = x + z.dx; ly = z.side === 'up' ? y - z.wire - th : y + z.wire; }
       tag.style.left = lx + 'px'; tag.style.top = ly + 'px';
       const wy1 = z.side === 'up' ? ly + th : y, wy2 = z.side === 'up' ? y : ly;
       const line = mkWire(x, y, x, z.side === 'up' ? ly + th : ly);
       line.style.strokeDasharray = Math.abs(wy2 - wy1); line.style.strokeDashoffset = Math.abs(wy2 - wy1);
-      if (mobile()) line.style.display = 'none';
+      if (tagsOff()) line.style.display = 'none';
       wires.appendChild(line);
       items.push({ z, pt, tag, line, x, y, lx, ly, i });
     });
     const P = items.find((it) => it.z.lit);
-    const fx = mobile() ? 20 : Math.min(P.x - 190, 1328 - 344), fy = mobile() ? F.ty + 30 : P.y + 200;
+    const fq = document.getElementById('hx-found-q');
+    if (fq) { fq.querySelector('span').textContent = P.z.q; fq.hidden = !tagsOff(); }
+    // la ficha cuelga del punto encendido y cabe entera en pantalla, también en portátiles de poca altura
+    const drop = Math.min(200, Math.max(120, F.H * 0.22));
+    // nunca encima del texto: si no cabe a su lado, la ficha se estrecha (teléfono en horizontal)
+    let fx = 20;
+    if (!mobile()) {
+      const cEl = stage.querySelector('.copy'), cr = cEl ? cEl.getBoundingClientRect().right - stage.getBoundingClientRect().left : 0;
+      fx = Math.max(cr + 24, Math.min(P.x - 190, F.W - 112 - 344));
+      found.style.width = Math.min(344, F.W - 16 - fx) + 'px';
+    } else found.style.width = '';
+    const fy = mobile() ? F.ty + 30 : Math.min(P.y + drop, F.H - (found.offsetHeight || 140) - 28);
     found.style.left = fx + 'px'; found.style.top = fy + 'px';
     const down = mkWire(P.x, P.y + 9, P.x, fy); down.classList.add('down');
     down.style.strokeDasharray = fy - P.y; down.style.strokeDashoffset = fy - P.y;
-    if (mobile()) down.style.display = 'none';
+    if (tagsOff()) down.style.display = 'none';
     wires.appendChild(down); P.down = down;
   }
 
@@ -241,6 +278,7 @@ export function initHero(GEO) {
     cur = Math.abs(target - cur) < 0.0008 ? target : cur + step;
     const zoomed = cur > 0.985;
     stage.classList.toggle('zoomed', zoomed);
+    stage.classList.toggle('zooming', cur > 0.02);
     if (cur > 0.02 && cue) cue.classList.add('gone');
     let ping = 0;
     if (zoomed && !storyOn && !storyDone) { storyOn = true; storyT0 = now; }
@@ -259,45 +297,51 @@ export function initHero(GEO) {
     document.body.classList.toggle('hx-pinned', pinned);            // el globo del chat espera a que termine la portada
     if (ctabar && pinned) { ctabar.classList.remove('is-visible'); document.body.classList.remove('has-ctabar'); }
   }
+  // al salir la portada, la ficha clara se funde antes de meterse bajo la barra (no queda una tira suelta)
+  function exitFade() {
+    if (!found.classList.contains('on')) return;
+    const ex = scrollY - pin.offsetTop - (pin.offsetHeight - sticky.offsetHeight);
+    if (ex <= 0) { if (found.dataset.xf) { found.style.opacity = ''; found.style.transition = ''; delete found.dataset.xf; } return; }
+    const top = (parseFloat(found.style.top) || 0) - ex;
+    found.dataset.xf = '1'; found.style.transition = 'none';
+    found.style.opacity = Math.max(0, Math.min(1, (top - 72) / 110)).toFixed(3);
+  }
   function onScroll() {
-    guardBar();
+    guardBar(); exitFade();
     target = progress();
     if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
   }
 
-  function fit() {
-    if (mobile()) { scale = 1; ox = oy = 0; stage.style.transform = 'none'; stage.style.left = '0px'; stage.style.top = '0px'; return; }
-    const vw = sticky.clientWidth, vh = sticky.clientHeight;
-    scale = Math.min(vw / 1440, vh / 900);
-    stage.style.transform = `scale(${scale})`;
-    stage.style.left = (vw - 1440 * scale) / 2 + 'px';
-    stage.style.top = (vh - 900 * scale) / 2 + 'px';
-    ox = Math.max(0, Math.ceil((vw / scale - 1440) / 2)); oy = Math.max(0, Math.ceil((vh / scale - 900) / 2));
-  }
 
   function init() {
-    fit(); setup(); layout();
+    setup(); layout(); lastWH = innerWidth + 'x' + sticky.clientHeight + '@' + devicePixelRatio;
     const h = location.hash;
     if (reduce || h === '#final') {
       pin.classList.add('hero-pin--static');
-      cur = target = 1; storyDone = true; stage.classList.add('zoomed'); finalDom(); draw(1, 0);
+      cur = target = 1; storyDone = true; stage.classList.add('zoomed'); finalDom(); draw(1, 0); canvas.classList.add('ready');
       if (cue) cue.classList.add('gone');
       return;
     }
     cur = target = progress();
     if (cur > 0.985) { storyDone = true; stage.classList.add('zoomed'); finalDom(); }
     draw(cur, 0);
+    requestAnimationFrame(() => canvas.classList.add('ready'));
     addEventListener('scroll', onScroll, { passive: true });
     guardBar();
   }
   window.__hero = { get cur() { return cur; }, get target() { return target; }, get storyDone() { return storyDone; }, draw: (t) => draw(t, 0) };
   // el globo detallado (solo escritorio) sustituye al ligero cuando llega
   window.addEventListener('hx-geo50', () => { land110 = landGlobal(); draw(cur, 0); });
+  let lastWH = '';
   addEventListener('resize', () => {
-    fit(); setup(); layout();
+    // en el teléfono, la barra del navegador que aparece y se esconde no cambia la portada: no se redibuja
+    const wh = innerWidth + 'x' + sticky.clientHeight + '@' + devicePixelRatio; if (wh === lastWH) return; lastWH = wh;
+    setup(); layout();
     if (storyDone || storyOn) { storyOn = false; storyDone = true; finalDom(); }
     target = reduce ? 1 : progress(); if (reduce) cur = 1;
     draw(cur, 0);
   });
-  document.fonts && document.fonts.ready ? document.fonts.ready.then(init) : init();
+  init();
+  // las etiquetas se recolocan cuando llegan las fuentes (cambian de ancho)
+  document.fonts && document.fonts.ready.then(() => { setup(); layout(); if (storyDone) finalDom(); draw(cur, 0); });
 }

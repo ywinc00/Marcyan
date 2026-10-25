@@ -163,27 +163,37 @@ void main(){
   const VS = `#version 300 es
 in vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
   const NAMES = ['uRes', 'uTime', 'uScroll', 'uSpace', 'uLimbY', 'uLimbA', 'uSun', 'uNight', 'uCity', 'uCityZ', 'uGround', 'uDawn', 'uCalm', 'uGlow'];
-  function initGL() {
-    if (!gl) return false;
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; } return s; };
-    const v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS); if (!v || !f) return false;
-    prog = gl.createProgram(); gl.attachShader(prog, v); gl.attachShader(prog, f); gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+  // El sombreador se compila en paralelo y cuando el navegador está libre: nunca bloquea la portada.
+  // Mientras compila, se ven las estrellas (CSS) sobre el negro de la página.
+  let glState = gl ? 'idle' : 'none', ext = null, fsh = null;
+  function compileGL() {
+    ext = gl.getExtension('KHR_parallel_shader_compile');
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+    const v = sh(gl.VERTEX_SHADER, VS); fsh = sh(gl.FRAGMENT_SHADER, FS);
+    prog = gl.createProgram(); gl.attachShader(prog, v); gl.attachShader(prog, fsh); gl.linkProgram(prog);
+    glState = 'compiling';
+  }
+  function finishGL() {
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn(gl.getShaderInfoLog(fsh)); glState = 'failed'; cv.style.display = 'none'; css.hidden = false; return; }
     gl.useProgram(prog);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     NAMES.forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
-    return true;
+    gl.viewport(0, 0, cv.width, cv.height);
+    glState = 'ready';
+    cv.classList.add('ready');
   }
-  const ok = initGL();
-  if (!ok) { cv.style.display = 'none'; css.hidden = false; }
+  if (!gl) { cv.style.display = 'none'; css.hidden = false; }
+  else {
+    const kick = () => { try { compileGL(); } catch (e) { glState = 'failed'; cv.style.display = 'none'; css.hidden = false; } };
+    'requestIdleCallback' in window ? window.requestIdleCallback(kick, { timeout: 900 }) : setTimeout(kick, 250);
+  }
 
   function size() {
     const k = mobile() ? 0.5 : 0.6;
     cv.width = Math.max(2, Math.round(innerWidth * k)); cv.height = Math.max(2, Math.round(innerHeight * k));
-    if (ok) gl.viewport(0, 0, cv.width, cv.height);
+    if (glState === 'ready') gl.viewport(0, 0, cv.width, cv.height);
   }
 
   let last = 0, clock = 0, raf = 0, ph = phase(0);
@@ -203,7 +213,9 @@ in vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
       L2.style.transform = `translate3d(0,${-((scrollY * 0.22) % 900)}px,0)`;
       L3.style.transform = `translate3d(0,${-((scrollY * 0.07) % 640)}px,0)`;
     }
-    if (!ok) {
+    if (glState === 'compiling' && (!ext || gl.getProgramParameter(prog, ext.COMPLETION_STATUS_KHR))) finishGL();
+    if (glState !== 'ready') {
+      if (glState !== 'failed' && glState !== 'none') return;
       css.style.setProperty('--atm', Math.max(ph.night * 0.6, ph.limbA * ph.sun * 0.6).toFixed(3));
       css.style.setProperty('--ground', ph.ground.toFixed(3));
       css.style.setProperty('--dawn', ph.dawn.toFixed(3));

@@ -111,7 +111,10 @@ export function initSkyline() {
     for (let i = 0; i < id.data.length; i += 4) { const g2 = 120 + rnd() * 30; id.data[i] = id.data[i + 1] = id.data[i + 2] = g2; id.data[i + 3] = 7; }
     nc.putImageData(id, 0, 0); c.fillStyle = c.createPattern(n, 'repeat'); c.fillRect(0, 0, W, H);
   }
-  function all() { document.querySelectorAll('canvas[data-skyline]').forEach(draw); }
-  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(all, 150); });
-  document.fonts && document.fonts.ready ? document.fonts.ready.then(all) : all();
+  const done = new Set();
+  function all() { done.forEach(draw); }
+  const near = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { near.unobserve(e.target); done.add(e.target); draw(e.target); } }), { rootMargin: '150% 0px' });
+  document.querySelectorAll('canvas[data-skyline]').forEach((cv) => near.observe(cv));
+  let rt, lastW = innerWidth;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth === lastW) return; lastW = innerWidth; all(); }, 150); });
 }

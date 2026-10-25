@@ -18,6 +18,8 @@
   .foot__clouds :global(.clouds__l) { position: absolute; inset: 0; }
   .foot__clouds :global(.cloud) { position: absolute; display: block; }
   @media (max-width: 600px) { .foot__scape { height: 170px; } }
+  /* la línea legal del pie cae en la misma columna que el resto (en el pie común su relleno lateral queda a cero) */
+  :global(.footer .footer__bottom.container) { padding-inline: var(--container-pad); }
 </style>
 
 <script>

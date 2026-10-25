@@ -23,6 +23,7 @@ const c = content.en;
   path="houston"
 >
   <ItemListLd slot="head" items={h.itemList} name="Marcyan services in Houston" />
+  <link rel="preload" href="/geo/houston-globo-110.json" as="fetch" crossorigin="anonymous" slot="head" />
 
   <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 

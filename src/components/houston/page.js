@@ -262,9 +262,13 @@ export function initSections(loadGeo) {
     const pinEl = (n) => $$('.mp', plate).find((e) => e.textContent.trim().startsWith(n));
     function pinOn(n) { const e = pinEl(n); e && e.classList.add('hl'); chips[n] && chips[n].classList.add('hl'); }
     function pinOff(n) { const e = pinEl(n); e && e.classList.remove('hl'); chips[n] && chips[n].classList.remove('hl'); }
-    size(); placeZones(); drawMap(reduce ? 1 : 0);
-    let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { size(); placeZones(); drawMap(kNow); }, 120); });
+    let ready = false;
+    const prep = () => { if (ready) return; ready = true; size(); placeZones(); drawMap(reduce ? 1 : 0); };
+    const nIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { prep(); nIO.disconnect(); } }, { rootMargin: '150% 0px' });
+    nIO.observe(box);
+    let rt; addEventListener('resize', () => { if (!ready) return; clearTimeout(rt); rt = setTimeout(() => { size(); placeZones(); drawMap(kNow); }, 120); });
     function fly() {
+      prep();
       const t0 = performance.now(), dur = 2100;
       const f = (now) => { const p = Math.min(1, (now - t0) / dur); drawMap(p); if (p < 1) requestAnimationFrame(f); else box.classList.add('on'); };
       requestAnimationFrame(f);

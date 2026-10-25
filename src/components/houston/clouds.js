@@ -19,15 +19,15 @@ export function initClouds() {
     const K = COL[tone], pad = h * 0.8, W = Math.ceil(w + pad * 2), H = Math.ceil(h * 1.6 + pad);
     const ox = x - pad, oy = base - h * 1.35 - pad * 0.5, by = base - oy;
     const mk = () => { const k = document.createElement('canvas'); k.width = W; k.height = H; return [k, k.getContext('2d')]; };
-    const [M, m] = mk();
-    m.filter = `blur(${Math.max(2.5, h * 0.05)}px)`;
+    const [M, m] = mk(), [M0, m0] = mk();
     const N = Math.round(70 + w / 5);
     for (let i = 0; i < N; i++) {
       const t = rnd(), env = Math.pow(Math.sin(Math.PI * (0.04 + 0.92 * t)), 0.8) * (0.82 + 0.18 * Math.sin(t * 17 + w));
       const px = x + w * t - ox, topY = base - h * env - oy;
       const py = by - (by - topY) * Math.pow(rnd(), 0.5), r = h * (0.09 + 0.2 * rnd()) * (0.5 + 0.5 * env);
-      m.fillStyle = `rgba(255,255,255,${0.28 + 0.2 * rnd()})`; m.beginPath(); m.arc(px, py, r, 0, 7); m.fill();
+      m0.fillStyle = `rgba(255,255,255,${0.28 + 0.2 * rnd()})`; m0.beginPath(); m0.arc(px, py, r, 0, 7); m0.fill();
     }
+    m.filter = `blur(${Math.max(2.5, h * 0.05)}px)`; m.drawImage(M0, 0, 0);
     m.filter = 'none'; m.globalCompositeOperation = 'destination-out';
     const cut = m.createLinearGradient(0, by - h * 0.06, 0, by + h * 0.12); cut.addColorStop(0, 'rgba(0,0,0,0)'); cut.addColorStop(1, 'rgba(0,0,0,1)');
     m.fillStyle = cut; m.fillRect(0, 0, W, H);
@@ -36,8 +36,9 @@ export function initClouds() {
     b.fillStyle = g; b.fillRect(0, 0, W, H);
     const side = b.createLinearGradient(0, 0, W, 0); side.addColorStop(0, 'rgba(0,0,0,.25)'); side.addColorStop(1, 'rgba(0,0,0,0)');
     b.fillStyle = side; b.fillRect(0, 0, W, H);
-    b.filter = `blur(${Math.max(3, h * 0.08)}px)`;
-    for (let i = 0; i < Math.round(w / 40); i++) { b.fillStyle = 'rgba(6,6,5,.3)'; b.beginPath(); b.arc(w * rnd() + pad, by - h * (0.15 + 0.35 * rnd()), h * (0.12 + 0.16 * rnd()), 0, 7); b.fill(); }
+    const [P0, p0] = mk();
+    for (let i = 0; i < Math.round(w / 40); i++) { p0.fillStyle = 'rgba(6,6,5,.3)'; p0.beginPath(); p0.arc(w * rnd() + pad, by - h * (0.15 + 0.35 * rnd()), h * (0.12 + 0.16 * rnd()), 0, 7); p0.fill(); }
+    b.filter = `blur(${Math.max(3, h * 0.08)}px)`; b.drawImage(P0, 0, 0);
     b.filter = 'none'; b.globalCompositeOperation = 'destination-in'; b.drawImage(M, 0, 0);
     const [Rc, r] = mk();
     r.drawImage(M, 0, 0); r.globalCompositeOperation = 'destination-out'; r.drawImage(M, -h * 0.05, h * 0.09);
@@ -54,7 +55,8 @@ export function initClouds() {
   }
 
   const boxes = [];
-  function paint(b) {
+  // generador: deja una nube hecha en cada paso, en el mismo orden de siempre (mismas formas que el prototipo)
+  function* paint(b) {
     const W = b.el.clientWidth, H = b.el.clientHeight, kind = b.el.dataset.clouds;
     b.layers.forEach((g) => (g.innerHTML = ''));
     const put = (i, cv) => b.layers[i].appendChild(cv);
@@ -66,27 +68,42 @@ export function initClouds() {
       for (let i = 0; i < rows; i++) {
         const y = (i + 0.75) * (H / rows) + (rnd() - 0.5) * 120, side = i % 2 === 0;
         const w = 440 + rnd() * 160, h = 100 + rnd() * 40;
-        put(0, cloud(side ? left - 24 - w : right + 24, y, w, h, rnd, 'far'));
+        put(0, cloud(side ? left - 24 - w : right + 24, y, w, h, rnd, 'far')); yield;
         const w2 = 360 + rnd() * 140, h2 = 90 + rnd() * 30, y2 = y + 170 + rnd() * 90;
-        put(1, cloud(side ? right + 24 : left - 24 - w2, y2, w2, h2, rnd, 'near'));
+        put(1, cloud(side ? right + 24 : left - 24 - w2, y2, w2, h2, rnd, 'near')); yield;
       }
     } else if (kind === 'bank') {
       const rnd = seeded(7), unit = Math.max(260, Math.min(520, W * 0.3));
-      for (let x = -unit * 0.4; x < W; x += unit * (0.55 + rnd() * 0.25)) put(0, cloud(x, H * (0.4 + rnd() * 0.12), unit * (0.9 + rnd() * 0.4), unit * 0.26, rnd, 'far'));
-      for (let x = -unit * 0.6; x < W; x += unit * (0.6 + rnd() * 0.3)) put(1, cloud(x, H * (0.62 + rnd() * 0.12), unit * (1.0 + rnd() * 0.4), unit * 0.29, rnd, 'mid'));
-      for (let x = -unit * 0.5; x < W; x += unit * (0.75 + rnd() * 0.35)) put(2, cloud(x, H * (0.86 + rnd() * 0.08), unit * (1.1 + rnd() * 0.4), unit * 0.32, rnd, 'near'));
+      for (let x = -unit * 0.4; x < W; x += unit * (0.55 + rnd() * 0.25)) { put(0, cloud(x, H * (0.4 + rnd() * 0.12), unit * (0.9 + rnd() * 0.4), unit * 0.26, rnd, 'far')); yield; }
+      for (let x = -unit * 0.6; x < W; x += unit * (0.6 + rnd() * 0.3)) { put(1, cloud(x, H * (0.62 + rnd() * 0.12), unit * (1.0 + rnd() * 0.4), unit * 0.29, rnd, 'mid')); yield; }
+      for (let x = -unit * 0.5; x < W; x += unit * (0.75 + rnd() * 0.35)) { put(2, cloud(x, H * (0.86 + rnd() * 0.08), unit * (1.1 + rnd() * 0.4), unit * 0.32, rnd, 'near')); yield; }
     } else if (kind === 'foot') {
       const rnd = seeded(23), u = Math.min(360, W * 0.3);
-      put(0, cloud(W * 0.03, H * 0.42, u, u * 0.2, rnd, 'far'));
+      put(0, cloud(W * 0.03, H * 0.42, u, u * 0.2, rnd, 'far')); yield;
       if (W > 700) put(0, cloud(W * 0.8, H * 0.3, u * 0.75, u * 0.17, rnd, 'far'));
     }
   }
+  // cola de trabajo: unos milisegundos cada vez, cuando el navegador está libre (nunca congela la pantalla)
+  const queue = []; let pumping = false;
+  const later = (fn) => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 400 }) : setTimeout(fn, 32));
+  function pump() {
+    const t0 = performance.now();
+    while (queue.length && performance.now() - t0 < 10) { if (queue[0].next().done) queue.shift(); }
+    if (queue.length) later(pump); else pumping = false;
+  }
+  function enqueue(b) {
+    b.painted = true;
+    const i = queue.findIndex((g) => g.box === b); if (i >= 0) queue.splice(i, 1);
+    const g = paint(b); g.box = b; queue.push(g);
+    if (!pumping) { pumping = true; later(pump); }
+  }
   function setup() {
+    const near = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { near.unobserve(e.target); enqueue(e.target.__box); } }), { rootMargin: '150% 0px' });
     document.querySelectorAll('[data-clouds]').forEach((el) => {
       const kind = el.dataset.clouds;
       const speeds = kind === 'bank' ? [0.05, 0.12, 0.22] : kind === 'edges' ? [0.06, 0.14] : [0.03];
       const layers = speeds.map((sp) => { const g = document.createElement('div'); g.className = 'clouds__l'; g.dataset.speed = sp; el.appendChild(g); return g; });
-      const b = { el, layers }; boxes.push(b); paint(b);
+      const b = { el, layers }; el.__box = b; boxes.push(b); near.observe(el);
     });
   }
   let ticking = false;
@@ -100,8 +117,9 @@ export function initClouds() {
     });
   }
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(scroll); } }, { passive: true });
-  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { boxes.forEach(paint); scroll(); }, 150); });
-  const go = () => { setup(); scroll(); };
-  document.fonts && document.fonts.ready ? document.fonts.ready.then(go) : go();
+  // solo se rehacen si cambia el ancho (la barra del navegador del móvil no cuenta)
+  let rt, lastW = innerWidth;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth === lastW) return; lastW = innerWidth; boxes.filter((b) => b.painted).forEach(enqueue); scroll(); }, 150); });
+  setup(); scroll();
   window.__clouds = { cloud };
 }

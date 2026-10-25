@@ -291,6 +291,31 @@ https://claude.ai/artifact/V3db8f3ctFNusP7j6QFR45 (fuente `design/houston-v7/pag
 - Ojos: Chrome real (1440, 1920 y salida de la portada) y móvil 390 con táctil. Corregido en los ciclos: ciudad que parecía polvo dorado,
   nubes invisibles, ventanas fuera de las torres, borde del brillo del pie y ciudad demasiado intensa detrás del texto.
 
+**Vuelta 8 (2026-10-25), tras la corrección dura del dueño.** Sobre la vuelta 7: la ciudad iluminada desde arriba se superponía
+con los textos (bajo contraste, ruido, "sin sentido"); el pie dejaba un vacío enorme y la ciudad "es basura", lejos del nivel del
+hero; las nubes "parecen manchas"; y todo ello por atajos y por no verificar. El mapa de zonas se mantiene: sus zonas enlazan a las
+landings. Lecciones E-37, E-38 y E-39 al ledger. Prototipo aparte (v6 y v7 intactas): https://claude.ai/artifact/7gCcFczpgQciqsPqk3d6iz
+(fuente `design/houston-v8/pagina/`, `build6.py`).
+- **Referencias de Refero miradas en imagen:** Railway `77a2ae35-b27a-4ba4-816e-a84c1fd7d449` (nubes de ilustración con silueta,
+  enmarcando desde los bordes, nunca tras el texto), Cora `15c36325-0ee9-4aeb-946e-1951a570e6be` (nubes con volumen y luz real),
+  Drepute `aa138c1f-2b42-4b10-9a3d-bdb09c216c99` (cielo nocturno real con la silueta abajo, sobria), Joby Aviation
+  `e38f56d1-e3b6-4b4e-9f4b-072cedf44bf4` (la ciudad con luz cálida de fondo), Titan `56105743-b6f0-49df-8788-1578972a2e1d`
+  (ciudad de ilustración precisa). Silueta real de Houston mirada en fotografía antes de dibujarla.
+- **Fuera:** la ciudad iluminada del fondo y las nubes de ruido del fondo.
+- **Nubes nuevas:** máscara de densidad con bocanadas difuminadas en forma de cúmulo, cuerpo coloreado por altura con bolsas de
+  sombra y filo de luz de luna arriba a la derecha. Viven en los márgenes del portafolio (solo escritorio) y en un banco de nubes
+  entre proyectos y Houston, en un hueco sin texto; tres capas a distinta velocidad al bajar.
+- **Mapa:** el mismo gesto aprobado del hero a escala de la ciudad: empieza lejos con la costa del Golfo en puntos dorados, se
+  acerca y los puntos se funden en bronce; las zonas hacen su pulso una vez. Debajo, la lista de zonas (Katy y Sugar Land enlazan a
+  sus páginas) y lista y mapa se señalan entre sí al pasar el ratón. En el teléfono solo se rotulan Houston y las zonas con página.
+- **Pie:** compacto, la ciudad pegada a la barra legal: Uptown con Williams Tower a lo lejos, torres de fondo más claras, el centro
+  oscuro con coronas reales (JPMorgan Chase, Wells Fargo, Bank of America Center, Heritage Plaza, Pennzoil), ventanas encendidas
+  dispersas, línea de árboles delante y la luz cálida de la ciudad en el cielo; dos nubes finas a los lados. Borde superior fundido.
+- **Ojos:** piezas probadas aisladas antes de integrarlas (tres rondas de nubes: globos, escamas, nubes suaves con luz; dos de la
+  silueta: torres anchas y más claras que el cielo, corregidas). Integrado y revisado en Chrome real a 1280, 1440 y 1920 y en móvil
+  390 con táctil. Corregido además: un choque de nombres que rompía los contactos del pie, el corte recto del banco de nubes, el
+  borde de la ciudad del pie y un mapa que de lejos mostraba el recorte cuadrado de los datos.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

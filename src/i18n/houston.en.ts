@@ -182,4 +182,68 @@ export const houstonHub = {
     { name: 'Web Design and Local SEO in Sugar Land', path: '/en/houston/sugar-land' },
     { name: 'Bilingual Web Design in Houston (English and Spanish)', path: '/en/houston/bilingual-web-design' },
   ] as ListLink[],
+  // ── "The journey" redesign (2026-10-25) ── new page copy; the keys above stay untouched.
+  // Hero H1 approved by the owner; title and meta belong to the SEO chat (brief 2026-10-24).
+  journey: {
+    h1: 'The studio that puts your business on the map in <em>Houston</em>',
+    lead: 'Web, SEO and AI from one team. Customers find you on Google, on Maps and in AI answers, and your business replies in their language.',
+    call: { label: '713-823-9144', href: telHref },
+    pinsLabel: 'Sample searches across Houston areas',
+    pins: [
+      { name: 'THE WOODLANDS', q: 'kitchen remodeling contractor', en: false },
+      { name: 'KATY', q: 'realtor que hable español' },
+      { name: 'GULFTON', q: 'abogado de inmigración en español' },
+      { name: 'PASADENA', q: 'taller mecánico que hable español' },
+    ],
+    card: {
+      label: 'Sample result', name: 'Your business', meta: 'Pasadena, TX · Open now',
+      named: 'Named by', checks: ['✓ Google', '✓ Maps', '✓ AI'], ai: 'Your assistant answers in English or Spanish, 24/7',
+    },
+    services: {
+      title: 'Customers find you, choose you <em>and get an answer</em>',
+      lead: 'Three jobs, one team. Every service has a published starting price, and we put the final price in writing before we start.',
+      steps: [
+        { n: '01', title: 'Get found', txt: 'Show up when people search on Google, on Maps and in AI.', links: [2, 3], vig: 'search', note: 'Google, Maps, ChatGPT and Gemini read your site and your profile: we get them ready to name you.' },
+        { n: '02', title: 'Get chosen', txt: 'A fast, bilingual site that wins people over in seconds.', links: [0, 4, 5, 6], vig: 'web', note: '' },
+        { n: '03', title: 'Always answer', txt: 'An assistant that replies, books and captures leads around the clock.', links: [1], vig: 'chat', note: 'On your site and on WhatsApp, in English and Spanish. When it does not know something, it hands the conversation to you.' },
+      ],
+      vig: {
+        query: 'auto repair near me open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
+        time: '11:42 PM', me1: 'Can you check my brakes tomorrow?', bot: 'Sure, we have an opening at 8:30. Want me to book it?', me2: 'Yes please. Carlos.', ok: 'Booked · tomorrow 8:30',
+      },
+      all: { label: 'See all pricing', href: '/en/pricing' },
+    },
+    projects: {
+      tag: 'Portfolio', title: 'Real work, real <em>businesses</em>', did: 'What we did', result: 'Result',
+      note: 'Out of respect for our clients\' privacy we show the screenshots, not the links; we are happy to walk you through them on a call.',
+      more: { label: 'View projects', href: '/en/portfolio' }, shotPc: 'desktop view', shotMovil: 'mobile view',
+    },
+    local: {
+      nap: [
+        { label: 'Direct line', value: nap.houston, href: telHref },
+        { label: 'Hours', value: nap.hours },
+        { label: 'Languages', value: 'English · Spanish' },
+      ],
+      mapLabel: 'Map of the Houston area with the zones we serve',
+      mapCap: 'The entire metro area',
+      zonesLabel: 'Houston-area zones',
+      zones: [
+        { n: 'Houston', hq: true }, { n: 'Katy', href: '/en/houston/katy' }, { n: 'Sugar Land', href: '/en/houston/sugar-land' },
+        { n: 'The Woodlands' }, { n: 'Pearland' }, { n: 'Pasadena' },
+      ],
+    },
+    sectors: {
+      tag: 'By industry', title: 'How Houston searches for <em>your industry</em>',
+      lead: 'Each industry has its own page, with what its customers search for and how we serve them.',
+      queries: ['immigration lawyer who speaks Spanish', 'realtor near me', 'tacos near me open now', 'kitchen remodeling contractor', 'auto repair near me', 'nail salon near me', 'dentist who speaks Spanish'],
+      en: [],
+    },
+    answer: {
+      figs: [
+        { n: 46, txt: 'of Google searches have local intent' },
+        { n: 76, txt: 'of people who search "near me" visit a business within 24 hours' },
+      ],
+    },
+    cta: { call: `Call us: ${nap.houston}`, wa: 'Message us on WhatsApp' },
+  },
 };

@@ -77,7 +77,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     </span>
   </div>
 
-  {/* "Suelo" del arribo: horizonte de un planeta a lo ancho, DEBAJO de todo (no toca texto) */}
+  {/* "Suelo" del arribo: horizonte de un planeta a lo ancho, DEBAJO de todo (no toca texto).
+      Una página puede sustituirlo por su propio cierre con el slot "scape" (hoy solo Houston: la silueta de la ciudad). */}
+  {Astro.slots.has('scape') ? <slot name="scape" /> : (
   <div class="footer__ground" aria-hidden="true">
     <svg class="footer__ground-svg" viewBox="0 0 1440 300" preserveAspectRatio="none" fill="none">
       <defs>
@@ -106,6 +108,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       <path d="M0,128 Q720,70 1440,128" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity=".5" />
     </svg>
   </div>
+  )}
 
   <StarField />
 </footer>

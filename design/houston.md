@@ -194,6 +194,21 @@ NO lo hace el chat de diseño: queda encargado al chat de SEO en
   talleres; la que se enciende). Cada búsqueda es de un sector con página propia. Las zonas del centro
   (Spring Branch, East End) quedan fuera porque a esta escala se amontonan con Gulfton.
 
+**v4.3 · contraste, "Tu negocio" y fusión suave (2026-10-24, correcciones del dueño).**
+- Contraste (ledger E-35): el punto encendido y el hilo eran dorados sobre el mapa dorado. Ahora el encendido es
+  marfil (#fbf6ec) con anillo oscuro y halo; todos los hilos llevan doble trazo (núcleo marfil + contorno oscuro)
+  para leerse sobre el dorado y sobre el agua negra; puntos normales con anillo marfil y contorno; el aro delantero
+  lleva contorno oscuro donde cruza el mapa.
+- Tarjeta: "Tu negocio" en vez de "Taller Ejemplo" (sin la etiqueta EJEMPLO: ya no nombra un negocio real) y un
+  logotipo sencillo (sol sobre el horizonte en un cuadrado verde oscuro) en lugar de la inicial sobre círculo, que se
+  leía como contacto sin foto. Un primer intento (círculo sobre arco) parecía silueta de persona y se descartó antes
+  de enseñarlo.
+- Fusión de puntos a sólido: los puntos crecen (radio 1,05 → 3,15 px) y su color baja del dorado al bronce del sólido
+  mientras el sólido entra por debajo; repartido en ~1 s del acercamiento (antes ocurría en menos de medio segundo).
+- Movimiento: los puntos aparecen escalonados con un pequeño rebote, las etiquetas frenan suave (salida cúbica), los
+  hilos nacen del punto hacia la etiqueta y el hilo a la ficha baja con frenada; la ficha entra con leve escala.
+  Fluidez: 8,6 ms por fotograma sin aceleración gráfica.
+
 **Única pieza nueva común:** tarjetas claras de demo (`#e8e2d8`, las de la prueba aprobada). Todo
 lo demás es la gramática viva (SiteNav, Button, `.display` 700 40→80, tokens).
 

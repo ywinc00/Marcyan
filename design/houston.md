@@ -498,3 +498,21 @@ https://claude.ai/artifact/8Tm146y57jNrDtBePzLFSQ (fuente `design/houston-v9/pag
 - Pie: silueta calcada de una foto con licencia libre (Wikimedia Commons, "DowntownHouston.jpg", CC BY-SA 2.0, vista desde Buffalo
   Bayou), comprobada con la foto superpuesta; valor propio por torre, filo de luz solo en las coronas, resplandor detrás, ventanas por
   plantas y balizas rojas en las más altas. Lecciones E-41 a E-43 al ledger.
+
+**Construida en el sitio, en vista previa (2026-10-25).** El dueño: "esta versión es muy buena, aún le faltan ajustes, pero
+vamos a construir ya para ver desde el móvil y en vivo"; vista previa aparte, sin producción. Rama `feat/houston-rediseno`
+(con main al día), commit `54073af`.
+- `src/components/houston/HoustonHub.astro`: una sola pieza para `/es/houston` y `/en/houston` (las páginas quedan en 40
+  líneas cada una, sin duplicar). Textos nuevos en el bloque `journey` de `houston.ts` y `houston.en.ts`; las claves de
+  siempre intactas. Reutiliza la gramática del sitio: SiteNav, Kicker, Button, Breadcrumb, GrowthTeaser y Contact (envío y
+  seguimiento reales). Estilos en `houston.css`, generada desde el prototipo y prefijada con `.hx` (no toca otras páginas).
+- Pie: `SiteFooter` gana un slot opcional `scape`; solo Houston lo usa para la silueta (`HoustonScape.astro`). El resto de
+  páginas sigue con su "suelo" de siempre.
+- Datos del mapa en `public/geo/` (globo ligero 28 KB comprimidos para todos; el detallado 63 KB solo en escritorio y
+  cuando el navegador está libre). Nueva dependencia `d3-geo` 3.1.1.
+- Móvil: encuadre final que se ajusta al alto real del texto (el inglés ocupa más), la ficha libre del botón del chat (y el
+  globo del chat espera a que acabe la portada), en pantallas cortas el párrafo de entrada se recoge al acercarse, el
+  teléfono de cada proyecto se desliza contra el portátil al bajar, la barra de llamada inferior no tapa la portada.
+- Contratos comprobados en el resultado compilado (ES y EN): un h1, Breadcrumb + ItemList + FAQPage, 19 enlaces del silo,
+  anclas, canónica, hreflang, seguimiento; verificador de contratos de las landings y KB del chat: todo pasa. Title y meta
+  sin tocar (chat de SEO). Fluidez en móvil con procesador 4× más lento: la portada dibuja cada fotograma en 10-16 ms.

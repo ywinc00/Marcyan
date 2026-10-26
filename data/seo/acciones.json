@@ -104,15 +104,21 @@
       "titulo": "Dar el OK al PR #36 (anchors de Miami)",
       "estado": "pedida",
       "primeraVez": "2026-10-05",
-      "ultimaVez": "2026-10-05",
-      "propuestas": 1,
+      "ultimaVez": "2026-10-26",
+      "propuestas": 2,
       "vence": "2026-10-09",
       "historial": [
         {
           "fecha": "2026-10-05",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-10-26",
+          "estado": "pedida",
+          "nota": "recordatorio"
         }
-      ]
+      ],
+      "recordada": "2026-10-26"
     },
     "marcyan-senal-local-es": {
       "ref": "marcyan-senal-local-es",

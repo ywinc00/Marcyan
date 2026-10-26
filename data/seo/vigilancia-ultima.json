@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-25",
+  "fecha": "2026-10-26",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
@@ -77,9 +77,9 @@
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 24,
+  "sinRastreoReciente": 23,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 81,
+  "certificadoDias": 80,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,8 +113,8 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 8,
-    "sesionesDiaHabitual": 3.9,
+    "sesionesUltimos3Dias": 95,
+    "sesionesDiaHabitual": 3.8,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
     "probabilidadAzar": null
@@ -148,69 +148,35 @@
     ]
   },
   "alertas": {
-    "alta": [
-      {
-        "fecha": "2026-10-25",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/miami/local-seo"
-      }
-    ],
+    "alta": [],
     "media": [
       {
-        "fecha": "2026-10-25",
+        "fecha": "2026-10-26",
+        "cliente": "marcyan",
+        "nivel": "media",
+        "tipo": "gsc",
+        "detalle": "URL Inspection falló en 1 URLs",
+        "url": null
+      },
+      {
+        "fecha": "2026-10-26",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "24 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "23 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
-    "info": [
-      {
-        "fecha": "2026-10-25",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/houston"
-      },
-      {
-        "fecha": "2026-10-25",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/houston/bienes-raices"
-      },
-      {
-        "fecha": "2026-10-25",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/miami/doral"
-      },
-      {
-        "fecha": "2026-10-25",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/miami/seo-local"
-      }
-    ]
+    "info": []
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-25",
+      "fecha": "2026-10-26",
       "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/miami/local-seo"
+      "nivel": "media",
+      "tipo": "gsc",
+      "detalle": "URL Inspection falló en 1 URLs",
+      "url": null
     }
   ],
   "pedirIndexacion": [],

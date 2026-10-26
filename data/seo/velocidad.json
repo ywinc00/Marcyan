@@ -59,6 +59,18 @@
       },
       "campo": null,
       "campoOrigen": null
+    },
+    {
+      "fecha": "2026-10-26",
+      "puntuacion": 79,
+      "lab": {
+        "lcpMs": 4304,
+        "cls": 0,
+        "tbtMs": 174,
+        "fcpMs": 2473
+      },
+      "campo": null,
+      "campoOrigen": null
     }
   ],
   "https://marcyanstudio.com/en/houston/ai-seo": [
@@ -118,6 +130,18 @@
         "cls": 0.001,
         "tbtMs": 73,
         "fcpMs": 1576
+      },
+      "campo": null,
+      "campoOrigen": null
+    },
+    {
+      "fecha": "2026-10-26",
+      "puntuacion": 97,
+      "lab": {
+        "lcpMs": 2615,
+        "cls": 0.001,
+        "tbtMs": 8,
+        "fcpMs": 1201
       },
       "campo": null,
       "campoOrigen": null
@@ -183,6 +207,18 @@
       },
       "campo": null,
       "campoOrigen": null
+    },
+    {
+      "fecha": "2026-10-26",
+      "puntuacion": 100,
+      "lab": {
+        "lcpMs": 1351,
+        "cls": 0.001,
+        "tbtMs": 16,
+        "fcpMs": 1351
+      },
+      "campo": null,
+      "campoOrigen": null
     }
   ],
   "https://marcyanstudio.com/en/ai-for-small-business": [
@@ -242,6 +278,18 @@
         "cls": 0,
         "tbtMs": 92,
         "fcpMs": 1501
+      },
+      "campo": null,
+      "campoOrigen": null
+    },
+    {
+      "fecha": "2026-10-26",
+      "puntuacion": 99,
+      "lab": {
+        "lcpMs": 1651,
+        "cls": 0,
+        "tbtMs": 53,
+        "fcpMs": 1651
       },
       "campo": null,
       "campoOrigen": null

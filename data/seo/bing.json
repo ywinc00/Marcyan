@@ -1,12 +1,12 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-19",
+  "fecha": "2026-10-26",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
       "clics": 1,
-      "impresiones": 12
+      "impresiones": 19
     },
     "anteriores28": {
       "clics": 0,
@@ -17,8 +17,8 @@
     {
       "consulta": "diseño web en miami",
       "clics": 0,
-      "impresiones": 4,
-      "posicionMedia": 2,
+      "impresiones": 9,
+      "posicionMedia": 3.1,
       "marca": false
     },
     {
@@ -61,6 +61,27 @@
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 2,
+      "marca": false
+    },
+    {
+      "consulta": "¿cómo lograr que gemini recomiende mi marca en méxico?",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 4,
+      "marca": false
+    },
+    {
+      "consulta": "\"taller mecánico\" \"houston\" whatsapp",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 2,
+      "marca": false
+    },
+    {
+      "consulta": "que ia contesta las llamasdas en eeu y pide un mesnaje del caller para comunicarle al destinatario",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 6,
       "marca": false
     }
   ],

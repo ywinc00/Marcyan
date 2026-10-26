@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-19",
+  "actualizado": "2026-10-26",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -134,7 +134,7 @@
       "ref": "marcyan-decision-paginas",
       "tipo": "dueno",
       "titulo": "Decidir qué hacer con las páginas que Google dejó fuera",
-      "estado": "pedida",
+      "estado": "hecha",
       "primeraVez": "2026-10-12",
       "ultimaVez": "2026-10-12",
       "propuestas": 1,
@@ -143,6 +143,11 @@
         {
           "fecha": "2026-10-12",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-10-26",
+          "estado": "hecha",
+          "nota": "Decidido el 18-oct: Fase A de fusión aprobada (marcyan-indexacion-fase-a)"
         }
       ]
     },
@@ -343,7 +348,7 @@
       "ref": "marcyan-houston-diseno-web-reescribir",
       "tipo": "web",
       "titulo": "Reescribir /es/houston/diseno-web con ficha previa y prueba real (toda la familia de diseño web de Houston está fuera y es el enlace de la ficha)",
-      "estado": "propuesta",
+      "estado": "en-espera",
       "primeraVez": "2026-10-18",
       "ultimaVez": "2026-10-19",
       "propuestas": 2,
@@ -353,6 +358,11 @@
         {
           "fecha": "2026-10-18",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-26",
+          "estado": "en-espera",
+          "nota": "2 propuestas sin OK"
         }
       ]
     }

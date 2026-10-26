@@ -49,6 +49,8 @@
 
 > Revisión 2026-W43 (19-oct): sin reordenar (semana impar) y sin tareas nuevas: la cola aprobada el 18-oct ocupa al chat del proyecto. Enlaces legales ✓ en CAMBIOS.md. Salieron 6 páginas del índice el 18-oct (entre ellas /es/houston/diseno-web); la reescritura de esa página sigue esperando OK. Velocidad de portada y /en/houston/ai-seo en observación.
 
+> Revisión 2026-W44 (26-oct, semana par): sin reordenar. Reescribir /es/houston/diseno-web pasa a "en espera" (2 propuestas sin OK). Vuelven al índice 4 páginas de la petición de rastreo; sale /en/miami/local-seo. Vigilar velocidad de la portada (79): si se repite el 2-nov, entra en la tanda.
+
 ## En espera (sin responsable o bloqueadas)
 
 - Anchors de Houston (misma mecánica que Miami): esperan a que el rediseño de la landing de Houston tenga dirección elegida.

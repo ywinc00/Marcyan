@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-26",
+  "fecha": "2026-10-27",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
@@ -77,9 +77,9 @@
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 23,
+  "sinRastreoReciente": 24,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 80,
+  "certificadoDias": 79,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,7 +113,7 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 95,
+    "sesionesUltimos3Dias": 96,
     "sesionesDiaHabitual": 3.8,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
@@ -151,34 +151,17 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-10-26",
-        "cliente": "marcyan",
-        "nivel": "media",
-        "tipo": "gsc",
-        "detalle": "URL Inspection falló en 1 URLs",
-        "url": null
-      },
-      {
-        "fecha": "2026-10-26",
+        "fecha": "2026-10-27",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "23 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "24 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": []
   },
-  "alertasNuevas": [
-    {
-      "fecha": "2026-10-26",
-      "cliente": "marcyan",
-      "nivel": "media",
-      "tipo": "gsc",
-      "detalle": "URL Inspection falló en 1 URLs",
-      "url": null
-    }
-  ],
+  "alertasNuevas": [],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

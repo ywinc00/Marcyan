@@ -1,15 +1,15 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-27",
+  "fecha": "2026-10-28",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 36,
+  "indexadas": 35,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 36,
-    "Crawled - currently not indexed": 45,
-    "Alternate page with proper canonical tag": 3
+    "Submitted and indexed": 35,
+    "Crawled - currently not indexed": 47,
+    "Alternate page with proper canonical tag": 2
   },
   "porGrupo": {
     "home·en": {
@@ -42,7 +42,7 @@
     },
     "precios·en": {
       "total": 4,
-      "indexadas": 2
+      "indexadas": 1
     },
     "home·es": {
       "total": 1,
@@ -58,7 +58,7 @@
     },
     "herramientas·es": {
       "total": 2,
-      "indexadas": 1
+      "indexadas": 2
     },
     "ciudades·es": {
       "total": 6,
@@ -66,7 +66,7 @@
     },
     "landings·es": {
       "total": 18,
-      "indexadas": 9
+      "indexadas": 8
     },
     "servicios·es": {
       "total": 2,
@@ -77,9 +77,9 @@
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 24,
+  "sinRastreoReciente": 22,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 79,
+  "certificadoDias": 78,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,7 +113,7 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 96,
+    "sesionesUltimos3Dias": 88,
     "sesionesDiaHabitual": 3.8,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
@@ -148,20 +148,63 @@
     ]
   },
   "alertas": {
-    "alta": [],
+    "alta": [
+      {
+        "fecha": "2026-10-28",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+      },
+      {
+        "fecha": "2026-10-28",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
+      }
+    ],
     "media": [
       {
-        "fecha": "2026-10-27",
+        "fecha": "2026-10-28",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "24 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "22 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
-    "info": []
+    "info": [
+      {
+        "fecha": "2026-10-28",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/herramientas"
+      }
+    ]
   },
-  "alertasNuevas": [],
+  "alertasNuevas": [
+    {
+      "fecha": "2026-10-28",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+    },
+    {
+      "fecha": "2026-10-28",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
+    }
+  ],
   "pedirIndexacion": [],
   "colaPendiente": 0,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

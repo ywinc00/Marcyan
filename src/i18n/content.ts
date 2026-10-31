@@ -16,6 +16,7 @@ export const nap = {
   houston: '+1 713-823-9144',
   miami: '+1 786-938-1754',
   hours: 'Lun–Vie 9am–6pm CT',
+  hoursEn: 'Mon to Fri, 9am to 6pm CT',
 };
 
 export const content = {
@@ -414,7 +415,7 @@ export const content = {
       tag: 'Contact',
       title: "Let's talk about<br>your <em>project</em>",
       desc: 'Tell us your idea. In less than 24 hours you will have a personalized proposal, no commitment, completely free.',
-      info: { hoursLbl: 'Hours', hours: 'Mon–Fri 9am–6pm CT' },
+      info: { hoursLbl: 'Hours', hours: nap.hoursEn },
       form: {
         name: { label: 'Name', ph: 'Your name' },
         email: { label: 'Email', ph: 'you@email.com' },

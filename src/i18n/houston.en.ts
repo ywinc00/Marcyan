@@ -49,7 +49,7 @@ export const houstonHub = {
     explore: { label: 'See services and pricing ↓', href: '#servicios' },
     telemetry: [
       { label: 'Direct line', value: nap.houston, href: telHref, live: true },
-      { label: 'Hours', value: nap.hours },
+      { label: 'Hours', value: nap.hoursEn },
       { label: 'Public pricing', value: priceChain, href: '#servicios' },
       { label: 'Base', value: '29.7604° N, 95.3698° W' },
     ],
@@ -121,7 +121,7 @@ export const houstonHub = {
   ficha: {
     meta: [
       { ic: 'lucide:phone', label: 'Direct line', value: nap.houston, href: telHref },
-      { ic: 'lucide:clock', label: 'Hours', value: nap.hours },
+      { ic: 'lucide:clock', label: 'Hours', value: nap.hoursEn },
       { ic: 'lucide:map-pinned', label: 'Coverage', value: 'Katy, Sugar Land, The Woodlands, Pearland' },
       { ic: 'lucide:languages', label: 'Languages', value: 'English · Spanish' },
       { ic: 'lucide:locate-fixed', label: 'Coordinates', value: '29.7604° N, 95.3698° W' },

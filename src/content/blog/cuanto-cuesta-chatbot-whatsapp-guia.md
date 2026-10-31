@@ -19,7 +19,7 @@ faq:
   - q: "¿Un chatbot a medida es mejor que una app por suscripción?"
     a: "No siempre. Un desarrollo totalmente a medida cuesta miles de dólares y tiene sentido para necesidades muy específicas. Para la mayoría de los negocios pequeños, un servicio gestionado de pago único entrega casi el mismo valor sin la mensualidad indefinida ni la complejidad de mantenerlo tú mismo. Lo importante es comparar el modelo de cobro completo, no solo el precio de entrada."
   - q: "¿El chatbot va a responder bien siempre?"
-    a: "Ningún chatbot acierta el 100% de las veces. Una parte de las conversaciones siempre necesitará a una persona, por eso el nuestro está diseñado para pasarte el lead cuando hace falta. Lo entrenamos con la información de tu negocio para que responda con precisión las preguntas comunes, pero te decimos con honestidad que es una herramienta de apoyo, no un reemplazo total de tu equipo."
+    a: "Ningún chatbot acierta el 100% de las veces. Una parte de las conversaciones siempre necesitará a una persona, por eso el nuestro está diseñado para pasarte el cliente cuando hace falta. Lo entrenamos con la información de tu negocio para que responda con precisión las preguntas comunes, pero te decimos con honestidad que es una herramienta de apoyo, no un reemplazo total de tu equipo."
   - q: "¿Para qué sirve un chatbot de WhatsApp en un negocio pequeño?"
     a: "Para responder al instante. Muchos clientes escriben fuera del horario o cuando estás ocupado, y un prospecto sin respuesta se enfría rápido. Un chatbot contesta las preguntas frecuentes, agenda, captura datos del cliente y te avisa cuando alguien quiere hablar con una persona, para que ningún mensaje se quede sin atender."
 related:
@@ -75,7 +75,7 @@ La diferencia con una app por suscripción es el modelo: pagas una vez en lugar 
 
 Seamos directos, porque esto separa una promesa honesta de una vendida:
 
-- **No te podemos prometer que el bot acierte el 100% de las veces.** Ningún chatbot lo hace. Por eso el nuestro está diseñado para pasarte el lead a una persona cuando la conversación lo amerita.
+- **No te podemos prometer que el bot acierte el 100% de las veces.** Ningún chatbot lo hace. Por eso el nuestro está diseñado para pasarle la conversación a una persona cuando hace falta.
 - **No te podemos prometer que no pagues nada más.** Meta puede cobrar por los mensajes que envíes a través de su API oficial, como explicamos arriba.
 - **No te prometemos que reemplace a tu equipo.** Es una herramienta de apoyo que responde al instante y captura clientes; el cierre humano sigue importando.
 

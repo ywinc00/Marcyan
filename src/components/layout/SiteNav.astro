@@ -40,7 +40,7 @@ const isActive = (href: string) =>
 ---
 <header class="nav" data-nav>
   <div class="nav__bar container">
-    <a class="nav__logo" href={homeHref} aria-label="Marcyan Studio — inicio">
+    <a class="nav__logo" href={homeHref} aria-label={uin.nav.home}>
       <BrandType />
     </a>
 
@@ -49,7 +49,7 @@ const isActive = (href: string) =>
     </nav>
 
     <div class="nav__actions">
-      <div class="nav__lang" aria-label="Idioma">
+      <div class="nav__lang" aria-label={uin.nav.language}>
         {lang === 'es'
           ? <span class="nav__lang-opt is-on" aria-current="true">ES</span>
           : <a class="nav__lang-opt" href={otherHref} hreflang="es">ES</a>}

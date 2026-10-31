@@ -12,23 +12,34 @@ export const ui = {
     price: { from: 'desde', perMonth: '/mes', includes: 'Incluye', offer: 'OFERTA' },
     cta: { call: 'Llamar' },
     hero: { tapHint: 'Toca para explorar', hoverHint: 'Pasa el cursor sobre el planeta', planetLabel: 'Marcyan — planeta en órbita', exploreSite: 'Explorar el sitio' },
-    footer: { copyEmail: 'Copiar correo', copyHouston: 'Copiar teléfono de Houston', copyMiami: 'Copiar teléfono de Miami', copied: '¡Copiado!' },
-    nav: { primary: 'Principal', menu: 'Menú', mobileMenu: 'Menú móvil' },
+    footer: { copyEmail: 'Copiar correo', copyHouston: 'Copiar teléfono de Houston', copyMiami: 'Copiar teléfono de Miami', copied: '¡Copiado!', links: 'Enlaces del pie', top: 'Marcyan Studio, inicio' },
+    nav: { primary: 'Principal', menu: 'Menú', mobileMenu: 'Menú móvil', language: 'Idioma', home: 'Marcyan Studio, inicio' },
     postnav: { more: 'Más artículos' },
-    projects: { prev: 'Proyecto anterior', next: 'Proyecto siguiente' },
+    projects: { prev: 'Proyecto anterior', next: 'Proyecto siguiente', more: 'Ver Proyectos' },
     shot: { pc: 'vista de escritorio del sitio', movil: 'vista móvil del sitio' },
+    landing: { keyPoints: 'Puntos clave' },
+    features: { count: 'capacidades' },
+    related: { one: 'ruta', many: 'rutas' },
+    chat: { marcyAlt: 'Marcy, el asistente de Marcyan' },
   },
   en: {
     answer: { directAnswer: 'Direct answer', source: 'Source' },
     price: { from: 'from', perMonth: '/mo', includes: 'Includes', offer: 'OFFER' },
     cta: { call: 'Call' },
     hero: { tapHint: 'Tap to explore', hoverHint: 'Hover over the planet', planetLabel: 'Marcyan — planet in orbit', exploreSite: 'Explore the site' },
-    footer: { copyEmail: 'Copy email', copyHouston: 'Copy Houston phone', copyMiami: 'Copy Miami phone', copied: 'Copied!' },
-    nav: { primary: 'Main', menu: 'Menu', mobileMenu: 'Mobile menu' },
+    footer: { copyEmail: 'Copy email', copyHouston: 'Copy Houston phone', copyMiami: 'Copy Miami phone', copied: 'Copied!', links: 'Footer links', top: 'Marcyan Studio, back to top' },
+    nav: { primary: 'Main', menu: 'Menu', mobileMenu: 'Mobile menu', language: 'Language', home: 'Marcyan Studio home' },
     postnav: { more: 'More articles' },
-    projects: { prev: 'Previous project', next: 'Next project' },
+    projects: { prev: 'Previous project', next: 'Next project', more: 'View Projects' },
     shot: { pc: 'desktop view of the site', movil: 'mobile view of the site' },
+    landing: { keyPoints: 'Key points' },
+    features: { count: 'capabilities' },
+    related: { one: 'page', many: 'pages' },
+    chat: { marcyAlt: "Marcy, Marcyan's assistant" },
   },
 } as const;
 
 export const t = (lang: Lang) => ui[lang] ?? ui.es;
+
+// Idioma a partir de la ruta de la página (para componentes que no reciben `lang`).
+export const langFromPath = (path: string): Lang => (/^\/en(\/|$)/.test(path) ? 'en' : 'es');

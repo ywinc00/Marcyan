@@ -9,7 +9,7 @@ import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT } from '../lib/chat-kb.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
 import { analyzeSite } from '../lib/diagnostic-checks.mjs';
@@ -614,6 +614,28 @@ check('ssrf/resuelto: isBlockedIp bloquea IPs privadas/reservadas resueltas', ()
 });
 check('ssrf/resuelto: isBlockedIp DEJA PASAR IPs públicas (no rompe sitios reales)', () => {
   for (const ip of ['8.8.8.8', '1.1.1.1', '2001:4860:4860::8888']) assert.equal(isBlockedIp(ip), false, 'no debería bloquear ' + ip);
+});
+
+// ── Hallazgos de las pruebas de comportamiento (2026-10-31) ─────────
+const EM = String.fromCharCode(0x2014), EN_DASH = String.fromCharCode(0x2013);
+check('guion largo: conector a coma, sin unir líneas, rangos con guion corto intactos', () => {
+  assert.equal(stripEmDash('No puedo hacer eso ' + EM + ' sigo siendo Marcy.'), 'No puedo hacer eso, sigo siendo Marcy.');
+  assert.equal(stripEmDash('Desde $400 ' + EM + ' perfecta para tu taller.'), 'Desde $400, perfecta para tu taller.');
+  assert.equal(stripEmDash('y ' + EM + 'sobre todo' + EM + ' cuánto'), 'y, sobre todo, cuánto');
+  assert.equal(stripEmDash('Hola ' + EM + '\nSegunda'), 'Hola\nSegunda');
+  assert.equal(stripEmDash(EM + ' viñeta'), 'viñeta');
+  assert.equal(stripEmDash('Lun' + EN_DASH + 'Vie 9am' + EN_DASH + '6pm'), 'Lun' + EN_DASH + 'Vie 9am' + EN_DASH + '6pm');
+});
+check('guion largo: brandPostFilter lo quita de toda respuesta', () => {
+  assert.ok(!brandPostFilter('Claro ' + EM + ' te ayudo.', 'es').includes(EM));
+});
+check('instrucciones: sin guion largo salvo la regla que lo prohíbe (el modelo copia el estilo)', () => {
+  const all = SYSTEM_PROMPT + JSON.stringify(CHAT_TOOLS);
+  assert.equal((all.match(new RegExp(EM, 'g')) || []).length, 1);
+  assert.ok(SYSTEM_PROMPT.includes('Nunca uses guion largo'));
+});
+check('instrucciones: contesta en el idioma del visitante también al rechazar', () => {
+  assert.ok(/idioma en que te escribe el visitante, también cuando rechaces/.test(SYSTEM_PROMPT));
 });
 
 // ── P2 · coste y caché por turno (lib/chat-usage.mjs) ──────────────

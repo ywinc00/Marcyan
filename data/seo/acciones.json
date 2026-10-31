@@ -376,7 +376,7 @@
       "ref": "marcyan-prueba-causa-raiz",
       "tipo": "web",
       "titulo": "Prueba de 3 semanas (2 a 23-nov): 16 landings caídas en parejas, la mitad con la capa del cohete desactivada al cargar, petición única de rastreo para las 16",
-      "estado": "propuesta",
+      "estado": "descartada",
       "primeraVez": "2026-10-31",
       "ultimaVez": "2026-10-31",
       "propuestas": 1,
@@ -390,6 +390,11 @@
         {
           "fecha": "2026-10-31",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-31",
+          "estado": "descartada",
+          "nota": "El dueño prefirió arreglar ya sin esperar la prueba (31-oct)"
         }
       ]
     },
@@ -397,7 +402,7 @@
       "ref": "marcyan-cohete-render",
       "tipo": "web",
       "titulo": "Arreglar en todo el sitio la capa del cohete para que el render de Google no la dispare (tapa el 99 % de 54 páginas)",
-      "estado": "propuesta",
+      "estado": "hecha",
       "primeraVez": "2026-10-31",
       "ultimaVez": "2026-10-31",
       "propuestas": 1,
@@ -411,6 +416,11 @@
         {
           "fecha": "2026-10-31",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-31",
+          "estado": "hecha",
+          "nota": "PR #43 en producción el 31-oct"
         }
       ]
     },
@@ -418,7 +428,7 @@
       "ref": "marcyan-congelar-catalogo",
       "tipo": "web",
       "titulo": "Congelar páginas comerciales nuevas y cambios públicos hasta leer la prueba el 23-nov",
-      "estado": "propuesta",
+      "estado": "hecha",
       "primeraVez": "2026-10-31",
       "ultimaVez": "2026-10-31",
       "propuestas": 1,
@@ -432,6 +442,11 @@
         {
           "fecha": "2026-10-31",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-31",
+          "estado": "hecha",
+          "nota": "Sin páginas comerciales nuevas; el rediseño de Houston sigue en otro chat"
         }
       ]
     },
@@ -439,7 +454,7 @@
       "ref": "marcyan-consolidar-catalogo",
       "tipo": "web",
       "titulo": "Si la prueba lo confirma: recortar y fusionar el catálogo comercial (primero las 25 landings EN, luego gemelas de ciudad ES, luego resúmenes)",
-      "estado": "propuesta",
+      "estado": "hecha",
       "primeraVez": "2026-10-31",
       "ultimaVez": "2026-10-31",
       "propuestas": 1,
@@ -453,6 +468,11 @@
         {
           "fecha": "2026-10-31",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-31",
+          "estado": "hecha",
+          "nota": "PR #43 en producción el 31-oct: 32 URL juntadas, parejas Houston/Miami ES conservadas por decisión del dueño"
         }
       ]
     }

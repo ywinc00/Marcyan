@@ -16,6 +16,8 @@
 
 > Lectura del 18-oct (chat Marcyan Web, `diagnostico-indexacion-2026-10-13.md` §14): la caída sigue solo en Marcyan (cobertura 44 a 37 de 84 del 13 al 18-oct; TRR, JLX y MJA sin cambios) y /en/houston, la única página que citaba Gemini, salió tras un rastreo del 17-oct; toda la familia de diseño web de Houston está fuera. El dueño aprobó todo el plan el 18-oct. Calendario ajustado: peticiones de rastreo el 19-oct a las 07:45 (reintento único el 20-oct), cola automática neutralizada del 19 al 23-oct, señal de las peticiones el 2-nov, honestidad el 3-nov, higiene el 10-nov, Fase A desde el 17-nov empezando por /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local (orden nuevo, aprobado por Yan el 18-oct), tanda de /en/houston aplazada al 4-dic, reseñas (TRR, JLX, Rosy Nails en Houston) y Bing Places + Apple adelantados a octubre.
 
+> 31-oct (chat Marcyan Web): causa raíz con datos en vivo (`causa-raiz-2026-10-31.md`): Google conserva las páginas sin sustituto y suelta las páginas de venta repetidas. El dueño descartó la prueba de 3 semanas y aprobó arreglar ya: peticiones automáticas apagadas (6b134d8) y PR #43 en producción (5e46c1a): capa del cohete que ya no tapa la página a Google, inglés limpio, 32 páginas fuera del índice juntadas en su página fuerte (84 a 52 URL), botones a secciones que existen. Excepción del dueño: las parejas Houston/Miami en español se conservan (Miami tendrá rediseño real con proyectos y reseñas). Peticiones de rastreo de los 5 destinos el 1-nov temprano. El rediseño de Houston va en otro chat. Revisión: 7, 14 y 28-nov.
+
 ## Tanda en curso
 
 | # | Tarea | Palanca | Impacto | Confianza | Esfuerzo | Puntos | Responsable | Fecha | Estado |

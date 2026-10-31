@@ -4,7 +4,9 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, buildSiteToolResult, siteReviewAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
+import { readFileSync } from 'node:fs';
 import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -448,19 +450,73 @@ check('calc F4: extraAllow nunca incluye cifras < PRICE_MIN (10); un "$5" de reg
 });
 
 // ── v7.5: LÍMITES de revisar_sitio (1/sesión + 5/10min por IP), sin fetch ──
-check('límite: 1ª revisión de la sesión permitida, 2ª NO (misma sid)', () => {
-  const sid = 'sess-A-' + pass;
-  assert.equal(siteReviewAllowed(sid, '9.9.9.1'), true);
-  assert.equal(siteReviewAllowed(sid, '9.9.9.1'), false); // sin fetch: el cupo de sesión ya se consumió
+// Frenos GUARDADOS (puerta técnica 2026-10-31): las pruebas inyectan un
+// almacén en memoria; en producción la cuenta vive en rate_limit_hits.
+await acheck('límite: 1ª revisión de la sesión permitida, 2ª NO (misma sid)', async () => {
+  const store = memoryStore();
+  assert.equal(await siteReviewAllowed('sess-A', '9.9.9.1', { store }), true);
+  assert.equal(await siteReviewAllowed('sess-A', '9.9.9.1', { store }), false); // sin fetch: el cupo de sesión ya se consumió
 });
-check('límite: 6ª revisión de la MISMA IP (distintas sesiones) → false', () => {
-  const ip = '9.9.9.2';
+await acheck('límite: 6ª revisión de la MISMA IP (distintas sesiones) → false', async () => {
+  const store = memoryStore();
   let allowed = 0;
-  for (let i = 0; i < 7; i++) if (siteReviewAllowed('sess-B-' + i + '-' + pass, ip)) allowed++;
+  for (let i = 0; i < 7; i++) if (await siteReviewAllowed('sess-B-' + i, '9.9.9.2', { store })) allowed++;
   assert.equal(allowed, 5); // tope 5/10min por IP
 });
-check('límite: sid vacío no rompe (solo aplica tope por IP)', () => {
-  assert.equal(typeof siteReviewAllowed('', '9.9.9.3'), 'boolean');
+await acheck('límite: sid vacío no rompe (solo aplica tope por IP)', async () => {
+  assert.equal(typeof await siteReviewAllowed('', '9.9.9.3', { store: memoryStore() }), 'boolean');
+});
+await acheck('límite: revisar_sitio pasa de 20 al día por IP aunque se espacie', async () => {
+  const store = memoryStore();
+  let now = Date.UTC(2026, 9, 31, 0, 0, 0), allowed = 0;
+  for (let i = 0; i < 25; i++) { if (await siteReviewAllowed('sess-C-' + i, '9.9.9.4', { store, now })) allowed++; now += 11 * 60 * 1000; }
+  assert.equal(allowed, RL.chatSite[1].limit);
+});
+
+await acheck('freno chat: 12 mensajes por minuto por conexión, el 13.º se frena', async () => {
+  const store = memoryStore();
+  const now = Date.UTC(2026, 9, 31, 12, 0, 0);
+  for (let i = 0; i < 12; i++) assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-' + i, store, now }), true, 'mensaje ' + (i + 1));
+  assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-x', store, now }), false);
+  assert.equal(await chatAllowed({ ip: '2.2.2.2', sid: 's-y', store, now }), true, 'otra conexión no comparte cuenta');
+});
+await acheck('freno chat: 40 mensajes por conversación al día aunque cambie de conexión', async () => {
+  const store = memoryStore();
+  const now = Date.UTC(2026, 9, 31, 12, 0, 0);
+  for (let i = 0; i < 40; i++) assert.equal(await chatAllowed({ ip: '3.3.' + i + '.1', sid: 'conv-1', store, now }), true);
+  assert.equal(await chatAllowed({ ip: '3.3.99.1', sid: 'conv-1', store, now }), false);
+});
+await acheck('freno chat: 150 al día por conexión aunque respete el minuto', async () => {
+  const store = memoryStore();
+  let now = Date.UTC(2026, 9, 31, 0, 0, 30), allowed = 0;
+  for (let i = 0; i < 160; i++) { if (await chatAllowed({ ip: '4.4.4.4', sid: 'c-' + i, store, now })) allowed++; now += 61 * 1000; }
+  assert.equal(allowed, RL.chat[1].limit);
+});
+await acheck('freno chat: el freno sobrevive a un arranque en frío (la cuenta no vive en el módulo)', async () => {
+  // Antes el Map vivía en el módulo: cada instancia nueva empezaba en cero.
+  // Ahora la cuenta la lleva el almacén compartido; dos "instancias" (dos
+  // llamadas sin estado propio) ven la misma cuenta.
+  const shared = memoryStore();
+  const now = Date.UTC(2026, 9, 31, 12, 0, 0);
+  for (let i = 0; i < 12; i++) await chatAllowed({ ip: '5.5.5.5', sid: 'a-' + i, store: shared, now });
+  assert.equal(await chatAllowed({ ip: '5.5.5.5', sid: 'b', store: shared, now }), false);
+});
+await acheck('tope diario del sitio: 200 pasan, el 201 se frena y solo él marca justHit', async () => {
+  const store = memoryStore();
+  const now = Date.UTC(2026, 9, 31, 12, 0, 0);
+  for (let i = 0; i < RL.chatGlobal[0].limit; i++) assert.equal((await chatGlobalAllowed({ store, now })).ok, true);
+  const first = await chatGlobalAllowed({ store, now });
+  const second = await chatGlobalAllowed({ store, now });
+  assert.deepEqual([first.ok, first.justHit, second.ok, second.justHit], [false, true, false, false]);
+  assert.equal((await chatGlobalAllowed({ store, now: now + 86400 * 1000 })).ok, true, 'al día siguiente vuelve');
+});
+check('doctrina: el chat no importa la base de forma estática (solo frenos y avisos, dinámicos)', () => {
+  const src = readFileSync(new URL('../api/chat.mjs', import.meta.url), 'utf8');
+  const statics = [...src.matchAll(/^import\s.*?from\s+['"]([^'"]+)['"]/gm)].map((m) => m[1]);
+  for (const bad of ['@vercel/postgres', '../lib/db.mjs', '../lib/leads.mjs', '../lib/auth.mjs', '../lib/email.mjs', '../lib/notifications.mjs']) {
+    assert.ok(!statics.includes(bad), 'import estático prohibido en el chat: ' + bad);
+  }
+  assert.ok(!/new Map\(\)/.test(src), 'sin contadores en memoria por instancia');
 });
 
 // ── v7.6: ANTI-FORJADO — el cliente no puede inyectar un tool_result ──

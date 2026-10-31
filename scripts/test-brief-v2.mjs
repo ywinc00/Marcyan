@@ -359,6 +359,18 @@ await check('ratelimit: ventana diaria también cuenta', async () => {
   for (let i = 0; i < 21; i++) { last = await rateLimit({ bucket: 'brief', key: 'ip', limits: LIMITS.brief, store, now }); now += 11 * 60 * 1000; }
   assert.equal(last.ok, false, 'el envío 21 del día se rechaza aunque la ventana corta esté libre');
 });
+await check('ratelimit: a medianoche la ventana corta y la del día NO comparten fila (contaba doble)', async () => {
+  // Bug encontrado el 2026-10-31: las dos ventanas empiezan en el mismo instante
+  // a las 00:00 UTC y compartían la fila, así que cada envío contaba dos veces.
+  const store = memoryStore();
+  const now = Date.UTC(2026, 9, 31, 0, 2, 0);
+  const lim = [{ limit: 5, windowSec: 600 }, { limit: 20, windowSec: 86400 }];
+  for (let i = 0; i < 5; i++) {
+    const r = await rateLimit({ bucket: 'brief', key: 'ip-medianoche', limits: lim, store, now });
+    assert.equal(r.ok, true, 'envío ' + (i + 1) + ' de 5 tras medianoche');
+    assert.deepEqual(r.counts.map((c) => c.count), [i + 1, i + 1], 'cada ventana cuenta una vez');
+  }
+});
 await check('ratelimit: si el almacén falla, degrada a memoria sin romper', async () => {
   const broken = { async incr() { const e = new Error('relation "rate_limit_hits" does not exist'); e.code = '42P01'; throw e; } };
   const r = await rateLimit({ bucket: 'login', key: '9.9.9.9', limits: LIMITS.login, store: broken });

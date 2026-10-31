@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-28",
+  "fecha": "2026-10-31",
   "primeraEjecucion": false,
   "sitemap": 84,
   "inspeccion": true,
-  "indexadas": 35,
+  "indexadas": 34,
   "inspeccionadas": 84,
   "porEstado": {
-    "Submitted and indexed": 35,
-    "Crawled - currently not indexed": 47,
+    "Submitted and indexed": 34,
+    "Crawled - currently not indexed": 48,
     "Alternate page with proper canonical tag": 2
   },
   "porGrupo": {
@@ -22,7 +22,7 @@
     },
     "servicios·en": {
       "total": 2,
-      "indexadas": 0
+      "indexadas": 1
     },
     "blog·en": {
       "total": 1,
@@ -38,7 +38,7 @@
     },
     "landings·en": {
       "total": 18,
-      "indexadas": 3
+      "indexadas": 2
     },
     "precios·en": {
       "total": 4,
@@ -74,12 +74,12 @@
     },
     "precios·es": {
       "total": 4,
-      "indexadas": 1
+      "indexadas": 0
     }
   },
-  "sinRastreoReciente": 22,
+  "sinRastreoReciente": 20,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 78,
+  "certificadoDias": 75,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 84
@@ -113,8 +113,8 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 88,
-    "sesionesDiaHabitual": 3.8,
+    "sesionesUltimos3Dias": 5,
+    "sesionesDiaHabitual": 4.5,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
     "probabilidadAzar": null
@@ -137,72 +137,64 @@
   },
   "google": {
     "enCurso": [],
-    "recientes": [
-      {
-        "nombre": "September 2026 spam update",
-        "inicio": "2026-09-24T16:15:00+00:00",
-        "fin": "2026-10-08T08:00:00+00:00",
-        "url": "https://status.search.google.com/incidents/XhUDXP7A67iHCD2kmbVu",
-        "interpretableDesde": "2026-10-15"
-      }
-    ]
+    "recientes": []
   },
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-10-28",
+        "fecha": "2026-10-31",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+        "url": "https://marcyanstudio.com/en/houston/ai-seo"
       },
       {
-        "fecha": "2026-10-28",
+        "fecha": "2026-10-31",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
+        "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
       }
     ],
     "media": [
       {
-        "fecha": "2026-10-28",
+        "fecha": "2026-10-31",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "22 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "20 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-10-28",
+        "fecha": "2026-10-31",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "indexacion",
         "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/herramientas"
+        "url": "https://marcyanstudio.com/en/ai-for-small-business"
       }
     ]
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-10-28",
+      "fecha": "2026-10-31",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/pricing/chatbot-cost"
+      "url": "https://marcyanstudio.com/en/houston/ai-seo"
     },
     {
-      "fecha": "2026-10-28",
+      "fecha": "2026-10-31",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
+      "url": "https://marcyanstudio.com/es/precios/cuanto-cuesta-una-pagina-web-houston"
     }
   ],
   "pedirIndexacion": [],

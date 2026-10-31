@@ -516,3 +516,28 @@ vamos a construir ya para ver desde el móvil y en vivo"; vista previa aparte, s
 - Contratos comprobados en el resultado compilado (ES y EN): un h1, Breadcrumb + ItemList + FAQPage, 19 enlaces del silo,
   anclas, canónica, hreflang, seguimiento; verificador de contratos de las landings y KB del chat: todo pasa. Title y meta
   sin tocar (chat de SEO). Fluidez en móvil con procesador 4× más lento: la portada dibuja cada fotograma en 10-16 ms.
+## v11 · Conceptos de diseño aplicados y arreglos (2026-10-31)
+
+Punto de control previo: etiqueta `houston-v10-movil` (para volver atrás si hace falta).
+
+### Los cuatro conceptos: utilidad para esta landing y destino en el sitio o el producto
+
+| Concepto | ¿Útil aquí? | Qué se hizo en Houston | Dónde más lleva |
+|---|---|---|---|
+| Bento (contenido en piezas) | Sí, en un sitio concreto | La sección de Houston pasa a piezas: el mapa es la pieza dominante, el contacto va en su propia pieza y las zonas dentro de la del mapa. En servicios NO: ya cuenta tres pasos en orden y un bento lo rompería | Portada del sitio (resumen de servicios con una pieza dominante), /servicios (catálogo de 7 productos), Orbit (panel del cliente), resultados del diagnóstico |
+| Ilustraciones que cuentan una historia | Sí, es la columna del diseño | El viaje planeta → mapa → ciudad ahora termina en la ciudad REAL: mapa con las carreteras, la bahía y los bayous reales y skyline vectorizado de una foto real | Portadas de cada servicio (su escena: búsqueda, web, chat), brief y kit de arranque (guiar por pasos), Marcy |
+| Elementos interactivos | Sí, con medida (E-08) | El mapa se enciende desde el centro al llegar; la zona que se señala (lista o punto) se ilumina en el mapa | Calculadoras y diagnóstico, precios (conmutador de paquetes), demos de Marcy en las páginas de IA |
+| Menú mega | No dentro de la página | — | La barra del sitio: ~90 páginas (servicios × ciudades × idiomas). Menú mega en "Servicios" y "Ciudades". Es gramática global: decisión del dueño |
+
+### Arreglos
+- Estrellas del fondo: un 10 % menos en cada capa.
+- Planeta de la portada: responde antes (suavizado 95 ms, recorrido mínimo 0,65 s escritorio / 0,95 s móvil, acercamiento
+  completo en el 55 % del tramo fijo) y la historia de las búsquedas dura 2,4 s en vez de 3,8 s.
+- Mapa de zonas: rehecho con datos reales de TIGER/Line 2024 (Censo de EE. UU., dominio público): autopistas y carreteras
+  principales, bahía, lagos y embalses, y los bayous. De noche: carreteras como luz dorada, agua negra con costa fina. Datos en
+  `public/geo/houston-mapa.json` (57 KB comprimido, se carga al acercarse). Proceso: `scratchpad/maptools/build-houston-map.sh`
+  (mapshaper). Ojo: d3-geo quiere los anillos exteriores en sentido horario (al revés que GeoJSON estándar).
+- Ciudad del pie: el skyline real de Houston al anochecer, vectorizado de una foto de dominio público (Carol M. Highsmith,
+  Biblioteca del Congreso, 2014) en capas con potrace: silueta y plantas encendidas (los planos de fachada quedan en el
+  archivo, apagados). Coloreado con CSS: silueta casi negra contra el resplandor dorado, ventanas en oro en tres intensidades.
+  Archivo `public/assets/houston/skyline.svg` (51 KB, 17 KB comprimido), se inserta cuando el pie se acerca.

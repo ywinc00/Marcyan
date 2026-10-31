@@ -171,11 +171,12 @@ const names = projects.map((p) => p.name).join('|');
         <Kicker>{h.local.tag}</Kicker>
         <h2 class="h2" id="hx-local-t" set:html={h.local.title} />
         {h.local.paragraphs.map((p: string) => <p set:html={p} />)}
-        <dl class="nap">
-          {j.local.nap.map((r: any) => (<><dt>{r.label}</dt><dd>{r.href ? <a href={r.href} data-track="call_clicked">{r.value}</a> : r.value}</dd></>))}
-        </dl>
       </div>
-      <div class="local__right">
+      {/* bento: el mapa es la pieza dominante; datos de contacto y zonas en sus propias piezas */}
+      <dl class="nap local__nap" data-rev>
+        {j.local.nap.map((r: any) => (<><dt>{r.label}</dt><dd>{r.href ? <a href={r.href} data-track="call_clicked">{r.value}</a> : r.value}</dd></>))}
+      </dl>
+      <div class="local__right" data-rev>
         <figure class="local__map" id="hx-map" aria-label={j.local.mapLabel} data-zones={JSON.stringify(j.local.zones)}>
           <div class="local__plate" id="hx-map-plate"><canvas id="hx-map-cv"></canvas></div>
           <figcaption class="local__cap">{j.local.mapCap}</figcaption>

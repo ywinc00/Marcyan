@@ -1,4 +1,4 @@
-import { geoOrthographic, geoPath } from 'd3-geo';
+import { geoMercator, geoPath } from 'd3-geo';
 // Movimiento de las secciones: revelado de una vez, viñetas de servicios, panel de proyectos,
 // cifras que suben, mapa del área. Todo respeta "reducir movimiento".
 export function initSections(loadGeo) {
@@ -150,136 +150,132 @@ export function initSections(loadGeo) {
   }), { threshold: 0.4 });
   ['[data-demo]', '.answer__figs'].forEach((s) => { const el = $(s); if (!el) return; if (reduce) el.classList.add('in'); else { $$('[data-count]', el).forEach((n) => (n.textContent = '0')); cIO.observe(el); } });
 
-  // ── mapa del área: el mismo gesto aprobado del planeta de la portada, a escala de la ciudad ──
-  // empieza lejos, con la costa en puntos dorados; se acerca a Houston y los puntos crecen y se funden en bronce;
-  // al terminar, las zonas hacen su pulso una sola vez. La lista de zonas debajo enlaza a sus páginas.
+  // ── mapa del área: Houston de noche desde arriba, con sus carreteras, la bahía, los lagos y los bayous REALES ──
+  // (TIGER/Line 2024 del Censo de EE. UU., dominio público). Al entrar, la cámara baja hacia la ciudad y las
+  // autopistas se encienden desde el centro hacia fuera; luego las zonas hacen su pulso. La lista de zonas y los
+  // puntos se señalan entre sí, y al pasar por una zona el mapa la ilumina.
   const box = $('#hx-map'), cv = $('#hx-map-cv'), plate = $('#hx-map-plate');
-  if (box && cv) loadGeo().then((GEO) => {
-    const land = { type: 'MultiPolygon', coordinates: GEO.tx10 };
-    const HOU = [-95.369, 29.760], FIN = [-95.48, 29.86], GOLD = '#dcc089';
+  if (box && cv) {
+    const HOU = [-95.369, 29.760];
     const AT = { 'Houston': HOU, 'Katy': [-95.824, 29.786], 'Sugar Land': [-95.635, 29.620], 'The Woodlands': [-95.489, 30.166], 'Pearland': [-95.286, 29.564], 'Pasadena': [-95.209, 29.691] };
     const ZONES = JSON.parse(box.dataset.zones || '[]').map((z) => Object.assign({ at: AT[z.n] }, z)).filter((z) => z.at);
     const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-    // Houston estilizada (comprobada contra el mapa de OpenStreetMap): Loop 610, Beltway 8, Grand Parkway y las radiales
-    const L610 = [[-95.4555,29.8095],[-95.41,29.811],[-95.388,29.809],[-95.35,29.8095],[-95.317,29.8105],[-95.29,29.803],[-95.2745,29.788],[-95.2725,29.7705],[-95.269,29.74],[-95.2627,29.714],[-95.27,29.696],[-95.295,29.688],[-95.348,29.686],[-95.388,29.685],[-95.435,29.685],[-95.454,29.693],[-95.4565,29.7306],[-95.456,29.76],[-95.4555,29.7845],[-95.4555,29.8095]];
-    const BW8 = [[-95.5594,29.7848],[-95.559,29.83],[-95.553,29.88],[-95.53,29.91],[-95.49,29.93],[-95.4106,29.9376],[-95.35,29.944],[-95.306,29.948],[-95.26,29.942],[-95.215,29.92],[-95.19,29.88],[-95.1737,29.7905],[-95.1706,29.7036],[-95.18,29.64],[-95.22,29.605],[-95.29,29.596],[-95.3888,29.5965],[-95.46,29.605],[-95.53,29.64],[-95.5565,29.6985],[-95.56,29.74],[-95.5594,29.7848]];
-    const GP99 = [[-95.41,29.518],[-95.56,29.55],[-95.723,29.59],[-95.78,29.69],[-95.8015,29.7838],[-95.79,29.89],[-95.733,29.989],[-95.65,30.07],[-95.55,30.11],[-95.438,30.1195],[-95.33,30.12],[-95.26,30.114],[-95.15,30.07],[-95.05,29.95],[-94.977,29.815]];
-    const RADIALS = [
-      [[-95.95,29.79],[-95.8015,29.7838],[-95.65,29.784],[-95.5594,29.7848],[-95.4555,29.7845],[-95.39,29.778],[-95.365,29.77],[-95.33,29.773],[-95.2725,29.7705],[-95.1737,29.7905],[-95.05,29.8],[-94.977,29.815],[-94.85,29.83]],  // I-10
-      [[-95.365,29.765],[-95.38,29.79],[-95.3876,29.8087],[-95.4,29.86],[-95.4106,29.9376],[-95.415,30.0],[-95.438,30.1195],[-95.4613,30.1658],[-95.47,30.25]],  // I-45 norte
-      [[-95.355,29.745],[-95.318,29.718],[-95.285,29.688],[-95.24,29.65],[-95.2,29.6],[-95.13,29.54],[-95.07,29.48],[-95.0,29.4]],  // I-45 sur
-      [[-95.375,29.75],[-95.4,29.735],[-95.4565,29.7306],[-95.5,29.718],[-95.5565,29.6985],[-95.6349,29.6197],[-95.723,29.59],[-95.8,29.55]],  // US-59 suroeste
-      [[-95.355,29.77],[-95.33,29.8],[-95.317,29.8105],[-95.306,29.948],[-95.2622,29.9988],[-95.2,30.07],[-95.15,30.15]],  // US-59 noreste
-      [[-95.4555,29.8],[-95.49,29.835],[-95.553,29.88],[-95.62,29.93],[-95.733,29.989],[-95.85,30.06]],  // US-290
-      [[-95.38,29.745],[-95.388,29.685],[-95.3888,29.5965],[-95.395,29.56],[-95.41,29.518],[-95.42,29.45]],  // SH-288
-      [[-95.2627,29.708],[-95.2,29.703],[-95.1706,29.7036],[-95.11,29.705],[-95.03,29.69]],  // SH-225
-    ];
-    const CHANNEL = [[-95.365,29.762],[-95.33,29.756],[-95.293,29.7495],[-95.255,29.735],[-95.2,29.729],[-95.14,29.736],[-95.09,29.733],[-95.03,29.7],[-94.985,29.68]];  // Buffalo Bayou y el canal de barcos
-    const LAKE = [[-95.145,29.92],[-95.105,29.95],[-95.1,30.0],[-95.115,30.05],[-95.135,30.045],[-95.12,30.0],[-95.13,29.96],[-95.145,29.92]];  // Lake Houston
-    const ez = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-    const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-    const lp = (a, b, t) => a + (b - a) * t;
-    const mixHex = (a, b, t) => { const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
-      return 'rgb(' + pa.map((v, k) => Math.round(v + (pb[k] - v) * t)).join(',') + ')'; };
-    let W = 0, H = 0, dpr = 1, kNow = 0, fine = null; const pats = new Map();
+    // el encuadre final: toda el área metropolitana con la bahía de Galveston a la derecha
+    const VIEW = { type: 'MultiPoint', coordinates: [[-95.93, 29.49], [-94.86, 30.23]] };
+    const ez = (t) => 1 - Math.pow(1 - t, 3);
     const c = cv.getContext('2d');
-    function dotsFor(g) {
-      const q = Math.round(g * 20) / 20, key = q + '|' + dpr; if (pats.has(key)) return pats.get(key);
-      const k = document.createElement('canvas'); k.width = k.height = Math.round(4.5 * dpr);
-      const x = k.getContext('2d'); x.fillStyle = mixHex(GOLD, '#8f7142', q); x.beginPath(); x.arc(k.width / 2, k.height / 2, (1.05 + 2.1 * q) * dpr, 0, Math.PI * 2); x.fill();
-      const pat = c.createPattern(k, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(1 / dpr)); pats.set(key, pat); return pat;
+    let MAP = null, W = 0, H = 0, dpr = 1, layers = null, hl = null, revealed = false;
+    const mk = () => { const k = document.createElement('canvas'); k.width = Math.round(W * dpr); k.height = Math.round(H * dpr); const x = k.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); return [k, x]; };
+    const projFinal = () => geoMercator().fitExtent([[18, 26], [W - 18, H - 44]], VIEW);
+
+    // dos capas dibujadas UNA vez: el fondo (tierra, agua, bayous y el resplandor de la ciudad) y la luz de las carreteras
+    function build() {
+      W = plate.clientWidth; H = plate.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      const proj = projFinal(), [hx, hy] = proj(HOU);
+      const [B, b] = mk(), [R, r] = mk();
+      const gp = (ctx) => geoPath(proj, ctx);
+      // tierra de noche, con el resplandor de la ciudad alrededor del centro
+      b.fillStyle = '#13100c'; b.fillRect(0, 0, W, H);
+      const glow = b.createRadialGradient(hx, hy, 0, hx, hy, Math.max(W, H) * 0.42);
+      glow.addColorStop(0, 'rgba(214,172,104,.20)'); glow.addColorStop(0.45, 'rgba(160,118,62,.08)'); glow.addColorStop(1, 'rgba(20,16,12,0)');
+      b.fillStyle = glow; b.fillRect(0, 0, W, H);
+      // agua: bahía, lagos y embalses, con una costa fina en oro
+      b.beginPath(); MAP.w.forEach((poly) => gp(b)({ type: 'Polygon', coordinates: poly }));
+      b.fillStyle = '#060505'; b.fill('evenodd');
+      b.strokeStyle = 'rgba(220,192,137,.28)'; b.lineWidth = 0.8; b.stroke();
+      // bayous: hilos de agua oscura (la "Bayou City")
+      b.lineCap = b.lineJoin = 'round';
+      b.beginPath(); MAP.b.forEach((l) => gp(b)({ type: 'LineString', coordinates: l }));
+      b.strokeStyle = 'rgba(6,5,5,.95)'; b.lineWidth = 1.7; b.stroke();
+      b.strokeStyle = 'rgba(220,192,137,.10)'; b.lineWidth = 0.6; b.stroke();
+      // carreteras: las secundarias como luz tenue; las autopistas con halo y núcleo cálido
+      r.lineCap = r.lineJoin = 'round';
+      r.beginPath(); MAP.r2.forEach((l) => gp(r)({ type: 'LineString', coordinates: l }));
+      r.strokeStyle = 'rgba(214,180,118,.34)'; r.lineWidth = 0.75; r.stroke();
+      r.beginPath(); MAP.r1.forEach((l) => gp(r)({ type: 'LineString', coordinates: l }));
+      r.strokeStyle = 'rgba(220,180,110,.13)'; r.lineWidth = 4.5; r.stroke();
+      r.strokeStyle = 'rgba(244,224,180,.88)'; r.lineWidth = 1.25; r.stroke();
+      layers = { B, R, hx, hy, proj };
     }
-    function size() {
-      W = plate.clientWidth; H = plate.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1); pats.clear();
-      cv.width = W * dpr; cv.height = H * dpr;
-      const p = document.createElement('canvas'); p.width = p.height = Math.round(6 * dpr);
-      const pc = p.getContext('2d'); pc.fillStyle = 'rgba(8,7,5,.12)'; pc.beginPath(); pc.arc(p.width / 2, p.height / 2, 0.9 * dpr, 0, Math.PI * 2); pc.fill();   // trama más suave: no ensucia los rótulos
-      fine = c.createPattern(p, 'repeat'); if (fine.setTransform) fine.setTransform(new DOMMatrix().scale(1 / dpr));
-    }
-    function projFor(k) {
-      const kmF = Math.min((W - 80) / 92, (H - 120) / 76), e = ez(k);
-      const km = Math.exp(lp(Math.log(kmF * 0.32), Math.log(kmF), e));      // de lejos se lee la costa del Golfo
-      const ctr = [lp(HOU[0], FIN[0], e), lp(HOU[1], FIN[1], e)];
-      return geoOrthographic().rotate([-ctr[0], -ctr[1]]).scale(6371 * km).translate([W * 0.5, H * 0.47]).clipAngle(90).clipExtent([[-30, -30], [W + 30, H + 30]]).precision(0.6);
-    }
-    function drawMap(k) {
-      kNow = k;
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const proj = projFor(k), P = new Path2D(geoPath(proj)(land) || '');
-      const sea = c.createRadialGradient(W * 0.75, H * 0.8, 10, W * 0.75, H * 0.8, W * 0.8);
-      sea.addColorStop(0, '#12100c'); sea.addColorStop(1, '#070605');
-      c.fillStyle = sea; c.fillRect(0, 0, W, H);
-      const grow = sm(0.38, 0.74, k), solid = sm(0.6, 0.84, k), dotsA = 1 - sm(0.72, 0.92, k);
-      if (solid > 0) {
-        const g = c.createRadialGradient(W * 0.3, H * 0.25, 10, W * 0.45, H * 0.45, W * 0.9);
-        g.addColorStop(0, '#8a6c3f'); g.addColorStop(0.6, '#6a5232'); g.addColorStop(1, '#4a3a24');
-        c.globalAlpha = solid; c.fillStyle = g; c.fill(P);
-        c.save(); c.clip(P); c.fillStyle = fine; c.fillRect(0, 0, W, H); c.restore(); c.globalAlpha = 1;
+    // un fotograma: la cámara baja (de 0,6 a 1 de escala, hacia el centro) y la luz se extiende desde el centro
+    function frame(k) {
+      const L = layers; if (!L) return;
+      const e = ez(k), s = 0.6 + 0.4 * e;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+      c.save(); c.translate(L.hx, L.hy); c.scale(s, s); c.translate(-L.hx, -L.hy);
+      c.drawImage(L.B, 0, 0, W, H);
+      const rad = Math.max(W, H) * 1.25 * e;
+      if (rad > 0) {
+        const [T, t] = tmp();
+        t.setTransform(1, 0, 0, 1, 0, 0); t.clearRect(0, 0, T.width, T.height); t.setTransform(dpr, 0, 0, dpr, 0, 0);
+        t.globalCompositeOperation = 'source-over'; t.drawImage(L.R, 0, 0, W, H);
+        if (k < 1) {
+          const m = t.createRadialGradient(L.hx, L.hy, Math.max(0, rad - 90), L.hx, L.hy, rad);
+          m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+          t.globalCompositeOperation = 'destination-in'; t.fillStyle = m; t.fillRect(0, 0, W, H);
+        }
+        c.drawImage(T, 0, 0, W, H);
       }
-      if (dotsA > 0) { c.globalAlpha = dotsA; c.fillStyle = dotsFor(grow); c.fill(P); c.globalAlpha = 1; }
-      c.strokeStyle = '#e8d6ae'; c.lineWidth = lp(0.6, 1, solid); c.globalAlpha = lp(0.38, 0.6, solid); c.stroke(P); c.globalAlpha = 1;
-      const ra = 0.55 + 0.45 * sm(0.4, 0.9, k);                            // los anillos de Houston se ven desde el principio: así se reconoce
-      if (ra > 0.01) {
-        const gp = geoPath(proj, c);
-        c.save(); c.globalAlpha = ra; c.lineJoin = 'round'; c.lineCap = 'round';
-        c.fillStyle = '#0c0a08'; c.beginPath(); gp({ type: 'Polygon', coordinates: [LAKE.slice().reverse()] }); c.fill();   // anillo en el sentido que espera d3 (si no, rellena el mundo entero)
-        c.strokeStyle = '#0c0a08'; c.lineWidth = 2.4; c.beginPath(); gp({ type: 'LineString', coordinates: CHANNEL }); c.stroke();
-        const line = (coords, core, casing, a) => {
-          c.beginPath(); gp({ type: 'LineString', coordinates: coords });
-          c.strokeStyle = 'rgba(22,15,8,.42)'; c.lineWidth = casing; c.stroke();
-          c.strokeStyle = `rgba(248,238,216,${a})`; c.lineWidth = core; c.stroke();
-        };
-        RADIALS.forEach((r) => line(r, 1, 2.6, 0.42));
-        line(GP99, 1, 2.6, 0.38);
-        line(BW8, 1.3, 3.2, 0.6);
-        line(L610, 1.4, 3.4, 0.7);
-        c.restore();
+      // la zona señalada se ilumina
+      if (hl) {
+        const [x, y] = L.proj(hl.at), g = c.createRadialGradient(x, y, 0, x, y, 70);
+        g.addColorStop(0, 'rgba(236,206,150,.22)'); g.addColorStop(1, 'rgba(236,206,150,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(x, y, 70, 0, Math.PI * 2); c.fill();
       }
-      const v = c.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
-      v.addColorStop(0, 'rgba(9,8,7,0)'); v.addColorStop(1, 'rgba(9,8,7,.85)');
+      c.restore();
+      // viñeta: los bordes del mapa se funden con la tarjeta
+      const v = c.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.42, W / 2, H / 2, Math.max(W, H) * 0.78);
+      v.addColorStop(0, 'rgba(9,8,7,0)'); v.addColorStop(1, 'rgba(9,8,7,.78)');
       c.fillStyle = v; c.fillRect(0, 0, W, H);
     }
+    let TMP = null;
+    function tmp() { if (!TMP || TMP[0].width !== Math.round(W * dpr) || TMP[0].height !== Math.round(H * dpr)) TMP = mk(); return TMP; }
+
     const chips = {}; $$('#hx-zones [data-z]').forEach((el) => (chips[el.dataset.z] = el));
+    const pinEls = {};
     function placeZones() {
-      const proj = projFor(1);
+      const proj = layers.proj;
       $$('.mp', plate).forEach((e) => e.remove());
       ZONES.forEach((z, i) => {
         const [x, y] = proj(z.at);
         const el = document.createElement('div'); el.className = 'mp' + (z.hq ? ' mp--hq' : '');
-        el.style.left = x + 'px'; el.style.top = (y - 13) + 'px'; el.style.setProperty('--d', (z.hq ? 0 : 0.15 + i * 0.09) + 's');
-        // en un mapa pequeño (teléfono) solo llevan rótulo Houston y las zonas con página; las demás las nombra la lista de abajo
+        el.style.left = x + 'px'; el.style.top = (y - 13) + 'px'; el.style.setProperty('--d', (z.hq ? 0 : 0.12 + i * 0.08) + 's');
+        // en un mapa pequeño (teléfono) solo llevan rótulo Houston y las zonas con página; las demás las nombra la lista
         const label = W >= 500 || z.href || z.hq;
         el.innerHTML = (label ? (z.href ? `<a href="${z.href}">${z.n}${arrow}</a>` : `<span>${z.n}</span>`) : '') + '<i></i>';
-        plate.appendChild(el);
-        // la lista y el mapa se señalan entre sí
+        plate.appendChild(el); pinEls[z.n] = el;
+        el.addEventListener('mouseenter', () => zoneOn(z.n)); el.addEventListener('mouseleave', () => zoneOff(z.n));
         const chip = chips[z.n];
-        const on = () => { el.classList.add('hl'); chip && chip.classList.add('hl'); };
-        const off = () => { el.classList.remove('hl'); chip && chip.classList.remove('hl'); };
-        el.addEventListener('mouseenter', on); el.addEventListener('mouseleave', off);
-        if (chip && !chip.dataset.wired) { chip.dataset.wired = '1'; chip.addEventListener('mouseenter', () => pinOn(z.n)); chip.addEventListener('mouseleave', () => pinOff(z.n)); chip.addEventListener('focus', () => pinOn(z.n)); chip.addEventListener('blur', () => pinOff(z.n)); }
+        if (chip && !chip.dataset.wired) {
+          chip.dataset.wired = '1';
+          ['mouseenter', 'focus'].forEach((ev) => chip.addEventListener(ev, () => zoneOn(z.n)));
+          ['mouseleave', 'blur'].forEach((ev) => chip.addEventListener(ev, () => zoneOff(z.n)));
+        }
       });
     }
-    const pinEl = (n) => $$('.mp', plate).find((e) => e.textContent.trim().startsWith(n));
-    function pinOn(n) { const e = pinEl(n); e && e.classList.add('hl'); chips[n] && chips[n].classList.add('hl'); }
-    function pinOff(n) { const e = pinEl(n); e && e.classList.remove('hl'); chips[n] && chips[n].classList.remove('hl'); }
-    let ready = false;
-    const prep = () => { if (ready) return; ready = true; size(); placeZones(); drawMap(reduce ? 1 : 0); };
-    const nIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { prep(); nIO.disconnect(); } }, { rootMargin: '150% 0px' });
+    function zoneOn(n) { const z = ZONES.find((q) => q.n === n); if (!z) return; hl = z; pinEls[n] && pinEls[n].classList.add('hl'); chips[n] && chips[n].classList.add('hl'); if (revealed) frame(1); }
+    function zoneOff(n) { hl = null; pinEls[n] && pinEls[n].classList.remove('hl'); chips[n] && chips[n].classList.remove('hl'); if (revealed) frame(1); }
+
+    let mapP = null;
+    const loadMap = () => mapP || (mapP = fetch('/geo/houston-mapa.json').then((r) => r.json()).then((d) => { MAP = d; build(); placeZones(); frame(reduce ? 1 : 0); revealed = reduce; }));
+    const nIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { loadMap(); nIO.disconnect(); } }, { rootMargin: '150% 0px' });
     nIO.observe(box);
-    let rt; addEventListener('resize', () => { if (!ready) return; clearTimeout(rt); rt = setTimeout(() => { size(); placeZones(); drawMap(kNow); }, 120); });
-    function fly() {
-      prep();
-      const t0 = performance.now(), dur = 2100;
-      const f = (now) => { const p = Math.min(1, (now - t0) / dur); drawMap(p); if (p < 1) requestAnimationFrame(f); else box.classList.add('on'); };
-      requestAnimationFrame(f);
+    let rt; addEventListener('resize', () => { if (!MAP) return; clearTimeout(rt); rt = setTimeout(() => { build(); placeZones(); frame(revealed ? 1 : 0); }, 140); });
+    function play() {
+      loadMap().then(() => {
+        const t0 = performance.now(), dur = 1500;
+        const f = (now) => { const p = Math.min(1, (now - t0) / dur); frame(p); if (p < 1) requestAnimationFrame(f); else { revealed = true; box.classList.add('on'); } };
+        requestAnimationFrame(f);
+      });
     }
-    const mIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { fly(); mIO.disconnect(); } }, { threshold: 0.55 });
-    reduce ? box.classList.add('on') : mIO.observe(box);
+    const mIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { play(); mIO.disconnect(); } }, { threshold: 0.45 });
+    if (reduce) loadMap().then(() => box.classList.add('on')); else mIO.observe(box);
     if (!reduce) {
       let ticking = false;
-      const par = () => { ticking = false; const r = box.getBoundingClientRect(); const k = (r.top + r.height / 2 - innerHeight / 2) / innerHeight; plate.style.transform = `translate3d(0,${(-k * 22).toFixed(1)}px,0)`; };
+      const par = () => { ticking = false; const r = box.getBoundingClientRect(); const k = (r.top + r.height / 2 - innerHeight / 2) / innerHeight; plate.style.transform = `translate3d(0,${(-k * 18).toFixed(1)}px,0)`; };
       addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(par); } }, { passive: true }); par();
     }
-  });
+  }
 
 }

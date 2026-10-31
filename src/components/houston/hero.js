@@ -320,7 +320,7 @@ export function initHero(GEO) {
 
   // ── la historia de las búsquedas: corre una sola vez, la primera vez que el mapa llega a Houston ──
   let storyT0 = 0, storyDone = false, storyOn = false;
-  const STORY_MS = 3800;
+  const STORY_MS = 2400;
   function finalDom() {
     stage.classList.add('no-blip');
     items.forEach((it) => { it.pt.classList.add('on'); it.tag.style.opacity = 1; it.tag.style.transform = 'none'; it.line.style.strokeDashoffset = 0;
@@ -331,17 +331,17 @@ export function initHero(GEO) {
     if (T > -300) items.forEach((it) => it.pt.classList.add('on'));
     items.forEach((it) => {
       if (T < 0) return;
-      const p = Math.min(1, T / 700), e = 1 - Math.pow(1 - p, 3);
+      const p = Math.min(1, T / 440), e = 1 - Math.pow(1 - p, 3);
       const ox = houstonPx[0] - it.lx - 60, oy = houstonPx[1] - it.ly - 20;
       const bend = Math.sin(Math.PI * e) * (it.i % 2 ? -70 : 70);
       it.tag.style.opacity = Math.min(1, p * 2.2);
       it.tag.style.transform = `translate(${ox * (1 - e) + bend * 0.4}px,${oy * (1 - e) - bend}px) scale(${0.82 + 0.18 * e})`;
-      if (p >= 1) { const len = +it.line.style.strokeDasharray; const wp = Math.min(1, (T - 700) / 300); it.line.style.strokeDashoffset = Math.max(0, len * (1 - wp)); }
+      if (p >= 1) { const len = +it.line.style.strokeDasharray; const wp = Math.min(1, (T - 440) / 200); it.line.style.strokeDashoffset = Math.max(0, len * (1 - wp)); }
     });
-    if (T > 1150) { const P = items.find((it) => it.z.lit); P.pt.classList.add('lit'); P.tag.classList.add('lit'); P.line.classList.add('lit');
-      const len = +P.down.style.strokeDasharray; const dp = Math.min(1, Math.max(0, (T - 1350) / 600)); P.down.style.strokeDashoffset = Math.max(0, len * Math.pow(1 - dp, 3)); }
-    if (T > 1900) found.classList.add('on');
-    if (T > 2350) foundAi.classList.add('on');
+    if (T > 720) { const P = items.find((it) => it.z.lit); P.pt.classList.add('lit'); P.tag.classList.add('lit'); P.line.classList.add('lit');
+      const len = +P.down.style.strokeDasharray; const dp = Math.min(1, Math.max(0, (T - 840) / 380)); P.down.style.strokeDashoffset = Math.max(0, len * Math.pow(1 - dp, 3)); }
+    if (T > 1180) found.classList.add('on');
+    if (T > 1460) foundAi.classList.add('on');
   }
 
   // ── móvil: el texto se retira en cuanto empieza el viaje, para que el planeta tenga la pantalla entera ──
@@ -364,13 +364,13 @@ export function initHero(GEO) {
     const range = pin.offsetHeight - sticky.offsetHeight;
     if (range <= 0) return 1;
     const y = Math.min(range, Math.max(0, scrollY - pin.offsetTop));
-    return Math.min(1, y / (range * 0.65));         // el último 35 % del recorrido fijo deja ver la historia quieta
+    return Math.min(1, y / (range * 0.55));         // el último 45 % del recorrido fijo deja ver la historia quieta
   }
   function tick(now) {
     const dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
     // suavizado con un límite de velocidad: aunque el visitante baje de golpe, el viaje dura al menos ~1,2 s
-    let step = reduce ? (target >= 0.3 ? 1 : 0) - cur : (target - cur) * (1 - Math.exp(-dt / 150));
-    const maxStep = dt / (F.M ? 1700 : 1200);           // en móvil el viaje tiene un tiempo más (sube, gira, se acerca)
+    let step = reduce ? (target >= 0.3 ? 1 : 0) - cur : (target - cur) * (1 - Math.exp(-dt / 95));
+    const maxStep = dt / (F.M ? 950 : 650);             // el viaje entero dura como mínimo ~0,65 s (móvil ~0,95 s: tiene un tiempo más)
     if (!reduce) step = Math.max(-maxStep * 1.6, Math.min(maxStep, step));
     cur = reduce ? cur + step : Math.abs(target - cur) < 0.0008 ? target : cur + step;
     const zoomed = cur > 0.985;
@@ -382,7 +382,7 @@ export function initHero(GEO) {
     if (storyOn) {
       const T = now - storyT0;
       story(T);
-      ping = T > 2300 && T < 3700 ? (T - 2300) / 1400 : 0;
+      ping = T > 1460 && T < 2380 ? (T - 1460) / 920 : 0;
       if (T > STORY_MS) { storyOn = false; storyDone = true; }
     }
     draw(cur, ping);

@@ -23,9 +23,9 @@ export function initAtmo() {
     return `url("data:image/svg+xml;utf8,${out}</svg>")`;
   }
   const L1 = document.createElement('i'), L2 = document.createElement('i'), L3 = document.createElement('i');
-  L1.style.backgroundImage = starTile(31, 34, 720, 720, false);
-  L2.style.backgroundImage = starTile(77, 12, 900, 900, true); L2.style.backgroundSize = '900px 900px';
-  L3.style.backgroundImage = starTile(13, 60, 640, 640, false); L3.style.backgroundSize = '640px 640px'; // más densas: cielo de noche
+  L1.style.backgroundImage = starTile(31, 31, 720, 720, false);
+  L2.style.backgroundImage = starTile(77, 11, 900, 900, true); L2.style.backgroundSize = '900px 900px';
+  L3.style.backgroundImage = starTile(13, 54, 640, 640, false); L3.style.backgroundSize = '640px 640px'; // más densas: cielo de noche
   starsBox.append(L1, L2, L3);
 
   // ── fases por sección ──

@@ -8,8 +8,9 @@ interface Props {
   description: string;
   /** Ruta del índice con prefijo de idioma, sin dominio (p.ej. "/es/blog"). */
   path: string;
+  inLanguage?: string;
 }
-const { posts, name, description, path } = Astro.props;
-const ld = blog(posts, { name, description, path });
+const { posts, name, description, path, inLanguage } = Astro.props;
+const ld = blog(posts, { name, description, path, inLanguage });
 ---
 <script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />

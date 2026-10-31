@@ -23,10 +23,6 @@ faq:
   - q: "¿Cuánto cuesta un sitio web para mi restaurante?"
     a: "En Marcyan, el diseño web arranca desde 1,500 dólares e incluye menú digital, botón de WhatsApp y un sitio rápido en el celular. Si quieres cobrar en línea con carrito, el e-commerce arranca desde 2,900. Son precios públicos y de arranque; te damos una propuesta personalizada según lo que tu negocio necesite."
 related:
-  - label: "Diseño web para restaurantes en Houston"
-    href: "/es/houston/restaurantes"
-    desc: "El servicio completo: menú QR, pedidos por WhatsApp y sitio rápido."
-    icon: "lucide:utensils"
   - label: "IA conversacional en Houston"
     href: "/es/houston/ia-conversacional"
     desc: "Pedidos y reservas por WhatsApp atendidos las 24 horas."

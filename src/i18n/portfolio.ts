@@ -37,7 +37,7 @@ export const portfolioProjects: PortfolioProject[] = [
     badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local', 'Bilingüe'],
     did: 'Lo mismo en Orlando: sitio reconstruido desde cero, rápido y bilingüe, con SEO local (Perfil de Google, NAP y contenido por servicio) para su mercado de Florida.',
     result: 'Ya posiciona en su zona de Orlando y la IA de Google ya lo incluye en recomendaciones para algunas búsquedas.',
-    serviceLabel: 'SEO local', serviceHref: '/es/houston/seo-local',
+    serviceLabel: 'SEO local en Miami', serviceHref: '/es/miami/seo-local',
   },
   {
     name: "Julio's Landscape TX", cat: 'Paisajismo · Houston, TX', slug: 'jls', mh: 2397, accent: 'gold',
@@ -51,7 +51,7 @@ export const portfolioProjects: PortfolioProject[] = [
     badge: 'Web app', tags: ['Agenda de citas', 'A medida', 'Reservas en línea'],
     did: 'Construimos una web app a medida donde las clientas agendan sus citas en línea y exploran inspiración de diseños de uñas, para un salón de Houston.',
     result: 'Una web app de reservas a medida, en vivo y en uso por sus clientas.',
-    serviceLabel: 'Sitios para salones de belleza', serviceHref: '/es/houston/salon-belleza',
+    serviceLabel: 'Diseño web en Houston', serviceHref: '/es/houston/diseno-web',
   },
 ];
 

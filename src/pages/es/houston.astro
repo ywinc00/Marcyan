@@ -2,15 +2,16 @@
 // HUB DE CIUDAD · /es/houston — LANDING #1 del negocio (rediseño premium
 // "Horizonte de llegada"). Página POTENTE nivel-home (DESIGN.md §2/§5):
 //   1. CityHero bespoke (cielo + riel de telemetría + escenario de horizonte),
-//   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 5 filas),
+//   2. Servicios CON PRECIO (id="servicios": 2 destacadas asimétricas + 4 filas),
 //   3. Projects (prueba: "así se ve lo que cuesta"),
 //   4. Ficha Houston (contexto local + riel NAP + zonas como pills-ruta),
 //   5. Directorio por industria (índice denso),
 //   6. AnswerBlock + FAQ (AEO, texto verbatim),
 //   7. Franja "Sigue explorando" slim → CtaBand (secundaria = tel) →
 //      micro-reaseguro → Contact.
-// Los 19 <a> del silo (7 servicios + 7 industrias + 2 zonas + 3 related)
-// sobreviven íntegros. Schema (ItemList + Breadcrumb) y meta INTACTOS.
+// Silo tras la consolidación de nov 2026: 6 servicios + 2 industrias + 2 zonas +
+// 2 related (las industrias y el diseño bilingüe fundidos redirigen a diseño web).
+// Schema (ItemList + Breadcrumb) y meta INTACTOS.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -61,7 +62,7 @@ const splitPrice = (p?: string) =>
 >
   <ItemListLd slot="head" items={h.itemList} name="Servicios de Marcyan en Houston" />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <CityHero

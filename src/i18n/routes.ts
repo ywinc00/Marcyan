@@ -15,31 +15,7 @@ export const ROUTE_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['/es/ia-para-pymes', '/en/ai-for-small-business'],
   ['/es/houston', '/en/houston'],
   ['/es/miami', '/en/miami'],
-  ['/es/houston/diseno-web', '/en/houston/web-design'],
-  ['/es/houston/seo-local', '/en/houston/local-seo'],
-  ['/es/houston/ia-conversacional', '/en/houston/conversational-ai'],
-  ['/es/houston/ecommerce', '/en/houston/ecommerce'],
-  ['/es/houston/branding', '/en/houston/branding'],
-  ['/es/houston/seo-para-ia', '/en/houston/ai-seo'],
-  ['/es/houston/abogados-inmigracion', '/en/houston/immigration-lawyers'],
-  ['/es/houston/bienes-raices', '/en/houston/real-estate'],
-  ['/es/houston/restaurantes', '/en/houston/restaurants'],
   ['/es/houston/contratistas', '/en/houston/contractors'],
-  ['/es/houston/talleres-mecanicos', '/en/houston/auto-repair'],
-  ['/es/houston/salon-belleza', '/en/houston/beauty-salons'],
-  ['/es/houston/clinicas-dentales', '/en/houston/dental-clinics'],
-  ['/es/houston/diseno-web-bilingue', '/en/houston/bilingual-web-design'],
-  ['/es/houston/katy', '/en/houston/katy'],
-  ['/es/houston/sugar-land', '/en/houston/sugar-land'],
-  ['/es/miami/diseno-web', '/en/miami/web-design'],
-  ['/es/miami/ia-conversacional', '/en/miami/conversational-ai'],
-  ['/es/miami/seo-local', '/en/miami/local-seo'],
-  ['/es/miami/ecommerce', '/en/miami/ecommerce'],
-  ['/es/miami/doral', '/en/miami/doral'],
-  ['/es/miami/hialeah', '/en/miami/hialeah'],
-  ['/es/precios/cuanto-cuesta-una-pagina-web-houston', '/en/pricing/website-cost-houston'],
-  ['/es/precios/cuanto-cuesta-un-chatbot', '/en/pricing/chatbot-cost'],
-  ['/es/precios/cuanto-cuesta-seo-local-houston', '/en/pricing/local-seo-cost-houston'],
   ['/es/blog', '/en/blog'],
   ['/es/diagnostico', '/en/checkup'],
   ['/es/herramientas', '/en/tools'],
@@ -67,7 +43,23 @@ export function hasMirror(pathname: string): boolean {
   return ES2EN.has(key) || EN2ES.has(key);
 }
 
-/** Destino del toggle de idioma: el espejo exacto si existe; si no, la home del otro idioma. */
+// Hubs de ciudad: una página de ciudad sin espejo exacto lleva al hub de su ciudad
+// en el otro idioma (p. ej. /es/houston/katy → /en/houston), no a la portada.
+const CITY_HUBS = ['houston', 'miami'] as const;
+
+/** Destino del toggle de idioma: el espejo exacto si existe; si no, el hub de su
+ *  ciudad en el otro idioma; si no, la home del otro idioma. Solo el botón: el
+ *  hreflang sigue usando únicamente el espejo exacto (hasMirror). */
 export function toggleHref(pathname: string, lang: 'es' | 'en'): string {
-  return mirrorPath(pathname, lang) ?? (lang === 'es' ? '/en/' : '/es/');
+  const exact = mirrorPath(pathname, lang);
+  if (exact) return exact;
+  const key = norm(pathname);
+  for (const city of CITY_HUBS) {
+    const hub = `/${lang}/${city}`;
+    if (key.startsWith(`${hub}/`)) {
+      const other = mirrorPath(hub, lang);
+      if (other) return other;
+    }
+  }
+  return lang === 'es' ? '/en' : '/es';
 }

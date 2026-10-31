@@ -9,7 +9,7 @@ import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 
 // The nav CTA points to the CONTACT FORM (lead capture), not the brief.
-const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '/en/#contacto' } };
+const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '/en#contacto' } };
 ---
 <Layout
   title="Privacy Policy · Marcyan Studio"
@@ -19,7 +19,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '
   canonical="https://marcyanstudio.com/en/privacy"
   hasEn={true}
 >
-  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
+  <SiteNav nav={pageNav} lang="en" homeHref="/en" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
 
   <main id="main">
     <LegalDoc title="Privacy Policy" updated="October 19, 2026" updatedLabel="Last updated">

@@ -57,8 +57,12 @@ const abs = (p: string) => (p === '/' ? `${SITE}/` : `${SITE}${p}`);
 const canon = canonical ?? abs(selfPath);
 // URLs por idioma para los <link rel=alternate>. La versión propia = canon;
 // la otra sale del mapa (null si aún no hay espejo publicado).
-const esHref = lang === 'es' ? canon : otherPath ? abs(otherPath) : canon;
+// EN sin espejo ES: sin alternate es y x-default = la propia página; hasEn={false}
+// (kit) conserva el comportamiento anterior.
+const enOnly = lang === 'en' && otherPath == null && hasEn !== false;
+const esHref = lang === 'es' ? canon : otherPath ? abs(otherPath) : enOnly ? null : canon;
 const enHref = lang === 'en' ? canon : otherPath ? abs(otherPath) : null;
+const xDefaultHref = esHref ?? canon;
 const ogLocale = lang === 'es' ? 'es_US' : 'en_US';
 // hasEn: explícito, o hay espejo real (o esta misma página ya es EN).
 const hasEnResolved = hasEn ?? (lang === 'en' || otherPath != null);
@@ -71,6 +75,9 @@ const orgDescription =
   lang === 'en'
     ? 'Web design agency, local SEO, and artificial-intelligence solutions for small and medium businesses in Houston and Miami. We put AI to work for your business, in English and Spanish.'
     : 'Agencia de diseño web, SEO local y soluciones de inteligencia artificial para pequeñas y medianas empresas en Houston y Miami. Ponemos la IA a trabajar para tu negocio, en español e inglés.';
+// La raíz '/' redirige a /es: la url de la entidad es la home del idioma de la página.
+// Los @id (#organization, #houston, #miami) son identificadores y no cambian.
+const homeUrl = `${SITE}/${lang === 'en' ? 'en' : 'es'}`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -78,11 +85,11 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': `${SITE}/#organization`,
       name: 'Marcyan Studio',
-      url: `${SITE}/`,
+      url: homeUrl,
       logo: `${SITE}/logos/marcyan-lateral-fondo-blanco.png`,
       email: nap.email,
       description: orgDescription,
-      slogan: 'Diseño web que piensa por ti',
+      slogan: lang === 'en' ? 'Web design that thinks for you' : 'Diseño web que piensa por ti',
       knowsLanguage: ['es', 'en'],
       areaServed: [
         { '@type': 'City', name: 'Houston' },
@@ -94,7 +101,7 @@ const jsonLd = {
       '@id': `${SITE}/#houston`,
       name: 'Marcyan Studio',
       parentOrganization: { '@id': `${SITE}/#organization` },
-      url: `${SITE}/`,
+      url: homeUrl,
       telephone: tel(nap.houston),
       email: nap.email,
       priceRange: '$$',
@@ -107,7 +114,7 @@ const jsonLd = {
       '@id': `${SITE}/#miami`,
       name: 'Marcyan Studio',
       parentOrganization: { '@id': `${SITE}/#organization` },
-      url: `${SITE}/`,
+      url: homeUrl,
       telephone: tel(nap.miami),
       email: nap.email,
       priceRange: '$$',
@@ -135,9 +142,9 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
     <link rel="canonical" href={canon} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-    <link rel="alternate" hreflang="es" href={esHref} />
+    {esHref && <link rel="alternate" hreflang="es" href={esHref} />}
     {hasEnResolved && <link rel="alternate" hreflang="en" href={enHref} />}
-    <link rel="alternate" hreflang="x-default" href={esHref} />
+    <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
 
     <meta name="theme-color" content="#080808" />
 
@@ -150,7 +157,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={ogLocale} />
-    {hasEnResolved && <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />}
+    {hasEnResolved && !enOnly && <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_US'} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={`${SITE}${ogImage}`} />
 

@@ -168,8 +168,9 @@ export function breadcrumbList(items: CrumbItem[]) {
 // ─────────────────────────────────────────────────────────────
 export interface ListLink {
   name: string;
-  /** Ruta con prefijo de idioma SIN dominio, p.ej. "/es/houston/ia-conversacional". */
-  path: string;
+  /** Ruta con prefijo de idioma SIN dominio, p.ej. "/es/houston/ia-conversacional".
+   *  Opcional: un elemento sin página propia va solo con su nombre. */
+  path?: string;
 }
 export function itemList(items: ListLink[], opts?: { name?: string }) {
   return {
@@ -180,7 +181,7 @@ export function itemList(items: ListLink[], opts?: { name?: string }) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      url: abs(it.path),
+      ...(it.path ? { url: abs(it.path) } : {}),
     })),
   };
 }

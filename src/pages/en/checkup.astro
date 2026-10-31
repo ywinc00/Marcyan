@@ -13,7 +13,7 @@ import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ServiceLd from '../../components/seo/ServiceLd.astro';
 import DiagnosticWizard from '../../components/growthos/DiagnosticWizard.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
+import { clusterNavEn } from '../../i18n/clusters';
 import { GOS } from '../../i18n/growth-os';
 import { GROWTH_OS } from '../../flags';
 
@@ -36,7 +36,7 @@ const breadcrumb = [
 <Layout title={t.metaTitle} description={t.metaDesc} lang="en" path="checkup">
   <ServiceLd slot="head" {...service} />
 
-  <SiteNav nav={clusterNav} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -55,5 +55,5 @@ const breadcrumb = [
     <SpaceBackdrop tone="gold" />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang="en" />
 </Layout>

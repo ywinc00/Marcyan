@@ -10,7 +10,7 @@
  *      Además, el FAQPage cita VERBATIM las preguntas/respuestas del slice.
  *   3. Canonical = https://marcyanstudio.com + ruta, SIN barra final.
  *   4. hreflang es + x-default (= la versión ES) y en cuando hay espejo (routes.ts);
- *      ningún alternate con barra final.
+ *      EN sin espejo: sin es, x-default = la propia EN; ningún alternate con barra final.
  *   5. Trío de conversión anclado al marcado del PROPIO CtaBand: pares clase+atributo
  *      `ctaband__act--form`+proposal_requested · `--wa`+whatsapp_clicked ·
  *      `--call`+call_clicked, exactamente uno de cada. (La mera presencia de los
@@ -31,7 +31,7 @@
  *                         las fechas).
  *
  * Alcance: por defecto TODAS las landings de `clusters` (ES) y `clustersEn` (EN).
- *   --urls /es/houston/diseno-web,/en/houston/web-design   Solo esas rutas (las migradas).
+ *   --urls /es/houston/diseno-web,/en/houston/contractors   Solo esas rutas (las migradas).
  *   --dist <dir>   Carpeta de build (default: dist)     --json   Salida máquina (una línea)
  *
  * Cómo lee los slices TS sin toolchain extra: los bundlea en memoria con el esbuild que
@@ -188,8 +188,9 @@ async function checkUrl(cluster, lang, mirrorPath, indexing) {
   const mirror = mirrorPath(p, lang);
   const esHref = lang === 'es' ? abs(p) : mirror ? abs(mirror) : null;
   const enHref = lang === 'en' ? abs(p) : mirror ? abs(mirror) : null;
-  ok('hreflang-es', esHref ? alts.es === esHref : !!alts.es, `es → ${alts.es ?? 'AUSENTE'}`);
-  ok('hreflang-x-default', alts['x-default'] === alts.es && !!alts.es, `x-default → ${alts['x-default'] ?? 'AUSENTE'}`);
+  const xDefault = esHref ?? abs(p);
+  ok('hreflang-es', esHref ? alts.es === esHref : !alts.es, esHref ? `es → ${alts.es ?? 'AUSENTE'}` : (alts.es ? `es → ${alts.es} pero NO hay espejo ES en routes.ts` : 'sin espejo ES, sin es (correcto)'));
+  ok('hreflang-x-default', alts['x-default'] === xDefault, `x-default → ${alts['x-default'] ?? 'AUSENTE'} (esperado ${xDefault})`);
   if (enHref) ok('hreflang-en', alts.en === enHref, `en → ${alts.en ?? 'AUSENTE'} (esperado ${enHref})`);
   else ok('hreflang-en', !alts.en, alts.en ? `en → ${alts.en} pero NO hay espejo en routes.ts` : 'sin espejo, sin en (correcto)');
   ok('hreflang-sin-barra', Object.values(alts).every((h) => !/[^/]\/$/.test(h) || h === `${SITE}/`), Object.values(alts).join(' · '));

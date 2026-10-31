@@ -30,28 +30,28 @@ export const portfolioProjects: PortfolioProject[] = [
     badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO', 'Bilingual'],
     did: 'We rebuilt their site from scratch, fast and bilingual, and set up their local SEO: Google Business Profile, consistent NAP and per-service pages for their Houston area.',
     result: 'It already ranks in its Houston service area, Google\'s AI already includes it in its recommendations for some searches, and it gets visits arriving straight from ChatGPT.',
-    serviceLabel: 'Local SEO in Houston', serviceHref: '/en/houston/local-seo',
+    serviceLabel: 'Local SEO in Houston', serviceHref: '/en/houston',
   },
   {
     name: 'Move Junk Away', cat: 'Junk Removal · Orlando, FL', slug: 'mja', mh: 2282, accent: 'teal',
     badge: 'Site + SEO', tags: ['Rebuilt from scratch', 'Local SEO', 'Bilingual'],
     did: 'The same in Orlando: a site rebuilt from scratch, fast and bilingual, with local SEO (Google Business Profile, NAP and per-service content) for their Florida market.',
     result: 'It already ranks in its Orlando area and Google\'s AI already includes it in recommendations for some searches.',
-    serviceLabel: 'Local SEO', serviceHref: '/en/houston/local-seo',
+    serviceLabel: 'Local SEO', serviceHref: '/en/miami',
   },
   {
     name: "Julio's Landscape TX", cat: 'Landscaping · Houston, TX', slug: 'jls', mh: 2397, accent: 'gold',
     badge: 'Brand + Site', tags: ['Brand identity', 'Custom site', 'From scratch'],
     did: 'We created their brand from scratch (logo, palette and typography) and their custom website, consistent from start to finish, for a Houston landscaper.',
     result: 'A new brand identity and website, custom-built from scratch.',
-    serviceLabel: 'Branding and identity', serviceHref: '/en/houston/branding',
+    serviceLabel: 'Branding and identity', serviceHref: '/en/houston',
   },
   {
     name: 'Rosy Nails & Care', cat: 'Nail Salon · Houston, TX', slug: 'rn', mh: 2710, accent: 'teal',
     badge: 'Web app', tags: ['Appointment booking', 'Custom-built', 'Online reservations'],
     did: 'We built a custom web app where clients book their appointments online and browse nail-design inspiration, for a Houston salon.',
     result: 'A custom booking web app, live and in use by their clients.',
-    serviceLabel: 'Sites for beauty salons', serviceHref: '/en/houston/beauty-salons',
+    serviceLabel: 'Web design in Houston', serviceHref: '/en/houston',
   },
 ];
 

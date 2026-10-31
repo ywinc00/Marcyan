@@ -49,7 +49,7 @@ export const houstonHub = {
     explore: { label: 'See services and pricing ↓', href: '#servicios' },
     telemetry: [
       { label: 'Direct line', value: nap.houston, href: telHref, live: true },
-      { label: 'Hours', value: nap.hours },
+      { label: 'Hours', value: nap.hoursEn },
       { label: 'Public pricing', value: priceChain, href: '#servicios' },
       { label: 'Base', value: '29.7604° N, 95.3698° W' },
     ],
@@ -71,14 +71,13 @@ export const houstonHub = {
     tag: 'Services in Houston',
     title: 'Everything your business needs, in <em>one studio</em>',
     links: [
-      { label: 'Web design in Houston', href: '/en/houston/web-design', desc: 'Custom, fast, bilingual sites, ready for Google and AI.', icon: 'lucide:layout-template', price: `from ${usd(PRICE_ANCHORS.web)}` },
-      { label: 'Conversational AI in Houston', href: '/en/houston/conversational-ai', desc: 'Assistants that answer, book and capture leads 24/7, in English and Spanish.', icon: 'lucide:messages-square', price: `from ${usd(PRICE_ANCHORS.ia)}` },
-      { label: 'Local SEO in Houston', href: '/en/houston/local-seo', desc: 'Show up on Google Maps and in AI.', icon: 'lucide:search', price: `from ${usd(PRICE_ANCHORS.seoLocal)}/mo` },
-      { label: 'AI SEO in Houston', href: '/en/houston/ai-seo', desc: 'So ChatGPT and Gemini recommend you.', icon: 'marcyan-ai', price: 'Free diagnostic' },
-      { label: 'Bilingual web design (ES/EN)', href: '/en/houston/bilingual-web-design', desc: 'Your site in true English and Spanish, not machine-translated.', icon: 'lucide:languages', price: `from ${usd(PRICE_ANCHORS.web)}` },
-      { label: 'Online store in Houston', href: '/en/houston/ecommerce', desc: 'E-commerce that sells, with payments and catalog.', icon: 'lucide:shopping-bag', price: `from ${usd(PRICE_ANCHORS.ecommerce)}` },
-      { label: 'Branding and identity in Houston', href: '/en/houston/branding', desc: 'Logo, colors and typography with expert judgment.', icon: 'lucide:palette', price: `from ${usd(PRICE_ANCHORS.branding)}` },
-    ] as RelatedLink[],
+      { label: 'Web design in Houston', desc: 'Custom, fast, bilingual sites, ready for Google and AI.', icon: 'lucide:layout-template', price: `from ${usd(PRICE_ANCHORS.web)}` },
+      { label: 'Conversational AI in Houston', desc: 'Assistants that answer, book and capture leads 24/7, in English and Spanish.', icon: 'lucide:messages-square', price: `from ${usd(PRICE_ANCHORS.ia)}` },
+      { label: 'Local SEO in Houston', desc: 'Show up on Google Maps and in AI.', icon: 'lucide:search', price: `from ${usd(PRICE_ANCHORS.seoLocal)}/mo` },
+      { label: 'AI SEO in Houston', desc: 'So ChatGPT and Gemini recommend you.', icon: 'marcyan-ai', price: 'Free diagnostic' },
+      { label: 'Online store in Houston', desc: 'E-commerce that sells, with payments and catalog.', icon: 'lucide:shopping-bag', price: `from ${usd(PRICE_ANCHORS.ecommerce)}` },
+      { label: 'Branding and identity in Houston', desc: 'Logo, colors and typography with expert judgment.', icon: 'lucide:palette', price: `from ${usd(PRICE_ANCHORS.branding)}` },
+    ] as Array<Omit<RelatedLink, 'href'> & { href?: string }>,
   },
   // Directory by industry: dense index — mono subs of 3-6 words derived from the
   // original honest descs (no repeated figures or new claims).
@@ -86,22 +85,8 @@ export const houstonHub = {
     tag: 'By industry',
     title: 'Solutions by sector',
     links: [
-      { label: 'Immigration lawyers', href: '/en/houston/immigration-lawyers', desc: 'AI that books consultations 24/7', icon: 'lucide:scale' },
-      { label: 'Real estate', href: '/en/houston/real-estate', desc: 'Listings, lead capture and SEO by area', icon: 'lucide:home' },
       { label: 'Restaurants', href: '/en/houston/restaurants', desc: 'QR menu and orders via WhatsApp', icon: 'lucide:utensils' },
       { label: 'Contractors', href: '/en/houston/contractors', desc: 'AI that rescues missed calls', icon: 'lucide:hard-hat' },
-      { label: 'Auto repair shops', href: '/en/houston/auto-repair', desc: 'Services, hours and "near me" SEO', icon: 'lucide:car' },
-      { label: 'Beauty salons', href: '/en/houston/beauty-salons', desc: 'Bookings 24/7 and gallery', icon: 'lucide:scissors' },
-      { label: 'Dental clinics', href: '/en/houston/dental-clinics', desc: 'Bilingual site that books appointments', icon: 'lucide:stethoscope' },
-    ] as RelatedLink[],
-  },
-  // Areas: they live as route-pills inside the Houston Card (the 2 silo <a>).
-  zonas: {
-    tag: 'By area',
-    title: 'Web design by <em>Houston area</em>',
-    links: [
-      { label: 'Katy, TX', href: '/en/houston/katy', desc: 'Web and local SEO in Katy', icon: 'lucide:map-pin' },
-      { label: 'Sugar Land, TX', href: '/en/houston/sugar-land', desc: 'Bilingual web and SEO in Sugar Land', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
   // Houston Card (merge of local context + NAP rail): the paragraphs keep the
@@ -121,7 +106,7 @@ export const houstonHub = {
   ficha: {
     meta: [
       { ic: 'lucide:phone', label: 'Direct line', value: nap.houston, href: telHref },
-      { ic: 'lucide:clock', label: 'Hours', value: nap.hours },
+      { ic: 'lucide:clock', label: 'Hours', value: nap.hoursEn },
       { ic: 'lucide:map-pinned', label: 'Coverage', value: 'Katy, Sugar Land, The Woodlands, Pearland' },
       { ic: 'lucide:languages', label: 'Languages', value: 'English · Spanish' },
       { ic: 'lucide:locate-fixed', label: 'Coordinates', value: '29.7604° N, 95.3698° W' },
@@ -133,8 +118,7 @@ export const houstonHub = {
     title: 'Pricing and more',
     links: [
       { label: 'Pricing and plans', href: '/en/pricing', desc: 'Every starting price, published', icon: 'lucide:tag' },
-      { label: 'How much does a website cost in Houston?', href: '/en/pricing/website-cost-houston', desc: 'The direct answer, with real pricing', icon: 'lucide:help-circle' },
-      { label: 'Web design in Miami', href: '/en/miami/web-design', desc: 'We also design in Miami', icon: 'lucide:layout-template' },
+      { label: 'Web design in Miami', href: '/en/miami', desc: 'We also design in Miami', icon: 'lucide:layout-template' },
     ] as RelatedLink[],
   },
   faq: {
@@ -165,21 +149,10 @@ export const houstonHub = {
   // the proposal in 24 hours, and without disambiguating they read as
   // contradictory numbers. Reply = contact · Proposal = deliverable.
   reassure: 'Reply in 1 business hour · Free proposal in 24h · Price in writing before we start',
-  // ItemList (schema) — the services offered in Houston, each to its landing.
+  // ItemList (schema): the Houston pages that keep their own landing (the services
+  // themselves now live on this hub, so they are not listed as separate URLs).
   itemList: [
-    { name: 'Web Design in Houston', path: '/en/houston/web-design' },
-    { name: 'Local SEO in Houston', path: '/en/houston/local-seo' },
-    { name: 'Conversational AI in Houston', path: '/en/houston/conversational-ai' },
-    { name: 'AI SEO in Houston', path: '/en/houston/ai-seo' },
-    { name: 'Online Store in Houston', path: '/en/houston/ecommerce' },
-    { name: 'Branding and Identity in Houston', path: '/en/houston/branding' },
     { name: 'Websites for Restaurants in Houston', path: '/en/houston/restaurants' },
     { name: 'Websites for Contractors in Houston', path: '/en/houston/contractors' },
-    { name: 'Websites for Auto Repair Shops in Houston', path: '/en/houston/auto-repair' },
-    { name: 'Websites with Booking for Beauty Salons in Houston', path: '/en/houston/beauty-salons' },
-    { name: 'Websites for Dental Clinics in Houston', path: '/en/houston/dental-clinics' },
-    { name: 'Web Design and Local SEO in Katy, TX', path: '/en/houston/katy' },
-    { name: 'Web Design and Local SEO in Sugar Land', path: '/en/houston/sugar-land' },
-    { name: 'Bilingual Web Design in Houston (English and Spanish)', path: '/en/houston/bilingual-web-design' },
   ] as ListLink[],
 };

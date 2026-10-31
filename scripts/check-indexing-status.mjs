@@ -185,6 +185,30 @@ async function main() {
   const status = await loadStatus();
   const now = new Date().toISOString();
 
+  /* Solo cuenta lo que está en el mapa del sitio VIVO. Una URL que salió del mapa
+     (fundida en otra con redirección, o retirada) pasa de status.urls a
+     status.retired: así no entra en la cola de peticiones (no se gasta el cupo diario
+     de la cuenta, compartido con TRR y MJA, en URL que ya redirigen) ni en los totales
+     (el reporte mensual cuenta Object.keys(status.urls)). Si vuelve al mapa, se
+     recupera con su historial. */
+  const live = new Set(urls);
+  status.retired = status.retired || {};
+  let retiredNow = 0;
+  for (const url of Object.keys(status.urls)) {
+    if (live.has(url)) continue;
+    status.retired[url] = { ...status.urls[url], retiredAt: now };
+    delete status.urls[url];
+    retiredNow++;
+  }
+  for (const url of urls) {
+    if (!status.urls[url] && status.retired[url]) {
+      const { retiredAt, ...back } = status.retired[url];
+      status.urls[url] = back;
+      delete status.retired[url];
+    }
+  }
+  if (retiredNow) console.log(`▶ ${retiredNow} URL fuera del mapa del sitio → status.retired (no se piden ni se cuentan)`);
+
   console.log(`▶ Inspecting ${urls.length} URLs from sitemap (property: ${GSC_PROPERTY})`);
 
   for (const url of urls) {

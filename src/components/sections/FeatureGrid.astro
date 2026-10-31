@@ -7,6 +7,7 @@
 // Sección transparente: la atmósfera (SpaceBackdrop) se ve detrás. tone: gold | teal.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
+import { t, langFromPath, type Lang } from '../../i18n/ui';
 
 interface Item { icon: string; title: string; desc: string }
 interface Props {
@@ -15,8 +16,10 @@ interface Props {
   intro?: string;
   items: Item[];
   tone?: 'gold' | 'teal';
+  lang?: Lang;
 }
-const { tag, title, intro, items, tone = 'gold' } = Astro.props;
+const { tag, title, intro, items, tone = 'gold', lang = langFromPath(Astro.url.pathname) } = Astro.props;
+const uifg = t(lang);
 ---
 <section class:list={['section fgrid', `fgrid--${tone}`]}>
   <div class="container fgrid__inner">
@@ -24,7 +27,7 @@ const { tag, title, intro, items, tone = 'gold' } = Astro.props;
       <Kicker tone={tone}>{tag}</Kicker>
       <h2 class="h2" set:html={title} />
       {intro && <p class="lead fgrid__intro">{intro}</p>}
-      <span class="fgrid__count" aria-hidden="true">{String(items.length).padStart(2, '0')} <span>capacidades</span></span>
+      <span class="fgrid__count" aria-hidden="true">{String(items.length).padStart(2, '0')} <span>{uifg.features.count}</span></span>
     </header>
 
     <ol class="fgrid__list" role="list">

@@ -16,6 +16,7 @@ export const nap = {
   houston: '+1 713-823-9144',
   miami: '+1 786-938-1754',
   hours: 'Lun–Vie 9am–6pm CT',
+  hoursEn: 'Mon to Fri, 9am to 6pm CT',
 };
 
 export const content = {
@@ -34,7 +35,7 @@ export const content = {
       ] as Link[],
       cta: { label: 'Propuesta gratis', href: '#contacto' },
       langLabel: 'EN',
-      langHref: '/en/',
+      langHref: '/en',
       openMenu: 'Abrir menú',
       closeMenu: 'Cerrar menú',
     },
@@ -212,7 +213,7 @@ export const content = {
 
     footer: {
       tagline: 'Web, IA y SEO para tu negocio · Houston & Miami',
-      cta: { label: 'Propuesta gratis', href: '/es/#contacto' },
+      cta: { label: 'Propuesta gratis', href: '/es#contacto' },
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -266,7 +267,7 @@ export const content = {
       ] as Link[],
       cta: { label: 'Get my free proposal', href: '#contacto' },
       langLabel: 'ES',
-      langHref: '/es/',
+      langHref: '/es',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
     },
@@ -296,17 +297,17 @@ export const content = {
       cta: { label: 'See all services', href: '/en/services' },
       // Teaser: leads with each product's low anchor. Mirror of src/i18n/pricing.ts.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston/web-design',
+        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston#servicios',
           desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
         { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: 'from $500', href: '/en/ai-for-small-business',
           desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock, in their language and built into your site.' },
-        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/houston/ai-seo',
+        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/checkup',
           desc: 'Get recommended by ChatGPT, Gemini, and Meta AI when people search for what you offer. Starts with a free AI-visibility audit.' },
-        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston/ecommerce',
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston#servicios',
           desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience, from an essential store to a custom one.' },
-        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston/local-seo',
+        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston#servicios',
           desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, one-time or monthly.' },
-        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston/branding',
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston#servicios',
           desc: 'From just your logo to a full identity: palette, typography, and usage guide, made to measure for your business.' },
         { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
           desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
@@ -390,10 +391,6 @@ export const content = {
           connected: 'Connected with Houston',
           links: [
             { label: 'Houston agency', sub: 'Meet the team', href: '/en/houston', icon: 'lucide:users' },
-            { label: 'Web design in Houston', sub: 'Sites that build trust', href: '/en/houston/web-design', icon: 'lucide:monitor' },
-            { label: 'Local SEO in Houston', sub: 'Get found on Google', href: '/en/houston/local-seo', icon: 'lucide:globe' },
-            { label: 'Online store in Houston', sub: 'Sell more, no limits', href: '/en/houston/ecommerce', icon: 'lucide:shopping-bag' },
-            { label: 'Conversational AI in Houston', sub: 'Service that converts', href: '/en/houston/conversational-ai', icon: 'lucide:message-square' },
           ] },
         { city: 'Miami', state: 'FL', badge: 'Service Area',
           tagline: 'Magic City', taglineIcon: 'lucide:waves', illo: 'miami',
@@ -402,10 +399,6 @@ export const content = {
           connected: 'Connected with Miami',
           links: [
             { label: 'Miami agency', sub: 'Meet the team', href: '/en/miami', icon: 'lucide:users' },
-            { label: 'Web design in Miami', sub: 'Designs that win clients', href: '/en/miami/web-design', icon: 'lucide:monitor' },
-            { label: 'Local SEO in Miami', sub: 'More visibility, more clients', href: '/en/miami/local-seo', icon: 'lucide:globe' },
-            { label: 'Online store in Miami', sub: 'Sell more, no limits', href: '/en/miami/ecommerce', icon: 'lucide:shopping-bag' },
-            { label: 'Conversational AI in Miami', sub: 'Service that connects', href: '/en/miami/conversational-ai', icon: 'lucide:message-square' },
           ] },
       ],
     },
@@ -414,7 +407,7 @@ export const content = {
       tag: 'Contact',
       title: "Let's talk about<br>your <em>project</em>",
       desc: 'Tell us your idea. In less than 24 hours you will have a personalized proposal, no commitment, completely free.',
-      info: { hoursLbl: 'Hours', hours: 'Mon–Fri 9am–6pm CT' },
+      info: { hoursLbl: 'Hours', hours: nap.hoursEn },
       form: {
         name: { label: 'Name', ph: 'Your name' },
         email: { label: 'Email', ph: 'you@email.com' },
@@ -438,17 +431,12 @@ export const content = {
 
     footer: {
       tagline: 'Web, AI & SEO for your business · Houston & Miami',
-      cta: { label: 'Get my free proposal', href: '/en/#contacto' },
+      cta: { label: 'Get my free proposal', href: '/en#contacto' },
       cols: [
         { title: 'Services', links: [
           { label: 'All services', href: '/en/services' },
           { label: 'Pricing', href: '/en/pricing' },
-          { label: 'Web Design', href: '/en/houston/web-design' },
-          { label: 'AI SEO', href: '/en/houston/ai-seo' },
-          { label: 'E-Commerce', href: '/en/houston/ecommerce' },
           { label: 'AI for Business', href: '/en/ai-for-small-business' },
-          { label: 'Local SEO', href: '/en/houston/local-seo' },
-          { label: 'Branding', href: '/en/houston/branding' },
           { label: 'Digital checkup', href: '/en/checkup' },
           { label: 'Free tools', href: '/en/tools' },
           { label: 'Project Form', href: '/en/project-brief' },
@@ -463,11 +451,7 @@ export const content = {
         { title: 'Cities', links: [
           { label: 'Houston & Miami', href: '/en/cities' },
           { label: 'Houston agency', href: '/en/houston' },
-          { label: 'Web Design · Houston', href: '/en/houston/web-design' },
-          { label: 'Conversational AI · Houston', href: '/en/houston/conversational-ai' },
           { label: 'Miami agency', href: '/en/miami' },
-          { label: 'Web Design · Miami', href: '/en/miami/web-design' },
-          { label: 'Conversational AI · Miami', href: '/en/miami/conversational-ai' },
         ] },
       ],
       legal: [

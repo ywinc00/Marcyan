@@ -44,20 +44,14 @@ const cityHubs: Record<string, { href: string; teaser: string }> = {
 
 // Per-city service switcher (translated inline; EN content has no per-city links).
 // First entry = the city hub itself; the switcher renders links.slice(1) like the ES page.
+// Since the Nov 2026 consolidation the EN service landings live on each hub, so only
+// the hub entry is left and the switcher is not rendered (the card already links the hub).
 const cityLinks: Record<string, { label: string; sub: string; href: string; icon: string }[]> = {
   Houston: [
     { label: 'Studio in Houston', sub: 'Meet our team', href: '/en/houston', icon: 'lucide:users' },
-    { label: 'Web design in Houston', sub: 'Sites that build trust', href: '/en/houston/web-design', icon: 'lucide:monitor' },
-    { label: 'Local SEO in Houston', sub: 'We rank your business', href: '/en/houston/local-seo', icon: 'lucide:globe' },
-    { label: 'Online store in Houston', sub: 'Sell more. No limits', href: '/en/houston/ecommerce', icon: 'lucide:shopping-bag' },
-    { label: 'Conversational AI in Houston', sub: 'Support that converts', href: '/en/houston/conversational-ai', icon: 'lucide:message-square' },
   ],
   Miami: [
     { label: 'Studio in Miami', sub: 'Meet our team', href: '/en/miami', icon: 'lucide:users' },
-    { label: 'Web design in Miami', sub: 'Designs people love', href: '/en/miami/web-design', icon: 'lucide:monitor' },
-    { label: 'Local SEO in Miami', sub: 'More visibility, more clients', href: '/en/miami/local-seo', icon: 'lucide:globe' },
-    { label: 'Online store in Miami', sub: 'Sell more. No limits', href: '/en/miami/ecommerce', icon: 'lucide:shopping-bag' },
-    { label: 'Conversational AI in Miami', sub: 'Support that connects', href: '/en/miami/conversational-ai', icon: 'lucide:message-square' },
   ],
 };
 const cities = c.locations.items.map((city: any) => ({
@@ -112,7 +106,7 @@ const itemList = [
 >
   <ItemListLd slot="head" items={itemList} name="Marcyan Studio Cities" />
 
-  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -195,7 +189,7 @@ const itemList = [
                     </a>
                   )}
 
-                  {city.links && city.links.length > 0 && (
+                  {city.links && city.links.length > 1 && (
                     <div class="citycard__nav">
                       <p class="citycard__nav-tag">Services in {city.city}</p>
                       <ul class="citycard__links" role="list">

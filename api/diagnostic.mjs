@@ -13,7 +13,8 @@
 //   · Freno GUARDADO por conexión (lib/ratelimit.mjs, desde 2026-10-31;
 //     antes en memoria): analyze 5/10min y 30/día, claim 5/10min y 15/día
 //     → 429. Tope DIARIO de todo el sitio para los informes redactados por
-//     IA: pasado, el informe sale igual con el texto determinista.
+//     IA: pasado, el informe sale igual con el texto determinista. El
+//     informe por correo a una misma dirección, 3 al día.
 //   · Guardia SSRF ANTES de cualquier fetch, re-validada en CADA redirect.
 //   · La PII (email/tel/nombre) JAMÁS llega al modelo del reporte: al
 //     modelo solo van hallazgos ya verificados + negocio/ciudad/industria.
@@ -71,6 +72,14 @@ const ERR = {
 export async function diagnosticAllowed(kind, ip, { store, now } = {}) {
   const bucket = kind === 'claim' ? 'diagClaim' : 'diagAnalyze';
   const r = await rateLimit({ bucket, key: ip, limits: LIMITS[bucket], store, now });
+  return r.ok;
+}
+
+// Informe por correo a una misma dirección: 3 al día (la clave es el correo en
+// minúsculas; se guarda como HMAC, nunca en claro).
+export async function reportEmailAllowed(email, { store, now } = {}) {
+  if (!email) return false;
+  const r = await rateLimit({ bucket: 'diagReportEmail', key: String(email).trim().toLowerCase(), limits: LIMITS.diagReportEmail, store, now });
   return r.ok;
 }
 
@@ -334,8 +343,14 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
     return res.status(200).json({ ok: true, leadRef: (ex.rowCount && ex.rows[0].lead_ref) || leadRef });
   }
 
-  // Ganamos el enlace → reporte: IA (sin PII) o fallback determinista. El email SIEMPRE sale.
-  const reportText = (await generateReport({ lang, businessName, city, industry, scores, findings, recommended }))
+  // Tope de informes a una misma dirección (puerta técnica, 2026-10-31). Pasado,
+  // el lead se guarda igual y el dueño lo ve en el panel, pero el correo no sale
+  // y tampoco se gasta IA en redactarlo (es la firma de un abuso).
+  const emailCapped = !!email && !(await reportEmailAllowed(email));
+  if (emailCapped) console.warn(`[diagnostic] ${ref} informe no enviado: tope diario de esa dirección`);
+
+  // Ganamos el enlace → reporte: IA (sin PII) o fallback determinista.
+  const reportText = (emailCapped ? null : await generateReport({ lang, businessName, city, industry, scores, findings, recommended }))
     || fallbackReport({ businessName, lang, findings, recommended });
 
   try {
@@ -350,7 +365,7 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
     url: '/dashboard',
   });
 
-  if (resend && email) {
+  if (resend && email && !emailCapped) {
     const sent = await withTimeout(
       emailDiagnosticReport({ refId: ref, clientEmail: email, businessName, lang, reportText }),
       8000, 'Resend diag report'

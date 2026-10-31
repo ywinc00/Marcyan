@@ -31,6 +31,10 @@ const sql = (strings, ...vals) => {
   }
   if (/FROM leads/.test(t)) return db.failLeads ? Promise.reject(new Error('neon caído')) : Promise.resolve({ rows: [], rowCount: 0 });
   if (/INSERT INTO leads/.test(t)) return Promise.resolve({ rows: [], rowCount: 1 });
+  if (/SELECT \* FROM diagnostics WHERE ref_id/.test(t)) {
+    return Promise.resolve({ rows: [{ ref_id: vals[0], score_total: 60, score_web: 60, score_seo: 60, score_ai: 60, score_conv: 60, score_rep: 60, findings: [], industry: 'otro', business_name: 'Acme', city: 'Houston', lead_ref: null }], rowCount: 1 });
+  }
+  if (/UPDATE diagnostics SET lead_ref/.test(t)) return Promise.resolve({ rows: [{ id: 1 }], rowCount: 1 });
   if (/INSERT INTO notifications/.test(t)) {
     return Promise.resolve({ rows: [{ id: '1', type: vals[0], title: vals[1], body: vals[2], ref: vals[3], url: vals[4] }], rowCount: 1 });
   }
@@ -59,6 +63,7 @@ mock.module(new URL('../lib/email.mjs', import.meta.url).href, {
 const handoff = (await import('../api/handoff.mjs')).default;
 const { __resetForTests } = await import('../lib/ratelimit.mjs');
 const contact = (await import('../api/contact.mjs')).default;
+const diagnostic = (await import('../api/diagnostic.mjs')).default;
 
 // ── Utilidades ─────────────────────────────────────────────────
 let pass = 0;
@@ -164,6 +169,18 @@ await check('contacto: si falla el correo al dueño → aviso al panel', async (
   mail.failAdmin = true;
   const r = await call(contact, { phone: '7135550199' });
   assert.ok(notices().some((n) => n.ref === 'email-admin:' + r.body.refId));
+});
+
+// ── Diagnóstico ────────────────────────────────────────────────
+await check('diagnóstico: el informe sale 3 veces al día a una misma dirección; la 4.ª guarda el lead sin correo', async () => {
+  const results = [];
+  for (let i = 1; i <= 4; i++) {
+    results.push(await call(diagnostic, { action: 'claim', ref: 'DGN-00' + i, email: 'victima@example.com', lang: 'es' }));
+  }
+  assert.deepEqual(results.map((r) => r.code), [200, 200, 200, 200]);
+  assert.ok(results.every((r) => /^LEAD-\d+$/.test(r.body.leadRef)), 'los cuatro leads se guardan');
+  assert.equal(mail.sent.filter((m) => m.kind === 'report').length, 3, 'solo 3 informes por correo');
+  assert.equal(db.calls.filter((c) => /INSERT INTO leads/.test(c.t)).length, 4);
 });
 
 // ── Freno guardado real (neonStore) ────────────────────────────

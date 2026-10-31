@@ -218,7 +218,7 @@ check('S3: telephone+address DENTRO del ld+json sigue aprobando', () => {
 
 // ── Puerta técnica 2026-10-31: frenos guardados del endpoint ─────────
 {
-  const { diagnosticAllowed, reportAiAllowed } = await import('../api/diagnostic.mjs');
+  const { diagnosticAllowed, reportAiAllowed, reportEmailAllowed } = await import('../api/diagnostic.mjs');
   const { memoryStore, LIMITS } = await import('../lib/ratelimit.mjs');
   const t = async (name, fn) => { try { await fn(); pass++; } catch (e) { fails.push(name + ' → ' + e.message); } };
   await t('freno: analizar 5 cada 10 min por conexión y reclamar lleva su propia cuenta', async () => {
@@ -231,6 +231,13 @@ check('S3: telephone+address DENTRO del ld+json sigue aprobando', () => {
     const store = memoryStore(); let now = Date.UTC(2026, 9, 31, 1, 0, 0), ok = 0;
     for (let i = 0; i < 40; i++) { if (await diagnosticAllowed('analyze', '8.8.8.1', { store, now })) ok++; now += 11 * 60 * 1000; }
     assert.equal(ok, LIMITS.diagAnalyze[1].limit);
+  });
+  await t('informe por correo: 3 al día por dirección, sin importar mayúsculas ni conexión', async () => {
+    const store = memoryStore(); const now = Date.UTC(2026, 9, 31, 15, 0, 0);
+    for (let i = 0; i < 3; i++) assert.equal(await reportEmailAllowed(i ? 'victima@example.com' : ' Victima@Example.com ', { store, now }), true);
+    assert.equal(await reportEmailAllowed('VICTIMA@example.com', { store, now }), false);
+    assert.equal(await reportEmailAllowed('otra@example.com', { store, now }), true, 'otra dirección no comparte cuenta');
+    assert.equal(await reportEmailAllowed('', { store, now }), false, 'sin correo no hay envío');
   });
   await t('tope del sitio: pasado el máximo de informes con IA del día, no se llama a la IA', async () => {
     const store = memoryStore(); const now = Date.UTC(2026, 9, 31, 15, 0, 0);

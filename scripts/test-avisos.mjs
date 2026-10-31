@@ -364,6 +364,44 @@ await check('refresco: un fallo no corta el ciclo', async () => {
   stop();
 });
 
+// ── Puerta técnica 2026-10-31: avisos de lead, chat y freno ─────────
+import * as RLM from '../lib/ratelimit.mjs';
+const SIN_GUION = /[–—]/;
+await check('lead: aviso de correo fallido (dueño, confirmación, informe) enlaza al lead y sin guion largo', () => {
+  for (const who of ['admin', 'client', 'report']) {
+    const n = N.leadEmailFailureNotice({ refId: 'LEAD-031', who, name: 'Ana' });
+    assert.equal(n.url, '/dashboard#/leads/LEAD-031', who);
+    assert.ok(n.title.includes('LEAD-031') && n.title.includes('Ana'), who);
+    assert.ok(!SIN_GUION.test(n.title + n.body), 'guion largo en ' + who);
+    assert.ok(/guard/.test(n.body), who + ': dice que el lead se guardó');
+  }
+  const keys = ['admin', 'client', 'report'].map((who) => N.leadEmailFailureNotice({ refId: 'LEAD-031', who }).key);
+  assert.equal(new Set(keys).size, 3, 'claves distintas: un aviso no tapa a otro');
+});
+await check('lead: sin referencia no se crea aviso', async () => {
+  const db = fakeDb(() => ({ rows: [], rowCount: 0 }));
+  N.__setDbForTests(db);
+  assert.equal(await N.notifyLeadEmailFailure({ who: 'admin' }), null);
+  assert.equal(db.calls.length, 0);
+  N.__setDbForTests(null);
+});
+await check('lead: el aviso es system, clave en ref y deduplica una semana', async () => {
+  const db = fakeDb((t) => (/^INSERT/.test(t) ? { rows: [row({ type: 'system' })], rowCount: 1 } : { rows: [], rowCount: 0 }));
+  N.__setDbForTests(db);
+  await N.notifyLeadEmailFailure({ refId: 'LEAD-031', who: 'client', name: 'Ana' });
+  const ins = db.calls.find((c) => /^INSERT/.test(c.text));
+  assert.ok(ins, 'inserta');
+  assert.equal(ins.params[0], 'system');
+  assert.equal(ins.params[3], 'email-client:LEAD-031');
+  N.__setDbForTests(null);
+});
+await check('chat y freno: avisos con clave fija y sin guion largo', () => {
+  for (const n of [N.CHAT_FAILING_NOTICE, N.CHAT_DAILY_CAP_NOTICE, RLM.DEGRADED_NOTICE]) {
+    assert.ok(n.key && !/\s/.test(n.key), 'clave fija: ' + n.key);
+    assert.ok(!SIN_GUION.test(n.title + n.body), 'guion largo en ' + n.key);
+  }
+});
+
 console.log(`test:avisos · ${pass} ok, ${fails.length} fallos`);
 for (const f of fails) console.log('  ✗ ' + f);
 process.exit(fails.length ? 1 : 0);

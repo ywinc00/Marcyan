@@ -10,7 +10,10 @@
 //
 //  BLINDAJE (el servidor enforce; el modelo NO decide seguridad):
 //   · POST only · body ≤ 50KB · honeypot website_hp → 200 fake.
-//   · Rate-limit en memoria: analyze/claim 5/10min por IP → 429.
+//   · Freno GUARDADO por conexión (lib/ratelimit.mjs, desde 2026-10-31;
+//     antes en memoria): analyze 5/10min y 30/día, claim 5/10min y 15/día
+//     → 429. Tope DIARIO de todo el sitio para los informes redactados por
+//     IA: pasado, el informe sale igual con el texto determinista.
 //   · Guardia SSRF ANTES de cualquier fetch, re-validada en CADA redirect.
 //   · La PII (email/tel/nombre) JAMÁS llega al modelo del reporte: al
 //     modelo solo van hallazgos ya verificados + negocio/ciudad/industria.
@@ -20,7 +23,8 @@ import { createHash } from 'node:crypto';
 import { sql } from '@vercel/postgres';
 import Anthropic from '@anthropic-ai/sdk';
 import { createLead } from '../lib/leads.mjs';
-import { createNotification } from '../lib/notifications.mjs';
+import { createNotification, notifyLeadEmailFailure } from '../lib/notifications.mjs';
+import { rateLimit, LIMITS, GLOBAL_KEY } from '../lib/ratelimit.mjs';
 import { emailDiagnosticReport, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
@@ -62,16 +66,19 @@ const ERR = {
   },
 };
 
-// ── Rate-limit en memoria (per-instancia; primera línea) ──────
-const RL = { analyze: new Map(), claim: new Map() };
-function rateLimited(kind, ip) {
-  if (!ip) return false;
-  const now = Date.now();
-  const arr = (RL[kind].get(ip) || []).filter((t) => now - t < 600_000); // 10 min
-  if (arr.length >= 5) { RL[kind].set(ip, arr); return true; }
-  arr.push(now); RL[kind].set(ip, arr);
-  if (RL[kind].size > 5000) { for (const [k, v] of RL[kind]) if (!v.some((t) => now - t < 600_000)) RL[kind].delete(k); }
-  return false;
+// ── Freno guardado por conexión (cuenta compartida entre instancias) ──
+// `store`/`now` solo los pasan las pruebas.
+export async function diagnosticAllowed(kind, ip, { store, now } = {}) {
+  const bucket = kind === 'claim' ? 'diagClaim' : 'diagAnalyze';
+  const r = await rateLimit({ bucket, key: ip, limits: LIMITS[bucket], store, now });
+  return r.ok;
+}
+
+// Tope diario de TODO el sitio para el informe con IA (acota el gasto). Pasado,
+// generateReport no llama a la IA y el informe sale con fallbackReport.
+export async function reportAiAllowed({ store, now } = {}) {
+  const r = await rateLimit({ bucket: 'diagReportGlobal', key: GLOBAL_KEY, limits: LIMITS.diagReportGlobal, store, now });
+  return r.ok;
 }
 
 // Guardia SSRF + descarga endurecida factorizadas a lib/site-fetch.mjs
@@ -94,6 +101,10 @@ REGLAS DURAS: usa SOLO los hallazgos del JSON, no inventes datos, números, porc
 
 async function generateReport({ lang, businessName, city, industry, scores, findings, recommended }) {
   if (process.env.CHAT_ENABLED === 'false' || !process.env.ANTHROPIC_API_KEY) return null;
+  if (!(await reportAiAllowed())) {
+    console.warn('[diagnostic] tope diario de informes con IA: sale el determinista');
+    return null;
+  }
   try {
     const input = JSON.stringify({
       lang,
@@ -143,7 +154,7 @@ export default async function handler(req, res) {
       return res.status(200).json(action === 'claim' ? { ok: true, leadRef: 'LEAD-000' } : { ok: true, ref: 'DGN-000', scores: null, findings: [], recommended: null, cached: false });
     }
 
-    if (rateLimited(action, ip)) return res.status(429).json({ ok: false, error: E.rate });
+    if (!(await diagnosticAllowed(action, ip))) return res.status(429).json({ ok: false, error: E.rate });
 
     if (action === 'analyze') return await handleAnalyze({ req, res, body, lang, E, ip });
     return await handleClaim({ req, res, body, lang, E, ip });
@@ -340,10 +351,13 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
   });
 
   if (resend && email) {
-    await withTimeout(
+    const sent = await withTimeout(
       emailDiagnosticReport({ refId: ref, clientEmail: email, businessName, lang, reportText }),
       8000, 'Resend diag report'
-    ).catch((err) => console.error(`[diagnostic] ${ref} report email falló:`, err && err.message));
+    ).then(() => true)
+     .catch((err) => { console.error(`[diagnostic] ${ref} report email falló:`, err && err.message); return false; });
+    // El lead ya está guardado; el aviso dice al dueño que el informe pudo no llegar.
+    if (!sent) await notifyLeadEmailFailure({ refId: leadRef, who: 'report', name: name || businessName || '' });
   }
 
   return res.status(200).json({ ok: true, leadRef });

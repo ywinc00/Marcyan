@@ -14,10 +14,16 @@
 //   · Única tool = SOLO-UI (solicitar_datos_contacto): sin tool_result ni 2ª
 //     llamada → no muta estado ni abre canal de exfiltración de PII.
 //   · La API key vive en process.env.ANTHROPIC_API_KEY (solo servidor).
-//   · CERO acceso a Postgres / briefs / admin / Resend. NO importamos
+//   · CERO acceso a briefs / leads / admin / Resend. NO importamos
 //     lib/auth.mjs (arrastra @vercel/postgres) → clientIp propio abajo.
-//   · El tope de costo REAL es el límite de gasto mensual en la consola
-//     de Anthropic. El rate-limit en memoria es solo la primera línea.
+//     Únicos contactos con la base (puerta técnica, 2026-10-31), los dos con
+//     import dinámico y sin nada del modelo ni del visitante dentro:
+//       1) los frenos de lib/ratelimit.mjs (tabla rate_limit_hits, la IP va
+//          como HMAC, nunca en claro);
+//       2) avisos 'system' de texto fijo al panel (chat fallando, tope diario).
+//   · Topes de gasto: por conexión, por conversación y un tope DIARIO de
+//     todo el sitio (LIMITS.chatGlobal). El freno último sigue siendo el
+//     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL } from '../lib/chat-kb.mjs';
@@ -27,6 +33,9 @@ import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
+// Frenos guardados (cuenta compartida entre instancias). Solo cuenta: el
+// módulo importa @vercel/postgres de forma dinámica y solo al contar.
+import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
 
 // maxDuration 60: un turno con herramienta interna hace 2 llamadas al modelo con
 // una revisión de sitio en medio. Invariante v8 de presupuestos por fase:
@@ -70,64 +79,64 @@ function clientIp(req) {
   return req.headers['x-real-ip'] || null;
 }
 
-// ── Rate limit en memoria (mismo patrón que api/admin/login.mjs) ──
-// Caveat conocido: per-instancia y se reinicia en cold start. Es la
-// primera línea contra abuso casual; el costo lo acota el límite de
-// gasto de Anthropic + los caps por petición de abajo.
-const IP_HITS = new Map();      // ip  → { count, resetAt }
-const SESSION_HITS = new Map(); // sid → { count }
+// ── Frenos GUARDADOS (puerta técnica, 2026-10-31) ─────────────────
+// Antes eran Map por instancia: se borraban en cada arranque en frío y cada
+// instancia llevaba su propia cuenta, así que un abuso repartido no tenía
+// freno real. Ahora la cuenta vive en la base (lib/ratelimit.mjs), compartida
+// por todas las instancias; si la base falla, cae a memoria y avisa al panel.
+// `store` y `now` solo los pasan las pruebas (memoryStore()).
 
-// ── Límites de revisar_sitio (tool interna con efecto de red) ──────
-// 1 revisión por SESIÓN + 5 / 10min por IP. Se CONSUME el cupo aunque la URL
-// resulte bloqueada por SSRF (limita el sondeo de IPs internas en una sesión).
-const SITE_SESSION = new Map(); // sid → ts (ya revisó)
-const SITE_IP = new Map();      // ip  → [ts]
-export function siteReviewAllowed(sid, ip) {
-  const now = Date.now();
-  if (sid && SITE_SESSION.has(sid)) return false;      // 1 por sesión
-  if (ip) {
-    const arr = (SITE_IP.get(ip) || []).filter((t) => now - t < 600_000); // 10 min
-    if (arr.length >= 5) { SITE_IP.set(ip, arr); return false; }
-    arr.push(now); SITE_IP.set(ip, arr);
-  }
-  if (sid) SITE_SESSION.set(sid, now);
-  return true;
+// Por conexión (12/min y 150/día) y por conversación (40/día).
+export async function chatAllowed({ ip, sid, store, now } = {}) {
+  const byIp = await persistLimit({ bucket: 'chat', key: ip, limits: RL.chat, store, now });
+  if (!byIp.ok) return false;
+  const bySession = await persistLimit({ bucket: 'chatSession', key: sid, limits: RL.chatSession, store, now });
+  return bySession.ok;
 }
 
-function rateLimit(ip, sid) {
-  const now = Date.now();
-  // Por IP: ventana deslizante simple.
-  if (ip) {
-    const slot = IP_HITS.get(ip);
-    if (!slot || slot.resetAt < now) {
-      IP_HITS.set(ip, { count: 1, resetAt: now + LIMITS.WINDOW_MS });
-    } else if (slot.count >= LIMITS.IP_PER_MIN) {
-      return false;
-    } else {
-      slot.count++;
-    }
+// Tope de TODO el sitio: mensajes que llegan a la IA en un día. Acota el gasto
+// aunque el abuso venga de muchas conexiones. `justHit` = esta petición es la
+// primera que lo pasa (para avisar una vez, no en cada bloqueo).
+export async function chatGlobalAllowed({ store, now } = {}) {
+  const r = await persistLimit({ bucket: 'chatGlobal', key: GLOBAL_KEY, limits: RL.chatGlobal, store, now });
+  const c = r.counts[0];
+  return { ok: r.ok, justHit: !r.ok && !!c && c.count === c.limit + 1 };
+}
+
+// revisar_sitio (tool interna con efecto de red): 1 por CONVERSACIÓN y 5/10 min
+// (20/día) por conexión. Se CONSUME el cupo aunque la URL resulte bloqueada por
+// SSRF (limita el sondeo de IPs internas en una conversación).
+export async function siteReviewAllowed(sid, ip, { store, now } = {}) {
+  if (sid) {
+    const s = await persistLimit({ bucket: 'chatSiteSession', key: sid, limits: RL.chatSiteSession, store, now });
+    if (!s.ok) return false;
   }
-  // Por sesión: tope total (no se confía como auth; solo throttling).
-  const s = SESSION_HITS.get(sid);
-  if (!s) {
-    SESSION_HITS.set(sid, { count: 1 });
-  } else if (s.count >= LIMITS.SESSION_MAX) {
-    return false;
-  } else {
-    s.count++;
+  if (ip) {
+    const r = await persistLimit({ bucket: 'chatSite', key: ip, limits: RL.chatSite, store, now });
+    if (!r.ok) return false;
   }
   return true;
 }
 
-// Limpieza perezosa para que los Map no crezcan sin límite en una instancia caliente.
-function sweep() {
-  const now = Date.now();
-  if (IP_HITS.size > 5000) {
-    for (const [k, v] of IP_HITS) if (v.resetAt < now) IP_HITS.delete(k);
+// Aviso al panel (texto fijo, sin nada del visitante ni del modelo). Import
+// dinámico: notifications.mjs solo se carga cuando hay algo que avisar.
+async function alertOwner(kind) {
+  try {
+    const n = await import('../lib/notifications.mjs');
+    await (kind === 'cap' ? n.notifyChatDailyCap() : n.notifyChatFailing());
+  } catch (err) {
+    console.error('[chat] no pude avisar al panel:', err && err.message);
   }
-  if (SESSION_HITS.size > 5000) SESSION_HITS.clear();
-  if (SITE_SESSION.size > 5000) SITE_SESSION.clear();
-  if (SITE_IP.size > 5000) { for (const [k, v] of SITE_IP) if (!v.some((t) => now - t < 600_000)) SITE_IP.delete(k); }
+}
+
+// Cuenta un fallo de la IA; pasado el tope de la hora (LIMITS.chatFail), avisa.
+async function recordFailure() {
+  try {
+    const r = await persistLimit({ bucket: 'chatFail', key: GLOBAL_KEY, limits: RL.chatFail });
+    if (!r.ok) await alertOwner('failing');
+  } catch (err) {
+    console.error('[chat] no pude contar el fallo:', err && err.message);
+  }
 }
 
 // ── Origin allowlist (fail-closed) ────────────────────────────────
@@ -379,7 +388,7 @@ async function reviewSite(url, lang) {
 async function runInternalTool(toolUse, { lang, ip, sid }) {
   if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
   if (toolUse.name === SITE_TOOL.name) {
-    if (!siteReviewAllowed(sid, ip)) return FAIL_RESULT;            // límites primero
+    if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
     const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
     if (!url) return FAIL_RESULT;
     try { return await withTimeout(reviewSite(url, lang), 9000, 'site review'); }
@@ -416,8 +425,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: M.badRequest });
   }
 
-  sweep();
-  if (!rateLimit(ip, sid)) {
+  if (!(await chatAllowed({ ip, sid }))) {
     console.warn('[chat] blocked=rate ip=' + ip);
     return res.status(429).json({ error: M.rateLimited });
   }
@@ -426,6 +434,17 @@ export default async function handler(req, res) {
   if (!messages) {
     console.warn('[chat] blocked=shape ip=' + ip);
     return res.status(400).json({ error: M.badRequest });
+  }
+
+  // Tope diario de todo el sitio, DESPUÉS de validar: solo cuentan los mensajes
+  // que de verdad irían a la IA (un bot no agota el tope con basura). Pasado,
+  // el visitante ve el mismo mensaje que con el chat apagado (formulario y
+  // teléfono), así que el lead no se pierde.
+  const global = await chatGlobalAllowed();
+  if (!global.ok) {
+    console.warn('[chat] blocked=daily-cap');
+    if (global.justHit) await alertOwner('cap');
+    return res.status(200).json({ reply: M.disabled });
   }
 
   const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
@@ -513,6 +532,7 @@ export default async function handler(req, res) {
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
     console.error('[chat] anthropic error:', err && err.message);
+    await recordFailure();
     return res.status(200).json({ reply: M.fallback });
   }
 }

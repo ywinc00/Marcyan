@@ -8,10 +8,20 @@
 //  La PII (nombre/contacto) viaja del WIDGET a este endpoint, NUNCA al
 //  modelo del chatbot — igual que el CONTACT_TOOL de captura de lead.
 //  Mismo molde que /api/contact: honeypot, validación, clientIp.
+//
+//  Puerta técnica (2026-10-31):
+//   · Freno guardado por conexión (3 cada 10 min, 10 al día) → 429.
+//   · Si deja email o teléfono, se GUARDA como lead (source 'chat') ANTES
+//     del aviso y del correo: si el correo falla, el contacto no se pierde.
+//   · Solo se responde error si no quedó NINGUNA copia (ni lead ni correo):
+//     así el visitante sabe que debe escribir por WhatsApp.
+//   · Correo al dueño fallido con lead guardado → aviso al panel.
 // ════════════════════════════════════════════════════════════════
-import { createNotification } from '../lib/notifications.mjs';
+import { createNotification, notifyLeadEmailFailure } from '../lib/notifications.mjs';
 import { emailAdminHandoff, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
+import { createLead } from '../lib/leads.mjs';
+import { rateLimit, LIMITS } from '../lib/ratelimit.mjs';
 
 function sanitize(v, max = 2000) {
   if (v === null || v === undefined) return null;
@@ -49,6 +59,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     }
 
+    const rl = await rateLimit({ bucket: 'handoff', key: clientIp(req), limits: LIMITS.handoff });
+    if (!rl.ok) {
+      res.setHeader('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({
+        ok: false,
+        error: body.lang === 'en'
+          ? 'We received several requests in a row from your connection. Please message us on WhatsApp.'
+          : 'Recibimos varias solicitudes seguidas desde tu conexión. Escríbenos por WhatsApp, por favor.',
+      });
+    }
+
     const lang = body.lang === 'en' ? 'en' : (body.lang === 'es' ? 'es' : null);
     const data = {
       name:    sanitize(body.name, 200),
@@ -82,27 +103,62 @@ export default async function handler(req, res) {
 
     const who = data.name || data.contact || 'un visitante';
 
-    // 1) Notificación in-dashboard — defensiva, no rompe el flujo si falla.
+    // 1) Copia guardada del contacto ANTES de avisar o mandar correo. Sin email
+    //    ni teléfono no hay lead que guardar (pidió una persona sin dejar datos):
+    //    queda el aviso del panel. createLead deduplica 10 min por source+contacto,
+    //    así que si ya lo dejó en la captura del chat no se duplica.
+    let refId = null;
+    let leadFailed = false;
+    if (data.contact) {
+      const isEmail = data.contact.includes('@');
+      try {
+        refId = await createLead({
+          name: data.name,
+          email: isEmail ? data.contact : null,
+          phone: isEmail ? null : data.contact,
+          interest: 'Quiere hablar con una persona (desde el chat)',
+          message: data.message,
+          source: 'chat',
+          ipAddress: data.ipAddress,
+          userAgent: data.userAgent,
+        });
+      } catch (err) {
+        leadFailed = true;
+        console.error('[handoff] no se pudo guardar el lead:', err && err.message);
+      }
+    }
+
+    // 2) Notificación in-dashboard — defensiva, no rompe el flujo si falla.
     await createNotification({
       type: 'chat_handoff',
       title: `${who} quiere hablar con un humano`,
       body: data.message || (data.contact ? `Contacto: ${data.contact}` : 'Sin mensaje.'),
-      ref: null,
+      ref: refId,
       url: '/dashboard',
     });
 
-    // 2) Email al fundador — awaitado, no bloquea la respuesta si falla.
+    // 3) Email al fundador — awaitado, no bloquea la respuesta si falla.
     let emailAdminOk = false;
     if (resend) {
-      await withTimeout(emailAdminHandoff({ ref: null, data }), 8000, 'Resend handoff')
+      await withTimeout(emailAdminHandoff({ ref: refId, data }), 8000, 'Resend handoff')
         .then(() => { emailAdminOk = true; })
         .catch(err => console.error('[handoff] admin email falló:', err && err.message));
-      console.log(`[handoff] (${who}) · adminEmail=${emailAdminOk}`);
+      console.log(`[handoff] ${refId || 'sin lead'} (${who}) · adminEmail=${emailAdminOk}`);
+      if (!emailAdminOk && refId) await notifyLeadEmailFailure({ refId, who: 'admin', name: data.name || '' });
     } else {
       console.warn('[handoff] registrado · RESEND_API_KEY no configurada, sin email');
     }
 
-    return res.status(200).json({ ok: true, emailAdmin: emailAdminOk });
+    // Sin ninguna copia (el lead no se guardó y el correo no salió): error, para
+    // que el visitante use WhatsApp en vez de creer que alguien le escribirá.
+    if (leadFailed && !emailAdminOk) {
+      return res.status(500).json({
+        ok: false,
+        error: 'No pudimos pasar tu solicitud. Por favor escríbenos directo por WhatsApp o email.',
+      });
+    }
+
+    return res.status(200).json({ ok: true, refId, emailAdmin: emailAdminOk });
 
   } catch (err) {
     console.error('[handoff] error:', err);

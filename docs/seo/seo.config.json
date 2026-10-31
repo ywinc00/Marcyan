@@ -51,9 +51,10 @@
     "home"
   ],
   "indexacion": {
-    "maxPeticionesDia": 8,
+    "maxPeticionesDia": 0,
     "reintentoDias": 14,
-    "diasNueva": 60
+    "diasNueva": 60,
+    "nota": "Peticiones automáticas apagadas el 31-oct-2026 con el OK del dueño (causa-raiz-2026-10-31.md): solo peticiones manuales, una por página con cambio real."
   },
   "alertas": {
     "diasSinRastreo": 30

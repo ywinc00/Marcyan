@@ -475,6 +475,31 @@
           "nota": "PR #43 en producción el 31-oct: 32 URL juntadas, parejas Houston/Miami ES conservadas por decisión del dueño"
         }
       ]
+    },
+    "marcyan-paginas-ciudad-casi-iguales": {
+      "ref": "marcyan-paginas-ciudad-casi-iguales",
+      "tipo": "web",
+      "titulo": "Páginas de Houston y Miami del mismo servicio casi iguales: reescribir la parte propia de cada ciudad con prueba local real o fusionar (cambia lo que se ve, OK de Yan)",
+      "estado": "encargada",
+      "primeraVez": "2026-10-31",
+      "ultimaVez": "2026-10-31",
+      "propuestas": 1,
+      "origen": "2026-10-31",
+      "evidencia": {
+        "fecha": "2026-10-31",
+        "texto": "2026-10-31: texto de hoy sin menú ni pie (kit/parecidas.mjs): /es/houston/ia-conversacional y /es/miami/ia-conversacional 90 %, /es/houston/ecommerce y /es/miami/ecommerce 89 %, /es/houston/seo-local y /es/miami/seo-local 88 %, /en/pricing y /en/services 83 %, /en/houston y /en/miami 81 % (https://marcyanstudio.com)"
+      },
+      "historial": [
+        {
+          "fecha": "2026-10-31",
+          "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-10-31",
+          "estado": "encargada",
+          "nota": "OK del dueño 2026-10-31: para después; encargo en el roadmap (no volver a proponer)"
+        }
+      ]
     }
   }
 }

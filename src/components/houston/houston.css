@@ -57,7 +57,7 @@ body.hx-pinned .mrc-nudge{opacity:0!important;visibility:hidden!important}
 .hx-js .hx [data-rev].in{opacity:1;transform:none;transition:opacity .55s var(--ease),transform .65s var(--ease)}
 .hx-js .hx [data-rev-list]>li{opacity:0;transform:translateY(12px)}
 .hx-js .hx [data-rev-list].in>li{opacity:1;transform:none;transition:opacity .45s var(--ease),transform .5s var(--ease)}
-.hx .hero-pin{position:relative;z-index:1;height:calc(100vh + 150vh)}
+.hx .hero-pin{position:relative;z-index:1;height:calc(100vh + 80vh)}
 .hx .hero-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
 .hx .hero-pin--static{height:auto}
 .hx .hero-pin--static .hero-sticky{position:relative}
@@ -343,7 +343,7 @@ body.hx-pinned .mrc-nudge{opacity:0!important;visibility:hidden!important}
   .hx .explore__row{grid-template-columns:1fr}
 }
 @media (max-width:899px) and (min-height:520px){
-  .hx .hero-pin{height:calc(100svh + 170svh)}
+  .hx .hero-pin{height:calc(100svh + 90svh)}
   .hx .hero-sticky{height:100svh}
   .hx .copy-wrap{align-items:flex-start;padding-top:calc(var(--nav-h) + 40px)}
   .hx .copy{width:100%;max-width:560px;will-change:opacity,transform}

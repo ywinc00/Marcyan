@@ -6,6 +6,7 @@
 ---
 <div class="foot__scape" aria-hidden="true">
   <div class="foot__glow"></div>
+  <div class="foot__clouds" data-clouds="foot"></div>
   <div class="foot__city" data-skyline-src="/assets/houston/skyline.svg"></div>
 </div>
 
@@ -19,22 +20,28 @@
   .foot__glow {
     position: absolute; inset: 0;
     background:
-      radial-gradient(ellipse 36% 125% at 58% 100%, rgba(212,158,90,.40), rgba(212,158,90,.10) 52%, rgba(212,158,90,0) 74%),
-      linear-gradient(0deg, rgba(180,130,72,.18), rgba(180,130,72,0) 75%);
+      radial-gradient(ellipse 46% 130% at 56% 100%, rgba(212,158,90,.42), rgba(212,158,90,.12) 55%, rgba(212,158,90,0) 76%),
+      linear-gradient(0deg, rgba(180,130,72,.2), rgba(180,130,72,0) 78%);
   }
   /* la ciudad entera, apoyada en el suelo; los dos lados se funden con la noche (la foto corta edificios en los bordes) */
   .foot__city {
     position: absolute; left: 58%; bottom: -2%; height: 100%; aspect-ratio: 2400 / 1019; max-width: 100vw; transform: translateX(-50%);
     opacity: 0; transition: opacity 1s cubic-bezier(.22,.61,.36,1);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
   .foot__city.on { opacity: 1; }
   .foot__city :global(svg) { display: block; width: 100%; height: 100%; }
   /* silueta nítida, siempre más oscura que el resplandor que la recorta; las plantas encendidas en oro.
      (la capa de planos de fachada se queda en el dibujo, apagada: con ella la ciudad se embarraba) */
   .foot__city :global(#sil) { fill: #090807; }
-  .foot__city :global(#fac) { fill: none; }
+  /* dos tonos de fachada sacados de la foto: separan las torres que se solapan (sobre todo las de cristal de la izquierda) */
+  .foot__city :global(#t1) { fill: #13100c; }
+  .foot__city :global(#t2) { fill: #1d1811; }
+  /* nubecitas a los costados de la ciudad, detrás de ella */
+  .foot__clouds { position: absolute; inset: 0; }
+  .foot__clouds :global(.clouds__l) { position: absolute; inset: 0; }
+  .foot__clouds :global(.cloud) { position: absolute; display: block; }
   .foot__city :global(.w0) { fill: rgba(244,220,168,.92); }
   .foot__city :global(.w1) { fill: rgba(230,196,132,.56); }
   .foot__city :global(.w2) { fill: rgba(216,178,112,.3); }

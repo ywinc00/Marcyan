@@ -262,14 +262,14 @@ export function initSections(loadGeo) {
     const nIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { loadMap(); nIO.disconnect(); } }, { rootMargin: '150% 0px' });
     nIO.observe(box);
     let rt; addEventListener('resize', () => { if (!MAP) return; clearTimeout(rt); rt = setTimeout(() => { build(); placeZones(); frame(revealed ? 1 : 0); }, 140); });
-    function play() {
+    function playMap() {                               // (nombre propio: «play» es el de las viñetas de servicios)
       loadMap().then(() => {
         const t0 = performance.now(), dur = 1500;
         const f = (now) => { const p = Math.min(1, (now - t0) / dur); frame(p); if (p < 1) requestAnimationFrame(f); else { revealed = true; box.classList.add('on'); } };
         requestAnimationFrame(f);
       });
     }
-    const mIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { play(); mIO.disconnect(); } }, { threshold: 0.45 });
+    const mIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { playMap(); mIO.disconnect(); } }, { threshold: 0.45 });
     if (reduce) loadMap().then(() => box.classList.add('on')); else mIO.observe(box);
     if (!reduce) {
       let ticking = false;

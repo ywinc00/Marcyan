@@ -357,22 +357,49 @@ export function initHero(GEO) {
     copyEl.inert = ft > 0.98;                            // invisible = sin foco ni toques
   }
 
-  // ── el desplazamiento dirige el acercamiento ──
-  let cur = 0, target = 0, raf = 0, lastT = 0, started = false;
+  // ── un gesto dispara el viaje entero ──
+  // En cuanto el visitante baja (un deslizamiento, un golpe de rueda, una flecha), el acercamiento corre COMPLETO
+  // solo, sin ir atado al recorrido; mientras corre, la página se queda quieta para que se vea entero. Al volver
+  // arriba del todo, el planeta se aleja solo. La historia de las búsquedas sigue al acercamiento.
+  let cur = 0, target = 0, raf = 0, lastT = 0, anim = null;
   const cue = document.getElementById('hx-cue');
-  function progress() {
-    const range = pin.offsetHeight - sticky.offsetHeight;
-    if (range <= 0) return 1;
-    const y = Math.min(range, Math.max(0, scrollY - pin.offsetTop));
-    return Math.min(1, y / (range * 0.55));         // el último 45 % del recorrido fijo deja ver la historia quieta
+  const DUR_IN = () => (F && F.M ? 1350 : 1150), DUR_OUT = 850;
+  const atTop = () => scrollY - pin.offsetTop <= 2;
+  function goTo(to) {
+    if (target === to) return;
+    target = to;
+    if (reduce) { cur = to; anim = null; }
+    else anim = { from: cur, to, t0: performance.now(), dur: (to > cur ? DUR_IN() : DUR_OUT) * Math.max(0.25, Math.abs(to - cur)) };
+    if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
   }
+  // la página se queda quieta mientras corre el acercamiento (rueda, dedo y teclado)
+  let locked = false, lockY = 0, lockT = 0;
+  function lock() { locked = true; lockY = scrollY; clearTimeout(lockT); lockT = setTimeout(unlock, DUR_IN() + 120); }
+  function unlock() { locked = false; clearTimeout(lockT); }
+  const DOWN_KEYS = new Set(['ArrowDown', 'PageDown', ' ', 'Spacebar', 'End']);
+  function start(e) { if (e && e.cancelable) e.preventDefault(); if (cue) cue.classList.add('gone'); lock(); goTo(1); }
+  addEventListener('wheel', (e) => {
+    if (locked) { if (e.cancelable) e.preventDefault(); return; }
+    if (!reduce && target === 0 && atTop() && e.deltaY > 0) start(e);
+  }, { passive: false });
+  let ty0 = null;
+  addEventListener('touchstart', (e) => { ty0 = e.touches[0] ? e.touches[0].clientY : null; }, { passive: true });
+  addEventListener('touchmove', (e) => {
+    if (locked) { if (e.cancelable) e.preventDefault(); return; }
+    if (reduce || ty0 == null || target !== 0 || !atTop()) return;
+    if (e.touches[0] && ty0 - e.touches[0].clientY > 2) start(e);        // el dedo sube: la página iba a bajar
+  }, { passive: false });
+  addEventListener('keydown', (e) => {
+    if (locked && DOWN_KEYS.has(e.key)) { e.preventDefault(); return; }
+    if (!reduce && target === 0 && atTop() && DOWN_KEYS.has(e.key) && !/input|textarea|select/i.test((e.target && e.target.tagName) || '')) start(e);
+  });
   function tick(now) {
-    const dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
-    // suavizado con un límite de velocidad: aunque el visitante baje de golpe, el viaje dura al menos ~1,2 s
-    let step = reduce ? (target >= 0.3 ? 1 : 0) - cur : (target - cur) * (1 - Math.exp(-dt / 95));
-    const maxStep = dt / (F.M ? 950 : 650);             // el viaje entero dura como mínimo ~0,65 s (móvil ~0,95 s: tiene un tiempo más)
-    if (!reduce) step = Math.max(-maxStep * 1.6, Math.min(maxStep, step));
-    cur = reduce ? cur + step : Math.abs(target - cur) < 0.0008 ? target : cur + step;
+    lastT = now;
+    if (anim) {
+      const p = Math.min(1, (now - anim.t0) / anim.dur);
+      cur = anim.from + (anim.to - anim.from) * p;                         // la curva la pone el propio viaje (state)
+      if (p >= 1) { cur = anim.to; anim = null; if (cur === 1) unlock(); }
+    }
     const zoomed = cur > 0.985;
     stage.classList.toggle('zoomed', zoomed);
     copyFade(cur);
@@ -386,7 +413,7 @@ export function initHero(GEO) {
       if (T > STORY_MS) { storyOn = false; storyDone = true; }
     }
     draw(cur, ping);
-    if ((!reduce && cur !== target) || storyOn) raf = requestAnimationFrame(tick); else { raf = 0; lastT = 0; }
+    if (anim || storyOn) raf = requestAnimationFrame(tick); else { raf = 0; lastT = 0; }
   }
   const ctabar = document.querySelector('[data-nav-ctabar]');
   function guardBar() {
@@ -404,9 +431,15 @@ export function initHero(GEO) {
     found.style.opacity = Math.max(0, Math.min(1, (top - 72) / 110)).toFixed(3);
   }
   function onScroll() {
+    // mientras corre el acercamiento, la inercia no mueve la página
+    if (locked && Math.abs(scrollY - lockY) > 1) { scrollTo(0, lockY); return; }
     guardBar(); exitFade();
-    target = progress();
-    if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
+    if (target === 0 && !atTop()) {
+      // se bajó sin rueda ni dedo (barra de desplazamiento, un enlace a una sección): el viaje corre igual, pero
+      // la página NO se frena (un salto a una sección tiene que llegar a su sitio)
+      if (cue) cue.classList.add('gone');
+      goTo(1);
+    } else if (target === 1 && atTop()) goTo(0);                            // arriba del todo: el planeta se aleja
   }
 
 
@@ -417,7 +450,7 @@ export function initHero(GEO) {
       // móvil: la portada sigue fija; con movimiento reducido la historia sale entera al bajar, sin animación,
       // y con #final se empieza en la historia terminada. Al subir, el texto vuelve.
       storyDone = true; finalDom();
-      cur = target = h === '#final' ? 1 : (progress() >= 0.3 ? 1 : 0);
+      cur = target = h === '#final' ? 1 : (atTop() ? 0 : 1);
       stage.classList.toggle('zoomed', cur > 0.985); copyFade(cur); draw(cur, 0); canvas.classList.add('ready');
       if (cue) cue.classList.add('gone');
       addEventListener('scroll', onScroll, { passive: true }); guardBar();
@@ -429,8 +462,8 @@ export function initHero(GEO) {
       if (cue) cue.classList.add('gone');
       return;
     }
-    cur = target = progress();
-    if (cur > 0.985) { storyDone = true; stage.classList.add('zoomed'); finalDom(); }
+    cur = target = atTop() ? 0 : 1;                                  // si la página se abre ya bajada, el viaje está hecho
+    if (cur > 0.985) { storyDone = true; stage.classList.add('zoomed'); finalDom(); if (cue) cue.classList.add('gone'); }
     copyFade(cur); draw(cur, 0);
     requestAnimationFrame(() => canvas.classList.add('ready'));
     addEventListener('scroll', onScroll, { passive: true });
@@ -448,11 +481,10 @@ export function initHero(GEO) {
       const m = mobile();
       pin.classList.toggle('hero-pin--static', !m);
       storyOn = false; storyDone = true; finalDom();
-      cur = target = m ? (progress() >= 0.3 ? 1 : 0) : 1;
+      cur = target = m ? (atTop() ? 0 : 1) : 1;
       stage.classList.toggle('zoomed', cur > 0.985);
     } else {
       if (storyDone || storyOn) { storyOn = false; storyDone = true; finalDom(); }
-      target = progress();
     }
     copyFade(cur); draw(cur, 0);
   });

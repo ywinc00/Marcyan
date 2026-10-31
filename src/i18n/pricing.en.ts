@@ -40,7 +40,7 @@ export const catalog: CatalogProduct[] = [
       'Custom, fast, bilingual websites (English and Spanish) with baseline SEO, easy for AI assistants to read. From a one-page landing page to a complete site.',
     tagline: 'Custom, fast, bilingual sites, ready for Google and AI.',
     anchorUnit: 'project',
-    href: '/en/houston',
+    href: '/en/houston#servicios',
     ctaLabel: 'See web design',
     tone: 'gold',
     tiers: [
@@ -80,7 +80,7 @@ export const catalog: CatalogProduct[] = [
       'Get ChatGPT, Gemini and Meta AI to recommend YOU when someone asks about your service. Different from Conversational AI (which serves your customers): here the goal is for AI to find and cite you.',
     tagline: 'Get AI to recommend you when people ask about your service.',
     anchorUnit: 'checkup',
-    href: '/en/houston',
+    href: '/en/checkup',
     ctaLabel: 'Get my free checkup',
     tone: 'teal',
     tiers: [
@@ -101,7 +101,7 @@ export const catalog: CatalogProduct[] = [
       'Online stores optimized to sell: catalog, cart and secure payments, in a bilingual experience. From an essential store to a fully custom one.',
     tagline: 'Online stores optimized to sell, with catalog and payments.',
     anchorUnit: 'project',
-    href: '/en/houston',
+    href: '/en/houston#servicios',
     ctaLabel: 'See online store',
     tone: 'gold',
     tiers: [
@@ -120,7 +120,7 @@ export const catalog: CatalogProduct[] = [
       'Show up on Google Maps and in local search: Google Business Profile, NAP consistency, bilingual local content and review management. One-time or month to month.',
     tagline: 'Show up on Google Maps and in local search in your area.',
     anchorUnit: 'one-time',
-    href: '/en/houston',
+    href: '/en/houston#servicios',
     ctaLabel: 'See local SEO',
     tone: 'gold',
     tiers: [
@@ -139,7 +139,7 @@ export const catalog: CatalogProduct[] = [
       'A custom visual identity: from just the logo to a complete brand system (palette, typography and usage guide).',
     tagline: 'Logo, colors and typography designed for your business.',
     anchorUnit: 'project',
-    href: '/en/houston',
+    href: '/en/houston#servicios',
     ctaLabel: 'See branding',
     tone: 'gold',
     tiers: [

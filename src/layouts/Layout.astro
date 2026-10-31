@@ -75,6 +75,9 @@ const orgDescription =
   lang === 'en'
     ? 'Web design agency, local SEO, and artificial-intelligence solutions for small and medium businesses in Houston and Miami. We put AI to work for your business, in English and Spanish.'
     : 'Agencia de diseño web, SEO local y soluciones de inteligencia artificial para pequeñas y medianas empresas en Houston y Miami. Ponemos la IA a trabajar para tu negocio, en español e inglés.';
+// La raíz '/' redirige a /es: la url de la entidad es la home del idioma de la página.
+// Los @id (#organization, #houston, #miami) son identificadores y no cambian.
+const homeUrl = `${SITE}/${lang === 'en' ? 'en' : 'es'}`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -82,7 +85,7 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': `${SITE}/#organization`,
       name: 'Marcyan Studio',
-      url: `${SITE}/`,
+      url: homeUrl,
       logo: `${SITE}/logos/marcyan-lateral-fondo-blanco.png`,
       email: nap.email,
       description: orgDescription,
@@ -98,7 +101,7 @@ const jsonLd = {
       '@id': `${SITE}/#houston`,
       name: 'Marcyan Studio',
       parentOrganization: { '@id': `${SITE}/#organization` },
-      url: `${SITE}/`,
+      url: homeUrl,
       telephone: tel(nap.houston),
       email: nap.email,
       priceRange: '$$',
@@ -111,7 +114,7 @@ const jsonLd = {
       '@id': `${SITE}/#miami`,
       name: 'Marcyan Studio',
       parentOrganization: { '@id': `${SITE}/#organization` },
-      url: `${SITE}/`,
+      url: homeUrl,
       telephone: tel(nap.miami),
       email: nap.email,
       priceRange: '$$',

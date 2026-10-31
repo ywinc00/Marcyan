@@ -20,7 +20,7 @@ const proj = (...names: string[]): ProjectItem[] =>
 const caso0: ProjectItem = {
   name: 'This site · Case #0',
   cat: 'Marcyan · Our own site',
-  url: '/en/',
+  url: '/en',
   display: 'marcyanstudio.com',
   result: 'Built in static HTML so ChatGPT and Gemini can read and cite it.',
   accent: 'teal',
@@ -263,7 +263,7 @@ const enIaPymes: ClusterPage = {
   path: '/en/ai-for-small-business',
   breadcrumb: [
     { name: 'Home', path: '/en/' },
-    { name: 'Services', path: '/en/#servicios' },
+    { name: 'Services', path: '/en/services' },
     { name: 'AI for Your Business', path: '/en/ai-for-small-business' },
   ],
   hero: {

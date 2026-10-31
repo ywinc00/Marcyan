@@ -43,7 +43,23 @@ export function hasMirror(pathname: string): boolean {
   return ES2EN.has(key) || EN2ES.has(key);
 }
 
-/** Destino del toggle de idioma: el espejo exacto si existe; si no, la home del otro idioma. */
+// Hubs de ciudad: una página de ciudad sin espejo exacto lleva al hub de su ciudad
+// en el otro idioma (p. ej. /es/houston/katy → /en/houston), no a la portada.
+const CITY_HUBS = ['houston', 'miami'] as const;
+
+/** Destino del toggle de idioma: el espejo exacto si existe; si no, el hub de su
+ *  ciudad en el otro idioma; si no, la home del otro idioma. Solo el botón: el
+ *  hreflang sigue usando únicamente el espejo exacto (hasMirror). */
 export function toggleHref(pathname: string, lang: 'es' | 'en'): string {
-  return mirrorPath(pathname, lang) ?? (lang === 'es' ? '/en/' : '/es/');
+  const exact = mirrorPath(pathname, lang);
+  if (exact) return exact;
+  const key = norm(pathname);
+  for (const city of CITY_HUBS) {
+    const hub = `/${lang}/${city}`;
+    if (key.startsWith(`${hub}/`)) {
+      const other = mirrorPath(hub, lang);
+      if (other) return other;
+    }
+  }
+  return lang === 'es' ? '/en' : '/es';
 }

@@ -157,7 +157,6 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
     // Desktop (riel horizontal ≥1024) → efecto por HOVER (CSS). Layout apilado (<1024) →
     // motor por SCROLL + cohete, que se reproduce UNA sola vez.
     if (window.innerWidth < 1024 && !reduce && steps.length) {
-      section.classList.add('has-finale');
       const last = steps[steps.length - 1];
       const lastDot = last.querySelector('.riel__dot') as HTMLElement;
       const rocket = section.querySelector<HTMLElement>('[data-rocket]');
@@ -167,10 +166,21 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
       // rueda, tecla o puntero) que haya movido la página. El update() inicial y los resize
       // marcan pasos pero nunca lanzan: un render sin scroll (p. ej. Google con un viewport
       // móvil altísimo) no puede dejar la capa fija tapando la página.
+      // has-finale (que prepara la capa y oculta el CTA de abajo) también espera a esa
+      // primera interacción: sin ella, el CTA de abajo sigue visible y se puede pulsar.
+      // Solo si en ese momento el CTA de abajo aún está por debajo de la pantalla: si ya está
+      // a la vista o se dejó atrás, se deja como está (ocultarlo movería la página bajo el
+      // dedo) y esa visita no tiene capa.
       let interacted = false;
       let scrollPending = false;
+      const inlineCta = section.querySelector<HTMLElement>('.riel__launch-inline');
       const interactionEvents = ['touchstart', 'wheel', 'keydown', 'pointerdown'] as const;
-      const markInteraction = () => { interacted = true; };
+      const markInteraction = () => {
+        if (interacted) return;
+        interacted = true;
+        const r = inlineCta?.getBoundingClientRect();
+        if (r && r.top >= window.innerHeight) section.classList.add('has-finale');
+      };
       interactionEvents.forEach((ev) => window.addEventListener(ev, markInteraction, { passive: true }));
 
       // el cohete arranca EN el círculo del nodo final y vuela LENTO a su sitio (centro)
@@ -209,7 +219,7 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
             if (steps[i].getBoundingClientRect().top + 24 <= center) active = i;
           }
           steps.forEach((s, i) => { s.classList.toggle('is-active', i === active); s.classList.toggle('is-passed', i < active); });
-          if (active === steps.length - 1 && canLaunch) launch(); // dispara JUSTO cuando la energía llega al nodo final
+          if (active === steps.length - 1 && canLaunch && section.classList.contains('has-finale')) launch(); // dispara JUSTO cuando la energía llega al nodo final
         } else if (phase === 'launched') {
           // se cierra al alejarte del nodo final (punto medio: ni tan pronto ni tan tarde)
           const cy = lastDot.getBoundingClientRect().top + 24;

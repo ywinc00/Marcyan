@@ -38,7 +38,7 @@ const works = portfolioProjects.map((w) => ({
 >
   <CollectionPageLd slot="head" name={p.meta.title} description={p.meta.description} path={p.path} items={works} inLanguage="en" />
 
-  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero

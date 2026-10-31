@@ -35,7 +35,7 @@ export const content = {
       ] as Link[],
       cta: { label: 'Propuesta gratis', href: '#contacto' },
       langLabel: 'EN',
-      langHref: '/en/',
+      langHref: '/en',
       openMenu: 'Abrir menú',
       closeMenu: 'Cerrar menú',
     },
@@ -213,7 +213,7 @@ export const content = {
 
     footer: {
       tagline: 'Web, IA y SEO para tu negocio · Houston & Miami',
-      cta: { label: 'Propuesta gratis', href: '/es/#contacto' },
+      cta: { label: 'Propuesta gratis', href: '/es#contacto' },
       cols: [
         { title: 'Servicios', links: [
           { label: 'Todos los servicios', href: '/es/servicios' },
@@ -267,7 +267,7 @@ export const content = {
       ] as Link[],
       cta: { label: 'Get my free proposal', href: '#contacto' },
       langLabel: 'ES',
-      langHref: '/es/',
+      langHref: '/es',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
     },
@@ -297,17 +297,17 @@ export const content = {
       cta: { label: 'See all services', href: '/en/services' },
       // Teaser: leads with each product's low anchor. Mirror of src/i18n/pricing.ts.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston',
+        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston#servicios',
           desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
         { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: 'from $500', href: '/en/ai-for-small-business',
           desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock, in their language and built into your site.' },
-        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/houston',
+        { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/checkup',
           desc: 'Get recommended by ChatGPT, Gemini, and Meta AI when people search for what you offer. Starts with a free AI-visibility audit.' },
-        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston',
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston#servicios',
           desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience, from an essential store to a custom one.' },
-        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston',
+        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston#servicios',
           desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, one-time or monthly.' },
-        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston',
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston#servicios',
           desc: 'From just your logo to a full identity: palette, typography, and usage guide, made to measure for your business.' },
         { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
           desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
@@ -431,7 +431,7 @@ export const content = {
 
     footer: {
       tagline: 'Web, AI & SEO for your business · Houston & Miami',
-      cta: { label: 'Get my free proposal', href: '/en/#contacto' },
+      cta: { label: 'Get my free proposal', href: '/en#contacto' },
       cols: [
         { title: 'Services', links: [
           { label: 'All services', href: '/en/services' },

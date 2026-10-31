@@ -76,7 +76,7 @@ export const clusterNav = {
   ],
   cta: { label: 'Propuesta gratis', href: '#contacto' },
   langLabel: 'EN',
-  langHref: '/en/',
+  langHref: '/en',
   openMenu: 'Abrir menú',
   closeMenu: 'Cerrar menú',
 };
@@ -93,7 +93,7 @@ export const clusterNavEn = {
   ],
   cta: { label: 'Get my free proposal', href: '#contacto' },
   langLabel: 'ES',
-  langHref: '/es/',
+  langHref: '/es',
   openMenu: 'Open menu',
   closeMenu: 'Close menu',
 };
@@ -109,7 +109,7 @@ const proj = (...names: string[]): ProjectItem[] =>
 const caso0: ProjectItem = {
   name: 'Este sitio · Caso #0',
   cat: 'Marcyan · Nuestro propio sitio',
-  url: '/es/',
+  url: '/es',
   display: 'marcyanstudio.com',
   result: 'Construido en HTML estático para que ChatGPT y Gemini puedan leerlo y citarlo.',
   accent: 'teal',
@@ -476,7 +476,7 @@ const iaPymes: ClusterPage = {
   path: '/es/ia-para-pymes',
   breadcrumb: [
     { name: 'Inicio', path: '/es/' },
-    { name: 'Servicios', path: '/es/#servicios' },
+    { name: 'Servicios', path: '/es/servicios' },
     { name: 'IA para tu Negocio', path: '/es/ia-para-pymes' },
   ],
   hero: {

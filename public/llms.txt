@@ -31,4 +31,4 @@ Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitio
 ## Contacto / Contact
 
 - Email: contact@marcyanstudio.com
-- [Formulario de contacto](https://marcyanstudio.com/es/#contacto)
+- [Formulario de contacto](https://marcyanstudio.com/es#contacto)

@@ -66,7 +66,7 @@ const relatedTone: 'gold' | 'teal' =
 >
   <ServiceLd slot="head" {...cluster.service} />
 
-  <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en/' : '/es/'} currentPath={Astro.url.pathname} />
+  <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en' : '/es'} currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero {...cluster.hero}>

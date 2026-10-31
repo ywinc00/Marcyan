@@ -37,7 +37,7 @@ export const portfolioProjects: PortfolioProject[] = [
     badge: 'Sitio + SEO', tags: ['Reconstruido desde cero', 'SEO local', 'Bilingüe'],
     did: 'Lo mismo en Orlando: sitio reconstruido desde cero, rápido y bilingüe, con SEO local (Perfil de Google, NAP y contenido por servicio) para su mercado de Florida.',
     result: 'Ya posiciona en su zona de Orlando y la IA de Google ya lo incluye en recomendaciones para algunas búsquedas.',
-    serviceLabel: 'SEO local', serviceHref: '/es/houston/seo-local',
+    serviceLabel: 'SEO local en Miami', serviceHref: '/es/miami/seo-local',
   },
   {
     name: "Julio's Landscape TX", cat: 'Paisajismo · Houston, TX', slug: 'jls', mh: 2397, accent: 'gold',

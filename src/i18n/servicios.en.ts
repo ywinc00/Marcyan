@@ -45,12 +45,8 @@ export const serviciosPage = {
     tag: 'Explore in depth',
     title: 'Every service in <em>detail</em>',
     links: [
-      { label: 'Web design in Houston', href: '/en/houston/web-design', desc: 'Landing, redesign or a complete custom site, fast and bilingual.', icon: 'lucide:layout-template' },
+      { label: 'Services in Houston', href: '/en/houston', desc: 'Web design, local SEO, AI SEO, online stores and branding, with prices.', icon: 'lucide:layout-template' },
       { label: 'AI for your business', href: '/en/ai-for-small-business', desc: 'Assistants that reply, book appointments and capture leads 24/7.', icon: 'lucide:messages-square' },
-      { label: 'AI SEO in Houston', href: '/en/houston/ai-seo', desc: 'So ChatGPT and Gemini recommend you. Free checkup.', icon: 'marcyan-ai' },
-      { label: 'Local SEO in Houston', href: '/en/houston/local-seo', desc: 'Show up on Google Maps and in local search in your area.', icon: 'lucide:search' },
-      { label: 'Online store in Houston', href: '/en/houston/ecommerce', desc: 'Catalog, cart and secure payments to sell online.', icon: 'lucide:shopping-bag' },
-      { label: 'Branding in Houston', href: '/en/houston/branding', desc: 'From just the logo to a complete brand identity.', icon: 'lucide:palette' },
       { label: 'Pricing and what it includes', href: '/en/pricing', desc: 'All rates published, no fine print.', icon: 'lucide:tag' },
     ] as RelatedLink[],
   },
@@ -99,12 +95,12 @@ export const serviciosPage = {
   },
   // ItemList schema — the 7 services pointing to their real page (or the hub).
   itemList: [
-    { name: 'Web Design', path: '/en/houston/web-design' },
+    { name: 'Web Design', path: '/en/houston' },
     { name: 'Conversational AI', path: '/en/ai-for-small-business' },
-    { name: 'AI SEO (AI Visibility)', path: '/en/houston/ai-seo' },
-    { name: 'E-Commerce & Stores', path: '/en/houston/ecommerce' },
-    { name: 'Local SEO', path: '/en/houston/local-seo' },
-    { name: 'Branding & Identity', path: '/en/houston/branding' },
+    { name: 'AI SEO (AI Visibility)', path: '/en/houston' },
+    { name: 'E-Commerce & Stores', path: '/en/houston' },
+    { name: 'Local SEO', path: '/en/houston' },
+    { name: 'Branding & Identity', path: '/en/houston' },
     { name: 'Ongoing Maintenance', path: '/en/services' },
   ] as ListLink[],
 };

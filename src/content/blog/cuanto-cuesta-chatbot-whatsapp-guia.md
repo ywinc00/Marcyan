@@ -23,10 +23,6 @@ faq:
   - q: "¿Para qué sirve un chatbot de WhatsApp en un negocio pequeño?"
     a: "Para responder al instante. Muchos clientes escriben fuera del horario o cuando estás ocupado, y un prospecto sin respuesta se enfría rápido. Un chatbot contesta las preguntas frecuentes, agenda, captura datos del cliente y te avisa cuando alguien quiere hablar con una persona, para que ningún mensaje se quede sin atender."
 related:
-  - label: "¿Cuánto cuesta un chatbot? (precios)"
-    href: "/es/precios/cuanto-cuesta-un-chatbot"
-    desc: "La página de precios del chatbot, con el detalle de qué incluye."
-    icon: "lucide:tag"
   - label: "IA conversacional en Houston"
     href: "/es/houston/ia-conversacional"
     desc: "Te instalamos y entrenamos el chatbot para tu negocio en Houston."
@@ -69,7 +65,7 @@ Lo decimos claro porque es honesto: **ese cobro es de Meta, no de la agencia.** 
 
 Nosotros publicamos el precio de forma abierta: el **chatbot empieza desde $900 en un pago único**, como **servicio gestionado**. Eso significa que no es solo el software: incluye la instalación, el entrenamiento del bot con la información real de tu negocio (tus servicios, tus precios, tus preguntas frecuentes) y el mantenimiento para que siga funcionando.
 
-La diferencia con una app por suscripción es el modelo: pagas una vez en lugar de una mensualidad indefinida. Puedes ver el desglose completo en la página de [precios del chatbot](/es/precios/cuanto-cuesta-un-chatbot) y el resto de nuestros servicios en [precios](/es/precios). Si quieres que te lo dejemos andando en tu negocio, mira [IA conversacional en Houston](/es/houston/ia-conversacional). Y si apenas estás explorando qué puede hacer la IA por un negocio pequeño, empieza por [inteligencia artificial para pymes](/es/ia-para-pymes).
+La diferencia con una app por suscripción es el modelo: pagas una vez en lugar de una mensualidad indefinida. Puedes ver el precio del chatbot y el resto de nuestros servicios en [precios](/es/precios). Si quieres que te lo dejemos andando en tu negocio, mira [IA conversacional en Houston](/es/houston/ia-conversacional). Y si apenas estás explorando qué puede hacer la IA por un negocio pequeño, empieza por [inteligencia artificial para pymes](/es/ia-para-pymes).
 
 ## ¿Qué NO te podemos prometer?
 

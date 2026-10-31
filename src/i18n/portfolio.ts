@@ -51,7 +51,7 @@ export const portfolioProjects: PortfolioProject[] = [
     badge: 'Web app', tags: ['Agenda de citas', 'A medida', 'Reservas en línea'],
     did: 'Construimos una web app a medida donde las clientas agendan sus citas en línea y exploran inspiración de diseños de uñas, para un salón de Houston.',
     result: 'Una web app de reservas a medida, en vivo y en uso por sus clientas.',
-    serviceLabel: 'Sitios para salones de belleza', serviceHref: '/es/houston/salon-belleza',
+    serviceLabel: 'Diseño web en Houston', serviceHref: '/es/houston/diseno-web',
   },
 ];
 

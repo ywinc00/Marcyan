@@ -27,10 +27,6 @@ related:
     href: "/es/houston/ia-conversacional"
     desc: "Asistentes que atienden y captan clientes las 24 horas."
     icon: "marcyan-ai"
-  - label: "¿Cuánto cuesta un chatbot?"
-    href: "/es/precios/cuanto-cuesta-un-chatbot"
-    desc: "Rangos reales y qué incluye, sin letra pequeña."
-    icon: "lucide:tag"
   - label: "IA para tu negocio (PYMEs)"
     href: "/es/ia-para-pymes"
     desc: "Cómo la inteligencia artificial ayuda a un negocio pequeño."
@@ -74,7 +70,7 @@ Aquí conviene separar dos cosas que suelen confundirse: lo que cuesta el asiste
 
 Un punto honesto sobre WhatsApp: desde julio de 2025 Meta cobra por cada mensaje de plantilla entregado, aunque muchos mensajes (las respuestas dentro de una conversación de servicio, por ejemplo) siguen siendo gratis ([documentación oficial de Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing)). Ese cobro es de Meta, no nuestro. Lo decimos claro para que no haya sorpresas en tu factura.
 
-Y para ponerlo en perspectiva: las apps de delivery cobran a los restaurantes comisiones que van del **15% al 30% por pedido** ([Rezku](https://rezku.com/blog/third-party-delivery-fees-in-2026-what-doordash-uber-eats-grubhub-really-cost-restaurants/)). Recuperar tus propias llamadas y mensajes, con un canal que es tuyo, suele salir mucho más barato a largo plazo. Si quieres ver los números con calma, tenemos una guía de [cuánto cuesta un chatbot](/es/precios/cuanto-cuesta-un-chatbot) y la lista completa de [precios](/es/precios).
+Y para ponerlo en perspectiva: las apps de delivery cobran a los restaurantes comisiones que van del **15% al 30% por pedido** ([Rezku](https://rezku.com/blog/third-party-delivery-fees-in-2026-what-doordash-uber-eats-grubhub-really-cost-restaurants/)). Recuperar tus propias llamadas y mensajes, con un canal que es tuyo, suele salir mucho más barato a largo plazo. Si quieres ver los números con calma, tienes el precio del chatbot y la lista completa en [precios](/es/precios).
 
 ## ¿La IA reemplaza a mi equipo?
 

@@ -4,8 +4,9 @@
 // Landing hero (variant 'landing') + a bespoke city SHOWCASE that injects local
 // identity (palm/skyline + FL silhouette + coords + "Magic City" tagline),
 // reusing the visual LANGUAGE of Locations.astro, and the ×Miami service switch.
-// Then: AnswerBlock (AEO), neighborhoods, local context (Prose), related, FAQ,
-// CtaBand, Contact. Schema: ItemList of the services + Breadcrumb.
+// Then: AnswerBlock (AEO), local context (Prose), related, FAQ, CtaBand, Contact.
+// Schema: Breadcrumb. Since the Nov 2026 consolidation the service and
+// neighborhood landings live on this hub, so the service rows are not links.
 // The base @graph already provides the Miami ProfessionalService.
 // HARD honesty: NO local Miami clients -> no Miami proof here.
 import Layout from '../../layouts/Layout.astro';
@@ -22,7 +23,6 @@ import Faq from '../../components/sections/Faq.astro';
 import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
-import ItemListLd from '../../components/seo/ItemListLd.astro';
 import GrowthTeaser from '../../components/sections/GrowthTeaser.astro';
 import GrowthCta from '../../components/growthos/GrowthCta.astro';
 import { content, nap } from '../../i18n/content';
@@ -45,7 +45,6 @@ const FL_SHAPE = {
   lang="en"
   path="miami"
 >
-  <ItemListLd slot="head" items={h.itemList} name="Marcyan services in Miami" />
 
   <SiteNav nav={clusterNavEn} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
 
@@ -109,9 +108,11 @@ const FL_SHAPE = {
           </header>
 
           <ul class="svc-switch" role="list">
-            {h.services.links.map((l, i) => (
+            {h.services.links.map((l, i) => {
+              const Tag = l.href ? 'a' : 'div';
+              return (
               <li class="svc-switch__row">
-                <a class="svc-switch__link" href={l.href}>
+                <Tag class="svc-switch__link" href={l.href}>
                   <span class="svc-switch__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <span class:list={['svc-switch__chip', l.icon === 'marcyan-ai' && 'svc-switch__chip--brand']}>
                     <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
@@ -120,10 +121,11 @@ const FL_SHAPE = {
                     <span class="svc-switch__label">{l.label}</span>
                     <span class="svc-switch__desc">{l.desc}</span>
                   </span>
-                  <Icon name="lucide:arrow-right" class="svc-switch__go" />
-                </a>
+                  {l.href && <Icon name="lucide:arrow-right" class="svc-switch__go" />}
+                </Tag>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -137,7 +139,6 @@ const FL_SHAPE = {
 
     <AnswerBlock lang="en" q={h.answer.q} a={h.answer.a} source={h.answer.source} />
 
-    <RelatedLinks tag={h.barrios.tag} title={h.barrios.title} links={h.barrios.links} tone="teal" />
 
     <Prose
       tag={h.local.tag}
@@ -279,16 +280,16 @@ const FL_SHAPE = {
     border-radius: var(--radius-md);
     transition: background var(--duration-fast) var(--ease-out-expo);
   }
-  .svc-switch__link:hover { background: var(--bg-elevated); }
-  .svc-switch__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+  a.svc-switch__link:hover { background: var(--bg-elevated); }
+  a.svc-switch__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
 
   .svc-switch__idx {
     flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs);
     color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
     transition: color var(--duration-fast);
   }
-  .svc-switch__link:hover .svc-switch__idx,
-  .svc-switch__link:focus-visible .svc-switch__idx { color: var(--accent-gold); }
+  a.svc-switch__link:hover .svc-switch__idx,
+  a.svc-switch__link:focus-visible .svc-switch__idx { color: var(--accent-gold); }
 
   .svc-switch__chip {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
@@ -308,12 +309,12 @@ const FL_SHAPE = {
     flex: 0 0 auto; width: 18px; height: 18px; color: var(--fg-subtle);
     transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
   }
-  .svc-switch__link:hover .svc-switch__go,
-  .svc-switch__link:focus-visible .svc-switch__go { color: var(--accent-gold); transform: translateX(4px); }
+  a.svc-switch__link:hover .svc-switch__go,
+  a.svc-switch__link:focus-visible .svc-switch__go { color: var(--accent-gold); transform: translateX(4px); }
 
   @media (--motion-reduce) {
-    .svc-switch__link:hover .svc-switch__go,
-    .svc-switch__link:focus-visible .svc-switch__go { transform: none; }
+    a.svc-switch__link:hover .svc-switch__go,
+    a.svc-switch__link:focus-visible .svc-switch__go { transform: none; }
   }
 
   @media (--md) {

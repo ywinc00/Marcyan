@@ -22,7 +22,6 @@ Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitio
 
 - [Home](https://marcyanstudio.com/en): what we do and who we serve.
 - [Services](https://marcyanstudio.com/en/services) · [Pricing](https://marcyanstudio.com/en/pricing): public rates, no fine print.
-- [Houston web design](https://marcyanstudio.com/en/houston/web-design) · [AI SEO](https://marcyanstudio.com/en/houston/ai-seo)
 - [AI for small business](https://marcyanstudio.com/en/ai-for-small-business)
 - [Houston](https://marcyanstudio.com/en/houston) · [Miami](https://marcyanstudio.com/en/miami) · [Cities](https://marcyanstudio.com/en/cities)
 - [Free digital checkup](https://marcyanstudio.com/en/checkup) · [Free tools](https://marcyanstudio.com/en/tools)

@@ -3,15 +3,17 @@
 // Business LANDING #1 (premium redesign "Arrival horizon"). Home-level page
 // (DESIGN.md §2/§5):
 //   1. Bespoke CityHero (sky + telemetry rail + horizon stage),
-//   2. Services WITH PRICE (id="servicios": 2 asymmetric featured + 5 rows),
+//   2. Services WITH PRICE (id="servicios": 2 asymmetric featured + 4 rows),
 //   3. Projects (proof: "this is what it costs, made visible"),
-//   4. Houston Card (local context + NAP rail + areas as route-pills),
+//   4. Houston Card (local context + NAP rail),
 //   5. Directory by industry (dense index),
 //   6. AnswerBlock + FAQ (AEO, verbatim text),
 //   7. "Keep exploring" slim strip → CtaBand (secondary = tel) →
 //      micro-reassurance → Contact.
-// The 19 silo <a> (7 services + 7 industries + 2 areas + 3 related) survive
-// intact. Schema (ItemList + Breadcrumb) and meta INTACT.
+// Since the Nov 2026 consolidation the service landings were merged into this hub:
+// the 6 service cards/rows are not links (they would point to this same page), the
+// areas block is gone (Katy and Sugar Land stay as text in the card) and the silo
+// keeps 2 industries + 2 related. Schema (ItemList + Breadcrumb) and meta INTACT.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
@@ -43,7 +45,8 @@ const TX_SHAPE = {
 };
 
 // Priced services showcase: the first 2 = featured cards (web + AI, the
-// pillars); the remaining 5 = dense rows with a price column.
+// pillars); the remaining 4 = dense rows with a price column. A card/row is a
+// link only when it has an href (today none do: the content lives here).
 const svc = h.services.links;
 const svcFeatured = svc.slice(0, 2);
 const svcRest = svc.slice(2);
@@ -91,8 +94,9 @@ const splitPrice = (p?: string) =>
         <div class="svcprice__feat">
           {svcFeatured.map((l, i) => {
             const p = splitPrice(l.price);
+            const Tag = l.href ? 'a' : 'div';
             return (
-              <a class="pcard" href={l.href}>
+              <Tag class="pcard" href={l.href}>
                 <span class="pcard__idx" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                 <span class:list={['pcard__icon', isBrand(l.icon) && 'pcard__icon--brand']}>
                   <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
@@ -103,8 +107,8 @@ const splitPrice = (p?: string) =>
                   {p.pre && <span class="pcard__from">{p.pre}</span>}
                   <span class="pcard__amt">{p.amt}</span>
                 </span>
-                <span class="pcard__go">View service <Icon name="lucide:arrow-right" /></span>
-              </a>
+                {l.href && <span class="pcard__go">View service <Icon name="lucide:arrow-right" /></span>}
+              </Tag>
             );
           })}
         </div>
@@ -112,9 +116,10 @@ const splitPrice = (p?: string) =>
         <ul class="svcprice__rest" role="list">
           {svcRest.map((l, i) => {
             const p = splitPrice(l.price);
+            const Tag = l.href ? 'a' : 'div';
             return (
               <li class="svcrow">
-                <a class="svcrow__link" href={l.href}>
+                <Tag class="svcrow__link" href={l.href}>
                   <span class="svcrow__idx" aria-hidden="true">{String(i + 3).padStart(2, '0')}</span>
                   <span class:list={['svcrow__icon', isBrand(l.icon) && 'svcrow__icon--brand']}>
                     <Icon name={l.icon ?? 'lucide:arrow-up-right'} />
@@ -126,8 +131,8 @@ const splitPrice = (p?: string) =>
                   <span class="svcrow__price">
                     {p.pre && <span class="svcrow__from">{p.pre} </span>}{p.amt}
                   </span>
-                  <Icon name="lucide:arrow-right" class="svcrow__go" />
-                </a>
+                  {l.href && <Icon name="lucide:arrow-right" class="svcrow__go" />}
+                </Tag>
               </li>
             );
           })}
@@ -183,16 +188,6 @@ const splitPrice = (p?: string) =>
               </span>
             </div>
 
-            <h3 class="ficha__zonestitle" set:html={h.zonas.title} />
-            <div class="ficha__zones">
-              {h.zonas.links.map((z) => (
-                <a class="ficha__zone" href={z.href}>
-                  <Icon name={z.icon ?? 'lucide:map-pin'} class="ficha__zone-pin" />
-                  <span>{z.label}</span>
-                  <Icon name="lucide:arrow-right" class="ficha__zone-arr" />
-                </a>
-              ))}
-            </div>
           </aside>
         </article>
       </div>
@@ -295,8 +290,8 @@ const splitPrice = (p?: string) =>
     text-decoration: none; color: inherit;
     transition: border-color var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo);
   }
-  .pcard:hover { border-color: var(--border-accent); transform: translateY(-3px); }
-  .pcard:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  a.pcard:hover { border-color: var(--border-accent); transform: translateY(-3px); }
+  a.pcard:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .pcard__idx {
     position: absolute; top: var(--space-5); right: var(--space-5);
     font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-subtle);
@@ -310,9 +305,9 @@ const splitPrice = (p?: string) =>
     transition: color var(--duration-fast), border-color var(--duration-fast);
   }
   .pcard__icon :global(svg) { width: 24px; height: 24px; stroke-width: 1.5; }
-  .pcard:hover .pcard__icon, .pcard:focus-visible .pcard__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  a.pcard:hover .pcard__icon, a.pcard:focus-visible .pcard__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
   /* brand badge (marcyan-ai): ALWAYS gold, never re-tinted */
-  .pcard__icon--brand, .pcard:hover .pcard__icon--brand { color: var(--accent-gold); }
+  .pcard__icon--brand, a.pcard:hover .pcard__icon--brand { color: var(--accent-gold); }
   .pcard__label {
     font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
     color: var(--fg-primary); line-height: var(--leading-snug); max-width: 22ch;
@@ -334,14 +329,14 @@ const splitPrice = (p?: string) =>
     color: var(--fg-primary); font-variant-numeric: tabular-nums;
     transition: color var(--duration-base) var(--ease-out-expo);
   }
-  .pcard:hover .pcard__amt, .pcard:focus-visible .pcard__amt { color: var(--accent-gold); }
+  a.pcard:hover .pcard__amt, a.pcard:focus-visible .pcard__amt { color: var(--accent-gold); }
   .pcard__go {
     display: inline-flex; align-items: center; gap: var(--space-2); padding-top: var(--space-2);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-gold);
   }
   .pcard__go :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .pcard:hover .pcard__go :global(svg) { transform: translateX(4px); }
+  a.pcard:hover .pcard__go :global(svg) { transform: translateX(4px); }
 
   /* dense rows 03–07 with a mono PRICE COLUMN on the right */
   .svcprice__rest {
@@ -360,14 +355,14 @@ const splitPrice = (p?: string) =>
     border-radius: var(--radius-md); text-decoration: none; color: inherit;
     transition: background var(--duration-fast) var(--ease-out-expo);
   }
-  .svcrow__link:hover { background: var(--bg-elevated); }
-  .svcrow__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
+  a.svcrow__link:hover { background: var(--bg-elevated); }
+  a.svcrow__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; background: var(--bg-elevated); }
   .svcrow__idx {
     grid-area: idx; font-family: var(--font-mono); font-size: var(--text-xs);
     color: var(--fg-subtle); letter-spacing: var(--tracking-wide);
     font-variant-numeric: tabular-nums; transition: color var(--duration-fast);
   }
-  .svcrow__link:hover .svcrow__idx, .svcrow__link:focus-visible .svcrow__idx { color: var(--accent-gold); }
+  a.svcrow__link:hover .svcrow__idx, a.svcrow__link:focus-visible .svcrow__idx { color: var(--accent-gold); }
   .svcrow__icon {
     grid-area: icon; display: inline-flex; align-items: center; justify-content: center;
     width: 40px; height: 40px; border-radius: var(--radius-md);
@@ -375,8 +370,8 @@ const splitPrice = (p?: string) =>
     transition: color var(--duration-fast), border-color var(--duration-fast);
   }
   .svcrow__icon :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .svcrow__link:hover .svcrow__icon, .svcrow__link:focus-visible .svcrow__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
-  .svcrow__icon--brand, .svcrow__link:hover .svcrow__icon--brand { color: var(--accent-gold); }
+  a.svcrow__link:hover .svcrow__icon, a.svcrow__link:focus-visible .svcrow__icon { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .svcrow__icon--brand, a.svcrow__link:hover .svcrow__icon--brand { color: var(--accent-gold); }
   .svcrow__txt { grid-area: txt; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .svcrow__label { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); line-height: var(--leading-snug); }
   .svcrow__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
@@ -387,7 +382,7 @@ const splitPrice = (p?: string) =>
     transition: color var(--duration-fast);
   }
   .svcrow__from { font-size: var(--text-xs); color: var(--fg-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
-  .svcrow__link:hover .svcrow__price, .svcrow__link:focus-visible .svcrow__price { color: var(--accent-gold); }
+  a.svcrow__link:hover .svcrow__price, a.svcrow__link:focus-visible .svcrow__price { color: var(--accent-gold); }
   /* arrow only from --md up (on mobile the price already closes the row) */
   .svcprice__rest :global(.svcrow__go) { display: none; }
 
@@ -415,7 +410,7 @@ const splitPrice = (p?: string) =>
       display: block; grid-area: arrow; width: 18px; height: 18px; color: var(--fg-subtle);
       transition: transform var(--duration-base) var(--ease-out-expo), color var(--duration-base);
     }
-    .svcrow__link:hover :global(.svcrow__go), .svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
+    a.svcrow__link:hover :global(.svcrow__go), a.svcrow__link:focus-visible :global(.svcrow__go) { color: var(--accent-gold); transform: translateX(4px); }
   }
 
   /* ════════ HOUSTON CARD (bespoke: context + NAP rail) ════════ */
@@ -575,9 +570,9 @@ const splitPrice = (p?: string) =>
   .finale :global(.contact.section) { padding-block-start: var(--space-6); }
 
   @media (--motion-reduce) {
-    .pcard:hover { transform: none; }
-    .pcard:hover .pcard__go :global(svg),
-    .svcrow__link:hover :global(.svcrow__go),
+    a.pcard:hover { transform: none; }
+    a.pcard:hover .pcard__go :global(svg),
+    a.svcrow__link:hover :global(.svcrow__go),
     .ficha__zone:hover :global(.ficha__zone-arr),
     .inddir__link:hover :global(.inddir__arr),
     .explore__link:hover :global(.explore__arr),

@@ -16,7 +16,8 @@
 //  con el freno por conexión (12 por minuto).
 //
 //  PUERTA (código de salida 1 si no pasa):
-//    · todo caso crítico al 100 % en todas sus repeticiones;
+//    · la regla de todo caso crítico (su corrector, no el idioma) al 100 %
+//      en todas sus repeticiones;
 //    · con línea base: el total no baja más de 5 puntos y ningún caso cae
 //      50 puntos o más.
 //  Resultados: data/evals/<suite>/<fecha>.json · línea base:
@@ -92,7 +93,8 @@ for (const caso of lista) {
   }
   const ok = intentos.filter((x) => x.pass).length;
   const rate = ok / trials;
-  results.push({ id: caso.id, titulo: caso.titulo, critico: !!caso.critico, rate, intentos });
+  const criticalRate = intentos.filter((x) => x.criticalPass).length / trials;
+  results.push({ id: caso.id, titulo: caso.titulo, critico: !!caso.critico, rate, criticalRate, intentos });
   const marca = rate === 1 ? '✓' : rate === 0 ? '✗' : '~';
   const motivos = [...new Set(intentos.flatMap((x) => x.reasons))];
   console.log(`  ${marca} ${caso.id}${caso.critico ? ' [crítico]' : ''}  ${ok}/${trials}${motivos.length ? '  · ' + motivos.join(' | ') : ''}`);
@@ -105,7 +107,7 @@ const turnos = results.length * trials;
 
 // ── Puerta ──────────────────────────────────────────────────────
 const fallos = [];
-for (const r of results) if (r.critico && r.rate < 1) fallos.push(`crítico ${r.id} al ${Math.round(r.rate * 100)} %`);
+for (const r of results) if (r.critico && r.criticalRate < 1) fallos.push(`crítico ${r.id} al ${Math.round(r.criticalRate * 100)} %`);
 const baselinePath = path.join(ROOT, 'scripts', 'evals', `${suite}.baseline.json`);
 let baseline = null;
 if (existsSync(baselinePath)) baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));

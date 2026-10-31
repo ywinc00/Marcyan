@@ -24,7 +24,7 @@ const breadcrumb = [
 ];
 ---
 <Layout title={tt.metaTitle} description={tt.metaDesc} lang="en" path="tools">
-  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
+  <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero

@@ -26,7 +26,7 @@ interface Props {
 const { tag, title, price, unit, lead, features, cta, note, tone = 'gold', lang = 'es' } = Astro.props;
 const uip = t(lang);
 ---
-<section class:list={['section pricing', `pricing--${tone}`]}>
+<section class:list={['section pricing', `pricing--${tone}`]} id="precios">
   <div class="container">
     <div class="pricing__card">
       <span class="pricing__stamp" aria-hidden="true">// {uip.price.offer}</span>

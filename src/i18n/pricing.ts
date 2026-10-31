@@ -137,7 +137,7 @@ export const catalog: CatalogProduct[] = [
       'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
     tagline: 'Que la IA te recomiende cuando preguntan por tu servicio.',
     anchorUnit: 'diagnóstico',
-    href: '/es/houston/seo-para-ia',
+    href: '/es/diagnostico',
     ctaLabel: 'Pedir diagnóstico gratis',
     tone: 'teal',
     tiers: [

@@ -43,18 +43,18 @@ export const miamiHub = {
     tag: 'Servicios en Miami',
     title: 'Todo para tu negocio, en una <em>sola agencia</em>',
     links: [
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
-      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'lucide:messages-square' },
-      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
+      { label: 'Agencia de diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Diseño de páginas web a medida, rápidas y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
+      { label: 'Agencia de SEO local en Miami', href: '/es/miami/seo-local', desc: 'Posicionamiento web en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Chatbot para tu negocio: contesta WhatsApp y agenda 24/7. Desde $900.', icon: 'lucide:messages-square' },
+      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'Una web para vender en Miami, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
   },
   barrios: {
     tag: 'Por barrio',
     title: 'Soluciones por <em>barrio</em>',
     links: [
-      { label: 'Doral (Doralzuela)', href: '/es/miami/doral', desc: 'Diseño web, SEO e IA para negocios de Doral. Bilingüe, desde $1,500.', icon: 'lucide:map-pin' },
-      { label: 'Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en español para negocios de Hialeah.', icon: 'lucide:map-pin' },
+      { label: 'Diseño de páginas web en Doral', href: '/es/miami/doral', desc: 'Doralzuela: web, SEO e IA para negocios de Doral. Bilingüe, desde $1,500.', icon: 'lucide:map-pin' },
+      { label: 'Diseño de páginas web en Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en español para negocios de Hialeah.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
   local: {
@@ -95,11 +95,11 @@ export const miamiHub = {
   },
   // ItemList (schema) — los servicios ofrecidos en Miami, cada uno a su landing.
   itemList: [
-    { name: 'Diseño web en Miami', path: '/es/miami/diseno-web' },
-    { name: 'SEO local en Miami', path: '/es/miami/seo-local' },
+    { name: 'Agencia de diseño web en Miami', path: '/es/miami/diseno-web' },
+    { name: 'Agencia de SEO local en Miami', path: '/es/miami/seo-local' },
     { name: 'IA conversacional en Miami', path: '/es/miami/ia-conversacional' },
     { name: 'Tienda en línea en Miami', path: '/es/miami/ecommerce' },
-    { name: 'Diseño web y SEO en Doral', path: '/es/miami/doral' },
-    { name: 'Diseño web y SEO en Hialeah', path: '/es/miami/hialeah' },
+    { name: 'Diseño de páginas web en Doral', path: '/es/miami/doral' },
+    { name: 'Diseño de páginas web en Hialeah', path: '/es/miami/hialeah' },
   ] as ListLink[],
 };

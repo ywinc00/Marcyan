@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-26",
+  "actualizado": "2026-10-31",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -369,6 +369,90 @@
           "fecha": "2026-10-26",
           "estado": "en-espera",
           "nota": "2 propuestas sin OK"
+        }
+      ]
+    },
+    "marcyan-prueba-causa-raiz": {
+      "ref": "marcyan-prueba-causa-raiz",
+      "tipo": "web",
+      "titulo": "Prueba de 3 semanas (2 a 23-nov): 16 landings caídas en parejas, la mitad con la capa del cohete desactivada al cargar, petición única de rastreo para las 16",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-31",
+      "ultimaVez": "2026-10-31",
+      "propuestas": 1,
+      "vence": "2026-11-02",
+      "origen": "causa-raiz-2026-10-31",
+      "evidencia": {
+        "fecha": "2026-10-31",
+        "texto": "31-oct en vivo: prueba en vivo de Search Console de https://marcyanstudio.com/es/houston/diseno-web, captura de Google con todo el contenido desenfocado por .riel__finale (is-launched); reinspección API de las 84: 34 indexadas, 14/14 de utilidad dentro y 20/70 comerciales"
+      },
+      "historial": [
+        {
+          "fecha": "2026-10-31",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-cohete-render": {
+      "ref": "marcyan-cohete-render",
+      "tipo": "web",
+      "titulo": "Arreglar en todo el sitio la capa del cohete para que el render de Google no la dispare (tapa el 99 % de 54 páginas)",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-31",
+      "ultimaVez": "2026-10-31",
+      "propuestas": 1,
+      "vence": "2026-11-23",
+      "origen": "causa-raiz-2026-10-31",
+      "evidencia": {
+        "fecha": "2026-10-31",
+        "texto": "31-oct en vivo: captura de la prueba en vivo de Google de https://marcyanstudio.com/es/houston/diseno-web desenfocada; la capa .riel__finale está en 54 de 84 URL servidas hoy"
+      },
+      "historial": [
+        {
+          "fecha": "2026-10-31",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-congelar-catalogo": {
+      "ref": "marcyan-congelar-catalogo",
+      "tipo": "web",
+      "titulo": "Congelar páginas comerciales nuevas y cambios públicos hasta leer la prueba el 23-nov",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-31",
+      "ultimaVez": "2026-10-31",
+      "propuestas": 1,
+      "vence": "2026-11-23",
+      "origen": "causa-raiz-2026-10-31",
+      "evidencia": {
+        "fecha": "2026-10-31",
+        "texto": "31-oct en vivo: prueba en vivo de Search Console de https://marcyanstudio.com/es/houston/diseno-web, captura de Google con todo el contenido desenfocado por .riel__finale (is-launched); reinspección API de las 84: 34 indexadas, 14/14 de utilidad dentro y 20/70 comerciales"
+      },
+      "historial": [
+        {
+          "fecha": "2026-10-31",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-consolidar-catalogo": {
+      "ref": "marcyan-consolidar-catalogo",
+      "tipo": "web",
+      "titulo": "Si la prueba lo confirma: recortar y fusionar el catálogo comercial (primero las 25 landings EN, luego gemelas de ciudad ES, luego resúmenes)",
+      "estado": "propuesta",
+      "primeraVez": "2026-10-31",
+      "ultimaVez": "2026-10-31",
+      "propuestas": 1,
+      "vence": "2026-11-30",
+      "origen": "causa-raiz-2026-10-31",
+      "evidencia": {
+        "fecha": "2026-10-31",
+        "texto": "31-oct en vivo: prueba en vivo de Search Console de https://marcyanstudio.com/es/houston/diseno-web, captura de Google con todo el contenido desenfocado por .riel__finale (is-launched); reinspección API de las 84: 34 indexadas, 14/14 de utilidad dentro y 20/70 comerciales"
+      },
+      "historial": [
+        {
+          "fecha": "2026-10-31",
+          "estado": "propuesta"
         }
       ]
     }

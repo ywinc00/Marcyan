@@ -20,7 +20,9 @@
 //     import dinámico y sin nada del modelo ni del visitante dentro:
 //       1) los frenos de lib/ratelimit.mjs (tabla rate_limit_hits, la IP va
 //          como HMAC, nunca en claro);
-//       2) avisos 'system' de texto fijo al panel (chat fallando, tope diario).
+//       2) avisos 'system' de texto fijo al panel (chat fallando, tope diario);
+//       3) la suma de tokens y coste del turno en chat_usage_daily (P2).
+//     Frenos y coste de la vista previa cuentan aparte (envBucket / chatEnv).
 //   · Topes de gasto: por conexión, por conversación y un tope DIARIO de
 //     todo el sitio (LIMITS.chatGlobal). El freno último sigue siendo el
 //     límite de gasto mensual en la consola de Anthropic.
@@ -36,6 +38,19 @@ import { analyzeSite, recommendService, findContactHref, mergeContactSignals } f
 // Frenos guardados (cuenta compartida entre instancias). Solo cuenta: el
 // módulo importa @vercel/postgres de forma dinámica y solo al contar.
 import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
+// Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
+import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
+
+// Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
+// y su coste se cuentan aparte para que las pruebas de Marcy (que corren contra
+// la vista previa) no gasten el tope diario de los visitantes reales.
+export function chatEnv() {
+  return process.env.VERCEL_ENV || 'development';
+}
+export function envBucket(bucket) {
+  const env = chatEnv();
+  return env === 'production' ? bucket : `${bucket}@${env}`;
+}
 
 // maxDuration 60: un turno con herramienta interna hace 2 llamadas al modelo con
 // una revisión de sitio en medio. Invariante v8 de presupuestos por fase:
@@ -88,9 +103,9 @@ function clientIp(req) {
 
 // Por conexión (12/min y 150/día) y por conversación (40/día).
 export async function chatAllowed({ ip, sid, store, now } = {}) {
-  const byIp = await persistLimit({ bucket: 'chat', key: ip, limits: RL.chat, store, now });
+  const byIp = await persistLimit({ bucket: envBucket('chat'), key: ip, limits: RL.chat, store, now });
   if (!byIp.ok) return false;
-  const bySession = await persistLimit({ bucket: 'chatSession', key: sid, limits: RL.chatSession, store, now });
+  const bySession = await persistLimit({ bucket: envBucket('chatSession'), key: sid, limits: RL.chatSession, store, now });
   return bySession.ok;
 }
 
@@ -98,7 +113,7 @@ export async function chatAllowed({ ip, sid, store, now } = {}) {
 // aunque el abuso venga de muchas conexiones. `justHit` = esta petición es la
 // primera que lo pasa (para avisar una vez, no en cada bloqueo).
 export async function chatGlobalAllowed({ store, now } = {}) {
-  const r = await persistLimit({ bucket: 'chatGlobal', key: GLOBAL_KEY, limits: RL.chatGlobal, store, now });
+  const r = await persistLimit({ bucket: envBucket('chatGlobal'), key: GLOBAL_KEY, limits: RL.chatGlobal, store, now });
   const c = r.counts[0];
   return { ok: r.ok, justHit: !r.ok && !!c && c.count === c.limit + 1 };
 }
@@ -108,11 +123,11 @@ export async function chatGlobalAllowed({ store, now } = {}) {
 // SSRF (limita el sondeo de IPs internas en una conversación).
 export async function siteReviewAllowed(sid, ip, { store, now } = {}) {
   if (sid) {
-    const s = await persistLimit({ bucket: 'chatSiteSession', key: sid, limits: RL.chatSiteSession, store, now });
+    const s = await persistLimit({ bucket: envBucket('chatSiteSession'), key: sid, limits: RL.chatSiteSession, store, now });
     if (!s.ok) return false;
   }
   if (ip) {
-    const r = await persistLimit({ bucket: 'chatSite', key: ip, limits: RL.chatSite, store, now });
+    const r = await persistLimit({ bucket: envBucket('chatSite'), key: ip, limits: RL.chatSite, store, now });
     if (!r.ok) return false;
   }
   return true;
@@ -132,7 +147,7 @@ async function alertOwner(kind) {
 // Cuenta un fallo de la IA; pasado el tope de la hora (LIMITS.chatFail), avisa.
 async function recordFailure() {
   try {
-    const r = await persistLimit({ bucket: 'chatFail', key: GLOBAL_KEY, limits: RL.chatFail });
+    const r = await persistLimit({ bucket: envBucket('chatFail'), key: GLOBAL_KEY, limits: RL.chatFail });
     if (!r.ok) await alertOwner('failing');
   } catch (err) {
     console.error('[chat] no pude contar el fallo:', err && err.message);
@@ -528,6 +543,14 @@ export default async function handler(req, res) {
     }
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
+
+    // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
+    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, finalResp]);
+    const costMicro = turnCostMicroUsd(model, usage);
+    const firstTurn = messages.length === 1;
+    console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
+    await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
+
     return res.status(200).json(action ? { reply, action } : { reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.

@@ -35,6 +35,10 @@ const sql = (strings, ...vals) => {
     return Promise.resolve({ rows: [{ ref_id: vals[0], score_total: 60, score_web: 60, score_seo: 60, score_ai: 60, score_conv: 60, score_rep: 60, findings: [], industry: 'otro', business_name: 'Acme', city: 'Houston', lead_ref: null }], rowCount: 1 });
   }
   if (/UPDATE diagnostics SET lead_ref/.test(t)) return Promise.resolve({ rows: [{ id: 1 }], rowCount: 1 });
+  if (/INSERT INTO chat_usage_daily/.test(t)) {
+    if (db.noUsageTable) return Promise.reject(Object.assign(new Error('relation "chat_usage_daily" does not exist'), { code: '42P01' }));
+    return Promise.resolve({ rows: [], rowCount: 1 });
+  }
   if (/INSERT INTO notifications/.test(t)) {
     return Promise.resolve({ rows: [{ id: '1', type: vals[0], title: vals[1], body: vals[2], ref: vals[3], url: vals[4] }], rowCount: 1 });
   }
@@ -60,6 +64,15 @@ mock.module(new URL('../lib/email.mjs', import.meta.url).href, {
   },
 });
 
+// ── IA falsa: devuelve lo que la prueba ponga en `ai.queue`, con su usage ──
+const ai = { queue: [], calls: [] };
+class FakeAnthropic {
+  constructor() { this.messages = { create: async (params) => { ai.calls.push(params); const r = ai.queue.shift(); if (r instanceof Error) throw r; return r; } }; }
+}
+mock.module('@anthropic-ai/sdk', { defaultExport: FakeAnthropic });
+process.env.ANTHROPIC_API_KEY = 'prueba-sin-red';
+const chat = (await import('../api/chat.mjs')).default;
+
 const handoff = (await import('../api/handoff.mjs')).default;
 const { __resetForTests } = await import('../lib/ratelimit.mjs');
 const contact = (await import('../api/contact.mjs')).default;
@@ -69,7 +82,8 @@ const diagnostic = (await import('../api/diagnostic.mjs')).default;
 let pass = 0;
 const fails = [];
 function reset() {
-  db.calls = []; db.counts = new Map(); db.failLeads = false; db.noRateTable = false; db.hangRate = false;
+  db.calls = []; db.counts = new Map(); db.failLeads = false; db.noRateTable = false; db.hangRate = false; db.noUsageTable = false;
+  ai.queue = []; ai.calls = [];
   __resetForTests();
   mail.sent = []; mail.failAdmin = false; mail.failClient = false;
 }
@@ -85,7 +99,7 @@ async function call(handler, body, ip = '198.51.100.' + ((++ipSeq % 250) + 1)) {
     json(b) { this.body = b; return this; },
     setHeader(k, v) { this.headers[k] = v; },
   };
-  await handler({ method: 'POST', body, headers: { 'x-forwarded-for': ip, 'user-agent': 'prueba' } }, res);
+  await handler({ method: 'POST', body, headers: { 'x-forwarded-for': ip, 'user-agent': 'prueba', origin: 'https://marcyanstudio.com' } }, res);
   return res;
 }
 const order = () => db.calls
@@ -169,6 +183,51 @@ await check('contacto: si falla el correo al dueño → aviso al panel', async (
   mail.failAdmin = true;
   const r = await call(contact, { phone: '7135550199' });
   assert.ok(notices().some((n) => n.ref === 'email-admin:' + r.body.refId));
+});
+
+// ── Chat: coste y caché por turno (P2) ─────────────────────────
+const usage = (o) => ({ input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, ...o });
+const usageRow = () => db.calls.find((c) => /INSERT INTO chat_usage_daily/.test(c.t));
+await check('chat: el turno suma su uso en la fila del día (entorno, modelo, conversación nueva, coste)', async () => {
+  ai.queue.push({ content: [{ type: 'text', text: 'Hola, cuéntame de tu negocio.' }], usage: usage({ input_tokens: 120, output_tokens: 300, cache_read_input_tokens: 8000 }) });
+  const r = await call(chat, { sessionId: 'conv-uso-1', messages: [{ role: 'user', content: 'hola' }], lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.match(r.body.reply, /negocio/);
+  const row = usageRow();
+  assert.ok(row, 'guarda el uso');
+  // VALUES (day, env, model, 1, conversations, calls, input, output, cacheRead, cacheWrite, cost)
+  const [day, env, model, convs, calls, inp, out, cr, cw, cost] = row.vals;
+  assert.match(day, /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(env, 'development');
+  assert.equal(model, 'claude-sonnet-5');
+  assert.deepEqual([convs, calls, inp, out, cr, cw], [1, 1, 120, 300, 8000, 0]);
+  // 120×2 + 300×10 + 8000×0,2 = 240 + 3000 + 1600 = 4840 micro-USD
+  assert.equal(cost, 4840);
+  assert.ok(!row.vals.some((v) => typeof v === 'string' && /hola|negocio|198\.51/.test(v)), 'ni contenido ni IP');
+});
+await check('chat: con herramienta interna suma las DOS llamadas; turno siguiente no cuenta como conversación nueva', async () => {
+  ai.queue.push({ content: [{ type: 'tool_use', id: 't1', name: 'calcular_perdida', input: { modo: 'llamadas', llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200, tasa_cierre: 30 } }],
+    usage: usage({ input_tokens: 100, output_tokens: 200, cache_creation_input_tokens: 8000 }) });
+  ai.queue.push({ content: [{ type: 'text', text: 'Con esos números pierdes clientes cada semana.' }], usage: usage({ input_tokens: 400, output_tokens: 250, cache_read_input_tokens: 8000 }) });
+  const r = await call(chat, { sessionId: 'conv-uso-2', messages: [{ role: 'user', content: 'pierdo llamadas' }, { role: 'assistant', content: '¿cuántas?' }, { role: 'user', content: '20 a la semana, 30 % sin contestar, ticket 200' }], lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.equal(ai.calls.length, 2);
+  const [, , , convs, calls, inp, out, cr, cw] = usageRow().vals;
+  assert.deepEqual([convs, calls, inp, out, cr, cw], [0, 2, 500, 450, 8000, 8000]);
+});
+await check('chat: sin la tabla de uso el visitante recibe su respuesta igual', async () => {
+  db.noUsageTable = true;
+  ai.queue.push({ content: [{ type: 'text', text: 'Claro, te ayudo.' }], usage: usage({ input_tokens: 10, output_tokens: 20 }) });
+  const r = await call(chat, { sessionId: 'conv-uso-3', messages: [{ role: 'user', content: 'ayuda' }], lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.match(r.body.reply, /ayudo/);
+});
+await check('chat: fuera de producción los frenos cuentan en su propio cubo (las pruebas no gastan el tope real)', async () => {
+  ai.queue.push({ content: [{ type: 'text', text: 'Hola.' }], usage: usage({}) });
+  await call(chat, { sessionId: 'conv-uso-4', messages: [{ role: 'user', content: 'hola' }], lang: 'es' });
+  const buckets = db.calls.filter((c) => /INSERT INTO rate_limit_hits/.test(c.t)).map((c) => c.vals[0]);
+  assert.ok(buckets.length >= 3, 'cuenta por conexión, conversación y sitio');
+  assert.ok(buckets.every((b) => b.endsWith('@development')), 'todos con su entorno: ' + buckets.join(','));
 });
 
 // ── Diagnóstico ────────────────────────────────────────────────

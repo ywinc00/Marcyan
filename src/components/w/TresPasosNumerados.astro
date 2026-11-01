@@ -1,0 +1,51 @@
+---
+// Tres pasos numerados (W-ADV-57, design/rediseno-workos.md §3.4).
+// 3 columnas centradas separadas por líneas verticales de 1 px; número mono en
+// casilla oro al 15 %; título 20/500; texto 15. Móvil: apilados con línea de 1 px.
+interface Step { title: string; text: string }
+interface Props {
+  items: [Step, Step, Step];
+  id?: string;
+  tone?: 'gold' | 'teal';
+  class?: string;
+}
+const { items, id, tone = 'gold', class: cls } = Astro.props;
+---
+<ol class:list={['steps3', cls]} id={id} data-w-tone={tone}>
+  {items.map((s, i) => (
+    <li class="steps3__item">
+      <span class="steps3__n" aria-hidden="true">{i + 1}</span>
+      <h3 class="steps3__title">{s.title}</h3>
+      <p class="steps3__text">{s.text}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps3 {
+    list-style: none; margin: 0 auto; padding: 0; max-width: var(--w-rail-max);
+    display: grid; grid-template-columns: 1fr;
+  }
+  .steps3__item { padding: 28px 0; text-align: center; min-width: 0; }
+  .steps3__item + .steps3__item { border-top: 1px solid var(--w-line); }
+  .steps3__n {
+    display: inline-grid; place-items: center; inline-size: 32px; block-size: 32px;
+    border-radius: var(--w-r-cell);
+    background: rgba(var(--w-accent-rgb, var(--accent-gold-rgb)), .15);
+    color: var(--w-accent, var(--accent-gold));
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1;
+  }
+  .steps3__title {
+    margin: 16px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .steps3__text {
+    margin: 8px auto 0; max-width: 34ch;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--fg-secondary);
+  }
+  @media (--md) {
+    .steps3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .steps3__item { padding: 0 32px; }
+    .steps3__item + .steps3__item { border-top: 0; border-left: 1px solid var(--w-line); }
+  }
+</style>

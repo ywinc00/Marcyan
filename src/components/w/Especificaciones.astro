@@ -1,0 +1,71 @@
+---
+// Ficha de especificaciones (W-NEW-31, design/rediseno-workos.md §3.4).
+// Rótulo mono encima; rejilla 4×2 (8 celdas) o 3×2 (6) con borde 1 px y líneas
+// de 1 px entre celdas, radio 6 → token 8; celdas ~284×115, padding 20:
+// etiqueta mono oro, valor 20/500, nota 14. Móvil: 2 columnas.
+// Celdas opacas (--w-s0): nunca dejan ver estrellas detrás del texto (E-37).
+interface Cell { k: string; v: string; note?: string }
+interface Props {
+  label?: string;
+  cells: Cell[];
+  /** Enlace opcional a la derecha del rótulo (p. ej. a la ficha completa). */
+  aside?: { label: string; href: string };
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const { label, cells, aside, tone = 'gold', id, class: cls } = Astro.props;
+const cols = cells.length % 4 === 0 ? 4 : 3;
+---
+<div class:list={['spec', cls]} id={id} data-w-tone={tone}>
+  {(label || aside) && (
+    <div class="spec__bar">
+      {label && <p class="spec__label">{label}</p>}
+      {aside && <a class="spec__aside" href={aside.href}>{aside.label}<span aria-hidden="true">›</span></a>}
+    </div>
+  )}
+  <dl class="spec__grid" style={`--spec-cols:${cols}`}>
+    {cells.map((c) => (
+      <div class="spec__cell">
+        <dt class="spec__k">{c.k}</dt>
+        <dd class="spec__v">{c.v}</dd>
+        {c.note && <dd class="spec__note">{c.note}</dd>}
+      </div>
+    ))}
+  </dl>
+</div>
+
+<style>
+  .spec { max-width: var(--w-rail-max); margin-inline: auto; }
+  .spec__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+  .spec__label, .spec__aside {
+    margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+  }
+  .spec__aside {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .spec__aside:hover { color: var(--w-accent); } }
+
+  .spec__grid {
+    margin: 0; display: grid; gap: 1px; grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--w-line); border: 1px solid var(--w-line); border-radius: var(--w-r-cell); overflow: hidden;
+  }
+  @media (--lg) { .spec__grid { grid-template-columns: repeat(var(--spec-cols), minmax(0, 1fr)); } }
+  .spec__cell { background: var(--w-s0); padding: 20px; min-block-size: 115px; min-width: 0; }
+  .spec__k {
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-accent);
+  }
+  .spec__v {
+    margin: 14px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .spec__note { margin: 6px 0 0; font-family: var(--font-body); font-size: 14px; line-height: 1.45; color: var(--w-ink-70); }
+  @media (--lt-md) {
+    .spec__cell { padding: 16px; min-block-size: 0; }
+    .spec__k { font-size: 11px; }
+    .spec__v { font-size: 18px; }
+  }
+</style>

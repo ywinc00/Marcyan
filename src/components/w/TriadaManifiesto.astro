@@ -1,0 +1,65 @@
+---
+// Tríada manifiesto a dos tonos (W-ADV-08 / W-ADV-20, design/rediseno-workos.md §3.4).
+// Contenedor 896; 3 columnas de 272 con hueco 40; título 20/500 en 2 líneas
+// (1.ª frase apagada, 2.ª al 100 %); texto 15/24. Sin caja ni icono (E-04).
+// Móvil: 1 columna con separadores de 1 px.
+// Contraste: la 1.ª frase va al 60 % (no al 45 %): a 20 px no es texto grande
+// y el 45 % no llega a AA (§6.8 solo admite el 45 % en ≥ 28 px).
+interface Item { tone1: string; tone2: string; text: string }
+interface Props {
+  titleHtml?: string;
+  lead?: string;
+  items: [Item, Item, Item];
+  id?: string;
+  class?: string;
+}
+const { titleHtml, lead, items, id, class: cls } = Astro.props;
+---
+<div class:list={['tri', cls]} id={id}>
+  {(titleHtml || lead) && (
+    <header class="tri__head">
+      {titleHtml && <h2 class="tri__title" set:html={titleHtml} />}
+      {lead && <p class="tri__lead">{lead}</p>}
+    </header>
+  )}
+  <ul class="tri__list">
+    {items.map((it) => (
+      <li class="tri__item">
+        <h3 class="tri__h"><span class="tri__t1">{it.tone1}</span> <span class="tri__t2">{it.tone2}</span></h3>
+        <p class="tri__text">{it.text}</p>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .tri { max-width: 896px; margin-inline: auto; }
+  .tri__head { text-align: center; margin: 0 auto 72px; max-width: 640px; }
+  .tri__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2); line-height: var(--w-lh-h2); letter-spacing: var(--w-tr-h2);
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .tri__title :global(.w-tone) { color: var(--w-ink-45); }
+  .tri__lead {
+    margin: 16px auto 0; max-width: 32.5rem;
+    font-family: var(--font-body); font-size: var(--w-lead); line-height: var(--w-lh-lead); color: var(--w-ink-80);
+  }
+  .tri__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
+  .tri__item { padding-block: 24px; min-width: 0; }
+  .tri__item + .tri__item { border-top: 1px solid var(--w-line); }
+  .tri__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; line-height: 1.25; letter-spacing: -0.01em;
+  }
+  .tri__t1, .tri__t2 { display: block; }
+  .tri__t1 { color: var(--w-ink-60); }
+  .tri__t2 { color: var(--w-ink); }
+  .tri__text { margin: 12px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--fg-secondary); }
+  @media (--md) {
+    .tri__list { grid-template-columns: repeat(3, minmax(0, 272px)); column-gap: 40px; justify-content: center; }
+    .tri__item { padding-block: 0; }
+    .tri__item + .tri__item { border-top: 0; }
+  }
+  @media (--lt-md) { .tri__head { margin-bottom: 40px; } }
+</style>

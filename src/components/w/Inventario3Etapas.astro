@@ -1,0 +1,65 @@
+---
+// Inventario en 3 etapas (W-CORE-04, design/rediseno-workos.md §3.4).
+// Celda de 1200 en 3 columnas separadas por líneas de 1 px; título 20/500;
+// ítems 18/26 con check circular relleno de 18 en oro, filas a 34 px, padding 48.
+// Un ítem con href se pinta como enlace (solo a páginas que existen).
+interface Entry { label: string; href?: string }
+interface Col { title: string; items: Entry[] }
+interface Props {
+  cols: [Col, Col, Col];
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const { cols, tone = 'gold', id, class: cls } = Astro.props;
+---
+<div class:list={['inv3', cls]} id={id} data-w-tone={tone}>
+  {cols.map((c) => (
+    <div class="inv3__col">
+      <h3 class="inv3__title">{c.title}</h3>
+      <ul class="inv3__list">
+        {c.items.map((it) => (
+          <li>
+            <svg class="inv3__check" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+              <circle cx="9" cy="9" r="9" />
+              <path d="M5.2 9.3l2.5 2.4 5.1-5.3" />
+            </svg>
+            {it.href ? <a href={it.href}>{it.label}</a> : <span>{it.label}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+
+<style>
+  .inv3 {
+    max-width: var(--w-rail-max); margin-inline: auto;
+    display: grid; grid-template-columns: 1fr; gap: 1px;
+    background: var(--w-line); border-block: 1px solid var(--w-line);
+  }
+  .inv3__col { background: var(--w-s0); padding: 32px 0; min-width: 0; }
+  .inv3__title {
+    margin: 0 0 20px; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .inv3__list { list-style: none; margin: 0; padding: 0; display: grid; }
+  .inv3__list li {
+    display: flex; align-items: center; gap: 12px; min-block-size: 34px;
+    font-family: var(--font-body); font-size: 18px; line-height: 26px; color: var(--w-ink-80);
+  }
+  .inv3__list a {
+    color: inherit; text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+    min-block-size: 34px; display: inline-flex; align-items: center;
+  }
+  @media (--hover-fine) { .inv3__list a:hover { color: var(--w-accent); } }
+  .inv3__check { flex: none; inline-size: 18px; block-size: 18px; }
+  .inv3__check circle { fill: var(--w-accent); }
+  .inv3__check path { fill: none; stroke: var(--fg-inverse); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  @media (--md) {
+    .inv3 { grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--w-line); }
+    .inv3__col { padding: 48px; }
+  }
+  @media (--md) and (--lt-lg) { .inv3__col { padding: 32px 24px; } }
+  @media (--lt-md) { .inv3__list li { font-size: 16px; line-height: 24px; } }
+</style>

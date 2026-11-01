@@ -1,0 +1,87 @@
+---
+// "¿Dónde está tu negocio?" (design/rediseno-workos.md §3.2; W-CONV-33): 2 columnas
+// de tarjetas 372×112 (radio 12, superficie de objeto, borde 1 px, padding 24):
+// nombre 16/500, texto 13 y, a la derecha, pin Lucide en cuadro de 48 (barrio) o
+// icono-objeto 48 (sector). Si son impares, la última va a todo el ancho.
+// Sin logos de terceros. Cerrojo 5: sale de v3 (hubs), TODO su CSS va aquí.
+import IconoObjeto from './IconoObjeto.astro';
+import Icon from '../ui/Icon.astro';
+import type { IconoId } from './objects/registry';
+
+interface Item {
+  name: string;
+  text: string;
+  href: string;
+  kind: 'barrio' | 'sector';
+  /** Sector: icono-objeto del producto que más le sirve (de pricing.ts). */
+  iconId?: IconoId;
+}
+interface Props {
+  items: Item[];
+  titleHtml?: string;
+  /** Página sin SiteNav (sin sprite): los iconos se dibujan dentro de su SVG. */
+  iconsInline?: boolean;
+  id?: string;
+  class?: string;
+}
+const { items, titleHtml, iconsInline = false, id, class: cls } = Astro.props;
+const odd = items.length % 2 === 1;
+const titleId = `${id ?? 'donde'}-title`;
+---
+<section class:list={['w-where', cls]} id={id} aria-labelledby={titleHtml ? titleId : undefined}>
+  {titleHtml && <h2 class="w-where__title" id={titleId} set:html={titleHtml} />}
+  <ul class="w-where__grid" role="list">
+    {items.map((it, i) => (
+      <li class:list={['w-where__cell', odd && i === items.length - 1 && 'w-where__cell--wide']}>
+        <a class="w-where__card" href={it.href}>
+          <span class="w-where__txt">
+            <span class="w-where__name" translate={it.kind === 'barrio' ? 'no' : undefined}>{it.name}</span>
+            <span class="w-where__text">{it.text}</span>
+          </span>
+          {it.kind === 'sector' && it.iconId
+            ? <IconoObjeto id={it.iconId} size={48} inline={iconsInline} class="w-where__obj" />
+            : <span class="w-where__pin" aria-hidden="true"><Icon name="lucide:map-pin" /></span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .w-where { min-width: 0; }
+  .w-where__title {
+    margin: 0 0 20px; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h4); line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .w-where__title :global(em) { font-style: normal; color: var(--w-accent); }
+  .w-where__grid {
+    list-style: none; margin: 0; padding: 0; display: grid; gap: 16px;
+    grid-template-columns: 1fr; max-width: 760px;
+  }
+  @media (--md) { .w-where__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (--md) { .w-where__cell--wide { grid-column: 1 / -1; } }
+  .w-where__cell { min-width: 0; display: flex; }
+
+  .w-where__card {
+    flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    min-height: 112px; padding: 20px 24px; border-radius: var(--w-r-obj); text-decoration: none;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .w-where__card:hover { border-color: var(--w-line-strong); } }
+  .w-where__card:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+
+  .w-where__txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .w-where__name {
+    font-family: var(--font-display); font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--w-ink);
+  }
+  .w-where__text { font-family: var(--font-body); font-size: 13px; line-height: 1.5; color: var(--w-ink-70); max-width: 34ch; }
+
+  .w-where__pin {
+    display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: var(--w-r-obj);
+    background: var(--w-s3); border: 1px solid var(--w-line); color: var(--w-accent);
+  }
+  .w-where__pin :global(svg) { width: 22px; height: 22px; stroke-width: 1.5; }
+
+  @media (--motion-reduce) { .w-where__card { transition: none; } }
+</style>

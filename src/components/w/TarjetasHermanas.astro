@@ -1,0 +1,158 @@
+---
+// Tarjetas hermanas (design/rediseno-workos.md §3.2; W-ADV-40 + W-ADV-50).
+// Cabecera a la izquierda (H2 40/44 a dos frases + texto 18/29 en 500), 55 px,
+// bandeja de 1200 (radio 22, padding 16) con tarjetas de 282×182 (radio 12, hueco
+// 14, padding 22): icono-objeto 48, 45 px de aire, nombre 20/500, una línea 16 y
+// "desde $X" mono 12 oro (se omite en la tarjeta de la página actual).
+// · hrefs SOLO los que la página ya enlaza hoy (related.links, filas svc,
+//   priceServices): prohibido crear o adivinar URL, sobre todo en EN (R5).
+// · La actual va sin elevar (bandeja) con aria-current="page".
+// · Debajo, tarjetas de recurso W-ADV-50 (icono Lucide 24 en acento, título
+//   15/500 en acento, texto 13).
+// Cerrojo 5: sale de v3 (hubs), TODO su CSS va aquí y solo lee --w-*.
+import IconoObjeto from './IconoObjeto.astro';
+import Icon from '../ui/Icon.astro';
+import type { IconoId } from './objects/registry';
+
+interface Item { id: IconoId; label: string; desc: string; href: string; price?: string }
+interface Recurso { icon: string; title: string; text: string; href: string; track?: string }
+interface Props {
+  /** H2 a dos frases: la 1.ª en <span class="w-tone"> (45 %), la 2.ª al 100 %. */
+  titleHtml: string;
+  lead?: string;
+  items: Item[];
+  currentId?: IconoId;
+  recursos?: Recurso[];
+  /** Página sin SiteNav (sin sprite): los iconos se dibujan dentro de su SVG. */
+  iconsInline?: boolean;
+  id?: string;
+  class?: string;
+}
+const { titleHtml, lead, items, currentId, recursos, iconsInline = false, id, class: cls } = Astro.props;
+const titleId = `${id ?? 'hermanas'}-title`;
+---
+<section class:list={['w-sib', cls]} id={id} aria-labelledby={titleId}>
+  <header class="w-sib__head">
+    <h2 class="w-sib__title" id={titleId} set:html={titleHtml} />
+    {lead && <p class="w-sib__lead">{lead}</p>}
+  </header>
+
+  <ul class="w-sib__tray" role="list">
+    {items.map((it) => {
+      const current = it.id === currentId;
+      return (
+        <li class="w-sib__cell">
+          <a
+            class:list={['w-sib__card', current && 'w-sib__card--current']}
+            href={it.href}
+            aria-current={current ? 'page' : undefined}
+          >
+            <IconoObjeto id={it.id} size={48} inline={iconsInline} />
+            <span class="w-sib__txt">
+              <span class="w-sib__name">{it.label}</span>
+              <span class="w-sib__desc">{it.desc}</span>
+              {it.price && !current && <span class="w-sib__price">{it.price}</span>}
+            </span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+
+  {recursos && recursos.length > 0 && (
+    <ul class:list={['w-sib__res', `w-sib__res--${Math.min(recursos.length, 3)}`]} role="list">
+      {recursos.map((r) => (
+        <li class="w-sib__rcell">
+          <a class="w-sib__rcard" href={r.href} data-track={r.track}>
+            <Icon name={r.icon} class="w-sib__ricon" />
+            <span class="w-sib__rtxt">
+              <span class="w-sib__rtitle">{r.title}</span>
+              <span class="w-sib__rtext">{r.text}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>
+
+<style>
+  .w-sib { min-width: 0; }
+  .w-sib__head { display: flex; flex-direction: column; gap: 16px; max-width: 520px; margin-bottom: 40px; }
+  @media (--md) { .w-sib__head { margin-bottom: 55px; } }
+  .w-sib__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2); line-height: 1.1; letter-spacing: var(--w-tr-h2); color: var(--w-ink);
+    text-wrap: balance;
+  }
+  .w-sib__title :global(.w-tone) { color: var(--w-ink-45); }
+  .w-sib__title :global(em) { font-style: normal; color: var(--w-accent); }
+  .w-sib__lead {
+    margin: 0; max-width: 500px; font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+    color: var(--w-ink-70);
+  }
+  @media (--md) { .w-sib__lead { font-size: 18px; line-height: 29px; } }
+
+  /* Bandeja (G3): radio 22, padding 16, filo de luz. */
+  .w-sib__tray {
+    list-style: none; margin: 0; display: grid; gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 10px; border: 1px solid var(--w-line); border-radius: var(--w-r-tray);
+    background: var(--w-s1); box-shadow: var(--w-edge);
+  }
+  @media (--md) { .w-sib__tray { gap: 14px; padding: var(--w-pad-tray); } }
+  @media (--lg) { .w-sib__tray { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .w-sib__cell { min-width: 0; display: flex; }
+
+  .w-sib__card {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 28px;
+    padding: 14px; border-radius: var(--w-r-obj); text-decoration: none;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--md) { .w-sib__card { gap: 45px; padding: 22px; min-height: 182px; } }
+  @media (--hover-fine) { .w-sib__card:hover { border-color: var(--w-line-strong); } }
+  .w-sib__card:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+  /* La página actual, sin elevar: a ras de la bandeja. */
+  .w-sib__card--current { background: transparent; box-shadow: none; border-color: var(--w-line); }
+
+  .w-sib__txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .w-sib__name {
+    font-family: var(--font-display); font-weight: 500; font-size: 16px; line-height: 1.25;
+    overflow-wrap: break-word; hyphens: auto;
+    letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  @media (--sm) { .w-sib__name { font-size: 18px; } }
+  @media (--md) { .w-sib__name { font-size: 20px; } }
+  .w-sib__desc { font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-70); }
+  @media (--md) { .w-sib__desc { font-size: 16px; } }
+  .w-sib__price {
+    margin-top: 6px; font-family: var(--font-mono); font-weight: 500; font-size: 13px; line-height: 1.2;
+    letter-spacing: 0.04em; color: var(--accent-gold);
+  }
+
+  /* Recursos (W-ADV-50). */
+  .w-sib__res {
+    list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 14px;
+    grid-template-columns: 1fr;
+  }
+  @media (--md) {
+    .w-sib__res--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .w-sib__res--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .w-sib__rcell { min-width: 0; display: flex; }
+  .w-sib__rcard {
+    flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 14px;
+    padding: 20px 24px; border-radius: var(--w-r-obj); text-decoration: none;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .w-sib__rcard:hover { border-color: var(--w-line-strong); } }
+  .w-sib__rcard:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+  .w-sib__rcard :global(.w-sib__ricon) { width: 24px; height: 24px; flex: none; color: var(--w-accent); stroke-width: 1.5; }
+  .w-sib__rtxt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .w-sib__rtitle { font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.4; color: var(--w-accent); }
+  .w-sib__rtext { font-family: var(--font-body); font-size: 13px; line-height: 1.5; color: var(--w-ink-70); }
+
+  @media (--motion-reduce) { .w-sib__card, .w-sib__rcard { transition: none; } }
+</style>

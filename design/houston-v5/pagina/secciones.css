@@ -1,0 +1,119 @@
+/* ── Página completa de Houston: secciones nuevas. Gramática del sitio: Kicker con filete, .h2 600 (32→48),
+      superficies bg-base / bg-2 / bg-card, borde #242420, radios 8/12, botones de Button.astro. ── */
+html,body{width:auto!important;height:auto!important;overflow-x:hidden!important;overflow-y:visible!important}
+body{background:var(--bg-base)}
+.hero-wrap{position:relative;width:100%;overflow:hidden;background:var(--bg-base)}
+.replay{display:none!important}
+
+/* rótulo de sección = Kicker del sitio (filete + mono oro) */
+.kick,.stage .kicker{display:inline-flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-gold)}
+.kick::before,.stage .kicker::before{content:"";width:28px;height:1px;background:var(--accent-gold);flex:none}
+.stage .kicker i{display:none}
+
+.wrap{max-width:1216px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.sec{position:relative;padding-block:104px}
+.sec--alt{background:var(--bg-2);border-top:1px solid rgba(240,237,232,.05);border-bottom:1px solid rgba(240,237,232,.04)}
+.h2{font-family:var(--font-display);font-size:clamp(2rem,1.30rem + 3.50vw,3rem);font-weight:600;line-height:1.1;letter-spacing:var(--tracking-tight);text-wrap:balance;margin:18px 0 0}
+.h2 em{color:var(--accent-gold);font-style:normal}
+.sec__head{max-width:720px}
+.sec__head .lead{margin-top:18px;max-width:58ch}
+
+/* ── 2 · Servicios contados como la historia de la portada ── */
+.svc{background:radial-gradient(ellipse 900px 380px at 50% 0,rgba(200,169,110,.07),transparent 70%),var(--bg-base)}
+.svc__grid{list-style:none;margin:56px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;counter-reset:s}
+.svc__col{display:flex;flex-direction:column;background:linear-gradient(180deg,#151411,#111010);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px 24px 10px;box-shadow:var(--edge-light);min-width:0}
+.svc__top{display:flex;align-items:baseline;gap:12px}
+.step{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;color:var(--accent-gold)}
+.svc__top h3{margin:0;font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.01em}
+.svc__txt{margin:10px 0 0;color:var(--fg-secondary);font-size:15px;line-height:1.55}
+.vig{margin:20px 0 6px;height:132px;border-radius:var(--radius-md);background:radial-gradient(ellipse 80% 90% at 30% 20%,rgba(200,169,110,.10),transparent 70%),#0c0b0a;border:1px solid rgba(240,237,232,.06);position:relative;overflow:hidden;padding:16px}
+.svc__rows{list-style:none;margin:8px 0 0;padding:0;flex:1}
+.svc__rows li{border-top:1px solid var(--border)}
+.svc__rows a{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0;color:var(--fg-primary);font-size:15.5px;font-weight:500}
+.svc__rows a:hover .svc__name{color:var(--accent-gold)}
+.svc__name{flex:1;min-width:0;transition:color .2s}
+.price{font-family:var(--font-mono);font-size:12.5px;color:var(--fg-primary);white-space:nowrap}
+.price small{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-secondary);margin-right:6px}
+.arr{width:16px;height:16px;color:var(--fg-secondary);flex:none}
+.svc__note{margin:auto 0 14px;padding-top:14px;font-size:13.5px;color:var(--fg-secondary);line-height:1.5}
+.svc__more{margin:28px 0 0;display:flex;justify-content:flex-end}
+.more{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-secondary)}
+.more:hover{color:var(--accent-gold)}
+
+/* viñetas: lo que pasa en cada paso, con las piezas de la portada */
+.vf-search{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:999px;background:#1a1916;border:1px solid rgba(240,237,232,.12);font-size:12.5px;color:var(--fg-primary);white-space:nowrap;overflow:hidden}
+.vf-search svg{width:13px;height:13px;color:var(--fg-secondary);flex:none}
+.vf-res{margin-top:10px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--surface-paper);color:var(--fg-inverse);font-size:12.5px}
+.vf-res b{font-size:13px}
+.vf-res span{color:#5d5850;margin-left:auto;font-size:11.5px}
+.mini-logo{width:22px;height:22px;flex:none}
+.vb{position:absolute;inset:16px;border-radius:8px;background:#151413;border:1px solid rgba(240,237,232,.1);overflow:hidden}
+.vb__bar{height:18px;display:flex;align-items:center;gap:5px;padding:0 8px;border-bottom:1px solid rgba(240,237,232,.08)}
+.vb__bar i{width:6px;height:6px;border-radius:50%;background:rgba(240,237,232,.18)}
+.vb__body{padding:12px 12px 0;display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+.vb__l b{display:block;height:9px;border-radius:3px;background:rgba(240,237,232,.85);margin-bottom:6px}
+.vb__l b:nth-child(2){width:78%;background:rgba(240,237,232,.85)}
+.vb__l s{display:block;height:5px;border-radius:3px;background:rgba(240,237,232,.25);margin:8px 0 0;width:90%}
+.vb__l u{display:inline-block;margin-top:10px;height:14px;width:58px;border-radius:4px;background:var(--accent-gold)}
+.vb__r{border-radius:6px;background:radial-gradient(circle at 35% 30%,rgba(200,169,110,.5),rgba(138,102,48,.25) 45%,#141210 75%);position:relative}
+.vb__lang{position:absolute;right:8px;top:4px;font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--fg-secondary)}
+.vc{display:flex;flex-direction:column;gap:7px;font-size:12px;line-height:1.35}
+.vc p{margin:0;max-width:88%;padding:7px 10px;border-radius:11px}
+.vc .me{align-self:flex-end;background:#1f1e1b;color:var(--fg-primary);border-bottom-right-radius:3px}
+.vc .bot{align-self:flex-start;background:var(--surface-paper);color:var(--fg-inverse);border-bottom-left-radius:3px}
+.vc .ok{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;color:var(--fg-primary)}
+.vc .ok i{width:7px;height:7px;border-radius:50%;background:var(--accent-teal)}
+.vig.vig--grow{flex:1 0 auto;height:auto!important;min-height:132px;display:flex;align-items:flex-end}
+.vig--grow .vc{width:100%}
+.vc__t{align-self:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary)}
+
+/* ── 4 · Houston: el mercado y el mapa del área ── */
+.local{background:radial-gradient(ellipse 700px 520px at 78% 50%,rgba(200,169,110,.08),transparent 70%),var(--bg-2)}
+.local__grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+.local__copy p{color:var(--fg-secondary);font-size:16px;line-height:1.7;margin:18px 0 0;max-width:52ch}
+.local__copy strong{color:var(--fg-primary);font-weight:600}
+.nap{margin:28px 0 0;display:grid;grid-template-columns:auto 1fr;border-top:1px solid var(--border)}
+.nap dt,.nap dd{margin:0;padding:12px 0;border-bottom:1px solid var(--border)}
+.nap dt{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-secondary);padding-right:24px}
+.nap dd{font-size:15px;color:var(--fg-primary);text-align:right}
+.nap a{color:var(--fg-primary)}
+.local__map{position:relative;margin:0;height:540px;border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;background:#090807;box-shadow:var(--edge-light),0 30px 80px rgba(0,0,0,.45)}
+#metro{position:absolute;inset:0;width:100%;height:100%}
+.mp{position:absolute;z-index:2;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.mp i{width:9px;height:9px;border-radius:50%;background:#0b0906;box-shadow:0 0 0 2px #f3ecdf,0 0 0 3.5px rgba(8,7,5,.5)}
+.mp--hq i{width:11px;height:11px;background:#fbf6ec;box-shadow:0 0 0 2.5px #0b0906,0 0 0 6px rgba(251,246,236,.55),0 0 0 7.5px rgba(8,7,5,.4)}
+.mp span,.mp a{pointer-events:auto;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-primary);background:rgba(10,9,8,.86);border:1px solid rgba(240,237,232,.14);padding:5px 9px;border-radius:6px;white-space:nowrap}
+.mp a{display:inline-flex;align-items:center;gap:6px;border-color:var(--accent-gold-line)}
+.mp a svg{width:12px;height:12px;color:var(--accent-gold)}
+.mp a:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
+.local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-secondary)}
+
+/* ── 5 · Sectores: lo que busca el cliente de cada sector ── */
+.sectors__list{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;border-top:1px solid var(--border)}
+.sectors__list li{border-bottom:1px solid var(--border)}
+.sectors__list a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;min-height:76px;padding:12px 0;color:var(--fg-primary)}
+.sname{display:block;font-size:17px;font-weight:500}
+.squery{display:inline-flex;align-items:center;gap:7px;margin-top:6px;font-size:13.5px;color:var(--fg-secondary)}
+.squery svg{width:12px;height:12px;flex:none}
+.squery .en{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 4px}
+.spin{width:9px;height:9px;border-radius:50%;background:#0b0906;box-shadow:0 0 0 2px #f3ecdf}
+.sectors__list a:hover .sname{color:var(--accent-gold)}
+.sectors__list a:hover .arr{color:var(--accent-gold);transform:translateX(3px)}
+.arr{transition:transform .2s,color .2s}
+
+/* secciones que no cambian (se muestran tal como están hoy en el sitio) */
+.keep{position:relative;display:block;width:100%;background:var(--bg-base)}
+.keep img{display:block;width:100%;max-width:1440px;margin:0 auto;height:auto}
+.keep__tag{position:absolute;right:16px;top:10px;z-index:2;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(154,149,144,.75);background:rgba(8,8,8,.7);padding:4px 8px;border-radius:4px;border:1px solid rgba(240,237,232,.08)}
+
+@media (max-width:900px){
+  .svc__grid{grid-template-columns:1fr}
+  .local__grid{grid-template-columns:1fr;gap:36px}
+  .sectors__list{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .sec{padding-block:76px}
+  .vig{height:120px}
+  .local__map{height:380px}
+  .nap dd{font-size:14px}
+}

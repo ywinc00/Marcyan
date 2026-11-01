@@ -1,0 +1,101 @@
+---
+// Pie de los hubs de ciudad (slot "scape" de SiteFooter): el skyline real de la ciudad al anochecer, vectorizado de
+// una foto libre en capas (silueta, dos tonos de fachada y ventanas encendidas) y coloreado aquí con los tonos de la
+// marca. Houston: foto de dominio público (Carol M. Highsmith, Biblioteca del Congreso, 2014). Miami: foto CC0 (Joe
+// deSousa, Wikimedia Commons, 2019). Se carga cuando el pie se acerca. La ciudad emerge del borde de abajo; el
+// protagonista sigue siendo el cielo.
+// src: el dibujo · ratio: ancho/alto de su viewBox · x: dónde cae su centro en escritorio · glow: ancho y centro de
+// la luz que sube por detrás (Miami es más ancha y baja que Houston: la luz se abre para que se lean los dos lados)
+// fill: la ciudad ocupa todo el alto de la franja aunque se salga por los lados (una ciudad ancha y baja, como Miami,
+// se lee mejor grande y recortada por los bordes que entera y pequeña)
+interface Props { src: string; ratio: string; x?: string; glow?: [string, string]; fill?: boolean }
+const { src, ratio, x = '58%', glow = ['46%', '56%'], fill = false } = Astro.props;
+---
+<div class:list={['foot__scape', fill && 'foot__scape--fill']} aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x};--glow-w:${glow[0]};--glow-x:${glow[1]}`}>
+  <div class="foot__glow"></div>
+  <div class="foot__clouds" data-clouds="foot"></div>
+  <div class="foot__city" data-skyline-src={src}></div>
+</div>
+
+<style>
+  .foot__scape {
+    position: relative; height: clamp(250px, 34vh, 360px); margin-top: 4px; pointer-events: none; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%);
+    mask-image: linear-gradient(180deg, transparent, #000 22%);
+  }
+  /* la luz de la ciudad sube por detrás de las torres: banda baja y ancha, más cálida bajo el centro */
+  .foot__glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse var(--glow-w) 130% at var(--glow-x) 100%, rgba(212,158,90,.42), rgba(212,158,90,.12) 55%, rgba(212,158,90,0) 76%),
+      linear-gradient(0deg, rgba(180,130,72,.2), rgba(180,130,72,0) 78%);
+  }
+  /* la ciudad entera, apoyada en el suelo; los dos lados se funden con la noche (la foto corta edificios en los bordes) */
+  .foot__city {
+    position: absolute; left: var(--city-x); bottom: -2%; height: 100%; aspect-ratio: var(--city-ratio); max-width: 100vw; transform: translateX(-50%);
+    opacity: 0; transition: opacity 1s cubic-bezier(.22,.61,.36,1);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+  .foot__city.on { opacity: 1; }
+  .foot__city :global(svg) { display: block; width: 100%; height: 100%; }
+  /* silueta nítida, siempre más oscura que el resplandor que la recorta; las plantas encendidas en oro.
+     (la capa de planos de fachada se queda en el dibujo, apagada: con ella la ciudad se embarraba) */
+  .foot__city :global(#sil) { fill: #090807; }
+  /* dos tonos de fachada sacados de la foto: separan las torres que se solapan (sobre todo las de cristal de la izquierda) */
+  .foot__city :global(#t1) { fill: #13100c; }
+  .foot__city :global(#t2) { fill: #1d1811; }
+  /* nubecitas a los costados de la ciudad, detrás de ella */
+  .foot__clouds { position: absolute; inset: 0; }
+  .foot__clouds :global(.clouds__l) { position: absolute; inset: 0; }
+  .foot__clouds :global(.cloud) { position: absolute; display: block; }
+  .foot__city :global(.w0) { fill: rgba(244,220,168,.92); }
+  .foot__city :global(.w1) { fill: rgba(230,196,132,.56); }
+  .foot__city :global(.w2) { fill: rgba(216,178,112,.3); }
+  /* abajo la ciudad se funde con el suelo del pie */
+  .foot__scape::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 22%;
+    background: linear-gradient(180deg, rgba(8,7,6,0), #080706 92%);
+  }
+  /* fill: la ciudad no se encoge al ancho; los bordes de la pantalla se funden con la noche */
+  .foot__scape--fill .foot__city { max-width: none; }
+  .foot__scape--fill {
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-composite: intersect;
+  }
+  @media (max-width: 700px) {
+    .foot__scape { height: clamp(180px, 26vh, 230px); }
+    .foot__city { left: 50%; max-width: none; -webkit-mask-image: none; mask-image: none; }
+    .foot__scape {
+      -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+      -webkit-mask-composite: source-in;
+      mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+      mask-composite: intersect;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) { .foot__city { transition: none; } }
+</style>
+
+<script>
+  // el dibujo se trae y se inserta en la página cuando el pie se acerca (así se puede colorear con CSS), y se funde
+  // cuando la ciudad entra de verdad en pantalla (antes el fundido acababa antes de que se viera)
+  const el = document.querySelector('[data-skyline-src]') as HTMLElement | null;
+  if (el) {
+    const io = new IntersectionObserver((es) => {
+      if (!es[0].isIntersecting) return;
+      io.disconnect();
+      fetch(el.dataset.skylineSrc as string).then((r) => r.text()).then((svg) => {
+        el.innerHTML = svg;
+        const seen = new IntersectionObserver((s) => {
+          if (!s[0].isIntersecting) return;
+          seen.disconnect();
+          requestAnimationFrame(() => el.classList.add('on'));
+        }, { threshold: 0.15 });
+        seen.observe(el);
+      }).catch(() => {});
+    }, { rootMargin: '120% 0px' });
+    io.observe(el);
+  }
+</script>

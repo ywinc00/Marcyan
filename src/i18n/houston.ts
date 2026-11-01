@@ -169,4 +169,81 @@ export const houstonHub = {
     { name: 'Diseño web y SEO local en Katy, TX', path: '/es/houston/katy' },
     { name: 'Diseño web y SEO local en Sugar Land', path: '/es/houston/sugar-land' },
   ] as ListLink[],
+  // ── Rediseño "el viaje" (2026-10-25) ── textos nuevos de la página; las claves de arriba siguen intactas
+  // (meta, breadcrumb, servicios con sus anclas, industrias, zonas, local, answer, faq, cta, itemList).
+  // El H1 del hero es el aprobado por el dueño; title y meta los cambia el chat de SEO (encargo 2026-10-24).
+  journey: {
+    h1: 'La agencia que pone tu negocio en el mapa de <em>Houston</em>',
+    lead: 'Web, SEO e IA con un solo equipo. Te encuentran en Google, en Maps y en la IA, y tu negocio les contesta en su idioma.',
+    call: { label: '713-823-9144', href: telHref },
+    pinsLabel: 'Búsquedas de ejemplo en zonas de Houston',
+    pins: [
+      { name: 'THE WOODLANDS', q: 'kitchen remodeling contractor', en: true },
+      { name: 'KATY', q: 'realtor que hable español' },
+      { name: 'GULFTON', q: 'abogado de inmigración en español' },
+      { name: 'PASADENA', q: 'taller mecánico que hable español' },
+    ],
+    card: {
+      label: 'Resultado de ejemplo', name: 'Tu negocio', meta: 'Pasadena, TX · Abierto ahora',
+      named: 'Te nombran', checks: ['✓ Google', '✓ Maps', '✓ La IA'], ai: 'Tu asistente le contesta en español, 24/7',
+    },
+    services: {
+      title: 'Te encuentran, te eligen <em>y te contestan</em>',
+      lead: 'Tres trabajos y un mismo equipo. Cada servicio tiene su precio de arranque publicado y el final te lo damos por escrito antes de empezar.',
+      // índices sobre services.links (las anclas del silo no cambian)
+      steps: [
+        { n: '01', title: 'Te encuentran', txt: 'Que salgas cuando te buscan en Google, en Maps y en la IA.', links: [2, 3], vig: 'search', note: 'Google, Maps, ChatGPT y Gemini leen tu web y tu ficha: las dejamos listas para que te nombren.' },
+        { n: '02', title: 'Te eligen', txt: 'Una web rápida y bilingüe que convence en segundos.', links: [0, 4, 5], vig: 'web', note: '' },
+        { n: '03', title: 'Te contestan', txt: 'Un asistente que responde, agenda y capta clientes a cualquier hora.', links: [1], vig: 'chat', note: 'En tu web y en WhatsApp, en español e inglés. Cuando no sabe algo, te pasa la conversación a ti.' },
+      ],
+      vig: {
+        query: 'taller mecánico que hable español', result: 'Tu negocio', open: 'Abierto ahora', checks: ['✓ Google', '✓ Maps', '✓ La IA'],
+        time: '11:42 p. m.', me1: '¿Me revisan los frenos mañana?', bot: 'Claro, a las 8:30 tenemos espacio. ¿Te lo aparto?', me2: 'Sí, porfa. Carlos.', ok: 'Cita apartada · mañana 8:30',
+      },
+      all: { label: 'Ver todos los precios', href: '/es/precios' },
+    },
+    projects: {
+      // trabajos que se muestran en esta ciudad y en este orden (decisión del dueño 2026-11-01: TRR, Rosy Nails, Julio's)
+      slugs: ['trr', 'rn', 'jls'],
+      tag: 'Portafolio', title: 'Trabajo real, negocios <em>reales</em>', did: 'Qué hicimos', result: 'Resultado',
+      note: 'Por respeto a la privacidad de nuestros clientes mostramos las capturas, no los enlaces; con gusto te los enseñamos en una llamada.',
+      more: { label: 'Ver Proyectos', href: '/es/portafolio' }, shotPc: 'vista de escritorio', shotMovil: 'vista móvil',
+    },
+    local: {
+      nap: [
+        { label: 'Línea directa', value: nap.houston, href: telHref },
+        { label: 'Horario', value: nap.hours },
+        { label: 'Idiomas', value: 'Español · Inglés' },
+      ],
+      mapLabel: 'Mapa del área de Houston con las zonas que atendemos',
+      mapCap: 'Toda el área metropolitana',
+      zonesLabel: 'Zonas del área de Houston',
+      zones: [
+        { n: 'Houston', hq: true }, { n: 'Katy', href: '/es/houston/katy' }, { n: 'Sugar Land', href: '/es/houston/sugar-land' },
+        { n: 'The Woodlands' }, { n: 'Pearland' }, { n: 'Pasadena' },
+      ],
+    },
+    sectors: {
+      tag: 'Por sector', title: 'Así buscan a <em>tu sector</em> en Houston',
+      lead: 'Lo que escribe el cliente de cada sector. Preparamos tu web y tu ficha para esa búsqueda.',
+      // filas propias (desde la consolidación de nov 2026 solo algunos sectores conservan página: esas filas la
+      // enlazan, buscada por su nombre en industries.links; las demás se quedan como fila sin enlace)
+      rows: [
+        { label: 'Abogados de inmigración', icon: 'lucide:scale', q: 'abogado de inmigración en español' },
+        { label: 'Bienes raíces', icon: 'lucide:home', q: 'realtor que hable español' },
+        { label: 'Restaurantes', icon: 'lucide:utensils', q: 'tacos cerca de mí abierto ahora' },
+        { label: 'Contratistas', icon: 'lucide:hard-hat', q: 'kitchen remodeling contractor', en: true },
+        { label: 'Talleres mecánicos', icon: 'lucide:car', q: 'taller mecánico que hable español' },
+        { label: 'Salones de belleza', icon: 'lucide:scissors', q: 'salón de uñas cerca de mí' },
+        { label: 'Clínicas dentales', icon: 'lucide:stethoscope', q: 'dentista que hable español' },
+      ],
+    },
+    answer: {
+      figs: [
+        { n: 46, txt: 'de las búsquedas en Google tienen intención local' },
+        { n: 76, txt: 'de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas' },
+      ],
+    },
+    cta: { call: `Llámanos: ${nap.houston}`, wa: 'Escríbenos por WhatsApp' },
+  },
 };

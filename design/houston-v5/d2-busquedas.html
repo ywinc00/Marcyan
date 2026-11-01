@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Houston · Las búsquedas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── principio de Cosmos: texto a la izquierda; a la derecha un planeta con puntos que laten
+      y etiquetas colgadas de cada punto. Aquí el planeta es el de la marca y cada punto es una
+      zona de Houston con lo que la gente busca allí. ── */
+.scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(ellipse 620px 520px at 1080px 470px,rgba(200,169,110,.12),transparent 70%),
+  linear-gradient(180deg,#090807 0%,#0d0b08 100%)}
+.world{position:absolute;left:0;top:0;width:1440px;height:900px}
+.planet{position:absolute;left:780px;top:170px;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#2c2318 0%,#17130e 42%,#0b0a08 74%);
+  box-shadow:inset 10px 12px 26px -10px rgba(226,207,164,.55),inset -40px -50px 90px rgba(0,0,0,.6),0 0 120px rgba(200,169,110,.10)}
+.planet::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background-image:radial-gradient(rgba(240,237,232,.30) 1px,transparent 1.5px);background-size:9px 9px;
+  -webkit-mask-image:radial-gradient(circle at 36% 32%,#000 0%,rgba(0,0,0,.55) 45%,transparent 78%);mask-image:radial-gradient(circle at 36% 32%,#000 0%,rgba(0,0,0,.55) 45%,transparent 78%)}
+.ring{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:visible}
+
+/* ── texto: gramática del sitio, a la izquierda ── */
+.copy{position:absolute;z-index:3;left:112px;top:196px;width:600px}
+.copy .display{margin-top:24px}
+.copy .lead{margin-top:24px;max-width:38ch}
+.actions{margin-top:36px;display:flex;align-items:center;gap:20px}
+.copy .micro{margin-top:14px}
+
+/* ── puntos y etiquetas ── */
+.pt{position:absolute;z-index:2;width:0;height:0}
+.pt i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--fg-primary);opacity:.85}
+.pt b{position:absolute;border-radius:50%;border:1px solid rgba(240,237,232,.28);transform:translate(-50%,-50%)}
+.pt b:nth-of-type(1){width:26px;height:26px}.pt b:nth-of-type(2){width:46px;height:46px;opacity:.6}.pt b:nth-of-type(3){width:70px;height:70px;opacity:.3}
+.tag{position:absolute;z-index:3;display:grid;gap:3px;padding:8px 12px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,rgba(28,28,28,.82),rgba(14,14,13,.9));border:1px solid rgba(240,237,232,.12);box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
+.tag small{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--tracking-wider);color:var(--fg-secondary)}
+.tag span{font-size:14px;color:var(--fg-primary);display:inline-flex;align-items:center;gap:8px}
+.tag .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.16);border-radius:4px;padding:1px 5px}
+.wire{position:absolute;z-index:2;background:rgba(240,237,232,.25)}
+/* encendido: el punto de Pasadena y su búsqueda */
+.is-story .pt--lit i{background:var(--accent-gold);opacity:1}
+.is-story .pt--lit b{border-color:rgba(200,169,110,.7)}
+.is-story .tag--lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(46,36,20,.94),rgba(22,18,12,.94))}
+.is-story .tag--lit small{color:var(--accent-gold)}
+.is-story .wire--lit{background:var(--accent-gold)}
+.wire--down{display:none}
+.is-story .wire--down{display:block;background:linear-gradient(180deg,var(--accent-gold),rgba(200,169,110,.35))}
+.tag--dim{opacity:.62}
+.m-only{display:none}
+
+/* resultado */
+.found{position:absolute;z-index:4;left:988px;top:664px;width:340px;padding:14px 16px;display:none}
+.is-story .found{display:block}
+.found__head{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.found__who{flex:1;line-height:1.25}
+.found__who b{display:block;font-size:15px}
+.found__who span{font-size:12.5px;color:#4a4640}
+.found .pill{color:#3a3833}
+.found__foot{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#4a4640}
+.chk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824}
+
+@media (max-width:600px){
+  .copy{left:20px;right:20px;top:104px;width:auto}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy .lead{margin-top:16px;font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .copy .micro{text-align:center;margin-top:8px}
+  .world{transform:translate(-400px,470px) scale(.62);transform-origin:0 0}
+  .world .tag,.world .wire{display:none}
+  .m-only{display:grid;left:20px;top:596px}
+  .sky{background:radial-gradient(ellipse 360px 300px at 50% 820px,rgba(200,169,110,.16),transparent 70%),linear-gradient(180deg,#090807,#0d0b08)}
+  .m-hide{display:none}
+  .found{left:20px;right:20px;width:auto;top:676px}
+}
+</style>
+</head>
+<body>
+<header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+<nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+<div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+<div class="scene" aria-hidden="true">
+  <div class="sky"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="70" data-seed="31"></svg>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <section class="copy">
+    <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    <p class="lead">Que te encuentren cuando te buscan en Google, en Maps y en la IA, en español y en inglés.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+      <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+    </div>
+    <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+  </section>
+
+  <figure class="world" aria-label="Búsquedas de ejemplo en zonas de Houston">
+    <!-- mitad trasera del aro -->
+    <svg class="ring" viewBox="0 0 1440 900" aria-hidden="true"><g transform="rotate(-13 1080 470)" fill="none" stroke="#c8a96e"><path d="M720 470 A360 80 0 0 1 1440 470" stroke-width="10" opacity=".05"/><path d="M720 470 A360 80 0 0 1 1440 470" stroke-width="1.2" opacity=".45"/></g></svg>
+    <div class="planet"></div>
+    <!-- mitad delantera del aro -->
+    <svg class="ring" viewBox="0 0 1440 900" aria-hidden="true"><g transform="rotate(-13 1080 470)" fill="none" stroke="#c8a96e"><path d="M720 470 A360 80 0 0 0 1440 470" stroke-width="10" opacity=".07"/><path d="M720 470 A360 80 0 0 0 1440 470" stroke-width="1.4" opacity=".7"/></g></svg>
+
+    <!-- The Woodlands -->
+    <span class="pt m-hide" style="left:1070px;top:262px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire m-hide" style="left:1070px;top:206px;width:1px;height:56px"></span>
+    <span class="tag tag--dim m-hide" style="left:1070px;top:150px"><small>THE WOODLANDS</small><span>plomero 24 horas</span></span>
+    <!-- Katy (inglés) -->
+    <span class="pt" style="left:880px;top:392px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire" style="left:880px;top:330px;width:1px;height:62px"></span>
+    <span class="tag tag--dim" style="left:760px;top:276px"><small>KATY</small><span>roofing contractor near me <span class="en">EN</span></span></span>
+    <!-- Sugar Land -->
+    <span class="pt m-hide" style="left:950px;top:600px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire m-hide" style="left:950px;top:600px;width:1px;height:76px"></span>
+    <span class="tag tag--dim m-hide" style="left:790px;top:676px"><small>SUGAR LAND</small><span>dentista que hable español</span></span>
+    <!-- Pasadena: la que se enciende -->
+    <span class="pt pt--lit" style="left:1196px;top:478px"><b></b><b></b><b></b><i></i></span>
+    <span class="wire wire--lit" style="left:1196px;top:430px;width:1px;height:48px"></span>
+    <span class="wire wire--down" style="left:1196px;top:486px;width:1px;height:178px"></span>
+    <span class="tag tag--lit" style="left:1040px;top:374px"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
+
+
+  </figure>
+  <span class="tag tag--lit m-only"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
+  <article class="found paper" aria-label="Resultado de ejemplo">
+      <div class="found__head">
+        <span class="avatar">T</span>
+        <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto ahora</span></span>
+        <span class="pill">EJEMPLO</span>
+      </div>
+      <div class="found__foot">Te nombran <span class="chk">✓ Google</span><span class="chk">✓ Maps</span><span class="chk">✓ La IA</span></div>
+    </article>
+</main>
+<script src="base.js"></script>
+</body>
+</html>

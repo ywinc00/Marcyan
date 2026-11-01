@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Houston · Las búsquedas (v3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Portada 2, tercera versión.
+   · El planeta es EL MISMO de la portada principal (oro → oro hondo → núcleo, media luna en sombra,
+     aro a −18° y satélite verde = la IA), a escala de paisaje y saliéndose por la derecha (SpaceX).
+   · Sobre la cara iluminada, zonas de Houston con lo que la gente busca allí (Cosmos).
+   · Historia en un solo movimiento: una búsqueda se enciende, baja el hilo dorado, aparece tu ficha
+     y el satélite de la IA confirma que contesta. Después solo laten los puntos. */
+:root{--t0:.35s;--ease:cubic-bezier(.22,.61,.36,1)}
+.scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(ellipse 700px 600px at 930px 420px,rgba(200,169,110,.10),transparent 70%),
+  linear-gradient(180deg,#090807 0%,#0c0a08 100%)}
+.world{position:absolute;inset:0;overflow:hidden}
+.world svg{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:visible}
+
+/* ── texto ── */
+.copy{position:absolute;z-index:4;left:112px;top:196px;width:600px}
+.copy .display{margin-top:24px}
+.copy .lead{margin-top:24px;max-width:38ch}
+.actions{margin-top:36px;display:flex;align-items:center;gap:20px}
+.copy .micro{margin-top:14px}
+
+/* ── puntos ── */
+.pt{position:absolute;z-index:3;left:var(--x);top:var(--y);width:0;height:0}
+.pt i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:#1a140c;box-shadow:0 0 0 2px rgba(240,237,232,.85)}
+.pt b{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:1px solid rgba(240,237,232,.55);opacity:0;animation:pulse 3.6s var(--ease) infinite;animation-delay:var(--d,0s)}
+.pt b+b{animation-delay:calc(var(--d,0s) + 1.2s)}
+@keyframes pulse{0%{transform:scale(.25);opacity:.9}70%{opacity:.15}100%{transform:scale(1.6);opacity:0}}
+.wire{position:absolute;z-index:3;left:var(--x);top:var(--y);width:1px;height:var(--h);background:rgba(240,237,232,.4);transform-origin:top;animation:wireIn .5s var(--ease) both;animation-delay:var(--d,0s)}
+@keyframes wireIn{from{opacity:0}to{opacity:1}}
+
+/* ── etiquetas: zona + lo que se busca ── */
+.tag{position:absolute;z-index:4;left:var(--x);top:var(--y);display:grid;gap:3px;padding:8px 12px;border-radius:var(--radius-md);
+  background:linear-gradient(180deg,rgba(24,22,19,.86),rgba(12,11,10,.92));border:1px solid rgba(240,237,232,.14);
+  box-shadow:var(--edge-light),0 10px 26px rgba(0,0,0,.45);white-space:nowrap;
+  animation:tagIn .5s var(--ease) both;animation-delay:var(--d,0s)}
+.tag small{font-family:var(--font-mono);font-size:11px;letter-spacing:var(--tracking-wider);color:var(--fg-secondary)}
+.tag span{font-size:14px;color:var(--fg-primary);display:inline-flex;align-items:center;gap:8px}
+.tag .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--fg-secondary);border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 5px}
+@keyframes tagIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── la búsqueda que se enciende (Pasadena) ── */
+.tag--lit{animation:tagIn .5s var(--ease) both,lit .45s var(--ease) both;animation-delay:var(--d),2.3s}
+@keyframes lit{to{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(50,39,21,.95),rgba(24,19,12,.95))}}
+.tag--lit small{animation:litTxt .45s var(--ease) both 2.3s}
+@keyframes litTxt{to{color:var(--accent-gold)}}
+.pt--lit i{animation:litPt .45s var(--ease) both 2.3s}
+@keyframes litPt{to{background:var(--accent-gold);box-shadow:0 0 0 2px var(--accent-gold),0 0 0 7px rgba(200,169,110,.18)}}
+.pt--lit b{border-color:rgba(226,207,164,.9)}
+.wire--lit{animation:wireIn .5s var(--ease) both,litWire .45s var(--ease) both;animation-delay:var(--d,0s),2.3s}
+@keyframes litWire{to{background:var(--accent-gold)}}
+.wire--down{background:linear-gradient(180deg,var(--accent-gold),rgba(200,169,110,.3));transform:scaleY(0);animation:draw .6s var(--ease) both 2.75s}
+@keyframes draw{to{transform:scaleY(1)}}
+
+/* ── tu ficha ── */
+.found{position:absolute;z-index:5;left:var(--x);top:var(--y);width:344px;padding:14px 16px;animation:rise .55s var(--ease) both 3.25s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.found__head{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1c1c1c;color:var(--accent-gold);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:15px;flex:none}
+.found__who{flex:1;min-width:0;line-height:1.25}
+.found__who b{display:block;font-size:15px}
+.found__who span{font-size:12.5px;color:#4a4640}
+.found .pill{color:#3a3833}
+.found__row{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#4a4640}
+.chk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824}
+.found__ai{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#2a2824;animation:tagIn .45s var(--ease) both 3.85s}
+.found__ai i{width:7px;height:7px;border-radius:50%;background:var(--accent-teal);flex:none}
+/* el satélite de la IA confirma (anillo nítido, sin halo: E-03) */
+.sat-ping{transform-box:fill-box;transform-origin:center;opacity:0;animation:satPing 1.4s var(--ease) 3.85s 2}
+@keyframes satPing{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(3.2)}}
+
+/* estados fijos para capturas: #reposo y #historia */
+.is-rest *,.is-story *{animation-play-state:paused!important}
+.is-rest .tag,.is-story .tag,.is-rest .wire:not(.wire--down),.is-story .wire:not(.wire--down){animation:none!important;opacity:1;transform:none}
+.is-rest .found,.is-rest .found__ai{animation:none!important;opacity:0}
+.is-rest .wire--down{animation:none!important;transform:scaleY(0)}
+.is-story .found,.is-story .found__ai{animation:none!important;opacity:1;transform:none}
+.is-story .wire--down{animation:none!important;transform:scaleY(1)}
+.is-story .tag--lit{border-color:var(--accent-gold);background:linear-gradient(180deg,rgba(50,39,21,.95),rgba(24,19,12,.95))}
+.is-story .tag--lit small{animation:none!important;color:var(--accent-gold)}
+.is-story .pt--lit i{animation:none!important;background:var(--accent-gold);box-shadow:0 0 0 2px var(--accent-gold),0 0 0 7px rgba(200,169,110,.18)}
+.is-story .wire--lit{animation:none!important;background:var(--accent-gold)}
+.is-rest .pt b,.is-story .pt b{animation:none!important;opacity:.35;transform:scale(1)}
+.is-rest .pt b+b,.is-story .pt b+b{opacity:.15;transform:scale(1.5)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important}
+  .found,.found__ai,.tag{opacity:1;transform:none}
+  .wire--down{transform:none}
+  .tag--lit{border-color:var(--accent-gold)}
+  .pt b{opacity:.3}
+}
+
+/* ── móvil: planeta abajo a la derecha, una búsqueda encendida y tu ficha ── */
+.m{display:none}
+@media (max-width:600px){
+  .copy{left:20px;right:20px;top:104px;width:auto}
+  .copy .display{margin-top:16px;font-size:40px}
+  .copy .lead{margin-top:16px;font-size:17px}
+  .actions{margin-top:24px;flex-direction:column;align-items:stretch;gap:4px}
+  .copy .micro{text-align:center;margin-top:8px}
+  .d{display:none!important}
+  .m{display:block}
+  .tag.m{display:grid}
+  .world svg.m{width:390px;height:844px}
+  .found{left:20px!important;right:20px;width:auto;top:688px!important}
+}
+</style>
+</head>
+<body>
+<header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+<nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+<div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+<div class="scene" aria-hidden="true">
+  <div class="sky"></div>
+  <svg class="stars" viewBox="0 0 1440 640" data-n="70" data-seed="31"></svg>
+  <div class="grain"></div>
+</div>
+
+<main>
+  <section class="copy">
+    <span class="kicker"><i></i>Agencia hispana · Houston, TX</span>
+    <h1 class="display">Diseño de páginas web en <em>Houston</em></h1>
+    <p class="lead">Que te encuentren cuando te buscan en Google, en Maps y en la IA, en español y en inglés.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+      <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+    </div>
+    <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+  </section>
+
+  <figure class="world" aria-label="Ejemplo: búsquedas en zonas de Houston y un negocio que aparece">
+    <!-- ESCRITORIO: planeta de la marca a escala de paisaje -->
+    <svg class="d" viewBox="0 0 1440 900" aria-hidden="true">
+      <defs>
+        <radialGradient id="pl" cx="22%" cy="30%" r="78%">
+          <stop offset="0%" stop-color="#c8a96e"/>
+          <stop offset="34%" stop-color="#8a6630"/>
+          <stop offset="72%" stop-color="#2e2010"/>
+          <stop offset="100%" stop-color="#120d07"/>
+        </radialGradient>
+        <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="60%" stop-color="#c8a96e" stop-opacity=".16"/><stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/></radialGradient>
+        <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="#080808" opacity=".55"/></pattern>
+        <radialGradient id="dotfade" cx="28%" cy="34%" r="60%"><stop offset="0%" stop-color="#fff" stop-opacity=".9"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <mask id="dotmask"><circle cx="1250" cy="520" r="400" fill="url(#dotfade)"/></mask>
+        <clipPath id="pc"><circle cx="1250" cy="520" r="400"/></clipPath>
+      </defs>
+      <circle cx="1250" cy="520" r="470" fill="url(#halo)"/>
+      <!-- aro · mitad trasera (mismo trazo que el de la portada principal) -->
+      <path d="M690 520 A560 140 0 0 1 1810 520" transform="rotate(-18 1250 520)" fill="none" stroke="#c8a96e" stroke-width="2.2" stroke-opacity=".75" stroke-linecap="round"/>
+      <circle cx="1250" cy="520" r="400" fill="url(#pl)"/>
+      <rect x="850" y="120" width="800" height="800" fill="url(#dots)" mask="url(#dotmask)" clip-path="url(#pc)"/>
+      <!-- media luna en sombra, como el isotipo -->
+      <ellipse cx="1330" cy="560" rx="380" ry="380" fill="rgba(0,0,0,.45)" clip-path="url(#pc)"/>
+      <!-- aro · mitad delantera -->
+      <path d="M690 520 A560 140 0 0 0 1810 520" transform="rotate(-18 1250 520)" fill="none" stroke="#c8a96e" stroke-width="2.2" stroke-opacity=".9" stroke-linecap="round"/>
+      <!-- satélite = la IA, sobre el aro delantero -->
+      <g transform="rotate(-18 1250 520)"><circle cx="1347" cy="658" r="9" fill="#4fc3a1"/><circle class="sat-ping" cx="1347" cy="658" r="9" fill="none" stroke="#4fc3a1" stroke-width="1.5"/></g>
+    </svg>
+
+    <!-- MÓVIL: el mismo planeta, abajo a la derecha -->
+    <svg class="m" viewBox="0 0 390 844" aria-hidden="true">
+      <defs>
+        <radialGradient id="plm" cx="22%" cy="30%" r="78%"><stop offset="0%" stop-color="#c8a96e"/><stop offset="34%" stop-color="#8a6630"/><stop offset="72%" stop-color="#2e2010"/><stop offset="100%" stop-color="#120d07"/></radialGradient>
+        <clipPath id="pcm"><circle cx="360" cy="840" r="250"/></clipPath>
+      </defs>
+      <path d="M10 840 A350 88 0 0 1 710 840" transform="rotate(-18 360 840)" fill="none" stroke="#c8a96e" stroke-width="1.8" stroke-opacity=".75"/>
+      <circle cx="360" cy="840" r="250" fill="url(#plm)"/>
+      <ellipse cx="410" cy="865" rx="236" ry="236" fill="rgba(0,0,0,.45)" clip-path="url(#pcm)"/>
+      <path d="M10 840 A350 88 0 0 0 710 840" transform="rotate(-18 360 840)" fill="none" stroke="#c8a96e" stroke-width="1.8" stroke-opacity=".9"/>
+      <g transform="rotate(-18 360 840)"><circle cx="96" cy="897" r="7" fill="#4fc3a1"/></g>
+    </svg>
+
+    <!-- The Woodlands -->
+    <span class="pt d" style="--x:1100px;--y:236px;--d:.2s"><b></b><b></b><i></i></span>
+    <span class="wire d" style="--x:1100px;--y:186px;--h:50px;--d:.25s"></span>
+    <span class="tag d" style="--x:1040px;--y:132px;--d:.25s"><small>THE WOODLANDS</small><span>plomero 24 horas</span></span>
+    <!-- Katy, en inglés -->
+    <span class="pt d" style="--x:930px;--y:410px;--d:1.1s"><b></b><b></b><i></i></span>
+    <span class="wire d" style="--x:930px;--y:346px;--h:64px;--d:.45s"></span>
+    <span class="tag d" style="--x:772px;--y:292px;--d:.45s"><small>KATY</small><span>roofing contractor near me <span class="en">EN</span></span></span>
+    <!-- Sugar Land -->
+    <span class="pt d" style="--x:990px;--y:640px;--d:2s"><b></b><b></b><i></i></span>
+    <span class="wire d" style="--x:990px;--y:640px;--h:58px;--d:.65s"></span>
+    <span class="tag d" style="--x:776px;--y:698px;--d:.65s"><small>SUGAR LAND</small><span>dentista que hable español</span></span>
+    <!-- Pasadena: la búsqueda que se enciende -->
+    <span class="pt pt--lit d" style="--x:1150px;--y:478px;--d:.6s"><b></b><b></b><i></i></span>
+    <span class="wire wire--lit d" style="--x:1150px;--y:426px;--h:52px;--d:.85s"></span>
+    <span class="tag tag--lit d" style="--x:1050px;--y:372px;--d:.85s"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
+    <span class="wire wire--down d" style="--x:1150px;--y:486px;--h:200px"></span>
+
+    <!-- móvil: una búsqueda encendida -->
+    <span class="tag tag--lit m" style="--x:20px;--y:604px;--d:.3s"><small>PASADENA</small><span>taller que hable español cerca de mí</span></span>
+  </figure>
+
+  <article class="found paper" style="--x:984px;--y:686px" aria-label="Resultado de ejemplo">
+    <div class="found__head">
+      <span class="avatar">T</span>
+      <span class="found__who"><b>Taller Ejemplo</b><span>Pasadena, TX · Abierto ahora</span></span>
+      <span class="pill">EJEMPLO</span>
+    </div>
+    <div class="found__row">Te nombran <span class="chk">✓ Google</span><span class="chk">✓ Maps</span><span class="chk">✓ La IA</span></div>
+    <p class="found__ai"><i></i>Tu asistente le contesta en español, 24/7</p>
+  </article>
+</main>
+<script>
+if (location.hash === '#reposo') document.documentElement.classList.add('is-rest');
+if (location.hash === '#historia') document.documentElement.classList.add('is-story');
+</script>
+<script src="base.js"></script>
+</body>
+</html>

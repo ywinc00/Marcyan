@@ -9,14 +9,15 @@ import LogoWordmark from '../brand/LogoWordmark.astro';
 import StarField from '../StarField.astro';
 import { t, type Lang } from '../../i18n/ui';
 
-interface Props { footer: any; lang?: Lang }
-const { footer, lang = 'es' } = Astro.props;
+// starDensity: densidad de estrellas del pie (por defecto la de todo el sitio; Houston la baja un 10 %)
+interface Props { footer: any; lang?: Lang; starDensity?: number }
+const { footer, lang = 'es', starDensity = 1.5 } = Astro.props;
 const uif = t(lang);
 const f = footer;
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
 ---
-<footer class="footer" data-fx="gold" data-fx-density="1.5">
+<footer class="footer" data-fx="gold" data-fx-density={String(starDensity)}>
   <div class="container footer__inner">
     <div class="footer__brand">
       <a href="#top" aria-label={uif.footer.top} class="footer__logo">
@@ -77,7 +78,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     </span>
   </div>
 
-  {/* "Suelo" del arribo: horizonte de un planeta a lo ancho, DEBAJO de todo (no toca texto) */}
+  {/* "Suelo" del arribo: horizonte de un planeta a lo ancho, DEBAJO de todo (no toca texto).
+      Una página puede sustituirlo por su propio cierre con el slot "scape" (hoy solo Houston: la silueta de la ciudad). */}
+  {Astro.slots.has('scape') ? <slot name="scape" /> : (
   <div class="footer__ground" aria-hidden="true">
     <svg class="footer__ground-svg" viewBox="0 0 1440 300" preserveAspectRatio="none" fill="none">
       <defs>
@@ -106,6 +109,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
       <path d="M0,128 Q720,70 1440,128" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity=".5" />
     </svg>
   </div>
+  )}
 
   <StarField />
 </footer>
@@ -196,7 +200,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     position: relative; z-index: 1;
     display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
     justify-content: space-between; align-items: center;
-    margin-top: var(--space-7); padding: var(--space-4) 0 var(--space-6);
+    /* solo arriba y abajo: el relleno lateral es el del contenedor (antes el atajo lo ponía a cero y la línea
+       quedaba pegada a los bordes de la pantalla) */
+    margin-top: var(--space-7); padding-block: var(--space-4) var(--space-6);
     border-top: 1px solid var(--border-subtle);
     font-size: var(--text-xs); color: var(--fg-secondary);
   }
@@ -211,7 +217,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     .footer { padding-top: var(--space-6); }
     .footer__brand { gap: var(--space-3); }
     .footer__ground, .footer__ground-svg { height: 124px; }
-    .footer__bottom { margin-top: var(--space-6); padding: var(--space-4) 0 var(--space-5); }
+    .footer__bottom { margin-top: var(--space-6); padding-block: var(--space-4) var(--space-5); }
   }
 
   /* ── ≥ md: marca izquierda · columnas derecha ───────────────────── */

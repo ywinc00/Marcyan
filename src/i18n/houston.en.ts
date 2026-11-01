@@ -155,4 +155,77 @@ export const houstonHub = {
     { name: 'Websites for Restaurants in Houston', path: '/en/houston/restaurants' },
     { name: 'Websites for Contractors in Houston', path: '/en/houston/contractors' },
   ] as ListLink[],
+  // ── "The journey" redesign (2026-10-25) ── new page copy; the keys above stay untouched.
+  // Hero H1 approved by the owner; title and meta belong to the SEO chat (brief 2026-10-24).
+  journey: {
+    h1: 'The studio that puts your business on the map in <em>Houston</em>',
+    lead: 'Web, SEO and AI from one team. Customers find you on Google, on Maps and in AI answers, and your business replies in their language.',
+    call: { label: '713-823-9144', href: telHref },
+    pinsLabel: 'Sample searches across Houston areas',
+    pins: [
+      { name: 'THE WOODLANDS', q: 'kitchen remodeling contractor', en: false },
+      { name: 'KATY', q: 'realtor que hable español', lang: 'es' },
+      { name: 'GULFTON', q: 'abogado de inmigración en español', lang: 'es' },
+      { name: 'PASADENA', q: 'taller mecánico que hable español', lang: 'es' },
+    ],
+    card: {
+      label: 'Sample result', name: 'Your business', meta: 'Pasadena, TX · Open now',
+      named: 'Named by', checks: ['✓ Google', '✓ Maps', '✓ AI'], ai: 'Your assistant answers in English or Spanish, 24/7',
+    },
+    services: {
+      title: 'Customers find you, choose you <em>and get an answer</em>',
+      lead: 'Three jobs, one team. Every service has a published starting price, and we put the final price in writing before we start.',
+      steps: [
+        { n: '01', title: 'Get found', txt: 'Show up when people search on Google, on Maps and in AI.', links: [2, 3], vig: 'search', note: 'Google, Maps, ChatGPT and Gemini read your site and your profile: we get them ready to name you.' },
+        { n: '02', title: 'Get chosen', txt: 'A fast, bilingual site that wins people over in seconds.', links: [0, 4, 5], vig: 'web', note: '' },
+        { n: '03', title: 'Always answer', txt: 'An assistant that replies, books and captures leads around the clock.', links: [1], vig: 'chat', note: 'On your site and on WhatsApp, in English and Spanish. When it does not know something, it hands the conversation to you.' },
+      ],
+      vig: {
+        query: 'auto repair near me open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
+        time: '11:42 PM', me1: 'Can you check my brakes tomorrow?', bot: 'Sure, we have an opening at 8:30. Want me to book it?', me2: 'Yes please. Carlos.', ok: 'Booked · tomorrow 8:30',
+      },
+      all: { label: 'See all pricing', href: '/en/pricing' },
+    },
+    projects: {
+      // trabajos que se muestran en esta ciudad y en este orden (decisión del dueño 2026-11-01: TRR, Rosy Nails, Julio's)
+      slugs: ['trr', 'rn', 'jls'],
+      tag: 'Portfolio', title: 'Real work, real <em>businesses</em>', did: 'What we did', result: 'Result',
+      note: 'Out of respect for our clients\' privacy we show the screenshots, not the links; we are happy to walk you through them on a call.',
+      more: { label: 'View projects', href: '/en/portfolio' }, shotPc: 'desktop view', shotMovil: 'mobile view',
+    },
+    local: {
+      nap: [
+        { label: 'Direct line', value: nap.houston, href: telHref },
+        { label: 'Hours', value: nap.hoursEn },
+        { label: 'Languages', value: 'English · Spanish' },
+      ],
+      mapLabel: 'Map of the Houston area with the zones we serve',
+      mapCap: 'The entire metro area',
+      zonesLabel: 'Houston-area zones',
+      zones: [
+        { n: 'Houston', hq: true }, { n: 'Katy' }, { n: 'Sugar Land' },
+        { n: 'The Woodlands' }, { n: 'Pearland' }, { n: 'Pasadena' },
+      ],
+    },
+    sectors: {
+      tag: 'By industry', title: 'How Houston searches for <em>your industry</em>',
+      lead: "What each industry's customers type. We get your site and your profile ready for that search.",
+      rows: [
+        { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'immigration lawyer who speaks Spanish' },
+        { label: 'Real estate', icon: 'lucide:home', q: 'realtor near me' },
+        { label: 'Restaurants', icon: 'lucide:utensils', q: 'tacos near me open now' },
+        { label: 'Contractors', icon: 'lucide:hard-hat', q: 'kitchen remodeling contractor' },
+        { label: 'Auto repair shops', icon: 'lucide:car', q: 'auto repair near me' },
+        { label: 'Beauty salons', icon: 'lucide:scissors', q: 'nail salon near me' },
+        { label: 'Dental clinics', icon: 'lucide:stethoscope', q: 'dentist who speaks Spanish' },
+      ],
+    },
+    answer: {
+      figs: [
+        { n: 46, txt: 'of Google searches have local intent' },
+        { n: 76, txt: 'of people who search "near me" visit a business within 24 hours' },
+      ],
+    },
+    cta: { call: `Call us: ${nap.houston}`, wa: 'Message us on WhatsApp' },
+  },
 };

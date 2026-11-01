@@ -12,6 +12,11 @@
 
 import type { FaqItem, CrumbItem } from '../lib/schema';
 import type { RelatedLink } from './clusters';
+import { PRICE_ANCHORS } from './pricing';
+import { nap } from './content';
+
+const telHref = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
 
 export const miamiHub = {
   meta: {
@@ -27,7 +32,8 @@ export const miamiHub = {
   hero: {
     badge: 'Miami, FL',
     badgeIcon: 'lucide:map-pin',
-    kicker: 'Local studio',
+    kicker: 'Bilingual studio · Miami, FL',
+    microcopy: 'Reply in 1 business hour · No commitment',
     h1: 'Web design in <em>Miami</em>',
     sub: 'One bilingual studio for your site, your AI and your local SEO in Miami: custom-built, in true English and Spanish, with public pricing. Made for how your Cuban, Venezuelan or Colombian customers really search.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
@@ -37,17 +43,17 @@ export const miamiHub = {
   },
   answer: {
     q: 'Why choose a bilingual web design studio in Miami?',
-    a: 'Because in Miami, Spanish is the language of commerce: close to 69% of Miami-Dade is Hispanic, according to the U.S. Census Bureau. You need a studio that builds in real English and Spanish, writes for the way your Cuban, Venezuelan or Colombian customers actually speak, and structures your site so Google and AI can find you. That connects you to your market far better than a generic agency.',
-    source: 'U.S. Census Bureau, ACS 2023',
+    a: 'Because in Miami, Spanish is the language of commerce: close to 69% of Miami-Dade is Hispanic and 75% of residents age 5 and over speak a language other than English at home, according to the U.S. Census Bureau. You need a studio that builds in real English and Spanish, writes for the way your Cuban, Venezuelan or Colombian customers actually speak, and structures your site so Google and AI can find you. That connects you to your market far better than a generic agency.',
+    source: 'U.S. Census Bureau, 2019-2023 ACS 5-year estimates',
   },
   services: {
     tag: 'Services in Miami',
     title: 'Everything for your business, in <em>one studio</em>',
     links: [
-      { label: 'Web design in Miami', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template' },
-      { label: 'Local SEO in Miami', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search' },
-      { label: 'Conversational AI in Miami', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square' },
-      { label: 'Online store in Miami', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag' },
+      { label: 'Web design in Miami', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template', price: `from ${usd(PRICE_ANCHORS.web)}` },
+      { label: 'Local SEO in Miami', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search', price: `from ${usd(PRICE_ANCHORS.seoLocal)}/mo` },
+      { label: 'Conversational AI in Miami', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square', price: `from ${usd(PRICE_ANCHORS.ia)}` },
+      { label: 'Online store in Miami', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag', price: `from ${usd(PRICE_ANCHORS.ecommerce)}` },
     ] as Array<Omit<RelatedLink, 'href'> & { href?: string }>,
   },
   local: {
@@ -72,7 +78,7 @@ export const miamiHub = {
     title: 'A Miami studio, <em>no runaround</em>',
     items: [
       { q: 'What services do you offer in Miami?', a: 'Custom web design and development, local SEO, conversational AI (assistants that answer 24/7) and online stores; also branding and AI SEO. Everything bilingual in English and Spanish, and built for the Spanish-speaking side of your Miami market. You can start with a single service or a coordinated package.' },
-      { q: 'Do you have clients or an office in Miami?', a: 'We\'ll be honest: we are just getting started in Miami, so we do not yet have published case studies from this city or a public address (we work as a service-area business). We do have real, verifiable work done in Houston and Orlando, with links you can visit. That is why we offer Founding Client spots in Miami.' },
+      { q: 'Do you have clients or an office in Miami?', a: 'We\'ll be honest: we are just getting started in Miami, so we do not yet have published case studies from this city or a public address (we work as a service-area business). We do have real, verifiable work done in Houston and Orlando, which we are happy to walk you through on a call. That is why we offer Founding Client spots in Miami.' },
       { q: 'Do you work in the Spanish of Miami?', a: 'Yes. We are a bilingual team focused on the Spanish-speaking market in the United States. In Miami that means the Spanish that is really spoken here, Cuban, Venezuelan, Colombian, and English too. We write and optimize for how your customer actually speaks and searches, not in generic Spanish.' },
       { q: 'Do you serve the whole Miami area?', a: 'Yes. We cover Miami-Dade and its metro area (Doral, Hialeah, Kendall, Coral Gables, Brickell, Aventura and more) as a service-area business, remotely and efficiently. You do not need to visit an office: the entire process, from proposal to delivery, happens online and in your language.' },
       { q: 'How much do your services cost in Miami?', a: 'We publish our starting prices: web design from $1,500, AI from $900, online store from $2,900 and local SEO from $600 a month. The final price depends on scope, and we always give it to you in writing before we start. You can see them all on our pricing page.' },
@@ -85,4 +91,81 @@ export const miamiHub = {
     primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
+  reassure: 'Reply in 1 business hour · Free proposal in 24h · Price in writing before we start',
+  // ── "The journey" redesign (2026-11-01, the Houston base with Miami's own elements) ── new page copy; the keys above
+  // stay untouched. Title and meta do not change here (they belong to the SEO department).
+  journey: {
+    h1: 'The studio that puts your business on the map in <em>Miami</em>',
+    lead: 'Web, SEO and AI from one team. In Miami people search in English and in Spanish: get found on Google, on Maps and in AI answers, and have your business reply in both.',
+    call: { label: '786-938-1754', href: telHref },
+    pinsLabel: 'Sample searches across Miami areas',
+    pins: [
+      { name: 'HIALEAH', q: 'taller de mecánica cerca de mí', lang: 'es' },
+      { name: 'DORAL', q: 'abogado de inmigración en español', lang: 'es' },
+      { name: 'KENDALL', q: 'dentist near me' },
+      { name: 'MIAMI BEACH', q: 'restaurante cubano abierto ahora', lang: 'es' },
+    ],
+    card: {
+      label: 'Sample result', name: 'Your business', meta: 'Miami Beach, FL · Open now',
+      named: 'Named by', checks: ['✓ Google', '✓ Maps', '✓ AI'], ai: 'Your assistant answers in English or Spanish, 24/7',
+    },
+    services: {
+      title: 'Customers find you, choose you <em>and get an answer</em>',
+      lead: 'Three jobs, one team for all of Miami-Dade. Every service has a published starting price, and your final quote comes in writing before any work starts.',
+      steps: [
+        { n: '01', title: 'Get found', txt: 'Show up when Miami searches for you, in English or Spanish, on Google, on Maps and in AI.', links: [1], vig: 'search', note: 'Your site and your Google profile, ready for the way Miami searches: in English, in Spanish and often both in the same sentence.' },
+        { n: '02', title: 'Get chosen', txt: 'A fast site in real English and real Spanish, so nobody has to settle for a translation.', links: [0, 3], vig: 'web', note: '' },
+        { n: '03', title: 'Always answer', txt: 'An assistant that answers, books and captures leads at any hour, in the language each customer writes in.', links: [2], vig: 'chat', note: 'On your site and on WhatsApp, the app Miami runs on. When it does not know something, it hands the conversation to you.' },
+      ],
+      vig: {
+        query: 'Cuban restaurant open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
+        time: '11:42 PM', me1: 'Do you have a table for four tomorrow at 8?', bot: 'Of course. Tomorrow at 8 we have a table on the terrace. Want me to hold it?', me2: 'Yes please, under Carlos.', ok: 'Table held · tomorrow 8:00 PM',
+      },
+      all: { label: 'See all pricing', href: '/en/pricing' },
+    },
+    projects: {
+      slugs: ['mja'],
+      tag: 'Portfolio', title: 'Real work in <em>Florida</em>', did: 'What we did', result: 'Result',
+      note: 'Move Junk Away is based in Orlando. It is our closest project to Miami, so we show it here labeled with its real city. For privacy we show the screenshots, not the links; we are happy to walk you through it on a call.',
+      over: {
+        mja: { did: 'We rebuilt their site from scratch, fast and bilingual, with local SEO (Google Business Profile, NAP and per-service content) for their Florida market.' },
+      },
+      more: { label: 'View projects', href: '/en/portfolio' }, shotPc: 'desktop view', shotMovil: 'mobile view',
+    },
+    local: {
+      nap: [
+        { label: 'Direct line', value: nap.miami, href: telHref },
+        { label: 'Hours', value: nap.hoursEn },
+        { label: 'Languages', value: 'English · Spanish' },
+      ],
+      mapLabel: 'Map of the Miami area with the zones we serve',
+      mapCap: 'All of Miami-Dade',
+      zonesLabel: 'Miami-area zones',
+      zones: [
+        { n: 'Miami', hq: true }, { n: 'Doral' }, { n: 'Hialeah' },
+        { n: 'Miami Beach' }, { n: 'Coral Gables' }, { n: 'Kendall' },
+      ],
+    },
+    sectors: {
+      tag: 'By industry', title: 'How Miami searches for <em>your industry</em>',
+      lead: "What each industry's customers type in Miami, in English or in Spanish. We get your site and your profile ready for that search.",
+      rows: [
+        { label: 'Restaurants', icon: 'lucide:utensils', q: 'Cuban restaurant open now' },
+        { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'abogado de inmigración en Doral', lang: 'es' },
+        { label: 'Real estate', icon: 'lucide:home', q: 'realtor in Brickell' },
+        { label: 'Contractors', icon: 'lucide:hard-hat', q: 'roofing contractor near me' },
+        { label: 'Auto repair shops', icon: 'lucide:car', q: 'taller de mecánica en Hialeah', lang: 'es' },
+        { label: 'Beauty salons', icon: 'lucide:scissors', q: 'nail salon in Kendall' },
+        { label: 'Dental clinics', icon: 'lucide:stethoscope', q: 'dentist who speaks Spanish' },
+      ],
+    },
+    answer: {
+      figs: [
+        { n: 69, txt: 'of Miami-Dade residents are Hispanic' },
+        { n: 75, txt: 'of residents age 5 and over speak a language other than English at home' },
+      ],
+    },
+    cta: { call: `Call us: ${nap.miami}`, wa: 'Message us on WhatsApp' },
+  },
+
 };

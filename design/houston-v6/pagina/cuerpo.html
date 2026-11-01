@@ -1,0 +1,328 @@
+<!-- Fondo de toda la página: espacio → borde del planeta → atmósfera → terreno → amanecer -->
+<div class="atmo" aria-hidden="true">
+  <canvas id="atmo"></canvas>
+  <div class="atmo__css" id="atmoCss" hidden><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  <div class="atmo__stars" id="atmoStars"></div>
+  <div class="atmo__grain"></div>
+</div>
+
+<!-- 1 · Portada: se queda fija mientras el desplazamiento acerca el planeta a Houston -->
+<section class="hero-pin" id="heroPin" data-atmo="top|space:1 limb:-0.6 limbA:0 atm:0 ground:0 dawn:0 calm:0;end-0.95|limbA:0;end-0.5|limb:-0.3 limbA:1">
+  <div class="hero-sticky" id="heroSticky">
+    <div class="stage" id="stage">
+      <header class="nav"><a class="logo" href="#" translate="no" aria-label="Marcyan Digital Studio, inicio"><span class="logo__word">MAR<b>C</b>YAN</span><span class="logo__tag">DIGITAL STUDIO</span></a>
+      <nav class="nav__links" aria-label="Principal"><a href="#">Servicios</a><a href="#">Portafolio</a><a href="#">Precios</a><a href="#" class="is-on">Ciudades</a><a href="#">Nosotros</a><a href="#">Blog</a></nav>
+      <div class="nav__actions"><div class="lang" aria-label="Idioma"><span class="lang__opt is-on" aria-current="true">ES</span><span class="lang__sep" aria-hidden="true"></span><a class="lang__opt" href="#" hreflang="en">EN</a></div><a class="nav__cta" href="#contacto">Propuesta gratis</a><a class="menu" href="#" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></a></div></header>
+
+      <div class="sky" aria-hidden="true"></div>
+
+      <div class="copy">
+        <span class="kicker">Agencia hispana · Houston, TX</span>
+        <h1 class="h1">La agencia que pone tu negocio en el mapa de <em>Houston</em></h1>
+        <p class="lead">Web, SEO e IA con un solo equipo. Te encuentran en Google, en Maps y en la IA, y tu negocio les contesta en su idioma.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="#contacto">Propuesta gratis</a>
+          <a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>713-823-9144</a>
+        </div>
+        <p class="micro">Respuesta en 1 hora hábil · Sin compromiso</p>
+      </div>
+
+      <canvas id="globe" aria-hidden="true"></canvas>
+      <svg id="wires" aria-hidden="true"></svg>
+      <div id="pins" aria-label="Búsquedas de ejemplo en zonas de Houston"></div>
+
+      <article class="found paper" id="found" aria-label="Resultado de ejemplo">
+        <div class="found__head">
+          <svg class="logo-mark" viewBox="0 0 38 38" aria-hidden="true"><defs><linearGradient id="lmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c4a40"/><stop offset="1" stop-color="#16271f"/></linearGradient></defs><rect width="38" height="38" rx="10" fill="url(#lmg)"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.2" stroke-linecap="round"/><path d="M19 13.2v-2.6M12.6 15.8l-1.8-1.8M25.4 15.8l1.8-1.8" stroke="#f3ecdf" stroke-width="2" stroke-linecap="round"/><path d="M13.5 29h11" stroke="#f3ecdf" stroke-width="1.8" stroke-linecap="round" opacity=".45"/></svg>
+          <span class="found__who"><b>Tu negocio</b><span>Pasadena, TX · Abierto ahora</span></span>
+        </div>
+        <div class="found__row">Te nombran <span class="chk">✓ Google</span><span class="chk">✓ Maps</span><span class="chk">✓ La IA</span></div>
+        <p class="found__ai" id="foundAi"><i></i>Tu asistente le contesta en español, 24/7</p>
+      </article>
+
+      <div class="cue" id="cue" aria-hidden="true"><i></i></div>
+    </div>
+  </div>
+</section>
+
+<main id="main">
+
+<!-- 2 · Servicios: la historia de la portada, paso a paso, con su precio -->
+<section class="sec svc" id="servicios" aria-labelledby="svc-t" data-atmo="top|limb:0.02 space:0.95 atm:0;mid|limb:0.62 space:0.4 atm:0.12;end|limb:1.3 space:0.05 atm:0.92 limbA:1">
+  <div class="wrap">
+    <header class="sec__head" data-rev>
+      <span class="kick">Servicios en Houston</span>
+      <h2 class="h2" id="svc-t">Te encuentran, te eligen <em>y te contestan</em></h2>
+      <p class="lead">Tres trabajos y un mismo equipo. Cada servicio tiene su precio de arranque publicado y el final te lo damos por escrito antes de empezar.</p>
+    </header>
+    <ol class="svc__grid">
+      <li class="svc__col" data-rev>
+        <div class="svc__top"><span class="step">01</span><h3>Te encuentran</h3></div>
+        <p class="svc__txt">Que salgas cuando te buscan en Google, en Maps y en la IA.</p>
+        <div class="vig vig--search" data-vig="search" aria-hidden="true">
+          <div class="vf-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="vf-q" data-q="taller mecánico que hable español">taller mecánico que hable español</span><i class="caret"></i></div>
+          <div class="vf-res"><svg class="mini-logo" viewBox="0 0 38 38"><rect width="38" height="38" rx="10" fill="#203a31"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.4" stroke-linecap="round"/></svg><b>Tu negocio</b><span>Abierto ahora</span></div>
+          <div class="vf-chips"><span>✓ Google</span><span>✓ Maps</span><span>✓ La IA</span></div>
+        </div>
+        <ul class="svc__rows">
+          <li><a href="/es/houston/seo-local"><span class="svc__name">SEO local en Houston</span><span class="price"><small>desde</small>$600/mes</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+          <li><a href="/es/houston/seo-para-ia"><span class="svc__name">SEO para IA en Houston</span><span class="price">Diagnóstico gratis</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+        </ul>
+        <p class="svc__note">Google, Maps, ChatGPT y Gemini leen tu web y tu ficha: las dejamos listas para que te nombren.</p>
+      </li>
+      <li class="svc__col" data-rev>
+        <div class="svc__top"><span class="step">02</span><h3>Te eligen</h3></div>
+        <p class="svc__txt">Una web rápida y bilingüe que convence en segundos.</p>
+        <div class="vig vig--web" data-vig="web" aria-hidden="true">
+          <div class="vb"><div class="vb__bar"><i></i><i></i><i></i><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
+            <div class="vb__body"><div class="vb__l"><b></b><b></b><s></s><s></s><u></u></div><div class="vb__r"><em></em></div></div></div>
+        </div>
+        <ul class="svc__rows">
+          <li><a href="/es/houston/diseno-web"><span class="svc__name">Diseño web en Houston</span><span class="price"><small>desde</small>$1,500</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+          <li><a href="/es/houston/diseno-web-bilingue"><span class="svc__name">Diseño web bilingüe (ES/EN)</span><span class="price"><small>desde</small>$1,500</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+          <li><a href="/es/houston/ecommerce"><span class="svc__name">Tienda en línea en Houston</span><span class="price"><small>desde</small>$2,900</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+          <li><a href="/es/houston/branding"><span class="svc__name">Branding e identidad</span><span class="price"><small>desde</small>$750</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+        </ul>
+      </li>
+      <li class="svc__col" data-rev>
+        <div class="svc__top"><span class="step">03</span><h3>Te contestan</h3></div>
+        <p class="svc__txt">Un asistente que responde, agenda y capta clientes a cualquier hora.</p>
+        <div class="vig vig--chat vig--grow" data-vig="chat" aria-hidden="true">
+          <div class="vc"><span class="vc__t">11:42 p. m.</span><p class="me">¿Me revisan los frenos mañana?</p><p class="dots"><i></i><i></i><i></i></p><p class="bot">Claro, a las 8:30 tenemos espacio. ¿Te lo aparto?</p><p class="me me2">Sí, porfa. Carlos.</p><span class="ok"><i></i>Cita apartada · mañana 8:30</span></div>
+        </div>
+        <ul class="svc__rows">
+          <li><a href="/es/houston/ia-conversacional"><span class="svc__name">IA conversacional en Houston</span><span class="price"><small>desde</small>$900</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+        </ul>
+        <p class="svc__note">En tu web y en WhatsApp, en español e inglés. Cuando no sabe algo, te pasa la conversación a ti.</p>
+      </li>
+    </ol>
+    <p class="svc__more"><a class="more" href="/es/precios">Ver todos los precios <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
+  </div>
+</section>
+
+<!-- 3 · Proyectos: panel fijo con el trabajo real, que cambia según el paso -->
+<section class="sec pf" id="proyectos" aria-labelledby="pf-t" data-atmo="top+0.25|atm:1 limbA:0 space:0 calm:0.8;end-0.45|atm:1 calm:0.8">
+  <div class="wrap">
+    <header class="sec__head" data-rev>
+      <span class="kick">Portafolio</span>
+      <h2 class="h2" id="pf-t">Trabajo real, negocios <em>reales</em></h2>
+    </header>
+    <div class="pf__grid">
+      <div class="pf__stage" aria-hidden="true">
+        <div class="pf__light"></div>
+        <div class="pf__laptop">
+          <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><b data-names="Texas Rush Remove|Move Junk Away|Julio's Landscape TX|Rosy Nails &amp; Care">Texas Rush Remove</b></span></div>
+          <div class="pf__screen">
+            <img class="is-on" src="trr-pc-900.webp" width="900" height="506" alt="">
+            <img src="mja-pc-900.webp" width="900" height="506" alt="" loading="lazy">
+            <img src="jls-pc-900.webp" width="900" height="506" alt="" loading="lazy">
+            <img src="rn-pc-900.webp" width="900" height="506" alt="" loading="lazy">
+          </div>
+        </div>
+        <div class="pf__phone">
+          <div class="pf__notch"></div>
+          <div class="pf__pscreen">
+            <img class="is-on" src="trr-movil-520.webp" width="520" height="958" alt="">
+            <img src="mja-movil-520.webp" width="520" height="899" alt="" loading="lazy">
+            <img src="jls-movil-520.webp" width="520" height="944" alt="" loading="lazy">
+            <img src="rn-movil-520.webp" width="520" height="1068" alt="" loading="lazy">
+          </div>
+        </div>
+        <p class="pf__count"><b>01</b> / 04</p>
+      </div>
+      <ol class="pf__steps">
+        <li class="pf__step is-on" data-i="0">
+          <figure class="pf__mini"><img src="trr-pc-900.webp" width="900" height="506" alt="Texas Rush Remove, vista de escritorio" loading="lazy"><img class="pf__mph" src="trr-movil-520.webp" width="520" height="958" alt="Texas Rush Remove, vista móvil" loading="lazy"></figure>
+          <p class="pf__cat"><span>01</span>Junk Removal · Houston, TX</p>
+          <h3 class="pf__name">Texas Rush Remove</h3>
+          <dl class="pf__dl"><dt>Qué hicimos</dt><dd>Reconstruimos su sitio desde cero, rápido y bilingüe, y montamos su SEO local: Perfil de Google, NAP consistente y páginas por servicio para su área de Houston.</dd>
+          <dt>Resultado</dt><dd>Ya posiciona en su zona de Houston, la IA de Google ya lo incluye en sus recomendaciones para algunas búsquedas y recibe visitas que llegan desde ChatGPT.</dd></dl>
+          <ul class="pf__tags"><li>Sitio + SEO</li><li>Reconstruido desde cero</li><li>SEO local</li><li>Bilingüe</li></ul>
+          <a class="more" href="/es/houston/seo-local">SEO local en Houston <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </li>
+        <li class="pf__step" data-i="1">
+          <figure class="pf__mini"><img src="mja-pc-900.webp" width="900" height="506" alt="Move Junk Away, vista de escritorio" loading="lazy"><img class="pf__mph" src="mja-movil-520.webp" width="520" height="899" alt="Move Junk Away, vista móvil" loading="lazy"></figure>
+          <p class="pf__cat"><span>02</span>Junk Removal · Orlando, FL</p>
+          <h3 class="pf__name">Move Junk Away</h3>
+          <dl class="pf__dl"><dt>Qué hicimos</dt><dd>Lo mismo en Orlando: sitio reconstruido desde cero, rápido y bilingüe, con SEO local (Perfil de Google, NAP y contenido por servicio) para su mercado de Florida.</dd>
+          <dt>Resultado</dt><dd>Ya posiciona en su zona de Orlando y la IA de Google ya lo incluye en recomendaciones para algunas búsquedas.</dd></dl>
+          <ul class="pf__tags"><li>Sitio + SEO</li><li>Reconstruido desde cero</li><li>SEO local</li><li>Bilingüe</li></ul>
+          <a class="more" href="/es/houston/seo-local">SEO local <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </li>
+        <li class="pf__step" data-i="2">
+          <figure class="pf__mini"><img src="jls-pc-900.webp" width="900" height="506" alt="Julio's Landscape TX, vista de escritorio" loading="lazy"><img class="pf__mph" src="jls-movil-520.webp" width="520" height="944" alt="Julio's Landscape TX, vista móvil" loading="lazy"></figure>
+          <p class="pf__cat"><span>03</span>Paisajismo · Houston, TX</p>
+          <h3 class="pf__name" translate="no">Julio's Landscape TX</h3>
+          <dl class="pf__dl"><dt>Qué hicimos</dt><dd>Creamos su marca desde cero (logo, paleta y tipografías) y su sitio web a medida, coherente de principio a fin, para un paisajista de Houston.</dd>
+          <dt>Resultado</dt><dd>Una identidad de marca y un sitio nuevos, hechos a medida desde cero.</dd></dl>
+          <ul class="pf__tags"><li>Marca + Sitio</li><li>Identidad de marca</li><li>Sitio a medida</li><li>Desde cero</li></ul>
+          <a class="more" href="/es/houston/branding">Branding e identidad <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </li>
+        <li class="pf__step" data-i="3">
+          <figure class="pf__mini"><img src="rn-pc-900.webp" width="900" height="506" alt="Rosy Nails &amp; Care, vista de escritorio" loading="lazy"><img class="pf__mph" src="rn-movil-520.webp" width="520" height="1068" alt="Rosy Nails &amp; Care, vista móvil" loading="lazy"></figure>
+          <p class="pf__cat"><span>04</span>Salón de uñas · Houston, TX</p>
+          <h3 class="pf__name" translate="no">Rosy Nails &amp; Care</h3>
+          <dl class="pf__dl"><dt>Qué hicimos</dt><dd>Construimos una web app a medida donde las clientas agendan sus citas en línea y exploran inspiración de diseños de uñas, para un salón de Houston.</dd>
+          <dt>Resultado</dt><dd>Una web app de reservas a medida, en vivo y en uso por sus clientas.</dd></dl>
+          <ul class="pf__tags"><li>Web app</li><li>Agenda de citas</li><li>A medida</li><li>Reservas en línea</li></ul>
+          <a class="more" href="/es/houston/salon-belleza">Sitios para salones de belleza <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </li>
+      </ol>
+    </div>
+    <div class="pf__foot" data-rev>
+      <p>Por respeto a la privacidad de nuestros clientes mostramos las capturas, no los enlaces; con gusto te los enseñamos en una llamada.</p>
+      <a class="more" href="/es/portafolio">Ver Proyectos <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · Houston: el mercado y el mapa del área -->
+<section class="sec local" aria-labelledby="local-t" data-atmo="top-0.1|atm:0.75 ground:0.3 calm:0;mid|atm:0.16 ground:1">
+  <div class="wrap local__grid">
+    <div class="local__copy" data-rev>
+      <span class="kick">Houston</span>
+      <h2 class="h2" id="local-t">Conocemos el <em>mercado de Houston</em></h2>
+      <p>Houston es la cuarta ciudad más grande de Estados Unidos y una de las de mayor población hispana. Es un mercado enorme y competido, donde aparecer primero, en Google, en Maps y en los asistentes de IA, marca la diferencia entre una llamada y un cliente perdido.</p>
+      <p>Trabajamos toda el área metropolitana como negocio de área de servicio, en español e inglés. <strong>No somos una agencia remota que «también cubre» Houston:</strong> diseñamos, escribimos y posicionamos pensando en cómo busca de verdad tu cliente aquí.</p>
+      <dl class="nap">
+        <dt>Línea directa</dt><dd><a href="tel:+17138239144">+1 713-823-9144</a></dd>
+        <dt>Horario</dt><dd>Lun–Vie 9am–6pm CT</dd>
+        <dt>Idiomas</dt><dd>Español · Inglés</dd>
+      </dl>
+    </div>
+    <figure class="local__map" id="metroBox" aria-label="Mapa del área de Houston con las zonas que atendemos">
+      <div class="local__plate" id="metroPlate"><canvas id="metro"></canvas></div>
+      <figcaption class="local__cap">Toda el área metropolitana</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 5 · Sectores -->
+<section class="sec sectors" aria-labelledby="sectors-t">
+  <div class="wrap">
+    <header class="sec__head" data-rev>
+      <span class="kick">Por sector</span>
+      <h2 class="h2" id="sectors-t">Así buscan a <em>tu sector</em> en Houston</h2>
+      <p class="lead">Cada sector tiene su página, con lo que busca su cliente y cómo lo atendemos.</p>
+    </header>
+    <ul class="sectors__list" data-rev-list>
+      <li><a href="/es/houston/abogados-inmigracion"><span class="sic" data-ic="scale"></span><span><span class="sname">Abogados de inmigración</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>abogado de inmigración en español</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/bienes-raices"><span class="sic" data-ic="house"></span><span><span class="sname">Bienes raíces</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>realtor que hable español</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/contratistas"><span class="sic" data-ic="hard-hat"></span><span><span class="sname">Contratistas</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>kitchen remodeling contractor <span class="en">EN</span></span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/talleres-mecanicos"><span class="sic" data-ic="car"></span><span><span class="sname">Talleres mecánicos</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>taller mecánico que hable español</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/restaurantes"><span class="sic" data-ic="utensils"></span><span><span class="sname">Restaurantes</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>tacos cerca de mí abierto ahora</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/salon-belleza"><span class="sic" data-ic="scissors"></span><span><span class="sname">Salones de belleza</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>salón de uñas cerca de mí</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/houston/clinicas-dentales"><span class="sic" data-ic="stethoscope"></span><span><span class="sname">Clínicas dentales</span><span class="squery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>dentista que hable español</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6 · Diagnóstico gratis -->
+<section class="sec diag" id="diagnostico" aria-labelledby="diag-t" data-atmo="mid|atm:0.1 ground:0.7">
+  <div class="wrap diag__grid">
+    <div class="diag__copy">
+      <span class="kick">Diagnóstico digital</span>
+      <h2 class="h2" id="diag-t">Descubre dónde está <em>perdiendo clientes</em> tu negocio en Houston</h2>
+      <p class="lead">En 2 minutos, la IA revisa tu presencia digital (web, Google, lectura por IA y conversión) y te dice qué priorizar para competir en Houston. Gratis y sin compromiso.</p>
+      <div class="diag__act"><a class="btn btn--primary" href="/es/diagnostico">Hacer mi diagnóstico gratis</a><p class="micro">2 min · Sin llamada · Reporte por email</p></div>
+    </div>
+    <a class="diag__demo" href="/es/diagnostico" data-track="growth_teaser_clicked" aria-label="Hacer mi diagnóstico gratis" data-demo>
+      <span class="diag__head"><img src="marcy-mini.webp" width="36" height="36" alt=""><span>Marcy te lo explica en el chat</span><b>EJEMPLO</b></span>
+      <span class="diag__body">
+        <span class="diag__ring" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="#2a2a26" stroke-width="7"/><circle class="ring" cx="48" cy="48" r="40" fill="none" stroke="#c8a96e" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="95.5" transform="rotate(-90 48 48)"/></svg><strong data-count="62">62</strong></span>
+        <span class="diag__bars" aria-hidden="true">
+          <span><em>Web móvil</em><i style="--w:64%"></i></span>
+          <span><em>SEO local</em><i style="--w:41%"></i></span>
+          <span><em>Lectura por IA</em><i style="--w:28%" class="is-teal"></i></span>
+        </span>
+      </span>
+    </a>
+  </div>
+</section>
+
+<!-- 7 · Respuesta directa (texto citable, intacto) -->
+<section class="sec answer" aria-labelledby="answer-q" data-atmo="mid|ground:0.6">
+  <div class="wrap answer__grid">
+    <div class="answer__main" data-rev>
+      <span class="kick">Respuesta directa</span>
+      <h2 class="answer__q" id="answer-q">¿Por qué elegir una agencia de diseño web en Houston?</h2>
+      <p class="answer__a">Una agencia local entiende tu mercado: el 46% de las búsquedas en Google tienen intención local y el 76% de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas. En Houston, una agencia hispana y bilingüe te ayuda a aparecer en Google y en la IA, y a hablarles a tus clientes en su idioma.</p>
+      <p class="answer__src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Fuente: Google · BrightLocal, 2025</p>
+    </div>
+    <div class="answer__figs" aria-hidden="true">
+      <div class="fig"><p class="fig__n"><b data-count="46">46</b>%</p><p>de las búsquedas en Google tienen intención local</p></div>
+      <div class="fig"><p class="fig__n"><b data-count="76">76</b>%</p><p>de quienes buscan «cerca de mí» visitan un negocio en menos de 24 horas</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · Preguntas frecuentes (todas cerradas al cargar) -->
+<section class="sec faq" id="faq" aria-labelledby="faq-t" data-atmo="top|ground:0.4;end|ground:0.45">
+  <div class="wrap faq__grid">
+    <header class="faq__head">
+      <span class="kick">Preguntas frecuentes</span>
+      <h2 class="h2" id="faq-t">Agencia en Houston, <em>sin rodeos</em></h2>
+    </header>
+    <div class="faq__list">
+      <details class="qa"><summary>¿Qué servicios ofrecen en Houston?<i></i></summary><div class="qa__a"><p>Diseño y desarrollo web a medida, SEO local, IA conversacional (asistentes que atienden 24/7), tiendas en línea, branding y mantenimiento. Todo bilingüe en español e inglés, y pensado para el mercado hispano de Houston. Puedes contratar un solo servicio o un paquete coordinado.</p></div></details>
+      <details class="qa"><summary>¿Tienen oficina en Houston?<i></i></summary><div class="qa__a"><p>Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.</p></div></details>
+      <details class="qa"><summary>¿Trabajan en español e inglés?<i></i></summary><div class="qa__a"><p>Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. Diseñamos, escribimos y posicionamos en español e inglés, porque en Houston tus clientes buscan en ambos idiomas.</p></div></details>
+      <details class="qa"><summary>¿Atienden solo a Houston o también el área metropolitana?<i></i></summary><div class="qa__a"><p>Cubrimos Houston y toda su área metropolitana (Katy, Sugar Land, The Woodlands, Pearland y más). Al ser negocio de área de servicio, podemos atenderte en las zonas donde realmente operas, sin necesidad de una dirección pública.</p></div></details>
+      <details class="qa"><summary>¿Cuánto cuestan sus servicios en Houston?<i></i></summary><div class="qa__a"><p>Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.</p></div></details>
+      <details class="qa"><summary>¿Por qué una agencia hispana local y no una grande?<i></i></summary><div class="qa__a"><p>Porque hablamos tu idioma, conocemos a tu cliente hispano y te damos atención cercana, con precios públicos y sin contratos que te aten. Reunimos algo que pocos ofrecen en conjunto: diseño web, IA conversacional y SEO, todo bilingüe y bajo un mismo equipo.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · Sigue explorando -->
+<section class="explore" aria-labelledby="ex-t">
+  <div class="wrap explore__in">
+    <div class="explore__head"><span class="kick">Sigue explorando</span><h2 class="explore__t" id="ex-t">Precios y más</h2></div>
+    <ul class="explore__row">
+      <li><a href="/es/precios"><span class="exic" data-ic="tag"></span><span><b>Precios y planes</b><small>Todos los precios de arranque, publicados</small></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/precios/cuanto-cuesta-una-pagina-web-houston"><span class="exic" data-ic="circle-help"></span><span><b>¿Cuánto cuesta una página web en Houston?</b><small>La respuesta directa, con precio real</small></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+      <li><a href="/es/miami/diseno-web"><span class="exic" data-ic="layout-template"></span><span><b>Diseño web en Miami</b><small>También diseñamos en Miami</small></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10 · Cierre: amanece sobre el horizonte (el sol del logo de la tarjeta de la portada) -->
+<section class="cta" aria-labelledby="cta-t" data-atmo="top-0.15|ground:0.45 dawn:0.15;mid|dawn:1 ground:0.18 atm:0">
+  <div class="wrap cta__in">
+    <h2 class="cta__t" id="cta-t">¿Listo para crecer en <em>Houston</em>?</h2>
+    <p class="lead">Cuéntanos sobre tu negocio y recibe una propuesta personalizada en menos de 24 horas, sin compromiso.</p>
+    <div class="actions"><a class="btn btn--primary" href="#contacto">Propuesta gratis</a><a class="btn btn--ghost" href="tel:+17138239144"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Llámanos: +1 713-823-9144</a></div>
+    <p class="reassure">Respuesta en 1 hora hábil · Propuesta gratis en 24h · Precio por escrito antes de empezar</p>
+  </div>
+</section>
+
+<!-- 11 · Contacto (la luz queda quieta junto al formulario) -->
+<section class="sec contact" id="contacto" aria-labelledby="ct-t" data-atmo="top|dawn:0.85 calm:1 ground:0.12;end|dawn:0.55">
+  <div class="wrap contact__grid">
+    <div class="contact__info">
+      <span class="kick">Contacto</span>
+      <h2 class="h2" id="ct-t">Hablemos de<br>tu <em>proyecto</em></h2>
+      <p class="lead">Cuéntanos tu idea. En menos de 24 horas tendrás una propuesta personalizada, sin compromisos y completamente gratis.</p>
+      <dl class="nap nap--ct">
+        <dt><span data-ic="mail"></span>Email</dt><dd>contact@marcyanstudio.com</dd>
+        <dt><span data-ic="phone"></span>Houston</dt><dd><a href="tel:+17138239144">+1 713-823-9144</a></dd>
+        <dt><span data-ic="phone"></span>Miami</dt><dd><a href="tel:+17869381754">+1 786-938-1754</a></dd>
+        <dt><span data-ic="clock"></span>Horario</dt><dd>Lun–Vie 9am–6pm CT</dd>
+      </dl>
+      <a class="wa" href="https://wa.me/17138239144"><span data-ic="message-circle"></span>Escríbenos por WhatsApp</a>
+    </div>
+    <form class="form" id="form" novalidate>
+      <div class="f2"><label>Nombre<input name="name" placeholder="Tu nombre" autocomplete="name"></label><label>Email<input name="email" type="email" placeholder="tu@email.com" autocomplete="email"></label></div>
+      <div class="f2"><label>Empresa<input name="company" placeholder="Nombre de tu empresa" autocomplete="organization"></label>
+        <label>Ciudad<select name="city"><option>Houston, TX</option><option>Miami, FL</option><option>Otra ciudad</option></select></label></div>
+      <div class="f2"><label>Teléfono (opcional)<input name="phone" placeholder="Tu teléfono o WhatsApp" autocomplete="tel"></label>
+        <label>Servicio de interés<select name="service"><option value="">¿Qué necesitas?</option><option>Diseño web</option><option>Rediseño de sitio actual</option><option>E-commerce / Tienda en línea</option><option>IA conversacional / Chatbot</option><option>SEO local</option><option>SEO para IA (visibilidad en IA)</option><option>Branding e identidad</option><option>Mantenimiento continuo</option><option>Paquete completo</option></select></label></div>
+      <label>Cuéntanos tu proyecto<textarea name="message" rows="4" placeholder="Describe brevemente lo que necesitas..."></textarea></label>
+      <button class="btn btn--primary" type="submit">Enviar mensaje</button>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<figure class="keep" data-atmo="top|dawn:0.3 calm:1"><picture><source media="(max-width:600px)" srcset="m-sec-footer.png"><img src="sec-footer.png" alt="Pie de página actual" loading="lazy"></picture></figure>

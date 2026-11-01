@@ -1,0 +1,314 @@
+---
+// HUB DE CIUDAD · rediseño "el viaje" (Houston 2026-10-25; Miami 2026-11-01). Una sola pieza para los hubs de
+// Houston y Miami en ES y EN: lo que cambia por ciudad vive en cities.js (planeta, zonas, mapa) y en sus textos.
+// Recorrido: el planeta se acerca a Houston al bajar → el borde del planeta a contraluz (servicios) →
+// la noche con nubes (proyectos) → el mapa del área con las zonas → la noche sigue hasta el pie, que
+// cierra con la silueta de la ciudad (slot "scape" de SiteFooter, lo monta la página).
+// Contratos que NO cambian: un solo <h1>, Breadcrumb + ItemList (página) + FAQPage, los 19 enlaces del
+// silo (7 servicios + 7 sectores + 2 zonas + 3 "sigue explorando"), anclas #servicios #proyectos
+// #diagnostico #faq #contacto, nombres de data-track, textos de answer/faq/local literales.
+import Kicker from '../ui/Kicker.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import Breadcrumb from '../ui/Breadcrumb.astro';
+import Contact from '../sections/Contact.astro';
+import GrowthTeaser from '../sections/GrowthTeaser.astro';
+import { faqPage } from '../../lib/schema';
+import { t, type Lang } from '../../i18n/ui';
+import { nap } from '../../i18n/content';
+import './city.css';
+
+interface Props { lang: Lang; city: 'houston' | 'miami'; h: any; c: any; projects: any[] }
+const { lang, city, h, c } = Astro.props;
+const j = h.journey;
+// los trabajos de esta ciudad, en el orden que fija su bloque de textos
+const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean)
+  .map((p: any) => ({ ...p, ...(j.projects.over?.[p.slug] ?? {}) }));
+const ui = t(lang);
+const svc = h.services.links;
+const faqLd = faqPage(h.faq.items);
+const phone: string = (nap as any)[city];
+const telHref = 'tel:' + phone.replace(/[^\d+]/g, '');
+const waHref = 'https://wa.me/' + phone.replace(/\D/g, '');
+const defaultCity = city === 'miami' ? 'Miami, FL' : 'Houston, TX';
+const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
+const names = projects.map((p) => p.name).join('|');
+// sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
+const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
+---
+<script is:inline>document.documentElement.classList.add('hx-js')</script>
+<div class="hx" data-city={city}>
+  <div class="atmo" aria-hidden="true">
+    <div class="atmo__stars" id="hx-atmo-stars"></div>
+    <canvas id="hx-atmo"></canvas>
+    <div class="atmo__css" id="hx-atmo-css" hidden><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  </div>
+
+  {/* 1 · Portada: se queda fija mientras el desplazamiento acerca el planeta a Houston */}
+  <section class="hero-pin" id="hx-hero-pin" data-atmo="top|space:1 limb:-0.6 limbA:0 sun:0 night:0 city:0 cityZ:0 ground:0 dawn:0 calm:0;end-0.95|limbA:0;end-0.5|limb:-0.3 limbA:1 sun:0.15">
+    <div class="hero-sticky" id="hx-hero-sticky">
+      <div class="stage" id="hx-stage" data-pins={JSON.stringify(j.pins)}>
+        <div class="sky" aria-hidden="true"></div>
+        <div class="copy-wrap container"><div class="copy">
+          <div class="crumb"><Breadcrumb items={h.breadcrumb} lang={lang} /></div>
+          <Kicker>{h.hero.kicker}</Kicker>
+          <h1 class="h1" set:html={j.h1} />
+          <p class="lead">{j.lead}</p>
+          <div class="actions">
+            <Button href={h.hero.primary.href} size="lg" data-track="proposal_requested">{h.hero.primary.label}</Button>
+            <Button href={j.call.href} variant="ghost" size="lg" class="call" data-track="call_clicked"><Icon name="lucide:phone" class="call__ic" />{j.call.label}</Button>
+          </div>
+          <p class="micro">{h.hero.microcopy}</p>
+        </div></div>
+        <canvas id="hx-globe" aria-hidden="true"></canvas>
+        <div id="hx-pins" role="group" aria-label={j.pinsLabel}></div>
+        <article class="found paper" id="hx-found" tabindex="-1" aria-label={j.card.label}>
+          <p class="found__q" id="hx-found-q" hidden><Icon name="lucide:search" class="found__qi" /><span></span></p>
+          <div class="found__head">
+            <svg class="logo-mark" viewBox="0 0 38 38" aria-hidden="true"><defs><linearGradient id="hx-lmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c4a40"/><stop offset="1" stop-color="#16271f"/></linearGradient></defs><rect width="38" height="38" rx="10" fill="url(#hx-lmg)"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.2" stroke-linecap="round"/><path d="M19 13.2v-2.6M12.6 15.8l-1.8-1.8M25.4 15.8l1.8-1.8" stroke="#f3ecdf" stroke-width="2" stroke-linecap="round"/><path d="M13.5 29h11" stroke="#f3ecdf" stroke-width="1.8" stroke-linecap="round" opacity=".45"/></svg>
+            <span class="found__who"><b>{j.card.name}</b><span>{j.card.meta}</span></span>
+          </div>
+          <div class="found__row">{j.card.named} {j.card.checks.map((x: string) => <span class="chk">{x}</span>)}</div>
+          <p class="found__ai" id="hx-found-ai"><i></i>{j.card.ai}</p>
+        </article>
+        <div class="cue" id="hx-cue" aria-hidden="true"><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  {/* 2 · Servicios: la historia de la portada, paso a paso */}
+  <section class="sec svc" id="servicios" aria-labelledby="hx-svc-t">
+    <div class="hx-wrap">
+      <header class="sec__head svc__head" data-rev data-atmo="top-0.3|limb:-0.08 sun:0.35 space:1;end+0.2|limb:0.42 sun:1 space:0.9">
+        <Kicker>{h.services.tag}</Kicker>
+        <h2 class="h2" id="hx-svc-t" set:html={j.services.title} />
+        <p class="lead">{j.services.lead}</p>
+      </header>
+      <ol class="svc__grid" data-atmo="top+0.05|limb:0.64 sun:0.75 space:0.65;end|limb:1.35 sun:0 space:0">
+        {j.services.steps.map((st: any) => (
+          <li class="svc__col" data-rev>
+            <div class="svc__top"><span class="step">{st.n}</span><h3>{st.title}</h3></div>
+            <p class="svc__txt">{st.txt}</p>
+            {st.vig === 'search' && (
+              <div class="vig vig--search" data-vig="search" aria-hidden="true">
+                <div class="vf-search"><Icon name="lucide:search" /><span class="vf-q" data-q={j.services.vig.query}>{j.services.vig.query}</span><i class="caret"></i></div>
+                <div class="vf-res"><svg class="mini-logo" viewBox="0 0 38 38"><rect width="38" height="38" rx="10" fill="#203a31"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.4" stroke-linecap="round"/></svg><b>{j.services.vig.result}</b><span>{j.services.vig.open}</span></div>
+                <div class="vf-chips">{j.services.vig.checks.map((x: string) => <span>{x}</span>)}</div>
+              </div>
+            )}
+            {st.vig === 'web' && (
+              <div class="vig vig--web" data-vig="web" aria-hidden="true">
+                <div class="vb"><div class="vb__bar"><i></i><i></i><i></i><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
+                  <div class="vb__body"><div class="vb__l"><b></b><b></b><s></s><s></s><u></u></div><div class="vb__r"><em></em></div></div></div>
+              </div>
+            )}
+            {st.vig === 'chat' && (
+              <div class="vig vig--chat vig--grow" data-vig="chat" aria-hidden="true">
+                <div class="vc"><span class="vc__t">{j.services.vig.time}</span><p class="me">{j.services.vig.me1}</p><p class="dots"><i></i><i></i><i></i></p><p class="bot">{j.services.vig.bot}</p><p class="me me2">{j.services.vig.me2}</p><span class="ok"><i></i>{j.services.vig.ok}</span></div>
+              </div>
+            )}
+            <ul class="svc__rows">
+              {st.links.map((i: number) => svc[i]).map((l: any) => (
+                <li>{l.href
+                  ? <a href={l.href}><span class="svc__name">{l.label}</span><Icon name="lucide:arrow-right" class="arr" /></a>
+                  : <div class="row"><span class="svc__name">{l.label}</span>{l.price && <span class="svc__price">{l.price}</span>}</div>}</li>
+              ))}
+            </ul>
+            {st.note && <p class="svc__note">{st.note}</p>}
+          </li>
+        ))}
+      </ol>
+      <p class="svc__more"><a class="more" href={j.services.all.href}>{j.services.all.label} <Icon name="lucide:arrow-right" class="arr" /></a></p>
+    </div>
+  </section>
+
+  {/* 3 · Proyectos: panel fijo con el trabajo real (escritorio) · tarjetas apiladas (teléfono) */}
+  <section class:list={['sec pf', projects.length === 1 && 'pf--solo']} id="proyectos" aria-labelledby="hx-pf-t" data-atmo="top+0.3|limbA:0 night:1 calm:0.7 space:0;end-0.7|night:1 calm:0.7">
+    <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
+    <div class="hx-wrap">
+      <header class="sec__head" data-rev>
+        <Kicker>{j.projects.tag}</Kicker>
+        <h2 class="h2" id="hx-pf-t" set:html={j.projects.title} />
+      </header>
+      <div class="pf__grid">
+        <div class="pf__stage" aria-hidden="true">
+          <div class="pf__light"></div>
+          <div class="pf__laptop">
+            <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url"><Icon name="lucide:lock" /><b data-names={names}>{projects[0].name}</b></span></div>
+            <div class="pf__screen">
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} width="900" height="506" alt="" loading="lazy" decoding="async" />)}
+            </div>
+          </div>
+          <div class="pf__phone">
+            <div class="pf__notch"></div>
+            <div class="pf__pscreen">
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
+            </div>
+          </div>
+          <p class="pf__count"><b>01</b> / {String(projects.length).padStart(2, '0')}</p>
+        </div>
+        <ol class="pf__steps">
+          {projects.map((p, i) => (
+            <li class:list={['pf__step', i === 0 && 'is-on']} data-i={i}>
+              <figure class="pf__mini" data-rev>
+                <img src={shot(p.slug, p.mh).pc} width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
+                <img class="pf__mph" src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
+              </figure>
+              <p class="pf__cat"><span>{String(i + 1).padStart(2, '0')}</span>{p.cat}</p>
+              <h3 class="pf__name" translate="no">{p.name}</h3>
+              <dl class="pf__dl"><dt>{j.projects.did}</dt><dd>{p.did}</dd><dt>{j.projects.result}</dt><dd>{p.result}</dd></dl>
+              <ul class="pf__tags"><li>{p.badge}</li>{p.tags.map((tg: string) => <li>{tg}</li>)}</ul>
+              {p.serviceHref !== h.path && <a class="more" href={p.serviceHref}>{p.serviceLabel} <Icon name="lucide:arrow-right" class="arr" /></a>}
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div class="pf__foot" data-rev>
+        <p>{j.projects.note}</p>
+        <a class="more" href={j.projects.more.href}>{j.projects.more.label} <Icon name="lucide:arrow-right" class="arr" /></a>
+      </div>
+    </div>
+  </section>
+
+  {/* entre proyectos y Houston: atravesamos un banco de nubes (sin texto encima) */}
+  <div class="cloudbank" data-clouds="bank" aria-hidden="true"></div>
+
+  {/* 4 · Houston: el mercado y el mapa del área con las zonas (Katy y Sugar Land enlazan a sus páginas) */}
+  <section class="sec local" aria-labelledby="hx-local-t" data-atmo="top-0.4|night:1 calm:0.3 ground:0 glow:0;mid|night:1 glow:0.35 calm:0.4">
+    <div class="hx-wrap local__grid">
+      <div class="local__copy" data-rev>
+        <Kicker>{h.local.tag}</Kicker>
+        <h2 class="h2" id="hx-local-t" set:html={h.local.title} />
+        {h.local.paragraphs.map((p: string) => <p set:html={p} />)}
+      </div>
+      {/* bento: el mapa es la pieza dominante; datos de contacto y zonas en sus propias piezas */}
+      <dl class="nap local__nap" data-rev>
+        {j.local.nap.map((r: any) => (<><dt>{r.label}</dt><dd>{r.href ? <a href={r.href} data-track="call_clicked">{r.value}</a> : r.value}</dd></>))}
+      </dl>
+      <div class="local__right" data-rev>
+        <figure class="local__map" id="hx-map" aria-label={j.local.mapLabel} data-zones={JSON.stringify(j.local.zones)}>
+          <div class="local__plate" id="hx-map-plate"><canvas id="hx-map-cv"></canvas></div>
+          <figcaption class="local__cap">{j.local.mapCap}</figcaption>
+        </figure>
+        <ul class="zones" id="hx-zones" aria-label={j.local.zonesLabel}>
+          {j.local.zones.map((z: any) => (
+            <li>{z.href
+              ? <a class="zones__z zones__z--link" data-z={z.n} href={z.href}>{z.n}<Icon name="lucide:arrow-right" /></a>
+              : <span class:list={['zones__z', z.hq && 'zones__z--hq']} data-z={z.n}>{z.n}</span>}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* 5 · Sectores: lo que busca el cliente de cada uno */}
+  <section class="sec sectors" aria-labelledby="hx-sectors-t">
+    <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
+    <div class="hx-wrap">
+      <header class="sec__head" data-rev>
+        <Kicker>{j.sectors.tag}</Kicker>
+        <h2 class="h2" id="hx-sectors-t" set:html={j.sectors.title} />
+        <p class="lead">{j.sectors.lead}</p>
+      </header>
+      <ul class="sectors__list" data-rev-list>
+        {j.sectors.rows.map((r: any) => {
+          const href = sectorHref[r.label];
+          const body = <><span class="sic"><Icon name={r.icon} /></span>
+            <span><span class="sname">{r.label}</span><span class="squery"><Icon name="lucide:search" /><span lang={r.lang ?? (r.en ? 'en' : undefined)}>{r.q}</span>{r.en && <span class="en">EN</span>}</span></span></>;
+          return <li>{href ? <a href={href}>{body}<Icon name="lucide:arrow-right" class="arr" /></a> : <div class="row">{body}</div>}</li>;
+        })}
+      </ul>
+    </div>
+  </section>
+
+  {/* 6 · Diagnóstico gratis (el componente del sitio: sus enlaces y su seguimiento no cambian) */}
+  <div class="diag" data-atmo="mid|night:1 glow:0.3"><GrowthTeaser lang={lang} city={city} /></div>
+
+  {/* 7 · Respuesta directa (texto citable, literal) */}
+  <section class="sec answer" aria-labelledby="answer-q" data-atmo="mid|night:1 glow:0.25">
+    <div class="hx-wrap">
+      <div class="answer__grid">
+        <div class="answer__main" data-rev>
+          <Kicker>{ui.answer.directAnswer}</Kicker>
+          <h2 class="answer__q" id="answer-q">{h.answer.q}</h2>
+          <p class="answer__a">{h.answer.a}</p>
+          <p class="answer__src"><Icon name="lucide:bar-chart-3" />{ui.answer.source}: {h.answer.source}</p>
+        </div>
+        <div class="answer__figs" aria-hidden="true">
+          {j.answer.figs.map((f: any) => <div class="fig"><p class="fig__n"><b data-count={f.n}>{f.n}</b>%</p><p>{f.txt}</p></div>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* 8 · Preguntas frecuentes: todas cerradas al cargar */}
+  <section class="sec faq" id="faq" aria-labelledby="hx-faq-t" data-atmo="top|night:1 glow:0.25;end|night:1 glow:0.3">
+    <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
+    <div class="hx-wrap faq__grid">
+      <header class="faq__head">
+        <Kicker>{h.faq.tag}</Kicker>
+        <h2 class="h2" id="hx-faq-t" set:html={h.faq.title} />
+      </header>
+      <div class="faq__list">
+        {h.faq.items.map((it: any) => (
+          <details class="qa"><summary>{it.q}<i aria-hidden="true"></i></summary><div class="qa__a"><p>{it.a}</p></div></details>
+        ))}
+      </div>
+    </div>
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(faqLd)} />
+  </section>
+
+  {/* 9 · Sigue explorando */}
+  <section class="explore" aria-labelledby="hx-ex-t">
+    <div class="hx-wrap explore__in">
+      <div class="explore__head"><Kicker>{h.related.tag}</Kicker><h2 class="explore__t" id="hx-ex-t">{h.related.title}</h2></div>
+      <ul class="explore__row">
+        {h.related.links.map((l: any) => (
+          <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}</b><small>{l.desc}</small></span><Icon name="lucide:arrow-right" class="arr" /></a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* 10 · Cierre: la noche de la ciudad (trío de conversión con sus nombres de seguimiento) */}
+  <section class="cta" aria-labelledby="hx-cta-t" data-atmo="top-0.15|night:1 glow:0.4 dawn:0;mid|night:1 glow:1">
+    <div class="hx-wrap cta__in">
+      <h2 class="cta__t" id="hx-cta-t" set:html={h.cta.title} />
+      <p class="lead">{h.cta.sub}</p>
+      <div class="actions">
+        <Button href={h.cta.primary.href} size="lg" class="ctaband__act ctaband__act--form" data-track="proposal_requested">{h.cta.primary.label}</Button>
+        <Button href={telHref} variant="ghost" size="lg" class="call ctaband__act ctaband__act--call" data-track="call_clicked"><Icon name="lucide:phone" class="call__ic" />{j.cta.call}</Button>
+        <a class="wa ctaband__act ctaband__act--wa" href={waHref} data-track="whatsapp_clicked"><Icon name="lucide:message-circle" />{j.cta.wa}</a>
+      </div>
+      <p class="reassure">{h.reassure}</p>
+    </div>
+  </section>
+
+  {/* 11 · Contacto: el formulario real del sitio (envío, validación y seguimiento intactos) */}
+  <div class="contact-wrap" data-atmo="top|night:1 glow:0.6 calm:1;end|night:1 glow:0.5">
+    <Contact contact={c.contact} defaultCity={defaultCity} />
+  </div>
+</div>
+
+<script>
+  import { initAtmo } from './atmo.js';
+  import { initHero } from './hero.js';
+  import { initSections } from './page.js';
+  import { initClouds } from './clouds.js';
+  import { CITIES } from './cities.js';
+
+  const C = (CITIES as any)[(document.querySelector('.hx') as HTMLElement)?.dataset.city || 'houston'];
+  // datos geográficos: el globo ligero (todo dispositivo) primero; el detallado solo en escritorio y después
+  let geoP: Promise<any> | null = null;
+  const loadGeo = () => geoP || (geoP = fetch(C.globe).then((r) => r.json()));
+  initAtmo();
+  initSections(loadGeo, C);
+  initClouds();
+  loadGeo().then((G) => {
+    initHero(G, C);
+    if (innerWidth > 600) {
+      const more = () => fetch(C.globe50).then((r) => r.json()).then((d) => { G.land50 = d.land50; window.dispatchEvent(new Event('hx-geo50')); }).catch(() => {});
+      'requestIdleCallback' in window ? (window as any).requestIdleCallback(more, { timeout: 2500 }) : setTimeout(more, 1200);
+    }
+  });
+</script>

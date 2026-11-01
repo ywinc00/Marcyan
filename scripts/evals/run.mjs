@@ -3,7 +3,7 @@
 //  scripts/evals/run.mjs — Ejecutor genérico de pruebas de comportamiento (P1)
 //
 //    node scripts/evals/run.mjs <suite> --url <vista previa> [--share <token>]
-//         [--trials 2] [--delay 5500] [--only id1,id2] [--save-baseline]
+//         [--trials 3] [--delay 5500] [--only id1,id2] [--save-baseline]
 //
 //  <suite> = archivo scripts/evals/<suite>-casos.mjs (meta + casos). Hoy:
 //  "marcy". Para el chatbot de un cliente: copiar el archivo de casos y
@@ -35,7 +35,9 @@ const flag = (name) => argv.includes('--' + name);
 
 const base = String(opt('url', '')).replace(/\/+$/, '');
 const share = opt('share', process.env.VERCEL_SHARE || '');
-const trials = Math.max(1, Number(opt('trials', 2)));
+// 3 por defecto: con 2, un solo tropiezo de la IA en un caso al 100 % ya cuenta
+// como caída de 50 puntos y cierra la puerta (falsa alarma del 01-nov).
+const trials = Math.max(1, Number(opt('trials', 3)));
 const delay = Math.max(0, Number(opt('delay', 5500)));
 const only = opt('only', '') ? new Set(opt('only').split(',')) : null;
 
@@ -135,6 +137,9 @@ writeFileSync(path.join(outDir, `${runId}.json`), JSON.stringify(out, null, 2));
 if (flag('save-baseline') && only) {
   console.error('La línea base se guarda solo con la batería completa (sin --only).');
   process.exitCode = 2;
+} else if (flag('save-baseline') && fallos.length && !flag('force-baseline')) {
+  // Una pasada que no pasa la puerta no puede convertirse en la referencia.
+  console.error('No guardo la línea base: la puerta no pasa. Si el cambio es deliberado y aprobado, usa --force-baseline.');
 } else if (flag('save-baseline')) {
   writeFileSync(baselinePath, JSON.stringify({ suite, fecha: runId, trials, total, casos: Object.fromEntries(results.map((r) => [r.id, r.rate])) }, null, 2) + '\n');
   console.log('Línea base guardada en ' + path.relative(ROOT, baselinePath));

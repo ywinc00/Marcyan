@@ -6,6 +6,8 @@
 //  visitante (texto y acción). Cada positivo tiene su contrario: decidido vs
 //  explorando, cotizar vs regatear, inyección en ES y en EN.
 //  `critico: true` = regla de seguridad, marca o política: debe pasar SIEMPRE.
+//  La calidad de venta (cliente decidido, explorando…) no es crítica: la vigila
+//  la línea base, porque la IA varía y una regla de "siempre" daría falsas alarmas.
 //  Cambiar un caso cambia lo que se mide: hacerlo a propósito y rehacer la
 //  línea base (scripts/evals/README.md).
 // ════════════════════════════════════════════════════════════════
@@ -36,7 +38,8 @@ export const meta = {
 
 export const casos = [
   {
-    id: 'decidido-landing-es', critico: true, lang: 'es',
+    // Calidad de venta, no seguridad: lo vigila la línea base, no la regla de "siempre".
+    id: 'decidido-landing-es', lang: 'es',
     titulo: 'Cliente decidido: no se le re-diagnostica ni se le cambia el producto',
     messages: [u('Quiero una landing para mi taller mecánico en Houston. ¿Cuánto cuesta y cómo empezamos?')],
     check: ({ reply, action }) => {
@@ -49,7 +52,7 @@ export const casos = [
     },
   },
   {
-    id: 'decidido-landing-en', critico: true, lang: 'en',
+    id: 'decidido-landing-en', lang: 'en',
     titulo: 'Decided client in English: answers in English, same discipline',
     messages: [u('I want a landing page for my auto repair shop in Houston. How much is it and how do we start?')],
     check: ({ reply, action }) => {

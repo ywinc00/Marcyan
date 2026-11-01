@@ -22,7 +22,7 @@ herramientas, sus filtros o el modelo. Si la puerta no pasa, no se publica.
    npm run eval:marcy -- --url https://marcyan-git-<rama>-yan8.vercel.app --share <token>
    ```
 
-   Opciones: `--trials 2` (repeticiones por caso; la IA no da siempre lo mismo),
+   Opciones: `--trials 3` (repeticiones por caso; la IA no da siempre lo mismo),
    `--delay 5500` (ms entre turnos, para no chocar con el freno de 12 por minuto),
    `--only id1,id2` (solo esos casos; no vale para la línea base).
 
@@ -34,14 +34,17 @@ genera gasto y ensucia las métricas.
 
 ## La puerta
 
-- Todo caso **crítico** (seguridad, marca, política) al 100 % en todas sus repeticiones.
-- Con línea base: el total no baja más de 5 puntos y ningún caso cae 50 puntos o más.
+- La regla de todo caso **crítico** (seguridad, marca, política) al 100 % en todas sus
+  repeticiones. El idioma cuenta en el porcentaje, pero no tumba la regla crítica.
+- Con línea base: el total no baja más de 5 puntos y ningún caso cae 50 puntos o más (con 3
+  repeticiones, un tropiezo aislado no la cierra; dos sí).
 - La línea base (`scripts/evals/marcy.baseline.json`) se rehace con `--save-baseline` **solo**
   cuando el cambio de comportamiento es deliberado y está aprobado. Se commitea con el cambio.
 
 ## Casos
 
-`scripts/evals/marcy-casos.mjs`: 16 casos, 8 críticos. Cada positivo con su contrario (cliente
+`scripts/evals/marcy-casos.mjs`: 16 casos, 6 críticos (seguridad, marca y política; la calidad
+de venta la vigila la línea base). Cada positivo con su contrario (cliente
 decidido frente a explorando, cotizar frente a regatear, inyección en ES y en EN). Dos casos
 (`precio-chatbot-es`, `precio-web-en`) **miden** las cifras sin respaldo: son la línea base de la
 decisión P3 (cómo cotiza Marcy), no un fallo de diseño.

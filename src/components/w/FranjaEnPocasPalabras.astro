@@ -1,0 +1,109 @@
+---
+// Franja "En pocas palabras" (design/rediseno-workos.md §3.2; W-CORE-23 aligerada,
+// I-02, revisión 1 B-01). Sustituye a la caja "Respuesta directa":
+// · Va JUSTO ANTES de PreguntasFrecuentes (o del cierre si no hay FAQ), nunca en
+//   las dos primeras posiciones tras el hero (R1 de §4). La posición la pone la página.
+// · Rótulo mono 12 al 60 % (no compite con el eyebrow); pregunta answer.q como
+//   <h2 id="answer-q"> 24/500 centrada; respuesta answer.a VERBATIM en 760 px 18/1.6.
+// · `cols` (opcional; en hubs, sin columnas): qué es · desde cuánto · en cuánto
+//   tiempo, construidas SOLO con datos existentes que pasa la página.
+// · `source` en línea mono 12; con `verified` lleva el sello W-CONV-52.
+// Sigue en el HTML para AEO. Cerrojo 5: sale de v3, TODO su CSS va aquí.
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Col { title: string; text: string; link?: { label: string; href: string; track?: string } }
+interface Props {
+  q: string;
+  a: string;
+  source?: string;
+  /** Fecha real de verificación de la fuente (p. ej. "1 de noviembre de 2026"). */
+  verified?: string;
+  cols?: Col[];
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { q, a, source, verified, cols, lang = 'es', class: cls } = Astro.props;
+const L = lang === 'en'
+  ? { tag: 'In short', source: 'Source', verified: 'Last verified' }
+  : { tag: 'En pocas palabras', source: 'Fuente', verified: 'Verificado el' };
+---
+<section class:list={['w-short', cls]} aria-labelledby="answer-q">
+  <p class="w-short__tag">{L.tag}</p>
+  <h2 class="w-short__q" id="answer-q">{q}</h2>
+  <p class="w-short__a">{a}</p>
+
+  {source && (
+    <div class="w-short__src">
+      {verified && <Icon name="lucide:circle-check" class="w-short__check" />}
+      {verified && <p class="w-short__line">{L.verified} {verified}</p>}
+      <p class="w-short__line w-short__line--src">{L.source}: {source}</p>
+    </div>
+  )}
+
+  {cols && cols.length > 0 && (
+    <div class="w-short__cols">
+      {cols.map((c) => (
+        <div class="w-short__col">
+          <h3 class="w-short__ctitle">{c.title}</h3>
+          <p class="w-short__ctext">{c.text}</p>
+          {c.link && (
+            <Button variant="link" href={c.link.href} data-track={c.link.track} class="w-short__clink">{c.link.label}</Button>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+</section>
+
+<style>
+  /* Móvil: a la izquierda (un párrafo largo centrado no se lee); centrada desde --md. */
+  .w-short {
+    display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-width: 0;
+  }
+  @media (--md) { .w-short { align-items: center; text-align: center; } }
+  .w-short__tag {
+    margin: 0 0 16px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+  }
+  .w-short__q {
+    margin: 0; max-width: 760px; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: 20px; line-height: 1.25; letter-spacing: -0.02em; color: var(--w-ink); text-wrap: balance;
+  }
+  @media (--md) { .w-short__q { font-size: var(--w-h3); line-height: var(--w-lh-h3); } }
+  .w-short__a {
+    margin: 16px 0 0; max-width: 760px; font-family: var(--font-body); font-weight: 400;
+    font-size: 17px; line-height: 1.6; color: var(--w-ink-80); text-wrap: pretty;
+  }
+  @media (--md) { .w-short__a { font-size: 18px; } }
+
+  /* Sello W-CONV-52: check en círculo, fecha y fuente, centrados. */
+  .w-short__src {
+    display: flex; flex-direction: column; align-items: inherit; gap: 4px; margin-top: 24px;
+  }
+  .w-short__src :global(.w-short__check) { width: 16px; height: 16px; color: var(--w-ink-60); margin-bottom: 4px; }
+  .w-short__line {
+    margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.4;
+    color: var(--w-ink-60);
+  }
+  .w-short__line--src { color: var(--w-ink-60); }
+
+  /* Columnas (W-CORE-23): 3 de ~395, título 20/500 + 2 líneas 16/24 + enlace. */
+  .w-short__cols {
+    display: grid; grid-template-columns: 1fr; gap: 32px; width: 100%; margin-top: 56px;
+  }
+  @media (--md) {
+    .w-short__cols { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 64px; }
+  }
+  .w-short__col { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+  @media (--md) { .w-short__col { align-items: center; padding-inline: 12px; } }
+  .w-short__ctitle {
+    margin: 0; font-family: var(--font-display); font-weight: 500; font-size: var(--w-h4);
+    line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .w-short__ctext {
+    margin: 0; max-width: 300px; font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+    color: var(--fg-secondary);
+  }
+  .w-short__col :global(.w-short__clink) { margin-top: -4px; }
+</style>

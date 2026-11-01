@@ -1,0 +1,224 @@
+---
+// Cierre en dos tarjetas por temperatura (design/rediseno-workos.md §3.2; W-CORE-15).
+// Sustituye a CtaBand en las páginas v3 (y en los hubs, ola 4).
+// · Grande (fría, decidida): titular 32/40, prueba real 16/24 en 340 px y el TRÍO
+//   contractual exactamente una vez: a.ctaband__act--form[proposal_requested] → #contacto,
+//   a.ctaband__act--wa[whatsapp_clicked], a.ctaband__act--call[call_clicked].
+//   Dominante por dispositivo SIN `order` (WCAG 1.3.2/2.4.3): el DOM es fijo
+//   (formulario · WhatsApp · llamar) y solo cambia la piel por punto de corte:
+//   escritorio = formulario como botón principal; móvil = Llamar como principal.
+// · Pequeña (templada): diagnóstico, "Pregúntale a Marcy" (evento mrc:ask con texto
+//   FIJO de la página, sin datos del visitante) o portafolio, con enlace con chevron.
+// · tel/wa SIEMPRE por props (nunca calculados aquí).
+// El botón principal reproduce la piel de Button variant="primary" (intacta) y el
+// enlace la de variant="link": los dos estados viven en el mismo <a> porque cambian
+// por punto de corte. Cerrojo 5: sale de v3, TODO su CSS va aquí.
+import Button from '../ui/Button.astro';
+import { t, type Lang } from '../../i18n/ui';
+
+interface Warm {
+  kind: 'diagnostico' | 'marcy' | 'portafolio';
+  title: string;
+  text: string;
+  /** Rótulo del enlace de la tarjeta pequeña. */
+  cta: string;
+  href?: string;
+  /** Texto fijo que se envía a Marcy (solo kind="marcy"). */
+  ask?: string;
+}
+interface Props {
+  titleHtml: string;
+  proof: string;
+  city?: 'houston' | 'miami';
+  tel: string;
+  wa: string;
+  lang?: Lang;
+  warm: Warm;
+  grad?: boolean;
+  formLabel?: string;
+  id?: string;
+  class?: string;
+}
+const {
+  titleHtml, proof, city = 'houston', tel, wa, lang = 'es', warm, grad = false,
+  formLabel, id = 'cierre', class: cls,
+} = Astro.props;
+const ui = t(lang);
+const form = formLabel ?? (lang === 'en' ? 'Get my free proposal' : 'Propuesta gratis');
+const titleId = `${id}-title`;
+const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
+---
+<section class:list={['w-close', cls]} id={id} aria-labelledby={titleId} data-city={city}>
+  <div class="w-close__grid">
+    <article class="w-close__card w-close__card--big">
+      <div class="w-close__body">
+        <h2 class:list={['w-close__title', grad && 'w-close__title--grad']} id={titleId} set:html={titleHtml} />
+        <p class="w-close__proof">{proof}</p>
+      </div>
+      <div class="w-close__acts">
+        <a class="w-close__act ctaband__act ctaband__act--form" href="#contacto" data-track="proposal_requested">
+          <span>{form}</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+        <a class="w-close__act ctaband__act ctaband__act--wa" href={wa} data-track="whatsapp_clicked">
+          <span>WhatsApp</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+        <a class="w-close__act ctaband__act ctaband__act--call" href={tel} data-track="call_clicked">
+          <span>{ui.cta.call}</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+      </div>
+    </article>
+
+    <article class="w-close__card w-close__card--warm">
+      <div class="w-close__body">
+        <h3 class="w-close__wtitle">{warm.title}</h3>
+        <p class="w-close__wtext">{warm.text}</p>
+      </div>
+      <div class="w-close__wacts">
+        {warm.kind === 'marcy'
+          ? <Button variant="link" data-w-ask={warm.ask ?? warm.title} data-track="marcy_ask_clicked">{warm.cta}</Button>
+          : <Button variant="link" href={warm.href} data-track={warmTrack}>{warm.cta}</Button>}
+      </div>
+    </article>
+  </div>
+</section>
+
+<script>
+  // "Pregúntale a Marcy": texto FIJO por página (data-w-ask), sin datos del
+  // visitante. ChatWidget lo envía al momento y consume un turno con sus topes.
+  document.querySelectorAll<HTMLElement>('.w-close [data-w-ask]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = btn.dataset.wAsk || '';
+      if (text) window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text } }));
+    });
+  });
+</script>
+
+<style>
+  .w-close { min-width: 0; }
+  .w-close__grid { display: grid; grid-template-columns: 1fr; gap: 18px; min-width: 0; }
+  @media (--lg) {
+    .w-close__grid { grid-template-columns: minmax(0, 728fr) minmax(0, 355fr); }
+  }
+
+  .w-close__card {
+    position: relative; isolation: isolate; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 40px;
+    padding: 28px 24px; border: 1px solid var(--w-line); border-radius: var(--w-r-obj);
+    box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--md) { .w-close__card { padding: 32px; min-height: 390px; } }
+  @media (--hover-fine) { .w-close__card:hover { border-color: var(--w-line-strong); } }
+
+  /* Grande: superficie de objeto con franjas de luz en el tercio inferior
+     (W-CORE-15), que se funden hacia arriba y se aclaran bajo los enlaces. */
+  .w-close__card--big { background: var(--w-s2); }
+  .w-close__card--big::before {
+    content: ''; position: absolute; inset: auto 0 0 0; height: 66%; z-index: -1; pointer-events: none;
+    background: var(--w-stripes);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
+  }
+  .w-close__card--warm { background: var(--w-s1); }
+
+  .w-close__body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .w-close__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2-small); line-height: 1.25; letter-spacing: -0.03em; color: var(--w-ink);
+    text-wrap: balance;
+  }
+  .w-close__title :global(em) { font-style: normal; color: var(--w-accent); }
+  .w-close__title--grad {
+    background: var(--w-grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  .w-close__title--grad :global(em) { color: inherit; }
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .w-close__title--grad { color: var(--accent-gold); -webkit-text-fill-color: currentColor; }
+  }
+  .w-close__proof {
+    margin: 0; max-width: 340px; font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+    color: var(--w-ink-70);
+  }
+  .w-close__wtitle {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: 24px; line-height: 1.3; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  @media (--md) { .w-close__wtitle { font-size: 27px; line-height: 36px; } }
+  .w-close__wtext {
+    margin: 0; font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70);
+  }
+
+  /* ── Trío ─────────────────────────────────────────────────────────
+     Piel de enlace (variant="link") por defecto; el dominante de cada
+     dispositivo toma la piel del botón principal. */
+  .w-close__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; min-width: 0; }
+  .w-close__act {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--tap-min); padding: 8px 0; white-space: nowrap; text-decoration: none;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); background: none; border: 0;
+    border-radius: var(--radius-md);
+    transition: color var(--w-dur-micro) var(--w-ease-ui), background var(--duration-fast) var(--ease-out-expo),
+                box-shadow var(--duration-base), transform var(--duration-fast);
+  }
+  .w-close__chev {
+    font-size: 18px; line-height: 1; color: var(--w-accent);
+    transition: transform var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .w-close__act:hover { color: var(--w-accent); }
+    .w-close__act:hover .w-close__chev { transform: translateX(3px); }
+  }
+  .w-close__act:focus-visible { color: var(--w-accent); }
+  .w-close__act:focus-visible .w-close__chev { transform: translateX(3px); }
+
+  /* Piel del botón principal (= Button primary lg, intacto). */
+  .w-close__acts .ctaband__act--call {
+    padding: 14px 28px; font-weight: 600; letter-spacing: 0.01em;
+    background: var(--accent-gold); color: var(--fg-inverse);
+  }
+  /* Móvil: Llamar domina y ocupa la fila de abajo, a todo el ancho. */
+  .w-close__acts .ctaband__act--call { flex: 1 0 100%; margin-top: 8px; }
+  .w-close__acts .ctaband__act--call .w-close__chev { display: none; }
+  .w-close__acts .ctaband__act--call:focus-visible { color: var(--fg-inverse); }
+  .w-close__acts .ctaband__act--call:active { transform: scale(0.97); }
+  @media (--hover-fine) {
+    .w-close__acts .ctaband__act--call:hover {
+      color: var(--fg-inverse);
+      background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold);
+    }
+  }
+
+  /* Escritorio: el formulario domina; Llamar vuelve a enlace. */
+  @media (--md) {
+    .w-close__acts .ctaband__act--call {
+      flex: 0 0 auto; margin-top: 0; padding: 8px 0; font-weight: 500; letter-spacing: 0;
+      background: none; color: var(--w-ink);
+    }
+    .w-close__acts .ctaband__act--call .w-close__chev { display: inline; }
+    .w-close__acts .ctaband__act--call:focus-visible { color: var(--w-accent); }
+    .w-close__acts .ctaband__act--form:focus-visible { color: var(--fg-inverse); }
+    .w-close__acts .ctaband__act--call:active { transform: none; }
+    .w-close__acts .ctaband__act--form {
+      padding: 14px 28px; font-weight: 600; letter-spacing: 0.01em;
+      background: var(--accent-gold); color: var(--fg-inverse);
+    }
+    .w-close__acts .ctaband__act--form .w-close__chev { display: none; }
+    .w-close__acts .ctaband__act--form:active { transform: scale(0.97); }
+  }
+  @media (--md) and (--hover-fine) {
+    .w-close__acts .ctaband__act--call:hover { color: var(--w-accent); background: none; box-shadow: none; }
+    .w-close__acts .ctaband__act--form:hover {
+      color: var(--fg-inverse);
+      background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold);
+    }
+  }
+
+  .w-close__wacts { min-width: 0; }
+
+  @media (--motion-reduce) {
+    .w-close__card, .w-close__act, .w-close__chev { transition: none; }
+    .w-close__act:hover .w-close__chev, .w-close__act:focus-visible .w-close__chev { transform: none; }
+    .w-close__acts .ctaband__act--call:active, .w-close__acts .ctaband__act--form:active { transform: none; }
+  }
+</style>

@@ -1,0 +1,75 @@
+---
+// Preguntas a la vista (design/rediseno-workos.md §3.2; W-PROOF-26): rejilla 2×N,
+// todas visibles (no es acordeón). Icono burbuja Lucide en cuadro de 24, pregunta
+// 19/500, respuesta 15. Emite FAQPage idéntico al texto visible.
+import Icon from '../ui/Icon.astro';
+import { faqPage } from '../../lib/schema';
+
+interface Item { q: string; a: string }
+interface Props {
+  items: Item[];
+  cols?: 2;
+  titleHtml?: string;
+  tag?: string;
+  id?: string;
+  jsonld?: boolean;
+  class?: string;
+}
+const { items, titleHtml, tag, id, jsonld = true, class: cls } = Astro.props;
+const ld = faqPage(items);
+const titleId = id ? `${id}-title` : undefined;
+---
+<section class:list={['w-qopen', cls]} id={id} aria-labelledby={titleHtml ? titleId : undefined}>
+  {(tag || titleHtml) && (
+    <header class="w-qopen__head">
+      {tag && <p class="w-qopen__tag">{tag}</p>}
+      {titleHtml && <h2 class="w-qopen__title" id={titleId} set:html={titleHtml} />}
+    </header>
+  )}
+  <dl class="w-qopen__grid">
+    {items.map((it) => (
+      <div class="w-qopen__item">
+        <dt class="w-qopen__q">
+          <span class="w-qopen__ico" aria-hidden="true"><Icon name="lucide:message-circle-question" /></span>
+          <span>{it.q}</span>
+        </dt>
+        <dd class="w-qopen__a">{it.a}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+{jsonld && <script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />}
+
+<style>
+  .w-qopen { min-width: 0; }
+  .w-qopen__head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+  .w-qopen__tag {
+    margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+  }
+  .w-qopen__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2-small); line-height: 1.2; letter-spacing: -0.03em; color: var(--w-ink);
+  }
+  .w-qopen__title :global(em) { font-style: normal; color: var(--w-accent); }
+
+  .w-qopen__grid { display: grid; grid-template-columns: 1fr; gap: 36px; margin: 0; }
+  @media (--md) { .w-qopen__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 64px; } }
+  .w-qopen__item { min-width: 0; }
+  .w-qopen__q {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 1.3;
+    letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  @media (--md) { .w-qopen__q { font-size: 19px; } }
+  .w-qopen__ico {
+    display: grid; place-items: center; flex: none; width: 24px; height: 24px; margin-top: 1px;
+    border-radius: var(--w-r-cell); background: rgba(var(--w-accent-rgb), 0.14); color: var(--w-accent);
+  }
+  .w-qopen__ico :global(svg) { width: 14px; height: 14px; }
+  .w-qopen__a {
+    margin: 8px 0 0 36px; font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+    color: var(--fg-secondary);
+  }
+</style>

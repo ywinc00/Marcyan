@@ -1,0 +1,85 @@
+---
+// Prosa local (W-CONV-30, §3.3): izquierda 330 px con titular 30/500 a dos tonos
+// (1.ª parte al 45 %, 2.ª al 100 %); derecha 763 px con los `local.paragraphs`
+// VERBATIM (19/1.6, set:html) y, si hay `items`, rejilla 2×2 (icono Lucide en
+// cuadro 40 radio 8, título 21/500, texto 15/24). Sin animación. Móvil: apilado.
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  titleTone1: string;
+  titleTone2: string;
+  /** HTML verbatim de `local.paragraphs`. */
+  paragraphs: string[];
+  items?: { icon: string; title: string; text: string }[];
+  /** id del titular (para aria-labelledby de la sección que lo monte). */
+  id?: string;
+  class?: string;
+}
+const { titleTone1, titleTone2, paragraphs, items, id, class: cls } = Astro.props;
+---
+<div class:list={['w-prose', cls]}>
+  <h2 class="w-prose__title" id={id}>
+    <span class="w-prose__tone" set:html={titleTone1} />{' '}<span set:html={titleTone2} />
+  </h2>
+  <div class="w-prose__body">
+    {paragraphs.map((html) => <p class="w-prose__p" set:html={html} />)}
+    {items && items.length > 0 && (
+      <ul class="w-prose__grid">
+        {items.map((it) => (
+          <li class="w-prose__item">
+            <span class="w-prose__icon"><Icon name={it.icon} /></span>
+            <h3 class="w-prose__h">{it.title}</h3>
+            <p class="w-prose__t">{it.text}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+
+<style>
+  .w-prose { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .w-prose__title {
+    margin: 0;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(1.5rem, 1.25rem + 0.7vw, 1.875rem); line-height: 1.2; letter-spacing: -0.04em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .w-prose__tone { color: var(--w-ink-45); }
+  /* El <em> del dato (si viene) no cambia de estilo: el tono ya lo da la frase. */
+  .w-prose__title :global(em) { font-style: normal; }
+  .w-prose__body { min-width: 0; }
+  .w-prose__p {
+    margin: 0 0 1.1em;
+    font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--w-ink-80);
+  }
+  .w-prose__p:last-of-type { margin-bottom: 0; }
+  .w-prose__p :global(strong) { color: var(--w-ink); font-weight: 600; }
+  .w-prose__p :global(a) { color: var(--w-ink); text-decoration: underline; text-decoration-color: rgba(var(--accent-gold-rgb), 0.5); text-underline-offset: 3px; }
+
+  .w-prose__grid {
+    list-style: none; margin: 48px 0 0; padding: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px;
+  }
+  .w-prose__icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--w-r-cell, 8px);
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    color: var(--w-accent, var(--accent-gold));
+  }
+  .w-prose__icon :global(svg) { width: 20px; height: 20px; }
+  .w-prose__h {
+    margin: 20px 0 0;
+    font-family: var(--font-display); font-weight: 500; font-size: 21px; line-height: 1.25;
+    letter-spacing: -0.03em; color: var(--w-ink);
+  }
+  .w-prose__t { margin: 8px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--fg-secondary); }
+
+  @media (--md) {
+    .w-prose__p { font-size: 19px; line-height: 1.6; }
+    .w-prose__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 56px; }
+  }
+  @media (--lg) {
+    .w-prose { grid-template-columns: minmax(0, 330px) minmax(0, 763px); justify-content: space-between; gap: 64px; }
+  }
+</style>

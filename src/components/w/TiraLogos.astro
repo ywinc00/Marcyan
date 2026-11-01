@@ -1,0 +1,51 @@
+---
+// Tira de clientes bajo el hero (W-CORE-03, §3.3): fila centrada, alto 22 px,
+// monocromo crema al 45 %, ~90 px bajo el objeto del hero, con antetítulo mono 12
+// al 60 %. Fija: los 4 clientes reales. No hay logos de clientes en el repo:
+// hasta que el dueño los dé, nombres en Space Grotesk 500 18 px con translate="no".
+// En páginas de Miami NO se pinta (los 4 son de Houston y Orlando: insinuaría
+// clientes en Miami). Móvil: 2×2.
+interface Props {
+  lang?: 'es' | 'en';
+  /** Ciudad de la página: en 'miami' el componente no pinta nada. */
+  city?: 'houston' | 'miami';
+  class?: string;
+}
+const { lang = 'es', city, class: cls } = Astro.props;
+const label = lang === 'en' ? 'Websites we built, in use' : 'Webs nuestras en uso';
+const CLIENTES = ['Texas Rush Remove', 'Rosy Nails & Care', "Julio's Landscape TX", 'Move Junk Away'];
+---
+{city !== 'miami' && (
+  <div class:list={['w-logos', cls]}>
+    <p class="w-logos__label">{label}</p>
+    <ul class="w-logos__row">
+      {CLIENTES.map((n) => <li class="w-logos__name" translate="no">{n}</li>)}
+    </ul>
+  </div>
+)}
+
+<style>
+  .w-logos { margin-top: clamp(56px, 3rem + 2.4vw, 90px); text-align: center; }
+  .w-logos__label {
+    margin: 0 0 20px;
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro, 0.1em);
+    color: var(--w-ink-60);
+  }
+  .w-logos__row {
+    list-style: none; margin: 0 auto; padding: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px;
+    max-width: var(--w-rail-max, 1200px);
+  }
+  .w-logos__name {
+    display: flex; align-items: center; justify-content: center; min-height: 22px;
+    font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 22px;
+    letter-spacing: -0.01em; text-align: center; text-wrap: balance;
+    color: rgba(var(--star-rgb), 0.45);
+  }
+  @media (--lt-sm) { .w-logos__name { font-size: 16px; } }
+  @media (--md) {
+    .w-logos__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px clamp(40px, 5vw, 88px); }
+    .w-logos__name { white-space: nowrap; }
+  }
+</style>

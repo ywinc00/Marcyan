@@ -1,0 +1,60 @@
+---
+// Ficha lateral (W-PROOF-06, §3.3): columna de 379 px, pegajosa con
+// top: calc(var(--nav-h) + 40px) durante el cuerpo del caso. Caja del nombre
+// --w-s2 padding 24 radio 8 (~145 px; no hay logos de clientes en el repo: el
+// nombre va en Space Grotesk, translate="no"); tabla de filas con borde 1 px
+// radio 8, etiqueta 14 / valor 14 --fg-secondary, filas ~70 px.
+// Para que pegue, quien la monta la pone en una columna de rejilla (la ficha ya
+// trae align-self:start) sin overflow oculto en los ancestros.
+// Móvil: no pegajosa; va entre la entradilla y el cuerpo.
+interface Props {
+  logoName: string;
+  rows: { label: string; value: string; href?: string }[];
+  sticky?: boolean;
+  /** Etiqueta accesible de la ficha ("Ficha del proyecto"). */
+  label?: string;
+  class?: string;
+}
+const { logoName, rows, sticky = true, label = 'Ficha del proyecto', class: cls } = Astro.props;
+---
+<aside class:list={['w-side', sticky && 'w-side--sticky', cls]} aria-label={label}>
+  <div class="w-side__logo"><span translate="no">{logoName}</span></div>
+  <dl class="w-side__table">
+    {rows.map((r) => (
+      <div class="w-side__row">
+        <dt class="w-side__k">{r.label}</dt>
+        <dd class="w-side__v">{r.href ? <a href={r.href}>{r.value}</a> : r.value}</dd>
+      </div>
+    ))}
+  </dl>
+</aside>
+
+<style>
+  .w-side { width: 100%; max-width: 379px; align-self: start; display: grid; gap: 24px; }
+  @media (--lg) {
+    .w-side--sticky { position: sticky; top: calc(var(--nav-h, 64px) + 40px); }
+  }
+  .w-side__logo {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 145px; padding: 24px; text-align: center;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-cell, 8px); box-shadow: var(--w-edge);
+    font-family: var(--font-display); font-weight: 500; font-size: 26px; line-height: 1.15;
+    letter-spacing: -0.03em; color: var(--w-ink); text-wrap: balance;
+  }
+  .w-side__table {
+    margin: 0;
+    border: 1px solid var(--w-line); border-radius: var(--w-r-cell, 8px);
+    background: var(--w-s1-a);
+  }
+  .w-side__row {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px;
+    min-height: 70px; padding: 22px 24px; align-items: start;
+  }
+  .w-side__row + .w-side__row { border-top: 1px solid var(--w-line); }
+  .w-side__k, .w-side__v { margin: 0; font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+  .w-side__k { color: var(--w-ink); font-weight: 500; }
+  .w-side__v { color: var(--fg-secondary); }
+  .w-side__v a { color: var(--fg-secondary); text-decoration: none; transition: color var(--w-dur-micro, 150ms) var(--w-ease-ui, ease); }
+  .w-side__v a:hover, .w-side__v a:focus-visible { color: var(--w-accent, var(--accent-gold)); }
+</style>

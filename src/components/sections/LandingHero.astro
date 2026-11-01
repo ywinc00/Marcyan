@@ -17,6 +17,7 @@ import Badge from '../ui/Badge.astro';
 import Button from '../ui/Button.astro';
 import Kicker from '../ui/Kicker.astro';
 import Icon from '../ui/Icon.astro';
+import { t, langFromPath, type Lang } from '../../i18n/ui';
 
 interface Props {
   badge?: string;
@@ -29,11 +30,14 @@ interface Props {
   chips?: string[];
   tone?: 'gold' | 'teal';
   variant?: 'landing' | 'header';
+  lang?: Lang;
 }
 const {
   badge, badgeIcon, kicker, h1, sub, primary, secondary,
   chips = [], tone = 'gold', variant = 'landing',
+  lang = langFromPath(Astro.url.pathname),
 } = Astro.props;
+const uih = t(lang);
 const isHeader = variant === 'header';
 const uid = 'lh' + Math.random().toString(36).slice(2, 7);
 ---
@@ -72,7 +76,7 @@ const uid = 'lh' + Math.random().toString(36).slice(2, 7);
           </div>
 
           {chips.length > 0 && (
-            <ul class="l-hero__chips" aria-label="Puntos clave">
+            <ul class="l-hero__chips" aria-label={uih.landing.keyPoints}>
               {chips.map((ch) => (
                 <li><span class="l-hero__chip-dot" aria-hidden="true"></span>{ch}</li>
               ))}

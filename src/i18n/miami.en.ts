@@ -10,7 +10,7 @@
 // presence, NOT price. Positioning: bilingual studio (never "hispanic-label-in-EN").
 // ─────────────────────────────────────────────────────────────
 
-import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
+import type { FaqItem, CrumbItem } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 
 export const miamiHub = {
@@ -44,19 +44,11 @@ export const miamiHub = {
     tag: 'Services in Miami',
     title: 'Everything for your business, in <em>one studio</em>',
     links: [
-      { label: 'Web design in Miami', href: '/en/miami/web-design', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template' },
-      { label: 'Local SEO in Miami', href: '/en/miami/local-seo', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search' },
-      { label: 'Conversational AI in Miami', href: '/en/miami/conversational-ai', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square' },
-      { label: 'Online store in Miami', href: '/en/miami/ecommerce', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag' },
-    ] as RelatedLink[],
-  },
-  barrios: {
-    tag: 'By neighborhood',
-    title: 'Solutions by <em>neighborhood</em>',
-    links: [
-      { label: 'Doral (Doralzuela)', href: '/en/miami/doral', desc: 'Web design, SEO and AI for Doral businesses. Bilingual, from $1,500.', icon: 'lucide:map-pin' },
-      { label: 'Hialeah', href: '/en/miami/hialeah', desc: 'Web, local SEO and Spanish-language AI for Hialeah businesses.', icon: 'lucide:map-pin' },
-    ] as RelatedLink[],
+      { label: 'Web design in Miami', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template' },
+      { label: 'Local SEO in Miami', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search' },
+      { label: 'Conversational AI in Miami', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square' },
+      { label: 'Online store in Miami', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag' },
+    ] as Array<Omit<RelatedLink, 'href'> & { href?: string }>,
   },
   local: {
     tag: 'Miami',
@@ -72,7 +64,6 @@ export const miamiHub = {
     title: 'Pricing and more',
     links: [
       { label: 'Pricing and plans', href: '/en/pricing', desc: 'Every service with its starting price and what it includes.', icon: 'lucide:tag' },
-      { label: 'AI SEO (so AI recommends you)', href: '/en/houston/ai-seo', desc: 'So ChatGPT and Gemini recommend you. Free diagnostic.', icon: 'marcyan-ai' },
       { label: 'Studio in Houston', href: '/en/houston', desc: 'Our home base, with verifiable case studies.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
@@ -94,13 +85,4 @@ export const miamiHub = {
     primary: { label: 'Get my free proposal', href: '#contacto' },
     tone: 'gold' as const,
   },
-  // ItemList (schema) — the services offered in Miami, each linking to its landing.
-  itemList: [
-    { name: 'Web Design in Miami', path: '/en/miami/web-design' },
-    { name: 'Local SEO in Miami', path: '/en/miami/local-seo' },
-    { name: 'Conversational AI in Miami', path: '/en/miami/conversational-ai' },
-    { name: 'Online Store in Miami', path: '/en/miami/ecommerce' },
-    { name: 'Web Design and SEO in Doral', path: '/en/miami/doral' },
-    { name: 'Web Design and SEO in Hialeah', path: '/en/miami/hialeah' },
-  ] as ListLink[],
 };

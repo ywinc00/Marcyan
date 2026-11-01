@@ -21,13 +21,15 @@
 // Fuente: public/assets/bot/marcy-{hero,mini}.{webp,png} (ver README.md de esa
 // carpeta para regenerarlos desde el render original).
 // ─────────────────────────────────────────────────────────────
-interface Props { variant?: 'hero' | 'mini'; defer?: boolean; class?: string; }
-const { variant = 'mini', defer = false, class: cls = '' } = Astro.props;
+import { t, type Lang } from '../../i18n/ui';
+
+interface Props { variant?: 'hero' | 'mini'; defer?: boolean; class?: string; lang?: Lang }
+const { variant = 'mini', defer = false, class: cls = '', lang = 'es' } = Astro.props;
 
 const dims = variant === 'hero' ? { w: 364, h: 512 } : { w: 256, h: 256 };
 // El héroe lleva alt descriptivo (la imagen aporta significado en la bienvenida);
 // el mini es DECORATIVO (siempre va junto al texto "Marcy") → alt vacío.
-const alt = variant === 'hero' ? 'Marcy, el asistente de Marcyan' : '';
+const alt = variant === 'hero' ? t(lang).chat.marcyAlt : '';
 const webp = `/assets/bot/marcy-${variant}.webp`;
 const png = `/assets/bot/marcy-${variant}.png`;
 // GIF 1×1 transparente (placeholder mientras el héroe está diferido).

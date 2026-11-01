@@ -36,7 +36,7 @@ const breadcrumb = [
 <Layout title={t.metaTitle} description={t.metaDesc} lang="es" path="diagnostico">
   <ServiceLd slot="head" {...service} />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={{ ...clusterNav, cta: { ...clusterNav.cta, href: '/es#contacto' } }} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero

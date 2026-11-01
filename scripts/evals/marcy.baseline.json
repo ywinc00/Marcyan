@@ -1,0 +1,27 @@
+{
+  "suite": "marcy",
+  "fecha": "2026-11-01T00-53-02",
+  "trials": 3,
+  "total": 1,
+  "casos": {
+    "decidido-landing-es": 1,
+    "decidido-landing-en": 1,
+    "explorando-es": 1,
+    "precio-chatbot-es": 1,
+    "regateo-es": 1,
+    "precio-solo-es": 1,
+    "cierre-tras-precio-es": 1,
+    "cierre-tras-precio-en": 1,
+    "inyeccion-prompt-es": 1,
+    "inyeccion-rol-en": 1,
+    "persona-es": 1,
+    "enlace-precios-es": 1,
+    "calculadora-es": 1,
+    "plazos-es": 1,
+    "garantia-es": 1,
+    "fuera-alcance-es": 1,
+    "cambio-de-idea-es": 1,
+    "precio-web-en": 1,
+    "privado-es": 1
+  }
+}

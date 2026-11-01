@@ -216,6 +216,37 @@ check('S3: telephone+address DENTRO del ld+json sigue aprobando', () => {
   assert.equal(run(html).checks.S3, 'pass');
 });
 
+// ── Puerta técnica 2026-10-31: frenos guardados del endpoint ─────────
+{
+  const { diagnosticAllowed, reportAiAllowed, reportEmailAllowed } = await import('../api/diagnostic.mjs');
+  const { memoryStore, LIMITS } = await import('../lib/ratelimit.mjs');
+  const t = async (name, fn) => { try { await fn(); pass++; } catch (e) { fails.push(name + ' → ' + e.message); } };
+  await t('freno: analizar 5 cada 10 min por conexión y reclamar lleva su propia cuenta', async () => {
+    const store = memoryStore(); const now = Date.UTC(2026, 9, 31, 15, 0, 0);
+    for (let i = 0; i < 5; i++) assert.equal(await diagnosticAllowed('analyze', '7.7.7.7', { store, now }), true);
+    assert.equal(await diagnosticAllowed('analyze', '7.7.7.7', { store, now }), false);
+    assert.equal(await diagnosticAllowed('claim', '7.7.7.7', { store, now }), true, 'reclamar no comparte cuenta');
+  });
+  await t('freno: el tope del día por conexión aguanta aunque se espacie', async () => {
+    const store = memoryStore(); let now = Date.UTC(2026, 9, 31, 1, 0, 0), ok = 0;
+    for (let i = 0; i < 40; i++) { if (await diagnosticAllowed('analyze', '8.8.8.1', { store, now })) ok++; now += 11 * 60 * 1000; }
+    assert.equal(ok, LIMITS.diagAnalyze[1].limit);
+  });
+  await t('informe por correo: 3 al día por dirección, sin importar mayúsculas ni conexión', async () => {
+    const store = memoryStore(); const now = Date.UTC(2026, 9, 31, 15, 0, 0);
+    for (let i = 0; i < 3; i++) assert.equal(await reportEmailAllowed(i ? 'victima@example.com' : ' Victima@Example.com ', { store, now }), true);
+    assert.equal(await reportEmailAllowed('VICTIMA@example.com', { store, now }), false);
+    assert.equal(await reportEmailAllowed('otra@example.com', { store, now }), true, 'otra dirección no comparte cuenta');
+    assert.equal(await reportEmailAllowed('', { store, now }), false, 'sin correo no hay envío');
+  });
+  await t('tope del sitio: pasado el máximo de informes con IA del día, no se llama a la IA', async () => {
+    const store = memoryStore(); const now = Date.UTC(2026, 9, 31, 15, 0, 0);
+    for (let i = 0; i < LIMITS.diagReportGlobal[0].limit; i++) assert.equal(await reportAiAllowed({ store, now }), true);
+    assert.equal(await reportAiAllowed({ store, now }), false);
+    assert.equal(await reportAiAllowed({ store, now: now + 86400 * 1000 }), true, 'al día siguiente vuelve');
+  });
+}
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) del diagnóstico fallaron:\n - ` + fails.join('\n - '));
   process.exit(1);

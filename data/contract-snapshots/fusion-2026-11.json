@@ -1,0 +1,486 @@
+{
+  "name": "fusion-2026-11",
+  "createdAt": "2026-10-31T17:43:18.176Z",
+  "indexingCheckedAt": "2026-10-31T15:24:03.223Z",
+  "urls": {
+    "/es/houston/seo-local": {
+      "path": "/es/houston/seo-local",
+      "lang": "es",
+      "h1": "SEO local en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/seo-local",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/seo-local",
+        "x-default": "https://marcyanstudio.com/es/houston/seo-local"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/diseno-web": {
+      "path": "/es/houston/diseno-web",
+      "lang": "es",
+      "h1": "Diseño web en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/diseno-web",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/diseno-web",
+        "x-default": "https://marcyanstudio.com/es/houston/diseno-web"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Crawled - currently not indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/ia-conversacional": {
+      "path": "/es/houston/ia-conversacional",
+      "lang": "es",
+      "h1": "Asistente de IA para tu negocio en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/ia-conversacional",
+        "x-default": "https://marcyanstudio.com/es/houston/ia-conversacional"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Crawled - currently not indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/ecommerce": {
+      "path": "/es/houston/ecommerce",
+      "lang": "es",
+      "h1": "Diseño de tienda en línea en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/ecommerce",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/ecommerce",
+        "x-default": "https://marcyanstudio.com/es/houston/ecommerce"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/branding": {
+      "path": "/es/houston/branding",
+      "lang": "es",
+      "h1": "Diseño de logo y marca en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/branding",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/branding",
+        "x-default": "https://marcyanstudio.com/es/houston/branding"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/bienes-raices": {
+      "path": "/es/houston/bienes-raices",
+      "lang": "es",
+      "h1": "Sitios para agentes de bienes raíces en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/bienes-raices",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/bienes-raices",
+        "x-default": "https://marcyanstudio.com/es/houston/bienes-raices"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/contratistas": {
+      "path": "/es/houston/contratistas",
+      "lang": "es",
+      "h1": "Sitios web para contratistas en Houston",
+      "canonical": "https://marcyanstudio.com/es/houston/contratistas",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/contratistas",
+        "en": "https://marcyanstudio.com/en/houston/contractors",
+        "x-default": "https://marcyanstudio.com/es/houston/contratistas"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/katy": {
+      "path": "/es/houston/katy",
+      "lang": "es",
+      "h1": "Diseño web en Katy , para tu negocio local",
+      "canonical": "https://marcyanstudio.com/es/houston/katy",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/katy",
+        "x-default": "https://marcyanstudio.com/es/houston/katy"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Crawled - currently not indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/houston/sugar-land": {
+      "path": "/es/houston/sugar-land",
+      "lang": "es",
+      "h1": "Diseño web premium en Sugar Land",
+      "canonical": "https://marcyanstudio.com/es/houston/sugar-land",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/sugar-land",
+        "x-default": "https://marcyanstudio.com/es/houston/sugar-land"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/diseno-web": {
+      "path": "/es/miami/diseno-web",
+      "lang": "es",
+      "h1": "Diseño web en Miami",
+      "canonical": "https://marcyanstudio.com/es/miami/diseno-web",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/diseno-web",
+        "x-default": "https://marcyanstudio.com/es/miami/diseno-web"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/ia-conversacional": {
+      "path": "/es/miami/ia-conversacional",
+      "lang": "es",
+      "h1": "Asistente de IA para tu negocio en Miami",
+      "canonical": "https://marcyanstudio.com/es/miami/ia-conversacional",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/ia-conversacional",
+        "x-default": "https://marcyanstudio.com/es/miami/ia-conversacional"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/seo-local": {
+      "path": "/es/miami/seo-local",
+      "lang": "es",
+      "h1": "SEO local en Miami",
+      "canonical": "https://marcyanstudio.com/es/miami/seo-local",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/seo-local",
+        "x-default": "https://marcyanstudio.com/es/miami/seo-local"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/ecommerce": {
+      "path": "/es/miami/ecommerce",
+      "lang": "es",
+      "h1": "Diseño de tienda en línea en Miami",
+      "canonical": "https://marcyanstudio.com/es/miami/ecommerce",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/ecommerce",
+        "x-default": "https://marcyanstudio.com/es/miami/ecommerce"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Crawled - currently not indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/doral": {
+      "path": "/es/miami/doral",
+      "lang": "es",
+      "h1": "Diseño web y SEO para negocios en Doral",
+      "canonical": "https://marcyanstudio.com/es/miami/doral",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/doral",
+        "x-default": "https://marcyanstudio.com/es/miami/doral"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/miami/hialeah": {
+      "path": "/es/miami/hialeah",
+      "lang": "es",
+      "h1": "Diseño web y SEO para tu negocio en Hialeah",
+      "canonical": "https://marcyanstudio.com/es/miami/hialeah",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/miami/hialeah",
+        "x-default": "https://marcyanstudio.com/es/miami/hialeah"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Crawled - currently not indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/es/ia-para-pymes": {
+      "path": "/es/ia-para-pymes",
+      "lang": "es",
+      "h1": "IA para tu Negocio",
+      "canonical": "https://marcyanstudio.com/es/ia-para-pymes",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/ia-para-pymes",
+        "en": "https://marcyanstudio.com/en/ai-for-small-business",
+        "x-default": "https://marcyanstudio.com/es/ia-para-pymes"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.223Z"
+      }
+    },
+    "/en/houston/restaurants": {
+      "path": "/en/houston/restaurants",
+      "lang": "en",
+      "h1": "Websites for restaurants in Houston",
+      "canonical": "https://marcyanstudio.com/en/houston/restaurants",
+      "hreflang": {
+        "en": "https://marcyanstudio.com/en/houston/restaurants",
+        "x-default": "https://marcyanstudio.com/en/houston/restaurants"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.222Z"
+      }
+    },
+    "/en/houston/contractors": {
+      "path": "/en/houston/contractors",
+      "lang": "en",
+      "h1": "Websites for contractors in Houston",
+      "canonical": "https://marcyanstudio.com/en/houston/contractors",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/houston/contratistas",
+        "en": "https://marcyanstudio.com/en/houston/contractors",
+        "x-default": "https://marcyanstudio.com/es/houston/contratistas"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.222Z"
+      }
+    },
+    "/en/ai-for-small-business": {
+      "path": "/en/ai-for-small-business",
+      "lang": "en",
+      "h1": "AI for your business",
+      "canonical": "https://marcyanstudio.com/en/ai-for-small-business",
+      "hreflang": {
+        "es": "https://marcyanstudio.com/es/ia-para-pymes",
+        "en": "https://marcyanstudio.com/en/ai-for-small-business",
+        "x-default": "https://marcyanstudio.com/es/ia-para-pymes"
+      },
+      "jsonLdTypes": [
+        "BreadcrumbList",
+        "FAQPage",
+        "Service"
+      ],
+      "trio": {
+        "form": 1,
+        "wa": 1,
+        "call": 1
+      },
+      "parity": true,
+      "indexing": {
+        "coverageState": "Submitted and indexed",
+        "lastChecked": "2026-10-31T15:24:03.222Z"
+      }
+    }
+  }
+}

@@ -4,10 +4,12 @@
 //  el contacto simple del sitio y el chatbot caen aquí, en la tabla
 //  `leads` (LEAD-XXX propio), sin consumir un MRC-XXX de proyecto.
 //    1) Email al admin (notificación de nuevo lead)
-//    2) Email al cliente (auto-respuesta de confirmación)
+//    2) Email al cliente (auto-respuesta de confirmación), uno por
+//       dirección cada 24 h (puerta técnica, 2026-10-31)
+//    Si un correo no sale, aviso al panel (el lead ya está guardado).
 // ════════════════════════════════════════════════════════════════
 import { createLead } from '../lib/leads.mjs';
-import { createNotification } from '../lib/notifications.mjs';
+import { createNotification, notifyLeadEmailFailure } from '../lib/notifications.mjs';
 import { emailAdminNewLead, emailClientLeadConfirmation, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
 import { rateLimit, LIMITS } from '../lib/ratelimit.mjs';
@@ -128,7 +130,13 @@ export default async function handler(req, res) {
       ).then(() => { emailAdminOk = true; })
        .catch(err => console.error(`[contact] ${refId} admin email falló:`, err && err.message));
 
-      const clientP = data.email
+      // Una confirmación por correo cada 24 h (B-03, como el brief): un bot no
+      // puede usar este formulario para escribirle una y otra vez a un tercero.
+      // Cubo propio para no quitarle el día a la confirmación del brief.
+      const confirm = data.email
+        ? await rateLimit({ bucket: 'confirmEmailContact', key: data.email.toLowerCase(), limits: LIMITS.confirmEmailContact })
+        : { ok: false };
+      const clientP = data.email && confirm.ok
         ? withTimeout(
             emailClientLeadConfirmation({ refId, clientEmail: data.email, name: data.name }),
             8000, 'Resend client'
@@ -137,7 +145,10 @@ export default async function handler(req, res) {
         : Promise.resolve();
 
       await Promise.all([adminP, clientP]);
-      console.log(`[contact] ${refId} (${source}) · adminEmail=${emailAdminOk} · clientEmail=${emailClientOk}`);
+      // El lead ya está guardado: el aviso solo dice que el correo pudo no salir.
+      if (!emailAdminOk) await notifyLeadEmailFailure({ refId, who: 'admin', name: data.name || '' });
+      if (data.email && confirm.ok && !emailClientOk) await notifyLeadEmailFailure({ refId, who: 'client', name: data.name || '' });
+      console.log(`[contact] ${refId} (${source}) · adminEmail=${emailAdminOk} · clientEmail=${emailClientOk}${data.email && !confirm.ok ? ' (confirmación ya enviada hoy)' : ''}`);
     } else {
       console.warn(`[contact] ${refId} insertado · RESEND_API_KEY no configurada, sin emails`);
     }

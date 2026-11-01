@@ -137,7 +137,7 @@ export const catalog: CatalogProduct[] = [
       'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando alguien pregunta por tu servicio. Distinto de la IA conversacional (que atiende a tus clientes): aquí el objetivo es que la IA te encuentre y te cite.',
     tagline: 'Que la IA te recomiende cuando preguntan por tu servicio.',
     anchorUnit: 'diagnóstico',
-    href: '/es/houston/seo-para-ia',
+    href: '/es/diagnostico',
     ctaLabel: 'Pedir diagnóstico gratis',
     tone: 'teal',
     tiers: [
@@ -327,30 +327,6 @@ export const preciosPage = {
     tag: 'Nuestros precios',
     title: 'Lo que cuesta y lo que <em>incluye</em>',
     intro: 'Cada precio es un punto de partida real, «desde $». Mostramos primero la opción más accesible de cada servicio; el alcance final lo definimos juntos en una propuesta gratuita y honesta.',
-  },
-  related: {
-    tag: 'Guías de precio',
-    title: 'Respuestas concretas',
-    links: [
-      {
-        label: '¿Cuánto cuesta una página web en Houston?',
-        href: '/es/precios/cuanto-cuesta-una-pagina-web-houston',
-        desc: 'El precio real de un sitio, con qué incluye y de qué depende.',
-        icon: 'lucide:layout-template',
-      },
-      {
-        label: '¿Cuánto cuesta un chatbot?',
-        href: '/es/precios/cuanto-cuesta-un-chatbot',
-        desc: 'Qué incluye un asistente con IA y por qué no es solo una suscripción.',
-        icon: 'lucide:messages-square',
-      },
-      {
-        label: '¿Cuánto cuesta el SEO local en Houston?',
-        href: '/es/precios/cuanto-cuesta-seo-local-houston',
-        desc: 'La tarifa mensual publicada, sin contratos largos forzados.',
-        icon: 'lucide:search',
-      },
-    ],
   },
   faq: {
     tag: 'Preguntas frecuentes',

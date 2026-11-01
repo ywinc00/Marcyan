@@ -16,6 +16,8 @@
 
 > Lectura del 18-oct (chat Marcyan Web, `diagnostico-indexacion-2026-10-13.md` §14): la caída sigue solo en Marcyan (cobertura 44 a 37 de 84 del 13 al 18-oct; TRR, JLX y MJA sin cambios) y /en/houston, la única página que citaba Gemini, salió tras un rastreo del 17-oct; toda la familia de diseño web de Houston está fuera. El dueño aprobó todo el plan el 18-oct. Calendario ajustado: peticiones de rastreo el 19-oct a las 07:45 (reintento único el 20-oct), cola automática neutralizada del 19 al 23-oct, señal de las peticiones el 2-nov, honestidad el 3-nov, higiene el 10-nov, Fase A desde el 17-nov empezando por /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local (orden nuevo, aprobado por Yan el 18-oct), tanda de /en/houston aplazada al 4-dic, reseñas (TRR, JLX, Rosy Nails en Houston) y Bing Places + Apple adelantados a octubre.
 
+> 31-oct (chat Marcyan Web): causa raíz con datos en vivo (`causa-raiz-2026-10-31.md`): Google conserva las páginas sin sustituto y suelta las páginas de venta repetidas. El dueño descartó la prueba de 3 semanas y aprobó arreglar ya: peticiones automáticas apagadas (6b134d8) y PR #43 en producción (5e46c1a): capa del cohete que ya no tapa la página a Google, inglés limpio, 32 páginas fuera del índice juntadas en su página fuerte (84 a 52 URL), botones a secciones que existen. Excepción del dueño: las parejas Houston/Miami en español se conservan (Miami tendrá rediseño real con proyectos y reseñas). Peticiones de rastreo de los 5 destinos el 1-nov temprano. El rediseño de Houston va en otro chat. Revisión: 7, 14 y 28-nov.
+
 ## Tanda en curso
 
 | # | Tarea | Palanca | Impacto | Confianza | Esfuerzo | Puntos | Responsable | Fecha | Estado |
@@ -48,6 +50,8 @@
 > Revisión 2026-W42 (12-oct, semana par): reordenado por puntos (los números de las tareas son identificadores estables). Indexación 76 → 50 de 84 (29 rastreadas sin indexar; 8 salieron el 9-oct, entre ellas /es/houston y /es/miami/ecommerce): la fusión prevista para enero (Siguiente 6) se adelanta como triage de las 29, con decisión de Yan el 15-oct, cuando se pueda interpretar. Tanda de la semana: triage, medición de GA4 (alerta del 9-oct: 3 días sin visitas) y tarea 2 (tercera semana esperando OK). Tarea 3 sigue esperando el OK a PR #36. Espera OK de Yan.
 
 > Revisión 2026-W43 (19-oct): sin reordenar (semana impar) y sin tareas nuevas: la cola aprobada el 18-oct ocupa al chat del proyecto. Enlaces legales ✓ en CAMBIOS.md. Salieron 6 páginas del índice el 18-oct (entre ellas /es/houston/diseno-web); la reescritura de esa página sigue esperando OK. Velocidad de portada y /en/houston/ai-seo en observación.
+
+> Revisión 2026-W44 (26-oct, semana par): sin reordenar. Reescribir /es/houston/diseno-web pasa a "en espera" (2 propuestas sin OK). Vuelven al índice 4 páginas de la petición de rastreo; sale /en/miami/local-seo. Vigilar velocidad de la portada (79): si se repite el 2-nov, entra en la tanda.
 
 ## En espera (sin responsable o bloqueadas)
 

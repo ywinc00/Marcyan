@@ -12,13 +12,16 @@ interface Props {
 const { items, lang = 'es', class: cls } = Astro.props;
 const label = lang === 'es' ? 'Migas de pan' : 'Breadcrumb';
 const ld = breadcrumbList(items);
+// Sin barra final antes del ancla o del final ('/es/' → '/es'): con trailingSlash
+// desactivado, '/es/' redirige. Igual que el JSON-LD, que ya sale sin barra.
+const hrefOf = (p: string) => p.replace(/\/+(?=#|$)/, '') || '/';
 ---
 <nav class:list={['crumbs', cls]} aria-label={label}>
   <ol>
     {items.map((it, i) => (
       <li>
         {i < items.length - 1
-          ? <a href={it.path}>{it.name}</a>
+          ? <a href={hrefOf(it.path)}>{it.name}</a>
           : <span aria-current="page">{it.name}</span>}
         {i < items.length - 1 && (
           <Icon name="lucide:chevron-right" class="crumbs__sep" />

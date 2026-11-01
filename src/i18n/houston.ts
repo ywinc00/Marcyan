@@ -74,7 +74,6 @@ export const houstonHub = {
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7, en español.', icon: 'lucide:messages-square', price: `desde ${usd(PRICE_ANCHORS.ia)}` },
       { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA.', icon: 'lucide:search', price: `desde ${usd(PRICE_ANCHORS.seoLocal)}/mes` },
       { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden.', icon: 'marcyan-ai', price: 'Diagnóstico gratis' },
-      { label: 'Diseño web bilingüe (ES/EN)', href: '/es/houston/diseno-web-bilingue', desc: 'Tu página en español e inglés de verdad, no traducida.', icon: 'lucide:languages', price: `desde ${usd(PRICE_ANCHORS.web)}` },
       { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo.', icon: 'lucide:shopping-bag', price: `desde ${usd(PRICE_ANCHORS.ecommerce)}` },
       { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto.', icon: 'lucide:palette', price: `desde ${usd(PRICE_ANCHORS.branding)}` },
     ] as RelatedLink[],
@@ -85,13 +84,8 @@ export const houstonHub = {
     tag: 'Por industria',
     title: 'Soluciones por sector',
     links: [
-      { label: 'Abogados de inmigración', href: '/es/houston/abogados-inmigracion', desc: 'IA que agenda consultas 24/7', icon: 'lucide:scale' },
       { label: 'Bienes raíces', href: '/es/houston/bienes-raices', desc: 'Propiedades, captación y SEO por zona', icon: 'lucide:home' },
-      { label: 'Restaurantes', href: '/es/houston/restaurantes', desc: 'Menú QR y pedidos por WhatsApp', icon: 'lucide:utensils' },
       { label: 'Contratistas', href: '/es/houston/contratistas', desc: 'IA que rescata llamadas perdidas', icon: 'lucide:hard-hat' },
-      { label: 'Talleres mecánicos', href: '/es/houston/talleres-mecanicos', desc: 'Servicios, horario y SEO «cerca de mí»', icon: 'lucide:car' },
-      { label: 'Salones de belleza', href: '/es/houston/salon-belleza', desc: 'Reservas 24/7 y galería', icon: 'lucide:scissors' },
-      { label: 'Clínicas dentales', href: '/es/houston/clinicas-dentales', desc: 'Sitio bilingüe que agenda citas', icon: 'lucide:stethoscope' },
     ] as RelatedLink[],
   },
   // Zonas: viven como pills-ruta dentro de la Ficha Houston (los 2 <a> del silo).
@@ -132,7 +126,6 @@ export const houstonHub = {
     title: 'Precios y más',
     links: [
       { label: 'Precios y planes', href: '/es/precios', desc: 'Todos los precios de arranque, publicados', icon: 'lucide:tag' },
-      { label: '¿Cuánto cuesta una página web en Houston?', href: '/es/precios/cuanto-cuesta-una-pagina-web-houston', desc: 'La respuesta directa, con precio real', icon: 'lucide:help-circle' },
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'También diseñamos en Miami', icon: 'lucide:layout-template' },
     ] as RelatedLink[],
   },
@@ -172,14 +165,9 @@ export const houstonHub = {
     { name: 'SEO para IA en Houston', path: '/es/houston/seo-para-ia' },
     { name: 'Tienda en línea en Houston', path: '/es/houston/ecommerce' },
     { name: 'Branding e identidad en Houston', path: '/es/houston/branding' },
-    { name: 'Páginas Web para Restaurantes en Houston', path: '/es/houston/restaurantes' },
     { name: 'Sitios Web para Contratistas en Houston', path: '/es/houston/contratistas' },
-    { name: 'Sitios Web para Talleres Mecánicos en Houston', path: '/es/houston/talleres-mecanicos' },
-    { name: 'Sitios Web con Reservas para Salones de Belleza en Houston', path: '/es/houston/salon-belleza' },
-    { name: 'Sitios Web para Clínicas Dentales en Houston', path: '/es/houston/clinicas-dentales' },
     { name: 'Diseño web y SEO local en Katy, TX', path: '/es/houston/katy' },
     { name: 'Diseño web y SEO local en Sugar Land', path: '/es/houston/sugar-land' },
-    { name: 'Diseño web Bilingüe en Houston (Español e Inglés)', path: '/es/houston/diseno-web-bilingue' },
   ] as ListLink[],
   // ── Rediseño "el viaje" (2026-10-25) ── textos nuevos de la página; las claves de arriba siguen intactas
   // (meta, breadcrumb, servicios con sus anclas, industrias, zonas, local, answer, faq, cta, itemList).

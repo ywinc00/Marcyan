@@ -31,10 +31,6 @@ related:
     href: "/es/portafolio"
     desc: "Sitios en vivo de clientes reales que puedes visitar y verificar."
     icon: "lucide:layout-template"
-  - label: "Diseño web bilingüe en Houston"
-    href: "/es/houston/diseno-web-bilingue"
-    desc: "Español e inglés escritos para tu cliente, no traducidos a máquina."
-    icon: "lucide:languages"
   - label: "Diseño web en Houston"
     href: "/es/houston/diseno-web"
     desc: "Sitios a medida desde $1,500 para negocios de Houston."
@@ -68,7 +64,7 @@ Esto importa más de lo que parece: al menos el **29% de los negocios pequeños 
 
 Aquí cae mucha gente. Una agencia dice que trabaja en español, pero por dentro traduce todo a máquina. El resultado suena artificial, comete errores de género y aleja al cliente hispano en vez de acercarlo. El español de Estados Unidos tiene su propio tono, y redactarlo bien es trabajo, no un botón de traducir.
 
-La prueba es simple: pide leer páginas reales que hayan escrito en español. Si suenan calcadas del inglés, ya sabes. Nosotros redactamos cada idioma para su público; puedes ver cómo lo hacemos en [diseño web bilingüe en Houston](/es/houston/diseno-web-bilingue).
+La prueba es simple: pide leer páginas reales que hayan escrito en español. Si suenan calcadas del inglés, ya sabes. Nosotros redactamos cada idioma para su público; puedes ver cómo lo hacemos en [diseño web bilingüe en Houston](/es/houston/diseno-web).
 
 ## ¿La IA puede leer tu sitio o ve una página en blanco?
 

@@ -1,0 +1,177 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-10-17",
+    "hasta": "2026-10-23"
+  },
+  "anterior": {
+    "desde": "2026-10-10",
+    "hasta": "2026-10-16"
+  },
+  "anioPasado": {
+    "desde": "2025-10-18",
+    "hasta": "2025-10-24"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 0,
+      "impresiones": 76,
+      "ctr": 0,
+      "posicion": 10.9
+    },
+    "anterior": {
+      "clicks": 0,
+      "impresiones": 64,
+      "ctr": 0,
+      "posicion": 14.7
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 0,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 30,
+        "ctr": 0,
+        "posicion": 17.5
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 29,
+        "ctr": 0,
+        "posicion": 21.6
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 52,
+      "ctr": 0,
+      "posicion": 10.9,
+      "dClicks": 0,
+      "dImpresiones": 15,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 21,
+      "ctr": 0,
+      "posicion": 6.3,
+      "dClicks": 0,
+      "dImpresiones": 12,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "landings",
+      "clicks": 0,
+      "impresiones": 8,
+      "ctr": 0,
+      "posicion": 7.4,
+      "dClicks": 0,
+      "dImpresiones": 2,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "home",
+      "clicks": 0,
+      "impresiones": 7,
+      "ctr": 0,
+      "posicion": 3.3,
+      "dClicks": 0,
+      "dImpresiones": 5,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 6,
+      "ctr": 0,
+      "posicion": 5,
+      "dClicks": 0,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 6,
+      "ctr": 0,
+      "posicion": 27,
+      "dClicks": 0,
+      "dImpresiones": -7,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "herramientas",
+      "clicks": 0,
+      "impresiones": 3,
+      "ctr": 0,
+      "posicion": 6,
+      "dClicks": 0,
+      "dImpresiones": 3,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "es",
+      "clicks": 0,
+      "impresiones": 87,
+      "ctr": 0,
+      "posicion": 10.3,
+      "dClicks": 0,
+      "dImpresiones": 30,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "en",
+      "clicks": 0,
+      "impresiones": 16,
+      "ctr": 0,
+      "posicion": 5.9,
+      "dClicks": 0,
+      "dImpresiones": 1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [],
+  "paginasBajan": [],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 12.4,
+      "impresiones": 34,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [
+    {
+      "query": "precio chatbot whatsapp",
+      "pagina": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 18.4,
+      "impresiones": 11
+    }
+  ],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

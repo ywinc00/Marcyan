@@ -23,9 +23,13 @@
     "test:finance": "node --experimental-test-module-mocks --no-warnings scripts/test-finance.mjs",
     "test:projects": "node scripts/test-projects.mjs",
     "test:seo": "node scripts/test-seo.mjs",
+    "test:puerta": "node --experimental-test-module-mocks --no-warnings scripts/test-puerta-tecnica.mjs",
     "test:avisos": "node scripts/test-avisos.mjs",
     "test:brief-form": "node scripts/test-brief-form.mjs",
-    "test:brief-files": "node --experimental-test-module-mocks --no-warnings scripts/test-brief-files.mjs"
+    "test:brief-files": "node --experimental-test-module-mocks --no-warnings scripts/test-brief-files.mjs",
+    "test:evals": "node scripts/test-evals.mjs",
+    "eval:marcy": "node scripts/evals/run.mjs marcy",
+    "costes:chat": "node --env-file=.env.local scripts/chat-costes.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

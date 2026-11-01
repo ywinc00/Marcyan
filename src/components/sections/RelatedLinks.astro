@@ -9,6 +9,7 @@
 // Contrato de props INTACTO (tag, title set:html, links[{label,href,desc,icon}], tone).
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
+import { t, langFromPath, type Lang } from '../../i18n/ui';
 
 interface LinkItem { label: string; href: string; desc: string; icon?: string }
 interface Props {
@@ -16,8 +17,10 @@ interface Props {
   title: string;
   links: LinkItem[];
   tone?: 'gold' | 'teal';
+  lang?: Lang;
 }
-const { tag, title, links, tone = 'gold' } = Astro.props;
+const { tag, title, links, tone = 'gold', lang = langFromPath(Astro.url.pathname) } = Astro.props;
+const uirl = t(lang);
 
 const n = links.length;
 // Densidad: con 4+ rutas se reparte en 2 columnas en desktop (el conmutador de
@@ -49,7 +52,7 @@ const pad = (i: number) => String(i + 1).padStart(2, '0');
       <header class="related__head">
         <Kicker tone={tone}>{tag}</Kicker>
         <h2 class="h3 related__title" set:html={title} />
-        <span class="related__count">{n} {n === 1 ? 'ruta' : 'rutas'}</span>
+        <span class="related__count">{n} {n === 1 ? uirl.related.one : uirl.related.many}</span>
       </header>
 
       <ul class="related__list" role="list">

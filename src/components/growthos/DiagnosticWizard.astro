@@ -16,7 +16,7 @@ interface Props { lang: 'es' | 'en' }
 const { lang } = Astro.props;
 const t = GOS[lang].page;
 const e = GOS[lang].errors;
-const contactHref = lang === 'en' ? '/en/#contacto' : '/es/#contacto';
+const contactHref = lang === 'en' ? '/en#contacto' : '/es#contacto';
 const scoreLabel = lang === 'en' ? 'Score' : 'Puntaje';
 const ctaTitle = lang === 'en' ? 'Prefer to talk now?' : '¿Prefieres hablar ahora?';
 const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';

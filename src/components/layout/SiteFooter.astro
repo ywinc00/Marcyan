@@ -20,7 +20,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 <footer class="footer" data-fx="gold" data-fx-density={String(starDensity)}>
   <div class="container footer__inner">
     <div class="footer__brand">
-      <a href="#top" aria-label="Marcyan Studio — inicio" class="footer__logo">
+      <a href="#top" aria-label={uif.footer.top} class="footer__logo">
         <LogoWordmark width={184} />
       </a>
       <p class="footer__tagline">{f.tagline}</p>
@@ -52,11 +52,11 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
             <svg class="footer__copy-ic footer__copy-ic--ok" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
           </button>
         </li>
-        <li class="footer__hours">{nap.hours}</li>
+        <li class="footer__hours">{lang === 'en' ? nap.hoursEn : nap.hours}</li>
       </ul>
     </div>
 
-    <nav class="footer__cols" aria-label="Enlaces del pie">
+    <nav class="footer__cols" aria-label={uif.footer.links}>
       {f.cols.map((col: any) => (
         <details class="footer__col" open>
           <summary class="footer__col-title">

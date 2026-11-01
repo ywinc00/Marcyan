@@ -515,8 +515,8 @@ function buildDeviceLines(devices) {
    estructurales de Marcyan:
 
    1) Marcyan NO usa un prefijo de idioma sobre el mismo path: los slugs están
-      TRADUCIDOS (/es/servicios ↔ /en/services, /es/houston/diseno-web ↔
-      /en/houston/web-design, /es/diagnostico ↔ /en/checkup). Por eso la
+      TRADUCIDOS (/es/servicios ↔ /en/services, /es/houston/contratistas ↔
+      /en/houston/contractors, /es/diagnostico ↔ /en/checkup). Por eso la
       clasificación no se resuelve con una regex sobre el path, hace falta un
       diccionario slug → cohorte que meta el par ES/EN en la MISMA cohorte con
       `lang` distinto. Ese es el objetivo entero de la sección: comparar el

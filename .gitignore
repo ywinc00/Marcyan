@@ -33,3 +33,6 @@ public/dev/
 _reel/
 docs/galeria-src/
 docs/redes/
+
+# Resultados de cada pasada de las pruebas de comportamiento (la línea base vive en scripts/evals/)
+data/evals/

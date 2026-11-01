@@ -50,7 +50,7 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
                       src={`/Galeria/${shot.slug}-pc.webp`}
                       srcset={`/Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc.webp 1920w`}
                       sizes="(min-width: 1024px) 440px, 92vw"
-                      alt={`${p.name} — ${projects.shotAlt?.pc ?? 'escritorio'}`}
+                      alt={`${p.name}, ${projects.shotAlt?.pc ?? uipr.shot.pc}`}
                       width="1920" height="1080"
                       loading="lazy" decoding="async"
                     />
@@ -71,7 +71,7 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
                       src={`/Galeria/${shot.slug}-movil.webp`}
                       srcset={`/Galeria/${shot.slug}-movil-520.webp 520w, /Galeria/${shot.slug}-movil.webp 1320w`}
                       sizes="(min-width: 1024px) 160px, 40vw"
-                      alt={`${p.name} — ${projects.shotAlt?.movil ?? 'móvil'}`}
+                      alt={`${p.name}, ${projects.shotAlt?.movil ?? uipr.shot.movil}`}
                       width="1320" height={shot.mh}
                       loading="lazy" decoding="async"
                     />
@@ -97,7 +97,7 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
       <button class="pf__arrow pf__arrow--next" type="button" data-next aria-label={uipr.projects.next}><Icon name="lucide:chevron-right" /></button>
 
       <button class="pf__more" type="button" data-more aria-expanded="false">
-        <span>{projects.more ?? 'Ver Proyectos'}</span>
+        <span>{projects.more ?? uipr.projects.more}</span>
         <Icon name="lucide:chevron-down" class="pf__more-ic" />
       </button>
     </div>

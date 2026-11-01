@@ -10,7 +10,7 @@ import LandingHero from '../../components/sections/LandingHero.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ToolsHub from '../../components/growthos/ToolsHub.astro';
 import { content } from '../../i18n/content';
-import { clusterNav } from '../../i18n/clusters';
+import { clusterNavEn } from '../../i18n/clusters';
 import { GOS } from '../../i18n/growth-os';
 import { GROWTH_OS } from '../../flags';
 
@@ -24,7 +24,7 @@ const breadcrumb = [
 ];
 ---
 <Layout title={tt.metaTitle} description={tt.metaDesc} lang="en" path="tools">
-  <SiteNav nav={clusterNav} lang="en" homeHref="/en/" currentPath={Astro.url.pathname} />
+  <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
     <LandingHero
@@ -43,5 +43,5 @@ const breadcrumb = [
     <SpaceBackdrop tone="gold" />
   </main>
 
-  <SiteFooter footer={c.footer} />
+  <SiteFooter footer={c.footer} lang="en" />
 </Layout>

@@ -150,8 +150,9 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .vig{margin:20px 0 6px;height:158px;border-radius:var(--radius-md);background:radial-gradient(ellipse 80% 90% at 30% 20%,rgba(200,169,110,.10),transparent 70%),#0c0b0a;border:1px solid rgba(240,237,232,.06);position:relative;overflow:hidden;padding:16px}
 .hx .svc__rows{list-style:none;margin:8px 0 0;padding:0;flex:1}
 .hx .svc__rows li{border-top:1px solid var(--border)}
-.hx .svc__rows a{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0;color:var(--fg-primary);font-size:15.5px;font-weight:500}
+.hx .svc__rows a,.hx .svc__rows .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0;color:var(--fg-primary);font-size:15.5px;font-weight:500}
 .hx .svc__rows a:hover .svc__name{color:var(--accent-gold)}
+.hx .svc__price{margin-left:auto;font-family:var(--font-mono);font-size:12.5px;color:var(--fg-secondary);white-space:nowrap}
 .hx .svc__name{flex:1;min-width:0;transition:color .2s}
 .hx .price{font-family:var(--font-mono);font-size:12.5px;color:var(--fg-primary);white-space:nowrap}
 .hx .price small{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-secondary);margin-right:6px}
@@ -288,7 +289,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;background:rgba(9,8,7,.8);padding:5px 8px;border-radius:4px}
 .hx .sectors__list{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;border-top:1px solid var(--border)}
 .hx .sectors__list li{border-bottom:1px solid var(--border)}
-.hx .sectors__list a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;min-height:80px;padding:12px 0;color:var(--fg-primary)}
+.hx .sectors__list a,.hx .sectors__list .row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;min-height:80px;padding:12px 0;color:var(--fg-primary)}
 .hx .sic,.hx .exic{width:40px;height:40px;border-radius:var(--radius-md);display:grid;place-items:center;color:var(--accent-gold);background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);transition:background .25s,border-color .25s}
 .hx .sic svg,.hx .exic svg{width:19px;height:19px}
 .hx .sectors__list a:hover .sic{background:rgba(200,169,110,.14);border-color:var(--accent-gold-line)}

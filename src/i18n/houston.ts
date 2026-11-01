@@ -193,7 +193,7 @@ export const houstonHub = {
       // índices sobre services.links (las anclas del silo no cambian)
       steps: [
         { n: '01', title: 'Te encuentran', txt: 'Que salgas cuando te buscan en Google, en Maps y en la IA.', links: [2, 3], vig: 'search', note: 'Google, Maps, ChatGPT y Gemini leen tu web y tu ficha: las dejamos listas para que te nombren.' },
-        { n: '02', title: 'Te eligen', txt: 'Una web rápida y bilingüe que convence en segundos.', links: [0, 4, 5, 6], vig: 'web', note: '' },
+        { n: '02', title: 'Te eligen', txt: 'Una web rápida y bilingüe que convence en segundos.', links: [0, 4, 5], vig: 'web', note: '' },
         { n: '03', title: 'Te contestan', txt: 'Un asistente que responde, agenda y capta clientes a cualquier hora.', links: [1], vig: 'chat', note: 'En tu web y en WhatsApp, en español e inglés. Cuando no sabe algo, te pasa la conversación a ti.' },
       ],
       vig: {
@@ -203,6 +203,8 @@ export const houstonHub = {
       all: { label: 'Ver todos los precios', href: '/es/precios' },
     },
     projects: {
+      // trabajos que se muestran en esta ciudad y en este orden (decisión del dueño 2026-11-01: TRR, Rosy Nails, Julio's)
+      slugs: ['trr', 'rn', 'jls'],
       tag: 'Portafolio', title: 'Trabajo real, negocios <em>reales</em>', did: 'Qué hicimos', result: 'Resultado',
       note: 'Por respeto a la privacidad de nuestros clientes mostramos las capturas, no los enlaces; con gusto te los enseñamos en una llamada.',
       more: { label: 'Ver Proyectos', href: '/es/portafolio' }, shotPc: 'vista de escritorio', shotMovil: 'vista móvil',
@@ -223,10 +225,18 @@ export const houstonHub = {
     },
     sectors: {
       tag: 'Por sector', title: 'Así buscan a <em>tu sector</em> en Houston',
-      lead: 'Cada sector tiene su página, con lo que busca su cliente y cómo lo atendemos.',
-      // en el orden de industries.links
-      queries: ['abogado de inmigración en español', 'realtor que hable español', 'tacos cerca de mí abierto ahora', 'kitchen remodeling contractor', 'taller mecánico que hable español', 'salón de uñas cerca de mí', 'dentista que hable español'],
-      en: [3],
+      lead: 'Lo que escribe el cliente de cada sector. Preparamos tu web y tu ficha para esa búsqueda.',
+      // filas propias (desde la consolidación de nov 2026 solo algunos sectores conservan página: esas filas la
+      // enlazan, buscada por su nombre en industries.links; las demás se quedan como fila sin enlace)
+      rows: [
+        { label: 'Abogados de inmigración', icon: 'lucide:scale', q: 'abogado de inmigración en español' },
+        { label: 'Bienes raíces', icon: 'lucide:home', q: 'realtor que hable español' },
+        { label: 'Restaurantes', icon: 'lucide:utensils', q: 'tacos cerca de mí abierto ahora' },
+        { label: 'Contratistas', icon: 'lucide:hard-hat', q: 'kitchen remodeling contractor', en: true },
+        { label: 'Talleres mecánicos', icon: 'lucide:car', q: 'taller mecánico que hable español' },
+        { label: 'Salones de belleza', icon: 'lucide:scissors', q: 'salón de uñas cerca de mí' },
+        { label: 'Clínicas dentales', icon: 'lucide:stethoscope', q: 'dentista que hable español' },
+      ],
     },
     answer: {
       figs: [

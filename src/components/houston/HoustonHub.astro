@@ -18,8 +18,10 @@ import { nap } from '../../i18n/content';
 import './houston.css';
 
 interface Props { lang: Lang; h: any; c: any; projects: any[] }
-const { lang, h, c, projects } = Astro.props;
+const { lang, h, c } = Astro.props;
 const j = h.journey;
+// los trabajos de esta ciudad, en el orden que fija su bloque de textos
+const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean);
 const ui = t(lang);
 const svc = h.services.links;
 const faqLd = faqPage(h.faq.items);
@@ -27,6 +29,8 @@ const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const waHref = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
 const names = projects.map((p) => p.name).join('|');
+// sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
+const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
 ---
 <script is:inline>document.documentElement.classList.add('hx-js')</script>
 <div class="hx">
@@ -101,7 +105,9 @@ const names = projects.map((p) => p.name).join('|');
             )}
             <ul class="svc__rows">
               {st.links.map((i: number) => svc[i]).map((l: any) => (
-                <li><a href={l.href}><span class="svc__name">{l.label}</span><Icon name="lucide:arrow-right" class="arr" /></a></li>
+                <li>{l.href
+                  ? <a href={l.href}><span class="svc__name">{l.label}</span><Icon name="lucide:arrow-right" class="arr" /></a>
+                  : <div class="row"><span class="svc__name">{l.label}</span>{l.price && <span class="svc__price">{l.price}</span>}</div>}</li>
               ))}
             </ul>
             {st.note && <p class="svc__note">{st.note}</p>}
@@ -201,13 +207,12 @@ const names = projects.map((p) => p.name).join('|');
         <p class="lead">{j.sectors.lead}</p>
       </header>
       <ul class="sectors__list" data-rev-list>
-        {h.industries.links.map((l: any, i: number) => (
-          <li><a href={l.href}>
-            <span class="sic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span>
-            <span><span class="sname">{l.label}</span><span class="squery"><Icon name="lucide:search" />{j.sectors.queries[i]}{j.sectors.en.includes(i) && <span class="en">EN</span>}</span></span>
-            <Icon name="lucide:arrow-right" class="arr" />
-          </a></li>
-        ))}
+        {j.sectors.rows.map((r: any) => {
+          const href = sectorHref[r.label];
+          const body = <><span class="sic"><Icon name={r.icon} /></span>
+            <span><span class="sname">{r.label}</span><span class="squery"><Icon name="lucide:search" />{r.q}{r.en && <span class="en">EN</span>}</span></span></>;
+          return <li>{href ? <a href={href}>{body}<Icon name="lucide:arrow-right" class="arr" /></a> : <div class="row">{body}</div>}</li>;
+        })}
       </ul>
     </div>
   </section>

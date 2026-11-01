@@ -177,7 +177,7 @@ export const houstonHub = {
       lead: 'Three jobs, one team. Every service has a published starting price, and we put the final price in writing before we start.',
       steps: [
         { n: '01', title: 'Get found', txt: 'Show up when people search on Google, on Maps and in AI.', links: [2, 3], vig: 'search', note: 'Google, Maps, ChatGPT and Gemini read your site and your profile: we get them ready to name you.' },
-        { n: '02', title: 'Get chosen', txt: 'A fast, bilingual site that wins people over in seconds.', links: [0, 4, 5, 6], vig: 'web', note: '' },
+        { n: '02', title: 'Get chosen', txt: 'A fast, bilingual site that wins people over in seconds.', links: [0, 4, 5], vig: 'web', note: '' },
         { n: '03', title: 'Always answer', txt: 'An assistant that replies, books and captures leads around the clock.', links: [1], vig: 'chat', note: 'On your site and on WhatsApp, in English and Spanish. When it does not know something, it hands the conversation to you.' },
       ],
       vig: {
@@ -187,6 +187,8 @@ export const houstonHub = {
       all: { label: 'See all pricing', href: '/en/pricing' },
     },
     projects: {
+      // trabajos que se muestran en esta ciudad y en este orden (decisión del dueño 2026-11-01: TRR, Rosy Nails, Julio's)
+      slugs: ['trr', 'rn', 'jls'],
       tag: 'Portfolio', title: 'Real work, real <em>businesses</em>', did: 'What we did', result: 'Result',
       note: 'Out of respect for our clients\' privacy we show the screenshots, not the links; we are happy to walk you through them on a call.',
       more: { label: 'View projects', href: '/en/portfolio' }, shotPc: 'desktop view', shotMovil: 'mobile view',
@@ -201,15 +203,22 @@ export const houstonHub = {
       mapCap: 'The entire metro area',
       zonesLabel: 'Houston-area zones',
       zones: [
-        { n: 'Houston', hq: true }, { n: 'Katy', href: '/en/houston/katy' }, { n: 'Sugar Land', href: '/en/houston/sugar-land' },
+        { n: 'Houston', hq: true }, { n: 'Katy' }, { n: 'Sugar Land' },
         { n: 'The Woodlands' }, { n: 'Pearland' }, { n: 'Pasadena' },
       ],
     },
     sectors: {
       tag: 'By industry', title: 'How Houston searches for <em>your industry</em>',
-      lead: 'Each industry has its own page, with what its customers search for and how we serve them.',
-      queries: ['immigration lawyer who speaks Spanish', 'realtor near me', 'tacos near me open now', 'kitchen remodeling contractor', 'auto repair near me', 'nail salon near me', 'dentist who speaks Spanish'],
-      en: [],
+      lead: "What each industry's customers type. We get your site and your profile ready for that search.",
+      rows: [
+        { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'immigration lawyer who speaks Spanish' },
+        { label: 'Real estate', icon: 'lucide:home', q: 'realtor near me' },
+        { label: 'Restaurants', icon: 'lucide:utensils', q: 'tacos near me open now' },
+        { label: 'Contractors', icon: 'lucide:hard-hat', q: 'kitchen remodeling contractor' },
+        { label: 'Auto repair shops', icon: 'lucide:car', q: 'auto repair near me' },
+        { label: 'Beauty salons', icon: 'lucide:scissors', q: 'nail salon near me' },
+        { label: 'Dental clinics', icon: 'lucide:stethoscope', q: 'dentist who speaks Spanish' },
+      ],
     },
     answer: {
       figs: [

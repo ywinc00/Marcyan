@@ -82,7 +82,9 @@ const cookie = await shareCookie();
 const results = [];
 let first = true;
 console.log(`Pruebas de "${suite}": ${lista.length} casos × ${trials} contra ${base}`);
+let frenada = null;
 for (const caso of lista) {
+  if (frenada) break;
   const intentos = [];
   for (let t = 0; t < trials; t++) {
     if (!first) await sleep(delay);
@@ -90,6 +92,10 @@ for (const caso of lista) {
     let res;
     try { res = await turn(cookie, caso, `eval-${caso.id}-${t}-${runId}`.slice(0, 64)); }
     catch (e) { res = { status: 0, reply: null, action: null, error: e && e.message }; }
+    // 429 = el freno del sitio cortó la pasada (lección del 01-nov: se contaron como
+    // fallos de Marcy 55 respuestas que nunca llegaron a la IA). No es comportamiento:
+    // se para y se avisa; la pasada no vale ni para la puerta ni para la línea base.
+    if (res.status === 429) { frenada = caso.id; break; }
     const g = grade(caso, res);
     intentos.push({ ...g, status: res.status, reply: res.reply, action: res.action });
   }
@@ -100,6 +106,12 @@ for (const caso of lista) {
   const marca = rate === 1 ? '✓' : rate === 0 ? '✗' : '~';
   const motivos = [...new Set(intentos.flatMap((x) => x.reasons))];
   console.log(`  ${marca} ${caso.id}${caso.critico ? ' [crítico]' : ''}  ${ok}/${trials}${motivos.length ? '  · ' + motivos.join(' | ') : ''}`);
+}
+
+if (frenada) {
+  console.error(`\nPASADA CORTADA: el freno del sitio respondió 429 en "${frenada}". No es un fallo de Marcy.`
+    + '\nEspera a que se reinicie (medianoche UTC) o reduce la pasada con --only / --trials.');
+  process.exitCode = 2;
 }
 
 const total = results.reduce((s, r) => s + r.rate, 0) / (results.length || 1);
@@ -134,7 +146,9 @@ writeFileSync(path.join(outDir, `${runId}.json`), JSON.stringify(out, null, 2));
 
 // process.exitCode en vez de process.exit(): en Windows, salir de golpe con
 // conexiones de fetch cerrándose revienta libuv (UV_HANDLE_CLOSING).
-if (flag('save-baseline') && only) {
+if (frenada) {
+  // Pasada cortada: no vale como referencia.
+} else if (flag('save-baseline') && only) {
   console.error('La línea base se guarda solo con la batería completa (sin --only).');
   process.exitCode = 2;
 } else if (flag('save-baseline') && fallos.length && !flag('force-baseline')) {
@@ -145,7 +159,9 @@ if (flag('save-baseline') && only) {
   console.log('Línea base guardada en ' + path.relative(ROOT, baselinePath));
 }
 
-if (fallos.length) {
+if (frenada) {
+  console.log('\nPUERTA: SIN VEREDICTO (pasada cortada por el freno del sitio)');
+} else if (fallos.length) {
   console.log('\nPUERTA: NO PASA\n - ' + fallos.join('\n - '));
   if (!process.exitCode) process.exitCode = 1;
 } else {

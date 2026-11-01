@@ -478,20 +478,20 @@ await acheck('límite: revisar_sitio pasa de 20 al día por IP aunque se espacie
 await acheck('freno chat: 12 mensajes por minuto por conexión, el 13.º se frena', async () => {
   const store = memoryStore();
   const now = Date.UTC(2026, 9, 31, 12, 0, 0);
-  for (let i = 0; i < 12; i++) assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-' + i, store, now }), true, 'mensaje ' + (i + 1));
-  assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-x', store, now }), false);
-  assert.equal(await chatAllowed({ ip: '2.2.2.2', sid: 's-y', store, now }), true, 'otra conexión no comparte cuenta');
+  for (let i = 0; i < 12; i++) assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-' + i, store, now, env: 'production' }), true, 'mensaje ' + (i + 1));
+  assert.equal(await chatAllowed({ ip: '1.1.1.1', sid: 's-x', store, now, env: 'production' }), false);
+  assert.equal(await chatAllowed({ ip: '2.2.2.2', sid: 's-y', store, now, env: 'production' }), true, 'otra conexión no comparte cuenta');
 });
 await acheck('freno chat: 40 mensajes por conversación al día aunque cambie de conexión', async () => {
   const store = memoryStore();
   const now = Date.UTC(2026, 9, 31, 12, 0, 0);
-  for (let i = 0; i < 40; i++) assert.equal(await chatAllowed({ ip: '3.3.' + i + '.1', sid: 'conv-1', store, now }), true);
-  assert.equal(await chatAllowed({ ip: '3.3.99.1', sid: 'conv-1', store, now }), false);
+  for (let i = 0; i < 40; i++) assert.equal(await chatAllowed({ ip: '3.3.' + i + '.1', sid: 'conv-1', store, now, env: 'production' }), true);
+  assert.equal(await chatAllowed({ ip: '3.3.99.1', sid: 'conv-1', store, now, env: 'production' }), false);
 });
 await acheck('freno chat: 150 al día por conexión aunque respete el minuto', async () => {
   const store = memoryStore();
   let now = Date.UTC(2026, 9, 31, 0, 0, 30), allowed = 0;
-  for (let i = 0; i < 160; i++) { if (await chatAllowed({ ip: '4.4.4.4', sid: 'c-' + i, store, now })) allowed++; now += 61 * 1000; }
+  for (let i = 0; i < 160; i++) { if (await chatAllowed({ ip: '4.4.4.4', sid: 'c-' + i, store, now, env: 'production' })) allowed++; now += 61 * 1000; }
   assert.equal(allowed, RL.chat[1].limit);
 });
 await acheck('freno chat: el freno sobrevive a un arranque en frío (la cuenta no vive en el módulo)', async () => {
@@ -500,17 +500,26 @@ await acheck('freno chat: el freno sobrevive a un arranque en frío (la cuenta n
   // llamadas sin estado propio) ven la misma cuenta.
   const shared = memoryStore();
   const now = Date.UTC(2026, 9, 31, 12, 0, 0);
-  for (let i = 0; i < 12; i++) await chatAllowed({ ip: '5.5.5.5', sid: 'a-' + i, store: shared, now });
-  assert.equal(await chatAllowed({ ip: '5.5.5.5', sid: 'b', store: shared, now }), false);
+  for (let i = 0; i < 12; i++) await chatAllowed({ ip: '5.5.5.5', sid: 'a-' + i, store: shared, now, env: 'production' });
+  assert.equal(await chatAllowed({ ip: '5.5.5.5', sid: 'b', store: shared, now, env: 'production' }), false);
 });
 await acheck('tope diario del sitio: 200 pasan, el 201 se frena y solo él marca justHit', async () => {
   const store = memoryStore();
   const now = Date.UTC(2026, 9, 31, 12, 0, 0);
-  for (let i = 0; i < RL.chatGlobal[0].limit; i++) assert.equal((await chatGlobalAllowed({ store, now })).ok, true);
-  const first = await chatGlobalAllowed({ store, now });
-  const second = await chatGlobalAllowed({ store, now });
+  for (let i = 0; i < RL.chatGlobal[0].limit; i++) assert.equal((await chatGlobalAllowed({ store, now, env: 'production' })).ok, true);
+  const first = await chatGlobalAllowed({ store, now, env: 'production' });
+  const second = await chatGlobalAllowed({ store, now, env: 'production' });
   assert.deepEqual([first.ok, first.justHit, second.ok, second.justHit], [false, true, false, false]);
-  assert.equal((await chatGlobalAllowed({ store, now: now + 86400 * 1000 })).ok, true, 'al día siguiente vuelve');
+  assert.equal((await chatGlobalAllowed({ store, now: now + 86400 * 1000, env: 'production' })).ok, true, 'al día siguiente vuelve');
+});
+await acheck('fuera de producción: margen para las pruebas (600 al día por conexión), el minuto igual', async () => {
+  const store = memoryStore();
+  let now = Date.UTC(2026, 10, 1, 0, 0, 30), allowed = 0;
+  for (let i = 0; i < 620; i++) { if (await chatAllowed({ ip: '6.6.6.6', sid: 'p-' + i, store, now, env: 'preview' })) allowed++; now += 61 * 1000; }
+  assert.equal(allowed, RL.chatNoProd[1].limit);
+  const s2 = memoryStore(); const t = Date.UTC(2026, 10, 1, 12, 0, 0); let m = 0;
+  for (let i = 0; i < 13; i++) if (await chatAllowed({ ip: '7.7.7.7', sid: 'q-' + i, store: s2, now: t, env: 'preview' })) m++;
+  assert.equal(m, 12, 'el freno por minuto no cambia');
 });
 check('doctrina: el chat no importa la base de forma estática (solo frenos y avisos, dinámicos)', () => {
   const src = readFileSync(new URL('../api/chat.mjs', import.meta.url), 'utf8');

@@ -141,6 +141,22 @@ try {
     assert.equal(r.code, 1);
     assert.match(r.out, /frente a 100 % de la línea base|cae de 100 %/);
   });
+  await check('ejecutor: si el freno corta (429), se para, no da veredicto ni toca la línea base', async () => {
+    const frenado = http.createServer((req, res) => { req.resume(); req.on('end', () => { res.writeHead(429, { 'Content-Type': 'application/json' }); res.end('{"error":"rápido"}'); }); });
+    await new Promise((r) => frenado.listen(0, '127.0.0.1', r));
+    writeFileSync(baselinePath, '{"suite":"marcy","fecha":"intacta","trials":1,"total":1,"casos":{}}');
+    const { spawn } = await import('node:child_process');
+    const r = await new Promise((resolve) => {
+      const p = spawn(process.execPath, [runner, 'marcy', '--url', `http://127.0.0.1:${frenado.address().port}`, '--trials', '1', '--delay', '0', '--out', outTmp, '--baseline', baselinePath, '--save-baseline'], { cwd: path.resolve(import.meta.dirname, '..') });
+      let out = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { out += d; });
+      p.on('close', (code) => resolve({ code, out }));
+    });
+    frenado.close();
+    assert.equal(r.code, 2, r.out);
+    assert.match(r.out, /PASADA CORTADA/);
+    assert.match(r.out, /SIN VEREDICTO/);
+    assert.equal(JSON.parse(readFileSync(baselinePath, 'utf8')).fecha, 'intacta');
+  });
 } finally {
   server.close();
   rmSync(outTmp, { recursive: true, force: true });

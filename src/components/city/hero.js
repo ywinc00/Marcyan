@@ -47,19 +47,21 @@ export function initHero(GEO, C) {
       // Galveston (36 km al este), que es lo que dice "esto es Houston" igual que en escritorio
       const th = W <= 600 ? 52 : 60, cardH = found.offsetHeight || 130;
       const band = H - navH - 14 - 24;
-      let kmpx, up, down, lite, xh;
+      let kmpx, up, down, lite, xh, bandUse = band;
       if (C.mobile === 'miami') {
+        // la ficha va a la derecha (bajo Miami Beach): termina por encima del botón del chat
+        bandUse = band - 56;
         // Miami: Hialeah arriba (10,7 km al norte), Miami Beach encendida a la derecha (6,2 km al este) con su
         // etiqueta encima, Doral (16,2 km al oeste) y Kendall (9,2 km al sur) con la etiqueta debajo, y la ficha al
         // final. Todo cabe en 22,4 km de ancho y 19,9 km de alto: el acercamiento llega mucho más cerca que en Houston.
         const kW = (W - 2 * pad - 48) / 22.4;
-        const kFit = (band - (30 + th) - (30 + th + 18 + cardH)) / 19.9;
+        const kFit = (bandUse - (30 + th) - (30 + th + 18 + cardH)) / 19.9;
         lite = Math.min(kFit, kW) < 5;                                 // teléfonos bajos: solo la búsqueda encendida
         if (!lite) {
           kmpx = Math.min(13, kFit, kW);
           up = 10.7 * kmpx + 30 + th; down = 9.2 * kmpx + 30 + th + 18 + cardH;
         } else {
-          kmpx = Math.max(4, Math.min(11, kW, (band - 54 - cardH - 30 - th) / 13.9));
+          kmpx = Math.max(4, Math.min(11, kW, (bandUse - 54 - cardH - 30 - th) / 13.9));
           up = Math.max(10.7 * kmpx + 16, 3.2 * kmpx + 30 + th); down = 9.2 * kmpx + 24 + cardH;
         }
         // la franja de las zonas centrada en la pantalla, sin que Doral ni la etiqueta de Miami Beach se salgan
@@ -79,7 +81,7 @@ export function initHero(GEO, C) {
         }
         xh = Math.max(pad + 20 + 44 * kmpx, Math.min(W - 70 - 36 * kmpx, W / 2 - 10 * kmpx));
       }
-      const yh = navH + 14 + up + Math.max(0, (band - up - down) / 2);
+      const yh = navH + 14 + up + Math.max(0, (bandUse - up - down) / 2);
       // la lente llena la pantalla: de la barra hasta pasado el borde de abajo (se ven solo sus curvas)
       const Rb = (H - navH) / 2 + 20, cyB = (navH + H) / 2;
       // el satélite termina en el borde derecho de la pantalla, como en escritorio (no junto a los puntos)

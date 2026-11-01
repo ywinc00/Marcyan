@@ -236,7 +236,6 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         </div>
         <div class="answer__figs" aria-hidden="true">
           {j.answer.figs.map((f: any) => <div class="fig"><p class="fig__n"><b data-count={f.n}>{f.n}</b>%</p><p>{f.txt}</p></div>)}
-          {j.answer.figsSource && <p class="answer__src fig__src"><Icon name="lucide:bar-chart-3" />{ui.answer.source}: {j.answer.figsSource}</p>}
         </div>
       </div>
     </div>

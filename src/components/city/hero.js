@@ -18,7 +18,8 @@ export function initHero(GEO, C) {
   // por debajo de 900 px la portada se compone en vertical (texto arriba, planeta abajo)
   // teléfono en horizontal (poca altura): composición en horizontal, sin etiquetas (la búsqueda va en la ficha)
   const mobile = () => innerWidth < 900 && innerHeight >= 520;
-  const tagsOff = () => innerHeight < (innerWidth >= 900 ? 560 : 520);
+  // por debajo de 520 px de alto, siempre sin etiquetas; por encima, en escritorio, se decide al colocar (si caben)
+  const tagsOff = () => innerHeight < 520;
   let isM = mobile(), noTags = tagsOff();            // se fijan en setup(): nunca se leen dentro del dibujo
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const copyEl = stage.querySelector('.copy');
@@ -288,7 +289,7 @@ export function initHero(GEO, C) {
     pinsBox.appendChild(el); return el;
   }
   const ms = (el, k, v) => el && el.style.setProperty(k, Math.round(v) + 'ms');
-  function layout() {
+  function layout(pass = 0) {
     pinsBox.innerHTML = ''; items = []; isBorn = false;
     const s = state(1);
     ZONES.forEach((z, i) => {
@@ -302,12 +303,19 @@ export function initHero(GEO, C) {
       items.push({ z, pt, tag, x, y, i, side: z.side, th: 50, tr: '' });
     });
     if (noTags) items.forEach((it) => { it.lx = -999; it.ly = -999; it.hide = true; });
-    else if (!isM) items.forEach((it) => {
+    else if (!isM) {
+      // borde derecho real del texto de la portada: ninguna etiqueta se acerca a menos de 24 px
+      const sl = stage.getBoundingClientRect().left;
+      const txR = copyEl ? Math.max(0, ...[...copyEl.children].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 1 && r.height > 1).map((r) => r.right - sl)) : 0;
+      items.forEach((it) => {
       const tw = it.tag.offsetWidth || 200;
       it.lx = Math.max(it.x - tw + 22, Math.min(it.x - 22, it.x + it.z.dx));
       it.lx = Math.max(16, Math.min(F.W - 16 - tw, it.lx));
+      // si apartarla del texto deja su punto fuera de ella, las etiquetas no caben (se decide al colocar la ficha)
+      if (it.lx < txR + 24) { it.lx = txR + 24; it.off = it.lx > it.x - 22; }
       it.ly = it.side === 'up' ? it.y - it.z.wire - it.th : it.y + it.z.wire;
-    });
+      });
+    }
     else {
       const cx = (l, w) => Math.max(F.pad, Math.min(F.W - F.pad - w, l));
       items.forEach((it) => { it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight || 52; });
@@ -373,6 +381,14 @@ export function initHero(GEO, C) {
       }
       }
     }
+    // escritorio: dos etiquetas del mismo lado que se tocan se separan alargando el hilo de la que va por fuera
+    if (!isM && !noTags) for (let n = 0; n < 2; n++) items.forEach((a) => items.forEach((b) => {
+      if (a === b || a.side !== b.side) return;
+      const g = 8, ah = a.tag.offsetHeight, bh = b.tag.offsetHeight;
+      if (!(a.lx < b.lx + b.tag.offsetWidth + 2 && b.lx < a.lx + a.tag.offsetWidth + 2)) return;   // una encima de otra
+      if (a.side === 'up' && a.y < b.y && a.ly + ah + g > b.ly) a.ly = b.ly - g - ah;
+      if (a.side !== 'up' && a.y > b.y && b.ly + bh + g > a.ly) a.ly = b.ly + bh + g;
+    }));
     items.forEach((it) => {
       it.tag.style.left = it.lx + 'px'; it.tag.style.top = it.ly + 'px';
       it.tag.classList.toggle('dn', it.side === 'down');
@@ -423,6 +439,23 @@ export function initHero(GEO, C) {
       const clearChat = (x, y) => x + cw <= F.W - 84 || y + ch <= F.H - 96;
       const pick = cands.find(([x, y]) => okX(x) && okY(y) && clearChat(x, y) && !hit(x, y));
       if (pick) [fx, fy] = pick; else fy = Math.min(Math.max(fy, lo), F.H - ch - 6);
+      // no cabe: si con etiquetas la ficha tapa algo, o dos etiquetas se tocan, o una se mete bajo la barra o tapa
+      // otro punto, la portada va sin etiquetas (la búsqueda pasa a la ficha), como en las pantallas bajas
+      if (!noTags && pass === 0) {
+        const tb = items.map((it) => [it.lx, it.ly, it.lx + it.tag.offsetWidth, it.ly + it.tag.offsetHeight]);
+        const over = (a, b, g) => a[2] + g > b[0] && b[2] + g > a[0] && a[3] + g > b[1] && b[3] + g > a[1];
+        const clash = items.some((it) => it.off) || tb.some((a, i) => a[1] < 70 || a[3] > F.H - 6 || a[2] > F.W - 6 || tb.some((b, j) => j > i && over(a, b, 6))
+          || items.some((it, j) => j !== i && over(a, [it.x - 7, it.y - 7, it.x + 7, it.y + 7], 0)));
+        const cardOn = !pick && boxes.some(([a, b, c, d]) => c > fx && a < fx + cw && d > fy && b < fy + ch);
+        if (clash || cardOn) { noTags = true; return layout(1); }
+      }
+      // sin etiquetas y la ficha sigue sin sitio: el grupo de zonas sube lo justo para que la ficha quepa debajo
+      // de todos los puntos (sin meter el de arriba bajo la barra)
+      if (noTags && !pick && pass < 2) {
+        const ys = items.map((it) => it.y);
+        const d = Math.min(Math.max(...ys) + 9 + m + 2 - (F.H - ch - 6), Math.min(...ys) - 9 - 78);
+        if (d > 1) { F.B.target = [F.B.target[0], F.B.target[1] - d]; return layout(2); }
+      }
     }
     found.style.left = fx + 'px'; found.style.top = fy + 'px';
     downEl = noTags ? null : mkWire(P.x, P.y + 9, fy, 'down');
@@ -703,6 +736,7 @@ export function initHero(GEO, C) {
       pin.classList.add('hero-pin--static');
       cur = target = 1; storyDone = true; sync(); draw(1); canvas.classList.add('ready');
       if (cue) cue.classList.add('gone');
+      addEventListener('scroll', guardBar, { passive: true }); guardBar();
       return;
     }
     cur = target = atTop() ? 0 : 1;                                  // si la página se abre ya bajada, el viaje está hecho
@@ -713,7 +747,7 @@ export function initHero(GEO, C) {
     guardBar();
     idle(warm);
   }
-  window.__hero = { get cur() { return cur; }, get target() { return target; }, get storyDone() { return storyDone; }, get tBirth() { return tBirth; }, draw: (t) => draw(t),
+  window.__hero = { get noTags() { return noTags; }, get cur() { return cur; }, get target() { return target; }, get storyDone() { return storyDone; }, get tBirth() { return tBirth; }, draw: (t) => draw(t),
     // para las pruebas: dónde caen en pantalla el planeta, Houston y las zonas en un instante t del viaje
     probe: (t) => { const s = state(t); return { cx: s.cx, cy: s.cy, R: s.R, S: s.S, houston: s.proj(HOUSTON), city: s.proj(HOUSTON), zones: ZONES.map((z) => s.proj(z.at)) }; } };
   // el globo detallado (solo escritorio) sustituye al ligero cuando llega; sus casquetes se preparan en un rato libre

@@ -116,6 +116,10 @@ export function initSections(loadGeo, C) {
     // precargar las capturas del panel en cuanto la sección se acerca
     const pre = new IntersectionObserver((es) => { if (es[0].isIntersecting) { $$('img', stage).forEach((im) => (im.loading = 'eager')); pre.disconnect(); } }, { rootMargin: '600px 0px' });
     pre.observe(stage);
+    // en escritorio la primera pareja llega antes aunque se salte de golpe a la sección (en el teléfono el panel
+    // está oculto y no debe descargarse)
+    const first = () => { if (matchMedia('(min-width:1024px)').matches) $$('img.is-on', stage).forEach((im) => (im.loading = 'eager')); };
+    if (document.readyState === 'complete') first(); else addEventListener('load', first, { once: true });
   }
 
   // ── proyectos en el teléfono: sin panel fijo, el teléfono de cada maqueta se desliza un poco contra el portátil ──

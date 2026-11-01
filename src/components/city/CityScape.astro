@@ -58,7 +58,7 @@ const { src, ratio, x = '58%', glow = ['46%', '56%'], fill = false } = Astro.pro
     background: linear-gradient(180deg, rgba(8,7,6,0), #080706 92%);
   }
   /* fill: la ciudad no se encoge al ancho; los bordes de la pantalla se funden con la noche */
-  .foot__scape--fill .foot__city { max-width: none; -webkit-mask-image: none; mask-image: none; }
+  .foot__scape--fill .foot__city { max-width: none; }
   .foot__scape--fill {
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
     -webkit-mask-composite: source-in;

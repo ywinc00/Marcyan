@@ -40,8 +40,8 @@ export const miamiHub = {
   },
   answer: {
     q: '¿Por qué elegir una agencia hispana de diseño web en Miami?',
-    a: 'Porque en Miami el español es la lengua del comercio: cerca del 69% de Miami-Dade es hispano, según el U.S. Census Bureau. Necesitas una agencia que hable el español de tus clientes, cubano, venezolano, colombiano, y que construya tu sitio para que te encuentren en Google y en la IA. Eso te conecta con tu mercado mejor que una agencia genérica.',
-    source: 'U.S. Census Bureau, ACS 2023',
+    a: 'Porque en Miami el español es la lengua del comercio: cerca del 69% de Miami-Dade es hispano y el 75% de sus residentes de 5 años o más habla en casa un idioma distinto del inglés, según el U.S. Census Bureau. Necesitas una agencia que hable el español de tus clientes, cubano, venezolano, colombiano, y que construya tu sitio para que te encuentren en Google y en la IA. Eso te conecta con tu mercado mejor que una agencia genérica.',
+    source: 'U.S. Census Bureau, ACS 2019-2023 (5 años)',
   },
   services: {
     tag: 'Servicios en Miami',
@@ -174,13 +174,13 @@ export const miamiHub = {
         { label: 'Clínicas dentales', icon: 'lucide:stethoscope', q: 'dentista que hable español' },
       ],
     },
-    // cifras de Miami-Dade con su fuente oficial (QuickFacts del Censo: hispanos ≈69 %; idioma en casa 75,2 %, ACS 2019-2023)
+    // cifras de Miami-Dade del Censo (ACS de 5 años 2019-2023: hispanos ≈69 %, idioma en casa distinto del inglés 75,2 %);
+    // la respuesta de arriba las cita con su fuente
     answer: {
       figs: [
         { n: 69, txt: 'de los vecinos de Miami-Dade es hispano' },
         { n: 75, txt: 'de los residentes de 5 años o más habla en casa un idioma distinto del inglés' },
       ],
-      figsSource: 'U.S. Census Bureau, QuickFacts (ACS 2019-2023)',
     },
     cta: { call: `Llámanos: ${nap.miami}`, wa: 'Escríbenos por WhatsApp' },
   },

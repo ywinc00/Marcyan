@@ -43,8 +43,8 @@ export const miamiHub = {
   },
   answer: {
     q: 'Why choose a bilingual web design studio in Miami?',
-    a: 'Because in Miami, Spanish is the language of commerce: close to 69% of Miami-Dade is Hispanic, according to the U.S. Census Bureau. You need a studio that builds in real English and Spanish, writes for the way your Cuban, Venezuelan or Colombian customers actually speak, and structures your site so Google and AI can find you. That connects you to your market far better than a generic agency.',
-    source: 'U.S. Census Bureau, ACS 2023',
+    a: 'Because in Miami, Spanish is the language of commerce: close to 69% of Miami-Dade is Hispanic and 75% of residents age 5 and over speak a language other than English at home, according to the U.S. Census Bureau. You need a studio that builds in real English and Spanish, writes for the way your Cuban, Venezuelan or Colombian customers actually speak, and structures your site so Google and AI can find you. That connects you to your market far better than a generic agency.',
+    source: 'U.S. Census Bureau, 2019-2023 ACS 5-year estimates',
   },
   services: {
     tag: 'Services in Miami',
@@ -118,7 +118,7 @@ export const miamiHub = {
         { n: '03', title: 'Always answer', txt: 'An assistant that answers, books and captures leads at any hour, in the language each customer writes in.', links: [2], vig: 'chat', note: 'On your site and on WhatsApp, the app Miami runs on. When it does not know something, it hands the conversation to you.' },
       ],
       vig: {
-        query: 'cuban restaurant open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
+        query: 'Cuban restaurant open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
         time: '11:42 PM', me1: 'Do you have a table for four tomorrow at 8?', bot: 'Of course. Tomorrow at 8 we have a table on the terrace. Want me to hold it?', me2: 'Yes please, under Carlos.', ok: 'Table held · tomorrow 8:00 PM',
       },
       all: { label: 'See all pricing', href: '/en/pricing' },
@@ -150,7 +150,7 @@ export const miamiHub = {
       tag: 'By industry', title: 'How Miami searches for <em>your industry</em>',
       lead: "What each industry's customers type in Miami, in English or in Spanish. We get your site and your profile ready for that search.",
       rows: [
-        { label: 'Restaurants', icon: 'lucide:utensils', q: 'cuban restaurant open now' },
+        { label: 'Restaurants', icon: 'lucide:utensils', q: 'Cuban restaurant open now' },
         { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'abogado de inmigración en Doral', lang: 'es' },
         { label: 'Real estate', icon: 'lucide:home', q: 'realtor in Brickell' },
         { label: 'Contractors', icon: 'lucide:hard-hat', q: 'roofing contractor near me' },
@@ -164,7 +164,6 @@ export const miamiHub = {
         { n: 69, txt: 'of Miami-Dade residents are Hispanic' },
         { n: 75, txt: 'of residents age 5 and over speak a language other than English at home' },
       ],
-      figsSource: 'U.S. Census Bureau, QuickFacts (ACS 2019-2023)',
     },
     cta: { call: `Call us: ${nap.miami}`, wa: 'Message us on WhatsApp' },
   },

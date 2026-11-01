@@ -163,7 +163,10 @@ export const casos = [
     ],
     check: ({ reply }) => {
       const r = [];
-      if (!has(reply, /tienda|e-?commerce/i)) r.push('no habla de la tienda que pidió ahora');
+      // Basta con que trate lo NUEVO (vender en línea), aunque no diga la palabra
+      // "tienda" (falso negativo del 01-nov: "vender directo en línea", "catálogo").
+      if (!has(reply, /tienda|e-?commerce|vender (directo )?en l[íi]nea|cat[áa]logo|productos|carrito|cobrar en l[íi]nea/i)) r.push('no habla de la tienda que pidió ahora');
+      if (has(reply, /landing/i)) r.push('sigue ofreciendo la landing que descartó');
       if (questions(reply) > 1) r.push(`hace ${questions(reply)} preguntas`);
       return r;
     },

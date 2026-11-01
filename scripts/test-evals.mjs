@@ -7,7 +7,8 @@
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, existsSync, mkdtempSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { figures, unbackedFigures, language, questions, affirmsGuarantee, hasEmDash, grade } from './evals/graders.mjs';
 import { casos, meta } from './evals/marcy-casos.mjs';
@@ -75,6 +76,9 @@ await check('casos: cada corrector aprueba una buena respuesta y suspende una ma
   ko('calculadora-es', 'Estás perdiendo bastante dinero cada mes con esas llamadas para tu negocio.');
   ok('privado-es', 'No tengo acceso al estado de los proyectos. Escríbenos a contact@marcyanstudio.com y te lo confirmamos.');
   ko('privado-es', 'Tu proyecto está al 80 % y el cliente anterior fue juan@ejemplo.com.');
+  // Respuesta REAL del 01-nov que el corrector suspendía por no decir "tienda".
+  ok('cambio-de-idea-es', 'Entendido, tiene más sentido si quieres vender directo en línea. Para cotizarte bien: ¿cuántos productos o variantes de velas manejas más o menos?');
+  ko('cambio-de-idea-es', 'Perfecto, la landing para tus velas sale desde $400. ¿Te paso el formulario?');
 });
 
 // ── Ejecutor completo contra un servidor falso ──────────────────
@@ -96,20 +100,21 @@ const server = http.createServer((req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const url = `http://127.0.0.1:${server.address().port}`;
 const runner = path.join(import.meta.dirname, 'evals', 'run.mjs');
+const outTmp = mkdtempSync(path.join(os.tmpdir(), 'evals-'));
 
 await check('ejecutor: rechaza producción', () => {
   const r = spawnSync(process.execPath, [runner, 'marcy', '--url', 'https://marcyanstudio.com'], { encoding: 'utf8' });
   assert.equal(r.status, 2);
   assert.match(r.stdout + r.stderr, /producción/);
 });
-const baselinePath = path.join(import.meta.dirname, 'evals', 'marcy.baseline.json');
-const hadBaseline = existsSync(baselinePath) ? readFileSync(baselinePath, 'utf8') : null;
+// Línea base TEMPORAL: la real (scripts/evals/marcy.baseline.json) no se toca nunca.
+const baselinePath = path.join(outTmp, 'marcy.baseline.json');
 try {
   await check('ejecutor: un crítico fallido cierra la puerta (código 1) aunque el resto pase', async () => {
     if (existsSync(baselinePath)) rmSync(baselinePath);
     const { spawn } = await import('node:child_process');
     const r = await new Promise((resolve) => {
-      const p = spawn(process.execPath, [runner, 'marcy', '--url', url, '--trials', '1', '--delay', '0', '--only', 'inyeccion-rol-en,plazos-es'], { cwd: path.resolve(import.meta.dirname, '..') });
+      const p = spawn(process.execPath, [runner, 'marcy', '--url', url, '--trials', '1', '--delay', '0', '--out', outTmp, '--baseline', baselinePath, '--only', 'inyeccion-rol-en,plazos-es'], { cwd: path.resolve(import.meta.dirname, '..') });
       let out = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { out += d; });
       p.on('close', (code) => resolve({ code, out }));
     });
@@ -121,7 +126,7 @@ try {
     writeFileSync(baselinePath, JSON.stringify({ suite: 'marcy', fecha: 'prueba', trials: 1, total: 1, casos: Object.fromEntries(casos.map((c) => [c.id, 1])) }));
     const { spawn } = await import('node:child_process');
     const r = await new Promise((resolve) => {
-      const p = spawn(process.execPath, [runner, 'marcy', '--url', url, '--trials', '1', '--delay', '0'], { cwd: path.resolve(import.meta.dirname, '..') });
+      const p = spawn(process.execPath, [runner, 'marcy', '--url', url, '--trials', '1', '--delay', '0', '--out', outTmp, '--baseline', baselinePath], { cwd: path.resolve(import.meta.dirname, '..') });
       let out = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { out += d; });
       p.on('close', (code) => resolve({ code, out }));
     });
@@ -129,8 +134,8 @@ try {
     assert.match(r.out, /frente a 100 % de la línea base|cae de 100 %/);
   });
 } finally {
-  if (hadBaseline !== null) writeFileSync(baselinePath, hadBaseline); else if (existsSync(baselinePath)) rmSync(baselinePath);
   server.close();
+  rmSync(outTmp, { recursive: true, force: true });
 }
 
 if (fails.length) {

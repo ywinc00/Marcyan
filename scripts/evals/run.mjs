@@ -108,7 +108,8 @@ const turnos = results.length * trials;
 // ── Puerta ──────────────────────────────────────────────────────
 const fallos = [];
 for (const r of results) if (r.critico && r.criticalRate < 1) fallos.push(`crítico ${r.id} al ${Math.round(r.criticalRate * 100)} %`);
-const baselinePath = path.join(ROOT, 'scripts', 'evals', `${suite}.baseline.json`);
+// --baseline solo lo usa test:evals (para no tocar la línea base real).
+const baselinePath = opt('baseline', '') || path.join(ROOT, 'scripts', 'evals', `${suite}.baseline.json`);
 let baseline = null;
 if (existsSync(baselinePath)) baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
 if (baseline && !only) {
@@ -123,7 +124,8 @@ console.log(`\nTotal: ${Math.round(total * 100)} % de aciertos en ${turnos} turn
   + (baseline ? ` (línea base ${Math.round(baseline.total * 100)} %, ${baseline.fecha})` : ' (sin línea base)'));
 if (Object.keys(estilo).length) console.log('Estilo (no bloquea): ' + Object.entries(estilo).map(([k, v]) => `${k} en ${v} de ${turnos} respuestas`).join(' · '));
 
-const outDir = path.join(ROOT, 'data', 'evals', suite);
+// --out solo lo usa test:evals (para no mezclar sus pasadas falsas con las reales).
+const outDir = opt('out', '') || path.join(ROOT, 'data', 'evals', suite);
 mkdirSync(outDir, { recursive: true });
 const out = { suite, fecha: runId, url: base, trials, total, estilo, fallos, casos: results };
 writeFileSync(path.join(outDir, `${runId}.json`), JSON.stringify(out, null, 2));

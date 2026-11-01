@@ -1,0 +1,50 @@
+---
+// 3.ª columna del megamenú: "Recursos" (design/rediseno-workos.md §2.12, W-HOME-03).
+// Dos niveles de icono: producto = objeto (MegaServicios), recurso = línea Lucide.
+// Cerrojo 5: sale de v3 (vive en la nav de todo el sitio), TODO su CSS aquí.
+import Icon from '../../ui/Icon.astro';
+import { recursos, navW, type NavLang } from '../../../i18n/w/nav';
+
+interface Props { lang?: NavLang }
+const { lang = 'es' } = Astro.props;
+const items = recursos[lang] ?? recursos.es;
+const ui = navW[lang] ?? navW.es;
+---
+<div class="mr">
+  <p class="mr__label" id="nav-mega-res">{ui.groups.resources}</p>
+  <ul class="mr__list" aria-labelledby="nav-mega-res">
+    {items.map((r) => (
+      <li>
+        <a class="mr__row" href={r.href}>
+          <Icon name={r.icon} class="mr__icon" />
+          <span>{r.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .mr { display: flex; flex-direction: column; min-width: 0; }
+  .mr__label {
+    margin: 0; padding: 12px 16px 8px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
+    color: var(--w-ink-60);
+  }
+  .mr__list { list-style: none; margin: 0; padding: 0; }
+  .mr__row {
+    display: flex; align-items: center; gap: 12px;
+    min-height: 48px; padding: 12px 16px; border-radius: var(--w-r-cell, 8px);
+    font-family: var(--font-body); font-size: 14px; line-height: 1.43;
+    color: var(--w-ink);
+    transition: background var(--w-dur-micro, 150ms) var(--w-ease-ui, ease);
+  }
+  .mr__row :global(.mr__icon) {
+    width: 20px; height: 20px; flex: none; stroke-width: 1.75;
+    color: var(--accent-gold);
+  }
+  @media (--hover-fine) { .mr__row:hover { background: var(--w-s2); } }
+  .mr__row:focus-visible { background: var(--w-s2); }
+  @media (--motion-reduce) { .mr__row { transition: none; } }
+</style>

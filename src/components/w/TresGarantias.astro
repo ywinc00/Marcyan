@@ -1,0 +1,70 @@
+---
+// Tres garantías (W-ADV-49, design/rediseno-workos.md §3.4).
+// Franja de 3 celdas separadas por líneas de 1 px; icono Lucide 20 en el acento,
+// título 16/500 y una línea de 14. Los plazos llegan por props (contacto en
+// 1 hora hábil · propuesta en 24 horas · la web es tuya) y NO se fusionan.
+// La usan precios (§4.4) y los hubs (§4.2).
+// Cerrojo 5: sale de v3 (hubs de ciudad), así que TODO su CSS va aquí y solo
+// lee variables (--w-*, --accent-*, --font-*): no depende de ninguna clase de w.css.
+import Icon from '../ui/Icon.astro';
+
+interface Item { icon: string; title: string; text: string }
+interface Props {
+  items: [Item, Item, Item];
+  /** Titular opcional encima de la franja. */
+  title?: string;
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const { items, title, tone = 'gold', id, class: cls } = Astro.props;
+const accent = tone === 'teal' ? 'var(--accent-teal)' : 'var(--accent-gold)';
+---
+<div class:list={['g3', cls]} id={id} style={`--g3-accent:${accent}`}>
+  {title && <h2 class="g3__title">{title}</h2>}
+  <ul class="g3__list">
+    {items.map((it) => (
+      <li class="g3__item">
+        <Icon name={it.icon} class="g3__ic" />
+        <h3 class="g3__h">{it.title}</h3>
+        <p class="g3__text">{it.text}</p>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .g3 { max-width: var(--w-rail-max, 1200px); margin-inline: auto; }
+  .g3__title {
+    margin: 0 0 32px; text-align: center;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h2-small, 2rem); line-height: 1.2; letter-spacing: -0.03em;
+    color: var(--w-ink, var(--fg-primary));
+  }
+  .g3__list {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr;
+    border-block: 1px solid var(--w-line, rgba(200, 169, 110, .09));
+  }
+  /* Líneas como bordes (sin fondo opaco): en los hubs la franja vive sobre
+     la atmósfera del viaje y no debe abrir un hueco negro. */
+  .g3__item {
+    display: grid; justify-items: center; text-align: center; gap: 0;
+    padding: 28px 16px; min-width: 0;
+  }
+  .g3__item + .g3__item { border-top: 1px solid var(--w-line, rgba(200, 169, 110, .09)); }
+  .g3__list :global(.g3__ic) { width: 20px; height: 20px; color: var(--g3-accent); }
+  .g3__h {
+    margin: 14px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 16px; line-height: 1.35; letter-spacing: 0; color: var(--w-ink, var(--fg-primary));
+  }
+  .g3__text {
+    margin: 4px 0 0; max-width: 32ch;
+    font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--w-ink-70, rgba(240, 237, 232, .7));
+  }
+  @media (--md) {
+    .g3__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .g3__item { padding: 32px 24px; }
+    .g3__item + .g3__item { border-top: 0; border-left: 1px solid var(--w-line, rgba(200, 169, 110, .09)); }
+  }
+</style>

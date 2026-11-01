@@ -1,0 +1,165 @@
+---
+// Tarjeta de precio por servicio (W-CONV-03 + W-CONV-06, design/rediseno-workos.md §3.4).
+// 1200 de ancho, radio 24 → token 22, borde 1 px. Cabecera de 116 px: icono-objeto
+// 56, nombre 24/500, descripción 16 y "Pedir propuesta ›" a #contacto. Cuerpo
+// 760/440: a la izquierda lo incluido (checks oro); a la derecha panel --w-s1
+// con filas de 40 px (nivel | precio 16/500 + unidad) y la caja "¿Necesitas algo
+// distinto?" (borde 1 px, radio 8). SIN deslizador: las calculadoras son de
+// ToolsHub (§4.10). Ningún precio escrito aquí: todo llega por `tiers`
+// (de priceServices / catalog).
+import IconoObjeto from './IconoObjeto.astro';
+import Icon from '../ui/Icon.astro';
+import type { IconoId } from './objects/registry';
+
+interface Tier { label: string; price: string; unit?: string }
+interface Props {
+  serviceId: IconoId;
+  name: string;
+  desc: string;
+  tiers: Tier[];
+  includes?: string[];
+  cta: { label: string; href: string };
+  /** Texto de la caja "¿Necesitas algo distinto?" (pregunta + respuesta corta). */
+  note?: { title: string; text?: string; href?: string; label?: string };
+  /** Rótulo del panel de niveles ("Precios" / "Pricing"). */
+  tiersLabel?: string;
+  /** Rótulo de la columna de lo incluido ("Qué incluye" / "What's included"). */
+  includesLabel?: string;
+  track?: string;
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const {
+  serviceId, name, desc, tiers, includes, cta, note,
+  tiersLabel = 'Precios', includesLabel = 'Qué incluye',
+  track = 'pricing_card_clicked', tone, id, class: cls,
+} = Astro.props;
+const headingId = id ? `${id}-t` : undefined;
+---
+<article class:list={['tp', cls]} id={id} data-w-tone={tone} aria-labelledby={headingId}>
+  <header class="tp__head">
+    <IconoObjeto id={serviceId} size={56} tone={tone} class="tp__icon" />
+    <div class="tp__intro">
+      <h3 class="tp__name" id={headingId}>{name}</h3>
+      <p class="tp__desc">{desc}</p>
+    </div>
+    <a class="tp__cta" href={cta.href} data-track={track}>{cta.label}<span class="tp__chev" aria-hidden="true">›</span></a>
+  </header>
+
+  <div class:list={['tp__body', !includes?.length && 'tp__body--solo']}>
+    {includes && includes.length > 0 && (
+      <div class="tp__inc">
+        <p class="tp__k">{includesLabel}</p>
+        <ul class="tp__list">
+          {includes.map((it) => (
+            <li><Icon name="lucide:check" class="tp__check" />{it}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+    <div class="tp__panel">
+      <p class="tp__k tp__k--panel">{tiersLabel}</p>
+      <dl class="tp__tiers">
+        {tiers.map((t) => (
+          <div class="tp__row">
+            <dt>{t.label}</dt>
+            <dd><span class="tp__price">{t.price}</span>{t.unit && <span class="tp__unit"> {t.unit}</span>}</dd>
+          </div>
+        ))}
+      </dl>
+      {note && (
+        <div class="tp__note">
+          <p class="tp__note-t">{note.title}</p>
+          {note.text && <p class="tp__note-x">{note.text}</p>}
+          {note.href && note.label && (
+            <a class="tp__note-a" href={note.href} data-track={track}>{note.label}<span class="tp__chev" aria-hidden="true">›</span></a>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+</article>
+
+<style>
+  .tp {
+    max-width: var(--w-rail-max); margin-inline: auto;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-tray); box-shadow: var(--w-edge); overflow: hidden;
+  }
+
+  /* ── Cabecera 116 px ── */
+  .tp__head {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center;
+    gap: 16px 24px; padding: 28px 32px; border-bottom: 1px solid var(--w-line);
+  }
+  .tp__name {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h3); line-height: 1.2; letter-spacing: var(--w-tr-h3); color: var(--w-ink);
+  }
+  .tp__desc { margin: 4px 0 0; font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70); }
+  .tp__cta, .tp__note-a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); text-decoration: none;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .tp__cta { grid-column: 1 / -1; justify-self: start; }
+  .tp__chev {
+    font-size: 18px; line-height: 1; color: var(--w-accent, var(--accent-gold));
+    transition: transform var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .tp__cta:hover, .tp__note-a:hover { color: var(--w-accent, var(--accent-gold)); }
+    .tp__cta:hover .tp__chev, .tp__note-a:hover .tp__chev { transform: translateX(3px); }
+  }
+  .tp__cta:focus-visible .tp__chev, .tp__note-a:focus-visible .tp__chev { transform: translateX(3px); }
+  @media (--md) {
+    .tp__head { grid-template-columns: auto minmax(0, 1fr) auto; min-block-size: 116px; padding-block: 24px; }
+    .tp__cta { grid-column: auto; justify-self: end; }
+  }
+
+  /* ── Cuerpo 760 / 440 ── */
+  .tp__body { display: grid; grid-template-columns: 1fr; }
+  @media (--lg) {
+    .tp__body { grid-template-columns: minmax(0, 760fr) minmax(0, 440fr); }
+    .tp__body--solo { grid-template-columns: 1fr; }
+  }
+  .tp__inc { padding: 32px; }
+  .tp__k {
+    margin: 0 0 16px; font-family: var(--font-display); font-weight: 500;
+    font-size: 16px; line-height: 1.3; color: var(--w-ink);
+  }
+  /* Una columna: equilibra en alto con el panel de precios (sin deslizador,
+     dos columnas dejaban media tarjeta vacía). */
+  .tp__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .tp__list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-80);
+  }
+  .tp__list :global(.tp__check) { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--w-accent, var(--accent-gold)); }
+
+  .tp__panel { background: var(--w-s1); padding: 32px; border-top: 1px solid var(--w-line); }
+  @media (--lg) { .tp__panel { border-top: 0; border-left: 1px solid var(--w-line); } }
+  .tp__tiers { margin: 0; }
+  .tp__row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    min-block-size: 40px; padding-block: 8px;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.4;
+  }
+  .tp__row + .tp__row { border-top: 1px solid var(--w-line); }
+  .tp__row dt { color: var(--w-ink-80); min-width: 0; }
+  .tp__row dd { margin: 0; white-space: nowrap; color: var(--w-ink-70); }
+  .tp__price { font-size: 16px; font-weight: 500; color: var(--w-ink); }
+
+  .tp__note {
+    margin-top: 24px; padding: 16px; border: 1px solid var(--w-line-strong); border-radius: var(--w-r-cell);
+  }
+  .tp__note-t { margin: 0; font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.4; color: var(--w-ink); }
+  .tp__note-x { margin: 4px 0 0; font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--w-ink-70); }
+  .tp__note-a { font-size: 15px; min-height: 44px; }
+
+  @media (--lt-md) {
+    .tp__head, .tp__inc, .tp__panel { padding-inline: 20px; }
+  }
+  @media (--motion-reduce) { .tp__chev { transition: none; } .tp__cta:hover .tp__chev, .tp__note-a:hover .tp__chev, .tp__cta:focus-visible .tp__chev, .tp__note-a:focus-visible .tp__chev { transform: none; } }
+</style>

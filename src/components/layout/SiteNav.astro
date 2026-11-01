@@ -11,6 +11,11 @@ import BrandType from '../brand/BrandType.astro';
 import Button from '../ui/Button.astro';
 import { toggleHref } from '../../i18n/routes';
 import { t, type Lang } from '../../i18n/ui';
+// Megamenú (design/rediseno-workos.md §2.12, G10) + sprite de iconos-objeto (§2.8).
+import IconosSprite from '../w/objects/IconosSprite.astro';
+import MegaServicios from '../w/nav/MegaServicios.astro';
+import DrawerGrupos from '../w/nav/DrawerGrupos.astro';
+import { navW, navIcon, cubiertoPorGrupos } from '../../i18n/w/nav';
 
 interface Props {
   nav: any;
@@ -19,6 +24,8 @@ interface Props {
   hasEn?: boolean;
   currentPath?: string;
   showCtaBar?: boolean;
+  /** Megamenú de Servicios + grupos del drawer. false = nav de siempre (plan B, §2.12). */
+  mega?: boolean;
 }
 const {
   nav,
@@ -27,6 +34,7 @@ const {
   hasEn = true,
   currentPath,
   showCtaBar = true,
+  mega = true,
 } = Astro.props;
 const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
 const uin = t(lang as Lang);
@@ -37,15 +45,38 @@ const ctaTrack = nav.cta.track || 'proposal_requested';
 // aria-current: marca el link activo (no aplica al ancla de #contacto).
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
+
+// Megamenú: se acopla al enlace cuyo href termina en /servicios o /services.
+const navLang = (lang === 'en' ? 'en' : 'es') as 'es' | 'en';
+const isServicesLink = (href: string) => /\/(servicios|services)\/?$/.test(href);
+const hasMega = mega && nav.links.some((l: any) => isServicesLink(l.href));
+const uiw = navW[navLang];
+// En el drawer, los enlaces que ya representan los grupos no se repiten.
+const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.href)) : nav.links;
 ---
 <header class="nav" data-nav>
+  <IconosSprite />
   <div class="nav__bar container">
     <a class="nav__logo" href={homeHref} aria-label={uin.nav.home}>
       <BrandType />
     </a>
 
     <nav class="nav__links" aria-label={uin.nav.primary}>
-      {nav.links.map((l: any) => <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+      {nav.links.map((l: any) => hasMega && isServicesLink(l.href)
+        ? (
+          <span class="nav__mega" data-nav-mega-wrap>
+            <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
+            <button class="nav__mega-btn" type="button" aria-expanded="false" aria-controls="nav-mega" aria-label={uiw.megaBtn} data-nav-mega-btn>
+              {/* SVG propio (navIcon), no astro-icon: así ningún icono de la página
+                  (p. ej. el hero de portada) cambia de marcado por el megamenú. */}
+              <Fragment set:html={navIcon('lucide:chevron-down')} />
+            </button>
+            {/* Justo detrás del botón: el Tab entra en el panel. Posición absoluta
+                respecto al <header> (ningún ancestro intermedio está posicionado). */}
+            <MegaServicios lang={navLang} currentPath={currentPath} />
+          </span>
+        )
+        : <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
 
     <div class="nav__actions">
@@ -82,11 +113,15 @@ const isActive = (href: string) =>
     </button>
   </div>
   <nav class="nav__drawer-links" aria-label={uin.nav.mobileMenu}>
-    {nav.links.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
   </nav>
-  <div class="nav__drawer-foot">
-    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track={ctaTrack}>{nav.cta.label}</Button>
-  </div>
+  {hasMega
+    ? <DrawerGrupos lang={navLang} currentPath={currentPath} />
+    : (
+      <div class="nav__drawer-foot">
+        <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track={ctaTrack}>{nav.cta.label}</Button>
+      </div>
+    )}
 </aside>
 
 {showCtaBar && (
@@ -163,6 +198,30 @@ const isActive = (href: string) =>
     .nav__cta { display: inline-flex; }
     .nav__toggle { display: none; }
   }
+  /* Megamenú: "Servicios" sigue siendo enlace; a su lado, el botón-chevron.
+     16 px visibles y 44 de objetivo táctil con ::after. Entre 768 y 1024 el hueco
+     entre enlaces baja de 16 a 12: devuelve los ~18 px que ocupa el botón y la
+     barra mide lo mismo que antes (el CTA no se estrecha). */
+  .nav__mega { display: none; }
+  @media (--md) and (--lt-lg) { .nav__links:has(.nav__mega) { gap: var(--space-3); } }
+  @media (--md) {
+    .nav__mega { display: inline-flex; align-items: center; gap: 2px; }
+    .nav__mega-btn {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: var(--tap-min); padding: 0; color: var(--fg-secondary);
+      transition: color var(--duration-fast);
+    }
+    .nav__mega-btn::after { content: ''; position: absolute; inset: 0 -12px; }
+    .nav__mega-btn :global(svg) {
+      flex: none; width: 14px; height: 14px; stroke-width: 2;
+      transition: transform 150ms var(--w-ease-ui, ease);
+    }
+    .nav__mega-btn[aria-expanded="true"] { color: var(--fg-primary); }
+    .nav__mega-btn[aria-expanded="true"] :global(svg) { transform: rotate(180deg); }
+    .nav__mega-btn:hover { color: var(--fg-primary); }
+  }
+  @media (--motion-reduce) { .nav__mega-btn :global(svg) { transition: none; } }
+
   /* ≥ lg: hay espacio de sobra → respira más entre enlaces */
   @media (--lg) { .nav__links { gap: var(--space-6); } }
 
@@ -253,7 +312,8 @@ const isActive = (href: string) =>
   if (root) {
     const ctabar = document.querySelector('[data-nav-ctabar]') as HTMLElement;
     const onScroll = () => {
-      root.classList.toggle('is-scrolled', window.scrollY > 24);
+      // Con el megamenú abierto la barra conserva su fondo (data-mega-open).
+      root.classList.toggle('is-scrolled', window.scrollY > 24 || root.hasAttribute('data-mega-open'));
       const showBar = window.scrollY > 560;
       if (ctabar) ctabar.classList.toggle('is-visible', showBar);
       // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
@@ -261,6 +321,65 @@ const isActive = (href: string) =>
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // ── Megamenú de Servicios (§2.12) ──────────────────────────
+  // Clic/Enter/Espacio siempre; hover con intención (120 ms entrar, 200 ms salir)
+  // solo con puntero fino; Esc cierra y devuelve el foco; clic fuera, foco fuera
+  // y pasar a < md cierran. Busca dentro de su propio nodo (E-51).
+  const megaWrap = root?.querySelector<HTMLElement>('[data-nav-mega-wrap]');
+  const megaBtn = root?.querySelector<HTMLButtonElement>('[data-nav-mega-btn]');
+  const megaPanel = root?.querySelector<HTMLElement>('[data-nav-mega]');
+  if (root && megaWrap && megaBtn && megaPanel) {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const desk = window.matchMedia('(min-width: 768px)');
+    let tIn = 0, tOut = 0, raf = 0;
+    const isOpen = () => !megaPanel.hidden;
+    const inside = (n: Node | null) => !!n && (megaWrap.contains(n) || megaPanel.contains(n));
+    const openMega = () => {
+      clearTimeout(tOut);
+      if (isOpen()) return;
+      megaPanel.hidden = false;
+      megaBtn.setAttribute('aria-expanded', 'true');
+      root.setAttribute('data-mega-open', '');
+      root.classList.add('is-scrolled');
+      cancelAnimationFrame(raf);
+      // Dos fotogramas: el panel ya pintado en opacidad 0 antes del fundido.
+      raf = requestAnimationFrame(() => { raf = requestAnimationFrame(() => megaPanel.setAttribute('data-open', '')); });
+    };
+    const closeMega = (returnFocus = false) => {
+      clearTimeout(tIn); clearTimeout(tOut); cancelAnimationFrame(raf);
+      if (!isOpen()) return;
+      megaPanel.removeAttribute('data-open');
+      megaPanel.hidden = true;
+      megaBtn.setAttribute('aria-expanded', 'false');
+      root.removeAttribute('data-mega-open');
+      root.classList.toggle('is-scrolled', window.scrollY > 24);
+      if (returnFocus) megaBtn.focus();
+    };
+    megaBtn.addEventListener('click', () => (isOpen() ? closeMega() : openMega()));
+    [megaWrap, megaPanel].forEach((el) => {
+      el.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse' || !fine.matches) return;
+        clearTimeout(tOut);
+        if (!isOpen()) tIn = window.setTimeout(openMega, 120);
+      });
+      el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'mouse' || !fine.matches) return;
+        clearTimeout(tIn);
+        tOut = window.setTimeout(() => closeMega(), 200);
+      });
+      el.addEventListener('focusout', (e) => {
+        if (isOpen() && !inside(e.relatedTarget as Node | null)) closeMega();
+      });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) closeMega(true);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (isOpen() && !inside(e.target as Node)) closeMega();
+    });
+    desk.addEventListener('change', () => { if (!desk.matches) closeMega(); });
   }
 
   // Elección EXPLÍCITA de idioma (plan maestro 0.3): el conmutador ES|EN escribe

@@ -1,0 +1,120 @@
+---
+// Grupos del drawer móvil (design/rediseno-workos.md §2.12, W-HOME-04):
+// SERVICIOS (icono-objeto 40 + nombre 16 + promesa 13) · CIUDADES · RECURSOS
+// (2 columnas, icono de línea 16) y pie en caja con Llamar + WhatsApp.
+// Todos son <a>: la lógica actual del drawer los cierra al pulsarlos.
+// Cerrojo 5: sale de v3, TODO su CSS aquí y solo lee variables.
+
+import Button from '../../ui/Button.astro';
+import IconoObjeto from '../IconoObjeto.astro';
+import { serviciosPara, recursos, ciudades, navW, contactoPara, navIcon, type NavLang } from '../../../i18n/w/nav';
+
+interface Props { lang?: NavLang; currentPath?: string }
+const { lang = 'es', currentPath } = Astro.props;
+const ui = navW[lang] ?? navW.es;
+const items = serviciosPara(lang, currentPath);
+const res = recursos[lang] ?? recursos.es;
+const cities = ciudades[lang] ?? ciudades.es;
+const c = contactoPara(currentPath);
+const isActive = (href: string) => !!currentPath && currentPath.startsWith(href);
+---
+<div class="dg">
+  <div class="dg__group" role="group" aria-labelledby="dg-services">
+    <p class="dg__head" id="dg-services">{ui.groups.services}</p>
+    <ul class="dg__list">
+      {items.map((s) => (
+        <li>
+          <a class="dg__svc" href={s.href}>
+            <IconoObjeto id={s.id} size={40} />
+            <span class="dg__txt">
+              <span class="dg__name">{s.name}</span>
+              <span class="dg__promise">{s.promise}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+      <li>
+        <a class="dg__all" href={ui.allServices.href} aria-current={isActive(ui.allServices.href) ? 'page' : undefined}>
+          {ui.allServices.label}<span class="dg__chev" aria-hidden="true">›</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="dg__group" role="group" aria-labelledby="dg-cities">
+    <p class="dg__head" id="dg-cities">{ui.groups.cities}</p>
+    <ul class="dg__cols">
+      {cities.map((l) => (
+        <li>
+          <a class="dg__line" href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>
+            <Fragment set:html={navIcon('lucide:map-pin', 'dg__icon')} /><span>{l.label}</span>
+          </a>
+        </li>
+      ))}
+      <li>
+        <a class="dg__line" href={ui.allCities.href} aria-current={isActive(ui.allCities.href) ? 'page' : undefined}>
+          <span>{ui.allCities.label}</span><span class="dg__chev" aria-hidden="true">›</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="dg__group" role="group" aria-labelledby="dg-res">
+    <p class="dg__head" id="dg-res">{ui.groups.resources}</p>
+    <ul class="dg__cols">
+      {res.map((r) => (
+        <li>
+          <a class="dg__line" href={r.href} aria-current={isActive(r.href) ? 'page' : undefined}>
+            <Fragment set:html={navIcon(r.icon, 'dg__icon')} /><span>{r.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="dg__foot">
+    <Button href={c.tel} variant="primary" size="lg" data-track="call_clicked" data-track-loc="drawer">{ui.call}</Button>
+    <Button href={c.wa} variant="link" data-track="whatsapp_clicked" data-track-loc="drawer">{ui.whatsapp}</Button>
+  </div>
+</div>
+
+<style>
+  .dg { display: flex; flex-direction: column; }
+  .dg__group { padding: 16px 0 12px; border-top: 1px solid var(--w-line); }
+  .dg__group:first-child { border-top: 0; padding-top: 0; }
+  .dg__head {
+    margin: 0 0 8px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
+    color: var(--w-ink-60);
+  }
+  .dg__list, .dg__cols { list-style: none; margin: 0; padding: 0; }
+  .dg__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; }
+
+  .dg__svc {
+    display: flex; align-items: center; gap: 14px;
+    min-height: 64px; padding: 8px 0;
+    color: var(--w-ink);
+  }
+  .dg__txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .dg__name { font-family: var(--font-body); font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--w-ink); }
+  .dg__promise { font-family: var(--font-body); font-size: 13px; line-height: 1.4; color: var(--w-ink-60); }
+
+  .dg__all, .dg__line {
+    display: flex; align-items: center; gap: 8px; min-height: 44px;
+    font-family: var(--font-body); font-size: 14px; color: var(--w-ink);
+  }
+  .dg__all { font-weight: 500; }
+  .dg__line :global(.dg__icon) { width: 16px; height: 16px; flex: none; stroke-width: 1.75; color: var(--accent-gold); }
+  .dg__chev { font-size: 18px; line-height: 1; color: var(--accent-gold); }
+  .dg a[aria-current="page"] { color: var(--accent-gold); }
+  @media (--hover-fine) {
+    .dg__svc:hover .dg__name, .dg__all:hover, .dg__line:hover { color: var(--accent-gold); }
+  }
+
+  .dg__foot {
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    margin-top: 12px; padding: 16px; border-radius: var(--w-r-cell, 8px);
+    background: var(--w-s1);
+  }
+</style>

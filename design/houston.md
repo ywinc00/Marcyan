@@ -541,3 +541,41 @@ Punto de control previo: etiqueta `houston-v10-movil` (para volver atrás si hac
   Biblioteca del Congreso, 2014) en capas con potrace: silueta y plantas encendidas (los planos de fachada quedan en el
   archivo, apagados). Coloreado con CSS: silueta casi negra contra el resplandor dorado, ventanas en oro en tres intensidades.
   Archivo `public/assets/houston/skyline.svg` (51 KB, 17 KB comprimido), se inserta cuando el pie se acerca.
+
+## v13 · Fluidez del planeta, nodos que nacen en el movimiento, ciudad legible y menos estrellas (2026-10-31)
+
+Encargo del dueño: "las animaciones siguen siendo toscas, rústicas y pesadas; el planeta da tirones; al final los nodos
+aparecen de la nada"; "la parte izquierda de la ciudad sigue viéndose mal, la forma no se entiende"; quitar un 10 % más de
+estrellas en la portada y un 10 % en el pie.
+
+Piezas del catálogo usadas: **F-01** (escala de tiempos y curvas: 200/320/120 ms, curvas de entrada, salida y dentro de
+pantalla, sin rebotes), **F-09** (cambio de estado sin salto: cada nodo se ve pasar, nada aparece en un fotograma) y **F-08**
+(movimiento que aguanta en un móvil de gama media: verificado con la CPU ralentizada 4x y 6x).
+
+Diagnóstico medido (dos agentes, datos en el scratchpad `perf/` y `coreo/`):
+- Coste por fotograma: d3 proyectaba el mundo entero (13 274 puntos, también el hemisferio oculto), lo pasaba a una cadena de
+  160-180 KB y la volvía a leer como Path2D; la tarjeta gráfica rellenaba ese trazado gigante 2-3 veces. Móvil a 4x: hilo
+  principal al 100 % durante el zoom.
+- Curva: cúbica entrada-salida (nada en 150 ms, latigazo a mitad, llegada muerta), giro cortado en seco al 87 % (las zonas
+  cambiaban de velocidad un 87 % en un fotograma) y, en el móvil, parada completa de ~310 ms entre los dos tiempos.
+- Nodos: la capa de puntos y etiquetas, al fundirse, quedaba DEBAJO del lienzo del planeta; salían todos a la vez, con rebote,
+  cuando el mapa ya llevaba ~430 ms parado; la historia seguía redibujando el planeta 2,4 s.
+
+Arreglos:
+- Una sola curva para todos los canales (velocidad en campana: 4 % a los 100 ms, pico a un tercio, llegada suave); el giro se
+  reparte según su coste en pantalla y Houston se desliza en línea recta a su sitio; en el móvil, un solo trayecto (sube y crece
+  a la vez). La textura de la tierra va atada al zoom.
+- Dibujo: solo lo visible (descarte por casquete + recorte al disco), directo a Path2D; el desvanecido inferior dentro del
+  lienzo; el lienzo deja de dibujarse al llegar (el pulso del satélite es una pieza del DOM); calentamiento de la tarjeta
+  gráfica antes del gesto; el fondo WebGL se pinta a ~8 fps mientras la página está quieta.
+- Historia: los puntos nacen sobre el mapa cuando ya se distinguen (28 px entre ellos, ~0,6 del viaje), pegados a su sitio
+  geográfico, y se posan con el zoom; luego, escalonados 80 ms, cada hilo crece desde su punto con un anillo, la etiqueta sale
+  del final del hilo (8 px), se enciende la búsqueda de Pasadena, baja el hilo a la ficha y entra la ficha. Todo con
+  transiciones CSS en el compositor; ≈1,4 s desde que el mapa se posa. Al volver arriba, etiquetas, hilos y ficha salen en
+  120 ms y los puntos vuelven a Houston con el mapa. Segunda vez: todo entra a la vez, sin anillos.
+- La inercia del panel táctil y el dedo apoyado ya no mueven la página mientras salen los nodos; el viaje nunca se invierte a
+  mitad.
+- Texto del móvil: se retira en 120 ms y vuelve en 200 ms (antes, 79 ms con 40 px de recorrido).
+- Estrellas: portada 31→28 y 11→10 (−10 %); pie de Houston densidad 1,5→1,35 (−10 %, solo esta página).
+- Ciudad: lado izquierdo reconstruido por generalización cartográfica (candidata A elegida por un juez frente a B), con los
+  arreglos del juez; ver el registro E-53.

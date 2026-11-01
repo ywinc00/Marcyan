@@ -53,9 +53,8 @@ const names = projects.map((p) => p.name).join('|');
           <p class="micro">{h.hero.microcopy}</p>
         </div></div>
         <canvas id="hx-globe" aria-hidden="true"></canvas>
-        <svg id="hx-wires" aria-hidden="true"></svg>
         <div id="hx-pins" aria-label={j.pinsLabel}></div>
-        <article class="found paper" id="hx-found" aria-label={j.card.label}>
+        <article class="found paper" id="hx-found" tabindex="-1" aria-label={j.card.label}>
           <p class="found__q" id="hx-found-q" hidden><Icon name="lucide:search" class="found__qi" /><span></span></p>
           <div class="found__head">
             <svg class="logo-mark" viewBox="0 0 38 38" aria-hidden="true"><defs><linearGradient id="hx-lmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c4a40"/><stop offset="1" stop-color="#16271f"/></linearGradient></defs><rect width="38" height="38" rx="10" fill="url(#hx-lmg)"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.2" stroke-linecap="round"/><path d="M19 13.2v-2.6M12.6 15.8l-1.8-1.8M25.4 15.8l1.8-1.8" stroke="#f3ecdf" stroke-width="2" stroke-linecap="round"/><path d="M13.5 29h11" stroke="#f3ecdf" stroke-width="1.8" stroke-linecap="round" opacity=".45"/></svg>

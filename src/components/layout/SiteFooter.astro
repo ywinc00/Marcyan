@@ -9,14 +9,15 @@ import LogoWordmark from '../brand/LogoWordmark.astro';
 import StarField from '../StarField.astro';
 import { t, type Lang } from '../../i18n/ui';
 
-interface Props { footer: any; lang?: Lang }
-const { footer, lang = 'es' } = Astro.props;
+// starDensity: densidad de estrellas del pie (por defecto la de todo el sitio; Houston la baja un 10 %)
+interface Props { footer: any; lang?: Lang; starDensity?: number }
+const { footer, lang = 'es', starDensity = 1.5 } = Astro.props;
 const uif = t(lang);
 const f = footer;
 const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
 ---
-<footer class="footer" data-fx="gold" data-fx-density="1.5">
+<footer class="footer" data-fx="gold" data-fx-density={String(starDensity)}>
   <div class="container footer__inner">
     <div class="footer__brand">
       <a href="#top" aria-label="Marcyan Studio — inicio" class="footer__logo">

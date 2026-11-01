@@ -23,8 +23,8 @@ export function initAtmo() {
     return `url("data:image/svg+xml;utf8,${out}</svg>")`;
   }
   const L1 = document.createElement('i'), L2 = document.createElement('i'), L3 = document.createElement('i');
-  L1.style.backgroundImage = starTile(31, 31, 720, 720, false);
-  L2.style.backgroundImage = starTile(77, 11, 900, 900, true); L2.style.backgroundSize = '900px 900px';
+  L1.style.backgroundImage = starTile(31, 28, 720, 720, false);   // 2026-10-31: un 10 % menos en la portada (31→28, 11→10)
+  L2.style.backgroundImage = starTile(77, 10, 900, 900, true); L2.style.backgroundSize = '900px 900px';
   L3.style.backgroundImage = starTile(13, 54, 640, 640, false); L3.style.backgroundSize = '640px 640px'; // más densas: cielo de noche
   starsBox.append(L1, L2, L3);
 
@@ -193,22 +193,30 @@ in vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
   function size() {
     const k = mobile() ? 0.5 : 0.6;
     cv.width = Math.max(2, Math.round(innerWidth * k)); cv.height = Math.max(2, Math.round(innerHeight * k));
+    lastDraw = 0; lastY = -1;
     if (glState === 'ready') gl.viewport(0, 0, cv.width, cv.height);
   }
 
-  let last = 0, clock = 0, raf = 0, ph = phase(0);
+  let last = 0, clock = 0, raf = 0, ph = phase(0), lastY = -1, lastDraw = 0;
+  const css1 = (el, k, v) => { if (el.style[k] !== v) el.style[k] = v; };
   function render(now) {
     raf = requestAnimationFrame(render);
     const dt = now - last;
     last = now;
     if (!reduce.matches) clock += Math.min(dt, 100) / 1000;
+    // con la página quieta (por ejemplo, mientras corre el viaje del planeta) el fondo apenas cambia: se pinta a
+    // unos 8 fotogramas por segundo y deja la tarjeta gráfica libre para la portada
+    const moved = scrollY !== lastY;
+    if (!moved && glState === 'ready' && now - lastDraw < 120) return;
+    lastY = scrollY; lastDraw = now;
     const vh = innerHeight, y = scrollY + vh * 0.5;
     ph = phase(y);
     const scroll = reduce.matches ? 0 : scrollY / vh;
     const sOp = Math.max(ph.space, ph.night * (1 - ph.city));
-    starsBox.style.opacity = Math.max(0, Math.min(1, sOp)).toFixed(3);
-    L3.style.opacity = Math.max(0, Math.min(1, ph.night)).toFixed(3);
-    if (sOp > 0.01) {
+    css1(starsBox, 'opacity', String(+Math.max(0, Math.min(1, sOp)).toFixed(3)));
+    css1(L3, 'opacity', String(+Math.max(0, Math.min(1, ph.night)).toFixed(3)));
+    css1(L3, 'visibility', ph.night < 0.005 ? 'hidden' : '');        // la capa del cielo de noche no se compone en la portada
+    if (sOp > 0.01 && moved) {
       L1.style.transform = `translate3d(0,${-((scrollY * 0.12) % 720)}px,0)`;
       L2.style.transform = `translate3d(0,${-((scrollY * 0.22) % 900)}px,0)`;
       L3.style.transform = `translate3d(0,${-((scrollY * 0.07) % 640)}px,0)`;

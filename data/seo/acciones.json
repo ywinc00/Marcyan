@@ -510,7 +510,7 @@
       "ref": "marcyan-paginas-ciudad-casi-iguales",
       "tipo": "web",
       "titulo": "Páginas de Houston y Miami del mismo servicio casi iguales: reescribir la parte propia de cada ciudad con prueba local real o fusionar (cambia lo que se ve, OK de Yan)",
-      "estado": "encargada",
+      "estado": "hecha",
       "primeraVez": "2026-10-31",
       "ultimaVez": "2026-10-31",
       "propuestas": 1,
@@ -533,6 +533,11 @@
           "fecha": "2026-11-01",
           "estado": "encargada",
           "nota": "Texto propio por ciudad en las 3 parejas ES (IA 90->59 %, tienda 89->64 %, SEO local 88->51 %), PR #51, espera el OK de Yan sobre la vista previa. /en/houston y /en/miami (83 %) quedan para el chat del rediseño de Houston"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "hecha",
+          "nota": "Publicado el 1-nov con OK de Yan (PR #51, cf8970d). En producción los 3 pares ES salen de la lista de casi iguales (antes 90/89/88 %). Revisión 15-nov; quedan /en/houston y /en/miami (83 %) para el chat del rediseño de Houston"
         }
       ]
     }

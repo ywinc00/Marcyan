@@ -4,11 +4,12 @@
 // marca. Houston: foto de dominio público (Carol M. Highsmith, Biblioteca del Congreso, 2014). Miami: foto CC0 (Joe
 // deSousa, Wikimedia Commons, 2019). Se carga cuando el pie se acerca. La ciudad emerge del borde de abajo; el
 // protagonista sigue siendo el cielo.
-// src: el dibujo · ratio: ancho/alto de su viewBox · x: dónde cae su centro en escritorio (la luz va detrás)
-interface Props { src: string; ratio: string; x?: string }
-const { src, ratio, x = '58%' } = Astro.props;
+// src: el dibujo · ratio: ancho/alto de su viewBox · x: dónde cae su centro en escritorio · glow: ancho y centro de
+// la luz que sube por detrás (Miami es más ancha y baja que Houston: la luz se abre para que se lean los dos lados)
+interface Props { src: string; ratio: string; x?: string; glow?: [string, string] }
+const { src, ratio, x = '58%', glow = ['46%', '56%'] } = Astro.props;
 ---
-<div class="foot__scape" aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x}`}>
+<div class="foot__scape" aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x};--glow-w:${glow[0]};--glow-x:${glow[1]}`}>
   <div class="foot__glow"></div>
   <div class="foot__clouds" data-clouds="foot"></div>
   <div class="foot__city" data-skyline-src={src}></div>
@@ -24,7 +25,7 @@ const { src, ratio, x = '58%' } = Astro.props;
   .foot__glow {
     position: absolute; inset: 0;
     background:
-      radial-gradient(ellipse 46% 130% at 56% 100%, rgba(212,158,90,.42), rgba(212,158,90,.12) 55%, rgba(212,158,90,0) 76%),
+      radial-gradient(ellipse var(--glow-w) 130% at var(--glow-x) 100%, rgba(212,158,90,.42), rgba(212,158,90,.12) 55%, rgba(212,158,90,0) 76%),
       linear-gradient(0deg, rgba(180,130,72,.2), rgba(180,130,72,0) 78%);
   }
   /* la ciudad entera, apoyada en el suelo; los dos lados se funden con la noche (la foto corta edificios en los bordes) */

@@ -1,0 +1,126 @@
+---
+// Figura de proyecto (W-PROOF-12, §3.3): captura REAL en marco de navegador de
+// 736 px, radio 8 (3 puntos + dominio SIN enlace), con el teléfono solapado y
+// pie mono 13 ("Texas Rush Remove · Junk Removal · Houston", nombre translate="no").
+// Capturas /Galeria/* con srcset, width/height nativos y carga diferida (CLS 0).
+// Cerrojo 5: sale de v3 (Projects.astro de portada, ola 4), así que TODO su CSS
+// va aquí y solo lee variables --w-* y del sitio. Nunca arte de hero (E-32).
+import { portfolioProjects as PES } from '../../i18n/portfolio';
+import { portfolioProjects as PEN } from '../../i18n/portfolio.en';
+
+interface ProjectLike { name: string; cat: string; slug?: string; mh?: number; accent?: string }
+interface Props {
+  /** De `portfolioProjects` o de `proof.items` (se resuelve por nombre). */
+  project: ProjectLike;
+  /** Lado hacia el que se solapa el teléfono. */
+  side?: 'left' | 'right';
+  lang?: 'es' | 'en';
+  /** Dominio a mostrar en la barra (texto, nunca enlace). Si no se pasa, el del registro verificado. */
+  domain?: string;
+  class?: string;
+}
+const { project, side = 'right', lang = 'es', domain, class: cls } = Astro.props;
+
+const list = lang === 'en' ? PEN : PES;
+const full = list.find((p) => p.name === project.name) ?? PES.find((p) => p.name === project.name);
+const slug = project.slug ?? full?.slug;
+// Alto nativo de cada captura móvil de 520 px (public/Galeria/*-movil-520.webp).
+const MOVIL_520_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
+// Solo dominios VERIFICADOS en el repo (lib/diagnostic-checks.mjs). Los demás, barra sin texto.
+const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
+const shownDomain = domain ?? (slug ? DOMINIOS[slug] : undefined);
+
+const parts = (project.cat ?? '').split('·').map((s) => s.trim());
+const rubro = parts[0] ?? '';
+const cityRaw = parts[1] ?? '';
+const city = slug === 'mja' ? 'Florida (Orlando)' : cityRaw.replace(/,\s*[A-Z]{2}$/, '');
+const alt = lang === 'en'
+  ? { pc: 'desktop view', movil: 'mobile view' }
+  : { pc: 'vista de escritorio', movil: 'vista móvil' };
+---
+{slug && (
+  <figure class:list={['w-fig', `w-fig--${side}`, cls]}>
+    <div class="w-fig__stage">
+      <div class="w-fig__browser">
+        <div class="w-fig__bar" aria-hidden="true">
+          <span class="w-fig__dots"><i></i><i></i><i></i></span>
+          <span class="w-fig__url" translate="no">{shownDomain ?? ''}</span>
+        </div>
+        <div class="w-fig__screen">
+          <img
+            src={`/Galeria/${slug}-pc-900.webp`}
+            srcset={`/Galeria/${slug}-pc-900.webp 900w, /Galeria/${slug}-pc.webp 1920w`}
+            sizes="(min-width: 800px) 736px, calc(100vw - 32px)"
+            width="900" height="506"
+            alt={`${project.name}, ${alt.pc}`}
+            loading="lazy" decoding="async"
+          />
+        </div>
+      </div>
+      <div class="w-fig__phone">
+        <div class="w-fig__phone-screen">
+          <img
+            src={`/Galeria/${slug}-movil-520.webp`}
+            srcset={`/Galeria/${slug}-movil-520.webp 520w, /Galeria/${slug}-movil.webp 1320w`}
+            sizes="(min-width: 800px) 156px, 26vw"
+            width="520" height={MOVIL_520_H[slug] ?? 960}
+            alt={`${project.name}, ${alt.movil}`}
+            loading="lazy" decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+    <figcaption class="w-fig__cap">
+      <span translate="no">{project.name}</span> · {rubro}{city && ` · ${city}`}
+    </figcaption>
+  </figure>
+)}
+
+<style>
+  .w-fig { margin: 0; width: 100%; max-width: 736px; margin-inline: auto; }
+  .w-fig__stage { position: relative; padding-bottom: clamp(28px, 4vw, 48px); }
+
+  .w-fig__browser {
+    position: relative; z-index: 1;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-cell, 8px); box-shadow: var(--w-edge);
+    overflow: hidden;
+  }
+  .w-fig__bar {
+    display: flex; align-items: center; gap: 12px;
+    height: 32px; padding: 0 12px;
+    border-bottom: 1px solid var(--w-line);
+  }
+  .w-fig__dots { display: inline-flex; gap: 6px; flex: none; }
+  .w-fig__dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--w-ink-30); }
+  .w-fig__url {
+    flex: 1; min-width: 0; max-width: 320px; margin-inline: auto; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; background: rgba(var(--star-rgb), 0.05);
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; color: var(--w-ink-60);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .w-fig__screen { aspect-ratio: 900 / 506; background: var(--w-s1); }
+  .w-fig__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+  /* Teléfono solapado sobre la esquina inferior del navegador. */
+  .w-fig__phone {
+    position: absolute; z-index: 2; bottom: 0; right: 4%;
+    width: 21%; min-width: 72px; max-width: 156px;
+    padding: 5px; border-radius: var(--w-r-tray, 22px);
+    background: var(--w-s3); border: 1px solid var(--w-line-strong);
+    box-shadow: var(--w-edge);
+  }
+  .w-fig--left .w-fig__phone { right: auto; left: 4%; }
+  .w-fig__phone-screen {
+    aspect-ratio: 10 / 17; overflow: hidden; border-radius: 17px; background: var(--w-s1);
+  }
+  /* Ancho completo de la captura, recortada solo por abajo (nunca por los lados). */
+  .w-fig__phone-screen img { display: block; width: 100%; height: auto; }
+
+  .w-fig__cap {
+    margin-top: 16px; text-align: center;
+    font-family: var(--font-mono); font-weight: 400; font-size: 13px; line-height: 1.5;
+    color: var(--w-ink-60);
+  }
+</style>

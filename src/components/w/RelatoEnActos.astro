@@ -1,0 +1,43 @@
+---
+// Relato en actos (W-PROOF-08, §3.3): columna de 688 px, H2 26/33.8 con 48 px
+// encima, párrafos 19/30.4 (se lee como revista). Móvil: 17 px a ancho completo.
+// `html` de cada acto es HTML de confianza del dato (párrafos <p>…</p> o texto suelto).
+interface Props {
+  acts: { title: string; html: string; id?: string }[];
+  class?: string;
+}
+const { acts, class: cls } = Astro.props;
+const wrap = (h: string) => (/^\s*<(p|ul|ol|figure|blockquote)\b/i.test(h) ? h : `<p>${h}</p>`);
+---
+<div class:list={['w-story', cls]}>
+  {acts.map((a) => (
+    <section class="w-story__act" aria-labelledby={a.id}>
+      <h2 class="w-story__h" id={a.id}>{a.title}</h2>
+      <div class="w-story__body" set:html={wrap(a.html)} />
+    </section>
+  ))}
+</div>
+
+<style>
+  .w-story { max-width: 688px; margin-inline: auto; }
+  .w-story__act + .w-story__act { margin-top: 48px; }
+  .w-story__h {
+    margin: 0;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 22px; line-height: 1.3; letter-spacing: -0.03em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .w-story__body { margin-top: 16px; }
+  .w-story__body :global(p) {
+    margin: 0 0 1.25em;
+    font-family: var(--font-body); font-size: 17px; line-height: 1.65; color: var(--w-ink-80);
+  }
+  .w-story__body :global(p:last-child) { margin-bottom: 0; }
+  .w-story__body :global(strong) { color: var(--w-ink); font-weight: 600; }
+  .w-story__body :global(a) { color: var(--w-ink); text-decoration: underline; text-decoration-color: rgba(var(--accent-gold-rgb), 0.5); text-underline-offset: 3px; }
+  @media (--md) {
+    .w-story__h { font-size: 26px; line-height: 33.8px; letter-spacing: -0.04em; }
+    .w-story__body { margin-top: 18px; }
+    .w-story__body :global(p) { font-size: 19px; line-height: 30.4px; }
+  }
+</style>

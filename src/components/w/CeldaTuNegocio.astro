@@ -1,0 +1,55 @@
+---
+// Celda "Tu negocio aquí" (W-NEW-08, §3.3): celda punteada 205×64 con marcas de
+// recorte que sobresalen en las esquinas, "+ Tu negocio aquí"; cambio de color
+// en 150 ms; abre WhatsApp con data-track="whatsapp_clicked". Sin movimiento.
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  /** Enlace de WhatsApp (siempre por props, nunca calculado aquí). */
+  href: string;
+  label?: string;
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { href, label, lang = 'es', class: cls } = Astro.props;
+const text = label ?? (lang === 'en' ? 'Your business here' : 'Tu negocio aquí');
+---
+<a
+  class:list={['w-addcell', cls]}
+  href={href}
+  data-track="whatsapp_clicked"
+>
+  <span class="w-addcell__marks" aria-hidden="true"></span>
+  <Icon name="lucide:plus" class="w-addcell__plus" />
+  <span>{text}</span>
+</a>
+
+<style>
+  .w-addcell {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 205px; max-width: 100%; height: 64px;
+    border: 1px dashed var(--w-line-strong);
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1;
+    color: var(--w-ink-70); text-decoration: none;
+    transition: color var(--w-dur-micro, 150ms) var(--w-ease-ui, ease),
+                border-color var(--w-dur-micro, 150ms) var(--w-ease-ui, ease);
+  }
+  .w-addcell :global(.w-addcell__plus) { width: 14px; height: 14px; flex: none; }
+  /* Marcas de recorte: 8 segmentos de 10 px que salen 6 px por fuera de cada esquina. */
+  .w-addcell__marks {
+    position: absolute; inset: -6px; pointer-events: none;
+    --m: var(--w-ink-30);
+    background:
+      linear-gradient(var(--m), var(--m)) left 0 top 6px / 10px 1px,
+      linear-gradient(var(--m), var(--m)) left 6px top 0 / 1px 10px,
+      linear-gradient(var(--m), var(--m)) right 0 top 6px / 10px 1px,
+      linear-gradient(var(--m), var(--m)) right 6px top 0 / 1px 10px,
+      linear-gradient(var(--m), var(--m)) left 0 bottom 6px / 10px 1px,
+      linear-gradient(var(--m), var(--m)) left 6px bottom 0 / 1px 10px,
+      linear-gradient(var(--m), var(--m)) right 0 bottom 6px / 10px 1px,
+      linear-gradient(var(--m), var(--m)) right 6px bottom 0 / 1px 10px;
+    background-repeat: no-repeat;
+  }
+  .w-addcell:hover, .w-addcell:focus-visible { color: var(--w-accent, var(--accent-gold)); border-color: var(--w-accent, var(--accent-gold)); }
+</style>

@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-10-31",
+  "actualizado": "2026-11-01",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -161,7 +161,7 @@
       "ref": "marcyan-indexacion-fase-a",
       "tipo": "web",
       "titulo": "Fase A del triage: fusionar en su hub 7 páginas que Google ya soltó (más 4 en inglés opcionales), un hub por semana desde el 30-oct",
-      "estado": "aprobada",
+      "estado": "descartada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -176,6 +176,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "descartada",
+          "nota": "Sustituida por la fusión del 31-oct (PR #43): las 32 páginas ya redirigen a su página fuerte"
         }
       ]
     },
@@ -183,7 +188,7 @@
       "ref": "marcyan-metas-t4-cobertura",
       "tipo": "meta",
       "titulo": "Cambiar la meta de indexación del trimestre a cobertura sobre URL vivas: deja de caer el 4-nov, 60 % el 4-dic, 80 % en enero",
-      "estado": "aprobada",
+      "estado": "hecha",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -198,6 +203,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "hecha",
+          "nota": "Metas a cobertura escritas en PLAN.md el 18-oct"
         }
       ]
     },
@@ -205,7 +215,7 @@
       "ref": "marcyan-peticiones-variantes",
       "tipo": "dueno",
       "titulo": "Permiso o mano del dueño para una petición de rastreo a 5 páginas el 16 o 17-oct antes de las 09:05",
-      "estado": "aprobada",
+      "estado": "hecha",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -220,6 +230,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "hecha",
+          "nota": "Las 4 pedidas el 24-oct con el dueño delante (CAMBIOS.md); revisión 7-nov"
         }
       ]
     },
@@ -293,7 +308,7 @@
       "ref": "marcyan-diferenciar-4",
       "tipo": "web",
       "titulo": "Reescribir con ficha previa y prueba real 4 páginas (talleres Houston, conversational AI Miami, beauty salons Houston, SEO local Miami), una por semana",
-      "estado": "aprobada",
+      "estado": "descartada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -308,6 +323,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "descartada",
+          "nota": "3 de las 4 juntadas el 31-oct (PR #43); /es/miami/seo-local pasa al encargo de páginas de ciudad casi iguales y al rediseño de Miami"
         }
       ]
     },
@@ -315,7 +335,7 @@
       "ref": "marcyan-fase-a-orden-nuevo",
       "tipo": "web",
       "titulo": "Fase A con orden nuevo: empezar el 17-nov por /es/precios/cuanto-cuesta-seo-local-houston hacia /es/houston/seo-local; la tanda de /en/houston espera al 4-dic porque /en/houston salió del índice",
-      "estado": "aprobada",
+      "estado": "descartada",
       "primeraVez": "2026-10-18",
       "ultimaVez": "2026-10-18",
       "propuestas": 1,
@@ -330,6 +350,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "descartada",
+          "nota": "Sustituida por la fusión del 31-oct (PR #43): /es/precios/cuanto-cuesta-seo-local-houston ya redirige a /es/precios"
         }
       ]
     },

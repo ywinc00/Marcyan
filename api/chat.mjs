@@ -101,9 +101,11 @@ function clientIp(req) {
 // por todas las instancias; si la base falla, cae a memoria y avisa al panel.
 // `store` y `now` solo los pasan las pruebas (memoryStore()).
 
-// Por conexión (12/min y 150/día) y por conversación (40/día).
-export async function chatAllowed({ ip, sid, store, now } = {}) {
-  const byIp = await persistLimit({ bucket: envBucket('chat'), key: ip, limits: RL.chat, store, now });
+// Por conexión (12/min y 150/día; fuera de producción 600/día para las pruebas)
+// y por conversación (40/día).
+export async function chatAllowed({ ip, sid, store, now, env = chatEnv() } = {}) {
+  const limits = env === 'production' ? RL.chat : RL.chatNoProd;
+  const byIp = await persistLimit({ bucket: envBucket('chat'), key: ip, limits, store, now });
   if (!byIp.ok) return false;
   const bySession = await persistLimit({ bucket: envBucket('chatSession'), key: sid, limits: RL.chatSession, store, now });
   return bySession.ok;
@@ -112,8 +114,9 @@ export async function chatAllowed({ ip, sid, store, now } = {}) {
 // Tope de TODO el sitio: mensajes que llegan a la IA en un día. Acota el gasto
 // aunque el abuso venga de muchas conexiones. `justHit` = esta petición es la
 // primera que lo pasa (para avisar una vez, no en cada bloqueo).
-export async function chatGlobalAllowed({ store, now } = {}) {
-  const r = await persistLimit({ bucket: envBucket('chatGlobal'), key: GLOBAL_KEY, limits: RL.chatGlobal, store, now });
+export async function chatGlobalAllowed({ store, now, env = chatEnv() } = {}) {
+  const limits = env === 'production' ? RL.chatGlobal : RL.chatGlobalNoProd;
+  const r = await persistLimit({ bucket: envBucket('chatGlobal'), key: GLOBAL_KEY, limits, store, now });
   const c = r.counts[0];
   return { ok: r.ok, justHit: !r.ok && !!c && c.count === c.limit + 1 };
 }

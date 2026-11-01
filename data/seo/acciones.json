@@ -242,7 +242,7 @@
       "ref": "marcyan-honestidad-textos",
       "tipo": "web",
       "titulo": "Quitar de los textos lo que no se puede demostrar (IA de Google ya lo recomienda, enlaces que puedes visitar, oferta de 400, precios del blog) en un solo cambio",
-      "estado": "aprobada",
+      "estado": "descartada",
       "primeraVez": "2026-10-13",
       "ultimaVez": "2026-10-13",
       "propuestas": 1,
@@ -257,6 +257,11 @@
           "fecha": "2026-10-18",
           "estado": "aprobada",
           "nota": "OK del dueño en el chat del proyecto, 18-oct"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "descartada",
+          "nota": "Yan, 1-nov: la IA ya recomienda a los tres clientes (TRR, Julio's y MJA); no se quita nada del sitio"
         }
       ]
     },
@@ -523,6 +528,11 @@
           "fecha": "2026-10-31",
           "estado": "encargada",
           "nota": "OK del dueño 2026-10-31: para después; encargo en el roadmap (no volver a proponer)"
+        },
+        {
+          "fecha": "2026-11-01",
+          "estado": "encargada",
+          "nota": "Texto propio por ciudad en las 3 parejas ES (IA 90->59 %, tienda 89->64 %, SEO local 88->51 %), PR #51, espera el OK de Yan sobre la vista previa. /en/houston y /en/miami (83 %) quedan para el chat del rediseño de Houston"
         }
       ]
     }

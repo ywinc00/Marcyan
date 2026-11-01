@@ -1,0 +1,120 @@
+---
+// Tarjeta-objeto con capa desplazada (W-CORE-16 · design/rediseno-workos.md §3.6).
+// 476×359, radio 44, OPACA (clara si su contenido es un objeto de producto). Trama de
+// puntos SOLO en la franja superior sin texto (zona del icono, slot "icon"). Detrás,
+// capa idéntica desplazada 25 px arriba-izquierda en el acento de la página (18 % → 6 %).
+// Haces de líneas oro al 10 % que convergen desde la izquierda, en la franja baja
+// (por debajo de la fila de botones del hero), nunca detrás de texto; fuera en móvil.
+// Botón interno 346×44 con halo ORO (nunca teal, E-03): es ilustración, no un control.
+// Coreografía: tarjeta data-w-in="obj"; capa "sat" 500 ms (data-w-sat="layer").
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  surface?: 'product' | 'system';
+  tone?: 'gold' | 'teal';
+  /** Texto del botón interno (ilustrativo). */
+  button?: string;
+  beams?: boolean;
+  example?: boolean;
+  size?: 'hero' | 'card' | 'mini';
+  /** Resumen para lectores de pantalla (la tarjeta es aria-hidden). */
+  sr?: string;
+  class?: string;
+}
+const {
+  lang = 'es', surface = 'product', tone = 'gold', button, beams = true,
+  example = true, size = 'hero', sr, class: cls,
+} = Astro.props;
+const lines = Array.from({ length: 14 }, (_, i) => 120 + i * 18);
+---
+<div class:list={['wo-to', `wo-to--${surface}`, `wo-to--${size}`, cls]} data-tone={tone}>
+  {sr && <p class="sr-only">{sr}</p>}
+  {beams && (
+    <svg class="wo-to__beams" viewBox="0 0 900 420" preserveAspectRatio="none" aria-hidden="true">
+      {lines.map((y, i) => (
+        <path d={`M0 ${y + i * 6} C 380 ${y + i * 4}, 640 ${80 + i * 3}, 900 ${70 + i * 2}`} />
+      ))}
+    </svg>
+  )}
+  <div class="wo-to__layer" data-w-in="sat" data-w-sat="layer" style="--w-sat-x:25px;--w-sat-y:25px" aria-hidden="true"></div>
+  <div class="wo-to__card" data-w-in="obj" aria-hidden="true">
+    {example && <Ejemplo lang={lang} on={surface === 'product' ? 'light' : 'dark'} />}
+    <div class="wo-to__band"><slot name="icon" /></div>
+    <div class="wo-to__body">
+      <slot />
+      {button && <span class="wo-to__btn">{button}</span>}
+    </div>
+  </div>
+</div>
+
+<style>
+  .wo-to {
+    --wo-acc-rgb: var(--accent-gold-rgb);
+    position: relative; width: min(100%, 476px); min-height: 359px;
+    isolation: isolate;
+  }
+  .wo-to[data-tone='teal'] { --wo-acc-rgb: var(--accent-teal-rgb); }
+  .wo-to__beams {
+    position: absolute; z-index: -2; right: calc(100% - 60px); top: 34%;
+    width: min(900px, 62vw); height: 420px;
+    fill: none; stroke: rgba(var(--accent-gold-rgb), .10); stroke-width: 1;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%);
+    mask-image: linear-gradient(90deg, transparent, #000 35%);
+    pointer-events: none;
+  }
+  .wo-to__beams path { vector-effect: non-scaling-stroke; }
+  .wo-to__layer {
+    position: absolute; z-index: -1; top: -25px; left: -25px; width: 100%; height: 100%;
+    border-radius: var(--w-r-feature, 44px);
+    background: linear-gradient(180deg, rgba(var(--wo-acc-rgb), .18), rgba(var(--wo-acc-rgb), .06));
+    border: 1px solid rgba(var(--wo-acc-rgb), .14);
+  }
+  .wo-to__card {
+    position: relative; min-height: 359px; height: 100%;
+    border-radius: var(--w-r-feature, 44px); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .wo-to--product .wo-to__card {
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  .wo-to--system .wo-to__card {
+    background: var(--w-s2, #181817); color: var(--w-ink, #f0ede8);
+    border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wo-to__card :global(.w-example--corner) { top: 20px; right: 26px; }
+  .wo-to__band {
+    position: relative; height: 96px; flex: none;
+    display: grid; place-items: center;
+  }
+  .wo-to__band::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(rgba(14,14,13,.14) 1px, transparent 1.3px) 0 0 / 22px 22px;
+    -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent);
+    mask-image: linear-gradient(180deg, #000 40%, transparent);
+  }
+  .wo-to--system .wo-to__band::before { background: var(--w-dots); }
+  .wo-to__band > :global(*) { position: relative; }
+  .wo-to__body {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: 4px 40px 36px;
+  }
+  .wo-to__btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: min(100%, 346px); height: 44px; margin-top: auto;
+    border-radius: 8px; background: #fff; color: var(--w-p-ink, #0e0e0d);
+    font: 600 15px/1 var(--font-body);
+    border: 1px solid rgba(var(--accent-gold-rgb), .55);
+    box-shadow: 0 0 0 4px rgba(var(--accent-gold-rgb), .14), 0 0 22px rgba(var(--accent-gold-rgb), .30);
+  }
+  .wo-to--system .wo-to__btn { background: var(--w-s3, #1f1f1d); color: var(--w-ink, #f0ede8); }
+  @media (--lt-md) {
+    .wo-to { width: min(100% - 25px, 476px); margin-left: 25px; min-height: 0; }
+    .wo-to__beams { display: none; }
+    .wo-to__card { min-height: 300px; border-radius: var(--w-r-tray, 22px); }
+    .wo-to__layer { border-radius: var(--w-r-tray, 22px); top: -16px; left: -16px; }
+    .wo-to__body { padding: 4px 22px 24px; }
+  }
+</style>

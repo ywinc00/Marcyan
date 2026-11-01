@@ -1,0 +1,108 @@
+---
+// Solicitud de oficio (contenido de TarjetaObjeto en las landings de sector · §3.6).
+// Objeto de PRODUCTO (claro), estático. Lo que le llega al negocio del cliente:
+//   kind="contratista"  → aviso en el teléfono: "Solicitud de presupuesto: remodelación de
+//                         cocina · Katy · 21:40" + "Responder".
+//   kind="inmobiliaria" → ficha de propiedad de EJEMPLO + "¿Sigue disponible?".
+//   kind="restaurante"  → menú + "Pedir por WhatsApp" (WhatsApp solo en texto, icono genérico).
+// Sin precios ni cifras de negocio inventadas; nombres genéricos ("Tu Negocio").
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  kind: 'contratista' | 'inmobiliaria' | 'restaurante';
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  /** false cuando va dentro de una TarjetaObjeto que ya lleva su etiqueta. */
+  example?: boolean;
+  class?: string;
+}
+const { kind, lang = 'es', size = 'card', example = true, class: cls } = Astro.props;
+const en = lang === 'en';
+const C = {
+  contratista: en
+    ? { app: 'New request', title: 'Estimate request', body: 'Kitchen remodel · Katy', time: '9:40 p.m.', from: 'From your website', btn: 'Reply', icon: 'lucide:hammer', sr: 'Example: an estimate request for a kitchen remodel in Katy arrives at 9:40 p.m. through your website.' }
+    : { app: 'Nueva solicitud', title: 'Solicitud de presupuesto', body: 'Remodelación de cocina · Katy', time: '21:40', from: 'Desde tu web', btn: 'Responder', icon: 'lucide:hammer', sr: 'Ejemplo: llega a las 21:40 una solicitud de presupuesto para remodelar una cocina en Katy, desde tu web.' },
+  inmobiliaria: en
+    ? { app: 'Listing', title: '3-bedroom house', body: 'Yard and garage · open house Saturday', time: '11:05', from: 'Is it still available?', btn: 'Reply', icon: 'lucide:house', sr: 'Example: a buyer asks whether a 3-bedroom house is still available.' }
+    : { app: 'Propiedad', title: 'Casa de 3 recámaras', body: 'Patio y cochera · se muestra el sábado', time: '11:05', from: '¿Sigue disponible?', btn: 'Responder', icon: 'lucide:house', sr: 'Ejemplo: un comprador pregunta si una casa de 3 recámaras sigue disponible.' },
+  restaurante: en
+    ? { app: "Today's menu", title: 'Your Restaurant', body: '', time: '', from: '', btn: 'Order on WhatsApp', icon: 'lucide:utensils', sr: "Example: today's menu with a button to order on WhatsApp.", menu: ['Chicken enchiladas', 'Shrimp tacos', 'Rice and beans'] }
+    : { app: 'Menú de hoy', title: 'Tu Restaurante', body: '', time: '', from: '', btn: 'Pedir por WhatsApp', icon: 'lucide:utensils', sr: 'Ejemplo: el menú del día con un botón para pedir por WhatsApp.', menu: ['Enchiladas de pollo', 'Tacos de camarón', 'Arroz y frijoles'] },
+}[kind] as { app: string; title: string; body: string; time: string; from: string; btn: string; icon: string; sr: string; menu?: string[] };
+---
+<div class:list={['wo-req', `wo-req--${kind}`, `wo-req--${size}`, example && 'wo-req--ex', cls]}>
+  <p class="sr-only">{C.sr}</p>
+  <div class="wo-req__card" aria-hidden="true">
+    {example && <Ejemplo lang={lang} on="light" />}
+    <p class="wo-req__app"><span class="wo-req__ic"><Icon name={C.icon} /></span>{C.app}{C.time && <span class="wo-req__time">{C.time}</span>}</p>
+
+    {kind === 'contratista' && (
+      <div class="wo-req__note">
+        <b>{C.title}</b>
+        <span>{C.body}</span>
+        <span class="wo-req__from">{C.from}</span>
+      </div>
+    )}
+
+    {kind === 'inmobiliaria' && (
+      <>
+        <div class="wo-req__prop">
+          <span class="wo-req__photo"><Icon name="lucide:house" /></span>
+          <span class="wo-req__pt"><b>{C.title}</b><span>{C.body}</span></span>
+        </div>
+        <p class="wo-req__msg">{C.from}</p>
+      </>
+    )}
+
+    {kind === 'restaurante' && (
+      <>
+        <p class="wo-req__rest" translate="no">{C.title}</p>
+        <ul class="wo-req__menu">{C.menu?.map((m) => <li>{m}</li>)}</ul>
+      </>
+    )}
+
+    <span class:list={['wo-req__btn', kind === 'restaurante' && 'wo-req__btn--wa']}>
+      {kind === 'restaurante' && <Icon name="lucide:message-circle" />}{C.btn}
+    </span>
+  </div>
+</div>
+
+<style>
+  .wo-req { position: relative; width: min(100%, 346px); font-family: var(--font-body); text-align: left; }
+  .wo-req__card {
+    position: relative; display: flex; flex-direction: column; gap: 12px; padding: 16px;
+    background: #fff; color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: var(--w-r-obj, 12px);
+  }
+  .wo-req--ex .wo-req__app { padding-right: 80px; }
+  .wo-req__app { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--w-p-ink-2, #4a4743); }
+  .wo-req__ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d); }
+  .wo-req__ic :global(svg) { width: 14px; height: 14px; }
+  .wo-req__time { margin-left: auto; font-weight: 400; }
+  .wo-req__note { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border-radius: 10px; background: var(--w-p-bg, #f0ede8); }
+  .wo-req__note b { font: 600 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .wo-req__note span { font-size: 14px; }
+  .wo-req__note .wo-req__from { color: var(--w-p-ink-2, #4a4743); font-size: 13px; }
+  .wo-req__prop { display: flex; gap: 12px; align-items: center; }
+  .wo-req__photo {
+    flex: none; display: grid; place-items: center; width: 72px; height: 56px; border-radius: 8px;
+    background: linear-gradient(160deg, #e3dfd7, #cfc9be); color: #6b6660;
+  }
+  .wo-req__photo :global(svg) { width: 24px; height: 24px; }
+  .wo-req__pt { display: flex; flex-direction: column; gap: 2px; }
+  .wo-req__pt b { font: 600 15px/1.25 var(--font-display); }
+  .wo-req__pt span { font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-req__msg {
+    margin: 0; align-self: flex-start; padding: 9px 12px; border-radius: 12px; border-bottom-left-radius: 4px;
+    background: var(--w-p-bg, #f0ede8); font-size: 14px;
+  }
+  .wo-req__rest { margin: 0; font: 600 17px/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .wo-req__menu { list-style: none; margin: 0; padding: 0; }
+  .wo-req__menu li { padding: 8px 0; font-size: 14px; border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .wo-req__btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 8px;
+    background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font-size: 14px; font-weight: 600;
+  }
+  .wo-req__btn :global(svg) { width: 16px; height: 16px; }
+</style>

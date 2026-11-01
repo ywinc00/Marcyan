@@ -1,0 +1,115 @@
+---
+// Marco con pestañas (W-ADV-18 · design/rediseno-workos.md §3.6, §2.10). Objeto de SISTEMA.
+// Marco radio 24 con borde 1 px teal al 45 %; barra de pestañas 52 px de alto, radio 26,
+// fondo blanco al 6 % SIN backdrop-filter; 4 pestañas de 40 px. Activa = píldora crema
+// con spinner; inactivas 14/500 al 80 % con círculo vacío de 12 px. La píldora se
+// desliza en 400 ms. Móvil: las pestañas se desplazan en horizontal dentro del marco.
+// Lleva el ritmo de lo que tenga dentro: emite wo:play {index} / wo:stop / wo:still y,
+// si el hijo (ChatMarcy con tabsBar={false}) responde wo:done, pasa a la siguiente tras
+// una pausa; si no hay hijo que responda, cambia cada 8 s.
+// Ilustración: la barra es aria-hidden (no son pestañas que maneje el visitante).
+interface Props {
+  tabs: string[];
+  lang?: 'es' | 'en';
+  tone?: 'teal' | 'gold';
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { tabs, lang = 'es', tone = 'teal', size = 'hero', class: cls } = Astro.props;
+---
+<div class:list={['wo-marco', `wo-marco--${size}`, cls]} data-tone={tone} data-wo-marco data-lang={lang}>
+  <div class="wo-marco__bar" aria-hidden="true">
+    <div class="wo-marco__track">
+      <span class="wo-marco__pill"></span>
+      {tabs.map((t, i) => <span class:list={['wo-marco__tab', i === 0 && 'is-on']}><i></i>{t}</span>)}
+    </div>
+  </div>
+  <div class="wo-marco__body"><slot /></div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  const FALLBACK = 8000, HOLD = 1200, SLIDE = 400;
+  document.querySelectorAll<HTMLElement>('[data-wo-marco]').forEach((el) => {
+    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.wo-marco__tab'));
+    const pill = el.querySelector<HTMLElement>('.wo-marco__pill');
+    const track = el.querySelector<HTMLElement>('.wo-marco__track');
+    if (!tabs.length) return;
+    let idx = 0, timer = 0, answered = false;
+    const move = (i: number) => {
+      tabs.forEach((t, k) => t.classList.toggle('is-on', k === i));
+      const t = tabs[i];
+      if (pill && t) { pill.style.width = `${t.offsetWidth}px`; pill.style.transform = `translateX(${t.offsetLeft}px)`; }
+      // En móvil, la activa a la vista dentro de su propio carril (sin mover la página).
+      if (track && t && track.scrollWidth > track.clientWidth) track.scrollTo({ left: t.offsetLeft - 16, behavior: 'smooth' });
+    };
+    const advance = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        idx = (idx + 1) % tabs.length; move(idx);
+        timer = window.setTimeout(play, SLIDE);
+      }, answered ? HOLD : 0);
+    };
+    const play = () => {
+      el.dispatchEvent(new CustomEvent('wo:play', { detail: { index: idx } }));
+      window.clearTimeout(timer);
+      if (!answered) timer = window.setTimeout(advance, FALLBACK);
+    };
+    el.addEventListener('wo:done', () => { answered = true; advance(); });
+    requestAnimationFrame(() => move(0));
+    window.addEventListener('resize', () => move(idx), { passive: true });
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); play(); },
+      stop: () => { window.clearTimeout(timer); el.dispatchEvent(new CustomEvent('wo:stop')); },
+      still: () => { window.clearTimeout(timer); idx = 0; move(0); el.classList.add('is-still'); el.dispatchEvent(new CustomEvent('wo:still')); },
+    });
+  });
+</script>
+
+<style>
+  .wo-marco {
+    --wo-acc-rgb: var(--accent-teal-rgb);
+    position: relative; width: min(100%, 1080px); margin-inline: auto;
+    padding: 14px; border-radius: 24px;
+    border: 1px solid rgba(var(--wo-acc-rgb), .45);
+    background: var(--w-s1, #121211);
+    font-family: var(--font-body);
+  }
+  .wo-marco[data-tone='gold'] { --wo-acc-rgb: var(--accent-gold-rgb); }
+  .wo-marco__bar {
+    height: 52px; padding: 6px; border-radius: 26px; margin-bottom: 14px;
+    background: rgba(255, 255, 255, .06);
+  }
+  .wo-marco__track {
+    position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    height: 40px; overflow-x: auto; scrollbar-width: none;
+  }
+  .wo-marco__track::-webkit-scrollbar { display: none; }
+  .wo-marco__pill {
+    position: absolute; left: 0; top: 0; height: 40px; width: 0; border-radius: 20px;
+    background: var(--w-p-bg, #f0ede8);
+    transition: transform 400ms var(--w-ease-ui), width 400ms var(--w-ease-ui);
+  }
+  .wo-marco__tab {
+    position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 40px; padding: 0 14px; border-radius: 20px; white-space: nowrap;
+    font-size: 14px; font-weight: 500; color: var(--w-ink-80);
+    transition: color 200ms var(--w-ease-ui);
+  }
+  .wo-marco__tab i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid currentColor; opacity: .7; flex: none; }
+  .wo-marco__tab.is-on { color: var(--w-p-ink, #0e0e0d); }
+  .wo-marco__tab.is-on i { border-color: rgba(14,14,13,.22); border-top-color: var(--w-p-ink, #0e0e0d); opacity: 1; animation: wo-marco-spin 900ms linear infinite; }
+  .wo-marco.is-still .wo-marco__tab.is-on i { animation: none; }
+  @keyframes wo-marco-spin { to { transform: rotate(360deg); } }
+  .wo-marco__body > :global(*) { width: 100%; }
+  .wo-marco__body :global(.wo-chat.wo-chat) { width: 100%; }
+  .wo-marco__body :global(.wo-chat__frame.wo-chat__frame) { padding: 0; border: 0; background: none; box-shadow: none; }
+  @media (--lt-md) {
+    .wo-marco { padding: 8px; border-radius: 20px; }
+    .wo-marco__track { grid-auto-columns: max-content; }
+  }
+  @media (--motion-reduce) {
+    .wo-marco__pill { transition: none; }
+    .wo-marco__tab.is-on i { animation: none; }
+  }
+</style>

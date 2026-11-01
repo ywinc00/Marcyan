@@ -1,0 +1,63 @@
+---
+// Túnel de rejilla (W-ADV-28 · design/rediseno-workos.md §3.6). Objeto de SISTEMA, fondo.
+// Rejilla de 1 px oro en perspectiva hacia un rectángulo central limpio de 840×600 (4
+// paredes, SVG inline generado aquí), y un arco teal suave desde la esquina inferior
+// derecha (radial CSS). Cubre la ventana entera (E-36): el SVG va con "slice" y el
+// hero que lo monte le da position:relative + overflow:clip. El texto vive en el
+// rectángulo central, que no lleva líneas (E-37). Estático. Decorativo: aria-hidden,
+// sin etiqueta "Ejemplo" (no muestra datos).
+interface Props {
+  /** Opacidad de las líneas (0.06 según plan; sube un punto si la captura no las enseña). */
+  strength?: number;
+  arc?: boolean;
+  class?: string;
+}
+const { strength = 0.08, arc = true, class: cls } = Astro.props;
+const W = 1920, H = 1080;
+const I = { x0: 540, y0: 240, x1: 1380, y1: 840 };          // rectángulo central 840×600
+const O = { x0: -260, y0: -300, x1: W + 260, y1: H + 300 };  // fuera del lienzo: siempre cubre
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const f = (n: number) => n.toFixed(1);
+// Anillos en profundidad (más juntos hacia el fondo, como una perspectiva real).
+const rings = Array.from({ length: 9 }, (_, i) => Math.pow((i + 1) / 9, 1.9)).map((t) => {
+  const x0 = lerp(I.x0, O.x0, t), y0 = lerp(I.y0, O.y0, t), x1 = lerp(I.x1, O.x1, t), y1 = lerp(I.y1, O.y1, t);
+  return `M${f(x0)} ${f(y0)}H${f(x1)}V${f(y1)}H${f(x0)}Z`;
+});
+// Líneas de fuga: de cada punto del borde interior al punto equivalente del exterior.
+const rays: string[] = [];
+const NX = 10, NY = 7;
+for (let i = 0; i <= NX; i++) {
+  const t = i / NX;
+  rays.push(`M${f(lerp(I.x0, I.x1, t))} ${I.y0}L${f(lerp(O.x0, O.x1, t))} ${O.y0}`);
+  rays.push(`M${f(lerp(I.x0, I.x1, t))} ${I.y1}L${f(lerp(O.x0, O.x1, t))} ${O.y1}`);
+}
+for (let j = 1; j < NY; j++) {
+  const t = j / NY;
+  rays.push(`M${I.x0} ${f(lerp(I.y0, I.y1, t))}L${O.x0} ${f(lerp(O.y0, O.y1, t))}`);
+  rays.push(`M${I.x1} ${f(lerp(I.y0, I.y1, t))}L${O.x1} ${f(lerp(O.y0, O.y1, t))}`);
+}
+const inner = `M${I.x0} ${I.y0}H${I.x1}V${I.y1}H${I.x0}Z`;
+---
+<div class:list={['wo-tunnel', cls]} aria-hidden="true" style={`--wo-a:${strength}`}>
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice">
+    <path class="wo-tunnel__grid" d={rings.join('') + rays.join('')} />
+    <path class="wo-tunnel__in" d={inner} />
+  </svg>
+  {arc && <span class="wo-tunnel__arc"></span>}
+</div>
+
+<style>
+  .wo-tunnel { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .wo-tunnel svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .wo-tunnel__grid { fill: none; stroke: rgba(var(--accent-gold-rgb), var(--wo-a)); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .wo-tunnel__in { fill: none; stroke: rgba(var(--accent-gold-rgb), calc(var(--wo-a) * 1.6)); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .wo-tunnel__arc {
+    position: absolute; inset: 0;
+    background: radial-gradient(70% 60% at 100% 100%, rgba(var(--accent-teal-rgb), .10) 0%, rgba(var(--accent-teal-rgb), .04) 45%, transparent 70%);
+  }
+  /* Funde arriba (bajo la nav) y abajo, sin bordes rectos (E-36). */
+  .wo-tunnel {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 80%, transparent 100%);
+  }
+</style>

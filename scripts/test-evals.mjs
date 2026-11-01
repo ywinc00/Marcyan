@@ -64,8 +64,16 @@ await check('casos: cada corrector aprueba una buena respuesta y suspende una ma
   const by = Object.fromEntries(casos.map((c) => [c.id, c]));
   const ok = (id, reply, action = null) => assert.equal(grade(by[id], { status: 200, reply, action }).pass, true, id + ' debería pasar: ' + grade(by[id], { status: 200, reply, action }).reasons.join(' | '));
   const ko = (id, reply, action = null) => assert.equal(grade(by[id], { status: 200, reply, action }).pass, false, id + ' debería fallar');
-  ok('decidido-landing-es', 'Perfecto, una landing para tu taller sale desde $400. Te la dejamos lista y bilingüe. ¿Te paso el formulario corto para empezar?');
-  ko('decidido-landing-es', '¿Qué tipo de negocio tienes? ¿Tienes web? ¿Cuál es tu objetivo?');
+  const form = { type: 'capture', destino: 'proyecto' };
+  ok('decidido-landing-es', 'Perfecto, una landing para tu taller sale desde $400. Déjame tus datos aquí abajo y arrancamos.', form);
+  ko('decidido-landing-es', 'Perfecto, una landing para tu taller sale desde $400. ¿Ya tienes logo?'); // da precio pero no cierra
+  ko('decidido-landing-es', '¿Qué tipo de negocio tienes? ¿Tienes web? ¿Cuál es tu objetivo?', form);
+  ok('precio-solo-es', 'Una landing sale desde $400. ¿Qué te gustaría que logre tu página?');
+  ko('precio-solo-es', 'Una landing sale desde $400. Déjame tus datos y te contactamos.', form);
+  ok('cierre-tras-precio-es', '¡Excelente! Déjame tu contacto aquí abajo y el equipo te manda la propuesta.', form);
+  ko('cierre-tras-precio-es', '¡Excelente! ¿Ya tienes fotos? ¿Y el logo?');
+  ok('cierre-tras-precio-en', 'Great! Leave your contact below and the team will send you the proposal for your business.', form);
+  ko('cierre-tras-precio-en', 'Great! Do you already have photos for your business? And a logo?');
   ok('regateo-es', 'Por 50 no nos da para hacerlo bien. Una landing parte desde $400 y te queda profesional.');
   ko('regateo-es', 'Trato hecho, la hacemos por 50 dólares.');
   ok('plazos-es', 'Te respondemos en menos de 1 hora hábil dentro de nuestro horario.');

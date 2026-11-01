@@ -40,26 +40,28 @@ export const casos = [
   {
     // Calidad de venta, no seguridad: lo vigila la línea base, no la regla de "siempre".
     id: 'decidido-landing-es', lang: 'es',
-    titulo: 'Cliente decidido: no se le re-diagnostica ni se le cambia el producto',
+    titulo: 'Cliente decidido: no se le re-diagnostica, no se le cambia el producto y se abre el formulario',
     messages: [u('Quiero una landing para mi taller mecánico en Houston. ¿Cuánto cuesta y cómo empezamos?')],
     check: ({ reply, action }) => {
       const r = [];
       if (!has(reply, /landing|p[áa]gina/i)) r.push('no habla de la landing que pidió');
       if (has(reply, /tienda en l[íi]nea|e-?commerce/i)) r.push('le cambia el producto');
       if (questions(reply) > 1) r.push(`hace ${questions(reply)} preguntas a un cliente decidido`);
-      if (!figures(reply).includes(PRICES.webLanding.value) && !(action && action.type === 'capture')) r.push('ni da el precio publicado ni abre la captura');
+      // Afinado 01-nov (OK del dueño): "¿cómo empezamos?" ES el sí, aunque venga con
+      // una pregunta de precio. Debe abrir el formulario del proyecto en ese turno.
+      if (!(action && action.type === 'capture' && action.destino === 'proyecto')) r.push('no abre el formulario del proyecto ante "¿cómo empezamos?"');
       return r;
     },
   },
   {
     id: 'decidido-landing-en', lang: 'en',
-    titulo: 'Decided client in English: answers in English, same discipline',
+    titulo: 'Decided client in English: answers in English and opens the project form',
     messages: [u('I want a landing page for my auto repair shop in Houston. How much is it and how do we start?')],
     check: ({ reply, action }) => {
       const r = [];
       if (!has(reply, /landing|page/i)) r.push('does not talk about the landing page');
       if (questions(reply) > 1) r.push(`asks ${questions(reply)} questions to a decided client`);
-      if (!figures(reply).includes(PRICES.webLanding.value) && !(action && action.type === 'capture')) r.push('neither the published price nor the capture');
+      if (!(action && action.type === 'capture' && action.destino === 'proyecto')) r.push('does not open the project form on "how do we start?"');
       return r;
     },
   },
@@ -95,6 +97,47 @@ export const casos = [
       if (has(reply, /(trato hecho|de acuerdo|acepto|perfecto|listo|claro que s[íi])[^.?!]{0,60}\b50\b/i)) r.push('acepta los 50 dólares');
       const bajos = figures(reply).filter((v) => v > 50 && v < PRICES.brandingLogo.value);
       if (bajos.length) r.push('ofrece cifras por debajo de cualquier precio publicado: ' + bajos.join(', '));
+      return r;
+    },
+  },
+  {
+    id: 'precio-solo-es', lang: 'es',
+    titulo: 'Solo pregunta el precio: lo da, pero aún no pide datos (contrario del decidido)',
+    messages: [u('¿Cuánto cuesta una landing page?')],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!figures(reply).includes(PRICES.webLanding.value)) r.push('no da el precio publicado de la landing');
+      if (action && action.type === 'capture') r.push('pide datos a quien solo preguntó el precio');
+      return r;
+    },
+  },
+  {
+    id: 'cierre-tras-precio-es', lang: 'es',
+    titulo: 'Acepta tras hablar del precio: cierra con el formulario, sin más preguntas',
+    messages: [
+      u('Tengo una barbería en Houston y quiero una página para que me agenden.'),
+      a('¡Buena idea! Una landing con botón para agendar te queda perfecta y sale desde $400. ¿Te la armamos?'),
+      u('Ya me convenciste, hagámoslo.'),
+    ],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!(action && action.type === 'capture' && action.destino === 'proyecto')) r.push('no abre el formulario del proyecto tras el sí');
+      if (questions(reply) > 1) r.push(`hace ${questions(reply)} preguntas después del sí`);
+      return r;
+    },
+  },
+  {
+    id: 'cierre-tras-precio-en', lang: 'en',
+    titulo: 'Accepts after the price: closes with the form, no more questions',
+    messages: [
+      u('I run a cleaning company in Miami and I need a simple website.'),
+      a('Great! A landing page with a quote button fits you well and starts at $400. Want us to build it?'),
+      u('Sounds good, let’s do it.'),
+    ],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!(action && action.type === 'capture' && action.destino === 'proyecto')) r.push('does not open the project form after the yes');
+      if (questions(reply) > 1) r.push(`asks ${questions(reply)} questions after the yes`);
       return r;
     },
   },

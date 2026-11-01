@@ -1,0 +1,72 @@
+---
+// Texto de hero v3 (design/rediseno-workos.md §3.1; W-CORE-01 centrado en 768,
+// W-CORE-16 a la izquierda en 560). Pone los data-w-in de la coreografía única
+// (§2.9): chip + eyebrow y H1 + cola en el paso 1, bajada en el 2, botones en el 3.
+// · h1Html = la cadena hero.h1 del dato TAL CUAL (§2.14, H1 congelado).
+// · Cola (.w-h1__tail): <p> bajo el H1, misma escala y tono (o degradado si es
+//   el elemento elegido de la página). Regla de longitud: H1 + cola ≤ 2 líneas a
+//   1440 y ≤ 4 a 390; si no cabe, la página no pasa `tail` y la idea va a la bajada.
+// · Botones: principal intacto (lg) + variante link, a 24 px.
+import Button from '../ui/Button.astro';
+import ChipCiudad from './ChipCiudad.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  eyebrow?: string;
+  tone?: 'gold' | 'teal';
+  chip?: string;
+  h1Html: string;
+  tail?: string;
+  tailGrad?: boolean;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  align?: 'center' | 'left';
+  size?: 'landing' | 'hub' | 'night';
+  class?: string;
+}
+const {
+  eyebrow, tone = 'gold', chip, h1Html, tail, tailGrad = false, lead,
+  primary, link, align = 'center', size = 'landing', class: cls,
+} = Astro.props;
+const mod = size === 'landing' ? null : size;
+---
+<div class:list={['w-herotext', `w-herotext--${align}`, cls]} data-w-tone={tone}>
+  {Astro.slots.has('crumbs') && <div class="w-herotext__crumbs"><slot name="crumbs" /></div>}
+  {(chip || eyebrow) && (
+    <div class="w-herotext__top" data-w-in="1">
+      {chip && <ChipCiudad label={chip} />}
+      {eyebrow && <Eyebrow tone={tone}>{eyebrow}</Eyebrow>}
+    </div>
+  )}
+  <h1 class:list={['w-h1', mod && `w-h1--${mod}`]} data-w-in="1" set:html={h1Html} />
+  {tail && (
+    <p class:list={['w-h1__tail', mod && `w-h1__tail--${mod}`, tailGrad && 'w-grad-text']} data-w-in="1">{tail}</p>
+  )}
+  <p class="w-lead w-herotext__lead" data-w-in="2">{lead}</p>
+  <div class="w-herotext__actions" data-w-in="3">
+    <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
+    {link && <Button variant="link" href={link.href} data-track={link.track}>{link.label}</Button>}
+  </div>
+</div>
+
+<style>
+  .w-herotext { display: flex; flex-direction: column; min-width: 0; }
+  .w-herotext--center { align-items: center; text-align: center; max-width: 768px; margin-inline: auto; }
+  .w-herotext--left { align-items: flex-start; text-align: left; max-width: 560px; }
+  .w-herotext__crumbs { margin-bottom: 24px; }
+  .w-herotext__top {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px;
+    margin-bottom: var(--w-gap-eyebrow);
+  }
+  .w-herotext--center .w-herotext__top { justify-content: center; flex-direction: column; gap: 14px; }
+  /* H1 → cola 0 · cola/H1 → bajada 16 · bajada → botones 24 (§2.3). */
+  .w-herotext__lead { margin-top: var(--w-gap-h1); }
+  .w-herotext--center .w-herotext__lead { margin-inline: auto; }
+  .w-herotext__actions {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
+    margin-top: var(--w-gap-lead);
+  }
+  .w-herotext--center .w-herotext__actions { justify-content: center; }
+</style>

@@ -1,0 +1,31 @@
+---
+// Bandeja (G3, §2.4; W-ADV-37/40): contenedor de objetos, radio 22, padding 16,
+// borde 1 px oro al 9 % y filo de luz. Translúcida sobre noche lisa; `opaque`
+// cuando detrás corre un patrón (E-37).
+interface Props {
+  cols?: 1 | 2 | 3 | 4;
+  gap?: number;
+  as?: string;
+  opaque?: boolean;
+  class?: string;
+  [key: string]: any;
+}
+const { cols = 1, gap = 14, as: Tag = 'div', opaque = false, class: cls, ...rest } = Astro.props;
+---
+<Tag
+  class:list={['w-tray', 'w-bandeja', opaque && 'w-tray--opaque', cls]}
+  style={`--w-tray-cols:${cols};--w-tray-gap:${gap}px`}
+  data-cols={cols}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .w-bandeja { display: grid; gap: var(--w-tray-gap); grid-template-columns: 1fr; min-width: 0; }
+  /* Móvil: 1 columna; las de 4 quedan en 2 (como las tarjetas hermanas, §3.2). */
+  .w-bandeja[data-cols='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (--md) {
+    .w-bandeja { grid-template-columns: repeat(var(--w-tray-cols), minmax(0, 1fr)); }
+  }
+</style>

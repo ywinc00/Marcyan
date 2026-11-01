@@ -1,0 +1,30 @@
+---
+// H2 de capítulo a dos tonos (W-CORE-07, W-ADV-32): 52/1.08 centrado, 1.ª frase
+// al 45 %, 2.ª al 100 %; sub 20 en 520; 80 px hasta la rejilla.
+interface Props {
+  tone1: string;
+  tone2: string;
+  sub?: string;
+  id?: string;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const { tone1, tone2, sub, id, as: Tag = 'h2', class: cls } = Astro.props;
+---
+<header class:list={['w-chapter', cls]}>
+  <Tag class="w-h2--chapter" id={id}><span class="w-tone">{tone1}</span> {tone2}</Tag>
+  {sub && <p class="w-chapter__sub">{sub}</p>}
+</header>
+
+<style>
+  .w-chapter { text-align: center; margin-bottom: var(--w-chapter-gap); }
+  .w-chapter__sub {
+    margin: 24px auto 0; max-width: 32.5rem;
+    font-family: var(--font-body); font-size: var(--w-lead); line-height: 1.6;
+    letter-spacing: -0.01em; color: var(--w-ink-80);
+  }
+  @media (--lt-md) {
+    .w-chapter { margin-bottom: 48px; }
+    .w-chapter__sub { font-size: 1rem; margin-top: 16px; }
+  }
+</style>

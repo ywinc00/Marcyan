@@ -1,0 +1,23 @@
+---
+// Sprite único de los 7 iconos-objeto (design/rediseno-workos.md §2.8, revisión 1 I3).
+// Se emite UNA vez por página (lo monta SiteNav en la tarea 0B-6) y cada
+// IconoObjeto pinta <use href="#wi-<id>">: los degradados se definen una sola
+// vez y no se repiten ids.
+// No usa `hidden` (display:none): Chrome y Firefox no pintan degradados
+// definidos dentro de un SVG oculto. Tamaño 0 fuera del flujo = mismo efecto.
+import { GLYPH_DEFS, GLYPH_IDS, glyphMarkup } from './glyphs';
+
+const symbols = GLYPH_IDS.map(
+  (id) => `<symbol id="wi-${id}" viewBox="0 0 64 64">${glyphMarkup(id)}</symbol>`,
+).join('');
+const markup = `<defs>${GLYPH_DEFS}</defs>${symbols}`;
+---
+<svg
+  class="wi-sprite"
+  width="0"
+  height="0"
+  aria-hidden="true"
+  focusable="false"
+  style="position:absolute;width:0;height:0;overflow:hidden"
+  set:html={markup}
+/>

@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN · TOKENS DEL REDISEÑO WorkOS (sistema v3)
+   Plan: design/rediseno-workos.md §2.1. SOLO declara variables en :root,
+   no pinta nada (entra en global.css y por eso llega a TODAS las páginas,
+   portada y hubs incluidos, sin cambiar cómo se ven). Todo deriva de
+   tokens.css, que NO se edita. Las clases que usan estos tokens viven en
+   w.css, que solo cargan las páginas v3 (w/WStyles.astro).
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía (Space Grotesk, pesos 400/500) ── */
+  --w-h1:          clamp(2.25rem, 1.35rem + 2.6vw, 3.625rem);  /* 36 → 58 */
+  --w-h1-hub:      clamp(2rem,    1.30rem + 2.2vw, 3.25rem);   /* 32 → 52 */
+  --w-h1-night:    clamp(2.5rem,  1.40rem + 3.4vw, 4.5rem);    /* 40 → 72 (IA, SEO para IA) */
+  --w-h2-chapter:  clamp(1.875rem,1.10rem + 2.4vw, 3.25rem);   /* 30 → 52 */
+  --w-h2:          clamp(1.75rem, 1.20rem + 1.6vw, 2.5rem);    /* 28 → 40 */
+  --w-h2-small:    clamp(1.5rem,  1.20rem + 0.9vw, 2rem);      /* 24 → 32 (FAQ, demos) */
+  --w-h3:          1.5rem;                                      /* 24 */
+  --w-h4:          1.25rem;                                     /* 20 */
+  --w-eyebrow:     clamp(1.125rem, 0.90rem + 0.7vw, 1.75rem);  /* 18 → 28 */
+  --w-lead:        clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);    /* 17 → 20 */
+  --w-body:        1rem;                                        /* 16 */
+  --w-small:       0.875rem;                                    /* 14 */
+  --w-micro:       0.75rem;                                     /* 12, mono */
+  --w-lh-h1: 1.02;  --w-lh-h1-hub: 1.07; --w-lh-h2c: 1.08; --w-lh-h2: 1.1;
+  --w-lh-h3: 1.2;   --w-lh-lead: 1.5;    --w-lh-body: 1.6;
+  /* --w-tr-h2c calibrado en la captura de 0A: el arranque del plan (-0.055em) juntaba "Má", "we" y
+     "cl" en Space Grotesk 500 a 52 px; -0.045em las separa sin perder la compresión (mínimo -0.03em). */
+  --w-tr-h1: -0.04em; --w-tr-h1-hub: -0.05em; --w-tr-h2c: -0.045em; --w-tr-h2: -0.04em;
+  --w-tr-h3: -0.02em; --w-tr-eyebrow: -0.02em; --w-tr-micro: 0.1em;
+  --w-weight-head: 500; --w-weight-text: 400;
+
+  /* ── Acento de la página (oro por defecto; teal en páginas de IA vía [data-w-tone="teal"]) ── */
+  --w-accent:     var(--accent-gold);
+  --w-accent-rgb: var(--accent-gold-rgb);
+
+  /* ── Tinta (derivada de --fg-primary #f0ede8) ── */
+  --w-ink:     var(--fg-primary);
+  --w-ink-80:  rgba(var(--star-rgb), .80);  /* bajada */
+  --w-ink-70:  rgba(var(--star-rgb), .70);  /* texto de objeto */
+  --w-ink-60:  rgba(var(--star-rgb), .60);  /* mínimo para texto de 14-16 px (≈6.4:1 sobre noche) */
+  --w-ink-45:  rgba(var(--star-rgb), .45);  /* SOLO 1.ª frase de H2 de capítulo ≥ 28 px (≈3.9:1, AA grande) */
+  --w-ink-55:  rgba(var(--star-rgb), .55);  /* suelo de las filas apagadas del registro en bucle */
+  --w-ink-30:  rgba(var(--star-rgb), .30);  /* solo decoración (rayas, cuadrícula); nunca texto ni estados */
+
+  /* ── Líneas ── */
+  --w-line:        rgba(var(--accent-gold-rgb), .09);  /* raíles, celdas, bordes de bandeja */
+  --w-line-strong: rgba(var(--accent-gold-rgb), .18);  /* hover, activo */
+  --w-line-ink:    rgba(var(--star-rgb), .08);         /* divisores dentro de objetos claros */
+
+  /* ── Superficies (rampa H-06 sobre la noche) ── */
+  --w-s0: var(--bg-base);                               /* noche + estrellas */
+  --w-s1: #121211;                                      /* bandeja OPACA (texto sobre patrón, E-37) */
+  --w-s2: #181817;                                      /* objeto de sistema / tarjeta en bandeja */
+  --w-s3: #1f1f1d;                                      /* objeto activo / fila central */
+  --w-s1-a: rgba(var(--star-rgb), .035);                /* bandeja translúcida, SOLO sobre noche lisa */
+  --w-s2-a: rgba(var(--star-rgb), .06);                 /* tarjeta translúcida, SOLO sobre noche lisa */
+  --w-p-bg: #f0ede8; --w-p-ink: #0e0e0d; --w-p-ink-2: #4a4743; --w-p-line: rgba(14,14,13,.08); /* objetos de producto en claro */
+  --w-s-solid: var(--bg-elevated);                      /* paneles opacos (megamenú, tarjeta de formulario) */
+  --w-edge: inset 0 1px 0 rgba(255,255,255,.08);        /* filo de luz G-10 */
+  --w-contrast-bg: var(--bg-elevated);                  /* capítulo de contraste A */
+  --w-dawn: radial-gradient(120% 60% at 50% 100%, rgba(var(--accent-gold-rgb), .22) 0%,
+            rgba(var(--accent-gold-rgb), .08) 38%, transparent 70%);  /* capítulo de contraste B (amanecer) */
+  --w-dawn-teal: radial-gradient(120% 60% at 50% 100%, rgba(79,195,161,.14) 0%,
+            rgba(79,195,161,.05) 38%, transparent 70%);  /* amanecer de páginas de IA (E-14) */
+  --w-dots: radial-gradient(rgba(var(--accent-gold-rgb), .16) 1px, transparent 1.2px) 0 0 / 24px 24px; /* trama de puntos */
+  --w-stripes: repeating-linear-gradient(180deg, rgba(var(--accent-gold-rgb), .14) 0 1px, transparent 1px 5px); /* franjas de luz */
+
+  /* ── Radios (4; ≤ 8 → 8 · 10-16 → 12 · 18-28 → 22 · ≥ 40 → 44; píldoras 999) ── */
+  --w-r-cell: 8px;  --w-r-obj: 12px;  --w-r-tray: 22px;  --w-r-feature: 44px;
+
+  /* ── Espacio y layout ── */
+  --w-rail-max: 1200px;
+  --w-rail-x: max(16px, calc(50% - var(--w-rail-max) / 2)); /* 50 % del contenedor (nunca 100vw) */
+  --w-pad-tray: 16px;  --w-gap-tray: 14px;
+  --w-section-y: clamp(80px, 4rem + 3vw, 120px);
+  --w-chapter-gap: 80px;          /* cabecera de capítulo → rejilla */
+  --w-hero-top: calc(var(--nav-h) + clamp(48px, 2rem + 3vw, 96px));
+  --w-gap-eyebrow: 12px; --w-gap-h1: 16px; --w-gap-lead: 24px;
+
+  /* ── Degradado único ── */
+  --w-grad: linear-gradient(45deg, var(--accent-gold) 0%, var(--accent-teal) 100%);
+
+  /* ── Movimiento (F-01 + coreografía aprobada) ── */
+  --w-ease-text:  cubic-bezier(.33, 1, .68, 1);     /* entrada de textos y objeto */
+  --w-ease-sat:   cubic-bezier(.45, 0, .2, 1);      /* satélites que salen de detrás */
+  --w-ease-loop:  cubic-bezier(.645, .045, .355, 1);/* listas que suben */
+  --w-ease-stack: cubic-bezier(.77, 0, .175, 1);    /* pila de interruptores */
+  --w-ease-ui:    cubic-bezier(.4, 0, .2, 1);       /* hover, megamenú, pestañas */
+  --w-ease-out:   cubic-bezier(.2, 0, 0, 1);        /* revelado de sección */
+  --w-dur-micro: 150ms; --w-dur-hover: 200ms; --w-dur-ui: 320ms; --w-dur-reveal: 480ms;
+  --w-dur-text: 1100ms; --w-dur-obj: 950ms; --w-dur-sat: 1800ms; --w-dur-layer: 500ms;
+  --w-d1: 100ms; --w-d2: 300ms; --w-d3: 400ms; --w-d-obj: 500ms; --w-d-sat: 750ms;
+  --w-rise: 12px; --w-rise-section: 16px;
+}

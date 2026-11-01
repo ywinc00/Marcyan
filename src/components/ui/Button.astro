@@ -1,8 +1,9 @@
 ---
-// Botón / enlace-botón. Variantes: primary (oro) · secondary (contorno) · teal · ghost.
+// Botón / enlace-botón. Variantes: primary (oro) · secondary (contorno) · teal · ghost
+// · link (texto + chevron, rediseño WorkOS §2.7; aditiva: las otras no cambian).
 // Renderiza <a> si hay href, si no <button>. Altura mínima ≥44px (objetivo táctil).
 interface Props {
-  variant?: 'primary' | 'secondary' | 'teal' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'teal' | 'ghost' | 'link';
   size?: 'md' | 'lg';
   href?: string;
   type?: 'button' | 'submit';
@@ -18,7 +19,7 @@ const Tag = href ? 'a' : 'button';
   type={href ? undefined : type}
   {...rest}
 >
-  <slot />
+  <slot />{variant === 'link' && <span class="btn__chev" aria-hidden="true">›</span>}
 </Tag>
 
 <style>
@@ -47,6 +48,26 @@ const Tag = href ? 'a' : 'button';
   .btn--ghost { background: transparent; color: var(--fg-secondary); padding-inline: var(--space-2); }
   .btn--ghost:hover { color: var(--accent-gold); }
 
+  /* Enlace con chevron (G7). Después de .btn--md/.btn--lg: con la misma
+     especificidad gana por orden y el relleno queda en 8px 0. Sin subrayado (E-22).
+     El chevron usa el acento de la página (--w-accent, oro por defecto). */
+  .btn--link {
+    gap: 8px; padding: 8px 0; min-height: var(--tap-min);
+    font: 500 16px/1 var(--font-body); letter-spacing: 0;
+    color: var(--w-ink, var(--fg-primary)); background: none; border: 0;
+    transition: color var(--w-dur-micro, 150ms) var(--w-ease-ui, ease);
+  }
+  .btn__chev {
+    font-size: 18px; line-height: 1; color: var(--w-accent, var(--accent-gold));
+    transition: transform var(--w-dur-hover, 200ms) var(--w-ease-ui, ease);
+  }
+  @media (--hover-fine) {
+    .btn--link:hover { color: var(--w-accent, var(--accent-gold)); }
+    .btn--link:hover .btn__chev { transform: translateX(3px); }
+  }
+  .btn--link:focus-visible { color: var(--w-accent, var(--accent-gold)); }
+  .btn--link:focus-visible .btn__chev { transform: translateX(3px); }
+
   /* Estado deshabilitado (feedback de carga "Enviando…") — cubre todas las variantes */
   .btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; box-shadow: none; }
   .btn:disabled:hover { transform: none; }
@@ -63,5 +84,8 @@ const Tag = href ? 'a' : 'button';
     opacity: 1; cursor: default;
   }
 
-  @media (--motion-reduce) { .btn:active { transform: none; } }
+  @media (--motion-reduce) {
+    .btn:active { transform: none; }
+    .btn--link .btn__chev, .btn--link:hover .btn__chev, .btn--link:focus-visible .btn__chev { transform: none; }
+  }
 </style>

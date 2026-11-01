@@ -1,0 +1,10 @@
+---
+// Chip de ciudad (G2): la ciudad pasa a una píldora mono pequeña junto al eyebrow.
+import Icon from '../ui/Icon.astro';
+interface Props {
+  label: string;
+  class?: string;
+}
+const { label, class: cls } = Astro.props;
+---
+<span class:list={['w-chip-city', cls]}><Icon name="lucide:map-pin" />{label}</span>

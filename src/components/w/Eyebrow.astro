@@ -1,0 +1,12 @@
+---
+// Eyebrow de servicio (G2, W-CORE-02): el NOMBRE DE PRODUCTO sobre el H1, en
+// Space Grotesk 500 y en el acento (§2.14: nunca repite el H1; nunca mayúsculas).
+interface Props {
+  tone?: 'gold' | 'teal';
+  as?: 'p' | 'span';
+  class?: string;
+  [key: string]: any;
+}
+const { tone, as: Tag = 'p', class: cls, ...rest } = Astro.props;
+---
+<Tag class:list={['w-eyebrow', tone && `w-eyebrow--${tone}`, cls]} {...rest}><slot /></Tag>

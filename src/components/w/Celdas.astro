@@ -1,0 +1,21 @@
+---
+// Rejilla de celdas separadas por líneas de 1 px (G4, W-CORE-08/37): la línea es
+// el hueco sobre fondo --w-line; sin sombras ni bordes duplicados. Estilos en w.css.
+interface Props {
+  cols: 2 | 3 | 4;
+  pad?: 48 | 32 | 20;
+  as?: string;
+  class?: string;
+  [key: string]: any;
+}
+const { cols, pad = 48, as: Tag = 'div', class: cls, ...rest } = Astro.props;
+// Móvil: 48 → 32 (§2.2); 32 y 20 se quedan.
+const padSm = pad === 48 ? 32 : pad;
+---
+<Tag
+  class:list={['w-cells', cls]}
+  style={`--w-cols:${cols};--w-cell-pad:${padSm}px;--w-cell-pad-md:${pad}px`}
+  {...rest}
+>
+  <slot />
+</Tag>

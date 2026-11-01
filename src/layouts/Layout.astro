@@ -26,6 +26,9 @@ interface Props {
   /** Si la página tiene espejo en el otro idioma. false → no emitir hreflang en
    *  (las landings de cluster son solo-ES hasta la Ola 3; apuntar a /en/ daría 404). */
   hasEn?: boolean;
+  /** Sistema de diseño del rediseño WorkOS (design/rediseno-workos.md §2.13, Cerrojo 1).
+   *  'v3' escribe <html data-ds="v3"> y el script de la coreografía. Portada y hubs NO lo pasan. */
+  ds?: 'v3';
 }
 
 const SITE = 'https://marcyanstudio.com';
@@ -38,6 +41,7 @@ const {
   noindex = false,
   ogImage = '/assets/og/og-default.png',
   hasEn,
+  ds,
 } = Astro.props;
 
 // hreflang/canonical derivados de la RUTA REAL (Astro.url.pathname) + el mapa
@@ -130,13 +134,18 @@ const jsonLd = {
 // Google Analytics 4. El snippet init va como string (set:html en el <head>)
 // para que las llaves del snippet no las procese el JSX de Astro.
 const GA_ID = 'G-4GJPX4PTRV';
+// Coreografía v3 (§2.9): html.w-anim si no hay reduced-motion; salvaguarda html.w-in-all a
+// los 2,5 s si reveal.ts no arrancó (red, bloqueador o error previo del bundle). Va inline en el
+// <head> para que el estado inicial exista antes del primer fotograma.
+const wAnimInit = `(function(){var d=document.documentElement;try{if(matchMedia('(prefers-reduced-motion: no-preference)').matches)d.classList.add('w-anim')}catch(e){}setTimeout(function(){if(!d.classList.contains('w-ready'))d.classList.add('w-in-all')},2500)})();`;
 const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`;
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} data-ds={ds}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {ds === 'v3' && <script is:inline set:html={wAnimInit} />}
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canon} />

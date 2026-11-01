@@ -1,0 +1,211 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN · CLASES DEL SISTEMA v3 (rediseño WorkOS)
+   Plan: design/rediseno-workos.md §2.2-§2.10.
+   · Se carga SOLO en páginas v3 desde src/components/w/WStyles.astro
+     (nunca en global.css: inlineStylesheets 'always' lo incrustaría en
+     portada y hubs).
+   · TODO va bajo :root[data-ds="v3"] (Cerrojo 1). Fuera de v3 ninguna
+     de estas reglas pinta, aunque alguien use una clase .w-*.
+   · Los componentes que salen de v3 (Cerrojo 5) NO dependen de este
+     archivo: llevan su CSS dentro.
+   · Animaciones: solo transform y opacity (color/borde en hovers ≤ 200 ms).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Acento por zona (E-14: un acento manda por bloque) ─────────── */
+:root[data-ds="v3"] [data-w-tone="teal"] { --w-accent: var(--accent-teal); --w-accent-rgb: var(--accent-teal-rgb); }
+:root[data-ds="v3"] [data-w-tone="gold"] { --w-accent: var(--accent-gold); --w-accent-rgb: var(--accent-gold-rgb); }
+
+/* ── Contenedores ───────────────────────────────────────────────── */
+:root[data-ds="v3"] .w-container { width: min(100% - 32px, var(--w-rail-max)); margin-inline: auto; }
+:root[data-ds="v3"] .w-hero { padding-top: var(--w-hero-top); }
+
+/* Raíles: 2 líneas verticales de 1 px a los lados del contenedor de 1200 (G4).
+   left/right con --w-rail-x (50 % del main, nunca 100vw: sin la barra de Windows). */
+:root[data-ds="v3"] .w-rails { position: relative; }
+:root[data-ds="v3"] .w-rails::before,
+:root[data-ds="v3"] .w-rails::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
+  background: var(--w-line); pointer-events: none; z-index: 0;
+}
+:root[data-ds="v3"] .w-rails::before { left: var(--w-rail-x); }
+:root[data-ds="v3"] .w-rails::after { right: var(--w-rail-x); }
+/* El objeto a sangre del hero tapa los raíles (§2.5). */
+:root[data-ds="v3"] .w-hero--bleed { position: relative; z-index: 1; }
+
+/* Sección-celda y rejilla de líneas de 1 px (la línea es el hueco). */
+:root[data-ds="v3"] .w-cell { border-top: 1px solid var(--w-line); padding-block: var(--w-section-y); position: relative; z-index: 1; }
+:root[data-ds="v3"] .w-cells {
+  display: grid; gap: 1px; background: var(--w-line);
+  grid-template-columns: 1fr;
+  padding: 1px; /* marco exterior de 1 px: casa con los raíles, la cruz queda visible */
+}
+:root[data-ds="v3"] .w-cells > * { background: var(--w-s0); padding: var(--w-cell-pad, 32px); min-width: 0; }
+@media (--md) {
+  :root[data-ds="v3"] .w-cells { grid-template-columns: repeat(var(--w-cols, 2), minmax(0, 1fr)); }
+  :root[data-ds="v3"] .w-cells > * { padding: var(--w-cell-pad-md, 48px); }
+}
+
+/* ── Tipografía ─────────────────────────────────────────────────── */
+:root[data-ds="v3"] .w-h1,
+:root[data-ds="v3"] .w-h1__tail {
+  font-family: var(--font-display); font-weight: var(--w-weight-head);
+  font-size: var(--w-h1); line-height: var(--w-lh-h1); letter-spacing: var(--w-tr-h1);
+  text-wrap: balance; color: var(--w-ink);
+}
+:root[data-ds="v3"] .w-h1--hub,
+:root[data-ds="v3"] .w-h1__tail--hub { font-size: var(--w-h1-hub); line-height: var(--w-lh-h1-hub); letter-spacing: var(--w-tr-h1-hub); }
+:root[data-ds="v3"] .w-h1--night,
+:root[data-ds="v3"] .w-h1__tail--night { font-size: var(--w-h1-night); line-height: 1.04; letter-spacing: -0.045em; }
+/* <em> del dato del H1 (verbatim, §2.14): solo color, en el tono del eyebrow. */
+:root[data-ds="v3"] .w-h1 em { font-style: normal; color: var(--w-accent); }
+
+:root[data-ds="v3"] .w-h2--chapter {
+  font-family: var(--font-display); font-weight: var(--w-weight-head);
+  font-size: var(--w-h2-chapter); line-height: var(--w-lh-h2c); letter-spacing: var(--w-tr-h2c);
+  text-align: center; max-width: 18ch; margin-inline: auto; color: var(--w-ink); text-wrap: balance;
+}
+:root[data-ds="v3"] .w-tone { color: var(--w-ink-45); }
+:root[data-ds="v3"] .w-h2 {
+  font-family: var(--font-display); font-weight: var(--w-weight-head);
+  font-size: var(--w-h2); line-height: var(--w-lh-h2); letter-spacing: var(--w-tr-h2);
+  color: var(--w-ink); text-wrap: balance;
+}
+:root[data-ds="v3"] .w-h2--small { font-size: var(--w-h2-small); line-height: 1.2; letter-spacing: -0.03em; }
+:root[data-ds="v3"] .w-h3 {
+  font-family: var(--font-display); font-weight: var(--w-weight-head);
+  font-size: var(--w-h3); line-height: var(--w-lh-h3); letter-spacing: var(--w-tr-h3); color: var(--w-ink);
+}
+:root[data-ds="v3"] .w-h4 {
+  font-family: var(--font-display); font-weight: var(--w-weight-head);
+  font-size: var(--w-h4); line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink);
+}
+:root[data-ds="v3"] .w-lead {
+  font-family: var(--font-body); font-weight: var(--w-weight-text);
+  font-size: var(--w-lead); line-height: var(--w-lh-lead); color: var(--w-ink-80);
+  max-width: 32.5rem;
+}
+@media (--lt-md) { :root[data-ds="v3"] .w-lead { font-size: 1rem; } }  /* bajada 16 en móvil (§2.3) */
+:root[data-ds="v3"] .w-eyebrow {
+  font-family: var(--font-display); font-weight: 500; font-size: var(--w-eyebrow);
+  line-height: 1.1; letter-spacing: var(--w-tr-eyebrow); color: var(--w-accent);
+}
+:root[data-ds="v3"] .w-eyebrow--gold { color: var(--accent-gold); }
+:root[data-ds="v3"] .w-eyebrow--teal { color: var(--accent-teal); }
+:root[data-ds="v3"] .w-chip-city {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-weight: 500; font-size: var(--w-micro); line-height: 1.2;
+  text-transform: uppercase; letter-spacing: var(--w-tr-micro);
+  padding: 4px 10px; border-radius: 100px; border: 1px solid var(--w-line-strong); color: var(--w-ink-70);
+}
+:root[data-ds="v3"] .w-chip-city svg { width: 12px; height: 12px; flex: none; }
+:root[data-ds="v3"] .w-label {
+  font-family: var(--font-mono); font-weight: 500; font-size: var(--w-micro); line-height: 1.2;
+  text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+}
+:root[data-ds="v3"] .w-grad-text {
+  background: var(--w-grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  :root[data-ds="v3"] .w-grad-text { color: var(--accent-gold); -webkit-text-fill-color: currentColor; }
+}
+
+/* ── Superficies (rampa H-06) ───────────────────────────────────── */
+:root[data-ds="v3"] .w-tray {
+  background: var(--w-s1-a); border: 1px solid var(--w-line);
+  border-radius: var(--w-r-tray); padding: var(--w-pad-tray); box-shadow: var(--w-edge);
+}
+/* Opaca cuando detrás corre un patrón (E-37). */
+:root[data-ds="v3"] .w-tray--opaque { background: var(--w-s1); }
+:root[data-ds="v3"] .w-obj {
+  background: var(--w-s2); border: 1px solid var(--w-line);
+  border-radius: var(--w-r-obj); box-shadow: var(--w-edge);
+}
+:root[data-ds="v3"] .w-obj--active { background: var(--w-s3); border-color: var(--w-line-strong); }
+:root[data-ds="v3"] .w-obj--product {
+  background: var(--w-p-bg); color: var(--w-p-ink);
+  border: 1px solid var(--w-p-line); border-radius: var(--w-r-obj); box-shadow: none;
+}
+:root[data-ds="v3"] .w-contrast {
+  background: var(--w-contrast-bg); position: relative;
+  --w-line: var(--w-line-strong);
+}
+:root[data-ds="v3"] .w-dawn { background: var(--w-dawn) no-repeat; background-size: 100% 100%; }
+:root[data-ds="v3"] [data-w-tone="teal"] .w-dawn,
+:root[data-ds="v3"] .w-dawn[data-w-tone="teal"] { background-image: var(--w-dawn-teal); }
+
+/* ── Enlace con chevron fuera de <Button> (§2.7; misma piel que btn--link) ── */
+:root[data-ds="v3"] .w-link {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0;
+  font: 500 16px/1 var(--font-body); color: var(--w-ink); text-decoration: none;
+  transition: color var(--w-dur-micro) var(--w-ease-ui);
+}
+:root[data-ds="v3"] .w-link::after {
+  content: '\203A'; font-size: 18px; line-height: 1; color: var(--w-accent);
+  transition: transform var(--w-dur-hover) var(--w-ease-ui);
+}
+@media (--hover-fine) {
+  :root[data-ds="v3"] .w-link:hover { color: var(--w-accent); }
+  :root[data-ds="v3"] .w-link:hover::after { transform: translateX(3px); }
+}
+:root[data-ds="v3"] .w-link:focus-visible { color: var(--w-accent); }
+:root[data-ds="v3"] .w-link:focus-visible::after { transform: translateX(3px); }
+@media (--motion-reduce) {
+  :root[data-ds="v3"] .w-link::after,
+  :root[data-ds="v3"] .w-link:hover::after,
+  :root[data-ds="v3"] .w-link:focus-visible::after { transform: none; }
+}
+
+/* ═══ Coreografía de entrada única (§2.9, A-12) ═════════════════════
+   Estado final visible por defecto. El script inline del <head> (Layout,
+   solo v3) añade html.w-anim si no hay reduced-motion: entonces los
+   [data-w-in] arrancan en su estado inicial; reveal.ts añade .is-in al
+   main[data-w] en el primer rAF tras DOMContentLoaded. Salvaguarda:
+   html.w-in-all (2,5 s, mismo script inline, solo si reveal.ts no arrancó).
+   Textos y objeto en 0.01 (no 0): cuentan como pintados para el LCP.
+   OJO: un elemento con data-w-in NO puede usar transform para colocarse (la
+   coreografía lo pisa con translate/none): se coloca con left/margin o con
+   un envoltorio, y el data-w-in va en el hijo. */
+:root[data-ds="v3"].w-anim [data-w-in] {
+  opacity: .01; transform: translateY(var(--w-rise));
+  transition:
+    opacity var(--w-dur-text) var(--w-ease-text) var(--w-d1),
+    transform var(--w-dur-text) var(--w-ease-text) var(--w-d1);
+}
+:root[data-ds="v3"].w-anim [data-w-in="2"] { transition-delay: var(--w-d2), var(--w-d2); }
+/* Botones: nunca tocables sin verse (0.6 → 1). */
+:root[data-ds="v3"].w-anim [data-w-in="3"] { opacity: .6; transition-delay: var(--w-d3), var(--w-d3); }
+:root[data-ds="v3"].w-anim [data-w-in="obj"] {
+  transform: translateY(24px);
+  transition:
+    opacity var(--w-dur-obj) var(--w-ease-text) var(--w-d-obj),
+    transform var(--w-dur-obj) var(--w-ease-text) var(--w-d-obj);
+}
+/* Satélites: salen de DETRÁS del objeto (E-52), ya dentro de su movimiento.
+   Cada pieza fija su salida con --w-sat-x / --w-sat-y. */
+:root[data-ds="v3"].w-anim [data-w-in="sat"] {
+  transform: translate(var(--w-sat-x, 0px), var(--w-sat-y, 24px)) scale(.96);
+  transition:
+    opacity var(--w-dur-sat) var(--w-ease-sat) var(--w-d-sat),
+    transform var(--w-dur-sat) var(--w-ease-sat) var(--w-d-sat);
+}
+/* Capa de color desplazada (TarjetaObjeto): 500 ms. */
+:root[data-ds="v3"].w-anim [data-w-in="sat"][data-w-sat="layer"] {
+  transition-duration: var(--w-dur-layer), var(--w-dur-layer);
+}
+:root[data-ds="v3"].w-anim main[data-w].is-in [data-w-in] { opacity: 1; transform: none; }
+/* Salvaguarda: sin transición (si reveal.ts no llegó, todo visible YA, no 2,5 s después). */
+:root[data-ds="v3"].w-in-all [data-w-in] { opacity: 1; transform: none; transition: none; }
+
+/* ── Revelado de sección bajo el pliegue (F-04), una vez ─────────── */
+:root[data-ds="v3"].w-anim main[data-w] [data-w-reveal] {
+  opacity: .01; transform: translateY(var(--w-rise-section));
+  transition:
+    opacity var(--w-dur-reveal) var(--w-ease-out),
+    transform var(--w-dur-reveal) var(--w-ease-out);
+}
+:root[data-ds="v3"].w-anim main[data-w] [data-w-reveal].is-revealed { opacity: 1; transform: none; }
+:root[data-ds="v3"].w-in-all main[data-w] [data-w-reveal] { opacity: 1; transform: none; transition: none; }
+
+/* Reduced-motion: sin html.w-anim nada arranca escondido. Si la preferencia
+   cambia con la página abierta, reveal.ts quita html.w-anim (sin !important). */

@@ -1,13 +1,17 @@
 ---
-// Pie de /es/houston y /en/houston (slot "scape" de SiteFooter): el skyline real de Houston al anochecer.
-// Vectorizado de una foto de dominio público (Carol M. Highsmith, Biblioteca del Congreso, 2014) en tres capas
-// (silueta, planos de fachada y ventanas encendidas) y coloreado aquí con los tonos de la marca. Se carga cuando el
-// pie se acerca. La ciudad emerge del borde de abajo; el protagonista sigue siendo el cielo.
+// Pie de los hubs de ciudad (slot "scape" de SiteFooter): el skyline real de la ciudad al anochecer, vectorizado de
+// una foto libre en capas (silueta, dos tonos de fachada y ventanas encendidas) y coloreado aquí con los tonos de la
+// marca. Houston: foto de dominio público (Carol M. Highsmith, Biblioteca del Congreso, 2014). Miami: foto CC0 (Joe
+// deSousa, Wikimedia Commons, 2019). Se carga cuando el pie se acerca. La ciudad emerge del borde de abajo; el
+// protagonista sigue siendo el cielo.
+// src: el dibujo · ratio: ancho/alto de su viewBox · x: dónde cae su centro en escritorio (la luz va detrás)
+interface Props { src: string; ratio: string; x?: string }
+const { src, ratio, x = '58%' } = Astro.props;
 ---
-<div class="foot__scape" aria-hidden="true">
+<div class="foot__scape" aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x}`}>
   <div class="foot__glow"></div>
   <div class="foot__clouds" data-clouds="foot"></div>
-  <div class="foot__city" data-skyline-src="/assets/houston/skyline.svg"></div>
+  <div class="foot__city" data-skyline-src={src}></div>
 </div>
 
 <style>
@@ -25,7 +29,7 @@
   }
   /* la ciudad entera, apoyada en el suelo; los dos lados se funden con la noche (la foto corta edificios en los bordes) */
   .foot__city {
-    position: absolute; left: 58%; bottom: -2%; height: 100%; aspect-ratio: 2400 / 1019; max-width: 100vw; transform: translateX(-50%);
+    position: absolute; left: var(--city-x); bottom: -2%; height: 100%; aspect-ratio: var(--city-ratio); max-width: 100vw; transform: translateX(-50%);
     opacity: 0; transition: opacity 1s cubic-bezier(.22,.61,.36,1);
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);

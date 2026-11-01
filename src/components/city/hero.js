@@ -6,17 +6,11 @@ import { geoOrthographic, geoPath, geoInterpolate, geoDistance } from 'd3-geo';
 //  · el mapa solo proyecta lo que se ve (descarte por casquete + recorte al disco, directo a Path2D, sin cadenas);
 //  · los puntos nacen sobre el mapa mientras aún se acerca, pegados a su sitio, y la historia (hilos, etiquetas,
 //    búsqueda encendida, ficha) corre con transiciones CSS en el compositor; el lienzo deja de dibujarse al llegar.
-export function initHero(GEO) {
+export function initHero(GEO, C) {
   const GOLD = '#dcc089', TEAL = '#4fc3a1';
-  const HOUSTON = [-95.369, 29.760];
-  // Zonas por negocio: Pasadena (70,5 % hispano, censo 2020) y Gulfton (inmigración centroamericana),
-  // y el poder de compra de Katy y The Woodlands. Cada búsqueda es de un sector con página propia.
-  const ZONES_POS = [
-    { at: [-95.489, 30.166], side: 'up', wire: 54, dx: -70 },
-    { at: [-95.824, 29.786], side: 'up', wire: 86, dx: -150 },
-    { at: [-95.478, 29.718], side: 'down', wire: 70, dx: -230 },
-    { at: [-95.209, 29.691], side: 'up', wire: 70, dx: -120, lit: true },
-  ];
+  // la ciudad del hub (cities.js): su centro, sus cuatro zonas y el encuadre del acercamiento
+  const HOUSTON = C.center;                          // (nombre histórico: es el centro de la ciudad, sea cual sea)
+  const ZONES_POS = C.zones;
   const pin = document.getElementById('hx-hero-pin'), sticky = document.getElementById('hx-hero-sticky'), stage = document.getElementById('hx-stage');
   if (!pin || !stage) return;
   // nombres y búsquedas vienen del idioma de la página (data-pins); la posición es diseño
@@ -53,21 +47,39 @@ export function initHero(GEO) {
       // Galveston (36 km al este), que es lo que dice "esto es Houston" igual que en escritorio
       const th = W <= 600 ? 52 : 60, cardH = found.offsetHeight || 130;
       const band = H - navH - 14 - 24;
-      const kW = (W - 2 * pad - 70) / 80;
-      // cuatro etiquetas: The Woodlands arriba, Katy y Pasadena en escalera entre los puntos, Gulfton (a veces en dos
-      // líneas) abajo y la ficha al final. La escalera necesita 52,8 km de alto entre The Woodlands y Pasadena.
-      const kFit = (band - (30 + th + 34 + (th + 22) + 18 + cardH)) / 49.8, kStair = (2 * th + 16 + 36) / 52.8;
-      const lite = Math.min(kFit, kW) < Math.max(2.2, kStair);         // teléfonos bajos: solo la búsqueda encendida
-      let kmpx, up, down;
-      if (!lite) {
-        kmpx = Math.min(5.2, kFit, kW);
-        up = 45.1 * kmpx + 30 + th; down = Math.max(4.7 * kmpx + 34 + th + 22, 7.7 * kmpx + 20) + 18 + cardH;
+      let kmpx, up, down, lite, xh;
+      if (C.mobile === 'miami') {
+        // Miami: Hialeah arriba (10,7 km al norte), Miami Beach encendida a la derecha (6,2 km al este) con su
+        // etiqueta encima, Doral (16,2 km al oeste) y Kendall (9,2 km al sur) con la etiqueta debajo, y la ficha al
+        // final. Todo cabe en 22,4 km de ancho y 19,9 km de alto: el acercamiento llega mucho más cerca que en Houston.
+        const kW = (W - 2 * pad - 48) / 22.4;
+        const kFit = (band - (30 + th) - (30 + th + 18 + cardH)) / 19.9;
+        lite = Math.min(kFit, kW) < 5;                                 // teléfonos bajos: solo la búsqueda encendida
+        if (!lite) {
+          kmpx = Math.min(13, kFit, kW);
+          up = 10.7 * kmpx + 30 + th; down = 9.2 * kmpx + 30 + th + 18 + cardH;
+        } else {
+          kmpx = Math.max(4, Math.min(11, kW, (band - 54 - cardH - 30 - th) / 13.9));
+          up = Math.max(10.7 * kmpx + 16, 3.2 * kmpx + 30 + th); down = 9.2 * kmpx + 24 + cardH;
+        }
+        // la franja de las zonas centrada en la pantalla, sin que Doral ni la etiqueta de Miami Beach se salgan
+        xh = Math.max(pad + 22 + 16.2 * kmpx, Math.min(W - pad - 30 - 6.2 * kmpx, W / 2 + 5 * kmpx));
       } else {
-        kmpx = Math.max(1.9, Math.min(4.5, kW, (band - 54 - cardH) / 52.8));
-        up = Math.max(45.1 * kmpx + 16, 30 + th - 7.7 * kmpx); down = 7.7 * kmpx + 38 + cardH;
+        const kW = (W - 2 * pad - 70) / 80;
+        // cuatro etiquetas: The Woodlands arriba, Katy y Pasadena en escalera entre los puntos, Gulfton (a veces en dos
+        // líneas) abajo y la ficha al final. La escalera necesita 52,8 km de alto entre The Woodlands y Pasadena.
+        const kFit = (band - (30 + th + 34 + (th + 22) + 18 + cardH)) / 49.8, kStair = (2 * th + 16 + 36) / 52.8;
+        lite = Math.min(kFit, kW) < Math.max(2.2, kStair);             // teléfonos bajos: solo la búsqueda encendida
+        if (!lite) {
+          kmpx = Math.min(5.2, kFit, kW);
+          up = 45.1 * kmpx + 30 + th; down = Math.max(4.7 * kmpx + 34 + th + 22, 7.7 * kmpx + 20) + 18 + cardH;
+        } else {
+          kmpx = Math.max(1.9, Math.min(4.5, kW, (band - 54 - cardH) / 52.8));
+          up = Math.max(45.1 * kmpx + 16, 30 + th - 7.7 * kmpx); down = 7.7 * kmpx + 38 + cardH;
+        }
+        xh = Math.max(pad + 20 + 44 * kmpx, Math.min(W - 70 - 36 * kmpx, W / 2 - 10 * kmpx));
       }
       const yh = navH + 14 + up + Math.max(0, (band - up - down) / 2);
-      const xh = Math.max(pad + 20 + 44 * kmpx, Math.min(W - 70 - 36 * kmpx, W / 2 - 10 * kmpx));
       // la lente llena la pantalla: de la barra hasta pasado el borde de abajo (se ven solo sus curvas)
       const Rb = (H - navH) / 2 + 20, cyB = (navH + H) / 2;
       // el satélite termina en el borde derecho de la pantalla, como en escritorio (no junto a los puntos)
@@ -78,7 +90,7 @@ export function initHero(GEO) {
       // y luego crecía: esa parada era el tirón del móvil)
       return {
         W, H, pad, lite, satA,
-        A: { cx: W * 0.62, cy: Math.max(H * 0.86, full + 20 + Ra), R: Ra, center: [-97, 33] },
+        A: { cx: W * 0.62, cy: Math.max(H * 0.86, full + 20 + Ra), R: Ra, center: C.start },
         B: { cx: W / 2, cy: cyB, R: Rb, target: [xh, yh], kmpx },
       };
     }
@@ -97,8 +109,8 @@ export function initHero(GEO) {
     const k = Math.min(1.4, Math.max(Math.min(0.95, R / 240), R / 300));
     return {
       W, H,
-      A: { cx, cy, R, center: [-97, 33] },
-      B: { cx: cx + R * 0.567, cy: cy + R * 0.167, R: R * 1.333, target: [cx + R * 0.107, cy - R * 0.027], kmpx: 3.3 * k },
+      A: { cx, cy, R, center: C.start },
+      B: { cx: cx + R * 0.567, cy: cy + R * 0.167, R: R * 1.333, target: [cx + R * C.desk.target[0], cy + R * C.desk.target[1]], kmpx: C.desk.kmpx * k },
     };
   }
 
@@ -107,8 +119,9 @@ export function initHero(GEO) {
   let F, dpr, goAt = 0.93;
   const landGlobal = () => ({ type: 'MultiPolygon', coordinates: !isM && GEO.land50 ? GEO.land50 : GEO.land110 });
   let land110 = landGlobal();
-  const land10 = { type: 'MultiPolygon', coordinates: GEO.tx10 };
-  const texas = { type: 'MultiPolygon', coordinates: GEO.texas };
+  // detalle de la costa del área y contorno del estado (Houston: tx10 y texas; las ciudades nuevas: detail y state)
+  const land10 = { type: 'MultiPolygon', coordinates: GEO.detail || GEO.tx10 };
+  const texas = { type: 'MultiPolygon', coordinates: GEO.state || GEO.texas };
   // casquete de cada polígono (centro y radio angular): permite no proyectar lo que cae fuera de lo visible
   const D = Math.PI / 180, capsCache = new Map();
   function capsOf(coords) {
@@ -288,11 +301,8 @@ export function initHero(GEO) {
     if (noTags) items.forEach((it) => { it.lx = -999; it.ly = -999; it.hide = true; });
     else if (!isM) items.forEach((it) => { it.lx = it.x + it.z.dx; it.ly = it.side === 'up' ? it.y - it.z.wire - it.th : it.y + it.z.wire; });
     else {
-      // móvil: The Woodlands arriba; Katy debajo de ese punto, a la izquierda; Pasadena debajo de Katy, a la derecha;
-      // Gulfton debajo del grupo. Cada hilo sale de su punto y ninguno cruza otra etiqueta.
       const cx = (l, w) => Math.max(F.pad, Math.min(F.W - F.pad - w, l));
       items.forEach((it) => { it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight || 52; });
-      const [wd, ka, gu, pa] = items;
       // parte una etiqueta en dos líneas equilibradas y ajusta la caja a la línea más larga (sin hueco a la derecha)
       const wrap = (it, maxW) => {
         it.tag.style.maxWidth = Math.max(120, maxW) + 'px'; it.tag.style.whiteSpace = 'normal';
@@ -302,6 +312,37 @@ export function initHero(GEO) {
         it.tag.style.width = Math.ceil(right - tr.left + parseFloat(cs.paddingRight) + 2) + 'px';
         it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight;
       };
+      if (C.mobile === 'miami') {
+        // móvil, Miami: Hialeah arriba; Miami Beach (la búsqueda encendida) encima de su punto, a la derecha y sin tapar
+        // el punto de Hialeah; Doral y Kendall con la etiqueta debajo, siempre a la izquierda del hilo que baja de
+        // Miami Beach a la ficha.
+        const [hi, dor, ke, mb] = items;
+        if (F.lite) {
+          [hi, dor, ke].forEach((it) => { it.lx = it.ly = -999; it.hide = true; });
+          mb.side = 'up'; mb.lx = cx(mb.x + 22 - mb.tw, mb.tw); mb.ly = mb.y - 30 - mb.th;
+        } else {
+          hi.side = 'up'; hi.lx = cx(hi.x - hi.tw / 2, hi.tw); hi.ly = hi.y - 30 - hi.th;
+          const minL = hi.x + 18;
+          mb.side = 'up'; mb.lx = Math.max(minL, cx(mb.x + 22 - mb.tw, mb.tw));
+          if (mb.lx + mb.tw > F.W - F.pad || mb.lx > mb.x - 14) {
+            wrap(mb, F.W - F.pad - minL);
+            mb.lx = Math.max(minL, Math.min(F.W - F.pad - mb.tw, mb.x + 22 - mb.tw));
+          }
+          mb.ly = mb.y - 30 - mb.th;
+          // si la de Miami Beach sube hasta la de Hialeah, la de Hialeah sube lo justo
+          if (mb.ly < hi.ly + hi.th + 10 && mb.lx < hi.lx + hi.tw) hi.ly = mb.ly - 10 - hi.th;
+          const maxR = mb.x - 14;
+          [dor, ke].forEach((it) => {
+            it.side = 'down';
+            const l0 = Math.max(F.pad, it.x - 22);
+            if (l0 + it.tw > maxR) wrap(it, maxR - l0);
+            it.lx = Math.max(F.pad, Math.min(l0, maxR - it.tw)); it.ly = it.y + 30;
+          });
+        }
+      } else {
+      // móvil: The Woodlands arriba; Katy debajo de ese punto, a la izquierda; Pasadena debajo de Katy, a la derecha;
+      // Gulfton debajo del grupo. Cada hilo sale de su punto y ninguno cruza otra etiqueta.
+      const [wd, ka, gu, pa] = items;
       if (F.lite) {
         // teléfono bajo: los cuatro puntos y solo la búsqueda encendida (Pasadena) con su ficha
         [wd, ka, gu].forEach((it) => { it.lx = it.ly = -999; it.hide = true; });
@@ -322,6 +363,7 @@ export function initHero(GEO) {
         if (gu.x + 22 - gu.tw < F.pad && pa.x - 14 - F.pad < gu.tw) wrap(gu, pa.x - 14 - F.pad);
         gu.side = 'down'; gu.lx = Math.max(F.pad, Math.min(cx(gu.x + 22 - gu.tw, gu.tw), pa.x - 14 - gu.tw)); gu.ly = gu.y + 34;
       }
+      }
     }
     items.forEach((it) => {
       it.tag.style.left = it.lx + 'px'; it.tag.style.top = it.ly + 'px';
@@ -340,7 +382,8 @@ export function initHero(GEO) {
     if (isM) {
       const cw = found.offsetWidth || 284, gu = items[2];
       // en el teléfono la ficha va a la izquierda para dejar ver la bahía a la derecha
-      fx = F.W <= 600 ? F.pad : Math.max(F.pad, Math.min(F.W - 84 - cw, P.x - cw * 0.62));
+      fx = C.mobile === 'miami' ? Math.max(F.pad, Math.min(F.W - F.pad - cw, P.x - cw + 44))
+        : F.W <= 600 ? F.pad : Math.max(F.pad, Math.min(F.W - 84 - cw, P.x - cw * 0.62));
       fyM = F.lite ? P.y + 24 : Math.max(gu.ly + gu.th, P.y + 20) + 18;
       found.style.width = '';
     }
@@ -661,7 +704,7 @@ export function initHero(GEO) {
   }
   window.__hero = { get cur() { return cur; }, get target() { return target; }, get storyDone() { return storyDone; }, get tBirth() { return tBirth; }, draw: (t) => draw(t),
     // para las pruebas: dónde caen en pantalla el planeta, Houston y las zonas en un instante t del viaje
-    probe: (t) => { const s = state(t); return { cx: s.cx, cy: s.cy, R: s.R, S: s.S, houston: s.proj(HOUSTON), zones: ZONES.map((z) => s.proj(z.at)) }; } };
+    probe: (t) => { const s = state(t); return { cx: s.cx, cy: s.cy, R: s.R, S: s.S, houston: s.proj(HOUSTON), city: s.proj(HOUSTON), zones: ZONES.map((z) => s.proj(z.at)) }; } };
   // el globo detallado (solo escritorio) sustituye al ligero cuando llega; sus casquetes se preparan en un rato libre
   window.addEventListener('hx-geo50', () => idle(() => {
     const L = landGlobal(); capsOf(L.coordinates);

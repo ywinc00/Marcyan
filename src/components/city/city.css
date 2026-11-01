@@ -257,6 +257,9 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .pf__tags{list-style:none;margin:18px 0 6px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .hx .pf__tags li{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;padding:4px 8px;border-radius:4px;border:1px solid rgba(240,237,232,.14);color:var(--fg-secondary)}
 .hx .pf__tags li:first-child{border-color:var(--accent-gold-line);color:var(--accent-gold)}
+/* un solo proyecto (Miami, hasta que haya más): sin recorrido fijo ni contador, el panel y la ficha lado a lado */
+@media (min-width:1024px){.hx .pf--solo .pf__grid{align-items:center}.hx .pf--solo .pf__stage{position:relative;top:auto}.hx .pf--solo .pf__step{min-height:500px}}
+.hx .pf--solo .pf__count{display:none}
 .hx .pf__foot{margin-top:40px;padding-top:22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:24px}
 .hx .pf__foot p{font-size:13.5px;color:var(--fg-secondary);max-width:62ch;line-height:1.55}
 .hx .local__grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-rows:auto 1fr;gap:24px 48px;align-items:start}

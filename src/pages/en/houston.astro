@@ -1,14 +1,14 @@
 ---
 // CITY HUB · /en/houston — "The journey" redesign (2026-10-25, direction in design/houston.md).
-// All content lives in HoustonHub (one piece for ES and EN); copy in i18n/houston.en.ts (`journey` block +
+// All content lives in CityHub (one piece for Houston and Miami, ES and EN); copy in i18n/houston.en.ts (`journey` block +
 // the usual keys). Schema (ItemList + Breadcrumb + FAQPage), meta, the 19 silo links, anchors and tracking
 // names are kept. The footer is the site's; this page only swaps its ending for the city skyline ("scape" slot).
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
-import HoustonHub from '../../components/houston/HoustonHub.astro';
-import HoustonScape from '../../components/houston/HoustonScape.astro';
+import CityHub from '../../components/city/CityHub.astro';
+import CityScape from '../../components/city/CityScape.astro';
 import { content } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston.en';
@@ -28,10 +28,10 @@ const c = content.en;
   <SiteNav nav={clusterNavEn} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    <HoustonHub lang="en" h={h} c={c} projects={portfolioProjects} />
+    <CityHub lang="en" city="houston" h={h} c={c} projects={portfolioProjects} />
   </main>
 
   <SiteFooter lang="en" footer={c.footer} starDensity={1.35}>
-    <HoustonScape slot="scape" />
+    <CityScape slot="scape" src="/assets/houston/skyline.svg" ratio="2400 / 1019" />
   </SiteFooter>
 </Layout>

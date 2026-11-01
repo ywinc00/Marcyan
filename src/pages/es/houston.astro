@@ -1,6 +1,6 @@
 ---
 // HUB DE CIUDAD · /es/houston — rediseño "el viaje" (2026-10-25, dirección en design/houston.md).
-// Todo el contenido vive en HoustonHub (una sola pieza para ES y EN, sin duplicar 586 líneas por idioma);
+// Todo el contenido vive en CityHub (una sola pieza para Houston y Miami en ES y EN, sin duplicar 586 líneas por idioma);
 // los textos, en i18n/houston.ts (bloque `journey` + las claves de siempre). Schema (ItemList + Breadcrumb +
 // FAQPage), meta, los 19 enlaces del silo, las anclas y los nombres de seguimiento se mantienen.
 // El pie es el del sitio; esta página cambia solo su cierre por la silueta de la ciudad (slot "scape").
@@ -8,8 +8,8 @@ import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
-import HoustonHub from '../../components/houston/HoustonHub.astro';
-import HoustonScape from '../../components/houston/HoustonScape.astro';
+import CityHub from '../../components/city/CityHub.astro';
+import CityScape from '../../components/city/CityScape.astro';
 import { content } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { houstonHub as h } from '../../i18n/houston';
@@ -29,10 +29,10 @@ const c = content.es;
   <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    <HoustonHub lang="es" h={h} c={c} projects={portfolioProjects} />
+    <CityHub lang="es" city="houston" h={h} c={c} projects={portfolioProjects} />
   </main>
 
   <SiteFooter footer={c.footer} starDensity={1.35}>
-    <HoustonScape slot="scape" />
+    <CityScape slot="scape" src="/assets/houston/skyline.svg" ratio="2400 / 1019" />
   </SiteFooter>
 </Layout>

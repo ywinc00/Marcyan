@@ -1,5 +1,6 @@
 ---
-// HUB DE HOUSTON · rediseño "el viaje" (2026-10-25). Una sola pieza para /es/houston y /en/houston.
+// HUB DE CIUDAD · rediseño "el viaje" (Houston 2026-10-25; Miami 2026-11-01). Una sola pieza para los hubs de
+// Houston y Miami en ES y EN: lo que cambia por ciudad vive en cities.js (planeta, zonas, mapa) y en sus textos.
 // Recorrido: el planeta se acerca a Houston al bajar → el borde del planeta a contraluz (servicios) →
 // la noche con nubes (proyectos) → el mapa del área con las zonas → la noche sigue hasta el pie, que
 // cierra con la silueta de la ciudad (slot "scape" de SiteFooter, lo monta la página).
@@ -15,25 +16,27 @@ import GrowthTeaser from '../sections/GrowthTeaser.astro';
 import { faqPage } from '../../lib/schema';
 import { t, type Lang } from '../../i18n/ui';
 import { nap } from '../../i18n/content';
-import './houston.css';
+import './city.css';
 
-interface Props { lang: Lang; h: any; c: any; projects: any[] }
-const { lang, h, c } = Astro.props;
+interface Props { lang: Lang; city: 'houston' | 'miami'; h: any; c: any; projects: any[] }
+const { lang, city, h, c } = Astro.props;
 const j = h.journey;
 // los trabajos de esta ciudad, en el orden que fija su bloque de textos
 const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean);
 const ui = t(lang);
 const svc = h.services.links;
 const faqLd = faqPage(h.faq.items);
-const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
-const waHref = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+const phone: string = (nap as any)[city];
+const telHref = 'tel:' + phone.replace(/[^\d+]/g, '');
+const waHref = 'https://wa.me/' + phone.replace(/\D/g, '');
+const defaultCity = city === 'miami' ? 'Miami, FL' : 'Houston, TX';
 const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
 const names = projects.map((p) => p.name).join('|');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
 const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
 ---
 <script is:inline>document.documentElement.classList.add('hx-js')</script>
-<div class="hx">
+<div class="hx" data-city={city}>
   <div class="atmo" aria-hidden="true">
     <div class="atmo__stars" id="hx-atmo-stars"></div>
     <canvas id="hx-atmo"></canvas>
@@ -119,7 +122,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   </section>
 
   {/* 3 · Proyectos: panel fijo con el trabajo real (escritorio) · tarjetas apiladas (teléfono) */}
-  <section class="sec pf" id="proyectos" aria-labelledby="hx-pf-t" data-atmo="top+0.3|limbA:0 night:1 calm:0.7 space:0;end-0.7|night:1 calm:0.7">
+  <section class:list={['sec pf', projects.length === 1 && 'pf--solo']} id="proyectos" aria-labelledby="hx-pf-t" data-atmo="top+0.3|limbA:0 night:1 calm:0.7 space:0;end-0.7|night:1 calm:0.7">
     <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
     <div class="hx-wrap">
       <header class="sec__head" data-rev>
@@ -154,7 +157,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
               <h3 class="pf__name" translate="no">{p.name}</h3>
               <dl class="pf__dl"><dt>{j.projects.did}</dt><dd>{p.did}</dd><dt>{j.projects.result}</dt><dd>{p.result}</dd></dl>
               <ul class="pf__tags"><li>{p.badge}</li>{p.tags.map((tg: string) => <li>{tg}</li>)}</ul>
-              <a class="more" href={p.serviceHref}>{p.serviceLabel} <Icon name="lucide:arrow-right" class="arr" /></a>
+              {p.serviceHref !== h.path && <a class="more" href={p.serviceHref}>{p.serviceLabel} <Icon name="lucide:arrow-right" class="arr" /></a>}
             </li>
           ))}
         </ol>
@@ -218,7 +221,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   </section>
 
   {/* 6 · Diagnóstico gratis (el componente del sitio: sus enlaces y su seguimiento no cambian) */}
-  <div class="diag" data-atmo="mid|night:1 glow:0.3"><GrowthTeaser lang={lang} city="houston" /></div>
+  <div class="diag" data-atmo="mid|night:1 glow:0.3"><GrowthTeaser lang={lang} city={city} /></div>
 
   {/* 7 · Respuesta directa (texto citable, literal) */}
   <section class="sec answer" aria-labelledby="answer-q" data-atmo="mid|night:1 glow:0.25">
@@ -282,7 +285,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
 
   {/* 11 · Contacto: el formulario real del sitio (envío, validación y seguimiento intactos) */}
   <div class="contact-wrap" data-atmo="top|night:1 glow:0.6 calm:1;end|night:1 glow:0.5">
-    <Contact contact={c.contact} defaultCity="Houston, TX" />
+    <Contact contact={c.contact} defaultCity={defaultCity} />
   </div>
 </div>
 
@@ -291,17 +294,19 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   import { initHero } from './hero.js';
   import { initSections } from './page.js';
   import { initClouds } from './clouds.js';
+  import { CITIES } from './cities.js';
 
+  const C = (CITIES as any)[(document.querySelector('.hx') as HTMLElement)?.dataset.city || 'houston'];
   // datos geográficos: el globo ligero (todo dispositivo) primero; el detallado solo en escritorio y después
   let geoP: Promise<any> | null = null;
-  const loadGeo = () => geoP || (geoP = fetch('/geo/houston-globo-110.json').then((r) => r.json()));
+  const loadGeo = () => geoP || (geoP = fetch(C.globe).then((r) => r.json()));
   initAtmo();
-  initSections(loadGeo);
+  initSections(loadGeo, C);
   initClouds();
   loadGeo().then((G) => {
-    initHero(G);
+    initHero(G, C);
     if (innerWidth > 600) {
-      const more = () => fetch('/geo/houston-globo-50.json').then((r) => r.json()).then((d) => { G.land50 = d.land50; window.dispatchEvent(new Event('hx-geo50')); }).catch(() => {});
+      const more = () => fetch(C.globe50).then((r) => r.json()).then((d) => { G.land50 = d.land50; window.dispatchEvent(new Event('hx-geo50')); }).catch(() => {});
       'requestIdleCallback' in window ? (window as any).requestIdleCallback(more, { timeout: 2500 }) : setTimeout(more, 1200);
     }
   });

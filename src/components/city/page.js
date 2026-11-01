@@ -1,7 +1,7 @@
 import { geoMercator, geoPath } from 'd3-geo';
 // Movimiento de las secciones: revelado de una vez, viñetas de servicios, panel de proyectos,
 // cifras que suben, mapa del área. Todo respeta "reducir movimiento".
-export function initSections(loadGeo) {
+export function initSections(loadGeo, C) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -156,12 +156,11 @@ export function initSections(loadGeo) {
   // puntos se señalan entre sí, y al pasar por una zona el mapa la ilumina.
   const box = $('#hx-map'), cv = $('#hx-map-cv'), plate = $('#hx-map-plate');
   if (box && cv) {
-    const HOU = [-95.369, 29.760];
-    const AT = { 'Houston': HOU, 'Katy': [-95.824, 29.786], 'Sugar Land': [-95.635, 29.620], 'The Woodlands': [-95.489, 30.166], 'Pearland': [-95.286, 29.564], 'Pasadena': [-95.209, 29.691] };
+    const HOU = C.center, AT = C.map.at;            // (el nombre HOU es histórico: es el centro de la ciudad del hub)
     const ZONES = JSON.parse(box.dataset.zones || '[]').map((z) => Object.assign({ at: AT[z.n] }, z)).filter((z) => z.at);
     const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-    // el encuadre final: toda el área metropolitana con la bahía de Galveston a la derecha
-    const VIEW = { type: 'MultiPoint', coordinates: [[-95.93, 29.49], [-94.86, 30.23]] };
+    // el encuadre final de la ciudad (cities.js)
+    const VIEW = { type: 'MultiPoint', coordinates: C.map.view };
     const ez = (t) => 1 - Math.pow(1 - t, 3);
     const c = cv.getContext('2d');
     let MAP = null, W = 0, H = 0, dpr = 1, layers = null, hl = null, revealed = false;
@@ -258,7 +257,7 @@ export function initSections(loadGeo) {
     function zoneOff(n) { hl = null; pinEls[n] && pinEls[n].classList.remove('hl'); chips[n] && chips[n].classList.remove('hl'); if (revealed) frame(1); }
 
     let mapP = null;
-    const loadMap = () => mapP || (mapP = fetch('/geo/houston-mapa.json').then((r) => r.json()).then((d) => { MAP = d; build(); placeZones(); frame(reduce ? 1 : 0); revealed = reduce; }));
+    const loadMap = () => mapP || (mapP = fetch(C.map.file).then((r) => r.json()).then((d) => { MAP = d; build(); placeZones(); frame(reduce ? 1 : 0); revealed = reduce; }));
     const nIO = new IntersectionObserver((es) => { if (es[0].isIntersecting) { loadMap(); nIO.disconnect(); } }, { rootMargin: '150% 0px' });
     nIO.observe(box);
     let rt; addEventListener('resize', () => { if (!MAP) return; clearTimeout(rt); rt = setTimeout(() => { build(); placeZones(); frame(revealed ? 1 : 0); }, 140); });

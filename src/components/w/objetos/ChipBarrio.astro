@@ -1,0 +1,142 @@
+---
+// Chip de barrio con pistas (W-CONV-23 · design/rediseno-workos.md §3.6, §2.10).
+// Objeto de SISTEMA que cuenta el mecanismo (E-34): en el centro, un chip 164×164 radio 8
+// opaco (--w-s3) con halo oro estático y una ficha mínima de EJEMPLO (pin, "Tu negocio",
+// botón "Llamar"); por las calles llegan pulsos HACIA el chip (clientes que llegan).
+// Calles: prop `tracks` con trazados REALES del barrio (E-49), generalizados (E-53), cada
+// uno con su nombre en letra de texto ≥ 13 px FUERA del chip. Coordenadas: lienzo de
+// 600×300 con el chip centrado en (300,150) (lado 164). Sin `tracks` dibuja un circuito
+// ABSTRACTO declarado como tal (§10.3: nada se descarga sin el dueño).
+// Pulsos: 4 s lineales, 7 retrasos (0 · .6 · 1.1 · 1.7 · 2.3 · 2.9 · 3.4 s); brillo que gira
+// en el borde del chip en 4 s. Quieto (reduced-motion): calles sin pulsos y brillo parado.
+// La máscara superior corta las pistas para que no pasen detrás del texto del hero (E-37).
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Track { d: string; name?: string; at?: [number, number] }
+interface Props {
+  lang?: 'es' | 'en';
+  /** Nombre del barrio (para el resumen accesible y el rótulo del chip). */
+  name: string;
+  tracks?: Track[];
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { lang = 'es', name, size = 'hero', class: cls } = Astro.props;
+const en = lang === 'en';
+// Circuito abstracto por defecto (sin nombres: no finge calles reales).
+const ABSTRACT: Track[] = [
+  { d: 'M0 70 H120 Q132 70 132 82 V110 Q132 122 144 122 H218' },
+  { d: 'M0 236 H96 Q108 236 108 224 V190 Q108 178 120 178 H218' },
+  { d: 'M600 54 H470 Q458 54 458 66 V118 Q458 130 446 130 H382' },
+  { d: 'M600 250 H500 Q488 250 488 238 V184 Q488 172 476 172 H382' },
+  { d: 'M240 0 V40 Q240 52 252 52 H266 Q278 52 278 64 V68' },
+  { d: 'M360 300 V262 Q360 250 348 250 H334 Q322 250 322 238 V232' },
+];
+const tracks = (Astro.props.tracks ?? ABSTRACT).slice(0, 8);
+const abstract = !Astro.props.tracks;
+const DELAYS = [0, 0.6, 1.1, 1.7, 2.3, 2.9, 3.4];
+const T = en
+  ? { biz: 'Your business', call: 'Call', sr: `Example: customers in ${name} find your business and call you.` }
+  : { biz: 'Tu negocio', call: 'Llamar', sr: `Ejemplo: clientes de ${name} encuentran tu negocio y te llaman.` };
+---
+<div class:list={['wo-hood', `wo-hood--${size}`, cls]} data-wo-hood data-abstract={abstract ? '' : undefined}>
+  <p class="sr-only">{T.sr}</p>
+  <div class="wo-hood__stage" aria-hidden="true">
+    <svg class="wo-hood__map" viewBox="0 0 600 300">
+      {tracks.map((t, i) => <path class="wo-hood__st" d={t.d} data-i={i} />)}
+      {DELAYS.map((b, k) => {
+        const t = tracks[k % tracks.length];
+        return (
+          <circle class="wo-hood__pulse" r="3.5">
+            <animateMotion dur="4s" begin={`${b}s`} repeatCount="indefinite" path={t.d} calcMode="linear" />
+          </circle>
+        );
+      })}
+      {tracks.filter((t) => t.name && t.at).map((t) => (
+        <text class="wo-hood__name" x={t.at![0]} y={t.at![1]}>{t.name}</text>
+      ))}
+    </svg>
+    <div class="wo-hood__chipwrap">
+      <span class="wo-hood__glow"></span>
+      <div class="wo-hood__chip">
+        <span class="wo-hood__pin"><Icon name="lucide:map-pin" /></span>
+        <b>{T.biz}</b>
+        <span class="wo-hood__where">{name}</span>
+        <span class="wo-hood__call"><Icon name="lucide:phone" />{T.call}</span>
+      </div>
+      <Ejemplo lang={lang} on="dark" pos="inline" class="wo-hood__ex" />
+    </div>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  document.querySelectorAll<HTMLElement>('[data-wo-hood]').forEach((el) => {
+    const svg = el.querySelector<SVGSVGElement>('.wo-hood__map');
+    if (!svg) return;
+    svg.pauseAnimations();
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); el.classList.add('is-playing'); svg.unpauseAnimations(); },
+      stop: () => { el.classList.remove('is-playing'); svg.pauseAnimations(); },
+      still: () => { el.classList.remove('is-playing'); svg.pauseAnimations(); svg.setCurrentTime(0); el.classList.add('is-still'); },
+    });
+  });
+</script>
+
+<style>
+  .wo-hood { position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
+  .wo-hood__stage {
+    position: relative; left: 50%; translate: -50% 0; width: 600px; height: 300px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 88%, transparent 100%),
+      linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 88%, transparent 100%),
+      linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-composite: intersect;
+  }
+  .wo-hood__map { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .wo-hood__st { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1.5; stroke-linecap: round; }
+  .wo-hood:not([data-abstract]) .wo-hood__st { stroke: rgba(var(--star-rgb), .30); stroke-width: 2; }
+  .wo-hood__pulse { fill: var(--accent-gold); opacity: 0; }
+  .wo-hood.is-playing .wo-hood__pulse { opacity: 1; }
+  .wo-hood__name { font: 500 13px var(--font-body); fill: var(--w-ink-70); paint-order: stroke; stroke: var(--w-s0, #080808); stroke-width: 4px; }
+  .wo-hood__chipwrap {
+    position: absolute; left: 50%; top: 50%; width: 164px; height: 164px; margin: -82px 0 0 -82px;
+    border-radius: 9px; overflow: visible;
+  }
+  .wo-hood__glow {
+    position: absolute; inset: -1px; border-radius: 9px; overflow: hidden;
+    box-shadow: 0 0 24px rgba(var(--accent-gold-rgb), .20);
+  }
+  .wo-hood__glow::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; margin: -130px 0 0 -130px;
+    background: conic-gradient(from 0deg, transparent 0 70%, rgba(var(--accent-gold-rgb), .9) 85%, transparent 100%);
+    animation: wo-hood-spin 4s linear infinite; animation-play-state: paused;
+  }
+  .wo-hood.is-playing .wo-hood__glow::before { animation-play-state: running; }
+  @keyframes wo-hood-spin { to { transform: rotate(360deg); } }
+  .wo-hood__chip {
+    position: absolute; inset: 0; border-radius: 8px;
+    background: var(--w-s3, #1f1f1d); border: 1px solid var(--w-line-strong);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px;
+    text-align: center;
+  }
+  .wo-hood__pin { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(var(--accent-gold-rgb), .14); color: var(--accent-gold); margin-bottom: 4px; }
+  .wo-hood__pin :global(svg) { width: 16px; height: 16px; }
+  .wo-hood__chip b { font: 500 15px/1.2 var(--font-display); color: var(--w-ink, #f0ede8); }
+  .wo-hood__where { font-size: 13px; color: var(--w-ink-60); }
+  .wo-hood__call {
+    margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 6px;
+    background: var(--accent-gold); color: var(--fg-inverse, #080808); font-size: 13px; font-weight: 600;
+  }
+  .wo-hood__call :global(svg) { width: 13px; height: 13px; }
+  .wo-hood__chipwrap :global(.wo-hood__ex) { position: absolute; right: 0; bottom: calc(100% + 8px); }
+  @media (--lt-md) {
+    .wo-hood { height: 300px; }
+  }
+  @media (--motion-reduce) {
+    .wo-hood__glow::before { animation: none; }
+    .wo-hood .wo-hood__pulse { opacity: 0; }
+  }
+</style>

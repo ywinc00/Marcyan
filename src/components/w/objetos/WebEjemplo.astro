@@ -1,0 +1,204 @@
+---
+// Web de EJEMPLO (objeto de PRODUCTO, claro cálido · design/rediseno-workos.md §3.6, §2.4).
+// Lo que vería el cliente del cliente: cabecera "Tu Plomería · Houston", titular,
+// botón principal, tarjeta de servicios, fila "Abierto ahora" (sin estrellas ni
+// valoraciones) y selector ES/EN. Cada `kind` lleva su paleta neutra de ejemplo,
+// nunca la de un cliente (E-32, E-47). Estático: lo animan AbanicoWebs,
+// DemoPorPasos y Escalera cambiando `data-wo-state` (esqueleto ⇄ lista).
+// Todo su CSS va aquí y solo lee variables (--w-*, --font-*).
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+type Kind = 'plomeria' | 'salon' | 'restaurante';
+interface Props {
+  kind?: Kind;
+  frame?: 'movil' | 'pantalla' | 'tarjeta';
+  state?: 'esqueleto' | 'lista';
+  lang?: 'es' | 'en';
+  city?: string;
+  size?: 'hero' | 'card' | 'mini';
+  /** Etiqueta "Ejemplo" propia (AbanicoWebs la pone una vez para las tres). */
+  example?: boolean;
+  class?: string;
+}
+const {
+  kind = 'plomeria', frame = 'tarjeta', state = 'lista', lang = 'es',
+  city = 'Houston', size = 'card', example = true, class: cls,
+} = Astro.props;
+
+const C = {
+  plomeria: {
+    color: '#2f5266', tint: 'rgba(47,82,102,.08)', initial: 'P',
+    es: { name: 'Tu Plomería', h: `Plomeros en ${city}, hoy mismo`, sub: 'Fugas, drenajes y calentadores. Te contestamos en español.', cta: 'Llamar ahora', ctaIcon: 'lucide:phone', svc: ['Fugas de agua', 'Drenajes', 'Calentadores'] },
+    en: { name: 'Your Plumbing', h: `${city} plumbers, same day`, sub: 'Leaks, drains and water heaters. We answer in English and Spanish.', cta: 'Call now', ctaIcon: 'lucide:phone', svc: ['Water leaks', 'Drains', 'Water heaters'] },
+    icons: ['lucide:droplets', 'lucide:wrench', 'lucide:flame'],
+  },
+  salon: {
+    color: '#5f604a', tint: 'rgba(95,96,74,.09)', initial: 'S',
+    es: { name: 'Tu Salón', h: `Tu cita en ${city}, sin esperar`, sub: 'Corte, color y uñas. Reserva en un minuto desde el teléfono.', cta: 'Reservar cita', ctaIcon: 'lucide:calendar', svc: ['Corte y peinado', 'Color', 'Uñas'] },
+    en: { name: 'Your Salon', h: `Book in ${city}, no waiting`, sub: 'Cuts, color and nails. Book in a minute from your phone.', cta: 'Book now', ctaIcon: 'lucide:calendar', svc: ['Cut and style', 'Color', 'Nails'] },
+    icons: ['lucide:scissors', 'lucide:palette', 'lucide:sparkles'],
+  },
+  restaurante: {
+    color: '#8a4a30', tint: 'rgba(138,74,48,.08)', initial: 'R',
+    es: { name: 'Tu Restaurante', h: `Cocina casera en ${city}`, sub: 'Menú del día, para llevar y reservas. Pide sin llamar.', cta: 'Ver el menú', ctaIcon: 'lucide:utensils', svc: ['Menú del día', 'Para llevar', 'Reservas'] },
+    en: { name: 'Your Restaurant', h: `Home cooking in ${city}`, sub: 'Daily menu, takeout and reservations. Order without calling.', cta: 'See the menu', ctaIcon: 'lucide:utensils', svc: ['Daily menu', 'Takeout', 'Reservations'] },
+    icons: ['lucide:utensils', 'lucide:shopping-bag', 'lucide:calendar'],
+  },
+}[kind];
+const T = C[lang];
+const open = lang === 'en' ? 'Open now' : 'Abierto ahora';
+const until = lang === 'en' ? 'until 6 p.m.' : 'hasta las 6 p. m.';
+const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
+---
+<div
+  class:list={['wo-web', `wo-web--${frame}`, `wo-web--${size}`, cls]}
+  data-wo-web
+  data-wo-state={state}
+  style={`--wo-k:${C.color};--wo-tint:${C.tint}`}
+>
+  {frame === 'movil' && <span class="wo-web__notch" aria-hidden="true"></span>}
+  {frame === 'pantalla' && (
+    <div class="wo-web__bar" aria-hidden="true">
+      <i></i><i></i><i></i><span class="wo-web__url"></span>
+    </div>
+  )}
+  <div class="wo-web__screen">
+    {example && frame !== 'movil' && <Ejemplo lang={lang} on="light" />}
+    <header class="wo-web__head">
+      <span class="wo-web__logo wo-sk" aria-hidden="true">{C.initial}</span>
+      <span class="wo-web__name wo-sk" translate="no">{T.name}</span>
+      <span class="wo-web__city wo-sk">· {city}</span>
+      {frame === 'movil'
+        ? example && <Ejemplo lang={lang} on="light" pos="inline" class="wo-web__ex" />
+        : <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>}
+    </header>
+    <div class="wo-web__body">
+      <div class="wo-web__main">
+        {frame === 'movil' && <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>}
+        <p class="wo-web__h wo-sk">{T.h}</p>
+        <p class="wo-web__sub wo-sk">{T.sub}</p>
+        <span class="wo-web__cta wo-sk"><Icon name={T.ctaIcon} />{T.cta}</span>
+      </div>
+      <div class="wo-web__side">
+        <div class="wo-web__svc">
+          <p class="wo-web__svct wo-sk">{svcTitle}</p>
+          <ul>
+            {T.svc.map((s, i) => (
+              <li><span class="wo-web__ic wo-sk"><Icon name={C.icons[i]} /></span><span class="wo-sk">{s}</span></li>
+            ))}
+          </ul>
+        </div>
+        <p class="wo-web__open wo-sk"><i aria-hidden="true"></i>{open} <span>· {until}</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wo-web {
+    --wo-ink: var(--w-p-ink, #0e0e0d);
+    --wo-ink2: var(--w-p-ink-2, #4a4743);
+    --wo-sk: #dcd7cf;
+    position: relative;
+    color: var(--wo-ink);
+    font-family: var(--font-body);
+    text-align: left;
+  }
+  .wo-web__screen {
+    position: relative; height: 100%;
+    background: var(--w-p-bg, #f0ede8);
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 20px;
+  }
+  /* ── Marcos ── */
+  .wo-web--tarjeta .wo-web__screen { background: transparent; padding: 0; }
+  .wo-web--movil {
+    width: 280px; max-width: 100%; aspect-ratio: 280 / 540;
+    padding: 9px; border-radius: 40px;
+    background: #111110; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 0 0 1px rgba(var(--accent-gold-rgb), .12);
+  }
+  .wo-web--movil .wo-web__screen { border-radius: 31px; padding: 44px 16px 18px; overflow: hidden; }
+  .wo-web__notch {
+    position: absolute; z-index: 2; top: 18px; left: 50%; translate: -50% 0;
+    width: 84px; height: 22px; border-radius: 12px; background: #111110;
+  }
+  .wo-web--pantalla {
+    border-radius: var(--w-r-obj, 12px); overflow: hidden;
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    background: var(--w-p-bg, #f0ede8);
+  }
+  .wo-web__bar {
+    display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+    background: #e6e2db; border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+  }
+  .wo-web__bar i { width: 8px; height: 8px; border-radius: 50%; background: #c9c4bb; }
+  .wo-web__url { margin-left: 12px; height: 12px; width: 38%; border-radius: 6px; background: #d6d1c9; }
+  .wo-web--pantalla .wo-web__screen { padding: 22px 24px 24px; }
+  .wo-web--pantalla .wo-web__body { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: start; }
+  .wo-web--mini.wo-web--movil { width: 240px; }
+
+  /* ── Contenido ── */
+  .wo-web__head { display: flex; align-items: center; gap: 8px; padding-right: 84px; min-height: 26px; }
+  .wo-web__logo {
+    display: inline-grid; place-items: center; flex: none;
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--wo-k); color: #fff; font: 600 13px/1 var(--font-display);
+  }
+  .wo-web__name { font: 600 14px/1.2 var(--font-display); letter-spacing: -0.01em; white-space: nowrap; }
+  .wo-web__city { font-size: 13px; color: var(--wo-ink2); white-space: nowrap; }
+  .wo-web__body { display: flex; flex-direction: column; gap: 14px; }
+  .wo-web__main { display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .wo-web__h { margin: 4px 0 0; font: 600 22px/1.12 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
+  .wo-web__sub { margin: 0; font-size: 13px; line-height: 1.45; color: var(--wo-ink2); }
+  .wo-web__cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px;
+    height: 40px; border-radius: 8px; background: var(--wo-k); color: #fff;
+    font: 600 14px/1 var(--font-body);
+  }
+  .wo-web__cta :global(svg) { width: 16px; height: 16px; }
+  .wo-web__lang {
+    margin-left: auto; display: none; flex: none;
+    font: 500 11px/1 var(--font-mono); border: 1px solid var(--w-p-line); border-radius: 999px; overflow: hidden;
+  }
+  .wo-web__lang b, .wo-web__lang span { display: inline-block; padding: 4px 7px; font-weight: 500; }
+  .wo-web__lang b { background: var(--wo-ink); color: var(--w-p-bg, #f0ede8); }
+  .wo-web__svc {
+    border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line); padding: 12px 14px;
+  }
+  .wo-web__svct { margin: 0 0 6px; font: 500 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--wo-ink2); }
+  .wo-web__svc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .wo-web__svc li { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; min-height: 30px; }
+  .wo-web__svc li + li { border-top: 1px solid var(--w-p-line); }
+  .wo-web__ic { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--wo-tint); color: var(--wo-k); }
+  .wo-web__ic :global(svg) { width: 14px; height: 14px; }
+  .wo-web__open { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+  .wo-web__open i { width: 8px; height: 8px; border-radius: 50%; background: var(--wo-k); flex: none; }
+  .wo-web__open span { color: var(--wo-ink2); font-weight: 400; }
+  .wo-web--pantalla .wo-web__lang, .wo-web--movil .wo-web__lang { display: inline-flex; }
+  .wo-web--movil .wo-web__head, .wo-web--pantalla .wo-web__head { padding-right: 0; }
+  .wo-web--pantalla .wo-web__head { padding-right: 84px; }
+  .wo-web--movil .wo-web__city { display: none; }
+  /* En el móvil la etiqueta va al final de la cabecera (no cabe en la esquina, junto a la isla). */
+  .wo-web--movil :global(.wo-web__ex) { margin-left: auto; }
+  .wo-web--movil .wo-web__lang { margin-left: 0; align-self: flex-start; }
+  .wo-web--movil .wo-web__screen { gap: 14px; }
+  .wo-web--movil .wo-web__h { font-size: 24px; }
+  .wo-web--movil .wo-web__body { flex: 1; }
+  .wo-web--movil .wo-web__side { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+  .wo-web--movil .wo-web__open { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--w-p-line); }
+
+  /* ── Estado esqueleto (lo cambian las demos con data-wo-state) ── */
+  .wo-sk { transition: color 400ms var(--w-ease-ui), background-color 400ms var(--w-ease-ui); }
+  [data-wo-state='esqueleto'] .wo-sk {
+    color: transparent; background-color: var(--wo-sk); border-radius: 5px;
+  }
+  [data-wo-state='esqueleto'] .wo-sk :global(svg) { opacity: 0; }
+  [data-wo-state='esqueleto'] .wo-sk * { color: transparent; }
+  [data-wo-state='esqueleto'] .wo-web__open i { background: transparent; }
+  [data-wo-state='esqueleto'] .wo-web__lang b { background: transparent; }
+  .wo-sk :global(svg) { transition: opacity 400ms var(--w-ease-ui); }
+  @media (--motion-reduce) {
+    .wo-sk, .wo-sk :global(svg) { transition: none; }
+  }
+</style>

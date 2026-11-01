@@ -1,0 +1,156 @@
+---
+// Escáner de señales (W-ADV-45 · design/rediseno-workos.md §3.6, §2.10). Objeto de SISTEMA.
+// Tarjeta radio 48 padding 64; mosaico de chips (49 px, radio 12, texto 16 al 50 %)
+// fundidos hacia los bordes; caja central 250×172 con borde oro y fondo oro al 15 %
+// (OPACO: los chips no se ven a través, E-37) con una web dibujada en línea; una barra
+// de 132×10 la barre de abajo arriba en 1,8 s.
+// Chips = señales REALES que revisa el motor del diagnóstico (lib/diagnostic-checks.mjs:
+// móvil, título, conexión segura, fotos, teléfono, ciudad, datos del negocio, páginas
+// por servicio, descripción, datos para IA, respuestas, texto sin JavaScript, llamar con
+// un toque, WhatsApp, formulario, botón de contacto, reseñas). Nada inventado.
+//   motion="loop"   → bucle (solo en /diagnóstico), con botón de pausa (loop.ts).
+//   motion="once"   → recorre UNA vez al entrar en vista y se queda a media altura (portada, hubs).
+//   motion="static" → barra quieta a media altura.
+// CERROJO 5: sale de v3 (portada y hubs), así que TODO su CSS va aquí y solo lee variables.
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  variant?: 'completo' | 'compacto';
+  motion?: 'loop' | 'once' | 'static';
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { lang = 'es', variant = 'completo', motion = 'once', size = 'card', class: cls } = Astro.props;
+const en = lang === 'en';
+const SIGNALS = en
+  ? ['Mobile version', 'Clear title', 'Secure connection', 'Photo descriptions', 'Visible phone', 'City mentioned', 'Business data', 'A page per service', 'Google description', 'Data for AI', 'Direct answers', 'Text without JavaScript', 'Tap to call', 'Visible WhatsApp', 'Contact form', 'Contact button in view', 'Google reviews', 'Live website']
+  : ['Versión móvil', 'Título claro', 'Conexión segura', 'Fotos con descripción', 'Teléfono visible', 'Ciudad mencionada', 'Datos del negocio', 'Páginas por servicio', 'Descripción en Google', 'Datos para IA', 'Respuestas directas', 'Texto sin JavaScript', 'Llamar con un toque', 'WhatsApp visible', 'Formulario de contacto', 'Botón de contacto a la vista', 'Reseñas en Google', 'Sitio activo'];
+const nRows = variant === 'compacto' ? 5 : 7;
+const perRow = 6;
+// Filas desplazadas (como un muro de ladrillo) con las señales repartidas en orden.
+const rows = Array.from({ length: nRows }, (_, r) =>
+  Array.from({ length: perRow }, (_, k) => SIGNALS[(r * 5 + k * 3) % SIGNALS.length]));
+const sr = en
+  ? 'Example: the free checkup scans a website for signals such as mobile version, visible phone, Google reviews and data for AI.'
+  : 'Ejemplo: el diagnóstico gratis revisa una web buscando señales como la versión móvil, el teléfono visible, las reseñas en Google y los datos para IA.';
+---
+<div
+  class:list={['wo-scan', `wo-scan--${variant}`, `wo-scan--${size}`, `wo-scan--${motion}`, cls]}
+  data-wo-scan={motion === 'static' ? undefined : motion}
+>
+  <p class="wo-scan__sr">{sr}</p>
+  <Ejemplo lang={lang} on="dark" />
+  <div class="wo-scan__wall" aria-hidden="true">
+    {rows.map((row, r) => (
+      <div class="wo-scan__row" style={`--off:${(r % 2) * -60 - (r % 3) * 18}px`}>
+        {row.map((s) => <span class="wo-scan__chip">{s}</span>)}
+      </div>
+    ))}
+  </div>
+  <div class="wo-scan__box" aria-hidden="true">
+    <svg viewBox="0 0 250 172" preserveAspectRatio="xMidYMid meet">
+      <rect x="40" y="26" width="170" height="114" rx="8" />
+      <path d="M40 44H210" />
+      <circle cx="52" cy="35" r="2.5" /><circle cx="61" cy="35" r="2.5" /><circle cx="70" cy="35" r="2.5" />
+      <path d="M56 62H150M56 74H130" />
+      <rect x="56" y="88" width="46" height="14" rx="7" />
+      <rect x="150" y="58" width="44" height="64" rx="5" />
+      <path d="M56 116H120" />
+    </svg>
+    <span class="wo-scan__bar"></span>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-wo-scan]').forEach((el) => {
+    if (el.dataset.woScan === 'loop') {
+      registerLoop(el, {
+        start: () => el.classList.add('is-run', 'is-playing'),
+        stop: () => el.classList.remove('is-playing'),
+        still: () => el.classList.remove('is-run', 'is-playing'),
+      });
+      return;
+    }
+    // once: una pasada al entrar en vista y se queda a media altura.
+    if (mq.matches || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) { el.classList.add('is-once'); io.disconnect(); }
+    }, { threshold: .4 });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .wo-scan {
+    --gold: var(--accent-gold-rgb, 200, 169, 110);
+    --bw: 250px; --bh: 172px; --travel: calc(var(--bh) - 36px);
+    position: relative; overflow: hidden; isolation: isolate;
+    width: 100%; min-height: 480px; padding: 64px;
+    border-radius: 48px;
+    background: var(--w-s1, #121211);
+    border: 1px solid var(--w-line, rgba(200,169,110,.09));
+    box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08));
+    display: grid; place-items: center;
+    font-family: var(--font-body);
+  }
+  .wo-scan__sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .wo-scan__wall {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+    -webkit-mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
+    mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
+  }
+  .wo-scan__row { display: flex; gap: 12px; justify-content: center; margin-left: var(--off); white-space: nowrap; }
+  .wo-scan__chip {
+    flex: none; display: inline-flex; align-items: center; height: 49px; padding: 0 22px;
+    border-radius: 12px; border: 1px solid rgba(var(--star-rgb, 240, 237, 232), .10);
+    background: var(--w-s1, #121211);
+    font-size: 16px; color: rgba(var(--star-rgb, 240, 237, 232), .50);
+  }
+  .wo-scan__box {
+    position: relative; z-index: 1; width: var(--bw); height: var(--bh); overflow: hidden;
+    border-radius: 12px; border: 1px solid rgba(var(--gold), .85);
+    background: #2d291f; /* oro al 15 % sobre la bandeja, opaco */
+    box-shadow: 0 0 0 6px var(--w-s1, #121211), 0 0 28px rgba(var(--gold), .18);
+  }
+  .wo-scan__box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .wo-scan__box svg * { fill: none; stroke: rgba(var(--gold), .75); stroke-width: 1.4; }
+  .wo-scan__box svg circle { fill: rgba(var(--gold), .75); stroke: none; }
+  .wo-scan__bar {
+    position: absolute; left: 50%; bottom: 14px; width: 132px; height: 10px; margin-left: -66px;
+    border-radius: 5px; background: var(--accent-gold, #c8a96e);
+    box-shadow: 0 0 14px rgba(var(--gold), .45);
+    transform: translateY(calc(var(--travel) / -2)); /* quieto: a media altura */
+  }
+  .wo-scan__bar::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 36px;
+    background: linear-gradient(180deg, rgba(var(--gold), .22), transparent);
+    border-radius: 0 0 6px 6px;
+  }
+  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 1.8s var(--w-ease-ui, ease) infinite; animation-play-state: paused; }
+  .wo-scan.is-run.is-playing .wo-scan__bar { animation-play-state: running; }
+  .wo-scan.is-once .wo-scan__bar { animation: wo-scan-once 1.8s var(--w-ease-ui, ease) 1 both; }
+  @keyframes wo-scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(var(--travel) * -1)); } }
+  @keyframes wo-scan-once {
+    0% { transform: translateY(0); }
+    70% { transform: translateY(calc(var(--travel) * -1)); }
+    100% { transform: translateY(calc(var(--travel) / -2)); }
+  }
+  .wo-scan--compacto { --bw: 184px; --bh: 126px; min-height: 300px; padding: 24px; border-radius: 22px; }
+  .wo-scan--compacto .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
+  .wo-scan--compacto .wo-scan__wall, .wo-scan--compacto .wo-scan__row { gap: 10px; }
+  .wo-scan--compacto .wo-scan__bar { width: 96px; margin-left: -48px; bottom: 10px; }
+  @media (max-width: 767.98px) {
+    .wo-scan { min-height: 360px; padding: 24px; border-radius: 22px; --bw: 200px; --bh: 138px; }
+    .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
+    .wo-scan__bar { width: 104px; margin-left: -52px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wo-scan .wo-scan__bar { animation: none; }
+  }
+</style>

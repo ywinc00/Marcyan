@@ -1,0 +1,169 @@
+---
+// Pila de interruptores de servicios (W-HOME-06 · design/rediseno-workos.md §3.6, §2.10, §4.3).
+// Objeto de PRODUCTO (tarjetas claras). Bloque 560×550; tarjetas 360×62 radio 16 padding 20,
+// paso 78 px, en arco (la central sobresale a la izquierda, 24 px más a la derecha por paso);
+// interruptor 40×22; etiqueta 14/500; chapa "Activo" en tinta con texto crema (estado por
+// valor) / "Listo" gris; opacidades 100/70/40/12 %; rayas verticales oro de 1 px cada 5 px
+// en óvalo difuminado detrás. Cada tarjeta es un <a> a su servicio (hrefs por props: los de
+// priceServices, nunca inventados).
+// Bucle (firma de Servicios): la pila sube 78 px cada 2,4 s en 1400 ms (--w-ease-stack) y la
+// central enciende su interruptor y su chapa. Quieto: "Web rápida" en el centro, activa.
+// size: hero 560×550 · card ≈ 480×420 (Servicios) · mini. Móvil: pila reducida, nunca oculta.
+interface Item { label: string; href: string; track?: string }
+interface Props {
+  items: Item[];
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { items, lang = 'es', size = 'hero', class: cls } = Astro.props;
+const en = lang === 'en';
+const T = en ? { on: 'Active', ready: 'Ready', sr: 'Our services' } : { on: 'Activo', ready: 'Listo', sr: 'Nuestros servicios' };
+const n = items.length;
+const c = Math.floor(n / 2);
+// Hueco inicial de cada tarjeta: la 1.ª en el centro, las siguientes debajo, las últimas arriba.
+const slot = (i: number) => (i + c) % n;
+---
+<div class:list={['wo-sw', `wo-sw--${size}`, cls]} data-wo-sw data-c={c}>
+  <div class="wo-sw__stage">
+    <span class="wo-sw__rays" aria-hidden="true"></span>
+    <nav class="wo-sw__list" aria-label={T.sr}>
+      {items.map((it, i) => {
+        const d = slot(i) - c;
+        return (
+          <a
+            class:list={['wo-sw__card', d <= 0 && 'is-on', Math.abs(d) > 3 && 'is-off']}
+            href={it.href}
+            data-p={slot(i)}
+            data-track={it.track}
+            style={`--d:${d}`}
+          >
+            <span class="wo-sw__tog" aria-hidden="true"><i></i></span>
+            <span class="wo-sw__label">{it.label}</span>
+            <span class="wo-sw__chip" aria-hidden="true"><span class="wo-sw__chip-on">{T.on}</span><span class="wo-sw__chip-off">{T.ready}</span></span>
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  const EVERY = 2400, MOVE = 1400;
+  document.querySelectorAll<HTMLElement>('[data-wo-sw]').forEach((el) => {
+    const cards = Array.from(el.querySelectorAll<HTMLElement>('.wo-sw__card'));
+    const n = cards.length, c = Number(el.dataset.c || 0);
+    if (n < 3) return;
+    const init = cards.map((k) => Number(k.dataset.p));
+    let timer = 0;
+    const paint = (k: HTMLElement, p: number) => {
+      const d = p - c;
+      k.dataset.p = String(p);
+      k.style.setProperty('--d', String(d));
+      k.classList.toggle('is-on', d <= 0);
+      k.classList.toggle('is-off', Math.abs(d) > 3);
+    };
+    const step = () => {
+      cards.forEach((k) => {
+        const p = Number(k.dataset.p) - 1;
+        if (p < 0) {
+          // Sale por arriba (a opacidad 0) y vuelve por abajo sin cruzar la pila.
+          paint(k, -1);
+          window.setTimeout(() => {
+            k.classList.add('is-jump');
+            k.style.setProperty('--d', String(n - c));
+            void k.offsetWidth;
+            k.classList.remove('is-jump');
+            k.classList.remove('is-off');
+            paint(k, n - 1);
+          }, MOVE);
+        } else paint(k, p);
+      });
+      timer = window.setTimeout(step, EVERY);
+    };
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, EVERY - MOVE); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); cards.forEach((k, i) => paint(k, init[i])); el.classList.add('is-still'); },
+    });
+  });
+</script>
+
+<style>
+  /* Medidas por variables (nunca zoom: la letra no baja de 14 px, E-40). */
+  .wo-sw {
+    --sw-w: 560px; --sw-h: 550px; --cw: 360px; --ch: 62px; --step: 78px; --dx: 24px; --x0: 40px;
+    position: relative; width: min(100%, var(--sw-w)); font-family: var(--font-body);
+  }
+  .wo-sw--card { --sw-w: 480px; --sw-h: 420px; --cw: 330px; --ch: 54px; --step: 62px; --dx: 20px; --x0: 34px; }
+  .wo-sw--mini { --sw-w: 358px; --sw-h: 340px; --cw: 284px; --ch: 50px; --step: 56px; --dx: 14px; --x0: 12px; }
+  .wo-sw__stage {
+    position: relative; width: 100%; height: var(--sw-h); overflow: hidden;
+    /* Sin bordes rectos al recortar la pila (E-36). */
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+  }
+  .wo-sw__rays {
+    position: absolute; left: 60px; right: 20px; top: 40px; bottom: 40px;
+    background: repeating-linear-gradient(90deg, rgba(var(--accent-gold-rgb), .30) 0 1px, transparent 1px 5px);
+    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    filter: blur(.4px);
+  }
+  .wo-sw__list { position: absolute; inset: 0; }
+  .wo-sw__card {
+    --ad: max(var(--d), calc(var(--d) * -1));
+    position: absolute; left: var(--x0); top: calc(50% - var(--ch) / 2);
+    display: flex; align-items: center; gap: 14px;
+    width: min(var(--cw), 100% - var(--x0) - 3 * var(--dx)); height: var(--ch); padding: 0 18px;
+    border-radius: 16px; text-decoration: none;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid rgba(14,14,13,.04);
+    box-shadow: inset 0 1px 0 #fff;
+    transform: translate(calc(var(--ad) * var(--dx)), calc(var(--d) * var(--step)));
+    opacity: clamp(0, calc(1 - var(--ad) * .3 + max(0, var(--ad) - 2) * .02 - max(0, var(--ad) - 3) * .12), 1);
+    transition:
+      transform 1400ms var(--w-ease-stack),
+      opacity 1400ms var(--w-ease-stack),
+      color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  /* Más allá de ±3, fuera de la vista y del foco. */
+  .wo-sw__card.is-off {
+    visibility: hidden;
+    transition: transform 1400ms var(--w-ease-stack), opacity 1400ms var(--w-ease-stack), visibility 0s linear 1400ms;
+  }
+  .wo-sw__card.is-jump { transition: none; }
+  .wo-sw__card:focus-visible { opacity: 1; outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .wo-sw__tog {
+    position: relative; flex: none; width: 40px; height: 22px; border-radius: 11px; background: #d6d1c9;
+    transition: background-color 320ms var(--w-ease-ui);
+  }
+  .wo-sw__tog i {
+    position: absolute; top: 1px; left: 1px; width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 2px rgba(14,14,13,.25);
+    transition: transform 320ms var(--w-ease-ui);
+  }
+  .wo-sw__card.is-on .wo-sw__tog { background: var(--w-p-ink, #0e0e0d); }
+  .wo-sw__card.is-on .wo-sw__tog i { transform: translateX(18px); background: var(--w-p-bg, #f0ede8); }
+  .wo-sw__label { flex: 1; font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .wo-sw__chip { position: relative; flex: none; height: 22px; min-width: 64px; }
+  .wo-sw__chip span {
+    position: absolute; right: 0; top: 0; height: 22px; padding: 0 9px; border-radius: 8px;
+    display: inline-flex; align-items: center; font-size: 13px; font-weight: 500; white-space: nowrap;
+    transition: opacity 320ms var(--w-ease-ui);
+  }
+  .wo-sw__chip-on { background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); opacity: 0; }
+  .wo-sw__chip-off { background: rgba(14,14,13,.06); color: var(--w-p-ink-2, #4a4743); }
+  .wo-sw__card.is-on .wo-sw__chip-on { opacity: 1; }
+  .wo-sw__card.is-on .wo-sw__chip-off { opacity: 0; }
+  @media (--hover-fine) {
+    .wo-sw__card:hover { border-color: rgba(var(--accent-gold-rgb), .55); }
+  }
+  @media (--lt-md) {
+    .wo-sw, .wo-sw--card { --sw-w: 100%; --sw-h: 360px; --cw: 300px; --ch: 50px; --step: 58px; --dx: 14px; --x0: 8px; }
+  }
+  @media (--motion-reduce) {
+    .wo-sw__card, .wo-sw__tog, .wo-sw__tog i, .wo-sw__chip span { transition: none; }
+  }
+</style>

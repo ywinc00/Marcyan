@@ -1,0 +1,116 @@
+---
+// Mini-UIs de los pasos (objetos de PRODUCTO, claros, estáticos · design/rediseno-workos.md §3.6).
+//   kind="correo"        → correo "Tu propuesta" con su hora (paso 1 de BandejaPasos).
+//   kind="esqueleto"     → pantalla en esqueleto (paso 2).
+//   kind="publicada"     → web con "● Publicada" (punto teal, texto en tinta: estado por valor).
+//   kind="mantenimiento" → "Copia de seguridad · Hecha" (celda de Servicios, ancla #mantenimiento).
+// Caben en la zona de objeto de ~180 px de alto de una tarjeta de BandejaPasos.
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  kind: 'correo' | 'esqueleto' | 'publicada' | 'mantenimiento';
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  example?: boolean;
+  class?: string;
+}
+const { kind, lang = 'es', size = 'card', example = true, class: cls } = Astro.props;
+const en = lang === 'en';
+const T = en
+  ? { inbox: 'Inbox', subj: 'Your proposal', prev: 'Scope, timeline and a clear price.', time: '10:24 a.m.', pub: 'Published', site: 'Your Business', backup: 'Backup', done: 'Done', check: 'Site check', today: 'Today', updates: 'Updates', upToDate: 'Up to date',
+      sr: { correo: 'Example: the email with your proposal arrives in your inbox.', esqueleto: 'Example: the website takes shape as a skeleton.', publicada: 'Example: the website is published.', mantenimiento: 'Example: the website backup is done.' } }
+  : { inbox: 'Bandeja de entrada', subj: 'Tu propuesta', prev: 'Alcance, plazos y un precio claro.', time: '10:24', pub: 'Publicada', site: 'Tu Negocio', backup: 'Copia de seguridad', done: 'Hecha', check: 'Revisión del sitio', today: 'Hoy', updates: 'Actualizaciones', upToDate: 'Al día',
+      sr: { correo: 'Ejemplo: te llega el correo con tu propuesta.', esqueleto: 'Ejemplo: la web toma forma en esqueleto.', publicada: 'Ejemplo: la web queda publicada.', mantenimiento: 'Ejemplo: la copia de seguridad de la web está hecha.' } };
+---
+<div class:list={['wo-mini', `wo-mini--${kind}`, `wo-mini--${size}`, cls]}>
+  <p class="sr-only">{T.sr[kind]}</p>
+  <div class="wo-mini__card" aria-hidden="true">
+    {example && <Ejemplo lang={lang} on="light" />}
+
+    {kind === 'correo' && (
+      <>
+        <p class="wo-mini__lab">{T.inbox}</p>
+        <div class="wo-mini__mail is-on">
+          <span class="wo-mini__av" translate="no">M</span>
+          <span class="wo-mini__mt"><b><span translate="no">Marcyan</span><span class="wo-mini__time">{T.time}</span></b><span class="wo-mini__subj">{T.subj}</span><span>{T.prev}</span></span>
+        </div>
+        <div class="wo-mini__mail"><span class="wo-mini__av wo-mini__av--sk"></span><span class="wo-mini__mt"><i style="width:60%"></i><i style="width:85%"></i></span></div>
+      </>
+    )}
+
+    {kind === 'esqueleto' && (
+      <div class="wo-mini__screen">
+        <span class="wo-mini__dots"><i></i><i></i><i></i></span>
+        <div class="wo-mini__sk">
+          <i style="width:34%;height:10px"></i>
+          <i style="width:78%;height:14px"></i>
+          <i style="width:62%"></i>
+          <span class="wo-mini__skrow"><i style="width:30%;height:22px;border-radius:6px"></i><i style="width:22%;height:22px;border-radius:6px"></i></span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'publicada' && (
+      <div class="wo-mini__screen">
+        <span class="wo-mini__dots"><i></i><i></i><i></i><span class="wo-mini__pub"><b></b>{T.pub}</span></span>
+        <div class="wo-mini__site">
+          <p class="wo-mini__name" translate="no">{T.site}</p>
+          <p class="wo-mini__h">{en ? 'Ready to get calls' : 'Lista para recibir llamadas'}</p>
+          <span class="wo-mini__cta"><Icon name="lucide:phone" />{en ? 'Call now' : 'Llamar ahora'}</span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'mantenimiento' && (
+      <ul class="wo-mini__rows">
+        <li class="is-main"><span class="wo-mini__ic"><Icon name="lucide:database-backup" /></span><span>{T.backup}</span><b><Icon name="lucide:check" />{T.done}</b></li>
+        <li><span class="wo-mini__ic"><Icon name="lucide:shield-check" /></span><span>{T.check}</span><em>{T.today}</em></li>
+        <li><span class="wo-mini__ic"><Icon name="lucide:refresh-cw" /></span><span>{T.updates}</span><em>{T.upToDate}</em></li>
+      </ul>
+    )}
+  </div>
+</div>
+
+<style>
+  .wo-mini { position: relative; width: min(100%, 320px); font-family: var(--font-body); text-align: left; }
+  .wo-mini__card {
+    position: relative; display: flex; flex-direction: column; gap: 10px; padding: 14px;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: var(--w-r-obj, 12px);
+  }
+  .wo-mini__lab { margin: 0; font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); padding-right: 80px; }
+  .wo-mini__mail { display: flex; gap: 10px; padding: 10px; border-radius: 8px; }
+  .wo-mini__mail.is-on { background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .wo-mini__av { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font: 600 13px/1 var(--font-display); }
+  .wo-mini__av--sk { background: #dcd7cf; }
+  .wo-mini__mt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__mt b { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--w-p-ink, #0e0e0d); }
+  .wo-mini__time { font-weight: 400; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__subj { font-size: 14px; font-weight: 500; color: var(--w-p-ink, #0e0e0d); }
+  .wo-mini__mt i { display: block; height: 8px; border-radius: 4px; background: #dcd7cf; margin: 4px 0; }
+  .wo-mini__screen { border-radius: 8px; overflow: hidden; background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .wo-mini__dots { display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; background: #e6e2db; }
+  .wo-mini__dots i { width: 7px; height: 7px; border-radius: 50%; background: #c9c4bb; }
+  .wo-mini__sk { display: flex; flex-direction: column; gap: 10px; padding: 16px 14px 18px; }
+  .wo-mini__sk i, .wo-mini__skrow i { display: block; height: 8px; border-radius: 4px; background: #e2ddd5; }
+  .wo-mini__skrow { display: flex; gap: 8px; margin-top: 4px; }
+  .wo-mini--esqueleto .wo-mini__card { padding-top: 40px; }
+  .wo-mini--publicada .wo-mini__card { padding-top: 40px; }
+  .wo-mini__pub { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--w-p-ink, #0e0e0d); }
+  .wo-mini__pub b { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 1px rgba(14,14,13,.2); }
+  .wo-mini__site { padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .wo-mini__name { margin: 0; font-size: 13px; font-weight: 600; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__h { margin: 0; font: 600 17px/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .wo-mini__cta { align-self: flex-start; margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 6px; background: #2f5266; color: #fff; font-size: 13px; font-weight: 600; }
+  .wo-mini__cta :global(svg) { width: 13px; height: 13px; }
+  .wo-mini__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .wo-mini__rows li { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 14px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__rows li.is-main { background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); color: var(--w-p-ink, #0e0e0d); font-weight: 500; margin-top: 30px; }
+  .wo-mini__rows li > span:nth-child(2) { flex: 1; }
+  .wo-mini__ic { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(14,14,13,.06); }
+  .wo-mini__ic :global(svg) { width: 14px; height: 14px; }
+  .wo-mini__rows b { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 8px; background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font-size: 13px; font-weight: 500; }
+  .wo-mini__rows b :global(svg) { width: 12px; height: 12px; }
+  .wo-mini__rows em { font-style: normal; font-size: 13px; }
+</style>

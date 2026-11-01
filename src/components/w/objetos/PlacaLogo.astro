@@ -1,0 +1,112 @@
+---
+// Logo de empresa sobre placa de circuito (W-PROOF-16 · design/rediseno-workos.md §3.6).
+// Objeto de SISTEMA. El logo de empresa (el planeta ilustrado del schema, NO el wordmark de
+// la nav ni el favicon: los 3 no se unifican) redibujado como pieza física sobre una placa
+// oscura con pistas oro al 12 %. SVG inline en dos capas (apagado / encendido), sin imagen
+// binaria. Encendido ÚNICO al entrar en vista: fundido de 2 s con 600 ms de retraso.
+// Sin JS o con reduced-motion: encendido desde el principio. Es nuestra marca real, no un
+// dato inventado: no lleva etiqueta "Ejemplo".
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { lang = 'es', size = 'hero', class: cls } = Astro.props;
+const label = lang === 'en' ? 'Marcyan logo on a circuit board' : 'Logo de Marcyan sobre una placa de circuito';
+const cx = 320, cy = 200;
+const u = Math.random().toString(36).slice(2, 7); // ids de degradado únicos por instancia
+// Pistas: salen de los pines del chip y se doblan hacia los bordes.
+const traces: string[] = [];
+const pads: [number, number][] = [];
+for (let i = 0; i < 6; i++) {
+  const y = cy - 70 + i * 28;
+  const bendL = 200 - (i % 3) * 26, bendR = 440 + (i % 3) * 26;
+  const yo = y + (i < 3 ? -1 : 1) * (18 + (i % 3) * 14);
+  traces.push(`M228 ${y}H${bendL}L${bendL - 24} ${yo}H${40 + (i % 2) * 30}`);
+  traces.push(`M412 ${y}H${bendR}L${bendR + 24} ${yo}H${600 - (i % 2) * 30}`);
+  pads.push([40 + (i % 2) * 30, yo], [600 - (i % 2) * 30, yo]);
+}
+for (let i = 0; i < 5; i++) {
+  const x = cx - 56 + i * 28;
+  const xo = x + (i - 2) * 22;
+  traces.push(`M${x} 108V${84 - (i % 2) * 10}L${xo} ${60 - (i % 2) * 10}V${24 + (i % 2) * 8}`);
+  traces.push(`M${x} 292V${316 + (i % 2) * 10}L${xo} ${340 + (i % 2) * 10}V${376 - (i % 2) * 8}`);
+  pads.push([xo, 24 + (i % 2) * 8], [xo, 376 - (i % 2) * 8]);
+}
+const pinsH = Array.from({ length: 6 }, (_, i) => cy - 70 + i * 28);
+const pinsV = Array.from({ length: 5 }, (_, i) => cx - 56 + i * 28);
+const tr = traces.join('');
+---
+<div class:list={['wo-plate', `wo-plate--${size}`, cls]} data-wo-plate role="img" aria-label={label}>
+  <svg viewBox="0 0 640 400" aria-hidden="true">
+    <defs>
+      <radialGradient id={`wo-ps-${u}`} cx="40%" cy="38%" r="70%">
+        <stop offset="0" stop-color="#8c7c58" /><stop offset=".6" stop-color="#5a4524" /><stop offset="1" stop-color="#2e2210" />
+      </radialGradient>
+      <radialGradient id={`wo-pd-${u}`} cx="50%" cy="50%" r="50%">
+        <stop offset=".55" stop-color="#c8a96e" /><stop offset="1" stop-color="#d9bd84" />
+      </radialGradient>
+    </defs>
+    <rect class="wo-plate__board" x="1" y="1" width="638" height="398" rx="22" />
+    <!-- Capa apagada -->
+    <g class="wo-plate__off">
+      <path class="wo-plate__tr" d={tr} />
+      {pads.map(([x, y]) => <circle class="wo-plate__pad" cx={x} cy={y} r="4" />)}
+    </g>
+    <!-- Capa encendida (se funde una vez) -->
+    <g class="wo-plate__on">
+      <path class="wo-plate__tr wo-plate__tr--on" d={tr} />
+      {pads.map(([x, y]) => <circle class="wo-plate__pad wo-plate__pad--on" cx={x} cy={y} r="4" />)}
+      <rect class="wo-plate__halo" x={cx - 104} y={cy - 104} width="208" height="208" rx="26" />
+    </g>
+    <!-- Chip -->
+    {pinsH.map((y) => <><rect class="wo-plate__pin" x="214" y={y - 4} width="16" height="8" rx="1.5" /><rect class="wo-plate__pin" x="410" y={y - 4} width="16" height="8" rx="1.5" /></>)}
+    {pinsV.map((x) => <><rect class="wo-plate__pin" x={x - 4} y="94" width="8" height="16" rx="1.5" /><rect class="wo-plate__pin" x={x - 4} y="290" width="8" height="16" rx="1.5" /></>)}
+    <rect class="wo-plate__chip" x={cx - 90} y={cy - 90} width="180" height="180" rx="20" />
+    <rect class="wo-plate__chip-in" x={cx - 80} y={cy - 80} width="160" height="160" rx="14" />
+    <!-- Logo de empresa: disco con anillos, planeta, anillo y luna -->
+    <g class="wo-plate__logo">
+      <circle cx={cx} cy={cy} r="62" fill={`url(#wo-pd-${u})`} />
+      {[56, 50, 44, 38].map((r) => <circle cx={cx} cy={cy} r={r} fill="none" stroke="#b8975a" stroke-width=".8" opacity=".55" />)}
+      <ellipse cx={cx} cy={cy + 2} rx="56" ry="11" fill="none" stroke="#c8a96e" stroke-width="3" transform={`rotate(-3 ${cx} ${cy})`} opacity=".9" />
+      <circle cx={cx} cy={cy} r="34" fill={`url(#wo-ps-${u})`} stroke="#4a3a1c" stroke-width="1" />
+      <path d={`M${cx - 6} ${cy - 33} A34 34 0 0 0 ${cx - 6} ${cy + 33} A30 34 0 0 1 ${cx - 6} ${cy - 33}Z`} fill="#c8a96e" opacity=".35" />
+      <path d={`M${cx - 52} ${cy + 6} Q${cx} ${cy + 20} ${cx + 52} ${cy + 4}`} fill="none" stroke="#c8a96e" stroke-width="3" />
+      <circle cx={cx + 60} cy={cy} r="12" fill="#4fc3a1" />
+    </g>
+  </svg>
+</div>
+
+<script>
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-wo-plate]').forEach((el) => {
+    if (mq.matches || !('IntersectionObserver' in window)) return;
+    el.classList.add('is-armed');
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) { el.classList.add('is-lit'); io.disconnect(); }
+    }, { threshold: .3 });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .wo-plate { position: relative; width: min(100%, 640px); margin-inline: auto; }
+  .wo-plate svg { display: block; width: 100%; height: auto; }
+  .wo-plate__board { fill: var(--w-s1, #121211); stroke: var(--w-line-strong); stroke-width: 1; }
+  .wo-plate__tr { fill: none; stroke: rgba(var(--accent-gold-rgb), .12); stroke-width: 2; stroke-linejoin: round; }
+  .wo-plate__pad { fill: var(--w-s1, #121211); stroke: rgba(var(--accent-gold-rgb), .22); stroke-width: 1.5; }
+  .wo-plate__tr--on { stroke: rgba(var(--accent-gold-rgb), .45); }
+  .wo-plate__pad--on { stroke: rgba(var(--accent-gold-rgb), .7); }
+  .wo-plate__halo { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1; filter: drop-shadow(0 0 10px rgba(200,169,110,.35)); }
+  .wo-plate__pin { fill: #3a3427; stroke: rgba(var(--accent-gold-rgb), .35); stroke-width: .8; }
+  .wo-plate__chip { fill: #1f1f1d; stroke: rgba(var(--star-rgb), .14); stroke-width: 1; }
+  .wo-plate__chip-in { fill: #161615; stroke: rgba(var(--star-rgb), .06); stroke-width: 1; }
+  /* Encendido único: solo si el script lo arma. */
+  .wo-plate.is-armed .wo-plate__on { opacity: 0; }
+  .wo-plate.is-armed .wo-plate__logo { opacity: .55; }
+  .wo-plate.is-lit .wo-plate__on, .wo-plate.is-lit .wo-plate__logo {
+    opacity: 1; transition: opacity 2s var(--w-ease-out) 600ms;
+  }
+  .wo-plate--card { width: min(100%, 480px); }
+  .wo-plate--mini { width: min(100%, 320px); }
+</style>

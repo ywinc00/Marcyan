@@ -1,0 +1,121 @@
+---
+// Radar de búsquedas locales (W-CORE-09 · design/rediseno-workos.md §3.6, §2.10).
+// Objeto de SISTEMA. Semicírculo de 5 anillos (mayor 623 px) anclado abajo y recortado,
+// oro al 6 %; haz en abanico oro al 8 % que barre 180° en 2,5 s; avisos que aparecen al
+// pasar el haz (ciclo 10 s, primero a 1,06 s). Avisos OPACOS (E-37) con punto crema
+// nítido, sin halo: estado por valor, no un 2.º acento (§2.11). Firma de SEO local,
+// como celda de bento, nunca detrás de texto. Quieto (reduced-motion o sin JS): haz a
+// 45° y 2 avisos visibles. Bucle por loop.ts (pausa fuera de pantalla, pestaña oculta,
+// foco/puntero, botón de pausa porque dura más de 5 s).
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  pings?: { label: string; status: string }[];
+  class?: string;
+}
+const { lang = 'es', size = 'card', pings, class: cls } = Astro.props;
+const en = lang === 'en';
+const P = pings ?? (en
+  ? [{ label: 'Search: plumber near me', status: 'Found you' }, { label: 'Map', status: 'Called you' }, { label: 'Directions', status: 'Open' }]
+  : [{ label: 'Búsqueda: plomero cerca de mí', status: 'Te encontró' }, { label: 'Mapa', status: 'Te llamó' }, { label: 'Cómo llegar', status: 'Abierto' }]);
+const sr = en
+  ? 'Example: people search for a plumber near them, find your business on the map, call you and ask for directions.'
+  : 'Ejemplo: alguien busca un plomero cerca, encuentra tu negocio en el mapa, te llama y pide cómo llegar.';
+---
+<div class:list={['wo-radar', `wo-radar--${size}`, cls]} data-wo-radar>
+  <p class="sr-only">{sr}</p>
+  <Ejemplo lang={lang} on="dark" />
+  <div class="wo-radar__scope" aria-hidden="true">
+    {[1, .8, .61, .42, .23].map((k) => <span class="wo-radar__ring" style={`--k:${k}`}></span>)}
+    <span class="wo-radar__beam"></span>
+  </div>
+  <ul class="wo-radar__pings" aria-hidden="true">
+    {P.slice(0, 3).map((p, i) => (
+      <li class={`wo-radar__ping wo-radar__ping--${i + 1}`}><i></i><span>{p.label}</span><b>{p.status}</b></li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  document.querySelectorAll<HTMLElement>('[data-wo-radar]').forEach((el) => {
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); el.classList.add('is-run', 'is-playing'); },
+      stop: () => el.classList.remove('is-playing'),
+      still: () => { el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); },
+    });
+  });
+</script>
+
+<style>
+  .wo-radar {
+    --R: 623px; --cx: 60%;
+    position: relative; width: 100%; height: 340px; overflow: hidden;
+    border-radius: var(--w-r-obj, 12px);
+    font-family: var(--font-body);
+  }
+  .wo-radar__scope {
+    position: absolute; inset: 0;
+    /* Recorte sin bordes rectos (E-36): los anillos se funden hacia los lados. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  }
+  .wo-radar__ring, .wo-radar__beam {
+    position: absolute; left: calc(var(--cx) - var(--R) * var(--k, 1) / 2); bottom: calc(var(--R) * var(--k, 1) / -2);
+    width: calc(var(--R) * var(--k, 1)); height: calc(var(--R) * var(--k, 1)); border-radius: 50%;
+  }
+  .wo-radar__ring {
+    border: 1px solid rgba(var(--accent-gold-rgb), .14);
+    background: radial-gradient(closest-side, transparent 92%, rgba(var(--accent-gold-rgb), .06));
+  }
+  .wo-radar__beam {
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--accent-gold-rgb), .02) 4deg, rgba(var(--accent-gold-rgb), .08) 33deg, rgba(var(--accent-gold-rgb), .22) 36deg, transparent 36.5deg);
+    transform: rotate(9deg); /* quieto: borde del haz a ~45° */
+  }
+  .wo-radar__pings { list-style: none; margin: 0; padding: 0; }
+  .wo-radar__ping {
+    position: absolute; display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+    background: var(--w-s2, #181817); border: 1px solid var(--w-line-strong);
+    font-size: 13px; line-height: 1.2; color: var(--w-ink-70);
+  }
+  .wo-radar__ping b { font-weight: 500; color: var(--w-ink, #f0ede8); }
+  .wo-radar__ping i {
+    position: absolute; right: calc(100% + 10px); top: 50%; margin-top: -4px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--w-ink, #f0ede8);
+  }
+  .wo-radar__ping--1 { left: 12%; top: 22%; }
+  .wo-radar__ping--2 { left: 52%; top: 45%; }
+  .wo-radar__ping--3 { left: 20%; top: 66%; }
+  /* Quieto: 2 avisos visibles. */
+  .wo-radar__ping--3 { opacity: 0; }
+
+  /* En marcha: haz continuo (lineal, F-01) y avisos al paso del haz. */
+  .wo-radar.is-run .wo-radar__beam { animation: wo-radar-sweep 5s linear infinite; }
+  .wo-radar.is-run .wo-radar__ping { opacity: 0; animation: wo-radar-ping 10s var(--w-ease-ui) infinite; }
+  .wo-radar.is-run .wo-radar__ping--1 { animation-delay: 1.06s; }
+  .wo-radar.is-run .wo-radar__ping--2 { animation-delay: 3.4s; }
+  .wo-radar.is-run .wo-radar__ping--3 { animation-delay: 5.9s; }
+  .wo-radar.is-run .wo-radar__beam,
+  .wo-radar.is-run .wo-radar__ping { animation-play-state: paused; }
+  .wo-radar.is-run.is-playing .wo-radar__beam,
+  .wo-radar.is-run.is-playing .wo-radar__ping { animation-play-state: running; }
+  @keyframes wo-radar-sweep { from { transform: rotate(-126deg); } to { transform: rotate(234deg); } }
+  @keyframes wo-radar-ping {
+    0% { opacity: 0; transform: translateY(6px); }
+    3% { opacity: 1; transform: none; }
+    88% { opacity: 1; transform: none; }
+    95%, 100% { opacity: 0; transform: none; }
+  }
+  @media (--lt-md) {
+    .wo-radar { --R: 440px; --cx: 50%; height: 290px; }
+    .wo-radar__ping--1 { left: 24px; top: 20%; }
+    .wo-radar__ping--2 { left: 38%; top: 44%; }
+    .wo-radar__ping--3 { left: 30px; top: 66%; }
+  }
+  @media (--motion-reduce) {
+    .wo-radar .wo-radar__beam, .wo-radar .wo-radar__ping { animation: none; }
+  }
+</style>

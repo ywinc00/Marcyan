@@ -7,7 +7,9 @@ import assert from 'node:assert/strict';
 import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES } from '../lib/chat-kb.mjs';
+import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
+import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT } from '../lib/chat-kb.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
 import { analyzeSite } from '../lib/diagnostic-checks.mjs';
@@ -612,6 +614,68 @@ check('ssrf/resuelto: isBlockedIp bloquea IPs privadas/reservadas resueltas', ()
 });
 check('ssrf/resuelto: isBlockedIp DEJA PASAR IPs públicas (no rompe sitios reales)', () => {
   for (const ip of ['8.8.8.8', '1.1.1.1', '2001:4860:4860::8888']) assert.equal(isBlockedIp(ip), false, 'no debería bloquear ' + ip);
+});
+
+// ── Hallazgos de las pruebas de comportamiento (2026-10-31) ─────────
+const EM = String.fromCharCode(0x2014), EN_DASH = String.fromCharCode(0x2013);
+check('guion largo: conector a coma, sin unir líneas, rangos con guion corto intactos', () => {
+  assert.equal(stripEmDash('No puedo hacer eso ' + EM + ' sigo siendo Marcy.'), 'No puedo hacer eso, sigo siendo Marcy.');
+  assert.equal(stripEmDash('Desde $400 ' + EM + ' perfecta para tu taller.'), 'Desde $400, perfecta para tu taller.');
+  assert.equal(stripEmDash('y ' + EM + 'sobre todo' + EM + ' cuánto'), 'y, sobre todo, cuánto');
+  assert.equal(stripEmDash('Hola ' + EM + '\nSegunda'), 'Hola\nSegunda');
+  assert.equal(stripEmDash(EM + ' viñeta'), 'viñeta');
+  assert.equal(stripEmDash('Lun' + EN_DASH + 'Vie 9am' + EN_DASH + '6pm'), 'Lun' + EN_DASH + 'Vie 9am' + EN_DASH + '6pm');
+});
+check('guion largo: brandPostFilter lo quita de toda respuesta', () => {
+  assert.ok(!brandPostFilter('Claro ' + EM + ' te ayudo.', 'es').includes(EM));
+});
+check('instrucciones: sin guion largo salvo la regla que lo prohíbe (el modelo copia el estilo)', () => {
+  const all = SYSTEM_PROMPT + JSON.stringify(CHAT_TOOLS);
+  assert.equal((all.match(new RegExp(EM, 'g')) || []).length, 1);
+  assert.ok(SYSTEM_PROMPT.includes('Nunca uses guion largo'));
+});
+check('instrucciones: contesta en el idioma del visitante también al rechazar', () => {
+  assert.ok(/idioma en que te escribe el visitante, también cuando rechaces/.test(SYSTEM_PROMPT));
+});
+
+// ── P2 · coste y caché por turno (lib/chat-usage.mjs) ──────────────
+check('coste: cada modelo permitido tiene precio (nunca un coste inventado)', () => {
+  for (const m of MODELS_FOR_PRICES) assert.ok(PRICES_USD_PER_MTOK[m], 'sin precio: ' + m);
+});
+check('coste: suma el usage de las dos llamadas e ignora huecos', () => {
+  const u = sumUsage([{ usage: { input_tokens: 10, output_tokens: 20, cache_read_input_tokens: 30, cache_creation_input_tokens: 40 } }, null, { usage: { input_tokens: 1, output_tokens: 2 } }]);
+  assert.deepEqual(u, { calls: 2, input: 11, output: 22, cacheRead: 30, cacheWrite: 40 });
+});
+check('coste: micro-dólares con los precios oficiales (Sonnet 5: 2 / 10 / 0,20 / 2,50)', () => {
+  const u = { calls: 1, input: 1_000_000, output: 1_000_000, cacheRead: 1_000_000, cacheWrite: 1_000_000 };
+  assert.equal(turnCostMicroUsd('claude-sonnet-5', u), (2 + 10 + 0.2 + 2.5) * 1e6);
+  assert.equal(turnCostMicroUsd('modelo-desconocido', u), 0);
+});
+check('coste: % de caché sobre toda la entrada', () => {
+  assert.equal(cacheHitRate({ input: 100, cacheRead: 900, cacheWrite: 0 }), 0.9);
+  assert.equal(cacheHitRate({ input: 0, cacheRead: 0, cacheWrite: 0 }), 0);
+});
+check('coste: el resumen del mes da coste por conversación y por turno', () => {
+  const t = summarize([
+    { day: '2026-11-01', model: 'claude-sonnet-5', turns: 6, conversations: 2, calls: 7, input_tokens: 1000, output_tokens: 3000, cache_read_tokens: 40000, cache_write_tokens: 8000, cost_micro_usd: 60000 },
+    { day: '2026-11-02', model: 'claude-sonnet-5', turns: 2, conversations: 1, calls: 2, input_tokens: 500, output_tokens: 900, cache_read_tokens: 8000, cache_write_tokens: 8000, cost_micro_usd: 30000 },
+  ]);
+  assert.equal(t.days, 2);
+  assert.equal(t.conversations, 3);
+  assert.equal(t.costUsd, 0.09);
+  assert.equal(t.costPerConversationUsd, 0.03);
+  assert.equal(t.costPerTurnUsd, 0.09 / 8);
+  assert.equal(Math.round(t.cacheHitRate * 100), 73); // 48000 / (1500 + 48000 + 16000) = 0,733
+});
+check('coste: la línea del registro no lleva contenido ni IP', () => {
+  const l = usageLogLine({ model: 'claude-sonnet-5', env: 'production', firstTurn: true, u: { calls: 1, input: 5, output: 6, cacheRead: 7, cacheWrite: 0 }, costMicro: 1234 });
+  assert.match(l, /^\[chat\] uso modelo=claude-sonnet-5 entorno=production conversacion_nueva=si llamadas=1 /);
+  assert.ok(!/ip=|\d+\.\d+\.\d+\.\d+/.test(l));
+});
+await acheck('coste: si la base falla o tarda, recordUsage no lanza y devuelve false', async () => {
+  const broken = () => Promise.reject(new Error('relation "chat_usage_daily" does not exist'));
+  assert.equal(await recordUsage({ model: 'claude-sonnet-5', env: 'development', firstTurn: true, u: { calls: 1, input: 1, output: 1, cacheRead: 0, cacheWrite: 0 }, costMicro: 1, sqlImpl: broken }), false);
+  assert.equal(await recordUsage({ u: { calls: 0 } }), false, 'turno sin llamadas no escribe');
 });
 
 if (fails.length) {

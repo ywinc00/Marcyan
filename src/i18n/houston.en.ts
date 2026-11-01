@@ -164,9 +164,9 @@ export const houstonHub = {
     pinsLabel: 'Sample searches across Houston areas',
     pins: [
       { name: 'THE WOODLANDS', q: 'kitchen remodeling contractor', en: false },
-      { name: 'KATY', q: 'realtor que hable español' },
-      { name: 'GULFTON', q: 'abogado de inmigración en español' },
-      { name: 'PASADENA', q: 'taller mecánico que hable español' },
+      { name: 'KATY', q: 'realtor que hable español', lang: 'es' },
+      { name: 'GULFTON', q: 'abogado de inmigración en español', lang: 'es' },
+      { name: 'PASADENA', q: 'taller mecánico que hable español', lang: 'es' },
     ],
     card: {
       label: 'Sample result', name: 'Your business', meta: 'Pasadena, TX · Open now',
@@ -196,7 +196,7 @@ export const houstonHub = {
     local: {
       nap: [
         { label: 'Direct line', value: nap.houston, href: telHref },
-        { label: 'Hours', value: nap.hours },
+        { label: 'Hours', value: nap.hoursEn },
         { label: 'Languages', value: 'English · Spanish' },
       ],
       mapLabel: 'Map of the Houston area with the zones we serve',

@@ -6,10 +6,12 @@
 // protagonista sigue siendo el cielo.
 // src: el dibujo · ratio: ancho/alto de su viewBox · x: dónde cae su centro en escritorio · glow: ancho y centro de
 // la luz que sube por detrás (Miami es más ancha y baja que Houston: la luz se abre para que se lean los dos lados)
-interface Props { src: string; ratio: string; x?: string; glow?: [string, string] }
-const { src, ratio, x = '58%', glow = ['46%', '56%'] } = Astro.props;
+// fill: la ciudad ocupa todo el alto de la franja aunque se salga por los lados (una ciudad ancha y baja, como Miami,
+// se lee mejor grande y recortada por los bordes que entera y pequeña)
+interface Props { src: string; ratio: string; x?: string; glow?: [string, string]; fill?: boolean }
+const { src, ratio, x = '58%', glow = ['46%', '56%'], fill = false } = Astro.props;
 ---
-<div class="foot__scape" aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x};--glow-w:${glow[0]};--glow-x:${glow[1]}`}>
+<div class:list={['foot__scape', fill && 'foot__scape--fill']} aria-hidden="true" style={`--city-ratio:${ratio};--city-x:${x};--glow-w:${glow[0]};--glow-x:${glow[1]}`}>
   <div class="foot__glow"></div>
   <div class="foot__clouds" data-clouds="foot"></div>
   <div class="foot__city" data-skyline-src={src}></div>
@@ -54,6 +56,14 @@ const { src, ratio, x = '58%', glow = ['46%', '56%'] } = Astro.props;
   .foot__scape::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 22%;
     background: linear-gradient(180deg, rgba(8,7,6,0), #080706 92%);
+  }
+  /* fill: la ciudad no se encoge al ancho; los bordes de la pantalla se funden con la noche */
+  .foot__scape--fill .foot__city { max-width: none; -webkit-mask-image: none; mask-image: none; }
+  .foot__scape--fill {
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent, #000 22%), linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-composite: intersect;
   }
   @media (max-width: 700px) {
     .foot__scape { height: clamp(180px, 26vh, 230px); }

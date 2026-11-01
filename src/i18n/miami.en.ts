@@ -78,7 +78,7 @@ export const miamiHub = {
     title: 'A Miami studio, <em>no runaround</em>',
     items: [
       { q: 'What services do you offer in Miami?', a: 'Custom web design and development, local SEO, conversational AI (assistants that answer 24/7) and online stores; also branding and AI SEO. Everything bilingual in English and Spanish, and built for the Spanish-speaking side of your Miami market. You can start with a single service or a coordinated package.' },
-      { q: 'Do you have clients or an office in Miami?', a: 'We\'ll be honest: we are just getting started in Miami, so we do not yet have published case studies from this city or a public address (we work as a service-area business). We do have real, verifiable work done in Houston and Orlando, with links you can visit. That is why we offer Founding Client spots in Miami.' },
+      { q: 'Do you have clients or an office in Miami?', a: 'We\'ll be honest: we are just getting started in Miami, so we do not yet have published case studies from this city or a public address (we work as a service-area business). We do have real, verifiable work done in Houston and Orlando, which we are happy to walk you through on a call. That is why we offer Founding Client spots in Miami.' },
       { q: 'Do you work in the Spanish of Miami?', a: 'Yes. We are a bilingual team focused on the Spanish-speaking market in the United States. In Miami that means the Spanish that is really spoken here, Cuban, Venezuelan, Colombian, and English too. We write and optimize for how your customer actually speaks and searches, not in generic Spanish.' },
       { q: 'Do you serve the whole Miami area?', a: 'Yes. We cover Miami-Dade and its metro area (Doral, Hialeah, Kendall, Coral Gables, Brickell, Aventura and more) as a service-area business, remotely and efficiently. You do not need to visit an office: the entire process, from proposal to delivery, happens online and in your language.' },
       { q: 'How much do your services cost in Miami?', a: 'We publish our starting prices: web design from $1,500, AI from $900, online store from $2,900 and local SEO from $600 a month. The final price depends on scope, and we always give it to you in writing before we start. You can see them all on our pricing page.' },
@@ -100,13 +100,13 @@ export const miamiHub = {
     call: { label: '786-938-1754', href: telHref },
     pinsLabel: 'Sample searches across Miami areas',
     pins: [
-      { name: 'HIALEAH', q: 'taller de mecánica cerca de mí' },
-      { name: 'DORAL', q: 'abogado de inmigración en español' },
+      { name: 'HIALEAH', q: 'taller de mecánica cerca de mí', lang: 'es' },
+      { name: 'DORAL', q: 'abogado de inmigración en español', lang: 'es' },
       { name: 'KENDALL', q: 'dentist near me' },
-      { name: 'MIAMI BEACH', q: 'restaurante cubano abierto ahora' },
+      { name: 'MIAMI BEACH', q: 'restaurante cubano abierto ahora', lang: 'es' },
     ],
     card: {
-      label: 'Sample result', name: 'Your business', meta: 'Miami Beach, FL · Open now',
+      label: 'Sample result', name: 'Your business', meta: 'Miami Beach, FL · Open now',
       named: 'Named by', checks: ['✓ Google', '✓ Maps', '✓ AI'], ai: 'Your assistant answers in English or Spanish, 24/7',
     },
     services: {
@@ -126,7 +126,10 @@ export const miamiHub = {
     projects: {
       slugs: ['mja'],
       tag: 'Portfolio', title: 'Real work in <em>Florida</em>', did: 'What we did', result: 'Result',
-      note: 'Move Junk Away is in Orlando: it is our closest project to Miami and we show it with its real city. For privacy we show the screenshots, not the links; we are happy to walk you through it on a call.',
+      note: 'Move Junk Away is based in Orlando. It is our closest project to Miami, so we show it here labeled with its real city. For privacy we show the screenshots, not the links; we are happy to walk you through it on a call.',
+      over: {
+        mja: { did: 'We rebuilt their site from scratch, fast and bilingual, with local SEO (Google Business Profile, NAP and per-service content) for their Florida market.' },
+      },
       more: { label: 'View projects', href: '/en/portfolio' }, shotPc: 'desktop view', shotMovil: 'mobile view',
     },
     local: {
@@ -140,7 +143,7 @@ export const miamiHub = {
       zonesLabel: 'Miami-area zones',
       zones: [
         { n: 'Miami', hq: true }, { n: 'Doral' }, { n: 'Hialeah' },
-        { n: 'Miami Beach' }, { n: 'Coral Gables' }, { n: 'Kendall' }, { n: 'Aventura' },
+        { n: 'Miami Beach' }, { n: 'Coral Gables' }, { n: 'Kendall' },
       ],
     },
     sectors: {
@@ -148,19 +151,20 @@ export const miamiHub = {
       lead: "What each industry's customers type in Miami, in English or in Spanish. We get your site and your profile ready for that search.",
       rows: [
         { label: 'Restaurants', icon: 'lucide:utensils', q: 'cuban restaurant open now' },
-        { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'abogado de inmigración en Doral' },
+        { label: 'Immigration lawyers', icon: 'lucide:scale', q: 'abogado de inmigración en Doral', lang: 'es' },
         { label: 'Real estate', icon: 'lucide:home', q: 'realtor in Brickell' },
         { label: 'Contractors', icon: 'lucide:hard-hat', q: 'roofing contractor near me' },
-        { label: 'Auto repair shops', icon: 'lucide:car', q: 'taller de mecánica en Hialeah' },
+        { label: 'Auto repair shops', icon: 'lucide:car', q: 'taller de mecánica en Hialeah', lang: 'es' },
         { label: 'Beauty salons', icon: 'lucide:scissors', q: 'nail salon in Kendall' },
         { label: 'Dental clinics', icon: 'lucide:stethoscope', q: 'dentist who speaks Spanish' },
       ],
     },
     answer: {
       figs: [
-        { n: 46, txt: 'of Google searches have local intent' },
-        { n: 76, txt: 'of people who search "near me" visit a business within 24 hours' },
+        { n: 69, txt: 'of Miami-Dade residents are Hispanic' },
+        { n: 75, txt: 'of residents age 5 and over speak a language other than English at home' },
       ],
+      figsSource: 'U.S. Census Bureau, QuickFacts (ACS 2019-2023)',
     },
     cta: { call: `Call us: ${nap.miami}`, wa: 'Message us on WhatsApp' },
   },

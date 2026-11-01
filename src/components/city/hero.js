@@ -18,7 +18,7 @@ export function initHero(GEO, C) {
   // por debajo de 900 px la portada se compone en vertical (texto arriba, planeta abajo)
   // teléfono en horizontal (poca altura): composición en horizontal, sin etiquetas (la búsqueda va en la ficha)
   const mobile = () => innerWidth < 900 && innerHeight >= 520;
-  const tagsOff = () => innerHeight < 520;
+  const tagsOff = () => innerHeight < (innerWidth >= 900 ? 560 : 520);
   let isM = mobile(), noTags = tagsOff();            // se fijan en setup(): nunca se leen dentro del dibujo
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const copyEl = stage.querySelector('.copy');
@@ -50,7 +50,7 @@ export function initHero(GEO, C) {
       let kmpx, up, down, lite, xh, bandUse = band;
       if (C.mobile === 'miami') {
         // la ficha va a la derecha (bajo Miami Beach): termina por encima del botón del chat
-        bandUse = band - 56;
+        bandUse = band - 66;
         // Miami: Hialeah arriba (10,7 km al norte), Miami Beach encendida a la derecha (6,2 km al este) con su
         // etiqueta encima, Doral (16,2 km al oeste) y Kendall (9,2 km al sur) con la etiqueta debajo, y la ficha al
         // final. Todo cabe en 22,4 km de ancho y 19,9 km de alto: el acercamiento llega mucho más cerca que en Houston.
@@ -296,12 +296,18 @@ export function initHero(GEO, C) {
       const pt = document.createElement('span'); pt.className = 'pt'; pt.style.left = x + 'px'; pt.style.top = y + 'px'; pt.innerHTML = '<b></b><b></b><i></i>';
       pinsBox.appendChild(pt);
       const tag = document.createElement('span'); tag.className = 'tag';
-      tag.innerHTML = `<small>${z.name}</small><span>${z.q}${z.en ? ' <span class="en">EN</span>' : ''}</span>`;
+      const lg = z.lang || (z.en ? 'en' : '');
+      tag.innerHTML = `<small>${z.name}</small><span${lg ? ` lang="${lg}"` : ''}>${z.q}${z.en ? ' <span class="en">EN</span>' : ''}</span>`;
       pinsBox.appendChild(tag);
       items.push({ z, pt, tag, x, y, i, side: z.side, th: 50, tr: '' });
     });
     if (noTags) items.forEach((it) => { it.lx = -999; it.ly = -999; it.hide = true; });
-    else if (!isM) items.forEach((it) => { it.lx = it.x + it.z.dx; it.ly = it.side === 'up' ? it.y - it.z.wire - it.th : it.y + it.z.wire; });
+    else if (!isM) items.forEach((it) => {
+      const tw = it.tag.offsetWidth || 200;
+      it.lx = Math.max(it.x - tw + 22, Math.min(it.x - 22, it.x + it.z.dx));
+      it.lx = Math.max(16, Math.min(F.W - 16 - tw, it.lx));
+      it.ly = it.side === 'up' ? it.y - it.z.wire - it.th : it.y + it.z.wire;
+    });
     else {
       const cx = (l, w) => Math.max(F.pad, Math.min(F.W - F.pad - w, l));
       items.forEach((it) => { it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight || 52; });
@@ -376,7 +382,7 @@ export function initHero(GEO, C) {
     P = items.find((it) => it.z.lit);
     [P.pt, P.tag, P.line].forEach((el) => el && el.classList.add('lz'));
     const fq = document.getElementById('hx-found-q');
-    if (fq) { fq.querySelector('span').textContent = P.z.q; fq.hidden = !noTags; }
+    if (fq) { const sp = fq.querySelector('span'); sp.textContent = P.z.q; if (P.z.lang || P.z.en) sp.lang = P.z.lang || 'en'; else sp.removeAttribute('lang'); fq.hidden = !noTags; }
     // la ficha cuelga del punto encendido y cabe entera en pantalla, también en portátiles de poca altura
     const drop = Math.min(200, Math.max(120, F.H * 0.22));
     // nunca encima del texto: si no cabe a su lado, la ficha se estrecha (teléfono en horizontal)
@@ -412,7 +418,10 @@ export function initHero(GEO, C) {
       boxes.forEach((b) => cands.push([b[2] + m, fy], [b[0] - m - cw, fy]));
       if (noTags) cands.push([Math.max(...boxes.map((b) => b[2])) + 24, fy]);
       cands.push([fx, hiY]);
-      const pick = cands.find(([x, y]) => okX(x) && okY(y) && !hit(x, y));
+      const chatY = F.H - 96 - ch;
+      cands.slice().forEach(([x]) => cands.push([x, chatY]));
+      const clearChat = (x, y) => x + cw <= F.W - 84 || y + ch <= F.H - 96;
+      const pick = cands.find(([x, y]) => okX(x) && okY(y) && clearChat(x, y) && !hit(x, y));
       if (pick) [fx, fy] = pick; else fy = Math.min(Math.max(fy, lo), F.H - ch - 6);
     }
     found.style.left = fx + 'px'; found.style.top = fy + 'px';

@@ -22,7 +22,8 @@ interface Props { lang: Lang; city: 'houston' | 'miami'; h: any; c: any; project
 const { lang, city, h, c } = Astro.props;
 const j = h.journey;
 // los trabajos de esta ciudad, en el orden que fija su bloque de textos
-const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean);
+const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean)
+  .map((p: any) => ({ ...p, ...(j.projects.over?.[p.slug] ?? {}) }));
 const ui = t(lang);
 const svc = h.services.links;
 const faqLd = faqPage(h.faq.items);
@@ -60,7 +61,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           <p class="micro">{h.hero.microcopy}</p>
         </div></div>
         <canvas id="hx-globe" aria-hidden="true"></canvas>
-        <div id="hx-pins" aria-label={j.pinsLabel}></div>
+        <div id="hx-pins" role="group" aria-label={j.pinsLabel}></div>
         <article class="found paper" id="hx-found" tabindex="-1" aria-label={j.card.label}>
           <p class="found__q" id="hx-found-q" hidden><Icon name="lucide:search" class="found__qi" /><span></span></p>
           <div class="found__head">
@@ -135,13 +136,13 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           <div class="pf__laptop">
             <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url"><Icon name="lucide:lock" /><b data-names={names}>{projects[0].name}</b></span></div>
             <div class="pf__screen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} width="900" height="506" alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} width="900" height="506" alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <div class="pf__phone">
             <div class="pf__notch"></div>
             <div class="pf__pscreen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <p class="pf__count"><b>01</b> / {String(projects.length).padStart(2, '0')}</p>
@@ -213,7 +214,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         {j.sectors.rows.map((r: any) => {
           const href = sectorHref[r.label];
           const body = <><span class="sic"><Icon name={r.icon} /></span>
-            <span><span class="sname">{r.label}</span><span class="squery"><Icon name="lucide:search" />{r.q}{r.en && <span class="en">EN</span>}</span></span></>;
+            <span><span class="sname">{r.label}</span><span class="squery"><Icon name="lucide:search" /><span lang={r.lang ?? (r.en ? 'en' : undefined)}>{r.q}</span>{r.en && <span class="en">EN</span>}</span></span></>;
           return <li>{href ? <a href={href}>{body}<Icon name="lucide:arrow-right" class="arr" /></a> : <div class="row">{body}</div>}</li>;
         })}
       </ul>
@@ -235,6 +236,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         </div>
         <div class="answer__figs" aria-hidden="true">
           {j.answer.figs.map((f: any) => <div class="fig"><p class="fig__n"><b data-count={f.n}>{f.n}</b>%</p><p>{f.txt}</p></div>)}
+          {j.answer.figsSource && <p class="answer__src fig__src"><Icon name="lucide:bar-chart-3" />{ui.answer.source}: {j.answer.figsSource}</p>}
         </div>
       </div>
     </div>

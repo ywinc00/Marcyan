@@ -76,8 +76,6 @@ const { src, ratio, x = '58%', glow = ['46%', '56%'], fill = false } = Astro.pro
     }
   }
   @media (prefers-reduced-motion: reduce) { .foot__city { transition: none; } }
-  /* la línea legal del pie cae en la misma columna que el resto (en el pie común su relleno lateral queda a cero) */
-  :global(.footer .footer__bottom.container) { padding-inline: var(--container-pad); }
 </style>
 
 <script>

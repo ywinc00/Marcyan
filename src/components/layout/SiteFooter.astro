@@ -200,7 +200,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     position: relative; z-index: 1;
     display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5);
     justify-content: space-between; align-items: center;
-    margin-top: var(--space-7); padding: var(--space-4) 0 var(--space-6);
+    /* solo arriba y abajo: el relleno lateral es el del contenedor (antes el atajo lo ponía a cero y la línea
+       quedaba pegada a los bordes de la pantalla) */
+    margin-top: var(--space-7); padding-block: var(--space-4) var(--space-6);
     border-top: 1px solid var(--border-subtle);
     font-size: var(--text-xs); color: var(--fg-secondary);
   }
@@ -215,7 +217,7 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     .footer { padding-top: var(--space-6); }
     .footer__brand { gap: var(--space-3); }
     .footer__ground, .footer__ground-svg { height: 124px; }
-    .footer__bottom { margin-top: var(--space-6); padding: var(--space-4) 0 var(--space-5); }
+    .footer__bottom { margin-top: var(--space-6); padding-block: var(--space-4) var(--space-5); }
   }
 
   /* ── ≥ md: marca izquierda · columnas derecha ───────────────────── */

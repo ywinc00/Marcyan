@@ -4,10 +4,10 @@
 // (2 columnas, icono de línea 16) y pie en caja con Llamar + WhatsApp.
 // Todos son <a>: la lógica actual del drawer los cierra al pulsarlos.
 // Cerrojo 5: sale de v3, TODO su CSS aquí y solo lee variables.
-import Icon from '../../ui/Icon.astro';
+
 import Button from '../../ui/Button.astro';
 import IconoObjeto from '../IconoObjeto.astro';
-import { serviciosPara, recursos, ciudades, navW, contactoPara, type NavLang } from '../../../i18n/w/nav';
+import { serviciosPara, recursos, ciudades, navW, contactoPara, navIcon, type NavLang } from '../../../i18n/w/nav';
 
 interface Props { lang?: NavLang; currentPath?: string }
 const { lang = 'es', currentPath } = Astro.props;
@@ -47,7 +47,7 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
       {cities.map((l) => (
         <li>
           <a class="dg__line" href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>
-            <Icon name="lucide:map-pin" class="dg__icon" /><span>{l.label}</span>
+            <Fragment set:html={navIcon('lucide:map-pin', 'dg__icon')} /><span>{l.label}</span>
           </a>
         </li>
       ))}
@@ -65,7 +65,7 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
       {res.map((r) => (
         <li>
           <a class="dg__line" href={r.href} aria-current={isActive(r.href) ? 'page' : undefined}>
-            <Icon name={r.icon} class="dg__icon" /><span>{r.label}</span>
+            <Fragment set:html={navIcon(r.icon, 'dg__icon')} /><span>{r.label}</span>
           </a>
         </li>
       ))}

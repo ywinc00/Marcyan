@@ -7,6 +7,7 @@
 import { priceServices as servicesEs } from '../pricing';
 import { priceServices as servicesEn } from '../pricing.en';
 import { nap } from '../content';
+import lucide from '@iconify-json/lucide/icons.json';
 import type { IconoId } from '../../components/w/objects/registry';
 
 export type NavLang = 'es' | 'en';
@@ -136,6 +137,18 @@ export function contactoPara(currentPath?: string) {
     tel: 'tel:' + tel.replace(/[^\d+]/g, ''),
     wa: 'https://wa.me/' + tel.replace(/\D/g, ''),
   };
+}
+
+/** SVG en línea de un icono Lucide para la nav, leído del mismo paquete que usa
+ *  astro-icon pero SIN pasar por él: astro-icon cuenta los usos de cada icono por
+ *  página y emite su <symbol> en el primero, así que un icono de la nav (que va
+ *  antes que el hero) cambiaría el marcado del hero de portada (§2.13, huella DOM). */
+export function navIcon(name: string, cls = ''): string {
+  const key = name.replace(/^lucide:/, '');
+  const set = lucide as { icons: Record<string, { body: string }>; aliases?: Record<string, { parent: string }> };
+  const icon = set.icons[key] ?? set.icons[set.aliases?.[key]?.parent ?? ''];
+  if (!icon) throw new Error(`navIcon: icono desconocido "${name}"`);
+  return `<svg class="${cls}" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icon.body}</svg>`;
 }
 
 /** Enlaces de la barra que en el drawer ya representan los grupos (servicios,

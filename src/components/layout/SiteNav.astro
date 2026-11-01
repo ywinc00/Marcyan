@@ -15,7 +15,7 @@ import { t, type Lang } from '../../i18n/ui';
 import IconosSprite from '../w/objects/IconosSprite.astro';
 import MegaServicios from '../w/nav/MegaServicios.astro';
 import DrawerGrupos from '../w/nav/DrawerGrupos.astro';
-import { navW, cubiertoPorGrupos } from '../../i18n/w/nav';
+import { navW, navIcon, cubiertoPorGrupos } from '../../i18n/w/nav';
 
 interface Props {
   nav: any;
@@ -67,7 +67,9 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
           <span class="nav__mega" data-nav-mega-wrap>
             <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
             <button class="nav__mega-btn" type="button" aria-expanded="false" aria-controls="nav-mega" aria-label={uiw.megaBtn} data-nav-mega-btn>
-              <Icon name="lucide:chevron-down" />
+              {/* SVG propio (navIcon), no astro-icon: así ningún icono de la página
+                  (p. ej. el hero de portada) cambia de marcado por el megamenú. */}
+              <Fragment set:html={navIcon('lucide:chevron-down')} />
             </button>
             {/* Justo detrás del botón: el Tab entra en el panel. Posición absoluta
                 respecto al <header> (ningún ancestro intermedio está posicionado). */}

@@ -2,8 +2,8 @@
 // 3.ª columna del megamenú: "Recursos" (design/rediseno-workos.md §2.12, W-HOME-03).
 // Dos niveles de icono: producto = objeto (MegaServicios), recurso = línea Lucide.
 // Cerrojo 5: sale de v3 (vive en la nav de todo el sitio), TODO su CSS aquí.
-import Icon from '../../ui/Icon.astro';
-import { recursos, navW, type NavLang } from '../../../i18n/w/nav';
+
+import { recursos, navW, navIcon, type NavLang } from '../../../i18n/w/nav';
 
 interface Props { lang?: NavLang }
 const { lang = 'es' } = Astro.props;
@@ -16,7 +16,7 @@ const ui = navW[lang] ?? navW.es;
     {items.map((r) => (
       <li>
         <a class="mr__row" href={r.href}>
-          <Icon name={r.icon} class="mr__icon" />
+          <Fragment set:html={navIcon(r.icon, 'mr__icon')} />
           <span>{r.label}</span>
         </a>
       </li>

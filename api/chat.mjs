@@ -180,6 +180,18 @@ function pickLang(body) {
   return body && body.lang === 'en' ? 'en' : 'es';
 }
 
+// Idioma de la PÁGINA como contexto del turno (hallazgo de las pruebas del 31-oct:
+// ante un intento de engaño en inglés, Marcy rechazaba en español; la regla del
+// prompt sola no bastó porque el modelo nunca recibía el idioma de la página y
+// caía al de sus instrucciones). Va en un bloque APARTE, detrás del bloque
+// cacheado: el prefijo de la caché no cambia. Manda el idioma del visitante si
+// escribe en el otro.
+export function langContext(lang) {
+  return lang === 'en'
+    ? 'Contexto de este turno: el visitante está en la versión en INGLÉS del sitio. Responde en inglés, también si rechazas algo, salvo que el visitante te escriba en español.'
+    : 'Contexto de este turno: el visitante está en la versión en ESPAÑOL del sitio. Responde en español, salvo que el visitante te escriba en inglés.';
+}
+
 // ── Validación de messages (la red más fiable: pura, por petición) ──
 // Devuelve un array saneado o null si es inválido.
 export function validateMessages(raw) {
@@ -472,7 +484,11 @@ export default async function handler(req, res) {
       model,
       max_tokens: LIMITS.MAX_TOKENS,
       // Bloque estable (instrucciones + KB) → cache de prompt + a prueba de inyección.
-      system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+      // + idioma de la página DETRÁS de la marca de caché (no rompe el prefijo cacheado).
+      system: [
+        { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
+        { type: 'text', text: langContext(lang) },
+      ],
       // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
       // tool_choice = auto (omitido) → el modelo decide cuándo.
       tools: CHAT_TOOLS,

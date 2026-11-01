@@ -222,6 +222,19 @@ await check('chat: sin la tabla de uso el visitante recibe su respuesta igual', 
   assert.equal(r.code, 200);
   assert.match(r.body.reply, /ayudo/);
 });
+await check('chat: el idioma de la página va DETRÁS del bloque cacheado (la caché no cambia)', async () => {
+  ai.queue.push({ content: [{ type: 'text', text: 'Hi.' }], usage: usage({}) });
+  ai.queue.push({ content: [{ type: 'text', text: 'Hola.' }], usage: usage({}) });
+  await call(chat, { sessionId: 'conv-idioma-en', messages: [{ role: 'user', content: 'hello' }], lang: 'en' });
+  await call(chat, { sessionId: 'conv-idioma-es', messages: [{ role: 'user', content: 'hola' }], lang: 'es' });
+  const [en, es] = ai.calls.map((c) => c.system);
+  assert.equal(en.length, 2);
+  assert.deepEqual(en[0], es[0], 'el bloque cacheado es idéntico en los dos idiomas');
+  assert.ok(en[0].cache_control, 'la marca de caché sigue en el primer bloque');
+  assert.ok(!en[1].cache_control, 'el idioma no lleva marca de caché');
+  assert.match(en[1].text, /INGLÉS/);
+  assert.match(es[1].text, /ESPAÑOL/);
+});
 await check('chat: fuera de producción los frenos cuentan en su propio cubo (las pruebas no gastan el tope real)', async () => {
   ai.queue.push({ content: [{ type: 'text', text: 'Hola.' }], usage: usage({}) });
   await call(chat, { sessionId: 'conv-uso-4', messages: [{ role: 'user', content: 'hola' }], lang: 'es' });

@@ -20,6 +20,15 @@ const { copy, lang = 'es' } = Astro.props;
   /* La tarjeta se ajusta a sus 5 filas: el min-height de 530 es del modo en bucle y en
      estático dejaba ~140 px de losa vacía arriba y abajo (rev1, importante 2). Pendiente
      [SISTEMA] de llevarlo a RegistroVivo para todo variant="static". */
+  /* La fila "Pagado" en superficie clara cálida (§2.4, rev2 menor): da luz a la tarjeta
+     oscura sobre la banda gris. Sobre crema el acento no tiene contraste de texto: el chip
+     va en tinta de producto con el acento en fondo y borde. */
+  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center) { background: var(--w-p-bg); border-bottom-color: var(--w-p-line); }
+  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__ic),
+  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__lbl) { color: var(--w-p-ink); }
+  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__chip) {
+    color: var(--w-p-ink); background: rgba(var(--w-accent-rgb), .22); border-color: rgba(var(--w-accent-rgb), .7);
+  }
   @media (--md) {
     .ws-gap :global(.wd-log.ws-dia) { min-height: 0; }
     .ws-gap :global(.ws-dia .wd-log__win) { min-height: 0; padding-block: 48px; }

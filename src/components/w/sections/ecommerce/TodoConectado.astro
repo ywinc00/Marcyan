@@ -148,6 +148,8 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
   .tc__tab[aria-selected='true'] { background: var(--w-p-bg); color: var(--w-p-ink); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
   @media (--hover-fine) { .tc__tab[aria-selected='false']:hover { color: var(--w-ink); } }
   .tc__tab:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+  /* A 360 las 3 pestañas no cabían y la activa quedaba cortada en el borde: menos aire lateral. */
+  @media (--lt-sm) { .tc__tab { padding: 0 13px; } }
 
   .tc__panel { display: flex; align-items: stretch; outline: none; }
   .tc__panel[hidden] { display: none; }
@@ -162,8 +164,10 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
     position: relative; list-style: none; margin: 0 auto; padding: 0;
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%;
   }
+  /* Móvil: icono encima del texto, para que los títulos tengan todo el ancho de la casilla
+     y no se partan a mitad de palabra (E-18). En --md vuelve a fila. */
   .tc__tile {
-    position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; min-width: 0;
+    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0;
     min-height: 72px; padding: 12px 14px; border-radius: var(--w-r-obj);
     background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
   }
@@ -185,6 +189,7 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
     .tc__body { padding: 40px 0 36px; }
     .tc__tabs { margin-bottom: 40px; }
     .tc__wire { display: block; }
+    .tc__tile { flex-direction: row; align-items: center; gap: 12px; }
     .tc__grid { flex: none; width: 624px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     /* Hilo que une las casillas de cada fila (W-ADV-38), por detrás de las casillas opacas. */
     .tc__grid::before, .tc__grid::after {

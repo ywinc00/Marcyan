@@ -35,7 +35,7 @@ export default defineConfig({
     //   sirve /es con 200 y /es/ con 308; el sitemap debe listar las que dan 200.
     sitemap({
       filter: (page) =>
-        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/project-brief') && !page.includes('/dashboard') && !page.includes('/w-muestrario'),
+        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/project-brief') && !page.includes('/dashboard'),
       serialize: (item) => {
         item.url = item.url.replace(/\/$/, '');
         return item;

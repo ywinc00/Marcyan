@@ -2,7 +2,9 @@
 // Barrio · 04 "Trabajo real" (§4.20-6): TarjetasCaso con los proyectos más cercanos de
 // proof.items (capturas REALES: aquí sí, es prueba, E-32), de dos en dos. El título es
 // proof.title del dato; la bajada dice con verdad de dónde es el trabajo (FAQ verbatim:
-// "no vamos a inventarte un cliente de <barrio>").
+// "no vamos a inventarte un cliente de <barrio>"). Sin antetítulo sobre las tarjetas
+// (revisión 1, M1: repetía la cabecera "04 Trabajo real"); TarjetasCaso pide `label`, así
+// que va vacío y no se pinta ([SISTEMA]: hacerlo opcional).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import TarjetasCaso from '../../TarjetasCaso.astro';
 import type { ProjectItem } from '../../../../i18n/clusters';
@@ -13,16 +15,16 @@ interface Props {
   title: string;
   lead: string;
   items: ProjectItem[];
-  more: string;
   lang?: 'es' | 'en';
 }
-const { n, label, title, lead, items, more, lang = 'es' } = Astro.props;
+const { n, label, title, lead, items, lang = 'es' } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
 <div class="wb-gap">
-  <TarjetasCaso items={items} label={more} lang={lang} as="h3" />
+  <TarjetasCaso items={items} label="" lang={lang} as="h3" />
 </div>
 <style>
   .wb-gap { margin-top: var(--w-chapter-gap); }
+  .wb-gap :global(.w-cases__label:empty) { display: none; }
   @media (--lt-md) { .wb-gap { margin-top: 40px; } }
 </style>

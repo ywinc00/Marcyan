@@ -3,7 +3,8 @@
 // /es/houston/katy, /es/houston/sugar-land, /es/miami/doral, /es/miami/hialeah.
 // Su existencia activa el tipo (registry.ts); cada página lo importa y monta WLanding.
 //
-// Contraste: MatrizFilas "Zonas que cubrimos" con la fila del barrio fija (.w-contrast).
+// Contraste: MatrizFilas "Zonas que cubrimos" con la fila del barrio fija (.w-contrast), con
+// la ficha de mapa de ejemplo en claro al lado (revisión 1, I3: decisión del director).
 // Firma: los pulsos del chip del hero (vías reales, TIGER/Line). Degradado: el titular
 // del cierre (sin cola en el H1, R2; el precio va en TarjetaPrecio, sin cifra W-CORE-14).
 // Orden (§4.20 y R1): hero → 01 servicios → 02 zonas (contraste) → prosa local →
@@ -47,15 +48,6 @@ const tier = (productId: string, key: string) => {
   const t = p.tiers.find((x) => x.key === key)!;
   return { label: t.name, value: t.value as number, monthly: !!t.monthly };
 };
-/** "Desde $X" (o "al mes") del ancla baja de cada producto, desde pricing.ts. */
-const anchorOf = (id: string) => {
-  const p = catalog.find((x) => x.id === id);
-  if (!p) return undefined;
-  const t = p.tiers.find((x) => x.anchor) ?? p.tiers[0];
-  if (t.value === null) return undefined;
-  return t.monthly ? `Desde ${usd(t.value)} al mes` : `Desde ${usd(t.value)}`;
-};
-
 /** Lo que cubre la página de cada barrio (su `service` y su texto: web + SEO local; en
  *  Miami también la IA). Esas casillas enlazan a la página del barrio. */
 const COVERS: Record<Barrio, IconoId[]> = {
@@ -112,8 +104,13 @@ const spec: KindSpec = {
             titleHtml: t.servicios.title,
             lead: t.servicios.lead,
             lang: ctx.lang,
+            // Sin "Desde $X" en estas tarjetas (revisión 1, I2 y M5): el ancla baja de diseño
+            // web ($400, landing) chocaba con "Tu web en <barrio>, desde $1,500" y con la FAQ, y el
+            // SEO local ($300) con "$600 al mes". Los precios de lo que cubre la página viven en
+            // #precios y el resto en /es/precios (recurso de al lado); así ninguna tarjeta va
+            // sin precio mientras otras lo llevan.
             items: serviciosPara('es', ctx.cluster.path).map((s) => ({
-              id: s.id, label: s.name, desc: s.promise, href: s.href, price: anchorOf(s.id),
+              id: s.id, label: s.name, desc: s.promise, href: s.href,
             })),
             recursos: [
               { icon: 'lucide:map-pin', title: hub.title, text: hub.text, href: `/es/${t.city}` },
@@ -155,6 +152,9 @@ const spec: KindSpec = {
           columns: cols.map((c) => c.name),
           fixedRow: zonas.findIndex((z) => z.page === ctx.cluster.path),
           tableLabel: T.zonasTable(t.name),
+          legend: T.zonasLegend(t.name, t.cityName),
+          ficha: { city: t.name, caption: T.fichaCaption(t.name) },
+          lang: ctx.lang,
         };
       },
     },
@@ -219,7 +219,6 @@ const spec: KindSpec = {
         title: dosTonos(ctx.cluster.proof.title),
         lead: copyOf(ctx).caso.lead,
         items: caseItems(ctx),
-        more: T.casoMore,
         lang: ctx.lang,
       }),
     },

@@ -58,6 +58,12 @@ const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astr
   /* El objeto mide lo que su lienzo (600): la etiqueta "Ejemplo" y el botón de pausa quedan
      junto al chip y no sueltos en el borde de la pantalla. */
   .hb__obj { max-width: 680px; margin-inline: auto; }
+  /* Vías con más grosor y contraste (revisión 1, I4: tres trazos grises finos se quedaban
+     flojos frente a la red luminosa de W-CONV-30). Oro como las pistas vivas de la placa, y el
+     nombre a tinta 80. PROVISIONAL hasta [SISTEMA] ChipBarrio (mismo valor en el componente):
+     el generador ya deja ≥ 8 px entre nombre y trazo contando estos 2,5 px. */
+  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__st) { stroke: rgba(var(--accent-gold-rgb), .58); stroke-width: 2.5; }
+  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__name) { fill: var(--w-ink-80); }
   @media (--lt-md) {
     .hb__chip { margin-top: 32px; }
   }

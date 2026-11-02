@@ -1,0 +1,25 @@
+---
+// Barrio · 03 "Inversión" (§4.20-5, #precios): cabecera numerada con el título de
+// precio del dato (libre, ya existente) + TarjetaPrecio. Niveles SOLO de pricing.ts
+// (sitio a medida, SEO local continuo y asistente con IA: lo que nombra la nota de
+// precio de la página). La nota verbatim del dato va en la caja lateral. El CTA
+// conserva el evento pricing_cta_clicked de la tarjeta de precio de antes.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TarjetaPrecio from '../../TarjetaPrecio.astro';
+
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  card: Record<string, unknown>;
+}
+const { n, label, title, card } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={title} />
+<div class="wb-gap">
+  <TarjetaPrecio {...(card as any)} />
+</div>
+<style>
+  .wb-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .wb-gap { margin-top: 40px; } }
+</style>

@@ -1,0 +1,70 @@
+---
+// Hero de las landings de barrio (design/rediseno-workos.md §4.20, ola 2; W-CONV-23/30).
+// Centrado: eyebrow oro con el barrio ("Katy, TX"), H1 de hub VERBATIM sin cola (R2),
+// bajada 19 px, botón + "Ver precios ›". Debajo, el chip del barrio (ChipBarrio) con las
+// vías REALES por las que se reconoce (TIGER/Line, objetos/barrios/<barrio>.svg.ts) y los
+// pulsos que llegan al chip: es la firma de la página. Las pistas viven SOLO en la franja
+// bajo los botones (nunca detrás del texto, E-37): el chip es un bloque aparte.
+// Resplandor oro al 6 % arriba a la izquierda (capa de la sección, sin texto encima de
+// ningún detalle).
+import HeroTexto from '../HeroTexto.astro';
+import ChipBarrio from '../objetos/ChipBarrio.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Track { d: string; name?: string; at?: [number, number] }
+interface Props {
+  h1Html: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  name: string;
+  tracks?: Track[];
+  lang?: 'es' | 'en';
+}
+const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astro.props;
+---
+<section class="w-hero w-hero--bleed hb">
+  <div class="w-container hb__text">
+    <HeroTexto
+      eyebrow={eyebrow}
+      tone="gold"
+      h1Html={h1Html}
+      lead={lead}
+      primary={primary}
+      link={link}
+      size="hub"
+    >
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+  </div>
+  <div class="hb__chip" data-w-in="obj">
+    <div class="hb__obj">
+      <ChipBarrio name={name} tracks={tracks} lang={lang} size="hero" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hb { position: relative; overflow-x: clip; }
+  /* Resplandor oro al 6 % arriba a la izquierda (§4.20). */
+  .hb::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; pointer-events: none; z-index: 0;
+    background: radial-gradient(60% 70% at 8% 0%, rgba(var(--accent-gold-rgb), .06), transparent 70%);
+  }
+  .hb > * { position: relative; z-index: 1; }
+  /* El chip se corta en una línea de suelo (la de la celda que sigue), no en un borde suelto (E-36). */
+  .hb__chip { margin-top: 40px; padding-bottom: 8px; border-bottom: 1px solid var(--w-line-strong); }
+  /* El objeto mide lo que su lienzo (600): la etiqueta "Ejemplo" y el botón de pausa quedan
+     junto al chip y no sueltos en el borde de la pantalla. */
+  .hb__obj { max-width: 680px; margin-inline: auto; }
+  /* Vías con más grosor y contraste (revisión 1, I4: tres trazos grises finos se quedaban
+     flojos frente a la red luminosa de W-CONV-30). Oro como las pistas vivas de la placa, y el
+     nombre a tinta 80. PROVISIONAL hasta [SISTEMA] ChipBarrio (mismo valor en el componente):
+     el generador ya deja ≥ 8 px entre nombre y trazo contando estos 2,5 px. */
+  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__st) { stroke: rgba(var(--accent-gold-rgb), .58); stroke-width: 2.5; }
+  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__name) { fill: var(--w-ink-80); }
+  @media (--lt-md) {
+    .hb__chip { margin-top: 32px; }
+  }
+</style>

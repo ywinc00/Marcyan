@@ -1,0 +1,73 @@
+---
+// Diagnóstico · pasos del wizard (W-NEW-41, design/rediseno-workos.md §4.9-1).
+// Piel del progreso: 3 celdas numeradas en mono ("01 Tu negocio") separadas por
+// líneas de 1 px, con un filete de 2 px en la activa. SIN lógica propia: el estado
+// sale por CSS del propio wizard (qué fieldset no está [hidden] y qué vista se ve),
+// así el script de DiagnosticWizard no se toca. Va aria-hidden: el texto accesible
+// del progreso sigue siendo "Paso N/3" del wizard (data-step-n), que sí se actualiza.
+interface Props { steps: string[] }
+const { steps } = Astro.props;
+---
+<ol class="pw" aria-hidden="true">
+  {steps.map((s, i) => (
+    <li class="pw__s" data-pw={i}>
+      <span class="pw__n">{String(i + 1).padStart(2, '0')}</span>
+      <span class="pw__t">{s}</span>
+      <svg class="pw__ok" viewBox="0 0 24 24" width="14" height="14"><path d="M20 6 9 17l-5-5" /></svg>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .pw {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--w-line-strong); border-bottom: 1px solid var(--w-line-strong);
+  }
+  .pw__s {
+    position: relative; display: flex; align-items: center; gap: 8px; min-width: 0;
+    padding: 14px 8px 14px 0; color: var(--w-ink-60);
+    transition: color var(--w-dur-ui, .2s) var(--w-ease-ui, ease);
+  }
+  .pw__s + .pw__s { padding-left: 12px; border-left: 1px solid var(--w-line-strong); }
+  /* Filete de la activa: un elemento escalado (solo transform), nunca un carácter. */
+  .pw__s::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+    background: var(--accent-gold); transform: scaleX(0); transform-origin: left;
+    transition: transform var(--w-dur-layer, .32s) var(--w-ease-out, ease);
+  }
+  .pw__n { flex: none; font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .04em; }
+  .pw__t { font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.25; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pw__ok { flex: none; margin-left: auto; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+
+  /* Estado por CSS. Paso i activo = su fieldset visible; los anteriores, hechos. */
+  :global(.dgw:has(.dgw__fs[data-fs="0"]:not([hidden]))) .pw__s[data-pw="0"],
+  :global(.dgw:has(.dgw__fs[data-fs="1"]:not([hidden]))) .pw__s[data-pw="1"],
+  :global(.dgw:has(.dgw__fs[data-fs="2"]:not([hidden]))) .pw__s[data-pw="2"] { color: var(--w-ink); }
+  :global(.dgw:has(.dgw__fs[data-fs="0"]:not([hidden]))) .pw__s[data-pw="0"]::after,
+  :global(.dgw:has(.dgw__fs[data-fs="1"]:not([hidden]))) .pw__s[data-pw="1"]::after,
+  :global(.dgw:has(.dgw__fs[data-fs="2"]:not([hidden]))) .pw__s[data-pw="2"]::after { transform: scaleX(1); }
+  :global(.dgw:has(.dgw__fs[data-fs="0"]:not([hidden]))) .pw__s[data-pw="0"] .pw__n,
+  :global(.dgw:has(.dgw__fs[data-fs="1"]:not([hidden]))) .pw__s[data-pw="1"] .pw__n,
+  :global(.dgw:has(.dgw__fs[data-fs="2"]:not([hidden]))) .pw__s[data-pw="2"] .pw__n { color: var(--accent-gold); }
+  :global(.dgw:has(.dgw__fs[data-fs="1"]:not([hidden]))) .pw__s[data-pw="0"],
+  :global(.dgw:has(.dgw__fs[data-fs="2"]:not([hidden]))) .pw__s:is([data-pw="0"], [data-pw="1"]) { color: var(--w-ink-80); }
+  :global(.dgw:has(.dgw__fs[data-fs="1"]:not([hidden]))) .pw__s[data-pw="0"] .pw__ok,
+  :global(.dgw:has(.dgw__fs[data-fs="2"]:not([hidden]))) .pw__s:is([data-pw="0"], [data-pw="1"]) .pw__ok { opacity: 1; color: var(--accent-gold); }
+
+  @media (max-width: 599.98px) {
+    .pw__s { flex-direction: column; align-items: flex-start; gap: 4px; padding-block: 12px; }
+    /* El check va arriba a la derecha (fila del número): el texto puede usar todo el ancho
+       de la celda, así "Tu presencia" / "Your presence" caben en una línea a 390. */
+    .pw__s { padding-right: 0; }
+    /* Columnas al ancho de su texto (el sobrante se reparte): "Your presence" es más
+       largo que "Your goal" y en tres tercios iguales partía en dos líneas. */
+    .pw { grid-template-columns: repeat(3, auto); }
+    .pw__s + .pw__s { padding-left: 10px; }
+    .pw__ok { position: absolute; top: 12px; right: 10px; }
+    .pw__t { font-size: 14px; white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pw__s, .pw__s::after { transition: none; }
+  }
+</style>

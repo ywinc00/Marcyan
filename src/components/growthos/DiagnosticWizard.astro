@@ -3,13 +3,18 @@
 // result(ScoreRing+ScoreBars+señales+ruta+disclaimer+captura) → success(check+CtaBand).
 // Bilingüe por `lang`; todo el copy de src/i18n/growth-os.ts. La PII (email/tel/nombre)
 // se captura aquí y se postea a /api/diagnostic; nunca toca el modelo del reporte.
+// Rediseño WorkOS (design/rediseno-workos.md §4.9, ola 3): SOLO piel y marcado. Vive en
+// la columna izquierda del hero v3 (sin .container propio), con id="diagnostico-form",
+// los pasos W-NEW-41 (PasosWizard, estado por CSS) y el cierre del éxito con la piel de
+// la tarjeta grande W-CORE-15. La FAQ (única FAQPage) la monta la página con la piel v3.
+// Lógica, data-*, llamadas y eventos: intactos.
 import { GOS } from '../../i18n/growth-os';
 import Icon from '../ui/Icon.astro';
 import BtnStates from '../ui/BtnStates.astro';
 import ScoreRing from './ScoreRing.astro';
 import ScoreBars from './ScoreBars.astro';
 import ScanSequence from './ScanSequence.astro';
-import Faq from '../sections/Faq.astro';
+import PasosWizard from '../w/sections/diagnostico/PasosWizard.astro';
 import CtaBand from '../sections/CtaBand.astro';
 
 interface Props { lang: 'es' | 'en' }
@@ -21,8 +26,8 @@ const scoreLabel = lang === 'en' ? 'Score' : 'Puntaje';
 const ctaTitle = lang === 'en' ? 'Prefer to talk now?' : '¿Prefieres hablar ahora?';
 const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
 ---
-<section class="dgw" data-dgw data-lang={lang} aria-label={t.h1.replace(/<[^>]+>/g, '')}>
-  <div class="container">
+<section class="dgw" id="diagnostico-form" data-dgw data-lang={lang} aria-label={t.h1.replace(/<[^>]+>/g, '')}>
+  <div class="dgw__wrap">
     <div class="dgw__stage">
 
       <!-- ── FORM (wizard 3 pasos) ─────────────────────────────── -->
@@ -31,6 +36,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
           <span class="dgw__steplbl">{t.stepLabel} <b data-step-n>1</b>/3</span>
           <span class="dgw__steptitle" data-step-title>{t.steps[0]}</span>
           <span class="dgw__track" aria-hidden="true"><i class="dgw__trackfill" data-progress style="--p:33%"></i></span>
+          <PasosWizard steps={t.steps} />
         </div>
 
         <form class="dgw__form" data-analyze-form novalidate>
@@ -200,51 +206,46 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
       lang={lang}
     />
   </div>
-
-  <!-- FAQ (siempre visible; emite FAQPage JSON-LD) -->
-  <Faq tag={t.faqTitle} title={t.faqTitle} items={GOS[lang].faq.map((f) => ({ q: f.q, a: f.a }))} />
 </section>
 
 <style>
-  .dgw { padding-block: var(--section-gap); }
-  .dgw__stage { max-width: 680px; margin-inline: auto; }
-  .dgw__panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
-                box-shadow: var(--shadow-card); padding: clamp(var(--space-5), 4vw, var(--space-7)); }
+  /* Piel v3: tarjeta opaca del formulario (--w-s-solid), radio de bandeja, filo de luz,
+     borde oro al 18 %. Es el único bloque de contraste de la página (§4.9). */
+  .dgw { scroll-margin-top: calc(var(--nav-h) + 16px); }
+  .dgw__panel { background: var(--w-s-solid); border: 1px solid var(--w-line-strong); border-radius: var(--w-r-tray);
+                box-shadow: var(--w-edge); padding: clamp(20px, 3vw, 36px); }
   /* Varios elementos con display propio (--success grid, botones inline-flex,
      .dgw__rec flex) sobrescribirían el display:none del atributo [hidden] (regla
      UA de baja especificidad). Forzamos el ocultado para TODO lo que togglea hidden. */
   [hidden] { display: none !important; }
 
-  /* Progreso (telemetría) */
-  .dgw__progress { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-4);
-                   align-items: center; margin-bottom: var(--space-6); }
-  .dgw__steplbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wider);
-                  text-transform: uppercase; color: var(--accent-gold); }
-  .dgw__steplbl b { color: var(--fg-primary); }
-  .dgw__steptitle { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-                    text-transform: uppercase; color: var(--fg-subtle); text-align: right; }
-  .dgw__track { grid-column: 1 / -1; height: 4px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
-  .dgw__trackfill { display: block; height: 100%; width: var(--p, 33%); border-radius: inherit;
-                    background: linear-gradient(90deg, var(--accent-gold-deep), var(--accent-gold));
-                    transition: width var(--duration-base) var(--ease-out-expo); }
+  /* Progreso: la piel visible son los pasos numerados (PasosWizard, W-NEW-41). "Paso N/3"
+     queda solo para lectores de pantalla (lo actualiza el script); el título y la barra
+     siguen en el DOM porque el script escribe en ellos, pero no se pintan. */
+  .dgw__progress { margin: 0 0 28px; }
+  .dgw__steplbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+                  clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .dgw__steptitle, .dgw__track { display: none; }
 
   .dgw__fs { border: 0; margin: 0; padding: 0; min-inline-size: 0; }
-  .dgw__legend { padding: 0; font-family: var(--font-display); font-size: var(--text-lg); color: var(--fg-primary);
-                 letter-spacing: var(--tracking-tight); margin-bottom: var(--space-5); }
-  .dgw__field { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); border: 0; padding: 0; min-inline-size: 0; }
-  .dgw__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-  .dgw__lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-              text-transform: uppercase; color: var(--fg-secondary); }
-  .dgw__hint { font-size: var(--text-sm); color: var(--fg-subtle); }
+  .dgw__legend { padding: 0; font-family: var(--font-display); font-weight: 500; font-size: var(--w-h3); line-height: var(--w-lh-h3);
+                 color: var(--w-ink); letter-spacing: -0.02em; margin-bottom: 20px; }
+  .dgw__field { display: grid; gap: 8px; margin-bottom: 20px; border: 0; padding: 0; min-inline-size: 0; }
+  .dgw__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  /* E-40: lo que se lee para rellenar va en letra de texto, no en mono de adorno. */
+  .dgw__lbl { font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--w-ink-80); }
+  .dgw__hint { font-size: 14px; color: var(--w-ink-60); }
   .dgw input[type="text"], .dgw input[type="email"], .dgw input[type="tel"], .dgw select {
     width: 100%; min-height: var(--tap-min); padding: 0 var(--space-4); font-family: var(--font-body);
-    font-size: 16px; color: var(--fg-primary); background: var(--bg-elevated);
-    border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color var(--duration-base) var(--ease); }
+    font-size: 16px; color: var(--w-ink); background: var(--w-s1);
+    border: 1px solid rgba(var(--star-rgb), .14); border-radius: var(--w-r-cell); transition: border-color var(--w-dur-hover) var(--ease); }
+  .dgw input:hover, .dgw select:hover { border-color: rgba(var(--star-rgb), .24); }
   .dgw select { appearance: none; -webkit-appearance: none; cursor: pointer;
     background-image: linear-gradient(45deg, transparent 50%, var(--fg-secondary) 50%), linear-gradient(135deg, var(--fg-secondary) 50%, transparent 50%);
     background-position: calc(100% - 20px) center, calc(100% - 15px) center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: var(--space-8); }
-  .dgw input:focus-visible, .dgw select:focus-visible { outline: none; border-color: var(--accent-teal);
-    box-shadow: 0 0 0 2px var(--accent-teal-line); }
+  /* E-14: el foco va en el acento de la página (oro), no en teal junto a botones oro. */
+  .dgw input:focus-visible, .dgw select:focus-visible { outline: none; border-color: var(--accent-gold);
+    box-shadow: 0 0 0 2px var(--accent-gold-line); }
   .dgw input[aria-invalid="true"] { border-color: #c96e6e; }
 
   /* Pills (reseñas) + chips (problema) */
@@ -252,12 +253,12 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__pill, .dgw__chip { position: relative; }
   .dgw__pill input, .dgw__chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
   .dgw__pill span, .dgw__chip span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--space-4);
-    font-size: var(--text-sm); color: var(--fg-secondary); background: var(--bg-elevated);
-    border: 1px solid var(--border); border-radius: var(--radius-pill); cursor: pointer;
+    font-size: 14px; color: var(--w-ink-80); background: var(--w-s1);
+    border: 1px solid rgba(var(--star-rgb), .14); border-radius: var(--radius-pill); cursor: pointer;
     transition: border-color var(--duration-base) var(--ease), color var(--duration-base) var(--ease), background var(--duration-base) var(--ease); }
   .dgw__pill input:checked + span, .dgw__chip input:checked + span {
     color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .dgw__pill input:focus-visible + span, .dgw__chip input:focus-visible + span { box-shadow: 0 0 0 2px var(--accent-teal-line); }
+  .dgw__pill input:focus-visible + span, .dgw__chip input:focus-visible + span { box-shadow: 0 0 0 2px var(--accent-gold-line); }
 
   .dgw__nav { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-6); }
   .dgw__btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap-min);
@@ -283,7 +284,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
      al anillo y el botón se quedaba SIN indicador de foco visible cuando estaba
      enfocado por teclado y el puntero descansaba encima. `outline` no compite con
      `box-shadow`, así que el anillo es inmune a esa pelea de especificidad. */
-  .dgw__btn:focus-visible { outline: 2px solid var(--accent-teal-line); outline-offset: 2px; }
+  .dgw__btn:focus-visible { outline: 2px solid var(--accent-gold-line); outline-offset: 2px; }
 
   .dgw__err { margin: var(--space-4) 0 0; color: #d98b8b; font-size: var(--text-sm); }
 
@@ -297,7 +298,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
                text-transform: uppercase; padding: 4px 12px; border-radius: var(--radius-pill); border: 1px solid var(--border); }
   .dgw__risk[data-level="high"] { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
   .dgw__risk[data-level="med"]  { color: var(--fg-secondary); }
-  .dgw__risk[data-level="low"]  { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
+  .dgw__risk[data-level="low"]  { color: var(--w-ink); border-color: var(--accent-gold-line); }
   .dgw__rgrid { display: grid; grid-template-columns: auto 1fr; gap: var(--space-7); align-items: center;
                 justify-items: center; margin-bottom: var(--space-7); }
   .dgw__findings { margin-bottom: var(--space-6); }
@@ -317,7 +318,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
     transition: box-shadow var(--duration-base) var(--ease); }
   .dgw__rec:hover { box-shadow: var(--shadow-gold); }
   .dgw__rec-lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-                  text-transform: uppercase; color: var(--fg-subtle); }
+                  text-transform: uppercase; color: var(--w-ink-60); }
   .dgw__rec-svc { color: var(--accent-gold); font-weight: 600; }
   .dgw__rec svg { width: 18px; height: 18px; color: var(--accent-gold); margin-left: auto; }
 
@@ -335,7 +336,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__marcy-sub { color: var(--fg-secondary); font-size: var(--text-xs); line-height: var(--leading-normal); }
   .dgw__marcy > :global(svg:last-child) { width: 18px; height: 18px; color: var(--accent-teal); margin-left: auto; flex-shrink: 0; }
 
-  .dgw__disclaimer { font-size: var(--text-sm); color: var(--fg-subtle); line-height: var(--leading-normal);
+  .dgw__disclaimer { font-size: var(--text-sm); color: var(--w-ink-60); line-height: var(--leading-normal);
                      margin: 0 0 var(--space-6); }
 
   .dgw__claim { border-top: 1px solid var(--border); padding-top: var(--space-6); }
@@ -345,14 +346,91 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   /* Éxito */
   .dgw__panel--success { text-align: center; display: grid; justify-items: center; gap: var(--space-4); }
   .dgw__check { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
-    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); }
-  .dgw__check svg { width: 28px; height: 28px; color: var(--accent-teal); }
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); }
+  .dgw__check svg { width: 28px; height: 28px; color: var(--accent-gold); }
   .dgw__donetext { color: var(--fg-primary); font-size: var(--text-lg); font-family: var(--font-display); max-width: 40ch; margin: 0; }
-  .dgw__restart { background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono);
-    font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; cursor: pointer; text-decoration: underline; }
+  /* E-40: es un control, va en letra de texto legible (antes mono 11 en gris tenue). */
+  .dgw__restart { background: transparent; border: 0; padding: 10px 0; min-height: var(--tap-min); color: var(--w-ink-70); font-family: var(--font-body);
+    font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
   .dgw__restart:hover { color: var(--accent-gold); }
 
+  /* Escaneo: el micro-estado es el punto vivo + la lista de pasos (W-NEW-33). La órbita
+     que giraba aquí era una segunda animación al lado del escáner (la firma) y repetía el
+     motivo del planeta con órbita que el rediseño retira (G9): no se pinta. */
+  .dgw :global(.scan__orbit) { display: none; }
+  .dgw :global(.scan) { padding-block: 40px; }
+  /* Sin salto de altura al pasar del formulario al escaneo: el panel guarda un alto
+     parecido al del paso 3 y centra el estado vivo. */
+  .dgw__panel[data-view="scan"] { min-height: 380px; display: grid; place-items: center; }
+  /* Destinos de foco programático tras cambiar de vista (tabindex -1): el lector de
+     pantalla los anuncia; el anillo de foco sobre un texto no es un control y confundía. */
+  .dgw__rkick:focus, .dgw__donetext:focus { outline: none; }
+  /* E-40: el resultado es la recompensa y se lee: rótulos y estados en letra de texto
+     14-15 con tinta 80, no en mono 11-12 en mayúsculas grises. */
+  .dgw__rkick { font-family: var(--font-body); font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--w-ink-80); }
+  .dgw__rkick b { font-weight: 600; color: var(--w-ink); }
+  .dgw__risk { font-family: var(--font-body); font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  .dgw__risk[data-level="med"] { color: var(--w-ink-80); border-color: var(--w-line-strong); }
+  .dgw__rec-lbl { font-family: var(--font-body); font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--w-ink-80); }
+  .dgw :global(.sbars__row) { grid-template-columns: 124px 1fr 44px; }
+  .dgw :global(.sbars__label) { font-family: var(--font-body); font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--w-ink-80); }
+  /* E-14: la barra de IA también va en el acento de la página (era la única en teal). */
+  .dgw :global(.sbars__row[data-cat="ai"] .sbars__fill) { background: linear-gradient(90deg, var(--accent-gold-deep), var(--accent-gold)); }
+  .dgw :global(.scan__steps) { font-family: var(--font-body); font-size: 15px; gap: 10px; color: var(--w-ink-80); }
+  .dgw :global(.scan__steps li.is-on) { color: var(--w-ink); }
+  .dgw :global(.scan__steps li.is-done) { color: var(--w-ink-80); }
+  /* Los pasos (PasosWizard) ya nombran cada paso: la leyenda repetía "Tu negocio" justo
+     debajo. Sigue en el DOM (nombre accesible del fieldset; el script lee su texto). */
+  .dgw__legend { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+                 clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .dgw__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  /* Éxito + cierre como UNA tarjeta grande W-CORE-15 (la piel de CierreDosTarjetas):
+     arriba la confirmación, debajo, tras una línea de 1 px, el trío. A la izquierda,
+     sin glow ni filete de acento. El trío de CtaBand (clases, data-track, tel/wa y el
+     dominante por dispositivo) no se toca: solo se le cambia la piel desde aquí. */
+  .dgw__panel--success { text-align: left; justify-items: start; gap: 16px; }
+  .dgw__donetext { font-weight: 500; font-size: var(--w-h4); line-height: 1.35; color: var(--w-ink); }
+  .dgw:has([data-view="success"]:not([hidden])) .dgw__panel--success { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0; }
+  .dgw [data-view="success-cta"] :global(.ctaband) { padding: 0; margin: 0; }
+  .dgw [data-view="success-cta"] :global(.container) { max-width: none; padding: 0; }
+  .dgw [data-view="success-cta"] :global(.ctaband__inner) {
+    align-items: flex-start; text-align: left; gap: 8px;
+    padding: clamp(20px, 3vw, 36px); background: var(--w-s-solid);
+    border: 1px solid var(--w-line-strong); border-top-color: var(--w-line);
+    border-radius: 0 0 var(--w-r-tray) var(--w-r-tray); box-shadow: none;
+  }
+  .dgw [data-view="success-cta"] :global(.ctaband__inner::before),
+  .dgw [data-view="success-cta"] :global(.ctaband__inner::after) { display: none; }
+  /* El texto de éxito ya invita a hablar ("Si prefieres, hablamos ya:"): el titular de la
+     banda repetía la misma pregunta justo debajo. Se queda para lectores de pantalla
+     (encabeza el trío) y no se pinta. */
+  .dgw [data-view="success-cta"] :global(.ctaband__title) {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .dgw [data-view="success-cta"] :global(.ctaband__actions) { margin: 0; max-width: none; justify-content: flex-start; }
+  /* En la columna de 600 los tres caben en una fila (escritorio) sin partir el trío. */
+  @media (min-width: 768px) {
+    .dgw [data-view="success-cta"] :global(.ctaband__actions) { gap: 10px; }
+    .dgw [data-view="success-cta"] :global(.ctaband__act) { padding: 12px 16px; font-size: 15px; }
+  }
+
+  /* E-40 + contraste en el resto del resultado real (revisión 2). El anillo y las barras
+     son componentes compartidos: se les cambia la piel solo aquí, sin tocar la lógica.
+     E-13: la cifra del anillo usa la misma letra que el ejemplo de "Lo que verás"
+     (titular 500, -0.02em), y la barra lleva el mismo carril visible. */
+  .dgw :global(.sring__val strong) { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--w-ink); }
+  .dgw :global(.sring__val span) { font-family: var(--font-body); font-size: 14px; color: var(--w-ink-70); }
+  .dgw :global(.sring__label) { font-family: var(--font-body); font-size: 14px; font-weight: 400; letter-spacing: 0;
+                                text-transform: none; color: var(--w-ink-80); }
+  .dgw :global(.sbars__track) { background: var(--w-line-strong); }
+  .dgw :global(.sbars__val) { font-size: 15px; font-weight: 500; color: var(--w-ink); }
+  .dgw__marcy-lbl { font-size: 15px; }
+  .dgw__flist :global(li) { font-size: 15px; line-height: 1.45; color: var(--w-ink-80); }
+  .dgw__marcy-sub { font-size: 14px; line-height: 1.4; color: var(--w-ink-70); }
+  .dgw__disclaimer { font-size: 14px; line-height: 1.5; color: var(--w-ink-70); }
+  .dgw__claimsub { font-size: 14px; line-height: 1.5; color: var(--w-ink-80); }
 
   @media (max-width: 599px) {
     .dgw__row2 { grid-template-columns: 1fr; }

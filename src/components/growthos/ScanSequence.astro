@@ -2,9 +2,14 @@
 interface Props { lang: 'es' | 'en' }
 const { lang } = Astro.props;
 import { GOS } from '../../i18n/growth-os';
+import { diagCopy } from '../../i18n/w/diagnostico';
 const t = GOS[lang].scan; // { steps: [4 strings], done }
+// Estado vivo (W-NEW-33, rediseño WorkOS §4.9): solo marcado. El punto late mientras
+// este bloque se ve, es decir, SOLO durante el escaneo (fuera de él está [hidden]).
+const vivo = diagCopy[lang].vivo;
 ---
 <div class="scan" data-scan hidden>
+  <p class="scan__live" aria-hidden="true"><span class="scan__dot"></span>{vivo}</p>
   <svg class="scan__orbit" viewBox="0 0 120 120" aria-hidden="true">
     <circle cx="60" cy="60" r="52" class="scan__ring scan__ring--dash"/>
     <circle cx="60" cy="60" r="38" class="scan__ring"/>
@@ -18,6 +23,12 @@ const t = GOS[lang].scan; // { steps: [4 strings], done }
 
 <style>
   .scan { display: grid; justify-items: center; gap: var(--space-5); padding: var(--space-7) 0; }
+  .scan__live { display: inline-flex; align-items: center; gap: 8px; margin: 0;
+                font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .06em;
+                text-transform: uppercase; color: var(--w-ink-80, var(--fg-secondary)); }
+  .scan__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold);
+               animation: scanLive 2s var(--ease-in-out) infinite; }
+  @keyframes scanLive { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
   .scan__orbit { width: 120px; }
   .scan__ring { fill: none; stroke: var(--border); stroke-width: 1.5; }
   .scan__ring--dash { stroke: var(--accent-gold-line); stroke-dasharray: 4 7;
@@ -30,13 +41,13 @@ const t = GOS[lang].scan; // { steps: [4 strings], done }
   .scan__steps li { opacity: 0; transform: translateY(4px);
                     transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo), color .4s; }
   .scan__steps li.is-on   { opacity: 1; transform: none; color: var(--fg-secondary); }
-  .scan__steps li.is-done { opacity: 1; transform: none; color: var(--accent-teal); }
-  .scan__steps li.is-done::before { content: '✓ '; }
+  .scan__steps li.is-done { opacity: 1; transform: none; color: var(--fg-secondary); }
+  .scan__steps li.is-done::before { content: '✓ '; color: var(--accent-gold); }
   .scan__steps li.is-on::before   { content: '▸ '; color: var(--accent-gold); }
   @keyframes scanSpin  { to { transform: rotate(360deg); } }
   @keyframes scanPulse { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) {
-    .scan__ring--dash, .scan__sat, .scan__core { animation: none; }
+    .scan__ring--dash, .scan__sat, .scan__core, .scan__dot { animation: none; }
     .scan__steps li { transition: none; }
   }
 </style>

@@ -54,13 +54,19 @@ const PROMESA: Record<NavLang, Record<IconoId, string>> = {
 };
 
 /** Mantenimiento no tiene página propia todavía: a #contacto hasta que la ola 3
- *  cree `#mantenimiento` en servicios (§2.12). pricing ya lo apunta a #contacto. */
+ *  cree `#mantenimiento` en servicios (§2.12). pricing lo apunta a `#contacto`
+ *  relativo, que en las páginas sin formulario (diagnóstico, herramientas) no
+ *  tiene destino: se ancla al contacto de la página de servicios, que siempre existe. */
+const HUB_SERVICIOS: Record<NavLang, string> = { es: '/es/servicios', en: '/en/services' };
+const anclaFiable = (lang: NavLang, href: string) =>
+  href.startsWith('#') ? HUB_SERVICIOS[lang] + href : href;
+
 const toItems = (lang: NavLang, list: { id: string; name: string; tagline: string; href: string }[]): MegaServicio[] =>
   list.map((s) => ({
     id: s.id as IconoId,
     name: shortName(s.name),
     promise: PROMESA[lang][s.id as IconoId] ?? s.tagline,
-    href: s.href,
+    href: anclaFiable(lang, s.href),
   }));
 
 export const megaServicios: Record<NavLang, MegaServicio[]> = {

@@ -1,0 +1,66 @@
+---
+// Sobre nosotros · 6 "Clientes Fundadores" (design/rediseno-workos.md §4.6-6, W-CONV-17).
+// Partido como el formulario de contacto de WorkOS, pero SIN formulario nuevo:
+// · Izquierda (384): rótulo mono + titular (a.founders.title, verbatim) + 3 checks con
+//   las tres ventajas que nombra el párrafo (fragmentos literales de a.founders).
+// · Derecha (576): tarjeta con halo oro quieto (sin animar box-shadow) con los dos
+//   párrafos de a.founders VERBATIM y el enlace a #contacto (variante link).
+import Button from '../../../ui/Button.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Props {
+  tag: string;
+  titleHtml: string;
+  paragraphs: string[];
+  checks: [string, string, string];
+  cta: string;
+  aria: string;
+}
+const { tag, titleHtml, paragraphs, checks, cta, aria } = Astro.props;
+---
+<div class="wsf">
+  <div class="wsf__left">
+    <p class="w-label wsf__tag">{tag}</p>
+    <h2 class="w-h2 wsf__title" set:html={titleHtml} />
+    <ul class="wsf__checks" aria-label={aria}>
+      {checks.map((c) => (
+        <li><span class="wsf__tick" aria-hidden="true"><Icon name="lucide:check" /></span><span>{c}</span></li>
+      ))}
+    </ul>
+  </div>
+  <div class="wsf__card">
+    {paragraphs.map((p) => <p class="wsf__p" set:html={p} />)}
+    <div class="wsf__act">
+      <Button variant="link" href="#contacto">{cta}</Button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wsf { display: grid; grid-template-columns: 1fr; gap: 40px; max-width: var(--w-rail-max); margin-inline: auto; min-width: 0; }
+  .wsf__tag { margin: 0 0 16px; }
+  .wsf__title { margin: 0; max-width: 384px; }
+  .wsf__title :global(em) { font-style: normal; color: var(--w-accent); }
+  .wsf__checks { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 18px; }
+  .wsf__checks li { display: flex; gap: 14px; align-items: flex-start; font: 500 16px/1.5 var(--font-body); color: var(--w-ink); }
+  .wsf__tick {
+    flex: none; width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+    background: rgba(var(--accent-gold-rgb), .12); color: var(--w-accent);
+  }
+  .wsf__tick :global(svg) { width: 14px; height: 14px; }
+  .wsf__card {
+    position: relative; min-width: 0;
+    background: var(--w-s2); border: 1px solid var(--w-line-strong); border-radius: var(--w-r-obj);
+    padding: 28px 24px;
+    /* Halo oro quieto (W-CONV-17): filo de luz + resplandor suave, nunca animado. */
+    box-shadow: var(--w-edge), 0 0 0 1px rgba(var(--accent-gold-rgb), .06), 0 24px 80px -24px rgba(var(--accent-gold-rgb), .28);
+  }
+  .wsf__p { margin: 0 0 16px; font: 400 16px/1.65 var(--font-body); color: var(--w-ink-80); }
+  .wsf__p :global(strong) { color: var(--w-ink); font-weight: 500; }
+  .wsf__act { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--w-line); }
+  @media (--lg) {
+    .wsf { grid-template-columns: minmax(0, 384fr) minmax(0, 576fr); column-gap: clamp(48px, 8vw, 240px); align-items: start; }
+    .wsf__card { padding: 40px; }
+    .wsf__p { font-size: 17px; }
+  }
+</style>

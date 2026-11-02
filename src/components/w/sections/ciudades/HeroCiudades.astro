@@ -3,7 +3,9 @@
 // Cabecera compacta de hub, centrada y SOLO texto (A-04, E-05: hub sin botones ni chips):
 // migas, eyebrow, H1 hub verbatim, cola en degradado (el único de la página) y bajada de
 // una línea. Debajo, asomando en la primera pantalla, las tarjetas por perfil: Houston y
-// Miami con la silueta real de su ciudad (la del pie de cada hub) + la ancha de "otra ciudad".
+// Miami (sin silueta: a 72-96 px no se entendía, E-53) + la ancha de "otra ciudad", y debajo
+// el teléfono de cada ciudad (call_clicked). Va FUERA de las tarjetas porque cada tarjeta ya es
+// un enlace al hub (pendiente de sistema: `tel` por tarjeta en TarjetasPerfil).
 // · Marcado del texto = el de HeroTexto (mismas clases del sistema y mismos data-w-in de la
 //   coreografía §2.9), sin la fila de botones: HeroTexto exige `primary` (pendiente de
 //   sistema: hacerlo opcional y volver a montar HeroTexto aquí).
@@ -11,8 +13,9 @@
 //   esquema de titulares), porque el H1 y la bajada ya dicen "elige tu ciudad".
 import Eyebrow from '../../Eyebrow.astro';
 import TarjetasPerfil from '../../TarjetasPerfil.astro';
+import Icon from '../../../ui/Icon.astro';
 
-interface Card { title: string; text: string; href: string; cta: string; art?: string }
+interface Card { title: string; text: string; href: string; cta: string }
 interface Wide { icon: string; title: string; text: string; href: string; cta: string; track?: string }
 interface Props {
   eyebrow: string;
@@ -22,8 +25,11 @@ interface Props {
   perfilesTitle: string;
   cards: [Card, Card];
   wide: Wide;
+  phones: { city: string; tel: string }[];
+  callLabel: string;
 }
-const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide } = Astro.props;
+const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide, phones, callLabel } = Astro.props;
+const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
 ---
 <section class="w-hero ciu-hero">
   <div class="w-container">
@@ -38,6 +44,15 @@ const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide } = Astro.props;
     </div>
     <div class="ciu-hero__cards" data-w-in="obj">
       <TarjetasPerfil titleHtml={perfilesTitle} cards={cards} wide={wide} id="elige" class="ciu-prof" />
+      <ul class="ciu-tel" role="list">
+        {phones.map((p) => (
+          <li>
+            <a class="ciu-tel__a" href={telHref(p.tel)} data-track="call_clicked" aria-label={`${callLabel} ${p.city}: ${p.tel}`}>
+              <Icon name="lucide:phone" /><span class="ciu-tel__city">{p.city}</span>{p.tel}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </section>
@@ -64,16 +79,18 @@ const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide } = Astro.props;
     clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
 
-  /* Silueta real de la ciudad (la del pie de su hub, vectorizada de foto libre): se pinta como
-     máscara en el acento de la página, nítida a cualquier ancho, anclada abajo a todo el ancho. */
-  .ciu-hero :global(.ciu-sky) {
-    display: block; width: 100%; height: 96px;
-    background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), 0.42) 0%, rgba(var(--accent-gold-rgb), 0.10) 100%);
-    -webkit-mask: var(--sky) var(--sky-pos) / auto 100% no-repeat;
-    mask: var(--sky) var(--sky-pos) / auto 100% no-repeat;
+  /* Teléfonos: una línea centrada bajo las tarjetas, en la letra de los enlaces de tarjeta. */
+  .ciu-tel {
+    list-style: none; margin: 24px auto 0; padding: 0; max-width: 920px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 40px;
   }
-  /* Houston es alta: entera a 96 px de alto, hacia la derecha. Miami es ancha y baja: a todo
-     el ancho, recortada por los lados (como en el pie de su hub). */
-  .ciu-hero :global(.ciu-sky--houston) { --sky: url('/assets/houston/skyline.svg'); --sky-pos: 88% 100%; }
-  .ciu-hero :global(.ciu-sky--miami) { --sky: url('/assets/miami/skyline.svg'); --sky-pos: 50% 100%; height: 72px; }
+  .ciu-tel__a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font-family: var(--font-body); font-weight: 500; font-size: 15px; color: var(--w-ink);
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .ciu-tel__a :global(svg) { width: 16px; height: 16px; color: var(--w-accent); }
+  .ciu-tel__city { color: var(--w-ink-60); font-weight: 400; }
+  @media (--hover-fine) { .ciu-tel__a:hover { color: var(--w-accent); } }
+  @media (--motion-reduce) { .ciu-tel__a { transition: none; } }
 </style>

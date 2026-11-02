@@ -27,10 +27,11 @@ const { n, label, title, lead, items } = Astro.props;
   </div>
 </div>
 <style>
+  /* H2 a 12 px de la cabecera, como §2.6 y el resto de capítulos; el objeto arranca arriba. */
   .ciu-2c { display: grid; gap: 32px; margin-top: 12px; min-width: 0; }
   .ciu-2c__txt, .ciu-2c__obj { min-width: 0; }
   .ciu-2c__lead { margin: 12px 0 0; max-width: 430px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary); }
   @media (--lg) {
-    .ciu-2c { grid-template-columns: minmax(0, 380px) minmax(0, 760px); column-gap: 60px; justify-content: space-between; align-items: center; margin-top: 40px; }
+    .ciu-2c { grid-template-columns: minmax(0, 380px) minmax(0, 760px); column-gap: 60px; justify-content: space-between; align-items: start; }
   }
 </style>

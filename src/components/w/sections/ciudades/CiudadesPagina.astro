@@ -42,15 +42,17 @@ const pre = en ? '/en' : '/es';
 
 // ── Tarjetas por ciudad (hero) ──
 const cities = c.locations.items as { city: 'Houston' | 'Miami'; state: string; area: string; tel: string; links?: { label: string; href: string; sub?: string }[] }[];
-const sky = (city: string) => `<span class="ciu-sky ciu-sky--${city.toLowerCase()}"></span>`;
-type Card = { title: string; text: string; href: string; cta: string; art?: string };
+// Sin silueta: a la escala de la tarjeta (72-96 px) ninguna de las dos se entendía (E-53).
+type Card = { title: string; text: string; href: string; cta: string };
 const cards = cities.map((ct): Card => ({
   title: `${ct.city}, ${ct.state}`,
   text: t.perfiles.teaser[ct.city],
   href: `${pre}/${ct.city.toLowerCase()}`,
   cta: t.perfiles.cta(ct.city),
-  art: sky(ct.city),
 })) as [Card, Card];
+// Teléfono de cada ciudad bajo su tarjeta (call_clicked): la tarjeta entera ya es un enlace
+// al hub y no admite otro enlace dentro (pendiente de sistema: `tel` por tarjeta).
+const phones = cities.map((ct) => ({ city: ct.city, tel: ct.tel }));
 const wide = {
   icon: 'lucide:map-pinned', title: t.perfiles.wide.title, text: t.perfiles.wide.text,
   href: '#contacto', cta: t.perfiles.wide.cta, track: 'proposal_requested',
@@ -81,7 +83,8 @@ const rows = megaServicios[lang]
   .filter((s) => LANDING.houston[s.id] || LANDING.miami[s.id])
   .map((s) => ({
     label: ROW_NAME[lang][s.id] ?? s.name,
-    cells: (['houston', 'miami'] as const).map((city) => ({ label: ROW_NAME[lang][s.id] ?? s.name, href: cellHref(city, s.id) })),
+    // La etiqueta de cada casilla es su CIUDAD (MatrizFilas compone "<casilla> en <fila>").
+    cells: (['houston', 'miami'] as const).map((city) => ({ label: city === 'houston' ? 'Houston' : 'Miami', href: cellHref(city, s.id) })),
   }));
 const columns = ['Houston', 'Miami'];
 
@@ -91,6 +94,8 @@ const sedes = cities.map((ct) => ({ city: ct.city, state: ct.state, area: ct.are
 // ── Barrios y sectores: landings existentes con la descripción que ya llevan en su hub ──
 type Where = { name: string; text: string; href: string; kind: 'barrio' | 'sector'; iconId?: IconoId };
 const SECTOR_ICON: Record<string, IconoId> = {
+  // Contratistas = IA (su página va de rescatar llamadas): el icono sale teal por registro; pasarlo
+  // a oro en esta página es de sistema (DondeEstaTuNegocio no deja elegir el tono, E-14).
   '/es/houston/bienes-raices': 'seo-local', '/es/houston/contratistas': 'ia-conversacional',
   '/en/houston/contractors': 'ia-conversacional', '/en/houston/restaurants': 'ecommerce',
 };
@@ -125,6 +130,8 @@ const waOf = (n: string) => 'https://wa.me/' + n.replace(/\D/g, '');
       perfilesTitle={t.perfiles.title}
       cards={cards}
       wide={wide}
+      phones={phones}
+      callLabel={t.sedes.callLabel}
     >
       <Breadcrumb slot="crumbs" items={t.breadcrumb} lang={lang} />
     </HeroCiudades>

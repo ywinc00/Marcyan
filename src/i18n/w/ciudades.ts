@@ -148,7 +148,8 @@ export const ciudadesCopy: Record<CiudadesLang, CiudadesCopy> = {
     matriz: {
       label: 'What we do in each city',
       title: 'Every service, city by city',
-      lead: "Tap a box to see that service on the city's page. Dotted boxes aren't offered there yet.",
+      // Sin landings EN por servicio: cada casilla lleva a los servicios del hub EN de su ciudad.
+      lead: "Each box takes you to that city's services. Dotted ones don't have their own page there yet.",
       tableLabel: 'Marcyan services by city',
     },
     sedes: {

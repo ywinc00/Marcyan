@@ -1,6 +1,7 @@
 ---
 // Ciudades · 02 "Dónde estamos" (§4.13-3): sedes en acordeón, todas cerradas al cargar
 // (E-23), con el teléfono de cada ciudad (call_clicked). Datos de content.locations.
+// Texto a la izquierda y sedes a la derecha (como 01 y 03).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import SedesAcordeon from '../../SedesAcordeon.astro';
 
@@ -15,11 +16,24 @@ interface Props {
 }
 const { n, label, title, lead, more, callLabel, items } = Astro.props;
 ---
-<CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
-<div class="ciu-sedes">
-  <SedesAcordeon items={items} more={more} callLabel={callLabel} tone="gold" />
+<CabeceraNumerada n={n} label={label} />
+<div class="ciu-2c">
+  <div class="ciu-2c__txt">
+    <h2 class="w-h2" set:html={title} />
+    <p class="ciu-2c__lead">{lead}</p>
+  </div>
+  <div class="ciu-2c__obj">
+    <SedesAcordeon items={items} more={more} callLabel={callLabel} tone="gold" />
+  </div>
 </div>
 <style>
-  .ciu-sedes { margin-top: 56px; }
-  @media (--lt-md) { .ciu-sedes { margin-top: 32px; } }
+  /* Revisión 1 (E-01): a todo el ancho eran 714 px de noche con media sección vacía. Mismo
+     reparto que 01 y 03 (texto a la izquierda, sedes a la derecha): la sección se compacta y
+     la página tiene una sola gramática de capítulo. */
+  .ciu-2c { display: grid; gap: 32px; margin-top: 12px; min-width: 0; }
+  .ciu-2c__txt, .ciu-2c__obj { min-width: 0; }
+  .ciu-2c__lead { margin: 12px 0 0; max-width: 430px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary); }
+  @media (--lg) {
+    .ciu-2c { grid-template-columns: minmax(0, 380px) minmax(0, 1fr); column-gap: 96px; align-items: start; }
+  }
 </style>

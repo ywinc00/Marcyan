@@ -2,10 +2,13 @@
 // Tipo `branding` · /es/houston/branding (design/rediseno-workos.md §4.18, ola 2).
 // Su existencia activa el tipo (registry.ts); la página lo importa y monta WLanding.
 //
-// Contraste: el plano técnico del hero (marco propio sobre --w-s1), así que ninguna
-// sección lleva .w-contrast. Firma: ninguna en bucle (el plano reacciona al hover).
+// Contraste (revisión 1, I-1 · E-01): el plano del hero se lee ahora sobre --w-contrast-bg
+// con franjas de luz oro detrás, y la escalera 02 es el capítulo .w-contrast de la página
+// (el único, como el bento del piloto): sin él, desde el plano hasta el pie no había luz
+// ni cambio de superficie. Pendiente de OK del director: §4.18 decía "contraste = plano".
+// Firma: ninguna en bucle (el plano reacciona al hover).
 // Degradado: la cifra del precio. Marca de EJEMPLO "Tu Marca", nunca Julio's (E-32).
-// Orden (R1): hero + plano → 01 entregables → 02 de la marca a todo lo demás →
+// Orden (R1): hero + plano → 01 el encargo (I-2: solo lo que el plano no dice) → 02 de la marca a todo lo demás →
 // prosa local → 03 caso real → precio → franja "En pocas palabras" → FAQ → hermanas →
 // cierre (Contact lo pone WLanding). Ids que ya tenía la página (`proceso`, `proyectos`,
 // `precios`) se conservan en las secciones equivalentes.
@@ -53,13 +56,14 @@ const spec: KindSpec = {
     lang: ctx.lang,
   }),
   sections: [
-    // 2 · 01 Entregables: ficha del encargo 4×2.
+    // 2 · 01 El encargo: ficha 3×2 con lo que no repite la lista del plano (I-2, E-10).
     { component: Entregables, props: () => ({ copy: t.entregables, n: 1 }) },
 
     // 3 · 02 De la marca a todo lo demás: escalera de 4 con maquetas de "Tu Marca".
     {
       component: DeLaMarca,
       id: 'proceso',
+      contrast: 'contrast',
       props: (ctx) => ({ copy: t.marca, n: 2, city: t.cityName, lang: ctx.lang }),
     },
 

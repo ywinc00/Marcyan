@@ -44,20 +44,21 @@ export const brandingCopy: BrandingCopy = {
   primary: 'Quiero mi marca',
   link: 'Ver precios',
 
+  // Revisión 1 (I-2, E-10): la lista de entregables ya está en el plano del hero; la 01
+  // se queda solo con lo que no se repite (cómo trabajamos), con datos de clusters.ts
+  // (includes, local, pricing) y la política de plazos.
   entregables: {
-    label: 'Entregables',
-    title: 'Todo lo que recibes, listo para usar',
-    lead: 'Una marca completa, no solo un logo. Cada pieza llega en los formatos que vas a necesitar.',
+    label: 'El encargo',
+    title: 'Una marca pensada, no una plantilla',
+    lead: 'Lo que recibes está en el plano, pieza por pieza. Así trabajamos contigo para llegar ahí.',
     specsLabel: 'Ficha del encargo',
     specs: [
-      { k: 'Logo', v: 'A medida', note: 'Desde cero, con versión horizontal, vertical e icono.' },
-      { k: 'Color', v: 'Paleta propia', note: 'Funciona en pantalla y en impresión.' },
-      { k: 'Tipografía', v: 'Fuentes elegidas', note: 'La voz escrita de tu marca.' },
-      { k: 'Guía', v: 'Guía de uso', note: 'Para que se vea igual en todos lados.' },
-      { k: 'Formatos', v: 'Vectorial, PNG y PDF', note: 'Para el rótulo, las redes y la imprenta.' },
       { k: 'Criterio', v: 'De diseñador', note: 'Muchas direcciones exploradas, una decisión pensada.' },
+      { k: 'Diseño', v: 'A medida', note: 'Sin plantillas: tu marca parte de tu negocio.' },
       { k: 'Idioma', v: 'En español', note: 'Te acompañamos en español de principio a fin.' },
       { k: 'Propuesta', v: 'En 24 horas', note: 'Clara, por escrito y sin compromiso.' },
+      { k: 'Pago', v: 'Por proyecto', note: 'El precio depende del alcance: solo el logo o la marca completa.' },
+      { k: 'Tu web', v: 'Opcional', note: 'Si la sumas, nace coherente con tu marca.' },
     ],
   },
 

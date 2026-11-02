@@ -3,6 +3,8 @@
 // branding (diseño de logo) con "Desde" y el degradado único de la página; abajo a la
 // derecha el slice "Branding completo" (R6). Debajo, la nota de precio del dato y el
 // enlace a la propuesta que conserva el evento pricing_cta_clicked (contrato de analítica).
+// Revisión 1 (M-2): el slice "Branding completo · Desde $750" pesa lo mismo que "Diseño de
+// logo", para que la nota ("$750 es el punto de partida…") no se lea como contradicción.
 import PrecioPuntos from '../../PrecioPuntos.astro';
 import Button from '../../../ui/Button.astro';
 import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
@@ -13,6 +15,7 @@ const { copy, note } = Astro.props;
 const br = catalog.find((p) => p.id === 'branding')!;
 const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
 ---
+<div class="bp">
 <PrecioPuntos
   eyebrow={copy.eyebrow}
   titleHtml={copy.title}
@@ -21,11 +24,17 @@ const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
   bottomLeft={{ big: br.tiers[0].name, text: br.tiers[0].blurb }}
   bottomRight={{ label: br.tiers[1].name, value: desde(PRICE_ANCHORS.branding) }}
 />
+</div>
 <div class="bp-foot">
   {note && <p class="bp-note">{note}</p>}
   <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
 </div>
 <style>
+  /* M-2: el slice de la derecha con el peso de pp__big (mismo cuerpo, peso y color). */
+  .bp :global(.pp__foot-r) { gap: 6px; }
+  .bp :global(.pp__label) { font-family: var(--font-display); font-weight: 500; font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; color: var(--w-ink); }
+  .bp :global(.pp__value) { font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--w-ink); }
+  @media (--lt-md) { .bp :global(.pp__label) { font-size: 24px; } }
   .bp-foot {
     max-width: var(--w-rail-max); margin: 24px auto 0; display: flex; flex-wrap: wrap; align-items: center;
     justify-content: space-between; gap: 8px 32px;

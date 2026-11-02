@@ -1,0 +1,34 @@
+---
+// Sector · 04 "Trabajo real" (§4.19-7). Contratistas / contractors: FichaProyecto grande de
+// Julio's Landscape TX (JLS, el oficio de Houston más cercano: aquí sí su web real, es
+// prueba, E-32). Bienes raíces / restaurants: TarjetasCaso con proof.items (de 2 en 2: con
+// un número impar la última quedaría huérfana). La cabecera dice con honestidad que aún no
+// hay un caso del sector (como la FAQ verbatim).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import FichaProyecto from '../../FichaProyecto.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props {
+  copy: SectorCopy['proyectos']; n: number; items: ProjectItem[];
+  /** Nombre del proyecto de la ficha grande; sin él, tarjetas de caso. */
+  lead?: string;
+  lang?: 'es' | 'en';
+}
+const { copy, n, items, lead, lang = 'es' } = Astro.props;
+const main = lead ? items.find((p) => p.name === lead) : undefined;
+const cards = items.length % 2 ? items.slice(0, -1) : items;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ss-gap">
+  {main ? (
+    <FichaProyecto project={main} variant="grande" lang={lang} as="h3" />
+  ) : (
+    <TarjetasCaso items={cards} label={copy.more} lang={lang} as="h3" />
+  )}
+</div>
+<style>
+  .ss-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ss-gap { margin-top: 48px; } }
+</style>

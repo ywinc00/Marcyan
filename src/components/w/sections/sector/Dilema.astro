@@ -1,0 +1,29 @@
+---
+// Sector · 01 "El problema" (§4.19-2): CabeceraNumerada solo de etiqueta + DilemaDosCaminos
+// (W-ADV-03 + W-ADV-04, disparo único) con las dos malas opciones del oficio y la casilla
+// "?" que pasa al icono-objeto de diseño web (la respuesta es tu sitio; página oro, un
+// acento por bloque). Las cajas de evidencia son de ejemplo y van rotuladas.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import DilemaDosCaminos from '../../DilemaDosCaminos.astro';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props { copy: SectorCopy['dilema']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ss-gap">
+  <DilemaDosCaminos
+    titleHtml={copy.title}
+    lead={copy.lead}
+    left={copy.left}
+    right={copy.right}
+    bridge={copy.bridge}
+    answerId="diseno-web"
+    tone="gold"
+    lang={lang}
+  />
+</div>
+<style>
+  .ss-gap { margin-top: 48px; }
+  @media (--lt-md) { .ss-gap { margin-top: 32px; } }
+</style>

@@ -1,0 +1,90 @@
+---
+// Bento 2×2 con celda y mini-UI (W-CORE-08 + B-03 · design/rediseno-workos.md §3.5).
+// Celdas de 600 separadas por líneas de 1 px (la línea es el hueco: la cruz se ve),
+// padding 48: etiqueta (icono 16 + nombre 16), título 24/500, texto 16/26 en 503,
+// ~90 px de aire y la mini-UI en bandeja radio 20 (token 22) padding 14,5
+// (slot `ui-<n>`, n desde 1). Estático. Móvil: 1 columna.
+// `wideLast`: la última celda ocupa las dos columnas (Servicios usa 7 celdas).
+import Icon from '../ui/Icon.astro';
+
+interface Cell {
+  id?: string;
+  /** Icono Lucide funcional (16 px). */
+  icon: string;
+  label: string;
+  titleHtml: string;
+  text: string;
+  /** false si la mini-UI ya trae su propia bandeja (p. ej. RespuestaAsistente). */
+  tray?: boolean;
+}
+interface Props {
+  cells: Cell[];
+  wideLast?: boolean;
+  tone?: 'gold' | 'teal';
+  /** Nivel del título de cada celda (por defecto h3). */
+  headingLevel?: 'h3' | 'h4';
+  id?: string;
+  class?: string;
+}
+const { cells, wideLast = false, tone = 'gold', headingLevel = 'h3', id, class: cls } = Astro.props;
+const H = headingLevel;
+const uis = await Promise.all(
+  cells.map(async (_, i) => (Astro.slots.has(`ui-${i + 1}`) ? await Astro.slots.render(`ui-${i + 1}`) : '')),
+);
+---
+<div class:list={['wd-bento', cls]} id={id} data-w-tone={tone}>
+  {cells.map((c, i) => (
+    <article
+      class:list={['wd-bento__cell', wideLast && i === cells.length - 1 && 'wd-bento__cell--wide']}
+      id={c.id}
+    >
+      <p class="wd-bento__lab"><Icon name={c.icon} class="wd-bento__ic" />{c.label}</p>
+      <H class="wd-bento__t" set:html={c.titleHtml} />
+      <p class="wd-bento__x">{c.text}</p>
+      {uis[i] && <div class="wd-bento__ui"><div class:list={['wd-bento__tray', c.tray === false && 'wd-bento__tray--bare']} set:html={uis[i]} /></div>}
+    </article>
+  ))}
+</div>
+
+<style>
+  .wd-bento {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    gap: 1px; padding: 1px; background: var(--w-line);
+    max-width: var(--w-rail-max); margin-inline: auto;
+  }
+  .wd-bento__cell {
+    display: flex; flex-direction: column; min-width: 0;
+    background: var(--w-s0); padding: 32px 20px 24px;
+  }
+  .wd-bento__lab {
+    margin: 0; display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-body); font-weight: 400; font-size: 16px; line-height: 1.4; color: var(--w-ink-70);
+  }
+  .wd-bento__ic { width: 16px; height: 16px; color: var(--wd-acc); flex: none; }
+  .wd-bento__t {
+    margin: 16px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  .wd-bento__x {
+    margin: 12px 0 0; max-width: 503px;
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
+  }
+  .wd-bento__ui {
+    margin-top: 40px; flex: 1; display: grid; align-items: end; min-width: 0;
+  }
+  .wd-bento__tray {
+    justify-self: center; width: 100%; max-width: 440px; min-width: 0;
+    padding: 14.5px; border-radius: var(--w-r-tray);
+    background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-bento__tray--bare { padding: 0; background: none; border: 0; box-shadow: none; }
+  .wd-bento__tray > :global(*) { min-width: 0; }
+  @media (--md) {
+    .wd-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .wd-bento__cell { padding: 48px; }
+    .wd-bento__cell--wide { grid-column: 1 / -1; }
+    .wd-bento__t { font-size: var(--w-h3); }
+    .wd-bento__ui { margin-top: 88px; }
+  }
+</style>

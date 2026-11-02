@@ -1,0 +1,21 @@
+---
+// Sector · 02 "Cómo funciona" (§4.19-3), capítulo de CONTRASTE de la página (.w-contrast lo
+// pone la celda): CabeceraNumerada con H2 a dos tonos + bajada, y el CicloEnU (W-PROOF-11)
+// con los 4 pasos del oficio (llamada perdida → Marcy contesta → contacto guardado y aviso
+// → presupuesto agendado; en inmobiliaria y restaurante, su equivalente). Estático: la
+// firma de la página no está aquí (ninguna en bucle, §4.19).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import CicloEnU from '../../CicloEnU.astro';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props { copy: SectorCopy['ciclo']; n: number }
+const { copy, n } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ss-gap">
+  <CicloEnU title={copy.uTitle} sub={copy.uSub} nodes={copy.nodes} tone="gold" />
+</div>
+<style>
+  .ss-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ss-gap { margin-top: 40px; } }
+</style>

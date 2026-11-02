@@ -1,0 +1,65 @@
+---
+// Hero de las landings de sector (design/rediseno-workos.md §4.19, ola 2).
+// A-05 + W-CORE-16: hero PARTIDO. Izquierda HeroTexto alineado a la izquierda (columna
+// de 560: chip de ciudad, eyebrow del sector, H1 verbatim sin cola, bajada, botón +
+// "Ver precios ›"); derecha TarjetaObjeto con la SolicitudOficio del oficio (lo que le
+// llega al negocio desde su web, rotulado Ejemplo / Example). Coreografía §2.9: la
+// tarjeta entra como objeto y su capa sale de detrás (data-w-in de los componentes).
+// Móvil: texto arriba, objeto debajo y visible (W-CORE-41, E-18).
+import HeroTexto from '../HeroTexto.astro';
+import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
+import SolicitudOficio from '../objetos/SolicitudOficio.astro';
+import IconoObjeto from '../IconoObjeto.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  obj: 'contratista' | 'inmobiliaria' | 'restaurante';
+  sr: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Astro.props;
+---
+<section class="w-hero hs">
+  <div class="w-container hs__grid">
+    <HeroTexto
+      eyebrow={eyebrow}
+      tone="gold"
+      chip={chip}
+      h1Html={h1Html}
+      lead={lead}
+      primary={primary}
+      link={link}
+      align="left"
+      class="hs__text"
+    >
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+    <div class="hs__obj">
+      <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example>
+        <IconoObjeto id="diseno-web" size={56} slot="icon" />
+        <SolicitudOficio kind={obj} lang={lang} example={false} size="hero" />
+      </TarjetaObjeto>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hs { overflow-x: clip; padding-bottom: 96px; }
+  .hs__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
+  .hs__obj { display: flex; justify-content: center; }
+  @media (--lg) {
+    /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */
+    .hs__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 480px; }
+    .hs__obj { justify-content: flex-end; padding: 25px 0 0 25px; }
+  }
+  @media (--lt-md) {
+    .hs { padding-bottom: 64px; }
+    .hs__grid { gap: 48px; }
+  }
+</style>

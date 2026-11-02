@@ -41,8 +41,8 @@ const vivo = diagCopy[lang].vivo;
   .scan__steps li { opacity: 0; transform: translateY(4px);
                     transition: opacity .4s var(--ease-out-expo), transform .4s var(--ease-out-expo), color .4s; }
   .scan__steps li.is-on   { opacity: 1; transform: none; color: var(--fg-secondary); }
-  .scan__steps li.is-done { opacity: 1; transform: none; color: var(--accent-teal); }
-  .scan__steps li.is-done::before { content: '✓ '; }
+  .scan__steps li.is-done { opacity: 1; transform: none; color: var(--fg-secondary); }
+  .scan__steps li.is-done::before { content: '✓ '; color: var(--accent-gold); }
   .scan__steps li.is-on::before   { content: '▸ '; color: var(--accent-gold); }
   @keyframes scanSpin  { to { transform: rotate(360deg); } }
   @keyframes scanPulse { 0%,100% { opacity: .5; } 50% { opacity: 1; } }

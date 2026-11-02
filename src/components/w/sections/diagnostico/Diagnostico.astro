@@ -10,13 +10,17 @@
 // El escáner se para mientras el visitante escribe (E-42): :focus-within del
 // formulario pausa la barra por CSS, sin tocar loop.ts.
 // El wizard NO lleva data-w-in ni data-w-reveal (§2.9): nace visible.
-// Secciones: 01 Lo que verás (resultado de ejemplo) · Gratis de verdad · FAQ (la del
-// wizard, única FAQPage, con la piel v3). Sin Contact: hoy no existe en esta página y
-// el trío vive en el cierre del estado de éxito del propio wizard.
+// Mientras el panel enseña el escaneo, el resultado o el éxito (lo REAL del visitante),
+// el escáner "Ejemplo" se queda quieto a media altura y sin botón de pausa: nunca dos
+// "revisando" a la vez ni un ejemplo en bucle junto al resultado real (E-42/E-43).
+// Secciones: 01 Lo que verás (resultado de ejemplo con la forma del real) · 02 Gratis de
+// verdad · FAQ (la del wizard, única FAQPage, con la piel v3) + enlace de vuelta al
+// formulario. Sin Contact: el trío vive en el cierre del éxito del propio wizard.
 import Layout from '../../../../layouts/Layout.astro';
 import SiteNav from '../../../layout/SiteNav.astro';
 import SiteFooter from '../../../layout/SiteFooter.astro';
 import Breadcrumb from '../../../ui/Breadcrumb.astro';
+import Button from '../../../ui/Button.astro';
 import Icon from '../../../ui/Icon.astro';
 import SpaceBackdrop from '../../../SpaceBackdrop.astro';
 import ServiceLd from '../../../seo/ServiceLd.astro';
@@ -24,6 +28,7 @@ import DiagnosticWizard from '../../../growthos/DiagnosticWizard.astro';
 import WStyles from '../../WStyles.astro';
 import Escaner from '../../objetos/Escaner.astro';
 import GratisDeVerdad from '../../GratisDeVerdad.astro';
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
 import ResultadoEjemplo from './ResultadoEjemplo.astro';
 import { content } from '../../../../i18n/content';
@@ -83,7 +88,9 @@ const home = lang === 'en' ? '/en' : '/es';
 
     <section class="w-cell" id="gratis">
       <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={2} label={w.gratis.label} titleHtml={w.gratis.heading} lead={w.gratis.lead} />
         <GratisDeVerdad
+          class="dg__free"
           items={w.gratis.items}
           title={w.gratis.title}
           checks={w.gratis.checks}
@@ -95,6 +102,7 @@ const home = lang === 'en' ? '/en' : '/es';
     <div class="w-cell">
       <div class="w-container" data-w-reveal>
         <PreguntasFrecuentes id="faq" titleHtml={t.faqTitle} items={GOS[lang].faq.map((f) => ({ q: f.q, a: f.a }))} lang={lang} />
+        <p class="dg__again"><Button variant="link" href="#diagnostico-form">{w.gratis.cta}</Button></p>
       </div>
     </div>
   </main>
@@ -124,10 +132,26 @@ const home = lang === 'en' ? '/en' : '/es';
     .dgh__split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; }
     /* El escáner acompaña al formulario mientras el resultado (largo) baja. */
     .dgh__side { position: sticky; top: calc(var(--nav-h) + 24px); }
+    /* Partido 600/600 alineado: la tarjeta del formulario y la del escaneo miden al menos
+       lo que el escáner (480), con la acción abajo; los pasos más largos crecen. */
+    .dgh__form :global(.dgw__panel[data-view="form"]) { min-height: 480px; display: flex; flex-direction: column; }
+    .dgh__form :global(.dgw__form) { flex: 1; display: flex; flex-direction: column; }
+    .dgh__form :global(.dgw__nav) { margin-top: auto; padding-top: 24px; }
+    .dgh__form :global(.dgw__panel[data-view="scan"]) { min-height: 480px; }
   }
 
   /* E-42: la barra del escáner se para mientras el visitante rellena el formulario. */
   .dgh__split[data-typing] :global(.wo-scan.is-run.is-playing .wo-scan__bar) { animation-play-state: paused; }
+  /* E-42/E-43: con el escaneo, el resultado o el éxito reales a la vista, el escáner de
+     ejemplo se queda quieto a media altura (sin animación = transform base del objeto) y
+     su botón de pausa, que ya no pausaría nada, no se pinta (loop.ts lo pinta con estilo
+     en línea: solo !important lo vence sin tocar loop.ts). */
+  .dgh__split:has(.dgw__panel:is([data-view="scan"], [data-view="result"], [data-view="success"]):not([hidden])) :global(.wo-scan .wo-scan__bar) { animation: none; }
+  .dgh__split:has(.dgw__panel:is([data-view="scan"], [data-view="result"], [data-view="success"]):not([hidden])) :global(.w-loop-pause) { display: none !important; }
+
+  :global(.dg__free) { margin-top: var(--w-chapter-gap); }
+  /* Vuelta al formulario tras la FAQ, en su misma columna (776, la de PreguntasFrecuentes). */
+  .dg__again { margin: 24px auto 0; max-width: 776px; }
 </style>
 
 <script>

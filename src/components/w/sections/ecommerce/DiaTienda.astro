@@ -12,9 +12,16 @@ const { copy, lang = 'es' } = Astro.props;
 ---
 <CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
 <div class="ws-gap">
-  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="static" lang={lang} />
+  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="static" lang={lang} class="ws-dia" />
 </div>
 <style>
   .ws-gap { margin-top: var(--w-chapter-gap); }
   @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  /* La tarjeta se ajusta a sus 5 filas: el min-height de 530 es del modo en bucle y en
+     estático dejaba ~140 px de losa vacía arriba y abajo (rev1, importante 2). Pendiente
+     [SISTEMA] de llevarlo a RegistroVivo para todo variant="static". */
+  @media (--md) {
+    .ws-gap :global(.wd-log.ws-dia) { min-height: 0; }
+    .ws-gap :global(.ws-dia .wd-log__win) { min-height: 0; padding-block: 48px; }
+  }
 </style>

@@ -56,7 +56,7 @@ const SR: Record<MiniKind, string> = {
           </div>
           <div class="wt__prod">
             <span class="wt__img wt__img--b"><Icon name="lucide:coffee" /></span>
-            <b>Café de olla, 1 kg</b><span class="wt__price">{money(12)}</span>
+            <b>Café de olla, 1&nbsp;kg</b><span class="wt__price">{money(12)}</span>
             <span class="wt__btn wt__btn--ink"><Icon name="lucide:check" />Añadido</span>
           </div>
         </div>
@@ -68,7 +68,7 @@ const SR: Record<MiniKind, string> = {
         <p class="wt__t">Tu pedido</p>
         <dl class="wt__sum">
           <div><dt>Vela aromática</dt><dd>{money(18)}</dd></div>
-          <div><dt>Café de olla, 1 kg</dt><dd>{money(12)}</dd></div>
+          <div><dt>Café de olla, 1&nbsp;kg</dt><dd>{money(12)}</dd></div>
           <div class="wt__sum-tax"><dt>Impuesto de {tax.state} ({tax.total})</dt><dd>{money(TAX)}</dd></div>
           <div class="wt__sum-total"><dt>Total</dt><dd>{money(TOTAL)}</dd></div>
         </dl>
@@ -84,7 +84,7 @@ const SR: Record<MiniKind, string> = {
           <div><dt>Pedido</dt><dd class="wt__mono">#1042</dd></div>
           <div><dt>Cliente</dt><dd>Ana R.</dd></div>
           <div><dt>Estado</dt><dd><span class="wt__chip wt__chip--paid"><i></i>Pagado</span></dd></div>
-          <div><dt>{miami ? 'Envío' : 'Entrega'}</dt><dd><span class="wt__chip">{miami ? 'Otro estado' : 'Recogida'}</span></dd></div>
+          <div><dt>{miami ? 'Envío' : 'Entrega'}</dt><dd><span class="wt__chip">{miami ? 'A otro estado' : 'Recogida'}</span></dd></div>
         </dl>
       </>
     )}

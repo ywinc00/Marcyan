@@ -74,7 +74,7 @@ const mensajeria: TileCopy[] = [
   { icon: 'lucide:bell', name: 'Pedido nuevo', sub: 'Aviso para ti' },
   { icon: 'lucide:message-circle', name: 'WhatsApp', sub: 'Botón en tu tienda' },
   { icon: 'lucide:languages', name: 'En su idioma', sub: 'Español o inglés' },
-  { icon: 'lucide:bot', name: 'Marcy', sub: 'Contesta dudas, aparte' },
+  { icon: 'lucide:bot', name: 'Marcy', sub: 'Servicio aparte' },
 ];
 
 const franja: ShopCopy['franja'] = {
@@ -134,7 +134,7 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
           { icon: 'lucide:wallet', name: 'Stripe', sub: 'Pasarela de pago' },
           { icon: 'lucide:wallet', name: 'PayPal', sub: 'Pago con su cuenta' },
           { icon: 'lucide:lock', name: 'Pago seguro', sub: 'Conexión cifrada' },
-          { icon: 'lucide:receipt', name: 'Impuesto', sub: '8.25 % en Houston' },
+          { icon: 'lucide:tag', name: 'Cupones', sub: 'Para tus ofertas' },
         ] },
         { id: 'entregas', label: 'Entregas', tiles: [
           { icon: 'lucide:truck', name: 'Entrega local', sub: 'Por zonas de Houston' },
@@ -147,17 +147,17 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       ],
       more: 'A medida',
       moreSub: 'Lo que necesites',
-      sr: 'Ejemplo: tu tienda conectada con pagos (tarjeta, Stripe, PayPal), entregas (entrega local, zonas, recogida, paquetería) y mensajería (confirmación al cliente, aviso de pedido nuevo, botón de WhatsApp).',
+      sr: 'Ejemplo: tu tienda conectada con pagos (tarjeta, Stripe, PayPal, cupones), entregas (entrega local, zonas, recogida, paquetería) y mensajería (confirmación al cliente, aviso de pedido nuevo, botón de WhatsApp).',
     },
     dia: {
       tone1: 'Abrir la tienda es el principio.',
       tone2: 'Lo que cuenta es cada día.',
       sub: 'Así se ve un día normal con tu tienda funcionando: pedidos, cobros y entregas en orden.',
       title: 'El día de tu tienda',
-      text: 'Los pedidos entran pagados, el impuesto se cobra solo y tu cliente sabe cuándo recibe. Tú preparas y entregas.',
+      text: 'Los pedidos entran pagados, el inventario se descuenta solo y tu cliente sabe cuándo recibe. Tú preparas y entregas.',
       rows: [
         { icon: 'lucide:mail', label: 'Confirmación a Luis M.', chip: 'Enviada', tone: 'pass' },
-        { icon: 'lucide:receipt', label: 'Impuesto de Texas, 8.25 %', chip: 'Cobrado', tone: 'pass' },
+        { icon: 'lucide:package', label: 'Inventario de velas', chip: 'Al día', tone: 'pass' },
         { icon: 'lucide:shopping-bag', label: 'Pedido de Ana R.', chip: 'Pagado', tone: 'ok' },
         { icon: 'lucide:truck', label: 'Entrega local en tu zona', chip: 'Preparada', tone: 'pass' },
         { icon: 'lucide:store', label: 'Recogida en tu negocio', chip: 'Lista', tone: 'pass' },
@@ -186,7 +186,7 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       diag: { title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.' },
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
     },
-    cierre: { proof: 'Rosy Nails & Care ya recibe reservas en la app a medida que le construimos.', ...warm },
+    cierre: { proof: 'Elegimos contigo la plataforma y te guiamos con la cuenta de pagos, paso a paso.', ...warm },
   },
   miami: {
     chip: 'Miami, FL',
@@ -218,7 +218,7 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
           { icon: 'lucide:wallet', name: 'Stripe', sub: 'Pasarela de pago' },
           { icon: 'lucide:wallet', name: 'PayPal', sub: 'Pago con su cuenta' },
           { icon: 'lucide:globe', name: 'Tarjetas de fuera', sub: 'También de Latinoamérica' },
-          { icon: 'lucide:receipt', name: 'Impuesto', sub: '7 % en Miami' },
+          { icon: 'lucide:tag', name: 'Cupones', sub: 'Para tus ofertas' },
         ] },
         { id: 'envios', label: 'Envíos', tiles: [
           { icon: 'lucide:truck', name: 'Miami', sub: 'Entrega en la ciudad' },
@@ -231,17 +231,17 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       ],
       more: 'A medida',
       moreSub: 'Lo que necesites',
-      sr: 'Ejemplo: tu tienda conectada con pagos (tarjeta, Stripe, PayPal, tarjetas de fuera), envíos (Miami, otros estados, Latinoamérica) y mensajería (confirmación al cliente, aviso de pedido nuevo, botón de WhatsApp).',
+      sr: 'Ejemplo: tu tienda conectada con pagos (tarjeta, Stripe, PayPal, tarjetas de fuera, cupones), envíos (Miami, otros estados, Latinoamérica) y mensajería (confirmación al cliente, aviso de pedido nuevo, botón de WhatsApp).',
     },
     dia: {
       tone1: 'Abrir la tienda es el principio.',
       tone2: 'Lo que cuenta es cada día.',
       sub: 'Así se ve un día normal con tu tienda funcionando: pedidos, cobros y envíos en orden.',
       title: 'El día de tu tienda',
-      text: 'Los pedidos entran pagados, el impuesto se cobra solo y tu cliente sabe cuándo recibe, aquí o fuera. Tú preparas y envías.',
+      text: 'Los pedidos entran pagados, el inventario se descuenta solo y tu cliente sabe cuándo recibe, aquí o fuera. Tú preparas y envías.',
       rows: [
         { icon: 'lucide:mail', label: 'Confirmación a Luis M.', chip: 'Enviada', tone: 'pass' },
-        { icon: 'lucide:receipt', label: 'Impuesto de Florida, 7 %', chip: 'Cobrado', tone: 'pass' },
+        { icon: 'lucide:package', label: 'Inventario de velas', chip: 'Al día', tone: 'pass' },
         { icon: 'lucide:shopping-bag', label: 'Pedido de Ana R.', chip: 'Pagado', tone: 'ok' },
         { icon: 'lucide:truck', label: 'Envío dentro de Miami', chip: 'Preparado', tone: 'pass' },
         { icon: 'lucide:globe', label: 'Envío a Latinoamérica', chip: 'En camino', tone: 'pass' },
@@ -270,6 +270,6 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       diag: { title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.' },
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
     },
-    cierre: { proof: 'Rosy Nails & Care, en Houston, ya recibe reservas en la app a medida que le construimos.', ...warm },
+    cierre: { proof: 'Elegimos contigo la plataforma y te guiamos con la cuenta de pagos, paso a paso.', ...warm },
   },
 };

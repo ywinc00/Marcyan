@@ -17,7 +17,7 @@ const custom = shop.tiers.find((t) => t.key === 'ecommerce')!;
 const usd = (v: number) => `$${v.toLocaleString('en-US')}`;
 const tail = city === 'miami'
   ? 'Si vendes fuera de Estados Unidos, usas suscripciones o quieres mudar tu tienda actual, te lo cotizamos aparte y por escrito.'
-  : 'El precio final depende del número de productos, las funciones y si hay que mudar una tienda que ya tienes. Siempre por escrito.';
+  : 'Incluye SEO base y queda lista para el celular y para la IA. El precio final depende del número de productos, las funciones y si hay que mudar una tienda que ya tienes. Siempre por escrito.';
 const note = `${essential.name} desde ${usd(PRICE_ANCHORS.ecommerceEssential)}; ${custom.name.toLowerCase()}, desde ${usd(PRICE_ANCHORS.ecommerce)}. ${tail}`;
 ---
 <PrecioPuntos

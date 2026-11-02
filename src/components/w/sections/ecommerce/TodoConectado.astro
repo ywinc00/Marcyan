@@ -134,14 +134,14 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
   .tc__win > :global(.w-example) { top: 12px; right: 14px; }
 
   .tc__body { position: relative; padding: 32px 16px 28px; }
-  /* Control segmentado (W-ADV-38: 577×40, radio 12, padding 4). */
+  /* Control segmentado (W-ADV-38, radio 12, padding 4); pestañas de 44 de alto (§6.8). */
   .tc__tabs {
     display: flex; gap: 4px; width: max-content; max-width: 100%; margin: 0 auto 32px;
     padding: 4px; border-radius: 12px; background: rgba(var(--star-rgb), .05); border: 1px solid var(--w-line);
     overflow-x: auto; scrollbar-width: none;
   }
   .tc__tab {
-    flex: none; min-height: 40px; padding: 0 18px; border: 0; border-radius: 9px; background: transparent; cursor: pointer;
+    flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 9px; background: transparent; cursor: pointer;
     font: 500 15px/1 var(--font-body); color: var(--w-ink-70); -webkit-tap-highlight-color: transparent;
     transition: color var(--w-dur-micro) var(--w-ease-ui), background-color var(--w-dur-micro) var(--w-ease-ui);
   }
@@ -172,7 +172,9 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
   .tc__tx { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
   .tc__tx b { font: 500 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
   .tc__tx span { font-size: 13px; color: var(--w-p-ink-2); }
-  .tc__tile--more { background: transparent; color: var(--w-ink); border: 1px dashed rgba(var(--star-rgb), .28); }
+  /* Fondo opaco de la ventana: el hilo de la fila pasa por DETRÁS de la casilla punteada
+     y no tacha su texto (E-37; en W-ADV-38 las líneas mueren en el borde de las casillas). */
+  .tc__tile--more { background: var(--w-s2); color: var(--w-ink); border: 1px dashed rgba(var(--star-rgb), .28); }
   .tc__tile--more .tc__ic { background: transparent; border-color: var(--w-line-strong); color: var(--w-accent); }
   .tc__tile--more .tc__tx span { color: var(--w-ink-70); }
   .tc__more { margin: 28px 0 0; text-align: center; }

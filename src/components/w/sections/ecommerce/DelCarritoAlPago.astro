@@ -21,9 +21,11 @@ const { copy, tax, n, city, lang = 'es' } = Astro.props;
 </div>
 <style>
   .ws-gap { margin-top: 12px; }
-  /* Las tres zonas de objeto con el mismo alto (la del pago, la más alta) y los objetos
-     arriba: los títulos de los pasos quedan en la misma línea, como en W-ADV-37. */
+  /* Las tres tarjetas comparten filas (subgrid): la zona de objeto mide lo que la más
+     alta (la del pago) y los títulos de los pasos quedan en la misma línea (W-ADV-37). */
   @media (--lg) {
-    .ws-gap :global(.wd-bp__obj) { min-height: 300px; place-items: start center; }
+    .ws-gap :global(.wd-bp__tray) { grid-template-rows: auto auto auto; row-gap: 0; }
+    .ws-gap :global(.wd-bp__card) { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
+    .ws-gap :global(.wd-bp__obj) { place-items: start center; }
   }
 </style>

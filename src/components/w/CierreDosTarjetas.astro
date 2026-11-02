@@ -119,6 +119,20 @@ const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
             mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
   }
+  /* Móvil (control 2, E-37): la tarjeta es baja y el tercio con franjas caía justo debajo de
+     "Propuesta gratis" y "WhatsApp". Aquí las franjas son una banda en el hueco entre el texto y
+     los enlaces, que quedan sobre la superficie lisa. */
+  @media (--lt-md) {
+    .w-close__card--big { gap: 88px; }
+    .w-close__card--big::before { content: none; }
+    .w-close__card--big .w-close__acts { position: relative; }
+    .w-close__card--big .w-close__acts::before {
+      content: ''; position: absolute; left: -24px; right: -24px; bottom: calc(100% + 14px); height: 60px;
+      z-index: -1; pointer-events: none; background: var(--w-stripes);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%, #000 60%, transparent);
+              mask-image: linear-gradient(to bottom, transparent, #000 45%, #000 60%, transparent);
+    }
+  }
   .w-close__card--warm { background: var(--w-s1); }
 
   .w-close__body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }

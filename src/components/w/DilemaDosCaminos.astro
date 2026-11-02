@@ -91,11 +91,12 @@ const { titleHtml, lead, left, right, answerId, bridge, iconInline = false, tone
 
   @media (--md) {
     .wd-dil__mob { display: none; }
-    .wd-dil__row { grid-template-columns: minmax(0, 425px) 72px minmax(0, 425px); justify-content: space-between; align-items: center; gap: 24px; }
+    .wd-dil__row { grid-template-columns: minmax(0, 425px) 72px minmax(0, 425px); justify-content: space-between; align-items: stretch; gap: 24px; }
+    /* Las dos tarjetas a la misma altura y en la misma línea; solo la casilla se centra. */
     .wd-dil__card { min-height: 232px; }
     .wd-dil__card--r { grid-column: 3; grid-row: 1; }
     .wd-dil__q {
-      grid-column: 2; grid-row: 1; position: relative; display: grid; place-items: center;
+      grid-column: 2; grid-row: 1; align-self: center; position: relative; display: grid; place-items: center;
       width: 72px; height: 72px; border-radius: var(--w-r-obj);
       border: 1px dashed rgba(var(--star-rgb), .35);
       transition: border-color 320ms var(--w-ease-ui);

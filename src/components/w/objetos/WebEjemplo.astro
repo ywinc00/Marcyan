@@ -89,7 +89,7 @@ const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
             ))}
           </ul>
         </div>
-        <p class="wo-web__open wo-sk"><i aria-hidden="true"></i>{open} <span>· {until}</span></p>
+        <p class="wo-web__open wo-sk"><i aria-hidden="true"></i><span>{open} <span class="wo-web__until">· {until}</span></span></p>
       </div>
     </div>
   </div>
@@ -172,9 +172,12 @@ const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
   .wo-web__svc li + li { border-top: 1px solid var(--w-p-line); }
   .wo-web__ic { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--wo-tint); color: var(--wo-k); }
   .wo-web__ic :global(svg) { width: 14px; height: 14px; }
-  .wo-web__open { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
-  .wo-web__open i { width: 8px; height: 8px; border-radius: 50%; background: var(--wo-k); flex: none; }
-  .wo-web__open span { color: var(--wo-ink2); font-weight: 400; }
+  /* El texto va en UN solo hijo del flex: con "Abierto ahora" y la hora como hijos sueltos, en la
+     pantalla de móvil se partían en dos columnas (control 2). Así envuelve como una frase. */
+  .wo-web__open { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .wo-web__open i { width: 8px; height: 8px; border-radius: 50%; background: var(--wo-k); flex: none; align-self: center; }
+  .wo-web__open > span { min-width: 0; }
+  .wo-web__until { color: var(--wo-ink2); font-weight: 400; white-space: nowrap; }
   .wo-web--pantalla .wo-web__lang, .wo-web--movil .wo-web__lang { display: inline-flex; }
   .wo-web--movil .wo-web__head, .wo-web--pantalla .wo-web__head { padding-right: 0; }
   .wo-web--pantalla .wo-web__head { padding-right: 84px; }

@@ -127,13 +127,27 @@ const data = JSON.stringify(tabs.map((t) => t.script));
             {channels.map((c, i) => <li class:list={[i === 0 && 'is-on']}>{c}</li>)}
           </ul>
         )}
-        <div class="wo-chat__msgs" data-wo-msgs>
-          {first.script.map((m) => (
-            <div class={`wo-chat__msg wo-chat__msg--${m.from}`}>
-              <p>{m.text}</p>
-              {m.time && <span class="wo-chat__time">{m.time}</span>}
+        <div class="wo-chat__stage">
+          {/* Medidores invisibles: cada guion completo ocupa la misma celda, así el alto de la
+              ventana es el del guion más largo a ese ancho y la última burbuja nunca se corta (E-18). */}
+          {(live ? tabs : [first]).map((t) => (
+            <div class="wo-chat__msgs wo-chat__ghost">
+              {t.script.map((m) => (
+                <div class={`wo-chat__msg wo-chat__msg--${m.from}`}>
+                  <p>{m.text}</p>
+                  {m.time && <span class="wo-chat__time">{m.time}</span>}
+                </div>
+              ))}
             </div>
           ))}
+          <div class="wo-chat__msgs" data-wo-msgs>
+            {first.script.map((m) => (
+              <div class={`wo-chat__msg wo-chat__msg--${m.from}`}>
+                <p>{m.text}</p>
+                {m.time && <span class="wo-chat__time">{m.time}</span>}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -275,12 +289,15 @@ const data = JSON.stringify(tabs.map((t) => t.script));
   .wo-chat__side li { padding: 7px 10px; border-radius: 6px; font-size: 13px; color: #4a4743; }
   .wo-chat__side li::before { content: '# '; color: #8a857e; }
   .wo-chat__side li.is-on { background: #fff; color: var(--w-p-ink, #0e0e0d); font-weight: 500; }
+  /* El alto sale del guion más largo (medidores invisibles en la misma celda), no de un número fijo. */
+  .wo-chat__stage { flex: 1; min-width: 0; display: grid; }
   .wo-chat__msgs {
-    flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;
-    padding: 16px; height: 318px; overflow: hidden;
+    grid-area: 1 / 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;
+    padding: 16px; min-height: 318px; overflow: hidden;
   }
-  .wo-chat--compacto .wo-chat__msgs, .wo-chat--estatico .wo-chat__msgs { height: 300px; }
-  .wo-chat--mini .wo-chat__msgs { height: auto; max-height: 260px; padding: 12px; }
+  .wo-chat__ghost { visibility: hidden; }
+  .wo-chat--compacto .wo-chat__msgs, .wo-chat--estatico .wo-chat__msgs { min-height: 300px; }
+  .wo-chat--mini .wo-chat__msgs { min-height: 0; padding: 12px; }
   .wo-chat :global(.wo-chat__msg) { max-width: 82%; display: flex; flex-direction: column; gap: 3px; }
   .wo-chat :global(.wo-chat__msg) :global(p) {
     margin: 0; padding: 9px 12px; border-radius: 12px; font-size: 14px; line-height: 1.45;
@@ -306,7 +323,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
   @keyframes wo-chat-shine { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
   @media (--lt-md) {
     .wo-chat__side { display: none; }
-    .wo-chat__msgs { height: 340px; padding: 12px; }
+    .wo-chat .wo-chat__msgs { min-height: 0; padding: 12px; }
     .wo-chat :global(.wo-chat__msg) { max-width: 90%; }
   }
   @media (--motion-reduce) {

@@ -26,8 +26,8 @@ let inner = '';
 if (inline) {
   const sfx = `-${id}-${Math.random().toString(36).slice(2, 8)}`;
   inner = `<defs>${GLYPH_DEFS}</defs>${glyphMarkup(id)}`
-    .replace(/id="wi-(bg|hl)"/g, `id="wi-$1${sfx}"`)
-    .replace(/url\(#wi-(bg|hl)\)/g, `url(#wi-$1${sfx})`);
+    .replace(/id="wi-(bg|hl|mk|fade)"/g, `id="wi-$1${sfx}"`)
+    .replace(/url\(#wi-(bg|hl|mk|fade)\)/g, `url(#wi-$1${sfx})`);
 }
 ---
 <svg
@@ -53,14 +53,21 @@ if (inline) {
   }
   .wi {
     display: block; flex: none; overflow: visible;
-    --wi-edge-a: 0.45;
+    --wi-edge-a: 0.45; --wi-edge-hover: 0.8;
+    --wi-sw: 2; --wi-tint: 0.1; --wi-bw: 1;
     transition: --wi-edge-a var(--w-dur-hover, 200ms) var(--w-ease-ui, ease);
   }
+  /* Oficio por tamaño (control 2, E-27): lo que a 80 px es relieve, a 40-48 px desaparece.
+     Pequeño = trazo ~2 px reales, contorno más presente y el acento como relleno de la base. */
+  .wi[width='40'], .wi[width='44'], .wi[width='48'] {
+    --wi-sw: 2.9; --wi-tint: 0.26; --wi-edge-a: 0.72; --wi-edge-hover: 1; --wi-bw: 1.4;
+  }
+  .wi[width='52'], .wi[width='56'] { --wi-sw: 2.5; --wi-tint: 0.2; --wi-edge-a: 0.6; --wi-edge-hover: 0.9; --wi-bw: 1.2; }
   .wi--glow { filter: drop-shadow(0 0 10px rgba(200, 169, 110, 0.18)); }
   /* Hover solo dentro de tarjetas enlazadas y con puntero fino. */
   @media (--hover-fine) {
-    :global(a:hover) .wi { --wi-edge-a: 0.8; }
+    :global(a:hover) .wi { --wi-edge-a: var(--wi-edge-hover); }
   }
-  :global(a:focus-visible) .wi { --wi-edge-a: 0.8; }
+  :global(a:focus-visible) .wi { --wi-edge-a: var(--wi-edge-hover); }
   @media (--motion-reduce) { .wi { transition: none; } }
 </style>

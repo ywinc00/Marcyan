@@ -105,6 +105,9 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
       if (last) { later(() => set('is-ch'), 2100); return; }
       later(() => set('is-doors-b', 'is-exit', 'is-ch'), 2900);
       later(() => unset('is-doors-b'), 3500);
+      // El veredicto se apaga ANTES de cambiar de caso: si se quitaba en run() a la vez que se
+      // cambiaba el texto, durante su fundido de 320 ms se leía el veredicto del caso siguiente.
+      later(() => unset('is-verdict'), 4100);
       later(() => run(n + 1), 4500);
     };
     // Al terminar los 8 casos se queda en el veredicto; al volver a entrar en vista corre otra vez.

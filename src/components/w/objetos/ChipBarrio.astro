@@ -78,6 +78,8 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 ---
 <div class:list={['wo-hood', `wo-hood--${size}`, cls]} data-wo-hood data-abstract={abstract ? '' : undefined}>
   <p class="sr-only">{T.sr}</p>
+  {/* En la esquina del objeto, donde la placa ya se funde: sobre el chip pisaba sus patillas. */}
+  <Ejemplo lang={lang} on="dark" class="wo-hood__ex" />
   <div class="wo-hood__stage" aria-hidden="true">
     {abstract && <span class="wo-hood__board"></span>}
     <svg class="wo-hood__map" viewBox={vb}>
@@ -109,7 +111,6 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
         <span class="wo-hood__where">{name}</span>
         <span class="wo-hood__call"><Icon name="lucide:phone" />{T.call}</span>
       </div>
-      <Ejemplo lang={lang} on="dark" pos="inline" class="wo-hood__ex" />
     </div>
   </div>
 </div>
@@ -191,7 +192,7 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
   }
   .wo-hood__call :global(svg) { width: 13px; height: 13px; }
   /* Opaca: las pistas pasan por detrás de la etiqueta (E-37). */
-  .wo-hood__chipwrap :global(.wo-hood__ex) { position: absolute; right: 0; bottom: calc(100% + 12px); background: var(--w-s1, #121211); }
+  .wo-hood :global(.wo-hood__ex) { top: 0; right: 0; background: var(--w-s1, #121211); }
   @media (--lt-md) {
     .wo-hood { height: var(--sh); }
     .wo-hood[data-abstract] { --chip: 156px; }

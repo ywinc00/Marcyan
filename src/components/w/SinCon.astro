@@ -25,7 +25,7 @@ interface Props {
   class?: string;
 }
 const { labels, sin, conTitle, initial = 'sin', tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
-const mess: Mess[] = sin.slice(0, 8).map((m) => (typeof m === 'string' ? { text: m } : m));
+const mess: Mess[] = sin.slice(0, 9).map((m) => (typeof m === 'string' ? { text: m } : m));
 const on = initial === 'con';
 const uid = `wd-sc-${id ?? 'x'}`;
 ---
@@ -112,6 +112,8 @@ const uid = `wd-sc-${id ?? 'x'}`;
   .wd-sc__mh b { font-weight: 600; }
   .wd-sc__mh span { opacity: .75; }
   .wd-sc__mt { font-family: var(--font-body); font-size: 14px; line-height: 1.4; }
+  /* Móvil: la pila se queda en 6 piezas para no alargar la sección. */
+  .wd-sc__m--p6, .wd-sc__m--p7, .wd-sc__m--p8 { display: none; }
 
   /* Con */
   .wd-sc__con {
@@ -142,17 +144,23 @@ const uid = `wd-sc-${id ?? 'x'}`;
   .wd-sc__body { min-width: 0; }
 
   @media (--md) {
-    .wd-sc__cloud { position: relative; height: 440px; padding: 0; display: block; }
+    /* El escenario mide lo que la tarjeta "con" (misma celda): el caos ocupa ese alto entero,
+       sin dejar una franja de noche vacía debajo (control 2). */
+    .wd-sc__sin { display: flex; flex-direction: column; }
+    .wd-sc__cloud { position: relative; flex: 1; min-height: 440px; padding: 0; display: block; }
     .wd-sc__m { position: absolute; }
-    /* Posiciones del caos (8 como máximo), repartidas como en W-CORE-25. */
-    .wd-sc__m--p0 { left: 2%;  top: 6%; }
+    /* Posiciones del caos (9 como máximo), repartidas en tres bandas densas como en W-CORE-25;
+       la última se funde por abajo (el caos sigue fuera de cuadro). */
+    .wd-sc__m--p0 { left: 2%;  top: 4%; }
     .wd-sc__m--p1 { left: 33%; top: 0; }
-    .wd-sc__m--p2 { right: 2%; top: 9%; }
-    .wd-sc__m--p3 { left: 18%; top: 35%; }
-    .wd-sc__m--p4 { right: 12%; top: 31%; }
-    .wd-sc__m--p5 { left: 0;  top: 60%; }
-    .wd-sc__m--p6 { left: 34%; top: 62%; }
-    .wd-sc__m--p7 { right: 0; top: 66%; }
+    .wd-sc__m--p2 { right: 2%; top: 6%; }
+    .wd-sc__m--p3 { left: 16%; top: 27%; }
+    .wd-sc__m--p4 { right: 10%; top: 30%; }
+    .wd-sc__m--p5 { left: 0;  top: 52%; }
+    .wd-sc__m--p6 { left: 36%; top: 55%; }
+    .wd-sc__m--p7 { right: 0; top: 58%; }
+    .wd-sc__m--p8 { left: 22%; top: 80%; opacity: .45; }
+    .wd-sc__m--p6, .wd-sc__m--p7, .wd-sc__m--p8 { display: grid; }
     .wd-sc__card { min-height: 440px; padding: 76px 64px 48px; border-radius: var(--w-r-feature); }
     .wd-sc__ct { font-size: 32px; }
   }

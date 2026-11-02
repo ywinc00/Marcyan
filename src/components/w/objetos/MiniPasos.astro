@@ -13,9 +13,12 @@ interface Props {
   lang?: 'es' | 'en';
   size?: 'hero' | 'card' | 'mini';
   example?: boolean;
+  /** Llena el alto que le dé su contenedor (celda de bento junto a un objeto más alto):
+   *  en "correo", la bandeja sigue con más correos en esqueleto que se funden abajo. */
+  fill?: boolean;
   class?: string;
 }
-const { kind, lang = 'es', size = 'card', example = true, class: cls } = Astro.props;
+const { kind, lang = 'es', size = 'card', example = true, fill = false, class: cls } = Astro.props;
 const en = lang === 'en';
 const T = en
   ? { inbox: 'Inbox', subj: 'Your proposal', prev: 'Scope, timeline and a clear price.', time: '10:24 a.m.', pub: 'Published', site: 'Your Business', backup: 'Backup', done: 'Done', check: 'Site check', today: 'Today', updates: 'Updates', upToDate: 'Up to date',
@@ -23,7 +26,7 @@ const T = en
   : { inbox: 'Bandeja de entrada', subj: 'Tu propuesta', prev: 'Alcance, plazos y un precio claro.', time: '10:24', pub: 'Publicada', site: 'Tu Negocio', backup: 'Copia de seguridad', done: 'Hecha', check: 'Revisión del sitio', today: 'Hoy', updates: 'Actualizaciones', upToDate: 'Al día',
       sr: { correo: 'Ejemplo: te llega el correo con tu propuesta.', esqueleto: 'Ejemplo: la web toma forma en esqueleto.', publicada: 'Ejemplo: la web queda publicada.', mantenimiento: 'Ejemplo: la copia de seguridad de la web está hecha.' } };
 ---
-<div class:list={['wo-mini', `wo-mini--${kind}`, `wo-mini--${size}`, cls]}>
+<div class:list={['wo-mini', `wo-mini--${kind}`, `wo-mini--${size}`, fill && 'wo-mini--fill', cls]}>
   <p class="sr-only">{T.sr[kind]}</p>
   <div class="wo-mini__card" aria-hidden="true">
     {example && <Ejemplo lang={lang} on="light" />}
@@ -36,6 +39,9 @@ const T = en
           <span class="wo-mini__mt"><b><span translate="no">Marcyan</span><span class="wo-mini__time">{T.time}</span></b><span class="wo-mini__subj">{T.subj}</span><span>{T.prev}</span></span>
         </div>
         <div class="wo-mini__mail"><span class="wo-mini__av wo-mini__av--sk"></span><span class="wo-mini__mt"><i style="width:60%"></i><i style="width:85%"></i></span></div>
+        {fill && [['48%', '72%'], ['55%', '64%'], ['40%', '78%'], ['52%', '70%']].map(([a, b]) => (
+          <div class="wo-mini__mail wo-mini__mail--more"><span class="wo-mini__av wo-mini__av--sk"></span><span class="wo-mini__mt"><i style={`width:${a}`}></i><i style={`width:${b}`}></i></span></div>
+        ))}
       </>
     )}
 
@@ -82,6 +88,22 @@ const T = en
   .wo-mini__lab { margin: 0; font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); padding-right: 80px; }
   .wo-mini__mail { display: flex; gap: 10px; padding: 10px; border-radius: 8px; }
   .wo-mini__mail.is-on { background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  /* fill: alto del contenedor; los correos de más se recortan y se funden abajo (solo escritorio,
+     donde la celda vecina es más alta; en móvil las celdas van apiladas y no sobra alto). */
+  .wo-mini__mail--more { display: none; }
+  @media (--md) {
+    /* contain:size: los correos de más no empujan la fila; mide lo que le den (mínimo 220). */
+    .wo-mini--fill { height: 100%; min-height: 220px; contain: size; }
+    .wo-mini--fill .wo-mini__card { height: 100%; overflow: hidden; }
+    /* Los correos se funden hacia el claro de la propia tarjeta (no hacia la noche: la tarjeta
+       sigue siendo luz de la sección). */
+    .wo-mini--fill .wo-mini__card::after {
+      content: ''; position: absolute; inset: auto 0 0 0; height: 45%; pointer-events: none;
+      border-radius: 0 0 var(--w-r-obj, 12px) var(--w-r-obj, 12px);
+      background: linear-gradient(180deg, rgba(240,237,232,0), var(--w-p-bg, #f0ede8) 85%);
+    }
+    .wo-mini--fill .wo-mini__mail--more { display: flex; flex: none; }
+  }
   .wo-mini__av { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font: 600 13px/1 var(--font-display); }
   .wo-mini__av--sk { background: #dcd7cf; }
   .wo-mini__mt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }

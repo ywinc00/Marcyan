@@ -23,8 +23,12 @@ const { cols = 1, gap = 14, as: Tag = 'div', opaque = false, class: cls, ...rest
 
 <style>
   .w-bandeja { display: grid; gap: var(--w-tray-gap); grid-template-columns: 1fr; min-width: 0; }
-  /* Móvil: 1 columna; las de 4 quedan en 2 (como las tarjetas hermanas, §3.2). */
-  .w-bandeja[data-cols='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Móvil: 1 columna. Las de 4 pasan a 2 solo desde 480 px: por debajo, cada columna se queda en
+     ~110 px de texto y un nombre de servicio ("IA conversacional", "E-commerce") se partía por la
+     mitad de la palabra. Nunca se parten palabras: a esa anchura, una tarjeta por fila. */
+  @media (--sm) {
+    .w-bandeja[data-cols='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
   /* Mismo peso que la regla de 4 columnas (atributo incluido): si no, la de móvil
      ganaba también en escritorio y cols={4} salía en 2 columnas a 1440. */
   @media (--md) {

@@ -83,6 +83,9 @@ const uis = await Promise.all(
     background: var(--w-tray-bg, var(--w-s1)); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
   }
   .wd-bento__tray--bare { padding: 0; background: none; border: 0; box-shadow: none; }
+  /* Una mini-UI que se declara "fill" ocupa el alto que deja la celda vecina (control 2: la
+     bandeja de entrada dejaba ~150 px vacíos junto al teléfono). */
+  .wd-bento__ui:has(.wo-mini--fill) { flex: 1; align-items: stretch; }
   .wd-bento__tray > :global(*) { min-width: 0; }
   /* Las mini-UI fluidas (pasos, ficha, chat) llenan la bandeja; la web en móvil sigue centrada. */
   .wd-bento__tray > :global(.wo-mini),

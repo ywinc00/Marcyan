@@ -230,7 +230,7 @@ const sizes = [40, 48, 56, 80] as const;
             { icon: 'lucide:message-circle', label: 'Marcy', titleHtml: 'Contesta a las 23:40', text: 'Tu asistente responde cuando tú ya cerraste.', tray: false },
           ]}
         >
-          <MiniPasos slot="ui-1" kind="correo" />
+          <MiniPasos slot="ui-1" kind="correo" fill />
           <WebEjemplo slot="ui-2" frame="movil" kind="salon" size="mini" />
           <FichaMapaEjemplo slot="ui-3" size="card" />
           <ChatMarcy slot="ui-4" mode="estatico" tone="neutral" size="card" />
@@ -257,7 +257,7 @@ const sizes = [40, 48, 56, 80] as const;
 
     <section class="w-cell" id="proyectos">
       <div class="w-container" data-w-reveal>
-        <CabeceraNumerada n={3} label="Proyectos" titleHtml="Webs nuestras, en uso" lead="Negocios reales de Houston con su sitio nuevo." />
+        <CabeceraNumerada n={3} label="Proyectos" titleHtml="Webs nuestras, en uso" lead="Negocios reales de Houston y Florida con su sitio nuevo." />
         <p class="mz-tag mz-gap">FichaProyecto (grande) · W-EVT-15</p>
         <FichaProyecto project={trr} variant="grande" id="m-trr" />
         <p class="mz-tag mz-gap">TarjetasCaso · W-PROOF-13</p>
@@ -288,13 +288,13 @@ const sizes = [40, 48, 56, 80] as const;
           label="Qué incluye"
           cells={[
             { k: 'Diseño', v: 'A medida', note: 'Sin plantillas recicladas.' },
-            { k: 'Páginas', v: 'Según el plan' },
-            { k: 'Idiomas', v: 'Español e inglés' },
-            { k: 'SEO', v: 'Base incluida' },
-            { k: 'Contacto', v: 'Formulario integrado' },
-            { k: 'Listo para', v: 'Móvil y la IA' },
-            { k: 'Propuesta', v: 'En 24 horas' },
-            { k: 'Propiedad', v: 'La web es tuya' },
+            { k: 'Páginas', v: 'Según el plan', note: 'Las que necesita tu negocio.' },
+            { k: 'Idiomas', v: 'Español e inglés', note: 'Cada versión escrita para su público.' },
+            { k: 'SEO', v: 'Base incluida', note: 'Títulos, datos y velocidad desde el inicio.' },
+            { k: 'Contacto', v: 'Formulario integrado', note: 'Llamada y WhatsApp siempre a la vista.' },
+            { k: 'Listo para', v: 'Móvil y la IA', note: 'Se lee bien en el teléfono y en los asistentes.' },
+            { k: 'Propuesta', v: 'En 24 horas', note: 'Clara, por escrito y sin compromiso.' },
+            { k: 'Propiedad', v: 'La web es tuya', note: 'Nunca te dejamos amarrado.' },
           ]}
         />
       </div>
@@ -413,12 +413,14 @@ const sizes = [40, 48, 56, 80] as const;
       </div>
     </section>
 
-    <section class="w-cell mz-tunnel" id="m-seo-ia" data-w-tone="teal">
-      <TunelRejilla />
-      <div class="w-container mz-tunnel__in">
-        <p class="mz-tag mz-tag--c">SEO para IA (§4.17) · TunelRejilla · W-ADV-28</p>
-        <Eyebrow tone="teal">Que la IA te nombre</Eyebrow>
-        <p class="w-h1 w-h1--night mz-mt">Que ChatGPT te recomiende a ti</p>
+    <section class="w-cell" id="m-seo-ia" data-w-tone="teal">
+      <div class="mz-tunnel">
+        <TunelRejilla />
+        <div class="w-container mz-tunnel__in">
+          <p class="mz-tag mz-tag--c">SEO para IA (§4.17) · TunelRejilla · W-ADV-28</p>
+          <Eyebrow tone="teal">Que la IA te nombre</Eyebrow>
+          <p class="w-h1 w-h1--night mz-mt">Que ChatGPT te recomiende a ti</p>
+        </div>
       </div>
       <div class="w-container mz-gap2" data-w-reveal>
         <p class="mz-tag mz-tag--c">RespuestaAsistente · W-CORE-10 (tarjeta y tres columnas)</p>
@@ -531,6 +533,11 @@ const sizes = [40, 48, 56, 80] as const;
             { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '22:15' },
             { text: 'Llamada perdida', kind: 'notice', time: '08:05' },
             { text: '¿Siguen abiertos?', from: 'Web', time: '23:02' },
+            { text: 'Mensaje de voz sin escuchar', kind: 'notice', time: '07:48' },
+            { text: 'Hola, ¿hacen presupuestos a domicilio?', from: 'Facebook', time: '19:12' },
+            { text: '¿Me pueden llamar mañana temprano?', from: 'WhatsApp', time: '22:51' },
+            { text: 'Formulario sin respuesta', kind: 'notice', time: 'Ayer' },
+            { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '09:30' },
           ]}
           conTitle="Todo contestado"
         >
@@ -884,11 +891,12 @@ const sizes = [40, 48, 56, 80] as const;
   @media (max-width: 767px) { .mz-radar { padding: 16px; } }
   .mz-figs { display: grid; grid-template-columns: 1fr; gap: 48px; }
   @media (min-width: 1024px) { .mz-figs { grid-template-columns: 1fr 1fr; } }
-  .mz-tunnel { position: relative; overflow: clip; }
-  .mz-tunnel__in { position: relative; min-height: 520px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .mz-tunnel { position: relative; overflow: clip; margin-top: calc(-1 * var(--w-section-y, 120px)); padding-top: var(--w-section-y, 120px); }
+  .mz-tunnel__in { position: relative; min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .mz-light { display: inline-flex; padding: 12px; border-radius: 12px; background: var(--w-p-bg); }
   .mz-sheet { display: flex; flex-direction: column; gap: 20px; }
   .mz-sheet__row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
   .mz-card { display: flex; flex-direction: column; gap: 45px; padding: 22px; min-height: 182px; text-decoration: none; }
+  @media (--lt-sm) { .mz-card { flex-direction: row; align-items: center; gap: 16px; min-height: 0; padding: 16px 18px; } }
   .mz-p { margin: 8px 0 0; color: var(--fg-secondary); }
 </style>

@@ -16,7 +16,7 @@
         "userCanonical": "https://marcyanstudio.com/en",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -57,7 +57,7 @@
         "userCanonical": "https://marcyanstudio.com/en/about",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -97,8 +97,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/ai-for-small-business",
         "userCanonical": "https://marcyanstudio.com/en/ai-for-small-business",
         "referringUrls": 2,
-        "enSitemap": false,
-        "fecha": "2026-11-01"
+        "enSitemap": true,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -138,8 +138,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/blog",
         "userCanonical": "https://marcyanstudio.com/en/blog/",
         "referringUrls": 1,
-        "enSitemap": false,
-        "fecha": "2026-11-01"
+        "enSitemap": true,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -180,7 +180,7 @@
         "userCanonical": "https://marcyanstudio.com/en/checkup",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -220,8 +220,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/cities",
         "userCanonical": "https://marcyanstudio.com/en/cities",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -263,7 +263,7 @@
         "userCanonical": "https://marcyanstudio.com/en/houston",
         "referringUrls": 2,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -285,9 +285,9 @@
           "href": "https://marcyanstudio.com/es/houston"
         }
       ],
-      "hash": "20664ea61c556616",
+      "hash": "f896914c3ef28a79",
       "enlacesVivos": 25,
-      "hashCambio": "2026-11-01"
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/en/houston/ai-seo": {
       "primeraVez": null,
@@ -511,7 +511,7 @@
         "userCanonical": "https://marcyanstudio.com/en/houston/contractors",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -839,8 +839,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/houston/restaurants",
         "userCanonical": "https://marcyanstudio.com/en/houston/restaurants",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -960,7 +960,7 @@
         "userCanonical": "https://marcyanstudio.com/en/miami",
         "referringUrls": 3,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -982,9 +982,9 @@
           "href": "https://marcyanstudio.com/es/miami"
         }
       ],
-      "hash": "5772de7ac578b9e6",
+      "hash": "e4051c97c5e89da2",
       "enlacesVivos": 22,
-      "hashCambio": "2026-11-01"
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/en/miami/conversational-ai": {
       "primeraVez": null,
@@ -1247,8 +1247,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/portfolio",
         "userCanonical": "https://marcyanstudio.com/en/portfolio",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1289,8 +1289,8 @@
         "googleCanonical": "https://marcyanstudio.com/en/pricing",
         "userCanonical": "https://marcyanstudio.com/en/pricing",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1455,7 +1455,7 @@
         "userCanonical": "https://marcyanstudio.com/en/privacy",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1496,7 +1496,7 @@
         "userCanonical": "https://marcyanstudio.com/en/services",
         "referringUrls": 3,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1537,7 +1537,7 @@
         "userCanonical": "https://marcyanstudio.com/en/terms",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1578,7 +1578,7 @@
         "userCanonical": "https://marcyanstudio.com/en/tools",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1619,7 +1619,7 @@
         "userCanonical": "https://marcyanstudio.com/es",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1659,7 +1659,7 @@
         "userCanonical": "https://marcyanstudio.com/es/blog",
         "referringUrls": 4,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1699,8 +1699,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
         "userCanonical": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1736,7 +1736,7 @@
         "userCanonical": "https://marcyanstudio.com/es/blog/como-elegir-agencia-diseno-web-hispana",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1773,7 +1773,7 @@
         "userCanonical": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1809,8 +1809,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp",
         "userCanonical": "https://marcyanstudio.com/es/blog/diseno-web-restaurantes-menu-pedidos-whatsapp",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1846,7 +1846,7 @@
         "userCanonical": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1884,7 +1884,7 @@
         "userCanonical": "https://marcyanstudio.com/es/blog/precio-pagina-web-houston-guia",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1919,8 +1919,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/ciudades",
         "userCanonical": "https://marcyanstudio.com/es/ciudades",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1959,8 +1959,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/diagnostico",
         "userCanonical": "https://marcyanstudio.com/es/diagnostico",
         "referringUrls": 3,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -1998,8 +1998,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/herramientas",
         "userCanonical": "https://marcyanstudio.com/es/herramientas",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2039,8 +2039,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/houston",
         "userCanonical": "https://marcyanstudio.com/es/houston",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2062,10 +2062,10 @@
           "href": "https://marcyanstudio.com/es/houston"
         }
       ],
-      "hash": "aa864ddae43a97d2",
+      "hash": "65b164d45cecca58",
       "ultimaPeticion": "2026-10-24",
       "enlacesVivos": 37,
-      "hashCambio": "2026-11-01"
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/houston/abogados-inmigracion": {
       "primeraVez": null,
@@ -2124,7 +2124,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/bienes-raices",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2161,8 +2161,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/houston/branding",
         "userCanonical": "https://marcyanstudio.com/es/houston/branding",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2238,8 +2238,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/houston/contratistas",
         "userCanonical": "https://marcyanstudio.com/es/houston/contratistas",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2278,8 +2278,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
         "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2357,8 +2357,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
         "userCanonical": "https://marcyanstudio.com/es/houston/ecommerce",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2376,8 +2376,9 @@
           "href": "https://marcyanstudio.com/es/houston/ecommerce"
         }
       ],
-      "hash": "d5311fe94e823ec5",
-      "enlacesVivos": 35
+      "hash": "0d20ed5422977824",
+      "enlacesVivos": 35,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/houston/ia-conversacional": {
       "primeraVez": null,
@@ -2395,7 +2396,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/ia-conversacional",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2413,9 +2414,9 @@
           "href": "https://marcyanstudio.com/es/houston/ia-conversacional"
         }
       ],
-      "hash": "2f52740fd21aa7b6",
+      "hash": "6619ab6cf4bf3006",
       "enlacesVivos": 35,
-      "hashCambio": "2026-11-01"
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/houston/katy": {
       "primeraVez": null,
@@ -2432,7 +2433,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/katy",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2551,7 +2552,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/seo-local",
         "referringUrls": 1,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2569,8 +2570,9 @@
           "href": "https://marcyanstudio.com/es/houston/seo-local"
         }
       ],
-      "hash": "8991c4e59654f1b9",
-      "enlacesVivos": 35
+      "hash": "964d261935670af7",
+      "enlacesVivos": 35,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/houston/seo-para-ia": {
       "primeraVez": null,
@@ -2588,7 +2590,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/seo-para-ia",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2623,7 +2625,7 @@
         "userCanonical": "https://marcyanstudio.com/es/houston/sugar-land",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2702,8 +2704,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/ia-para-pymes",
         "userCanonical": "https://marcyanstudio.com/es/ia-para-pymes",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2744,7 +2746,7 @@
         "userCanonical": "https://marcyanstudio.com/es/miami",
         "referringUrls": 2,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2766,8 +2768,9 @@
           "href": "https://marcyanstudio.com/es/miami"
         }
       ],
-      "hash": "754b9e34cb751df3",
-      "enlacesVivos": 36
+      "hash": "c203f05101db93db",
+      "enlacesVivos": 36,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/miami/diseno-web": {
       "primeraVez": null,
@@ -2785,7 +2788,7 @@
         "userCanonical": "https://marcyanstudio.com/es/miami/diseno-web",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2820,7 +2823,7 @@
         "userCanonical": "https://marcyanstudio.com/es/miami/doral",
         "referringUrls": 1,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2857,8 +2860,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
         "userCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2876,8 +2879,9 @@
           "href": "https://marcyanstudio.com/es/miami/ecommerce"
         }
       ],
-      "hash": "92c5eb1f7a2949f4",
-      "enlacesVivos": 4
+      "hash": "3e76968038a53b82",
+      "enlacesVivos": 4,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/miami/hialeah": {
       "primeraVez": null,
@@ -2893,8 +2897,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/miami/hialeah",
         "userCanonical": "https://marcyanstudio.com/es/miami/hialeah",
         "referringUrls": 1,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2929,8 +2933,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional",
         "userCanonical": "https://marcyanstudio.com/es/miami/ia-conversacional",
         "referringUrls": 3,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2948,8 +2952,9 @@
           "href": "https://marcyanstudio.com/es/miami/ia-conversacional"
         }
       ],
-      "hash": "c286d7ec522205db",
-      "enlacesVivos": 35
+      "hash": "b9d55930afbc7add",
+      "enlacesVivos": 35,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/miami/seo-local": {
       "primeraVez": null,
@@ -2965,7 +2970,7 @@
         "userCanonical": "https://marcyanstudio.com/es/miami/seo-local",
         "referringUrls": 2,
         "enSitemap": false,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -2983,10 +2988,11 @@
           "href": "https://marcyanstudio.com/es/miami/seo-local"
         }
       ],
-      "hash": "e1ff151d1757fa1e",
+      "hash": "6d9aa0f8ee12e132",
       "ultimaPeticion": "2026-10-24",
       "indexadaDesde": "2026-10-25",
-      "enlacesVivos": 9
+      "enlacesVivos": 9,
+      "hashCambio": "2026-11-02"
     },
     "https://marcyanstudio.com/es/portafolio": {
       "primeraVez": null,
@@ -3002,8 +3008,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/portafolio/",
         "userCanonical": "https://marcyanstudio.com/es/portafolio/",
         "referringUrls": 4,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3044,8 +3050,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/precios",
         "userCanonical": "https://marcyanstudio.com/es/precios",
         "referringUrls": 1,
-        "enSitemap": false,
-        "fecha": "2026-11-01"
+        "enSitemap": true,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3209,8 +3215,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/servicios",
         "userCanonical": "https://marcyanstudio.com/es/servicios",
         "referringUrls": 4,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3249,8 +3255,8 @@
         "googleCanonical": "https://marcyanstudio.com/es/sobre-nosotros/",
         "userCanonical": "https://marcyanstudio.com/es/sobre-nosotros/",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3290,8 +3296,8 @@
         "googleCanonical": "https://marcyanstudio.com/privacidad",
         "userCanonical": "https://marcyanstudio.com/privacidad",
         "referringUrls": 2,
-        "enSitemap": true,
-        "fecha": "2026-11-01"
+        "enSitemap": false,
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3333,7 +3339,7 @@
         "userCanonical": "https://marcyanstudio.com/terminos",
         "referringUrls": 3,
         "enSitemap": true,
-        "fecha": "2026-11-01"
+        "fecha": "2026-11-02"
       },
       "enSitemap": true,
       "alternos": [],
@@ -3359,10 +3365,10 @@
       "enlacesVivos": 36
     }
   },
-  "actualizado": "2026-11-01",
+  "actualizado": "2026-11-02",
   "robotsHash": "64c4d6727ceab8b3",
   "ga4Flujos": {
-    "fecha": "2026-10-26",
+    "fecha": "2026-11-02",
     "ids": [
       "G-4GJPX4PTRV"
     ]

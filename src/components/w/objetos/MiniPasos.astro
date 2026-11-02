@@ -27,9 +27,11 @@ const { kind, lang = 'es', size = 'card', example = true, fill = false, class: c
 const en = lang === 'en';
 const T = en
   ? { inbox: 'Inbox', subj: 'Your proposal', prev: 'Scope, timeline and a clear price.', time: '10:24 a.m.', pub: 'Published', site: 'Your Business', backup: 'Backup', done: 'Done', check: 'Site check', today: 'Today', updates: 'Updates', upToDate: 'Up to date',
+      prev2: [['Luis', 'Local SEO', '9:12 a.m.'], ['Carmen', 'Online store', 'Yesterday'], ['Jorge', 'Web design', 'Yesterday'], ['Rosa', 'Maintenance', 'Mon']],
       form: { lab: 'New contact', name: 'Name', svc: 'Service', msg: 'Message', vName: 'Ana', vSvc: 'Web design', vMsg: 'Can you send me a proposal?', send: 'Send', saved: 'Saved', note: 'before the alert', now: 'Now', via: 'Via your website' },
       sr: { contacto: 'Example: a new contact comes in through the website and is saved before the alert.', formulario: 'Example: a contact arrives through the form and is saved.', correo: 'Example: the email with your proposal arrives in your inbox.', esqueleto: 'Example: the website takes shape as a skeleton.', publicada: 'Example: the website is published.', mantenimiento: 'Example: the website backup is done.' } }
   : { inbox: 'Bandeja de entrada', subj: 'Tu propuesta', prev: 'Alcance, plazos y un precio claro.', time: '10:24', pub: 'Publicada', site: 'Tu Negocio', backup: 'Copia de seguridad', done: 'Hecha', check: 'Revisión del sitio', today: 'Hoy', updates: 'Actualizaciones', upToDate: 'Al día',
+      prev2: [['Luis', 'SEO local', '9:12'], ['Carmen', 'Tienda en línea', 'Ayer'], ['Jorge', 'Diseño web', 'Ayer'], ['Rosa', 'Mantenimiento', 'Lun']],
       form: { lab: 'Nuevo contacto', name: 'Nombre', svc: 'Servicio', msg: 'Mensaje', vName: 'Ana', vSvc: 'Diseño web', vMsg: '¿Me pueden mandar una propuesta?', send: 'Enviar', saved: 'Guardado', note: 'antes del aviso', now: 'Ahora', via: 'Por tu web' },
       sr: { contacto: 'Ejemplo: entra un contacto nuevo por la web y queda guardado antes del aviso.', formulario: 'Ejemplo: un contacto llega por el formulario y queda guardado.', correo: 'Ejemplo: te llega el correo con tu propuesta.', esqueleto: 'Ejemplo: la web toma forma en esqueleto.', publicada: 'Ejemplo: la web queda publicada.', mantenimiento: 'Ejemplo: la copia de seguridad de la web está hecha.' } };
 ---
@@ -77,8 +79,8 @@ const T = en
           </span>
         </div>
         <p class="wo-mini__saved"><b><Icon name="lucide:check" />{T.form.saved}</b><span>{T.form.note}</span></p>
-        {fill && [['44%', '70%'], ['52%', '62%'], ['38%', '74%'], ['48%', '66%'], ['42%', '72%']].map(([x, y]) => (
-          <div class="wo-mini__mail wo-mini__mail--more"><span class="wo-mini__av wo-mini__av--sk"></span><span class="wo-mini__mt"><i style={`width:${x}`}></i><i style={`width:${y}`}></i></span></div>
+        {fill && T.prev2.map(([who, svc, when]) => (
+          <div class="wo-mini__mail wo-mini__mail--more wo-mini__mail--prev"><span class="wo-mini__av wo-mini__av--prev">{who.charAt(0)}</span><span class="wo-mini__mt"><b>{who}<span class="wo-mini__time">{when}</span></b><span>{svc} · <span class="wo-mini__ok"><Icon name="lucide:check" />{T.form.saved}</span></span></span></div>
         ))}
       </>
     )}
@@ -188,5 +190,12 @@ const T = en
   .wo-mini__saved { margin: 2px 0 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
   .wo-mini__saved b { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: 8px; background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font-size: 13px; font-weight: 500; }
   .wo-mini__saved b :global(svg) { width: 13px; height: 13px; }
+  /* Contactos anteriores (fill): texto real atenuado, ya guardados; nada de barras de esqueleto
+     que se lean como "cargando" (control global r1, menor 2). */
+  .wo-mini__mail--prev { padding: 8px 10px; border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: 0; }
+  .wo-mini__mail--prev .wo-mini__mt b { font-weight: 500; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__av--prev { background: #dcd7cf; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__ok { display: inline-flex; align-items: center; gap: 3px; }
+  .wo-mini__ok :global(svg) { width: 11px; height: 11px; }
 
 </style>

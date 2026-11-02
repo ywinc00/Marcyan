@@ -61,8 +61,6 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
   @media (--lt-md) {
     .he { padding-bottom: 64px; }
     .he__grid { gap: 48px; }
-    .he__text :global(.w-herotext__top) { align-items: center; }
-    .he__text :global(.w-herotext--left) { align-items: center; text-align: center; margin-inline: auto; }
-    .he__text :global(.w-herotext--left .w-herotext__actions) { justify-content: center; }
+    /* Texto a la izquierda también en móvil, como los demás heros partidos (control global r1). */
   }
 </style>

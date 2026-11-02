@@ -145,7 +145,7 @@ const en: SobreCopy = {
   cierre: {
     warmTitle: 'Not sure what you need yet?',
     warmText: 'Check for free whether your business is losing customers online.',
-    warmCta: 'Run the checkup',
+    warmCta: 'Take the checkup',
     warmHref: '/en/checkup',
   },
 };

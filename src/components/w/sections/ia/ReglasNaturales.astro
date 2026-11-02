@@ -23,7 +23,7 @@ interface Props { copy: Copy; n: number; lang?: 'es' | 'en' }
 const { copy, n, lang = 'es' } = Astro.props;
 let i = 0;
 ---
-<CabeceraNumerada n={n} label={copy.label} />
+<CabeceraNumerada n={n} label={copy.label} align="center" />
 <div class="rn">
   <h2 class="w-h2 rn__h" set:html={copy.title} />
   <p class="rn__sub">{copy.sub}</p>

@@ -103,7 +103,7 @@ export const blogW: Record<BlogLang, BlogW> = {
       checkup: {
         title: 'Free checkup',
         text: 'See for free whether your business is losing customers online.',
-        cta: 'Run the checkup',
+        cta: 'Take the checkup',
         href: '/en/checkup',
       },
     },

@@ -68,7 +68,7 @@ export const portCopy: Record<PortLang, PortCopy> = {
       proof: 'Four businesses in Houston and Orlando already have theirs live.',
       warmTitle: 'Already have a site?',
       warmText: 'Check for free where your business is losing customers.',
-      warmCta: 'Run the free checkup',
+      warmCta: 'Take the checkup',
     },
   },
 };

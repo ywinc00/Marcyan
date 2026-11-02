@@ -10,7 +10,7 @@ import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
 interface Props { copy: IaChatCopy['pasos']; n: number; lang?: 'es' | 'en' }
 const { copy, n } = Astro.props;
 ---
-<CabeceraNumerada n={n} label={copy.label} />
+<CabeceraNumerada n={n} label={copy.label} align="center" />
 <div class="ws-gap">
   <BandejaPasos titleHtml={copy.title} lead={copy.lead} steps={copy.steps} tone="teal">
     <div slot="ui-1" class="ev ev--quote" aria-hidden="true"><p>“{copy.ask}”</p></div>

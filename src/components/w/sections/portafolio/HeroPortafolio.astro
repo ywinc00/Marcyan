@@ -92,6 +92,9 @@ const { h1Html, tail, lead, shot, side, wa, lang = 'es' } = Astro.props;
   .ph__head { position: relative; }
   .ph__h1, .ph__tail { margin: 0; }
   .ph__h1, .ph__tail { max-width: 780px; }
+  /* La cola va en el tono atenuado (§2.3, como la 1.ª frase del capítulo a dos tonos): el H1
+     verbatim no lleva punto y, al mismo tono, se leía seguido con la cola (control global r1). */
+  :global(:root[data-ds="v3"]) .ph__tail { color: var(--w-ink-45); }
 
   .ph__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; margin-top: 40px; }
   .ph__main { min-width: 0; }

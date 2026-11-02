@@ -6,18 +6,22 @@
 // Sin `titleHtml` (sistema tras el piloto): solo divisoria + número + etiqueta; el H2 lo
 // lleva el componente de debajo en su propia columna (Escalera con título, como W-CORE-06:
 // título, bajada y opciones juntos). Sigue habiendo UN solo titular por sección.
+// `align="center"` (solo etiqueta, control global r1): cuando debajo va un titular centrado
+// (dilema, bandeja de pasos, capítulo conectado) la fila número + filete + etiqueta se centra
+// con él; la divisoria sigue a ancho completo. Un solo eje por bloque.
 interface Props {
   n: number;
   label: string;
   titleHtml?: string;
   lead?: string;
   id?: string;
+  align?: 'start' | 'center';
   class?: string;
 }
-const { n, label, titleHtml, lead, id, class: cls } = Astro.props;
+const { n, label, titleHtml, lead, id, align = 'start', class: cls } = Astro.props;
 const num = String(n).padStart(2, '0');
 ---
-<header class:list={['w-numhead', !titleHtml && 'w-numhead--tag', cls]}>
+<header class:list={['w-numhead', !titleHtml && 'w-numhead--tag', !titleHtml && align === 'center' && 'w-numhead--center', cls]}>
   <p class="w-numhead__tag">
     <span class="w-numhead__n">{num}</span>
     <span class="w-numhead__rule" aria-hidden="true"></span>
@@ -39,6 +43,7 @@ const num = String(n).padStart(2, '0');
     letter-spacing: var(--w-tr-micro);
   }
   .w-numhead--tag .w-numhead__tag { margin-bottom: 0; }
+  .w-numhead--center .w-numhead__tag { justify-content: center; }
   .w-numhead__n { color: var(--w-accent); }
   .w-numhead__rule {
     display: inline-block; inline-size: 24px; block-size: 1px; flex: none;

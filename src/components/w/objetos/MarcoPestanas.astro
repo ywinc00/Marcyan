@@ -55,6 +55,17 @@ const { tabs, lang = 'es', tone = 'teal', size = 'hero', class: cls } = Astro.pr
       window.clearTimeout(timer);
       if (!answered) timer = window.setTimeout(advance, FALLBACK);
     };
+    // Carril desplazable en móvil: la pestaña cortada se funde hacia el borde en vez de cortarse
+    // en seco, y el fundido cambia de lado según quede más carril a cada lado (control global r1).
+    const edges = () => {
+      if (!track) return;
+      const max = track.scrollWidth - track.clientWidth;
+      track.classList.toggle('is-more-r', max > 2 && track.scrollLeft < max - 2);
+      track.classList.toggle('is-more-l', max > 2 && track.scrollLeft > 2);
+    };
+    track?.addEventListener('scroll', edges, { passive: true });
+    window.addEventListener('resize', edges, { passive: true });
+    requestAnimationFrame(edges);
     el.addEventListener('wo:done', () => { answered = true; advance(); });
     requestAnimationFrame(() => move(0));
     window.addEventListener('resize', () => move(idx), { passive: true });
@@ -107,6 +118,9 @@ const { tabs, lang = 'es', tone = 'teal', size = 'hero', class: cls } = Astro.pr
   @media (--lt-md) {
     .wo-marco { padding: 8px; border-radius: 20px; }
     .wo-marco__track { grid-auto-columns: max-content; }
+    .wo-marco__track.is-more-r { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); }
+    .wo-marco__track.is-more-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px); mask-image: linear-gradient(90deg, transparent, #000 56px); }
+    .wo-marco__track.is-more-l.is-more-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent); }
   }
   @media (--motion-reduce) {
     .wo-marco__pill { transition: none; }

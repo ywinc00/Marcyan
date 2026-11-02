@@ -241,3 +241,9 @@
 /* Contact (sections/Contact.astro, protegido): titular a 500 como el resto de v3.
    0,4,0 gana al .h2 de base.css (600) sin !important. */
 :root[data-ds="v3"] .contact .h2 { font-weight: var(--w-weight-head); }
+
+/* Migas a la escala de la etiqueta mono del sistema en escritorio (12, §2.3; control global r1).
+   Solo v3: la regla vive aquí y no en Breadcrumb para no tocar portada ni hubs. */
+@media (--lg) {
+  :root[data-ds="v3"] .crumbs ol { font-size: var(--w-micro); }
+}

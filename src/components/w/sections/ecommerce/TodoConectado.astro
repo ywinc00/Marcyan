@@ -18,7 +18,7 @@ interface Props { copy: ShopCopy['conectado']; n: number; lang?: 'es' | 'en'; ui
 const { copy, n, lang = 'es', uid = 'tc' } = Astro.props;
 const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramienta? Pregúntanos';
 ---
-<CabeceraNumerada n={n} label={copy.label} />
+<CabeceraNumerada n={n} label={copy.label} align="center" />
 <div class="tc" data-tc>
   <header class="tc__head" data-w-reveal>
     <h2 class="tc__h">{copy.title}</h2>

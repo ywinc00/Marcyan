@@ -75,7 +75,9 @@ const { h1Html, chip, eyebrow, lead, primary, link, tabs, sr, avatarAlt, lang = 
   .hic__marcy img { display: block; width: 100%; height: auto; }
   .hic__frame { position: relative; z-index: 1; width: 100%; max-width: 1080px; }
   @media (--lt-md) {
-    .hic__stage { margin-top: 32px; }
-    .hic__marcy { width: 128px; margin-bottom: -22px; }
+    /* Avatar más pequeño y escenario más arriba: la etiqueta "Ejemplo" del chat queda por
+       encima del botón flotante del chat en la primera pantalla a 390×844 (E-18, control global r1). */
+    .hic__stage { margin-top: 24px; }
+    .hic__marcy { width: 96px; margin-bottom: -16px; }
   }
 </style>

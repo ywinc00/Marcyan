@@ -11,7 +11,7 @@ import type { ShopCopy } from '../../../../i18n/w/ecommerce';
 interface Props { copy: ShopCopy['pasos']; tax: ShopCopy['tax']; n: number; city: 'houston' | 'miami'; lang?: 'es' | 'en' }
 const { copy, tax, n, city, lang = 'es' } = Astro.props;
 ---
-<CabeceraNumerada n={n} label={copy.label} />
+<CabeceraNumerada n={n} label={copy.label} align="center" />
 <div class="ws-gap">
   <BandejaPasos titleHtml={copy.title} lead={copy.lead} steps={copy.steps}>
     <MiniTienda slot="ui-1" kind="catalogo" tax={tax} city={city} lang={lang} />

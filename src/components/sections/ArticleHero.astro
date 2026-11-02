@@ -65,13 +65,14 @@ const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic,
 
   .ahero__crumbs { margin-bottom: 28px; }
   .ahero__crumbs :global(ol) { padding-inline-start: 0; margin: 0; flex-wrap: nowrap; }
-  /* La última miga repite el H1 entero: en una sola línea, recortada con puntos suspensivos
-     (el título completo se lee justo debajo; el BreadcrumbList no cambia). */
-  .ahero__crumbs :global(li:last-child) { flex: 1 1 auto; min-width: 0; }
-  .ahero__crumbs :global([aria-current="page"]) {
-    display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    color: var(--w-ink-60);
+  /* La última miga repetía el H1 entero justo encima de él (control global r1): queda solo para
+     lectores de pantalla (aria-current intacto) y el BreadcrumbList no cambia. Visible:
+     Inicio › Blog, sin la flecha colgando. */
+  .ahero__crumbs :global(li:last-child) {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
+  .ahero__crumbs :global(li:nth-last-child(2) .crumbs__sep) { display: none; }
 
   /* Título: H1 48/1.1 500 (W-CONT-20 mide 48/52.8 y -2.16 px). Verbatim. */
   .ahero__title {

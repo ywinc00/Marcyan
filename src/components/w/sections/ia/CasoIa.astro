@@ -1,0 +1,29 @@
+---
+// IA · caso real (§4.11-7 y §4.12-10): Rosy Nails & Care, la web app de reservas real
+// (automatiza el agendado; honesto, como en proof.items). Desviación medida del plan: el
+// plan pide TarjetasCaso, pero con un solo proyecto real una tarjeta de 582 queda huérfana;
+// va como FichaProyecto grande (la misma del piloto, con captura REAL: aquí sí, es prueba,
+// E-32). Sin métricas. El "Caso #0" (este sitio) no se repite: Marcy ya está en la página
+// (cierre "Pregúntale a Marcy"). En Miami se dice con verdad que el caso es de Houston.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import FichaProyecto from '../../FichaProyecto.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+
+interface Props {
+  copy: { label: string; title: string; lead: string };
+  n: number;
+  items: ProjectItem[];
+  link?: boolean;
+  lang?: 'es' | 'en';
+}
+const { copy, n, items, link = true, lang = 'es' } = Astro.props;
+const rn = items.find((p) => p.name === 'Rosy Nails & Care') ?? items[0];
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ws-gap">
+  <FichaProyecto project={rn} variant="grande" lang={lang} as="h3" link={link ? undefined : false} />
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
+</style>

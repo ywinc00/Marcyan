@@ -1,0 +1,58 @@
+---
+// Hero de IA para pymes (design/rediseno-workos.md §4.11, ola 2) · ES y EN.
+// A-05 + W-ADV-01 + W-ADV-02: noche estrellada (SpaceBackdrop teal) con el amanecer teal en
+// el tercio inferior (.w-dawn: el único capítulo de contraste de la página; nunca oro en
+// una página teal, E-14). Rejilla de 2 columnas en el contenedor: a la izquierda el texto
+// (HeroTexto noche, alineado a la izquierda, coreografía §2.9); a la derecha la esclusa de
+// Marcy, la firma de la página (2 ciclos y se detiene; vuelve a correr al volver a verla).
+// Entra como objeto (data-w-in="obj" en un envoltorio: la esclusa no se coloca con transform).
+// Móvil: una columna, esclusa debajo (335 px).
+import HeroTexto from '../HeroTexto.astro';
+import EsclusaMarcy from '../objetos/EsclusaMarcy.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  eyebrow: string;
+  tail?: string;
+  tailGrad?: boolean;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  lang?: 'es' | 'en';
+}
+const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = Astro.props;
+---
+<section class="w-hero w-hero--bleed w-dawn hip" data-w-tone="teal">
+  <div class="w-container hip__grid">
+    <div class="hip__text">
+      <HeroTexto
+        eyebrow={eyebrow}
+        tone="teal"
+        h1Html={h1Html}
+        tail={tail}
+        tailGrad={tailGrad}
+        lead={lead}
+        primary={primary}
+        link={link}
+        align="left"
+        size="night"
+      >
+        <slot name="crumbs" slot="crumbs" />
+      </HeroTexto>
+    </div>
+    <div class="hip__obj" data-w-in="obj">
+      <EsclusaMarcy lang={lang} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hip { overflow-x: clip; padding-bottom: clamp(72px, 3rem + 4vw, 128px); }
+  .hip__grid { display: grid; gap: 48px; align-items: center; }
+  .hip__obj { display: flex; justify-content: center; min-width: 0; }
+  @media (--lg) {
+    .hip__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: 64px; min-height: 560px; }
+  }
+  @media (--lt-md) { .hip__grid { gap: 40px; } }
+</style>

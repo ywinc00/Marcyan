@@ -1,0 +1,29 @@
+---
+// IA para pymes · 01 "Cómo decide" (§4.11-3): cabecera numerada (solo etiqueta) +
+// DilemaDosCaminos (W-ADV-03 + W-ADV-04): contestar tú vs un bot de respuestas fijas; la
+// "?" del centro pasa al icono-objeto de Marcy, disparo único (E-50). Destino del enlace
+// "Ver cómo decide" del hero (id de la celda: como-decide).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import DilemaDosCaminos from '../../DilemaDosCaminos.astro';
+import type { IaPymesCopy } from '../../../../i18n/w/ia-pymes';
+
+interface Props { copy: IaPymesCopy['dilema']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ws-gap">
+  <DilemaDosCaminos
+    titleHtml={copy.title}
+    lead={copy.lead}
+    left={copy.left}
+    right={copy.right}
+    bridge={copy.bridge}
+    answerId="ia-conversacional"
+    tone="teal"
+    lang={lang}
+    id="ia-dilema"
+  />
+</div>
+<style>
+  .ws-gap { margin-top: 24px; }
+</style>

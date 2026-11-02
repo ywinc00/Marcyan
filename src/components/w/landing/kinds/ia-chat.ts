@@ -158,7 +158,9 @@ const spec: KindSpec = {
         const t = copyOf(ctx).cierre;
         const num = city === 'miami' ? nap.miami : nap.houston;
         return {
-          titleHtml: ctx.cluster.cta.title,
+          // Un solo acento en el cierre (E-14): el amanecer y el botón son oro, así que el
+          // titular va sin su <em> teal (el texto no cambia).
+          titleHtml: ctx.cluster.cta.title.replace(/<\/?em>/g, ''),
           proof: t.proof,
           city,
           tel: 'tel:' + num.replace(/[^\d+]/g, ''),

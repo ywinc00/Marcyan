@@ -40,4 +40,9 @@ const { copy, n } = Astro.props;
   .ev__k { color: var(--w-p-ink); font-weight: 500; }
   .ev__dot, .ev__v { color: var(--w-p-ink-2); }
   .ev--chips { padding: 6px 14px; }
+  /* Móvil estrecho: en la tarjeta no caben chip y motivo en una línea en las tres filas;
+     las tres pasan igual a chip arriba y motivo debajo, alineados a la izquierda. */
+  @media (--lt-sm) {
+    .ev--chips :global(.wd-chips__row) { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 0; }
+  }
 </style>

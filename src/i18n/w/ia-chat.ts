@@ -150,7 +150,7 @@ const base = (city: IaCity) => {
         { icon: 'lucide:message-circle', label: 'Mensaje de WhatsApp', chip: 'Respondido', tone: 'ok' as const },
         { icon: 'lucide:calendar', label: 'Cita sábado 10:00', chip: 'Agendada', tone: 'ok' as const },
         { icon: 'lucide:help-circle', label: 'Pregunta de precio', chip: 'Te lo pasa', tone: 'pass' as const },
-        { icon: 'lucide:moon', label: 'Mensaje fuera de horario', chip: 'Respondido', tone: 'ok' as const },
+        { icon: 'lucide:moon', label: 'Fuera de horario', chip: 'Respondido', tone: 'ok' as const },
         { icon: 'lucide:user', label: 'Quiere hablar con alguien', chip: 'Te lo pasa', tone: 'pass' as const },
       ],
       memoryLabel: 'Lo que ya sabe de tu negocio',

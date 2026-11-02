@@ -5,8 +5,8 @@
 // resuelve) y se bifurca en 2 destinos: el correo y el WhatsApp del dueño, cada uno con su
 // caja-objeto (producto en claro, §2.4: una vista previa de correo y un mensaje) y su texto.
 // Estático (la firma de la página es el hero). La línea es decorativa (aria-hidden); los
-// destinos son texto real. Móvil: la línea pasa a vertical a la izquierda y los destinos
-// se apilan. Datos de EJEMPLO rotulados.
+// destinos son texto real. Móvil: la línea pasa a vertical a la izquierda, dentro del canal, y
+// baja hasta los destinos apilados (un ramal a cada caja). Datos de EJEMPLO rotulados.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Ejemplo from '../../Ejemplo.astro';
 import Icon from '../../../ui/Icon.astro';
@@ -86,8 +86,11 @@ const NODES = [{ x: 73.5, y: 38 }, { x: 60.6, y: 49.5 }];
   .ab__text { position: relative; z-index: 1; max-width: 540px; }
   .ab__p { margin: 16px 0 0; max-width: 500px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-80); }
   .ab__map { display: none; }
-  .ab__steps { list-style: none; margin: 32px 0 0; padding: 0 0 0 23px; border-left: 4px solid var(--w-line-strong); display: grid; gap: 18px; }
-  .ab__steps li { display: flex; align-items: center; gap: 12px; margin-left: -48px; font: 500 15px/1.3 var(--font-body); color: var(--w-ink-80); }
+  /* Móvil y tableta: la línea baja en vertical DENTRO del canal (eje a 24 px del borde del
+     texto, nodos de 48 alineados con el titular) y sigue hasta las dos cajas: un ramal
+     horizontal a cada caja y, en la última, el codo redondeado donde termina (W-HOME-14). */
+  .ab__steps { list-style: none; margin: 32px 0 0 22px; padding: 0 0 8px; border-left: 4px solid var(--w-line-strong); display: grid; gap: 18px; }
+  .ab__steps li { display: flex; align-items: center; gap: 12px; margin-left: -26px; font: 500 15px/1.3 var(--font-body); color: var(--w-ink-80); }
 
   .ab__node {
     position: absolute; transform: translate(-50%, -50%);
@@ -102,8 +105,22 @@ const NODES = [{ x: 73.5, y: 38 }, { x: 60.6, y: 49.5 }];
     white-space: nowrap; font: 500 14px/1.2 var(--font-body); color: var(--w-ink-80);
   }
 
-  .ab__dests { display: grid; gap: 40px; margin-top: 40px; }
-  .ab__dest { display: grid; gap: 20px; }
+  .ab__dests { display: grid; margin: 0 0 0 22px; }
+  .ab__dest { position: relative; display: grid; gap: 20px; padding: 32px 0 0 30px; border-left: 4px solid var(--w-line-strong); }
+  .ab__dest + .ab__dest { padding-top: 40px; }
+  /* Ramal a la caja, a 36 px de su borde superior. */
+  .ab__dest::before {
+    content: ''; position: absolute; left: -4px; top: calc(var(--ab-pt, 32px) + 36px);
+    width: 34px; height: 4px; background: var(--w-line-strong);
+  }
+  .ab__dest + .ab__dest { --ab-pt: 40px; }
+  /* La última: la línea termina en su ramal con un codo redondeado. */
+  .ab__dest:last-child { border-left-color: transparent; }
+  .ab__dest:last-child::before {
+    top: 0; height: calc(var(--ab-pt, 32px) + 40px); width: 34px; box-sizing: border-box; background: none;
+    border-left: 4px solid var(--w-line-strong); border-bottom: 4px solid var(--w-line-strong);
+    border-bottom-left-radius: 14px;
+  }
   .ab__obj {
     position: relative; background: var(--w-p-bg); color: var(--w-p-ink);
     border: 1px solid var(--w-p-line); border-radius: 16px; padding: 18px; min-height: 150px;
@@ -131,10 +148,11 @@ const NODES = [{ x: 73.5, y: 38 }, { x: 60.6, y: 49.5 }];
     .ab__map { display: block; position: absolute; inset: 0; pointer-events: none; }
     .ab__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
     .ab__svg path { fill: none; stroke: rgba(var(--star-rgb), .10); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-    .ab__dests { grid-template-columns: 1fr 1fr; gap: 0; margin-top: 0; }
+    .ab__dests { grid-template-columns: 1fr 1fr; gap: 0; margin: 0; }
     /* Cada destino cuelga de su rama: la caja (300) empieza en el borde de su columna y la
        rama baja a su centro (x = 150 y 750 de 1200). */
-    .ab__dest { grid-template-columns: 300px 1fr; align-items: start; gap: 28px; }
+    .ab__dest, .ab__dest + .ab__dest { grid-template-columns: 300px 1fr; align-items: start; gap: 28px; padding: 0; border-left: 0; }
+    .ab__dest::before, .ab__dest:last-child::before { content: none; }
     .ab__dt { padding-top: 40px; }
     .ab__obj { width: 300px; }
   }

@@ -27,6 +27,9 @@ const { copy, n, lang = 'es' } = Astro.props;
   .ws-gap { margin-top: 24px; }
   .ws-mem { margin-top: 48px; display: grid; gap: 20px; align-items: center; }
   @media (--md) { .ws-mem { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-inline: 64px; gap: 48px; } }
+  /* Chips de memoria a todo el ancho de su columna; en escritorio, rejilla de 2 × 2. */
+  .ws-mem :global(.wd-chips--mem) { max-width: none; }
+  @media (--lg) { .ws-mem :global(.wd-chips--mem) { grid-template-columns: 1fr 1fr; } }
   .ws-mem__h { margin: 0; }
   .ws-mem__p { margin: 8px 0 0; max-width: 400px; font: 400 16px/1.6 var(--font-body); color: var(--w-ink-70); }
 </style>

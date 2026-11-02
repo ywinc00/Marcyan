@@ -134,7 +134,9 @@ const spec: KindSpec = {
       props: (ctx) => {
         const t = copyOf(ctx).cierre;
         return {
-          titleHtml: ctx.cluster.cta.title,
+          // Un solo acento en el cierre (E-14): el amanecer y el botón son oro, así que el
+          // titular va sin su <em> teal (el texto no cambia).
+          titleHtml: ctx.cluster.cta.title.replace(/<\/?em>/g, ''),
           proof: t.proof,
           city: 'houston',
           tel: 'tel:' + HOUSTON.replace(/[^\d+]/g, ''),

@@ -1,0 +1,54 @@
+---
+// Servicios · capítulo de contraste "Un capítulo por servicio" (§4.3-4; W-CORE-07 + W-CORE-08
+// + B-03): CapituloDosFrases + Bento2x2 de 7 celdas con la última ancha (wideLast), una por
+// servicio con su objeto y con id="<id del producto>" (destino de los enlaces del inventario,
+// de los perfiles y, tras la integración, del megamenú: #mantenimiento).
+// Página oro: Marcy en burbujas neutras y la respuesta del asistente en oro (E-14, un acento
+// por bloque). Todos los objetos ESTÁTICOS (la firma de la página es la pila del hero).
+// Móvil (E-18): conservan objeto la web, el chat de Marcy, los pedidos y el mantenimiento;
+// la ficha, la respuesta del asistente y el plano de marca quedan en texto.
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
+import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+import ListaPedidos from '../../objetos/ListaPedidos.astro';
+import PlanoMarca from '../../objetos/PlanoMarca.astro';
+import MiniPasos from '../../objetos/MiniPasos.astro';
+import type { ServiciosCopy } from '../../../../i18n/w/servicios';
+
+interface Props { copy: ServiciosCopy['capitulo']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+const sr = lang === 'en'
+  ? 'Example: a customer asks to book and Marcy confirms the appointment.'
+  : 'Ejemplo: un cliente pide cita y Marcy se la confirma.';
+---
+<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div class="ws-gap">
+  <Bento2x2 cells={copy.cells} wideLast mobileTextOnly={[2, 4, 6]}>
+    <WebEjemplo slot="ui-1" frame="movil" kind="plomeria" city="Houston" lang={lang} size="mini" />
+    <FichaMapaEjemplo slot="ui-2" city="Houston" lang={lang} size="card" />
+    <ChatMarcy slot="ui-3" mode="estatico" tone="neutral" lang={lang} size="card" sr={sr} />
+    <RespuestaAsistente slot="ui-4" lang={lang} tone="gold" size="mini" />
+    <ListaPedidos slot="ui-5" lang={lang} size="card" static />
+    <PlanoMarca slot="ui-6" lang={lang} size="mini" />
+    <MiniPasos slot="ui-7" kind="mantenimiento" lang={lang} size="card" />
+  </Bento2x2>
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  /* Celda ancha (Mantenimiento) a dos columnas en escritorio: texto a la izquierda y el panel
+     a la derecha, a la altura del texto. A todo el ancho, un panel de tres filas quedaba
+     estirado a 1100 px y vacío (autocrítica c1). Composición de esta página; propuesto como
+     [SISTEMA] para Bento2x2 (wideLast). */
+  @media (--lg) {
+    .ws-gap :global(.wd-bento__cell--wide) {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 96px;
+      grid-template-rows: auto auto 1fr; align-items: start;
+    }
+    .ws-gap :global(.wd-bento__cell--wide > :not(.wd-bento__ui)) { grid-column: 1; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__ui) { grid-column: 2; grid-row: 1 / span 3; margin-top: 0; align-self: center; }
+  }
+</style>

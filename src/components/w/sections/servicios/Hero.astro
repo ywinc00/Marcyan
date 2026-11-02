@@ -1,0 +1,57 @@
+---
+// Servicios · cabecera partida del hub (design/rediseno-workos.md §4.3; A-04 + W-CONV-01 +
+// W-HOME-06). Izquierda (560): migas, eyebrow oro "Servicios", H1 hub VERBATIM (§2.14) y
+// una bajada de una línea, SIN botones (E-05: hub con cabecera compacta; el primer CTA
+// llega con el catálogo). Derecha (480×420): la pila de Interruptores con los 7 productos
+// de pricing en su orden, firma de la página (bucle de loop.ts, quieto con reduced-motion).
+// No usa HeroTexto porque ese componente siempre pinta botones (apuntado como [SISTEMA]);
+// reproduce su coreografía con las mismas clases y data-w-in de §2.9.
+import Eyebrow from '../../Eyebrow.astro';
+import Interruptores from '../../objetos/Interruptores.astro';
+
+interface Item { label: string; href: string }
+interface Props {
+  h1Html: string;
+  eyebrow: string;
+  tail?: string;
+  lead: string;
+  items: Item[];
+  lang?: 'es' | 'en';
+}
+const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
+---
+<section class="w-hero ws-hero">
+  <div class="w-container ws-hero__grid">
+    <div class="ws-hero__text" data-w-tone="gold">
+      <div class="ws-hero__crumbs"><slot name="crumbs" /></div>
+      <div data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
+      <h1 class="w-h1 w-h1--hub ws-hero__h1" data-w-in="1" set:html={h1Html} />
+      {tail && <p class="w-h1__tail w-h1__tail--hub" data-w-in="1">{tail}</p>}
+      <p class="w-lead ws-hero__lead" data-w-in="2">{lead}</p>
+    </div>
+    <div class="ws-hero__obj" data-w-in="obj">
+      <Interruptores items={items} lang={lang} size="card" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .ws-hero { padding-bottom: 72px; }
+  .ws-hero__grid { display: grid; gap: 40px; align-items: center; }
+  .ws-hero__text { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; max-width: 560px; }
+  .ws-hero__crumbs { margin-bottom: 28px; }
+  .ws-hero__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  .ws-hero__h1 { margin: var(--w-gap-eyebrow) 0 0; }
+  .ws-hero__lead { margin: var(--w-gap-h1) 0 0; }
+  .ws-hero__obj { min-width: 0; display: flex; justify-content: center; }
+  @media (--lg) {
+    .ws-hero { padding-bottom: 96px; }
+    .ws-hero__grid { grid-template-columns: minmax(0, 560px) minmax(0, 480px); justify-content: space-between; gap: 64px; }
+    .ws-hero__obj { justify-content: flex-end; }
+  }
+  @media (--lt-md) {
+    .ws-hero { padding-bottom: 48px; }
+    .ws-hero__grid { gap: 24px; }
+    .ws-hero__crumbs { margin-bottom: 20px; }
+  }
+</style>

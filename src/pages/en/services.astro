@@ -1,88 +1,181 @@
 ---
-// SERVICES CATALOG · /en/services — services hub (Track E).
-// Gathers the 7 products (with tiers) into one navigable page, reusing the
-// DS components (LandingHero, AnswerBlock, PriceGrid, RelatedLinks,
-// FeatureGrid, Faq, CtaBand, Contact). Schema: OfferCatalog (all tiers)
-// + ItemList (the 7 services) + BreadcrumbList.
+// CATÁLOGO DE SERVICIOS · /en/services, services hub v3 (espejo de /es/servicios) (design/rediseno-workos.md §4.3).
+// Contraste: el capítulo "un capítulo por servicio" (.w-contrast). Firma: los interruptores
+// del hero. Degradado: el titular del cierre.
+// Orden: hero partido (sin botones) → 01 por etapa → 02 catálogo (#precios) → contraste
+// (ids de los 7 servicios, #mantenimiento) → 03 empieza por tu caso → 04 por qué Marcyan →
+// En pocas palabras (answer VERBATIM) → FAQ (VERBATIM) → cierre en dos tarjetas → Contact.
+// Schema intacto: OfferCatalog (todos los niveles) + ItemList (los 7) en el head, igual que
+// antes; BreadcrumbList lo emite Breadcrumb; FAQPage, PreguntasFrecuentes con el mismo texto.
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
-import LandingHero from '../../components/sections/LandingHero.astro';
-import GrowthCta from '../../components/growthos/GrowthCta.astro';
-import AnswerBlock from '../../components/sections/AnswerBlock.astro';
-import PriceGrid from '../../components/sections/PriceGrid.astro';
-import RelatedLinks from '../../components/sections/RelatedLinks.astro';
-import FeatureGrid from '../../components/sections/FeatureGrid.astro';
-import Faq from '../../components/sections/Faq.astro';
-import CtaBand from '../../components/sections/CtaBand.astro';
 import Contact from '../../components/sections/Contact.astro';
 import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
 import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
-import { content } from '../../i18n/content';
+import WStyles from '../../components/w/WStyles.astro';
+import CabeceraNumerada from '../../components/w/CabeceraNumerada.astro';
+import Inventario3Etapas from '../../components/w/Inventario3Etapas.astro';
+import TarjetasHermanas from '../../components/w/TarjetasHermanas.astro';
+import TarjetasPerfil from '../../components/w/TarjetasPerfil.astro';
+import CuatroRazones from '../../components/w/CuatroRazones.astro';
+import FranjaEnPocasPalabras from '../../components/w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../components/w/PreguntasFrecuentes.astro';
+import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
+import Hero from '../../components/w/sections/servicios/Hero.astro';
+import Catalogo from '../../components/w/sections/servicios/Catalogo.astro';
+import UnCapitulo from '../../components/w/sections/servicios/UnCapitulo.astro';
+import { arteWeb, arteEscaner } from '../../components/w/sections/servicios/arte';
+import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { priceServices, offerItems } from '../../i18n/pricing.en';
 import { serviciosPage as s } from '../../i18n/servicios.en';
+import { serviciosCopy } from '../../i18n/w/servicios';
+import { megaServicios } from '../../i18n/w/nav';
+import type { IconoId } from '../../components/w/objects/registry';
 
 const c = content.en;
+const t = serviciosCopy.en;
+const lang = 'en' as const;
+
+/** Nombre corto (sin el paréntesis aclaratorio) y promesa de una línea: los del megamenú. */
+const mega = Object.fromEntries(megaServicios.en.map((m) => [m.id, m]));
+const precio = (p: (typeof priceServices)[number]) =>
+  p.free ? 'Free checkup' : p.monthly ? `From ${p.displayPrice} a month` : `From ${p.displayPrice}`;
+
+// Hrefs SIEMPRE los de priceServices (los que la página enlazaba hoy, R5).
+const switches = priceServices.map((p) => ({ label: t.switches[p.id as IconoId], href: p.href }));
+const catalogo = priceServices.map((p) => ({
+  id: p.id as IconoId,
+  label: mega[p.id]?.name ?? p.name,
+  desc: mega[p.id]?.promise ?? p.tagline,
+  href: p.href,
+  price: precio(p),
+}));
+const razones = s.why.items.map((i) => ({ icon: i.icon, title: i.title, text: i.desc })) as [
+  { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
+  { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
+];
+// Arte de línea en las dos tarjetas de perfil (rev1, imp. 2): la web que asoma y el muro del diagnóstico.
+const perfiles = [
+  { ...t.perfil.cards[0], art: arteWeb },
+  { ...t.perfil.cards[1], art: arteEscaner },
+] as [typeof t.perfil.cards[0] & { art: string }, typeof t.perfil.cards[1] & { art: string }];
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 ---
 <Layout
   title={s.meta.title}
   description={s.meta.description}
-  lang="en"
+  lang={lang}
   path="services"
+  ds="v3"
 >
   <Fragment slot="head">
     <OfferCatalogLd items={offerItems} url={s.path} name="Services and pricing — Marcyan Studio" />
     <ItemListLd items={s.itemList} name="Marcyan Studio services" />
   </Fragment>
+  <WStyles />
 
-  <SiteNav nav={clusterNavEn} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
+  <SiteNav nav={clusterNavEn} lang={lang} homeHref="/en" currentPath={Astro.url.pathname} />
 
-  <main id="main">
-    <LandingHero
-      variant="header"
-      kicker={s.hero.kicker}
-      h1={s.hero.h1}
-      sub={s.hero.sub}
-      primary={s.hero.primary}
-      secondary={s.hero.secondary}
-      chips={s.hero.chips}
-      tone={s.hero.tone}
-    >
-      <Breadcrumb slot="breadcrumb" items={s.breadcrumb} lang="en" />
-    </LandingHero>
+  <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="servicios">
+    <Hero h1Html={s.hero.h1} eyebrow={t.eyebrow} tail={t.tail} lead={t.lead} items={switches} lang={lang}>
+      <Breadcrumb slot="crumbs" items={s.breadcrumb} lang={lang} />
+    </Hero>
 
-    <AnswerBlock lang="en" q={s.answer.q} a={s.answer.a} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={1} label={t.etapas.label} titleHtml={t.etapas.title} lead={t.etapas.lead} />
+        <div class="ws-after"><Inventario3Etapas cols={t.etapas.cols} /></div>
+      </div>
+    </section>
 
-    <PriceGrid lang="en" tag={s.grid.tag} title={s.grid.title} intro={s.grid.intro} items={priceServices} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={2} label={t.catalogo.label} />
+        <div class="ws-tight">
+          <Catalogo track="pricing_card_clicked" expect={catalogo.length}>
+            <TarjetasHermanas
+              id="catalogo"
+              titleHtml={t.catalogo.title}
+              lead={s.grid.intro}
+              items={catalogo}
+              lang={lang}
+            />
+          </Catalogo>
+        </div>
+      </div>
+    </section>
 
-    <GrowthCta
-      text="Torn between web, SEO, or AI?"
-      linkLabel="The free checkup gives you your priority in 2 minutes"
-      href="/en/checkup"
-    />
+    <section class="w-cell w-contrast">
+      <div class="w-container" data-w-reveal>
+        <UnCapitulo copy={t.capitulo} lang={lang} />
+      </div>
+    </section>
 
-    <RelatedLinks tag={s.related.tag} title={s.related.title} links={s.related.links} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={3} label={t.perfil.label} />
+        <div class="ws-tight ws-left"><TarjetasPerfil id="perfiles" titleHtml={t.perfil.title} cards={perfiles} wide={t.perfil.wide} /></div>
+      </div>
+    </section>
 
-    <FeatureGrid tag={s.why.tag} title={s.why.title} items={s.why.items} tone={s.why.tone} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={4} label={t.razones.label} />
+        <div class="ws-tight ws-left"><CuatroRazones titleHtml={t.razones.title} items={razones} /></div>
+      </div>
+    </section>
 
-    <Faq tag={s.faq.tag} title={s.faq.title} items={s.faq.items} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras q={s.answer.q} a={s.answer.a} lang={lang} />
+      </div>
+    </section>
 
-    <CtaBand lang="en"
-      title={s.cta.title}
-      sub={s.cta.sub}
-      primary={s.cta.primary}
-      tone={s.cta.tone}
-    />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <PreguntasFrecuentes id="faq" tag={s.faq.tag} titleHtml={s.faq.title} items={s.faq.items} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={s.cta.title}
+          proof={t.cierre.proof}
+          city="houston"
+          tel={tel}
+          wa={wa}
+          lang={lang}
+          grad
+          warm={{ kind: 'diagnostico', title: t.cierre.warmTitle, text: t.cierre.warmText, cta: t.cierre.warmCta, href: t.cierre.warmHref }}
+        />
+      </div>
+    </section>
 
     <Contact contact={c.contact} />
-
-    {/* Home atmosphere (§1): a single fixed gold/teal + stars layer, so the
-        hub does not look like a flat slab of --bg-base. tone="gold" = hub accent. */}
-    <SpaceBackdrop tone="gold" />
   </main>
+
+  <SpaceBackdrop tone="gold" />
 
   <SiteFooter lang="en" footer={c.footer} />
 </Layout>
+
+<style>
+  .ws-after { margin-top: 48px; }
+  @media (--md) { .ws-after { margin-top: 56px; } }
+  /* Tras una cabecera numerada SOLO de etiqueta, el titular del componente va a 12 px (como
+     la demo y la escalera del piloto): la etiqueta y su titular se leen juntos. */
+  .ws-tight { margin-top: 12px; }
+  /* Las razones (y los perfiles) arrancan en la línea del contenido, como su cabecera numerada (no centradas
+     a 96 px del borde: dos alineaciones en una misma sección). */
+  .ws-left :global(.why4) { margin-inline: 0; }
+  /* Lo mismo en "03 Empieza por tu caso" (rev1, menor 3): titular y tarjetas a la izquierda,
+     en la línea de su etiqueta numerada (TarjetasPerfil los centra por defecto). */
+  .ws-left :global(.w-prof__title) { text-align: left; }
+  .ws-left :global(.w-prof__grid) { margin-inline: 0; }
+</style>

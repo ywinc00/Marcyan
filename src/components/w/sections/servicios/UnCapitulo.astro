@@ -1,0 +1,109 @@
+---
+// Servicios · capítulo de contraste "Un capítulo por servicio" (§4.3-4; W-CORE-07 + W-CORE-08
+// + B-03): CapituloDosFrases + Bento2x2 de 7 celdas con la última ancha (wideLast), una por
+// servicio con su objeto y con id="<id del producto>" (destino de los enlaces del inventario,
+// de los perfiles y, tras la integración, del megamenú: #mantenimiento).
+// Cada celda lleva, entre el texto y el objeto, sus NIVELES con precio (Niveles.astro, de
+// `catalog`): el OfferCatalog declara los 15 niveles y aquí se ven los mismos (rev1, imp. 1).
+// Bento2x2 solo admite un slot por celda (la mini-UI dentro de su bandeja), así que las
+// celdas van con la bandeja "desnuda" (tray: false) y este envoltorio pinta dentro del slot
+// los niveles y, debajo, la bandeja del objeto con la MISMA piel que la del sistema
+// (.ws-tray = .wd-bento__tray). Pedido como [SISTEMA]: slot `extra-<n>` en Bento2x2.
+// Página oro: Marcy en burbujas neutras y la respuesta del asistente en oro (E-14, un acento
+// por bloque). Todos los objetos ESTÁTICOS (la firma de la página es la pila del hero).
+// Móvil (E-18): conservan objeto la web, el chat de Marcy, los pedidos y el mantenimiento;
+// la ficha, la respuesta del asistente y el plano de marca quedan en texto + niveles (.ws-dm).
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
+import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+import ListaPedidos from '../../objetos/ListaPedidos.astro';
+import PlanoMarca from '../../objetos/PlanoMarca.astro';
+import MiniPasos from '../../objetos/MiniPasos.astro';
+import Niveles from './Niveles.astro';
+import { catalog as catalogEs } from '../../../../i18n/pricing';
+import { catalog as catalogEn } from '../../../../i18n/pricing.en';
+import type { ServiciosCopy } from '../../../../i18n/w/servicios';
+
+interface Props { copy: ServiciosCopy['capitulo']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const sr = en
+  ? 'Example: a customer asks to book and Marcy confirms the appointment.'
+  : 'Ejemplo: un cliente pide cita y Marcy se la confirma.';
+const cat = en ? catalogEn : catalogEs;
+const tiersOf = (id: string) => (cat.find((p) => p.id === id)?.tiers ?? []).map((t) => ({ name: t.name, display: t.display }));
+const labelOf = (name: string) => (en ? `${name}: tiers and prices` : `${name}: niveles y precios`);
+const cells = copy.cells.map((c) => ({ ...c, tray: false }));
+const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id), label: labelOf(c.label) }]));
+---
+<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div class="ws-gap">
+  <Bento2x2 cells={cells} wideLast>
+    <div slot="ui-1" class="ws-ui">
+      <Niveles {...T['diseno-web']} />
+      <div class="ws-tray"><WebEjemplo frame="movil" kind="plomeria" city="Houston" lang={lang} size="mini" /></div>
+    </div>
+    <div slot="ui-2" class="ws-ui">
+      <Niveles {...T['seo-local']} />
+      <div class="ws-tray ws-dm"><FichaMapaEjemplo city="Houston" lang={lang} size="card" /></div>
+    </div>
+    <div slot="ui-3" class="ws-ui">
+      <Niveles {...T['ia-conversacional']} />
+      <div class="ws-tray"><ChatMarcy mode="estatico" tone="neutral" lang={lang} size="card" sr={sr} /></div>
+    </div>
+    <div slot="ui-4" class="ws-ui">
+      <Niveles {...T['seo-ia']} />
+      <div class="ws-bare ws-dm"><RespuestaAsistente lang={lang} tone="gold" size="mini" /></div>
+    </div>
+    <div slot="ui-5" class="ws-ui">
+      <Niveles {...T['ecommerce']} />
+      <div class="ws-tray"><ListaPedidos lang={lang} size="card" static /></div>
+    </div>
+    <div slot="ui-6" class="ws-ui">
+      <Niveles {...T['branding']} />
+      <div class="ws-tray ws-dm"><PlanoMarca lang={lang} size="mini" /></div>
+    </div>
+    <div slot="ui-7" class="ws-ui">
+      <Niveles {...T['mantenimiento']} />
+      <div class="ws-tray"><MiniPasos kind="mantenimiento" lang={lang} size="card" /></div>
+    </div>
+  </Bento2x2>
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  /* Los niveles van pegados al texto; el objeto, con su aire de siempre debajo. */
+  .ws-gap :global(.wd-bento__ui) { margin-top: 28px; }
+  .ws-ui { justify-self: stretch; width: 100%; min-width: 0; display: grid; }
+  .ws-tray, .ws-bare { margin-top: 40px; min-width: 0; }
+  @media (--md) {
+    .ws-gap :global(.wd-bento__ui) { margin-top: 32px; }
+    .ws-tray, .ws-bare { margin-top: 56px; }
+  }
+  /* Misma piel que .wd-bento__tray (Bento2x2): radio 22, padding 14,5, un escalón más claro. */
+  .ws-tray {
+    display: grid; justify-items: center;
+    padding: 14.5px; border-radius: var(--w-r-tray);
+    background: var(--w-tray-bg, var(--w-s1)); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .ws-tray > :global(*) { min-width: 0; }
+  .ws-tray > :global(.wo-mini),
+  .ws-tray > :global(.wo-map),
+  .ws-tray > :global(.wo-chat) { width: 100%; max-width: none; }
+  @media (--lt-md) { .ws-dm { display: none; } }
+  /* Celda ancha (Mantenimiento) a dos columnas en escritorio: texto a la izquierda; el nivel y
+     el panel a la derecha. A todo el ancho, un panel de tres filas quedaba estirado a 1100 px
+     y vacío (autocrítica c1). Propuesto como [SISTEMA] para Bento2x2 (wideLast). */
+  @media (--lg) {
+    .ws-gap :global(.wd-bento__cell--wide) {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 96px;
+      grid-template-rows: auto auto 1fr; align-items: start;
+    }
+    .ws-gap :global(.wd-bento__cell--wide > :not(.wd-bento__ui)) { grid-column: 1; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__ui) { grid-column: 2; grid-row: 1 / span 3; margin-top: 0; align-self: center; }
+    .ws-gap :global(.wd-bento__cell--wide .ws-tray) { margin-top: 32px; }
+  }
+</style>

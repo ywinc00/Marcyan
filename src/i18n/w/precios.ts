@@ -32,6 +32,15 @@ export const tiersOf = (p: CatalogProduct, lang: PreciosLang) =>
     unit: t.monthly ? (lang === 'en' ? 'a month' : 'al mes') : undefined,
   }));
 
+/** Cifra grande de cada TarjetaPrecio (W-CONV-03): el nivel ancla del catálogo.
+ *  k = rótulo pequeño encima, v = la cifra. Gratis → rótulo = nombre del nivel (verbatim). */
+export const fromOf = (p: CatalogProduct, lang: PreciosLang): { k: string; v: string } => {
+  const t = p.tiers.find((x) => x.anchor) ?? p.tiers[0];
+  if (t.value === null) return { k: t.name, v: lang === 'en' ? 'Free' : 'Gratis' };
+  const k = lang === 'en' ? (t.monthly ? 'Monthly, from' : 'From') : (t.monthly ? 'Al mes, desde' : 'Desde');
+  return { k, v: usd(t.value) };
+};
+
 /** Lo incluido de cada tarjeta: el `blurb` verbatim de cada nivel (o los cardBullets). */
 export const includesOf = (p: CatalogProduct) =>
   p.cardBullets ?? p.tiers.map((t) => `${t.name}: ${t.blurb}`);
@@ -163,7 +172,7 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
     garantias: {
       title: 'Tres compromisos, siempre',
       items: [
-        { icon: 'lucide:clock', title: 'Te contactamos en 1 hora hábil', text: 'Escríbenos y te respondemos ese mismo día laboral.' },
+        { icon: 'lucide:clock', title: 'Te contactamos en 1 hora hábil', text: 'Escríbenos en horario laboral y te contestamos dentro de la hora.' },
         { icon: 'lucide:file-pen-line', title: 'Propuesta en 24 horas', text: 'Con alcance y precio claros, sin costo ni compromiso.' },
         { icon: 'lucide:key-round', title: 'La web es tuya', text: 'Al terminar, el sitio es tuyo. Nunca te dejamos amarrado.' },
       ],
@@ -237,7 +246,7 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
     despues: {
       label: 'After launch',
       title: 'Your site is never left <em>on its own</em>',
-      lead: 'Three month to month services that keep it working for you. No lock-in.',
+      lead: 'Three monthly services that keep it working for you. No lock-in.',
       cols: [
         {
           id: 'mantenimiento', key: 'maintenance',
@@ -267,7 +276,7 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
     garantias: {
       title: 'Three promises, every time',
       items: [
-        { icon: 'lucide:clock', title: 'We reply within 1 business hour', text: 'Reach out and hear back the same working day.' },
+        { icon: 'lucide:clock', title: 'We reply within 1 business hour', text: 'Message us during business hours and hear back within the hour.' },
         { icon: 'lucide:file-pen-line', title: 'Proposal in 24 hours', text: 'Clear scope and price, no cost and no commitment.' },
         { icon: 'lucide:key-round', title: 'The site is yours', text: 'Once it is done, you own it. We never lock you in.' },
       ],

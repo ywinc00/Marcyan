@@ -58,5 +58,17 @@ const { eyebrow, h1Html, lead, cards } = Astro.props;
   /* Cada promesa entera en su línea: el corte cae en el punto medio, nunca dentro. */
   .ph__part { white-space: nowrap; }
   .ph__cards { margin-top: 80px; }
+  /* "Ver precios" baja a #precios: flecha ↓ en vez del chevron (W-CONV-01). Button
+     no tiene esa variante (pendiente [SISTEMA]); se cambia el glifo solo aquí. */
+  .ph__cards :global(.tm__card:first-child .btn__chev) { font-size: 0; }
+  .ph__cards :global(.tm__card:first-child .btn__chev::after) { content: "↓"; font-size: 18px; }
+  @media (--hover-fine) {
+    .ph__cards :global(.tm__card:first-child .btn--link:hover .btn__chev) { transform: translateY(3px); }
+  }
+  .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: translateY(3px); }
+  @media (--motion-reduce) {
+    .ph__cards :global(.tm__card:first-child .btn--link:hover .btn__chev),
+    .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: none; }
+  }
   @media (--lt-md) { .ph__cards { margin-top: 48px; } }
 </style>

@@ -6,6 +6,7 @@
 // Derecha: lo que trae una propuesta combinada (sin descuentos inventados).
 import Button from '../../../ui/Button.astro';
 import Icon from '../../../ui/Icon.astro';
+import Eyebrow from '../../Eyebrow.astro';
 
 interface Props { tag: string; title: string; text: string; lead: string; items: string[]; cta: string }
 const { tag, title, text, lead, items, cta } = Astro.props;
@@ -13,7 +14,7 @@ const { tag, title, text, lead, items, cta } = Astro.props;
 <div class="pc">
   <span class="pc__stripes" aria-hidden="true"></span>
   <div class="pc__main">
-    <p class="pc__tag">{tag}</p>
+    <Eyebrow tone="gold" class="pc__tag">{tag}</Eyebrow>
     <h2 class="pc__h">{title}</h2>
     <p class="pc__text">{text}</p>
     <div class="pc__cta">
@@ -43,7 +44,7 @@ const { tag, title, text, lead, items, cta } = Astro.props;
     -webkit-mask-image: radial-gradient(110% 140% at 100% 100%, #000 15%, transparent 70%);
     mask-image: radial-gradient(110% 140% at 100% 100%, #000 15%, transparent 70%);
   }
-  .pc__tag { margin: 0 0 12px; font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-70); }
+  .pc__main :global(.pc__tag) { margin: 0 0 12px; }
   .pc__h {
     margin: 0; max-width: 16em; font-family: var(--font-display); font-weight: 500;
     font-size: clamp(1.625rem, 1.3rem + 0.9vw, 2rem); line-height: 1.2; letter-spacing: -0.03em;

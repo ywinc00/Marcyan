@@ -1,0 +1,65 @@
+---
+// Precios · banner "Combina servicios" (§4.4-6; W-CONV-07, recorte W-CONV-04-banner-anual).
+// 1060×306 en --w-s1 (bandeja opaca: el texto nunca va sobre el patrón, E-37), radio
+// de bandeja, franjas de luz oro solo en la esquina inferior derecha, lejos del texto.
+// Izquierda: rótulo, titular 32/500, una línea y el botón principal a la propuesta.
+// Derecha: lo que trae una propuesta combinada (sin descuentos inventados).
+import Button from '../../../ui/Button.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Props { tag: string; title: string; text: string; lead: string; items: string[]; cta: string }
+const { tag, title, text, lead, items, cta } = Astro.props;
+---
+<div class="pc">
+  <span class="pc__stripes" aria-hidden="true"></span>
+  <div class="pc__main">
+    <p class="pc__tag">{tag}</p>
+    <h2 class="pc__h">{title}</h2>
+    <p class="pc__text">{text}</p>
+    <div class="pc__cta">
+      <Button variant="primary" size="lg" href="#contacto" data-track="proposal_requested">{cta}</Button>
+    </div>
+  </div>
+  <div class="pc__side">
+    <p class="pc__lead">{lead}</p>
+    <ul class="pc__list">
+      {items.map((it) => <li><Icon name="lucide:check" class="pc__check" />{it}</li>)}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .pc {
+    position: relative; overflow: hidden; isolation: isolate;
+    max-width: 1060px; margin-inline: auto; min-block-size: 306px;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center;
+    padding: 48px; background: var(--w-s1);
+    border: 1px solid var(--w-line); border-radius: var(--w-r-tray); box-shadow: var(--w-edge);
+  }
+  @media (--md) { .pc { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; } }
+  .pc__stripes {
+    position: absolute; right: 0; bottom: 0; inline-size: min(520px, 70%); block-size: 160px;
+    background: var(--w-stripes); opacity: .5; z-index: -1; pointer-events: none;
+    -webkit-mask-image: radial-gradient(110% 140% at 100% 100%, #000 15%, transparent 70%);
+    mask-image: radial-gradient(110% 140% at 100% 100%, #000 15%, transparent 70%);
+  }
+  .pc__tag { margin: 0 0 12px; font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-70); }
+  .pc__h {
+    margin: 0; max-width: 16em; font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(1.625rem, 1.3rem + 0.9vw, 2rem); line-height: 1.2; letter-spacing: -0.03em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .pc__text { margin: 12px 0 0; font-family: var(--font-body); font-size: 16px; line-height: 1.55; color: var(--w-ink-80); }
+  .pc__cta { margin-top: 28px; }
+  .pc__lead { margin: 0 0 14px; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink); }
+  .pc__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .pc__list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-80);
+  }
+  .pc__list :global(.pc__check) { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--accent-gold); }
+  @media (--lt-md) {
+    .pc { padding: 32px 24px; min-block-size: 0; }
+    .pc__stripes { block-size: 120px; }
+  }
+</style>

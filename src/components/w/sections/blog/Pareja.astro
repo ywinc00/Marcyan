@@ -1,0 +1,70 @@
+---
+// Pareja de guías bajo la destacada (W-CONT-09, design/rediseno-workos.md §4.7): dos
+// columnas de 576 con 48 px entre ellas; portada ilustrada 576×368 radio 8 arriba,
+// etiqueta, titular 24/30, extracto y pie (tiempo de lectura | fecha). Sin caja: la
+// portada hace de imagen y el texto va sobre la noche, como en WorkOS.
+import Portada from './Portada.astro';
+import type { PostCard } from '../../../../i18n/w/blog';
+
+interface Props {
+  posts: PostCard[];
+}
+const { posts } = Astro.props;
+---
+<ul class="bpar" role="list">
+  {posts.map((p) => (
+    <li class="bpar__item">
+      <a class="bpar__card" href={p.href}>
+        <Portada tags={p.tags} class="bpar__art" />
+        <div class="bpar__body">
+          {p.tags[0] && <span class="bpar__tag">{p.tags[0]}</span>}
+          <h2 class="bpar__title">{p.title}</h2>
+          <p class="bpar__excerpt">{p.description}</p>
+          <div class="bpar__foot">
+            <span>{p.reading}</span>
+            <time datetime={p.dateISO}>{p.dateLabel}</time>
+          </div>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .bpar { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 56px; min-width: 0; }
+  .bpar__item { min-width: 0; display: flex; }
+  .bpar__card { display: flex; flex-direction: column; gap: 24px; min-width: 0; width: 100%; color: var(--w-ink); text-decoration: none; }
+  .bpar__card :global(.bpar__art) {
+    aspect-ratio: 576 / 368; border-radius: var(--w-r-cell);
+    border: 1px solid var(--w-line); transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .bpar__body { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; flex: 1; min-width: 0; }
+  .bpar__tag {
+    display: inline-flex; padding: 3px 9px; border-radius: var(--w-r-cell);
+    font: 500 13px/20px var(--font-body); color: var(--accent-gold); background: rgba(var(--accent-gold-rgb), .12);
+  }
+  .bpar__title {
+    margin: 4px 0 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h3); line-height: 1.25; letter-spacing: -0.025em; color: var(--w-ink); text-wrap: balance;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .bpar__excerpt {
+    margin: 0; font: 400 16px/1.5 var(--font-body); color: var(--w-ink-70);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .bpar__foot {
+    margin-top: auto; padding-top: 6px; width: 100%; display: flex; justify-content: space-between; gap: 16px;
+    font: 400 14px/20px var(--font-body); color: var(--w-ink-60);
+  }
+  @media (--hover-fine) {
+    .bpar__card:hover :global(.bpar__art) { border-color: rgba(var(--accent-gold-rgb), .32); }
+    .bpar__card:hover .bpar__title { color: var(--accent-gold); }
+  }
+  .bpar__card:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 6px; border-radius: var(--w-r-cell); }
+  @media (--md) {
+    .bpar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+  }
+  @media (--motion-reduce) {
+    .bpar__card :global(.bpar__art), .bpar__title { transition: none; }
+  }
+</style>

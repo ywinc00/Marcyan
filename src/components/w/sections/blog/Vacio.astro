@@ -1,0 +1,42 @@
+---
+// Estado vacío del índice (design/rediseno-workos.md §4.7, EN sin guías todavía): celda
+// punteada de W-NEW-08 (borde discontinuo con marcas de corte que sobresalen en las
+// esquinas) con el aviso y un enlace a las guías en español. Nunca lista artículos ES.
+interface Props {
+  title: string;
+  text?: string;
+  link?: { label: string; href: string };
+}
+const { title, text, link } = Astro.props;
+---
+<div class="bv">
+  <span class="bv__mark bv__mark--tl" aria-hidden="true"></span>
+  <span class="bv__mark bv__mark--br" aria-hidden="true"></span>
+  <p class="bv__title">{title}</p>
+  {text && <p class="bv__text">{text}</p>}
+  {link && link.href && <a class="w-link bv__link" href={link.href} hreflang="es">{link.label}</a>}
+</div>
+
+<style>
+  .bv {
+    position: relative; max-width: 776px; margin-inline: auto; padding: 48px 32px 40px;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+    border: 1px dashed rgba(var(--accent-gold-rgb), .38); border-radius: 2px;
+    background: var(--w-s1-a);
+  }
+  /* Marcas de corte: el borde se prolonga 16 px fuera de dos esquinas opuestas. */
+  .bv__mark { position: absolute; width: 16px; height: 16px; pointer-events: none; }
+  .bv__mark--tl { top: -1px; left: -17px; border-top: 1px dashed rgba(var(--accent-gold-rgb), .38); }
+  .bv__mark--tl::after { content: ''; position: absolute; left: 16px; top: -17px; height: 16px; border-left: 1px dashed rgba(var(--accent-gold-rgb), .38); }
+  .bv__mark--br { bottom: -1px; right: -17px; border-bottom: 1px dashed rgba(var(--accent-gold-rgb), .38); }
+  .bv__mark--br::after { content: ''; position: absolute; right: 16px; bottom: -17px; height: 16px; border-right: 1px dashed rgba(var(--accent-gold-rgb), .38); }
+  .bv__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2-small); line-height: 1.2; letter-spacing: -0.03em; color: var(--w-ink); text-wrap: balance;
+  }
+  .bv__text { margin: 0; max-width: 46ch; font: 400 16px/1.6 var(--font-body); color: var(--w-ink-70); }
+  .bv__link { margin-top: 6px; }
+  @media (--lt-md) {
+    .bv { padding: 36px 20px 28px; margin-inline: 8px; }
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+// Guía destacada (W-CONT-02, design/rediseno-workos.md §4.7): tarjeta partida 1312×420,
+// radio 44, que sobresale 56 px por lado de la línea del contenido (solo donde caben los
+// raíles, ≥ 1328 px). Mitad izquierda texto con 48 px de aire (etiqueta oro + fecha arriba,
+// titular 32/38, extracto, pie con autoría honesta "Equipo Marcyan" y tiempo de lectura +
+// enlace con chevron); mitad derecha la portada ilustrada a sangre, recortada por el radio.
+// Es el ÚNICO capítulo de contraste de la página (superficie elevada, .w-contrast).
+// Toda la tarjeta es el enlace (un solo destino); el "Leer guía ›" es su rótulo visible.
+import Portada from './Portada.astro';
+import type { PostCard } from '../../../../i18n/w/blog';
+
+interface Props {
+  post: PostCard;
+  team: string;
+  readMore: string;
+}
+const { post, team, readMore } = Astro.props;
+---
+<div class="bd-wrap" data-w-in="obj">
+  <a class="bd w-contrast" href={post.href}>
+    <div class="bd__text">
+      <div class="bd__top">
+        {post.tags[0] && <span class="bd__tag">{post.tags[0]}</span>}
+        <time class="bd__date" datetime={post.dateISO}>{post.dateLabel}</time>
+      </div>
+      <h2 class="bd__title">{post.title}</h2>
+      <p class="bd__excerpt">{post.description}</p>
+      <div class="bd__foot">
+        <span class="bd__by">{team} · {post.reading}</span>
+        <span class="bd__more">{readMore}<span class="bd__chev" aria-hidden="true">›</span></span>
+      </div>
+    </div>
+    <Portada tags={post.tags} size="feature" class="bd__art" />
+  </a>
+</div>
+
+<style>
+  .bd-wrap { min-width: 0; }
+  .bd {
+    display: grid; grid-template-columns: 1fr; min-width: 0; overflow: hidden;
+    border: 1px solid var(--w-line-strong); border-radius: var(--w-r-obj);
+    box-shadow: var(--w-edge); color: var(--w-ink); text-decoration: none;
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .bd__text { display: flex; flex-direction: column; gap: 14px; padding: 28px 24px 24px; min-width: 0; }
+  .bd__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .bd__tag {
+    display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--w-r-cell);
+    font: 500 13px/20px var(--font-body); color: var(--accent-gold);
+    background: rgba(var(--accent-gold-rgb), .12);
+  }
+  .bd__date { font: 400 14px/20px var(--font-body); color: var(--w-ink-60); }
+  .bd__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2rem); line-height: 1.19; letter-spacing: -0.035em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .bd__excerpt { margin: 0; font: 400 16px/1.5 var(--font-body); color: var(--w-ink-70); max-width: 34rem; }
+  .bd__foot {
+    margin-top: auto; padding-top: 12px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 24px;
+  }
+  .bd__by { font: 400 14px/20px var(--font-body); color: var(--w-ink-60); }
+  .bd__more {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .bd__chev { font-size: 18px; line-height: 1; color: var(--w-accent); transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  .bd :global(.bd__art) { aspect-ratio: 16 / 10; }
+  @media (--hover-fine) {
+    .bd:hover { border-color: rgba(var(--accent-gold-rgb), .32); }
+    .bd:hover .bd__more { color: var(--w-accent); }
+    .bd:hover .bd__chev { transform: translateX(3px); }
+  }
+  .bd:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; }
+
+  @media (--md) {
+    .bd { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 420px; border-radius: var(--w-r-feature); }
+    .bd__text { padding: 56px 48px 48px; gap: 16px; }
+    .bd :global(.bd__art) { aspect-ratio: auto; height: 100%; }
+  }
+  /* Sobresale 56 px por lado donde caben los raíles (W-CONT-02: 1312 sobre 1200). */
+  @media (min-width: 1328px) {
+    .bd-wrap { margin-inline: -56px; }
+  }
+  @media (--motion-reduce) {
+    .bd, .bd__more, .bd__chev { transition: none; }
+    .bd:hover .bd__chev { transform: none; }
+  }
+</style>

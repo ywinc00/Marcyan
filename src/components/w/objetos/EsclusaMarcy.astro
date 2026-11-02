@@ -168,7 +168,9 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
     transition: opacity 600ms var(--w-ease-ui), transform 600ms var(--w-ease-ui);
   }
   .wo-lock.is-pill .wo-lock__pill { opacity: 1; transform: none; }
-  .wo-lock.is-pill.is-exit .wo-lock__pill { opacity: 0; transform: translateY(96px); transition-duration: 500ms; }
+  /* Sale hacia la puerta de abajo pero se funde antes de llegar a la explicación (control 1:
+     al bajar 96 px se montaba sobre ella). */
+  .wo-lock.is-pill.is-exit .wo-lock__pill { opacity: 0; transform: translateY(14px); transition-duration: 280ms; }
   .wo-lock__verdict {
     position: absolute; left: 0; right: 0; top: 58%; margin: 0; text-align: center;
     display: flex; flex-direction: column; gap: 2px; padding: 0 30px;

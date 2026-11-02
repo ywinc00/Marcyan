@@ -369,7 +369,7 @@ const sizes = [40, 48, 56, 80] as const;
           <ChipCiudad label="Houston, TX" />
           <p class="w-h2 mz-mt">SEO local en Houston, para que te llamen a ti.</p>
         </div>
-        <TarjetaObjeto button="Llamar" example={false}>
+        <TarjetaObjeto example={false}>
           <IconoObjeto id="seo-local" size={56} slot="icon" />
           <FichaMapaEjemplo />
         </TarjetaObjeto>
@@ -441,7 +441,7 @@ const sizes = [40, 48, 56, 80] as const;
           <Eyebrow tone="gold">Contratistas</Eyebrow>
           <p class="w-h2 mz-mt">Sitios web para contratistas en Houston</p>
         </div>
-        <TarjetaObjeto button="Responder">
+        <TarjetaObjeto>
           <IconoObjeto id="diseno-web" size={56} slot="icon" />
           <SolicitudOficio kind="contratista" example={false} />
         </TarjetaObjeto>
@@ -511,8 +511,8 @@ const sizes = [40, 48, 56, 80] as const;
         <p class="mz-tag">DilemaDosCaminos · W-ADV-03/04 (IA para pymes 01)</p>
         <DilemaDosCaminos
           titleHtml="<span class='w-tone'>Contestar o perder el cliente.</span> Con Marcy no eliges."
-          left={{ title: 'Contestar tú cada mensaje', text: 'Respondes entre trabajo y trabajo, y de noche nadie contesta.' }}
-          right={{ title: 'Un bot de respuestas fijas', text: 'Contesta siempre lo mismo y el cliente se cansa.' }}
+          left={{ title: 'Contestar tú cada mensaje', text: 'Respondes entre trabajo y trabajo, y de noche nadie contesta.', evidence: ['Mensaje de las 22:14', '¿Tienen cita para mañana temprano?', 'Sin responder'] }}
+          right={{ title: 'Un bot de respuestas fijas', text: 'Contesta siempre lo mismo y el cliente se cansa.', evidence: ['Respuesta automática', 'Gracias por escribir. Horario de 9 a 5.', 'La misma, pregunte lo que pregunte.'] }}
           answerId="ia-conversacional"
           tone="teal"
           bridge="Marcy contesta como tu negocio, a cualquier hora."
@@ -692,7 +692,7 @@ const sizes = [40, 48, 56, 80] as const;
         <TarjetasModelo
           cards={[
             { title: 'Pago por proyecto', text: 'Pagas una vez y la web es tuya.', icon: 'diseno-web', items: [`Diseño web ${desde(PRICE_ANCHORS.webLanding).toLowerCase()}`, `Tienda en línea ${desde(PRICE_ANCHORS.ecommerceEssential).toLowerCase()}`, `Logo ${desde(PRICE_ANCHORS.brandingLogo).toLowerCase()}`], cta: { label: 'Ver precios', href: '#precios', variant: 'link' } },
-            { title: 'Mensual', text: 'Lo que sigue trabajando después de publicar.', icon: 'seo-local', items: [`SEO local ${desde(PRICE_ANCHORS.seoLocal).toLowerCase()} al mes`, `Mantenimiento ${desde(PRICE_ANCHORS.maintenance).toLowerCase()} al mes`, `Monitoreo de IA ${desde(PRICE_ANCHORS.aeoMonitoring).toLowerCase()} al mes`], cta: { label: 'Ver precios', href: '#precios', variant: 'link' } },
+            { title: 'Mensual', text: 'Lo que sigue trabajando después de publicar.', icon: 'seo-local', items: [`SEO local ${desde(PRICE_ANCHORS.seoLocal).toLowerCase()} al mes`, `Mantenimiento ${desde(PRICE_ANCHORS.maintenance).toLowerCase()} al mes`, `Monitoreo de IA ${desde(PRICE_ANCHORS.aeoMonitoring).toLowerCase()} al mes`], cta: { label: 'Ver precios', href: '#precios', variant: 'primary' } },
           ]}
         />
       </div>

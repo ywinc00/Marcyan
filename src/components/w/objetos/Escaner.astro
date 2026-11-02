@@ -149,6 +149,9 @@ const sr = en
     .wo-scan { min-height: 360px; padding: 24px; border-radius: 22px; --bw: 200px; --bh: 138px; }
     .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
     .wo-scan__bar { width: 104px; margin-left: -52px; }
+    /* E-18: el botón de pausa del bucle tiene su franja; el mosaico termina encima. */
+    .wo-scan--loop { padding-bottom: 76px; }
+    .wo-scan--loop .wo-scan__wall { bottom: 64px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .wo-scan .wo-scan__bar { animation: none; }

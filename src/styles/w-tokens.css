@@ -59,12 +59,16 @@
   --w-s-solid: var(--bg-elevated);                      /* paneles opacos (megamenú, tarjeta de formulario) */
   --w-edge: inset 0 1px 0 rgba(255,255,255,.08);        /* filo de luz G-10 */
   --w-contrast-bg: var(--bg-elevated);                  /* capítulo de contraste A */
-  --w-dawn: radial-gradient(120% 60% at 50% 100%, rgba(var(--accent-gold-rgb), .22) 0%,
-            rgba(var(--accent-gold-rgb), .08) 38%, transparent 70%);  /* capítulo de contraste B (amanecer) */
-  --w-dawn-teal: radial-gradient(120% 60% at 50% 100%, rgba(79,195,161,.14) 0%,
-            rgba(79,195,161,.05) 38%, transparent 70%);  /* amanecer de páginas de IA (E-14) */
-  --w-dots: radial-gradient(rgba(var(--accent-gold-rgb), .16) 1px, transparent 1.2px) 0 0 / 24px 24px; /* trama de puntos */
-  --w-stripes: repeating-linear-gradient(180deg, rgba(var(--accent-gold-rgb), .14) 0 1px, transparent 1px 5px); /* franjas de luz */
+  --w-dawn: radial-gradient(120% 60% at 50% 100%, rgba(var(--accent-gold-rgb), .34) 0%,
+            rgba(var(--accent-gold-rgb), .12) 40%, transparent 72%);  /* capítulo de contraste B (amanecer) */
+  --w-dawn-teal: radial-gradient(120% 60% at 50% 100%, rgba(79,195,161,.22) 0%,
+            rgba(79,195,161,.08) 40%, transparent 72%);  /* amanecer de páginas de IA (E-14) */
+  --w-dots: radial-gradient(rgba(var(--accent-gold-rgb), .28) 1px, transparent 1.3px) 0 0 / 24px 24px; /* trama de puntos */
+  /* Franjas de luz (W-CORE-01): líneas de 1 px cada 4 px sobre una banda de luz oro baja.
+     Recalibradas en el control 1 (antes pico 34/255 sobre 8: no se veían). Las máscaras de cada
+     pieza dan la forma; nunca corren detrás de texto (E-37). */
+  --w-stripes: repeating-linear-gradient(180deg, rgba(var(--accent-gold-rgb), .38) 0 1px, transparent 1px 4px),
+               linear-gradient(180deg, transparent 0%, rgba(var(--accent-gold-rgb), .10) 45%, rgba(var(--accent-gold-rgb), .16) 70%, rgba(var(--accent-gold-rgb), .06) 100%);
 
   /* ── Radios (4; ≤ 8 → 8 · 10-16 → 12 · 18-28 → 22 · ≥ 40 → 44; píldoras 999) ── */
   --w-r-cell: 8px;  --w-r-obj: 12px;  --w-r-tray: 22px;  --w-r-feature: 44px;

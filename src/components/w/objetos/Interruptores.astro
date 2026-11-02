@@ -1,13 +1,14 @@
 ---
 // Pila de interruptores de servicios (W-HOME-06 · design/rediseno-workos.md §3.6, §2.10, §4.3).
-// Objeto de PRODUCTO (tarjetas claras). Bloque 560×550; tarjetas 360×62 radio 16 padding 20,
-// paso 78 px, en arco (la central sobresale a la izquierda, 24 px más a la derecha por paso);
-// interruptor 40×22; etiqueta 14/500; chapa "Activo" en tinta con texto crema (estado por
-// valor) / "Listo" gris; opacidades 100/70/40/12 %; rayas verticales oro de 1 px cada 5 px
-// en óvalo difuminado detrás. Cada tarjeta es un <a> a su servicio (hrefs por props: los de
-// priceServices, nunca inventados).
+// Objeto de PRODUCTO: la tarjeta central es clara (la que se enciende); las demás se funden
+// hacia la noche (tarjeta opaca de sistema con su contenido apagado por una máscara de noche,
+// nunca una tarjeta clara con opacidad, que da gris barro: E-14, control 1). Bloque 560×550;
+// tarjetas 360×62 radio 16, paso 78 px, en arco (la central sobresale a la izquierda, 24 px más
+// a la derecha por paso); interruptor 40×22; etiqueta 14/500; chapa "Activo" / "Listo";
+// rayas verticales oro de 1 px cada 5 px en óvalo difuminado detrás. Cada tarjeta es un <a>
+// a su servicio (hrefs por props: los de priceServices, nunca inventados).
 // Bucle (firma de Servicios): la pila sube 78 px cada 2,4 s en 1400 ms (--w-ease-stack) y la
-// central enciende su interruptor y su chapa. Quieto: "Web rápida" en el centro, activa.
+// central enciende su interruptor y su chapa. Quieto: "Web rápida" en el centro, la única activa.
 // size: hero 560×550 · card ≈ 480×420 (Servicios) · mini. Móvil: pila reducida, nunca oculta.
 interface Item { label: string; href: string; track?: string }
 interface Props {
@@ -32,7 +33,7 @@ const slot = (i: number) => (i + c) % n;
         const d = slot(i) - c;
         return (
           <a
-            class:list={['wo-sw__card', d <= 0 && 'is-on', Math.abs(d) > 3 && 'is-off']}
+            class:list={['wo-sw__card', d <= 0 && 'is-on', d === 0 && 'is-mid', Math.abs(d) > 3 && 'is-off']}
             href={it.href}
             data-p={slot(i)}
             data-track={it.track}
@@ -55,37 +56,88 @@ const slot = (i: number) => (i + c) % n;
     const cards = Array.from(el.querySelectorAll<HTMLElement>('.wo-sw__card'));
     const n = cards.length, c = Number(el.dataset.c || 0);
     if (n < 3) return;
+    // Estado ABSOLUTO: un solo contador de pasos. La posición de cada tarjeta se deriva de él,
+    // nunca de "su posición anterior menos uno". Antes, si el bucle se paraba y volvía a
+    // arrancar (salir de pantalla, puntero, foco) en mitad de un paso, el salto de la tarjeta
+    // que da la vuelta caía fuera de su turno y dos tarjetas acababan en el mismo hueco: la
+    // pila se montaba y dejaba un hueco abajo (control 1, bloqueante).
     const init = cards.map((k) => Number(k.dataset.p));
+    const mod = (a: number) => ((a % n) + n) % n;
+    let t = 0;
     let timer = 0;
-    const paint = (k: HTMLElement, p: number) => {
+    let last = 0;
+    const jumps = new Map<HTMLElement, number>();
+
+    // Paso y arco en px reales (cambian con el punto de corte). La posición se escribe como
+    // transform explícito: una transición entre dos valores en px no depende de recalcular
+    // variables a mitad de camino.
+    const dims = () => {
+      const cs = getComputedStyle(el);
+      return { step: parseFloat(cs.getPropertyValue('--step')) || 78, dx: parseFloat(cs.getPropertyValue('--dx')) || 24 };
+    };
+    let D = dims();
+    window.matchMedia('(max-width: 767.98px)').addEventListener?.('change', () => { D = dims(); cards.forEach((k) => paint(k, Number(k.dataset.p), el.classList.contains('is-still'))); });
+    const paint = (k: HTMLElement, p: number, stillMode = false) => {
       const d = p - c;
       k.dataset.p = String(p);
       k.style.setProperty('--d', String(d));
-      k.classList.toggle('is-on', d <= 0);
+      k.style.transform = `translate(${Math.abs(d) * D.dx}px, ${d * D.step}px)`;
+      k.classList.toggle('is-on', stillMode ? d === 0 : d <= 0);
+      k.classList.toggle('is-mid', d === 0);
       k.classList.toggle('is-off', Math.abs(d) > 3);
     };
+    // Recoloca sin transición (vuelta por abajo, sin cruzar la pila).
+    const place = (k: HTMLElement, p: number) => {
+      k.classList.add('is-jump');
+      paint(k, p);
+      void k.offsetWidth;
+      k.classList.remove('is-jump');
+    };
+    // Termina YA los saltos pendientes: nunca quedan temporizadores sueltos fuera del bucle.
+    const flush = () => {
+      jumps.forEach((id, k) => {
+        window.clearTimeout(id);
+        place(k, n); // d = n - c: justo debajo de la última visible
+        paint(k, mod(init[cards.indexOf(k)] - t));
+      });
+      jumps.clear();
+    };
     const step = () => {
-      cards.forEach((k) => {
-        const p = Number(k.dataset.p) - 1;
-        if (p < 0) {
-          // Sale por arriba (a opacidad 0) y vuelve por abajo sin cruzar la pila.
+      flush();
+      t += 1;
+      last = performance.now();
+      cards.forEach((k, i) => {
+        const p = mod(init[i] - t);
+        const prev = Number(k.dataset.p);
+        if (prev === 0 && p === n - 1) {
+          // Sale por arriba (se funde) y, acabado el movimiento, vuelve por abajo.
           paint(k, -1);
-          window.setTimeout(() => {
-            k.classList.add('is-jump');
-            k.style.setProperty('--d', String(n - c));
-            void k.offsetWidth;
-            k.classList.remove('is-jump');
-            k.classList.remove('is-off');
-            paint(k, n - 1);
-          }, MOVE);
+          jumps.set(k, window.setTimeout(() => {
+            jumps.delete(k);
+            place(k, n);
+            paint(k, mod(init[i] - t));
+          }, MOVE));
         } else paint(k, p);
       });
       timer = window.setTimeout(step, EVERY);
     };
     registerLoop(el, {
-      start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, EVERY - MOVE); },
-      stop: () => window.clearTimeout(timer),
-      still: () => { window.clearTimeout(timer); cards.forEach((k, i) => paint(k, init[i])); el.classList.add('is-still'); },
+      start: () => {
+        el.classList.remove('is-still');
+        // Respeta la cadencia: nunca dos pasos a menos de EVERY.
+        const since = last ? performance.now() - last : EVERY;
+        timer = window.setTimeout(step, Math.max(EVERY - MOVE, EVERY - since));
+      },
+      stop: () => { window.clearTimeout(timer); flush(); },
+      still: () => {
+        window.clearTimeout(timer);
+        jumps.forEach((id) => window.clearTimeout(id));
+        jumps.clear();
+        t = 0;
+        cards.forEach((k, i) => place(k, init[i]));
+        cards.forEach((k, i) => paint(k, init[i], true));
+        el.classList.add('is-still');
+      },
     });
   });
 </script>
@@ -101,15 +153,16 @@ const slot = (i: number) => (i + c) % n;
   .wo-sw__stage {
     position: relative; width: 100%; height: var(--sw-h); overflow: hidden;
     /* Sin bordes rectos al recortar la pila (E-36). */
-    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
-    mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%);
   }
+  /* Óvalo de rayas: la luz de la sección (W-HOME-06). Más denso en el centro, detrás de la
+     tarjeta encendida; las tarjetas son opacas, así que nunca corre detrás de texto (E-37). */
   .wo-sw__rays {
-    position: absolute; left: 60px; right: 20px; top: 40px; bottom: 40px;
-    background: repeating-linear-gradient(90deg, rgba(var(--accent-gold-rgb), .30) 0 1px, transparent 1px 5px);
-    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
-    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
-    filter: blur(.4px);
+    position: absolute; left: 20px; right: 0; top: 10px; bottom: 10px;
+    background: repeating-linear-gradient(90deg, rgba(var(--accent-gold-rgb), .55) 0 1px, transparent 1px 5px);
+    -webkit-mask-image: radial-gradient(closest-side, #000 35%, rgba(0,0,0,.45) 70%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 35%, rgba(0,0,0,.45) 70%, transparent 100%);
   }
   .wo-sw__list { position: absolute; inset: 0; }
   .wo-sw__card {
@@ -117,53 +170,84 @@ const slot = (i: number) => (i + c) % n;
     position: absolute; left: var(--x0); top: calc(50% - var(--ch) / 2);
     display: flex; align-items: center; gap: 14px;
     width: min(var(--cw), 100% - var(--x0) - 3 * var(--dx)); height: var(--ch); padding: 0 18px;
-    border-radius: 16px; text-decoration: none;
-    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
-    border: 1px solid rgba(14,14,13,.04);
-    box-shadow: inset 0 1px 0 #fff;
+    border-radius: 16px; text-decoration: none; isolation: isolate;
+    /* Tarjeta apagada = objeto de sistema opaco (tapa las rayas). */
+    background: var(--w-s2); color: var(--w-ink);
+    border: 1px solid var(--w-line-strong);
+    box-shadow: var(--w-edge);
     transform: translate(calc(var(--ad) * var(--dx)), calc(var(--d) * var(--step)));
-    opacity: clamp(0, calc(1 - var(--ad) * .3 + max(0, var(--ad) - 2) * .02 - max(0, var(--ad) - 3) * .12), 1);
+    /* Solo se va del todo en el borde de la pila; el apagado lo hace la máscara de noche. */
+    opacity: clamp(0, calc(3.5 - var(--ad)), 1);
     transition:
       transform 1400ms var(--w-ease-stack),
       opacity 1400ms var(--w-ease-stack),
-      color var(--w-dur-micro) var(--w-ease-ui);
+      color 0s linear var(--ink-delay);
+    /* La cara clara se enciende al LLEGAR al centro y se apaga nada más salir; la tinta cambia de
+       golpe a mitad del fundido, así nunca hay texto gris sobre gris (E-14). */
+    --face-dur: 400ms; --face-delay: 0ms; --ink-delay: 200ms;
   }
+  /* Cara clara de la tarjeta encendida (objeto de producto). */
+  .wo-sw__card::before {
+    content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
+    background: var(--w-p-bg, #f0ede8); box-shadow: inset 0 1px 0 #fff;
+    opacity: 0; transition: opacity var(--face-dur) var(--w-ease-ui) var(--face-delay);
+  }
+  /* Máscara de noche: funde el contenido hacia el fondo según la distancia al centro
+     (100 / 78 / 50 / 18 % de presencia). Opaca, así que no deja ver las rayas a través. */
+  .wo-sw__card::after {
+    content: ''; position: absolute; inset: -1px; z-index: 2; border-radius: inherit; pointer-events: none;
+    background: var(--w-s0);
+    opacity: clamp(0, calc(var(--ad) * .22 + max(0, var(--ad) - 1) * .06 + max(0, var(--ad) - 2) * .04), .9);
+    transition: opacity 1400ms var(--w-ease-stack);
+  }
+  .wo-sw__card.is-mid { color: var(--w-p-ink, #0e0e0d); --face-dur: 500ms; --face-delay: 900ms; --ink-delay: 1150ms; }
+  .wo-sw__card.is-mid::before { opacity: 1; }
   /* Más allá de ±3, fuera de la vista y del foco. */
   .wo-sw__card.is-off {
     visibility: hidden;
     transition: transform 1400ms var(--w-ease-stack), opacity 1400ms var(--w-ease-stack), visibility 0s linear 1400ms;
   }
-  .wo-sw__card.is-jump { transition: none; }
-  .wo-sw__card:focus-visible { opacity: 1; outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .wo-sw__card.is-jump, .wo-sw__card.is-jump::before, .wo-sw__card.is-jump::after { transition: none; }
+  .wo-sw__card:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .wo-sw__card:focus-visible::after { opacity: 0; }
   .wo-sw__tog {
-    position: relative; flex: none; width: 40px; height: 22px; border-radius: 11px; background: #d6d1c9;
-    transition: background-color 320ms var(--w-ease-ui);
+    position: relative; flex: none; width: 40px; height: 22px; border-radius: 11px;
+    background: rgba(var(--star-rgb), .16);
+    transition: background-color 0s linear var(--ink-delay);
   }
   .wo-sw__tog i {
     position: absolute; top: 1px; left: 1px; width: 20px; height: 20px; border-radius: 50%;
-    background: #fff; box-shadow: 0 1px 2px rgba(14,14,13,.25);
-    transition: transform 320ms var(--w-ease-ui);
+    background: rgba(var(--star-rgb), .75); box-shadow: 0 1px 2px rgba(0,0,0,.35);
+    transition: transform 320ms var(--w-ease-ui), background-color 0s linear var(--ink-delay);
   }
-  .wo-sw__card.is-on .wo-sw__tog { background: var(--w-p-ink, #0e0e0d); }
-  .wo-sw__card.is-on .wo-sw__tog i { transform: translateX(18px); background: var(--w-p-bg, #f0ede8); }
+  .wo-sw__card.is-on .wo-sw__tog { background: rgba(var(--star-rgb), .7); }
+  .wo-sw__card.is-on .wo-sw__tog i { transform: translateX(18px); background: var(--w-s1); }
+  .wo-sw__card.is-mid .wo-sw__tog { background: #d6d1c9; }
+  .wo-sw__card.is-mid .wo-sw__tog i { background: #fff; box-shadow: 0 1px 2px rgba(14,14,13,.25); }
+  .wo-sw__card.is-mid.is-on .wo-sw__tog { background: var(--w-p-ink, #0e0e0d); }
+  .wo-sw__card.is-mid.is-on .wo-sw__tog i { background: var(--w-p-bg, #f0ede8); }
   .wo-sw__label { flex: 1; font-size: 14px; font-weight: 500; white-space: nowrap; }
   .wo-sw__chip { position: relative; flex: none; height: 22px; min-width: 64px; }
   .wo-sw__chip span {
     position: absolute; right: 0; top: 0; height: 22px; padding: 0 9px; border-radius: 8px;
     display: inline-flex; align-items: center; font-size: 13px; font-weight: 500; white-space: nowrap;
-    transition: opacity 320ms var(--w-ease-ui);
+    transition: opacity 320ms var(--w-ease-ui), background-color 0s linear var(--ink-delay), color 0s linear var(--ink-delay);
   }
-  .wo-sw__chip-on { background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); opacity: 0; }
-  .wo-sw__chip-off { background: rgba(14,14,13,.06); color: var(--w-p-ink-2, #4a4743); }
+  .wo-sw__chip-on { background: rgba(var(--star-rgb), .14); color: var(--w-ink); opacity: 0; }
+  .wo-sw__chip-off { background: rgba(var(--star-rgb), .06); color: var(--w-ink-70); }
+  .wo-sw__card.is-mid .wo-sw__chip-on { background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); }
+  .wo-sw__card.is-mid .wo-sw__chip-off { background: rgba(14,14,13,.06); color: var(--w-p-ink-2, #4a4743); }
   .wo-sw__card.is-on .wo-sw__chip-on { opacity: 1; }
   .wo-sw__card.is-on .wo-sw__chip-off { opacity: 0; }
   @media (--hover-fine) {
     .wo-sw__card:hover { border-color: rgba(var(--accent-gold-rgb), .55); }
+    .wo-sw__card:hover::after { opacity: 0; }
   }
   @media (--lt-md) {
     .wo-sw, .wo-sw--card { --sw-w: 100%; --sw-h: 360px; --cw: 300px; --ch: 50px; --step: 58px; --dx: 14px; --x0: 8px; }
   }
   @media (--motion-reduce) {
-    .wo-sw__card, .wo-sw__tog, .wo-sw__tog i, .wo-sw__chip span { transition: none; }
+    .wo-sw__card, .wo-sw__card::before, .wo-sw__card::after,
+    .wo-sw__tog, .wo-sw__tog i, .wo-sw__chip span { transition: none; }
   }
 </style>

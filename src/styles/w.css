@@ -39,7 +39,7 @@
   grid-template-columns: 1fr;
   padding: 1px; /* marco exterior de 1 px: casa con los raíles, la cruz queda visible */
 }
-:root[data-ds="v3"] .w-cells > * { background: var(--w-s0); padding: var(--w-cell-pad, 32px); min-width: 0; }
+:root[data-ds="v3"] .w-cells > * { background: var(--w-cell-bg, var(--w-s0)); padding: var(--w-cell-pad, 32px); min-width: 0; }
 @media (--md) {
   :root[data-ds="v3"] .w-cells { grid-template-columns: repeat(var(--w-cols, 2), minmax(0, 1fr)); }
   :root[data-ds="v3"] .w-cells > * { padding: var(--w-cell-pad-md, 48px); }
@@ -129,6 +129,10 @@
 :root[data-ds="v3"] .w-contrast {
   background: var(--w-contrast-bg); position: relative;
   --w-line: var(--w-line-strong);
+  /* Las celdas de dentro son del color de la sección, no losas de noche (control 1). */
+  --w-cell-bg: var(--w-contrast-bg);
+  /* Bandejas de dentro: un escalón MÁS claro que la sección (nunca un agujero de noche). */
+  --w-tray-bg: rgba(var(--star-rgb), .045);
 }
 :root[data-ds="v3"] .w-dawn { background: var(--w-dawn) no-repeat; background-size: 100% 100%; }
 :root[data-ds="v3"] [data-w-tone="teal"] .w-dawn,
@@ -209,3 +213,8 @@
 
 /* Reduced-motion: sin html.w-anim nada arranca escondido. Si la preferencia
    cambia con la página abierta, reveal.ts quita html.w-anim (sin !important). */
+
+/* ── Componentes compartidos dentro de v3 (Cerrojo 1) ── */
+/* Contact (sections/Contact.astro, protegido): titular a 500 como el resto de v3.
+   0,4,0 gana al .h2 de base.css (600) sin !important. */
+:root[data-ds="v3"] .contact .h2 { font-weight: var(--w-weight-head); }

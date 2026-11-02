@@ -95,7 +95,7 @@ const T = en
       start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, TICK); },
       stop: () => window.clearTimeout(timer),
       still: () => { window.clearTimeout(timer); reset(); el.classList.add('is-still'); },
-    });
+    }, { buttonTone: 'light' });
   });
 </script>
 
@@ -109,9 +109,9 @@ const T = en
   /* Campo de puntos en óvalo, detrás y más ancho que la tarjeta. */
   .wo-orders::before {
     content: ''; position: absolute; z-index: 0; inset: -40px -90px;
-    background: radial-gradient(rgba(var(--accent-gold-rgb), .30) 1.5px, transparent 1.8px) 0 0 / 12px 12px;
-    -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent 100%);
-    mask-image: radial-gradient(closest-side, #000 30%, transparent 100%);
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .55) 1.5px, transparent 1.8px) 0 0 / 12px 12px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
     pointer-events: none;
   }
   .wo-orders__card {

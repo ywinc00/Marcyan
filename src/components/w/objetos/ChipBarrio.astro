@@ -1,15 +1,16 @@
 ---
-// Chip de barrio con pistas (W-CONV-23 · design/rediseno-workos.md §3.6, §2.10).
-// Objeto de SISTEMA que cuenta el mecanismo (E-34): en el centro, un chip 164×164 radio 8
+// Chip de barrio con pistas (W-CONV-23/30 · design/rediseno-workos.md §3.6, §2.10).
+// Objeto de SISTEMA que cuenta el mecanismo (E-34): en el centro, un chip 176×176 radio 8
 // opaco (--w-s3) con halo oro estático y una ficha mínima de EJEMPLO (pin, "Tu negocio",
-// botón "Llamar"); por las calles llegan pulsos HACIA el chip (clientes que llegan).
-// Calles: prop `tracks` con trazados REALES del barrio (E-49), generalizados (E-53), cada
-// uno con su nombre en letra de texto ≥ 13 px FUERA del chip. Coordenadas: lienzo de
-// 600×300 con el chip centrado en (300,150) (lado 164). Sin `tracks` dibuja un circuito
-// ABSTRACTO declarado como tal (§10.3: nada se descarga sin el dueño).
-// Pulsos: 4 s lineales, 7 retrasos (0 · .6 · 1.1 · 1.7 · 2.3 · 2.9 · 3.4 s); brillo que gira
-// en el borde del chip en 4 s. Quieto (reduced-motion): calles sin pulsos y brillo parado.
-// La máscara superior corta las pistas para que no pasen detrás del texto del hero (E-37).
+// botón "Llamar"); por las pistas llegan pulsos HACIA el chip (clientes que llegan).
+// Calles reales: prop `tracks` (lienzo 600×300, chip en (300,150)), REALES del barrio (E-49),
+// generalizadas (E-53), con su nombre en letra de texto ≥ 13 px FUERA del chip.
+// Sin `tracks`: PLACA DE CIRCUITO ABSTRACTA declarada como tal (§10.3, nada se descarga sin
+// el dueño). Control 1 (E-38): el chip suelto con 6 trazos no llegaba al nivel del hero de
+// W-CONV-30, así que la placa es densa como la referencia: 4 buses de pistas paralelas que
+// salen de las patas del chip y se abren a 45°, vías, patas y trama, en un lienzo de 1000×400.
+// Pulsos: 4 s lineales, 8 retrasos; brillo que gira en el borde del chip en 4 s.
+// Quieto (reduced-motion): pistas sin pulsos y brillo parado.
 import Icon from '../../ui/Icon.astro';
 import Ejemplo from '../Ejemplo.astro';
 
@@ -24,28 +25,71 @@ interface Props {
 }
 const { lang = 'es', name, size = 'hero', class: cls } = Astro.props;
 const en = lang === 'en';
-// Circuito abstracto por defecto (sin nombres: no finge calles reales).
-const ABSTRACT: Track[] = [
-  { d: 'M0 70 H120 Q132 70 132 82 V110 Q132 122 144 122 H218' },
-  { d: 'M0 236 H96 Q108 236 108 224 V190 Q108 178 120 178 H218' },
-  { d: 'M600 54 H470 Q458 54 458 66 V118 Q458 130 446 130 H382' },
-  { d: 'M600 250 H500 Q488 250 488 238 V184 Q488 172 476 172 H382' },
-  { d: 'M240 0 V40 Q240 52 252 52 H266 Q278 52 278 64 V68' },
-  { d: 'M360 300 V262 Q360 250 348 250 H334 Q322 250 322 238 V232' },
-];
-const tracks = (Astro.props.tracks ?? ABSTRACT).slice(0, 8);
 const abstract = !Astro.props.tracks;
-const DELAYS = [0, 0.6, 1.1, 1.7, 2.3, 2.9, 3.4];
+
+// ── Placa abstracta (1000×400, chip 176 centrado en 500,200: bordes 412/588 · 112/288) ──
+const W = 1000, H = 400, CX = 500, CY = 200, HALF = 88;
+type Trace = { d: string; hot: boolean; via?: [number, number]; pin: [number, number, 'h' | 'v'] };
+const board: Trace[] = [];
+if (abstract) {
+  // Buses izquierdo y derecho: 8 pistas cada 10 px que se abren hacia fuera.
+  for (let i = 0; i < 8; i++) {
+    const y0 = CY - 35 + i * 10;
+    const dy = (i - 3.5) * 22;
+    const yOut = y0 + dy;
+    const xEnd = CX - HALF - 50;            // fin de la diagonal (columna común)
+    const xa = xEnd - Math.abs(dy);         // inicio de la diagonal
+    const hot = i === 1 || i === 6;
+    const L = `M0 ${yOut} H${xa} L${xEnd} ${y0} H${CX - HALF}`;
+    const R = `M${W} ${yOut} H${W - xa} L${W - xEnd} ${y0} H${CX + HALF}`;
+    board.push({ d: L, hot, via: i % 2 === 0 ? [xa, yOut] : undefined, pin: [CX - HALF, y0, 'h'] });
+    board.push({ d: R, hot: i === 2 || i === 5, via: i % 2 === 1 ? [W - xa, yOut] : undefined, pin: [CX + HALF, y0, 'h'] });
+  }
+  // Buses superior e inferior: 6 pistas cada 10 px.
+  for (let j = 0; j < 6; j++) {
+    const x0 = CX - 25 + j * 10;
+    const dx = (j - 2.5) * 26;
+    const xOut = x0 + dx;
+    const yEnd = CY - HALF - 30;
+    const ya = yEnd - Math.abs(dx);
+    const T = `M${xOut} 0 V${ya} L${x0} ${yEnd} V${CY - HALF}`;
+    const B = `M${xOut} ${H} V${H - ya} L${x0} ${H - yEnd} V${CY + HALF}`;
+    board.push({ d: T, hot: j === 1 || j === 4, via: j % 2 === 0 ? [xOut, ya] : undefined, pin: [x0, CY - HALF, 'v'] });
+    board.push({ d: B, hot: j === 3, via: j % 2 === 1 ? [xOut, H - ya] : undefined, pin: [x0, CY + HALF, 'v'] });
+  }
+}
+// Ramales cortos con vía al final (la densidad de una placa real, lejos del chip).
+const stubs = abstract
+  ? [
+      // Cuelgan de las pistas laterales (y 88/120/152/248/280/312).
+      'M150 88 V62', 'M230 120 V100', 'M150 312 V338', 'M230 280 V300',
+      'M850 88 V62', 'M770 120 V100', 'M850 312 V338', 'M770 280 V300',
+      'M300 152 V138', 'M700 152 V138', 'M300 248 V262', 'M700 248 V262',
+    ]
+  : [];
+const stubEnd = (d: string) => { const n = d.match(/-?\d+(\.\d+)?/g)!.map(Number); return [n[n.length - 2] ?? n[0], n[n.length - 1]]; };
+
+const tracks = abstract ? board.filter((t) => t.hot).map((t) => ({ d: t.d })) : (Astro.props.tracks ?? []).slice(0, 8);
+const DELAYS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
 const T = en
   ? { biz: 'Your business', call: 'Call', sr: `Example: customers in ${name} find your business and call you.` }
   : { biz: 'Tu negocio', call: 'Llamar', sr: `Ejemplo: clientes de ${name} encuentran tu negocio y te llaman.` };
+const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 ---
 <div class:list={['wo-hood', `wo-hood--${size}`, cls]} data-wo-hood data-abstract={abstract ? '' : undefined}>
   <p class="sr-only">{T.sr}</p>
   <div class="wo-hood__stage" aria-hidden="true">
-    <svg class="wo-hood__map" viewBox="0 0 600 300">
-      {tracks.map((t, i) => <path class="wo-hood__st" d={t.d} data-i={i} />)}
-      {DELAYS.map((b, k) => {
+    {abstract && <span class="wo-hood__board"></span>}
+    <svg class="wo-hood__map" viewBox={vb}>
+      {abstract && board.map((t) => <path class:list={['wo-hood__st', t.hot && 'is-hot']} d={t.d} />)}
+      {abstract && stubs.map((d) => <path class="wo-hood__st wo-hood__st--stub" d={d} />)}
+      {abstract && board.filter((t) => t.via).map((t) => <circle class="wo-hood__via" cx={t.via![0]} cy={t.via![1]} r="3" />)}
+      {abstract && stubs.map((d) => { const [x, y] = stubEnd(d); return <circle class="wo-hood__via" cx={x} cy={y} r="2.5" />; })}
+      {abstract && board.map((t) => t.pin[2] === 'h'
+        ? <rect class="wo-hood__leg" x={t.pin[0] < CX ? t.pin[0] - 8 : t.pin[0]} y={t.pin[1] - 2} width="8" height="4" rx="1" />
+        : <rect class="wo-hood__leg" x={t.pin[0] - 2} y={t.pin[1] < CY ? t.pin[1] - 8 : t.pin[1]} width="4" height="8" rx="1" />)}
+      {!abstract && tracks.map((t, i) => <path class="wo-hood__st" d={t.d} data-i={i} />)}
+      {tracks.length > 0 && DELAYS.map((b, k) => {
         const t = tracks[k % tracks.length];
         return (
           <circle class="wo-hood__pulse" r="3.5">
@@ -53,7 +97,7 @@ const T = en
           </circle>
         );
       })}
-      {tracks.filter((t) => t.name && t.at).map((t) => (
+      {!abstract && (Astro.props.tracks ?? []).filter((t) => t.name && t.at).map((t) => (
         <text class="wo-hood__name" x={t.at![0]} y={t.at![1]}>{t.name}</text>
       ))}
     </svg>
@@ -85,55 +129,72 @@ const T = en
 </script>
 
 <style>
-  .wo-hood { position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
+  .wo-hood { --sw: 600px; --sh: 300px; --chip: 164px; position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
+  .wo-hood[data-abstract] { --sw: 1000px; --sh: 400px; --chip: 176px; }
   .wo-hood__stage {
-    position: relative; left: 50%; translate: -50% 0; width: 600px; height: 300px;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 88%, transparent 100%),
-      linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    position: relative; left: 50%; translate: -50% 0; width: var(--sw); height: var(--sh);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+      linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
     -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 88%, transparent 100%),
-      linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+      linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
     mask-composite: intersect;
   }
+  /* La placa: trama de puntos y una luz oro baja centrada en el chip (sin texto encima). */
+  .wo-hood__board {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(46% 62% at 50% 50%, rgba(var(--accent-gold-rgb), .16) 0%, rgba(var(--accent-gold-rgb), .05) 45%, transparent 75%),
+      var(--w-dots);
+  }
   .wo-hood__map { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .wo-hood__st { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1.5; stroke-linecap: round; }
+  .wo-hood__st { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .wo-hood[data-abstract] .wo-hood__st { stroke: rgba(var(--accent-gold-rgb), .34); stroke-width: 1.25; }
+  .wo-hood[data-abstract] .wo-hood__st.is-hot { stroke: rgba(var(--accent-gold-rgb), .7); stroke-width: 1.5; }
+  .wo-hood[data-abstract] .wo-hood__st--stub { stroke: rgba(var(--accent-gold-rgb), .28); }
+  .wo-hood__via { fill: var(--w-s0, #080808); stroke: rgba(var(--accent-gold-rgb), .6); stroke-width: 1.25; }
+  .wo-hood__leg { fill: rgba(var(--accent-gold-rgb), .8); }
   .wo-hood:not([data-abstract]) .wo-hood__st { stroke: rgba(var(--star-rgb), .30); stroke-width: 2; }
-  .wo-hood__pulse { fill: var(--accent-gold); opacity: 0; }
+  .wo-hood__pulse { fill: #f3dfb4; opacity: 0; }
   .wo-hood.is-playing .wo-hood__pulse { opacity: 1; }
   .wo-hood__name { font: 500 13px var(--font-body); fill: var(--w-ink-70); paint-order: stroke; stroke: var(--w-s0, #080808); stroke-width: 4px; }
   .wo-hood__chipwrap {
-    position: absolute; left: 50%; top: 50%; width: 164px; height: 164px; margin: -82px 0 0 -82px;
+    position: absolute; left: 50%; top: 50%; width: var(--chip); height: var(--chip);
+    margin: calc(var(--chip) / -2) 0 0 calc(var(--chip) / -2);
     border-radius: 9px; overflow: visible;
   }
   .wo-hood__glow {
     position: absolute; inset: -1px; border-radius: 9px; overflow: hidden;
-    box-shadow: 0 0 24px rgba(var(--accent-gold-rgb), .20);
+    box-shadow: 0 0 0 1px rgba(var(--accent-gold-rgb), .35), 0 0 36px rgba(var(--accent-gold-rgb), .32);
   }
   .wo-hood__glow::before {
-    content: ''; position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; margin: -130px 0 0 -130px;
-    background: conic-gradient(from 0deg, transparent 0 70%, rgba(var(--accent-gold-rgb), .9) 85%, transparent 100%);
+    content: ''; position: absolute; left: 50%; top: 50%; width: 280px; height: 280px; margin: -140px 0 0 -140px;
+    background: conic-gradient(from 0deg, transparent 0 70%, rgba(var(--accent-gold-rgb), .95) 85%, transparent 100%);
     animation: wo-hood-spin 4s linear infinite; animation-play-state: paused;
   }
   .wo-hood.is-playing .wo-hood__glow::before { animation-play-state: running; }
   @keyframes wo-hood-spin { to { transform: rotate(360deg); } }
   .wo-hood__chip {
-    position: absolute; inset: 0; border-radius: 8px;
-    background: var(--w-s3, #1f1f1d); border: 1px solid var(--w-line-strong);
+    position: absolute; inset: 1px; border-radius: 8px;
+    background: linear-gradient(180deg, #262522, var(--w-s3, #1f1f1d) 55%, #1a1a18);
+    border: 1px solid var(--w-line-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px;
     text-align: center;
   }
-  .wo-hood__pin { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(var(--accent-gold-rgb), .14); color: var(--accent-gold); margin-bottom: 4px; }
+  .wo-hood__pin { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: rgba(var(--accent-gold-rgb), .14); color: var(--accent-gold); margin-bottom: 4px; }
   .wo-hood__pin :global(svg) { width: 16px; height: 16px; }
-  .wo-hood__chip b { font: 500 15px/1.2 var(--font-display); color: var(--w-ink, #f0ede8); }
+  .wo-hood__chip b { font: 500 16px/1.2 var(--font-display); color: var(--w-ink, #f0ede8); }
   .wo-hood__where { font-size: 13px; color: var(--w-ink-60); }
   .wo-hood__call {
     margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 6px;
     background: var(--accent-gold); color: var(--fg-inverse, #080808); font-size: 13px; font-weight: 600;
   }
   .wo-hood__call :global(svg) { width: 13px; height: 13px; }
-  .wo-hood__chipwrap :global(.wo-hood__ex) { position: absolute; right: 0; bottom: calc(100% + 8px); }
+  /* Opaca: las pistas pasan por detrás de la etiqueta (E-37). */
+  .wo-hood__chipwrap :global(.wo-hood__ex) { position: absolute; right: 0; bottom: calc(100% + 12px); background: var(--w-s1, #121211); }
   @media (--lt-md) {
-    .wo-hood { height: 300px; }
+    .wo-hood { height: var(--sh); }
+    .wo-hood[data-abstract] { --chip: 156px; }
   }
   @media (--motion-reduce) {
     .wo-hood__glow::before { animation: none; }

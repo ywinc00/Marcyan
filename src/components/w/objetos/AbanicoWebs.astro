@@ -26,9 +26,11 @@ const sr = lang === 'en'
   <p class="sr-only">{sr}</p>
   <div class="wo-fan__stripes" aria-hidden="true"></div>
   <div class="wo-fan__side wo-fan__side--l" data-w-in="sat" style="--w-sat-x:120px;--w-sat-y:30px" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
     <WebEjemplo kind="salon" frame="tarjeta" lang={lang} city={city} example={false} size="mini" />
   </div>
   <div class="wo-fan__side wo-fan__side--r" data-w-in="sat" style="--w-sat-x:-120px;--w-sat-y:30px" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
     <WebEjemplo kind="restaurante" frame="tarjeta" lang={lang} city={city} example={false} size="mini" />
   </div>
   <div class="wo-fan__main" data-w-in="obj" aria-hidden="true">
@@ -78,6 +80,12 @@ const sr = lang === 'en'
   }
   .wo-fan__side--l { left: calc(50% - 200px - 180px); }
   .wo-fan__side--r { left: calc(50% + 200px - 84px); }
+  /* Cada web inventada lleva su "Ejemplo" en la esquina que queda a la vista: la izquierda
+     tiene la derecha tapada por la central, así que va arriba a la izquierda. */
+  .wo-fan__side--l :global(.w-example--corner) { left: 12px; right: auto; }
+  /* Cada web inventada lleva su "Ejemplo" en la esquina que queda a la vista: la izquierda
+     tiene la derecha tapada por la central, así que va arriba a la izquierda. */
+  .wo-fan__side--l :global(.w-example--corner) { left: 12px; right: auto; }
   /* Las laterales se leen como segundo plano (como en W-CORE-01), sin opacidad sobre el texto. */
   .wo-fan__side :global(.wo-web) { --wo-ink2: #5c5853; zoom: .78; } /* fondo del abanico, medio tapado: decorativo */
 

@@ -87,7 +87,9 @@ const fitSm = Math.min(37, Math.round(150 / figure.length));
 </div>
 
 <style>
-  .pp { --pp-dot: radial-gradient(circle, #000 1.5px, transparent 1.6px) 0 0 / 6px 6px; }
+  /* Puntos de la cifra más gordos que los del lienzo (2,2 frente a 1,5 px): la cifra se lee
+     encendida sobre la trama (control 1: con el mismo punto quedaba apagada). */
+  .pp { --pp-dot: radial-gradient(circle, #000 2.2px, transparent 2.4px) 0 0 / 6px 6px; }
 
   /* ── Cabecera (W-CORE-14: rótulo pequeño, H2 40/500, bajada) ── */
   .pp__head { max-width: 1100px; margin: 0 auto 48px; }

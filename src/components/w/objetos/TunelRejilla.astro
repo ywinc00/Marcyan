@@ -12,7 +12,7 @@ interface Props {
   arc?: boolean;
   class?: string;
 }
-const { strength = 0.08, arc = true, class: cls } = Astro.props;
+const { strength = 0.16, arc = true, class: cls } = Astro.props;
 const W = 1920, H = 1080;
 const I = { x0: 540, y0: 240, x1: 1380, y1: 840 };          // rectángulo central 840×600
 const O = { x0: -260, y0: -300, x1: W + 260, y1: H + 300 };  // fuera del lienzo: siempre cubre
@@ -53,7 +53,7 @@ const inner = `M${I.x0} ${I.y0}H${I.x1}V${I.y1}H${I.x0}Z`;
   .wo-tunnel__in { fill: none; stroke: rgba(var(--accent-gold-rgb), calc(var(--wo-a) * 1.6)); stroke-width: 1; vector-effect: non-scaling-stroke; }
   .wo-tunnel__arc {
     position: absolute; inset: 0;
-    background: radial-gradient(70% 60% at 100% 100%, rgba(var(--accent-teal-rgb), .10) 0%, rgba(var(--accent-teal-rgb), .04) 45%, transparent 70%);
+    background: radial-gradient(70% 60% at 100% 100%, rgba(var(--accent-teal-rgb), .15) 0%, rgba(var(--accent-teal-rgb), .05) 45%, transparent 70%);
   }
   /* Funde arriba (bajo la nav) y abajo, sin bordes rectos (E-36). */
   .wo-tunnel {

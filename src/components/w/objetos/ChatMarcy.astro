@@ -214,7 +214,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
       start: () => { el.classList.remove('is-still'); play(idx, next); },
       stop: clear,
       still: () => { clear(); idx = 0; movePill(0); box.innerHTML = stillHTML; el.classList.add('is-still'); },
-    });
+    }, { buttonTone: 'light' });
   });
 </script>
 

@@ -29,6 +29,10 @@ export interface LoopOptions {
   lang?: 'es' | 'en';
   /** Dónde colgar el botón (por defecto el propio objeto). */
   buttonHost?: HTMLElement;
+  /** Piel del botón según el objeto sobre el que cae: 'dark' (objetos de sistema, por
+   *  defecto) o 'light' (objetos de producto claros: pedidos, chat). Contorno y tinta al
+   *  70 %, nunca un bloque macizo que pese más que el objeto (control 1). */
+  buttonTone?: 'dark' | 'light';
 }
 export interface LoopController {
   /** Pausa/reanuda por decisión del visitante (lo que hace el botón). */
@@ -47,7 +51,7 @@ const TXT = {
 };
 
 export function registerLoop(el: HTMLElement, handlers: LoopHandlers = {}, options: LoopOptions = {}): LoopController {
-  const { pauseButton = true, lang = (document.documentElement.lang === 'en' ? 'en' : 'es'), buttonHost = el } = options;
+  const { pauseButton = true, lang = (document.documentElement.lang === 'en' ? 'en' : 'es'), buttonHost = el, buttonTone = 'dark' } = options;
   const start = handlers.start ?? (() => el.classList.add('is-playing'));
   const stop = handlers.stop ?? (() => el.classList.remove('is-playing'));
   const still = handlers.still ?? (() => { el.classList.remove('is-playing'); el.classList.add('is-still'); });
@@ -85,8 +89,10 @@ export function registerLoop(el: HTMLElement, handlers: LoopHandlers = {}, optio
     btn.style.cssText = [
       'position:absolute', 'right:12px', 'bottom:12px', 'z-index:4',
       'width:44px', 'height:44px', 'display:inline-flex', 'align-items:center', 'justify-content:center',
-      'border-radius:var(--w-r-cell, 8px)', 'border:1px solid var(--w-line-strong)',
-      'background:var(--w-s-solid, #1c1c1c)', 'color:var(--w-ink, #f0ede8)', 'cursor:pointer', 'padding:0',
+      'border-radius:var(--w-r-cell, 8px)', 'cursor:pointer', 'padding:0',
+      ...(buttonTone === 'light'
+        ? ['border:1px solid rgba(14,14,13,.18)', 'background:rgba(255,255,255,.55)', 'color:rgba(14,14,13,.7)']
+        : ['border:1px solid var(--w-line-strong)', 'background:rgba(8,8,8,.45)', 'color:var(--w-ink-70, rgba(240,237,232,.7))']),
     ].join(';');
     btn.addEventListener('click', () => { userPaused = !userPaused; paintBtn(); sync(); });
     paintBtn();

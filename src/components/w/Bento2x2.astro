@@ -55,7 +55,8 @@ const uis = await Promise.all(
   }
   .wd-bento__cell {
     display: flex; flex-direction: column; min-width: 0;
-    background: var(--w-s0); padding: 32px 20px 24px;
+    /* Del color de la sección (W-CORE-08): noche, o la superficie del capítulo de contraste. */
+    background: var(--w-cell-bg, var(--w-s0)); padding: 32px 20px 24px;
   }
   .wd-bento__lab {
     margin: 0; display: flex; align-items: center; gap: 10px;
@@ -70,16 +71,23 @@ const uis = await Promise.all(
     margin: 12px 0 0; max-width: 503px;
     font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
   }
+  /* La mini-UI va pegada al texto (~90 px) y a todo el ancho de la celda (W-CORE-08):
+     nada de empujarla al fondo, que dejaba media celda vacía. */
   .wd-bento__ui {
-    margin-top: 40px; flex: 1; display: grid; align-items: end; min-width: 0;
+    margin-top: 40px; display: grid; align-items: start; min-width: 0;
   }
   .wd-bento__tray {
-    justify-self: center; width: 100%; max-width: 440px; min-width: 0;
+    justify-self: stretch; width: 100%; min-width: 0;
+    display: grid; justify-items: center;
     padding: 14.5px; border-radius: var(--w-r-tray);
-    background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    background: var(--w-tray-bg, var(--w-s1)); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
   }
   .wd-bento__tray--bare { padding: 0; background: none; border: 0; box-shadow: none; }
   .wd-bento__tray > :global(*) { min-width: 0; }
+  /* Las mini-UI fluidas (pasos, ficha, chat) llenan la bandeja; la web en móvil sigue centrada. */
+  .wd-bento__tray > :global(.wo-mini),
+  .wd-bento__tray > :global(.wo-map),
+  .wd-bento__tray > :global(.wo-chat) { width: 100%; max-width: none; }
   @media (--md) {
     .wd-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .wd-bento__cell { padding: 48px; }

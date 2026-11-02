@@ -13,7 +13,9 @@ interface Props {
   lang?: 'es' | 'en';
   surface?: 'product' | 'system';
   tone?: 'gold' | 'teal';
-  /** Texto del botón interno (ilustrativo). */
+  /** Texto del botón interno (ilustrativo). Solo si el contenido NO trae ya su propia acción
+   *  (FichaMapaEjemplo ya tiene "Llamar", SolicitudOficio ya tiene "Responder"): repetirlo
+   *  se lee como un error (control 1). */
   button?: string;
   beams?: boolean;
   example?: boolean;
@@ -58,7 +60,7 @@ const lines = Array.from({ length: 14 }, (_, i) => 120 + i * 18);
   .wo-to__beams {
     position: absolute; z-index: -2; right: calc(100% - 60px); top: 34%;
     width: min(900px, 62vw); height: 420px;
-    fill: none; stroke: rgba(var(--accent-gold-rgb), .10); stroke-width: 1;
+    fill: none; stroke: rgba(var(--accent-gold-rgb), .24); stroke-width: 1;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%);
     mask-image: linear-gradient(90deg, transparent, #000 35%);
     pointer-events: none;
@@ -67,8 +69,9 @@ const lines = Array.from({ length: 14 }, (_, i) => 120 + i * 18);
   .wo-to__layer {
     position: absolute; z-index: -1; top: -25px; left: -25px; width: 100%; height: 100%;
     border-radius: var(--w-r-feature, 44px);
-    background: linear-gradient(180deg, rgba(var(--wo-acc-rgb), .18), rgba(var(--wo-acc-rgb), .06));
-    border: 1px solid rgba(var(--wo-acc-rgb), .14);
+    /* Recalibrada en el control 1: al 18 % no se distinguía de la noche (W-CORE-16 la lee de lejos). */
+    background: linear-gradient(180deg, rgba(var(--wo-acc-rgb), .40), rgba(var(--wo-acc-rgb), .14));
+    border: 1px solid rgba(var(--wo-acc-rgb), .32);
   }
   .wo-to__card {
     position: relative; min-height: 359px; height: 100%;

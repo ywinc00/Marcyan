@@ -147,7 +147,7 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
   .wd-esc__opt.is-on .wd-esc__oi { color: var(--wd-acc); }
   .wd-esc__on { font-family: var(--font-body); font-weight: 500; font-size: 16px; line-height: 1.4; color: var(--w-ink); }
   .wd-esc__op {
-    margin-left: auto; font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .04em; color: var(--wd-acc);
+    margin-left: auto; font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--wd-acc); /* precio = texto que se lee (E-40) */
   }
   .wd-esc__ox {
     font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--w-ink-60);
@@ -174,7 +174,7 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
   .wd-esc__screen > :global(*) { height: 100%; }
 
   /* Raíles: en móvil, cápsulas en fila bajo la pantalla. */
-  .wd-esc__rail { display: flex; gap: 8px; justify-content: center; transition: opacity var(--w-dur-hover) var(--w-ease-ui); }
+  .wd-esc__rail { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-width: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui); }
   .wd-esc__rail--l { order: 2; } /* solo visual y aria-hidden: no altera la lectura */
   .wd-esc__rail--r { order: 3; }
   .wd-esc__frame:not(.has-rails) .wd-esc__rail { opacity: 0; }
@@ -184,6 +184,11 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
     background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
   }
   .wd-esc__cap i { font-style: normal; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; }
+  /* Móvil: cápsulas más compactas y en filas que saltan; nunca se cortan (control 1). */
+  @media (--lt-md) {
+    .wd-esc__cap { gap: 4px; padding: 6px 8px; }
+    .wd-esc__cap i { width: 26px; height: 26px; }
+  }
   .wd-esc__cap i.is-sel { background: var(--w-s3); box-shadow: inset 0 0 0 1px var(--w-line-strong); }
   .wd-esc__sw::after { content: ''; width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
   .wd-esc__cor::after { content: ''; width: 12px; height: 12px; border: 1.5px solid var(--w-ink-60); border-right: 0; border-bottom: 0; }

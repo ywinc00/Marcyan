@@ -1,25 +1,22 @@
 ---
-// Sección Proyectos — "Renderizado en dispositivo": UN trabajo a la vez en una
-// maqueta REALISTA de laptop (captura PC) + teléfono (captura móvil), con la info
-// al lado. Carrusel con flechitas. Las capturas reales viven en /public/Galeria.
+// Sección Proyectos · detalles permitidos de la portada (design/rediseno-workos.md §4.1, W-PROOF-12).
+// El carrusel portátil + teléfono pasa a figuras de proyecto (w/FiguraProyecto): captura REAL
+// en marco de navegador radio 8 (3 puntos + dominio sin enlace), teléfono solapado y pie mono
+// 13 con el nombre (translate="no"). Dos por fila en escritorio, con el teléfono hacia fuera
+// (alternando); en móvil una columna y "Ver Proyectos" despliega el resto. Se conservan
+// id="proyectos", data-fx, la cabecera y el texto de resultado de cada proyecto (content.ts).
+// El script del carrusel ([data-projects]) se borra; queda solo el botón de desplegar.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import FiguraProyecto from '../w/FiguraProyecto.astro';
 import { t, type Lang } from '../../i18n/ui';
 
 interface Props { projects: any; lang?: Lang }
 const { projects, lang = 'es' } = Astro.props;
 const uipr = t(lang);
-const items = projects.items;
-
-// Capturas reales por proyecto (webp en /public/Galeria). Mapeadas por nombre de
-// marca (idéntico en es/en). mh = alto nativo de la captura móvil → evita CLS.
-const SHOTS: Record<string, { slug: string; mh: number }> = {
-  'Texas Rush Remove':    { slug: 'trr', mh: 2431 },
-  'Move Junk Away':       { slug: 'mja', mh: 2282 },
-  "Julio's Landscape TX": { slug: 'jls', mh: 2397 },
-  'Rosy Nails & Care':    { slug: 'rn',  mh: 2710 },
-};
+const items = projects.items as any[];
+const extra = items.length > 2;
 ---
 <section class="section projects" id="proyectos" data-fx="gold">
   <div class="container">
@@ -31,76 +28,20 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
       <Button href={projects.cta.href} variant="secondary" class="projects__head-cta">{projects.cta.label}</Button>
     </header>
 
-    <div class="pf" data-projects role="group" aria-label={projects.tag}>
-      <button class="pf__arrow pf__arrow--prev" type="button" data-prev aria-label={uipr.projects.prev}><Icon name="lucide:chevron-left" /></button>
-
-      <div class="pf__stage">
-        {items.map((p: any, idx: number) => {
-          const shot = SHOTS[p.name];
-          return (
-          <article class={`pf__slide${idx === 0 ? ' is-active' : ''}`} data-slide data-accent={p.accent} aria-hidden={idx === 0 ? 'false' : 'true'}>
-            <div class="pf__devices">
-              {/* LAPTOP */}
-              <div class="dv-laptop">
-                <div class="dv-screen">
-                  <span class="dv-cam" aria-hidden="true"></span>
-                  {shot ? (
-                    <img
-                      class="dv-shot"
-                      src={`/Galeria/${shot.slug}-pc.webp`}
-                      srcset={`/Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc.webp 1920w`}
-                      sizes="(min-width: 1024px) 440px, 92vw"
-                      alt={`${p.name}, ${projects.shotAlt?.pc ?? uipr.shot.pc}`}
-                      width="1920" height="1080"
-                      loading="lazy" decoding="async"
-                    />
-                  ) : (
-                    <div class="dv-wire" aria-hidden="true"><span style="width:74%"></span><span style="width:48%"></span><span style="width:62%"></span><span style="width:36%"></span></div>
-                  )}
-                </div>
-                <div class="dv-deck" aria-hidden="true"><span class="dv-lip"></span></div>
-              </div>
-
-              {/* TELÉFONO */}
-              <div class="dv-phone">
-                <span class="dv-island" aria-hidden="true"></span>
-                <div class="dv-pscreen">
-                  {shot ? (
-                    <img
-                      class="dv-pshot"
-                      src={`/Galeria/${shot.slug}-movil.webp`}
-                      srcset={`/Galeria/${shot.slug}-movil-520.webp 520w, /Galeria/${shot.slug}-movil.webp 1320w`}
-                      sizes="(min-width: 1024px) 160px, 40vw"
-                      alt={`${p.name}, ${projects.shotAlt?.movil ?? uipr.shot.movil}`}
-                      width="1320" height={shot.mh}
-                      loading="lazy" decoding="async"
-                    />
-                  ) : (
-                    <div class="dv-pwire" aria-hidden="true"></div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div class="pf__info">
-              {p.badge && <span class="pf__badge">{p.badge}</span>}
-              <h3 class="pf__name">{p.name}</h3>
-              <span class="pf__cat">{p.cat}</span>
-              <p class="pf__result">{p.result}</p>
-              {p.tags && <div class="pf__tags">{p.tags.map((t: string, ti: number) => <span class={`pf__tag pf__tag--${ti % 3}`}>{t}</span>)}</div>}
-            </div>
-          </article>
-          );
-        })}
-      </div>
-
-      <button class="pf__arrow pf__arrow--next" type="button" data-next aria-label={uipr.projects.next}><Icon name="lucide:chevron-right" /></button>
-
-      <button class="pf__more" type="button" data-more aria-expanded="false">
-        <span>{projects.more ?? uipr.projects.more}</span>
-        <Icon name="lucide:chevron-down" class="pf__more-ic" />
-      </button>
+    <div class="pjw" data-pjw>
+      {items.map((p, idx) => (
+        <article class:list={['pjw__item', idx >= 2 && 'pjw__item--more']}>
+          <FiguraProyecto project={p} side={idx % 2 === 0 ? 'left' : 'right'} lang={lang} />
+          <p class="pjw__result">{p.result}</p>
+        </article>
+      ))}
     </div>
+    {extra && (
+      <button class="pjw__more" type="button" data-pjw-more aria-expanded="false">
+        <span>{projects.more ?? uipr.projects.more}</span>
+        <Icon name="lucide:chevron-down" class="pjw__more-ic" />
+      </button>
+    )}
   </div>
 </section>
 
@@ -109,174 +50,44 @@ const SHOTS: Record<string, { slug: string; mh: number }> = {
   .projects__head { display: flex; flex-direction: column; gap: var(--space-5); align-items: flex-start; margin-bottom: var(--space-7); }
   .projects__intro { display: flex; flex-direction: column; gap: var(--space-4); }
 
-  .pf { position: relative; display: flex; flex-direction: column; }
-  .pf__stage { display: grid; }
-  .pf__slide { grid-area: 1 / 1; display: none; }
-  .pf__slide.is-active { display: grid; grid-template-columns: 1fr; gap: var(--space-6); align-items: center; animation: pfin var(--duration-slow) var(--ease-out-expo); }
-  @keyframes pfin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-  @media (--motion-reduce) { .pf__slide.is-active { animation: none; } }
-
-  /* ── ESCENARIO de los dispositivos ─────────────────────── */
-  .pf__devices {
-    position: relative; aspect-ratio: 16 / 10; border-radius: var(--radius-lg);
-    border: 1px solid var(--border); --a: var(--accent-gold);
-    background:
-      radial-gradient(120% 120% at 18% 0%, color-mix(in srgb, var(--a), transparent 86%), transparent 60%),
-      var(--bg-2);
-    padding: clamp(14px, 5%, 40px);
-  }
-  .pf__slide[data-accent="teal"] .pf__devices { --a: var(--accent-teal); }
-
-  /* ── LAPTOP realista ───────────────────────────────────── */
-  .dv-laptop {
-    position: absolute; left: 50%; top: 50%; transform: translate(-58%, -52%); width: 70%;
-  }
-  /* sombra vía box-shadow (NO filter): el filtro rasteriza la imagen y la ablanda
-     en monitores DPR 1; con box-shadow la captura se renderiza nítida. */
-  .dv-screen {
-    position: relative; background: #0a0a0b; border: 1px solid #34343a;
-    border-radius: 12px 12px 5px 5px; padding: 7px 7px 9px;
-    box-shadow: 0 22px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  }
-  .dv-cam {
-    position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px; border-radius: 50%; background: #14201f;
-    box-shadow: 0 0 0 1px #000, inset 0 0 1px rgba(79, 195, 161, 0.7);
-  }
-  .dv-shot {
-    display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top center;
-    border-radius: 3px; background: var(--bg-base);
-  }
-  .dv-wire { width: 100%; aspect-ratio: 16 / 9; background: var(--bg-base); border-radius: 3px; display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 12px; }
-  .dv-wire span { height: 7px; border-radius: 100px; background: var(--fg-subtle); opacity: 0.5; }
-  /* base / bisagra: se ensancha respecto a la pantalla (como un portátil real) */
-  .dv-deck {
-    position: relative; width: 118%; left: -9%; height: clamp(8px, 1.5vw, 14px); margin-top: -1px;
-    background: linear-gradient(180deg, #46474b 0%, #2a2b2e 42%, #131315 100%);
-    border-radius: 1px 1px 12px 12px; box-shadow: 0 12px 18px rgba(0, 0, 0, 0.42);
-  }
-  .dv-lip {
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 15%; height: 4px; border-radius: 0 0 7px 7px; background: #0c0c0e;
-    box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.06);
+  /* ── Figuras W-PROOF-12 ────────────────────────────────── */
+  .pjw { display: grid; grid-template-columns: 1fr; row-gap: 56px; }
+  .pjw__item { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+  .pjw__item--more { display: none; }
+  .pjw.is-expanded .pjw__item--more { display: flex; }
+  .pjw__result {
+    margin: 10px auto 0; max-width: 46ch; text-align: center;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--fg-secondary);
   }
 
-  /* ── TELÉFONO realista (flota en frente, a la derecha) ──── */
-  .dv-phone {
-    position: absolute; right: 3%; bottom: 13%; z-index: 3; width: 24%; aspect-ratio: 9 / 16;
-    background: #0a0a0b; border: 1px solid #34343a; border-radius: clamp(13px, 1.5vw, 20px); padding: 4px;
-    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.6), 0 3px 8px rgba(0, 0, 0, 0.4);
-  }
-  .dv-pscreen {
-    position: relative; width: 100%; height: 100%; overflow: hidden;
-    border-radius: clamp(10px, 1.3vw, 16px); background: var(--bg-base);
-  }
-  /* proporción 9/16 ≈ la de las capturas → object-fit cover llena el marco y
-     recorta SÓLO abajo (no los costados; el recorte lateral queda < 3%). */
-  .dv-pshot { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-  .dv-pwire { width: 100%; height: 100%; }
-  .dv-island {
-    position: absolute; top: 7px; left: 50%; transform: translateX(-50%); z-index: 4;
-    width: 30%; height: 6px; border-radius: 100px; background: #000;
-  }
-
-  /* ── info ──────────────────────────────────────────────── */
-  .pf__info { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
-  .pf__badge { align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-teal); background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); margin-bottom: var(--space-1); }
-  .pf__name { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; }
-  .pf__cat { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .pf__result { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); margin-top: var(--space-1); }
-  .pf__tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
-  .pf__tag { font-size: var(--text-xs); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); border: 1px solid var(--border); color: var(--fg-secondary); background: var(--bg-elevated); }
-  .pf__tag--0 { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .pf__tag--2 { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-
-  /* ── flechitas sutiles izq/der ─────────────────────────── */
-  .pf__arrow {
-    position: absolute; top: 38%; transform: translateY(-50%); z-index: 5;
-    display: none; align-items: center; justify-content: center;
-    width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-pill);
-    color: var(--fg-subtle); background: transparent; border: 0;
-    transition: color var(--duration-fast), background var(--duration-fast);
-  }
-  .pf__arrow:hover { color: var(--accent-gold); background: var(--accent-gold-dim); }
-  .pf__arrow :global(svg) { width: 24px; height: 24px; }
-  .pf__arrow--prev { left: calc(var(--space-2) * -1); }
-  .pf__arrow--next { right: calc(var(--space-2) * -1); }
-
-  /* "Ver Proyectos" — móvil: muestra UN trabajo y al tocar despliega todos */
-  .pf__more {
-    align-self: center; display: inline-flex; align-items: center; gap: var(--space-2);
-    margin-top: var(--space-6); min-height: var(--tap-min); padding: var(--space-2) var(--space-4);
+  /* "Ver Proyectos" (móvil): despliega los dos que quedan. */
+  .pjw__more {
+    display: flex; align-items: center; gap: var(--space-2); margin: var(--space-6) auto 0;
+    min-height: var(--tap-min); padding: var(--space-2) var(--space-4);
     color: var(--fg-secondary); background: transparent; border: 0; cursor: pointer;
     font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: var(--tracking-wide); text-transform: uppercase;
     transition: color var(--duration-fast);
   }
-  .pf__more:hover { color: var(--accent-gold); }
-  .pf__more-ic { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .pf.is-expanded .pf__more-ic { transform: rotate(180deg); }
-  /* desplegado: se ven todos, apilados */
-  .pf.is-expanded .pf__stage { display: flex; flex-direction: column; gap: var(--space-9); }
-  .pf.is-expanded .pf__slide { grid-area: auto; display: grid; grid-template-columns: 1fr; gap: var(--space-6); animation: none; }
+  .pjw__more:hover { color: var(--accent-gold); }
+  .pjw__more :global(.pjw__more-ic) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
+  .pjw.is-expanded + .pjw__more :global(.pjw__more-ic) { transform: rotate(180deg); }
 
   @media (--md) {
     .projects__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
-    .pf { padding-inline: var(--space-7); }
-    .pf__arrow { display: inline-flex; }
-    .pf__more { display: none; }
-    .pf__slide.is-active { grid-template-columns: 1.1fr 0.9fr; gap: var(--space-8); }
-    .pf__arrow--prev { left: calc(var(--space-2) * -1); }
-    .pf__arrow--next { right: calc(var(--space-2) * -1); }
+    .pjw { grid-template-columns: 1fr 1fr; column-gap: 48px; row-gap: 72px; }
+    .pjw__item--more { display: flex; }
+    .pjw__more { display: none; }
+    .pjw__result { font-size: 16px; }
   }
+  @media (--lg) { .pjw { column-gap: 64px; row-gap: 88px; } }
 </style>
 
 <script>
-  const root = document.querySelector('[data-projects]');
-  if (root) {
-    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
-    const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
-    const next = root.querySelector<HTMLButtonElement>('[data-next]');
-    const n = slides.length;
-    let i = 0;
-    function go(k: number) {
-      i = (k + n) % n;
-      slides.forEach((s, idx) => { const on = idx === i; s.classList.toggle('is-active', on); s.setAttribute('aria-hidden', on ? 'false' : 'true'); });
-    }
-    prev?.addEventListener('click', () => go(i - 1));
-    next?.addEventListener('click', () => go(i + 1));
-    root.addEventListener('keydown', (e) => {
-      const k = (e as KeyboardEvent).key;
-      if (k === 'ArrowLeft') go(i - 1);
-      else if (k === 'ArrowRight') go(i + 1);
-    });
-
-    // PRECARGA: al acercarse la sección, descarga TODAS las capturas (incluidas las
-    // de slides ocultos, que el navegador no baja por estar en display:none) para
-    // que cambiar de trabajo sea INSTANTÁNEO, sin esperar al lazy.
-    const lazyImgs = Array.from(root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'));
-    let preloaded = false;
-    function preloadAll() {
-      if (preloaded) return; preloaded = true;
-      // Fuerza la carga+decode de los <img> REALES (aunque su slide esté en
-      // display:none) → al cambiar de trabajo ya están listos en el DOM, sin
-      // re-descargar ni esperar al lazy.
-      lazyImgs.forEach((im) => { im.loading = 'eager'; im.decode?.().catch(() => {}); });
-    }
-    if ('IntersectionObserver' in window && lazyImgs.length) {
-      const io = new IntersectionObserver((ents) => {
-        if (ents.some((e) => e.isIntersecting)) { preloadAll(); io.disconnect(); }
-      }, { rootMargin: '600px' });
-      io.observe(root);
-    } else {
-      preloadAll();
-    }
-
-    // "Ver Proyectos" (móvil): despliega / recoge todos los trabajos
-    const more = root.querySelector<HTMLButtonElement>('[data-more]');
+  document.querySelectorAll<HTMLElement>('[data-pjw]').forEach((root) => {
+    const more = root.parentElement?.querySelector<HTMLButtonElement>('[data-pjw-more]');
     more?.addEventListener('click', () => {
       const exp = root.classList.toggle('is-expanded');
       more.setAttribute('aria-expanded', exp ? 'true' : 'false');
-      slides.forEach((s, idx) => s.setAttribute('aria-hidden', exp ? 'false' : (idx === i ? 'false' : 'true')));
     });
-  }
+  });
 </script>

@@ -34,7 +34,7 @@ export interface SeoCopy {
   pasos: { label: string; title: string; lead: string; items: [{ title: string; text: string }, { title: string; text: string }, { title: string; text: string }] };
   prosa: { tone1: string; tone2: string; items: { icon: string; title: string; text: string }[] };
   proyectos: { label: string; title: string; lead: string; more: string; addText: string };
-  precio: { eyebrow: string; title: string; cta: string };
+  precio: { eyebrow: string; title: string; cta: string; specsLabel: string; specKeys: string[] };
   franja: { queEs: string; desde: (inicial: string, mensual: string) => string; tiempo: string; verQue: string; verPrecios: string; pedir: string };
   hermanas: { title: string; lead: string; diag: { title: string; text: string }; precios: { title: string; text: string }; blog: { title: string; text: string } };
   cierre: { proof: string; warmTitle: string; warmText: string; warmCta: string };
@@ -97,6 +97,10 @@ const precio: SeoCopy['precio'] = {
   eyebrow: 'Inversión',
   title: 'SEO local, con el precio a la vista',
   cta: 'Pedir mi propuesta',
+  specsLabel: 'Qué incluye el plan mensual',
+  // Rótulo de cada punto de pricing.features (clusters.ts), en el mismo orden; el valor
+  // es el punto VERBATIM.
+  specKeys: ['Ficha', 'Directorios', 'Contenido', 'Reseñas', 'Reporte', 'Idiomas'],
 };
 
 const franja: SeoCopy['franja'] = {
@@ -139,7 +143,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
     ventanas: ventanas('Katy, Sugar Land, Pearland'),
     barrios: {
       label: 'Barrio por barrio',
-      title: 'Una página para cada zona que te deja',
+      title: 'Una página para cada zona que te da trabajo',
       lead: 'Así se ve este sitio hoy en Houston: cada casilla llena es una página que ya existe. Contigo hacemos lo mismo con tus zonas.',
       tableLabel: 'Páginas de Marcyan por zona y servicio en el área de Houston',
       columns: COLUMNS,
@@ -150,11 +154,9 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
           { label: 'IA conversacional', href: '/es/houston/ia-conversacional' },
           { label: 'Tienda en línea', href: '/es/houston/ecommerce' },
         ] },
-        { label: 'Katy', cells: [{ label: 'SEO local' }, { label: 'Diseño web', href: '/es/houston/katy' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
-        { label: 'Sugar Land', cells: [{ label: 'SEO local' }, { label: 'Diseño web', href: '/es/houston/sugar-land' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
-        { label: 'The Woodlands', cells: COLUMNS.map((label) => ({ label })) },
+        { label: 'Katy', cells: [{ label: 'SEO local', href: '/es/houston/katy' }, { label: 'Diseño web', href: '/es/houston/katy' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
+        { label: 'Sugar Land', cells: [{ label: 'SEO local', href: '/es/houston/sugar-land' }, { label: 'Diseño web', href: '/es/houston/sugar-land' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
         { label: 'Pearland', cells: COLUMNS.map((label) => ({ label })) },
-        { label: 'Pasadena', cells: COLUMNS.map((label) => ({ label })) },
       ],
       note: 'Casilla llena: página publicada. Casilla punteada: todavía sin página.',
     },
@@ -214,7 +216,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
     ventanas: ventanas('Doral, Hialeah, Kendall'),
     barrios: {
       label: 'Barrio por barrio',
-      title: 'Una página para cada barrio que te deja',
+      title: 'Una página para cada barrio que te da trabajo',
       lead: 'Así se ve este sitio hoy en Miami: cada casilla llena es una página que ya existe. Contigo hacemos lo mismo con tus barrios.',
       tableLabel: 'Páginas de Marcyan por barrio y servicio en Miami-Dade',
       columns: COLUMNS,
@@ -228,7 +230,6 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
         { label: 'Doral', cells: [{ label: 'SEO local', href: '/es/miami/doral' }, { label: 'Diseño web', href: '/es/miami/doral' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
         { label: 'Hialeah', cells: [{ label: 'SEO local', href: '/es/miami/hialeah' }, { label: 'Diseño web', href: '/es/miami/hialeah' }, { label: 'IA conversacional' }, { label: 'Tienda en línea' }] },
         { label: 'Kendall', cells: COLUMNS.map((label) => ({ label })) },
-        { label: 'Brickell', cells: COLUMNS.map((label) => ({ label })) },
       ],
       note: 'Casilla llena: página publicada. Casilla punteada: todavía sin página.',
     },

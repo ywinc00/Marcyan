@@ -102,7 +102,7 @@ const spec: KindSpec = {
     {
       component: Precio,
       id: 'precios',
-      props: (ctx) => ({ copy: copyOf(ctx).precio, note: ctx.cluster.pricing.note }),
+      props: (ctx) => ({ copy: copyOf(ctx).precio, note: ctx.cluster.pricing.note, features: ctx.cluster.pricing.features }),
     },
 
     // 8 · Proyectos (#proyectos): ficha grande del de la ciudad + el resto. Sin cifras.

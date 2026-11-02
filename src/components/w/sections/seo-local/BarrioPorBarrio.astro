@@ -13,11 +13,26 @@ const { copy, n, lang = 'es' } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
 <div class="sl-gap">
+  <div class="sl-mx">
   <MatrizFilas rows={copy.rows} columns={copy.columns} fixedRow={0} label={copy.tableLabel} lang={lang} />
+  </div>
   <p class="sl-note">{copy.note}</p>
 </div>
 <style>
   .sl-gap { margin-top: var(--w-chapter-gap); }
   .sl-note { margin: 20px auto 0; max-width: 46rem; text-align: center; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
-  @media (--lt-md) { .sl-gap { margin-top: 48px; } }
+  .sl-mx { position: relative; }
+  @media (--lt-md) {
+    .sl-gap { margin-top: 48px; }
+    /* Móvil: columnas con sitio para que los servicios partan por palabra (nunca
+       "conve…") y un fundido en el borde derecho que avisa de que la caja se desplaza. */
+    .sl-mx :global(.wd-mx__t) { min-width: calc(196px + var(--wd-cols) * 100px); }
+    .sl-mx :global(.wd-mx__ch) { font-size: 13px; }
+    .sl-mx::after {
+      content: ''; position: absolute; z-index: 2; top: 1px; right: 1px; bottom: 1px; width: 48px;
+      border-radius: 0 var(--w-r-obj) var(--w-r-obj) 0;
+      background: linear-gradient(90deg, transparent, var(--w-s1));
+      pointer-events: none;
+    }
+  }
 </style>

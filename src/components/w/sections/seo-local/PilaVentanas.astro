@@ -4,7 +4,7 @@
 // la acción dominante de la página es otra). Derecha: tres ventanas de navegador CLARAS
 // (objetos de producto, §2.4) apiladas en escalera, cada una con el nombre del mapa EN
 // TEXTO (sin logotipos de terceros, §1.C) y sus pasos numerados; la de delante (Google)
-// a la derecha y entera, las de detrás asoman recortadas por la siguiente.
+// abajo a la derecha y entera; las de detrás, más arriba, enseñan entera su cabecera.
 // Son los pasos reales del trabajo, no datos inventados: sin etiqueta "Ejemplo".
 // Estático (la firma de la página es el radar). Móvil: la pila cabe en 358 px con las
 // ventanas más estrechas y desplazadas menos.
@@ -59,7 +59,10 @@ const titleId = `${id ?? 'sl-pila'}-title`;
   .sl-pila__ck :global(svg) { width: 13px; height: 13px; }
 
   /* Pila: altura reservada y ventanas en posición absoluta, de atrás (1) a delante (3). */
-  .sl-pila__stack { position: relative; height: 470px; isolation: isolate; width: 100%; max-width: 600px; margin-inline: auto; }
+  /* Escalera en diagonal hacia abajo: cada ventana de detrás asoma ENTERA su cabecera
+     (barra + nombre del mapa) por encima de la siguiente, como la identidad de cada
+     ventana en W-CORE-27 (revisión 1: "Bing Place", "Apple Map" salían cortados). */
+  .sl-pila__stack { position: relative; height: 600px; isolation: isolate; width: 100%; max-width: 600px; margin-inline: auto; }
   .sl-win {
     position: absolute; top: 0; width: 300px;
     border-radius: 12px; overflow: hidden;
@@ -68,9 +71,9 @@ const titleId = `${id ?? 'sl-pila'}-title`;
     box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 24px 48px -16px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.25);
     font-family: var(--font-body);
   }
-  .sl-win--1 { left: 0; top: 72px; z-index: 1; }
-  .sl-win--2 { left: 128px; top: 36px; z-index: 2; }
-  .sl-win--3 { left: 256px; top: 0; z-index: 3; width: 320px; }
+  .sl-win--1 { left: 0; top: 0; z-index: 1; }
+  .sl-win--2 { left: 128px; top: 106px; z-index: 2; }
+  .sl-win--3 { left: 256px; top: 212px; z-index: 3; width: 320px; }
   .sl-win__bar {
     display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px;
     background: #f1eee8; border-bottom: 1px solid rgba(14,14,13,.07);
@@ -109,10 +112,11 @@ const titleId = `${id ?? 'sl-pila'}-title`;
     .sl-pila__stack { margin-inline: 0; }
   }
   @media (--lt-md) {
-    .sl-pila__stack { height: 420px; max-width: 358px; }
+    .sl-pila__stack { height: 580px; max-width: 358px; }
     .sl-win { width: 236px; }
-    .sl-win--1 { left: 0; top: 64px; }
-    .sl-win--2 { left: 52px; top: 32px; }
+    .sl-win--1 { left: 0; top: 0; }
+    .sl-win--2 { left: 52px; top: 100px; }
+    .sl-win--3 { top: 200px; }
     .sl-win--3 { left: auto; right: 0; width: 252px; }
     .sl-win__body { padding: 16px 16px 20px; }
     .sl-win__t { font-size: 20px; }

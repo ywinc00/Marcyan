@@ -26,6 +26,36 @@ const { copy, n, city, lang = 'es' } = Astro.props;
 </div>
 <style>
   .sl-gap { margin-top: var(--w-chapter-gap); }
+  /* Superficie: la sección entera sobre --w-s1 (como el bento del piloto), para romper la
+     losa negra entre el hero y la pila (E-01). Las celdas toman el color de la sección y
+     las bandejas suben un escalón (nunca un agujero de noche). */
+  :global(.w-cell:has(.sl-rev)) {
+    background: var(--w-s1);
+    --w-cell-bg: var(--w-s1);
+    --w-tray-bg: rgba(var(--star-rgb), .045);
+  }
+  /* Firma (E-54): la celda del radar es la que tiene luz. Amanecer oro bajo el radar,
+     anillos y haz con más contraste, y los avisos dentro del semicírculo, 2 o 3 a la vez. */
+  :global(.sl-rev.wd-bento .wd-bento__cell:first-child) {
+    background:
+      radial-gradient(70% 55% at 55% 100%, rgba(var(--accent-gold-rgb), .16), transparent 70%),
+      var(--w-s1);
+  }
+  .sl-rev__radar :global(.wo-radar__ring) {
+    border-color: rgba(var(--accent-gold-rgb), .38);
+    background: radial-gradient(closest-side, transparent 90%, rgba(var(--accent-gold-rgb), .10));
+  }
+  .sl-rev__radar :global(.wo-radar__beam) {
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--accent-gold-rgb), .05) 4deg, rgba(var(--accent-gold-rgb), .20) 33deg, rgba(var(--accent-gold-rgb), .55) 36deg, transparent 36.5deg);
+  }
+  .sl-rev__radar :global(.wo-radar__ping--1) { left: 30%; top: 36%; }
+  .sl-rev__radar :global(.wo-radar__ping--2) { left: 54%; top: 57%; }
+  .sl-rev__radar :global(.wo-radar__ping--3) { left: 22%; top: 76%; }
+  /* Retrasos negativos: al arrancar ya hay 2 avisos a la vista y el ciclo los solapa
+     (cada aviso vive 8,5 s de 10; separados ~3,3 s → 2 o 3 visibles a la vez). */
+  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--1) { animation-delay: -5.6s; }
+  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--2) { animation-delay: -2.3s; }
+  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--3) { animation-delay: 1.06s; }
   /* El radar llega hasta el borde inferior de su celda, como en W-CORE-09 (sin bandeja). */
   .sl-rev__radar { width: 100%; }
   :global(.sl-rev .wd-bento__cell:first-child) { padding-bottom: 0; }
@@ -41,5 +71,8 @@ const { copy, n, city, lang = 'es' } = Astro.props;
   @media (--lt-md) {
     .sl-gap { margin-top: 48px; }
     :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { margin-inline: -20px; }
+    .sl-rev__radar :global(.wo-radar__ping--1) { left: 12%; top: 50%; }
+    .sl-rev__radar :global(.wo-radar__ping--2) { left: 40%; top: 67%; }
+    .sl-rev__radar :global(.wo-radar__ping--3) { left: 16%; top: 85%; }
   }
 </style>

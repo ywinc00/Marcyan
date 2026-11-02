@@ -1,8 +1,8 @@
 ---
-// Diseño web · 01 "Cómo se construye tu web" (§4.14-4): CabeceraNumerada + DemoPorPasos
-// (W-CORE-05 + F-05, firma de la página: disparo único por entrada en vista) con la
-// web de EJEMPLO que pasa de esqueleto a lista. Envoltorio fino: la plantilla pasa
-// props, no slots, y la demo necesita su pantalla por slot.
+// Diseño web · 01 "Cómo se construye tu web" (§4.14-4): CabeceraNumerada (H2 + bajada)
+// + DemoPorPasos en modo bajo cabecera (W-CORE-05: sin titular propio, control 2), firma
+// de la página: disparo único por entrada en vista, la lista marca el paso que corre y
+// el registro cuenta lo que deja cada paso. La web de EJEMPLO va rotulada.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import DemoPorPasos from '../../DemoPorPasos.astro';
 import WebEjemplo from '../../objetos/WebEjemplo.astro';
@@ -11,13 +11,13 @@ import type { WebCopy } from '../../../../i18n/w/web';
 interface Props { copy: WebCopy['proceso']; n: number; city: string; lang?: 'es' | 'en' }
 const { copy, n, city, lang = 'es' } = Astro.props;
 ---
-<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} />
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.demoText} />
 <div class="ws-gap">
-  <DemoPorPasos titleHtml={copy.demoTitle} text={copy.demoText} steps={copy.steps} done={copy.done} working={copy.working} lang={lang}>
-    <WebEjemplo slot="screen" frame="tarjeta" city={city} lang={lang} example={false} />
+  <DemoPorPasos steps={copy.steps} log={copy.log} done={copy.done} working={copy.working} lang={lang}>
+    <WebEjemplo slot="screen" frame="tarjeta" city={city} lang={lang} />
   </DemoPorPasos>
 </div>
 <style>
   .ws-gap { margin-top: 56px; }
-  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
 </style>

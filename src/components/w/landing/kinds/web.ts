@@ -166,6 +166,7 @@ const spec: KindSpec = {
           titleHtml: t.title,
           lead: t.lead,
           currentId: 'diseno-web',
+          lang: ctx.lang,
           items: serviciosPara('es', ctx.cluster.path).map((s) => ({
             id: s.id, label: s.name, desc: s.promise, href: s.href, price: anchorOf(s.id),
           })),

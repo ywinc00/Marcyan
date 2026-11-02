@@ -22,8 +22,8 @@ export interface WebCopy {
     { tone1: string; tone2: string; text: string },
     { tone1: string; tone2: string; text: string },
   ];
-  proceso: { label: string; title: string; demoTitle: string; demoText: string; steps: string[]; done: string; working: string };
-  escalera: { label: string; title: string; demoTitle: string; demoLead: string; chip: string };
+  proceso: { label: string; title: string; demoText: string; steps: string[]; log: string[]; done: string; working: string };
+  escalera: { label: string; title: string; demoLead: string; chip: string; pages: string[]; antes: string; despues: string };
   bento: {
     tone1: string; tone2: string; sub: string;
     cells: { icon: string; label: string; titleHtml: string; text: string; tray?: boolean }[];
@@ -45,7 +45,6 @@ const triada: WebCopy['triada'] = [
 const proceso: WebCopy['proceso'] = {
   label: 'Cómo se construye tu web',
   title: 'De tu negocio a tu web publicada',
-  demoTitle: 'Cinco pasos, todos a la vista',
   demoText: 'La propuesta llega en 24 horas y cada paso deja algo que puedes ver. Al final, tu web está publicada y conectada.',
   steps: [
     'Revisamos tu negocio y tu competencia',
@@ -54,6 +53,14 @@ const proceso: WebCopy['proceso'] = {
     'La conectamos a tu ficha de mapa y a Marcy',
     'Publicada',
   ],
+  // Registro de la demo: lo que deja cada paso (no repite la lista). Objeto de ejemplo.
+  log: [
+    'informe-competencia.pdf',
+    'textos-es.md · textos-en.md',
+    'inicio · servicios · contacto',
+    'ficha + Marcy: conectadas',
+    'tunegocio.com: en línea',
+  ],
   done: 'Web publicada',
   working: 'Publicando tu web',
 };
@@ -61,9 +68,12 @@ const proceso: WebCopy['proceso'] = {
 const escalera: WebCopy['escalera'] = {
   label: 'Hazla tuya',
   title: 'Elige por dónde empezar',
-  demoTitle: 'Una página, un rediseño o un sitio completo',
   demoLead: 'Tres formas de tener tu web, con el precio de entrada a la vista. Empieza con una página y crece cuando lo necesites.',
   chip: 'Tus colores, tu letra, en español e inglés',
+  // La misma web de ejemplo en las tres opciones, cambiando de alcance (control 2).
+  pages: ['Inicio', 'Servicios', 'Zonas', '+2'],
+  antes: 'Antes',
+  despues: 'Después',
 };
 
 const bento: WebCopy['bento'] = {

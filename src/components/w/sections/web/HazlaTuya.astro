@@ -1,6 +1,13 @@
 ---
-// Diseño web · 02 "Hazla tuya" (§4.14-5): Escalera (W-CORE-06 + B-08) Landing /
-// Rediseño / A medida con sus anclas de pricing.ts; el precio solo en la opción activa.
+// Diseño web · 02 "Hazla tuya" (§4.14-5): CabeceraNumerada (H2 + bajada) + Escalera en
+// modo bajo cabecera (W-CORE-06 + B-08) Landing / Rediseño / A medida con sus anclas de
+// pricing.ts. Control 2: la MISMA web de ejemplo en las tres opciones, cambiando de
+// alcance para que la maqueta exprese la opción (como W-CORE-06, cada opción su variante):
+//   Landing   → una página.
+//   Rediseño  → antes y después (la mitad izquierda, la web vieja; la derecha, la nueva).
+//   A medida  → sitio de varias páginas (menú de páginas en la cabecera).
+// Decisión del director (control 2): los tres precios se ven siempre, no solo el de la
+// opción activa (precio legible antes que escondido); queda apuntada para el dueño.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Escalera from '../../Escalera.astro';
 import WebEjemplo from '../../objetos/WebEjemplo.astro';
@@ -13,11 +20,10 @@ const web = catalog.find((p) => p.id === 'diseno-web')!;
 const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
 const [t0, t1, t2] = web.tiers;
 ---
-<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} />
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.demoLead} />
 <div class="ws-gap">
   <Escalera
-    titleHtml={copy.demoTitle}
-    lead={copy.demoLead}
+    label={copy.title.replace(/<[^>]+>/g, '')}
     chip={copy.chip}
     lang={lang}
     options={[
@@ -26,12 +32,45 @@ const [t0, t1, t2] = web.tiers;
       { id: 'medida', title: t2.name, text: t2.blurb, price: desde(PRICE_ANCHORS.web) },
     ]}
   >
-    <WebEjemplo slot="screen-landing" frame="movil" kind="plomeria" city={city} lang={lang} example={false} />
-    <WebEjemplo slot="screen-rediseno" frame="movil" kind="salon" city={city} lang={lang} example={false} />
-    <WebEjemplo slot="screen-medida" frame="movil" kind="restaurante" city={city} lang={lang} example={false} />
+    <WebEjemplo slot="screen-landing" frame="movil" kind="plomeria" city={city} lang={lang} class="ht-phone" />
+    <div slot="screen-rediseno" class="ht-ab">
+      <WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} class="ht-phone" />
+      <div class="ht-ab__antes" aria-hidden="true">
+        <WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} example={false} class="ht-phone ht-old" />
+      </div>
+      <span class="ht-ab__line" aria-hidden="true"></span>
+      <span class="ht-ab__tag ht-ab__tag--a">{copy.antes}</span>
+      <span class="ht-ab__tag ht-ab__tag--d">{copy.despues}</span>
+    </div>
+    <WebEjemplo slot="screen-medida" frame="movil" kind="plomeria" city={city} lang={lang} pages={copy.pages} class="ht-phone" />
   </Escalera>
 </div>
 <style>
   .ws-gap { margin-top: 56px; }
-  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
+  /* Móvil: el teléfono algo más pequeño para que opciones y maqueta quepan juntas. */
+  @media (--lt-md) { :global(.ht-phone.wo-web--movil) { width: 236px; } }
+
+  /* Rediseño: la misma web dos veces; la vieja recortada a la mitad izquierda. */
+  .ht-ab { position: relative; width: fit-content; margin-inline: auto; height: auto !important; }
+  .ht-ab__antes { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
+  .ht-ab__line {
+    position: absolute; top: 9px; bottom: 9px; left: 50%; width: 2px; translate: -1px 0;
+    background: #fff; box-shadow: 0 0 0 1px rgba(14, 14, 13, .18);
+  }
+  .ht-ab__tag {
+    position: absolute; top: 16px; z-index: 3;
+    padding: 4px 8px; border-radius: 999px;
+    font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+    color: #f0ede8; background: #111110;
+  }
+  .ht-ab__tag--a { left: 20px; }
+  .ht-ab__tag--d { right: 20px; }
+  /* La web "antes": la misma maqueta (las líneas casan a los dos lados del corte) apagada,
+     en gris y con esquinas cuadradas de hace años. */
+  .ht-ab :global(.ht-old .wo-web__screen) { filter: grayscale(1) contrast(.8) brightness(.97); background: #e4e2de; }
+  .ht-ab :global(.ht-old .wo-web__cta),
+  .ht-ab :global(.ht-old .wo-web__svc),
+  .ht-ab :global(.ht-old .wo-web__ic),
+  .ht-ab :global(.ht-old .wo-web__logo) { border-radius: 0; }
 </style>

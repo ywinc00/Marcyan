@@ -13,7 +13,10 @@ interface Props {
 }
 const { lang = 'es', city, class: cls } = Astro.props;
 const label = lang === 'en' ? 'Websites we built, in use' : 'Webs nuestras en uso';
-const CLIENTES = ['Texas Rush Remove', 'Rosy Nails & Care', "Julio's Landscape TX", 'Move Junk Away'];
+// En Houston, solo los de Houston (control 2: MJA es de Orlando).
+const CLIENTES = city === 'houston'
+  ? ['Texas Rush Remove', 'Rosy Nails & Care', "Julio's Landscape TX"]
+  : ['Texas Rush Remove', 'Rosy Nails & Care', "Julio's Landscape TX", 'Move Junk Away'];
 ---
 {city !== 'miami' && (
   <div class:list={['w-logos', cls]}>
@@ -41,7 +44,7 @@ const CLIENTES = ['Texas Rush Remove', 'Rosy Nails & Care', "Julio's Landscape T
     display: flex; align-items: center; justify-content: center; min-height: 22px;
     font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 22px;
     letter-spacing: -0.01em; text-align: center; text-wrap: balance;
-    color: rgba(var(--star-rgb), 0.45);
+    color: rgba(var(--star-rgb), 0.5); /* 4,8:1 a 18 px sobre la noche (control 2: al 45 % daba 4,0) */
   }
   @media (--lt-sm) { .w-logos__name { font-size: 16px; } }
   @media (--md) {

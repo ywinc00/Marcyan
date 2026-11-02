@@ -3,7 +3,9 @@
 // Fondo --w-s1 con halo del accent del proyecto arriba a la derecha al 10 %
 // (solo oro: el teal nunca lleva halo, E-03; se expresa por el punto nítido de la meta).
 // Izquierda 512: título 48/1.2 500 (compacta 32), meta "Sitio + SEO · Houston" 16
-// al 70 %, principal + enlace, 2 párrafos 16/26 (did, result). Derecha: captura
+// al 70 %, botón secundario + enlace (la acción dominante de la página es otra) y UN
+// solo texto 16/26 (control 2: did y result decían casi lo mismo): el `result` que trae
+// la página (proof.items) si lo hay; si no, el `did` del portafolio. Derecha: captura
 // REAL en marco de navegador radio 8 + teléfono solapado, width/height y lazy.
 // MJA rotulado "Florida (Orlando)". Móvil: captura arriba, texto abajo.
 // Sin apertura animada (con o sin reduced-motion).
@@ -46,6 +48,8 @@ const meta = [p.badge, city].filter(Boolean).join(' · ');
 const portHref = lang === 'en' ? '/en/portfolio' : '/es/portafolio';
 const prim = primary ?? { label: lang === 'en' ? 'See the project' : 'Ver el proyecto', href: `${portHref}#${slug ?? ''}` };
 const lnk = link === false ? null : (link ?? (p.serviceLabel && p.serviceHref ? { label: p.serviceLabel, href: p.serviceHref } : null));
+// Un solo texto por pieza: el de la página manda; si no trae, el del portafolio.
+const body = project.result ?? p.did ?? p.result;
 const alt = lang === 'en' ? { pc: 'desktop view', movil: 'mobile view' } : { pc: 'vista de escritorio', movil: 'vista móvil' };
 ---
 <article
@@ -90,11 +94,10 @@ const alt = lang === 'en' ? { pc: 'desktop view', movil: 'mobile view' } : { pc:
     <H class="w-fp__title" translate="no">{p.name}</H>
     {meta && <p class="w-fp__meta"><span class="w-fp__dot" aria-hidden="true"></span>{meta}</p>}
     <div class="w-fp__actions">
-      <Button variant="primary" size="lg" href={prim.href} data-track={prim.track}>{prim.label}</Button>
+      <Button variant="secondary" size="lg" href={prim.href} data-track={prim.track}>{prim.label}</Button>
       {lnk && <Button variant="link" href={lnk.href} data-track={lnk.track}>{lnk.label}</Button>}
     </div>
-    {p.did && <p class="w-fp__p">{p.did}</p>}
-    {p.result && <p class="w-fp__p">{p.result}</p>}
+    {body && <p class="w-fp__p">{body}</p>}
   </div>
 </article>
 

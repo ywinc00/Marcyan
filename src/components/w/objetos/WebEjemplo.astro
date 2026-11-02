@@ -19,11 +19,14 @@ interface Props {
   size?: 'hero' | 'card' | 'mini';
   /** Etiqueta "Ejemplo" propia (AbanicoWebs la pone una vez para las tres). */
   example?: boolean;
+  /** Menú de páginas del sitio (p. ej. la opción "A medida" de la escalera): en el
+   *  marco móvil sustituye a la fila del idioma; la 1.ª va marcada. */
+  pages?: string[];
   class?: string;
 }
 const {
   kind = 'plomeria', frame = 'tarjeta', state = 'lista', lang = 'es',
-  city = 'Houston', size = 'card', example = true, class: cls,
+  city = 'Houston', size = 'card', example = true, pages, class: cls,
 } = Astro.props;
 
 const C = {
@@ -75,7 +78,9 @@ const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
     </header>
     <div class="wo-web__body">
       <div class="wo-web__main">
-        {frame === 'movil' && <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>}
+        {frame === 'movil' && (pages?.length
+          ? <p class="wo-web__pages" aria-hidden="true">{pages.map((pg, i) => <span class:list={['wo-sk', i === 0 && 'is-on']}>{pg}</span>)}</p>
+          : <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>)}
         <p class="wo-web__h wo-sk">{T.h}</p>
         <p class="wo-web__sub wo-sk">{T.sub}</p>
         <span class="wo-web__cta wo-sk"><Icon name={T.ctaIcon} />{T.cta}</span>
@@ -190,6 +195,14 @@ const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
   .wo-web--movil .wo-web__body { flex: 1; }
   .wo-web--movil .wo-web__side { flex: 1; display: flex; flex-direction: column; gap: 14px; }
   .wo-web--movil .wo-web__open { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--w-p-line); }
+
+  /* Menú de páginas (sitio de varias páginas): píldoras 11 px, la actual en el color del ejemplo. */
+  .wo-web__pages { margin: 0; display: flex; gap: 3px; flex-wrap: nowrap; overflow: hidden; }
+  .wo-web__pages span {
+    flex: none; padding: 5px 7px; border-radius: 999px; white-space: nowrap;
+    font: 500 11px/1 var(--font-body); color: var(--wo-ink2); border: 1px solid var(--w-p-line);
+  }
+  .wo-web__pages span.is-on { background: var(--wo-k); border-color: var(--wo-k); color: #fff; }
 
   /* ── Estado esqueleto (lo cambian las demos con data-wo-state) ── */
   .wo-sk { transition: color 400ms var(--w-ease-ui), background-color 400ms var(--w-ease-ui); }

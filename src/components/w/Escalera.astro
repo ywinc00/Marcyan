@@ -9,6 +9,11 @@
 // Accesible: role="radiogroup", cada opción role="radio" con aria-checked,
 // tabindex itinerante y flechas/Inicio/Fin (patrón APG de radio).
 // Precios solo por props (desde pricing.ts en la página), nunca escritos aquí.
+// Modo bajo cabecera (sin `titleHtml`, control 2): va debajo de una CabeceraNumerada
+// que ya lleva el H2 y la bajada; aquí no hay titular propio y el grupo se nombra con
+// `label`. Raíles de personalización en TODAS las opciones salvo `rails: false`.
+// Móvil (diseño por sustracción, E-18): sin raíles, las opciones inactivas solo con
+// nombre y precio, y la pantalla justo debajo para que el cambio se vea al tocar.
 import Icon from '../ui/Icon.astro';
 
 interface Option {
@@ -19,12 +24,14 @@ interface Option {
   price?: string;
   /** Icono Lucide funcional (16 px), opcional. */
   icon?: string;
-  /** Raíles de personalización a los lados de la pantalla (por defecto solo la 1.ª). */
+  /** Raíles de personalización a los lados de la pantalla (por defecto en todas). */
   rails?: boolean;
 }
 interface Props {
-  titleHtml: string;
-  lead: string;
+  titleHtml?: string;
+  lead?: string;
+  /** Nombre accesible del grupo de opciones cuando no hay titular propio. */
+  label?: string;
   options: [Option, Option, Option];
   /** Chip bajo la demo, p. ej. "Tus colores, tu letra, en español e inglés". */
   chip?: string;
@@ -35,20 +42,20 @@ interface Props {
   id?: string;
   class?: string;
 }
-const { titleHtml, lead, options, chip, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const { titleHtml, lead, label, options, chip, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
 const initial = Astro.props.initial ?? options[0].id;
 const uid = `wd-esc-${id ?? options.map((o) => o.id).join('-')}`;
 const screens = await Promise.all(
   options.map(async (o) => (Astro.slots.has(`screen-${o.id}`) ? await Astro.slots.render(`screen-${o.id}`) : '')),
 );
-const railsOf = (o: Option, i: number) => o.rails ?? i === 0;
+const railsOf = (o: Option, _i: number) => o.rails ?? true;
 const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
 ---
-<div class:list={['wd-esc', cls]} id={id} data-w-tone={tone} data-wd-esc>
+<div class:list={['wd-esc', !titleHtml && 'wd-esc--bare', cls]} id={id} data-w-tone={tone} data-wd-esc>
   <div class="wd-esc__copy">
-    <h2 class="wd-esc__h" id={`${uid}-h`} set:html={titleHtml} />
-    <p class="wd-esc__lead">{lead}</p>
-    <div class="wd-esc__opts" role="radiogroup" aria-labelledby={`${uid}-h`}>
+    {titleHtml && <h2 class="wd-esc__h" id={`${uid}-h`} set:html={titleHtml} />}
+    {lead && <p class="wd-esc__lead">{lead}</p>}
+    <div class="wd-esc__opts" role="radiogroup" aria-labelledby={titleHtml ? `${uid}-h` : undefined} aria-label={titleHtml ? undefined : label}>
       {options.map((o, i) => {
         const on = o.id === initial;
         return (
@@ -128,6 +135,7 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
     font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
   }
   .wd-esc__opts { margin: 32px 0 0; display: grid; gap: 6px; max-width: 486px; }
+  .wd-esc--bare .wd-esc__opts { margin-top: 0; }
   .wd-esc__opt {
     display: grid; gap: 4px; padding: 14px 16px; min-height: 44px;
     border-radius: var(--w-r-obj); border: 1px solid transparent; cursor: pointer;
@@ -208,6 +216,19 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
   }
   .wd-esc__ci { width: 16px; height: 16px; color: var(--wd-acc); flex: none; }
 
+  /* Móvil: opciones compactas (la inactiva, solo nombre y precio), pantalla debajo y
+     sin raíles: al tocar una opción el cambio queda a la vista (control 2, E-18). */
+  @media (--lt-lg) {
+    .wd-esc { gap: 24px; }
+    .wd-esc__opt:not(.is-on) .wd-esc__ox { display: none; }
+    .wd-esc__opt { padding-block: 12px; }
+  }
+  @media (--lt-md) {
+    .wd-esc__rail { display: none; }
+    .wd-esc__frame { padding: 10px; max-width: 340px; }
+    .wd-esc__screen { padding: 16px; display: grid; justify-items: center; }
+    .wd-esc__screen > :global(*) { height: auto; }
+  }
   @media (--md) {
     .wd-esc__frame {
       grid-template-columns: 64px minmax(0, 345px) 64px; max-width: none; width: auto;

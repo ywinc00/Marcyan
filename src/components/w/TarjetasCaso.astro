@@ -2,8 +2,10 @@
 // Tarjetas de caso (W-PROOF-13 sin citas, §3.3): antetítulo mono 12; tarjetas
 // 582×336, hueco 36, radio 8, FRANJA SUPERIOR de 4 px en el accent del proyecto
 // de portfolio.ts (oro o teal; prohibido muestrear colores de las webs, E-47),
-// padding 48/48/64: nombre Space Grotesk 24/500 translate="no", texto 20/32 = qué
-// se hizo (did), resultado verificable (result), pie con enlace "Ver caso ›".
+// padding 48/48/64: nombre Space Grotesk 24/500 translate="no", UN solo texto 16/26
+// (control 2: did y result se repetían y el cuerpo a 20 px aplanaba la jerarquía): el
+// `result` que trae la página si lo hay, si no el `did` del portafolio; pie "Ver caso ›".
+// Franja superior en el acento de la PÁGINA para todas (E-14: un acento por bloque).
 // Cerrojo 5: sale de v3, así que TODO su CSS va aquí (solo variables --w-* y del sitio).
 import Button from '../ui/Button.astro';
 import { portfolioProjects as PES } from '../../i18n/portfolio';
@@ -30,8 +32,7 @@ const cards = items.map((it) => {
   return {
     name: p.name,
     accent: p.accent === 'teal' ? 'teal' : 'gold',
-    did: p.did ?? full?.did,
-    result: p.result,
+    text: it.result ?? p.did ?? full?.did ?? p.result,
     href: p.slug ? `${portHref}#${p.slug}` : (p.url ?? portHref),
   };
 });
@@ -42,8 +43,7 @@ const cards = items.map((it) => {
     {cards.map((c) => (
       <li class:list={['w-case', `w-case--${c.accent}`]}>
         <H class="w-case__name" translate="no">{c.name}</H>
-        {c.did && <p class="w-case__did">{c.did}</p>}
-        {c.result && c.result !== c.did && <p class="w-case__result">{c.result}</p>}
+        {c.text && <p class="w-case__did">{c.text}</p>}
         <div class="w-case__foot">
           <Button variant="link" href={c.href}>{linkLabel}</Button>
         </div>
@@ -64,7 +64,7 @@ const cards = items.map((it) => {
   }
   .w-case {
     position: relative; display: flex; flex-direction: column;
-    min-height: 336px; padding: 36px 24px 32px;
+    padding: 36px 24px 32px;
     background: var(--w-s2); border: 1px solid var(--w-line);
     border-radius: var(--w-r-cell, 8px); box-shadow: var(--w-edge);
     overflow: hidden;
@@ -72,9 +72,8 @@ const cards = items.map((it) => {
   /* Franja superior de 4 px en el accent del proyecto. */
   .w-case::before {
     content: ''; position: absolute; inset: 0 0 auto 0; height: 4px;
-    background: var(--accent-gold);
+    background: var(--w-accent, var(--accent-gold)); opacity: .85;
   }
-  .w-case--teal::before { background: var(--accent-teal); }
   .w-case__name {
     margin: 0;
     font-family: var(--font-display); font-weight: 500; font-size: 24px; line-height: 1.2;
@@ -82,17 +81,12 @@ const cards = items.map((it) => {
   }
   .w-case__did {
     margin: 24px 0 0;
-    font-family: var(--font-body); font-size: 18px; line-height: 1.6; color: var(--w-ink-80);
-  }
-  .w-case__result {
-    margin: 16px 0 0;
-    font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary);
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--w-ink-70);
   }
   .w-case__foot { margin-top: auto; padding-top: 24px; }
 
   @media (--md) {
     .w-cases__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
-    .w-case { padding: 48px 48px 64px; }
-    .w-case__did { font-size: 20px; line-height: 32px; }
+    .w-case { padding: 48px 48px 56px; min-height: 280px; }
   }
 </style>

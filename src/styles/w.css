@@ -29,6 +29,14 @@
 }
 :root[data-ds="v3"] .w-rails::before { left: var(--w-rail-x); }
 :root[data-ds="v3"] .w-rails::after { right: var(--w-rail-x); }
+/* El contenido va DENTRO de los raíles, nunca encima de la línea (control 2): en WorkOS el
+   raíl está en x=120 y el texto en x=168 (48 px); en móvil, 16 px. */
+:root[data-ds="v3"] .w-rails .w-container { padding-inline: 16px; }
+@media (--lg) { :root[data-ds="v3"] .w-rails .w-container { padding-inline: 48px; } }
+/* Las rejillas de celdas sí van de raíl a raíl: su marco de 1 px ES el raíl y el padding de
+   la celda deja el texto en la misma línea que el resto (W-CORE-08, authkit s05). */
+:root[data-ds="v3"] .w-rails .w-container :is(.wd-bento, .w-cells) { margin-inline: -16px; max-width: none; }
+@media (--lg) { :root[data-ds="v3"] .w-rails .w-container :is(.wd-bento, .w-cells) { margin-inline: -48px; } }
 /* El objeto a sangre del hero tapa los raíles (§2.5). */
 :root[data-ds="v3"] .w-hero--bleed { position: relative; z-index: 1; }
 

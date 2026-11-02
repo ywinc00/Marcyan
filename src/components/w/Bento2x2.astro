@@ -5,6 +5,8 @@
 // ~90 px de aire y la mini-UI en bandeja radio 20 (token 22) padding 14,5
 // (slot `ui-<n>`, n desde 1). Estático. Móvil: 1 columna.
 // `wideLast`: la última celda ocupa las dos columnas (Servicios usa 7 celdas).
+// `mobileTextOnly`: celdas (desde 1) que en móvil se quedan solo con texto, sin mini-UI
+// (diseño por sustracción, E-18, control 2).
 import Icon from '../ui/Icon.astro';
 
 interface Cell {
@@ -20,13 +22,14 @@ interface Cell {
 interface Props {
   cells: Cell[];
   wideLast?: boolean;
+  mobileTextOnly?: number[];
   tone?: 'gold' | 'teal';
   /** Nivel del título de cada celda (por defecto h3). */
   headingLevel?: 'h3' | 'h4';
   id?: string;
   class?: string;
 }
-const { cells, wideLast = false, tone = 'gold', headingLevel = 'h3', id, class: cls } = Astro.props;
+const { cells, wideLast = false, mobileTextOnly = [], tone = 'gold', headingLevel = 'h3', id, class: cls } = Astro.props;
 const H = headingLevel;
 const uis = await Promise.all(
   cells.map(async (_, i) => (Astro.slots.has(`ui-${i + 1}`) ? await Astro.slots.render(`ui-${i + 1}`) : '')),
@@ -35,7 +38,7 @@ const uis = await Promise.all(
 <div class:list={['wd-bento', cls]} id={id} data-w-tone={tone}>
   {cells.map((c, i) => (
     <article
-      class:list={['wd-bento__cell', wideLast && i === cells.length - 1 && 'wd-bento__cell--wide']}
+      class:list={['wd-bento__cell', wideLast && i === cells.length - 1 && 'wd-bento__cell--wide', mobileTextOnly.includes(i + 1) && 'wd-bento__cell--textm']}
       id={c.id}
     >
       <p class="wd-bento__lab"><Icon name={c.icon} class="wd-bento__ic" />{c.label}</p>
@@ -91,6 +94,7 @@ const uis = await Promise.all(
   .wd-bento__tray > :global(.wo-mini),
   .wd-bento__tray > :global(.wo-map),
   .wd-bento__tray > :global(.wo-chat) { width: 100%; max-width: none; }
+  @media (--lt-md) { .wd-bento__cell--textm .wd-bento__ui { display: none; } }
   @media (--md) {
     .wd-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .wd-bento__cell { padding: 48px; }

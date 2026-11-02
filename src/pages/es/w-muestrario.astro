@@ -1,0 +1,894 @@
+---
+// ─────────────────────────────────────────────────────────────
+// MUESTRARIO v3 del rediseño WorkOS (design/rediseno-workos.md §3.7, ola 0C).
+// Página INTERNA: noindex + fuera del sitemap (filter de astro.config.mjs).
+// SE BORRA (con su condición del sitemap) ANTES DE CUALQUIER MERGE (ola 5).
+//
+// Enseña TODOS los componentes de src/components/w/ con contenido realista, en
+// el orden de una página tipo (la landing de diseño web en Houston, §4.14) y
+// después, en anexos, las piezas que viven en otros tipos de página, cada una en
+// el orden en que aparece en la suya. Todo el texto sale de los datos del sitio
+// (clusters, pricing, portfolio, content, servicios) o del copy del plan (§4);
+// lo inventado va en objetos rotulados "Ejemplo". Ningún precio escrito a mano.
+// Su pareja sin `ds` (prueba del Cerrojo 5) es w-muestrario-base.astro.
+// ─────────────────────────────────────────────────────────────
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import Button from '../../components/ui/Button.astro';
+import Contact from '../../components/sections/Contact.astro';
+import WStyles from '../../components/w/WStyles.astro';
+// Sistema base (0A)
+import Eyebrow from '../../components/w/Eyebrow.astro';
+import ChipCiudad from '../../components/w/ChipCiudad.astro';
+import HeroTexto from '../../components/w/HeroTexto.astro';
+import CabeceraNumerada from '../../components/w/CabeceraNumerada.astro';
+import CapituloDosFrases from '../../components/w/CapituloDosFrases.astro';
+import Bandeja from '../../components/w/Bandeja.astro';
+import Celdas from '../../components/w/Celdas.astro';
+import IconoObjeto from '../../components/w/IconoObjeto.astro';
+import Ejemplo from '../../components/w/Ejemplo.astro';
+// Conversión (0B-1)
+import FranjaEnPocasPalabras from '../../components/w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../components/w/PreguntasFrecuentes.astro';
+import PreguntasAbiertas from '../../components/w/PreguntasAbiertas.astro';
+import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
+import TarjetasHermanas from '../../components/w/TarjetasHermanas.astro';
+import TarjetasPerfil from '../../components/w/TarjetasPerfil.astro';
+import DondeEstaTuNegocio from '../../components/w/DondeEstaTuNegocio.astro';
+// Prueba (0B-2)
+import TiraLogos from '../../components/w/TiraLogos.astro';
+import FichaProyecto from '../../components/w/FichaProyecto.astro';
+import FiguraProyecto from '../../components/w/FiguraProyecto.astro';
+import TarjetasCaso from '../../components/w/TarjetasCaso.astro';
+import ProsaLocal from '../../components/w/ProsaLocal.astro';
+import RelatoEnActos from '../../components/w/RelatoEnActos.astro';
+import FichaLateral from '../../components/w/FichaLateral.astro';
+import CeldaTuNegocio from '../../components/w/CeldaTuNegocio.astro';
+// Precio y estructura (0B-3)
+import PrecioPuntos from '../../components/w/PrecioPuntos.astro';
+import TarjetaPrecio from '../../components/w/TarjetaPrecio.astro';
+import TarjetasModelo from '../../components/w/TarjetasModelo.astro';
+import Especificaciones from '../../components/w/Especificaciones.astro';
+import TriadaManifiesto from '../../components/w/TriadaManifiesto.astro';
+import TresPasosNumerados from '../../components/w/TresPasosNumerados.astro';
+import CuatroRazones from '../../components/w/CuatroRazones.astro';
+import GratisDeVerdad from '../../components/w/GratisDeVerdad.astro';
+import Inventario3Etapas from '../../components/w/Inventario3Etapas.astro';
+import TresGarantias from '../../components/w/TresGarantias.astro';
+import TablaFases from '../../components/w/TablaFases.astro';
+import SedesAcordeon from '../../components/w/SedesAcordeon.astro';
+// Demos y bucles (0B-4)
+import DemoPorPasos from '../../components/w/DemoPorPasos.astro';
+import Escalera from '../../components/w/Escalera.astro';
+import Bento2x2 from '../../components/w/Bento2x2.astro';
+import BandejaPasos from '../../components/w/BandejaPasos.astro';
+import RegistroVivo from '../../components/w/RegistroVivo.astro';
+import MatrizFilas from '../../components/w/MatrizFilas.astro';
+import DilemaDosCaminos from '../../components/w/DilemaDosCaminos.astro';
+import SinCon from '../../components/w/SinCon.astro';
+import CicloEnU from '../../components/w/CicloEnU.astro';
+import ChipsVeredicto from '../../components/w/ChipsVeredicto.astro';
+// Objetos de servicio (0B-5)
+import WebEjemplo from '../../components/w/objetos/WebEjemplo.astro';
+import AbanicoWebs from '../../components/w/objetos/AbanicoWebs.astro';
+import FichaMapaEjemplo from '../../components/w/objetos/FichaMapaEjemplo.astro';
+import TarjetaObjeto from '../../components/w/objetos/TarjetaObjeto.astro';
+import Radar from '../../components/w/objetos/Radar.astro';
+import ListaPedidos from '../../components/w/objetos/ListaPedidos.astro';
+import ChatMarcy from '../../components/w/objetos/ChatMarcy.astro';
+import MarcoPestanas from '../../components/w/objetos/MarcoPestanas.astro';
+import EsclusaMarcy from '../../components/w/objetos/EsclusaMarcy.astro';
+import RespuestaAsistente from '../../components/w/objetos/RespuestaAsistente.astro';
+import TunelRejilla from '../../components/w/objetos/TunelRejilla.astro';
+import Escaner from '../../components/w/objetos/Escaner.astro';
+import Interruptores from '../../components/w/objetos/Interruptores.astro';
+import PlanoMarca from '../../components/w/objetos/PlanoMarca.astro';
+import ChipBarrio from '../../components/w/objetos/ChipBarrio.astro';
+import PlacaLogo from '../../components/w/objetos/PlacaLogo.astro';
+import SolicitudOficio from '../../components/w/objetos/SolicitudOficio.astro';
+import MiniPasos from '../../components/w/objetos/MiniPasos.astro';
+// Datos reales del sitio
+import { content, nap } from '../../i18n/content';
+import { clusters, clusterNav } from '../../i18n/clusters';
+import { catalog, PRICE_ANCHORS } from '../../i18n/pricing';
+import { portfolioProjects } from '../../i18n/portfolio';
+import { serviciosPage } from '../../i18n/servicios';
+import { megaServicios } from '../../i18n/w/nav';
+import type { IconoId } from '../../components/w/objects/registry';
+
+const c = content.es;
+const web = clusters['houston/diseno-web'];
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+const desde = (n: number) => `Desde ${usd(n)}`;
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+const [trr, mja, jls, rn] = portfolioProjects;
+const webCat = catalog.find((p) => p.id === 'diseno-web')!;
+const anchorOf = (id: string) => {
+  const p = catalog.find((x) => x.id === id)!;
+  const t = p.tiers.find((x) => x.anchor) ?? p.tiers[0];
+  return t.value === null ? 'Gratis' : t.monthly ? `Desde ${usd(t.value)} al mes` : desde(t.value);
+};
+
+// Hermanas de Houston (hrefs del megamenú = los de pricing.ts; R5, sin URL nuevas).
+const hermanas = megaServicios.es.map((s) => ({
+  id: s.id, label: s.name, desc: s.promise, href: s.href, price: anchorOf(s.id),
+}));
+const interruptores = [
+  { label: 'Web rápida', href: '/es/houston/diseno-web' },
+  { label: 'Marcy 24/7', href: '/es/houston/ia-conversacional' },
+  { label: 'Que la IA te nombre', href: '/es/houston/seo-para-ia' },
+  { label: 'Tienda', href: '/es/houston/ecommerce' },
+  { label: 'SEO local', href: '/es/houston/seo-local' },
+  { label: 'Marca', href: '/es/houston/branding' },
+  { label: 'Mantenimiento', href: '/es/servicios' },
+];
+const ids: IconoId[] = ['diseno-web', 'seo-local', 'ia-conversacional', 'ecommerce', 'branding', 'seo-ia', 'mantenimiento'];
+const sizes = [40, 48, 56, 80] as const;
+---
+<Layout title="Muestrario v3" description="Muestrario interno del sistema v3." lang="es" path="/w-muestrario" noindex ds="v3">
+  <WStyles />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath="/es/w-muestrario" />
+
+  <main id="main" class="w-rails mz" data-w data-w-tone="gold">
+    <!-- ═════════ PÁGINA TIPO · Diseño web en Houston (§4.14) ═════════ -->
+    <section class="w-hero w-hero--bleed mz-hero" id="m-hero">
+      <div class="w-container">
+        <p class="mz-tag">HeroTexto · Eyebrow · ChipCiudad · Breadcrumb · W-CORE-01/02</p>
+        <HeroTexto
+          eyebrow="Web rápida"
+          tone="gold"
+          chip="Houston, TX"
+          h1Html={web.hero.h1}
+          tail="que te trae clientes."
+          lead="Webs a medida, rápidas y en español e inglés, para que tus clientes de Houston te encuentren y te escriban."
+          primary={{ label: 'Quiero mi web', href: '#contacto', track: 'proposal_requested' }}
+          link={{ label: 'Ver proyectos', href: '#proyectos' }}
+        >
+          <Breadcrumb slot="crumbs" items={web.breadcrumb} lang="es" />
+        </HeroTexto>
+      </div>
+      <div class="mz-fan" data-w-in="obj">
+        <p class="mz-tag mz-tag--c">AbanicoWebs · WebEjemplo ×3 · W-CORE-01</p>
+        <AbanicoWebs city="Houston" />
+      </div>
+      <div class="w-container mz-logos">
+        <p class="mz-tag mz-tag--c">TiraLogos · W-CORE-03</p>
+        <TiraLogos city="houston" />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-triada">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TriadaManifiesto · W-ADV-08</p>
+        <TriadaManifiesto
+          items={[
+            { tone1: 'Rápida.', tone2: 'Carga al instante.', text: 'HTML ligero que abre rápido en el celular, donde te buscan primero.' },
+            { tone1: 'Bilingüe.', tone2: 'De verdad.', text: 'Español e inglés escritos desde el diseño, no un botón de traducir.' },
+            { tone1: 'Encontrable.', tone2: 'En Google y en la IA.', text: 'Estructura y datos que Google y los asistentes de IA pueden leer.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="proceso">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">CabeceraNumerada · W-NEW-32</p>
+        <CabeceraNumerada n={1} label="Cómo se construye tu web" titleHtml="De tu negocio a tu web publicada" lead="Cinco pasos, con la propuesta en 24 horas y tu web revisada en vivo hasta que suene como tú." />
+        <p class="mz-tag mz-gap">DemoPorPasos · WebEjemplo · W-CORE-05</p>
+        <DemoPorPasos
+          titleHtml="Así la construimos"
+          text="Cada paso deja algo que puedes ver. Cuando termina, tu web está publicada y conectada."
+          steps={[
+            'Revisamos tu negocio y tu competencia',
+            'Escribimos los textos en español e inglés',
+            'Diseñamos y montamos tu web',
+            'La conectamos a tu ficha de mapa y a Marcy',
+            'Publicada',
+          ]}
+          done="Web publicada"
+        >
+          <WebEjemplo slot="screen" frame="tarjeta" city="Houston" example={false} />
+        </DemoPorPasos>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-escalera">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={2} label="Hazla tuya" titleHtml="Elige por dónde empezar" lead="Tres formas de tener tu web, con el precio de entrada a la vista." />
+        <p class="mz-tag mz-gap">Escalera · W-CORE-06 · B-08</p>
+        <Escalera
+          titleHtml="Tu web, a tu medida"
+          lead="Empieza con una página y crece cuando lo necesites."
+          chip="Tus colores, tu letra, en español e inglés"
+          options={[
+            { id: 'landing', title: webCat.tiers[0].name, text: webCat.tiers[0].blurb, price: desde(PRICE_ANCHORS.webLanding) },
+            { id: 'rediseno', title: webCat.tiers[1].name, text: webCat.tiers[1].blurb, price: desde(PRICE_ANCHORS.webRedesign) },
+            { id: 'medida', title: webCat.tiers[2].name, text: webCat.tiers[2].blurb, price: desde(PRICE_ANCHORS.web) },
+          ]}
+        >
+          <WebEjemplo slot="screen-landing" frame="movil" kind="plomeria" example={false} />
+          <WebEjemplo slot="screen-rediseno" frame="movil" kind="salon" example={false} />
+          <WebEjemplo slot="screen-medida" frame="movil" kind="restaurante" example={false} />
+        </Escalera>
+      </div>
+    </section>
+
+    <section class="w-cell w-contrast" id="m-bento">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">.w-contrast · CapituloDosFrases · W-CORE-07</p>
+        <CapituloDosFrases tone1="Una web bonita no basta." tone2="Tiene que traerte clientes." sub="Cada parte de tu web trabaja para que te encuentren, te entiendan y te escriban." />
+        <p class="mz-tag mz-gap">Bento2x2 · FichaMapaEjemplo · ChatMarcy · W-CORE-08</p>
+        <Bento2x2
+          cells={[
+            { icon: 'lucide:inbox', label: 'Formulario', titleHtml: 'Ningún contacto se pierde', text: 'Cada mensaje se guarda antes de avisarte, aunque falle el correo.' },
+            { icon: 'lucide:languages', label: 'Idiomas', titleHtml: 'Tu web en inglés también', text: 'El visitante elige idioma y todo cambia, textos y botones.' },
+            { icon: 'lucide:map-pin', label: 'Ficha de mapa', titleHtml: 'Conectada a tu ficha', text: 'Mismo nombre, teléfono y horario en tu web y en el mapa.' },
+            { icon: 'lucide:message-circle', label: 'Marcy', titleHtml: 'Contesta a las 23:40', text: 'Tu asistente responde cuando tú ya cerraste.', tray: false },
+          ]}
+        >
+          <MiniPasos slot="ui-1" kind="correo" />
+          <WebEjemplo slot="ui-2" frame="movil" kind="salon" size="mini" />
+          <FichaMapaEjemplo slot="ui-3" size="card" />
+          <ChatMarcy slot="ui-4" mode="estatico" tone="neutral" size="card" />
+        </Bento2x2>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-prosa">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">ProsaLocal · W-CONV-30 / W-CONV-41</p>
+        <ProsaLocal
+          titleTone1="Por qué en Houston."
+          titleTone2="Un sitio pensado para tu mercado."
+          paragraphs={web.local.paragraphs}
+          items={[
+            { icon: 'lucide:smartphone', title: 'Primero el celular', text: 'Pensada para la pantalla donde te buscan.' },
+            { icon: 'lucide:languages', title: 'Dos idiomas', text: 'Español e inglés con el contexto correcto.' },
+            { icon: 'lucide:gauge', title: 'Rápida', text: 'HTML ligero que carga al instante.' },
+            { icon: 'lucide:search', title: 'Lista para buscar', text: 'SEO base y datos que la IA entiende.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="proyectos">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={3} label="Proyectos" titleHtml="Webs nuestras, en uso" lead="Negocios reales de Houston con su sitio nuevo." />
+        <p class="mz-tag mz-gap">FichaProyecto (grande) · W-EVT-15</p>
+        <FichaProyecto project={trr} variant="grande" id="m-trr" />
+        <p class="mz-tag mz-gap">TarjetasCaso · W-PROOF-13</p>
+        <TarjetasCaso items={[jls, rn]} label="Más proyectos" />
+        <p class="mz-tag mz-gap">FiguraProyecto · W-PROOF-12</p>
+        <div class="mz-figs">
+          <FiguraProyecto project={rn} side="right" />
+          <FiguraProyecto project={mja} side="left" />
+        </div>
+        <p class="mz-tag mz-gap">CeldaTuNegocio · W-NEW-08</p>
+        <CeldaTuNegocio href={wa} />
+      </div>
+    </section>
+
+    <section class="w-cell" id="precios">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">PrecioPuntos · W-CORE-14 (degradado único de la página)</p>
+        <PrecioPuntos
+          eyebrow="Inversión"
+          titleHtml="Tu web, con el precio a la vista"
+          anchor="webLanding"
+          from="Desde"
+          bottomLeft={{ big: webCat.tiers[0].name, text: webCat.tiers[0].blurb }}
+          bottomRight={{ label: webCat.tiers[2].name, value: desde(PRICE_ANCHORS.web) }}
+        />
+        <p class="mz-tag mz-gap">Especificaciones · W-NEW-31</p>
+        <Especificaciones
+          label="Qué incluye"
+          cells={[
+            { k: 'Diseño', v: 'A medida', note: 'Sin plantillas recicladas.' },
+            { k: 'Páginas', v: 'Según el plan' },
+            { k: 'Idiomas', v: 'Español e inglés' },
+            { k: 'SEO', v: 'Base incluida' },
+            { k: 'Contacto', v: 'Formulario integrado' },
+            { k: 'Listo para', v: 'Móvil y la IA' },
+            { k: 'Propuesta', v: 'En 24 horas' },
+            { k: 'Propiedad', v: 'La web es tuya' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-franja">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag mz-tag--c">FranjaEnPocasPalabras · W-CORE-23</p>
+        <FranjaEnPocasPalabras
+          q={web.answer.q}
+          a={web.answer.a}
+          source={web.answer.source}
+          cols={[
+            { title: 'Qué es', text: web.service.description, link: { label: 'Ver diseño web', href: '/es/houston/diseno-web' } },
+            { title: 'Desde cuánto', text: `${desde(PRICE_ANCHORS.webLanding)} una landing; ${desde(PRICE_ANCHORS.web)} un sitio a medida.`, link: { label: 'Ver precios', href: '/es/precios' } },
+            { title: 'En cuánto tiempo', text: 'Propuesta en 24 horas. Te damos un calendario realista desde el inicio.', link: { label: 'Pedir propuesta', href: '#contacto' } },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-faq">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag mz-tag--c">PreguntasFrecuentes · W-CONV-11 (todas cerradas)</p>
+        <PreguntasFrecuentes id="faq" tag={web.faq.tag} titleHtml={web.faq.title} items={web.faq.items} />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-hermanas">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TarjetasHermanas · IconoObjeto · W-ADV-40 / W-ADV-50</p>
+        <TarjetasHermanas
+          titleHtml="<span class='w-tone'>Tu web es el centro.</span> Lo demás la hace crecer."
+          lead="Servicios de Marcyan en Houston que se conectan con tu web."
+          items={hermanas}
+          currentId="diseno-web"
+          recursos={[
+            { icon: 'lucide:book-open', title: 'Guía de precios de una web', text: 'Cuánto cuesta una página web en Houston.', href: '/es/blog/precio-pagina-web-houston-guia' },
+            { icon: 'lucide:scan-search', title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.', href: '/es/diagnostico', track: 'tool_cta_clicked' },
+            { icon: 'lucide:tag', title: 'Precios', text: 'Todos los precios de entrada, a la vista.', href: '/es/precios' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-cierre">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">CierreDosTarjetas · W-CORE-15 (trío contractual)</p>
+        <CierreDosTarjetas
+          titleHtml={web.cta.title}
+          proof="Texas Rush Remove ya posiciona en su zona de Houston con su sitio nuevo."
+          city="houston"
+          tel={tel}
+          wa={wa}
+          lang="es"
+          warm={{ kind: 'diagnostico', title: '¿Aún no sabes qué necesitas?', text: 'Revisa gratis si tu negocio está perdiendo clientes online.', cta: 'Hacer el diagnóstico', href: '/es/diagnostico' }}
+        />
+      </div>
+    </section>
+
+    <!-- ═════════ ANEXO A · Heros y objetos de otros tipos de página ═════════ -->
+    <section class="w-cell mz-annex" id="m-anexo-a">
+      <div class="w-container">
+        <p class="mz-annex__t">Anexo A · Heros y objetos de los otros tipos de página</p>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-seo-local">
+      <div class="w-container mz-split" data-w-reveal>
+        <div>
+          <p class="mz-tag">SEO local (§4.16) · TarjetaObjeto · FichaMapaEjemplo · W-CORE-16</p>
+          <ChipCiudad label="Houston, TX" />
+          <p class="w-h2 mz-mt">SEO local en Houston, para que te llamen a ti.</p>
+        </div>
+        <TarjetaObjeto button="Llamar" example={false}>
+          <IconoObjeto id="seo-local" size={56} slot="icon" />
+          <FichaMapaEjemplo />
+        </TarjetaObjeto>
+      </div>
+      <div class="w-container mz-gap2" data-w-reveal>
+        <p class="mz-tag">Radar · W-CORE-09 (celda dominante de bento, bucle)</p>
+        <div class="mz-radar"><Radar /></div>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-tienda">
+      <div class="w-container mz-split" data-w-reveal>
+        <div>
+          <p class="mz-tag">Tienda (§4.15) · ListaPedidos · W-ADV-36 (bucle)</p>
+          <Eyebrow tone="gold">Tienda</Eyebrow>
+          <p class="w-h2 mz-mt">Tu tienda en línea, que vende mientras duermes.</p>
+        </div>
+        <ListaPedidos />
+      </div>
+    </section>
+
+    <section class="w-cell w-dawn" id="m-ia-pymes" data-w-tone="teal">
+      <div class="w-container mz-split" data-w-reveal>
+        <div>
+          <p class="mz-tag">IA para pymes (§4.11) · .w-dawn teal · EsclusaMarcy · W-ADV-01/02</p>
+          <Eyebrow tone="teal">Marcy contesta por ti</Eyebrow>
+          <p class="w-h2 mz-mt">Tu negocio contesta aunque estés cerrado.</p>
+        </div>
+        <EsclusaMarcy />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-ia-chat" data-w-tone="teal">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">IA conversacional (§4.12) · MarcoPestanas · ChatMarcy (pestañas) · W-ADV-18/19</p>
+        <MarcoPestanas tabs={['Agendar cita', 'Pedir precio', 'Fuera de horario', 'Pasar a una persona']}>
+          <ChatMarcy mode="pestanas" tabsBar={false} />
+        </MarcoPestanas>
+        <p class="mz-tag mz-gap">ChatMarcy compacto (burbujas neutras de página oro)</p>
+        <div class="mz-row"><ChatMarcy mode="compacto" tone="neutral" /></div>
+      </div>
+    </section>
+
+    <section class="w-cell mz-tunnel" id="m-seo-ia" data-w-tone="teal">
+      <TunelRejilla />
+      <div class="w-container mz-tunnel__in">
+        <p class="mz-tag mz-tag--c">SEO para IA (§4.17) · TunelRejilla · W-ADV-28</p>
+        <Eyebrow tone="teal">Que la IA te nombre</Eyebrow>
+        <p class="w-h1 w-h1--night mz-mt">Que ChatGPT te recomiende a ti</p>
+      </div>
+      <div class="w-container mz-gap2" data-w-reveal>
+        <p class="mz-tag mz-tag--c">RespuestaAsistente · W-CORE-10 (tarjeta y tres columnas)</p>
+        <div class="mz-center"><RespuestaAsistente /></div>
+        <div class="mz-gap2"><RespuestaAsistente variant="tres-columnas" /></div>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-branding">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">Branding (§4.18) · PlanoMarca · W-NEW-12</p>
+        <PlanoMarca />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-sector">
+      <div class="w-container mz-split" data-w-reveal>
+        <div>
+          <p class="mz-tag">Sectores (§4.19) · TarjetaObjeto · SolicitudOficio</p>
+          <Eyebrow tone="gold">Contratistas</Eyebrow>
+          <p class="w-h2 mz-mt">Sitios web para contratistas en Houston</p>
+        </div>
+        <TarjetaObjeto button="Responder">
+          <IconoObjeto id="diseno-web" size={56} slot="icon" />
+          <SolicitudOficio kind="contratista" example={false} />
+        </TarjetaObjeto>
+      </div>
+      <div class="w-container mz-row mz-gap2" data-w-reveal>
+        <SolicitudOficio kind="inmobiliaria" />
+        <SolicitudOficio kind="restaurante" />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-barrio">
+      <div class="w-container mz-center" data-w-reveal>
+        <p class="mz-tag mz-tag--c">Barrios (§4.20) · ChipBarrio · W-CONV-23 (circuito abstracto declarado)</p>
+        <Eyebrow tone="gold">Katy, TX</Eyebrow>
+        <ChipBarrio name="Katy, TX" />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-servicios">
+      <div class="w-container mz-split" data-w-reveal>
+        <div>
+          <p class="mz-tag">Servicios (§4.3) · Interruptores · W-HOME-06 (bucle)</p>
+          <Eyebrow tone="gold">Servicios</Eyebrow>
+          <p class="w-h2 mz-mt">Todo lo que tu marca necesita</p>
+        </div>
+        <Interruptores items={interruptores} />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-diagnostico">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">Diagnóstico (§4.9) · Escaner · W-ADV-45 (bucle) y compacto (una vez)</p>
+        <Escaner motion="loop" />
+        <div class="mz-row mz-gap2"><Escaner variant="compacto" motion="once" class="mz-w480" /></div>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-sobre">
+      <div class="w-container mz-center" data-w-reveal>
+        <p class="mz-tag mz-tag--c">Sobre nosotros (§4.6) · PlacaLogo · W-PROOF-16</p>
+        <PlacaLogo />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-objetos">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">WebEjemplo (pantalla, móvil, esqueleto) · MiniPasos ×4</p>
+        <div class="mz-row">
+          <WebEjemplo frame="pantalla" kind="salon" class="mz-w480" />
+          <WebEjemplo frame="movil" kind="restaurante" state="esqueleto" />
+        </div>
+        <div class="mz-row mz-gap2">
+          <MiniPasos kind="correo" /><MiniPasos kind="esqueleto" /><MiniPasos kind="publicada" /><MiniPasos kind="mantenimiento" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════ ANEXO B · Estructura, demos y prueba de otras páginas ═════════ -->
+    <section class="w-cell mz-annex" id="m-anexo-b">
+      <div class="w-container">
+        <p class="mz-annex__t">Anexo B · Secciones de otras páginas, en su orden</p>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-dilema" data-w-tone="teal">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">DilemaDosCaminos · W-ADV-03/04 (IA para pymes 01)</p>
+        <DilemaDosCaminos
+          titleHtml="<span class='w-tone'>Contestar o perder el cliente.</span> Con Marcy no eliges."
+          left={{ title: 'Contestar tú cada mensaje', text: 'Respondes entre trabajo y trabajo, y de noche nadie contesta.' }}
+          right={{ title: 'Un bot de respuestas fijas', text: 'Contesta siempre lo mismo y el cliente se cansa.' }}
+          answerId="ia-conversacional"
+          tone="teal"
+          bridge="Marcy contesta como tu negocio, a cualquier hora."
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-sincon" data-w-tone="teal">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">SinCon · W-CORE-25 (IA conversacional 01)</p>
+        <SinCon
+          labels={['Sin Marcy', 'Con Marcy']}
+          tone="teal"
+          sin={[
+            { text: '¿Tienen cita para el sábado?', from: 'WhatsApp', time: '21:40' },
+            { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '22:15' },
+            { text: 'Llamada perdida', kind: 'notice', time: '08:05' },
+            { text: '¿Siguen abiertos?', from: 'Web', time: '23:02' },
+          ]}
+          conTitle="Todo contestado"
+        >
+          <ChatMarcy slot="con" mode="estatico" example={false} size="card" />
+        </SinCon>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-pasos">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">BandejaPasos · MiniPasos · W-ADV-37</p>
+        <BandejaPasos
+          titleHtml="Tres pasos hasta tu web"
+          lead="Sin llamadas de ventas para enterarte de algo."
+          steps={[
+            { label: 'Paso 01', title: 'Tu propuesta', text: 'Nos cuentas tu negocio y en 24 horas tienes una propuesta clara.' },
+            { label: 'Paso 02', title: 'Tu web toma forma', text: 'La revisas en vivo hasta que suene como tú en los dos idiomas.' },
+            { label: 'Paso 03', title: 'Publicada', text: 'Sale en vivo y seguimos contigo después del lanzamiento.' },
+          ]}
+        >
+          <MiniPasos slot="ui-1" kind="correo" />
+          <MiniPasos slot="ui-2" kind="esqueleto" />
+          <MiniPasos slot="ui-3" kind="publicada" />
+        </BandejaPasos>
+        <p class="mz-tag mz-gap">ChipsVeredicto · W-ADV-05/06/23</p>
+        <div class="mz-stack">
+          <ChipsVeredicto items={[{ label: 'Respondido', kind: 'ok' }, { label: 'Te lo pasa', kind: 'mid' }, { label: 'Fuera de horario', kind: 'off' }]} />
+          <ChipsVeredicto tone="gold" items={[{ label: 'Bien', kind: 'ok' }, { label: 'Mejorable', kind: 'mid' }, { label: 'Falta', kind: 'off' }]} />
+          <ChipsVeredicto memory items={[{ label: 'Canal', value: 'WhatsApp' }, { label: 'Citas', value: 'Sábados' }, { label: 'Idioma', value: 'Español' }]} />
+        </div>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-registro">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">RegistroVivo · W-ADV-44 (bucle)</p>
+        <RegistroVivo
+          titleHtml="El día de tu tienda"
+          text="Lo que pasa mientras atiendes a otros clientes, ordenado y contestado."
+          rows={[
+            { icon: 'lucide:shopping-bag', label: 'Pedido de la tarde', chip: 'Pagado', tone: 'ok' },
+            { icon: 'lucide:message-circle', label: 'Mensaje de WhatsApp', chip: 'Respondido', tone: 'ok' },
+            { icon: 'lucide:package', label: 'Envío a Katy', chip: 'Preparado', tone: 'ok' },
+            { icon: 'lucide:help-circle', label: 'Pregunta de precio', chip: 'Te lo pasa', tone: 'pass' },
+            { icon: 'lucide:calendar', label: 'Cita del sábado', chip: 'Agendada', tone: 'ok' },
+            { icon: 'lucide:moon', label: 'Mensaje de madrugada', chip: 'Respondido', tone: 'ok' },
+            { icon: 'lucide:file-text', label: 'Factura enviada', chip: 'Hecho', tone: 'ok' },
+            { icon: 'lucide:clock', label: 'Pedido sin pagar', chip: 'Pendiente', tone: 'off' },
+          ]}
+        />
+        <p class="mz-tag mz-gap">RegistroVivo static (IA conversacional 04)</p>
+        <RegistroVivo
+          variant="static"
+          tone="teal"
+          titleHtml="Lo que pasó hoy"
+          text="Cinco conversaciones de ejemplo y qué hizo Marcy con cada una."
+          rows={[
+            { icon: 'lucide:message-circle', label: 'Mensaje de WhatsApp', chip: 'Respondido', tone: 'ok' },
+            { icon: 'lucide:calendar', label: 'Cita sábado 10:00', chip: 'Agendada', tone: 'ok' },
+            { icon: 'lucide:help-circle', label: 'Pregunta de precio', chip: 'Te lo pasa', tone: 'pass' },
+            { icon: 'lucide:moon', label: 'Mensaje fuera de horario', chip: 'Respondido', tone: 'ok' },
+            { icon: 'lucide:user', label: 'Quiere hablar con alguien', chip: 'Te lo pasa', tone: 'pass' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-matriz">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">MatrizFilas · W-ADV-52 (Ciudades 01, bucle; casillas solo con landing existente)</p>
+        <MatrizFilas
+          label="Servicios por ciudad"
+          columns={['Houston', 'Miami']}
+          rows={[
+            { label: 'Diseño web', cells: [{ label: 'Houston', href: '/es/houston/diseno-web' }, { label: 'Miami', href: '/es/miami/diseno-web' }] },
+            { label: 'SEO local', cells: [{ label: 'Houston', href: '/es/houston/seo-local' }, { label: 'Miami', href: '/es/miami/seo-local' }] },
+            { label: 'IA conversacional', cells: [{ label: 'Houston', href: '/es/houston/ia-conversacional' }, { label: 'Miami', href: '/es/miami/ia-conversacional' }] },
+            { label: 'Tienda en línea', cells: [{ label: 'Houston', href: '/es/houston/ecommerce' }, { label: 'Miami', href: '/es/miami/ecommerce' }] },
+            { label: 'Branding', cells: [{ label: 'Houston', href: '/es/houston/branding' }, { label: 'Miami' }] },
+            { label: 'SEO para IA', cells: [{ label: 'Houston', href: '/es/houston/seo-para-ia' }, { label: 'Miami' }] },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-ciclo">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">CicloEnU · W-PROOF-11 (Sectores 02)</p>
+        <CicloEnU
+          title="Del timbre al presupuesto"
+          sub="Lo que pasa cuando no puedes contestar en plena obra."
+          nodes={[
+            { icon: 'lucide:phone-missed', label: 'Llamada perdida' },
+            { icon: 'lucide:message-circle', label: 'Marcy contesta' },
+            { icon: 'lucide:bell', label: 'Te avisa con el contacto' },
+            { icon: 'lucide:calendar-check', label: 'Presupuesto agendado' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-etapas">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={4} label="Por etapa" titleHtml="Qué necesitas según dónde estás" />
+        <p class="mz-tag mz-gap">Inventario3Etapas · W-CORE-04 (Servicios 01)</p>
+        <Inventario3Etapas
+          cols={[
+            { title: 'Que te encuentren', items: [{ label: 'SEO local', href: '/es/houston/seo-local' }, { label: 'SEO para IA', href: '/es/houston/seo-para-ia' }] },
+            { title: 'Que te elijan', items: [{ label: 'Diseño web', href: '/es/houston/diseno-web' }, { label: 'Branding', href: '/es/houston/branding' }] },
+            { title: 'Que te escriban y compren', items: [{ label: 'IA conversacional', href: '/es/houston/ia-conversacional' }, { label: 'Tienda en línea', href: '/es/houston/ecommerce' }, { label: 'Mantenimiento', href: '/es/servicios' }] },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-perfil">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TarjetasPerfil · W-NEW-09 (Servicios 03)</p>
+        <TarjetasPerfil
+          titleHtml="Empieza por tu caso"
+          cards={[
+            { title: 'Abro mi negocio', text: 'Tu primera web, rápida y en dos idiomas.', href: '/es/houston/diseno-web', cta: 'Ver diseño web' },
+            { title: 'Ya tengo web pero no me llaman', text: 'Revisa gratis qué te está costando clientes.', href: '/es/diagnostico', cta: 'Hacer el diagnóstico', track: 'tool_cta_clicked' },
+          ]}
+          wide={{ icon: 'lucide:wrench', title: 'Ya soy cliente', text: 'Respaldos, actualizaciones y soporte bilingüe.', href: '/es/servicios', cta: 'Ver mantenimiento' }}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-razones">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">CuatroRazones · W-CONV-27 (Servicios 04)</p>
+        <CuatroRazones
+          titleHtml={serviciosPage.why.title}
+          items={serviciosPage.why.items.map((i) => ({ icon: i.icon, title: i.title, text: i.desc })) as any}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-donde">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">DondeEstaTuNegocio · W-CONV-33 (Ciudades 03)</p>
+        <DondeEstaTuNegocio
+          titleHtml="¿Dónde está tu negocio?"
+          items={[
+            { name: 'Katy', text: 'Diseño web para negocios de Katy.', href: '/es/houston/katy', kind: 'barrio' },
+            { name: 'Sugar Land', text: 'Diseño web premium en Sugar Land.', href: '/es/houston/sugar-land', kind: 'barrio' },
+            { name: 'Contratistas', text: 'Sitios que traen solicitudes de presupuesto.', href: '/es/houston/contratistas', kind: 'sector', iconId: 'diseno-web' },
+            { name: 'Bienes raíces', text: 'Sitio con tus propiedades y SEO por zona.', href: '/es/houston/bienes-raices', kind: 'sector', iconId: 'seo-local' },
+            { name: 'Doral', text: 'Diseño web y SEO para negocios en Doral.', href: '/es/miami/doral', kind: 'barrio' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-modelo">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TarjetasModelo · W-CONV-02 (Precios, hero)</p>
+        <TarjetasModelo
+          cards={[
+            { title: 'Pago por proyecto', text: 'Pagas una vez y la web es tuya.', icon: 'diseno-web', items: [`Diseño web ${desde(PRICE_ANCHORS.webLanding).toLowerCase()}`, `Tienda en línea ${desde(PRICE_ANCHORS.ecommerceEssential).toLowerCase()}`, `Logo ${desde(PRICE_ANCHORS.brandingLogo).toLowerCase()}`], cta: { label: 'Ver precios', href: '#precios', variant: 'link' } },
+            { title: 'Mensual', text: 'Lo que sigue trabajando después de publicar.', icon: 'seo-local', items: [`SEO local ${desde(PRICE_ANCHORS.seoLocal).toLowerCase()} al mes`, `Mantenimiento ${desde(PRICE_ANCHORS.maintenance).toLowerCase()} al mes`, `Monitoreo de IA ${desde(PRICE_ANCHORS.aeoMonitoring).toLowerCase()} al mes`], cta: { label: 'Ver precios', href: '#precios', variant: 'link' } },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-tarjeta-precio">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TarjetaPrecio · W-CONV-03/06 (Precios 01)</p>
+        <TarjetaPrecio
+          serviceId="diseno-web"
+          name={webCat.name}
+          desc={webCat.description}
+          tiers={webCat.tiers.map((t) => ({ label: t.name, price: t.display }))}
+          includes={['Diseño 100% a medida', 'Versión en español e inglés', 'Optimización SEO base', 'Formulario de contacto integrado', 'Listo para móvil y para la IA']}
+          cta={{ label: 'Pedir propuesta', href: '#contacto' }}
+          note={{ title: '¿Necesitas algo distinto?', text: 'Tiendas y funciones especiales tienen su propio alcance.', href: '#contacto', label: 'Escríbenos' }}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-garantias">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TresGarantias · W-ADV-49 (Precios 7, hubs 9)</p>
+        <TresGarantias
+          items={[
+            { icon: 'lucide:clock', title: 'Contacto en 1 hora hábil', text: 'Te respondemos en menos de una hora hábil.' },
+            { icon: 'lucide:file-text', title: 'Propuesta en 24 horas', text: 'Clara, por escrito y sin compromiso.' },
+            { icon: 'lucide:key-round', title: 'La web es tuya', text: 'Nunca te dejamos amarrado.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-tres-pasos">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TresPasosNumerados · W-ADV-57 (SEO local 04)</p>
+        <TresPasosNumerados
+          items={[
+            { title: 'Revisamos tu ficha y tu web', text: 'Nombre, teléfono, categorías, horario y reseñas.' },
+            { title: 'Corregimos y completamos', text: 'Datos iguales en tu web, tu ficha y los directorios.' },
+            { title: 'Te contamos qué cambió', text: 'Un resumen claro cada mes, sin jerga.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-gratis">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">GratisDeVerdad · W-CORE-29 (Diagnóstico 3)</p>
+        <GratisDeVerdad
+          title="Gratis"
+          sub="Lo que revisamos de tu negocio"
+          items={[
+            { icon: 'lucide:gauge', text: 'La velocidad de tu web' },
+            { icon: 'lucide:map-pin', text: 'Tu ficha de mapa' },
+            { icon: 'lucide:sparkles', text: 'Si la IA te entiende' },
+            { icon: 'lucide:smartphone', text: 'Cómo se ve en el celular' },
+          ]}
+          checks={['Ves tu resultado al momento', 'Te lo mandamos por correo si quieres']}
+          cta={{ label: 'Hacer el diagnóstico', href: '/es/diagnostico', track: 'tool_cta_clicked' }}
+        />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-fases">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">TablaFases · W-NEW-25 (Sobre nosotros 3, de content.process)</p>
+        <TablaFases label="Cómo es un proyecto" rows={c.process.steps.map((s) => ({ phase: s.n, block: s.title, gets: s.desc }))} />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-sedes">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">SedesAcordeon · W-EVT-38 (Sobre nosotros 5, cerrado al cargar)</p>
+        <SedesAcordeon items={c.locations.items.map((l: any) => ({ city: l.city, state: l.state, area: l.area, tel: l.tel, links: l.links }))} />
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-relato">
+      <div class="w-container mz-story" data-w-reveal>
+        <div>
+          <p class="mz-tag">RelatoEnActos · W-PROOF-08 (Portafolio)</p>
+          <RelatoEnActos acts={[{ title: 'Lo que hicimos', html: trr.did }, { title: 'Cómo quedó', html: trr.result }]} />
+        </div>
+        <div>
+          <p class="mz-tag">FichaLateral · W-PROOF-06 (pegajosa)</p>
+          <FichaLateral
+            logoName={trr.name}
+            rows={[
+              { label: 'Sector', value: 'Junk Removal' },
+              { label: 'Ciudad', value: 'Houston, TX' },
+              { label: 'Servicios', value: trr.serviceLabel, href: trr.serviceHref },
+            ]}
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-abiertas">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">PreguntasAbiertas · W-PROOF-26 (Sobre nosotros 8)</p>
+        <PreguntasAbiertas tag={serviciosPage.faq.tag} titleHtml={serviciosPage.faq.title} items={serviciosPage.faq.items.slice(0, 4)} jsonld={false} />
+      </div>
+    </section>
+
+    <!-- ═════════ ANEXO C · Piezas base ═════════ -->
+    <section class="w-cell mz-annex" id="m-anexo-c">
+      <div class="w-container">
+        <p class="mz-annex__t">Anexo C · Piezas base del sistema</p>
+      </div>
+    </section>
+
+    <section class="w-cell" id="m-base">
+      <div class="w-container" data-w-reveal>
+        <p class="mz-tag">Eyebrow (oro, teal) · ChipCiudad · Ejemplo (noche, claro) · Button primary + link</p>
+        <div class="mz-row mz-row--c">
+          <Eyebrow tone="gold">Web rápida</Eyebrow>
+          <Eyebrow tone="teal">Conoce a Marcy</Eyebrow>
+          <ChipCiudad label="Miami, FL" />
+          <Ejemplo pos="inline" />
+          <span class="mz-light"><Ejemplo pos="inline" on="light" /></span>
+        </div>
+        <div class="mz-row mz-row--c mz-gap2">
+          <Button variant="primary" size="lg" href="#contacto">Quiero mi web</Button>
+          <Button variant="link" href="#proyectos">Ver proyectos</Button>
+        </div>
+        <p class="mz-tag mz-gap">IconoObjeto · 7 × 40/48/56/80 (sprite de SiteNav)</p>
+        <div class="mz-sheet">
+          {ids.map((id) => (
+            <div class="mz-sheet__row">
+              {sizes.map((s) => <IconoObjeto id={id} size={s} />)}
+              <span class="w-label">{id}</span>
+            </div>
+          ))}
+        </div>
+        <p class="mz-tag mz-gap">Bandeja (4 columnas) con tarjetas de objeto · Celdas (3 columnas)</p>
+        <Bandeja cols={4}>
+          {ids.slice(0, 4).map((id) => (
+            <a class="w-obj mz-card" href="#m-base"><IconoObjeto id={id} size={48} /><span class="w-h4">{megaServicios.es.find((m) => m.id === id)?.name}</span></a>
+          ))}
+        </Bandeja>
+        <div class="mz-gap2">
+          <Celdas cols={3}>
+            <div><p class="w-h3">Propuesta en 24 horas</p><p class="mz-p">Clara, por escrito y sin compromiso.</p></div>
+            <div><p class="w-h3">Precios a la vista</p><p class="mz-p">También el SEO mensual y el mantenimiento.</p></div>
+            <div><p class="w-h3">La web es tuya</p><p class="mz-p">Nunca te dejamos amarrado.</p></div>
+          </Celdas>
+        </div>
+      </div>
+    </section>
+
+    <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="Diseño web" />
+  </main>
+
+  <SpaceBackdrop tone="gold" />
+  <SiteFooter footer={c.footer} lang="es" />
+</Layout>
+
+<style>
+  /* Solo maquetación del muestrario: rótulos de pieza y rejillas de prueba. */
+  .mz-tag {
+    margin: 0 0 16px; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    letter-spacing: .06em; color: rgba(var(--star-rgb), .55);
+  }
+  .mz-tag--c { text-align: center; }
+  .mz-gap { margin-top: 72px; }
+  .mz-gap2 { margin-top: 48px; }
+  .mz-mt { margin-top: 16px; }
+  .mz-hero { padding-bottom: 48px; overflow-x: clip; }
+  .mz-fan { margin-top: 64px; }
+  .mz-logos { margin-top: 90px; }
+  .mz-annex { padding-block: 56px; }
+  .mz-annex__t {
+    margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: 500;
+    letter-spacing: -.02em; color: var(--accent-gold);
+  }
+  .mz-split { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+  .mz-story { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: start; }
+  @media (min-width: 1024px) {
+    .mz-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .mz-story { grid-template-columns: minmax(0, 688fr) minmax(0, 379fr); gap: 96px; }
+  }
+  .mz-row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+  .mz-row--c { align-items: center; }
+  .mz-stack { display: flex; flex-direction: column; gap: 20px; }
+  .mz-center { display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
+  .mz-w480 { width: min(100%, 480px); }
+  .mz-radar { max-width: 600px; border: 1px solid var(--w-line); padding: 48px; }
+  @media (max-width: 767px) { .mz-radar { padding: 16px; } }
+  .mz-figs { display: grid; grid-template-columns: 1fr; gap: 48px; }
+  @media (min-width: 1024px) { .mz-figs { grid-template-columns: 1fr 1fr; } }
+  .mz-tunnel { position: relative; overflow: clip; }
+  .mz-tunnel__in { position: relative; min-height: 520px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .mz-light { display: inline-flex; padding: 12px; border-radius: 12px; background: var(--w-p-bg); }
+  .mz-sheet { display: flex; flex-direction: column; gap: 20px; }
+  .mz-sheet__row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .mz-card { display: flex; flex-direction: column; gap: 45px; padding: 22px; min-height: 182px; text-decoration: none; }
+  .mz-p { margin: 8px 0 0; color: var(--fg-secondary); }
+</style>

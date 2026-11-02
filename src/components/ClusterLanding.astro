@@ -26,32 +26,31 @@ import GrowthCta from './growthos/GrowthCta.astro';
 import ServiceLd from './seo/ServiceLd.astro';
 import { content } from '../i18n/content';
 import { clusterNav, clusterNavEn, type ClusterPage } from '../i18n/clusters';
+import { deriveDefaultCity, deriveDefaultService } from './w/landing/defaults';
+// ── Rediseño v3 (design/rediseno-workos.md §3.7): guarda del despachador ──
+// El TIPO de cada ruta lo decide KIND_BY_PATH (w/landing/registry.ts). Mientras su
+// archivo kinds/<kind>.ts no exista, esta plantilla pinta el cuerpo de siempre,
+// intacto (cerrado por defecto). Cuando existe, la página de esa ruta monta
+// WLanding con su tipo (activación por página: ver registry.ts, por qué no se
+// importa WLanding aquí) y llegar aquí es un olvido que corta el build.
+import { readyKindFor } from './w/landing/registry';
 
 interface Props { cluster: ClusterPage; lang?: 'es' | 'en' }
 const { cluster, lang = 'es' } = Astro.props;
+const wKind = readyKindFor(cluster.path);
+if (wKind) {
+  throw new Error(
+    `ClusterLanding: ${cluster.path} tiene listo el tipo v3 "${wKind}"; su página debe montar ` +
+      `WLanding con kinds/${wKind}.ts (ver src/components/w/landing/registry.ts).`,
+  );
+}
 const c = content[lang];
 const nav = lang === 'en' ? clusterNavEn : clusterNav;
 // path sin prefijo de idioma para el Layout (construye canonical + hreflang).
 const pathNoLocale = cluster.path.replace(/^\/(es|en)\//, '');
 
 // ── Prellenado del formulario de contacto desde el cluster ──
-function deriveDefaultCity(city?: string): string | undefined {
-  if (city === 'Houston') return 'Houston, TX';
-  if (city === 'Miami') return 'Miami, FL';
-  return undefined;
-}
-// defaultService: por substring del path (ES o EN); coincide con las options del select por idioma.
-function deriveDefaultService(path: string, lang: 'es' | 'en'): string | undefined {
-  const es = lang === 'es';
-  if (/abogados-inmigracion|bienes-raices|immigration-lawyers|real-estate/.test(path)) return es ? 'Diseño web' : 'Web Design';
-  if (/diseno-web|pagina-web|web-design|website-cost/.test(path)) return es ? 'Diseño web' : 'Web Design';
-  if (/ia-conversacional|chatbot|ia-para-pymes|conversational-ai|ai-for-small-business/.test(path)) return es ? 'IA conversacional / Chatbot' : 'Conversational AI / Chatbot';
-  if (/ecommerce/.test(path)) return es ? 'E-Commerce / Tienda Online' : 'E-Commerce / Online Store';
-  if (/seo-para-ia|ai-seo/.test(path)) return es ? 'SEO para IA (visibilidad en IA)' : 'AI Visibility (AEO)';
-  if (/seo-local|local-seo/.test(path)) return es ? 'SEO local' : 'Local SEO';
-  if (/branding/.test(path)) return es ? 'Branding e identidad' : 'Branding & Identity';
-  return undefined;
-}
+// (funciones en w/landing/defaults.ts: las comparte la plantilla v3, §3.7)
 const defaultCity = deriveDefaultCity(cluster.service.areaCity);
 const defaultService = deriveDefaultService(cluster.path, lang);
 

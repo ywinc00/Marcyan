@@ -1,0 +1,209 @@
+---
+// ─────────────────────────────────────────────────────────────
+// MUESTRARIO BASE (prueba del Cerrojo 5, design/rediseno-workos.md §2.13 y §3.7).
+// Página INTERNA: noindex + fuera del sitemap. SIN `ds` y SIN WStyles: aquí no
+// carga w.css, así que los componentes que salen de v3 (portada, hubs, nav) deben
+// verse igual que en /es/w-muestrario solo con su CSS propio y las variables --w-*.
+// Mismo contenido que sus secciones del muestrario v3, para comparar lado a lado.
+// SE BORRA (con su condición del sitemap) ANTES DE CUALQUIER MERGE (ola 5).
+// Lista cerrada del Cerrojo 5: IconoObjeto, objetos/Escaner, FiguraProyecto,
+// TarjetasHermanas, TarjetasCaso, TresGarantias, CierreDosTarjetas,
+// FranjaEnPocasPalabras, PreguntasFrecuentes, DondeEstaTuNegocio, Ejemplo,
+// nav/MegaServicios + MegaRecursos + DrawerGrupos (dentro de SiteNav) y la
+// variante `link` de Button.
+// ─────────────────────────────────────────────────────────────
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import Button from '../../components/ui/Button.astro';
+import IconoObjeto from '../../components/w/IconoObjeto.astro';
+import Ejemplo from '../../components/w/Ejemplo.astro';
+import Escaner from '../../components/w/objetos/Escaner.astro';
+import FiguraProyecto from '../../components/w/FiguraProyecto.astro';
+import TarjetasHermanas from '../../components/w/TarjetasHermanas.astro';
+import TarjetasCaso from '../../components/w/TarjetasCaso.astro';
+import TresGarantias from '../../components/w/TresGarantias.astro';
+import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
+import FranjaEnPocasPalabras from '../../components/w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../components/w/PreguntasFrecuentes.astro';
+import DondeEstaTuNegocio from '../../components/w/DondeEstaTuNegocio.astro';
+import { content, nap } from '../../i18n/content';
+import { clusters, clusterNav } from '../../i18n/clusters';
+import { catalog, PRICE_ANCHORS } from '../../i18n/pricing';
+import { portfolioProjects } from '../../i18n/portfolio';
+import { megaServicios } from '../../i18n/w/nav';
+import type { IconoId } from '../../components/w/objects/registry';
+
+const c = content.es;
+const web = clusters['houston/diseno-web'];
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+const desde = (n: number) => `Desde ${usd(n)}`;
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+const [trr, mja, jls, rn] = portfolioProjects;
+const anchorOf = (id: string) => {
+  const p = catalog.find((x) => x.id === id)!;
+  const t = p.tiers.find((x) => x.anchor) ?? p.tiers[0];
+  return t.value === null ? 'Gratis' : t.monthly ? `Desde ${usd(t.value)} al mes` : desde(t.value);
+};
+const hermanas = megaServicios.es.map((s) => ({
+  id: s.id, label: s.name, desc: s.promise, href: s.href, price: anchorOf(s.id),
+}));
+const ids: IconoId[] = ['diseno-web', 'seo-local', 'ia-conversacional', 'ecommerce', 'branding', 'seo-ia', 'mantenimiento'];
+const sizes = [40, 48, 56, 80] as const;
+---
+<Layout title="Muestrario base" description="Muestrario interno sin sistema v3 (Cerrojo 5)." lang="es" path="/w-muestrario-base" noindex>
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath="/es/w-muestrario-base" />
+
+  <main id="main" class="mzb">
+    <section class="mzb-sec" id="m-base">
+      <div class="mzb-in">
+        <p class="mzb-tag">Sin ds="v3" · Ejemplo (noche, claro) · Button link</p>
+        <div class="mzb-row">
+          <Ejemplo pos="inline" />
+          <span class="mzb-light"><Ejemplo pos="inline" on="light" /></span>
+          <Button variant="primary" size="lg" href="#contacto">Quiero mi web</Button>
+          <Button variant="link" href="#proyectos">Ver proyectos</Button>
+        </div>
+        <p class="mzb-tag mzb-gap">IconoObjeto · 7 × 40/48/56/80 (sprite de SiteNav)</p>
+        <div class="mzb-sheet">
+          {ids.map((id) => (
+            <div class="mzb-sheet__row">
+              {sizes.map((s) => <IconoObjeto id={id} size={s} />)}
+              <span class="mzb-id">{id}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-diagnostico">
+      <div class="mzb-in">
+        <p class="mzb-tag">objetos/Escaner · compacto (una vez) y completo</p>
+        <div class="mzb-row"><Escaner variant="compacto" motion="once" class="mzb-w480" /></div>
+        <div class="mzb-gap"><Escaner motion="static" /></div>
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="proyectos">
+      <div class="mzb-in">
+        <p class="mzb-tag">TarjetasCaso</p>
+        <TarjetasCaso items={[jls, rn]} label="Más proyectos" />
+        <p class="mzb-tag mzb-gap">FiguraProyecto</p>
+        <div class="mzb-figs">
+          <FiguraProyecto project={rn} side="right" />
+          <FiguraProyecto project={mja} side="left" />
+        </div>
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-franja">
+      <div class="mzb-in">
+        <p class="mzb-tag mzb-tag--c">FranjaEnPocasPalabras</p>
+        <FranjaEnPocasPalabras
+          q={web.answer.q}
+          a={web.answer.a}
+          source={web.answer.source}
+          cols={[
+            { title: 'Qué es', text: web.service.description, link: { label: 'Ver diseño web', href: '/es/houston/diseno-web' } },
+            { title: 'Desde cuánto', text: `${desde(PRICE_ANCHORS.webLanding)} una landing; ${desde(PRICE_ANCHORS.web)} un sitio a medida.`, link: { label: 'Ver precios', href: '/es/precios' } },
+            { title: 'En cuánto tiempo', text: 'Propuesta en 24 horas. Te damos un calendario realista desde el inicio.', link: { label: 'Pedir propuesta', href: '#contacto' } },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-faq">
+      <div class="mzb-in">
+        <p class="mzb-tag mzb-tag--c">PreguntasFrecuentes (todas cerradas)</p>
+        <PreguntasFrecuentes id="faq" tag={web.faq.tag} titleHtml={web.faq.title} items={web.faq.items} />
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-hermanas">
+      <div class="mzb-in">
+        <p class="mzb-tag">TarjetasHermanas</p>
+        <TarjetasHermanas
+          titleHtml="<span class='w-tone'>Tu web es el centro.</span> Lo demás la hace crecer."
+          lead="Servicios de Marcyan en Houston que se conectan con tu web."
+          items={hermanas}
+          currentId="diseno-web"
+          recursos={[
+            { icon: 'lucide:book-open', title: 'Guía de precios de una web', text: 'Cuánto cuesta una página web en Houston.', href: '/es/blog/precio-pagina-web-houston-guia' },
+            { icon: 'lucide:scan-search', title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.', href: '/es/diagnostico', track: 'tool_cta_clicked' },
+            { icon: 'lucide:tag', title: 'Precios', text: 'Todos los precios de entrada, a la vista.', href: '/es/precios' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-donde">
+      <div class="mzb-in">
+        <p class="mzb-tag">DondeEstaTuNegocio</p>
+        <DondeEstaTuNegocio
+          titleHtml="¿Dónde está tu negocio?"
+          items={[
+            { name: 'Katy', text: 'Diseño web para negocios de Katy.', href: '/es/houston/katy', kind: 'barrio' },
+            { name: 'Sugar Land', text: 'Diseño web premium en Sugar Land.', href: '/es/houston/sugar-land', kind: 'barrio' },
+            { name: 'Contratistas', text: 'Sitios que traen solicitudes de presupuesto.', href: '/es/houston/contratistas', kind: 'sector', iconId: 'diseno-web' },
+            { name: 'Bienes raíces', text: 'Sitio con tus propiedades y SEO por zona.', href: '/es/houston/bienes-raices', kind: 'sector', iconId: 'seo-local' },
+            { name: 'Doral', text: 'Diseño web y SEO para negocios en Doral.', href: '/es/miami/doral', kind: 'barrio' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-garantias">
+      <div class="mzb-in">
+        <p class="mzb-tag">TresGarantias</p>
+        <TresGarantias
+          items={[
+            { icon: 'lucide:clock', title: 'Contacto en 1 hora hábil', text: 'Te respondemos en menos de una hora hábil.' },
+            { icon: 'lucide:file-text', title: 'Propuesta en 24 horas', text: 'Clara, por escrito y sin compromiso.' },
+            { icon: 'lucide:key-round', title: 'La web es tuya', text: 'Nunca te dejamos amarrado.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="mzb-sec" id="m-cierre">
+      <div class="mzb-in">
+        <p class="mzb-tag">CierreDosTarjetas (trío contractual)</p>
+        <CierreDosTarjetas
+          titleHtml={web.cta.title}
+          proof="Texas Rush Remove ya posiciona en su zona de Houston con su sitio nuevo."
+          city="houston"
+          tel={tel}
+          wa={wa}
+          lang="es"
+          warm={{ kind: 'diagnostico', title: '¿Aún no sabes qué necesitas?', text: 'Revisa gratis si tu negocio está perdiendo clientes online.', cta: 'Hacer el diagnóstico', href: '/es/diagnostico' }}
+        />
+      </div>
+    </section>
+  </main>
+
+  <SpaceBackdrop tone="gold" />
+  <SiteFooter footer={c.footer} lang="es" />
+</Layout>
+
+<style>
+  /* Maquetación mínima propia (sin .w-*: en esta página w.css no existe). */
+  .mzb { padding-top: calc(var(--nav-h) + 48px); }
+  .mzb-sec { padding-block: clamp(80px, 4rem + 3vw, 120px); border-top: 1px solid rgba(var(--accent-gold-rgb), .09); }
+  .mzb-in { width: min(100% - 32px, 1200px); margin-inline: auto; }
+  .mzb-tag {
+    margin: 0 0 16px; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    letter-spacing: .06em; color: rgba(var(--star-rgb), .55);
+  }
+  .mzb-tag--c { text-align: center; }
+  .mzb-gap { margin-top: 48px; }
+  .mzb-row { display: flex; flex-wrap: wrap; gap: 32px; align-items: center; }
+  .mzb-light { display: inline-flex; padding: 12px; border-radius: 12px; background: #f0ede8; }
+  .mzb-sheet { display: flex; flex-direction: column; gap: 20px; }
+  .mzb-sheet__row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .mzb-id { font-family: var(--font-mono); font-size: 12px; color: rgba(var(--star-rgb), .6); text-transform: uppercase; letter-spacing: .1em; }
+  .mzb-w480 { width: min(100%, 480px); }
+  .mzb-figs { display: grid; grid-template-columns: 1fr; gap: 48px; }
+  @media (min-width: 1024px) { .mzb-figs { grid-template-columns: 1fr 1fr; } }
+</style>

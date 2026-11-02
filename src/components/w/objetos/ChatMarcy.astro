@@ -220,18 +220,20 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     if (marco) {
       // El marco lleva el ritmo.
       marco.addEventListener('wo:play', (e) => {
+        el.classList.remove('is-paused');
         const i = (e as CustomEvent).detail?.index ?? 0;
         play(i % scripts.length, () => marco.dispatchEvent(new CustomEvent('wo:done')));
       });
-      marco.addEventListener('wo:stop', clear);
+      // Parado (fuera de pantalla, pestaña oculta, pausa): el destello de "escribiendo" también.
+      marco.addEventListener('wo:stop', () => { clear(); el.classList.add('is-paused'); });
       marco.addEventListener('wo:still', () => { clear(); box.innerHTML = stillHTML; });
       return;
     }
     const next = () => later(() => { const n = (idx + 1) % scripts.length; movePill(n); later(() => play(n, next), 400); }, HOLD);
     requestAnimationFrame(() => movePill(0));
     registerLoop(el, {
-      start: () => { el.classList.remove('is-still'); play(idx, next); },
-      stop: clear,
+      start: () => { el.classList.remove('is-still', 'is-paused'); play(idx, next); },
+      stop: () => { clear(); el.classList.add('is-paused'); },
       still: () => { clear(); idx = 0; movePill(0); box.innerHTML = stillHTML; el.classList.add('is-still'); },
     }, { buttonTone: 'light' });
   });
@@ -312,7 +314,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
   .wo-chat :global(.wo-chat__msg--c) :global(p) { background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-bottom-right-radius: 4px; }
   .wo-chat :global(.wo-chat__msg--m) { align-self: flex-start; }
   .wo-chat :global(.wo-chat__msg--m) :global(p) { background: var(--wo-m); border-bottom-left-radius: 4px; }
-  .wo-chat :global(.wo-chat__time) { font-size: 11px; color: #6b6762; padding: 0 4px; }
+  .wo-chat :global(.wo-chat__time) { font-size: 13px; color: #5c5853; padding: 0 4px; }
   .wo-chat :global(.wo-chat__msg.is-new) { animation: wo-chat-in 240ms var(--w-ease-ui) both; }
   @keyframes wo-chat-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   /* "Marcy está escribiendo" con destello del texto. */
@@ -325,6 +327,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     animation: wo-chat-shine 1.5s linear infinite;
     font-style: italic; font-size: 13px;
   }
+  .wo-chat.is-paused :global(.wo-chat__typing) :global(p) { animation-play-state: paused; }
   @keyframes wo-chat-shine { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
   @media (--lt-md) {
     .wo-chat__side { display: none; }

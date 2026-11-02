@@ -36,19 +36,22 @@ interface Props {
   warm: Warm;
   grad?: boolean;
   formLabel?: string;
+  /** id de la sección; vacío = sin id (hubs: el tramo del viaje no lo llevaba). */
   id?: string;
+  /** id del titular si no vale el derivado `${id}-title` (hubs: hx-cta-t, el de antes). */
+  titleId?: string;
   class?: string;
 }
 const {
   titleHtml, proof, city = 'houston', tel, wa, lang = 'es', warm, grad = false,
-  formLabel, id = 'cierre', class: cls,
+  formLabel, id = 'cierre', titleId: titleIdProp, class: cls,
 } = Astro.props;
 const ui = t(lang);
 const form = formLabel ?? (lang === 'en' ? 'Get my free proposal' : 'Propuesta gratis');
-const titleId = `${id}-title`;
+const titleId = titleIdProp ?? `${id || 'cierre'}-title`;
 const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
 ---
-<section class:list={['w-close', cls]} id={id} aria-labelledby={titleId} data-city={city}>
+<section class:list={['w-close', cls]} id={id || undefined} aria-labelledby={titleId} data-city={city}>
   <div class="w-close__grid">
     <article class="w-close__card w-close__card--big">
       <div class="w-close__body">

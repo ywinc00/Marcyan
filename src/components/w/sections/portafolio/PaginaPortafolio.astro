@@ -60,9 +60,17 @@ const rest = projects.slice(1);
 const price = '$' + PRICE_ANCHORS.web.toLocaleString('en-US');
 ---
 <Layout title={p.meta.title} description={p.meta.description} lang={lang} path={en ? 'portfolio' : 'portafolio'} ds="v3">
-  {en
-    ? <CollectionPageLd slot="head" name={p.meta.title} description={p.meta.description} path={p.path} items={works} inLanguage="en" />
-    : <CollectionPageLd slot="head" name={p.meta.title} description={p.meta.description} path={p.path} items={works} />}
+  {/* La captura del hero es el LCP: se pide con el <head>, no al llegar a ella tras el CSS en línea
+      (§6.6). Va en un Fragment con el schema: con el ternario suelto, Astro descartaba el <link>. */}
+  <Fragment slot="head">
+    <link rel="preload" as="image" fetchpriority="high"
+      href={`/Galeria/${first.slug}-pc-900.webp`}
+      imagesrcset={`/Galeria/${first.slug}-pc-900.webp 900w, /Galeria/${first.slug}-pc.webp 1920w`}
+      imagesizes="(min-width: 1024px) 736px, calc(100vw - 32px)" />
+    {en
+      ? <CollectionPageLd name={p.meta.title} description={p.meta.description} path={p.path} items={works} inLanguage="en" />
+      : <CollectionPageLd name={p.meta.title} description={p.meta.description} path={p.path} items={works} />}
+  </Fragment>
   <WStyles />
 
   <SiteNav nav={en ? clusterNavEn : clusterNav} lang={lang} homeHref={en ? '/en' : '/es'} currentPath={Astro.url.pathname} />

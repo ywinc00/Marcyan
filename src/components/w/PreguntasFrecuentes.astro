@@ -17,19 +17,22 @@ interface Props {
   items: Item[];
   /** Obligatorio, sin valor por defecto (normalmente "faq"). */
   id: string;
+  /** id del titular si no vale el derivado `${id}-title` (hubs: hx-faq-t, el de antes). */
+  titleId?: string;
   jsonld?: boolean;
   lang?: 'es' | 'en';
   class?: string;
 }
-const { tag, titleHtml, items, id, jsonld = true, lang = 'es', class: cls } = Astro.props;
+const { tag, titleHtml, items, id, titleId: titleIdProp, jsonld = true, lang = 'es', class: cls } = Astro.props;
+const titleId = titleIdProp ?? `${id}-title`;
 const ld = faqPage(items.map(({ q, a }) => ({ q, a })));
 const verifiedLabel = lang === 'en' ? 'Verified' : 'Verificado el';
 ---
-<section class:list={['w-faq', cls]} id={id} aria-labelledby={`${id}-title`}>
+<section class:list={['w-faq', cls]} id={id} aria-labelledby={titleId}>
   <div class="w-faq__block">
     <header class="w-faq__head">
       {tag && <p class="w-faq__tag">{tag}</p>}
-      <h2 class="w-faq__title" id={`${id}-title`} set:html={titleHtml} />
+      <h2 class="w-faq__title" id={titleId} set:html={titleHtml} />
     </header>
 
     <div class="w-faq__list">

@@ -261,7 +261,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   {/* 8 · Preguntas frecuentes: todas cerradas al cargar */}
   <div class="sec faq" data-atmo="top|night:1 glow:0.25;end|night:1 glow:0.3">
     <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
-    <div class="hx-wrap"><PreguntasFrecuentes id="faq" tag={h.faq.tag} titleHtml={h.faq.title} items={h.faq.items} lang={lang} /></div>
+    <div class="hx-wrap"><PreguntasFrecuentes id="faq" titleId="hx-faq-t" tag={h.faq.tag} titleHtml={h.faq.title} items={h.faq.items} lang={lang} /></div>
   </div>
 
   {/* 9 · Sigue explorando */}
@@ -281,7 +281,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   {/* cierre en dos tarjetas (W-CORE-15) dentro del tramo del horizonte encendido; el trío sale una vez, con el teléfono de la ciudad */}
   <div class="cta" data-atmo="top-0.15|night:1 glow:0.4 dawn:0;mid|night:1 glow:1">
     <div class="hx-wrap">
-      <CierreDosTarjetas id="" titleHtml={h.cta.title} proof={w.cierre.proof} city={city} tel={telHref} wa={waHref} lang={lang}
+      <CierreDosTarjetas id="" titleId="hx-cta-t" titleHtml={h.cta.title} proof={w.cierre.proof} city={city} tel={telHref} wa={waHref} lang={lang}
         formLabel={h.cta.primary.label} warm={{ kind: 'marcy', ...w.cierre.warm }} />
     </div>
   </div>

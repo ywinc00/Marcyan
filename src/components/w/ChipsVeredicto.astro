@@ -19,13 +19,16 @@ interface Props {
   /** dark = sobre noche · light = dentro de un objeto de producto claro (§2.4: el acento solo como relleno). */
   on?: 'dark' | 'light';
   tone?: 'gold' | 'teal';
+  /** Icono del estado intermedio. Por defecto la persona (IA: "Te lo pasa"); en el
+   *  diagnóstico "Mejorable" no es una persona: allí va un aviso. */
+  midIcon?: string;
   /** Etiqueta accesible del grupo (opcional). */
   label?: string;
   id?: string;
   class?: string;
 }
-const { items, memory = false, on = 'dark', tone = 'teal', label, id, class: cls } = Astro.props;
-const ICON = { ok: 'lucide:check', mid: 'lucide:user-round', off: 'lucide:x' } as const;
+const { items, memory = false, on = 'dark', tone = 'teal', midIcon = 'lucide:user-round', label, id, class: cls } = Astro.props;
+const ICON: Record<'ok' | 'mid' | 'off', string> = { ok: 'lucide:check', mid: midIcon, off: 'lucide:x' };
 const rows = !memory && items.some((i) => i.note);
 ---
 {memory ? (

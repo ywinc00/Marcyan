@@ -47,7 +47,7 @@ const off = (C * (1 - copy.score / 100)).toFixed(1);
                 <span class="re__name">{a.name}</span>
                 <span class="re__bar"><i style={`width:${a.value}%`}></i></span>
                 <b class="re__val">{a.value}</b>
-                <ChipsVeredicto items={[{ label: a.verdict, kind: a.kind }]} tone="gold" class="re__chip" />
+                <ChipsVeredicto items={[{ label: a.verdict, kind: a.kind }]} tone="gold" midIcon="lucide:circle-alert" class="re__chip" />
               </li>
             ))}
           </ul>

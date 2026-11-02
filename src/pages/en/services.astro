@@ -97,9 +97,10 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
       <div class="w-container" data-w-reveal>
         <CabeceraNumerada n={2} label={t.catalogo.label} />
         <div class="ws-tight">
-          <Catalogo track="pricing_card_clicked" expect={catalogo.length}>
+          <Catalogo>
             <TarjetasHermanas
               id="catalogo"
+              cardTrack="pricing_card_clicked"
               titleHtml={t.catalogo.title}
               lead={s.grid.intro}
               items={catalogo}

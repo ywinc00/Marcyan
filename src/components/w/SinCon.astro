@@ -147,6 +147,12 @@ const uid = `wd-sc-${id ?? 'x'}`;
     /* El escenario mide lo que la tarjeta "con" (misma celda): el caos ocupa ese alto entero,
        sin dejar una franja de noche vacía debajo (control 2). */
     .wd-sc__sin { display: flex; flex-direction: column; }
+    /* El caos va en su bandeja de noche, como la tarjeta "Con" va en la suya: sin ella las
+       burbujas quedaban sueltas y "Ejemplo" flotaba sin objeto al que pertenecer (ia, menor 10). */
+    .wd-sc__sin {
+      padding: 24px; border-radius: var(--w-r-tray);
+      background: var(--w-s1); border: 1px solid var(--w-line);
+    }
     .wd-sc__cloud { position: relative; flex: 1; min-height: 440px; padding: 0; display: block; }
     .wd-sc__m { position: absolute; }
     /* Posiciones del caos (9 como máximo), repartidas en tres bandas densas como en W-CORE-25;

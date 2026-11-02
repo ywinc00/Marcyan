@@ -140,7 +140,10 @@ const sr = Astro.props.sr ?? (en ? 'Example: ' : 'Ejemplo: ') + rows.map((r) => 
     .wd-log__p { font-size: 19px; line-height: 30px; }
     .wd-log__list { border-top: 0; border-left: 1px solid var(--w-line); }
     .wd-log__win { height: 100%; min-height: 530px; }
-    .wd-log--static .wd-log__win { min-height: 0; height: 100%; display: grid; align-content: center; }
+    /* En estático la tarjeta se ajusta a sus 5 filas: los 530 px son del modo en bucle y aquí
+       dejaban ~140 px de losa vacía arriba y abajo (ecommerce, rev1). */
+    .wd-log--static { min-height: 0; }
+    .wd-log--static .wd-log__win { min-height: 0; height: 100%; display: grid; align-content: center; padding-block: 48px; }
     .wd-log__row { grid-template-columns: 18px minmax(0, 260px) auto; padding: 0 32px 0 24px; gap: 16px; }
     .wd-log__lbl { font-size: 16px; }
   }

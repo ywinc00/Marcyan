@@ -41,7 +41,10 @@ const rows: Row[] = Astro.props.rows ?? (en
       { name: 'Archivo vectorial', detail: 'Para rótulos y camisetas a cualquier tamaño', part: 2 },
       { name: 'Archivos PNG', detail: 'Para tu web y tus redes', part: 5 },
       { name: 'Archivo PDF', detail: 'Listo para la imprenta', part: 6 },
-    ]);
+    ]
+// Orden por pieza del plano (1 → 6): así cada fila apunta a la siguiente llamada del dibujo
+// en cualquier uso (hero de branding, mini del hub de servicios, muestrario).
+).slice().sort((a, b) => a.part - b.part);
 const T = en
   ? { front: 'FRONT VIEW', app: 'APPLICATION', title: 'TITLE', manual: 'Brand guide', deliv: 'DELIVERY', delivV: 'logo, colors, typefaces', sheet: 'SHEET', sheetV: '1 of 1', list: 'What you get', sr: `Example brand blueprint for “${brand}”: logo, versions, colors, typefaces and usage guide.` }
   : { front: 'VISTA FRONTAL', app: 'APLICACIÓN', title: 'TÍTULO', manual: 'Manual de marca', deliv: 'ENTREGA', delivV: 'logo, colores, tipografía', sheet: 'HOJA', sheetV: '1 de 1', list: 'Lo que recibes', sr: `Plano de marca de ejemplo para “${brand}”: logo, variantes, colores, tipografías y guía de uso.` };
@@ -113,7 +116,7 @@ const mini = size === 'mini';
         <p class="wo-plan__lt">{T.list}</p>
         <ol class="wo-plan__rows">
           {rows.map((r, i) => (
-            <li class="wo-plan__row" data-part={r.part} tabindex="0">
+            <li class="wo-plan__row" data-part={r.part}>
               <span class="wo-plan__n">{String(i + 1).padStart(2, '0')}</span>
               <span class="wo-plan__rt"><b>{r.name}<i aria-hidden="true"></i></b><span>{r.detail}</span></span>
             </li>
@@ -218,6 +221,8 @@ const mini = size === 'mini';
     .wo-plan__ruler--l, .wo-plan__ruler--r { top: 22px; bottom: 22px; width: 22px; }
     .wo-plan__grid { grid-template-columns: 1fr; gap: 20px; padding: 28px 6px 14px; }
     .wo-plan :global(.w-example--corner) { top: 30px; right: 30px; }
+    /* Cotas y rótulos del dibujo: a este tamaño se leían a ~5 px (E-40). Son decorativos. */
+    .wo-plan__lab, .wo-plan__num { display: none; }
   }
   @media (--motion-reduce) {
     .wo-plan *, .wo-plan__row { transition: none; }

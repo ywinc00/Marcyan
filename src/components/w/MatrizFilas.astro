@@ -12,7 +12,15 @@
 // Los nombres que se leen (filas, columnas, casillas) van en letra de texto ≥ 13 px (E-40).
 import Icon from '../ui/Icon.astro';
 
-interface CellDef { label: string; href?: string }
+interface CellDef {
+  label: string;
+  href?: string;
+  /** Página actual: casilla llena, sin enlace y con aria-current="page". */
+  current?: boolean;
+  /** Lectura completa para lectores de pantalla (p. ej. "Diseño web en Houston");
+   *  si falta, se compone "<casilla> en <fila>". */
+  aria?: string;
+}
 interface RowDef { label: string; cells: CellDef[] }
 interface Props {
   rows: RowDef[];
@@ -34,6 +42,7 @@ const active = fixedRow ?? 0;
 const nCols = Math.max(columns?.length ?? 0, ...rows.map((r) => r.cells.length));
 const inWord = en ? 'in' : 'en';
 const noPage = en ? 'not available yet' : 'todavía sin página';
+const herePage = en ? 'this page' : 'esta página';
 ---
 <div
   class:list={['wd-mx', cls]}
@@ -67,15 +76,21 @@ const noPage = en ? 'not available yet' : 'todavía sin página';
             {Array.from({ length: nCols }, (_, j) => {
               const c = r.cells[j];
               if (!c) return <td class="wd-mx__td"></td>;
+              const read = c.aria ?? `${c.label} ${inWord} ${r.label}`;
               return (
                 <td class="wd-mx__td">
-                  {c.href ? (
-                    <a class="wd-mx__cell" href={c.href} aria-label={`${c.label} ${inWord} ${r.label}`} title={`${c.label} · ${r.label}`}>
+                  {c.current ? (
+                    <span class="wd-mx__cell wd-mx__cell--current" aria-current="page" title={`${c.label} · ${r.label}`}>
+                      <span class="wd-mx__fill" aria-hidden="true"></span>
+                      <span class="sr-only">{`${read}: ${herePage}`}</span>
+                    </span>
+                  ) : c.href ? (
+                    <a class="wd-mx__cell" href={c.href} aria-label={read} title={`${c.label} · ${r.label}`}>
                       <span class="wd-mx__fill" aria-hidden="true"></span>
                     </a>
                   ) : (
                     <span class="wd-mx__cell wd-mx__cell--empty" title={`${c.label} · ${r.label}`}>
-                      <span class="sr-only">{`${c.label} ${inWord} ${r.label}: ${noPage}`}</span>
+                      <span class="sr-only">{`${read}: ${noPage}`}</span>
                     </span>
                   )}
                 </td>
@@ -167,6 +182,8 @@ const noPage = en ? 'not available yet' : 'todavía sin página';
     opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
   }
   .wd-mx__row.is-on .wd-mx__fill { opacity: 1; }
+  /* Página actual: llena siempre, esté o no encendida su fila. */
+  .wd-mx__cell--current .wd-mx__fill { opacity: 1; }
   a.wd-mx__cell:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
   @media (--hover-fine) { a.wd-mx__cell:hover .wd-mx__fill { opacity: .7; } }
   @media (--lt-md) {

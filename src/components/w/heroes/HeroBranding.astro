@@ -28,19 +28,6 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.props;
-// Mismos textos que las filas por defecto de PlanoMarca, reordenados por pieza (M-1).
-const rows = lang === 'es'
-  ? [
-      { name: 'Logo a medida', detail: 'Diseñado desde cero para tu negocio', part: 1 },
-      { name: 'Archivo vectorial', detail: 'Para rótulos y camisetas a cualquier tamaño', part: 2 },
-      { name: 'Tipografías', detail: 'La voz escrita de tu marca', part: 3 },
-      { name: 'Paleta de color', detail: 'Para pantalla e impresión', part: 4 },
-      { name: 'Variantes del logo', detail: 'Horizontal, vertical e icono', part: 5 },
-      { name: 'Archivos PNG', detail: 'Para tu web y tus redes', part: 5 },
-      { name: 'Guía de uso', detail: 'Para que se vea igual en todos lados', part: 6 },
-      { name: 'Archivo PDF', detail: 'Listo para la imprenta', part: 6 },
-    ]
-  : undefined;
 ---
 <section class="w-hero hb">
   <div class="w-container">
@@ -65,7 +52,7 @@ const rows = lang === 'es'
     <div class="hb__plan">
       <div class="hb__light" aria-hidden="true"></div>
       <div data-w-in="obj">
-        <PlanoMarca lang={lang} rows={rows} />
+        <PlanoMarca lang={lang} />
       </div>
     </div>
   </div>

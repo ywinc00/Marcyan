@@ -28,13 +28,15 @@ interface Props {
   items: Item[];
   currentId?: IconoId;
   recursos?: Recurso[];
+  /** data-track en CADA tarjeta (p. ej. pricing_card_clicked en el catálogo de servicios). */
+  cardTrack?: string;
   /** Página sin SiteNav (sin sprite): los iconos se dibujan dentro de su SVG. */
   iconsInline?: boolean;
   lang?: 'es' | 'en';
   id?: string;
   class?: string;
 }
-const { titleHtml, lead, items, currentId, recursos, iconsInline = false, lang = 'es', id, class: cls } = Astro.props;
+const { titleHtml, lead, items, currentId, recursos, cardTrack, iconsInline = false, lang = 'es', id, class: cls } = Astro.props;
 const here = lang === 'en' ? 'You are here' : 'Estás aquí';
 const titleId = `${id ?? 'hermanas'}-title`;
 ---
@@ -53,6 +55,7 @@ const titleId = `${id ?? 'hermanas'}-title`;
             class:list={['w-sib__card', current && 'w-sib__card--current']}
             href={it.href}
             aria-current={current ? 'page' : undefined}
+            data-track={cardTrack}
           >
             <IconoObjeto id={it.id} size={48} inline={iconsInline} />
             <span class="w-sib__txt">
@@ -188,6 +191,13 @@ const titleId = `${id ?? 'hermanas'}-title`;
     .w-sib__price, .w-sib__here { grid-column: 2; grid-row: 1; margin-top: 0; white-space: nowrap; font-size: 14px; }
     .w-sib__rcard { padding: 14px 16px; }
     .w-sib__res { gap: 6px; margin-top: 12px; }
+  }
+  /* Por debajo de 375 la columna del nombre se queda en ~90 px junto al precio y parte las
+     palabras ("Mantenimiento"): el nombre pasa a ancho completo y el precio baja a su fila. */
+  @media (max-width: 374.98px) {
+    .w-sib__txt { grid-template-columns: minmax(0, 1fr); }
+    .w-sib__name { hyphens: manual; }
+    .w-sib__price, .w-sib__here { grid-column: 1; grid-row: 3; margin-top: 2px; }
   }
   @media (--motion-reduce) { .w-sib__card, .w-sib__rcard { transition: none; } }
 </style>

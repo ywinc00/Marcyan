@@ -12,7 +12,7 @@ export type SeoCity = 'houston' | 'miami';
 
 export interface CheckRow { k: string; v: string; ok?: boolean }
 export interface Ventana { title: string; sub: string; steps: string[] }
-export interface ZonaFila { label: string; cells: { label: string; href?: string }[] }
+export interface ZonaFila { label: string; cells: { label: string; href?: string; current?: boolean }[] }
 
 export interface SeoCopy {
   chip: string;
@@ -149,7 +149,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
       columns: COLUMNS,
       rows: [
         { label: 'Toda el área', cells: [
-          { label: 'SEO local', href: '/es/houston/seo-local' },
+          { label: 'SEO local', href: '/es/houston/seo-local', current: true },
           { label: 'Diseño web', href: '/es/houston/diseno-web' },
           { label: 'IA conversacional', href: '/es/houston/ia-conversacional' },
           { label: 'Tienda en línea', href: '/es/houston/ecommerce' },
@@ -222,7 +222,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
       columns: COLUMNS,
       rows: [
         { label: 'Todo Miami-Dade', cells: [
-          { label: 'SEO local', href: '/es/miami/seo-local' },
+          { label: 'SEO local', href: '/es/miami/seo-local', current: true },
           { label: 'Diseño web', href: '/es/miami/diseno-web' },
           { label: 'IA conversacional', href: '/es/miami/ia-conversacional' },
           { label: 'Tienda en línea', href: '/es/miami/ecommerce' },

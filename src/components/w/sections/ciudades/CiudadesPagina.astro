@@ -83,8 +83,12 @@ const rows = megaServicios[lang]
   .filter((s) => LANDING.houston[s.id] || LANDING.miami[s.id])
   .map((s) => ({
     label: ROW_NAME[lang][s.id] ?? s.name,
-    // La etiqueta de cada casilla es su CIUDAD (MatrizFilas compone "<casilla> en <fila>").
-    cells: (['houston', 'miami'] as const).map((city) => ({ label: city === 'houston' ? 'Houston' : 'Miami', href: cellHref(city, s.id) })),
+    // La casilla es su CIUDAD; se lee en orden natural: "Diseño web en Houston" / "Web design in Houston".
+    cells: (['houston', 'miami'] as const).map((city) => {
+      const cityName = city === 'houston' ? 'Houston' : 'Miami';
+      const name = ROW_NAME[lang][s.id] ?? s.name;
+      return { label: cityName, href: cellHref(city, s.id), aria: `${name} ${en ? 'in' : 'en'} ${cityName}` };
+    }),
   }));
 const columns = ['Houston', 'Miami'];
 

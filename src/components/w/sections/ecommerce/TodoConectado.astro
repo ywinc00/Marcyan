@@ -1,0 +1,202 @@
+---
+// Tienda en línea · 02 "Todo conectado" (W-ADV-38 · design/rediseno-workos.md §4.15-4).
+// Cabecera numerada (solo etiqueta) + titular centrado con bajada + ventana "Tu Tienda"
+// (objeto de SISTEMA, noche opaca) con control segmentado Pagos / Envíos / Mensajería y
+// una rejilla de 6 casillas de PRODUCTO (claro cálido) cableadas a los dos lados, como el
+// catálogo de W-ADV-38. Sin logotipos de terceros: cada servicio se nombra en texto con un
+// icono Lucide genérico (§1.C). Las plataformas son las que de verdad usamos según la
+// página (Stripe, PayPal; Shopify, WooCommerce o a medida); lo demás se nombra por función.
+// Pestañas que maneja el visitante: NO rotan solas, roles tablist/tab/tabpanel, flechas,
+// Inicio y Fin; cambio con fundido de opacidad de 180 ms (sin movimiento con reduced-motion).
+// Sin JS: se ve la primera pestaña.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import Icon from '../../../ui/Icon.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['conectado']; n: number; lang?: 'es' | 'en'; uid?: string }
+const { copy, n, lang = 'es', uid = 'tc' } = Astro.props;
+const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramienta? Pregúntanos';
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="tc" data-tc>
+  <header class="tc__head" data-w-reveal>
+    <h2 class="tc__h">{copy.title}</h2>
+    <p class="tc__lead">{copy.lead}</p>
+  </header>
+
+  <div class="tc__win" data-w-reveal>
+    <p class="sr-only">{copy.sr}</p>
+    <div class="tc__bar">
+      <span class="tc__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="tc__app"><Icon name="lucide:store" /><b translate="no">{copy.app}</b></span>
+      <span class="tc__plat">{copy.platforms}</span>
+    </div>
+    <Ejemplo lang={lang} on="dark" class="tc__ex" />
+
+    <div class="tc__body">
+      <div class="tc__tabs" role="tablist" aria-label={copy.label}>
+        {copy.tabs.map((t, i) => (
+          <button
+            type="button" role="tab" class="tc__tab"
+            id={`${uid}-tab-${t.id}`} aria-controls={`${uid}-panel-${t.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}
+          >{t.label}</button>
+        ))}
+      </div>
+
+      {copy.tabs.map((t, i) => (
+        <div
+          class="tc__panel" role="tabpanel" id={`${uid}-panel-${t.id}`}
+          aria-labelledby={`${uid}-tab-${t.id}`} tabindex="0" hidden={i !== 0}
+        >
+          <svg class="tc__wire tc__wire--l" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 50 C 45 50, 45 25.5, 100 25.5" /><path d="M0 50 C 45 50, 45 74.5, 100 74.5" />
+          </svg>
+          <ul class="tc__grid">
+            {t.tiles.map((tile) => (
+              <li class="tc__tile">
+                <span class="tc__ic"><Icon name={tile.icon} /></span>
+                <span class="tc__tx"><b>{tile.name}</b><span>{tile.sub}</span></span>
+              </li>
+            ))}
+            <li class="tc__tile tc__tile--more">
+              <span class="tc__ic"><Icon name="lucide:plus" /></span>
+              <span class="tc__tx"><b>{copy.more}</b><span>{copy.moreSub}</span></span>
+            </li>
+          </ul>
+          <svg class="tc__wire tc__wire--r" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M100 50 C 55 50, 55 25.5, 0 25.5" /><path d="M100 50 C 55 50, 55 74.5, 0 74.5" />
+          </svg>
+        </div>
+      ))}
+
+      <p class="tc__more"><a class="w-link" href="#contacto">{ask}</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tc]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = j === i;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        const p = root.querySelector<HTMLElement>('#' + t.getAttribute('aria-controls'));
+        if (!p) return;
+        if (on && p.hidden) { p.hidden = false; p.classList.remove('is-in'); void p.offsetWidth; p.classList.add('is-in'); }
+        else if (!on) p.hidden = true;
+      });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        const k = e.key;
+        let to = -1;
+        if (k === 'ArrowRight') to = (i + 1) % tabs.length;
+        else if (k === 'ArrowLeft') to = (i - 1 + tabs.length) % tabs.length;
+        else if (k === 'Home') to = 0;
+        else if (k === 'End') to = tabs.length - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(to, true);
+      });
+    });
+  });
+</script>
+
+<style>
+  .tc { max-width: var(--w-rail-max); margin: 12px auto 0; }
+  .tc__head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+  .tc__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500; text-wrap: balance;
+    font-size: var(--w-h2); line-height: var(--w-lh-h2); letter-spacing: var(--w-tr-h2); color: var(--w-ink);
+  }
+  .tc__lead { margin: 16px auto 0; max-width: 34rem; font-size: 18px; line-height: 29px; color: var(--w-ink-80); }
+
+  /* Ventana (objeto de sistema opaco): 1024 de ancho como W-ADV-38. */
+  .tc__win {
+    position: relative; max-width: 1024px; margin-inline: auto; overflow: hidden;
+    border-radius: var(--w-r-tray); background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .tc__bar {
+    position: relative; display: flex; align-items: center; justify-content: center; gap: 12px;
+    height: 48px; padding: 0 20px; border-bottom: 1px solid var(--w-line);
+  }
+  .tc__dots { position: absolute; left: 20px; display: flex; gap: 6px; }
+  .tc__dots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--w-ink-30); }
+  .tc__app { display: inline-flex; align-items: center; gap: 8px; font: 500 14px/1 var(--font-display); color: var(--w-ink); }
+  .tc__app :global(svg) { width: 16px; height: 16px; color: var(--w-accent); }
+  .tc__plat { display: none; }
+  .tc__win > :global(.w-example) { top: 12px; right: 14px; }
+
+  .tc__body { position: relative; padding: 32px 16px 28px; }
+  /* Control segmentado (W-ADV-38, radio 12, padding 4); pestañas de 44 de alto (§6.8). */
+  .tc__tabs {
+    display: flex; gap: 4px; width: max-content; max-width: 100%; margin: 0 auto 32px;
+    padding: 4px; border-radius: 12px; background: rgba(var(--star-rgb), .05); border: 1px solid var(--w-line);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .tc__tab {
+    flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 9px; background: transparent; cursor: pointer;
+    font: 500 15px/1 var(--font-body); color: var(--w-ink-70); -webkit-tap-highlight-color: transparent;
+    transition: color var(--w-dur-micro) var(--w-ease-ui), background-color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .tc__tab[aria-selected='true'] { background: var(--w-p-bg); color: var(--w-p-ink); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
+  @media (--hover-fine) { .tc__tab[aria-selected='false']:hover { color: var(--w-ink); } }
+  .tc__tab:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+  /* A 360 las 3 pestañas no cabían y la activa quedaba cortada en el borde: menos aire lateral. */
+  @media (--lt-sm) { .tc__tab { padding: 0 13px; } }
+
+  .tc__panel { display: flex; align-items: stretch; outline: none; }
+  .tc__panel[hidden] { display: none; }
+  .tc__panel.is-in { animation: tc-in 180ms var(--w-ease-ui) both; }
+  @keyframes tc-in { from { opacity: 0; } to { opacity: 1; } }
+  .tc__panel:focus-visible .tc__grid { outline: 2px solid var(--w-accent); outline-offset: 6px; border-radius: 12px; }
+
+  .tc__wire { display: none; flex: 1; min-width: 0; height: auto; overflow: visible; }
+  .tc__wire path { fill: none; stroke: rgba(var(--accent-gold-rgb), .28); stroke-width: 1; vector-effect: non-scaling-stroke; }
+
+  .tc__grid {
+    position: relative; list-style: none; margin: 0 auto; padding: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%;
+  }
+  /* Móvil: icono encima del texto, para que los títulos tengan todo el ancho de la casilla
+     y no se partan a mitad de palabra (E-18). En --md vuelve a fila. */
+  .tc__tile {
+    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0;
+    min-height: 72px; padding: 12px 14px; border-radius: var(--w-r-obj);
+    background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
+  }
+  .tc__ic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); }
+  .tc__ic :global(svg) { width: 16px; height: 16px; }
+  .tc__tx { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+  .tc__tx b { font: 500 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .tc__tx span { font-size: 13px; color: var(--w-p-ink-2); }
+  /* Fondo opaco de la ventana: el hilo de la fila pasa por DETRÁS de la casilla punteada
+     y no tacha su texto (E-37; en W-ADV-38 las líneas mueren en el borde de las casillas). */
+  .tc__tile--more { background: var(--w-s2); color: var(--w-ink); border: 1px dashed rgba(var(--star-rgb), .28); }
+  .tc__tile--more .tc__ic { background: transparent; border-color: var(--w-line-strong); color: var(--w-accent); }
+  .tc__tile--more .tc__tx span { color: var(--w-ink-70); }
+  .tc__more { margin: 28px 0 0; text-align: center; }
+
+  @media (--md) {
+    .tc__plat { display: block; position: absolute; right: 20px; font-size: 13px; color: var(--w-ink-60); }
+    .tc__win > :global(.w-example) { top: auto; bottom: 16px; right: 16px; }
+    .tc__body { padding: 40px 0 36px; }
+    .tc__tabs { margin-bottom: 40px; }
+    .tc__wire { display: block; }
+    .tc__tile { flex-direction: row; align-items: center; gap: 12px; }
+    .tc__grid { flex: none; width: 624px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    /* Hilo que une las casillas de cada fila (W-ADV-38), por detrás de las casillas opacas. */
+    .tc__grid::before, .tc__grid::after {
+      content: ''; position: absolute; left: 0; right: 0; height: 1px; background: rgba(var(--accent-gold-rgb), .28);
+    }
+    .tc__grid::before { top: 25.5%; }
+    .tc__grid::after { top: 74.5%; }
+  }
+  @media (--motion-reduce) { .tc__panel.is-in { animation: none; } .tc__tab { transition: none; } }
+</style>

@@ -1,0 +1,31 @@
+---
+// Tienda en línea · 01 "Del carrito al pago" (§4.15-3): CabeceraNumerada (solo etiqueta) +
+// BandejaPasos (W-ADV-37) con un objeto de producto por paso: catálogo, pago con el
+// impuesto real de la ciudad y la ficha del pedido "Pagado" (estado en el acento de la
+// página, como en la lista de pedidos del hero: el mismo estado, la misma marca, E-14).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import BandejaPasos from '../../BandejaPasos.astro';
+import MiniTienda from './MiniTienda.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['pasos']; tax: ShopCopy['tax']; n: number; city: 'houston' | 'miami'; lang?: 'es' | 'en' }
+const { copy, tax, n, city, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ws-gap">
+  <BandejaPasos titleHtml={copy.title} lead={copy.lead} steps={copy.steps}>
+    <MiniTienda slot="ui-1" kind="catalogo" tax={tax} city={city} lang={lang} />
+    <MiniTienda slot="ui-2" kind="pago" tax={tax} city={city} lang={lang} />
+    <MiniTienda slot="ui-3" kind="pedido" tax={tax} city={city} lang={lang} />
+  </BandejaPasos>
+</div>
+<style>
+  .ws-gap { margin-top: 12px; }
+  /* Las tres tarjetas comparten filas (subgrid): la zona de objeto mide lo que la más
+     alta (la del pago) y los títulos de los pasos quedan en la misma línea (W-ADV-37). */
+  @media (--lg) {
+    .ws-gap :global(.wd-bp__tray) { grid-template-rows: auto auto auto; row-gap: 0; }
+    .ws-gap :global(.wd-bp__card) { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
+    .ws-gap :global(.wd-bp__obj) { place-items: start center; }
+  }
+</style>

@@ -1,16 +1,16 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-10-26",
+  "fecha": "2026-11-02",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
       "clics": 1,
-      "impresiones": 19
+      "impresiones": 21
     },
     "anteriores28": {
       "clics": 0,
-      "impresiones": 0
+      "impresiones": 2
     }
   },
   "consultasSinMarca": [
@@ -22,10 +22,10 @@
       "marca": false
     },
     {
-      "consulta": "cómo activar que la ia contesta mis llamadas",
+      "consulta": "idea.ia llamadas y mensajes",
       "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 4,
+      "impresiones": 2,
+      "posicionMedia": 7,
       "marca": false
     },
     {
@@ -43,13 +43,6 @@
       "marca": false
     },
     {
-      "consulta": "diseño web para negocios en miami",
-      "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 3,
-      "marca": false
-    },
-    {
       "consulta": "poner una ia para que conteste las llamadas y los whatsapp",
       "clics": 0,
       "impresiones": 1,
@@ -61,6 +54,20 @@
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 2,
+      "marca": false
+    },
+    {
+      "consulta": "diseño web para negocios en miami",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 3,
+      "marca": false
+    },
+    {
+      "consulta": "que ia contesta las llamasdas en eeu y pide un mesnaje del caller para comunicarle al destinatario",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 6,
       "marca": false
     },
     {
@@ -78,7 +85,7 @@
       "marca": false
     },
     {
-      "consulta": "que ia contesta las llamasdas en eeu y pide un mesnaje del caller para comunicarle al destinatario",
+      "consulta": "idea.ia que responde llamadas y mensajes",
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 6,

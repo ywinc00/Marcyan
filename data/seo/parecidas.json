@@ -1,0 +1,23 @@
+{
+  "fecha": "2026-11-02",
+  "umbral": 0.8,
+  "casiIguales": [
+    {
+      "a": "https://marcyanstudio.com/en/houston",
+      "b": "https://marcyanstudio.com/en/miami",
+      "parecido": 0.83
+    },
+    {
+      "a": "https://marcyanstudio.com/en/pricing",
+      "b": "https://marcyanstudio.com/en/services",
+      "parecido": 0.83
+    }
+  ],
+  "relacionadasSinEnlace": [
+    {
+      "a": "https://marcyanstudio.com/en/houston/contractors",
+      "b": "https://marcyanstudio.com/en/houston/restaurants",
+      "parecido": 0.65
+    }
+  ]
+}

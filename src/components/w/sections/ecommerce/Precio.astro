@@ -1,0 +1,41 @@
+---
+// Tienda en línea · precio (§4.15-8): PrecioPuntos (W-CORE-14). Cifra = ancla baja con
+// "Desde" (Tienda esencial, PRICE_ANCHORS.ecommerceEssential), degradado único de la página;
+// el slice de la página (Tienda a medida = service.priceValue) abajo a la derecha (R6).
+// Debajo, la nota de precio (libre, §4) formada con los mismos precios de pricing.ts para
+// que no contradiga a la cifra grande, y el enlace que conserva pricing_cta_clicked.
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Button from '../../../ui/Button.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['precio']; city: 'houston' | 'miami' }
+const { copy, city } = Astro.props;
+const shop = catalog.find((p) => p.id === 'ecommerce')!;
+const essential = shop.tiers.find((t) => t.key === 'ecommerceEssential')!;
+const custom = shop.tiers.find((t) => t.key === 'ecommerce')!;
+const usd = (v: number) => `$${v.toLocaleString('en-US')}`;
+const tail = city === 'miami'
+  ? 'Si vendes fuera de Estados Unidos, usas suscripciones o quieres mudar tu tienda actual, te lo cotizamos aparte y por escrito.'
+  : 'El precio final depende del número de productos, las funciones y si hay que mudar una tienda que ya tienes. Siempre por escrito.';
+const note = `${essential.name} desde ${usd(PRICE_ANCHORS.ecommerceEssential)}; ${custom.name.toLowerCase()}, desde ${usd(PRICE_ANCHORS.ecommerce)}. ${tail}`;
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="ecommerceEssential"
+  from="Desde"
+  bottomLeft={{ big: essential.name, text: essential.blurb }}
+  bottomRight={{ label: custom.name, value: `Desde ${usd(PRICE_ANCHORS.ecommerce)}` }}
+/>
+<div class="ws-foot">
+  <p class="ws-note">{note}</p>
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  .ws-foot {
+    max-width: var(--w-rail-max); margin: 24px auto 0; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 32px;
+  }
+  .ws-note { margin: 0; max-width: 46rem; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+</style>

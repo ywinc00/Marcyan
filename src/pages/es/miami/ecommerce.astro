@@ -1,7 +1,8 @@
 ---
-// Landing · /es/miami/ecommerce — Tienda en línea en Miami ($2,900).
-// Toda la estructura vive en ClusterLanding; aquí solo se elige el contenido.
-import ClusterLanding from '../../../components/ClusterLanding.astro';
+// Landing · /es/miami/ecommerce · Tienda en línea en Miami.
+// Plantilla v3 (rediseño WorkOS, tipo `ecommerce`): WLanding + kinds/ecommerce.ts (activación por página, ver registry.ts).
+import WLanding from '../../../components/w/landing/WLanding.astro';
+import spec from '../../../components/w/landing/kinds/ecommerce';
 import { clusters } from '../../../i18n/clusters';
 ---
-<ClusterLanding cluster={clusters['miami/ecommerce']} />
+<WLanding cluster={clusters['miami/ecommerce']} spec={spec} />

@@ -1,0 +1,68 @@
+---
+// Hero de las landings de tienda en línea (design/rediseno-workos.md §4.15, ola 2).
+// A-05 + W-ADV-36: hero PARTIDO. Izquierda, HeroTexto alineado a la izquierda (chip de
+// ciudad, eyebrow "Tienda", H1 verbatim, bajada y botones; coreografía §2.9). Derecha, la
+// lista "Pedidos de hoy" de EJEMPLO con su campo de puntos oro: firma de la página, en
+// bucle (una fila pasa a "Pagado" cada 950 ms; pausada fuera de pantalla, con pestaña
+// oculta y con reduced-motion en su estado quieto). Entra como objeto (data-w-in="obj").
+// Sin cola en el H1 (regla de longitud §2.14: el H1 ya ocupa 2 líneas a 1440).
+// Móvil: texto arriba y la lista debajo a ancho completo, nunca oculta (W-CORE-41).
+import HeroTexto from '../HeroTexto.astro';
+import ListaPedidos from '../objetos/ListaPedidos.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
+---
+<section class="w-hero he">
+  <div class="w-container he__grid">
+    <div class="he__text">
+      <HeroTexto
+        eyebrow={eyebrow}
+        tone="gold"
+        chip={chip}
+        h1Html={h1Html}
+        lead={lead}
+        primary={primary}
+        link={link}
+        align="left"
+      >
+        <slot name="crumbs" slot="crumbs" />
+      </HeroTexto>
+    </div>
+    <div class="he__obj" data-w-in="obj">
+      <ListaPedidos lang={lang} size="hero" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .he { overflow-x: clip; padding-bottom: 72px; }
+  .he__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
+  .he__obj { display: flex; justify-content: center; padding-inline: 8px; }
+  /* El chip de ciudad va encima del eyebrow también a la izquierda (misma pila que el
+     centrado del piloto): el eyebrow es el nombre de producto y manda sobre el chip. */
+  .he__text :global(.w-herotext__top) { flex-direction: column; align-items: flex-start; gap: 14px; }
+  @media (--lg) {
+    .he { padding-bottom: 80px; }
+    /* Columna de texto 600 (el H1 de 58 cabe en 2 líneas) y objeto a la derecha. */
+    .he__grid { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); gap: 48px; min-height: 520px; }
+    .he__text :global(.w-herotext--left) { max-width: 600px; }
+    .he__obj { justify-content: flex-end; padding-inline: 0 56px; }
+  }
+  @media (--lt-md) {
+    .he { padding-bottom: 64px; }
+    .he__grid { gap: 48px; }
+    .he__text :global(.w-herotext__top) { align-items: center; }
+    .he__text :global(.w-herotext--left) { align-items: center; text-align: center; margin-inline: auto; }
+    .he__text :global(.w-herotext--left .w-herotext__actions) { justify-content: center; }
+  }
+</style>

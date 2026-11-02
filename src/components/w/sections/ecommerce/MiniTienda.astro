@@ -1,0 +1,247 @@
+---
+// Mini-UIs de la tienda de EJEMPLO (objetos de PRODUCTO, claros, estáticos · §2.4, §3.6).
+// Contenido por slot para BandejaPasos ("Del carrito al pago") y Bento2x2 ("Qué incluye")
+// de las landings de tienda en línea (§4.15). Misma familia que ListaPedidos (claro cálido,
+// tinta, el acento de la página solo como relleno de botón o punto de estado, E-14/§2.11).
+//   catalogo   → dos productos, uno ya en el carrito (paso 1).
+//   pago       → resumen con el impuesto real de la ciudad y "Pagar" (paso 2).
+//   pedido     → ficha del pedido clave-valor con "Pagado" (paso 3, W-ADV-37).
+//   idiomas    → la misma ficha en el OTRO idioma; la marca "Tu Tienda" no se traduce (E-24).
+//   variantes  → ficha con tallas y colores, y el carrito.
+//   recibo     → desglose del impuesto de ventas (datos reales de la página).
+//   plataforma → Shopify / WooCommerce / A medida, elegida contigo.
+//   busqueda   → una búsqueda de ejemplo que encuentra tu tienda (sin logotipos de terceros).
+// Ilustración: aria-hidden + resumen sr-only. Productos, nombres y precios de EJEMPLO.
+import Icon from '../../../ui/Icon.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import type { MiniKind, ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props {
+  kind: MiniKind;
+  tax: ShopCopy['tax'];
+  city: 'houston' | 'miami';
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { kind, tax, city, lang = 'es', class: cls } = Astro.props;
+const money = (n: number) => '$' + n.toFixed(2);
+const SUB = 30; // 18 + 12, los dos productos de ejemplo
+const TAX = Math.round(SUB * tax.rate * 100) / 100;
+const TOTAL = SUB + TAX;
+const miami = city === 'miami';
+const SR: Record<MiniKind, string> = {
+  catalogo: 'Ejemplo: el cliente elige en tu catálogo y añade un producto al carrito.',
+  pago: `Ejemplo: el cliente paga con tarjeta y la tienda suma el impuesto de ${tax.state} (${tax.total}).`,
+  pedido: 'Ejemplo: el pedido te llega pagado, con cliente y forma de entrega.',
+  idiomas: 'Ejemplo: la misma ficha de producto en inglés, con el nombre de la tienda sin traducir.',
+  variantes: 'Ejemplo: ficha de producto con tallas, colores y el botón para añadir al carrito.',
+  recibo: `Ejemplo: el impuesto de ventas de ${tax.state} desglosado, ${tax.total} en total.`,
+  plataforma: 'Ejemplo: elegimos contigo entre Shopify, WooCommerce o una tienda a medida.',
+  busqueda: 'Ejemplo: alguien busca tu producto en Miami y aparece tu tienda.',
+};
+---
+<div class:list={['wt', `wt--${kind}`, cls]}>
+  <p class="sr-only">{SR[kind]}</p>
+  <div class="wt__card" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+
+    {kind === 'catalogo' && (
+      <>
+        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__cart"><Icon name="lucide:shopping-cart" /><i>1</i></span></p>
+        <div class="wt__grid">
+          <div class="wt__prod">
+            <span class="wt__img wt__img--a"><Icon name="lucide:flame" /></span>
+            <b>Vela aromática</b><span class="wt__price">{money(18)}</span>
+            <span class="wt__btn wt__btn--line">Añadir</span>
+          </div>
+          <div class="wt__prod">
+            <span class="wt__img wt__img--b"><Icon name="lucide:coffee" /></span>
+            <b>Café de olla, 1 kg</b><span class="wt__price">{money(12)}</span>
+            <span class="wt__btn wt__btn--ink"><Icon name="lucide:check" />Añadido</span>
+          </div>
+        </div>
+      </>
+    )}
+
+    {kind === 'pago' && (
+      <>
+        <p class="wt__t">Tu pedido</p>
+        <dl class="wt__sum">
+          <div><dt>Vela aromática</dt><dd>{money(18)}</dd></div>
+          <div><dt>Café de olla, 1 kg</dt><dd>{money(12)}</dd></div>
+          <div class="wt__sum-tax"><dt>Impuesto de {tax.state} ({tax.total})</dt><dd>{money(TAX)}</dd></div>
+          <div class="wt__sum-total"><dt>Total</dt><dd>{money(TOTAL)}</dd></div>
+        </dl>
+        <p class="wt__methods"><span class="is-on"><Icon name="lucide:credit-card" />Tarjeta</span><span><Icon name="lucide:wallet" />PayPal</span></p>
+        <span class="wt__btn wt__btn--acc wt__btn--wide"><Icon name="lucide:lock" />Pagar {money(TOTAL)}</span>
+      </>
+    )}
+
+    {kind === 'pedido' && (
+      <>
+        <p class="wt__t">Pedido nuevo</p>
+        <dl class="wt__kv">
+          <div><dt>Pedido</dt><dd class="wt__mono">#1042</dd></div>
+          <div><dt>Cliente</dt><dd>Ana R.</dd></div>
+          <div><dt>Estado</dt><dd><span class="wt__chip wt__chip--paid"><i></i>Pagado</span></dd></div>
+          <div><dt>{miami ? 'Envío' : 'Entrega'}</dt><dd><span class="wt__chip">{miami ? 'Otro estado' : 'Recogida'}</span></dd></div>
+        </dl>
+      </>
+    )}
+
+    {kind === 'idiomas' && (
+      <>
+        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__lang"><span>ES</span><span class="is-on">EN</span></span></p>
+        <div class="wt__detail">
+          <span class="wt__img wt__img--a wt__img--sq"><Icon name="lucide:flame" /></span>
+          <div class="wt__dtxt">
+            <b lang="en">Scented candle</b>
+            <span lang="en">Hand-poured in small batches.</span>
+            <span class="wt__price">{money(18)}</span>
+            <span class="wt__btn wt__btn--acc" lang="en">Add to cart</span>
+          </div>
+        </div>
+      </>
+    )}
+
+    {kind === 'variantes' && (
+      <>
+        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__cart"><Icon name="lucide:shopping-cart" /><i>2</i></span></p>
+        <div class="wt__detail">
+          <span class="wt__img wt__img--c wt__img--sq"><Icon name="lucide:shirt" /></span>
+          <div class="wt__dtxt">
+            <b>Camiseta bordada</b>
+            <span class="wt__price">{money(22)}</span>
+            <span class="wt__opt">Talla</span>
+            <span class="wt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
+            <span class="wt__opt">Color</span>
+            <span class="wt__colors"><i class="is-on" style="--c:#2f3b4c"></i><i style="--c:#b9a68a"></i><i style="--c:#f7f5f1"></i></span>
+          </div>
+        </div>
+        <span class="wt__btn wt__btn--acc wt__btn--wide">Añadir al carrito</span>
+      </>
+    )}
+
+    {kind === 'recibo' && (
+      <>
+        <p class="wt__t">Impuesto de ventas</p>
+        <dl class="wt__kv">
+          <div><dt>Estatal, {tax.state}</dt><dd>{tax.stateRate}</dd></div>
+          <div><dt>{tax.localLabel}</dt><dd>{tax.localRate}</dd></div>
+          <div class="wt__kv-total"><dt>Total en {miami ? 'Miami' : 'Houston'}</dt><dd>{tax.total}</dd></div>
+        </dl>
+        <p class="wt__note"><Icon name="lucide:check" />Se suma solo en cada pedido</p>
+      </>
+    )}
+
+    {kind === 'plataforma' && (
+      <>
+        <p class="wt__t">Tu plataforma</p>
+        <ul class="wt__plat">
+          <li class="is-on"><span class="wt__radio"></span><span><b>Shopify</b><em>Lanzar rápido y vender simple</em></span><span class="wt__chip wt__chip--paid"><i></i>Elegida</span></li>
+          <li><span class="wt__radio"></span><span><b>WooCommerce</b><em>Más control, si ya usas WordPress</em></span></li>
+          <li><span class="wt__radio"></span><span><b>A medida</b><em>Si tu caso no cabe en ninguna</em></span></li>
+        </ul>
+      </>
+    )}
+
+    {kind === 'busqueda' && (
+      <>
+        <p class="wt__search"><Icon name="lucide:search" />tienda de velas en miami</p>
+        <div class="wt__res is-on">
+          <span class="wt__url"><span class="wt__fav" translate="no">T</span>tutienda.example</span>
+          <b><span translate="no">Tu Tienda</span>: velas artesanales en Miami</b>
+          <span>Envío en Miami y a otros estados. Paga con tarjeta o PayPal.</span>
+        </div>
+        <div class="wt__res"><i style="width:40%"></i><i style="width:78%"></i><i style="width:64%"></i></div>
+      </>
+    )}
+  </div>
+</div>
+
+<style>
+  .wt { --wt-acc: var(--w-accent, var(--accent-gold)); position: relative; width: 100%; font-family: var(--font-body); text-align: left; }
+  .wt__card {
+    position: relative; overflow: hidden;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: var(--w-r-obj, 12px);
+    padding: 18px 18px 18px;
+  }
+  .wt :global(svg) { width: 14px; height: 14px; flex: none; }
+  .wt__t { margin: 0 0 12px; font: 500 15px/1.3 var(--font-display); letter-spacing: -0.01em; }
+  .wt__bar { margin: 0 0 12px; padding-right: 92px; display: flex; align-items: center; gap: 10px; font: 500 15px/1.3 var(--font-display); }
+  .wt__cart { position: relative; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); margin-left: auto; }
+  .wt__cart i { position: absolute; top: -6px; right: -6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--w-p-ink); color: var(--w-p-bg); font: 600 11px/16px var(--font-body); font-style: normal; text-align: center; }
+  .wt__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wt__prod { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 8px; border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line); }
+  .wt__prod b { font-size: 13px; font-weight: 500; line-height: 1.25; min-height: 2.5em; }
+  .wt__bar > b { white-space: nowrap; }
+  .wt__img { display: grid; place-items: center; height: 64px; border-radius: 8px; margin-bottom: 4px; color: rgba(14,14,13,.55); }
+  .wt__img :global(svg) { width: 22px; height: 22px; }
+  .wt__img--a { background: #e9dfcf; }
+  .wt__img--b { background: #ddd3c6; }
+  .wt__img--c { background: #d8dde3; }
+  .wt__img--sq { width: 96px; height: 96px; margin: 0; flex: none; }
+  .wt__price { font-size: 13px; color: var(--w-p-ink-2, #4a4743); font-variant-numeric: tabular-nums; }
+  .wt__btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 30px; margin-top: 6px; padding: 0 12px; border-radius: 8px;
+    font: 500 13px/1 var(--font-body); white-space: nowrap;
+  }
+  .wt__btn--line { border: 1px solid rgba(14,14,13,.2); background: #fff; }
+  .wt__btn--ink { background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); }
+  .wt__btn--acc { background: var(--wt-acc); color: #0e0e0d; }
+  .wt__btn--wide { display: flex; width: 100%; height: 36px; margin-top: 12px; }
+
+  .wt__sum, .wt__kv { margin: 0; display: grid; }
+  .wt__sum > div, .wt__kv > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 30px; font-size: 13px; }
+  .wt__sum dt, .wt__kv dt { color: var(--w-p-ink-2, #4a4743); }
+  .wt__sum dd, .wt__kv dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .wt__sum-tax { border-top: 1px solid var(--w-p-line); }
+  .wt__sum > .wt__sum-total { font-size: 14px; }
+  .wt__sum > .wt__sum-total dt { color: var(--w-p-ink); font-weight: 500; }
+  .wt__kv { border: 1px solid var(--w-p-line); border-radius: 10px; background: #fff; overflow: hidden; }
+  .wt__kv > div { min-height: 40px; padding: 0 14px; }
+  .wt__kv > div + div { border-top: 1px solid var(--w-p-line); }
+  .wt__kv > .wt__kv-total dt { color: var(--w-p-ink); font-weight: 500; }
+  .wt__mono { font-family: var(--font-mono); font-size: 13px; }
+  .wt__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 500; background: rgba(14,14,13,.06); border: 1px solid rgba(14,14,13,.08); }
+  .wt__chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--wt-acc); box-shadow: 0 0 0 1px rgba(14,14,13,.25); }
+  .wt__methods { display: flex; gap: 8px; margin: 10px 0 0; }
+  .wt__methods span { flex: 1; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); font-size: 13px; color: var(--w-p-ink-2); }
+  .wt__methods .is-on { border-color: var(--w-p-ink); color: var(--w-p-ink); box-shadow: inset 0 0 0 1px var(--w-p-ink); }
+
+  .wt__lang { margin-left: auto; display: inline-flex; padding: 2px; border-radius: 8px; background: rgba(14,14,13,.06); font: 500 12px/1 var(--font-body); }
+  .wt__lang span { padding: 5px 8px; border-radius: 6px; color: var(--w-p-ink-2); }
+  .wt__lang .is-on { background: #fff; color: var(--w-p-ink); box-shadow: 0 0 0 1px var(--w-p-line); }
+  .wt__detail { display: flex; gap: 14px; align-items: flex-start; }
+  .wt__dtxt { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+  .wt__dtxt b { font: 500 15px/1.25 var(--font-display); }
+  .wt__dtxt > span:not(.wt__price):not(.wt__btn):not(.wt__opt):not(.wt__sizes):not(.wt__colors) { font-size: 13px; color: var(--w-p-ink-2); line-height: 1.4; }
+  .wt__opt { margin-top: 6px; font-size: 13px; color: var(--w-p-ink-2); }
+  .wt__sizes { display: flex; gap: 6px; }
+  .wt__sizes span { display: grid; place-items: center; width: 30px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid rgba(14,14,13,.14); font-size: 13px; font-weight: 500; }
+  .wt__sizes .is-on { background: var(--w-p-ink); color: var(--w-p-bg); border-color: var(--w-p-ink); }
+  .wt__colors { display: flex; gap: 8px; padding: 2px 0; }
+  .wt__colors i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(14,14,13,.18); }
+  .wt__colors .is-on { box-shadow: inset 0 0 0 1px rgba(14,14,13,.18), 0 0 0 2px var(--w-p-bg), 0 0 0 3.5px var(--w-p-ink); }
+
+  .wt__note { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: 13px; color: var(--w-p-ink-2); }
+  .wt__plat { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .wt__plat li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line); }
+  .wt__plat li.is-on { box-shadow: inset 0 0 0 1px var(--w-p-ink); border-color: var(--w-p-ink); }
+  .wt__plat li > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .wt__plat b { font-size: 14px; font-weight: 500; }
+  .wt__plat em { font-style: normal; font-size: 13px; color: var(--w-p-ink-2); }
+  .wt__radio { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(14,14,13,.35); }
+  .is-on > .wt__radio { border: 5px solid var(--w-p-ink); }
+
+  .wt__search { display: flex; align-items: center; gap: 8px; height: 38px; margin: 0 0 12px; padding: 0 14px; margin-right: 76px; border-radius: 999px; background: #fff; border: 1px solid rgba(14,14,13,.14); font-size: 13px; }
+  .wt__res { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; }
+  .wt__res.is-on { background: #fff; border: 1px solid var(--w-p-line); }
+  .wt__res b { font: 500 14px/1.3 var(--font-display); }
+  .wt__res > span:last-child { font-size: 13px; color: var(--w-p-ink-2); line-height: 1.4; }
+  .wt__res i { display: block; height: 8px; border-radius: 4px; background: rgba(14,14,13,.08); }
+  .wt__url { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--w-p-ink-2); }
+  .wt__fav { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--w-p-ink); color: var(--w-p-bg); font: 600 10px/1 var(--font-display); }
+</style>

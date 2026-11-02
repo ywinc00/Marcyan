@@ -1,0 +1,27 @@
+---
+// Tienda en línea · 04 "Trabajo real" (§4.15-9): sin caso de tienda publicado todavía, se
+// dice tal cual (como la FAQ) y se enseñan webs y apps reales a medida con TarjetasCaso,
+// sin llamarlas tienda. De 2 en 2 (una impar quedaría huérfana). Al pie, la celda
+// "Tu tienda aquí" (W-NEW-08) abre el WhatsApp de la ciudad: la oferta de Cliente Fundador.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+import CeldaTuNegocio from '../../CeldaTuNegocio.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['proyectos']; n: number; items: ProjectItem[]; wa: string; lang?: 'es' | 'en' }
+const { copy, n, items, wa, lang = 'es' } = Astro.props;
+const cards = items.length > 1 && items.length % 2 ? items.slice(0, -1) : items;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ws-gap">
+  <TarjetasCaso items={cards} label={copy.more} lang={lang} as="h3" />
+</div>
+<div class="ws-add">
+  <CeldaTuNegocio href={wa} label={copy.addCell} lang={lang} />
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  .ws-add { margin-top: 36px; display: flex; justify-content: center; }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } .ws-add { margin-top: 28px; } }
+</style>

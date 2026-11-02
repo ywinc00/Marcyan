@@ -1,0 +1,20 @@
+---
+// Tienda en línea · capítulo de contraste (§4.15-5): CapituloDosFrases + RegistroVivo
+// variant="static" "El día de tu tienda" (W-ADV-44 sin bucle: la firma de la página es la
+// lista de pedidos del hero). Cinco filas al 100 %, la central ("Pagado", en el acento)
+// realzada por fondo; el resto de estados en crema (por valor, §2.11).
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import RegistroVivo from '../../RegistroVivo.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['dia']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+---
+<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div class="ws-gap">
+  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="static" lang={lang} />
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

@@ -1,0 +1,28 @@
+---
+// Tienda en línea · 03 "Qué incluye" (§4.15-6): CabeceraNumerada con titular y bajada +
+// Bento2x2 (W-CORE-08 + B-03) con cuatro de `includes.items` reescritos, cada celda con
+// su objeto de producto de ejemplo. Móvil: objeto en la 1 y la 3; la 2 y la 4 en texto
+// (diseño por sustracción, E-18; la página móvil del piloto ya iba larga).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import MiniTienda from './MiniTienda.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['incluye']; tax: ShopCopy['tax']; n: number; city: 'houston' | 'miami'; lang?: 'es' | 'en' }
+const { copy, tax, n, city, lang = 'es' } = Astro.props;
+const [c1, c2, c3, c4] = copy.cells;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ws-gap qi">
+  <Bento2x2 cells={copy.cells} mobileTextOnly={[2, 4]}>
+    <MiniTienda slot="ui-1" kind={c1.ui} tax={tax} city={city} lang={lang} />
+    <MiniTienda slot="ui-2" kind={c2.ui} tax={tax} city={city} lang={lang} />
+    <MiniTienda slot="ui-3" kind={c3.ui} tax={tax} city={city} lang={lang} />
+    <MiniTienda slot="ui-4" kind={c4.ui} tax={tax} city={city} lang={lang} />
+  </Bento2x2>
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  .qi :global(.wt) { max-width: 440px; margin-inline: auto; }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

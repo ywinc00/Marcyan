@@ -4,6 +4,7 @@
 // VERBATIM (19/1.6, set:html) y, si hay `items`, rejilla 2×2 (icono Lucide en
 // cuadro 40 radio 8, título 21/500, texto 15/24). Sin animación. Móvil: apilado.
 import Icon from '../ui/Icon.astro';
+import { protegerNombresHtml } from '../../lib/nombres-clientes';
 
 interface Props {
   titleTone1: string;
@@ -24,7 +25,7 @@ const { titleTone1, titleTone2, paragraphs, items, itemsMobile = true, id, class
     <span class="w-prose__tone" set:html={titleTone1} />{' '}<span set:html={titleTone2} />
   </h2>
   <div class="w-prose__body">
-    {paragraphs.map((html) => <p class="w-prose__p" set:html={html} />)}
+    {paragraphs.map((html) => <p class="w-prose__p" set:html={protegerNombresHtml(html)} />)}
     {items && items.length > 0 && (
       <ul class:list={['w-prose__grid', !itemsMobile && 'w-prose__grid--desk']}>
         {items.map((it) => (

@@ -6,9 +6,12 @@
 // (E-22). Las tablas que ya trae el Markdown se pintan como la comparativa W-CONV-37:
 // tarjeta opaca de radio 12, cabecera 18/500, primera columna en tinta 500, divisores
 // de 1 px, sin rayado de filas. Estilos a contenido dinámico = :global() bajo .article__body.
+// E-24: los nombres de clientes del Markdown se pintan bajo translate="no" (solo el HTML visible).
+import { protegerNombresHtml } from '../../lib/nombres-clientes';
+const body = protegerNombresHtml(await Astro.slots.render('default'));
 ---
 <div class="article">
-  <div class="article__body"><slot /></div>
+  <div class="article__body" set:html={body} />
 </div>
 
 <style>

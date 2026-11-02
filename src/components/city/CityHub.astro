@@ -22,6 +22,7 @@ import { type Lang } from '../../i18n/ui';
 import { hubs, HUB_PRODUCTOS, FILA, HUB_SERVICIOS, DOMINIOS } from '../../i18n/w/hubs';
 import { nap } from '../../i18n/content';
 import './city.css';
+import { protegerNombres } from '../../lib/nombres-clientes';
 
 interface Props { lang: Lang; city: 'houston' | 'miami'; h: any; c: any; projects: any[] }
 const { lang, city, h, c } = Astro.props;
@@ -180,7 +181,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         </ol>
       </div>
       <div class="pf__foot" data-rev>
-        <p>{j.projects.note}</p>
+        <p set:html={protegerNombres(j.projects.note)} />
         <a class="more" href={j.projects.more.href}>{j.projects.more.label} <Icon name="lucide:arrow-right" class="arr" /></a>
       </div>
     </div>

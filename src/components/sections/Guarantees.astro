@@ -1,15 +1,27 @@
 ---
 // Sección "Por qué Marcyan" (Garantías) · detalles permitidos de la portada
-// (design/rediseno-workos.md §4.1, W-CORE-23). Las tarjetas pasan a celdas sin caja
-// separadas por filetes de 1 px (cruce visible en 2×2, §2.5), MISMO texto de content.ts
-// y titular .h2 intacto. Icono Lucide 20 en oro, título 20/500, texto 16/1.6.
-// Sin fondos: la sección conserva data-fx="gold" y StarField pinta detrás.
+// (design/rediseno-workos.md §4.1, W-CORE-23). Celdas sin caja separadas por filetes
+// de 1 px, MISMO texto de content.ts y titular .h2 intacto.
+// E-51: conserva lo vivo de producción dentro del formato de celdas: el mismo orden
+// (la destacada "Listo para IA" primero, a la izquierda, y las otras tres apiladas a
+// la derecha), su barra de escaneo y su punto que late (solo transform/opacity,
+// quietos con reduced-motion), la chapa del destacado y las chapas ES/EN.
+// El destacado es un halo oro tenue sin caja ni fondo opaco.
+// Sin fondos de sección: conserva data-fx="gold" y StarField pinta detrás.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { guarantees: any }
 const { guarantees } = Astro.props;
+
 const items = guarantees.items as any[];
+// La destacada = la garantía "Listo para IA y buscadores" (icono radar), como en producción.
+let featIdx = items.findIndex((i) => (i.icon || '').includes('radar'));
+if (featIdx < 0) featIdx = items.length > 2 ? 2 : 0;
+const featured = items[featIdx];
+const rest = items.filter((_, i) => i !== featIdx);
+// Adorno atado al icono, no al texto: chapas ES / EN en la garantía bilingüe.
+const isLang = (s: any) => (s.icon || '').includes('languages');
 ---
 <section class="section guarantees" id="garantias" data-fx="gold">
   <div class="container">
@@ -19,11 +31,36 @@ const items = guarantees.items as any[];
     </header>
 
     <ul class="gw" role="list">
-      {items.map((s) => (
+      <li class="gw__cell gw__cell--feat">
+        {guarantees.featuredBadge && (
+          <span class="gw__badge"><Icon name="lucide:sparkles" /> {guarantees.featuredBadge}</span>
+        )}
+        <span class="gw__ic"><Icon name={featured.icon} /></span>
+        <h3 class="gw__title">{featured.title}</h3>
+        <p class="gw__desc">{featured.desc}</p>
+
+        <div class="gw-scan" aria-hidden="true">
+          <div class="gw-scan__head"><span class="gw-scan__dot"></span><span>{guarantees.scanLabel}</span></div>
+          <span class="gw-scan__ln" style="width:82%"></span>
+          <span class="gw-scan__ln gw-scan__ln--acc" style="width:46%"></span>
+          <span class="gw-scan__ln" style="width:64%"></span>
+          <span class="gw-scan__ln" style="width:38%"></span>
+          <span class="gw-scan__bar"></span>
+        </div>
+      </li>
+
+      {rest.map((s) => (
         <li class="gw__cell">
           <span class="gw__ic"><Icon name={s.icon} /></span>
           <h3 class="gw__title">{s.title}</h3>
           <p class="gw__desc">{s.desc}</p>
+          {isLang(s) && (
+            <div class="gw__chips" translate="no">
+              <span class="gw__chip gw__chip--on">ES</span>
+              <span class="gw__chip gw__chip--on">EN</span>
+              <span class="gw__chip gw__chip--muted">Houston · Miami</span>
+            </div>
+          )}
         </li>
       ))}
     </ul>
@@ -36,7 +73,7 @@ const items = guarantees.items as any[];
 
   /* ── Celdas W-CORE-23 ──────────────────────────────────── */
   .gw { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
-  .gw__cell { min-width: 0; padding: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .gw__cell { position: relative; min-width: 0; padding: 28px 0; display: flex; flex-direction: column; gap: 10px; }
   .gw__cell:first-child { padding-top: 0; }
   .gw__cell + .gw__cell { border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
   .gw__ic { display: inline-flex; color: var(--accent-gold); margin-bottom: 4px; }
@@ -47,22 +84,88 @@ const items = guarantees.items as any[];
   }
   .gw__desc { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--fg-secondary); max-width: 480px; }
 
-  @media (--md) {
-    .gw { grid-template-columns: 1fr 1fr; }
-    .gw__cell, .gw__cell:first-child { padding: 40px 40px 40px 0; }
-    /* Sin filete encima de la 2.ª celda (fila de arriba). Mismo compuesto que la regla base para ganarle (I1). */
-    .gw__cell + .gw__cell:nth-child(2) { border-top: 0; }
-    .gw__cell:nth-child(2n) { padding: 40px 0 40px 40px; border-left: 1px solid var(--w-line, rgba(200,169,110,.09)); }
-    .gw__cell:nth-child(n + 3) { border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
-    .gw__cell:nth-child(-n + 2) { padding-top: 8px; }
-    .gw__cell:nth-last-child(-n + 2):nth-child(n + 3) { padding-bottom: 8px; }
+  /* ── Destacada: halo oro tenue (sin caja), chapa e icono un punto mayor ── */
+  .gw__cell--feat > * { position: relative; }
+  .gw__cell--feat::before {
+    content: ''; position: absolute; inset: -32px 0 0 -32px; pointer-events: none;
+    /* El halo se apaga antes de tocar los bordes de su capa: sin cantos visibles. */
+    background: radial-gradient(42% 38% at 36% 32%, rgba(var(--accent-gold-rgb), .07), transparent 100%);
   }
+  .gw__badge {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 6px;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--accent-gold); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-pill);
+    padding: 3px 10px;
+  }
+  .gw__badge :global(svg) { width: 12px; height: 12px; }
+  .gw__cell--feat .gw__ic :global(svg) { width: 28px; height: 28px; }
+
+  /* Mini-widget "escaneo IA": renglones + barra que recorre. Solo transform/opacity. */
+  .gw-scan {
+    position: relative; overflow: hidden; margin-top: 14px; max-width: 480px;
+    border: 1px solid var(--w-line, rgba(200,169,110,.09)); border-radius: var(--radius-md);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .gw-scan__head {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--fg-secondary);
+  }
+  .gw-scan__dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
+  .gw-scan__dot::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent-teal);
+    animation: gw-scandot 2.2s ease-out infinite;
+  }
+  .gw-scan__ln { height: 6px; border-radius: 100px; background: var(--bg-elevated); }
+  .gw-scan__ln--acc { background: var(--accent-gold); opacity: .5; }
+  /* La banda (22 px, filete arriba) va pintada al pie de una capa del alto del widget,
+     así el recorrido completo se expresa con translateY en % de la propia capa. */
+  .gw-scan__bar {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, transparent calc(100% - 22px), rgba(var(--accent-gold-rgb), .5) calc(100% - 22px), rgba(var(--accent-gold-rgb), .5) calc(100% - 21px), transparent calc(100% - 21px)),
+      linear-gradient(180deg, transparent calc(100% - 22px), rgba(var(--accent-gold-rgb), .16) calc(100% - 11px), transparent 100%);
+    transform: translateY(-100%); opacity: 0;
+    animation: gw-scanmove 3.6s var(--ease-in-out) infinite;
+  }
+  /* Nombres propios (E-51): no los pisa ninguna otra pieza de la página. */
+  @keyframes gw-scanmove {
+    0% { transform: translateY(-100%); opacity: 0; }
+    12% { opacity: 1; }
+    86% { opacity: 1; }
+    100% { transform: translateY(22px); opacity: 0; }
+  }
+  @keyframes gw-scandot {
+    0% { transform: scale(1); opacity: .7; }
+    70% { transform: scale(2.7); opacity: 0; }
+    100% { transform: scale(2.7); opacity: 0; }
+  }
+
+  /* Chapas ES / EN (garantía bilingüe) */
+  .gw__chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+  .gw__chip { font-family: var(--font-mono); font-size: var(--text-xs); border-radius: var(--radius-pill); padding: 2px 8px; border: 1px solid var(--w-line, rgba(200,169,110,.09)); color: var(--fg-secondary); }
+  .gw__chip--on { color: var(--accent-gold); border-color: var(--accent-gold-line); }
+  .gw__chip--muted { border-color: transparent; padding-inline: 4px; }
+
+  @media (--motion-reduce) {
+    .gw-scan__bar { display: none; }
+    .gw-scan__dot::after { animation: none; opacity: 0; }
+  }
+
+  /* PC: destacada a la izquierda (3 filas) y las otras tres apiladas a la derecha, como en producción. */
   @media (--lg) {
-    .gw__cell, .gw__cell:first-child { padding: 48px 56px 48px 0; }
-    .gw__cell:nth-child(2n) { padding: 48px 0 48px 56px; }
-    .gw__cell:nth-child(-n + 2) { padding-top: 8px; }
-    .gw__cell:nth-last-child(-n + 2):nth-child(n + 3) { padding-bottom: 8px; }
+    .gw { grid-template-columns: 1.02fr .98fr; grid-template-rows: repeat(3, auto); }
+    .gw__cell--feat {
+      grid-column: 1; grid-row: 1 / span 3;
+      padding: 8px 56px 8px 0; border-right: 1px solid var(--w-line, rgba(200,169,110,.09));
+    }
+    .gw__cell--feat::before { inset: -64px 0 -32px -64px; }
+    .gw__cell:not(.gw__cell--feat) { grid-column: 2; padding: 36px 0 36px 56px; }
+    .gw__cell + .gw__cell:nth-child(2) { border-top: 0; padding-top: 8px; }
+    .gw__cell:last-child { padding-bottom: 8px; }
+    .gw__cell--feat .gw__title { font-size: 26px; line-height: 1.2; }
     .gw__title { font-size: 20px; line-height: 1.2; }
     .gw__desc { font-size: 16px; }
+    .gw-scan { margin-top: 24px; }
   }
 </style>

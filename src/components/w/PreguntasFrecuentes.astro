@@ -8,6 +8,7 @@
 // · `verified` por pregunta = sello W-CONV-52 (fecha real de la fuente).
 // Cerrojo 5: sale de v3 (hubs), así que TODO su CSS va aquí y solo lee --w-*.
 import Icon from '../ui/Icon.astro';
+import { protegerNombres } from '../../lib/nombres-clientes';
 import { faqPage } from '../../lib/schema';
 
 interface Item { q: string; a: string; verified?: string }
@@ -43,10 +44,10 @@ const verifiedLabel = lang === 'en' ? 'Verified' : 'Verificado el';
               <span class="w-faq__bar"></span>
               <span class="w-faq__bar w-faq__bar--v"></span>
             </span>
-            <span class="w-faq__qtext">{it.q}</span>
+            <span class="w-faq__qtext" set:html={protegerNombres(it.q)} />
           </summary>
           <div class="w-faq__a">
-            <p>{it.a}</p>
+            <p set:html={protegerNombres(it.a)} />
             {it.verified && (
               <p class="w-faq__seal">
                 <Icon name="lucide:circle-check" />

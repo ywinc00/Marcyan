@@ -14,6 +14,7 @@
 // enlace la de variant="link": los dos estados viven en el mismo <a> porque cambian
 // por punto de corte. Cerrojo 5: sale de v3, TODO su CSS va aquí.
 import Button from '../ui/Button.astro';
+import { protegerNombres } from '../../lib/nombres-clientes';
 import { t, type Lang } from '../../i18n/ui';
 
 interface Warm {
@@ -56,7 +57,7 @@ const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
     <article class="w-close__card w-close__card--big">
       <div class="w-close__body">
         <h2 class:list={['w-close__title', grad && 'w-close__title--grad']} id={titleId} set:html={titleHtml} />
-        <p class="w-close__proof">{proof}</p>
+        <p class="w-close__proof" set:html={protegerNombres(proof)} />
       </div>
       <div class="w-close__acts">
         <a class="w-close__act ctaband__act ctaband__act--form" href="#contacto" data-track="proposal_requested">

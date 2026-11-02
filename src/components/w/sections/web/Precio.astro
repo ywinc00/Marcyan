@@ -32,7 +32,7 @@ const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
 </div>
 <style>
   /* Mismo ancho que la tarjeta de precio (1100) para que los bordes casen. */
-  .ws-w { max-width: 1100px; margin-inline: auto; }
+  .ws-w { max-width: var(--w-rail-max); margin-inline: auto; }
   .ws-gap { margin-top: 72px; }
   .ws-foot {
     margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center;

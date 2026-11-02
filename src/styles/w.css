@@ -16,27 +16,33 @@
 :root[data-ds="v3"] [data-w-tone="gold"] { --w-accent: var(--accent-gold); --w-accent-rgb: var(--accent-gold-rgb); }
 
 /* ── Contenedores ───────────────────────────────────────────────── */
-:root[data-ds="v3"] .w-container { width: min(100% - 32px, var(--w-rail-max)); margin-inline: auto; }
+/* El contenedor de las secciones v3 es el MISMO que el de la barra (.container: 1280 con
+   el margen fluido --container-pad), así el borde del texto cae en la línea del logo a
+   cualquier ancho (E-44; control 2 ronda 2: logo/contenido iban a 122/168). */
+:root[data-ds="v3"] .w-container {
+  box-sizing: border-box; width: 100%; max-width: var(--container-max);
+  padding-inline: var(--container-pad); margin-inline: auto;
+}
 :root[data-ds="v3"] .w-hero { padding-top: var(--w-hero-top); }
 
-/* Raíles: 2 líneas verticales de 1 px a los lados del contenedor de 1200 (G4).
+/* Raíles: 2 líneas verticales de 1 px 48 px POR FUERA del borde del contenido (en WorkOS,
+   raíl en x=120 y texto en x=168). El contenido sigue en la línea del logo de la barra; lo
+   que se mueve es el raíl (la barra es gramática intocable). Donde no caben 48 px por fuera
+   con 16 px de margen (ventanas de menos de 1328 px) no se pintan.
    left/right con --w-rail-x (50 % del main, nunca 100vw: sin la barra de Windows). */
 :root[data-ds="v3"] .w-rails { position: relative; }
-:root[data-ds="v3"] .w-rails::before,
-:root[data-ds="v3"] .w-rails::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
-  background: var(--w-line); pointer-events: none; z-index: 0;
+@media (min-width: 1328px) {
+  :root[data-ds="v3"] .w-rails::before,
+  :root[data-ds="v3"] .w-rails::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
+    background: var(--w-line); pointer-events: none; z-index: 0;
+  }
+  :root[data-ds="v3"] .w-rails::before { left: var(--w-rail-x); }
+  :root[data-ds="v3"] .w-rails::after { right: var(--w-rail-x); }
+  /* Las rejillas de celdas sí van de raíl a raíl: su marco de 1 px ES el raíl y el padding
+     de la celda deja el texto 48 px dentro (W-CORE-08, authkit s05). */
+  :root[data-ds="v3"] .w-rails .w-container :is(.wd-bento, .w-cells) { margin-inline: -48px; max-width: none; }
 }
-:root[data-ds="v3"] .w-rails::before { left: var(--w-rail-x); }
-:root[data-ds="v3"] .w-rails::after { right: var(--w-rail-x); }
-/* El contenido va DENTRO de los raíles, nunca encima de la línea (control 2): en WorkOS el
-   raíl está en x=120 y el texto en x=168 (48 px); en móvil, 16 px. */
-:root[data-ds="v3"] .w-rails .w-container { padding-inline: 16px; }
-@media (--lg) { :root[data-ds="v3"] .w-rails .w-container { padding-inline: 48px; } }
-/* Las rejillas de celdas sí van de raíl a raíl: su marco de 1 px ES el raíl y el padding de
-   la celda deja el texto en la misma línea que el resto (W-CORE-08, authkit s05). */
-:root[data-ds="v3"] .w-rails .w-container :is(.wd-bento, .w-cells) { margin-inline: -16px; max-width: none; }
-@media (--lg) { :root[data-ds="v3"] .w-rails .w-container :is(.wd-bento, .w-cells) { margin-inline: -48px; } }
 /* El objeto a sangre del hero tapa los raíles (§2.5). */
 :root[data-ds="v3"] .w-hero--bleed { position: relative; z-index: 1; }
 

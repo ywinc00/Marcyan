@@ -1,10 +1,11 @@
 ---
 // Ficha de proyecto (W-EVT-15 como bloque, sin capa modal; §3.3).
 // Fondo --w-s1 con halo del accent del proyecto arriba a la derecha al 10 %
-// (solo oro: el teal nunca lleva halo, E-03; se expresa por el punto nítido de la meta).
+// (solo oro: el teal nunca lleva halo, E-03; el punto de la meta va en el acento de la página).
 // Izquierda 512: título 48/1.2 500 (compacta 32), meta "Sitio + SEO · Houston" 16
-// al 70 %, botón secundario + enlace (la acción dominante de la página es otra) y UN
-// solo texto 16/26 (control 2: did y result decían casi lo mismo): el `result` que trae
+// al 70 %, UN solo texto 16/26 y DESPUÉS (el motivo antes que la acción, control 2
+// ronda 2) botón secundario + enlace (la acción dominante de la página es otra).
+// Texto único (control 2: did y result decían casi lo mismo): el `result` que trae
 // la página (proof.items) si lo hay; si no, el `did` del portafolio. Derecha: captura
 // REAL en marco de navegador radio 8 + teléfono solapado, width/height y lazy.
 // MJA rotulado "Florida (Orlando)". Móvil: captura arriba, texto abajo.
@@ -93,11 +94,11 @@ const alt = lang === 'en' ? { pc: 'desktop view', movil: 'mobile view' } : { pc:
   <div class="w-fp__body">
     <H class="w-fp__title" translate="no">{p.name}</H>
     {meta && <p class="w-fp__meta"><span class="w-fp__dot" aria-hidden="true"></span>{meta}</p>}
+    {body && <p class="w-fp__p">{body}</p>}
     <div class="w-fp__actions">
       <Button variant="secondary" size="lg" href={prim.href} data-track={prim.track}>{prim.label}</Button>
       {lnk && <Button variant="link" href={lnk.href} data-track={lnk.track}>{lnk.label}</Button>}
     </div>
-    {body && <p class="w-fp__p">{body}</p>}
   </div>
 </article>
 
@@ -129,9 +130,10 @@ const alt = lang === 'en' ? { pc: 'desktop view', movil: 'mobile view' } : { pc:
     display: flex; align-items: center; gap: 10px; margin: 12px 0 0;
     font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70);
   }
-  .w-fp__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); flex: none; }
-  .w-fp--teal .w-fp__dot { background: var(--accent-teal); }
-  .w-fp__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 24px; }
+  /* El punto va en el acento de la PÁGINA (E-14: un acento por bloque; en Miami, oro, el
+     punto teal de MJA chocaba con los filetes oro de las tarjetas). */
+  .w-fp__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--w-accent, var(--accent-gold)); flex: none; }
+  .w-fp__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 32px; }
   .w-fp__p {
     margin: 24px 0 0; max-width: 512px;
     font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--w-ink-70);

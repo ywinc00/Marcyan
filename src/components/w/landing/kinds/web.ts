@@ -98,6 +98,8 @@ const spec: KindSpec = {
         titleTone2: copyOf(ctx).prosa.tone2,
         paragraphs: ctx.cluster.local.paragraphs,
         items: copyOf(ctx).prosa.items,
+        // Móvil sin la rejilla: repetía la tríada y alargaba la página (control 2, E-18).
+        itemsMobile: false,
       }),
     },
 

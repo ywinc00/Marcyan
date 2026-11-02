@@ -5,7 +5,9 @@
 // Derecha: pantalla 345×450 radio 16 dentro de un marco-bandeja radio 28 (token
 // 22 más cercano: 28 → 22) padding 14, con raíles laterales de cápsulas de 64 px
 // (colores / esquinas / ES-EN) y un chip bajo la demo. Una pantalla por opción
-// por slot `screen-<id>`; cambia con fundido de 200 ms --w-ease-ui.
+// por slot `screen-<id>`; la nueva entra ENCIMA con fundido de 200 ms --w-ease-ui y la
+// saliente queda opaca debajo hasta que la nueva termina (control 2 ronda 2: el fundido
+// cruzado dejaba las dos a medias y agrisadas).
 // Accesible: role="radiogroup", cada opción role="radio" con aria-checked,
 // tabindex itinerante y flechas/Inicio/Fin (patrón APG de radio).
 // Precios solo por props (desde pricing.ts en la página), nunca escritos aquí.
@@ -175,10 +177,11 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
   .wd-esc__screen {
     grid-area: 1 / 1; min-width: 0; border-radius: var(--w-r-obj); overflow: hidden;
     padding: 24px 22px; background: var(--w-p-bg); color: var(--w-p-ink);
+    position: relative; z-index: 0;
     opacity: 0; visibility: hidden;
-    transition: opacity var(--w-dur-hover) var(--w-ease-ui), visibility 0s linear var(--w-dur-hover);
+    transition: opacity 0s linear var(--w-dur-hover), visibility 0s linear var(--w-dur-hover);
   }
-  .wd-esc__screen.is-on { opacity: 1; visibility: visible; transition: opacity var(--w-dur-hover) var(--w-ease-ui), visibility 0s; }
+  .wd-esc__screen.is-on { z-index: 1; opacity: 1; visibility: visible; transition: opacity var(--w-dur-hover) var(--w-ease-ui), visibility 0s; }
   .wd-esc__screen > :global(*) { height: 100%; }
 
   /* Raíles: en móvil, cápsulas en fila bajo la pantalla. */
@@ -245,6 +248,8 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
   }
   @media (--lg) {
     .wd-esc { grid-template-columns: minmax(0, 490px) auto; justify-content: space-between; gap: 64px; }
+    /* Bajo cabecera las opciones arrancan pegadas a la bajada (sin hueco muerto bajo el H2). */
+    .wd-esc--bare { align-items: start; }
   }
   @media (--motion-reduce) {
     .wd-esc__opt::before, .wd-esc__screen, .wd-esc__screen.is-on, .wd-esc__rail { transition: none; }

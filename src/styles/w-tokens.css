@@ -75,7 +75,8 @@
 
   /* ── Espacio y layout ── */
   --w-rail-max: 1200px;
-  --w-rail-x: max(16px, calc(50% - var(--w-rail-max) / 2)); /* 50 % del contenedor (nunca 100vw) */
+  /* Raíl = borde del contenido (el de .container de la barra) menos 48 px; 50 % del main. */
+  --w-rail-x: max(16px, calc(max(0px, 50% - var(--container-max) / 2) + var(--container-pad) - 48px));
   --w-pad-tray: 16px;  --w-gap-tray: 14px;
   --w-section-y: clamp(80px, 4rem + 3vw, 120px);
   --w-chapter-gap: 80px;          /* cabecera de capítulo → rejilla */

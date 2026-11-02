@@ -8,10 +8,14 @@
 // Izquierda (440): los pasos como filas legibles 16/26 con número mono. El paso que
 // corre se marca (caja --w-s3, número en acento, brillo de 0,9 s); los hechos llevan
 // su marca; los pendientes van atenuados.
-// Derecha (600): pantalla radio 20 en marco --w-s2 y fondo claro (slot `screen`,
-// normalmente <WebEjemplo frame="tarjeta">) y, solapado a su izquierda, el registro de
-// la máquina (`log`, mono 13 oro): lo que DEJA cada paso (archivos, conexiones), nunca
-// la lista repetida. Sin `log` no hay registro.
+// Derecha (680): pantalla radio 20 en marco --w-s2 y fondo claro (slot `screen`,
+// normalmente <WebEjemplo frame="tarjeta">) y, asomando por DETRÁS a su izquierda (como
+// el terminal de W-CORE-05), el registro de la máquina (`log`, mono 13 oro): lo que DEJA
+// cada paso (archivos, conexiones), nunca la lista repetida. La pantalla nunca queda
+// tapada (control 2 ronda 2: el registro encima cortaba la web de ejemplo) y el texto del
+// registro acaba antes del borde de la pantalla. Sin `log` no hay registro.
+// Armado (antes de arrancar): el registro ya lleva sus líneas, atenuadas, nunca una caja
+// vacía (WorkOS en t0000).
 // Sin pegajoso (control 2: el panel apenas se quedaba fijo ~270 px y la reserva dejaba
 // una losa negra de ~490 px, E-01): disparo único por entrada en vista (~3 s), cuando la
 // demo está entera (o casi) en pantalla.
@@ -170,9 +174,9 @@ const sr = (en ? 'Example: ' : 'Ejemplo: ') + (log?.length ? log.join(', ') : st
   }
   .wd-demo__step.is-done .wd-demo__mark::after { opacity: 1; }
   .wd-demo__lbl { min-width: 0; overflow-wrap: anywhere; }
-  .wd-demo.is-armed .wd-demo__step { opacity: 0; transform: translateY(6px); }
-  .wd-demo__step { transition: opacity 320ms var(--w-ease-ui), transform 320ms var(--w-ease-ui); }
-  .wd-demo.is-armed .wd-demo__step.is-shown { opacity: 1; transform: none; }
+  .wd-demo.is-armed .wd-demo__step { opacity: .38; }
+  .wd-demo__step { transition: opacity 320ms var(--w-ease-ui); }
+  .wd-demo.is-armed .wd-demo__step.is-shown { opacity: 1; }
 
   /* Leyenda: spinner → check. */
   .wd-demo__cap {
@@ -199,14 +203,23 @@ const sr = (en ? 'Example: ' : 'Ejemplo: ') + (log?.length ? log.join(', ') : st
     .wd-demo__screen-in { min-height: 300px; padding: 18px 16px 22px; }
   }
   @media (--lg) {
-    .wd-demo { grid-template-columns: minmax(0, 440px) minmax(0, 600px); justify-content: space-between; align-items: center; gap: 64px; }
-    /* Como en W-CORE-05: el registro asoma por la izquierda y solo tapa el margen de la pantalla. */
-    .wd-demo__screen { margin-left: 200px; }
+    .wd-demo { grid-template-columns: minmax(0, 440px) minmax(0, 680px); justify-content: space-between; align-items: center; gap: 64px; }
+    /* Bajo cabecera la lista arranca pegada a la bajada (sin hueco muerto bajo el H2). */
+    .wd-demo--bare { align-items: start; }
+    /* Como en W-CORE-05: el registro asoma por DETRÁS de la pantalla, a su izquierda. Su
+       lado derecho (40 px) queda bajo la pantalla y es solo relleno: el texto acaba antes. */
+    .wd-demo__stage { --wd-shift: 40%; }
+    .wd-demo__screen { margin-left: var(--wd-shift); }
     .wd-demo__stage--solo .wd-demo__screen { margin-left: 0; }
     .wd-demo__screen-in { min-height: 400px; }
-    .wd-demo__cap { margin-left: 200px; }
+    .wd-demo__cap { margin-left: 40%; }
     .wd-demo__stage--solo + .wd-demo__cap { margin-left: 0; }
-    .wd-demo__log { position: absolute; left: 0; top: 50%; translate: 0 -50%; margin: 0; width: 292px; }
+    .wd-demo__log {
+      position: absolute; z-index: 0; left: 0; top: 50%; translate: 0 -50%; margin: 0;
+      width: calc(var(--wd-shift) + 40px); padding-right: 52px;
+    }
+    /* Mono 12 en escritorio: cada línea del registro cabe entera en lo que asoma. */
+    .wd-demo__step { font-size: 12px; }
   }
   @media (--motion-reduce) {
     .wd-demo__step, .wd-demo__mark::after, .wd-demo__row, .wd-demo__row::before, .wd-demo__tick { transition: none; }

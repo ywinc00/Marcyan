@@ -28,6 +28,9 @@ interface Props {
   size?: 'hero' | 'card' | 'mini';
   example?: boolean;
   sr?: string;
+  /** Pestaña con la que empieza (índice en `tabs`; p. ej. 2 = "Fuera de horario"). En modo
+   *  estático es la única que se ve. */
+  startAt?: number;
   class?: string;
 }
 const en = Astro.props.lang === 'en';
@@ -87,7 +90,9 @@ const DEFAULT_TABS: Tab[] = en
 const {
   lang = 'es', mode = 'pestanas', tone = 'teal', tabsBar = true, size = 'hero', example = true, class: cls,
 } = Astro.props;
-const all = Astro.props.tabs ?? DEFAULT_TABS;
+const base = Astro.props.tabs ?? DEFAULT_TABS;
+const k = Math.max(0, Math.min(base.length - 1, Astro.props.startAt ?? 0));
+const all = k ? [...base.slice(k), ...base.slice(0, k)] : base;
 const tabs = mode === 'compacto' ? all.slice(0, 2) : all;
 const first = tabs[0];
 const T = en

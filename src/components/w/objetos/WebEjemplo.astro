@@ -22,12 +22,16 @@ interface Props {
   /** Menú de páginas del sitio (p. ej. la opción "A medida" de la escalera): en el
    *  marco móvil sustituye a la fila del idioma; la 1.ª va marcada. */
   pages?: string[];
+  /** Idioma de la web que se enseña, si no es el de la página (p. ej. la celda "Tu web en
+   *  inglés también" de una página en español). La etiqueta "Ejemplo" sigue en `lang`. */
+  site?: 'es' | 'en';
   class?: string;
 }
 const {
   kind = 'plomeria', frame = 'tarjeta', state = 'lista', lang = 'es',
   city = 'Houston', size = 'card', example = true, pages, class: cls,
 } = Astro.props;
+const site = Astro.props.site ?? lang;
 
 const C = {
   plomeria: {
@@ -49,12 +53,14 @@ const C = {
     icons: ['lucide:utensils', 'lucide:shopping-bag', 'lucide:calendar'],
   },
 }[kind];
-const T = C[lang];
-const open = lang === 'en' ? 'Open now' : 'Abierto ahora';
-const until = lang === 'en' ? 'until 6 p.m.' : 'hasta las 6 p. m.';
-const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
+const T = C[site];
+const open = site === 'en' ? 'Open now' : 'Abierto ahora';
+const until = site === 'en' ? 'until 6 p.m.' : 'hasta las 6 p. m.';
+const svcTitle = site === 'en' ? 'Services' : 'Servicios';
+// Selector de idioma de la web: el activo (relleno, <b>) es el idioma que se enseña.
 ---
 <div
+  lang={site !== lang ? site : undefined}
   class:list={['wo-web', `wo-web--${frame}`, `wo-web--${size}`, cls]}
   data-wo-web
   data-wo-state={state}
@@ -74,13 +80,13 @@ const svcTitle = lang === 'en' ? 'Services' : 'Servicios';
       <span class="wo-web__city wo-sk">· {city}</span>
       {frame === 'movil'
         ? example && <Ejemplo lang={lang} on="light" pos="inline" class="wo-web__ex" />
-        : <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>}
+        : <span class="wo-web__lang wo-sk" aria-hidden="true">{site === 'en' ? <><span>ES</span><b>EN</b></> : <><b>ES</b><span>EN</span></>}</span>}
     </header>
     <div class="wo-web__body">
       <div class="wo-web__main">
         {frame === 'movil' && (pages?.length
           ? <p class="wo-web__pages" aria-hidden="true">{pages.map((pg, i) => <span class:list={['wo-sk', i === 0 && 'is-on']}>{pg}</span>)}</p>
-          : <span class="wo-web__lang wo-sk" aria-hidden="true"><b>ES</b><span>EN</span></span>)}
+          : <span class="wo-web__lang wo-sk" aria-hidden="true">{site === 'en' ? <><span>ES</span><b>EN</b></> : <><b>ES</b><span>EN</span></>}</span>)}
         <p class="wo-web__h wo-sk">{T.h}</p>
         <p class="wo-web__sub wo-sk">{T.sub}</p>
         <span class="wo-web__cta wo-sk"><Icon name={T.ctaIcon} />{T.cta}</span>

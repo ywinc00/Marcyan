@@ -6,6 +6,9 @@
 // (control 2: did y result se repetían y el cuerpo a 20 px aplanaba la jerarquía): el
 // `result` que trae la página si lo hay, si no el `did` del portafolio; pie "Ver caso ›".
 // Franja superior en el acento de la PÁGINA para todas (E-14: un acento por bloque).
+// Captura REAL de la web del proyecto (/Galeria/<slug>-pc-900.webp) al pie de la tarjeta,
+// recortada por abajo (control 2 ronda 2: solo texto con mucho aire se leía como
+// plantilla). Móvil: sin captura (diseño por sustracción, E-18).
 // Cerrojo 5: sale de v3, así que TODO su CSS va aquí (solo variables --w-* y del sitio).
 import Button from '../ui/Button.astro';
 import { portfolioProjects as PES } from '../../i18n/portfolio';
@@ -33,6 +36,7 @@ const cards = items.map((it) => {
     name: p.name,
     accent: p.accent === 'teal' ? 'teal' : 'gold',
     text: it.result ?? p.did ?? full?.did ?? p.result,
+    slug: p.slug,
     href: p.slug ? `${portHref}#${p.slug}` : (p.url ?? portHref),
   };
 });
@@ -47,6 +51,16 @@ const cards = items.map((it) => {
         <div class="w-case__foot">
           <Button variant="link" href={c.href}>{linkLabel}</Button>
         </div>
+        {c.slug && (
+          <div class="w-case__shot">
+            <img
+              src={`/Galeria/${c.slug}-pc-900.webp`}
+              sizes="(min-width: 1024px) 480px, 45vw" width="900" height="506"
+              alt={`${c.name}, ${lang === 'en' ? 'desktop view' : 'vista de escritorio'}`}
+              loading="lazy" decoding="async"
+            />
+          </div>
+        )}
       </li>
     ))}
   </ul>
@@ -85,8 +99,17 @@ const cards = items.map((it) => {
   }
   .w-case__foot { margin-top: auto; padding-top: 24px; }
 
+  .w-case__shot { display: none; }
   @media (--md) {
     .w-cases__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
-    .w-case { padding: 48px 48px 56px; min-height: 280px; }
+    .w-case { padding: 48px 48px 0; }
+    .w-case__foot { padding-top: 20px; }
+    /* Captura al pie: sale del borde inferior de la tarjeta, recortada (solo arriba). */
+    .w-case__shot {
+      display: block; margin-top: 32px; height: 172px; overflow: hidden;
+      border: 1px solid var(--w-line); border-bottom: 0; border-radius: var(--w-r-cell, 8px) var(--w-r-cell, 8px) 0 0;
+      background: var(--w-s1);
+    }
+    .w-case__shot img { display: block; width: 100%; height: auto; }
   }
 </style>

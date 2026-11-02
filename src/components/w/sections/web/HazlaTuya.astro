@@ -5,6 +5,8 @@
 // alcance para que la maqueta exprese la opción (como W-CORE-06, cada opción su variante):
 //   Landing   → una página.
 //   Rediseño  → antes y después (la mitad izquierda, la web vieja; la derecha, la nueva).
+//               La vieja es MÁS POBRE, no la misma en gris (control 2 ronda 2): sin botón
+//               de llamar, sin tarjeta de servicios ni horario, sin idiomas.
 //   A medida  → sitio de varias páginas (menú de páginas en la cabecera).
 // Decisión del director (control 2): los tres precios se ven siempre, no solo el de la
 // opción activa (precio legible antes que escondido); queda apuntada para el dueño.
@@ -21,7 +23,7 @@ const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
 const [t0, t1, t2] = web.tiers;
 ---
 <CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.demoLead} />
-<div class="ws-gap">
+<div class="ws-gap ht">
   <Escalera
     label={copy.title.replace(/<[^>]+>/g, '')}
     chip={copy.chip}
@@ -66,11 +68,13 @@ const [t0, t1, t2] = web.tiers;
   }
   .ht-ab__tag--a { left: 20px; }
   .ht-ab__tag--d { right: 20px; }
-  /* La web "antes": la misma maqueta (las líneas casan a los dos lados del corte) apagada,
-     en gris y con esquinas cuadradas de hace años. */
-  .ht-ab :global(.ht-old .wo-web__screen) { filter: grayscale(1) contrast(.8) brightness(.97); background: #e4e2de; }
-  .ht-ab :global(.ht-old .wo-web__cta),
-  .ht-ab :global(.ht-old .wo-web__svc),
-  .ht-ab :global(.ht-old .wo-web__ic),
+  /* La web "antes": la misma cabecera, pero más pobre. Sin botón de llamar, sin tarjeta de
+     servicios ni "Abierto ahora", sin selector de idioma y en gris: la opción cuenta qué
+     mejora el rediseño. La letra es la misma para que las líneas casen en el corte. */
+  .ht-ab :global(.ht-old .wo-web__screen) { filter: grayscale(1) contrast(.85); background: #e4e2de; }
+  .ht-ab :global(.ht-old :is(.wo-web__cta, .wo-web__side, .wo-web__lang)) { visibility: hidden; }
   .ht-ab :global(.ht-old .wo-web__logo) { border-radius: 0; }
+  /* Tres capas, no cuatro (control 2 ronda 2): el teléfono va directo sobre la bandeja, sin
+     el panel claro de la pantalla de la escalera. */
+  .ht :global(.wd-esc__screen) { background: transparent; padding: 0; display: grid; place-items: center; }
 </style>

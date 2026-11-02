@@ -4,7 +4,8 @@
 // al 60 %. Fija: los 4 clientes reales. No hay logos de clientes en el repo:
 // hasta que el dueño los dé, nombres en Space Grotesk 500 18 px con translate="no".
 // En páginas de Miami NO se pinta (los 4 son de Houston y Orlando: insinuaría
-// clientes en Miami). Móvil: 2×2.
+// clientes en Miami). Móvil: fila centrada que salta de línea, cada nombre entero
+// (control 2 ronda 2: en 2×2 el tercero quedaba solo y partido en dos).
 interface Props {
   lang?: 'es' | 'en';
   /** Ciudad de la página: en 'miami' el componente no pinta nada. */
@@ -37,7 +38,7 @@ const CLIENTES = city === 'houston'
   }
   .w-logos__row {
     list-style: none; margin: 0 auto; padding: 0;
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 24px;
     max-width: var(--w-rail-max, 1200px);
   }
   .w-logos__name {
@@ -45,10 +46,10 @@ const CLIENTES = city === 'houston'
     font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 22px;
     letter-spacing: -0.01em; text-align: center; text-wrap: balance;
     color: rgba(var(--star-rgb), 0.5); /* 4,8:1 a 18 px sobre la noche (control 2: al 45 % daba 4,0) */
+    white-space: nowrap;
   }
   @media (--lt-sm) { .w-logos__name { font-size: 16px; } }
   @media (--md) {
-    .w-logos__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px clamp(40px, 5vw, 88px); }
-    .w-logos__name { white-space: nowrap; }
+    .w-logos__row { gap: 16px clamp(40px, 5vw, 88px); }
   }
 </style>

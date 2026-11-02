@@ -59,7 +59,7 @@ const proceso: WebCopy['proceso'] = {
     'textos-es.md · textos-en.md',
     'inicio · servicios · contacto',
     'ficha + Marcy: conectadas',
-    'tunegocio.com: en línea',
+    'tunegocio.example: en línea',
   ],
   done: 'Web publicada',
   working: 'Publicando tu web',
@@ -91,7 +91,7 @@ const bento: WebCopy['bento'] = {
 const prosaItems: WebCopy['prosa']['items'] = [
   { icon: 'lucide:smartphone', title: 'Primero el celular', text: 'Pensada para la pantalla donde te buscan.' },
   { icon: 'lucide:languages', title: 'Dos idiomas', text: 'Español e inglés con el contexto correcto.' },
-  { icon: 'lucide:gauge', title: 'Rápida', text: 'HTML ligero que carga al instante.' },
+  { icon: 'lucide:map-pin', title: 'Tus zonas, claras', text: 'Los barrios y zonas donde trabajas, a la vista en tu web.' },
   { icon: 'lucide:search', title: 'Lista para buscar', text: 'SEO base y datos que la IA entiende.' },
 ];
 

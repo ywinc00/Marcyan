@@ -55,13 +55,13 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, city, cityName, lang =
   /* El abanico se corta en una línea de suelo (como la línea de celda que sigue),
      no en un borde recto sin intención (E-36). */
   .hw__fan { margin-top: 56px; border-bottom: 1px solid var(--w-line-strong); }
-  /* Escritorio: las migas se alinean al borde del contenido (48 px dentro del raíl, como
-     las secciones; control 2), a la altura del chip,
+  /* Escritorio: las migas se alinean al borde del contenido (la línea del logo de la
+     barra, como las secciones; control 2 ronda 2), a la altura del chip,
      en vez de ocupar una línea propia sobre el texto centrado. Así el abanico sube
      ~44 px en la primera pantalla (W-CORE-01 enseña ~435 px del objeto). */
   @media (--lg) {
     .hw__text { position: relative; }
-    .hw__text :global(.w-herotext__crumbs) { position: absolute; top: 4px; left: 48px; margin: 0; }
+    .hw__text :global(.w-herotext__crumbs) { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
   }
   /* Sin la sangría por defecto de la lista: el texto de las migas empieza en el borde
      del contenedor, en la línea del logo de la barra (E-44), y en móvil queda centrado

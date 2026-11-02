@@ -1,0 +1,49 @@
+---
+// Portafolio · tarjeta lateral pegajosa (W-PROOF-07, §4.5-4): en la columna de la ficha del
+// último proyecto, "Una web como esta, desde $X" con el precio del ancla de pricing.ts (lo
+// pasa la página, nunca escrito aquí) y el botón principal intacto a #contacto.
+// Trama de puntos solo en la esquina superior derecha, fundida antes del texto (E-37).
+import Button from '../../../ui/Button.astro';
+
+interface Props {
+  title1: string;
+  title2: string;
+  text: string;
+  cta: { label: string; href: string; track?: string };
+}
+const { title1, title2, text, cta } = Astro.props;
+---
+<aside class="pt">
+  <span class="pt__dots" aria-hidden="true"></span>
+  <p class="pt__title"><span>{title1}</span> <span>{title2}</span></p>
+  <p class="pt__text">{text}</p>
+  <div class="pt__cta">
+    <Button variant="primary" size="md" href={cta.href} data-track={cta.track}>{cta.label}</Button>
+  </div>
+</aside>
+
+<style>
+  .pt {
+    position: relative; overflow: hidden; max-width: 379px;
+    padding: 28px 28px 28px;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-obj, 12px); box-shadow: var(--w-edge);
+  }
+  .pt__dots {
+    position: absolute; top: 0; right: 0; width: 46%; height: 70%; pointer-events: none;
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .22) 1px, transparent 1.3px) 0 0 / 14px 14px;
+    -webkit-mask-image: radial-gradient(100% 100% at 100% 0%, #000 20%, transparent 75%);
+            mask-image: radial-gradient(100% 100% at 100% 0%, #000 20%, transparent 75%);
+  }
+  .pt__title {
+    position: relative; margin: 0; max-width: 15ch;
+    font-family: var(--font-display); font-weight: 500; font-size: 24px; line-height: 1.2;
+    letter-spacing: -0.03em; color: var(--w-ink);
+  }
+  .pt__title span { display: block; }
+  .pt__text {
+    position: relative; margin: 12px 0 0; max-width: 30ch;
+    font-family: var(--font-body); font-size: 14px; line-height: 1.55; color: var(--w-ink-70);
+  }
+  .pt__cta { position: relative; margin-top: 22px; }
+</style>

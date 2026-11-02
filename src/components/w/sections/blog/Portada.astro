@@ -1,0 +1,49 @@
+---
+// Portada ilustrada de una guía (design/rediseno-workos.md §4.7): la "imagen" de
+// W-CONT-02/06/09, hecha con la ilustración propia del tema (BlogIllustration, nunca
+// capturas ni fotos de banco) sobre una placa de noche opaca con amanecer oro desde
+// abajo y franjas de luz en el pie (W-CORE-01). Sin texto encima (E-37). Decorativa.
+// BlogIllustration no se toca: aquí solo se engrosa su trazo para el tamaño grande.
+import BlogIllustration from '../../../BlogIllustration.astro';
+
+interface Props {
+  tags: string[];
+  size?: 'feature' | 'card';
+  class?: string;
+}
+const { tags, size = 'card', class: cls } = Astro.props;
+---
+<div class:list={['bp', `bp--${size}`, cls]} aria-hidden="true">
+  <BlogIllustration tags={tags} class="bp__illo" />
+</div>
+
+<style>
+  .bp {
+    position: relative; isolation: isolate; overflow: hidden; min-width: 0;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(85% 75% at 50% 112%, rgba(var(--accent-gold-rgb), .42) 0%, rgba(var(--accent-gold-rgb), .14) 42%, transparent 74%),
+      radial-gradient(55% 55% at 50% 42%, rgba(var(--accent-gold-rgb), .07), transparent 70%),
+      linear-gradient(180deg, #151513 0%, var(--w-s1) 100%);
+  }
+  /* Franjas de luz en el pie de la placa, fundidas hacia arriba. */
+  .bp::before {
+    content: ''; position: absolute; inset: auto 0 0 0; height: 46%; z-index: -1; pointer-events: none;
+    background: var(--w-stripes);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.7) 70%, rgba(0,0,0,.9));
+            mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.7) 70%, rgba(0,0,0,.9));
+  }
+  /* Trama de puntos tenue en la parte alta, fundida hacia abajo (luz con textura, E-01). */
+  .bp::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 55%; z-index: -1; pointer-events: none;
+    background: var(--w-dots); opacity: .55;
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+            mask-image: linear-gradient(to bottom, #000, transparent);
+  }
+  .bp :global(.bp__illo) { width: 78%; max-width: 520px; }
+  .bp--feature :global(.bp__illo) { width: 84%; max-width: 600px; }
+  /* Trazo de la casa algo más firme a este tamaño (el SVG usa trazo que no escala). */
+  .bp :global(.bp__illo .illo-line) { stroke-width: 2; stroke-opacity: .9; }
+  .bp :global(.bp__illo .illo-thin) { stroke-width: 1.5; }
+  .bp--card :global(.bp__illo .illo-line) { stroke-width: 1.75; }
+</style>

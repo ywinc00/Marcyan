@@ -1,0 +1,83 @@
+---
+// Diagnóstico · 01 "Lo que verás" (design/rediseno-workos.md §4.9-2).
+// Cabecera numerada + un resultado de EJEMPLO dibujado como objeto de sistema
+// (noche opaca, rotulado "Ejemplo"): a la izquierda las 4 áreas reales del motor
+// (web móvil, SEO local, lectura por IA, conversión) con su veredicto en
+// ChipsVeredicto (Bien · Mejorable · Falta) y la señal que falla, con frases del
+// catálogo real; a la derecha la ruta sugerida, como la enseña el resultado de verdad.
+// Sin puntajes ni cifras: es un ejemplo, no un dato. Marca de ejemplo "Tu Negocio"
+// (nunca se traduce). El objeto es ilustración: aria-hidden + resumen sr-only.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import ChipsVeredicto from '../../ChipsVeredicto.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import type { DiagCopy } from '../../../../i18n/w/diagnostico';
+
+interface Props { copy: DiagCopy['resultado']; n: number; lang?: 'es' | 'en'; resultTitle: string }
+const { copy, n, lang = 'es', resultTitle } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="re">
+  <p class="re__sr">{copy.sr}</p>
+  <div class="re__obj" aria-hidden="true">
+    <Ejemplo lang={lang} on="dark" />
+    <div class="re__head">
+      <p class="re__kick">{resultTitle} <b translate="no">{copy.biz}</b></p>
+    </div>
+    <div class="re__body">
+      <div class="re__areas">
+        <p class="re__lbl">{copy.areasLabel}</p>
+        <ul class="re__list">
+          {copy.areas.map((a) => (
+            <li class="re__row">
+              <span class="re__name">{a.name}</span>
+              <ChipsVeredicto items={[{ label: a.verdict, kind: a.kind }]} tone="gold" class="re__chip" />
+              <span class="re__note">{a.note}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="re__ruta">
+        <p class="re__lbl">{copy.rutaLabel}</p>
+        <p class="re__svc">{copy.ruta}<span class="re__chev">›</span></p>
+        <p class="re__rnote">{copy.rutaNote}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .re { margin-top: var(--w-chapter-gap); }
+  .re__sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .re__obj {
+    position: relative; border-radius: var(--w-r-tray); background: var(--w-s1);
+    border: 1px solid var(--w-line); box-shadow: var(--w-edge); overflow: hidden;
+  }
+  .re__head { padding: 22px 32px; border-bottom: 1px solid var(--w-line); }
+  .re__kick { margin: 0; font-family: var(--font-mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--w-ink-60); }
+  .re__kick b { color: var(--w-ink); font-weight: 500; }
+  .re__body { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .re__areas { padding: 28px 32px 20px; }
+  .re__ruta { padding: 28px 32px 32px; border-top: 1px solid var(--w-line); background: var(--w-s2); }
+  .re__lbl { margin: 0 0 14px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: var(--w-tr-micro); text-transform: uppercase; color: var(--w-ink-60); }
+  .re__list { list-style: none; margin: 0; padding: 0; }
+  .re__row {
+    display: grid; grid-template-columns: 150px 140px minmax(0, 1fr); align-items: center; gap: 8px 16px;
+    min-height: 60px; padding: 10px 0; border-top: 1px solid var(--w-line);
+  }
+  .re__name { font-family: var(--font-display); font-weight: 500; font-size: 17px; color: var(--w-ink); }
+  .re__note { font-size: 15px; line-height: 1.45; color: var(--w-ink-70); }
+  .re__svc { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 26px; line-height: 1.15; color: var(--accent-gold); letter-spacing: -0.02em; }
+  .re__chev { margin-left: 8px; }
+  .re__rnote { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--w-ink-70); max-width: 30ch; }
+  @media (min-width: 1024px) {
+    .re__body { grid-template-columns: minmax(0, 1fr) 340px; }
+    .re__ruta { border-top: 0; border-left: 1px solid var(--w-line); display: flex; flex-direction: column; justify-content: center; }
+  }
+  @media (max-width: 767.98px) {
+    .re { margin-top: 48px; }
+    .re__head, .re__areas, .re__ruta { padding-inline: 20px; }
+    .re__head { padding-right: 96px; }
+    .re__row { grid-template-columns: minmax(0, 1fr) auto; }
+    .re__note { grid-column: 1 / -1; font-size: 14px; }
+  }
+</style>

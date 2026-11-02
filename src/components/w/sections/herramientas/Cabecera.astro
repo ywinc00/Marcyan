@@ -1,0 +1,44 @@
+---
+// Cabecera de /es/herramientas y /en/tools (design/rediseno-workos.md §4.10; A-04 + W-CONV-01).
+// Hub de herramientas: cabecera compacta centrada SOLO texto (E-05), sin botones: la
+// calculadora 1 asoma a 80 px dentro de la primera pantalla y es el primer CTA.
+// Reproduce la composición de HeroTexto (centrado en 768, migas a la izquierda en la
+// línea del logo en escritorio, centradas encima en móvil) y su coreografía §2.9
+// (eyebrow + H1 + cola en el paso 1, bajada en el 2). No usa HeroTexto porque este
+// exige botón principal (apuntado como [SISTEMA] en el informe de la tarea).
+// · H1 = la cadena tt.h1 del dato TAL CUAL (§2.14), tamaño hub 52/500.
+// · Cola solo si H1 + cola caben en 2 líneas a 1440 (regla de §2.14).
+import Eyebrow from '../../Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  h1Html: string;
+  tail?: string;
+  lead: string;
+}
+const { eyebrow, h1Html, tail, lead } = Astro.props;
+---
+<section class="w-hero th">
+  <div class="w-container th__wrap">
+    <div class="th__crumbs"><slot name="crumbs" /></div>
+    <div class="th__text">
+      <div class="th__top" data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
+      <h1 class="w-h1 w-h1--hub" data-w-in="1" set:html={h1Html} />
+      {tail && <p class="w-h1__tail w-h1__tail--hub" data-w-in="1">{tail}</p>}
+      <p class="w-lead th__lead" data-w-in="2">{lead}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .th { position: relative; z-index: 1; }
+  .th__wrap { position: relative; }
+  .th__text { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 768px; margin-inline: auto; }
+  .th__crumbs { display: flex; justify-content: center; margin-bottom: 24px; }
+  .th__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  @media (--lg) {
+    .th__crumbs { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
+  }
+  .th__top { margin-bottom: var(--w-gap-eyebrow); }
+  .th__lead { margin: var(--w-gap-h1) auto 0; text-wrap: balance; }
+</style>

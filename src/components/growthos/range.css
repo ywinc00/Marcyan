@@ -1,9 +1,31 @@
-/* Sliders de calculadora (Growth OS) — thumb oro sobre riel fino, DS v2. */
-.gos-range { appearance: none; -webkit-appearance: none; width: 100%; height: 4px; border-radius: var(--radius-pill);
-             background: var(--bg-elevated); outline: none; }
-.gos-range::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-  background: var(--accent-gold); border: 3px solid var(--bg-base);
-  box-shadow: var(--shadow-gold); cursor: pointer; }
-.gos-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%;
-  background: var(--accent-gold); border: 3px solid var(--bg-base); cursor: pointer; }
-.gos-range:focus-visible { box-shadow: 0 0 0 2px var(--accent-teal-line); }
+/* Deslizadores de las calculadoras (Growth OS) con la piel v3 (rediseño WorkOS,
+   W-CONV-03): carril de 6 px con el tramo recorrido en oro (variable --p que pone
+   ToolsHub en el input), tirador de 28 px oro con anillo crema de 3 px y sombra corta.
+   Objetivo táctil: el input mide 28 px de alto (el tirador) dentro de una fila de 44+. */
+.gos-range {
+  appearance: none; -webkit-appearance: none; width: 100%; height: 28px; margin: 0;
+  background: transparent; cursor: pointer; outline: none;
+  --gos-fill: var(--accent-gold);
+  --gos-rest: rgba(var(--star-rgb), .12);
+}
+.gos-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--gos-fill) 0 var(--p, 50%), var(--gos-rest) var(--p, 50%) 100%);
+}
+.gos-range::-moz-range-track {
+  height: 6px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--gos-fill) 0 var(--p, 50%), var(--gos-rest) var(--p, 50%) 100%);
+}
+.gos-range::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none; width: 28px; height: 28px; margin-top: -11px;
+  border-radius: 50%; background: var(--accent-gold); border: 3px solid var(--fg-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .45); cursor: grab;
+}
+.gos-range::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--accent-gold);
+  border: 3px solid var(--fg-primary); box-shadow: 0 2px 6px rgba(0, 0, 0, .45); cursor: grab;
+}
+.gos-range:active::-webkit-slider-thumb { cursor: grabbing; }
+/* Foco de teclado: anillo oro como el resto del sitio (sin teal en página oro, E-14). */
+.gos-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+.gos-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent-gold); outline-offset: 3px; }

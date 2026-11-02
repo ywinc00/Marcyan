@@ -247,3 +247,23 @@
 @media (--lg) {
   :root[data-ds="v3"] .crumbs ol { font-size: var(--w-micro); }
 }
+
+/* Reserva para el botón flotante del chat a 390 (E-18; control global r2, menor 4).
+   El botón (58 px, a 12 px del borde) ocupa la franja x ≥ 320 a 390; aquí los valores
+   alineados a la derecha de cuatro objetos se apartan 32 a 40 px para no quedar debajo al
+   pasar. Solo v3 y solo móvil: el botón, portada y hubs no se tocan. */
+@media (--lt-md) {
+  /* Herramientas: valor de cada deslizador, el deslizador y el desglose */
+  :root[data-ds="v3"] .tc-sl,
+  :root[data-ds="v3"] .tc__bdrow { padding-right: 40px; }
+  /* Tienda: estado de cada pedido en la lista del hero */
+  :root[data-ds="v3"] .wo-orders--hero .wo-orders__row { padding-right: 32px; }
+  /* IA: mensajes del cliente en las ventanas de Marcy */
+  :root[data-ds="v3"] .wo-chat .wo-chat__msg--c { margin-right: 40px; }
+  /* Diagnóstico: puntos por área del resultado de ejemplo y, en el resultado real,
+     puntos por área, servicio recomendado y tarjeta de Marcy */
+  :root[data-ds="v3"] .re__row,
+  :root[data-ds="v3"] .sbars__row,
+  :root[data-ds="v3"] .dgw__rec,
+  :root[data-ds="v3"] .dgw__marcy { padding-right: 40px; }
+}

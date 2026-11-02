@@ -144,13 +144,15 @@ const T = en
   .wo-orders__st { position: relative; flex: none; width: 76px; height: 26px; }
   .wo-orders__prep, .wo-orders__paid {
     position: absolute; inset: 0; display: inline-flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 500; transition: opacity 240ms var(--w-ease-ui);
+    font-size: 13px; font-weight: 500; transition: opacity 120ms var(--w-ease-ui);
   }
-  .wo-orders__prep { border: 1px solid rgba(14,14,13,.18); border-radius: 6px; background: #fff; }
+  .wo-orders__prep { border: 1px solid rgba(14,14,13,.18); border-radius: 6px; background: #fff; transition-delay: 120ms; }
   .wo-orders__paid { gap: 6px; justify-content: flex-end; opacity: 0; }
   .wo-orders__paid i { width: 7px; height: 7px; border-radius: 50%; background: var(--wo-acc); box-shadow: 0 0 0 1px rgba(14,14,13,.25); }
-  .is-paid .wo-orders__prep { opacity: 0; }
-  .is-paid .wo-orders__paid { opacity: 1; }
+  /* Cambio en secuencia (control global r2, menor 2): sale una palabra en 120 ms y
+     entra la otra en los 120 ms siguientes; nunca se leen las dos a la vez. */
+  .is-paid .wo-orders__prep { opacity: 0; transition-delay: 0ms; }
+  .is-paid .wo-orders__paid { opacity: 1; transition-delay: 120ms; }
   .wo-orders__foot {
     margin: 0 -20px; padding: 0 20px; min-height: 64px; display: flex; align-items: center; background: #e6e2db;
     font-size: 12px; color: var(--w-p-ink-2, #4a4743);

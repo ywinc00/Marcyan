@@ -138,7 +138,7 @@ const spec: KindSpec = {
             { title: t.queEs, text: ctx.cluster.service.description, link: { label: t.verQue, href: '#precios' } },
             {
               title: 'Desde cuánto',
-              text: t.desde(desde(PRICE_ANCHORS.webLanding), desde(PRICE_ANCHORS.web)),
+              text: t.desde(desde(PRICE_ANCHORS.webLanding), `desde ${usd(PRICE_ANCHORS.web)}`),
               link: { label: t.verPrecios, href: '/es/precios' },
             },
             { title: 'En cuánto tiempo', text: t.tiempo, link: { label: t.pedir, href: '#contacto' } },

@@ -196,7 +196,7 @@ export const GOS = {
       calcDisclaimer: 'A directional estimate based on your numbers: useful for sizing, not a guaranteed projection.',
       calcCta: 'Review my case', calcMarcy: 'Ask Marcy about it',
       diagCardTitle: 'Complete digital checkup',
-      diagCardSub: 'The full review of your digital presence. Free, with an email report.', diagCardCta: 'Start the checkup',
+      diagCardSub: 'The full review of your digital presence. Free, with an email report.', diagCardCta: 'Take the checkup',
     },
     errors: {
       errNet: "We couldn't finish the analysis. Check your connection and try again.",

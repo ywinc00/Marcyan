@@ -109,7 +109,8 @@ let i = 0;
   :global(html.w-in-all) .rn__row { opacity: 1; transform: none; }
 
   @media (--lt-md) {
-    .rn { text-align: left; align-items: stretch; }
+    /* Un solo eje en móvil (control global r2, menor 1): titular y bajada siguen centrados
+       como la etiqueta, igual que 02 "Cómo trabaja". */
     .rn__h, .rn__sub { margin-inline: 0; }
     .rn__sub { font-size: 1rem; }
     .rn__panel { margin-top: 36px; }

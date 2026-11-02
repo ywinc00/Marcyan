@@ -3,7 +3,9 @@
 // Las dos páginas son finas: montan esto con su idioma. Orden:
 // hero (W-PROOF-05: titular + captura de TRR + ficha pegajosa; tira de nombres reales y
 // "Tu negocio aquí" al pie) → 01 TRR (capítulo de CONTRASTE, sin repetir la captura grande)
-// → 02 MJA "Florida (Orlando)" → 03 JLS → 04 RN (+ tarjeta lateral W-PROOF-07) → franja
+// → 02 MJA "Florida (Orlando)" (+ tarjeta lateral W-PROOF-07: el precio va junto a un SITIO
+// a medida, nunca junto a la web app de RN, que no tiene ancla en pricing.ts) → 03 JLS
+// → 04 RN (figura a ancho completo de raíl a raíl, para romper la repetición) → franja
 // "En pocas palabras" (answer VERBATIM) → FAQ (VERBATIM, todas cerradas) → cierre W-PROOF-14
 // con el ÚNICO degradado + CierreDosTarjetas (trío contractual) → Contact (#contacto).
 // Firma: ninguna (página de prueba). Contratos: CollectionPageLd idéntico (mismos items),
@@ -43,7 +45,6 @@ const works = projects.map((w) => ({ name: w.name, description: w.did, about: w.
 
 const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
-const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
 
 type Proj = (typeof projects)[number];
 const cityOf = (w: Proj) => (w.slug === 'mja' ? 'Florida (Orlando)' : (w.cat.split('·')[1] ?? '').trim());
@@ -71,7 +72,7 @@ const price = '$' + PRICE_ANCHORS.web.toLocaleString('en-US');
       h1Html={p.hero.h1}
       tail={t.tail}
       lead={p.hero.sub}
-      shot={{ slug: first.slug, name: first.name, label: t.heroShot(first.name), alt: `${first.name}, ${en ? 'desktop view' : 'vista de escritorio'}`, domain: DOMINIOS[first.slug] }}
+      shot={{ slug: first.slug, name: first.name, label: t.heroShot(first.name), alt: `${first.name}, ${en ? 'desktop view' : 'vista de escritorio'}` }}
       side={{ logoName: first.name, rows: rowsOf(first), label: t.side.label }}
       wa={wa}
       lang={lang}
@@ -88,8 +89,8 @@ const price = '$' + PRICE_ANCHORS.web.toLocaleString('en-US');
     {rest.map((w, i) => (
       <section class="w-cell pp-case" id={w.slug}>
         <div class="w-container" data-w-reveal>
-          <Caso project={w} n={i + 2} acts={t.acts} side={{ rows: rowsOf(w), label: t.side.label }} figSide={i % 2 ? 'left' : 'right'} lang={lang}>
-            {i === rest.length - 1 && (
+          <Caso project={w} n={i + 2} acts={t.acts} side={{ rows: rowsOf(w), label: t.side.label }} figSide={i % 2 ? 'left' : 'right'} figWide={i === rest.length - 1} lang={lang}>
+            {i === 0 && (
               <TarjetaLateral
                 slot="aside"
                 title1={t.tarjeta.title1}

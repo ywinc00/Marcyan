@@ -8,7 +8,11 @@
 // · `phoneOnly`: el primer caso (TRR) ya enseña su captura de escritorio en el hero; aquí
 //   solo la móvil, a la derecha, sin repetir la grande (§4.5).
 // · Slot `aside`: lo que va encima de la ficha en la columna pegajosa (TarjetaLateral en
-//   el último proyecto, W-PROOF-07). Ficha y tarjeta pegan juntas.
+//   MJA, W-PROOF-07). Ficha y tarjeta pegan juntas.
+// · `figWide`: la figura sale de la columna de 688 y ocupa el ancho de raíl a raíl, debajo
+//   del relato y la ficha (RN): una variación para que los casos 02 a 04 no se calquen.
+// · Barra del navegador SIN dominio en los cuatro casos (solo TRR y MJA lo tienen verificado y
+//   no enlazamos las webs del cliente): se oculta la píldora para que no se lea a vacía.
 // "Ver la web" del cliente NO se enlaza (privacidad del schema).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import RelatoEnActos from '../../RelatoEnActos.astro';
@@ -27,9 +31,11 @@ interface Props {
   caption?: string;
   /** Lado del teléfono en la figura (alterna entre casos para que no se calquen). */
   figSide?: 'left' | 'right';
+  /** Figura a ancho completo, fuera de la columna del relato. */
+  figWide?: boolean;
   lang?: 'es' | 'en';
 }
-const { project: p, n, acts, side, phoneOnly = false, phoneAlt = 'vista móvil', caption, figSide = 'right', lang = 'es' } = Astro.props;
+const { project: p, n, acts, side, phoneOnly = false, phoneAlt = 'vista móvil', caption, figSide = 'right', figWide = false, lang = 'es' } = Astro.props;
 const MOVIL_520_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
 const hasAside = Astro.slots.has('aside');
 // Etiquetas reales de portfolio.ts como frase: mayúscula solo en la primera (salvo siglas, "SEO").
@@ -50,7 +56,7 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
         { title: acts.result, html: p.result, id: `${p.slug}-result` },
       ]}
     />
-    {!phoneOnly && (
+    {!phoneOnly && !figWide && (
       <div class="pc__fig">
         <FiguraProyecto project={p} lang={lang} side={figSide} />
       </div>
@@ -81,6 +87,12 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
       </div>
     )}
   </div>
+
+  {figWide && (
+    <div class="pc__fig pc__fig--wide">
+      <FiguraProyecto project={p} lang={lang} side={figSide} />
+    </div>
+  )}
 </div>
 
 <style>
@@ -100,8 +112,15 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
   .pc__phone-screen img { display: block; width: 100%; height: auto; }
   .pc__cap {
     margin: 16px -48px 0; text-align: center;
-    font-family: var(--font-mono); font-size: 13px; line-height: 1.5; color: var(--w-ink-60);
+    font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--w-ink-60);
   }
+  /* Pies de figura en letra de texto (E-40: la mono es para rótulos). */
+  .pc__fig :global(.w-fig__cap) { font-family: var(--font-body); font-size: 14px; }
+  /* Sin dominio en ninguna barra: queda la barra con sus tres puntos. */
+  .pc__fig :global(.w-fig__url) { visibility: hidden; }
+  .pc__fig--wide { margin-top: 16px; }
+  .pc__fig--wide :global(.w-fig) { max-width: none; }
+  .pc__fig--wide :global(.w-fig__phone) { max-width: 200px; }
 
   /* Móvil (E-18, por sustracción): la caja del nombre repite el H2 de la cabecera; queda la tabla. */
   @media (--lt-lg) { .pc__side :global(.w-side__logo) { display: none; } }
@@ -116,6 +135,7 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
     }
     .pc--phone { align-items: center; }
     .pc__fig { margin-top: 64px; }
+    .pc__fig--wide { grid-column: 1 / -1; margin-top: 24px; }
     /* La columna se estira con la rejilla: la ficha pega durante el relato y la figura. */
     .pc__side { align-self: stretch; }
     .pc__stick--aside { position: sticky; top: calc(var(--nav-h, 64px) + 40px); }

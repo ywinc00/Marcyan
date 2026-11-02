@@ -47,7 +47,6 @@ const { h1Html, tail, lead, shot, side, wa, lang = 'es' } = Astro.props;
           <a class="ph__shot" href={`#${shot.slug}`} aria-label={shot.label}>
             <span class="ph__bar" aria-hidden="true">
               <span class="ph__dotsbar"><i></i><i></i><i></i></span>
-              <span class="ph__url" translate="no">{shot.domain ?? ''}</span>
             </span>
             <span class="ph__screen">
               <img
@@ -111,17 +110,14 @@ const { h1Html, tail, lead, shot, side, wa, lang = 'es' } = Astro.props;
   .ph__bar { display: flex; align-items: center; gap: 12px; height: 32px; padding: 0 12px; border-bottom: 1px solid var(--w-line); }
   .ph__dotsbar { display: inline-flex; gap: 6px; flex: none; }
   .ph__dotsbar i { width: 8px; height: 8px; border-radius: 50%; background: var(--w-ink-30); }
-  .ph__url {
-    flex: 1; min-width: 0; max-width: 320px; margin-inline: auto; height: 20px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 999px; background: rgba(var(--star-rgb), .05);
-    font-family: var(--font-mono); font-size: 11px; line-height: 1; color: var(--w-ink-60);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
   .ph__screen { display: block; aspect-ratio: 900 / 506; background: var(--w-s1); }
   .ph__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 
   .ph__side { min-width: 0; }
+  /* Caja del nombre compacta (sin logos en el repo): una cabecera de la tabla, no un hueco
+     de 145 px que se lee a relleno. También alarga el recorrido pegajoso de la ficha. */
+  .ph__side :global(.w-side) { gap: 12px; }
+  .ph__side :global(.w-side__logo) { min-height: 0; padding: 18px 24px; font-size: 22px; }
 
   .ph__logos { text-align: center; }
   .ph__add { margin-top: 28px; display: flex; justify-content: center; }

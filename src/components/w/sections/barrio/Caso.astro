@@ -1,0 +1,28 @@
+---
+// Barrio · 04 "Trabajo real" (§4.20-6): TarjetasCaso con los proyectos más cercanos de
+// proof.items (capturas REALES: aquí sí, es prueba, E-32), de dos en dos. El título es
+// proof.title del dato; la bajada dice con verdad de dónde es el trabajo (FAQ verbatim:
+// "no vamos a inventarte un cliente de <barrio>").
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  items: ProjectItem[];
+  more: string;
+  lang?: 'es' | 'en';
+}
+const { n, label, title, lead, items, more, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
+<div class="wb-gap">
+  <TarjetasCaso items={items} label={more} lang={lang} as="h3" />
+</div>
+<style>
+  .wb-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .wb-gap { margin-top: 40px; } }
+</style>

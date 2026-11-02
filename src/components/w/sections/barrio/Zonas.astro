@@ -1,0 +1,30 @@
+---
+// Barrio · 02 "Zonas que cubrimos" (§4.20-3, capítulo de contraste): MatrizFilas con
+// las zonas del mapa del hub (filas) por los servicios con página (columnas), y la fila
+// del barrio FIJA y encendida (fixedRow: sin bucle, la firma es el chip del hero).
+// Cada casilla enlaza a una página que existe: la del barrio para lo que esa página
+// cubre, y la del servicio en la ciudad para el resto (R5, nada inventado).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import MatrizFilas from '../../MatrizFilas.astro';
+
+interface Cell { label: string; href?: string }
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  rows: { label: string; cells: Cell[] }[];
+  columns: string[];
+  fixedRow: number;
+  tableLabel: string;
+}
+const { n, label, title, lead, rows, columns, fixedRow, tableLabel } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
+<div class="wb-gap">
+  <MatrizFilas rows={rows} columns={columns} fixedRow={fixedRow} label={tableLabel} tone="gold" />
+</div>
+<style>
+  .wb-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .wb-gap { margin-top: 40px; } }
+</style>

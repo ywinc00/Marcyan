@@ -1,0 +1,170 @@
+---
+// Matriz de casillas que se enciende por filas (W-ADV-52 · design/rediseno-workos.md §3.5, §2.10).
+// Panel --w-s1 radio 16 (token 12); llave Lucide gris a la izquierda de cada fila;
+// casillas de 24 px, enlazadas SOLO si la landing existe (href por props); si no,
+// casilla punteada sin enlace. La fila activa se aclara (--w-s3) y sus casillas
+// se rayan en el acento; su llave pasa a tinta. Todo por opacidad de capas ya
+// pintadas (§2.10: solo transform y opacity).
+// · Bucle: la fila activa cambia cada 1 s (200 ms --w-ease-ui), registrado en
+//   loop.ts (pausa fuera de pantalla / pestaña oculta / foco o puntero dentro, botón).
+// · `fixedRow`: fila fija, sin bucle (barrios). Reducir movimiento: 1.ª fila fija.
+// · Móvil: desplazamiento horizontal DENTRO de su caja.
+// Los nombres que se leen (filas, columnas, casillas) van en letra de texto ≥ 13 px (E-40).
+import Icon from '../ui/Icon.astro';
+
+interface CellDef { label: string; href?: string }
+interface RowDef { label: string; cells: CellDef[] }
+interface Props {
+  rows: RowDef[];
+  /** Cabeceras de columna (p. ej. los servicios). */
+  columns?: string[];
+  /** Índice de la fila fija (sin bucle). */
+  fixedRow?: number;
+  /** Etiqueta accesible de la tabla. */
+  label: string;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { rows, columns, fixedRow, label, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const en = lang === 'en';
+const loop = fixedRow === undefined && rows.length > 1;
+const active = fixedRow ?? 0;
+const nCols = Math.max(columns?.length ?? 0, ...rows.map((r) => r.cells.length));
+const inWord = en ? 'in' : 'en';
+const noPage = en ? 'not available yet' : 'todavía sin página';
+---
+<div
+  class:list={['wd-mx', cls]}
+  id={id}
+  data-w-tone={tone}
+  data-wd-mx={loop ? 'loop' : 'fixed'}
+  style={`--wd-cols:${nCols}`}
+>
+  <div class="wd-mx__scroll">
+    <table class="wd-mx__t">
+      <caption class="sr-only">{label}</caption>
+      {columns && (
+        <thead>
+          <tr>
+            <td class="wd-mx__key-h"></td>
+            <td></td>
+            {columns.map((c) => <th scope="col" class="wd-mx__ch">{c}</th>)}
+          </tr>
+        </thead>
+      )}
+      <tbody>
+        {rows.map((r, i) => (
+          <tr class:list={['wd-mx__row', i === active && 'is-on']} data-wd-row>
+            <td class="wd-mx__key" aria-hidden="true">
+              <span class="wd-mx__kbox">
+                <Icon name="lucide:key-round" class="wd-mx__ki wd-mx__ki--off" />
+                <Icon name="lucide:key-round" class="wd-mx__ki wd-mx__ki--on" />
+              </span>
+            </td>
+            <th scope="row" class="wd-mx__rh"><span>{r.label}</span></th>
+            {Array.from({ length: nCols }, (_, j) => {
+              const c = r.cells[j];
+              if (!c) return <td class="wd-mx__td"></td>;
+              return (
+                <td class="wd-mx__td">
+                  {c.href ? (
+                    <a class="wd-mx__cell" href={c.href} aria-label={`${c.label} ${inWord} ${r.label}`} title={`${c.label} · ${r.label}`}>
+                      <span class="wd-mx__fill" aria-hidden="true"></span>
+                    </a>
+                  ) : (
+                    <span class="wd-mx__cell wd-mx__cell--empty" title={`${c.label} · ${r.label}`}>
+                      <span class="sr-only">{`${c.label} ${inWord} ${r.label}: ${noPage}`}</span>
+                    </span>
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .wd-mx {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    position: relative; max-width: 100%;
+    border-radius: var(--w-r-obj); background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-mx__scroll { overflow-x: auto; overscroll-behavior-x: contain; padding: 12px 0 16px; border-radius: inherit; }
+  /* Hueco para el botón de pausa del bucle (44×44, esquina inferior derecha). */
+  .wd-mx[data-wd-mx='loop'] .wd-mx__scroll { padding-bottom: 64px; }
+  .wd-mx__t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: calc(220px + var(--wd-cols) * 64px); }
+  .wd-mx__ch {
+    padding: 8px 8px 12px; text-align: center; vertical-align: bottom;
+    font-family: var(--font-body); font-weight: 500; font-size: 13px; line-height: 1.3; color: var(--w-ink-70);
+    border-bottom: 1px solid var(--w-line);
+  }
+  .wd-mx__row { position: relative; }
+  .wd-mx__row > * { position: relative; height: 56px; border-bottom: 1px solid var(--w-line); }
+  .wd-mx__row:last-child > * { border-bottom: 0; }
+  /* Fondo claro de la fila activa: capa en cada celda que se funde. */
+  .wd-mx__row > *::before {
+    content: ''; position: absolute; inset: 4px 0; background: var(--w-s3);
+    border-block: 1px solid var(--w-line-strong);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui); pointer-events: none; z-index: 0;
+  }
+  .wd-mx__row > :first-child::before { left: 8px; border-left: 1px solid var(--w-line-strong); border-radius: 10px 0 0 10px; }
+  .wd-mx__row > :last-child::before { right: 8px; border-right: 1px solid var(--w-line-strong); border-radius: 0 10px 10px 0; }
+  .wd-mx__row.is-on > *::before { opacity: 1; }
+  .wd-mx__row > * > * { position: relative; z-index: 1; }
+
+  .wd-mx__key, .wd-mx__key-h { width: 56px; padding: 0 0 0 16px; }
+  .wd-mx__kbox { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; }
+  .wd-mx__ki { grid-area: 1 / 1; width: 18px; height: 18px; transition: opacity var(--w-dur-hover) var(--w-ease-ui); }
+  .wd-mx__ki--off { color: var(--w-ink-30); }
+  .wd-mx__ki--on { color: var(--w-ink); opacity: 0; }
+  .wd-mx__row.is-on .wd-mx__ki--on { opacity: 1; }
+  .wd-mx__row.is-on .wd-mx__ki--off { opacity: 0; }
+  .wd-mx__rh {
+    text-align: left; padding: 0 16px 0 4px; white-space: nowrap;
+    font-family: var(--font-body); font-weight: 500; font-size: 15px; color: var(--w-ink-80);
+  }
+  .wd-mx__td { text-align: center; padding: 0 8px; }
+  .wd-mx__cell {
+    position: relative; display: inline-grid; place-items: center; width: 24px; height: 24px; vertical-align: middle;
+    border-radius: 6px; background: rgba(var(--star-rgb), .08); box-shadow: inset 0 0 0 1px var(--w-line-ink);
+  }
+  .wd-mx__cell::after { content: ''; width: 10px; height: 10px; border-radius: 2px; background: rgba(var(--star-rgb), .22); }
+  .wd-mx__cell--empty { background: transparent; box-shadow: none; border: 1px dashed rgba(var(--star-rgb), .22); }
+  .wd-mx__cell--empty::after { display: none; }
+  /* Rayado en acento de la fila activa (capa propia, solo opacidad). */
+  .wd-mx__fill {
+    position: absolute; inset: 0; border-radius: inherit;
+    background: repeating-linear-gradient(180deg, var(--wd-acc) 0 1.5px, transparent 1.5px 4px);
+    box-shadow: inset 0 0 0 1px var(--wd-acc);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-mx__row.is-on .wd-mx__fill { opacity: 1; }
+  a.wd-mx__cell:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+  @media (--hover-fine) { a.wd-mx__cell:hover .wd-mx__fill { opacity: .7; } }
+  @media (--motion-reduce) {
+    .wd-mx__row > *::before, .wd-mx__ki, .wd-mx__fill { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from './loop';
+  const TICK = 1000; // medido en W-ADV-52: la fila activa cambia cada ~1 s
+  document.querySelectorAll<HTMLElement>('[data-wd-mx="loop"]').forEach((el) => {
+    const rows = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-row]'));
+    if (rows.length < 2) return;
+    let i = 0, timer = 0;
+    const paint = () => rows.forEach((r, j) => r.classList.toggle('is-on', j === i));
+    const tick = () => { i = (i + 1) % rows.length; paint(); timer = window.setTimeout(tick, TICK); };
+    registerLoop(el, {
+      start: () => { timer = window.setTimeout(tick, TICK); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); i = 0; paint(); },
+    });
+  });
+</script>

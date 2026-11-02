@@ -1,0 +1,264 @@
+---
+// Escalera de paquetes (W-CORE-06 + B-08 · design/rediseno-workos.md §3.5).
+// Izquierda (490): H2 + bajada + 3 opciones. La activa en caja 486×102 radio 12,
+// padding 14×16, --w-s3 con borde de 1 px; las inactivas sin caja.
+// Derecha: pantalla 345×450 radio 16 dentro de un marco-bandeja radio 28 (token
+// 22 más cercano: 28 → 22) padding 14, con raíles laterales de cápsulas de 64 px
+// (colores / esquinas / ES-EN) y un chip bajo la demo. Una pantalla por opción
+// por slot `screen-<id>`; cambia con fundido de 200 ms --w-ease-ui.
+// Accesible: role="radiogroup", cada opción role="radio" con aria-checked,
+// tabindex itinerante y flechas/Inicio/Fin (patrón APG de radio).
+// Precios solo por props (desde pricing.ts en la página), nunca escritos aquí.
+import Icon from '../ui/Icon.astro';
+
+interface Option {
+  id: string;
+  title: string;
+  text: string;
+  /** Texto de precio ya formateado desde pricing.ts, p. ej. "Desde $400". */
+  price?: string;
+  /** Icono Lucide funcional (16 px), opcional. */
+  icon?: string;
+  /** Raíles de personalización a los lados de la pantalla (por defecto solo la 1.ª). */
+  rails?: boolean;
+}
+interface Props {
+  titleHtml: string;
+  lead: string;
+  options: [Option, Option, Option];
+  /** Chip bajo la demo, p. ej. "Tus colores, tu letra, en español e inglés". */
+  chip?: string;
+  /** Opción activa al cargar (por defecto la 1.ª). */
+  initial?: string;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { titleHtml, lead, options, chip, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const initial = Astro.props.initial ?? options[0].id;
+const uid = `wd-esc-${id ?? options.map((o) => o.id).join('-')}`;
+const screens = await Promise.all(
+  options.map(async (o) => (Astro.slots.has(`screen-${o.id}`) ? await Astro.slots.render(`screen-${o.id}`) : '')),
+);
+const railsOf = (o: Option, i: number) => o.rails ?? i === 0;
+const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
+---
+<div class:list={['wd-esc', cls]} id={id} data-w-tone={tone} data-wd-esc>
+  <div class="wd-esc__copy">
+    <h2 class="wd-esc__h" id={`${uid}-h`} set:html={titleHtml} />
+    <p class="wd-esc__lead">{lead}</p>
+    <div class="wd-esc__opts" role="radiogroup" aria-labelledby={`${uid}-h`}>
+      {options.map((o, i) => {
+        const on = o.id === initial;
+        return (
+          <div
+            class:list={['wd-esc__opt', on && 'is-on']}
+            role="radio"
+            aria-checked={on ? 'true' : 'false'}
+            tabindex={on ? 0 : -1}
+            aria-controls={`${uid}-s-${o.id}`}
+            data-wd-opt={o.id}
+            data-wd-rails={railsOf(o, i) ? '1' : '0'}
+          >
+            <span class="wd-esc__ot">
+              {o.icon && <Icon name={o.icon} class="wd-esc__oi" />}
+              <span class="wd-esc__on">{o.title}</span>
+              {o.price && <span class="wd-esc__op">{o.price}</span>}
+            </span>
+            <span class="wd-esc__ox">{o.text}</span>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <div class="wd-esc__demo">
+    <div class:list={['wd-esc__frame', railsOf(options.find((o) => o.id === initial) ?? options[0], options.findIndex((o) => o.id === initial)) && 'has-rails']} data-wd-frame>
+      <div class="wd-esc__rail wd-esc__rail--l" aria-hidden="true">
+        <span class="wd-esc__cap">
+          {SWATCH.map((c, i) => <i class:list={['wd-esc__sw', i === 0 && 'is-sel']} style={`--c:${c}`}></i>)}
+        </span>
+        <span class="wd-esc__cap">
+          <i class="wd-esc__cor wd-esc__cor--0"></i>
+          <i class="wd-esc__cor wd-esc__cor--1 is-sel"></i>
+          <i class="wd-esc__cor wd-esc__cor--2"></i>
+        </span>
+      </div>
+      <div class="wd-esc__screens">
+        {options.map((o, i) => (
+          <div
+            class:list={['wd-esc__screen', o.id === initial && 'is-on']}
+            id={`${uid}-s-${o.id}`}
+            data-wd-screen={o.id}
+            aria-hidden={o.id === initial ? undefined : 'true'}
+            inert={o.id === initial ? undefined : true}
+            set:html={screens[i]}
+          />
+        ))}
+      </div>
+      <div class="wd-esc__rail wd-esc__rail--r" aria-hidden="true">
+        <span class="wd-esc__cap">
+          <i class="wd-esc__lang is-sel">ES</i>
+          <i class="wd-esc__lang">EN</i>
+        </span>
+        <span class="wd-esc__cap">
+          <i class="wd-esc__aa is-sel">Aa</i>
+          <i class="wd-esc__aa wd-esc__aa--mono">Aa</i>
+        </span>
+      </div>
+    </div>
+    {chip && <p class="wd-esc__chip"><Icon name="lucide:palette" class="wd-esc__ci" />{chip}</p>}
+  </div>
+</div>
+
+<style>
+  .wd-esc {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; align-items: center;
+    max-width: var(--w-rail-max); margin-inline: auto;
+  }
+  .wd-esc__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h2-small); line-height: 1.25; letter-spacing: -0.03em; color: var(--w-ink); text-wrap: balance;
+  }
+  .wd-esc__lead {
+    margin: 16px 0 0; max-width: 30rem;
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
+  }
+  .wd-esc__opts { margin: 32px 0 0; display: grid; gap: 6px; max-width: 486px; }
+  .wd-esc__opt {
+    display: grid; gap: 4px; padding: 14px 16px; min-height: 44px;
+    border-radius: var(--w-r-obj); border: 1px solid transparent; cursor: pointer;
+    background-clip: padding-box; position: relative; isolation: isolate;
+    outline: none;
+  }
+  /* Caja de la activa: capa propia que se funde (solo opacidad). */
+  .wd-esc__opt::before {
+    content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
+    background: var(--w-s3); border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-esc__opt.is-on::before { opacity: 1; }
+  .wd-esc__opt:focus-visible { box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent-gold); }
+  .wd-esc__ot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .wd-esc__oi { width: 16px; height: 16px; color: var(--w-ink-60); flex: none; transition: color var(--w-dur-hover) var(--w-ease-ui); }
+  .wd-esc__opt.is-on .wd-esc__oi { color: var(--wd-acc); }
+  .wd-esc__on { font-family: var(--font-body); font-weight: 500; font-size: 16px; line-height: 1.4; color: var(--w-ink); }
+  .wd-esc__op {
+    margin-left: auto; font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .04em; color: var(--wd-acc);
+  }
+  .wd-esc__ox {
+    font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--w-ink-60);
+    transition: color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-esc__opt.is-on .wd-esc__ox { color: var(--w-ink-80); }
+  @media (--hover-fine) { .wd-esc__opt:not(.is-on):hover .wd-esc__on { color: var(--wd-acc); } }
+
+  /* ── Demo ── */
+  .wd-esc__demo { display: grid; justify-items: center; gap: 20px; min-width: 0; }
+  .wd-esc__frame {
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; width: 100%; max-width: 420px;
+    padding: 14px; border-radius: var(--w-r-tray);
+    background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-esc__screens { display: grid; min-width: 0; }
+  .wd-esc__screen {
+    grid-area: 1 / 1; min-width: 0; border-radius: var(--w-r-obj); overflow: hidden;
+    padding: 24px 22px; background: var(--w-p-bg); color: var(--w-p-ink);
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--w-dur-hover) var(--w-ease-ui), visibility 0s linear var(--w-dur-hover);
+  }
+  .wd-esc__screen.is-on { opacity: 1; visibility: visible; transition: opacity var(--w-dur-hover) var(--w-ease-ui), visibility 0s; }
+  .wd-esc__screen > :global(*) { height: 100%; }
+
+  /* Raíles: en móvil, cápsulas en fila bajo la pantalla. */
+  .wd-esc__rail { display: flex; gap: 8px; justify-content: center; transition: opacity var(--w-dur-hover) var(--w-ease-ui); }
+  .wd-esc__rail--l { order: 2; } /* solo visual y aria-hidden: no altera la lectura */
+  .wd-esc__rail--r { order: 3; }
+  .wd-esc__frame:not(.has-rails) .wd-esc__rail { opacity: 0; }
+  .wd-esc__cap {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 8px 10px; border-radius: 999px;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-esc__cap i { font-style: normal; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; }
+  .wd-esc__cap i.is-sel { background: var(--w-s3); box-shadow: inset 0 0 0 1px var(--w-line-strong); }
+  .wd-esc__sw::after { content: ''; width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
+  .wd-esc__cor::after { content: ''; width: 12px; height: 12px; border: 1.5px solid var(--w-ink-60); border-right: 0; border-bottom: 0; }
+  .wd-esc__cor--0::after { border-top-left-radius: 0; }
+  .wd-esc__cor--1::after { border-top-left-radius: 5px; border-color: var(--w-ink); }
+  .wd-esc__cor--2::after { border-top-left-radius: 12px; }
+  .wd-esc__lang, .wd-esc__aa { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--w-ink-60); }
+  .wd-esc__lang.is-sel, .wd-esc__aa.is-sel { color: var(--w-ink); }
+  .wd-esc__aa { font-family: var(--font-display); font-size: 14px; }
+  .wd-esc__aa--mono { font-family: var(--font-mono); }
+
+  .wd-esc__chip {
+    margin: 0; display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--w-ink-80);
+  }
+  .wd-esc__ci { width: 16px; height: 16px; color: var(--wd-acc); flex: none; }
+
+  @media (--md) {
+    .wd-esc__frame {
+      grid-template-columns: 64px minmax(0, 345px) 64px; max-width: none; width: auto;
+      gap: 14px; align-items: start; background: transparent; border: 0; box-shadow: none; padding: 0;
+    }
+    .wd-esc__screens {
+      padding: 14px; border-radius: var(--w-r-tray);
+      background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    }
+    .wd-esc__screen { min-height: 450px; border-radius: var(--w-r-obj); }
+    .wd-esc__rail { flex-direction: column; gap: 12px; }
+    .wd-esc__rail--l, .wd-esc__rail--r { order: 0; }
+    .wd-esc__cap { flex-direction: column; padding: 10px 8px; border-radius: var(--w-r-tray); }
+  }
+  @media (--lg) {
+    .wd-esc { grid-template-columns: minmax(0, 490px) auto; justify-content: space-between; gap: 64px; }
+  }
+  @media (--motion-reduce) {
+    .wd-esc__opt::before, .wd-esc__screen, .wd-esc__screen.is-on, .wd-esc__rail { transition: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-wd-esc]').forEach((el) => {
+    const opts = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-opt]'));
+    const screens = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-screen]'));
+    const frame = el.querySelector<HTMLElement>('[data-wd-frame]');
+    const select = (i: number, focus = false) => {
+      opts.forEach((o, j) => {
+        const on = i === j;
+        o.classList.toggle('is-on', on);
+        o.setAttribute('aria-checked', on ? 'true' : 'false');
+        o.tabIndex = on ? 0 : -1;
+      });
+      const id = opts[i].dataset.wdOpt;
+      screens.forEach((s) => {
+        const on = s.dataset.wdScreen === id;
+        s.classList.toggle('is-on', on);
+        if (on) { s.removeAttribute('aria-hidden'); s.inert = false; }
+        else { s.setAttribute('aria-hidden', 'true'); s.inert = true; }
+      });
+      frame?.classList.toggle('has-rails', opts[i].dataset.wdRails === '1');
+      if (focus) opts[i].focus();
+    };
+    opts.forEach((o, i) => {
+      o.addEventListener('click', () => select(i));
+      o.addEventListener('keydown', (e) => {
+        const k = e.key;
+        let n = -1;
+        if (k === 'ArrowDown' || k === 'ArrowRight') n = (i + 1) % opts.length;
+        else if (k === 'ArrowUp' || k === 'ArrowLeft') n = (i - 1 + opts.length) % opts.length;
+        else if (k === 'Home') n = 0;
+        else if (k === 'End') n = opts.length - 1;
+        else if (k === ' ' || k === 'Enter') { e.preventDefault(); select(i); return; }
+        if (n >= 0) { e.preventDefault(); select(n, true); }
+      });
+    });
+  });
+</script>

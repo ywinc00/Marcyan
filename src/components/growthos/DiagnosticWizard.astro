@@ -416,6 +416,22 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
     .dgw [data-view="success-cta"] :global(.ctaband__act) { padding: 12px 16px; font-size: 15px; }
   }
 
+  /* E-40 + contraste en el resto del resultado real (revisión 2). El anillo y las barras
+     son componentes compartidos: se les cambia la piel solo aquí, sin tocar la lógica.
+     E-13: la cifra del anillo usa la misma letra que el ejemplo de "Lo que verás"
+     (titular 500, -0.02em), y la barra lleva el mismo carril visible. */
+  .dgw :global(.sring__val strong) { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--w-ink); }
+  .dgw :global(.sring__val span) { font-family: var(--font-body); font-size: 14px; color: var(--w-ink-70); }
+  .dgw :global(.sring__label) { font-family: var(--font-body); font-size: 14px; font-weight: 400; letter-spacing: 0;
+                                text-transform: none; color: var(--w-ink-80); }
+  .dgw :global(.sbars__track) { background: var(--w-line-strong); }
+  .dgw :global(.sbars__val) { font-size: 15px; font-weight: 500; color: var(--w-ink); }
+  .dgw__marcy-lbl { font-size: 15px; }
+  .dgw__flist :global(li) { font-size: 15px; line-height: 1.45; color: var(--w-ink-80); }
+  .dgw__marcy-sub { font-size: 14px; line-height: 1.4; color: var(--w-ink-70); }
+  .dgw__disclaimer { font-size: 14px; line-height: 1.5; color: var(--w-ink-70); }
+  .dgw__claimsub { font-size: 14px; line-height: 1.5; color: var(--w-ink-80); }
+
   @media (max-width: 599px) {
     .dgw__row2 { grid-template-columns: 1fr; }
     .dgw__rgrid { grid-template-columns: 1fr; gap: var(--space-5); }

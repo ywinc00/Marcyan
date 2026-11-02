@@ -47,6 +47,8 @@ export interface DiagCopy {
     checks: string[];
     cta: string;
   };
+  /** Cabecera de la FAQ (rótulo + titular). Las preguntas siguen verbatim en growth-os.ts. */
+  faq: { tag: string; title: string };
 }
 
 export const diagCopy: Record<DiagLang, DiagCopy> = {
@@ -56,7 +58,7 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
     pasosLabel: 'Pasos del diagnóstico',
     resultado: {
       label: 'Lo que verás',
-      title: 'Tu puntaje y cinco áreas, en tu idioma',
+      title: 'Tu puntaje y cinco áreas, de un vistazo',
       lead: 'Al terminar ves tu puntaje de 0 a 100, cómo está cada área, qué señales fallan y por dónde empezar.',
       biz: 'Tu Negocio',
       risk: 'Prioridad: media',
@@ -95,6 +97,7 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
       checks: ['Ves el resultado sin dejar tus datos', 'El reporte por correo, solo si lo pides'],
       cta: 'Empezar el diagnóstico',
     },
+    faq: { tag: 'Preguntas frecuentes', title: 'Lo que conviene saber <em>antes de empezar</em>' },
   },
   en: {
     despues: ['See your results right away', "We'll email them to you if you want"],
@@ -102,7 +105,7 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
     pasosLabel: 'Checkup steps',
     resultado: {
       label: "What you'll see",
-      title: 'Your score and five areas, in your language',
+      title: 'Your score and five areas at a glance',
       lead: "When you finish, you see your score from 0 to 100, how each area is doing, which signals are failing and where to start.",
       biz: 'Tu Negocio',
       risk: 'Priority: medium',
@@ -141,5 +144,6 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
       checks: ['See your result without leaving your details', 'The emailed report, only if you ask for it'],
       cta: 'Start the checkup',
     },
+    faq: { tag: 'Frequently asked questions', title: 'Good to know <em>before you start</em>' },
   },
 };

@@ -101,7 +101,7 @@ const home = lang === 'en' ? '/en' : '/es';
 
     <div class="w-cell">
       <div class="w-container" data-w-reveal>
-        <PreguntasFrecuentes id="faq" titleHtml={t.faqTitle} items={GOS[lang].faq.map((f) => ({ q: f.q, a: f.a }))} lang={lang} />
+        <PreguntasFrecuentes id="faq" tag={w.faq.tag} titleHtml={w.faq.title} items={GOS[lang].faq.map((f) => ({ q: f.q, a: f.a }))} lang={lang} />
         <p class="dg__again"><Button variant="link" href="#diagnostico-form">{w.gratis.cta}</Button></p>
       </div>
     </div>

@@ -1,11 +1,11 @@
 ---
 // SEO para IA · 02 "Lo que dices y lo que entiende la IA" (design/rediseno-workos.md §4.17-4,
-// W-CORE-28). Cabecera numerada solo de etiqueta; debajo, a la izquierda, la tarjeta del
+// W-CORE-28). Cabecera numerada solo de etiqueta; debajo, a la derecha, la tarjeta del
 // mecanismo (radio 50 → token 44, trama de puntos SOLO en la franja del rótulo, sin texto
 // encima que se tenga que leer, E-37): 4 filas "lo que pones en tu web" (frase en claro: es
-// lo que lee tu cliente, objeto de producto) → flecha en el acento de la página → la misma
+// lo que lee tu cliente, objeto de producto) → flecha oro → la misma
 // información como dato estructurado (caja mono en noche: lo que lee la máquina). A la
-// derecha, titular, bajada y enlace a la sección siguiente. Estático (como en WorkOS).
+// izquierda, pegados al rótulo, titular, bajada y enlace a la sección siguiente. Estático.
 // Datos de EJEMPLO ("Tu Plomería"), rotulados.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Ejemplo from '../../Ejemplo.astro';
@@ -58,13 +58,13 @@ const { n, label, cardTitle, colSay, colData, rows, titleHtml, lead, link } = As
 </div>
 
 <style>
-  .de { margin-top: 48px; display: grid; gap: 48px; align-items: center; }
+  /* El titular va pegado al rótulo numerado, en su misma columna, como en el resto de
+     cabeceras de la página (control rev1 m-3): texto a la izquierda bajo el rótulo, tarjeta
+     del mecanismo a la derecha. */
+  .de { margin-top: 12px; display: grid; gap: 48px; align-items: start; }
   @media (--lg) {
-    .de { grid-template-columns: minmax(0, 620fr) minmax(0, 480fr); column-gap: 80px; margin-top: 56px; }
-    /* El texto va primero en el DOM (se lee antes que el ejemplo); en escritorio la tarjeta
-       se pinta a la izquierda, como en W-CORE-28. */
-    .de__text { grid-column: 2; grid-row: 1; }
-    .de__card { grid-column: 1; grid-row: 1; }
+    .de { grid-template-columns: minmax(0, 480fr) minmax(0, 620fr); column-gap: 80px; }
+    .de__card { margin-top: 44px; }
   }
 
   .de__card {
@@ -88,7 +88,7 @@ const { n, label, cardTitle, colSay, colData, rows, titleHtml, lead, link } = As
   .de__top :global(.w-example) { position: relative; }
   .de__title {
     position: relative; margin: 0; font-family: var(--font-display); font-weight: 500;
-    font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; color: var(--w-ink-80);
+    font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; color: var(--w-ink);
   }
 
   .de__grid { display: grid; gap: 12px; }
@@ -103,7 +103,8 @@ const { n, label, cardTitle, colSay, colData, rows, titleHtml, lead, link } = As
     background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
     border-radius: var(--w-r-cell); font: 400 14px/1.35 var(--font-body);
   }
-  .de__arrow { display: grid; place-items: center; color: var(--w-accent); }
+  /* Flecha oro (§4.17-4), en las dos páginas de tono. */
+  .de__arrow { display: grid; place-items: center; color: var(--accent-gold); }
   .de__data {
     display: block; min-height: 48px; box-sizing: border-box; padding: 9px 14px;
     background: var(--w-s1); border: 1px solid var(--w-line-strong); border-radius: var(--w-r-cell);
@@ -121,7 +122,7 @@ const { n, label, cardTitle, colSay, colData, rows, titleHtml, lead, link } = As
   .de__link { margin-top: 20px; }
 
   @media (--lt-md) {
-    .de { margin-top: 32px; gap: 36px; }
+    .de { gap: 36px; }
     .de__card { padding: 0 16px 20px; border-radius: var(--w-r-tray); }
     .de__top { margin-inline: -16px; padding: 22px 16px 18px; }
     .de__title { font-size: 18px; }

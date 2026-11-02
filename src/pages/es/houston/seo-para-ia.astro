@@ -165,6 +165,7 @@ const t = {
     ] as [{ icon: string; text: string }, { icon: string; text: string }, { icon: string; text: string }, { icon: string; text: string }],
     checks: [diag.includes![3], 'Te decimos con honestidad cómo estás'],
   },
+  desde: 'Desde',
   precioNote: { title: '¿Empiezas por el diagnóstico?', text: 'Es gratis y te dice qué te falta antes de pagar nada.' },
   franja: {
     queEs: 'Qué es',
@@ -295,7 +296,7 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
               serviceId="seo-ia"
               name={tier.name}
               desc={tier.description}
-              tiers={[{ label: tier.name, price: tier.displayPrice!, unit: tier.monthly ? 'al mes' : tier.displayUnit }]}
+              tiers={[{ label: t.desde, price: tier.displayPrice!, unit: tier.monthly ? 'al mes' : tier.displayUnit }]}
               includes={tier.includes}
               cta={{ label: tier.ctaLabel!, href: tier.href! }}
               note={i === 0 ? t.precioNote : undefined}
@@ -392,9 +393,17 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
   .sh__crumbs { position: relative; z-index: 2; }
   /* Las migas caen sobre el techo del túnel: van sobre una capa opaca de noche para que la
      rejilla nunca corra detrás de su texto (E-37). El texto sigue en la línea del logo. */
-  .sh__crumbs :global(nav) { display: inline-block; margin-left: -10px; padding: 4px 10px; border-radius: var(--w-r-cell); background: var(--w-s0); }
+  .sh__crumbs :global(nav) {
+    display: inline-block; margin-left: -10px; padding: 4px 10px; border-radius: var(--w-r-cell);
+    background: var(--w-s0);
+    /* Velo de noche que se funde alrededor de la placa: ninguna línea del túnel llega a rozar
+       el texto de las migas (control rev1 m-5). */
+    box-shadow: 0 0 24px 18px var(--w-s0);
+  }
   .sh__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
-  .sh__room { position: relative; margin-top: clamp(112px, 6vw + 40px, 160px); }
+  /* Margen superior algo más corto que en la ronda 1: a 1440×900 la tarjeta del hero entra
+     entera en la primera pantalla (control rev1 m-1). */
+  .sh__room { position: relative; margin-top: clamp(96px, 6vw + 20px, 140px); }
   .sh__room :global(.sh__tunnel) {
     inset: auto; left: calc(50% - 50vw); right: calc(50% - 50vw);
     top: calc(-40% - 86.4px); bottom: calc(-40% - 86.4px);
@@ -403,7 +412,7 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
   .sh__text :global(.w-herotext) { max-width: 680px; }
   .sh__text :global(.w-eyebrow) { font-size: clamp(1.125rem, 0.95rem + 0.45vw, 1.5rem); }
   .sh__text :global(.w-lead) { max-width: 36rem; }
-  .sh__obj { position: relative; z-index: 1; display: flex; justify-content: center; margin-top: 72px; padding-bottom: 96px; }
+  .sh__obj { position: relative; z-index: 1; display: flex; justify-content: center; margin-top: 64px; padding-bottom: 96px; }
   .sh__obj :global(.sh__ans) { width: min(100%, 460px); }
   /* La respuesta se escribe cuando la tarjeta ya terminó de entrar (coreografía §2.9:
      el objeto entra a .5 s en 950 ms; sin este retraso se escribía a opacidad 0). */
@@ -421,9 +430,29 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
   /* El <em> de los titulares del dato (verbatim) sin cursiva sintética (Space Grotesk no
      tiene itálica): en el acento de la página, igual que hace PreguntasFrecuentes. */
   main :global(.w-numhead h2 em) { font-style: normal; color: var(--w-accent); }
+  /* Rótulos largos que parten en móvil: líneas equilibradas, sin palabra huérfana
+     ("LA IA" sola en el 02, control rev1 m-4). */
+  main :global(.w-numhead__label) { text-wrap: balance; }
 
-  /* ── 05 Cómo empezamos ── */
+  /* ── 05 Cómo empezamos ──
+     Las tres piezas ocupan la columna entera: en la rejilla, el margin-inline:auto de la
+     tarjeta la encogía a su contenido y cada una salía de un ancho (control rev1 I-1). */
   .sp { margin-top: 64px; display: grid; gap: 24px; }
+  .sp > :global(*) { width: 100%; }
   .sp :global(.sp__free) { margin-bottom: 40px; }
+  /* Jerarquía del precio (§10.2, como la cifra del piloto): cada paso lleva su cifra grande
+     en el acento. "Gratis" en el diagnóstico; "Desde $500" y "Desde $200 al mes" en las
+     tarjetas, con el ancla "Desde" a la izquierda y la unidad detrás (control rev1 I-2). */
+  .sp :global(.free__title),
+  .sp :global(.tp__price) {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem); line-height: 1; letter-spacing: -0.04em;
+    color: var(--w-accent);
+  }
+  .sp :global(.free__sub) { margin-top: 10px; }
+  .sp :global(.tp__row) { justify-content: flex-start; align-items: baseline; gap: 12px; padding-block: 4px 0; }
+  .sp :global(.tp__row dt) { font-size: 16px; font-weight: 500; color: var(--w-ink-80); }
+  .sp :global(.tp__row dd) { white-space: normal; }
+  .sp :global(.tp__unit) { margin-left: 4px; font-size: 15px; color: var(--w-ink-70); }
   @media (--lt-md) { .sp { margin-top: 40px; gap: 16px; } .sp :global(.sp__free) { margin-bottom: 24px; } }
 </style>

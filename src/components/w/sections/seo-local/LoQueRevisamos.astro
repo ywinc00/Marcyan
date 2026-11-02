@@ -1,0 +1,45 @@
+---
+// SEO local · 01 "Lo que revisamos" (§4.16-2): CabeceraNumerada + Bento2x2 (W-CORE-08/09 + B-03).
+// Celda 1 = el Radar (W-CORE-09 en su sitio de WorkOS: una celda de bento), firma de la
+// página, sin nada encima (el texto de la celda va arriba y el radar debajo, nunca detrás:
+// E-37). Las otras tres celdas, las señales que revisamos, cada una con su objeto:
+// datos iguales (NAP) · ficha (categorías, zonas, horario, fotos, reseñas) · web.
+// Móvil: el radar y los datos con objeto; ficha y web en texto (E-18).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import Radar from '../../objetos/Radar.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import Comprobacion from './Comprobacion.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['revisamos']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, city, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap">
+  <Bento2x2 cells={copy.cells} mobileTextOnly={[3, 4]} class="sl-rev">
+    <div slot="ui-1" class="sl-rev__radar"><Radar lang={lang} size="card" /></div>
+    <Comprobacion slot="ui-2" title={copy.datos.title} rows={copy.datos.rows} lang={lang} />
+    <Comprobacion slot="ui-3" title={copy.ficha.title} rows={copy.ficha.rows} lang={lang} />
+    <div slot="ui-4" class="sl-rev__web"><WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} size="mini" /></div>
+  </Bento2x2>
+</div>
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  /* El radar llega hasta el borde inferior de su celda, como en W-CORE-09 (sin bandeja). */
+  .sl-rev__radar { width: 100%; }
+  :global(.sl-rev .wd-bento__cell:first-child) { padding-bottom: 0; }
+  :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { flex: 1; align-items: end; margin-inline: -48px; }
+  /* La web en el móvil se corta en la línea de la celda (el teléfono "sale" por abajo, como
+     los objetos de W-CORE-08): la fila no crece hasta el alto del teléfono entero. */
+  .sl-rev__web { height: 340px; overflow: hidden; display: flex; justify-content: center; }
+  @media (--md) {
+    :global(.sl-rev .wd-bento__cell:last-child) { padding-bottom: 0; }
+    :global(.sl-rev .wd-bento__cell:last-child .wd-bento__ui) { flex: 1; align-items: end; }
+    :global(.sl-rev .wd-bento__cell:last-child .wd-bento__tray) { padding-bottom: 0; border-bottom: 0; border-radius: var(--w-r-tray) var(--w-r-tray) 0 0; }
+  }
+  @media (--lt-md) {
+    .sl-gap { margin-top: 48px; }
+    :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { margin-inline: -20px; }
+  }
+</style>

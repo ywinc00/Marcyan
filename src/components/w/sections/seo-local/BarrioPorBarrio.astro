@@ -1,0 +1,23 @@
+---
+// SEO local · 03 "Barrio por barrio" (§4.16-4), capítulo de contraste: CabeceraNumerada +
+// MatrizFilas (W-ADV-52) zona × servicio con las zonas reales de la ciudad (las del mapa
+// del hub y las que ya nombra la página). Casilla llena = landing que EXISTE hoy (enlazada);
+// punteada = todavía sin página (sin enlace). Fila fija, la del área entera: la única
+// animación en bucle de la página es el radar de la sección 01 (§2.10, "una firma").
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import MatrizFilas from '../../MatrizFilas.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['barrios']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap">
+  <MatrizFilas rows={copy.rows} columns={copy.columns} fixedRow={0} label={copy.tableLabel} lang={lang} />
+  <p class="sl-note">{copy.note}</p>
+</div>
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  .sl-note { margin: 20px auto 0; max-width: 46rem; text-align: center; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+  @media (--lt-md) { .sl-gap { margin-top: 48px; } }
+</style>

@@ -1,0 +1,85 @@
+---
+// SEO local · mini-UI "revisión" (objeto de PRODUCTO, claro; design/rediseno-workos.md §2.4,
+// §3.6). Lista corta de lo que revisamos con su estado POR VALOR (§2.11): lo que está
+// bien en tinta con check; lo que hay que arreglar, en gris con un aviso, sin un 2.º
+// acento (E-14). Datos de ejemplo rotulados "Ejemplo" (§1.C). Estático.
+// Exclusivo de la tarea 2-seo-local (vive en w/sections/seo-local/).
+import Icon from '../../../ui/Icon.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import type { CheckRow } from '../../../../i18n/w/seo-local';
+
+interface Props {
+  title: string;
+  rows: CheckRow[];
+  lang?: 'es' | 'en';
+  /** Llena el alto de la celda (junto a un objeto más alto). */
+  fill?: boolean;
+  class?: string;
+}
+const { title, rows, lang = 'es', fill = false, class: cls } = Astro.props;
+const fix = lang === 'en' ? 'To fix' : 'Por arreglar';
+---
+<div class:list={['sl-chk', fill && 'sl-chk--fill', cls]}>
+  <div class="sl-chk__card">
+    <Ejemplo lang={lang} on="light" />
+    <p class="sl-chk__lab">{title}</p>
+    <ul class="sl-chk__rows">
+      {rows.map((r) => (
+        <li class:list={['sl-chk__row', r.ok === false && 'is-fix']}>
+          <span class="sl-chk__k">{r.k}</span>
+          <span class="sl-chk__v">{r.v}</span>
+          {r.ok === false ? (
+            <b class="sl-chk__st sl-chk__st--fix"><Icon name="lucide:circle-alert" />{fix}</b>
+          ) : (
+            <b class="sl-chk__st" aria-label="OK"><Icon name="lucide:check" /></b>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .sl-chk { position: relative; width: 100%; font-family: var(--font-body); text-align: left; }
+  .sl-chk__card {
+    position: relative; display: flex; flex-direction: column; gap: 12px; padding: 16px;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: var(--w-r-obj, 12px);
+  }
+  .sl-chk__lab {
+    /* Se lee (qué se revisa): letra de texto, no mono de adorno (E-40). */
+    margin: 0; padding-right: 84px;
+    font: 600 14px/1.35 var(--font-body); color: var(--w-p-ink, #0e0e0d);
+  }
+  .sl-chk__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .sl-chk__row {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
+    min-height: 44px; padding: 8px 10px 8px 14px; border-radius: 8px;
+    background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    font-size: 14px; line-height: 1.3;
+  }
+  .sl-chk__k { color: var(--w-p-ink-2, #4a4743); }
+  .sl-chk__v { font-weight: 500; color: var(--w-p-ink, #0e0e0d); text-align: right; }
+  .sl-chk__st {
+    display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px;
+    background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8);
+  }
+  .sl-chk__st :global(svg) { width: 14px; height: 14px; }
+  /* Lo que hay que arreglar: fila sin blanco (apagada) y aviso en tinta, por valor. */
+  .sl-chk__row.is-fix { background: transparent; border-style: dashed; border-color: rgba(14,14,13,.22); }
+  .sl-chk__row.is-fix .sl-chk__v { color: var(--w-p-ink-2, #4a4743); }
+  .sl-chk__st--fix {
+    display: inline-flex; align-items: center; height: 26px; width: auto; white-space: nowrap; gap: 5px; padding: 0 9px; font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--w-p-ink, #0e0e0d); box-shadow: inset 0 0 0 1px rgba(14,14,13,.35);
+  }
+  .sl-chk__st--fix :global(svg) { width: 13px; height: 13px; }
+  @media (--md) {
+    .sl-chk--fill { height: 100%; }
+    .sl-chk--fill .sl-chk__card { height: 100%; }
+  }
+  @media (--lt-md) {
+    .sl-chk__row { grid-template-columns: minmax(0, 1fr) auto; }
+    .sl-chk__v { grid-column: 1; grid-row: 2; text-align: left; }
+    .sl-chk__st { grid-column: 2; grid-row: 1 / 3; }
+  }
+</style>

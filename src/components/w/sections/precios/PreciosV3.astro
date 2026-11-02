@@ -1,0 +1,249 @@
+---
+// Hub de precios v3 (design/rediseno-workos.md §4.4, ola 3, tarea 3-precios).
+// Lo montan /es/precios y /en/pricing (páginas finas) con su dato de siempre.
+//
+// Contraste: SOLO la tarjeta "Mensual" del hero (TarjetasModelo); el banner
+// "Combina servicios" va en --w-s1. Firma: ninguna (página de decisión, F-06
+// "cuándo NO"). Degradado: ninguno (W-CONV-12 en oro plano).
+// Orden: cabecera + 2 modelos · prosa de transparencia (verbatim) · 01 lo que
+// cuesta (#precios, 7 TarjetaPrecio) · 02 incluido en toda web · 03 después de
+// publicar · combina servicios · tres compromisos · en pocas palabras (answer
+// verbatim) · FAQ (verbatim, cerradas) · ¿dudas? · cierre en dos tarjetas · Contact.
+// Contratos: OfferCatalogLd igual que antes (mismos items, url y nombre); un H1
+// verbatim; BreadcrumbList; FAQPage = texto visible; #precios, #contacto, #faq,
+// #answer-q; pricing_card_clicked = 1 por tarjeta (7); tool_cta_clicked.
+// Ningún precio escrito a mano: todo sale de PRICE_ANCHORS / catalog (i18n/w/precios.ts).
+import Layout from '../../../../layouts/Layout.astro';
+import SiteNav from '../../../layout/SiteNav.astro';
+import SiteFooter from '../../../layout/SiteFooter.astro';
+import Breadcrumb from '../../../ui/Breadcrumb.astro';
+import Contact from '../../../sections/Contact.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
+import OfferCatalogLd from '../../../seo/OfferCatalogLd.astro';
+import WStyles from '../../WStyles.astro';
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import ProsaLocal from '../../ProsaLocal.astro';
+import TarjetaPrecio from '../../TarjetaPrecio.astro';
+import TresGarantias from '../../TresGarantias.astro';
+import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
+import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
+import HeroPrecios from './HeroPrecios.astro';
+import Incluido from './Incluido.astro';
+import Despues from './Despues.astro';
+import Combina from './Combina.astro';
+import Dudas from './Dudas.astro';
+import { content, nap } from '../../../../i18n/content';
+import { clusterNav, clusterNavEn } from '../../../../i18n/clusters';
+import type { OfferItem } from '../../../../lib/schema';
+import type { IconoId } from '../../objects/registry';
+import {
+  preciosCopy, catalogFor, tiersOf, includesOf, fromOf, tierName, MODELO_ICONS, type PreciosLang,
+} from '../../../../i18n/w/precios';
+
+interface Props {
+  lang: PreciosLang;
+  /** preciosPage de pricing.ts / pricing.en.ts (textos congelados, tal cual). */
+  p: any;
+  offerItems: OfferItem[];
+  /** Nombre del OfferCatalog (el de siempre de cada página). */
+  ldName: string;
+  /** path del Layout sin idioma ("precios" / "pricing"). */
+  path: string;
+}
+const { lang, p, offerItems, ldName, path } = Astro.props;
+const c = content[lang];
+const t = preciosCopy[lang];
+const catalog = catalogFor(lang);
+const nav = lang === 'en' ? clusterNavEn : clusterNav;
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+const detail = lang === 'en' ? 'See details' : 'Ver detalle';
+
+const m = t.modelo;
+const cards = [
+  {
+    title: m.proyecto.title, text: m.proyecto.text, icon: MODELO_ICONS[0],
+    itemsLead: m.proyecto.lead, items: m.proyecto.items,
+    cta: { label: m.proyecto.cta, href: '#precios', variant: 'link' as const },
+  },
+  {
+    title: m.mensual.title, text: m.mensual.text, icon: MODELO_ICONS[1],
+    itemsLead: m.mensual.lead, items: m.mensual.items,
+    cta: { label: m.mensual.cta, href: '#contacto', track: 'proposal_requested', variant: 'link' as const },
+  },
+] as const;
+
+const despuesCols = t.despues.cols.map((col) => ({
+  title: tierName(lang, col.id, col.key),
+  lines: col.lines,
+  price: col.price,
+  href: `#precio-${col.id}`,
+  cta: detail,
+}));
+---
+<Layout title={p.meta.title} description={p.meta.description} lang={lang} path={path} ds="v3">
+  <OfferCatalogLd slot="head" items={offerItems} url={p.path} name={ldName} />
+  <WStyles />
+
+  <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en' : '/es'} currentPath={Astro.url.pathname} />
+
+  <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <HeroPrecios eyebrow={t.eyebrow} h1Html={p.hero.h1} lead={t.lead} cards={cards as any}>
+      <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
+    </HeroPrecios>
+
+    {/* Por qué lo publicamos: texto VERBATIM (transparency), titular a dos tonos. */}
+    <section class="w-cell" aria-labelledby="transparencia">
+      <div class="w-container" data-w-reveal>
+        <ProsaLocal
+          id="transparencia"
+          titleTone1={t.prosa.tone1}
+          titleTone2={t.prosa.tone2}
+          paragraphs={p.transparency.paragraphs}
+        />
+      </div>
+    </section>
+
+    {/* 01 · Lo que cuesta: una TarjetaPrecio por producto, niveles del catálogo. */}
+    <section class="w-cell" id="precios" aria-labelledby="precios-title">
+      <div class="w-container">
+        <div data-w-reveal>
+          <CabeceraNumerada n={1} label={t.cuesta.label} titleHtml={p.grid.title} lead={p.grid.intro} id="precios-title" />
+        </div>
+        <div class="pv-cards">
+          {catalog.map((prod) => {
+            const f = fromOf(prod, lang);
+            return (
+            <div data-w-reveal class="pv-card" style={`--pv-k:"${f.k}";--pv-v:"${f.v}"`}>
+              <TarjetaPrecio
+                id={`precio-${prod.id}`}
+                serviceId={prod.id as IconoId}
+                name={prod.name}
+                desc={prod.tagline}
+                tiers={tiersOf(prod, lang)}
+                includes={includesOf(prod)}
+                cta={{ label: prod.ctaLabel, href: prod.href }}
+                tiersLabel={t.cuesta.tiersLabel}
+                includesLabel={t.cuesta.includesLabel}
+                tone={prod.tone}
+              />
+            </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Incluido n={2} label={t.incluido.label} titleHtml={t.incluido.title} lead={t.incluido.lead} items={t.incluido.items} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Despues n={3} label={t.despues.label} titleHtml={t.despues.title} lead={t.despues.lead} cols={despuesCols} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Combina {...t.combina} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <TresGarantias title={t.garantias.title} items={t.garantias.items} />
+      </div>
+    </section>
+
+    {/* En pocas palabras (answer VERBATIM), justo antes de la FAQ (R1). */}
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras q={p.answer.q} a={p.answer.a} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <PreguntasFrecuentes id="faq" tag={p.faq.tag} titleHtml={p.faq.title} items={p.faq.items} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Dudas {...t.dudas} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={p.cta.title}
+          proof={t.cierre.proof}
+          city="houston"
+          tel={tel}
+          wa={wa}
+          lang={lang}
+          warm={{ kind: 'marcy', title: t.cierre.warmTitle, text: t.cierre.warmText, cta: t.cierre.warmCta, ask: t.cierre.ask }}
+        />
+      </div>
+    </section>
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SpaceBackdrop tone="gold" />
+
+  <SiteFooter footer={c.footer} lang={lang} />
+</Layout>
+
+<style>
+  /* El <em> de los titulares de sección (dato verbatim) en el acento y sin cursiva, como el
+     <em> del H1 (w.css solo lo define para .w-h1; ver pendiente [SISTEMA]). */
+  :global(:root[data-ds="v3"] main[data-w] .w-numhead .w-h2 em) { font-style: normal; color: var(--w-accent); }
+  .pv-cards { display: grid; gap: 32px; margin-top: 56px; }
+  @media (--lt-md) { .pv-cards { gap: 24px; margin-top: 40px; } }
+  /* Móvil por sustracción (E-18): la columna "Qué incluye cada nivel" repite los nombres
+     del panel de precios; en móvil queda solo nombre, frase y niveles con su precio
+     (lo mismo que enseñaba la tarjeta de antes). En escritorio se ve entera. */
+  @media (--lt-md) { .pv-cards :global(.tp__inc) { display: none; } .pv-cards :global(.tp__panel) { border-top: 0; } }
+
+  /* Cifra grande "Desde $X" (W-CONV-03, §10.2): el nivel ancla del catálogo (fromOf).
+     TarjetaPrecio no tiene hueco para ella (ver pendiente [SISTEMA]); hasta entonces
+     la pintan dos pseudoelementos del cuerpo con el texto en --pv-k / --pv-v.
+     Móvil y tableta: bajo la cabecera. Escritorio: abajo a la izquierda de "qué incluye",
+     con su divisoria de 1 px encima, como el total de WorkOS. */
+  .pv-card :global(.tp__body::before),
+  .pv-card :global(.tp__body::after) { order: -1; padding-inline: 32px; color: var(--w-ink); }
+  .pv-card :global(.tp__body::before) {
+    content: var(--pv-k); padding-top: 28px;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-70);
+  }
+  .pv-card :global(.tp__body::after) {
+    content: var(--pv-v); padding-top: 4px; padding-bottom: 28px;
+    font-family: var(--font-display); font-weight: 500; font-size: 48px; line-height: 1;
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  @media (--lt-md) {
+    .pv-card :global(.tp__body::before), .pv-card :global(.tp__body::after) { padding-inline: 20px; }
+    .pv-card :global(.tp__body::before) { padding-top: 24px; }
+    .pv-card :global(.tp__body::after) { font-size: 40px; padding-bottom: 24px; }
+  }
+  @media (--lg) {
+    .pv-card :global(.tp__body) { grid-template-rows: minmax(0, 1fr) auto auto; }
+    .pv-card :global(.tp__inc) { grid-column: 1; grid-row: 1; padding-bottom: 32px; }
+    .pv-card :global(.tp__panel) { grid-column: 2; grid-row: 1 / span 3; }
+    .pv-card :global(.tp__body::before) {
+      grid-column: 1; grid-row: 2; margin-inline: 32px; padding: 24px 0 0;
+      border-top: 1px solid var(--w-line);
+    }
+    .pv-card :global(.tp__body::after) { grid-column: 1; grid-row: 3; padding: 4px 32px 32px; }
+  }
+  /* Panel de niveles en la superficie elevada (E-01): se separa del cuerpo de la
+     tarjeta como el panel gris de WorkOS, con divisoria de 1 px. Sin brillos ni degradados. */
+  .pv-card :global(.tp__panel) { background: var(--w-s3); }
+  @media (--lg) { .pv-card :global(.tp__panel) { border-left-color: var(--w-line-strong); } }
+</style>

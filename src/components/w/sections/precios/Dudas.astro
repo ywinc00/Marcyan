@@ -1,0 +1,35 @@
+---
+// Precios · "¿Te quedó alguna duda?" (§4.4-9; W-CONV-12, recorte W-CONV-07-still).
+// Tarjeta 776×328 centrada; el titular va en ORO PLANO (no degradado: esta página
+// no tiene elemento degradado, §4.4). Botón principal a la propuesta + enlace al
+// diagnóstico con tool_cta_clicked (sustituye al GrowthCta de antes).
+import Button from '../../../ui/Button.astro';
+
+interface Props { title: string; text: string; cta: string; link: string; linkHref: string }
+const { title, text, cta, link, linkHref } = Astro.props;
+---
+<div class="pq">
+  <h2 class="pq__h">{title}</h2>
+  <p class="pq__text">{text}</p>
+  <div class="pq__acts">
+    <Button variant="primary" size="lg" href="#contacto" data-track="proposal_requested">{cta}</Button>
+    <Button variant="link" href={linkHref} data-track="tool_cta_clicked">{link}</Button>
+  </div>
+</div>
+
+<style>
+  .pq {
+    max-width: 776px; min-block-size: 328px; margin-inline: auto; box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 56px 80px; background: var(--w-s2);
+    border: 1px solid var(--w-line); border-radius: var(--w-r-tray); box-shadow: var(--w-edge);
+  }
+  .pq__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem); line-height: 1.15; letter-spacing: -0.03em;
+    color: var(--accent-gold);
+  }
+  .pq__text { margin: 16px 0 0; max-width: 34em; font-family: var(--font-body); font-size: 18px; line-height: 1.6; color: var(--w-ink-70); }
+  .pq__acts { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+  @media (--lt-md) { .pq { padding: 36px 24px; min-block-size: 0; } .pq__text { font-size: 16px; } }
+</style>

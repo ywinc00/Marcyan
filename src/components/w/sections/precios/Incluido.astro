@@ -1,0 +1,51 @@
+---
+// Precios · 02 "Incluido en toda web" (§4.4-4; W-CONV-10 "Batteries included").
+// Lista a 2 columnas: azulejo en relieve de 52 px con un glifo Lucide (los 7
+// iconos-objeto son de PRODUCTO y no se reutilizan para rasgos, por eso aquí va
+// un azulejo propio con la misma piel de relieve) + título 18/500 + una línea 15.
+// Solo lo que ya dice pricing.ts del diseño web (a medida, rápida, bilingüe,
+// SEO base, legible por la IA) más la propiedad del sitio (plazo oficial).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Item { icon: string; title: string; text: string }
+interface Props { n: number; label: string; titleHtml: string; lead: string; items: Item[] }
+const { n, label, titleHtml, lead, items } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+<ul class="pi">
+  {items.map((it) => (
+    <li class="pi__item">
+      <span class="pi__tile" aria-hidden="true"><Icon name={it.icon} class="pi__glyph" /></span>
+      <div class="pi__txt">
+        <h3 class="pi__h">{it.title}</h3>
+        <p class="pi__p">{it.text}</p>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .pi {
+    list-style: none; margin: 56px 0 0; padding: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
+  }
+  @media (--md) { .pi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 64px; } }
+  .pi__item { display: flex; align-items: center; gap: 24px; min-width: 0; }
+  /* Relieve propio (G-10): superficie de objeto, filo de luz arriba, borde oro al 9 %. */
+  .pi__tile {
+    flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 12px;
+    background: linear-gradient(180deg, var(--w-s3), var(--w-s1));
+    border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge);
+    color: var(--w-accent, var(--accent-gold));
+  }
+  .pi__tile :global(.pi__glyph) { width: 24px; height: 24px; }
+  .pi__txt { min-width: 0; }
+  .pi__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 18px; line-height: 1.3; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  .pi__p { margin: 4px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink-70); }
+  @media (--lt-md) { .pi { margin-top: 40px; gap: 24px; } .pi__item { gap: 16px; } }
+</style>

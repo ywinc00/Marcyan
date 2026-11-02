@@ -1,0 +1,74 @@
+---
+// Precios · cabecera (design/rediseno-workos.md §4.4; A-04 + W-CONV-01 + W-CONV-02).
+// Cabecera compacta de hub de venta: centrada, solo texto y SIN botones (E-05, como
+// el hub de servicios §4.3: las acciones van dentro de las tarjetas). Eyebrow = la
+// sección ("Precios", §2.14 R3), H1 hub VERBATIM (h1Html = preciosPage.hero.h1 tal
+// cual; el corte en 2 líneas lo da el ancho, sin añadir etiquetas), bajada de una
+// línea, y a 80 px las dos TarjetasModelo asomando en la primera pantalla (la 2.ª,
+// "Mensual", es el único capítulo de contraste de la página).
+// Coreografía única (§2.9): eyebrow + H1 en el paso 1, bajada en el 2 y las
+// tarjetas como objeto (data-w-in="obj", en un envoltorio: TarjetasModelo no se toca).
+import Eyebrow from '../../Eyebrow.astro';
+import TarjetasModelo from '../../TarjetasModelo.astro';
+import type { IconoId } from '../../objects/registry';
+
+interface Card {
+  title: string; text: string; icon: IconoId; items: string[]; itemsLead?: string;
+  cta: { label: string; href: string; track?: string; variant?: 'primary' | 'link' };
+}
+interface Props {
+  eyebrow: string;
+  h1Html: string;
+  lead: string;
+  cards: [Card, Card];
+}
+const { eyebrow, h1Html, lead, cards } = Astro.props;
+---
+<section class="w-hero ph">
+  <div class="w-container ph__wrap">
+    {Astro.slots.has('crumbs') && <div class="ph__crumbs"><slot name="crumbs" /></div>}
+    <div class="ph__text">
+      <div data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
+      <h1 class="w-h1 w-h1--hub ph__h1" data-w-in="1" set:html={h1Html} />
+      <p class="w-lead ph__lead" data-w-in="2">{lead.split(' · ').map((part, i) => <>{i > 0 && <span class="ph__dot" aria-hidden="true"> · </span>}<span class="ph__part">{part}</span></>)}</p>
+    </div>
+    <div class="ph__cards" data-w-in="obj">
+      <TarjetasModelo cards={cards} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .ph__wrap { position: relative; }
+  .ph__crumbs { display: flex; justify-content: center; margin-bottom: 24px; }
+  .ph__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  @media (--lg) {
+    /* Migas a la izquierda, en la línea del logo, a la altura del eyebrow (como HeroTexto). */
+    .ph__crumbs { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
+  }
+  .ph__text {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    max-width: 768px; margin-inline: auto;
+  }
+  .ph__text > div:first-child { margin-bottom: var(--w-gap-eyebrow); }
+  /* H1 en dos líneas ("Precios claros," / "sin letra pequeña") por ancho, sin <br>. */
+  .ph__h1 { max-width: 10.5em; text-wrap: balance; }
+  /* Una sola línea en escritorio (gana a la anchura de .w-lead de w.css con un nivel más). */
+  .ph__text .ph__lead { margin: var(--w-gap-h1) auto 0; max-width: 46em; text-wrap: balance; }
+  /* Cada promesa entera en su línea: el corte cae en el punto medio, nunca dentro. */
+  .ph__part { white-space: nowrap; }
+  .ph__cards { margin-top: 80px; }
+  /* "Ver precios" baja a #precios: flecha ↓ en vez del chevron (W-CONV-01). Button
+     no tiene esa variante (pendiente [SISTEMA]); se cambia el glifo solo aquí. */
+  .ph__cards :global(.tm__card:first-child .btn__chev) { font-size: 0; }
+  .ph__cards :global(.tm__card:first-child .btn__chev::after) { content: "↓"; font-size: 18px; }
+  @media (--hover-fine) {
+    .ph__cards :global(.tm__card:first-child .btn--link:hover .btn__chev) { transform: translateY(3px); }
+  }
+  .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: translateY(3px); }
+  @media (--motion-reduce) {
+    .ph__cards :global(.tm__card:first-child .btn--link:hover .btn__chev),
+    .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: none; }
+  }
+  @media (--lt-md) { .ph__cards { margin-top: 48px; } }
+</style>

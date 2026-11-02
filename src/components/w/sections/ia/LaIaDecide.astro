@@ -1,0 +1,33 @@
+---
+// IA para pymes · 02 "La IA ya decide por tus clientes" (§4.11-4): cabecera numerada con H2
+// a dos tonos; los `local.paragraphs` VERBATIM (contrato de paridad, set:html) en la columna
+// de la derecha, como la bajada de W-NEW-32; debajo, RespuestaAsistente variant="tres-columnas"
+// (ChatGPT te recomienda · Google te resume · Marcy agenda; nombres solo en texto, "Tu
+// Negocio" de EJEMPLO rotulado). No afirma que la IA recomiende a un cliente concreto.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+import type { IaPymesCopy } from '../../../../i18n/w/ia-pymes';
+
+interface Props { copy: IaPymesCopy['decide']; n: number; paragraphs: string[]; lang?: 'es' | 'en' }
+const { copy, n, paragraphs, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ld">
+  <h2 class="w-h2 ld__h" set:html={copy.title} />
+  <div class="ld__p">
+    {paragraphs.map((p) => <p set:html={p} />)}
+  </div>
+</div>
+<div class="ld__obj">
+  <RespuestaAsistente variant="tres-columnas" tone="teal" lang={lang} />
+</div>
+<style>
+  .ld { margin-top: 12px; display: grid; gap: 20px; }
+  @media (--lg) { .ld { grid-template-columns: minmax(0, 520px) minmax(0, 560px); justify-content: space-between; align-items: start; } }
+  .ld__h { max-width: 520px; }
+  .ld__p p { margin: 0 0 16px; font: 400 17px/1.65 var(--font-body); color: var(--w-ink-80); }
+  .ld__p p:last-child { margin-bottom: 0; }
+  .ld__p :global(strong) { color: var(--w-ink); font-weight: 600; }
+  .ld__obj { margin-top: 64px; }
+  @media (--lt-md) { .ld__p p { font-size: 16px; } .ld__obj { margin-top: 40px; } }
+</style>

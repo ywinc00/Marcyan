@@ -1,0 +1,81 @@
+---
+// Hero de IA conversacional por ciudad (design/rediseno-workos.md §4.12, ola 2).
+// A-05 + W-ADV-18 + W-ADV-19: texto centrado (HeroTexto noche, coreografía §2.9) y debajo
+// el avatar 3D REAL de Marcy, QUIETO (entra como objeto y se queda: la única vida del hero
+// son las pestañas, E-52), sobre el MarcoPestanas con ChatMarcy en claro.
+// Avatar: el archivo tal cual (public/assets/bot/marcy-hero.webp, 364×512), sin recorte
+// ni object-fit: su encuadre es un contrato (public/assets/bot/README.md). Solo
+// se escala. El marco tapa los pies (como el portátil de W-ADV-18): composición, no recorte.
+import HeroTexto from '../HeroTexto.astro';
+import MarcoPestanas from '../objetos/MarcoPestanas.astro';
+import ChatMarcy from '../objetos/ChatMarcy.astro';
+
+interface Cta { label: string; href: string; track?: string }
+type Msg = { from: 'c' | 'm'; text: string; time?: string };
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  tabs: { label: string; script: Msg[] }[];
+  sr: string;
+  avatarAlt: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, tabs, sr, avatarAlt, lang = 'es' } = Astro.props;
+---
+<section class="w-hero w-hero--bleed hic">
+  <div class="w-container">
+    <HeroTexto
+      eyebrow={eyebrow}
+      tone="teal"
+      chip={chip}
+      h1Html={h1Html}
+      lead={lead}
+      primary={primary}
+      link={link}
+      size="night"
+    >
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+  </div>
+
+  <div class="w-container hic__stage">
+    <div class="hic__marcy" data-w-in="obj">
+      <picture>
+        <source srcset="/assets/bot/marcy-hero.webp" type="image/webp" />
+        <img src="/assets/bot/marcy-hero.png" width="364" height="512" alt={avatarAlt} decoding="async" fetchpriority="low" />
+      </picture>
+    </div>
+    <div class="hic__frame" data-w-in="obj">
+      <MarcoPestanas tabs={tabs.map((t) => t.label)} lang={lang}>
+        <ChatMarcy mode="pestanas" tabsBar={false} tabs={tabs} lang={lang} sr={sr} />
+      </MarcoPestanas>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hic { overflow-x: clip; padding-bottom: clamp(64px, 3rem + 3vw, 112px); }
+  .hic__stage {
+    position: relative; margin-top: 40px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  /* Luz neutra detrás del avatar (crema muy tenue, sin halo teal: E-03): el cuerpo negro
+     de Marcy no se pierde contra la noche. */
+  .hic__marcy {
+    position: relative; z-index: 0; width: 185px; margin-bottom: -34px;
+  }
+  .hic__marcy::before {
+    content: ''; position: absolute; inset: -20% -70% -10%; z-index: -1; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(var(--star-rgb), .10), rgba(var(--star-rgb), .035) 55%, transparent);
+  }
+  .hic__marcy img { display: block; width: 100%; height: auto; }
+  .hic__frame { position: relative; z-index: 1; width: 100%; max-width: 1080px; }
+  @media (--lt-md) {
+    .hic__stage { margin-top: 32px; }
+    .hic__marcy { width: 128px; margin-bottom: -22px; }
+  }
+</style>

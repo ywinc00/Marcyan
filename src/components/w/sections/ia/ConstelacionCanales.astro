@@ -1,0 +1,90 @@
+---
+// "Dónde trabaja" (W-ADV-21 reducida · design/rediseno-workos.md §4.11-5). Propiedad de 2-ia-pymes.
+// Rejilla de 2 columnas: texto a la izquierda (cabecera numerada + H2 a dos tonos + párrafo);
+// a la derecha, anillos concéntricos de 1 px con los CANALES REALES (web, WhatsApp, Instagram,
+// Messenger, Google) en píldoras, cada uno unido por una línea tenue al avatar real de Marcy
+// (marcy-mini, su encuadre de contrato, sin recorte). Sin logotipos de terceros: nombre en
+// texto + icono Lucide genérico (§1.C). ESTÁTICA: la firma de la página es la esclusa.
+// Móvil: Marcy arriba y los canales en una fila que salta de línea (sin anillos: a 358 px
+// las píldoras se pisarían).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Channel { name: string; icon: string }
+interface Copy { label: string; title: string; text: string; marcy: string; channels: Channel[]; sr: string }
+interface Props { copy: Copy; n: number }
+const { copy, n } = Astro.props;
+// Lienzo 600 × 360; centro de los anillos en (300, 330). Posición de cada canal: [r, ángulo].
+const W = 600, H = 360, CX = 300, CY = 330;
+const RINGS = [100, 175, 255];
+const SLOTS: [number, number][] = [[175, 118], [255, 150], [255, 30], [175, 62], [262, 90]];
+const pos = copy.channels.slice(0, 5).map((c, i) => {
+  const [r, a] = SLOTS[i];
+  const x = CX + r * Math.cos((a * Math.PI) / 180);
+  const y = CY - r * Math.sin((a * Math.PI) / 180);
+  return { ...c, x, y, l: (x / W) * 100, t: (y / H) * 100 };
+});
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="cc">
+  <div class="cc__text">
+    <h2 class="w-h2 cc__h" set:html={copy.title} />
+    <p class="cc__p">{copy.text}</p>
+  </div>
+
+  <figure class="cc__fig">
+    <figcaption class="sr-only">{copy.sr}</figcaption>
+    <div class="cc__map" aria-hidden="true">
+      <svg class="cc__svg" viewBox={`0 0 ${W} ${H}`} focusable="false">
+        {RINGS.map((r) => <path class="cc__ring" d={`M${CX - r} ${CY} A${r} ${r} 0 0 1 ${CX + r} ${CY}`} />)}
+        {pos.map((p) => <line class="cc__link" x1={p.x} y1={p.y} x2={CX} y2={CY - 70} />)}
+        <line class="cc__base" x1="0" y1={CY} x2={W} y2={CY} />
+      </svg>
+      {pos.map((p) => (
+        <span class="cc__chip" style={`left:${p.l}%;top:${p.t}%`}><Icon name={p.icon} class="cc__i" />{p.name}</span>
+      ))}
+      <span class="cc__marcy">
+        <img src="/assets/bot/marcy-mini.webp" width="256" height="256" alt="" loading="lazy" decoding="async" />
+      </span>
+    </div>
+    <div class="cc__list" aria-hidden="true">
+      <img class="cc__mav" src="/assets/bot/marcy-mini.webp" width="256" height="256" alt="" loading="lazy" decoding="async" />
+      <ul role="list">{copy.channels.map((c) => <li class="cc__chip cc__chip--flow"><Icon name={c.icon} class="cc__i" />{c.name}</li>)}</ul>
+    </div>
+  </figure>
+</div>
+
+<style>
+  .cc { margin-top: 12px; display: grid; gap: 40px; align-items: center; }
+  @media (--lg) { .cc { grid-template-columns: minmax(0, 440px) minmax(0, 640px); justify-content: space-between; } }
+  .cc__h { max-width: 440px; }
+  .cc__p { margin: 16px 0 0; max-width: 416px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-80); }
+  @media (--lt-md) { .cc__p { font-size: 1rem; } }
+  .cc__fig { margin: 0; }
+  .cc__map { display: none; position: relative; aspect-ratio: 600 / 360; }
+  .cc__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .cc__ring { fill: none; stroke: var(--w-line-strong); stroke-width: 1; }
+  .cc__base { stroke: var(--w-line-strong); stroke-width: 1; }
+  .cc__link { stroke: rgba(var(--w-accent-rgb), .28); stroke-width: 1; }
+  .cc__chip {
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--w-s2); border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge);
+    font: 500 14px/1 var(--font-body); color: var(--w-ink);
+  }
+  .cc__map .cc__chip { position: absolute; transform: translate(-50%, -50%); }
+  .cc__chip :global(.cc__i) { width: 16px; height: 16px; color: var(--w-accent); flex: none; }
+  .cc__marcy {
+    /* El busto (marcy-mini, entero) se apoya en la línea base de los anillos (y = 330). */
+    position: absolute; left: 50%; bottom: calc(30 / 360 * 100%); transform: translateX(-50%);
+    width: 120px;
+  }
+  .cc__marcy img, .cc__mav { display: block; width: 100%; height: auto; }
+  .cc__list { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .cc__mav { width: 96px; }
+  .cc__list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  @media (--md) {
+    .cc__map { display: block; }
+    .cc__list { display: none; }
+  }
+</style>

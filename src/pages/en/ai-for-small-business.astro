@@ -1,6 +1,8 @@
 ---
-// EN wrapper · /en/ai-for-small-business — Bloque D (bilingüe total). Contenido en clusters.en.ts.
-import ClusterLanding from '../../components/ClusterLanding.astro';
+// EN · /en/ai-for-small-business · AI for your business. Contenido en clusters.en.ts.
+// Plantilla v3 (rediseño WorkOS, tipo `ia-pymes`): WLanding + kinds/ia-pymes.ts (activación por página, ver registry.ts).
+import WLanding from '../../components/w/landing/WLanding.astro';
+import spec from '../../components/w/landing/kinds/ia-pymes';
 import { clustersEn } from '../../i18n/clusters.en';
 ---
-<ClusterLanding cluster={clustersEn['ai-for-small-business']} lang="en" />
+<WLanding cluster={clustersEn['ai-for-small-business']} lang="en" spec={spec} />

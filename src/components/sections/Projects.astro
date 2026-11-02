@@ -11,6 +11,7 @@ import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import FiguraProyecto from '../w/FiguraProyecto.astro';
 import { t, type Lang } from '../../i18n/ui';
+import { proyectosMenos } from '../../i18n/w/portada';
 
 interface Props { projects: any; lang?: Lang }
 const { projects, lang = 'es' } = Astro.props;
@@ -38,7 +39,7 @@ const extra = items.length > 2;
     </div>
     {extra && (
       <button class="pjw__more" type="button" data-pjw-more aria-expanded="false">
-        <span>{projects.more ?? uipr.projects.more}</span>
+        <span data-pjw-label data-less={proyectosMenos[lang === 'en' ? 'en' : 'es']}>{projects.more ?? uipr.projects.more}</span>
         <Icon name="lucide:chevron-down" class="pjw__more-ic" />
       </button>
     )}
@@ -85,9 +86,12 @@ const extra = items.length > 2;
 <script>
   document.querySelectorAll<HTMLElement>('[data-pjw]').forEach((root) => {
     const more = root.parentElement?.querySelector<HTMLButtonElement>('[data-pjw-more]');
+    const label = more?.querySelector<HTMLElement>('[data-pjw-label]');
+    const txt = { more: label?.textContent ?? '', less: label?.dataset.less ?? '' };
     more?.addEventListener('click', () => {
       const exp = root.classList.toggle('is-expanded');
       more.setAttribute('aria-expanded', exp ? 'true' : 'false');
+      if (label) label.textContent = exp ? txt.less : txt.more;
     });
   });
 </script>

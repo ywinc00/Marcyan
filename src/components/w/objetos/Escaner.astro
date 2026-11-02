@@ -26,8 +26,9 @@ const en = lang === 'en';
 const SIGNALS = en
   ? ['Mobile version', 'Clear title', 'Secure connection', 'Photo descriptions', 'Visible phone', 'City mentioned', 'Business data', 'A page per service', 'Google description', 'Data for AI', 'Direct answers', 'Text without JavaScript', 'Tap to call', 'Visible WhatsApp', 'Contact form', 'Contact button in view', 'Google reviews', 'Live website']
   : ['Versión móvil', 'Título claro', 'Conexión segura', 'Fotos con descripción', 'Teléfono visible', 'Ciudad mencionada', 'Datos del negocio', 'Páginas por servicio', 'Descripción en Google', 'Datos para IA', 'Respuestas directas', 'Texto sin JavaScript', 'Llamar con un toque', 'WhatsApp visible', 'Formulario de contacto', 'Botón de contacto a la vista', 'Reseñas en Google', 'Sitio activo'];
-const nRows = variant === 'compacto' ? 5 : 7;
-const perRow = 6;
+// Compacto (portada y hubs): 4×4 chips para no pasar del presupuesto de peso de §2.13 paso 6.
+const nRows = variant === 'compacto' ? 4 : 7;
+const perRow = variant === 'compacto' ? 4 : 6;
 // Filas desplazadas (como un muro de ladrillo) con las señales repartidas en orden.
 const rows = Array.from({ length: nRows }, (_, r) =>
   Array.from({ length: perRow }, (_, k) => SIGNALS[(r * 5 + k * 3) % SIGNALS.length]));
@@ -85,14 +86,14 @@ const sr = en
 
 <style>
   .wo-scan {
-    --gold: var(--accent-gold-rgb, 200, 169, 110);
+    --gold: var(--accent-gold-rgb);
     --bw: 250px; --bh: 172px; --travel: calc(var(--bh) - 36px);
     position: relative; overflow: hidden; isolation: isolate;
     width: 100%; min-height: 480px; padding: 64px;
     border-radius: 48px;
-    background: var(--w-s1, #121211);
-    border: 1px solid var(--w-line, rgba(200,169,110,.09));
-    box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08));
+    background: var(--w-s1);
+    border: 1px solid var(--w-line);
+    box-shadow: var(--w-edge);
     display: grid; place-items: center;
     font-family: var(--font-body);
   }
@@ -108,22 +109,22 @@ const sr = en
   .wo-scan__row { display: flex; gap: 12px; justify-content: center; margin-left: var(--off); white-space: nowrap; }
   .wo-scan__chip {
     flex: none; display: inline-flex; align-items: center; height: 49px; padding: 0 22px;
-    border-radius: 12px; border: 1px solid rgba(var(--star-rgb, 240, 237, 232), .10);
-    background: var(--w-s1, #121211);
-    font-size: 16px; color: rgba(var(--star-rgb, 240, 237, 232), .50);
+    border-radius: 12px; border: 1px solid rgba(var(--star-rgb), .10);
+    background: var(--w-s1);
+    font-size: 16px; color: rgba(var(--star-rgb), .50);
   }
   .wo-scan__box {
     position: relative; z-index: 1; width: var(--bw); height: var(--bh); overflow: hidden;
     border-radius: 12px; border: 1px solid rgba(var(--gold), .85);
     background: #2d291f; /* oro al 15 % sobre la bandeja, opaco */
-    box-shadow: 0 0 0 6px var(--w-s1, #121211), 0 0 28px rgba(var(--gold), .18);
+    box-shadow: 0 0 0 6px var(--w-s1), 0 0 28px rgba(var(--gold), .18);
   }
   .wo-scan__box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .wo-scan__box svg * { fill: none; stroke: rgba(var(--gold), .75); stroke-width: 1.4; }
   .wo-scan__box svg circle { fill: rgba(var(--gold), .75); stroke: none; }
   .wo-scan__bar {
     position: absolute; left: 50%; bottom: 14px; width: 132px; height: 10px; margin-left: -66px;
-    border-radius: 5px; background: var(--accent-gold, #c8a96e);
+    border-radius: 5px; background: var(--accent-gold);
     box-shadow: 0 0 14px rgba(var(--gold), .45);
     transform: translateY(calc(var(--travel) / -2)); /* quieto: a media altura */
   }
@@ -132,9 +133,9 @@ const sr = en
     background: linear-gradient(180deg, rgba(var(--gold), .22), transparent);
     border-radius: 0 0 6px 6px;
   }
-  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 1.8s var(--w-ease-ui, ease) infinite; animation-play-state: paused; }
+  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 1.8s var(--w-ease-ui) infinite; animation-play-state: paused; }
   .wo-scan.is-run.is-playing .wo-scan__bar { animation-play-state: running; }
-  .wo-scan.is-once .wo-scan__bar { animation: wo-scan-once 1.8s var(--w-ease-ui, ease) 1 both; }
+  .wo-scan.is-once .wo-scan__bar { animation: wo-scan-once 1.8s var(--w-ease-ui) 1 both; }
   @keyframes wo-scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(var(--travel) * -1)); } }
   @keyframes wo-scan-once {
     0% { transform: translateY(0); }
@@ -145,6 +146,8 @@ const sr = en
   .wo-scan--compacto .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
   .wo-scan--compacto .wo-scan__wall, .wo-scan--compacto .wo-scan__row { gap: 10px; }
   .wo-scan--compacto .wo-scan__bar { width: 96px; margin-left: -48px; bottom: 10px; }
+  /* E-18: el mosaico compacto empieza debajo de la franja de "Ejemplo" (pisaba la fila de arriba). */
+  .wo-scan--compacto .wo-scan__wall { top: 44px; }
   @media (max-width: 767.98px) {
     .wo-scan { min-height: 360px; padding: 24px; border-radius: 22px; --bw: 200px; --bh: 138px; }
     .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }

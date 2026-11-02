@@ -54,13 +54,13 @@ const href = lang === 'en' ? '/en/checkup' : '/es/diagnostico';
   .gost__meta { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); }
   /* Mini escáner (W-ADV-45): el enlace es solo envoltorio; el objeto pone su propia tarjeta. */
   .gost__demo { display: block; text-decoration: none; color: inherit; border-radius: 22px; }
-  .gost__demo :global(.gost__scan) { min-height: 300px; transition: border-color var(--w-dur-hover, 200ms) var(--w-ease-ui, ease); }
+  .gost__demo :global(.gost__scan) { transition: border-color var(--w-dur-hover) var(--w-ease-ui); }
   /* Móvil: mismo alto que la tarjeta anterior (±40 px), el hub mide sus marcas data-atmo debajo. */
   @media (max-width: 767.98px) {
     /* Caja central más pequeña para que se lean más señales alrededor a este alto. */
     .gost__demo :global(.gost__scan) { min-height: 236px; --bw: 152px; --bh: 106px; }
     .gost__demo :global(.gost__scan .wo-scan__bar) { width: 88px; margin-left: -44px; bottom: 9px; }
   }
-  @media (--hover-fine) { .gost__demo:hover :global(.gost__scan) { border-color: var(--w-line-strong, rgba(200,169,110,.18)); } }
+  @media (--hover-fine) { .gost__demo:hover :global(.gost__scan) { border-color: var(--w-line-strong); } }
   @media (max-width: 1023px) { .gost__inner { grid-template-columns: 1fr; gap: var(--space-6); } }
 </style>

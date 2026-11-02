@@ -26,7 +26,8 @@ const full = list.find((p) => p.name === project.name) ?? PES.find((p) => p.name
 const slug = project.slug ?? full?.slug;
 // Alto nativo de cada captura móvil de 520 px (public/Galeria/*-movil-520.webp).
 const MOVIL_520_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
-// Solo dominios VERIFICADOS en el repo (lib/diagnostic-checks.mjs). Los demás, barra sin texto.
+// Solo dominios VERIFICADOS en el repo (lib/diagnostic-checks.mjs). Sin dominio verificado no se
+// pinta la píldora (una píldora vacía se leía como hueco); quedan los 3 puntos.
 const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
 const shownDomain = domain ?? (slug ? DOMINIOS[slug] : undefined);
 
@@ -44,7 +45,7 @@ const alt = lang === 'en'
       <div class="w-fig__browser">
         <div class="w-fig__bar" aria-hidden="true">
           <span class="w-fig__dots"><i></i><i></i><i></i></span>
-          <span class="w-fig__url" translate="no">{shownDomain ?? ''}</span>
+          {shownDomain && <span class="w-fig__url" translate="no">{shownDomain}</span>}
         </div>
         <div class="w-fig__screen">
           <img

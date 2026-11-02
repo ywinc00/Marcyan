@@ -1,31 +1,15 @@
 ---
-// Sección "Por qué Marcyan" (Garantías) — Variante "Destacado + compactas".
-// 1 garantía DESTACADA (la diferencial: legible para IA) con mini-widget de
-// "escaneo" animado + badge, y 3 garantías compactas. Mantiene los TEXTOS reales
-// de content.ts; el layout y los adornos (badge, escaneo, ghost 24h, chips ES/EN)
-// son puramente visuales. Acento oro. Móvil: apilado.
+// Sección "Por qué Marcyan" (Garantías) · detalles permitidos de la portada
+// (design/rediseno-workos.md §4.1, W-CORE-23). Las tarjetas pasan a celdas sin caja
+// separadas por filetes de 1 px (cruce visible en 2×2, §2.5), MISMO texto de content.ts
+// y titular .h2 intacto. Icono Lucide 20 en oro, título 20/500, texto 16/1.6.
+// Sin fondos: la sección conserva data-fx="gold" y StarField pinta detrás.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 
 interface Props { guarantees: any }
 const { guarantees } = Astro.props;
-
 const items = guarantees.items as any[];
-// La destacada = la garantía "Listo para IA y buscadores" (icono radar).
-let featIdx = items.findIndex((i) => (i.icon || '').includes('radar'));
-if (featIdx < 0) featIdx = items.length > 2 ? 2 : 0;
-const featured = items[featIdx];
-const rest = items.filter((_, i) => i !== featIdx);
-
-const pad2 = (n: number) => String(n).padStart(2, '0');
-const total = pad2(items.length);
-// adorno por garantía (atado al icono, no al texto → no toca los copies)
-const motif = (s: any) => {
-  const ic = s.icon || '';
-  if (ic.includes('zap')) return 'hours';      // → marca de agua "24h"
-  if (ic.includes('languages')) return 'lang'; // → chips ES / EN
-  return '';
-};
 ---
 <section class="section guarantees" id="garantias" data-fx="gold">
   <div class="container">
@@ -34,53 +18,15 @@ const motif = (s: any) => {
       <h2 class="h2" set:html={guarantees.title} />
     </header>
 
-    <div class="why-grid">
-      <!-- DESTACADA: legible para IA -->
-      <article class="why-feat">
-        <div class="feat-top">
-          <span class="ix">01 / {total}</span>
-          {guarantees.featuredBadge && (
-            <span class="feat-badge"><Icon name="lucide:sparkles" /> {guarantees.featuredBadge}</span>
-          )}
-        </div>
-        <span class="feat-ic"><Icon name={featured.icon} /></span>
-        <h3 class="feat-title">{featured.title}</h3>
-        <p class="feat-desc">{featured.desc}</p>
-
-        <div class="scan" aria-hidden="true">
-          <div class="scan-head"><span class="scan-dot"></span><span>{guarantees.scanLabel}</span></div>
-          <span class="ln" style="width:82%"></span>
-          <span class="ln acc" style="width:46%"></span>
-          <span class="ln" style="width:64%"></span>
-          <span class="ln" style="width:38%"></span>
-          <span class="scanbar"></span>
-        </div>
-      </article>
-
-      <!-- COMPACTAS -->
-      <div class="why-stack">
-        {rest.map((s, i) => {
-          const m = motif(s);
-          return (
-            <div class:list={['why-card', m && `has-${m}`]}>
-              <span class="wc-ic"><Icon name={s.icon} /></span>
-              <div class="wc-tx">
-                <div class="wc-row"><h4>{s.title}</h4><span class="ix">{pad2(i + 2)}</span></div>
-                <p>{s.desc}</p>
-                {m === 'lang' && (
-                  <div class="wc-chips">
-                    <span class="chip on">ES</span>
-                    <span class="chip on">EN</span>
-                    <span class="chip muted">Houston · Miami</span>
-                  </div>
-                )}
-              </div>
-              {m === 'hours' && <span class="wc-ghost" aria-hidden="true">24h</span>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <ul class="gw" role="list">
+      {items.map((s) => (
+        <li class="gw__cell">
+          <span class="gw__ic"><Icon name={s.icon} /></span>
+          <h3 class="gw__title">{s.title}</h3>
+          <p class="gw__desc">{s.desc}</p>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
@@ -88,91 +34,35 @@ const motif = (s: any) => {
   .guarantees :global(em) { color: var(--accent-gold); font-style: normal; }
   .guarantees__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
 
-  .why-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); align-items: stretch; }
-  .ix { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); letter-spacing: var(--tracking-wide); }
-
-  /* ── Garantía destacada ─────────────────────────────────── */
-  .why-feat {
-    display: flex; flex-direction: column; gap: var(--space-3);
-    background:
-      radial-gradient(120% 120% at 0% 0%, var(--accent-gold-dim), transparent 55%),
-      var(--bg-card);
-    border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg);
-    padding: var(--space-6); box-shadow: var(--shadow-card);
+  /* ── Celdas W-CORE-23 ──────────────────────────────────── */
+  .gw { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
+  .gw__cell { min-width: 0; padding: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .gw__cell:first-child { padding-top: 0; }
+  .gw__cell + .gw__cell { border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
+  .gw__ic { display: inline-flex; color: var(--accent-gold); margin-bottom: 4px; }
+  .gw__ic :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .gw__title {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 18px; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg-primary);
   }
-  .feat-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-  .feat-badge {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase;
-    color: var(--accent-gold); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
-    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3);
-  }
-  .feat-badge :global(svg) { width: 13px; height: 13px; }
-  .feat-ic { color: var(--accent-gold); margin-top: var(--space-2); }
-  .feat-ic :global(svg) { width: 34px; height: 34px; stroke-width: 1.5; }
-  .feat-title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: var(--leading-snug); }
-  .feat-desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); }
+  .gw__desc { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--fg-secondary); max-width: 480px; }
 
-  /* mini-widget "escaneo IA": skeleton + barra que recorre (legible para IA) */
-  .scan {
-    position: relative; margin-top: var(--space-4); overflow: hidden;
-    border: 1px solid var(--border); border-radius: var(--radius-md);
-    background: var(--bg-base); padding: var(--space-4);
-    display: flex; flex-direction: column; gap: var(--space-3);
+  @media (--md) {
+    .gw { grid-template-columns: 1fr 1fr; }
+    .gw__cell, .gw__cell:first-child { padding: 40px 40px 40px 0; }
+    /* Sin filete encima de la 2.ª celda (fila de arriba). Mismo compuesto que la regla base para ganarle (I1). */
+    .gw__cell + .gw__cell:nth-child(2) { border-top: 0; }
+    .gw__cell:nth-child(2n) { padding: 40px 0 40px 40px; border-left: 1px solid var(--w-line, rgba(200,169,110,.09)); }
+    .gw__cell:nth-child(n + 3) { border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
+    .gw__cell:nth-child(-n + 2) { padding-top: 8px; }
+    .gw__cell:nth-last-child(-n + 2):nth-child(n + 3) { padding-bottom: 8px; }
   }
-  .scan-head { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
-  .scan-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: scandot 2.2s ease-out infinite; }
-  .scan .ln { height: 6px; border-radius: 100px; background: var(--bg-elevated); }
-  .scan .ln.acc { background: var(--accent-gold); opacity: 0.5; }
-  .scanbar {
-    position: absolute; left: 0; right: 0; top: -22px; height: 22px; pointer-events: none;
-    background: linear-gradient(180deg, transparent, rgba(var(--accent-gold-rgb), 0.16), transparent);
-    border-top: 1px solid rgba(var(--accent-gold-rgb), 0.5);
-    animation: scanmove 3.6s var(--ease-in-out) infinite;
-  }
-  @keyframes scanmove { 0% { top: -22px; opacity: 0; } 12% { opacity: 1; } 86% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-  @keyframes scandot { 0% { box-shadow: 0 0 0 0 var(--accent-teal); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-
-  /* ── Garantías compactas ────────────────────────────────── */
-  .why-stack { display: flex; flex-direction: column; gap: var(--space-3); }
-  .why-card {
-    position: relative; overflow: hidden;
-    display: flex; gap: var(--space-4); align-items: flex-start;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    transition: border-color var(--duration-base) var(--ease-out-expo);
-  }
-  .why-card:hover { border-color: var(--border-accent); }
-  .wc-ic {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold);
-  }
-  .wc-ic :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
-  .wc-tx { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: var(--space-1); }
-  .wc-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-  .wc-row h4 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .wc-tx p { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
-
-  /* chips ES / EN (garantía bilingüe) */
-  .wc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
-  .chip { font-family: var(--font-mono); font-size: var(--text-xs); border-radius: var(--radius-pill); padding: 2px var(--space-2); border: 1px solid var(--border); color: var(--fg-secondary); }
-  .chip.on { color: var(--accent-gold); border-color: var(--accent-gold-line); background: var(--accent-gold-dim); }
-  .chip.muted { color: var(--fg-secondary); border-color: transparent; padding-inline: var(--space-1); }
-
-  /* marca de agua "24h" (garantía de propuesta) */
-  .wc-ghost {
-    position: absolute; right: var(--space-2); bottom: -12px;
-    font-family: var(--font-mono); font-weight: 700; font-size: 60px; line-height: 1; letter-spacing: -0.05em;
-    color: var(--accent-gold); opacity: 0.06; pointer-events: none;
-  }
-
-  @media (--motion-reduce) { .scanbar { display: none; } .scan-dot { animation: none; } }
-
   @media (--lg) {
-    .why-grid { grid-template-columns: 1.02fr 0.98fr; gap: var(--space-5); }
-    .why-feat { padding: var(--space-7); }
-    /* la pila reparte su alto para cuadrar con la destacada */
-    .why-stack { justify-content: space-between; }
+    .gw__cell, .gw__cell:first-child { padding: 48px 56px 48px 0; }
+    .gw__cell:nth-child(2n) { padding: 48px 0 48px 56px; }
+    .gw__cell:nth-child(-n + 2) { padding-top: 8px; }
+    .gw__cell:nth-last-child(-n + 2):nth-child(n + 3) { padding-bottom: 8px; }
+    .gw__title { font-size: 20px; line-height: 1.2; }
+    .gw__desc { font-size: 16px; }
   }
 </style>

@@ -1,6 +1,7 @@
 ---
-// Diseño web · 01 "Cómo se construye tu web" (§4.14-4): CabeceraNumerada (H2 + bajada)
-// + DemoPorPasos en modo bajo cabecera (W-CORE-05: sin titular propio, control 2), firma
+// Diseño web · 01 "Cómo se construye tu web" (§4.14-4): CabeceraNumerada SOLO de etiqueta
+// + DemoPorPasos con su título de sección, bajada y pasos juntos a la izquierda (W-CORE-05;
+// sistema tras el piloto, igual que la Escalera de 02: un solo titular), firma
 // de la página: disparo único por entrada en vista, la lista marca el paso que corre y
 // el registro cuenta lo que deja cada paso. La web de EJEMPLO va rotulada.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
@@ -11,13 +12,12 @@ import type { WebCopy } from '../../../../i18n/w/web';
 interface Props { copy: WebCopy['proceso']; n: number; city: string; lang?: 'es' | 'en' }
 const { copy, n, city, lang = 'es' } = Astro.props;
 ---
-<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.demoText} />
+<CabeceraNumerada n={n} label={copy.label} />
 <div class="ws-gap">
-  <DemoPorPasos steps={copy.steps} log={copy.log} done={copy.done} working={copy.working} lang={lang}>
+  <DemoPorPasos titleHtml={copy.title} text={copy.demoText} headSize="section" steps={copy.steps} log={copy.log} done={copy.done} working={copy.working} lang={lang}>
     <WebEjemplo slot="screen" frame="tarjeta" city={city} lang={lang} />
   </DemoPorPasos>
 </div>
 <style>
-  .ws-gap { margin-top: 56px; }
-  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
+  .ws-gap { margin-top: 12px; }
 </style>

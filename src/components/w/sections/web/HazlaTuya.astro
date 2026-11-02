@@ -10,6 +10,9 @@
 //   A medida  → sitio de varias páginas (menú de páginas en la cabecera).
 // Decisión del director (control 2): los tres precios se ven siempre, no solo el de la
 // opción activa (precio legible antes que escondido); queda apuntada para el dueño.
+// Sistema tras el piloto: CabeceraNumerada solo de etiqueta y la Escalera con su título
+// (H2 de sección), bajada y opciones juntos a la izquierda y la maqueta a la derecha
+// (W-CORE-06; control 2 piloto r3: quedaba una columna vacía de ~420 px bajo las opciones).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Escalera from '../../Escalera.astro';
 import WebEjemplo from '../../objetos/WebEjemplo.astro';
@@ -22,10 +25,12 @@ const web = catalog.find((p) => p.id === 'diseno-web')!;
 const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
 const [t0, t1, t2] = web.tiers;
 ---
-<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.demoLead} />
+<CabeceraNumerada n={n} label={copy.label} />
 <div class="ws-gap ht">
   <Escalera
-    label={copy.title.replace(/<[^>]+>/g, '')}
+    titleHtml={copy.title}
+    lead={copy.demoLead}
+    headSize="section"
     chip={copy.chip}
     lang={lang}
     options={[
@@ -48,8 +53,7 @@ const [t0, t1, t2] = web.tiers;
   </Escalera>
 </div>
 <style>
-  .ws-gap { margin-top: 56px; }
-  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
+  .ws-gap { margin-top: 12px; }
   /* Móvil: el teléfono algo más pequeño para que opciones y maqueta quepan juntas. */
   @media (--lt-md) { :global(.ht-phone.wo-web--movil) { width: 236px; } }
 

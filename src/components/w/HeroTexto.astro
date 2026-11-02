@@ -7,6 +7,11 @@
 //   el elemento elegido de la página). Regla de longitud: H1 + cola ≤ 2 líneas a
 //   1440 y ≤ 4 a 390; si no cabe, la página no pasa `tail` y la idea va a la bajada.
 // · Botones: principal intacto (lg) + variante link, a 24 px.
+// · Migas (slot `crumbs`): en escritorio, con el texto centrado, van a la IZQUIERDA en la
+//   línea del logo de la barra (borde del contenido de .w-container) y a la altura del chip,
+//   sin línea propia sobre el texto; en móvil, centradas encima. Subido de HeroWeb a aquí tras
+//   el piloto para que todas las landings lo hereden (composición, no gramática). Requiere que
+//   el hero monte HeroTexto dentro de un .w-container (todas las landings v3 lo hacen).
 import Button from '../ui/Button.astro';
 import ChipCiudad from './ChipCiudad.astro';
 import Eyebrow from './Eyebrow.astro';
@@ -56,6 +61,13 @@ const mod = size === 'landing' ? null : size;
   .w-herotext--center { align-items: center; text-align: center; max-width: 768px; margin-inline: auto; }
   .w-herotext--left { align-items: flex-start; text-align: left; max-width: 560px; }
   .w-herotext__crumbs { margin-bottom: 24px; }
+  /* Sin la sangría por defecto de la lista: el texto de las migas empieza en el borde del
+     contenedor (línea del logo, E-44) y en móvil queda centrado de verdad. */
+  .w-herotext__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  @media (--lg) {
+    :global(.w-container):has(> .w-herotext--center > .w-herotext__crumbs) { position: relative; }
+    .w-herotext--center > .w-herotext__crumbs { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
+  }
   .w-herotext__top {
     display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px;
     margin-bottom: var(--w-gap-eyebrow);

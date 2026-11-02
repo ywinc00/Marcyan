@@ -6,17 +6,20 @@
 //   kind="mantenimiento" → "Copia de seguridad · Hecha" (celda de Servicios, ancla #mantenimiento).
 //   kind="formulario"    → mini formulario con un contacto que llega y "Guardado ✓" (bento de
 //                          diseño web, "Ningún contacto se pierde", control 2).
+//   kind="contacto"      → contacto entrante compacto: "Nuevo contacto" con quién, qué servicio y
+//                          su mensaje, y "Guardado ✓ antes del aviso" (celda Formulario del bento
+//                          del piloto; más bajo que el formulario entero: móvil más corto, E-18).
 // Caben en la zona de objeto de ~180 px de alto de una tarjeta de BandejaPasos.
 import Icon from '../../ui/Icon.astro';
 import Ejemplo from '../Ejemplo.astro';
 
 interface Props {
-  kind: 'correo' | 'esqueleto' | 'publicada' | 'mantenimiento' | 'formulario';
+  kind: 'correo' | 'esqueleto' | 'publicada' | 'mantenimiento' | 'formulario' | 'contacto';
   lang?: 'es' | 'en';
   size?: 'hero' | 'card' | 'mini';
   example?: boolean;
   /** Llena el alto que le dé su contenedor (celda de bento junto a un objeto más alto):
-   *  en "correo", la bandeja sigue con más correos en esqueleto que se funden abajo. */
+   *  en "correo" y "contacto", siguen más filas en esqueleto que se funden abajo. */
   fill?: boolean;
   class?: string;
 }
@@ -24,11 +27,11 @@ const { kind, lang = 'es', size = 'card', example = true, fill = false, class: c
 const en = lang === 'en';
 const T = en
   ? { inbox: 'Inbox', subj: 'Your proposal', prev: 'Scope, timeline and a clear price.', time: '10:24 a.m.', pub: 'Published', site: 'Your Business', backup: 'Backup', done: 'Done', check: 'Site check', today: 'Today', updates: 'Updates', upToDate: 'Up to date',
-      form: { lab: 'New contact', name: 'Name', svc: 'Service', msg: 'Message', vName: 'Ana', vSvc: 'Web design', vMsg: 'Can you send me a proposal?', send: 'Send', saved: 'Saved', note: 'before the alert' },
-      sr: { formulario: 'Example: a contact arrives through the form and is saved.', correo: 'Example: the email with your proposal arrives in your inbox.', esqueleto: 'Example: the website takes shape as a skeleton.', publicada: 'Example: the website is published.', mantenimiento: 'Example: the website backup is done.' } }
+      form: { lab: 'New contact', name: 'Name', svc: 'Service', msg: 'Message', vName: 'Ana', vSvc: 'Web design', vMsg: 'Can you send me a proposal?', send: 'Send', saved: 'Saved', note: 'before the alert', now: 'Now', via: 'Via your website' },
+      sr: { contacto: 'Example: a new contact comes in through the website and is saved before the alert.', formulario: 'Example: a contact arrives through the form and is saved.', correo: 'Example: the email with your proposal arrives in your inbox.', esqueleto: 'Example: the website takes shape as a skeleton.', publicada: 'Example: the website is published.', mantenimiento: 'Example: the website backup is done.' } }
   : { inbox: 'Bandeja de entrada', subj: 'Tu propuesta', prev: 'Alcance, plazos y un precio claro.', time: '10:24', pub: 'Publicada', site: 'Tu Negocio', backup: 'Copia de seguridad', done: 'Hecha', check: 'Revisión del sitio', today: 'Hoy', updates: 'Actualizaciones', upToDate: 'Al día',
-      form: { lab: 'Nuevo contacto', name: 'Nombre', svc: 'Servicio', msg: 'Mensaje', vName: 'Ana', vSvc: 'Diseño web', vMsg: '¿Me pueden mandar una propuesta?', send: 'Enviar', saved: 'Guardado', note: 'antes del aviso' },
-      sr: { formulario: 'Ejemplo: un contacto llega por el formulario y queda guardado.', correo: 'Ejemplo: te llega el correo con tu propuesta.', esqueleto: 'Ejemplo: la web toma forma en esqueleto.', publicada: 'Ejemplo: la web queda publicada.', mantenimiento: 'Ejemplo: la copia de seguridad de la web está hecha.' } };
+      form: { lab: 'Nuevo contacto', name: 'Nombre', svc: 'Servicio', msg: 'Mensaje', vName: 'Ana', vSvc: 'Diseño web', vMsg: '¿Me pueden mandar una propuesta?', send: 'Enviar', saved: 'Guardado', note: 'antes del aviso', now: 'Ahora', via: 'Por tu web' },
+      sr: { contacto: 'Ejemplo: entra un contacto nuevo por la web y queda guardado antes del aviso.', formulario: 'Ejemplo: un contacto llega por el formulario y queda guardado.', correo: 'Ejemplo: te llega el correo con tu propuesta.', esqueleto: 'Ejemplo: la web toma forma en esqueleto.', publicada: 'Ejemplo: la web queda publicada.', mantenimiento: 'Ejemplo: la copia de seguridad de la web está hecha.' } };
 ---
 <div class:list={['wo-mini', `wo-mini--${kind}`, `wo-mini--${size}`, fill && 'wo-mini--fill', cls]}>
   <p class="sr-only">{T.sr[kind]}</p>
@@ -59,6 +62,24 @@ const T = en
           <span class="wo-mini__send">{T.form.send}</span>
         </div>
         <p class="wo-mini__saved"><b><Icon name="lucide:check" />{T.form.saved}</b><span>{T.form.note}</span></p>
+      </>
+    )}
+
+    {kind === 'contacto' && (
+      <>
+        <p class="wo-mini__lab">{T.form.lab}</p>
+        <div class="wo-mini__lead">
+          <span class="wo-mini__av">{T.form.vName.charAt(0)}</span>
+          <span class="wo-mini__mt">
+            <b>{T.form.vName}<span class="wo-mini__time">{T.form.now}</span></b>
+            <span class="wo-mini__via">{T.form.vSvc} · {T.form.via}</span>
+            <span class="wo-mini__msg">{T.form.vMsg}</span>
+          </span>
+        </div>
+        <p class="wo-mini__saved"><b><Icon name="lucide:check" />{T.form.saved}</b><span>{T.form.note}</span></p>
+        {fill && [['44%', '70%'], ['52%', '62%'], ['38%', '74%'], ['48%', '66%'], ['42%', '72%']].map(([x, y]) => (
+          <div class="wo-mini__mail wo-mini__mail--more"><span class="wo-mini__av wo-mini__av--sk"></span><span class="wo-mini__mt"><i style={`width:${x}`}></i><i style={`width:${y}`}></i></span></div>
+        ))}
       </>
     )}
 
@@ -159,6 +180,11 @@ const T = en
   .wo-mini__f em { font-style: normal; font: 500 11px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); }
   .wo-mini__f b { font-size: 14px; font-weight: 500; line-height: 1.35; color: var(--w-p-ink, #0e0e0d); }
   .wo-mini__send { align-self: flex-end; display: inline-flex; align-items: center; height: 30px; padding: 0 14px; border-radius: 6px; background: #d9d4cc; color: var(--w-p-ink-2, #4a4743); font-size: 13px; font-weight: 600; }
+  /* Contacto entrante: una fila clara (como un correo abierto) y el estado debajo. */
+  .wo-mini__lead { display: flex; gap: 10px; padding: 12px; border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .wo-mini__lead .wo-mini__mt { gap: 3px; }
+  .wo-mini__via { font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-mini__msg { font-size: 14px; line-height: 1.4; color: var(--w-p-ink, #0e0e0d); }
   .wo-mini__saved { margin: 2px 0 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
   .wo-mini__saved b { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: 8px; background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font-size: 13px; font-weight: 500; }
   .wo-mini__saved b :global(svg) { width: 13px; height: 13px; }

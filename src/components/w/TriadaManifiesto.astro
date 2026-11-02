@@ -2,7 +2,10 @@
 // Tríada manifiesto a dos tonos (W-ADV-08 / W-ADV-20, design/rediseno-workos.md §3.4).
 // Contenedor 896; 3 columnas de 272 con hueco 40; título 20/500 en 2 líneas
 // (1.ª frase apagada, 2.ª al 100 %); texto 15/24. Sin caja ni icono (E-04).
-// Móvil: 1 columna con separadores de 1 px.
+// Móvil (sistema tras el piloto, E-18): fila desplazable NATIVA (scroll-snap, sin JS de
+// arrastre) a sangre hasta el borde de la pantalla, con la siguiente asomando; separadores
+// verticales de 1 px entre columnas. Antes, 1 columna apilada (~540 px).
+// Si la fila desborda, la lista recibe foco de teclado para poder desplazarla (y solo entonces).
 // Contraste: la 1.ª frase va al 60 % (no al 45 %): a 20 px no es texto grande
 // y el 45 % no llega a AA (§6.8 solo admite el 45 % en ≥ 28 px).
 interface Item { tone1: string; tone2: string; text: string }
@@ -22,7 +25,7 @@ const { titleHtml, lead, items, id, class: cls } = Astro.props;
       {lead && <p class="tri__lead">{lead}</p>}
     </header>
   )}
-  <ul class="tri__list">
+  <ul class="tri__list" data-tri-list>
     {items.map((it) => (
       <li class="tri__item">
         <h3 class="tri__h"><span class="tri__t1">{it.tone1}</span> <span class="tri__t2">{it.tone2}</span></h3>
@@ -45,9 +48,16 @@ const { titleHtml, lead, items, id, class: cls } = Astro.props;
     margin: 16px auto 0; max-width: 32.5rem;
     font-family: var(--font-body); font-size: var(--w-lead); line-height: var(--w-lh-lead); color: var(--w-ink-80);
   }
-  .tri__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; }
-  .tri__item { padding-block: 24px; min-width: 0; }
-  .tri__item + .tri__item { border-top: 1px solid var(--w-line); }
+  .tri__list {
+    list-style: none; margin: 0 calc(-1 * var(--container-pad, 20px)); padding: 4px var(--container-pad, 20px);
+    display: grid; grid-auto-flow: column; grid-auto-columns: 78%; column-gap: 24px;
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--container-pad, 20px); scrollbar-width: none;
+  }
+  .tri__list::-webkit-scrollbar { display: none; }
+  .tri__list:focus-visible { outline: 2px solid var(--w-accent, var(--accent-gold)); outline-offset: -2px; }
+  .tri__item { min-width: 0; scroll-snap-align: start; }
+  .tri__item + .tri__item { border-left: 1px solid var(--w-line); padding-left: 24px; margin-left: -1px; }
   .tri__h {
     margin: 0; font-family: var(--font-display); font-weight: 500;
     font-size: 20px; line-height: 1.25; letter-spacing: -0.01em;
@@ -57,9 +67,23 @@ const { titleHtml, lead, items, id, class: cls } = Astro.props;
   .tri__t2 { color: var(--w-ink); }
   .tri__text { margin: 12px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 24px; color: var(--fg-secondary); }
   @media (--md) {
-    .tri__list { grid-template-columns: repeat(3, minmax(0, 272px)); column-gap: 40px; justify-content: center; }
-    .tri__item { padding-block: 0; }
-    .tri__item + .tri__item { border-top: 0; }
+    .tri__list {
+      margin: 0; padding: 0; overflow: visible; scroll-snap-type: none;
+      grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 272px)); column-gap: 40px; justify-content: center;
+    }
+    .tri__item + .tri__item { border-left: 0; padding-left: 0; margin-left: 0; }
   }
   @media (--lt-md) { .tri__head { margin-bottom: 40px; } }
 </style>
+
+<script>
+  // Foco de teclado solo cuando la fila desborda (móvil): sin parada inútil en escritorio.
+  document.querySelectorAll<HTMLElement>('[data-tri-list]').forEach((ul) => {
+    const sync = () => {
+      if (ul.scrollWidth > ul.clientWidth + 1) ul.tabIndex = 0;
+      else ul.removeAttribute('tabindex');
+    };
+    sync();
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(ul);
+  });
+</script>

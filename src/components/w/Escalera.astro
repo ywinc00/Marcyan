@@ -14,6 +14,12 @@
 // Modo bajo cabecera (sin `titleHtml`, control 2): va debajo de una CabeceraNumerada
 // que ya lleva el H2 y la bajada; aquí no hay titular propio y el grupo se nombra con
 // `label`. Raíles de personalización en TODAS las opciones salvo `rails: false`.
+// Título propio OPCIONAL (sistema tras el piloto): con `titleHtml` + `headSize="section"`
+// va bajo una CabeceraNumerada solo de etiqueta y el H2 de sección (40) queda en la columna
+// izquierda con la bajada y las opciones, y la maqueta a la derecha centrada con ese bloque
+// (W-CORE-06): sin la columna vacía de ~420 px bajo las opciones (control 2 piloto r3).
+// Precios: los tres "Desde $X" a la vista siempre (decisión del director, revisable por el
+// dueño: el plan §4.14 decía solo en la activa).
 // Móvil (diseño por sustracción, E-18): sin raíles, las opciones inactivas solo con
 // nombre y precio, y la pantalla justo debajo para que el cambio se vea al tocar.
 import Icon from '../ui/Icon.astro';
@@ -34,6 +40,9 @@ interface Props {
   lead?: string;
   /** Nombre accesible del grupo de opciones cuando no hay titular propio. */
   label?: string;
+  /** Tamaño del titular propio: "small" (32, por defecto) o "section" (H2 40 de sección,
+   *  bajo una CabeceraNumerada solo de etiqueta). */
+  headSize?: 'small' | 'section';
   options: [Option, Option, Option];
   /** Chip bajo la demo, p. ej. "Tus colores, tu letra, en español e inglés". */
   chip?: string;
@@ -44,7 +53,7 @@ interface Props {
   id?: string;
   class?: string;
 }
-const { titleHtml, lead, label, options, chip, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const { titleHtml, lead, label, headSize = 'small', options, chip, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
 const initial = Astro.props.initial ?? options[0].id;
 const uid = `wd-esc-${id ?? options.map((o) => o.id).join('-')}`;
 const screens = await Promise.all(
@@ -53,9 +62,9 @@ const screens = await Promise.all(
 const railsOf = (o: Option, _i: number) => o.rails ?? true;
 const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
 ---
-<div class:list={['wd-esc', !titleHtml && 'wd-esc--bare', cls]} id={id} data-w-tone={tone} data-wd-esc>
+<div class:list={['wd-esc', !titleHtml && 'wd-esc--bare', titleHtml && headSize === 'section' && 'wd-esc--sec', cls]} id={id} data-w-tone={tone} data-wd-esc>
   <div class="wd-esc__copy">
-    {titleHtml && <h2 class="wd-esc__h" id={`${uid}-h`} set:html={titleHtml} />}
+    {titleHtml && <h2 class:list={[headSize === 'section' ? 'w-h2' : 'wd-esc__h']} id={`${uid}-h`} set:html={titleHtml} />}
     {lead && <p class="wd-esc__lead">{lead}</p>}
     <div class="wd-esc__opts" role="radiogroup" aria-labelledby={titleHtml ? `${uid}-h` : undefined} aria-label={titleHtml ? undefined : label}>
       {options.map((o, i) => {
@@ -136,6 +145,8 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
     margin: 16px 0 0; max-width: 30rem;
     font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
   }
+  .wd-esc--sec .wd-esc__lead { max-width: 430px; line-height: 1.6; }
+  .wd-esc--sec :global(.w-h2) { margin: 0; max-width: 580px; }
   .wd-esc__opts { margin: 32px 0 0; display: grid; gap: 6px; max-width: 486px; }
   .wd-esc--bare .wd-esc__opts { margin-top: 0; }
   .wd-esc__opt {
@@ -250,6 +261,9 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
     .wd-esc { grid-template-columns: minmax(0, 490px) auto; justify-content: space-between; gap: 64px; }
     /* Bajo cabecera las opciones arrancan pegadas a la bajada (sin hueco muerto bajo el H2). */
     .wd-esc--bare { align-items: start; }
+    /* Con título de sección bajo la etiqueta numerada: el H2 pegado a la etiqueta (12 px) y la
+       maqueta arranca a su altura; nada de centrar el bloque, que abría ~70 px bajo la etiqueta. */
+    .wd-esc--sec { align-items: start; }
   }
   @media (--motion-reduce) {
     .wd-esc__opt::before, .wd-esc__screen, .wd-esc__screen.is-on, .wd-esc__rail { transition: none; }

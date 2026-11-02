@@ -1,10 +1,11 @@
 ---
 // Diseño web · capítulo de contraste (§4.14-6): CapituloDosFrases + Bento2x2
 // (W-CORE-08 + B-03) con un objeto por celda. Página oro: Marcy en burbujas neutras (E-14).
-// Celda 1: mini formulario con "Guardado ✓" (§4.14). Celda 2: la web en el OTRO idioma
-// (en inglés en la página en español). Celda 4: la conversación de las 23:40 ("Fuera de
-// horario"), la que cuenta el titular (control 2 ronda 2). Móvil: solo las celdas 1 y 3 llevan
-// objeto; la 2 y la 4 quedan en texto (E-18, control 2).
+// Celda 1: contacto entrante con "Guardado ✓" (MiniPasos kind="contacto"; sistema tras el
+// piloto). Celda 2: la web en el OTRO idioma (en inglés en la página en español), con la marca
+// de ejemplo SIN traducir (E-24). Celda 4: la conversación de las 23:40, la que cuenta el
+// titular (control 2 ronda 2). Móvil: llevan objeto la 1 y la 4 (el chat de Marcy es la celda
+// que más vende); la 2 y la 3 (ficha) quedan en texto (E-18, control 2 piloto r3).
 import CapituloDosFrases from '../../CapituloDosFrases.astro';
 import Bento2x2 from '../../Bento2x2.astro';
 import MiniPasos from '../../objetos/MiniPasos.astro';
@@ -21,8 +22,8 @@ const sr = lang === 'en'
 ---
 <CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
 <div class="ws-gap">
-  <Bento2x2 cells={copy.cells} mobileTextOnly={[2, 4]}>
-    <MiniPasos slot="ui-1" kind="formulario" lang={lang} />
+  <Bento2x2 cells={copy.cells} mobileTextOnly={[2, 3]}>
+    <MiniPasos slot="ui-1" kind="contacto" fill lang={lang} />
     <WebEjemplo slot="ui-2" frame="movil" kind="salon" city={city} lang={lang} site={lang === 'en' ? 'es' : 'en'} size="mini" />
     <FichaMapaEjemplo slot="ui-3" city={city} lang={lang} size="card" />
     <ChatMarcy slot="ui-4" mode="estatico" tone="neutral" lang={lang} size="card" startAt={2} sr={sr} />

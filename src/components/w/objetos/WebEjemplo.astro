@@ -54,6 +54,9 @@ const C = {
   },
 }[kind];
 const T = C[site];
+// La marca de ejemplo NO se traduce aunque la web se enseñe en el otro idioma (E-24; control 2
+// piloto r3: la celda de idiomas convertía "Tu Salón" en "Your Salon"): sale del idioma de la página.
+const brand = C[lang].name;
 const open = site === 'en' ? 'Open now' : 'Abierto ahora';
 const until = site === 'en' ? 'until 6 p.m.' : 'hasta las 6 p. m.';
 const svcTitle = site === 'en' ? 'Services' : 'Servicios';
@@ -76,7 +79,7 @@ const svcTitle = site === 'en' ? 'Services' : 'Servicios';
     {example && frame !== 'movil' && <Ejemplo lang={lang} on="light" />}
     <header class="wo-web__head">
       <span class="wo-web__logo wo-sk" aria-hidden="true">{C.initial}</span>
-      <span class="wo-web__name wo-sk" translate="no">{T.name}</span>
+      <span class="wo-web__name wo-sk" translate="no">{brand}</span>
       <span class="wo-web__city wo-sk">· {city}</span>
       {frame === 'movil'
         ? example && <Ejemplo lang={lang} on="light" pos="inline" class="wo-web__ex" />
@@ -210,8 +213,15 @@ const svcTitle = site === 'en' ? 'Services' : 'Servicios';
   }
   .wo-web__pages span.is-on { background: var(--wo-k); border-color: var(--wo-k); color: #fff; }
 
-  /* ── Estado esqueleto (lo cambian las demos con data-wo-state) ── */
-  .wo-sk { transition: color 400ms var(--w-ease-ui), background-color 400ms var(--w-ease-ui); }
+  /* ── Estado esqueleto (lo cambian las demos con data-wo-state) ──
+     Esqueleto → lista en DOS tiempos (control 2 piloto r3: el texto salía encima de las
+     barras grises y "hasta las 6 p. m.", hijo sin transición, aparecía antes que el resto):
+     1) las barras se van (fondo, 220 ms); 2) el texto, los iconos y los rellenos interiores
+     entran juntos (240 ms, tras 180 ms). Hacia el esqueleto el cambio es inmediato (la demo
+     arma fuera de la vista). */
+  .wo-sk { transition: background-color 220ms var(--w-ease-ui), color 240ms var(--w-ease-ui) 180ms; }
+  .wo-sk * { transition: color 240ms var(--w-ease-ui) 180ms, background-color 240ms var(--w-ease-ui) 180ms; }
+  .wo-sk :global(svg) { transition: opacity 240ms var(--w-ease-ui) 180ms; }
   [data-wo-state='esqueleto'] .wo-sk {
     color: transparent; background-color: var(--wo-sk); border-radius: 5px;
   }
@@ -219,8 +229,10 @@ const svcTitle = site === 'en' ? 'Services' : 'Servicios';
   [data-wo-state='esqueleto'] .wo-sk * { color: transparent; }
   [data-wo-state='esqueleto'] .wo-web__open i { background: transparent; }
   [data-wo-state='esqueleto'] .wo-web__lang b { background: transparent; }
-  .wo-sk :global(svg) { transition: opacity 400ms var(--w-ease-ui); }
+  [data-wo-state='esqueleto'] .wo-sk,
+  [data-wo-state='esqueleto'] .wo-sk *,
+  [data-wo-state='esqueleto'] .wo-sk :global(svg) { transition: none; }
   @media (--motion-reduce) {
-    .wo-sk, .wo-sk :global(svg) { transition: none; }
+    .wo-sk, .wo-sk *, .wo-sk :global(svg) { transition: none; }
   }
 </style>

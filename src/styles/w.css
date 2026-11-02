@@ -15,6 +15,14 @@
 :root[data-ds="v3"] [data-w-tone="teal"] { --w-accent: var(--accent-teal); --w-accent-rgb: var(--accent-teal-rgb); }
 :root[data-ds="v3"] [data-w-tone="gold"] { --w-accent: var(--accent-gold); --w-accent-rgb: var(--accent-gold-rgb); }
 
+/* ── Toque en móvil ─────────────────────────────────────────────
+   Sin el destello azul por defecto del navegador al tocar (control 2 piloto r3, menor 1):
+   en v3 cada elemento tocable tiene su estado propio (caja de la opción activa, borde en
+   hover). El foco de teclado no cambia: :focus-visible sigue pintando su anillo. */
+:root[data-ds="v3"] :is(a, button, summary, label, [role="radio"], [role="tab"], [role="button"], [tabindex]) {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ── Contenedores ───────────────────────────────────────────────── */
 /* El contenedor de las secciones v3 es el MISMO que el de la barra (.container: 1280 con
    el margen fluido --container-pad), así el borde del texto cae en la línea del logo a

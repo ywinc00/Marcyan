@@ -100,6 +100,14 @@ const cards = items.map((it) => {
   .w-case__foot { margin-top: auto; padding-top: 24px; }
 
   .w-case__shot { display: none; }
+  /* Móvil compacto (sistema tras el piloto, E-18): mismo contenido, menos aire. */
+  @media (--lt-md) {
+    .w-cases__grid { gap: 12px; }
+    .w-case { padding: 26px 20px 20px; }
+    .w-case__name { font-size: 22px; }
+    .w-case__did { margin-top: 10px; }
+    .w-case__foot { padding-top: 12px; }
+  }
   @media (--md) {
     .w-cases__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
     .w-case { padding: 48px 48px 0; }

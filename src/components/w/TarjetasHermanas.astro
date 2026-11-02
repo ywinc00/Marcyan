@@ -11,6 +11,9 @@
 //   en el sitio del precio (control 2: no se distinguía de las demás).
 // · Debajo, tarjetas de recurso W-ADV-50 (icono Lucide 24 en acento, título
 //   15/500 en acento, texto 13).
+// Móvil (sistema tras el piloto, E-18): lista compacta de una columna, icono 36 a la
+// izquierda y nombre, línea y precio a la derecha (antes, rejilla 2×N de tarjetas altas).
+// Mismo contenido, ~40 % menos alto.
 // Cerrojo 5: sale de v3 (hubs), TODO su CSS va aquí y solo lee --w-*.
 import IconoObjeto from './IconoObjeto.astro';
 import Icon from '../ui/Icon.astro';
@@ -173,5 +176,18 @@ const titleId = `${id ?? 'hermanas'}-title`;
   .w-sib__rtitle { font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.4; color: var(--w-accent); }
   .w-sib__rtext { font-family: var(--font-body); font-size: 13px; line-height: 1.5; color: var(--w-ink-70); }
 
+  /* Móvil compacto: filas de una columna (mismo contenido, sin el aire de tarjeta). */
+  @media (--lt-md) {
+    .w-sib__tray { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 6px; }
+    .w-sib__tray[data-r2='1'] > .w-sib__cell:last-child { grid-column: auto; }
+    .w-sib__card { flex-direction: row; align-items: center; gap: 14px; padding: 12px 14px; }
+    .w-sib__card :global(.wi) { width: 36px; height: 36px; flex: none; }
+    .w-sib__txt { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 2px; align-items: baseline; flex: 1; }
+    .w-sib__name { font-size: 16px; }
+    .w-sib__desc { grid-column: 1 / -1; grid-row: 2; font-size: 14px; }
+    .w-sib__price, .w-sib__here { grid-column: 2; grid-row: 1; margin-top: 0; white-space: nowrap; font-size: 14px; }
+    .w-sib__rcard { padding: 14px 16px; }
+    .w-sib__res { gap: 6px; margin-top: 12px; }
+  }
   @media (--motion-reduce) { .w-sib__card, .w-sib__rcard { transition: none; } }
 </style>

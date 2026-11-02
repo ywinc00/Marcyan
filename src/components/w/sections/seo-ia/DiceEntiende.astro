@@ -1,0 +1,134 @@
+---
+// SEO para IA · 02 "Lo que dices y lo que entiende la IA" (design/rediseno-workos.md §4.17-4,
+// W-CORE-28). Cabecera numerada solo de etiqueta; debajo, a la izquierda, la tarjeta del
+// mecanismo (radio 50 → token 44, trama de puntos SOLO en la franja del rótulo, sin texto
+// encima que se tenga que leer, E-37): 4 filas "lo que pones en tu web" (frase en claro: es
+// lo que lee tu cliente, objeto de producto) → flecha en el acento de la página → la misma
+// información como dato estructurado (caja mono en noche: lo que lee la máquina). A la
+// derecha, titular, bajada y enlace a la sección siguiente. Estático (como en WorkOS).
+// Datos de EJEMPLO ("Tu Plomería"), rotulados.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Ejemplo from '../../Ejemplo.astro';
+
+interface Row { say: string; key: string; value: string }
+interface Props {
+  n: number;
+  label: string;
+  cardTitle: string;
+  colSay: string;
+  colData: string;
+  rows: Row[];
+  titleHtml: string;
+  lead: string;
+  link: { label: string; href: string };
+}
+const { n, label, cardTitle, colSay, colData, rows, titleHtml, lead, link } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} />
+
+<div class="de">
+  <div class="de__text">
+    <h2 class="w-h2 de__h2" set:html={titleHtml} />
+    <p class="de__lead">{lead}</p>
+    <a class="w-link de__link" href={link.href}>{link.label}</a>
+  </div>
+  <div class="de__card">
+    <div class="de__top">
+      <p class="de__title">{cardTitle}</p>
+      <Ejemplo />
+    </div>
+    <div class="de__grid" role="table" aria-label={cardTitle}>
+      <div class="de__row de__row--head" role="row">
+        <span class="de__k" role="columnheader">{colSay}</span>
+        <span aria-hidden="true"></span>
+        <span class="de__k" role="columnheader">{colData}</span>
+      </div>
+      {rows.map((r) => (
+        <div class="de__row" role="row">
+          <span class="de__say" role="cell">{r.say}</span>
+          <span class="de__arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+          <code class="de__data" role="cell"><span class="de__key">{r.key}:</span> <span class="de__val">{r.value}</span></code>
+        </div>
+      ))}
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .de { margin-top: 48px; display: grid; gap: 48px; align-items: center; }
+  @media (--lg) {
+    .de { grid-template-columns: minmax(0, 620fr) minmax(0, 480fr); column-gap: 80px; margin-top: 56px; }
+    /* El texto va primero en el DOM (se lee antes que el ejemplo); en escritorio la tarjeta
+       se pinta a la izquierda, como en W-CORE-28. */
+    .de__text { grid-column: 2; grid-row: 1; }
+    .de__card { grid-column: 1; grid-row: 1; }
+  }
+
+  .de__card {
+    position: relative; min-width: 0; overflow: hidden;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-feature); box-shadow: var(--w-edge), 0 40px 80px -40px rgba(0, 0, 0, .6);
+    padding: 0 40px 44px;
+  }
+  /* Franja del rótulo con trama de puntos (W-CORE-28): el rótulo es corto y grande, sin
+     nada que leer en letra pequeña encima de la trama. */
+  .de__top {
+    position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    margin-inline: -40px; padding: 36px 40px 28px;
+  }
+  .de__top::before {
+    content: ''; position: absolute; inset: 0; background: var(--w-dots);
+    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 55%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 0, #000 55%, transparent 100%);
+    opacity: .7; pointer-events: none;
+  }
+  .de__top :global(.w-example) { position: relative; }
+  .de__title {
+    position: relative; margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; color: var(--w-ink-80);
+  }
+
+  .de__grid { display: grid; gap: 12px; }
+  .de__row {
+    display: grid; grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1.12fr);
+    align-items: center; column-gap: 8px;
+  }
+  .de__row--head { margin-bottom: 2px; }
+  .de__k { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); }
+  .de__say {
+    display: flex; align-items: center; min-height: 48px; padding: 10px 14px;
+    background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
+    border-radius: var(--w-r-cell); font: 400 14px/1.35 var(--font-body);
+  }
+  .de__arrow { display: grid; place-items: center; color: var(--w-accent); }
+  .de__data {
+    display: block; min-height: 48px; box-sizing: border-box; padding: 9px 14px;
+    background: var(--w-s1); border: 1px solid var(--w-line-strong); border-radius: var(--w-r-cell);
+    font: 400 13px/1.45 var(--font-mono); color: var(--w-ink-80);
+  }
+  /* Clave arriba y valor debajo: cada uno en su línea, nunca partido a media palabra. */
+  .de__key { display: block; color: var(--w-accent); }
+  .de__val { display: block; white-space: nowrap; }
+
+  .de__h2 { margin: 0; max-width: 480px; }
+  .de__lead {
+    margin: 20px 0 0; max-width: 460px;
+    font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--fg-secondary);
+  }
+  .de__link { margin-top: 20px; }
+
+  @media (--lt-md) {
+    .de { margin-top: 32px; gap: 36px; }
+    .de__card { padding: 0 16px 20px; border-radius: var(--w-r-tray); }
+    .de__top { margin-inline: -16px; padding: 22px 16px 18px; }
+    .de__title { font-size: 18px; }
+    .de__row--head { display: none; }
+    /* En móvil cada fila se apila: frase arriba, flecha hacia abajo, dato debajo. */
+    .de__row { grid-template-columns: 1fr; row-gap: 4px; }
+    .de__grid { gap: 18px; }
+    .de__arrow { justify-self: start; padding-left: 14px; transform: rotate(90deg); }
+  }
+</style>

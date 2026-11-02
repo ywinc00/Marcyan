@@ -1,0 +1,16 @@
+---
+// SEO local · 02 "Dónde te ponemos" (§4.16-3): CabeceraNumerada SOLO de etiqueta (el H2 lo
+// lleva la pila en su columna, como la Escalera del piloto: un solo titular) + PilaVentanas
+// (W-CORE-27): Google · Apple Maps · Bing Places en texto, con sus pasos numerados.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import PilaVentanas from './PilaVentanas.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['ventanas']; n: number }
+const { copy, n } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="sl-gap"><PilaVentanas copy={copy} id="donde" /></div>
+<style>
+  .sl-gap { margin-top: 12px; }
+</style>

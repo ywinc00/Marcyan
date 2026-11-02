@@ -27,6 +27,7 @@ import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
 import Hero from '../../components/w/sections/servicios/Hero.astro';
 import Catalogo from '../../components/w/sections/servicios/Catalogo.astro';
 import UnCapitulo from '../../components/w/sections/servicios/UnCapitulo.astro';
+import { arteWeb, arteEscaner } from '../../components/w/sections/servicios/arte';
 import { content, nap } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { priceServices, offerItems } from '../../i18n/pricing';
@@ -57,6 +58,11 @@ const razones = s.why.items.map((i) => ({ icon: i.icon, title: i.title, text: i.
   { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
   { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
 ];
+// Arte de línea en las dos tarjetas de perfil (rev1, imp. 2): la web que asoma y el muro del diagnóstico.
+const perfiles = [
+  { ...t.perfil.cards[0], art: arteWeb },
+  { ...t.perfil.cards[1], art: arteEscaner },
+] as [typeof t.perfil.cards[0] & { art: string }, typeof t.perfil.cards[1] & { art: string }];
 const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 ---
@@ -91,7 +97,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
       <div class="w-container" data-w-reveal>
         <CabeceraNumerada n={2} label={t.catalogo.label} />
         <div class="ws-tight">
-          <Catalogo track="pricing_card_clicked">
+          <Catalogo track="pricing_card_clicked" expect={catalogo.length}>
             <TarjetasHermanas
               id="catalogo"
               titleHtml={t.catalogo.title}
@@ -113,7 +119,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
         <CabeceraNumerada n={3} label={t.perfil.label} />
-        <div class="ws-tight"><TarjetasPerfil id="perfiles" titleHtml={t.perfil.title} cards={t.perfil.cards} wide={t.perfil.wide} /></div>
+        <div class="ws-tight ws-left"><TarjetasPerfil id="perfiles" titleHtml={t.perfil.title} cards={perfiles} wide={t.perfil.wide} /></div>
       </div>
     </section>
 
@@ -165,7 +171,11 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   /* Tras una cabecera numerada SOLO de etiqueta, el titular del componente va a 12 px (como
      la demo y la escalera del piloto): la etiqueta y su titular se leen juntos. */
   .ws-tight { margin-top: 12px; }
-  /* Las razones arrancan en la línea del contenido, como su cabecera numerada (no centradas
+  /* Las razones (y los perfiles) arrancan en la línea del contenido, como su cabecera numerada (no centradas
      a 96 px del borde: dos alineaciones en una misma sección). */
   .ws-left :global(.why4) { margin-inline: 0; }
+  /* Lo mismo en "03 Empieza por tu caso" (rev1, menor 3): titular y tarjetas a la izquierda,
+     en la línea de su etiqueta numerada (TarjetasPerfil los centra por defecto). */
+  .ws-left :global(.w-prof__title) { text-align: left; }
+  .ws-left :global(.w-prof__grid) { margin-inline: 0; }
 </style>

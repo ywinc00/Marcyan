@@ -51,7 +51,7 @@ export interface ServiciosCopy {
 export const serviciosCopy: Record<SrvLang, ServiciosCopy> = {
   es: {
     eyebrow: 'Servicios',
-    lead: 'Siete servicios para que te encuentren, te elijan y te escriban, en Houston y Miami.',
+    lead: 'Que te encuentren, te elijan y te escriban.',
     switches: {
       'diseno-web': 'Web rápida',
       'ia-conversacional': 'Marcy 24/7',
@@ -119,7 +119,7 @@ export const serviciosCopy: Record<SrvLang, ServiciosCopy> = {
   },
   en: {
     eyebrow: 'Services',
-    lead: 'Seven services that get you found, chosen and contacted, in Houston and Miami.',
+    lead: 'Get found, get chosen, get contacted.',
     switches: {
       'diseno-web': 'Fast website',
       'ia-conversacional': 'Marcy 24/7',
@@ -142,7 +142,7 @@ export const serviciosCopy: Record<SrvLang, ServiciosCopy> = {
           { label: 'Web design', href: '/en/houston#servicios' },
           { label: 'Branding', href: '/en/houston#servicios' },
         ] },
-        { title: 'Get messages and sales', items: [
+        { title: 'Get messages and orders', items: [
           { label: 'Conversational AI', href: '/en/ai-for-small-business' },
           { label: 'Online store', href: '/en/houston#servicios' },
           { label: 'Maintenance', href: '#mantenimiento' },
@@ -160,27 +160,27 @@ export const serviciosCopy: Record<SrvLang, ServiciosCopy> = {
       cells: [
         { id: 'diseno-web', icon: 'lucide:layout-template', label: 'Web design', titleHtml: 'A site that makes sense on a phone', text: 'Custom, fast and in English and Spanish, with a clear button to call or message you.' },
         { id: 'seo-local', icon: 'lucide:map-pin', label: 'Local SEO', titleHtml: 'Show up on the map in your area', text: 'We tune up your listing and your local presence for searches near you.' },
-        { id: 'ia-conversacional', icon: 'lucide:messages-square', label: 'Conversational AI', titleHtml: 'Answers even when you are closed', text: 'Marcy replies, books and saves the contact at any hour of the day.' },
+        { id: 'ia-conversacional', icon: 'lucide:messages-square', label: 'Conversational AI', titleHtml: "Answers even when you're closed", text: 'Marcy replies, books appointments and saves every lead, any time of day.' },
         { id: 'seo-ia', icon: 'lucide:sparkles', label: 'AI SEO', titleHtml: 'Get named when people ask AI', text: 'We get your business ready so ChatGPT, Gemini and Meta AI can read you and recommend you.', tray: false },
-        { id: 'ecommerce', icon: 'lucide:shopping-bag', label: 'Online store', titleHtml: 'Orders that arrive already paid', text: 'Catalog, cart and online payments, so sales do not depend on the phone.' },
+        { id: 'ecommerce', icon: 'lucide:shopping-bag', label: 'Online store', titleHtml: 'Orders that arrive already paid', text: "Catalog, cart and online payments, so sales don't depend on the phone." },
         { id: 'branding', icon: 'lucide:palette', label: 'Branding', titleHtml: 'A brand people recognize', text: 'Logo, colors and typography made for your business, ready for the web and for print.' },
         { id: 'mantenimiento', icon: 'lucide:wrench', label: 'Maintenance', titleHtml: 'A healthy site you never have to think about', text: 'We keep an eye on uptime, security and backups, with bilingual support month to month.' },
       ],
     },
     perfil: {
       label: 'Start with your situation',
-      title: '<span class="w-tone">Where do I start?</span> It depends on you.',
+      title: '<span class="w-tone">Where do I start?</span> Pick your situation.',
       cards: [
-        { title: 'I am opening my business', text: 'Start with a clear website that introduces you and brings in your first leads.', cta: 'See web design', href: '/en/houston#servicios' },
-        { title: 'I have a site, but nobody calls', text: 'The free checkup shows what is failing and where to start, in 2 minutes.', cta: 'Take the checkup', href: '/en/checkup', track: 'tool_cta_clicked' },
+        { title: "I'm opening my business", text: 'Start with a clear website that introduces you and brings in your first leads.', cta: 'See web design', href: '/en/houston#servicios' },
+        { title: 'I have a site, but nobody calls', text: "The free checkup shows what's wrong and where to start, in 2 minutes.", cta: 'Take the checkup', href: '/en/checkup', track: 'tool_cta_clicked' },
       ],
-      wide: { icon: 'lucide:wrench', title: 'I am already a client', text: 'Monthly maintenance keeps your site fast, secure and up to date.', cta: 'See maintenance', href: '#mantenimiento' },
+      wide: { icon: 'lucide:wrench', title: "I'm already a client", text: 'Monthly maintenance keeps your site fast, secure and up to date.', cta: 'See maintenance', href: '#mantenimiento' },
     },
     razones: { label: 'Why Marcyan', title: '<span class="w-tone">Four reasons.</span> What makes us different.' },
     cierre: {
       proof: 'Texas Rush Remove already ranks in its Houston area with its new site.',
       warmTitle: 'Not sure what you need yet?',
-      warmText: 'Check for free whether your business is losing customers online.',
+      warmText: 'Find out for free if your business is losing customers online.',
       warmCta: 'Take the checkup',
       warmHref: '/en/checkup',
     },

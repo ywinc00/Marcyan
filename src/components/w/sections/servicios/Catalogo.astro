@@ -2,15 +2,24 @@
 // Servicios · 02 "Catálogo" (§4.3-3): TarjetasHermanas con los 7 productos (sin currentId)
 // dentro de <div id="precios">, con data-track="pricing_card_clicked" en CADA tarjeta
 // (contrato de medición de la página de antes: 7 eventos).
-// TarjetasHermanas no acepta un data-track por tarjeta (cambio de sistema pedido como
-// [SISTEMA] en el informe); mientras tanto el envoltorio recibe el componente por slot,
-// renderiza su HTML y añade el atributo a cada <a class="w-sib__card"> en el servidor.
-// Es HTML estático: el atributo está en el HTML que lee verify-extra y el rastreo
-// delegado de Layout (closest('[data-track]')) lo recoge igual que antes.
-interface Props { track: string }
-const { track } = Astro.props;
+// TarjetasHermanas no acepta un data-track por tarjeta (pedido como [SISTEMA]: prop `track`
+// por ítem); mientras tanto el envoltorio recibe el componente por slot, renderiza su HTML y
+// añade el atributo a cada <a class="w-sib__card"> en el servidor.
+// Guardia (rev1, menor 8): si el componente cambia su marcado y el atributo no entra en las
+// `expect` tarjetas, la compilación FALLA con un error claro, en vez de perder el rastreo en
+// silencio. Es HTML estático: verify-extra lo lee y el rastreo delegado de Layout
+// (closest('[data-track]')) lo recoge igual que antes.
+interface Props { track: string; expect: number }
+const { track, expect } = Astro.props;
 const html = await Astro.slots.render('default');
-const tracked = html.replace(/<a(\s[^>]*?)class="w-sib__card/g, `<a$1data-track="${track}" class="w-sib__card`);
+let n = 0;
+const tracked = html.replace(/<a(\s[^>]*?)class="w-sib__card/g, (_m, attrs: string) => {
+  n += 1;
+  return `<a${attrs}data-track="${track}" class="w-sib__card`;
+});
+if (n !== expect) {
+  throw new Error(`[servicios/Catalogo] data-track="${track}" entró en ${n} tarjetas de ${expect}: TarjetasHermanas cambió su marcado; añade la prop track al componente.`);
+}
 ---
 <div id="precios" class="ws-cat"><Fragment set:html={tracked} /></div>
 

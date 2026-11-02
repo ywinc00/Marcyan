@@ -1,0 +1,181 @@
+---
+// Branding · 02 "De la marca a todo lo demás" (§4.18-3): CabeceraNumerada solo de
+// etiqueta + Escalera con título de sección (W-CORE-06 + B-08, mismo patrón que la
+// escalera del piloto). Cuatro opciones, como dice el plan: Tu logo / Tus colores /
+// Tu tipografía / Tu web, cada una con su maqueta de la marca de EJEMPLO "Tu Marca"
+// (objeto de producto en claro, rotulado "Ejemplo"). Precios solo de pricing.ts:
+// logo = ancla baja del branding, colores = branding completo (trae colores,
+// tipografía y guía; la tipografía no repite precio), web = ancla baja del diseño web.
+// "Tu web": WebEjemplo (Tu Plomería, cuya paleta es la misma del ejemplo) vestida con
+// "Tu Marca": se tapa su cabecera con la de la marca, porque WebEjemplo aún no acepta
+// una marca por props (pendiente [SISTEMA] en el informe).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Escalera from '../../Escalera.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import SelloMarca from './SelloMarca.astro';
+import { PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { BrandingCopy } from '../../../../i18n/w/branding';
+
+interface Props { copy: BrandingCopy['marca']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, city, lang = 'es' } = Astro.props;
+const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
+const brand = lang === 'en' ? 'Your Brand' : 'Tu Marca';
+// Escalera tipa `options` como trío; su marcado y su script funcionan con N opciones
+// (pendiente [SISTEMA]: tipar como Option[]).
+const options: any = [
+  { id: 'logo', title: copy.logo.title, text: copy.logo.text, price: desde(PRICE_ANCHORS.brandingLogo) },
+  { id: 'colores', title: copy.colores.title, text: copy.colores.text, price: desde(PRICE_ANCHORS.branding) },
+  { id: 'tipo', title: copy.tipo.title, text: copy.tipo.text },
+  { id: 'web', title: copy.web.title, text: copy.web.text, price: desde(PRICE_ANCHORS.webLanding) },
+];
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="bm-gap bm">
+  <Escalera titleHtml={copy.title} lead={copy.lead} headSize="section" chip={copy.chip} lang={lang} id="marca" options={options}>
+    <div slot="screen-logo" class="bm-s bm-s--logo">
+      <Ejemplo lang={lang} on="light" />
+      <div class="bm-main">
+        <SelloMarca size={132} />
+        <span class="bm-word" translate="no">{brand}</span>
+        <span class="bm-cap">{copy.logo.main}</span>
+      </div>
+      <ul class="bm-vars">
+        <li>
+          <span class="bm-var"><SelloMarca size={26} /><b translate="no">{brand}</b></span>
+          <span class="bm-cap">{copy.logo.variants[0]}</span>
+        </li>
+        <li>
+          <span class="bm-var bm-var--sq"><SelloMarca size={34} /></span>
+          <span class="bm-cap">{copy.logo.variants[1]}</span>
+        </li>
+        <li>
+          <span class="bm-var bm-var--dark"><SelloMarca size={34} /></span>
+          <span class="bm-cap">{copy.logo.variants[2]}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div slot="screen-colores" class="bm-s bm-s--color">
+      <Ejemplo lang={lang} on="light" />
+      <p class="bm-k"><SelloMarca size={20} /><span translate="no">{brand}</span></p>
+      <ul class="bm-sw">
+        {copy.colores.swatches.map((s, i) => (
+          <li class:list={['bm-sw__i', `bm-sw__i--${i}`]} style={`--sw:${s.hex}`}>
+            <span class="bm-sw__chip" aria-hidden="true"></span>
+            <span class="bm-sw__t"><b>{s.name}</b><span>{s.role}</span></span>
+            <code class="bm-sw__hex">{s.hex}</code>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div slot="screen-tipo" class="bm-s bm-s--type">
+      <Ejemplo lang={lang} on="light" />
+      <p class="bm-k"><SelloMarca size={20} /><span translate="no">{brand}</span></p>
+      <div class="bm-ty">
+        <div class="bm-ty__row">
+          <span class="bm-ty__aa bm-ty__aa--d" aria-hidden="true">Aa</span>
+          <span class="bm-ty__n"><b>Space Grotesk</b><span>{copy.tipo.display}</span><i class="bm-ty__g bm-ty__g--d" aria-hidden="true">Aa Bb Cc Ññ 123</i></span>
+        </div>
+        <div class="bm-ty__row">
+          <span class="bm-ty__aa bm-ty__aa--b" aria-hidden="true">Aa</span>
+          <span class="bm-ty__n"><b>DM Sans</b><span>{copy.tipo.body}</span><i class="bm-ty__g bm-ty__g--b" aria-hidden="true">Aa Bb Cc Ññ 123</i></span>
+        </div>
+      </div>
+      <div class="bm-ty__sample">
+        <p class="bm-ty__h">{copy.tipo.sampleH}</p>
+        <p class="bm-ty__p">{copy.tipo.sampleP}</p>
+      </div>
+    </div>
+
+    <div slot="screen-web" class="bm-s bm-s--web">
+      <div class="bm-web">
+        <WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} size="mini" class="bm-web__phone" />
+        <span class="bm-web__head" aria-hidden="true"><SelloMarca size={26} /><b translate="no">{brand}</b></span>
+      </div>
+    </div>
+  </Escalera>
+</div>
+
+<style>
+  .bm-gap { margin-top: 12px; }
+  .bm-s {
+    position: relative; box-sizing: border-box; min-height: 402px;
+    display: flex; flex-direction: column; gap: 20px;
+    --bm-ink: #2f5266; --bm-paper: #f0ede8;
+    color: var(--w-p-ink); font-family: var(--font-body);
+  }
+  .bm-cap { font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2); }
+  .bm-k { margin: 0; display: inline-flex; align-items: center; gap: 8px; font: 600 15px/1.2 var(--font-display); letter-spacing: -0.01em; }
+
+  /* Logo: sello grande + palabra, y una fila de variantes. */
+  .bm-main { flex: 1; display: grid; justify-items: center; align-content: center; gap: 14px; padding-top: 18px; }
+  .bm-word { font: 500 34px/1 var(--font-display); letter-spacing: -0.03em; color: var(--w-p-ink); }
+  .bm-vars { list-style: none; margin: 0; padding: 14px 0 0; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; border-top: 1px solid var(--w-p-line); }
+  .bm-vars li { display: grid; justify-items: center; gap: 8px; }
+  .bm-var {
+    height: 56px; width: 100%; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line);
+  }
+  .bm-var b { font: 600 14px/1 var(--font-display); letter-spacing: -0.01em; white-space: nowrap; }
+  .bm-var--dark { background: #0e0e0d; border-color: #0e0e0d; --bm-ink: #f0ede8; --bm-paper: #0e0e0d; }
+
+  /* Colores: cuatro muestras con su papel y su código. */
+  .bm-sw { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; flex: 1; align-content: start; }
+  .bm-sw__i {
+    display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 14px;
+    padding: 8px 14px 8px 8px; border-radius: 12px; background: #fff; border: 1px solid var(--w-p-line);
+  }
+  /* La principal, en grande: el color ES la tarjeta y el texto va en crema encima (≈7:1). */
+  .bm-sw__i--0 {
+    grid-template-columns: 1fr auto; align-items: end; min-height: 116px; padding: 16px;
+    background: var(--sw); border-color: transparent; color: #f0ede8;
+  }
+  .bm-sw__i--0 .bm-sw__chip { display: none; }
+  .bm-sw__i--0 .bm-sw__t span, .bm-sw__i--0 .bm-sw__hex { color: rgba(240, 237, 232, .82); }
+  .bm-sw__chip { width: 56px; height: 56px; border-radius: 8px; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(14,14,13,.10); }
+  .bm-sw__t { display: grid; gap: 2px; }
+  .bm-sw__t b { font: 600 15px/1.2 var(--font-display); }
+  .bm-sw__t span { font-size: 13px; color: var(--w-p-ink-2); }
+  .bm-sw__hex { font: 500 13px/1 var(--font-mono); color: var(--w-p-ink-2); }
+
+  /* Tipografía: dos muestras "Aa" y un titular de ejemplo. */
+  .bm-ty { display: grid; gap: 8px; }
+  .bm-ty__row { display: flex; align-items: center; gap: 16px; padding: 16px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--w-p-line); }
+  .bm-ty__aa { font-size: 52px; line-height: 1; color: var(--bm-ink); width: 76px; }
+  .bm-ty__aa--d { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.04em; }
+  .bm-ty__aa--b { font-family: var(--font-body); font-weight: 400; }
+  .bm-ty__n { display: grid; gap: 2px; }
+  .bm-ty__n b { font: 600 15px/1.2 var(--font-body); }
+  .bm-ty__n span { font-size: 13px; color: var(--w-p-ink-2); }
+  .bm-ty__g { margin-top: 6px; font-style: normal; font-size: 14px; letter-spacing: .02em; color: var(--w-p-ink); }
+  .bm-ty__g--d { font-family: var(--font-display); }
+  .bm-ty__g--b { font-family: var(--font-body); }
+  .bm-ty__sample { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--w-p-line); }
+  .bm-ty__h { margin: 0; font: 500 30px/1.08 var(--font-display); letter-spacing: -0.035em; color: var(--w-p-ink); text-wrap: balance; }
+  .bm-ty__p { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--w-p-ink-2); }
+
+  /* Tu web: el teléfono directo sobre la bandeja (sin el panel claro), como en el piloto. */
+  .bm :global([data-wd-screen='web']) { background: transparent; padding: 0; display: grid; place-items: center; }
+  .bm-s--web { min-height: 0; align-items: center; justify-content: center; }
+  .bm-web { position: relative; width: fit-content; }
+  /* Teléfono a 236 px (455 de alto): cabe entero en la pantalla de 450 de la escalera. */
+  .bm-web :global(.bm-web__phone.wo-web--movil) { width: 236px; }
+  /* Cabecera de "Tu Marca" sobre la de la web de ejemplo (marco móvil: 9 px de marco +
+     44/16 px de padding de la pantalla). */
+  .bm-web :global(.bm-web__phone :is(.wo-web__logo, .wo-web__name, .wo-web__city)) { visibility: hidden; }
+  .bm-web__head {
+    position: absolute; top: 53px; left: 25px; height: 26px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 8px; color: var(--w-p-ink);
+  }
+  .bm-web__head b { font: 600 14px/1.2 var(--font-display); letter-spacing: -0.01em; white-space: nowrap; }
+  .bm-web__head span { font-size: 13px; color: var(--w-p-ink-2); white-space: nowrap; }
+
+  @media (--lt-md) {
+    .bm-s { min-height: 0; width: 100%; gap: 16px; }
+    .bm-main { padding-top: 24px; }
+    .bm-word { font-size: 30px; }
+    .bm-sw__i--0 { min-height: 88px; }
+  }
+</style>

@@ -409,7 +409,9 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 /* 2 · bandeja de hermanos bajo las viñetas (W-ADV-40): sustituye a las filas de enlaces y a "Ver todos los precios" */
 .hx .svc__tray{grid-column:1/-1;list-style:none;min-width:0}
 /* sin filas debajo, las tres viñetas llenan su tarjeta (mismo alto en la fila; animaciones de page.js intactas) */
-@media (min-width:901px){.hx .svc__col .vig{flex:1 0 auto}.hx .vig--search{display:flex;flex-direction:column;justify-content:center}}
+@media (min-width:901px){.hx .svc__col .vig{flex:1 0 auto}.hx .vig--search{display:flex;flex-direction:column;justify-content:center}
+  /* cada nombre reserva dos líneas: la bandeja mide lo mismo en todos los idiomas y el tramo de Proyectos no se mueve */
+  .hx .w-htray__name{min-height:2.5em}}
 .hx .w-htray{list-style:none;margin:0;padding:12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:1px solid var(--w-line);border-radius:var(--w-r-tray);background:var(--w-s1-a);box-shadow:var(--w-edge)}
 .hx .w-htray>li{display:flex;min-width:0}
 .hx .w-htray__card{flex:1;min-width:0;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--w-r-obj);background:var(--w-s2);border:1px solid var(--w-line);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
@@ -445,6 +447,9 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .w-hwhere__q .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 4px}
 .hx .w-hwhere__ic{flex:none;width:48px;height:48px;display:grid;place-items:center;border-radius:var(--w-r-obj);color:var(--accent-gold);background:rgba(var(--accent-gold-rgb),.07);border:1px solid var(--w-line-strong)}
 .hx .w-hwhere__ic svg{width:21px;height:21px}
+/* sector sin página propia: misma tarjeta opaca (E-37) pero quieta, sin relieve ni icono dorado, para que no parezca un botón */
+.hx div.w-hwhere__card{background:var(--w-s1);box-shadow:none}
+.hx div.w-hwhere__card .w-hwhere__ic{color:var(--w-ink-60);background:none;border-color:var(--w-line)}
 /* 7 · franja "En pocas palabras" con sus dos cifras (mismas que cita la respuesta) */
 .hx .answer{padding-block:140px}
 .hx .w-hanswer .answer__figs{display:flex;justify-content:center;gap:clamp(32px,6vw,96px);margin-top:36px}
@@ -457,7 +462,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 @media (min-width:901px){
   .hx .faq .w-faq__block{max-width:none;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:72px;align-items:start}
   .hx .faq .w-faq__head{position:sticky;top:120px;margin-bottom:0}
-  .hx .faq .w-faq__list{gap:12px}
   .hx .faq .w-faq__q{padding:18px 24px;font-size:18px}
   .hx .faq .w-faq__list{gap:10px}
 }
@@ -476,6 +480,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .cta{padding-block:96px 112px}
 /* el tramo de servicios conserva su alto: la bandeja ocupa el sitio de las filas y del margen inferior */
 .hx .svc{padding-bottom:45px}
+@media (min-width:901px){.hx .svc{padding-bottom:21px}}
 @media (max-width:900px){
   .hx .w-htray{grid-template-columns:repeat(2,minmax(0,1fr))}
   .hx .w-hwhere{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -495,19 +500,19 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .pf__mini::before{height:20px}
   .hx .w-hcase{padding:24px 18px 12px}
   .hx .pf__dl dd{font-size:15px;line-height:1.55}
-  .hx .pf__tags li:not(:first-child){display:none}
+  /* una sola fila de etiquetas: caben las que caben enteras (las que saltarían a otra fila se ocultan), sin alargar el tramo */
+  .hx .pf__tags{max-height:26px;overflow:hidden}
+  .hx .pf__tags li{line-height:16px}
   .hx .explore__in{gap:20px}
   .hx .answer{padding-block:160px 150px}
   .hx .faq{padding-block:36px}
   .hx .faq .w-faq__list{gap:8px}
   .hx .faq .w-faq__q{padding:18px 16px}
   .hx .explore__row a{padding:14px 16px}
-  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;text-align:left;column-gap:14px;padding:14px 4px}
-  .hx .w-hg3 .g3__ic{grid-row:1/span 2;margin-top:2px}
+  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:18px 4px}
+  .hx .w-hg3 .g3__ic{margin-top:0}
   .hx .w-hg3 .g3__h{margin-top:0}
   .hx .w-hg3 .g3__text{display:none}
-  .hx .w-hg3 .g3__item{grid-template-columns:20px minmax(0,1fr);align-items:center;padding:18px 4px}
-  .hx .w-hg3 .g3__ic{grid-row:auto;margin-top:0}
   /* el alto de cada tramo depende del largo de los textos de cada página: se iguala aquí, dentro de sus contenedores */
   .hx[data-city="miami"]:lang(es) .pf--solo .pf__step{margin-bottom:8px}
   .hx[data-city="houston"]:lang(en) .pf__step{margin-bottom:56px}
@@ -517,7 +522,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx[data-city="miami"]:lang(en) .cta{padding-block:52px}
   .hx .w-hwhere{grid-template-columns:minmax(0,1fr);gap:8px}
   .hx .w-hwhere>li:last-child:nth-child(odd){grid-column:auto}
-  .hx .w-hwhere__barrio{display:none!important}
+  .hx .w-hwhere>li.w-hwhere__barrio{display:none}
   .hx .w-hwhere__card{padding:12px 14px 12px 18px}
   .hx .w-hwhere__ic{width:40px;height:40px}
   .hx .w-hanswer .answer__figs{flex-direction:column;gap:20px;margin-top:28px}

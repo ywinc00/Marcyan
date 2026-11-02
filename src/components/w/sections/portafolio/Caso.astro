@@ -11,6 +11,7 @@
 //   MJA, W-PROOF-07). Ficha y tarjeta pegan juntas.
 // · `figWide`: la figura sale de la columna de 688 y ocupa el ancho de raíl a raíl, debajo
 //   del relato y la ficha (RN): una variación para que los casos 02 a 04 no se calquen.
+//   Tope de 900 px centrada: es el ancho nativo de la captura, para que no se amplíe.
 // · Barra del navegador SIN dominio en los cuatro casos (solo TRR y MJA lo tienen verificado y
 //   no enlazamos las webs del cliente): se oculta la píldora para que no se lea a vacía.
 // "Ver la web" del cliente NO se enlaza (privacidad del schema).
@@ -119,7 +120,9 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
   /* Sin dominio en ninguna barra: queda la barra con sus tres puntos. */
   .pc__fig :global(.w-fig__url) { visibility: hidden; }
   .pc__fig--wide { margin-top: 16px; }
-  .pc__fig--wide :global(.w-fig) { max-width: none; }
+  /* Tope de 900 px = ancho nativo de la captura `-pc-900` que elige el navegador con el `sizes`
+     de FiguraProyecto (736 px): así nunca se amplía (puerta técnica 1). Centrada en el raíl. */
+  .pc__fig--wide :global(.w-fig) { max-width: 900px; }
   .pc__fig--wide :global(.w-fig__phone) { max-width: 200px; }
 
   /* Móvil (E-18, por sustracción): la caja del nombre repite el H2 de la cabecera; queda la tabla. */

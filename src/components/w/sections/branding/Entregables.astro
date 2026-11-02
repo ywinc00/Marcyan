@@ -1,0 +1,19 @@
+---
+// Branding · 01 "Entregables" (§4.18-2): CabeceraNumerada (H2 + bajada) + Especificaciones
+// 4×2 (W-NEW-31): la ficha del encargo, escaneable. Los entregables vienen de
+// includes.items (libre) reescritos a ocho celdas con plazos oficiales.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Especificaciones from '../../Especificaciones.astro';
+import type { BrandingCopy } from '../../../../i18n/w/branding';
+
+interface Props { copy: BrandingCopy['entregables']; n: number }
+const { copy, n } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="be-gap">
+  <Especificaciones label={copy.specsLabel} cells={copy.specs} />
+</div>
+<style>
+  .be-gap { margin-top: 64px; }
+  @media (--lt-md) { .be-gap { margin-top: 40px; } }
+</style>

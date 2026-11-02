@@ -1,0 +1,34 @@
+---
+// Branding · precio (§4.18-6): PrecioPuntos (W-CORE-14) con la cifra = ancla baja del
+// branding (diseño de logo) con "Desde" y el degradado único de la página; abajo a la
+// derecha el slice "Branding completo" (R6). Debajo, la nota de precio del dato y el
+// enlace a la propuesta que conserva el evento pricing_cta_clicked (contrato de analítica).
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Button from '../../../ui/Button.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { BrandingCopy } from '../../../../i18n/w/branding';
+
+interface Props { copy: BrandingCopy['precio']; note?: string }
+const { copy, note } = Astro.props;
+const br = catalog.find((p) => p.id === 'branding')!;
+const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="brandingLogo"
+  from="Desde"
+  bottomLeft={{ big: br.tiers[0].name, text: br.tiers[0].blurb }}
+  bottomRight={{ label: br.tiers[1].name, value: desde(PRICE_ANCHORS.branding) }}
+/>
+<div class="bp-foot">
+  {note && <p class="bp-note">{note}</p>}
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  .bp-foot {
+    max-width: var(--w-rail-max); margin: 24px auto 0; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 32px;
+  }
+  .bp-note { margin: 0; max-width: 46rem; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+</style>

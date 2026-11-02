@@ -1,0 +1,21 @@
+---
+// Branding · 03 "Caso real" (§4.18-5): FichaProyecto grande de Julio's Landscape TX
+// (aquí sí su web real: es PRUEBA, E-32), el único proyecto de proof.items que es
+// marca + sitio. Sin el enlace al servicio del proyecto: apuntaría a esta misma página.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import FichaProyecto from '../../FichaProyecto.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+import type { BrandingCopy } from '../../../../i18n/w/branding';
+
+interface Props { copy: BrandingCopy['caso']; n: number; items: ProjectItem[]; lead: string; lang?: 'es' | 'en' }
+const { copy, n, items, lead, lang = 'es' } = Astro.props;
+const main = items.find((p) => p.name === lead) ?? items[0];
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="bc-gap">
+  <FichaProyecto project={main} variant="grande" lang={lang} as="h3" link={false} />
+</div>
+<style>
+  .bc-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .bc-gap { margin-top: 48px; } }
+</style>

@@ -21,14 +21,14 @@ import PlacaLogo from '../../components/w/objetos/PlacaLogo.astro';
 import CapituloDosFrases from '../../components/w/CapituloDosFrases.astro';
 import CabeceraNumerada from '../../components/w/CabeceraNumerada.astro';
 import Especificaciones from '../../components/w/Especificaciones.astro';
-import TablaFases from '../../components/w/TablaFases.astro';
 import CuatroRazones from '../../components/w/CuatroRazones.astro';
-import SedesAcordeon from '../../components/w/SedesAcordeon.astro';
 import FranjaEnPocasPalabras from '../../components/w/FranjaEnPocasPalabras.astro';
 import PreguntasAbiertas from '../../components/w/PreguntasAbiertas.astro';
 import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
 import Fundadores from '../../components/w/sections/sobre/Fundadores.astro';
 import SalidaSuave from '../../components/w/sections/sobre/SalidaSuave.astro';
+import Proceso from '../../components/w/sections/sobre/Proceso.astro';
+import Sedes from '../../components/w/sections/sobre/Sedes.astro';
 import { content, nap } from '../../i18n/content';
 import { clusterNav } from '../../i18n/clusters';
 import { sobreNosotros as a } from '../../i18n/sobre-nosotros';
@@ -113,11 +113,11 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
       </div>
     </section>
 
-    {/* 3 · 02 Cómo es un proyecto (#proceso, de content.process; Process.astro no se toca). */}
+    {/* 3 · 02 Cómo es un proyecto (#proceso, de content.process; Process.astro no se toca):
+        lista + bandeja con dos objetos de producto (patrón del piloto, rev1 E-54/E-01). */}
     <section class="w-cell" id="proceso">
       <div class="w-container" data-w-reveal>
-        <CabeceraNumerada n={2} label={t.proceso.label} titleHtml={t.proceso.title} lead={t.proceso.lead} />
-        <div class="wsb-gap"><TablaFases rows={fases} headers={t.proceso.headers} /></div>
+        <Proceso n={2} label={t.proceso.label} titleHtml={t.proceso.title} lead={t.proceso.lead} rows={fases} headers={t.proceso.headers} lang="es" />
       </div>
     </section>
 
@@ -129,11 +129,11 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
       </div>
     </section>
 
-    {/* 5 · 04 Dónde estamos (#ciudades): NAP real, acordeón cerrado al cargar. */}
+    {/* 5 · 04 Dónde estamos (#ciudades): dos bandejas con silueta real y NAP real,
+        acordeón cerrado al cargar (rev1). */}
     <section class="w-cell" id="ciudades">
       <div class="w-container" data-w-reveal>
-        <CabeceraNumerada n={4} label={t.sedes.label} titleHtml={t.sedes.title} lead={t.sedes.lead} />
-        <div class="wsb-gap"><SedesAcordeon items={c.locations.items} more={t.sedes.more} callLabel={t.sedes.call} /></div>
+        <Sedes n={4} label={t.sedes.label} titleHtml={t.sedes.title} lead={t.sedes.lead} items={c.locations.items} more={t.sedes.more} callLabel={t.sedes.call} />
       </div>
     </section>
 

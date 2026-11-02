@@ -88,7 +88,7 @@ const es: SobreCopy = {
 
 const en: SobreCopy = {
   hero: {
-    lead: 'We master AI so your business doesn’t have to. Websites, AI assistants and local SEO, in real English and real Spanish.',
+    lead: 'We master AI so your business doesn’t have to. Websites, AI assistants and local SEO, in English and Spanish that actually sound native.',
     chip: 'Houston and Miami',
     primary: 'Get my free proposal',
     link: 'View portfolio',
@@ -100,7 +100,7 @@ const en: SobreCopy = {
     title: 'What you can check today',
     lead: 'Facts you can verify on this very site, not promises.',
     cells: [
-      { k: 'Cities', v: 'Houston and Miami', note: 'Service-area business, direct attention in your market.' },
+      { k: 'Cities', v: 'Houston and Miami', note: 'Service-area business, with hands-on support in your market.' },
       { k: 'Languages', v: 'English and Spanish', note: 'Written for how your customer searches, not Google Translate.' },
       { k: 'Pricing', v: 'Public', note: 'Down to the monthly SEO and maintenance, no fine print.' },
       { k: 'Contact', v: '1 business hour', note: 'That is how fast we get back to you when you write.' },

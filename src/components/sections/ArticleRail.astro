@@ -22,22 +22,20 @@ const { headings, tocLabel, rail, postTitle } = Astro.props;
 </div>
 
 <style>
+  /* Piel v3 (design/rediseno-workos.md §4.8): la lógica y las tarjetas no cambian.
+     Móvil: solo el índice (plegado). Escritorio (≥1024): el raíl se disuelve
+     (display: contents) para que la rejilla de la página coloque el índice a la
+     izquierda (W-CONT-21) y las 2 tarjetas a la derecha de la lectura, pegajosas
+     a la misma altura que el índice mientras se lee. */
   .rail { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
-
-  /* Móvil: solo la ToC (details). Las tarjetas viven en el raíl desktop. */
   .rail__cards { display: none; }
 
   @media (--lg) {
-    /* El raíl ocupa todo el alto del aside (que se estira al alto del artículo)
-       para que las tarjetas puedan fijarse a lo largo de toda la lectura. No hay
-       scroll interno: la ToC y las tarjetas se ven completas. */
-    .rail { height: 100%; }
-    /* La ToC (arriba) se desplaza normal con la página. Las 2 tarjetas se fijan
-       cuando la primera llega arriba y quedan siempre visibles. */
+    .rail { display: contents; }
     .rail__cards {
-      display: flex; flex-direction: column; gap: var(--space-4);
+      display: flex; flex-direction: column; gap: 16px; min-width: 0;
       position: sticky;
-      top: calc(var(--nav-h) + var(--space-3));
+      top: calc(var(--nav-h) + 32px);
     }
   }
 </style>

@@ -1,45 +1,63 @@
 ---
-// RENDERER DE POST · /es/blog/[slug] — ensambla una pieza desde su Markdown.
-// Estructura: Nav · Hero(kicker/título/fecha)+Breadcrumb · AnswerBlock (AEO) ·
-// <Content/> (cuerpo Markdown estilizado) · FAQ (FAQPage) · Relacionados ·
-// CtaBand · Contacto · Footer. Schema: BlogPosting + FAQPage + BreadcrumbList.
-// El @graph base (Organization + 2 ProfessionalService) ya vive en el Layout.
+// RENDERER DE POST v3 · /es/blog/[slug] (design/rediseno-workos.md §4.8, tarea 3-articulo).
+// Estructura: Nav · [cabecera W-CONT-20 + índice W-CONT-21 + lectura W-CONT-23 + raíl]
+// en UNA rejilla (el índice arranca a la altura del título, como en WorkOS; las 2
+// tarjetas del raíl, RailCta y RailTools, acompañan la lectura) · PostNav + Sigue
+// leyendo (W-CONT-26) · En pocas palabras (answer verbatim) · Preguntas frecuentes
+// (FAQPage) · Cierre en dos tarjetas (trío) · Contacto · Footer.
+// Schema: BlogPosting + FAQPage + BreadcrumbList (+ @graph base del Layout), sin cambios.
+// Contraste: ninguno extra (la portada ensanchada aporta la luz). Firma: ninguna.
+// Degradado: ninguno.
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import SiteNav from '../../../components/layout/SiteNav.astro';
 import SiteFooter from '../../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import ArticleHero from '../../../components/sections/ArticleHero.astro';
-import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
 import Article from '../../../components/sections/Article.astro';
 import ArticleRail from '../../../components/sections/ArticleRail.astro';
 import RailTools from '../../../components/sections/RailTools.astro';
-import Faq from '../../../components/sections/Faq.astro';
 import PostNav from '../../../components/sections/PostNav.astro';
-import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
-import CtaBand from '../../../components/sections/CtaBand.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ArticleLd from '../../../components/seo/ArticleLd.astro';
 import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
-import { content } from '../../../i18n/content';
+import WStyles from '../../../components/w/WStyles.astro';
+import FranjaEnPocasPalabras from '../../../components/w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../../components/w/PreguntasFrecuentes.astro';
+import CierreDosTarjetas from '../../../components/w/CierreDosTarjetas.astro';
+import PreguntaATuIA from '../../../components/w/sections/blog/PreguntaATuIA.astro';
+import SigueLeyendo from '../../../components/w/sections/blog/SigueLeyendo.astro';
+import { content, nap } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
 import { postChrome } from '../../../i18n/blog';
+
+const SITE = 'https://marcyanstudio.com';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang !== 'en'))
     .sort((a, z) => z.data.datePublished.getTime() - a.data.datePublished.getTime());
   const ref = (p: (typeof posts)[number]) => ({ title: p.data.title, path: `/es/blog/${p.id}` });
+  // Fichas ligeras de todos los artículos para "Sigue leyendo" (sin el cuerpo).
+  const cards = posts.map((p) => ({
+    id: p.id,
+    title: p.data.title,
+    href: `/es/blog/${p.id}`,
+    desc: p.data.description,
+    tags: p.data.tags,
+    time: p.data.datePublished.getTime(),
+  }));
   return posts.map((post, i) => ({
     params: { slug: post.id },
     props: {
       post,
       prevPost: posts[i + 1] ? ref(posts[i + 1]) : null, // más antiguo
       nextPost: posts[i - 1] ? ref(posts[i - 1]) : null, // más reciente
+      cards,
     },
   }));
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post, prevPost, nextPost, cards } = Astro.props;
 const { Content, headings } = await render(post);
 
 const c = content.es;
@@ -60,10 +78,20 @@ const ogImage = d.ogImage ?? '/assets/og/og-default.png';
 const crumbs = [...postChrome.root, { name: d.title, path: slugPath }];
 const related = d.related.map((r) => ({ ...r, desc: r.desc ?? '' }));
 
-// La ToC solo se monta con ≥3 H2 (mismo umbral que ArticleToc). Cuando existe, la
-// lectura usa una grilla [ToC sticky | cuerpo]; si no, el cuerpo va a una sola columna.
+// "Sigue leyendo": hasta 3 artículos, primero los que comparten más temas, luego los recientes.
+const mine = new Set(d.tags);
+const more = cards
+  .filter((p) => p.id !== post.id)
+  .map((p) => ({ ...p, shared: p.tags.filter((t) => mine.has(t)).length }))
+  .sort((a, z) => z.shared - a.shared || z.time - a.time)
+  .slice(0, 3);
+
 const tocItems = headings.filter((h) => h.depth === 2);
 const hasToc = tocItems.length >= 3;
+
+// Cierre: teléfono de Houston, el mismo que ya usa el raíl (RailCta).
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 ---
 <Layout
   title={`${d.title} | Marcyan Studio`}
@@ -72,6 +100,7 @@ const hasToc = tocItems.length >= 3;
   path={`blog/${post.id}`}
   hasEn={false}
   ogImage={ogImage}
+  ds="v3"
 >
   <ArticleLd
     slot="head"
@@ -84,66 +113,92 @@ const hasToc = tocItems.length >= 3;
     section={d.tags[0]}
     keywords={d.tags}
   />
+  <WStyles />
 
   <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath="/es/blog" />
 
-  <main id="main">
-    <ArticleHero
-      kicker={d.heroKicker ?? 'Blog de Marcyan'}
-      badge={d.heroBadge}
-      title={d.title}
-      lead={d.description}
-      dateISO={dateISO}
-      dateLabel={fmt(d.datePublished)}
-      readingLabel={readingLabel}
-      tags={d.tags}
-      topic={d.tags[0]}
-    >
-      <Breadcrumb slot="breadcrumb" items={crumbs} lang="es" />
-    </ArticleHero>
+  <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="articulo">
+    <div class="w-container art">
+      <div class:list={['art__grid', !hasToc && 'art__grid--notoc']}>
+        <ArticleHero
+          class="art__hero"
+          kicker={d.heroKicker}
+          title={d.title}
+          lead={d.description}
+          dateISO={dateISO}
+          dateLabel={fmt(d.datePublished)}
+          readingLabel={readingLabel}
+          tags={d.tags}
+          topic={d.tags[0]}
+        >
+          <Breadcrumb slot="breadcrumb" items={crumbs} lang="es" />
+          <PreguntaATuIA slot="ia" question={d.answer.q} url={SITE + slugPath} />
+        </ArticleHero>
 
-    <AnswerBlock q={d.answer.q} a={d.answer.a} source={d.answer.source} />
+        <aside class="art__aside">
+          <ArticleRail
+            headings={headings}
+            tocLabel={postChrome.toc}
+            rail={postChrome.rail}
+            postTitle={d.title}
+          />
+        </aside>
 
-    {/* Lectura: el texto corre; el raíl (ToC + conversión + herramientas) acompaña
-        pegado en desktop. En móvil: ToC colapsable arriba + herramientas inline abajo. */}
-    <section class="section reader">
-      <div class="container">
-        <div class="reader__grid">
-          <aside class="reader__aside">
-            <ArticleRail
-              headings={headings}
-              tocLabel={postChrome.toc}
-              rail={postChrome.rail}
-              postTitle={d.title}
-            />
-          </aside>
-          <div class="reader__body">
-            <Article><Content /></Article>
-            <div class="reader__tools-m">
-              <RailTools t={postChrome.rail.tools} />
-            </div>
+        <div class="art__body">
+          <Article><Content /></Article>
+          <div class="art__tools-m">
+            <RailTools t={postChrome.rail.tools} />
           </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="w-cell art-more" aria-label="Más guías">
+      <div class="w-container" data-w-reveal>
+        <div class="art__col">
+          <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
+          <SigueLeyendo posts={more} links={related} relatedTitle="Recursos relacionados" />
         </div>
       </div>
     </section>
 
-    {/* El menú de post anterior/siguiente va ANTES que las preguntas frecuentes. */}
-    <PostNav prev={prevPost} next={nextPost} indexHref="/es/blog" labels={postChrome.nav} />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras
+          q={d.answer.q}
+          a={d.answer.a}
+          source={d.answer.source}
+          verified={d.updated ? fmt(d.updated) : undefined}
+        />
+      </div>
+    </section>
 
     {d.faq.length > 0 && (
-      <Faq tag={postChrome.faq.tag} title={postChrome.faq.title} items={d.faq} />
+      <section class="w-cell">
+        <div class="w-container" data-w-reveal>
+          <PreguntasFrecuentes id="faq" tag={postChrome.faq.tag} titleHtml={postChrome.faq.title} items={d.faq} />
+        </div>
+      </section>
     )}
 
-    {related.length > 0 && (
-      <RelatedLinks tag={postChrome.related.tag} title={postChrome.related.title} links={related} />
-    )}
-
-    <CtaBand
-      title={postChrome.cta.title}
-      sub={postChrome.cta.sub}
-      primary={postChrome.cta.primary}
-      tone={postChrome.cta.tone}
-    />
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={postChrome.cta.title}
+          proof={postChrome.cta.sub}
+          city="houston"
+          tel={tel}
+          wa={wa}
+          warm={{
+            kind: 'diagnostico',
+            title: '¿Aún no sabes qué necesitas?',
+            text: 'Revisa gratis si tu negocio está perdiendo clientes online.',
+            cta: 'Hacer el diagnóstico',
+            href: '/es/diagnostico',
+          }}
+        />
+      </div>
+    </section>
 
     <Contact contact={c.contact} />
   </main>
@@ -154,31 +209,40 @@ const hasToc = tocItems.length >= 3;
 </Layout>
 
 <style>
-  /* Zona de lectura: ritmo más ceñido que una sección completa (la energía va al texto). */
-  .reader { padding-block: var(--space-7); }
-  .reader__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-6); min-width: 0; }
-
-  /* En móvil el raíl solo pinta la ToC (details) arriba del cuerpo. */
-  .reader__aside { min-width: 0; }
-  .reader__body { min-width: 0; }
-
-  /* Herramientas inline: solo móvil (en desktop viven en el raíl). */
-  .reader__tools-m { margin-top: var(--space-7); }
+  /* ── Rejilla de lectura (W-CONT-20/21/23) ─────────────────────────────────
+     Móvil: una columna (cabecera · índice plegado · cuerpo · herramientas).
+     ≥1024: índice plegado en rayas (24) · cuerpo 680 · raíl con las 2 tarjetas.
+     ≥1280: índice desplegado (200) · cuerpo 680 · raíl.
+     El índice ocupa las dos filas (empieza a la altura del título, como en WorkOS);
+     las tarjetas del raíl solo la fila de la lectura. Orden del DOM = cabecera,
+     índice + tarjetas, cuerpo (el índice llega antes que el texto al lector). */
+  .art { padding-top: var(--w-hero-top); padding-bottom: clamp(64px, 3rem + 3vw, 104px); }
+  .art__grid { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+  .art__aside { min-width: 0; margin-top: 32px; }
+  .art__body { min-width: 0; margin-top: 32px; }
+  .art__grid--notoc .art__aside { margin-top: 0; }
+  .art__tools-m { margin-top: 56px; }
 
   @media (--lg) {
-    /* Desktop: texto a la IZQUIERDA (medida la manda Article, max 72ch) + raíl
-       pegajoso a la DERECHA. El aside va primero en el DOM (ToC móvil arriba +
-       lectores de pantalla reciben el índice antes del cuerpo); visualmente
-       se coloca a la derecha vía grid-column. */
-    .reader__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 19.5rem);
-      gap: var(--space-8);
-      align-items: start;
+    .art__grid {
+      grid-template-columns: 24px 32px minmax(0, 680px) 32px minmax(232px, 1fr);
+      grid-template-rows: auto 1fr;
     }
-    /* El aside se estira al alto de la fila (= alto del artículo) para que las
-       tarjetas del raíl puedan fijarse (sticky) durante toda la lectura. */
-    .reader__aside { grid-column: 2; grid-row: 1; align-self: stretch; }
-    .reader__body  { grid-column: 1; grid-row: 1; }
-    .reader__tools-m { display: none; }
+    /* El aside y el raíl se disuelven: el índice y las tarjetas son celdas de la rejilla. */
+    .art__aside { display: contents; }
+    .art__grid :global(.art__hero) { grid-column: 3; grid-row: 1; }
+    .art__body { grid-column: 3; grid-row: 2; margin-top: 56px; }
+    .art__grid :global(.toc) { grid-column: 1; grid-row: 1 / 3; align-self: stretch; }
+    .art__grid :global(.rail__cards) { grid-column: 5; grid-row: 2; align-self: start; margin-top: 56px; }
+    .art__tools-m { display: none; }
   }
+  @media (--xl) {
+    .art__grid { grid-template-columns: 200px 32px minmax(0, 680px) 32px minmax(0, 1fr); }
+  }
+
+  /* Bloque "más guías": misma columna que la lectura. */
+  .art-more { padding-block: clamp(64px, 3rem + 3vw, 104px); }
+  .art__col { max-width: 680px; display: flex; flex-direction: column; gap: 72px; }
+  @media (--lg) { .art__col { margin-left: 56px; } }
+  @media (--xl) { .art__col { margin-left: 232px; } }
 </style>

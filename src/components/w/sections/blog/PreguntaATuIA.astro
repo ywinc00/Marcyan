@@ -1,0 +1,70 @@
+---
+// "Pregúntale a tu IA" (design/rediseno-workos.md §4.8; W-CONT-22). Fila bajo la firma
+// del artículo: rótulo corto a la izquierda y tres enlaces que abren ChatGPT, Claude y
+// Perplexity con la PREGUNTA DEL ARTÍCULO y su dirección escritas. Solo eso: ningún dato
+// del visitante viaja en la URL. Los asistentes se nombran en texto, sin sus logotipos
+// (§1.C); el icono es genérico de Lucide. Se abren en otra pestaña y se avisa.
+import Icon from '../../../ui/Icon.astro';
+
+interface Props {
+  /** La pregunta del artículo (answer.q del frontmatter). */
+  question: string;
+  /** Dirección pública del artículo (canonical). */
+  url: string;
+  label?: string;
+}
+const { question, url, label = 'Pregúntale a tu IA' } = Astro.props;
+const prompt = encodeURIComponent(`Lee esta guía de Marcyan Studio y respóndeme: ${question} ${url}`);
+const tools = [
+  { name: 'ChatGPT', href: `https://chatgpt.com/?q=${prompt}` },
+  { name: 'Claude', href: `https://claude.ai/new?q=${prompt}` },
+  { name: 'Perplexity', href: `https://www.perplexity.ai/search?q=${prompt}` },
+];
+---
+<div class="askai">
+  <p class="askai__label">{label}</p>
+  <ul class="askai__list">
+    {tools.map((t) => (
+      <li>
+        <a class="askai__link" href={t.href} target="_blank" rel="noopener noreferrer">
+          <span>Abrir en {t.name}</span>
+          <Icon name="lucide:arrow-up-right" />
+          <span class="askai__sr">(se abre en otra pestaña)</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .askai { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 24px; min-width: 0; }
+  .askai__label {
+    margin: 0;
+    font-family: var(--font-mono); font-size: var(--w-micro); font-weight: 500; line-height: 1.2;
+    letter-spacing: var(--w-tr-micro); text-transform: uppercase; color: var(--w-ink-60);
+  }
+  .askai__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 20px; }
+  .askai__link {
+    display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--w-ink-80);
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .askai__link :global(svg) {
+    width: 14px; height: 14px; color: var(--accent-gold);
+    transition: transform var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .askai__link:hover { color: var(--w-ink); }
+    .askai__link:hover :global(svg) { transform: translate(2px, -2px); }
+  }
+  .askai__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; color: var(--w-ink); }
+  .askai__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @media (--lt-md) {
+    .askai { flex-direction: column; align-items: flex-start; }
+    .askai__list { gap: 0 16px; }
+  }
+  @media (--motion-reduce) {
+    .askai__link, .askai__link :global(svg) { transition: none; }
+    .askai__link:hover :global(svg) { transform: none; }
+  }
+</style>

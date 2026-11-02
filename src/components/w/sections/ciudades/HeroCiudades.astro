@@ -1,0 +1,79 @@
+---
+// Ciudades · hero (design/rediseno-workos.md §4.13; A-04 + W-CONV-01 + W-NEW-09).
+// Cabecera compacta de hub, centrada y SOLO texto (A-04, E-05: hub sin botones ni chips):
+// migas, eyebrow, H1 hub verbatim, cola en degradado (el único de la página) y bajada de
+// una línea. Debajo, asomando en la primera pantalla, las tarjetas por perfil: Houston y
+// Miami con la silueta real de su ciudad (la del pie de cada hub) + la ancha de "otra ciudad".
+// · Marcado del texto = el de HeroTexto (mismas clases del sistema y mismos data-w-in de la
+//   coreografía §2.9), sin la fila de botones: HeroTexto exige `primary` (pendiente de
+//   sistema: hacerlo opcional y volver a montar HeroTexto aquí).
+// · TarjetasPerfil pinta su <h2>: aquí se oculta a la vista (sigue para lectores y para el
+//   esquema de titulares), porque el H1 y la bajada ya dicen "elige tu ciudad".
+import Eyebrow from '../../Eyebrow.astro';
+import TarjetasPerfil from '../../TarjetasPerfil.astro';
+
+interface Card { title: string; text: string; href: string; cta: string; art?: string }
+interface Wide { icon: string; title: string; text: string; href: string; cta: string; track?: string }
+interface Props {
+  eyebrow: string;
+  h1Html: string;
+  tail: string;
+  lead: string;
+  perfilesTitle: string;
+  cards: [Card, Card];
+  wide: Wide;
+}
+const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide } = Astro.props;
+---
+<section class="w-hero ciu-hero">
+  <div class="w-container">
+    <div class="ciu-hero__text" data-w-tone="gold">
+      {Astro.slots.has('crumbs') && <div class="ciu-hero__crumbs"><slot name="crumbs" /></div>}
+      <div class="ciu-hero__top" data-w-in="1">
+        <Eyebrow tone="gold">{eyebrow}</Eyebrow>
+      </div>
+      <h1 class="w-h1 w-h1--hub" data-w-in="1" set:html={h1Html} />
+      <p class="w-h1__tail w-h1__tail--hub w-grad-text" data-w-in="1">{tail}</p>
+      <p class="w-lead ciu-hero__lead" data-w-in="2">{lead}</p>
+    </div>
+    <div class="ciu-hero__cards" data-w-in="obj">
+      <TarjetasPerfil titleHtml={perfilesTitle} cards={cards} wide={wide} id="elige" class="ciu-prof" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .ciu-hero { padding-bottom: var(--w-section-y); }
+  .ciu-hero__text { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 768px; margin-inline: auto; min-width: 0; }
+  .ciu-hero__crumbs { margin-bottom: 24px; }
+  .ciu-hero__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  /* Migas a la izquierda, en la línea del logo, como en HeroTexto (E-44). */
+  @media (--lg) {
+    .ciu-hero > .w-container { position: relative; }
+    .ciu-hero__crumbs { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
+  }
+  .ciu-hero__top { margin-bottom: var(--w-gap-eyebrow); }
+  .ciu-hero__lead { margin-top: var(--w-gap-h1); margin-inline: auto; }
+
+  /* Tarjetas asomando (W-CONV-01: ~80 px bajo la bajada). */
+  .ciu-hero__cards { margin-top: 64px; }
+  @media (--lt-md) { .ciu-hero__cards { margin-top: 40px; } }
+  /* El H2 de las tarjetas, solo para lectores (el hero ya lo dice). */
+  .ciu-hero :global(.ciu-prof .w-prof__title) {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* Silueta real de la ciudad (la del pie de su hub, vectorizada de foto libre): se pinta como
+     máscara en el acento de la página, nítida a cualquier ancho, anclada abajo a todo el ancho. */
+  .ciu-hero :global(.ciu-sky) {
+    display: block; width: 100%; height: 96px;
+    background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), 0.42) 0%, rgba(var(--accent-gold-rgb), 0.10) 100%);
+    -webkit-mask: var(--sky) var(--sky-pos) / auto 100% no-repeat;
+    mask: var(--sky) var(--sky-pos) / auto 100% no-repeat;
+  }
+  /* Houston es alta: entera a 96 px de alto, hacia la derecha. Miami es ancha y baja: a todo
+     el ancho, recortada por los lados (como en el pie de su hub). */
+  .ciu-hero :global(.ciu-sky--houston) { --sky: url('/assets/houston/skyline.svg'); --sky-pos: 88% 100%; }
+  .ciu-hero :global(.ciu-sky--miami) { --sky: url('/assets/miami/skyline.svg'); --sky-pos: 50% 100%; height: 72px; }
+</style>

@@ -1,0 +1,40 @@
+---
+// Ciudades · 01 "Qué hacemos en cada ciudad" (§4.13-2, capítulo de contraste): matriz
+// servicio × ciudad que se enciende por filas (W-ADV-52, firma de la página). Solo se
+// enlazan las casillas con página EXISTENTE; las demás van punteadas, sin enlace.
+// Composición como W-ADV-52 en WorkOS: texto a la izquierda y el objeto a la derecha
+// (cabecera numerada solo con número y etiqueta; el H2 va en su columna, patrón del sistema).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import MatrizFilas from '../../MatrizFilas.astro';
+
+interface Cell { label: string; href?: string }
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  tableLabel: string;
+  columns: string[];
+  rows: { label: string; cells: Cell[] }[];
+  lang?: 'es' | 'en';
+}
+const { n, label, title, lead, tableLabel, columns, rows, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} />
+<div class="ciu-2c">
+  <div class="ciu-2c__txt">
+    <h2 class="w-h2" set:html={title} />
+    <p class="ciu-2c__lead">{lead}</p>
+  </div>
+  <div class="ciu-2c__obj">
+    <MatrizFilas rows={rows} columns={columns} label={tableLabel} tone="gold" lang={lang} />
+  </div>
+</div>
+<style>
+  .ciu-2c { display: grid; gap: 32px; margin-top: 12px; min-width: 0; }
+  .ciu-2c__txt, .ciu-2c__obj { min-width: 0; }
+  .ciu-2c__lead { margin: 12px 0 0; max-width: 430px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary); }
+  @media (--lg) {
+    .ciu-2c { grid-template-columns: minmax(0, 430px) minmax(0, 1fr); column-gap: 96px; align-items: center; margin-top: 40px; }
+  }
+</style>

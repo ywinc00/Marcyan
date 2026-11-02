@@ -1,0 +1,25 @@
+---
+// Ciudades · 02 "Dónde estamos" (§4.13-3): sedes en acordeón, todas cerradas al cargar
+// (E-23), con el teléfono de cada ciudad (call_clicked). Datos de content.locations.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import SedesAcordeon from '../../SedesAcordeon.astro';
+
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  more: string;
+  callLabel: string;
+  items: { city: string; state?: string; area: string; tel: string; links?: { label: string; href: string; sub?: string }[] }[];
+}
+const { n, label, title, lead, more, callLabel, items } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
+<div class="ciu-sedes">
+  <SedesAcordeon items={items} more={more} callLabel={callLabel} tone="gold" />
+</div>
+<style>
+  .ciu-sedes { margin-top: 56px; }
+  @media (--lt-md) { .ciu-sedes { margin-top: 32px; } }
+</style>

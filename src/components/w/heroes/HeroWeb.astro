@@ -1,0 +1,74 @@
+---
+// Hero de las landings de diseño web (design/rediseno-workos.md §4.14, piloto ola 1).
+// A-05 + A-12 + W-CORE-01/02: texto centrado en 768 (HeroTexto pone la coreografía
+// de §2.9), debajo el abanico con las 3 webs de EJEMPLO nuestras sobre franjas de
+// luz oro a ventana completa, y la tira de nombres reales (~90 px bajo el abanico;
+// TiraLogos no pinta nada en Miami).
+// El abanico recorta en vertical él mismo; esta sección recorta en horizontal
+// (las franjas miden 100vw) y reserva la nav con .w-hero.
+import HeroTexto from '../HeroTexto.astro';
+import AbanicoWebs from '../objetos/AbanicoWebs.astro';
+import TiraLogos from '../TiraLogos.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  tail?: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  city?: 'houston' | 'miami';
+  cityName: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, tail, lead, primary, link, city, cityName, lang = 'es' } = Astro.props;
+---
+<section class="w-hero w-hero--bleed hw">
+  <div class="w-container hw__text">
+    <HeroTexto
+      eyebrow={eyebrow}
+      tone="gold"
+      chip={chip}
+      h1Html={h1Html}
+      tail={tail}
+      lead={lead}
+      primary={primary}
+      link={link}
+    >
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+  </div>
+  <div class="hw__fan">
+    <AbanicoWebs lang={lang} city={cityName} />
+  </div>
+  {city !== 'miami' && (
+    <div class="w-container hw__logos">
+      <TiraLogos lang={lang} city={city} />
+    </div>
+  )}
+</section>
+
+<style>
+  .hw { overflow-x: clip; }
+  /* El abanico se corta en una línea de suelo (como la línea de celda que sigue),
+     no en un borde recto sin intención (E-36). */
+  .hw__fan { margin-top: 56px; border-bottom: 1px solid var(--w-line-strong); }
+  /* Escritorio: las migas se alinean al borde del contenedor, a la altura del chip,
+     en vez de ocupar una línea propia sobre el texto centrado. Así el abanico sube
+     ~44 px en la primera pantalla (W-CORE-01 enseña ~435 px del objeto). */
+  @media (--lg) {
+    .hw__text { position: relative; }
+    .hw__text :global(.w-herotext__crumbs) { position: absolute; top: 4px; left: 0; margin: 0; }
+  }
+  /* Sin la sangría por defecto de la lista: el texto de las migas empieza en el borde
+     del contenedor, en la línea del logo de la barra (E-44), y en móvil queda centrado
+     de verdad. */
+  .hw__text :global(.w-herotext__crumbs ol) { padding-inline-start: 0; margin: 0; }
+  .hw__logos { margin-top: 72px; padding-bottom: 72px; }
+  @media (--lt-md) {
+    .hw__fan { margin-top: 48px; }
+    .hw__logos { margin-top: 56px; padding-bottom: 56px; }
+  }
+</style>

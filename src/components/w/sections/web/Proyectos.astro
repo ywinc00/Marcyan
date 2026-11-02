@@ -1,0 +1,37 @@
+---
+// Diseño web · 03 "Proyectos" (§4.14-8): FichaProyecto grande del proyecto de la
+// ciudad (Houston: TRR; Miami: MJA, rotulado Florida (Orlando)) + TarjetasCaso con el
+// resto de proof.items. Capturas REALES: aquí sí, es prueba (E-32).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import FichaProyecto from '../../FichaProyecto.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props {
+  copy: WebCopy['proyectos']; n: number; items: ProjectItem[]; lead: string;
+  /** false = sin el enlace al servicio del proyecto (p. ej. MJA en Miami: su servicio
+   *  es de Orlando y el enlace de la ciudad insinuaría un caso en Miami). */
+  leadLink?: boolean;
+  lang?: 'es' | 'en';
+}
+const { copy, n, items, lead, leadLink = true, lang = 'es' } = Astro.props;
+const main = items.find((p) => p.name === lead) ?? items[0];
+const others = items.filter((p) => p !== main);
+// Las tarjetas van de 2 en 2: con un número impar, la última quedaría huérfana.
+const rest = others.length > 1 && others.length % 2 ? others.slice(0, -1) : others;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ws-gap">
+  <FichaProyecto project={main} variant="grande" lang={lang} as="h3" link={leadLink ? undefined : false} />
+</div>
+{rest.length > 0 && (
+  <div class="ws-gap2">
+    <TarjetasCaso items={rest} label={copy.more} lang={lang} as="h3" />
+  </div>
+)}
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  .ws-gap2 { margin-top: 72px; }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } .ws-gap2 { margin-top: 48px; } }
+</style>

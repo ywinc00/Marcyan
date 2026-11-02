@@ -1,0 +1,43 @@
+---
+// Diseño web · precio (§4.14-9): PrecioPuntos (W-CORE-14, cifra = ancla baja con
+// "Desde", degradado único de la página; el slice "A medida" abajo a la derecha, R6)
+// + Especificaciones "Qué incluye" (W-NEW-31) + la nota de precio del dato y el
+// enlace a la propuesta que conserva el evento pricing_cta_clicked de la tarjeta de
+// precio de antes (contrato de analítica).
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Especificaciones from '../../Especificaciones.astro';
+import Button from '../../../ui/Button.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props { copy: WebCopy['precio']; note?: string }
+const { copy, note } = Astro.props;
+const web = catalog.find((p) => p.id === 'diseno-web')!;
+const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="webLanding"
+  from="Desde"
+  bottomLeft={{ big: web.tiers[0].name, text: web.tiers[0].blurb }}
+  bottomRight={{ label: web.tiers[2].name, value: desde(PRICE_ANCHORS.web) }}
+/>
+<div class="ws-gap ws-w">
+  <Especificaciones label={copy.specsLabel} cells={copy.specs} />
+</div>
+<div class="ws-foot ws-w">
+  {note && <p class="ws-note">{note}</p>}
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  /* Mismo ancho que la tarjeta de precio (1100) para que los bordes casen. */
+  .ws-w { max-width: 1100px; margin-inline: auto; }
+  .ws-gap { margin-top: 72px; }
+  .ws-foot {
+    margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 32px;
+  }
+  .ws-note { margin: 0; max-width: 46rem; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

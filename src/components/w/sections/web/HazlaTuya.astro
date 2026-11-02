@@ -1,0 +1,37 @@
+---
+// Diseño web · 02 "Hazla tuya" (§4.14-5): Escalera (W-CORE-06 + B-08) Landing /
+// Rediseño / A medida con sus anclas de pricing.ts; el precio solo en la opción activa.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Escalera from '../../Escalera.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props { copy: WebCopy['escalera']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, city, lang = 'es' } = Astro.props;
+const web = catalog.find((p) => p.id === 'diseno-web')!;
+const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
+const [t0, t1, t2] = web.tiers;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} />
+<div class="ws-gap">
+  <Escalera
+    titleHtml={copy.demoTitle}
+    lead={copy.demoLead}
+    chip={copy.chip}
+    lang={lang}
+    options={[
+      { id: 'landing', title: t0.name, text: t0.blurb, price: desde(PRICE_ANCHORS.webLanding) },
+      { id: 'rediseno', title: t1.name, text: t1.blurb, price: desde(PRICE_ANCHORS.webRedesign) },
+      { id: 'medida', title: t2.name, text: t2.blurb, price: desde(PRICE_ANCHORS.web) },
+    ]}
+  >
+    <WebEjemplo slot="screen-landing" frame="movil" kind="plomeria" city={city} lang={lang} example={false} />
+    <WebEjemplo slot="screen-rediseno" frame="movil" kind="salon" city={city} lang={lang} example={false} />
+    <WebEjemplo slot="screen-medida" frame="movil" kind="restaurante" city={city} lang={lang} example={false} />
+  </Escalera>
+</div>
+<style>
+  .ws-gap { margin-top: 56px; }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

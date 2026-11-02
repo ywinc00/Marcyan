@@ -1,0 +1,27 @@
+---
+// Diseño web · capítulo de contraste (§4.14-6): CapituloDosFrases + Bento2x2
+// (W-CORE-08 + B-03) con un objeto por celda. Página oro: Marcy en burbujas neutras (E-14).
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import MiniPasos from '../../objetos/MiniPasos.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
+import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props { copy: WebCopy['bento']; city: string; lang?: 'es' | 'en' }
+const { copy, city, lang = 'es' } = Astro.props;
+---
+<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div class="ws-gap">
+  <Bento2x2 cells={copy.cells}>
+    <MiniPasos slot="ui-1" kind="correo" lang={lang} fill />
+    <WebEjemplo slot="ui-2" frame="movil" kind="salon" city={city} lang={lang} size="mini" />
+    <FichaMapaEjemplo slot="ui-3" city={city} lang={lang} size="card" />
+    <ChatMarcy slot="ui-4" mode="estatico" tone="neutral" lang={lang} size="card" />
+  </Bento2x2>
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

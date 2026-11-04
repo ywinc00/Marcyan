@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-02",
+  "fecha": "2026-11-04",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
@@ -50,17 +50,17 @@
       "marca": false
     },
     {
-      "consulta": "páginas web houston",
-      "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 2,
-      "marca": false
-    },
-    {
       "consulta": "diseño web para negocios en miami",
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 3,
+      "marca": false
+    },
+    {
+      "consulta": "páginas web houston",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 2,
       "marca": false
     },
     {

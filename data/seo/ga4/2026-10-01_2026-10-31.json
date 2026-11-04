@@ -1,0 +1,103 @@
+{
+  "cliente": "marcyan",
+  "estado": "ok",
+  "periodo": {
+    "desde": "2026-10-01",
+    "hasta": "2026-10-31"
+  },
+  "anterior": {
+    "desde": "2026-09-01",
+    "hasta": "2026-09-30"
+  },
+  "eventoContacto": "generate_lead",
+  "totales": {
+    "sesiones": 757,
+    "contactos": 0
+  },
+  "porCanal": {
+    "Direct": {
+      "actual": {
+        "sesiones": 734,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 93,
+        "contactos": 0
+      }
+    },
+    "Organic Search": {
+      "actual": {
+        "sesiones": 15,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 12,
+        "contactos": 0
+      }
+    },
+    "Unassigned": {
+      "actual": {
+        "sesiones": 5,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 9,
+        "contactos": 0
+      }
+    },
+    "Referral": {
+      "actual": {
+        "sesiones": 2,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 8,
+        "contactos": 0
+      }
+    },
+    "Organic Social": {
+      "actual": {
+        "sesiones": 1,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 3,
+        "contactos": 0
+      }
+    }
+  },
+  "porIdioma": {
+    "es": {
+      "actual": {
+        "sesiones": 638,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 107,
+        "contactos": 0
+      }
+    },
+    "en": {
+      "actual": {
+        "sesiones": 119,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 18,
+        "contactos": 0
+      }
+    }
+  },
+  "ia": {
+    "actual": {
+      "sesiones": 0,
+      "contactos": 0
+    },
+    "anterior": {
+      "sesiones": 0,
+      "contactos": 0
+    },
+    "fuentes": {}
+  },
+  "nota": "Contactos = número de eventos de contacto (un mismo cliente puede enviar dos veces). Visitas de IA sin referrer caen en Direct."
+}

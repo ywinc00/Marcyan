@@ -1,0 +1,273 @@
+{
+  "cliente": "marcyan",
+  "tipo": "mes",
+  "periodo": {
+    "desde": "2026-10-01",
+    "hasta": "2026-10-31"
+  },
+  "anterior": {
+    "desde": "2026-09-01",
+    "hasta": "2026-09-30"
+  },
+  "anioPasado": {
+    "desde": "2025-10-01",
+    "hasta": "2025-10-31"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 1,
+      "impresiones": 342,
+      "ctr": 0.29,
+      "posicion": 17.8
+    },
+    "anterior": {
+      "clicks": 6,
+      "impresiones": 829,
+      "ctr": 0.72,
+      "posicion": 28.9
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": -5,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 1,
+        "ctr": 0,
+        "posicion": 2
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 162,
+        "ctr": 0,
+        "posicion": 26.8
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 1,
+        "ctr": 0,
+        "posicion": 7
+      },
+      "sinMarca": {
+        "clicks": 2,
+        "impresiones": 509,
+        "ctr": 0.39,
+        "posicion": 40.2
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "home",
+      "clicks": 1,
+      "impresiones": 17,
+      "ctr": 5.88,
+      "posicion": 3.2,
+      "dClicks": 1,
+      "dImpresiones": 12,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 183,
+      "ctr": 0,
+      "posicion": 13.5,
+      "dClicks": -1,
+      "dImpresiones": 58,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "landings",
+      "clicks": 0,
+      "impresiones": 77,
+      "ctr": 0,
+      "posicion": 25.6,
+      "dClicks": -3,
+      "dImpresiones": -264,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 57,
+      "ctr": 0,
+      "posicion": 26.9,
+      "dClicks": -1,
+      "dImpresiones": -275,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 36,
+      "ctr": 0,
+      "posicion": 5.9,
+      "dClicks": 0,
+      "dImpresiones": 22,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 16,
+      "ctr": 0,
+      "posicion": 6.5,
+      "dClicks": 0,
+      "dImpresiones": -41,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "herramientas",
+      "clicks": 0,
+      "impresiones": 3,
+      "ctr": 0,
+      "posicion": 6,
+      "dClicks": 0,
+      "dImpresiones": 3,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "servicios",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": -1,
+      "dImpresiones": -7,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "en",
+      "clicks": 1,
+      "impresiones": 61,
+      "ctr": 1.64,
+      "posicion": 10.9,
+      "dClicks": 0,
+      "dImpresiones": -134,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "es",
+      "clicks": 0,
+      "impresiones": 328,
+      "ctr": 0,
+      "posicion": 17.4,
+      "dClicks": -5,
+      "dImpresiones": -358,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/en",
+      "clicks": 1,
+      "impresiones": 10,
+      "ctr": 10,
+      "posicion": 2.7,
+      "dClicks": 1,
+      "dImpresiones": 8,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [
+    {
+      "clave": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "clicks": 0,
+      "impresiones": 115,
+      "ctr": 0,
+      "posicion": 13.5,
+      "dClicks": -1,
+      "dImpresiones": 54,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/miami",
+      "clicks": 0,
+      "impresiones": 27,
+      "ctr": 0,
+      "posicion": 26.4,
+      "dClicks": -1,
+      "dImpresiones": -245,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/miami/ecommerce",
+      "clicks": 0,
+      "impresiones": 5,
+      "ctr": 0,
+      "posicion": 7,
+      "dClicks": -1,
+      "dImpresiones": 2,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/miami/diseno-web",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 7,
+      "dClicks": -1,
+      "dImpresiones": -100,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/en/ai-for-small-business",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": -1,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 13.5,
+      "impresiones": 115,
+      "ctr": 0
+    },
+    {
+      "url": "https://marcyanstudio.com/es/blog/ia-que-contesta-llamadas-mensajes-perdidos",
+      "posicion": 14.6,
+      "impresiones": 45,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [
+    {
+      "query": "precio chatbot whatsapp",
+      "pagina": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 16.5,
+      "impresiones": 31
+    },
+    {
+      "query": "chatbot whatsapp precio",
+      "pagina": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 16.2,
+      "impresiones": 23
+    },
+    {
+      "query": "hacer web en miami",
+      "pagina": "https://marcyanstudio.com/es/miami",
+      "posicion": 28.1,
+      "impresiones": 19
+    },
+    {
+      "query": "posicionamiento web miami",
+      "pagina": "https://marcyanstudio.com/es/miami/seo-local",
+      "posicion": 46.2,
+      "impresiones": 11
+    }
+  ],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

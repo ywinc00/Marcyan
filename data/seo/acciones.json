@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-11-01",
+  "actualizado": "2026-11-04",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -538,6 +538,48 @@
           "fecha": "2026-11-01",
           "estado": "hecha",
           "nota": "Publicado el 1-nov con OK de Yan (PR #51, cf8970d). En producción los 3 pares ES salen de la lista de casi iguales (antes 90/89/88 %). Revisión 15-nov; quedan /en/houston y /en/miami (83 %) para el chat del rediseño de Houston"
+        }
+      ]
+    },
+    "marcyan-guia-chatbot-enlaces": {
+      "ref": "marcyan-guia-chatbot-enlaces",
+      "tipo": "web",
+      "titulo": "Enlazar la guía de precio del chatbot de WhatsApp desde /es/precios y las dos páginas de IA conversacional (Houston y Miami) y afinar su título para «precio chatbot whatsapp», tras el congelado del 23-nov (cambia lo que se ve, OK de Yan)",
+      "estado": "propuesta",
+      "primeraVez": "2026-11-04",
+      "ultimaVez": "2026-11-04",
+      "propuestas": 1,
+      "vence": "2026-11-30",
+      "origen": "mensual-2026-10",
+      "evidencia": {
+        "fecha": "2026-11-04",
+        "texto": "4-nov: la guía trae 115 de las 342 apariciones de octubre (puesto 13,5, 0 clics); Google la rastreó por última vez el 7-sep y solo conoce 1 enlace interno; hoy solo la enlaza /es/blog, no /es/precios ni /es/houston|miami/ia-conversacional"
+      },
+      "historial": [
+        {
+          "fecha": "2026-11-04",
+          "estado": "propuesta"
+        }
+      ]
+    },
+    "marcyan-bing-sesion-chrome": {
+      "ref": "marcyan-bing-sesion-chrome",
+      "tipo": "dueno",
+      "titulo": "Dejar abierta la sesión de Bing Webmaster en Chrome para que la rutina lea el informe de IA de Microsoft",
+      "estado": "pedida",
+      "primeraVez": "2026-11-04",
+      "ultimaVez": "2026-11-04",
+      "propuestas": 1,
+      "vence": "2026-11-30",
+      "origen": "mensual-2026-10",
+      "evidencia": {
+        "fecha": "2026-11-04",
+        "texto": "4-nov: la URL del informe AI Performance redirige a la página pública de Bing Webmaster (sin sesión)"
+      },
+      "historial": [
+        {
+          "fecha": "2026-11-04",
+          "estado": "pedida"
         }
       ]
     }

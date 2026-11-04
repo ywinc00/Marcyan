@@ -1,0 +1,1966 @@
+{
+  "cliente": "marcyan",
+  "fecha": "2026-11-04",
+  "hora": "2026-11-04T21:04:12.106Z",
+  "motor": "chatgpt",
+  "proveedor": "openai",
+  "metodo": "API de OpenAI con búsqueda web",
+  "modeloPedido": "gpt-6-luna",
+  "modelos": [
+    "gpt-6-luna"
+  ],
+  "preguntasDe": "config",
+  "preguntas": 5,
+  "listaPreguntas": [
+    {
+      "posicion": 1,
+      "idioma": "en",
+      "texto": "best bilingual web design agency in Houston"
+    },
+    {
+      "posicion": 2,
+      "idioma": "en",
+      "texto": "web design agency for Hispanic small businesses in Houston"
+    },
+    {
+      "posicion": 3,
+      "idioma": "en",
+      "texto": "local SEO agency in Miami for small businesses"
+    },
+    {
+      "posicion": 4,
+      "idioma": "es",
+      "texto": "agencia de diseño web para negocios hispanos en Houston"
+    },
+    {
+      "posicion": 5,
+      "idioma": "es",
+      "texto": "cuánto cuesta una página web en Houston"
+    }
+  ],
+  "repeticiones": 10,
+  "esperadas": 50,
+  "respuestas": 50,
+  "errores": 0,
+  "llamadas": 50,
+  "coste": 0.580082,
+  "estado": "completa",
+  "porcentajeApariciones": {
+    "marcyan": 0,
+    "True Digital Marketing": 0,
+    "Webnhubs": 0,
+    "Artisticore": 0
+  },
+  "preguntasPorMarca": {
+    "marcyan": 0,
+    "True Digital Marketing": 0,
+    "Webnhubs": 0,
+    "Artisticore": 0
+  },
+  "porPregunta": [
+    {
+      "posicion": 1,
+      "idioma": "en",
+      "texto": "best bilingual web design agency in Houston",
+      "respuestas": 10,
+      "veces": {
+        "marcyan": 0,
+        "True Digital Marketing": 0,
+        "Webnhubs": 0,
+        "Artisticore": 0
+      }
+    },
+    {
+      "posicion": 2,
+      "idioma": "en",
+      "texto": "web design agency for Hispanic small businesses in Houston",
+      "respuestas": 10,
+      "veces": {
+        "marcyan": 0,
+        "True Digital Marketing": 0,
+        "Webnhubs": 0,
+        "Artisticore": 0
+      }
+    },
+    {
+      "posicion": 3,
+      "idioma": "en",
+      "texto": "local SEO agency in Miami for small businesses",
+      "respuestas": 10,
+      "veces": {
+        "marcyan": 0,
+        "True Digital Marketing": 0,
+        "Webnhubs": 0,
+        "Artisticore": 0
+      }
+    },
+    {
+      "posicion": 4,
+      "idioma": "es",
+      "texto": "agencia de diseño web para negocios hispanos en Houston",
+      "respuestas": 10,
+      "veces": {
+        "marcyan": 0,
+        "True Digital Marketing": 0,
+        "Webnhubs": 0,
+        "Artisticore": 0
+      }
+    },
+    {
+      "posicion": 5,
+      "idioma": "es",
+      "texto": "cuánto cuesta una página web en Houston",
+      "respuestas": 10,
+      "veces": {
+        "marcyan": 0,
+        "True Digital Marketing": 0,
+        "Webnhubs": 0,
+        "Artisticore": 0
+      }
+    }
+  ],
+  "fuentesSinCliente": [
+    {
+      "dominio": "serendipdigital.com",
+      "veces": 27
+    },
+    {
+      "dominio": "fernvicknetwork.com",
+      "veces": 27
+    },
+    {
+      "dominio": "nexodigital70.com",
+      "veces": 10
+    },
+    {
+      "dominio": "design.bripemedia.com",
+      "veces": 9
+    },
+    {
+      "dominio": "themanifest.com",
+      "veces": 8
+    },
+    {
+      "dominio": "abdesignstrategy.com",
+      "veces": 6
+    },
+    {
+      "dominio": "officialcystudio.com",
+      "veces": 6
+    },
+    {
+      "dominio": "cafecitoweb.com",
+      "veces": 5
+    },
+    {
+      "dominio": "mcsocialagency.com",
+      "veces": 5
+    },
+    {
+      "dominio": "seekemedia.com",
+      "veces": 5
+    },
+    {
+      "dominio": "aglads.com",
+      "veces": 4
+    },
+    {
+      "dominio": "lvbranding.com",
+      "veces": 3
+    },
+    {
+      "dominio": "wallstreetwebdesigns.com",
+      "veces": 3
+    },
+    {
+      "dominio": "apexweb360.com",
+      "veces": 3
+    },
+    {
+      "dominio": "nexloft.io",
+      "veces": 3
+    }
+  ],
+  "detalle": [
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 1,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:24.000Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "huella": "7a1c59ddbce0e46e6fa2cf72b1a8dac420a3747d9b66a4e50bac469e26cd6911",
+      "usage": {
+        "entrada": 12633,
+        "entradaCache": 4318,
+        "salida": 286,
+        "razonamiento": 42
+      },
+      "coste": 0.011722,
+      "texto": "**Serendip Digital** looks like the strongest fit for a Houston small business seeking bilingual web design: it’s Houston-based and says it creates websites and content in English and Spanish, rather than simply translating an English site. It also offers local SEO and Google Business Profile support. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n\nOther options worth comparing:\n- **Fernvick Network** — Houston-based; bilingual web design plus IT and Google Ads. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **LV Branding** — better suited to larger or more complex projects needing bilingual UX/UI and web development. ([lvbranding.com](https://www.lvbranding.com/services/ux-ui-digital-experience-houston?utm_source=openai))\n- **AB Design Strategy** — a Houston design studio that welcomes Spanish-speaking clients. ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n\nThere isn’t an objective “best” without knowing your budget and project needs. Before choosing, ask to see **live English/Spanish websites**, confirm who writes the Spanish copy, and clarify ownership, hosting, maintenance, and ongoing costs."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 1,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:40.398Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://www.expertise.com/business/seo-agencies/florida/miami",
+        "https://cafecitoweb.com/en/miami-seo"
+      ],
+      "fuentes": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://www.expertise.com/business/seo-agencies/florida/miami",
+        "https://cafecitoweb.com/en/miami-seo"
+      ],
+      "huella": "54ee8a8fef185ea520034062f84970cf6d953dc3c1e376e35cf0d0f0a9264704",
+      "usage": {
+        "entrada": 12690,
+        "entradaCache": 4318,
+        "salida": 293,
+        "razonamiento": 45
+      },
+      "coste": 0.011733,
+      "texto": "For a **Miami small business**, I’d start by comparing these:\n\n- **OptFirst Internet Marketing** — Miami-area agency that serves small and mid-sized businesses; a good option to ask about Google Maps and local search work. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **On The Map, Inc.** — Miami-based and focused on lead generation; its listed clients include contractors and home-service businesses. ([expertise.com](https://www.expertise.com/business/seo-agencies/florida/miami?utm_source=openai))\n- **CafecitoWeb** — specifically promotes local SEO for Miami businesses, including Google Business Profile optimization and neighborhood-focused search. ([cafecitoweb.com](https://cafecitoweb.com/en/miami-seo?utm_source=openai))\n\n**My suggestion:** get proposals from two or three and compare the exact monthly deliverables—not just promises to “rank you.” Ask whether they’ll work on your Google Business Profile, local service pages, reviews, and reporting on calls/leads. Get a relevant client example, a clear contract and cancellation terms, and make sure you retain ownership of your website and listings.\n\nShare your **business type, Miami neighborhood, and rough monthly budget**, and I can narrow this down."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 1,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:41.230Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://www.fernvicknetwork.com/",
+        "https://nexodigital70.com/",
+        "https://serendipdigital.com/",
+        "https://mcsocialagency.com/"
+      ],
+      "fuentes": [
+        "https://www.fernvicknetwork.com/",
+        "https://nexodigital70.com/",
+        "https://serendipdigital.com/",
+        "https://mcsocialagency.com/"
+      ],
+      "huella": "87367fca0d530b0c819b91cb14cb1355a03b7b9b368cd8bf2a34bc5f2fe4aadf",
+      "usage": {
+        "entrada": 12634,
+        "entradaCache": 4318,
+        "salida": 355,
+        "razonamiento": 58
+      },
+      "coste": 0.011757,
+      "texto": "Si buscas una **agencia de diseño web que atienda en español a negocios hispanos en Houston**, estas opciones parecen relevantes:\n\n- **Fernvick Network** — Está en Houston y ofrece sitios web y publicidad en español, inglés o ambos; también trabaja con pequeños negocios. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **NEXO Digital Houston** — Se presenta como un servicio local para negocios hispanos, con atención bilingüe y enfoque en sitios web para negocios pequeños. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Serendip Digital** — Agencia de Houston enfocada en diseño web bilingüe y SEO local para pequeños negocios. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **MC Social Agency** — Agencia de Houston que ofrece diseño web y otros servicios creativos, con atención en español. ([mcsocialagency.com](https://mcsocialagency.com/?utm_source=openai))\n\n**Para empezar:** pediría cotización a Fernvick si quieres trato local y varios servicios de marketing; a NEXO si buscas algo sencillo para un negocio pequeño; y a Serendip si también necesitas mejorar tu presencia en Google.\n\nAntes de contratar, pregunta si el precio incluye dominio, mantenimiento, versión móvil y SEO local; solicita ejemplos de sitios publicados y deja por escrito quién será dueño de la web y sus accesos."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 1,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:41.322Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://wallstreetwebdesigns.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://wallstreetwebdesigns.com/"
+      ],
+      "huella": "c6d382ed334445d4f083cc30f2b4776a18d27133589756d00b2ec338a97fc936",
+      "usage": {
+        "entrada": 12718,
+        "entradaCache": 4318,
+        "salida": 408,
+        "razonamiento": 53
+      },
+      "coste": 0.011794,
+      "texto": "Here are a few Houston-area options that specifically mention bilingual service or work with Latino-owned small businesses:\n\n- **[Serendip Digital](https://serendipdigital.com/)** — Houston-based and focused on small businesses. Offers bilingual websites, local SEO, and Google Business Profile help; says it creates content in English and Spanish. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **[Fernvick Network](https://www.fernvicknetwork.com/)** — Houston small-business web design and marketing; says its team is bilingual and can build websites and ads in English, Spanish, or both. Offers a free quote. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **[Bripe Media](https://design.bripemedia.com/about)** — Specializes in bilingual websites for Latino-owned small businesses and lists Houston clients. Its site says projects start at $850; confirm current pricing and availability directly. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **[Wallstreet Webdesigns](https://wallstreetwebdesigns.com/)** — Houston web designer focused on small businesses; advertises affordable sites and Spanish-speaking service. ([wallstreetwebdesigns.com](https://wallstreetwebdesigns.com/?utm_source=openai))\n\n**Best starting point:** Serendip Digital for a Houston-based, small-business-focused bilingual agency; Bripe Media if you want a provider that explicitly specializes in Latino-owned businesses.\n\nWhen you contact them, ask for examples in your industry, a written total cost (including hosting and maintenance), and confirmation that you’ll own the domain, website, and accounts."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 2,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:52.463Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.apexweb360.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
+        "https://nexloft.io/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.apexweb360.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston",
+        "https://nexloft.io/"
+      ],
+      "huella": "41ad001495a5154a015ea48b7fd712057494de8ccc30002b9ef52915b4b5c51d",
+      "usage": {
+        "entrada": 12660,
+        "entradaCache": 4329,
+        "salida": 312,
+        "razonamiento": 51
+      },
+      "coste": 0.011739,
+      "texto": "If you mean **English–Spanish websites**, **Serendip Digital** looks like a strong Houston-local option for small businesses. It says it creates website content natively in both languages and offers local SEO and Google Business Profile support. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives, depending on what you need:\n\n- **ApexWeb360** — Houston-based, bilingual web design with SEO and ongoing maintenance. ([apexweb360.com](https://www.apexweb360.com/?utm_source=openai))\n- **LV Branding** — a better fit for larger or more complex projects; focuses on bilingual UX, brand strategy, and websites designed for English- and Spanish-speaking audiences. ([lvbranding.com](https://www.lvbranding.com/services/ux-ui-digital-experience-houston?utm_source=openai))\n- **NexLoft** — nearby in Crosby; says English–Spanish support is standard and publishes a starting project price. ([nexloft.io](https://nexloft.io/?utm_source=openai))\n\nThere isn’t enough independent information here to call one objectively “the best.” Before choosing, ask for **live bilingual site examples**, a clear quote, who writes the Spanish copy, and whether you’ll own the domain and website files."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 2,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:52.567Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://mcsocialagency.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://mcsocialagency.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "huella": "3f53d3152da30bcd1ba2697b32044a10a80f701a71cc8e59d6bfba79ef6f6fab",
+      "usage": {
+        "entrada": 12660,
+        "entradaCache": 4331,
+        "salida": 378,
+        "razonamiento": 54
+      },
+      "coste": 0.011772,
+      "texto": "Here are a few Houston-area options that specifically mention bilingual service or working with Latino/Hispanic small businesses:\n\n- **Serendip Digital** — Houston-based, small-business focused; offers English/Spanish websites, local SEO, and Google Business Profile help. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **Fernvick Network** — Houston small-business web design and digital services; says it works with Spanish-speaking business owners and builds sites in English, Spanish, or both. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Bripe Media** — Focuses on Latino-owned small businesses and bilingual websites; its site lists Houston clients. Ask whether it can meet your needs locally or remotely. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **MC Social Agency** — Houston-based, bilingual marketing and creative agency with website design, social media, photography, and video services. ([mcsocialagency.com](https://mcsocialagency.com/?utm_source=openai))\n- **AB Design Strategy** — Houston web design for small businesses; says you can communicate in English or Spanish. ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n\n**Good starting point:** Compare Serendip and Fernvick if you want a Houston-based partner for both a bilingual website and local search visibility. Before choosing, ask for examples in your industry, the total cost (including hosting and updates), and whether Spanish copy is written by a fluent speaker—not just auto-translated."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 2,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:52.817Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://miamiseonerdz.com/",
+        "https://www.miamiseocompany.net/about/",
+        "https://clutch.co/seo-firms/miami"
+      ],
+      "fuentes": [
+        "https://miamiseonerdz.com/",
+        "https://www.miamiseocompany.net/about/",
+        "https://clutch.co/seo-firms/miami"
+      ],
+      "huella": "efc8e8450255396f34f99d1296e7284344c390781e83528b0df9ef30b4616ffa",
+      "usage": {
+        "entrada": 12816,
+        "entradaCache": 4330,
+        "salida": 309,
+        "razonamiento": 54
+      },
+      "coste": 0.011757,
+      "texto": "Here are a few Miami-area options worth comparing for a small business:\n\n- **Miami SEO Nerdz** — A local, bilingual agency focused on service businesses in South Florida. ([miamiseonerdz.com](https://miamiseonerdz.com/?utm_source=openai))\n- **Miami SEO Company** — Founder-led and based in Brickell; offers local SEO and bilingual services across Miami-Dade and Broward. ([miamiseocompany.net](https://www.miamiseocompany.net/about/?utm_source=openai))\n- **OptFirst Internet Marketing** — Miami agency; client reviews mention local search, website updates, and content strategy. ([clutch.co](https://clutch.co/seo-firms/miami?utm_source=openai))\n- **On The Map Marketing** — Miami-based and offers SEO and web design; reviews are mixed, so ask for references from businesses like yours. ([clutch.co](https://clutch.co/seo-firms/miami?utm_source=openai))\n\nBefore signing, ask for a clear monthly scope—especially Google Business Profile work, local keyword targeting, review support, and reporting on calls or leads. Get a couple of references in your industry, and be cautious of anyone promising guaranteed rankings.\n\nIf you tell me your **business type, neighborhood, and monthly budget**, I can narrow this down."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 1,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:04:52.842Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://zenintech.com/blog/web-design-cost-houston/"
+      ],
+      "fuentes": [
+        "https://zenintech.com/blog/web-design-cost-houston/"
+      ],
+      "huella": "277ea74a157da2582d6c2de05740a19a4d926b72815bff4e3ad76337a28dc2ba",
+      "usage": {
+        "entrada": 8683,
+        "entradaCache": 4318,
+        "salida": 284,
+        "razonamiento": 47
+      },
+      "coste": 0.011227,
+      "texto": "En Houston, **una página web para un negocio pequeño suele costar entre $1,500 y $8,000** si la hace un profesional. Como referencia:\n\n- **Landing page sencilla:** $500–$1,500  \n- **Sitio básico de 4–6 páginas:** $1,500–$3,500  \n- **Sitio personalizado con más diseño y funciones:** $3,500–$10,000+  \n- **Tienda en línea:** desde unos $3,000; puede subir bastante según productos y pagos  \n\nEl precio depende de cuántas páginas necesitas, si ya tienes textos y fotos, y si incluye SEO, mantenimiento o funciones especiales. También pueden cobrarse aparte el dominio, alojamiento y actualizaciones. Los precios publicados por proveedores locales varían bastante, así que conviene comparar cotizaciones con el mismo alcance. ([zenintech.com](https://zenintech.com/blog/web-design-cost-houston/?utm_source=openai))\n\nSi me dices **qué tipo de negocio tienes** y si necesitas vender en línea, te doy un rango más ajustado."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 3,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:03.886Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://nexloft.io/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://nexloft.io/"
+      ],
+      "huella": "2725c409eb5e1aab887e06b0916759dbe043598f914e71f5f1d340ae91208740",
+      "usage": {
+        "entrada": 12726,
+        "entradaCache": 4329,
+        "salida": 293,
+        "razonamiento": 41
+      },
+      "coste": 0.011737,
+      "texto": "**Best fit for most Houston small businesses: Serendip Digital.** It’s Houston-based and specifically focused on bilingual English–Spanish websites and local SEO for small businesses. The agency says it creates content for both languages rather than simply translating it. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA couple of alternatives, depending on what you need:\n\n- **Fernvick Network** — worth considering if you also want Google Ads, SEO, or IT support alongside web design; it offers services in English and Spanish. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **NexLoft** — advertises custom websites with English and Spanish included as standard, and lists a starting price of **$1,500**. It’s based in Crosby and serves Houston. ([nexloft.io](https://nexloft.io/?utm_source=openai))\n\n“Best” depends on your budget, industry, and project scope, so I’d ask two or three agencies for proposals. Compare their **live bilingual portfolio**, who writes the Spanish copy, what’s included in the quote, and whether you’ll own the site and domain."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 2,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:04.058Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://www.fernvicknetwork.com/es/",
+        "https://nexodigital70.com/",
+        "https://presenzamedia.com/es",
+        "https://serendipdigital.com/"
+      ],
+      "fuentes": [
+        "https://www.fernvicknetwork.com/es/",
+        "https://nexodigital70.com/",
+        "https://presenzamedia.com/es",
+        "https://serendipdigital.com/"
+      ],
+      "huella": "4dfb83077c482a104a957c085ad31bdf32376445fd1146ce0abe965ef8c3cea9",
+      "usage": {
+        "entrada": 12498,
+        "entradaCache": 4334,
+        "salida": 347,
+        "razonamiento": 58
+      },
+      "coste": 0.011736,
+      "texto": "Si buscas una agencia que atienda en español y trabaje con negocios hispanos en Houston, estas opciones parecen relevantes:\n\n- **Fernvick Network** — Agencia local y bilingüe; ofrece diseño web, SEO, Google Ads y diseño gráfico para Houston y alrededores. Cotización gratis. ([fernvicknetwork.com](https://www.fernvicknetwork.com/es/?utm_source=openai))\n- **NEXO Digital Houston** — Enfocada en pequeños negocios hispanos; ofrece sitios bilingües y atención en español. Publica un plazo estimado de entrega de 3 a 5 días. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Presenza Media** — Agencia bilingüe basada en Houston; combina diseño web con Google Ads y redes sociales. Indica sitios desde $1,500. ([presenzamedia.com](https://presenzamedia.com/es?utm_source=openai))\n- **Serendip Digital** — Diseño web bilingüe y SEO local para pequeños negocios en Houston y ciudades cercanas. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n\nAntes de contratar, pide ejemplos de trabajos para negocios parecidos al tuyo y una propuesta por escrito que detalle precio, mantenimiento, dominio y quién será dueño del sitio. Si me dices qué tipo de negocio tienes y tu presupuesto aproximado, puedo ayudarte a elegir cuál encaja mejor."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 3,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:04.223Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://serendipdigital.com/",
+        "https://mcsocialagency.com/",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "fuentes": [
+        "https://www.fernvicknetwork.com/",
+        "https://design.bripemedia.com/about",
+        "https://serendipdigital.com/",
+        "https://mcsocialagency.com/",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "huella": "9de2865f0d66979d4658db469784eb3990ddaffeb25b41441d41eaf64a7d37ef",
+      "usage": {
+        "entrada": 8645,
+        "entradaCache": 4331,
+        "salida": 333,
+        "razonamiento": 46
+      },
+      "coste": 0.011247,
+      "texto": "Here are a few options to check out for **web design serving Hispanic or Spanish-speaking small businesses in Houston**:\n\n- **Fernvick Network** — Houston-based and explicitly serves Spanish-speaking small businesses; offers websites in English, Spanish, or both, plus SEO and Google Ads. **Free quote.** ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Bripe Media** — Focuses on Latino-owned small businesses and bilingual websites; lists projects for Houston businesses and says websites start at **$850**. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **Serendip Digital** — Offers bilingual web design, local SEO, and Google Business Profile optimization for Houston small businesses. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **MC Social Agency** — Houston creative agency offering website design and bilingual English/Spanish marketing. ([mcsocialagency.com](https://mcsocialagency.com/?utm_source=openai))\n- **Seek Media** — Works with Houston-area businesses on bilingual web design, SEO, and related digital marketing. ([seekemedia.com](https://seekemedia.com/locations/houston?utm_source=openai))\n\nWhen comparing quotes, ask whether Spanish copy is written naturally (not just machine-translated), whether local SEO and mobile-friendly design are included, and who owns the website and domain after launch."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 2,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:05.141Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/"
+      ],
+      "fuentes": [
+        "https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/"
+      ],
+      "huella": "ae4fb4882dfe98bb110f4cac25f262579689a4a788f2bbc7b96eaf7dc1098a09",
+      "usage": {
+        "entrada": 10696,
+        "entradaCache": 4330,
+        "salida": 299,
+        "razonamiento": 45
+      },
+      "coste": 0.011487,
+      "texto": "En Houston, **una página web puede costar desde unos cientos de dólares hasta decenas de miles**, según quién la haga y qué incluya. Como referencia:\n\n- **Página sencilla de una sola sección:** aprox. **$500–$1,500**\n- **Sitio básico para un negocio pequeño (5–10 páginas):** aprox. **$1,500–$5,000**\n- **Sitio personalizado con diseño, contenido y funciones adicionales:** aprox. **$5,000–$15,000 o más**\n- **Tienda en línea o sistema a medida:** normalmente **$3,000–$15,000+**, y puede subir bastante si requiere integraciones especiales. ([officialcystudio.com](https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/?utm_source=openai))\n\nAdemás del diseño, pregunta si el presupuesto incluye **dominio, hosting, mantenimiento, textos, SEO básico, formularios y revisiones**; esos rubros pueden cobrarse aparte. Para un negocio local con una web profesional de pocas páginas, **presupuestaría alrededor de $2,000–$5,000** como punto de partida."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 4,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:17.926Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://loboandco.com/services/",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://loboandco.com/services/",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "huella": "0c70ef5ae58b0396cfe07acd37049e5a1738231c7abf7eeb141ac067f7d09b1e",
+      "usage": {
+        "entrada": 12670,
+        "entradaCache": 4329,
+        "salida": 301,
+        "razonamiento": 43
+      },
+      "coste": 0.011734,
+      "texto": "**Serendip Digital** looks like the strongest fit if you’re a Houston small business looking for an agency focused specifically on bilingual websites. They say they build English and Spanish content to feel natural in both languages, and pair web design with local SEO and Google Business Profile work. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n\nA couple of alternatives worth comparing:\n\n- **Fernvick Network** — Houston-based, bilingual web design plus SEO, Google Ads, and IT support under one roof. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Lobo & Company** — Houston small-business marketing and web design with a bilingual team; highlights 20+ years in business. ([loboandco.com](https://loboandco.com/services/?utm_source=openai))\n- **Seek Media** — offers bilingual web design and SEO for Houston and nearby suburbs. ([seekemedia.com](https://seekemedia.com/locations/houston?utm_source=openai))\n\nThere isn’t an objective “best” without knowing your budget and project needs. When you compare proposals, ask who writes the Spanish copy, whether both language versions get their own SEO setup, and for examples of launched bilingual sites."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 3,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:18.047Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "fuentes": [
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "huella": "893de78c720360d49d065417d8d518f958a5f51043c6fd46aaabd9174774f242",
+      "usage": {
+        "entrada": 12824,
+        "entradaCache": 4330,
+        "salida": 281,
+        "razonamiento": 54
+      },
+      "coste": 0.011744,
+      "texto": "For a small business in Miami, I’d start by talking to **OptFirst Internet Marketing** and **LMD (LiveMediaDigital)**—both are Miami-area agencies listed as serving small businesses and offering SEO/local SEO. OptFirst has a longer operating history; LMD may be worth a look if you want SEO alongside web development and ads. These are starting points, not endorsements, so ask for references from businesses similar to yours. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n\n**Before hiring, ask each agency:**\n- What will you do for my Google Business Profile, reviews, and local landing pages?\n- Can I see a recent case study for a business like mine in Miami?\n- What will you report monthly—calls, form leads, and direction requests, not just rankings?\n- What’s the monthly fee, contract length, and what do I own if we stop?\n\nBe wary of anyone promising guaranteed rankings. If you share your business type, neighborhood, and approximate monthly budget, I can narrow the options further."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 3,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:18.426Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://www.ezpublicidad.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://cances.co/us/houston"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://www.ezpublicidad.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://cances.co/us/houston"
+      ],
+      "huella": "f82a1ef1c53df25c9739aea4df34a40ea4e287716344bf0e3c528bf44e86439f",
+      "usage": {
+        "entrada": 8655,
+        "entradaCache": 4334,
+        "salida": 326,
+        "razonamiento": 44
+      },
+      "coste": 0.011245,
+      "texto": "Si buscas una **agencia de diseño web para un negocio hispano en Houston**, estas opciones anuncian servicios en español o bilingües:\n\n- **NEXO Digital Houston** — negocio local; ofrece sitios bilingües para pequeños negocios y dice que suele entregarlos en 3–5 días. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **EZ Publicidad** — estudio creativo en Houston orientado a negocios hispanos; ofrece páginas web y publicidad digital. ([ezpublicidad.com](https://www.ezpublicidad.com/?utm_source=openai))\n- **Fernvick Network** — ofrece diseño web y otros servicios para pequeños negocios; indica que trabaja en inglés y español. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Cances** — enfocado en web y SEO local para Houston; trabaja en español, inglés o ambos, aunque tiene base en Colombia. ([cances.co](https://cances.co/us/houston?utm_source=openai))\n\n**Yo empezaría comparando NEXO y EZ Publicidad** si priorizas atención en español y enfoque local. Antes de contratar, pide precio por escrito y confirma qué incluye: dominio y alojamiento, versión móvil, textos bilingües, mantenimiento, SEO local y propiedad de la web. También solicita ejemplos de negocios similares al tuyo."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 3,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:18.763Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "fuentes": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "huella": "740626d08a2bfcd2d3da4f182182d5286df8d4a3ed3e230c4b478fde485ae7f7",
+      "usage": {
+        "entrada": 8708,
+        "entradaCache": 4330,
+        "salida": 287,
+        "razonamiento": 45
+      },
+      "coste": 0.011232,
+      "texto": "En Houston, una página web puede costar desde **unos cientos de dólares hasta decenas de miles**, según lo que necesites. Como guía aproximada:\n\n- **Landing page sencilla:** $500–$2,000  \n- **Sitio para un pequeño negocio (5–10 páginas):** $1,800–$8,000 con freelancer; una agencia puede cobrar más.  \n- **Tienda en línea:** $3,000–$15,000 o más, según productos y funciones.  \n- **Sitio a medida o con integraciones complejas:** $10,000+.\n\nSon rangos orientativos, no una tarifa fija; por ejemplo, algunos proveedores locales anuncian proyectos desde $550, mientras que un sitio de negocio personalizado puede costar varios miles. ([officialcystudio.com](https://officialcystudio.com/en/pricing/?utm_source=openai))\n\nAdemás, pregunta si el precio incluye **dominio, alojamiento, textos, mantenimiento, SEO y cambios posteriores**: a veces se cobran aparte.\n\nSi me dices qué tipo de negocio tienes y cuántas páginas o funciones quieres, puedo darte un rango más preciso."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 4,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:29.031Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://agencies.semrush.com/list/local-seo/miami/small-business/"
+      ],
+      "fuentes": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://agencies.semrush.com/list/local-seo/miami/small-business/"
+      ],
+      "huella": "6b12a131eadd9b90dddef72a48b3e0fb189ddf779fb4f84d6a6f0146652ffbb1",
+      "usage": {
+        "entrada": 12747,
+        "entradaCache": 4330,
+        "salida": 295,
+        "razonamiento": 49
+      },
+      "coste": 0.011741,
+      "texto": "If you’re looking for a **Miami local SEO agency for a small business**, I’d start by comparing:\n\n- **OptFirst Internet Marketing** — Miami-area agency; directory profiles say it works with small and mid-sized businesses. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))  \n- **Geeks360** — Miami-based SEO firm; a directory lists projects starting around $1,000. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))  \n- **LMD / LiveMediaDigital** — Miami-based, with local SEO among its services; listed pricing starts around $2,500. ([agencies.semrush.com](https://agencies.semrush.com/list/local-seo/miami/small-business/?utm_source=openai))  \n\nThose starting prices are directory estimates, not quotes—ask what’s included and whether there’s a minimum contract. For a small local business, make sure the proposal covers your **Google Business Profile, local search terms, reviews/listings, and reporting on calls or leads**. Get at least two proposals and ask for references from businesses like yours before signing.\n\nWhat kind of business do you run, and roughly what monthly budget are you considering?"
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 4,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:29.118Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://serendipdigital.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://serendipdigital.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "huella": "ffe8811fe32e78fd4326d37d1bb87e47523c7a20c026b75ae824bb644d0e0ad7",
+      "usage": {
+        "entrada": 12426,
+        "entradaCache": 4334,
+        "salida": 336,
+        "razonamiento": 54
+      },
+      "coste": 0.011721,
+      "texto": "Si buscas una agencia que atienda en español y trabaje con negocios hispanos en Houston, estas opciones parecen relevantes:\n\n- **NEXO Digital Houston** — Se enfoca en pequeños negocios hispanos; ofrece sitios bilingües y dice entregar en 3–5 días. Contacto por WhatsApp: **(346) 644-2654**. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Fernvick Network** — Agencia local de Houston con diseño web, Google Ads y SEO en español o inglés. Teléfono: **832-900-9720**. ([fernvicknetwork.com](https://www.fernvicknetwork.com/es/?utm_source=openai))\n- **Serendip Digital** — Diseño web bilingüe y SEO local para negocios pequeños en Houston y alrededores. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **AB Design Strategy** — Diseña sitios para pequeños negocios y ofrece comunicación en español; muestra trabajos locales en Houston y Cypress. ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n\nAntes de contratar, pide ejemplos de sitios para negocios similares al tuyo, precio y plazo por escrito, y confirma quién será dueño del dominio y del contenido. ¿Qué tipo de negocio tienes y buscas solo una página web o también SEO y publicidad?"
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 4,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:29.477Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://zenintech.com/blog/how-much-does-web-design-cost-in-houston/"
+      ],
+      "fuentes": [
+        "https://zenintech.com/blog/how-much-does-web-design-cost-in-houston/"
+      ],
+      "huella": "b7bab197617cc4f90438ba786e2f64c306e56af6edd4329dbeb9e33dc3e22dca",
+      "usage": {
+        "entrada": 10778,
+        "entradaCache": 4330,
+        "salida": 254,
+        "razonamiento": 44
+      },
+      "coste": 0.011474,
+      "texto": "En Houston, una página web puede costar desde **unos cientos de dólares hasta decenas de miles**, según lo que necesites. Como referencia para un negocio pequeño:\n\n- **Una página sencilla:** $500–$3,000  \n- **Sitio de 5–10 páginas con diseño profesional:** $3,000–$10,000  \n- **Diseño personalizado con contenido y SEO local:** $8,000–$25,000  \n- **Tienda en línea o funciones especiales:** desde $5,000; puede subir bastante según la complejidad. ([zenintech.com](https://zenintech.com/blog/how-much-does-web-design-cost-in-houston/?utm_source=openai))\n\nAparte, pregunta si el presupuesto incluye **dominio, alojamiento, textos, mantenimiento y actualizaciones**; algunos se cobran por separado o mensualmente.\n\nSi me dices qué tipo de negocio tienes y cuántas páginas o funciones quieres, te doy un rango más ajustado."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 4,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:30.910Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://wallstreetwebdesigns.com/",
+        "https://design.bripemedia.com/about",
+        "https://addhorizons.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://wallstreetwebdesigns.com/",
+        "https://design.bripemedia.com/about",
+        "https://addhorizons.com/"
+      ],
+      "huella": "42cbdb80710bf0d0ed9f256677022b4314c836d1a6d1748822327ba3d0664671",
+      "usage": {
+        "entrada": 12651,
+        "entradaCache": 4331,
+        "salida": 463,
+        "razonamiento": 56
+      },
+      "coste": 0.011813,
+      "texto": "A few Houston-area options that specifically mention bilingual service or Hispanic/Latino small businesses:\n\n- **[Serendip Digital](https://serendipdigital.com/)** — Houston-rooted, small-business focused; builds websites and local SEO in English and Spanish. A good fit if you want a local partner for both your site and Google visibility. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **[Fernvick Network](https://www.fernvicknetwork.com/)** — Houston-based and bilingual; offers web design, SEO/Google Ads, and graphic design for small businesses. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **[Wallstreet Webdesigns](https://wallstreetwebdesigns.com/)** — Houston-based small-business web design, with Spanish-speaking service and a free website demo. ([wallstreetwebdesigns.com](https://wallstreetwebdesigns.com/?utm_source=openai))\n- **[Bripe Media](https://design.bripemedia.com/about)** — Specializes in websites for Latino-owned small businesses and says it creates English and Spanish content. It serves Houston clients, though it works across the U.S. rather than being strictly Houston-based. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **[ADD Horizons](https://addhorizons.com/)** — Houston-based studio with English- and Spanish-language service; says it writes website copy and offers a seven-day website build. ([addhorizons.com](https://addhorizons.com/?utm_source=openai))\n\n**Best starting points:** Serendip Digital or Fernvick if you want a Houston-based bilingual agency; Bripe Media if Latino-owned-business experience is your priority.\n\nBefore choosing, ask for examples from businesses like yours, a written quote, who owns the domain and website, and whether Spanish copy is written naturally—not just machine-translated."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 5,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:40.528Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://cances.co/us/houston"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://cances.co/us/houston"
+      ],
+      "huella": "f0692e937ffd36f72dd4264d30eabda26e4f3ff7b81d5f641496a043c3754fdd",
+      "usage": {
+        "entrada": 10792,
+        "entradaCache": 4334,
+        "salida": 367,
+        "razonamiento": 52
+      },
+      "coste": 0.011533,
+      "texto": "Si buscas una agencia de diseño web que atienda en español a negocios hispanos en Houston, estas opciones parecen relevantes:\n\n- **NEXO Digital Houston** — Se presenta como un negocio local hispano; ofrece sitios bilingües y contacto por WhatsApp. Dice que algunos proyectos se entregan en 3–5 días. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Serendip Digital** — Agencia con sede en Houston enfocada en pequeños negocios, sitios bilingües y SEO local. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **Fernvick Network** — Agencia local con equipo bilingüe; ofrece diseño web en español, inglés o ambos, además de SEO y anuncios. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Cances** — Ofrece webs, tiendas online y SEO para negocios hispanos de Houston, aunque su agencia tiene base en Colombia y trabaja de forma remota. ([cances.co](https://cances.co/us/houston?utm_source=openai))\n\n**Para empezar, compararía NEXO y Serendip** si quieres atención en español y enfoque en pequeños negocios. Antes de contratar, pide ejemplos de webs de tu sector, precio total por escrito, quién será dueño del dominio y qué incluye el mantenimiento.\n\nSi me dices qué tipo de negocio tienes y tu presupuesto aproximado, puedo ayudarte a elegir cuál encaja mejor."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 5,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:40.810Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://seekemedia.com/locations/houston",
+        "https://nexloft.io/",
+        "https://kliklocal.com/bilingual-website-english-spanish"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://seekemedia.com/locations/houston",
+        "https://nexloft.io/",
+        "https://kliklocal.com/bilingual-website-english-spanish"
+      ],
+      "huella": "36c8eb30674dfa735685ec649901f5b48d1a2103a83a2d884bbef2813820d603",
+      "usage": {
+        "entrada": 12638,
+        "entradaCache": 4329,
+        "salida": 313,
+        "razonamiento": 51
+      },
+      "coste": 0.011736,
+      "texto": "“Best” depends on your budget and project, but **Serendip Digital** looks like a strong first choice if you’re a Houston small business seeking a local agency focused on English–Spanish websites and local SEO. Its site says it creates content natively in both languages and serves Houston and nearby communities. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives worth comparing:\n\n- **Seek Media** — bilingual web design and SEO for Houston-area businesses. ([seekemedia.com](https://seekemedia.com/locations/houston?utm_source=openai))\n- **NexLoft** — Crosby-based studio serving Houston; says English and Spanish support is included on every build. ([nexloft.io](https://nexloft.io/?utm_source=openai))\n- **Klik** — highlights bilingual SEO, Spanish keyword research, and forms and website features in both languages. ([kliklocal.com](https://kliklocal.com/bilingual-website-english-spanish?utm_source=openai))\n\nBefore choosing, ask for **live bilingual sites they’ve built**, a written quote and timeline, and confirmation that *all* pages, forms, and follow-up messages will work in both languages. I’d start by requesting proposals from Serendip and one or two alternatives."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 5,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:41.703Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://miamiseonerdz.com/"
+      ],
+      "fuentes": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://miamiseonerdz.com/"
+      ],
+      "huella": "ca883ba28edfe51f958da7f32862f32b7e47ebde4be916609a23fe6676757208",
+      "usage": {
+        "entrada": 12715,
+        "entradaCache": 4330,
+        "salida": 316,
+        "razonamiento": 42
+      },
+      "coste": 0.011747,
+      "texto": "For a **small business in Miami**, I’d start by comparing these:\n\n- **CafecitoWeb** — Focuses on local businesses and contractors; offers English/Spanish SEO and says it publishes pricing. ([cafecitoweb.com](https://cafecitoweb.com/en/miami-seo?utm_source=openai))\n- **OptFirst Internet Marketing** — Miami-area agency offering SEO and PPC, with small and midsize business clients. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **On The Map Marketing** — Miami-based agency with SEO and web services; listed projects start around $1,000 on The Manifest. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **Miami SEO Nerdz** — Bilingual agency focused on local service businesses. ([miamiseonerdz.com](https://miamiseonerdz.com/?utm_source=openai))\n\n**My suggestion:** get quotes from CafecitoWeb and one other agency, then compare what’s included—not just the monthly price. Ask specifically about Google Business Profile optimization, local ranking improvements, lead/call tracking, and how often you’ll get clear reports. Avoid anyone promising guaranteed #1 rankings.\n\nTell me your **business type and neighborhood** (for example, a salon in Brickell or a contractor in Doral), and I can narrow the shortlist."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 5,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:42.327Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://magismarketing.com/about",
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://oakinteractive.com/about/",
+        "https://design.bripemedia.com/about"
+      ],
+      "fuentes": [
+        "https://magismarketing.com/about",
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://oakinteractive.com/about/",
+        "https://design.bripemedia.com/about"
+      ],
+      "huella": "252bd6325b3d5e45f67e68ca375a9cd285a36c0fa933f07730692236203d13a6",
+      "usage": {
+        "entrada": 12749,
+        "entradaCache": 4331,
+        "salida": 399,
+        "razonamiento": 54
+      },
+      "coste": 0.011793,
+      "texto": "Here are a few Houston-area options that specifically mention bilingual service or working with Latino/Hispanic small businesses:\n\n- **Magis Marketing** — Says it’s built by and for Latino entrepreneurs and focuses on helping Latino small-business owners. A good fit if you may also want broader marketing support alongside a website. ([magismarketing.com](https://magismarketing.com/about?utm_source=openai))\n- **Serendip Digital** — Houston-focused bilingual web design, local SEO, and Google Business Profile help for small businesses. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **Fernvick Network** — Houston-based, bilingual team offering web design, SEO, Google Ads, and IT support; says it can build sites in English, Spanish, or both. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **OAK Interactive** — Hispanic-owned Houston marketing agency that offers website design and development along with digital marketing. ([oakinteractive.com](https://oakinteractive.com/about/?utm_source=openai))\n- **Bripe Media** — Specializes in websites for Latino-owned small businesses and offers bilingual English-Spanish content; it mentions Houston clients. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n\n**My starting shortlist:** Magis if you want an agency with a Latino-business focus, or Serendip/Fernvick if bilingual web design and local search visibility are the main priorities.\n\nBefore choosing, ask for recent examples in your industry, whether Spanish copy is written by a fluent person (not just auto-translated), the full project and ongoing costs, and who owns the website and domain."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 6,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:49.006Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://mcsocialagency.com/",
+        "https://aglads.com/index.html"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://mcsocialagency.com/",
+        "https://aglads.com/index.html"
+      ],
+      "huella": "7944bda0f32d0292b1f4a8787ffd52f7434c13e3c239500994f83b7d1455fe5d",
+      "usage": {
+        "entrada": 12717,
+        "entradaCache": 4329,
+        "salida": 308,
+        "razonamiento": 44
+      },
+      "coste": 0.011744,
+      "texto": "**Serendip Digital** looks like the strongest first call if you’re a Houston small business seeking a genuinely bilingual English–Spanish website. Its site says it creates content natively in both languages and pairs web design with local SEO and Google Business Profile support. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives, depending on what you need:\n\n- **Fernvick Network** — bilingual web design plus Google Ads, SEO, and small-business IT support. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **MC Social Agency** — a fit if you also want social media, photography, and brand content alongside web design. ([mcsocialagency.com](https://mcsocialagency.com/?utm_source=openai))\n- **AGLA Digital Solutions** — offers website and platform development, with communication and handover in English or Spanish. ([aglads.com](https://aglads.com/index.html?utm_source=openai))\n\n“Best” depends on budget, industry, and whether you need just a site or ongoing marketing. Before choosing, ask to see **live bilingual sites they’ve built**, confirm who writes the Spanish copy, and get the scope, timeline, and ongoing costs in writing."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 5,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:49.399Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://zenintech.com/blog/web-design-cost-houston/"
+      ],
+      "fuentes": [
+        "https://zenintech.com/blog/web-design-cost-houston/"
+      ],
+      "huella": "52d4a6ff983aacee537bf51b3608ea5f5598da06cc954b16eef7e2d35b26138a",
+      "usage": {
+        "entrada": 8586,
+        "entradaCache": 4330,
+        "salida": 286,
+        "razonamiento": 45
+      },
+      "coste": 0.011216,
+      "texto": "En Houston, el precio depende mucho de quién la construya y de lo que necesites:\n\n- **Landing page sencilla:** alrededor de **$500–$1,500**\n- **Sitio básico para un negocio** (unas pocas páginas, formulario y versión móvil): **$1,000–$4,000**\n- **Sitio personalizado** con más páginas, diseño y funciones: **$4,000–$12,000 o más**\n- **Tienda en línea:** desde **$1,500**, y puede subir bastante según productos y pagos\n\nComo referencia, para un sitio profesional de pequeño negocio, presupuestaría **$2,000–$6,000**. El dominio, alojamiento, redacción, fotos, mantenimiento y SEO pueden cobrarse aparte; pide que la cotización detalle qué incluye. Los precios publicados por proveedores locales varían mucho según el alcance. ([zenintech.com](https://zenintech.com/blog/web-design-cost-houston/?utm_source=openai))\n\nSi me dices qué tipo de negocio tienes y si necesitas vender en línea, te doy un rango más ajustado."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 6,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:49.881Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://surfsideppc.com/pages/seo-services-miami-fl",
+        "https://www.klashtech.com/miami-seo-services/",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "fuentes": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://surfsideppc.com/pages/seo-services-miami-fl",
+        "https://www.klashtech.com/miami-seo-services/",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "huella": "207664425ef96bbc98b0d8d10c2e0d8d08b7db5aaf0035f3e0e9ed1785465cf2",
+      "usage": {
+        "entrada": 12852,
+        "entradaCache": 4330,
+        "salida": 356,
+        "razonamiento": 46
+      },
+      "coste": 0.011785,
+      "texto": "If you’re looking for a **Miami local SEO agency for a small business**, these are worth comparing:\n\n- **CafecitoWeb** — Focuses on Miami local businesses and contractors, offers English/Spanish SEO, and lists plans starting at **$499/month** with no long-term contracts. ([cafecitoweb.com](https://cafecitoweb.com/en/miami-seo?utm_source=openai))\n- **Surfside PPC** — Offers local SEO and neighborhood landing pages, with management starting at **$500/month** and no long-term contracts. ([surfsideppc.com](https://surfsideppc.com/pages/seo-services-miami-fl?utm_source=openai))\n- **Klashtech** — Specifically markets SEO for small businesses and lists a lower-cost maintenance option; ask what work is included at that price. ([klashtech.com](https://www.klashtech.com/miami-seo-services/?utm_source=openai))\n- **OptFirst** — An established Miami-area agency serving small and mid-sized businesses; worth considering if you want a larger, more full-service team. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n\n**My first calls:** CafecitoWeb or Surfside PPC if you want published pricing and a local focus. Before signing, ask for a sample monthly report, who will manage your Google Business Profile, what they’ll do in the first 90 days, and whether you keep ownership of your website and listings. Avoid anyone promising guaranteed rankings.\n\nIf you share your **business type, neighborhood, and rough monthly budget**, I can narrow this down."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 6,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:50.067Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://design.bripemedia.com/about",
+        "https://www.fernvicknetwork.com/",
+        "https://aglegacy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://design.bripemedia.com/about",
+        "https://www.fernvicknetwork.com/",
+        "https://aglegacy.com/"
+      ],
+      "huella": "6c34318d0d7c1d9009ca047723685a06a7c56a5b37ef241d0870e536ffe03ab6",
+      "usage": {
+        "entrada": 12673,
+        "entradaCache": 4331,
+        "salida": 373,
+        "razonamiento": 57
+      },
+      "coste": 0.011771,
+      "texto": "If you’re looking for a **Houston web design agency that can work comfortably in Spanish and understands small businesses**, these look like good starting points:\n\n- **Serendip Digital** — Houston-based and focused on small businesses; offers bilingual websites, local SEO, and Google Business Profile help. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **Bripe Media** — Specializes in websites for Latino-owned small businesses, with English/Spanish content, local SEO, and WhatsApp integration. Its site lists plans starting at **$850**. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **Fernvick Network** — Houston-based, bilingual team offering web design, SEO, Google Ads, and IT support for small businesses; says it can build sites in English, Spanish, or both. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **A&G Legacy** — Houston bilingual marketing agency with website design, local SEO, ads, and automation; better fit if you want broader marketing support, not just a website. ([aglegacy.com](https://aglegacy.com/?utm_source=openai))\n\n**My first calls would be Serendip or Bripe Media** for a straightforward bilingual small-business website. Before choosing, ask for a couple of examples in your industry, a written total price (including hosting and updates), and whether they’ll write Spanish copy natively rather than just translate it."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 7,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:57.989Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://aglegacy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://aglegacy.com/"
+      ],
+      "huella": "d04756a83310badc0911449b0350ba0faba313375eae7114a8ec3f662bd7e763",
+      "usage": {
+        "entrada": 12675,
+        "entradaCache": 4329,
+        "salida": 228,
+        "razonamiento": 40
+      },
+      "coste": 0.011698,
+      "texto": "**Serendip Digital** looks like the strongest match if you’re a Houston small business seeking bilingual English–Spanish web design. They’re Houston-based and focus on websites and local SEO, with content created for both languages rather than simply translated. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA couple of alternatives to compare:\n- **Fernvick Network** — bilingual web design plus Google Ads, SEO, and IT support. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **A&G Legacy** — bilingual websites alongside broader marketing and automation services. ([aglegacy.com](https://aglegacy.com/?utm_source=openai))\n\n“Best” depends on your budget and project, so ask each for relevant examples, a clear English/Spanish content plan, and a written breakdown of hosting and ongoing costs."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 7,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:58.984Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://presenzamedia.com/es",
+        "https://design.bripemedia.com/about",
+        "https://aglegacy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://presenzamedia.com/es",
+        "https://design.bripemedia.com/about",
+        "https://aglegacy.com/"
+      ],
+      "huella": "824fb61c5014b8393f2cc1f7c09010e1bc08f909f6f7108cb671f44a76b4f32a",
+      "usage": {
+        "entrada": 12853,
+        "entradaCache": 4331,
+        "salida": 376,
+        "razonamiento": 58
+      },
+      "coste": 0.011795,
+      "texto": "If you’re looking for **bilingual web design for a Hispanic-owned small business in Houston**, these look like good starting points:\n\n- **Serendip Digital** — Houston-focused and specifically works with small businesses; offers English/Spanish websites, local SEO, and Google Business Profile support. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **Fernvick Network** — Bilingual Houston team offering small-business web design alongside SEO, Google Ads, and IT support. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **Presenza Media** — Houston-based, bilingual agency with web design and marketing services; its site lists website design starting at **$1,500**. ([presenzamedia.com](https://presenzamedia.com/es?utm_source=openai))\n- **Bripe Media** — Specializes in websites for Latino-owned small businesses, with bilingual content, local SEO, and WhatsApp integration; its site says projects start at **$850**. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n- **A&G Legacy** — Bilingual Houston agency offering website design as part of a broader marketing and automation package. ([aglegacy.com](https://aglegacy.com/?utm_source=openai))\n\n**Best first calls:** Serendip Digital for a small-business-focused bilingual site; Bripe Media if affordability and Latino-business experience are priorities. Ask each for examples in your industry, a written quote, and who owns the domain and website after launch."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 6,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:05:59.659Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://nexodigital70.com/",
+        "https://axistem.net/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://nexodigital70.com/",
+        "https://axistem.net/"
+      ],
+      "huella": "3b2cbcc118a2ad92166c345590420e176eb1ab79f7d479d6311b77d3ad026847",
+      "usage": {
+        "entrada": 12726,
+        "entradaCache": 4334,
+        "salida": 332,
+        "razonamiento": 56
+      },
+      "coste": 0.011757,
+      "texto": "Si buscas una agencia que trabaje en español con pequeños negocios hispanos en Houston, estas opciones parecen relevantes:\n\n- **Serendip Digital** — Agencia boutique con base en Houston, enfocada en pequeños negocios y sitios y campañas creados en español e inglés. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **Fernvick Network** — Equipo bilingüe local; ofrece diseño web y publicidad para pequeñas empresas de Houston. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **NEXO Digital Houston** — Enfocada en negocios hispanos; ofrece páginas bilingües y dice tener entregas de 3–5 días. Conviene confirmar alcance y precio directamente. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Axistem** — Empresa de Houston que ofrece diseño web y otros servicios digitales; indica que puede atender en español. ([axistem.net](https://axistem.net/?utm_source=openai))\n\n**Para comparar presupuestos**, pide que te especifiquen si incluyen dominio y alojamiento, textos en ambos idiomas, SEO local, mantenimiento y quién será dueño de la web y sus cuentas. Si me dices qué tipo de negocio tienes y tu presupuesto aproximado, puedo ayudarte a elegir cuál encaja mejor."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 6,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:00.608Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/"
+      ],
+      "fuentes": [
+        "https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/"
+      ],
+      "huella": "8099e5b98eb02dbf4aa9804228a952871976c1c890bf9caa39499efedce9a929",
+      "usage": {
+        "entrada": 8752,
+        "entradaCache": 4330,
+        "salida": 296,
+        "razonamiento": 48
+      },
+      "coste": 0.011242,
+      "texto": "En Houston, **una página web puede costar desde unos cientos de dólares hasta decenas de miles**, según lo que necesites. Como referencia aproximada:\n\n- **Landing page sencilla:** $500–$1,500  \n- **Sitio para negocio pequeño** (unas 5–10 páginas): **$1,000–$5,000** con plantilla; **$3,000–$8,000 o más** con diseño a medida.  \n- **Tienda en línea:** desde **$1,500–$3,500** para algo básico; puede subir bastante si requiere funciones o integraciones especiales.  \n- **Agencia con estrategia, contenido, SEO y soporte:** puede cotizar desde varios miles hasta más de $10,000. ([officialcystudio.com](https://officialcystudio.com/en/blog/how-much-does-a-website-cost-in-houston/?utm_source=openai))\n\nAparte, pregunta si la cotización incluye **dominio, alojamiento (hosting), mantenimiento, textos, SEO y cambios posteriores**; a veces esos costos se cobran por separado. Si me dices qué tipo de negocio tienes y qué funciones quieres, puedo afinar el rango."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 7,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:11.185Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://arthemisstudio.com/",
+        "https://dardocreativo.com/diseno-paginas-web-houston-espanol/"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://arthemisstudio.com/",
+        "https://dardocreativo.com/diseno-paginas-web-houston-espanol/"
+      ],
+      "huella": "d2d60ea1dfed4fe2d2cf6c6a1a873c9c82855eab2eaf464d5d0ac5709fa45f6c",
+      "usage": {
+        "entrada": 8684,
+        "entradaCache": 4334,
+        "salida": 301,
+        "razonamiento": 44
+      },
+      "coste": 0.011236,
+      "texto": "Si buscas **una agencia de diseño web que atienda en español a negocios hispanos en Houston**, estas opciones parecen relevantes:\n\n- **NEXO Digital Houston** — Se presenta como un servicio local para pequeños negocios, con sitios bilingües y consultas en español. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Fernvick Network** — Ofrece diseño web y Google Ads para pequeños negocios; puedes pedir el sitio en español, inglés o ambos. ([fernvicknetwork.com](https://www.fernvicknetwork.com/es/?utm_source=openai))\n- **Arthemis Studio** — Tiene base en Houston y ofrece páginas web bilingües, además de contenido y marketing. ([arthemisstudio.com](https://arthemisstudio.com/?utm_source=openai))\n- **Dardo Creativo** — Ofrece diseño de páginas web en español para negocios hispanos de Houston. ([dardocreativo.com](https://dardocreativo.com/diseno-paginas-web-houston-espanol/?utm_source=openai))\n\nAntes de contratar, pide **ejemplos de trabajos**, precio total y qué incluye el servicio (dominio, alojamiento, cambios, SEO y soporte). Si me dices qué tipo de negocio tienes y tu presupuesto aproximado, puedo ayudarte a comparar cuál encaja mejor."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 8,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:11.240Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://www.apexweb360.com/",
+        "https://aglads.com/index.html"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://www.apexweb360.com/",
+        "https://aglads.com/index.html"
+      ],
+      "huella": "621145cc46d016ed0ab08ad719822ef8024f4408071f0d38253da2b5bf72db23",
+      "usage": {
+        "entrada": 12672,
+        "entradaCache": 4329,
+        "salida": 310,
+        "razonamiento": 41
+      },
+      "coste": 0.011739,
+      "texto": "**Best fit for a Houston small business:** **Serendip Digital**. It’s Houston-based and specifically builds English–Spanish websites and local SEO for small businesses, with an emphasis on writing naturally in both languages rather than just translating the English site. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives, depending on what you need:\n\n- **Fernvick Network** — bilingual web design plus Google Ads, SEO, and IT support under one roof. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **ApexWeb360** — bilingual custom design with a strong SEO/AI-search focus. ([apexweb360.com](https://www.apexweb360.com/?utm_source=openai))\n- **AGLA Digital Solutions** — Houston-based, bilingual custom websites and web platforms, with project scope and handover emphasized. ([aglads.com](https://aglads.com/index.html?utm_source=openai))\n\n“Best” depends on your budget, industry, and whether you need a simple business site, online store, or lead-generation/SEO help. Before hiring, ask to see **live English and Spanish client sites**, confirm who writes the Spanish copy, and get the full price and post-launch support in writing."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 7,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:12.589Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://miamiseonerdz.com/",
+        "https://www.threepointssocial.com/",
+        "https://www.miamiseocompany.net/about/"
+      ],
+      "fuentes": [
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://miamiseonerdz.com/",
+        "https://www.threepointssocial.com/",
+        "https://www.miamiseocompany.net/about/"
+      ],
+      "huella": "4db16b6e4ab64191673052d43d62d79e9d3bee990c9371b399dccfee595f247b",
+      "usage": {
+        "entrada": 12739,
+        "entradaCache": 4330,
+        "salida": 383,
+        "razonamiento": 45
+      },
+      "coste": 0.011784,
+      "texto": "A few Miami agencies worth shortlisting for a small business:\n\n- **CafecitoWeb** — Publishes pricing starting at **$499/month**, offers English/Spanish local SEO, and says it has no long-term contracts. Could be a good fit if you want clear pricing. ([cafecitoweb.com](https://cafecitoweb.com/en/miami-seo?utm_source=openai))\n- **Miami SEO Nerdz** — Focuses on local service businesses and says campaigns start at **$1,500/month**. It also offers bilingual SEO and Google Business Profile optimization. ([miamiseonerdz.com](https://miamiseonerdz.com/?utm_source=openai))\n- **Three Points Social** — Miami-based, focused on local SEO and Google Business Profile management for small businesses, including home services, law firms, dental clinics, auto shops, and restaurants. ([threepointssocial.com](https://www.threepointssocial.com/?utm_source=openai))\n- **Miami SEO Company** — A founder-led boutique in Brickell offering local SEO and bilingual services; its site says engagements are month-to-month. ([miamiseocompany.net](https://www.miamiseocompany.net/about/?utm_source=openai))\n\n**My first calls would be CafecitoWeb for budget transparency, or Three Points Social for a small-business-focused local SEO service.** These are shortlist options, not independently verified endorsements—ask each for references from businesses like yours and a sample report before signing.\n\nWhen you compare proposals, make sure they cover your **Google Business Profile, local landing pages, reviews/listings, and reporting on calls or leads**—not just rankings. What kind of business do you run, and what monthly budget are you aiming for?"
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 7,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:15.379Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://elevatebiz.co/guides/small-business-website-cost-houston"
+      ],
+      "fuentes": [
+        "https://elevatebiz.co/guides/small-business-website-cost-houston"
+      ],
+      "huella": "9384ac915a2388becf45019798ad9d8e83bb573f999c865baa42bdbcc8b53338",
+      "usage": {
+        "entrada": 8786,
+        "entradaCache": 4330,
+        "salida": 268,
+        "razonamiento": 48
+      },
+      "coste": 0.011232,
+      "texto": "En Houston, **una página web para un negocio pequeño suele costar entre US$1,000 y US$8,000**, según el diseño y las funciones. Como referencia:\n\n- **Sencilla, hecha con plantilla:** US$1,000–US$3,000  \n- **Personalizada, de unas 5–15 páginas:** US$3,000–US$8,000  \n- **Tienda en línea o funciones especiales:** US$5,000–US$15,000 o más  \n\nAdemás, calcula gastos recurrentes de **dominio, alojamiento, mantenimiento y posibles licencias**. En las cotizaciones, revisa si incluyen textos, configuración para celular, SEO básico, formularios y cambios después del lanzamiento; esos extras pueden cambiar bastante el precio. ([elevatebiz.co](https://elevatebiz.co/guides/small-business-website-cost-houston?utm_source=openai))\n\nSi me dices qué tipo de negocio tienes y qué debería hacer la página, puedo darte un rango más preciso."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 8,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:27.311Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://www.expertise.com/business/seo-agencies/florida/miami",
+        "https://www.miamiseocompany.net/about/"
+      ],
+      "fuentes": [
+        "https://themanifest.com/seo/local/agencies/miami",
+        "https://www.expertise.com/business/seo-agencies/florida/miami",
+        "https://www.miamiseocompany.net/about/"
+      ],
+      "huella": "db122d91e91a7495fa8dfea75a0535512b4c5073ef869913fb57ca8c9cf865fe",
+      "usage": {
+        "entrada": 12790,
+        "entradaCache": 4330,
+        "salida": 305,
+        "razonamiento": 54
+      },
+      "coste": 0.011751,
+      "texto": "A few Miami options to compare for a small business:\n\n- **OptFirst Internet Marketing** — Miami-area agency with SEO and digital marketing services; a directory listing says it works with small and midsize businesses. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **On the Map, Inc.** — Miami-based, with local SEO and lead-generation experience, including home services and contractors. ([expertise.com](https://www.expertise.com/business/seo-agencies/florida/miami?utm_source=openai))\n- **Link2City** — Miami-based agency offering SEO, website work, and reporting. ([expertise.com](https://www.expertise.com/business/seo-agencies/florida/miami?utm_source=openai))\n- **Miami SEO Company** — says it serves Miami-Dade and South Florida, including local and bilingual SEO. ([miamiseocompany.net](https://www.miamiseocompany.net/about/?utm_source=openai))\n\nBefore signing, ask each for a **written scope and monthly price**, examples for businesses like yours, who owns the website and Google Business Profile, and how they measure calls or leads—not just rankings. Avoid anyone promising a guaranteed #1 spot.\n\nWhat kind of business do you run, and roughly what monthly budget are you considering? I can narrow the list."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 8,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:27.355Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://www.fernvicknetwork.com/",
+        "https://addhorizons.com/",
+        "https://serendipdigital.com/",
+        "https://www.abdesignstrategy.com/",
+        "https://design.bripemedia.com/about"
+      ],
+      "fuentes": [
+        "https://www.fernvicknetwork.com/",
+        "https://addhorizons.com/",
+        "https://serendipdigital.com/",
+        "https://www.abdesignstrategy.com/",
+        "https://design.bripemedia.com/about"
+      ],
+      "huella": "3a8706adfd7d20accbb1dd59f0506dd1602333632f60ff848c5b77642784ba68",
+      "usage": {
+        "entrada": 12805,
+        "entradaCache": 4331,
+        "salida": 439,
+        "razonamiento": 55
+      },
+      "coste": 0.01182,
+      "texto": "Here are a few Houston-area options that specifically mention bilingual service or working with Hispanic/Latino small businesses:\n\n- **[Fernvick Network](https://www.fernvicknetwork.com/)** — Houston-based; builds websites and ads in English, Spanish, or both, and also offers SEO and IT support. **832-900-9720.** ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **[ADD Horizons](https://addhorizons.com/)** — Houston-based web studio serving small businesses in English and Spanish. Its site lists a 7-day website offering. **832-434-8006.** ([addhorizons.com](https://addhorizons.com/?utm_source=openai))\n- **[Serendip Digital](https://serendipdigital.com/)** — Focuses on bilingual websites, local SEO, and Google Business Profile help for Houston small businesses. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **[AB Design Strategy](https://www.abdesignstrategy.com/)** — Works with small businesses and says you can reach out in English or Spanish; its examples include Houston-area businesses. **281-851-5116.** ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n- **[Bripe Media](https://design.bripemedia.com/about)** — Specializes in websites for Latino-owned small businesses and mentions Houston clients; bilingual sites are available. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n\nWhen you contact them, ask for a **total project price**, what’s included (writing in both languages, hosting, domain, SEO, revisions), and whether you’ll own the site and domain. If you tell me your business type and budget, I can narrow this down."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 8,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:27.417Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/es/",
+        "https://nexodigital70.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/es/",
+        "https://nexodigital70.com/",
+        "https://www.abdesignstrategy.com/"
+      ],
+      "huella": "68a9a512f2e404c5e6fd110f181069fdb4d22a017dfe5607da34f63a4239925a",
+      "usage": {
+        "entrada": 12548,
+        "entradaCache": 4334,
+        "salida": 408,
+        "razonamiento": 57
+      },
+      "coste": 0.011773,
+      "texto": "Si buscas una agencia que trabaje con negocios hispanos en Houston, estas son algunas opciones para comparar:\n\n- **[Serendip Digital](https://serendipdigital.com/)** — Agencia fundada en Houston, enfocada en pequeños negocios; ofrece diseño web bilingüe, SEO local y optimización del perfil de Google. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **[Fernvick Network](https://www.fernvicknetwork.com/es/)** — Equipo local bilingüe; ofrece diseño web, Google Ads, SEO y otros servicios para pequeños negocios. Publica el teléfono **832-900-9720** y ofrece cotización gratis. ([fernvicknetwork.com](https://www.fernvicknetwork.com/es/?utm_source=openai))\n- **[NEXO Digital Houston](https://nexodigital70.com/)** — Se especializa en sitios web para negocios locales, en español e inglés; indica que trabaja por WhatsApp y que sus proyectos suelen tomar de 3 a 5 días. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **[AB Design Strategy](https://www.abdesignstrategy.com/)** — Diseña sitios para pequeños negocios de Houston y atiende en español; muestra trabajos locales en su sitio. ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n\nAntes de contratar, pide ejemplos de negocios similares al tuyo, precio total por escrito y detalles sobre dominio, mantenimiento, SEO y quién será dueño del sitio. Si me dices qué tipo de negocio tienes y tu presupuesto aproximado, te ayudo a elegir cuál encaja mejor."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 8,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:33.427Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "fuentes": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "huella": "3bde6eb2e8a1fcd2e05cb3097fce586a53ac9c6995279e6e6ed410ff439232aa",
+      "usage": {
+        "entrada": 8574,
+        "entradaCache": 4330,
+        "salida": 298,
+        "razonamiento": 44
+      },
+      "coste": 0.011221,
+      "texto": "En Houston, **una página web para un negocio pequeño suele costar aproximadamente entre $1,500 y $7,500**; una web más personalizada o con funciones especiales puede subir a **$8,000–$25,000 o más**. Como referencia, algunos proveedores locales anuncian páginas sencillas desde unos cientos de dólares, mientras que agencias y proyectos a medida cuestan bastante más. ([officialcystudio.com](https://officialcystudio.com/en/pricing/?utm_source=openai))\n\n**Rangos orientativos:**\n- **Una página sencilla** (landing page): **$500–$2,000**\n- **Sitio para un negocio pequeño** (varias páginas, formulario, diseño adaptable a móvil): **$2,000–$7,500**\n- **Tienda en línea o sitio a medida:** **$5,000–$25,000+**\n\nAparte, pregunta si la cotización incluye **dominio, hosting, textos, SEO básico, mantenimiento y cambios futuros**: a veces se cobran por separado.\n\nSi me dices qué tipo de negocio tienes y qué necesitas que haga la web, te doy un rango más preciso."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 9,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:47.333Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://123webmobile.com/",
+        "https://viceseo.com/",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "fuentes": [
+        "https://123webmobile.com/",
+        "https://viceseo.com/",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "huella": "251159674fe7f7ba78f701b30c194da6b6900439efd62bfe95c1f9a2ca528745",
+      "usage": {
+        "entrada": 12668,
+        "entradaCache": 4330,
+        "salida": 350,
+        "razonamiento": 41
+      },
+      "coste": 0.011759,
+      "texto": "Here are a few Miami-area options worth checking for a small business:\n\n- **123 Web Mobile** — specifically positions itself around Miami-Dade small businesses and offers bilingual English/Spanish marketing. ([123webmobile.com](https://123webmobile.com/?utm_source=openai))\n- **VICE SEO** — Miami-based, focused on SEO, and says its plans are month-to-month with no long-term contract. ([viceseo.com](https://viceseo.com/?utm_source=openai))\n- **OptFirst Internet Marketing** — serves small and mid-sized businesses; listed in Miami Shores. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **SEOfly** — a small Miami SEO agency focused on search optimization. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n- **Netrocket** — Miami-based SEO firm; directory listings describe it as a smaller team. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n\n**My shortlist to contact first:** 123 Web Mobile if you want a small-business-oriented, bilingual team; VICE SEO if flexible terms matter most. These are starting points, not endorsements—ask each for references from businesses like yours and a sample monthly report.\n\nBefore signing, ask what they’ll do for your **Google Business Profile, local service pages, review strategy, and calls/leads tracking**. Get the deliverables and cancellation terms in writing, and be wary of anyone guaranteeing a specific Google ranking."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 9,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:47.803Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://seekemedia.com/locations/houston",
+        "https://cances.co/us/houston"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/es/",
+        "https://seekemedia.com/locations/houston",
+        "https://cances.co/us/houston"
+      ],
+      "huella": "f6b4985f1437c2b5e656600e222c114b5823c3e69511363b39c1e1fc17c70768",
+      "usage": {
+        "entrada": 10685,
+        "entradaCache": 4334,
+        "salida": 337,
+        "razonamiento": 43
+      },
+      "coste": 0.011504,
+      "texto": "Si buscas una **agencia de diseño web que atienda en español a negocios hispanos en Houston**, estas opciones parecen relevantes:\n\n- **NEXO Digital Houston**: agencia local que ofrece sitios bilingües, consulta gratis y contacto por WhatsApp. Su sitio anuncia entregas de 3 a 5 días; confirma alcance y precio para tu proyecto. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **Fernvick Network**: equipo bilingüe en Houston; ofrece diseño web, Google Ads y SEO, con cotización gratuita. ([fernvicknetwork.com](https://www.fernvicknetwork.com/es/?utm_source=openai))\n- **Seek Media**: trabaja en inglés y español con negocios de Houston y suburbios; combina diseño web y SEO local. ([seekemedia.com](https://seekemedia.com/locations/houston?utm_source=openai))\n- **Cances**: páginas y tiendas en español, inglés o bilingües, con enfoque en Google Maps; es una agencia hispana con base en Colombia, no local. ([cances.co](https://cances.co/us/houston?utm_source=openai))\n\nAntes de contratar, pide ejemplos de sitios para negocios parecidos al tuyo y una propuesta por escrito que detalle precio, dominio, mantenimiento, SEO y quién será dueño de la web. ¿Qué tipo de negocio tienes y buscas una página sencilla, una tienda en línea o también atraer clientes desde Google?"
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 9,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:48.656Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://aglads.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://aglads.com/",
+        "https://www.lvbranding.com/services/ux-ui-digital-experience-houston"
+      ],
+      "huella": "7e5c78ea7d7d90d6feeb6b8b01e1b42da4f97387f0789f99d977f561c24afc66",
+      "usage": {
+        "entrada": 12815,
+        "entradaCache": 4329,
+        "salida": 324,
+        "razonamiento": 42
+      },
+      "coste": 0.011764,
+      "texto": "“Best” depends on your budget and the kind of site you need, but **Serendip Digital** looks like a strong fit for a Houston small business seeking bilingual English–Spanish web design with local SEO. It says it creates content natively in both languages and serves Houston and nearby communities. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives worth comparing:\n\n- **Fernvick Network** — Houston-based; offers bilingual websites alongside IT support and Google Ads. Could suit a business that wants several services from one provider. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **AGLA Digital Solutions** — Houston-based and bilingual, with business websites, e-commerce, and custom web apps. ([aglads.com](https://aglads.com/?utm_source=openai))\n- **LV Branding** — describes a more strategy- and UX-focused approach to English/Spanish digital experiences; may be a better match for a larger or more complex project. ([lvbranding.com](https://www.lvbranding.com/services/ux-ui-digital-experience-houston?utm_source=openai))\n\nBefore choosing, ask to see **live bilingual sites they’ve built**, confirm Spanish copy is written for Spanish-speaking customers rather than machine-translated, and get the project scope, timeline, ongoing costs, and website ownership terms in writing."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 9,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:06:48.698Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://www.abdesignstrategy.com/",
+        "https://design.bripemedia.com/about"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.fernvicknetwork.com/",
+        "https://www.abdesignstrategy.com/",
+        "https://design.bripemedia.com/about"
+      ],
+      "huella": "cf13ca34aa088d56916bb10249dfbd8499a8c63a28edb150cb93f57a88812543",
+      "usage": {
+        "entrada": 8393,
+        "entradaCache": 4331,
+        "salida": 311,
+        "razonamiento": 45
+      },
+      "coste": 0.011205,
+      "texto": "If you’re looking for a **Houston agency that can work in English and Spanish and understands small businesses**, **Serendip Digital** looks like a strong fit. It’s Houston-rooted, focuses on small businesses, and offers bilingual websites, local SEO, and Google Business Profile help. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few other options to compare:\n\n- **Fernvick Network** — Houston small-business web design and digital services; says it serves Spanish-speaking business owners and can build sites in English, Spanish, or both. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **AB Design Strategy** — works with small businesses and says you can contact them in Spanish; portfolio includes Houston-area local businesses. ([abdesignstrategy.com](https://www.abdesignstrategy.com/?utm_source=openai))\n- **Bripe Media** — specializes in Latino-owned small businesses and bilingual websites; its site lists projects for Houston businesses. ([design.bripemedia.com](https://design.bripemedia.com/about?utm_source=openai))\n\nWhen you contact them, ask for **recent examples in your industry**, the total cost (including hosting and updates), and whether Spanish copy is written naturally—not just machine-translated."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "best bilingual web design agency in Houston",
+      "posicion": 1,
+      "repeticion": 10,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:03.724Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://serendipdigital.com/about.html",
+        "https://www.apexweb360.com/",
+        "https://aglads.com/",
+        "https://mcsocialagency.com/"
+      ],
+      "fuentes": [
+        "https://serendipdigital.com/about.html",
+        "https://www.apexweb360.com/",
+        "https://aglads.com/",
+        "https://mcsocialagency.com/"
+      ],
+      "huella": "a8c46abab930a148a6677eab923fb73de17c6128e2dd452fca3a66393812c560",
+      "usage": {
+        "entrada": 12656,
+        "entradaCache": 4329,
+        "salida": 324,
+        "razonamiento": 52
+      },
+      "coste": 0.011744,
+      "texto": "If you mean **English–Spanish**, **Serendip Digital** looks like the strongest fit for a Houston small business: it’s Houston-based and focuses on bilingual websites and local SEO, with content written to feel natural in both languages rather than simply translated. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n\nA few alternatives, depending on what you need:\n\n- **ApexWeb360** — Houston-based; emphasizes custom bilingual websites, SEO, and lead generation. ([apexweb360.com](https://www.apexweb360.com/?utm_source=openai))\n- **AGLA Digital Solutions** — Houston-based and bilingual; worth considering if your project includes web platforms, e-commerce, or automation as well as a website. ([aglads.com](https://aglads.com/?utm_source=openai))\n- **MC Social Agency** — Houston-based; a potential fit if you want web design together with bilingual marketing, photography, or social media. ([mcsocialagency.com](https://mcsocialagency.com/?utm_source=openai))\n\nThere isn’t an objective “best” without knowing your budget and project. Before choosing, ask each agency for **live bilingual site examples**, who writes the Spanish copy, what’s included in maintenance, and who owns the site and domain after launch."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "local SEO agency in Miami for small businesses",
+      "posicion": 3,
+      "repeticion": 10,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:03.845Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://surfsideppc.com/pages/seo-services-miami-fl",
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "fuentes": [
+        "https://surfsideppc.com/pages/seo-services-miami-fl",
+        "https://cafecitoweb.com/en/miami-seo",
+        "https://themanifest.com/seo/local/agencies/miami"
+      ],
+      "huella": "65f53095ab61ca134a1837de649ea34482db9e61f5918701a41d3252393a8137",
+      "usage": {
+        "entrada": 12857,
+        "entradaCache": 4330,
+        "salida": 298,
+        "razonamiento": 51
+      },
+      "coste": 0.011756,
+      "texto": "For a **small business in Miami**, these are a few options worth comparing:\n\n- **Surfside PPC** — Miami-focused SEO, neighborhood landing pages, and **no long-term contracts**; says management starts at **$500/month**. ([surfsideppc.com](https://surfsideppc.com/pages/seo-services-miami-fl?utm_source=openai))\n- **CafecitoWeb** — Focuses on Miami local businesses and contractors, with English/Spanish SEO and plans starting at **$499/month**. ([cafecitoweb.com](https://cafecitoweb.com/en/miami-seo?utm_source=openai))\n- **OptFirst Internet Marketing** — Established South Florida agency serving small and mid-sized businesses; directory listing shows a **$1,000+** minimum project budget. ([themanifest.com](https://themanifest.com/seo/local/agencies/miami?utm_source=openai))\n\n**My quick take:** If keeping costs down is important, start by comparing Surfside PPC and CafecitoWeb. Ask each for a written scope covering Google Business Profile, local rankings, website work, reporting, and contract terms. Compare those deliverables—not just the promised ranking results.\n\nIf you share your **type of business, neighborhood, and monthly budget**, I can narrow the list."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 9,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:04.608Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://elevatebiz.co/guides/small-business-website-cost-houston",
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "fuentes": [
+        "https://elevatebiz.co/guides/small-business-website-cost-houston",
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "huella": "a40f1cf1a749a968dcd79bdb645f4732ddbdea545d676fb5f144ab547c5d7b00",
+      "usage": {
+        "entrada": 8783,
+        "entradaCache": 4330,
+        "salida": 338,
+        "razonamiento": 48
+      },
+      "coste": 0.011267,
+      "texto": "En Houston, **una página web para un pequeño negocio suele costar entre $1,000 y $8,000**; puede ser menos si es una página sencilla, o bastante más si lleva funciones especiales. Como referencia, algunas guías locales sitúan una web básica con plantilla alrededor de **$1,000–$3,000** y una hecha a medida entre **$3,000–$8,000**. ([elevatebiz.co](https://elevatebiz.co/guides/small-business-website-cost-houston?utm_source=openai))\n\n- **Página sencilla o landing page:** desde unos **$550**; el precio depende de lo que incluya. ([officialcystudio.com](https://officialcystudio.com/en/pricing/?utm_source=openai))  \n- **Sitio para negocio pequeño** —varias páginas, formulario y diseño adaptable a celular—: aproximadamente **$1,000–$5,500**. ([elevatebiz.co](https://elevatebiz.co/guides/small-business-website-cost-houston?utm_source=openai))  \n- **Tienda en línea, reservas o funciones personalizadas:** puede costar más; conviene pedir un presupuesto detallado según las funciones.\n\nPregunta si el precio incluye **dominio, alojamiento, textos, mantenimiento y SEO**: a veces se cobran aparte. Si me dices qué tipo de negocio tienes y qué necesitas que haga la página, te doy un rango más preciso."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "en",
+      "pregunta": "web design agency for Hispanic small businesses in Houston",
+      "posicion": 2,
+      "repeticion": 10,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:04.780Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://magismarketing.com/about",
+        "https://www.fernvicknetwork.com/",
+        "https://serendipdigital.com/",
+        "https://oakinteractive.com/about/",
+        "https://wallstreetwebdesigns.com/"
+      ],
+      "fuentes": [
+        "https://magismarketing.com/about",
+        "https://www.fernvicknetwork.com/",
+        "https://serendipdigital.com/",
+        "https://oakinteractive.com/about/",
+        "https://wallstreetwebdesigns.com/"
+      ],
+      "huella": "407b79e6499aa04934cf99175453ccfcf8b233666b47c5b9e17ae3a047b26f59",
+      "usage": {
+        "entrada": 12735,
+        "entradaCache": 4331,
+        "salida": 410,
+        "razonamiento": 54
+      },
+      "coste": 0.011797,
+      "texto": "Here are a few Houston options that specifically mention bilingual service or work with Latino small businesses:\n\n- **[Magis Marketing](https://magismarketing.com/)** — Says it was built by and for Latino entrepreneurs and focuses on helping Latino small-business owners. Offers design and broader marketing services. ([magismarketing.com](https://magismarketing.com/about?utm_source=openai))\n- **[Fernvick Network](https://www.fernvicknetwork.com/)** — Serves Houston small businesses and says it builds websites and ads in English, Spanish, or both. Also offers SEO and Google Ads. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **[Serendip Digital](https://serendipdigital.com/)** — Focuses on bilingual web design and local SEO for Houston small businesses. ([serendipdigital.com](https://serendipdigital.com/?utm_source=openai))\n- **[OAK Interactive](https://oakinteractive.com/)** — A Houston-based Hispanic-owned digital marketing agency offering website design and development alongside other services. ([oakinteractive.com](https://oakinteractive.com/about/?utm_source=openai))\n- **[Wallstreet Webdesigns](https://wallstreetwebdesigns.com/)** — Advertises affordable small-business websites and Spanish-speaking service in Houston. ([wallstreetwebdesigns.com](https://wallstreetwebdesigns.com/?utm_source=openai))\n\n**Best starting points:** Magis if you want an agency oriented toward Latino entrepreneurs; Fernvick or Serendip if your main needs are a bilingual website and local search visibility.\n\nBefore choosing, ask for examples in your industry, the total cost (including hosting and ongoing edits), and whether you’ll own the domain and website files."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "cuánto cuesta una página web en Houston",
+      "posicion": 5,
+      "repeticion": 10,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:16.914Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "fuentes": [
+        "https://officialcystudio.com/en/pricing/"
+      ],
+      "huella": "38bc6a9497fe390d70a36f943b707af117c27737744613516c31cd4686817152",
+      "usage": {
+        "entrada": 8644,
+        "entradaCache": 4330,
+        "salida": 313,
+        "razonamiento": 48
+      },
+      "coste": 0.011237,
+      "texto": "En Houston, **el precio depende de qué necesitas**, pero como referencia:\n\n- **Página sencilla o landing page:** desde unos **$500–$2,500**.\n- **Sitio para negocio pequeño** (varias páginas, formulario y diseño profesional): aproximadamente **$2,000–$8,000**.\n- **Diseño personalizado con contenido, SEO o funciones especiales:** puede costar **$8,000–$15,000 o más**.\n- **Tienda en línea:** normalmente cuesta más; depende del catálogo, pagos y funciones que requiera.\n\nTambién considera gastos recurrentes de **dominio, alojamiento y mantenimiento**. Algunos proveedores locales anuncian proyectos desde **$550**, mientras que otros sitúan sitios empresariales personalizados en rangos de varios miles de dólares. ([officialcystudio.com](https://officialcystudio.com/en/pricing/?utm_source=openai))\n\nPara comparar cotizaciones, confirma cuántas páginas incluye, quién escribe los textos, si incluye versión móvil, SEO básico, mantenimiento y si el precio es único o mensual. **Para un negocio pequeño, un presupuesto inicial razonable suele ser $2,000–$5,000**, si no necesitas tienda ni funciones complejas."
+    },
+    {
+      "motor": "chatgpt",
+      "idioma": "es",
+      "pregunta": "agencia de diseño web para negocios hispanos en Houston",
+      "posicion": 4,
+      "repeticion": 10,
+      "intento": 1,
+      "modelo": "gpt-6-luna",
+      "hora": "2026-11-04T21:07:17.039Z",
+      "cuenta": true,
+      "estado": "completed",
+      "busco": true,
+      "busquedas": 1,
+      "aparecen": [],
+      "citaWeb": false,
+      "webs": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://serendipdigital.com/about.html",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "fuentes": [
+        "https://nexodigital70.com/",
+        "https://www.fernvicknetwork.com/",
+        "https://serendipdigital.com/about.html",
+        "https://seekemedia.com/locations/houston"
+      ],
+      "huella": "6d6b71f555d82a29ede98fa7d5823ea15b27f74d19b0a2aef4be8d9605a4ee79",
+      "usage": {
+        "entrada": 8660,
+        "entradaCache": 4334,
+        "salida": 362,
+        "razonamiento": 45
+      },
+      "coste": 0.011264,
+      "texto": "Si buscas una agencia que atienda en español y diseñe para negocios hispanos en Houston, estas opciones podrían servirte:\n\n- **[NEXO Digital Houston](https://nexodigital70.com/)** — Agencia local enfocada en pequeños negocios hispanos; ofrece sitios bilingües y consulta por WhatsApp. Publica que suele entregar en 3–5 días. ([nexodigital70.com](https://nexodigital70.com/?utm_source=openai))\n- **[Fernvick Network](https://www.fernvicknetwork.com/)** — Equipo bilingüe en Houston; hace páginas web y publicidad en español, inglés o ambos. Indica que las cotizaciones son gratis. ([fernvicknetwork.com](https://www.fernvicknetwork.com/?utm_source=openai))\n- **[Serendip Digital](https://serendipdigital.com/)** — Agencia de Houston para pequeños negocios, con diseño web bilingüe y SEO local. ([serendipdigital.com](https://serendipdigital.com/about.html?utm_source=openai))\n- **[Seek Media](https://seekemedia.com/locations/houston)** — Diseño web bilingüe y SEO para Houston y alrededores. ([seekemedia.com](https://seekemedia.com/locations/houston?utm_source=openai))\n\nAntes de contratar, pide ejemplos de negocios parecidos al tuyo, precio total y qué incluye el mantenimiento, el dominio y el SEO. ¿Qué tipo de negocio tienes y buscas una web sencilla, tienda en línea o más clientes desde Google?"
+    }
+  ]
+}

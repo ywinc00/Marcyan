@@ -53,6 +53,13 @@
 
 > Revisión 2026-W44 (26-oct, semana par): sin reordenar. Reescribir /es/houston/diseno-web pasa a "en espera" (2 propuestas sin OK). Vuelven al índice 4 páginas de la petición de rastreo; sale /en/miami/local-seo. Vigilar velocidad de la portada (79): si se repite el 2-nov, entra en la tanda.
 
+> Revisión 2026-11-04 (informe de octubre): octubre cerró con 0 contactos, 1 clic y 342 apariciones (septiembre 829); indexadas 34 de 52 y planas desde la fusión del 31-oct. Estado de la tanda: tarea 2 hecha (12-oct); tareas 4 y 5 superadas (fusión del 31-oct; "marcyan" ya aterriza en /es, puesto 2); tarea 3 (PR #36) queda sobre textos viejos tras el hub de Miami del 1-nov; tareas 1 y 6 siguen en Yan. Entra la tarea 8. Hasta el 23-nov, solo revisiones (catálogo congelado).
+
+| # | Tarea | Palanca | Impacto | Confianza | Esfuerzo | Puntos | Responsable | Fecha | Estado |
+|---|---|---|---|---|---|---|---|---|---|
+| 8 | Enlazar la guía de precio del chatbot de WhatsApp desde /es/precios, /es/houston/ia-conversacional y /es/miami/ia-conversacional y afinar su título para "precio chatbot whatsapp" (115 de 342 apariciones de octubre, puesto 13,5, 0 clics; último rastreo 7-sep; hoy solo la enlaza /es/blog, comprobado el 4-nov). Ref `marcyan-guia-chatbot-enlaces` | §2.4 Refresco + enlazado | 3 | 3 | 1 | 9 | Yan (OK) + Departamento (chat Marcyan Web) | OK: 2026-11-20 · cambio: 2026-11-27 | Propuesta 2026-11-04, espera OK |
+| 9 | Revisiones de los cambios del 31-oct y 1-nov (render, inglés, destinos de fusión, contador en 2 lecturas semanales) | §7 Indexación | 4 | 5 | 1 | 20 | Departamento | 2026-11-07, 14 y 28 | En curso |
+
 ## En espera (sin responsable o bloqueadas)
 
 - Anchors de Houston (misma mecánica que Miami): esperan a que el rediseño de la landing de Houston tenga dirección elegida.

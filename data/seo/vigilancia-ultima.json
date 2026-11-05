@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-04",
+  "fecha": "2026-11-05",
   "primeraEjecucion": false,
   "sitemap": 52,
   "inspeccion": true,
-  "indexadas": 33,
+  "indexadas": 31,
   "inspeccionadas": 52,
   "porEstado": {
-    "Submitted and indexed": 33,
-    "Crawled - currently not indexed": 17,
+    "Submitted and indexed": 31,
+    "Crawled - currently not indexed": 19,
     "Alternate page with proper canonical tag": 2
   },
   "porGrupo": {
@@ -50,7 +50,7 @@
     },
     "blog·es": {
       "total": 7,
-      "indexadas": 4
+      "indexadas": 3
     },
     "otras·es": {
       "total": 5,
@@ -62,7 +62,7 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 3
+      "indexadas": 2
     },
     "landings·es": {
       "total": 12,
@@ -77,9 +77,9 @@
       "indexadas": 0
     }
   },
-  "sinRastreoReciente": 21,
+  "sinRastreoReciente": 19,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 71,
+  "certificadoDias": 70,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 52
@@ -113,8 +113,8 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 899,
-    "sesionesDiaHabitual": 14.7,
+    "sesionesUltimos3Dias": 40,
+    "sesionesDiaHabitual": 28.9,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
     "probabilidadAzar": null
@@ -142,21 +142,29 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-11-04",
+        "fecha": "2026-11-05",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/miami/seo-local"
+        "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+      },
+      {
+        "fecha": "2026-11-05",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/sugar-land"
       }
     ],
     "media": [
       {
-        "fecha": "2026-11-04",
+        "fecha": "2026-11-05",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "21 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "19 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
@@ -164,12 +172,20 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-11-04",
+      "fecha": "2026-11-05",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/miami/seo-local"
+      "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+    },
+    {
+      "fecha": "2026-11-05",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/sugar-land"
     }
   ],
   "pedirIndexacion": [],

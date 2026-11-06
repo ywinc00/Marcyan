@@ -1,0 +1,86 @@
+---
+// F22 · Obra (contratistas, v3). Un solo motivo: el armazón de madera de una casa en alzado, dibujado a
+// línea fina de oro como en un plano de obra (montantes cada 16″, soleras, cerchas del tejado, losa y una
+// cota). Principio tomado de Trunk (Refero, estilo 09af2984-b556-4971-bd5a-20224574ccd9): una única
+// escena dibujada a línea que vive detrás del producto y se funde con la noche; aquí, la tarjeta del
+// hero queda delante del armazón, como la obra que se levanta. Nada detrás del texto: el dibujo empieza
+// donde acaba la columna de texto y se desvanece por su borde izquierdo. Quieto (sin bucle ni pausa).
+// Ajustes: --wf-obra-top / --wf-obra-top-movil (alto del dibujo), --wf-obra-escala-movil.
+interface Props { estilos?: boolean; lang?: 'es' | 'en' }
+const { estilos = true } = Astro.props;
+
+// Alzado en un lienzo de 900 × 650. Muro de 120 a 800 (680 = 28′ a escala), suelo en 600.
+const X0 = 120, X1 = 800, TOP = 300, SOLE = 560;
+const VENTANA = { a: 144, b: 240, header: 348, sill: 452 };
+const montantes: string[] = [];
+for (let x = X0 + 8; x <= X1 - 8; x += 32) {
+  if (x > VENTANA.a && x < VENTANA.b) {
+    // Bajo el alféizar y sobre el dintel: montantes cortos (cripples).
+    montantes.push(`M${x} ${VENTANA.sill + 6}V${SOLE}`, `M${x} ${TOP + 16}V${VENTANA.header}`);
+  } else montantes.push(`M${x} ${TOP + 16}V${SOLE}`);
+}
+const PICO = { x: 460, y: 92 };
+const L = { x: 84, y: TOP + 6 }, R = { x: 836, y: TOP + 6 };
+const mid = (t: number, a: { x: number; y: number }) => ({ x: a.x + (PICO.x - a.x) * t, y: a.y + (PICO.y - a.y) * t });
+const l1 = mid(0.5, L), r1 = mid(0.5, R), l2 = mid(0.25, L), r2 = mid(0.25, R);
+const CERCHA = [
+  `M${L.x} ${L.y}L${PICO.x} ${PICO.y}L${R.x} ${R.y}`,
+  `M${L.x + 6} ${L.y + 8}L${PICO.x} ${PICO.y + 10}L${R.x - 6} ${R.y + 8}`,
+  `M${PICO.x} ${PICO.y + 10}V${TOP}`,
+  `M${PICO.x} ${TOP}L${l1.x} ${l1.y}M${PICO.x} ${TOP}L${r1.x} ${r1.y}`,
+  `M${l1.x} ${l1.y}L${l2.x + 40} ${TOP}M${r1.x} ${r1.y}L${r2.x - 40} ${TOP}`,
+  `M${l2.x} ${l2.y}V${TOP}M${r2.x} ${r2.y}V${TOP}`,
+].join('');
+const SUELO: string[] = [];
+for (let x = 10; x < 900; x += 18) SUELO.push(`M${x} 600l-9 11`);
+const CSS = `
+  .wf:has(> .wf-ob) {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent);
+            mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent);
+  }
+  .wf-ob { position: absolute; inset: 0; }
+  /* Luz baja y cálida bajo la obra (G-01): sin ella el armazón flota en negro plano. */
+  .wf-ob::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(40% 38% at calc(100% - var(--wf-l) - 238px) 82%, rgba(var(--accent-gold-rgb), .10), transparent 100%);
+  }
+  .wf-ob__dib {
+    position: absolute; width: 900px; height: 650px;
+    left: calc(100% - var(--wf-l) - 238px - 460px); top: var(--wf-obra-top, 40px);
+    fill: none; stroke: rgba(var(--accent-gold-rgb), .28); stroke-width: 1; stroke-linecap: square;
+    -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 20%);
+            mask-image: linear-gradient(90deg, transparent 4%, #000 20%);
+  }
+  .wf-ob__dib .fino { stroke: rgba(var(--accent-gold-rgb), .2); }
+  .wf-ob__dib .fuerte { stroke: rgba(var(--accent-gold-rgb), .5); }
+  .wf-ob__dib text {
+    fill: rgba(var(--accent-gold-rgb), .8); stroke: none;
+    font: 500 11px/1 var(--font-mono, monospace); letter-spacing: .06em;
+  }
+  @media (max-width: 1023.98px) {
+    .wf-ob::before { background: radial-gradient(80% 26% at 50% 80%, rgba(var(--accent-gold-rgb), .10), transparent 100%); }
+    .wf-ob__dib {
+      left: 50%; top: var(--wf-obra-top-movil, 528px);
+      transform: translateX(-50%) scale(var(--wf-obra-escala-movil, .62)); transform-origin: 50% 0;
+      -webkit-mask-image: none; mask-image: none;
+    }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-ob">
+  <svg class="wf-ob__dib" viewBox="0 0 900 650" aria-hidden="true">
+    <path class="fino" d={SUELO.join('')} />
+    <path class="fuerte" d="M0 600H900" />
+    <rect x={X0 - 10} y="572" width={X1 - X0 + 20} height="28" />
+    <rect x={X0} y={SOLE} width={X1 - X0} height="12" />
+    <rect x={X0} y={TOP} width={X1 - X0} height="8" />
+    <rect x={X0} y={TOP + 8} width={X1 - X0} height="8" />
+    <path d={montantes.join('')} />
+    <rect x={VENTANA.a} y={VENTANA.header} width={VENTANA.b - VENTANA.a} height="18" />
+    <path d={`M${VENTANA.a} ${VENTANA.sill}H${VENTANA.b}M${VENTANA.a} ${VENTANA.sill + 6}H${VENTANA.b}`} />
+    <path class="fuerte" d={CERCHA} />
+    <path class="fino" d={`M${X0} 618V640M${X1} 618V640M${X0} 630H410M510 630H${X1}`} />
+    <text x="460" y="634" text-anchor="middle">28′ 0″</text>
+  </svg>
+</div>

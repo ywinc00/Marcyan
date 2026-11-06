@@ -55,6 +55,7 @@ import F10Franjas from './F10Franjas.astro';
 import F12Escaneo from './F12Escaneo.astro';
 import F13Hoja from './F13Hoja.astro';
 import F30Rombos from './F30Rombos.astro';
+import F20Sector from './F20Sector.astro';
 
 interface Props {
   /** Tema por nombre ('radar') o por código del plan ('F03'). */
@@ -78,7 +79,7 @@ interface Props {
 const TEXTO_POR_TEMA: Record<TemaFondo, 'centro' | 'izquierda' | 'ambos'> = {
   reticula: 'centro', escaparate: 'izquierda', radar: 'izquierda', hilos: 'centro',
   placa: 'izquierda', construccion: 'ambos', plano: 'izquierda', calles: 'centro',
-  tunel: 'centro', franjas: 'centro', escaneo: 'centro', hoja: 'centro', rombos: 'centro',
+  tunel: 'centro', franjas: 'centro', escaneo: 'centro', hoja: 'centro', rombos: 'centro', sector: 'izquierda',
 };
 const TEAL: TemaFondo[] = ['hilos', 'placa', 'tunel'];
 const NUCLEO: TemaFondo[] = ['reticula', 'radar', 'placa', 'calles'];
@@ -99,7 +100,7 @@ const TXT_PAUSA = lang === 'en'
 const MOTIVO = {
   reticula: F01Reticula, escaparate: F02Escaparate, radar: F03Radar, hilos: F04Hilos,
   placa: F05Placa, construccion: F06Construccion, plano: F07Plano, calles: F08Calles,
-  tunel: F09Tunel, franjas: F10Franjas, escaneo: F12Escaneo, hoja: F13Hoja, rombos: F30Rombos,
+  tunel: F09Tunel, franjas: F10Franjas, escaneo: F12Escaneo, hoja: F13Hoja, rombos: F30Rombos, sector: F20Sector,
 } as const;
 const Motivo = MOTIVO[tema];
 

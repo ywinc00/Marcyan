@@ -38,15 +38,16 @@ export type TemaFondo =
   | 'franjas'       // F10 servicios y precios
   | 'escaneo'       // F12 diagnóstico y herramientas
   | 'hoja'          // F13 blog
-  | 'rombos';       // F30 barrios (vuelta 3: malla de rombos sola)
+  | 'rombos'        // F30 barrios (vuelta 3: malla de rombos sola)
+  | 'sector';       // F20 sectores (v3): escena propia por página (atardecer, obra, mesa)
 
 /** Código del plan (F01…F13, sin F11): el plan G escribe `fondo: 'F01'`; se aceptan los dos. */
 export type CodigoFondo =
-  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F10' | 'F12' | 'F13' | 'F30';
+  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F10' | 'F12' | 'F13' | 'F20' | 'F30';
 
 const POR_CODIGO: Record<CodigoFondo, TemaFondo> = {
   F01: 'reticula', F02: 'escaparate', F03: 'radar', F04: 'hilos', F05: 'placa', F06: 'construccion',
-  F07: 'plano', F08: 'calles', F09: 'tunel', F10: 'franjas', F12: 'escaneo', F13: 'hoja', F30: 'rombos',
+  F07: 'plano', F08: 'calles', F09: 'tunel', F10: 'franjas', F12: 'escaneo', F13: 'hoja', F20: 'sector', F30: 'rombos',
 };
 /** Normaliza un código del plan ('F03') o un nombre ('radar') al nombre del tema. */
 export function temaDeFondo(t: TemaFondo | CodigoFondo): TemaFondo {

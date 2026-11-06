@@ -4,8 +4,8 @@
 // con el reparto de marcas de §1.6 (pendiente [SISTEMA]: sustituir por SolicitudOficio de P03):
 //   contratista  → pantalla de bloqueo con la notificación de "Tu Plomería" (su signo como icono
 //                  de app): "Solicitud de presupuesto · cambio de calentador de agua · Katy · 9:40 p. m."
-//   inmobiliaria → ficha de casa al estilo Samara (nombre enorme y fino, 3 datos mono, casita
-//                  geométrica mínima) + mensaje entrante "¿Sigue disponible?"
+//   inmobiliaria → ficha de casa al estilo Samara: foto real del inmueble con su nombre fino encima,
+//                  3 datos mono + mensaje entrante "¿Sigue disponible?" (v3: la foto sustituye al dibujo)
 //   restaurante  → carta de "Your Restaurant" (paleta ladrillo de negocios.ts) + "Order on WhatsApp"
 //                  con el logo de WhatsApp a color (P06).
 // Va dentro de TarjetaObjeto (W-CORE-16): `band` llena la franja de puntos, el resto el cuerpo.
@@ -19,7 +19,6 @@
 // 2 s); al salir ≥ 8 s y volver, se reproduce de nuevo. Sin JS o con reducir movimiento: final.
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import LogoMarca from '../../marcas/LogoMarca.astro';
-import CasaIlustrada from './CasaIlustrada.astro';
 
 interface Props { kind: 'contratista' | 'inmobiliaria' | 'restaurante'; lang?: 'es' | 'en'; parte: 'band' | 'body' }
 const { kind, lang = 'es', parte } = Astro.props;
@@ -39,6 +38,9 @@ const C = {
 // simplificada del mismo signo, como hacen las apps: codo de tubería grueso con sus dos bridas y la gota.
 const ICONO = 'M4 8H14A12 12 0 0 1 26 20V27H18V20A4 4 0 0 0 14 16H4Z';
 const BRIDAS = 'M1.5 5.5H5V18.5H1.5ZM15.5 26H28.5V29.5H15.5Z';
+// v3: la ficha lleva la FOTO de la casa (E-57 (5)): foto libre de Unsplash, recortada a 2,2:1 y servida en
+// AVIF/WebP a 1x y 2x del ancho de la tarjeta (licencia en LICENCIAS.md, junto a este archivo).
+const FOTO = '/assets/w/sector/casa-roble';
 const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 24.6 8.5 21.5 8.5 21.5Z';
 ---
 {parte === 'band' && (
@@ -81,13 +83,16 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
     {kind === 'inmobiliaria' && (
       <div class="oo-casa">
         <div class="oo-casa__ficha" data-oo-i="1">
-          <span class="oo-casa__ilu" aria-hidden="true"><CasaIlustrada v={0} uid={`hero-${lang}`} /></span>
+          <picture class="oo-casa__foto">
+            <source type="image/avif" srcset={`${FOTO}-440.avif 440w, ${FOTO}-840.avif 840w`} sizes="(max-width: 767.98px) 300px, 396px" />
+            <img src={`${FOTO}-840.webp`} srcset={`${FOTO}-440.webp 440w, ${FOTO}-840.webp 840w`} sizes="(max-width: 767.98px) 300px, 396px" width="840" height="382" alt="" loading="lazy" decoding="async" />
+          </picture>
           <span class="oo-casa__txt">
             <span class="oo-casa__n">{C.casa}</span>
             <span class="oo-casa__z">{C.zona}</span>
-            <span class="oo-casa__d">{C.datos.map((d: string) => <span>{d}</span>)}</span>
           </span>
         </div>
+        <span class="oo-casa__d" data-oo-i="1">{C.datos.map((d: string) => <span>{d}</span>)}</span>
         <div class="oo-msg" data-oo-i="2">
           <span class="oo-msg__top"><i class="oo-vivo" aria-hidden="true"></i>{C.quien}<span>{C.h}</span></span>
           <span class="oo-msg__b">{C.msg}</span>
@@ -199,14 +204,22 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
   .oo--contratista .oo-noti__card { align-self: start; }
   .oo--contratista .oo-lock { align-self: end; }
 
-  /* ── Inmobiliaria: ficha Samara + mensaje entrante ── */
-  .oo-casa { display: grid; gap: 12px; }
-  .oo-casa__ficha { display: grid; grid-template-columns: 148px 1fr; gap: 16px; align-items: center; }
-  .oo-casa__ilu { display: block; height: 104px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 18px rgba(17, 19, 22, .14), inset 0 0 0 1px rgba(17, 19, 22, .06); }
-  .oo-casa__txt { display: grid; gap: 4px; }
-  .oo-casa__n { font: 300 38px/1 var(--font-display); letter-spacing: -0.035em; color: #111316; }
-  .oo-casa__z { font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #4d5358; }
-  .oo-casa__d { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  /* ── Inmobiliaria: ficha Samara con la foto del inmueble + mensaje entrante ── */
+  .oo-casa { display: grid; gap: 10px; width: 100%; }
+  .oo-casa__ficha {
+    position: relative; display: block; border-radius: 14px; overflow: hidden; aspect-ratio: 2.2;
+    background: #3a2a1e; box-shadow: 0 10px 22px rgba(17, 19, 22, .18), inset 0 0 0 1px rgba(17, 19, 22, .06);
+  }
+  .oo-casa__foto, .oo-casa__foto img { display: block; width: 100%; height: 100%; }
+  .oo-casa__foto img { object-fit: cover; }
+  /* Rótulo sobre la foto con su velo (texto blanco AA sobre la parte baja oscurecida). */
+  .oo-casa__txt {
+    position: absolute; inset: auto 0 0 0; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 36px 16px 12px; background: linear-gradient(180deg, transparent, rgba(12, 10, 9, .78) 70%);
+  }
+  .oo-casa__n { font: 300 30px/1 var(--font-display); letter-spacing: -0.035em; color: #fff; }
+  .oo-casa__z { font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .86); white-space: nowrap; }
+  .oo-casa__d { display: flex; flex-wrap: wrap; gap: 6px; }
   .oo-casa__d span { padding: 4px 8px; border-radius: 6px; font: 500 12px/1 var(--font-mono); color: #111316; background: rgba(17, 19, 22, .06); }
   .oo-msg {
     --oo-papel: #fff;
@@ -245,10 +258,8 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
     .oo-app { width: 36px; height: 36px; }
     .oo-noti__top { white-space: nowrap; }
     .oo-noti__btn { grid-column: 2; justify-self: start; }
-    .oo-casa__n { font-size: 32px; }
-    .oo-casa__ficha { grid-template-columns: 112px 1fr; gap: 12px; }
-    .oo-casa__ilu { height: 84px; }
-    .oo-casa__n { font-size: 28px; }
+    .oo-casa__n { font-size: 26px; }
+    .oo-casa__txt { padding: 28px 12px 10px; }
   }
   @media (prefers-reduced-motion: reduce) {
     :global(.oo-arm) [data-oo-i] { opacity: 1; transform: none; animation: none !important; }

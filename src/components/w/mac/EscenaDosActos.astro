@@ -154,7 +154,7 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
             <div class="dv-cab">
               <span class:list={['dv-ico', `dv-ico--${v.canal}`]}>
                 {LogoMarca && MARCA[v.canal]
-                  ? <LogoMarca id={MARCA[v.canal]} size={22} tono="color" />
+                  ? <LogoMarca id={MARCA[v.canal]} size={22} tono="color" titulo="" />
                   : <Fragment set:html={icono(v.canal)} />}
               </span>
               <b>{T.canales[v.canal]}</b>
@@ -205,7 +205,7 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
               <li class:list={['da-fila', `da-fila--${f.est}`]} style={`--j:${i}`}>
                 <span class:list={['dv-ico', 'da-fila-ico', `dv-ico--${f.canal}`]}>
                   {LogoMarca && MARCA[f.canal]
-                    ? <LogoMarca id={MARCA[f.canal]} size={22} tono="color" />
+                    ? <LogoMarca id={MARCA[f.canal]} size={22} tono="color" titulo="" />
                     : <Fragment set:html={icono(f.canal)} />}
                 </span>
                 <span class="da-fila-txt"><b>{T.canales[f.canal]}</b><small>{f.txt}</small></span>

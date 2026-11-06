@@ -90,7 +90,7 @@ const MARCA: Partial<Record<DockId, LogoReservaId>> = {
         <span class:list={['esc-app', `esc-app--${id}`]} data-w2-dock={id}>
           {MARCA[id] ? (
             LogoMarca ? (
-              <LogoMarca id={MARCA[id]} size={58} tono="color" baldosa />
+              <LogoMarca id={MARCA[id]} size={58} tono="color" baldosa titulo="" />
             ) : (
               <span class="esc-baldosa" set:html={logoReserva(MARCA[id]!, id === 'whatsapp' ? 34 : 32, id === 'whatsapp' ? 'blanco' : 'color')} />
             )

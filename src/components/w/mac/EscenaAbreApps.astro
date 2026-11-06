@@ -193,7 +193,7 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
             </div>
           </div>
         )}
-        {LogoMarca ? <LogoMarca slot="carga" id="googlemaps" size={40} tono="color" /> : <span slot="carga" class="abre-logo" set:html={logo('googlemaps')} />}
+        {LogoMarca ? <LogoMarca slot="carga" id="googlemaps" size={40} tono="color" titulo="" /> : <span slot="carga" class="abre-logo" set:html={logo('googlemaps')} />}
         <Fragment slot="chip">{T.encuentran}</Fragment>
       </VentanaApp>
 
@@ -212,7 +212,7 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
           </div>
           <div class="wa-pie"><span>{T.wa.escribe}</span></div>
         </div>
-        {LogoMarca ? <LogoMarca slot="carga" id="whatsapp" size={40} tono="color" /> : <span slot="carga" class="abre-logo abre-logo--wa" set:html={logo('whatsapp')} />}
+        {LogoMarca ? <LogoMarca slot="carga" id="whatsapp" size={40} tono="color" titulo="" /> : <span slot="carga" class="abre-logo abre-logo--wa" set:html={logo('whatsapp')} />}
       </VentanaApp>
 
       {/* 4 · correo al dueño (solo ≥ 641 px) */}
@@ -233,7 +233,7 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
             <span class="cor-txt cor-txt--2">{T.correo.cierre}</span>
           </div>
         </div>
-        {LogoMarca ? <LogoMarca slot="carga" id="gmail" size={40} tono="color" /> : <span slot="carga" class="abre-logo" set:html={logo('gmail')} />}
+        {LogoMarca ? <LogoMarca slot="carga" id="gmail" size={40} tono="color" titulo="" /> : <span slot="carga" class="abre-logo" set:html={logo('gmail')} />}
         <Fragment slot="chip">{T.nuevo}</Fragment>
       </VentanaApp>
     </Escritorio>

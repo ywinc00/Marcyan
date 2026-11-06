@@ -4,8 +4,8 @@
 // · Consola (estado 1): se reproduce UNA vez al entrar la demo en vista (35 %), con los tiempos medidos
 //   en el original (C/01): consola 60 ms · comando 214 · leyenda 290 · esqueleto en cascada 500-1460 cada
 //   120 ms · bloques 570 / 1210 / 2120 / 2970 · check 2970-3070 · barrido de revelado 3220 (1170 ms).
-//   Vuelve a reproducirse solo si la demo estuvo ≥ 8 s fuera de vista y vuelve en estado 1; pasar del
-//   estado 2 al 1 al subir NO la repite.
+//   El estado de salida (vacío) se pone al montar y, para repetir, se rearma con la demo ≥ 8 s del todo
+//   fuera de vista en estado 1; pasar del estado 2 al 1 al subir NO la repite.
 // · Estado 1 ⇄ 2 por umbral: la cabecera del bloque 2 cruza el 50 % de la ventana (IntersectionObserver).
 // · Personalizador: cada clic escribe --ej-s-* o data-ej-* en el [data-ej-scope] (contrato WebEjemplo,
 //   P02a). Grupos radiogroup con tabulación itinerante y flechas. Resumen en aria-live SOLO con cambios
@@ -128,7 +128,7 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
     tag.style.height = `${Math.round(r.height + pad * 2)}px`;
     const rad = parseFloat(getComputedStyle(t).borderTopLeftRadius) || 0;
     tag.style.borderRadius = `${Math.min(999, rad + pad)}px`;
-    // Titular: el rótulo va por dentro, arriba a la derecha (hueco tras la 1.ª línea); el resto, encima.
+    // Titular: el rótulo va encima y a la derecha (hueco tras el antetítulo corto); el resto, encima a la izquierda.
     tag.classList.toggle('is-in', PARTE[g] === '.ej__tit');
     tag.querySelector('b')!.textContent = D.pieza[g];
     tag.classList.add('is-on');
@@ -283,7 +283,12 @@ function montarDemo(dc: HTMLElement) {
   montarPz(pz, dc, () => state === 2 || apilado());
 
   // ── Estado 1 ⇄ 2 ──
-  const fijarEstado = (n: number) => { if (n === state && dc.getAttribute('data-dc-state') === String(n)) return; state = n; dc.setAttribute('data-dc-state', String(n)); };
+  let armado = false;
+  const fijarEstado = (n: number) => {
+    if (n === state && dc.getAttribute('data-dc-state') === String(n)) return;
+    state = n; dc.setAttribute('data-dc-state', String(n));
+    if (n === 2 && armado) final(); // armada y sin reproducir: el personalizador enseña la web terminada
+  };
   if (reduced()) fijarEstado(2);
   else {
     // Umbral: la cabecera del bloque 2 por encima del 50 % de la ventana. Se mide en scroll (pasivo, un
@@ -306,25 +311,38 @@ function montarDemo(dc: HTMLElement) {
 
   const final = () => {
     parar();
-    dc.classList.remove('is-building', 'is-reveal');
+    armado = false;
+    dc.classList.remove('is-building', 'is-reveal', 'is-armed');
     con.classList.remove('is-reset');
     con.classList.add('is-done');
     lineas.forEach((l) => { l.classList.add('is-on'); l.classList.remove('is-cur'); });
+    leg.classList.remove('is-work', 'is-idle');
+  };
+
+  // Estado de salida de la reproducción (caja crema vacía, consola vacía, sin leyenda). Se pone al montar
+  // (la demo se monta 200 px antes de asomar) y se rearma con la demo FUERA de la vista cuando toca repetir:
+  // nadie ve la web terminada antes de verla construirse. El HTML conserva el estado final (sin JS y con
+  // reducir movimiento).
+  const armar = () => {
+    parar();
+    armado = true;
+    lineas.forEach((l) => { partir(l); l.classList.remove('is-on', 'is-cur'); });
+    $$(dc, '[data-dc-sk] .ej-k').forEach((x) => x.classList.remove('is-in'));
+    con.classList.remove('is-done');
+    con.classList.add('is-reset');
+    dc.classList.remove('is-reveal');
+    dc.classList.add('is-building', 'is-armed');
     leg.classList.remove('is-work');
+    leg.classList.add('is-idle');
   };
 
   const reproducir = () => {
     if (reduced()) return final();
-    parar();
-    lineas.forEach((l) => { partir(l); l.classList.remove('is-on', 'is-cur'); });
+    armar();
+    armado = false;
+    dc.classList.remove('is-armed');
     // Solo los bloques que se pintan (los enlaces del menú no existen en la tarjeta): sin huecos en la cascada.
     const sk = $$(dc, '[data-dc-sk] .ej-k').filter((x) => x.getClientRects().length > 0);
-    sk.forEach((x) => x.classList.remove('is-in'));
-    con.classList.remove('is-done');
-    con.classList.add('is-reset');
-    dc.classList.remove('is-reveal');
-    dc.classList.add('is-building');
-    leg.classList.remove('is-work');
     con.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 950, delay: 60, easing: EASE, fill: 'backwards' });
 
     const linea = (l: HTMLElement, cur = false) => {
@@ -334,7 +352,7 @@ function montarDemo(dc: HTMLElement) {
     };
     en(214, () => linea(lineas[0]));
     en(222, () => linea(lineas[1]));
-    en(290, () => leg.classList.add('is-work'));
+    en(290, () => { leg.classList.add('is-work'); leg.classList.remove('is-idle'); });
     sk.forEach((x, i) => { x.style.setProperty('--sd', `${i * 120}ms`); en(500 + i * 120, () => x.classList.add('is-in')); });
     [570, 1210, 2120, 2970].forEach((t0, b) => {
       lineas.filter((l) => l.getAttribute('data-dc-b') === String(b)).forEach((l, k) => en(t0 + (k ? 100 + (k - 1) * 150 : 0), () => linea(l, k === 0 && b < 3)));
@@ -348,16 +366,23 @@ function montarDemo(dc: HTMLElement) {
     en(3220, barrido);
   };
 
-  // ── Una vez por entrada (35 %); de nuevo solo tras ≥ 8 s fuera y en estado 1 ──
-  let jugado = false; let fuera = 0;
+  // ── Una vez por entrada (35 %); de nuevo solo tras ≥ 8 s del todo fuera y en estado 1 ──
+  // El rearme ocurre a los 8 s con la demo sin un solo píxel en pantalla; al volver (35 %) se reproduce.
+  const blanco = apilado() ? con : demo;
+  let jugado = false; let tFuera = 0;
+  if (!reduced()) armar();
   new IntersectionObserver((es) => {
     const e = es[es.length - 1];
-    if (e.isIntersecting) {
-      if (!jugado) { jugado = true; reproducir(); }
-      else if (fuera && Date.now() - fuera >= 8000 && state === 1) reproducir();
-      fuera = 0;
-    } else if (jugado) fuera = Date.now();
-  }, { threshold: 0.35 }).observe(apilado() ? con : demo);
+    if (e.isIntersecting) { clearTimeout(tFuera); tFuera = 0; return; }
+    if (!jugado || armado) return;
+    clearTimeout(tFuera);
+    tFuera = window.setTimeout(() => { tFuera = 0; if (state === 1 && !reduced()) armar(); }, 8000);
+  }, { threshold: 0 }).observe(blanco);
+  new IntersectionObserver((es) => {
+    if (!es[es.length - 1].isIntersecting) return;
+    if (!jugado) { jugado = true; reproducir(); }
+    else if (armado) reproducir();
+  }, { threshold: 0.35 }).observe(blanco);
 }
 
 export function initDemos() {

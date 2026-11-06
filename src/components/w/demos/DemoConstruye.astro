@@ -168,15 +168,19 @@ const [o1, o2, o3] = bloque2.opciones;
   .dc-leg.is-work .dc-leg__a { opacity: 1; }
   .dc-leg.is-work .dc-leg__b { opacity: 0; }
   .dc-leg.is-work .dc-leg__b :global(svg) { transform: scale(.9); opacity: 0; }
+  /* Armada (antes de reproducir): sin leyenda y sin consola; la reproducción las hace entrar. */
+  .dc-leg.is-idle .dc-leg__a, .dc-leg.is-idle .dc-leg__b { opacity: 0; }
+  .dc.is-armed :global(.dcc) { opacity: 0; }
   .dc-leg__spin { width: 14px; height: 14px; box-sizing: border-box; border-radius: 999px; border: 2px solid rgba(240, 237, 232, .25); border-top-color: rgba(240, 237, 232, .7); animation: dc-spin 900ms linear infinite; }
   @keyframes dc-spin { to { transform: rotate(1turn); } }
 
   /* Esqueleto + barrido: el envoltorio baja y su hijo sube (máscara por transform). */
-  .dc-sk { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; z-index: 3; overflow: hidden; contain: paint; visibility: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 22px); }
+  .dc-sk { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; z-index: 3; overflow: hidden; contain: paint; visibility: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 24px); }
   .dc-sk__in { position: absolute; inset: 0; }
   .dc.is-building .dc-sk { visibility: visible; }
   .dc.is-building :global(.pz-view.is-on > :not(.dc-sk)) { opacity: 0; transform: scale(.98); }
-  .dc :global(.pz-view.is-on > :not(.dc-sk)) { transition: opacity 240ms ease, transform 1170ms var(--dc-ease); }
+  /* La web ya está a opacidad 1 bajo el esqueleto cuando empieza el barrido: la franja revelada sale limpia. */
+  .dc :global(.pz-view.is-on > :not(.dc-sk)) { transition: opacity 0s, transform 1170ms var(--dc-ease); }
   .dc.is-reveal :global(.pz-view.is-on > :not(.dc-sk)) { opacity: 1; transform: none; }
   .dc.is-reveal .dc-sk { transform: translateY(100%); transition: transform 1170ms var(--dc-ease); }
   .dc.is-reveal .dc-sk__in { transform: translateY(-100%); transition: transform 1170ms var(--dc-ease); }
@@ -224,8 +228,8 @@ const [o1, o2, o3] = bloque2.opciones;
   .dc-fan__c, .dc-fan__s { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; }
   .dc-fan__c { z-index: 2; box-shadow: 0 20px 40px rgba(0, 0, 0, .35); }
   .dc-fan__s { bottom: auto; aspect-ratio: 400 / 520; transform-origin: 50% 100%; }
-  .dc-fan__s--l { transform: translateX(-104px) translateY(-6px) rotate(-3deg) scale(.86); }
-  .dc-fan__s--r { transform: translateX(104px) translateY(-6px) rotate(3deg) scale(.86); }
+  .dc-fan__s--l { transform: translateX(-104px) translateY(-6px) rotate(-3deg) scale(.95); }
+  .dc-fan__s--r { transform: translateX(104px) translateY(-6px) rotate(3deg) scale(.95); }
   .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: hidden; }
 
   /* ── Apilado (< 1120): sin sticky; 01 → consola → 02 + lista → tiras + maqueta ── */
@@ -245,8 +249,8 @@ const [o1, o2, o3] = bloque2.opciones;
     .dc[data-dc-state='2'] .dc-leg { opacity: 1; }
     .dc :global(.pz-tray) { margin-top: -8px; }
     .dc :global(.pz.is-norails .pz-rail) { display: none; }
-    .dc-fan__s--l { transform: translateX(-40px) translateY(-6px) rotate(-3deg) scale(.86); }
-    .dc-fan__s--r { transform: translateX(40px) translateY(-6px) rotate(3deg) scale(.86); }
+    .dc-fan__s--l { transform: translateX(-40px) translateY(-6px) rotate(-3deg) scale(.95); }
+    .dc-fan__s--r { transform: translateX(40px) translateY(-6px) rotate(3deg) scale(.95); }
     .dc-ab__seg { top: auto; bottom: 40px; }
     .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: visible; }
   }

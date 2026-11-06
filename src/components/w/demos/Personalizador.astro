@@ -288,7 +288,7 @@ const opcionesGrupo = (g: GrupoId): any[] =>
   .pz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   /* Brillo que cruza la maqueta al cambiar de idioma (por transform, 900 ms). */
-  .pz-shine { position: absolute; z-index: 5; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; overflow: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 22px); pointer-events: none; }
+  .pz-shine { position: absolute; z-index: 5; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; overflow: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 24px); pointer-events: none; }
   .pz-shine::before {
     content: ''; position: absolute; inset: 0 -60%; opacity: 0;
     background: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, .28) 50%, transparent 60%);
@@ -309,7 +309,8 @@ const opcionesGrupo = (g: GrupoId): any[] =>
     position: absolute; left: -1px; bottom: 100%; white-space: nowrap; padding: 1px 5px 0; border-radius: 3px 3px 3px 0;
     font: 600 11px/13px var(--font-mono); letter-spacing: .02em; color: #111110; background: var(--accent-gold, #c8a96e);
   }
-  .pz-tag.is-in b { bottom: auto; left: auto; top: 3px; right: 3px; border-radius: 4px; }
+  /* Titular: rótulo ENCIMA y a la derecha, en el hueco que deja el antetítulo corto (no tapa el titular). */
+  .pz-tag.is-in b { left: auto; right: -1px; border-radius: 3px 3px 0 3px; }
 
   .pz-ghost { position: absolute; z-index: 9; top: 0; left: 0; opacity: 0; pointer-events: none; transition: opacity 300ms, transform 700ms var(--pz-ease); }
   .pz-ghost.is-on { opacity: 1; }
@@ -333,7 +334,7 @@ const opcionesGrupo = (g: GrupoId): any[] =>
      (0,4,0) para que se vea también con los botones en píldora: el marco de la tarjeta sigue al radio
      (tope 22 para quedar concéntrico con la bandeja de 26), el botón de menú lo lleva × .5 y el chip
      "Abierto" × .25. Los botones en píldora siguen en píldora (manda Botones). */
-  .pz[data-ej-scope] :global(.ej.ej--tarjeta .ej__marco) { border-radius: clamp(2px, var(--ej-radius), 22px); transition: border-radius 220ms var(--pz-ease); }
+  .pz[data-ej-scope] :global(.ej.ej--tarjeta .ej__marco) { border-radius: clamp(2px, var(--ej-radius), 24px); transition: border-radius 220ms var(--pz-ease); }
   .pz[data-ej-scope] :global(.ej.ej--vertical .ej__nav .ej__menu) {
     display: grid; place-items: center; width: 32px; height: 32px; box-sizing: border-box;
     border: 1px solid color-mix(in srgb, var(--ej-ink) 22%, transparent); border-radius: calc(var(--ej-radius) * .5);

@@ -55,8 +55,8 @@ const { comando, bloques, cierre, class: cls } = Astro.props;
   .dcc__l--acc { color: var(--accent-teal, #4fc3a1); }
   .dcc__l--mut { color: var(--fg-secondary, #9a9590); }
   .dcc__l.is-cur { color: var(--accent-gold, #c8a96e); }
-  /* Letras de la reproducción (las crea demo-construye.ts): opacidad, 140 ms. En línea (no inline-block)
-     para que en el apilado el comando parta por los espacios. */
+  /* Letras de la reproducción (las crea demo-construye.ts): opacidad, 140 ms. En línea (no inline-block),
+     para que el recorte del comando en el apilado funcione. */
   .dcc__l :global(.dcc__c) { opacity: 0; }
   .dcc__l.is-on :global(.dcc__c) {
     animation: dcc-c 140ms ease-out both; animation-delay: var(--d, 0ms);
@@ -79,6 +79,7 @@ const { comando, bloques, cierre, class: cls } = Astro.props;
     .dcc { position: relative; top: auto; left: auto; width: 100%; max-width: 420px; height: auto; margin-inline: auto; }
     .dcc__body { position: relative; inset: auto; margin: 0 5px 5px; }
     .dcc__lines { padding: 14px 12px 18px; }
-    .dcc__l--wrap { white-space: pre-wrap; }
+    /* El comando en UNA línea, recortado al borde como el original (no se parte en dos). */
+    .dcc__l--wrap { overflow: hidden; text-overflow: ellipsis; }
   }
 </style>

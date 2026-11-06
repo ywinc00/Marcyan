@@ -221,6 +221,10 @@
   transition-duration: var(--w-dur-layer), var(--w-dur-layer);
 }
 :root[data-ds="v3"].w-anim main[data-w].is-in [data-w-in] { opacity: 1; transform: none; }
+/* El H1 NO entra (§4.8 y crítica B3 de la v2): visible al 100 % y en su sitio desde el primer
+   pintado, sin depender de reveal.ts. Lo que lo rodea (chip, antetítulo, cola, bajada y botones)
+   sigue con su coreografía. Va por etiqueta, así vale para todos los heroes con h1[data-w-in]. */
+:root[data-ds="v3"].w-anim h1[data-w-in] { opacity: 1; transform: none; transition: none; }
 /* Salvaguarda: sin transición (si reveal.ts no llegó, todo visible YA, no 2,5 s después). */
 :root[data-ds="v3"].w-in-all [data-w-in] { opacity: 1; transform: none; transition: none; }
 

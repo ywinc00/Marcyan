@@ -202,6 +202,9 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   /* Mando de pausa: pegado al pie derecho del chip (el botón cae 16 px a su derecha, alineado con su base). */
   .chipia__mando { position: absolute; z-index: 5; top: calc(8px + 350px * var(--k) - 56px); left: min(calc(50% + 110px * var(--k) + 4px), calc(100% - 72px)); width: 68px; height: 68px; }
   .chipia__mando:empty { pointer-events: none; }
+  /* Sello: la pausa no va junto a la marca (parecía un error) sino en la esquina inferior derecha
+     de la placa, o del hueco visible si la placa es más ancha (móvil). El botón queda a 12 px. */
+  .chipia--sello .chipia__mando { top: calc(8px + 480px * var(--k) - 68px); left: min(calc(50% + 430px * var(--k) - 68px), calc(100% - 68px)); }
 
   .chipia__chip {
     position: absolute; z-index: 3;

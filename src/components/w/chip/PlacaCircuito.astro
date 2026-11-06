@@ -7,9 +7,12 @@
 // · Luz: degradados que se trasladan (solo `transform`/`opacity`) enmascarados por las
 //   pistas. `.cp-hl` = luz de entrada (pista inferior); `.cp-luz--sup` / `.cp-luz--inf`
 //   = bucle de 6 s (lo anima ChipIA con sus clases; aquí solo se dibuja).
+// · capa="entrada" (solo variante portada): pinta ÚNICAMENTE la luz de entrada sobre el bus
+//   inferior y su brillo sobre el arco del horizonte, en un SVG aparte que ChipIA pone ENCIMA del
+//   horizonte (si no, el relleno del horizonte la tapa y el encendido pierde su primer tiempo).
 // Ids con sufijo por instancia (`uid`). Decorativa: aria-hidden.
-interface Props { uid: string; class?: string }
-const { uid, class: cls } = Astro.props;
+interface Props { uid: string; class?: string; capa?: 'placa' | 'entrada' }
+const { uid, class: cls, capa = 'placa' } = Astro.props;
 
 const CX = 430, CY = 240, L = 320, R = 540, T = 130, B = 350, W = 860, H = 480;
 
@@ -90,6 +93,40 @@ ics.push([92, 150, 54, 32], [714, 146, 46, 28], [100, 300, 40, 26], [726, 318, 5
 const dSup = sup.join('');
 const dInf = inf.join('');
 ---
+{capa === 'entrada' ? (
+<svg class:list={['cp', 'cp--entrada', cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <defs>
+    <path id={`cpe-i-${uid}`} d={dInf} />
+    <mask id={`cpe-mi-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <use href={`#cpe-i-${uid}`} fill="none" stroke="#fff" stroke-width="2.6" />
+    </mask>
+    <linearGradient id={`cpe-fv-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="322" x2="0" y2={H}>
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+    <mask id={`cpe-f-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <rect x={CX - 150} y="322" width="300" height={H - 322} fill={`url(#cpe-fv-${uid})`} />
+    </mask>
+    <linearGradient id={`cpe-hg-${uid}`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4fc3a1" stop-opacity="0" />
+      <stop offset=".7" stop-color="#4fc3a1" stop-opacity="1" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id={`cpe-ar-${uid}`} cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#d6f5ea" stop-opacity="1" />
+      <stop offset=".55" stop-color="#4fc3a1" stop-opacity=".6" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <g mask={`url(#cpe-f-${uid})`}>
+    <g mask={`url(#cpe-mi-${uid})`}>
+      <rect class="cp-hl" x={CX - 135} y="220" width="270" height="260" fill={`url(#cpe-hg-${uid})`} />
+    </g>
+  </g>
+  <ellipse class="cp-hl-arco" cx={CX} cy="323" rx="270" ry="7" fill={`url(#cpe-ar-${uid})`} />
+  <g opacity=".35"><ellipse class="cp-hl-arco" cx={CX} cy="323" rx="210" ry="26" fill={`url(#cpe-ar-${uid})`} /></g>
+</svg>
+) : (
 <svg class:list={['cp', cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
   <defs>
     <path id={`cp-s-${uid}`} d={dSup} />
@@ -143,3 +180,4 @@ const dInf = inf.join('');
     </g>
   </g>
 </svg>
+)}

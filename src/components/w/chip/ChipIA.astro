@@ -21,6 +21,10 @@
 // (6 s lineal, superiores retraso 0, inferiores 1150 ms) mientras está a la vista, vía
 // registerLoop de loop.ts (pestaña oculta, fuera de vista, botón de pausa y estado global de
 // pausa cuando loop.ts lo tenga). Reentrada tras ≥ 8 s fuera: repite el encendido (no en 'sello').
+// El bucle se registra en un vigía invisible (sin puntero ni foco) que cubre la escena: pasar el
+// ratón por la sección NO lo para (E-56); se para con el botón, fuera de vista o con la pestaña oculta.
+// En 'portada' la luz de entrada y su brillo sobre el arco van en una capa ENCIMA del horizonte.
+// En 'landing' unas pistas salen del bus inferior y bajan hasta la primera fila de píldoras.
 // Reduced-motion: encendido completo, sin luz, `w2:encender` inmediato.
 // Sin JS: se pinta encendido (el estado apagado solo existe con la clase `is-armed`).
 //
@@ -62,11 +66,14 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
           </linearGradient>
         </defs>
         <circle cx="3636" cy="3636" r="3636" fill={`url(#chz-f-${uid})`} />
-        <circle cx="3636" cy="3640" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".035" stroke-width="16" vector-effect="non-scaling-stroke" />
-        <circle cx="3636" cy="3638" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".07" stroke-width="5" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3650" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".022" stroke-width="40" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3642" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".05" stroke-width="16" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3638" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".1" stroke-width="5" vector-effect="non-scaling-stroke" />
         <circle cx="3636" cy="3636" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".3" stroke-width="1" vector-effect="non-scaling-stroke" />
       </svg>
     )}
+    {variante === 'portada' && <PlacaCircuito uid={uid} capa="entrada" class="chipia__entrada" />}
+    <span class="chipia__vigia" data-w2-vigia aria-hidden="true"></span>
     <div class="chipia__chip" aria-hidden="true">
       <span class="chipia__sombra"></span>
       <span class="chipia__borde"><span class="chipia__giro"></span></span>
@@ -113,7 +120,29 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
     {variante === 'landing' && <span class="chipia__suelo" aria-hidden="true"></span>}
   </div>
   <div class="chipia__mando" data-w2-mando></div>
-  {conPildoras && <div class="chipia__pildoras" data-w2-pildoras><slot name="pildoras" /></div>}
+  {conPildoras && (
+    <div class="chipia__pildoras" data-w2-chip-pildoras>
+      {variante === 'landing' && (
+        <svg class="chipia__conectores" viewBox="0 0 300 64" width="300" height="64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id={`chc-g-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="64">
+              <stop offset="0" stop-color="#4fc3a1" stop-opacity=".05" />
+              <stop offset="1" stop-color="#4fc3a1" stop-opacity=".26" />
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke={`url(#chc-g-${uid})`} stroke-width="1.25" class="chipia__con-d">
+            <path d="M84 0V16L98 30V64M64 0V20L88 44V64M24 0V22M216 0V16L202 30V64M236 0V20L212 44V64M276 0V22" />
+          </g>
+          <g fill="none" stroke={`url(#chc-g-${uid})`} stroke-width="1.25" class="chipia__con-m">
+            <path d="M100 0V14L104 18V64M85 0V18L96 29V64M54 0V22M200 0V14L196 18V64M215 0V18L204 29V64M246 0V22" />
+          </g>
+          <g fill="#4fc3a1" fill-opacity=".14" class="chipia__con-d"><rect x="21" y="22" width="6" height="8" rx="1" /><rect x="273" y="22" width="6" height="8" rx="1" /></g>
+          <g fill="#4fc3a1" fill-opacity=".14" class="chipia__con-m"><rect x="51" y="22" width="6" height="8" rx="1" /><rect x="243" y="22" width="6" height="8" rx="1" /></g>
+        </svg>
+      )}
+      <slot name="pildoras" />
+    </div>
+  )}
 </div>
 
 <style>
@@ -139,7 +168,8 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
     height: calc(480px * var(--k));
     margin-left: calc(50% - 430px * var(--k));
   }
-  .chipia__placa { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+  /* PlacaCircuito no hereda el atributo de ámbito: sus clases se alcanzan con :global. */
+  .chipia :global(.chipia__placa) { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
 
   /* Horizonte (portada): arco de radio 3636 px, 28 px por encima del pie del chip. */
   .chipia__horizonte {
@@ -155,8 +185,12 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   }
   @media (max-width: 639.98px) {
     /* curvatura visible también a 390: radio más corto */
-    .chipia__horizonte { transform: scale(calc(var(--k) * .56)); }
+    .chipia__horizonte { transform: scale(calc(var(--k) * .4)); }
   }
+  /* Luz de entrada (portada): encima del horizonte, debajo del chip. */
+  .chipia :global(.chipia__entrada) { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; display: block; pointer-events: none; }
+  /* Vigía del bucle: invisible, sin puntero ni foco (el ratón encima no congela la placa). */
+  .chipia__vigia { position: absolute; inset: 0; pointer-events: none; }
 
   /* Suelo (landing): 1 px que funde en los extremos. */
   .chipia__suelo {
@@ -165,11 +199,12 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   }
 
   /* ── Chip (se construye a 220 y escala con --k) ── */
-  .chipia__mando { position: absolute; z-index: 4; top: 0; left: min(calc(50% + 430px * var(--k) - 68px), calc(100% - 72px)); width: 68px; height: 68px; }
+  /* Mando de pausa: pegado al pie derecho del chip (el botón cae 16 px a su derecha, alineado con su base). */
+  .chipia__mando { position: absolute; z-index: 5; top: calc(8px + 350px * var(--k) - 56px); left: min(calc(50% + 110px * var(--k) + 4px), calc(100% - 72px)); width: 68px; height: 68px; }
   .chipia__mando:empty { pointer-events: none; }
 
   .chipia__chip {
-    position: absolute; z-index: 2;
+    position: absolute; z-index: 3;
     left: 50%; top: 50%;
     width: 220px; height: 220px;
     margin: -110px 0 0 -110px;
@@ -222,7 +257,7 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
 
   /* ── Luz por las pistas (bucle) ── */
   .chipia :global(.cp-luz) { opacity: 0; }
-  .chipia :global(.cp-hl) { opacity: 0; }
+  .chipia :global(.cp-hl), .chipia :global(.cp-hl-arco) { opacity: 0; }
 
   .chipia :global(.cp-luz--sup) {
     animation: chipia-luz-sup 6s linear infinite paused;
@@ -256,6 +291,7 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   .chipia.is-armed .chipia__palabra { opacity: .2; }
 
   .chipia.is-armed.is-lit :global(.cp-hl) { animation: chipia-hl 700ms linear both; }
+  .chipia.is-armed.is-lit :global(.cp-hl-arco) { animation: chipia-arco 1100ms ease-out both; }
   .chipia.is-armed.is-lit .chipia__borde { animation: chipia-on 945ms ease-out 530ms both; }
   .chipia.is-armed.is-lit .chipia__giro { animation: chipia-giro 945ms cubic-bezier(var(--chip-t)) 530ms both; }
   .chipia.is-armed.is-lit .chipia__sombra { animation: chipia-halo 1095ms ease-out 1475ms both; }
@@ -263,11 +299,21 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   .chipia.is-armed.is-lit .chipia__logo { animation: chipia-logo 1095ms ease-out 1475ms both; }
   .chipia.is-armed.is-lit .chipia__palabra { animation: chipia-palabra 1040ms ease-out 1530ms both; }
 
+  /* La cresta de la luz (y 402 en reposo) sale del pie del chip (y 312) y baja hasta pasar el borde
+     de la placa (y 512) en 0-530 ms: siempre a la vista bajo el chip durante el primer tiempo. */
   @keyframes chipia-hl {
-    0%    { transform: translateY(-260px); opacity: .75; }
-    75.7% { transform: translateY(260px); opacity: .75; }
-    100%  { transform: translateY(260px); opacity: 0; }
+    0%    { transform: translateY(-90px); opacity: .85; }
+    75.7% { transform: translateY(110px); opacity: .85; }
+    100%  { transform: translateY(110px); opacity: 0; }
   }
+  /* Brillo sobre el arco: se enciende al cruzar la luz el horizonte y se apaga cuando el borde gira. */
+  @keyframes chipia-arco {
+    0%   { opacity: 0; transform: scaleX(.55); }
+    18%  { opacity: 1; transform: scaleX(1); }
+    55%  { opacity: .55; }
+    100% { opacity: 0; transform: scaleX(1.15); }
+  }
+  .chipia :global(.cp-hl-arco) { transform-box: fill-box; transform-origin: center; }
   @keyframes chipia-on { from { opacity: 0; } to { opacity: 1; } }
   @keyframes chipia-giro { from { transform: rotate(0deg); } to { transform: rotate(545deg); } }
   @keyframes chipia-halo { from { opacity: .2; } to { opacity: 1; } }
@@ -275,13 +321,21 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
   @keyframes chipia-palabra { from { opacity: .36; } to { opacity: 1; } }
 
   /* ── Píldoras: bajo el horizonte (portada) o bajo el suelo (landing) ── */
-  .chipia__pildoras { position: relative; z-index: 3; padding-inline: 16px; }
+  .chipia__pildoras { position: relative; z-index: 4; padding-inline: 16px; }
+  .chipia__pildoras > :global(*:not(svg)) { position: relative; z-index: 1; }
+  /* Pistas de la placa a la primera fila de píldoras (landing): cruzan el hueco y entran bajo la píldora. */
+  .chipia__conectores { position: absolute; z-index: 0; top: -32px; left: 50%; margin-left: -150px; width: 300px; height: 64px; pointer-events: none; }
+  .chipia__conectores .chipia__con-m { display: none; }
+  @media (max-width: 639.98px) {
+    .chipia__conectores .chipia__con-d { display: none; }
+    .chipia__conectores .chipia__con-m { display: inline; }
+  }
   .chipia--portada .chipia__pildoras { margin-top: calc(-14px * var(--k)); padding-bottom: 72px; }
   .chipia--landing .chipia__pildoras { margin-top: 32px; padding-bottom: 64px; }
   .chipia--sello { padding-bottom: 8px; }
 
   @media (prefers-reduced-motion: reduce) {
-    .chipia :global(.cp-luz), .chipia :global(.cp-hl) { animation: none !important; opacity: 0 !important; }
+    .chipia :global(.cp-luz), .chipia :global(.cp-hl), .chipia :global(.cp-hl-arco) { animation: none !important; opacity: 0 !important; }
     .chipia .chipia__brillo, .chipia .chipia__sombra, .chipia .chipia__borde, .chipia .chipia__logo, .chipia .chipia__palabra { animation: none !important; opacity: 1 !important; }
     .chipia .chipia__giro { animation: none !important; transform: rotate(545deg) !important; }
   }
@@ -301,11 +355,11 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
     const variante = root.dataset.variante;
     const alCargar = root.dataset.encender === 'carga';
     const lang = root.lang === 'en' ? 'en' : 'es';
-    const pildoras = root.querySelector<HTMLElement>('[data-w2-pildoras]');
+    const pildoras = root.querySelector<HTMLElement>('[data-w2-chip-pildoras]');
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const encenderPildoras = () => {
-      pildoras?.querySelectorAll<HTMLElement>(':scope > *').forEach((el) =>
+      pildoras?.querySelectorAll<HTMLElement>(':scope > :not(svg)').forEach((el) =>
         el.dispatchEvent(new CustomEvent('w2:encender', { bubbles: true })));
     };
 
@@ -314,7 +368,10 @@ const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
     let timers: number[] = [];
     const aplicarBucle = () => root.classList.toggle('is-playing', introHecha && quiereBucle);
 
-    registerLoop(root, {
+    // Vigía: cubre la escena pero no recibe puntero ni foco, así el bucle solo se para con el
+    // botón, fuera de vista o con la pestaña oculta (no al pasar el ratón: E-56).
+    const vigia = root.querySelector<HTMLElement>('[data-w2-vigia]') ?? root;
+    registerLoop(vigia, {
       start: () => { quiereBucle = true; aplicarBucle(); },
       stop: () => { quiereBucle = false; aplicarBucle(); },
       still: () => { quiereBucle = false; root.classList.remove('is-playing', 'is-armed', 'is-lit'); root.classList.add('is-still'); },

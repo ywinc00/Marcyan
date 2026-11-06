@@ -1,0 +1,84 @@
+---
+// Consola de "Cómo se construye tu web" (P01 · design/rediseno-workos-v2.md §2 P01; original W-CORE-05,
+// ficha C/01-consola-integrar). Gramática EXACTA del original: línea `~`, comando con forma de código,
+// línea vacía, bloques `◇ paso` con detalles `│`, cierre `◆`. Tres colores (claro, acento teal,
+// apagado) y la línea en curso en oro. JetBrains Mono 10,5/18, 318×342, barra con 3 puntos grises.
+// El HTML trae el ESTADO FINAL completo (A-05: el primer pintado no depende del JS); demo-construye.ts
+// parte cada línea en letras solo cuando la reproduce. Todo es `aria-hidden`: el resumen sr-only lo
+// pone DemoConstruye. Objeto de ejemplo: sin h1-h6, sin enlaces.
+export interface ConsolaBloque { paso: string; detalles: string[] }
+interface Props {
+  comando: string;
+  bloques: ConsolaBloque[];
+  cierre: string;
+  class?: string;
+}
+const { comando, bloques, cierre, class: cls } = Astro.props;
+---
+<div class:list={['dcc', cls]} aria-hidden="true" data-nosnippet data-dc-con>
+  <div class="dcc__bar"><i></i><i></i><i></i></div>
+  <div class="dcc__body">
+    <div class="dcc__lines">
+      <div class="dcc__l dcc__l--cmd" data-dc-l data-dc-b="-1">~</div>
+      <div class="dcc__l dcc__l--cmd dcc__l--wrap" data-dc-l data-dc-b="-1">{comando}</div>
+      <div class="dcc__l"> </div>
+      {bloques.map((b, i) => (
+        <>
+          <div class="dcc__l dcc__l--acc" data-dc-l data-dc-b={i} data-dc-paso>{`◇  ${b.paso}`}</div>
+          {b.detalles.map((d) => <div class="dcc__l dcc__l--mut" data-dc-l data-dc-b={i}>{`│  ${d}`}</div>)}
+        </>
+      ))}
+      <div class="dcc__l dcc__l--acc" data-dc-l data-dc-b={bloques.length} data-dc-paso>{`◆  ${cierre}`}<span class="dcc__cur" data-dc-cur></span></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dcc {
+    position: absolute; z-index: 1; top: 63px; left: -12px; width: 318px; height: 342px;
+    box-sizing: border-box; overflow: hidden;
+    background: var(--bg-card, #141414); border: 1px solid rgba(255, 255, 255, .10); border-radius: 12px;
+    box-shadow: 0 42px 32px rgba(0, 0, 0, .30), 0 17px 14px rgba(0, 0, 0, .22), 0 9px 8px rgba(0, 0, 0, .18),
+      0 5px 4px rgba(0, 0, 0, .16), 0 3px 2px rgba(0, 0, 0, .12);
+    transform-origin: 30% 50%;
+  }
+  .dcc__bar { display: flex; gap: 5px; padding: 7px 6px 6px; }
+  .dcc__bar i { width: 7px; height: 7px; border-radius: 999px; background: #626468; }
+  .dcc__body {
+    position: absolute; inset: 20px 5px 5px; overflow: hidden; border-radius: 6px;
+    background: radial-gradient(circle at 72% 20%, rgba(255, 255, 255, .045), transparent 26%), #0a0a0a;
+    color: #c6c9d4; font-size: 10.5px; line-height: 18px; letter-spacing: .01em;
+  }
+  .dcc__lines { font-family: var(--font-mono); padding: 16px 15px 24px; }
+  .dcc__l { white-space: pre; }
+  .dcc__l { min-height: 18px; }
+  .dcc__l--acc { color: var(--accent-teal, #4fc3a1); }
+  .dcc__l--mut { color: var(--fg-secondary, #9a9590); }
+  .dcc__l.is-cur { color: var(--accent-gold, #c8a96e); }
+  /* Letras de la reproducción (las crea demo-construye.ts): opacidad, 140 ms. En línea (no inline-block)
+     para que en el apilado el comando parta por los espacios. */
+  .dcc__l :global(.dcc__c) { opacity: 0; }
+  .dcc__l.is-on :global(.dcc__c) {
+    animation: dcc-c 140ms ease-out both; animation-delay: var(--d, 0ms);
+  }
+  .dcc.is-reset [data-dc-l]:not(.is-on) { opacity: 0; }
+  @keyframes dcc-c { from { opacity: 0; } to { opacity: 1; } }
+  /* Cursor de bloque tras ◆: micro-vida del estado final (1,06 s, steps(2)). */
+  .dcc__cur {
+    display: inline-block; width: 6px; height: 12px; margin-left: 6px; vertical-align: -2px;
+    background: var(--accent-teal, #4fc3a1); opacity: 0;
+  }
+  .dcc.is-done .dcc__cur { animation: dcc-blink 1.06s steps(2, jump-none) infinite; }
+  @keyframes dcc-blink { 0% { opacity: 1; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .dcc__cur { opacity: 1; }
+    .dcc.is-done .dcc__cur { animation: none; }
+  }
+  /* Apilado (< 1120): la consola entera, ya no tapada, al ancho de la columna. */
+  @media (max-width: 1119.98px) {
+    .dcc { position: relative; top: auto; left: auto; width: 100%; max-width: 420px; height: auto; margin-inline: auto; }
+    .dcc__body { position: relative; inset: auto; margin: 0 5px 5px; }
+    .dcc__lines { padding: 14px 12px 18px; }
+    .dcc__l--wrap { white-space: pre-wrap; }
+  }
+</style>

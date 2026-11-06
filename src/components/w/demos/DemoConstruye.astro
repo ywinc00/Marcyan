@@ -1,0 +1,260 @@
+---
+// "Cómo se construye tu web" + "Hazla tuya" en UN componente con demo fija (P01 · design/rediseno-workos-v2.md
+// §2 P01; original W-CORE-05 + W-CORE-06 de workos.com/authkit, fichas C/01 y C/03).
+//
+// Composición (1440, contenedor 1200): columna izquierda de 454 con DOS bloques de texto (01 y 02, el 2.º a
+// ≥ 560 px) y columna derecha de 544 con la demo `position: sticky` (544×556). Estado 1: la consola asoma
+// por detrás de la maqueta y la construye (esqueleto en cascada → barrido de revelado). Estado 2 (la cabecera
+// del bloque 2 cruza el 50 % de la ventana): la maqueta va al centro, la consola se escurre detrás y entran
+// los raíles del personalizador. Ningún ancestro con overflow:hidden (trampa F-05 del sticky).
+// Apilado (< 1120): sin sticky; texto 01 → consola entera → texto 02 con la lista → tiras + maqueta.
+// Motor: demo-construye.ts (IntersectionObserver; solo transform/opacity).
+import Icon from '../../ui/Icon.astro';
+import ConsolaConstruye, { type ConsolaBloque } from './ConsolaConstruye.astro';
+import Personalizador, { type ControlSet, type Opcion } from './Personalizador.astro';
+import WebEjemplo from '../objetos/WebEjemplo.astro';
+
+interface Bloque { n: number; etiqueta: string; titleHtml: string; texto: string }
+interface Props {
+  lang: 'es' | 'en';
+  /** `texto` admite {comando}: ahí va el comando como chip mono (detalle clave del original). */
+  bloque1: Bloque & { ventajas: { icon: string; titulo: string; texto: string }[] };
+  bloque2: Bloque & { opciones: Opcion[] };
+  consola: { comando: string; bloques: ConsolaBloque[]; cierre: string; leyendaTrabajando: string; leyendaLista: string };
+  controles?: ControlSet;
+  id?: string;
+  class?: string;
+}
+const { lang, bloque1, bloque2, consola, controles, id, class: cls } = Astro.props;
+const L = lang === 'en';
+const uid = id ?? `dc-${lang}`;
+const num = (n: number) => String(n).padStart(2, '0');
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const chip = `<code class="dc-cmd">${esc(consola.comando)}</code>`;
+const texto1 = bloque1.texto.replace('{comando}', chip);
+const sr = L ? 'Example: how we prepare a website, from your brand to a site ready to publish.' : 'Ejemplo: así preparamos una web, de la marca a la web lista para publicar.';
+const ab = L ? { antes: 'Before', despues: 'After', label: 'Compare' } : { antes: 'Antes', despues: 'Después', label: 'Comparar' };
+const [o1, o2, o3] = bloque2.opciones;
+---
+<div class:list={['dc', cls]} id={uid} lang={lang} data-dc data-dc-state="1">
+  <div class="dc__col">
+    <div class="dc__b dc__b1">
+      <p class="dc__tag"><span class="dc__n">{num(bloque1.n)}</span><span class="dc__rule" aria-hidden="true"></span><span>{bloque1.etiqueta}</span></p>
+      <h2 class="dc__h" set:html={bloque1.titleHtml} />
+      <p class="dc__p" set:html={texto1} />
+      <ul class="dc__adv">
+        {bloque1.ventajas.map((v) => (
+          <li><span class="dc__ico"><Icon name={v.icon} width={18} height={18} /></span><span><b>{v.titulo}</b><span>{v.texto}</span></span></li>
+        ))}
+      </ul>
+    </div>
+    <div class="dc__b dc__b2" data-dc-b2>
+      <p class="dc__tag" data-dc-b2h><span class="dc__n">{num(bloque2.n)}</span><span class="dc__rule" aria-hidden="true"></span><span>{bloque2.etiqueta}</span></p>
+      <h2 class="dc__h" set:html={bloque2.titleHtml} />
+      <p class="dc__p" set:html={bloque2.texto} />
+      <div class="pz-opts dc__opts" role="radiogroup" aria-label={bloque2.etiqueta} data-dc-opts>
+        {bloque2.opciones.map((o, i) => (
+          <button type="button" role="radio" class="dc-opt" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-dc-opt={o.id}>
+            <span class="dc-opt__t">{o.icon && <Icon name={o.icon} width={18} height={18} />}<b>{o.titulo}</b>{o.precio && <span class="dc-opt__p">{o.precio}</span>}</span>
+            <span class="dc-opt__x">{o.texto}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="dc__side">
+    <div class="dc__demo" data-dc-demo>
+      <p class="dc-sr">{sr}</p>
+      <Personalizador lang={lang} embebido controles={controles} opciones={bloque2.opciones} id={uid}>
+        <ConsolaConstruye slot="consola" comando={consola.comando} bloques={consola.bloques} cierre={consola.cierre} />
+        <Fragment slot="maqueta">
+          <slot name="maqueta">
+            <WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" lang={lang} />
+          </slot>
+        </Fragment>
+        <div slot="capa" class="dc-sk" aria-hidden="true" data-dc-sk>
+          <div class="dc-sk__in" data-dc-sk-in>
+            <WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="esqueleto" lang={lang} ejemplo={false} />
+          </div>
+        </div>
+        {o2 && (
+          <div slot={`opcion-${o2.id}`} class="dc-ab" data-dc-ab data-i="0">
+            <div class="dc-ab__v is-on" data-dc-ab-v="0"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="antes" lang={lang} /></div>
+            <div class="dc-ab__v" data-dc-ab-v="1"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="lista" lang={lang} /></div>
+            <div class="dc-ab__seg" role="radiogroup" aria-label={ab.label} data-dc-ab-g>
+              <span class="dc-ab__pill" aria-hidden="true"></span>
+              <button type="button" role="radio" aria-checked="true" tabindex="0" data-dc-ab-i="0">{ab.antes}</button>
+              <button type="button" role="radio" aria-checked="false" tabindex="-1" data-dc-ab-i="1">{ab.despues}</button>
+            </div>
+          </div>
+        )}
+        {o3 && (
+          <div slot={`opcion-${o3.id}`} class="dc-fan">
+            <div class="dc-fan__s dc-fan__s--l"><WebEjemplo marca="plomeria" frame="tarjeta" vista="hero" pagina="servicios" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__s dc-fan__s--r"><WebEjemplo marca="plomeria" frame="tarjeta" vista="hero" pagina="contacto" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__c"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" pagina="inicio" lang={lang} /></div>
+          </div>
+        )}
+        <p slot="leyenda" class="dc-leg" aria-hidden="true" data-dc-leg>
+          <span class="dc-leg__a"><span class="dc-leg__spin"></span>{consola.leyendaTrabajando}</span>
+          <span class="dc-leg__b"><Icon name="lucide:check" width={15} height={15} />{consola.leyendaLista}</span>
+        </p>
+      </Personalizador>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dc { --dc-ease: cubic-bezier(.22, 1, .36, 1); position: relative; display: grid; grid-template-columns: minmax(0, 454px) 544px; justify-content: space-between; column-gap: 48px; }
+  .dc__col { display: flex; flex-direction: column; }
+  .dc__b2 { margin-top: 560px; padding-bottom: 120px; }
+  .dc__tag { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; font: 500 12px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--w-ink-70, rgba(240,237,232,.7)); }
+  .dc__n { color: var(--accent-gold, #c8a96e); }
+  .dc__rule { width: 24px; height: 1px; background: currentColor; opacity: .5; }
+  .dc__h { margin: 0; font: 500 32px/40px var(--font-display); letter-spacing: -.03em; color: var(--fg-primary, #f0ede8); text-wrap: balance; }
+  .dc__p { margin: 16px 0 0; max-width: 454px; font: 400 16px/26.4px var(--font-body); color: var(--fg-secondary, #9a9590); }
+  /* Chip del comando en el párrafo (mono 14, como el original), en la noche Marcyan. */
+  .dc__p :global(.dc-cmd) {
+    display: inline; padding: 1px 6px 1px 7px; border-radius: 6px; white-space: normal; overflow-wrap: anywhere;
+    font: 400 13.5px/20px var(--font-mono); letter-spacing: -.01em; color: #c6c9d4;
+    background: var(--w-s2, #181817); box-shadow: inset 0 0 0 .67px rgba(240, 237, 232, .14);
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .dc__adv { list-style: none; margin: 28px 0 0; padding: 0; }
+  .dc__adv li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; padding: 16px 0; border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
+  .dc__adv li > span:last-child { display: grid; gap: 2px; }
+  .dc__adv b { font: 500 16px/24px var(--font-display); color: var(--fg-primary, #f0ede8); }
+  .dc__adv b + span { font: 400 15px/22px var(--font-body); color: var(--fg-secondary, #9a9590); }
+  .dc__ico { display: grid; place-items: center; width: 24px; height: 24px; color: var(--accent-gold, #c8a96e); }
+  .dc__opts { display: grid; gap: 4px; margin-top: 28px; max-width: 486px; }
+  .dc-opt {
+    display: grid; gap: 8px; width: 100%; min-height: 102px; box-sizing: border-box; padding: 14px 16px; text-align: left; cursor: pointer;
+    border: 0; border-radius: 12px; background: transparent; color: inherit; font: inherit;
+    transition: background-color 200ms var(--w-ease-ui, ease), box-shadow 200ms var(--w-ease-ui, ease);
+  }
+  .dc-opt[aria-checked='true'] { background: var(--w-s3, #1f1f1d); box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08)), 0 0 0 1px var(--w-line, rgba(200,169,110,.09)), 0 3px 8px rgba(0, 0, 0, .25); }
+  @media (hover: hover) and (pointer: fine) { .dc-opt[aria-checked='false']:hover { background: rgba(240, 237, 232, .03); } }
+  .dc-opt__t { display: flex; align-items: center; gap: 10px; font: 500 16px/24px var(--font-display); color: var(--fg-primary, #f0ede8); }
+  .dc-opt__t b { font-weight: 500; }
+  .dc-opt__p { margin-left: auto; font: 500 13px/1 var(--font-mono); color: var(--accent-gold, #c8a96e); white-space: nowrap; }
+  .dc-opt__x { font: 400 15px/24px var(--font-body); color: var(--fg-secondary, #9a9590); }
+  .dc-opt:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+
+  .dc__side { position: relative; }
+  .dc__demo { position: sticky; top: calc(var(--nav-h, 64px) + 24px); width: 544px; }
+  .dc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+
+  /* ── Estado 1 (consola) ⇄ 2 (personalizador): 600 ms, umbral, nunca ligado al dedo ── */
+  .dc :global(.pz-tray) { will-change: transform; }
+  .dc[data-dc-state='1'] :global(.pz-tray) { transform: translateX(80px); }
+  .dc :global(.dcc) { transition: opacity 600ms var(--dc-ease), transform 600ms var(--dc-ease); }
+  .dc[data-dc-state='2'] :global(.dcc) { opacity: 0; transform: translateX(150px) scale(.975); pointer-events: none; }
+  .dc[data-dc-state='1'] :global(.pz-rail) { opacity: 0; transform: translateY(16px); pointer-events: none; }
+  .dc[data-dc-state='1'] :global(.pz-g) { transform: scaleY(.96); opacity: 0; }
+  .dc :global(.pz-rail--der .pz-g) { transition-delay: 60ms; }
+  .dc[data-dc-state='1'] :global(.pz-sum) { opacity: 0; transform: translateY(6px); }
+  .dc[data-dc-state='2'] .dc-leg { opacity: 0; }
+
+  /* Leyenda bajo la maqueta (estado 1): 15/23, spinner 14 px → check teal. */
+  .dc-leg {
+    margin: 0; transform: translateX(80px); display: grid; justify-items: center;
+    font: 400 15px/23px var(--font-body); color: var(--fg-secondary, #9a9590); transition: opacity 400ms var(--dc-ease);
+  }
+  .dc-leg > span { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: 8px; transition: opacity 200ms; }
+  .dc-leg__a { opacity: 0; }
+  .dc-leg__b :global(svg) { color: var(--accent-teal, #4fc3a1); transition: transform 300ms var(--dc-ease), opacity 300ms; }
+  .dc-leg.is-work .dc-leg__a { opacity: 1; }
+  .dc-leg.is-work .dc-leg__b { opacity: 0; }
+  .dc-leg.is-work .dc-leg__b :global(svg) { transform: scale(.9); opacity: 0; }
+  .dc-leg__spin { width: 14px; height: 14px; box-sizing: border-box; border-radius: 999px; border: 2px solid rgba(240, 237, 232, .25); border-top-color: rgba(240, 237, 232, .7); animation: dc-spin 900ms linear infinite; }
+  @keyframes dc-spin { to { transform: rotate(1turn); } }
+
+  /* Esqueleto + barrido: el envoltorio baja y su hijo sube (máscara por transform). */
+  .dc-sk { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; z-index: 3; overflow: hidden; visibility: hidden; border-radius: inherit; }
+  .dc-sk__in { position: absolute; inset: 0; }
+  .dc.is-building .dc-sk { visibility: visible; }
+  .dc.is-building :global(.pz-view.is-on > :not(.dc-sk)) { opacity: 0; transform: scale(.98); }
+  .dc :global(.pz-view.is-on > :not(.dc-sk)) { transition: opacity 240ms ease, transform 1170ms var(--dc-ease); }
+  .dc.is-reveal :global(.pz-view.is-on > :not(.dc-sk)) { opacity: 1; transform: none; }
+  .dc.is-reveal .dc-sk { transform: translateY(100%); transition: transform 1170ms var(--dc-ease); }
+  .dc.is-reveal .dc-sk__in { transform: translateY(-100%); transition: transform 1170ms var(--dc-ease); }
+  /* Cascada del esqueleto cada 120 ms y brillo que cruza cada barra (1550 ms, bucle mientras construye). */
+  /* El esqueleto vive dentro del scope del personalizador: su botón y los SVG de logo e ilustración
+     (otros componentes, fuera del alcance de los estilos de WebEjemplo) se apagan aquí. */
+  .dc-sk :global(.ej-k *) { visibility: hidden !important; }
+  .dc-sk :global(.ej .ej-k.ej__btn), .dc-sk :global(.ej .ej-k.ej__btn2) { background: rgba(240, 237, 232, .08) !important; border-color: transparent !important; }
+  .dc-sk :global(.ej-k) { opacity: 0; transform: translateY(6px); position: relative; overflow: hidden; }
+  .dc-sk :global(.ej-k.is-in) { opacity: 1; transform: none; transition: opacity 340ms var(--dc-ease), transform 340ms var(--dc-ease); }
+  .dc-sk :global(.ej-k)::after {
+    content: ''; position: absolute; inset: 0; transform: translateX(-120%);
+    background: linear-gradient(90deg, transparent, rgba(240, 237, 232, .16), transparent);
+  }
+  .dc.is-building .dc-sk :global(.ej-k.is-in)::after { animation: dc-shim 1550ms ease-in-out infinite; animation-delay: var(--sd, 0ms); }
+  @keyframes dc-shim { to { transform: translateX(120%); } }
+
+  /* Rediseño: Antes / Después con control segmentado propio (no automático). */
+  .dc-ab { position: absolute; inset: 0; }
+  .dc-ab__v { position: absolute; inset: 0; opacity: 0; transition: opacity 260ms var(--w-ease-ui, ease); }
+  .dc-ab__v.is-on { opacity: 1; }
+  .dc-ab__seg {
+    position: absolute; z-index: 4; left: 50%; top: 522px; translate: -50% 0; display: grid; grid-template-columns: 1fr 1fr;
+    padding: 3px; border-radius: 999px; background: #111110; box-shadow: 0 0 0 1px rgba(240, 237, 232, .14), 0 8px 20px rgba(0, 0, 0, .35);
+  }
+  .dc-ab__seg button {
+    position: relative; z-index: 1; min-width: 84px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; cursor: pointer;
+    background: none; color: rgba(240, 237, 232, .7); font: 500 13px/1 var(--font-body);
+  }
+  .dc-ab__seg button[aria-checked='true'] { color: #111110; }
+  .dc-ab__seg button:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+  .dc-ab__pill { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: #f0ede8; transition: transform 260ms var(--dc-ease); }
+  .dc-ab[data-i='1'] .dc-ab__pill { transform: translateX(100%); }
+
+  /* A medida: tres páginas de la misma marca en abanico (opcion-2 del original). */
+  .dc-fan { position: absolute; inset: 0; overflow: visible; }
+  .dc-fan__c, .dc-fan__s { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; }
+  .dc-fan__c { z-index: 2; box-shadow: 0 20px 40px rgba(0, 0, 0, .35); }
+  .dc-fan__s { bottom: auto; aspect-ratio: 400 / 520; transform-origin: 50% 100%; }
+  .dc-fan__s--l { transform: translateX(-104px) translateY(-6px) rotate(-3deg) scale(.86); }
+  .dc-fan__s--r { transform: translateX(104px) translateY(-6px) rotate(3deg) scale(.86); }
+  .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: hidden; }
+
+  /* ── Apilado (< 1120): sin sticky; 01 → consola → 02 + lista → tiras + maqueta ── */
+  @media (max-width: 1119.98px) {
+    .dc { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+    .dc__col, .dc__side, .dc__demo, .dc :global(.pz), .dc :global(.pz-stage), .dc :global(.pz-foot) { display: contents; }
+    .dc__b { align-self: stretch; }
+    .dc__b1 { order: 1; }
+    .dc :global(.dcc) { order: 2; transform: none !important; opacity: 1 !important; }
+    .dc-leg { order: 3; transform: none; margin-top: -12px; }
+    .dc__b2 { order: 4; margin-top: 24px; padding-bottom: 0; }
+    .dc :global(.pz-rail--izq) { order: 5; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    .dc :global(.pz-tray) { order: 6; }
+    .dc :global(.pz-rail--der) { order: 7; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    .dc :global(.pz-g) { opacity: 1 !important; transform: none !important; }
+    .dc :global(.pz-sum) { order: 8; opacity: 1 !important; transform: none !important; }
+    .dc[data-dc-state='2'] .dc-leg { opacity: 1; }
+    .dc :global(.pz-tray) { margin-top: -8px; }
+    .dc :global(.pz.is-norails .pz-rail) { display: none; }
+    .dc-fan__s--l { transform: translateX(-40px) translateY(-6px) rotate(-3deg) scale(.86); }
+    .dc-fan__s--r { transform: translateX(40px) translateY(-6px) rotate(3deg) scale(.86); }
+    .dc-ab__seg { top: auto; bottom: 40px; }
+    .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: visible; }
+  }
+
+  /* Movimiento reducido: estado final; la columna derecha enseña consola y personalizador apilados. */
+  @media (prefers-reduced-motion: reduce) and (min-width: 1120px) {
+    .dc__demo { position: relative; top: auto; }
+    .dc :global(.pz-stage) { height: 1020px; }
+    .dc :global(.dcc) { top: 0; left: 113px; opacity: 1 !important; transform: none !important; }
+    .dc :global(.pz-tray), .dc :global(.pz-rail) { top: 420px; transform: none !important; }
+    .dc :global(.pz-rail), .dc :global(.pz-g), .dc :global(.pz-sum) { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    .dc :global(.pz-foot) { top: 954px; }
+    .dc-leg { display: none; }
+  }
+</style>
+
+<script>
+  import { initDemos } from './demo-construye';
+  initDemos();
+</script>

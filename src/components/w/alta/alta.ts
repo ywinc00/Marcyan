@@ -44,12 +44,26 @@ function initAlta(root: HTMLElement) {
   const step = (n: number) => root.setAttribute('data-w2-step', String(n));
   const vivo = () => root.classList.toggle('is-vivo', inView && !reduced && root.getAttribute('data-w2-step') === '5');
 
+  // Al repetir con teclado el botón se oculta: el foco pasa a la tarjeta (tabindex -1) y
+  // vuelve al botón cuando reaparece, para no caer en <body>.
+  const mostrarRepetir = () => {
+    root.classList.add('is-replay');
+    if (document.activeElement === root && btn) btn.focus({ preventScroll: true });
+  };
+  const setLista = (abierta: boolean) => {
+    if (!lista) return;
+    lista.hidden = !abierta;
+    root.classList.toggle('is-lista', abierta);
+    btn?.setAttribute('aria-expanded', String(abierta));
+  };
+
   const final = () => {
     clear();
     step(5);
     c3.forEach((r) => r.classList.add('is-on'));
     c4.forEach((r) => r.classList.add('is-on'));
-    root.classList.add('is-bajada', 'is-replay');
+    root.classList.add('is-bajada');
+    mostrarRepetir();
     vivo();
   };
 
@@ -57,7 +71,8 @@ function initAlta(root: HTMLElement) {
     if (reduced) { final(); return; }
     clear();
     played = true;
-    if (lista) lista.hidden = true;
+    if (lista) { lista.hidden = true; root.classList.remove('is-lista'); }
+    if (btn && document.activeElement === btn) root.focus({ preventScroll: true });
     root.classList.remove('is-replay', 'is-bajada', 'is-vivo');
     c3.forEach((r) => r.classList.remove('is-on'));
     c4.forEach((r) => r.classList.remove('is-on'));
@@ -69,7 +84,7 @@ function initAlta(root: HTMLElement) {
     at(T.s4, () => step(4));
     c4.forEach((r, i) => at(T.c4[Math.min(i, T.c4.length - 1)], () => r.classList.add('is-on')));
     at(T.panel, () => { step(5); vivo(); });
-    at(T.repetir, () => root.classList.add('is-replay'));
+    at(T.repetir, mostrarRepetir);
   };
 
   // Modo reducido: "Repetir" despliega / recoge la lista de los 4 pasos.
@@ -80,17 +95,15 @@ function initAlta(root: HTMLElement) {
       final();
       if (lista) { btn.setAttribute('aria-controls', lista.id); btn.setAttribute('aria-expanded', String(!lista.hidden)); }
     } else {
+      if (lista) { lista.hidden = true; root.classList.remove('is-lista'); }
       btn.removeAttribute('aria-controls');
       btn.removeAttribute('aria-expanded');
-      if (lista) lista.hidden = true;
     }
   };
 
   btn?.addEventListener('click', () => {
     if (reduced) {
-      if (!lista) return;
-      lista.hidden = !lista.hidden;
-      btn.setAttribute('aria-expanded', String(!lista.hidden));
+      if (lista) setLista(lista.hidden);
       return;
     }
     play();

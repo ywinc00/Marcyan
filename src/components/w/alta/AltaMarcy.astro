@@ -54,7 +54,7 @@ const T = {
     ejemplo: 'Ejemplo',
     ejemploPanel: 'Ejemplo de configuración contigo',
     negocio: 'Tu Negocio',
-    sr: 'Ejemplo de cómo empiezas con Marcy en cuatro pasos: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar. Al final, Marcy contesta en tus canales.',
+    sr: 'Ejemplo de cómo empiezas con Marcy en cuatro pasos: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar. Al final, Marcy contesta en tus canales de mensajes, agenda las citas y te avisa de las llamadas perdidas y de cada contacto por correo.',
     atras: 'Atrás', continuar: 'Continuar', empezar: 'Empezar', repetir: 'Repetir',
     s1t: 'Conoce a Marcy', s1d: 'Tu asistente para Tu Negocio. Contesta, agenda y te avisa.',
     s1rows: [
@@ -68,7 +68,10 @@ const T = {
     s4t: 'Lista para contestar', s4d: 'Marcy ya atiende a Tu Negocio.',
     s4rows: [['Respuestas automáticas', 'Activadas · Contesta a cualquier hora'], ['Te avisa por correo', 'Activado · Te pasa cada contacto']],
     enLinea: 'Marcy · En línea', tusCanales: 'Tus canales',
-    contesta: 'Marcy contesta', contestaD: 'Activado · En todos tus canales',
+    contesta: 'Marcy contesta', contestaD: 'Activado · En tus canales de mensajes',
+    contestaEn: 'Contesta en', agendaEn: 'Agenda en',
+    aviso: 'Te avisa al momento', avisoD: 'Llamadas perdidas y cada contacto por correo',
+    resumen4: 'Respuestas automáticas y avisos por correo, activados.', y: ' y ',
     horario: 'Horario', idiomas: 'Idiomas',
     listaT: 'Los 4 pasos',
   },
@@ -76,7 +79,7 @@ const T = {
     ejemplo: 'Example',
     ejemploPanel: 'Example setup, done with you',
     negocio: 'Your Business',
-    sr: 'Example of how you start with Marcy in four steps: you meet her, check your business hours and languages, connect your channels, and she is ready to answer. At the end, Marcy answers on your channels.',
+    sr: 'Example of how you start with Marcy in four steps: you meet her, check your business hours and languages, connect your channels, and she is ready to answer. At the end, Marcy answers on your messaging channels, books appointments, and lets you know about missed calls and every lead by email.',
     atras: 'Back', continuar: 'Continue', empezar: 'Get started', repetir: 'Replay',
     s1t: 'Meet Marcy', s1d: 'Your assistant for Your Business. Answers, books and lets you know.',
     s1rows: [
@@ -90,34 +93,57 @@ const T = {
     s4t: 'Ready to answer', s4d: 'Marcy is now looking after Your Business.',
     s4rows: [['Automatic replies', 'On · Answers at any hour'], ['Email alerts', 'On · Sends you every lead']],
     enLinea: 'Marcy · Online', tusCanales: 'Your channels',
-    contesta: 'Marcy answers', contestaD: 'On · Across your channels',
+    contesta: 'Marcy answers', contestaD: 'On · Across your messaging channels',
+    contestaEn: 'Answers on', agendaEn: 'Books in',
+    aviso: 'Lets you know right away', avisoD: 'Missed calls, and every lead by email',
+    resumen4: 'Automatic replies and email alerts are on.', y: ' and ',
     horario: 'Hours', idiomas: 'Languages',
     listaT: 'The 4 steps',
   },
 }[lang];
 
-// Canales: nombre, línea gris, logo de P06 (si es una marca) y glifo genérico.
-const CANALES: Record<CanalAlta, { es: [string, string]; en: [string, string]; marca?: string; icono: string; avatar?: boolean }> = {
-  whatsapp: { es: ['WhatsApp', 'Contesta tus mensajes'], en: ['WhatsApp', 'Answers your messages'], marca: 'whatsapp', icono: 'message-circle-more' },
-  web: { es: ['Chat de tu web', 'Contesta en tu página'], en: ['Your website chat', 'Answers on your site'], icono: 'globe', avatar: true },
-  calendario: { es: ['Calendario', 'Agenda las citas'], en: ['Calendar', 'Books appointments'], icono: 'calendar-days' },
-  correo: { es: ['Correo', 'Te pasa cada contacto'], en: ['Email', 'Sends you every lead'], icono: 'mail' },
-  llamadas: { es: ['Llamadas perdidas', 'Te avisa al momento'], en: ['Missed calls', 'Lets you know right away'], icono: 'phone-missed' },
+// Canales: nombre, línea gris, nombre dentro de frase (minúscula), papel en el panel final
+// (§5-14: solo CONTESTA en los de mensajes; el calendario es AGENDA; llamadas y correo son AVISO)
+// e icono de app. Las marcas van por LogoMarca (P06); el resto son iconos de app propios
+// (squircle 22,5 %, dibujo de producto, nunca un logo ajeno).
+type Rol = 'contesta' | 'agenda' | 'aviso';
+const CANALES: Record<CanalAlta, { es: [string, string, string]; en: [string, string, string]; rol: Rol; marca?: string }> = {
+  whatsapp: { es: ['WhatsApp', 'Contesta tus mensajes', 'WhatsApp'], en: ['WhatsApp', 'Answers your messages', 'WhatsApp'], rol: 'contesta', marca: 'whatsapp' },
+  web: { es: ['Chat de tu web', 'Contesta en tu página', 'chat de tu web'], en: ['Your website chat', 'Answers on your site', 'your website chat'], rol: 'contesta' },
+  calendario: { es: ['Calendario', 'Agenda las citas', 'calendario'], en: ['Calendar', 'Books appointments', 'calendar'], rol: 'agenda' },
+  correo: { es: ['Correo', 'Te pasa cada contacto', 'correo'], en: ['Email', 'Sends you every lead', 'email'], rol: 'aviso' },
+  llamadas: { es: ['Llamadas perdidas', 'Te avisa al momento', 'llamadas perdidas'], en: ['Missed calls', 'Lets you know right away', 'missed calls'], rol: 'aviso' },
 };
 const filas = canales.map((id) => ({ id, ...CANALES[id], txt: CANALES[id][lang] }));
+const deRol = (r: Rol) => filas.filter((f) => f.rol === r);
 // Alto de la lista: 142 px; baja lo justo para que la última fila quede entera (como el original).
 const bajar = Math.max(0, filas.length * 34 + 4 - 142);
 
+// Iconos de app propios (SVG sin ids: hay varias instancias por página).
+const dia = lang === 'en' ? 'MON' : 'LUN';
+const GLIFO: Record<string, string> = {
+  whatsapp: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9.5c-6.1 0-11 4.5-11 10.1 0 2.2.8 4.3 2.1 6L10 31l5.7-1.9c1.3.6 2.8.9 4.3.9 6.1 0 11-4.5 11-10.1S26.1 9.5 20 9.5z" fill="#fff"/></svg>',
+  web: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M15 11h12a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6h-8.5L13 31.5V26.3A6 6 0 0 1 9 21v-4a6 6 0 0 1 6-6z" fill="#f0ede8"/><circle cx="15.5" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="21" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="26.5" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="31.5" cy="10.5" r="4.6" fill="#4fc3a1" stroke="#1d2321" stroke-width="2.2"/></svg>',
+  calendario: `<svg viewBox="0 0 40 40" aria-hidden="true"><text x="20" y="13.2" text-anchor="middle" font-size="7.6" font-weight="700" letter-spacing=".4" fill="#e5484d">${dia}</text><text x="20" y="31.5" text-anchor="middle" font-size="18.5" font-weight="500" letter-spacing="-.6" fill="#1d1d1f">12</text></svg>`,
+  correo: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8.5" y="12" width="23" height="16.5" rx="3" fill="#fff"/><path d="M9.6 13.6 20 21.2l10.4-7.6" fill="none" stroke="#2b78ea" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  llamadas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(3.2 3.6) scale(.7)" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" fill="#fff"/><circle cx="18.6" cy="5.4" r="3.1" fill="#ff453a" stroke="#34c759" stroke-width="1.1"/></svg>',
+};
+
 const listaId = `w2-alta-lista-${uid}`;
+const frase = filas.map((f) => f.txt[2]);
+const enumera = (xs: string[]) => (xs.length > 1 ? xs.slice(0, -1).join(', ') + T.y + xs[xs.length - 1] : xs[0] ?? '');
+const trasDosPuntos = (x: string) => { const y = x.replace(/\.$/, ''); return lang === 'es' ? y.charAt(0).toLowerCase() + y.slice(1) : y; };
+const may = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 const pasos = [
   [T.s1t, T.s1d],
-  [T.s2t, `${T.s2rows[1][0]}: ${T.s2rows[1][1].replace(/\.$/, '')}. ${T.s2rows[2][0]}: ${T.s2rows[2][1]}.`],
-  [T.s3t, filas.map((f) => f.txt[0]).join(', ') + '.'],
-  [T.s4t, T.s4rows.map((r) => r[0]).join(lang === 'en' ? ' and ' : ' y ') + '.'],
+  // En español, tras dos puntos va minúscula; en inglés los días y los idiomas van con mayúscula.
+  [T.s2t, `${T.s2rows[1][0]}: ${trasDosPuntos(T.s2rows[1][1])}. ${T.s2rows[2][0]}: ${trasDosPuntos(T.s2rows[2][1])}.`],
+  [T.s3t, may(enumera(frase)) + '.'],
+  [T.s4t, T.resumen4],
 ];
 const avatar = '/assets/bot/marcy-mini.webp';
 ---
-<div class:list={['alta', cls]} data-w2-alta data-w2-step="5" lang={lang} style={`--alta-bajar:${bajar}px`}>
+<div class:list={['alta', cls]} tabindex="-1" data-w2-alta data-w2-step="5" lang={lang} style={`--alta-bajar:${bajar}px`}>
   <p class="sr-only">{T.sr}</p>
   <div class="alta-lienzo">
     <div class="alta-escena" aria-hidden="true" data-nosnippet>
@@ -166,10 +192,8 @@ const avatar = '/assets/bot/marcy-mini.webp';
                   <span class="alta-row" data-w2-alta-c3>
                     <span class="alta-tile">
                       {f.marca && LogoMarca
-                        ? <LogoMarca id={f.marca} size={22} tono="color" baldosa />
-                        : f.avatar
-                          ? <img src={avatar} alt="" width="22" height="22" loading="lazy" decoding="async" />
-                          : <Icon name={`lucide:${f.icono}`} />}
+                        ? <LogoMarca id={f.marca} size={24} tono="color" baldosa titulo="" />
+                        : <span class={`alta-ic alta-ic--${f.id}`} set:html={GLIFO[f.id]} />}
                     </span>
                     <span class="alta-row-tx"><span class="alta-rt">{f.txt[0]}</span><span class="alta-rd">{f.txt[1]}</span></span>
                     <span class="alta-chk"><Icon name="lucide:check" /></span>
@@ -210,27 +234,33 @@ const avatar = '/assets/bot/marcy-mini.webp';
               <span class="alta-p-on"><i class="alta-p-dot"></i>{T.enLinea}</span>
             </span>
           </span>
-          <span class="alta-p-sec">
-            <span class="alta-p-lab">{T.tusCanales}</span>
-            <span class="alta-p-tiles">
-              {filas.map((f) => (
-                <span class="alta-tile alta-tile--p">
-                  {f.marca && LogoMarca
-                    ? <LogoMarca id={f.marca} size={30} tono="color" baldosa />
-                    : f.avatar
-                      ? <img src={avatar} alt="" width="30" height="30" loading="lazy" decoding="async" />
-                      : <Icon name={`lucide:${f.icono}`} />}
+          <span class="alta-p-sec alta-p-grupos">
+            {[['contesta', T.contestaEn], ['agenda', T.agendaEn]].map(([rol, lab]) => deRol(rol as Rol).length > 0 && (
+              <span class="alta-p-grupo">
+                <span class="alta-p-lab">{lab}</span>
+                <span class="alta-p-tiles">
+                  {deRol(rol as Rol).map((f) => (
+                    <span class="alta-tile alta-tile--p">
+                      {f.marca && LogoMarca
+                        ? <LogoMarca id={f.marca} size={34} tono="color" baldosa titulo="" />
+                        : <span class={`alta-ic alta-ic--${f.id}`} set:html={GLIFO[f.id]} />}
+                    </span>
+                  ))}
                 </span>
-              ))}
-            </span>
+              </span>
+            ))}
           </span>
           <span class="alta-p-sec alta-p-sw">
             <span><span class="alta-rt">{T.contesta}</span><span class="alta-rd">{T.contestaD}</span></span>
-            <span class="alta-sw"><i class="alta-sw-halo"></i><i class="alta-sw-knob"></i></span>
+            <span class="alta-sw"><i class="alta-sw-knob"></i></span>
           </span>
           <span class="alta-p-sec alta-p-sw">
-            <span><span class="alta-rt">{T.s4rows[1][0]}</span><span class="alta-rd">{T.s4rows[1][1]}</span></span>
-            <span class="alta-chk alta-chk--on"><Icon name="lucide:check" /></span>
+            <span><span class="alta-rt">{T.aviso}</span><span class="alta-rd">{T.avisoD}</span></span>
+            <span class="alta-p-av">
+              {(['llamadas', 'correo'] as const).map((id) => (
+                <span class="alta-tile alta-tile--av"><span class={`alta-ic alta-ic--${id}`} set:html={GLIFO[id]} /></span>
+              ))}
+            </span>
           </span>
           <span class="alta-p-sec alta-p-dl">
             <span class="alta-p-kv"><span class="alta-k">{T.horario}</span><span class="alta-v">{T.s2rows[1][1]}</span></span>
@@ -273,6 +303,7 @@ const avatar = '/assets/bot/marcy-mini.webp';
     --alta-ease: var(--w-ease-text, cubic-bezier(.33,1,.68,1));
     width: 100%;
   }
+  .alta:focus { outline: none; }
 
   /* ── Lienzo ─────────────────────────────────────────── */
   .alta-lienzo {
@@ -322,9 +353,15 @@ const avatar = '/assets/bot/marcy-mini.webp';
     box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 22px 50px -18px rgba(0,0,0,.55);
     color: var(--alta-ink);
     font-family: var(--font-body); -webkit-font-smoothing: antialiased;
+    transform-origin: 50% 1%;
     transition: opacity 350ms var(--alta-ease), transform 350ms var(--alta-ease);
   }
-  .alta[data-w2-step="5"] .alta-win { opacity: 0; transform: scale(.96); pointer-events: none; }
+  /* Se recoge: la ventana se encoge hacia la caja del panel (300 × ~331 px, arriba) y el panel
+     toma su lugar desde ese mismo tamaño. */
+  .alta[data-w2-step="5"] .alta-win {
+    opacity: 0; transform: scaleX(.843) scaleY(.89); pointer-events: none;
+    transition: transform 520ms cubic-bezier(.65,0,.35,1), opacity 260ms var(--alta-ease) 260ms;
+  }
 
   .alta-bar { position: absolute; top: 13px; left: 14px; display: flex; gap: 7px; }
   .alta-bar i { width: 11px; height: 11px; border-radius: 50%; background: #d3d0cb; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
@@ -397,18 +434,24 @@ const avatar = '/assets/bot/marcy-mini.webp';
   .alta-lst .alta-row + .alta-row { border-top: 1px solid var(--alta-line); }
   .alta-row .alta-rt { font-size: 12.5px; line-height: 15px; }
   .alta-row .alta-rd { font-size: 10.5px; line-height: 13px; }
-  .alta-tile {
-    display: grid; place-items: center; width: 24px; height: 24px; border-radius: 22.5%; overflow: hidden;
-    background: #fff; color: var(--alta-ink); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+  .alta-tile { display: grid; place-items: center; width: 24px; height: 24px; }
+  /* Iconos de app propios: squircle 22,5 %, relieve de icono (luz arriba, sombra corta). */
+  .alta-ic {
+    position: relative; display: block; width: 100%; height: 100%; border-radius: 22.5%; overflow: hidden;
+    box-shadow: inset 0 0 0 .5px rgba(0,0,0,.14), 0 1px 1.5px rgba(0,0,0,.16);
   }
-  .alta-tile :global(svg) { width: 14px; height: 14px; }
-  /* Glifo genérico (canales que no son una marca): baldosa de app oscura con glifo crema. */
-  .alta-tile:has(> svg) {
-    background: linear-gradient(180deg, #2f3331, #1b1d1c); color: #f0ede8;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 1px 2px rgba(0,0,0,.18);
+  .alta-ic::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 46%);
   }
-  .alta-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .alta-tile:has(> :not(svg):not(img)) { background: transparent; box-shadow: none; }
+  .alta-ic :global(svg) { display: block; width: 100%; height: 100%; }
+  .alta-ic :global(text) { font-family: var(--font-body); }
+  .alta-ic--whatsapp { background: linear-gradient(180deg, #5be584, #1fb955); }
+  .alta-ic--web { background: linear-gradient(180deg, #2f3a36, #141716); }
+  .alta-ic--calendario { background: #fff; }
+  .alta-ic--calendario::after { background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.035)); }
+  .alta-ic--correo { background: linear-gradient(180deg, #5eb0ff, #1b6fe4); }
+  .alta-ic--llamadas { background: linear-gradient(180deg, #6fe58a, #2dbd52); }
   .alta-chk {
     display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%;
     background: var(--alta-ok); color: #fff;
@@ -471,47 +514,56 @@ const avatar = '/assets/bot/marcy-mini.webp';
     background: rgba(246,245,241,.97); color: var(--alta-ink);
     box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 22px 50px -18px rgba(0,0,0,.55);
     font-family: var(--font-body); -webkit-font-smoothing: antialiased;
-    opacity: 0; transform: translateY(-10px) scale(.98); transform-origin: 50% 0;
-    transition: opacity 280ms var(--alta-ease), transform 280ms var(--alta-ease);
+    opacity: 0; transform: scaleX(1.187) scaleY(1.124); transform-origin: 50% 0;
+    transition: opacity 200ms var(--alta-ease), transform 200ms var(--alta-ease);
     pointer-events: none;
   }
   .alta[data-w2-step="5"] .alta-panel {
-    opacity: 1; transform: none; transition-duration: 420ms; transition-delay: 160ms;
+    opacity: 1; transform: none;
+    transition: transform 520ms cubic-bezier(.65,0,.35,1), opacity 300ms var(--alta-ease) 180ms;
   }
   .alta-p-head { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: center; padding-bottom: 12px; }
   .alta-p-ava { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #1b1d1c; }
   .alta-p-name { display: block; font-family: var(--font-display); font-size: 15px; line-height: 19px; font-weight: 600; letter-spacing: -.01em; }
   .alta-p-on { display: flex; align-items: center; gap: 6px; font-size: 11.5px; line-height: 15px; color: var(--alta-ink-2); }
-  .alta-p-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--alta-ok); }
+  .alta-p-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--alta-ok); }
   .alta-p-dot::after {
-    content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--alta-ok);
-    opacity: 0; transform: scale(.5);
+    content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(35,165,90,.5);
   }
   .alta-p-sec { display: block; padding: 11px 0; border-top: 1px solid var(--alta-line); }
   .alta-p-lab { display: block; font-size: 11.5px; line-height: 15px; color: var(--alta-ink-2); margin-bottom: 8px; }
+  .alta-p-grupos { display: flex; gap: 18px; }
+  .alta-p-grupo + .alta-p-grupo { padding-left: 18px; border-left: 1px solid var(--alta-line); }
   .alta-p-tiles { display: flex; flex-wrap: wrap; gap: 8px; }
   .alta-tile--p { width: 34px; height: 34px; }
-  .alta-tile--p :global(svg) { width: 18px; height: 18px; }
+  .alta-p-av { display: flex; gap: 6px; }
+  .alta-tile--av { width: 24px; height: 24px; }
   .alta-p-sw { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
   .alta-p-sw .alta-rt { font-size: 13px; }
-  .alta-sw { position: relative; width: 34px; height: 20px; border-radius: 10px; background: var(--alta-acc); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.1); }
+  .alta-sw { position: relative; flex: none; width: 34px; height: 20px; border-radius: 10px; background: var(--alta-acc); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.1); }
+  .alta-sw::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(79,195,161,.55);
+  }
   .alta-sw-knob {
     position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%;
     background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
-  }
-  .alta-sw-halo {
-    position: absolute; top: -3px; right: -3px; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--alta-acc); opacity: 0; transform: scale(.6);
   }
   .alta-p-dl { display: grid; gap: 6px; }
   .alta-p-kv { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; line-height: 15px; }
 
   /* Micro-vida del estado final (solo a la vista y sin reducir movimiento) */
-  .alta.is-vivo[data-w2-step="5"] .alta-sw-halo { animation: alta-halo 2s var(--alta-ease) infinite; }
-  .alta.is-vivo[data-w2-step="5"] .alta-p-dot::after { animation: alta-halo 2s var(--alta-ease) 1s infinite; }
-  @keyframes alta-halo {
-    0% { opacity: .38; transform: scale(.6); }
-    70%, 100% { opacity: 0; transform: scale(1.25); }
+  /* Anillos que se expanden por fuera (box-shadow): se ven sobre el papel, no se tapan con la pista. */
+  .alta.is-vivo[data-w2-step="5"] .alta-sw::before { animation: alta-ring-sw 2.4s cubic-bezier(.2,.7,.3,1) infinite; }
+  .alta.is-vivo[data-w2-step="5"] .alta-p-dot::after { animation: alta-ring-dot 2.4s cubic-bezier(.2,.7,.3,1) 1.2s infinite; }
+  @keyframes alta-ring-sw {
+    0% { box-shadow: 0 0 0 0 rgba(79,195,161,.6); }
+    75%, 100% { box-shadow: 0 0 0 9px rgba(79,195,161,0); }
+  }
+  @keyframes alta-ring-dot {
+    0% { box-shadow: 0 0 0 0 rgba(35,165,90,.55); }
+    75%, 100% { box-shadow: 0 0 0 7px rgba(35,165,90,0); }
   }
 
   /* ── Repetir ────────────────────────────────────────── */
@@ -541,6 +593,8 @@ const avatar = '/assets/bot/marcy-mini.webp';
     font-family: var(--font-body);
   }
   .alta-lista[hidden] { display: none; }
+  .alta.is-lista .alta-escena { visibility: hidden; }
+  .alta-lista { top: 16px; bottom: 64px; overflow: auto; }
   .alta-lista-t { margin: 0 0 8px; font-family: var(--font-display); font-weight: 600; font-size: 15px; }
   .alta-lista ol { margin: 0; padding-left: 20px; display: grid; gap: 9px; }
   .alta-lista li { font-size: 12.5px; color: var(--alta-ink-2); }

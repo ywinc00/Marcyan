@@ -49,7 +49,7 @@ const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`
 // barra del navegador: solo dominios verificados (los demás, barra sin texto; nunca enlace)
 const domains = projects.map((p) => DOMINIOS[p.slug] ?? '');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
-// "Sigue explorando": siempre tres tarjetas (las de la página y, si faltan, el blog)
+// "Sigue explorando": siempre tres tarjetas (las de la página y, si faltan, las herramientas gratis)
 const explore = [...h.related.links, w.recurso].slice(0, 3);
 const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
 ---
@@ -268,7 +268,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   </div>
 
   {/* 9 · Sigue explorando (W-CORE-23): cabecera a la izquierda y debajo, a ancho del contenedor, las tres garantías
-       y tres tarjetas de recurso en fila, alineadas con sus columnas. Si la página trae dos enlaces, el tercero es el blog. */}
+       y tres tarjetas de recurso en fila, alineadas con sus columnas. Si la página trae dos enlaces, el tercero son las herramientas gratis. */}
   <section class="explore" aria-labelledby="hx-ex-t">
     <div class="hx-wrap">
       <div class="explore__head"><Kicker>{h.related.tag}</Kicker><h2 class="explore__t" id="hx-ex-t">{h.related.title}</h2></div>

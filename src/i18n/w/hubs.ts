@@ -68,12 +68,12 @@ export interface HubCopy {
   garantias: { items: [{ icon: string; title: string; text: string }, { icon: string; title: string; text: string }, { icon: string; title: string; text: string }] };
   cierre: { proof: string; warm: { title: string; text: string; cta: string; ask: string } };
   /** "Sigue explorando" (W-CORE-23, plan v2 G02): tercera tarjeta de recurso cuando la página trae solo dos.
-   *  Enlaza al blog, que la página ya enlaza desde el menú y el pie (no abre un enlace nuevo en el silo). */
+   *  Enlaza a las herramientas gratis (calculadoras), que la página ya enlaza desde el menú y el pie: un recurso útil, no relleno. */
   recurso: { label: string; href: string; desc: string; icon: string };
 }
 
-const RECURSO_ES: HubCopy['recurso'] = { label: 'Blog', href: '/es/blog', desc: 'Guías de diseño web, IA y SEO.', icon: 'lucide:book-open' };
-const RECURSO_EN: HubCopy['recurso'] = { label: 'Blog', href: '/en/blog', desc: 'Web design, AI and SEO guides.', icon: 'lucide:book-open' };
+const RECURSO_ES: HubCopy['recurso'] = { label: 'Herramientas gratis', href: '/es/herramientas', desc: 'Calcula lo que te cuesta no contestar a tiempo.', icon: 'lucide:calculator' };
+const RECURSO_EN: HubCopy['recurso'] = { label: 'Free tools', href: '/en/tools', desc: 'See what slow replies are really costing you.', icon: 'lucide:calculator' };
 
 const GARANTIAS_ES: HubCopy['garantias'] = {
   items: [

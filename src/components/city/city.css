@@ -273,8 +273,10 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .mp a svg{width:13px;height:13px;color:var(--accent-gold)}
 .hx .mp a:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
 .hx .local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;background:rgba(9,8,7,.8);padding:5px 8px;border-radius:4px}
-.hx .explore{position:relative;padding-block:0 24px}
-.hx .explore__t{margin-top:12px;font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.01em}
+/* la sección absorbe dentro de sí el alto que gana (garantías + fila de tres): sube sobre el aire inferior de la FAQ
+   y cede su margen inferior, para que las marcas data-atmo del cierre y del contacto sigan en ±40 px */
+.hx .explore{position:relative;margin-top:-24px;padding-block:0}
+.hx .explore__t{margin-top:12px;font-family:var(--font-display);font-size:clamp(26px,1.2rem + 1vw,34px);font-weight:600;line-height:1.15;letter-spacing:-.02em}
 .hx .explore__row{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px}
 .hx .explore__row a{display:flex;align-items:flex-start;gap:14px;height:100%;padding:18px 20px;border-radius:var(--w-r-obj);border:1px solid var(--w-line);background:var(--w-s2);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
 .hx .explore__row a:hover{border-color:var(--w-line-strong)}
@@ -448,7 +450,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx div.w-hwhere__card{background:var(--w-s1);box-shadow:none}
 .hx div.w-hwhere__card .w-hwhere__ic{color:var(--w-ink-60);background:none;border-color:var(--w-line)}
 /* 7 · franja "En pocas palabras" con sus dos cifras (mismas que cita la respuesta) */
-.hx .answer{padding-block:140px 130px}
+.hx .answer{padding-block:140px}
 .hx .w-hanswer .answer__figs{display:flex;justify-content:center;gap:clamp(32px,6vw,96px);margin-top:36px}
 .hx .w-hanswer .fig{max-width:300px;padding-left:18px;border-left:1px solid var(--accent-gold-line)}
 .hx .w-hanswer .fig__n{font-family:var(--font-display);font-size:clamp(2.25rem,1.7rem + 1.4vw,3rem);font-weight:500;line-height:1;letter-spacing:-.03em;color:var(--accent-gold);font-variant-numeric:tabular-nums}
@@ -462,7 +464,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .faq .w-faq__q{padding:18px 24px;font-size:18px}
   .hx .faq .w-faq__list{gap:10px}
 }
-.hx .faq{padding-block:80px 32px}
+.hx .faq{padding-block:80px 56px}
 /* el titular de la FAQ conserva la gramática de los .h2 del viaje (600, escala fluida) */
 .hx .faq .w-faq__title{font-size:var(--fluid-h2);font-weight:600;line-height:var(--leading-tight);letter-spacing:var(--tracking-tight)}
 .hx .faq .w-faq__title em{color:var(--accent-gold)}
@@ -478,13 +480,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .w-hg3 + .explore__row{margin-top:24px}
 @media (hover:hover) and (pointer:fine){.hx .explore__row a:hover .exic{transform:translateY(-2px);color:var(--accent-gold)}}
 .hx .explore__row a:focus-visible .exic{color:var(--accent-gold)}
-/* "Sigue explorando" crece (garantías + fila de tres): FAQ y "En pocas palabras" ceden ese alto por página para que
-   las marcas data-atmo del cierre y del contacto queden en ±40 px (mismo método de la v1 en móvil) */
-@media (min-width:601px){
-  .hx[data-city="miami"]:lang(es) .answer{padding-bottom:140px}
-  .hx[data-city="miami"]:lang(en) .answer{padding-bottom:122px}
-  .hx[data-city="miami"]:lang(en) .faq{padding-bottom:22px}
-}
 /* 10 · cierre en dos tarjetas sobre el horizonte encendido */
 .hx .cta{padding-block:96px 112px}
 /* el tramo de servicios conserva su alto: la bandeja ocupa el sitio de las filas y del margen inferior */
@@ -513,11 +508,12 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .pf__tags{max-height:26px;overflow:hidden}
   .hx .pf__tags li{line-height:16px}
   .hx .answer{padding-block:160px 150px}
-  .hx .faq{padding-block:36px 24px}
-  .hx[data-city="miami"]:lang(es) .faq{padding-bottom:36px}
-  .hx[data-city="houston"]:lang(en) .answer{padding-bottom:130px}
+  .hx .faq{padding-block:36px}
   .hx .faq .w-faq__list{gap:8px}
   .hx .faq .w-faq__q{padding:18px 16px}
+  .hx .explore{margin-top:0;padding-bottom:4px}
+  /* /es/miami trae tres enlaces propios (sin la tarjeta añadida): conserva el margen para que el cierre no suba de más */
+  .hx[data-city="miami"]:lang(es) .explore{padding-bottom:44px}
   .hx .explore__row,.hx .w-hg3 + .explore__row{margin-top:16px;row-gap:8px}
   .hx .w-hg3 .g3__list{border-bottom:1px solid var(--w-line)}
   .hx .explore__row a{padding:12px 16px}
@@ -530,7 +526,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx[data-city="miami"]:lang(es) .pf--solo .pf__step{margin-bottom:8px}
   .hx[data-city="houston"]:lang(en) .pf__step{margin-bottom:56px}
   .hx[data-city="miami"] .answer{padding-block:195px 185px}
-  .hx[data-city="miami"]:lang(es) .answer{padding-block:172px 183px}
+  .hx[data-city="miami"]:lang(es) .answer{padding-block:172px 163px}
   .hx:lang(es) .cta{padding-block:12px}
   .hx[data-city="miami"]:lang(en) .cta{padding-block:52px}
   .hx .w-hwhere{grid-template-columns:minmax(0,1fr);gap:8px}

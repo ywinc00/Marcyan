@@ -56,7 +56,12 @@ const html = await Astro.slots.render('default');
   .dif { min-height: var(--dif-h); display: flex; justify-content: center; align-items: center; width: 100%; }
   .dif[data-w2-dif='listo'] { min-height: 0; }
   /* Sin JS: <noscript> se pinta como un elemento normal; que no rompa el centrado del hueco. */
-  .dif > :global(noscript) { display: contents; }
+  /* Solo SIN JS: con JS el contenido del <noscript> es UN nodo de texto (el HTML escapado) y,
+     con display: contents, se maquetaba como una línea de texto sin cortes de cientos de px. En
+     el teléfono eso ensanchaba la página entera a 681 px hasta que la escena se montaba (v3:
+     "el hero de IA conversacional se rompe en móvil"). */
+  .dif > :global(noscript) { display: none; }
+  @media (scripting: none) { .dif > :global(noscript) { display: contents; } }
   @media (--lg) { .dif { min-height: var(--dif-h-lg); } }
   @media (--lg) { .dif[data-w2-dif='listo'] { min-height: 0; } }
 </style>

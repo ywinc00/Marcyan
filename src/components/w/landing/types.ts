@@ -131,4 +131,11 @@ export interface KindSpec {
     barrio?: BarrioFondo;
     vars?: string;
   };
+  /**
+   * v3 (E-57 regla 2): corta las líneas de margen (raíles de main.w-rails) en TODO el hero
+   * del tipo. Úsalo cuando el hero tenga objetos a sangre o un fondo de líneas que el raíl
+   * cruzaría. WLanding pone `data-w-sin-rail` en la zona del hero; rails.ts hace el corte.
+   * Para cortar otra sección, pon el atributo `data-w-sin-rail` en su componente.
+   */
+  sinRail?: boolean;
 }

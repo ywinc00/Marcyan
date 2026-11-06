@@ -293,6 +293,15 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
     .da-pie { order: 3; margin: 26px 0 48px; }
     .da-acciones { flex-direction: column; align-items: center; }
     .da-mac :global(.dv--extra) { display: none; }
+    /* v3 (móvil diseñado a 390 y 360): el portátil va a sangre (los 16 px de margen eran 9 %
+       de pantalla perdida; .da recorta con overflow: clip) y la hoja y el panel crecen dentro
+       de la pantalla (propiedad scale, independiente del transform de las fases): la letra del
+       panel pasa de ≈ 3,6 a ≈ 5,7 px y el título a ≈ 9 px. El panel sigue entero en pantalla
+       (555 × 1,45 + 62 < 895). Nada se oculta que en escritorio se use. */
+    .da-mac { width: calc(100% + 32px); max-width: none; margin-inline: -16px; }
+    .da-ejemplo { right: calc(5% + 16px); }
+    .da-panel { scale: 1.45; transform-origin: 50% 0; }
+    .da-hoja { scale: 1.45; }
   }
 
   /* ventanas oscuras (cada canal con su forma) */

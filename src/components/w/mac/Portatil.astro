@@ -11,11 +11,12 @@
 // Props:
 //   ancho  → ancho máximo del conjunto (base incluida), por defecto 990
 //   tapa   → 'abierta' | 'scroll'. 'scroll': la tapa gira de -90° a 0° con
-//            animation-timeline: view() en entry 25% → entry 100% (≈ 470 px a 1440; la pieza entera a la vista = tapa abierta,
-//            compositor, sin listener: E-50). Sin view(): se abre por tiempo
-//            (1,2 s) al cruzar el 40 % de vista. Reducir movimiento: abierta.
+//            animation-timeline: view(). Por defecto en contain 0% → contain 70%: empieza
+//            con la pieza ENTERA ya encuadrada, nunca al asomar (E-57 regla 4; v3), con la
+//            curva de pt-gira (compositor, sin listener: E-50). Sin view(): se abre por
+//            tiempo (1,2 s) con el 85 % de la pieza a la vista. Reducir movimiento: abierta.
 //            Una escena puede dar su propia línea y rango heredando --pt-linea y
-//            --pt-rango (EscenaAbreApps: portátil fijado al borde inferior).
+//            --pt-rango (EscenaAbreApps: portátil fijado y centrado en la ventana).
 //   base   → pinta la base y la bisagra (por defecto true)
 //   encendida → false deja la pantalla apagada (la escena la enciende con
 //            data-pt-encendida="true")
@@ -57,6 +58,9 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
   </div>
   {base && (
     <div class="pt-base">
+      <span class="pt-sombra"></span>
+      <span class="pt-pie pt-pie--i"></span>
+      <span class="pt-pie pt-pie--d"></span>
       <span class="pt-bisagra"></span>
       <span class="pt-hendidura"></span>
     </div>
@@ -140,45 +144,80 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     backface-visibility: hidden;
   }
 
-  /* base plateada + bisagra (lo único que se ve con la tapa cerrada) */
+  /* Base (v3, W2N-03 medida en imagen): una losa de aluminio vista de frente, NO una cuchilla.
+     Alto 3,1 % del ancho (24 px en 745 del original). Cara frontal con filo de luz arriba
+     (canto superior) y degradado que oscurece hacia abajo; extremos con esquina pequeña arriba
+     y grande abajo; hendidura para el pulgar centrada (17 % del ancho, media altura); dos pies
+     oscuros bajo la losa al 5,5 % de cada extremo; sombra de contacto debajo. Todo en cqw del
+     conjunto (.pt es contenedor): escala igual de 320 a 1440 sin reglas por tamaño. */
   .pt-base {
     position: relative; display: block;
-    width: 100%; height: 0; padding-bottom: 2.9%;
-    margin-top: -.15%;
-    border-radius: .35% .35% 50% 50% / 10% 10% 100% 100%;
+    width: 100%; height: 3.1cqw;
+    margin-top: -.12cqw;
+    border-radius: .55cqw .55cqw 1.7cqw 1.7cqw / .55cqw .55cqw 1.95cqw 1.95cqw;
     background:
-      linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,0) 4% 96%, rgba(0,0,0,.28)),
-      linear-gradient(180deg, #e3e4e8 0, #c9cace 18%, #a9aaae 55%, #86878b 82%, #5b5c60 100%);
-    box-shadow: 0 1.2cqw 2.4cqw -1cqw rgba(0,0,0,.55);
+      linear-gradient(90deg, rgba(0,0,0,.34), rgba(0,0,0,.08) 1.6%, rgba(0,0,0,0) 5% 95%, rgba(0,0,0,.08) 98.4%, rgba(0,0,0,.34)),
+      linear-gradient(180deg, #eef0f2 0, #d3d4d8 6%, #c3c4c8 25%, #a3a4a8 31%, #9a9b9f 55%, #838488 80%, #626367 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.28);
   }
+  .pt-sombra {
+    position: absolute; left: 4%; right: 4%; top: calc(100% - .2cqw); height: 2.4cqw;
+    background: radial-gradient(50% 50% at 50% 22%, rgba(0,0,0,.62), rgba(0,0,0,.28) 45%, rgba(0,0,0,0) 72%);
+    pointer-events: none;
+  }
+  .pt-pie {
+    position: absolute; top: calc(100% - .1cqw); width: 6.3%; height: .62cqw;
+    border-radius: 0 0 .7cqw .7cqw / 0 0 .5cqw .5cqw;
+    background: linear-gradient(180deg, #121214, #2e2f32 55%, #0d0d0f);
+  }
+  .pt-pie--i { left: 5.5%; }
+  .pt-pie--d { right: 5.5%; }
   .pt-bisagra {
-    position: absolute; left: calc((100% - 100% / 1.08) / 2 + 1%); right: calc((100% - 100% / 1.08) / 2 + 1%);
-    top: 0; height: 22%;
-    background: linear-gradient(#252527, #222224 80%, #101012);
-    border-radius: 0 0 4px 4px;
+    position: absolute; left: calc((100% - 100% / 1.08) / 2 + 1.2%); right: calc((100% - 100% / 1.08) / 2 + 1.2%);
+    top: 0; height: 16%;
+    background: linear-gradient(#1c1c1e, #2a2a2d 70%, #0e0e10);
+    border-radius: 0 0 .3cqw .3cqw;
   }
   .pt-hendidura {
     position: absolute; left: 50%; translate: -50%; top: 0;
-    width: 14%; height: 34%;
-    border-radius: 0 0 1cqw 1cqw;
-    background: linear-gradient(#8d8e92, #b9babe);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.35);
+    width: 17%; height: 46%;
+    border-radius: 0 0 1.4cqw 1.4cqw / 0 0 1.2cqw 1.2cqw;
+    background: linear-gradient(180deg, #7d7e82 0, #a9aaae 30%, #c6c7cb 100%);
+    box-shadow: inset 0 .12cqw .18cqw rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.35);
   }
 
   /* ── tapa por scroll ─────────────────────────────── */
-  @keyframes pt-gira { from { transform: rotateX(-90deg); } to { transform: rotateX(0deg); } }
+  /* Curva de apertura (v3): cubic-bezier(.45,0,.25,1) muestreada en 13 fotogramas (lineales
+     entre sí). Arranca suave al quedar fijado, la tapa está abierta al 67 % del tramo y el
+     último tercio es la pantalla encendiéndose, como W2N-03. El titular de EscenaAbreApps
+     usa la MISMA muestra (abre-cab-baja), así sigue al borde de la tapa sin desfase. */
+  @keyframes pt-gira {
+    0% { transform: rotateX(-90deg); }
+    8.33% { transform: rotateX(-88.81deg); }
+    16.67% { transform: rotateX(-84.32deg); }
+    25% { transform: rotateX(-74.48deg); }
+    33.33% { transform: rotateX(-57.64deg); }
+    41.67% { transform: rotateX(-38.71deg); }
+    50% { transform: rotateX(-24.36deg); }
+    58.33% { transform: rotateX(-14.73deg); }
+    66.67% { transform: rotateX(-8.37deg); }
+    75% { transform: rotateX(-4.25deg); }
+    83.33% { transform: rotateX(-1.73deg); }
+    91.67% { transform: rotateX(-.4deg); }
+    100% { transform: rotateX(0deg); }
+  }
   @keyframes pt-enciende { 0%, 70% { opacity: 1; } 88%, 100% { opacity: 0; } }
   @supports (animation-timeline: view()) {
     .pt[data-pt-tapa="scroll"] .pt-tapa {
       animation: pt-gira linear both;
       animation-timeline: var(--pt-linea, --pt-vista);
-      animation-range: var(--pt-rango, entry 25% entry 100%);
+      animation-range: var(--pt-rango, contain 0% contain 70%);
       will-change: transform;
     }
     .pt[data-pt-tapa="scroll"] .pt-apagada {
       animation: pt-enciende linear both;
       animation-timeline: var(--pt-linea, --pt-vista);
-      animation-range: var(--pt-rango, entry 25% entry 100%);
+      animation-range: var(--pt-rango, contain 0% contain 70%);
     }
   }
   /* reserva sin view(): cerrada hasta que el guion pone data-pt-abierta (por tiempo) */
@@ -197,7 +236,7 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
 
 <script>
   // 1) Escala de la pantalla donde el CSS no divide longitudes (Firefox y otros).
-  // 2) Reserva de la tapa sin view(): se abre por tiempo al cruzar el 40 % de vista.
+  // 2) Reserva de la tapa sin view(): se abre por tiempo con el 85 % de la pieza a la vista.
   const sinDivision = !CSS.supports('width', 'calc(100cqw / 1415px * 1px)');
   const sinView = !CSS.supports('animation-timeline', 'view()');
   for (const pt of document.querySelectorAll<HTMLElement>('[data-w2-portatil]')) {
@@ -213,8 +252,8 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     }
     if (sinView && pt.dataset.ptTapa === 'scroll') {
       const io = new IntersectionObserver((ents) => {
-        if (ents.some((e) => e.intersectionRatio >= 0.4)) { pt.setAttribute('data-pt-abierta', ''); io.disconnect(); }
-      }, { threshold: [0.4] });
+        if (ents.some((e) => e.intersectionRatio >= 0.85)) { pt.setAttribute('data-pt-abierta', ''); io.disconnect(); }
+      }, { threshold: [0.85] });
       io.observe(pt);
     }
   }

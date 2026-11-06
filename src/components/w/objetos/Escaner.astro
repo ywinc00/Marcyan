@@ -1,16 +1,36 @@
 ---
-// Escáner de señales (W-ADV-45 · design/rediseno-workos.md §3.6, §2.10). Objeto de SISTEMA.
-// Tarjeta radio 48 padding 64; mosaico de chips (49 px, radio 12, texto 16 al 50 %)
-// fundidos hacia los bordes; caja central 250×172 con borde oro y fondo oro al 15 %
-// (OPACO: los chips no se ven a través, E-37) con una web dibujada en línea; una barra
-// de 132×10 la barre de abajo arriba en 1,8 s.
-// Chips = señales REALES que revisa el motor del diagnóstico (lib/diagnostic-checks.mjs:
-// móvil, título, conexión segura, fotos, teléfono, ciudad, datos del negocio, páginas
-// por servicio, descripción, datos para IA, respuestas, texto sin JavaScript, llamar con
-// un toque, WhatsApp, formulario, botón de contacto, reseñas). Nada inventado.
-//   motion="loop"   → bucle (solo en /diagnóstico), con botón de pausa (loop.ts).
-//   motion="once"   → recorre UNA vez al entrar en vista y se queda a media altura (portada, hubs).
-//   motion="static" → barra quieta a media altura.
+// Escáner de señales VIVO (W-ADV-45 · design/rediseno-workos-v2.md §1.5 y §2 P04). Objeto de SISTEMA.
+//
+// Composición (como el original): mosaico de chips en 7 filas que RODEAN la caja central y
+// le dejan su hueco (nunca se monta encima): 2 filas anchas arriba y 2 abajo, que arrancan
+// del mismo margen izquierdo y se pierden por la derecha (máscara), y 3 filas a los lados
+// con columnas de ANCHO FIJO pegadas a la caja. Cada chip se pinta ENTERO o no se pinta, y
+// cada señal sale UNA vez por instancia: el guion reparte los 19 chips midiendo el texto
+// (largo si cabe, corto si no) y salta la etiqueta "Ejemplo" y el botón de pausa.
+// Chips = señales REALES que revisa el motor del diagnóstico (lib/diagnostic-checks.mjs).
+//
+// Movimiento (pantalla viva, §1.5): la barra 132×10 barre la caja de abajo arriba en 1,8 s
+// (--w-ease-ui), pausa 0,6 s y repite MIENTRAS esté a la vista, en TODAS las páginas; cada
+// pasada enciende 2 chips (texto 60 %→90 % y filo oro en 900 ms, se apagan en 600 ms).
+// Pausa fuera de vista (rootMargin 100px), con la pestaña oculta, con el puntero o el foco
+// dentro y con el botón "Pausar animación" (loop.ts; el estado global de pausa, cuando lo
+// tenga loop.ts, se hereda solo). Con un formulario en la misma sección (diagnóstico) se
+// pausa al escribir: focusin del visitante en un campo de closest('section') (o en
+// `pausarCon`, selector relativo a esa sección). Movimiento reducido: barra a media altura
+// y 3 chips encendidos, quieto. Solo transform y opacity.
+//
+// Props que se conservan: variant, size, class, motion (motion ya NO apaga el bucle: 'once'
+// y 'static' se aceptan por compatibilidad y también viven).
+// Tamaños (tabla en W2/escaner-vivo/informe.md); "aire" = relleno lateral del mosaico:
+//   mini (portada y hubs): radio 24, caja 160×110, chips 30, aire 24, barra 88×8 (escala de
+//     la 132×10 a esta caja). Móvil: caja 128×88 (112×78 bajo 360), chips 25, aire 14, alto 236.
+//   card: radio 32, caja 204×141, chips 40, aire 24.
+//   hero (diagnóstico): radio 48, caja 250×172 con 24 px de aire, chips 49 radio 12, texto 16,
+//     aire 32 (no 64: así caben las columnas). Móvil hero y card: caja 150×104, chips 32, alto 360
+//     (116×80 y chips 30 bajo 360). En PC la escala del hero la manda el ancho de la TARJETA
+//     (@container): card bajo 570 px y caja de mini con chips 38 bajo 490 (diagnóstico de ~1000 a ~1250).
+// Caja central: web en línea NEUTRA (sin marca) con cotas de diseño. Provisional hasta que
+// A0 integre WebEjemplo estado="alambre" (se cambia aquí por ese componente).
 // CERROJO 5: sale de v3 (portada y hubs), así que TODO su CSS va aquí y solo lee variables.
 import Ejemplo from '../Ejemplo.astro';
 
@@ -19,45 +39,69 @@ interface Props {
   variant?: 'completo' | 'compacto';
   motion?: 'loop' | 'once' | 'static';
   size?: 'hero' | 'card' | 'mini';
+  /** Selector (relativo a la sección que contiene el escáner) cuyo foco pausa el bucle. */
+  pausarCon?: string;
   class?: string;
 }
-const { lang = 'es', variant = 'completo', motion = 'once', size = 'card', class: cls } = Astro.props;
+const { lang = 'es', variant = 'completo', motion = 'loop', size = 'card', pausarCon, class: cls } = Astro.props;
 const en = lang === 'en';
-const SIGNALS = en
-  ? ['Mobile version', 'Clear title', 'Secure connection', 'Photo descriptions', 'Visible phone', 'City mentioned', 'Business data', 'A page per service', 'Google description', 'Data for AI', 'Direct answers', 'Text without JavaScript', 'Tap to call', 'Visible WhatsApp', 'Contact form', 'Contact button in view', 'Google reviews', 'Live website']
-  : ['Versión móvil', 'Título claro', 'Conexión segura', 'Fotos con descripción', 'Teléfono visible', 'Ciudad mencionada', 'Datos del negocio', 'Páginas por servicio', 'Descripción en Google', 'Datos para IA', 'Respuestas directas', 'Texto sin JavaScript', 'Llamar con un toque', 'WhatsApp visible', 'Formulario de contacto', 'Botón de contacto a la vista', 'Reseñas en Google', 'Sitio activo'];
-// Compacto (portada y hubs): 4×4 chips para no pasar del presupuesto de peso de §2.13 paso 6.
-const nRows = variant === 'compacto' ? 4 : 7;
-const perRow = variant === 'compacto' ? 4 : 6;
-// Filas desplazadas (como un muro de ladrillo) con las señales repartidas en orden.
-const rows = Array.from({ length: nRows }, (_, r) =>
-  Array.from({ length: perRow }, (_, k) => SIGNALS[(r * 5 + k * 3) % SIGNALS.length]));
+
+// Señales reales del motor (lib/diagnostic-checks.mjs): [nombre largo, nombre corto].
+// El corto se usa donde el largo no cabe entero (lados de la caja, móvil). Cada señal sale
+// UNA sola vez por instancia, larga o corta (W-ADV-45 enseña ~20 señales sin repetir).
+const SENALES: [string, string][] = en
+  ? [['Mobile version', 'Mobile'], ['Visible phone', 'Phone'], ['Text without JavaScript', 'Text without JavaScript'], ['Secure connection', 'Secure'], ['A page per service', 'Services'], ['Google reviews', 'Reviews'], ['Clear title', 'Title'], ['Tap to call', 'Tap to call'], ['Data for AI', 'Data for AI'], ['City mentioned', 'City'], ['Contact form', 'Form'], ['Photo descriptions', 'Photos'], ['Direct answers', 'Answers'], ['Visible WhatsApp', 'WhatsApp'], ['Business data', 'Business data'], ['Summary up top', 'Summary'], ['Google description', 'Description'], ['Contact button in view', 'Contact'], ['Live website', 'Live site']]
+  : [['Versión móvil', 'Móvil'], ['Teléfono visible', 'Teléfono'], ['Texto sin JavaScript', 'Texto sin JavaScript'], ['Conexión segura', 'Candado'], ['Páginas por servicio', 'Servicios'], ['Reseñas en Google', 'Reseñas'], ['Título claro', 'Título'], ['Llamar con un toque', 'Llamar'], ['Datos para IA', 'Datos para IA'], ['Ciudad mencionada', 'Ciudad'], ['Formulario de contacto', 'Formulario'], ['Fotos con descripción', 'Fotos'], ['Respuestas directas', 'Respuestas'], ['WhatsApp visible', 'WhatsApp'], ['Datos del negocio', 'Negocio'], ['Resumen al inicio', 'Resumen'], ['Descripción en Google', 'Descripción'], ['Botón de contacto a la vista', 'Contacto'], ['Sitio activo', 'Sitio activo']];
+// Reparto inicial (sin JavaScript): 6 señales cortas a los lados de la caja y las 13
+// restantes, largas, en las 4 filas anchas. El guion lo rehace midiendo: columnas laterales
+// de ancho fijo, filas anchas desde el mismo margen izquierdo, nada repetido ni cortado.
+const chip = (i: number, corta: boolean) => {
+  const [l, c] = SENALES[i];
+  return { t: corta ? c : l, l: corta && c !== l ? l : undefined, c: !corta && c !== l ? c : undefined };
+};
+const LADOS = [[0, 1], [3, 5], [6, 9]];
+const resto = SENALES.map((_, i) => i).filter((i) => !LADOS.flat().includes(i));
+const ANCHAS = [resto.slice(9, 12), resto.slice(0, 4), resto.slice(4, 8), [resto[8], resto[12]]];
+type Fila = { tipo: 'ancha'; chips: ReturnType<typeof chip>[] } | { tipo: 'lados'; izq: ReturnType<typeof chip>[]; der: ReturnType<typeof chip>[] };
+const filas: Fila[] = [
+  { tipo: 'ancha', chips: ANCHAS[0].map((i) => chip(i, false)) },
+  { tipo: 'ancha', chips: ANCHAS[1].map((i) => chip(i, false)) },
+  ...LADOS.map(([a, b]): Fila => ({ tipo: 'lados', izq: [chip(a, true)], der: [chip(b, true)] })),
+  { tipo: 'ancha', chips: ANCHAS[2].map((i) => chip(i, false)) },
+  { tipo: 'ancha', chips: ANCHAS[3].map((i) => chip(i, false)) },
+];
 const sr = en
   ? 'Example: the free checkup scans a website for signals such as mobile version, visible phone, Google reviews and data for AI.'
   : 'Ejemplo: el diagnóstico gratis revisa una web buscando señales como la versión móvil, el teléfono visible, las reseñas en Google y los datos para IA.';
 ---
 <div
   class:list={['wo-scan', `wo-scan--${variant}`, `wo-scan--${size}`, `wo-scan--${motion}`, cls]}
-  data-wo-scan={motion === 'static' ? undefined : motion}
+  data-wo-scan="loop"
+  data-wo-scan-pausar={pausarCon}
+  data-wo-scan-lang={lang}
 >
   <p class="wo-scan__sr">{sr}</p>
   <Ejemplo lang={lang} on="dark" />
-  <div class="wo-scan__wall" aria-hidden="true">
-    {rows.map((row, r) => (
-      <div class="wo-scan__row" style={`--off:${(r % 2) * -60 - (r % 3) * 18}px`}>
-        {row.map((s) => <span class="wo-scan__chip">{s}</span>)}
-      </div>
+  <div class="wo-scan__wall" aria-hidden="true" data-nosnippet>
+    {filas.map((f) => (
+      f.tipo === 'ancha' ? (
+        <div class="wo-scan__row wo-scan__row--ancha">
+          {f.chips.map((s) => <span data-l={s.l} data-c={s.c}>{s.t}</span>)}
+        </div>
+      ) : (
+        <div class="wo-scan__row wo-scan__row--lados">
+          <div class="wo-scan__lado wo-scan__lado--izq">{f.izq.map((s) => <span data-l={s.l} data-c={s.c}>{s.t}</span>)}</div>
+          <div class="wo-scan__lado wo-scan__lado--der">{f.der.map((s) => <span data-l={s.l} data-c={s.c}>{s.t}</span>)}</div>
+        </div>
+      )
     ))}
   </div>
   <div class="wo-scan__box" aria-hidden="true">
     <svg viewBox="0 0 250 172" preserveAspectRatio="xMidYMid meet">
-      <rect x="40" y="26" width="170" height="114" rx="8" />
-      <path d="M40 44H210" />
-      <circle cx="52" cy="35" r="2.5" /><circle cx="61" cy="35" r="2.5" /><circle cx="70" cy="35" r="2.5" />
-      <path d="M56 62H150M56 74H130" />
-      <rect x="56" y="88" width="46" height="14" rx="7" />
-      <rect x="150" y="58" width="44" height="64" rx="5" />
-      <path d="M56 116H120" />
+      <path class="wo-scan__web" d="M41 22H209a7 7 0 0 1 7 7V143a7 7 0 0 1-7 7H41a7 7 0 0 1-7-7V29a7 7 0 0 1 7-7ZM34 38H216M52 72H142M52 83H126M58.5 106H89.5a6.5 6.5 0 0 1 0 13H58.5a6.5 6.5 0 0 1 0-13ZM156 66H196a4 4 0 0 1 4 4V118a4 4 0 0 1-4 4H156a4 4 0 0 1-4-4V70a4 4 0 0 1 4-4Z" />
+      <path class="wo-scan__fino" d="M52 52H86M150 52H164M172 52H186M194 52H202M52 96H122M152 66l48 56M200 66l-48 56M52 134H200" />
+      <path class="wo-scan__cota" d="M52 64V60M142 64V60M52 62H142M208 66H212M208 122H212M210 66V122" />
+      <path class="wo-scan__dots" d="M41.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0M49.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0M57.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0" />
     </svg>
     <span class="wo-scan__bar"></span>
   </div>
@@ -65,102 +109,392 @@ const sr = en
 
 <script>
   import { registerLoop } from '../loop';
-  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  document.querySelectorAll<HTMLElement>('[data-wo-scan]').forEach((el) => {
-    if (el.dataset.woScan === 'loop') {
-      registerLoop(el, {
-        start: () => el.classList.add('is-run', 'is-playing'),
-        stop: () => el.classList.remove('is-playing'),
-        still: () => el.classList.remove('is-run', 'is-playing'),
-      });
-      return;
+
+  const rectsOverlap = (a: DOMRect, b: DOMRect) =>
+    a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  // Orden de reparto por instancia (rotado): dos escáneres de la misma página no empiezan igual.
+  let instancia = 0;
+  let ctx: CanvasRenderingContext2D | null = null;
+
+  function setup(el: HTMLElement) {
+    if (el.dataset.woScanReady) return;
+    el.dataset.woScanReady = '1';
+    const wall = el.querySelector<HTMLElement>('.wo-scan__wall');
+    const bar = el.querySelector<HTMLElement>('.wo-scan__bar');
+    const lang = el.dataset.woScanLang === 'en' ? 'en' : 'es';
+    if (!wall || !bar) return;
+    // Cada señal es UN span (19, del servidor): el reparto los coloca, nunca los duplica.
+    const rot = (instancia++ * 7) % 19;
+    const all = Array.from(wall.querySelectorAll<HTMLElement>('span')).map((s) => {
+      const t = s.textContent || '';
+      return { s, long: s.dataset.l || t, short: s.dataset.c || t };
+    });
+    const sig = [...all.slice(rot % all.length), ...all.slice(0, rot % all.length)];
+    const rows = Array.from(wall.querySelectorAll<HTMLElement>(':scope > .wo-scan__row'));
+
+    // Si el escáner vive dentro de un enlace (portada y hubs), el botón de pausa no puede ir
+    // dentro del <a>: se envuelve el enlace en un contenedor del mismo tamaño y el botón
+    // cuelga de él, en la esquina de la tarjeta.
+    let host: HTMLElement = el;
+    const link = el.closest('a');
+    if (link && link.parentElement) {
+      const wrap = document.createElement('div');
+      wrap.className = 'wo-scan-host';
+      wrap.style.position = 'relative';
+      link.parentElement.insertBefore(wrap, link);
+      wrap.appendChild(link);
+      host = wrap;
     }
-    // once: una pasada al entrar en vista y se queda a media altura.
-    if (mq.matches || !('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver((es) => {
-      if (es.some((e) => e.isIntersecting)) { el.classList.add('is-once'); io.disconnect(); }
-    }, { threshold: .4 });
-    io.observe(el);
-  });
+
+    // Reparto medido (W-ADV-45): columnas laterales de ANCHO FIJO pegadas a la caja, filas
+    // anchas desde el mismo margen izquierdo; el borde derecho lo funde la máscara. Cada chip
+    // entero o fuera; ninguna señal dos veces; si se acaban, la fila sale más corta.
+    let candidates: HTMLElement[] = [];
+    const layout = () => {
+      all.forEach(({ s }) => { s.style.paddingInline = ''; });
+      const probe = all[0].s;
+      if (!probe.isConnected) rows[0].appendChild(probe);
+      const ps = getComputedStyle(probe);
+      ctx = ctx || document.createElement('canvas').getContext('2d');
+      if (!ctx) return;
+      ctx.font = `${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
+      const pad = parseFloat(ps.paddingLeft) * 2 + 3; // relleno + borde + holgura
+      const width = (t: string) => Math.ceil(ctx!.measureText(t).width + pad);
+      // En las columnas laterales el chip ya tiene ancho fijo: si ninguna señal cabe con su
+      // relleno normal, se admite una con relleno de 10 px antes de dejar el hueco vacío.
+      const ajuste = Math.max(0, parseFloat(ps.paddingLeft) * 2 - 20);
+      // Las medidas se leen del mosaico (las escalas por ancho de tarjeta, @container, viven ahí).
+      const ws = getComputedStyle(wall);
+      const gap = parseFloat(ws.getPropertyValue('--sc-gap')) || 8;
+      const cap = parseFloat(ws.getPropertyValue('--sc-col')) || 180;
+
+      all.forEach(({ s }) => { s.remove(); s.classList.remove('is-lit', 'is-on'); s.style.width = ''; });
+      wall.querySelectorAll('.wo-scan__gap').forEach((g) => g.remove());
+      rows.forEach((r) => r.classList.remove('is-vacia'));
+      const free = new Set(sig);
+      const pick = (max: number, preferShort = false, tight = 0) => {
+        const order: ('long' | 'short')[] = preferShort ? ['short', 'long'] : ['long', 'short'];
+        for (const k of order) for (const x of sig) {
+          if (!free.has(x)) continue;
+          const w = width(x[k]) - tight;
+          if (w <= max) { free.delete(x); x.s.textContent = x[k]; return { x, w }; }
+        }
+        return null;
+      };
+      const obstacles = [el.querySelector('.w-example'), host.querySelector('.w-loop-pause')]
+        .filter((o): o is Element => !!o && !(o as HTMLElement).hidden)
+        .map((o) => { const r = o.getBoundingClientRect(); return new DOMRect(r.left - 6, r.top - 6, r.width + 12, r.height + 12); });
+
+      // 1) lados de la caja (lo más nítido), fila a fila: izquierda y derecha.
+      const lados = rows.filter((r) => r.classList.contains('wo-scan__row--lados'));
+      for (const r of lados) {
+        for (const side of r.querySelectorAll<HTMLElement>('.wo-scan__lado')) {
+          const sr = side.getBoundingClientRect();
+          const k = Math.max(1, Math.round(sr.width / cap));
+          const colW = Math.floor((sr.width - (k - 1) * gap) / k);
+          for (let j = 0; j < k; j++) {
+            const x0 = sr.left + j * (colW + gap);
+            const slot = new DOMRect(x0, sr.top, colW, sr.height);
+            const libre = !obstacles.some((o) => rectsOverlap(slot, o));
+            const normal = libre ? pick(colW, colW < cap * 0.7) : null;
+            const p = normal || (libre ? pick(colW, true, ajuste) : null);
+            if (p && !normal) p.x.s.style.paddingInline = '10px';
+            const n: HTMLElement = p ? p.x.s : Object.assign(document.createElement('i'), { className: 'wo-scan__gap' });
+            n.style.width = `${colW}px`;
+            side.appendChild(n);
+          }
+        }
+      }
+      // 2) filas anchas: las de dentro antes que las del borde; cada pareja (dentro, borde) se llena a la
+      //    par (chip a chip) para que arriba y abajo queden equilibradas.
+      const anchas = rows.filter((r) => r.classList.contains('wo-scan__row--ancha'));
+      const fila = (r: HTMLElement) => {
+        const rr = r.getBoundingClientRect();
+        const cs = getComputedStyle(r);
+        const left = rr.left + parseFloat(cs.paddingLeft);
+        let right = rr.right - parseFloat(cs.paddingRight);
+        obstacles.forEach((o) => { if (o.top < rr.bottom && o.bottom > rr.top && o.left < right) right = Math.min(right, o.left); });
+        return { r, room: rr.width ? right - left : 0, used: 0, chips: [] as { s: HTMLElement; w: number }[] };
+      };
+      const put = (f: ReturnType<typeof fila>) => {
+        const p = pick(f.room - (f.used ? f.used + gap : 0));
+        if (!p) return false;
+        f.used = f.used ? f.used + gap + p.w : p.w;
+        f.chips.push({ s: p.x.s, w: p.w });
+        f.r.appendChild(p.x.s);
+        return true;
+      };
+      const dentro = [anchas[1], anchas[2]].filter(Boolean).map(fila);
+      for (let more = true; more;) { more = false; for (const f of dentro) more = put(f) || more; }
+      const borde = [anchas[0], anchas[3]].filter(Boolean).map(fila);
+      for (let more = true; more;) { more = false; for (const f of borde) more = put(f) || more; }
+      // Si las señales no llegan a las dos filas del borde (tarjeta muy ancha), salen las dos:
+      // el muro sigue centrado en la caja y no queda una fila vacía.
+      if (borde.length === 2 && borde.some((f) => !f.chips.length)) {
+        borde.forEach((f) => { f.chips.forEach(({ s }) => s.remove()); f.chips = []; f.r.classList.add('is-vacia'); });
+      }
+      // Lo que sobra en cada fila se reparte entre sus chips (celdas algo más anchas, como el
+      // muro del original), con tope, para que la fila llegue al filo de la máscara.
+      for (const f of [...dentro, ...borde]) {
+        const left = f.room - f.used;
+        if (!f.chips.length || left <= 0 || left > f.room * 0.45) continue;
+        const extra = Math.min(left / f.chips.length, Math.min(...f.chips.map((c) => c.w)) * 0.6);
+        f.chips.forEach((c) => { c.s.style.width = `${Math.floor(c.w + extra)}px`; });
+      }
+
+      const card = el.getBoundingClientRect();
+      candidates = [];
+      for (const { s } of all) {
+        if (!s.isConnected) continue;
+        const r = s.getBoundingClientRect();
+        const cx = (r.left + r.right) / 2 - (card.left + card.width / 2);
+        const cy = (r.top + r.bottom) / 2 - (card.top + card.height / 2);
+        // a encender: dentro de la zona nítida (la máscara funde la derecha y los bordes)
+        if (cx < card.width * 0.3 && (cx / (card.width * 0.44)) ** 2 + (cy / (card.height * 0.4)) ** 2 < 1) candidates.push(s);
+      }
+      // Movimiento reducido: cada nuevo reparto (redimensión, fuentes, botón) vuelve a dejar
+      // 3 chips encendidos; sin esto el relayout los apagaba.
+      if (el.classList.contains('is-still')) { lastLit = []; light(3, true); }
+    };
+
+    let lastLit: HTMLElement[] = [];
+    const light = (n: number, still = false) => {
+      const pool = candidates.filter((c) => !lastLit.includes(c));
+      const chosen: HTMLElement[] = [];
+      while (chosen.length < n && pool.length) chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+      lastLit = chosen;
+      chosen.forEach((c, i) => {
+        if (still) { c.classList.add('is-on'); return; }
+        c.classList.remove('is-lit');
+        c.style.setProperty('--d', `${i * 380}ms`);
+        void c.offsetWidth; // reinicia la animación
+        c.classList.add('is-lit');
+      });
+    };
+
+    let ro: ResizeObserver | null = null;
+    let raf = 0;
+    const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
+    layout();
+    (document as any).fonts?.ready?.then(relayout);
+    if ('ResizeObserver' in window) { ro = new ResizeObserver(relayout); ro.observe(el); }
+
+    // El chip se apaga al terminar SU animación (con la pausa puesta se queda como está).
+    wall.addEventListener('animationend', (e) => {
+      if (e.animationName === 'wo-scan-lit-t') (e.target as HTMLElement).classList.remove('is-lit');
+    });
+    // Cada pasada de la barra enciende 2 chips.
+    bar.addEventListener('animationstart', () => light(2));
+    bar.addEventListener('animationiteration', () => light(2));
+
+    const ctl = registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); el.querySelectorAll('.is-on').forEach((c) => c.classList.remove('is-on')); el.classList.add('is-run', 'is-playing'); },
+      stop: () => el.classList.remove('is-playing'),
+      still: () => { el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); requestAnimationFrame(layout); },
+    }, { lang, buttonHost: host });
+    relayout(); // el botón de pausa ya existe: quitar los chips que pisa
+    void ctl;
+
+    // Formulario en la misma sección (diagnóstico): se pausa mientras el visitante escribe.
+    // El foco programático al cargar no cuenta: solo tras un toque o una tecla del visitante.
+    const section = el.closest('section');
+    const sel = el.dataset.woScanPausar;
+    if (section) {
+      const field = (t: EventTarget | null) => t instanceof Element && !el.contains(t) &&
+        (sel ? !!t.closest(sel) && section.querySelector(sel)?.contains(t) : t.matches('input, select, textarea, [contenteditable]'));
+      let user = false;
+      const mark = () => { user = true; };
+      section.addEventListener('pointerdown', (e) => { mark(); if (field(e.target)) el.classList.add('is-held'); }, true);
+      section.addEventListener('keydown', mark, true);
+      section.addEventListener('focusin', (e) => { if (user && field(e.target)) el.classList.add('is-held'); });
+      section.addEventListener('focusout', (e) => {
+        if (field(e.relatedTarget)) return;
+        el.classList.remove('is-held');
+      });
+    }
+  }
+
+  const init = () => document.querySelectorAll<HTMLElement>('[data-wo-scan]').forEach(setup);
+  init();
 </script>
 
-<style>
+<style is:global>
+  /* is:global: sin atributos de ámbito en cada chip (peso del HTML); todo va bajo .wo-scan. */
   .wo-scan {
     --gold: var(--accent-gold-rgb);
-    --bw: 250px; --bh: 172px; --travel: calc(var(--bh) - 36px);
+    /* medidas por tamaño (hero por defecto; ver --mini / --card) */
+    --sc-bw: 250px; --sc-bh: 172px; --sc-air: 24px;
+    --sc-ch: 49px; --sc-gap: 12px; --sc-px: 22px; --sc-fs: 16px; --sc-r: 12px;
+    --sc-bar: 132px; --sc-pad: 32px; --sc-col: 210px;
+    --sc-travel: calc(var(--sc-bh) - 34px);
     position: relative; overflow: hidden; isolation: isolate;
-    width: 100%; min-height: 480px; padding: 64px;
+    container: wo-scan / inline-size; /* escalas por ancho de TARJETA (ver "Tamaños") */
+    width: 100%; min-height: 480px;
     border-radius: 48px;
     background: var(--w-s1);
     border: 1px solid var(--w-line);
     box-shadow: var(--w-edge);
-    display: grid; place-items: center;
     font-family: var(--font-body);
   }
   .wo-scan__sr {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
+
+  /* ── Mosaico (W-ADV-45): 7 filas; la del medio a la altura de la caja. Filas anchas desde
+     el margen izquierdo común; lados en columnas de ancho fijo pegadas a la caja (el guion
+     fija el ancho). Máscara: nítido a la izquierda y en el centro, se pierde por la derecha
+     y se suaviza arriba y abajo. ── */
   .wo-scan__wall {
-    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;
-    -webkit-mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
-    mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
+    position: absolute; left: 0; right: 0; top: 50%;
+    display: flex; flex-direction: column; gap: var(--sc-gap);
+    transform: translateY(-50%);
+    -webkit-mask-image: linear-gradient(90deg, #000 62%, rgba(0,0,0,.16) 100%), linear-gradient(180deg, rgba(0,0,0,.5) 0, #000 26%, #000 74%, rgba(0,0,0,.5) 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, #000 62%, rgba(0,0,0,.16) 100%), linear-gradient(180deg, rgba(0,0,0,.5) 0, #000 26%, #000 74%, rgba(0,0,0,.5) 100%);
+    mask-composite: intersect;
   }
-  .wo-scan__row { display: flex; gap: 12px; justify-content: center; margin-left: var(--off); white-space: nowrap; }
-  .wo-scan__chip {
-    flex: none; display: inline-flex; align-items: center; height: 49px; padding: 0 22px;
-    border-radius: 12px; border: 1px solid rgba(var(--star-rgb), .10);
-    background: var(--w-s1);
-    font-size: 16px; color: rgba(var(--star-rgb), .50);
+  .wo-scan__row { display: flex; height: var(--sc-ch); padding-inline: var(--sc-pad); }
+  .wo-scan__row--ancha, .wo-scan__lado {
+    flex-wrap: wrap; overflow: hidden; height: var(--sc-ch); gap: var(--sc-gap); align-content: flex-start;
   }
+  .wo-scan__row--ancha { justify-content: flex-start; }
+  .wo-scan__lado { display: flex; flex: 1 1 0; min-width: 0; }
+  .wo-scan__row--lados { column-gap: calc(var(--sc-bw) + var(--sc-air) * 2); } /* el hueco de la caja */
+  .wo-scan__gap { flex: none; display: block; height: var(--sc-ch); }
+  .wo-scan__row.is-vacia { display: none; } /* filas del borde sin señales (tarjeta muy ancha) */
+
+  .wo-scan__wall span {
+    position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center;
+    height: var(--sc-ch); padding: 0 var(--sc-px); white-space: nowrap; box-sizing: border-box;
+    border-radius: var(--sc-r); border: 1px solid rgba(var(--star-rgb), .14); /* 8 % efectivo */
+    background: none; /* sin fondo propio: señal, no botón */
+    font-size: var(--sc-fs); line-height: 1; color: rgb(var(--star-rgb));
+    opacity: .6; /* texto al 60 % (y el borde con él) */
+  }
+  .wo-scan__wall span::after {
+    content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+    border: 1px solid rgba(var(--gold), .55);
+    background: rgba(var(--gold), .06);
+    opacity: 0;
+  }
+  .wo-scan__wall span.is-lit { animation: wo-scan-lit-t 1.5s linear var(--d, 0ms) both; }
+  .wo-scan__wall span.is-lit::after { animation: wo-scan-lit-b 1.5s linear var(--d, 0ms) both; }
+  .wo-scan:not(.is-playing) .wo-scan__wall span.is-lit,
+  .wo-scan:not(.is-playing) .wo-scan__wall span.is-lit::after,
+  .wo-scan.is-held .wo-scan__wall span.is-lit,
+  .wo-scan.is-held .wo-scan__wall span.is-lit::after { animation-play-state: paused; }
+  .wo-scan__wall span.is-on { opacity: .9; }
+  .wo-scan__wall span.is-on::after { opacity: 1; }
+  /* de 50-60 % a 90 % en 900 ms (60 % de 1,5 s), y se apaga en 600 ms */
+  @keyframes wo-scan-lit-t { 0% { opacity: .6; } 60% { opacity: .95; } 100% { opacity: .6; } }
+  @keyframes wo-scan-lit-b { 0% { opacity: 0; } 60% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* ── Caja central: web en línea neutra, opaca (los chips no se ven a través, E-37) ── */
   .wo-scan__box {
-    position: relative; z-index: 1; width: var(--bw); height: var(--bh); overflow: hidden;
+    position: absolute; z-index: 1; left: 50%; top: 50%;
+    width: var(--sc-bw); height: var(--sc-bh);
+    margin: calc(var(--sc-bh) / -2) 0 0 calc(var(--sc-bw) / -2);
+    overflow: hidden;
     border-radius: 12px; border: 1px solid rgba(var(--gold), .85);
     background: #2d291f; /* oro al 15 % sobre la bandeja, opaco */
-    box-shadow: 0 0 0 6px var(--w-s1), 0 0 28px rgba(var(--gold), .18);
+    box-shadow: 0 0 28px rgba(var(--gold), .16);
   }
   .wo-scan__box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .wo-scan__box svg * { fill: none; stroke: rgba(var(--gold), .75); stroke-width: 1.4; }
-  .wo-scan__box svg circle { fill: rgba(var(--gold), .75); stroke: none; }
+  .wo-scan__web { fill: none; stroke: rgba(var(--gold), .78); stroke-width: 1.4; stroke-linecap: round; }
+  .wo-scan__fino { fill: none; stroke: rgba(var(--gold), .42); stroke-width: 1.1; stroke-linecap: round; }
+  .wo-scan__cota { fill: none; stroke: rgba(var(--star-rgb), .38); stroke-width: .9; stroke-dasharray: 2 2; }
+  .wo-scan__dots { fill: rgba(var(--gold), .75); }
+
   .wo-scan__bar {
-    position: absolute; left: 50%; bottom: 14px; width: 132px; height: 10px; margin-left: -66px;
+    position: absolute; left: 50%; bottom: 12px; width: var(--sc-bar); height: 10px;
+    margin-left: calc(var(--sc-bar) / -2);
     border-radius: 5px; background: var(--accent-gold);
     box-shadow: 0 0 14px rgba(var(--gold), .45);
-    transform: translateY(calc(var(--travel) / -2)); /* quieto: a media altura */
+    transform: translateY(calc(var(--sc-travel) / -2)); /* quieto: a media altura */
   }
   .wo-scan__bar::after {
-    content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 36px;
+    content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 34px;
     background: linear-gradient(180deg, rgba(var(--gold), .22), transparent);
     border-radius: 0 0 6px 6px;
   }
-  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 1.8s var(--w-ease-ui) infinite; animation-play-state: paused; }
-  .wo-scan.is-run.is-playing .wo-scan__bar { animation-play-state: running; }
-  .wo-scan.is-once .wo-scan__bar { animation: wo-scan-once 1.8s var(--w-ease-ui) 1 both; }
-  @keyframes wo-scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(var(--travel) * -1)); } }
-  @keyframes wo-scan-once {
-    0% { transform: translateY(0); }
-    70% { transform: translateY(calc(var(--travel) * -1)); }
-    100% { transform: translateY(calc(var(--travel) / -2)); }
+  /* 1,8 s de barrido + 0,6 s de pausa arriba (2,4 s); vuelve abajo apagada y entra */
+  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 2.4s linear infinite; animation-play-state: paused; }
+  .wo-scan.is-run.is-playing:not(.is-held) .wo-scan__bar { animation-play-state: running; }
+  @keyframes wo-scan-sweep {
+    0% { transform: translateY(0); opacity: 0; animation-timing-function: var(--w-ease-ui, cubic-bezier(.4, 0, .2, 1)); }
+    4% { opacity: 1; }
+    75% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 1; }
+    92% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 1; }
+    100% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 0; }
   }
-  .wo-scan--compacto { --bw: 184px; --bh: 126px; min-height: 300px; padding: 24px; border-radius: 22px; }
-  .wo-scan--compacto .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
-  .wo-scan--compacto .wo-scan__wall, .wo-scan--compacto .wo-scan__row { gap: 10px; }
-  .wo-scan--compacto .wo-scan__bar { width: 96px; margin-left: -48px; bottom: 10px; }
-  /* E-18: el mosaico compacto empieza debajo de la franja de "Ejemplo" (pisaba la fila de arriba). */
-  .wo-scan--compacto .wo-scan__wall { top: 44px; }
+
+  /* ── Tamaños ── */
+  .wo-scan--card {
+    --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+    --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+    --sc-pad: 24px; --sc-col: 180px;
+    min-height: 400px; border-radius: 32px;
+  }
+  .wo-scan--mini {
+    --sc-bw: 160px; --sc-bh: 110px; --sc-air: 12px;
+    --sc-ch: 30px; --sc-gap: 6px; --sc-px: 13px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 88px; /* 7 filas = 246 de 300: 27 px de aire */
+    --sc-pad: 24px; --sc-col: 160px;
+    --sc-travel: calc(var(--sc-bh) - 30px);
+    min-height: 300px; border-radius: 24px;
+  }
+  .wo-scan--mini .wo-scan__bar { bottom: 10px; height: 8px; }
+  .wo-scan--mini .wo-scan__bar::after { top: 8px; height: 26px; }
+
+  /* Móvil (E-18): caja más estrecha y chips más bajos para que el mosaico siga rodeándola
+     con sus 7 filas; mismo alto de tarjeta que la v1 (236 mini, 360 hero/card). */
   @media (max-width: 767.98px) {
-    .wo-scan { min-height: 360px; padding: 24px; border-radius: 22px; --bw: 200px; --bh: 138px; }
-    .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
-    .wo-scan__bar { width: 104px; margin-left: -52px; }
-    /* E-18: el botón de pausa del bucle tiene su franja; el mosaico termina encima. */
-    .wo-scan--loop { padding-bottom: 76px; }
-    .wo-scan--loop .wo-scan__wall { bottom: 64px; }
-    /* E-18: lo mismo arriba para "Ejemplo": el mosaico empieza debajo de su franja (se montaba
-       sobre el chip "Formulario de contacto"). */
-    .wo-scan { padding-top: 56px; }
-    .wo-scan__wall { top: 46px; }
+    .wo-scan--hero, .wo-scan--card {
+      --sc-bw: 150px; --sc-bh: 104px; --sc-air: 10px;
+      --sc-ch: 32px; --sc-gap: 8px; --sc-px: 10px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 84px;
+      --sc-pad: 16px; --sc-col: 150px;
+      min-height: 360px; border-radius: 24px;
+    }
+    .wo-scan--mini {
+      --sc-bw: 128px; --sc-bh: 88px; --sc-air: 8px;
+      --sc-ch: 25px; --sc-gap: 4px; --sc-px: 9px; --sc-fs: 12px; --sc-r: 7px; --sc-bar: 72px; /* 7 filas = 199 de 236: 18 px de aire */
+      --sc-pad: 14px; --sc-col: 140px;
+      min-height: 236px;
+    }
   }
+  @media (max-width: 359.98px) {
+    .wo-scan--hero, .wo-scan--card {
+      --sc-bw: 116px; --sc-bh: 80px; --sc-air: 6px; --sc-pad: 10px; --sc-bar: 64px;
+      --sc-ch: 30px; --sc-gap: 6px; --sc-px: 8px; --sc-fs: 12px; --sc-r: 7px;
+    }
+    .wo-scan--mini { --sc-bw: 112px; --sc-bh: 78px; --sc-air: 6px; --sc-pad: 10px; --sc-bar: 60px; }
+  }
+
+  /* Hero y card en una columna estrecha de PC (diagnóstico entre ~1000 y ~1250 px: tarjeta de
+     450 a 570): la escala la manda el ancho de la TARJETA, no el de la ventana, para que a cada
+     lado de la caja quepa siempre una columna de chips. Las variables se redefinen en los hijos
+     (un @container no puede cambiar al propio contenedor). */
+  @media (min-width: 768px) {
+    @container wo-scan (max-width: 569.98px) {
+      .wo-scan--hero > .wo-scan__wall, .wo-scan--hero > .wo-scan__box {
+        --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+        --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+        --sc-pad: 24px; --sc-col: 180px; --sc-travel: calc(var(--sc-bh) - 34px);
+      }
+    }
+    @container wo-scan (max-width: 489.98px) {
+      .wo-scan--hero > .wo-scan__wall, .wo-scan--hero > .wo-scan__box,
+      .wo-scan--card > .wo-scan__wall, .wo-scan--card > .wo-scan__box {
+        /* caja de mini y chips de 38: la tarjeta sigue midiendo 480 de alto en PC */
+        --sc-bw: 160px; --sc-bh: 110px; --sc-air: 10px;
+        --sc-ch: 38px; --sc-gap: 10px; --sc-px: 12px; --sc-fs: 14px; --sc-r: 9px; --sc-bar: 88px;
+        --sc-pad: 16px; --sc-col: 150px; --sc-travel: calc(var(--sc-bh) - 34px);
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .wo-scan .wo-scan__bar { animation: none; }
+    .wo-scan .wo-scan__bar { animation: none !important; }
+    .wo-scan .wo-scan__wall span.is-lit, .wo-scan .wo-scan__wall span.is-lit::after { animation: none; }
   }
 </style>

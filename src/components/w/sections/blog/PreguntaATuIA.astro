@@ -1,10 +1,20 @@
 ---
-// "Pregúntale a tu IA" (design/rediseno-workos.md §4.8; W-CONT-22). Fila bajo la firma
-// del artículo: rótulo corto a la izquierda y tres enlaces que abren ChatGPT, Claude y
-// Perplexity con la PREGUNTA DEL ARTÍCULO y su dirección escritas. Solo eso: ningún dato
-// del visitante viaja en la URL. Los asistentes se nombran en texto, sin sus logotipos
-// (§1.C); el icono es genérico de Lucide. Se abren en otra pestaña y se avisa.
+// "Pregúntale a tu IA" (v1 §4.8 · v2 G11 "L6"; W-CONT-22 "Explore with AI"). Fila bajo la
+// firma del artículo: rótulo corto a la izquierda y tres enlaces que abren Claude,
+// Perplexity y ChatGPT con la PREGUNTA DEL ARTÍCULO y su dirección escritas. Solo eso:
+// ningún dato del visitante viaja en la URL. Se abren en otra pestaña y se avisa.
+//
+// Marcas (v2 §1.4, uso nominativo, todo por LogoMarca): como en el original, cada enlace
+// lleva la marca del asistente delante de su nombre. Perplexity con su glifo monocromo
+// crema SÓLIDO de 14 px (veredicto "apto" de w/marcas/LICENCIAS.md). ChatGPT en palabra
+// (simple-icons ya no lo trae; decisión §5-2 sin respuesta). Claude también en palabra: el
+// cerrojo de LICENCIAS.md (guía de marca de Anthropic, 2026-11-05) prohíbe su glifo en
+// páginas públicas sin permiso escrito, y la crema ya sería una alteración. Cuando el dueño
+// tenga el permiso, basta con pasar `claude` a { glifo: true } abajo. Orden: Claude
+// primero (el modelo con el que trabajamos de verdad).
 import Icon from '../../../ui/Icon.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import type { MarcaId } from '../../marcas/datos';
 
 interface Props {
   /** La pregunta del artículo (answer.q del frontmatter). */
@@ -15,10 +25,11 @@ interface Props {
 }
 const { question, url, label = 'Pregúntale a tu IA' } = Astro.props;
 const prompt = encodeURIComponent(`Lee esta guía de Marcyan Studio y respóndeme: ${question} ${url}`);
-const tools = [
-  { name: 'ChatGPT', href: `https://chatgpt.com/?q=${prompt}` },
+type Tool = { name: string; href: string; glifo?: MarcaId };
+const tools: Tool[] = [
   { name: 'Claude', href: `https://claude.ai/new?q=${prompt}` },
-  { name: 'Perplexity', href: `https://www.perplexity.ai/search?q=${prompt}` },
+  { name: 'Perplexity', href: `https://www.perplexity.ai/search?q=${prompt}`, glifo: 'perplexity' },
+  { name: 'ChatGPT', href: `https://chatgpt.com/?q=${prompt}` },
 ];
 ---
 <div class="askai">
@@ -27,7 +38,13 @@ const tools = [
     {tools.map((t) => (
       <li>
         <a class="askai__link" href={t.href} target="_blank" rel="noopener noreferrer">
-          <span>Abrir en {t.name}</span>
+          <span class="askai__pre">Abrir en</span>
+          <span class="askai__brand">
+            {t.glifo && <LogoMarca id={t.glifo} size={14} tono="mono" titulo="" class="askai__glyph" />}
+            {t.name === 'ChatGPT'
+              ? <LogoMarca id="chatgpt-texto" size={16} tono="mono" titulo="ChatGPT" class="askai__word" />
+              : <span class="askai__name">{t.name}</span>}
+          </span>
           <Icon name="lucide:arrow-up-right" />
           <span class="askai__sr">(se abre en otra pestaña)</span>
         </a>
@@ -45,16 +62,24 @@ const tools = [
   }
   .askai__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 20px; }
   .askai__link {
-    display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
-    font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--w-ink-80);
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; color: var(--w-ink-60);
     text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  /* La marca: glifo crema sólido + nombre en la voz de las palabras de marca (Space Grotesk
+     600, crema), al mismo alto óptico que "ChatGPT" de LogoMarca. La jerarquía la da el
+     tamaño y el peso, nunca la transparencia del logo (§1.4). */
+  .askai__brand { display: inline-flex; align-items: center; gap: 5px; color: #F0EDE8; }
+  .askai__name {
+    font-family: var(--font-display, 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif);
+    font-weight: 600; font-size: 13.76px; line-height: 1; letter-spacing: -.035em;
   }
   .askai__link :global(svg) {
     width: 14px; height: 14px; color: var(--accent-gold);
     transition: transform var(--w-dur-hover) var(--w-ease-ui);
   }
   @media (--hover-fine) {
-    .askai__link:hover { color: var(--w-ink); }
+    .askai__link:hover { color: var(--w-ink-80); }
     .askai__link:hover :global(svg) { transform: translate(2px, -2px); }
   }
   .askai__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; color: var(--w-ink); }

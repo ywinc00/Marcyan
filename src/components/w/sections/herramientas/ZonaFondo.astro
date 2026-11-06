@@ -1,0 +1,31 @@
+---
+// Zona del fondo de /es/herramientas y /en/tools (v2 §1.3 · G11): F12 "Escaneo", el mismo
+// motivo que el diagnóstico (trama de puntos y una línea de lectura que baja sin parar).
+// La zona envuelve SOLO la cabecera: así el botón de pausa del fondo (WCAG 2.2.2, lo cuelga
+// Fondo.astro al pie de la zona) queda junto al motivo y no 1.700 px más abajo. La capa del
+// fondo mide una pantalla (--wf-alto) y sigue por debajo de la calculadora 1, que sube por
+// encima (position + z-index en el hermano siguiente: una zona aislada se pinta sobre el
+// contenido sin posicionar). La línea arranca bajo la bajada (--wf-obj). Sustituye a
+// SpaceBackdrop (una atmósfera por página).
+import Fondo from '../../fondos/Fondo.astro';
+
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+---
+<div class="wf-zona thz">
+  <Fondo tema="F12" lang={lang} />
+  <slot />
+</div>
+
+<style>
+  /* Medidas tomadas del HTML compilado (W2/diagnostico-blog/informe.md). */
+  .thz > :global(.wf) { --wf-alto: max(100svh, 860px); --wf-obj: 400px; bottom: auto; }
+  @media (max-width: 767.98px) {
+    .thz > :global(.wf) { --wf-obj: 380px; }
+    /* En móvil la bajada ocupa todo el ancho al pie de la zona: la pausa sube a la línea de
+       las migas (centradas y estrechas), a la derecha, sin rozar ningún texto. */
+    .thz > :global(.wf-pausa) { top: 96px; bottom: auto; }
+  }
+  /* Lo que sigue a la zona (las calculadoras) se pinta encima de la capa del fondo. */
+  .thz + :global(*) { position: relative; z-index: 1; }
+</style>

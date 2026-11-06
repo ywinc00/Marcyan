@@ -78,7 +78,7 @@ const spec: KindSpec = {
     {
       component: Proceso,
       id: 'proceso',
-      props: (ctx) => ({ copy: copyOf(ctx).demo, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).demo, city: copyOf(ctx).cityName, lang: ctx.lang }),
     },
 
     // 6 · Capítulo de contraste: dos frases + bento con un objeto por celda.

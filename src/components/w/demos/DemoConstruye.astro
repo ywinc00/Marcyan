@@ -22,10 +22,12 @@ interface Props {
   bloque2: Bloque & { opciones: Opcion[] };
   consola: { comando: string; bloques: ConsolaBloque[]; cierre: string; leyendaTrabajando: string; leyendaLista: string };
   controles?: ControlSet;
+  /** Ciudad de los textos y del teléfono de la web de ejemplo (por defecto Houston, como WebEjemplo). */
+  city?: string;
   id?: string;
   class?: string;
 }
-const { lang, bloque1, bloque2, consola, controles, id, class: cls } = Astro.props;
+const { lang, bloque1, bloque2, consola, controles, id, class: cls, city } = Astro.props;
 const L = lang === 'en';
 const uid = id ?? `dc-${lang}`;
 const num = (n: number) => String(n).padStart(2, '0');
@@ -70,18 +72,18 @@ const [o1, o2, o3] = bloque2.opciones;
         <ConsolaConstruye slot="consola" comando={consola.comando} bloques={consola.bloques} cierre={consola.cierre} />
         <Fragment slot="maqueta">
           <slot name="maqueta">
-            <WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" lang={lang} />
+            <WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" lang={lang} />
           </slot>
         </Fragment>
         <div slot="capa" class="dc-sk" aria-hidden="true" data-dc-sk>
           <div class="dc-sk__in" data-dc-sk-in>
-            <WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="esqueleto" lang={lang} ejemplo={false} />
+            <WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="esqueleto" lang={lang} ejemplo={false} />
           </div>
         </div>
         {o2 && (
           <div slot={`opcion-${o2.id}`} class="dc-ab" data-dc-ab data-i="0">
-            <div class="dc-ab__v is-on" data-dc-ab-v="0"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="antes" lang={lang} /></div>
-            <div class="dc-ab__v" data-dc-ab-v="1"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" estado="lista" lang={lang} /></div>
+            <div class="dc-ab__v is-on" data-dc-ab-v="0"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="antes" lang={lang} /></div>
+            <div class="dc-ab__v" data-dc-ab-v="1"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="lista" lang={lang} /></div>
             <div class="dc-ab__seg" role="radiogroup" aria-label={ab.label} data-dc-ab-g>
               <span class="dc-ab__pill" aria-hidden="true"></span>
               <button type="button" role="radio" aria-checked="true" tabindex="0" data-dc-ab-i="0">{ab.antes}</button>
@@ -91,9 +93,9 @@ const [o1, o2, o3] = bloque2.opciones;
         )}
         {o3 && (
           <div slot={`opcion-${o3.id}`} class="dc-fan">
-            <div class="dc-fan__s dc-fan__s--l"><WebEjemplo marca="plomeria" frame="tarjeta" vista="hero" pagina="servicios" lang={lang} ejemplo={false} /></div>
-            <div class="dc-fan__s dc-fan__s--r"><WebEjemplo marca="plomeria" frame="tarjeta" vista="hero" pagina="contacto" lang={lang} ejemplo={false} /></div>
-            <div class="dc-fan__c"><WebEjemplo marca="plomeria" frame="tarjeta" vista="completa" pagina="inicio" lang={lang} /></div>
+            <div class="dc-fan__s dc-fan__s--l"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="hero" pagina="servicios" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__s dc-fan__s--r"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="hero" pagina="contacto" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__c"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" pagina="inicio" lang={lang} /></div>
           </div>
         )}
         <p slot="leyenda" class="dc-leg" aria-hidden="true" data-dc-leg>
@@ -253,7 +255,18 @@ const [o1, o2, o3] = bloque2.opciones;
     .dc-fan__s--r { transform: translateX(40px) translateY(-6px) rotate(3deg) scale(.95); }
     .dc-ab__seg { top: auto; bottom: 40px; }
     .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: visible; }
+    /* Las tiras de controles desbordan (≤ 400 px de ancho): el borde derecho se desvanece para que se
+       vea que siguen, y el velo se retira al llegar al final donde hay línea de tiempo de scroll. */
+    .dc :global(.pz-rail) {
+      -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--dc-velo)), transparent);
+      mask-image: linear-gradient(90deg, #000 calc(100% - var(--dc-velo)), transparent);
+    }
+    @supports (animation-timeline: scroll()) {
+      .dc :global(.pz-rail) { animation: dc-velo linear both; animation-timeline: scroll(self inline); }
+    }
   }
+  @property --dc-velo { syntax: '<length>'; inherits: false; initial-value: 40px; }
+  @keyframes dc-velo { 0%, 88% { --dc-velo: 40px; } 100% { --dc-velo: 0px; } }
 
   /* Movimiento reducido: estado final; la columna derecha enseña consola y personalizador apilados. */
   @media (prefers-reduced-motion: reduce) and (min-width: 1120px) {

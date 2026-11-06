@@ -11,8 +11,8 @@ import DemoConstruye from '../../demos/DemoConstruye.astro';
 import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
 import type { WebCopy } from '../../../../i18n/w/web';
 
-interface Props { copy: WebCopy['demo']; lang?: 'es' | 'en' }
-const { copy, lang = 'es' } = Astro.props;
+interface Props { copy: WebCopy['demo']; lang?: 'es' | 'en'; city?: string }
+const { copy, lang = 'es', city } = Astro.props;
 const tiers = catalog.find((p) => p.id === 'diseno-web')!.tiers;
 const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 const anclas = [PRICE_ANCHORS.webLanding, PRICE_ANCHORS.webRedesign, PRICE_ANCHORS.web];
@@ -27,6 +27,7 @@ const opciones = tiers.slice(0, 3).map((t, i) => ({
 ---
 <DemoConstruye
   lang={lang}
+  city={city}
   id="dc-web"
   bloque1={{ n: 1, etiqueta: copy.bloque1.etiqueta, titleHtml: copy.bloque1.titulo, texto: copy.bloque1.texto, ventajas: copy.bloque1.ventajas }}
   bloque2={{ n: 2, etiqueta: copy.bloque2.etiqueta, titleHtml: copy.bloque2.titulo, texto: copy.bloque2.texto, opciones }}

@@ -9,7 +9,7 @@
 export const cierreChat = {
   es: {
     reply: 'Con gusto te lo explico. Primero, ¿a qué se dedica tu negocio?',
-    q2: '¿También contestan en inglés?',
+    q2: '¿También contestas en inglés?',
     a2: 'Sí, en español o en inglés, como prefieras.',
     sr: (ask: string) => `Ejemplo: le preguntas a Marcy «${ask}» y te contesta al momento.`,
     // Versión ligera de los hubs: solo el saludo con el que abre el chat.

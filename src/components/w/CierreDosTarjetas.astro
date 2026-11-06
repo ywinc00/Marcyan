@@ -27,7 +27,13 @@ import { t, type Lang } from '../../i18n/ui';
 import Ejemplo from './Ejemplo.astro';
 // Ojo de peso: Astro adjunta el CSS de ChatMarcy (~1,0 KB comprimido) a TODA página que importe
 // este cierre, lo pinte o no (probado también con import dinámico y con import.meta.glob). Por
-// eso los hubs lo cargan aunque usen la versión ligera: [SISTEMA] en el informe de G00.
+// eso los hubs lo cargan aunque usen la versión ligera.
+// DECISIÓN ESCRITA (G00 ronda 1, pendiente de OK del dueño): se ACEPTA esa suma en los hubs
+// (≈ +1,5 KB comprimidos con la versión ligera) solo HASTA G02. Quitarla de verdad exige tocar
+// archivos fuera de G00: que CityHub importe un cierre propio sin ChatMarcy (o partir este
+// componente en dos y cambiar su import en CityHub). G02 lo hace junto con la recuperación de
+// los +10,2 KB de la v1, y mide los hubs sin esta suma. Alternativa si el dueño no lo acepta:
+// sacar la versión ligera de los hubs (tarjeta vacía como antes) baja la suma a ≈ +1,0 KB, no a 0.
 import ChatMarcy from './objetos/ChatMarcy.astro';
 import { cierreChat } from '../../i18n/w/globales';
 

@@ -6,11 +6,14 @@
 // · `art` (opcional) = SVG en cadena (p. ej. silueta de una ciudad): va a todo el
 //   ancho de la tarjeta, anclado abajo, detrás del texto solo en la franja inferior
 //   sin texto (revisión "¿se entiende?" a 1x antes de integrar, E-53).
-// · v2 (G00): la tarjeta que lleva a un hub de ciudad (href …/houston o …/miami, o `city`
-//   explícito) pinta la SILUETA REAL de esa ciudad (la misma vectorizada del pie de su hub,
-//   /assets/{houston,miami}/skyline.svg, E-53) a todo el ancho y anclada abajo, en tinta de
-//   noche contra la luz de la ciudad que sube por detrás. Se pinta como máscara CSS: una sola
-//   descarga (la caché del hub) y sin <img> que lectores ni buscadores tengan que describir.
+// · v2 (G00, ronda 1): la tarjeta que lleva a un hub de ciudad (href …/houston o …/miami, o
+//   `city` explícito) pinta el DIBUJO DE LA CIUDAD del plan, /assets/cities/{houston,miami}.svg
+//   (el mismo de "Sedes": Houston = torres; Miami = hotel Art Déco con palmeras),
+//   que se reconoce a 1x (E-53). La silueta del pie del hub se descartó: a tamaño de tarjeta Miami
+//   era una franja de cajas negras. Desviación anotada: el plan pedía "a todo el ancho", pero el
+//   dibujo es una imagen de 322×235 / 276×249 px; a 450 px de ancho saldría borroso y más alto
+//   que la tarjeta, así que va a su tamaño natural (190 px de alto), apoyado abajo a la derecha.
+//   <img> diferida con alt vacío (decorativa); `lighten` funde su lavado oscuro con la tarjeta.
 // · v2 (G00): cuando la sección va alineada a la izquierda (servicios, `.ws-left`), la rejilla
 //   ocupa todo el ancho del contenido: ya no queda un hueco a la derecha (FI servicios 05).
 import Icon from '../ui/Icon.astro';
@@ -27,6 +30,8 @@ interface Props {
 const { titleHtml, cards, wide, id, class: cls } = Astro.props;
 const titleId = `${id ?? 'perfiles'}-title`;
 // Ciudad de la tarjeta: explícita o la del hub al que enlaza (/es/houston, /en/miami…).
+// Tamaño natural de cada dibujo (el de su PNG interno).
+const CITY_IMG = { houston: { w: 276, h: 249 }, miami: { w: 322, h: 235 } } as const;
 const cityOf = (c: Card) => c.city ?? (c.art ? undefined : (/\/(houston|miami)\/?$/.exec(c.href)?.[1] as Card['city']));
 ---
 <section class:list={['w-prof', cls]} id={id} aria-labelledby={titleId}>
@@ -40,7 +45,7 @@ const cityOf = (c: Card) => c.city ?? (c.art ? undefined : (/\/(houston|miami)\/
         </span>
         <span class="w-prof__link">{c.cta}<span class="w-prof__chev" aria-hidden="true">›</span></span>
         {c.art && <span class="w-prof__art" aria-hidden="true" set:html={c.art} />}
-        {city && <span class:list={['w-prof__city', `w-prof__city--${city}`]} aria-hidden="true"><i></i></span>}
+        {city && <span class:list={['w-prof__city', `w-prof__city--${city}`]} aria-hidden="true"><img src={`/assets/cities/${city}.svg`} alt="" width={CITY_IMG[city].w} height={CITY_IMG[city].h} loading="lazy" decoding="async" /></span>}
       </a>
     ); })}
     {wide && (
@@ -129,29 +134,26 @@ const cityOf = (c: Card) => c.city ?? (c.art ? undefined : (/\/(houston|miami)\/
   /* Sin hueco a la derecha cuando la sección va a la izquierda (servicios). */
   :global(.ws-left) .w-prof__grid { max-width: none; }
 
-  /* Silueta de la ciudad (v2, G00): a todo el ancho, apoyada en el borde de abajo. La luz de la
-     ciudad sube por detrás (oro bajo, como el pie del hub) y la ciudad se recorta en tinta de
-     noche; arriba se funde con la tarjeta para que el texto quede sobre superficie lisa. */
-  .w-prof__card--city { gap: 20px; justify-content: flex-start; }
+  /* Dibujo de la ciudad (v2, G00 ronda 1): debajo del enlace, apoyado en el borde de abajo y a la
+     derecha, a su tamaño natural. Una luz oro baja por detrás, como el pie del hub. */
+  .w-prof__card--city { gap: 16px; justify-content: flex-start; }
   .w-prof__city {
-    position: relative; display: block; margin: auto -24px -24px; pointer-events: none;
-    aspect-ratio: var(--city-ratio);
-    background:
-      radial-gradient(ellipse 64% 125% at var(--glow-x, 56%) 100%, rgba(212, 158, 90, .5), rgba(212, 158, 90, .16) 55%, transparent 80%),
-      linear-gradient(0deg, rgba(180, 130, 72, .22), transparent 75%);
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 38%);
-            mask-image: linear-gradient(180deg, transparent, #000 38%);
+    position: relative; display: flex; justify-content: flex-end; align-items: flex-end;
+    margin: auto -24px -24px; pointer-events: none;
   }
   @media (--md) { .w-prof__city { margin: auto -28px -28px; } }
-  .w-prof__city i {
-    position: absolute; inset: 0; background: var(--w-s0, #0b0b0a);
-    -webkit-mask: var(--city-src) center bottom / cover no-repeat;
-            mask: var(--city-src) center bottom / cover no-repeat;
+  .w-prof__city::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 60% 90% at 72% 100%, rgba(212, 158, 90, .1), transparent 70%);
   }
-  /* Houston entera a lo ancho (alta y estrecha); Miami es ancha y baja: se recorta por los lados
-     para que sus torres se lean a tamaño de tarjeta (como el pie de su hub, `fill`). */
-  .w-prof__city--houston { --city-ratio: 2400 / 1019; --city-src: url('/assets/houston/skyline.svg'); --glow-x: 50%; }
-  .w-prof__city--miami { --city-ratio: 2400 / 760; --city-src: url('/assets/miami/skyline.svg'); --glow-x: 62%; }
+  /* Un punto más de brillo para que el trazo oro se lea a 1x sobre la tarjeta. Miami: el PNG trae
+     en su borde izquierdo un resto de letra cortada; se recorta ese 3 %. */
+  .w-prof__city img {
+    display: block; height: 160px; width: auto; max-width: 100%; mix-blend-mode: lighten;
+    filter: brightness(1.45);
+  }
+  .w-prof__city--miami img { clip-path: inset(0 0 0 3%); }
+  @media (--md) { .w-prof__city img { height: 190px; } }
 
   @media (--motion-reduce) {
     .w-prof__card, .w-prof__link, .w-prof__chev { transition: none; }

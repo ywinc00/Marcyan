@@ -10,6 +10,14 @@
 // · `fixedRow`: fila fija, sin bucle (barrios). Reducir movimiento: 1.ª fila fija.
 // · Móvil: desplazamiento horizontal DENTRO de su caja.
 // Los nombres que se leen (filas, columnas, casillas) van en letra de texto ≥ 13 px (E-40).
+// · v2 (G00, FI ciudades): el encendido ya no es un fundido. Al fundir a la vez el fondo
+//   (noche → crema) y la letra (crema → tinta), a mitad de camino quedaba gris sobre gris y la
+//   fila se leía apagada ("SEO para IA" desaparecía). Ahora el nombre va en dos capas (crema al
+//   80 % y una copia en tinta #0e0e0d, aria-hidden) que NO se funden a la vez que el fondo: la
+//   clara se va en el primer tercio del encendido (con la crema aún por debajo del 35 %) y la
+//   tinta llega en el último (con la crema ya por encima del 65 %); al apagarse, al revés. En
+//   ningún fotograma hay letra gris sobre fondo gris. Solo opacity (§4.6). Se probó una cortina
+//   por celda (scaleX): a mitad de camino la fila se veía troceada, descartada.
 import Icon from '../ui/Icon.astro';
 
 interface CellDef {
@@ -72,7 +80,7 @@ const herePage = en ? 'this page' : 'esta página';
                 <Icon name="lucide:key-round" class="wd-mx__ki wd-mx__ki--on" />
               </span>
             </td>
-            <th scope="row" class="wd-mx__rh"><span>{r.label}</span></th>
+            <th scope="row" class="wd-mx__rh"><span class="wd-mx__rl">{r.label}</span><span class="wd-mx__ink" aria-hidden="true">{r.label}</span></th>
             {Array.from({ length: nCols }, (_, j) => {
               const c = r.cells[j];
               if (!c) return <td class="wd-mx__td"></td>;
@@ -125,11 +133,14 @@ const herePage = en ? 'this page' : 'esta página';
   .wd-mx__row { position: relative; }
   .wd-mx__row > * { position: relative; height: 76px; border-bottom: 1px solid var(--w-line); }
   .wd-mx__row:last-child > * { border-bottom: 0; }
-  /* Fondo CLARO de la fila activa: capa en cada celda que se funde (solo opacidad). */
+  /* Fondo CLARO de la fila activa: capa en cada celda que se funde (solo opacidad, 210 ms);
+     el nombre cambia de capa en los extremos del fundido (ver la cabecera, v2 G00). */
+  .wd-mx { --wd-fade: 210ms; --wd-swap: 50ms; }
   .wd-mx__row > *::before {
     content: ''; position: absolute; inset: 6px 0; background: var(--w-p-bg, #f0ede8);
     box-shadow: inset 0 1px 0 #fff;
-    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui); pointer-events: none; z-index: 0;
+    opacity: 0; transition: opacity var(--wd-fade) linear;
+    pointer-events: none; z-index: 0;
   }
   .wd-mx__row > :first-child::before { left: 84px; border-radius: 12px 0 0 12px; }
   .wd-mx__row > :last-child::before { right: 10px; border-radius: 0 12px 12px 0; }
@@ -157,9 +168,21 @@ const herePage = en ? 'this page' : 'esta página';
   .wd-mx__rh {
     text-align: left; padding: 0 16px 0 12px; white-space: nowrap;
     font-family: var(--font-body); font-weight: 500; font-size: 16px; color: var(--w-ink-80);
-    transition: color var(--w-dur-hover) var(--w-ease-ui);
   }
-  .wd-mx__row.is-on .wd-mx__rh { color: var(--w-p-ink, #0e0e0d); }
+  /* Nombre en dos capas: la clara (en el flujo) y la tinta (encima, absoluta). Cada una cambia en
+     --wd-swap y en el extremo del fundido que le toca: nunca a la vez que la mitad del fondo. */
+  .wd-mx__row > .wd-mx__rh > .wd-mx__rl,
+  .wd-mx__row > .wd-mx__rh > .wd-mx__ink { transition: opacity var(--wd-swap) linear; }
+  .wd-mx__row > .wd-mx__rh > .wd-mx__ink {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    display: flex; align-items: center; padding-left: 12px; color: var(--w-p-ink, #0e0e0d);
+    opacity: 0;
+  }
+  /* Encender: la clara se va al momento; la tinta llega al final. */
+  .wd-mx__row.is-on > .wd-mx__rh > .wd-mx__rl { opacity: 0; }
+  .wd-mx__row.is-on > .wd-mx__rh > .wd-mx__ink { opacity: 1; transition-delay: calc(var(--wd-fade) - var(--wd-swap)); }
+  /* Apagar: la tinta se va al momento; la clara vuelve al final. */
+  .wd-mx__row:not(.is-on) > .wd-mx__rh > .wd-mx__rl { transition-delay: calc(var(--wd-fade) - var(--wd-swap)); }
   .wd-mx__td { text-align: center; padding: 0 10px; }
   .wd-mx__cell {
     position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; vertical-align: middle;
@@ -197,9 +220,11 @@ const herePage = en ? 'this page' : 'esta página';
     .wd-mx__t { min-width: calc(196px + var(--wd-cols) * 62px); }
     .wd-mx__td { padding: 0 6px; }
     .wd-mx__rh { padding-left: 6px; font-size: 15px; }
+    .wd-mx__row > .wd-mx__rh > .wd-mx__ink { padding-left: 6px; }
   }
   @media (--motion-reduce) {
-    .wd-mx__row > *::before, .wd-mx__ki, .wd-mx__kbox::before, .wd-mx__rh, .wd-mx__fill { transition: none; }
+    .wd-mx__row > *::before, .wd-mx__ki, .wd-mx__kbox::before, .wd-mx__fill { transition: none; }
+    .wd-mx__row > .wd-mx__rh > .wd-mx__rl, .wd-mx__row > .wd-mx__rh > .wd-mx__ink { transition: none; }
   }
 </style>
 

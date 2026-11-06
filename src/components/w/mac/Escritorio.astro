@@ -24,7 +24,7 @@ interface Props {
   cursor?: boolean;
   fase?: 'bloqueo' | 'escritorio';
   dia?: boolean;
-  bloqueo?: { fecha: string; hora: string; nombre: string; iniciales: string };
+  bloqueo?: { fecha: string; hora: string; nombre: string };
   class?: string;
 }
 const {
@@ -130,7 +130,7 @@ const MARCA: Partial<Record<DockId, LogoReservaId>> = {
       <p class="esc-bl-fecha">{bloqueo.fecha}</p>
       <p class="esc-bl-hora">{bloqueo.hora}</p>
       <div class="esc-bl-user">
-        <span class="esc-bl-av">{bloqueo.iniciales}</span>
+        <span class="esc-bl-av"><svg width="64" height="64" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="9.6" r="4.3" fill="currentColor" /><path d="M2.8 25c.7-5.5 4.6-8.7 9.2-8.7s8.5 3.2 9.2 8.7z" fill="currentColor" /></svg></span>
         <p>{bloqueo.nombre}</p>
       </div>
     </div>
@@ -273,7 +273,7 @@ const MARCA: Partial<Record<DockId, LogoReservaId>> = {
   .esc-bl-user { position: absolute; left: 0; right: 0; bottom: 92px; display: grid; justify-items: center; gap: 10px; }
   .esc-bl-av {
     display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
-    background: linear-gradient(180deg, #9a9ca6, #6b6d76); font-size: 22px; font-weight: 600; color: #fff;
+    overflow: hidden; background: linear-gradient(180deg, #9a9ca6, #6b6d76); color: rgba(255,255,255,.92);
   }
   .esc-bl-user p { margin: 0; font-size: 17px; font-weight: 600; }
 

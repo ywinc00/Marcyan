@@ -50,7 +50,7 @@ const LogoMarca = Object.values(logoMods)[0]?.default ?? null;
 const T = {
   es: {
     resumen: 'Ejemplo animado: un portátil se abre y muestra, ya funcionando, la web publicada de un salón, su ficha en el mapa, Marcy contestando por WhatsApp y el aviso de nuevo contacto por correo.',
-    negocio: 'Tu Salón', iniciales: 'TS', dominio: 'tusalon.example', ejemplo: 'Ejemplo',
+    negocio: 'Tu Salón', cuenta: 'Tu Negocio', dominio: 'tusalon.example', ejemplo: 'Ejemplo',
     fecha: 'jueves, 5 de noviembre', horaBloqueo: '9:41', horaMenu: 'jue 5 nov  9:41 p. m.',
     apps: { inicio: 'Escritorio', web: 'Navegador', mapa: 'Mapas', wa: 'WhatsApp', correo: 'Correo' },
     publicada: 'Publicada', encuentran: 'Te encuentran', nuevo: 'Nuevo contacto',
@@ -77,7 +77,7 @@ const T = {
   },
   en: {
     resumen: 'Animated example: a laptop opens and shows, already working, a salon’s live website, its map listing, Marcy answering on WhatsApp and the new lead email.',
-    negocio: 'Your Salon', iniciales: 'YS', dominio: 'yoursalon.example', ejemplo: 'Example',
+    negocio: 'Your Salon', cuenta: 'Your Business', dominio: 'yoursalon.example', ejemplo: 'Example',
     fecha: 'Thursday, November 5', horaBloqueo: '9:41', horaMenu: 'Thu Nov 5  9:41 PM',
     apps: { inicio: 'Desktop', web: 'Browser', mapa: 'Maps', wa: 'WhatsApp', correo: 'Mail' },
     publicada: 'Live', encuentran: 'On the map', nuevo: 'New lead',
@@ -120,7 +120,7 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
   <p class="sr-only">{T.resumen}</p>
   <Portatil ancho={ancho} tapa={tapa}>
     <Escritorio lang={lang} cursor app={T.apps.correo} hora={T.horaMenu}
-      bloqueo={{ fecha: T.fecha, hora: T.horaBloqueo, nombre: T.negocio, iniciales: T.iniciales }}>
+      bloqueo={{ fecha: T.fecha, hora: T.horaBloqueo, nombre: T.cuenta }}>
 
       {/* 1 · la web publicada (salón) */}
       <VentanaApp id="web" url={`${T.dominio} · ${T.ejemplo}`} x={56} y={54} w={650} h={520} z={1} chipTop={114} textoCarga={T.cargaWeb}>
@@ -260,7 +260,17 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
     --pt-linea: --abre-vista;
     --pt-rango: cover var(--abre-b) cover calc(var(--abre-b) + var(--abre-rec));
   }
-  @media (min-width: 768px) { .abre[data-tapa="scroll"] { --abre-rec: 450px; --abre-b: 24px; } }
+  @media (min-width: 768px) {
+    .abre[data-tapa="scroll"] {
+      --abre-rec: 450px; --abre-b: 24px;
+      /* Al final del tramo fijado el grupo entero (titular + portátil) cabe bajo la
+         navegación: el ancho del portátil se limita por el alto de la ventana. Alto
+         del portátil ≈ 0,638 × su ancho (tapa 1/1,08 × 933/1415 + base 2,75 %).
+         --abre-cabh = alto del titular con su aire (lo mide el script; 220 sin JS). */
+      --abre-wv: max(600px, calc((100svh - var(--nav-h, 72px) - var(--abre-b) - var(--abre-cabh, 220px) - 20px) / .638));
+    }
+    .abre[data-tapa="scroll"] :global(.pt) { width: min(100%, var(--pt-w), var(--abre-wv)); }
+  }
   /* en móvil queda por encima de la barra fija de CTA del sitio (≈ 72 px + zona segura) */
   .abre[data-tapa="scroll"] .abre-fijo { position: sticky; bottom: var(--abre-b); }
   /* Titular y portátil, un solo grupo: --abre-h = alto de la tapa abierta (ancho del
@@ -283,7 +293,7 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
   }
   @supports (animation-timeline: view()) {
     .abre[data-tapa="scroll"] .abre-cab {
-      --abre-h: calc(min(100cqw, var(--abre-w, 990px)) / 1.08 * 933 / 1415);
+      --abre-h: calc(min(100cqw, var(--abre-w, 990px), var(--abre-wv, 9999px)) / 1.08 * 933 / 1415);
       animation: abre-cab-baja linear both;
       animation-timeline: --abre-vista;
       animation-range: var(--pt-rango);
@@ -477,20 +487,63 @@ const logo = (id: 'googlemaps' | 'whatsapp' | 'gmail', size = 40) => logoReserva
 
     const sec: Secuencia = secuencia(pasos);
     reset();
-    const arranca = () => { reset(); sec.play(); };
+    // Reinicio AL SALIR, no al entrar (I-1 de la ronda 2): cuando el portátil
+    // lleva ≥ 8 s del todo fuera de vista (margen 100 px), se para la secuencia y
+    // se vuelve al bloqueo SIN que se vea; al volver, la tapa enseña el bloqueo y
+    // la secuencia arranca de nuevo. Si vuelve antes de 8 s, se queda como estaba.
+    let armada = true;
+    let tFuera = 0;
+    const arranca = () => { if (!armada) return; armada = false; reset(); sec.play(); };
+    const fuera = () => {
+      clearTimeout(tFuera);
+      tFuera = window.setTimeout(() => { sec.stop(); reset(); armada = true; }, 8000);
+    };
+    const dentro = () => clearTimeout(tFuera);
+    vigilar(pt, { umbral: 0.001, reentradaMs: 0, alEntrar: dentro, alSalir: fuera });
     const vida = (si: boolean) => { esc.classList.toggle('is-pausa', !si); if (!sec.corriendo && esc.dataset.escFase === 'escritorio') esc.classList.toggle('is-vivo', si); };
     // Disparo = fin del giro de la tapa. La tapa termina cuando la pista (alto
     // --abre-rec, al pie de la escena) queda ENTERA por encima de --abre-b (el hueco
     // de la barra fija de CTA en móvil): se observa con ese margen inferior y umbral
     // 0,97, sin listener de scroll. Tapa abierta o sin view(): 35 % del portátil.
+    // reentradaMs 0: cada entrada consulta `armada` (la decide el reinicio al salir).
     const conTapa = raiz.dataset.tapa === 'scroll' && CSS.supports('animation-timeline', 'view()') && pista && pista.offsetHeight > 0;
     if (conTapa) {
-      const fijo = raiz.querySelector<HTMLElement>('.abre-fijo');
-      const b = Math.round(parseFloat(fijo ? getComputedStyle(fijo).bottom : '0') || 0);
-      vigilar(pista!, { umbral: 0.97, margen: `0px 0px ${-b}px 0px`, alEntrar: arranca });
+      const fijo = raiz.querySelector<HTMLElement>('.abre-fijo')!;
+      const obj = raiz.querySelector<HTMLElement>('.abre-obj');
+      // Medidas del grupo fijado: --abre-cabh (alto del titular, limita el ancho del
+      // portátil en escritorio) y, en móvil, --abre-b: el grupo es más bajo que la
+      // ventana y, pegado a la barra de CTA, dejaba ~300 px de negro encima del
+      // titular. Se centra entre la navegación y la barra (nunca por debajo de ella).
+      // Todo lo que usa --abre-b (sticky, rango de la tapa, disparo) lee el mismo valor.
+      let cortaPista: () => void = () => {};
+      let medidaW = 0, medidaH = 0;
+      const medir = () => {
+        medidaW = innerWidth; medidaH = innerHeight;
+        raiz.style.removeProperty('--abre-b');
+        const cabh = obj ? Math.round(obj.getBoundingClientRect().top - fijo.getBoundingClientRect().top) : 0;
+        if (cabh > 0) raiz.style.setProperty('--abre-cabh', `${cabh}px`);
+        if (matchMedia('(max-width: 767px)').matches) {
+          const b0 = parseFloat(getComputedStyle(fijo).bottom) || 0;
+          const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
+          const hueco = innerHeight - nav - b0 - fijo.offsetHeight;
+          if (hueco > 24) raiz.style.setProperty('--abre-b', `${Math.round(b0 + hueco / 2)}px`);
+        }
+        const b = Math.round(parseFloat(getComputedStyle(fijo).bottom) || 0);
+        cortaPista();
+        cortaPista = vigilar(pista!, { umbral: 0.97, margen: `0px 0px ${-b}px 0px`, reentradaMs: 0, alEntrar: arranca });
+      };
+      medir();
+      document.fonts?.ready.then(() => medir());
+      // La barra de direcciones del móvil cambia el alto unos 60-100 px al hacer
+      // scroll: solo se vuelve a medir si cambia el ancho o el alto en más de 120 px.
+      let tMedir = 0;
+      addEventListener('resize', () => {
+        clearTimeout(tMedir);
+        tMedir = window.setTimeout(() => { if (innerWidth !== medidaW || Math.abs(innerHeight - medidaH) > 120) medir(); }, 200);
+      });
       vigilar(pt, { umbral: 0.1, alEntrar: () => {}, vivo: vida });
     } else {
-      vigilar(pt, { umbral: 0.35, alEntrar: arranca, vivo: vida });
+      vigilar(pt, { umbral: 0.35, reentradaMs: 0, alEntrar: arranca, vivo: vida });
     }
   }
 </script>

@@ -83,6 +83,9 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   .mu-fin { padding: 80px 16px; }
   /* solo muestrario: sin corte duro entre el amanecer de dos actos y el negro de AbreApps */
   #abre-apps { background: linear-gradient(180deg, #12302d 0, rgba(18,48,45,.35) 160px, transparent 360px); }
+  /* solo muestrario: con la tapa cerrada el titular ya baja hasta la base; el relleno
+     superior de .mu sumaba 120 px de vacío tras el portátil de dos actos */
+  #abre-apps { padding-top: 0; }
   /* el H2 del segundo DosActos hereda la escala del H1 de la escena */
   #dos-actos-en :global(h2) { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 54px; line-height: 1; letter-spacing: -.035em; }
 </style>

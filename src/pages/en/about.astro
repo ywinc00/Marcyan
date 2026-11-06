@@ -1,9 +1,9 @@
 ---
 // ABOUT · /en/about · v3 (rediseño WorkOS, design/rediseno-workos.md §4.6).
-// Contraste: .w-dawn de la 1.ª sección (la placa encendida). Firma: encendido ÚNICO de la
-// PlacaLogo (no bucle). Degradado: titular del cierre (sin cola, R2).
-// Orden: hero compacto centrado → 1 placa + capítulo + historia → 01 datos → 02 proceso
-// (#proceso) → 03 por qué → 04 sedes (#ciudades) → fundadores → En pocas palabras → FAQ a la
+// Contraste: .w-dawn de la 1.ª sección (el chip encendido). Firma: ChipIA "sello" (v2, P07):
+// encendido ÚNICO y luz por las pistas en bucle mientras está a la vista. Degradado: titular del cierre (sin cola, R2).
+// Orden: hero compacto centrado → 1 chip + capítulo + historia → 01 datos → 02 proceso
+// (#proceso, LineaFases compacta) → 03 por qué → 04 sedes (#ciudades) → fundadores → En pocas palabras → FAQ a la
 // vista (#faq) → salida suave → cierre en dos tarjetas → Contact (#contacto).
 // Schema: AboutPage (→ Organization del @graph) + BreadcrumbList + FAQPage, idénticos a la
 // base. ⚠️ HONESTIDAD: sin nodo Person ni AggregateRating hasta tener el dato real (el
@@ -17,7 +17,7 @@ import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import AboutPageLd from '../../components/seo/AboutPageLd.astro';
 import WStyles from '../../components/w/WStyles.astro';
 import HeroTexto from '../../components/w/HeroTexto.astro';
-import PlacaLogo from '../../components/w/objetos/PlacaLogo.astro';
+import ChipIA from '../../components/w/chip/ChipIA.astro';
 import CapituloDosFrases from '../../components/w/CapituloDosFrases.astro';
 import CabeceraNumerada from '../../components/w/CabeceraNumerada.astro';
 import Especificaciones from '../../components/w/Especificaciones.astro';
@@ -29,6 +29,7 @@ import Fundadores from '../../components/w/sections/sobre/Fundadores.astro';
 import SalidaSuave from '../../components/w/sections/sobre/SalidaSuave.astro';
 import Proceso from '../../components/w/sections/sobre/Proceso.astro';
 import Sedes from '../../components/w/sections/sobre/Sedes.astro';
+import { fasesDe } from '../../components/w/proceso/proceso';
 import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { sobreNosotros as a } from '../../i18n/sobre-nosotros.en';
@@ -38,7 +39,7 @@ const lang = 'en' as const;
 const c = content[lang];
 const t = sobreCopy[lang];
 const plain = (s: string) => s.replace(/<br\s*\/?>/gi, ' ').replace(/<\/?em>/gi, '').replace(/\s+/g, ' ').trim();
-const fases = c.process.steps.map((s: { n: string; title: string; desc: string }) => ({ phase: `${t.proceso.step} ${s.n}`, block: s.title, gets: s.desc }));
+const fases = fasesDe(c.process.steps);
 const razones = a.values.items.map((v) => ({ icon: v.icon, title: v.title, text: v.desc })) as [any, any, any, any];
 const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
@@ -92,10 +93,10 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
       </div>
     </section>
 
-    {/* 1 · Contraste .w-dawn: la placa con el logo de empresa se enciende una vez. */}
+    {/* 1 · Contraste .w-dawn: el chip con el logo de empresa se enciende una vez (ChipIA sello). */}
     <section class="w-cell w-dawn wsb-story">
       <div class="w-container">
-        <PlacaLogo lang="en" size="hero" class="wsb-plate" />
+        <ChipIA variante="sello" lang="en" class="wsb-chip" />
         <div data-w-reveal>
           <CapituloDosFrases tone1={t.capitulo.tone1} tone2={t.capitulo.tone2} />
           <div class="wsb-prose">
@@ -117,7 +118,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
         lista + bandeja con dos objetos de producto (patrón del piloto, rev1 E-54/E-01). */}
     <section class="w-cell" id="proceso">
       <div class="w-container" data-w-reveal>
-        <Proceso n={2} label={t.proceso.label} titleHtml={t.proceso.title} lead={t.proceso.lead} rows={fases} headers={t.proceso.headers} lang="en" />
+        <Proceso n={2} label={t.proceso.label} titleHtml={t.proceso.title} lead={t.proceso.lead} fases={fases} lang="en" />
       </div>
     </section>
 
@@ -198,19 +199,33 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 </Layout>
 
 <style>
-  .wsb-hero { padding-bottom: 72px; }
+  /* El chip (sello) entra ENTERO en la primera pantalla (1366×768 a 1920×1080 y 390×844): se
+     enciende a la vista y no a medias bajo el pliegue. La placa ya funde por arriba. */
+  .wsb-hero { padding-bottom: 24px; }
   .wsb-hero :global(.w-lead) { text-wrap: balance; }
-  .wsb-story { padding-top: 56px; }
-  .wsb-story :global(.wsb-plate) { margin-bottom: 64px; }
+  /* :root[data-ds] .w-cell (0,3,0) pisaba este relleno desde la v1: se sube la especificidad. */
+  :global(:root[data-ds="v3"]) .wsb-story { padding-top: 16px; }
+  .wsb-story :global(.wsb-chip) { margin-bottom: 24px; }
+  /* Portátil bajo (1366×768): el chip no entraba (asomaba la placa). Hero 32 px más corto arriba,
+     sello a 150 (el tamaño de móvil) y sin el relleno superior de la sección: el chip entra entero. */
+  @media (min-width: 768px) and (max-height: 820px) {
+    :global(:root[data-ds="v3"]) .wsb-hero { padding-top: calc(var(--nav-h) + 40px); }
+    :global(:root[data-ds="v3"]) .wsb-story { padding-top: 0; }
+    .wsb-story :global(.wsb-chip.chipia--sello) { --k: calc(150 / 220); }
+  }
+  /* Portátil muy bajo (1280×720): aún faltaban unos 24 px; el hero se acorta otros 24 arriba. */
+  @media (min-width: 768px) and (max-height: 740px) {
+    :global(:root[data-ds="v3"]) .wsb-hero { padding-top: calc(var(--nav-h) + 12px); }
+  }
   .wsb-prose { max-width: 680px; margin: 56px auto 0; }
   .wsb-prose p { margin: 0 0 20px; font: 400 18px/1.65 var(--font-body); color: var(--w-ink-80); }
   .wsb-prose p:last-child { margin-bottom: 0; }
   .wsb-prose :global(strong) { color: var(--w-ink); font-weight: 500; }
   .wsb-gap { margin-top: var(--w-chapter-gap); }
   @media (--lt-md) {
-    .wsb-hero { padding-bottom: 64px; }
-    .wsb-story { padding-top: 48px; }
-    .wsb-story :global(.wsb-plate) { margin-bottom: 48px; }
+    .wsb-hero { padding-bottom: 24px; }
+    :global(:root[data-ds="v3"]) .wsb-story { padding-top: 8px; }
+    .wsb-story :global(.wsb-chip) { margin-bottom: 16px; }
     .wsb-prose { margin-top: 40px; }
     .wsb-prose p { font-size: 16px; }
     .wsb-gap { margin-top: 40px; }

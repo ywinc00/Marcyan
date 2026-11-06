@@ -162,7 +162,10 @@ const C = T.correo;
   }
   .lf__n { display: block; margin-bottom: 12px; font: 500 12px/12px var(--font-mono); letter-spacing: .1em; color: var(--accent-gold); }
   .lf__t { margin: 0 0 10px; font: 500 24px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--w-ink, #f0ede8); }
-  .lf__b { all: unset; cursor: pointer; border-radius: 4px; }
+  .lf__b { all: unset; cursor: pointer; border-radius: 4px; position: relative; }
+  /* Área táctil ≥ 44 px (§4.4) sin mover el texto: la línea mide 29 px y el ::after la amplía
+     8 px arriba y abajo (y 4 a los lados). Invisible y sin pintar nada. */
+  .lf__b::after { content: ''; position: absolute; inset: -8px -4px; }
   .lf__b:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .lf__x { margin: 0; max-width: 420px; font-size: 16px; line-height: 26px; color: var(--w-ink-70, rgba(240,237,232,.7)); }
   .lf[data-w2-on] .lf__paso { opacity: .55; transition: opacity 400ms ease; }

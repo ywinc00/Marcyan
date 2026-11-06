@@ -11,7 +11,7 @@ export interface SobreCopy {
   hero: { lead: string; chip: string; primary: string; link: string; linkHref: string };
   capitulo: { tone1: string; tone2: string };
   datos: { label: string; title: string; lead: string; cells: { k: string; v: string; note: string }[] };
-  proceso: { label: string; title: string; lead: string; headers: [string, string, string]; step: string };
+  proceso: { label: string; title: string; lead: string };
   razones: { label: string; lead?: string };
   sedes: { label: string; title: string; lead: string; more: string; call: string };
   fundadores: { checks: [string, string, string]; cta: string; aria: string };
@@ -48,8 +48,6 @@ const es: SobreCopy = {
     label: 'Cómo es un proyecto',
     title: 'Del concepto al lanzamiento',
     lead: 'Cinco pasos, con los precios sobre la mesa desde el primero.',
-    headers: ['Paso', 'Qué hacemos', 'Qué recibes'],
-    step: 'Paso',
   },
   razones: { label: 'Por qué Marcyan' },
   sedes: {
@@ -112,8 +110,6 @@ const en: SobreCopy = {
     label: 'What a project looks like',
     title: 'From idea to launch',
     lead: 'Five steps, with pricing on the table from the first one.',
-    headers: ['Step', 'What we do', 'What you get'],
-    step: 'Step',
   },
   razones: { label: 'Why Marcyan' },
   sedes: {

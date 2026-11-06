@@ -8,6 +8,8 @@
 // y rotulado. Estático (la respuesta del asistente se escribe una vez al entrar).
 // v2 (G08): antes/después, listados y mesa con QR pasan a ObjetoFila.astro (productos de las marcas
 // de ejemplo); la respuesta del asistente es la de P05 (con logos) y la web, WebEjemplo de P02a.
+// Ronda 1: la respuesta del asistente cita la marca de ejemplo del oficio (Tu Plomería, Tu Inmobiliaria),
+// no "Tu Negocio" (I5); la fila de fotos de restaurants enseña platos de verdad dibujados (B2, `platos`).
 // Alternancia: el DOM siempre es objeto → texto (el objeto es ilustración aria-hidden, sin
 // nada que enfocar); en escritorio las filas pares colocan el objeto a la derecha con la
 // rejilla, sin `order`. Móvil: objeto arriba, texto debajo (W-CORE-21).
@@ -15,15 +17,16 @@ import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Icon from '../../../ui/Icon.astro';
 import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
 import ChatMarcy from '../../objetos/ChatMarcy.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
 import ObjetoFila from './ObjetoFila.astro';
+import { negocios, type NegocioId } from '../../objetos/ejemplos/negocios';
 import type { FeatureItem } from '../../../../i18n/clusters';
-import type { SectorCopy } from '../../../../i18n/w/sector';
+import type { SectorCopy, SectorObj } from '../../../../i18n/w/sector';
 
-interface Props { copy: SectorCopy['filas']; n: number; items: FeatureItem[]; lang?: 'es' | 'en' }
-const { copy, n, items, lang = 'es' } = Astro.props;
+interface Props { copy: SectorCopy['filas']; n: number; items: FeatureItem[]; oficio: SectorObj; lang?: 'es' | 'en' }
+const { copy, n, items, oficio, lang = 'es' } = Astro.props;
 const en = lang === 'en';
-const biz = en ? 'Your Business' : 'Tu Negocio';
+const NEGOCIO: Record<SectorObj, NegocioId> = { contratista: 'plomeria', inmobiliaria: 'inmobiliaria', restaurante: 'restaurante' };
+const biz = negocios[NEGOCIO[oficio]].nombre[lang];
 const T = en
   ? { loc: { t: 'Today', s: 'East End · 11 AM to 3 PM' } }
   : { loc: { t: 'Hoy', s: 'East End · de 11 a. m. a 3 p. m.' } };
@@ -41,9 +44,9 @@ const pad = (k: number) => String(k).padStart(2, '0');
           {row.obj === 'chat' && (
             <ChatMarcy mode="estatico" tone="neutral" lang={lang} size="card" tabs={[copy.chat]} sr={copy.chatSr} />
           )}
-          {row.obj === 'web-restaurante' && (
+          {row.obj === 'platos' && (
             <div class="sf-web">
-              <WebEjemplo kind="restaurante" frame="movil" lang={lang} city="Houston" size="card" />
+              <ObjetoFila kind="platos" lang={lang} />
               <p class="sf-loc" aria-hidden="true"><Icon name="lucide:map-pin" /><span><b>{T.loc.t}</b>{T.loc.s}</span></p>
             </div>
           )}
@@ -84,7 +87,7 @@ const pad = (k: number) => String(k).padStart(2, '0');
     mask-image: linear-gradient(180deg, #000 30%, transparent);
     pointer-events: none;
   }
-  .sf__obj { position: relative; width: 100%; display: flex; justify-content: center; }
+  .sf__obj { position: relative; width: 100%; min-width: 0; display: flex; justify-content: center; }
 
   .sf__text { min-width: 0; max-width: 480px; }
   .sf__n {
@@ -119,9 +122,10 @@ const pad = (k: number) => String(k).padStart(2, '0');
   /* Ubicación de hoy (food trucks): ficha clara pegada al teléfono, fuera de su pantalla. */
   .sf-web { position: relative; display: flex; justify-content: center; }
   .sf-loc {
-    position: absolute; right: calc(50% - 196px); bottom: 64px; margin: 0;
+    position: absolute; right: calc(50% - 196px); top: 52px; margin: 0;
     display: flex; align-items: center; gap: 10px; padding: 10px 14px;
     background: #fff; color: var(--w-p-ink); border: 1px solid var(--w-p-line); border-radius: var(--w-r-obj);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .35);
     font-family: var(--font-body); font-size: 13px; white-space: nowrap;
   }
   .sf-loc :global(svg) { width: 18px; height: 18px; color: #8a4a30; flex: none; }

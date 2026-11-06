@@ -11,11 +11,15 @@
 // Va dentro de TarjetaObjeto (W-CORE-16): `band` llena la franja de puntos, el resto el cuerpo.
 // Contrato §1.6: dentro no hay h1-h6, ni tel:/wa.me/data-track ("Responder" y "Order on WhatsApp"
 // son span); la tarjeta ya es aria-hidden con su sr; aquí data-nosnippet.
+// Ronda 1: la casa lleva su "foto" dibujada (CasaIlustrada, I2); la pantalla de bloqueo gana su pie
+// (linterna, cámara y barra de inicio) y la notificación LLEGA después de la tarjeta (M2); el icono de app
+// suma la brida de entrada del codo para leerse como tubería y no como un gancho (M3).
 // Vida (§1.5, demo con guion): entra UNA vez al cruzar el 35 % (cascada de 90 ms, 520 ms
 // cubic-bezier(.22,1,.36,1), solo transform/opacity) y se queda con micro-vida (punto que late
 // 2 s); al salir ≥ 8 s y volver, se reproduce de nuevo. Sin JS o con reducir movimiento: final.
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import LogoMarca from '../../marcas/LogoMarca.astro';
+import CasaIlustrada from './CasaIlustrada.astro';
 
 interface Props { kind: 'contratista' | 'inmobiliaria' | 'restaurante'; lang?: 'es' | 'en'; parte: 'band' | 'body' }
 const { kind, lang = 'es', parte } = Astro.props;
@@ -28,13 +32,14 @@ const C = {
     ? { casa: 'Oak House', zona: 'Katy · TX', datos: ['3 bd', '2 ba', '1,850 sq ft'], msg: 'Is it still available?', h: '10:10 PM', quien: 'New message', btn: 'Reply' }
     : { casa: 'Casa Roble', zona: 'Katy · TX', datos: ['3 hab', '2 baños', '1,850 pies²'], msg: '¿Sigue disponible?', h: '10:10 p. m.', quien: 'Mensaje nuevo', btn: 'Responder' },
   restaurante: en
-    ? { k: "Today's menu", abierto: 'Kitchen’s open', platos: [['Shrimp tacos', 'Corn tortilla, cabbage, chipotle'], ['Chicken enchiladas', 'Green sauce, crema, queso fresco'], ['Rice and beans', 'Like at home']], btn: 'Order on WhatsApp' }
+    ? { k: "Today's menu", abierto: 'Kitchen’s open', platos: [['Shrimp tacos', 'Corn tortilla, cabbage, chipotle'], ['Chicken enchiladas', 'Green sauce, crema, queso fresco'], ['Rice and beans', 'Just like home']], btn: 'Order on WhatsApp' }
     : { k: 'La carta de hoy', abierto: 'Cocina abierta', platos: [['Tacos de camarón', 'Tortilla de maíz, col, chipotle'], ['Enchiladas de pollo', 'Salsa verde, crema, queso fresco'], ['Arroz y frijoles', 'Como en casa']], btn: 'Pedir por WhatsApp' },
 }[kind] as any;
-// Signo de "Tu Plomería" (codo de tubería + gota): la MISMA geometría de LogoEjemplo (P02a), aquí
-// solo el signo, como icono de app de la notificación.
-const CODO = 'M3 3A20 20 0 0 1 23 23H17A14 14 0 0 0 3 9ZM15.6 23.4H24.4V25H15.6Z';
-const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29 20 26.4 20 26.4Z';
+// Icono de app (M3): a 22 px el signo de la web (arco fino) se leía como un gancho. El icono es la versión
+// simplificada del mismo signo, como hacen las apps: codo de tubería grueso con sus dos bridas y la gota.
+const ICONO = 'M4 8H14A12 12 0 0 1 26 20V27H18V20A4 4 0 0 0 14 16H4Z';
+const BRIDAS = 'M1.5 5.5H5V18.5H1.5ZM15.5 26H28.5V29.5H15.5Z';
+const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 24.6 8.5 21.5 8.5 21.5Z';
 ---
 {parte === 'band' && (
   <div class:list={['oo-band', `oo-band--${kind}`]} data-nosnippet>
@@ -52,7 +57,7 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
       <div class="oo-noti">
         <div class="oo-noti__card" data-oo-i="1">
           <span class="oo-app">
-            <svg viewBox="2 2 23 31" aria-hidden="true"><path d={CODO} fill="currentColor" /><path d={GOTA} fill="#e0935c" /></svg>
+            <svg viewBox="0 0 30 31" aria-hidden="true"><path d={ICONO} fill="currentColor" /><path d={BRIDAS} fill="currentColor" /><path d={GOTA_APP} fill="#e0935c" /></svg>
             <i class="oo-vivo" aria-hidden="true"></i>
           </span>
           <span class="oo-noti__txt">
@@ -65,15 +70,18 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
         <span class="oo-noti__pila oo-noti__pila--1" data-oo-i="2"></span>
         <span class="oo-noti__pila oo-noti__pila--2" data-oo-i="2"></span>
         <span class="oo-noti__mas" data-oo-i="3">{C.mas}</span>
+        <span class="oo-lock" data-oo-i="0">
+          <span class="oo-lock__b"><svg viewBox="0 0 24 24"><path d="M8 2h8v4l-2 4v11a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V10L8 6Z" /><path d="M8 6h8M12 13v2" /></svg></span>
+          <span class="oo-lock__barra"></span>
+          <span class="oo-lock__b"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" /><circle cx="12" cy="13" r="3.5" /></svg></span>
+        </span>
       </div>
     )}
 
     {kind === 'inmobiliaria' && (
       <div class="oo-casa">
         <div class="oo-casa__ficha" data-oo-i="1">
-          <span class="oo-casa__ilu" aria-hidden="true">
-            <svg viewBox="0 0 80 64"><path d="M8 34 40 10l32 24" /><path d="M16 28v28h48V28" /><path d="M34 56V40h12v16" /><path d="M52 18v-6h6v10.5" /></svg>
-          </span>
+          <span class="oo-casa__ilu" aria-hidden="true"><CasaIlustrada v={0} uid={`hero-${lang}`} /></span>
           <span class="oo-casa__txt">
             <span class="oo-casa__n">{C.casa}</span>
             <span class="oo-casa__z">{C.zona}</span>
@@ -135,7 +143,7 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
   :global(.oo-arm.oo-play.oo-rearm) [data-oo-i] { animation: none; opacity: 0; }
   [data-oo-i='1'] { --oo-d: 1; } [data-oo-i='2'] { --oo-d: 2.4; } [data-oo-i='3'] { --oo-d: 3.6; }
   @keyframes oo-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  @keyframes oo-cae { from { opacity: 0; transform: translateY(-18px) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes oo-cae { 0% { opacity: 0; transform: translateY(-26px) scale(.96); } 62% { opacity: 1; transform: translateY(3px) scale(1.005); } 100% { opacity: 1; transform: none; } }
   .oo-vivo { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #2f9e72; box-shadow: 0 0 0 2px var(--oo-papel, #fff); }
   :global(.oo-vis) .oo-vivo { animation: oo-late 2s ease-in-out infinite; }
   :global(html[data-w-pausa]) .oo-vivo { animation-play-state: paused; }
@@ -160,7 +168,7 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
     box-shadow: 0 1px 0 #fff inset, 0 12px 28px rgba(20, 35, 43, .12), 0 2px 6px rgba(20, 35, 43, .08);
   }
   .oo-app { position: relative; width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center; background: #14232b; color: #f3efe6; }
-  .oo-app svg { width: 18px; height: 24px; }
+  .oo-app svg { width: 24px; height: 25px; }
   .oo-app .oo-vivo { top: -3px; right: -3px; }
   .oo-noti__txt { display: grid; gap: 2px; min-width: 0; }
   .oo-noti__top { display: flex; justify-content: space-between; gap: 8px; font: 500 12px/1.2 var(--font-body); color: rgba(20, 35, 43, .55); }
@@ -175,12 +183,25 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
   .oo-noti__pila--1 { z-index: 1; width: 92%; }
   .oo-noti__pila--2 { width: 84%; background: rgba(255, 255, 255, .5); }
   .oo-noti__mas { margin-top: 12px; font: 500 12px/1 var(--font-body); color: rgba(20, 35, 43, .5); }
+  /* Pie de la pantalla de bloqueo (M2): linterna, barra de inicio y cámara, como un teléfono de verdad. */
+  .oo--contratista { flex: 1; margin-block: 0; display: flex; flex-direction: column; }
+  .oo--contratista .oo-noti { flex: 1; grid-template-rows: auto auto auto auto 1fr; }
+  .oo-lock { align-self: stretch; justify-self: stretch; display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding: 0 6px; }
+  .oo-lock__b { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(20, 35, 43, .07); box-shadow: inset 0 0 0 1px rgba(20, 35, 43, .06); }
+  .oo-lock__b svg { width: 20px; height: 20px; fill: none; stroke: #14232b; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+  .oo-lock__barra { width: 120px; height: 5px; border-radius: 999px; background: rgba(20, 35, 43, .5); align-self: flex-end; margin-bottom: 2px; }
+  /* La notificación llega DESPUÉS de la tarjeta (≈ 1 s), cae y se asienta con un leve rebote. */
+  .oo--contratista .oo-noti__card[data-oo-i] { --oo-d: 8; }
+  .oo--contratista .oo-noti__pila[data-oo-i] { --oo-d: 9.4; }
+  .oo--contratista .oo-noti__mas[data-oo-i] { --oo-d: 10.6; }
+  .oo--contratista .oo-lock[data-oo-i] { --oo-d: 1; }
+  .oo--contratista .oo-noti__card { align-self: start; }
+  .oo--contratista .oo-lock { align-self: end; }
 
   /* ── Inmobiliaria: ficha Samara + mensaje entrante ── */
   .oo-casa { display: grid; gap: 12px; }
-  .oo-casa__ficha { display: grid; grid-template-columns: 92px 1fr; gap: 16px; align-items: center; }
-  .oo-casa__ilu { display: grid; place-items: center; height: 92px; border-radius: 14px; background: #34507a; }
-  .oo-casa__ilu svg { width: 58px; fill: none; stroke: #f7f8fa; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+  .oo-casa__ficha { display: grid; grid-template-columns: 148px 1fr; gap: 16px; align-items: center; }
+  .oo-casa__ilu { display: block; height: 104px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 18px rgba(17, 19, 22, .14), inset 0 0 0 1px rgba(17, 19, 22, .06); }
   .oo-casa__txt { display: grid; gap: 4px; }
   .oo-casa__n { font: 300 38px/1 var(--font-display); letter-spacing: -0.035em; color: #111316; }
   .oo-casa__z { font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #4d5358; }
@@ -224,8 +245,9 @@ const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29
     .oo-noti__top { white-space: nowrap; }
     .oo-noti__btn { grid-column: 2; justify-self: start; }
     .oo-casa__n { font-size: 32px; }
-    .oo-casa__ficha { grid-template-columns: 76px 1fr; }
-    .oo-casa__ilu { height: 76px; }
+    .oo-casa__ficha { grid-template-columns: 112px 1fr; gap: 12px; }
+    .oo-casa__ilu { height: 84px; }
+    .oo-casa__n { font-size: 28px; }
   }
   @media (prefers-reduced-motion: reduce) {
     :global(.oo-arm) [data-oo-i] { opacity: 1; transform: none; animation: none !important; }

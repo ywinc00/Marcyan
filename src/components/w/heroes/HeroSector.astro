@@ -54,6 +54,15 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
   .hs { overflow-x: clip; padding-bottom: 96px; }
   .hs__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
   .hs__obj { display: flex; justify-content: center; }
+  /* Ronda 1 (M2): la placa trasera con el brillo de W-CORE-16 (degradado vivo de oro a cobre que se
+     apaga hacia abajo y un halo suave), no la lámina oro apagada de la tarjeta de sistema. */
+  .hs__obj :global(.wo-to__layer) {
+    background:
+      radial-gradient(120% 90% at 12% 0%, rgba(var(--accent-gold-rgb), .85), transparent 62%),
+      linear-gradient(160deg, rgba(var(--accent-gold-rgb), .62) 0%, rgba(176, 108, 52, .42) 45%, rgba(var(--accent-gold-rgb), .12) 100%);
+    border-color: rgba(var(--accent-gold-rgb), .5);
+    box-shadow: 0 0 80px rgba(var(--accent-gold-rgb), .16);
+  }
   @media (--lg) {
     /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */
     .hs__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 480px; }

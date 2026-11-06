@@ -9,12 +9,14 @@
 // las mismas del abanico del piloto. La sección recorta en horizontal (franjas de 100vw).
 // Revisión 1 (M-1): las filas van ordenadas por pieza del dibujo, para que la llamada N
 // señale la fila N (1 sello, 2 isotipo, 3 palabra, 4 paleta, 5 aplicación, 6 cajetín).
+// Ronda 1 G08 (I3/I4): el plano es PlanoTuMarca (carpeta de la página): signo nuevo, paleta de la marca
+// del personalizador y construcción animada al entrar. Pendiente [SISTEMA]: el PlanoMarca nuevo de P03.
 // HeroTexto no sirve aquí (solo centrado o a la izquierda en una columna): el marcado
 // repite sus clases y data-w-in para heredar la misma coreografía y escala.
 import Button from '../../ui/Button.astro';
 import ChipCiudad from '../ChipCiudad.astro';
 import Eyebrow from '../Eyebrow.astro';
-import PlanoMarca from '../objetos/PlanoMarca.astro';
+import PlanoTuMarca from '../sections/branding/PlanoTuMarca.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -52,7 +54,7 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.
     <div class="hb__plan">
       <div class="hb__light" aria-hidden="true"></div>
       <div data-w-in="obj">
-        <PlanoMarca lang={lang} />
+        <PlanoTuMarca lang={lang} />
       </div>
     </div>
   </div>
@@ -97,9 +99,6 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.
     mask-composite: intersect;
     pointer-events: none;
   }
-  /* El plano ocupa el contenedor entero: sus bordes caen en la línea del logo y del filete
-     de la cabecera (E-44), no 30 px dentro como con su tope de 1136. */
-  .hb__plan :global(.wo-plan) { max-width: none; }
   @media (--lg) {
     /* W-NEW-30: titular en 568 a la izquierda; texto y botones a la derecha (433),
        los botones a la altura del pie del titular. */

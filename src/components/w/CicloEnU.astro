@@ -31,7 +31,7 @@ const D = 'M70 32H770A178 178 0 0 1 770 388H70';
 <div class:list={['cu', cls]} id={id} data-w-tone={tone} data-cu>
   <div class="cu__panel">
     <div class="cu__lienzo">
-      <svg class="cu__svg" viewBox="0 0 960 560" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="cu__svg" viewBox="0 0 960 520" preserveAspectRatio="none" aria-hidden="true">
         <path class="cu__base" d={D} />
         <path class="cu__luz cu__luz--halo" d={D} />
         <path class="cu__luz" d={D} />
@@ -152,8 +152,10 @@ const D = 'M70 32H770A178 178 0 0 1 770 388H70';
   .cu__vl { top: 32px; }
 
   @media (min-width: 1024px) {
-    .cu__panel { padding: 64px 72px; }
-    .cu__lienzo { height: 560px; }
+    .cu__panel { padding: 64px 72px 48px; }
+    /* Ronda 1 (M5): lienzo de 520 (el pie de los nodos de abajo cae en 510) y 48 de aire inferior:
+       quedaban ~115 px vacíos bajo la fila inferior. Las coordenadas del trazado no cambian. */
+    .cu__lienzo { height: 520px; }
     .cu__svg { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
     /* Sin vector-effect: con non-scaling-stroke Chrome ignora pathLength en los guiones. */
     .cu__svg path { fill: none; }

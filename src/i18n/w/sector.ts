@@ -16,7 +16,7 @@ import { PRICE_ANCHORS } from '../pricing';
 export type SectorKey = 'contratistas' | 'bienes-raices' | 'contractors' | 'restaurants';
 export type SectorObj = 'contratista' | 'inmobiliaria' | 'restaurante';
 /** Objeto de cada fila de "Lo que necesita tu web" (W-CORE-21). */
-export type FilaObj = 'respuesta' | 'antes-despues' | 'chat' | 'listados' | 'mesa-qr' | 'web-restaurante';
+export type FilaObj = 'respuesta' | 'antes-despues' | 'chat' | 'listados' | 'mesa-qr' | 'platos';
 
 type Msg = { from: 'c' | 'm'; text: string; time?: string };
 interface Side { title: string; text: string; evidence: string[] }
@@ -349,7 +349,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       rows: [
         { obj: 'mesa-qr', title: 'Your menu, one scan away', text: 'A QR code on the table opens your menu on any phone, in English and Spanish. Change a price or pull a sold-out dish without reprinting.', items: [0, 5] },
         { obj: 'chat', title: 'Orders and reservations, straight to you', text: 'Customers build their order or ask for a table and it lands in your WhatsApp. No app takes a cut, and an assistant handles questions while you cook.', items: [1, 2] },
-        { obj: 'web-restaurante', title: 'Photos that make people hungry', text: "Your dishes shown the way they deserve. And for food trucks, where you're parked today, so regulars can find you.", items: [3, 4] },
+        { obj: 'platos', title: 'Photos that make people hungry', text: "Your dishes shown the way they deserve. And for food trucks, where you're parked today, so regulars can find you.", items: [3, 4] },
       ],
       chat: {
         label: 'To go',

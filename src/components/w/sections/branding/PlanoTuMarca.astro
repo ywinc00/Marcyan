@@ -1,0 +1,264 @@
+---
+// Plano de la marca de ejemplo "Tu Marca" para el hero de branding (G08 ronda 1, I3 e I4).
+// Parte del plano de sistema de la v1 (objetos/PlanoMarca.astro, W-NEW-12: marco con regla perimetral,
+// cuadrícula, vista frontal, vista de aplicación con cotas, llamadas y lista de entregables con cajetín)
+// y lo pone al día mientras P03 no entrega su PlanoMarca nuevo (pendiente [SISTEMA]):
+//   · el signo es el monograma "m." de signo.ts (deja la estrella de 4 puntas, que cantaba a IA);
+//   · la paleta es la de la marca (negocios.ts → 'marca'), la MISMA del personalizador de más abajo:
+//     una sola identidad en la página (el plano usa su versión de noche para el relleno del signo);
+//   · el plano SE CONSTRUYE al entrar en vista (W-NEW-12 + piloto): ejes y círculos de trazado, guías
+//     de las astas, contorno del signo, la "m" trazo a trazo, relleno, palabra, muestras de color una a
+//     una y la tarjeta de aplicación con sus cotas (≈ 3,4 s, solo stroke-dashoffset/opacity/transform).
+//     Una vez; al volver tras ≥ 8 s fuera se repite. Sin JS o con reducir movimiento: plano terminado.
+// Hover/foco de fila → la fila y su pieza del dibujo en oro, 200 ms (CSS :has), como en la v1.
+// Contrato §1.6: ilustración aria-hidden con resumen sr-only, sin h1-h6, rótulo Ejemplo una vez.
+import Ejemplo from '../../Ejemplo.astro';
+import { negocios } from '../../objetos/ejemplos/negocios';
+import { SIGNO } from './signo';
+
+interface Row { name: string; detail: string; part: number }
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const n = negocios.marca;
+const brand = n.nombre[lang];
+const rows: Row[] = (en
+  ? [
+      { name: 'Custom logo', detail: 'Designed from scratch around your business', part: 1 },
+      { name: 'Logo versions', detail: 'Horizontal, stacked and icon', part: 5 },
+      { name: 'Color palette', detail: 'Works on screen and in print', part: 4 },
+      { name: 'Typefaces', detail: 'The written voice of your brand', part: 3 },
+      { name: 'Usage guide', detail: 'So it looks the same everywhere', part: 6 },
+      { name: 'Vector file', detail: 'For signs and shirts at any size', part: 2 },
+      { name: 'PNG files', detail: 'For your website and social media', part: 5 },
+      { name: 'PDF file', detail: 'Ready for the print shop', part: 6 },
+    ]
+  : [
+      { name: 'Logo a medida', detail: 'Diseñado desde cero para tu negocio', part: 1 },
+      { name: 'Variantes del logo', detail: 'Horizontal, vertical e icono', part: 5 },
+      { name: 'Paleta de color', detail: 'Para pantalla e impresión', part: 4 },
+      { name: 'Tipografías', detail: 'La voz escrita de tu marca', part: 3 },
+      { name: 'Guía de uso', detail: 'Para que se vea igual en todos lados', part: 6 },
+      { name: 'Archivo vectorial', detail: 'Para rótulos y camisetas a cualquier tamaño', part: 2 },
+      { name: 'Archivos PNG', detail: 'Para tu web y tus redes', part: 5 },
+      { name: 'Archivo PDF', detail: 'Listo para la imprenta', part: 6 },
+    ]
+).slice().sort((a, b) => a.part - b.part);
+const T = en
+  ? { front: 'FRONT VIEW', app: 'APPLICATION', title: 'TITLE', manual: 'Brand guide', deliv: 'DELIVERY', delivV: 'logo, colors, typefaces', sheet: 'SHEET', sheetV: '1 of 1', list: 'What you get', sr: `Example brand blueprint for “${brand}”: the logo is drawn step by step, then its colors, its name and a business card. Next to it, what you get: logo, versions, colors, typefaces and usage guide.` }
+  : { front: 'VISTA FRONTAL', app: 'APLICACIÓN', title: 'TÍTULO', manual: 'Manual de marca', deliv: 'ENTREGA', delivV: 'logo, colores, tipografía', sheet: 'HOJA', sheetV: '1 de 1', list: 'Lo que recibes', sr: `Plano de marca de ejemplo para “${brand}”: el logo se dibuja paso a paso, después sus colores, su nombre y una tarjeta. Al lado, lo que recibes: logo, variantes, colores, tipografías y guía de uso.` };
+// Vista frontal: el signo (caja 200) centrado en cx,cy a escala 1,3.
+const cx = 230, cy = 236, k = 1.3;
+const tf = `translate(${cx - 100 * k} ${cy - 100 * k}) scale(${k})`;
+const X = (c: number) => +(cx + (c - 100) * k).toFixed(1);
+const Y = (c: number) => +(cy + (c - 100) * k).toFixed(1);
+const sw = [n.paleta.bg, n.paleta.accent, n.paleta.ink2, n.paleta.ink];
+---
+<div class="pt" data-pt style={`--pt-sig:${n.paletaNoche.accent}`}>
+  <p class="sr-only">{T.sr}</p>
+  <Ejemplo lang={lang} on="dark" />
+  <div class="pt__ruler pt__ruler--t" aria-hidden="true">{[1, 2, 3, 4, 5, 6].map((x) => <span>{x}</span>)}</div>
+  <div class="pt__ruler pt__ruler--b" aria-hidden="true">{[1, 2, 3, 4, 5, 6].map((x) => <span>{x}</span>)}</div>
+  <div class="pt__ruler pt__ruler--l" aria-hidden="true">{['A', 'B', 'C', 'D'].map((x) => <span>{x}</span>)}</div>
+  <div class="pt__ruler pt__ruler--r" aria-hidden="true">{['A', 'B', 'C', 'D'].map((x) => <span>{x}</span>)}</div>
+
+  <div class="pt__grid">
+    <svg class="pt__draw" viewBox="0 0 660 600" aria-hidden="true">
+      <!-- 1 · Trazado: ejes y círculo doble de la vista frontal -->
+      <path class="pt__axis pt-d" pathLength="1" style="--d:0s;--t:.7s" d={`M${cx} 40V460M20 ${cy}H420`} />
+      <circle class="pt__ln pt__ln--fino pt-d" pathLength="1" style="--d:.15s;--t:.9s" cx={cx} cy={cy} r="160" />
+      <circle class="pt__ln pt__ln--fino pt-d" pathLength="1" style="--d:.3s;--t:.9s" cx={cx} cy={cy} r="152" />
+      <!-- 2 · Guías de las astas, altura de x y línea base -->
+      <g class="pt__guias">
+        {SIGNO.astas.map((a, i) => <path class="pt-d" pathLength="1" style={`--d:${0.55 + i * 0.08}s;--t:.5s`} d={`M${X(a)} ${Y(30)}V${Y(170)}`} />)}
+        <path class="pt-d" pathLength="1" style="--d:.8s;--t:.5s" d={`M${X(36)} ${Y(SIGNO.xAlto)}H${X(170)}`} />
+        <path class="pt-d" pathLength="1" style="--d:.86s;--t:.5s" d={`M${X(36)} ${Y(SIGNO.base)}H${X(170)}`} />
+      </g>
+      <!-- 3 · El signo: contorno, la "m" trazo a trazo, relleno y punto -->
+      <g data-part="1">
+        <circle class="pt__ln pt-d" pathLength="1" style="--d:.95s;--t:.8s" cx={cx} cy={cy} r={SIGNO.r * k} />
+      </g>
+      <g data-part="2" transform={tf}>
+        <circle class="pt__fill pt-f" style="--d:2.05s" cx="100" cy="100" r={SIGNO.r} />
+        <path class="pt__m pt-d" pathLength="1" style="--d:1.35s;--t:.75s" d={SIGNO.m} stroke-width={SIGNO.trazo} />
+        <circle class="pt__punto pt-p" style="--d:2.2s" cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} />
+      </g>
+      <!-- 4 · Nombre y paleta -->
+      <g data-part="3"><text class="pt__word pt-f" style="--d:2.3s" x={cx} y="446" text-anchor="middle">{brand}</text></g>
+      <g data-part="4">
+        {sw.map((c, i) => <circle class="pt__sw pt-p" style={`--d:${2.45 + i * 0.12}s;fill:${c}`} cx={166 + i * 48} cy="526" r="16" />)}
+      </g>
+      <text class="pt__lab pt-f" style="--d:.2s" x="20" y="30">{T.front}</text>
+      <!-- 5 · Vista de aplicación: tarjeta con el signo, cotas -->
+      <g data-part="5">
+        <rect class="pt__ln pt-d" pathLength="1" style="--d:2.6s;--t:.7s" x="430" y="150" width="180" height="108" rx="6" />
+        <g transform="translate(450 178) scale(.26)">
+          <circle class="pt__fill pt-f" style="--d:3s" cx="100" cy="100" r={SIGNO.r} />
+          <path class="pt__m pt-f" style="--d:3s" d={SIGNO.m} stroke-width={SIGNO.trazo} />
+          <circle class="pt__punto pt-f" style="--d:3s" cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} />
+        </g>
+        <path class="pt__ln pt-d" pathLength="1" style="--d:3.05s;--t:.4s" d="M514 196H588M514 212H570" />
+      </g>
+      <g class="pt-f" style="--d:3.15s">
+        <path class="pt__dim" d="M450 130H502M450 124V136M502 124V136" />
+        <text class="pt__num" x="476" y="120" text-anchor="middle">Ø52</text>
+        <path class="pt__dim" d="M630 150V258M624 150H636M624 258H636" />
+        <text class="pt__num" x="648" y="204" text-anchor="middle" transform="rotate(-90 648 204)">15.5</text>
+        <text class="pt__lab" x="430" y="290">{T.app}</text>
+      </g>
+      <!-- Llamadas -->
+      {[
+        { n: 1, x: 420, y: 70, tx: 300, ty: 150 },
+        { n: 2, x: 92, y: 120, tx: 196, ty: 210 },
+        { n: 3, x: 420, y: 424, tx: 322, ty: 436 },
+        { n: 4, x: 92, y: 560, tx: 152, ty: 538 },
+        { n: 5, x: 580, y: 330, tx: 570, ty: 258 },
+      ].map((c, i) => (
+        <g class="pt__call pt-f" data-part={c.n} style={`--d:${2.9 + i * 0.06}s`}>
+          <path class="pt__lead" d={`M${c.x} ${c.y}L${c.tx} ${c.ty}`} />
+          <circle cx={c.x} cy={c.y} r="11" />
+          <text x={c.x} y={c.y + 4} text-anchor="middle">{c.n}</text>
+        </g>
+      ))}
+    </svg>
+
+    <div class="pt__side">
+      <p class="pt__lt">{T.list}</p>
+      <ol class="pt__rows">
+        {rows.map((r, i) => (
+          <li class="pt__row" data-part={r.part}>
+            <span class="pt__n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="pt__rt"><b>{r.name}<i aria-hidden="true"></i></b><span>{r.detail}</span></span>
+          </li>
+        ))}
+      </ol>
+      <dl class="pt__box" data-part="6">
+        <div class="pt__cell pt__cell--w"><dt>{T.title}</dt><dd><b translate="no">{brand}</b> · {T.manual}</dd></div>
+        <div class="pt__cell"><dt>{T.deliv}</dt><dd>{T.delivV}</dd></div>
+        <div class="pt__cell"><dt>{T.sheet}</dt><dd>{T.sheetV}</dd></div>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Construcción: una vez cuando el DIBUJO cruza el 20 % (en móvil el plano entero mide más que la pantalla); al volver tras ≥ 8 s fuera, se repite (se rearma fuera de vista).
+  const mq = matchMedia('(prefers-reduced-motion: reduce)');
+  for (const el of document.querySelectorAll<HTMLElement>('[data-pt]:not([data-pt-on])')) {
+    el.setAttribute('data-pt-on', '');
+    if (mq.matches) continue;
+    el.classList.add('pt-arm');
+    let t = 0;
+    new IntersectionObserver((es) => {
+      if (es[0].isIntersecting) { clearTimeout(t); el.classList.remove('pt-rearm'); el.classList.add('pt-play'); }
+      else if (el.classList.contains('pt-play')) t = window.setTimeout(() => { el.classList.remove('pt-play'); el.classList.add('pt-rearm'); }, 8000);
+    }, { threshold: 0.2 }).observe(el.querySelector('.pt__draw') ?? el);
+  }
+</script>
+
+<style>
+  .pt {
+    --ink: rgba(var(--star-rgb), .72);
+    --hl: var(--accent-gold);
+    position: relative; width: 100%; margin-inline: auto;
+    padding: 34px; border-radius: 6px;
+    background:
+      linear-gradient(rgba(var(--star-rgb), .06) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(var(--star-rgb), .06) 1px, transparent 1px) 0 0 / 40px 40px,
+      var(--w-s1, #121211);
+    border: 1px solid var(--w-line-strong);
+    font-family: var(--font-body);
+  }
+  .pt :global(.w-example--corner) { top: 40px; right: 40px; }
+  .pt__ruler { position: absolute; display: flex; justify-content: space-around; font: 500 10px/1 var(--font-mono); color: rgba(var(--star-rgb), .40); }
+  .pt__ruler--t, .pt__ruler--b { left: 34px; right: 34px; height: 34px; align-items: center; }
+  .pt__ruler--t { top: 0; border-bottom: 1px solid var(--w-line); }
+  .pt__ruler--b { bottom: 0; border-top: 1px solid var(--w-line); }
+  .pt__ruler--l, .pt__ruler--r { top: 34px; bottom: 34px; width: 34px; flex-direction: column; align-items: center; }
+  .pt__ruler--l { left: 0; border-right: 1px solid var(--w-line); }
+  .pt__ruler--r { right: 0; border-left: 1px solid var(--w-line); }
+  .pt__grid { display: grid; grid-template-columns: minmax(0, 660fr) minmax(0, 340fr); gap: 40px; padding: 36px 32px 28px; }
+  .pt__draw { width: 100%; height: auto; display: block; overflow: visible; }
+  .pt__ln, .pt__axis, .pt__dim, .pt__lead, .pt__guias path { fill: none; stroke: var(--ink); stroke-width: 1.5; transition: stroke 200ms var(--w-ease-ui); }
+  .pt__ln--fino { stroke: rgba(var(--star-rgb), .5); stroke-width: 1; }
+  .pt__axis { stroke: rgba(var(--star-rgb), .22); stroke-width: 1; }
+  .pt__guias path { stroke: rgba(var(--accent-gold-rgb), .38); stroke-width: 1; }
+  .pt__dim, .pt__lead { stroke-width: 1; stroke: rgba(var(--star-rgb), .45); }
+  /* El signo en la versión de noche de la marca: disco lila y letra en la noche del plano. */
+  .pt__fill { fill: var(--pt-sig, #B9A3E6); transition: fill 200ms var(--w-ease-ui); }
+  .pt__m { fill: none; stroke: var(--w-s1, #121211); }
+  .pt__punto { fill: var(--w-s1, #121211); }
+  .pt__word { font: 500 34px var(--font-display); letter-spacing: -0.03em; fill: var(--w-ink, #f0ede8); transition: fill 200ms var(--w-ease-ui); }
+  .pt__sw { stroke: rgba(var(--star-rgb), .35); stroke-width: 1; transition: stroke 200ms var(--w-ease-ui); }
+  .pt__lab { font: 500 11px var(--font-mono); letter-spacing: .1em; fill: rgba(var(--star-rgb), .55); }
+  .pt__num { font: 500 13px var(--font-mono); fill: var(--w-ink, #f0ede8); }
+  .pt__call circle { fill: var(--w-s1, #121211); stroke: rgba(var(--star-rgb), .55); stroke-width: 1; transition: stroke 200ms; }
+  .pt__call text { font: 500 12px var(--font-mono); fill: var(--w-ink, #f0ede8); }
+
+  /* ── Construcción (JS: pt-arm, pt-play; pt-rearm deja todo listo fuera de vista) ── */
+  .pt-arm .pt-d { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  .pt-arm :is(.pt-f, .pt-p) { opacity: 0; }
+  .pt-arm .pt-p { transform-box: fill-box; transform-origin: center; transform: scale(.4); }
+  /* Mientras se traza, la "m" se ve en línea clara sobre la noche; al llegar el relleno pasa a recorte. */
+  .pt-arm .pt__m.pt-d { stroke: var(--ink); }
+  .pt-arm.pt-play .pt-d { animation: pt-draw var(--t, .8s) cubic-bezier(.65, 0, .35, 1) var(--d, 0s) forwards; }
+  .pt-arm.pt-play .pt-f { animation: pt-in 420ms cubic-bezier(.22, 1, .36, 1) var(--d, 0s) forwards; }
+  .pt-arm.pt-play .pt-p { animation: pt-pop 460ms cubic-bezier(.34, 1.56, .64, 1) var(--d, 0s) forwards; }
+  .pt-arm.pt-play .pt__m.pt-d { animation: pt-draw var(--t) cubic-bezier(.65, 0, .35, 1) var(--d) forwards, pt-recorte 300ms ease-out 2.05s forwards; }
+  .pt-arm.pt-rearm :is(.pt-d, .pt-f, .pt-p) { animation: none; }
+  @keyframes pt-draw { to { stroke-dashoffset: 0; } }
+  @keyframes pt-in { to { opacity: 1; } }
+  @keyframes pt-pop { to { opacity: 1; transform: none; } }
+  @keyframes pt-recorte { to { stroke: var(--w-s1, #121211); } }
+
+  .pt__side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .pt__lt { margin: 0; font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); }
+  .pt__rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--w-line); }
+  .pt__row {
+    display: flex; gap: 14px; align-items: flex-start; min-height: 60px; padding: 11px 6px;
+    border-bottom: 1px solid var(--w-line); cursor: default; outline: none;
+    transition: background-color 200ms var(--w-ease-ui);
+  }
+  .pt__n { font: 500 12px/1.6 var(--font-mono); color: var(--w-ink-60); transition: color 200ms; }
+  .pt__rt { display: flex; flex-direction: column; gap: 2px; }
+  .pt__rt b { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--w-ink, #f0ede8); transition: color 200ms; }
+  .pt__rt b i { width: 6px; height: 6px; border-radius: 50%; background: rgba(var(--star-rgb), .35); transition: background-color 200ms; }
+  .pt__rt > span { font-size: 13px; color: var(--w-ink-60); }
+  .pt__row:hover { background: rgba(var(--accent-gold-rgb), .06); }
+  .pt__row:hover .pt__rt b, .pt__row:hover .pt__n { color: var(--hl); }
+  .pt__row:hover .pt__rt b i { background: var(--hl); }
+  .pt__box { margin: 4px 0 0; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--w-line-strong); border-radius: 4px; transition: border-color 200ms; }
+  .pt__cell { padding: 10px 12px; border-top: 1px solid var(--w-line-strong); }
+  .pt__cell + .pt__cell + .pt__cell { border-left: 1px solid var(--w-line-strong); }
+  .pt__cell--w { grid-column: 1 / -1; border-top: 0; }
+  .pt__cell dt { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; color: rgba(var(--star-rgb), .55); }
+  .pt__cell dd { margin: 4px 0 0; font: 500 13px/1.35 var(--font-mono); color: var(--w-ink, #f0ede8); }
+  .pt__cell dd b { font-weight: 500; font-family: var(--font-display); font-size: 16px; }
+
+  /* Fila ⇄ pieza del dibujo (1-6). */
+  .pt:has(.pt__row[data-part='1']:hover) [data-part='1'] .pt__ln,
+  .pt:has(.pt__row[data-part='5']:hover) [data-part='5'] .pt__ln { stroke: var(--hl); }
+  .pt:has(.pt__row[data-part='2']:hover) [data-part='2'] .pt__fill,
+  .pt:has(.pt__row[data-part='5']:hover) [data-part='5'] .pt__fill { fill: var(--hl); }
+  .pt:has(.pt__row[data-part='3']:hover) [data-part='3'] .pt__word { fill: var(--hl); }
+  .pt:has(.pt__row[data-part='4']:hover) [data-part='4'] .pt__sw { stroke: var(--hl); stroke-width: 2; }
+  .pt:has(.pt__row[data-part='6']:hover) .pt__box[data-part='6'] { border-color: var(--hl); }
+  .pt:has(.pt__row[data-part='1']:hover) .pt__call[data-part='1'] circle,
+  .pt:has(.pt__row[data-part='2']:hover) .pt__call[data-part='2'] circle,
+  .pt:has(.pt__row[data-part='3']:hover) .pt__call[data-part='3'] circle,
+  .pt:has(.pt__row[data-part='4']:hover) .pt__call[data-part='4'] circle,
+  .pt:has(.pt__row[data-part='5']:hover) .pt__call[data-part='5'] circle { stroke: var(--hl); }
+
+  @media (--lt-md) {
+    .pt { padding: 22px; }
+    .pt__ruler--t, .pt__ruler--b { left: 22px; right: 22px; height: 22px; }
+    .pt__ruler--l, .pt__ruler--r { top: 22px; bottom: 22px; width: 22px; }
+    .pt__grid { grid-template-columns: 1fr; gap: 20px; padding: 28px 6px 14px; }
+    .pt :global(.w-example--corner) { top: 30px; right: 30px; }
+    /* Cotas y rótulos del dibujo: a este tamaño se leían a ~5 px (E-40). Son decorativos. */
+    .pt__lab, .pt__num { display: none; }
+  }
+  @media (--motion-reduce) {
+    .pt *, .pt__row { transition: none; }
+  }
+</style>

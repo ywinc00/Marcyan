@@ -9,12 +9,12 @@
 // Cuatro opciones a la izquierda (Tu logo / Tus colores / Tu tipografía / Tu web): la maqueta
 // cambia por opción y las elecciones se conservan. Láminas de logo, paleta y tipografía en
 // VistaMarca.astro (sustituto local de las vistas de PlanoMarca de P03, pendiente [SISTEMA]);
-// "Tu web" es WebEjemplo marca="marca". Las tres no activas viajan en <template> (§1.8).
+// "Tu web" es también VistaMarca (vista="web", ronda 1 B1: WebEjemplo se quedaba en esqueleto). Las tres
+// no activas viajan en <template> (§1.8).
 // Precios solo de pricing.ts: logo = ancla baja del branding, colores = branding completo,
 // web = ancla baja del diseño web; la tipografía va con los colores y no repite precio.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Personalizador, { type Opcion } from '../../demos/Personalizador.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
 import VistaMarca from './VistaMarca.astro';
 import { PRICE_ANCHORS } from '../../../../i18n/pricing';
 import type { BrandingCopy } from '../../../../i18n/w/branding';
@@ -42,7 +42,7 @@ const opciones: Opcion[] = [
     <VistaMarca slot="maqueta" vista="logo" lang={lang} />
     <VistaMarca slot="opcion-colores" vista="paleta" lang={lang} />
     <VistaMarca slot="opcion-tipo" vista="tipo" lang={lang} />
-    <WebEjemplo slot="opcion-web" marca="marca" frame="tarjeta" vista="completa" lang={lang} />
+    <VistaMarca slot="opcion-web" vista="web" lang={lang} />
   </Personalizador>
 </div>
 

@@ -1,24 +1,17 @@
 ---
-// Isotipo de la marca de EJEMPLO "Tu Marca" (sello dentado + estrella de 4 puntas):
-// la MISMA geometría que dibuja el plano del hero (objetos/PlanoMarca.astro), aquí
-// rellena, para las maquetas de la escalera de branding (§4.18-3). Diseñada por
-// nosotros; nunca la marca de un cliente (E-32, E-47). Decorativa: aria-hidden.
-// Colores por variables: --bm-ink (sello y estrella) y --bm-paper (centro).
+// Isotipo de la marca de EJEMPLO "Tu Marca": monograma "m." en un círculo (geometría en signo.ts,
+// la MISMA que dibuja el plano del hero, PlanoTuMarca.astro). Ronda 1 (I3): deja el sello dentado
+// con estrella de 4 puntas, que cantaba a IA. Diseñada por nosotros; nunca la marca de un cliente
+// (E-32, E-47). Decorativa: aria-hidden. Colores por variables: --bm-ink (disco) y --bm-paper (letra).
+import { SIGNO } from './signo';
+
 interface Props { size?: number; class?: string }
 const { size = 64, class: cls } = Astro.props;
-const c = 100;
-const teeth = Array.from({ length: 32 }, (_, i) => {
-  const a = (i / 32) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 84 : 94;
-  return `${(c + r * Math.cos(a)).toFixed(1)},${(c + r * Math.sin(a)).toFixed(1)}`;
-}).join(' ');
-const s = 40;
-const star = `M${c} ${c - s} Q${c + 7} ${c - 7} ${c + s} ${c} Q${c + 7} ${c + 7} ${c} ${c + s} Q${c - 7} ${c + 7} ${c - s} ${c} Q${c - 7} ${c - 7} ${c} ${c - s}Z`;
 ---
 <svg class:list={['bm-seal', cls]} viewBox="0 0 200 200" width={size} height={size} aria-hidden="true">
-  <polygon points={teeth} fill="var(--bm-ink, #2f5266)" />
-  <circle cx={c} cy={c} r="74" fill="none" stroke="var(--bm-paper, #f0ede8)" stroke-width="3" />
-  <circle cx={c} cy={c} r="66" fill="var(--bm-paper, #f0ede8)" />
-  <path d={star} fill="var(--bm-ink, #2f5266)" />
+  <circle cx="100" cy="100" r={SIGNO.r} fill="var(--bm-ink, #6B4FA0)" />
+  <path d={SIGNO.m} fill="none" stroke="var(--bm-paper, #F0EDE8)" stroke-width={SIGNO.trazo} />
+  <circle cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} fill="var(--bm-paper, #F0EDE8)" />
 </svg>
 <style>
   .bm-seal { display: block; flex: none; }

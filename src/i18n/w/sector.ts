@@ -16,7 +16,7 @@ import { PRICE_ANCHORS } from '../pricing';
 export type SectorKey = 'contratistas' | 'bienes-raices' | 'contractors' | 'restaurants';
 export type SectorObj = 'contratista' | 'inmobiliaria' | 'restaurante';
 /** Objeto de cada fila de "Lo que necesita tu web" (W-CORE-21). */
-export type FilaObj = 'respuesta' | 'antes-despues' | 'chat' | 'listados' | 'mesa-qr' | 'web-restaurante';
+export type FilaObj = 'respuesta' | 'antes-despues' | 'chat' | 'listados' | 'mesa-qr' | 'platos';
 
 type Msg = { from: 'c' | 'm'; text: string; time?: string };
 interface Side { title: string; text: string; evidence: string[] }
@@ -130,13 +130,13 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
     eyebrow: 'Contratistas',
     lead: 'Tu sitio sale en Google cuando buscan contratista cerca, enseña tus trabajos y contesta por ti mientras estás en la obra.',
     link: 'Ver precios',
-    heroSr: 'Ejemplo: a las 21:40 te llega desde tu web una solicitud de presupuesto para remodelar una cocina en Katy.',
+    heroSr: 'Ejemplo: a las 9:40 p. m. te llega desde tu web una solicitud de presupuesto para remodelar una cocina en Katy.',
     dilema: {
       label: 'El problema',
       title: "<span class='w-tone'>Estás en la obra.</span><br /> El teléfono no espera.",
       lead: 'Hoy tienes dos opciones, y las dos te cuestan trabajos.',
-      left: { title: 'Contestar en plena obra', text: 'Funciona, hasta que estás en el techo con las manos ocupadas.', evidence: ['Llamada entrante · 14:10', 'Bajas del techo, pero ya colgaron.'] },
-      right: { title: 'Dejar que suene', text: 'Sigues trabajando, y el cliente llama al siguiente contratista.', evidence: ['Llamada perdida · 14:10', 'A las 14:12 ya llamó a otro.'] },
+      left: { title: 'Contestar en plena obra', text: 'Funciona, hasta que estás en el techo con las manos ocupadas.', evidence: ['Llamada entrante · 2:10 p. m.', 'Bajas del techo, pero ya colgaron.'] },
+      right: { title: 'Dejar que suene', text: 'Sigues trabajando, y el cliente llama al siguiente contratista.', evidence: ['Llamada perdida · 2:10 p. m.', 'A las 2:12 p. m. ya llamó a otro.'] },
       bridge: 'Con tu sitio y su asistente, no tienes que elegir.',
     },
     ciclo: {
@@ -166,10 +166,10 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chat: {
         label: 'Llamada perdida',
         script: [
-          { from: 'm', text: 'Hola, vimos tu llamada. Ahora mismo estamos en una obra. ¿Qué trabajo necesitas?', time: '14:11' },
-          { from: 'c', text: 'Cambiar el techo de mi casa, en Pasadena.', time: '14:12' },
-          { from: 'm', text: 'Anotado. Te llamamos hoy para darte el presupuesto. ¿A nombre de quién?', time: '14:12' },
-          { from: 'c', text: 'Ana. Gracias.', time: '14:13' },
+          { from: 'm', text: 'Hola, vimos tu llamada. Ahora mismo estamos en una obra. ¿Qué trabajo necesitas?', time: '2:11 p. m.' },
+          { from: 'c', text: 'Tengo una fuga debajo del fregadero, en Pasadena.', time: '2:12 p. m.' },
+          { from: 'm', text: 'Anotado. Te llamamos hoy para darte el presupuesto. ¿A nombre de quién?', time: '2:12 p. m.' },
+          { from: 'c', text: 'Ana. Gracias.', time: '2:13 p. m.' },
         ],
       },
       chatSr: 'Ejemplo: tras una llamada perdida, Marcy le escribe al cliente, anota el trabajo y queda en que lo llamas hoy con el presupuesto.',
@@ -198,8 +198,8 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       label: 'El problema',
       title: "<span class='w-tone'>El comprador pregunta hoy.</span><br /> Mañana ya vio otra casa.",
       lead: 'Responder a tiempo decide quién se queda con el cliente.',
-      left: { title: 'Contestar tú cada mensaje', text: 'Funciona, hasta que estás mostrando una casa con el teléfono en silencio.', evidence: ['Mensaje · 22:10', '¿Sigue disponible la casa de Katy?'] },
-      right: { title: 'Contestar mañana', text: 'Tranquilo, hasta que el comprador ya agendó con otro agente.', evidence: ['Visto · 22:10', 'Respondes a las 9:00. Ya tenía otra visita.'] },
+      left: { title: 'Contestar tú cada mensaje', text: 'Funciona, hasta que estás mostrando una casa con el teléfono en silencio.', evidence: ['Mensaje · 10:10 p. m.', '¿Sigue disponible la casa de Katy?'] },
+      right: { title: 'Contestar mañana', text: 'Tranquilo, hasta que el comprador ya agendó con otro agente.', evidence: ['Visto · 10:10 p. m.', 'Respondes a las 9:00 a. m. Ya tenía otra visita.'] },
       bridge: 'Con tu sitio y su asistente, ningún interesado se enfría.',
     },
     ciclo: {
@@ -209,7 +209,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       uTitle: 'Del mensaje a la visita',
       uSub: 'Cada interesado queda registrado, aunque escriba a las diez de la noche.',
       nodes: [
-        { icon: 'lucide:message-circle', label: 'Pregunta por una casa', text: 'Escribe a las 22:10 si sigue disponible.' },
+        { icon: 'lucide:message-circle', label: 'Pregunta por una casa', text: 'Escribe a las 10:10 p. m. si sigue disponible.' },
         { icon: 'lucide:messages-square', label: 'Marcy responde', text: 'Contesta, pregunta si compra o vende y pide sus datos.' },
         { icon: 'lucide:bell', label: 'Interesado guardado y aviso', text: 'Queda registrado y te llega el aviso con el resumen.' },
         { icon: 'lucide:calendar-check', label: 'Visita agendada', text: 'La confirmas tú al día siguiente, con todo el contexto.' },
@@ -229,13 +229,13 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chat: {
         label: 'Comprador',
         script: [
-          { from: 'c', text: 'Hola, ¿la casa de Katy sigue disponible?', time: '22:10' },
-          { from: 'm', text: 'Sí, sigue disponible y se muestra el sábado. ¿Buscas comprar, o también vender tu casa actual?', time: '22:10' },
-          { from: 'c', text: 'Comprar. ¿Puedo verla el sábado?', time: '22:11' },
-          { from: 'm', text: 'Claro. ¿Me dejas tu nombre? Te aparto la visita y te la confirman mañana.', time: '22:11' },
+          { from: 'c', text: 'Hola, ¿la casa de Katy sigue disponible?', time: '10:10 p. m.' },
+          { from: 'm', text: 'Sí, sigue disponible y se muestra el sábado. ¿Buscas comprar, o también vender tu casa actual?', time: '10:10 p. m.' },
+          { from: 'c', text: 'Comprar. ¿Puedo verla el sábado?', time: '10:11 p. m.' },
+          { from: 'm', text: 'Claro. ¿Me dejas tu nombre? Te aparto la visita y te la confirman mañana.', time: '10:11 p. m.' },
         ],
       },
-      chatSr: 'Ejemplo: a las 22:10 un comprador pregunta por una casa en Katy y Marcy le aparta la visita del sábado.',
+      chatSr: 'Ejemplo: a las 10:10 p. m. un comprador pregunta por una casa en Katy y Marcy le aparta la visita del sábado.',
     },
     prosa: { tone1: 'En Houston, tu comprador busca casa', tone2: 'desde el celular y en español.' },
     proyectos: {
@@ -256,13 +256,13 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
     eyebrow: 'Contractors',
     lead: "Your site shows up when people search for a contractor nearby, shows off your work, and answers for you while you're on the job.",
     link: 'See pricing',
-    heroSr: 'Example: at 9:40 p.m. an estimate request for a kitchen remodel in Katy comes in through your website.',
+    heroSr: 'Example: at 9:40 PM an estimate request for a kitchen remodel in Katy comes in through your website.',
     dilema: {
       label: 'The problem',
       title: "<span class='w-tone'>You're on the job.</span><br /> The phone won't wait.",
       lead: 'Right now you have two options, and both cost you work.',
-      left: { title: 'Pick up mid-job', text: "Works, until you're up on a roof with your hands full.", evidence: ['Incoming call · 2:10 p.m.', 'You climb down, but they already hung up.'] },
-      right: { title: 'Let it ring', text: 'You keep working, and the customer calls the next contractor.', evidence: ['Missed call · 2:10 p.m.', "By 2:12 p.m. they'd called someone else."] },
+      left: { title: 'Pick up mid-job', text: "Works, until you're up on a roof with your hands full.", evidence: ['Incoming call · 2:10 PM', 'You climb down, but they already hung up.'] },
+      right: { title: 'Let it ring', text: 'You keep working, and the customer calls the next contractor.', evidence: ['Missed call · 2:10 PM', "By 2:12 PM they'd called someone else."] },
       bridge: "With your site and its assistant, you don't have to choose.",
     },
     ciclo: {
@@ -292,10 +292,10 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chat: {
         label: 'Missed call',
         script: [
-          { from: 'm', text: "Hi, we saw your call. We're on a job right now. What work do you need done?", time: '2:11 p.m.' },
-          { from: 'c', text: 'A new roof on my house, in Pasadena.', time: '2:12 p.m.' },
-          { from: 'm', text: "Got it. We'll call you today with the estimate. What name should I put down?", time: '2:12 p.m.' },
-          { from: 'c', text: 'Ana. Thanks.', time: '2:13 p.m.' },
+          { from: 'm', text: "Hi, we saw your call. We're on a job right now. What work do you need done?", time: '2:11 PM' },
+          { from: 'c', text: 'A leak under my kitchen sink, in Pasadena.', time: '2:12 PM' },
+          { from: 'm', text: "Got it. We'll call you today with the estimate. What name should I put down?", time: '2:12 PM' },
+          { from: 'c', text: 'Ana. Thanks.', time: '2:13 PM' },
         ],
       },
       chatSr: 'Example: after a missed call, Marcy texts the customer, notes the job and lets them know you will call today with the estimate.',
@@ -324,8 +324,8 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       label: 'The problem',
       title: "<span class='w-tone'>The apps take a cut.</span><br /> The phone rings mid-rush.",
       lead: 'Most kitchens end up picking one of two bad options.',
-      left: { title: 'Sell through the apps', text: 'Easy, until 25% to 30% of every order goes to them.', evidence: ['App order · 7:15 p.m.', 'The commission comes off before you see it.'] },
-      right: { title: 'Take orders by phone', text: 'No cut, until it rings with every burner going.', evidence: ['Missed call · 7:16 p.m.', 'Three tickets on the grill. Nobody free.'] },
+      left: { title: 'Sell through the apps', text: 'Easy, until 25% to 30% of every order goes to them.', evidence: ['App order · 7:15 PM', 'The commission comes off before you see it.'] },
+      right: { title: 'Take orders by phone', text: 'No cut, until it rings with every burner going.', evidence: ['Missed call · 7:16 PM', 'Three tickets on the grill. Nobody free.'] },
       bridge: 'With your own site, orders come straight to you.',
     },
     ciclo: {
@@ -335,7 +335,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       uTitle: 'From question to pickup',
       uSub: 'Orders and reservations reach you directly, with no app in the middle.',
       nodes: [
-        { icon: 'lucide:message-circle', label: 'Asks about the menu', text: 'A message comes in at 7:10 p.m.' },
+        { icon: 'lucide:message-circle', label: 'Asks about the menu', text: 'A message comes in at 7:10 PM' },
         { icon: 'lucide:messages-square', label: 'Marcy replies', text: 'She sends the menu and takes the order or the reservation.' },
         { icon: 'lucide:bell', label: 'Order saved, you get the alert', text: 'It reaches your WhatsApp with everything the kitchen needs.' },
         { icon: 'lucide:shopping-bag', label: 'Ready for pickup', text: 'The customer picks up and pays you the full price.' },
@@ -349,15 +349,15 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       rows: [
         { obj: 'mesa-qr', title: 'Your menu, one scan away', text: 'A QR code on the table opens your menu on any phone, in English and Spanish. Change a price or pull a sold-out dish without reprinting.', items: [0, 5] },
         { obj: 'chat', title: 'Orders and reservations, straight to you', text: 'Customers build their order or ask for a table and it lands in your WhatsApp. No app takes a cut, and an assistant handles questions while you cook.', items: [1, 2] },
-        { obj: 'web-restaurante', title: 'Photos that make people hungry', text: "Your dishes shown the way they deserve. And for food trucks, where you're parked today, so regulars can find you.", items: [3, 4] },
+        { obj: 'platos', title: 'Photos that make people hungry', text: "Your dishes shown the way they deserve. And for food trucks, where you're parked today, so regulars can find you.", items: [3, 4] },
       ],
       chat: {
         label: 'To go',
         script: [
-          { from: 'c', text: 'Hi! Two shrimp tacos and rice and beans, to go.', time: '7:10 p.m.' },
-          { from: 'm', text: 'Got it: two shrimp tacos and rice and beans. Ready for pickup in 20 minutes. Name for the order?', time: '7:10 p.m.' },
-          { from: 'c', text: 'Luis.', time: '7:11 p.m.' },
-          { from: 'm', text: 'Thanks, Luis. Your order is in. See you at 7:30.', time: '7:11 p.m.' },
+          { from: 'c', text: 'Hi! Two shrimp tacos and rice and beans, to go.', time: '7:10 PM' },
+          { from: 'm', text: 'Got it: two shrimp tacos and rice and beans. Ready for pickup in 20 minutes. Name for the order?', time: '7:10 PM' },
+          { from: 'c', text: 'Luis.', time: '7:11 PM' },
+          { from: 'm', text: 'Thanks, Luis. Your order is in. See you at 7:30 PM.', time: '7:11 PM' },
         ],
       },
       chatSr: 'Example: a customer orders tacos to go by message and Marcy confirms the order and the pickup time.',

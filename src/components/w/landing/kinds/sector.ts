@@ -54,6 +54,13 @@ const LEAD_PROJECT: Record<string, string | undefined> = {
 const spec: KindSpec = {
   kind: 'sector',
   tone: 'gold',
+  // v2 (G08): fondo temático F07 (plano isométrico con dos cotas, quieto, P12) en lugar del espacio.
+  fondo: 'F07',
+  // Ronda 1 (M1): las dos cotas de F07 caían casi invisibles y descentradas bajo la tarjeta y bajo los
+  // botones (se leían como restos). F07 no tiene opción para quitarlas, así que se sacan del hero con su
+  // propio ajuste de altura (--wf-cota1/2 fuera del lienzo, que recorta). Pendiente [SISTEMA] (P12): una
+  // opción `cotas: false` o cotas legibles alineadas al objeto.
+  fondoOpciones: () => ({ texto: 'izquierda', vars: '--wf-cota1: -200px; --wf-cota2: -200px' }),
   Hero: HeroSector,
   hero: (ctx) => {
     const t = copyOf(ctx);
@@ -79,7 +86,7 @@ const spec: KindSpec = {
     // 03 · Lo que necesita tu web: filas alternas texto + objeto con includes.items.
     {
       component: FilasOficio,
-      props: (ctx) => ({ copy: copyOf(ctx).filas, n: 3, items: ctx.cluster.includes.items, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).filas, n: 3, items: ctx.cluster.includes.items, oficio: copyOf(ctx).obj, lang: ctx.lang }),
     },
 
     // Por qué este enfoque: local.paragraphs VERBATIM (contrato de paridad).

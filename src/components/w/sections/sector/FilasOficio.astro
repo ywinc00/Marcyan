@@ -5,68 +5,35 @@
 // El objeto vive en un escenario de noche (bandeja con trama de puntos en la franja alta,
 // sin texto encima, E-37) y es de PRODUCTO, en claro (§2.4): respuesta de asistente,
 // antes y después, chat de Marcy, listados, carta con QR o web de ejemplo. Todo de EJEMPLO
-// y rotulado. Estático (la respuesta del asistente se escribe una vez al entrar).
+// y rotulado. La respuesta del asistente se escribe una vez al entrar.
+// Ronda 2 (I-A): el chat ya no es estático. FilasOficio hace de marco (data-wo-marco, el mismo
+// contrato que MarcoPestanas): con la fila a la vista, pestaña visible y sin la pausa global
+// (<html data-w-pausa>) el guion entra con "escribiendo" y se repite tras una pausa; botón de
+// pausa propio (registerLoop, >5 s); con movimiento reducido, la conversación completa y quieta.
+// v2 (G08): antes/después, listados y mesa con QR pasan a ObjetoFila.astro (productos de las marcas
+// de ejemplo); la respuesta del asistente es la de P05 (con logos) y la web, WebEjemplo de P02a.
+// Ronda 1: la respuesta del asistente cita la marca de ejemplo del oficio (Tu Plomería, Tu Inmobiliaria),
+// no "Tu Negocio" (I5); la fila de fotos de restaurants enseña platos de verdad dibujados (B2, `platos`).
 // Alternancia: el DOM siempre es objeto → texto (el objeto es ilustración aria-hidden, sin
 // nada que enfocar); en escritorio las filas pares colocan el objeto a la derecha con la
 // rejilla, sin `order`. Móvil: objeto arriba, texto debajo (W-CORE-21).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import Ejemplo from '../../Ejemplo.astro';
 import Icon from '../../../ui/Icon.astro';
 import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
 import ChatMarcy from '../../objetos/ChatMarcy.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import ObjetoFila from './ObjetoFila.astro';
+import { negocios, type NegocioId } from '../../objetos/ejemplos/negocios';
 import type { FeatureItem } from '../../../../i18n/clusters';
-import type { SectorCopy } from '../../../../i18n/w/sector';
+import type { SectorCopy, SectorObj } from '../../../../i18n/w/sector';
 
-interface Props { copy: SectorCopy['filas']; n: number; items: FeatureItem[]; lang?: 'es' | 'en' }
-const { copy, n, items, lang = 'es' } = Astro.props;
+interface Props { copy: SectorCopy['filas']; n: number; items: FeatureItem[]; oficio: SectorObj; lang?: 'es' | 'en' }
+const { copy, n, items, oficio, lang = 'es' } = Astro.props;
 const en = lang === 'en';
-const biz = en ? 'Your Business' : 'Tu Negocio';
+const NEGOCIO: Record<SectorObj, NegocioId> = { contratista: 'plomeria', inmobiliaria: 'inmobiliaria', restaurante: 'restaurante' };
+const biz = negocios[NEGOCIO[oficio]].nombre[lang];
 const T = en
-  ? {
-      ad: { head: 'Projects', before: 'Before', after: 'After', cap: 'Kitchen remodel · Katy', lic: 'Licensed and insured', sr: 'Example: a before-and-after photo of a kitchen remodel in Katy, with the licensed and insured badge.' },
-      loc: { t: 'Today', s: 'East End · 11 a.m. to 3 p.m.' },
-      qr: { name: 'Your Restaurant', scan: 'Scan for the menu', table: 'Table 4', sr: 'Example: a table card with a QR code that opens the menu in English and Spanish.' },
-    }
-  : {
-      ad: { head: 'Proyectos', before: 'Antes', after: 'Después', cap: 'Remodelación de cocina · Katy', lic: 'Con licencia y asegurado', sr: 'Ejemplo: foto de antes y después de una remodelación de cocina en Katy, con el sello de licencia y seguro.' },
-      loc: { t: 'Hoy', s: 'East End · de 11 a. m. a 3 p. m.' },
-      qr: { name: 'Tu Restaurante', scan: 'Escanea para ver el menú', table: 'Mesa 4', sr: 'Ejemplo: tarjeta de mesa con un código QR que abre el menú en español e inglés.' },
-    };
-const LIST = {
-  marca: 'Tu Marca',
-  role: 'Agente · Houston',
-  tabs: ['Comprar', 'Vender'],
-  rows: [
-    { t: 'Casa de 3 recámaras', s: 'Katy · patio y cochera' },
-    { t: 'Townhome de 2 pisos', s: 'Cypress · se muestra el sábado' },
-    { t: 'Casa con jardín', s: 'Spring Branch · lista para mudarse' },
-  ],
-  btn: 'Agendar visita',
-  sr: 'Ejemplo: tu sitio de agente con tus propiedades en lista, un filtro para comprar o vender y un botón para agendar visita.',
-};
-
-// Código QR de EJEMPLO: módulos deterministas (no lleva a ningún sitio) con los tres
-// cuadros de posición. 21×21, como un QR versión 1.
-const Q = 21;
-const finder = (r: number, c: number) => {
-  for (const [r0, c0] of [[0, 0], [0, Q - 7], [Q - 7, 0]]) {
-    const y = r - r0, x = c - c0;
-    if (y >= -1 && y <= 7 && x >= -1 && x <= 7) {
-      if (y < 0 || y > 6 || x < 0 || x > 6) return 0;
-      if (y === 0 || y === 6 || x === 0 || x === 6) return 1;
-      return y >= 2 && y <= 4 && x >= 2 && x <= 4 ? 1 : 0;
-    }
-  }
-  return -1;
-};
-let seed = 7;
-const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
-const qr: string[] = [];
-for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) {
-  const f = finder(r, c);
-  if (f === 1 || (f === -1 && rnd() > 0.52)) qr.push(`M${c} ${r}h1v1h-1z`);
-}
+  ? { loc: { t: 'Today', s: 'East End · 11 AM to 3 PM' } }
+  : { loc: { t: 'Hoy', s: 'East End · de 11 a. m. a 3 p. m.' } };
 const pad = (k: number) => String(k).padStart(2, '0');
 ---
 <CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
@@ -79,94 +46,18 @@ const pad = (k: number) => String(k).padStart(2, '0');
             <RespuestaAsistente lang={lang} tone="gold" size="card" question={copy.question} business={biz} />
           )}
           {row.obj === 'chat' && (
-            <ChatMarcy mode="estatico" tone="neutral" lang={lang} size="card" tabs={[copy.chat]} sr={copy.chatSr} />
+            <div class="sf-chat" data-wo-marco data-sf-chat>
+              <ChatMarcy mode="compacto" tabsBar={false} tone="neutral" lang={lang} size="card" tabs={[copy.chat]} sr={copy.chatSr} />
+            </div>
           )}
-          {row.obj === 'web-restaurante' && (
+          {row.obj === 'platos' && (
             <div class="sf-web">
-              <WebEjemplo kind="restaurante" frame="movil" lang={lang} city="Houston" size="card" />
+              <ObjetoFila kind="platos" lang={lang} />
               <p class="sf-loc" aria-hidden="true"><Icon name="lucide:map-pin" /><span><b>{T.loc.t}</b>{T.loc.s}</span></p>
             </div>
           )}
-          {row.obj === 'antes-despues' && (
-            <div class="sf-ad">
-              <p class="sr-only">{T.ad.sr}</p>
-              <div class="sf-ad__card" aria-hidden="true">
-                <Ejemplo lang={lang} on="light" />
-                <p class="sf-ad__head"><span class="sf-ad__ic"><Icon name="lucide:image" /></span>{T.ad.head} · <span translate="no">{biz}</span></p>
-                <div class="sf-ad__pair">
-                  {[0, 1].map((k) => (
-                    <figure class:list={['sf-ad__tile', k === 1 && 'sf-ad__tile--after']}>
-                      <svg viewBox="0 0 150 112" preserveAspectRatio="xMidYMid slice">
-                        {k === 0 ? (
-                          <g>
-                            <rect width="150" height="112" fill="#d8d3ca" />
-                            <rect x="0" y="66" width="150" height="46" fill="#c4bdb1" />
-                            <rect x="10" y="12" width="40" height="34" rx="2" fill="#b3ab9e" />
-                            <rect x="56" y="16" width="36" height="30" rx="2" fill="#aaa294" transform="rotate(-4 74 31)" />
-                            <rect x="98" y="12" width="42" height="34" rx="2" fill="#b3ab9e" />
-                            <rect x="8" y="60" width="134" height="7" fill="#9e968a" />
-                            <rect x="14" y="74" width="34" height="32" fill="#aea699" />
-                            <rect x="54" y="74" width="34" height="32" fill="#a39b8e" transform="rotate(3 71 90)" />
-                            <rect x="94" y="74" width="42" height="32" fill="#aea699" />
-                            <path d="M120 20 l8 18 M64 80 l14 20" stroke="#8d857a" stroke-width="1.5" fill="none" />
-                          </g>
-                        ) : (
-                          <g>
-                            <rect width="150" height="112" fill="#f3ede3" />
-                            <rect x="0" y="66" width="150" height="46" fill="#e7dccb" />
-                            <rect x="8" y="46" width="134" height="14" fill="#fff" />
-                            <path d="M8 53h134M30 46v14M52 46v14M74 46v14M96 46v14M118 46v14" stroke="#e4ddd2" stroke-width="1" />
-                            <rect x="10" y="10" width="40" height="32" rx="3" fill="#2f5266" />
-                            <rect x="55" y="10" width="40" height="32" rx="3" fill="#2f5266" />
-                            <rect x="100" y="10" width="40" height="32" rx="3" fill="#2f5266" />
-                            <rect x="8" y="60" width="134" height="6" fill="#c8a96e" />
-                            <rect x="12" y="72" width="40" height="34" rx="3" fill="#3a6378" />
-                            <rect x="55" y="72" width="40" height="34" rx="3" fill="#3a6378" />
-                            <rect x="98" y="72" width="40" height="34" rx="3" fill="#3a6378" />
-                            <path d="M26 30h12M69 30h12M114 30h12M26 80h12M69 80h12M112 80h12" stroke="#e8e2d6" stroke-width="2" stroke-linecap="round" />
-                          </g>
-                        )}
-                      </svg>
-                      <figcaption>{k === 0 ? T.ad.before : T.ad.after}</figcaption>
-                    </figure>
-                  ))}
-                </div>
-                <p class="sf-ad__cap">{T.ad.cap}</p>
-                <p class="sf-ad__lic"><Icon name="lucide:badge-check" />{T.ad.lic}</p>
-              </div>
-            </div>
-          )}
-          {row.obj === 'listados' && (
-            <div class="sf-ls">
-              <p class="sr-only">{LIST.sr}</p>
-              <div class="sf-ls__card" aria-hidden="true">
-                <Ejemplo lang={lang} on="light" />
-                <p class="sf-ls__head"><span class="sf-ls__av">T</span><span><b translate="no">{LIST.marca}</b><span>{LIST.role}</span></span></p>
-                <p class="sf-ls__tabs">{LIST.tabs.map((t, k) => <span class:list={['sf-ls__tab', k === 0 && 'is-on']}>{t}</span>)}</p>
-                <ul class="sf-ls__list">
-                  {LIST.rows.map((r) => (
-                    <li><span class="sf-ls__ph"><Icon name="lucide:house" /></span><span class="sf-ls__t"><b>{r.t}</b><span>{r.s}</span></span></li>
-                  ))}
-                </ul>
-                <span class="sf-ls__btn">{LIST.btn}</span>
-              </div>
-            </div>
-          )}
-          {row.obj === 'mesa-qr' && (
-            <div class="sf-qr">
-              <p class="sr-only">{T.qr.sr}</p>
-              <div class="sf-qr__card" aria-hidden="true">
-                <Ejemplo lang={lang} on="light" />
-                <p class="sf-qr__name" translate="no">{T.qr.name}</p>
-                <svg class="sf-qr__code" viewBox={`-1 -1 ${Q + 2} ${Q + 2}`} shape-rendering="crispEdges">
-                  <rect x="-1" y="-1" width={Q + 2} height={Q + 2} fill="#fff" />
-                  <path d={qr.join('')} fill="#0e0e0d" />
-                </svg>
-                <p class="sf-qr__scan">{T.qr.scan}</p>
-                <p class="sf-qr__langs"><span class="is-on">EN</span><span>ES</span></p>
-                <p class="sf-qr__table">{T.qr.table}</p>
-              </div>
-            </div>
+          {(row.obj === 'antes-despues' || row.obj === 'listados' || row.obj === 'mesa-qr') && (
+            <ObjetoFila kind={row.obj} lang={lang} />
           )}
         </div>
       </div>
@@ -184,7 +75,30 @@ const pad = (k: number) => String(k).padStart(2, '0');
   ))}
 </div>
 
+<script>
+  import { registerLoop } from '../../loop';
+  const HOLD = 2600;
+  const pausaGlobal = () => document.documentElement.hasAttribute('data-w-pausa');
+  document.querySelectorAll<HTMLElement>('[data-sf-chat]').forEach((marco) => {
+    let corre = false;
+    let t = 0;
+    const play = () => { window.clearTimeout(t); if (corre && !pausaGlobal()) marco.dispatchEvent(new CustomEvent('wo:play', { detail: { index: 0 } })); };
+    const stop = () => { window.clearTimeout(t); marco.dispatchEvent(new CustomEvent('wo:stop')); };
+    marco.addEventListener('wo:done', () => { window.clearTimeout(t); t = window.setTimeout(play, HOLD); });
+    registerLoop(marco, {
+      start: () => { corre = true; play(); },
+      stop: () => { corre = false; stop(); },
+      still: () => { corre = false; window.clearTimeout(t); marco.dispatchEvent(new CustomEvent('wo:still')); },
+    }, { buttonTone: 'dark' });
+    const aplicar = () => { if (pausaGlobal()) stop(); else if (corre) play(); };
+    document.addEventListener('w:pausa', aplicar);
+    new MutationObserver(aplicar).observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
+  });
+</script>
+
 <style>
+  /* El botón de pausa cae en la bandeja, bajo la ventana: así no tapa la hora de la última burbuja. */
+  .sf-chat { position: relative; width: min(100%, 440px); display: flex; justify-content: center; padding-bottom: 60px; margin-bottom: -20px; }
   .sf { margin-top: var(--w-chapter-gap); display: grid; gap: 64px; }
   .sf__row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; }
 
@@ -202,7 +116,7 @@ const pad = (k: number) => String(k).padStart(2, '0');
     mask-image: linear-gradient(180deg, #000 30%, transparent);
     pointer-events: none;
   }
-  .sf__obj { position: relative; width: 100%; display: flex; justify-content: center; }
+  .sf__obj { position: relative; width: 100%; min-width: 0; display: flex; justify-content: center; }
 
   .sf__text { min-width: 0; max-width: 480px; }
   .sf__n {
@@ -233,62 +147,14 @@ const pad = (k: number) => String(k).padStart(2, '0');
     .sf__stage { min-height: 0; padding: 48px 16px 28px; border-radius: var(--w-r-tray); }
   }
 
-  /* ── Objetos propios de la sección (PRODUCTO, claro) ── */
-  .sf-ad, .sf-ls, .sf-qr { position: relative; width: min(100%, 360px); font-family: var(--font-body); text-align: left; }
-  .sf-ad__card, .sf-ls__card, .sf-qr__card {
-    position: relative; display: flex; flex-direction: column; gap: 12px; padding: 16px;
-    background: #fff; color: var(--w-p-ink); border: 1px solid var(--w-p-line);
-    border-radius: var(--w-r-obj); box-shadow: inset 0 1px 0 #fff;
-  }
-  .sf-ad__head, .sf-ls__head { margin: 0; padding-right: 84px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--w-p-ink-2); }
-  .sf-ad__ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: var(--w-p-bg); color: var(--w-p-ink); }
-  .sf-ad__ic :global(svg) { width: 14px; height: 14px; }
-  .sf-ad__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .sf-ad__tile { position: relative; margin: 0; border-radius: 8px; overflow: hidden; aspect-ratio: 150 / 112; }
-  .sf-ad__tile svg { display: block; width: 100%; height: 100%; }
-  .sf-ad__tile figcaption {
-    position: absolute; left: 8px; top: 8px; padding: 2px 8px; border-radius: 6px;
-    background: rgba(255,255,255,.92); color: var(--w-p-ink); font-size: 13px; font-weight: 600;
-  }
-  .sf-ad__tile--after figcaption { background: var(--w-p-ink); color: var(--w-p-bg); }
-  .sf-ad__cap { margin: 0; font: 600 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
-  .sf-ad__lic { margin: 0; display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid var(--w-p-line); font-size: 13px; color: var(--w-p-ink-2); }
-  .sf-ad__lic :global(svg) { width: 16px; height: 16px; color: var(--w-p-ink); }
-
-  .sf-ls__av { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #2f5266; color: #fff; font: 600 14px/1 var(--font-display); }
-  .sf-ls__head > span:last-child { display: flex; flex-direction: column; gap: 1px; }
-  .sf-ls__head b { font: 600 15px/1.2 var(--font-display); color: var(--w-p-ink); }
-  .sf-ls__tabs { margin: 0; display: flex; gap: 6px; }
-  .sf-ls__tab { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--w-p-line); font-size: 13px; font-weight: 500; color: var(--w-p-ink-2); }
-  .sf-ls__tab.is-on { background: var(--w-p-ink); border-color: var(--w-p-ink); color: var(--w-p-bg); }
-  .sf-ls__list { list-style: none; margin: 0; padding: 0; }
-  .sf-ls__list li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--w-p-line); }
-  .sf-ls__ph { flex: none; display: grid; place-items: center; width: 64px; height: 48px; border-radius: 8px; background: linear-gradient(160deg, #e3dfd7, #cfc9be); color: #6b6660; }
-  .sf-ls__ph :global(svg) { width: 20px; height: 20px; }
-  .sf-ls__t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .sf-ls__t b { font: 600 14px/1.25 var(--font-display); }
-  .sf-ls__t span { font-size: 13px; color: var(--w-p-ink-2); }
-  .sf-ls__btn, .sf-qr__langs .is-on {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--w-p-ink); color: var(--w-p-bg); font-weight: 600;
-  }
-  .sf-ls__btn { height: 40px; border-radius: 8px; font-size: 14px; }
-
-  .sf-qr { width: min(100%, 300px); }
-  .sf-qr__card { align-items: center; text-align: center; padding: 48px 24px 24px; }
-  .sf-qr__name { margin: 0; font: 600 19px/1.2 var(--font-display); letter-spacing: -0.02em; }
-  .sf-qr__code { width: 148px; height: 148px; border-radius: 6px; border: 1px solid var(--w-p-line); }
-  .sf-qr__scan { margin: 0; font-size: 15px; font-weight: 500; }
-  .sf-qr__langs { margin: 0; display: flex; gap: 6px; font-size: 13px; }
-  .sf-qr__langs span { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--w-p-line); color: var(--w-p-ink-2); }
-  .sf-qr__langs .is-on { border-color: var(--w-p-ink); }
-  .sf-qr__table { margin: 2px 0 0; font-size: 13px; color: var(--w-p-ink-2); }
+  /* Objetos de antes/después, listados y mesa con QR: ObjetoFila.astro (v2). */
   /* Ubicación de hoy (food trucks): ficha clara pegada al teléfono, fuera de su pantalla. */
   .sf-web { position: relative; display: flex; justify-content: center; }
   .sf-loc {
-    position: absolute; right: calc(50% - 196px); bottom: 64px; margin: 0;
+    position: absolute; right: calc(50% - 196px); top: 96px; margin: 0;
     display: flex; align-items: center; gap: 10px; padding: 10px 14px;
     background: #fff; color: var(--w-p-ink); border: 1px solid var(--w-p-line); border-radius: var(--w-r-obj);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .35);
     font-family: var(--font-body); font-size: 13px; white-space: nowrap;
   }
   .sf-loc :global(svg) { width: 18px; height: 18px; color: #8a4a30; flex: none; }

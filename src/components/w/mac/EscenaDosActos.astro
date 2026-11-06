@@ -44,7 +44,7 @@ const T = {
   es: {
     acto1: '¿Quién contesta a las 11 de la noche?',
     resumen: 'Ejemplo animado: de noche llegan mensajes por WhatsApp, Instagram, Messenger, el formulario y el chat de la web; Marcy los contesta y por la mañana el panel muestra todo respondido, y te avisa de la llamada perdida y del mensaje de texto.',
-    ejemplo: 'Ejemplo', app: 'Escritorio', hora: 'jue 5 nov  11:58 p. m.',
+    ejemplo: 'Ejemplo', app: 'Escritorio', hora: 'jue 5 nov  11:58 p. m.', horaDia: 'vie 6 nov  7:02 a. m.',
     canales: { whatsapp: 'WhatsApp', instagram: 'Instagram', messenger: 'Messenger', form: 'Formulario web', web: 'Chat de la web', llamada: 'Llamada perdida', sms: 'Mensaje de texto' },
     pedir: 'Pedir presupuesto', campos: ['Nombre', 'Servicio', 'Mensaje'], enviado: 'Enviado', enviar: 'Enviar',
     sinLeer: 'sin leer', escribe: 'Escribe un mensaje',
@@ -53,15 +53,15 @@ const T = {
     respondido: 'Respondido', avisa: 'Te avisa', sello: 'RESPONDIDO',
     ventanas: [
       { canal: 'whatsapp', x: 36, y: 50, w: 300, quien: 'Ana R.', texto: '¿Están abiertos mañana?', hora: '10:47 p. m.' },
-      { canal: 'instagram', x: 318, y: 74, w: 290, quien: 'marisol.hz', texto: 'Hola, ¿tienen hueco el sábado?', hora: '10:52 p. m.' },
+      { canal: 'instagram', x: 318, y: 74, w: 290, quien: 'marisol.hz', texto: 'Hola, ¿pueden venir el sábado a ver la cocina?', hora: '10:52 p. m.' },
       { canal: 'form', x: 584, y: 46, w: 300, quien: 'Carlos P.', texto: '¿Pueden venir esta semana a ver la casa?', hora: '11:02 p. m.' },
-      { canal: 'messenger', x: 862, y: 66, w: 290, quien: 'Rosa G.', texto: 'Hi! Do you have anything open this week?', hora: '11:06 p. m.', enLang: true },
+      { canal: 'messenger', x: 862, y: 66, w: 290, quien: 'Rosa G.', texto: 'Hi! Could someone come by this week for an estimate?', hora: '11:06 p. m.', enLang: true },
       { canal: 'web', x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿me pueden llamar mañana?', hora: '11:10 p. m.' },
       { canal: 'llamada', x: 1030, y: 318, w: 318, quien: '(281) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
       { canal: 'whatsapp', x: 110, y: 352, w: 300, quien: 'Luis T.', texto: 'Buenas noches, ¿cuánto tarda una cotización?', hora: '11:21 p. m.', extra: true },
       { canal: 'instagram', x: 402, y: 400, w: 290, quien: 'casa.verde', texto: 'Me interesa, ¿hacen visitas en Katy?', hora: '11:33 p. m.', extra: true },
       { canal: 'sms', x: 1030, y: 452, w: 318, quien: '(832) 555-0187', texto: '¿Siguen abiertos?', hora: '11:41 p. m.', extra: true },
-      { canal: 'web', x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, anything early Monday?', hora: '11:52 p. m.', extra: true, enLang: true },
+      { canal: 'web', x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, can you come out early Monday?', hora: '11:52 p. m.', extra: true, enLang: true },
     ] as Ventana[],
     filas: [
       { canal: 'whatsapp', txt: 'Ana R. y Luis T.', est: 'ok' },
@@ -76,24 +76,24 @@ const T = {
   en: {
     acto1: 'Who answers at 11 at night?',
     resumen: 'Animated example: at night messages arrive on WhatsApp, Instagram, Messenger, the website form and website chat; Marcy answers them and in the morning the panel shows everything answered, and flags the missed call and the text message for you.',
-    ejemplo: 'Example', app: 'Desktop', hora: 'Thu Nov 5  11:58 PM',
+    ejemplo: 'Example', app: 'Desktop', hora: 'Thu Nov 5  11:58 PM', horaDia: 'Fri Nov 6  7:02 AM',
     canales: { whatsapp: 'WhatsApp', instagram: 'Instagram', messenger: 'Messenger', form: 'Website form', web: 'Website chat', llamada: 'Missed call', sms: 'Text message' },
     pedir: 'Request a quote', campos: ['Name', 'Service', 'Message'], enviado: 'Sent', enviar: 'Send',
     sinLeer: 'unread', escribe: 'Type a message',
     contestando: 'Marcy is answering', respondidoPor: 'Answered by Marcy',
     panel: 'Today, while you slept', enLinea: 'Marcy · online',
-    respondido: 'Answered', avisa: 'Lets you know', sello: 'ANSWERED',
+    respondido: 'Answered', avisa: 'Flagged for you', sello: 'ANSWERED',
     ventanas: [
       { canal: 'whatsapp', x: 36, y: 50, w: 300, quien: 'Ana R.', texto: 'Are you open tomorrow?', hora: '10:47 PM' },
-      { canal: 'instagram', x: 318, y: 74, w: 290, quien: 'marisol.hz', texto: 'Hi, any openings on Saturday?', hora: '10:52 PM' },
+      { canal: 'instagram', x: 318, y: 74, w: 290, quien: 'marisol.hz', texto: 'Hi, could you come Saturday to look at the kitchen?', hora: '10:52 PM' },
       { canal: 'form', x: 584, y: 46, w: 300, quien: 'Carlos P.', texto: 'Can you come see the house this week?', hora: '11:02 PM' },
-      { canal: 'messenger', x: 862, y: 66, w: 290, quien: 'Rosa G.', texto: '¡Hola! ¿Tienen algo libre esta semana?', hora: '11:06 PM', enLang: true },
+      { canal: 'messenger', x: 862, y: 66, w: 290, quien: 'Rosa G.', texto: '¡Hola! ¿Pueden venir esta semana a dar un presupuesto?', hora: '11:06 PM', enLang: true },
       { canal: 'web', x: 1104, y: 44, w: 250, quien: 'Visitor', texto: 'Hi, can you call me tomorrow?', hora: '11:10 PM' },
       { canal: 'llamada', x: 1030, y: 318, w: 318, quien: '(281) 555-0142', texto: 'No voicemail', hora: '11:14 PM' },
       { canal: 'whatsapp', x: 110, y: 352, w: 300, quien: 'Luis T.', texto: 'Good evening, how long does a quote take?', hora: '11:21 PM', extra: true },
       { canal: 'instagram', x: 402, y: 400, w: 290, quien: 'casa.verde', texto: 'Interested, do you do visits in Katy?', hora: '11:33 PM', extra: true },
       { canal: 'sms', x: 1030, y: 452, w: 318, quien: '(832) 555-0187', texto: 'Still open?', hora: '11:41 PM', extra: true },
-      { canal: 'web', x: 714, y: 404, w: 290, quien: 'Visitor', texto: 'Hola, ¿algo el lunes temprano?', hora: '11:52 PM', extra: true, enLang: true },
+      { canal: 'web', x: 714, y: 404, w: 290, quien: 'Visitor', texto: 'Hola, ¿pueden venir el lunes temprano?', hora: '11:52 PM', extra: true, enLang: true },
     ] as Ventana[],
     filas: [
       { canal: 'whatsapp', txt: 'Ana R. and Luis T.', est: 'ok' },
@@ -148,7 +148,7 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
     <p class="sr-only">{T.resumen}</p>
     <span class="da-ejemplo" aria-hidden="true">{T.ejemplo}</span>
     <Portatil ancho={976}>
-      <Escritorio lang={lang} dock={false} app={T.app} hora={T.hora} class="da-esc">
+      <Escritorio lang={lang} dock={false} app={T.app} hora={T.hora} horaDia={T.horaDia} class="da-esc">
         {T.ventanas.map((v, i) => (
           <div class:list={['dv', `dv--${v.canal}`, v.extra && 'dv--extra']} data-da-v={i} style={`left:${v.x}px;top:${v.y}px;width:${v.w}px;--i:${i}`}>
             <div class="dv-cab">
@@ -240,7 +240,9 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
   @media (min-width: 375px) { .da { --da-t: 46px; } }
   @media (min-width: 640px) { .da { --da-t: 54px; padding-top: calc(var(--nav-h, 72px) + 28px); } }
   @media (min-width: 1024px) { .da { --da-t: 68px; padding-top: calc(var(--nav-h, 72px) + 32px); } }
-  @media (min-width: 1280px) and (min-height: 860px) { .da { --da-t: 80px; padding-top: calc(var(--nav-h, 72px) + 40px); } }
+  /* 80 px solo con alto de sobra: a 1440×900 el titular de 2 líneas a 80 y una bajada
+     larga dejaban el portátil en y≈575 (dos tercios de la demo bajo el pliegue) */
+  @media (min-width: 1280px) and (min-height: 1000px) { .da { --da-t: 80px; padding-top: calc(var(--nav-h, 72px) + 40px); } }
   @media (min-width: 1920px) and (min-height: 1200px) { .da { --da-t: 96px; } }
 
   /* cielo: noche → amanecer teal (600 ms) */
@@ -272,15 +274,22 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
     font-size: clamp(17px, 1rem + .3vw, 21px); line-height: 1.32; letter-spacing: -.012em; color: var(--w-ink-70, rgba(240,237,232,.7));
   }
   .da-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: clamp(18px, 2vw, 26px); }
+  /* escritorio: bajada más ancha y algo menor (3 líneas, no 4) y aire justo, para que
+     el portátil suba y la demo quede casi entera en la primera pantalla */
+  @media (min-width: 1024px) {
+    .da-bajada :global(p) { max-width: 900px; font-size: 19px; line-height: 1.34; margin-top: 12px; }
+    .da-acciones { margin-top: 20px; }
+  }
 
   /* portátil */
   .da-mac { position: relative; z-index: 1; width: min(976px, 100%); margin-top: clamp(28px, 3vw, 44px); }
+  @media (min-width: 1024px) { .da-mac { margin-top: 30px; } }
   .da-ejemplo { position: absolute; right: 5%; top: -22px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); }
   .da-pie { position: relative; z-index: 2; max-width: 1100px; }
   /* Móvil: la demo va justo bajo el H1 (si no, una bajada larga la deja fuera de la
      primera pantalla); bajada y botones debajo. El orden del DOM no cambia. */
   @media (max-width: 639px) {
-    .da-mac { order: 2; margin-top: 22px; }
+    .da-mac { order: 2; margin-top: 44px; } /* aire para el rótulo "Ejemplo" (va a -22 px) */
     .da-pie { order: 3; margin: 26px 0 48px; }
     .da-acciones { flex-direction: column; align-items: center; }
     .da-mac :global(.dv--extra) { display: none; }
@@ -388,6 +397,9 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
   /* fondo de la pantalla: noche en el acto 1, amanecer en el acto 2 (cruce de 600 ms del Escritorio) */
   .da:not([data-da-fase="inicio"]) :global(.esc-cielo-dia) { opacity: 1; }
   .da:not([data-da-fase="inicio"]) :global(.esc-estrellas) { opacity: 0; }
+  /* barra de menús: 11:58 p. m. de noche, hora de la mañana en el acto 2 */
+  .da:not([data-da-fase="inicio"]) :global(.esc-hora--noche) { display: none; }
+  .da:not([data-da-fase="inicio"]) :global(.esc-hora--dia) { display: inline; }
   .da[data-da-fase="inicio"] .dv:not(.is-on) { opacity: 0; transform: translateY(14px) scale(.96); }
   .da[data-da-fase="inicio"] .da-hoja:not(.is-on) { opacity: 0; transform: scale(.96); }
   .da[data-da-fase="inicio"] .da-hoja:not(.is-ok) .da-hoja-t--2,

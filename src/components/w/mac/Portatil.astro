@@ -80,6 +80,10 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     container-type: inline-size;
     perspective: 260cqw;
     perspective-origin: 50% 20%;
+    /* la tapa casi cerrada (giro hacia quien mira) se proyecta POR DEBAJO de la
+       bisagra y colgaba como un trapecio oscuro bajo la base: se recorta en la
+       línea de la bisagra; por arriba y a los lados queda holgura para el 3D */
+    clip-path: inset(-40% -12% 0 -12%);
   }
   .pt-tapa {
     position: absolute; inset: 0;

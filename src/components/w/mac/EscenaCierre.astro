@@ -5,7 +5,9 @@
 // Escena de 902 u de alto, --u = min(100cqw, 1440px) / 1440 (≥ 768 px):
 //   · portátil 1084u en top 109u; su pantalla enseña la web publicada
 //     ATENUADA (opacity .35) como fondo: slot "pantalla" (la página mete aquí
-//     WebEjemplo de P02) y, si no llega, un amanecer abstracto de la marca;
+//     WebEjemplo de P02) y, si no llega, el escritorio de mañana (barra de menús +
+//     dock) con la web publicada de un negocio neutro "Tu Negocio" en el navegador,
+//     atenuada: se lee como la última pantalla del producto (W2N-06);
 //   · tarjeta 623×391 radio 18 rgba(240,237,232,.94) centrada en top 436u:
 //     isotipo Marcyan 40 px, H2 48/50 (slot "titulo"), bajada 21 (slot
 //     "bajada") y CTAs del sitio (slot "acciones": el trío contractual de G03);
@@ -18,6 +20,8 @@
 // tarjeta sobre el horizonte (padding 48). Reducir movimiento: todo en su sitio.
 // ─────────────────────────────────────────────────────────────
 import Portatil from './Portatil.astro';
+import Escritorio from './Escritorio.astro';
+import VentanaApp from './VentanaApp.astro';
 import LogoMark from '../../brand/LogoMark.astro';
 
 interface Props {
@@ -27,6 +31,14 @@ interface Props {
 }
 const { lang = 'es', id, class: cls } = Astro.props;
 const conPantalla = Astro.slots.has('pantalla');
+const W = {
+  es: { negocio: 'Tu Negocio', dominio: 'tunegocio.example · Ejemplo', nav: ['Servicios', 'Nosotros', 'Contacto'], reservar: 'Reservar',
+    eyebrow: 'Houston · desde hoy en línea', titulo: ['Cerca de ti,', 'desde el primer clic.'], tira: ['Servicios', 'Horario', 'Cómo llegar'],
+    hora: 'vie 6 nov  9:00 a. m.', app: 'Navegador' },
+  en: { negocio: 'Your Business', dominio: 'yourbusiness.example · Example', nav: ['Services', 'About', 'Contact'], reservar: 'Book',
+    eyebrow: 'Houston · live today', titulo: ['Close to you,', 'from the first click.'], tira: ['Services', 'Hours', 'Directions'],
+    hora: 'Fri Nov 6  9:00 AM', app: 'Browser' },
+}[lang];
 ---
 <section class:list={['cie', cls]} id={id} data-w2-cierre lang={lang}>
   <div class="cie-escena">
@@ -37,7 +49,29 @@ const conPantalla = Astro.slots.has('pantalla');
     <div class="cie-mac">
       <Portatil ancho={1084 * 1.08} base={false}>
         <div class="cie-pantalla">
-          {conPantalla ? <div class="cie-web"><slot name="pantalla" /></div> : <div class="cie-web cie-web--vacia"></div>}
+          {conPantalla ? <div class="cie-web"><slot name="pantalla" /></div> : (
+            <div class="cie-web cie-web--esc">
+              <Escritorio lang={lang} dia app={W.app} hora={W.hora}>
+                <VentanaApp url={W.dominio} x={104} y={62} w={1170} h={712} z={1}>
+                  <div class="cw">
+                    <div class="cw-nav">
+                      <span class="cw-logo"><span class="cw-signo"></span>{W.negocio}</span>
+                      <span class="cw-links">{W.nav.map((n) => <span>{n}</span>)}</span>
+                      <span class="cw-btn">{W.reservar}</span>
+                    </div>
+                    <div class="cw-hero">
+                      <div class="cw-txt">
+                        <span class="cw-eyebrow">{W.eyebrow}</span>
+                        <span class="cw-h">{W.titulo[0]}<br />{W.titulo[1]}</span>
+                      </div>
+                      <div class="cw-arte"><span></span></div>
+                    </div>
+                    <div class="cw-tira">{W.tira.map((t) => <span>{t}<i>→</i></span>)}</div>
+                  </div>
+                </VentanaApp>
+              </Escritorio>
+            </div>
+          )}
           <span class="cie-apagada"></span>
         </div>
       </Portatil>
@@ -99,7 +133,7 @@ const conPantalla = Astro.slots.has('pantalla');
     position: relative; z-index: 3; max-width: 623px; margin-inline: auto;
     display: grid; justify-items: center; text-align: center; gap: 14px;
     padding: 40px 28px 36px; border-radius: 18px;
-    background: rgba(240,237,232,.94); color: #0e0e0d;
+    background: #efece7; color: #0e0e0d; /* opaca: al 94 % el horizonte se leía como mancha curva */
     box-shadow: 0 30px 80px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(14,14,13,.06);
   }
   .cie-tarjeta :global(.cie-iso) { display: block; }
@@ -116,12 +150,23 @@ const conPantalla = Astro.slots.has('pantalla');
   /* pantalla del portátil */
   .cie-pantalla { position: absolute; inset: 0; background: #0b0b0e; }
   .cie-web { position: absolute; inset: 0; opacity: .35; }
-  .cie-web--vacia {
-    opacity: 1;
-    background:
-      radial-gradient(90% 55% at 50% 100%, rgba(239,191,127,.85), rgba(232,184,108,.25) 55%, transparent 80%),
-      linear-gradient(180deg, #2f5466 0%, #5f8b94 30%, #a9bdb3 52%, #e6d2ac 70%, #b9714f 100%);
-  }
+  /* reserva sin WebEjemplo: escritorio de mañana con la web publicada, atenuado */
+  .cie-web--esc { opacity: .5; }
+  .cw { position: absolute; inset: 0; background: #f4f1ea; color: #1b1a17; font-family: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif; }
+  .cw-nav { display: flex; align-items: center; gap: 28px; height: 78px; padding: 0 40px; border-bottom: 1px solid rgba(27,26,23,.08); }
+  .cw-logo { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 600; letter-spacing: -.04em; }
+  .cw-signo { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2px #1b1a17; background: radial-gradient(circle at 50% 50%, #1b1a17 0 4px, transparent 4.5px); }
+  .cw-links { display: flex; gap: 26px; margin-left: auto; font-size: 15px; color: #57534b; }
+  .cw-btn { display: inline-flex; align-items: center; height: 40px; padding: 0 20px; border-radius: 999px; background: #1b1a17; color: #f4f1ea; font-size: 14.5px; font-weight: 600; }
+  .cw-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; height: 440px; padding: 40px 40px 0; }
+  .cw-txt { display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .cw-eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: #8a6a3a; }
+  .cw-h { font-size: 60px; line-height: 1; letter-spacing: -.055em; font-weight: 300; white-space: nowrap; }
+  .cw-arte { position: relative; border-radius: 20px; overflow: hidden; background: linear-gradient(170deg, #e8c99a 0%, #d79a62 45%, #8f5638 100%); }
+  .cw-arte span { position: absolute; left: -20%; right: -20%; bottom: -55%; height: 100%; border-radius: 50%; background: #2a211c; box-shadow: 0 -2px 0 rgba(255,236,200,.7); }
+  .cw-tira { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 30px 40px 0; }
+  .cw-tira span { display: flex; justify-content: space-between; align-items: center; height: 64px; padding: 0 22px; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px rgba(27,26,23,.08); font-size: 17px; font-weight: 500; letter-spacing: -.02em; }
+  .cw-tira i { font-style: normal; color: #8a6a3a; }
   .cie-apagada { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.06), transparent 45%), #060607; opacity: 0; }
 
   @media (min-width: 768px) {

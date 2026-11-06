@@ -54,13 +54,14 @@ const LEAD_PROJECT: Record<string, string | undefined> = {
 const spec: KindSpec = {
   kind: 'sector',
   tone: 'gold',
-  // v2 (G08): fondo temático F07 (plano isométrico con dos cotas, quieto, P12) en lugar del espacio.
-  fondo: 'F07',
-  // Ronda 1 (M1): las dos cotas de F07 caían casi invisibles y descentradas bajo la tarjeta y bajo los
-  // botones (se leían como restos). F07 no tiene opción para quitarlas, así que se sacan del hero con su
-  // propio ajuste de altura (--wf-cota1/2 fuera del lienzo, que recorta). Pendiente [SISTEMA] (P12): una
-  // opción `cotas: false` o cotas legibles alineadas al objeto.
-  fondoOpciones: () => ({ texto: 'izquierda', vars: '--wf-cota1: -200px; --wf-cota2: -200px' }),
+  // v3: fondo F20, una escena por oficio con un solo motivo (E-57): atardecer con el haz de líneas que sale
+  // por la izquierda en bienes raíces, armazón de obra en contratistas; restaurantes sigue en F07 (sus cotas
+  // se sacan del lienzo como en la v2, ronda 1 M1). F20 elige la escena por la ruta.
+  fondo: 'F20',
+  fondoOpciones: (ctx) => ({
+    texto: 'izquierda',
+    vars: ctx.cluster.path === '/en/houston/restaurants' ? '--wf-cota1: -200px; --wf-cota2: -200px' : undefined,
+  }),
   Hero: HeroSector,
   hero: (ctx) => {
     const t = copyOf(ctx);

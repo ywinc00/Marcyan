@@ -30,9 +30,3 @@ export const ICONOS: Record<IconoId, IconoObjetoDef> = {
   'seo-ia': { id: 'seo-ia', tone: 'teal', glyph: 'chispa-ia' },
   mantenimiento: { id: 'mantenimiento', tone: 'gold', glyph: 'llave' },
 };
-
-/** "r, g, b" de cada acento (iguales a --accent-gold-rgb / --accent-teal-rgb de tokens.css). */
-export const TONE_RGB: Record<IconoTone, string> = {
-  gold: 'var(--accent-gold-rgb)',
-  teal: 'var(--accent-teal-rgb)',
-};

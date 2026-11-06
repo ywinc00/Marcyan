@@ -77,7 +77,7 @@ const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
   <div class="w-close__grid">
     <article class="w-close__card w-close__card--big">
       <div class="w-close__body">
-        <h2 class:list={['w-close__title', grad && 'w-close__title--grad']} id={titleId} set:html={titleHtml} />
+        <h2 class:list={['w-close__title', grad && 'w-grad-text']} id={titleId} set:html={titleHtml} />
         <p class="w-close__proof" set:html={protegerNombres(proof)} />
       </div>
       <div class="w-close__acts">
@@ -190,14 +190,9 @@ const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
     text-wrap: balance;
   }
   .w-close__title :global(em) { font-style: normal; color: var(--w-accent); }
-  .w-close__title--grad {
-    background: var(--w-grad); -webkit-background-clip: text; background-clip: text;
-    color: transparent; -webkit-text-fill-color: transparent;
-  }
-  .w-close__title--grad :global(em) { color: inherit; }
-  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
-    .w-close__title--grad { color: var(--accent-gold); -webkit-text-fill-color: currentColor; }
-  }
+  /* grad: la clase global .w-grad-text de styles/w.css (misma receta y su respaldo), no una copia aquí:
+     esta copia viajaba también a los hubs, que no la usan (control v2 r3, I-02). */
+  .w-close__title:global(.w-grad-text) :global(em) { color: inherit; }
   .w-close__proof {
     margin: 0; max-width: 340px; font-family: var(--font-body); font-size: 16px; line-height: 1.5;
     color: var(--w-ink-70);

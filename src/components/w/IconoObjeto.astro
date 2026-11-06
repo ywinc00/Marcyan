@@ -1,12 +1,13 @@
 ---
 // Icono-objeto de producto (design/rediseno-workos.md §2.8, G6).
-// Pinta <use href="#wi-<id>"> del sprite de SiteNav (IconosSprite). En una
-// página sin SiteNav, `inline` dibuja el símbolo completo dentro del propio
-// SVG (ids de degradado con sufijo único: sin duplicados).
+// Pinta <use href="/w/iconos.svg#wi-<id>">: el sprite es un archivo compartido en caché
+// (control v2 r3, I-02; antes iba en línea en cada página). `inline` dibuja el símbolo completo
+// dentro del propio SVG (ids de degradado con sufijo único: sin duplicados).
 // Cerrojo 5: sale de v3 (megamenú, tarjetas de portada y hubs), así que
 // TODO su CSS va aquí y solo lee variables (--w-*, --accent-*).
-import { ICONOS, TONE_RGB, type IconoId, type IconoTone } from './objects/registry';
+import { ICONOS, type IconoId, type IconoTone } from './objects/registry';
 import { GLYPH_DEFS, glyphMarkup } from './objects/glyphs';
+import { SPRITE_HREF } from './objects/sprite';
 
 interface Props {
   id: IconoId;
@@ -31,16 +32,14 @@ if (inline) {
 }
 ---
 <svg
-  class:list={['wi', glow && 'wi--glow', cls]}
+  class:list={['wi', t === 'teal' && 'wi--teal', glow && 'wi--glow', cls]}
   width={size}
   height={size}
   viewBox="0 0 64 64"
   aria-hidden="true"
   focusable="false"
-  style={`--wi-rgb:${TONE_RGB[t]}`}
-  data-wi={id}
 >
-  {inline ? <Fragment set:html={inner} /> : <use href={`#wi-${id}`} />}
+  {inline ? <Fragment set:html={inner} /> : <use href={`${SPRITE_HREF}#wi-${id}`} />}
 </svg>
 
 <style>
@@ -53,6 +52,7 @@ if (inline) {
   }
   .wi {
     display: block; flex: none; overflow: visible;
+    --wi-rgb: var(--accent-gold-rgb); /* tono por clase (oro por defecto), no por style en línea: pesa menos */
     --wi-edge-a: 0.45; --wi-edge-hover: 0.8;
     --wi-sw: 2; --wi-tint: 0.1; --wi-bw: 1;
     transition: --wi-edge-a var(--w-dur-hover, 200ms) var(--w-ease-ui, ease);
@@ -63,6 +63,7 @@ if (inline) {
     --wi-sw: 2.9; --wi-tint: 0.26; --wi-edge-a: 0.72; --wi-edge-hover: 1; --wi-bw: 1.4;
   }
   .wi[width='52'], .wi[width='56'] { --wi-sw: 2.5; --wi-tint: 0.2; --wi-edge-a: 0.6; --wi-edge-hover: 0.9; --wi-bw: 1.2; }
+  .wi--teal { --wi-rgb: var(--accent-teal-rgb); }
   .wi--glow { filter: drop-shadow(0 0 10px rgba(200, 169, 110, 0.18)); }
   /* Hover solo dentro de tarjetas enlazadas y con puntero fino. */
   @media (--hover-fine) {

@@ -1,0 +1,49 @@
+/* Tamaños grandes del escáner (hero y card), fuera de Escaner.astro (control v2 r3, I-02): el CSS
+   de un componente viaja a toda página que lo importa, y la mini (hubs, portada, landings) no los usa.
+   Lo importan Diagnostico.astro (hero) y el muestrario (card y hero). Selectores con .wo-scan delante
+   para ganar a la base de Escaner.astro sea cual sea el orden de las hojas. */
+.wo-scan.wo-scan--card {
+  --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+  --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+  --sc-pad: 24px; --sc-col: 180px;
+  min-height: 400px; border-radius: 32px;
+}
+/* Móvil (E-18): caja más estrecha y chips más bajos; mismo alto de tarjeta que la v1 (360). */
+@media (max-width: 767.98px) {
+  .wo-scan.wo-scan--hero, .wo-scan.wo-scan--card {
+    --sc-bw: 150px; --sc-bh: 104px; --sc-air: 10px;
+    --sc-ch: 32px; --sc-gap: 8px; --sc-px: 10px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 84px;
+    --sc-pad: 16px; --sc-col: 150px;
+    min-height: 360px; border-radius: 24px;
+  }
+}
+@media (max-width: 359.98px) {
+  .wo-scan.wo-scan--hero, .wo-scan.wo-scan--card {
+    --sc-bw: 116px; --sc-bh: 80px; --sc-air: 6px; --sc-pad: 10px; --sc-bar: 64px;
+    --sc-ch: 30px; --sc-gap: 6px; --sc-px: 8px; --sc-fs: 12px; --sc-r: 7px;
+  }
+}
+
+/* Hero y card en una columna estrecha de PC (diagnóstico entre ~1000 y ~1250 px: tarjeta de
+   450 a 570): la escala la manda el ancho de la TARJETA, no el de la ventana, para que a cada
+   lado de la caja quepa siempre una columna de chips. Las variables se redefinen en los hijos
+   (un @container no puede cambiar al propio contenedor). */
+@media (min-width: 768px) {
+  @container wo-scan (max-width: 569.98px) {
+    .wo-scan.wo-scan--hero > .wo-scan__wall, .wo-scan.wo-scan--hero > .wo-scan__box {
+      --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+      --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+      --sc-pad: 24px; --sc-col: 180px; --sc-travel: calc(var(--sc-bh) - 34px);
+    }
+  }
+  @container wo-scan (max-width: 489.98px) {
+    .wo-scan.wo-scan--hero > .wo-scan__wall, .wo-scan.wo-scan--hero > .wo-scan__box,
+    .wo-scan.wo-scan--card > .wo-scan__wall, .wo-scan.wo-scan--card > .wo-scan__box {
+      /* caja de mini y chips de 38: la tarjeta sigue midiendo 480 de alto en PC */
+      --sc-bw: 160px; --sc-bh: 110px; --sc-air: 10px;
+      --sc-ch: 38px; --sc-gap: 10px; --sc-px: 12px; --sc-fs: 14px; --sc-r: 9px; --sc-bar: 88px;
+      --sc-pad: 16px; --sc-col: 150px; --sc-travel: calc(var(--sc-bh) - 34px);
+    }
+  }
+}
+

@@ -18,6 +18,7 @@ import FranjaEnPocasPalabras from '../w/FranjaEnPocasPalabras.astro';
 import PreguntasFrecuentes from '../w/PreguntasFrecuentes.astro';
 import TresGarantias from '../w/TresGarantias.astro';
 import CierreDosTarjetas from '../w/CierreDosTarjetasBase.astro'; // sin ChatMarcy: chat 'ligero'
+import Ejemplo from '../w/Ejemplo.astro';
 import { type Lang } from '../../i18n/ui';
 import { hubs, HUB_PRODUCTOS, FILA, HUB_SERVICIOS, DOMINIOS } from '../../i18n/w/hubs';
 import { nap } from '../../i18n/content';
@@ -117,7 +118,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
               <div class="vig vig--web" data-vig="web" aria-hidden="true">
                 {/* web de ejemplo de verdad (E-56): marca, titular, horario y botón; el idioma cambia ES ⇄ EN mientras se ve */}
                 <div class="vb">
-                  <div class="vb__bar"><i></i><i></i><i></i><span class="vb__url">{j.services.vig.web.url}</span><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
+                  <div class="vb__bar"><i></i><i></i><i></i><span class="vb__url">{j.services.vig.web.url}</span><Ejemplo lang={lang} pos="inline" class="vb__ej" /><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
                   <div class="vb__body">
                     <div class="vb__l">
                       <span class="vb__brand"><svg viewBox="0 0 38 38"><rect width="38" height="38" rx="10" fill="#203a31"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.4" stroke-linecap="round"/></svg>{j.services.vig.result}</span>

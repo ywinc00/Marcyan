@@ -12,7 +12,6 @@ import Button from '../ui/Button.astro';
 import { toggleHref } from '../../i18n/routes';
 import { t, type Lang } from '../../i18n/ui';
 // Megamenú (design/rediseno-workos.md §2.12, G10) + sprite de iconos-objeto (§2.8).
-import IconosSprite from '../w/objects/IconosSprite.astro';
 import MegaServicios from '../w/nav/MegaServicios.astro';
 import DrawerGrupos from '../w/nav/DrawerGrupos.astro';
 import { navW, navIcon, cubiertoPorGrupos } from '../../i18n/w/nav';
@@ -55,7 +54,6 @@ const uiw = navW[navLang];
 const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.href)) : nav.links;
 ---
 <header class="nav" data-nav>
-  <IconosSprite />
   <div class="nav__bar container">
     <a class="nav__logo" href={homeHref} aria-label={uin.nav.home}>
       <BrandType />

@@ -45,6 +45,14 @@ export default defineConfig({
   ],
   trailingSlash: 'ignore',
   build: { format: 'directory', inlineStylesheets: 'always' },
+  // Control v2 r3 (I-02): el script del menú (SiteNav) es idéntico en las 69 páginas y rozaba el
+  // límite de 4 KB con el que Vite lo metía en línea en cada HTML. Va como archivo compartido en
+  // caché (módulo diferido, no bloquea el pintado). El resto de recursos sigue la regla por defecto.
+  vite: {
+    build: {
+      assetsInlineLimit: (file) => (/SiteNav\.astro_astro_type_script/.test(file) ? false : undefined),
+    },
+  },
   redirects: {
     '/': '/es',
   },

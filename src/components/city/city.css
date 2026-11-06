@@ -165,7 +165,10 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .vb__bar{flex:none;height:22px;display:flex;align-items:center;gap:5px;padding:0 8px;background:#1a1917;border-bottom:1px solid rgba(240,237,232,.08)}
 .hx .vb__bar>i{width:6px;height:6px;border-radius:50%;background:rgba(240,237,232,.18)}
 .hx .vb__url{margin-left:8px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.02em;color:rgba(240,237,232,.62);padding:2px 8px;border-radius:4px;background:rgba(240,237,232,.06)}
-.hx .vb__lang{flex:none;position:relative;margin-left:auto;display:flex;font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--fg-secondary)}
+/* rótulo "Ejemplo" en la barra (control v2 r3, M-04): pequeño, a la izquierda del ES/EN */
+.hx .vb__bar .vb__ej{flex:none;margin-left:auto;font-size:8.5px;padding:1px 5px;border-radius:3px}
+@media (max-width:480px){.hx .vb__bar>i{display:none}.hx .vb__url{margin-left:0}}
+.hx .vb__lang{flex:none;position:relative;margin-left:6px;display:flex;font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--fg-secondary)}
 .hx .vb__lang b{position:relative;z-index:1;font-weight:500;padding:2px 5px;transition:color .3s}
 .hx .vb__lang s{position:absolute;left:0;top:0;width:50%;height:100%;border-radius:3px;background:rgba(200,169,110,.18);border:1px solid rgba(200,169,110,.4);transition:transform .45s var(--ease-io)}
 .hx .vb__lang .es{color:var(--accent-gold)}

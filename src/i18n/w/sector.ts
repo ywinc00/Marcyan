@@ -167,7 +167,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
         label: 'Llamada perdida',
         script: [
           { from: 'm', text: 'Hola, vimos tu llamada. Ahora mismo estamos en una obra. ¿Qué trabajo necesitas?', time: '2:11 p. m.' },
-          { from: 'c', text: 'Cambiar el techo de mi casa, en Pasadena.', time: '2:12 p. m.' },
+          { from: 'c', text: 'Tengo una fuga debajo del fregadero, en Pasadena.', time: '2:12 p. m.' },
           { from: 'm', text: 'Anotado. Te llamamos hoy para darte el presupuesto. ¿A nombre de quién?', time: '2:12 p. m.' },
           { from: 'c', text: 'Ana. Gracias.', time: '2:13 p. m.' },
         ],
@@ -293,7 +293,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
         label: 'Missed call',
         script: [
           { from: 'm', text: "Hi, we saw your call. We're on a job right now. What work do you need done?", time: '2:11 PM' },
-          { from: 'c', text: 'A new roof on my house, in Pasadena.', time: '2:12 PM' },
+          { from: 'c', text: 'A leak under my kitchen sink, in Pasadena.', time: '2:12 PM' },
           { from: 'm', text: "Got it. We'll call you today with the estimate. What name should I put down?", time: '2:12 PM' },
           { from: 'c', text: 'Ana. Thanks.', time: '2:13 PM' },
         ],

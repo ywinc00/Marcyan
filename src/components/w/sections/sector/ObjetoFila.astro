@@ -12,7 +12,12 @@
 // Ronda 1: las casas del listado llevan su "foto" dibujada (CasaIlustrada, I2) y antes | después y el
 // listado caben enteros a 390 px (I1, E-18): nada se recorta dentro de su marco.
 // Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only, sin h1-h6, acciones como span,
-// un solo rótulo "Ejemplo" por objeto (en la barra o al pie). Estáticos (no son pantallas vivas).
+// un solo rótulo "Ejemplo" por objeto (en la barra o al pie).
+// Ronda 2 (I-A): el comparador antes | después ya no es un tirador muerto. La costura barre sola
+// (CSS, --of-p registrada) mientras la fila está a la vista, con la pestaña visible y sin la pausa
+// global; botón de pausa propio (registerLoop, >5 s). Con el puntero encima el barrido se detiene y
+// la costura se arrastra de verdad (pointer capture; touch-action pan-y para no robar el scroll).
+// Movimiento reducido: quieto en el 47 %. Dominios de ejemplo en inglés en las páginas EN (M-2).
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import LogoMarca from '../../marcas/LogoMarca.astro';
 import CasaIlustrada from './CasaIlustrada.astro';
@@ -25,13 +30,13 @@ const en = lang === 'en';
 const ej = en ? 'Example' : 'Ejemplo';
 const T = {
   'antes-despues': en
-    ? { sr: 'Example: a project page on your site with a before-and-after view of a kitchen remodel in Katy and the licensed and insured badge.', nav: ['Projects', 'Services', 'Contact'], k: 'Project', t: 'Kitchen remodel', z: 'Katy, TX', antes: 'Before', despues: 'After', lic: 'Licensed and insured', dom: negocios.plomeria.dominio }
+    ? { sr: 'Example: a project page on your site with a before-and-after view of a kitchen remodel in Katy and the licensed and insured badge.', nav: ['Projects', 'Services', 'Contact'], k: 'Project', t: 'Kitchen remodel', z: 'Katy, TX', antes: 'Before', despues: 'After', lic: 'Licensed and insured', dom: 'yourplumbing.example' }
     : { sr: 'Ejemplo: página de proyecto de tu web con antes y después de una remodelación de cocina en Katy y el sello de licencia y seguro.', nav: ['Proyectos', 'Servicios', 'Contacto'], k: 'Proyecto', t: 'Remodelación de cocina', z: 'Katy, TX', antes: 'Antes', despues: 'Después', lic: 'Con licencia y asegurado', dom: negocios.plomeria.dominio },
   listados: en
-    ? { sr: 'Example: your agent site with your homes listed, a buy or sell filter and a button to book a showing.', tabs: ['Buy', 'Sell'], casas: [['Oak House', 'Katy · yard and garage', ['3 bd', '2 ba']], ['Cypress Townhome', 'Cypress · showing Saturday', ['2 bd', '2.5 ba']], ['Garden House', 'Spring Branch · move-in ready', ['4 bd', '3 ba']]], btn: 'Book a showing', dom: negocios.inmobiliaria.dominio }
+    ? { sr: 'Example: your agent site with your homes listed, a buy or sell filter and a button to book a showing.', tabs: ['Buy', 'Sell'], casas: [['Oak House', 'Katy · yard and garage', ['3 bd', '2 ba']], ['Cypress Townhome', 'Cypress · showing Saturday', ['2 bd', '2.5 ba']], ['Garden House', 'Spring Branch · move-in ready', ['4 bd', '3 ba']]], btn: 'Book a showing', dom: 'yourrealty.example' }
     : { sr: 'Ejemplo: tu sitio de agente con tus casas en lista, un filtro para comprar o vender y un botón para agendar visita.', tabs: ['Comprar', 'Vender'], casas: [['Casa Roble', 'Katy · patio y cochera', ['3 hab', '2 baños']], ['Townhome Cypress', 'Cypress · se muestra el sábado', ['2 hab', '2.5 baños']], ['Casa Jardín', 'Spring Branch · lista para mudarse', ['4 hab', '3 baños']]], btn: 'Agendar visita', dom: negocios.inmobiliaria.dominio },
   platos: en
-    ? { sr: "Example: your restaurant's website on a phone, with a large photo of the shrimp tacos, today's menu with two more dishes and a button to order on WhatsApp.", hero: 'Shrimp tacos', k: "Today's menu", abierto: 'Kitchen’s open', platos: ['Chicken enchiladas', 'Rice and beans'], btn: 'Order on WhatsApp', dom: negocios.restaurante.dominio }
+    ? { sr: "Example: your restaurant's website on a phone, with a large photo of the shrimp tacos, today's menu with two more dishes and a button to order on WhatsApp.", hero: 'Shrimp tacos', k: "Today's menu", abierto: 'Kitchen’s open', platos: ['Chicken enchiladas', 'Rice and beans'], btn: 'Order on WhatsApp', dom: 'yourrestaurant.example' }
     : { sr: 'Ejemplo: la web de tu restaurante en un teléfono, con una foto grande de los tacos de camarón, la carta de hoy con dos platos más y un botón para pedir por WhatsApp.', hero: 'Tacos de camarón', k: 'La carta de hoy', abierto: 'Cocina abierta', platos: ['Enchiladas de pollo', 'Arroz y frijoles'], btn: 'Pedir por WhatsApp', dom: negocios.restaurante.dominio },
   'mesa-qr': en
     ? { sr: 'Example: a table card with a QR code that opens the menu in English and Spanish.', scan: 'Scan for the menu', mesa: 'Table 4' }
@@ -71,9 +76,8 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
         </div>
         <p class="of-ad__k">{T.k} · {T.z}</p>
         <p class="of-ad__t">{T.t}</p>
-        <div class="of-ad__cmp">
-          <svg viewBox="0 0 320 168" preserveAspectRatio="xMidYMid slice">
-            <defs><clipPath id={`of-ad-izq-${lang}`}><rect width="150" height="168" /></clipPath></defs>
+        <div class="of-ad__cmp" data-of-ad>
+          <svg class="of-ad__new" viewBox="0 0 320 168" preserveAspectRatio="xMidYMid slice">
             <!-- Después: la cocina nueva entera -->
             <rect width="320" height="168" fill="#efe9de" />
             <rect y="104" width="320" height="64" fill="#e2d8c6" />
@@ -85,19 +89,26 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
             <path d="M89 95v56M160 95v56M231 95v56" stroke="#2a3e48" stroke-width="1.5" />
             <path d="M48 104h12M119 104h12M190 104h12M261 104h12" stroke="#e0935c" stroke-width="2.5" stroke-linecap="round" />
             <path d="M196 88V74a8 8 0 0 1 16 0" fill="none" stroke="#a3561f" stroke-width="2.5" stroke-linecap="round" />
-            <!-- Antes: la mitad izquierda, gastada -->
-            <g clip-path={`url(#of-ad-izq-${lang})`}>
+          </svg>
+          <span class="of-ad__old">
+            <svg viewBox="0 0 320 168" preserveAspectRatio="xMidYMid slice">
+              <!-- Antes: la misma cocina, gastada, de punta a punta (la costura decide cuánto se ve) -->
               <rect width="320" height="168" fill="#d9d4cb" />
               <rect y="104" width="320" height="64" fill="#c9c2b6" />
               <rect x="18" y="18" width="62" height="40" rx="2" fill="#b4ab9c" />
               <rect x="86" y="20" width="58" height="38" rx="2" fill="#aca393" />
+              <rect x="150" y="18" width="70" height="40" rx="2" fill="#b1a899" />
+              <rect x="226" y="20" width="76" height="38" rx="2" fill="#a9a090" />
               <rect x="14" y="88" width="292" height="7" fill="#a59c8d" />
               <rect x="18" y="95" width="62" height="56" rx="2" fill="#b0a798" />
               <rect x="86" y="95" width="58" height="56" rx="2" fill="#a69d8e" />
-              <path d="M44 50h10M110 50h10M44 104h10M110 104h10" stroke="#8f8676" stroke-width="2" stroke-linecap="round" />
-            </g>
-            <path d="M150 0v168" stroke="#fff" stroke-width="2" />
-          </svg>
+              <rect x="150" y="95" width="70" height="56" rx="2" fill="#ada495" />
+              <rect x="226" y="95" width="76" height="56" rx="2" fill="#a49b8c" />
+              <path d="M200 88V78a6 6 0 0 1 12 0" fill="none" stroke="#8f8676" stroke-width="2.5" stroke-linecap="round" />
+              <path d="M44 50h10M110 50h10M180 50h10M258 50h10M44 104h10M110 104h10M180 104h10M258 104h10" stroke="#8f8676" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="of-ad__seam"></span>
           <span class="of-ad__asa"><svg viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M15 7l5 5-5 5" /></svg></span>
           <span class="of-ad__chip of-ad__chip--a">{T.antes}</span>
           <span class="of-ad__chip of-ad__chip--d">{T.despues}</span>
@@ -162,7 +173,31 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
   </div>
 </div>
 
+<script>
+  import { registerLoop } from '../../loop';
+  document.querySelectorAll<HTMLElement>('.of--antes-despues').forEach((el) => {
+    const cmp = el.querySelector<HTMLElement>('[data-of-ad]');
+    if (!cmp) return;
+    registerLoop(el, {}, { buttonTone: 'light' });
+    let drag = false;
+    const mover = (x: number) => {
+      const r = cmp.getBoundingClientRect();
+      const p = Math.min(94, Math.max(6, ((x - r.left) / r.width) * 100));
+      cmp.style.setProperty('--of-p', `${p.toFixed(1)}%`);
+    };
+    cmp.addEventListener('pointerdown', (e) => {
+      drag = true; cmp.classList.add('is-user'); cmp.setPointerCapture(e.pointerId); mover(e.clientX);
+    });
+    cmp.addEventListener('pointermove', (e) => { if (drag) mover(e.clientX); });
+    const soltar = () => { drag = false; };
+    cmp.addEventListener('pointerup', soltar);
+    cmp.addEventListener('pointercancel', soltar);
+  });
+</script>
+
 <style>
+  @property --of-p { syntax: '<percentage>'; inherits: true; initial-value: 47%; }
+  @keyframes of-ad-barre { 0%, 100% { --of-p: 47%; } 30% { --of-p: 80%; } 65% { --of-p: 20%; } }
   .of { width: min(100%, 380px); min-width: 0; }
   .of__in { position: relative; }
   .of-bar { margin: 0; display: flex; align-items: center; gap: 5px; height: 28px; padding: 0 12px; background: #e9e3d8; border-bottom: 1px solid rgba(20, 35, 43, .08); }
@@ -176,9 +211,19 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
   .of-ad__links .is-on { color: #14232b; box-shadow: 0 1px 0 #a3561f; padding-bottom: 3px; }
   .of-ad__k { margin: 18px 18px 0; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #a3561f; }
   .of-ad__t { margin: 6px 18px 0; font: 600 26px/1.05 var(--font-display); letter-spacing: -0.03em; }
-  .of-ad__cmp { position: relative; margin: 14px 18px 0; border-radius: 10px; overflow: hidden; aspect-ratio: 320 / 168; }
-  .of-ad__cmp > svg { display: block; width: 100%; height: 100%; }
-  .of-ad__asa { position: absolute; left: calc(150 / 320 * 100%); top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(20, 35, 43, .25); }
+  .of-ad__cmp {
+    --of-p: 47%;
+    position: relative; margin: 14px 18px 0; border-radius: 10px; overflow: hidden; aspect-ratio: 320 / 168;
+    cursor: ew-resize; touch-action: pan-y; user-select: none;
+    animation: of-ad-barre 9s cubic-bezier(.45, 0, .55, 1) infinite paused;
+  }
+  .of.is-playing .of-ad__cmp { animation-play-state: running; }
+  :global(:root[data-w-pausa]) .of.is-playing .of-ad__cmp { animation-play-state: paused; }
+  .of.is-still .of-ad__cmp, .of-ad__cmp.is-user { animation: none; }
+  .of-ad__cmp svg { display: block; width: 100%; height: 100%; }
+  .of-ad__old { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--of-p)) 0 0); }
+  .of-ad__seam { position: absolute; top: 0; bottom: 0; left: var(--of-p); width: 2px; margin-left: -1px; background: #fff; }
+  .of-ad__asa { position: absolute; left: var(--of-p); top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(20, 35, 43, .25); }
   .of-ad__asa svg { width: 16px; fill: none; stroke: #14232b; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .of-ad__chip { position: absolute; top: 8px; padding: 4px 8px; border-radius: 999px; font: 600 11px/1 var(--font-body); }
   .of-ad__chip--a { left: 8px; background: rgba(20, 35, 43, .7); color: #f3efe6; }

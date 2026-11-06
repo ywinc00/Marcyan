@@ -11,13 +11,14 @@
 //   con flecha de enlace) y la fila de esta página (encendida). Las filas que no son el
 //   barrio ya no parecen apagadas. Leyenda debajo con los tres estados.
 // · La llave de W-ADV-52 (permisos) no significa nada aquí: pin de mapa.
-// · Objeto de producto en claro junto a la matriz (FichaMapaEjemplo, rotulada Ejemplo):
+// · Objeto de producto en claro junto a la matriz (v2 G05: FichaMapa de la marca inmobiliaria,
+//   sin barras grises de "Reseñas", §1.6; rotulada Ejemplo):
 //   une zona y ficha, y da luz al capítulo (E-01).
 // PROVISIONAL hasta [SISTEMA] MatrizFilas (prop `icon` y `state` por casilla): los estados
 // se pintan aquí por el destino de cada enlace, con las mismas capas del componente.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import MatrizFilas from '../../MatrizFilas.astro';
-import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
+import FichaMapa from '../../objetos/barrios/FichaMapa.astro';
 import Icon from '../../../ui/Icon.astro';
 
 interface Cell { label: string; href?: string }
@@ -47,7 +48,7 @@ const { n, label, title, lead, rows, columns, fixedRow, tableLabel, legend, fich
     </ul>
   </div>
   <figure class="wb-z__ficha">
-    <FichaMapaEjemplo city={ficha.city} lang={lang} size="card" />
+    <FichaMapa marca="inmobiliaria" city={ficha.city} lang={lang} size="card" />
     <figcaption>{ficha.caption}</figcaption>
   </figure>
 </div>

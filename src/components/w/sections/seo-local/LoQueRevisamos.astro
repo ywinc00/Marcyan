@@ -21,7 +21,7 @@ const { copy, n, city, lang = 'es' } = Astro.props;
     <div slot="ui-1" class="sl-rev__radar"><Radar lang={lang} size="card" /></div>
     <Comprobacion slot="ui-2" title={copy.datos.title} rows={copy.datos.rows} lang={lang} />
     <Comprobacion slot="ui-3" title={copy.ficha.title} rows={copy.ficha.rows} lang={lang} />
-    <div slot="ui-4" class="sl-rev__web"><WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} size="mini" /></div>
+    <div slot="ui-4" class="sl-rev__web"><WebEjemplo frame="movil" marca="restaurante" city={city} lang={lang} size="mini" /></div>
   </Bento2x2>
 </div>
 <style>
@@ -48,14 +48,7 @@ const { copy, n, city, lang = 'es' } = Astro.props;
   .sl-rev__radar :global(.wo-radar__beam) {
     background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--accent-gold-rgb), .05) 4deg, rgba(var(--accent-gold-rgb), .20) 33deg, rgba(var(--accent-gold-rgb), .55) 36deg, transparent 36.5deg);
   }
-  .sl-rev__radar :global(.wo-radar__ping--1) { left: 30%; top: 36%; }
-  .sl-rev__radar :global(.wo-radar__ping--2) { left: 54%; top: 57%; }
-  .sl-rev__radar :global(.wo-radar__ping--3) { left: 22%; top: 76%; }
-  /* Retrasos negativos: al arrancar ya hay 2 avisos a la vista y el ciclo los solapa
-     (cada aviso vive 8,5 s de 10; separados ~3,3 s → 2 o 3 visibles a la vez). */
-  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--1) { animation-delay: -5.6s; }
-  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--2) { animation-delay: -2.3s; }
-  .sl-rev__radar :global(.wo-radar.is-run .wo-radar__ping--3) { animation-delay: 1.06s; }
+  /* v2 (G05): los avisos se colocan solos, en polares entre anillos y con su foso (Radar.astro). */
   /* El radar llega hasta el borde inferior de su celda, como en W-CORE-09 (sin bandeja). */
   .sl-rev__radar { width: 100%; }
   :global(.sl-rev .wd-bento__cell:first-child) { padding-bottom: 0; }
@@ -71,8 +64,5 @@ const { copy, n, city, lang = 'es' } = Astro.props;
   @media (--lt-md) {
     .sl-gap { margin-top: 48px; }
     :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { margin-inline: -20px; }
-    .sl-rev__radar :global(.wo-radar__ping--1) { left: 12%; top: 50%; }
-    .sl-rev__radar :global(.wo-radar__ping--2) { left: 40%; top: 67%; }
-    .sl-rev__radar :global(.wo-radar__ping--3) { left: 16%; top: 85%; }
   }
 </style>

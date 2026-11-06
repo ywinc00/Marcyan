@@ -11,8 +11,19 @@
 // salen de las patas del chip y se abren a 45°, vías, patas y trama, en un lienzo de 1000×400.
 // Pulsos: 4 s lineales, 8 retrasos; brillo que gira en el borde del chip en 4 s.
 // Quieto (reduced-motion): pistas sin pulsos y brillo parado.
-import Icon from '../../ui/Icon.astro';
+//
+// v2 (G05, FI §4.8 "chip pequeño, poca presencia, pulsos 0,2 %"):
+// · Chip de 220 px (164 en móvil) sobre un lienzo de vías ×1,5 (900×450; las coordenadas siguen en
+//   600×300 y el texto de las vías sigue a 13 px con su hueco del generador: el chip ocupa MENOS
+//   unidades de lienzo que el de 164 de la v1, así que ningún nombre queda tapado).
+// · Pulsos visibles: estelas de luz (dash de stroke-dashoffset con su halo ancho debajo) que
+//   recorren cada vía HACIA el chip, dos por vía, 4 s lineales; sustituyen a los puntos SMIL de
+//   3,5 px. Solo stroke-dashoffset/opacity (§1.8).
+// · Dentro del chip, ficha de EJEMPLO de la marca inmobiliaria (§1.6, ficha Samara: logotipo,
+//   número de la casa enorme y fino, datos mono pequeños) y abajo una fila que alterna "Llamar"
+//   con el mensaje entrante "¿Sigue disponible?" (8 s, mientras está a la vista).
 import Ejemplo from '../Ejemplo.astro';
+import LogoEjemplo from './ejemplos/LogoEjemplo.astro';
 
 interface Track { d: string; name?: string; at?: [number, number] }
 interface Props {
@@ -70,10 +81,13 @@ const stubs = abstract
 const stubEnd = (d: string) => { const n = d.match(/-?\d+(\.\d+)?/g)!.map(Number); return [n[n.length - 2] ?? n[0], n[n.length - 1]]; };
 
 const tracks = abstract ? board.filter((t) => t.hot).map((t) => ({ d: t.d })) : (Astro.props.tracks ?? []).slice(0, 8);
-const DELAYS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
+// Tres estelas por vía, repartidas en los 4 s del ciclo (y desfasadas entre vías).
+const streaks = tracks.flatMap((t, i) => [0, 4 / 3, 8 / 3].map((o) => ({ d: t.d, delay: -(+((i * 0.67 + o) % 4).toFixed(2)) })));
 const T = en
-  ? { biz: 'Your business', call: 'Call', sr: `Example: customers in ${name} find your business and call you.` }
-  : { biz: 'Tu negocio', call: 'Llamar', sr: `Ejemplo: clientes de ${name} encuentran tu negocio y te llaman.` };
+  ? { name: 'House in ' + name, num: '214', data: '3 bd · 2 ba', area: '1,850 sq ft', call: 'Call', msg: 'Is it still available?', ago: 'now',
+      sr: `Example: people in ${name} find a real estate office on the map and message it about a house.` }
+  : { name: 'Casa en ' + name, num: '214', data: '3 hab · 2 baños', area: '1,850 pies²', call: 'Llamar', msg: '¿Sigue disponible?', ago: 'ahora',
+      sr: `Ejemplo: clientes de ${name} encuentran una inmobiliaria en el mapa y le escriben por una casa.` };
 const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 ---
 <div class:list={['wo-hood', `wo-hood--${size}`, cls]} data-wo-hood data-abstract={abstract ? '' : undefined}>
@@ -91,25 +105,27 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
         ? <rect class="wo-hood__leg" x={t.pin[0] < CX ? t.pin[0] - 8 : t.pin[0]} y={t.pin[1] - 2} width="8" height="4" rx="1" />
         : <rect class="wo-hood__leg" x={t.pin[0] - 2} y={t.pin[1] < CY ? t.pin[1] - 8 : t.pin[1]} width="4" height="8" rx="1" />)}
       {!abstract && tracks.map((t, i) => <path class="wo-hood__st" d={t.d} data-i={i} />)}
-      {tracks.length > 0 && DELAYS.map((b, k) => {
-        const t = tracks[k % tracks.length];
-        return (
-          <circle class="wo-hood__pulse" r="3.5">
-            <animateMotion dur="4s" begin={`${b}s`} repeatCount="indefinite" path={t.d} calcMode="linear" />
-          </circle>
-        );
-      })}
+      {streaks.map((k) => <path class="wo-hood__glowline" d={k.d} pathLength="100" style={`--dl:${k.delay}s`} />)}
+      {streaks.map((k) => <path class="wo-hood__tail" d={k.d} pathLength="100" style={`--dl:${k.delay}s`} />)}
+      {streaks.map((k) => <path class="wo-hood__streak" d={k.d} pathLength="100" style={`--dl:${k.delay}s`} />)}
       {!abstract && (Astro.props.tracks ?? []).filter((t) => t.name && t.at).map((t) => (
         <text class="wo-hood__name" x={t.at![0]} y={t.at![1]}>{t.name}</text>
       ))}
     </svg>
     <div class="wo-hood__chipwrap">
+      <span class="wo-hood__arrive"></span>
       <span class="wo-hood__glow"></span>
       <div class="wo-hood__chip">
-        <span class="wo-hood__pin"><Icon name="lucide:map-pin" /></span>
-        <b>{T.biz}</b>
-        <span class="wo-hood__where">{name}</span>
-        <span class="wo-hood__call"><Icon name="lucide:phone" />{T.call}</span>
+        <span class="wo-hood__logo"><LogoEjemplo marca="inmobiliaria" size={11} lang={lang} tono="mono" signo={false} class="wo-hood__logo-d" /><LogoEjemplo marca="inmobiliaria" size={8.5} lang={lang} tono="mono" signo={false} class="wo-hood__logo-m" /></span>
+        <span class="wo-hood__num">{T.num}</span>
+        <span class="wo-hood__where"><span>{T.name}</span><span class="wo-hood__area">{T.area}</span></span>
+        <span class="wo-hood__data">{T.data}</span>
+        <span class="wo-hood__row">
+          <span class="wo-hood__call">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>{T.call}
+          </span>
+          <span class="wo-hood__msg"><i></i>{T.msg}<small>{T.ago}</small></span>
+        </span>
       </div>
     </div>
   </div>
@@ -118,26 +134,28 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 <script>
   import { registerLoop } from '../loop';
   document.querySelectorAll<HTMLElement>('[data-wo-hood]').forEach((el) => {
-    const svg = el.querySelector<SVGSVGElement>('.wo-hood__map');
-    if (!svg) return;
-    svg.pauseAnimations();
+    const pausaGlobal = () => document.documentElement.hasAttribute('data-w-pausa');
+    let want = false;
+    const paint = () => el.classList.toggle('is-playing', want && !pausaGlobal());
     registerLoop(el, {
-      start: () => { el.classList.remove('is-still'); el.classList.add('is-playing'); svg.unpauseAnimations(); },
-      stop: () => { el.classList.remove('is-playing'); svg.pauseAnimations(); },
-      still: () => { el.classList.remove('is-playing'); svg.pauseAnimations(); svg.setCurrentTime(0); el.classList.add('is-still'); },
+      start: () => { el.classList.remove('is-still'); el.classList.add('is-run'); want = true; paint(); },
+      stop: () => { want = false; paint(); },
+      still: () => { want = false; el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); },
     });
+    new MutationObserver(paint).observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
   });
 </script>
 
 <style>
-  .wo-hood { --sw: 600px; --sh: 300px; --chip: 164px; position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
-  .wo-hood[data-abstract] { --sw: 1000px; --sh: 400px; --chip: 176px; }
+  /* Lienzo de vías reales: coordenadas 600×300 pintadas a ×1,5 (escritorio) o ×1 (móvil). */
+  .wo-hood { --sw: 900px; --sh: 450px; --chip: 220px; position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
+  .wo-hood[data-abstract] { --sw: 1000px; --sh: 400px; --chip: 220px; }
   .wo-hood__stage {
     position: relative; left: 50%; translate: -50% 0; width: var(--sw); height: var(--sh);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%),
       linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
     -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+    mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%),
       linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
     mask-composite: intersect;
   }
@@ -149,56 +167,118 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
       var(--w-dots);
   }
   .wo-hood__map { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .wo-hood__st { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .wo-hood__st { fill: none; stroke: rgba(var(--accent-gold-rgb), .30); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
   .wo-hood[data-abstract] .wo-hood__st { stroke: rgba(var(--accent-gold-rgb), .34); stroke-width: 1.25; }
   .wo-hood[data-abstract] .wo-hood__st.is-hot { stroke: rgba(var(--accent-gold-rgb), .7); stroke-width: 1.5; }
   .wo-hood[data-abstract] .wo-hood__st--stub { stroke: rgba(var(--accent-gold-rgb), .28); }
-  .wo-hood__via { fill: var(--w-s0, #080808); stroke: rgba(var(--accent-gold-rgb), .6); stroke-width: 1.25; }
+  .wo-hood__via { fill: var(--w-s0, #080808); stroke: rgba(var(--accent-gold-rgb), .6); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
   .wo-hood__leg { fill: rgba(var(--accent-gold-rgb), .8); }
-  .wo-hood:not([data-abstract]) .wo-hood__st { stroke: rgba(var(--star-rgb), .30); stroke-width: 2; }
-  .wo-hood__pulse { fill: #f3dfb4; opacity: 0; }
-  .wo-hood.is-playing .wo-hood__pulse { opacity: 1; }
-  .wo-hood__name { font: 500 13px var(--font-body); fill: var(--w-ink-70); paint-order: stroke; stroke: var(--w-s0, #080808); stroke-width: 4px; }
+  /* Vías reales: oro al 58 %, 2,5 px (revisión 1 de la v1, I4; antes en HeroBarrio). */
+  .wo-hood:not([data-abstract]) .wo-hood__st { stroke: rgba(var(--accent-gold-rgb), .58); stroke-width: 2.5; }
+  /* Estelas (cometa): cabeza corta y brillante, cola más larga y fina, y halo tenue; los tres
+     dashes comparten el borde delantero (offset = largo − avance), así la cola SIGUE a la cabeza.
+     Avanzan hacia el chip (las vías del generador acaban en él). Solo stroke-dashoffset. */
+  .wo-hood__streak, .wo-hood__tail, .wo-hood__glowline { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: 0; }
+  .wo-hood__streak { stroke: #FFF3DA; stroke-width: 4; stroke-dasharray: 3 200; stroke-dashoffset: 3; }
+  .wo-hood__tail { stroke: rgba(248, 231, 194, .55); stroke-width: 2.25; stroke-dasharray: 16 200; stroke-dashoffset: 16; }
+  .wo-hood__glowline { stroke: rgba(var(--accent-gold-rgb), .24); stroke-width: 14; stroke-dasharray: 14 200; stroke-dashoffset: 14; }
+  .wo-hood.is-run .wo-hood__streak { opacity: 1; animation: wo-hood-run3 4s linear infinite; }
+  .wo-hood.is-run .wo-hood__tail { opacity: 1; animation: wo-hood-run16 4s linear infinite; }
+  .wo-hood.is-run .wo-hood__glowline { opacity: 1; animation: wo-hood-run14 4s linear infinite; }
+  .wo-hood.is-run :is(.wo-hood__streak, .wo-hood__tail, .wo-hood__glowline) { animation-delay: var(--dl); animation-play-state: paused; }
+  .wo-hood.is-run.is-playing :is(.wo-hood__streak, .wo-hood__tail, .wo-hood__glowline) { animation-play-state: running; }
+  /* Mismo borde delantero para los tres: offset = largo − avance (avance 0 → 118). */
+  @keyframes wo-hood-run3 { from { stroke-dashoffset: 3; } to { stroke-dashoffset: -115; } }
+  @keyframes wo-hood-run16 { from { stroke-dashoffset: 16; } to { stroke-dashoffset: -102; } }
+  @keyframes wo-hood-run14 { from { stroke-dashoffset: 14; } to { stroke-dashoffset: -104; } }
+  /* Llegada: cada 2,6 s el chip "recibe" (luz suave que sale de él y se apaga; transform/opacity). */
+  .wo-hood__arrive {
+    position: absolute; inset: -120px; border-radius: 50%; pointer-events: none; opacity: 0;
+    background: radial-gradient(closest-side, rgba(var(--accent-gold-rgb), .30) 46%, rgba(var(--accent-gold-rgb), .10) 72%, transparent);
+  }
+  .wo-hood.is-run .wo-hood__arrive { animation: wo-hood-arrive 2.6s var(--w-ease-out) infinite; animation-play-state: paused; }
+  .wo-hood.is-run.is-playing .wo-hood__arrive { animation-play-state: running; }
+  @keyframes wo-hood-arrive { 0% { opacity: 0; transform: scale(.8); } 18% { opacity: 1; } 100% { opacity: 0; transform: scale(1.18); } }
+  /* Nombres de vía a 13 px reales en el lienzo escalado (×1,5 en escritorio). */
+  .wo-hood { --k: 1.5; }
+  .wo-hood[data-abstract] { --k: 1; }
+  .wo-hood__name { font-family: var(--font-body); font-weight: 500; font-size: calc(13px / var(--k)); fill: var(--w-ink-80); paint-order: stroke; stroke: var(--w-s0, #080808); stroke-width: calc(4px / var(--k)); }
+
   .wo-hood__chipwrap {
     position: absolute; left: 50%; top: 50%; width: var(--chip); height: var(--chip);
     margin: calc(var(--chip) / -2) 0 0 calc(var(--chip) / -2);
-    border-radius: 9px; overflow: visible;
+    border-radius: 10px; overflow: visible;
   }
   .wo-hood__glow {
-    position: absolute; inset: -1px; border-radius: 9px; overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(var(--accent-gold-rgb), .35), 0 0 36px rgba(var(--accent-gold-rgb), .32);
+    position: absolute; inset: -1px; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(var(--accent-gold-rgb), .40), 0 0 48px rgba(var(--accent-gold-rgb), .30), 0 0 120px rgba(var(--accent-gold-rgb), .10);
   }
   .wo-hood__glow::before {
-    content: ''; position: absolute; left: 50%; top: 50%; width: 280px; height: 280px; margin: -140px 0 0 -140px;
+    content: ''; position: absolute; left: 50%; top: 50%; width: 360px; height: 360px; margin: -180px 0 0 -180px;
     background: conic-gradient(from 0deg, transparent 0 70%, rgba(var(--accent-gold-rgb), .95) 85%, transparent 100%);
     animation: wo-hood-spin 4s linear infinite; animation-play-state: paused;
   }
   .wo-hood.is-playing .wo-hood__glow::before { animation-play-state: running; }
   @keyframes wo-hood-spin { to { transform: rotate(360deg); } }
   .wo-hood__chip {
-    position: absolute; inset: 1px; border-radius: 8px;
+    position: absolute; inset: 1px; border-radius: 9px; overflow: hidden;
     background: linear-gradient(180deg, #262522, var(--w-s3, #1f1f1d) 55%, #1a1a18);
     border: 1px solid var(--w-line-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 12px;
-    text-align: center;
+    display: flex; flex-direction: column; align-items: flex-start; padding: 16px 16px 14px;
+    text-align: left; color: #EEECE8;
   }
-  .wo-hood__pin { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: rgba(var(--accent-gold-rgb), .14); color: var(--accent-gold); margin-bottom: 4px; }
-  .wo-hood__pin :global(svg) { width: 16px; height: 16px; }
-  .wo-hood__chip b { font: 500 16px/1.2 var(--font-display); color: var(--w-ink, #f0ede8); }
-  .wo-hood__where { font-size: 13px; color: var(--w-ink-60); }
+  /* Ficha Samara (marca inmobiliaria, paleta de noche de negocios.ts): logotipo fino, número
+     de la casa enorme y fino, datos mono, y una fila de acción. */
+  .wo-hood__logo { display: block; line-height: 0; color: #EEECE8; }
+  .wo-hood__logo :global(.wo-hood__logo-m) { display: none; }
+  .wo-hood__num {
+    margin-top: 12px; font: 300 58px/0.9 var(--font-display); letter-spacing: -0.045em; color: #F4F2EE;
+    font-variant-numeric: tabular-nums;
+  }
+  .wo-hood__where { margin-top: 8px; width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; line-height: 1.2; color: #A6A39E; }
+  .wo-hood__area { font: 500 11px/1.2 var(--font-mono); color: #C9C6C0; white-space: nowrap; }
+  .wo-hood__data { margin-top: 5px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .02em; color: #C9C6C0; white-space: nowrap; }
+  .wo-hood__row { position: relative; margin-top: auto; width: 100%; height: 30px; }
+  .wo-hood__call, .wo-hood__msg { position: absolute; top: 0; bottom: 0; left: 0; display: inline-flex; align-items: center; gap: 6px; }
   .wo-hood__call {
-    margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 6px;
-    background: var(--accent-gold); color: var(--fg-inverse, #080808); font-size: 13px; font-weight: 600;
+    padding: 0 12px; border-radius: 4px; border: 1px solid rgba(238,236,232,.38);
+    font-size: 13px; font-weight: 600; color: #EEECE8;
   }
-  .wo-hood__call :global(svg) { width: 13px; height: 13px; }
+  .wo-hood__msg {
+    right: 0; padding: 0 10px; border-radius: 8px; background: #F4F2EE; color: #111316;
+    font-size: 12.5px; font-weight: 600; white-space: nowrap; opacity: 0; transform: translateY(8px);
+  }
+  .wo-hood__msg i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #34507A; }
+  .wo-hood__msg small { margin-left: auto; font: 500 11px/1 var(--font-mono); color: #4D5358; }
+  /* La fila alterna: Llamar (4 s) → entra el mensaje (4 s), mientras está a la vista. */
+  .wo-hood.is-run .wo-hood__call { animation: wo-hood-a 8s var(--w-ease-ui) infinite; animation-play-state: paused; }
+  .wo-hood.is-run .wo-hood__msg { animation: wo-hood-b 8s var(--w-ease-ui) infinite; animation-play-state: paused; }
+  .wo-hood.is-run.is-playing .wo-hood__call, .wo-hood.is-run.is-playing .wo-hood__msg { animation-play-state: running; }
+  @keyframes wo-hood-a { 0%, 44% { opacity: 1; transform: none; } 50%, 94% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 1; transform: none; } }
+  @keyframes wo-hood-b { 0%, 46% { opacity: 0; transform: translateY(8px); } 52%, 92% { opacity: 1; transform: none; } 98%, 100% { opacity: 0; transform: translateY(-8px); } }
+  /* Quieto: se ve el mensaje (lo que cuenta la pieza: te escriben desde tu barrio). */
+  .wo-hood.is-still .wo-hood__call { opacity: 0; }
+  .wo-hood.is-still .wo-hood__msg { opacity: 1; transform: none; }
+
   /* Opaca: las pistas pasan por detrás de la etiqueta (E-37). */
   .wo-hood :global(.wo-hood__ex) { top: 0; right: 0; background: var(--w-s1, #121211); }
   @media (--lt-md) {
-    .wo-hood { height: var(--sh); }
-    .wo-hood[data-abstract] { --chip: 156px; }
+    .wo-hood { --sw: 600px; --sh: 300px; --chip: 164px; --k: 1; height: var(--sh); }
+    .wo-hood[data-abstract] { --chip: 164px; }
+    .wo-hood__chip { padding: 12px 11px 10px; }
+    .wo-hood__logo :global(.wo-hood__logo-d) { display: none; }
+    .wo-hood__logo :global(.wo-hood__logo-m) { display: block; }
+    .wo-hood__num { margin-top: 9px; font-size: 42px; }
+    .wo-hood__where { display: none; }
+    .wo-hood__data { margin-top: 6px; }
+    .wo-hood__row { height: 28px; }
+    .wo-hood__call { font-size: 12px; padding: 0 10px; }
+    .wo-hood__msg { font-size: 12px; padding: 0 8px; gap: 5px; }
+    .wo-hood__msg small { display: none; }
   }
   @media (--motion-reduce) {
-    .wo-hood__glow::before { animation: none; }
-    .wo-hood .wo-hood__pulse { opacity: 0; }
+    .wo-hood .wo-hood__arrive { animation: none !important; opacity: 0; }
+    .wo-hood__glow::before, .wo-hood .wo-hood__streak, .wo-hood .wo-hood__tail, .wo-hood .wo-hood__glowline, .wo-hood .wo-hood__call, .wo-hood .wo-hood__msg { animation: none !important; }
+    .wo-hood .wo-hood__streak, .wo-hood .wo-hood__tail, .wo-hood .wo-hood__glowline { opacity: 0; }
   }
 </style>

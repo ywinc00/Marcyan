@@ -76,6 +76,11 @@ const caseItems = (ctx: LandingCtx) => {
 const spec: KindSpec = {
   kind: 'barrio',
   tone: 'gold',
+  // v2 (G05, §1.3/P12, §5-6): fondo F08. En el hero, trama de calles ABSTRACTA y declarada (el
+  // mapa real del barrio ya lo dibuja ChipBarrio); en el capítulo de contraste, eco quieto con
+  // las vías REALES del barrio (public/geo/<ciudad>-mapa.json).
+  fondo: 'F08',
+  fondoOpciones: (ctx) => ({ eco: true, barrio: slugOf(ctx) }),
   Hero: HeroBarrio,
   hero: (ctx) => {
     const t = copyOf(ctx);

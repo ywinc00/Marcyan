@@ -11,7 +11,9 @@
 export type SeoCity = 'houston' | 'miami';
 
 export interface CheckRow { k: string; v: string; ok?: boolean }
-export interface Ventana { title: string; sub: string; steps: string[] }
+/** `logo`: cabecera de la ventana (v2 G05, §1.4): Google Maps en monocromo sobre baldosa;
+ *  Apple Maps y Bing en palabra (LogoMarca). `resto`: lo que sigue a la palabra ("Places"). */
+export interface Ventana { title: string; sub: string; steps: string[]; logo?: 'googlemaps' | 'applemaps-texto' | 'bing-texto'; resto?: string }
 export interface ZonaFila { label: string; cells: { label: string; href?: string; current?: boolean }[] }
 
 export interface SeoCopy {
@@ -43,7 +45,7 @@ export interface SeoCopy {
 const COLUMNS = ['SEO local', 'Diseño web', 'IA conversacional', 'Tienda en línea'];
 
 const datos: SeoCopy['revisamos']['datos'] = {
-  title: 'Tu Plomería: nombre, dirección y teléfono',
+  title: 'Tu Restaurante: nombre, dirección y teléfono',
   rows: [
     { k: 'Tu web', v: 'Igual', ok: true },
     { k: 'Ficha de mapa', v: 'Igual', ok: true },
@@ -55,10 +57,10 @@ const datos: SeoCopy['revisamos']['datos'] = {
 const ficha = (zonas: string): SeoCopy['revisamos']['ficha'] => ({
   title: 'Revisión de la ficha de mapa',
   rows: [
-    { k: 'Categoría principal', v: 'Plomero', ok: true },
+    { k: 'Categoría principal', v: 'Restaurante', ok: true },
     { k: 'Zonas que atiendes', v: zonas, ok: true },
-    { k: 'Horario', v: 'Lun a sáb, 8 a 6', ok: true },
-    { k: 'Fotos', v: 'Del trabajo real', ok: true },
+    { k: 'Horario', v: 'Todos los días, de 11 a. m.', ok: true },
+    { k: 'Fotos', v: 'Platos y local reales', ok: true },
     { k: 'Reseñas', v: 'Sin contestar', ok: false },
   ],
 });
@@ -81,9 +83,9 @@ const ventanas = (zonas: string): SeoCopy['ventanas'] => ({
   ],
   stepsLabel: 'Pasos',
   windows: [
-    { title: 'Bing Places', sub: 'Microsoft', steps: ['Importar desde tu ficha', 'Revisar los datos', 'Zonas y horario', 'Lista para la IA'] },
-    { title: 'Apple Maps', sub: 'Business Connect', steps: ['Reclamar la ficha', 'Los mismos datos', 'Horario y fotos', 'Categoría correcta'] },
-    { title: 'Google', sub: 'Perfil de Negocio', steps: ['Verificar la ficha', 'Categorías y zonas', 'Servicios y horario', 'Fotos del trabajo', 'Reseñas contestadas'] },
+    { title: 'Bing Places', logo: 'bing-texto', resto: 'Places', sub: 'Microsoft', steps: ['Importar desde tu ficha', 'Revisar los datos', 'Zonas y horario', 'Lista para la IA'] },
+    { title: 'Apple Maps', logo: 'applemaps-texto', sub: 'Business Connect', steps: ['Reclamar la ficha', 'Los mismos datos', 'Horario y fotos', 'Categoría correcta'] },
+    { title: 'Google', logo: 'googlemaps', sub: 'Perfil de Negocio', steps: ['Verificar la ficha', 'Categorías y zonas', 'Servicios y horario', 'Fotos del trabajo', 'Reseñas contestadas'] },
   ],
 });
 
@@ -132,7 +134,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
       title: 'Todo lo que mira Google antes de enseñarte',
       lead: 'Google ordena por relevancia, distancia y prominencia. Revisamos cada señal que puedes mejorar tú.',
       cells: [
-        { icon: 'lucide:radar', label: 'Búsquedas cerca de ti', titleHtml: 'Cuando te buscan cerca, sales tú', text: 'Quien busca «plomero cerca de mí» ya está listo para llamar. El trabajo es que te encuentre a ti primero.', tray: false },
+        { icon: 'lucide:radar', label: 'Búsquedas cerca de ti', titleHtml: 'Cuando te buscan cerca, sales tú', text: 'Quien busca «cerca de mí» ya está listo para llamar o para ir. El trabajo es que te encuentre a ti primero.', tray: false },
         { icon: 'lucide:list-checks', label: 'Tus datos', titleHtml: 'Iguales en todas partes', text: 'Nombre, dirección y teléfono idénticos en tu web, tu ficha y los directorios. Es lo primero que cruza la IA.' },
         { icon: 'lucide:map-pin', label: 'Tu ficha', titleHtml: 'Completa y con tus zonas', text: 'Categoría, zonas que atiendes, horario, fotos del trabajo y reseñas contestadas en su idioma.' },
         { icon: 'lucide:globe', label: 'Tu web', titleHtml: 'Una página por zona fuerte', text: 'Cada zona importante con su página, escrita para ese mercado y con tus datos a la vista.' },
@@ -205,7 +207,7 @@ export const seoCopy: Record<SeoCity, SeoCopy> = {
       title: 'Todo lo que mira Google antes de enseñarte',
       lead: 'En Miami se busca en dos idiomas. Revisamos cada señal que puedes mejorar tú, en español y en inglés.',
       cells: [
-        { icon: 'lucide:radar', label: 'Búsquedas cerca de ti', titleHtml: 'Cuando te buscan cerca, sales tú', text: 'Quien busca «plomero cerca de mí» ya está listo para llamar. El trabajo es que te encuentre a ti primero.', tray: false },
+        { icon: 'lucide:radar', label: 'Búsquedas cerca de ti', titleHtml: 'Cuando te buscan cerca, sales tú', text: 'Quien busca «cerca de mí» ya está listo para llamar o para ir. El trabajo es que te encuentre a ti primero.', tray: false },
         { icon: 'lucide:list-checks', label: 'Tus datos', titleHtml: 'Iguales en todas partes', text: 'Nombre, teléfono y zonas idénticos en tu web, tu ficha y los directorios, para que nadie dude de quién eres.' },
         { icon: 'lucide:map-pin', label: 'Tu ficha', titleHtml: 'En dos idiomas y con tus barrios', text: 'Categoría, barrios que atiendes, horario, fotos del trabajo y reseñas contestadas en su idioma.' },
         { icon: 'lucide:globe', label: 'Tu web', titleHtml: 'Una página por barrio fuerte', text: 'Cada barrio importante con su página, escrita para su gente y con tus datos a la vista.' },

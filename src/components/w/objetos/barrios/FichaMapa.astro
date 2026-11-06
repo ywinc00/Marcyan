@@ -1,0 +1,370 @@
+---
+// Ficha de mapa de EJEMPLO con marca (design/rediseno-workos-v2.md P03 "FichaMapaEjemplo", §1.6).
+// PROVISIONAL de G05 mientras P03 no exista: [SISTEMA] FichaMapaEjemplo debe absorber este
+// objeto (mismas props: marca, lang, city, distancia) y esta copia se borra. Vive en la
+// carpeta de G05 porque FichaMapaEjemplo no es de esta tarea.
+//
+// Recorte de mapa DIBUJADO por nosotros (calles en dos grises, un parque, un río; abstracto,
+// sin nombres de calles ni logotipo de Google) con ruta curva desde "Tú" al alfiler; debajo, el
+// logotipo de la marca (trazados de LogoEjemplo), categoría, "Abierto · cierra …", horario
+// plegable con HOY en negrita (cerrado al cargar, E-23; se despliega encima de la fila de
+// acciones, sin mover el alto del objeto: CLS 0) y acciones en fila: "Llamar" relleno del
+// acento de la marca, "Cómo llegar" y "Sitio web" en contorno, iconos de UN juego de trazo 1,5.
+// Sin reseñas ni estrellas: "Servicios" con datos de la ficha.
+// Vida (§1.5): al entrar (35 %) la ruta se dibuja (stroke-dashoffset 900 ms) y el alfiler cae
+// 6 px con rebote corto; mientras está a la vista, el punto "Abierto" late (2 s). Al salir ≥ 8 s
+// y volver, se reproduce de nuevo. Con reducir movimiento: ruta dibujada y alfiler quieto.
+// Contrato de objetos de ejemplo (§1.6): raíz aria-hidden + data-nosnippet + resumen sr-only;
+// sin encabezados; acciones como span; ids sin repetir (no usa ids).
+import LogoEjemplo from '../ejemplos/LogoEjemplo.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import { negocios } from '../ejemplos/negocios';
+
+type MarcaFicha = 'restaurante' | 'inmobiliaria';
+interface Props {
+  marca?: MarcaFicha;
+  lang?: 'es' | 'en';
+  city?: string;
+  /** Etiqueta de distancia de la ruta (sin prop, sin cifra). */
+  distancia?: string;
+  size?: 'hero' | 'card';
+  class?: string;
+}
+const { marca = 'restaurante', lang = 'es', city = 'Houston', distancia, size = 'card', class: cls } = Astro.props;
+const en = lang === 'en';
+const n = negocios[marca];
+const pal = n.paleta;
+
+// Horario de ejemplo (12 h, §1.6), agrupado como en las fichas reales ("Lun a jue"), para que
+// quepa entero en el hueco de servicios y acciones (r1: 7 filas se cortaban). `dias`: lunes = 0.
+type Grupo = { d: string; dias: number[]; h: string | null; cierra?: string; abre?: string };
+const GRUPOS: Record<MarcaFicha, Grupo[]> = en
+  ? {
+      restaurante: [
+        { d: 'Mon to Thu', dias: [0, 1, 2, 3], h: '11 AM to 10 PM', cierra: '10 PM', abre: '11 AM' },
+        { d: 'Fri and Sat', dias: [4, 5], h: '11 AM to 11 PM', cierra: '11 PM', abre: '11 AM' },
+        { d: 'Sunday', dias: [6], h: '11 AM to 9 PM', cierra: '9 PM', abre: '11 AM' },
+      ],
+      inmobiliaria: [
+        { d: 'Mon to Fri', dias: [0, 1, 2, 3, 4], h: '9 AM to 6 PM', cierra: '6 PM', abre: '9 AM' },
+        { d: 'Saturday', dias: [5], h: '10 AM to 2 PM', cierra: '2 PM', abre: '10 AM' },
+        { d: 'Sunday', dias: [6], h: null },
+      ],
+    }
+  : {
+      restaurante: [
+        { d: 'Lun a jue', dias: [0, 1, 2, 3], h: '11 a. m. a 10 p. m.', cierra: '10 p. m.', abre: '11 a. m.' },
+        { d: 'Vie y sáb', dias: [4, 5], h: '11 a. m. a 11 p. m.', cierra: '11 p. m.', abre: '11 a. m.' },
+        { d: 'Domingo', dias: [6], h: '11 a. m. a 9 p. m.', cierra: '9 p. m.', abre: '11 a. m.' },
+      ],
+      inmobiliaria: [
+        { d: 'Lun a vie', dias: [0, 1, 2, 3, 4], h: '9 a. m. a 6 p. m.', cierra: '6 p. m.', abre: '9 a. m.' },
+        { d: 'Sábado', dias: [5], h: '10 a. m. a 2 p. m.', cierra: '2 p. m.', abre: '10 a. m.' },
+        { d: 'Domingo', dias: [6], h: null },
+      ],
+    };
+const grupos = GRUPOS[marca];
+const HOY = 1; // martes en el HTML; el guion marca el día real del visitante.
+const gHoy = grupos.findIndex((g) => g.dias.includes(HOY));
+const T = en
+  ? {
+      cat: marca === 'restaurante' ? `Home cooking · ${city}` : `Real estate · ${city}`,
+      open: 'Open', closed: 'Closed', closes: 'closes', opens: 'opens', tomorrow: 'tomorrow',
+      hours: 'Hours', today: 'Today',
+      svcL: 'Services',
+      svc: marca === 'restaurante' ? 'dine in · takeout · catering' : 'buy · sell · rent',
+      call: 'Call', dir: 'Directions', web: 'Website', you: 'You',
+      sr: marca === 'restaurante'
+        ? `Example map listing of a restaurant in ${city}: route on the map, category, hours, services and buttons to call, get directions or visit the website.`
+        : `Example map listing of a real estate office in ${city}: route on the map, category, hours, services and buttons to call, get directions or visit the website.`,
+    }
+  : {
+      cat: marca === 'restaurante' ? `Cocina casera · ${city}` : `Inmobiliaria · ${city}`,
+      open: 'Abierto', closed: 'Cerrado', closes: 'cierra', opens: 'abre', tomorrow: 'mañana',
+      hours: 'Horario', today: 'Hoy',
+      svcL: 'Servicios',
+      svc: marca === 'restaurante' ? 'comer aquí · para llevar · encargos' : 'compra · venta · renta',
+      call: 'Llamar', dir: 'Cómo llegar', web: 'Sitio web', you: 'Tú',
+      sr: marca === 'restaurante'
+        ? `Ficha de mapa de ejemplo de un restaurante de ${city}: ruta en el mapa, categoría, horario, servicios y botones para llamar, llegar o ir a su web.`
+        : `Ficha de mapa de ejemplo de una inmobiliaria de ${city}: ruta en el mapa, categoría, horario, servicios y botones para llamar, llegar o ir a su web.`,
+    };
+const hoy = grupos[gHoy];
+const style = `--fm-acc:${pal.accent === '#F7D9A0' ? pal.bg : pal.accent};--fm-on:${pal.accent === '#F7D9A0' ? pal.ink : pal.onAccent};--fm-ink:${marca === 'restaurante' ? pal.bg : pal.ink};--fm-tile:${pal.bg};--fm-tile-ink:${pal.ink}`;
+// La ruta: de "Tú" (abajo a la izquierda) al alfiler, por las calles dibujadas.
+const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 50';
+---
+<div class:list={['fm', `fm--${size}`, cls]} data-w2-ficha data-marca={marca} style={style}
+  data-closes={T.closes} data-opens={T.opens} data-tomorrow={T.tomorrow} data-open={T.open} data-closed={T.closed}>
+  <p class="sr-only">{T.sr}</p>
+  <div class="fm__obj" aria-hidden="true" data-nosnippet>
+    <div class="fm__map">
+      <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">
+        <rect width="400" height="150" fill="#EAE6DE" />
+        {/* manzanas */}
+        <g fill="#E2DDD3">
+          <rect x="8" y="8" width="64" height="42" rx="3" /><rect x="84" y="8" width="70" height="42" rx="3" />
+          <rect x="196" y="104" width="64" height="40" rx="3" /><rect x="324" y="98" width="70" height="46" rx="3" />
+          <rect x="8" y="62" width="48" height="36" rx="3" />
+        </g>
+        {/* río */}
+        <path d="M-10 18 C 60 26, 120 4, 190 14 S 330 40, 410 22" fill="none" stroke="#C3D3DA" stroke-width="13" stroke-linecap="round" />
+        {/* parque */}
+        <rect x="320" y="58" width="74" height="32" rx="7" fill="#D3DEC7" />
+        <circle cx="340" cy="72" r="5" fill="#C4D3B6" /><circle cx="362" cy="78" r="4" fill="#C4D3B6" /><circle cx="378" cy="68" r="4.5" fill="#C4D3B6" />
+        {/* calles secundarias */}
+        <g fill="none" stroke="#F6F3ED" stroke-width="4" stroke-linecap="round">
+          <path d="M78 -6 L 74 156" /><path d="M164 -6 L 168 156" /><path d="M310 -6 L 316 156" />
+          <path d="M-6 56 L 406 52" /><path d="M-6 100 L 406 96" />
+        </g>
+        {/* calles principales: borde y relleno */}
+        <g fill="none" stroke-linecap="round">
+          <path d="M-6 128 C 110 128, 118 96, 160 94 S 260 92, 406 86" stroke="#D9D3C8" stroke-width="11" />
+          <path d="M252 -6 C 250 40, 262 80, 256 156" stroke="#D9D3C8" stroke-width="10" />
+          <path d="M-6 128 C 110 128, 118 96, 160 94 S 260 92, 406 86" stroke="#FFFFFF" stroke-width="8" />
+          <path d="M252 -6 C 250 40, 262 80, 256 156" stroke="#FFFFFF" stroke-width="7" />
+        </g>
+        {/* ruta: casing blanco + trazo del acento */}
+        <path class="fm__route-c" d={ROUTE} pathLength="100" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" />
+        <path class="fm__route" d={ROUTE} pathLength="100" fill="none" stroke="var(--fm-acc)" stroke-width="4.5" stroke-linecap="round" />
+        {/* Tú */}
+        <circle class="fm__you-halo" cx="70" cy="128" r="11" fill="var(--fm-acc)" opacity=".16" />
+        <circle cx="70" cy="128" r="6.5" fill="#FFFFFF" />
+        <circle cx="70" cy="128" r="4.2" fill="#1E1D1B" />
+        {/* sombra del alfiler */}
+        <ellipse class="fm__pin-sh" cx="298" cy="52" rx="7" ry="2.4" fill="rgba(0,0,0,.22)" />
+      </svg>
+      <span class="fm__you">{T.you}</span>
+      <span class="fm__pin">
+        <svg viewBox="0 0 28 36" width="28" height="36"><path d="M14 35c-1-3.4-12-12.5-12-21A12 12 0 0 1 26 14c0 8.5-11 17.6-12 21Z" fill="var(--fm-acc)" stroke="#FFFFFF" stroke-width="2" /><circle cx="14" cy="14" r="4.6" fill="#FFFFFF" /></svg>
+      </span>
+      {distancia && <span class="fm__dist">{distancia}</span>}
+      <Ejemplo lang={lang} on="light" class="fm__ex" />
+    </div>
+
+    <div class="fm__body">
+      <div class="fm__id">
+        <span class="fm__tile">
+          {marca === 'restaurante' ? (
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 21V3c-2.2 1.4-3 4-3 7v3h3" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5.5h4V20" /></svg>
+          )}
+        </span>
+        <span class="fm__names">
+          <span class="fm__logo"><LogoEjemplo marca={marca} size={size === 'hero' ? 15 : 13} lang={lang} tono="mono" signo={false} /></span>
+          <span class="fm__cat">{T.cat}</span>
+        </span>
+      </div>
+
+      <p class="fm__state">
+        <span class="fm__dot"><i></i></span>
+        <b class="fm__open">{hoy.h ? T.open : T.closed}</b>
+        <span class="fm__sep">·</span>
+        <span class="fm__when">{hoy.h ? `${T.closes} ${hoy.cierra}` : ''}</span>
+      </p>
+
+      <div class="fm__fold">
+        <span class="fm__hrow" data-w2-ficha-toggle>
+          <span>{T.hours}</span>
+          <svg class="fm__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+        </span>
+        <div class="fm__under">
+          <p class="fm__svc"><span class="fm__svcl">{T.svcL}</span>{T.svc}</p>
+          <div class="fm__acts">
+            <span class="fm__act fm__act--main">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+              {T.call}
+            </span>
+            <span class="fm__act">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 21 3l-8 18-2-8Z" /></svg>
+              {T.dir}
+            </span>
+            <span class="fm__act">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 3.6 5.7 3.6 9s-1.1 6.3-3.6 9c-2.5-2.7-3.6-5.7-3.6-9S9.5 5.7 12 3Z" /></svg>
+              {T.web}
+            </span>
+          </div>
+          <ul class="fm__hours">
+            {grupos.map((d, i) => (
+              <li class:list={[i === gHoy && 'is-today']} data-dias={d.dias.join(',')} data-h={d.h ?? ''} data-cierra={d.cierra ?? ''} data-abre={d.abre ?? ''}>
+                <span>{d.d}{i === gHoy && <em> · {T.today}</em>}</span><span>{d.h ?? T.closed}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Una vez por instancia: busca dentro de su nodo (nunca global), respeta la pausa global
+  // (html[data-w-pausa]) y la pestaña oculta. Sin rAF continuo.
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-w2-ficha]').forEach((el) => {
+    // Día real del visitante (lunes = 0): HOY en negrita y "cierra …" coherente.
+    const wd = (new Date().getDay() + 6) % 7;
+    const rows = [...el.querySelectorAll<HTMLElement>('.fm__hours li')];
+    const of = (d: number) => rows.find((r) => (r.dataset.dias ?? '').split(',').includes(String(d)));
+    const row = of(wd);
+    if (row) {
+      const em = el.querySelector('.fm__hours li.is-today em');
+      rows.forEach((r) => r.classList.remove('is-today'));
+      row.classList.add('is-today');
+      if (em) row.firstElementChild?.appendChild(em);
+      const open = !!row.dataset.h;
+      el.querySelector('.fm__open')!.textContent = open ? el.dataset.open! : el.dataset.closed!;
+      const next = of((wd + 1) % 7);
+      el.querySelector('.fm__when')!.textContent = open
+        ? `${el.dataset.closes} ${row.dataset.cierra}`
+        : `${el.dataset.opens} ${el.dataset.tomorrow} ${next?.dataset.abre ?? ''}`;
+      el.classList.toggle('is-closed', !open);
+    }
+
+    // Horario plegable: clic o toque sobre la fila (el objeto es ilustración aria-hidden; el
+    // resumen accesible ya nombra el horario).
+    const tog = el.querySelector<HTMLElement>('[data-w2-ficha-toggle]');
+    tog?.addEventListener('click', () => el.classList.toggle('is-open'));
+
+    if (mq.matches) { el.classList.add('is-drawn', 'is-still'); return; }
+    let outAt = 0;
+    let played = false;
+    const paused = () => document.documentElement.hasAttribute('data-w-pausa') || document.hidden;
+    const syncLive = (vis: boolean) => el.classList.toggle('is-live', vis && !paused());
+    const play = () => {
+      el.classList.remove('is-drawn', 'is-play');
+      void el.offsetWidth; // reinicia la coreografía
+      el.classList.add('is-play');
+      played = true;
+    };
+    let vis = false;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && e.intersectionRatio >= 0.35) {
+          if (!vis) {
+            vis = true;
+            if (!played || (outAt && performance.now() - outAt >= 8000)) play();
+          }
+        } else if (!e.isIntersecting && vis) {
+          vis = false; outAt = performance.now();
+        }
+        syncLive(vis);
+      }
+    }, { threshold: [0, 0.35] });
+    io.observe(el);
+    document.addEventListener('visibilitychange', () => syncLive(vis));
+    new MutationObserver(() => syncLive(vis)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
+  });
+</script>
+
+<style>
+  .fm {
+    position: relative; width: 100%; max-width: 420px;
+    font-family: var(--font-body); color: #1E1D1B; text-align: left;
+  }
+  .fm__obj {
+    position: relative; overflow: hidden; border-radius: 16px;
+    background: #FBFAF7; border: 1px solid rgba(14,14,13,.09);
+    box-shadow: 0 1px 0 #fff inset, 0 18px 36px -22px rgba(14,14,13,.35);
+  }
+  .fm__map { position: relative; height: 138px; border-bottom: 1px solid rgba(14,14,13,.07); }
+  .fm--card .fm__map { height: 120px; }
+  .fm__map > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* Rótulo "Ejemplo" arriba a la IZQUIERDA del mapa (r1: arriba a la derecha tapaba el alfiler). */
+  .fm__map :global(.fm__ex) { position: absolute; top: 10px; left: 10px; right: auto; background: rgba(251,250,247,.94); }
+  /* Posiciones en % del lienzo 400×150 (el SVG es "slice": el ancho manda). */
+  .fm__you {
+    position: absolute; left: calc(70 / 400 * 100%); top: calc(128 / 150 * 100%); translate: -50% calc(-100% - 12px);
+    padding: 2px 7px; border-radius: 6px; background: #1E1D1B; color: #FBFAF7;
+    font: 600 11px/1.3 var(--font-body); letter-spacing: .01em;
+  }
+  .fm__pin {
+    position: absolute; left: calc(298 / 400 * 100%); top: calc(52 / 150 * 100%);
+    width: 28px; height: 36px; margin: -35px 0 0 -14px; transform-origin: 50% 100%;
+  }
+  .fm__pin svg { display: block; filter: drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
+  .fm__dist {
+    position: absolute; left: 44%; top: 50%; padding: 2px 8px; border-radius: 6px;
+    background: #fff; font: 600 11px/1.3 var(--font-body); box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  }
+
+  .fm__body { padding: 16px 18px 18px; }
+  .fm--card .fm__body { padding: 14px 16px 16px; }
+  .fm__id { display: flex; align-items: center; gap: 12px; }
+  .fm__tile {
+    flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 11px;
+    background: var(--fm-tile); color: var(--fm-tile-ink);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .fm--card .fm__tile { width: 40px; height: 40px; border-radius: 10px; }
+  .fm__names { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .fm__logo { display: block; color: var(--fm-ink); line-height: 0; }
+  .fm__cat { font-size: 13px; line-height: 1.2; color: #5B5852; }
+  .fm__state { margin: 14px 0 0; display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.2; color: #3E3B36; }
+  .fm__open { font-weight: 600; color: #2D6A3E; }
+  .fm.is-closed .fm__open { color: #9A3324; }
+  .fm__sep { color: #9A968E; }
+  .fm__dot { position: relative; width: 8px; height: 8px; margin-right: 2px; }
+  .fm__dot, .fm__dot i { display: block; border-radius: 50%; background: #2D6A3E; }
+  .fm__dot i { position: absolute; inset: 0; opacity: 0; }
+  .fm.is-closed .fm__dot, .fm.is-closed .fm__dot i { background: #9A3324; }
+
+  .fm__fold { position: relative; margin-top: 12px; }
+  .fm__hrow {
+    display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 0 2px;
+    border-top: 1px solid rgba(14,14,13,.08); border-bottom: 1px solid rgba(14,14,13,.08);
+    font-size: 13px; font-weight: 500; color: #3E3B36; cursor: pointer; user-select: none;
+  }
+  .fm__chev { transition: transform 220ms var(--w-ease-ui); }
+  .fm.is-open .fm__chev { transform: rotate(180deg); }
+  .fm__under { position: relative; }
+  .fm__svc { margin: 12px 0 0; font-size: 13px; line-height: 1.4; color: #5B5852; }
+  .fm__svcl { font-weight: 600; color: #1E1D1B; margin-right: 6px; }
+  .fm__acts { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .fm__act {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 8px;
+    border-radius: 999px; border: 1px solid rgba(14,14,13,.18); background: #fff;
+    font-size: 13px; font-weight: 600; color: #1E1D1B; white-space: nowrap;
+  }
+  .fm__act--main { background: var(--fm-acc); border-color: var(--fm-acc); color: var(--fm-on); }
+  .fm__act svg { flex: none; }
+  /* Horario: se despliega ENCIMA de servicios y acciones (mismo alto: CLS 0). */
+  .fm__hours {
+    list-style: none; margin: 0; padding: 4px 2px 0; position: absolute; inset: 0;
+    background: #FBFAF7; display: flex; flex-direction: column; justify-content: space-between;
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity 220ms var(--w-ease-ui), transform 220ms var(--w-ease-ui);
+  }
+  .fm.is-open .fm__hours { opacity: 1; transform: none; pointer-events: auto; }
+  .fm__hours { justify-content: center; gap: 8px; }
+  .fm__hours li { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; line-height: 1.25; color: #5B5852; }
+  .fm__hours li.is-today { font-weight: 700; color: #1E1D1B; }
+  .fm__hours em { font-style: normal; font-weight: 600; }
+
+  /* Coreografía de entrada (solo transform / opacity / stroke-dashoffset). */
+  .fm__route, .fm__route-c { stroke-dasharray: 100; stroke-dashoffset: 0; }
+  .fm.is-play .fm__route, .fm.is-play .fm__route-c { animation: fm-draw 900ms var(--w-ease-out) both; }
+  .fm.is-play .fm__pin { animation: fm-drop 620ms 820ms cubic-bezier(.3, 1.4, .5, 1) both; }
+  .fm.is-play .fm__pin-sh { animation: fm-sh 620ms 820ms var(--w-ease-out) both; transform-box: fill-box; transform-origin: center; }
+  @keyframes fm-draw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  @keyframes fm-drop { 0% { opacity: 0; transform: translateY(-6px); } 40% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+  @keyframes fm-sh { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+  /* Micro-vida mientras está a la vista: el punto "Abierto" y el halo de "Tú" laten. */
+  .fm.is-live .fm__dot i { animation: fm-beat 2s var(--w-ease-out) infinite; }
+  .fm.is-live .fm__you-halo { animation: fm-halo 2s var(--w-ease-out) infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes fm-beat { 0% { opacity: .55; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.6); } }
+  @keyframes fm-halo { 0% { opacity: .28; transform: scale(.7); } 70%, 100% { opacity: 0; transform: scale(1.5); } }
+  /* Ficha estrecha (columna de 340 junto a la matriz): acciones sin icono en contorno. */
+  .fm--card .fm__acts { gap: 6px; }
+  .fm--card .fm__act { font-size: 12.5px; padding: 0 6px; }
+  .fm--card .fm__act:not(.fm__act--main) svg { display: none; }
+  @media (--lt-md) {
+    .fm__body { padding: 14px 14px 16px; }
+    .fm__act { font-size: 12px; gap: 4px; padding: 0 6px; }
+  }
+  @media (--motion-reduce) {
+    .fm .fm__route, .fm .fm__route-c, .fm .fm__pin, .fm .fm__pin-sh, .fm .fm__dot i, .fm .fm__you-halo { animation: none !important; }
+    .fm__hours, .fm__chev { transition: none; }
+  }
+</style>

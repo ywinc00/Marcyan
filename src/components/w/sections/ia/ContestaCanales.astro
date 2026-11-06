@@ -218,4 +218,6 @@ const L = { region: 'Conversaciones que contesta Marcy', carrusel: 'carrusel', d
     .cz.is-playing.is-tick .cz__punto.is-on i b { animation: none; }
   }
   .cz.is-rm .cz__pausa { display: none; }
+  /* Sin JS (la pila se pinta desde <noscript>, Diferido): primera carta quieta, sin controles muertos. */
+  .cz:not(.is-js) .cz__ctrl { display: none; }
 </style>

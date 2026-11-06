@@ -41,7 +41,7 @@ const es = {
     label: 'Así está montada',
     title: '<span class="w-tone">Un cerebro,</span> todos tus canales.',
     text: 'Marcy piensa con Claude y responde donde te escriben tus clientes.',
-    filas: ['Piensa con', 'Contesta en tu web y en', 'Te encuentran en'] as [string, string, string],
+    filas: ['Piensa con', 'Contesta en', 'Te encuentran en'] as [string, string, string],
   },
 
   canales: {
@@ -133,7 +133,7 @@ const en: typeof es = {
     label: 'How it’s built',
     title: '<span class="w-tone">One brain,</span> every channel.',
     text: 'Marcy thinks with Claude and answers wherever your customers reach you.',
-    filas: ['Thinks with', 'Answers on your website and', 'Found on'],
+    filas: ['Thinks with', 'Answers on', 'Found on'],
   },
 
   canales: {

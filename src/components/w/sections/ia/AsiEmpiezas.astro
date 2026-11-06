@@ -54,5 +54,17 @@ const { copy, n, lang = 'es' } = Astro.props;
   .ae__steps b { display: block; font-weight: 500; color: var(--w-ink); }
   .ae__n { font: 500 13px/1.6 var(--font-mono); color: var(--w-accent); }
   .ae__obj { min-width: 0; display: flex; justify-content: center; }
+  /* Revisión G06 r2: "Repetir" medía 88×32; la regla pide 44 de alto visible. */
+  .ae__obj :global(.alta-replay) { min-height: 44px; padding-inline: 18px; }
+  /* Móvil (revisión G06 r2: el texto del alta quedaba bajo 11 px porque el lienzo de 347 px
+     encogía la ventana al 84 %): el lienzo ocupa el ancho de la pantalla, así la ventana va a
+     su tamaño real o algo más (escala 1,05 desde 384 px de lienzo) y el texto se lee a 11-13 px. */
+  @media (max-width: 599.98px) {
+    .ae__obj { margin-inline: calc(var(--container-pad) * -1); }
+    /* Más alto que los 404 px de la pieza: la ventana crecida no tapa el rótulo "Ejemplo". */
+    .ae__obj :global(.alta-lienzo) { border-radius: 0; height: 464px; }
+    /* Con el lienzo a ancho completo cabe un 5 % más: las líneas grises pasan de 10,5 a 11 px. */
+    @container alta (min-width: 384px) { .ae__obj :global(.alta-escena) { --alta-k: 1.05; } }
+  }
   @media (--lt-md) { .ae__p { font-size: 1rem; } }
 </style>

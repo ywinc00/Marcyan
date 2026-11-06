@@ -183,7 +183,7 @@ const base = (city: IaCity) => {
       memoryLabel: 'Lo que ya sabe de tu negocio',
       memoryText: 'Lo que le cuentas una vez, lo recuerda en cada conversación. Si algo cambia, nos avisas y lo ajustamos.',
       memory: [
-        { label: 'Canales', value: 'Web, WhatsApp, Instagram y Messenger' },
+        { label: 'Canales', value: 'Web y redes' },
         { label: 'Citas', value: 'Lun a sáb' },
         { label: 'Zona', value: zone },
         { label: 'Idioma', value: 'Español e inglés' },

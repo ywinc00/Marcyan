@@ -180,9 +180,9 @@ const arcoD = (r: number) => {
   .ck__t.is-on { z-index: 2; }
   .ck__t.is-on .ck__c { transform: scale(1.12); }
   .ck__t.is-on .ck__c::before { opacity: 1; transform: scale(1); }
-  /* Pausa junto a la composición: abajo a la derecha del lienzo, a la altura del busto. */
-  .ck > :global(.w-loop-pause) { right: 4% !important; bottom: 4% !important; }
-  @container (min-width: 460px) { .ck > :global(.w-loop-pause) { right: 17% !important; bottom: 10% !important; } }
+  /* Pausa: arriba a la derecha del lienzo, fuera del arco y de Marcy (revisión G06 r2: junto al
+     busto flotaba suelta). Mismo sitio que en ConstelacionMarcas. */
+  .ck > :global(.w-loop-pause) { top: 0 !important; right: 0 !important; bottom: auto !important; }
   @media (prefers-reduced-motion: reduce) {
     .ck__c, .ck__c::before, .ck__ln, .ck__ln.is-on { transition: none; }
   }

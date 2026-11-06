@@ -3,7 +3,7 @@
 // P03 no está integrado, así que la solicitud por oficio vive aquí, en la carpeta de la página,
 // con el reparto de marcas de §1.6 (pendiente [SISTEMA]: sustituir por SolicitudOficio de P03):
 //   contratista  → pantalla de bloqueo con la notificación de "Tu Plomería" (su signo como icono
-//                  de app): "Solicitud de presupuesto · remodelación de cocina · Katy · 9:40 p. m."
+//                  de app): "Solicitud de presupuesto · cambio de calentador de agua · Katy · 9:40 p. m."
 //   inmobiliaria → ficha de casa al estilo Samara (nombre enorme y fino, 3 datos mono, casita
 //                  geométrica mínima) + mensaje entrante "¿Sigue disponible?"
 //   restaurante  → carta de "Your Restaurant" (paleta ladrillo de negocios.ts) + "Order on WhatsApp"
@@ -26,8 +26,8 @@ const { kind, lang = 'es', parte } = Astro.props;
 const en = lang === 'en';
 const C = {
   contratista: en
-    ? { dia: 'Thursday', hora: '9:40', app: 'Your Plumbing', t: 'Quote request', b: 'Kitchen remodel · Katy', h: '9:40 PM', btn: 'Reply', mas: '2 earlier notifications' }
-    : { dia: 'jueves', hora: '9:40', app: 'Tu Plomería', t: 'Solicitud de presupuesto', b: 'Remodelación de cocina · Katy', h: '9:40 p. m.', btn: 'Responder', mas: '2 avisos anteriores' },
+    ? { dia: 'Thursday', hora: '9:40', p: 'PM', app: 'Your Plumbing', t: 'Quote request', b: 'Water heater replacement · Katy', h: '9:40 PM', btn: 'Reply', mas: '2 earlier notifications' }
+    : { dia: 'jueves', hora: '9:40', p: 'p. m.', app: 'Tu Plomería', t: 'Solicitud de presupuesto', b: 'Cambio de calentador de agua · Katy', h: '9:40 p. m.', btn: 'Responder', mas: '2 avisos anteriores' },
   inmobiliaria: en
     ? { casa: 'Oak House', zona: 'Katy · TX', datos: ['3 bd', '2 ba', '1,850 sq ft'], msg: 'Is it still available?', h: '10:10 PM', quien: 'New message', btn: 'Reply' }
     : { casa: 'Casa Roble', zona: 'Katy · TX', datos: ['3 hab', '2 baños', '1,850 pies²'], msg: '¿Sigue disponible?', h: '10:10 p. m.', quien: 'Mensaje nuevo', btn: 'Responder' },
@@ -44,7 +44,7 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
 {parte === 'band' && (
   <div class:list={['oo-band', `oo-band--${kind}`]} data-nosnippet>
     {kind === 'contratista' && (
-      <p class="oo-reloj" data-oo-i="0"><span class="oo-reloj__d">{C.dia}</span><span class="oo-reloj__h">{C.hora}</span></p>
+      <p class="oo-reloj" data-oo-i="0"><span class="oo-reloj__d">{C.dia}</span><span class="oo-reloj__h">{C.hora}<span class="oo-reloj__p">{C.p}</span></span></p>
     )}
     {kind === 'inmobiliaria' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="inmobiliaria" size={13} lang={lang} tono="mono" /></span>}
     {kind === 'restaurante' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="restaurante" size={18} lang={lang} tono="mono" /></span>}
@@ -154,6 +154,7 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
   .oo-reloj { margin: 6px 0 0; display: grid; justify-items: center; line-height: 1; color: #14232b; }
   .oo-reloj__d { font: 500 13px/1 var(--font-body); color: rgba(20, 35, 43, .62); text-transform: capitalize; }
   .oo-reloj__h { margin-top: 4px; font: 300 58px/0.95 var(--font-display); letter-spacing: -0.04em; }
+  .oo-reloj__p { margin-left: .18em; font-size: .3em; font-weight: 500; letter-spacing: 0; }
   .oo-marca { color: var(--w-p-ink, #0e0e0d); display: inline-flex; }
 
   /* Centrado en el alto del cuerpo de la tarjeta (sin hueco vacío abajo). */

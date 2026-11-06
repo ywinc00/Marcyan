@@ -5,6 +5,7 @@
 // Los hubs importan la base directamente (chat 'ligero'), así no cargan el CSS de ChatMarcy.
 import CierreDosTarjetasBase from './CierreDosTarjetasBase.astro';
 import ChatMarcy from './objetos/ChatMarcy.astro';
+import ObjPerfil from './sections/servicios/ObjPerfil.astro';
 import { cierreChat } from '../../i18n/w/globales';
 import type { ComponentProps } from 'astro/types';
 
@@ -20,6 +21,7 @@ const chatTabs = [
 ];
 ---
 <CierreDosTarjetasBase {...props}>
+  {warm.kind === 'diagnostico' && <ObjPerfil slot="obj" tipo="diagnostico" juego="b" lang={lang === 'en' ? 'en' : 'es'} />}
   {chatMode === 'vivo' && (
     <ChatMarcy slot="chat" lang={lang} mode="compacto" tabsBar={false} size="mini" tabs={chatTabs} sr={cc.sr(ask)} />
   )}

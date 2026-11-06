@@ -80,9 +80,29 @@ veredicto de la tabla.
 
 Comprobado en el paquete: `apple` existe pero NO se copió; `openai`, `chatgpt`, `microsoftbing`, `bing` y `applemaps` no existen.
 
+## Cerrojo aplicado en el código (2026-11-06, control v2 r1, I-01)
+
+El cerrojo de arriba ya no depende de cada página: `datos.ts` exporta `BLOQUEADAS` (`claude`, `google`,
+`googlemaps`, `gmail`, `googlecalendar`, `googlegemini`) y `LogoMarca.astro` NUNCA pinta su glifo:
+
+- en un icono de app (baldosa, o caja de 26 px o más: dock del portátil, carga de ventanas, ficha de Maps,
+  constelación de canales) pinta un **pictograma genérico sin marca** (`PICTO_BLOQUEADA`: chincheta,
+  sobre, calendario, lupa, burbuja) en baldosa blanca;
+- en una fila o cabecera pinta el **nombre en texto** (`PALABRA_BLOQUEADA`: Claude, Google, Google Maps,
+  Gmail, Google Calendar, Gemini), igual que ChatGPT;
+- si el nombre ya va escrito al lado (`titulo=""`), no pinta nada (`siBloqueada` lo cambia por llamada).
+
+Esos nodos llevan `data-w2-bloq="<id>"` en lugar de `data-w2-marca`, así una búsqueda de
+`data-w2-marca="claude"` en el HTML compilado da 0. Los trazados siguen en `datos.ts` (CC0) para el día
+que haya permiso: basta con sacar el id de `BLOQUEADAS`. La reserva de `mac/mac.ts` ya no guarda
+Claude ni los de Google.
+
 ## Dónde se usa
 
-A 2026-11-05 solo en el muestrario interno `/es/w-muestrario-marcas` (noindex, se borra antes de cualquier merge a
-`main`). Cada página que monte un logo añade aquí su ruta en esta lista, con los ids que usa:
-
-- `/es/w-muestrario-marcas` · los 19 ids (muestrario)
+A 2026-11-06, con el cerrojo aplicado, ninguna página pública pinta como logo `claude` ni los 5 de Google.
+Logos que sí salen como glifo (veredicto de la tabla): WhatsApp, Instagram, Messenger, Facebook, Meta,
+Perplexity, Shopify, Stripe, PayPal, Calendly; y en palabra ChatGPT, Apple Maps y Bing. Páginas:
+portada `/es` y `/en` (ventana del agente, chip "Así está montada", portátil del proceso), IA para pymes
+ES/EN, IA conversacional, SEO para IA, servicios ES/EN, tienda en línea, SEO local, sectores y artículos
+del blog ("Pregúntale a tu IA"). El muestrario interno `/es/w-muestrario-marcas` (noindex, se borra
+antes de cualquier merge a `main`) también pasa por el cerrojo.

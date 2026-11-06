@@ -130,7 +130,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
     eyebrow: 'Contratistas',
     lead: 'Tu sitio sale en Google cuando buscan contratista cerca, enseña tus trabajos y contesta por ti mientras estás en la obra.',
     link: 'Ver precios',
-    heroSr: 'Ejemplo: a las 9:40 p. m. te llega desde tu web una solicitud de presupuesto para remodelar una cocina en Katy.',
+    heroSr: 'Ejemplo: a las 9:40 p. m. te llega desde tu web una solicitud de presupuesto para cambiar un calentador de agua en Katy.',
     dilema: {
       label: 'El problema',
       title: "<span class='w-tone'>Estás en la obra.</span><br /> El teléfono no espera.",
@@ -157,7 +157,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       title: 'Un sitio que te consigue trabajos',
       lead: 'Tres cosas que hace por ti mientras trabajas.',
       includes: 'Incluye',
-      question: '¿Quién remodela cocinas en Houston?',
+      question: '¿Quién cambia calentadores de agua en Houston?',
       rows: [
         { obj: 'respuesta', title: 'Te encuentran cuando buscan', text: 'Apareces cuando buscan contratista cerca o remodelación en Houston, en Google y en los asistentes de IA. Y tu sitio abre rápido y en su idioma.', items: [0, 5] },
         { obj: 'antes-despues', title: 'Tu trabajo, a la vista', text: 'Tus mejores obras al frente, con fotos de antes y después, tu licencia y tus reseñas reales: lo que el cliente necesita para llamarte a ti.', items: [1, 4] },
@@ -256,7 +256,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
     eyebrow: 'Contractors',
     lead: "Your site shows up when people search for a contractor nearby, shows off your work, and answers for you while you're on the job.",
     link: 'See pricing',
-    heroSr: 'Example: at 9:40 PM an estimate request for a kitchen remodel in Katy comes in through your website.',
+    heroSr: 'Example: at 9:40 PM an estimate request to replace a water heater in Katy comes in through your website.',
     dilema: {
       label: 'The problem',
       title: "<span class='w-tone'>You're on the job.</span><br /> The phone won't wait.",
@@ -283,7 +283,7 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       title: 'A site that wins you jobs',
       lead: 'Three things it does for you while you work.',
       includes: 'Included',
-      question: 'Who does kitchen remodels in Houston?',
+      question: 'Who replaces water heaters in Houston?',
       rows: [
         { obj: 'respuesta', title: 'They find you when they search', text: 'You show up when people search for a contractor nearby or remodeling in Houston, on Google and in AI assistants. And your site loads fast, in their language.', items: [0, 5] },
         { obj: 'antes-despues', title: 'Your work, front and center', text: 'Your best jobs up front, with before-and-after photos, your license and your real reviews: what a customer needs to call you.', items: [1, 4] },

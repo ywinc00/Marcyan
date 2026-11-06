@@ -1,0 +1,107 @@
+---
+// Servicios · objeto de las tarjetas de "Empieza por tu caso" (control v2 r1, I-04: fuera los
+// alambres de barras y píldoras vacías de la v1, §1.6). Dos objetos REALES, de producto, cada uno
+// con lo que ese caso consigue:
+//   · contacto    → "Abro mi negocio": la web ya publicada y el primer contacto que llega por ella.
+//   · diagnostico → "Ya tengo web pero no me llaman": el informe del diagnóstico con 3 señales que
+//                   revisa el motor de verdad (lib/diagnostic-checks.mjs: teléfono visible, móvil,
+//                   ciudad en la página). Sin puntuación inventada.
+// Va dentro de un <a> (la tarjeta): todo son <span>, sin enlaces ni botones. aria-hidden lo pone
+// TarjetasPerfil; un solo rótulo "Ejemplo" por objeto. Quieto (no compite con el bento de arriba):
+// solo el punto "en línea" late, y con reducir movimiento tampoco.
+// `juego` 'b' = otras 3 señales reales (conexión segura, descripción en Google, página por servicio):
+// la usa el cierre de las páginas, para no repetir el mismo informe si la página ya lleva el 'a'.
+interface Props { tipo: 'contacto' | 'diagnostico'; lang?: 'es' | 'en'; juego?: 'a' | 'b' }
+const { tipo, lang = 'es', juego = 'a' } = Astro.props;
+const T = {
+  es: {
+    ej: 'Ejemplo', dominio: 'tunegocio.com', publicada: 'Publicada',
+    aviso: 'Nuevo contacto desde tu web', quien: 'Ana G.', pide: 'Quiere una cotización para el sábado', hora: '9:12 a. m.',
+    informe: 'Diagnóstico', filas: [['Teléfono visible', 'No aparece', 'mal'], ['Se ve bien en el móvil', 'Sí', 'bien'], ['Tu ciudad en la página', 'Falta', 'medio']],
+    filasB: [['Conexión segura', 'Sí', 'bien'], ['Descripción en Google', 'Falta', 'medio'], ['Una página por servicio', 'No hay', 'mal']],
+  },
+  en: {
+    ej: 'Example', dominio: 'yourbusiness.com', publicada: 'Live',
+    aviso: 'New lead from your website', quien: 'Ana G.', pide: 'Wants a quote for Saturday', hora: '9:12 AM',
+    informe: 'Checkup', filas: [['Phone number visible', 'Missing', 'mal'], ['Looks right on mobile', 'Yes', 'bien'], ['Your city on the page', 'Missing', 'medio']],
+    filasB: [['Secure connection', 'Yes', 'bien'], ['Google description', 'Missing', 'medio'], ['A page per service', 'None', 'mal']],
+  },
+}[lang];
+---
+{tipo === 'contacto' ? (
+  <span class="op op--c" data-nosnippet>
+    <span class="op__url"><span class="op__vivo"></span><span translate="no">{T.dominio}</span><span class="op__pub">{T.publicada}</span><span class="op__ej">{T.ej}</span></span>
+    <span class="op__toast">
+      <span class="op__av">AG</span>
+      <span class="op__tt">
+        <span class="op__tk">{T.aviso}<span class="op__h">{T.hora}</span></span>
+        <span class="op__tx"><b>{T.quien}</b> · {T.pide}</span>
+      </span>
+    </span>
+  </span>
+) : (
+  <span class="op op--d" data-nosnippet>
+    <span class="op__url"><span class="op__lupa"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m10.4 10.4 3.4 3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg></span><span>{T.informe} · <span translate="no">{T.dominio}</span></span><span class="op__ej">{T.ej}</span></span>
+    <span class="op__filas">
+      {(juego === 'b' ? T.filasB : T.filas).map(([k, v, e]) => (
+        <span class="op__fila"><span class:list={['op__dot', `op__dot--${e}`]}></span><span class="op__k">{k}</span><span class:list={['op__v', `op__v--${e}`]}>{v}</span></span>
+      ))}
+    </span>
+  </span>
+)}
+
+<style>
+  .op {
+    display: flex; flex-direction: column; gap: 10px; min-width: 0; max-width: 420px;
+    font-family: var(--font-body); color: var(--w-ink);
+  }
+  .op__url {
+    display: flex; align-items: center; gap: 8px; min-width: 0; height: 30px; padding: 0 12px;
+    border-radius: 999px; background: rgba(240, 237, 232, .05); border: 1px solid var(--w-line);
+    font-size: 12px; color: var(--w-ink-70); white-space: nowrap;
+  }
+  .op__url > span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; }
+  .op__vivo { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #3fb27f; box-shadow: 0 0 0 3px rgba(63, 178, 127, .18); }
+  .op__pub { color: #3fb27f; font-weight: 500; }
+  .op__lupa { display: inline-flex; color: var(--w-accent); }
+  .op__ej { margin-left: auto; padding-left: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--w-ink-70); }
+
+  /* Contacto: la tarjeta clara del aviso, como llega al teléfono. */
+  .op__toast {
+    display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 14px;
+    border-radius: 14px; background: #f4f1ec; color: #1c1b19;
+    box-shadow: 0 12px 28px -12px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .6);
+  }
+  .op__av {
+    display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: rgb(var(--w-accent-rgb)); color: #1c1b19; font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  }
+  .op__tt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .op__tk { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; color: #1c1b19; }
+  .op__h { margin-left: auto; font-weight: 400; color: #6b675f; white-space: nowrap; }
+  .op__tx { font-size: 13px; line-height: 1.35; color: #4a4741; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .op__tx b { font-weight: 600; color: #1c1b19; }
+
+  /* Diagnóstico: tres filas del informe, cada una con su veredicto. */
+  .op__filas {
+    display: flex; flex-direction: column; min-width: 0; border-radius: 14px; overflow: hidden;
+    background: rgba(240, 237, 232, .035); border: 1px solid var(--w-line);
+  }
+  .op__fila { display: flex; align-items: center; gap: 10px; min-width: 0; height: 36px; padding: 0 14px; font-size: 13px; }
+  .op__fila + .op__fila { border-top: 1px solid var(--w-line); }
+  .op__dot { width: 8px; height: 8px; flex: none; border-radius: 50%; }
+  .op__dot--mal { background: #e0675a; }
+  .op__dot--medio { background: #d9a441; }
+  .op__dot--bien { background: #3fb27f; }
+  .op__k { color: var(--w-ink-80); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .op__v { margin-left: auto; padding-left: 8px; font-weight: 500; white-space: nowrap; }
+  .op__v--mal { color: #ec8a7f; }
+  .op__v--medio { color: #e2b660; }
+  .op__v--bien { color: #6fcaa0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .op__vivo { animation: op-late 2.4s ease-in-out infinite; }
+    @keyframes op-late { 50% { box-shadow: 0 0 0 6px rgba(63, 178, 127, 0); } }
+    :global(.w2-pausado) .op__vivo { animation-play-state: paused; }
+  }
+</style>

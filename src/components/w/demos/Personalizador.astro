@@ -374,6 +374,14 @@ const opcionesGrupo = (g: GrupoId): any[] =>
     .pz.is-norails .pz-rail { display: none; }
   }
   @media (max-width: 1119.98px) and (pointer: coarse) { .pz-g { gap: 20px; } .pz-rail { height: 52px; } }
+  /* Teléfono (control v2 r1, M6): las tiras medían 478 y 424 px para 345 de hueco y escondían
+     "Redondas" y "Día/Noche" sin pista de desliz. Bajo 520 px cada tira PARTE sus grupos en líneas
+     (sin desliz ni máscara): todo control queda a la vista. */
+  @media (max-width: 519.98px) {
+    .pz-rail { height: auto; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .pz-rail__in { width: 100%; flex-wrap: wrap; justify-content: center; row-gap: 6px; column-gap: 4px; }
+  }
+  @media (max-width: 519.98px) and (pointer: coarse) { .pz-rail { height: auto; } .pz-g { gap: 12px; } }
 
   @media (prefers-reduced-motion: reduce) {
     .pz *, .pz *::before { transition-duration: 0s !important; animation: none !important; }

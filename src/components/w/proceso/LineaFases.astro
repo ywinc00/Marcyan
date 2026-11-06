@@ -16,7 +16,8 @@
 //  · Portada: la ÚLTIMA fase va a lo ancho bajo el bloque con el slot `final` (EscenaAbreApps de
 //    P08); mientras no llega, ocupa el hueco EscenaPublicada en una caja de 330 px de alto (el
 //    máximo previsto para el slot, así el alto de la sección ya se mide con él). Compacta (sobre
-//    nosotros): las 5 fases en el bloque y la 5.ª escena es EscenaPublicada.
+//    nosotros): las 5 fases en el bloque y la 5.ª escena es EscenaPublicada, que pasa el consumidor
+//    por el slot `quinta` (así su CSS no viaja a la portada, que no la pinta).
 //  · Escenas compuestas a su tamaño: la compacta (420×320) NO se encoge con zoom (texto < 11 px);
 //    cada escena tiene su composición pequeña por @container y :global(.lf--compacta).
 //  · Escena 01 (aquí abajo): correo abierto "Tu propuesta" + aviso que llega + reloj de 24 h. Se
@@ -34,7 +35,6 @@ import Ejemplo from '../Ejemplo.astro';
 import EscenaAlcance from './EscenaAlcance.astro';
 import EscenaBilingue from './EscenaBilingue.astro';
 import EscenaEncontrar from './EscenaEncontrar.astro';
-import EscenaPublicada from './EscenaPublicada.astro';
 import { copy, type Fase, type Lang } from './proceso';
 
 interface Props {
@@ -106,7 +106,7 @@ const C = T.correo;
             {i === 1 && <EscenaAlcance lang={lang} />}
             {i === 2 && <EscenaBilingue lang={lang} />}
             {i === 3 && <EscenaEncontrar lang={lang} />}
-            {i === 4 && <EscenaPublicada lang={lang} />}
+            {i === 4 && <slot name="quinta" />}
           </div>
         </div>
       </Fragment>
@@ -126,7 +126,7 @@ const C = T.correo;
         : (
           <div class="lf__slot lf__slot--esc" data-w2-final>
             <p class="sr-only">{T.sr[N - 1]}</p>
-            <div class="lf__stage" aria-hidden="true"><EscenaPublicada lang={lang} /></div>
+            <div class="lf__stage" aria-hidden="true"><slot name="quinta" /></div>
           </div>
         )}
     </div>

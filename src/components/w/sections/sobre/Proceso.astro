@@ -6,6 +6,7 @@
 // escena es la web publicada. En móvil cada escena cae bajo su paso (lo resuelve la pieza).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import LineaFases from '../../proceso/LineaFases.astro';
+import EscenaPublicada from '../../proceso/EscenaPublicada.astro';
 import type { Fase } from '../../proceso/proceso';
 
 interface Props {
@@ -20,7 +21,7 @@ const { n, label, titleHtml, lead, fases, lang = 'es' } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
 <div class="wsp">
-  <LineaFases fases={fases} lang={lang} variante="compacta" tono="gold" />
+  <LineaFases fases={fases} lang={lang} variante="compacta" tono="gold"><EscenaPublicada slot="quinta" lang={lang} /></LineaFases>
 </div>
 
 <style>

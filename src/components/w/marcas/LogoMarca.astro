@@ -18,9 +18,13 @@
 // · Las palabras (chatgpt-texto, applemaps-texto, bing-texto) en tono 'color' usan esa misma tinta.
 // · titulo = aria-label (por defecto el título oficial). titulo="" → aria-hidden (el nombre ya está
 //   escrito al lado).
+// · Cerrojo legal (BLOQUEADAS en datos.ts, LICENCIAS.md): claude y los 5 de Google nunca salen como
+//   logo. En baldosa o a ≥ 26 px → pictograma genérico sin marca; si no, `siBloqueada` decide:
+//   'palabra' (su nombre en texto) o 'nada' (el nombre ya va escrito al lado). Por defecto, 'nada'
+//   cuando titulo="" y 'palabra' en otro caso.
 // Todo su CSS va dentro (Cerrojo 5): sirve también fuera de las páginas v3.
 // ─────────────────────────────────────────────────────────────
-import { MARCAS, type MarcaId } from './datos';
+import { MARCAS, BLOQUEADAS, PALABRA_BLOQUEADA, PICTO_BLOQUEADA, type MarcaId } from './datos';
 
 interface Props {
   id: MarcaId;
@@ -32,11 +36,18 @@ interface Props {
   /** Icono de app: squircle radio 22,5 %. */
   baldosa?: boolean;
   class?: string;
+  /** Qué pintar si la marca está bajo el cerrojo legal y no es icono de app. */
+  siBloqueada?: 'palabra' | 'nada';
 }
 
-const { id, size = 24, tono = 'color', titulo, baldosa = false, class: extra = '' } = Astro.props;
-const m = MARCAS[id];
-if (!m) throw new Error(`LogoMarca: id desconocido "${id}"`);
+const { id, size = 24, tono = 'color', titulo, baldosa = false, class: extra = '', siBloqueada } = Astro.props;
+const bloqueada = BLOQUEADAS.has(id);
+const picto = bloqueada && (baldosa || size >= 26);
+const modoBloq = siBloqueada ?? (titulo === '' ? 'nada' : 'palabra');
+const m0 = MARCAS[id];
+if (!m0) throw new Error(`LogoMarca: id desconocido "${id}"`);
+// Bajo el cerrojo, fuera de un icono de app, la marca se pinta como palabra (nunca su glifo).
+const m = bloqueada && !picto ? { tipo: 'texto' as const, titulo: m0.titulo, palabra: PALABRA_BLOQUEADA[id] ?? m0.titulo, optico: 1 } : m0;
 
 const label = titulo ?? m.titulo;
 const oculto = titulo === '';
@@ -64,17 +75,24 @@ if (m.tipo === 'trazo') {
 }
 const tinta = tono === 'mono' ? CREMA : baldosa ? '#111111' : 'var(--marca-tinta, currentColor)';
 const cls = ['lm', extra].filter(Boolean).join(' ');
+// Bajo el cerrojo no se marca como logo de marca (las pruebas buscan data-w2-marca).
+const attr = bloqueada ? { 'data-w2-bloq': id } : { 'data-w2-marca': id };
 ---
-{m.tipo === 'trazo' && !baldosa && (
-  <svg class={cls} data-w2-marca={id} width={size} height={size} viewBox={vb(m.optico)} fill={fill} focusable="false" {...a11y}><path d={m.d} /></svg>
+{picto && (
+  <span class:list={[cls, 'lm--tile', 'lm--picto']} {...attr} style={`--lm-s:${size}px;--lm-bg:#FFFFFF`} {...a11y}>
+    <svg width={Math.round(size * 0.6)} height={Math.round(size * 0.6)} viewBox="0 0 24 24" fill="none" stroke="#3C4043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d={PICTO_BLOQUEADA[id]} /></svg>
+  </span>
 )}
-{m.tipo === 'trazo' && baldosa && (
-  <span class={`${cls} lm--tile`} data-w2-marca={id} style={`--lm-s:${size}px;--lm-bg:${tileBg}`} {...a11y}>
+{!picto && !(bloqueada && modoBloq === 'nada') && m.tipo === 'trazo' && !baldosa && (
+  <svg class={cls} {...attr} width={size} height={size} viewBox={vb(m.optico)} fill={fill} focusable="false" {...a11y}><path d={m.d} /></svg>
+)}
+{!picto && m.tipo === 'trazo' && baldosa && (
+  <span class={`${cls} lm--tile`} {...attr} style={`--lm-s:${size}px;--lm-bg:${tileBg}`} {...a11y}>
     <svg width={glyph} height={glyph} viewBox={vb(m.optico)} fill={fill} focusable="false" aria-hidden="true"><path d={m.d} /></svg>
   </span>
 )}
-{m.tipo === 'texto' && (
-  <span class={`${cls} lm--word${baldosa ? ' lm--tile lm--tile-word' : ''}`} data-w2-marca={id} style={`--lm-s:${size}px;--lm-ink:${tinta}${baldosa ? ';--lm-bg:#FFFFFF' : ''}`} {...a11y}>
+{!picto && !(bloqueada && modoBloq === 'nada') && m.tipo === 'texto' && (
+  <span class={`${cls} lm--word${baldosa ? ' lm--tile lm--tile-word' : ''}`} {...attr} style={`--lm-s:${size}px;--lm-ink:${tinta}${baldosa ? ';--lm-bg:#FFFFFF' : ''}`} {...a11y}>
     <span aria-hidden="true">{m.palabra}</span>
   </span>
 )}

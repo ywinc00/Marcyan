@@ -17,6 +17,8 @@
 //   JS, su bucle y +190 px de alto): solo la cabecera de Marcy y su saludo, sin JS,
 //   en el hueco que ya tenía la tarjeta en escritorio, y nada en móvil (allí la tarjeta no
 //   tiene hueco). Hasta que G02 recupere margen (§4.6). 'no' = sin chat.
+// · Tarjeta "diagnóstico" (control v2 r1, M2): ranura `obj` con un objeto de producto al pie
+//   (el informe de ejemplo, ObjPerfil); la rellena CierreDosTarjetas, nunca los hubs (peso).
 // · tel/wa SIEMPRE por props (nunca calculados aquí).
 // El botón principal reproduce la piel de Button variant="primary" (intacta) y el
 // enlace la de variant="link": los dos estados viven en el mismo <a> porque cambian
@@ -91,11 +93,16 @@ const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
       </div>
     </article>
 
-    <article class:list={['w-close__card w-close__card--warm', chatMode !== 'no' && 'w-close__card--chat', chatMode === 'ligero' && 'w-close__card--ligero']}>
+    <article class:list={['w-close__card w-close__card--warm', (chatMode !== 'no' || Astro.slots.has('obj')) && 'w-close__card--chat', chatMode === 'ligero' && 'w-close__card--ligero']}>
       <div class="w-close__body">
         <h3 class="w-close__wtitle">{warm.title}</h3>
         <p class="w-close__wtext">{warm.text}</p>
       </div>
+      {chatMode === 'no' && Astro.slots.has('obj') && (
+        <div class="w-close__chat" aria-hidden="true">
+          <slot name="obj" />
+        </div>
+      )}
       {chatMode === 'vivo' && (
         <div class="w-close__chat">
           <slot name="chat" />

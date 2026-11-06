@@ -31,13 +31,13 @@ const channels = Astro.props.channels ?? (en ? ['WhatsApp', 'Website', 'Instagra
 const LOGO: Record<string, MarcaId> = { WhatsApp: 'whatsapp', Instagram: 'instagram', Messenger: 'messenger' };
 const cases: Case[] = Astro.props.cases ?? (en
   ? [
-      { ask: 'Do you have an opening this Saturday?', pill: 'book · sat 10:00', ok: true, verdict: 'Answered', why: 'Booked it and confirmed it', ch: 0 },
+      { ask: 'Do you have an opening this Saturday?', pill: 'book · sat 10:00 AM', ok: true, verdict: 'Answered', why: 'Booked it and confirmed it', ch: 0 },
       { ask: 'I want to talk to someone', pill: 'person · summary', ok: false, verdict: 'Hands it to you', why: 'Passed you the case with a summary', ch: 1 },
       { ask: 'How much is a haircut?', pill: 'price · haircut', ok: true, verdict: 'Answered', why: 'Gave the price from your list', ch: 2 },
       { ask: 'Are you open early tomorrow?', pill: 'hours · tomorrow 8:00', ok: true, verdict: 'Answered', why: 'Answered after hours', ch: 3 },
     ]
   : [
-      { ask: '¿Tienen cita este sábado?', pill: 'agendar · sábado 10:00', ok: true, verdict: 'Respondido', why: 'Apartó la cita y la confirmó', ch: 0 },
+      { ask: '¿Tienen cita este sábado?', pill: 'agendar · sábado 10:00 a. m.', ok: true, verdict: 'Respondido', why: 'Apartó la cita y la confirmó', ch: 0 },
       { ask: 'Quiero hablar con alguien', pill: 'persona · resumen', ok: false, verdict: 'Te lo pasa', why: 'Te pasó el caso con resumen', ch: 1 },
       { ask: '¿Cuánto cuesta un corte?', pill: 'precio · corte', ok: true, verdict: 'Respondido', why: 'Dio el precio de tu lista', ch: 2 },
       { ask: '¿Abren mañana temprano?', pill: 'horario · mañana 8:00', ok: true, verdict: 'Respondido', why: 'Contestó fuera de horario', ch: 3 },

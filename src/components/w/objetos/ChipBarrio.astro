@@ -83,10 +83,16 @@ const stubEnd = (d: string) => { const n = d.match(/-?\d+(\.\d+)?/g)!.map(Number
 const tracks = abstract ? board.filter((t) => t.hot).map((t) => ({ d: t.d })) : (Astro.props.tracks ?? []).slice(0, 8);
 // Tres estelas por vía, repartidas en los 4 s del ciclo (y desfasadas entre vías).
 const streaks = tracks.flatMap((t, i) => [0, 4 / 3, 8 / 3].map((o) => ({ d: t.d, delay: -(+((i * 0.67 + o) % 4).toFixed(2)) })));
+// Cada barrio con SU casa (control v2 r1, M7): número y datos distintos por barrio, para que las
+// cuatro páginas de barrio y la de bienes raíces no repitan la misma ficha.
+const CASAS: Record<string, [string, number, number, string]> = {
+  katy: ['118', 4, 3, '2,240'], 'sugar land': ['305', 3, 2, '1,960'], doral: ['742', 3, 2, '1,420'], hialeah: ['561', 2, 2, '1,180'],
+};
+const [cNum, cHab, cBan, cArea] = CASAS[String(name).toLowerCase()] ?? ['214', 3, 2, '1,850'];
 const T = en
-  ? { name: 'House in ' + name, num: '214', nump: 'No.', data: '3 bd · 2 ba', area: '1,850 sq ft', call: 'Call', msg: 'Is it still available?', ago: 'now',
+  ? { name: 'House in ' + name, num: cNum, nump: 'No.', data: `${cHab} bd · ${cBan} ba`, area: `${cArea} sq ft`, call: 'Call', msg: 'Is it still available?', ago: 'now',
       sr: `Example: people in ${name} find a real estate office on the map and message it about a house.` }
-  : { name: 'Casa en ' + name, num: '214', nump: 'N.º', data: '3 hab · 2 baños', area: '1,850 pies²', call: 'Llamar', msg: '¿Sigue disponible?', ago: 'ahora',
+  : { name: 'Casa en ' + name, num: cNum, nump: 'N.º', data: `${cHab} hab · ${cBan} baños`, area: `${cArea} pies²`, call: 'Llamar', msg: '¿Sigue disponible?', ago: 'ahora',
       sr: `Ejemplo: clientes de ${name} encuentran una inmobiliaria en el mapa y le escriben por una casa.` };
 const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 ---

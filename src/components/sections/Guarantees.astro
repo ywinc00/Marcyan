@@ -1,10 +1,11 @@
 ---
 // Sección "Por qué Marcyan" (Garantías) · vuelta 2 (design/rediseno-workos-v2.md §3 G01, W-CORE-23).
 // MISMO texto de content.ts y titular .h2 intacto. Fuera la tarjeta "Legible para IA" de barras:
-//  · arriba, la garantía destacada ("Listo para IA y buscadores", la del icono radar, como en
-//    producción) a lo ancho, con su objeto REAL a la derecha: PaseNegocio (P10), la ficha de tu
-//    negocio que leen los asistentes (interactiva con el puntero, rotulada "Ejemplo");
-//  · debajo, las otras tres en 3 columnas separadas por líneas de 1 px (W-CORE-23).
+//  · arriba, bajo el titular, tres garantías en 3 columnas separadas por líneas de 1 px, como
+//    W-CORE-23 (control v2 r1, M3: antes iban debajo de la destacada);
+//  · debajo, la garantía destacada ("Listo para IA y buscadores", la del icono radar, como en
+//    producción) a lo ancho, con su objeto REAL a la derecha a su tamaño grande (620 px):
+//    PaseNegocio (P10), la ficha de tu negocio que leen los asistentes (interactiva, "Ejemplo").
 // Conserva la chapa del destacado y las chapas ES / EN de la garantía bilingüe (E-51).
 // Sin fondos de sección: conserva data-fx="gold" y StarField pinta detrás.
 import Icon from '../ui/Icon.astro';
@@ -32,20 +33,6 @@ const isLang = (s: any) => (s.icon || '').includes('languages');
     </header>
 
     <ul class="gw" role="list">
-      <li class="gw__cell gw__cell--feat">
-        <div class="gw__feat-tx">
-          {guarantees.featuredBadge && (
-            <span class="gw__badge"><Icon name="lucide:sparkles" /> {guarantees.featuredBadge}</span>
-          )}
-          <span class="gw__ic"><Icon name={featured.icon} /></span>
-          <h3 class="gw__title">{featured.title}</h3>
-          <p class="gw__desc">{featured.desc}</p>
-        </div>
-        <div class="gw__pase">
-          <PaseNegocio lang={lang} ancho={560} />
-        </div>
-      </li>
-
       {rest.map((s) => (
         <li class="gw__cell gw__cell--col">
           <span class="gw__ic"><Icon name={s.icon} /></span>
@@ -60,6 +47,20 @@ const isLang = (s: any) => (s.icon || '').includes('languages');
           )}
         </li>
       ))}
+
+      <li class="gw__cell gw__cell--feat">
+        <div class="gw__feat-tx">
+          {guarantees.featuredBadge && (
+            <span class="gw__badge"><Icon name="lucide:sparkles" /> {guarantees.featuredBadge}</span>
+          )}
+          <span class="gw__ic"><Icon name={featured.icon} /></span>
+          <h3 class="gw__title">{featured.title}</h3>
+          <p class="gw__desc">{featured.desc}</p>
+        </div>
+        <div class="gw__pase">
+          <PaseNegocio lang={lang} ancho={620} />
+        </div>
+      </li>
     </ul>
   </div>
 </section>
@@ -72,6 +73,7 @@ const isLang = (s: any) => (s.icon || '').includes('languages');
   .gw { --gw-l: var(--w-line, rgba(200,169,110,.09)); list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
   .gw__cell { position: relative; min-width: 0; padding: 28px 0; display: flex; flex-direction: column; gap: 10px; }
   .gw__cell:first-child { padding-top: 0; }
+  .gw__cell--feat { padding-bottom: 0; }
   .gw__cell + .gw__cell { border-top: 1px solid var(--gw-l); }
   .gw__ic { display: inline-flex; color: var(--accent-gold); margin-bottom: 4px; }
   .gw__ic :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
@@ -92,7 +94,7 @@ const isLang = (s: any) => (s.icon || '').includes('languages');
   }
   .gw__badge :global(svg) { width: 12px; height: 12px; }
   .gw__cell--feat .gw__ic :global(svg) { width: 28px; height: 28px; }
-  .gw__pase { min-width: 0; width: 100%; max-width: 560px; }
+  .gw__pase { min-width: 0; width: 100%; max-width: 620px; }
 
   /* Chapas ES / EN (garantía bilingüe) */
   .gw__chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
@@ -100,19 +102,20 @@ const isLang = (s: any) => (s.icon || '').includes('languages');
   .gw__chip--on { color: var(--accent-gold); border-color: var(--accent-gold-line); }
   .gw__chip--muted { border-color: transparent; padding-inline: 4px; }
 
-  /* PC: destacada a lo ancho (texto | ficha) y debajo 3 columnas con líneas verticales de 1 px. */
+  /* PC: arriba 3 columnas con líneas verticales de 1 px (W-CORE-23); debajo, la destacada a lo
+     ancho (texto | ficha), separada por un filete horizontal. */
   @media (--lg) {
     .gw { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gw__cell--col { padding: 8px 40px 56px; }
+    .gw__cell--col + .gw__cell--col { border-top: 0; border-left: 1px solid var(--gw-l); }
+    .gw__cell--col:first-child { padding-left: 0; }
+    .gw__cell--col:nth-child(3) { padding-right: 0; }
     .gw__cell--feat {
-      grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
-      align-items: center; column-gap: 72px; padding: 8px 0 56px;
+      grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 620px);
+      align-items: center; column-gap: 64px; padding: 56px 0 0;
     }
     .gw__cell--feat .gw__title { font-size: 26px; line-height: 1.2; }
     .gw__cell--feat .gw__desc { font-size: 16px; }
-    .gw__cell--col { padding: 40px 40px 8px; }
-    .gw__cell--col + .gw__cell--col { border-left: 1px solid var(--gw-l); }
-    .gw__cell--col:nth-child(2) { padding-left: 0; }
-    .gw__cell--col:last-child { padding-right: 0; }
     .gw__title { font-size: 20px; line-height: 1.2; }
     .gw__desc { font-size: 16px; }
   }

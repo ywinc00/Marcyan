@@ -10,10 +10,11 @@
 //   [data-w2-dock="<id>"] + clase is-rebote · [data-w2-cursor] (style.translate)
 // horaDia: segunda hora de la barra (la de la mañana); se ve con data-esc-dia="true"
 //   o cuando la escena muestra .esc-hora--dia (EscenaDosActos, acto 2).
-// Logos: LogoMarca de P06 si está en la rama (import.meta.glob); si no, los de
-// reserva de mac.ts (simple-icons CC0). Multicolor siempre en monocromo (§1.4).
+// Logos: LogoMarca (P06), con el cerrojo legal de LICENCIAS.md.
 // ─────────────────────────────────────────────────────────────
-import { DOCK_ORDEN, logoReserva, type DockId, type LogoReservaId } from './mac';
+import { DOCK_ORDEN, type DockId } from './mac';
+import LogoMarca from '../marcas/LogoMarca.astro';
+import type { MarcaId } from '../marcas/datos';
 
 interface Props {
   lang?: 'es' | 'en';
@@ -45,10 +46,8 @@ const T = {
   en: { app: 'Desktop', menus: ['File', 'Edit', 'View', 'Window', 'Help'], hora: 'Thu Nov 5  9:41 PM' },
 }[lang];
 
-const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
-const LogoMarca = Object.values(logoMods)[0]?.default ?? null;
-
-const MARCA: Partial<Record<DockId, LogoReservaId>> = {
+// Gmail, Calendar, Maps y Claude están bajo el cerrojo legal: LogoMarca los pinta como pictograma genérico.
+const MARCA: Partial<Record<DockId, MarcaId>> = {
   gmail: 'gmail', googlecalendar: 'googlecalendar', googlemaps: 'googlemaps', whatsapp: 'whatsapp',
   instagram: 'instagram', messenger: 'messenger', claude: 'claude',
 };
@@ -89,11 +88,7 @@ const MARCA: Partial<Record<DockId, LogoReservaId>> = {
       {DOCK_ORDEN.map((id) => (
         <span class:list={['esc-app', `esc-app--${id}`]} data-w2-dock={id}>
           {MARCA[id] ? (
-            LogoMarca ? (
-              <LogoMarca id={MARCA[id]} size={58} tono="color" baldosa titulo="" />
-            ) : (
-              <span class="esc-baldosa" set:html={logoReserva(MARCA[id]!, id === 'whatsapp' ? 34 : 32, id === 'whatsapp' ? 'blanco' : 'color')} />
-            )
+            <LogoMarca id={MARCA[id]!} size={58} tono="color" baldosa titulo="" />
           ) : id === 'marcy' ? (
             <span class="esc-baldosa"><img src="/assets/bot/marcy-mini.webp" width="58" height="58" alt="" loading="lazy" decoding="async" /></span>
           ) : id === 'navegador' ? (

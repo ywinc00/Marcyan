@@ -29,7 +29,7 @@ import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
 import Hero from '../../components/w/sections/servicios/Hero.astro';
 import Catalogo from '../../components/w/sections/servicios/Catalogo.astro';
 import UnCapitulo from '../../components/w/sections/servicios/UnCapitulo.astro';
-import { arteWeb, arteEscaner } from '../../components/w/sections/servicios/arte';
+import ObjPerfil from '../../components/w/sections/servicios/ObjPerfil.astro';
 import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { priceServices, offerItems } from '../../i18n/pricing.en';
@@ -60,11 +60,11 @@ const razones = s.why.items.map((i) => ({ icon: i.icon, title: i.title, text: i.
   { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
   { icon: string; title: string; text: string }, { icon: string; title: string; text: string },
 ];
-// Arte de línea en las dos tarjetas de perfil (rev1, imp. 2): la web que asoma y el muro del diagnóstico.
+// Tarjetas de perfil: un objeto de producto al pie de cada una (control v2 r1, I-04; sustituye al arte de línea).
 const perfiles = [
-  { ...t.perfil.cards[0], art: arteWeb },
-  { ...t.perfil.cards[1], art: arteEscaner },
-] as [typeof t.perfil.cards[0] & { art: string }, typeof t.perfil.cards[1] & { art: string }];
+  t.perfil.cards[0],
+  t.perfil.cards[1],
+];
 const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 ---
@@ -127,7 +127,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
         <CabeceraNumerada n={3} label={t.perfil.label} />
-        <div class="ws-tight ws-left"><TarjetasPerfil id="perfiles" titleHtml={t.perfil.title} cards={perfiles} wide={t.perfil.wide} /></div>
+        <div class="ws-tight ws-left"><TarjetasPerfil id="perfiles" titleHtml={t.perfil.title} cards={perfiles} wide={t.perfil.wide}><ObjPerfil slot="obj-0" tipo="contacto" lang="en" /><ObjPerfil slot="obj-1" tipo="diagnostico" lang="en" /></TarjetasPerfil></div>
       </div>
     </section>
 

@@ -30,7 +30,7 @@ const uid = `wsai-${lang}`;
     {P.map((p, i) => (
       <button type="button" class:list={['wsai__l', i === 0 && 'is-on']} aria-pressed={i === 0 ? 'true' : 'false'}
         aria-label={`${ver} ${p.nombre}`} data-nombre={p.nombre} data-palabra={p.palabra ? '1' : ''}>
-        <LogoMarca id={p.id} size={22} tono="color" titulo="" />
+        <LogoMarca id={p.id} size={22} tono="color" titulo="" siBloqueada="palabra" />
       </button>
     ))}
   </div>

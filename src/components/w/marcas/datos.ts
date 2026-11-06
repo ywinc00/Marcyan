@@ -95,3 +95,23 @@ export const MARCAS: Record<MarcaId, Marca> = {
 
 /** Ids que se pintan como trazo (los únicos que caben en una casilla redonda). */
 export const esTrazo = (id: MarcaId) => MARCAS[id].tipo === 'trazo';
+
+// ── Cerrojo legal (LICENCIAS.md §Revisión, 2026-11-05) ───────────────────────
+// Claude (Anthropic) y los 5 iconos de Google NO se pintan como logo en páginas públicas sin permiso
+// escrito de su dueño. LogoMarca los sustituye SIEMPRE: por su nombre en texto, por nada (si el nombre
+// ya va escrito al lado) o, en contextos de icono de app (baldosa o ≥ 26 px), por un pictograma
+// genérico sin marca. Con el permiso en la mano basta con sacar el id de este conjunto.
+export const BLOQUEADAS: ReadonlySet<MarcaId> = new Set<MarcaId>(['claude', 'google', 'googlemaps', 'gmail', 'googlecalendar', 'googlegemini']);
+export const PALABRA_BLOQUEADA: Partial<Record<MarcaId, string>> = {
+  claude: 'Claude', google: 'Google', googlemaps: 'Google Maps', gmail: 'Gmail', googlecalendar: 'Google Calendar', googlegemini: 'Gemini',
+};
+/** Pictograma genérico (trazo, viewBox 24) para el icono de app de una marca bloqueada. */
+export const PICTO_BLOQUEADA: Partial<Record<MarcaId, string>> = {
+  googlemaps: 'M12 21.5s-6.5-6.2-6.5-11.3a6.5 6.5 0 0 1 13 0c0 5.1-6.5 11.3-6.5 11.3ZM12 12.6a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8Z',
+  gmail: 'M3.5 6.5h17v11h-17zM3.8 7l8.2 6.2L20.2 7',
+  googlecalendar: 'M4.5 6h15v13.5h-15zM4.5 10h15M8.5 3.8v4M15.5 3.8v4M8 13.5h2M11 13.5h2M14 13.5h2M8 16.3h2M11 16.3h2',
+  google: 'M10.5 16.5a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM15 15l5 5',
+  claude: 'M5 5.5h14v10H10l-4 3.5v-3.5H5z',
+  googlegemini: 'M5 5.5h14v10H10l-4 3.5v-3.5H5z',
+};
+

@@ -79,7 +79,7 @@ const sr = en
     {lista.map((x, i) => (
       <div class="mz__carta" data-w2-carta data-pos={i} data-titulo={`${x.titulo} · ${x.sub}, ${i + 1} ${L.de} ${lista.length}`} aria-roledescription={L.diapo} aria-hidden={i === 0 ? 'false' : 'true'}>
         <div class="mz__cab" aria-hidden="true">
-          {x.logo && LogoMarca ? <LogoMarca id={x.logo} size={16} tono="color" /> : x.c === 'web' ? (
+          {x.logo && LogoMarca ? <LogoMarca id={x.logo} size={16} tono="color" titulo="" /> : x.c === 'web' ? (
             <svg class="mz__web" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" /></svg>
           ) : null}
           <b translate="no">{x.titulo}</b><span>· {x.sub}</span>

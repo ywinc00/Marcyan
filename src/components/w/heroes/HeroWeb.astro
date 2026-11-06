@@ -1,5 +1,5 @@
 ---
-// Hero de las landings de diseño web (design/rediseno-workos.md §4.14 · v2 G03).
+// Hero de las landings de diseño web (design/rediseno-workos.md §4.14 · v2 G03 · v3).
 // A-05 + A-12 + W-CORE-01/02: texto centrado en 768 (HeroTexto pone la coreografía de §2.9),
 // debajo el abanico de 3 webs de EJEMPLO sobre franjas de luz oro a ventana completa, y la
 // tira de nombres reales (TiraLogos no pinta nada en Miami).
@@ -19,11 +19,9 @@
 // Coreografía (§2.9): central data-w-in="obj"; laterales "sat" saliendo de detrás. El giro va en
 // un hijo: lo que lleva data-w-in no usa transform para colocarse.
 //
-// AJUSTES LOCALES AL FONDO F01 (G03 ronda 1, I1 y m4). La causa está en F01Reticula.astro
-// (sistema, P12): cifras de la regla a 9 px y rótulo del marco a 10 px. Aquí, solo en esta
-// página: la regla pierde las cifras (quedan las marcas), baja 12 px para no pegarse al menú,
-// el rótulo del marco sube a 11 px y el botón de pausa sube a la altura de las migas, lejos de
-// la tira de clientes. PENDIENTE de llevar al propio F01 cuando se toque P12.
+// v3 (E-57, dueño 2026-11-06): composición y fondo de la v1 (espacio de SpaceBackdrop + franjas oro
+// del abanico como ÚNICO motivo) con las tarjetas de la v2. La retícula F01 (columnas, regla con
+// escala y marco de "módulo" animado) ya no se monta en esta landing, ni sus ajustes locales.
 import HeroTexto from '../HeroTexto.astro';
 import WebEjemplo from '../objetos/WebEjemplo.astro';
 import TiraLogos from '../TiraLogos.astro';
@@ -171,12 +169,6 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
     box-shadow: 0 0 0 1px rgba(255, 246, 236, .35);
   }
 
-  /* ── Ajustes locales al fondo F01 (ver cabecera) ─────────────── */
-  :global([data-w-kind='web'] .wf-r__marcas span) { display: none; }
-  :global([data-w-kind='web'] .wf-r__regla) { top: calc(var(--nav-h) + 12px); }
-  :global([data-w-kind='web'] .wf-r__f b) { font-size: 11px; top: -23px; }
-  :global([data-w-kind='web'] .wf-zona > .wf-pausa) { top: calc(var(--nav-h) + 52px); bottom: auto; }
-
   @media (--lt-md) {
     .hw__fan { margin-top: 48px; }
     .hw__logos { margin-top: 44px; padding-bottom: 56px; }
@@ -187,6 +179,5 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
     .hf__pos--r { left: calc(50% + 170px - 175px); }
     /* Solo asoman 25 px: color de la marca, sin texto (nada a medias). */
     .hf__mini, .hf__foto { display: none; }
-    :global([data-w-kind='web'] .wf-zona > .wf-pausa) { top: calc(var(--nav-h) + 74px); }
   }
 </style>

@@ -54,7 +54,7 @@ let fill = CREMA;
 let tileBg = '';
 let glyph = size;
 if (m.tipo === 'trazo') {
-  if (tono === 'mono') fill = CREMA;
+  if (tono === 'mono') fill = m.monoBlanco ? '#FFFFFF' : CREMA;
   else if (baldosa) {
     if (m.multicolor) { tileBg = '#FFFFFF'; fill = '#111111'; }
     else if (m.baldosa === 'marca') { tileBg = `#${m.hex}`; fill = '#FFFFFF'; }

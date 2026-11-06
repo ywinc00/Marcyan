@@ -151,6 +151,14 @@ if (plano) {
     .pm-lista--plana { column-gap: 6px; }
     .pm-lista--plana .pm-p { padding: 0 12px; }
   }
+  /* Teléfonos estrechos, filas con etiqueta: la de 3 ("Te encuentran en") cabe entera desde 320 px
+     en vez de partirse 2+1 con una píldora huérfana (rev2 P06). Píldora 44, logo 20, nombre 13. */
+  @media (max-width: 400px) {
+    .pm-fila .pm-lista { gap: 6px; }
+    .pm-fila .pm-p { height: 44px; padding: 0 12px; gap: 6px; }
+    .pm-fila .pm-p > :global(svg) { width: 20px; height: 20px; }
+    .pm-fila .pm-n { font-size: 13px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .pm.is-armed .pm-p, .pm.is-on .pm-p, .pm.is-armed .pm-et, .pm.is-on .pm-et { opacity: 1; transform: none; transition: none; }
   }

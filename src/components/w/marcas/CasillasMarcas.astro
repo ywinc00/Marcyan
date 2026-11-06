@@ -7,8 +7,12 @@
 // Bandeja --w-s1 radio 22 padding 16; casillas 96×64 radio 12 claras (#F7F6F2, filo inset) con logo a
 // color de 28-40 px (las multicolor en negro, las palabras en su tinta). Con más de un grupo, control
 // segmentado de pestañas (tablist manejable: flechas, Inicio/Fin, tabulación itinerante,
-// aria-selected) y fundido de 160 ms del panel. Los paneles se apilan: el alto es el del mayor. Sin enlaces. Pieza quieta: no lleva bucle (el
-// original tampoco).
+// aria-selected) y fundido de 160 ms del panel. Los paneles se apilan: el alto es el del mayor y la
+// bandeja no salta al cambiar de pestaña; un panel más corto se centra en vertical y sus casillas se
+// centran en la fila (nunca una fila arriba y el resto oscuro, rev2 P06). La pestaña inicial es la del
+// grupo MÁS LLENO salvo que se pida otra (`inicial`): la bandeja entra llena, como W-ADV-53. Regla de
+// uso: grupos del mismo número de casillas (múltiplo de las columnas) siempre que el contenido lo
+// permita. Sin enlaces. Pieza quieta: no lleva bucle (el original tampoco).
 // ─────────────────────────────────────────────────────────────
 import LogoMarca from './LogoMarca.astro';
 import { MARCAS, type MarcaId } from './datos';
@@ -25,10 +29,14 @@ interface Props {
   logo?: number;
   /** Nombre accesible del grupo de pestañas. */
   etiqueta?: string;
+  /** Pestaña abierta al cargar (por defecto, la del grupo con más casillas). */
+  inicial?: number;
   class?: string;
 }
-const { grupos, columnas = 3, logo = 30, etiqueta = 'Categorías', class: extra = '' } = Astro.props;
+const { grupos, columnas = 3, logo = 30, etiqueta = 'Categorías', inicial, class: extra = '' } = Astro.props;
 const conTabs = grupos.length > 1;
+const mayor = grupos.reduce((b, g, i) => (g.ids.length > grupos[b].ids.length ? i : b), 0);
+const ini = inicial !== undefined && inicial >= 0 && inicial < grupos.length ? inicial : mayor;
 const uid = `cs${Math.random().toString(36).slice(2, 8)}`;
 const L = Math.max(28, Math.min(40, logo));
 // Las palabras (ChatGPT, Apple Maps, Bing) se ajustan al ancho útil de la casilla (≈ 76 px):
@@ -43,13 +51,13 @@ const sizeDe = (id: MarcaId) => {
     <div class="cs-tabs" role="tablist" aria-label={etiqueta}>
       {grupos.map((g, i) => (
         <button type="button" class="cs-tab" role="tab" id={`${uid}-t${i}`} aria-controls={`${uid}-p${i}`}
-          aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{g.nombre}</button>
+          aria-selected={i === ini ? 'true' : 'false'} tabindex={i === ini ? 0 : -1}>{g.nombre}</button>
       ))}
     </div>
   )}
   <div class="cs-paneles">
   {grupos.map((g, i) => (
-    <div class="cs-panel" id={`${uid}-p${i}`} {...(conTabs ? { role: 'tabpanel', 'aria-labelledby': `${uid}-t${i}`, tabindex: 0 } : {})} hidden={i > 0}>
+    <div class="cs-panel" id={`${uid}-p${i}`} {...(conTabs ? { role: 'tabpanel', 'aria-labelledby': `${uid}-t${i}`, tabindex: 0 } : {})} hidden={i !== ini}>
       <ul class="cs-grid" role="list">
         {g.ids.map((id) => <li class="cs-c"><LogoMarca id={id} size={sizeDe(id)} tono="color" /></li>)}
       </ul>
@@ -92,16 +100,19 @@ const sizeDe = (id: MarcaId) => {
 
   /* Paneles apilados en la misma celda: la bandeja toma el alto del panel MAYOR y no salta al cambiar
      de pestaña. El oculto sigue fuera del árbol de accesibilidad (visibility: hidden). */
-  .cs-paneles { display: grid; justify-items: center; align-items: start; }
+  .cs-paneles { display: grid; justify-items: center; align-items: center; }
   .cs-panel { grid-area: 1 / 1; animation: cs-in 160ms var(--w-ease-ui, ease) both; }
   .cs-panel[hidden] { display: block; visibility: hidden; animation: none; }
   .cs-panel:focus-visible { outline: 2px solid var(--accent-gold, #c9a96e); outline-offset: 4px; border-radius: 14px; }
+  /* Ancho fijo de --c columnas; las filas incompletas se centran (flex), no se pegan a la izquierda. */
   .cs-grid {
-    display: grid; grid-template-columns: repeat(var(--cols), 96px); gap: 10px;
+    --c: var(--cols); --cw: 96px; --g: 10px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--g);
+    width: calc(var(--c) * var(--cw) + (var(--c) - 1) * var(--g));
     margin: 0; padding: 0; list-style: none;
   }
   .cs-c {
-    display: flex; align-items: center; justify-content: center;
+    flex: none; display: flex; align-items: center; justify-content: center;
     width: 96px; height: 64px; border-radius: 12px;
     background: #F7F6F2;
     box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .07), 0 1px 2px rgba(0, 0, 0, .3);
@@ -109,11 +120,11 @@ const sizeDe = (id: MarcaId) => {
   @keyframes cs-in { from { opacity: 0; } to { opacity: 1; } }
 
   @media (max-width: 680px) {
-    .cs-grid { grid-template-columns: repeat(min(var(--cols), 3), 96px); }
+    .cs-grid { --c: min(var(--cols), 3); }
   }
   @media (max-width: 360px) {
     .cs { padding: 12px; }
-    .cs-grid { grid-template-columns: repeat(min(var(--cols), 3), 84px); gap: 8px; }
+    .cs-grid { --c: min(var(--cols), 3); --cw: 84px; --g: 8px; }
     .cs-c { width: 84px; height: 58px; }
   }
   @media (prefers-reduced-motion: reduce) {

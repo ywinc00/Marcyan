@@ -1,8 +1,10 @@
 ---
 // ─────────────────────────────────────────────────────────────
 // MUESTRARIO P06 · logos de plataformas (design/rediseno-workos-v2.md §1.4, §2 y P06).
-// Página INTERNA: noindex. SE BORRA ANTES DE CUALQUIER MERGE A main (§1.2). OJO: el sitemap
-// (astro.config, fuera de P06) no la filtra y sale en sitemap-0.xml; borrarla es obligatorio.
+// Página INTERNA: noindex. LISTA DE BORRADO OBLIGATORIA ANTES DE CUALQUIER MERGE A main (§1.2).
+// OJO: el plan dice que astro.config filtra /w-muestrario del sitemap, pero el filtro NO existe:
+// esta página sale en sitemap-0.xml siendo noindex, nofollow. Borrarla (o añadir el filtro) es
+// condición de merge.
 // Monta 2 instancias de cada pieza (§1.6: ids únicos comprobables por verify-extra).
 // Los conjuntos de logos de cada demo salen del copy que ya existe en el sitio (IA conversacional:
 // WhatsApp, Instagram, Messenger y Google; tienda: Shopify, Stripe y PayPal; SEO para IA: ChatGPT,
@@ -100,13 +102,13 @@ const trazos = todos.filter(esTrazo);
 
     <section class="mm-s mm-s--c" id="casillas" data-mm="casillas">
       <h2>5 · Casillas (W-ADV-53 · Pipes)</h2>
-      <p class="mm-n">A · con pestañas por categoría (flechas, Inicio y Fin).</p>
+      <p class="mm-n">A · con pestañas por categoría (flechas, Inicio y Fin). Grupos de 3: cada pestaña llena su fila.</p>
       <CasillasMarcas columnas={3} etiqueta="Herramientas por categoría" grupos={[
+        { nombre: 'Mensajería', ids: ['whatsapp', 'instagram', 'messenger'] },
         { nombre: 'Pagos', ids: ['shopify', 'stripe', 'paypal'] },
-        { nombre: 'Mensajería', ids: ['whatsapp', 'instagram', 'messenger', 'facebook', 'gmail', 'google'] },
-        { nombre: 'Agenda', ids: ['googlecalendar', 'calendly', 'googlemaps'] },
+        { nombre: 'Agenda', ids: ['googlecalendar', 'calendly', 'gmail'] },
       ]} />
-      <p class="mm-n">B · bandeja de 3×3 sin pestañas (Vault).</p>
+      <p class="mm-n mm-n--sep">B · bandeja de 3×3 sin pestañas (Vault).</p>
       <CasillasMarcas columnas={3} grupos={[
         { nombre: 'IA', ids: ['claude', 'chatgpt-texto', 'googlegemini', 'perplexity', 'meta', 'google', 'bing-texto', 'applemaps-texto', 'googlemaps'] },
       ]} />
@@ -123,7 +125,7 @@ const trazos = todos.filter(esTrazo);
   .mm-k { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); margin: 0; }
   .mm-lead { font-size: var(--w-lead); color: var(--w-ink-80); line-height: 1.5; margin: 0; }
   .mm-n { color: var(--w-ink-60); font-size: 14px; margin: 0 0 20px; }
-  .mm-stage + .mm-n, .mm-s > div + .mm-n { margin-top: 40px; }
+  .mm-stage + .mm-n, .mm-n--sep { margin-top: 40px; }
   .mm-s { padding: 64px 0; border-top: 1px solid var(--w-line-ink); }
   .mm-s--c { display: flex; flex-direction: column; align-items: center; text-align: center; }
   .mm-stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 32px 0 48px; }

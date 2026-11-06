@@ -20,8 +20,11 @@
 // dibuja hasta la cabeza (stroke-dashoffset, 500 ms); al apagarse se FUNDE entera (no se recoge).
 // Se solapan 2-3 a la vez.
 // Bucle (pantalla viva, §1.5) SOLO mientras está a la vista y con la pestaña visible (loop.ts:
-// IntersectionObserver rootMargin 100px, visibilitychange, pausa con puntero/foco dentro, botón
-// de pausa 44×44 porque dura más de 5 s). Obedece además el estado GLOBAL de pausa: evento
+// IntersectionObserver rootMargin 100px, visibilitychange, botón de pausa 44×44 porque dura más de
+// 5 s). NO se para con el puntero encima (rev2 P06: medido 3 s quieta = parecía congelada): el bucle
+// se registra sobre el escenario `.cm-st`, que es decorativo (aria-hidden, nada enfocable) y lleva
+// pointer-events: none, así loop.ts nunca recibe pointerenter; la pausa queda en el botón y en el
+// estado global. Obedece además el estado GLOBAL de pausa: evento
 // `w2:pausa` en document ({ detail: { pausado } }) y sessionStorage 'w2:pausa' = '1'; su propio
 // botón lo publica (contrato propuesto hasta que loop.ts lo integre, ver informe P06).
 // Reducir movimiento: quieta con una casilla encendida y su línea (estado con sentido).
@@ -170,7 +173,7 @@ const estiloSt = [
 <style>
   .cm { position: relative; width: 100%; max-width: 560px; margin-inline: auto; container-type: inline-size; --marca-tinta: #111; }
   .cm-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .cm-st { position: relative; width: 100%; aspect-ratio: var(--ar); }
+  .cm-st { position: relative; width: 100%; aspect-ratio: var(--ar); pointer-events: none; }
 
   /* Horizonte fino a la altura del centro del abanico (el original lo lleva bajo la corona). */
   .cm-hz {
@@ -268,7 +271,8 @@ const estiloSt = [
       const t = window.setTimeout(() => { set(i, false); offs.delete(t); }, ON);
       offs.add(t);
     };
-    const ctrl = registerLoop(el, {
+    const st = el.querySelector<HTMLElement>('.cm-st') ?? el;
+    const ctrl = registerLoop(st, {
       start: () => { el.classList.remove('is-still'); items.forEach((_, i) => set(i, false)); encender(); tick = window.setInterval(encender, TICK); },
       // Al parar, lo encendido termina su vuelta (sin saltos).
       stop: () => { window.clearInterval(tick); },

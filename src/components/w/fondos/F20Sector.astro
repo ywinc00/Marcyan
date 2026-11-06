@@ -4,22 +4,25 @@
 //   bienes raíces            → F21 atardecer: cielo de noche que se calienta en el horizonte detrás de
 //                              la casa, con el haz de líneas que sale por la izquierda (W-CORE-16).
 //   contratistas/contractors → F22 obra: el armazón de madera de una casa en alzado, a línea fina.
-//   restaurantes (EN)        → F07 plano, sin cambios (fuera del encargo de la v3).
+//   restaurants (EN)         → F23 mesa: lámparas colgantes, mesa y dos sillas de bistró, a línea fina.
+// Ninguna página de sector usa ya F07 (la malla de rombos con rayas).
 // La escena se elige por la ruta de la página (el KindSpec solo admite un fondo por tipo).
 import F21Atardecer from './F21Atardecer.astro';
 import F22Obra from './F22Obra.astro';
-import F07Plano from './F07Plano.astro';
+import F23Mesa from './F23Mesa.astro';
 
-interface Props { estilos?: boolean; eco?: boolean }
-const { estilos = true, eco = false } = Astro.props;
+interface Props { estilos?: boolean }
+const { estilos = true } = Astro.props;
 const ruta = Astro.url.pathname.replace(/\/+$/, '');
-const ESCENA: Record<string, 'atardecer' | 'obra'> = {
+const ESCENA: Record<string, 'atardecer' | 'obra' | 'mesa'> = {
   '/es/houston/bienes-raices': 'atardecer',
   '/es/houston/contratistas': 'obra',
   '/en/houston/contractors': 'obra',
+  '/en/houston/restaurants': 'mesa',
 };
-const escena = ESCENA[ruta] ?? 'plano';
+// Una página de sector nueva sin escena propia cae en la obra (nunca en una malla).
+const escena = ESCENA[ruta] ?? 'obra';
 ---
 {escena === 'atardecer' && <F21Atardecer estilos={estilos} />}
 {escena === 'obra' && <F22Obra estilos={estilos} lang={ruta.startsWith('/en') ? 'en' : 'es'} />}
-{escena === 'plano' && <F07Plano estilos={estilos} eco={eco} />}
+{escena === 'mesa' && <F23Mesa estilos={estilos} />}

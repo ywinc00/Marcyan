@@ -55,13 +55,10 @@ const spec: KindSpec = {
   kind: 'sector',
   tone: 'gold',
   // v3: fondo F20, una escena por oficio con un solo motivo (E-57): atardecer con el haz de líneas que sale
-  // por la izquierda en bienes raíces, armazón de obra en contratistas; restaurantes sigue en F07 (sus cotas
-  // se sacan del lienzo como en la v2, ronda 1 M1). F20 elige la escena por la ruta.
+  // por la izquierda en bienes raíces, armazón de obra en contratistas, mesa de comedor en restaurantes.
+  // F20 elige la escena por la ruta.
   fondo: 'F20',
-  fondoOpciones: (ctx) => ({
-    texto: 'izquierda',
-    vars: ctx.cluster.path === '/en/houston/restaurants' ? '--wf-cota1: -200px; --wf-cota2: -200px' : undefined,
-  }),
+  fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroSector,
   hero: (ctx) => {
     const t = copyOf(ctx);

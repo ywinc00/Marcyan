@@ -1,0 +1,73 @@
+---
+// F23 · Mesa (restaurantes, v3). Misma familia que F22 (obra): un solo motivo dibujado a línea fina de
+// oro, quieto. Aquí la escena es una mesa de comedor en alzado: tres lámparas colgantes sobre la tarjeta
+// (la carta del restaurante queda delante, como servida en la mesa), el tablero que asoma por los dos
+// lados, sus patas, dos sillas de bistró enfrentadas, una copa y una botella, y el suelo. Nada detrás del
+// texto: la silla izquierda empieza donde acaba la columna de texto. Los cordones nacen bajo la barra de
+// navegación con un fundido. En pantallas estrechas las lámparas se apagan (caerían sobre los botones).
+// Ajustes: --wf-mesa-top / --wf-mesa-top-movil, --wf-mesa-escala-movil.
+interface Props { estilos?: boolean }
+const { estilos = true } = Astro.props;
+
+// Lienzo 900 × 700; la tarjeta queda centrada (x 212 a 688). Tablero en 560, suelo en 690.
+const MESA = { a: 150, b: 750, y: 560 };
+const SUELO = 690;
+// Silla de bistró de perfil, mirando hacia la mesa (dir 1 = a la derecha, -1 = a la izquierda).
+const silla = (x: number, dir: 1 | -1) => {
+  const f = (dx: number) => x + dx * dir;
+  return [
+    `M${f(0)} 600C${f(-4)} 560 ${f(-10)} 500 ${f(-6)} 478Q${f(4)} 466 ${f(16)} 476C${f(18)} 500 ${f(14)} 560 ${f(14)} 600`, // respaldo curvado en lazo
+    `M${f(-3)} 520Q${f(6)} 514 ${f(15)} 520`,
+    `M${f(-2)} 600H${f(76)}M${f(-2)} 607H${f(76)}`, // asiento
+    `M${f(2)} 607L${f(-6)} ${SUELO}M${f(72)} 607L${f(80)} ${SUELO}`, // patas abiertas
+    `M${f(-2)} 652H${f(78)}`, // aro bajo
+  ].join('');
+};
+const lampara = (x: number) =>
+  `M${x} 70V112M${x - 34} 146Q${x - 30} 112 ${x} 112Q${x + 30} 112 ${x + 34} 146ZM${x - 7} 146Q${x} 156 ${x + 7} 146`;
+const CSS = `
+  .wf:has(> .wf-me) {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 56px), transparent);
+            mask-image: linear-gradient(180deg, #000 calc(100% - 56px), transparent);
+  }
+  .wf-me { position: absolute; inset: 0; }
+  /* Luz cálida bajo las lámparas (G-01), centrada en la tarjeta. */
+  .wf-me::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(30% 34% at calc(100% - var(--wf-l) - 238px) 24%, rgba(var(--accent-gold-rgb), .10), transparent 100%);
+  }
+  .wf-me__dib {
+    position: absolute; width: 900px; height: 700px;
+    left: calc(100% - var(--wf-l) - 238px - 450px); top: var(--wf-mesa-top, 4px);
+    fill: none; stroke: rgba(var(--accent-gold-rgb), .3); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round;
+    -webkit-mask-image: linear-gradient(180deg, transparent 64px, #000 104px);
+            mask-image: linear-gradient(180deg, transparent 64px, #000 104px);
+  }
+  .wf-me__dib .fuerte { stroke: rgba(var(--accent-gold-rgb), .5); }
+  .wf-me__dib .fino { stroke: rgba(var(--accent-gold-rgb), .18); }
+  @media (max-width: 1023.98px) {
+    .wf-me::before { background: radial-gradient(80% 24% at 50% 84%, rgba(var(--accent-gold-rgb), .10), transparent 100%); }
+    .wf-me__dib {
+      left: 50%; top: var(--wf-mesa-top-movil, 560px);
+      transform: translateX(-50%) scale(var(--wf-mesa-escala-movil, .62)); transform-origin: 50% 0;
+      -webkit-mask-image: none; mask-image: none;
+    }
+    .wf-me__lamparas { display: none; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-me">
+  <svg class="wf-me__dib" viewBox="0 0 900 700" aria-hidden="true">
+    <g class="wf-me__lamparas"><path class="fuerte" d={[300, 450, 600].map(lampara).join('')} /></g>
+    <path class="fuerte" d={`M${MESA.a} ${MESA.y}H${MESA.b}`} />
+    <path d={`M${MESA.a} ${MESA.y + 8}H${MESA.b}M${MESA.a + 22} ${MESA.y + 8}V${MESA.y + 26}H${MESA.b - 22}V${MESA.y + 8}`} />
+    <path d={`M${MESA.a + 34} ${MESA.y + 26}L${MESA.a + 40} ${SUELO}M${MESA.b - 34} ${MESA.y + 26}L${MESA.b - 40} ${SUELO}`} />
+    <path d={silla(70, 1) + silla(830, -1)} />
+    <!-- Copa (izquierda) y botella (derecha), en los trozos de mesa que la tarjeta deja ver. -->
+    <path d="M178 516Q178 534 190 536Q202 534 202 516ZM190 536V556M180 559H200" />
+    <path d="M716 559V506Q716 494 722 488V470H730V488Q736 494 736 506V559" />
+    <path class="fuerte" d={`M0 ${SUELO}H900`} />
+    <path class="fino" d={Array.from({ length: 25 }, (_, i) => `M${i * 38} ${SUELO}l-14 10`).join('')} />
+  </svg>
+</div>

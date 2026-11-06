@@ -6,7 +6,7 @@
 // Pantalla viva (§1.5): cada 3 s una tarea pasa a "Revisando…" (punto que late y una luz que
 // recorre la fila) y a los 1,8 s vuelve a su estado hecho; ronda sin fin mientras está a la vista
 // (loop.ts: pausa fuera de vista, pestaña oculta, puntero/foco, botón 44×44) y obedece la pausa
-// global (html[data-w-pausa] + `w:pausa`). Reducir movimiento: todo hecho, quieto.
+// global (html[data-w-pausa] + `w:pausa`) y su botón la produce (pausaGlobal.ts). Reducir movimiento: todo hecho, quieto.
 // Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; sin ids.
 interface Props { lang?: 'es' | 'en' }
 const { lang = 'es' } = Astro.props;
@@ -14,7 +14,7 @@ const en = lang === 'en';
 const T = en
   ? {
       sr: 'Example: a website’s daily care log, with backups, security updates, uptime checks and bilingual support.',
-      dom: 'tunegocio.example', title: 'Today’s care', checking: 'Checking…', next: 'Next backup · 3:00 AM',
+      dom: 'yourbusiness.example', title: 'Today’s care', checking: 'Checking…', next: 'Next backup · 3:00 AM',
       rows: [
         { k: 'backup', label: 'Backup', st: 'Done', t: '3:00 AM' },
         { k: 'shield', label: 'Security updates', st: 'Up to date', t: '3:12 AM' },
@@ -65,6 +65,7 @@ const ICON: Record<string, string> = {
 
 <script>
   import { registerLoop } from '../../loop';
+  import { enlazaPausa } from './pausaGlobal';
   const EVERY = 3000, CHECK = 1800;
   document.querySelectorAll<HTMLElement>('[data-w2-cuidado]').forEach((el) => {
     const rows = Array.from(el.querySelectorAll<HTMLElement>('.ocu__row'));
@@ -84,8 +85,7 @@ const ICON: Record<string, string> = {
       stop: () => { window.clearTimeout(t1); window.clearTimeout(t2); clear(); },
       still: () => { window.clearTimeout(t1); window.clearTimeout(t2); clear(); el.classList.add('is-still'); },
     }, { buttonTone: 'dark', buttonHost: el.querySelector<HTMLElement>('[data-w2-host]') ?? el });
-    if (document.documentElement.hasAttribute('data-w-pausa')) ctrl.setUserPaused(true);
-    document.addEventListener('w:pausa', (e) => ctrl.setUserPaused(!!(e as CustomEvent).detail?.paused));
+    enlazaPausa(ctrl, el);
   });
 </script>
 

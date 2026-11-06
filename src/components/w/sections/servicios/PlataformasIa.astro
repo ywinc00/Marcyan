@@ -1,0 +1,48 @@
+---
+// Servicios · fila "Donde la IA te puede recomendar" bajo la respuesta de ChatGPT de la celda
+// "SEO para IA" (rev1 de G09: la celda iba sin bandeja y quieta). Logos de las plataformas que
+// dominamos (P06: logos reconocibles como señal de confianza, nunca alianza; ChatGPT como palabra,
+// §1.4). Vida lenta: cada 2,6 s se ilumina la siguiente plataforma (solo a la vista, sin pausa
+// global, quieta con reducir movimiento). Decorativa: aria-hidden + data-nosnippet; el sentido lo
+// da el texto de la celda.
+import LogoMarca from '../../marcas/LogoMarca.astro';
+
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const k = lang === 'en' ? 'Where AI can recommend you' : 'Donde la IA te puede recomendar';
+const ids = ['chatgpt-texto', 'claude', 'googlegemini', 'perplexity'] as const;
+---
+<div class="wsai" aria-hidden="true" data-nosnippet data-w2-plataformas>
+  <span class="wsai__k">{k}</span>
+  <span class="wsai__row">
+    {ids.map((id, i) => (
+      <span class:list={['wsai__l', i === 0 && 'is-on']}><LogoMarca id={id} size={18} tono="color" titulo="" /></span>
+    ))}
+  </span>
+</div>
+
+<script>
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-w2-plataformas]').forEach((el) => {
+    if (mq.matches) return;
+    const ls = Array.from(el.querySelectorAll<HTMLElement>('.wsai__l'));
+    let visible = false, i = 0;
+    new IntersectionObserver((ents) => { for (const e of ents) visible = e.isIntersecting; }, { rootMargin: '100px' }).observe(el);
+    window.setInterval(() => {
+      if (!visible || document.hidden || document.documentElement.hasAttribute('data-w-pausa')) return;
+      ls[i % ls.length].classList.remove('is-on'); i++; ls[i % ls.length].classList.add('is-on');
+    }, 2600);
+  });
+</script>
+
+<style>
+  .wsai { width: 100%; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: #F7F5F0; color: #1E1C19; text-align: left; }
+  .wsai__k { display: block; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #5E5A53; }
+  .wsai__row { display: grid; grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; --marca-tinta: #1E1C19; }
+  .wsai__l {
+    display: grid; place-items: center; height: 44px; border-radius: 10px; border: 1px solid #E2DED5; background: #FFFFFF;
+    opacity: .72; transition: opacity 500ms ease, transform 500ms ease, border-color 500ms ease, box-shadow 500ms ease;
+  }
+  .wsai__l.is-on { opacity: 1; transform: translateY(-2px); border-color: #CFCAC0; box-shadow: 0 6px 14px -10px rgba(30,28,25,.5); }
+  @media (prefers-reduced-motion: reduce) { .wsai__l { transition: none; opacity: 1; } }
+</style>

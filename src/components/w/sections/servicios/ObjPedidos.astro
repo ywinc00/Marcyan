@@ -7,7 +7,8 @@
 // Pantalla viva (§1.5): una fila avanza de estado cada 950 ms; tras 3 avances la lista sube 52 px
 // (600 ms). Bucle mientras está a la vista (loop.ts: pausa fuera de vista, pestaña oculta,
 // puntero/foco y botón 44×44 porque dura más de 5 s); obedece además la pausa GLOBAL de la
-// página (html[data-w-pausa] + evento `w:pausa`, contrato de Fondo.astro).
+// página (html[data-w-pausa] + evento `w:pausa`, contrato de Fondo.astro) y su botón la PRODUCE
+// (pausaGlobal.ts, rev1 de G09). En el bento llena el alto de la fila (8 filas en la lista).
 // Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; sin ids; sin precios.
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import { negocios } from '../../objetos/ejemplos/negocios';
@@ -18,7 +19,7 @@ const { lang = 'es' } = Astro.props;
 const en = lang === 'en';
 const p = negocios.tienda.paleta;
 const T = en
-  ? { sr: 'Example: an online shop’s orders move from paid to preparing to ready.', title: 'Today’s orders', foot: 'tutienda.example', st: ['Paid', 'Preparing', 'Ready'] }
+  ? { sr: 'Example: an online shop’s orders move from paid to preparing to ready.', title: 'Today’s orders', foot: 'yourshop.example', st: ['Paid', 'Preparing', 'Ready'] }
   : { sr: 'Ejemplo: los pedidos de una tienda en línea pasan de pagado a preparando y a listo.', title: 'Pedidos de hoy', foot: 'tutienda.example', st: ['Pagado', 'Preparando', 'Listo'] };
 type Prod = 'vela' | 'velaOliva' | 'cafe' | 'caja';
 const filas: { prod: Prod; es: string; en: string; who: string; s: number }[] = [
@@ -27,6 +28,9 @@ const filas: { prod: Prod; es: string; en: string; who: string; s: number }[] = 
   { prod: 'caja', es: 'Caja de regalo', en: 'Gift box', who: 'Carla P.', s: 1 },
   { prod: 'velaOliva', es: 'Vela de higo', en: 'Fig candle', who: 'Jorge T.', s: 0 },
   { prod: 'cafe', es: 'Café molido', en: 'Ground coffee', who: 'Rosa G.', s: 0 },
+  { prod: 'caja', es: 'Caja de temporada', en: 'Seasonal box', who: 'Marta L.', s: 0 },
+  { prod: 'vela', es: 'Vela de vainilla', en: 'Vanilla candle', who: 'Diego S.', s: 0 },
+  { prod: 'velaOliva', es: 'Vela de romero', en: 'Rosemary candle', who: 'Elena V.', s: 0 },
 ];
 const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.accent};--ej-ink:${p.ink};--ej-accent:${p.accent}`;
 ---
@@ -56,6 +60,7 @@ const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.ac
 
 <script>
   import { registerLoop } from '../../loop';
+  import { enlazaPausa } from './pausaGlobal';
   const ROW = 52, TICK = 950, SHIFT = 600;
   document.querySelectorAll<HTMLElement>('[data-w2-pedidos]').forEach((el) => {
     const list = el.querySelector<HTMLElement>('.opd__list');
@@ -63,10 +68,10 @@ const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.ac
     const ST: string[] = JSON.parse(el.dataset.st || '[]');
     const rows = () => Array.from(list.children) as HTMLElement[];
     const set = (r: HTMLElement, s: number) => { r.dataset.s = String(s); const t = r.querySelector('.opd__st'); if (t) t.textContent = ST[s] ?? ''; };
-    const initial = [2, 1, 1, 0, 0];
+    const initial = [2, 1, 1, 0, 0, 0, 0, 0];
     let timer = 0, ticks = 0;
     const step = () => {
-      const r = rows().slice(0, 4).find((x) => Number(x.dataset.s) < 2);
+      const r = rows().slice(0, 6).find((x) => Number(x.dataset.s) < 2);
       if (r) set(r, Number(r.dataset.s) + 1);
       ticks++;
       if (ticks % 3 === 0) {
@@ -87,22 +92,22 @@ const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.ac
       stop: () => window.clearTimeout(timer),
       still: () => { window.clearTimeout(timer); list.style.transition = 'none'; list.style.transform = ''; rows().forEach((r, i) => set(r, initial[i] ?? 0)); el.classList.add('is-still'); },
     }, { buttonTone: 'light', buttonHost: el.querySelector<HTMLElement>('[data-w2-host]') ?? el });
-    const global = () => document.documentElement.hasAttribute('data-w-pausa');
-    if (global()) ctrl.setUserPaused(true);
-    document.addEventListener('w:pausa', (e) => ctrl.setUserPaused(!!(e as CustomEvent).detail?.paused));
+    enlazaPausa(ctrl, el);
   });
 </script>
 
 <style>
-  .opd-wrap { width: 100%; min-width: 0; display: flex; justify-content: center; }
-  .opd { position: relative; width: min(100%, 420px); container-type: inline-size; }
+  .opd-wrap { width: 100%; min-width: 0; height: 100%; display: flex; justify-content: center; }
+  /* Llena el alto de la fila del bento (rev1, imp. 1): la ventana de pedidos crece y enseña más filas. */
+  .opd { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; container-type: inline-size; }
+  .opd__ui { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   .opd__ui {
     background: var(--t-bg); color: var(--t-ink); border-radius: 14px; overflow: hidden;
     font-family: var(--font-body); text-align: left;
   }
   .opd__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px; border-bottom: 1px solid rgba(42,33,27,.12); color: var(--t-ink); }
   .opd__title { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--t-ink2); }
-  .opd__win { height: 208px; overflow: hidden; }
+  .opd__win { flex: 1 1 auto; height: 208px; min-height: 208px; overflow: hidden; }
   .opd__list { list-style: none; margin: 0; padding: 0; will-change: transform; }
   .opd__row {
     display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;

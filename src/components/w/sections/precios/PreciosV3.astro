@@ -258,11 +258,22 @@ const despuesCols = t.despues.cols.map((col) => ({
   @media (--md) { .pv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (--lg) { .pv-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .pv-c { min-width: 0; }
+  /* Compactas en la misma fila con las mismas 5 franjas (cabecera, cifra, niveles, qué incluye,
+     acción) compartidas por subrejilla (rev1 de G09, menor): con un solo nivel, Mantenimiento ya
+     no deja ~100 px de hueco sobre su acción; las franjas se alinean como una tabla. */
+  @media (--md) {
+    .pv-c { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; }
+    .pv-c > :global(.tp--c) { grid-row: span 5; display: grid; grid-template-rows: subgrid; row-gap: 0; align-content: start; }
+    .pv-c > :global(.tp--c > *) { align-self: start; }
+  }
   @media (--lt-md) { .pv-grupo { margin-top: 48px; } .pv-grupo + .pv-grupo { margin-top: 64px; } .pv-grid { gap: 16px; margin-top: 24px; } .pv-grupo__lead { font-size: 18px; } }
-  /* Móvil por sustracción (E-18): la columna "Qué incluye cada nivel" repite los nombres
-     del panel de precios; en móvil queda solo nombre, frase y niveles con su precio
-     (lo mismo que enseñaba la tarjeta de antes). En escritorio se ve entera. */
-  @media (--lt-md) { .pv-card :global(.tp__inc) { display: none; } .pv-card :global(.tp__panel) { border-top: 0; } }
+  /* Móvil (rev1 de G09, menor): "Qué incluye cada nivel" ya no se oculta en las destacadas;
+     va plegado bajo el panel de niveles, con el MISMO desplegable que las compactas. */
+  @media (--lt-md) {
+    .pv-card :global(.tp__body) { display: flex; flex-direction: column; }
+    .pv-card :global(.tp__panel) { border-top: 0; }
+    .pv-card :global(.tp__inc) { order: 2; margin-inline: 20px; padding-inline: 0; }
+  }
 
   /* Cifra grande "Desde $X" (W-CONV-03, §10.2): el nivel ancla del catálogo (fromOf).
      TarjetaPrecio no tiene hueco para ella (ver pendiente [SISTEMA]); hasta entonces

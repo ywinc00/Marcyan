@@ -80,7 +80,7 @@ interface Copy {
   prosa: { tone1: string; tone2: string };
   /** v2 (G09): objeto W-CONV-51/67 junto a la prosa. Sin rivales ni importes en "otros". */
   compara: {
-    otros: { title: string; sub: string; steps: { t: string; x: string }[]; qs: { t: string; x: string }[] };
+    otros: { title: string; sub: string; steps: { t: string; x: string }[]; qs: { t: string; x: string }[]; fine: { k: string; x: string } };
     nosotros: { title: string; sub: string; foot: string };
   };
   /** v2 (G09): las 7 tarjetas agrupadas, cada grupo con su cabecera numerada. */
@@ -147,6 +147,10 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
           { t: '¿Cuánto pagarás en un año?', x: 'Difícil saberlo antes de firmar.' },
           { t: '¿Y las renovaciones?', x: 'Llegan aparte del precio que te enseñaron.' },
         ],
+        fine: {
+          k: 'Letra pequeña',
+          x: 'Precio de arranque sujeto al alcance final. Hospedaje, dominio y licencias se facturan aparte. La mensualidad empieza al publicar y se renueva sola. Los cambios fuera del alcance se cotizan por separado. Las renovaciones se cobran a la tarifa vigente en ese momento.',
+        },
       },
       nosotros: {
         title: 'Marcyan',
@@ -275,6 +279,10 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
           { t: 'What will you pay in a year?', x: 'Hard to know before you sign.' },
           { t: 'And the renewals?', x: 'They come on top of the price you were shown.' },
         ],
+        fine: {
+          k: 'Fine print',
+          x: 'Starting price subject to final scope. Hosting, domain and licenses are billed separately. The monthly fee starts at launch and renews automatically. Changes outside the scope are quoted separately. Renewals are charged at the rate in effect at that time.',
+        },
       },
       nosotros: {
         title: 'Marcyan',

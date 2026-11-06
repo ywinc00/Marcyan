@@ -7,8 +7,12 @@
 // bajada (verbatim) a la derecha en su línea base; debajo, partido 600/600: el wizard
 // ENTERO en su tarjeta opaca (el contraste de la página) y el escáner con su bucle (la
 // firma), con los 2 checks de "lo que pasa después" debajo, fuera del formulario.
-// El escáner se para mientras el visitante escribe (E-42): :focus-within del
-// formulario pausa la barra por CSS, sin tocar loop.ts.
+// El escáner se para mientras el visitante escribe (E-42): lo hace el propio escáner vivo
+// (P04: focusin del visitante en un campo de su closest('section')).
+// Fondo (v2 §1.3 · G11): F12 "Escaneo" (trama de puntos y una línea de lectura que baja,
+// continua), que casa con el escáner vivo. Vive en la zona del hero (div.wf-zona) y NO se
+// monta SpaceBackdrop (una atmósfera por página). Con el escaneo, el resultado o el éxito
+// REALES a la vista, la línea del fondo también se queda quieta en su sitio (E-42/E-43).
 // El wizard NO lleva data-w-in ni data-w-reveal (§2.9): nace visible.
 // Mientras el panel enseña el escaneo, el resultado o el éxito (lo REAL del visitante),
 // el escáner "Ejemplo" se queda quieto a media altura y sin botón de pausa: nunca dos
@@ -22,11 +26,11 @@ import SiteFooter from '../../../layout/SiteFooter.astro';
 import Breadcrumb from '../../../ui/Breadcrumb.astro';
 import Button from '../../../ui/Button.astro';
 import Icon from '../../../ui/Icon.astro';
-import SpaceBackdrop from '../../../SpaceBackdrop.astro';
 import ServiceLd from '../../../seo/ServiceLd.astro';
 import DiagnosticWizard from '../../../growthos/DiagnosticWizard.astro';
 import WStyles from '../../WStyles.astro';
 import Escaner from '../../objetos/Escaner.astro';
+import Fondo from '../../fondos/Fondo.astro';
 import GratisDeVerdad from '../../GratisDeVerdad.astro';
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
@@ -57,6 +61,8 @@ const home = lang === 'en' ? '/en' : '/es';
   <SiteNav nav={nav} lang={lang} homeHref={home} currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="diagnostico">
+    <div class="wf-zona dgz">
+    <Fondo tema="F12" lang={lang} />
     <section class="w-hero dgh">
       <div class="w-container">
         <div class="dgh__crumbs"><Breadcrumb items={breadcrumb} lang={lang} /></div>
@@ -79,6 +85,7 @@ const home = lang === 'en' ? '/en' : '/es';
         </div>
       </div>
     </section>
+    </div>
 
     <section class="w-cell" id="lo-que-veras">
       <div class="w-container" data-w-reveal>
@@ -106,8 +113,6 @@ const home = lang === 'en' ? '/en' : '/es';
       </div>
     </div>
   </main>
-
-  <SpaceBackdrop tone="gold" />
 
   <SiteFooter footer={c.footer} lang={lang} />
 </Layout>
@@ -140,37 +145,24 @@ const home = lang === 'en' ? '/en' : '/es';
     .dgh__form :global(.dgw__panel[data-view="scan"]) { min-height: 480px; }
   }
 
-  /* E-42: la barra del escáner se para mientras el visitante rellena el formulario. */
-  .dgh__split[data-typing] :global(.wo-scan.is-run.is-playing .wo-scan__bar) { animation-play-state: paused; }
   /* E-42/E-43: con el escaneo, el resultado o el éxito reales a la vista, el escáner de
      ejemplo se queda quieto a media altura (sin animación = transform base del objeto) y
      su botón de pausa, que ya no pausaría nada, no se pinta (loop.ts lo pinta con estilo
      en línea: solo !important lo vence sin tocar loop.ts). */
   .dgh__split:has(.dgw__panel:is([data-view="scan"], [data-view="result"], [data-view="success"]):not([hidden])) :global(.wo-scan .wo-scan__bar) { animation: none; }
   .dgh__split:has(.dgw__panel:is([data-view="scan"], [data-view="result"], [data-view="success"]):not([hidden])) :global(.w-loop-pause) { display: none !important; }
+  /* Y la línea de lectura del fondo F12 vuelve a su sitio quieto (sobre el objeto). */
+  /* E-42: mientras el visitante escribe (el escáner queda en .is-held), la línea del fondo
+     también se detiene donde está; al salir del formulario siguen las dos. */
+  .dgz:has(.wo-scan.is-held) :global(.wf-es__linea) { animation-play-state: paused; }
+  .dgz:has(.dgw__panel:is([data-view="scan"], [data-view="result"], [data-view="success"]):not([hidden])) :global(.wf-es__linea) { animation: none; }
+
+  /* F12: la línea de lectura sale justo sobre el formulario y el escáner (--wf-obj, medido
+     en el HTML compilado) y baja hasta el pie del hero. */
+  .dgz > :global(.wf) { --wf-obj: 420px; }
+  @media (max-width: 1023.98px) { .dgz > :global(.wf) { --wf-obj: 400px; } }
 
   :global(.dg__free) { margin-top: var(--w-chapter-gap); }
   /* Vuelta al formulario tras la FAQ, en su misma columna (776, la de PreguntasFrecuentes). */
   .dg__again { margin: 24px auto 0; max-width: 776px; }
 </style>
-
-<script>
-  // E-42 (§4.9): focusin dentro del formulario para el escáner y focusout lo reanuda.
-  // El wizard enfoca su primer campo al cargar (sin que nadie escriba): ese foco
-  // programático no cuenta; solo el que llega tras un toque o una tecla del visitante.
-  // Solo marca un atributo; el bucle (loop.ts) sigue siendo del escáner.
-  const split = document.querySelector<HTMLElement>('.dgh__split');
-  const form = split?.querySelector<HTMLElement>('.dgw');
-  if (split && form) {
-    let user = false;
-    const mark = () => { user = true; };
-    document.addEventListener('pointerdown', mark, { capture: true, once: true });
-    document.addEventListener('keydown', mark, { capture: true, once: true });
-    form.addEventListener('focusin', () => { if (user) split.setAttribute('data-typing', ''); });
-    form.addEventListener('pointerdown', () => split.setAttribute('data-typing', ''));
-    form.addEventListener('focusout', (e) => {
-      if (e.relatedTarget instanceof Node && form.contains(e.relatedTarget)) return;
-      split.removeAttribute('data-typing');
-    });
-  }
-</script>

@@ -6,6 +6,7 @@
 // leyendo (W-CONT-26) · En pocas palabras (answer verbatim) · Preguntas frecuentes
 // (FAQPage) · Cierre en dos tarjetas (trío) · Contacto · Footer.
 // Schema: BlogPosting + FAQPage + BreadcrumbList (+ @graph base del Layout), sin cambios.
+// Fondo (v2 §1.3 y §5-5 · G11): hoja oscura F13 (ZonaHoja) bajo la lectura, sin SpaceBackdrop.
 // Contraste: ninguno extra (la portada ensanchada aporta la luz). Firma: ninguna.
 // Degradado: ninguno.
 import { getCollection, render } from 'astro:content';
@@ -20,13 +21,13 @@ import RailTools from '../../../components/sections/RailTools.astro';
 import PostNav from '../../../components/sections/PostNav.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ArticleLd from '../../../components/seo/ArticleLd.astro';
-import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
 import WStyles from '../../../components/w/WStyles.astro';
 import FranjaEnPocasPalabras from '../../../components/w/FranjaEnPocasPalabras.astro';
 import PreguntasFrecuentes from '../../../components/w/PreguntasFrecuentes.astro';
 import CierreDosTarjetas from '../../../components/w/CierreDosTarjetas.astro';
 import PreguntaATuIA from '../../../components/w/sections/blog/PreguntaATuIA.astro';
 import SigueLeyendo from '../../../components/w/sections/blog/SigueLeyendo.astro';
+import ZonaHoja from '../../../components/w/sections/blog/ZonaHoja.astro';
 import { content, nap } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
 import { postChrome } from '../../../i18n/blog';
@@ -118,6 +119,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath="/es/blog" />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="articulo">
+    <ZonaHoja lang="es">
     <div class="w-container art">
       <div class:list={['art__grid', !hasToc && 'art__grid--notoc']}>
         <ArticleHero
@@ -152,6 +154,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
         </div>
       </div>
     </div>
+    </ZonaHoja>
 
     <section class="w-cell art-more" aria-label="Más guías">
       <div class="w-container" data-w-reveal>
@@ -202,8 +205,6 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 
     <Contact contact={c.contact} />
   </main>
-
-  <SpaceBackdrop tone="gold" />
 
   <SiteFooter footer={c.footer} />
 </Layout>

@@ -1,0 +1,27 @@
+---
+// Zona de la hoja oscura del blog (v2 §1.3 y §5-5 · G11): F13 "Hoja" (W-NEW-11, la página
+// como hoja: columna central más clara con bordes finos oro al 9 % y pautado tenue sobre un
+// marco más profundo). Quieta. Envuelve la parte de LECTURA (índice: cabecera, destacada,
+// pareja y listado; artículo: cabecera, índice, cuerpo y raíl) y se funde a la noche al
+// acabar; el cierre y el contacto siguen sobre la noche lisa. Sustituye a SpaceBackdrop.
+// El raíl fijo (sticky) del artículo vive DENTRO: la zona no recorta (sin overflow) y el
+// recorte del fondo está en su propia capa (.wf), así que el sticky no muere.
+import Fondo from '../../fondos/Fondo.astro';
+
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+---
+<div class="wf-zona bz">
+  <Fondo tema="F13" lang={lang} />
+  <slot />
+</div>
+
+<style>
+  /* La hoja es quieta: el botón de pausa que el sistema cuelga a los fondos en bucle no
+     pausaría nada aquí (E-56: ningún control que no haga nada). Ver [SISTEMA] en el informe. */
+  .bz > :global(.wf-pausa) { display: none; }
+  /* Las líneas de margen de la hoja caen a 40 px de los raíles de la página (.w-rails) y,
+     juntas, se leían como un doble filo en los dos lados. La hoja ya tiene sus bordes
+     (que coinciden con los raíles): fuera los márgenes. */
+  .bz :global(.wf-ho__margen) { display: none; }
+</style>

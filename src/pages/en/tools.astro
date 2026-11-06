@@ -4,17 +4,18 @@
 // Cabecera compacta centrada (A-04 + W-CONV-01) · 2 calculadoras con piel W-CONV-03
 // (ToolsHub: contrato, fórmulas y eventos intactos) · cierre en dos tarjetas con el
 // trío · Contact (#contacto, destino del trío y del CTA de la barra) · BreadcrumbList.
-// Contraste: la calculadora 1 en superficie elevada. Firma: ninguna. Degradado: el
+// Fondo (v2 1.3, G11): F12 Escaneo en ZonaFondo (cabecera; la capa baja tras la calculadora 1), sin
+// SpaceBackdrop. Contraste: la calculadora 1 en superficie elevada. Firma: ninguna. Degradado: el
 // total de la calculadora activa. Par en ROUTE_PAIRS (hreflang auto).
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Contact from '../../components/sections/Contact.astro';
-import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import ToolsHub from '../../components/growthos/ToolsHub.astro';
 import WStyles from '../../components/w/WStyles.astro';
 import Cabecera from '../../components/w/sections/herramientas/Cabecera.astro';
+import ZonaFondo from '../../components/w/sections/herramientas/ZonaFondo.astro';
 import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
 import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
@@ -38,9 +39,11 @@ const num = nap.houston;
   <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <ZonaFondo lang="en">
     <Cabecera eyebrow={w.eyebrow} h1Html={tt.h1} tail={w.tail} lead={w.lead}>
       <Breadcrumb slot="crumbs" items={breadcrumb} lang="en" />
     </Cabecera>
+    </ZonaFondo>
 
     <ToolsHub lang="en" />
 
@@ -60,8 +63,6 @@ const num = nap.houston;
 
     <Contact contact={c.contact} />
   </main>
-
-  <SpaceBackdrop tone="gold" />
 
   <SiteFooter footer={c.footer} lang="en" />
 </Layout>

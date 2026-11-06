@@ -1,8 +1,9 @@
 ---
-// Tienda en línea · capítulo de contraste (§4.15-5): CapituloDosFrases + RegistroVivo
-// variant="static" "El día de tu tienda" (W-ADV-44 sin bucle: la firma de la página es la
-// lista de pedidos del hero). Cinco filas al 100 %, la central ("Pagado", en el acento)
-// realzada por fondo; el resto de estados en crema (por valor, §2.11).
+// Tienda en línea · capítulo de contraste (§4.15-5; v2 G04): CapituloDosFrases + RegistroVivo VIVO
+// "El día de tu tienda" (W-ADV-44: el registro avanza). En la v1 era estático y la prueba de vida daba
+// 0 % (FI §3-12, E-56 regla 7): ahora sube una fila cada 1,5 s mientras está a la vista, con la fila
+// central al 100 % y el resto ≥ 55 %, pausa fuera de vista y botón de pausa (loop.ts). El modo
+// `vivo-lento` de P03 (3 s) sustituirá a `loop` cuando P03 se integre ([SISTEMA]).
 import CapituloDosFrases from '../../CapituloDosFrases.astro';
 import RegistroVivo from '../../RegistroVivo.astro';
 import type { ShopCopy } from '../../../../i18n/w/ecommerce';
@@ -12,18 +13,17 @@ const { copy, lang = 'es' } = Astro.props;
 ---
 <CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
 <div class="ws-gap">
-  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="static" lang={lang} class="ws-dia" />
+  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="loop" lang={lang} class="ws-dia" />
 </div>
 <style>
   .ws-gap { margin-top: var(--w-chapter-gap); }
-  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
-  /* La fila "Pagado" en superficie clara cálida (§2.4, rev2 menor): da luz a la tarjeta
-     oscura sobre la banda gris. Sobre crema el acento no tiene contraste de texto: el chip
-     va en tinta de producto con el acento en fondo y borde. */
-  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center) { background: var(--w-p-bg); border-bottom-color: var(--w-p-line); }
-  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__ic),
-  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__lbl) { color: var(--w-p-ink); }
-  .ws-gap :global(.wd-log.ws-dia .wd-log__row.is-center .wd-log__chip) {
-    color: var(--w-p-ink); background: rgba(var(--w-accent-rgb), .22); border-color: rgba(var(--w-accent-rgb), .7);
+  /* La etiqueta "Ejemplo" (esquina superior) cae sobre la primera fila del bucle: en PC el
+     fundido de arriba deja libres sus primeros 52 px (revisión r1, menor 2). */
+  @media (--md) {
+    .ws-gap :global(.ws-dia.wd-log--loop .wd-log__win) {
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 52px, #000 150px, #000 calc(100% - 100px), transparent 100%);
+      mask-image: linear-gradient(180deg, transparent 0, transparent 52px, #000 150px, #000 calc(100% - 100px), transparent 100%);
+    }
   }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
 </style>

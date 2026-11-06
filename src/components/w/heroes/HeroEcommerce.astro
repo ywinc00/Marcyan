@@ -1,5 +1,6 @@
 ---
-// Hero de las landings de tienda en línea (design/rediseno-workos.md §4.15, ola 2).
+// Hero de las landings de tienda en línea (design/rediseno-workos.md §4.15, ola 2; v2 G04: la lista es
+// PedidosHoy, con productos ilustrados y raíl de estados, sobre el fondo F02 "Escaparate").
 // A-05 + W-ADV-36: hero PARTIDO. Izquierda, HeroTexto alineado a la izquierda (chip de
 // ciudad, eyebrow "Tienda", H1 verbatim, bajada y botones; coreografía §2.9). Derecha, la
 // lista "Pedidos de hoy" de EJEMPLO con su campo de puntos oro: firma de la página, en
@@ -8,7 +9,8 @@
 // Sin cola en el H1 (regla de longitud §2.14: el H1 ya ocupa 2 líneas a 1440).
 // Móvil: texto arriba y la lista debajo a ancho completo, nunca oculta (W-CORE-41).
 import HeroTexto from '../HeroTexto.astro';
-import ListaPedidos from '../objetos/ListaPedidos.astro';
+import PedidosHoy from '../sections/ecommerce/PedidosHoy.astro';
+import ProductoArte from '../sections/ecommerce/ProductoArte.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -39,7 +41,8 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
       </HeroTexto>
     </div>
     <div class="he__obj" data-w-in="obj">
-      <ListaPedidos lang={lang} size="hero" />
+      <PedidosHoy lang={lang} />
+      <ProductoArte modo="sprite" />
     </div>
   </div>
 </section>

@@ -1,0 +1,127 @@
+---
+// P11 · Escena 05 "En vivo y contigo" (design/rediseno-workos-v2.md §2 P11).
+// Navegador dibujado con la web de EJEMPLO de "Tu Negocio" (plomería neutra, §1.6) que pasa a
+// "● Publicada" y, como satélite, su asistente "en línea" que saluda (el paso 05 dice que el
+// asistente entra a atender clientes). Compacta: 5.ª escena del panel. Portada: ocupa el hueco de
+// la fase 05 mientras el slot `final` (EscenaAbreApps de P08) no llega.
+// Se reproduce con .is-play en un ancestro; sin él, o con reducir movimiento, estado final.
+// Micro-vida (§1.5): el punto "en línea" late mientras la línea está a la vista (.is-vista).
+// Objeto de ejemplo: aria-hidden + data-nosnippet, sin h1-h6, "Llamar" es un span.
+import { copy, type Lang } from './proceso';
+
+interface Props { lang?: Lang; class?: string }
+const { lang = 'es', class: cls } = Astro.props;
+const T = copy[lang].publicada;
+---
+<div class:list={['pb', cls]} aria-hidden="true" data-nosnippet>
+  <div class="pb__win">
+    <div class="pb__chrome">
+      <span class="pb__dots"><i></i><i></i><i></i></span>
+      <span class="pb__url" translate="no">tunegocio.example</span>
+      <span class="pb__st"><i></i>{T.estado}</span>
+    </div>
+    <div class="pb__site">
+      <div class="pb__nav">
+        <span class="pb__logo">
+          <svg viewBox="0 0 16 20" width="12" height="15"><path d="M8 1.5C5.6 5.2 3 8.4 3 12.2a5 5 0 0 0 10 0C13 8.4 10.4 5.2 8 1.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <span>Tu Negocio</span>
+        </span>
+        <span class="pb__tel">(281) 555-0142</span>
+      </div>
+      <div class="pb__hero">
+        <div class="pb__txt">
+          <span class="pb__h">{T.titular}</span>
+          <span class="pb__sub">{T.bajada}</span>
+          <span class="pb__btn">{T.boton}</span>
+        </div>
+        <span class="pb__art"><i></i><i></i><i></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="pb__asis">
+    <span class="pb__ah"><span class="pb__av"></span><b>{T.asis}</b><span class="pb__on"><i></i>{T.linea}</span></span>
+    <span class="pb__msg">{T.msg}</span>
+  </div>
+</div>
+
+<style>
+  .pb { --ink: #14212e; --acc: #1f4f86; --bg: #f5f3ee;
+    position: relative; width: 100%; height: 100%; display: grid; place-items: center; font-family: var(--font-body); }
+  .pb__win {
+    width: 400px; border-radius: var(--w-r-obj, 12px); overflow: hidden; background: #fbfaf8;
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75);
+    transform: translate(-40px, -10px);
+  }
+  .pb__chrome { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 12px; border-bottom: 1px solid rgba(14,14,13,.08); }
+  .pb__dots { display: flex; gap: 5px; }
+  .pb__dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(14,14,13,.14); }
+  .pb__url { flex: 1; text-align: center; font: 500 11px/22px var(--font-mono); color: #4a4743; background: rgba(14,14,13,.05); border-radius: 6px; }
+  .pb__st { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px; border-radius: 999px; font: 600 11px/1 var(--font-body); color: #0f3d31; background: rgba(var(--accent-teal-rgb, 79,195,161), .18); }
+  .pb__st i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal, #4fc3a1); }
+  .pb__site { background: var(--bg); color: var(--ink); padding: 14px 18px 20px; }
+  .pb__nav { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; }
+  .pb__logo { display: inline-flex; align-items: center; gap: 7px; color: var(--acc); }
+  .pb__logo span { font: 700 13px/1 var(--font-display); letter-spacing: -.01em; color: var(--ink); }
+  .pb__tel { font: 500 11px/1 var(--font-mono); color: #3d4a57; }
+  .pb__hero { display: grid; grid-template-columns: 1fr 112px; gap: 16px; align-items: center; }
+  .pb__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+  .pb__h { font: 600 28px/1.02 var(--font-display); letter-spacing: -.035em; }
+  .pb__sub { font-size: 12px; line-height: 1.4; color: #3d4a57; }
+  .pb__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--acc); color: #fff; font: 600 12px/1 var(--font-body); }
+  .pb__art { position: relative; height: 128px; border-radius: 10px; background: linear-gradient(160deg, #2c5f99, var(--acc) 70%); overflow: hidden; }
+  .pb__art i { position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.55); left: 50%; top: 56%; translate: -50% -50%; }
+  .pb__art i:nth-child(1) { width: 34px; height: 34px; background: rgba(255,255,255,.9); border: 0; }
+  .pb__art i:nth-child(2) { width: 66px; height: 66px; }
+  .pb__art i:nth-child(3) { width: 104px; height: 104px; border-color: rgba(255,255,255,.28); }
+
+  /* Satélite: su asistente en línea (tarjeta oscura, abajo a la derecha, asoma sobre la ventana). */
+  .pb__asis {
+    position: absolute; right: 22px; bottom: 26px; width: 214px; display: flex; flex-direction: column; gap: 10px;
+    padding: 12px 14px 14px; border-radius: var(--w-r-obj, 12px); background: var(--w-s3, #1f1f1d); color: var(--w-ink, #f0ede8);
+    border: 1px solid rgba(200,169,110,.18); box-shadow: 0 22px 44px -14px rgba(0,0,0,.8);
+  }
+  .pb__ah { display: flex; align-items: center; gap: 8px; font-size: 12px; white-space: nowrap; }
+  .pb__ah b { font-weight: 600; }
+  .pb__av { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f3dfb4, var(--accent-gold, #c8a96e) 60%, #7d6431); }
+  .pb__on { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; font: 500 11px/1 var(--font-mono); color: rgba(240,237,232,.72); }
+  .pb__on i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal, #4fc3a1); }
+  .pb__msg { align-self: flex-start; padding: 8px 11px; border-radius: 12px 12px 12px 4px; background: rgba(240,237,232,.08); font-size: 13px; line-height: 1.35; }
+
+  @container (max-width: 440px) {
+    .pb__win { width: min(100%, 300px); transform: translate(-14px, -30px); }
+    .pb__chrome { height: 28px; gap: 8px; padding: 0 10px; }
+    .pb__dots { display: none; }
+    .pb__site { padding: 10px 14px 14px; }
+    .pb__nav { padding-bottom: 10px; }
+    .pb__tel { display: none; }
+    .pb__hero { grid-template-columns: 1fr 74px; gap: 12px; }
+    .pb__h { font-size: 21px; }
+    .pb__sub { font-size: 11px; }
+    .pb__btn { height: 26px; padding: 0 12px; font-size: 11px; }
+    .pb__art { height: 92px; }
+    .pb__art i:nth-child(3) { display: none; }
+    .pb__asis { right: 6px; bottom: 6px; width: 196px; gap: 7px; padding: 9px 11px 11px; }
+    .pb__msg { font-size: 12px; }
+  }
+
+  /* ── Coreografía ── */
+  :global(.is-play) .pb__win { animation: pb-win 520ms var(--w-ease-text, ease) 100ms both; }
+  :global(.is-play) .pb__st { animation: pb-pop 360ms var(--w-ease-text, ease) 1000ms both; }
+  :global(.is-play) .pb__asis { animation: pb-sat 560ms var(--w-ease-sat, ease) 1500ms both; }
+  :global(.is-play) .pb__msg { animation: pb-in 380ms var(--w-ease-text, ease) 1950ms both; }
+  /* La ventana lleva su propio translate: la entrada parte 10 px más abajo de él. */
+  @keyframes pb-win { from { opacity: 0; transform: translate(-40px, 0) scale(.98); } }
+  @container (max-width: 440px) { :global(.is-play) .pb__win { animation-name: pb-win-s; } }
+  @keyframes pb-win-s { from { opacity: 0; transform: translate(-14px, -20px) scale(.98); } }
+  @keyframes pb-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes pb-pop { from { opacity: 0; transform: scale(.85); } }
+  @keyframes pb-sat { from { opacity: 0; transform: translateY(18px); } }
+  /* Micro-vida: "en línea" late (2 s) mientras la línea está a la vista. */
+  .pb__on i, .pb__st i { animation: pb-live 2s ease-in-out infinite; animation-play-state: paused; }
+  :global(.is-vista) .pb__on i, :global(.is-vista) .pb__st i { animation-play-state: running; }
+  @keyframes pb-live { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.is-play) .pb__win, :global(.is-play) .pb__st, :global(.is-play) .pb__asis, :global(.is-play) .pb__msg,
+    .pb__on i, .pb__st i { animation: none !important; }
+  }
+</style>

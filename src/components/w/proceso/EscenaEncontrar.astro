@@ -1,58 +1,187 @@
 ---
 // P11 · Escena 04 "Que te encuentren" (design/rediseno-workos-v2.md §2 P11).
-// Respuesta de asistente (RespuestaAsistente: "Buscando…" → check, "Leyendo fuentes" → check,
-// burbuja que cita **Tu Negocio**, tiempos W-CORE-10) con la ficha de mapa mini asomando
-// abajo a la izquierda (gesto W-ADV-58: objeto + satélite). El asistente que pregunta es uno
-// de los que nombra el paso 04 (ChatGPT, Gemini, Meta AI) y cambia en cada reproducción;
-// va en píldora de texto (§1.4: sin logo de OpenAI; P06 podrá cambiarla por LogoMarca).
-// LineaFases re-dispara RespuestaAsistente (clases is-armed/is-run) y rota [data-k].
-// Negocio neutro "Tu Negocio" (§1.6). Objeto de ejemplo: aria-hidden + data-nosnippet.
-import RespuestaAsistente from '../objetos/RespuestaAsistente.astro';
-import FichaMapaEjemplo from '../objetos/FichaMapaEjemplo.astro';
-import { copy, ASISTENTES, type Lang } from './proceso';
+// Respuesta de asistente con el patrón W-CORE-10 completo: cabecera con el LOGO de la plataforma
+// que responde (E-56-5; Gemini, ChatGPT o Meta AI, los que nombra el paso 04, uno por reproducción),
+// burbuja del usuario con pico abajo a la derecha, pasos con punto que late → check (1170 / 2000 ms)
+// y respuesta que cita **Tu Negocio** (2330 ms) con su fuente. Satélite: la ficha de mapa de
+// Tu Negocio (mapa dibujado y abstracto, ruta que se dibuja, pin que cae) que asoma a la derecha.
+// Negocio neutro "Tu Negocio" (§1.6). Objeto de ejemplo: aria-hidden + data-nosnippet; "Llamar" es span.
+// LineaFases rota [data-k] en cada reproducción. Micro-vida (§1.5, .is-vista): cursor de la
+// respuesta que parpadea y punto "Abierto" que late.
+// Mientras P05 (RespuestaAsistente mini) y P03 (FichaMapaEjemplo mini) no estén integrados, se
+// dibujan aquí; los logos salen de la tabla PROVISIONAL de proceso.ts (ver allí).
+import { copy, ASISTENTES, vbOptico, type Lang } from './proceso';
 
-interface Props { lang?: Lang; tone?: 'gold' | 'teal'; class?: string }
-const { lang = 'es', tone = 'gold', class: cls } = Astro.props;
+interface Props { lang?: Lang; class?: string }
+const { lang = 'es', class: cls } = Astro.props;
 const T = copy[lang].encontrar;
 const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
 ---
 <div class:list={['en', cls]} aria-hidden="true" data-nosnippet data-k="0" data-w2-asis={ASISTENTES.length}>
   <div class="en__main">
-    <span class="en__who">
-      <span class="en__lab">{T.lab}</span>
-      <span class="en__names">{ASISTENTES.map((a, i) => <b data-i={i}>{a}</b>)}</span>
-    </span>
-    <RespuestaAsistente lang={lang} tone={tone} size="card" business={negocio} question={T.pregunta} />
+  <span class="en__lab">{T.lab}</span>
+  <div class="en__win">
+    <div class="en__hd">
+      <span class="en__who">
+        {ASISTENTES.map((a, i) => (
+          <span class="en__as" data-i={i}>
+            {a.d
+              ? <span class="en__tile"><svg viewBox={vbOptico(a.optico)} width="14" height="14" fill={a.hex ? `#${a.hex}` : '#111111'}><path d={a.d} /></svg></span>
+              : null}
+            <b class:list={[!a.d && 'en__word']}>{a.nombre}</b>
+          </span>
+        ))}
+      </span>
+    </div>
+    <div class="en__body">
+      <span class="en__q">{T.pregunta}</span>
+      <span class="en__steps">
+        {T.pasos.map((p, i) => <span class="en__st" style={`--s:${i}`}><i class="en__dot"><svg viewBox="0 0 16 16" width="9" height="9"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg></i>{p}</span>)}
+      </span>
+      <span class="en__a">{T.antes}<b>{negocio}</b>{T.despues}<i class="en__caret"></i></span>
+      <span class="en__src"><i></i><span translate="no">tunegocio.example</span></span>
+    </div>
   </div>
-  <div class="en__sat"><FichaMapaEjemplo lang={lang} name={negocio} size="mini" tone={tone} /></div>
+  </div>
+
+  <div class="en__map">
+    <span class="en__geo">
+      <svg viewBox="0 0 220 92" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+        <rect width="220" height="92" fill="#ebe7df" />
+        <path d="M-10 70 C40 58 70 84 120 72 S190 50 232 60" fill="none" stroke="#c9dae6" stroke-width="10" />
+        <rect x="132" y="8" width="54" height="30" rx="6" fill="#d5e0c8" />
+        <g fill="none" stroke="#ffffff" stroke-width="5"><path d="M-5 22 H230" /><path d="M48 -5 V100" /><path d="M118 -5 L104 100" /><path d="M-5 50 L230 40" /></g>
+        <g fill="none" stroke="#f6f4ef" stroke-width="2.5"><path d="M80 -5 V100" /><path d="M160 -5 L150 100" /><path d="M-5 84 H90" /></g>
+        <path class="en__route" pathLength="1" d="M26 80 C40 56 62 54 84 48 S112 34 120 30" fill="none" stroke="#1f4f86" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1" />
+        <circle cx="26" cy="80" r="4.5" fill="#1f4f86" stroke="#fff" stroke-width="2" />
+      </svg>
+      <svg class="en__pin" viewBox="0 0 24 30" width="22" height="28"><path d="M12 1.5a9 9 0 0 0-9 9c0 6.6 9 17.5 9 17.5s9-10.9 9-17.5a9 9 0 0 0-9-9z" fill="#14212e" /><circle cx="12" cy="10.5" r="3.4" fill="#fff" /></svg>
+    </span>
+    <span class="en__info">
+      <b class="en__name">{negocio}</b>
+      <span class="en__cat">{T.cat}</span>
+      <span class="en__open"><i></i><b>{T.abierto}</b><span class="en__cierra">· {T.cierra}</span></span>
+      <span class="en__acts"><span class="en__call">{T.llamar}</span><span class="en__go">{T.llegar}</span></span>
+    </span>
+  </div>
 </div>
 
 <style>
-  .en { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
-  .en :global(.w-example) { display: none; }   /* un solo "Ejemplo" por sección: lo pone el panel */
-  .en { grid-template-columns: 284px 268px; gap: 16px; place-content: center; align-items: start; }
-  .en > .en__sat { align-self: end; }
-  .en__main { position: relative; width: 100%; transform: translateY(-14px); }
-  .en__main :global(.wo-ans) { width: 100%; }
-  .en__who { display: flex; align-items: center; gap: 8px; margin: 0 0 8px 2px; }
-  .en__lab { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); }
-  .en__names { display: inline-grid; }
-  .en__names b {
-    grid-area: 1 / 1; display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px;
-    font: 600 13px/1 var(--font-display); letter-spacing: -.01em; color: var(--w-ink, #f0ede8);
-    background: var(--w-s3, #1f1f1d); border: 1px solid rgba(var(--star-rgb), .14);
-    opacity: 0; transition: opacity 320ms ease, transform 320ms var(--w-ease-text, ease); transform: translateY(4px);
+  .en { --acc: #1f4f86; position: relative; width: 100%; height: 100%; display: grid; place-items: center; font-family: var(--font-body); }
+  .en__main { position: relative; display: flex; flex-direction: column; gap: 8px; width: 330px; transform: translate(-100px, 4px); }
+  .en__win {
+    position: relative; width: 100%;
+    background: #fbfaf8; color: var(--w-p-ink, #0e0e0d); border-radius: var(--w-r-obj, 12px);
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75); overflow: hidden;
   }
-  .en[data-k='0'] .en__names b[data-i='0'], .en[data-k='1'] .en__names b[data-i='1'], .en[data-k='2'] .en__names b[data-i='2'] { opacity: 1; transform: none; }
-  .en__sat { position: relative; width: 100%; --t: translateY(18px); transform: var(--t); box-shadow: 0 22px 44px -14px rgba(0,0,0,.75); border-radius: var(--w-r-obj, 12px); }
-  .en__sat :global(.wo-map) { width: 100%; }
+  .en__hd { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-bottom: 1px solid rgba(14,14,13,.08); }
+  .en__lab { padding-left: 2px; font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.62)); }
+  .en__who { display: inline-grid; justify-items: start; }
+  .en__as { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: 7px; opacity: 0; transform: translateY(4px); transition: opacity 320ms ease, transform 320ms var(--w-ease-text, ease); }
+  .en[data-k='0'] .en__as[data-i='0'], .en[data-k='1'] .en__as[data-i='1'], .en[data-k='2'] .en__as[data-i='2'] { opacity: 1; transform: none; }
+  .en__tile { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 5.4px; background: #fff; border: 1px solid rgba(14,14,13,.12); }
+  .en__as b { font: 600 14px/1 var(--font-display); letter-spacing: -.01em; color: #111; }
+  .en__word { font-size: 15px !important; letter-spacing: -.02em !important; }
 
-  @container (max-width: 520px) {
-    .en { grid-template-columns: minmax(0, 300px); gap: 0; padding: 16px 0; }
-    .en__main { transform: none; }
-    .en__sat { width: 250px; margin: -28px 0 0; justify-self: end; --t: translateX(10px); }
+  .en__body { display: flex; flex-direction: column; gap: 12px; padding: 14px 14px 14px; }
+  .en__q { align-self: flex-end; max-width: 82%; padding: 9px 12px; border-radius: 14px 14px 4px 14px; background: #ebe9e4; font-size: 13px; line-height: 1.35; }
+  .en__steps { display: flex; flex-direction: column; gap: 7px; }
+  .en__st { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--w-p-ink-2, #4a4743); }
+  .en__dot { position: relative; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; color: #fff; background: #8a6a2c; }
+  .en__a { font-size: 13.5px; line-height: 1.45; }
+  .en__a b { font-weight: 700; }
+  .en__caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 3px; vertical-align: -2px; background: #8a6a2c; }
+  .en__src { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(14,14,13,.12); font: 500 11px/1 var(--font-mono); color: #4a4743; }
+  .en__src i { width: 10px; height: 10px; border-radius: 3px; background: var(--acc); }
+
+  /* Satélite: ficha de mapa que asoma a la derecha, por encima del borde de la ventana. */
+  .en__map {
+    position: absolute; right: 14px; top: 34px; width: 220px; display: flex; flex-direction: column; overflow: hidden;
+    background: #fbfaf8; color: #14212e; border-radius: var(--w-r-obj, 12px);
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 26px 52px -16px rgba(0,0,0,.8);
   }
-  :global(.is-play) .en__sat { animation: en-sat 600ms var(--w-ease-text, ease) 2300ms both; }
-  @keyframes en-sat { from { opacity: 0; transform: var(--t) translateY(14px); } to { opacity: 1; transform: var(--t); } }
-  @media (prefers-reduced-motion: reduce) { :global(.is-play) .en__sat { animation: none; } .en__names b { transition: none; } }
+  .en__geo { position: relative; display: block; height: 92px; }
+  .en__geo > svg:first-child { display: block; }
+  .en__pin { position: absolute; left: calc(120 / 220 * 100% - 11px); top: calc(30 / 92 * 100% - 27px); filter: drop-shadow(0 3px 3px rgba(0,0,0,.25)); }
+  .en__info { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 12px; }
+  .en__name { font: 600 16px/1.15 var(--font-display); letter-spacing: -.02em; }
+  .en__cat { font-size: 12px; color: #4b5866; }
+  .en__open { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 12px; color: #4b5866; }
+  .en__open b { color: #1c6b4a; font-weight: 600; }
+  .en__open i { width: 7px; height: 7px; border-radius: 50%; background: #2f9e6e; }
+  .en__acts { display: flex; gap: 6px; padding-top: 6px; }
+  .en__acts span { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; font: 600 12px/1 var(--font-body); }
+  .en__call { background: var(--acc); color: #fff; }
+  .en__go { border: 1px solid rgba(20,33,46,.22); color: #14212e; }
+
+  /* ── Compacta y móvil: compuesta a su tamaño (texto ≥ 11 px). ── */
+  @container (max-width: 440px) {
+    .en { padding: 12px 0; align-content: start; }
+    .en__main { width: min(100%, 300px); transform: none; justify-self: start; gap: 6px; }
+    .en__hd { height: 36px; padding: 0 12px; }
+    .en__body { gap: 9px; padding: 10px 12px 12px; }
+    .en__q { font-size: 12px; }
+    .en__st { font-size: 12px; }
+    .en__a { font-size: 12.5px; }
+    .en__src { display: none; }
+    .en__map { position: relative; right: auto; top: auto; width: 206px; justify-self: end; margin-top: -4px; }
+    .en__geo { height: 64px; }
+    .en__info { padding: 8px 10px 10px; gap: 3px; }
+    .en__name { font-size: 14px; }
+    .en__cat, .en__open { font-size: 11px; }
+    .en__acts span { height: 24px; padding: 0 10px; font-size: 11px; }
+  }
+  /* Compacta de escritorio (escenario 388×252): ventana y ficha lado a lado. */
+  @media (min-width: 1120px) {
+    :global(.lf--compacta) .en { grid-template-columns: 240px 150px; align-items: center; justify-content: center; padding: 0; }
+    :global(.lf--compacta) .en__main { width: 100%; gap: 5px; }
+    :global(.lf--compacta) .en__hd { height: 30px; padding: 0 10px; }
+    :global(.lf--compacta) .en__tile { width: 20px; height: 20px; }
+    :global(.lf--compacta) .en__body { gap: 6px; padding: 8px 10px 10px; }
+    :global(.lf--compacta) .en__q { max-width: 92%; padding: 6px 9px; font-size: 11.5px; }
+    :global(.lf--compacta) .en__steps { gap: 4px; }
+    :global(.lf--compacta) .en__st { font-size: 11px; }
+    :global(.lf--compacta) .en__dot { width: 13px; height: 13px; }
+    :global(.lf--compacta) .en__a { font-size: 11.5px; line-height: 1.4; }
+    :global(.lf--compacta) .en__map { width: 160px; margin: 0 0 0 -10px; justify-self: start; }
+    :global(.lf--compacta) .en__geo { height: 56px; }
+    :global(.lf--compacta) .en__acts { flex-direction: column; align-items: flex-start; gap: 4px; }
+    :global(.lf--compacta) .en__cierra { display: none; }
+    :global(.lf--compacta) .en__map { margin-top: 0; }
+  }
+
+  /* ── Coreografía W-CORE-10 (1170 / 2000 / 2330 ms) ── */
+  :global(.is-play) .en__main { animation: en-win 480ms var(--w-ease-text, ease) 60ms both; }
+  :global(.is-play) .en__q { animation: en-in 420ms var(--w-ease-text, ease) 350ms both; }
+  :global(.is-play) .en__st { animation: en-in 320ms ease both; animation-delay: calc(700ms + var(--s) * 830ms); }
+  :global(.is-play) .en__dot { animation: en-dot 1300ms linear both; animation-delay: calc(700ms + var(--s) * 830ms); }
+  :global(.is-play) .en__dot svg { animation: en-chk 1300ms linear both; animation-delay: calc(700ms + var(--s) * 830ms); }
+  :global(.is-play) .en__a { animation: en-in 440ms var(--w-ease-text, ease) 2330ms both; }
+  :global(.is-play) .en__src { animation: en-in 360ms ease 2650ms both; }
+  :global(.is-play) .en__map { animation: en-sat 600ms var(--w-ease-sat, ease) 2600ms both; }
+  :global(.is-play) .en__route { animation: en-route 900ms var(--w-ease-ui, ease) 3000ms both; }
+  :global(.is-play) .en__pin { animation: en-pin 520ms var(--w-ease-text, ease) 3700ms both; }
+  @keyframes en-win { from { opacity: 0; translate: 0 10px; scale: .98; } }
+  @keyframes en-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  /* Punto que late (gris) y pasa a check oro: 0-36 % late, 36 % check. */
+  @keyframes en-dot {
+    0% { background: #c9c5bd; transform: scale(.7); } 12% { transform: scale(1); } 24% { transform: scale(.75); }
+    35% { background: #c9c5bd; transform: scale(1); } 40%, 100% { background: #8a6a2c; transform: scale(1); }
+  }
+  @keyframes en-chk { 0%, 36% { opacity: 0; transform: scale(.5); } 44%, 100% { opacity: 1; transform: none; } }
+  @keyframes en-sat { from { opacity: 0; transform: translateX(-20px) translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes en-route { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes en-pin { 0% { opacity: 0; transform: translateY(-8px); } 60% { opacity: 1; transform: translateY(1px); } 100% { opacity: 1; transform: none; } }
+  /* Micro-vida a la vista: cursor (1,06 s, steps) y punto "Abierto" (2 s). */
+  .en__caret { animation: en-caret 1.06s steps(2, jump-none) infinite; animation-play-state: paused; }
+  .en__open i { animation: en-live 2s ease-in-out infinite; animation-play-state: paused; }
+  :global(.is-vista) .en__caret, :global(.is-vista) .en__open i { animation-play-state: running; }
+  @keyframes en-caret { 0% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes en-live { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.is-play) .en__main, :global(.is-play) .en__q, :global(.is-play) .en__st, :global(.is-play) .en__dot, :global(.is-play) .en__dot svg,
+    :global(.is-play) .en__a, :global(.is-play) .en__src, :global(.is-play) .en__map, :global(.is-play) .en__route, :global(.is-play) .en__pin,
+    .en__caret, .en__open i { animation: none !important; }
+    .en__as { transition: none; }
+  }
 </style>

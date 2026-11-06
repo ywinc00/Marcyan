@@ -1,24 +1,59 @@
 ---
 // P11 · Escena 03 "Diseño bilingüe" (design/rediseno-workos-v2.md §2 P11).
-// La web de EJEMPLO del salón (WebEjemplo, marco tarjeta: el panel no llega a 640 px, §1.8)
-// con un segmentado ES | EN que cambia SOLO una vez a EN con un brillo que barre el texto
-// (900 ms) y vuelve a ES. Arranca con .is-play en un ancestro (LineaFases); sin él, o con
-// reducir movimiento, queda en el idioma de la página, quieta.
-// WebEjemplo: hoy es la versión v1 (props kind/site). Cuando entre P02 (marca/lienzo/<template>
-// del idioma inactivo) se cambia aquí: <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
-import WebEjemplo from '../objetos/WebEjemplo.astro';
-import { copy, type Lang } from './proceso';
+// La web de EJEMPLO del salón ("Tu Salón", §1.6: marca inventada con signo propio, paleta de 3 tonos,
+// hero tipográfico + volumen geométrico, sin cuadradito con inicial ni botón a todo el ancho) en un
+// navegador dibujado, con el segmentado ES | EN como satélite. Cambia UNA vez al otro idioma y vuelve:
+// el idioma nuevo entra con una cortina que barre de izquierda a derecha con su filo de luz (máscara
+// por translate contrapuesto, §1.8: nunca se ven los dos textos a la vez). Arranca con .is-play en un
+// ancestro (LineaFases); sin él, o con reducir movimiento, queda en el idioma de la página, quieta.
+// Micro-vida (§1.5): el sol del arco respira mientras la línea está a la vista (.is-vista).
+// Mientras P02 (WebEjemplo premium) no esté integrado, la web se dibuja aquí; cuando entre, el
+// director decide si se sustituye por <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
+import { copy, salon, type Lang } from './proceso';
 
 interface Props { lang?: Lang; class?: string }
 const { lang = 'es', class: cls } = Astro.props;
 const T = copy[lang].bilingue;
 const otro: Lang = lang === 'es' ? 'en' : 'es';
+const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
 ---
 <div class:list={['bi', cls]} aria-hidden="true" data-nosnippet>
-  <div class="bi__web">
-    <div class="bi__l bi__l--a"><WebEjemplo kind="salon" frame="tarjeta" lang={lang} site={lang} example={false} /></div>
-    <div class="bi__l bi__l--b"><WebEjemplo kind="salon" frame="tarjeta" lang={lang} site={otro} example={false} /></div>
-    <span class="bi__shine"></span>
+  <div class="bi__win">
+    <div class="bi__chrome">
+      <span class="bi__dots"><i></i><i></i><i></i></span>
+      <span class="bi__url" translate="no">tusalon.example</span>
+    </div>
+    <div class="bi__view">
+      {capas.map(({ l, c }) => {
+        const S = salon[l];
+        const site = (
+          <div class="bi__site" lang={l}>
+            <div class="bi__nav">
+              <span class="bi__logo">
+                <svg viewBox="0 0 16 20" width="13" height="16"><path d="M2 19V8a6 6 0 0 1 12 0v11" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="8" cy="9" r="2.2" fill="currentColor" /></svg>
+                <span translate="no">TU SALÓN</span>
+              </span>
+              <span class="bi__links">{S.nav.map((n) => <span>{n}</span>)}<b>{l.toUpperCase()}</b></span>
+            </div>
+            <div class="bi__hero">
+              <div class="bi__txt">
+                <span class="bi__h">{S.titular}</span>
+                <span class="bi__sub">{S.bajada}</span>
+                <span class="bi__btn">{S.boton}</span>
+              </div>
+              <span class="bi__art"><i class="bi__sun"></i><i class="bi__hill"></i></span>
+            </div>
+            <div class="bi__strip">
+              <span class="bi__svc">{S.servicios.map((s) => <span>{s}</span>)}</span>
+              <span class="bi__hor">{S.horario}</span>
+            </div>
+          </div>
+        );
+        return c === 'a'
+          ? <div class="bi__la">{site}</div>
+          : <div class="bi__wipe"><div class="bi__lb">{site}</div><span class="bi__edge bi__edge--r"></span><span class="bi__edge bi__edge--l"></span></div>;
+      })}
+    </div>
   </div>
   <span class="bi__seg" data-from={lang}>
     <span class="bi__pill"></span>
@@ -28,53 +63,111 @@ const otro: Lang = lang === 'es' ? 'en' : 'es';
 </div>
 
 <style>
-  .bi { position: relative; display: grid; place-items: center; width: 100%; height: 100%; }
-  .bi__web { position: relative; display: grid; width: min(100%, 360px); padding: 18px; border-radius: var(--w-r-obj, 12px); overflow: clip; background: var(--w-p-bg, #f0ede8); border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); box-shadow: 0 24px 48px -18px rgba(0,0,0,.6); }
-  .bi__l { grid-area: 1 / 1; }
-  .bi__l--b { opacity: 0; }
-  .bi__l :global(.wo-web) { width: 100%; max-width: none; }
-  .bi__shine {
-    position: absolute; inset: 0; pointer-events: none; opacity: 0;
-    background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
-    transform: translateX(-100%);
+  .bi { --s-bg: #f4ece4; --s-ink: #2a1d17; --s-acc: #a8502f;
+    position: relative; display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--font-body); }
+  .bi__win {
+    width: 424px; border-radius: var(--w-r-obj, 12px); overflow: hidden; background: #fbfaf8;
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75); transform: translateX(-12px);
   }
-  /* Segmentado: satélite que asoma por arriba a la derecha de la web (gesto W-ADV-58). */
+  .bi__chrome { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px; border-bottom: 1px solid rgba(14,14,13,.08); }
+  .bi__dots { display: flex; gap: 5px; }
+  .bi__dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(14,14,13,.14); }
+  .bi__url { flex: 1; margin-right: 44px; text-align: center; font: 500 11px/22px var(--font-mono); color: #4a4743; background: rgba(14,14,13,.05); border-radius: 6px; }
+
+  /* Vista: la capa A (idioma de la página) debajo; la B dentro de una cortina que la descubre. */
+  .bi__view { position: relative; display: grid; overflow: hidden; }
+  .bi__la, .bi__wipe { grid-area: 1 / 1; }
+  .bi__wipe { position: relative; overflow: hidden; transform: translateX(-101%); }
+  .bi__lb { transform: translateX(101%); }
+  .bi__edge { position: absolute; top: 0; bottom: 0; width: 56px; pointer-events: none; opacity: 0; }
+  .bi__edge--r { right: 0; background: linear-gradient(90deg, rgba(255,250,240,0), rgba(255,250,240,.85)); }
+  .bi__edge--l { left: 0; background: linear-gradient(270deg, rgba(255,250,240,0), rgba(255,250,240,.85)); }
+
+  .bi__site { background: var(--s-bg); color: var(--s-ink); padding: 14px 20px 0; }
+  .bi__nav { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; }
+  .bi__logo { display: inline-flex; align-items: center; gap: 8px; color: var(--s-acc); }
+  .bi__logo span { font: 600 11px/1 var(--font-display); letter-spacing: .3em; color: var(--s-ink); }
+  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: #5b4a41; }
+  .bi__links b { font: 600 11px/1 var(--font-mono); letter-spacing: .08em; color: var(--s-acc); }
+  .bi__hero { display: grid; grid-template-columns: 1fr 120px; gap: 18px; align-items: end; }
+  .bi__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 24px; }
+  .bi__h { font: 500 36px/.96 var(--font-display); letter-spacing: -.045em; }
+  .bi__sub { font-size: 12px; line-height: 1.4; color: #5b4a41; }
+  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--s-acc); color: #fff8f2; font: 600 12px/1 var(--font-body); }
+  .bi__art { position: relative; height: 176px; border-radius: 60px 60px 0 0; overflow: hidden; background: linear-gradient(180deg, #f2cdb6 0%, #e3a888 55%, #c9744f 100%); }
+  .bi__sun { position: absolute; left: 50%; top: 40px; width: 48px; height: 48px; margin-left: -24px; border-radius: 50%; background: #fff3e8; }
+  .bi__hill { position: absolute; left: -20%; right: -20%; bottom: -60px; height: 110px; border-radius: 50%; background: var(--s-acc); }
+  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid rgba(42,29,23,.14); font-size: 12px; }
+  .bi__svc { display: inline-flex; gap: 14px; font-weight: 600; }
+  .bi__hor { font: 500 11px/1 var(--font-mono); color: #5b4a41; white-space: nowrap; }
+
+  /* Segmentado: satélite que asoma por arriba a la derecha de la ventana (gesto W-ADV-58). */
   .bi__seg {
-    position: absolute; top: max(6px, calc(50% - 168px)); right: max(6px, calc(50% - 222px));
+    position: absolute; top: max(6px, calc(50% - 168px)); right: max(6px, calc(50% - 236px));
     display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px;
-    background: var(--w-s3, #1f1f1d); border: 1px solid var(--w-line-strong, rgba(200,169,110,.18));
+    background: var(--w-s3, #1f1f1d); border: 1px solid rgba(200,169,110,.18);
     box-shadow: 0 12px 28px -10px rgba(0,0,0,.7);
     font: 500 12px/1 var(--font-mono); letter-spacing: .1em;
   }
-  .bi__o { position: relative; z-index: 1; width: 44px; height: 28px; display: grid; place-items: center; color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .bi__o { position: relative; z-index: 1; width: 44px; height: 28px; display: grid; place-items: center; color: rgba(240,237,232,.6); }
   .bi__o.is-a { color: var(--w-p-ink, #0e0e0d); }
-  .bi__pill { position: absolute; top: 4px; left: 4px; width: 44px; height: 28px; border-radius: 999px; background: var(--accent-gold); }
+  .bi__pill { position: absolute; top: 4px; left: 4px; width: 44px; height: 28px; border-radius: 999px; background: var(--accent-gold, #c8a96e); }
   .bi__seg[data-from='en'] .bi__pill { transform: translateX(44px); }
 
-  @container (max-width: 480px) {
-    .bi { padding: 40px 0 16px; }
-    .bi__web { width: min(100%, 300px); }
-    .bi__seg { top: 4px; right: 8px; }
+  /* ── Compacta y móvil: la web compuesta a su tamaño (texto ≥ 11 px), no encogida. ── */
+  @container (max-width: 440px) {
+    .bi { padding: 22px 0 8px; }
+    .bi__win { width: min(100%, 320px); transform: none; }
+    .bi__chrome { height: 26px; }
+    .bi__dots { display: none; }
+    .bi__url { margin-right: 70px; }
+    .bi__site { padding: 10px 14px 0; }
+    .bi__nav { padding-bottom: 10px; }
+    .bi__links span { display: none; }
+    .bi__hero { grid-template-columns: 1fr 84px; gap: 12px; }
+    .bi__txt { gap: 7px; padding-bottom: 12px; }
+    .bi__h { font-size: 22px; }
+    .bi__sub { font-size: 11px; }
+    .bi__btn { height: 26px; padding: 0 12px; font-size: 11px; }
+    .bi__art { height: 100px; border-radius: 42px 42px 0 0; }
+    .bi__sun { top: 22px; width: 30px; height: 30px; margin-left: -15px; }
+    .bi__hill { bottom: -70px; }
+    .bi__strip { height: 30px; font-size: 11px; }
+    .bi__hor { display: none; }
+    .bi__seg { top: 6px; right: max(6px, calc(50% - 166px)); }
+    .bi__o { width: 38px; height: 24px; font-size: 11px; }
+    .bi__pill { width: 38px; height: 24px; }
+    .bi__seg[data-from='en'] .bi__pill { transform: translateX(38px); }
   }
-  /* ── Coreografía: 0-1,3 s idioma de la página · cambia al otro · 3,6 s vuelve ── */
-  :global(.is-play) .bi__l--a { animation: bi-a 4800ms ease both; }
-  :global(.is-play) .bi__l--b { animation: bi-b 4800ms ease both; }
-  :global(.is-play) .bi__shine { animation: bi-shine 4800ms linear both; }
-  :global(.is-play) .bi__seg[data-from='es'] .bi__pill { animation: bi-pill-es 4800ms var(--w-ease-ui, ease) both; }
-  :global(.is-play) .bi__seg[data-from='en'] .bi__pill { animation: bi-pill-en 4800ms var(--w-ease-ui, ease) both; }
-  :global(.is-play) .bi__o { animation: bi-o 4800ms linear both; }
-  @keyframes bi-a { 0%, 27% { opacity: 1; } 33%, 75% { opacity: 0; } 81%, 100% { opacity: 1; } }
-  @keyframes bi-b { 0%, 27% { opacity: 0; } 33%, 75% { opacity: 1; } 81%, 100% { opacity: 0; } }
-  @keyframes bi-shine { 0%, 25% { opacity: 0; transform: translateX(-100%); } 27% { opacity: 1; } 44% { opacity: 1; transform: translateX(100%); } 45%, 100% { opacity: 0; transform: translateX(100%); } }
-  @keyframes bi-pill-es { 0%, 25% { transform: none; } 30%, 75% { transform: translateX(44px); } 80%, 100% { transform: none; } }
-  @keyframes bi-pill-en { 0%, 25% { transform: translateX(44px); } 30%, 75% { transform: none; } 80%, 100% { transform: translateX(44px); } }
-  /* El texto del segmentado sigue a la píldora: el activo en tinta, el otro apagado. */
-  :global(.is-play) .bi__o.is-a { animation-name: bi-oa; }
-  :global(.is-play) .bi__o:not(.is-a) { animation-name: bi-ob; }
-  @keyframes bi-oa { 0%, 27% { color: var(--w-p-ink, #0e0e0d); } 29%, 77% { color: rgba(240,237,232,.6); } 79%, 100% { color: var(--w-p-ink, #0e0e0d); } }
-  @keyframes bi-ob { 0%, 27% { color: rgba(240,237,232,.6); } 29%, 77% { color: var(--w-p-ink, #0e0e0d); } 79%, 100% { color: rgba(240,237,232,.6); } }
+
+  /* ── Coreografía (5,4 s): idioma de la página · cortina al otro (900 ms) · se queda · vuelve ── */
+  :global(.is-play) .bi__win { animation: bi-win 480ms var(--w-ease-text, ease) 60ms both; }
+  :global(.is-play) .bi__wipe { animation: bi-wipe 5400ms var(--w-ease-ui, ease) both; }
+  :global(.is-play) .bi__lb { animation: bi-lb 5400ms var(--w-ease-ui, ease) both; }
+  :global(.is-play) .bi__edge--r { animation: bi-er 5400ms linear both; }
+  :global(.is-play) .bi__edge--l { animation: bi-el 5400ms linear both; }
+  :global(.is-play) .bi__seg[data-from='es'] .bi__pill { animation: bi-pill 5400ms var(--w-ease-ui, ease) both; --d: 44px; }
+  :global(.is-play) .bi__seg[data-from='en'] .bi__pill { animation: bi-pill-r 5400ms var(--w-ease-ui, ease) both; --d: 44px; }
+  @keyframes bi-win { from { opacity: 0; translate: 0 10px; scale: .98; } }
+  /* 0-24 % quieta · 24-41 % la cortina descubre el otro idioma · 41-72 % quieta · 72-89 % la cortina se va y vuelve el de la página. */
+  @keyframes bi-wipe { 0%, 24% { transform: translateX(-101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(101%); } }
+  @keyframes bi-lb { 0%, 24% { transform: translateX(101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(-101%); } }
+  @keyframes bi-er { 0%, 24% { opacity: 0; } 26%, 39% { opacity: 1; } 41%, 100% { opacity: 0; } }
+  @keyframes bi-el { 0%, 72% { opacity: 0; } 74%, 87% { opacity: 1; } 89%, 100% { opacity: 0; } }
+  @keyframes bi-pill { 0%, 24% { transform: none; } 30%, 72% { transform: translateX(var(--d)); } 78%, 100% { transform: none; } }
+  @keyframes bi-pill-r { 0%, 24% { transform: translateX(var(--d)); } 30%, 72% { transform: none; } 78%, 100% { transform: translateX(var(--d)); } }
+  @container (max-width: 440px) { :global(.is-play) .bi__pill { --d: 38px; } }
+  /* El texto del segmentado sigue a la píldora. */
+  :global(.is-play) .bi__o.is-a { animation: bi-oa 5400ms linear both; }
+  :global(.is-play) .bi__o:not(.is-a) { animation: bi-ob 5400ms linear both; }
+  @keyframes bi-oa { 0%, 26% { color: var(--w-p-ink, #0e0e0d); } 28%, 74% { color: rgba(240,237,232,.6); } 76%, 100% { color: var(--w-p-ink, #0e0e0d); } }
+  @keyframes bi-ob { 0%, 26% { color: rgba(240,237,232,.6); } 28%, 74% { color: var(--w-p-ink, #0e0e0d); } 76%, 100% { color: rgba(240,237,232,.6); } }
+  /* Micro-vida: el sol del arco respira (6 s) mientras la línea está a la vista. */
+  .bi__sun { animation: bi-sun 6s ease-in-out infinite; animation-play-state: paused; }
+  :global(.is-vista) .bi__sun { animation-play-state: running; }
+  @keyframes bi-sun { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(5px) scale(1.06); } }
   @media (prefers-reduced-motion: reduce) {
-    :global(.is-play) .bi__l--a, :global(.is-play) .bi__l--b, :global(.is-play) .bi__shine,
-    :global(.is-play) .bi__pill, :global(.is-play) .bi__o { animation: none !important; }
+    :global(.is-play) .bi__win, :global(.is-play) .bi__wipe, :global(.is-play) .bi__lb, :global(.is-play) .bi__edge--r, :global(.is-play) .bi__edge--l,
+    :global(.is-play) .bi__pill, :global(.is-play) .bi__o, .bi__sun { animation: none !important; }
   }
 </style>

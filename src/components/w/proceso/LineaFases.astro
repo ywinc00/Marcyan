@@ -14,8 +14,13 @@
 //    duplicar DOM. Ningún ancestro lleva overflow:hidden (trampa F-05).
 //  · Fase activa: IntersectionObserver rootMargin -45% 0px -45% 0px (umbral, nunca píxel a píxel).
 //  · Portada: la ÚLTIMA fase va a lo ancho bajo el bloque con el slot `final` (EscenaAbreApps de
-//    P08; si no llega, vacío). Compacta (sobre nosotros): las 5 fases en el bloque y la 5.ª
-//    escena es MiniPasos "publicada".
+//    P08); mientras no llega, ocupa el hueco EscenaPublicada en una caja de 330 px de alto (el
+//    máximo previsto para el slot, así el alto de la sección ya se mide con él). Compacta (sobre
+//    nosotros): las 5 fases en el bloque y la 5.ª escena es EscenaPublicada.
+//  · Escenas compuestas a su tamaño: la compacta (420×320) NO se encoge con zoom (texto < 11 px);
+//    cada escena tiene su composición pequeña por @container y :global(.lf--compacta).
+//  · Escena 01 (aquí abajo): correo abierto "Tu propuesta" + aviso que llega + reloj de 24 h. Se
+//    dibuja aquí mientras P03 (MiniPasos correo) no esté integrado.
 //  · Cohete (E-02, G01): al activarse la última fase emite `w2:fases-fin` (burbujea) con
 //    detail.origen = centro del punto de esa fase en px relativos a la <section> que la contiene
 //    (o a la propia línea si no hay sección). No implementa el vuelo.
@@ -26,10 +31,10 @@
 // Todo su CSS va aquí (sale fuera de v3: portada) y solo lee --w-* y tokens.
 // ─────────────────────────────────────────────────────────────
 import Ejemplo from '../Ejemplo.astro';
-import MiniPasos from '../objetos/MiniPasos.astro';
 import EscenaAlcance from './EscenaAlcance.astro';
 import EscenaBilingue from './EscenaBilingue.astro';
 import EscenaEncontrar from './EscenaEncontrar.astro';
+import EscenaPublicada from './EscenaPublicada.astro';
 import { copy, type Fase, type Lang } from './proceso';
 
 interface Props {
@@ -76,23 +81,32 @@ const C = T.correo;
           <div class="lf__mbar" aria-hidden="true"><span class="lf__fase">{T.fase} <b>{dos(i)}</b> / {dos(N - 1)}</span><span class="lf__live"></span>{i === 0 && <Ejemplo lang={lang} pos="inline" class="lf__ej" />}</div>
           <div class="lf__stage" aria-hidden="true">
             {i === 0 && (
-              /* Escena 01 "Propuesta en 24h": MiniPasos correo (P03) + hoja abierta de la propuesta.
-                 Puente hasta P03: cuando MiniPasos traiga variante="correo" animada con su hoja, la
-                 hoja .co__sat de aquí se retira y queda solo <MiniPasos variante="correo" />. */
               <div class="co" data-nosnippet>
-                <div class="co__main"><MiniPasos kind="correo" lang={lang} size="card" example={false} /></div>
-                <div class="co__sat">
-                  <span class="co__from"><span translate="no">Marcyan</span><em>{C.hace}</em></span>
-                  <span class="co__tit">{C.titulo}</span>
-                  <ol class="co__idx">{C.idx.map((t, k) => <li style={`--k:${k}`}><span>{dos(k)}</span>{t}</li>)}</ol>
+                <div class="co__mail">
+                  <span class="co__hd">
+                    <span class="co__av"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="5" fill="currentColor" /><ellipse cx="12" cy="12" rx="10" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(-18 12 12)" /></svg></span>
+                    <span class="co__who"><b translate="no">Marcyan</b><em>{C.para}</em></span>
+                    <span class="co__hace">{C.hace}</span>
+                  </span>
+                  <span class="co__subj">{C.titulo}</span>
+                  <span class="co__body">{C.cuerpo}</span>
+                  <ol class="co__idx">{C.idx.map(([k, v], j) => <li style={`--k:${j}`}><span class="co__n">{dos(j)}</span><span class="co__k">{k}</span><span class="co__v">{v}</span></li>)}</ol>
                   <span class="co__pie"><svg viewBox="0 0 16 16" width="12" height="12"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>{C.pie}</span>
+                </div>
+                <div class="co__toast">
+                  <span class="co__tdot"></span>
+                  <span class="co__tt"><span class="co__tl">{C.aviso}</span><span class="co__ts"><b translate="no">Marcyan</b> · {C.titulo}</span></span>
+                </div>
+                <div class="co__clock">
+                  <svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(240,237,232,.12)" stroke-width="3" /><circle class="co__ring" cx="32" cy="32" r="27" pathLength="1" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="1" transform="rotate(-90 32 32)" /></svg>
+                  <span>{C.reloj}</span>
                 </div>
               </div>
             )}
             {i === 1 && <EscenaAlcance lang={lang} />}
             {i === 2 && <EscenaBilingue lang={lang} />}
             {i === 3 && <EscenaEncontrar lang={lang} />}
-            {i === 4 && <div class="pu"><MiniPasos kind="publicada" lang={lang} size="card" example={false} /></div>}
+            {i === 4 && <EscenaPublicada lang={lang} />}
           </div>
         </div>
       </Fragment>
@@ -100,14 +114,21 @@ const C = T.correo;
   </div>
 
   {fin && (
-    <div class:list={['lf__fin', conFinal && 'lf__fin--slot']}>
+    <div class="lf__fin lf__fin--slot">
       <div class="lf__paso lf__paso--fin" data-w2-paso={N - 1}>
         <span class="lf__dot" data-w2-dot></span>
         <span class="lf__n">{fin.n}</span>
         <h3 class="lf__t"><button type="button" class="lf__b" data-w2-ir={N - 1}>{fin.titulo}</button></h3>
         <p class="lf__x">{fin.texto}</p>
       </div>
-      {conFinal && <div class="lf__slot"><slot name="final" /></div>}
+      {conFinal
+        ? <div class="lf__slot"><slot name="final" /></div>
+        : (
+          <div class="lf__slot lf__slot--esc" data-w2-final>
+            <p class="sr-only">{T.sr[N - 1]}</p>
+            <div class="lf__stage" aria-hidden="true"><EscenaPublicada lang={lang} /></div>
+          </div>
+        )}
     </div>
   )}
 </div>
@@ -206,11 +227,14 @@ const C = T.correo;
     .lf[data-w2-on] .lf__esc.is-leaving { transform: translateY(-8px); }
     .lf__mbar { display: none; }
     .lf__stage { width: 100%; height: 100%; place-items: center; }
-    .lf--compacta .lf__stage { width: 524px; height: 340px; zoom: .74; }
 
     .lf__fin { display: grid; grid-template-columns: 420px minmax(0, var(--pw)); justify-content: space-between; column-gap: 48px; align-items: start; padding-top: 20px; }
     .lf__fin .lf__paso { padding-bottom: 0; }
     .lf__slot { min-width: 0; }
+    .lf__slot--esc { height: 330px; padding: 16px; border-radius: var(--w-r-tray, 22px);
+      background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09)); box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08)); }
+    .lf__slot--esc .lf__stage { border-radius: var(--w-r-obj, 12px); border: 1px solid rgba(var(--star-rgb), .05);
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(var(--accent-gold-rgb), .07), transparent 70%), radial-gradient(rgba(var(--accent-gold-rgb), .20) 1px, transparent 1.3px) 0 0 / 24px 24px, #151514; }
   }
 
   /* ── Móvil / apilado: sin sticky, escena bajo su paso ── */
@@ -229,46 +253,104 @@ const C = T.correo;
       min-height: 360px;
     }
     .lf__slot { margin: 16px 0 0; }
+    .lf__slot--esc { padding: 12px; border-radius: var(--w-r-tray, 22px); background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09)); }
   }
 
-  /* ── Escena 01: correo + hoja de la propuesta ── */
-  .co { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
-  .co__main { width: 320px; transform: translate(-64px, -76px); }
-  .co__main :global(.wo-mini) { width: 100%; }
-  .co__sat {
-    position: absolute; left: calc(50% - 20px); top: calc(50% - 34px); width: 236px;
-    display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 14px;
-    background: #fff; color: var(--w-p-ink, #0e0e0d); border-radius: var(--w-r-obj, 12px);
-    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); box-shadow: 0 26px 50px -16px rgba(0,0,0,.7);
+  /* ── Escena 01: correo abierto "Tu propuesta" + aviso que llega (satélite delante, arriba a la
+     derecha) + reloj de 24 h (satélite detrás, abajo a la derecha). ── */
+  .co { position: relative; width: 100%; height: 100%; display: grid; place-items: center; font-family: var(--font-body); }
+  .co__mail {
+    position: relative; z-index: 1; width: 330px; display: flex; flex-direction: column; transform: translate(-40px, 14px);
+    padding: 14px 16px 12px; background: #fbfaf8; color: var(--w-p-ink, #0e0e0d); border-radius: var(--w-r-obj, 12px);
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75);
   }
-  .co__from { display: flex; justify-content: space-between; gap: 8px; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); }
-  .co__from em { font-style: normal; text-transform: none; letter-spacing: 0; }
-  .co__tit { font: 500 18px/1.2 var(--font-display); letter-spacing: -.02em; }
+  .co__hd { display: flex; align-items: center; gap: 10px; }
+  .co__av { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #0e0e0d; color: var(--accent-gold, #c8a96e); }
+  .co__who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .co__who b { font-size: 13px; font-weight: 600; }
+  .co__who em { font-style: normal; font-size: 11px; color: var(--w-p-ink-2, #4a4743); }
+  .co__hace { margin-left: auto; font: 500 11px/1 var(--font-mono); color: var(--w-p-ink-2, #4a4743); white-space: nowrap; }
+  .co__subj { margin-top: 12px; font: 500 20px/1.15 var(--font-display); letter-spacing: -.02em; }
+  .co__body { margin: 4px 0 8px; font-size: 13px; line-height: 1.4; color: var(--w-p-ink-2, #4a4743); }
   .co__idx { list-style: none; margin: 0; padding: 0; }
-  .co__idx li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; font-size: 14px; border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
-  .co__idx li span { font: 500 11px/1 var(--font-mono); color: var(--w-p-ink-2, #4a4743); }
-  .co__pie { display: inline-flex; align-items: center; gap: 6px; padding-top: 4px; font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; }
+  .co__idx li { display: grid; grid-template-columns: 22px auto 1fr; align-items: baseline; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(14,14,13,.08); font-size: 13px; }
+  .co__n { font: 500 11px/1 var(--font-mono); color: var(--w-p-ink-2, #4a4743); }
+  .co__k { font-weight: 600; }
+  .co__v { text-align: right; color: var(--w-p-ink-2, #4a4743); }
+  .co__pie { display: inline-flex; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid rgba(14,14,13,.08); font: 500 12px/1.2 var(--font-mono); letter-spacing: .02em; }
   .co__pie svg { color: #8a6a2c; }
-  @container (max-width: 480px) {
-    .co { min-height: 372px; }
-    .co__main { width: min(100%, 290px); transform: translate(-10px, -86px); }
-    .co__sat { left: auto; right: 10px; top: auto; bottom: 14px; width: 222px; }
-    .co__pie { font-size: 11px; letter-spacing: 0; }
+  .co__toast {
+    position: absolute; z-index: 2; top: 12px; right: 22px; width: 228px; display: flex; align-items: flex-start; gap: 10px;
+    padding: 11px 13px; border-radius: var(--w-r-obj, 12px); background: var(--w-s3, #1f1f1d); color: var(--w-ink, #f0ede8);
+    border: 1px solid rgba(200,169,110,.18); box-shadow: 0 18px 40px -12px rgba(0,0,0,.8);
   }
-  .pu { display: grid; place-items: center; width: 100%; height: 100%; }
-  .pu :global(.wo-mini) { width: 320px; }
+  .co__tdot { flex: none; width: 8px; height: 8px; margin-top: 3px; border-radius: 50%; background: var(--accent-gold, #c8a96e); }
+  .co__tt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .co__tl { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent-gold, #c8a96e); }
+  .co__ts { font-size: 13px; line-height: 1.3; color: rgba(240,237,232,.85); }
+  .co__ts b { font-weight: 600; color: var(--w-ink, #f0ede8); }
+  .co__clock {
+    position: absolute; z-index: 0; right: 92px; bottom: 30px; width: 92px; height: 92px; display: grid; place-items: center;
+    border-radius: 50%; background: var(--w-s3, #1f1f1d); border: 1px solid rgba(200,169,110,.18); color: var(--accent-gold, #c8a96e);
+    box-shadow: 0 18px 40px -12px rgba(0,0,0,.8);
+  }
+  .co__clock > * { grid-area: 1 / 1; }
+  .co__clock span { font: 500 14px/1 var(--font-mono); letter-spacing: .04em; color: var(--w-ink, #f0ede8); }
 
-  :global(.is-play) .co__main :global(.wo-mini__mail.is-on) { animation: co-row 400ms var(--w-ease-text, ease) 300ms both; }
-  :global(.is-play) .co__sat { animation: co-sat 520ms var(--w-ease-text, ease) 1000ms both; }
-  :global(.is-play) .co__idx li { animation: co-in 360ms ease both; animation-delay: calc(1350ms + var(--k) * 140ms); }
-  :global(.is-play) .co__pie { animation: co-in 360ms ease 1900ms both; }
-  @keyframes co-row { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
-  @keyframes co-sat { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+  /* Compacta y móvil: compuesta a su tamaño, nunca encogida (ningún texto < 11 px). */
+  @container (max-width: 440px) {
+    .co { min-height: 340px; align-content: center; }
+    .co__mail { width: min(100%, 300px); transform: translateY(14px); justify-self: start; padding: 12px 14px 10px; }
+    .co__subj { margin-top: 10px; font-size: 17px; }
+    .co__body { font-size: 12px; }
+    .co__idx li { padding: 6px 0; font-size: 12px; }
+    .co__toast { top: 0; right: 0; width: 196px; padding: 9px 11px; }
+    .co__ts { font-size: 12px; }
+    .co__clock { right: 2px; bottom: 6px; width: 64px; height: 64px; }
+    .co__clock svg { width: 48px; height: 48px; }
+    .co__clock span { font-size: 12px; }
+  }
+  /* Compacta de escritorio (escenario 388×252). */
+  @media (min-width: 1120px) {
+    :global(.lf--compacta) .co { min-height: 0; }
+    :global(.lf--compacta) .co__mail { width: 236px; transform: translate(6px, 14px); padding: 10px 12px 8px; }
+    :global(.lf--compacta) .co__v { display: none; }
+    :global(.lf--compacta) .co__av { width: 24px; height: 24px; }
+    :global(.lf--compacta) .co__subj { margin-top: 6px; font-size: 15px; }
+    :global(.lf--compacta) .co__body { display: none; }
+    :global(.lf--compacta) .co__idx { margin-top: 6px; }
+    :global(.lf--compacta) .co__idx li { padding: 4px 0; font-size: 11.5px; grid-template-columns: 18px auto 1fr; }
+    :global(.lf--compacta) .co__pie { padding-top: 6px; font-size: 11px; }
+    :global(.lf--compacta) .co__toast { top: 0; right: 0; width: 172px; padding: 8px 10px; gap: 8px; }
+    :global(.lf--compacta) .co__ts { font-size: 11.5px; }
+    :global(.lf--compacta) .co__clock { right: 18px; bottom: 8px; width: 64px; height: 64px; }
+    :global(.lf--compacta) .co__clock svg { width: 48px; height: 48px; }
+    :global(.lf--compacta) .co__clock span { font-size: 12px; }
+  }
+
+  /* Coreografía: aviso que llega (200 ms) → se abre el correo (700 ms) → índice en cascada → pie;
+     el reloj se cierra a la vez (stroke-dashoffset). */
+  :global(.is-play) .co__toast { animation: co-toast 420ms var(--w-ease-text, ease) 200ms both; }
+  :global(.is-play) .co__mail { animation: co-mail 480ms var(--w-ease-text, ease) 700ms both; }
+  :global(.is-play) .co__body { animation: co-in 360ms ease 1050ms both; }
+  :global(.is-play) .co__idx li { animation: co-in 360ms ease both; animation-delay: calc(1200ms + var(--k) * 160ms); }
+  :global(.is-play) .co__pie { animation: co-in 360ms ease 1800ms both; }
+  :global(.is-play) .co__clock { animation: co-clock 520ms var(--w-ease-sat, ease) 900ms both; }
+  :global(.is-play) .co__ring { animation: co-ring 1400ms var(--w-ease-ui, ease) 1000ms both; }
+  @keyframes co-toast { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+  @keyframes co-mail { from { opacity: 0; translate: 0 10px; scale: .98; } }
   @keyframes co-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes co-clock { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+  @keyframes co-ring { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  /* Micro-vida (§1.5): el punto de "no leído" del aviso late mientras la línea está a la vista. */
+  .co__tdot { animation: co-live 2s ease-in-out infinite; animation-play-state: paused; }
+  .lf.is-vista .co__tdot { animation-play-state: running; }
+  @keyframes co-live { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
 
   @media (prefers-reduced-motion: reduce) {
     .lf__live, .lf__live::after, .lf__linea b { animation: none !important; }
-    :global(.is-play) .co__main :global(.wo-mini__mail.is-on), :global(.is-play) .co__sat, :global(.is-play) .co__idx li, :global(.is-play) .co__pie { animation: none; }
+    :global(.is-play) .co__mail, :global(.is-play) .co__toast, :global(.is-play) .co__body, :global(.is-play) .co__idx li, :global(.is-play) .co__pie,
+    :global(.is-play) .co__clock, :global(.is-play) .co__ring, .co__tdot { animation: none !important; }
   }
 </style>
 
@@ -288,6 +370,8 @@ const C = T.correo;
     const num = root.querySelector<HTMLElement>('[data-w2-num]');
     const ticks = [...root.querySelectorAll<HTMLElement>('[data-w2-tick]')];
     const N = pasos.length;
+    // Portada: la fase 05 va fuera del panel (el contador llega a 04); compacta: llega a 05.
+    const tope = root.classList.contains('lf--compacta') ? N - 1 : N - 2;
     let act = -1, still = mqR.matches, enVista = false, salio = 0, bloqueo = 0;
     root.toggleAttribute('data-w2-on', true);
     root.toggleAttribute('data-still', still);
@@ -307,12 +391,11 @@ const C = T.correo;
 
     function play(e?: HTMLElement) {
       if (!e || still) return;
-      const ans = e.querySelectorAll<HTMLElement>('[data-wo-ans]');
-      e.classList.remove('is-play'); ans.forEach((x) => x.classList.remove('is-run'));
+      e.classList.remove('is-play');
       void e.offsetWidth;
       const asis = e.querySelector<HTMLElement>('[data-w2-asis]');
       if (asis) { const n = +asis.dataset.w2Asis! || 1; const veces = +(e.dataset.veces || 0); asis.dataset.k = String(veces % n); e.dataset.veces = String(veces + 1); }
-      e.classList.add('is-play'); ans.forEach((x) => x.classList.add('is-armed', 'is-run'));
+      e.classList.add('is-play');
     }
 
     function activate(i: number) {
@@ -322,7 +405,7 @@ const C = T.correo;
         p.classList.toggle('is-on', j === i); p.classList.toggle('is-done', j < i);
         const b = p.querySelector('[data-w2-ir]'); if (j === i) b?.setAttribute('aria-current', 'step'); else b?.removeAttribute('aria-current');
       });
-      if (num) num.textContent = String(Math.min(i, N - 2) + 1).padStart(2, '0');
+      if (num) num.textContent = String(Math.min(i, tope) + 1).padStart(2, '0');
       ticks.forEach((t, j) => t.classList.toggle('is-a', j <= i));
       geo();
       if (!mqM.matches) {
@@ -369,6 +452,16 @@ const C = T.correo;
       });
     }, { threshold: .35 });
     escs.forEach((e) => ioEsc.observe(e));
+    // Escena de la fase 05 en la portada (mientras no llega el slot): se reproduce al entrar en vista
+    // en cualquier ancho y repite tras ≥ 8 s fuera.
+    const finEsc = root.querySelector<HTMLElement>('[data-w2-final]');
+    if (finEsc) {
+      let s = -1;
+      new IntersectionObserver((es) => es.forEach((e) => {
+        if (e.isIntersecting) { if (s !== -2 && (s === -1 || performance.now() - s >= 8000)) play(finEsc); s = -2; }
+        else if (s === -2) s = performance.now();
+      }), { threshold: .35 }).observe(finEsc);
+    }
 
     // Clic / teclado en el título de una fase: la lleva al centro y la activa.
     root.querySelectorAll<HTMLElement>('[data-w2-ir]').forEach((b) => b.addEventListener('click', () => {
@@ -378,7 +471,7 @@ const C = T.correo;
       pasos[i].scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' });
     }));
 
-    mqR.addEventListener('change', () => { still = mqR.matches; root.toggleAttribute('data-still', still); escs.forEach((e) => e.classList.remove('is-play')); geo(); });
+    mqR.addEventListener('change', () => { still = mqR.matches; root.toggleAttribute('data-still', still); escs.forEach((e) => e.classList.remove('is-play')); finEsc?.classList.remove('is-play'); geo(); });
     mqM.addEventListener('change', () => { const a = act; act = -1; activate(Math.max(0, a)); });
     new ResizeObserver(() => geo()).observe(root);
     activate(0);

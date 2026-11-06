@@ -1,17 +1,54 @@
 ---
 // IA para pymes · "Dónde trabaja" (design/rediseno-workos-v2.md §3 G06, P06 · W-ADV-21 Atlas).
-// Texto a la izquierda y, a la derecha, la constelación de logos de P06 con Marcy de héroe en el
-// centro (sustituye las 5 píldoras de texto quietas de la v1, FI §3-8): cada ~0,9 s se enciende
-// una casilla y una línea teal se dibuja hasta Marcy, en bucle mientras está a la vista.
-// Solo herramientas que la página nombra y con las que Marcy trabaja de verdad (§1.4, §5-14):
-// WhatsApp, Instagram y Messenger (canales que contesta), tu calendario (agenda) y tu correo
-// (te avisa). "Tu web" no tiene logo: va en el texto.
+// Texto a la izquierda y, a la derecha, la constelación del original con Marcy de héroe.
+//
+// Revisión G06 r1: la ConstelacionMarcas compartida está calculada para coronas de 8-30 marcas;
+// con las 5 honestas de esta página salían 5 casillas pequeñas en un tercio del arco, Marcy
+// cortada y la pausa lejos. Aquí la composición está DISEÑADA PARA ESTA LISTA (6 casillas:
+// tu web + 5 marcas): Marcy de busto ≈ 38 % del ancho (como el robot de Atlas), las casillas
+// grandes (64 px, logo de 28) repartidas por TODO el arco de 150°, dos órbitas finas y polvo de
+// puntos que dan la densidad del original sin inventar herramientas, y la línea de horizonte.
+// Coreografía del original (tira T-tools): cada 1,1 s se enciende una casilla (escala 1,12 y
+// halo teal) y una línea de 1 px se dibuja hasta la cabeza de Marcy; se solapan dos. Bucle vivo
+// mientras está a la vista (loop.ts: pestaña visible, botón 44×44, estado global de pausa).
+// Reducir movimiento: quieta con una casilla encendida y su línea.
+// Logos (§1.4): por LogoMarca a color; las multicolor (Instagram, Gmail, Calendar) en tinta
+// negra sobre la casilla clara, nunca con un solo hex. "Tu web" lleva el globo del sitio.
+// Rendimiento (§1.8): la escena vive en un <template> (Diferido) y se monta al acercarse.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import ConstelacionMarcas from '../../marcas/ConstelacionMarcas.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import Diferido from './Diferido.astro';
+import type { MarcaId } from '../../marcas/datos';
 
 interface Copy { label: string; title: string; text: string; sr: string; chips: string[] }
 interface Props { copy: Copy; n: number; lang?: 'es' | 'en' }
 const { copy, n, lang = 'es' } = Astro.props;
+
+// Lienzo lógico 600 × 440: centro del arco en la coronilla de Marcy.
+const W = 600, H = 440, CX = 300, CY = 262, R = 212, ARCO = 150;
+const ids: (MarcaId | 'web')[] = ['web', 'whatsapp', 'instagram', 'messenger', 'googlecalendar', 'gmail'];
+const pos = ids.map((id, i) => {
+  const a = ((90 + ARCO / 2 - (ARCO * i) / (ids.length - 1)) * Math.PI) / 180;
+  return { id, x: CX + R * Math.cos(a), y: CY - R * Math.sin(a) };
+});
+// Polvo: puntos fijos (pseudoaleatorios) sobre dos radios exteriores y entre casillas.
+let semilla = 11;
+const rnd = () => (semilla = (semilla * 9301 + 49297) % 233280) / 233280;
+const polvo: { x: number; y: number; o: number; r: number }[] = [];
+for (const [rr, k] of [[168, 18], [256, 26], [290, 22]] as const) {
+  for (let j = 0; j < k; j++) {
+    const a = ((90 + 86 - (172 * (j + rnd() * 0.6)) / k) * Math.PI) / 180;
+    const r = rr + (rnd() - 0.5) * 10;
+    const y = CY - r * Math.sin(a);
+    if (y < 6 || y > CY + 6) continue;
+    polvo.push({ x: CX + r * Math.cos(a), y, o: +(0.08 + rnd() * 0.2).toFixed(2), r: rnd() > 0.75 ? 1.6 : 1.1 });
+  }
+}
+const p = (v: number, b: number) => `${((v / b) * 100).toFixed(2)}%`;
+const arcoD = (r: number) => {
+  const a0 = ((90 + 84) * Math.PI) / 180, a1 = ((90 - 84) * Math.PI) / 180;
+  return `M${(CX + r * Math.cos(a0)).toFixed(1)} ${(CY - r * Math.sin(a0)).toFixed(1)} A${r} ${r} 0 0 1 ${(CX + r * Math.cos(a1)).toFixed(1)} ${(CY - r * Math.sin(a1)).toFixed(1)}`;
+};
 ---
 <CabeceraNumerada n={n} label={copy.label} />
 <div class="cc">
@@ -21,12 +58,79 @@ const { copy, n, lang = 'es' } = Astro.props;
     <ul class="cc__chips" role="list">{copy.chips.map((c) => <li>{c}</li>)}</ul>
   </div>
   <div class="cc__fig">
-    <ConstelacionMarcas ids={['whatsapp', 'instagram', 'messenger', 'googlecalendar', 'gmail']} lang={lang} resumen={copy.sr} />
+    <p class="sr-only">{copy.sr}</p>
+    <Diferido h={300} hLg={440}>
+      <div class="ck" data-w2-ck data-lang={lang}>
+        <div class="ck__st" aria-hidden="true" data-nosnippet style={`--ar:${W}/${H}`}>
+          <svg class="ck__orb" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" focusable="false">
+            <path class="ck__o" d={arcoD(R)} />
+            <path class="ck__o ck__o--in" d={arcoD(132)} />
+            <line class="ck__hz" x1={CX - 292} y1={CY} x2={CX + 292} y2={CY} />
+            {polvo.map((d) => <circle cx={d.x.toFixed(1)} cy={d.y.toFixed(1)} r={d.r} opacity={d.o} />)}
+            {pos.map((t, i) => <line class="ck__ln" data-i={i} x1={t.x.toFixed(1)} y1={t.y.toFixed(1)} x2={CX} y2={CY + 6} pathLength="1" />)}
+          </svg>
+          <div class="ck__marcy" style={`left:${p(CX, W)};top:${p(CY - 34, H)};width:${p(232, W)}`}>
+            <img src="/assets/bot/marcy-hero.webp" width="364" height="512" alt="" loading="lazy" decoding="async" />
+          </div>
+          {pos.map((t, i) => (
+            <span class="ck__t" data-i={i} style={`left:${p(t.x, W)};top:${p(t.y, H)}`}>
+              <span class="ck__c">
+                {t.id === 'web'
+                  ? <svg class="ck__web" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" /></svg>
+                  : <LogoMarca id={t.id as MarcaId} size={28} tono="color" titulo="" />}
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </Diferido>
   </div>
 </div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  const TICK = 1100, ON = 1500;
+  const KEY = 'w2:pausa', EVT = 'w2:pausa';
+  const leer = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
+  const guardar = (v: boolean) => { try { v ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch { /* sin almacenamiento */ } };
+  const montar = () => {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-w2-ck]')) {
+      if (el.dataset.w2Listo) continue;
+      el.dataset.w2Listo = '1';
+      const tiles = [...el.querySelectorAll<HTMLElement>('.ck__t')];
+      const lines = [...el.querySelectorAll<SVGLineElement>('.ck__ln')];
+      const set = (i: number, on: boolean) => { tiles[i]?.classList.toggle('is-on', on); lines[i]?.classList.toggle('is-on', on); };
+      let tick = 0, ult = -1;
+      const offs = new Set<number>();
+      const encender = () => {
+        let i = Math.floor(Math.random() * tiles.length);
+        if (i === ult) i = (i + 1 + Math.floor(Math.random() * (tiles.length - 1))) % tiles.length;
+        ult = i; set(i, true);
+        const t = window.setTimeout(() => { set(i, false); offs.delete(t); }, ON);
+        offs.add(t);
+      };
+      const st = el.querySelector<HTMLElement>('.ck__st') ?? el;
+      const ctrl = registerLoop(st, {
+        start: () => { el.classList.remove('is-still'); encender(); tick = window.setInterval(encender, TICK); },
+        stop: () => { window.clearInterval(tick); },
+        still: () => { window.clearInterval(tick); offs.forEach((t) => clearTimeout(t)); offs.clear(); tiles.forEach((_, i) => set(i, i === 1)); el.classList.add('is-still'); },
+      }, { pauseButton: true, lang: el.dataset.lang === 'en' ? 'en' : 'es', buttonHost: el });
+      if (leer()) ctrl.setUserPaused(true);
+      document.addEventListener(EVT, (e) => ctrl.setUserPaused(!!(e as CustomEvent<{ pausado?: boolean }>).detail?.pausado));
+      el.querySelector<HTMLButtonElement>('.w-loop-pause')?.addEventListener('click', (e) => {
+        const v = (e.currentTarget as HTMLElement).getAttribute('aria-pressed') === 'true';
+        guardar(v);
+        document.dispatchEvent(new CustomEvent(EVT, { detail: { pausado: v } }));
+      });
+    }
+  };
+  document.addEventListener('w2:diferido', montar);
+  montar();
+</script>
+
 <style>
-  .cc { content-visibility: auto; contain-intrinsic-size: auto 480px; margin-top: 12px; display: grid; gap: 40px; align-items: center; }
-  @media (--lg) { .cc { grid-template-columns: minmax(0, 440px) minmax(0, 600px); justify-content: space-between; } }
+  .cc { margin-top: 12px; display: grid; gap: 32px; align-items: center; }
+  @media (--lg) { .cc { grid-template-columns: minmax(0, 440px) minmax(0, 600px); justify-content: space-between; gap: 40px; } }
   .cc__h { margin: 0; max-width: 440px; }
   .cc__p { margin: 16px 0 0; max-width: 416px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-80); }
   .cc__chips { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
@@ -36,4 +140,50 @@ const { copy, n, lang = 'es' } = Astro.props;
   }
   .cc__fig { min-width: 0; }
   @media (--lt-md) { .cc__p { font-size: 1rem; } }
+
+  /* ── Constelación ── */
+  .ck { position: relative; width: 100%; max-width: 600px; margin-inline: auto; container-type: inline-size; --marca-tinta: #111; }
+  .ck__st { position: relative; width: 100%; aspect-ratio: var(--ar); pointer-events: none; }
+  .ck__orb { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .ck__o { fill: none; stroke: rgba(240, 237, 232, .1); stroke-width: 1; stroke-dasharray: 2 6; vector-effect: non-scaling-stroke; }
+  .ck__o--in { stroke: rgba(79, 195, 161, .16); stroke-dasharray: none; }
+  .ck__hz { stroke: rgba(240, 237, 232, .14); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .ck__orb circle { fill: #F0EDE8; }
+  .ck__ln {
+    stroke: var(--accent-teal, #4fc3a1); stroke-width: 1.2; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;
+    transition: opacity 450ms linear, stroke-dashoffset 0s linear 460ms;
+  }
+  .ck__ln.is-on { stroke-dashoffset: 0; opacity: .9; transition: stroke-dashoffset 520ms cubic-bezier(.22, 1, .36, 1), opacity 120ms linear; }
+  /* Marcy de busto: recortada a un cuadrado por arriba y fundida por abajo, delante de las líneas. */
+  .ck__marcy {
+    position: absolute; transform: translateX(-50%); aspect-ratio: 1; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 97%);
+    mask-image: linear-gradient(180deg, #000 60%, transparent 97%);
+  }
+  .ck__marcy img { display: block; width: 100%; height: auto; }
+  .ck__t { position: absolute; width: max(44px, 10.6cqw); height: max(44px, 10.6cqw); transform: translate(-50%, -50%); }
+  .ck__c {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #F7F6F2; color: #1d1d1f;
+    box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .08), 0 10px 24px -10px rgba(0, 0, 0, .6);
+    transition: transform 1100ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .ck__c :global(svg) { width: max(22px, 4.7cqw); height: max(22px, 4.7cqw); }
+  .ck__c::before {
+    content: ''; position: absolute; inset: -16%; border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(79, 195, 161, .6), 0 0 0 6px rgba(79, 195, 161, .08);
+    opacity: 0; transform: scale(.85);
+    transition: opacity 500ms linear, transform 1100ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .ck__t.is-on { z-index: 2; }
+  .ck__t.is-on .ck__c { transform: scale(1.12); }
+  .ck__t.is-on .ck__c::before { opacity: 1; transform: scale(1); }
+  /* Pausa junto a la composición: abajo a la derecha del lienzo, a la altura del busto. */
+  .ck > :global(.w-loop-pause) { right: 4% !important; bottom: 4% !important; }
+  @container (min-width: 460px) { .ck > :global(.w-loop-pause) { right: 17% !important; bottom: 10% !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ck__c, .ck__c::before, .ck__ln, .ck__ln.is-on { transition: none; }
+  }
 </style>

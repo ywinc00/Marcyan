@@ -102,12 +102,15 @@ const uid = 'av' + Math.random().toString(36).slice(2, 7);
 <script>
   import { secuencia, vigilar, reducido } from '../../mac/mac';
 
-  for (const st of document.querySelectorAll<HTMLElement>('[data-w2-aviso]')) {
-    if (st.dataset.listo) continue;
+  // Rendimiento (revisión G06 r1): medir los globos al cargar forzaba un trazado de toda la
+  // página en plena carga (≈ 380 ms con CPU ×4). Ahora la escena se prepara cuando se acerca
+  // (1.000 px antes), y hasta entonces el HTML trae el estado final.
+  const arrancar = (st: HTMLElement) => {
+    if (st.dataset.listo) return;
     st.dataset.listo = '1';
     const scene = st.querySelector<HTMLElement>('.av__scene');
     const svg = st.querySelector<SVGSVGElement>('.av__lines');
-    if (!scene || !svg) continue;
+    if (!scene || !svg) return;
     const msgs = [...st.querySelectorAll<HTMLElement>('[data-av-m]')];
     const sat = { a: st.querySelector<HTMLElement>('[data-av-sat="a"]'), b: st.querySelector<HTMLElement>('[data-av-sat="b"]') };
     const ln = { a: st.querySelectorAll<SVGPathElement>('[data-av-ln="a"],[data-av-gl="a"]'), b: st.querySelectorAll<SVGPathElement>('[data-av-ln="b"],[data-av-gl="b"]') };
@@ -153,7 +156,7 @@ const uid = 'av' + Math.random().toString(36).slice(2, 7);
     const sync = () => st.classList.toggle('is-pausa', pausada());
     window.addEventListener('w2:pausa', sync); sync();
     const vida = (si: boolean) => st.classList.toggle('is-vivo', si && st.dataset.av === 'final');
-    if (reducido()) { st.dataset.av = 'final'; vigilar(st, { alEntrar: () => {}, vivo: () => {} }); continue; }
+    if (reducido()) { st.dataset.av = 'final'; vigilar(st, { alEntrar: () => {}, vivo: () => {} }); return; }
 
     const on = (el: Element | null | undefined) => el?.classList.add('is-on');
     const pasos: Array<[number, () => void]> = [
@@ -177,7 +180,14 @@ const uid = 'av' + Math.random().toString(36).slice(2, 7);
       alSalir: () => { if (sec.corriendo) { sec.stop(); st.dataset.av = 'final'; } },
       vivo: vida,
     });
-  }
+  };
+  const etapas = [...document.querySelectorAll<HTMLElement>('[data-w2-aviso]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); arrancar(e.target as HTMLElement); }
+    }, { rootMargin: '1000px 0px' });
+    etapas.forEach((st) => io.observe(st));
+  } else etapas.forEach(arrancar);
 </script>
 
 <style>

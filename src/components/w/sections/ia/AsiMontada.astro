@@ -40,5 +40,8 @@ const rotulos = { googlegemini: 'Gemini', meta: 'Meta AI' } as const;
   .am__h { margin: 0; }
   .am__p { margin: 16px auto 0; max-width: 520px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-70); }
   .am__chip { margin-top: 32px; }
+  /* La pausa del chip (44×44) se montaba sobre el filo de la placa: aquí sale a su derecha,
+     en el aire, a la misma altura (revisión G06 r1). */
+  .am__chip :global(.chipia__mando) { left: min(calc(50% + 110px * var(--k) + 64px), calc(100% - 72px)); }
   @media (--lt-md) { .am__p { font-size: 1rem; } .am__chip { margin-top: 16px; } }
 </style>

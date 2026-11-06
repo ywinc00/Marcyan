@@ -3,12 +3,16 @@
 // W2N-01 (hero de Passport) calzado: "¿Quién contesta a las 11 de la noche?" → "Respondido
 // por Marcy". Monta EscenaDosActos (P08, pieza compartida, no se edita aquí) con:
 //   · slot "titulo": el H1 VERBATIM de la página, único <h1>, visible al 100 % desde el
-//     primer pintado (sin data-w-in ni opacidad: B3, LCP independiente de la coreografía);
+//     primer pintado (sin data-w-in ni opacidad: B3, LCP independiente de la coreografía),
+//     y, encima, la línea del acto 2 ("Respondido por Marcy."), aria-hidden, que ocupa
+//     EXACTAMENTE la caja de la pregunta del acto 1 (mismo tamaño y línea) y aparece cuando
+//     ésta se funde: como "Single sign-on?" → "Passport" del original, sin hueco sobre el H1;
 //   · slot "bajada": la bajada de hoy; slot "acciones": los botones del sitio (mismos
 //     destinos y data-track que la v1).
-// Fondo: F04 (hilos de voz, P12) lo monta WLanding detrás de toda la zona del hero; aquí
-// solo se aclaran las capas de cielo propias de la escena (noche opaca → transparente;
-// el amanecer teal del acto 2 queda como luz baja) para que los hilos se vean a través.
+// Cielo (revisión G06 r1): en W2N-01 TODO el fondo pasa de noche a amanecer. La noche de la
+// escena queda transparente (deja ver los hilos F04 de la zona sobre la noche lisa) y el
+// amanecer del acto 2 cubre el hero entero: un velo que aclara desde arriba hacia un
+// horizonte teal, con el resplandor del token --w-dawn-teal; deja ver los hilos.
 // Migas: arriba a la izquierda en la línea del logo (como HeroTexto en escritorio); en
 // móvil, centradas encima de la pregunta del acto 1.
 import EscenaDosActos from '../mac/EscenaDosActos.astro';
@@ -20,14 +24,22 @@ interface Props {
   lead: string;
   primary: Cta;
   link?: Cta;
+  respondido?: string;
   lang?: 'es' | 'en';
 }
-const { h1Html, lead, primary, link, lang = 'es' } = Astro.props;
+const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
 ---
 <div class="hic" data-w-tone="teal">
   {Astro.slots.has('crumbs') && <div class="hic__crumbs"><slot name="crumbs" /></div>}
   <EscenaDosActos lang={lang} id="dos-actos">
-    <h1 slot="titulo" class="hic__h1" set:html={h1Html} />
+    <Fragment slot="titulo">
+      {respondido && (
+        <p class="hic__ok" aria-hidden="true">
+          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.4 3 3 6-6.4" /></svg>{respondido}
+        </p>
+      )}
+      <h1 class="hic__h1" set:html={h1Html} />
+    </Fragment>
     <p slot="bajada">{lead}</p>
     <Fragment slot="acciones">
       <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
@@ -38,14 +50,44 @@ const { h1Html, lead, primary, link, lang = 'es' } = Astro.props;
 
 <style>
   .hic { position: relative; }
-  /* El cielo de la escena deja ver el F04 de la zona: la noche pasa a transparente (la
-     noche lisa de la página sigue debajo) y el amanecer del acto 2 es solo su luz baja. */
+  /* Noche: transparente (la noche lisa de la página y los hilos F04 se ven debajo). */
   .hic :global(.da-noche) { background: none; }
+  /* Amanecer del acto 2 sobre TODO el hero: arriba casi noche (el H1 sigue sobre oscuro),
+     el cielo se abre hacia un horizonte teal y el resplandor sube desde abajo. */
   .hic :global(.da-alba) {
     background:
-      var(--w-dawn-teal),
-      linear-gradient(180deg, transparent 0%, rgba(79,195,161,.035) 45%, rgba(79,195,161,.09) 100%);
+      radial-gradient(90% 55% at 50% 100%, rgba(79, 195, 161, .34) 0%, rgba(79, 195, 161, .12) 45%, transparent 75%),
+      linear-gradient(180deg, rgba(9, 14, 22, .55) 0%, rgba(13, 34, 42, .62) 38%, rgba(20, 70, 70, .66) 72%, rgba(36, 112, 98, .7) 100%);
+    transition: opacity 1.2s cubic-bezier(.22, 1, .36, 1);
   }
+  /* Línea del acto 2: la caja de la pregunta del acto 1 (mismo cuerpo y línea, encima del H1). */
+  .hic :global(.da-h1) { position: relative; }
+  .hic__ok {
+    position: absolute; left: 0; right: 0; bottom: 100%;
+    margin: 0 0 calc(var(--da-t) * .6 * .25);
+    display: flex; align-items: center; justify-content: center; gap: .35em;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: calc(var(--da-t) * .6); line-height: 1.1; letter-spacing: -.03em;
+    color: var(--accent-teal, #4fc3a1);
+    white-space: nowrap;
+    transition: opacity .6s ease .45s, transform .6s cubic-bezier(.22, 1, .36, 1) .45s;
+  }
+  .hic__ok svg { flex: none; width: .82em; height: .82em; }
+  .hic :global(.da[data-da-fase='inicio']) .hic__ok { opacity: 0; transform: translateY(.2em); transition: none; }
+  /* Rendimiento (revisión G06 r1, medido con CPU ×4 y red móvil): el primer trazado del
+     portátil (≈ 280 nodos de ventanas y panel) retrasaba el primer pintado del H1 ≈ 300 ms y
+     dejaba tareas largas. El portátil se pinta un fotograma DESPUÉS (60 ms) que el titular:
+     mientras, su caja queda reservada con su medida real (ancho min(976 px, 100vw − 32 px),
+     alto 0,638 × ancho, medido de 360 a 1920), así nada salta. Solo CSS: sin JS y con
+     movimiento reducido el portátil se pinta a la vez. La causa de fondo (las ventanas del
+     acto 1 viven siempre en el DOM aunque solo se usan en la primera visita) es de la pieza
+     compartida EscenaDosActos, apuntada como [SISTEMA]. */
+  .hic :global(.da-mac) {
+    contain-intrinsic-size: auto min(976px, 100vw - 32px) auto calc(min(976px, 100vw - 32px) * .638);
+    animation: hic-mac 1ms steps(1) 60ms backwards;
+  }
+  @keyframes hic-mac { from { content-visibility: hidden; } to { content-visibility: visible; } }
+  @media (prefers-reduced-motion: reduce) { .hic :global(.da-mac) { animation: none; } }
   .hic__crumbs {
     position: absolute; z-index: 3; left: 0; right: 0;
     top: calc(var(--nav-h, 72px) + 12px);
@@ -61,4 +103,5 @@ const { h1Html, lead, primary, link, lang = 'es' } = Astro.props;
     }
     .hic :global(.da) { padding-top: calc(var(--nav-h, 72px) + 48px); }
   }
+  @media (prefers-reduced-motion: reduce) { .hic__ok { transition: none; } }
 </style>

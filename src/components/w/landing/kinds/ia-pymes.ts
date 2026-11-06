@@ -83,7 +83,8 @@ const spec: KindSpec = {
     },
 
     // 03 Así está montada (ChipIA landing + PildorasMarcas, filas honestas de G01; v2 §3 G06).
-    { component: AsiMontada, id: 'montada', props: (ctx) => ({ copy: copyOf(ctx).montada, n: 3, lang: ctx.lang }) },
+    // Ancla #proceso: la de producción para "cómo funciona", perdida desde la v1 (revisión G06 r1).
+    { component: AsiMontada, id: 'proceso', props: (ctx) => ({ copy: copyOf(ctx).montada, n: 3, lang: ctx.lang }) },
 
     // 04 Dónde trabaja: ConstelacionMarcas (W-ADV-21) con Marcy en el centro, viva.
     { component: ConstelacionCanales, props: (ctx) => ({ copy: copyOf(ctx).canales, n: 4, lang: ctx.lang }) },

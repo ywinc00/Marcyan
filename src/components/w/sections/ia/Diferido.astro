@@ -1,0 +1,42 @@
+---
+// Montaje diferido de una escena de ejemplo (design/rediseno-workos-v2.md §1.8: "maquetas en
+// <template> clonadas bajo demanda"). La escena (aria-hidden, sin texto que cuente para el SEO)
+// vive en un <template> y se clona cuando el hueco se acerca a la pantalla (900 px antes), así
+// no pesa en el DOM ni en el trazado mientras la página carga (revisión G06 r1: TBT 536 ms y
+// 2.317 nodos). El hueco reserva su alto con --dif-h / --dif-h-lg para que nada salte. Al
+// montar avisa con el evento `w2:diferido` en document (detail = el hueco) y cada sección
+// arranca su pieza. El resumen sr-only va FUERA del template (lo da quien usa el hueco).
+interface Props { h: number; hLg?: number; class?: string }
+const { h, hLg = h, class: cls } = Astro.props;
+---
+<div class:list={['dif', cls]} data-w2-dif style={`--dif-h:${h}px;--dif-h-lg:${hLg}px`}>
+  <template><slot /></template>
+</div>
+
+<script>
+  const montar = (host: HTMLElement) => {
+    if (host.dataset.w2Dif === 'listo') return;
+    const t = host.querySelector('template');
+    if (!t) return;
+    host.dataset.w2Dif = 'listo';
+    host.append(t.content.cloneNode(true));
+    t.remove();
+    document.dispatchEvent(new CustomEvent('w2:diferido', { detail: host }));
+  };
+  const huecos = [...document.querySelectorAll<HTMLElement>('[data-w2-dif]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); montar(e.target as HTMLElement); }
+    }, { rootMargin: '900px 0px' });
+    huecos.forEach((h) => io.observe(h));
+  } else huecos.forEach(montar);
+  // Saltos por ancla o impresión: todo montado.
+  addEventListener('beforeprint', () => huecos.forEach(montar));
+</script>
+
+<style>
+  .dif { min-height: var(--dif-h); display: flex; justify-content: center; align-items: center; width: 100%; }
+  .dif[data-w2-dif='listo'] { min-height: 0; }
+  @media (--lg) { .dif { min-height: var(--dif-h-lg); } }
+  @media (--lg) { .dif[data-w2-dif='listo'] { min-height: 0; } }
+</style>

@@ -51,6 +51,15 @@ const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = As
   /* v2 (§3 G06, crítica B3): el H1 verbatim se ve al 100 % desde el primer pintado; la
      coreografía de entrada (§2.9) sigue en eyebrow, bajada y botones, nunca en el H1. */
   :global(:root[data-ds="v3"].w-anim) .hip :global(h1[data-w-in]) { opacity: 1; transform: none; transition: none; }
+  /* F05 (revisión G06 r1): las pistas de arriba subían hasta la barra y tocaban "Propuesta
+     gratis". Se funden antes de llegar a ella (la geometría de F05 está medida para el chip de
+     480 × 580; ajustarla a la esclusa es de la pieza compartida, apuntado como [SISTEMA]). */
+  @media (min-width: 1024px) {
+    :global(.wf-zona:has(.hip) .wf-pl) {
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 104px, #000 168px);
+              mask-image: linear-gradient(180deg, transparent 0, transparent 104px, #000 168px);
+    }
+  }
   .hip { overflow-x: clip; padding-bottom: clamp(72px, 3rem + 4vw, 128px); }
   .hip__grid { display: grid; gap: 48px; align-items: center; }
   .hip__obj { display: flex; justify-content: center; min-width: 0; }

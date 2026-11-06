@@ -1,22 +1,83 @@
 ---
 // IA conversacional · "Contesta en cada canal" (design/rediseno-workos-v2.md §3 G06).
-// Sustituye a las pestañas automáticas del hero de la v1 (MarcoPestanas + ChatMarcy) por el
-// mazo de hilos de P05 (W-ADV-22, "A coworker for the whole team"): composición del original,
-// el mazo a la izquierda y el texto a la derecha, centrado en altura con él. Canales: SOLO los
-// que Marcy contesta de verdad y que esta página nombra (§5-14: web, WhatsApp, Instagram;
-// Messenger no está en el mazo compartido, apuntado como [SISTEMA]). Móvil: texto arriba,
-// mazo debajo a ancho completo.
+// Mazo de hilos de P05 (W-ADV-22, "A coworker for the whole team"): el mazo a la izquierda y el
+// texto a la derecha, centrado en altura con él. Móvil: texto arriba, mazo debajo.
+//
+// Revisión G06 r1: el mazo compartido (agente/MazoHilos) traía conversaciones cortas en una
+// tarjeta de alto fijo (media tarjeta vacía) y un remitente "Cliente" con avatar gris. Aquí la
+// pila es propia de esta página, con el MISMO motor (montarMazo de agente.ts: avance cada 5 s,
+// Pausar como primer control, flechas, puntos con progreso, estado global de pausa):
+//   · personas con nombre y avatar propio (las del hero: Luis T., marisol.hz, Rosa G., Carlos P.);
+//   · 4 mensajes por hilo y caja de respuesta abajo: la tarjeta queda llena como un producto real;
+//   · los 4 canales que esta página nombra y Marcy contesta (WhatsApp, Instagram, Messenger y el
+//     chat de tu web, como el panel del hero), con el horario del negocio de ejemplo de la página
+//     (lun a sáb, 9:00 a. m. a 7:00 p. m., el mismo de "Así empiezas con Marcy").
+// Rendimiento (§1.8): la pila vive en un <template> (Diferido) y se monta al acercarse.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import MazoHilos from '../../agente/MazoHilos.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import Diferido from './Diferido.astro';
 import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
 
 interface Props { copy: IaChatCopy['canales']; n: number; lang?: 'es' | 'en' }
 const { copy, n, lang = 'es' } = Astro.props;
+const h = copy.hilos;
+const L = { region: 'Conversaciones que contesta Marcy', carrusel: 'carrusel', diapo: 'diapositiva', prev: 'Conversación anterior', next: 'Conversación siguiente', ir: 'Ir a la conversación', pausaL: 'Pausar conversaciones', de: 'de' };
 ---
 <CabeceraNumerada n={n} label={copy.label} />
 <div class="cn">
   <div class="cn__mazo">
-    <MazoHilos lang={lang} canales={['whatsapp', 'instagram', 'web']} />
+    <p class="sr-only">{copy.sr}</p>
+    <Diferido h={540} hLg={500}>
+      <section class="cz" data-w2-mazo data-lang={lang} aria-roledescription={L.carrusel} aria-label={L.region} data-nosnippet>
+        <div class="cz__pila" data-w2-pila>
+          {h.map((x, i) => (
+            <div class="cz__carta" data-w2-carta data-pos={i} data-titulo={`${x.canal} · ${x.quien}, ${i + 1} ${L.de} ${h.length}`} aria-roledescription={L.diapo} aria-hidden={i === 0 ? 'false' : 'true'}>
+              <div class="cz__cab" aria-hidden="true">
+                {x.logo
+                  ? <LogoMarca id={x.logo} size={16} tono="color" titulo="" />
+                  : <svg class="cz__web" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" /></svg>}
+                <b translate="no">{x.canal}</b><span>· {x.quien}</span>
+              </div>
+              <div class="cz__msgs" aria-hidden="true">
+                {x.msgs.map((m) => (
+                  <div class:list={['cz__msg', m.m && 'is-m']}>
+                    {m.m
+                      ? <img class="cz__av" src="/assets/bot/marcy-mini.webp" width="28" height="28" alt="" loading="lazy" decoding="async" />
+                      : <span class="cz__av cz__av--p" style={`--av-bg:${x.color[0]};--av-ink:${x.color[1]}`}>{x.ini}</span>}
+                    <div>
+                      <p class="cz__who"><b>{m.m ? 'Marcy' : x.quien}</b>{m.m && <span class="cz__tag">ASISTENTE</span>}<span class="cz__h">{m.h}</span></p>
+                      <p class="cz__t" lang={x.en ? 'en' : undefined}>{m.t}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div class="cz__resp" aria-hidden="true"><span>{x.responder}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6l-.01 6.53L15 12l-11.61 1.87z" /></svg></div>
+            </div>
+          ))}
+        </div>
+        <div class="cz__ctrl">
+          <button type="button" class="cz__btn cz__pausa" data-w2-pausa aria-pressed="false" aria-label={L.pausaL}>
+            <svg class="cz__ip" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" /></svg>
+            <svg class="cz__ir" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>
+            <span data-w2-pausa-t>Pausar</span>
+          </button>
+          <button type="button" class="cz__btn cz__flecha" data-w2-prev aria-label={L.prev}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <div class="cz__puntos">
+            {h.map((x, i) => (
+              <button type="button" class:list={['cz__punto', i === 0 && 'is-on']} data-w2-punto aria-label={`${L.ir} ${i + 1}: ${x.canal}`} aria-current={i === 0 ? 'true' : 'false'}><i><b></b></i></button>
+            ))}
+          </div>
+          <button type="button" class="cz__btn cz__flecha" data-w2-next aria-label={L.next}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        </div>
+        <Ejemplo lang={lang} pos="inline" class="cz__ej" />
+        <p class="sr-only" aria-live="polite" data-w2-live></p>
+      </section>
+    </Diferido>
   </div>
   <div class="cn__text">
     <h2 class="w-h2 cn__h" set:html={copy.title} />
@@ -26,14 +87,18 @@ const { copy, n, lang = 'es' } = Astro.props;
     </ul>
   </div>
 </div>
+
+<script>
+  import { montarMazo } from '../../agente/agente';
+  const arrancar = () => document.querySelectorAll<HTMLElement>('.cz[data-w2-mazo]').forEach((el) => montarMazo(el));
+  document.addEventListener('w2:diferido', arrancar);
+  arrancar();
+</script>
+
 <style>
-  .cn { content-visibility: auto; contain-intrinsic-size: auto 620px; margin-top: 24px; display: grid; gap: 40px; align-items: center; }
+  .cn { margin-top: 24px; display: grid; gap: 40px; align-items: center; }
   @media (--lg) {
     .cn { grid-template-columns: minmax(0, 440px) minmax(0, 460px); justify-content: center; gap: 112px; margin-top: 40px; }
-    /* Escala del original (tarjeta ≈ 406 px en W-ADV-22): el mazo compartido expone su ancho
-       por variable; aquí sube a 400 y la pila gana alto para las 4 líneas de WhatsApp. */
-    .cn__mazo :global(.mz) { --mz-w: min(400px, 100%); max-width: 440px; }
-    .cn__mazo :global(.mz__pila) { height: 330px; }
   }
   .cn__mazo { min-width: 0; display: flex; justify-content: center; }
   @media (--lt-lg) { .cn__text { order: -1; } }
@@ -48,4 +113,109 @@ const { copy, n, lang = 'es' } = Astro.props;
   .cn__list li:last-child { border-bottom: 1px solid var(--w-line-strong); }
   .cn__list b { font-weight: 500; color: var(--w-ink); }
   @media (--lt-md) { .cn__p { font-size: 1rem; } .cn__list li { grid-template-columns: 96px minmax(0, 1fr); } }
+
+  /* ── Mazo (escala del original: tarjeta ≈ 406 px en W-ADV-22) ── */
+  .cz {
+    --cz-w: min(400px, 100%);
+    --cz-step: 22px;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    width: 100%; max-width: 440px; margin-inline: auto;
+    font-family: var(--font-body);
+  }
+  .cz p { margin: 0; }
+  .cz__pila { position: relative; width: var(--cz-w); height: 404px; margin-top: calc(var(--cz-step) * 3); }
+  @media (max-width: 400px) { .cz__pila { height: 432px; } }
+  .cz__carta {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    border-radius: 12px; overflow: hidden;
+    background: #FBFAF8; color: #16161a;
+    box-shadow: 0 0 0 1px rgba(14, 14, 13, .08), 0 24px 48px -20px rgba(0, 0, 0, .6);
+    transform-origin: 50% 0;
+    transition: transform 420ms cubic-bezier(.22, 1, .36, 1), opacity 400ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .cz__carta[data-pos='0'] { z-index: 4; transform: none; }
+  .cz__carta[data-pos='1'] { z-index: 3; transform: translateY(calc(var(--cz-step) * -1)) scale(.955); }
+  .cz__carta[data-pos='2'] { z-index: 2; transform: translateY(calc(var(--cz-step) * -2)) scale(.91); }
+  .cz__carta[data-pos='3'] { z-index: 1; transform: translateY(calc(var(--cz-step) * -3)) scale(.865); }
+  .cz__carta:not([data-pos='0']) :is(.cz__msgs, .cz__resp) { opacity: 0; }
+  .cz__carta[data-pos='2'] .cz__cab, .cz__carta[data-pos='3'] .cz__cab { opacity: .75; }
+  .cz__carta.is-out { z-index: 5 !important; opacity: 0 !important; transform: translateY(-12px) !important; transition-duration: 400ms; }
+  .cz__carta.is-out :is(.cz__msgs, .cz__resp) { opacity: 0; transition: opacity 100ms; }
+  .cz.is-js .cz__carta[data-pos='0']:not(.is-out) :is(.cz__msgs, .cz__resp) { transition: opacity 260ms ease 200ms; }
+
+  .cz__cab {
+    flex: none; display: flex; align-items: center; gap: 7px;
+    height: 40px; padding: 0 16px;
+    background: #F3F1EC; border-bottom: 1px solid rgba(14, 14, 13, .07);
+    font-size: 13px; color: #5d5a55;
+  }
+  .cz__cab b { font: 600 13.5px/1 var(--font-display); color: #16161a; }
+  .cz__cab :global(svg) { flex: none; display: block; }
+  .cz__web { color: #3c3a36; }
+  .cz__msgs { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 8px; overflow: hidden; }
+  .cz__msg { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+  .cz__av { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; background: #e7e3dc; }
+  .cz__av--p {
+    display: grid; place-items: center;
+    background: var(--av-bg); color: var(--av-ink);
+    font: 600 11px/1 var(--font-display); letter-spacing: .02em;
+    box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .06);
+  }
+  .cz__who { display: flex; align-items: baseline; gap: 6px; font-size: 13.5px; line-height: 1.2; }
+  .cz__who b { font-weight: 700; }
+  .cz__tag { font: 600 9px/1 var(--font-mono); letter-spacing: .06em; padding: 2px 4px; border-radius: 3px; background: rgba(14, 14, 13, .07); color: #5d5a55; }
+  .cz__h { font-size: 11px; color: #6c6964; }
+  .cz__t { margin-top: 3px !important; font-size: 14px; line-height: 1.4; color: #24242a; }
+  .cz__resp {
+    flex: none; display: flex; align-items: center; justify-content: space-between;
+    margin: 0 12px 12px; height: 38px; padding: 0 12px;
+    border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .14);
+    font-size: 13px; color: #8a867f;
+  }
+  .cz__resp svg { color: #b5b0a8; }
+
+  /* Controles: Pausar (primero, 44 de alto), flechas redondas y píldora de puntos */
+  .cz__ctrl { display: flex; align-items: center; gap: 6px; }
+  .cz__btn {
+    appearance: none; border: 0; cursor: pointer; position: relative;
+    min-width: 44px; height: 44px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    background: none; color: var(--w-ink-80, rgba(240, 237, 232, .8));
+    border-radius: 999px;
+  }
+  .cz__btn::before {
+    content: ''; position: absolute; border-radius: 999px;
+    background: rgba(240, 237, 232, .07); box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .1);
+    transition: background-color 160ms;
+  }
+  .cz__flecha::before { width: 36px; height: 36px; }
+  .cz__pausa { padding: 0 14px 0 12px; margin-right: 6px; font: 500 12px/1 var(--font-mono); letter-spacing: .04em; }
+  .cz__pausa::before { inset: 4px 0; }
+  .cz__btn > * { position: relative; }
+  .cz__btn:hover::before { background: rgba(240, 237, 232, .14); }
+  .cz__ir { display: none; }
+  .cz__pausa[data-estado='pausa'] .cz__ip { display: none; }
+  .cz__pausa[data-estado='pausa'] .cz__ir { display: block; }
+  .cz__puntos {
+    display: inline-flex; align-items: center; padding: 0 6px; height: 36px;
+    border-radius: 999px; background: rgba(240, 237, 232, .07); box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .1);
+  }
+  .cz__punto { appearance: none; border: 0; background: none; cursor: pointer; width: 24px; height: 44px; padding: 0; display: grid; place-items: center; transition: width 300ms cubic-bezier(.22, 1, .36, 1); }
+  .cz__punto i { position: relative; display: block; width: 7px; height: 7px; border-radius: 999px; background: rgba(240, 237, 232, .35); overflow: hidden; transition: width 300ms cubic-bezier(.22, 1, .36, 1); }
+  .cz__punto.is-on { width: 40px; }
+  .cz__punto.is-on i { width: 26px; background: rgba(240, 237, 232, .25); }
+  .cz__punto i b { position: absolute; inset: 0; background: var(--w-ink, #f0ede8); transform: scaleX(1); transform-origin: 0 50%; }
+  .cz__punto:not(.is-on) i b { opacity: 0; }
+  .cz.is-js .cz__punto.is-on i b { transform: scaleX(0); }
+  .cz.is-playing.is-tick .cz__punto.is-on i b { animation: cz-prog 5s linear forwards; }
+  @keyframes cz-prog { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .cz__btn:focus-visible, .cz__punto:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+  .cz :global(.cz__ej) { margin-top: -6px; }
+  @media (prefers-reduced-motion: reduce) {
+    .cz__carta { transition: none; }
+    .cz.is-playing.is-tick .cz__punto.is-on i b { animation: none; }
+  }
+  .cz.is-rm .cz__pausa { display: none; }
 </style>

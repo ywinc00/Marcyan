@@ -60,6 +60,7 @@ const spec: KindSpec = {
       lead: t.lead,
       primary: { label: t.primary, href: '#contacto', track: 'proposal_requested' },
       link: { label: t.link, href: '#faq' },
+      respondido: t.respondido,
       lang: ctx.lang,
     };
   },

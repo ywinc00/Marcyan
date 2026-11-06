@@ -7,6 +7,7 @@
 // perdidas salen como aviso, nunca como "respondido").
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import AltaMarcy from '../../alta/AltaMarcy.astro';
+import Diferido from './Diferido.astro';
 import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
 
 interface Props { copy: IaChatCopy['alta']; n: number; lang?: 'es' | 'en' }
@@ -24,11 +25,21 @@ const { copy, n, lang = 'es' } = Astro.props;
     </ol>
   </div>
   <div class="ae__obj">
-    <AltaMarcy lang={lang} canales={['whatsapp', 'web', 'calendario', 'correo', 'llamadas']} />
+    <p class="sr-only">{copy.sr}</p>
+    <Diferido h={520} hLg={500}>
+      <AltaMarcy lang={lang} canales={['whatsapp', 'web', 'calendario', 'correo', 'llamadas']} />
+    </Diferido>
   </div>
 </div>
+
+<script>
+  // La escena vive en un <template> (Diferido, §1.8): se arranca al montarse.
+  import { initAltas } from '../../alta/alta';
+  document.addEventListener('w2:diferido', () => initAltas());
+</script>
 <style>
-  .ae { content-visibility: auto; contain-intrinsic-size: auto 560px; margin-top: 24px; display: grid; gap: 40px; align-items: center; }
+  /* Sin content-visibility: la escena ya se monta tarde (Diferido) y el hueco reserva su alto. */
+  .ae { margin-top: 24px; display: grid; gap: 40px; align-items: center; }
   @media (--lg) {
     .ae { grid-template-columns: minmax(0, 470px) minmax(0, 528px); justify-content: space-between; gap: 64px; margin-top: 40px; }
   }

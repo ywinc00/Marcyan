@@ -8,8 +8,10 @@
 // Degradado: la cifra del precio (desviación medida del plan: el plan lo ponía en la cola del
 // H1, pero H1 noche + cola no caben en 2 líneas en la columna de 560 y la cola no se pinta,
 // regla de §2.14).
-// Orden (§4.11): hero → tríada → 01 cómo decide → 02 la IA ya decide → 03 dónde trabaja →
-// 04 tus datos → caso → precio → franja → FAQ → cierre → hermanas (Contact lo pone WLanding).
+// v2 (rediseno-workos-v2.md §3 G06): fondo F05 (placa); esclusa con canales legibles y
+// amanecer teal; "Así está montada" (chip) y "Dónde trabaja" (constelación de logos).
+// Orden: hero → tríada → 01 cómo decide → 02 la IA ya decide → 03 así está montada →
+// 04 dónde trabaja → 05 tus datos → caso → precio → franja → FAQ → cierre → hermanas.
 // Process desaparece (el secundario de antes iba a #faq, que sigue).
 // ─────────────────────────────────────────────────────────────
 import HeroIaPymes from '../../heroes/HeroIaPymes.astro';
@@ -20,6 +22,7 @@ import TarjetasHermanas from '../../TarjetasHermanas.astro';
 import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
 import ComoDecide from '../../sections/ia/ComoDecide.astro';
 import LaIaDecide from '../../sections/ia/LaIaDecide.astro';
+import AsiMontada from '../../sections/ia/AsiMontada.astro';
 import ConstelacionCanales from '../../sections/ia/ConstelacionCanales.astro';
 import DatosASalvo from '../../sections/ia/DatosASalvo.astro';
 import CasoIa from '../../sections/ia/CasoIa.astro';
@@ -51,6 +54,9 @@ const HOUSTON = nap.houston;
 const spec: KindSpec = {
   kind: 'ia-pymes',
   tone: 'teal',
+  // F05 (placa, P12): pistas teal con pulsos que nacen de la esclusa del hero (texto a la izquierda).
+  fondo: 'F05',
+  fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroIaPymes,
   hero: (ctx) => {
     const t = copyOf(ctx);
@@ -76,17 +82,21 @@ const spec: KindSpec = {
       props: (ctx) => ({ copy: copyOf(ctx).decide, n: 2, paragraphs: ctx.cluster.local.paragraphs, lang: ctx.lang }),
     },
 
-    // 5 · 03 Dónde trabaja: constelación de canales reales, estática.
-    { component: ConstelacionCanales, props: (ctx) => ({ copy: copyOf(ctx).canales, n: 3 }) },
+    // 03 Así está montada (ChipIA landing + PildorasMarcas, filas honestas de G01; v2 §3 G06).
+    // Ancla #proceso: la de producción para "cómo funciona", perdida desde la v1 (revisión G06 r1).
+    { component: AsiMontada, id: 'proceso', props: (ctx) => ({ copy: copyOf(ctx).montada, n: 3, lang: ctx.lang }) },
 
-    // 6 · 04 Tus datos, a salvo (DatosASalvo de 2-ia-chat).
-    { component: DatosASalvo, props: (ctx) => ({ copy: copyOf(ctx).datos, n: 4, lang: ctx.lang }) },
+    // 04 Dónde trabaja: ConstelacionMarcas (W-ADV-21) con Marcy en el centro, viva.
+    { component: ConstelacionCanales, props: (ctx) => ({ copy: copyOf(ctx).canales, n: 4, lang: ctx.lang }) },
+
+    // 05 Tus datos, a salvo (DatosASalvo de 2-ia-chat).
+    { component: DatosASalvo, props: (ctx) => ({ copy: copyOf(ctx).datos, n: 5, lang: ctx.lang }) },
 
     // 7 · Caso real (Rosy Nails & Care). Conserva el id #proyectos de antes.
     {
       component: CasoIa,
       id: 'proyectos',
-      props: (ctx) => ({ copy: copyOf(ctx).caso, n: 5, items: ctx.cluster.proof.items, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).caso, n: 6, items: ctx.cluster.proof.items, lang: ctx.lang }),
     },
 
     // 8 · Precio (#precios): "Desde $500" + "Asistente completo desde $900" (R6); degradado.

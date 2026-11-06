@@ -1,14 +1,13 @@
 // ─────────────────────────────────────────────────────────────
-// Tipo `ia-chat` · IA conversacional por ciudad (design/rediseno-workos.md §4.12, ola 2).
-// Su existencia activa el tipo (registry.ts); /es/houston/ia-conversacional y
-// /es/miami/ia-conversacional lo importan y montan WLanding.
+// Tipo `ia-chat` · IA conversacional por ciudad (design/rediseno-workos-v2.md §3 G06).
+// /es/houston/ia-conversacional y /es/miami/ia-conversacional lo importan y montan WLanding.
 //
-// Contraste: "Tú le explicas, Marcy lo cumple" (.w-contrast). Firma: las pestañas de Marcy
-// del hero (el avatar está quieto). Degradado: la cifra del precio.
-// Orden (§4.12): hero → 01 sin/con → 02 cómo trabaja → 03 contraste → 04 lo que pasó hoy →
-// 05 a dónde te avisa → prosa local → 06 tus datos → precio → caso → franja → FAQ →
-// cierre → hermanas (Contact lo pone WLanding). Process desaparece (su ancla no la usaba
-// nadie: el secundario del hero ya iba a #faq).
+// Fondo F04 (hilos de voz, P12). Hero = EscenaDosActos (P08, W2N-01): "¿Quién contesta a las
+// 11 de la noche?" → "Respondido por Marcy", con el H1 verbatim visible desde el primer pintado.
+// Orden: hero → 01 sin/con → 02 contesta en cada canal (MazoHilos, P05) → 03 cómo trabaja →
+// 04 contraste → 05 lo que pasó hoy (RegistroVivo vivo) → 06 a dónde te avisa (W-CORE-30) →
+// prosa local → 07 tus datos → 08 así empiezas con Marcy (AltaMarcy, P09) → precio → caso →
+// franja → FAQ → cierre → hermanas (Contact lo pone WLanding).
 // ─────────────────────────────────────────────────────────────
 import HeroIaChat from '../../heroes/HeroIaChat.astro';
 import ProsaLocal from '../../ProsaLocal.astro';
@@ -16,6 +15,8 @@ import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
 import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
 import TarjetasHermanas from '../../TarjetasHermanas.astro';
 import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
+import ContestaCanales from '../../sections/ia/ContestaCanales.astro';
+import AsiEmpiezas from '../../sections/ia/AsiEmpiezas.astro';
 import SinMarcy from '../../sections/ia/SinMarcy.astro';
 import ComoTrabaja from '../../sections/ia/ComoTrabaja.astro';
 import ReglasNaturales from '../../sections/ia/ReglasNaturales.astro';
@@ -47,19 +48,19 @@ const anchorOf = (id: string) => {
 const spec: KindSpec = {
   kind: 'ia-chat',
   tone: 'teal',
+  fondo: 'F04',
+  // --wf-obj: la banda de hilos pasa por detrás del borde de arriba del portátil (el nudo queda
+  // tapado por el objeto opaco, nunca detrás del texto: E-37).
+  fondoOpciones: () => ({ texto: 'centro', vars: '--wf-obj: 600px; --wf-obj-movil: 560px' }),
   Hero: HeroIaChat,
   hero: (ctx) => {
     const t = copyOf(ctx);
     return {
       h1Html: ctx.cluster.hero.h1,
-      chip: t.chip,
-      eyebrow: t.eyebrow,
       lead: t.lead,
       primary: { label: t.primary, href: '#contacto', track: 'proposal_requested' },
       link: { label: t.link, href: '#faq' },
-      tabs: t.tabs,
-      sr: t.heroSr,
-      avatarAlt: t.avatarAlt,
+      respondido: t.respondido,
       lang: ctx.lang,
     };
   },
@@ -67,21 +68,24 @@ const spec: KindSpec = {
     // 2 · 01 Sin Marcy / con Marcy (W-CORE-25).
     { component: SinMarcy, props: (ctx) => ({ copy: copyOf(ctx).sinCon, n: 1, lang: ctx.lang }) },
 
-    // 3 · 02 Cómo trabaja (W-ADV-05 + W-ADV-06).
-    { component: ComoTrabaja, id: 'proceso', props: (ctx) => ({ copy: copyOf(ctx).pasos, n: 2, lang: ctx.lang }) },
+    // 3 · 02 Contesta en cada canal (MazoHilos, P05 · W-ADV-22): sustituye a las pestañas v1.
+    { component: ContestaCanales, id: 'canales', props: (ctx) => ({ copy: copyOf(ctx).canales, n: 2, lang: ctx.lang }) },
+
+    // 4 · 03 Cómo trabaja (W-ADV-05 + W-ADV-06).
+    { component: ComoTrabaja, id: 'proceso', props: (ctx) => ({ copy: copyOf(ctx).pasos, n: 3, lang: ctx.lang }) },
 
     // 4 · Capítulo de contraste: 03 Tú le explicas, Marcy lo cumple (W-ADV-07).
     {
       component: ReglasNaturales,
       contrast: 'contrast',
-      props: (ctx) => ({ copy: copyOf(ctx).reglas, n: 3, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).reglas, n: 4, lang: ctx.lang }),
     },
 
-    // 5 · 04 Lo que pasó hoy (W-ADV-44 static + W-ADV-23).
-    { component: LoQuePasoHoy, props: (ctx) => ({ copy: copyOf(ctx).hoy, n: 4, lang: ctx.lang }) },
+    // 05 Lo que pasó hoy (W-ADV-44 vivo + W-ADV-23).
+    { component: LoQuePasoHoy, props: (ctx) => ({ copy: copyOf(ctx).hoy, n: 5, lang: ctx.lang }) },
 
-    // 6 · 05 A dónde te avisa (W-HOME-14).
-    { component: AvisoBifurca, props: (ctx) => ({ copy: copyOf(ctx).aviso, n: 5, lang: ctx.lang }) },
+    // 06 A dónde te avisa (W-CORE-30: navegador + 2 satélites, la línea nace del globo de Marcy).
+    { component: AvisoBifurca, props: (ctx) => ({ copy: copyOf(ctx).aviso, n: 6, lang: ctx.lang }) },
 
     // 7 · Por qué en la ciudad: local.paragraphs VERBATIM (contrato de paridad).
     {
@@ -94,7 +98,10 @@ const spec: KindSpec = {
     },
 
     // 8 · 06 Tus datos, a salvo (W-PROOF-25 sin sellos).
-    { component: DatosASalvo, props: (ctx) => ({ copy: copyOf(ctx).datos, n: 6, lang: ctx.lang }) },
+    { component: DatosASalvo, props: (ctx) => ({ copy: copyOf(ctx).datos, n: 7, lang: ctx.lang }) },
+
+    // 08 Así empiezas con Marcy (AltaMarcy, P09 · W2N-05), antes del precio.
+    { component: AsiEmpiezas, id: 'empezar', props: (ctx) => ({ copy: copyOf(ctx).alta, n: 8, lang: ctx.lang }) },
 
     // 9 · Precio con puntos (#precios): "Desde $500" + "Asistente completo desde $900" (R6).
     {
@@ -108,7 +115,7 @@ const spec: KindSpec = {
       component: CasoIa,
       id: 'proyectos',
       props: (ctx) => ({
-        copy: copyOf(ctx).caso, n: 7, items: ctx.cluster.proof.items,
+        copy: copyOf(ctx).caso, n: 9, items: ctx.cluster.proof.items,
         // Miami: sin el enlace al servicio de Houston del proyecto (insinuaría un caso en Miami).
         link: cityOf(ctx) !== 'miami', lang: ctx.lang,
       }),

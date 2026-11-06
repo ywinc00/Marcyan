@@ -1,83 +1,107 @@
 ---
-// Hero de IA conversacional por ciudad (design/rediseno-workos.md §4.12, ola 2).
-// A-05 + W-ADV-18 + W-ADV-19: texto centrado (HeroTexto noche, coreografía §2.9) y debajo
-// el avatar 3D REAL de Marcy, QUIETO (entra como objeto y se queda: la única vida del hero
-// son las pestañas, E-52), sobre el MarcoPestanas con ChatMarcy en claro.
-// Avatar: el archivo tal cual (public/assets/bot/marcy-hero.webp, 364×512), sin recorte
-// ni object-fit: su encuadre es un contrato (public/assets/bot/README.md). Solo
-// se escala. El marco tapa los pies (como el portátil de W-ADV-18): composición, no recorte.
-import HeroTexto from '../HeroTexto.astro';
-import MarcoPestanas from '../objetos/MarcoPestanas.astro';
-import ChatMarcy from '../objetos/ChatMarcy.astro';
+// Hero de IA conversacional por ciudad (design/rediseno-workos-v2.md §3 G06, P08).
+// W2N-01 (hero de Passport) calzado: "¿Quién contesta a las 11 de la noche?" → "Respondido
+// por Marcy". Monta EscenaDosActos (P08, pieza compartida, no se edita aquí) con:
+//   · slot "titulo": el H1 VERBATIM de la página, único <h1>, visible al 100 % desde el
+//     primer pintado (sin data-w-in ni opacidad: B3, LCP independiente de la coreografía),
+//     y, encima, la línea del acto 2 ("Respondido por Marcy."), aria-hidden, que ocupa
+//     EXACTAMENTE la caja de la pregunta del acto 1 (mismo tamaño y línea) y aparece cuando
+//     ésta se funde: como "Single sign-on?" → "Passport" del original, sin hueco sobre el H1;
+//   · slot "bajada": la bajada de hoy; slot "acciones": los botones del sitio (mismos
+//     destinos y data-track que la v1).
+// Cielo (revisión G06 r1): en W2N-01 TODO el fondo pasa de noche a amanecer. La noche de la
+// escena queda transparente (deja ver los hilos F04 de la zona sobre la noche lisa) y el
+// amanecer del acto 2 cubre el hero entero: un velo que aclara desde arriba hacia un
+// horizonte teal, con el resplandor del token --w-dawn-teal; deja ver los hilos.
+// Migas: arriba a la izquierda en la línea del logo (como HeroTexto en escritorio); en
+// móvil, centradas encima de la pregunta del acto 1.
+import EscenaDosActos from '../mac/EscenaDosActos.astro';
+import Button from '../../ui/Button.astro';
 
 interface Cta { label: string; href: string; track?: string }
-type Msg = { from: 'c' | 'm'; text: string; time?: string };
 interface Props {
   h1Html: string;
-  chip: string;
-  eyebrow: string;
   lead: string;
   primary: Cta;
   link?: Cta;
-  tabs: { label: string; script: Msg[] }[];
-  sr: string;
-  avatarAlt: string;
+  respondido?: string;
   lang?: 'es' | 'en';
 }
-const { h1Html, chip, eyebrow, lead, primary, link, tabs, sr, avatarAlt, lang = 'es' } = Astro.props;
+const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero w-hero--bleed hic">
-  <div class="w-container">
-    <HeroTexto
-      eyebrow={eyebrow}
-      tone="teal"
-      chip={chip}
-      h1Html={h1Html}
-      lead={lead}
-      primary={primary}
-      link={link}
-      size="night"
-    >
-      <slot name="crumbs" slot="crumbs" />
-    </HeroTexto>
-  </div>
-
-  <div class="w-container hic__stage">
-    <div class="hic__marcy" data-w-in="obj">
-      <picture>
-        <source srcset="/assets/bot/marcy-hero.webp" type="image/webp" />
-        <img src="/assets/bot/marcy-hero.png" width="364" height="512" alt={avatarAlt} decoding="async" fetchpriority="low" />
-      </picture>
-    </div>
-    <div class="hic__frame" data-w-in="obj">
-      <MarcoPestanas tabs={tabs.map((t) => t.label)} lang={lang}>
-        <ChatMarcy mode="pestanas" tabsBar={false} tabs={tabs} lang={lang} sr={sr} />
-      </MarcoPestanas>
-    </div>
-  </div>
-</section>
+<div class="hic" data-w-tone="teal">
+  {Astro.slots.has('crumbs') && <div class="hic__crumbs"><slot name="crumbs" /></div>}
+  <EscenaDosActos lang={lang} id="dos-actos">
+    <Fragment slot="titulo">
+      {respondido && (
+        <p class="hic__ok" aria-hidden="true">
+          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.4 3 3 6-6.4" /></svg>{respondido}
+        </p>
+      )}
+      <h1 class="hic__h1" set:html={h1Html} />
+    </Fragment>
+    <p slot="bajada">{lead}</p>
+    <Fragment slot="acciones">
+      <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
+      {link && <Button variant="secondary" size="lg" href={link.href} data-track={link.track}>{link.label}</Button>}
+    </Fragment>
+  </EscenaDosActos>
+</div>
 
 <style>
-  .hic { overflow-x: clip; padding-bottom: clamp(64px, 3rem + 3vw, 112px); }
-  .hic__stage {
-    position: relative; margin-top: 40px;
-    display: flex; flex-direction: column; align-items: center;
+  .hic { position: relative; }
+  /* Noche: transparente (la noche lisa de la página y los hilos F04 se ven debajo). */
+  .hic :global(.da-noche) { background: none; }
+  /* Amanecer del acto 2 sobre TODO el hero: arriba casi noche (el H1 sigue sobre oscuro),
+     el cielo se abre hacia un horizonte teal y el resplandor sube desde abajo. */
+  .hic :global(.da-alba) {
+    background:
+      radial-gradient(90% 55% at 50% 100%, rgba(79, 195, 161, .34) 0%, rgba(79, 195, 161, .12) 45%, transparent 75%),
+      linear-gradient(180deg, rgba(9, 14, 22, .55) 0%, rgba(13, 34, 42, .62) 38%, rgba(20, 70, 70, .66) 72%, rgba(36, 112, 98, .7) 100%);
+    transition: opacity 1.2s cubic-bezier(.22, 1, .36, 1);
   }
-  /* Luz neutra detrás del avatar (crema muy tenue, sin halo teal: E-03): el cuerpo negro
-     de Marcy no se pierde contra la noche. */
-  .hic__marcy {
-    position: relative; z-index: 0; width: 185px; margin-bottom: -34px;
+  /* Línea del acto 2: la caja de la pregunta del acto 1 (mismo cuerpo y línea, encima del H1). */
+  .hic :global(.da-h1) { position: relative; }
+  .hic__ok {
+    position: absolute; left: 0; right: 0; bottom: 100%;
+    margin: 0 0 calc(var(--da-t) * .6 * .25);
+    display: flex; align-items: center; justify-content: center; gap: .35em;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: calc(var(--da-t) * .6); line-height: 1.1; letter-spacing: -.03em;
+    color: var(--accent-teal, #4fc3a1);
+    white-space: nowrap;
+    transition: opacity .6s ease .45s, transform .6s cubic-bezier(.22, 1, .36, 1) .45s;
   }
-  .hic__marcy::before {
-    content: ''; position: absolute; inset: -20% -70% -10%; z-index: -1; pointer-events: none;
-    background: radial-gradient(closest-side, rgba(var(--star-rgb), .10), rgba(var(--star-rgb), .035) 55%, transparent);
+  .hic__ok svg { flex: none; width: .82em; height: .82em; }
+  .hic :global(.da[data-da-fase='inicio']) .hic__ok { opacity: 0; transform: translateY(.2em); transition: none; }
+  /* Rendimiento (revisión G06 r1, medido con CPU ×4 y red móvil): el primer trazado del
+     portátil (≈ 280 nodos de ventanas y panel) retrasaba el primer pintado del H1 ≈ 300 ms y
+     dejaba tareas largas. El portátil se pinta un fotograma DESPUÉS (60 ms) que el titular:
+     mientras, su caja queda reservada con su medida real (ancho min(976 px, 100vw − 32 px),
+     alto 0,638 × ancho, medido de 360 a 1920), así nada salta. Solo CSS: sin JS y con
+     movimiento reducido el portátil se pinta a la vez. La causa de fondo (las ventanas del
+     acto 1 viven siempre en el DOM aunque solo se usan en la primera visita) es de la pieza
+     compartida EscenaDosActos, apuntada como [SISTEMA]. */
+  .hic :global(.da-mac) {
+    contain-intrinsic-size: auto min(976px, 100vw - 32px) auto calc(min(976px, 100vw - 32px) * .638);
+    animation: hic-mac 1ms steps(1) 60ms backwards;
   }
-  .hic__marcy img { display: block; width: 100%; height: auto; }
-  .hic__frame { position: relative; z-index: 1; width: 100%; max-width: 1080px; }
-  @media (--lt-md) {
-    /* Avatar más pequeño y escenario más arriba: la etiqueta "Ejemplo" del chat queda por
-       encima del botón flotante del chat en la primera pantalla a 390×844 (E-18, control global r1). */
-    .hic__stage { margin-top: 24px; }
-    .hic__marcy { width: 96px; margin-bottom: -16px; }
+  @keyframes hic-mac { from { content-visibility: hidden; } to { content-visibility: visible; } }
+  @media (prefers-reduced-motion: reduce) { .hic :global(.da-mac) { animation: none; } }
+  .hic__crumbs {
+    position: absolute; z-index: 3; left: 0; right: 0;
+    top: calc(var(--nav-h, 72px) + 12px);
+    display: flex; justify-content: center; padding-inline: 16px;
   }
+  .hic__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  /* En móvil las migas ocupan su línea: la escena baja lo justo para no pisar la pregunta. */
+  .hic :global(.da) { padding-top: calc(var(--nav-h, 72px) + 56px); }
+  @media (min-width: 1024px) {
+    .hic__crumbs {
+      justify-content: flex-start;
+      left: max(0px, calc(50% - var(--container-max) / 2)); padding-inline: var(--container-pad);
+    }
+    .hic :global(.da) { padding-top: calc(var(--nav-h, 72px) + 48px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hic__ok { transition: none; } }
 </style>

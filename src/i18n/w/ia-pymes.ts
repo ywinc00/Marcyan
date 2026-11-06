@@ -37,19 +37,19 @@ const es = {
     title: '<span class="w-tone">Tus clientes ya le preguntan a la IA.</span> ¿Te nombra a ti?',
   },
 
+  montada: {
+    label: 'Así está montada',
+    title: '<span class="w-tone">Un cerebro,</span> todos tus canales.',
+    text: 'Marcy piensa con Claude y responde donde te escriben tus clientes.',
+    filas: ['Piensa con', 'Contesta en', 'Te encuentran en'] as [string, string, string],
+  },
+
   canales: {
     label: 'Dónde trabaja',
     title: '<span class="w-tone">Donde ya te escriben.</span> Sin cambiar de herramientas.',
-    text: 'Marcy contesta en los canales que tus clientes ya usan. Antes de empezar te decimos con honestidad cuáles se pueden conectar en tu negocio.',
-    marcy: 'Marcy',
-    channels: [
-      { name: 'Tu web', icon: 'lucide:globe' },
-      { name: 'WhatsApp', icon: 'lucide:message-circle' },
-      { name: 'Instagram', icon: 'lucide:instagram' },
-      { name: 'Messenger', icon: 'lucide:messages-square' },
-      { name: 'Google', icon: 'lucide:map-pin' },
-    ],
-    sr: 'Marcy contesta en tu web, WhatsApp, Instagram, Messenger y Google.',
+    text: 'Marcy contesta en tu web y en los canales que tus clientes ya usan, agenda en tu calendario y te avisa por correo. Antes de empezar te decimos con honestidad cuáles se pueden conectar en tu negocio.',
+    chips: ['Tu web', 'WhatsApp', 'Instagram', 'Messenger', 'Calendario', 'Correo'],
+    sr: 'Marcy trabaja con tu web, WhatsApp, Instagram, Messenger, tu calendario y tu correo.',
   },
 
   datos: {
@@ -129,19 +129,19 @@ const en: typeof es = {
     title: '<span class="w-tone">Your customers already ask AI.</span> Does it name you?',
   },
 
+  montada: {
+    label: 'How it’s built',
+    title: '<span class="w-tone">One brain,</span> every channel.',
+    text: 'Marcy thinks with Claude and answers wherever your customers reach you.',
+    filas: ['Thinks with', 'Answers on', 'Found on'],
+  },
+
   canales: {
     label: 'Where she works',
     title: '<span class="w-tone">Where customers already reach you.</span> No new tools to learn.',
-    text: 'Marcy answers on the channels your customers already use. Before we start, we tell you honestly which ones we can connect for your business.',
-    marcy: 'Marcy',
-    channels: [
-      { name: 'Your website', icon: 'lucide:globe' },
-      { name: 'WhatsApp', icon: 'lucide:message-circle' },
-      { name: 'Instagram', icon: 'lucide:instagram' },
-      { name: 'Messenger', icon: 'lucide:messages-square' },
-      { name: 'Google', icon: 'lucide:map-pin' },
-    ],
-    sr: 'Marcy answers on your website, WhatsApp, Instagram, Messenger and Google.',
+    text: 'Marcy answers on your website and on the channels your customers already use, books into your calendar and lets you know by email. Before we start, we tell you honestly which ones we can connect for your business.',
+    chips: ['Your website', 'WhatsApp', 'Instagram', 'Messenger', 'Calendar', 'Email'],
+    sr: 'Marcy works with your website, WhatsApp, Instagram, Messenger, your calendar and your email.',
   },
 
   datos: {

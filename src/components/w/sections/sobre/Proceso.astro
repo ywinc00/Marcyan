@@ -1,65 +1,29 @@
 ---
-// Sobre nosotros · 02 "Cómo es un proyecto" (#proceso, design/rediseno-workos.md §4.6-3).
-// Patrón del piloto (lista junto a un objeto, rev1 E-54): a la izquierda la TablaFases con
-// los 5 pasos de content.process (datos intactos, Process.astro no se toca), apilada en dos
-// columnas (paso · qué hacemos y qué recibes); a la derecha una bandeja opaca con dos
-// objetos de PRODUCTO en claro cálido (MiniPasos, estáticos, rotulados "Ejemplo"): lo que
-// recibes en el primer paso (el correo con tu propuesta) y en el último (la web publicada).
-// Son la luz de la sección (E-01): sin bucle, la firma de la página sigue siendo la placa.
+// Sobre nosotros · 02 "Cómo es un proyecto" (#proceso, design/rediseno-workos-v2.md §3 G10).
+// v2: la TablaFases de la v1 se sustituye por LineaFases variante="compacta" (P11): los cinco
+// pasos de content.process (VERBATIM, Process.astro no se toca) a la izquierda y el panel fijo
+// de escenas a la derecha, gesto F-05 de WorkOS. La compacta no lleva slot final: la quinta
+// escena es la web publicada. En móvil cada escena cae bajo su paso (lo resuelve la pieza).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import TablaFases from '../../TablaFases.astro';
-import MiniPasos from '../../objetos/MiniPasos.astro';
+import LineaFases from '../../proceso/LineaFases.astro';
+import type { Fase } from '../../proceso/proceso';
 
-interface Row { phase: string; block: string; gets?: string }
 interface Props {
   n: number;
   label: string;
   titleHtml: string;
   lead: string;
-  rows: Row[];
-  headers: [string, string, string];
+  fases: Fase[];
   lang?: 'es' | 'en';
 }
-const { n, label, titleHtml, lead, rows, headers, lang = 'es' } = Astro.props;
-const first = rows[0];
-const last = rows[rows.length - 1];
+const { n, label, titleHtml, lead, fases, lang = 'es' } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
 <div class="wsp">
-  <TablaFases rows={rows} headers={headers} class="wsp__list" />
-  <div class="wsp__side w-tray w-tray--opaque">
-    <figure class="wsp__obj">
-      <figcaption class="wsp__cap"><span>{first.phase}</span>{first.block}</figcaption>
-      <MiniPasos kind="correo" lang={lang} />
-    </figure>
-    <figure class="wsp__obj">
-      <figcaption class="wsp__cap"><span>{last.phase}</span>{last.block}</figcaption>
-      <MiniPasos kind="publicada" lang={lang} />
-    </figure>
-  </div>
+  <LineaFases fases={fases} lang={lang} variante="compacta" tono="gold" />
 </div>
 
 <style>
-  .wsp { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; margin-top: 40px; min-width: 0; }
-  .wsp__side { display: grid; gap: 16px; align-content: start; min-width: 0; order: -1; }
-  /* Móvil y tableta: los objetos ANTES de la lista (como la demo del piloto), para que la
-     sección no abra con ~1.000 px de texto seguido. */
-  .wsp__obj { margin: 0; padding: 16px; background: var(--w-s2); border: 1px solid var(--w-line); border-radius: var(--w-r-obj); box-shadow: var(--w-edge); min-width: 0; }
-  .wsp__cap {
-    display: flex; gap: 12px; align-items: baseline; margin: 0 0 14px;
-    font: 500 15px/1.3 var(--font-display); color: var(--w-ink);
-  }
-  .wsp__cap span { font: 500 13px/1.3 var(--font-mono); letter-spacing: .02em; color: var(--w-accent); }
-  @media (--md) {
-    /* En columna: paso a la izquierda; qué hacemos y qué recibes juntos a la derecha. */
-    .wsp :global(.wsp__list .phases__t tr) { grid-template-columns: 96px minmax(0, 1fr); gap: 6px 0; }
-    .wsp :global(.wsp__list .phases__phase) { grid-row: span 2; }
-    .wsp :global(.wsp__list .phases__block) { padding-right: 0; font-weight: 500; }
-    .wsp :global(.wsp__list .phases__gets) { grid-column: 2; }
-  }
-  @media (--lg) {
-    .wsp { grid-template-columns: minmax(0, 1fr) 440px; gap: 64px; margin-top: var(--w-chapter-gap); align-items: start; }
-    .wsp :global(.wsp__list) { margin: 0; }
-    .wsp__side { order: 0; }
-  }
+  .wsp { margin-top: var(--w-chapter-gap); min-width: 0; }
+  @media (--lt-md) { .wsp { margin-top: 40px; } }
 </style>

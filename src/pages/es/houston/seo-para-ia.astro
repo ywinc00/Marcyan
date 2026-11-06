@@ -20,9 +20,9 @@ import SiteFooter from '../../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ServiceLd from '../../../components/seo/ServiceLd.astro';
-import SpaceBackdrop from '../../../components/SpaceBackdrop.astro';
 import WStyles from '../../../components/w/WStyles.astro';
 import HeroTexto from '../../../components/w/HeroTexto.astro';
+import Fondo from '../../../components/w/fondos/Fondo.astro';
 import TunelRejilla from '../../../components/w/objetos/TunelRejilla.astro';
 import RespuestaAsistente from '../../../components/w/objetos/RespuestaAsistente.astro';
 import ProsaLocal from '../../../components/w/ProsaLocal.astro';
@@ -37,11 +37,13 @@ import CadaAsistente from '../../../components/w/sections/seo-ia/CadaAsistente.a
 import DiceEntiende from '../../../components/w/sections/seo-ia/DiceEntiende.astro';
 import QueCambiamos from '../../../components/w/sections/seo-ia/QueCambiamos.astro';
 import FichaAgentes from '../../../components/w/sections/seo-ia/FichaAgentes.astro';
+import PreguntaleTu from '../../../components/w/sections/seo-ia/PreguntaleTu.astro';
 import { content, nap } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
 import { catalog } from '../../../i18n/pricing';
 import { serviciosPara } from '../../../i18n/w/nav';
 import { seoIaPage as p, aeoTiers } from '../../../i18n/seo-ia';
+import { seoIaW } from '../../../i18n/w/seo-ia';
 
 const c = content.es;
 const usd = (n: number) => '$' + n.toLocaleString('en-US');
@@ -68,129 +70,8 @@ const [diag, cimientos, monitoreo] = aeoTiers;
 const telH = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const waH = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 
-// ── Copy NUEVO (libre) · sin guiones conectores, "dominamos" la IA, ejemplos rotulados ──
-const t = {
-  eyebrow: 'Que la IA te nombre',
-  lead: 'Cuando le pregunten a la IA, que diga tu nombre. Preparamos tu negocio de Houston para que ChatGPT, Gemini y Google te encuentren y te recomienden, en español.',
-  primary: 'Diagnóstico de IA gratis',
-  question: '¿Qué plomero de Houston atiende en español?',
-  business: 'Tu Plomería',
-  asistentes: {
-    label: 'Cada asistente, su respuesta',
-    title: 'La misma pregunta, cuatro asistentes',
-    lead: 'Cada uno arma su respuesta con fuentes distintas. Preparamos tu información para todos, no solo para Google.',
-    intro: 'Tu cliente no pregunta en un solo sitio. Por eso cuidamos lo que lee cada asistente.',
-    traits: [
-      { icon: 'lucide:message-square', text: 'ChatGPT busca sobre todo en Bing.' },
-      { icon: 'lucide:globe', text: 'Perplexity cita las páginas que lee, con su enlace.' },
-      { icon: 'lucide:sparkles', text: 'Gemini se apoya en la búsqueda de Google.' },
-      { icon: 'lucide:search', text: 'Google resume la respuesta en la misma página de resultados.' },
-    ],
-    sourcesLabel: 'Leyó',
-    tabs: [
-      { id: 'chatgpt', label: 'ChatGPT', kind: 'Responde ChatGPT', answer: { pre: 'Te sugiero ', biz: 'Tu Plomería', post: ': atiende en español e inglés, trabaja en Katy y Sugar Land y hoy abre hasta las 6 p. m.' }, sources: ['Bing Places', 'tunegocio.example'] },
-      { id: 'perplexity', label: 'Perplexity', kind: 'Responde Perplexity', answer: { pre: '', biz: 'Tu Plomería', post: ' es un servicio de plomería en Houston con atención en español. En su web indica sus zonas y su horario.', refs: true }, sources: ['tunegocio.example/servicios', 'tunegocio.example/preguntas'] },
-      { id: 'gemini', label: 'Gemini', kind: 'Responde Gemini', answer: { pre: 'Una opción es ', biz: 'Tu Plomería', post: ', en Houston: atiende en los dos idiomas y cubre Katy y Sugar Land.' }, sources: ['Ficha de empresa', 'tunegocio.example'] },
-      { id: 'google', label: 'Google', kind: 'Resumen en la búsqueda de Google', answer: { pre: '', biz: 'Tu Plomería', post: ' es un plomero de Houston con atención en español. Abre de lunes a sábado, de 8 a 6.' }, sources: ['Ficha de mapa', 'tunegocio.example'] },
-    ],
-  },
-  dice: {
-    label: 'Lo que dices y lo que entiende la IA',
-    cardTitle: 'De tu web a datos que la IA lee',
-    colSay: 'En tu web',
-    colData: 'Para la IA',
-    rows: [
-      { say: 'Abrimos de lunes a sábado, de 8 a 6', key: 'openingHours', value: '"Mo-Sa 08:00-18:00"' },
-      { say: 'Hablamos español e inglés', key: 'availableLanguage', value: '["es", "en"]' },
-      { say: 'Trabajamos en Katy y Sugar Land', key: 'areaServed', value: '["Katy", "Sugar Land"]' },
-      { say: 'Somos plomeros', key: '@type', value: '"Plumber"' },
-    ],
-    title: 'Lo que ya dices, en el formato que la IA entiende',
-    lead: 'Un párrafo se puede malinterpretar; un dato estructurado no. Pasamos tu horario, tus zonas y tus idiomas a schema, el formato que leen Google, Bing y los asistentes.',
-    link: 'Ver qué cambiamos',
-  },
-  cambiamos: {
-    label: 'Qué cambiamos',
-    card: {
-      name: 'Tu Plomería',
-      kind: 'Plomero · Houston, TX',
-      rows: [
-        { k: 'Bing Places', v: 'Al día' },
-        { k: 'Schema', v: 'En cada página' },
-        { k: 'Preguntas', v: 'ES y EN' },
-        { k: 'Nombre y teléfono', v: 'Iguales' },
-      ],
-      result: 'Lista para que la IA la cite',
-    },
-  },
-  ficha: {
-    label: 'La ficha que leen los asistentes',
-    title: 'Un archivo que le explica tu negocio a la IA',
-    lead: 'Además del schema, dejamos en tu web un llms.txt: un resumen en texto plano de quién eres, qué haces y dónde trabajas, pensado para los asistentes.',
-    file: {
-      name: 'tunegocio.example/llms.txt',
-      kind: 'Texto',
-      foot: 'Cada negocio lleva el suyo, escrito con sus datos reales.',
-      lines: [
-        { t: 'h1', text: '# Tu Plomería' },
-        { t: 'q', text: '> Plomeros en Houston. Atendemos en español e inglés.' },
-        { t: 'sp' },
-        { t: 'h2', text: '## Servicios' },
-        { t: 'li', text: '- Reparación de fugas' },
-        { t: 'li', text: '- Destapado de drenajes' },
-        { t: 'li', text: '- Calentadores de agua' },
-        { t: 'sp' },
-        { t: 'h2', text: '## Zonas' },
-        { t: 'li', text: '- Houston, Katy y Sugar Land' },
-        { t: 'sp' },
-        { t: 'h2', text: '## Horario' },
-        { t: 'li', text: '- Lunes a sábado, de 8:00 a 18:00' },
-        { t: 'sp' },
-        { t: 'h2', text: '## Contacto' },
-        { t: 'li', text: '- Teléfono y WhatsApp en tunegocio.example/contacto' },
-      ] as { t: 'h1' | 'q' | 'h2' | 'li' | 'sp'; text?: string }[],
-    },
-    prompt: { title: 'Lo que pregunta tu cliente', kind: 'Ejemplo', text: '¿Qué plomero de Houston atiende en español y abre el sábado?', biz: 'Tu Plomería', reply: ' atiende en español e inglés y abre los sábados, de 8:00 a 18:00.', source: 'Fuente: tunegocio.example/llms.txt' },
-    notes: [
-      { k: 'Índice', text: 'llms.txt resume tu negocio en una sola página que la IA lee rápido.' },
-      { k: 'Datos estructurados', text: 'El schema de cada página dice tu horario, tus zonas y tus servicios.' },
-    ],
-  },
-  gratis: {
-    items: [
-      { icon: 'lucide:radar', text: diag.includes![0] },
-      { icon: 'lucide:map-pin', text: diag.includes![1] },
-      { icon: 'lucide:list-checks', text: diag.includes![2] },
-      { icon: 'lucide:languages', text: 'En español, para tu mercado local' },
-    ] as [{ icon: string; text: string }, { icon: string; text: string }, { icon: string; text: string }, { icon: string; text: string }],
-    checks: [diag.includes![3], 'Te decimos con honestidad cómo estás'],
-  },
-  desde: 'Desde',
-  precioNote: { title: '¿Empiezas por el diagnóstico?', text: 'Es gratis y te dice qué te falta antes de pagar nada.' },
-  franja: {
-    queEs: 'Qué es',
-    desdeT: 'Desde cuánto',
-    tiempoT: 'En cuánto tiempo',
-    desde: `Diagnóstico gratis. Cimientos desde ${cimientos.displayPrice} y monitoreo desde ${monitoreo.displayPrice} al mes.`,
-    tiempo: 'Propuesta en 24 horas. Las primeras señales suelen tomar semanas.',
-    verQue: 'Ver qué cambiamos',
-    verPrecios: 'Ver precios',
-    pedir: 'Pedir diagnóstico',
-  },
-  hermanas: {
-    title: "<span class='w-tone'>Que la IA te nombre es el principio.</span> Lo demás te trae el cliente.",
-    lead: 'Servicios de Marcyan en Houston que trabajan junto al SEO para IA.',
-    guia: { title: 'Guía: aparecer en ChatGPT', text: 'El paso a paso, si quieres entenderlo a fondo.' },
-    diag: { title: 'Diagnóstico gratis', text: 'Mira cómo te ven hoy tu web y tu ficha.' },
-    precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
-  },
-  cierre: {
-    proof: 'Lo aplicamos en nuestro sitio y en el de nuestros clientes en Houston y Orlando.',
-    warmTitle: '¿Quieres verlo tú primero?',
-    warmText: 'Haz el diagnóstico gratis y mira qué encuentra la IA sobre tu negocio.',
-    warmCta: 'Hacer el diagnóstico',
-  },
-};
+// Copy NUEVO (libre): src/i18n/w/seo-ia.ts (rediseño WorkOS v2, G07).
+const t = seoIaW;
 
 const [dTone1, dTone2] = splitTitle(p.distinction.title, '≠');
 const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
@@ -246,11 +127,19 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
       </div>
     </section>
 
+    <!-- 4 · 02 Pregúntale tú (W-NEW-04/05 auth.md: VentanaAgente "buscar", piel hueso). -->
+    <section class="w-cell sq" data-w-eco>
+      <Fondo tema="F09" eco />
+      <div class="w-container" data-w-reveal>
+        <PreguntaleTu n={2} label={t.pregunta.label} titleHtml={t.pregunta.title} lead={t.pregunta.lead} pasos={t.pregunta.pasos} />
+      </div>
+    </section>
+
     <!-- 4 · 02 Lo que dices y lo que entiende la IA (W-CORE-28). -->
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
         <DiceEntiende
-          n={2}
+          n={3}
           label={t.dice.label}
           cardTitle={t.dice.cardTitle}
           colSay={t.dice.colSay}
@@ -266,21 +155,21 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
     <!-- 5 · 03 Qué cambiamos (W-CORE-34 estático, mechanics VERBATIM). -->
     <section class="w-cell" id="que-cambiamos">
       <div class="w-container" data-w-reveal>
-        <QueCambiamos n={3} label={t.cambiamos.label} titleHtml={p.mechanics.title} items={p.mechanics.items} card={t.cambiamos.card} />
+        <QueCambiamos n={4} label={t.cambiamos.label} titleHtml={p.mechanics.title} items={p.mechanics.items} card={t.cambiamos.card} />
       </div>
     </section>
 
     <!-- 6 · 04 La ficha que leen los asistentes (W-NEW-38). -->
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
-        <FichaAgentes n={4} label={t.ficha.label} titleHtml={t.ficha.title} lead={t.ficha.lead} file={t.ficha.file} prompt={t.ficha.prompt} notes={t.ficha.notes} />
+        <FichaAgentes n={5} label={t.ficha.label} titleHtml={t.ficha.title} lead={t.ficha.lead} loLeen={t.ficha.loLeen} file={t.ficha.file} notes={t.ficha.notes} />
       </div>
     </section>
 
     <!-- 7 · 05 Cómo empezamos (#precios): el diagnóstico gratis + las dos tarjetas de precio. -->
     <section class="w-cell" id="precios">
       <div class="w-container" data-w-reveal>
-        <CabeceraNumerada n={5} label={p.grid.tag} titleHtml={p.grid.title} lead={p.grid.intro} />
+        <CabeceraNumerada n={6} label={p.grid.tag} titleHtml={p.grid.title} lead={p.grid.intro} />
         <div class="sp">
           <GratisDeVerdad
             items={t.gratis.items}
@@ -376,8 +265,6 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
     <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="SEO para IA (visibilidad en IA)" />
   </main>
 
-  <SpaceBackdrop tone="teal" />
-
   <SiteFooter footer={c.footer} />
 </Layout>
 
@@ -426,6 +313,9 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
     .sh__room { margin-top: 96px; }
     .sh__obj { margin-top: 64px; padding-bottom: 72px; }
   }
+
+  /* 02 Pregúntale tú: el túnel del hero vuelve como eco quieto (F09) detrás de la sección. */
+  .sq { position: relative; }
 
   /* El <em> de los titulares del dato (verbatim) sin cursiva sintética (Space Grotesk no
      tiene itálica): en el acento de la página, igual que hace PreguntasFrecuentes. */

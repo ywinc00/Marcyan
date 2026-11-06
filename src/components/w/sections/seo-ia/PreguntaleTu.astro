@@ -1,0 +1,59 @@
+---
+// SEO para IA · 02 "Pregúntale tú" (design/rediseno-workos-v2.md §3 G07 · P05 guion "buscar").
+// Original: W-NEW-04/05, auth.md (C/05-asistente/authmd-final.jpg, authmd-tira.jpg): una ventana
+// clara de agente que ESPERA a que el visitante elija una opción del menú y entonces escribe la
+// respuesta por bloques (pasos con ramas ├ └), con control segmentado arriba a la derecha.
+// Situación calzada: "tu cliente le pregunta a la IA; con tus datos te nombra, sin ellos cita un
+// directorio". La ventana es la pieza compartida VentanaAgente (no se edita aquí): esta sección
+// solo la compone. A la izquierda, tres pasos cortos que dicen qué se puede tocar (los mismos tres
+// controles de la ventana: menú, escenario, fuentes), en filas con filete de 1 px.
+// El túnel del hero vuelve aquí como ECO quieto (F09, §1.3: un solo motivo por página; el capítulo
+// de contraste puede llevar su eco al 40 %).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import VentanaAgente from '../../agente/VentanaAgente.astro';
+
+interface Props {
+  n: number;
+  label: string;
+  titleHtml: string;
+  lead: string;
+  pasos: { k: string; text: string }[];
+}
+const { n, label, titleHtml, lead, pasos } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+
+<div class="pt">
+  <ol class="pt__steps" role="list">
+    {pasos.map((p, i) => (
+      <li class="pt__step">
+        <span class="pt__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+        <span class="pt__k">{p.k}</span>
+        <span class="pt__tx">{p.text}</span>
+      </li>
+    ))}
+  </ol>
+  <div class="pt__win">
+    <VentanaAgente guion="buscar" piel="hueso" lang="es" class="pt__va" />
+  </div>
+</div>
+
+<style>
+  .pt { margin-top: 64px; display: grid; gap: 40px; }
+  @media (--lg) {
+    .pt { grid-template-columns: minmax(0, 400fr) minmax(0, 720fr); column-gap: 80px; align-items: center; }
+  }
+  .pt__steps { list-style: none; margin: 0; padding: 0; display: grid; }
+  .pt__step {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 8px; row-gap: 6px;
+    padding: 22px 0; border-top: 1px solid var(--w-line);
+  }
+  .pt__step:last-child { border-bottom: 1px solid var(--w-line); }
+  .pt__n { grid-row: span 2; font: 500 13px/1.5 var(--font-mono); color: var(--w-accent); letter-spacing: .04em; }
+  .pt__k { font: 500 18px/1.3 var(--font-display); letter-spacing: -0.015em; color: var(--w-ink); }
+  .pt__tx { font: 400 15px/1.5 var(--font-body); color: var(--w-ink-70, var(--w-ink-80)); }
+  .pt__win { min-width: 0; display: flex; justify-content: center; }
+  @media (--lg) { .pt__win { order: 0; } }
+  @media (--lt-lg) { .pt__win { order: -1; } }
+  @media (--lt-md) { .pt { margin-top: 40px; gap: 28px; } .pt__step { padding: 18px 0; } }
+</style>

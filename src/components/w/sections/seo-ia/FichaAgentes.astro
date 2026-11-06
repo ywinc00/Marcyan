@@ -1,14 +1,18 @@
 ---
-// SEO para IA · 04 "La ficha que leen los asistentes" (design/rediseno-workos.md §4.17-6,
-// W-NEW-38). Cabecera numerada con H2 y bajada; debajo, a la izquierda (648) la ventana del
-// archivo `llms.txt` de EJEMPLO ("Tu Plomería") en mono 13, con los encabezados en el acento;
-// a la derecha (462) la tarjeta "Pregúntale a un asistente" con la pregunta de ejemplo y el
-// cursor de bloque, y debajo dos tarjetas que dicen qué es cada pieza (índice y datos).
-// Ventanas = objetos de SISTEMA en noche opaca (es lo que lee la máquina).
-// Movimiento: el cursor parpadea a 1,06 s SOLO al entrar en vista y se para a los 4 ciclos
-// (< 5 s: WCAG 2.2.2 sin botón de pausa); con reduced-motion queda fijo.
+// SEO para IA · 05 "La ficha que leen los asistentes" (design/rediseno-workos-v2.md §3 G07, P10).
+// Original: el pase holográfico de WorkOS (W2N-02, pase_hover_hoja.jpg): una ficha de identidad
+// clara dentro de una ventana, con la fila de apps que la usan debajo. Situación calzada: "la ficha
+// de identidad de tu negocio que leen los asistentes". Objeto principal = PaseNegocio (pieza
+// compartida, interactiva con el puntero) dentro de una bandeja, con FilaMarcas "Lo leen" en su
+// ranura. A la derecha, el archivo llms.txt de EJEMPLO (lo que hay detrás de la ficha) en mono 13.
+// Debajo, tres notas en columnas con filete de 1 px (W-CORE-23).
+// Se retira la tarjeta "Lo que pregunta tu cliente" de la v1: esa historia la cuenta ahora,
+// interactiva, la sección "Pregúntale tú".
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Ejemplo from '../../Ejemplo.astro';
+import PaseNegocio from '../../pase/PaseNegocio.astro';
+import FilaMarcas from '../../marcas/FilaMarcas.astro';
+import type { MarcaId } from '../../marcas/datos';
 
 interface Line { t: 'h1' | 'q' | 'h2' | 'li' | 'sp'; text?: string }
 interface Props {
@@ -16,18 +20,28 @@ interface Props {
   label: string;
   titleHtml: string;
   lead: string;
+  loLeen: MarcaId[];
   file: { name: string; kind: string; lines: Line[]; foot: string };
-  prompt: { title: string; kind: string; text: string; biz: string; reply: string; source: string };
   notes: { k: string; text: string }[];
 }
-const { n, label, titleHtml, lead, file, prompt, notes } = Astro.props;
+const { n, label, titleHtml, lead, loLeen, file, notes } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
 
-<div class="fa" data-fa>
+<div class="fa">
+  <div class="fa__tray">
+    <div class="fa__app" aria-hidden="true">
+      <span class="fa__dots"><i></i><i></i><i></i></span>
+      <span class="fa__url">tunegocio.example · ficha</span>
+    </div>
+    <PaseNegocio lang="es" ciudad="houston" ancho={620} class="fa__pase">
+      <FilaMarcas slot="lo-leen" ids={loLeen} lang="es" size={20} />
+    </PaseNegocio>
+  </div>
+
   <figure class="fa__win fa__file">
     <figcaption class="fa__bar">
-      <span class="fa__name">{file.name}</span>
+      <span class="fa__name" set:html={file.name.replace('/', '/<wbr>')} />
       <span class="fa__kind">{file.kind}</span>
     </figcaption>
     <div class="fa__body">
@@ -39,47 +53,43 @@ const { n, label, titleHtml, lead, file, prompt, notes } = Astro.props;
     <p class="fa__foot">{file.foot}</p>
   </figure>
 
-  <div class="fa__side">
-    <div class="fa__win fa__prompt">
-      <p class="fa__bar">
-        <span class="fa__name fa__name--txt">{prompt.title}</span>
-        <span class="fa__kind">{prompt.kind}</span>
-      </p>
-      <p class="fa__ask"><span class="fa__caret" aria-hidden="true">›</span><span>{prompt.text}<span class="fa__cursor" data-fa-cursor aria-hidden="true"></span></span></p>
-      <div class="fa__reply">
-        <p class="fa__reply-t"><b translate="no">{prompt.biz}</b>{prompt.reply}</p>
-        <p class="fa__reply-s">{prompt.source}</p>
+  <dl class="fa__notes">
+    {notes.map((x) => (
+      <div class="fa__note">
+        <dt>{x.k}</dt>
+        <dd>{x.text}</dd>
       </div>
-    </div>
-    <dl class="fa__win fa__notes">
-      {notes.map((x) => (
-        <div class="fa__note">
-          <dt>{x.k}</dt>
-          <dd>{x.text}</dd>
-        </div>
-      ))}
-    </dl>
-  </div>
+    ))}
+  </dl>
 </div>
-
-<script>
-  // El cursor parpadea solo cuando su ventana entra en vista; 4 ciclos y queda fijo.
-  document.querySelectorAll<HTMLElement>('[data-fa]').forEach((root) => {
-    const cur = root.querySelector<HTMLElement>('[data-fa-cursor]');
-    if (!cur || !('IntersectionObserver' in window)) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const io = new IntersectionObserver((es) => {
-      if (es.some((e) => e.isIntersecting)) { cur.classList.add('is-on'); io.disconnect(); }
-    }, { threshold: 0.6 });
-    io.observe(cur.closest('.fa__prompt') ?? cur);
-  });
-</script>
 
 <style>
   .fa { margin-top: 64px; display: grid; gap: 24px; }
   @media (--lg) {
-    .fa { grid-template-columns: minmax(0, 648fr) minmax(0, 462fr); column-gap: 24px; align-items: stretch; }
+    .fa { grid-template-columns: minmax(0, 700fr) minmax(0, 420fr); column-gap: 24px; align-items: stretch; }
+    .fa__notes { grid-column: 1 / -1; }
   }
+
+  /* Bandeja del pase = la ventana clara del original (W2N-02): barra con tres puntos grises y la
+     dirección, el pase y debajo la fila de quien lo lee. La bandeja de noche la enmarca. */
+  .fa__tray {
+    position: relative; min-width: 0; display: grid; justify-items: center; align-content: start; gap: 0;
+    padding: 0 40px 40px; border-radius: var(--w-r-tray); overflow: hidden;
+    background: linear-gradient(180deg, #fbfbf8, #f3f2ec);
+    border: 1px solid rgba(14, 14, 13, .08); box-shadow: var(--w-edge), 0 40px 80px -40px rgba(0, 0, 0, .7);
+  }
+  .fa__app {
+    align-self: stretch; justify-self: stretch; display: flex; align-items: center; gap: 14px;
+    height: 44px; margin: 0 -40px 48px; padding: 0 18px; border-bottom: 1px solid rgba(14, 14, 13, .07);
+    background: #f7f6f2;
+  }
+  .fa__dots { display: inline-flex; gap: 7px; }
+  .fa__dots i { width: 11px; height: 11px; border-radius: 50%; background: #dcd8cf; }
+  .fa__url { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12px/1 var(--font-mono); color: #6b675f; letter-spacing: .01em; }
+  .fa__tray :global(.fa__pase) { width: 100%; max-width: 620px; }
+  .fa__tray :global(.w2-pase__ej) { color: #77736b; }
+  .fa__tray :global(.w2-pase__leen-k) { color: #6b675f; }
+  .fa__tray :global(.fm) { box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .08); }
 
   .fa__win {
     margin: 0; min-width: 0; background: var(--w-s2); border: 1px solid var(--w-line);
@@ -89,8 +99,7 @@ const { n, label, titleHtml, lead, file, prompt, notes } = Astro.props;
     display: flex; justify-content: space-between; align-items: center; gap: 16px;
     margin: 0; padding: 14px 20px; border-bottom: 1px solid var(--w-line);
   }
-  .fa__name { font: 400 13px/1.3 var(--font-mono); color: var(--w-ink-70); overflow-wrap: anywhere; }
-  .fa__name--txt { font-family: var(--font-body); font-size: 14px; color: var(--w-ink-80); }
+  .fa__name { min-width: 0; font: 400 13px/1.3 var(--font-mono); color: var(--w-ink-70); }
   .fa__kind { flex: none; font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); }
 
   .fa__file { display: flex; flex-direction: column; }
@@ -103,43 +112,28 @@ const { n, label, titleHtml, lead, file, prompt, notes } = Astro.props;
   .fa__ln--li { padding-left: 1.2em; text-indent: -1.2em; }
   .fa__ln--h1 { color: var(--w-ink); font-weight: 500; }
   .fa__ln--q { color: var(--w-accent); }
-  .fa__ln--h2 { color: var(--w-accent); }
+  .fa__ln--h2 { color: var(--w-accent); margin-top: .6em; }
   .fa__foot {
     margin: 0; padding: 14px 20px; border-top: 1px solid var(--w-line);
     font: 400 14px/1.5 var(--font-body); color: var(--w-ink-70);
   }
 
-  .fa__side { display: grid; gap: 24px; grid-template-rows: 1fr auto; min-width: 0; }
-  .fa__ask {
-    display: flex; gap: 12px; margin: 0; padding: 24px 20px 32px;
-    font: 400 14px/1.75 var(--font-mono); color: var(--w-ink);
-  }
-  .fa__caret { color: var(--w-accent); flex: none; }
-  /* La respuesta que arma el asistente con el archivo: cierra la historia de la ventana. */
-  .fa__reply { margin: 0 20px 24px; padding: 16px 18px; border-radius: var(--w-r-cell); border-left: 2px solid var(--w-accent); background: var(--w-s1); }
-  .fa__reply-t { margin: 0; font: 400 15px/1.55 var(--font-body); color: var(--w-ink-80); }
-  .fa__reply-t b { color: var(--w-ink); font-weight: 600; }
-  .fa__reply-s { margin: 8px 0 0; font: 400 13px/1.4 var(--font-mono); color: var(--w-ink-60); overflow-wrap: anywhere; }
-  .fa__cursor {
-    display: inline-block; width: 8px; height: 1.1em; margin-left: 4px; vertical-align: -0.18em;
-    background: var(--w-ink-80);
-  }
-  .fa__cursor.is-on { animation: fa-blink 1.06s steps(1, end) 4; }
-  @keyframes fa-blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+  /* Tres notas en columnas con filete (W-CORE-23). */
+  .fa__notes { margin: 24px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fa__note { padding: 20px 28px 4px; border-left: 1px solid var(--w-line); }
+  .fa__note:first-child { border-left: 0; padding-left: 0; }
+  .fa__note dt { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-accent); }
+  .fa__note dd { margin: 10px 0 0; font: 400 15px/1.55 var(--font-body); color: var(--w-ink-80); }
 
-  .fa__notes { display: grid; }
-  .fa__note { padding: 18px 20px; }
-  .fa__note + .fa__note { border-top: 1px solid var(--w-line); }
-  .fa__note dt { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); }
-  .fa__note dd { margin: 8px 0 0; font: 400 15px/1.5 var(--font-body); color: var(--w-ink-80); }
-
+  @media (--lt-lg) {
+    .fa__notes { grid-template-columns: minmax(0, 1fr); margin-top: 8px; }
+    .fa__note { padding: 18px 0; border-left: 0; border-top: 1px solid var(--w-line); }
+  }
   @media (--lt-md) {
     .fa { margin-top: 40px; gap: 16px; }
-    .fa__side { gap: 16px; }
+    .fa__tray { padding: 0 14px 24px; }
+    .fa__app { margin: 0 -14px 28px; }
     .fa__body { padding: 44px 16px 16px; }
-    .fa__bar, .fa__foot, .fa__note { padding-inline: 16px; }
-    .fa__ask { padding: 20px 16px 20px; }
-    .fa__reply { margin: 0 16px 16px; }
+    .fa__bar, .fa__foot { padding-inline: 16px; }
   }
-  @media (--motion-reduce) { .fa__cursor.is-on { animation: none; } }
 </style>

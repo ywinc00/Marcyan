@@ -56,6 +56,8 @@ const spec: KindSpec = {
   tone: 'teal',
   // F05 (placa, P12): pistas teal con pulsos que nacen de la esclusa del hero (texto a la izquierda).
   fondo: 'F05',
+  // v3 (E-57 regla 2): sin líneas de margen en el hero: cruzaban las pistas de circuito del hero.
+  sinRail: true,
   fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroIaPymes,
   hero: (ctx) => {

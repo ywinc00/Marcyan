@@ -9,9 +9,9 @@
 // Revisión 1 de G01 (tope de alto ≤ 1.800 px a 1440 y portátil legible):
 //  · Escritorio (≥ 1120): la fase final va en dos columnas, su texto (300 px) y el portátil al
 //    resto del ancho (≈ 855 px a 1440, antes 600) con el CTA debajo del portátil.
-//  · La tapa se abre con el scroll SIN fijar la pieza (sin el hueco de 450 px): la pista de la
-//    escena sigue dando la línea de tiempo y la tapa termina de abrirse justo cuando el portátil
-//    entero está a la vista. Así no suma alto ni se queda a medio abrir mientras se mira (E-56).
+//  · v3 (E-57 regla 4): la tapa se abre con la pieza FIJADA y centrada en la ventana (el tramo
+//    de 450 px de EscenaAbreApps). La v2 la abría sin fijar y giraba mientras el portátil aún
+//    asomaba por abajo. El alto visible no cambia; el tramo suma 450 px de scroll.
 //  · Por debajo de 900 px el portátil NO se pinta: su lienzo de 1.415 px a 350 px de ancho deja
 //    la letra en 3-4 px (§1.8 pide ≥ 9 en lo decorativo). La fase 05 queda con su texto y el CTA
 //    (y en móvil, el cohete), como en producción.
@@ -71,9 +71,8 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
 
   /* ── Fase final: portátil + CTA (slot `final` de LineaFases) ── */
   .process__fin { min-width: 0; }
-  /* La tapa se abre con el scroll sin fijar la pieza: fuera el hueco del tramo fijado. */
-  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-hueco) { display: none; }
-  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-fijo) { position: static; }
+  /* v3: la tapa vuelve a abrirse con el portátil FIJADO y centrado (tramo de EscenaAbreApps).
+     Sin fijar, giraba mientras la pieza aún asomaba por abajo (E-57 regla 4). */
   @media (max-width: 899.98px) {
     .process[data-process] :global(.process__fin .abre) { display: none; }
   }

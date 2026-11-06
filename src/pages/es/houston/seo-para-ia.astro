@@ -91,7 +91,8 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
   <main id="main" class="w-rails" data-w data-w-tone="teal" data-w-kind="seo-ia">
     <!-- 1 · Hero: túnel de rejilla a ventana completa; texto en el rectángulo limpio; la
          respuesta del asistente debajo del rectángulo, fuera del túnel. -->
-    <section class="w-hero--bleed sh">
+    <!-- v3 (E-57 regla 2): sin líneas de margen en el hero (cruzaban las líneas del túnel). -->
+    <section class="w-hero--bleed sh" data-w-sin-rail>
       <div class="w-container sh__crumbs">
         <Breadcrumb items={p.breadcrumb} lang="es" />
       </div>

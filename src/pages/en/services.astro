@@ -84,7 +84,8 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   <SiteNav nav={clusterNavEn} lang={lang} homeHref="/en" currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="servicios" data-w-fondo="franjas">
-    <div class="wf-zona">
+    <!-- v3 (E-57 regla 2): sin líneas de margen en el hero (cruzaban las franjas y la malla del fondo). -->
+    <div class="wf-zona" data-w-sin-rail>
     <Fondo tema="F10" lang={lang} texto="izquierda" />
     <Hero h1Html={s.hero.h1} eyebrow={t.eyebrow} tail={t.tail} lead={t.lead} items={switches} lang={lang}>
       <Breadcrumb slot="crumbs" items={s.breadcrumb} lang={lang} />

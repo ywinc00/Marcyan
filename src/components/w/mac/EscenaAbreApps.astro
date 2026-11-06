@@ -175,10 +175,11 @@ const destinos = {
 </div>
 
 <style>
-  /* Tapa por scroll (W2N-03): la base se queda fijada al borde inferior de la
-     ventana mientras la tapa gira en --abre-rec px (450 escritorio, 300 móvil);
-     después la pieza sigue con la página. Un hueco de --abre-rec delante deja que
-     la parte fijada (titular + portátil) se quede pegada abajo. Una pista invisible
+  /* Tapa por scroll (W2N-03): el grupo entra con la página, se queda fijado CENTRADO en
+     la ventana (--abre-b lo calcula el guion: mitad del hueco libre; 24 px sin JS)
+     mientras la tapa gira en --abre-rec px (450 escritorio, 300 móvil) y después sigue
+     con la página. Un hueco de --abre-rec delante deja que la parte fijada (titular +
+     portátil) se quede pegada. Una pista invisible
      de --abre-rec px al pie de la escena da la línea de tiempo (timeline-scope):
      su entrada completa coincide EXACTAMENTE con el tramo fijado. Sin listener (E-50). */
   /* overflow-x: clip: la tapa en 3D se ensancha al girar; no crea contenedor de scroll (el sticky sigue) */
@@ -198,7 +199,7 @@ const destinos = {
          navegación: el ancho del portátil se limita por el alto de la ventana. Alto
          del portátil ≈ 0,638 × su ancho (tapa 1/1,08 × 933/1415 + base 2,75 %).
          --abre-cabh = alto del titular con su aire (lo mide el script; 220 sin JS). */
-      --abre-wv: max(600px, calc((100svh - var(--nav-h, 72px) - var(--abre-b) - var(--abre-cabh, 220px) - 20px) / .638));
+      --abre-wv: max(600px, calc((100svh - var(--nav-h, 72px) - 24px - var(--abre-cabh, 220px) - 20px) / .638));
     }
     .abre[data-tapa="scroll"] :global(.pt) { width: min(100%, var(--pt-w), var(--abre-wv)); }
   }
@@ -208,19 +209,23 @@ const destinos = {
      portátil / 1,08 × 933/1415). Con la tapa a -90° el titular baja ese alto y queda
      sobre la base; sube siguiendo la proyección del borde de la tapa (perspectiva
      260cqw, origen 50% 20%: fracción visible -0,25 · 0,01 · 0,27 · 0,50 · 0,69 · 0,84
-     · 0,94 · 0,99 · 1 cada 12,5 %). Su margen inferior (≈ 40 px) es el aire con la tapa. */
+     · 0,94 · 0,99 · 1 cada 12,5 % de giro), remuestreada con la curva de pt-gira (v3: 13
+     fotogramas, misma muestra que la tapa). Su margen inferior (≈ 40 px) es el aire con la tapa. */
   .abre-fijo { container-type: inline-size; }
   .abre-cab { position: relative; z-index: 2; }
   @keyframes abre-cab-baja {
     0% { transform: translateY(var(--abre-h)); }
-    12.5% { transform: translateY(calc(var(--abre-h) * .986)); }
-    25% { transform: translateY(calc(var(--abre-h) * .733)); }
-    37.5% { transform: translateY(calc(var(--abre-h) * .504)); }
-    50% { transform: translateY(calc(var(--abre-h) * .311)); }
-    62.5% { transform: translateY(calc(var(--abre-h) * .164)); }
-    75% { transform: translateY(calc(var(--abre-h) * .064)); }
-    87.5% { transform: translateY(calc(var(--abre-h) * .011)); }
-    100% { transform: none; }
+    8.33% { transform: translateY(calc(var(--abre-h) * .999)); }
+    16.67% { transform: translateY(calc(var(--abre-h) * .993)); }
+    25% { transform: translateY(calc(var(--abre-h) * .89)); }
+    33.33% { transform: translateY(calc(var(--abre-h) * .532)); }
+    41.67% { transform: translateY(calc(var(--abre-h) * .229)); }
+    50% { transform: translateY(calc(var(--abre-h) * .081)); }
+    58.33% { transform: translateY(calc(var(--abre-h) * .027)); }
+    66.67% { transform: translateY(calc(var(--abre-h) * .008)); }
+    75% { transform: translateY(calc(var(--abre-h) * .004)); }
+    83.33% { transform: translateY(calc(var(--abre-h) * .002)); }
+    91.67%, 100% { transform: none; }
   }
   @supports (animation-timeline: view()) {
     .abre[data-tapa="scroll"] .abre-cab {
@@ -416,7 +421,11 @@ const destinos = {
         raiz.style.removeProperty('--abre-b');
         const cabh = obj ? Math.round(obj.getBoundingClientRect().top - fijo.getBoundingClientRect().top) : 0;
         if (cabh > 0) raiz.style.setProperty('--abre-cabh', `${cabh}px`);
-        if (matchMedia('(max-width: 767px)').matches) {
+        // v3 (E-57 regla 4): también en escritorio. Con el margen de 24 px el portátil se fijaba
+        // pegado al borde inferior y la tapa giraba con la pieza a medio encuadrar. Ahora el
+        // grupo se fija CENTRADO entre la navegación y el borde (o la barra de CTA en móvil): la
+        // tapa empieza a girar cuando la pieza entera ya está encuadrada, como W2N-03.
+        {
           const b0 = parseFloat(getComputedStyle(fijo).bottom) || 0;
           const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
           const hueco = innerHeight - nav - b0 - fijo.offsetHeight;

@@ -37,7 +37,8 @@
    raíl en x=120 y texto en x=168). El contenido sigue en la línea del logo de la barra; lo
    que se mueve es el raíl (la barra es gramática intocable). Donde no caben 48 px por fuera
    con 16 px de margen (ventanas de menos de 1328 px) no se pintan.
-   left/right con --w-rail-x (50 % del main, nunca 100vw: sin la barra de Windows). */
+   left/right con --w-rail-x (50 % del main, nunca 100vw: sin la barra de Windows).
+   Se cortan en los bloques marcados con data-w-sin-rail (rails.ts). */
 :root[data-ds="v3"] .w-rails { position: relative; }
 @media (min-width: 1328px) {
   :root[data-ds="v3"] .w-rails::before,
@@ -45,6 +46,15 @@
     content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
     background: var(--w-line); pointer-events: none; z-index: 0;
   }
+  /* Corte por sección (v3, E-57 regla 2): rails.ts escribe --w-rail-mask con un tramo
+     transparente por cada bloque con data-w-sin-rail. Hasta que lo mide (o sin JS), una
+     página con cortes no pinta los raíles: nunca cruzan la pieza ni un instante. */
+  :root[data-ds="v3"] .w-rails::before,
+  :root[data-ds="v3"] .w-rails::after {
+    -webkit-mask-image: var(--w-rail-mask, none); mask-image: var(--w-rail-mask, none);
+  }
+  :root[data-ds="v3"] .w-rails:has([data-w-sin-rail]):not([data-w-rail-listo])::before,
+  :root[data-ds="v3"] .w-rails:has([data-w-sin-rail]):not([data-w-rail-listo])::after { visibility: hidden; }
   :root[data-ds="v3"] .w-rails::before { left: var(--w-rail-x); }
   :root[data-ds="v3"] .w-rails::after { right: var(--w-rail-x); }
   /* Las rejillas de celdas sí van de raíl a raíl: su marco de 1 px ES el raíl y el padding

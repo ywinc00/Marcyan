@@ -96,8 +96,14 @@ const sections = spec.sections
 
   <main id="main" class="w-rails" data-w data-w-tone={tone} data-w-kind={kind} data-w-fondo={fondo}>
     {fondo ? (
-      <div class="wf-zona">
+      <div class="wf-zona" data-w-sin-rail={spec.sinRail ? '' : undefined}>
         <Fondo tema={fondo} lang={lang} texto={fondoOp.texto} barrio={fondoOp.barrio} style={fondoOp.vars} />
+        <Hero {...heroProps}>
+          <Breadcrumb slot="crumbs" items={cluster.breadcrumb} lang={lang} />
+        </Hero>
+      </div>
+    ) : spec.sinRail ? (
+      <div data-w-sin-rail>
         <Hero {...heroProps}>
           <Breadcrumb slot="crumbs" items={cluster.breadcrumb} lang={lang} />
         </Hero>

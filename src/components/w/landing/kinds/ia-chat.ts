@@ -49,6 +49,8 @@ const spec: KindSpec = {
   kind: 'ia-chat',
   tone: 'teal',
   fondo: 'F04',
+  // v3 (E-57 regla 2): sin líneas de margen en el hero: cruzaban la pregunta, el portátil y los hilos del hero.
+  sinRail: true,
   // --wf-obj: la banda de hilos pasa por detrás del borde de arriba del portátil (el nudo queda
   // tapado por el objeto opaco, nunca detrás del texto: E-37).
   fondoOpciones: () => ({ texto: 'centro', vars: '--wf-obj: 600px; --wf-obj-movil: 560px' }),

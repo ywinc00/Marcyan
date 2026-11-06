@@ -13,6 +13,8 @@
 // escena queda transparente (deja ver los hilos F04 de la zona sobre la noche lisa) y el
 // amanecer del acto 2 cubre el hero entero: un velo que aclara desde arriba hacia un
 // horizonte teal, con el resplandor del token --w-dawn-teal; deja ver los hilos.
+// Líneas de margen (v3, E-57 regla 2): cortadas en todo el hero con `sinRail` en
+// kinds/ia-chat.ts (cruzaban la pregunta, el portátil y los hilos). Siguen debajo.
 // Migas: arriba a la izquierda en la línea del logo (como HeroTexto en escritorio); en
 // móvil, centradas encima de la pregunta del acto 1.
 import EscenaDosActos from '../mac/EscenaDosActos.astro';
@@ -85,6 +87,10 @@ const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
   .hic :global(.da-mac) {
     contain-intrinsic-size: auto min(976px, 100vw - 32px) auto calc(min(976px, 100vw - 32px) * .638);
     animation: hic-mac 1ms steps(1) 60ms backwards;
+  }
+  /* v3: en móvil el portátil va a sangre (EscenaDosActos): la reserva mide el ancho entero. */
+  @media (max-width: 639px) {
+    .hic :global(.da-mac) { contain-intrinsic-size: auto 100vw auto calc(100vw * .638); }
   }
   @keyframes hic-mac { from { content-visibility: hidden; } to { content-visibility: visible; } }
   @media (prefers-reduced-motion: reduce) { .hic :global(.da-mac) { animation: none; } }

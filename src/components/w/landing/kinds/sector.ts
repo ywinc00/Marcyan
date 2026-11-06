@@ -54,6 +54,9 @@ const LEAD_PROJECT: Record<string, string | undefined> = {
 const spec: KindSpec = {
   kind: 'sector',
   tone: 'gold',
+  // v2 (G08): fondo temático F07 (plano isométrico con dos cotas, quieto, P12) en lugar del espacio.
+  fondo: 'F07',
+  fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroSector,
   hero: (ctx) => {
     const t = copyOf(ctx);

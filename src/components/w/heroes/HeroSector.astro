@@ -6,10 +6,11 @@
 // llega al negocio desde su web, rotulado Ejemplo / Example). Coreografía §2.9: la
 // tarjeta entra como objeto y su capa sale de detrás (data-w-in de los componentes).
 // Móvil: texto arriba, objeto debajo y visible (W-CORE-41, E-18).
+// v2 (G08): la solicitud por oficio se rehace (ObjetoOficio: notificación de Tu Plomería, ficha de
+// casa con mensaje, carta con WhatsApp) y entra en cascada; el fondo F07 lo pone WLanding.
 import HeroTexto from '../HeroTexto.astro';
 import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
-import SolicitudOficio from '../objetos/SolicitudOficio.astro';
-import IconoObjeto from '../IconoObjeto.astro';
+import ObjetoOficio from '../sections/sector/ObjetoOficio.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -42,8 +43,8 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
     </HeroTexto>
     <div class="hs__obj">
       <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example>
-        <IconoObjeto id="diseno-web" size={56} slot="icon" />
-        <SolicitudOficio kind={obj} lang={lang} example={false} size="hero" />
+        <ObjetoOficio slot="icon" kind={obj} lang={lang} parte="band" />
+        <ObjetoOficio kind={obj} lang={lang} parte="body" />
       </TarjetaObjeto>
     </div>
   </div>

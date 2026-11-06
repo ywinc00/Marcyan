@@ -21,10 +21,10 @@ export interface BrandingCopy {
   link: string;
   entregables: { label: string; title: string; lead: string; specsLabel: string; specs: { k: string; v: string; note?: string }[] };
   marca: {
-    label: string; title: string; lead: string; chip: string;
-    logo: { title: string; text: string; main: string; variants: [string, string, string] };
-    colores: { title: string; text: string; swatches: { role: string; name: string; hex: string }[] };
-    tipo: { title: string; text: string; display: string; body: string; sampleH: string; sampleP: string };
+    label: string; title: string; lead: string; opciones: string;
+    logo: { title: string; text: string };
+    colores: { title: string; text: string };
+    tipo: { title: string; text: string };
     web: { title: string; text: string };
   };
   prosa: { tone1: string; tone2: string };
@@ -62,39 +62,17 @@ export const brandingCopy: BrandingCopy = {
     ],
   },
 
+  // v2 (G08): personalizador real (P01 solo). La bajada invita a tocarlo; las láminas de logo,
+  // paleta y tipografía viven en sections/branding/VistaMarca.astro.
   marca: {
     label: 'De la marca a todo lo demás',
     title: 'Una marca que se ve igual en todos lados',
-    lead: 'Empieza por el logo y crece hasta tu web. Todo sale de la misma marca, así se ve coherente desde el primer día.',
-    chip: 'La misma marca, de la tarjeta a la web',
-    logo: {
-      title: 'Tu logo',
-      text: 'Diseñado desde cero, con su versión horizontal, vertical e icono.',
-      main: 'Principal',
-      variants: ['Horizontal', 'Icono', 'Negativo'],
-    },
-    colores: {
-      title: 'Tus colores',
-      text: 'Con el branding completo: paleta, tipografía y guía de uso.',
-      swatches: [
-        { role: 'Principal', name: 'Azul', hex: '#2F5266' },
-        { role: 'Acento', name: 'Dorado', hex: '#C8A96E' },
-        { role: 'Fondo', name: 'Crema', hex: '#F0EDE8' },
-        { role: 'Texto', name: 'Tinta', hex: '#0E0E0D' },
-      ],
-    },
-    tipo: {
-      title: 'Tu tipografía',
-      text: 'Va con tus colores: la voz escrita de tu marca.',
-      display: 'Titulares',
-      body: 'Textos',
-      sampleH: 'Tu Marca, en todos lados',
-      sampleP: 'Una sola voz en el rótulo, en tus redes y en tu web.',
-    },
-    web: {
-      title: 'Tu web',
-      text: 'Tu marca aplicada a tu web, para que todo nazca coherente.',
-    },
+    lead: 'Prueba el color, el modo, los marcos y la letra: cambian a la vez en tu logo, tu paleta, tu tipografía y tu web.',
+    opciones: 'Piezas de tu marca',
+    logo: { title: 'Tu logo', text: 'Diseñado desde cero, con su versión horizontal, icono y negativo.' },
+    colores: { title: 'Tus colores', text: 'Con el branding completo: paleta, tipografía y guía de uso.' },
+    tipo: { title: 'Tu tipografía', text: 'Va con tus colores: la voz escrita de tu marca.' },
+    web: { title: 'Tu web', text: 'Tu marca aplicada a tu web, para que todo nazca coherente.' },
   },
 
   prosa: { tone1: 'Cómo lo hacemos.', tone2: 'Exploración amplia, decisiones de diseñador.' },

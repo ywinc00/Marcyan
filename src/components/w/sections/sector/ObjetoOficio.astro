@@ -1,0 +1,234 @@
+---
+// Objeto del hero de sector (G08 · design/rediseno-workos-v2.md §3; P03 "SolicitudOficio").
+// P03 no está integrado, así que la solicitud por oficio vive aquí, en la carpeta de la página,
+// con el reparto de marcas de §1.6 (pendiente [SISTEMA]: sustituir por SolicitudOficio de P03):
+//   contratista  → pantalla de bloqueo con la notificación de "Tu Plomería" (su signo como icono
+//                  de app): "Solicitud de presupuesto · remodelación de cocina · Katy · 9:40 p. m."
+//   inmobiliaria → ficha de casa al estilo Samara (nombre enorme y fino, 3 datos mono, casita
+//                  geométrica mínima) + mensaje entrante "¿Sigue disponible?"
+//   restaurante  → carta de "Your Restaurant" (paleta ladrillo de negocios.ts) + "Order on WhatsApp"
+//                  con el logo de WhatsApp a color (P06).
+// Va dentro de TarjetaObjeto (W-CORE-16): `band` llena la franja de puntos, el resto el cuerpo.
+// Contrato §1.6: dentro no hay h1-h6, ni tel:/wa.me/data-track ("Responder" y "Order on WhatsApp"
+// son span); la tarjeta ya es aria-hidden con su sr; aquí data-nosnippet.
+// Vida (§1.5, demo con guion): entra UNA vez al cruzar el 35 % (cascada de 90 ms, 520 ms
+// cubic-bezier(.22,1,.36,1), solo transform/opacity) y se queda con micro-vida (punto que late
+// 2 s); al salir ≥ 8 s y volver, se reproduce de nuevo. Sin JS o con reducir movimiento: final.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+
+interface Props { kind: 'contratista' | 'inmobiliaria' | 'restaurante'; lang?: 'es' | 'en'; parte: 'band' | 'body' }
+const { kind, lang = 'es', parte } = Astro.props;
+const en = lang === 'en';
+const C = {
+  contratista: en
+    ? { dia: 'Thursday', hora: '9:40', app: 'Your Plumbing', t: 'Quote request', b: 'Kitchen remodel · Katy', h: '9:40 PM', btn: 'Reply', mas: '2 earlier notifications' }
+    : { dia: 'jueves', hora: '9:40', app: 'Tu Plomería', t: 'Solicitud de presupuesto', b: 'Remodelación de cocina · Katy', h: '9:40 p. m.', btn: 'Responder', mas: '2 avisos anteriores' },
+  inmobiliaria: en
+    ? { casa: 'Oak House', zona: 'Katy · TX', datos: ['3 bd', '2 ba', '1,850 sq ft'], msg: 'Is it still available?', h: '10:10 PM', quien: 'New message', btn: 'Reply' }
+    : { casa: 'Casa Roble', zona: 'Katy · TX', datos: ['3 hab', '2 baños', '1,850 pies²'], msg: '¿Sigue disponible?', h: '10:10 p. m.', quien: 'Mensaje nuevo', btn: 'Responder' },
+  restaurante: en
+    ? { k: "Today's menu", abierto: 'Kitchen’s open', platos: [['Shrimp tacos', 'Corn tortilla, cabbage, chipotle'], ['Chicken enchiladas', 'Green sauce, crema, queso fresco'], ['Rice and beans', 'Like at home']], btn: 'Order on WhatsApp' }
+    : { k: 'La carta de hoy', abierto: 'Cocina abierta', platos: [['Tacos de camarón', 'Tortilla de maíz, col, chipotle'], ['Enchiladas de pollo', 'Salsa verde, crema, queso fresco'], ['Arroz y frijoles', 'Como en casa']], btn: 'Pedir por WhatsApp' },
+}[kind] as any;
+// Signo de "Tu Plomería" (codo de tubería + gota): la MISMA geometría de LogoEjemplo (P02a), aquí
+// solo el signo, como icono de app de la notificación.
+const CODO = 'M3 3A20 20 0 0 1 23 23H17A14 14 0 0 0 3 9ZM15.6 23.4H24.4V25H15.6Z';
+const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29 20 26.4 20 26.4Z';
+---
+{parte === 'band' && (
+  <div class:list={['oo-band', `oo-band--${kind}`]} data-nosnippet>
+    {kind === 'contratista' && (
+      <p class="oo-reloj" data-oo-i="0"><span class="oo-reloj__d">{C.dia}</span><span class="oo-reloj__h">{C.hora}</span></p>
+    )}
+    {kind === 'inmobiliaria' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="inmobiliaria" size={13} lang={lang} tono="mono" /></span>}
+    {kind === 'restaurante' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="restaurante" size={18} lang={lang} tono="mono" /></span>}
+  </div>
+)}
+
+{parte === 'body' && (
+  <div class:list={['oo', `oo--${kind}`]} data-oo data-nosnippet>
+    {kind === 'contratista' && (
+      <div class="oo-noti">
+        <div class="oo-noti__card" data-oo-i="1">
+          <span class="oo-app">
+            <svg viewBox="2 2 23 31" aria-hidden="true"><path d={CODO} fill="currentColor" /><path d={GOTA} fill="#e0935c" /></svg>
+            <i class="oo-vivo" aria-hidden="true"></i>
+          </span>
+          <span class="oo-noti__txt">
+            <span class="oo-noti__top"><b class="oo-noti__app" translate="no">{C.app}</b><span>{C.h}</span></span>
+            <span class="oo-noti__t">{C.t}</span>
+            <span class="oo-noti__b">{C.b}</span>
+          </span>
+          <span class="oo-noti__btn">{C.btn}</span>
+        </div>
+        <span class="oo-noti__pila oo-noti__pila--1" data-oo-i="2"></span>
+        <span class="oo-noti__pila oo-noti__pila--2" data-oo-i="2"></span>
+        <span class="oo-noti__mas" data-oo-i="3">{C.mas}</span>
+      </div>
+    )}
+
+    {kind === 'inmobiliaria' && (
+      <div class="oo-casa">
+        <div class="oo-casa__ficha" data-oo-i="1">
+          <span class="oo-casa__ilu" aria-hidden="true">
+            <svg viewBox="0 0 80 64"><path d="M8 34 40 10l32 24" /><path d="M16 28v28h48V28" /><path d="M34 56V40h12v16" /><path d="M52 18v-6h6v10.5" /></svg>
+          </span>
+          <span class="oo-casa__txt">
+            <span class="oo-casa__n">{C.casa}</span>
+            <span class="oo-casa__z">{C.zona}</span>
+            <span class="oo-casa__d">{C.datos.map((d: string) => <span>{d}</span>)}</span>
+          </span>
+        </div>
+        <div class="oo-msg" data-oo-i="2">
+          <span class="oo-msg__top"><i class="oo-vivo" aria-hidden="true"></i>{C.quien}<span>{C.h}</span></span>
+          <span class="oo-msg__b">{C.msg}</span>
+          <span class="oo-noti__btn">{C.btn}</span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'restaurante' && (
+      <div class="oo-carta" data-oo-i="1">
+        <p class="oo-carta__k"><span>{C.k}</span><span class="oo-carta__ab"><i class="oo-vivo" aria-hidden="true"></i>{C.abierto}</span></p>
+        <ul class="oo-carta__l">
+          {C.platos.map(([t, d]: string[], i: number) => <li data-oo-i={String(2 + Math.min(i, 1))}><b>{t}</b><span>{d}</span></li>)}
+        </ul>
+        <span class="oo-carta__btn" data-oo-i="3"><LogoMarca id="whatsapp" size={18} tono="color" titulo="" />{C.btn}</span>
+      </div>
+    )}
+  </div>
+)}
+
+<script>
+  // Coreografía: una vez al cruzar el 35 %; repite al volver tras ≥ 8 s fuera (§1.5).
+  const mq = matchMedia('(prefers-reduced-motion: reduce)');
+  for (const el of document.querySelectorAll<HTMLElement>('[data-oo]:not([data-oo-on])')) {
+    el.setAttribute('data-oo-on', '');
+    if (mq.matches) continue;
+    const zona = (el.closest('.wo-to') as HTMLElement) ?? el;
+    let t = 0;
+    zona.classList.add('oo-arm');
+    // Tras ≥ 8 s fuera de vista se rearma ESTANDO FUERA (piezas ocultas, sin animación): al volver
+    // se reproduce sin el parpadeo de "visible → oculto → entra".
+    new IntersectionObserver((es) => {
+      if (es[0].isIntersecting) {
+        clearTimeout(t); zona.classList.add('oo-vis');
+        if (!zona.classList.contains('oo-play')) zona.classList.add('oo-play');
+        else if (zona.classList.contains('oo-rearm')) {
+          zona.classList.remove('oo-rearm');
+          zona.querySelectorAll('[data-oo-i]').forEach((x) => x.getAnimations().forEach((a) => { a.cancel(); a.play(); }));
+        }
+      } else {
+        zona.classList.remove('oo-vis');
+        if (zona.classList.contains('oo-play')) t = window.setTimeout(() => zona.classList.add('oo-rearm'), 8000);
+      }
+    }, { threshold: 0.35 }).observe(zona);
+  }
+</script>
+
+<style>
+  /* ── Coreografía (JS añade oo-arm y oo-play en la tarjeta) ── */
+  :global(.oo-arm) [data-oo-i] { opacity: 0; transform: translateY(10px); }
+  :global(.oo-arm.oo-play) [data-oo-i] { animation: oo-in 520ms cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--oo-d, 0) * 90ms + 250ms); }
+  :global(.oo-arm.oo-play) .oo-noti__card[data-oo-i] { animation-name: oo-cae; }
+  :global(.oo-arm.oo-play.oo-rearm) [data-oo-i] { animation: none; opacity: 0; }
+  [data-oo-i='1'] { --oo-d: 1; } [data-oo-i='2'] { --oo-d: 2.4; } [data-oo-i='3'] { --oo-d: 3.6; }
+  @keyframes oo-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes oo-cae { from { opacity: 0; transform: translateY(-18px) scale(.97); } to { opacity: 1; transform: none; } }
+  .oo-vivo { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #2f9e72; box-shadow: 0 0 0 2px var(--oo-papel, #fff); }
+  :global(.oo-vis) .oo-vivo { animation: oo-late 2s ease-in-out infinite; }
+  :global(html[data-w-pausa]) .oo-vivo { animation-play-state: paused; }
+  @keyframes oo-late { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+  /* ── Franja ── */
+  .oo-band { display: grid; place-items: center; }
+  .oo-reloj { margin: 6px 0 0; display: grid; justify-items: center; line-height: 1; color: #14232b; }
+  .oo-reloj__d { font: 500 13px/1 var(--font-body); color: rgba(20, 35, 43, .62); text-transform: capitalize; }
+  .oo-reloj__h { margin-top: 4px; font: 300 58px/0.95 var(--font-display); letter-spacing: -0.04em; }
+  .oo-marca { color: var(--w-p-ink, #0e0e0d); display: inline-flex; }
+
+  /* Centrado en el alto del cuerpo de la tarjeta (sin hueco vacío abajo). */
+  .oo { width: 100%; margin-block: auto; }
+
+  /* ── Contratista: notificación de pantalla de bloqueo ── */
+  .oo-noti { position: relative; padding-top: 10px; display: grid; justify-items: center; }
+  .oo-noti__card {
+    --oo-papel: #fff;
+    position: relative; z-index: 2; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px;
+    padding: 13px 14px; border-radius: 20px; background: rgba(255, 255, 255, .92);
+    box-shadow: 0 1px 0 #fff inset, 0 12px 28px rgba(20, 35, 43, .12), 0 2px 6px rgba(20, 35, 43, .08);
+  }
+  .oo-app { position: relative; width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center; background: #14232b; color: #f3efe6; }
+  .oo-app svg { width: 18px; height: 24px; }
+  .oo-app .oo-vivo { top: -3px; right: -3px; }
+  .oo-noti__txt { display: grid; gap: 2px; min-width: 0; }
+  .oo-noti__top { display: flex; justify-content: space-between; gap: 8px; font: 500 12px/1.2 var(--font-body); color: rgba(20, 35, 43, .55); }
+  .oo-noti__app { font-weight: 600; letter-spacing: .02em; text-transform: uppercase; font-size: 11px; color: rgba(20, 35, 43, .7); }
+  .oo-noti__t { font: 600 15px/1.25 var(--font-body); color: #14232b; }
+  .oo-noti__b { font: 400 13px/1.35 var(--font-body); color: #4e5a5f; }
+  .oo-noti__btn {
+    align-self: end; padding: 6px 11px; border-radius: 999px; font: 600 12px/1 var(--font-body); color: #14232b;
+    background: rgba(20, 35, 43, .06); box-shadow: inset 0 0 0 1px rgba(20, 35, 43, .1); white-space: nowrap;
+  }
+  .oo-noti__pila { position: relative; display: block; height: 10px; border-radius: 0 0 16px 16px; background: rgba(255, 255, 255, .7); box-shadow: 0 6px 14px rgba(20, 35, 43, .08); }
+  .oo-noti__pila--1 { z-index: 1; width: 92%; }
+  .oo-noti__pila--2 { width: 84%; background: rgba(255, 255, 255, .5); }
+  .oo-noti__mas { margin-top: 12px; font: 500 12px/1 var(--font-body); color: rgba(20, 35, 43, .5); }
+
+  /* ── Inmobiliaria: ficha Samara + mensaje entrante ── */
+  .oo-casa { display: grid; gap: 12px; }
+  .oo-casa__ficha { display: grid; grid-template-columns: 92px 1fr; gap: 16px; align-items: center; }
+  .oo-casa__ilu { display: grid; place-items: center; height: 92px; border-radius: 14px; background: #34507a; }
+  .oo-casa__ilu svg { width: 58px; fill: none; stroke: #f7f8fa; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+  .oo-casa__txt { display: grid; gap: 4px; }
+  .oo-casa__n { font: 300 38px/1 var(--font-display); letter-spacing: -0.035em; color: #111316; }
+  .oo-casa__z { font: 500 12px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #4d5358; }
+  .oo-casa__d { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .oo-casa__d span { padding: 4px 8px; border-radius: 6px; font: 500 12px/1 var(--font-mono); color: #111316; background: rgba(17, 19, 22, .06); }
+  .oo-msg {
+    --oo-papel: #fff;
+    position: relative; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #fff;
+    box-shadow: 0 10px 24px rgba(17, 19, 22, .1), 0 1px 3px rgba(17, 19, 22, .06);
+  }
+  .oo-msg__top { grid-column: 1 / -1; position: relative; display: flex; align-items: center; gap: 6px; padding-left: 14px; font: 500 12px/1.2 var(--font-body); color: #4d5358; }
+  .oo-msg__top .oo-vivo { left: 0; top: 50%; margin-top: -4px; }
+  .oo-msg__top span { margin-left: auto; }
+  .oo-msg__b { font: 600 16px/1.3 var(--font-body); color: #111316; align-self: center; }
+
+  /* ── Restaurante: carta de la marca + pedir por WhatsApp ── */
+  .oo-carta {
+    --oo-papel: #8e3a1e;
+    box-sizing: border-box; width: 100%; display: grid; gap: 12px; padding: 16px 18px 18px; border-radius: 18px;
+    background: #8e3a1e; color: #fff6ec;
+  }
+  .oo-carta__k { margin: 0; display: flex; justify-content: space-between; align-items: center; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #f2d8c4; }
+  .oo-carta__ab { position: relative; padding-left: 14px; text-transform: none; letter-spacing: .02em; }
+  .oo-carta__ab .oo-vivo { left: 0; top: 50%; margin-top: -4px; background: #7fd6a4; }
+  .oo-carta__l { list-style: none; margin: 0; padding: 0; display: grid; }
+  .oo-carta__l li { display: grid; gap: 2px; padding: 8px 0; border-top: 1px solid rgba(255, 246, 236, .18); }
+  .oo-carta__l b { font: 600 16px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .oo-carta__l span { font: 400 13px/1.35 var(--font-body); color: #f2d8c4; }
+  .oo-carta__btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 999px;
+    border: 1px solid #fff6ec; font: 600 14px/1 var(--font-body); color: #fff6ec;
+  }
+
+  @media (--lt-md) {
+    .oo-reloj__h { font-size: 48px; }
+    /* La marca de la franja baja y se encoge: a 390 chocaba con el rótulo "Ejemplo". */
+    .oo-band--inmobiliaria, .oo-band--restaurante { padding-top: 30px; }
+    .oo-band--restaurante .oo-marca { transform: scale(.82); }
+    .oo-noti__card { grid-template-columns: 36px 1fr; gap: 6px 12px; padding: 12px; }
+    .oo-app { width: 36px; height: 36px; }
+    .oo-noti__top { white-space: nowrap; }
+    .oo-noti__btn { grid-column: 2; justify-self: start; }
+    .oo-casa__n { font-size: 32px; }
+    .oo-casa__ficha { grid-template-columns: 76px 1fr; }
+    .oo-casa__ilu { height: 76px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.oo-arm) [data-oo-i] { opacity: 1; transform: none; animation: none !important; }
+    .oo-vivo { animation: none !important; }
+  }
+</style>

@@ -7,6 +7,9 @@
 // (el único, como el bento del piloto): sin él, desde el plano hasta el pie no había luz
 // ni cambio de superficie. Pendiente de OK del director: §4.18 decía "contraste = plano".
 // Firma: ninguna en bucle (el plano reacciona al hover).
+// v2 (G08): fondo temático F06 (retícula de construcción que se dibuja una vez, P12) en lugar
+// del espacio; "De la marca a todo lo demás" monta el Personalizador de P01 solo, con 4 controles
+// reales (Color, Modo, Marcos, Letra) y 4 opciones con su maqueta.
 // Degradado: la cifra del precio. Marca de EJEMPLO "Tu Marca", nunca Julio's (E-32).
 // Orden (R1): hero + plano → 01 el encargo (I-2: solo lo que el plano no dice) → 02 de la marca a todo lo demás →
 // prosa local → 03 caso real → precio → franja "En pocas palabras" → FAQ → hermanas →
@@ -44,6 +47,9 @@ const anchorOf = (id: string) => {
 const spec: KindSpec = {
   kind: 'branding',
   tone: 'gold',
+  fondo: 'F06',
+  // Hero partido (titular a la izquierda, bajada y botones a la derecha): modo 'ambos' de F06.
+  fondoOpciones: () => ({ texto: 'ambos' }),
   Hero: HeroBranding,
   hero: (ctx) => ({
     h1Html: ctx.cluster.hero.h1,
@@ -59,7 +65,7 @@ const spec: KindSpec = {
     // 2 · 01 El encargo: ficha 3×2 con lo que no repite la lista del plano (I-2, E-10).
     { component: Entregables, props: () => ({ copy: t.entregables, n: 1 }) },
 
-    // 3 · 02 De la marca a todo lo demás: escalera de 4 con maquetas de "Tu Marca".
+    // 3 · 02 De la marca a todo lo demás: personalizador real con 4 opciones de "Tu Marca".
     {
       component: DeLaMarca,
       id: 'proceso',

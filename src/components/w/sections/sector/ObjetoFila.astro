@@ -1,0 +1,194 @@
+---
+// Objetos nuevos de "Lo que necesita tu web" (G08 · design/rediseno-workos-v2.md §3 y §1.6).
+// Sustituyen a los de la v1 (cocina dibujada a mano, casitas en cajita gris con botón de bloque,
+// tarjeta de QR genérica) por piezas de producto con la marca de ejemplo de cada oficio:
+//   antes-despues → página de proyecto de "Tu Plomería" con comparador antes | después (volúmenes
+//                   geométricos simples, sin escena dibujada: E-38/E-53) y el sello de licencia.
+//   listados      → lista de casas de "Tu Inmobiliaria" (nombre fino, datos mono, miniatura
+//                   geométrica en la paleta de la marca), pestañas Comprar | Vender, acción de contorno.
+//   mesa-qr       → tarjeta de mesa de "Your Restaurant" en su ladrillo, con QR de ejemplo e idiomas.
+// Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only, sin h1-h6, acciones como span,
+// un solo rótulo "Ejemplo" por objeto (en la barra o al pie). Estáticos (no son pantallas vivas).
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import { negocios } from '../../objetos/ejemplos/negocios';
+
+interface Props { kind: 'antes-despues' | 'listados' | 'mesa-qr'; lang?: 'es' | 'en' }
+const { kind, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const ej = en ? 'Example' : 'Ejemplo';
+const T = {
+  'antes-despues': en
+    ? { sr: 'Example: a project page on your site with a before-and-after view of a kitchen remodel in Katy and the licensed and insured badge.', nav: ['Projects', 'Services', 'Contact'], k: 'Project', t: 'Kitchen remodel', z: 'Katy, TX', antes: 'Before', despues: 'After', lic: 'Licensed and insured', dom: negocios.plomeria.dominio }
+    : { sr: 'Ejemplo: página de proyecto de tu web con antes y después de una remodelación de cocina en Katy y el sello de licencia y seguro.', nav: ['Proyectos', 'Servicios', 'Contacto'], k: 'Proyecto', t: 'Remodelación de cocina', z: 'Katy, TX', antes: 'Antes', despues: 'Después', lic: 'Con licencia y asegurado', dom: negocios.plomeria.dominio },
+  listados: en
+    ? { sr: 'Example: your agent site with your homes listed, a buy or sell filter and a button to book a showing.', tabs: ['Buy', 'Sell'], casas: [['Oak House', 'Katy · yard and garage', ['3 bd', '2 ba']], ['Cypress Townhome', 'Cypress · showing Saturday', ['2 bd', '2.5 ba']], ['Garden House', 'Spring Branch · move-in ready', ['4 bd', '3 ba']]], btn: 'Book a showing', dom: negocios.inmobiliaria.dominio }
+    : { sr: 'Ejemplo: tu sitio de agente con tus casas en lista, un filtro para comprar o vender y un botón para agendar visita.', tabs: ['Comprar', 'Vender'], casas: [['Casa Roble', 'Katy · patio y cochera', ['3 hab', '2 baños']], ['Townhome Cypress', 'Cypress · se muestra el sábado', ['2 hab', '2.5 baños']], ['Casa Jardín', 'Spring Branch · lista para mudarse', ['4 hab', '3 baños']]], btn: 'Agendar visita', dom: negocios.inmobiliaria.dominio },
+  'mesa-qr': en
+    ? { sr: 'Example: a table card with a QR code that opens the menu in English and Spanish.', scan: 'Scan for the menu', mesa: 'Table 4' }
+    : { sr: 'Ejemplo: tarjeta de mesa con un código QR que abre la carta en español e inglés.', scan: 'Escanea para ver la carta', mesa: 'Mesa 4' },
+}[kind] as any;
+
+// QR de EJEMPLO (no lleva a ningún sitio): 21×21 con sus tres cuadros de posición.
+const Q = 21;
+const finder = (r: number, c: number) => {
+  for (const [r0, c0] of [[0, 0], [0, Q - 7], [Q - 7, 0]]) {
+    const y = r - r0, x = c - c0;
+    if (y >= -1 && y <= 7 && x >= -1 && x <= 7) {
+      if (y < 0 || y > 6 || x < 0 || x > 6) return 0;
+      if (y === 0 || y === 6 || x === 0 || x === 6) return 1;
+      return y >= 2 && y <= 4 && x >= 2 && x <= 4 ? 1 : 0;
+    }
+  }
+  return -1;
+};
+let seed = 7;
+const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+const qr: string[] = [];
+if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) {
+  const f = finder(r, c);
+  if (f === 1 || (f === -1 && rnd() > 0.52)) qr.push(`M${c} ${r}h1v1h-1z`);
+}
+// Miniaturas de casa: tres volúmenes distintos, en los tonos de la marca inmobiliaria.
+const casas = [
+  { bg: '#34507a', d: 'M10 40 30 24l20 16M15 36v18h30V36M26 54V44h8v10' },
+  { bg: '#4b6a93', d: 'M8 54V30l12-8 12 8v24M32 54V34l10-7 10 7v20M16 54v-8h8v8M38 40h8' },
+  { bg: '#2a3f60', d: 'M6 54V36l24-14 24 14v18M14 54V42h10v12M36 44h10v6H36' },
+];
+---
+<div class:list={['of', `of--${kind}`]} data-nosnippet>
+  <p class="sr-only">{T.sr}</p>
+  <div class="of__in" aria-hidden="true">
+    {kind === 'antes-despues' && (
+      <div class="of-ad">
+        <p class="of-bar"><i></i><i></i><i></i><span>{T.dom} · {ej}</span></p>
+        <div class="of-ad__nav">
+          <LogoEjemplo marca="plomeria" size={9} lang={lang} />
+          <span class="of-ad__links">{T.nav.map((l: string, i: number) => <span class:list={[i === 0 && 'is-on']}>{l}</span>)}</span>
+        </div>
+        <p class="of-ad__k">{T.k} · {T.z}</p>
+        <p class="of-ad__t">{T.t}</p>
+        <div class="of-ad__cmp">
+          <svg viewBox="0 0 320 168" preserveAspectRatio="xMidYMid slice">
+            <defs><clipPath id={`of-ad-izq-${lang}`}><rect width="150" height="168" /></clipPath></defs>
+            <!-- Después: la cocina nueva entera -->
+            <rect width="320" height="168" fill="#efe9de" />
+            <rect y="104" width="320" height="64" fill="#e2d8c6" />
+            <rect x="18" y="16" width="284" height="44" rx="3" fill="#14232b" />
+            <path d="M89 16v44M160 16v44M231 16v44" stroke="#23353f" stroke-width="1.5" />
+            <path d="M48 52h12M119 52h12M190 52h12M261 52h12" stroke="#e0935c" stroke-width="2.5" stroke-linecap="round" />
+            <rect x="14" y="88" width="292" height="7" rx="1.5" fill="#f7f3ec" />
+            <rect x="18" y="95" width="284" height="56" rx="3" fill="#1d3039" />
+            <path d="M89 95v56M160 95v56M231 95v56" stroke="#2a3e48" stroke-width="1.5" />
+            <path d="M48 104h12M119 104h12M190 104h12M261 104h12" stroke="#e0935c" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M196 88V74a8 8 0 0 1 16 0" fill="none" stroke="#a3561f" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Antes: la mitad izquierda, gastada -->
+            <g clip-path={`url(#of-ad-izq-${lang})`}>
+              <rect width="320" height="168" fill="#d9d4cb" />
+              <rect y="104" width="320" height="64" fill="#c9c2b6" />
+              <rect x="18" y="18" width="62" height="40" rx="2" fill="#b4ab9c" />
+              <rect x="86" y="20" width="58" height="38" rx="2" fill="#aca393" />
+              <rect x="14" y="88" width="292" height="7" fill="#a59c8d" />
+              <rect x="18" y="95" width="62" height="56" rx="2" fill="#b0a798" />
+              <rect x="86" y="95" width="58" height="56" rx="2" fill="#a69d8e" />
+              <path d="M44 50h10M110 50h10M44 104h10M110 104h10" stroke="#8f8676" stroke-width="2" stroke-linecap="round" />
+            </g>
+            <path d="M150 0v168" stroke="#fff" stroke-width="2" />
+          </svg>
+          <span class="of-ad__asa"><svg viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M15 7l5 5-5 5" /></svg></span>
+          <span class="of-ad__chip of-ad__chip--a">{T.antes}</span>
+          <span class="of-ad__chip of-ad__chip--d">{T.despues}</span>
+        </div>
+        <p class="of-ad__lic"><svg viewBox="0 0 24 24"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.4 7.5 10 4.3-1.6 7.5-5.4 7.5-10v-6z" /><path d="m8.5 12 2.5 2.5 4.5-5" /></svg>{T.lic}</p>
+      </div>
+    )}
+
+    {kind === 'listados' && (
+      <div class="of-ls">
+        <div class="of-ls__top">
+          <LogoEjemplo marca="inmobiliaria" size={10} lang={lang} />
+          <span class="of-ls__tabs"><span class="is-on">{T.tabs[0]}</span><span>{T.tabs[1]}</span></span>
+        </div>
+        <ul class="of-ls__l">
+          {T.casas.map(([n, z, d]: [string, string, string[]], i: number) => (
+            <li>
+              <span class="of-ls__mini" style={`background:${casas[i].bg}`}><svg viewBox="0 0 60 60"><path d={casas[i].d} /></svg></span>
+              <span class="of-ls__t"><b>{n}</b><span>{z}</span></span>
+              <span class="of-ls__d">{d.map((x) => <span>{x}</span>)}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="of-ls__pie"><span class="of-ls__btn">{T.btn}</span><span class="of-ls__ej">{T.dom} · {ej}</span></p>
+      </div>
+    )}
+
+    {kind === 'mesa-qr' && (
+      <div class="of-qr">
+        <span class="of-qr__marca"><LogoEjemplo marca="restaurante" size={17} lang={lang} tono="mono" /></span>
+        <span class="of-qr__code">
+          <svg viewBox={`-1.5 -1.5 ${Q + 3} ${Q + 3}`} shape-rendering="crispEdges">
+            <rect x="-1.5" y="-1.5" width={Q + 3} height={Q + 3} rx="1.5" fill="#fff6ec" />
+            <path d={qr.join('')} fill="#3a1a0c" />
+          </svg>
+        </span>
+        <p class="of-qr__scan">{T.scan}</p>
+        <p class="of-qr__langs"><span class:list={[en && 'is-on']}>EN</span><span class:list={[!en && 'is-on']}>ES</span></p>
+        <p class="of-qr__pie"><span>{T.mesa}</span><span>{ej}</span></p>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .of { width: min(100%, 380px); }
+  .of__in { position: relative; }
+  .of-bar { margin: 0; display: flex; align-items: center; gap: 5px; height: 28px; padding: 0 12px; background: #e9e3d8; border-bottom: 1px solid rgba(20, 35, 43, .08); }
+  .of-bar i { width: 7px; height: 7px; border-radius: 50%; background: rgba(20, 35, 43, .22); }
+  .of-bar span { margin-left: 10px; padding: 3px 10px; border-radius: 6px; background: rgba(255, 255, 255, .7); font: 500 11px/1 var(--font-mono); color: #4e5a5f; }
+
+  /* ── Antes | después en la página de proyecto de Tu Plomería ── */
+  .of-ad { overflow: hidden; border-radius: 14px; background: #f3efe6; color: #14232b; box-shadow: 0 24px 48px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .06); }
+  .of-ad__nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 0; --ej-accent: #a3561f; }
+  .of-ad__links { display: flex; gap: 12px; font: 500 12px/1 var(--font-body); color: #4e5a5f; }
+  .of-ad__links .is-on { color: #14232b; box-shadow: 0 1px 0 #a3561f; padding-bottom: 3px; }
+  .of-ad__k { margin: 18px 18px 0; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #a3561f; }
+  .of-ad__t { margin: 6px 18px 0; font: 600 26px/1.05 var(--font-display); letter-spacing: -0.03em; }
+  .of-ad__cmp { position: relative; margin: 14px 18px 0; border-radius: 10px; overflow: hidden; aspect-ratio: 320 / 168; }
+  .of-ad__cmp > svg { display: block; width: 100%; height: 100%; }
+  .of-ad__asa { position: absolute; left: calc(150 / 320 * 100%); top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(20, 35, 43, .25); }
+  .of-ad__asa svg { width: 16px; fill: none; stroke: #14232b; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .of-ad__chip { position: absolute; top: 8px; padding: 4px 8px; border-radius: 999px; font: 600 11px/1 var(--font-body); }
+  .of-ad__chip--a { left: 8px; background: rgba(20, 35, 43, .7); color: #f3efe6; }
+  .of-ad__chip--d { right: 8px; background: #fff; color: #14232b; }
+  .of-ad__lic { display: flex; align-items: center; gap: 8px; margin: 0; padding: 14px 18px 16px; font: 500 13px/1.2 var(--font-body); color: #14232b; }
+  .of-ad__lic svg { width: 18px; fill: none; stroke: #a3561f; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+
+  /* ── Lista de casas de Tu Inmobiliaria ── */
+  .of-ls { border-radius: 14px; background: #e3e6e8; color: #111316; padding: 18px; box-shadow: 0 24px 48px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .06); }
+  .of-ls__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .of-ls__tabs { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(17, 19, 22, .07); font: 500 12px/1 var(--font-body); }
+  .of-ls__tabs span { padding: 6px 11px; border-radius: 999px; color: #4d5358; }
+  .of-ls__tabs .is-on { background: #fff; color: #111316; box-shadow: 0 1px 3px rgba(17, 19, 22, .12); }
+  .of-ls__l { list-style: none; margin: 16px 0 0; padding: 0; display: grid; }
+  .of-ls__l li { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid rgba(17, 19, 22, .1); }
+  .of-ls__mini { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 8px; }
+  .of-ls__mini svg { width: 40px; fill: none; stroke: #f7f8fa; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .of-ls__t { display: grid; gap: 3px; min-width: 0; }
+  .of-ls__t b { font: 300 19px/1.1 var(--font-display); letter-spacing: -0.02em; }
+  .of-ls__t span { font: 400 12px/1.3 var(--font-body); color: #4d5358; }
+  .of-ls__d { display: grid; gap: 4px; justify-items: end; }
+  .of-ls__d span { font: 500 11px/1 var(--font-mono); color: #111316; padding: 3px 6px; border-radius: 4px; background: rgba(17, 19, 22, .06); }
+  .of-ls__pie { margin: 12px 0 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .of-ls__btn { white-space: nowrap; padding: 9px 14px; border: 1px solid #111316; border-radius: 2px; font: 600 13px/1 var(--font-body); }
+  .of-ls__ej { text-align: right; font: 500 11px/1 var(--font-mono); color: #4d5358; }
+
+  /* ── Tarjeta de mesa de Your Restaurant ── */
+  .of-qr { width: min(100%, 280px); margin-inline: auto; box-sizing: border-box; display: grid; justify-items: center; gap: 12px; padding: 24px 22px 16px; border-radius: 16px; background: #8e3a1e; color: #fff6ec; box-shadow: 0 24px 48px rgba(0, 0, 0, .4), inset 0 0 0 6px #8e3a1e, inset 0 0 0 7px rgba(255, 246, 236, .3); }
+  .of-qr__marca { display: inline-flex; color: #fff6ec; }
+  .of-qr__code { display: block; width: 150px; padding: 4px; }
+  .of-qr__code svg { display: block; width: 100%; }
+  .of-qr__scan { margin: 0; font: 600 15px/1.2 var(--font-display); }
+  .of-qr__langs { margin: 0; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 246, 236, .14); font: 600 11px/1 var(--font-mono); }
+  .of-qr__langs span { padding: 5px 10px; border-radius: 999px; color: #f2d8c4; }
+  .of-qr__langs .is-on { background: #fff6ec; color: #3a1a0c; }
+  .of-qr__pie { width: 100%; margin: 4px 0 0; padding-top: 10px; display: flex; justify-content: space-between; border-top: 1px solid rgba(255, 246, 236, .22); font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #f2d8c4; }
+</style>

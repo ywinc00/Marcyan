@@ -5,6 +5,8 @@
 // Contraste: SOLO la tarjeta "Mensual" del hero (TarjetasModelo); el banner
 // "Combina servicios" va en --w-s1. Firma: ninguna (página de decisión, F-06
 // "cuándo NO"). Degradado: ninguno (W-CONV-12 en oro plano).
+// v2 (G09): fondo temático F10 en el hero (sin SpaceBackdrop), objeto W-CONV-51 junto a la prosa,
+// tarjetas en dos grupos numerados (01 Por proyecto · 02 Mensual) e incluido con iconos-objeto.
 // Orden: cabecera + 2 modelos · prosa de transparencia (verbatim) · 01 lo que
 // cuesta (#precios, 7 TarjetaPrecio) · 02 incluido en toda web · 03 después de
 // publicar · combina servicios · tres compromisos · en pocas palabras (answer
@@ -18,7 +20,7 @@ import SiteNav from '../../../layout/SiteNav.astro';
 import SiteFooter from '../../../layout/SiteFooter.astro';
 import Breadcrumb from '../../../ui/Breadcrumb.astro';
 import Contact from '../../../sections/Contact.astro';
-import SpaceBackdrop from '../../../SpaceBackdrop.astro';
+import Fondo from '../../fondos/Fondo.astro';
 import OfferCatalogLd from '../../../seo/OfferCatalogLd.astro';
 import WStyles from '../../WStyles.astro';
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
@@ -30,6 +32,7 @@ import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
 import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
 import HeroPrecios from './HeroPrecios.astro';
 import Incluido from './Incluido.astro';
+import ComoSeCalcula from './ComoSeCalcula.astro';
 import Despues from './Despues.astro';
 import Combina from './Combina.astro';
 import Dudas from './Dudas.astro';
@@ -38,7 +41,7 @@ import { clusterNav, clusterNavEn } from '../../../../i18n/clusters';
 import type { OfferItem } from '../../../../lib/schema';
 import type { IconoId } from '../../objects/registry';
 import {
-  preciosCopy, catalogFor, tiersOf, includesOf, fromOf, tierName, MODELO_ICONS, type PreciosLang,
+  preciosCopy, catalogFor, tiersOf, includesOf, fromOf, tierName, MODELO_ICONS, GRUPOS_PRECIO, type PreciosLang,
 } from '../../../../i18n/w/precios';
 
 interface Props {
@@ -74,6 +77,33 @@ const cards = [
   },
 ] as const;
 
+// v2 (G09): las 7 tarjetas en dos grupos con cabecera numerada; la 1.ª de cada grupo destacada
+// (tarjeta completa) y el resto compactas en rejilla. Cero cifras a mano (catalog/PRICE_ANCHORS).
+const byId = (id: string) => {
+  const prod = catalog.find((x) => x.id === id);
+  if (!prod) throw new Error(`precios: "${id}" no está en el catálogo`);
+  return prod;
+};
+const grupos = (['proyecto', 'mensual'] as const).map((g, gi) => ({
+  key: g, n: gi + 1, ...t.grupos[g], prods: GRUPOS_PRECIO[g].map(byId),
+}));
+// Filas del objeto W-CONV-51: por proyecto, el nivel ancla; mensual, su nivel mensual (lo recurrente a la vista).
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+const filasCompara = grupos.flatMap((g) => g.prods.map((prod) => {
+  const tier = g.key === 'mensual'
+    ? (prod.tiers.find((x) => x.monthly) ?? prod.tiers[0])
+    : (prod.tiers.find((x) => x.anchor) ?? prod.tiers[0]);
+  const free = tier.value === null;
+  return {
+    id: prod.id as IconoId, tone: prod.tone,
+    name: prod.name,
+    sub: prod.tiers.map((x) => x.name).join(' · '),
+    k: free ? '' : (lang === 'en' ? 'From' : 'Desde'),
+    v: free ? (lang === 'en' ? 'Free' : 'Gratis') : usd(tier.value as number),
+    mensual: !!tier.monthly,
+  };
+}));
+
 const despuesCols = t.despues.cols.map((col) => ({
   title: tierName(lang, col.id, col.key),
   lines: col.lines,
@@ -89,9 +119,12 @@ const despuesCols = t.despues.cols.map((col) => ({
   <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en' : '/es'} currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold">
-    <HeroPrecios eyebrow={t.eyebrow} h1Html={p.hero.h1} lead={t.lead} cards={cards as any}>
-      <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
-    </HeroPrecios>
+    <div class="wf-zona">
+      <Fondo tema="F10" lang={lang} texto="centro" />
+      <HeroPrecios eyebrow={t.eyebrow} h1Html={p.hero.h1} lead={t.lead} cards={cards as any}>
+        <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
+      </HeroPrecios>
+    </div>
 
     {/* Por qué lo publicamos: texto VERBATIM (transparency), titular a dos tonos. */}
     <section class="w-cell" aria-labelledby="transparencia">
@@ -102,48 +135,58 @@ const despuesCols = t.despues.cols.map((col) => ({
           titleTone2={t.prosa.tone2}
           paragraphs={p.transparency.paragraphs}
         />
+        <ComoSeCalcula otros={t.compara.otros} nosotros={t.compara.nosotros} filas={filasCompara} lang={lang} />
       </div>
     </section>
 
-    {/* 01 · Lo que cuesta: una TarjetaPrecio por producto, niveles del catálogo. */}
+    {/* Lo que cuesta: titular de sección (verbatim) y las 7 tarjetas en dos grupos numerados
+        (01 Por proyecto · 02 Mensual), la 1.ª de cada grupo completa y destacada. */}
     <section class="w-cell" id="precios" aria-labelledby="precios-title">
       <div class="w-container">
-        <div data-w-reveal>
-          <CabeceraNumerada n={1} label={t.cuesta.label} titleHtml={p.grid.title} lead={p.grid.intro} id="precios-title" />
+        <div data-w-reveal class="pv-head">
+          <h2 class="w-h2" id="precios-title" set:html={p.grid.title} />
+          <p class="pv-head__lead">{p.grid.intro}</p>
         </div>
-        <div class="pv-cards">
-          {catalog.map((prod) => {
-            const f = fromOf(prod, lang);
-            return (
-            <div data-w-reveal class="pv-card" style={`--pv-k:"${f.k}";--pv-v:"${f.v}"`}>
-              <TarjetaPrecio
-                id={`precio-${prod.id}`}
-                serviceId={prod.id as IconoId}
-                name={prod.name}
-                desc={prod.tagline}
-                tiers={tiersOf(prod, lang)}
-                includes={includesOf(prod)}
-                cta={{ label: prod.ctaLabel, href: prod.href }}
-                tiersLabel={t.cuesta.tiersLabel}
-                includesLabel={t.cuesta.includesLabel}
-                tone={prod.tone}
-              />
+        {grupos.map((g) => (
+          <div class="pv-grupo" data-grupo={g.key}>
+            <div data-w-reveal><CabeceraNumerada n={g.n} label={g.label} /><p class="pv-grupo__lead">{g.lead}</p></div>
+            <div class:list={['pv-grid', `pv-grid--${g.prods.length - 1}`]}>
+              {g.prods.map((prod, i) => {
+                // En el grupo Mensual la cifra grande es la cuota mensual (lo recurrente a la vista).
+                const mt = g.key === 'mensual' ? prod.tiers.find((x) => x.monthly) : undefined;
+                const f = mt && mt.value !== null
+                  ? { k: lang === 'en' ? 'Monthly, from' : 'Al mes, desde', v: usd(mt.value) }
+                  : fromOf(prod, lang);
+                const common = {
+                  id: `precio-${prod.id}`, serviceId: prod.id as IconoId, name: prod.name, desc: prod.tagline,
+                  tiers: tiersOf(prod, lang), includes: includesOf(prod), cta: { label: prod.ctaLabel, href: prod.href },
+                  tiersLabel: t.cuesta.tiersLabel, includesLabel: t.cuesta.includesLabel, tone: prod.tone,
+                };
+                return i === 0 ? (
+                  <div data-w-reveal class="pv-card pv-card--dest" style={`--pv-k:"${f.k}";--pv-v:"${f.v}"`}>
+                    <TarjetaPrecio {...common} destacada />
+                  </div>
+                ) : (
+                  <div data-w-reveal class="pv-c">
+                    <TarjetaPrecio {...common} variante="compacta" desde={f} />
+                  </div>
+                );
+              })}
             </div>
-            );
-          })}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
 
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
-        <Incluido n={2} label={t.incluido.label} titleHtml={t.incluido.title} lead={t.incluido.lead} items={t.incluido.items} />
+        <Incluido n={3} label={t.incluido.label} titleHtml={t.incluido.title} lead={t.incluido.lead} items={t.incluido.items} />
       </div>
     </section>
 
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
-        <Despues n={3} label={t.despues.label} titleHtml={t.despues.title} lead={t.despues.lead} cols={despuesCols} />
+        <Despues n={4} label={t.despues.label} titleHtml={t.despues.title} lead={t.despues.lead} cols={despuesCols} />
       </div>
     </section>
 
@@ -195,8 +238,6 @@ const despuesCols = t.despues.cols.map((col) => ({
     <Contact contact={c.contact} />
   </main>
 
-  <SpaceBackdrop tone="gold" />
-
   <SiteFooter footer={c.footer} lang={lang} />
 </Layout>
 
@@ -204,12 +245,35 @@ const despuesCols = t.despues.cols.map((col) => ({
   /* El <em> de los titulares de sección (dato verbatim) en el acento y sin cursiva, como el
      <em> del H1 (w.css solo lo define para .w-h1; ver pendiente [SISTEMA]). */
   :global(:root[data-ds="v3"] main[data-w] .w-numhead .w-h2 em) { font-style: normal; color: var(--w-accent); }
-  .pv-cards { display: grid; gap: 32px; margin-top: 56px; }
-  @media (--lt-md) { .pv-cards { gap: 24px; margin-top: 40px; } }
-  /* Móvil por sustracción (E-18): la columna "Qué incluye cada nivel" repite los nombres
-     del panel de precios; en móvil queda solo nombre, frase y niveles con su precio
-     (lo mismo que enseñaba la tarjeta de antes). En escritorio se ve entera. */
-  @media (--lt-md) { .pv-cards :global(.tp__inc) { display: none; } .pv-cards :global(.tp__panel) { border-top: 0; } }
+  .pv-head { display: grid; gap: 16px; }
+  @media (--lg) { .pv-head { grid-template-columns: minmax(0, 580px) minmax(0, 430px); justify-content: space-between; align-items: end; } }
+  .pv-head :global(.w-h2) { margin: 0; }
+  .pv-head :global(.w-h2 em) { font-style: normal; color: var(--w-accent); }
+  .pv-head__lead { margin: 0; font: 400 16px/1.6 var(--font-body); color: var(--w-ink-70); }
+  .pv-grupo { margin-top: 72px; }
+  .pv-grupo + .pv-grupo { margin-top: 96px; }
+  .pv-grupo__lead { margin: 12px 0 0; font: 500 20px/1.35 var(--font-display); letter-spacing: -0.015em; color: var(--w-ink); }
+  .pv-grid { display: grid; gap: 24px; margin-top: 32px; grid-template-columns: minmax(0, 1fr); }
+  .pv-grid > .pv-card--dest { grid-column: 1 / -1; }
+  @media (--md) { .pv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (--lg) { .pv-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .pv-c { min-width: 0; }
+  /* Compactas en la misma fila con las mismas 5 franjas (cabecera, cifra, niveles, qué incluye,
+     acción) compartidas por subrejilla (rev1 de G09, menor): con un solo nivel, Mantenimiento ya
+     no deja ~100 px de hueco sobre su acción; las franjas se alinean como una tabla. */
+  @media (--md) {
+    .pv-c { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; }
+    .pv-c > :global(.tp--c) { grid-row: span 5; display: grid; grid-template-rows: subgrid; row-gap: 0; align-content: start; }
+    .pv-c > :global(.tp--c > *) { align-self: start; }
+  }
+  @media (--lt-md) { .pv-grupo { margin-top: 48px; } .pv-grupo + .pv-grupo { margin-top: 64px; } .pv-grid { gap: 16px; margin-top: 24px; } .pv-grupo__lead { font-size: 18px; } }
+  /* Móvil (rev1 de G09, menor): "Qué incluye cada nivel" ya no se oculta en las destacadas;
+     va plegado bajo el panel de niveles, con el MISMO desplegable que las compactas. */
+  @media (--lt-md) {
+    .pv-card :global(.tp__body) { display: flex; flex-direction: column; }
+    .pv-card :global(.tp__panel) { border-top: 0; }
+    .pv-card :global(.tp__inc) { order: 2; margin-inline: 20px; padding-inline: 0; }
+  }
 
   /* Cifra grande "Desde $X" (W-CONV-03, §10.2): el nivel ancla del catálogo (fromOf).
      TarjetaPrecio no tiene hueco para ella (ver pendiente [SISTEMA]); hasta entonces
@@ -246,4 +310,10 @@ const despuesCols = t.despues.cols.map((col) => ({
      tarjeta como el panel gris de WorkOS, con divisoria de 1 px. Sin brillos ni degradados. */
   .pv-card :global(.tp__panel) { background: var(--w-s3); }
   @media (--lg) { .pv-card :global(.tp__panel) { border-left-color: var(--w-line-strong); } }
+  /* rev2 de G09 (menor): a 1440×900 la pausa del fondo (abajo a la derecha de la zona) quedaba
+     pegada al bocadillo del botón de Marcy y medio bajo el borde. En escritorio sube a la línea
+     de las migas, en el borde derecho del contenedor (centrada con ellas). */
+  @media (--lg) {
+    .wf-zona > :global(.wf-pausa) { top: calc(var(--w-hero-top) - 9px); bottom: auto; }
+  }
 </style>

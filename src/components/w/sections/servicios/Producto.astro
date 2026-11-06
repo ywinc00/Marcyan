@@ -1,0 +1,39 @@
+---
+// Servicios · producto de la marca de ejemplo `tienda` como VOLUMEN geométrico sólido con sombra
+// propia (vela, bolsa de café, caja de regalo; Palmer: el objeto, nunca un icono en caja ni un
+// dibujo de línea). Lo usan ObjWebTienda (escaparate del móvil) y ObjPedidos (miniatura de fila).
+// `size` = lado de la baldosa en px; todo escala con --pz. Decorativo (lo envuelve un aria-hidden).
+interface Props { prod: 'vela' | 'velaOliva' | 'cafe' | 'caja'; size?: number; baldosa?: boolean }
+const { prod, size = 40, baldosa = true } = Astro.props;
+---
+<span class:list={['pz', `pz--${prod}`, baldosa && 'pz--b']} style={`--pz:${size / 40}`}><i></i></span>
+
+<style>
+  .pz { position: relative; display: inline-block; flex: none; width: calc(40px * var(--pz)); height: calc(40px * var(--pz)); }
+  .pz--b { border-radius: calc(9px * var(--pz)); background: rgba(42,33,27,.07); overflow: hidden; }
+  .pz i { position: absolute; display: block; }
+  .pz--vela i, .pz--velaOliva i {
+    left: calc(11px * var(--pz)); bottom: calc(7px * var(--pz)); width: calc(18px * var(--pz)); height: calc(21px * var(--pz));
+    border-radius: calc(3px * var(--pz)) calc(3px * var(--pz)) calc(4px * var(--pz)) calc(4px * var(--pz));
+    background: linear-gradient(90deg, #E9DFCC 0%, #F6EFE2 45%, #D9CCB4 100%);
+    box-shadow: calc(3px * var(--pz)) calc(3px * var(--pz)) 0 rgba(42,33,27,.14);
+  }
+  .pz--velaOliva i { background: linear-gradient(90deg, #7F8A69 0%, #98A27F 45%, #6A7556 100%); }
+  .pz--vela i::before, .pz--velaOliva i::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: calc(5px * var(--pz)); border-radius: calc(3px * var(--pz)); background: rgba(42,33,27,.16); }
+  .pz--vela i::after, .pz--velaOliva i::after { content: ''; position: absolute; left: calc(8px * var(--pz)); top: calc(-5px * var(--pz)); width: calc(2px * var(--pz)); height: calc(6px * var(--pz)); border-radius: 1px; background: #2A211B; }
+  .pz--cafe i {
+    left: calc(11px * var(--pz)); bottom: calc(6px * var(--pz)); width: calc(18px * var(--pz)); height: calc(26px * var(--pz));
+    border-radius: calc(2px * var(--pz)) calc(2px * var(--pz)) calc(3px * var(--pz)) calc(3px * var(--pz));
+    background: linear-gradient(90deg, #5B4332 0%, #74573F 50%, #4C3829 100%);
+    box-shadow: calc(3px * var(--pz)) calc(3px * var(--pz)) 0 rgba(42,33,27,.16);
+  }
+  .pz--cafe i::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: calc(4px * var(--pz)); background: #3E2E22; }
+  .pz--cafe i::after { content: ''; position: absolute; left: calc(3px * var(--pz)); right: calc(3px * var(--pz)); top: calc(10px * var(--pz)); height: calc(8px * var(--pz)); border-radius: 1px; background: #EFE6D6; }
+  .pz--caja i {
+    left: calc(7px * var(--pz)); bottom: calc(9px * var(--pz)); width: calc(26px * var(--pz)); height: calc(17px * var(--pz));
+    border-radius: calc(2px * var(--pz)); background: linear-gradient(180deg, #CDB58F, #B89C72);
+    box-shadow: calc(3px * var(--pz)) calc(3px * var(--pz)) 0 rgba(42,33,27,.14);
+  }
+  .pz--caja i::before { content: ''; position: absolute; left: calc(-2px * var(--pz)); right: calc(-2px * var(--pz)); top: calc(-2px * var(--pz)); height: calc(6px * var(--pz)); border-radius: calc(2px * var(--pz)); background: #D8C29E; box-shadow: 0 1px 0 rgba(42,33,27,.15); }
+  .pz--caja i::after { content: ''; position: absolute; left: calc(12px * var(--pz)); top: calc(-2px * var(--pz)); bottom: 0; width: calc(2px * var(--pz)); background: #4E5A3D; }
+</style>

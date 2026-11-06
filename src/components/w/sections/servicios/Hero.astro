@@ -35,6 +35,36 @@ const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
   </div>
 </section>
 
+<script>
+  // Pausa global (rev1 de G09, imp. 4): la pausa de los interruptores es la ÚNICA del hero (el
+  // fondo esconde la suya), así que también produce el contrato global y lo obedece: si otra pausa
+  // de la página (pedidos, cuidado) lo activa, este botón se pone en el mismo estado.
+  import { fijaPausa, pausaActiva } from './pausaGlobal';
+  const SEL = '.ws-hero__obj .w-loop-pause';
+  const pressed = (b: Element) => b.getAttribute('aria-pressed') === 'true';
+  let propio = false; // el clic en curso es del propio botón: él mismo cambiará de estado
+  // En captura: loop.ts repinta el icono del botón al pulsarlo y el destino del clic sale del DOM
+  // antes de burbujear; aquí aún no ha cambiado, así que el estado nuevo es el contrario.
+  document.addEventListener('click', (e) => {
+    const b = (e.target as Element | null)?.closest?.(SEL);
+    if (!b) return;
+    const p = !pressed(b);
+    propio = true; fijaPausa(p); propio = false;
+    // Tras el clic, el botón ya está en su estado: se repite el aviso (idempotente) para que el
+    // fondo, que mira también este botón, se vuelva a sincronizar.
+    window.setTimeout(() => document.dispatchEvent(new CustomEvent('w:pausa', { detail: { paused: p } })), 0);
+  }, true);
+  const align = (p: boolean) => {
+    if (propio) return;
+    const b = document.querySelector<HTMLButtonElement>(SEL);
+    if (b && pressed(b) !== p) b.click();
+  };
+  document.addEventListener('w:pausa', (e) => align(!!(e as CustomEvent).detail?.paused));
+  // El botón lo crea loop.ts al arrancar: se alinea con una pausa de la sesión cuando ya existe.
+  const boot = () => { if (pausaActiva()) { fijaPausa(true); align(true); } };
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot, { once: true });
+</script>
+
 <style>
   .ws-hero { padding-bottom: 72px; }
   .ws-hero__grid { display: grid; gap: 40px; align-items: center; }
@@ -50,6 +80,9 @@ const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
     .ws-hero__obj { justify-content: flex-end; }
   }
   @media (--lt-md) {
+    /* La pausa de los interruptores baja bajo la pila (rev1 de G09, menor): tapaba "Listo" de SEO local. */
+    .ws-hero__obj { padding-bottom: 52px; }
+    .ws-hero__obj :global(.w-loop-pause) { bottom: -52px !important; right: 4px !important; }
     .ws-hero { padding-bottom: 48px; }
     .ws-hero__grid { gap: 24px; }
     .ws-hero__crumbs { margin-bottom: 20px; }

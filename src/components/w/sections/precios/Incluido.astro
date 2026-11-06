@@ -1,22 +1,48 @@
 ---
-// Precios · 02 "Incluido en toda web" (§4.4-4; W-CONV-10 "Batteries included").
-// Lista a 2 columnas: azulejo en relieve de 52 px con un glifo Lucide (los 7
-// iconos-objeto son de PRODUCTO y no se reutilizan para rasgos, por eso aquí va
-// un azulejo propio con la misma piel de relieve) + título 18/500 + una línea 15.
-// Solo lo que ya dice pricing.ts del diseño web (a medida, rápida, bilingüe,
-// SEO base, legible por la IA) más la propiedad del sitio (plazo oficial).
+// Precios · "Lo que trae cada web" (§4.4-4; v2 G09: iconos-OBJETO, ya no glifos Lucide pequeños,
+// FI §3-16). Cada rasgo lleva un azulejo de app de 64 px dibujado para él, a la manera de las
+// baldosas de producto de W-CONV-67 (AuthKit, SSO…): squircle en relieve con una mini-interfaz
+// dentro (maqueta de web con cursor, velocímetro, conmutador ES|EN, buscador con resultado,
+// documento legible con destello, llave con etiqueta). Línea crema 1,5 + UN acento oro por pieza.
+// Rejilla de 3 columnas en escritorio (2 filas), 2 en tableta y 1 en móvil.
+// Al entrar en vista, la parte oro de cada azulejo se dibuja una vez (stroke-dashoffset, 700 ms,
+// escalonado 80 ms); quieto con reducir movimiento o sin JS (dibujado).
+// Solo lo que ya dice pricing.ts del diseño web (a medida, rápida, bilingüe, SEO base, legible
+// por la IA) más la propiedad del sitio (plazo oficial).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import Icon from '../../../ui/Icon.astro';
+import type { IncluidoIcono } from '../../../../i18n/w/precios';
 
-interface Item { icon: string; title: string; text: string }
+interface Item { icon: IncluidoIcono; title: string; text: string }
 interface Props { n: number; label: string; titleHtml: string; lead: string; items: Item[] }
 const { n, label, titleHtml, lead, items } = Astro.props;
+
+// Trazos en viewBox 64. `.g` = parte oro que se dibuja (pathLength=1).
+const ART: Record<IncluidoIcono, string> = {
+  medida: `<rect x="12" y="15" width="40" height="30" rx="4" class="l"/><path d="M12 21.5h40" class="l"/><circle cx="16" cy="18.3" r="1" class="f"/><circle cx="19.5" cy="18.3" r="1" class="f"/>
+    <path class="g" pathLength="1" d="M17 28h17"/><path d="M17 33h11M17 38h8" class="l s"/><rect x="38" y="27" width="10" height="13" rx="2" class="l s"/>
+    <path d="M41 41.5 41 52l3-3 2.4 4.6 2.2-1.1-2.4-4.6 4.3-.4Z" class="cur"/>`,
+  rapida: `<path d="M14 42a18 18 0 0 1 36 0" class="l"/><path d="M18.5 30.5l2.6 1.5M32 24v3M45.5 30.5l-2.6 1.5" class="l s"/>
+    <path class="g" pathLength="1" d="M17.6 38.2a14.5 14.5 0 0 1 22.6-11.4"/><path d="M32 42 42.5 31" class="ndl"/><circle cx="32" cy="42" r="2.6" class="f"/>`,
+  bilingue: `<rect x="10" y="24" width="44" height="17" rx="8.5" class="l"/><rect class="pill" x="12" y="26" width="21" height="13" rx="6.5"/>
+    <text x="22.5" y="35.4" class="tx on">ES</text><text x="43.3" y="35.4" class="tx">EN</text>
+    <path class="g" pathLength="1" d="M18 47.5h28"/>`,
+  seo: `<rect x="10" y="14" width="44" height="12" rx="6" class="l"/><circle cx="17.5" cy="20" r="2.6" class="l s"/><path d="m19.4 21.9 1.8 1.8" class="l s"/>
+    <circle cx="14.5" cy="34.5" r="2" class="gd"/><path class="g" pathLength="1" d="M20 34.5h22"/><path d="M20 39.5h28" class="l s"/>
+    <path d="M14.5 47.5h0M20 47.5h18" class="l s o"/>`,
+  ia: `<path d="M17 12h20l10 10v30H17Z" class="l"/><path d="M37 12v10h10" class="l"/>
+    <path d="M24.5 30 21.5 34l3 4M39.5 30l3 4-3 4" class="l s"/><path d="M30 41.5 34 27" class="l s"/>
+    <path class="g" pathLength="1" d="M48 41v8M44 45h8"/>`,
+  tuya: `<circle cx="24" cy="30" r="8.5" class="l"/><circle cx="24" cy="30" r="2.6" class="l s"/>
+    <path class="g" pathLength="1" d="M32.5 30H51M44.5 30v6M49.5 30v4.5"/><path d="M15 40.5 13 46.5h13l-2-6" class="l s o"/>`,
+};
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
-<ul class="pi">
+<ul class="pi" data-w2-incluido>
   {items.map((it) => (
     <li class="pi__item">
-      <span class="pi__tile" aria-hidden="true"><Icon name={it.icon} class="pi__glyph" /></span>
+      <span class="pi__tile" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="64" height="64" set:html={ART[it.icon]} />
+      </span>
       <div class="pi__txt">
         <h3 class="pi__h">{it.title}</h3>
         <p class="pi__p">{it.text}</p>
@@ -25,27 +51,63 @@ const { n, label, titleHtml, lead, items } = Astro.props;
   ))}
 </ul>
 
+<script>
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-w2-incluido]').forEach((el) => {
+    if (mq.matches) return;
+    el.classList.add('is-armed');
+    const io = new IntersectionObserver((ents) => {
+      if (ents.some((e) => e.isIntersecting)) { el.classList.add('is-in'); io.disconnect(); }
+    }, { threshold: 0.3 });
+    io.observe(el);
+  });
+</script>
+
 <style>
   .pi {
     list-style: none; margin: 56px 0 0; padding: 0;
-    display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px;
   }
-  @media (--md) { .pi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 64px; } }
-  .pi__item { display: flex; align-items: center; gap: 24px; min-width: 0; }
-  /* Relieve propio (G-10): superficie de objeto, filo de luz arriba, borde oro al 9 %. */
+  @media (--md) { .pi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 48px; } }
+  @media (--lg) { .pi { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 56px; } }
+  .pi__item { display: flex; align-items: flex-start; gap: 20px; min-width: 0; }
+  @media (--lg) { .pi__item { flex-direction: column; gap: 20px; } }
+  /* Baldosa de app (W-CONV-67): relieve de objeto, filo de luz arriba, borde al 9 %. */
   .pi__tile {
-    flex: none; display: inline-flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; border-radius: 12px;
-    background: linear-gradient(180deg, var(--w-s3), var(--w-s1));
-    border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge);
-    color: var(--w-accent, var(--accent-gold));
+    flex: none; display: inline-flex; width: 64px; height: 64px; border-radius: 15px;
+    background: radial-gradient(120% 90% at 30% 0%, rgba(201,169,110,.13), transparent 60%), linear-gradient(180deg, var(--w-s3), var(--w-s1));
+    border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge), 0 8px 18px -10px rgba(0,0,0,.6);
+    color: var(--w-ink);
   }
-  .pi__tile :global(.pi__glyph) { width: 24px; height: 24px; }
+  .pi__tile svg { display: block; }
+  .pi__tile :global(.l) { fill: none; stroke: rgba(240,237,232,.82); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .pi__tile :global(.s) { stroke: rgba(240,237,232,.55); }
+  .pi__tile :global(.o) { stroke: rgba(240,237,232,.3); }
+  .pi__tile :global(.f) { fill: rgba(240,237,232,.6); }
+  .pi__tile :global(.g) { fill: none; stroke: var(--w-accent, var(--accent-gold)); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .pi__tile :global(.gd) { fill: var(--w-accent, var(--accent-gold)); }
+  .pi__tile :global(.ndl) { fill: none; stroke: rgba(240,237,232,.92); stroke-width: 2; stroke-linecap: round; transform-origin: 32px 42px; }
+  .pi__tile :global(.cur) { fill: var(--w-ink); stroke: #0e0e0d; stroke-width: 1; stroke-linejoin: round; }
+  .pi__tile :global(.pill) { fill: var(--w-accent, var(--accent-gold)); }
+  .pi__tile :global(.tx) { font: 600 8.5px/1 var(--font-mono); text-anchor: middle; fill: rgba(240,237,232,.6); letter-spacing: .04em; }
+  .pi__tile :global(.tx.on) { fill: #14110b; }
+  .pi.is-armed :global(.g) { stroke-dashoffset: 1; }
+  .pi.is-armed :global(.ndl) { transform: rotate(-70deg); }
+  .pi.is-in :global(.g) { animation: pi-draw 700ms cubic-bezier(.6,0,.2,1) forwards; }
+  .pi.is-in :global(.ndl) { animation: pi-ndl 900ms 120ms cubic-bezier(.3,1.35,.5,1) forwards; }
+  .pi.is-in .pi__item:nth-child(2) :global(.g), .pi.is-in .pi__item:nth-child(2) :global(.ndl) { animation-delay: 80ms; }
+  .pi.is-in .pi__item:nth-child(3) :global(.g) { animation-delay: 160ms; }
+  .pi.is-in .pi__item:nth-child(4) :global(.g) { animation-delay: 240ms; }
+  .pi.is-in .pi__item:nth-child(5) :global(.g) { animation-delay: 320ms; }
+  .pi.is-in .pi__item:nth-child(6) :global(.g) { animation-delay: 400ms; }
+  @keyframes pi-draw { to { stroke-dashoffset: 0; } }
+  @keyframes pi-ndl { to { transform: rotate(0deg); } }
   .pi__txt { min-width: 0; }
   .pi__h {
     margin: 0; font-family: var(--font-display); font-weight: 500;
     font-size: 18px; line-height: 1.3; letter-spacing: -0.02em; color: var(--w-ink);
   }
-  .pi__p { margin: 4px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink-70); }
-  @media (--lt-md) { .pi { margin-top: 40px; gap: 24px; } .pi__item { gap: 16px; } }
+  .pi__p { margin: 6px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink-70); max-width: 34ch; }
+  @media (--lt-md) { .pi { margin-top: 40px; gap: 24px; } .pi__item { gap: 16px; } .pi__tile { width: 56px; height: 56px; border-radius: 13px; } .pi__tile svg { width: 56px; height: 56px; } }
+  @media (prefers-reduced-motion: reduce) { .pi :global(.g), .pi :global(.ndl) { animation: none !important; stroke-dashoffset: 0 !important; transform: none !important; } }
 </style>

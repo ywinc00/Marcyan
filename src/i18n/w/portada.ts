@@ -42,12 +42,14 @@ export const iaMontada: Record<L, {
     titulo: 'Un cerebro, todos tus canales',
     bajada: 'Marcy piensa con Claude y responde donde te escriben tus clientes.',
     // §5-1 (por defecto): solo Claude como modelo; sin fila "Montada sobre".
-    // §5-14: canales que el sitio nombra Y que Marcy contesta de verdad (WhatsApp; "tu web" no es
-    // una marca y PildorasMarcas solo admite MarcaId: pendiente [SISTEMA]).
+    // §5-14: canales que el sitio ya nombra como canales donde Marcy contesta: WhatsApp, Instagram y
+    // Messenger (copy congelado de IA para pymes: "Marcy contesta en tu web, WhatsApp, Instagram,
+    // Messenger y Google"; revisión 1 de G01: con solo WhatsApp el titular "todos tus canales"
+    // sonaba hueco). "Tu web" no es una marca y PildorasMarcas solo admite MarcaId: pendiente [SISTEMA].
     // "Te encuentran en" = las tres del paso 04 del proceso (copy congelado).
     filas: [
       { etiqueta: 'Piensa con', ids: ['claude'] },
-      { etiqueta: 'Contesta en', ids: ['whatsapp'] },
+      { etiqueta: 'Contesta en', ids: ['whatsapp', 'instagram', 'messenger'] },
       { etiqueta: 'Te encuentran en', ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
     ],
   },
@@ -57,7 +59,7 @@ export const iaMontada: Record<L, {
     bajada: 'Marcy thinks with Claude and answers wherever your customers reach you.',
     filas: [
       { etiqueta: 'Thinks with', ids: ['claude'] },
-      { etiqueta: 'Answers on', ids: ['whatsapp'] },
+      { etiqueta: 'Answers on', ids: ['whatsapp', 'instagram', 'messenger'] },
       { etiqueta: 'Found on', ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
     ],
   },

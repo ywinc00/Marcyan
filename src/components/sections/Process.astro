@@ -6,6 +6,16 @@
 // con EscenaAbreApps (P08, W2N-03: el portátil que se abre y enseña tu web, tu ficha y Marcy ya
 // funcionando) en el slot final. El CTA va bajo el portátil.
 //
+// Revisión 1 de G01 (tope de alto ≤ 1.800 px a 1440 y portátil legible):
+//  · Escritorio (≥ 1120): la fase final va en dos columnas, su texto (300 px) y el portátil al
+//    resto del ancho (≈ 855 px a 1440, antes 600) con el CTA debajo del portátil.
+//  · La tapa se abre con el scroll SIN fijar la pieza (sin el hueco de 450 px): la pista de la
+//    escena sigue dando la línea de tiempo y la tapa termina de abrirse justo cuando el portátil
+//    entero está a la vista. Así no suma alto ni se queda a medio abrir mientras se mira (E-56).
+//  · Por debajo de 900 px el portátil NO se pinta: su lienzo de 1.415 px a 350 px de ancho deja
+//    la letra en 3-4 px (§1.8 pide ≥ 9 en lo decorativo). La fase 05 queda con su texto y el CTA
+//    (y en móvil, el cohete), como en producción.
+//
 // Cohete del final móvil (E-02, adaptación escrita en P11): el motor launch(), las clases
 // has-finale / is-launched / is-done y TODO su CSS quedan iguales. Solo cambian dos cosas:
 //  · la detección del paso: en vez de medir los [data-step] del riel, escucha el evento
@@ -34,14 +44,15 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
     </header>
 
     <LineaFases fases={fasesDe(process.steps)} lang={lang} variante="portada" class="process__fases">
-      <EscenaAbreApps slot="final" lang={lang} />
+      <div slot="final" class="process__fin">
+        <EscenaAbreApps lang={lang} ancho={880} />
+        <!-- CTA inline (PC / reduced-motion / sin JS / tras el show en móvil), bajo el portátil -->
+        <div class="riel__launch-inline">
+          {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
+          <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
+        </div>
+      </div>
     </LineaFases>
-
-    <!-- CTA inline (PC / reduced-motion / sin JS / tras el show en móvil) -->
-    <div class="riel__launch-inline">
-      {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
-      <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
-    </div>
   </div>
 
   <!-- FINALE (móvil, una sola vez): el cohete vuela al centro + CTA + fondo difuminado -->
@@ -57,6 +68,30 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
 <style>
   .process :global(em) { color: var(--accent-gold); font-style: normal; }
   .process__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+
+  /* ── Fase final: portátil + CTA (slot `final` de LineaFases) ── */
+  .process__fin { min-width: 0; }
+  /* La tapa se abre con el scroll sin fijar la pieza: fuera el hueco del tramo fijado. */
+  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-hueco) { display: none; }
+  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-fijo) { position: static; }
+  @media (max-width: 899.98px) {
+    .process[data-process] :global(.process__fin .abre) { display: none; }
+  }
+  /* Apilado: las escenas de LineaFases llevan content-visibility:auto, y en la portada (hero con
+     animación continua) eso costaba ≈ 100 ms de TBT móvil medidos (perf ×4, 412 px, mediana de 7-9
+     pasadas: 150-200 ms con él, ≈ 30 ms sin él; producción ≈ 10). Aquí se pintan normal. */
+  @media (max-width: 1119.98px) {
+    .process[data-process] :global(.lf__esc) { content-visibility: visible; }
+  }
+  @media (min-width: 1120px) {
+    /* Tope de alto (≤ 1.800 a 1440): menos aire abajo (el CTA ya cierra) y entre fases. */
+    .process { padding-bottom: 56px; }
+    .process__head { margin-bottom: 40px; }
+    .process[data-process] :global(.lf__grid .lf__paso) { padding-bottom: 16px; }
+    /* 40 px arriba: el panel fijo de las fases termina donde acaba su rejilla y no debe rozar la tapa. */
+    .process[data-process] :global(.lf__fin) { grid-template-columns: 300px minmax(0, 1fr); column-gap: 40px; align-items: center; padding-top: 40px; }
+    .process__fin .riel__launch-inline { margin-top: 12px; }
+  }
 
   /* ── CTA inline (abajo, bajo el portátil) ──────────────── */
   .riel__launch-inline { margin-top: var(--space-6); display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }

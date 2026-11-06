@@ -2,11 +2,15 @@
 // Sección "Tecnología Marcyan" (#ia) · vuelta 2 (design/rediseno-workos-v2.md §3 G01, notas 1 y 8).
 // Se conservan section#ia[data-fx="teal"], kicker, H2, bajada, las 4 capacidades y el botón de
 // content.ts (verbatim). Dos tramos:
-//  (a) Izquierda: texto + capacidades como filas separadas por filetes de 1 px.
-//      Derecha: VentanaAgente guion "marcy" piel "noche" (P05, W-ADV-16 + W-NEW-04): Marcy atiende
-//      una petición real y el visitante elige qué más le pide; marca del modelo = LogoMarca claude.
-//  (b) Debajo, centrado: "Así está montada" + ChipIA variante "portada" (P07, W-HOME-12/13) con
-//      PildorasMarcas (P06): Piensa con · Contesta en · Te encuentran en (copy en i18n/w/portada.ts).
+//  (a) Izquierda: texto. Derecha: VentanaAgente guion "marcy" piel "noche" (P05, W-ADV-16 +
+//      W-NEW-04): Marcy atiende una petición real y el visitante elige qué más le pide; marca del
+//      modelo = LogoMarca claude. Debajo, las 4 capacidades en filas/columnas con filetes de 1 px.
+//  (b) "Así está montada", en zigzag con el tramo (a) (escritorio): a la izquierda ChipIA variante
+//      "portada" (P07, W-HOME-12/13) en su columna, con los bordes fundidos; a la derecha cabecera
+//      corta + PildorasMarcas (P06) como ficha de 3 filas (Piensa con · Contesta en · Te encuentran
+//      en). En móvil: cabecera, chip a todo el ancho y filas de píldoras centradas.
+//      Revisión 1 de G01: el chip a todo el ancho con las píldoras debajo llevaba #ia a 1.806 px a
+//      1440 (tope = producción 1.015 + 300). En zigzag el tramo (b) cabe en ≈ 350 px.
 // Sin lienzo nuevo: la ventana es HTML y el chip es SVG. El demo de burbujas de la v1 se retira.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
@@ -49,21 +53,24 @@ const M = iaMontada[lang];
     </ul>
   </div>
 
-  <div class="ai__montada">
-    <header class="container ai__mhead">
-      <p class="ai__mk">{M.kicker}</p>
-      <h3 class="ai__mt">{M.titulo}</h3>
-      <p class="ai__mb">{M.bajada}</p>
-    </header>
-    <ChipIA variante="portada" lang={lang}>
-      <PildorasMarcas slot="pildoras" filas={M.filas} rotulos={iaRotulos} />
-    </ChipIA>
+  <div class="container ai__montada">
+    <div class="ai__mchip">
+      <ChipIA variante="portada" lang={lang} />
+    </div>
+    <div class="ai__mtx">
+      <header class="ai__mhead">
+        <p class="ai__mk">{M.kicker}</p>
+        <h3 class="ai__mt">{M.titulo}</h3>
+        <p class="ai__mb">{M.bajada}</p>
+      </header>
+      <PildorasMarcas filas={M.filas} rotulos={iaRotulos} encender="vista" class="ai__pm" />
+    </div>
   </div>
 </section>
 
 <style>
   .ai :global(em) { color: var(--accent-teal); font-style: normal; }
-  /* El horizonte del chip cierra la sección: menos aire abajo que el resto de secciones. */
+  /* Menos aire abajo que el resto de secciones: el chip y su horizonte ya cierran (y #ia tiene tope de alto). */
   .ai { padding-bottom: clamp(40px, 4vw, 64px); }
   .ai__inner {
     --ai-l: rgba(var(--star-rgb, 240, 237, 232), .08);
@@ -90,29 +97,55 @@ const M = iaMontada[lang];
   .ai__cap-tx p { margin: 0; color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
   /* ── (b) Así está montada ── */
-  .ai__montada { margin-top: clamp(64px, 7vw, 96px); }
-  .ai__mhead { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-bottom: clamp(0px, 1vw, 12px); }
+  /* Móvil: cabecera, chip a todo el ancho (sale del padding del contenedor) y filas de píldoras. */
+  .ai__montada { margin-top: clamp(56px, 7vw, 72px); display: flex; flex-direction: column; }
+  .ai__mtx { display: contents; }
+  .ai__mhead { order: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .ai__mchip { order: 2; margin-inline: calc(-1 * var(--container-pad)); min-width: 0; }
+  .ai :global(.ai__pm) { order: 3; }
   .ai__mk {
     margin: 0; font-family: var(--font-mono); font-size: 12px; line-height: 1; letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--accent-teal);
   }
   .ai__mt {
     margin: 0; font-family: var(--font-display); font-weight: 500; color: var(--fg-primary);
-    font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; letter-spacing: -.03em; text-wrap: balance;
+    font-size: clamp(28px, 3vw, 36px); line-height: 1.1; letter-spacing: -.03em; text-wrap: balance;
   }
-  /* Las filas de píldoras (Piensa con · Contesta en · Te encuentran en) van una junto a otra y
-     saltan solo si no caben: en PC, una línea; en móvil, dos (las de una píldora comparten fila).
-     Así la escena no se alarga con tres pisos de una sola píldora. */
-  .ai__montada :global(.pm:has(.pm-et)) { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; column-gap: clamp(20px, 3vw, 40px); row-gap: 24px; }
   .ai__mb { margin: 0; max-width: 520px; color: var(--fg-secondary); font-size: 17px; line-height: 1.5; text-wrap: balance; }
+  /* Mando de pausa del chip: en la esquina inferior de la escena, bajo el horizonte, no pegado al chip. */
+  .ai__mchip :global(.chipia__mando) { top: auto; bottom: 10px; left: auto; right: max(16px, 9%); }
+  /* Píldoras (móvil): las filas van una junto a otra y saltan solo si no caben. */
+  .ai :global(.ai__pm:has(.pm-et)) { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; column-gap: 24px; row-gap: 20px; }
+  /* "ChatGPT" es palabra (no hay glifo): mismo tono y peso que los nombres vecinos, no más blanca ni más negra. */
+  .ai :global(.ai__pm .lm--word) { color: rgba(var(--star-rgb, 240, 237, 232), .62); font-weight: 500; font-size: 14px; letter-spacing: -.01em; }
 
   @media (--lg) {
-    .ai__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 528px); column-gap: var(--space-9); row-gap: 56px; align-items: center; }
+    .ai__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 528px); column-gap: var(--space-9); row-gap: 40px; align-items: center; }
     .ai__caps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ai-l); border-bottom: 0; }
     .ai__cap { display: flex; flex-direction: column; gap: 10px; padding: 28px 28px 4px; border-bottom: 0; }
     .ai__cap + .ai__cap { border-left: 1px solid var(--ai-l); }
     .ai__cap:first-child { padding-left: 0; }
     .ai__cap:last-child { padding-right: 0; }
     .ai__cap-ic { padding-top: 0; }
+
+    /* Zigzag: el chip a la izquierda (la ventana del agente va a la derecha arriba). */
+    .ai__montada { margin-top: 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: center; }
+    .ai__mtx { display: flex; flex-direction: column; gap: 28px; min-width: 0; order: 2; }
+    .ai__mhead { align-items: flex-start; text-align: left; }
+    .ai__mb { max-width: 470px; }
+    /* El chip vive en su columna: la escena se recorta a su ancho y los bordes se funden (sin cortes duros). */
+    .ai__mchip { order: 1; margin-inline: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
+    .ai__mchip :global(.chipia) { --k: .58; }
+    /* Ficha de 3 filas: rótulo a la izquierda, píldoras a la derecha. */
+    .ai :global(.ai__pm:has(.pm-et)) { flex-direction: column; align-items: stretch; row-gap: 12px; }
+    .ai :global(.ai__pm .pm-fila) { align-items: flex-start; gap: 8px; }
+    .ai :global(.ai__pm .pm-lista) { justify-content: flex-start; gap: 8px; }
+    .ai :global(.ai__pm .pm-p) { height: 44px; padding: 0 16px; gap: 8px; }
+    .ai :global(.ai__pm .pm-p > svg) { width: 20px; height: 20px; }
+    .ai :global(.ai__pm .pm-n) { font-size: 14px; }
+  }
+  @media (--xl) {
+    .ai__mchip :global(.chipia) { --k: .70; }
+    .ai :global(.ai__pm .pm-fila) { display: grid; grid-template-columns: 136px minmax(0, 1fr); align-items: center; column-gap: 16px; }
   }
 </style>

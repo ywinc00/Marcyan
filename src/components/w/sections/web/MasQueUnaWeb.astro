@@ -1,35 +1,282 @@
 ---
-// Diseño web · capítulo de contraste (§4.14-6): CapituloDosFrases + Bento2x2
-// (W-CORE-08 + B-03) con un objeto por celda. Página oro: Marcy en burbujas neutras (E-14).
-// Celda 1: contacto entrante con "Guardado ✓" (MiniPasos kind="contacto"; sistema tras el
-// piloto). Celda 2: la web en el OTRO idioma (en inglés en la página en español), con la marca
-// de ejemplo SIN traducir (E-24). Celda 4: la conversación de las 23:40, la que cuenta el
-// titular (control 2 ronda 2). Móvil: llevan objeto la 1 y la 4 (el chat de Marcy es la celda
-// que más vende); la 2 y la 3 (ficha) quedan en texto (E-18, control 2 piloto r3).
+// Diseño web · capítulo de contraste "Más que una web" (v2 · G03): CapituloDosFrases + Bento2x2
+// (W-CORE-07/08) con objetos NUEVOS, compactos y de oficio, en vez de las mini-UI v1 a todo el
+// ancho (FI 4.3 "mini-UI grandes y pesadas"). Cada objeto vive en su bandeja propia al ~80 % del
+// ancho de la celda, centrada y con aire (Bento2x2 con tray:false: la bandeja es nuestra), como
+// las dos tarjetas de "B2B-first by design" y la pila de "Support every IdP" del original.
+//   1 · Formulario: pila de contactos (W-CORE-08 der.): el delantero con sus 4 pasos numerados,
+//       dos anteriores asomando como pestañas.
+//   2 · Idiomas: la misma web en ES y EN que se alterna sola (pantalla viva: bucle con pausa
+//       global y botón de loop.ts; quieta en ES con reducir movimiento).
+//   3 · Ficha de mapa: dos tarjetas gemelas (W-CORE-08 izq.), "Tu web" y "Tu ficha de mapa",
+//       con los mismos datos y su check: el mensaje es que coinciden.
+//   4 · Marcy: conversación de las 11:40 p. m. con horas en 12 h y el punto "en línea" que late.
+// Negocio neutro "Tu Negocio" (reparto §1.6: el salón y la plomería ya salen en esta página).
+// UN solo rótulo "Ejemplo" para toda la sección, al pie del bento. Contrato común de objetos
+// (§1.6): raíz aria-hidden + data-nosnippet, resumen sr-only, sin h1-h6, sin tel/wa/data-track.
+// Logos: el cerrojo de LICENCIAS.md impide el de Google Maps en páginas públicas: "mapa" en texto.
 import CapituloDosFrases from '../../CapituloDosFrases.astro';
 import Bento2x2 from '../../Bento2x2.astro';
-import MiniPasos from '../../objetos/MiniPasos.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
-import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
-import ChatMarcy from '../../objetos/ChatMarcy.astro';
 import type { WebCopy } from '../../../../i18n/w/web';
 
 interface Props { copy: WebCopy['bento']; city: string; lang?: 'es' | 'en' }
 const { copy, city, lang = 'es' } = Astro.props;
-const sr = lang === 'en'
-  ? 'Example: at 11:40 p.m. a customer asks if you are open and Marcy holds the first visit for the next morning.'
-  : 'Ejemplo: a las 23:40 un cliente pregunta si siguen abiertos y Marcy le aparta la primera visita de la mañana.';
+const tel = city === 'Miami' ? '(305) 555-0142' : '(281) 555-0142';
+const o = copy.objetos;
+const cells = copy.cells.map((c) => ({ ...c, tray: false }));
 ---
 <CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
 <div class="ws-gap">
-  <Bento2x2 cells={copy.cells} mobileTextOnly={[2, 3]}>
-    <MiniPasos slot="ui-1" kind="contacto" fill lang={lang} />
-    <WebEjemplo slot="ui-2" frame="movil" kind="salon" city={city} lang={lang} site={lang === 'en' ? 'es' : 'en'} size="mini" />
-    <FichaMapaEjemplo slot="ui-3" city={city} lang={lang} size="card" />
-    <ChatMarcy slot="ui-4" mode="estatico" tone="neutral" lang={lang} size="card" startAt={2} sr={sr} />
+  <Bento2x2 cells={cells}>
+    <!-- 1 · Pila de contactos -->
+    <div slot="ui-1" class="mq">
+      <p class="mq-sr">{o.pila.sr}</p>
+      <div class="mq-tray" aria-hidden="true" data-nosnippet>
+        <div class="mq-pila">
+          {o.pila.atras.map((n, i) => (
+            <div class={`mq-tab mq-tab--${i}`}>
+              <span class="mq-tab__n">{n}</span>
+              <span class="mq-tab__pasos">{[1, 2, 3, 4].map((k) => <i>{k}</i>)}</span>
+            </div>
+          ))}
+          <div class="mq-card mq-front">
+            <div class="mq-front__top">
+              <span class="mq-front__t"><span class="mq-dot"></span>{o.pila.titulo}</span>
+              <span class="mq-front__h">{o.pila.hora}</span>
+            </div>
+            <ol class="mq-pasos">
+              {o.pila.pasos.map((p, i) => (
+                <li class:list={['mq-paso', i < 3 && 'is-done', i === 3 && 'is-next']}>
+                  <i>{i + 1}</i><span><b>{p.t}</b><em>{p.x}</em></span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · La web en dos idiomas, alternándose -->
+    <div slot="ui-2" class="mq" data-mq-idioma>
+      <p class="mq-sr">{o.idioma.sr}</p>
+      <div class="mq-tray" aria-hidden="true" data-nosnippet>
+        <div class="mq-card mq-web">
+          <div class="mq-web__nav">
+            <span class="mq-web__logo"><span class="mq-web__signo"></span>{o.idioma.negocio}</span>
+            <span class="mq-seg"><span>ES</span><span>EN</span><span class="mq-seg__pill"><span class="mq-seg__in"><span>ES</span><span>EN</span></span></span></span>
+          </div>
+          <div class="mq-web__body">
+            {(['es', 'en'] as const).map((l) => (
+              <div class={`mq-web__l mq-web__l--${l}`} lang={l}>
+                <span class="mq-web__k">{o.idioma[l].k}</span>
+                <span class="mq-web__h">{o.idioma[l].h}</span>
+                <span class="mq-web__x">{o.idioma[l].x}</span>
+                <span class="mq-web__acts"><span class="mq-web__btn">{o.idioma[l].btn}</span><span class="mq-web__lnk">{o.idioma[l].lnk}</span></span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · Web y ficha de mapa, gemelas -->
+    <div slot="ui-3" class="mq">
+      <p class="mq-sr">{o.ficha.sr}</p>
+      <div class="mq-tray" aria-hidden="true" data-nosnippet>
+        <div class="mq-gemelas">
+          {o.ficha.tarjetas.map((t, i) => (
+            <div class="mq-gem">
+              <div class="mq-card mq-gem__card">
+                {o.ficha.filas.map((f) => (
+                  <div class="mq-gem__fila">
+                    <span class="mq-gem__k">{f.k}</span>
+                    <span class="mq-gem__v">{f.v === '{tel}' ? tel : f.v}<i class="mq-ok"></i></span>
+                  </div>
+                ))}
+              </div>
+              <div class="mq-gem__pie">
+                <span class={`mq-gem__ico mq-gem__ico--${i}`}></span>{t}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 · Marcy a las 11:40 p. m. -->
+    <div slot="ui-4" class="mq">
+      <p class="mq-sr">{o.chat.sr}</p>
+      <div class="mq-tray" aria-hidden="true" data-nosnippet>
+        <div class="mq-card mq-chat">
+          <div class="mq-chat__top">
+            <img src="/assets/bot/marcy-mini.webp" alt="" width="28" height="28" loading="lazy" decoding="async" class="mq-chat__av" />
+            <span class="mq-chat__who"><b>Marcy</b><span><i class="mq-vivo"></i>{o.chat.enLinea}</span></span>
+          </div>
+          <div class="mq-chat__msgs">
+            {o.chat.msgs.map((m) => (
+              <div class:list={['mq-msg', m.de === 'marcy' ? 'mq-msg--m' : 'mq-msg--c']}>
+                <span class="mq-msg__b">{m.t}</span>
+                {m.h && <span class="mq-msg__h">{m.h}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   </Bento2x2>
+  <p class="mq-ej" aria-hidden="true">{o.ejemplo}</p>
 </div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  // Pantalla viva (§1.5): la web de la celda 2 alterna ES/EN mientras está a la vista.
+  // Bucle CSS (animation-play-state); loop.ts arranca/para por vista, pestaña y pausa global.
+  document.querySelectorAll<HTMLElement>('[data-mq-idioma]').forEach((el) => {
+    // El botón de pausa va en la esquina de la CELDA (en su padding), no sobre la web de ejemplo.
+    const host = el.closest<HTMLElement>('.wd-bento__cell') ?? el;
+    registerLoop(el, {}, { buttonHost: host, buttonTone: 'dark' });
+  });
+</script>
+
 <style>
   .ws-gap { margin-top: var(--w-chapter-gap); }
   @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+
+  .mq { width: 100%; display: grid; justify-items: center; }
+  /* Las bandejas se asientan abajo (W-CORE-08): las dos de cada fila acaban a la misma altura. */
+  .ws-gap :global(.wd-bento__cell:has(.mq) .wd-bento__ui) { flex: 1; align-items: end; }
+  .mq-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .mq-ej {
+    margin: 14px 0 0; max-width: var(--w-rail-max); margin-inline: auto; text-align: right;
+    font: 400 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: rgba(240, 237, 232, .6);
+  }
+
+  /* Bandeja propia (W-CORE-08): ~80 % de la celda, centrada, filo y sombra interior. */
+  .mq-tray {
+    position: relative; box-sizing: border-box; width: 100%; max-width: 420px;
+    padding: 14px; border-radius: 22px;
+    background: rgba(240, 237, 232, .035); border: 1px solid var(--w-line);
+    box-shadow: var(--w-edge), inset 0 0 9px rgba(0, 0, 0, .25);
+  }
+  .mq-card {
+    background: #f4f1eb; color: #1b1a17; border-radius: 12px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 10px 24px -14px rgba(0, 0, 0, .55), 0 0 0 1px rgba(27, 26, 23, .06);
+    font-family: var(--font-body);
+  }
+
+  /* ── 1 · Pila de contactos ─────────────────────────────────────── */
+  .mq-pila { position: relative; display: grid; grid-template-columns: 44px 44px 1fr; min-height: 236px; }
+  .mq-tab {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: 16px 0 0; border-radius: 12px 0 0 12px; background: #ebe7e0; color: #8b857c;
+    box-shadow: -1px 0 0 rgba(27, 26, 23, .08) inset, 0 0 0 1px rgba(27, 26, 23, .06);
+    margin-right: -8px;
+  }
+  .mq-tab--1 { background: #efebe4; }
+  .mq-tab__n { font: 600 12px/1 var(--font-body); letter-spacing: -.01em; }
+  .mq-tab__pasos { display: grid; gap: 14px; }
+  .mq-tab__pasos i, .mq-paso i {
+    display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+    font: 600 11px/1 var(--font-body); font-style: normal; background: #9c968d; color: #f4f1eb;
+  }
+  .mq-front { position: relative; z-index: 1; padding: 16px 16px 14px; }
+  .mq-front__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(27, 26, 23, .08); }
+  .mq-front__t { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1.2 var(--font-body); }
+  .mq-front__h { font: 400 12px/1 var(--font-body); color: #6e6860; white-space: nowrap; }
+  .mq-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); }
+  .mq-pasos { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 12px; position: relative; }
+  .mq-paso { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; }
+  .mq-paso span { display: grid; gap: 2px; min-width: 0; }
+  .mq-paso b { font: 500 13.5px/20px var(--font-body); }
+  .mq-paso em { font: 400 12px/1.35 var(--font-body); font-style: normal; color: #6e6860; }
+  .mq-paso.is-done i { background: #1b1a17; }
+  .mq-paso.is-next i { background: transparent; color: #8b857c; box-shadow: inset 0 0 0 1px rgba(27, 26, 23, .25); }
+  .mq-paso.is-next b { color: #8b857c; }
+
+  /* ── 2 · La web en dos idiomas ─────────────────────────────────── */
+  .mq-web { overflow: hidden; }
+  .mq-web__nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(27, 26, 23, .08); }
+  .mq-web__logo { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--font-display); letter-spacing: -.02em; }
+  .mq-web__signo { width: 16px; height: 16px; border-radius: 50%; box-shadow: inset 0 0 0 2px #1b1a17; background: radial-gradient(circle, #1b1a17 0 3px, transparent 3.5px); }
+  .mq-seg { position: relative; display: grid; grid-template-columns: 30px 30px; padding: 3px; border-radius: 999px; background: #e6e2da; font: 600 11px/1 var(--font-mono); letter-spacing: .04em; }
+  .mq-seg > span:not(.mq-seg__pill), .mq-seg__in > span { width: 30px; padding: 5px 0; text-align: center; color: #6e6860; }
+  /* Píldora con su propia fila de letras claras, desplazada en sentido contrario (máscara por
+     transform): la letra activa queda siempre clara sobre la píldora, sin animar color. */
+  .mq-seg__pill { position: absolute; top: 3px; left: 3px; width: 30px; bottom: 3px; border-radius: 999px; background: #1b1a17; overflow: hidden; }
+  .mq-seg__in { position: absolute; top: 0; left: 0; display: grid; grid-template-columns: 30px 30px; }
+  .mq-seg__in > span { color: #f4f1eb; }
+  .mq-web__body { position: relative; display: grid; padding: 18px 16px 18px; }
+  .mq-web__l { grid-area: 1 / 1; display: grid; gap: 8px; align-content: start; }
+  .mq-web__k { font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #8a6a3a; }
+  .mq-web__h { font: 500 24px/1.08 var(--font-display); letter-spacing: -.035em; text-wrap: balance; }
+  .mq-web__x { font: 400 13px/1.45 var(--font-body); color: #57534b; }
+  .mq-web__acts { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .mq-web__btn { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: #1b1a17; color: #f4f1eb; font: 600 13px/1 var(--font-body); }
+  .mq-web__lnk { font: 500 13px/1 var(--font-body); color: #1b1a17; }
+  .mq-web__l--en { opacity: 0; }
+  /* Bucle (6,4 s): ES → EN → ES; la píldora se desliza con el cambio. Solo transform/opacity. */
+  @keyframes mq-es { 0%, 42% { opacity: 1; transform: none; } 50%, 92% { opacity: 0; transform: translateY(-4px); } 100% { opacity: 1; transform: none; } }
+  @keyframes mq-en { 0%, 42% { opacity: 0; transform: translateY(4px); } 50%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(4px); } }
+  @keyframes mq-pill { 0%, 44% { transform: none; } 50%, 94% { transform: translateX(30px); } 100% { transform: none; } }
+  @keyframes mq-pill-in { 0%, 44% { transform: none; } 50%, 94% { transform: translateX(-30px); } 100% { transform: none; } }
+  [data-mq-idioma] .mq-web__l--es { animation: mq-es 6.4s cubic-bezier(.22, 1, .36, 1) infinite paused; }
+  [data-mq-idioma] .mq-web__l--en { animation: mq-en 6.4s cubic-bezier(.22, 1, .36, 1) infinite paused; }
+  [data-mq-idioma] .mq-seg__pill { animation: mq-pill 6.4s cubic-bezier(.22, 1, .36, 1) infinite paused; }
+  [data-mq-idioma] .mq-seg__in { animation: mq-pill-in 6.4s cubic-bezier(.22, 1, .36, 1) infinite paused; }
+  [data-mq-idioma].is-playing :is(.mq-web__l--es, .mq-web__l--en, .mq-seg__pill, .mq-seg__in) { animation-play-state: running; }
+  [data-mq-idioma].is-still :is(.mq-web__l--es, .mq-web__l--en, .mq-seg__pill, .mq-seg__in) { animation: none; }
+
+  /* ── 3 · Gemelas web / ficha ───────────────────────────────────── */
+  .mq-gemelas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mq-gem { display: grid; border-radius: 12px; overflow: hidden; background: #1b1a17; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .55); }
+  .mq-gem__card { border-radius: 12px; padding: 4px 12px; box-shadow: 0 0 0 1px rgba(27, 26, 23, .06); }
+  .mq-gem__fila { display: grid; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(27, 26, 23, .08); }
+  .mq-gem__fila:last-child { border-bottom: 0; }
+  .mq-gem__k { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #8b857c; }
+  .mq-gem__v { display: flex; align-items: center; justify-content: space-between; gap: 6px; font: 500 13px/1.3 var(--font-body); white-space: nowrap; }
+  .mq-ok { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent-teal, #2fb59c); position: relative; }
+  .mq-ok::after { content: ''; position: absolute; left: 4.5px; top: 3px; width: 3px; height: 6px; border: solid #f4f1eb; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg); }
+  .mq-gem__pie { display: flex; align-items: center; gap: 8px; padding: 11px 12px; font: 500 12px/1 var(--font-body); color: #f0ede8; }
+  .mq-gem__ico { width: 14px; height: 14px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.5px #f0ede8; }
+  .mq-gem__ico--1 { border-radius: 50% 50% 50% 0; transform: rotate(-45deg) scale(.9); }
+
+  /* ── 4 · Chat de Marcy ─────────────────────────────────────────── */
+  .mq-chat { overflow: hidden; }
+  .mq-chat__top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(27, 26, 23, .08); }
+  .mq-chat__av { width: 28px; height: 28px; border-radius: 50%; background: #1b1a17; object-fit: cover; }
+  .mq-chat__who { display: grid; gap: 2px; }
+  .mq-chat__who b { font: 600 13.5px/1.1 var(--font-body); }
+  .mq-chat__who span { display: inline-flex; align-items: center; gap: 5px; font: 400 11px/1 var(--font-body); color: #6e6860; }
+  .mq-vivo { width: 6px; height: 6px; border-radius: 50%; background: #2fa36b; animation: mq-late 2s ease-in-out infinite; }
+  :global(html[data-w-pausa]) .mq-vivo { animation-play-state: paused; }
+  @keyframes mq-late { 0%, 100% { opacity: 1; transform: none; } 50% { opacity: .45; transform: scale(.8); } }
+  .mq-chat__msgs { display: grid; gap: 8px; padding: 12px 14px 14px; background: #ece8e1; }
+  .mq-msg { display: grid; gap: 3px; max-width: 84%; }
+  .mq-msg--c { justify-self: end; justify-items: end; }
+  .mq-msg__b { padding: 8px 11px; border-radius: 12px; font: 400 13px/1.4 var(--font-body); }
+  .mq-msg--c .mq-msg__b { background: #fff; border-bottom-right-radius: 4px; }
+  .mq-msg--m .mq-msg__b { background: #1b1a17; color: #f4f1eb; border-bottom-left-radius: 4px; }
+  .mq-msg__h { font: 400 11px/1 var(--font-body); color: #7a746b; }
+
+  /* Escritorio ancho (G03 ronda 1, I3): el objeto entero a escala 1,24, como en W-CORE-08, donde
+     la letra del objeto es la de la celda. La bandeja pasa de 420 a 521 px: el 81 % de una celda
+     de 644 (antes 65 %), y el alto crece en la misma proporción. zoom escala medidas y letra a la
+     vez sin transform (el bucle de idiomas y la pausa siguen igual). */
+  @media (--xl) {
+    .mq-tray { zoom: 1.24; }
+  }
+
+  /* Móvil: la bandeja ocupa la celda (a 350 px el 80 % no deja leer las gemelas). */
+  @media (--lt-md) {
+    .mq-tray { max-width: none; padding: 10px; border-radius: 18px; }
+    .mq-pila { grid-template-columns: 34px 34px 1fr; }
+    .mq-tab { gap: 14px; }
+    .mq-gemelas { gap: 8px; }
+    .mq-gem__card { padding: 2px 10px; }
+    [data-mq-idioma] { padding-bottom: 44px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mq-vivo { animation: none; }
+    [data-mq-idioma] :is(.mq-web__l--es, .mq-web__l--en, .mq-seg__pill, .mq-seg__in) { animation: none !important; }
+  }
 </style>

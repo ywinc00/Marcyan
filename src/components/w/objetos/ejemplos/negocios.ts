@@ -323,6 +323,11 @@ export const esNegocio = (v: unknown): v is NegocioId => typeof v === 'string' &
 /** Sustituye `{city}` en un texto de ejemplo. */
 export const conCiudad = (t: string | undefined, city: string) => (t ?? '').replaceAll('{city}', city);
 
+/** Prefijo de ficción de cada ciudad: el teléfono del ejemplo sale de la ciudad de la página (281 = Houston). */
+const PREFIJO: Record<string, string> = { Miami: '(305)' };
+/** Teléfono del ejemplo con el prefijo de `city` (Houston y desconocidas conservan el suyo). */
+export const telEnCiudad = (t: string, city: string) => (PREFIJO[city] ? t.replace(/^\(\d{3}\)/, PREFIJO[city]) : t);
+
 /* Contraste medido (tools/aa.mjs en la carpeta de la tarea, 2026-11-05):
    plomeria       ink 14.02 · ink2 6.20 · accent 4.68 · onAccent 5.10 | noche 14.32 · 7.98 · 7.12 · 7.62
    pino           10.73 · 5.89 · 5.48 · 5.58 | noche 15.19 · 8.11 · 8.65 · 8.70

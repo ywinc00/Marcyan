@@ -67,7 +67,13 @@ export interface HubCopy {
   barrios: { name: string; text: string; href: string }[];
   garantias: { items: [{ icon: string; title: string; text: string }, { icon: string; title: string; text: string }, { icon: string; title: string; text: string }] };
   cierre: { proof: string; warm: { title: string; text: string; cta: string; ask: string } };
+  /** "Sigue explorando" (W-CORE-23, plan v2 G02): tercera tarjeta de recurso cuando la página trae solo dos.
+   *  Enlaza al blog, que la página ya enlaza desde el menú y el pie (no abre un enlace nuevo en el silo). */
+  recurso: { label: string; href: string; desc: string; icon: string };
 }
+
+const RECURSO_ES: HubCopy['recurso'] = { label: 'Blog', href: '/es/blog', desc: 'Guías de diseño web, IA y SEO.', icon: 'lucide:book-open' };
+const RECURSO_EN: HubCopy['recurso'] = { label: 'Blog', href: '/en/blog', desc: 'Web design, AI and SEO guides.', icon: 'lucide:book-open' };
 
 const GARANTIAS_ES: HubCopy['garantias'] = {
   items: [
@@ -93,6 +99,7 @@ export const hubs: Record<Lang, Record<City, HubCopy>> = {
         { name: 'Sugar Land', text: 'Web bilingüe y SEO en Sugar Land', href: '/es/houston/sugar-land' },
       ],
       garantias: GARANTIAS_ES,
+      recurso: RECURSO_ES,
       cierre: {
         proof: "Hicimos las webs de Texas Rush Remove, Rosy Nails & Care y Julio's Landscape TX, aquí en Houston.",
         warm: {
@@ -110,6 +117,7 @@ export const hubs: Record<Lang, Record<City, HubCopy>> = {
         { name: 'Hialeah', text: 'Web, SEO local e IA en español para Hialeah', href: '/es/miami/hialeah' },
       ],
       garantias: GARANTIAS_ES,
+      recurso: RECURSO_ES,
       cierre: {
         proof: 'Hacemos sitios para negocios reales, como Move Junk Away en Orlando, Florida.',
         warm: {
@@ -126,6 +134,7 @@ export const hubs: Record<Lang, Record<City, HubCopy>> = {
       tray: { label: 'Services in Houston and their starting price', precio: PRECIO.en, nombre: NOMBRE.en },
       barrios: [],
       garantias: GARANTIAS_EN,
+      recurso: RECURSO_EN,
       cierre: {
         proof: "We built the sites for Texas Rush Remove, Rosy Nails & Care and Julio's Landscape TX, right here in Houston.",
         warm: {
@@ -140,6 +149,7 @@ export const hubs: Record<Lang, Record<City, HubCopy>> = {
       tray: { label: 'Services in Miami and their starting price', precio: PRECIO.en, nombre: NOMBRE.en },
       barrios: [],
       garantias: GARANTIAS_EN,
+      recurso: RECURSO_EN,
       cierre: {
         proof: 'We build sites for real businesses, like Move Junk Away in Orlando, Florida.',
         warm: {

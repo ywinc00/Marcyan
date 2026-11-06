@@ -49,6 +49,8 @@ const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`
 // barra del navegador: solo dominios verificados (los demás, barra sin texto; nunca enlace)
 const domains = projects.map((p) => DOMINIOS[p.slug] ?? '');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
+// "Sigue explorando": siempre tres tarjetas (las de la página y, si faltan, el blog)
+const explore = [...h.related.links, w.recurso].slice(0, 3);
 const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
 ---
 <script is:inline>document.documentElement.classList.add('hx-js')</script>
@@ -265,17 +267,18 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
     <div class="hx-wrap"><PreguntasFrecuentes id="faq" titleId="hx-faq-t" tag={h.faq.tag} titleHtml={h.faq.title} items={h.faq.items} lang={lang} /></div>
   </div>
 
-  {/* 9 · Sigue explorando */}
+  {/* 9 · Sigue explorando (W-CORE-23): cabecera a la izquierda y debajo, a ancho del contenedor, las tres garantías
+       y tres tarjetas de recurso en fila, alineadas con sus columnas. Si la página trae dos enlaces, el tercero es el blog. */}
   <section class="explore" aria-labelledby="hx-ex-t">
-    <div class="hx-wrap explore__in">
+    <div class="hx-wrap">
       <div class="explore__head"><Kicker>{h.related.tag}</Kicker><h2 class="explore__t" id="hx-ex-t">{h.related.title}</h2></div>
+      <TresGarantias items={w.garantias.items} class="w-hg3" />
       <ul class="explore__row">
-        {h.related.links.map((l: any) => (
+        {explore.map((l: any) => (
           <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}</b><small>{l.desc}</small></span></a></li>
         ))}
       </ul>
     </div>
-    <div class="hx-wrap"><TresGarantias items={w.garantias.items} class="w-hg3" /></div>
   </section>
 
   {/* 10 · Cierre: la noche de la ciudad (trío de conversión con sus nombres de seguimiento) */}

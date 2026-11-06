@@ -273,16 +273,13 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .mp a svg{width:13px;height:13px;color:var(--accent-gold)}
 .hx .mp a:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
 .hx .local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;background:rgba(9,8,7,.8);padding:5px 8px;border-radius:4px}
-.hx-js .hx .diag__demo:not(.in) .ring{stroke-dashoffset:251.3}
-.hx-js .hx .diag__demo:not(.in) .diag__bars i::after{transform:scaleX(0)}
-.hx .explore{position:relative;padding-block:24px 96px}
-.hx .explore__in{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:48px;align-items:center}
+.hx .explore{position:relative;padding-block:0 24px}
 .hx .explore__t{margin-top:12px;font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.01em}
-.hx .explore__row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.hx .explore__row a{display:flex;align-items:flex-start;gap:14px;height:100%;padding:20px 24px;border-radius:var(--w-r-obj);border:1px solid var(--w-line);background:var(--w-s2);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
+.hx .explore__row{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px}
+.hx .explore__row a{display:flex;align-items:flex-start;gap:14px;height:100%;padding:18px 20px;border-radius:var(--w-r-obj);border:1px solid var(--w-line);background:var(--w-s2);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
 .hx .explore__row a:hover{border-color:var(--w-line-strong)}
-.hx .explore__row .exic{flex:none;width:24px;height:24px;color:var(--accent-gold)}
-.hx .explore__row .exic svg{width:24px;height:24px;stroke-width:1.5}
+.hx .explore__row .exic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--w-ink-60);transition:transform var(--w-dur-hover) var(--w-ease-ui),color var(--w-dur-micro) var(--w-ease-ui)}
+.hx .explore__row .exic svg{width:20px;height:20px;stroke-width:1.5}
 .hx .explore__row b{display:block;font-size:15px;font-weight:500;line-height:1.4;color:var(--accent-gold)}
 .hx .explore__row small{display:block;margin-top:2px;font-size:13px;color:var(--w-ink-70);line-height:1.5}
 .hx .cta{position:relative;padding-block:150px 170px}
@@ -297,7 +294,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 }
 @media (max-width:900px){
   .hx .svc__grid{grid-template-columns:1fr}
-  .hx .local__grid,.hx .explore__in{grid-template-columns:1fr;gap:36px}
+  .hx .local__grid{grid-template-columns:1fr;gap:36px}
   .hx .local__grid{grid-template-rows:none;gap:20px}
   .hx .local__copy,.hx .local__right,.hx .local__nap{grid-column:1;grid-row:auto}
   .hx .local__right{order:2}.hx .local__nap{order:3}
@@ -441,7 +438,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .w-hwhere__card{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 18px 22px 22px;border-radius:var(--w-r-obj);background:var(--w-s2);border:1px solid var(--w-line);box-shadow:var(--w-edge);color:var(--fg-primary);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
 .hx .w-hwhere__txt{min-width:0}
 .hx .w-hwhere__name{display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:17px;font-weight:500;line-height:1.3;letter-spacing:-.01em}
-.hx .w-hwhere__chev{font-size:18px;line-height:1;color:var(--accent-gold);transition:transform var(--w-dur-hover) var(--w-ease-ui)}
+.hx .w-hwhere__chev{font-family:var(--font-body);font-size:22px;font-weight:400;line-height:1;color:var(--accent-gold);transition:transform var(--w-dur-hover) var(--w-ease-ui)}
 .hx .w-hwhere__q{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:14px;line-height:1.4;color:var(--w-ink-70)}
 .hx .w-hwhere__q svg{width:12px;height:12px;flex:none}
 .hx .w-hwhere__q .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 4px}
@@ -451,7 +448,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx div.w-hwhere__card{background:var(--w-s1);box-shadow:none}
 .hx div.w-hwhere__card .w-hwhere__ic{color:var(--w-ink-60);background:none;border-color:var(--w-line)}
 /* 7 · franja "En pocas palabras" con sus dos cifras (mismas que cita la respuesta) */
-.hx .answer{padding-block:140px}
+.hx .answer{padding-block:140px 130px}
 .hx .w-hanswer .answer__figs{display:flex;justify-content:center;gap:clamp(32px,6vw,96px);margin-top:36px}
 .hx .w-hanswer .fig{max-width:300px;padding-left:18px;border-left:1px solid var(--accent-gold-line)}
 .hx .w-hanswer .fig__n{font-family:var(--font-display);font-size:clamp(2.25rem,1.7rem + 1.4vw,3rem);font-weight:500;line-height:1;letter-spacing:-.03em;color:var(--accent-gold);font-variant-numeric:tabular-nums}
@@ -465,17 +462,29 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .faq .w-faq__q{padding:18px 24px;font-size:18px}
   .hx .faq .w-faq__list{gap:10px}
 }
-.hx .faq{padding-block:80px 56px}
+.hx .faq{padding-block:80px 32px}
 /* el titular de la FAQ conserva la gramática de los .h2 del viaje (600, escala fluida) */
 .hx .faq .w-faq__title{font-size:var(--fluid-h2);font-weight:600;line-height:var(--leading-tight);letter-spacing:var(--tracking-tight)}
 .hx .faq .w-faq__title em{color:var(--accent-gold)}
 .hx .pf--solo .w-hcase{padding:28px 32px 20px}
 .hx .pf--solo .pf__dl dd{font-size:15px}
-/* 9 · tres garantías bajo los recursos */
-.hx .explore{padding-block:0 24px}
-.hx .w-hg3{margin-top:24px}
-.hx .w-hg3 .g3__item{padding:20px 24px}
-.hx .w-hg3 .g3__text{max-width:none}
+/* 9 · Sigue explorando (W-CORE-23, plan v2 G02): cabecera a la izquierda; debajo, a ancho del contenedor, las tres
+   garantías y una fila de tres tarjetas de recurso alineada con sus columnas (mismo reparto en tercios) */
+.hx .w-hg3{max-width:none;margin-top:24px}
+.hx .w-hg3 .g3__item{padding:18px 24px}
+.hx .w-hg3 .g3__h{margin-top:10px}
+.hx .w-hg3 .g3__text{max-width:36ch}
+.hx .w-hg3 .g3__list{border-bottom:0}
+.hx .w-hg3 + .explore__row{margin-top:24px}
+@media (hover:hover) and (pointer:fine){.hx .explore__row a:hover .exic{transform:translateY(-2px);color:var(--accent-gold)}}
+.hx .explore__row a:focus-visible .exic{color:var(--accent-gold)}
+/* "Sigue explorando" crece (garantías + fila de tres): FAQ y "En pocas palabras" ceden ese alto por página para que
+   las marcas data-atmo del cierre y del contacto queden en ±40 px (mismo método de la v1 en móvil) */
+@media (min-width:601px){
+  .hx[data-city="miami"]:lang(es) .answer{padding-bottom:140px}
+  .hx[data-city="miami"]:lang(en) .answer{padding-bottom:122px}
+  .hx[data-city="miami"]:lang(en) .faq{padding-bottom:22px}
+}
 /* 10 · cierre en dos tarjetas sobre el horizonte encendido */
 .hx .cta{padding-block:96px 112px}
 /* el tramo de servicios conserva su alto: la bandeja ocupa el sitio de las filas y del margen inferior */
@@ -503,13 +512,17 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   /* una sola fila de etiquetas: caben las que caben enteras (las que saltarían a otra fila se ocultan), sin alargar el tramo */
   .hx .pf__tags{max-height:26px;overflow:hidden}
   .hx .pf__tags li{line-height:16px}
-  .hx .explore__in{gap:20px}
   .hx .answer{padding-block:160px 150px}
-  .hx .faq{padding-block:36px}
+  .hx .faq{padding-block:36px 24px}
+  .hx[data-city="miami"]:lang(es) .faq{padding-bottom:36px}
+  .hx[data-city="houston"]:lang(en) .answer{padding-bottom:130px}
   .hx .faq .w-faq__list{gap:8px}
   .hx .faq .w-faq__q{padding:18px 16px}
-  .hx .explore__row a{padding:14px 16px}
-  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:18px 4px}
+  .hx .explore__row,.hx .w-hg3 + .explore__row{margin-top:16px;row-gap:8px}
+  .hx .w-hg3 .g3__list{border-bottom:1px solid var(--w-line)}
+  .hx .explore__row a{padding:12px 16px}
+  .hx .w-hg3{margin-top:20px}
+  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:12px 4px}
   .hx .w-hg3 .g3__ic{margin-top:0}
   .hx .w-hg3 .g3__h{margin-top:0}
   .hx .w-hg3 .g3__text{display:none}
@@ -517,7 +530,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx[data-city="miami"]:lang(es) .pf--solo .pf__step{margin-bottom:8px}
   .hx[data-city="houston"]:lang(en) .pf__step{margin-bottom:56px}
   .hx[data-city="miami"] .answer{padding-block:195px 185px}
-  .hx[data-city="miami"]:lang(es) .answer{padding-block:172px 163px}
+  .hx[data-city="miami"]:lang(es) .answer{padding-block:172px 183px}
   .hx:lang(es) .cta{padding-block:12px}
   .hx[data-city="miami"]:lang(en) .cta{padding-block:52px}
   .hx .w-hwhere{grid-template-columns:minmax(0,1fr);gap:8px}
@@ -529,5 +542,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .cta{padding-block:24px 24px}
 }
 @media (prefers-reduced-motion:reduce){
-  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev{transition:none}
+  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev,.hx .explore__row .exic{transition:none}
+  .hx .explore__row a:hover .exic{transform:none}
 }

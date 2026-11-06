@@ -1,111 +1,165 @@
 ---
-// Barrio · 02 "Zonas que cubrimos" (§4.20-3, capítulo de contraste): MatrizFilas con
-// las zonas del mapa del hub (filas) por los servicios con página (columnas), y la fila
-// del barrio FIJA y encendida (fixedRow: sin bucle, la firma es el chip del hero).
-// Cada casilla enlaza a una página que existe: la del barrio para lo que esa página
-// cubre, y la del servicio en la ciudad para el resto (R5, nada inventado).
-//
-// Arreglos de la revisión 1 (I1, I3):
-// · Tres estados de casilla que SÍ dicen algo (los datos ya existían): zona con página
-//   propia (rayada en oro, en cualquier fila), página del servicio en la ciudad (casilla
-//   con flecha de enlace) y la fila de esta página (encendida). Las filas que no son el
-//   barrio ya no parecen apagadas. Leyenda debajo con los tres estados.
-// · La llave de W-ADV-52 (permisos) no significa nada aquí: pin de mapa.
-// · Objeto de producto en claro junto a la matriz (v2 G05: FichaMapa de la marca inmobiliaria,
-//   sin barras grises de "Reseñas", §1.6; rotulada Ejemplo):
-//   une zona y ficha, y da luz al capítulo (E-01).
-// PROVISIONAL hasta [SISTEMA] MatrizFilas (prop `icon` y `state` por casilla): los estados
-// se pintan aquí por el destino de cada enlace, con las mismas capas del componente.
+// Barrio · 02 "Zonas que cubrimos" (§4.20-3, capítulo de contraste). Vuelta 3: la tabla
+// zonas × servicios «no funciona» (dueño, E-57) y se sustituye por un PANEL DE MAPA:
+// lista de zonas a la izquierda y mapa real del área a la derecha (Refero: PamPam
+// fe9d4f2f…, Chargetrip 9fb51c18…: barra lateral con la lista y el mapa como protagonista).
+// Catálogo: B-06 (acordeón maestro detalle con visual sincronizado: <details name> nativo,
+// el mapa sigue a la zona abierta) sobre B-01 (filas de ancho completo, un dato por fila).
+// Los datos y enlaces son los de la tabla (nada inventado): cada zona abre sus servicios,
+// que llevan a la página propia del barrio cuando la hay (o a #precios en esta misma) y a la
+// del servicio en la ciudad en el resto. El barrio de la página abre por defecto.
+// Interacción: pasar o enfocar una zona la señala en el mapa; abrirla la deja marcada; tocar
+// un punto del mapa abre su zona (ratón y toque). Teclado: la lista (details/summary nativos).
+// Sin JS: todo se ve, el barrio queda encendido y los <details> funcionan solos.
+// A la derecha, la ficha de mapa de ejemplo (se conserva: «la tarjeta del mapa está bien»).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import MatrizFilas from '../../MatrizFilas.astro';
 import FichaMapa from '../../objetos/barrios/FichaMapa.astro';
+import MapaZonas from '../../objetos/barrios/MapaZonas.astro';
 import Icon from '../../../ui/Icon.astro';
 
-interface Cell { label: string; href?: string }
+interface Svc { label: string; href: string; where: string }
+interface Zona { name: string; kind: 'here' | 'own' | 'zone'; services: Svc[] }
 interface Props {
   n: number;
   label: string;
   title: string;
   lead: string;
-  rows: { label: string; cells: Cell[] }[];
-  columns: string[];
-  fixedRow: number;
-  tableLabel: string;
-  legend: { own: string; link: string; here: string };
+  city: 'houston' | 'miami';
+  zones: Zona[];
+  listLabel: string;
+  mapLabel: string;
+  tags: { here: string; own: string };
+  servicesLabel: (z: string) => string;
   ficha: { city: string; caption: string };
   lang?: 'es' | 'en';
 }
-const { n, label, title, lead, rows, columns, fixedRow, tableLabel, legend, ficha, lang = 'es' } = Astro.props;
+const { n, label, title, lead, city, zones, listLabel, mapLabel, tags, servicesLabel, ficha, lang = 'es' } = Astro.props;
+const grupo = `wz-${city}`;
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
 <div class="wb-gap wb-z">
-  <div class="wb-z__mx">
-    <MatrizFilas rows={rows} columns={columns} fixedRow={fixedRow} label={tableLabel} tone="gold" lang={lang} class="wb-mx" />
-    <ul class="wb-z__legend">
-      <li><span class="wb-z__sw wb-z__sw--own" aria-hidden="true"></span>{legend.own}</li>
-      <li><span class="wb-z__sw wb-z__sw--link" aria-hidden="true"><Icon name="lucide:arrow-up-right" /></span>{legend.link}</li>
-      <li><span class="wb-z__sw wb-z__sw--here" aria-hidden="true"></span>{legend.here}</li>
-    </ul>
+  <div class="wz" data-wz>
+    <div class="wz__lista">
+      <p class="wz__cab">{listLabel}</p>
+      {zones.map((z, i) => (
+        <details class:list={['wz-z', `wz-z--${z.kind}`]} name={grupo} data-z={i} open={z.kind === 'here'}>
+          <summary class="wz-z__sum">
+            <span class="wz-z__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="wz-z__name">{z.name}</span>
+            {z.kind !== 'zone' && <span class="wz-z__tag">{z.kind === 'here' ? tags.here : tags.own}</span>}
+            <span class="wz-z__chev" aria-hidden="true"><Icon name="lucide:chevron-down" /></span>
+          </summary>
+          <div class="wz-z__body">
+            <p class="sr-only">{servicesLabel(z.name)}</p>
+            <ul class="wz-z__svcs">
+              {z.services.map((s) => (
+                <li>
+                  <a href={s.href} class="wz-z__svc">
+                    <span>{s.label}</span>
+                    <em>{s.where}</em>
+                    <Icon name={s.href.startsWith('#') ? 'lucide:arrow-down' : 'lucide:arrow-up-right'} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
+      ))}
+    </div>
+    <MapaZonas city={city} zones={zones} label={mapLabel} class="wz__mapa" />
   </div>
   <figure class="wb-z__ficha">
     <FichaMapa marca="inmobiliaria" city={ficha.city} lang={lang} size="card" />
     <figcaption>{ficha.caption}</figcaption>
   </figure>
 </div>
+
+<script>
+  // Sincroniza lista y mapa (B-06). Mejora progresiva: sin JS la lista y el mapa ya se ven.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-wz]')) {
+    const items = [...root.querySelectorAll<HTMLDetailsElement>('details[data-z]')];
+    const pins = [...root.querySelectorAll<HTMLElement>('.wz-pin[data-z]')];
+    const pin = (z: string | undefined) => pins.find((p) => p.dataset.z === z);
+    const sync = () => {
+      const open = items.find((d) => d.open);
+      pins.forEach((p) => p.classList.toggle('is-sel', !!open && p.dataset.z === open.dataset.z));
+    };
+    const hint = (z: string | undefined, on: boolean) => pin(z)?.classList.toggle('is-hint', on);
+    for (const d of items) {
+      d.addEventListener('toggle', sync);
+      const s = d.querySelector('summary')!;
+      s.addEventListener('pointerenter', () => hint(d.dataset.z, true));
+      s.addEventListener('pointerleave', () => hint(d.dataset.z, false));
+      s.addEventListener('focus', () => hint(d.dataset.z, true));
+      s.addEventListener('blur', () => hint(d.dataset.z, false));
+    }
+    for (const p of pins) {
+      const d = items.find((x) => x.dataset.z === p.dataset.z);
+      p.addEventListener('click', () => { if (d) d.open = true; });
+      p.addEventListener('pointerenter', () => p.classList.add('is-hint'));
+      p.addEventListener('pointerleave', () => p.classList.remove('is-hint'));
+    }
+    sync();
+  }
+</script>
+
 <style>
   .wb-gap { margin-top: var(--w-chapter-gap); }
   .wb-z { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; align-items: center; }
-  .wb-z__mx { min-width: 0; }
   .wb-z__ficha { margin: 0; display: grid; gap: 16px; justify-items: center; }
   .wb-z__ficha figcaption { max-width: 300px; font-size: var(--w-small, 15px); line-height: 1.5; color: var(--w-ink-70); text-align: center; }
 
-  /* Leyenda: los tres estados, en letra de texto (E-40). */
-  .wb-z__legend {
-    list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 28px;
-    font-size: 14px; color: var(--w-ink-70);
+  /* Panel: lista a la izquierda, mapa a la derecha, en una sola superficie de objeto. */
+  .wz {
+    display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); min-width: 0;
+    border-radius: var(--w-r-obj, 12px); overflow: hidden;
+    background: var(--bg-base, #080808); box-shadow: inset 0 0 0 1px var(--w-line-strong), 0 24px 60px -30px rgba(0, 0, 0, .7);
   }
-  .wb-z__legend li { display: inline-flex; align-items: center; gap: 10px; }
-  .wb-z__sw { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; flex: none; }
-  .wb-z__sw--own {
-    background: repeating-linear-gradient(180deg, var(--accent-gold) 0 2px, transparent 2px 5px), #fff;
-    box-shadow: inset 0 0 0 1px rgba(var(--accent-gold-rgb), .7);
+  .wz__lista { padding: 8px 0; border-right: 1px solid var(--w-line-strong); display: flex; flex-direction: column; }
+  .wz__cab {
+    margin: 0; padding: 14px 20px 12px;
+    font: 500 11px/1.2 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60);
   }
-  .wb-z__sw--link { background: rgba(var(--star-rgb), .08); box-shadow: inset 0 0 0 1px var(--w-line-strong); color: var(--w-ink-80); }
-  .wb-z__sw--link :global(svg) { width: 14px; height: 14px; }
-  .wb-z__sw--here { width: 36px; background: var(--w-p-bg, #f0ede8); }
+  .wz :global(.wz__mapa) { min-width: 0; align-self: stretch; height: 100%; aspect-ratio: auto; min-height: 440px; }
 
-  /* ── Estados de casilla (provisional: ver cabecera) ── */
-  /* Pin de mapa en lugar de la llave. */
-  .wb-z :global(.wb-mx .wd-mx__ki) { opacity: 0 !important; }
-  .wb-z :global(.wb-mx .wd-mx__kbox::after) {
-    content: ''; grid-area: 1 / 1; position: relative; width: 22px; height: 22px; background: var(--w-ink-60);
-    -webkit-mask: var(--wb-pin) center / contain no-repeat; mask: var(--wb-pin) center / contain no-repeat;
+  .wz-z { border-top: 1px solid var(--w-line); }
+  .wz-z:last-child { border-bottom: 1px solid var(--w-line); }
+  .wz-z__sum {
+    list-style: none; cursor: pointer; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 16px; align-items: center; gap: 10px;
+    min-height: 52px; padding: 0 16px 0 20px; transition: background-color .2s;
   }
-  .wb-z :global(.wb-mx .wd-mx__row.is-on .wd-mx__kbox::after) { background: var(--accent-gold); }
-  .wb-z {
-    --wb-pin: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
-    --wb-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E");
+  .wz-z__sum::-webkit-details-marker { display: none; }
+  .wz-z__sum:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
+  .wz-z__n { font: 500 11px/1 var(--font-mono, monospace); color: var(--w-ink-60); letter-spacing: .04em; }
+  .wz-z__name { font: 500 16px/1.2 var(--font-display); color: var(--w-ink); letter-spacing: -.01em; }
+  .wz-z__tag {
+    font: 500 10px/1 var(--font-mono, monospace); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+    padding: 5px 7px; border-radius: 4px; color: var(--accent-gold); box-shadow: inset 0 0 0 1px rgba(var(--accent-gold-rgb), .45);
   }
-  /* Filas que no son el barrio: nombre a tinta plena (no "apagadas"). */
-  .wb-z :global(.wb-mx .wd-mx__rh) { color: var(--w-ink); }
-  /* Enlace a la página del servicio en la ciudad: casilla con flecha. */
-  .wb-z :global(.wb-mx a.wd-mx__cell) { background: rgba(var(--star-rgb), .08); box-shadow: inset 0 0 0 1px var(--w-line-strong); }
-  .wb-z :global(.wb-mx a.wd-mx__cell::after) {
-    width: 16px; height: 16px; border-radius: 0; background: var(--w-ink-80);
-    -webkit-mask: var(--wb-arrow) center / contain no-repeat; mask: var(--wb-arrow) center / contain no-repeat;
+  .wz-z--here .wz-z__tag { background: var(--accent-gold); color: var(--w-p-ink, #0e0e0d); box-shadow: none; }
+  .wz-z--here .wz-z__name { color: var(--accent-gold); }
+  .wz-z__chev { grid-column: 4; display: grid; place-items: center; color: var(--w-ink-60); transition: transform .25s var(--ease-out-expo, ease); }
+  .wz-z__chev :global(svg) { width: 16px; height: 16px; }
+  .wz-z[open] .wz-z__chev { transform: rotate(180deg); }
+  .wz-z[open] .wz-z__sum { background: rgba(var(--star-rgb), .04); }
+  @media (--hover-fine) { .wz-z__sum:hover { background: rgba(var(--star-rgb), .05); } }
+
+  .wz-z__body { padding: 2px 16px 14px 58px; background: rgba(var(--star-rgb), .04); }
+  .wz-z__svcs { list-style: none; margin: 0; padding: 0; display: grid; }
+  .wz-z__svc {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto 14px; align-items: center; gap: 10px;
+    min-height: 40px; color: var(--w-ink-80); text-decoration: none; font-size: 14px;
+    border-top: 1px dashed var(--w-line);
   }
-  .wb-z :global(.wb-mx .wd-mx__row.is-on a.wd-mx__cell) { background: #fff; box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .22); }
-  .wb-z :global(.wb-mx .wd-mx__row.is-on a.wd-mx__cell::after) { background: var(--w-p-ink, #0e0e0d); }
-  /* En la fila encendida, solo se rayan las casillas con página propia. */
-  .wb-z :global(.wb-mx .wd-mx__row.is-on .wd-mx__fill) { opacity: 0; }
-  /* Página propia de la zona (la del barrio o la de esta misma página): rayada en oro en
-     CUALQUIER fila. */
-  .wb-z :global(.wb-mx a.wd-mx__cell:is([href="#precios"], [href^="/es/houston/katy"], [href^="/es/houston/sugar-land"], [href^="/es/miami/doral"], [href^="/es/miami/hialeah"]) .wd-mx__fill) { opacity: 1; }
-  .wb-z :global(.wb-mx a.wd-mx__cell:is([href="#precios"], [href^="/es/houston/katy"], [href^="/es/houston/sugar-land"], [href^="/es/miami/doral"], [href^="/es/miami/hialeah"])::after) { display: none; }
+  .wz-z__svcs li:first-child .wz-z__svc { border-top: 0; }
+  .wz-z__svc em { font: 500 11px/1 var(--font-mono, monospace); font-style: normal; color: var(--w-ink-60); letter-spacing: .03em; white-space: nowrap; }
+  .wz-z__svc :global(svg) { width: 14px; height: 14px; color: var(--w-ink-60); transition: transform .2s; }
+  .wz-z__svc:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; }
   @media (--hover-fine) {
-    .wb-z :global(.wb-mx a.wd-mx__cell:hover) { box-shadow: inset 0 0 0 1.5px var(--accent-gold); }
-    .wb-z :global(.wb-mx a.wd-mx__cell:not(:is([href="#precios"], [href^="/es/houston/katy"], [href^="/es/houston/sugar-land"], [href^="/es/miami/doral"], [href^="/es/miami/hialeah"])):hover .wd-mx__fill) { opacity: 0; }
+    .wz-z__svc:hover { color: var(--w-ink); }
+    .wz-z__svc:hover :global(svg) { color: var(--accent-gold); transform: translate(2px, -2px); }
   }
+  @media (--motion-reduce) { .wz-z__chev, .wz-z__svc :global(svg), .wz-z__sum { transition: none; } }
 
   @media (max-width: 1099px) {
     .wb-z { grid-template-columns: 1fr; gap: 48px; }
@@ -113,13 +167,10 @@ const { n, label, title, lead, rows, columns, fixedRow, tableLabel, legend, fich
   @media (--lt-md) {
     .wb-gap { margin-top: 40px; }
     .wb-z { gap: 40px; }
-    .wb-z__legend { justify-content: flex-start; flex-direction: column; gap: 10px; }
-    /* Pista de desplazamiento: degradado en el borde derecho de la caja (M2). */
-    .wb-z :global(.wb-mx) { overflow: hidden; }
-    .wb-z :global(.wb-mx::after) {
-      content: ''; position: absolute; top: 1px; right: 1px; bottom: 1px; width: 40px; pointer-events: none; z-index: 2;
-      border-radius: 0 var(--w-r-obj) var(--w-r-obj) 0;
-      background: linear-gradient(90deg, transparent, var(--w-s1));
-    }
+    /* Apilado: el mapa arriba (protagonista), la lista debajo. */
+    .wz { grid-template-columns: 1fr; }
+    .wz :global(.wz__mapa) { order: -1; height: auto; min-height: 0; aspect-ratio: 6 / 5; }
+    .wz__lista { border-right: 0; border-top: 1px solid var(--w-line-strong); }
+    .wz-z__body { padding-left: 58px; }
   }
 </style>

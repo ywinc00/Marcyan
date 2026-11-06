@@ -89,7 +89,7 @@ const sr = en
             <div class:list={['mz__msg', m.m && 'is-m']}>
               {m.m
                 ? <img class="mz__av" src="/assets/bot/marcy-mini.webp" width="26" height="26" alt="" loading="lazy" decoding="async" />
-                : <span class="mz__av mz__av--c">{L.cliente.slice(0, 1)}</span>}
+                : <span class="mz__av mz__av--c"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4.2" /><path d="M3.8 21c.7-4.3 4-7 8.2-7s7.5 2.7 8.2 7z" /></svg></span>}
               <div>
                 <p class="mz__who"><b>{m.m ? 'Marcy' : L.cliente}</b>{m.m && <span class="mz__tag">{L.asist}</span>}<span class="mz__h">{m.h}</span></p>
                 <p class="mz__t">{m.t}</p>
@@ -157,6 +157,10 @@ const sr = en
   .mz__carta[data-pos='1'] .mz__msgs, .mz__carta[data-pos='2'] .mz__msgs, .mz__carta[data-pos='3'] .mz__msgs { opacity: 0; }
   .mz__carta[data-pos='2'] .mz__cab, .mz__carta[data-pos='3'] .mz__cab { opacity: .75; }
   .mz__carta.is-out { z-index: 5 !important; opacity: 0 !important; transform: translateY(-12px) !important; transition-duration: 400ms; }
+  /* Sin textos mezclados en el cambio: la que sale apaga su texto en 100 ms y la que entra lo
+     enciende cuando la otra ya casi no se ve. */
+  .mz__carta.is-out .mz__msgs { opacity: 0; transition-duration: 100ms; transition-delay: 0ms; }
+  .mz.is-js .mz__carta[data-pos='0']:not(.is-out) .mz__msgs { transition: opacity 260ms ease 200ms; }
 
   .mz__cab {
     flex: none; display: flex; align-items: center; gap: 7px;
@@ -170,7 +174,8 @@ const sr = en
   .mz__msgs { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 14px 14px 12px; transition: opacity 300ms; overflow: hidden; }
   .mz__msg { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; }
   .mz__av { width: 26px; height: 26px; border-radius: 7px; object-fit: cover; background: #e7e3dc; }
-  .mz__av--c { display: grid; place-items: center; background: #DDE5E2; color: #2c4b43; font: 600 12px/1 var(--font-display); }
+  .mz__av--c { display: grid; place-items: end center; overflow: hidden; background: #E4E1DB; color: #A7A29A; }
+  .mz__av--c svg { width: 22px; height: 22px; margin-bottom: -3px; }
   .mz__who { display: flex; align-items: baseline; gap: 6px; font-size: 13px; line-height: 1.2; }
   .mz__who b { font-weight: 700; }
   .mz__tag { font: 600 9px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding: 2px 4px; border-radius: 3px; background: rgba(14, 14, 13, .07); color: #5d5a55; }

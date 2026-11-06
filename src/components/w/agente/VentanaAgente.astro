@@ -219,7 +219,8 @@ const ej = lang === 'en' ? 'Example' : 'Ejemplo';
     display: grid; place-items: center;
     padding: 42px 54px;
     border-radius: 22px;
-    background: linear-gradient(180deg, #141b1e 0%, #182724 46%, #2c5148 100%);
+    /* Arriba un azul violeta que despega la ventana (como el original), abajo el teal de la marca. */
+    background: linear-gradient(180deg, #2a2d4c 0%, #233340 44%, #2c5148 100%);
     overflow: hidden;
     isolation: isolate;
   }
@@ -455,6 +456,9 @@ const ej = lang === 'en' ? 'Example' : 'Ejemplo';
     .vb__head { flex-direction: column; align-items: flex-start; gap: 6px; }
     .va__seg button::after { inset: -8px -2px; }
   }
+
+  /* Pausa global (§1.5) o fuera de vista: la micro-vida se queda quieta. */
+  .va.is-pausa .va__cur, .va.is-pausa .va__dot, .va.is-pausa .va__gls { animation-play-state: paused; }
 
   @media (prefers-reduced-motion: reduce) {
     .va__cur, .va__dot, .va__gls { animation: none !important; }

@@ -35,6 +35,8 @@ const q = Astro.props.question ?? (en ? 'Who builds websites in Spanish in Houst
 // LogoMarca (P06) si ya está integrado; si no, palabra con el mismo alto óptico.
 const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
 const LogoMarca = Object.values(logoMods)[0]?.default;
+// Los ids "*-texto" (ChatGPT) YA son la palabra: con LogoMarca no se repite el nombre al lado.
+const esPalabra = (p: Plataforma) => !!LogoMarca && !!PLAT[p].id?.endsWith('-texto');
 const PLAT: Record<Plataforma, { id?: string; nombre: string }> = {
   chatgpt: { id: 'chatgpt-texto', nombre: 'ChatGPT' },
   gemini: { id: 'googlegemini', nombre: 'Gemini' },
@@ -86,8 +88,8 @@ const srCols = en
             <p class="wo-ans__who">
               {c.p === 'marcy'
                 ? <img class="wo-ans__av" src="/assets/bot/marcy-mini.webp" width="16" height="16" alt="" loading="lazy" decoding="async" />
-                : LogoMarca ? <LogoMarca id={PLAT[c.p].id} size={16} tono="color" /> : null}
-              <b translate="no">{PLAT[c.p].nombre}</b> <span>{c.who}</span>
+                : LogoMarca ? <LogoMarca id={PLAT[c.p].id} size={16} tono="color" titulo="" /> : null}
+              {!esPalabra(c.p) && <b translate="no">{PLAT[c.p].nombre}</b>} <span>{c.who}</span>
             </p>
             <p class="wo-ans__user">{c.q}</p>
             <p class="wo-ans__bub" style="--d:900ms">{c.a[0]}<b translate="no">{c.a[1]}</b>{c.a[2]}</p>
@@ -101,8 +103,8 @@ const srCols = en
       <div class="wo-ans__card" aria-hidden="true">
         {variant !== 'mini' && <Ejemplo lang={lang} on="light" />}
         <p class="wo-ans__who">
-          {LogoMarca && PLAT[plataforma].id ? <LogoMarca id={PLAT[plataforma].id} size={16} tono="color" /> : null}
-          <b translate="no">{PLAT[plataforma].nombre}</b>
+          {LogoMarca && PLAT[plataforma].id ? <LogoMarca id={PLAT[plataforma].id} size={16} tono="color" titulo="" /> : null}
+          {!esPalabra(plataforma) && <b translate="no">{PLAT[plataforma].nombre}</b>}
         </p>
         <p class="wo-ans__user">{q}</p>
         <p class="wo-ans__step" style="--d:255ms;--h:1170ms"><span class="wo-ans__chk"><i></i></span><span class="wo-ans__sw"><span>{T.s1[0]}</span><span>{T.s1[1]}</span></span></p>

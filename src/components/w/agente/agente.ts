@@ -32,12 +32,30 @@ export function setPausaGlobal(p: boolean) {
   window.dispatchEvent(new CustomEvent('w2:pausa', { detail: { pausa: p } }));
 }
 
-// ── Programador cancelable ──────────────────────────────────────
+// ── Programador cancelable y PAUSABLE ───────────────────────────
+// pause() congela lo pendiente (fuera de vista, pestaña oculta) y resume() lo retoma
+// donde iba: el guion y la elección automática solo corren mientras se ven (§1.5).
 function reloj() {
-  let ids: number[] = [];
+  type Job = { id: number; due: number; fn: () => void };
+  let js: Job[] = [];
+  let pausado = 0;
+  const run = (j: Job) => {
+    j.id = window.setTimeout(() => { js = js.filter((x) => x !== j); j.fn(); }, Math.max(0, j.due - performance.now()));
+  };
   return {
-    at(ms: number, fn: () => void) { ids.push(window.setTimeout(fn, ms)); },
-    cancel() { ids.forEach(clearTimeout); ids = []; },
+    at(ms: number, fn: () => void) {
+      const j: Job = { id: 0, due: (pausado || performance.now()) + ms, fn };
+      js.push(j);
+      if (!pausado) run(j);
+    },
+    cancel() { js.forEach((j) => clearTimeout(j.id)); js = []; },
+    pause() { if (pausado) return; pausado = performance.now(); js.forEach((j) => clearTimeout(j.id)); },
+    resume() {
+      if (!pausado) return;
+      const d = performance.now() - pausado;
+      pausado = 0;
+      js.forEach((j) => { j.due += d; run(j); });
+    },
   };
 }
 
@@ -149,7 +167,7 @@ function flechas(btns: HTMLButtonElement[], onMove?: (i: number) => void) {
 }
 
 // ── Observación de vista con reentrada ≥ 8 s ────────────────────
-function vista(root: HTMLElement, onEnter: (reentrada: boolean) => void, onLeave?: () => void) {
+function vista(root: HTMLElement, onEnter: (reentrada: boolean) => void, onLeave?: () => void, onReturn?: () => void) {
   let visto = false;
   let salida = 0;
   if (!('IntersectionObserver' in window)) { onEnter(false); return; }
@@ -158,7 +176,7 @@ function vista(root: HTMLElement, onEnter: (reentrada: boolean) => void, onLeave
     if (e.isIntersecting && e.intersectionRatio >= 0.35) {
       if (!visto) { visto = true; onEnter(false); }
       else if (salida && performance.now() - salida >= T.reentrada) { salida = 0; onEnter(true); }
-      else salida = 0;
+      else if (salida) { salida = 0; onReturn?.(); }
     } else if (!e.isIntersecting && visto && !salida) {
       salida = performance.now(); onLeave?.();
     }
@@ -263,7 +281,10 @@ export function montarAgente(root: HTMLElement) {
       win.classList.add('is-in');
     }
     const t0 = primera ? T.evento : 250;
-    const fin = t0 + e.cliente.length * T.letra;
+    // En la entrada, la banda se envía a T.enviado en los dos idiomas (W-ADV-16): una frase más
+    // larga se teclea algo más rápido, nunca más despacio que 60 ms/letra.
+    const letra = primera ? Math.min(T.letra, (T.enviado - 320 - T.evento) / e.cliente.length) : T.letra;
+    const fin = t0 + e.cliente.length * letra;
     const enviado = fin + 320;
     const respuesta = enviado + 1400;
 
@@ -274,7 +295,7 @@ export function montarAgente(root: HTMLElement) {
     band.append(qtxt, h('i', 'va__car'));
     ev.append(h('p', 'va__evl', g.evento), band);
     rl.at(t0, () => log.append(ev));
-    for (let k = 1; k <= e.cliente.length; k++) rl.at(t0 + k * T.letra, () => { qtxt.textContent = e.cliente.slice(0, k); });
+    for (let k = 1; k <= e.cliente.length; k++) rl.at(t0 + k * letra, () => { qtxt.textContent = e.cliente.slice(0, k); });
 
     // Enviado: banda fijada, título nuevo, spinner.
     const spin = h('p', 'va__spin');
@@ -322,9 +343,9 @@ export function montarAgente(root: HTMLElement) {
       live.textContent = e.cierre.map((p) => p.s).join('');
     }
     // Elección automática: una vez por ciclo, solo si nadie ha tocado.
-    if (!autoHecha && !tocado && !RM()) {
+    if (!autoHecha && !tocado && !RM() && !pausaGlobal()) {
       rl.at(T.inactivo, () => {
-        if (tocado || autoHecha || corriendo) return;
+        if (tocado || autoHecha || corriendo || pausaGlobal()) return;
         autoHecha = true;
         const sig = (actual + 1) % ops.length;
         fantasma(root, ops[sig], () => { if (!tocado) reproducir(sig, false); }, rl);
@@ -360,7 +381,8 @@ export function montarAgente(root: HTMLElement) {
   ask.addEventListener('click', (ev) => {
     // Solo un gesto real del visitante (clic o Enter): nunca el fantasma ni un script.
     if (!ev.isTrusted) return;
-    const texto = root.dataset.pregunta || G().escenas[actual].cliente;
+    // Frase pensada para el VISITANTE (dueño de negocio), nunca la del cliente del ejemplo.
+    const texto = root.dataset.pregunta || G().escenas[actual].pide;
     window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text: texto } }));
   });
 
@@ -378,10 +400,34 @@ export function montarAgente(root: HTMLElement) {
   pintarHechas();
   if (RM()) return; // estado final del HTML, menú operativo
   root.classList.add('is-armed'); // la ventana espera fuera de vista (sin pintar el final)
-  vista(root, (re) => {
+
+  // Pausa: el reloj solo corre a la vista y con la pestaña visible. La pausa GLOBAL (§1.5)
+  // deja la escena en su estado final, quieta (sin micro-vida ni elección automática); el menú
+  // sigue respondiendo porque elegir es un gesto del visitante.
+  let fuera = true;
+  const sincronizar = () => {
+    const pg = pausaGlobal();
+    root.classList.toggle('is-pausa', pg);
+    if (fuera || document.hidden) { rl.pause(); return; }
+    if (pg && corriendo && !tocado) { rl.cancel(); finalDe(actual); terminar(actual, false); }
+    rl.resume();
+  };
+  const entrar = (re: boolean) => {
+    fuera = false;
+    rl.cancel();
+    rl.resume();
     if (re) { autoHecha = false; hechas.clear(); hechas.add(0); }
+    if (pausaGlobal()) {
+      root.classList.remove('is-armed');
+      actual = 0; finalDe(0); terminar(0, false); pintarHechas();
+      root.classList.add('is-pausa');
+      return;
+    }
     reproducir(0, true);
-  });
+  };
+  vista(root, entrar, () => { fuera = true; sincronizar(); }, () => { fuera = false; sincronizar(); });
+  document.addEventListener('visibilitychange', sincronizar);
+  window.addEventListener('w2:pausa', sincronizar);
 }
 
 // ═════════════════════════════════════════════════════════════
@@ -482,15 +528,25 @@ function montarBuscar(root: HTMLElement) {
   if (RM()) return; // estado final del HTML (respuesta a la 3), "Otra pregunta" operativa
   // Arranca ESPERANDO, como el original: el menú es lo primero que se ve.
   esperar();
+  let fuera = true;
+  const sincronizar = () => {
+    root.classList.toggle('is-pausa', pausaGlobal());
+    if (fuera || document.hidden) rl.pause(); else rl.resume();
+  };
   vista(root, (re) => {
+    fuera = false;
+    rl.resume();
     if (re && !tocado) { autoHecha = false; esperar(); }
-    if (autoHecha || tocado) return;
+    if (autoHecha || tocado || pausaGlobal()) return;
     rl.at(T.inactivo, () => {
-      if (tocado || autoHecha) return;
+      if (tocado || autoHecha || pausaGlobal()) return;
       autoHecha = true;
       fantasma(root, ops[2], () => { if (!tocado) responder(2, true); }, rl);
     });
-  });
+  }, () => { fuera = true; sincronizar(); }, () => { fuera = false; sincronizar(); });
+  document.addEventListener('visibilitychange', sincronizar);
+  window.addEventListener('w2:pausa', sincronizar);
+  sincronizar();
 }
 
 // ═════════════════════════════════════════════════════════════

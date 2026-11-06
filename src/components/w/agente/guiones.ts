@@ -22,6 +22,9 @@ export interface EscenaMarcy {
   opcion: string;
   /** Lo que escribe el cliente (se teclea en la banda del historial). */
   cliente: string;
+  /** Lo que "Pregúntale tú a Marcy" manda al chat REAL: frase del visitante (dueño de un
+   *  negocio), nunca la del cliente del ejemplo. Pendiente del OK del dueño. */
+  pide: string;
   /** Título de la ventana mientras trabaja (va tras "✳ "). */
   titulo: string;
   /** Texto junto al spinner. */
@@ -51,7 +54,7 @@ export interface GuionMarcy {
 }
 
 const MARCY_ES: GuionMarcy = {
-  tituloInicial: 'whatsapp · Tu Negocio',
+  tituloInicial: 'Esperando mensajes',
   evento: 'whatsapp · cliente',
   nombre: 'Marcy',
   rol: 'asistente de Tu Negocio',
@@ -67,6 +70,7 @@ const MARCY_ES: GuionMarcy = {
     {
       opcion: 'Reservar una cita',
       cliente: '¿Tienen cita mañana por la tarde?',
+      pide: 'Quiero que Marcy reserve las citas de mi negocio.',
       titulo: 'Buscando hueco en tu agenda',
       pensando: 'Leyendo tu agenda…',
       bloques: [
@@ -78,6 +82,7 @@ const MARCY_ES: GuionMarcy = {
     {
       opcion: 'Pedir un presupuesto',
       cliente: '¿Me pueden dar un presupuesto?',
+      pide: 'Quiero que Marcy atienda las peticiones de presupuesto de mi negocio.',
       titulo: 'Revisando tus servicios',
       pensando: 'Revisando tus servicios…',
       bloques: [{ t: 'paso', texto: 'Revisando tus servicios', ramas: ['Pide fotos del trabajo'] }],
@@ -86,6 +91,7 @@ const MARCY_ES: GuionMarcy = {
     {
       opcion: 'Hablar con una persona',
       cliente: '¿Puedo hablar con alguien?',
+      pide: '¿Cómo me pasa Marcy las conversaciones que necesitan a una persona?',
       titulo: 'Pasando la conversación',
       pensando: 'Pasando la conversación…',
       bloques: [{ t: 'paso', texto: 'Pasando la conversación', ramas: ['Aviso al dueño por WhatsApp'] }],
@@ -97,7 +103,7 @@ const MARCY_ES: GuionMarcy = {
 };
 
 const MARCY_EN: GuionMarcy = {
-  tituloInicial: 'whatsapp · Your Business',
+  tituloInicial: 'Waiting for messages',
   evento: 'whatsapp · customer',
   nombre: 'Marcy',
   rol: 'assistant for Your Business',
@@ -113,6 +119,7 @@ const MARCY_EN: GuionMarcy = {
     {
       opcion: 'Book an appointment',
       cliente: 'Do you have anything tomorrow afternoon?',
+      pide: 'I want Marcy to book appointments for my business.',
       titulo: 'Finding an open slot',
       pensando: 'Checking your calendar…',
       bloques: [
@@ -124,6 +131,7 @@ const MARCY_EN: GuionMarcy = {
     {
       opcion: 'Get a quote',
       cliente: 'Can I get a quote?',
+      pide: 'I want Marcy to handle quote requests for my business.',
       titulo: 'Reviewing your services',
       pensando: 'Reviewing your services…',
       bloques: [{ t: 'paso', texto: 'Reviewing your services', ramas: ['Asks for photos of the job'] }],
@@ -132,6 +140,7 @@ const MARCY_EN: GuionMarcy = {
     {
       opcion: 'Talk to a person',
       cliente: 'Can I talk to someone?',
+      pide: 'How does Marcy hand off conversations that need a person?',
       titulo: 'Handing off the conversation',
       pensando: 'Handing off the conversation…',
       bloques: [{ t: 'paso', texto: 'Handing off the conversation', ramas: ['Lets the owner know on WhatsApp'] }],

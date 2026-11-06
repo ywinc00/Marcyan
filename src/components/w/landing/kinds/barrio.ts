@@ -3,7 +3,7 @@
 // /es/houston/katy, /es/houston/sugar-land, /es/miami/doral, /es/miami/hialeah.
 // Su existencia activa el tipo (registry.ts); cada página lo importa y monta WLanding.
 //
-// Contraste: MatrizFilas "Zonas que cubrimos" con la fila del barrio fija (.w-contrast), con
+// Contraste: "Zonas que cubrimos" como panel de mapa (lista + mapa real, vuelta 3) (.w-contrast), con
 // la ficha de mapa de ejemplo en claro al lado (revisión 1, I3: decisión del director).
 // Firma: los pulsos del chip del hero (vías reales, TIGER/Line). Degradado: el titular
 // del cierre (sin cola en el H1, R2; el precio va en TarjetaPrecio, sin cifra W-CORE-14).
@@ -79,8 +79,9 @@ const spec: KindSpec = {
   // v2 (G05, §1.3/P12, §5-6): fondo F08. En el hero, trama de calles ABSTRACTA y declarada (el
   // mapa real del barrio ya lo dibuja ChipBarrio); en el capítulo de contraste, eco quieto con
   // las vías REALES del barrio (public/geo/<ciudad>-mapa.json).
-  fondo: 'F08',
-  fondoOpciones: (ctx) => ({ eco: true, barrio: slugOf(ctx) }),
+  // v3 (dueño, E-57): el hero lleva SOLO la malla de rombos (F30), sin la trama de calles. Sin
+  // eco en el capítulo de contraste: «Zonas que cubrimos» ya trae su mapa real del área.
+  fondo: 'F30',
   Hero: HeroBarrio,
   hero: (ctx) => {
     const t = copyOf(ctx);
@@ -137,15 +138,22 @@ const spec: KindSpec = {
         const svc = serviciosPara('es', ctx.cluster.path);
         const cols = COLS.map((id) => svc.find((s) => s.id === id)!);
         const zonas = zonasCiudad[t.city];
-        const rows = zonas.map((z) => {
+        // Zonas del mapa del hub con sus servicios: la página propia del barrio para lo que esa
+        // página cubre (o #precios si es esta misma) y la del servicio en la ciudad para el resto.
+        const zones = zonas.map((z) => {
           const own = z.page ? (Object.entries(barrioCopy).find(([, c]) => c.name === z.name)?.[0] as Barrio | undefined) : undefined;
+          const here = z.page === ctx.cluster.path;
           return {
-            label: z.name,
-            cells: cols.map((c) => ({
-              label: c.name,
-              // La fila de esta misma página no se enlaza a sí misma: va a su precio.
-              href: own && z.page && COVERS[own].includes(c.id) ? (z.page === ctx.cluster.path ? '#precios' : z.page) : c.href,
-            })),
+            name: z.name,
+            kind: (here ? 'here' : own ? 'own' : 'zone') as 'here' | 'own' | 'zone',
+            services: cols.map((c) => {
+              const propia = !!(own && z.page && COVERS[own].includes(c.id));
+              return {
+                label: c.name,
+                href: propia ? (here ? '#precios' : z.page!) : c.href,
+                where: propia ? (here ? T.zonasTag.here : z.name) : t.cityName,
+              };
+            }),
           };
         });
         return {
@@ -153,11 +161,12 @@ const spec: KindSpec = {
           label: T.zonasLabel,
           title: t.zonas.title,
           lead: t.zonas.lead,
-          rows,
-          columns: cols.map((c) => c.name),
-          fixedRow: zonas.findIndex((z) => z.page === ctx.cluster.path),
-          tableLabel: T.zonasTable(t.name),
-          legend: T.zonasLegend(t.name, t.cityName),
+          city: t.city,
+          zones,
+          listLabel: T.zonasLista(t.cityName, zonas.length),
+          mapLabel: T.zonasMapa(t.name, t.cityName),
+          tags: T.zonasTag,
+          servicesLabel: T.zonasServicios,
           ficha: { city: t.name, caption: T.fichaCaption(t.name) },
           lang: ctx.lang,
         };

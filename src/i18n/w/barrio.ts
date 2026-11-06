@@ -39,12 +39,11 @@ const comun = {
   precioNoteTitle: '¿Qué se suma y cuándo?',
   tiersLabel: 'Precios',
   includesLabel: 'Qué incluye',
-  zonasTable: (b: string) => `Servicios por zona, con ${b} destacado`,
-  zonasLegend: (b: string, c: string) => ({
-    own: 'Zona con página propia',
-    link: `Página del servicio en ${c}`,
-    here: `Estás en ${b}`,
-  }),
+  // Zonas (vuelta 3): lista de zonas con su mapa real, en lugar de la tabla.
+  zonasLista: (c: string, n: number) => `Área de ${c} · ${n} zonas`,
+  zonasMapa: (b: string, c: string) => `Mapa del área de ${c} con sus zonas y ${b} encendida`,
+  zonasTag: { here: 'Esta página', own: 'Página propia' },
+  zonasServicios: (z: string) => `Servicios en ${z}`,
   fichaCaption: (b: string) => `Lo que ve quien te busca en ${b}: tu ficha en el mapa, con llamar, cómo llegar y tu web.`,
   recursos: {
     hub: (c: string) => ({ title: `${c} y sus zonas`, text: `Todo lo que hacemos en el área de ${c}.` }),
@@ -82,7 +81,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     },
     zonas: {
       title: '<span class="w-tone">Todo el área de Houston,</span> con Katy encendida.',
-      lead: 'Cada casilla abre la página de ese servicio. Donde una zona no tiene página propia, te lleva a la de Houston.',
+      lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Houston.',
     },
     prosa: { tone1: 'En Katy, el cliente busca', tone2: 'por su zona, no por «Houston».', items: [1, 2, 3, 5] },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },
@@ -100,7 +99,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     },
     zonas: {
       title: '<span class="w-tone">Todo el área de Houston,</span> con Sugar Land encendida.',
-      lead: 'Cada casilla abre la página de ese servicio. Donde una zona no tiene página propia, te lleva a la de Houston.',
+      lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Houston.',
     },
     prosa: { tone1: 'Sugar Land', tone2: 'no es un mercado cualquiera.', items: [0, 1, 2, 4] },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },
@@ -118,7 +117,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     },
     zonas: {
       title: '<span class="w-tone">Todo el área de Miami,</span> con Doral encendida.',
-      lead: 'Cada casilla abre la página de ese servicio. Donde una zona no tiene página propia, te lleva a la de Miami.',
+      lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Miami.',
     },
     prosa: { tone1: 'Doral no es «Miami genérico»:', tone2: 'es Doralzuela.', items: [0, 1, 2, 3] },
     caso: { lead: 'Nuestro trabajo publicado es de Houston y de Florida (Orlando), y lo rotulamos por su ciudad real.' },
@@ -136,7 +135,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     },
     zonas: {
       title: '<span class="w-tone">Todo el área de Miami,</span> con Hialeah encendida.',
-      lead: 'Cada casilla abre la página de ese servicio. Donde una zona no tiene página propia, te lleva a la de Miami.',
+      lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Miami.',
     },
     prosa: { tone1: 'En Hialeah, el español', tone2: 'es el negocio.', items: [0, 2, 3, 4] },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },

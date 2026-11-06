@@ -1,0 +1,199 @@
+---
+// Mapa de zonas del barrio (vuelta 3, sustituye a la tabla de «Zonas que cubrimos»).
+// Mapa REAL del área metropolitana, de noche, con los mismos datos que el mapa de zonas de los
+// hubs de ciudad (public/geo/<ciudad>-mapa.json: autopistas r1, vías r2, bayous b, agua w) y
+// las coordenadas de cada zona de components/city/cities.js. Proyectado y simplificado en la
+// compilación (Douglas-Peucker): SVG estático, sin lienzo ni JS para dibujarse.
+// Encuadre: las zonas con margen, ajustado a la proporción del marco. El barrio de la página
+// va en oro con su resplandor (la misma luz cálida que el hub); las zonas con página propia
+// llevan anillo oro; el resto, punto claro. Escala gráfica medida de verdad (millas).
+// Los puntos y rótulos son HTML sobre el SVG (tamaño de letra fijo a cualquier ancho); su
+// estado lo pone el guion de Zonas.astro (data-z, .is-sel, .is-hint). Decorativo para el
+// lector de pantalla: la lista de zonas al lado es la interfaz accesible.
+import houston from '../../../../../public/geo/houston-mapa.json';
+import miami from '../../../../../public/geo/miami-mapa.json';
+import { CITIES } from '../../../city/cities.js';
+
+type Pt = [number, number];
+interface Zona { name: string; kind: 'here' | 'own' | 'zone' }
+interface Props { city: 'houston' | 'miami'; zones: Zona[]; label: string; class?: string }
+const { city, zones, label, class: cls } = Astro.props;
+
+const DATA = { houston, miami } as unknown as Record<string, { r1: Pt[][]; r2: Pt[][]; b: Pt[][]; w: Pt[][][] }>;
+const mapa = DATA[city];
+const at = (CITIES as Record<string, { map: { at: Record<string, Pt> } }>)[city].map.at;
+
+// Proyección equirectangular local (km), norte arriba.
+const lat0 = zones.reduce((s, z) => s + at[z.name][1], 0) / zones.length;
+const kx = 111.32 * Math.cos((lat0 * Math.PI) / 180), ky = 110.57;
+const P = ([lo, la]: Pt): Pt => [lo * kx, -la * ky];
+const zp = zones.map((z) => P(at[z.name]));
+let x0 = Math.min(...zp.map((p) => p[0])), x1 = Math.max(...zp.map((p) => p[0]));
+let y0 = Math.min(...zp.map((p) => p[1])), y1 = Math.max(...zp.map((p) => p[1]));
+// Margen: 22 % a los lados (rótulos), 16 % arriba y abajo.
+const padX = (x1 - x0) * 0.22, padY = (y1 - y0) * 0.16;
+x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
+// Proporción del marco 6:5; se amplía la dimensión corta.
+const AR = 6 / 5;
+if ((x1 - x0) / (y1 - y0) < AR) { const c = (x0 + x1) / 2, w = (y1 - y0) * AR; x0 = c - w / 2; x1 = c + w / 2; }
+else { const c = (y0 + y1) / 2, h = (x1 - x0) / AR; y0 = c - h / 2; y1 = c + h / 2; }
+const VW = 600, VH = 500, S = VW / (x1 - x0);
+const V = (p: Pt): Pt => { const [x, y] = P(p); return [(x - x0) * S, (y - y0) * S]; };
+const r = (n: number) => Math.round(n * 10) / 10;
+
+function dp(p: Pt[], t: number): Pt[] {
+  if (p.length < 3) return p;
+  const a = p[0], b = p[p.length - 1];
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+  let md = 0, mi = 0;
+  for (let i = 1; i < p.length - 1; i++) {
+    const d = Math.abs(dy * p[i][0] - dx * p[i][1] + b[0] * a[1] - b[1] * a[0]) / L;
+    if (d > md) { md = d; mi = i; }
+  }
+  return md > t ? dp(p.slice(0, mi + 1), t).slice(0, -1).concat(dp(p.slice(mi), t)) : [a, b];
+}
+const M = 40; // margen fuera del marco que aún se dibuja
+const dentro = ([x, y]: Pt) => x > -M && x < VW + M && y > -M && y < VH + M;
+const largo = (p: Pt[]) => p.reduce((s, q, i) => (i ? s + Math.hypot(q[0] - p[i - 1][0], q[1] - p[i - 1][1]) : 0), 0);
+const lineas = (ls: Pt[][], tol: number, min: number) => {
+  let d = '';
+  for (const ln of ls) {
+    let seg: Pt[] = [];
+    const cierra = () => {
+      if (seg.length > 1) { const q = dp(seg, tol); if (largo(q) >= min) d += 'M' + q.map((v) => `${r(v[0])} ${r(v[1])}`).join('L'); }
+      seg = [];
+    };
+    for (const g of ln) { const v = V(g); if (!dentro(v)) { cierra(); continue; } seg.push(v); }
+    cierra();
+  }
+  return d;
+};
+const agua = mapa.w
+  .map((poly) => poly.map((ring) => ring.map(V)))
+  // Por caja: el mar y la bahía tienen casi todos sus vértices fuera del marco.
+  .filter((poly) => {
+    const xs = poly[0].map((v) => v[0]), ys = poly[0].map((v) => v[1]);
+    return Math.max(...xs) > -M && Math.min(...xs) < VW + M && Math.max(...ys) > -M && Math.min(...ys) < VH + M;
+  })
+  .map((poly) => poly.map((ring) => { const h = ring.length >> 1; const q = ring.length < 4 ? ring : dp(ring.slice(0, h + 1), 1).concat(dp(ring.slice(h), 1).slice(1)); /* anillo cerrado: en dos mitades (con un solo tramo, inicio = fin y se colapsa) */ return q.length > 2 ? 'M' + q.map((v) => `${r(v[0])} ${r(v[1])}`).join('L') + 'Z' : ''; }).join(''))
+  .join('');
+const r1 = lineas(mapa.r1, 0.9, 6);
+const r2 = lineas(mapa.r2, 1.4, 14);
+const bayous = lineas(mapa.b, 1.2, 10);
+
+// Zonas en el marco (en %, para los puntos HTML) y lado del rótulo.
+const pins = zones.map((z, i) => {
+  const [x, y] = V(at[z.name]);
+  return { ...z, i, x: (x / VW) * 100, y: (y / VH) * 100, left: x / VW > 0.66 };
+});
+// Rótulos que chocarían con el de una zona vecina (casi a la misma altura y cerca en
+// horizontal): el de la zona de más arriba sube encima de su punto.
+const arriba = new Set<number>();
+for (const a of pins) for (const b of pins) {
+  if (a === b || arriba.has(b.i)) continue;
+  if (Math.abs(a.y - b.y) < 7 && Math.abs(a.x - b.x) < 26 && a.y < b.y) arriba.add(a.i);
+}
+const here = pins.find((p) => p.kind === 'here');
+
+// Escala gráfica: 1, 2, 5 o 10 millas, la que mida cerca del 18 % del ancho.
+const kmPx = S; // unidades del SVG por km
+const MI = 1.609344;
+const millas = [1, 2, 5, 10, 20].reduce((best, m) => (Math.abs(m * MI * kmPx - VW * 0.18) < Math.abs(best * MI * kmPx - VW * 0.18) ? m : best), 5);
+const escala = millas * MI * kmPx; // unidades del SVG; se pasa a px con el ancho del escenario
+---
+<div class:list={['wz-map', cls]} role="img" aria-label={label}>
+  <div class="wz-map__st">
+  <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="none" focusable="false" aria-hidden="true">
+    <defs>
+      <radialGradient id={`wz-glow-${city}`} cx={here ? (here.x / 100) * VW : VW / 2} cy={here ? (here.y / 100) * VH : VH / 2} r="190" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="rgb(214,172,104)" stop-opacity=".22" />
+        <stop offset=".45" stop-color="rgb(160,118,62)" stop-opacity=".08" />
+        <stop offset="1" stop-color="rgb(20,16,12)" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <rect width={VW} height={VH} class="wz-map__tierra" />
+    <rect width={VW} height={VH} fill={`url(#wz-glow-${city})`} />
+    <path class="wz-map__agua" d={agua} fill-rule="evenodd" />
+    <path class="wz-map__bayou" d={bayous} />
+    <path class="wz-map__r2" d={r2} />
+    <path class="wz-map__r1h" d={r1} />
+    <path class="wz-map__r1" d={r1} />
+  </svg>
+  <div class="wz-map__pins" aria-hidden="true">
+    {pins.map((p) => (
+      <span
+        class:list={['wz-pin', `wz-pin--${p.kind}`, p.left && 'wz-pin--izq', arriba.has(p.i) && 'wz-pin--arr', p.kind === 'here' && 'is-sel']}
+        data-z={p.i}
+        style={`left:${r(p.x)}%;top:${r(p.y)}%`}
+      >
+        <i class="wz-pin__dot"></i>
+        <b class="wz-pin__lbl">{p.name}</b>
+      </span>
+    ))}
+  </div>
+  </div>
+  <div class="wz-map__escala" aria-hidden="true"><i style={`width:calc(${(escala / VW).toFixed(4)} * max(100cqw, 120cqh))`}></i><span>{millas} mi</span></div>
+</div>
+
+<style>
+  /* El marco puede tener cualquier proporción (en el panel se estira al alto de la lista):
+     el escenario guarda el 6:5 del dibujo y lo recorta como "cover", centrado, para que puntos
+     HTML y SVG coincidan siempre. */
+  .wz-map { position: relative; overflow: hidden; aspect-ratio: 6 / 5; background: #19140e; container-type: size; }
+  .wz-map__st {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: max(100cqw, 120cqh); height: max(100cqh, 83.3333cqw);
+  }
+  .wz-map svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .wz-map path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .wz-map__tierra { fill: #19140e; }
+  /* Agua: noche más honda con una costa fina en oro (la misma lectura que el mapa del hub). */
+  .wz-map .wz-map__agua { fill: #050505; stroke: rgba(220, 192, 137, .5); stroke-width: 1; }
+  .wz-map__bayou { stroke: rgba(6, 5, 5, .95); stroke-width: 1.6; }
+  .wz-map__r2 { stroke: rgba(214, 180, 118, .22); stroke-width: .7; }
+  .wz-map__r1h { stroke: rgba(220, 180, 110, .10); stroke-width: 4.5; }
+  .wz-map__r1 { stroke: rgba(244, 224, 180, .62); stroke-width: 1.1; }
+
+  .wz-map__pins { position: absolute; inset: 0; }
+  .wz-pin {
+    position: absolute; width: 0; height: 0; cursor: pointer;
+    --pin: var(--fg-primary, #f0ede8);
+  }
+  /* Zona de toque de 40 px alrededor del punto (el rótulo también responde). */
+  .wz-pin::before { content: ''; position: absolute; left: -20px; top: -20px; width: 40px; height: 40px; border-radius: 50%; }
+  .wz-pin__dot {
+    position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%;
+    background: #13100c; box-shadow: inset 0 0 0 2.5px var(--pin), 0 0 0 4px rgba(19, 16, 12, .7);
+    transition: transform .25s var(--ease-out-expo, ease), box-shadow .25s;
+  }
+  .wz-pin--own { --pin: var(--accent-gold); }
+  .wz-pin--here { --pin: var(--accent-gold); }
+  .wz-pin--here .wz-pin__dot { background: var(--accent-gold); box-shadow: 0 0 0 4px rgba(var(--accent-gold-rgb), .22), 0 0 0 10px rgba(var(--accent-gold-rgb), .08); }
+  .wz-pin__lbl {
+    position: absolute; left: 14px; top: 0; transform: translateY(-50%); white-space: nowrap;
+    padding: 4px 8px; border-radius: 6px;
+    font: 500 13px/1.1 var(--font-body); color: var(--w-ink-80, rgba(240, 237, 232, .8));
+    background: rgba(12, 10, 8, .78); box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .08);
+    transition: color .2s, background-color .2s, box-shadow .2s;
+  }
+  .wz-pin--izq .wz-pin__lbl { left: auto; right: 14px; }
+  .wz-pin--arr .wz-pin__lbl { left: 0; right: auto; top: -14px; transform: translate(-50%, -100%); }
+  .wz-pin--here .wz-pin__lbl { color: var(--accent-gold); font-weight: 600; }
+  /* Zona elegida en la lista (o señalada al pasar por ella). */
+  .wz-pin.is-sel .wz-pin__dot, .wz-pin.is-hint .wz-pin__dot { transform: scale(1.25); }
+  .wz-pin.is-sel .wz-pin__lbl, .wz-pin.is-hint .wz-pin__lbl {
+    color: var(--w-p-ink, #0e0e0d); background: var(--fg-primary, #f0ede8); box-shadow: none;
+  }
+  .wz-pin--here.is-sel .wz-pin__lbl { background: var(--accent-gold); }
+  .wz-pin.is-sel { z-index: 2; }
+
+  .wz-map__escala {
+    position: absolute; left: 16px; bottom: 14px; width: 100%; display: flex; align-items: center; gap: 8px;
+    font: 500 11px/1 var(--font-mono, monospace); letter-spacing: .06em; color: rgba(240, 237, 232, .6);
+  }
+  .wz-map__escala i {
+    display: block; height: 6px; border: 1px solid rgba(240, 237, 232, .5); border-top: 0; 
+  }
+  @media (--motion-reduce) { .wz-pin__dot, .wz-pin__lbl { transition: none; } }
+  @media (--lt-md) { .wz-pin__lbl { font-size: 12px; padding: 3px 6px; } }
+</style>

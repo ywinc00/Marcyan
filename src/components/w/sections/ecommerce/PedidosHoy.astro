@@ -24,9 +24,9 @@ const en = lang === 'en';
 type Row = [ProductoId, string, string];
 const ROWS: Row[] = en
   ? [['vela', 'Scented candle', 'Ana R.'], ['cafe', 'Ground coffee, 2 lb', 'Luis M.'], ['caja', 'Gift box', 'Sofía G.'],
-     ['taza', 'Clay mug', 'Carlos D.'], ['viaje', 'Travel candle', 'Marta P.'], ['cafe', 'Whole bean coffee', 'Jorge T.']]
+     ['taza', 'Clay mug', 'Carlos D.'], ['viaje', 'Travel candle', 'Marta P.'], ['grano', 'Whole bean coffee', 'Jorge T.']]
   : [['vela', 'Vela aromática', 'Ana R.'], ['cafe', 'Café de olla, 1 kg', 'Luis M.'], ['caja', 'Caja de regalo', 'Sofía G.'],
-     ['taza', 'Taza de barro', 'Carlos D.'], ['viaje', 'Vela de viaje', 'Marta P.'], ['cafe', 'Café en grano, 1 kg', 'Jorge T.']];
+     ['taza', 'Taza de barro', 'Carlos D.'], ['viaje', 'Vela de viaje', 'Marta P.'], ['grano', 'Café en grano, 1 kg', 'Jorge T.']];
 // Estado inicial (y quieto) de cada fila: 2 = Listo, 1 = Preparando, 0 = Pagado.
 const INI = [2, 1, 1, 0, 0, 0];
 const T = en
@@ -139,7 +139,7 @@ const T = en
   .ph__s { margin: 4px 0 16px; font-size: 13.5px; line-height: 1.4; color: var(--ph-ink2); }
   .ph__cols {
     display: flex; justify-content: space-between; margin: 0; padding: 0 0 8px;
-    font: 500 10.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ph-ink2);
+    font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ph-ink2);
   }
   .ph__cols span:last-child { width: 112px; }
   .ph__view {

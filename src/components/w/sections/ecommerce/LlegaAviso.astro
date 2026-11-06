@@ -5,8 +5,9 @@
 // más un anillo que cuenta en bucle). Versión local de la tienda mientras P03 no esté integrado ([SISTEMA]).
 //
 // Aquí: el navegador enseña la página de "gracias" de Tu Tienda (pedido pagado) y de él NACEN dos líneas de
-// 1 px (resuelve la línea sin origen de FI §3-9) hasta los satélites: el correo al dueño y el aviso por
-// WhatsApp (LogoMarca de P06 a color, uso nominativo). Las líneas se dibujan con stroke-dashoffset (700 ms)
+// 1 px (resuelve la línea sin origen de FI §3-9) hasta los satélites: el correo al dueño y el pedido que
+// entra en el panel de su tienda. (Revisión r1: el satélite de WhatsApp prometía un aviso que la página no
+// vende, WhatsApp es un botón para el cliente; se cambió por el panel, que toda tienda trae.) Las líneas se dibujan con stroke-dashoffset (700 ms)
 // y los satélites entran con translateY(8px)→0 a los 0,6 y 0,9 s, tiempos del original.
 // Pantalla viva (§1.5): cada 5 s entra el pedido siguiente (3 pedidos de ejemplo en rueda) y la escena se
 // repite; registerLoop la pausa fuera de vista, con la pestaña oculta, con foco o puntero dentro y con su
@@ -15,7 +16,6 @@
 // dos satélites debajo, solapando su borde, con la línea corta que sube hasta el navegador.
 // Contrato común (§1.6): aria-hidden + data-nosnippet + sr-only, sin h1-h6, sin enlaces.
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
-import LogoMarca from '../../marcas/LogoMarca.astro';
 import ProductoArte, { type ProductoId } from './ProductoArte.astro';
 import { negocios } from '../../objetos/ejemplos/negocios';
 
@@ -36,11 +36,11 @@ const T = en
   ? { url: 'yourshop.example/thanks', ex: 'Example', nav: ['Shop', 'Coffee', 'Candles'], thanks: (f: string) => `Thank you, ${f}.`,
       paid: (n: string) => `Order #${n} is paid.`, how: miami ? 'Shipping to your address' : 'Pickup today at the shop',
       mail: 'Email', now: 'now', mailT: (n: string) => `New order #${n}`, mailB: (w: string, p: string) => `${w} paid for ${p}.`,
-      wa: (o: Ord) => `New order #${o.n}: ${o.who}, ${o.prod}. Paid by card.` }
+      panel: 'Your store admin', pst: 'Paid' }
   : { url: 'tutienda.example/gracias', ex: 'Ejemplo', nav: ['Tienda', 'Café', 'Velas'], thanks: (f: string) => `Gracias, ${f}.`,
       paid: (n: string) => `Tu pedido #${n} está pagado.`, how: miami ? 'Envío a tu dirección' : 'Recogida hoy en la tienda',
       mail: 'Correo', now: 'ahora', mailT: (n: string) => `Pedido nuevo #${n}`, mailB: (w: string, p: string) => `${w} pagó ${p}.`,
-      wa: (o: Ord) => `Pedido nuevo #${o.n}: ${o.who}, ${o.prod}. Pagado con tarjeta.` };
+      panel: 'Tu panel', pst: 'Pagado' };
 const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P.accent}`;
 ---
 <div class="la" data-la data-nosnippet style={vars}>
@@ -112,17 +112,25 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
       </div>
     </div>
 
-    <div class="la__sat la__sat--wa">
+    <div class="la__sat la__sat--panel">
       <p class="la__sh">
-        <LogoMarca id="whatsapp" size={15} tono="color" titulo="" />
-        <span>WhatsApp</span><time>{T.now}</time>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5" /><path d="M3 9h18M8 13.5h8M8 16.5h5" /></svg>
+        <span>{T.panel}</span><time>{T.now}</time>
       </p>
       <div class="la__swap">
         {[ORD[0]].map((o, i) => (
-          <div class="la__sb" data-i={i}><span class="la__bub">{T.wa(o)}</span></div>
+          <div class="la__sb la__prow" data-i={i}>
+            <span class="la__pth"><ProductoArte id={o.art} size={30} sombra={false} /></span>
+            <span class="la__ptx"><b>#{o.n} · {o.who}</b><span>{o.prod}</span></span>
+            <span class="la__pst">{T.pst}</span>
+          </div>
         ))}
 <template data-la-t>{ORD.slice(1).map((o, j) => { const i = j + 1; return (
-          <div class="la__sb" data-i={i}><span class="la__bub">{T.wa(o)}</span></div>
+          <div class="la__sb la__prow" data-i={i}>
+            <span class="la__pth"><ProductoArte id={o.art} size={30} sombra={false} /></span>
+            <span class="la__ptx"><b>#{o.n} · {o.who}</b><span>{o.prod}</span></span>
+            <span class="la__pst">{T.pst}</span>
+          </div>
         ); })}</template>
       </div>
     </div>
@@ -164,6 +172,8 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
       stop: () => window.clearTimeout(timer),
       still: () => { window.clearTimeout(timer); o = 0; stage.dataset.o = '0'; stage.classList.remove('is-run'); el.classList.add('is-still'); },
     }, { buttonTone: 'dark' });
+    // En PC el botón de pausa se recoge dentro de la esquina del navegador (revisión r1, menor 3).
+    el.querySelector<HTMLElement>(':scope > .w-loop-pause')?.classList.add('la__pause');
   });
 </script>
 
@@ -215,20 +225,35 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
 
   /* Satélites 270×150 radio 30 que sobresalen por los lados (W-CORE-30). */
   .la__sat {
-    position: absolute; z-index: 3; width: 270px; min-height: 140px; padding: 18px 20px; border-radius: 30px;
+    position: absolute; z-index: 3; width: 270px; padding: 18px 20px; border-radius: 30px;
     background: var(--la-sat); color: #1B1A17;
     box-shadow: 0 0 0 1px rgba(27, 26, 23, .05), 0 30px 60px -24px rgba(0, 0, 0, .75), 0 10px 20px -10px rgba(0, 0, 0, .4);
   }
   .la__sat--mail { left: 16px; top: 180px; }
-  .la__sat--wa { left: 712px; top: 120px; }
+  .la__sat--panel { left: 712px; top: 120px; }
   .la__sh { display: flex; align-items: center; gap: 7px; margin: 0 0 12px; font-size: 12px; font-weight: 500; color: #5F5A52; }
   .la__sh time { margin-left: auto; font: 500 11px/1 var(--font-mono); color: #7A746B; }
   .la__sb { display: flex; flex-direction: column; gap: 4px; line-height: 1.35; }
   .la__sb b { font: 500 15px/1.25 var(--font-display); letter-spacing: -.01em; color: #1B1A17; }
-  .la__sb > span:not(.la__bub) { font-size: 13px; color: #4F4A43; }
-  .la__bub {
-    position: relative; display: block; padding: 9px 12px; border-radius: 12px 12px 12px 4px;
-    background: #D9FDD3; color: #111B21; font-size: 13px; line-height: 1.4;
+  .la__sb > span { font-size: 13px; color: #4F4A43; }
+  /* Panel de la tienda: la fila del pedido nuevo, encendida (miniatura, número y cliente, estado). */
+  .la__prow {
+    flex-direction: row; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px;
+    background: #F1EBE0; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .08);
+  }
+  .la__pth { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: var(--la-bg); flex: none; }
+  .la__ptx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+  .la__ptx b { font: 500 13px/1.3 var(--font-body); color: #1B1A17; white-space: nowrap; }
+  .la__ptx span { font-size: 12px; color: #5F5A52; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .la__sb > .la__pst {
+    flex: none; padding: 3px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 500;
+    color: var(--la-acc); background: rgba(78, 90, 61, .12); box-shadow: inset 0 0 0 1px rgba(78, 90, 61, .3);
+  }
+  @media (min-width: 1080px) {
+    .la > :global(.la__pause) {
+      right: calc(50% - 300px + 14px) !important; bottom: 54px !important;
+      border-color: rgba(14, 14, 13, .18) !important; background: rgba(255, 255, 255, .55) !important; color: rgba(14, 14, 13, .7) !important;
+    }
   }
 
   /* Rueda de pedidos: se ve el de data-o. */
@@ -240,9 +265,9 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
   .la__stage.is-run .la__lines path { animation: la-line 700ms var(--w-ease-ui) 300ms both; }
   .la__stage.is-run .la__lines path + path { animation-delay: 420ms; }
   .la__stage.is-first .la__sat--mail { animation: la-up 800ms cubic-bezier(.22, 1, .36, 1) 600ms both; }
-  .la__stage.is-first .la__sat--wa { animation: la-up 800ms cubic-bezier(.22, 1, .36, 1) 900ms both; }
+  .la__stage.is-first .la__sat--panel { animation: la-up 800ms cubic-bezier(.22, 1, .36, 1) 900ms both; }
   .la__stage.is-run .la__sat--mail .la__sb { animation: la-in 420ms var(--w-ease-ui) 450ms both; }
-  .la__stage.is-run .la__sat--wa .la__sb { animation: la-in 420ms var(--w-ease-ui) 650ms both; }
+  .la__stage.is-run .la__sat--panel .la__sb { animation: la-in 420ms var(--w-ease-ui) 650ms both; }
   .la__stage.is-run .la__sh time { animation: la-in 300ms var(--w-ease-ui) 700ms both; }
   @keyframes la-in { from { opacity: 0; transform: translateY(6px); } }
   @keyframes la-line { from { stroke-dashoffset: 220; } to { stroke-dashoffset: 0; } }
@@ -272,8 +297,12 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
     .la__stage { column-gap: 10px; }
     .la__sat { padding: 14px 14px; border-radius: 22px; min-height: 0; }
     .la__sb b { font-size: 13.5px; }
-    .la__sb > span:not(.la__bub), .la__bub { font-size: 12px; }
-    .la__bub { padding: 8px 10px; }
+    .la__sb > span { font-size: 12px; }
+    .la__prow { padding: 6px 8px; gap: 8px; }
+    .la__pth { width: 30px; height: 30px; }
+    .la__ptx b { font-size: 12px; }
+    .la__ptx span { font-size: 11.5px; }
+    .la__sb > .la__pst { display: none; }
     .la__url { font-size: 11px; padding: 0 8px; }
     .la__bar { grid-template-columns: 44px 1fr 8px; }
   }
@@ -282,7 +311,7 @@ const vars = `--la-bg:${P.bg};--la-ink:${P.ink};--la-ink2:${P.ink2};--la-acc:${P
     .la__stage { grid-template-columns: 1fr; }
     .la__sat { margin-top: 12px; }
     .la__sat--mail { margin-top: -40px; }
-    .la__sat--wa::before { display: none; }
+    .la__sat--panel::before { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .la__stage.is-run * { animation: none !important; }

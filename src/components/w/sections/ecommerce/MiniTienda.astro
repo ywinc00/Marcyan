@@ -47,7 +47,6 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
           </span>
           <span class="mt__name" lang="en">Clay mug</span>
           <span class="mt__sub" lang="en">Hand-thrown, glazed in sage. Made in small batches.</span>
-          <span class="mt__ex">Ejemplo</span>
           <span class="mt__btn" lang="en">Add to cart</span>
         </div>
       </div>
@@ -60,7 +59,6 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
           <div class="mt__info">
             <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
             <span class="mt__name">Vela aromática</span>
-            <span class="mt__ex">Ejemplo</span>
             <span class="mt__lbl">Color · Cera natural</span>
             <span class="mt__sw"><i class="is-on" style="--c:#B47A3C"></i><i style="--c:#7F8E66"></i><i style="--c:#7C8A8D"></i><i style="--c:#EFE6D4"></i></span>
             <span class="mt__lbl">Tamaño</span>
@@ -144,7 +142,7 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
   .mt__ob { display: inline-flex; align-items: center; gap: 6px; }
   .mt__foot { display: block; margin-top: 10px; text-align: center; font: 500 11px/1 var(--font-mono); letter-spacing: .02em; color: var(--w-ink-60); }
   :global(.mt__logo) { color: var(--mt-ink2); }
-  .mt__mono, .mt__ex { font-family: var(--font-mono); font-weight: 500; }
+  .mt__mono { font-family: var(--font-mono); font-weight: 500; }
   /* Ficha */
   .mt__pdp { display: grid; grid-template-columns: 150px 1fr; gap: 18px; }
   .mt__img { display: grid; place-items: center; min-height: 176px; border-radius: 10px; background: var(--mt-tile); box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .05); }
@@ -159,12 +157,11 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
   .mt__seg .is-on { background: var(--mt-ink); color: #F8F5EE; }
   .mt__name { font: 500 17px/1.2 var(--font-display); letter-spacing: -.015em; }
   .mt__sub { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
-  .mt__ex { margin-top: 7px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
   .mt__btn {
     margin-top: auto; align-self: stretch; height: 32px; display: grid; place-items: center; border-radius: 7px;
     background: var(--mt-acc); color: #F8F5EE; font-size: 13px; font-weight: 500;
   }
-  .mt--idiomas .mt__ex { margin-bottom: 14px; }
+  .mt--idiomas .mt__sub { margin-bottom: 14px; }
   .mt__lbl { margin-top: 12px; font-size: 11px; color: var(--mt-ink2); }
   .mt__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
   .mt__chips span { padding: 5px 9px; border-radius: 999px; font-size: 12px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18); color: var(--mt-ink2); }
@@ -220,7 +217,7 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
   .mt__res b { font: 500 15px/1.3 var(--font-display); color: var(--mt-acc); }
   .mt__res > span:last-child { font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
   .mt__ai { display: flex; flex-direction: column; gap: 5px; padding: 11px 13px; border-radius: 10px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1); font-size: 12.5px; line-height: 1.45; }
-  .mt__ail { font: 500 10.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
+  .mt__ail { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
   .mt__ai b { font-weight: 600; }
   @media (max-width: 420px) {
     .mt__card { padding: 14px; }

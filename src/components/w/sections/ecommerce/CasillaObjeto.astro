@@ -1,0 +1,95 @@
+---
+// Detalle de objeto de las casillas de texto de "Todo conectado" (revisión r1, menor 1: Entregas eran seis
+// rectángulos de solo texto). No es un icono en caja (FI §3-2): es un objeto plano pequeño, a color, con la
+// paleta kraft/salvia/ámbar de "Tu Tienda", directamente sobre la casilla clara, sin fondo ni marco propio.
+// Sin ids internos (puede repetirse en las tres pestañas). Decorativo: aria-hidden; la función va en texto.
+import type { CasillaObj } from '../../../../i18n/w/ecommerce';
+interface Props { obj: CasillaObj }
+const { obj } = Astro.props;
+const INK = '#1B1A17', SAL = '#7F8E66', SAL2 = '#4E5A3D', AMB = '#C2703D', KR = '#C9A97E', CR = '#EFE6D4';
+---
+<svg class="co" width="56" height="30" viewBox="0 0 56 30" aria-hidden="true" focusable="false" fill="none">
+  {obj === 'tarjeta' && (<g>
+    <rect x="12" y="4" width="32" height="22" rx="3.5" fill={SAL2} />
+    <rect x="12" y="8.5" width="32" height="4" fill={INK} opacity=".55" />
+    <rect x="16" y="16" width="7" height="5.4" rx="1.2" fill={KR} />
+    <path d="M28 19.6h11" stroke={CR} stroke-width="1.6" stroke-linecap="round" opacity=".8" />
+  </g>)}
+  {obj === 'candado' && (<g>
+    <path d="M22 13V9.5a6 6 0 0 1 12 0V13" stroke={INK} stroke-width="2.4" />
+    <rect x="18" y="12" width="20" height="15" rx="3" fill={SAL} />
+    <path d="M23.6 19.4l3 3 5.8-6" stroke={CR} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>)}
+  {obj === 'cupon' && (<g>
+    <path d="M10 6h36v6a3 3 0 0 0 0 6v6H10v-6a3 3 0 0 0 0-6z" fill={AMB} />
+    <path d="M33 7v16" stroke={CR} stroke-width="1.2" stroke-dasharray="2 2" />
+    <path d="M17.5 19.5l7-9" stroke={CR} stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="18.5" cy="11.6" r="1.8" fill={CR} /><circle cx="23.6" cy="18.4" r="1.8" fill={CR} />
+  </g>)}
+  {obj === 'globo' && (<g>
+    <circle cx="28" cy="15" r="12" fill={SAL} />
+    <path d="M22 7.5c3 1.5 2 4.5 5 5.5 2.6.9 2.2 4-.6 4.6-2.4.5-2.4 3.6-1 6.4M34.5 9c-2 1.8-1 3.8.8 4.6 1.8.8 1.6 3.2.2 4.8" stroke={CR} stroke-width="1.4" stroke-linecap="round" />
+    <circle cx="28" cy="15" r="12" stroke={SAL2} stroke-width="1.2" />
+  </g>)}
+  {obj === 'ruta' && (<g>
+    <circle cx="11" cy="22" r="3.4" fill={SAL2} />
+    <path d="M14.5 22c8 0 6-12 15-12 6 0 7 4 10 4" stroke={INK} stroke-width="1.5" stroke-dasharray="2.6 2.6" stroke-linecap="round" opacity=".55" />
+    <path d="M44 4.5a6 6 0 0 1 6 6c0 4.6-6 10.5-6 10.5s-6-5.9-6-10.5a6 6 0 0 1 6-6z" fill={AMB} />
+    <circle cx="44" cy="10.5" r="2.2" fill={CR} />
+  </g>)}
+  {obj === 'zonas' && (<g>
+    <path d="M8 6l12-2 2 11-13 3z" fill={SAL2} />
+    <path d="M20 4l15 1-2 12-11-2z" fill={SAL} />
+    <path d="M35 5l13 3-2 13-13-4z" fill={KR} />
+    <path d="M9 18l13-3 11 2-1 9-22 1z" fill={AMB} opacity=".85" />
+    <path d="M33 17l13 4-1 6-13-1z" fill={SAL} opacity=".6" />
+  </g>)}
+  {obj === 'tienda' && (<g>
+    <rect x="14" y="13" width="28" height="15" rx="1.5" fill={CR} stroke={KR} stroke-width="1" />
+    <path d="M12 6h32l2 7H10z" fill={SAL} />
+    <path d="M18 6l-1.6 7M24 6l-.6 7M32 6l.6 7M38 6l1.6 7" stroke={CR} stroke-width="2.4" />
+    <rect x="24" y="18" width="8" height="10" rx="1" fill={SAL2} />
+  </g>)}
+  {obj === 'paquete' && (<g>
+    <path d="M14 10l14-6 14 6-14 6z" fill="#D9BE94" />
+    <path d="M14 10v13l14 6V16z" fill={KR} />
+    <path d="M42 10v13l-14 6V16z" fill="#B08E62" />
+    <path d="M21 7l14 6v5" stroke={AMB} stroke-width="2.4" />
+  </g>)}
+  {obj === 'recibo' && (<g>
+    <path d="M18 3h20v24l-2.5-1.6L33 27l-2.5-1.6L28 27l-2.5-1.6L23 27l-2.5-1.6L18 27z" fill={CR} stroke={KR} stroke-width="1" />
+    <path d="M22 9h12M22 13h8" stroke={INK} stroke-width="1.4" stroke-linecap="round" opacity=".45" />
+    <path d="M22 19h12" stroke={INK} stroke-width="2" stroke-linecap="round" />
+  </g>)}
+  {obj === 'camion' && (<g>
+    <rect x="8" y="7" width="24" height="15" rx="1.5" fill={KR} />
+    <path d="M32 11h8l5 5.5V22H32z" fill={SAL} />
+    <path d="M35 12.6h4.2l3 3.4H35z" fill={CR} />
+    <circle cx="15" cy="23" r="3.4" fill={INK} /><circle cx="39" cy="23" r="3.4" fill={INK} />
+    <circle cx="15" cy="23" r="1.2" fill={CR} /><circle cx="39" cy="23" r="1.2" fill={CR} />
+  </g>)}
+  {obj === 'sobre' && (<g>
+    <rect x="12" y="5" width="30" height="20" rx="2.5" fill={CR} stroke={KR} stroke-width="1" />
+    <path d="M12.8 6.5L27 17l14.2-10.5" stroke={KR} stroke-width="1.4" />
+    <circle cx="42" cy="22" r="6" fill={SAL} />
+    <path d="M39.3 22.1l1.9 1.9 3.6-3.8" stroke={CR} stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  </g>)}
+  {obj === 'campana' && (<g>
+    <path d="M28 4.5a8 8 0 0 1 8 8v6l2.6 3.5H17.4L20 18.5v-6a8 8 0 0 1 8-8z" fill={SAL} />
+    <path d="M24.6 24.5a3.4 3.4 0 0 0 6.8 0z" fill={SAL2} />
+    <circle cx="36.5" cy="7" r="4.2" fill={AMB} />
+  </g>)}
+  {obj === 'idioma' && (<g>
+    <rect x="7" y="7" width="20" height="16" rx="4" fill={SAL2} />
+    <rect x="29" y="7" width="20" height="16" rx="4" fill="none" stroke={SAL2} stroke-width="1.4" />
+    <text x="17" y="18.6" text-anchor="middle" font-size="9" font-weight="600" fill={CR} font-family="var(--font-mono), monospace">ES</text>
+    <text x="39" y="18.6" text-anchor="middle" font-size="9" font-weight="600" fill={SAL2} font-family="var(--font-mono), monospace">EN</text>
+  </g>)}
+  {obj === 'chat' && (<g>
+    <path d="M10 5h30a4 4 0 0 1 4 4v9a4 4 0 0 1-4 4H22l-6 5v-5h-6a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4z" fill={SAL} />
+    <circle cx="17" cy="13.5" r="1.8" fill={CR} /><circle cx="25" cy="13.5" r="1.8" fill={CR} /><circle cx="33" cy="13.5" r="1.8" fill={CR} />
+  </g>)}
+</svg>
+<style>
+  .co { display: block; flex: none; }
+</style>

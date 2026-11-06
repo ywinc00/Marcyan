@@ -14,6 +14,7 @@ import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Ejemplo from '../../Ejemplo.astro';
 import LogoMarca from '../../marcas/LogoMarca.astro';
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import CasillaObjeto from './CasillaObjeto.astro';
 import type { ShopCopy } from '../../../../i18n/w/ecommerce';
 
 interface Props { copy: ShopCopy['conectado']; n: number; lang?: 'es' | 'en'; uid?: string }
@@ -57,8 +58,9 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
           </svg>
           <ul class="tc__grid">
             {t.tiles.map((tile) => (
-              <li class:list={['tc__tile', tile.logo && 'tc__tile--logo']}>
+              <li class:list={['tc__tile', (tile.logo || tile.obj) && 'tc__tile--logo']}>
                 {tile.logo && <LogoMarca id={tile.logo} size={26} tono="color" titulo="" />}
+                {!tile.logo && tile.obj && <CasillaObjeto obj={tile.obj} />}
                 <span class="tc__tx"><b>{tile.name}</b><span>{tile.sub}</span></span>
               </li>
             ))}

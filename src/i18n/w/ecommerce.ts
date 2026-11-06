@@ -17,7 +17,15 @@ export type ShopCity = 'houston' | 'miami';
 
 /** Casilla de "Todo conectado": con `logo`, el logo de la plataforma (P06) que la página ya nombra;
  *  sin él, la función en texto (nombre + detalle), sin icono en caja (v2 G04). */
-export interface TileCopy { logo?: 'stripe' | 'paypal' | 'shopify' | 'whatsapp'; name: string; sub: string }
+export interface TileCopy {
+  logo?: 'stripe' | 'paypal' | 'shopify' | 'whatsapp'; name: string; sub: string;
+  /** Sin logo: detalle de objeto plano (CasillaObjeto, revisión r1 menor 1), nunca icono en caja. */
+  obj?: CasillaObj;
+}
+export type CasillaObj =
+  | 'tarjeta' | 'candado' | 'cupon' | 'globo'
+  | 'ruta' | 'zonas' | 'tienda' | 'paquete' | 'recibo' | 'camion'
+  | 'sobre' | 'campana' | 'idioma' | 'chat';
 export interface ShopCopy {
   chip: string;
   cityName: string;
@@ -74,11 +82,11 @@ const plataforma = {
 };
 
 const mensajeria: TileCopy[] = [
-  { name: 'Confirmación', sub: 'Correo al cliente' },
-  { name: 'Pedido nuevo', sub: 'Aviso para ti' },
+  { name: 'Confirmación', sub: 'Correo al cliente', obj: 'sobre' },
+  { name: 'Pedido nuevo', sub: 'Aviso para ti', obj: 'campana' },
   { logo: 'whatsapp', name: 'WhatsApp', sub: 'Botón en tu tienda' },
-  { name: 'En su idioma', sub: 'Español o inglés' },
-  { name: 'Marcy', sub: 'Servicio aparte' },
+  { name: 'En su idioma', sub: 'Español o inglés', obj: 'idioma' },
+  { name: 'Marcy', sub: 'Servicio aparte', obj: 'chat' },
 ];
 
 const franja: ShopCopy['franja'] = {
@@ -127,8 +135,8 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       ],
       aviso: {
         title: '¿Y a ti cómo te llega?',
-        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y por WhatsApp, con lo que compró y cómo lo recibe.',
-        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo y un aviso por WhatsApp con el pedido.',
+        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y el pedido entra en tu panel, con lo que compró y cómo lo recibe.',
+        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo con el pedido, que también aparece en el panel de tu tienda.',
       },
     },
     conectado: {
@@ -139,18 +147,18 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       platforms: 'WooCommerce o a medida',
       tabs: [
         { id: 'pagos', label: 'Pagos', tiles: [
-          { name: 'Tarjeta', sub: 'Crédito y débito' },
+          { name: 'Tarjeta', sub: 'Crédito y débito', obj: 'tarjeta' },
           { logo: 'stripe', name: 'Stripe', sub: 'Pasarela de pago' },
           { logo: 'paypal', name: 'PayPal', sub: 'Pago con su cuenta' },
-          { name: 'Pago seguro', sub: 'Conexión cifrada' },
-          { name: 'Cupones', sub: 'Para tus ofertas' },
+          { name: 'Pago seguro', sub: 'Conexión cifrada', obj: 'candado' },
+          { name: 'Cupones', sub: 'Para tus ofertas', obj: 'cupon' },
         ] },
         { id: 'entregas', label: 'Entregas', tiles: [
-          { name: 'Entrega local', sub: 'Por zonas de Houston' },
-          { name: 'Zonas', sub: 'Cada una con su costo' },
-          { name: 'Recogida', sub: 'En tu negocio' },
-          { name: 'Paquetería', sub: 'Fuera de tu zona' },
-          { name: 'Costo claro', sub: 'Antes de pagar' },
+          { name: 'Entrega local', sub: 'Por zonas de Houston', obj: 'ruta' },
+          { name: 'Zonas', sub: 'Cada una con su costo', obj: 'zonas' },
+          { name: 'Recogida', sub: 'En tu negocio', obj: 'tienda' },
+          { name: 'Paquetería', sub: 'Fuera de tu zona', obj: 'paquete' },
+          { name: 'Costo claro', sub: 'Antes de pagar', obj: 'recibo' },
         ] },
         { id: 'mensajes', label: 'Mensajería', tiles: mensajeria },
       ],
@@ -218,8 +226,8 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       ],
       aviso: {
         title: '¿Y a ti cómo te llega?',
-        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y por WhatsApp, con lo que compró y a dónde se envía.',
-        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo y un aviso por WhatsApp con el pedido.',
+        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y el pedido entra en tu panel, con lo que compró y a dónde se envía.',
+        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo con el pedido, que también aparece en el panel de tu tienda.',
       },
     },
     conectado: {
@@ -230,18 +238,18 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       platforms: 'WooCommerce o a medida',
       tabs: [
         { id: 'pagos', label: 'Pagos', tiles: [
-          { name: 'Tarjeta', sub: 'Crédito y débito' },
+          { name: 'Tarjeta', sub: 'Crédito y débito', obj: 'tarjeta' },
           { logo: 'stripe', name: 'Stripe', sub: 'Pasarela de pago' },
           { logo: 'paypal', name: 'PayPal', sub: 'Pago con su cuenta' },
-          { name: 'Tarjetas de fuera', sub: 'También de Latinoamérica' },
-          { name: 'Cupones', sub: 'Para tus ofertas' },
+          { name: 'Tarjetas de fuera', sub: 'También de Latinoamérica', obj: 'globo' },
+          { name: 'Cupones', sub: 'Para tus ofertas', obj: 'cupon' },
         ] },
         { id: 'envios', label: 'Envíos', tiles: [
-          { name: 'Miami', sub: 'Entrega en la ciudad' },
-          { name: 'Otros estados', sub: 'Tarifa por destino' },
-          { name: 'Latinoamérica', sub: 'Si tu producto lo permite' },
-          { name: 'Tarifas por país', sub: 'Cada una con su costo' },
-          { name: 'Costo claro', sub: 'Antes de pagar' },
+          { name: 'Miami', sub: 'Entrega en la ciudad', obj: 'ruta' },
+          { name: 'Otros estados', sub: 'Tarifa por destino', obj: 'camion' },
+          { name: 'Latinoamérica', sub: 'Si tu producto lo permite', obj: 'globo' },
+          { name: 'Tarifas por país', sub: 'Cada una con su costo', obj: 'zonas' },
+          { name: 'Costo claro', sub: 'Antes de pagar', obj: 'recibo' },
         ] },
         { id: 'mensajes', label: 'Mensajería', tiles: mensajeria },
       ],

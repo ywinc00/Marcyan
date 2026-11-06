@@ -43,7 +43,6 @@ const SR = {
           <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="pt__logo" />
           <span class="pt__name">{T.name}</span>
           <span class="pt__sub">{T.sub}</span>
-          <span class="pt__ex">{T.ex}</span>
           <span class="pt__lbl">{T.size}</span>
           <span class="pt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
           <span class="pt__qty"><span>−</span><b>1</b><span>+</span></span>
@@ -125,7 +124,7 @@ const SR = {
     background: var(--pt-bg); color: var(--pt-ink); border-radius: 14px; padding: 16px;
     box-shadow: 0 0 0 1px rgba(42, 33, 27, .06), 0 18px 40px -22px rgba(0, 0, 0, .7);
   }
-  .pt__mono, .pt__ex, .pt__ex2, .pt__num { font-family: var(--font-mono); font-weight: 500; }
+  .pt__mono, .pt__ex2, .pt__num { font-family: var(--font-mono); font-weight: 500; }
   /* Producto */
   .pt__pdp { display: grid; grid-template-columns: 118px 1fr; gap: 14px; }
   .pt__img {
@@ -136,7 +135,6 @@ const SR = {
   .pt__info > :global(.pt__logo) { color: var(--pt-ink2); margin-bottom: 10px; }
   .pt__name { font: 500 15px/1.2 var(--font-display); letter-spacing: -.01em; }
   .pt__sub { margin-top: 3px; font-size: 12px; line-height: 1.35; color: var(--pt-ink2); }
-  .pt__ex { margin-top: 6px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--pt-ink2); }
   .pt__lbl { margin-top: 10px; font-size: 11px; color: var(--pt-ink2); }
   .pt__sizes { display: flex; gap: 12px; margin-top: 3px; font: 500 13px/1 var(--font-display); }
   .pt__sizes span { padding-bottom: 3px; color: var(--pt-ink2); }
@@ -172,7 +170,7 @@ const SR = {
   .pt__by b { font-weight: 600; color: var(--pt-ink); margin-left: -2px; }
   .pt__by { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0 0; font-size: 11px; color: var(--pt-ink2); }
   /* Estado */
-  .pt__ex2 { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--pt-ink2); }
+  .pt__ex2 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--pt-ink2); }
   .pt__who { margin: -6px 0 18px; font-size: 12.5px; color: var(--pt-ink2); }
   .pt__rail { display: flex; align-items: flex-start; margin-bottom: 18px; }
   .pt__rail s { flex: 1; height: 2px; margin-top: 8px; background: rgba(42, 33, 27, .14); position: relative; overflow: hidden; }

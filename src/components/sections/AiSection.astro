@@ -1,279 +1,154 @@
 ---
-// Sección "Tecnología Marcyan" (IA) — 2 columnas:
-//  · Izquierda: intro + 4 capacidades (TEXTOS reales de content.ts).
-//  · Derecha: demo ILUSTRATIVO de un asistente (burbujas que se escriben solas,
-//    typing dots, "lead capturado") + riel de flujo. Es decorativo (aria-hidden):
-//    SSR renderiza el estado final → sin JS / reduced-motion se ve completo y quieto;
-//    con JS + movimiento permitido, se re-anima en bucle. Acento teal.
+// Sección "Tecnología Marcyan" (#ia) · vuelta 2 (design/rediseno-workos-v2.md §3 G01, notas 1 y 8).
+// Se conservan section#ia[data-fx="teal"], kicker, H2, bajada, las 4 capacidades y el botón de
+// content.ts (verbatim). Dos tramos:
+//  (a) Izquierda: texto. Derecha: VentanaAgente guion "marcy" piel "noche" (P05, W-ADV-16 +
+//      W-NEW-04): Marcy atiende una petición real y el visitante elige qué más le pide; marca del
+//      modelo = LogoMarca claude. Debajo, las 4 capacidades en filas/columnas con filetes de 1 px.
+//  (b) "Así está montada", en zigzag con el tramo (a) (escritorio): a la izquierda ChipIA variante
+//      "portada" (P07, W-HOME-12/13) en su columna, con los bordes fundidos; a la derecha cabecera
+//      corta + PildorasMarcas (P06) como ficha de 3 filas (Piensa con · Contesta en · Te encuentran
+//      en). En móvil: cabecera, chip a todo el ancho y filas de píldoras centradas.
+//      Revisión 1 de G01: el chip a todo el ancho con las píldoras debajo llevaba #ia a 1.806 px a
+//      1440 (tope = producción 1.015 + 300). En zigzag el tramo (b) cabe en ≈ 350 px.
+//      Declarado (revisión 2): el tope de alto se escribió a 1440. En móvil (390) #ia mide ≈ 2.470 px
+//      frente a 1.602 en producción (+≈ 870: ventana del agente + chip a todo el ancho); el viaje
+//      móvil no se desplaza (journey 0 px). Pendiente de que el dueño lo vea en el render.
+// Sin lienzo nuevo: la ventana es HTML y el chip es SVG. El demo de burbujas de la v1 se retira.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import VentanaAgente from '../w/agente/VentanaAgente.astro';
+import ChipIA from '../w/chip/ChipIA.astro';
+import PildorasMarcas from '../w/marcas/PildorasMarcas.astro';
+import { iaMontada, iaRotulos } from '../../i18n/w/portada';
 
 interface Props { ai: any }
 const { ai } = Astro.props;
-const demo = ai.demo;
+const lang: 'es' | 'en' = Astro.url.pathname.startsWith('/en') ? 'en' : 'es';
+const M = iaMontada[lang];
 ---
 <section class="section ai" id="ia" data-fx="teal">
   <div class="container ai__inner">
-    <!-- IZQUIERDA: intro + capacidades -->
     <div class="ai__intro">
       <Kicker tone="teal">{ai.tag}</Kicker>
       <h2 class="h2" set:html={ai.title} />
       <p class="lead">{ai.desc}</p>
-
-      <ul class="ai__caps">
-        {ai.features.map((f: any) => (
-          <li class="ai__cap">
-            <span class="ai__cap-ic"><Icon name={f.icon} /></span>
-            <div class="ai__cap-tx">
-              <h3>{f.title}</h3>
-              <p>{f.desc}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-
       {ai.cta && (
         <Button href={ai.cta.href} variant="teal" size="md" class="ai__cta">{ai.cta.label}</Button>
       )}
     </div>
 
-    <!-- DERECHA: demo de asistente (ilustrativo, decorativo) -->
-    {demo && (
-      <div class="ai__demo" data-ai-demo aria-hidden="true">
-        <div class="chatwin">
-          <div class="chat-bar">
-            <span class="chat-av"><Icon name="lucide:bot" /></span>
-            <span class="chat-who">
-              <b>{demo.title}</b>
-              <span class="chat-status"><span class="chat-live"></span>{demo.status}</span>
-            </span>
-            <span class="chat-lang">{demo.lang}</span>
+    <div class="ai__agente">
+      <VentanaAgente guion="marcy" piel="noche" lang={lang} />
+    </div>
+
+    <ul class="ai__caps">
+      {ai.features.map((f: any) => (
+        <li class="ai__cap">
+          <span class="ai__cap-ic"><Icon name={f.icon} /></span>
+          <div class="ai__cap-tx">
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
           </div>
+        </li>
+      ))}
+    </ul>
+  </div>
 
-          <div class="chat-body" data-chat-body>
-            {demo.messages.map((m: any) => (
-              <div class:list={['bub', m.who, 'show']}>
-                <span>{m.text}</span>
-                {m.who === 'ai' && m.meta && <span class="bub-meta">{m.meta}</span>}
-              </div>
-            ))}
-          </div>
-
-          <div class="lead-toast show" data-lead-toast>
-            <span class="lt-ic"><Icon name="lucide:user-check" /></span>
-            <span class="lt-tx"><b>{demo.toast.title}</b><span>{demo.toast.sub}</span></span>
-          </div>
-        </div>
-
-        <div class="ai__flow" data-flow>
-          {demo.flow.map((label: string, i: number) => (
-            <Fragment>
-              {i > 0 && <span class="ai__flow-arr"><Icon name="lucide:chevron-right" /></span>}
-              <span class="ai__flow-node lit" data-node>{label}</span>
-            </Fragment>
-          ))}
-        </div>
-
-        <script type="application/json" data-ai-demo-data set:html={JSON.stringify(demo)} />
-      </div>
-    )}
+  <div class="container ai__montada">
+    <div class="ai__mchip">
+      <ChipIA variante="portada" lang={lang} />
+    </div>
+    <div class="ai__mtx">
+      <header class="ai__mhead">
+        <p class="ai__mk">{M.kicker}</p>
+        <h3 class="ai__mt">{M.titulo}</h3>
+        <p class="ai__mb">{M.bajada}</p>
+      </header>
+      <PildorasMarcas filas={M.filas} rotulos={iaRotulos} encender="vista" class="ai__pm" />
+    </div>
   </div>
 </section>
 
 <style>
   .ai :global(em) { color: var(--accent-teal); font-style: normal; }
-  .ai__inner { display: grid; grid-template-columns: 1fr; gap: var(--space-7); align-items: start; }
+  /* Menos aire abajo que el resto de secciones: el chip y su horizonte ya cierran (y #ia tiene tope de alto). */
+  .ai { padding-bottom: clamp(40px, 4vw, 64px); }
+  .ai__inner {
+    --ai-l: rgba(var(--star-rgb, 240, 237, 232), .08);
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-7); align-items: start;
+  }
 
-  /* ── Izquierda: intro + capacidades ─────────────────────── */
+  /* ── (a) Texto ── */
   .ai__intro { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; min-width: 0; }
-  .ai__caps { list-style: none; display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-2); width: 100%; }
-  .ai__cap { display: flex; gap: var(--space-4); align-items: flex-start; min-width: 0; }
-  .ai__cap-ic {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
+  .ai__cta { margin-top: var(--space-3); }
+
+  /* ── (a) Ventana de agente ── */
+  .ai__agente { min-width: 0; display: flex; justify-content: center; }
+
+  /* ── (a) Capacidades: filas con filete de 1 px (móvil) · 4 columnas con líneas de 1 px (PC) ── */
+  .ai__caps { list-style: none; margin: 0; padding: 0; min-width: 0; border-top: 1px solid var(--ai-l); }
+  .ai__cap {
+    display: grid; grid-template-columns: 20px minmax(0, 1fr); column-gap: 14px; align-items: start;
+    padding: 16px 0; border-bottom: 1px solid var(--ai-l);
   }
-  .ai__cap-ic :global(svg) { width: 20px; height: 20px; stroke-width: 1.5; }
+  .ai__cap-ic { display: inline-flex; color: var(--accent-teal); padding-top: 2px; }
+  .ai__cap-ic :global(svg) { width: 18px; height: 18px; stroke-width: 1.5; }
   .ai__cap-tx { min-width: 0; }
-  .ai__cap-tx h3 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; margin-bottom: 2px; }
-  .ai__cap-tx p { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
-  .ai__cta { margin-top: var(--space-2); }
+  .ai__cap-tx h3 { margin: 0 0 4px; font-family: var(--font-display); font-size: 17px; line-height: 1.25; font-weight: 500; letter-spacing: -.01em; }
+  .ai__cap-tx p { margin: 0; color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
-  /* ── Derecha: ventana de chat ───────────────────────────── */
-  .ai__demo { min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
-  .chatwin {
-    position: relative; display: flex; flex-direction: column; height: 420px;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card); overflow: hidden;
+  /* ── (b) Así está montada ── */
+  /* Móvil: cabecera, chip a todo el ancho (sale del padding del contenedor) y filas de píldoras. */
+  .ai__montada { margin-top: clamp(56px, 7vw, 72px); display: flex; flex-direction: column; }
+  .ai__mtx { display: contents; }
+  .ai__mhead { order: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .ai__mchip { order: 2; margin-inline: calc(-1 * var(--container-pad)); min-width: 0; }
+  .ai :global(.ai__pm) { order: 3; }
+  .ai__mk {
+    margin: 0; font-family: var(--font-mono); font-size: 12px; line-height: 1; letter-spacing: var(--tracking-wide);
+    text-transform: uppercase; color: var(--accent-teal);
   }
-  .chat-bar {
-    display: flex; align-items: center; gap: var(--space-3);
-    padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, var(--accent-teal-dim), transparent);
+  .ai__mt {
+    margin: 0; font-family: var(--font-display); font-weight: 500; color: var(--fg-primary);
+    font-size: clamp(28px, 3vw, 36px); line-height: 1.1; letter-spacing: -.03em; text-wrap: balance;
   }
-  .chat-av {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal);
-  }
-  .chat-av :global(svg) { width: 18px; height: 18px; }
-  .chat-who { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; flex: 1; }
-  .chat-who b { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; }
-  .chat-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary); }
-  .chat-live { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: chatlive 2s ease-out infinite; }
-  .chat-lang { flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); letter-spacing: var(--tracking-wide); }
-
-  .chat-body {
-    flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end;
-    gap: var(--space-3); padding: var(--space-4); overflow: hidden;
-  }
-  /* Las burbujas y el "typing" las crea el JS dinámicamente → no reciben el atributo
-     de scope de Astro. Sus estilos viven en el <style is:global> de abajo (scopeados
-     a .ai__demo a mano). Aquí solo quedan los elementos renderizados por Astro. */
-
-  .lead-toast {
-    display: flex; align-items: center; gap: var(--space-3);
-    margin: 0 var(--space-4) var(--space-4); padding: var(--space-3) var(--space-4);
-    background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md);
-    opacity: 0; transform: translateY(8px);
-    transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
-  }
-  .lead-toast.show { opacity: 1; transform: none; }
-  .lt-ic {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; border-radius: 50%; background: var(--accent-teal); color: var(--fg-inverse);
-  }
-  .lt-ic :global(svg) { width: 18px; height: 18px; }
-  .lt-tx { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
-  .lt-tx b { font-size: var(--text-sm); font-weight: 600; }
-  .lt-tx span { font-size: var(--text-xs); color: var(--fg-secondary); }
-
-  /* riel de flujo */
-  .ai__flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-  .ai__flow-node {
-    font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-    padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill);
-    border: 1px solid var(--border); color: var(--fg-subtle); background: var(--bg-card);
-    transition: color 0.35s var(--ease-out-expo), border-color 0.35s var(--ease-out-expo), background 0.35s var(--ease-out-expo);
-  }
-  .ai__flow-node.lit { color: var(--accent-teal); border-color: var(--accent-teal-line); background: var(--accent-teal-dim); }
-  .ai__flow-arr { display: inline-flex; color: var(--fg-subtle); }
-  .ai__flow-arr :global(svg) { width: 14px; height: 14px; }
-
-  @keyframes chatlive { 0% { box-shadow: 0 0 0 0 var(--accent-teal); } 70% { box-shadow: 0 0 0 5px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  @media (--motion-reduce) { .chat-live, .typing i { animation: none; } }
+  .ai__mb { margin: 0; max-width: 520px; color: var(--fg-secondary); font-size: 17px; line-height: 1.5; text-wrap: balance; }
+  /* Mando de pausa del chip: en la esquina inferior de la escena, bajo el horizonte, no pegado al chip. */
+  .ai__mchip :global(.chipia__mando) { top: auto; bottom: 10px; left: auto; right: max(16px, 9%); }
+  /* Píldoras (móvil): las filas van una junto a otra y saltan solo si no caben. */
+  .ai :global(.ai__pm:has(.pm-et)) { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; column-gap: 24px; row-gap: 20px; }
+  /* "ChatGPT" es palabra (no hay glifo): mismo tono y peso que los nombres vecinos, no más blanca ni más negra. */
+  .ai :global(.ai__pm .lm--word) { color: rgba(var(--star-rgb, 240, 237, 232), .62); font-weight: 500; font-size: 14px; letter-spacing: -.01em; }
 
   @media (--lg) {
-    .ai__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-9); align-items: center; }
+    .ai__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 528px); column-gap: var(--space-9); row-gap: 40px; align-items: center; }
+    .ai__caps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ai-l); border-bottom: 0; }
+    .ai__cap { display: flex; flex-direction: column; gap: 10px; padding: 28px 28px 4px; border-bottom: 0; }
+    .ai__cap + .ai__cap { border-left: 1px solid var(--ai-l); }
+    .ai__cap:first-child { padding-left: 0; }
+    .ai__cap:last-child { padding-right: 0; }
+    .ai__cap-ic { padding-top: 0; }
+
+    /* Zigzag: el chip a la izquierda (la ventana del agente va a la derecha arriba). */
+    .ai__montada { margin-top: 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: center; }
+    .ai__mtx { display: flex; flex-direction: column; gap: 28px; min-width: 0; order: 2; }
+    .ai__mhead { align-items: flex-start; text-align: left; }
+    .ai__mb { max-width: none; }
+    /* El chip vive en su columna: la escena se recorta a su ancho y los bordes se funden (sin cortes duros). */
+    .ai__mchip { order: 1; margin-inline: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
+    .ai__mchip :global(.chipia) { --k: .58; }
+    /* Ficha de 3 filas: rótulo a la izquierda, píldoras a la derecha. */
+    .ai :global(.ai__pm:has(.pm-et)) { flex-direction: column; align-items: stretch; row-gap: 12px; }
+    .ai :global(.ai__pm .pm-fila) { align-items: flex-start; gap: 8px; }
+    .ai :global(.ai__pm .pm-lista) { justify-content: flex-start; gap: 8px; }
+    .ai :global(.ai__pm .pm-p) { height: 44px; padding: 0 16px; gap: 8px; }
+    .ai :global(.ai__pm .pm-p > svg) { width: 20px; height: 20px; }
+    .ai :global(.ai__pm .pm-n) { font-size: 14px; }
+  }
+  @media (--xl) {
+    .ai__mchip :global(.chipia) { --k: .70; }
+    .ai :global(.ai__pm .pm-fila) { display: grid; grid-template-columns: 136px minmax(0, 1fr); align-items: center; column-gap: 16px; }
   }
 </style>
-
-<style is:global>
-  /* Burbujas y "typing" del demo. GLOBAL (scopeado a .ai__demo a mano) porque el JS
-     las inyecta dinámicamente y no llevan el atributo data-astro-cid del scope. */
-  .ai__demo .bub {
-    max-width: 84%; padding: var(--space-3) var(--space-4); border-radius: 14px;
-    font-size: var(--text-sm); line-height: var(--leading-normal);
-    opacity: 0; transform: translateY(6px);
-    transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo);
-  }
-  .ai__demo .bub.show { opacity: 1; transform: none; }
-  .ai__demo .bub.user { align-self: flex-end; background: var(--accent-teal); color: var(--fg-inverse); border-bottom-right-radius: 4px; }
-  .ai__demo .bub.ai { align-self: flex-start; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); border-bottom-left-radius: 4px; }
-  .ai__demo .bub-meta { display: block; margin-top: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-teal); }
-
-  .ai__demo .typing {
-    align-self: flex-start; display: inline-flex; gap: 4px;
-    padding: var(--space-3) var(--space-4); background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: 14px; border-bottom-left-radius: 4px; opacity: 0; transition: opacity 0.3s;
-  }
-  .ai__demo .typing.show { opacity: 1; }
-  .ai__demo .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--fg-subtle); animation: mc-typedot 1.2s infinite ease-in-out; }
-  .ai__demo .typing i:nth-child(2) { animation-delay: 0.15s; }
-  .ai__demo .typing i:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes mc-typedot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .ai__demo .typing i { animation: none; } }
-</style>
-
-<script>
-  const demoEl = document.querySelector('[data-ai-demo]') as HTMLElement | null;
-  const dataEl = document.querySelector('[data-ai-demo-data]') as HTMLElement | null;
-  if (demoEl && dataEl) {
-    const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let demo: any = null;
-    try { demo = JSON.parse(dataEl.textContent || 'null'); } catch (_) { /* deja el estado SSR */ }
-
-    const body = demoEl.querySelector('[data-chat-body]') as HTMLElement;
-    const toast = demoEl.querySelector('[data-lead-toast]') as HTMLElement;
-    const nodes = Array.from(demoEl.querySelectorAll<HTMLElement>('[data-node]'));
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    let running = false;
-
-    function clearChat() {
-      body.innerHTML = '';
-      toast.classList.remove('show');
-      nodes.forEach((n) => n.classList.remove('lit'));
-    }
-    function addBubble(m: any) {
-      return new Promise<void>((res) => {
-        if (m.who === 'ai') {
-          const t = document.createElement('div');
-          t.className = 'typing';
-          t.innerHTML = '<i></i><i></i><i></i>';
-          body.appendChild(t);
-          requestAnimationFrame(() => t.classList.add('show'));
-          setTimeout(() => {
-            t.remove();
-            const b = document.createElement('div');
-            b.className = 'bub ai';
-            const sp = document.createElement('span'); sp.textContent = m.text; b.appendChild(sp);
-            if (m.meta) { const mt = document.createElement('span'); mt.className = 'bub-meta'; mt.textContent = m.meta; b.appendChild(mt); }
-            body.appendChild(b);
-            requestAnimationFrame(() => b.classList.add('show'));
-            res();
-          }, 1100);
-        } else {
-          const b = document.createElement('div');
-          b.className = 'bub user';
-          const sp = document.createElement('span'); sp.textContent = m.text; b.appendChild(sp);
-          body.appendChild(b);
-          requestAnimationFrame(() => b.classList.add('show'));
-          setTimeout(res, 520);
-        }
-      });
-    }
-    async function run() {
-      if (running || !demo) return;
-      running = true;
-      while (true) {
-        clearChat();
-        nodes[0]?.classList.add('lit');
-        await wait(420);
-        for (let i = 0; i < demo.messages.length; i++) {
-          await addBubble(demo.messages[i]);
-          await wait(420);
-          if (demo.messages[i].who === 'ai') nodes[1]?.classList.add('lit');
-        }
-        await wait(420);
-        nodes[2]?.classList.add('lit');
-        toast.classList.add('show');
-        await wait(900);
-        nodes[3]?.classList.add('lit');
-        await wait(4400);
-      }
-    }
-
-    if (!REDUCE) {
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((e) => { if (e.isIntersecting) { run(); io.disconnect(); } });
-        }, { rootMargin: '0px 0px -120px 0px' });
-        io.observe(demoEl);
-      } else {
-        run();
-      }
-    }
-    // reduced-motion: se conserva el estado SSR (conversación completa + lead + nodos encendidos)
-  }
-</script>

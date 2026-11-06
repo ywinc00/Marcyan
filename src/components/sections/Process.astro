@@ -1,21 +1,39 @@
 ---
-// Sección Proceso — "Riel conectado" con energía que recorre los pasos.
-//  · PC (riel horizontal + puntero fino): al pasar el cursor por un círculo, ESTE se
-//    resalta y crece suavemente; al alejarse vuelve; por la línea viaja una luz hacia
-//    el siguiente. Animación pulida (easing expo, tiempos naturales). CTA inline abajo.
-//  · Móvil/apilado (<1024): el MISMO patrón pero lo activa el SCROLL — un círculo activo
-//    a la vez + la línea se va llenando. Al llegar al nodo final, EL MISMO cohete del
-//    círculo despega LENTO y se detiene en el centro de la pantalla; al detenerse salen
-//    los botones y el fondo se difumina. **Se reproduce UNA sola vez** (primera bajada):
-//    no se revierte ni se re-ilumina al volver.
-//  · reduced-motion / sin JS: estado normal + CTA inline (sin animaciones).
+// Sección Proceso "Del concepto al lanzamiento" · vuelta 2 (design/rediseno-workos-v2.md §3 G01, nota 3).
+// Se conservan section#proceso[data-process][data-fx="gold"], kicker, H2 y los 5 pasos de
+// content.process (verbatim). El riel horizontal de la v1 se sustituye por LineaFases variante
+// "portada" (P11: fases a la izquierda + panel fijo de escenas a la derecha, gesto F-05 de WorkOS)
+// con EscenaAbreApps (P08, W2N-03: el portátil que se abre y enseña tu web, tu ficha y Marcy ya
+// funcionando) en el slot final. El CTA va bajo el portátil.
+//
+// Revisión 1 de G01 (tope de alto ≤ 1.800 px a 1440 y portátil legible):
+//  · Escritorio (≥ 1120): la fase final va en dos columnas, su texto (300 px) y el portátil al
+//    resto del ancho (≈ 855 px a 1440, antes 600) con el CTA debajo del portátil.
+//  · La tapa se abre con el scroll SIN fijar la pieza (sin el hueco de 450 px): la pista de la
+//    escena sigue dando la línea de tiempo y la tapa termina de abrirse justo cuando el portátil
+//    entero está a la vista. Así no suma alto ni se queda a medio abrir mientras se mira (E-56).
+//  · Por debajo de 900 px el portátil NO se pinta: su lienzo de 1.415 px a 350 px de ancho deja
+//    la letra en 3-4 px (§1.8 pide ≥ 9 en lo decorativo). La fase 05 queda con su texto y el CTA
+//    (y en móvil, el cohete), como en producción.
+//
+// Cohete del final móvil (E-02, adaptación escrita en P11): el motor launch(), las clases
+// has-finale / is-launched / is-done y TODO su CSS quedan iguales. Solo cambian dos cosas:
+//  · la detección del paso: en vez de medir los [data-step] del riel, escucha el evento
+//    `w2:fases-fin` que LineaFases emite cuando se activa su última fase;
+//  · el origen del vuelo: el centro del punto de esa fase, `detail.origen` (px relativos a la
+//    <section>), en vez de `.riel__dot` del último paso.
+// Una sola vez por visita, solo tras una interacción real que haya movido la página (igual que antes).
+//  · reduced-motion / sin JS: CTA inline (sin capa).
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import LineaFases from '../w/proceso/LineaFases.astro';
+import EscenaAbreApps from '../w/mac/EscenaAbreApps.astro';
+import { fasesDe } from '../w/proceso/proceso';
 
 interface Props { process: any }
 const { process } = Astro.props;
-const fallbackIcons = ['lucide:search', 'lucide:sparkles', 'lucide:code', 'lucide:shield-check', 'lucide:rocket'];
+const lang: 'es' | 'en' = Astro.url.pathname.startsWith('/en') ? 'en' : 'es';
 const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#contacto' };
 ---
 <section class="section process" id="proceso" data-process data-fx="gold">
@@ -25,24 +43,16 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
       <h2 class="h2" set:html={process.title} />
     </header>
 
-    <ol class="riel">
-      {process.steps.map((s: any, i: number) => (
-        <li class="riel__step" data-step>
-          <span class="riel__dot"><Icon name={s.icon ?? fallbackIcons[i % fallbackIcons.length]} /></span>
-          <div class="riel__tx">
-            <span class="riel__num">{s.n}</span>
-            <h3 class="riel__title">{s.title}</h3>
-            <p class="riel__desc">{s.desc}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
-
-    <!-- CTA inline (PC / reduced-motion / sin JS / tras el show en móvil) -->
-    <div class="riel__launch-inline">
-      {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
-      <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
-    </div>
+    <LineaFases fases={fasesDe(process.steps)} lang={lang} variante="portada" class="process__fases">
+      <div slot="final" class="process__fin">
+        <EscenaAbreApps lang={lang} ancho={880} />
+        <!-- CTA inline (PC / reduced-motion / sin JS / tras el show en móvil), bajo el portátil -->
+        <div class="riel__launch-inline">
+          {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
+          <Button href={launch.href} variant="primary" size="lg">{launch.label}</Button>
+        </div>
+      </div>
+    </LineaFases>
   </div>
 
   <!-- FINALE (móvil, una sola vez): el cohete vuela al centro + CTA + fondo difuminado -->
@@ -59,57 +69,32 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   .process :global(em) { color: var(--accent-gold); font-style: normal; }
   .process__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
 
-  .riel { position: relative; list-style: none; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
-  .riel__step { position: relative; display: grid; grid-template-columns: 48px 1fr; column-gap: var(--space-4); align-items: start; }
-  /* conector: del centro de este dot al centro del siguiente (último sin conector) */
-  .riel__step:not(:last-child)::after {
-    content: ""; position: absolute; left: 24px; top: 24px; width: 2px; height: calc(100% + var(--space-6));
-    transform: translateX(-1px); background: var(--border); z-index: 0;
-    transition: background 0.5s var(--ease-out-expo);
+  /* ── Fase final: portátil + CTA (slot `final` de LineaFases) ── */
+  .process__fin { min-width: 0; }
+  /* La tapa se abre con el scroll sin fijar la pieza: fuera el hueco del tramo fijado. */
+  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-hueco) { display: none; }
+  .process[data-process] :global(.abre[data-tapa="scroll"] .abre-fijo) { position: static; }
+  @media (max-width: 899.98px) {
+    .process[data-process] :global(.process__fin .abre) { display: none; }
   }
-  .riel__dot {
-    position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: var(--bg-elevated); border: 1px solid var(--accent-gold-line);
-    transition: transform 0.34s var(--ease-out-expo), border-color 0.34s var(--ease-out-expo), box-shadow 0.34s var(--ease-out-expo);
+  /* Apilado: las escenas de LineaFases llevan content-visibility:auto, y en la portada (hero con
+     animación continua) eso costaba ≈ 100 ms de TBT móvil medidos (perf ×4, 412 px, mediana de 7-9
+     pasadas: 150-200 ms con él, ≈ 30 ms sin él; producción ≈ 10). Aquí se pintan normal. */
+  @media (max-width: 1119.98px) {
+    .process[data-process] :global(.lf__esc) { content-visibility: visible; }
   }
-  .riel__dot :global(svg) { width: 22px; height: 22px; color: var(--accent-gold); stroke-width: 1.6; transition: opacity 0.4s var(--ease-out-expo); }
-  .riel__tx { display: flex; flex-direction: column; gap: var(--space-1); padding-top: 2px; }
-  .riel__num { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: var(--tracking-wide); }
-  .riel__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .riel__desc { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
-
-  /* CÍRCULO ACTIVO (móvil=is-active por scroll): se resalta y crece */
-  .riel__step.is-active .riel__dot { transform: scale(1.13); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 18px var(--accent-gold-glow); }
-  /* la energía que ya pasó deja la línea encendida */
-  .riel__step.is-passed::after { background: var(--accent-gold-line); }
-
-  /* riel horizontal (desktop) */
-  @media (--lg) {
-    .riel { grid-template-columns: repeat(5, 1fr); gap: var(--space-5); }
-    .riel__step { grid-template-columns: 1fr; justify-items: center; text-align: center; row-gap: var(--space-4); }
-    .riel__step:not(:last-child)::after {
-      left: 50%; top: 24px; width: calc(100% + var(--space-5)); height: 2px;
-      transform: translateY(-1px);
-    }
-    .riel__tx { padding-top: 0; align-items: center; }
+  @media (min-width: 1120px) {
+    /* Tope de alto (≤ 1.800 a 1440): menos aire abajo (el CTA ya cierra) y entre fases. */
+    .process { padding-bottom: 56px; }
+    .process__head { margin-bottom: 40px; }
+    .process[data-process] :global(.lf__grid .lf__paso) { padding-bottom: 16px; }
+    /* 40 px arriba: el panel fijo de las fases termina donde acaba su rejilla y no debe rozar la tapa. */
+    .process[data-process] :global(.lf__fin) { grid-template-columns: 300px minmax(0, 1fr); column-gap: 40px; align-items: center; padding-top: 40px; }
+    .process__fin .riel__launch-inline { margin-top: 12px; }
   }
 
-  /* PC (riel horizontal + puntero fino): hover pulido + luz que viaja por la línea */
-  @media (--lg) and (--hover-fine) {
-    .riel__step:hover .riel__dot { transform: scale(1.13); border-color: var(--accent-gold); box-shadow: 0 0 0 1px var(--accent-gold), 0 0 22px var(--accent-gold-glow); }
-    .riel__step:hover .riel__dot :global(svg) { color: var(--accent-gold); }
-    .riel__step:not(:last-child)::after {
-      background:
-        linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%) -55% 0 / 55% 100% no-repeat,
-        var(--border);
-    }
-    .riel__step:hover:not(:last-child)::after { animation: rielflow 1.15s var(--ease-out-expo); }
-    @keyframes rielflow { from { background-position: -55% 0, 0 0; } to { background-position: 155% 0, 0 0; } }
-  }
-
-  /* ── CTA inline (abajo) ────────────────────────────────── */
-  .riel__launch-inline { margin-top: var(--space-8); display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
+  /* ── CTA inline (abajo, bajo el portátil) ──────────────── */
+  .riel__launch-inline { margin-top: var(--space-6); display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
   .has-finale .riel__launch-inline { display: none; }
   .riel__cta-kicker { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
 
@@ -136,15 +121,14 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   /* el CTA sale CUANDO el cohete ya se detuvo (delay ~ el vuelo) */
   .riel__finale-cta { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); pointer-events: auto; opacity: 0; transform: translateY(16px); transition: opacity 0.55s var(--ease-out-expo), transform 0.55s var(--ease-out-expo); }
   .process.is-launched .riel__finale-cta { opacity: 1; transform: none; transition-delay: 1.7s; }
-  /* el cohete del nodo final desaparece (se ve que "salió" del círculo)… */
-  .process.is-launched .riel__step:last-child .riel__dot :global(svg) { opacity: 0; }
-  /* …y al salir del finale VUELVE a su círculo */
-  .process.is-done .riel__step:last-child .riel__dot :global(svg) { opacity: 1; }
+  /* el punto de la fase final se apaga (se ve que el cohete "salió" de él)… */
+  .process.is-launched :global(.lf__paso--fin .lf__dot) { opacity: 0; }
+  /* …y al salir del finale VUELVE */
+  .process.is-done :global(.lf__paso--fin .lf__dot) { opacity: 1; }
 
   @media (--motion-reduce) {
     .riel__finale { display: none !important; }
     .has-finale .riel__launch-inline { display: flex; }
-    .riel__dot, .riel__dot :global(svg), .riel__step:not(:last-child)::after { transition: none; }
   }
 </style>
 
@@ -152,33 +136,34 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
   const section = document.querySelector('[data-process]') as HTMLElement | null;
   if (section) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-step]'));
 
-    // Desktop (riel horizontal ≥1024) → efecto por HOVER (CSS). Layout apilado (<1024) →
-    // motor por SCROLL + cohete, que se reproduce UNA sola vez.
-    if (window.innerWidth < 1024 && !reduce && steps.length) {
-      const last = steps[steps.length - 1];
-      const lastDot = last.querySelector('.riel__dot') as HTMLElement;
+    // Desktop (≥1024) → sin capa. Layout apilado (<1024) → cohete, que se reproduce UNA sola vez.
+    if (window.innerWidth < 1024 && !reduce) {
       const rocket = section.querySelector<HTMLElement>('[data-rocket]');
       let phase: 'idle' | 'launched' | 'done' = 'idle';
       let ticking = false;
+      // Origen del vuelo: centro del punto de la última fase, en px relativos a la <section>
+      // (detail.origen de `w2:fases-fin`). Se convierte a pantalla en el momento del lanzamiento.
+      let origen: { x: number; y: number } | null = null;
+      const origenEnPantalla = () => {
+        const S = section.getBoundingClientRect();
+        return origen ? { x: S.left + origen.x, y: S.top + origen.y } : null;
+      };
       // La capa del cohete SOLO se lanza tras una interacción real de la persona (toque,
-      // rueda, tecla o puntero) que haya movido la página. El update() inicial y los resize
-      // marcan pasos pero nunca lanzan: un render sin scroll (p. ej. Google con un viewport
-      // móvil altísimo) no puede dejar la capa fija tapando la página.
+      // rueda, tecla o puntero) que haya movido la página. Un render sin scroll (p. ej. Google
+      // con un viewport móvil altísimo) no puede dejar la capa fija tapando la página.
       // has-finale (que prepara la capa y oculta el CTA de abajo) también espera a esa
       // primera interacción: sin ella, el CTA de abajo sigue visible y se puede pulsar.
       // Solo si en ese momento el CTA de abajo aún está por debajo de la pantalla: si ya está
       // a la vista o se dejó atrás, se deja como está (ocultarlo movería la página bajo el
       // dedo) y esa visita no tiene capa.
       let interacted = false;
-      let scrollPending = false;
+      let lastScroll = 0;
       const inlineCta = section.querySelector<HTMLElement>('.riel__launch-inline');
       const interactionEvents = ['touchstart', 'wheel', 'keydown', 'pointerdown'] as const;
-      // Un toque o clic en un enlace a otra sección de la MISMA página (p. ej. "Ver qué incluye"
-      // a #precios o "Propuesta gratis" a #contacto) no cuenta como interacción: su salto suave
-      // cruzaría la sección y haría un destello de la capa, y ocultar el CTA de abajo a mitad del
-      // salto lo dejaría corto. Mientras dura ese salto la capa tampoco puede lanzarse.
+      // Un toque o clic en un enlace a otra sección de la MISMA página no cuenta como interacción:
+      // su salto suave cruzaría la sección y haría un destello de la capa. Mientras dura ese salto
+      // la capa tampoco puede lanzarse.
       let jumpUntil = 0;
       const isInPageJump = (e: Event) => {
         const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
@@ -197,59 +182,60 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
       };
       interactionEvents.forEach((ev) => window.addEventListener(ev, markInteraction, { passive: true }));
 
-      // el cohete arranca EN el círculo del nodo final y vuela LENTO a su sitio (centro)
+      // el cohete arranca EN el punto de la fase final y vuela LENTO a su sitio (centro)
       function launch() {
         phase = 'launched';
-        steps.forEach((s) => { s.classList.remove('is-active'); s.classList.add('is-passed'); });
-        if (rocket) {
+        const o = origenEnPantalla();
+        if (rocket && o) {
           const rr = rocket.getBoundingClientRect();      // posición de reposo (centrada)
-          const dr = lastDot.getBoundingClientRect();
-          const dx = (dr.left + dr.width / 2) - (rr.left + rr.width / 2);
-          const dy = (dr.top + dr.height / 2) - (rr.top + rr.height / 2);
+          const dx = o.x - (rr.left + rr.width / 2);
+          const dy = o.y - (rr.top + rr.height / 2);
           rocket.style.transition = 'none';
           rocket.style.transform = `translate(${dx}px, ${dy}px) scale(0.5)`;
         }
-        section.classList.add('is-launched');             // overlay + blur + oculta el cohete del nodo
+        section.classList.add('is-launched');             // overlay + blur + apaga el punto de la fase
         setTimeout(() => { if (rocket) { rocket.style.transition = ''; rocket.style.transform = ''; } }, 40);
       }
-      // una vez reproducido: se cierra (sin revertir), el cohete vuelve al círculo, no recarga
+      // una vez reproducido: se cierra (sin revertir), no recarga
       function finish() {
         phase = 'done';
         section.classList.add('is-done');
         section.classList.remove('has-finale');           // CTA inline para futuras visitas
         window.removeEventListener('scroll', onScroll);
         window.removeEventListener('resize', onResize);
+        section.removeEventListener('w2:fases-fin', onFin);
         interactionEvents.forEach((ev) => window.removeEventListener(ev, markInteraction));
       }
+      // Detección del paso: LineaFases avisa cuando su última fase se activa.
+      const onFin = (e: Event) => {
+        const d = (e as CustomEvent).detail;
+        if (d?.origen) origen = d.origen;
+        if (phase !== 'idle') return;
+        const now = performance.now();
+        const canLaunch = interacted && window.scrollY > 0 && now >= jumpUntil && now - lastScroll < 700;
+        if (canLaunch && section.classList.contains('has-finale')) launch(); // dispara JUSTO cuando la energía llega a la fase final
+      };
+      section.addEventListener('w2:fases-fin', onFin);
+
       const update = () => {
         ticking = false;
-        const canLaunch = scrollPending && interacted && window.scrollY > 0 && performance.now() >= jumpUntil;
-        scrollPending = false;
+        if (phase !== 'launched') return;
+        // se cierra al alejarte de la fase final (punto medio: ni tan pronto ni tan tarde)
         const vh = window.innerHeight;
-        if (phase === 'idle') {
-          const center = vh * 0.5;
-          let active = -1;
-          for (let i = 0; i < steps.length; i++) {
-            if (steps[i].getBoundingClientRect().top + 24 <= center) active = i;
-          }
-          steps.forEach((s, i) => { s.classList.toggle('is-active', i === active); s.classList.toggle('is-passed', i < active); });
-          if (active === steps.length - 1 && canLaunch && section.classList.contains('has-finale')) launch(); // dispara JUSTO cuando la energía llega al nodo final
-        } else if (phase === 'launched') {
-          // se cierra al alejarte del nodo final (punto medio: ni tan pronto ni tan tarde)
-          const cy = lastDot.getBoundingClientRect().top + 24;
-          if (cy < vh * 0.16 || cy > vh * 0.98) finish();
-        }
+        const o = origenEnPantalla();
+        if (!o) return;
+        if (o.y < vh * 0.16 || o.y > vh * 0.98) finish();
       };
       const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
       const onScroll = () => {
         // mientras sigue el salto suave a un ancla, se alarga la ventana hasta que pare
         if (performance.now() < jumpUntil) jumpUntil = performance.now() + 250;
-        scrollPending = true; schedule();
+        lastScroll = performance.now();
+        schedule();
       };
       const onResize = () => schedule();
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onResize, { passive: true });
-      update(); // estado inicial: marca pasos, nunca lanza
     }
   }
 </script>

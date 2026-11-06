@@ -118,13 +118,29 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
     const vista = card.querySelector('.pz-view.is-on') ?? card;
     const t = $$(vista, PARTE[g]).find((x) => x.getClientRects().length) as HTMLElement | undefined;
     if (!t) return;
+    // Marco de selección ajustado a la pieza (2 px de aire) con su mismo radio; el rótulo va encima
+    // (en el hueco sobre la pieza) y, si la pieza llega al borde de la bandeja, por dentro.
     const r = t.getBoundingClientRect(); const b = tray.getBoundingClientRect();
-    const x = Math.round(r.right - b.left - 10), y = Math.round(r.top - b.top - 26);
-    tag.style.transform = `translate(${x}px, ${Math.max(14, y)}px)`;
-    tag.style.setProperty('--h', '24px');
+    const pad = g === 'marcos' ? 0 : 2;
+    tag.style.left = `${Math.round(r.left - b.left - pad)}px`;
+    tag.style.top = `${Math.round(r.top - b.top - pad)}px`;
+    tag.style.width = `${Math.round(r.width + pad * 2)}px`;
+    tag.style.height = `${Math.round(r.height + pad * 2)}px`;
+    const rad = parseFloat(getComputedStyle(t).borderTopLeftRadius) || 0;
+    tag.style.borderRadius = `${Math.min(999, rad + pad)}px`;
+    // Titular: el rótulo va por dentro, arriba a la derecha (hueco tras la 1.ª línea); el resto, encima.
+    tag.classList.toggle('is-in', PARTE[g] === '.ej__tit');
     tag.querySelector('b')!.textContent = D.pieza[g];
     tag.classList.add('is-on');
     clearTimeout(tagT); tagT = window.setTimeout(() => tag.classList.remove('is-on'), 1200);
+  };
+
+  // Rediseño: Antes (0) / Después (1).
+  const verAB = (ab: HTMLElement, i: number) => {
+    const seg = ab.querySelector<HTMLElement>('[data-dc-ab-g]');
+    if (seg) marcar(seg, i);
+    ab.setAttribute('data-i', String(i));
+    $$(ab, '[data-dc-ab-v]').forEach((v) => v.classList.toggle('is-on', v.getAttribute('data-dc-ab-v') === String(i)));
   };
 
   const aplicar = (g: G, i: number, quien: Quien) => {
@@ -136,6 +152,9 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
     escribir(g);
     sum.textContent = resumen();
     if (quien === 'init') return;
+    // Rediseño en "Antes": la web vieja no sigue a la marca; tocar un control enseña el "Después".
+    const ab = card.querySelector<HTMLElement>('.pz-view.is-on [data-dc-ab][data-i="0"]');
+    if (ab) verAB(ab, 1);
     if (antes !== i && g === 'idioma' && shine && !reduced()) { shine.classList.remove('is-on'); void shine.offsetWidth; shine.classList.add('is-on'); }
     if (!reduced()) etiqueta(g);
     if (quien === 'user') {
@@ -178,10 +197,7 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
       const b = $$(grupo, '[role="radio"]')[i];
       verOpcion(b.getAttribute('data-dc-opt') || '');
     } else if (grupo.hasAttribute('data-dc-ab-g')) {
-      marcar(grupo, i);
-      const ab = grupo.closest<HTMLElement>('[data-dc-ab]')!;
-      ab.setAttribute('data-i', String(i));
-      $$(ab, '[data-dc-ab-v]').forEach((v) => v.classList.toggle('is-on', v.getAttribute('data-dc-ab-v') === String(i)));
+      verAB(grupo.closest<HTMLElement>('[data-dc-ab]')!, i);
     } else {
       const g = grupo.getAttribute('data-pz-g') as G | null;
       if (g) aplicar(g, i, 'user');
@@ -193,7 +209,10 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
   const pasos: G[] = ['color', 'marcos', 'idioma'];
   let hechos = 0; let retirado = reduced() || yaToco; let t = 0; let visible = false; let desde = 0;
   function fantasmaFuera() { retirado = true; clearTimeout(t); ghost?.classList.remove('is-on'); }
-  for (const ev of ['pointerdown', 'pointerenter', 'focusin', 'keydown']) pieza.addEventListener(ev, fantasmaFuera, { once: true, passive: true });
+  // Gesto, foco o tecla en cualquier punto de la pieza lo retiran; el ratón solo cuando ENTRA en la demo
+  // (con el ratón quieto sobre la columna de texto mientras se baja con la rueda, el fantasma sigue).
+  for (const ev of ['pointerdown', 'focusin', 'keydown']) pieza.addEventListener(ev, fantasmaFuera, { once: true, passive: true });
+  pz.querySelector('[data-pz-stage]')?.addEventListener('pointerenter', fantasmaFuera, { once: true, passive: true });
   const ajuste = () => {
     if (retirado || !ghost || hechos >= 3) return;
     // Seis segundos seguidos a la vista y con los controles delante antes del primer ajuste.
@@ -298,7 +317,8 @@ function montarDemo(dc: HTMLElement) {
     if (reduced()) return final();
     parar();
     lineas.forEach((l) => { partir(l); l.classList.remove('is-on', 'is-cur'); });
-    const sk = $$(dc, '[data-dc-sk] .ej-k');
+    // Solo los bloques que se pintan (los enlaces del menú no existen en la tarjeta): sin huecos en la cascada.
+    const sk = $$(dc, '[data-dc-sk] .ej-k').filter((x) => x.getClientRects().length > 0);
     sk.forEach((x) => x.classList.remove('is-in'));
     con.classList.remove('is-done');
     con.classList.add('is-reset');

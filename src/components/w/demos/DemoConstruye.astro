@@ -116,11 +116,12 @@ const [o1, o2, o3] = bloque2.opciones;
   .dc__p { margin: 16px 0 0; max-width: 454px; font: 400 16px/26.4px var(--font-body); color: var(--fg-secondary, #9a9590); }
   /* Chip del comando en el párrafo (mono 14, como el original), en la noche Marcyan. */
   .dc__p :global(.dc-cmd) {
-    display: inline; padding: 1px 6px 1px 7px; border-radius: 6px; white-space: normal; overflow-wrap: anywhere;
+    display: inline-block; max-width: 100%; box-sizing: border-box; padding: 1px 6px 1px 7px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom;
     font: 400 13.5px/20px var(--font-mono); letter-spacing: -.01em; color: #c6c9d4;
     background: var(--w-s2, #181817); box-shadow: inset 0 0 0 .67px rgba(240, 237, 232, .14);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
+  @media (max-width: 479.98px) { .dc__p :global(.dc-cmd) { padding: 1px 5px; font-size: 11px; letter-spacing: -.02em; } }
   .dc__adv { list-style: none; margin: 28px 0 0; padding: 0; }
   .dc__adv li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; padding: 16px 0; border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
   .dc__adv li > span:last-child { display: grid; gap: 2px; }
@@ -171,7 +172,7 @@ const [o1, o2, o3] = bloque2.opciones;
   @keyframes dc-spin { to { transform: rotate(1turn); } }
 
   /* Esqueleto + barrido: el envoltorio baja y su hijo sube (máscara por transform). */
-  .dc-sk { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; z-index: 3; overflow: hidden; visibility: hidden; border-radius: inherit; }
+  .dc-sk { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; z-index: 3; overflow: hidden; contain: paint; visibility: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 22px); }
   .dc-sk__in { position: absolute; inset: 0; }
   .dc.is-building .dc-sk { visibility: visible; }
   .dc.is-building :global(.pz-view.is-on > :not(.dc-sk)) { opacity: 0; transform: scale(.98); }
@@ -182,13 +183,21 @@ const [o1, o2, o3] = bloque2.opciones;
   /* Cascada del esqueleto cada 120 ms y brillo que cruza cada barra (1550 ms, bucle mientras construye). */
   /* El esqueleto vive dentro del scope del personalizador: su botón y los SVG de logo e ilustración
      (otros componentes, fuera del alcance de los estilos de WebEjemplo) se apagan aquí. */
+  /* Esqueleto CLARO, como la web que va a salir (el original: gris sobre blanco desde el primer fotograma):
+     el fondo es el de la marca (sigue a Color y Modo) y los bloques su tinta al 11 %. */
+  .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej__vp), .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej__pg) { background: var(--ej-bg) !important; }
+  .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej-k) { background: color-mix(in srgb, var(--ej-ink) 13%, var(--ej-bg)) !important; }
+  .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej__g), .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej__gar) { border-color: color-mix(in srgb, var(--ej-ink) 8%, transparent) !important; }
+  .dc-sk :global(.ej[data-ej-estado='esqueleto'] .ej__url) { color: transparent; }
   .dc-sk :global(.ej-k *) { visibility: hidden !important; }
-  .dc-sk :global(.ej .ej-k.ej__btn), .dc-sk :global(.ej .ej-k.ej__btn2) { background: rgba(240, 237, 232, .08) !important; border-color: transparent !important; }
-  .dc-sk :global(.ej-k) { opacity: 0; transform: translateY(6px); position: relative; overflow: hidden; }
+  .dc-sk :global(.ej .ej-k.ej__menu) { border-color: transparent !important; }
+  .dc-sk :global(.ej .ej-k.ej__btn), .dc-sk :global(.ej .ej-k.ej__btn2) { background: color-mix(in srgb, var(--ej-ink) 13%, var(--ej-bg)) !important; border-color: transparent !important; }
+  /* clip-path recorta el brillo al propio bloque (overflow no recorta en los bloques en línea). */
+  .dc-sk :global(.ej-k) { opacity: 0; transform: translateY(6px); position: relative; overflow: hidden; clip-path: inset(0 round 6px); }
   .dc-sk :global(.ej-k.is-in) { opacity: 1; transform: none; transition: opacity 340ms var(--dc-ease), transform 340ms var(--dc-ease); }
   .dc-sk :global(.ej-k)::after {
     content: ''; position: absolute; inset: 0; transform: translateX(-120%);
-    background: linear-gradient(90deg, transparent, rgba(240, 237, 232, .16), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ej-bg) 70%, transparent), transparent);
   }
   .dc.is-building .dc-sk :global(.ej-k.is-in)::after { animation: dc-shim 1550ms ease-in-out infinite; animation-delay: var(--sd, 0ms); }
   @keyframes dc-shim { to { transform: translateX(120%); } }

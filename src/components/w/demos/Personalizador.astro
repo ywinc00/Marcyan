@@ -56,8 +56,8 @@ const T = {
   } as Record<GrupoId, string>,
   // Etiqueta fina que aparece sobre la parte cambiada (detalle Pedestal).
   pieza: {
-    color: L ? 'Color' : 'Color', marcos: L ? 'Corners' : 'Esquinas', modo: L ? 'Mode' : 'Modo',
-    idioma: L ? 'Language' : 'Idioma', letra: L ? 'Type' : 'Letra', botones: L ? 'Button' : 'Botón',
+    color: L ? 'Color' : 'Color', marcos: L ? 'Corners' : 'Marcos', modo: L ? 'Mode' : 'Modo',
+    idioma: L ? 'Language' : 'Idioma', letra: L ? 'Type' : 'Letra', botones: L ? 'Buttons' : 'Botones',
   } as Record<GrupoId, string>,
   chip: L ? 'Everything matches your brand' : 'Todo se ajusta a tu marca',
   tuWeb: L ? 'Your site' : 'Tu web',
@@ -122,6 +122,7 @@ const opcionesGrupo = (g: GrupoId): any[] =>
   data-ej-mode="claro"
   data-ej-btn={neg.boton}
   data-pz-view={opciones?.[0]?.id ?? 'base'}
+  style={`--ej-s-radius:${marcos[ini.marcos].v}`}
   lang={lang}
 >
   {opciones && !embebido && (
@@ -179,7 +180,7 @@ const opcionesGrupo = (g: GrupoId): any[] =>
         ))}
         <span class="pz-shine" aria-hidden="true"></span>
       </div>
-      <span class="pz-tag" aria-hidden="true" data-pz-tag><i></i><b></b></span>
+      <span class="pz-tag" aria-hidden="true" data-pz-tag><b></b></span>
     </div>
 
     <div class="pz-foot">
@@ -287,7 +288,7 @@ const opcionesGrupo = (g: GrupoId): any[] =>
   .pz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   /* Brillo que cruza la maqueta al cambiar de idioma (por transform, 900 ms). */
-  .pz-shine { position: absolute; z-index: 5; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; overflow: hidden; border-radius: 12px; pointer-events: none; }
+  .pz-shine { position: absolute; z-index: 5; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; overflow: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 22px); pointer-events: none; }
   .pz-shine::before {
     content: ''; position: absolute; inset: 0 -60%; opacity: 0;
     background: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, .28) 50%, transparent 60%);
@@ -296,14 +297,19 @@ const opcionesGrupo = (g: GrupoId): any[] =>
   .pz-shine.is-on::before { animation: pz-shine 900ms var(--pz-ease) both; }
   @keyframes pz-shine { 0% { opacity: 1; transform: translateX(-60%); } 100% { opacity: 1; transform: translateX(60%); } }
 
-  /* Etiqueta fina sobre la parte cambiada (1,2 s): mono 11, línea 1 px crema al 40 %. */
-  .pz-tag { position: absolute; z-index: 6; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 200ms; }
+  /* Etiqueta fina sobre la parte cambiada (1,2 s), como una selección de editor: marco de 1 px oro
+     ajustado a la pieza (con su mismo radio) y rótulo mono 11 pegado ENCIMA del marco, en el hueco
+     que la separa del texto de arriba (no tapa texto de la web). */
+  .pz-tag {
+    position: absolute; z-index: 6; top: 0; left: 0; box-sizing: border-box; pointer-events: none; opacity: 0;
+    border: 1px solid var(--accent-gold, #c8a96e); transition: opacity 200ms;
+  }
   .pz-tag.is-on { opacity: 1; }
   .pz-tag b {
-    position: absolute; right: 0; bottom: 100%; white-space: nowrap; padding: 3px 7px; border-radius: 6px;
-    font: 500 11px/1.3 var(--font-mono); color: #f0ede8; background: #111110; box-shadow: 0 0 0 1px rgba(240, 237, 232, .14);
+    position: absolute; left: -1px; bottom: 100%; white-space: nowrap; padding: 1px 5px 0; border-radius: 3px 3px 3px 0;
+    font: 600 11px/13px var(--font-mono); letter-spacing: .02em; color: #111110; background: var(--accent-gold, #c8a96e);
   }
-  .pz-tag i { position: absolute; right: 0; bottom: 0; width: 1px; height: var(--h, 24px); background: rgba(240, 237, 232, .4); transform: translateY(100%); }
+  .pz-tag.is-in b { bottom: auto; left: auto; top: 3px; right: 3px; border-radius: 4px; }
 
   .pz-ghost { position: absolute; z-index: 9; top: 0; left: 0; opacity: 0; pointer-events: none; transition: opacity 300ms, transform 700ms var(--pz-ease); }
   .pz-ghost.is-on { opacity: 1; }
@@ -323,8 +329,20 @@ const opcionesGrupo = (g: GrupoId): any[] =>
   .pz-opt__x { font: 400 15px/1.5 var(--font-body); color: var(--w-ink-70, rgba(240,237,232,.7)); }
   .pz-opt:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
 
-  /* Marcos: el marco de la web de ejemplo sigue al radio elegido (rectas 2 · suaves 10 · redondas 24). */
-  .pz :global(.ej--tarjeta .ej__marco) { border-radius: clamp(2px, var(--ej-radius), 22px); transition: border-radius 220ms var(--pz-ease); }
+  /* Marcos: rectas 2 · suaves 10 · redondas 24 (plan §2 P01). Pesa más que el radio fijo de WebEjemplo
+     (0,4,0) para que se vea también con los botones en píldora: el marco de la tarjeta sigue al radio
+     (tope 22 para quedar concéntrico con la bandeja de 26), el botón de menú lo lleva × .5 y el chip
+     "Abierto" × .25. Los botones en píldora siguen en píldora (manda Botones). */
+  .pz[data-ej-scope] :global(.ej.ej--tarjeta .ej__marco) { border-radius: clamp(2px, var(--ej-radius), 22px); transition: border-radius 220ms var(--pz-ease); }
+  .pz[data-ej-scope] :global(.ej.ej--vertical .ej__nav .ej__menu) {
+    display: grid; place-items: center; width: 32px; height: 32px; box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--ej-ink) 22%, transparent); border-radius: calc(var(--ej-radius) * .5);
+    transition: border-radius 220ms var(--pz-ease), border-color 220ms var(--pz-ease);
+  }
+  .pz[data-ej-scope] :global(.ej.ej--vertical .ej__nav .ej__abierto) {
+    padding: 4px 9px 4px 8px; background: color-mix(in srgb, var(--ej-ink) 6%, var(--ej-bg)); border-radius: calc(var(--ej-radius) * .25);
+    transition: border-radius 220ms var(--pz-ease), background-color 220ms var(--pz-ease);
+  }
 
   /* Vista sin raíles (p. ej. "A medida": abanico de páginas, como opcion-2 del original). */
   .pz.is-norails .pz-rail { opacity: 0; transform: translateY(16px); pointer-events: none; visibility: hidden; transition: opacity 300ms, transform 300ms, visibility 0s 300ms; }

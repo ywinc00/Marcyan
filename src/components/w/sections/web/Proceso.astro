@@ -1,23 +1,34 @@
 ---
-// Diseño web · 01 "Cómo se construye tu web" (§4.14-4): CabeceraNumerada SOLO de etiqueta
-// + DemoPorPasos con su título de sección, bajada y pasos juntos a la izquierda (W-CORE-05;
-// sistema tras el piloto, igual que la Escalera de 02: un solo titular), firma
-// de la página: disparo único por entrada en vista, la lista marca el paso que corre y
-// el registro cuenta lo que deja cada paso. La web de EJEMPLO va rotulada.
-import CabeceraNumerada from '../../CabeceraNumerada.astro';
-import DemoPorPasos from '../../DemoPorPasos.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
+// Diseño web · 01 "Cómo se construye tu web" + 02 "Hazla tuya" FUNDIDAS en una sola demo
+// fija (v2 · G03, P01 DemoConstruye; original W-CORE-05 + W-CORE-06 de workos.com/authkit).
+// Un solo camino (crítica B6): esta sección es la ÚNICA que monta la demo; la sección de
+// WLanding que la envuelve conserva id="proceso" (empieza en el bloque 1) y HazlaTuya.astro
+// ya no se monta desde web.ts (el archivo se conserva). La antigua "Hazla tuya" no tenía id
+// propio ni anclas del megamenú: el bloque 2 no necesita conservar ninguno.
+// Opciones Landing / Rediseño / A medida con los nombres y textos de pricing.ts y su
+// "Desde $X" de PRICE_ANCHORS (nunca un precio escrito a mano).
+import DemoConstruye from '../../demos/DemoConstruye.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
 import type { WebCopy } from '../../../../i18n/w/web';
 
-interface Props { copy: WebCopy['proceso']; n: number; city: string; lang?: 'es' | 'en' }
-const { copy, n, city, lang = 'es' } = Astro.props;
+interface Props { copy: WebCopy['demo']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+const tiers = catalog.find((p) => p.id === 'diseno-web')!.tiers;
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+const anclas = [PRICE_ANCHORS.webLanding, PRICE_ANCHORS.webRedesign, PRICE_ANCHORS.web];
+const ids = ['landing', 'rediseno', 'medida'];
+const opciones = tiers.slice(0, 3).map((t, i) => ({
+  id: ids[i],
+  titulo: t.name,
+  texto: t.blurb,
+  precio: `Desde ${usd(anclas[i])}`,
+  railes: i !== 2,
+}));
 ---
-<CabeceraNumerada n={n} label={copy.label} />
-<div class="ws-gap">
-  <DemoPorPasos titleHtml={copy.title} text={copy.demoText} headSize="section" steps={copy.steps} log={copy.log} done={copy.done} working={copy.working} lang={lang}>
-    <WebEjemplo slot="screen" frame="tarjeta" city={city} lang={lang} />
-  </DemoPorPasos>
-</div>
-<style>
-  .ws-gap { margin-top: 12px; }
-</style>
+<DemoConstruye
+  lang={lang}
+  id="dc-web"
+  bloque1={{ n: 1, etiqueta: copy.bloque1.etiqueta, titleHtml: copy.bloque1.titulo, texto: copy.bloque1.texto, ventajas: copy.bloque1.ventajas }}
+  bloque2={{ n: 2, etiqueta: copy.bloque2.etiqueta, titleHtml: copy.bloque2.titulo, texto: copy.bloque2.texto, opciones }}
+  consola={copy.consola}
+/>

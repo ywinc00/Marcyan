@@ -1,0 +1,134 @@
+---
+// Diseño web · cierre (v2 · G03): EscenaCierre (P08, W2N-06 calzado: cerrar con la última
+// pantalla del producto) con H2 "Tu web, lista para trabajar." y el TRÍO contractual dentro
+// de la tarjeta de la pantalla, cada uno exactamente una vez:
+//   a.ctaband__act--form[data-track=proposal_requested] → #contacto
+//   a.ctaband__act--wa[data-track=whatsapp_clicked]
+//   a.ctaband__act--call[data-track=call_clicked]
+// Dominante por dispositivo SIN `order` (WCAG 1.3.2/2.4.3): el DOM es fijo (formulario ·
+// WhatsApp · llamar) y solo cambia la piel por punto de corte (escritorio: formulario como
+// botón principal; móvil: Llamar). Las pieles reproducen Button primary/secondary (DESIGN.md)
+// sobre la tarjeta clara: mismas medidas, tinta oscura en lo secundario (igual que el ajuste
+// local de tokens de EscenaCierre). Enlace cálido (diagnóstico) como texto bajo la tarjeta.
+// tel/wa SIEMPRE por props. CierreDosTarjetas ya no se monta en esta página.
+// Pantalla: la web publicada de "Tu Negocio" (neutro, reparto §1.6) en el slot `pantalla`,
+// dibujada en el lienzo del portátil (1378×895) con ~20 nodos: el escritorio de reserva de
+// EscenaCierre costaba 126 y la página debe quedar por debajo de los nodos de la v1 (§1.8).
+import EscenaCierre from '../../mac/EscenaCierre.astro';
+import { t } from '../../../../i18n/ui';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props {
+  copy: WebCopy['escena'];
+  cityName?: string;
+  city?: 'houston' | 'miami';
+  tel: string;
+  wa: string;
+  lang?: 'es' | 'en';
+}
+const { copy, cityName = 'Houston', city = 'houston', tel, wa, lang = 'es' } = Astro.props;
+const ui = t(lang);
+const P = lang === 'en'
+  ? { neg: 'Your Business', links: ['Services', 'About', 'Contact'], btn: 'Book', k: `${cityName} · live today`, h: ['Close to you,', 'from the first click.'], tira: ['Services', 'Hours', 'Directions'], url: 'yourbusiness.example · Example' }
+  : { neg: 'Tu Negocio', links: ['Servicios', 'Nosotros', 'Contacto'], btn: 'Reservar', k: `${cityName} · desde hoy en línea`, h: ['Cerca de ti,', 'desde el primer clic.'], tira: ['Servicios', 'Horario', 'Cómo llegar'], url: 'tunegocio.example · Ejemplo' };
+---
+<div class="wcz" data-city={city}>
+  <EscenaCierre lang={lang} id="cierre">
+    <div slot="pantalla" class="wcz-p" aria-hidden="true" data-nosnippet>
+      <p class="wcz-p__url">{P.url}</p>
+      <p class="wcz-p__nav"><b>{P.neg}</b><span>{P.links.join('     ')}</span><i>{P.btn}</i></p>
+      <p class="wcz-p__k">{P.k}</p>
+      <p class="wcz-p__h">{P.h[0]}<br />{P.h[1]}</p>
+      <span class="wcz-p__arte"></span>
+      <p class="wcz-p__tira">{P.tira.map((x) => <span>{x}</span>)}</p>
+    </div>
+    <h2 slot="titulo" id="cierre-title">{copy.titulo}</h2>
+    <p slot="bajada">{copy.bajada}</p>
+    <Fragment slot="acciones">
+      <div class="wcz__acts">
+        <a class="wcz__act ctaband__act ctaband__act--form" href="#contacto" data-track="proposal_requested">{copy.form}</a>
+        <a class="wcz__act ctaband__act ctaband__act--wa" href={wa} data-track="whatsapp_clicked">WhatsApp</a>
+        <a class="wcz__act ctaband__act ctaband__act--call" href={tel} data-track="call_clicked">{ui.cta.call}</a>
+      </div>
+    </Fragment>
+  </EscenaCierre>
+  <p class="wcz__warm">
+    <span>{copy.calido}</span>
+    <a href="/es/diagnostico" data-track="tool_cta_clicked">{copy.calidoCta}<span aria-hidden="true">›</span></a>
+  </p>
+</div>
+
+<style>
+  .wcz { position: relative; border-top: 1px solid var(--w-line); }
+
+  /* ── Pantalla: web publicada en el lienzo 1378×895 (decorativa, atenuada por la escena) ── */
+  .wcz-p { position: absolute; inset: 0; background: #f4f1ea; color: #1b1a17; font-family: var(--font-body); overflow: hidden; }
+  .wcz-p p { margin: 0; }
+  .wcz-p__url { height: 44px; display: grid; place-items: center; font: 400 15px/1 var(--font-mono); color: #6e6860; background: #e9e5dd; border-bottom: 1px solid rgba(27,26,23,.08); }
+  .wcz-p__nav { display: flex; align-items: center; gap: 28px; height: 84px; padding: 0 56px; border-bottom: 1px solid rgba(27,26,23,.08); font-size: 17px; white-space: pre; }
+  .wcz-p__nav b { font: 600 24px/1 var(--font-display); letter-spacing: -.04em; padding-left: 34px; position: relative; }
+  .wcz-p__nav b::before { content: ''; position: absolute; left: 0; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; box-shadow: inset 0 0 0 2.5px #1b1a17; background: radial-gradient(circle, #1b1a17 0 4px, transparent 4.5px); }
+  .wcz-p__nav span { margin-left: auto; color: #57534b; }
+  .wcz-p__nav i { font-style: normal; display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 999px; background: #1b1a17; color: #f4f1ea; font-weight: 600; }
+  .wcz-p__k { position: absolute; left: 56px; top: 250px; font: 600 15px/1 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: #8a6a3a; }
+  .wcz-p__h { position: absolute; left: 56px; top: 290px; font: 300 76px/1 var(--font-display); letter-spacing: -.055em; }
+  .wcz-p__arte { position: absolute; right: 56px; top: 172px; width: 520px; height: 440px; border-radius: 24px; overflow: hidden; background: linear-gradient(170deg, #e8c99a 0%, #d79a62 45%, #8f5638 100%); }
+  .wcz-p__arte::after { content: ''; position: absolute; left: -20%; right: -20%; bottom: -55%; height: 100%; border-radius: 50%; background: #2a211c; box-shadow: 0 -2px 0 rgba(255,236,200,.7); }
+  .wcz-p__tira { position: absolute; left: 56px; right: 56px; top: 660px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .wcz-p__tira span { display: flex; align-items: center; height: 76px; padding: 0 26px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px rgba(27,26,23,.08); font: 500 19px/1 var(--font-body); }
+
+  /* ── Trío en la tarjeta clara ──────────────────────────────────── */
+  .wcz__acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+  .wcz__act {
+    display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+    min-height: var(--tap-min, 44px); padding: 14px 28px; border-radius: var(--radius-md);
+    font: 500 16px/1 var(--font-body); letter-spacing: 0.01em; white-space: nowrap; text-decoration: none;
+    color: #0e0e0d; background: transparent; box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .28);
+    transition: background var(--duration-fast) var(--ease-out-expo), box-shadow var(--duration-base), transform var(--duration-fast);
+  }
+  .wcz__act:active { transform: scale(0.97); }
+  @media (hover: hover) and (pointer: fine) {
+    .wcz__act:hover { background: rgba(14, 14, 13, .05); box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .5); }
+  }
+  /* Móvil: Llamar domina, a todo el ancho y debajo (piel de Button primary). */
+  .ctaband__act--call.wcz__act {
+    flex: 1 0 100%; font-weight: 600; background: var(--accent-gold); color: var(--fg-inverse); box-shadow: none;
+  }
+  .ctaband__act--form.wcz__act, .ctaband__act--wa.wcz__act { flex: 1 1 0; }
+  @media (hover: hover) and (pointer: fine) {
+    .ctaband__act--call.wcz__act:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }
+  }
+  /* Escritorio: el formulario domina; Llamar vuelve a secundario. */
+  @media (min-width: 768px) {
+    .ctaband__act--form.wcz__act, .ctaband__act--wa.wcz__act { flex: 0 0 auto; }
+    .ctaband__act--call.wcz__act {
+      flex: 0 0 auto; font-weight: 500; background: transparent; color: #0e0e0d; box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .28);
+    }
+    .ctaband__act--form.wcz__act { font-weight: 600; background: var(--accent-gold); color: var(--fg-inverse); box-shadow: none; }
+  }
+  @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+    .ctaband__act--call.wcz__act:hover { background: rgba(14, 14, 13, .05); box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .5); }
+    .ctaband__act--form.wcz__act:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }
+  }
+  .wcz__act:focus-visible { outline: 2px solid #0e0e0d; outline-offset: 2px; }
+
+  /* ── Enlace cálido, bajo la tarjeta ────────────────────────────── */
+  .wcz__warm {
+    position: relative; z-index: 3; margin: 0; padding: 20px 16px 72px;
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 12px;
+    font: 400 16px/1.5 var(--font-body); color: var(--w-ink-70, rgba(240, 237, 232, .7)); text-align: center;
+  }
+  .wcz__warm a {
+    display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap-min, 44px);
+    font-weight: 500; color: var(--w-ink, #f0ede8); text-decoration: none;
+  }
+  .wcz__warm a span { color: var(--accent-gold); font-size: 18px; transition: transform var(--w-dur-hover, .2s) var(--w-ease-ui, ease); }
+  @media (hover: hover) and (pointer: fine) {
+    .wcz__warm a:hover { color: var(--accent-gold); }
+    .wcz__warm a:hover span { transform: translateX(3px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wcz__act, .wcz__warm a span { transition: none; }
+    .wcz__act:active { transform: none; }
+  }
+</style>

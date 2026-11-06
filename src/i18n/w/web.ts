@@ -24,9 +24,23 @@ export interface WebCopy {
   ];
   proceso: { label: string; title: string; demoText: string; steps: string[]; log: string[]; done: string; working: string };
   escalera: { label: string; title: string; demoLead: string; chip: string; pages: string[]; antes: string; despues: string };
+  /** v2 (G03): secciones 01 y 02 fundidas en la demo de construcción (P01). `texto` admite {comando}. */
+  demo: {
+    bloque1: { etiqueta: string; titulo: string; texto: string; ventajas: { icon: string; titulo: string; texto: string }[] };
+    bloque2: { etiqueta: string; titulo: string; texto: string };
+    consola: { comando: string; bloques: { paso: string; detalles: string[] }[]; cierre: string; leyendaTrabajando: string; leyendaLista: string };
+  };
   bento: {
     tone1: string; tone2: string; sub: string;
     cells: { icon: string; label: string; titleHtml: string; text: string; tray?: boolean }[];
+    /** v2 (G03): objetos nuevos del bento (todos de ejemplo, negocio neutro "Tu Negocio"). */
+    objetos: {
+      ejemplo: string;
+      pila: { sr: string; titulo: string; hora: string; atras: string[]; pasos: { t: string; x: string }[] };
+      idioma: { sr: string; negocio: string } & Record<'es' | 'en', { k: string; h: string; x: string; btn: string; lnk: string }>;
+      ficha: { sr: string; tarjetas: string[]; filas: { k: string; v: string }[] };
+      chat: { sr: string; enLinea: string; msgs: { de: 'cliente' | 'marcy'; t: string; h?: string }[] };
+    };
   };
   prosa: { tone1: string; tone2: string; items: { icon: string; title: string; text: string }[] };
   proyectos: { label: string; title: string; lead: string; more: string };
@@ -34,6 +48,8 @@ export interface WebCopy {
   franja: { queEs: string; desde: (landing: string, medida: string) => string; tiempo: string; verQue: string; verPrecios: string; pedir: string };
   hermanas: { title: string; lead: string; guia: { title: string; text: string }; diag: { title: string; text: string }; precios: { title: string; text: string } };
   cierre: { proof: string; warmTitle: string; warmText: string; warmCta: string };
+  /** v2 (G03): cierre en la pantalla del portátil (EscenaCierre, P08). */
+  escena: { titulo: string; bajada: string; form: string; calido: string; calidoCta: string };
 }
 
 const triada: WebCopy['triada'] = [
@@ -76,6 +92,43 @@ const escalera: WebCopy['escalera'] = {
   despues: 'Después',
 };
 
+// v2 (G03): demo de construcción (P01). Copy de la consola = plan v2 §6 (a validar, §5-13).
+const demo: WebCopy['demo'] = {
+  bloque1: {
+    etiqueta: 'Cómo se construye tu web',
+    titulo: 'De tu negocio a tu web publicada',
+    texto: 'Arrancamos con tus datos, como en {comando}, y tu web se arma sobre tu marca: páginas en español e inglés, lista para Google. La propuesta llega en 24 horas.',
+    ventajas: [
+      { icon: 'lucide:languages', titulo: 'Bilingüe de verdad', texto: 'Español e inglés escritos desde el diseño, no un botón de traducir.' },
+      { icon: 'lucide:search', titulo: 'Lista para Google y la IA', texto: 'Estructura y datos que Google y los asistentes de IA pueden leer.' },
+    ],
+  },
+  bloque2: {
+    etiqueta: 'Hazla tuya',
+    titulo: 'Elige por dónde empezar',
+    texto: 'Tres formas de tener tu web, con el precio de entrada a la vista. Prueba los colores, los marcos, la letra y el idioma: así se ajusta a tu marca.',
+  },
+  consola: {
+    comando: 'marcyan web --negocio "Tu Plomería" --idiomas es,en',
+    bloques: [
+      { paso: 'Leyendo tu marca', detalles: ['logo.svg · colores · tipografía'] },
+      { paso: 'Escribiendo tus páginas', detalles: ['/es  /en', 'inicio · servicios · contacto'] },
+      { paso: 'Preparando para Google', detalles: ['sitemap.xml · datos para buscadores'] },
+    ],
+    cierre: 'Tu web está lista',
+    leyendaTrabajando: 'Preparando tu web',
+    leyendaLista: 'Web lista para publicar',
+  },
+};
+
+const escena: WebCopy['escena'] = {
+  titulo: 'Tu web, lista para trabajar.',
+  bajada: 'Rápida, en español y en inglés, y conectada a tus clientes desde el primer día.',
+  form: 'Propuesta gratis',
+  calido: '¿Aún no sabes qué necesitas?',
+  calidoCta: 'Haz el diagnóstico gratis',
+};
+
 const bento: WebCopy['bento'] = {
   tone1: 'Una web bonita no basta.',
   tone2: 'Tiene que traerte clientes.',
@@ -84,8 +137,48 @@ const bento: WebCopy['bento'] = {
     { icon: 'lucide:inbox', label: 'Formulario', titleHtml: 'Ningún contacto se pierde', text: 'Cada mensaje se guarda antes de avisarte, aunque falle el correo.' },
     { icon: 'lucide:languages', label: 'Idiomas', titleHtml: 'Tu web en inglés también', text: 'El visitante elige idioma y todo cambia, textos y botones.' },
     { icon: 'lucide:map-pin', label: 'Ficha de mapa', titleHtml: 'Conectada a tu ficha', text: 'Mismo nombre, teléfono y horario en tu web y en el mapa.' },
-    { icon: 'lucide:message-circle', label: 'Marcy', titleHtml: 'Contesta a las 23:40', text: 'Tu asistente responde cuando tú ya cerraste.', tray: false },
+    { icon: 'lucide:message-circle', label: 'Marcy', titleHtml: 'Contesta a las 11:40 p. m.', text: 'Tu asistente responde cuando tú ya cerraste.', tray: false },
   ],
+  objetos: {
+    ejemplo: 'Ejemplo',
+    pila: {
+      sr: 'Ejemplo: un contacto nuevo de las 9:41 p. m. se recibe, se guarda y te avisa por correo; tú respondes cuando puedas.',
+      titulo: 'Nuevo contacto',
+      hora: '9:41 p. m.',
+      atras: ['Luis', 'Eva'],
+      pasos: [
+        { t: 'Recibido', x: 'Ana · fuga en la cocina' },
+        { t: 'Guardado', x: 'Antes de avisarte' },
+        { t: 'Aviso a tu correo', x: 'Enviado' },
+        { t: 'Tú respondes', x: 'Cuando puedas' },
+      ],
+    },
+    idioma: {
+      sr: 'Ejemplo: la misma web cambia entre español e inglés, con textos y botones en cada idioma.',
+      negocio: 'Tu Negocio',
+      es: { k: 'Abierto hoy', h: 'Te atendemos hoy mismo.', x: 'Servicio en toda tu zona, en español y en inglés.', btn: 'Llamar', lnk: 'Ver servicios' },
+      en: { k: 'Open today', h: 'We can help you today.', x: 'Serving your whole area, in English and Spanish.', btn: 'Call', lnk: 'See services' },
+    },
+    ficha: {
+      sr: 'Ejemplo: tu web y tu ficha de mapa muestran el mismo nombre, teléfono y horario.',
+      tarjetas: ['Tu web', 'Tu ficha de mapa'],
+      filas: [
+        { k: 'Nombre', v: 'Tu Negocio' },
+        { k: 'Teléfono', v: '{tel}' },
+        { k: 'Horario', v: '8 a. m. a 6 p. m.' },
+      ],
+    },
+    chat: {
+      sr: 'Ejemplo: a las 11:40 p. m. un cliente pregunta si siguen abiertos y Marcy le aparta la primera visita de la mañana.',
+      enLinea: 'en línea',
+      msgs: [
+        { de: 'cliente', t: '¿Siguen abiertos?', h: '11:40 p. m.' },
+        { de: 'marcy', t: 'Ya cerramos. Abrimos mañana a las 8:00 a. m. ¿Te aparto la primera visita?' },
+        { de: 'cliente', t: 'Sí, a las 8 está bien.' },
+        { de: 'marcy', t: 'Hecho. Te esperamos mañana a las 8:00 a. m.', h: '11:41 p. m.' },
+      ],
+    },
+  },
 };
 
 const prosaItems: WebCopy['prosa']['items'] = [
@@ -139,6 +232,7 @@ export const webCopy: Record<WebCity, WebCopy> = {
     triada,
     proceso,
     escalera,
+    demo,
     bento,
     prosa: { tone1: 'Por qué en Houston.', tone2: 'Un sitio pensado para tu mercado.', items: prosaItems },
     proyectos: {
@@ -157,6 +251,7 @@ export const webCopy: Record<WebCity, WebCopy> = {
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
     },
     cierre: { proof: 'Texas Rush Remove ya posiciona en su zona de Houston con su sitio nuevo.', ...warm },
+    escena,
   },
   miami: {
     chip: 'Miami, FL',
@@ -169,6 +264,7 @@ export const webCopy: Record<WebCity, WebCopy> = {
     triada,
     proceso,
     escalera,
+    demo,
     bento,
     prosa: { tone1: 'Por qué Miami.', tone2: 'Un mercado bilingüe por naturaleza.', items: prosaItems },
     proyectos: {
@@ -187,5 +283,6 @@ export const webCopy: Record<WebCity, WebCopy> = {
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
     },
     cierre: { proof: 'Move Junk Away, en Orlando, ya posiciona en su zona con su sitio nuevo.', ...warm },
+    escena,
   },
 };

@@ -3,11 +3,14 @@
 // ola 1, PILOTO). Su existencia activa el tipo (registry.ts); las páginas
 // /es/houston/diseno-web y /es/miami/diseno-web lo importan y montan WLanding.
 //
-// Contraste: el bento "Más que una web" (.w-contrast). Firma: DemoPorPasos (una vez
-// por entrada en vista; el abanico no tiene bucle). Degradado: la cifra del precio.
-// Orden (R1): hero → tríada → 01 demo → 02 escalera → contraste → prosa local →
-// 03 proyectos → precio → franja "En pocas palabras" → FAQ → hermanas → cierre
-// (Contact lo pone WLanding).
+// Contraste: el bento "Más que una web" (.w-contrast). Degradado: la cifra del precio.
+// v2 (design/rediseno-workos-v2.md §3 G03): fondo F01 (retícula de maqueta, P12) en el hero;
+// 01 y 02 FUNDIDAS en la demo de construcción (P01, firma de la página) por un solo camino:
+// Proceso.astro monta DemoConstruye en la celda #proceso y HazlaTuya.astro ya no se monta
+// (el archivo se conserva). Cierre: EscenaCierre (P08) con el trío dentro de la tarjeta de
+// la pantalla; CierreDosTarjetas ya no se monta aquí.
+// Orden (R1): hero → tríada → 01+02 demo → contraste → prosa local → 03 proyectos →
+// precio → franja "En pocas palabras" → FAQ → hermanas → cierre (Contact lo pone WLanding).
 // ─────────────────────────────────────────────────────────────
 import HeroWeb from '../../heroes/HeroWeb.astro';
 import TriadaManifiesto from '../../TriadaManifiesto.astro';
@@ -15,12 +18,11 @@ import ProsaLocal from '../../ProsaLocal.astro';
 import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
 import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
 import TarjetasHermanas from '../../TarjetasHermanas.astro';
-import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
 import Proceso from '../../sections/web/Proceso.astro';
-import HazlaTuya from '../../sections/web/HazlaTuya.astro';
 import MasQueUnaWeb from '../../sections/web/MasQueUnaWeb.astro';
 import Proyectos from '../../sections/web/Proyectos.astro';
 import Precio from '../../sections/web/Precio.astro';
+import Cierre from '../../sections/web/Cierre.astro';
 import { webCopy, type WebCity } from '../../../../i18n/w/web';
 import { nap } from '../../../../i18n/content';
 import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
@@ -50,6 +52,8 @@ const LEAD_PROJECT: Record<WebCity, string> = {
 const spec: KindSpec = {
   kind: 'web',
   tone: 'gold',
+  // F01 · retícula de maqueta (P12): su marco de selección abraza las 3 webs del abanico.
+  fondo: 'F01',
   Hero: HeroWeb,
   hero: (ctx) => {
     const t = copyOf(ctx);
@@ -70,17 +74,11 @@ const spec: KindSpec = {
     // 2 · Tríada a dos tonos (W-ADV-08), sin caja ni icono.
     { component: TriadaManifiesto, props: (ctx) => ({ items: copyOf(ctx).triada }) },
 
-    // 4 · 01 Cómo se construye tu web: demo por pasos (firma). Conserva #proceso.
+    // 4 · 01 Cómo se construye tu web + 02 Hazla tuya: UNA demo fija (P01). Conserva #proceso.
     {
       component: Proceso,
       id: 'proceso',
-      props: (ctx) => ({ copy: copyOf(ctx).proceso, n: 1, city: copyOf(ctx).cityName, lang: ctx.lang }),
-    },
-
-    // 5 · 02 Hazla tuya: escalera de paquetes.
-    {
-      component: HazlaTuya,
-      props: (ctx) => ({ copy: copyOf(ctx).escalera, n: 2, city: copyOf(ctx).cityName, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).demo, lang: ctx.lang }),
     },
 
     // 6 · Capítulo de contraste: dos frases + bento con un objeto por celda.
@@ -181,21 +179,20 @@ const spec: KindSpec = {
       },
     },
 
-    // 12 · Cierre en dos tarjetas con el trío contractual (teléfono de la ciudad).
+    // 12 · Cierre en la pantalla del portátil (P08) con el trío contractual (teléfono de la ciudad).
     {
-      component: CierreDosTarjetas,
+      component: Cierre,
+      wrap: 'none',
       props: (ctx) => {
         const city = cityOf(ctx);
-        const t = copyOf(ctx).cierre;
         const num = city === 'miami' ? nap.miami : nap.houston;
         return {
-          titleHtml: ctx.cluster.cta.title,
-          proof: t.proof,
+          copy: copyOf(ctx).escena,
           city,
+          cityName: copyOf(ctx).cityName,
           tel: 'tel:' + num.replace(/[^\d+]/g, ''),
           wa: 'https://wa.me/' + num.replace(/\D/g, ''),
           lang: ctx.lang,
-          warm: { kind: 'diagnostico', title: t.warmTitle, text: t.warmText, cta: t.warmCta, href: '/es/diagnostico' },
         };
       },
     },

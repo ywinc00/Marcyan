@@ -1,143 +1,251 @@
 ---
-// Respuesta de asistente que te cita (W-CORE-10 · design/rediseno-workos.md §3.6).
-// Objeto de PRODUCTO: bandeja radio 20 padding 14 (noche) con tarjeta interior CLARA radio
-// 12: la pregunta, "Buscando…" que pasa a check, "Leyendo fuentes" que pasa a check y la
-// burbuja final que cita "Tu Negocio" en negrita. variant="tres-columnas" (IA para pymes):
-// "ChatGPT te recomienda · Google te resume · Marcy agenda", con los nombres SOLO en texto
-// (sin logotipos de terceros, §1.C). Se escribe UNA vez (~2,5 s) al entrar en vista; sin
-// JS o con reduced-motion se ve el estado final. Ilustración: aria-hidden + sr-only.
+// Respuesta de asistente que te cita (W-CORE-10 completo · design/rediseno-workos-v2.md §2 P05).
+// Bandeja noche radio 20 padding 14 con tarjeta interior CLARA radio 12. Patrón del original:
+// cabecera con la plataforma que responde (logo a color 16 px; ChatGPT como palabra, §1.4),
+// burbuja del usuario a la derecha con pico abajo a la derecha (radio 6 6 2 6), pasos con un punto
+// que LATE (0 → .5 → 0, 2 s) mientras está pendiente y pasa a check con fundido cruzado del texto
+// ("Buscando…" → "Busqué…"), y mensaje final en caja gris con el negocio en negrita.
+// Tiempos medidos (C/05-asistente/FICHA.md §A): paso 1 entra 255-480 ms y queda hecho a 1170;
+// paso 2 entra a 1170 y queda hecho a 2000; mensaje a 2330 (fundido 250 ms).
+// Variantes: tarjeta · tres-columnas (IA para pymes) · mini (burbuja + 1 paso + respuesta, 280 px,
+// para la escena 04 de P11). Se reproduce al entrar en vista y REPITE al reentrar tras ≥ 8 s fuera.
+// Sin JS o con reducir movimiento: estado final. Contrato §1.6: ilustración aria-hidden +
+// data-nosnippet + resumen sr-only, sin h1-h6.
 import Ejemplo from '../Ejemplo.astro';
 
+type Plataforma = 'chatgpt' | 'gemini' | 'perplexity' | 'google' | 'claude' | 'meta' | 'marcy';
 interface Props {
   lang?: 'es' | 'en';
-  variant?: 'tarjeta' | 'tres-columnas';
+  variant?: 'tarjeta' | 'tres-columnas' | 'mini';
   tone?: 'teal' | 'gold';
   size?: 'hero' | 'card' | 'mini';
+  /** Plataforma que responde (tarjeta y mini). Por defecto ChatGPT. */
+  plataforma?: Plataforma;
   question?: string;
   business?: string;
   class?: string;
 }
-const { lang = 'es', variant = 'tarjeta', tone = 'teal', size = 'card', class: cls } = Astro.props;
+const { lang = 'es', tone = 'teal', size = 'card', plataforma = 'chatgpt', class: cls } = Astro.props;
+// size="mini" (uso heredado de la v1) equivale a la variante mini.
+const variant = Astro.props.variant ?? (size === 'mini' ? 'mini' : 'tarjeta');
 const en = lang === 'en';
 const biz = Astro.props.business ?? (en ? 'Your Business' : 'Tu Negocio');
 const q = Astro.props.question ?? (en ? 'Who builds websites in Spanish in Houston?' : '¿Quién hace webs en español en Houston?');
+
+// LogoMarca (P06) si ya está integrado; si no, palabra con el mismo alto óptico.
+const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
+const LogoMarca = Object.values(logoMods)[0]?.default;
+const PLAT: Record<Plataforma, { id?: string; nombre: string }> = {
+  chatgpt: { id: 'chatgpt-texto', nombre: 'ChatGPT' },
+  gemini: { id: 'googlegemini', nombre: 'Gemini' },
+  perplexity: { id: 'perplexity', nombre: 'Perplexity' },
+  google: { id: 'google', nombre: 'Google' },
+  claude: { id: 'claude', nombre: 'Claude' },
+  meta: { id: 'meta', nombre: 'Meta AI' },
+  marcy: { nombre: 'Marcy' },
+};
+
 const T = en
-  ? { searching: 'Searching the web', reading: 'Reading sources', pre: 'A good option is ', post: ': bilingual website, quick replies and real work on display.', sr: `Example: someone asks an AI assistant who builds websites in Spanish in Houston, and the answer names ${biz}.` }
-  : { searching: 'Buscando en la web', reading: 'Leyendo fuentes', pre: 'Una buena opción es ', post: ': web bilingüe, responde rápido y enseña su trabajo.', sr: `Ejemplo: alguien le pregunta a un asistente de IA quién hace webs en español en Houston y la respuesta nombra a ${biz}.` };
-const COLS = en
+  ? {
+      s1: ['Searching the web', 'Searched the web'], s2: ['Reading sources', 'Read sources'],
+      pre: 'A good option is ', post: ': bilingual website, quick replies and real work on display.',
+      miniPre: 'I recommend ', miniPost: ': serves in Spanish and English.',
+      sr: `Example: someone asks an AI assistant who builds websites in Spanish in Houston, and the answer names ${biz}.`,
+      srMini: `Example: an AI assistant searches and recommends ${biz}.`,
+    }
+  : {
+      s1: ['Buscando en la web', 'Busqué en la web'], s2: ['Leyendo fuentes', 'Fuentes leídas'],
+      pre: 'Una buena opción es ', post: ': web bilingüe, responde rápido y enseña su trabajo.',
+      miniPre: 'Te recomiendo ', miniPost: ': atiende en español e inglés.',
+      sr: `Ejemplo: alguien le pregunta a un asistente de IA quién hace webs en español en Houston y la respuesta nombra a ${biz}.`,
+      srMini: `Ejemplo: un asistente de IA busca y recomienda a ${biz}.`,
+    };
+const COLS: { p: Plataforma; who: string; q: string; a: [string, string, string] }[] = en
   ? [
-      { who: 'ChatGPT recommends you', q: 'Best plumber near me in Houston?', a: [`I recommend `, biz, `: open today and answers in Spanish.`] },
-      { who: 'Google sums you up', q: 'plumber houston spanish', a: ['', biz, ` is a Houston plumber with bilingual service.`] },
-      { who: 'Marcy books it', q: 'Can someone come on Saturday?', a: [`Yes, `, 'Saturday 10:00', ` is booked. I sent you the confirmation.`] },
+      { p: 'chatgpt', who: 'recommends you', q: 'Best plumber near me in Houston?', a: ['I recommend ', biz, ': open today and answers in Spanish.'] },
+      { p: 'google', who: 'sums you up', q: 'plumber houston spanish', a: ['', biz, ' is a Houston plumber with bilingual service.'] },
+      { p: 'marcy', who: 'books it', q: 'Can someone come on Saturday?', a: ['Yes, ', 'Saturday at 10:00 AM', ' is booked. I sent you the confirmation.'] },
     ]
   : [
-      { who: 'ChatGPT te recomienda', q: '¿Un buen plomero cerca de mí en Houston?', a: ['Te recomiendo ', biz, ': abre hoy y atiende en español.'] },
-      { who: 'Google te resume', q: 'plomero houston en español', a: ['', biz, ' es un plomero de Houston con atención bilingüe.'] },
-      { who: 'Marcy agenda', q: '¿Pueden venir el sábado?', a: ['Sí, quedó el ', 'sábado a las 10:00', '. Te mandé la confirmación.'] },
+      { p: 'chatgpt', who: 'te recomienda', q: '¿Un buen plomero cerca de mí en Houston?', a: ['Te recomiendo ', biz, ': abre hoy y atiende en español.'] },
+      { p: 'google', who: 'te resume', q: 'plomero houston en español', a: ['', biz, ' es un plomero de Houston con atención bilingüe.'] },
+      { p: 'marcy', who: 'agenda', q: '¿Pueden venir el sábado?', a: ['Sí, quedó el ', 'sábado a las 10:00 a. m.', ' Te mandé la confirmación.'] },
     ];
 const srCols = en
   ? `Example: ChatGPT recommends ${biz}, Google sums it up, and Marcy books the appointment.`
   : `Ejemplo: ChatGPT recomienda a ${biz}, Google lo resume y Marcy agenda la cita.`;
 ---
-<div class:list={['wo-ans', `wo-ans--${variant}`, `wo-ans--${size}`, cls]} data-tone={tone} data-wo-ans>
-  {variant === 'tarjeta' ? (
-    <>
-      <p class="sr-only">{T.sr}</p>
-      <div class="wo-ans__card" aria-hidden="true">
-        <Ejemplo lang={lang} on="light" />
-        <p class="wo-ans__q">{q}</p>
-        <p class="wo-ans__step" style="--d:0ms"><span class="wo-ans__chk"><i></i></span>{T.searching}</p>
-        <p class="wo-ans__step" style="--d:700ms"><span class="wo-ans__chk"><i></i></span>{T.reading}</p>
-        <p class="wo-ans__bub" style="--d:1500ms">{T.pre}<b translate="no">{biz}</b>{T.post}</p>
-      </div>
-    </>
-  ) : (
+<div class:list={['wo-ans', `wo-ans--${variant}`, `wo-ans--${size}`, cls]} data-tone={tone} data-wo-ans data-nosnippet>
+  {variant === 'tres-columnas' ? (
     <>
       <p class="sr-only">{srCols}</p>
       <div class="wo-ans__cols" aria-hidden="true">
         {COLS.map((c, i) => (
-          <div class="wo-ans__card" style={`--d:${i * 500}ms`}>
+          <div class="wo-ans__card" style={`--o:${i * 500}ms`}>
             {i === 0 && <Ejemplo lang={lang} on="light" />}
-            <p class="wo-ans__who">{c.who}</p>
-            <p class="wo-ans__q">{c.q}</p>
-            <p class="wo-ans__bub" style={`--d:${i * 500 + 600}ms`}>{c.a[0]}<b translate="no">{c.a[1]}</b>{c.a[2]}</p>
+            <p class="wo-ans__who">
+              {c.p === 'marcy'
+                ? <img class="wo-ans__av" src="/assets/bot/marcy-mini.webp" width="16" height="16" alt="" loading="lazy" decoding="async" />
+                : LogoMarca ? <LogoMarca id={PLAT[c.p].id} size={16} tono="color" /> : null}
+              <b translate="no">{PLAT[c.p].nombre}</b> <span>{c.who}</span>
+            </p>
+            <p class="wo-ans__user">{c.q}</p>
+            <p class="wo-ans__bub" style="--d:900ms">{c.a[0]}<b translate="no">{c.a[1]}</b>{c.a[2]}</p>
           </div>
         ))}
+      </div>
+    </>
+  ) : (
+    <>
+      <p class="sr-only">{variant === 'mini' ? T.srMini : T.sr}</p>
+      <div class="wo-ans__card" aria-hidden="true">
+        {variant !== 'mini' && <Ejemplo lang={lang} on="light" />}
+        <p class="wo-ans__who">
+          {LogoMarca && PLAT[plataforma].id ? <LogoMarca id={PLAT[plataforma].id} size={16} tono="color" /> : null}
+          <b translate="no">{PLAT[plataforma].nombre}</b>
+        </p>
+        <p class="wo-ans__user">{q}</p>
+        <p class="wo-ans__step" style="--d:255ms;--h:1170ms"><span class="wo-ans__chk"><i></i></span><span class="wo-ans__sw"><span>{T.s1[0]}</span><span>{T.s1[1]}</span></span></p>
+        {variant !== 'mini' && (
+          <p class="wo-ans__step" style="--d:1170ms;--h:2000ms"><span class="wo-ans__chk"><i></i></span><span class="wo-ans__sw"><span>{T.s2[0]}</span><span>{T.s2[1]}</span></span></p>
+        )}
+        <p class="wo-ans__bub" style={`--d:${variant === 'mini' ? 1500 : 2330}ms`}>
+          {variant === 'mini' ? T.miniPre : T.pre}<b translate="no">{biz}</b>{variant === 'mini' ? T.miniPost : T.post}
+        </p>
       </div>
     </>
   )}
 </div>
 
 <script>
-  // Disparo único al entrar en vista (no es un bucle: sin registerLoop ni botón de pausa).
+  // Se reproduce al entrar en vista y repite al reentrar tras ≥ 8 s fuera (§1.5).
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
   document.querySelectorAll<HTMLElement>('[data-wo-ans]').forEach((el) => {
-    if (mq.matches || !('IntersectionObserver' in window)) return;
-    const r = el.getBoundingClientRect();
-    if (r.top < innerHeight && r.bottom > 0) { el.classList.add('is-armed'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-run'))); return; }
+    if (el.dataset.woMontado || mq.matches || !('IntersectionObserver' in window)) return;
+    el.dataset.woMontado = '1';
     el.classList.add('is-armed');
-    const io = new IntersectionObserver((es) => {
-      if (es.some((e) => e.isIntersecting)) { el.classList.add('is-run'); io.disconnect(); }
-    }, { threshold: .35 });
-    io.observe(el);
+    let visto = false;
+    let salida = 0;
+    const run = () => {
+      el.classList.remove('is-run');
+      void el.offsetWidth;
+      requestAnimationFrame(() => el.classList.add('is-run'));
+    };
+    new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      if (e.isIntersecting && e.intersectionRatio >= 0.35) {
+        if (!visto) { visto = true; run(); }
+        else if (salida && performance.now() - salida >= 8000) run();
+        salida = 0;
+      } else if (!e.isIntersecting && visto && !salida) salida = performance.now();
+    }, { threshold: [0, 0.35] }).observe(el);
   });
 </script>
 
 <style>
   .wo-ans {
-    --wo-acc: var(--accent-teal);
+    --wo-acc: var(--accent-teal, #4fc3a1);
     position: relative; width: min(100%, 420px);
     padding: 14px; border-radius: 20px;
-    background: var(--w-s1, #121211); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09)); box-shadow: var(--w-edge, none);
     font-family: var(--font-body); text-align: left;
   }
-  .wo-ans[data-tone='gold'] { --wo-acc: var(--accent-gold); }
+  .wo-ans[data-tone='gold'] { --wo-acc: var(--accent-gold, #c8a96e); }
+  .wo-ans--mini { width: min(100%, 280px); padding: 10px; border-radius: 16px; }
   .wo-ans--tres-columnas { width: 100%; max-width: 1200px; }
   .wo-ans__cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .wo-ans p { margin: 0; }
   .wo-ans__card {
+    --o: 0ms;
     position: relative; display: flex; flex-direction: column; gap: 10px;
-    padding: 18px; border-radius: var(--w-r-obj, 12px);
-    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
-    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    padding: 16px 18px 18px; border-radius: var(--w-r-obj, 12px);
+    background: #fff; color: #1c1d21;
+    border: 1px solid rgba(14, 14, 13, .07);
   }
-  .wo-ans__who { margin: 0 0 2px; font: 500 15px/1.25 var(--font-display); letter-spacing: -0.01em; padding-right: 84px; }
-  .wo-ans__q {
-    margin: 0; padding-right: 84px; font: 500 15px/1.35 var(--font-display); letter-spacing: -0.01em;
+  .wo-ans--mini .wo-ans__card { padding: 12px 12px 12px; gap: 8px; }
+
+  /* Cabecera: plataforma que responde */
+  .wo-ans__who {
+    display: flex; align-items: center; gap: 7px; min-height: 22px;
+    padding-right: 84px;
+    font: 400 13px/1.2 var(--font-body); color: #60646C;
   }
-  .wo-ans--tres-columnas .wo-ans__q {
-    padding: 8px 12px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line);
-    font: 400 14px/1.35 var(--font-body); color: var(--w-p-ink-2, #4a4743); align-self: flex-start;
+  .wo-ans__who b { font: 600 14px/1 var(--font-display); color: #1c1d21; letter-spacing: -0.01em; }
+  .wo-ans__who :global(svg) { flex: none; display: block; }
+  .wo-ans--mini .wo-ans__who { padding-right: 0; }
+  .wo-ans__av { width: 16px; height: 16px; border-radius: 50%; background: #e7e3dc; object-fit: cover; }
+
+  /* Burbuja del usuario: a la derecha, pico abajo a la derecha (6 6 2 6) */
+  .wo-ans__user {
+    align-self: flex-end; max-width: 86%;
+    padding: 8px 12px; border-radius: 6px 6px 2px 6px;
+    background: #fff; border: .67px solid #DADBDF;
+    font: 400 13.5px/1.35 var(--font-body); color: #1c1d21;
+    box-shadow: 0 1px 2px rgba(14, 14, 13, .04);
   }
-  .wo-ans--tres-columnas .wo-ans__card:not(:first-child) .wo-ans__who { padding-right: 0; }
-  .wo-ans__step { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-ans--mini .wo-ans__user { font-size: 12.5px; padding: 6px 10px; }
+
+  /* Pasos: punto que late → check; texto con fundido cruzado */
+  .wo-ans__step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #60646C; }
+  .wo-ans--mini .wo-ans__step { font-size: 12px; }
   .wo-ans__chk {
-    position: relative; flex: none; width: 18px; height: 18px; border-radius: 50%;
-    background: var(--wo-acc);
+    position: relative; flex: none; width: 16px; height: 16px; border-radius: 50%;
+    background: color-mix(in srgb, var(--wo-acc) 22%, #fff);
   }
   .wo-ans__chk i {
-    position: absolute; left: 6px; top: 3px; width: 5px; height: 9px;
-    border: solid #0e0e0d; border-width: 0 2px 2px 0; transform: rotate(45deg);
+    position: absolute; left: 5.5px; top: 3px; width: 4px; height: 8px;
+    border: solid color-mix(in srgb, var(--wo-acc) 70%, #0e0e0d); border-width: 0 1.6px 1.6px 0; transform: rotate(45deg);
   }
-  .wo-ans__bub {
-    margin: 4px 0 0; padding: 12px 14px; border-radius: 8px;
-    background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
-    font-size: 14px; line-height: 1.5;
+  .wo-ans__chk::before {
+    content: ''; position: absolute; inset: 5px; border-radius: 50%; background: #60646C; opacity: 0;
   }
-  .wo-ans__bub b { font-weight: 700; }
+  .wo-ans__sw { display: grid; }
+  .wo-ans__sw > span { grid-area: 1 / 1; }
+  .wo-ans__sw > span:first-child { opacity: 0; }
 
-  /* Disparo único: solo si el script lo arma (sin JS o con reduced-motion, estado final). */
+  .wo-ans__bub {
+    padding: 11px 13px; border-radius: 6px;
+    background: #F5F5F7; color: #3A3D44;
+    font-size: 13.5px; line-height: 1.4;
+  }
+  .wo-ans--mini .wo-ans__bub { font-size: 12.5px; padding: 9px 11px; }
+  .wo-ans__bub b { font-weight: 700; color: #1c1d21; }
+
+  .wo-ans--tres-columnas .wo-ans__user { font-size: 13px; }
+
+  /* Coreografía: solo si el script la arma (sin JS o con reduced-motion, estado final). */
   .wo-ans.is-armed .wo-ans__step,
-  .wo-ans.is-armed .wo-ans__bub { opacity: 0; transform: translateY(6px); }
-  .wo-ans.is-armed .wo-ans__chk { background: transparent; box-shadow: inset 0 0 0 2px rgba(14,14,13,.18); }
+  .wo-ans.is-armed .wo-ans__bub,
+  .wo-ans.is-armed .wo-ans__user { opacity: 0; transform: translateY(4px); }
+  .wo-ans.is-armed .wo-ans__chk { background: transparent; }
   .wo-ans.is-armed .wo-ans__chk i { opacity: 0; }
+  .wo-ans.is-armed .wo-ans__chk::before { opacity: .5; }
+  .wo-ans.is-armed .wo-ans__sw > span:first-child { opacity: 1; }
+  .wo-ans.is-armed .wo-ans__sw > span:last-child { opacity: 0; }
+
+  .wo-ans.is-run .wo-ans__user {
+    opacity: 1; transform: none;
+    transition: opacity 250ms var(--w-ease-ui, ease) var(--o), transform 250ms var(--w-ease-ui, ease) var(--o);
+  }
   .wo-ans.is-run .wo-ans__step,
   .wo-ans.is-run .wo-ans__bub {
     opacity: 1; transform: none;
-    transition: opacity 320ms var(--w-ease-ui) var(--d), transform 320ms var(--w-ease-ui) var(--d);
+    transition: opacity 225ms var(--w-ease-ui, ease) calc(var(--d) + var(--o)), transform 225ms var(--w-ease-ui, ease) calc(var(--d) + var(--o));
   }
-  .wo-ans.is-run .wo-ans__chk { background: var(--wo-acc); box-shadow: none; transition: background-color 200ms var(--w-ease-ui) calc(var(--d) + 600ms), box-shadow 200ms calc(var(--d) + 600ms); }
-  .wo-ans.is-run .wo-ans__chk i { opacity: 1; transition: opacity 200ms var(--w-ease-ui) calc(var(--d) + 600ms); }
-  @media (--lt-md) {
+  .wo-ans.is-run .wo-ans__bub { transition-duration: 250ms; }
+  /* El punto late (0 → .5 → 0, 2 s) mientras el paso está pendiente; a --h pasa a check. */
+  .wo-ans.is-run .wo-ans__chk::before { animation: wo-late 2s ease-in-out infinite, wo-fuera 1ms linear calc(var(--h) + var(--o)) forwards; }
+  .wo-ans.is-run .wo-ans__chk { background: color-mix(in srgb, var(--wo-acc) 22%, #fff); transition: background-color 220ms var(--w-ease-ui, ease) calc(var(--h) + var(--o)); }
+  .wo-ans.is-run .wo-ans__chk i { opacity: 1; transition: opacity 220ms var(--w-ease-ui, ease) calc(var(--h) + var(--o)); }
+  .wo-ans.is-run .wo-ans__sw > span:first-child { opacity: 0; transition: opacity 220ms calc(var(--h) + var(--o)); }
+  .wo-ans.is-run .wo-ans__sw > span:last-child { opacity: 1; transition: opacity 220ms calc(var(--h) + var(--o)); }
+  @keyframes wo-late { 0%, 100% { opacity: 0; } 50% { opacity: .5; } }
+  @keyframes wo-fuera { to { visibility: hidden; } }
+
+  @media (max-width: 767px) {
     .wo-ans__cols { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wo-ans .wo-ans__chk::before { animation: none !important; opacity: 0 !important; }
   }
 </style>

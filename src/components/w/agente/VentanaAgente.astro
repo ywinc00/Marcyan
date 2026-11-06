@@ -1,0 +1,464 @@
+---
+// Ventana de agente (design/rediseno-workos-v2.md §2 P05). Originales: W-ADV-16 (terminal de
+// Passport: lienzo con degradado, ventana con semáforos, cabecera de identidad, banda de
+// pregunta, spinner de glifos, lista alineada, prompt "❯ █") + W-NEW-04/05 (auth.md: menú de
+// opciones que elige el visitante y control segmentado). Situación calzada (E-56 regla 2):
+// "Marcy atiende una petición real" (guion marcy) y "qué contesta la IA" (guion buscar).
+//
+// Contrato común de objetos de ejemplo (§1.6): la capa visual es aria-hidden + data-nosnippet,
+// con un resumen sr-only; los controles (menú, segmentado, "Pregúntale tú") son botones reales
+// fuera del aria-hidden. Sin h1-h6, sin tel:/wa.me/data-track. Todo su CSS va aquí y solo lee
+// variables --w-* / tokens con valor de reserva (sale de v3).
+//
+// Sin JS o con reducir movimiento: el HTML ya es el estado final (opción 1 completa / respuesta
+// a la 3 en "buscar") y el menú sigue operativo. El motor está en agente.ts.
+import { GUIONES, type Lang, type Bloque, type Parte } from './guiones';
+
+interface Props {
+  guion?: 'marcy' | 'buscar';
+  piel?: 'noche' | 'hueso';
+  lang?: Lang;
+  /** Texto que se manda a Marcy con "Pregúntale tú" (por defecto, la petición de la escena activa). */
+  pregunta?: string;
+  /** Rótulo "Ejemplo" (por defecto true). */
+  ejemplo?: boolean;
+  class?: string;
+}
+const { guion = 'marcy', lang = 'es', pregunta, ejemplo = true, class: cls } = Astro.props;
+const piel = Astro.props.piel ?? (guion === 'buscar' ? 'hueso' : 'noche');
+
+// LogoMarca (P06) si ya está integrado; si no, la marca va como palabra (mismo alto óptico).
+const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
+const LogoMarca = Object.values(logoMods)[0]?.default;
+
+const uid = `va${Math.random().toString(36).slice(2, 8)}`;
+const M = GUIONES.marcy[lang];
+const B = GUIONES.buscar[lang];
+const otro: Lang = lang === 'es' ? 'en' : 'es';
+
+type Fila = { k: 'paso'; texto: string } | { k: 'rama'; texto: string; ult: boolean } | { k: 'txt'; partes: Parte[] };
+const aFilas = (bs: Bloque[]): Fila[] =>
+  bs.flatMap((b) => (b.t === 'paso'
+    ? [{ k: 'paso', texto: b.texto } as Fila, ...b.ramas.map((r, i) => ({ k: 'rama', texto: r, ult: i === b.ramas.length - 1 } as Fila))]
+    : [{ k: 'txt', partes: b.partes } as Fila]));
+const e0 = M.escenas[0];
+// "Clave: valor" → columna alineada (10ch) + valor en tinta de acento (mismo criterio que agente.ts).
+const kv = (t: string) => { const m = t.match(/^([^:]{1,12}): (.+)$/); return m ? { k: m[1], v: m[2] } : null; };
+const rB = B.respuestas.con;
+const ej = lang === 'en' ? 'Example' : 'Ejemplo';
+---
+<div
+  class:list={['va', `va--${piel}`, `va--${guion}`, cls]}
+  data-w2-agente
+  data-guion={guion}
+  data-lang={lang}
+  data-pregunta={pregunta}
+  data-escenario="con"
+  data-nosnippet
+>
+  <p class="sr-only" data-w2-sr>{guion === 'marcy' ? M.sr : B.sr}</p>
+  <div class="va__lienzo">
+    <div class="va__win">
+      <div class="va__bar">
+        <span class="va__tl" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="va__title" aria-hidden="true" data-w2-titulo>{guion === 'marcy' ? `✳ ${e0.titulo}` : B.titulo}</span>
+        {guion === 'marcy' ? (
+          <div class="va__seg" role="radiogroup" aria-label={M.idioma.etiqueta} data-w2-seg>
+            <span class="va__pill" data-w2-pill aria-hidden="true"></span>
+            <button type="button" role="radio" data-v="es" aria-checked={lang === 'es' ? 'true' : 'false'} tabindex={lang === 'es' ? 0 : -1} lang="es" aria-label="Español"><span class="va__sl">Español</span><span class="va__ss" aria-hidden="true">ES</span></button>
+            <button type="button" role="radio" data-v="en" aria-checked={lang === 'en' ? 'true' : 'false'} tabindex={lang === 'en' ? 0 : -1} lang="en" aria-label="English"><span class="va__sl">English</span><span class="va__ss" aria-hidden="true">EN</span></button>
+          </div>
+        ) : (
+          <div class="va__seg" role="radiogroup" aria-label={B.escenarios.etiqueta} data-w2-seg>
+            <span class="va__pill" data-w2-pill aria-hidden="true"></span>
+            <button type="button" role="radio" data-v="sin" aria-checked="false" tabindex="-1">{B.escenarios.sin}</button>
+            <button type="button" role="radio" data-v="con" aria-checked="true" tabindex="0">{B.escenarios.con}</button>
+          </div>
+        )}
+      </div>
+
+      {guion === 'marcy' ? (
+        <>
+          <div class="va__body">
+            <div class="va__head" aria-hidden="true">
+              <img class="va__av" src="/assets/bot/marcy-mini.webp" width="28" height="28" alt="" loading="lazy" decoding="async" />
+              <div class="va__id">
+                <p><b data-w2-t="nombre">{M.nombre}</b> <span class="va__g">·</span> <span class="va__g" data-w2-t="rol">{M.rol}</span></p>
+                <p class="va__g">
+                  <span data-w2-t="motor">{M.motor}</span>
+                  <span class="va__mm">
+                    <slot name="marca-modelo">
+                      {LogoMarca ? <LogoMarca id="claude" size={13} tono="color" titulo="Claude" /> : null}
+                    </slot>
+                    <span class="va__mmt" translate="no">Claude</span>
+                  </span>
+                  <span>·</span> <span data-w2-t="canal">{M.canal}</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="va__log" aria-hidden="true" data-w2-log>
+              <div class="va__ev">
+                <p class="va__evl">{M.evento}</p>
+                <p class="va__band is-sent"><span class="va__q">{e0.cliente}</span></p>
+              </div>
+              <div class="va__resp">
+                {aFilas(e0.bloques).map((f) => f.k === 'paso'
+                  ? <p class="va__paso" data-st="ok"><i class="va__dot"></i><span class="va__pt">{f.texto}</span></p>
+                  : f.k === 'rama'
+                    ? <p class="va__rama"><span class="va__rg">{f.ult ? '└' : '├'}</span>{kv(f.texto) ? <><span class="va__rk">{kv(f.texto)!.k}</span><span class="va__rv">{kv(f.texto)!.v}</span></> : <span>{f.texto}</span>}</p>
+                    : <p class="va__txt">{f.partes.map((p) => p.b ? <b>{p.s}</b> : p.s)}</p>)}
+                <p class="va__cierre">{e0.cierre.map((p) => p.b ? <b translate="no">{p.s}</b> : p.s)}</p>
+              </div>
+            </div>
+
+            <div class="va__menu" data-w2-menu data-w2-ctrl>
+              <p class="va__mq" id={`${uid}-q`} data-w2-t="preguntaMenu">{M.preguntaMenu}</p>
+              <ul class="va__ops" role="list" aria-labelledby={`${uid}-q`}>
+                {M.escenas.map((s, i) => (
+                  <li>
+                    <button type="button" class:list={['va__op', i === 0 && 'is-on is-done']} data-w2-op>
+                      <span class="va__tri" aria-hidden="true">▸</span><span class="va__n" aria-hidden="true">{i + 1}.</span>
+                      <span data-w2-optxt>{s.opcion}</span>
+                      <span class="va__ok" aria-hidden="true">✓</span>
+                      <span class="sr-only" data-w2-hecha hidden={i !== 0}>({M.hecha})</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" class="va__ask" data-w2-ask>
+                <span class="va__tri2" aria-hidden="true">▸</span> <span data-w2-t="pregunta">{M.pregunta}</span>
+              </button>
+            </div>
+          </div>
+          <div class="va__prompt" aria-hidden="true"><span class="va__pc">❯</span><i class="va__cur"></i></div>
+          <p class="va__foot" aria-hidden="true"><span class="va__ff">⏵⏵</span> <span class="va__fa" data-w2-t="pieA">{M.pieA}</span> <span class="va__g" data-w2-t="pieB">{M.pieB}</span></p>
+        </>
+      ) : (
+        <div class="va__body vb">
+          <div class="vb__head" aria-hidden="true">
+            <span class="vb__ht">{B.cabecera}</span>
+            <span class="vb__logos">
+              {LogoMarca ? (
+                <>
+                  <LogoMarca id="googlegemini" size={14} tono="color" />
+                  <LogoMarca id="perplexity" size={14} tono="color" />
+                  <LogoMarca id="claude" size={14} tono="color" />
+                  <LogoMarca id="chatgpt-texto" size={14} tono="color" />
+                </>
+              ) : (
+                ['Gemini', 'Perplexity', 'Claude', 'ChatGPT'].map((n) => <span class="vb__lw" translate="no">{n}</span>)
+              )}
+            </span>
+          </div>
+          <div class="vb__menu" data-w2-menu hidden>
+            <p class="vb__q" id={`${uid}-bq`}>{B.pregunta}</p>
+            <ul class="va__ops" role="list" aria-labelledby={`${uid}-bq`}>
+              {B.opciones.map((o, i) => (
+                <li>
+                  <button type="button" class:list={['va__op', i === 0 && 'is-on', i === 2 && 'is-gold']} data-w2-op>
+                    <span class="va__tri" aria-hidden="true">▸</span><span class="va__n" aria-hidden="true">{i + 1}.</span>
+                    <span>{i === 2 ? <><b>{o.split(':')[0]}</b>:{o.split(':').slice(1).join(':')}</> : o}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <p class="vb__help" aria-hidden="true">{B.ayuda}</p>
+          </div>
+          <div class="va__log vb__log" aria-hidden="true" data-w2-log>
+            <p class="vb__pq">{B.pregunta}</p>
+            <p class="vb__col"><span class="vb__colm">›</span> {B.opciones[2]}</p>
+            <p class="va__txt">{B.intro}</p>
+            {aFilas(rB.bloques).map((f) => f.k === 'paso'
+              ? <p class="va__paso" data-st="ok"><i class="va__dot"></i><span class="va__pt">{f.texto}</span></p>
+              : f.k === 'rama'
+                ? <p class="va__rama"><span class="va__rg">{f.ult ? '└' : '├'}</span><span>{f.texto}</span></p>
+                : null)}
+            <p class="va__cierre">{rB.cierre.map((p) => p.b ? <b translate="no">{p.s}</b> : p.s)}</p>
+          </div>
+          <button type="button" class="va__ask vb__otra" data-w2-otra><span class="va__tri2" aria-hidden="true">▸</span> {B.otra}</button>
+        </div>
+      )}
+    </div>
+    {ejemplo && <span class="va__ej" aria-hidden="true">{ej}</span>}
+    <span class="va__ghost" data-w2-fantasma aria-hidden="true">
+      <svg width="18" height="22" viewBox="0 0 18 22"><path d="M1.5 1.5v16.2l4.3-4.1 2.9 6.6 2.7-1.2-2.9-6.5 6-.4z" fill="#f7f6f2" stroke="#0e0e0d" stroke-width="1.3" stroke-linejoin="round" /></svg>
+    </span>
+  </div>
+  <p class="sr-only" aria-live="polite" data-w2-live></p>
+</div>
+
+<script>
+  import { montarAgente } from './agente';
+  document.querySelectorAll<HTMLElement>('[data-w2-agente]').forEach((el) => montarAgente(el));
+</script>
+
+<style is:global>
+  /* Global a propósito: el motor (agente.ts) crea filas en el navegador y no llevan el
+     atributo de ámbito de Astro. Todas las clases llevan prefijo va/vb (sin colisiones). */
+  .va {
+    container-type: inline-size;
+    position: relative;
+    width: min(100%, 528px);
+    margin-inline: auto;
+    --va-win-w: 420px;
+    --va-win-h: 452px;
+    --va-ink: #EBEBED;
+    --va-dim: #99999E;
+    --va-line: rgba(255, 255, 255, .1);
+    --va-band: rgba(255, 255, 255, .07);
+    --va-hot: rgba(255, 255, 255, .07);
+    --va-amb: #E9B44C;
+    --va-ok: var(--accent-teal, #4fc3a1);
+    --va-spin: #D97757;
+    text-align: left;
+  }
+  .va--buscar { width: min(100%, 640px); --va-win-w: 560px; --va-win-h: 404px; }
+  .va__lienzo {
+    position: relative;
+    display: grid; place-items: center;
+    padding: 42px 54px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #141b1e 0%, #182724 46%, #2c5148 100%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .va--hueso .va__lienzo { background: linear-gradient(180deg, #141311 0%, #1c1a16 50%, #2e2819 100%); padding-inline: 40px; }
+
+  /* Ventana: opaca (sin backdrop-filter, §1.8) */
+  .va__win {
+    position: relative;
+    width: min(var(--va-win-w), 100%);
+    height: var(--va-win-h);
+    display: flex; flex-direction: column;
+    border-radius: 12px;
+    background: rgba(28, 29, 34, .96);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .55), inset 0 0 0 .5px rgba(255, 255, 255, .12);
+    color: var(--va-ink);
+    font: 400 11px/16px var(--font-mono, ui-monospace, monospace);
+    font-variant-ligatures: none;
+    overflow: hidden;
+  }
+  .va--hueso .va__win {
+    --va-ink: #1B1A17; --va-dim: #6B675F; --va-line: #E4E1DA; --va-band: rgba(0, 0, 0, .05); --va-hot: rgba(0, 0, 0, .07);
+    --va-ok: #23825f;
+    background: #F7F6F2;
+    border-radius: 8px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .55), inset 0 0 0 1px #E4E1DA;
+  }
+
+  /* Barra */
+  .va__bar {
+    flex: none; position: relative;
+    height: 28px; display: flex; align-items: center; gap: 10px;
+    padding: 0 6px 0 10px;
+  }
+  .va--hueso .va__bar { height: 34px; border-bottom: 1px solid var(--va-line); }
+  .va__tl { display: inline-flex; gap: 8px; flex: none; }
+  .va__tl i { width: 12px; height: 12px; border-radius: 50%; background: #FF5F57; box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .25); }
+  .va__tl i:nth-child(2) { background: #FEBC2E; }
+  .va__tl i:nth-child(3) { background: #28C840; }
+  .va--hueso .va__tl i { background: #D9D5CC; box-shadow: none; }
+  .va__title {
+    flex: 1; min-width: 0;
+    font: 500 11.5px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: #99999E;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .va--hueso .va__title { font: 400 11px/1 var(--font-mono, ui-monospace, monospace); color: #6B675F; }
+
+  /* Segmentado (píldora que se desliza 260 ms) */
+  .va__seg {
+    position: relative; flex: none;
+    display: inline-flex; padding: 2px; border-radius: 6px;
+    background: rgba(255, 255, 255, .06);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+  }
+  .va--hueso .va__seg { background: #ECE9E2; box-shadow: inset 0 0 0 1px #E0DCD3; }
+  .va__pill {
+    position: absolute; left: 2px; top: 2px; bottom: 2px; width: 0;
+    border-radius: 4px; background: rgba(255, 255, 255, .12);
+    transition: transform 260ms cubic-bezier(.22, 1, .36, 1), width 260ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .va--hueso .va__pill { background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+  .va__seg button {
+    position: relative; z-index: 1;
+    appearance: none; border: 0; background: none; cursor: pointer;
+    padding: 0 8px; height: 20px; border-radius: 4px;
+    font: 500 11px/20px var(--font-mono, ui-monospace, monospace);
+    color: #99999E; white-space: nowrap;
+    transition: color 160ms;
+  }
+  .va__seg button[aria-checked='true'] { color: #EBEBED; }
+  .va--hueso .va__seg button { color: #77736B; }
+  .va--hueso .va__seg button[aria-checked='true'] { color: #1B1A17; }
+  .va__seg button::after { content: ''; position: absolute; inset: -12px -2px; } /* área de toque 44 */
+  .va__ss { display: none; }
+
+  /* Cuerpo */
+  .va__body {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column; gap: 9px;
+    padding: 10px 14px 8px;
+  }
+  .va__body p { margin: 0; }
+  .va__g { color: var(--va-dim); }
+  .va__head { display: flex; align-items: center; gap: 12px; padding-bottom: 2px; }
+  .va__av { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #e7e3dc; object-fit: cover; box-shadow: 0 0 0 1px rgba(255, 255, 255, .18); }
+  .va__id b { font-weight: 700; }
+  .va__mm { display: inline-flex; align-items: center; gap: 4px; vertical-align: -2px; color: var(--va-ink); }
+  .va__mm svg { display: block; }
+
+  .va__log { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .va__evl { color: var(--va-dim); }
+  .va__band {
+    margin: 2px -14px 0 !important; padding: 4px 14px;
+    background: var(--va-band);
+    min-height: 24px;
+  }
+  .va__band::before { content: '❯ '; color: var(--va-dim); }
+  .va__q { color: var(--va-ink); }
+  .va__car {
+    display: inline-block; width: 7px; height: 13px; margin-left: 1px; vertical-align: -2px;
+    background: var(--va-ink);
+  }
+  .va__band.is-sent .va__car { display: none; }
+
+  .va__spin { color: var(--va-spin); display: flex; align-items: center; gap: 8px; }
+  .va__gl { display: inline-block; width: 1ch; height: 16px; overflow: hidden; }
+  .va__gls { display: block; white-space: pre; animation: va-gl 1.2s steps(10) infinite; }
+  @keyframes va-gl { to { transform: translateY(-160px); } }
+
+  .va__resp { display: flex; flex-direction: column; }
+  .va__paso { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .va__dot {
+    position: relative; flex: none; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--va-ink);
+    animation: va-late 2s ease-in-out infinite;
+  }
+  .va__paso[data-st='ok'] .va__dot { background: var(--va-ok); animation: none; }
+  @keyframes va-late { 0%, 100% { opacity: .15; } 50% { opacity: .9; } }
+  .va__rama { display: flex; gap: 8px; padding-left: 2px; color: var(--va-dim); }
+  .va__rg { flex: none; width: 1ch; color: var(--va-dim); opacity: .7; }
+  .va__rk { flex: none; min-width: 9ch; color: var(--va-ink); }
+  .va__rv { color: #A9DCCB; }
+  .va--hueso .va__rv { color: #23825f; }
+  .va__txt { color: var(--va-ink); }
+  .va__cierre { margin-top: 6px !important; color: var(--va-ink); }
+  .va__cierre b, .va__txt b { font-weight: 700; }
+  .va--noche .va__cierre b { color: #fff; }
+  .is-new { animation: va-in 220ms cubic-bezier(.22, 1, .36, 1) both; }
+  @keyframes va-in { from { opacity: 0; transform: translateY(4px); } }
+
+  /* Menú (capa de controles real) */
+  .va__menu { margin-top: auto; padding-top: 8px; display: flex; flex-direction: column; gap: 2px; transition: opacity 260ms; }
+  .va__menu.is-off { opacity: 0; visibility: hidden; }
+  .va__menu[aria-busy='true'] .va__op, .va__menu[aria-busy='true'] .va__ask { cursor: progress; }
+  .va__mq { color: var(--va-ink); margin-bottom: 2px !important; }
+  .va__ops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .va__op, .va__ask {
+    appearance: none; border: 0; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    width: min(308px, 100%); height: 28px; padding: 0 8px;
+    border-radius: 4px; background: transparent;
+    color: var(--va-ink); text-align: left;
+    font: inherit;
+    transition: background-color 120ms;
+  }
+  .va__tri { width: 1ch; visibility: hidden; font-size: 9px; }
+  .va__n { color: var(--va-dim); }
+  .va__ok { color: var(--va-ok); margin-left: 4px; visibility: hidden; }
+  .va__op.is-done .va__ok { visibility: visible; }
+  .va__op.is-on, .va__op:hover, .va__op.is-hot { background: var(--va-hot); }
+  .va__op.is-on .va__tri, .va__op:hover .va__tri, .va__op:focus-visible .va__tri { visibility: visible; }
+  .va__ask {
+    width: auto; align-self: flex-start; margin-top: 4px; height: 26px; padding: 0 10px 0 8px;
+    background: var(--va-hot); font-weight: 700;
+  }
+  .va__ask:hover { background: rgba(255, 255, 255, .13); }
+  .va--hueso .va__ask:hover { background: rgba(0, 0, 0, .11); }
+  .va__tri2 { font-size: 9px; }
+  .va__op:focus-visible, .va__ask:focus-visible, .va__seg button:focus-visible {
+    outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px;
+  }
+
+  /* Prompt + pie (W-ADV-16) */
+  .va__prompt {
+    flex: none; margin: 0 14px; height: 33px;
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid var(--va-line); border-bottom: 1px solid var(--va-line);
+  }
+  .va__pc { color: var(--va-dim); }
+  .va__cur { width: 7px; height: 14px; background: var(--va-ink); animation: va-blink 1.06s steps(2, jump-none) infinite; }
+  @keyframes va-blink { 50% { opacity: 0; } }
+  .va__foot { flex: none; margin: 0; padding: 7px 14px 9px; color: var(--va-amb); }
+  .va__ff { letter-spacing: -1px; }
+
+  /* Rótulo "Ejemplo" (uno por objeto, al pie del lienzo) */
+  .va__ej {
+    position: absolute; left: 18px; bottom: 13px;
+    font: 500 11px/1 var(--font-mono, ui-monospace, monospace);
+    letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(240, 237, 232, .6);
+  }
+
+  /* Cursor fantasma */
+  .va__ghost {
+    position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none;
+    opacity: 0; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .4));
+  }
+  .va__ghost svg { display: block; transition: transform 120ms; transform-origin: 2px 2px; }
+  .va__ghost.is-press svg { transform: scale(.86); }
+
+  /* Guion buscar (W-NEW-04) */
+  .vb { gap: 10px; padding: 14px 18px 14px; overflow: hidden; }
+  .vb__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--va-dim); padding-bottom: 2px; }
+  .vb__logos { display: inline-flex; align-items: center; gap: 10px; }
+  .vb__lw { font: 600 11px/1 var(--font-display, system-ui); color: #3a3833; letter-spacing: -.01em; }
+  .vb__menu { display: flex; flex-direction: column; gap: 4px; }
+  .vb__menu[hidden] { display: none; }
+  .vb__q { color: var(--va-ink); margin-bottom: 4px !important; }
+  .va__op.is-gold { box-shadow: inset 2px 0 0 var(--accent-gold, #c8a96e); }
+  .va__op.is-gold b { color: #7a5a1c; }
+  .vb__help { color: var(--va-dim); margin-top: 4px !important; }
+  .vb__log { gap: 0; }
+  .vb__pq { color: var(--va-ink); margin-bottom: 6px !important; }
+  .vb__log > .va__paso, .vb__log > .va__txt, .vb__log > .va__cierre { margin-top: 10px !important; }
+  .vb__col { margin: 0 -18px 0 !important; padding: 4px 18px; background: var(--va-band); font-weight: 700; }
+  .vb__colm { color: var(--va-dim); font-weight: 400; }
+  .vb__otra { margin-top: 2px; }
+  .vb__otra[hidden] { display: none; }
+  .va--hueso .va__paso .va__dot { background: #B9B4AA; }
+  .va--hueso .va__paso[data-st='ok'] .va__dot { background: var(--va-ok); }
+
+  /* Armado por JS: la ventana espera fuera de vista y aparece al entrar (0-500 ms) */
+  .va.is-armed .va__win { opacity: 0; transform: translateY(12px); }
+  .va.is-armed .va__win.is-in {
+    opacity: 1; transform: none;
+    transition: opacity 500ms cubic-bezier(.22, 1, .36, 1), transform 500ms cubic-bezier(.22, 1, .36, 1);
+  }
+
+  /* Móvil: lienzo a todo el ancho, ventana 340, menú en filas de 44 */
+  @container (max-width: 480px) {
+    .va__lienzo, .va--hueso .va__lienzo { padding: 30px 9px 40px; border-radius: 20px; }
+    .va__win { width: min(340px, 100%); height: auto; min-height: 560px; }
+    .va--buscar .va__win { min-height: 470px; }
+    .va__op, .va__ask { height: 44px; width: 100%; }
+    .va__ask { width: auto; }
+    .va__sl { display: none; }
+    .va__ss { display: inline; }
+    .va--buscar .va__bar { flex-wrap: wrap; height: auto; padding: 8px 10px; row-gap: 8px; }
+    .va--buscar .va__seg { order: 3; width: 100%; }
+    .va--buscar .va__seg button { flex: 1 1 0; height: 28px; line-height: 28px; white-space: nowrap; padding: 0 4px; }
+    .vb { padding: 12px 14px; }
+    .vb__col { margin-inline: -14px !important; padding-inline: 14px; }
+    .vb__head { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .va__seg button::after { inset: -8px -2px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .va__cur, .va__dot, .va__gls { animation: none !important; }
+    .va__pill { transition: none; }
+    .is-new { animation: none; }
+  }
+</style>

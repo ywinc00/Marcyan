@@ -1,16 +1,33 @@
 ---
-// Escáner de señales (W-ADV-45 · design/rediseno-workos.md §3.6, §2.10). Objeto de SISTEMA.
-// Tarjeta radio 48 padding 64; mosaico de chips (49 px, radio 12, texto 16 al 50 %)
-// fundidos hacia los bordes; caja central 250×172 con borde oro y fondo oro al 15 %
-// (OPACO: los chips no se ven a través, E-37) con una web dibujada en línea; una barra
-// de 132×10 la barre de abajo arriba en 1,8 s.
-// Chips = señales REALES que revisa el motor del diagnóstico (lib/diagnostic-checks.mjs:
-// móvil, título, conexión segura, fotos, teléfono, ciudad, datos del negocio, páginas
-// por servicio, descripción, datos para IA, respuestas, texto sin JavaScript, llamar con
-// un toque, WhatsApp, formulario, botón de contacto, reseñas). Nada inventado.
-//   motion="loop"   → bucle (solo en /diagnóstico), con botón de pausa (loop.ts).
-//   motion="once"   → recorre UNA vez al entrar en vista y se queda a media altura (portada, hubs).
-//   motion="static" → barra quieta a media altura.
+// Escáner de señales VIVO (W-ADV-45 · design/rediseno-workos-v2.md §1.5 y §2 P04). Objeto de SISTEMA.
+//
+// Composición (como el original): mosaico de chips en filas que RODEAN la caja central y le
+// dejan su hueco (nunca se monta encima); filas de arriba y abajo a lo ancho, 3 filas a los
+// lados de la caja. Cada chip se pinta ENTERO o no se pinta: las filas envuelven (flex-wrap)
+// dentro de un alto de un chip, así lo que no cabe baja a una línea que no se ve; un guion
+// pequeño reparte cada fila con los que caben enteros y quita los que pisan la etiqueta "Ejemplo" o
+// el botón de pausa. Fundido a los bordes con máscara.
+// Chips = señales REALES que revisa el motor del diagnóstico (lib/diagnostic-checks.mjs).
+// En los lados (huecos estrechos) van los nombres cortos de esas mismas señales.
+//
+// Movimiento (pantalla viva, §1.5): la barra 132×10 barre la caja de abajo arriba en 1,8 s
+// (--w-ease-ui), pausa 0,6 s y repite MIENTRAS esté a la vista, en TODAS las páginas; cada
+// pasada enciende 2 chips (texto 60 %→90 % y filo oro en 900 ms, se apagan en 600 ms).
+// Pausa fuera de vista (rootMargin 100px), con la pestaña oculta, con el puntero o el foco
+// dentro y con el botón "Pausar animación" (loop.ts; el estado global de pausa, cuando lo
+// tenga loop.ts, se hereda solo). Con un formulario en la misma sección (diagnóstico) se
+// pausa al escribir: focusin del visitante en un campo de closest('section') (o en
+// `pausarCon`, selector relativo a esa sección). Movimiento reducido: barra a media altura
+// y 3 chips encendidos, quieto. Solo transform y opacity.
+//
+// Props que se conservan: variant, size, class, motion (motion ya NO apaga el bucle: 'once'
+// y 'static' se aceptan por compatibilidad y también viven).
+// Tamaños (tabla en W2/escaner-vivo/informe.md):
+//   mini + compacto (portada y hubs): radio 24, caja 160×110, chips 32 (3 filas a los lados).
+//   card: intermedio, caja 204×141, chips 40.
+//   hero (diagnóstico): radio 48, caja 250×172 con 24 px de aire, chips 49 radio 12, texto 16.
+// Caja central: web en línea NEUTRA (sin marca) con cotas de diseño. Provisional hasta que
+// A0 integre WebEjemplo estado="alambre" (se cambia aquí por ese componente).
 // CERROJO 5: sale de v3 (portada y hubs), así que TODO su CSS va aquí y solo lee variables.
 import Ejemplo from '../Ejemplo.astro';
 
@@ -19,45 +36,91 @@ interface Props {
   variant?: 'completo' | 'compacto';
   motion?: 'loop' | 'once' | 'static';
   size?: 'hero' | 'card' | 'mini';
+  /** Selector (relativo a la sección que contiene el escáner) cuyo foco pausa el bucle. */
+  pausarCon?: string;
   class?: string;
 }
-const { lang = 'es', variant = 'completo', motion = 'once', size = 'card', class: cls } = Astro.props;
+const { lang = 'es', variant = 'completo', motion = 'loop', size = 'card', pausarCon, class: cls } = Astro.props;
 const en = lang === 'en';
-const SIGNALS = en
-  ? ['Mobile version', 'Clear title', 'Secure connection', 'Photo descriptions', 'Visible phone', 'City mentioned', 'Business data', 'A page per service', 'Google description', 'Data for AI', 'Direct answers', 'Text without JavaScript', 'Tap to call', 'Visible WhatsApp', 'Contact form', 'Contact button in view', 'Google reviews', 'Live website']
-  : ['Versión móvil', 'Título claro', 'Conexión segura', 'Fotos con descripción', 'Teléfono visible', 'Ciudad mencionada', 'Datos del negocio', 'Páginas por servicio', 'Descripción en Google', 'Datos para IA', 'Respuestas directas', 'Texto sin JavaScript', 'Llamar con un toque', 'WhatsApp visible', 'Formulario de contacto', 'Botón de contacto a la vista', 'Reseñas en Google', 'Sitio activo'];
-// Compacto (portada y hubs): 4×4 chips para no pasar del presupuesto de peso de §2.13 paso 6.
-const nRows = variant === 'compacto' ? 4 : 7;
-const perRow = variant === 'compacto' ? 4 : 6;
-// Filas desplazadas (como un muro de ladrillo) con las señales repartidas en orden.
-const rows = Array.from({ length: nRows }, (_, r) =>
-  Array.from({ length: perRow }, (_, k) => SIGNALS[(r * 5 + k * 3) % SIGNALS.length]));
+
+// Señales reales del motor (lib/diagnostic-checks.mjs), nombre largo.
+const LARGAS = en
+  ? ['Mobile version', 'Clear title', 'Secure connection', 'Photo descriptions', 'Visible phone', 'City mentioned', 'Business data', 'A page per service', 'Google description', 'Data for AI', 'Direct answers', 'Text without JavaScript', 'Summary up top', 'Tap to call', 'Visible WhatsApp', 'Contact form', 'Contact button in view', 'Google reviews', 'Live website']
+  : ['Versión móvil', 'Título claro', 'Conexión segura', 'Fotos con descripción', 'Teléfono visible', 'Ciudad mencionada', 'Datos del negocio', 'Páginas por servicio', 'Descripción en Google', 'Datos para IA', 'Respuestas directas', 'Texto sin JavaScript', 'Resumen al inicio', 'Llamar con un toque', 'WhatsApp visible', 'Formulario de contacto', 'Botón de contacto a la vista', 'Reseñas en Google', 'Sitio activo'];
+// Las mismas señales, nombre corto (para los lados de la caja, donde el hueco es estrecho).
+const CORTAS = en
+  ? ['Mobile', 'Title', 'Padlock', 'Photos', 'Phone', 'City', 'Reviews', 'WhatsApp', 'Form', 'Description', 'Answers', 'Tap to call']
+  : ['Móvil', 'Título', 'Candado', 'Fotos', 'Teléfono', 'Ciudad', 'Reseñas', 'WhatsApp', 'Formulario', 'Descripción', 'Respuestas', 'Llamar'];
+
+// Señal de LARGAS a la que corresponde cada nombre corto (para no repetir la misma señal
+// en una fila: "Teléfono" junto a "Teléfono visible").
+const CORTA_DE = [0, 1, 2, 3, 4, 5, 17, 14, 15, 8, 10, 13];
+const unica = (largas: number[], cortas: number[]) => {
+  const usadas = new Set(largas);
+  return cortas.filter((c) => !usadas.has(CORTA_DE[c]) && (usadas.add(CORTA_DE[c]), true));
+};
+// 7 filas: 2 a lo ancho, 3 a los lados de la caja, 2 a lo ancho (como W-ADV-45).
+// Cada fila lleva más chips de los que caben; el guion reparte los que entran enteros.
+// Filas anchas: largas y cortas mezcladas (como el original: "Timezone" junto a
+// "Detectable privacy features"), así el reparto llena la fila sin huecos grandes.
+type Fila = { tipo: 'ancha'; chips: string[] } | { tipo: 'lados'; izq: string[]; der: string[] };
+// Chips por fila según el tamaño (los que no caben no se pintan: no se mandan de más).
+const nL = size === 'hero' ? 6 : size === 'card' ? 5 : 4;
+const nC = size === 'mini' ? 2 : 3;
+const nLado = size === 'mini' ? 1 : 2;
+const ancha = (a: number, b: number): Fila => {
+  const L = Array.from({ length: nL }, (_, k) => (a + k * 4) % LARGAS.length);
+  const C = unica(L, Array.from({ length: 6 }, (_, k) => (b + k * 5) % CORTAS.length)).slice(0, nC);
+  const chips: string[] = [];
+  L.forEach((l, k) => { chips.push(LARGAS[l]); if (k % 2 === 1 && C.length) chips.push(CORTAS[C.shift()!]); });
+  return { tipo: 'ancha', chips };
+};
+const lado = (c0: number, l0: number, ls: number) => {
+  const L = Array.from({ length: nLado }, (_, k) => (l0 + k * ls) % LARGAS.length);
+  const C = unica(L, [c0 % CORTAS.length, (c0 + 5) % CORTAS.length]);
+  return [...C.map((c) => CORTAS[c]), ...L.map((l) => LARGAS[l])];
+};
+const filas: Fila[] = [
+  ancha(0, 2),
+  ancha(7, 9),
+  { tipo: 'lados', izq: lado(0, 1, 4), der: lado(6, 14, 3) },
+  { tipo: 'lados', izq: lado(3, 9, 2), der: lado(9, 5, 6) },
+  { tipo: 'lados', izq: lado(4, 13, 5), der: lado(1, 3, 7) },
+  ancha(16, 8),
+  ancha(11, 3),
+];
 const sr = en
   ? 'Example: the free checkup scans a website for signals such as mobile version, visible phone, Google reviews and data for AI.'
   : 'Ejemplo: el diagnóstico gratis revisa una web buscando señales como la versión móvil, el teléfono visible, las reseñas en Google y los datos para IA.';
 ---
 <div
   class:list={['wo-scan', `wo-scan--${variant}`, `wo-scan--${size}`, `wo-scan--${motion}`, cls]}
-  data-wo-scan={motion === 'static' ? undefined : motion}
+  data-wo-scan="loop"
+  data-wo-scan-pausar={pausarCon}
+  data-wo-scan-lang={lang}
 >
   <p class="wo-scan__sr">{sr}</p>
   <Ejemplo lang={lang} on="dark" />
-  <div class="wo-scan__wall" aria-hidden="true">
-    {rows.map((row, r) => (
-      <div class="wo-scan__row" style={`--off:${(r % 2) * -60 - (r % 3) * 18}px`}>
-        {row.map((s) => <span class="wo-scan__chip">{s}</span>)}
-      </div>
+  <div class="wo-scan__wall" aria-hidden="true" data-nosnippet>
+    {filas.map((f, r) => (
+      f.tipo === 'ancha' ? (
+        <div class:list={['wo-scan__row', 'wo-scan__row--ancha', (r === 0 || r === 6) && 'wo-scan__row--borde']}>
+          {f.chips.map((s) => <span>{s}</span>)}
+        </div>
+      ) : (
+        <div class="wo-scan__row wo-scan__row--lados">
+          <div class="wo-scan__lado wo-scan__lado--izq">{f.izq.map((s) => <span>{s}</span>)}</div>
+          <div class="wo-scan__lado wo-scan__lado--der">{f.der.map((s) => <span>{s}</span>)}</div>
+        </div>
+      )
     ))}
   </div>
   <div class="wo-scan__box" aria-hidden="true">
     <svg viewBox="0 0 250 172" preserveAspectRatio="xMidYMid meet">
-      <rect x="40" y="26" width="170" height="114" rx="8" />
-      <path d="M40 44H210" />
-      <circle cx="52" cy="35" r="2.5" /><circle cx="61" cy="35" r="2.5" /><circle cx="70" cy="35" r="2.5" />
-      <path d="M56 62H150M56 74H130" />
-      <rect x="56" y="88" width="46" height="14" rx="7" />
-      <rect x="150" y="58" width="44" height="64" rx="5" />
-      <path d="M56 116H120" />
+      <path class="wo-scan__web" d="M41 22H209a7 7 0 0 1 7 7V143a7 7 0 0 1-7 7H41a7 7 0 0 1-7-7V29a7 7 0 0 1 7-7ZM34 38H216M52 72H142M52 83H126M58.5 106H89.5a6.5 6.5 0 0 1 0 13H58.5a6.5 6.5 0 0 1 0-13ZM156 66H196a4 4 0 0 1 4 4V118a4 4 0 0 1-4 4H156a4 4 0 0 1-4-4V70a4 4 0 0 1 4-4Z" />
+      <path class="wo-scan__fino" d="M52 52H86M150 52H164M172 52H186M194 52H202M52 96H122M152 66l48 56M200 66l-48 56M52 134H200" />
+      <path class="wo-scan__cota" d="M52 64V60M142 64V60M52 62H142M208 66H212M208 122H212M210 66V122" />
+      <path class="wo-scan__dots" d="M41.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0M49.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0M57.8 30a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0-4.4 0" />
     </svg>
     <span class="wo-scan__bar"></span>
   </div>
@@ -65,102 +128,267 @@ const sr = en
 
 <script>
   import { registerLoop } from '../loop';
-  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  document.querySelectorAll<HTMLElement>('[data-wo-scan]').forEach((el) => {
-    if (el.dataset.woScan === 'loop') {
-      registerLoop(el, {
-        start: () => el.classList.add('is-run', 'is-playing'),
-        stop: () => el.classList.remove('is-playing'),
-        still: () => el.classList.remove('is-run', 'is-playing'),
-      });
-      return;
+
+  const LIT_MS = 1500; // 900 ms encendido + 600 ms apagado
+
+  const rectsOverlap = (a: DOMRect, b: DOMRect) =>
+    a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+  function setup(el: HTMLElement) {
+    if (el.dataset.woScanReady) return;
+    el.dataset.woScanReady = '1';
+    const wall = el.querySelector<HTMLElement>('.wo-scan__wall');
+    const bar = el.querySelector<HTMLElement>('.wo-scan__bar');
+    const lang = el.dataset.woScanLang === 'en' ? 'en' : 'es';
+    if (!wall || !bar) return;
+    const chips = Array.from(wall.querySelectorAll<HTMLElement>('span'));
+
+    // Si el escáner vive dentro de un enlace (portada y hubs), el botón de pausa no puede ir
+    // dentro del <a>: se envuelve el enlace en un contenedor del mismo tamaño y el botón
+    // cuelga de él, en la esquina de la tarjeta.
+    let host: HTMLElement = el;
+    const link = el.closest('a');
+    if (link && link.parentElement) {
+      const wrap = document.createElement('div');
+      wrap.className = 'wo-scan-host';
+      wrap.style.position = 'relative';
+      link.parentElement.insertBefore(wrap, link);
+      wrap.appendChild(link);
+      host = wrap;
     }
-    // once: una pasada al entrar en vista y se queda a media altura.
-    if (mq.matches || !('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver((es) => {
-      if (es.some((e) => e.isIntersecting)) { el.classList.add('is-once'); io.disconnect(); }
-    }, { threshold: .4 });
-    io.observe(el);
-  });
+
+    // Chips enteros o no pintados. 1) el que no cabe ni solo en su fila fuera (display);
+    // 2) los que pisan la etiqueta "Ejemplo" o el botón de pausa, invisibles (sin reflujo).
+    let candidates: HTMLElement[] = [];
+    const layout = () => {
+      chips.forEach((c) => { c.hidden = false; c.classList.remove('is-off'); });
+      // Reparto voraz: cada fila se llena en orden con los chips que caben enteros (los
+      // demás fuera), así no queda la fila a medias porque uno largo no entró.
+      for (const row of wall.querySelectorAll<HTMLElement>('.wo-scan__row--ancha, .wo-scan__lado')) {
+        const cs = getComputedStyle(row);
+        const avail = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const gap = parseFloat(cs.columnGap) || 0;
+        let used = 0;
+        row.querySelectorAll<HTMLElement>(':scope > span').forEach((c) => {
+          const w = c.offsetWidth; const need = used ? used + gap + w : w;
+          if (need <= avail + 0.5) used = need; else c.hidden = true;
+        });
+      }
+      const card = el.getBoundingClientRect();
+      const obstacles = [el.querySelector('.w-example'), host.querySelector('.w-loop-pause'), el.querySelector('.wo-scan__box')]
+        .filter((o): o is Element => !!o && !(o as HTMLElement).hidden)
+        .map((o) => { const r = o.getBoundingClientRect(); return new DOMRect(r.left - 6, r.top - 6, r.width + 12, r.height + 12); });
+      candidates = [];
+      for (const c of chips) {
+        if (c.hidden) continue;
+        const r = c.getBoundingClientRect();
+        // visible = la fila no lo ha mandado a la 2.ª línea (cae dentro del alto de su fila)
+        const row = (c.closest('.wo-scan__lado') || c.closest('.wo-scan__row')) as HTMLElement;
+        const rr = row.getBoundingClientRect();
+        if (r.top >= rr.bottom - 1 || r.width === 0) continue;
+        if (r.left < card.left || r.right > card.right || obstacles.some((o) => rectsOverlap(r, o))) { c.classList.add('is-off'); continue; }
+        // candidato a encenderse: bien dentro de la zona nítida de la máscara
+        const cx = (r.left + r.right) / 2 - (card.left + card.width / 2);
+        const cy = (r.top + r.bottom) / 2 - (card.top + card.height / 2);
+        if ((cx / (card.width * 0.42)) ** 2 + (cy / (card.height * 0.42)) ** 2 < 1) candidates.push(c);
+      }
+    };
+
+    let lastLit: HTMLElement[] = [];
+    const light = (n: number, still = false) => {
+      const pool = candidates.filter((c) => !lastLit.includes(c));
+      const chosen: HTMLElement[] = [];
+      while (chosen.length < n && pool.length) chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+      lastLit = chosen;
+      chosen.forEach((c, i) => {
+        if (still) { c.classList.add('is-on'); return; }
+        c.classList.remove('is-lit');
+        c.style.setProperty('--d', `${i * 380}ms`);
+        void c.offsetWidth; // reinicia la animación
+        c.classList.add('is-lit');
+        window.setTimeout(() => c.classList.remove('is-lit'), LIT_MS + i * 380 + 50);
+      });
+    };
+
+    let ro: ResizeObserver | null = null;
+    let raf = 0;
+    const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
+    layout();
+    (document as any).fonts?.ready?.then(relayout);
+    if ('ResizeObserver' in window) { ro = new ResizeObserver(relayout); ro.observe(el); }
+
+    // Cada pasada de la barra enciende 2 chips.
+    bar.addEventListener('animationstart', () => light(2));
+    bar.addEventListener('animationiteration', () => light(2));
+
+    const ctl = registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); el.querySelectorAll('.is-on').forEach((c) => c.classList.remove('is-on')); el.classList.add('is-run', 'is-playing'); },
+      stop: () => el.classList.remove('is-playing'),
+      still: () => { el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); requestAnimationFrame(() => { layout(); light(3, true); }); },
+    }, { lang, buttonHost: host });
+    relayout(); // el botón de pausa ya existe: quitar los chips que pisa
+    void ctl;
+
+    // Formulario en la misma sección (diagnóstico): se pausa mientras el visitante escribe.
+    // El foco programático al cargar no cuenta: solo tras un toque o una tecla del visitante.
+    const section = el.closest('section');
+    const sel = el.dataset.woScanPausar;
+    if (section) {
+      const field = (t: EventTarget | null) => t instanceof Element && !el.contains(t) &&
+        (sel ? !!t.closest(sel) && section.querySelector(sel)?.contains(t) : t.matches('input, select, textarea, [contenteditable]'));
+      let user = false;
+      const mark = () => { user = true; };
+      section.addEventListener('pointerdown', (e) => { mark(); if (field(e.target)) el.classList.add('is-held'); }, true);
+      section.addEventListener('keydown', mark, true);
+      section.addEventListener('focusin', (e) => { if (user && field(e.target)) el.classList.add('is-held'); });
+      section.addEventListener('focusout', (e) => {
+        if (field(e.relatedTarget)) return;
+        el.classList.remove('is-held');
+      });
+    }
+  }
+
+  const init = () => document.querySelectorAll<HTMLElement>('[data-wo-scan]').forEach(setup);
+  init();
 </script>
 
-<style>
+<style is:global>
+  /* is:global: sin atributos de ámbito en cada chip (peso del HTML); todo va bajo .wo-scan. */
   .wo-scan {
     --gold: var(--accent-gold-rgb);
-    --bw: 250px; --bh: 172px; --travel: calc(var(--bh) - 36px);
+    /* medidas por tamaño (hero por defecto; ver --mini / --card) */
+    --sc-bw: 250px; --sc-bh: 172px; --sc-air: 24px;
+    --sc-ch: 49px; --sc-gap: 12px; --sc-px: 22px; --sc-fs: 16px; --sc-r: 12px;
+    --sc-bar: 132px;
+    --sc-travel: calc(var(--sc-bh) - 34px);
     position: relative; overflow: hidden; isolation: isolate;
-    width: 100%; min-height: 480px; padding: 64px;
+    width: 100%; min-height: 480px;
     border-radius: 48px;
     background: var(--w-s1);
     border: 1px solid var(--w-line);
     box-shadow: var(--w-edge);
-    display: grid; place-items: center;
     font-family: var(--font-body);
   }
   .wo-scan__sr {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
+
+  /* ── Mosaico: 7 filas centradas; la del medio queda a la altura de la caja ── */
   .wo-scan__wall {
-    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;
-    -webkit-mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
-    mask-image: radial-gradient(75% 70% at 50% 50%, #000 35%, transparent 100%);
+    position: absolute; left: 0; right: 0; top: 50%;
+    display: flex; flex-direction: column; gap: var(--sc-gap);
+    transform: translateY(-50%);
+    -webkit-mask-image: radial-gradient(70% 72% at 50% 50%, #000 58%, rgba(0,0,0,.62) 84%, rgba(0,0,0,.28) 100%);
+    mask-image: radial-gradient(70% 72% at 50% 50%, #000 58%, rgba(0,0,0,.62) 84%, rgba(0,0,0,.28) 100%);
   }
-  .wo-scan__row { display: flex; gap: 12px; justify-content: center; margin-left: var(--off); white-space: nowrap; }
-  .wo-scan__chip {
-    flex: none; display: inline-flex; align-items: center; height: 49px; padding: 0 22px;
-    border-radius: 12px; border: 1px solid rgba(var(--star-rgb), .10);
+  .wo-scan__row { display: flex; height: var(--sc-ch); }
+  .wo-scan__row--ancha, .wo-scan__lado {
+    flex-wrap: wrap; overflow: hidden; height: var(--sc-ch); gap: var(--sc-gap); align-content: flex-start;
+    padding-inline: var(--sc-gap);
+  }
+  .wo-scan__row--ancha { display: flex; justify-content: center; }
+  .wo-scan__lado { display: flex; flex: 1 1 0; min-width: 0; }
+  .wo-scan__lado--izq { justify-content: flex-end; padding-left: 4px; padding-right: 0; }
+  .wo-scan__lado--der { justify-content: flex-start; padding-left: 0; padding-right: 4px; }
+  .wo-scan__row--lados { column-gap: calc(var(--sc-bw) + var(--sc-air) * 2); } /* el hueco de la caja */
+
+  .wo-scan__wall span {
+    position: relative; flex: none; display: inline-flex; align-items: center;
+    height: var(--sc-ch); padding: 0 var(--sc-px); white-space: nowrap;
+    border-radius: var(--sc-r); border: 1px solid rgba(var(--star-rgb), .16);
     background: var(--w-s1);
-    font-size: 16px; color: rgba(var(--star-rgb), .50);
+    font-size: var(--sc-fs); line-height: 1; color: rgb(var(--star-rgb));
+    opacity: .6; /* texto al 60 % (y el borde con él) */
   }
+  .wo-scan__wall span::after {
+    content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+    border: 1px solid rgba(var(--gold), .55);
+    background: rgba(var(--gold), .06);
+    opacity: 0;
+  }
+  .wo-scan__wall span[hidden] { display: none; }
+  .wo-scan__wall span.is-off { visibility: hidden; }
+  .wo-scan__wall span.is-lit { animation: wo-scan-lit-t 1.5s linear var(--d, 0ms) both; }
+  .wo-scan__wall span.is-lit::after { animation: wo-scan-lit-b 1.5s linear var(--d, 0ms) both; }
+  .wo-scan:not(.is-playing) .wo-scan__wall span.is-lit,
+  .wo-scan:not(.is-playing) .wo-scan__wall span.is-lit::after,
+  .wo-scan.is-held .wo-scan__wall span.is-lit,
+  .wo-scan.is-held .wo-scan__wall span.is-lit::after { animation-play-state: paused; }
+  .wo-scan__wall span.is-on { opacity: .9; }
+  .wo-scan__wall span.is-on::after { opacity: 1; }
+  /* de 50-60 % a 90 % en 900 ms (60 % de 1,5 s), y se apaga en 600 ms */
+  @keyframes wo-scan-lit-t { 0% { opacity: .6; } 60% { opacity: .95; } 100% { opacity: .6; } }
+  @keyframes wo-scan-lit-b { 0% { opacity: 0; } 60% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* ── Caja central: web en línea neutra, opaca (los chips no se ven a través, E-37) ── */
   .wo-scan__box {
-    position: relative; z-index: 1; width: var(--bw); height: var(--bh); overflow: hidden;
+    position: absolute; z-index: 1; left: 50%; top: 50%;
+    width: var(--sc-bw); height: var(--sc-bh);
+    margin: calc(var(--sc-bh) / -2) 0 0 calc(var(--sc-bw) / -2);
+    overflow: hidden;
     border-radius: 12px; border: 1px solid rgba(var(--gold), .85);
     background: #2d291f; /* oro al 15 % sobre la bandeja, opaco */
-    box-shadow: 0 0 0 6px var(--w-s1), 0 0 28px rgba(var(--gold), .18);
+    box-shadow: 0 0 28px rgba(var(--gold), .16);
   }
   .wo-scan__box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .wo-scan__box svg * { fill: none; stroke: rgba(var(--gold), .75); stroke-width: 1.4; }
-  .wo-scan__box svg circle { fill: rgba(var(--gold), .75); stroke: none; }
+  .wo-scan__web { fill: none; stroke: rgba(var(--gold), .78); stroke-width: 1.4; stroke-linecap: round; }
+  .wo-scan__fino { fill: none; stroke: rgba(var(--gold), .42); stroke-width: 1.1; stroke-linecap: round; }
+  .wo-scan__cota { fill: none; stroke: rgba(var(--star-rgb), .38); stroke-width: .9; stroke-dasharray: 2 2; }
+  .wo-scan__dots { fill: rgba(var(--gold), .75); }
+
   .wo-scan__bar {
-    position: absolute; left: 50%; bottom: 14px; width: 132px; height: 10px; margin-left: -66px;
+    position: absolute; left: 50%; bottom: 12px; width: var(--sc-bar); height: 10px;
+    margin-left: calc(var(--sc-bar) / -2);
     border-radius: 5px; background: var(--accent-gold);
     box-shadow: 0 0 14px rgba(var(--gold), .45);
-    transform: translateY(calc(var(--travel) / -2)); /* quieto: a media altura */
+    transform: translateY(calc(var(--sc-travel) / -2)); /* quieto: a media altura */
   }
   .wo-scan__bar::after {
-    content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 36px;
+    content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 34px;
     background: linear-gradient(180deg, rgba(var(--gold), .22), transparent);
     border-radius: 0 0 6px 6px;
   }
-  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 1.8s var(--w-ease-ui) infinite; animation-play-state: paused; }
-  .wo-scan.is-run.is-playing .wo-scan__bar { animation-play-state: running; }
-  .wo-scan.is-once .wo-scan__bar { animation: wo-scan-once 1.8s var(--w-ease-ui) 1 both; }
-  @keyframes wo-scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(var(--travel) * -1)); } }
-  @keyframes wo-scan-once {
-    0% { transform: translateY(0); }
-    70% { transform: translateY(calc(var(--travel) * -1)); }
-    100% { transform: translateY(calc(var(--travel) / -2)); }
+  /* 1,8 s de barrido + 0,6 s de pausa arriba (2,4 s); vuelve abajo apagada y entra */
+  .wo-scan.is-run .wo-scan__bar { animation: wo-scan-sweep 2.4s linear infinite; animation-play-state: paused; }
+  .wo-scan.is-run.is-playing:not(.is-held) .wo-scan__bar { animation-play-state: running; }
+  @keyframes wo-scan-sweep {
+    0% { transform: translateY(0); opacity: 0; animation-timing-function: var(--w-ease-ui, cubic-bezier(.4, 0, .2, 1)); }
+    4% { opacity: 1; }
+    75% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 1; }
+    92% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 1; }
+    100% { transform: translateY(calc(var(--sc-travel) * -1)); opacity: 0; }
   }
-  .wo-scan--compacto { --bw: 184px; --bh: 126px; min-height: 300px; padding: 24px; border-radius: 22px; }
-  .wo-scan--compacto .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
-  .wo-scan--compacto .wo-scan__wall, .wo-scan--compacto .wo-scan__row { gap: 10px; }
-  .wo-scan--compacto .wo-scan__bar { width: 96px; margin-left: -48px; bottom: 10px; }
-  /* E-18: el mosaico compacto empieza debajo de la franja de "Ejemplo" (pisaba la fila de arriba). */
-  .wo-scan--compacto .wo-scan__wall { top: 44px; }
+
+  /* ── Tamaños ── */
+  .wo-scan--card {
+    --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+    --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+    min-height: 400px; border-radius: 32px;
+  }
+  .wo-scan--mini {
+    --sc-bw: 160px; --sc-bh: 110px; --sc-air: 12px;
+    --sc-ch: 32px; --sc-gap: 7px; --sc-px: 13px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 88px;
+    --sc-travel: calc(var(--sc-bh) - 30px);
+    min-height: 300px; border-radius: 24px;
+  }
+  .wo-scan--mini .wo-scan__bar { bottom: 10px; height: 8px; }
+  .wo-scan--mini .wo-scan__bar::after { top: 8px; height: 26px; }
+
   @media (max-width: 767.98px) {
-    .wo-scan { min-height: 360px; padding: 24px; border-radius: 22px; --bw: 200px; --bh: 138px; }
-    .wo-scan__chip { height: 40px; padding: 0 16px; font-size: 14px; }
-    .wo-scan__bar { width: 104px; margin-left: -52px; }
-    /* E-18: el botón de pausa del bucle tiene su franja; el mosaico termina encima. */
-    .wo-scan--loop { padding-bottom: 76px; }
-    .wo-scan--loop .wo-scan__wall { bottom: 64px; }
-    /* E-18: lo mismo arriba para "Ejemplo": el mosaico empieza debajo de su franja (se montaba
-       sobre el chip "Formulario de contacto"). */
-    .wo-scan { padding-top: 56px; }
-    .wo-scan__wall { top: 46px; }
+    .wo-scan--hero {
+      --sc-bw: 200px; --sc-bh: 138px; --sc-air: 12px;
+      --sc-ch: 40px; --sc-gap: 9px; --sc-px: 11px; --sc-fs: 13px; --sc-r: 10px; --sc-bar: 104px;
+      min-height: 360px; border-radius: 24px;
+    }
+    .wo-scan--card { min-height: 360px; border-radius: 24px; }
+    /* mini en móvil (alto 236 de la v1): 5 filas, la de arriba y la de abajo fuera */
+    .wo-scan--mini { min-height: 236px; }
+    .wo-scan--mini .wo-scan__row--borde { display: none; }
   }
+
   @media (prefers-reduced-motion: reduce) {
-    .wo-scan .wo-scan__bar { animation: none; }
+    .wo-scan .wo-scan__bar { animation: none !important; }
+    .wo-scan .wo-scan__wall span.is-lit, .wo-scan .wo-scan__wall span.is-lit::after { animation: none; }
   }
 </style>

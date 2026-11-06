@@ -3,7 +3,12 @@
 // PildorasMarcas · patrón L3 de WorkOS (píldoras de compatibilidad bajo el chip, W-HOME-13;
 // C/02-chip-marca/pildoras.jpg). design/rediseno-workos-v2.md P06.
 //
-// Las palabras (ChatGPT) van al 80 % en las píldoras para no pesar más que sus vecinas.
+// Las palabras (ChatGPT) van al 80 % en las píldoras de solo logo y al 66 % junto a nombres (allí la
+// palabra ES el nombre y, en crema sólida 600, pesaba más que los nombres al 62 %).
+//
+// Sin etiquetas y sin nombres (variante B): todas las filas van en UNA lista con saltos. En escritorio
+// salta donde dicen las filas (n y n-1, medio paso); en móvil (≤ 640 px) salta en filas equilibradas
+// de máx. 4 que alternan larga/corta (11 → 4/3/4), así nunca queda una fila huérfana.
 // Píldoras de 56 px, radio 100, fondo --bg-card, filo 1 px crema al 6 %, padding 0×28; logo
 // MONOCROMO crema sólido (sin opacidad) de 22-31 px normalizado a ojo (factor óptico de datos.ts)
 // y nombre opcional 15/500 al 62 %. Filas centradas: con filas de n y n-1 píldoras la 2.ª queda
@@ -38,9 +43,39 @@ interface Props {
 const { filas, nombres = true, encender = 'evento', alto = 24, rotulos = {}, class: extra = '' } = Astro.props;
 const h = Math.max(22, Math.min(31, alto));
 let n = 0;
+const palabraSize = (conNombres: boolean) => Math.round(h * (conNombres ? 0.66 : 0.8));
+
+// Variante B (solo logos, sin etiquetas): una lista con saltos de escritorio y de móvil.
+const plano = !nombres && filas.every((f) => !f.etiqueta);
+const todos = plano ? filas.flatMap((f) => f.ids) : [];
+const saltosPc = new Set<number>();
+if (plano) { let acc = 0; for (const f of filas.slice(0, -1)) { acc += f.ids.length; saltosPc.add(acc); } }
+const saltosMovil = new Set<number>();
+if (plano) {
+  const N = todos.length, r = Math.ceil(N / 4), base = Math.floor(N / r);
+  let extra = N % r, acc = 0;
+  // Las filas pares se llevan las sobrantes: larga/corta/larga (medio paso entre filas).
+  const largos = Array.from({ length: r }, (_, i) => base + (i % 2 === 0 && extra > 0 ? (extra--, 1) : 0));
+  while (extra > 0) { for (let i = 0; i < r && extra > 0; i++) if (largos[i] === base) { largos[i]++; extra--; } }
+  for (const l of largos.slice(0, -1)) { acc += l; saltosMovil.add(acc); }
+}
 ---
 <div class={`pm ${extra}`.trim()} data-w2-pildoras data-w2-encender={encender}>
-  {filas.map((f) => (
+  {plano && (
+    <ul class="pm-lista pm-lista--plana" role="list">
+      {todos.map((id, i) => {
+        const m = MARCAS[id];
+        const br = [saltosPc.has(i) ? 'pm-br--pc' : '', saltosMovil.has(i) ? 'pm-br--m' : ''].filter(Boolean).join(' ');
+        return (
+          <>
+            {br && <li class={`pm-br ${br}`} role="presentation" aria-hidden="true"></li>}
+            <li class="pm-p" style={`--i:${i}`}><LogoMarca id={id} size={m.tipo === 'texto' ? palabraSize(false) : h} tono="mono" /></li>
+          </>
+        );
+      })}
+    </ul>
+  )}
+  {!plano && filas.map((f) => (
     <div class="pm-fila">
       {f.etiqueta && <p class="pm-et" style={`--i:${n}`}>{f.etiqueta}</p>}
       <ul class="pm-lista" role="list">
@@ -52,7 +87,7 @@ let n = 0;
             <li class="pm-p" style={`--i:${i}`}>
               {conNombre
                 ? <><LogoMarca id={id} size={h} tono="mono" titulo="" /><span class="pm-n">{rotulos[id] ?? m.titulo}</span></>
-                : <LogoMarca id={id} size={m.tipo === 'texto' ? Math.round(h * 0.8) : h} tono="mono" />}
+                : <LogoMarca id={id} size={m.tipo === 'texto' ? palabraSize(nombres) : h} tono="mono" />}
             </li>
           );
         })}
@@ -95,10 +130,26 @@ let n = 0;
     transition-delay: calc(var(--i) * 60ms);
   }
 
+  /* Variante B: una lista con saltos (la fila de 0 alto del salto no suma hueco: el aire va en la píldora). */
+  .pm-lista--plana { row-gap: 0; max-width: 100%; }
+  .pm-lista--plana .pm-p { margin-block: 6px; }
+  .pm-br { display: none; flex-basis: 100%; height: 0; margin: 0; padding: 0; }
+  .pm-br--pc { display: block; }
+  @media (max-width: 640px) {
+    .pm-br--pc { display: none; }
+    .pm-br--m { display: block; }
+    .pm-lista--plana .pm-p { margin-block: 4px; }
+  }
+
   @media (max-width: 560px) {
     .pm-lista { gap: 8px; }
     .pm-p { height: 48px; padding: 0 18px; gap: 8px; }
     .pm-n { font-size: 14px; }
+  }
+  /* Teléfonos estrechos: la fila de 4 con la palabra ChatGPT tiene que caber entera. */
+  @media (max-width: 380px) {
+    .pm-lista--plana { column-gap: 6px; }
+    .pm-lista--plana .pm-p { padding: 0 12px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .pm.is-armed .pm-p, .pm.is-on .pm-p, .pm.is-armed .pm-et, .pm.is-on .pm-et { opacity: 1; transform: none; transition: none; }

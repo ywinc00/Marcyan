@@ -1,7 +1,8 @@
 ---
 // ─────────────────────────────────────────────────────────────
 // MUESTRARIO P06 · logos de plataformas (design/rediseno-workos-v2.md §1.4, §2 y P06).
-// Página INTERNA: noindex. SE BORRA ANTES DE CUALQUIER MERGE A main (§1.2).
+// Página INTERNA: noindex. SE BORRA ANTES DE CUALQUIER MERGE A main (§1.2). OJO: el sitemap
+// (astro.config, fuera de P06) no la filtra y sale en sitemap-0.xml; borrarla es obligatorio.
 // Monta 2 instancias de cada pieza (§1.6: ids únicos comprobables por verify-extra).
 // Los conjuntos de logos de cada demo salen del copy que ya existe en el sitio (IA conversacional:
 // WhatsApp, Instagram, Messenger y Google; tienda: Shopify, Stripe y PayPal; SEO para IA: ChatGPT,
@@ -83,15 +84,15 @@ const trazos = todos.filter(esTrazo);
         <div class="mm-txt">
           <p class="mm-k">A · IA conversacional (6)</p>
           <h3>Conectada a tus canales.</h3>
-          <p class="mm-n">Marcy en el centro; un anillo cuando son 6 o menos.</p>
+          <p class="mm-n">Marcy es el cerebro y va en el centro; alrededor, solo canales. Dos anillos hasta 8 marcas.</p>
         </div>
-        <ConstelacionMarcas ids={['claude', 'whatsapp', 'instagram', 'messenger', 'google', 'googlemaps']} />
+        <ConstelacionMarcas ids={['whatsapp', 'instagram', 'messenger', 'google', 'facebook', 'googlemaps']} />
       </div>
       <div class="mm-dos mm-dos--c">
         <div class="mm-txt">
           <p class="mm-k">B · registro completo (16, solo muestrario)</p>
-          <h3>Dos anillos.</h3>
-          <p class="mm-n">El de fuera, más pequeño y a medio paso.</p>
+          <h3>Tres anillos.</h3>
+          <p class="mm-n">Más de 8 marcas: tres anillos juntos; los de fuera, más pequeños.</p>
         </div>
         <ConstelacionMarcas ids={trazos} />
       </div>

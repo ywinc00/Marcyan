@@ -35,17 +35,17 @@ export type TemaFondo =
   | 'plano'         // F07 sectores
   | 'calles'        // F08 barrios
   | 'tunel'         // F09 SEO para IA
-  | 'franjas'       // F10 servicios y precios
-  | 'escaneo'       // F12 diagnóstico y herramientas
-  | 'hoja';         // F13 blog
+  | 'escaneo';      // F12 diagnóstico y herramientas
+// F10 (franjas que parpadean, servicios y precios) y F13 (hoja pautada, blog) RETIRADOS en la
+// vuelta 3 por decisión del dueño (E-57): esas páginas vuelven al fondo de la v1. No se reponen.
 
 /** Código del plan (F01…F13, sin F11): el plan G escribe `fondo: 'F01'`; se aceptan los dos. */
 export type CodigoFondo =
-  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F10' | 'F12' | 'F13';
+  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F12';
 
 const POR_CODIGO: Record<CodigoFondo, TemaFondo> = {
   F01: 'reticula', F02: 'escaparate', F03: 'radar', F04: 'hilos', F05: 'placa', F06: 'construccion',
-  F07: 'plano', F08: 'calles', F09: 'tunel', F10: 'franjas', F12: 'escaneo', F13: 'hoja',
+  F07: 'plano', F08: 'calles', F09: 'tunel', F12: 'escaneo',
 };
 /** Normaliza un código del plan ('F03') o un nombre ('radar') al nombre del tema. */
 export function temaDeFondo(t: TemaFondo | CodigoFondo): TemaFondo {

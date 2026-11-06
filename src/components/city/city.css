@@ -273,16 +273,15 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .mp a svg{width:13px;height:13px;color:var(--accent-gold)}
 .hx .mp a:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
 .hx .local__cap{position:absolute;left:16px;bottom:14px;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;background:rgba(9,8,7,.8);padding:5px 8px;border-radius:4px}
-.hx-js .hx .diag__demo:not(.in) .ring{stroke-dashoffset:251.3}
-.hx-js .hx .diag__demo:not(.in) .diag__bars i::after{transform:scaleX(0)}
-.hx .explore{position:relative;padding-block:24px 96px}
-.hx .explore__in{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:48px;align-items:center}
-.hx .explore__t{margin-top:12px;font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.01em}
-.hx .explore__row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.hx .explore__row a{display:flex;align-items:flex-start;gap:14px;height:100%;padding:20px 24px;border-radius:var(--w-r-obj);border:1px solid var(--w-line);background:var(--w-s2);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
+/* la sección absorbe dentro de sí el alto que gana (garantías + fila de tres): sube sobre el aire inferior de la FAQ
+   y cede su margen inferior, para que las marcas data-atmo del cierre y del contacto sigan en ±40 px */
+.hx .explore{position:relative;margin-top:-24px;padding-block:0}
+.hx .explore__t{margin-top:12px;font-family:var(--font-display);font-size:clamp(26px,1.2rem + 1vw,34px);font-weight:600;line-height:1.15;letter-spacing:-.02em}
+.hx .explore__row{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px}
+.hx .explore__row a{display:flex;align-items:flex-start;gap:14px;height:100%;padding:18px 20px;border-radius:var(--w-r-obj);border:1px solid var(--w-line);background:var(--w-s2);box-shadow:var(--w-edge);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
 .hx .explore__row a:hover{border-color:var(--w-line-strong)}
-.hx .explore__row .exic{flex:none;width:24px;height:24px;color:var(--accent-gold)}
-.hx .explore__row .exic svg{width:24px;height:24px;stroke-width:1.5}
+.hx .explore__row .exic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--w-ink-60);transition:transform var(--w-dur-hover) var(--w-ease-ui),color var(--w-dur-micro) var(--w-ease-ui)}
+.hx .explore__row .exic svg{width:20px;height:20px;stroke-width:1.5}
 .hx .explore__row b{display:block;font-size:15px;font-weight:500;line-height:1.4;color:var(--accent-gold)}
 .hx .explore__row small{display:block;margin-top:2px;font-size:13px;color:var(--w-ink-70);line-height:1.5}
 .hx .cta{position:relative;padding-block:150px 170px}
@@ -297,7 +296,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 }
 @media (max-width:900px){
   .hx .svc__grid{grid-template-columns:1fr}
-  .hx .local__grid,.hx .explore__in{grid-template-columns:1fr;gap:36px}
+  .hx .local__grid{grid-template-columns:1fr;gap:36px}
   .hx .local__grid{grid-template-rows:none;gap:20px}
   .hx .local__copy,.hx .local__right,.hx .local__nap{grid-column:1;grid-row:auto}
   .hx .local__right{order:2}.hx .local__nap{order:3}
@@ -441,7 +440,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .w-hwhere__card{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 18px 22px 22px;border-radius:var(--w-r-obj);background:var(--w-s2);border:1px solid var(--w-line);box-shadow:var(--w-edge);color:var(--fg-primary);transition:border-color var(--w-dur-hover) var(--w-ease-ui)}
 .hx .w-hwhere__txt{min-width:0}
 .hx .w-hwhere__name{display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:17px;font-weight:500;line-height:1.3;letter-spacing:-.01em}
-.hx .w-hwhere__chev{font-size:18px;line-height:1;color:var(--accent-gold);transition:transform var(--w-dur-hover) var(--w-ease-ui)}
+.hx .w-hwhere__chev{font-family:var(--font-body);font-size:22px;font-weight:400;line-height:1;color:var(--accent-gold);transition:transform var(--w-dur-hover) var(--w-ease-ui)}
 .hx .w-hwhere__q{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:14px;line-height:1.4;color:var(--w-ink-70)}
 .hx .w-hwhere__q svg{width:12px;height:12px;flex:none}
 .hx .w-hwhere__q .en{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;border:1px solid rgba(240,237,232,.18);border-radius:4px;padding:1px 4px}
@@ -471,11 +470,21 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .faq .w-faq__title em{color:var(--accent-gold)}
 .hx .pf--solo .w-hcase{padding:28px 32px 20px}
 .hx .pf--solo .pf__dl dd{font-size:15px}
-/* 9 · tres garantías bajo los recursos */
-.hx .explore{padding-block:0 24px}
-.hx .w-hg3{margin-top:24px}
-.hx .w-hg3 .g3__item{padding:20px 24px}
-.hx .w-hg3 .g3__text{max-width:none}
+/* 9 · Sigue explorando (W-CORE-23, plan v2 G02): cabecera a la izquierda; debajo, a ancho del contenedor, las tres
+   garantías y una fila de tres tarjetas de recurso alineada con sus columnas (mismo reparto en tercios) */
+.hx .w-hg3{max-width:none;margin-top:24px}
+.hx .w-hg3 .g3__item{padding:18px 24px}
+.hx .w-hg3 .g3__h{margin-top:10px}
+.hx .w-hg3 .g3__text{max-width:36ch}
+.hx .w-hg3 .g3__list{border-bottom:0}
+.hx .w-hg3 + .explore__row{margin-top:24px}
+@media (hover:hover) and (pointer:fine){.hx .explore__row a:hover .exic{transform:translateY(-2px);color:var(--accent-gold)}}
+.hx .explore__row a:focus-visible .exic{color:var(--accent-gold)}
+/* flecha de la tarjeta (la tenía producción): la "›" de los sectores, junto al título, sin quitar ancho a la descripción;
+   en táctil, sin hover, el icono va en oro */
+.hx .explore__chev{display:inline-block;margin-left:6px;font-family:var(--font-body);font-size:20px;font-weight:400;line-height:1;vertical-align:-1px;transition:transform var(--w-dur-hover) var(--w-ease-ui)}
+.hx .explore__row a:hover .explore__chev{transform:translateX(3px)}
+@media (hover:none){.hx .explore__row .exic{color:var(--accent-gold)}}
 /* 10 · cierre en dos tarjetas sobre el horizonte encendido */
 .hx .cta{padding-block:96px 112px}
 /* el tramo de servicios conserva su alto: la bandeja ocupa el sitio de las filas y del margen inferior */
@@ -503,13 +512,18 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   /* una sola fila de etiquetas: caben las que caben enteras (las que saltarían a otra fila se ocultan), sin alargar el tramo */
   .hx .pf__tags{max-height:26px;overflow:hidden}
   .hx .pf__tags li{line-height:16px}
-  .hx .explore__in{gap:20px}
   .hx .answer{padding-block:160px 150px}
   .hx .faq{padding-block:36px}
   .hx .faq .w-faq__list{gap:8px}
   .hx .faq .w-faq__q{padding:18px 16px}
-  .hx .explore__row a{padding:14px 16px}
-  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:18px 4px}
+  .hx .explore{margin-top:0;padding-bottom:4px}
+  /* /es/miami trae tres enlaces propios (sin la tarjeta añadida): conserva el margen para que el cierre no suba de más */
+  .hx[data-city="miami"]:lang(es) .explore{padding-bottom:44px}
+  .hx .explore__row,.hx .w-hg3 + .explore__row{margin-top:16px;row-gap:8px}
+  .hx .w-hg3 .g3__list{border-bottom:1px solid var(--w-line)}
+  .hx .explore__row a{padding:12px 16px}
+  .hx .w-hg3{margin-top:20px}
+  .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:12px 4px}
   .hx .w-hg3 .g3__ic{margin-top:0}
   .hx .w-hg3 .g3__h{margin-top:0}
   .hx .w-hg3 .g3__text{display:none}
@@ -529,5 +543,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .cta{padding-block:24px 24px}
 }
 @media (prefers-reduced-motion:reduce){
-  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev{transition:none}
+  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev,.hx .explore__row .exic,.hx .explore__chev{transition:none}
+  .hx .explore__row a:hover .exic,.hx .explore__row a:hover .explore__chev{transform:none}
 }

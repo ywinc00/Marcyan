@@ -1,0 +1,47 @@
+---
+// IA conversacional · "Así empiezas con Marcy" (design/rediseno-workos-v2.md §3 G06, P09).
+// Nueva, antes del precio. Situación: EMPEZAR. Texto a la izquierda (H2 a dos tonos, bajada y
+// los 3 pasos reales del arranque, sin plazos inventados: solo los oficiales) y el asistente de
+// alta de Marcy (W2N-05, pieza compartida) a la derecha, que se reproduce al entrar y trae su
+// botón "Repetir". Canales: los que Marcy contesta o con los que te avisa (§5-14; las llamadas
+// perdidas salen como aviso, nunca como "respondido").
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import AltaMarcy from '../../alta/AltaMarcy.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['alta']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ae">
+  <div class="ae__text">
+    <h2 class="w-h2 ae__h" set:html={copy.title} />
+    <p class="ae__p">{copy.text}</p>
+    <ol class="ae__steps" role="list">
+      {copy.steps.map((s, i) => (
+        <li><span class="ae__n">{String(i + 1).padStart(2, '0')}</span><span><b>{s[0]}</b>{s[1]}</span></li>
+      ))}
+    </ol>
+  </div>
+  <div class="ae__obj">
+    <AltaMarcy lang={lang} canales={['whatsapp', 'web', 'calendario', 'correo', 'llamadas']} />
+  </div>
+</div>
+<style>
+  .ae { content-visibility: auto; contain-intrinsic-size: auto 560px; margin-top: 24px; display: grid; gap: 40px; align-items: center; }
+  @media (--lg) {
+    .ae { grid-template-columns: minmax(0, 470px) minmax(0, 528px); justify-content: space-between; gap: 64px; margin-top: 40px; }
+  }
+  .ae__h { margin: 0; max-width: 470px; }
+  .ae__p { margin: 20px 0 0; max-width: 440px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-70); }
+  .ae__steps { list-style: none; margin: 28px 0 0; padding: 0; max-width: 440px; display: grid; gap: 0; }
+  .ae__steps li {
+    display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding: 14px 0;
+    border-top: 1px solid var(--w-line-strong); font: 400 15px/1.45 var(--font-body); color: var(--w-ink-70);
+  }
+  .ae__steps li:last-child { border-bottom: 1px solid var(--w-line-strong); }
+  .ae__steps b { display: block; font-weight: 500; color: var(--w-ink); }
+  .ae__n { font: 500 13px/1.6 var(--font-mono); color: var(--w-accent); }
+  .ae__obj { min-width: 0; display: flex; justify-content: center; }
+  @media (--lt-md) { .ae__p { font-size: 1rem; } }
+</style>

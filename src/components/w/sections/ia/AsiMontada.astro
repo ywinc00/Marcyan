@@ -1,0 +1,44 @@
+---
+// IA para pymes · "Así está montada" (design/rediseno-workos-v2.md §3 G06, P07 + P06).
+// W-HOME-12/13 de WorkOS ("Developer-first design") calzado a "cómo está montada la IA por
+// detrás": cabecera centrada y el chip con Marcyan en el centro (ChipIA variante "landing",
+// sin horizonte: la placa se apoya en su línea de suelo) con las píldoras de logos debajo.
+// Filas HONESTAS (las mismas que G01, §5-1 y §5-14 por defecto): "Piensa con" = Claude (el
+// modelo que corre Marcy en producción); "Contesta en" = los canales que Marcy contesta de
+// verdad y que esta página nombra; "Te encuentran en" = los asistentes que el copy congelado
+// de la página nombra (ChatGPT, Gemini y la IA de WhatsApp = Meta AI). Sin "Montada sobre"
+// hasta que el dueño confirme la infraestructura.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import ChipIA from '../../chip/ChipIA.astro';
+import PildorasMarcas, { type FilaPildoras } from '../../marcas/PildorasMarcas.astro';
+import type { IaPymesCopy } from '../../../../i18n/w/ia-pymes';
+
+interface Props { copy: IaPymesCopy['montada']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+const filas: FilaPildoras[] = [
+  { etiqueta: copy.filas[0], ids: ['claude'] },
+  { etiqueta: copy.filas[1], ids: ['whatsapp', 'instagram', 'messenger'] },
+  { etiqueta: copy.filas[2], ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
+];
+const rotulos = { googlegemini: 'Gemini', meta: 'Meta AI' } as const;
+---
+<CabeceraNumerada n={n} label={copy.label} align="center" />
+<div class="am">
+  <div class="am__text">
+    <h2 class="w-h2 am__h" set:html={copy.title} />
+    <p class="am__p">{copy.text}</p>
+  </div>
+  <div class="am__chip">
+    <ChipIA variante="landing" lang={lang}>
+      <PildorasMarcas slot="pildoras" filas={filas} rotulos={rotulos} />
+    </ChipIA>
+  </div>
+</div>
+<style>
+  .am { margin-top: 12px; content-visibility: auto; contain-intrinsic-size: auto 1100px; }
+  .am__text { text-align: center; max-width: 680px; margin-inline: auto; }
+  .am__h { margin: 0; }
+  .am__p { margin: 16px auto 0; max-width: 520px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-70); }
+  .am__chip { margin-top: 32px; }
+  @media (--lt-md) { .am__p { font-size: 1rem; } .am__chip { margin-top: 16px; } }
+</style>

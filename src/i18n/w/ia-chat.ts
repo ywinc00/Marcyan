@@ -9,7 +9,6 @@
 
 export type IaCity = 'houston' | 'miami';
 
-type Msg = { from: 'c' | 'm'; text: string; time?: string };
 type Kind = 'ok' | 'mid' | 'off';
 
 const base = (city: IaCity) => {
@@ -18,44 +17,12 @@ const base = (city: IaCity) => {
   const zone = H ? 'Katy' : 'Doral';
   return {
     cityName: name,
-    chip: H ? 'Houston, TX' : 'Miami, FL',
-    eyebrow: 'Conoce a Marcy',
     // Sin cola: H1 noche + cola pasaban de 2 líneas a 1440 (regla de §2.14); la idea abre la bajada.
     lead: H
       ? 'Tu recepcionista que no duerme: contesta tus mensajes, agenda citas y te pasa lo que necesita una persona, en español o en inglés.'
       : 'Tu recepcionista que no duerme: contesta tu WhatsApp, toma reservas y te pasa lo que necesita una persona, en tu español o en inglés.',
     primary: 'Quiero a Marcy',
     link: 'Ver preguntas',
-    avatarAlt: 'Marcy, la asistente con IA de Marcyan',
-
-    /** Pestañas del hero: guion de ejemplo. Precio = "te paso la propuesta", nunca una cifra. */
-    tabs: [
-      { label: 'Agendar cita', script: [
-        { from: 'c', text: 'Hola, ¿tienen cita este sábado?', time: '10:02' },
-        { from: 'm', text: '¡Hola! El sábado tengo a las 10:00 o a las 12:30. ¿Cuál te aparto?', time: '10:02' },
-        { from: 'c', text: 'La de las 10, porfa.', time: '10:03' },
-        { from: 'm', text: 'Listo, quedó apartada el sábado a las 10:00. Te mandé la confirmación por mensaje.', time: '10:03' },
-      ] as Msg[] },
-      { label: 'Pedir precio', script: [
-        { from: 'c', text: '¿Cuánto me cobran por arreglar una fuga en el baño?', time: '13:15' },
-        { from: 'm', text: 'Depende de lo que haya que cambiar. Te paso la propuesta por escrito hoy mismo. ¿Me cuentas en qué zona estás?', time: '13:15' },
-        { from: 'c', text: `En ${zone}.`, time: '13:16' },
-        { from: 'm', text: `Perfecto, ${zone} está en nuestra zona. En un rato te llega la propuesta por aquí.`, time: '13:16' },
-      ] as Msg[] },
-      { label: 'Fuera de horario', script: [
-        { from: 'c', text: '¿Siguen abiertos?', time: '23:40' },
-        { from: 'm', text: 'Ahora estamos cerrados, abrimos mañana a las 8:00. ¿Te aparto la primera visita?', time: '23:40' },
-        { from: 'c', text: 'Sí, a las 8 está bien.', time: '23:41' },
-        { from: 'm', text: 'Hecho. Mañana a las 8:00 te esperamos.', time: '23:41' },
-      ] as Msg[] },
-      { label: 'Pasar a una persona', script: [
-        { from: 'c', text: 'Tengo una duda con mi factura.', time: '16:20' },
-        { from: 'm', text: 'Te paso con alguien del equipo ahora mismo. Ya le dejé el resumen para que no repitas nada.', time: '16:20' },
-        { from: 'c', text: 'Gracias.', time: '16:21' },
-        { from: 'm', text: 'Con gusto. Te escriben aquí mismo en unos minutos.', time: '16:21' },
-      ] as Msg[] },
-    ],
-    heroSr: 'Ejemplo: Marcy agenda una cita, pasa la propuesta de precio por escrito, contesta fuera de horario y pasa el caso a una persona.',
 
     // 01 · Sin Marcy / con Marcy (W-CORE-25)
     sinCon: {
@@ -68,19 +35,19 @@ const base = (city: IaCity) => {
         : 'Entre el servicio de la noche y el cierre de caja, los mensajes se acumulan. Toca el interruptor y mira la diferencia.',
       labels: ['Sin Marcy', 'Con Marcy'] as [string, string],
       sin: [
-        { text: '¿Tienen cita para el sábado?', from: 'WhatsApp', time: '21:40' },
-        { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '22:15' },
-        { text: 'Llamada perdida', kind: 'notice' as const, time: '08:05' },
-        { text: '¿Siguen abiertos?', from: 'Web', time: '23:02' },
-        { text: 'Mensaje de voz sin escuchar', kind: 'notice' as const, time: '07:48' },
-        { text: H ? '¿Hacen presupuestos en Pearland?' : '¿Atienden en Brickell?', from: 'WhatsApp', time: '19:12' },
-        { text: '¿Me pueden llamar mañana temprano?', from: 'WhatsApp', time: '22:51' },
+        { text: '¿Tienen cita para el sábado?', from: 'WhatsApp', time: '9:40 p. m.' },
+        { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '10:15 p. m.' },
+        { text: 'Llamada perdida', kind: 'notice' as const, time: '8:05 a. m.' },
+        { text: '¿Siguen abiertos?', from: 'Web', time: '11:02 p. m.' },
+        { text: 'Mensaje de voz sin escuchar', kind: 'notice' as const, time: '7:48 a. m.' },
+        { text: H ? '¿Hacen presupuestos en Pearland?' : '¿Atienden en Brickell?', from: 'WhatsApp', time: '7:12 p. m.' },
+        { text: '¿Me pueden llamar mañana temprano?', from: 'WhatsApp', time: '10:51 p. m.' },
         { text: 'Formulario sin respuesta', kind: 'notice' as const, time: 'Ayer' },
-        { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '09:30' },
+        { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '9:30 a. m.' },
       ],
       conTitle: 'Todo contestado',
       con: [
-        { label: 'Respondido', kind: 'ok' as Kind, note: '¿Tienen cita para el sábado? Apartó las 10:00' },
+        { label: 'Respondido', kind: 'ok' as Kind, note: '¿Tienen cita para el sábado? Apartó las 10:00 a. m.' },
         { label: 'Respondido', kind: 'ok' as Kind, note: '¿Siguen abiertos? Agendó la primera visita' },
         { label: 'Te lo pasa', kind: 'mid' as Kind, note: '¿Cuánto cuesta? Te pide la propuesta' },
         { label: 'Respondido', kind: 'ok' as Kind, note: H ? '¿Presupuestos en Pearland? Sí, está en tu zona' : '¿Atienden en Brickell? Sí, está en tu zona' },
@@ -88,7 +55,19 @@ const base = (city: IaCity) => {
       ],
     },
 
-    // 02 · Cómo trabaja (W-ADV-05 + W-ADV-06)
+    // 02 · Contesta en cada canal (MazoHilos, P05 · W-ADV-22). Canales que Marcy contesta (§5-14).
+    canales: {
+      label: 'Contesta en cada canal',
+      title: '<span class="w-tone">Contesta en cada canal.</span> Con la misma voz en todos.',
+      text: 'Tu web, tu WhatsApp y tu Instagram: Marcy lleva cada conversación con los datos de tu negocio y no deja ninguna a medias. Antes de empezar te decimos cuáles se pueden conectar en tu caso.',
+      points: [
+        ['Tu web', 'Contesta en el chat de tu página, a cualquier hora.'],
+        ['WhatsApp', 'Agenda y responde sin que sueltes lo que estás haciendo.'],
+        ['Instagram', 'Los mensajes directos no se quedan sin leer.'],
+      ] as [string, string][],
+    },
+
+    // 03 · Cómo trabaja (W-ADV-05 + W-ADV-06)
     pasos: {
       label: 'Cómo trabaja',
       title: '<span class="w-tone">Entiende, actúa</span> y te dice qué hizo.',
@@ -100,7 +79,7 @@ const base = (city: IaCity) => {
       ] as [{ label: string; title: string; text: string }, { label: string; title: string; text: string }, { label: string; title: string; text: string }],
       ask: H ? '¿Me pueden ver el sábado por una fuga en el baño? Estoy en Katy.' : '¿Me pueden ver el sábado por una fuga en el baño? Estoy en Doral.',
       actions: [
-        ['agenda', 'sábado · libre 10:00'],
+        ['agenda', 'sábado · libre 10:00 a. m.'],
         ['servicio', 'fuga · plomería'],
         ['zona', `${zone} · dentro de tu área`],
       ] as [string, string][],
@@ -126,7 +105,7 @@ const base = (city: IaCity) => {
       fixedTitle: 'Reglas fijas',
       fixedNote: 'Siempre activas',
       fixed: [
-        ['ok', 'Sí', 'Agendar lun a sáb · 8:00 a 18:00'],
+        ['ok', 'Sí', 'Agendar lun a sáb · 8:00 a. m. a 6:00 p. m.'],
         ['ok', 'Sí', `Zona · ${zone} y alrededores`],
         ['mid', 'Te lo pasa', 'Fuera de zona · te pregunta'],
         ['off', 'No', 'Dar precios por chat'],
@@ -141,14 +120,14 @@ const base = (city: IaCity) => {
       sr: `Ejemplo: el dueño de un negocio escribe cómo trabaja (horario, zona, precios y quejas) y Marcy lo convierte en reglas fijas y en revisiones de cada mensaje.`,
     },
 
-    // 04 · Lo que pasó hoy (W-ADV-44 static + W-ADV-23)
+    // Lo que pasó hoy (W-ADV-44 vivo + W-ADV-23)
     hoy: {
       label: 'Lo que pasó hoy',
       title: 'Al final del día, todo en orden',
       text: 'Cinco conversaciones de ejemplo y qué hizo Marcy con cada una. Tú solo miras lo que te pasó.',
       rows: [
         { icon: 'lucide:message-circle', label: 'Mensaje de WhatsApp', chip: 'Respondido', tone: 'ok' as const },
-        { icon: 'lucide:calendar', label: 'Cita sábado 10:00', chip: 'Agendada', tone: 'ok' as const },
+        { icon: 'lucide:calendar', label: 'Cita sábado 10:00 a. m.', chip: 'Agendada', tone: 'ok' as const },
         { icon: 'lucide:help-circle', label: 'Pregunta de precio', chip: 'Te lo pasa', tone: 'pass' as const },
         { icon: 'lucide:moon', label: 'Fuera de horario', chip: 'Respondido', tone: 'ok' as const },
         { icon: 'lucide:user', label: 'Quiere hablar con alguien', chip: 'Te lo pasa', tone: 'pass' as const },
@@ -156,24 +135,30 @@ const base = (city: IaCity) => {
       memoryLabel: 'Lo que ya sabe de tu negocio',
       memoryText: 'Lo que le cuentas una vez, lo recuerda en cada conversación. Si algo cambia, nos avisas y lo ajustamos.',
       memory: [
-        { label: 'Canal', value: 'WhatsApp' },
+        { label: 'Canales', value: 'Web y WhatsApp' },
         { label: 'Citas', value: 'Lun a sáb' },
         { label: 'Zona', value: zone },
         { label: 'Idioma', value: 'Español e inglés' },
       ],
     },
 
-    // 05 · A dónde te avisa (W-HOME-14)
+    // A dónde te avisa (W-CORE-30: navegador + 2 satélites; la línea nace del globo de Marcy)
     aviso: {
       label: 'A dónde te avisa',
       title: '<span class="w-tone">¿Y tú cómo te enteras?</span> Te avisa donde ya miras.',
       text: 'Cada cita agendada y cada conversación que necesita una persona te llega con su resumen. No tienes que abrir otra app para saber qué pasó.',
-      nodes: [
-        { icon: 'lucide:message-circle', label: 'Entra un mensaje' },
-        { icon: 'lucide:bot', label: 'Marcy lo resuelve o lo prepara' },
-      ],
-      mail: { channel: 'Correo', from: 'Marcy', subject: 'Nueva cita: sábado 10:00', body: 'Ana · fuga en el baño · ' + zone, time: '10:03' },
-      wa: { channel: 'WhatsApp', from: 'Marcy', body: 'Te pasé una conversación: duda con una factura. Ya tienes el resumen.', time: '16:20' },
+      sr: 'Ejemplo: una clienta agenda una cita en el chat de la web; a ti te llega la cita por correo y su duda con la factura por WhatsApp.',
+      ejemplo: 'Ejemplo',
+      enLinea: 'en línea',
+      escribe: 'Escribe un mensaje',
+      chat: [
+        { t: '¿Me pueden ver el sábado? Tengo una fuga en el baño.', h: '9:58 p. m.' },
+        { m: true, o: 'a', t: 'Sí. Te aparté el sábado a las 10:00 a. m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
+        { t: 'Y tengo una duda con la factura pasada.', h: '9:59 p. m.' },
+        { m: true, o: 'b', t: 'Se la paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
+      ] as { m?: boolean; o?: 'a' | 'b'; t: string; h: string }[],
+      mail: { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva cita: sábado, 10:00 a. m.', body: 'Ana · fuga en el baño · ' + zone, time: '9:58 p. m.' },
+      wa: { channel: 'WhatsApp', body: 'Ana tiene una duda con su factura pasada. Te dejé el resumen.', time: '9:59 p. m.' },
       destA: { title: 'Por correo', text: 'Las citas y los contactos nuevos, con todos sus datos.' },
       destB: { title: 'Por WhatsApp', text: 'Lo urgente y lo que necesita que contestes tú.' },
     },
@@ -197,6 +182,18 @@ const base = (city: IaCity) => {
       masked: ['[nombre]', '[teléfono]'],
       stays: 'El nombre y el teléfono se quedan en tu negocio',
       sr: 'Ejemplo: el cliente escribe su nombre y su teléfono, y a la IA le llega el mensaje con esos datos ocultos.',
+    },
+
+    // Así empiezas con Marcy (AltaMarcy, P09 · W2N-05), antes del precio
+    alta: {
+      label: 'Así empiezas con Marcy',
+      title: '<span class="w-tone">Así empiezas con Marcy.</span> Corto y contigo.',
+      text: 'No tienes que configurarla tú. Lo hacemos contigo y Marcy queda contestando con los datos de tu negocio.',
+      steps: [
+        ['Nos cuentas tu negocio', 'Horario, servicios, zona y cómo quieres que conteste.'],
+        ['Conectamos tus canales', 'Tu web, tu WhatsApp y tu calendario, y a dónde te avisa.'],
+        ['Marcy empieza a contestar', 'Tú revisas lo que te pasa y ajustamos lo que haga falta.'],
+      ] as [string, string][],
     },
 
     precio: {

@@ -4,7 +4,7 @@
 // el tercio inferior (.w-dawn: el único capítulo de contraste de la página; nunca oro en
 // una página teal, E-14). Rejilla de 2 columnas en el contenedor: a la izquierda el texto
 // (HeroTexto noche, alineado a la izquierda, coreografía §2.9); a la derecha la esclusa de
-// Marcy, la firma de la página (2 ciclos y se detiene; vuelve a correr al volver a verla).
+// Marcy, la firma de la página (v2: en bucle mientras está a la vista; fondo F05 detrás).
 // Entra como objeto (data-w-in="obj" en un envoltorio: la esclusa no se coloca con transform).
 // Móvil: una columna, esclusa debajo (335 px).
 import HeroTexto from '../HeroTexto.astro';
@@ -48,6 +48,9 @@ const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = As
 </section>
 
 <style>
+  /* v2 (§3 G06, crítica B3): el H1 verbatim se ve al 100 % desde el primer pintado; la
+     coreografía de entrada (§2.9) sigue en eyebrow, bajada y botones, nunca en el H1. */
+  :global(:root[data-ds="v3"].w-anim) .hip :global(h1[data-w-in]) { opacity: 1; transform: none; transition: none; }
   .hip { overflow-x: clip; padding-bottom: clamp(72px, 3rem + 4vw, 128px); }
   .hip__grid { display: grid; gap: 48px; align-items: center; }
   .hip__obj { display: flex; justify-content: center; min-width: 0; }

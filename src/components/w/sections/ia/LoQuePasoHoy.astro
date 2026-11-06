@@ -1,6 +1,6 @@
 ---
-// IA conversacional · 04 "Lo que pasó hoy" (§4.12-5): RegistroVivo variant="static"
-// (5 filas al 100 %, la central realzada; la firma de la página es el hero) + chips de
+// IA conversacional · "Lo que pasó hoy" (v2 §3 G06): RegistroVivo variant="loop" VIVO (E-56 regla 7)
+// (sube una fila cada 1,5 s mientras está a la vista, pausa global y botón 44×44) + chips de
 // memoria W-ADV-23 estáticos: lo que Marcy ya sabe del negocio, como franja de dos columnas
 // bajo el registro (texto a la izquierda en la línea del texto del registro, pila de chips a
 // la derecha, como la lista que sube bajo el robot de W-ADV-23). EJEMPLO.
@@ -14,7 +14,7 @@ const { copy, n, lang = 'es' } = Astro.props;
 ---
 <CabeceraNumerada n={n} label={copy.label} />
 <div class="ws-gap">
-  <RegistroVivo variant="static" tone="teal" titleHtml={copy.title} text={copy.text} rows={copy.rows} lang={lang} />
+  <RegistroVivo variant="loop" tone="teal" titleHtml={copy.title} text={copy.text} rows={copy.rows} lang={lang} />
 </div>
 <div class="ws-mem">
   <div class="ws-mem__t">

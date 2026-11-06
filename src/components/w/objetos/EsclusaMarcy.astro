@@ -4,11 +4,18 @@
 // a 40 px, SVG) con trazo 2 px crema al 30 % que pasa a teal al resolver; "MARCY" en mono
 // vertical a los lados; dos puertas (barras 130×3) que se separan → píldora mono 13 con la
 // intención entendida → veredicto ("Respondido" en teal, el acento de la página / "Te lo
-// pasa" en crema al 70 %) + explicación → abanico de 4 curvas → 4 canales en texto.
-// Caso de ~4,5 s; 2 ciclos completos (8 casos) y se detiene en "Respondido". Vuelve a
-// correr al salir y volver a entrar en vista (E-42). Quieto: veredicto "Respondido".
+// pasa" en crema al 70 %) + explicación → abanico de 4 curvas → 4 canales.
+// v2 (rediseno-workos-v2.md §3 G06): canales = los que Marcy contesta de verdad (§5-14: web,
+// WhatsApp, Instagram, Messenger; fuera "Google"), con su logo a color (P06) y nombre a 13 px
+// (FI §4.7: eran diminutos); amanecer teal bajo la esclusa, como el horizonte azul de W-ADV-02.
+// Contrato de vida (§1.5, E-56 regla 7): ya no se detiene tras 2 ciclos; caso de ~4,5 s en
+// bucle MIENTRAS está a la vista (pausa fuera de vista, con la pestaña oculta y con el botón de
+// pausa 44×44 de loop.ts). El bucle se registra en la capa de ilustración, que no recibe
+// puntero: pasar el ratón por encima NO lo congela. Quieto (reducir movimiento): "Respondido".
 // Ilustración: aria-hidden + resumen sr-only. Firma de IA para pymes.
 import Ejemplo from '../Ejemplo.astro';
+import LogoMarca from '../marcas/LogoMarca.astro';
+import type { MarcaId } from '../marcas/datos';
 
 type Case = { ask: string; pill: string; ok: boolean; verdict: string; why: string; ch: number };
 interface Props {
@@ -20,7 +27,8 @@ interface Props {
 }
 const { lang = 'es', size = 'hero', class: cls } = Astro.props;
 const en = lang === 'en';
-const channels = Astro.props.channels ?? ['WhatsApp', 'Web', 'Instagram', 'Google'];
+const channels = Astro.props.channels ?? (en ? ['WhatsApp', 'Website', 'Instagram', 'Messenger'] : ['WhatsApp', 'Web', 'Instagram', 'Messenger']);
+const LOGO: Record<string, MarcaId> = { WhatsApp: 'whatsapp', Instagram: 'instagram', Messenger: 'messenger' };
 const cases: Case[] = Astro.props.cases ?? (en
   ? [
       { ask: 'Do you have an opening this Saturday?', pill: 'book · sat 10:00', ok: true, verdict: 'Answered', why: 'Booked it and confirmed it', ch: 0 },
@@ -36,8 +44,8 @@ const cases: Case[] = Astro.props.cases ?? (en
     ]);
 const c0 = cases[0];
 const sr = en
-  ? 'Example: each message goes through Marcy. She answers what she can (bookings, prices, hours) on WhatsApp, the web, Instagram or Google, and hands you what needs a person.'
-  : 'Ejemplo: cada mensaje pasa por Marcy. Contesta lo que puede (citas, precios, horario) en WhatsApp, la web, Instagram o Google, y te pasa lo que necesita una persona.';
+  ? 'Example: each message goes through Marcy. She answers what she can (bookings, prices, hours) on WhatsApp, your website, Instagram or Messenger, and hands you what needs a person.'
+  : 'Ejemplo: cada mensaje pasa por Marcy. Contesta lo que puede (citas, precios, horario) en WhatsApp, tu web, Instagram o Messenger, y te pasa lo que necesita una persona.';
 const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
 ---
 <div
@@ -48,7 +56,8 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
 >
   <p class="sr-only">{sr}</p>
   <Ejemplo lang={lang} on="dark" />
-  <div class="wo-lock__in" aria-hidden="true">
+  <span class="wo-lock__alba" aria-hidden="true"></span>
+  <div class="wo-lock__in" aria-hidden="true" data-wo-capa>
     <p class="wo-lock__ask" data-ask>“{c0.ask}”</p>
     <span class="wo-lock__line"></span>
     <div class="wo-lock__oct">
@@ -66,7 +75,14 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
       {fan.map((d, i) => <path d={d} data-i={i} />)}
     </svg>
     <ul class="wo-lock__chs">
-      {channels.map((c, i) => <li data-i={i}>{c}</li>)}
+      {channels.map((c, i) => (
+        <li data-i={i}>
+          {LOGO[c]
+            ? <LogoMarca id={LOGO[c]} size={15} tono="color" titulo="" />
+            : <svg class="wo-lock__web" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" /></svg>}
+          <span>{c}</span>
+        </li>
+      ))}
     </ul>
   </div>
 </div>
@@ -91,10 +107,8 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
     };
     const showFinal = (c: Case) => { el.classList.remove(...STATES); fill(c); set('is-pill', 'is-verdict', 'is-ch'); if (c.ok) set('is-ok'); else set('is-hand'); };
 
-    const TOTAL = cases.length * 2;
     const run = (n: number) => {
       const c = cases[n % cases.length];
-      const last = n === TOTAL - 1;
       el.classList.remove(...STATES);
       fill(c);
       set('is-asking');
@@ -102,21 +116,23 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
       later(() => set('is-pill'), 900);
       later(() => { unset('is-doors-t'); set(c.ok ? 'is-ok' : 'is-hand'); }, 1500);
       later(() => set('is-verdict'), 1800);
-      if (last) { later(() => set('is-ch'), 2100); return; }
       later(() => set('is-doors-b', 'is-exit', 'is-ch'), 2900);
       later(() => unset('is-doors-b'), 3500);
       // El veredicto se apaga ANTES de cambiar de caso: si se quitaba en run() a la vez que se
       // cambiaba el texto, durante su fundido de 320 ms se leía el veredicto del caso siguiente.
       later(() => unset('is-verdict'), 4100);
-      later(() => run(n + 1), 4500);
+      later(() => { n0 = (n + 1) % cases.length; run(n0); }, 4500);
     };
-    // Al terminar los 8 casos se queda en el veredicto; al volver a entrar en vista corre otra vez.
-    const finalCase = cases[(TOTAL - 1) % cases.length];
-    registerLoop(el, {
-      start: () => { clear(); el.classList.remove('is-still'); run(0); },
-      stop: () => { clear(); showFinal(finalCase); },
-      still: () => { clear(); showFinal(cases.find((c) => c.ok) || cases[0]); el.classList.add('is-still'); },
-    });
+    // Bucle mientras está a la vista. Se registra en la capa de ilustración (sin puntero ni
+    // foco): pasar el ratón por encima no lo para; el botón de pausa cuelga de la raíz.
+    const capa = el.querySelector<HTMLElement>('[data-wo-capa]') || el;
+    let n0 = 0;
+    const okCase = cases.find((c) => c.ok) || cases[0];
+    registerLoop(capa, {
+      start: () => { clear(); el.classList.remove('is-still'); run(n0); },
+      stop: () => { clear(); n0 = 0; showFinal(okCase); },
+      still: () => { clear(); showFinal(okCase); el.classList.add('is-still'); },
+    }, { buttonHost: el, lang: el.closest('[lang]')?.getAttribute('lang') === 'en' ? 'en' : 'es' });
   });
 </script>
 
@@ -125,7 +141,15 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
     position: relative; width: min(100%, 420px); margin-inline: auto;
     padding: 40px 10px 68px; font-family: var(--font-body);
   }
-  .wo-lock__in { display: flex; flex-direction: column; align-items: center; }
+  .wo-lock__in { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+  /* Amanecer teal bajo la esclusa (W-ADV-02 lleva un horizonte azul al pie del panel): luz baja,
+     sin halo sobre el texto; solo trazo de color en el objeto (E-03). */
+  .wo-lock__alba {
+    position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 60%; pointer-events: none;
+    background:
+      radial-gradient(50% 85% at 50% 100%, rgba(79,195,161,.24) 0%, rgba(79,195,161,.09) 45%, transparent 72%),
+      radial-gradient(40% 30% at 50% 100%, rgba(240,237,232,.06), transparent 70%);
+  }
   .wo-lock__ask {
     margin: 0; width: min(100%, 288px); min-height: 61px; display: grid; place-items: center;
     padding: 10px 16px; border-radius: var(--w-r-obj, 12px); text-align: center;
@@ -193,9 +217,10 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
     display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center;
   }
   .wo-lock__chs li {
-    padding: 5px 8px; border-radius: 6px; border: 1px solid var(--w-line-strong);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 9px; border-radius: 8px; border: 1px solid var(--w-line-strong);
     background: var(--w-s2, #181817);
-    font: 500 12px/1.2 var(--font-mono); color: var(--w-ink-70);
+    font: 500 13px/1.2 var(--font-body); color: var(--w-ink-80, rgba(240,237,232,.8));
     transition: color 200ms var(--w-ease-ui), border-color 200ms var(--w-ease-ui);
   }
   .wo-lock.is-ch[data-ch='0'] .wo-lock__fan path[data-i='0'],
@@ -209,7 +234,14 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
   @media (--lt-md) {
     .wo-lock { width: min(100%, 335px); padding-inline: 0; }
     .wo-lock__line { height: 56px; }
-    .wo-lock__chs li { padding: 5px 5px; }
+    /* Móvil: los cuatro nombres a 13 px caben en su columna sin el logo (en escritorio sí va). */
+    .wo-lock__chs li { padding: 6px 7px; font-size: 13px; }
+    .wo-lock__chs li :global(svg) { display: none; }
+  }
+  .wo-lock__chs li :global(svg) { flex: none; }
+  /* 320-359: 2 × 2 (cuatro columnas de 72 px no caben a 13 px). */
+  @media (max-width: 359px) {
+    .wo-lock__chs { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   }
   @media (--motion-reduce) {
     .wo-lock.wo-lock * { transition: none; }

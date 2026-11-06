@@ -1,0 +1,51 @@
+---
+// IA conversacional · "Contesta en cada canal" (design/rediseno-workos-v2.md §3 G06).
+// Sustituye a las pestañas automáticas del hero de la v1 (MarcoPestanas + ChatMarcy) por el
+// mazo de hilos de P05 (W-ADV-22, "A coworker for the whole team"): composición del original,
+// el mazo a la izquierda y el texto a la derecha, centrado en altura con él. Canales: SOLO los
+// que Marcy contesta de verdad y que esta página nombra (§5-14: web, WhatsApp, Instagram;
+// Messenger no está en el mazo compartido, apuntado como [SISTEMA]). Móvil: texto arriba,
+// mazo debajo a ancho completo.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import MazoHilos from '../../agente/MazoHilos.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['canales']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="cn">
+  <div class="cn__mazo">
+    <MazoHilos lang={lang} canales={['whatsapp', 'instagram', 'web']} />
+  </div>
+  <div class="cn__text">
+    <h2 class="w-h2 cn__h" set:html={copy.title} />
+    <p class="cn__p">{copy.text}</p>
+    <ul class="cn__list" role="list">
+      {copy.points.map((p) => <li><b>{p[0]}</b><span>{p[1]}</span></li>)}
+    </ul>
+  </div>
+</div>
+<style>
+  .cn { content-visibility: auto; contain-intrinsic-size: auto 620px; margin-top: 24px; display: grid; gap: 40px; align-items: center; }
+  @media (--lg) {
+    .cn { grid-template-columns: minmax(0, 440px) minmax(0, 460px); justify-content: center; gap: 112px; margin-top: 40px; }
+    /* Escala del original (tarjeta ≈ 406 px en W-ADV-22): el mazo compartido expone su ancho
+       por variable; aquí sube a 400 y la pila gana alto para las 4 líneas de WhatsApp. */
+    .cn__mazo :global(.mz) { --mz-w: min(400px, 100%); max-width: 440px; }
+    .cn__mazo :global(.mz__pila) { height: 330px; }
+  }
+  .cn__mazo { min-width: 0; display: flex; justify-content: center; }
+  @media (--lt-lg) { .cn__text { order: -1; } }
+  .cn__h { margin: 0; max-width: 470px; }
+  .cn__p { margin: 20px 0 0; max-width: 440px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-70); }
+  .cn__list { list-style: none; margin: 28px 0 0; padding: 0; max-width: 440px; }
+  .cn__list li {
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px;
+    padding: 14px 0; border-top: 1px solid var(--w-line-strong);
+    font: 400 15px/1.45 var(--font-body); color: var(--w-ink-70);
+  }
+  .cn__list li:last-child { border-bottom: 1px solid var(--w-line-strong); }
+  .cn__list b { font-weight: 500; color: var(--w-ink); }
+  @media (--lt-md) { .cn__p { font-size: 1rem; } .cn__list li { grid-template-columns: 96px minmax(0, 1fr); } }
+</style>

@@ -107,7 +107,10 @@ const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.ac
   }
   .opd__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px; border-bottom: 1px solid rgba(42,33,27,.12); color: var(--t-ink); }
   .opd__title { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--t-ink2); }
-  .opd__win { flex: 1 1 auto; height: 208px; min-height: 208px; overflow: hidden; }
+  .opd__win { position: relative; flex: 1 1 auto; height: 208px; min-height: 208px; overflow: hidden; }
+  /* Corte de la lista (rev2, menor): la última fila asoma y se funde con el fondo en vez de
+     quedar partida contra el pie. */
+  .opd__win::after { content: ''; position: absolute; inset: auto 0 0 0; height: 64px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--t-bg)); }
   .opd__list { list-style: none; margin: 0; padding: 0; will-change: transform; }
   .opd__row {
     display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;

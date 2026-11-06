@@ -48,6 +48,9 @@ const {
 } = Astro.props;
 const compacta = variante === 'compacta';
 const headingId = id ? `${id}-t` : undefined;
+// rev2 de G09 (menor): compacta con UN solo nivel (Mantenimiento) → lo incluido va abierto bajo
+// ese nivel, en el hueco que dejaba al igualar alto con su vecina, y sin desplegable.
+const solo = compacta && tiers.length === 1 && !!includes?.length;
 ---
 {compacta ? (
 <article class:list={['tp', 'tp--c', destacada && 'tp--dest', cls]} id={id} data-w-tone={tone} aria-labelledby={headingId}>
@@ -59,7 +62,7 @@ const headingId = id ? `${id}-t` : undefined;
   {desde && (
     <p class="tpc__from"><span class="tpc__k">{desde.k}</span><span class="tpc__v">{desde.v}</span></p>
   )}
-  <div class="tpc__panel">
+  <div class:list={['tpc__panel', solo && 'tpc__panel--solo']}>
     <p class="tp__k tp__k--panel">{tiersLabel}</p>
     <dl class="tp__tiers">
       {tiers.map((t) => (
@@ -69,8 +72,15 @@ const headingId = id ? `${id}-t` : undefined;
         </div>
       ))}
     </dl>
+    {solo && (
+      <ul class="tp__list tpc__solo">
+        {includes!.map((it) => (
+          <li><Icon name="lucide:check" class="tp__check" />{it}</li>
+        ))}
+      </ul>
+    )}
   </div>
-  {includes && includes.length > 0 && (
+  {!solo && includes && includes.length > 0 && (
     <details class="tpc__inc">
       <summary class="tpc__sum">{includesLabel}<span class="tpc__plus" aria-hidden="true"></span></summary>
       <ul class="tp__list">
@@ -249,6 +259,9 @@ const headingId = id ? `${id}-t` : undefined;
   .tpc__panel { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--w-line); }
   .tpc__panel .tp__k--panel { margin-bottom: 4px; font-size: 13px; font-family: var(--font-mono); font-weight: 500; letter-spacing: var(--w-tr-micro, .08em); text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); }
   .tpc__inc { margin-top: 8px; border-top: 1px solid var(--w-line); }
+  .tpc__panel--solo { grid-row: span 2; }
+  .tpc__solo { padding: 14px 0 8px; gap: 10px; border-top: 1px solid var(--w-line); }
+  .tpc__solo li { font-size: 14px; }
   .tpc__sum {
     list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
     min-height: 48px; font: 500 15px/1.3 var(--font-body); color: var(--w-ink-80);

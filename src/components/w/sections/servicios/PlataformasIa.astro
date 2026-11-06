@@ -1,37 +1,86 @@
 ---
-// Servicios · fila "Donde la IA te puede recomendar" bajo la respuesta de ChatGPT de la celda
-// "SEO para IA" (rev1 de G09: la celda iba sin bandeja y quieta). Logos de las plataformas que
-// dominamos (P06: logos reconocibles como señal de confianza, nunca alianza; ChatGPT como palabra,
-// §1.4). Vida lenta: cada 2,6 s se ilumina la siguiente plataforma (solo a la vista, sin pausa
-// global, quieta con reducir movimiento). Decorativa: aria-hidden + data-nosnippet; el sentido lo
-// da el texto de la celda.
+// Servicios · "Donde la IA te puede recomendar": selector REAL de plataforma bajo la respuesta de
+// la celda "SEO para IA" (rev2 de G09, importante 1 / E-56). En la rev1 las cuatro piezas tenían
+// aspecto de pestaña, se iluminaban solas y no hacían nada: el chat seguía diciendo ChatGPT.
+// Ahora son botones: elegir una (clic, toque o teclado) pone su cabecera en la ventana y repite
+// la pregunta y la respuesta. Vida propia: mientras se ve y nadie ha tocado, pasa a la siguiente
+// cada 7,5 s (la demo dura ~2,6 s y luego se lee). Se para con la pausa global (html[data-w-pausa]
+// / `w:pausa`), con la pestaña oculta y fuera de vista; en cuanto el visitante elige, deja de
+// rotar. Con reducir movimiento o en pausa: no rota y elegir cambia la cabecera sin animar.
+// Logos (P06) a 22 px y opacidad plena: señal de confianza, nunca alianza; ChatGPT como palabra.
+// La respuesta es genérica ("Buscando en la web…") y vale para las cuatro.
 import LogoMarca from '../../marcas/LogoMarca.astro';
 
 interface Props { lang?: 'es' | 'en' }
 const { lang = 'es' } = Astro.props;
-const k = lang === 'en' ? 'Where AI can recommend you' : 'Donde la IA te puede recomendar';
-const ids = ['chatgpt-texto', 'claude', 'googlegemini', 'perplexity'] as const;
+const en = lang === 'en';
+const k = en ? 'Where AI can recommend you' : 'Donde la IA te puede recomendar';
+const ver = en ? 'See the example in' : 'Ver el ejemplo en';
+const P = [
+  { id: 'chatgpt-texto', nombre: 'ChatGPT', palabra: true },
+  { id: 'claude', nombre: 'Claude', palabra: false },
+  { id: 'googlegemini', nombre: 'Gemini', palabra: false },
+  { id: 'perplexity', nombre: 'Perplexity', palabra: false },
+] as const;
+const uid = `wsai-${lang}`;
 ---
-<div class="wsai" aria-hidden="true" data-nosnippet data-w2-plataformas>
-  <span class="wsai__k">{k}</span>
-  <span class="wsai__row">
-    {ids.map((id, i) => (
-      <span class:list={['wsai__l', i === 0 && 'is-on']}><LogoMarca id={id} size={18} tono="color" titulo="" /></span>
+<div class="wsai" data-nosnippet data-w2-plataformas>
+  <span class="wsai__k" id={`${uid}-k`}>{k}</span>
+  <div class="wsai__row" role="group" aria-labelledby={`${uid}-k`}>
+    {P.map((p, i) => (
+      <button type="button" class:list={['wsai__l', i === 0 && 'is-on']} aria-pressed={i === 0 ? 'true' : 'false'}
+        aria-label={`${ver} ${p.nombre}`} data-nombre={p.nombre} data-palabra={p.palabra ? '1' : ''}>
+        <LogoMarca id={p.id} size={22} tono="color" titulo="" />
+      </button>
+    ))}
+  </div>
+  {/* Cabeceras listas para la ventana (16 px como la cabecera original de RespuestaAsistente). */}
+  <span class="wsai__cabs" hidden>
+    {P.map((p) => (
+      <span data-cab={p.nombre}><LogoMarca id={p.id} size={16} tono="color" titulo="" />{p.palabra ? null : <b class="wsai-nom" translate="no">{p.nombre}</b>}</span>
     ))}
   </span>
 </div>
 
 <script>
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const PASO = 7500;
   document.querySelectorAll<HTMLElement>('[data-w2-plataformas]').forEach((el) => {
-    if (mq.matches) return;
-    const ls = Array.from(el.querySelectorAll<HTMLElement>('.wsai__l'));
-    let visible = false, i = 0;
-    new IntersectionObserver((ents) => { for (const e of ents) visible = e.isIntersecting; }, { rootMargin: '100px' }).observe(el);
-    window.setInterval(() => {
-      if (!visible || document.hidden || document.documentElement.hasAttribute('data-w-pausa')) return;
-      ls[i % ls.length].classList.remove('is-on'); i++; ls[i % ls.length].classList.add('is-on');
-    }, 2600);
+    const ia = el.closest('.ws-ia')?.querySelector<HTMLElement>('[data-wo-ans]');
+    const cab = ia?.querySelector<HTMLElement>('.wo-ans__who');
+    const bs = Array.from(el.querySelectorAll<HTMLButtonElement>('.wsai__l'));
+    if (!ia || !cab || !bs.length) return;
+    const pausa = () => document.documentElement.hasAttribute('data-w-pausa');
+    let i = 0, visible = false, tocado = false, tid = 0;
+
+    const elegir = (k: number, animar: boolean) => {
+      i = (k + bs.length) % bs.length;
+      bs.forEach((b, n) => { b.classList.toggle('is-on', n === i); b.setAttribute('aria-pressed', String(n === i)); });
+      const t = el.querySelector<HTMLElement>(`[data-cab="${bs[i].dataset.nombre}"]`);
+      if (t) cab.replaceChildren(...Array.from(t.childNodes, (n) => n.cloneNode(true)));
+      // Repetir la demo: solo si la ventana está armada para animar (no con reducir movimiento).
+      if (animar && !mq.matches && !pausa() && ia.classList.contains('is-armed')) {
+        ia.classList.remove('is-run'); void ia.offsetWidth;
+        requestAnimationFrame(() => ia.classList.add('is-run'));
+      }
+    };
+    const corre = () => visible && !tocado && !document.hidden && !pausa() && !mq.matches;
+    const sync = () => {
+      window.clearTimeout(tid);
+      if (corre()) tid = window.setTimeout(() => { elegir(i + 1, true); sync(); }, PASO);
+    };
+
+    bs.forEach((b, n) => b.addEventListener('click', () => { tocado = true; elegir(n, true); sync(); }));
+    el.addEventListener('keydown', (e) => {
+      const idx = bs.indexOf(document.activeElement as HTMLButtonElement);
+      if (idx < 0 || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+      e.preventDefault();
+      bs[(idx + (e.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length].focus();
+    });
+    new IntersectionObserver((ents) => { visible = ents[ents.length - 1].isIntersecting; sync(); }, { threshold: 0.35 }).observe(ia);
+    document.addEventListener('visibilitychange', sync);
+    document.addEventListener('w:pausa', sync);
+    mq.addEventListener?.('change', sync);
   });
 </script>
 
@@ -40,9 +89,18 @@ const ids = ['chatgpt-texto', 'claude', 'googlegemini', 'perplexity'] as const;
   .wsai__k { display: block; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #5E5A53; }
   .wsai__row { display: grid; grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; --marca-tinta: #1E1C19; }
   .wsai__l {
-    display: grid; place-items: center; height: 44px; border-radius: 10px; border: 1px solid #E2DED5; background: #FFFFFF;
-    opacity: .72; transition: opacity 500ms ease, transform 500ms ease, border-color 500ms ease, box-shadow 500ms ease;
+    display: grid; place-items: center; height: 48px; padding: 0; border-radius: 10px; cursor: pointer;
+    border: 1px solid #E2DED5; background: #FFFFFF; color: inherit; font: inherit;
+    transition: transform 400ms var(--w-ease-ui, ease), border-color 400ms ease, box-shadow 400ms ease, background-color 400ms ease;
   }
-  .wsai__l.is-on { opacity: 1; transform: translateY(-2px); border-color: #CFCAC0; box-shadow: 0 6px 14px -10px rgba(30,28,25,.5); }
-  @media (prefers-reduced-motion: reduce) { .wsai__l { transition: none; opacity: 1; } }
+  .wsai__l:hover { border-color: #CFCAC0; }
+  /* Estrecho (móvil): la palabra ChatGPT no toca los bordes de su pieza. */
+  .wsai__row { container-type: inline-size; }
+  @container (max-width: 400px) { .wsai__l :global(.lm--word) { font-size: 15px; } }
+  .wsai__l.is-on { transform: translateY(-2px); border-color: #B9B3A7; box-shadow: 0 6px 14px -10px rgba(30,28,25,.5); }
+  .wsai__l:not(.is-on) { background: #FBFAF7; }
+  .wsai__l:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+  /* Nombre de la plataforma en la cabecera de la ventana (mismo trazo que RespuestaAsistente). */
+  :global(.wo-ans__who b.wsai-nom) { font: 600 14px/1 var(--font-display); color: #1c1d21; letter-spacing: -0.01em; }
+  @media (prefers-reduced-motion: reduce) { .wsai__l { transition: none; } .wsai__l.is-on { transform: none; } }
 </style>

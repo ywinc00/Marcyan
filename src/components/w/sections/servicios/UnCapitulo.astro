@@ -140,13 +140,18 @@ const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id)
   @media (--lg) {
     .ws-gap :global(.wd-bento__cell--wide) {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 96px;
-      grid-template-rows: auto auto auto 1fr; align-items: start;
+      grid-template-rows: 1fr auto auto auto auto 1fr; align-items: start;
     }
     .ws-gap :global(.wd-bento__cell--wide > :not(.wd-bento__ui)) { grid-column: 1; }
     .ws-gap :global(.wd-bento__cell--wide > .wd-bento__ui),
     .ws-gap :global(.wd-bento__cell--wide .wd-bento__tray),
     .ws-gap :global(.wd-bento__cell--wide .ws-ui) { display: contents; }
-    .ws-gap :global(.wd-bento__cell--wide .ws-niv) { grid-column: 1; grid-row: 4; margin-top: 40px; align-self: start; }
-    .ws-gap :global(.wd-bento__cell--wide .ws-tray) { grid-column: 2; grid-row: 1 / span 4; margin-top: 0; align-self: center; }
+    /* rev2 (menor): la columna izquierda (etiqueta, título, texto, niveles) va centrada en alto
+       frente al panel, entre dos franjas flexibles, en vez de dejar el vacío debajo. */
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__lab) { grid-row: 2; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__t) { grid-row: 3; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__x) { grid-row: 4; }
+    .ws-gap :global(.wd-bento__cell--wide .ws-niv) { grid-column: 1; grid-row: 5; margin-top: 40px; align-self: start; }
+    .ws-gap :global(.wd-bento__cell--wide .ws-tray) { grid-column: 2; grid-row: 1 / -1; margin-top: 0; align-self: center; }
   }
 </style>

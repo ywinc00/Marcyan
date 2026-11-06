@@ -310,4 +310,10 @@ const despuesCols = t.despues.cols.map((col) => ({
      tarjeta como el panel gris de WorkOS, con divisoria de 1 px. Sin brillos ni degradados. */
   .pv-card :global(.tp__panel) { background: var(--w-s3); }
   @media (--lg) { .pv-card :global(.tp__panel) { border-left-color: var(--w-line-strong); } }
+  /* rev2 de G09 (menor): a 1440×900 la pausa del fondo (abajo a la derecha de la zona) quedaba
+     pegada al bocadillo del botón de Marcy y medio bajo el borde. En escritorio sube a la línea
+     de las migas, en el borde derecho del contenedor (centrada con ellas). */
+  @media (--lg) {
+    .wf-zona > :global(.wf-pausa) { top: calc(var(--w-hero-top) - 9px); bottom: auto; }
+  }
 </style>

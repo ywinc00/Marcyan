@@ -13,9 +13,11 @@
 // BreadcrumbList, contrato SEO). Las secciones se envuelven en `.w-cell` según
 // su `wrap` (types.ts). El formulario nunca lleva data-w-in ni data-w-reveal (§2.9).
 //
-// Fondo temático (v2 §1.3 / P12): si el tipo trae `fondo`, se monta <Fondo> dentro
-// del <main> (bajo el hero, z-index 0) y NO SpaceBackdrop; con `eco`, vuelve quieto
-// en la sección de contraste. Sin `fondo`, el HTML sale igual que antes.
+// Fondo temático (v2 §1.3 / P12): si el tipo trae `fondo`, el hero va dentro de una
+// zona (div.wf-zona) que también contiene <Fondo> (absolute, z-index 0, mide lo que el
+// hero) y NO se monta SpaceBackdrop; con `eco`, vuelve quieto en la sección de
+// contraste. `fondoOpciones(ctx).vars` llega al fondo como `style` (ajustes --wf-*).
+// Sin `fondo`, el HTML sale igual que antes.
 // ─────────────────────────────────────────────────────────────
 import Layout from '../../../layouts/Layout.astro';
 import SiteNav from '../../layout/SiteNav.astro';
@@ -29,7 +31,7 @@ import { content } from '../../../i18n/content';
 import { clusterNav, clusterNavEn, type ClusterPage } from '../../../i18n/clusters';
 import { KIND_BY_PATH } from './registry';
 import { deriveDefaultCity, deriveDefaultService } from './defaults';
-import type { KindSpec, LandingCtx, LandingLang, LandingTone } from './types';
+import { temaDeFondo, type KindSpec, type LandingCtx, type LandingLang, type LandingTone } from './types';
 // Al final a propósito: importarlo antes movía el orden del CSS en línea de las landings.
 import Fondo from '../fondos/Fondo.astro';
 
@@ -61,7 +63,7 @@ const tone: LandingTone =
     : spec.tone ?? (cluster.hero.tone === 'teal' ? 'teal' : 'gold');
 const ctx: LandingCtx = { ...base, tone };
 
-const fondo = spec.fondo;
+const fondo = spec.fondo ? temaDeFondo(spec.fondo) : undefined;
 const fondoOp: ReturnType<NonNullable<KindSpec['fondoOpciones']>> =
   fondo && spec.fondoOpciones ? spec.fondoOpciones(ctx) : {};
 const conEco = !!(fondo && fondoOp.eco);
@@ -92,16 +94,25 @@ const sections = spec.sections
 
   <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en' : '/es'} currentPath={Astro.url.pathname} />
 
-  <main id="main" class="w-rails" data-w data-w-tone={tone} data-w-kind={kind} data-w-fondo={fondo}>{fondo && <Fondo tema={fondo} lang={lang} texto={fondoOp.texto} barrio={fondoOp.barrio} />}
-    <Hero {...heroProps}>
-      <Breadcrumb slot="crumbs" items={cluster.breadcrumb} lang={lang} />
-    </Hero>
+  <main id="main" class="w-rails" data-w data-w-tone={tone} data-w-kind={kind} data-w-fondo={fondo}>
+    {fondo ? (
+      <div class="wf-zona">
+        <Fondo tema={fondo} lang={lang} texto={fondoOp.texto} barrio={fondoOp.barrio} style={fondoOp.vars} />
+        <Hero {...heroProps}>
+          <Breadcrumb slot="crumbs" items={cluster.breadcrumb} lang={lang} />
+        </Hero>
+      </div>
+    ) : (
+      <Hero {...heroProps}>
+        <Breadcrumb slot="crumbs" items={cluster.breadcrumb} lang={lang} />
+      </Hero>
+    )}
 
     {sections.map(({ C, props, id, wrap, Tag, contrast, reveal }) =>
       wrap === 'none' ? (
         <C {...props} />
       ) : (
-        <Tag class:list={['w-cell', contrast && `w-${contrast}`]} id={id} data-w-eco={(conEco && contrast) ? '' : undefined}>{conEco && contrast && fondo && <Fondo tema={fondo} lang={lang} eco texto={fondoOp.texto} barrio={fondoOp.barrio} />}
+        <Tag class:list={['w-cell', contrast && `w-${contrast}`]} id={id} data-w-eco={(conEco && contrast) ? '' : undefined}>{conEco && contrast && fondo && <Fondo tema={fondo} lang={lang} eco texto={fondoOp.texto} barrio={fondoOp.barrio} style={fondoOp.vars} />}
           {wrap === 'cell' ? (
             <div class="w-container" data-w-reveal={reveal || undefined}>
               <C {...props} />

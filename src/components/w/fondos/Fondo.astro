@@ -2,33 +2,41 @@
 // ─────────────────────────────────────────────────────────────
 // Fondo temático de landing (design/rediseno-workos-v2.md §1.3 y P12; FO/informe.md).
 // Despachador: monta UN motivo por página que cuenta su tema, vive en el hero
-// (alto max(100svh, 860px), fundido a la noche en el 30 % inferior) y puede volver
+// (mide LO MISMO que el hero, fundido a la noche en su tramo inferior) y puede volver
 // como eco quieto al 40 % en el capítulo de contraste (prop `eco`).
 //
-// Montaje (corrección del plan): el <main> de la página es position:relative +
-// isolation:isolate; este fondo va dentro, absolute, z-index 0, y los hijos del
-// main suben a z-index 1. Nunca z-index:-1 sin contexto (quedaría tapado por
-// cualquier sección opaca). Todos los estilos van EN LÍNEA (una vez por página) y
-// SOLO viajan a las páginas que montan un fondo: una landing sin fondo queda igual.
+// Montaje: WLanding envuelve el hero en <div class="wf-zona"> (relative + isolation)
+// y monta este fondo dentro, absolute, inset 0, z-index 0; los demás hijos de la
+// zona suben a z-index 1. Así el fondo acaba donde acaba el hero, sea cual sea su
+// alto real, y el fundido termina antes de la sección siguiente (que es opaca): nunca
+// un corte recto. Nunca z-index:-1 sin contexto (quedaría tapado por cualquier sección
+// opaca). Todos los estilos van EN LÍNEA (una vez por página) y SOLO viajan a las
+// páginas que montan un fondo: una landing sin fondo queda igual. Dentro de la zona se
+// apagan las luces de suelo propias de los heroes de la v1 (franjas de horizonte), para
+// que cada página tenga UN solo motivo de fondo.
 //
 // Vida (§1.5): bucle mientras está a la vista; pausa fuera de vista
-// (IntersectionObserver, rootMargin 100px), con la pestaña oculta y con el estado
-// global de pausa de loop.ts (sin botón propio). Contrato que lee este guion:
-//   · <html data-w-pausa> presente  → todo en pausa
-//   · sessionStorage['w-pausa'] === '1' al cargar (try/catch)
-//   · evento `w:pausa` en document (detail: { paused: boolean })
+// (IntersectionObserver, rootMargin 100px), con la pestaña oculta y cuando el visitante
+// pulsa el botón "Pausar animación" del objeto del hero (loop.ts, .w-loop-pause dentro
+// de la misma zona): un solo botón para todo el hero. Contrato de pausa GLOBAL
+// reservado (hoy sin productor; quien lo implemente en loop.ts debe usar EXACTAMENTE
+// este): <html data-w-pausa> · sessionStorage['w-pausa'] === '1' · evento `w:pausa`
+// en document con detail { paused: boolean }.
 // Con reducir movimiento: sin animación y en su fotograma quieto con sentido.
 // Animación solo transform / opacity / stroke-dashoffset. SVG en línea, sin
 // imágenes ni lienzos. aria-hidden y pointer-events:none.
 //
-// Ajuste por página (prop `style` o en el <main>), todos opcionales; los valores por
-// defecto salen de medir los heroes compilados de cada tipo (1440 y 390):
+// Ajuste por página: `fondoOpciones(ctx).vars` en el KindSpec (WLanding lo pasa como
+// `style` a este fondo) o la prop `style`. Todos opcionales; los valores por defecto
+// salen de medir los heroes REALES compilados de cada tipo (1440 y 390):
+//   --wf-alto                            alto fijo (por defecto, el del hero)
 //   --wf-obj / --wf-obj-movil            parte de arriba del objeto del hero (F01, F04, F12)
+//   --wf-sel-1/2/3 (+ -movil), --wf-sel-dy  columnas del marco de F01 y desnivel de las laterales
 //   --wf-foco-x / --wf-foco-y (+ -movil)  centro del objeto (F03 radar, F05 placa, F06 construcción)
-//   --wf-marca-x / --wf-marca-y (+ -movil) hueco libre para la marca con sentido (F03 negocio encendido, F08 alfiler)
+//   --wf-marca-x / --wf-marca-y (+ -movil) hueco libre para la marca con sentido (F03 negocio encendido)
 //   --wf-cota1 / --wf-cota2              alto de las cotas de F07 · --wf-nucleo-top / --wf-nucleo-h  núcleo de noche
 // ─────────────────────────────────────────────────────────────
-import type { TemaFondo, BarrioFondo } from '../landing/types';
+import { temaDeFondo, type TemaFondo, type CodigoFondo, type BarrioFondo } from '../landing/types';
 import F01Reticula from './F01Reticula.astro';
 import F02Escaparate from './F02Escaparate.astro';
 import F03Radar from './F03Radar.astro';
@@ -43,7 +51,8 @@ import F12Escaneo from './F12Escaneo.astro';
 import F13Hoja from './F13Hoja.astro';
 
 interface Props {
-  tema: TemaFondo;
+  /** Tema por nombre ('radar') o por código del plan ('F03'). */
+  tema: TemaFondo | CodigoFondo;
   /** Versión quieta al 40 % para el capítulo de contraste (llena su sección). */
   eco?: boolean;
   /** Lado del bloque de texto del hero: decide dónde va el núcleo de noche y el foco del motivo. */
@@ -63,7 +72,8 @@ const TEXTO_POR_TEMA: Record<TemaFondo, 'centro' | 'izquierda'> = {
 const TEAL: TemaFondo[] = ['hilos', 'placa', 'tunel'];
 const NUCLEO: TemaFondo[] = ['reticula', 'radar', 'placa', 'calles'];
 
-const { tema, eco = false, barrio, lang = 'es', style } = Astro.props;
+const { eco = false, barrio, lang = 'es', style } = Astro.props;
+const tema = temaDeFondo(Astro.props.tema);
 const texto = Astro.props.texto ?? TEXTO_POR_TEMA[tema];
 const tono = TEAL.includes(tema) ? 'teal' : 'gold';
 const conNucleo = !eco && NUCLEO.includes(tema);
@@ -97,9 +107,15 @@ const JS = `
   if (!fondos.length) return;
   const vista = new WeakMap();
   let pausa = pausaGlobal();
+  // Botón de pausa del objeto del hero (loop.ts) dentro de la misma zona: pausa también el fondo.
+  const pulsado = (el) => {
+    const z = el.closest('.wf-zona');
+    const b = z && z.querySelector('.w-loop-pause');
+    return !!b && b.getAttribute('aria-pressed') === 'true';
+  };
   const sync = () => {
     for (const el of fondos) {
-      const on = !mq.matches && !!vista.get(el) && !document.hidden && !pausa;
+      const on = !mq.matches && !!vista.get(el) && !document.hidden && !pausa && !pulsado(el);
       el.classList.toggle('is-off', !on);
     }
   };
@@ -115,6 +131,10 @@ const JS = `
   }
   document.addEventListener('visibilitychange', sync);
   if (mq.addEventListener) mq.addEventListener('change', sync);
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t && t.closest && t.closest('.w-loop-pause')) sync();
+  });
   document.addEventListener('w:pausa', (e) => {
     const d = e.detail;
     pausa = d && typeof d.paused === 'boolean' ? d.paused : pausaGlobal();
@@ -126,9 +146,11 @@ const JS = `
 })();
 `;
 
-const CSS = `  /* Montaje: solo en páginas que montan un fondo (estilos en línea de este componente). */
-  main[data-w-fondo] { position: relative; isolation: isolate; }
-  main[data-w-fondo] > :not(.wf) { position: relative; z-index: 1; }
+const CSS = `  /* Montaje: la zona del hero (WLanding) contiene el fondo y mide lo que el hero. */
+  .wf-zona { position: relative; isolation: isolate; }
+  .wf-zona > :not(.wf) { position: relative; z-index: 1; }
+  /* Un solo motivo por página: fuera las luces de suelo de los heroes de la v1. */
+  .wf-zona :is(.hs__horizon, .wo-fan__stripes, .hb__light) { display: none; }
   [data-w-eco] { isolation: isolate; }
   [data-w-eco] > :not(.wf) { position: relative; z-index: 1; }
 
@@ -136,12 +158,12 @@ const CSS = `  /* Montaje: solo en páginas que montan un fondo (estilos en lín
     /* Borde izquierdo del contenido (= .w-container): el % se resuelve donde se usa. */
     --wf-l: calc(max(0px, 50% - var(--container-max) / 2) + var(--container-pad));
     --wf-s: var(--star-rgb);
-    --wf-alto: max(100svh, 860px);
-    position: absolute; inset: 0 0 auto; height: var(--wf-alto);
+    position: absolute; inset: 0; height: var(--wf-alto, auto);
     z-index: 0; pointer-events: none; overflow: hidden; isolation: isolate;
     contain: layout paint;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
-            mask-image: linear-gradient(180deg, #000 70%, transparent);
+    /* El fundido acaba JUSTO en el pie del hero: la sección siguiente nunca corta nada. */
+    -webkit-mask-image: linear-gradient(180deg, #000 min(70%, calc(100% - 240px)), transparent);
+            mask-image: linear-gradient(180deg, #000 min(70%, calc(100% - 240px)), transparent);
   }
   /* Los SVG de los motivos miden más que la pantalla a propósito (base.css limita svg al 100 %). */
   .wf svg { max-width: none; }

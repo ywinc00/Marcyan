@@ -2,6 +2,7 @@
 // F07 · Plano técnico isométrico (sectores). FO/bocetos/f07-sectores.html + W-CONV-55 / W-ADV-25.
 // Rejilla isométrica que se abre alrededor del texto (hueco limpio detrás del
 // titular) y dos cotas de plano en huecos libres (bajo el texto y bajo el objeto). Quieto.
+// Cotas en pies y pulgadas en los dos idiomas: las páginas de sector son de EE. UU.
 interface Props { estilos?: boolean; eco?: boolean }
 const { estilos = true, eco = false } = Astro.props;
 // Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
@@ -40,6 +41,6 @@ const CSS = `
 {estilos && <style is:inline set:html={CSS}></style>}
 <div class="wf-pn">
   <div class="wf-pn__iso"></div>
-  {!eco && <div class="wf-pn__cota wf-pn__cota--1"><b>4.20 m</b></div>}
-  {!eco && <div class="wf-pn__cota wf-pn__cota--2"><b>2.75 m</b></div>}
+  {!eco && <div class="wf-pn__cota wf-pn__cota--1"><b>13′ 9″</b></div>}
+  {!eco && <div class="wf-pn__cota wf-pn__cota--2"><b>9′ 0″</b></div>}
 </div>

@@ -1,6 +1,7 @@
 ---
 // Muestrario interno de los fondos temáticos (design/rediseno-workos-v2.md P12).
-// noindex, fuera del sitemap (/w-muestrario) y se borra antes de cualquier merge a main.
+// noindex. OJO: SÍ entra en sitemap-0.xml (el filtro del sitemap vive en astro.config, fuera
+// de esta tarea); se borra antes de cualquier merge a main.
 // Cada bloque imita el hero REAL de su landing (texto centrado o a la izquierda, objeto
 // opaco donde va el de verdad, medidas tomadas de las páginas compiladas) y debajo un
 // capítulo de contraste con el ECO del fondo: 2 instancias por fondo.
@@ -25,7 +26,7 @@ interface Demo {
   barrio?: BarrioFondo; obj: 'ancho' | 'lado' | 'avatar' | 'plano'; vars?: string;
 }
 const demos: Demo[] = [
-  { tema: 'reticula', codigo: 'F01', pagina: 'Diseño web', tono: 'gold', texto: 'centro', obj: 'ancho', vars: '--wf-obj:462px;--wf-obj-movil:514px', eyebrow: 'Diseño web', h1: 'Diseño web en Houston', lead: 'Webs a medida, rápidas y en español e inglés, para que tus clientes de Houston te encuentren y te escriban.' },
+  { tema: 'reticula', codigo: 'F01', pagina: 'Diseño web', tono: 'gold', texto: 'centro', obj: 'ancho', vars: '--wf-obj:462px;--wf-obj-movil:514px;--wf-sel-dy:0px', eyebrow: 'Diseño web', h1: 'Diseño web en Houston', lead: 'Webs a medida, rápidas y en español e inglés, para que tus clientes de Houston te encuentren y te escriban.' },
   { tema: 'escaparate', codigo: 'F02', pagina: 'Tienda en línea', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:400px', eyebrow: 'Tienda en línea', h1: 'Diseño de tienda en línea en Houston', lead: 'Tu catálogo, tus pagos y tus envíos en una tienda rápida que se ve bien en el teléfono.' },
   { tema: 'radar', codigo: 'F03', pagina: 'SEO local', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:481px;--wf-foco-y-movil:755px;--wf-marca-y-movil:452px', eyebrow: 'SEO local', h1: 'SEO local en Houston', lead: 'Que aparezcas en Google Maps y en las búsquedas de tu zona cuando un cliente te necesita.' },
   { tema: 'hilos', codigo: 'F04', pagina: 'IA conversacional', tono: 'teal', texto: 'centro', obj: 'avatar', vars: '--wf-obj:535px;--wf-obj-movil:535px', eyebrow: 'IA conversacional', h1: 'Asistente de IA para tu negocio en Houston', lead: 'Tu recepcionista que no duerme: contesta tus mensajes, agenda citas y te pasa lo que necesita una persona.' },
@@ -55,6 +56,7 @@ const demos: Demo[] = [
 
     {demos.map((d) => (
       <section class="mf" id={d.tema} data-mf={d.tema} aria-label={`${d.codigo} ${d.pagina}`} style={d.vars}>
+        <div class="wf-zona">
         <Fondo tema={d.tema} texto={d.texto} barrio={d.barrio} />
         <div class:list={['w-hero', 'mf__hero', `mf__hero--${d.texto}`, `mf__hero--${d.obj}`]}>
           <div class="w-container mf__grid">
@@ -70,6 +72,7 @@ const demos: Demo[] = [
             {d.obj === 'avatar' && <div class="mf__av" data-mf-obj></div>}
             <div class="mf__obj" data-mf-obj><span>{d.codigo} · objeto del hero (opaco)</span></div>
           </div>
+        </div>
         </div>
         <div class="w-cell w-contrast mf__cap" data-w-eco>
           <Fondo tema={d.tema} texto={d.texto} barrio={d.barrio} eco />
@@ -95,10 +98,10 @@ const demos: Demo[] = [
   .mfs__idx { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; }
   .mfs__idx a { font-size: 14px; color: var(--w-ink-80, rgba(240,237,232,.8)); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
 
-  /* Bloque = el <main> de una landing: relativo y aislado; el fondo, debajo. */
-  .mf { position: relative; isolation: isolate; border-top: 1px solid var(--w-line-strong); }
-  .mf > :not(.wf) { position: relative; z-index: 1; }
-  .mf__hero { min-height: max(100svh, 860px); box-sizing: border-box; padding-bottom: 96px; }
+  /* Bloque = el <main> de una landing; el hero va en .wf-zona como en WLanding y el fondo
+     mide lo que mide el hero (sin alto forzado: así el muestrario enseña el corte real). */
+  .mf { border-top: 1px solid var(--w-line-strong); }
+  .mf__hero { box-sizing: border-box; padding-bottom: 96px; }
   .mf__grid { display: grid; gap: 56px; }
   .mf__hero--izquierda .mf__grid { grid-template-columns: minmax(0, 1fr); }
   .mf__texto { display: flex; flex-direction: column; min-width: 0; }

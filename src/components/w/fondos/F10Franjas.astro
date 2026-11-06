@@ -10,7 +10,7 @@ const bloques = Array.from({ length: 30 }, (_, i) => ({
   top: (i * 9) % 176,
   left: ((i * 137) % 1340) / 14.4,
   w: 40 + ((i * 73) % 250),
-  o: (0.12 + ((i * 7) % 10) / 70).toFixed(2),
+  o: (0.2 + ((i * 7) % 10) / 45).toFixed(2),
   d: (i * 0.37).toFixed(2),
 }));
 // Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
@@ -18,7 +18,7 @@ const CSS = `
   .wf-fr { position: absolute; inset: 0; }
   .wf-fr__lineas {
     position: absolute; inset: var(--nav-h) 0 auto; height: 420px;
-    background: repeating-linear-gradient(180deg, rgba(var(--wf-a), .1) 0 1px, transparent 1px 6px);
+    background: repeating-linear-gradient(180deg, rgba(var(--wf-a), .17) 0 1px, transparent 1px 6px);
     -webkit-mask-image: linear-gradient(180deg, #000, transparent);
             mask-image: linear-gradient(180deg, #000, transparent);
   }
@@ -34,10 +34,10 @@ const CSS = `
   }
   @keyframes wf-fr-parpadea { 0%, 100% { opacity: var(--o); } 50% { opacity: .02; } }
   .wf-fr__iso {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58%;
     background:
-      repeating-linear-gradient(30deg, rgba(var(--wf-a), .07) 0 1px, transparent 1px 36px),
-      repeating-linear-gradient(150deg, rgba(var(--wf-a), .07) 0 1px, transparent 1px 36px);
+      repeating-linear-gradient(30deg, rgba(var(--wf-a), .12) 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(150deg, rgba(var(--wf-a), .12) 0 1px, transparent 1px 36px);
     -webkit-mask-image: linear-gradient(0deg, #000, transparent);
             mask-image: linear-gradient(0deg, #000, transparent);
   }

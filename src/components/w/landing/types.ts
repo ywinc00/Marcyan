@@ -39,6 +39,19 @@ export type TemaFondo =
   | 'escaneo'       // F12 diagnóstico y herramientas
   | 'hoja';         // F13 blog
 
+/** Código del plan (F01…F13, sin F11): el plan G escribe `fondo: 'F01'`; se aceptan los dos. */
+export type CodigoFondo =
+  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F10' | 'F12' | 'F13';
+
+const POR_CODIGO: Record<CodigoFondo, TemaFondo> = {
+  F01: 'reticula', F02: 'escaparate', F03: 'radar', F04: 'hilos', F05: 'placa', F06: 'construccion',
+  F07: 'plano', F08: 'calles', F09: 'tunel', F10: 'franjas', F12: 'escaneo', F13: 'hoja',
+};
+/** Normaliza un código del plan ('F03') o un nombre ('radar') al nombre del tema. */
+export function temaDeFondo(t: TemaFondo | CodigoFondo): TemaFondo {
+  return (POR_CODIGO as Record<string, TemaFondo>)[t] ?? (t as TemaFondo);
+}
+
 /** Barrios con vías reales en public/geo/*-mapa.json (F08). Sin barrio, F08 es abstracto y declarado. */
 export type BarrioFondo = 'katy' | 'sugar-land' | 'doral' | 'hialeah';
 export type LandingTone = 'gold' | 'teal';
@@ -103,7 +116,17 @@ export interface KindSpec {
    * Fondo temático (P12). Si existe, WLanding monta `<Fondo tema>` en el hero y NO monta
    * SpaceBackdrop (una atmósfera por página). Si falta, la página queda igual que hoy.
    */
-  fondo?: TemaFondo;
-  /** Opciones del fondo: eco quieto al 40 % en el capítulo de contraste, lado del texto del hero y barrio de F08. */
-  fondoOpciones?: (ctx: LandingCtx) => { eco?: boolean; texto?: 'centro' | 'izquierda'; barrio?: BarrioFondo };
+  fondo?: TemaFondo | CodigoFondo;
+  /**
+   * Opciones del fondo: eco quieto al 40 % en el capítulo de contraste, lado del texto del
+   * hero, barrio de F08 (solo el eco dibuja sus vías reales) y `vars`, ajustes de posición
+   * por página en variables --wf-* (p. ej. "--wf-obj: 600px; --wf-sel-1: 5 / 9"), que
+   * WLanding aplica al fondo del hero y al eco. Lista de variables en fondos/Fondo.astro.
+   */
+  fondoOpciones?: (ctx: LandingCtx) => {
+    eco?: boolean;
+    texto?: 'centro' | 'izquierda';
+    barrio?: BarrioFondo;
+    vars?: string;
+  };
 }

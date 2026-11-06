@@ -287,19 +287,22 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
     background: #FBFAF7; border: 1px solid rgba(14,14,13,.09);
     box-shadow: 0 1px 0 #fff inset, 0 18px 36px -22px rgba(14,14,13,.35);
   }
-  .fm__map { position: relative; height: 138px; border-bottom: 1px solid rgba(14,14,13,.07); }
-  .fm--card .fm__map { height: 120px; }
+  .fm__map { --mh: 138px; position: relative; height: var(--mh); border-bottom: 1px solid rgba(14,14,13,.07); container-type: inline-size; }
+  .fm--card .fm__map { --mh: 120px; }
   .fm__map > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   /* Rótulo "Ejemplo" arriba a la IZQUIERDA del mapa (r1: arriba a la derecha tapaba el alfiler). */
   .fm__map :global(.fm__ex) { position: absolute; top: 10px; left: 10px; right: auto; background: rgba(251,250,247,.94); }
-  /* Posiciones en % del lienzo 400×150 (el SVG es "slice": el ancho manda). */
+  /* Posiciones sobre el lienzo 400×150 con el MISMO encaje que el SVG ("slice", centrado):
+     escala = la mayor de ancho/400 y alto/150. rev2 G05: en % del ancho y del alto por
+     separado, en móvil (donde manda el alto) "Tú" flotaba lejos de su punto. */
+  .fm__you, .fm__pin { --s: max(calc(100cqw / 400), calc(var(--mh) / 150)); }
   .fm__you {
-    position: absolute; left: calc(70 / 400 * 100%); top: calc(128 / 150 * 100%); translate: -50% calc(-100% - 12px);
+    position: absolute; left: calc(50% - 130 * var(--s)); top: calc(50% + 53 * var(--s)); translate: -50% calc(-100% - 12px);
     padding: 2px 7px; border-radius: 6px; background: #1E1D1B; color: #FBFAF7;
     font: 600 11px/1.3 var(--font-body); letter-spacing: .01em;
   }
   .fm__pin {
-    position: absolute; left: calc(298 / 400 * 100%); top: calc(52 / 150 * 100%);
+    position: absolute; left: calc(50% + 98 * var(--s)); top: calc(50% - 23 * var(--s));
     width: 28px; height: 36px; margin: -35px 0 0 -14px; transform-origin: 50% 100%;
   }
   .fm__pin svg { display: block; filter: drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
@@ -317,13 +320,18 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
     box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
   }
   .fm--card .fm__tile { width: 40px; height: 40px; border-radius: 10px; }
-  .fm__names { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .fm__names { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .fm__logo { display: block; color: var(--fm-ink); line-height: 0; }
+  /* El logotipo es un trazado (no se parte): si la columna es más estrecha que la palabra,
+     se escala entero; nunca se recorta (rev2 G05: a 320 px quedaba "tu restau"). */
+  .fm__logo :global(.ej-logo) { max-width: 100%; }
+  .fm__logo :global(.ej-logo__palabra) { flex: 0 1 auto; max-width: 100%; height: auto; }
   .fm__cat { font-size: 13px; line-height: 1.2; color: #5B5852; }
-  .fm__state { margin: 14px 0 0; display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.2; color: #3E3B36; }
+  .fm__state { margin: 14px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 14px; line-height: 1.2; color: #3E3B36; }
   .fm__open { font-weight: 600; color: #2D6A3E; }
   .fm.is-closed .fm__open { color: #9A3324; }
   .fm__sep { color: #9A968E; }
+  .fm__when { white-space: nowrap; }
   .fm__dot { position: relative; width: 8px; height: 8px; margin-right: 2px; }
   .fm__dot, .fm__dot i { display: block; border-radius: 50%; background: #2D6A3E; }
   .fm__dot i { position: absolute; inset: 0; opacity: 0; }
@@ -357,7 +365,10 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
   }
   .fm.is-open .fm__hours { opacity: 1; transform: none; pointer-events: auto; }
   .fm__hours { justify-content: center; gap: 8px; }
-  .fm__hours li { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; line-height: 1.25; color: #5B5852; }
+  .fm__hours li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13px; line-height: 1.25; color: #5B5852; }
+  /* El día puede partirse; la franja horaria, nunca ("11 p." arriba y "m." abajo, rev2). */
+  .fm__hours li > span:first-child { min-width: 0; }
+  .fm__hours li > span:last-child { flex: none; white-space: nowrap; text-align: right; }
   .fm__hours li.is-today { font-weight: 700; color: #1E1D1B; }
   .fm__hours em { font-style: normal; font-weight: 600; }
 
@@ -378,9 +389,20 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
   .fm--card .fm__acts { gap: 6px; }
   .fm--card .fm__act { font-size: 12.5px; padding: 0 6px; }
   .fm--card .fm__act:not(.fm__act--main) svg { display: none; }
+  /* Móvil (rev2 G05: a 390 los tres botones se pisaban, a 320 quedaban "Llam / Cómo /
+     Sitio w"): "Llamar", la acción de la ficha, ocupa la primera fila entera y "Cómo llegar"
+     y "Sitio web" comparten la segunda, con su texto completo e icono. */
   @media (--lt-md) {
+    /* Mapa más bajo: con 138 px, a 320 el encaje recortaba el punto de "Tú" fuera del mapa. */
+    .fm__map, .fm--card .fm__map { --mh: 112px; }
     .fm__body { padding: 14px 14px 16px; }
-    .fm__act { font-size: 12px; gap: 4px; padding: 0 6px; }
+    .fm__acts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fm__act--main { grid-column: 1 / -1; }
+    .fm__act { font-size: 13px; gap: 6px; padding: 0 8px; }
+    .fm__hours li { font-size: 12.5px; gap: 10px; }
+  }
+  @media (max-width: 359.98px) {
+    .fm__act { font-size: 12.5px; gap: 5px; padding: 0 6px; }
   }
   @media (--motion-reduce) {
     .fm .fm__route, .fm .fm__route-c, .fm .fm__pin, .fm .fm__pin-sh, .fm .fm__dot i, .fm .fm__you-halo { animation: none !important; }

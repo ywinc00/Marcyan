@@ -103,6 +103,12 @@ const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = A
     .hs { padding-bottom: 64px; }
     .hs__horizon { height: 140px; }
     .hs__grid { gap: 48px; }
-    .hs__obj { padding-left: 25px; }
+    /* rev2 G05: la ficha se estrujaba (a 320 px le quedaban 146 px útiles). El sangrado de la
+       capa desplazada lo da ya la tarjeta en móvil (16 px): sin el relleno doble de 25 + 25 y
+       con menos margen interior, la ficha gana ~80 px. Banda del icono más baja. */
+    .hs__obj { padding: 16px 0 0; }
+    .hs__obj :global(.wo-to) { width: calc(100% - 16px); margin-left: 16px; }
+    .hs__obj :global(.wo-to__band) { height: 76px; }
+    .hs__obj :global(.wo-to__body) { padding: 4px 14px 18px; }
   }
 </style>

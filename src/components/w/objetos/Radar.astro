@@ -50,7 +50,7 @@ const RINGS = [1, 0.8, 0.61, 0.42, 0.23];
 const POS = [
   { d: { a: -46, r: 0.9 }, m: { a: 2, r: 0.9 } },
   { d: { a: 20, r: 0.9 }, m: { a: 24, r: 0.705 } },
-  { d: { a: 34, r: 0.515 }, m: { a: -36, r: 0.515 } },
+  { d: { a: 34, r: 0.515 }, m: { a: -16, r: 0.46 } }, // rev2: a −36° tocaba el borde izquierdo en móvil
   { d: { a: -62, r: 0.515 }, m: { a: -54, r: 0.33 } },
 ];
 const rad = (g: number) => (g * Math.PI) / 180;
@@ -189,6 +189,15 @@ const pings4 = P.slice(0, 4).map((p, i) => {
     .wo-radar.is-run .wo-radar__ping { animation-delay: var(--dlm); }
     .wo-radar__ping[data-side-m='l'] i { left: auto; right: calc(100% + 10px); }
     .wo-radar__ping[data-side-m='r'] i { right: auto; left: calc(100% + 10px); }
+  }
+  /* rev2 G05: por debajo de ~380 px los avisos (de ancho fijo, son texto) se salían de la
+     celda. El radar encoge con la pantalla y, en la más estrecha, sin el punto exterior. */
+  @media (max-width: 379.98px) {
+    .wo-radar { --R: 116vw; }
+    .wo-radar__ping { font-size: 12px; padding: 5px 10px; }
+  }
+  @media (max-width: 359.98px) {
+    .wo-radar__ping i { display: none; }
   }
   @media (--motion-reduce) {
     .wo-radar .wo-radar__beam, .wo-radar .wo-radar__ping, .wo-radar .wo-radar__ping i::after { animation: none; }

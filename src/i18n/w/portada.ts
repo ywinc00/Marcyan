@@ -39,27 +39,29 @@ export const iaMontada: Record<L, {
 }> = {
   es: {
     kicker: 'Así está montada',
-    titulo: 'Un cerebro, todos tus canales',
-    bajada: 'Marcy piensa con Claude y responde donde te escriben tus clientes.',
+    titulo: 'Un cerebro tras cada respuesta',
+    bajada: 'Marcy piensa con Claude y contesta en tu web y en WhatsApp.',
     // §5-1 (por defecto): solo Claude como modelo; sin fila "Montada sobre".
-    // §5-14: canales que el sitio ya nombra como canales donde Marcy contesta: WhatsApp, Instagram y
-    // Messenger (copy congelado de IA para pymes: "Marcy contesta en tu web, WhatsApp, Instagram,
-    // Messenger y Google"; revisión 1 de G01: con solo WhatsApp el titular "todos tus canales"
-    // sonaba hueco). "Tu web" no es una marca y PildorasMarcas solo admite MarcaId: pendiente [SISTEMA].
+    // §5-14 (pendiente del dueño): la fila "Contesta en" solo dice lo que el sitio ya afirma del
+    // producto: WhatsApp (clusters.ts, IA conversacional: "¿La IA puede contestar mi WhatsApp…? Sí").
+    // Instagram y Messenger salen hasta que el dueño lo confirme: hoy solo aparecen como opciones del
+    // brief (lib/brief-schema.mjs, bot_channels), no como capacidad afirmada en el sitio ni en la KB.
+    // Por eso el titular ya no dice "todos tus canales" y la bajada nombra los dos canales reales
+    // ("tu web" no es una marca y PildorasMarcas solo admite MarcaId: va en la bajada).
     // "Te encuentran en" = las tres del paso 04 del proceso (copy congelado).
     filas: [
       { etiqueta: 'Piensa con', ids: ['claude'] },
-      { etiqueta: 'Contesta en', ids: ['whatsapp', 'instagram', 'messenger'] },
+      { etiqueta: 'Contesta en', ids: ['whatsapp'] },
       { etiqueta: 'Te encuentran en', ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
     ],
   },
   en: {
     kicker: "How it's built",
-    titulo: 'One brain, every channel',
-    bajada: 'Marcy thinks with Claude and answers wherever your customers reach you.',
+    titulo: 'One brain behind every answer',
+    bajada: 'Marcy thinks with Claude and answers on your website and on WhatsApp.',
     filas: [
       { etiqueta: 'Thinks with', ids: ['claude'] },
-      { etiqueta: 'Answers on', ids: ['whatsapp', 'instagram', 'messenger'] },
+      { etiqueta: 'Answers on', ids: ['whatsapp'] },
       { etiqueta: 'Found on', ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
     ],
   },

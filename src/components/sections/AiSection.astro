@@ -11,6 +11,9 @@
 //      en). En móvil: cabecera, chip a todo el ancho y filas de píldoras centradas.
 //      Revisión 1 de G01: el chip a todo el ancho con las píldoras debajo llevaba #ia a 1.806 px a
 //      1440 (tope = producción 1.015 + 300). En zigzag el tramo (b) cabe en ≈ 350 px.
+//      Declarado (revisión 2): el tope de alto se escribió a 1440. En móvil (390) #ia mide ≈ 2.470 px
+//      frente a 1.602 en producción (+≈ 870: ventana del agente + chip a todo el ancho); el viaje
+//      móvil no se desplaza (journey 0 px). Pendiente de que el dueño lo vea en el render.
 // Sin lienzo nuevo: la ventana es HTML y el chip es SVG. El demo de burbujas de la v1 se retira.
 import Icon from '../ui/Icon.astro';
 import Kicker from '../ui/Kicker.astro';
@@ -132,7 +135,7 @@ const M = iaMontada[lang];
     .ai__montada { margin-top: 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: center; }
     .ai__mtx { display: flex; flex-direction: column; gap: 28px; min-width: 0; order: 2; }
     .ai__mhead { align-items: flex-start; text-align: left; }
-    .ai__mb { max-width: 470px; }
+    .ai__mb { max-width: none; }
     /* El chip vive en su columna: la escena se recorta a su ancho y los bordes se funden (sin cortes duros). */
     .ai__mchip { order: 1; margin-inline: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
     .ai__mchip :global(.chipia) { --k: .58; }

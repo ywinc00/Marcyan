@@ -1,0 +1,59 @@
+---
+// F06 · Retícula de construcción de logotipo (branding). FO/bocetos/f06-branding.html + W-ADV-25.
+// Círculos, diagonales, rectángulo y arco áureos con rótulos "φ 1.618" y "r 185",
+// que se DIBUJAN una vez (3,2 s, stroke-dashoffset) al entrar en vista y quedan.
+// Foco a la derecha del titular (sobre el objeto, que tapa la mitad baja).
+// Quieto (reducir movimiento / eco): dibujado entero.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-c { position: absolute; inset: 0; --fx: var(--wf-foco-x, calc(100% - var(--wf-l) - 300px)); --fy: var(--wf-foco-y, 330px); }
+  .wf--centro .wf-c { --fx: var(--wf-foco-x, 50%); --fy: var(--wf-foco-y, 520px); }
+  .wf-c__svg {
+    position: absolute; left: var(--fx); top: var(--fy); width: 1500px; height: 1000px;
+    margin: -560px 0 0 -750px; overflow: visible;
+  }
+  .wf-c__svg :is(line, circle, rect, path) { fill: none; stroke-width: 1; }
+  .wf-c__d * { stroke: rgba(var(--wf-s), .12); stroke-dasharray: 4 6; }
+  .wf-c__t * {
+    stroke: rgba(var(--wf-a), .24);
+    stroke-dasharray: 1; stroke-dashoffset: 0;
+    animation: wf-c-dibuja 3.2s cubic-bezier(.33, 1, .68, 1) both;
+  }
+  @keyframes wf-c-dibuja { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  .wf-c__svg text {
+    font: 500 11px var(--font-mono, monospace); letter-spacing: .08em; fill: rgba(var(--wf-a), .7);
+    animation: wf-c-rotulo .6s 2.6s ease-out both;
+  }
+  @keyframes wf-c-rotulo { from { opacity: 0; } to { opacity: 1; } }
+  @media (max-width: 767.98px) {
+    .wf-c, .wf--centro .wf-c { --fx: var(--wf-foco-x-movil, 50%); --fy: var(--wf-foco-y-movil, 360px); }
+    .wf-c__svg { transform: scale(.62); }
+    .wf-c__svg :is(line, circle, rect, path) { stroke-width: 1.6; }
+    .wf-c__svg text { display: none; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-c">
+  <svg class="wf-c__svg" viewBox="0 0 1500 1000" focusable="false">
+    <g class="wf-c__d">
+      <line x1="265" y1="74" x2="1235" y2="674" />
+      <line x1="1235" y1="74" x2="265" y2="674" />
+      <line x1="0" y1="560" x2="1500" y2="560" />
+      <line x1="750" y1="0" x2="750" y2="1000" />
+    </g>
+    <g class="wf-c__t">
+      <circle cx="750" cy="560" r="300" pathLength="1" />
+      <circle cx="750" cy="560" r="185" pathLength="1" style="animation-delay:.15s" />
+      <circle cx="935" cy="560" r="115" pathLength="1" style="animation-delay:.3s" />
+      <circle cx="565" cy="560" r="115" pathLength="1" style="animation-delay:.3s" />
+      <rect x="265" y="74" width="970" height="600" pathLength="1" style="animation-delay:.45s" />
+      <line x1="864" y1="74" x2="864" y2="674" pathLength="1" style="animation-delay:.6s" />
+      <path d="M864 674A371 371 0 0 1 1235 303" pathLength="1" style="animation-delay:.75s" />
+    </g>
+    {!eco && <text x="874" y="640">φ 1.618</text>}
+    {!eco && <text x="760" y="364">r 185</text>}
+  </svg>
+</div>

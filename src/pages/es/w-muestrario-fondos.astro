@@ -1,0 +1,134 @@
+---
+// Muestrario interno de los fondos temáticos (design/rediseno-workos-v2.md P12).
+// noindex, fuera del sitemap (/w-muestrario) y se borra antes de cualquier merge a main.
+// Cada bloque imita el hero REAL de su landing (texto centrado o a la izquierda, objeto
+// opaco donde va el de verdad, medidas tomadas de las páginas compiladas) y debajo un
+// capítulo de contraste con el ECO del fondo: 2 instancias por fondo.
+// Un solo <h1> (el de la página); los titulares de muestra van en <p class="w-h1">.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import WStyles from '../../components/w/WStyles.astro';
+// HeroTexto y SiteFooter se importan como en las páginas reales: así el orden del CSS
+// compartido del resto del sitio no cambia por este muestrario (comprobado contra la base).
+import HeroTexto from '../../components/w/HeroTexto.astro';
+import Eyebrow from '../../components/w/Eyebrow.astro';
+import Button from '../../components/ui/Button.astro';
+import { content } from '../../i18n/content';
+import Fondo from '../../components/w/fondos/Fondo.astro';
+import { clusterNav } from '../../i18n/clusters';
+import type { TemaFondo, BarrioFondo } from '../../components/w/landing/types';
+
+interface Demo {
+  tema: TemaFondo; codigo: string; pagina: string; tono: 'gold' | 'teal';
+  texto: 'centro' | 'izquierda'; eyebrow: string; h1: string; lead: string;
+  barrio?: BarrioFondo; obj: 'ancho' | 'lado' | 'avatar' | 'plano'; vars?: string;
+}
+const demos: Demo[] = [
+  { tema: 'reticula', codigo: 'F01', pagina: 'Diseño web', tono: 'gold', texto: 'centro', obj: 'ancho', vars: '--wf-obj:462px;--wf-obj-movil:514px', eyebrow: 'Diseño web', h1: 'Diseño web en Houston', lead: 'Webs a medida, rápidas y en español e inglés, para que tus clientes de Houston te encuentren y te escriban.' },
+  { tema: 'escaparate', codigo: 'F02', pagina: 'Tienda en línea', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:400px', eyebrow: 'Tienda en línea', h1: 'Diseño de tienda en línea en Houston', lead: 'Tu catálogo, tus pagos y tus envíos en una tienda rápida que se ve bien en el teléfono.' },
+  { tema: 'radar', codigo: 'F03', pagina: 'SEO local', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:481px;--wf-foco-y-movil:755px;--wf-marca-y-movil:452px', eyebrow: 'SEO local', h1: 'SEO local en Houston', lead: 'Que aparezcas en Google Maps y en las búsquedas de tu zona cuando un cliente te necesita.' },
+  { tema: 'hilos', codigo: 'F04', pagina: 'IA conversacional', tono: 'teal', texto: 'centro', obj: 'avatar', vars: '--wf-obj:535px;--wf-obj-movil:535px', eyebrow: 'IA conversacional', h1: 'Asistente de IA para tu negocio en Houston', lead: 'Tu recepcionista que no duerme: contesta tus mensajes, agenda citas y te pasa lo que necesita una persona.' },
+  { tema: 'placa', codigo: 'F05', pagina: 'IA para pymes', tono: 'teal', texto: 'izquierda', obj: 'lado', vars: '--mf-h:580px', eyebrow: 'IA para pymes', h1: 'IA para tu Negocio', lead: 'Tu negocio contesta aunque estés cerrado: mensajes, citas y preguntas, en español y en inglés.' },
+  { tema: 'construccion', codigo: 'F06', pagina: 'Branding', tono: 'gold', texto: 'izquierda', obj: 'plano', eyebrow: 'Branding', h1: 'Diseño de logo y marca en Houston', lead: 'Un logo y una identidad que se reconocen de lejos: en tu letrero, tu camioneta y tu Instagram.' },
+  { tema: 'plano', codigo: 'F07', pagina: 'Sectores', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:384px', eyebrow: 'Contratistas', h1: 'Sitios web para contratistas en Houston', lead: 'Una web que enseña tus trabajos, pide presupuestos y suena a tu oficio, en español y en inglés.' },
+  { tema: 'calles', codigo: 'F08', pagina: 'Barrios (Katy, vías reales)', tono: 'gold', texto: 'centro', obj: 'ancho', barrio: 'katy', eyebrow: 'Katy', h1: 'Diseño web en Katy, para tu negocio local', lead: 'Webs para negocios de Katy que quieren que los vecinos los encuentren primero.', vars: '--wf-marca-y-movil:466px' },
+  { tema: 'tunel', codigo: 'F09', pagina: 'SEO para IA (eco si hay TunelRejilla)', tono: 'teal', texto: 'centro', obj: 'ancho', eyebrow: 'SEO para IA', h1: 'Que ChatGPT te recomiende a ti', lead: 'Preparamos tu web y tu ficha para que los asistentes de IA te entiendan y te nombren cuando alguien pregunta.' },
+  { tema: 'franjas', codigo: 'F10', pagina: 'Servicios y precios', tono: 'gold', texto: 'centro', obj: 'ancho', eyebrow: 'Precios', h1: 'Precios claros, sin letra pequeña', lead: 'Lo que cuesta cada servicio, desde dónde parte y qué incluye. Sin sorpresas al final.' },
+  { tema: 'escaneo', codigo: 'F12', pagina: 'Diagnóstico y herramientas', tono: 'gold', texto: 'centro', obj: 'ancho', eyebrow: 'Diagnóstico gratis', h1: 'Revisa gratis si tu negocio está perdiendo clientes online', lead: 'Pon tu web y en un minuto ves qué te está costando clientes: velocidad, Google, reseñas y más.' },
+  { tema: 'hoja', codigo: 'F13', pagina: 'Blog', tono: 'gold', texto: 'centro', obj: 'ancho', eyebrow: 'Blog', h1: 'Guías honestas para hacer crecer tu negocio en línea', lead: 'Precios reales, cómo aparecer en Google y en la IA, y qué pedirle a una agencia. En español.' },
+];
+---
+<Layout title="Muestrario · fondos temáticos" lang="es" path="/w-muestrario-fondos" noindex hasEn={false} ds="v3">
+  <WStyles />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
+
+  <main id="main" class="mfs" data-w>
+    <header class="w-container mfs__cab">
+      <p class="mfs__k">Muestrario interno · P12 · noindex</p>
+      <h1 class="w-h2">Fondos temáticos por landing</h1>
+      <p class="w-lead">Doce motivos, uno por tipo de página. Cada bloque imita el hero real de su landing y debajo enseña el eco quieto en el capítulo de contraste. Los textos son los de producción; los objetos son cajas opacas en su sitio.</p>
+      <nav class="mfs__idx" aria-label="Fondos">
+        {demos.map((d) => <a href={`#${d.tema}`}>{d.codigo} · {d.pagina}</a>)}
+      </nav>
+    </header>
+
+    {demos.map((d) => (
+      <section class="mf" id={d.tema} data-mf={d.tema} aria-label={`${d.codigo} ${d.pagina}`} style={d.vars}>
+        <Fondo tema={d.tema} texto={d.texto} barrio={d.barrio} />
+        <div class:list={['w-hero', 'mf__hero', `mf__hero--${d.texto}`, `mf__hero--${d.obj}`]}>
+          <div class="w-container mf__grid">
+            <div class:list={['mf__texto', `mf__texto--${d.texto}`]} data-mf-texto>
+              <div class="mf__top"><Eyebrow tone={d.tono}>{d.eyebrow}</Eyebrow></div>
+              <p class="w-h1" data-mf-h1>{d.h1}</p>
+              <p class="w-lead mf__lead">{d.lead}</p>
+              <div class="mf__acc">
+                <Button variant="primary" size="lg" href="#main">Quiero empezar</Button>
+                <Button variant="link" href="#main">Ver cómo trabajamos</Button>
+              </div>
+            </div>
+            {d.obj === 'avatar' && <div class="mf__av" data-mf-obj></div>}
+            <div class="mf__obj" data-mf-obj><span>{d.codigo} · objeto del hero (opaco)</span></div>
+          </div>
+        </div>
+        <div class="w-cell w-contrast mf__cap" data-w-eco>
+          <Fondo tema={d.tema} texto={d.texto} barrio={d.barrio} eco />
+          <div class="w-container mf__capin">
+            <div>
+              <p class="w-h2" data-mf-h2>Capítulo de contraste con el eco</p>
+              <p class="w-lead">El mismo motivo vuelve quieto y al 40 %. El fondo cuenta el tema; el texto se lee siempre.</p>
+            </div>
+            <div class="mf__obj mf__obj--cap"><span>objeto</span></div>
+          </div>
+        </div>
+      </section>
+    ))}
+  </main>
+
+  <SiteFooter footer={content.es.footer} lang="es" />
+</Layout>
+
+<style is:inline>
+  .mfs { padding-bottom: 120px; }
+  .mfs__cab { padding-top: calc(var(--nav-h) + 64px); padding-bottom: 64px; display: grid; gap: 16px; }
+  .mfs__k { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; color: var(--w-ink-60, rgba(240,237,232,.6)); text-transform: uppercase; }
+  .mfs__idx { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; }
+  .mfs__idx a { font-size: 14px; color: var(--w-ink-80, rgba(240,237,232,.8)); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+
+  /* Bloque = el <main> de una landing: relativo y aislado; el fondo, debajo. */
+  .mf { position: relative; isolation: isolate; border-top: 1px solid var(--w-line-strong); }
+  .mf > :not(.wf) { position: relative; z-index: 1; }
+  .mf__hero { min-height: max(100svh, 860px); box-sizing: border-box; padding-bottom: 96px; }
+  .mf__grid { display: grid; gap: 56px; }
+  .mf__hero--izquierda .mf__grid { grid-template-columns: minmax(0, 1fr); }
+  .mf__texto { display: flex; flex-direction: column; min-width: 0; }
+  .mf__texto--centro { align-items: center; text-align: center; max-width: 768px; margin-inline: auto; }
+  .mf__texto--izquierda { align-items: flex-start; text-align: left; max-width: 600px; }
+  .mf__top { margin-bottom: var(--w-gap-eyebrow, 16px); }
+  .mf__lead { margin-top: 24px; }
+  .mf__acc { display: flex; flex-wrap: wrap; align-items: center; justify-content: inherit; gap: 16px 24px; margin-top: 32px; }
+  .mf__texto--centro .mf__acc { justify-content: center; }
+  .mf__obj {
+    display: grid; place-items: center; min-height: 300px; border-radius: var(--w-r-obj, 12px);
+    background: var(--w-s2, #181817); border: 1px solid var(--w-line-strong);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    font: 500 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6));
+  }
+  .mf__hero--ancho .mf__obj { width: min(100%, 1040px); margin-inline: auto; min-height: 420px; }
+  .mf__hero--avatar .mf__grid { gap: 0; }
+  .mf__av { width: 185px; height: 226px; margin: 40px auto 0; border-radius: 50% 50% 16px 16px; background: var(--w-s2, #181817); border: 1px solid var(--w-line-strong); }
+  .mf__hero--avatar .mf__obj { width: min(100%, 1080px); margin-inline: auto; min-height: 480px; }
+  .mf__hero--plano .mf__obj { min-height: 700px; }
+  @media (min-width: 1024px) {
+    .mf__hero--lado .mf__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); align-items: center; }
+    .mf__hero--lado .mf__obj { min-height: var(--mf-h, 520px); }
+  }
+  @media (max-width: 767.98px) {
+    .mf__hero--lado .mf__obj { min-height: 554px; }
+    .mf__hero--ancho .mf__obj { min-height: 320px; }
+  }
+  .mf__cap { min-height: 520px; }
+  .mf__capin { display: grid; gap: 32px; align-items: center; }
+  .mf__obj--cap { min-height: 260px; }
+  @media (min-width: 1024px) { .mf__capin { grid-template-columns: 1fr 1fr; } }
+</style>

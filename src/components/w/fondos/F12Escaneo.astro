@@ -1,0 +1,36 @@
+---
+// F12 · Escaneo (diagnóstico y herramientas). FO/bocetos/f12-diagnostico.html.
+// Trama de puntos oro y una línea de lectura que baja sin parar (6 s, continua:
+// nunca se queda quieta mientras se ve, E-56 punto 7). Solo transform.
+// Quieto (reducir movimiento): la línea detenida a media altura, sobre el objeto.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-es { position: absolute; inset: 0; }
+  .wf-es__puntos {
+    position: absolute; inset: 0;
+    background: radial-gradient(rgba(var(--wf-a), .28) 1.2px, transparent 1.6px) 0 0 / 24px 24px;
+    -webkit-mask-image: radial-gradient(75% 70% at 50% 45%, #000 10%, transparent 80%);
+            mask-image: radial-gradient(75% 70% at 50% 45%, #000 10%, transparent 80%);
+  }
+  .wf-es__linea {
+    position: absolute; left: 0; right: 0; top: 0; height: 180px;
+    /* Quieto: la línea de lectura justo encima del objeto, bajo las acciones. */
+    transform: translateY(calc(var(--wf-obj, 560px) - 196px));
+    background: linear-gradient(180deg, transparent, rgba(var(--wf-a), .06) 80%, rgba(var(--wf-a), .3) 99.4%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+    animation: wf-es-baja 6s cubic-bezier(.645, .045, .355, 1) infinite;
+  }
+  @keyframes wf-es-baja {
+    from { transform: translateY(-180px); }
+    to { transform: translateY(var(--wf-alto)); }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-es">
+  <div class="wf-es__puntos"></div>
+  {!eco && <div class="wf-es__linea"></div>}
+</div>

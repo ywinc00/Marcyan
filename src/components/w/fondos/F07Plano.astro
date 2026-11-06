@@ -1,0 +1,45 @@
+---
+// F07 · Plano técnico isométrico (sectores). FO/bocetos/f07-sectores.html + W-CONV-55 / W-ADV-25.
+// Rejilla isométrica que se abre alrededor del texto (hueco limpio detrás del
+// titular) y dos cotas de plano en huecos libres (bajo el texto y bajo el objeto). Quieto.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-pn { position: absolute; inset: 0; --hx: 28%; --hy: 40%; }
+  .wf--centro .wf-pn { --hx: 50%; --hy: 32%; }
+  .wf-pn__iso {
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(30deg, rgba(var(--wf-a), .11) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(150deg, rgba(var(--wf-a), .11) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, rgba(var(--wf-a), .06) 0 1px, transparent 1px 69.28px);
+    -webkit-mask-image: radial-gradient(80% 66% at var(--hx) var(--hy), transparent 18%, #000 46%, transparent 94%);
+            mask-image: radial-gradient(80% 66% at var(--hx) var(--hy), transparent 18%, #000 46%, transparent 94%);
+  }
+  .wf--eco .wf-pn__iso { -webkit-mask-image: none; mask-image: none; }
+  .wf-pn__cota { position: absolute; height: 1px; background: rgba(var(--wf-s), .26); }
+  .wf-pn__cota::before, .wf-pn__cota::after {
+    content: ''; position: absolute; top: -5px; width: 1px; height: 11px; background: rgba(var(--wf-s), .4);
+  }
+  .wf-pn__cota::before { left: 0; }
+  .wf-pn__cota::after { right: 0; }
+  .wf-pn__cota b {
+    position: absolute; left: 50%; top: -19px; transform: translateX(-50%); white-space: nowrap;
+    font: 500 10px/1 var(--font-mono, monospace); letter-spacing: .06em;
+    color: rgba(var(--wf-a), .75); background: var(--bg-base, #080808); padding: 3px 6px;
+  }
+  /* Cotas en huecos libres: bajo el bloque de texto (izquierda) y bajo el objeto (derecha). */
+  .wf-pn__cota--1 { left: var(--wf-l); width: 240px; top: var(--wf-cota1, 690px); }
+  .wf-pn__cota--2 { right: calc(var(--wf-l) + 120px); width: 180px; top: var(--wf-cota2, 640px); }
+  .wf--centro .wf-pn__cota--1 { right: auto; left: 6%; width: 16%; top: 260px; }
+  .wf--centro .wf-pn__cota--2 { right: 6%; width: 13%; top: 540px; }
+  @media (max-width: 767.98px) { .wf-pn__cota { display: none; } }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-pn">
+  <div class="wf-pn__iso"></div>
+  {!eco && <div class="wf-pn__cota wf-pn__cota--1"><b>4.20 m</b></div>}
+  {!eco && <div class="wf-pn__cota wf-pn__cota--2"><b>2.75 m</b></div>}
+</div>

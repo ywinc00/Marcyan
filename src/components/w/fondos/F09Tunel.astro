@@ -1,0 +1,66 @@
+---
+// F09 · Túnel de rejilla (SEO para IA). FO/bocetos/f09-seo-para-ia.html + W-ADV-28.
+// Perspectiva hacia una respuesta: marcos concéntricos y aristas hacia la boca del
+// túnel, en trazo teal que se aclara hacia el fondo y hacia abajo (sin halo teal,
+// §P12). Dibujado para la proporción real: un trazado de escritorio (encaja sin
+// deformar con slice) y otro de móvil. Declarado QUIETO (§1.5).
+// Si la página ya usa TunelRejilla en su hero, se monta solo como eco.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+
+function tunel(W: number, H: number, ix: number, iy: number, iw: number, ih: number, nr: number, nx: number, ny: number) {
+  const r = (v: number) => Math.round(v);
+  const marcos: { d: string; o: string }[] = [];
+  for (let k = 0; k <= nr; k++) {
+    const t = k / nr;
+    const x0 = ix * t, y0 = iy * t, x1 = W - (W - ix - iw) * t, y1 = H - (H - iy - ih) * t;
+    marcos.push({ d: `M${r(x0)} ${r(y0)}H${r(x1)}V${r(y1)}H${r(x0)}Z`, o: (0.3 + 0.7 * t).toFixed(2) });
+  }
+  let aristas = '';
+  for (let k = 0; k <= nx; k++) {
+    const t = k / nx;
+    aristas += `M${r(W * t)} 0L${r(ix + iw * t)} ${iy}M${r(W * t)} ${H}L${r(ix + iw * t)} ${iy + ih}`;
+  }
+  for (let k = 0; k <= ny; k++) {
+    const t = k / ny;
+    aristas += `M0 ${r(H * t)}L${ix} ${r(iy + ih * t)}M${W} ${r(H * t)}L${ix + iw} ${r(iy + ih * t)}`;
+  }
+  return { marcos, aristas, vb: `0 0 ${W} ${H}` };
+}
+const pc = tunel(1600, 900, 480, 190, 640, 400, 10, 14, 8);
+const mo = tunel(390, 860, 60, 170, 270, 360, 8, 6, 8);
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-tu { position: absolute; inset: 0; }
+  .wf-tu__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .wf-tu__svg--mo { display: none; }
+  .wf-tu path { fill: none; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .wf-tu__a { stroke: rgba(var(--wf-a), .18); }
+  .wf-tu__m { stroke: rgb(var(--wf-a)); }
+  .wf-tu__svg { -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.55), #000 70%); mask-image: linear-gradient(180deg, rgba(0,0,0,.55), #000 70%); }
+  .wf-tu__m { stroke-width: 1; }
+  .wf-tu__svg--pc .wf-tu__m, .wf-tu__svg--mo .wf-tu__m { opacity: .28; }
+  /* Boca del túnel en noche opaca: ahí va el texto (como W-ADV-28). */
+  .wf-tu__nucleo {
+    position: absolute; left: 50%; top: calc(var(--w-hero-top) - 60px); width: 820px; height: 480px;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(8, 8, 8, .94) 58%, rgba(8, 8, 8, .55) 82%, transparent);
+  }
+  .wf-tu--eco .wf-tu__nucleo { display: none; }
+  @media (max-width: 767.98px) {
+    .wf-tu__svg--pc { display: none; }
+    .wf-tu__svg--mo { display: block; }
+    .wf-tu__nucleo { width: 150%; top: 80px; height: 520px; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class:list={['wf-tu', eco && 'wf-tu--eco']}>
+  {[{ t: pc, cls: 'wf-tu__svg wf-tu__svg--pc' }, { t: mo, cls: 'wf-tu__svg wf-tu__svg--mo' }].map(({ t, cls }) => (
+    <svg class={cls} viewBox={t.vb} preserveAspectRatio="xMidYMid slice" focusable="false">
+      <path class="wf-tu__a" d={t.aristas} />
+      {t.marcos.map((m) => <path class="wf-tu__m" d={m.d} stroke-opacity={m.o} />)}
+    </svg>
+  ))}
+  <div class="wf-tu__nucleo"></div>
+</div>

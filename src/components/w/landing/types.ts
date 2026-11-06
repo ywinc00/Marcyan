@@ -19,6 +19,28 @@ export type LandingKind =
   | 'barrio';
 
 export type LandingLang = 'es' | 'en';
+
+/**
+ * Fondos temáticos por landing (design/rediseno-workos-v2.md §1.3 y P12).
+ * Un motivo por página que cuenta su tema; vive en el hero y se funde a la noche.
+ * F11 (portafolio) no existe: el portafolio se queda en el espacio (§5-7).
+ */
+export type TemaFondo =
+  | 'reticula'      // F01 diseño web
+  | 'escaparate'    // F02 tienda en línea
+  | 'radar'         // F03 SEO local
+  | 'hilos'         // F04 IA conversacional
+  | 'placa'         // F05 IA para pymes
+  | 'construccion'  // F06 branding
+  | 'plano'         // F07 sectores
+  | 'calles'        // F08 barrios
+  | 'tunel'         // F09 SEO para IA
+  | 'franjas'       // F10 servicios y precios
+  | 'escaneo'       // F12 diagnóstico y herramientas
+  | 'hoja';         // F13 blog
+
+/** Barrios con vías reales en public/geo/*-mapa.json (F08). Sin barrio, F08 es abstracto y declarado. */
+export type BarrioFondo = 'katy' | 'sugar-land' | 'doral' | 'hialeah';
 export type LandingTone = 'gold' | 'teal';
 
 /** Lo que cada hero y cada sección recibe para construir sus props. */
@@ -77,4 +99,11 @@ export interface KindSpec {
   sections: SectionSpec[];
   /** Tono de la página; si falta, el de `cluster.hero.tone`. */
   tone?: LandingTone | ((ctx: Omit<LandingCtx, 'tone'>) => LandingTone);
+  /**
+   * Fondo temático (P12). Si existe, WLanding monta `<Fondo tema>` en el hero y NO monta
+   * SpaceBackdrop (una atmósfera por página). Si falta, la página queda igual que hoy.
+   */
+  fondo?: TemaFondo;
+  /** Opciones del fondo: eco quieto al 40 % en el capítulo de contraste, lado del texto del hero y barrio de F08. */
+  fondoOpciones?: (ctx: LandingCtx) => { eco?: boolean; texto?: 'centro' | 'izquierda'; barrio?: BarrioFondo };
 }

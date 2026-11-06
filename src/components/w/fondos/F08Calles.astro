@@ -1,0 +1,136 @@
+---
+// F08 · Trama de calles (barrios). FO/bocetos/f08-barrios.html; E-41 / E-49.
+// Con `barrio`: las VÍAS REALES del barrio, de public/geo/<ciudad>-mapa.json (los
+// mismos datos del mapa de zonas de los hubs: r1 vías principales, r2 secundarias),
+// proyectadas al norte verdadero alrededor del centro del barrio, simplificadas en
+// la compilación (Douglas-Peucker) y con la vía principal más larga del recorte en
+// oro. El alfiler marca el centro del barrio y late (2,8 s).
+// Sin `barrio`: trama ABSTRACTA declarada (no pretende ser un mapa).
+// El núcleo de noche (Fondo) cubre el texto. Solo transform/opacity.
+import type { BarrioFondo } from '../landing/types';
+import houston from '../../../../public/geo/houston-mapa.json';
+import miami from '../../../../public/geo/miami-mapa.json';
+
+interface Props { estilos?: boolean; eco?: boolean; barrio?: BarrioFondo }
+const { estilos = true, eco = false, barrio } = Astro.props;
+
+type Pt = [number, number];
+type Linea = Pt[];
+const CENTROS: Record<BarrioFondo, { mapa: { r1: Linea[]; r2: Linea[] }; lon: number; lat: number }> = {
+  katy: { mapa: houston as never, lon: -95.8245, lat: 29.7858 },
+  'sugar-land': { mapa: houston as never, lon: -95.6349, lat: 29.6197 },
+  doral: { mapa: miami as never, lon: -80.3553, lat: 25.8195 },
+  hialeah: { mapa: miami as never, lon: -80.2781, lat: 25.8576 },
+};
+
+// Douglas-Peucker en píxeles.
+function dp(p: Pt[], t: number): Pt[] {
+  if (p.length < 3) return p;
+  const a = p[0], b = p[p.length - 1];
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+  let md = 0, mi = 0;
+  for (let i = 1; i < p.length - 1; i++) {
+    const d = Math.abs(dy * p[i][0] - dx * p[i][1] + b[0] * a[1] - b[1] * a[0]) / L;
+    if (d > md) { md = d; mi = i; }
+  }
+  return md > t ? dp(p.slice(0, mi + 1), t).slice(0, -1).concat(dp(p.slice(mi), t)) : [a, b];
+}
+const largo = (p: Pt[]) => p.reduce((s, q, i) => (i ? s + Math.hypot(q[0] - p[i - 1][0], q[1] - p[i - 1][1]) : 0), 0);
+const dStr = (p: Pt[]) => 'M' + p.map((q) => q.join(' ')).join('L');
+
+let real: { r1: string; r2: string; oro: string } | null = null;
+if (barrio) {
+  const { mapa, lon, lat } = CENTROS[barrio];
+  const K = 3000, kx = K * Math.cos((lat * Math.PI) / 180);
+  const recorta = (lineas: Linea[], W: number, H: number, tol: number, min: number) => {
+    const segs: { p: Pt[]; L: number; src: number }[] = [];
+    lineas.forEach((ln, src) => {
+      let seg: Pt[] = [];
+      const cierra = () => {
+        if (seg.length > 1) { const p = dp(seg, tol); const L = largo(p); if (L >= min) segs.push({ p, L, src }); }
+        seg = [];
+      };
+      for (const [lo, la] of ln) {
+        const x = Math.round((lo - lon) * kx), y = Math.round(-(la - lat) * K);
+        if (Math.abs(x) > W || Math.abs(y) > H) { cierra(); continue; }
+        seg.push([x, y]);
+      }
+      cierra();
+    });
+    return segs;
+  };
+  const r1 = recorta(mapa.r1, 1000, 560, 4, 40);
+  const r2 = recorta(mapa.r2, 1000, 560, 4, 30);
+  // Vía en oro: la línea principal con más recorrido dentro del recorte.
+  const porSrc = new Map<number, number>();
+  r1.forEach((s) => porSrc.set(s.src, (porSrc.get(s.src) ?? 0) + s.L));
+  const oroSrc = [...porSrc.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  real = {
+    r1: r1.filter((s) => s.src !== oroSrc).map((s) => dStr(s.p)).join(''),
+    r2: r2.map((s) => dStr(s.p)).join(''),
+    oro: r1.filter((s) => s.src === oroSrc).map((s) => dStr(s.p)).join(''),
+  };
+}
+// Trama abstracta (sin barrio): rejilla irregular ladeada y una autopista.
+const abstracta = barrio ? null : {
+  v: Array.from({ length: 30 }, (_, i) => `M${i * 62 + ((i * 13) % 20) - 900} -500L${i * 62 + ((i * 29) % 40) - 900} 500`),
+  h: Array.from({ length: 17 }, (_, i) => `M-900 ${i * 62 + ((i * 17) % 25) - 500}L900 ${i * 62 + ((i * 7) % 30) - 500}`),
+  oro: 'M-920 320C-500 260-200 60 100 20S600-80 920-200',
+};
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-ca {
+    position: absolute; inset: 0;
+    /* El alfiler (= centro del barrio) cae en un hueco libre a la derecha del texto. */
+    --px: var(--wf-marca-x, calc(50% + 450px)); --py: var(--wf-marca-y, 450px);
+  }
+  .wf--izq .wf-ca { --px: var(--wf-marca-x, calc(100% - var(--wf-l) - 120px)); --py: var(--wf-marca-y, 640px); }
+  .wf-ca__svg {
+    position: absolute; left: var(--px); top: var(--py); width: 2000px; height: 1120px;
+    margin: -560px 0 0 -1000px; overflow: visible;
+    -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 35%, transparent);
+            mask-image: radial-gradient(50% 50% at 50% 50%, #000 35%, transparent);
+  }
+  .wf-ca--abs .wf-ca__svg { margin-left: -1450px; margin-top: -400px; }
+  .wf--eco .wf-ca__svg { left: 50%; top: 50%; }
+  .wf-ca path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .wf-ca__s { stroke: rgba(var(--wf-s), .16); stroke-width: 1; }
+  .wf-ca__a { stroke: rgba(var(--wf-s), .26); stroke-width: 1.6; }
+  .wf-ca__o { stroke: rgba(var(--wf-a), .5); stroke-width: 3; }
+  .wf-ca__pin {
+    position: absolute; z-index: 3; left: var(--px); top: var(--py); width: 16px; height: 16px; margin: -8px 0 0 -8px;
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: rgb(var(--wf-a));
+    box-shadow: 0 0 0 4px var(--bg-base, #080808);
+  }
+  .wf-ca__pin::after {
+    content: ''; position: absolute; inset: -9px; border-radius: 50%;
+    border: 1px solid rgba(var(--wf-a), .7); opacity: 0;
+    animation: wf-ca-late 2.8s cubic-bezier(.2, .6, .35, 1) infinite;
+  }
+  @keyframes wf-ca-late { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(3.2); opacity: 0; } }
+  @media (max-width: 767.98px) {
+    .wf-ca, .wf--izq .wf-ca { --px: var(--wf-marca-x-movil, calc(100% - 52px)); --py: var(--wf-marca-y-movil, 457px); }
+    .wf-ca__svg { transform: scale(.62); }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class:list={['wf-ca', abstracta && 'wf-ca--abs']}>
+  <svg class="wf-ca__svg" viewBox="-1000 -560 2000 1120" focusable="false">
+    {real && (
+      <g>
+        <path class="wf-ca__s" d={real.r2} />
+        <path class="wf-ca__a" d={real.r1} />
+        <path class="wf-ca__o" d={real.oro} />
+      </g>
+    )}
+    {abstracta && (
+      <g transform="rotate(-8)">
+        {abstracta.v.map((d, i) => <path class={i % 5 === 0 ? 'wf-ca__a' : 'wf-ca__s'} d={d} />)}
+        {abstracta.h.map((d, i) => <path class={i % 4 === 0 ? 'wf-ca__a' : 'wf-ca__s'} d={d} />)}
+        <path class="wf-ca__o" d={abstracta.oro} />
+      </g>
+    )}
+  </svg>
+  {!eco && <span class="wf-ca__pin"></span>}
+</div>

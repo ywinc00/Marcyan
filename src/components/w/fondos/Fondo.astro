@@ -1,0 +1,201 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Fondo temático de landing (design/rediseno-workos-v2.md §1.3 y P12; FO/informe.md).
+// Despachador: monta UN motivo por página que cuenta su tema, vive en el hero
+// (alto max(100svh, 860px), fundido a la noche en el 30 % inferior) y puede volver
+// como eco quieto al 40 % en el capítulo de contraste (prop `eco`).
+//
+// Montaje (corrección del plan): el <main> de la página es position:relative +
+// isolation:isolate; este fondo va dentro, absolute, z-index 0, y los hijos del
+// main suben a z-index 1. Nunca z-index:-1 sin contexto (quedaría tapado por
+// cualquier sección opaca). Todos los estilos van EN LÍNEA (una vez por página) y
+// SOLO viajan a las páginas que montan un fondo: una landing sin fondo queda igual.
+//
+// Vida (§1.5): bucle mientras está a la vista; pausa fuera de vista
+// (IntersectionObserver, rootMargin 100px), con la pestaña oculta y con el estado
+// global de pausa de loop.ts (sin botón propio). Contrato que lee este guion:
+//   · <html data-w-pausa> presente  → todo en pausa
+//   · sessionStorage['w-pausa'] === '1' al cargar (try/catch)
+//   · evento `w:pausa` en document (detail: { paused: boolean })
+// Con reducir movimiento: sin animación y en su fotograma quieto con sentido.
+// Animación solo transform / opacity / stroke-dashoffset. SVG en línea, sin
+// imágenes ni lienzos. aria-hidden y pointer-events:none.
+//
+// Ajuste por página (prop `style` o en el <main>), todos opcionales; los valores por
+// defecto salen de medir los heroes compilados de cada tipo (1440 y 390):
+//   --wf-obj / --wf-obj-movil            parte de arriba del objeto del hero (F01, F04, F12)
+//   --wf-foco-x / --wf-foco-y (+ -movil)  centro del objeto (F03 radar, F05 placa, F06 construcción)
+//   --wf-marca-x / --wf-marca-y (+ -movil) hueco libre para la marca con sentido (F03 negocio encendido, F08 alfiler)
+//   --wf-cota1 / --wf-cota2              alto de las cotas de F07 · --wf-nucleo-top / --wf-nucleo-h  núcleo de noche
+// ─────────────────────────────────────────────────────────────
+import type { TemaFondo, BarrioFondo } from '../landing/types';
+import F01Reticula from './F01Reticula.astro';
+import F02Escaparate from './F02Escaparate.astro';
+import F03Radar from './F03Radar.astro';
+import F04Hilos from './F04Hilos.astro';
+import F05Placa from './F05Placa.astro';
+import F06Construccion from './F06Construccion.astro';
+import F07Plano from './F07Plano.astro';
+import F08Calles from './F08Calles.astro';
+import F09Tunel from './F09Tunel.astro';
+import F10Franjas from './F10Franjas.astro';
+import F12Escaneo from './F12Escaneo.astro';
+import F13Hoja from './F13Hoja.astro';
+
+interface Props {
+  tema: TemaFondo;
+  /** Versión quieta al 40 % para el capítulo de contraste (llena su sección). */
+  eco?: boolean;
+  /** Lado del bloque de texto del hero: decide dónde va el núcleo de noche y el foco del motivo. */
+  texto?: 'centro' | 'izquierda';
+  /** Solo F08: barrio con vías reales; sin él, trama abstracta declarada. */
+  barrio?: BarrioFondo;
+  lang?: 'es' | 'en';
+  /** Ajustes de posición por página (variables --wf-*), p. ej. "--wf-obj: 600px". */
+  style?: string;
+}
+
+const TEXTO_POR_TEMA: Record<TemaFondo, 'centro' | 'izquierda'> = {
+  reticula: 'centro', escaparate: 'izquierda', radar: 'izquierda', hilos: 'centro',
+  placa: 'izquierda', construccion: 'izquierda', plano: 'izquierda', calles: 'centro',
+  tunel: 'centro', franjas: 'centro', escaneo: 'centro', hoja: 'centro',
+};
+const TEAL: TemaFondo[] = ['hilos', 'placa', 'tunel'];
+const NUCLEO: TemaFondo[] = ['reticula', 'radar', 'placa', 'calles'];
+
+const { tema, eco = false, barrio, lang = 'es', style } = Astro.props;
+const texto = Astro.props.texto ?? TEXTO_POR_TEMA[tema];
+const tono = TEAL.includes(tema) ? 'teal' : 'gold';
+const conNucleo = !eco && NUCLEO.includes(tema);
+
+const MOTIVO = {
+  reticula: F01Reticula, escaparate: F02Escaparate, radar: F03Radar, hilos: F04Hilos,
+  placa: F05Placa, construccion: F06Construccion, plano: F07Plano, calles: F08Calles,
+  tunel: F09Tunel, franjas: F10Franjas, escaneo: F12Escaneo, hoja: F13Hoja,
+} as const;
+const Motivo = MOTIVO[tema];
+
+// Estilos EN LÍNEA y una sola vez por página (Astro.locals): una landing que importa
+// WLanding pero no monta fondo no recibe ni una regla (sale igual que la base).
+const vistos: Set<string> = ((Astro.locals as Record<string, unknown>).__wFondos as Set<string>) ?? new Set();
+(Astro.locals as Record<string, unknown>).__wFondos = vistos;
+const estilosBase = !vistos.has('base');
+const estilosMotivo = !vistos.has(tema);
+vistos.add('base'); vistos.add(tema);
+
+// Guion en línea (módulo: corre tras el análisis, ve también los ecos de más abajo).
+const JS = `
+// Vida de los fondos (§1.5): un observador por fondo de hero; los ecos son quietos.
+(() => {
+  const KEY = 'w-pausa';
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pausaGlobal = () => {
+    if (document.documentElement.hasAttribute('data-w-pausa')) return true;
+    try { return window.sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; }
+  };
+  const fondos = Array.from(document.querySelectorAll('.wf--hero[data-w2-fondo]'));
+  if (!fondos.length) return;
+  const vista = new WeakMap();
+  let pausa = pausaGlobal();
+  const sync = () => {
+    for (const el of fondos) {
+      const on = !mq.matches && !!vista.get(el) && !document.hidden && !pausa;
+      el.classList.toggle('is-off', !on);
+    }
+  };
+  fondos.forEach((el) => el.classList.add('is-off'));
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) vista.set(e.target, e.isIntersecting);
+      sync();
+    }, { threshold: 0, rootMargin: '100px' });
+    fondos.forEach((el) => io.observe(el));
+  } else {
+    fondos.forEach((el) => vista.set(el, true));
+  }
+  document.addEventListener('visibilitychange', sync);
+  if (mq.addEventListener) mq.addEventListener('change', sync);
+  document.addEventListener('w:pausa', (e) => {
+    const d = e.detail;
+    pausa = d && typeof d.paused === 'boolean' ? d.paused : pausaGlobal();
+    sync();
+  });
+  new MutationObserver(() => { pausa = pausaGlobal(); sync(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
+  sync();
+})();
+`;
+
+const CSS = `  /* Montaje: solo en páginas que montan un fondo (estilos en línea de este componente). */
+  main[data-w-fondo] { position: relative; isolation: isolate; }
+  main[data-w-fondo] > :not(.wf) { position: relative; z-index: 1; }
+  [data-w-eco] { isolation: isolate; }
+  [data-w-eco] > :not(.wf) { position: relative; z-index: 1; }
+
+  .wf {
+    /* Borde izquierdo del contenido (= .w-container): el % se resuelve donde se usa. */
+    --wf-l: calc(max(0px, 50% - var(--container-max) / 2) + var(--container-pad));
+    --wf-s: var(--star-rgb);
+    --wf-alto: max(100svh, 860px);
+    position: absolute; inset: 0 0 auto; height: var(--wf-alto);
+    z-index: 0; pointer-events: none; overflow: hidden; isolation: isolate;
+    contain: layout paint;
+    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
+            mask-image: linear-gradient(180deg, #000 70%, transparent);
+  }
+  /* Los SVG de los motivos miden más que la pantalla a propósito (base.css limita svg al 100 %). */
+  .wf svg { max-width: none; }
+  .wf--gold { --wf-a: var(--accent-gold-rgb); }
+  .wf--teal { --wf-a: var(--accent-teal-rgb); }
+
+  /* Eco: llena su sección, quieto, al 40 %, con fundido arriba y abajo. */
+  .wf--eco {
+    inset: 0; height: auto; opacity: .4;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 72%, transparent);
+            mask-image: linear-gradient(180deg, transparent, #000 22%, #000 72%, transparent);
+  }
+  .wf--eco * { animation: none !important; }
+
+  /* Núcleo de noche opaca detrás del bloque de texto del hero (F01, F03, F05, F08). */
+  .wf__nucleo {
+    position: absolute; z-index: 2;
+    top: var(--wf-nucleo-top, calc(var(--w-hero-top) - 70px));
+    left: 50%; width: 760px; height: var(--wf-nucleo-h, 440px); transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(8, 8, 8, .92) 62%, rgba(8, 8, 8, .6) 82%, transparent);
+  }
+  .wf--izq .wf__nucleo {
+    left: calc(var(--wf-l) - 150px); transform: none;
+    width: 960px; height: var(--wf-nucleo-h, 600px);
+  }
+  @media (max-width: 767.98px) {
+    .wf__nucleo, .wf--izq .wf__nucleo {
+      left: 50%; transform: translateX(-50%); width: 150%;
+      top: var(--wf-nucleo-top, 80px); height: var(--wf-nucleo-h, 500px);
+    }
+    /* F05: las pistas salen por ARRIBA del objeto; el núcleo acaba con el texto. */
+    .wf[data-w2-fondo="placa"] .wf__nucleo { height: var(--wf-nucleo-h, 340px); }
+  }
+
+  /* Pausa: fuera de vista, pestaña oculta o pausa global. Sin JS, todo corre. */
+  .wf.is-off *, .wf.is-off *::before, .wf.is-off *::after {
+    animation-play-state: paused !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wf *, .wf *::before, .wf *::after { animation: none !important; }
+  }
+`;
+---
+{estilosBase && <style is:inline set:html={CSS}></style>}
+{estilosBase && <script is:inline type="module" set:html={JS}></script>}
+<div
+  class:list={['wf', `wf--${tono}`, eco ? 'wf--eco' : 'wf--hero', texto === 'izquierda' ? 'wf--izq' : 'wf--centro']}
+  data-w2-fondo={tema}
+  aria-hidden="true"
+  style={style}
+>
+  <Motivo estilos={estilosMotivo} eco={eco} texto={texto} barrio={barrio} lang={lang} />
+  {conNucleo && <div class="wf__nucleo"></div>}
+</div>
+
+
+

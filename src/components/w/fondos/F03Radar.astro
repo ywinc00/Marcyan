@@ -1,0 +1,74 @@
+---
+// F03 · Radar de cercanía (SEO local). FO/bocetos/f03-seo-local.html + W-ADV-43.
+// Anillos centrados en el objeto del hero, barrido que gira (14 s), negocios
+// cercanos en puntos y UNO encendido que late (2,8 s), fuera de la caja del texto
+// y del objeto. El núcleo de noche (Fondo) cubre el texto. Solo transform/opacity.
+// Quieto: barrido parado en su ángulo inicial, el encendido sin onda.
+interface Props { estilos?: boolean; eco?: boolean; texto?: 'centro' | 'izquierda' }
+const { estilos = true, eco = false } = Astro.props;
+// Ángulo áureo: reparto regular sin rejilla (determinista).
+const puntos = Array.from({ length: 46 }, (_, i) => {
+  const a = i * 2.399, r = 70 + ((i * 97) % 520);
+  return [Math.round(Math.cos(a) * r), Math.round(Math.sin(a) * r * 0.82)];
+});
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-ra {
+    position: absolute; inset: 0;
+    /* Foco = centro del objeto; "yo" = negocio encendido, en un hueco libre. */
+    --fx: var(--wf-foco-x, 50%); --fy: var(--wf-foco-y, 300px);
+    --yx: var(--wf-marca-x, calc(50% - 470px)); --yy: var(--wf-marca-y, 480px);
+  }
+  .wf--izq .wf-ra {
+    --fx: var(--wf-foco-x, calc(100% - var(--wf-l) - 238px)); --fy: var(--wf-foco-y, 380px);
+    --yx: var(--wf-marca-x, calc(100% - var(--wf-l) - 560px)); --yy: var(--wf-marca-y, 640px);
+  }
+  .wf-ra__disco {
+    position: absolute; left: var(--fx); top: var(--fy); width: 1700px; height: 1700px;
+    margin: -850px 0 0 -850px; border-radius: 50%; overflow: hidden;
+    background: repeating-radial-gradient(circle, transparent 0 79px, rgba(var(--wf-a), .16) 79px 80px);
+    -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent);
+            mask-image: radial-gradient(closest-side, #000 40%, transparent);
+  }
+  .wf-ra__barrido {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(var(--wf-a), .13), transparent 22%);
+    animation: wf-ra-gira 14s linear infinite;
+  }
+  @keyframes wf-ra-gira { to { transform: rotate(360deg); } }
+  .wf-ra__pts { position: absolute; left: var(--fx); top: var(--fy); }
+  .wf-ra__pts i {
+    position: absolute; left: -2px; top: -2px; width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(var(--wf-s), .32);
+  }
+  .wf-ra__yo {
+    position: absolute; z-index: 3; left: var(--yx); top: var(--yy); width: 12px; height: 12px; margin: -6px 0 0 -6px;
+    border-radius: 50%; background: rgb(var(--wf-a)); box-shadow: 0 0 0 6px rgba(var(--wf-a), .18);
+  }
+  .wf-ra__yo::after {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid rgba(var(--wf-a), .7); opacity: 0;
+    animation: wf-ra-late 2.8s cubic-bezier(.2, .6, .35, 1) infinite;
+  }
+  @keyframes wf-ra-late { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(3.6); opacity: 0; } }
+
+  @media (max-width: 767.98px) {
+    .wf-ra, .wf--izq .wf-ra {
+      --fx: var(--wf-foco-x-movil, 50%); --fy: var(--wf-foco-y-movil, 820px);
+      --yx: var(--wf-marca-x-movil, calc(100% - 44px)); --yy: var(--wf-marca-y-movil, 566px);
+    }
+    .wf-ra__disco { width: 1100px; height: 1100px; margin: -550px 0 0 -550px; }
+    .wf-ra__pts { transform: scale(.6); }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-ra">
+  <div class="wf-ra__disco">{!eco && <div class="wf-ra__barrido"></div>}</div>
+  {!eco && (
+    <div class="wf-ra__pts">
+      {puntos.map(([x, y]) => <i style={`transform:translate(${x}px,${y}px)`}></i>)}
+    </div>
+  )}
+  {!eco && <span class="wf-ra__yo"></span>}
+</div>

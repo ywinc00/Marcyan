@@ -9,6 +9,14 @@
 //   escritorio = formulario como botón principal; móvil = Llamar como principal.
 // · Pequeña (templada): diagnóstico, "Pregúntale a Marcy" (evento mrc:ask con texto
 //   FIJO de la página, sin datos del visitante) o portafolio, con enlace con chevron.
+// · Tarjeta "Marcy" (v2, G00): deja de estar vacía. En su tercio inferior, ChatMarcy compacto
+//   (objeto de ejemplo, aria-hidden + resumen sr-only) con la MISMA pregunta fija que envía el
+//   botón y una respuesta que no promete nada; el botón sigue siendo el control real.
+//   `chat`: 'vivo' (bucle) por defecto; 'ligero' en los hubs (id vacío): los hubs ya van
+//   +10,2 KB sobre producción y su viaje admite ±40 px, así que ahí no se pinta ChatMarcy (su
+//   JS, su bucle y +190 px de alto): solo la cabecera de Marcy y su saludo, sin JS,
+//   en el hueco que ya tenía la tarjeta en escritorio, y nada en móvil (allí la tarjeta no
+//   tiene hueco). Hasta que G02 recupere margen (§4.6). 'no' = sin chat.
 // · tel/wa SIEMPRE por props (nunca calculados aquí).
 // El botón principal reproduce la piel de Button variant="primary" (intacta) y el
 // enlace la de variant="link": los dos estados viven en el mismo <a> porque cambian
@@ -16,6 +24,18 @@
 import Button from '../ui/Button.astro';
 import { protegerNombres } from '../../lib/nombres-clientes';
 import { t, type Lang } from '../../i18n/ui';
+import Ejemplo from './Ejemplo.astro';
+// Ojo de peso: Astro adjunta el CSS de ChatMarcy (~1,0 KB comprimido) a TODA página que importe
+// este cierre, lo pinte o no (probado también con import dinámico y con import.meta.glob). Por
+// eso los hubs lo cargan aunque usen la versión ligera.
+// DECISIÓN ESCRITA (G00 ronda 1, pendiente de OK del dueño): se ACEPTA esa suma en los hubs
+// (≈ +1,5 KB comprimidos con la versión ligera) solo HASTA G02. Quitarla de verdad exige tocar
+// archivos fuera de G00: que CityHub importe un cierre propio sin ChatMarcy (o partir este
+// componente en dos y cambiar su import en CityHub). G02 lo hace junto con la recuperación de
+// los +10,2 KB de la v1, y mide los hubs sin esta suma. Alternativa si el dueño no lo acepta:
+// sacar la versión ligera de los hubs (tarjeta vacía como antes) baja la suma a ≈ +1,0 KB, no a 0.
+import ChatMarcy from './objetos/ChatMarcy.astro';
+import { cierreChat } from '../../i18n/w/globales';
 
 interface Warm {
   kind: 'diagnostico' | 'marcy' | 'portafolio';
@@ -41,16 +61,26 @@ interface Props {
   id?: string;
   /** id del titular si no vale el derivado `${id}-title` (hubs: hx-cta-t, el de antes). */
   titleId?: string;
+  /** Chat de ejemplo en la tarjeta "Marcy": vivo (bucle), estático o sin chat. */
+  chat?: 'vivo' | 'ligero' | 'no';
   class?: string;
 }
 const {
   titleHtml, proof, city = 'houston', tel, wa, lang = 'es', warm, grad = false,
-  formLabel, id = 'cierre', titleId: titleIdProp, class: cls,
+  formLabel, id = 'cierre', titleId: titleIdProp, chat: chatProp, class: cls,
 } = Astro.props;
 const ui = t(lang);
 const form = formLabel ?? (lang === 'en' ? 'Get my free proposal' : 'Propuesta gratis');
 const titleId = titleIdProp ?? `${id || 'cierre'}-title`;
 const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
+// Hubs = id vacío (el tramo del viaje no lleva id): chat estático, sin bucle (peso y viaje).
+const chatMode = warm.kind !== 'marcy' ? 'no' : (chatProp ?? (id === '' ? 'ligero' : 'vivo'));
+const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
+const ask = warm.ask ?? warm.title;
+const chatTabs = [
+  { label: warm.cta, script: [{ from: 'c' as const, text: ask }, { from: 'm' as const, text: cc.reply }] },
+  { label: warm.cta, script: [{ from: 'c' as const, text: cc.q2 }, { from: 'm' as const, text: cc.a2 }] },
+];
 ---
 <section class:list={['w-close', cls]} id={id || undefined} aria-labelledby={titleId} data-city={city}>
   <div class="w-close__grid">
@@ -72,11 +102,29 @@ const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
       </div>
     </article>
 
-    <article class="w-close__card w-close__card--warm">
+    <article class:list={['w-close__card w-close__card--warm', chatMode !== 'no' && 'w-close__card--chat', chatMode === 'ligero' && 'w-close__card--ligero']}>
       <div class="w-close__body">
         <h3 class="w-close__wtitle">{warm.title}</h3>
         <p class="w-close__wtext">{warm.text}</p>
       </div>
+      {chatMode === 'vivo' && (
+        <div class="w-close__chat">
+          <ChatMarcy lang={lang} mode="compacto" tabsBar={false} size="mini" tabs={chatTabs} sr={cc.sr(ask)} />
+        </div>
+      )}
+      {chatMode === 'ligero' && (
+        <div class="w-close__chat w-close__chat--ligero">
+          <p class="sr-only">{cc.srHola}</p>
+          <div class="w-close__mini" aria-hidden="true" data-nosnippet>
+            <Ejemplo lang={lang} on="light" />
+            <span class="w-close__mhead">
+              <img src="/assets/bot/marcy-mini.webp" width="28" height="28" alt="" loading="lazy" decoding="async" />
+              <span><b>Marcy</b><span><i></i>{cc.online}</span></span>
+            </span>
+            <span class="w-close__mmsg">{cc.hola}</span>
+          </div>
+        </div>
+      )}
       <div class="w-close__wacts">
         {warm.kind === 'marcy'
           ? <Button variant="link" data-w-ask={warm.ask ?? warm.title} data-track="marcy_ask_clicked">{warm.cta}</Button>
@@ -233,6 +281,38 @@ const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
   }
 
   .w-close__wacts { min-width: 0; }
+
+  /* ── Tarjeta "Marcy" con su chat (v2, G00) ─────────────────────────
+     Texto arriba, el chat en el tercio inferior y el enlace debajo. El hueco
+     entre texto y chat es el que absorbe la diferencia de alto con la grande. */
+  .w-close__card--chat { gap: 20px; }
+  .w-close__chat { margin-top: auto; min-width: 0; }
+  .w-close__chat :global(.wo-chat) { width: 100%; }
+  .w-close__card--chat .w-close__wacts { margin-top: -8px; }
+
+  /* Ligera (hubs): ventana clara de Marcy con su saludo, sin JS. Mismos tonos que ChatMarcy. */
+  .w-close__mini {
+    position: relative; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px;
+    border-radius: var(--w-r-obj, 12px); background: rgba(240, 237, 232, .96); color: var(--w-p-ink, #0e0e0d);
+    box-shadow: 0 0 0 1px var(--w-line), var(--w-edge);
+  }
+  .w-close__mhead { display: flex; align-items: center; gap: 8px; line-height: 1.2; }
+  .w-close__mhead img { width: 28px; height: 28px; border-radius: 50%; background: #e7e3dc; object-fit: cover; }
+  .w-close__mhead > span { display: flex; flex-direction: column; }
+  .w-close__mhead b { font: 600 13px/1.2 var(--font-display); }
+  .w-close__mhead > span > span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #5f5b56; }
+  .w-close__mhead i { width: 6px; height: 6px; border-radius: 50%; background: #2f8f6f; }
+  .w-close__mmsg {
+    align-self: flex-start; max-width: 92%; padding: 7px 12px; border-radius: 12px; border-bottom-left-radius: 4px;
+    background: rgba(79, 195, 161, .14); font: 400 14px/1.45 var(--font-body);
+  }
+  .w-close__mini :global(.w-example) { top: 10px; right: 10px; }
+  /* Móvil de hub: sin chat y la tarjeta exactamente como antes (mismo hueco de 40 px). */
+  @media (--lt-md) {
+    .w-close__chat--ligero { display: none; }
+    .w-close__card--ligero { gap: 40px; }
+    .w-close__card--ligero .w-close__wacts { margin-top: 0; }
+  }
 
   @media (--motion-reduce) {
     .w-close__card, .w-close__act, .w-close__chev { transition: none; }

@@ -6,9 +6,19 @@
 // · `art` (opcional) = SVG en cadena (p. ej. silueta de una ciudad): va a todo el
 //   ancho de la tarjeta, anclado abajo, detrás del texto solo en la franja inferior
 //   sin texto (revisión "¿se entiende?" a 1x antes de integrar, E-53).
+// · v2 (G00, ronda 1): la tarjeta que lleva a un hub de ciudad (href …/houston o …/miami, o
+//   `city` explícito) pinta el DIBUJO DE LA CIUDAD del plan, /assets/cities/{houston,miami}.svg
+//   (el mismo de "Sedes": Houston = torres; Miami = hotel Art Déco con palmeras),
+//   que se reconoce a 1x (E-53). La silueta del pie del hub se descartó: a tamaño de tarjeta Miami
+//   era una franja de cajas negras. Desviación anotada: el plan pedía "a todo el ancho", pero el
+//   dibujo es una imagen de 322×235 / 276×249 px; a 450 px de ancho saldría borroso y más alto
+//   que la tarjeta, así que va a su tamaño natural (190 px de alto), apoyado abajo a la derecha.
+//   <img> diferida con alt vacío (decorativa); `lighten` funde su lavado oscuro con la tarjeta.
+// · v2 (G00): cuando la sección va alineada a la izquierda (servicios, `.ws-left`), la rejilla
+//   ocupa todo el ancho del contenido: ya no queda un hueco a la derecha (FI servicios 05).
 import Icon from '../ui/Icon.astro';
 
-interface Card { title: string; text: string; href: string; cta: string; art?: string; track?: string }
+interface Card { title: string; text: string; href: string; cta: string; art?: string; track?: string; city?: 'houston' | 'miami' }
 interface Wide { icon: string; title: string; text: string; href: string; cta: string; track?: string }
 interface Props {
   titleHtml: string;
@@ -19,20 +29,25 @@ interface Props {
 }
 const { titleHtml, cards, wide, id, class: cls } = Astro.props;
 const titleId = `${id ?? 'perfiles'}-title`;
+// Ciudad de la tarjeta: explícita o la del hub al que enlaza (/es/houston, /en/miami…).
+// Tamaño natural de cada dibujo (el de su PNG interno).
+const CITY_IMG = { houston: { w: 276, h: 249 }, miami: { w: 322, h: 235 } } as const;
+const cityOf = (c: Card) => c.city ?? (c.art ? undefined : (/\/(houston|miami)\/?$/.exec(c.href)?.[1] as Card['city']));
 ---
 <section class:list={['w-prof', cls]} id={id} aria-labelledby={titleId}>
   <h2 class="w-prof__title" id={titleId} set:html={titleHtml} />
   <div class="w-prof__grid">
-    {cards.map((c) => (
-      <a class:list={['w-prof__card', c.art && 'w-prof__card--art']} href={c.href} data-track={c.track}>
+    {cards.map((c) => { const city = cityOf(c); return (
+      <a class:list={['w-prof__card', c.art && 'w-prof__card--art', city && 'w-prof__card--city']} href={c.href} data-track={c.track}>
         <span class="w-prof__body">
           <span class="w-prof__ctitle">{c.title}</span>
           <span class="w-prof__ctext">{c.text}</span>
         </span>
         <span class="w-prof__link">{c.cta}<span class="w-prof__chev" aria-hidden="true">›</span></span>
         {c.art && <span class="w-prof__art" aria-hidden="true" set:html={c.art} />}
+        {city && <span class:list={['w-prof__city', `w-prof__city--${city}`]} aria-hidden="true"><img src={`/assets/cities/${city}.svg`} alt="" width={CITY_IMG[city].w} height={CITY_IMG[city].h} loading="lazy" decoding="async" /></span>}
       </a>
-    ))}
+    ); })}
     {wide && (
       <a class="w-prof__card w-prof__card--wide" href={wide.href} data-track={wide.track}>
         <span class="w-prof__wico" aria-hidden="true"><Icon name={wide.icon} /></span>
@@ -108,11 +123,37 @@ const titleId = `${id ?? 'perfiles'}-title`;
   .w-prof__wico :global(svg) { width: 18px; height: 18px; stroke-width: 1.75; }
 
   /* Arte de silueta: a todo el ancho, anclado abajo; el texto va arriba. */
-  .w-prof__card--art { padding-bottom: 104px; }
+  /* El arte mide 450×104: el hueco de abajo crece con el ancho de la tarjeta (el % de un padding
+     es del ancho), para que en servicios, ya a todo el ancho, no suba sobre el enlace. */
+  .w-prof__card--art { padding-bottom: max(104px, calc(23.2% + 8px)); }
   .w-prof__art {
     position: absolute; inset: auto 0 0 0; z-index: -1; pointer-events: none; color: rgba(var(--w-accent-rgb), 0.35);
   }
   .w-prof__art :global(svg) { display: block; width: 100%; height: auto; }
+
+  /* Sin hueco a la derecha cuando la sección va a la izquierda (servicios). */
+  :global(.ws-left) .w-prof__grid { max-width: none; }
+
+  /* Dibujo de la ciudad (v2, G00 ronda 1): debajo del enlace, apoyado en el borde de abajo y a la
+     derecha, a su tamaño natural. Una luz oro baja por detrás, como el pie del hub. */
+  .w-prof__card--city { gap: 16px; justify-content: flex-start; }
+  .w-prof__city {
+    position: relative; display: flex; justify-content: flex-end; align-items: flex-end;
+    margin: auto -24px -24px; pointer-events: none;
+  }
+  @media (--md) { .w-prof__city { margin: auto -28px -28px; } }
+  .w-prof__city::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 60% 90% at 72% 100%, rgba(212, 158, 90, .1), transparent 70%);
+  }
+  /* Un punto más de brillo para que el trazo oro se lea a 1x sobre la tarjeta. Miami: el PNG trae
+     en su borde izquierdo un resto de letra cortada; se recorta ese 3 %. */
+  .w-prof__city img {
+    display: block; height: 160px; width: auto; max-width: 100%; mix-blend-mode: lighten;
+    filter: brightness(1.45);
+  }
+  .w-prof__city--miami img { clip-path: inset(0 0 0 3%); }
+  @media (--md) { .w-prof__city img { height: 190px; } }
 
   @media (--motion-reduce) {
     .w-prof__card, .w-prof__link, .w-prof__chev { transition: none; }

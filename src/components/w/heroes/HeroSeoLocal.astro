@@ -10,7 +10,7 @@
 // tarjeta entera debajo (W-CORE-41), sin haces.
 import HeroTexto from '../HeroTexto.astro';
 import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
-import FichaMapaEjemplo from '../objetos/FichaMapaEjemplo.astro';
+import FichaMapa from '../objetos/barrios/FichaMapa.astro';
 import IconoObjeto from '../IconoObjeto.astro';
 
 interface Cta { label: string; href: string; track?: string }
@@ -47,7 +47,7 @@ const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = A
     <div class="hs__obj">
       <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example={false}>
         <IconoObjeto id="seo-local" size={56} slot="icon" />
-        <FichaMapaEjemplo lang={lang} city={cityName} size="hero" />
+        <FichaMapa marca="restaurante" lang={lang} city={cityName} size="hero" />
       </TarjetaObjeto>
     </div>
   </div>
@@ -89,9 +89,9 @@ const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = A
     background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), .30), rgba(var(--accent-gold-rgb), .05) 70%);
     border-color: rgba(var(--accent-gold-rgb), .62);
   }
-  /* "Llamar" de la ficha de EJEMPLO: oro rebajado hacia crema para que no compita con el
-     botón principal del hero (un solo dorado pleno en la primera pantalla). */
-  .hs__obj :global(.wo-map__act--main) { background: color-mix(in srgb, var(--accent-gold) 42%, #f6f3ee); }
+  /* v2 (G05): la ficha es la de la marca restaurante (§1.6): su "Llamar" va en el ladrillo
+     de la marca, no en oro, así que el único dorado pleno de la pantalla es el botón del hero. */
+  .hs__obj :global(.wo-to__body) { padding-inline: 32px; }
   @media (--lg) {
     /* W-CORE-16: texto a la izquierda en su columna y la tarjeta de 476 a la derecha.
        La columna de texto se ensancha (560 → 620) para que el H1 entre en una línea. */
@@ -103,6 +103,12 @@ const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = A
     .hs { padding-bottom: 64px; }
     .hs__horizon { height: 140px; }
     .hs__grid { gap: 48px; }
-    .hs__obj { padding-left: 25px; }
+    /* rev2 G05: la ficha se estrujaba (a 320 px le quedaban 146 px útiles). El sangrado de la
+       capa desplazada lo da ya la tarjeta en móvil (16 px): sin el relleno doble de 25 + 25 y
+       con menos margen interior, la ficha gana ~80 px. Banda del icono más baja. */
+    .hs__obj { padding: 16px 0 0; }
+    .hs__obj :global(.wo-to) { width: calc(100% - 16px); margin-left: 16px; }
+    .hs__obj :global(.wo-to__band) { height: 76px; }
+    .hs__obj :global(.wo-to__body) { padding: 4px 14px 18px; }
   }
 </style>

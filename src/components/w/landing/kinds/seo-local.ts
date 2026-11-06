@@ -51,6 +51,10 @@ const LEAD_PROJECT: Record<SeoCity, string> = {
 const spec: KindSpec = {
   kind: 'seo-local',
   tone: 'gold',
+  // v2 (G05, §1.3/P12): fondo temático F03 (radar de cercanía) en el hero; texto a la izquierda,
+  // foco del radar en la ficha del hero. Sin eco: el capítulo de contraste ya es una matriz.
+  fondo: 'F03',
+  fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroSeoLocal,
   hero: (ctx) => {
     const t = copyOf(ctx);

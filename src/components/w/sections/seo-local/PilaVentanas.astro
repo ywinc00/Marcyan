@@ -3,12 +3,13 @@
 // Izquierda: H2 de sección + bajada + lista de comprobación (como W-CORE-27, sin botones:
 // la acción dominante de la página es otra). Derecha: tres ventanas de navegador CLARAS
 // (objetos de producto, §2.4) apiladas en escalera, cada una con el nombre del mapa EN
-// TEXTO (sin logotipos de terceros, §1.C) y sus pasos numerados; la de delante (Google)
+// cabecera (v2 G05, §1.4: Google Maps en monocromo sobre baldosa, Apple Maps y Bing en palabra) y sus pasos numerados; la de delante (Google)
 // abajo a la derecha y entera; las de detrás, más arriba, enseñan entera su cabecera.
 // Son los pasos reales del trabajo, no datos inventados: sin etiqueta "Ejemplo".
 // Estático (la firma de la página es el radar). Móvil: la pila cabe en 358 px con las
 // ventanas más estrechas y desplazadas menos.
 import Icon from '../../../ui/Icon.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
 import type { SeoCopy } from '../../../../i18n/w/seo-local';
 
 interface Props { copy: SeoCopy['ventanas']; id?: string; class?: string }
@@ -28,9 +29,16 @@ const titleId = `${id ?? 'sl-pila'}-title`;
   <div class="sl-pila__stack" role="list" aria-label={copy.title}>
     {copy.windows.map((w, i) => (
       <article class={`sl-win sl-win--${i + 1}`} role="listitem">
-        <div class="sl-win__bar" aria-hidden="true"><i></i><i></i><i></i><span class="sl-win__side"></span></div>
+        <div class="sl-win__bar" aria-hidden="true"><i></i><i></i><i></i><span class="sl-win__side"></span><span class="sl-win__nav"><Icon name="lucide:chevron-left" /><Icon name="lucide:chevron-right" /></span></div>
         <div class="sl-win__body">
-          <h3 class="sl-win__t">{w.title}<span class="sl-win__sub">{w.sub}</span></h3>
+          <h3 class="sl-win__t">
+            {w.logo === 'googlemaps' ? (
+              <span class="sl-win__brand"><LogoMarca id="googlemaps" size={30} tono="color" baldosa titulo="" />{w.title}</span>
+            ) : w.logo ? (
+              <span class="sl-win__brand"><span class="sr-only">{w.title}</span><LogoMarca id={w.logo} size={26} tono="color" titulo="" />{w.resto && <span class="sl-win__resto" aria-hidden="true">{w.resto}</span>}</span>
+            ) : w.title}
+            <span class="sl-win__sub">{w.sub}</span>
+          </h3>
           <p class="sl-win__lab">{copy.stepsLabel}</p>
           <ol class="sl-win__steps">
             {w.steps.map((s, j) => (
@@ -78,7 +86,18 @@ const titleId = `${id ?? 'sl-pila'}-title`;
     display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px;
     background: #f1eee8; border-bottom: 1px solid rgba(14,14,13,.07);
   }
-  .sl-win__bar i { width: 9px; height: 9px; border-radius: 50%; background: #d8d3ca; }
+  /* Semáforo pastel como el original (contenido de una interfaz dibujada, no gramática: §0.2 E-15). */
+  .sl-win__bar i { width: 9px; height: 9px; border-radius: 50%; background: #EE9A93; }
+  .sl-win__bar i:nth-child(2) { background: #F0CB86; }
+  .sl-win__bar i:nth-child(3) { background: #9DCB97; }
+  .sl-win__nav { margin-left: 10px; display: inline-flex; gap: 2px; color: #b9b3a8; }
+  .sl-win__nav :global(svg) { width: 14px; height: 14px; }
+  .sl-win__nav :global(svg + svg) { opacity: .55; }
+  .sl-win__brand { display: inline-flex; align-items: center; gap: 10px; min-height: 30px; }
+  .sl-win__brand :global(.lm--word) { color: #1D1D1F; }
+  /* Baldosa blanca sobre la ventana crema: borde y sombra mínimos para que se lea como icono. */
+  .sl-win__brand :global(.lm--tile) { box-shadow: inset 0 0 0 1px rgba(14,14,13,.14), 0 1px 2px rgba(14,14,13,.10); }
+  .sl-win__resto { margin-left: -4px; font-size: 22px; font-weight: 400; letter-spacing: -.02em; color: #4a4743; }
   .sl-win__side { margin-left: 12px; width: 16px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px #cfc9bf; }
   .sl-win__body { padding: 20px 20px 24px; }
   .sl-win__t {

@@ -54,16 +54,16 @@ const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astr
   }
   .hb > * { position: relative; z-index: 1; }
   /* El chip se corta en una línea de suelo (la de la celda que sigue), no en un borde suelto (E-36). */
-  .hb__chip { margin-top: 40px; padding-bottom: 8px; border-bottom: 1px solid var(--w-line-strong); }
-  /* El objeto mide lo que su lienzo (600): la etiqueta "Ejemplo" y el botón de pausa quedan
-     junto al chip y no sueltos en el borde de la pantalla. */
-  .hb__obj { max-width: 680px; margin-inline: auto; }
-  /* Vías con más grosor y contraste (revisión 1, I4: tres trazos grises finos se quedaban
-     flojos frente a la red luminosa de W-CONV-30). Oro como las pistas vivas de la placa, y el
-     nombre a tinta 80. PROVISIONAL hasta [SISTEMA] ChipBarrio (mismo valor en el componente):
-     el generador ya deja ≥ 8 px entre nombre y trazo contando estos 2,5 px. */
-  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__st) { stroke: rgba(var(--accent-gold-rgb), .58); stroke-width: 2.5; }
-  .hb .hb__obj :global(.wo-hood:not([data-abstract]) .wo-hood__name) { fill: var(--w-ink-80); }
+  .hb__chip { margin-top: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--w-line-strong); }
+  /* El objeto mide lo que su lienzo (v2 G05: 900 a ×1,5; 600 en móvil): la etiqueta "Ejemplo"
+     y el botón de pausa quedan junto al chip y no sueltos en el borde de la pantalla. Grosor y
+     tinta de las vías viven ya en ChipBarrio (se retira el apaño provisional de la v1). */
+  .hb__obj { max-width: 960px; margin-inline: auto; }
+  /* rev1 y rev2 G05: los destellos de tráfico del fondo F08 corrían por calles de la trama al
+     6 % de tinta, así que se leían como un trazo oro suelto junto al chip, compitiendo con las
+     estelas de las vías reales. Una firma por página (§2.10): en el hero de barrio el
+     movimiento lo llevan el chip y sus vías; la trama del fondo queda quieta. */
+  :global(.wf-ca__t) { display: none; }
   @media (--lt-md) {
     .hb__chip { margin-top: 32px; }
   }

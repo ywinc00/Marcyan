@@ -84,9 +84,9 @@ const tracks = abstract ? board.filter((t) => t.hot).map((t) => ({ d: t.d })) : 
 // Tres estelas por vía, repartidas en los 4 s del ciclo (y desfasadas entre vías).
 const streaks = tracks.flatMap((t, i) => [0, 4 / 3, 8 / 3].map((o) => ({ d: t.d, delay: -(+((i * 0.67 + o) % 4).toFixed(2)) })));
 const T = en
-  ? { name: 'House in ' + name, num: '214', data: '3 bd · 2 ba', area: '1,850 sq ft', call: 'Call', msg: 'Is it still available?', ago: 'now',
+  ? { name: 'House in ' + name, num: '214', nump: 'No.', data: '3 bd · 2 ba', area: '1,850 sq ft', call: 'Call', msg: 'Is it still available?', ago: 'now',
       sr: `Example: people in ${name} find a real estate office on the map and message it about a house.` }
-  : { name: 'Casa en ' + name, num: '214', data: '3 hab · 2 baños', area: '1,850 pies²', call: 'Llamar', msg: '¿Sigue disponible?', ago: 'ahora',
+  : { name: 'Casa en ' + name, num: '214', nump: 'N.º', data: '3 hab · 2 baños', area: '1,850 pies²', call: 'Llamar', msg: '¿Sigue disponible?', ago: 'ahora',
       sr: `Ejemplo: clientes de ${name} encuentran una inmobiliaria en el mapa y le escriben por una casa.` };
 const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
 ---
@@ -117,7 +117,7 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
       <span class="wo-hood__glow"></span>
       <div class="wo-hood__chip">
         <span class="wo-hood__logo"><LogoEjemplo marca="inmobiliaria" size={11} lang={lang} tono="mono" signo={false} class="wo-hood__logo-d" /><LogoEjemplo marca="inmobiliaria" size={8.5} lang={lang} tono="mono" signo={false} class="wo-hood__logo-m" /></span>
-        <span class="wo-hood__num">{T.num}</span>
+        <span class="wo-hood__num"><small>{T.nump}</small>{T.num}</span>
         <span class="wo-hood__where"><span>{T.name}</span><span class="wo-hood__area">{T.area}</span></span>
         <span class="wo-hood__data">{T.data}</span>
         <span class="wo-hood__row">
@@ -150,13 +150,15 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
   /* Lienzo de vías reales: coordenadas 600×300 pintadas a ×1,5 (escritorio) o ×1 (móvil). */
   .wo-hood { --sw: 900px; --sh: 450px; --chip: 220px; position: relative; width: 100%; overflow: hidden; font-family: var(--font-body); }
   .wo-hood[data-abstract] { --sw: 1000px; --sh: 400px; --chip: 220px; }
+  /* r1 G05: a la izquierda las vías reales (US 90 e I-10 en Katy) se juntan cerca del borde y
+     acababan en punta; el fundido de ese lado es más largo y suave (ningún nombre baja del 21 %). */
   .wo-hood__stage {
     position: relative; left: 50%; translate: -50% 0; width: var(--sw); height: var(--sh);
     -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%),
-      linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+      linear-gradient(90deg, transparent 0, transparent 5%, rgba(0,0,0,.35) 12%, #000 21%, #000 86%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%),
-      linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+      linear-gradient(90deg, transparent 0, transparent 5%, rgba(0,0,0,.35) 12%, #000 21%, #000 86%, transparent 100%);
     mask-composite: intersect;
   }
   /* La placa: trama de puntos y una luz oro baja centrada en el chip (sin texto encima). */
@@ -235,6 +237,8 @@ const vb = abstract ? `0 0 ${W} ${H}` : '0 0 600 300';
     margin-top: 12px; font: 300 58px/0.9 var(--font-display); letter-spacing: -0.045em; color: #F4F2EE;
     font-variant-numeric: tabular-nums;
   }
+  /* r1 G05: "214" solo podía leerse como una cifra; con "N.º" es el número de la casa. */
+  .wo-hood__num small { margin-right: 6px; font: 500 11px/1 var(--font-mono); letter-spacing: .04em; color: #A6A39E; vertical-align: 0.35em; }
   .wo-hood__where { margin-top: 8px; width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; line-height: 1.2; color: #A6A39E; }
   .wo-hood__area { font: 500 11px/1.2 var(--font-mono); color: #C9C6C0; white-space: nowrap; }
   .wo-hood__data { margin-top: 5px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .02em; color: #C9C6C0; white-space: nowrap; }

@@ -37,29 +37,29 @@ const pal = n.paleta;
 
 // Horario de ejemplo (12 h, §1.6), agrupado como en las fichas reales ("Lun a jue"), para que
 // quepa entero en el hueco de servicios y acciones (r1: 7 filas se cortaban). `dias`: lunes = 0.
-type Grupo = { d: string; dias: number[]; h: string | null; cierra?: string; abre?: string };
+type Grupo = { d: string; dias: number[]; h: string | null; cierra?: string; abre?: string; a?: number; c?: number };
 const GRUPOS: Record<MarcaFicha, Grupo[]> = en
   ? {
       restaurante: [
-        { d: 'Mon to Thu', dias: [0, 1, 2, 3], h: '11 AM to 10 PM', cierra: '10 PM', abre: '11 AM' },
-        { d: 'Fri and Sat', dias: [4, 5], h: '11 AM to 11 PM', cierra: '11 PM', abre: '11 AM' },
-        { d: 'Sunday', dias: [6], h: '11 AM to 9 PM', cierra: '9 PM', abre: '11 AM' },
+        { d: 'Mon to Thu', dias: [0, 1, 2, 3], h: '11 AM to 10 PM', cierra: '10 PM', abre: '11 AM', a: 11, c: 22 },
+        { d: 'Fri and Sat', dias: [4, 5], h: '11 AM to 11 PM', cierra: '11 PM', abre: '11 AM', a: 11, c: 23 },
+        { d: 'Sunday', dias: [6], h: '11 AM to 9 PM', cierra: '9 PM', abre: '11 AM', a: 11, c: 21 },
       ],
       inmobiliaria: [
-        { d: 'Mon to Fri', dias: [0, 1, 2, 3, 4], h: '9 AM to 6 PM', cierra: '6 PM', abre: '9 AM' },
-        { d: 'Saturday', dias: [5], h: '10 AM to 2 PM', cierra: '2 PM', abre: '10 AM' },
+        { d: 'Mon to Fri', dias: [0, 1, 2, 3, 4], h: '9 AM to 6 PM', cierra: '6 PM', abre: '9 AM', a: 9, c: 18 },
+        { d: 'Saturday', dias: [5], h: '10 AM to 2 PM', cierra: '2 PM', abre: '10 AM', a: 10, c: 14 },
         { d: 'Sunday', dias: [6], h: null },
       ],
     }
   : {
       restaurante: [
-        { d: 'Lun a jue', dias: [0, 1, 2, 3], h: '11 a. m. a 10 p. m.', cierra: '10 p. m.', abre: '11 a. m.' },
-        { d: 'Vie y sáb', dias: [4, 5], h: '11 a. m. a 11 p. m.', cierra: '11 p. m.', abre: '11 a. m.' },
-        { d: 'Domingo', dias: [6], h: '11 a. m. a 9 p. m.', cierra: '9 p. m.', abre: '11 a. m.' },
+        { d: 'Lun a jue', dias: [0, 1, 2, 3], h: '11 a. m. a 10 p. m.', cierra: '10 p. m.', abre: '11 a. m.', a: 11, c: 22 },
+        { d: 'Vie y sáb', dias: [4, 5], h: '11 a. m. a 11 p. m.', cierra: '11 p. m.', abre: '11 a. m.', a: 11, c: 23 },
+        { d: 'Domingo', dias: [6], h: '11 a. m. a 9 p. m.', cierra: '9 p. m.', abre: '11 a. m.', a: 11, c: 21 },
       ],
       inmobiliaria: [
-        { d: 'Lun a vie', dias: [0, 1, 2, 3, 4], h: '9 a. m. a 6 p. m.', cierra: '6 p. m.', abre: '9 a. m.' },
-        { d: 'Sábado', dias: [5], h: '10 a. m. a 2 p. m.', cierra: '2 p. m.', abre: '10 a. m.' },
+        { d: 'Lun a vie', dias: [0, 1, 2, 3, 4], h: '9 a. m. a 6 p. m.', cierra: '6 p. m.', abre: '9 a. m.', a: 9, c: 18 },
+        { d: 'Sábado', dias: [5], h: '10 a. m. a 2 p. m.', cierra: '2 p. m.', abre: '10 a. m.', a: 10, c: 14 },
         { d: 'Domingo', dias: [6], h: null },
       ],
     };
@@ -69,7 +69,8 @@ const gHoy = grupos.findIndex((g) => g.dias.includes(HOY));
 const T = en
   ? {
       cat: marca === 'restaurante' ? `Home cooking · ${city}` : `Real estate · ${city}`,
-      open: 'Open', closed: 'Closed', closes: 'closes', opens: 'opens', tomorrow: 'tomorrow',
+      open: 'Open', closed: 'Closed', closes: 'closes', opens: 'opens', tomorrow: 'tomorrow', on: '',
+      days: 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
       hours: 'Hours', today: 'Today',
       svcL: 'Services',
       svc: marca === 'restaurante' ? 'dine in · takeout · catering' : 'buy · sell · rent',
@@ -80,7 +81,8 @@ const T = en
     }
   : {
       cat: marca === 'restaurante' ? `Cocina casera · ${city}` : `Inmobiliaria · ${city}`,
-      open: 'Abierto', closed: 'Cerrado', closes: 'cierra', opens: 'abre', tomorrow: 'mañana',
+      open: 'Abierto', closed: 'Cerrado', closes: 'cierra', opens: 'abre', tomorrow: 'mañana', on: 'el',
+      days: 'lunes,martes,miércoles,jueves,viernes,sábado,domingo',
       hours: 'Horario', today: 'Hoy',
       svcL: 'Servicios',
       svc: marca === 'restaurante' ? 'comer aquí · para llevar · encargos' : 'compra · venta · renta',
@@ -95,7 +97,7 @@ const style = `--fm-acc:${pal.accent === '#F7D9A0' ? pal.bg : pal.accent};--fm-o
 const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 50';
 ---
 <div class:list={['fm', `fm--${size}`, cls]} data-w2-ficha data-marca={marca} style={style}
-  data-closes={T.closes} data-opens={T.opens} data-tomorrow={T.tomorrow} data-open={T.open} data-closed={T.closed}>
+  data-closes={T.closes} data-opens={T.opens} data-tomorrow={T.tomorrow} data-open={T.open} data-closed={T.closed} data-on={T.on} data-days={T.days}>
   <p class="sr-only">{T.sr}</p>
   <div class="fm__obj" aria-hidden="true" data-nosnippet>
     <div class="fm__map">
@@ -187,7 +189,7 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
           </div>
           <ul class="fm__hours">
             {grupos.map((d, i) => (
-              <li class:list={[i === gHoy && 'is-today']} data-dias={d.dias.join(',')} data-h={d.h ?? ''} data-cierra={d.cierra ?? ''} data-abre={d.abre ?? ''}>
+              <li class:list={[i === gHoy && 'is-today']} data-dias={d.dias.join(',')} data-h={d.h ?? ''} data-cierra={d.cierra ?? ''} data-abre={d.abre ?? ''} data-a={d.a ?? ''} data-c={d.c ?? ''}>
                 <span>{d.d}{i === gHoy && <em> · {T.today}</em>}</span><span>{d.h ?? T.closed}</span>
               </li>
             ))}
@@ -203,8 +205,12 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
   // (html[data-w-pausa]) y la pestaña oculta. Sin rAF continuo.
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
   document.querySelectorAll<HTMLElement>('[data-w2-ficha]').forEach((el) => {
-    // Día real del visitante (lunes = 0): HOY en negrita y "cierra …" coherente.
-    const wd = (new Date().getDay() + 6) % 7;
+    // Día y HORA reales del visitante (lunes = 0): HOY en negrita y el estado según la hora:
+    // abierto entre la apertura y el cierre; antes de abrir, "abre 11 a. m."; después, el
+    // siguiente día con horario ("mañana" o su nombre). r1 G05: a la 1 a. m. decía "Abierto".
+    const now = new Date();
+    const wd = (now.getDay() + 6) % 7;
+    const hr = now.getHours() + now.getMinutes() / 60;
     const rows = [...el.querySelectorAll<HTMLElement>('.fm__hours li')];
     const of = (d: number) => rows.find((r) => (r.dataset.dias ?? '').split(',').includes(String(d)));
     const row = of(wd);
@@ -213,12 +219,25 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
       rows.forEach((r) => r.classList.remove('is-today'));
       row.classList.add('is-today');
       if (em) row.firstElementChild?.appendChild(em);
-      const open = !!row.dataset.h;
+      const a = row.dataset.a ? +row.dataset.a : NaN;
+      const c = row.dataset.c ? +row.dataset.c : NaN;
+      const open = !!row.dataset.h && hr >= a && hr < c;
       el.querySelector('.fm__open')!.textContent = open ? el.dataset.open! : el.dataset.closed!;
-      const next = of((wd + 1) % 7);
-      el.querySelector('.fm__when')!.textContent = open
-        ? `${el.dataset.closes} ${row.dataset.cierra}`
-        : `${el.dataset.opens} ${el.dataset.tomorrow} ${next?.dataset.abre ?? ''}`;
+      let when = `${el.dataset.closes} ${row.dataset.cierra}`;
+      if (!open) {
+        if (row.dataset.h && hr < a) when = `${el.dataset.opens} ${row.dataset.abre}`;
+        else {
+          const days = (el.dataset.days ?? '').split(',');
+          for (let k = 1; k <= 7; k++) {
+            const r = of((wd + k) % 7);
+            if (!r?.dataset.h) continue;
+            const dia = k === 1 ? el.dataset.tomorrow : `${el.dataset.on ? el.dataset.on + ' ' : ''}${days[(wd + k) % 7]}`;
+            when = `${el.dataset.opens} ${dia} ${r.dataset.abre}`;
+            break;
+          }
+        }
+      }
+      el.querySelector('.fm__when')!.textContent = when;
       el.classList.toggle('is-closed', !open);
     }
 

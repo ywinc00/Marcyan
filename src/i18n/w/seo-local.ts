@@ -45,7 +45,7 @@ export interface SeoCopy {
 const COLUMNS = ['SEO local', 'Diseño web', 'IA conversacional', 'Tienda en línea'];
 
 const datos: SeoCopy['revisamos']['datos'] = {
-  title: 'Tu Restaurante: nombre, dirección y teléfono',
+  title: 'Tu restaurante: nombre, dirección y teléfono',
   rows: [
     { k: 'Tu web', v: 'Igual', ok: true },
     { k: 'Ficha de mapa', v: 'Igual', ok: true },
@@ -59,7 +59,7 @@ const ficha = (zonas: string): SeoCopy['revisamos']['ficha'] => ({
   rows: [
     { k: 'Categoría principal', v: 'Restaurante', ok: true },
     { k: 'Zonas que atiendes', v: zonas, ok: true },
-    { k: 'Horario', v: 'Todos los días, de 11 a. m.', ok: true },
+    { k: 'Horario', v: 'Completo, los 7 días', ok: true },
     { k: 'Fotos', v: 'Platos y local reales', ok: true },
     { k: 'Reseñas', v: 'Sin contestar', ok: false },
   ],

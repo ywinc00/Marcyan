@@ -1,12 +1,16 @@
 ---
-// Logotipo de una marca de EJEMPLO (design/rediseno-workos-v2.md §1.6, P02a).
+// Logotipo de una marca de EJEMPLO (design/rediseno-workos-v2.md §1.6 y §1.8, P02a).
 // La palabra va CONTORNEADA a trazados (una fuente OFL distinta por marca, ver LICENCIAS.md):
 // no carga fuentes, no depende de Georgia y no cambia aunque la web de ejemplo cambie de idioma
-// (la marca sale del idioma de la PÁGINA, E-24). Trazados en línea, SIN ids (cero choques de id
-// aunque haya 3 webs en la misma vista; ~2-9 KB por logotipo).
+// (la marca sale del idioma de la PÁGINA, E-24).
 // Props: marca · size = alto de la mayúscula en px · tono 'marca' (palabra en tinta, signo en
 // acento: lee --ej-ink/--ej-accent, o currentColor fuera de una web) | 'mono' (todo currentColor)
-// · signo (por defecto true; solo plomería lo tiene en P02a) · lang.
+// · signo (por defecto true; solo plomería lo tiene en P02a) · lang
+// · modo: 'linea' (por defecto: trazados en línea, sin ids; para usos sueltos) | 'simbolo' (emite los
+//   <symbol> ej-s-logo-<marca>-<lang> y ej-s-signo para el sprite de la página) | 'uso' (pinta
+//   <use href="#…"> contra ese sprite: lo que hace WebEjemplo en cada instancia, §1.8).
+//   Los colores del symbol van por variables (style en línea) para que se resuelvan en el <use>, y el
+//   symbol lleva overflow visible: las tildes (Í) sobresalen de la línea de mayúsculas.
 import type { NegocioId } from './negocios';
 
 interface Props {
@@ -15,9 +19,12 @@ interface Props {
   tono?: 'marca' | 'mono';
   signo?: boolean;
   lang?: 'es' | 'en';
+  modo?: 'linea' | 'simbolo' | 'uso';
+  /** Solo con modo 'simbolo': emitir solo la palabra o solo el signo. */
+  solo?: 'palabra' | 'signo';
   class?: string;
 }
-const { marca, size = 16, tono = 'marca', signo = true, lang = 'es', class: cls } = Astro.props;
+const { marca, size = 16, tono = 'marca', signo = true, lang = 'es', modo = 'linea', solo, class: cls } = Astro.props;
 
 // Trazados generados con tools/logos.mjs (opentype.js 1.3.4, MIT) desde @fontsource 5.2.5 (OFL-1.1),
 // a 100 unidades de cuerpo, origen en la línea de mayúsculas. No editar a mano: regenerar.
@@ -34,22 +41,41 @@ const alto = +(size * h / t.cap).toFixed(2);
 const ancho = +(alto * w / h).toFixed(2);
 const conSigno = signo && marca === 'plomeria';
 const s = +(size * 1.75).toFixed(2);
+const idPal = `ej-s-logo-${marca}-${lang}`;
+// Signo de plomería (ronda 1): anillo más fino (6 de 20) con brida a la salida y la gota separada,
+// para que a tamaño de nav se lea como un codo de tubería y no como una mancha.
+const CODO = 'M3 3A20 20 0 0 1 23 23H17A14 14 0 0 0 3 9Z';
+const BRIDA = 'M15.6 23.4H24.4V25H15.6Z';
+const GOTA = 'M20 26.4C20 26.4 22.4 29 22.4 30.2A2.4 2.4 0 0 1 17.6 30.2C17.6 29 20 26.4 20 26.4Z';
+const fGota = 'fill:var(--ej-logo-gota,var(--ej-accent,currentColor))';
 ---
-<span class:list={['ej-logo', `ej-logo--${tono}`, cls]} style={`--ej-logo-cap:${size}px`} aria-hidden="true">
-  {conSigno && (
-    <svg class="ej-logo__signo" width={+(s * 22 / 30).toFixed(2)} height={s} viewBox="2 2 22 30" fill="none" focusable="false">
-      <path class="ej-logo__codo" d="M3 3A20 20 0 0 1 23 23H14A11 11 0 0 0 3 12Z" />
-      <path class="ej-logo__gota" d="M18.5 25.4C18.5 25.4 21.2 28.3 21.2 29.7A2.7 2.7 0 0 1 15.8 29.7C15.8 28.3 18.5 25.4 18.5 25.4Z" />
-    </svg>
-  )}
-  <svg class="ej-logo__palabra" width={ancho} height={alto} viewBox={`0 0 ${w} ${h}`} focusable="false"><path d={d} fill="currentColor" /></svg>
-</span>
+{modo === 'simbolo' ? (
+  <>
+    {solo !== 'signo' && <symbol id={idPal} viewBox={`0 0 ${w} ${h}`} overflow="visible"><path d={d} fill="currentColor" /></symbol>}
+    {(solo === 'signo' || (solo !== 'palabra' && conSigno)) && (
+      <symbol id="ej-s-signo" viewBox="2 2 23 31" overflow="visible"><path d={CODO + BRIDA} fill="currentColor" /><path d={GOTA} style={fGota} /></symbol>
+    )}
+  </>
+) : (
+  <span class:list={['ej-logo', `ej-logo--${tono}`, cls]} style={`--ej-logo-cap:${size}px`} aria-hidden="true">
+    {conSigno && (modo === 'uso' ? (
+      <svg class="ej-logo__signo" width={+(s * 23 / 31).toFixed(2)} height={s} focusable="false"><use href="#ej-s-signo" /></svg>
+    ) : (
+      <svg class="ej-logo__signo" width={+(s * 23 / 31).toFixed(2)} height={s} viewBox="2 2 23 31" fill="none" focusable="false">
+        <path d={CODO + BRIDA} fill="currentColor" /><path d={GOTA} style={fGota} />
+      </svg>
+    ))}
+    {modo === 'uso' ? (
+      <svg class="ej-logo__palabra" width={ancho} height={alto} focusable="false"><use href={`#${idPal}`} /></svg>
+    ) : (
+      <svg class="ej-logo__palabra" width={ancho} height={alto} viewBox={`0 0 ${w} ${h}`} focusable="false"><path d={d} fill="currentColor" /></svg>
+    )}
+  </span>
+)}
 
 <style>
-  .ej-logo { display: inline-flex; align-items: center; gap: calc(var(--ej-logo-cap) * .55); color: var(--ej-ink, currentColor); line-height: 0; flex: none; }
+  .ej-logo { display: inline-flex; align-items: center; gap: calc(var(--ej-logo-cap) * .5); color: var(--ej-ink, currentColor); line-height: 0; flex: none; }
   .ej-logo svg { display: block; overflow: visible; flex: none; }
   .ej-logo__signo { margin-block: calc(var(--ej-logo-cap) * -.3); }
-  .ej-logo__codo { fill: currentColor; }
-  .ej-logo__gota { fill: var(--ej-accent, currentColor); }
-  .ej-logo--mono .ej-logo__gota { fill: currentColor; }
+  .ej-logo--mono { --ej-logo-gota: currentColor; }
 </style>

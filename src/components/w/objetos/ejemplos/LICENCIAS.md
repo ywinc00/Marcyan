@@ -27,6 +27,8 @@ no restringe el uso de los contornos en logotipos ni exige reproducir la licenci
 
 `Ilustracion.astro` y el signo del logotipo de plomería (codo de tubería y gota) son geometría dibujada
 por nosotros (arcos y rectas); sin licencia de terceros.
+En una web de ejemplo se pintan como `<use>` contra un sprite `<symbol>` por página (§1.8); los trazados
+son los mismos. Ronda 1: el signo pequeño pasa a anillo fino con brida para leerse a tamaño de nav.
 
 ## Fotos
 

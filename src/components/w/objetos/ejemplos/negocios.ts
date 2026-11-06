@@ -50,7 +50,8 @@ export interface Negocio {
   paleta: Paleta;
   paletaNoche: Paleta;
   alternativas: [Alternativa, Alternativa, Alternativa];
-  /** Clave de los trazados del logotipo en LogoEjemplo.astro (palabra contorneada + signo). */
+  /** Clave de los trazados del logotipo en LogoEjemplo.astro (palabra contorneada + signo). En una web
+   *  de ejemplo se pinta como <use> del symbol `ej-s-logo-<logo>-<lang>` del sprite de la página. */
   logo: NegocioId;
   /** Id de Ilustracion.astro (signo grande del hero), si la marca lo lleva. */
   ilustracion?: string;
@@ -141,7 +142,7 @@ export const negocios: Record<NegocioId, Negocio> = {
         accionTel: true,
         abierto: 'Open · closes 6 PM',
         nav: ['Services', 'Emergencies', 'Contact'],
-        garantias: ['Upfront quote before we start', 'Emergencies', 'Spanish and English'],
+        garantias: ['Upfront quotes', 'Emergencies', 'Spanish and English'],
         servicios: {
           rotulo: 'What we fix',
           titulo: 'Services',
@@ -205,7 +206,10 @@ export const negocios: Record<NegocioId, Negocio> = {
     id: 'restaurante',
     nombre: { es: 'Tu Restaurante', en: 'Your Restaurant' },
     dominio: 'turestaurante.example',
-    paleta:      { bg: '#F6EBDD', ink: '#2A1A12', ink2: '#5E4A3E', accent: '#A8492A', onAccent: '#FFF6EC' },
+    // Campo pleno terracota (lección de Monte, plan #B5532F): con crema encima daba 4,6 / 3,6, así que
+    // se oscurece a #8E3A1E (ladrillo) para que tinta, tinta 2 y acento pasen la misma regla que el resto.
+    // El acento es un mantequilla claro (texto sobre el campo) y el botón es de contorno en crema.
+    paleta:      { bg: '#8E3A1E', ink: '#FFF6EC', ink2: '#F2D8C4', accent: '#F7D9A0', onAccent: '#3A1A0C' },
     paletaNoche: { bg: '#1C120D', ink: '#F6EBDD', ink2: '#BFA997', accent: '#E58A62', onAccent: '#200F07' },
     alternativas: [
       { id: 'oliva', nombre: { es: 'Oliva', en: 'Olive' },
@@ -229,7 +233,8 @@ export const negocios: Record<NegocioId, Negocio> = {
     id: 'tienda',
     nombre: { es: 'Tu Tienda', en: 'Your Shop' },
     dominio: 'tutienda.example',
-    paleta:      { bg: '#F4EFE7', ink: '#2A211B', ink2: '#5C534B', accent: '#5B6849', onAccent: '#F8F5EE' },
+    // Papel kraft (velas y café), más oscuro y cálido que el crema común; acento salvia oscurecido para AA.
+    paleta:      { bg: '#E6DBC8', ink: '#2A211B', ink2: '#574E46', accent: '#4E5A3D', onAccent: '#F8F5EE' },
     paletaNoche: { bg: '#17150F', ink: '#F1EBE0', ink2: '#ADA594', accent: '#A9B78F', onAccent: '#141A0C' },
     alternativas: [
       { id: 'cera', nombre: { es: 'Cera', en: 'Wax' },
@@ -253,7 +258,8 @@ export const negocios: Record<NegocioId, Negocio> = {
     id: 'inmobiliaria',
     nombre: { es: 'Tu Inmobiliaria', en: 'Your Realty' },
     dominio: 'tuinmobiliaria.example',
-    paleta:      { bg: '#F1EEE8', ink: '#111111', ink2: '#55524D', accent: '#3D5A80', onAccent: '#F7F8FA' },
+    // Piedra fría (gris azulado), separada del crema común de plomería y marca.
+    paleta:      { bg: '#E3E6E8', ink: '#111316', ink2: '#4D5358', accent: '#34507A', onAccent: '#F7F8FA' },
     paletaNoche: { bg: '#111315', ink: '#EEECE8', ink2: '#A6A39E', accent: '#93B2DA', onAccent: '#0D1520' },
     alternativas: [
       { id: 'piedra', nombre: { es: 'Piedra', en: 'Stone' },
@@ -323,9 +329,9 @@ export const conCiudad = (t: string | undefined, city: string) => (t ?? '').repl
    pizarra        11.01 · 5.60 · 5.91 · 6.29 | noche 14.74 · 7.66 · 8.07 · 8.38
    mostaza        13.68 · 6.54 · 4.62 · 5.00 | noche 15.21 · 8.21 · 8.02 · 8.20
    salon          11.08 · 5.87 · 5.13 · 6.43 | noche 14.39 · 7.72 · 7.44 · 7.82
-   restaurante    14.22 · 7.07 · 4.89 · 5.38 | noche 15.63 · 8.18 · 7.13 · 7.19
-   tienda         13.78 · 6.57 · 5.21 · 5.48 | noche 15.38 · 7.46 · 8.57 · 8.33
-   inmobiliaria   16.31 · 6.72 · 6.10 · 6.65 | noche 15.78 · 7.41 · 8.53 · 8.40
+   restaurante    7.08 · 5.55 · 5.55 · 11.54 (campo terracota, ronda 1) | noche 15.63 · 8.18 · 7.13 · 7.19
+   tienda         11.51 · 5.93 · 5.37 · 6.76 (kraft, ronda 1) | noche 15.38 · 7.46 · 8.57 · 8.33
+   inmobiliaria   14.84 · 6.22 · 6.51 · 7.68 (piedra fría, ronda 1) | noche 15.78 · 7.41 · 8.53 · 8.40
    marca          16.54 · 7.91 · 5.53 · 6.09 | noche 16.12 · 7.77 · 8.47 · 8.40
    Las alternativas de salón, restaurante, tienda, inmobiliaria y marca se miden en el mismo
    script (todas pasan; ver el informe de la tarea). */

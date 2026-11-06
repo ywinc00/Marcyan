@@ -1,60 +1,77 @@
 ---
-// Ilustraciones y glifos de las marcas de EJEMPLO (design/rediseno-workos-v2.md §1.6, P02a).
+// Ilustraciones y glifos de las marcas de EJEMPLO (design/rediseno-workos-v2.md §1.6 y §1.8, P02a).
 // Geometría simple dibujada por nosotros, nada de escenas (E-38, E-49, E-53: la camioneta con
 // casa y árbol queda prohibida). Trazo fino que NO escala (vector-effect), un solo plano de
-// acento. SIN ids internos: se pueden repetir en la misma página sin choques.
-// Lee --ej-ink / --ej-accent (con currentColor de reserva fuera de una web de ejemplo).
+// acento. Lee --ej-ink / --ej-accent (con currentColor de reserva fuera de una web de ejemplo).
 //
 //   codo-gota   signo grande de plomería: codo de tubería en cuarto de anillo con bridas, eje
 //               de construcción discontinuo, plano cobre al 18 % y una gota sólida a la salida.
 //   tel · presupuesto · urgencia · idiomas · menu · flecha   glifos de 24 (trazo 1,5, redondo).
 //   Los glifos sustituyen a los iconos de catálogo (0 iconos Lucide dentro de los ejemplos).
+//
+// modo: 'linea' (por defecto, sin ids) | 'simbolo' (emite <symbol id="ej-s-<id>"> para el sprite
+// de la página) | 'uso' (<svg><use href="#ej-s-<id>"></svg>: lo que pinta cada instancia, §1.8).
+// Todo color y estado va por atributos de presentación o por variables en `style` en línea, que el
+// <use> resuelve con lo que hereda de su sitio: --ej-ilu-plano (none en alambre),
+// --ej-ilu-gota y --ej-ilu-gota-trazo (contorno de la gota en alambre).
+type Id = 'codo-gota' | 'tel' | 'presupuesto' | 'urgencia' | 'idiomas' | 'menu' | 'flecha';
 interface Props {
-  id: 'codo-gota' | 'tel' | 'presupuesto' | 'urgencia' | 'idiomas' | 'menu' | 'flecha';
+  id: Id;
   size?: number;
+  modo?: 'linea' | 'simbolo' | 'uso';
   class?: string;
 }
-const { id, size = 24, class: cls } = Astro.props;
+const { id, size = 24, modo = 'linea', class: cls } = Astro.props;
 const big = id === 'codo-gota';
+const sid = `ej-s-${id}`;
+const vb = big ? '0 0 480 480' : '0 0 24 24';
+const fPlano = 'fill:var(--ej-ilu-plano,var(--ej-accent,currentColor))';
+const fGota = 'fill:var(--ej-ilu-gota,var(--ej-accent,currentColor));stroke:var(--ej-ilu-gota-trazo,none)';
 ---
-{big ? (
-  <svg class:list={['ej-ilu', 'ej-ilu--codo', cls]} width={size} height={size} viewBox="0 0 480 480" fill="none" aria-hidden="true" focusable="false">
-    <!-- plano de acento (cuarto de anillo del codo) -->
-    <path class="ej-ilu__plano" d="M232 96A224 224 0 0 1 456 320H392A160 160 0 0 0 232 160Z" />
-    <!-- tubo recto de entrada, codo y bajada -->
-    <g class="ej-ilu__linea">
-      <path d="M40 96H232A224 224 0 0 1 456 320V372" />
-      <path d="M40 160H232A160 160 0 0 1 392 320V372" />
-      <!-- bridas -->
-      <path d="M40 80V176M28 80V176M28 80H40M28 176H40" />
-      <path d="M376 372H472M376 384H472M376 372V384M472 372V384" />
-      <!-- uniones del codo -->
-      <path d="M232 88V168M456 312H384" />
-    </g>
-    <!-- eje de construcción -->
-    <path class="ej-ilu__eje" d="M0 128H232A192 192 0 0 1 424 320V392" />
-    <path class="ej-ilu__eje" d="M232 320m-8 0h16M232 320m0-8v16" />
-    <!-- gota -->
-    <path class="ej-ilu__gota" d="M424 404C424 404 446 434 446 449A22 22 0 0 1 402 449C402 434 424 404 424 404Z" />
-  </svg>
+{modo === 'uso' ? (
+  <svg class:list={['ej-ilu', big ? 'ej-ilu--codo' : 'ej-ilu--glifo', cls]} width={size} height={size} aria-hidden="true" focusable="false"><use href={`#${sid}`} /></svg>
+) : big ? (
+  modo === 'simbolo' ? (
+    <symbol id={sid} viewBox={vb} overflow="visible">
+      <path d="M232 96A224 224 0 0 1 456 320H392A160 160 0 0 0 232 160Z" opacity=".18" style={fPlano} />
+      <g fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="square" vector-effect="non-scaling-stroke">
+        <path vector-effect="non-scaling-stroke" d="M40 96H232A224 224 0 0 1 456 320V372M40 160H232A160 160 0 0 1 392 320V372M40 80V176M28 80V176M28 80H40M28 176H40M376 372H472M376 384H472M376 372V384M472 372V384M232 88V168M456 312H384" />
+      </g>
+      <path d="M0 128H232A192 192 0 0 1 424 320V392M224 320h16M232 312v16" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 7" opacity=".4" vector-effect="non-scaling-stroke" />
+      <path d="M424 404C424 404 446 434 446 449A22 22 0 0 1 402 449C402 434 424 404 424 404Z" stroke-width="1" vector-effect="non-scaling-stroke" style={fGota} />
+    </symbol>
+  ) : (
+    <svg class:list={['ej-ilu', 'ej-ilu--codo', cls]} width={size} height={size} viewBox={vb} fill="none" aria-hidden="true" focusable="false">
+      <path d="M232 96A224 224 0 0 1 456 320H392A160 160 0 0 0 232 160Z" opacity=".18" style={fPlano} />
+      <path d="M40 96H232A224 224 0 0 1 456 320V372M40 160H232A160 160 0 0 1 392 320V372M40 80V176M28 80V176M28 80H40M28 176H40M376 372H472M376 384H472M376 372V384M472 372V384M232 88V168M456 312H384" stroke="currentColor" stroke-width="1.25" stroke-linecap="square" vector-effect="non-scaling-stroke" />
+      <path d="M0 128H232A192 192 0 0 1 424 320V392M224 320h16M232 312v16" stroke="currentColor" stroke-width="1" stroke-dasharray="3 7" opacity=".4" vector-effect="non-scaling-stroke" />
+      <path d="M424 404C424 404 446 434 446 449A22 22 0 0 1 402 449C402 434 424 404 424 404Z" stroke-width="1" vector-effect="non-scaling-stroke" style={fGota} />
+    </svg>
+  )
 ) : (
-  <svg class:list={['ej-ilu', 'ej-ilu--glifo', cls]} width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"
-    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    {id === 'tel' && <path d="M8.2 3.8 6 4.4C4.9 4.7 4.3 5.8 4.6 6.9c1.6 6 6.5 10.9 12.5 12.5 1.1.3 2.2-.3 2.5-1.4l.6-2.2-3.6-2.1-1.9 1.6c-2.1-1-3.9-2.8-4.9-4.9l1.6-1.9Z" />}
-    {id === 'presupuesto' && <><path d="M6 3.5h8.5L18 7v13.5H6Z" /><path d="M14.5 3.5V7H18" /><path d="m9 13.5 2 2 4-4.5" /></>}
-    {id === 'urgencia' && <><circle cx="12" cy="13" r="7.5" /><path d="M12 9v4.2l2.6 1.6" /><path d="M9.5 3h5" /></>}
-    {id === 'idiomas' && <><path d="M4 5.5h9.5v7H9l-3 2.5v-2.5H4Z" /><path d="M13.5 9.5H20v6.5h-2v2.2L15.4 16H10.5v-3.5" /></>}
-    {id === 'menu' && <path d="M4 9h16M4 15h16" />}
-    {id === 'flecha' && <path d="M5 12h14M13 6l6 6-6 6" />}
-  </svg>
+  modo === 'simbolo' ? (
+    <symbol id={sid} viewBox={vb} overflow="visible" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      {id === 'tel' && <path d="M8.2 3.8 6 4.4C4.9 4.7 4.3 5.8 4.6 6.9c1.6 6 6.5 10.9 12.5 12.5 1.1.3 2.2-.3 2.5-1.4l.6-2.2-3.6-2.1-1.9 1.6c-2.1-1-3.9-2.8-4.9-4.9l1.6-1.9Z" />}
+      {id === 'presupuesto' && <path d="M6 3.5h8.5L18 7v13.5H6ZM14.5 3.5V7H18M9 13.5l2 2 4-4.5" />}
+      {id === 'urgencia' && <path d="M19.5 13a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0ZM12 9v4.2l2.6 1.6M9.5 3h5" />}
+      {id === 'idiomas' && <path d="M4 5.5h9.5v7H9l-3 2.5v-2.5H4ZM13.5 9.5H20v6.5h-2v2.2L15.4 16H10.5v-3.5" />}
+      {id === 'menu' && <path d="M4 9h16M4 15h16" />}
+      {id === 'flecha' && <path d="M5 12h14M13 6l6 6-6 6" />}
+    </symbol>
+  ) : (
+    <svg class:list={['ej-ilu', 'ej-ilu--glifo', cls]} width={size} height={size} viewBox={vb} fill="none" aria-hidden="true" focusable="false"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      {id === 'tel' && <path d="M8.2 3.8 6 4.4C4.9 4.7 4.3 5.8 4.6 6.9c1.6 6 6.5 10.9 12.5 12.5 1.1.3 2.2-.3 2.5-1.4l.6-2.2-3.6-2.1-1.9 1.6c-2.1-1-3.9-2.8-4.9-4.9l1.6-1.9Z" />}
+      {id === 'presupuesto' && <path d="M6 3.5h8.5L18 7v13.5H6ZM14.5 3.5V7H18M9 13.5l2 2 4-4.5" />}
+      {id === 'urgencia' && <path d="M19.5 13a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0ZM12 9v4.2l2.6 1.6M9.5 3h5" />}
+      {id === 'idiomas' && <path d="M4 5.5h9.5v7H9l-3 2.5v-2.5H4ZM13.5 9.5H20v6.5h-2v2.2L15.4 16H10.5v-3.5" />}
+      {id === 'menu' && <path d="M4 9h16M4 15h16" />}
+      {id === 'flecha' && <path d="M5 12h14M13 6l6 6-6 6" />}
+    </svg>
+  )
 )}
 
 <style>
-  .ej-ilu { display: block; flex: none; }
+  .ej-ilu { display: block; flex: none; overflow: visible; }
   .ej-ilu--codo { color: var(--ej-ink, currentColor); }
-  .ej-ilu__plano { fill: var(--ej-accent, currentColor); opacity: .18; }
-  .ej-ilu__linea { stroke: currentColor; stroke-width: 1.25; vector-effect: non-scaling-stroke; stroke-linecap: square; }
-  .ej-ilu__linea path { vector-effect: non-scaling-stroke; }
-  .ej-ilu__eje { stroke: currentColor; stroke-width: 1; stroke-dasharray: 3 7; opacity: .4; vector-effect: non-scaling-stroke; }
-  .ej-ilu__gota { fill: var(--ej-accent, currentColor); }
 </style>

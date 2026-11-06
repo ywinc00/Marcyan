@@ -11,11 +11,13 @@
 //   lienzo  escritorio 1280×800 · vertical 400×520 · movil 390×844. Por defecto según frame:
 //           navegador→escritorio, tarjeta/desnudo→vertical, movil→movil. El lienzo se dibuja a su
 //           tamaño fuente y se escala al ancho con transform: scale(min(1, 100cqw / ancho))
-//           (cociente de longitudes con tan(atan2()), sin JS). Cada lienzo tiene su PROPIA
+//           (cociente de longitudes con tan(atan2()), sin JS; sin trigonometría CSS, <ej-web> escribe
+//           --ej-k con un ResizeObserver). Cada lienzo tiene su PROPIA
 //           composición (el vertical es "la web en columna", no la de escritorio encogida).
 //           LEGIBILIDAD (texto renderizado ≥ 11 px donde se lee, ≥ 9 px decorativo):
-//             escritorio · texto fuente ≥ 18 px → legible (≥ 11) desde 782 px de ancho; entre 640 y 782
-//               queda ≥ 9 (decorativo). El marco navegador se usa SOLO en huecos ≥ 640.
+//             escritorio · texto fuente ≥ 18 px → legible (≥ 11) desde 782 px de ancho. El marco
+//               navegador (y cualquier lienzo de escritorio) se usa SOLO en huecos ≥ 782 px (ronda 1:
+//               el antiguo mínimo de 640 dejaba el texto en 9,6 px). Por debajo, tarjeta o móvil.
 //             vertical   · texto fuente ≥ 13 px → legible desde 339 px (en 360, escala 0,9).
 //             movil      · texto fuente ≥ 15,5 px → legible con el marco a ≥ 300 px (por defecto).
 //   vista   hero (primera pantalla) · completa (hero + segunda franja) · mini (≤ 240 px:
@@ -30,9 +32,20 @@
 //   lang    idioma de la PÁGINA (el logotipo y el rótulo salen de aquí y no cambian)
 //   ejemplo rótulo "Ejemplo" (por defecto true): en la barra del navegador o al pie del marco
 //   city    ciudad de los textos (por defecto Houston) · modo/boton: valores de partida opcionales
-//   Alias de compatibilidad (los usos de la v1 compilan): kind→marca, state→estado,
-//   example→ejemplo, frame "pantalla"→navegador, size hero|card|mini→vista hero|completa|mini,
-//   site→idioma inicial de la web, pages (se ignora).
+//   Alias de compatibilidad (los usos de la v1 compilan Y se ven bien): kind→marca, state→estado,
+//   example→ejemplo, frame "pantalla"→navegador, size hero|card|mini→vista hero|completa|mini
+//   (salvo size="mini" en tarjeta → vista hero: las laterales del abanico v1 miden 208×300 y la
+//   composición mini dejaba media tarjeta vacía), site→idioma inicial de la web, pages (se ignora).
+//   Con `kind` y vista mini la raíz lleva además la clase v1 `wo-web--<frame>` (las reglas de ancho de los
+//   usos v1, p. ej. 236 px, valen para la mini, que va a tamaño natural; en un lienzo escalado no se
+//   honran: a 236 px el lienzo móvil deja el texto en 8,7 px y el contrato pide ≥ 300). La
+//   clase `ht-old` (maqueta "antes" de HazlaTuya v1) equivale a estado="antes". PUENTE PROVISIONAL:
+//   desaparece cuando P01/P02b sustituyan esos usos.
+//
+// SPRITE (§1.8): logotipo, signo, ilustración y glifos se pintan como <use> contra <symbol> que se
+//   emiten UNA vez por página (la primera instancia que los necesita los deja en un <svg> oculto,
+//   hermano de la raíz y fuera de las plantillas de idioma). Si esa instancia vive dentro de un
+//   <template> del consumidor, <ej-web> copia el symbol que falte desde ahí al conectarse.
 //
 // PERSONALIZAR DESDE FUERA (prioridad del scope, crítica A2)
 //   Un ancestro [data-ej-scope] escribe --ej-s-bg, --ej-s-ink, --ej-s-ink-2, --ej-s-accent,
@@ -89,12 +102,14 @@ const p = Astro.props;
 const marca: NegocioId = p.marca ?? p.kind ?? 'plomeria';
 const frame: Frame = p.frame === 'pantalla' ? 'navegador' : (p.frame ?? 'tarjeta');
 const lienzo: Lienzo = p.lienzo ?? (frame === 'navegador' ? 'escritorio' : frame === 'movil' ? 'movil' : 'vertical');
-const vista: Vista = p.vista ?? (p.size === 'mini' ? 'mini' : p.size === 'hero' ? 'hero' : 'completa');
+const vista: Vista = p.vista ?? (p.size === 'mini' ? (frame === 'tarjeta' ? 'hero' : 'mini') : p.size === 'hero' ? 'hero' : 'completa');
+const clases = (p.class ?? '').split(/\s+/);
+const legado = p.kind !== undefined;
 const lang: L = p.lang ?? 'es';
 const city = p.city ?? 'Houston';
 const ejemplo = p.ejemplo ?? p.example ?? true;
 const n = negocios[marca];
-let estado: Estado = p.estado ?? p.state ?? 'lista';
+let estado: Estado = p.estado ?? p.state ?? (clases.includes('ht-old') ? 'antes' : 'lista');
 if (estado === 'antes' && !n.textos[lang].antes) estado = 'lista'; // solo plomería tiene "antes" en P02a
 let pagina = p.pagina ?? 'inicio';
 if (pagina === 'servicios' && !n.textos[lang].servicios) pagina = 'inicio';
@@ -108,13 +123,38 @@ const mini = vista === 'mini';
 // Tamaños que dependen del lienzo (alto de la mayúscula del logotipo y glifos, en px fuente).
 const LOGO: Record<Lienzo, number> = { escritorio: 17, vertical: 11, movil: 13 };
 const GLIFO: Record<Lienzo, number> = { escritorio: 22, vertical: 17, movil: 20 };
+// Ilustración ENTERA (ronda 1: nada de codos cortados a medias). 0 = esa composición no la lleva:
+// la tarjeta vertical completa necesita el alto para la franja de garantías.
 const ARTE: Record<Lienzo, Record<'hero' | 'completa', number>> = {
-  escritorio: { hero: 470, completa: 360 }, vertical: { hero: 220, completa: 112 }, movil: { hero: 320, completa: 150 },
+  escritorio: { hero: 470, completa: 360 }, vertical: { hero: 160, completa: 0 }, movil: { hero: 340, completa: 150 },
 };
 const logoCap = mini ? 9.5 : LOGO[lienzo];
 const glifo = mini ? 14 : GLIFO[lienzo];
-const arte = mini ? 0 : ARTE[lienzo][vista as 'hero' | 'completa'];
+const arte = mini || !n.ilustracion ? 0 : ARTE[lienzo][vista as 'hero' | 'completa'];
+// En hero vertical y móvil el dibujo se recorta a su caja real (viewBox 480: tubo de y 80 a 471, brida
+// derecha en x 472) para colocarlo entero bajo la acción sin el aire vacío de la caja.
+const arteRecorte = arte && vista === 'hero' && lienzo !== 'escritorio'
+  ? `--ej-arte-t:${-(80 / 480 * arte).toFixed(1)}px;--ej-arte-b:${-(9 / 480 * arte).toFixed(1)}px;--ej-arte-r:${-(8 / 480 * arte).toFixed(1)}px`
+  : undefined;
 const iconosGar = ['presupuesto', 'urgencia', 'idiomas'] as const;
+const conGar = !!n.textos[lang].garantias && !mini && (lienzo === 'escritorio' || vista === 'completa');
+
+// Sprite por página: symbols que necesita esta instancia y que ninguna anterior ha emitido.
+const sprite = (() => {
+  const loc = Astro.locals as Record<string, unknown>;
+  return (loc.__ejSprite ??= new Set<string>()) as Set<string>;
+})();
+const necesita: string[] = [];
+if (estado !== 'antes') {
+  necesita.push(`logo:${marca}:${lang}`, 'g:menu');
+  if (marca === 'plomeria') necesita.push('signo');
+  if (n.textos.es.accionTel) necesita.push('g:tel');
+  if (conGar && pagina === 'inicio') necesita.push(...iconosGar.map((g) => `g:${g}`));
+  if (pagina === 'servicios') necesita.push('g:flecha');
+  if (arte && pagina === 'inicio') necesita.push('g:codo-gota');
+}
+const nuevos = necesita.filter((x) => !sprite.has(x));
+nuevos.forEach((x) => sprite.add(x));
 
 const resumen = (() => {
   const nom = n.nombre[lang];
@@ -128,16 +168,32 @@ const pal = (pre: string, x: typeof n.paleta) =>
   `--ej-${pre}-bg:${x.bg};--ej-${pre}-ink:${x.ink};--ej-${pre}-ink-2:${x.ink2};--ej-${pre}-accent:${x.accent};--ej-${pre}-on-accent:${x.onAccent};`;
 const estilo = pal('m', n.paleta) + pal('n', n.paletaNoche) + `--ej-m-radius:${n.radio}px;`;
 
-// Cotas del alambre (solo se pintan si la instancia nace en alambre): [texto, clase de posición].
-const COTAS: Record<Lienzo, string[]> = {
-  escritorio: ['1280', 'nav 92', '7 col', '5 col', 'Aa 92'],
-  vertical: ['400', 'nav 64', '1 col', 'Aa 44'],
-  movil: ['390', 'nav 60', '1 col', 'Aa 50'],
+// Cotas del alambre (solo se pintan si la instancia nace en alambre). Van en los MÁRGENES del lienzo,
+// cada una con su línea de cota y sus topes (h = horizontal, v = vertical con el rótulo girado), nunca
+// encima de las cajas (el ancho, arriba en escritorio y al pie en vertical y móvil para no cruzar la
+// cota de la nav). [texto, tipo, x, y, largo] en px del lienzo fuente.
+type Cota = [string, 'h' | 'v', number, number, number];
+const titEsc = vista === 'completa' ? 84 : 96;
+const COTAS: Record<Lienzo, Cota[]> = {
+  escritorio: [['1280', 'h', 0, 10, 1280], ['nav 92', 'v', 1248, 0, 92], ['7 col', 'h', 64, 106, 662], ['5 col', 'h', 750, 106, 466],
+    [`Aa ${titEsc}`, 'v', 32, vista === 'completa' ? 192 : 208, titEsc]],
+  vertical: [['400', 'h', 0, 513, 400], ['nav 64', 'v', 385, 4, 64], ['1 col', 'h', 24, 96, 352], ['Aa 44', 'v', 11, 138, 44]],
+  movil: [['390', 'h', 0, 834, 390], ['nav 60', 'v', 379, 52, 60], ['1 col', 'h', 22, 150, 346], ['Aa 50', 'v', 10, 202, 50]],
 };
 ---
+{nuevos.length > 0 && (
+  <svg class="ej-sprite" data-ej-sprite aria-hidden="true" focusable="false" width="0" height="0">
+    {nuevos.map((x) => {
+      const [k, a, b] = x.split(':');
+      if (k === 'logo') return <LogoEjemplo marca={a as NegocioId} lang={b as L} modo="simbolo" solo="palabra" />;
+      if (k === 'signo') return <LogoEjemplo marca="plomeria" modo="simbolo" solo="signo" />;
+      return <Ilustracion id={a as any} modo="simbolo" />;
+    })}
+  </svg>
+)}
 <span class="ej-sr" data-nosnippet>{resumen}</span>
 <ej-web
-  class:list={['ej', `ej--${frame}`, `ej--${lienzo}`, `ej--${vista}`, p.class]}
+  class:list={['ej', `ej--${frame}`, `ej--${lienzo}`, `ej--${vista}`, p.class, legado && mini && `wo-web--${p.frame ?? 'tarjeta'}`]}
   aria-hidden="true"
   data-nosnippet
   data-ej-marca={marca}
@@ -168,18 +224,21 @@ const COTAS: Record<Lienzo, string[]> = {
           const T = n.textos[L];
           const c = (t?: string) => conCiudad(t, city);
           const panel = (
-            <div class="ej__l" data-ej-l-pane={L} lang={L !== lang ? L : undefined}>
+            <>
               {estado === 'antes' && T.antes ? (
-                /* ── ANTES: web de hace diez años, digna (alineada, legible, de una pieza) pero sin
-                   jerarquía: la llamada enterrada arriba a la derecha, foto de banco que no dice
-                   nada, párrafo de relleno justificado, un solo idioma, nada pensado para el móvil. */
-                <div class="ej__pg ea">
+                /* ── ANTES (crítica escrita, ronda 1): web de hace diez años, digna (alineada, legible,
+                   de una pieza) pero sin jerarquía. 1) La llamada va enterrada en la cabecera, en texto,
+                   sin botón. 2) La "foto" es un banner genérico de banco que no enseña nada del oficio
+                   (un plano difuso, sin figuras dibujadas). 3) "Bienvenidos a…" ocupa el sitio del
+                   titular y no dice qué hacen ni dónde. 4) Párrafo de relleno justificado, con ríos.
+                   5) Menú de cinco pestañas subrayadas, un solo idioma y nada pensado para el móvil. */
+                <div class="ej__l ej__pg ea" data-ej-l-pane={L} lang={L !== lang ? L : undefined}>
                   <div class="ea__top">
                     <span class="ea__logo" translate="no">{n.nombre[lang]}</span>
                     <span class="ea__tel">{T.antes.llamada} <b>{n.telefono}</b></span>
                   </div>
                   <div class="ea__nav">{T.antes.nav.map((x, i) => <span class:list={[i === 0 && 'is-on']}>{x}</span>)}</div>
-                  <div class="ea__foto"><i></i><i></i><i></i></div>
+                  <div class="ea__foto"></div>
                   <div class="ea__cuerpo">
                     <p class="ea__bien">{T.antes.bienvenida}</p>
                     <p class="ea__txt">{c(T.antes.texto)}</p>
@@ -187,14 +246,14 @@ const COTAS: Record<Lienzo, string[]> = {
                   <div class="ea__pie">{T.antes.pie}</div>
                 </div>
               ) : (
-                <div class="ej__pg" data-pg={pagina}>
+                <div class="ej__l ej__pg" data-pg={pagina} data-ej-l-pane={L} lang={L !== lang ? L : undefined}>
                   <div class="ej__nav">
-                    <span class="ej__logo ej-k"><LogoEjemplo marca={marca} size={logoCap} lang={lang} /></span>
+                    <span class="ej__logo ej-k"><LogoEjemplo marca={marca} size={logoCap} lang={lang} modo="uso" /></span>
                     {T.nav && <span class="ej__links">{T.nav.map((x) => <span class="ej-k">{x}</span>)}</span>}
                     <span class="ej__navder">
-                      {T.abierto && <span class="ej__abierto ej-k"><i></i>{T.abierto}</span>}
+                      {T.abierto && <span class="ej__abierto ej-k">{T.abierto}</span>}
                       {T.accionTel && <span class="ej__btn2 ej-k">{T.accion}</span>}
-                      <span class="ej__menu ej-k"><Ilustracion id="menu" size={glifo + 4} /></span>
+                      <span class="ej__menu ej-k"><Ilustracion id="menu" size={glifo + 4} modo="uso" /></span>
                     </span>
                   </div>
 
@@ -204,24 +263,22 @@ const COTAS: Record<Lienzo, string[]> = {
                         {T.antetitulo && <span class="ej__ante ej-k">{c(T.antetitulo)}</span>}
                         <p class="ej__tit"><span class="ej-k">{T.titular}</span></p>
                         {T.bajada && <p class="ej__baj"><span class="ej-k">{T.bajada}</span></p>}
-                        <span class="ej__acc">
-                          <span class="ej__btn ej-k">
-                            {T.accionTel && <Ilustracion id="tel" size={glifo} />}
-                            <span>{T.accion}</span>
-                            {T.accionTel && <span class="ej__num">{n.telefono}</span>}
-                          </span>
+                        <span class="ej__acc ej__btn ej-k">
+                          {T.accionTel && <Ilustracion id="tel" size={glifo} modo="uso" />}
+                          {T.accion}
+                          {T.accionTel && <span class="ej__num">{n.telefono}</span>}
                         </span>
                       </div>
-                      {n.ilustracion && !mini && (
-                        <div class="ej__arte ej-k"><Ilustracion id="codo-gota" size={arte} /></div>
+                      {arte > 0 && (
+                        <div class="ej__arte ej-k" style={arteRecorte}><Ilustracion id="codo-gota" size={arte} modo="uso" /></div>
                       )}
                     </div>
                   )}
 
-                  {pagina === 'inicio' && T.garantias && !mini && (lienzo === 'escritorio' || vista === 'completa') && (
+                  {pagina === 'inicio' && T.garantias && conGar && (
                     <div class="ej__gar">
                       {T.garantias.map((g, i) => (
-                        <span class="ej__g"><span class="ej-k"><Ilustracion id={iconosGar[i]} size={glifo} /><span>{g}</span></span></span>
+                        <span class="ej__g"><span class="ej-k"><Ilustracion id={iconosGar[i]} size={glifo} modo="uso" />{g}</span></span>
                       ))}
                     </div>
                   )}
@@ -247,7 +304,7 @@ const COTAS: Record<Lienzo, string[]> = {
                           <span class="ej__sv-f">
                             <span class="ej__sv-t ej-k">{f.t}</span>
                             <span class="ej__sv-d ej-k">{f.d}</span>
-                            <span class="ej__sv-a ej-k"><span>{T.servicios!.accionFila}</span><Ilustracion id="flecha" size={glifo - 2} /></span>
+                            <span class="ej__sv-a ej-k"><span>{T.servicios!.accionFila}</span><Ilustracion id="flecha" size={glifo - 2} modo="uso" /></span>
                           </span>
                         ))}
                       </div>
@@ -259,12 +316,10 @@ const COTAS: Record<Lienzo, string[]> = {
                       <div class="ej__ct-a">
                         <p class="ej__tit"><span class="ej-k">{T.contacto.titulo}</span></p>
                         <p class="ej__baj"><span class="ej-k">{T.contacto.intro}</span></p>
-                        <span class="ej__acc">
-                          <span class="ej__btn ej-k">
-                            {T.accionTel && <Ilustracion id="tel" size={glifo} />}
-                            <span>{T.accion}</span>
-                            {T.accionTel && <span class="ej__num">{n.telefono}</span>}
-                          </span>
+                        <span class="ej__acc ej__btn ej-k">
+                          {T.accionTel && <Ilustracion id="tel" size={glifo} modo="uso" />}
+                          {T.accion}
+                          {T.accionTel && <span class="ej__num">{n.telefono}</span>}
                         </span>
                         <span class="ej__hor">
                           {T.contacto.horario.map((h) => <span class="ej__hor-f ej-k"><span>{h.d}</span><span class="ej__hor-h">{h.h}</span></span>)}
@@ -280,12 +335,14 @@ const COTAS: Record<Lienzo, string[]> = {
 
                   {estado === 'alambre' && (
                     <div class="ej__cotas">
-                      {COTAS[lienzo].map((t, i) => <span class={`ej__cota ej__cota--${i}`}>{t}</span>)}
+                      {COTAS[lienzo].map(([t, tipo, x, y, l]) => (
+                        <span class={`ej__cota ej__cota--${tipo}`} style={`--x:${x}px;--y:${y}px;--l:${l}px`}><span>{t}</span></span>
+                      ))}
                     </div>
                   )}
                 </div>
               )}
-            </div>
+            </>
           );
           return L === webLang ? panel : <template data-ej-l={L}>{panel}</template>;
         })}
@@ -299,10 +356,26 @@ const COTAS: Record<Lienzo, string[]> = {
   // <ej-web>: resuelve el idioma efectivo (scope > raíz), inyecta el panel del otro idioma desde su
   // <template> la primera vez y puentea el atributo de la v1 (data-wo-state, DemoPorPasos) a
   // data-ej-estado. Solo actúa dentro de su propio nodo; no arranca nada hasta que hay un cambio.
+  const TRIG = typeof CSS !== 'undefined' && CSS.supports('width', 'calc(1px * tan(atan2(1px, 1px)))');
   class EjWeb extends HTMLElement {
     private obs?: MutationObserver;
+    private io?: IntersectionObserver;
+    private ro?: ResizeObserver;
     private scope: Element | null = null;
     connectedCallback() {
+      this.simbolos();
+      // Punto "Abierto": solo late mientras la web está a la vista (data-ej-vivo).
+      if (this.querySelector('.ej__abierto') && 'IntersectionObserver' in window) {
+        this.io = new IntersectionObserver(([e]) => this.toggleAttribute('data-ej-vivo', e.isIntersecting));
+        this.io.observe(this);
+      }
+      // Sin trigonometría CSS: la escala del lienzo la escribe JS (--ej-k).
+      const vp = this.querySelector<HTMLElement>('.ej__vp');
+      if (!TRIG && vp && !this.classList.contains('ej--mini') && 'ResizeObserver' in window) {
+        const w = parseFloat(getComputedStyle(this).getPropertyValue('--ej-w')) || 1280;
+        this.ro = new ResizeObserver(([e]) => this.style.setProperty('--ej-k', String(Math.min(1, e.contentRect.width / w))));
+        this.ro.observe(vp);
+      }
       this.scope = this.parentElement?.closest('[data-ej-scope]') ?? null;
       this.obs = new MutationObserver((recs) => {
         for (const r of recs) {
@@ -317,7 +390,21 @@ const COTAS: Record<Lienzo, string[]> = {
       if (this.scope) this.obs.observe(this.scope, { attributes: true, attributeFilter: ['data-ej-lang'] });
       this.idioma();
     }
-    disconnectedCallback() { this.obs?.disconnect(); }
+    disconnectedCallback() { this.obs?.disconnect(); this.io?.disconnect(); this.ro?.disconnect(); }
+    // Sprite: si el symbol que usa esta instancia no está en el documento (la instancia que lo emitió
+    // vive en un <template> del consumidor), se copia desde esa plantilla a un sprite propio.
+    private simbolos() {
+      const faltan = [...new Set([...this.querySelectorAll('use')].map((u) => (u.getAttribute('href') || '').slice(1)))]
+        .filter((id) => id && !document.getElementById(id));
+      if (!faltan.length) return;
+      const ns = 'http://www.w3.org/2000/svg';
+      const sp = document.createElementNS(ns, 'svg');
+      sp.setAttribute('class', 'ej-sprite'); sp.setAttribute('aria-hidden', 'true'); sp.setAttribute('width', '0'); sp.setAttribute('height', '0');
+      for (const t of document.querySelectorAll('template')) {
+        for (const id of faltan) { const s = t.content.getElementById(id); if (s && !sp.querySelector(`#${id}`)) sp.appendChild(s.cloneNode(true)); }
+      }
+      if (sp.childNodes.length) { sp.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden'; document.body.appendChild(sp); }
+    }
     private idioma() {
       const l = this.scope?.getAttribute('data-ej-lang') || this.getAttribute('data-ej-lang') || 'es';
       if (this.getAttribute('data-ej-l-activo') === l) return;
@@ -335,6 +422,7 @@ const COTAS: Record<Lienzo, string[]> = {
 
 <style>
   /* ═══ Raíz: variables con prioridad del scope ═══ */
+  .ej-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
   .ej-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .ej {
     --ej-bg: var(--ej-s-bg, var(--ej-m-bg));
@@ -348,7 +436,7 @@ const COTAS: Record<Lienzo, string[]> = {
     --ej-rule: color-mix(in srgb, var(--ej-ink) 16%, transparent);
     --ej-crema: 240, 237, 232;
     --ej-t: 220ms cubic-bezier(.22, 1, .36, 1);
-    position: relative; display: block; width: 100%;
+    position: relative; display: block;
     font-family: var(--font-body); text-align: left;
   }
   /* Modo noche: raíz < scope (el scope pesa más). Si el scope escribe --ej-s-*, mandan esas. */
@@ -366,7 +454,9 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej[data-ej-l-activo='en'] .ej__l:not([data-ej-l-pane='en']) { display: none; }
 
   /* ═══ Marcos ═══ */
-  .ej--movil { width: 300px; max-width: 100%; }
+  /* (0,1,1): gana a la regla base .ej (ancho 100 %) y pierde ante las de ancho del consumidor con 2 clases (236 px en móvil) */
+  :where(.ej) { width: 100%; } /* (0,1,0) */
+  ej-web:where(.ej--movil) { width: 300px; max-width: 100%; }
   .ej__marco { position: relative; }
   .ej--navegador .ej__marco {
     border-radius: 12px; overflow: hidden; background: #1a1a19;
@@ -400,9 +490,10 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej--movil .ej__vp { aspect-ratio: 390 / 844; }
   .ej__lz {
     position: absolute; left: 0; top: 0; width: var(--ej-w); height: var(--ej-h);
-    transform-origin: 0 0; transform: scale(min(1, tan(atan2(100cqw, var(--ej-w)))));
+    transform-origin: 0 0;
+    transform: scale(var(--ej-k, 1)); /* respaldo sin trigonometría CSS (lo escribe <ej-web>) */
+    transform: scale(min(1, tan(atan2(100cqw, var(--ej-w)))));
   }
-  .ej__l { height: 100%; }
   /* mini: composición propia a tamaño natural, sin lienzo */
   .ej--mini .ej__vp { aspect-ratio: auto; container-type: normal; }
   .ej--mini .ej__lz { position: static; width: auto; height: auto; transform: none; }
@@ -421,17 +512,19 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej__links { display: flex; justify-content: center; font-weight: 500; }
   .ej__navder { display: flex; align-items: center; justify-content: flex-end; }
   .ej__abierto { display: inline-flex; align-items: center; color: var(--ej-ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .ej__abierto i { width: .5em; height: .5em; border-radius: 50%; background: #3F8F5A; margin-right: .55em; flex: none; animation: ej-late 2s ease-in-out infinite; }
+  .ej__abierto::before { content: ''; width: .5em; height: .5em; border-radius: 50%; background: #3F8F5A; margin-right: .55em; flex: none; }
+  .ej[data-ej-vivo][data-ej-estado='lista'] .ej__abierto::before { animation: ej-late 2s ease-in-out infinite; }
+  .ej:not([data-ej-estado='lista']) .ej__abierto::before { visibility: hidden; }
   .ej__menu { display: none; line-height: 0; }
   .ej__hero { position: relative; }
   .ej__copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
   .ej__ante { display: inline-block; font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--ej-ink-2); }
   .ej__tit { font-family: var(--ej-font-display); font-weight: var(--ej-display-weight); text-wrap: balance; color: var(--ej-ink); }
   .ej__baj { color: var(--ej-ink-2); }
-  .ej__acc { display: flex; }
   .ej__num { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; }
   .ej__num::before { content: ''; width: 1px; height: 1.05em; background: currentColor; opacity: .38; margin: 0 .75em 0 .2em; }
   .ej__arte { line-height: 0; }
+  .ej__arte > :global(svg) { margin-top: var(--ej-arte-t, 0); margin-bottom: var(--ej-arte-b, 0); }
   .ej__gar { display: grid; border-top: 1px solid var(--ej-rule); flex: none; }
   .ej__g > span { display: inline-flex; align-items: center; font-weight: 500; }
   .ej__g :global(svg) { color: var(--ej-accent); }
@@ -541,17 +634,19 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej--vertical .ej__btn2 { height: 32px; padding: 0 14px; font-size: 13.5px; }
   .ej--vertical .ej__menu { display: block; }
   .ej--vertical .ej__abierto { grid-column: 1 / -1; grid-row: 2; margin-top: 14px; font-size: 13px; justify-self: start; }
-  .ej--vertical .ej__hero { flex: 1; padding-top: 26px; }
+  .ej--vertical .ej__hero { flex: 1; padding-top: 26px; display: flex; flex-direction: column; }
   .ej--vertical .ej__ante { font-size: 13px; }
   .ej--vertical .ej__tit { margin-top: 14px; font-size: 44px; line-height: 1; letter-spacing: -.04em; max-width: 7.5em; }
-  .ej--vertical .ej__baj { margin-top: 14px; font-size: 15px; line-height: 1.45; max-width: 13.5em; }
+  .ej--vertical .ej__baj { margin-top: 14px; font-size: 15px; line-height: 1.45; max-width: 21em; }
   .ej--vertical .ej__acc { margin-top: 20px; }
   .ej--vertical .ej__btn { height: 46px; padding: 0 18px 0 14px; gap: 9px; font-size: 15px; }
-  .ej--vertical .ej__arte { position: absolute; right: -34px; bottom: -78px; z-index: 0; }
+  /* hero: el signo ENTERO bajo la acción, alineado a la derecha y recortado a su caja real */
+  .ej--vertical .ej__arte { display: flex; justify-content: flex-end; margin: auto var(--ej-arte-r, 0) 10px 0; padding-top: 12px; }
   .ej--vertical.ej--completa .ej__hero { flex: none; }
-  .ej--vertical.ej--completa .ej__arte { right: -6px; bottom: auto; top: 194px; }
-  .ej--vertical .ej__gar { margin-top: auto; margin-bottom: 18px; grid-template-columns: 1fr; }
+  /* completa: sin signo (el logotipo ya lo lleva); 20 px de aire entre la acción y la franja */
+  .ej--vertical .ej__gar { margin-top: auto; margin-bottom: 20px; padding-top: 20px; border-top: 0; grid-template-columns: 1fr; }
   .ej--vertical .ej__g { padding: 10px 0; border-bottom: 1px solid var(--ej-rule); }
+  .ej--vertical .ej__g:first-child { border-top: 1px solid var(--ej-rule); }
   .ej--vertical .ej__g > span { gap: 10px; font-size: 13.5px; }
   .ej--vertical .ej__sv { padding-top: 26px; }
   .ej--vertical .ej__sv .ej__tit { margin-top: 12px; font-size: 44px; line-height: 1; letter-spacing: -.04em; }
@@ -583,8 +678,9 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej--movil .ej__baj { margin-top: 16px; font-size: 17.5px; line-height: 1.45; max-width: 18em; }
   .ej--movil .ej__acc { margin-top: 26px; }
   .ej--movil .ej__btn { height: 56px; padding: 0 22px 0 18px; gap: 10px; font-size: 17.5px; }
-  .ej--movil .ej__arte { display: flex; justify-content: flex-end; margin: 34px -46px 0 0; }
-  .ej--movil.ej--completa .ej__arte { margin: 18px -18px 0 0; }
+  .ej--movil.ej--hero .ej__hero { flex: 1; display: flex; flex-direction: column; }
+  .ej--movil .ej__arte { display: flex; justify-content: flex-end; margin: auto var(--ej-arte-r, 0) 40px 0; padding-top: 24px; }
+  .ej--movil.ej--completa .ej__arte { margin: 18px -18px 0 0; padding-top: 0; }
   .ej--movil .ej__gar { margin-top: auto; margin-bottom: 26px; grid-template-columns: 1fr; }
   .ej--movil .ej__g { padding: 15px 0; border-bottom: 1px solid var(--ej-rule); }
   .ej--movil .ej__g > span { gap: 12px; font-size: 16.5px; }
@@ -635,11 +731,12 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej[data-ej-estado='esqueleto'] .ej__sv-f,
   .ej[data-ej-estado='esqueleto'] .ej__hor-f { border-color: rgba(var(--ej-crema), .06); }
   .ej[data-ej-estado='esqueleto'] .ej__arte { border-radius: 12px; }
-  .ej[data-ej-estado='esqueleto'] .ej__url { color: transparent; }
 
   /* ═══ ESTADO alambre: la web en línea, con cotas (escáner P04, MiniPasos P03) ═══ */
-  .ej[data-ej-estado='alambre'] .ej__vp,
+  .ej[data-ej-estado='alambre'] .ej__vp { background: var(--ej-alambre-bg, #1a1a19); }
   .ej[data-ej-estado='alambre'] .ej__pg { background: transparent; }
+  /* UN contorno por bloque (no por línea): el texto de varias líneas se contornea como caja */
+  .ej[data-ej-estado='alambre'] :is(.ej__tit, .ej__baj) > .ej-k { display: inline-block; vertical-align: top; }
   .ej[data-ej-estado='alambre'] .ej__pg { color: rgba(var(--ej-crema), .55); }
   .ej[data-ej-estado='alambre'] .ej-k {
     color: transparent; background: none; border-color: transparent; border-radius: 3px;
@@ -648,35 +745,31 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej[data-ej-estado='alambre'] .ej-k :global(*) { visibility: hidden; }
   .ej[data-ej-estado='alambre'] .ej__arte { outline-style: dashed; }
   .ej[data-ej-estado='alambre'] .ej__arte :global(*) { visibility: visible; }
-  .ej[data-ej-estado='alambre'] .ej__arte :global(.ej-ilu__plano),
-  .ej[data-ej-estado='alambre'] .ej__arte :global(.ej-ilu__gota) { fill: none; }
-  .ej[data-ej-estado='alambre'] .ej__arte :global(.ej-ilu__gota) { stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .ej[data-ej-estado='alambre'] .ej__arte { --ej-ilu-plano: none; --ej-ilu-gota: none; --ej-ilu-gota-trazo: currentColor; --ej-ink: rgba(var(--ej-crema), .5); }
   .ej[data-ej-estado='alambre'] :is(.ej__gar, .ej__g, .ej__sv-f, .ej__hor-f) { border-color: rgba(var(--ej-crema), .18); }
   .ej__cotas { display: none; }
   .ej[data-ej-estado='alambre'] .ej__cotas {
     display: block; position: absolute; inset: 0; pointer-events: none;
     background: repeating-linear-gradient(90deg, rgba(var(--ej-crema), .05) 0 1px, transparent 1px calc((100% - var(--ej-cp, 128px)) / var(--ej-cn, 12)));
   }
-  .ej__cota {
-    position: absolute; font: 500 var(--ej-cf, 15px)/1 var(--font-mono); letter-spacing: .06em;
-    color: rgba(var(--ej-crema), .7); background: var(--w-s1, #121211); padding: 3px 6px; border-radius: 4px;
+  /* Cota: línea de 1 px con topes en los extremos y rótulo mono sobre la línea (fondo del lienzo). */
+  .ej__cota { position: absolute; left: var(--x); top: var(--y); color: rgba(var(--ej-crema), .42); }
+  .ej__cota::before, .ej__cota::after { content: ''; position: absolute; background: currentColor; }
+  .ej__cota > span {
+    position: absolute; white-space: nowrap; font: 500 var(--ej-cf, 15px)/1 var(--font-mono); letter-spacing: .06em;
+    color: rgba(var(--ej-crema), .78); background: var(--ej-alambre-bg, #1a1a19); padding: 2px 6px;
   }
+  .ej__cota--h { width: var(--l); height: 0; border-top: 1px solid; }
+  .ej__cota--h::before, .ej__cota--h::after { top: -5px; width: 1px; height: 9px; }
+  .ej__cota--h::before { left: 0; } .ej__cota--h::after { right: 0; }
+  .ej__cota--h > span { left: 50%; top: 0; transform: translate(-50%, -50%); }
+  .ej__cota--v { height: var(--l); width: 0; border-left: 1px solid; }
+  .ej__cota--v::before, .ej__cota--v::after { left: -5px; height: 1px; width: 9px; }
+  .ej__cota--v::before { top: 0; } .ej__cota--v::after { bottom: 0; }
+  .ej__cota--v > span { left: 0; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
   .ej--escritorio .ej__cotas { --ej-cf: 18px; }
-  .ej--escritorio .ej__cota--0 { top: 8px; left: 50%; transform: translateX(-50%); }
-  .ej--escritorio .ej__cota--1 { top: 34px; right: 8px; }
-  .ej--escritorio .ej__cota--2 { top: 132px; left: 64px; }
-  .ej--escritorio .ej__cota--3 { top: 132px; left: 760px; }
-  .ej--escritorio .ej__cota--4 { top: 200px; left: 690px; }
   .ej--vertical .ej__cotas { --ej-cf: 13px; --ej-cp: 48px; --ej-cn: 4; }
-  .ej--vertical .ej__cota--0 { top: 4px; left: 50%; transform: translateX(-50%); }
-  .ej--vertical .ej__cota--1 { top: 60px; right: 6px; }
-  .ej--vertical .ej__cota--2 { top: 120px; right: 6px; }
-  .ej--vertical .ej__cota--3 { top: 168px; right: 6px; }
   .ej--movil .ej__cotas { --ej-cf: 15.5px; --ej-cp: 44px; --ej-cn: 4; }
-  .ej--movil .ej__cota--0 { top: 14px; left: 22px; }
-  .ej--movil .ej__cota--1 { top: 66px; right: 8px; }
-  .ej--movil .ej__cota--2 { top: 190px; right: 8px; }
-  .ej--movil .ej__cota--3 { top: 250px; right: 8px; }
 
   /* ═══ ESTADO antes: web anticuada pero digna (tipografía de sistema, sin jerarquía) ═══ */
   .ea { font-family: Verdana, Geneva, Tahoma, sans-serif; color: #2b2b2b; background: #ffffff; }
@@ -690,11 +783,14 @@ const COTAS: Record<Lienzo, string[]> = {
   .ea__nav { display: flex; flex: none; background: linear-gradient(#f3f3f3, #d9d9d9); border-bottom: 1px solid #b9b9b9; }
   .ea__nav span { border-right: 1px solid #c4c4c4; color: #1d4f86; text-decoration: underline; }
   .ea__nav span.is-on { background: #fff; color: #2b2b2b; text-decoration: none; font-weight: 700; }
-  .ea__foto { position: relative; flex: none; overflow: hidden; background: linear-gradient(180deg, #a9c1d6 0%, #d8e1e8 58%, #9aa7a3 58%, #7f8c88 100%); }
-  .ea__foto i { position: absolute; bottom: 0; background: #6d7976; }
-  .ea__foto i:nth-child(1) { left: 12%; width: 22%; height: 46%; background: #c9c2b5; }
-  .ea__foto i:nth-child(2) { left: 14%; width: 18%; height: 14%; bottom: 46%; background: #8b5e4a; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
-  .ea__foto i:nth-child(3) { right: 16%; width: 9%; height: 30%; border-radius: 40% 40% 0 0; background: #5f7a5c; }
+  /* "Foto" de banco: un plano difuso de tonos fríos, sin figuras dibujadas (E-38, E-49, E-53). */
+  .ea__foto {
+    flex: none; border: 4px solid #fff; outline: 1px solid #c9c9c9; box-sizing: border-box;
+    background:
+      radial-gradient(60% 80% at 22% 30%, rgba(236, 242, 246, .9), transparent 70%),
+      radial-gradient(55% 70% at 78% 72%, rgba(120, 138, 150, .55), transparent 75%),
+      linear-gradient(160deg, #b9cad6 0%, #9fb0bb 48%, #8d9a9f 100%);
+  }
   .ea__cuerpo { flex: 1; }
   .ea__bien { font-family: Georgia, 'Times New Roman', serif; color: #24415f; font-weight: 700; }
   .ea__txt { text-align: justify; color: #444; }
@@ -706,7 +802,7 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej--escritorio .ea__tel { font-size: 18px; }
   .ej--escritorio .ea__nav { background: linear-gradient(#f3f3f3, #d9d9d9); }
   .ej--escritorio .ea__nav span { padding: 12px 22px; font-size: 18px; }
-  .ej--escritorio .ea__foto { height: 250px; background: linear-gradient(180deg, #a9c1d6 0%, #d8e1e8 58%, #9aa7a3 58%, #7f8c88 100%); }
+  .ej--escritorio .ea__foto { height: 250px; }
   .ej--escritorio .ea__cuerpo { padding: 26px 28px; }
   .ej--escritorio .ea__bien { font-size: 26px; }
   .ej--escritorio .ea__txt { margin-top: 12px; font-size: 18px; line-height: 1.55; }
@@ -742,9 +838,8 @@ const COTAS: Record<Lienzo, string[]> = {
   .ej--mini .ea__pie { padding: 7px; }
 
   @keyframes ej-late { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
-  .ej:not([data-ej-estado='lista']) .ej__abierto i { animation: none; }
   @media (prefers-reduced-motion: reduce) {
-    .ej__abierto i { animation: none; }
+    .ej__abierto::before { animation: none; }
     .ej, .ej * { transition: none !important; }
   }
 </style>

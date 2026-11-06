@@ -22,7 +22,8 @@ export interface PestanaAsistente {
   pasos: [PasoRespuesta, PasoRespuesta];
   /** Respuesta: texto antes, negocio en negrita, texto después. refs = notas [1] [2] (Perplexity). */
   answer: { pre: string; biz: string; post: string; refs?: [string, string] };
-  sources: string[];
+  /** Fuente que leyó (u) y qué datos sacó de ella (lee). */
+  sources: { u: string; lee: string }[];
   sr: string;
 }
 
@@ -47,6 +48,7 @@ export const seoIaW = {
     tablistLabel: 'Asistentes de IA',
     ejemplo: 'Ejemplo',
     srcTitle: 'Fuentes que leyó',
+    srcOk: 'leída',
     traits: [
       { marca: 'chatgpt-texto', nombre: '', text: 'Busca sobre todo en Bing.' },
       { marca: 'googlegemini', nombre: 'Gemini', text: 'Se apoya en la búsqueda de Google.' },
@@ -59,40 +61,40 @@ export const seoIaW = {
       {
         id: 'chatgpt', marca: 'chatgpt-texto', nombre: '', responde: 'responde', pasos: pasosWeb,
         answer: { pre: 'Te sugiero ', biz: BIZ, post: ': atiende en español e inglés y trabaja en Houston, Katy y Sugar Land.' },
-        sources: ['Bing Places', 'tunegocio.example'],
+        sources: [{ u: 'Bing Places', lee: 'categoría · zonas · teléfono' }, { u: 'tunegocio.example', lee: 'idiomas · servicios · horario' }],
         sr: `Ejemplo: ChatGPT responde que sugiere ${BIZ}, que atiende en español e inglés. Fuentes: Bing Places y la web del negocio.`,
       },
       {
         id: 'gemini', marca: 'googlegemini', nombre: 'Gemini', responde: 'responde', pasos: pasosWeb,
         answer: { pre: 'Una opción es ', biz: BIZ, post: ', en Houston: atiende en los dos idiomas y cubre Katy y Sugar Land.' },
-        sources: ['Perfil de empresa en Google', 'tunegocio.example'],
+        sources: [{ u: 'Perfil de empresa en Google', lee: 'horario · zonas · categoría' }, { u: 'tunegocio.example', lee: 'idiomas · servicios' }],
         sr: `Ejemplo: Gemini responde que una opción es ${BIZ}. Fuentes: su perfil de empresa en Google y su web.`,
       },
       {
         id: 'perplexity', marca: 'perplexity', nombre: 'Perplexity', responde: 'responde',
         pasos: [{ txt: ['Buscando en la web', 'Busqué en la web'] }, { txt: ['Leyendo 2 páginas', 'Leí 2 páginas'] }],
         answer: { pre: '', biz: BIZ, post: ' es un servicio de plomería en Houston con atención en español.', refs: [' En su web indica sus zonas y su horario.', ''] },
-        sources: ['tunegocio.example/servicios', 'tunegocio.example/preguntas'],
+        sources: [{ u: 'tunegocio.example/servicios', lee: 'servicios · zonas' }, { u: 'tunegocio.example/preguntas', lee: 'idiomas · horario' }],
         sr: `Ejemplo: Perplexity responde que ${BIZ} es un servicio de plomería en Houston con atención en español, y cita dos páginas de su web.`,
       },
       {
         id: 'claude', marca: 'claude', nombre: 'Claude', responde: 'responde', pasos: pasosWeb,
         answer: { pre: 'Según su web, ', biz: BIZ, post: ' atiende en español e inglés y trabaja en Houston, Katy y Sugar Land.' },
-        sources: ['tunegocio.example', 'tunegocio.example/contacto'],
+        sources: [{ u: 'tunegocio.example', lee: 'idiomas · servicios' }, { u: 'tunegocio.example/contacto', lee: 'zonas · teléfono · horario' }],
         sr: `Ejemplo: Claude responde que, según su web, ${BIZ} atiende en español e inglés.`,
       },
       {
         id: 'meta', marca: 'meta', nombre: 'Meta AI', responde: 'responde en WhatsApp',
         pasos: [{ txt: ['Buscando en la web', 'Busqué en la web'] }, { txt: ['Leyendo resultados', 'Leí 2 fuentes'] }],
         answer: { pre: 'Prueba con ', biz: BIZ, post: ': plomeros de Houston que atienden en español. Tienen WhatsApp en su web.' },
-        sources: ['Resultados de búsqueda', 'tunegocio.example'],
+        sources: [{ u: 'Resultados de búsqueda', lee: 'nombre · categoría · zona' }, { u: 'tunegocio.example', lee: 'idiomas · WhatsApp' }],
         sr: `Ejemplo: Meta AI responde dentro de WhatsApp que pruebes con ${BIZ}.`,
       },
       {
         id: 'google', marca: 'google', nombre: 'Google', responde: 'resume en la búsqueda',
         pasos: [{ txt: ['Buscando', 'Busqué'] }, { txt: ['Armando el resumen', 'Resumen listo'] }],
         answer: { pre: '', biz: BIZ, post: ' es un plomero de Houston con atención en español. Abre de lunes a sábado, de 9:00 a. m. a 7:00 p. m.' },
-        sources: ['Ficha de mapa', 'tunegocio.example'],
+        sources: [{ u: 'Ficha de mapa', lee: 'horario · ubicación · categoría' }, { u: 'tunegocio.example', lee: 'idiomas · servicios' }],
         sr: `Ejemplo: el resumen de Google dice que ${BIZ} es un plomero de Houston con atención en español.`,
       },
     ] as PestanaAsistente[],

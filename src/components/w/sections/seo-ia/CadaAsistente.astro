@@ -34,9 +34,10 @@ interface Props {
   tablistLabel: string;
   ejemplo: string;
   srcTitle: string;
+  srcOk: string;
   tabs: PestanaAsistente[];
 }
-const { n, label, titleHtml, lead, intro, traits, question, tablistLabel, ejemplo, srcTitle, tabs } = Astro.props;
+const { n, label, titleHtml, lead, intro, traits, question, tablistLabel, ejemplo, srcTitle, srcOk, tabs } = Astro.props;
 const uid = 'ca' + Math.random().toString(36).slice(2, 7);
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
@@ -126,7 +127,9 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
           {t.sources.map((s, j) => (
             <li class="ca__src-row" style={`--d:${2000 + j * 160}ms`}>
               <span class="ca__src-n">{j + 1}</span>
-              <span class="ca__src-u">{s}</span>
+              <span class="ca__src-u">{s.u}</span>
+              <span class="ca__src-ok"><span class="ca__src-tick">✓</span>{srcOk}</span>
+              <span class="ca__src-lee"><span class="ca__src-br">└</span>{s.lee}</span>
             </li>
           ))}
         </ol>
@@ -348,9 +351,17 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
     background: var(--w-s0);
   }
   .ca__src-t { margin: 0 0 12px; text-align: center; font: 500 12px/1.2 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--w-ink-60); }
-  .ca__src-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ca__src-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
   .ca__src-list[hidden] { display: none; }
-  .ca__src-row { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 12px; font: 400 13.5px/1.35 var(--font-mono); }
+  .ca__src-row {
+    display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; row-gap: 4px;
+    font: 400 13.5px/1.35 var(--font-mono);
+  }
+  .ca__src-row + .ca__src-row { padding-top: 12px; border-top: 1px dashed var(--w-line); }
+  .ca__src-ok { font-size: 12px; color: var(--w-ink-60); white-space: nowrap; }
+  .ca__src-tick { margin-right: 6px; color: var(--w-accent); }
+  .ca__src-lee { grid-column: 2 / -1; font-size: 12.5px; color: var(--w-ink-60); overflow-wrap: anywhere; }
+  .ca__src-br { margin-right: 8px; color: var(--w-ink-30); }
   .ca__src-n {
     display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
     background: rgba(var(--w-accent-rgb), .14); color: var(--w-accent); font-size: 11px;
@@ -396,7 +407,8 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
     .ca__chat { padding: 16px 16px 18px; }
     .ca__user { max-width: 94%; }
     .ca__src { padding: 16px 16px 18px; }
-    .ca__src-row { font-size: 12.5px; gap: 10px; }
+    .ca__src-row { font-size: 12.5px; column-gap: 10px; }
+    .ca__src-lee { font-size: 12px; }
   }
   @media (max-width: 380px) { .ca__traits { grid-template-columns: minmax(0, 1fr); } }
 </style>

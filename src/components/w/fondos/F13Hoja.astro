@@ -1,0 +1,32 @@
+---
+// F13 · Hoja oscura (blog). FO/bocetos/f13-blog.html + W-NEW-11.
+// Columna central más clara (#0e0e0d) del ancho del contenido, con bordes de 1 px
+// oro al 9 % y pautado tenue, sobre un marco más profundo; márgenes de lectura.
+// Registro editorial sin pasar a claro (decisión §4-1 del informe). Quieto.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-ho { position: absolute; inset: 0; }
+  .wf-ho__marco { position: absolute; inset: 0; background: #050505; }
+  .wf-ho__hoja {
+    position: absolute; top: 0; bottom: 0;
+    left: max(16px, calc(var(--wf-l) - 48px)); right: max(16px, calc(var(--wf-l) - 48px));
+    background:
+      repeating-linear-gradient(180deg, transparent 0 31px, rgba(var(--wf-s), .028) 31px 32px),
+      #0e0e0d;
+    border-inline: 1px solid rgba(var(--wf-a), .09);
+  }
+  .wf-ho__margen { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(var(--wf-a), .08); }
+  .wf-ho__margen--i { left: calc(var(--wf-l) - 8px); }
+  .wf-ho__margen--d { right: calc(var(--wf-l) - 8px); }
+  @media (max-width: 767.98px) { .wf-ho__margen { display: none; } .wf-ho__hoja { left: 8px; right: 8px; } }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-ho">
+  {!eco && <div class="wf-ho__marco"></div>}
+  <div class="wf-ho__hoja"></div>
+  {!eco && <div class="wf-ho__margen wf-ho__margen--i"></div>}
+  {!eco && <div class="wf-ho__margen wf-ho__margen--d"></div>}
+</div>

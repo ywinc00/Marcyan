@@ -1,0 +1,69 @@
+---
+// F10 · Franjas de datos (servicios y precios). FO/bocetos/f10-servicios-precios.html + W-CONV-55.
+// Arriba, franjas pixeladas de líneas finas y bloques de datos que parpadean en
+// escalones (6 s, steps); abajo, rejilla isométrica. "Todo medido". Solo opacity.
+// Quieto: los bloques encendidos a su intensidad base.
+// Por debajo de 1024 el texto centrado llena el ancho: los bloques se comprimen en la
+// franja entre la barra y el antetítulo (AA en el peor instante; rev2 I-2).
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Bloques deterministas (posición en % para que llenen cualquier ancho).
+const bloques = Array.from({ length: 30 }, (_, i) => ({
+  top: (i * 9) % 176,
+  left: ((i * 137) % 1340) / 14.4,
+  w: 40 + ((i * 73) % 250),
+  o: (0.2 + ((i * 7) % 10) / 45).toFixed(2),
+  d: (i * 0.37).toFixed(2),
+}));
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-fr { position: absolute; inset: 0; }
+  .wf-fr__lineas {
+    position: absolute; inset: var(--nav-h) 0 auto; height: 420px;
+    background: repeating-linear-gradient(180deg, rgba(var(--wf-a), .17) 0 1px, transparent 1px 6px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+            mask-image: linear-gradient(180deg, #000, transparent);
+  }
+  .wf--eco .wf-fr__lineas { inset: 0; height: auto; }
+  .wf-fr__bloques {
+    position: absolute; left: 0; right: 0; top: calc(var(--nav-h) + 8px); height: 200px;
+    -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent);
+            mask-image: linear-gradient(180deg, #000 30%, transparent);
+  }
+  .wf-fr__bloques i {
+    position: absolute; height: 3px; background: rgb(var(--wf-a)); opacity: var(--o);
+    top: calc(var(--t) * 1px);
+    animation: wf-fr-parpadea 6s steps(3, jump-none) infinite;
+  }
+  @keyframes wf-fr-parpadea { 0%, 100% { opacity: var(--o); } 50% { opacity: .02; } }
+  .wf-fr__iso {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58%;
+    background:
+      repeating-linear-gradient(30deg, rgba(var(--wf-a), .12) 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(150deg, rgba(var(--wf-a), .12) 0 1px, transparent 1px 36px);
+    -webkit-mask-image: linear-gradient(0deg, #000, transparent);
+            mask-image: linear-gradient(0deg, #000, transparent);
+  }
+  @media (max-width: 1023.98px) {
+    .wf--hero .wf-fr__bloques {
+      height: calc(var(--w-hero-top) - var(--nav-h) - 22px);
+      -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+              mask-image: linear-gradient(180deg, #000 55%, transparent);
+    }
+    .wf--hero .wf-fr__bloques i { top: calc(var(--t) / 176 * (var(--w-hero-top) - var(--nav-h) - 25px)); }
+  }
+  @media (max-width: 767.98px) {
+    .wf-fr__bloques i:nth-child(2n) { display: none; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-fr">
+  <div class="wf-fr__lineas"></div>
+  {!eco && (
+    <div class="wf-fr__bloques">
+      {bloques.map((b) => <i style={`--t:${b.top};left:${b.left.toFixed(1)}%;width:${b.w}px;--o:${b.o};animation-delay:-${b.d}s`}></i>)}
+    </div>
+  )}
+  {!eco && <div class="wf-fr__iso"></div>}
+</div>

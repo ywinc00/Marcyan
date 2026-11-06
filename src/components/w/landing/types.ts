@@ -19,6 +19,41 @@ export type LandingKind =
   | 'barrio';
 
 export type LandingLang = 'es' | 'en';
+
+/**
+ * Fondos temáticos por landing (design/rediseno-workos-v2.md §1.3 y P12).
+ * Un motivo por página que cuenta su tema; vive en el hero y se funde a la noche.
+ * F11 (portafolio) no existe: el portafolio se queda en el espacio (§5-7).
+ */
+export type TemaFondo =
+  | 'reticula'      // F01 diseño web
+  | 'escaparate'    // F02 tienda en línea
+  | 'radar'         // F03 SEO local
+  | 'hilos'         // F04 IA conversacional
+  | 'placa'         // F05 IA para pymes
+  | 'construccion'  // F06 branding
+  | 'plano'         // F07 sectores
+  | 'calles'        // F08 barrios
+  | 'tunel'         // F09 SEO para IA
+  | 'franjas'       // F10 servicios y precios
+  | 'escaneo'       // F12 diagnóstico y herramientas
+  | 'hoja';         // F13 blog
+
+/** Código del plan (F01…F13, sin F11): el plan G escribe `fondo: 'F01'`; se aceptan los dos. */
+export type CodigoFondo =
+  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F10' | 'F12' | 'F13';
+
+const POR_CODIGO: Record<CodigoFondo, TemaFondo> = {
+  F01: 'reticula', F02: 'escaparate', F03: 'radar', F04: 'hilos', F05: 'placa', F06: 'construccion',
+  F07: 'plano', F08: 'calles', F09: 'tunel', F10: 'franjas', F12: 'escaneo', F13: 'hoja',
+};
+/** Normaliza un código del plan ('F03') o un nombre ('radar') al nombre del tema. */
+export function temaDeFondo(t: TemaFondo | CodigoFondo): TemaFondo {
+  return (POR_CODIGO as Record<string, TemaFondo>)[t] ?? (t as TemaFondo);
+}
+
+/** Barrios con vías reales en public/geo/*-mapa.json (F08). Sin barrio, F08 es abstracto y declarado. */
+export type BarrioFondo = 'katy' | 'sugar-land' | 'doral' | 'hialeah';
 export type LandingTone = 'gold' | 'teal';
 
 /** Lo que cada hero y cada sección recibe para construir sus props. */
@@ -77,4 +112,21 @@ export interface KindSpec {
   sections: SectionSpec[];
   /** Tono de la página; si falta, el de `cluster.hero.tone`. */
   tone?: LandingTone | ((ctx: Omit<LandingCtx, 'tone'>) => LandingTone);
+  /**
+   * Fondo temático (P12). Si existe, WLanding monta `<Fondo tema>` en el hero y NO monta
+   * SpaceBackdrop (una atmósfera por página). Si falta, la página queda igual que hoy.
+   */
+  fondo?: TemaFondo | CodigoFondo;
+  /**
+   * Opciones del fondo: eco quieto al 40 % en el capítulo de contraste, lado del texto del
+   * hero, barrio de F08 (solo el eco dibuja sus vías reales) y `vars`, ajustes de posición
+   * por página en variables --wf-* (p. ej. "--wf-obj: 600px; --wf-sel-1: 5 / 9"), que
+   * WLanding aplica al fondo del hero y al eco. Lista de variables en fondos/Fondo.astro.
+   */
+  fondoOpciones?: (ctx: LandingCtx) => {
+    eco?: boolean;
+    texto?: 'centro' | 'izquierda' | 'ambos';
+    barrio?: BarrioFondo;
+    vars?: string;
+  };
 }

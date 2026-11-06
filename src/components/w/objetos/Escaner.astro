@@ -22,12 +22,13 @@
 // Props que se conservan: variant, size, class, motion (motion ya NO apaga el bucle: 'once'
 // y 'static' se aceptan por compatibilidad y también viven).
 // Tamaños (tabla en W2/escaner-vivo/informe.md); "aire" = relleno lateral del mosaico:
-//   mini (portada y hubs): radio 24, caja 160×110, chips 32, aire 24, barra 88×8 (escala de
-//     la 132×10 a esta caja). Móvil: caja 128×88 (112×78 bajo 360), chips 28, aire 14, alto 236.
+//   mini (portada y hubs): radio 24, caja 160×110, chips 30, aire 24, barra 88×8 (escala de
+//     la 132×10 a esta caja). Móvil: caja 128×88 (112×78 bajo 360), chips 25, aire 14, alto 236.
 //   card: radio 32, caja 204×141, chips 40, aire 24.
 //   hero (diagnóstico): radio 48, caja 250×172 con 24 px de aire, chips 49 radio 12, texto 16,
 //     aire 32 (no 64: así caben las columnas). Móvil hero y card: caja 150×104, chips 32, alto 360
-//     (116×80 y chips 30 bajo 360).
+//     (116×80 y chips 30 bajo 360). En PC la escala del hero la manda el ancho de la TARJETA
+//     (@container): card bajo 570 px y caja de mini con chips 38 bajo 490 (diagnóstico de ~1000 a ~1250).
 // Caja central: web en línea NEUTRA (sin marca) con cotas de diseño. Provisional hasta que
 // A0 integre WebEjemplo estado="alambre" (se cambia aquí por ese componente).
 // CERROJO 5: sale de v3 (portada y hubs), así que TODO su CSS va aquí y solo lee variables.
@@ -49,8 +50,8 @@ const en = lang === 'en';
 // El corto se usa donde el largo no cabe entero (lados de la caja, móvil). Cada señal sale
 // UNA sola vez por instancia, larga o corta (W-ADV-45 enseña ~20 señales sin repetir).
 const SENALES: [string, string][] = en
-  ? [['Mobile version', 'Mobile'], ['Visible phone', 'Phone'], ['Text without JavaScript', 'Text without JavaScript'], ['Secure connection', 'Padlock'], ['A page per service', 'Services'], ['Google reviews', 'Reviews'], ['Clear title', 'Title'], ['Tap to call', 'Tap to call'], ['Data for AI', 'Data for AI'], ['City mentioned', 'City'], ['Contact form', 'Form'], ['Photo descriptions', 'Photos'], ['Direct answers', 'Answers'], ['Visible WhatsApp', 'WhatsApp'], ['Business data', 'Business data'], ['Summary up top', 'Summary'], ['Google description', 'Description'], ['Contact button in view', 'Contact'], ['Live website', 'Live site']]
-  : [['Versión móvil', 'Móvil'], ['Teléfono visible', 'Teléfono'], ['Texto sin JavaScript', 'Texto sin JavaScript'], ['Conexión segura', 'Candado'], ['Páginas por servicio', 'Servicios'], ['Reseñas en Google', 'Reseñas'], ['Título claro', 'Título'], ['Llamar con un toque', 'Llamar'], ['Datos para IA', 'Datos para IA'], ['Ciudad mencionada', 'Ciudad'], ['Formulario de contacto', 'Formulario'], ['Fotos con descripción', 'Fotos'], ['Respuestas directas', 'Respuestas'], ['WhatsApp visible', 'WhatsApp'], ['Datos del negocio', 'Ficha'], ['Resumen al inicio', 'Resumen'], ['Descripción en Google', 'Descripción'], ['Botón de contacto a la vista', 'Contacto'], ['Sitio activo', 'Sitio activo']];
+  ? [['Mobile version', 'Mobile'], ['Visible phone', 'Phone'], ['Text without JavaScript', 'Text without JavaScript'], ['Secure connection', 'Secure'], ['A page per service', 'Services'], ['Google reviews', 'Reviews'], ['Clear title', 'Title'], ['Tap to call', 'Tap to call'], ['Data for AI', 'Data for AI'], ['City mentioned', 'City'], ['Contact form', 'Form'], ['Photo descriptions', 'Photos'], ['Direct answers', 'Answers'], ['Visible WhatsApp', 'WhatsApp'], ['Business data', 'Business data'], ['Summary up top', 'Summary'], ['Google description', 'Description'], ['Contact button in view', 'Contact'], ['Live website', 'Live site']]
+  : [['Versión móvil', 'Móvil'], ['Teléfono visible', 'Teléfono'], ['Texto sin JavaScript', 'Texto sin JavaScript'], ['Conexión segura', 'Candado'], ['Páginas por servicio', 'Servicios'], ['Reseñas en Google', 'Reseñas'], ['Título claro', 'Título'], ['Llamar con un toque', 'Llamar'], ['Datos para IA', 'Datos para IA'], ['Ciudad mencionada', 'Ciudad'], ['Formulario de contacto', 'Formulario'], ['Fotos con descripción', 'Fotos'], ['Respuestas directas', 'Respuestas'], ['WhatsApp visible', 'WhatsApp'], ['Datos del negocio', 'Negocio'], ['Resumen al inicio', 'Resumen'], ['Descripción en Google', 'Descripción'], ['Botón de contacto a la vista', 'Contacto'], ['Sitio activo', 'Sitio activo']];
 // Reparto inicial (sin JavaScript): 6 señales cortas a los lados de la caja y las 13
 // restantes, largas, en las 4 filas anchas. El guion lo rehace midiendo: columnas laterales
 // de ancho fijo, filas anchas desde el mismo margen izquierdo, nada repetido ni cortado.
@@ -150,6 +151,7 @@ const sr = en
     // entero o fuera; ninguna señal dos veces; si se acaban, la fila sale más corta.
     let candidates: HTMLElement[] = [];
     const layout = () => {
+      all.forEach(({ s }) => { s.style.paddingInline = ''; });
       const probe = all[0].s;
       if (!probe.isConnected) rows[0].appendChild(probe);
       const ps = getComputedStyle(probe);
@@ -158,18 +160,23 @@ const sr = en
       ctx.font = `${ps.fontWeight} ${ps.fontSize} ${ps.fontFamily}`;
       const pad = parseFloat(ps.paddingLeft) * 2 + 3; // relleno + borde + holgura
       const width = (t: string) => Math.ceil(ctx!.measureText(t).width + pad);
-      const ws = getComputedStyle(el);
+      // En las columnas laterales el chip ya tiene ancho fijo: si ninguna señal cabe con su
+      // relleno normal, se admite una con relleno de 10 px antes de dejar el hueco vacío.
+      const ajuste = Math.max(0, parseFloat(ps.paddingLeft) * 2 - 20);
+      // Las medidas se leen del mosaico (las escalas por ancho de tarjeta, @container, viven ahí).
+      const ws = getComputedStyle(wall);
       const gap = parseFloat(ws.getPropertyValue('--sc-gap')) || 8;
       const cap = parseFloat(ws.getPropertyValue('--sc-col')) || 180;
 
       all.forEach(({ s }) => { s.remove(); s.classList.remove('is-lit', 'is-on'); s.style.width = ''; });
       wall.querySelectorAll('.wo-scan__gap').forEach((g) => g.remove());
+      rows.forEach((r) => r.classList.remove('is-vacia'));
       const free = new Set(sig);
-      const pick = (max: number, preferShort = false) => {
+      const pick = (max: number, preferShort = false, tight = 0) => {
         const order: ('long' | 'short')[] = preferShort ? ['short', 'long'] : ['long', 'short'];
         for (const k of order) for (const x of sig) {
           if (!free.has(x)) continue;
-          const w = width(x[k]);
+          const w = width(x[k]) - tight;
           if (w <= max) { free.delete(x); x.s.textContent = x[k]; return { x, w }; }
         }
         return null;
@@ -188,30 +195,51 @@ const sr = en
           for (let j = 0; j < k; j++) {
             const x0 = sr.left + j * (colW + gap);
             const slot = new DOMRect(x0, sr.top, colW, sr.height);
-            const p = obstacles.some((o) => rectsOverlap(slot, o)) ? null : pick(colW, colW < cap * 0.7);
+            const libre = !obstacles.some((o) => rectsOverlap(slot, o));
+            const normal = libre ? pick(colW, colW < cap * 0.7) : null;
+            const p = normal || (libre ? pick(colW, true, ajuste) : null);
+            if (p && !normal) p.x.s.style.paddingInline = '10px';
             const n: HTMLElement = p ? p.x.s : Object.assign(document.createElement('i'), { className: 'wo-scan__gap' });
             n.style.width = `${colW}px`;
             side.appendChild(n);
           }
         }
       }
-      // 2) filas anchas: las de dentro antes que las del borde.
+      // 2) filas anchas: las de dentro antes que las del borde; cada pareja (dentro, borde) se llena a la
+      //    par (chip a chip) para que arriba y abajo queden equilibradas.
       const anchas = rows.filter((r) => r.classList.contains('wo-scan__row--ancha'));
-      const prio = [anchas[1], anchas[2], anchas[0], anchas[3]].filter(Boolean);
-      for (const r of prio) {
+      const fila = (r: HTMLElement) => {
         const rr = r.getBoundingClientRect();
         const cs = getComputedStyle(r);
         const left = rr.left + parseFloat(cs.paddingLeft);
         let right = rr.right - parseFloat(cs.paddingRight);
         obstacles.forEach((o) => { if (o.top < rr.bottom && o.bottom > rr.top && o.left < right) right = Math.min(right, o.left); });
-        let used = 0;
-        for (;;) {
-          const room = right - left - (used ? used + gap : 0);
-          const p = pick(room);
-          if (!p) break;
-          used = used ? used + gap + p.w : p.w;
-          r.appendChild(p.x.s);
-        }
+        return { r, room: rr.width ? right - left : 0, used: 0, chips: [] as { s: HTMLElement; w: number }[] };
+      };
+      const put = (f: ReturnType<typeof fila>) => {
+        const p = pick(f.room - (f.used ? f.used + gap : 0));
+        if (!p) return false;
+        f.used = f.used ? f.used + gap + p.w : p.w;
+        f.chips.push({ s: p.x.s, w: p.w });
+        f.r.appendChild(p.x.s);
+        return true;
+      };
+      const dentro = [anchas[1], anchas[2]].filter(Boolean).map(fila);
+      for (let more = true; more;) { more = false; for (const f of dentro) more = put(f) || more; }
+      const borde = [anchas[0], anchas[3]].filter(Boolean).map(fila);
+      for (let more = true; more;) { more = false; for (const f of borde) more = put(f) || more; }
+      // Si las señales no llegan a las dos filas del borde (tarjeta muy ancha), salen las dos:
+      // el muro sigue centrado en la caja y no queda una fila vacía.
+      if (borde.length === 2 && borde.some((f) => !f.chips.length)) {
+        borde.forEach((f) => { f.chips.forEach(({ s }) => s.remove()); f.chips = []; f.r.classList.add('is-vacia'); });
+      }
+      // Lo que sobra en cada fila se reparte entre sus chips (celdas algo más anchas, como el
+      // muro del original), con tope, para que la fila llegue al filo de la máscara.
+      for (const f of [...dentro, ...borde]) {
+        const left = f.room - f.used;
+        if (!f.chips.length || left <= 0 || left > f.room * 0.45) continue;
+        const extra = Math.min(left / f.chips.length, Math.min(...f.chips.map((c) => c.w)) * 0.6);
+        f.chips.forEach((c) => { c.s.style.width = `${Math.floor(c.w + extra)}px`; });
       }
 
       const card = el.getBoundingClientRect();
@@ -222,8 +250,11 @@ const sr = en
         const cx = (r.left + r.right) / 2 - (card.left + card.width / 2);
         const cy = (r.top + r.bottom) / 2 - (card.top + card.height / 2);
         // a encender: dentro de la zona nítida (la máscara funde la derecha y los bordes)
-        if (cx < card.width * 0.16 && (cx / (card.width * 0.44)) ** 2 + (cy / (card.height * 0.4)) ** 2 < 1) candidates.push(s);
+        if (cx < card.width * 0.3 && (cx / (card.width * 0.44)) ** 2 + (cy / (card.height * 0.4)) ** 2 < 1) candidates.push(s);
       }
+      // Movimiento reducido: cada nuevo reparto (redimensión, fuentes, botón) vuelve a dejar
+      // 3 chips encendidos; sin esto el relayout los apagaba.
+      if (el.classList.contains('is-still')) { lastLit = []; light(3, true); }
     };
 
     let lastLit: HTMLElement[] = [];
@@ -259,7 +290,7 @@ const sr = en
     const ctl = registerLoop(el, {
       start: () => { el.classList.remove('is-still'); el.querySelectorAll('.is-on').forEach((c) => c.classList.remove('is-on')); el.classList.add('is-run', 'is-playing'); },
       stop: () => el.classList.remove('is-playing'),
-      still: () => { el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); requestAnimationFrame(() => { layout(); light(3, true); }); },
+      still: () => { el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); requestAnimationFrame(layout); },
     }, { lang, buttonHost: host });
     relayout(); // el botón de pausa ya existe: quitar los chips que pisa
     void ctl;
@@ -297,6 +328,7 @@ const sr = en
     --sc-bar: 132px; --sc-pad: 32px; --sc-col: 210px;
     --sc-travel: calc(var(--sc-bh) - 34px);
     position: relative; overflow: hidden; isolation: isolate;
+    container: wo-scan / inline-size; /* escalas por ancho de TARJETA (ver "Tamaños") */
     width: 100%; min-height: 480px;
     border-radius: 48px;
     background: var(--w-s1);
@@ -330,6 +362,7 @@ const sr = en
   .wo-scan__lado { display: flex; flex: 1 1 0; min-width: 0; }
   .wo-scan__row--lados { column-gap: calc(var(--sc-bw) + var(--sc-air) * 2); } /* el hueco de la caja */
   .wo-scan__gap { flex: none; display: block; height: var(--sc-ch); }
+  .wo-scan__row.is-vacia { display: none; } /* filas del borde sin señales (tarjeta muy ancha) */
 
   .wo-scan__wall span {
     position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center;
@@ -405,7 +438,7 @@ const sr = en
   }
   .wo-scan--mini {
     --sc-bw: 160px; --sc-bh: 110px; --sc-air: 12px;
-    --sc-ch: 32px; --sc-gap: 7px; --sc-px: 13px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 88px;
+    --sc-ch: 30px; --sc-gap: 6px; --sc-px: 13px; --sc-fs: 13px; --sc-r: 8px; --sc-bar: 88px; /* 7 filas = 246 de 300: 27 px de aire */
     --sc-pad: 24px; --sc-col: 160px;
     --sc-travel: calc(var(--sc-bh) - 30px);
     min-height: 300px; border-radius: 24px;
@@ -424,7 +457,7 @@ const sr = en
     }
     .wo-scan--mini {
       --sc-bw: 128px; --sc-bh: 88px; --sc-air: 8px;
-      --sc-ch: 28px; --sc-gap: 5px; --sc-px: 9px; --sc-fs: 12px; --sc-r: 7px; --sc-bar: 72px;
+      --sc-ch: 25px; --sc-gap: 4px; --sc-px: 9px; --sc-fs: 12px; --sc-r: 7px; --sc-bar: 72px; /* 7 filas = 199 de 236: 18 px de aire */
       --sc-pad: 14px; --sc-col: 140px;
       min-height: 236px;
     }
@@ -435,6 +468,29 @@ const sr = en
       --sc-ch: 30px; --sc-gap: 6px; --sc-px: 8px; --sc-fs: 12px; --sc-r: 7px;
     }
     .wo-scan--mini { --sc-bw: 112px; --sc-bh: 78px; --sc-air: 6px; --sc-pad: 10px; --sc-bar: 60px; }
+  }
+
+  /* Hero y card en una columna estrecha de PC (diagnóstico entre ~1000 y ~1250 px: tarjeta de
+     450 a 570): la escala la manda el ancho de la TARJETA, no el de la ventana, para que a cada
+     lado de la caja quepa siempre una columna de chips. Las variables se redefinen en los hijos
+     (un @container no puede cambiar al propio contenedor). */
+  @media (min-width: 768px) {
+    @container wo-scan (max-width: 569.98px) {
+      .wo-scan--hero > .wo-scan__wall, .wo-scan--hero > .wo-scan__box {
+        --sc-bw: 204px; --sc-bh: 141px; --sc-air: 16px;
+        --sc-ch: 40px; --sc-gap: 10px; --sc-px: 16px; --sc-fs: 14px; --sc-r: 10px; --sc-bar: 108px;
+        --sc-pad: 24px; --sc-col: 180px; --sc-travel: calc(var(--sc-bh) - 34px);
+      }
+    }
+    @container wo-scan (max-width: 489.98px) {
+      .wo-scan--hero > .wo-scan__wall, .wo-scan--hero > .wo-scan__box,
+      .wo-scan--card > .wo-scan__wall, .wo-scan--card > .wo-scan__box {
+        /* caja de mini y chips de 38: la tarjeta sigue midiendo 480 de alto en PC */
+        --sc-bw: 160px; --sc-bh: 110px; --sc-air: 10px;
+        --sc-ch: 38px; --sc-gap: 10px; --sc-px: 12px; --sc-fs: 14px; --sc-r: 9px; --sc-bar: 88px;
+        --sc-pad: 16px; --sc-col: 150px; --sc-travel: calc(var(--sc-bh) - 34px);
+      }
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -258,6 +258,14 @@ const cells = copy.cells.map((c) => ({ ...c, tray: false }));
   .mq-msg--m .mq-msg__b { background: #1b1a17; color: #f4f1eb; border-bottom-left-radius: 4px; }
   .mq-msg__h { font: 400 11px/1 var(--font-body); color: #7a746b; }
 
+  /* Escritorio ancho (G03 ronda 1, I3): el objeto entero a escala 1,24, como en W-CORE-08, donde
+     la letra del objeto es la de la celda. La bandeja pasa de 420 a 521 px: el 81 % de una celda
+     de 644 (antes 65 %), y el alto crece en la misma proporción. zoom escala medidas y letra a la
+     vez sin transform (el bucle de idiomas y la pausa siguen igual). */
+  @media (--xl) {
+    .mq-tray { zoom: 1.24; }
+  }
+
   /* Móvil: la bandeja ocupa la celda (a 350 px el 80 % no deja leer las gemelas). */
   @media (--lt-md) {
     .mq-tray { max-width: none; padding: 10px; border-radius: 18px; }

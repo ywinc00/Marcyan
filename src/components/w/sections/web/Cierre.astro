@@ -64,7 +64,9 @@ const P = lang === 'en'
   /* ── Pantalla: web publicada en el lienzo 1378×895 (decorativa, atenuada por la escena) ── */
   .wcz-p { position: absolute; inset: 0; background: #f4f1ea; color: #1b1a17; font-family: var(--font-body); overflow: hidden; }
   .wcz-p p { margin: 0; }
-  .wcz-p__url { height: 44px; display: grid; place-items: center; font: 400 15px/1 var(--font-mono); color: #6e6860; background: #e9e5dd; border-bottom: 1px solid rgba(27,26,23,.08); }
+  .wcz-p__url::before { content: ''; position: absolute; left: 40px; top: 17px; width: 10px; height: 10px; border-radius: 50%; background: #cfc9bf; box-shadow: 18px 0 0 #cfc9bf, 36px 0 0 #cfc9bf; }
+  /* La dirección va a la izquierda, como en un navegador: centrada caía bajo la muesca (m1). */
+  .wcz-p__url { height: 44px; display: flex; align-items: center; padding-left: 128px; font: 400 15px/1 var(--font-mono); color: #6e6860; background: #e9e5dd; border-bottom: 1px solid rgba(27,26,23,.08); }
   .wcz-p__nav { display: flex; align-items: center; gap: 28px; height: 84px; padding: 0 56px; border-bottom: 1px solid rgba(27,26,23,.08); font-size: 17px; white-space: pre; }
   .wcz-p__nav b { font: 600 24px/1 var(--font-display); letter-spacing: -.04em; padding-left: 34px; position: relative; }
   .wcz-p__nav b::before { content: ''; position: absolute; left: 0; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; box-shadow: inset 0 0 0 2.5px #1b1a17; background: radial-gradient(circle, #1b1a17 0 4px, transparent 4.5px); }

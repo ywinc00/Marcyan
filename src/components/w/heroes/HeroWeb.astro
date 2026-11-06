@@ -1,14 +1,33 @@
 ---
-// Hero de las landings de diseño web (design/rediseno-workos.md §4.14, piloto ola 1).
-// A-05 + A-12 + W-CORE-01/02: texto centrado en 768 (HeroTexto pone la coreografía
-// de §2.9), debajo el abanico con las 3 webs de EJEMPLO nuestras sobre franjas de
-// luz oro a ventana completa, y la tira de nombres reales (~90 px bajo el abanico;
-// TiraLogos no pinta nada en Miami).
-// El abanico recorta en vertical él mismo; esta sección recorta en horizontal
-// (las franjas miden 100vw) y reserva la nav con .w-hero.
+// Hero de las landings de diseño web (design/rediseno-workos.md §4.14 · v2 G03).
+// A-05 + A-12 + W-CORE-01/02: texto centrado en 768 (HeroTexto pone la coreografía de §2.9),
+// debajo el abanico de 3 webs de EJEMPLO sobre franjas de luz oro a ventana completa, y la
+// tira de nombres reales (TiraLogos no pinta nada en Miami).
+//
+// ABANICO (G03 ronda 1, B1). P02b (AbanicoWebs premium) no existe todavía: esta página monta
+// su propio abanico con la composición que fija el plan v2 para P02b, sin tocar el componente
+// compartido. Cuando P02b llegue, se sustituye por él si iguala esto (texto ≥ 11 px y un rótulo).
+//   · Central 400×478 (plomería) SIN relleno: el lienzo vertical (400) se pinta a escala 1 y
+//     todo su texto queda ≥ 13 px (antes 9,8 px dentro de un relleno de 48). Móvil: 340 de ancho,
+//     escala 0,85, texto ≥ 11 px (a 280 quedaba en 9,1).
+//   · Laterales 264×381, 50 px más bajas, asomando 180 px, INCLINADAS ±3° y apagadas como en
+//     W-CORE-01, cada una con SU marca (salón izquierda, restaurante derecha): fondo de su paleta,
+//     composición mini a tamaño natural (logo, horario, titular, acción, todo ≥ 11 px) colocada
+//     ENTERA en la franja visible, y debajo su plano de imagen. El texto que no cabe no se pinta:
+//     nada queda cortado por la central. En móvil solo asoman 25 px de color: no llevan texto.
+//   · UN rótulo "Ejemplos" bajo el abanico (antes, tres).
+// Coreografía (§2.9): central data-w-in="obj"; laterales "sat" saliendo de detrás. El giro va en
+// un hijo: lo que lleva data-w-in no usa transform para colocarse.
+//
+// AJUSTES LOCALES AL FONDO F01 (G03 ronda 1, I1 y m4). La causa está en F01Reticula.astro
+// (sistema, P12): cifras de la regla a 9 px y rótulo del marco a 10 px. Aquí, solo en esta
+// página: la regla pierde las cifras (quedan las marcas), baja 12 px para no pegarse al menú,
+// el rótulo del marco sube a 11 px y el botón de pausa sube a la altura de las migas, lejos de
+// la tira de clientes. PENDIENTE de llevar al propio F01 cuando se toque P12.
 import HeroTexto from '../HeroTexto.astro';
-import AbanicoWebs from '../objetos/AbanicoWebs.astro';
+import WebEjemplo from '../objetos/WebEjemplo.astro';
 import TiraLogos from '../TiraLogos.astro';
+import { negocios } from '../objetos/ejemplos/negocios';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -24,6 +43,14 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { h1Html, chip, eyebrow, tail, lead, primary, link, city, cityName, lang = 'es' } = Astro.props;
+const sr = lang === 'en'
+  ? 'Examples: three websites we could build, a plumbing company, a salon and a restaurant.'
+  : 'Ejemplos: tres webs que podríamos hacer, una plomería, un salón y un restaurante.';
+const rotulo = lang === 'en' ? 'Examples' : 'Ejemplos';
+const fondoDe = (id: 'salon' | 'restaurante') => {
+  const p = negocios[id].paleta;
+  return `--hw-bg:${p.bg};--hw-acc:${p.accent};--hw-ink:${p.ink}`;
+};
 ---
 <section class="w-hero w-hero--bleed hw">
   <div class="w-container hw__text">
@@ -41,8 +68,27 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, city, cityName, lang =
     </HeroTexto>
   </div>
   <div class="hw__fan">
-    <AbanicoWebs lang={lang} city={cityName} />
+    <div class="hf">
+      <p class="sr-only">{sr}</p>
+      <div class="hf__stripes" aria-hidden="true"></div>
+      <div class="hf__pos hf__pos--l" data-w-in="sat" style="--w-sat-x:120px;--w-sat-y:30px" aria-hidden="true">
+        <div class="hf__side hf__side--l hf__side--salon" style={fondoDe('salon')}>
+          <div class="hf__mini"><WebEjemplo marca="salon" frame="desnudo" vista="mini" lang={lang} city={cityName} ejemplo={false} /></div>
+          <span class="hf__foto"></span>
+        </div>
+      </div>
+      <div class="hf__pos hf__pos--r" data-w-in="sat" style="--w-sat-x:-120px;--w-sat-y:30px" aria-hidden="true">
+        <div class="hf__side hf__side--r hf__side--rest" style={fondoDe('restaurante')}>
+          <div class="hf__mini"><WebEjemplo marca="restaurante" frame="desnudo" vista="mini" lang={lang} city={cityName} ejemplo={false} /></div>
+          <span class="hf__foto"></span>
+        </div>
+      </div>
+      <div class="hf__main" data-w-in="obj" aria-hidden="true">
+        <WebEjemplo marca="plomeria" frame="desnudo" lienzo="vertical" vista="hero" lang={lang} city={cityName} ejemplo={false} />
+      </div>
+    </div>
   </div>
+  <div class="w-container hw__rot"><span>{rotulo}</span></div>
   {city !== 'miami' && (
     <div class="w-container hw__logos">
       <TiraLogos lang={lang} city={city} />
@@ -52,13 +98,95 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, city, cityName, lang =
 
 <style>
   .hw { overflow-x: clip; }
-  /* El abanico se corta en una línea de suelo (como la línea de celda que sigue),
-     no en un borde recto sin intención (E-36). */
+  /* El abanico se corta en una línea de suelo (como la línea de celda que sigue), E-36. */
   .hw__fan { margin-top: 56px; border-bottom: 1px solid var(--w-line-strong); }
-  /* Migas a la izquierda en escritorio: las coloca HeroTexto (sistema tras el piloto). */
-  .hw__logos { margin-top: 72px; padding-bottom: 72px; }
+  .hw__rot { display: flex; justify-content: flex-end; margin-top: 12px; }
+  .hw__rot span {
+    font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--w-ink-60, rgba(240, 237, 232, .6));
+  }
+  .hw__logos { margin-top: 56px; padding-bottom: 72px; }
+  .hw:not(:has(.hw__logos)) .hw__rot { padding-bottom: 56px; }
+
+  /* ── Abanico ─────────────────────────────────────────────────── */
+  .hf { position: relative; height: 452px; overflow-y: clip; isolation: isolate; }
+  .hf__stripes {
+    position: absolute; z-index: -1;
+    left: 50%; width: 100vw; margin-left: -50vw; top: 22%; bottom: 0;
+    background: var(--w-stripes);
+    -webkit-mask-image:
+      linear-gradient(180deg, transparent 0%, #000 50%, #000 100%),
+      linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(180deg, transparent 0%, #000 50%, #000 100%),
+      linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    mask-composite: intersect;
+    pointer-events: none;
+  }
+  .hf__main {
+    position: absolute; z-index: 2; top: 0; left: calc(50% - 200px);
+    width: 400px; height: 478px; overflow: hidden;
+    border-radius: 16px; background: #F3EFE6;
+    box-shadow: 0 0 0 1px rgba(14, 14, 13, .08), inset 0 1px 0 #fff, 0 30px 60px -30px rgba(0, 0, 0, .7);
+  }
+  .hf__pos { position: absolute; z-index: 1; top: 50px; width: 264px; height: 381px; }
+  .hf__pos--l { left: calc(50% - 200px - 180px); }
+  .hf__pos--r { left: calc(50% + 200px - 84px); }
+  .hf__side {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    border-radius: 16px; background: var(--hw-bg);
+    box-shadow: 0 0 0 1px rgba(14, 14, 13, .1), 0 24px 48px -28px rgba(0, 0, 0, .8);
+  }
+  .hf__side--l { transform: rotate(-3deg); transform-origin: 100% 100%; }
+  .hf__side--r { transform: rotate(3deg); transform-origin: 0% 100%; }
+  /* Segundo plano, como W-CORE-01: un velo de noche por encima (no cambia el tamaño de la letra). */
+  .hf__side::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(8, 8, 8, .16), rgba(8, 8, 8, .34));
+  }
+  /* La composición mini va entera en la franja que asoma (180 px). */
+  .hf__mini { position: absolute; top: 6px; width: 176px; }
+  .hf__side--l .hf__mini { left: 0; }
+  .hf__side--r .hf__mini { right: 0; }
+  .hf__mini :global(.ej__tit) { font-size: 20px; }
+  /* Plano de imagen de cada marca (la foto de su hero), en la franja visible. */
+  .hf__foto {
+    position: absolute; bottom: 22px; width: 144px; height: 150px; overflow: hidden;
+    border-radius: 10px; background: color-mix(in srgb, var(--hw-acc) 22%, var(--hw-bg));
+  }
+  .hf__side--l .hf__foto { left: 16px; }
+  .hf__side--r .hf__foto { right: 16px; }
+  /* Salón: arco de espejo con su marco fino. Restaurante: plato visto desde arriba. */
+  .hf__side--salon .hf__foto::before {
+    content: ''; position: absolute; left: 30px; right: 30px; top: 22px; bottom: -2px;
+    border-radius: 999px 999px 0 0; border: 1.5px solid var(--hw-acc);
+    background: color-mix(in srgb, var(--hw-acc) 14%, transparent);
+  }
+  .hf__side--rest .hf__foto { border-radius: 2px; background: color-mix(in srgb, #000 22%, var(--hw-bg)); }
+  .hf__side--rest .hf__foto::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 104px; height: 104px; margin: -52px 0 0 -52px;
+    border-radius: 50%; background: radial-gradient(circle, var(--hw-acc) 0 30px, transparent 31px),
+      radial-gradient(circle, #FFF6EC 0 46px, transparent 47px);
+    box-shadow: 0 0 0 1px rgba(255, 246, 236, .35);
+  }
+
+  /* ── Ajustes locales al fondo F01 (ver cabecera) ─────────────── */
+  :global([data-w-kind='web'] .wf-r__marcas span) { display: none; }
+  :global([data-w-kind='web'] .wf-r__regla) { top: calc(var(--nav-h) + 12px); }
+  :global([data-w-kind='web'] .wf-r__f b) { font-size: 11px; top: -23px; }
+  :global([data-w-kind='web'] .wf-zona > .wf-pausa) { top: calc(var(--nav-h) + 52px); bottom: auto; }
+
   @media (--lt-md) {
     .hw__fan { margin-top: 48px; }
-    .hw__logos { margin-top: 56px; padding-bottom: 56px; }
+    .hw__logos { margin-top: 44px; padding-bottom: 56px; }
+    .hf { height: 360px; }
+    .hf__main { width: 340px; height: 430px; left: calc(50% - 170px); }
+    .hf__pos { top: 40px; width: 200px; height: 320px; }
+    .hf__pos--l { left: calc(50% - 170px - 25px); }
+    .hf__pos--r { left: calc(50% + 170px - 175px); }
+    /* Solo asoman 25 px: color de la marca, sin texto (nada a medias). */
+    .hf__mini, .hf__foto { display: none; }
+    :global([data-w-kind='web'] .wf-zona > .wf-pausa) { top: calc(var(--nav-h) + 74px); }
   }
 </style>

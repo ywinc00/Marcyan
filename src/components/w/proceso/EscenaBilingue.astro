@@ -1,0 +1,180 @@
+---
+// P11 · Escena 03 "Diseño bilingüe" (design/rediseno-workos-v2.md §2 P11).
+// La web de EJEMPLO del salón ("Tu Salón" / "Your Salon", §1.6), con la paleta, el logotipo, el titular y la acción
+// CANÓNICOS de P02a (negocios.ts, ver proceso.ts: SALON_PALETA / SALON_LOGO), para que no haya dos salones distintos;
+// hero tipográfico + volumen geométrico (sin cuadradito con inicial ni botón a todo el ancho), en un
+// navegador dibujado, con el segmentado ES | EN como satélite. Cambia UNA vez al otro idioma y vuelve:
+// el idioma nuevo entra con una cortina que barre de izquierda a derecha con su filo de luz (máscara
+// por translate contrapuesto, §1.8: nunca se ven los dos textos a la vez). Arranca con .is-play en un
+// ancestro (LineaFases); sin él, o con reducir movimiento, queda en el idioma de la página, quieta.
+// Micro-vida (§1.5): el sol del arco respira mientras la línea está a la vista (.is-vista).
+// Mientras P02 (WebEjemplo premium) no esté integrado, la web se dibuja aquí; cuando entre, el
+// director decide si se sustituye por <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
+import { copy, salon, SALON_PALETA as P, SALON_LOGO, type Lang } from './proceso';
+
+interface Props { lang?: Lang; class?: string }
+const { lang = 'es', class: cls } = Astro.props;
+const T = copy[lang].bilingue;
+const otro: Lang = lang === 'es' ? 'en' : 'es';
+const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
+// Logotipo canónico del salón (P02a), del idioma de la PÁGINA en las dos capas (E-24): la marca no se traduce al cambiar la web.
+const [lw, lh, ld] = SALON_LOGO[lang];
+const LOGO_CAP = 12;
+const logoH = +(LOGO_CAP * lh / SALON_LOGO.cap).toFixed(2), logoW = +(logoH * lw / lh).toFixed(2);
+const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.accent};--s-on:${P.onAccent}`;
+---
+<div class:list={['bi', cls]} style={vars} aria-hidden="true" data-nosnippet>
+  <div class="bi__win">
+    <div class="bi__chrome">
+      <span class="bi__dots"><i></i><i></i><i></i></span>
+      <span class="bi__url" translate="no">tusalon.example</span>
+    </div>
+    <div class="bi__view">
+      {capas.map(({ l, c }) => {
+        const S = salon[l];
+        const site = (
+          <div class="bi__site" lang={l}>
+            <div class="bi__nav">
+              <span class="bi__logo"><svg viewBox={`0 0 ${lw} ${lh}`} width={logoW} height={logoH}><path d={ld} fill="currentColor" /></svg></span>
+              <span class="bi__links">{S.nav.map((n) => <span>{n}</span>)}<b>{l.toUpperCase()}</b></span>
+            </div>
+            <div class="bi__hero">
+              <div class="bi__txt">
+                <span class="bi__h">{S.titular}</span>
+                <span class="bi__sub">{S.bajada}</span>
+                <span class="bi__btn">{S.boton}</span>
+              </div>
+              <span class="bi__art"><i class="bi__sun"></i><i class="bi__hill"></i></span>
+            </div>
+            <div class="bi__strip">
+              <span class="bi__svc">{S.servicios.map((s) => <span>{s}</span>)}</span>
+              <span class="bi__hor">{S.horario}</span>
+            </div>
+          </div>
+        );
+        return c === 'a'
+          ? <div class="bi__la">{site}</div>
+          : <div class="bi__wipe"><div class="bi__lb">{site}</div><span class="bi__edge bi__edge--r"></span><span class="bi__edge bi__edge--l"></span></div>;
+      })}
+    </div>
+  </div>
+  <span class="bi__seg" data-from={lang}>
+    <span class="bi__pill"></span>
+    <span class:list={['bi__o', lang === 'es' && 'is-a']}>{T.es}</span>
+    <span class:list={['bi__o', lang === 'en' && 'is-a']}>{T.en}</span>
+  </span>
+</div>
+
+<style>
+  .bi { position: relative; display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--font-body); }
+  .bi__win {
+    width: 424px; border-radius: var(--w-r-obj, 12px); overflow: hidden; background: #fbfaf8;
+    border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75); transform: translateX(-12px);
+  }
+  .bi__chrome { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px; border-bottom: 1px solid rgba(14,14,13,.08); }
+  .bi__dots { display: flex; gap: 5px; }
+  .bi__dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(14,14,13,.14); }
+  .bi__url { flex: 1; margin-right: 44px; text-align: center; font: 500 11px/22px var(--font-mono); color: #4a4743; background: rgba(14,14,13,.05); border-radius: 6px; }
+
+  /* Vista: la capa A (idioma de la página) debajo; la B dentro de una cortina que la descubre. */
+  .bi__view { position: relative; display: grid; overflow: hidden; }
+  .bi__la, .bi__wipe { grid-area: 1 / 1; }
+  .bi__wipe { position: relative; overflow: hidden; transform: translateX(-101%); }
+  .bi__lb { transform: translateX(101%); }
+  /* Las dos capas ocupan el alto de la más alta (el titular EN canónico es más largo): sin franja vacía bajo la capa corta. */
+  .bi__la, .bi__wipe { display: flex; }
+  .bi__lb { flex: 1; display: flex; }
+  .bi__la > .bi__site, .bi__lb > .bi__site { flex: 1; display: flex; flex-direction: column; }
+  .bi__hero { flex: 1; }
+  .bi__edge { position: absolute; top: 0; bottom: 0; width: 56px; pointer-events: none; opacity: 0; }
+  .bi__edge--r { right: 0; background: linear-gradient(90deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
+  .bi__edge--l { left: 0; background: linear-gradient(270deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
+
+  .bi__site { background: var(--s-bg); color: var(--s-ink); padding: 14px 20px 0; }
+  .bi__nav { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; }
+  .bi__logo { display: inline-flex; align-items: center; line-height: 0; color: var(--s-ink); }
+  .bi__logo svg { display: block; overflow: visible; }
+  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: var(--s-ink2); }
+  .bi__links b { font: 600 11px/1 var(--font-mono); letter-spacing: .08em; color: var(--s-acc); }
+  .bi__hero { display: grid; grid-template-columns: 1fr 120px; gap: 18px; align-items: end; }
+  .bi__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 24px; }
+  .bi__h { font: 500 36px/.96 var(--font-display); letter-spacing: -.045em; }
+  .bi__sub { font-size: 12px; line-height: 1.4; color: var(--s-ink2); }
+  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--s-acc); color: var(--s-on); font: 600 12px/1 var(--font-body); }
+  .bi__art { position: relative; height: 176px; border-radius: 60px 60px 0 0; overflow: hidden; background: linear-gradient(180deg, #eef0e8 0%, #c4cbb8 55%, #9ea893 100%); }
+  .bi__sun { position: absolute; left: 50%; top: 40px; width: 48px; height: 48px; margin-left: -24px; border-radius: 50%; background: var(--s-on); }
+  .bi__hill { position: absolute; left: -20%; right: -20%; bottom: -60px; height: 110px; border-radius: 50%; background: var(--s-acc); }
+  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid rgba(30,36,32,.16); font-size: 12px; }
+  .bi__svc { display: inline-flex; gap: 14px; font-weight: 600; }
+  .bi__hor { font: 500 11px/1 var(--font-mono); color: var(--s-ink2); white-space: nowrap; }
+
+  /* Segmentado: satélite que asoma por arriba a la derecha de la ventana (gesto W-ADV-58). */
+  .bi__seg {
+    position: absolute; top: max(6px, calc(50% - 168px)); right: max(6px, calc(50% - 236px));
+    display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px;
+    background: var(--w-s3, #1f1f1d); border: 1px solid rgba(200,169,110,.18);
+    box-shadow: 0 12px 28px -10px rgba(0,0,0,.7);
+    font: 500 12px/1 var(--font-mono); letter-spacing: .1em;
+  }
+  .bi__o { position: relative; z-index: 1; width: 44px; height: 28px; display: grid; place-items: center; color: rgba(240,237,232,.6); }
+  .bi__o.is-a { color: var(--w-p-ink, #0e0e0d); }
+  .bi__pill { position: absolute; top: 4px; left: 4px; width: 44px; height: 28px; border-radius: 999px; background: var(--accent-gold, #c8a96e); }
+  .bi__seg[data-from='en'] .bi__pill { transform: translateX(44px); }
+
+  /* ── Compacta y móvil: la web compuesta a su tamaño (texto ≥ 11 px), no encogida. ── */
+  @container (max-width: 440px) {
+    .bi { padding: 22px 0 8px; }
+    .bi__win { width: min(100%, 320px); transform: none; }
+    .bi__chrome { height: 26px; }
+    .bi__dots { display: none; }
+    .bi__url { margin-right: 70px; }
+    .bi__site { padding: 10px 14px 0; }
+    .bi__nav { padding-bottom: 10px; }
+    .bi__links span { display: none; }
+    .bi__hero { grid-template-columns: 1fr 84px; gap: 12px; }
+    .bi__txt { gap: 7px; padding-bottom: 12px; }
+    .bi__h { font-size: 22px; }
+    .bi__sub { font-size: 11px; }
+    .bi__btn { height: 26px; padding: 0 12px; font-size: 11px; }
+    .bi__art { height: 100px; border-radius: 42px 42px 0 0; }
+    .bi__sun { top: 22px; width: 30px; height: 30px; margin-left: -15px; }
+    .bi__hill { bottom: -70px; }
+    .bi__strip { height: 30px; font-size: 11px; }
+    .bi__hor { display: none; }
+    .bi__seg { top: 6px; right: max(6px, calc(50% - 166px)); }
+    .bi__o { width: 38px; height: 24px; font-size: 11px; }
+    .bi__pill { width: 38px; height: 24px; }
+    .bi__seg[data-from='en'] .bi__pill { transform: translateX(38px); }
+  }
+
+  /* ── Coreografía (5,4 s): idioma de la página · cortina al otro (900 ms) · se queda · vuelve ── */
+  :global(.is-play) .bi__win { animation: bi-win 480ms var(--w-ease-text, ease) 60ms both; }
+  :global(.is-play) .bi__wipe { animation: bi-wipe 5400ms var(--w-ease-ui, ease) both; }
+  :global(.is-play) .bi__lb { animation: bi-lb 5400ms var(--w-ease-ui, ease) both; }
+  :global(.is-play) .bi__edge--r { animation: bi-er 5400ms linear both; }
+  :global(.is-play) .bi__edge--l { animation: bi-el 5400ms linear both; }
+  :global(.is-play) .bi__seg[data-from='es'] .bi__pill { animation: bi-pill 5400ms var(--w-ease-ui, ease) both; --d: 44px; }
+  :global(.is-play) .bi__seg[data-from='en'] .bi__pill { animation: bi-pill-r 5400ms var(--w-ease-ui, ease) both; --d: 44px; }
+  @keyframes bi-win { from { opacity: 0; translate: 0 10px; scale: .98; } }
+  /* 0-24 % quieta · 24-41 % la cortina descubre el otro idioma · 41-72 % quieta · 72-89 % la cortina se va y vuelve el de la página. */
+  @keyframes bi-wipe { 0%, 24% { transform: translateX(-101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(101%); } }
+  @keyframes bi-lb { 0%, 24% { transform: translateX(101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(-101%); } }
+  @keyframes bi-er { 0%, 24% { opacity: 0; } 26%, 39% { opacity: 1; } 41%, 100% { opacity: 0; } }
+  @keyframes bi-el { 0%, 72% { opacity: 0; } 74%, 87% { opacity: 1; } 89%, 100% { opacity: 0; } }
+  @keyframes bi-pill { 0%, 24% { transform: none; } 30%, 72% { transform: translateX(var(--d)); } 78%, 100% { transform: none; } }
+  @keyframes bi-pill-r { 0%, 24% { transform: translateX(var(--d)); } 30%, 72% { transform: none; } 78%, 100% { transform: translateX(var(--d)); } }
+  @container (max-width: 440px) { :global(.is-play) .bi__pill { --d: 38px; } }
+  /* El texto del segmentado sigue a la píldora. */
+  :global(.is-play) .bi__o.is-a { animation: bi-oa 5400ms linear both; }
+  :global(.is-play) .bi__o:not(.is-a) { animation: bi-ob 5400ms linear both; }
+  @keyframes bi-oa { 0%, 26% { color: var(--w-p-ink, #0e0e0d); } 28%, 74% { color: rgba(240,237,232,.6); } 76%, 100% { color: var(--w-p-ink, #0e0e0d); } }
+  @keyframes bi-ob { 0%, 26% { color: rgba(240,237,232,.6); } 28%, 74% { color: var(--w-p-ink, #0e0e0d); } 76%, 100% { color: rgba(240,237,232,.6); } }
+  /* Micro-vida: el sol del arco respira (6 s) mientras la línea está a la vista. */
+  .bi__sun { animation: bi-sun 6s ease-in-out infinite; animation-play-state: paused; }
+  :global(.is-vista) .bi__sun { animation-play-state: running; }
+  @keyframes bi-sun { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(5px) scale(1.06); } }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.is-play) .bi__win, :global(.is-play) .bi__wipe, :global(.is-play) .bi__lb, :global(.is-play) .bi__edge--r, :global(.is-play) .bi__edge--l,
+    :global(.is-play) .bi__pill, :global(.is-play) .bi__o, .bi__sun { animation: none !important; }
+  }
+</style>

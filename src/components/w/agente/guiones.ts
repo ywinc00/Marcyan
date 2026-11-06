@@ -179,7 +179,7 @@ const BUSCAR_ES: GuionBuscar = {
         { t: 'paso', texto: 'Leyendo fuentes', ramas: ['tunegocio.example · datos para asistentes', 'Ficha de mapa · horario y servicios'] },
         { t: 'paso', texto: 'Comparando', ramas: ['Atiende en español e inglés', 'Abierto ahora'] },
       ],
-      cierre: [{ s: 'Te recomiendo ' }, { s: 'Tu Negocio', b: true }, { s: ': atiende en español e inglés y abre hasta las 6 p. m.' }],
+      cierre: [{ s: 'Te recomiendo ' }, { s: 'Tu Negocio', b: true }, { s: ': atiende en español e inglés y abre hasta las 7 p. m.' }],
     },
     sin: {
       bloques: [
@@ -208,7 +208,7 @@ const BUSCAR_EN: GuionBuscar = {
         { t: 'paso', texto: 'Reading sources', ramas: ['yourbusiness.example · data for assistants', 'Map listing · hours and services'] },
         { t: 'paso', texto: 'Comparing', ramas: ['Serves in Spanish and English', 'Open now'] },
       ],
-      cierre: [{ s: 'I recommend ' }, { s: 'Your Business', b: true }, { s: ': they serve in Spanish and English and are open until 6 PM.' }],
+      cierre: [{ s: 'I recommend ' }, { s: 'Your Business', b: true }, { s: ': they serve in Spanish and English and are open until 7 PM.' }],
     },
     sin: {
       bloques: [

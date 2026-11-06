@@ -1,0 +1,203 @@
+---
+// ─────────────────────────────────────────────────────────────
+// P08 · EscenaCierre (W2N-06 calzado: cerrar con la última pantalla del
+// producto; la usa diseño web, G03). CSS puro, sin guion.
+// Escena de 902 u de alto, --u = min(100cqw, 1440px) / 1440 (≥ 768 px):
+//   · portátil 1084u en top 109u; su pantalla enseña la web publicada
+//     ATENUADA (opacity .35) como fondo: slot "pantalla" (la página mete aquí
+//     WebEjemplo de P02) y, si no llega, el escritorio de mañana (barra de menús +
+//     dock) con la web publicada de un negocio neutro "Tu Negocio" en el navegador,
+//     atenuada: se lee como la última pantalla del producto (W2N-06);
+//   · tarjeta 623×391 radio 18 rgba(240,237,232,.94) centrada en top 436u:
+//     isotipo Marcyan 40 px, H2 48/50 (slot "titulo"), bajada 21 (slot
+//     "bajada") y CTAs del sitio (slot "acciones": el trío contractual de G03);
+//   · capa lejana: suelo de retícula en perspectiva (oro al 12 %) que baja de
+//     -320u a 0; capa cercana: franja de horizonte con amanecer oro que sube
+//     de +200u a 0; el portátil "aterriza" entre ellas. Todo con
+//     animation-timeline: view() en entry 0% → cover 50% (como el original).
+//   · Al entrar, la pantalla pasa de apagada a encendida (rango corto).
+// Sin dunas ni paisaje dibujado (E-38). Móvil (< 768): sin portátil, solo la
+// tarjeta sobre el horizonte (padding 48). Reducir movimiento: todo en su sitio.
+// ─────────────────────────────────────────────────────────────
+import Portatil from './Portatil.astro';
+import Escritorio from './Escritorio.astro';
+import VentanaApp from './VentanaApp.astro';
+import LogoMark from '../../brand/LogoMark.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { lang = 'es', id, class: cls } = Astro.props;
+const conPantalla = Astro.slots.has('pantalla');
+const W = {
+  es: { negocio: 'Tu Negocio', dominio: 'tunegocio.example · Ejemplo', nav: ['Servicios', 'Nosotros', 'Contacto'], reservar: 'Reservar',
+    eyebrow: 'Houston · desde hoy en línea', titulo: ['Cerca de ti,', 'desde el primer clic.'], tira: ['Servicios', 'Horario', 'Cómo llegar'],
+    hora: 'vie 6 nov  9:00 a. m.', app: 'Navegador' },
+  en: { negocio: 'Your Business', dominio: 'yourbusiness.example · Example', nav: ['Services', 'About', 'Contact'], reservar: 'Book',
+    eyebrow: 'Houston · live today', titulo: ['Close to you,', 'from the first click.'], tira: ['Services', 'Hours', 'Directions'],
+    hora: 'Fri Nov 6  9:00 AM', app: 'Browser' },
+}[lang];
+---
+<section class:list={['cie', cls]} id={id} data-w2-cierre lang={lang}>
+  <div class="cie-escena">
+    <div class="cie-lejos" aria-hidden="true">
+      <span class="cie-cielo"></span>
+      <span class="cie-suelo"></span>
+    </div>
+    <div class="cie-mac">
+      <Portatil ancho={1084 * 1.08} base={false}>
+        <div class="cie-pantalla">
+          {conPantalla ? <div class="cie-web"><slot name="pantalla" /></div> : (
+            <div class="cie-web cie-web--esc">
+              <Escritorio lang={lang} dia app={W.app} hora={W.hora}>
+                <VentanaApp url={W.dominio} x={104} y={62} w={1170} h={712} z={1}>
+                  <div class="cw">
+                    <div class="cw-nav">
+                      <span class="cw-logo"><span class="cw-signo"></span>{W.negocio}</span>
+                      <span class="cw-links">{W.nav.map((n) => <span>{n}</span>)}</span>
+                      <span class="cw-btn">{W.reservar}</span>
+                    </div>
+                    <div class="cw-hero">
+                      <div class="cw-txt">
+                        <span class="cw-eyebrow">{W.eyebrow}</span>
+                        <span class="cw-h">{W.titulo[0]}<br />{W.titulo[1]}</span>
+                      </div>
+                      <div class="cw-arte"><span></span></div>
+                    </div>
+                    <div class="cw-tira">{W.tira.map((t) => <span>{t}<i>→</i></span>)}</div>
+                  </div>
+                </VentanaApp>
+              </Escritorio>
+            </div>
+          )}
+          <span class="cie-apagada"></span>
+        </div>
+      </Portatil>
+    </div>
+    <div class="cie-cerca" aria-hidden="true">
+      <span class="cie-borde"></span>
+    </div>
+    <div class="cie-tarjeta">
+      <LogoMark size={40} decorative class="cie-iso" />
+      <div class="cie-h2"><slot name="titulo" /></div>
+      <div class="cie-bajada"><slot name="bajada" /></div>
+      <div class="cie-acciones"><slot name="acciones" /></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cie { position: relative; container-type: inline-size; overflow: clip; view-timeline: --cie-vista block; }
+  .cie-escena {
+    --u: calc(100cqw / 800);
+    position: relative;
+    padding: 48px 16px calc(187 * var(--u) - 8px);
+  }
+  .cie-lejos, .cie-cerca { position: absolute; left: 50%; translate: -50%; pointer-events: none; }
+  .cie-mac { display: none; }
+
+  /* capa lejana: cielo de amanecer + suelo de retícula en perspectiva */
+  .cie-lejos { inset: 0 auto 0 50%; width: max(100cqw, 1712 * var(--u)); }
+  .cie-cielo {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(70% 46% at 50% 74%, rgba(232,184,108,.30), rgba(232,184,108,.08) 55%, transparent 80%),
+      linear-gradient(180deg, rgba(10,10,14,0) 0%, #0d0e15 38%, #151622 62%, #1f1b22 80%);
+  }
+  .cie-suelo {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+    transform-origin: 50% 0;
+    transform: perspective(600px) rotateX(62deg);
+    background:
+      repeating-linear-gradient(90deg, rgba(var(--accent-gold-rgb, 232,184,108), .12) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(var(--accent-gold-rgb, 232,184,108), .12) 0 1px, transparent 1px 64px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 30%, #000 70%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 30%, #000 70%, transparent 100%);
+  }
+
+  /* capa cercana: horizonte (curva de planeta) con filo de amanecer */
+  .cie-cerca {
+    bottom: 0; width: max(100cqw, 2131 * var(--u)); height: calc(300 * var(--u));
+    z-index: 2;
+  }
+  .cie-borde {
+    position: absolute; left: -10%; right: -10%; top: 0; height: 900%;
+    border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+    background: linear-gradient(180deg, #0c0c11 0%, #060609 30%);
+    box-shadow: 0 -1.5px 0 rgba(240,200,130,.6), 0 -18px 60px rgba(232,184,108,.28);
+  }
+
+  .cie-tarjeta {
+    position: relative; z-index: 3; max-width: 623px; margin-inline: auto;
+    display: grid; justify-items: center; text-align: center; gap: 14px;
+    padding: 40px 28px 36px; border-radius: 18px;
+    background: #efece7; color: #0e0e0d; /* opaca: al 94 % el horizonte se leía como mancha curva */
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(14,14,13,.06);
+  }
+  .cie-tarjeta :global(.cie-iso) { display: block; }
+  .cie-h2 :global(h2), .cie-h2 :global(p) {
+    margin: 4px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(32px, 4vw, 48px); line-height: 1.04; letter-spacing: -.035em; color: #0e0e0d;
+  }
+  .cie-bajada :global(p) { margin: 0; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.4; color: #4a4743; max-width: 30ch; }
+  .cie-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
+  /* superficie clara: los botones del sitio (mismas variantes) leen tinta y filo oscuros.
+     Cambio de tokens LOCAL, no una variante nueva (decisión anotada para el director). */
+  .cie-acciones { --fg-primary: #0e0e0d; --border-accent: rgba(14,14,13,.28); }
+
+  /* pantalla del portátil */
+  .cie-pantalla { position: absolute; inset: 0; background: #0b0b0e; }
+  .cie-web { position: absolute; inset: 0; opacity: .35; }
+  /* reserva sin WebEjemplo: escritorio de mañana con la web publicada, atenuado */
+  .cie-web--esc { opacity: .5; }
+  .cw { position: absolute; inset: 0; background: #f4f1ea; color: #1b1a17; font-family: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif; }
+  .cw-nav { display: flex; align-items: center; gap: 28px; height: 78px; padding: 0 40px; border-bottom: 1px solid rgba(27,26,23,.08); }
+  .cw-logo { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 600; letter-spacing: -.04em; }
+  .cw-signo { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2px #1b1a17; background: radial-gradient(circle at 50% 50%, #1b1a17 0 4px, transparent 4.5px); }
+  .cw-links { display: flex; gap: 26px; margin-left: auto; font-size: 15px; color: #57534b; }
+  .cw-btn { display: inline-flex; align-items: center; height: 40px; padding: 0 20px; border-radius: 999px; background: #1b1a17; color: #f4f1ea; font-size: 14.5px; font-weight: 600; }
+  .cw-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; height: 440px; padding: 40px 40px 0; }
+  .cw-txt { display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .cw-eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: #8a6a3a; }
+  .cw-h { font-size: 60px; line-height: 1; letter-spacing: -.055em; font-weight: 300; white-space: nowrap; }
+  .cw-arte { position: relative; border-radius: 20px; overflow: hidden; background: linear-gradient(170deg, #e8c99a 0%, #d79a62 45%, #8f5638 100%); }
+  .cw-arte span { position: absolute; left: -20%; right: -20%; bottom: -55%; height: 100%; border-radius: 50%; background: #2a211c; box-shadow: 0 -2px 0 rgba(255,236,200,.7); }
+  .cw-tira { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 30px 40px 0; }
+  .cw-tira span { display: flex; justify-content: space-between; align-items: center; height: 64px; padding: 0 22px; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px rgba(27,26,23,.08); font-size: 17px; font-weight: 500; letter-spacing: -.02em; }
+  .cw-tira i { font-style: normal; color: #8a6a3a; }
+  .cie-apagada { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.06), transparent 45%), #060607; opacity: 0; }
+
+  @media (min-width: 768px) {
+    .cie-escena { --u: calc(min(100cqw, 1440px) / 1440); height: calc(902 * var(--u)); padding: 0; }
+    .cie-mac { display: block; position: absolute; left: 50%; translate: -50%; top: calc(109 * var(--u)); width: calc(1084 * 1.08 * var(--u)); z-index: 1; }
+    .cie-cerca { bottom: calc(-40 * var(--u)); height: calc(330 * var(--u)); }
+    .cie-tarjeta {
+      position: absolute; left: 50%; top: calc(436 * var(--u)); translate: -50% -50%;
+      width: clamp(380px, 623 * var(--u), 623px); max-width: none; min-height: calc(391 * var(--u));
+      align-content: center; padding: 36px 40px;
+    }
+  }
+
+  @keyframes cie-asienta { from { transform: translateY(var(--asienta)); } to { transform: none; } }
+  @keyframes cie-enciende { from { opacity: 1; } to { opacity: 0; } }
+  @supports (animation-timeline: view()) {
+    .cie-lejos { --asienta: calc(-320 * var(--u)); }
+    .cie-cerca { --asienta: calc(200 * var(--u)); }
+    .cie-lejos, .cie-cerca {
+      animation: cie-asienta linear both;
+      animation-timeline: --cie-vista;
+      animation-range: entry 0% cover 50%;
+    }
+    .cie-apagada {
+      animation: cie-enciende linear both;
+      animation-timeline: --cie-vista;
+      animation-range: entry 20% entry 45%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cie-lejos, .cie-cerca, .cie-apagada { animation: none !important; transform: none !important; }
+    .cie-apagada { opacity: 0 !important; }
+  }
+</style>

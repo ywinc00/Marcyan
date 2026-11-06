@@ -1,0 +1,221 @@
+---
+// ─────────────────────────────────────────────────────────────
+// P08 · Portatil (G-07, maqueta de dispositivo mínima: CSS + SVG, sin imagen).
+// Portátil GENÉRICO (§1.4): sin manzana, sin nombre de marca en pantalla.
+// Medidas del original W2N-03 (N/css-passport-reglas.txt):
+//   tapa 1415×933 fuente · marco #09090b 17,75 / 18,5 / 20,25 · radio 35 arriba
+//   · doble filo #6f7074 + #a1a2a6 · muesca 177×30 con cámara de 5 px
+//   · pantalla 1378×895 fuente, escalada con consultas de contenedor
+//     (scale = 100cqw / 1415px; donde el navegador no divide longitudes,
+//      un ResizeObserver escribe --pt-s; ver script).
+// Props:
+//   ancho  → ancho máximo del conjunto (base incluida), por defecto 990
+//   tapa   → 'abierta' | 'scroll'. 'scroll': la tapa gira de -90° a 0° con
+//            animation-timeline: view() en entry 25% → entry 100% (≈ 470 px a 1440; la pieza entera a la vista = tapa abierta,
+//            compositor, sin listener: E-50). Sin view(): se abre por tiempo
+//            (1,2 s) al cruzar el 40 % de vista. Reducir movimiento: abierta.
+//            Una escena puede dar su propia línea y rango heredando --pt-linea y
+//            --pt-rango (EscenaAbreApps: portátil fijado al borde inferior).
+//   base   → pinta la base y la bisagra (por defecto true)
+//   encendida → false deja la pantalla apagada (la escena la enciende con
+//            data-pt-encendida="true")
+// Slot por defecto: el contenido de la pantalla (px de la pantalla fuente).
+// ─────────────────────────────────────────────────────────────
+interface Props {
+  ancho?: number;
+  tapa?: 'abierta' | 'scroll';
+  base?: boolean;
+  encendida?: boolean;
+  class?: string;
+}
+const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls } = Astro.props;
+---
+<div
+  class:list={['pt', cls]}
+  data-w2-portatil
+  data-pt-tapa={tapa}
+  data-pt-base={base ? 'true' : 'false'}
+  data-pt-encendida={encendida ? 'true' : 'false'}
+  style={`--pt-w:${ancho}px`}
+  aria-hidden="true"
+>
+  <div class="pt-zona">
+    <div class="pt-tapa">
+      <div class="pt-fuente">
+        <div class="pt-pantalla">
+          <slot />
+          <div class="pt-apagada"></div>
+        </div>
+        <div class="pt-marco"></div>
+        <div class="pt-muesca">
+          <svg width="177" height="30" viewBox="0 0 177 30"><path d="M0 0h177c-6 0-9 3-9 9v9c0 7-5 12-12 12H21c-7 0-12-5-12-12V9c0-6-3-9-9-9z" /></svg>
+          <span class="pt-camara"></span>
+        </div>
+      </div>
+      <span class="pt-canto"></span>
+    </div>
+  </div>
+  {base && (
+    <div class="pt-base">
+      <span class="pt-bisagra"></span>
+      <span class="pt-hendidura"></span>
+    </div>
+  )}
+</div>
+
+<style>
+  .pt {
+    /* el conjunto mide --pt-w con la base; la tapa es 1/1,08 de ese ancho */
+    width: min(100%, var(--pt-w));
+    margin-inline: auto;
+    position: relative;
+    container-type: inline-size;
+    view-timeline: --pt-vista block;
+  }
+  .pt-zona {
+    position: relative;
+    width: calc(100% / 1.08);
+    margin-inline: auto;
+    aspect-ratio: 1415 / 933;
+    container-type: inline-size;
+    perspective: 260cqw;
+    perspective-origin: 50% 20%;
+    /* la tapa casi cerrada (giro hacia quien mira) se proyecta POR DEBAJO de la
+       bisagra y colgaba como un trapecio oscuro bajo la base: se recorta en la
+       línea de la bisagra; por arriba y a los lados queda holgura para el 3D */
+    clip-path: inset(-40% -12% 0 -12%);
+  }
+  .pt-tapa {
+    position: absolute; inset: 0;
+    transform-origin: 50% 100%;
+    transform-style: preserve-3d;
+  }
+  .pt-fuente {
+    --pt-s: .5;
+    position: absolute; top: 0; left: 0;
+    width: 1415px; height: 933px;
+    transform-origin: 0 0;
+    transform: scale(var(--pt-s));
+  }
+  @supports (width: calc(100cqw / 1415px * 1px)) {
+    .pt-fuente { --pt-s: calc(100cqw / 1415px); }
+  }
+  .pt-pantalla {
+    position: absolute; top: 17.75px; left: 18.5px;
+    width: 1378px; height: 895px;
+    overflow: hidden; isolation: isolate;
+    background: #050506;
+    -webkit-font-smoothing: antialiased;
+  }
+  .pt-pantalla::after {
+    content: ""; position: absolute; inset: 0; z-index: 60; pointer-events: none;
+    border-radius: 18.75px 18.75px 5px 5px;
+    box-shadow: 0 0 0 20px #09090b;
+  }
+  .pt-apagada {
+    position: absolute; inset: 0; z-index: 55; pointer-events: none;
+    background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(0,0,0,0) 45%), #060607;
+    opacity: 0;
+    transition: opacity .7s cubic-bezier(.22,1,.36,1) .15s;
+  }
+  .pt[data-pt-encendida="false"] .pt-apagada { opacity: 1; transition-duration: .25s; transition-delay: 0s; }
+  .pt-marco {
+    position: absolute; inset: 0; pointer-events: none;
+    border: solid #09090b; border-width: 17.75px 18.5px 20.25px;
+    border-radius: 35px 35px 15px 15px;
+    box-shadow: 0 0 0 1px #6f7074, 0 0 0 2px #a1a2a6, inset 0 0 0 1.25px #262628;
+  }
+  .pt-muesca { position: absolute; top: 13.75px; left: 50%; translate: -50%; width: 177px; height: 30px; z-index: 2; }
+  .pt-muesca svg { display: block; fill: #09090b; }
+  .pt-camara {
+    position: absolute; top: 10.25px; right: 36px; width: 5.25px; height: 5.25px; border-radius: 50%;
+    background: #131824; box-shadow: inset 0 0 2px #28304d;
+  }
+  /* canto de aluminio: solo se ve mientras la tapa está casi cerrada */
+  .pt-canto {
+    position: absolute; left: .4%; right: .4%; top: 0; height: 1.6%;
+    transform-origin: 50% 0; transform: rotateX(90deg);
+    background: linear-gradient(#9c9da1, #cbccd0 25%, #b3b4b8 55%, #85868a 90%, #2a2a2d);
+    border-radius: 3px 3px 0 0;
+    backface-visibility: hidden;
+  }
+
+  /* base plateada + bisagra (lo único que se ve con la tapa cerrada) */
+  .pt-base {
+    position: relative; display: block;
+    width: 100%; height: 0; padding-bottom: 2.9%;
+    margin-top: -.15%;
+    border-radius: .35% .35% 50% 50% / 10% 10% 100% 100%;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,0) 4% 96%, rgba(0,0,0,.28)),
+      linear-gradient(180deg, #e3e4e8 0, #c9cace 18%, #a9aaae 55%, #86878b 82%, #5b5c60 100%);
+    box-shadow: 0 1.2cqw 2.4cqw -1cqw rgba(0,0,0,.55);
+  }
+  .pt-bisagra {
+    position: absolute; left: calc((100% - 100% / 1.08) / 2 + 1%); right: calc((100% - 100% / 1.08) / 2 + 1%);
+    top: 0; height: 22%;
+    background: linear-gradient(#252527, #222224 80%, #101012);
+    border-radius: 0 0 4px 4px;
+  }
+  .pt-hendidura {
+    position: absolute; left: 50%; translate: -50%; top: 0;
+    width: 14%; height: 34%;
+    border-radius: 0 0 1cqw 1cqw;
+    background: linear-gradient(#8d8e92, #b9babe);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.35);
+  }
+
+  /* ── tapa por scroll ─────────────────────────────── */
+  @keyframes pt-gira { from { transform: rotateX(-90deg); } to { transform: rotateX(0deg); } }
+  @keyframes pt-enciende { 0%, 70% { opacity: 1; } 88%, 100% { opacity: 0; } }
+  @supports (animation-timeline: view()) {
+    .pt[data-pt-tapa="scroll"] .pt-tapa {
+      animation: pt-gira linear both;
+      animation-timeline: var(--pt-linea, --pt-vista);
+      animation-range: var(--pt-rango, entry 25% entry 100%);
+      will-change: transform;
+    }
+    .pt[data-pt-tapa="scroll"] .pt-apagada {
+      animation: pt-enciende linear both;
+      animation-timeline: var(--pt-linea, --pt-vista);
+      animation-range: var(--pt-rango, entry 25% entry 100%);
+    }
+  }
+  /* reserva sin view(): cerrada hasta que el guion pone data-pt-abierta (por tiempo) */
+  @supports not (animation-timeline: view()) {
+    .pt[data-pt-tapa="scroll"] .pt-tapa { transform: rotateX(-90deg); transition: transform 1.2s cubic-bezier(.22,1,.36,1); }
+    .pt[data-pt-tapa="scroll"] .pt-apagada { opacity: 1; transition: opacity .7s cubic-bezier(.22,1,.36,1) .85s; }
+    .pt[data-pt-tapa="scroll"][data-pt-abierta] .pt-tapa { transform: none; }
+    .pt[data-pt-tapa="scroll"][data-pt-abierta] .pt-apagada { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pt[data-pt-tapa="scroll"] .pt-tapa { animation: none !important; transform: none !important; transition: none !important; }
+    .pt[data-pt-tapa="scroll"] .pt-apagada { animation: none !important; opacity: 0 !important; }
+    .pt-apagada { transition: none; }
+  }
+</style>
+
+<script>
+  // 1) Escala de la pantalla donde el CSS no divide longitudes (Firefox y otros).
+  // 2) Reserva de la tapa sin view(): se abre por tiempo al cruzar el 40 % de vista.
+  const sinDivision = !CSS.supports('width', 'calc(100cqw / 1415px * 1px)');
+  const sinView = !CSS.supports('animation-timeline', 'view()');
+  for (const pt of document.querySelectorAll<HTMLElement>('[data-w2-portatil]')) {
+    if (pt.dataset.ptListo) continue;
+    pt.dataset.ptListo = '1';
+    if (sinDivision) {
+      const zona = pt.querySelector<HTMLElement>('.pt-zona');
+      const fuente = pt.querySelector<HTMLElement>('.pt-fuente');
+      if (zona && fuente) {
+        const ro = new ResizeObserver(() => fuente.style.setProperty('--pt-s', String(zona.clientWidth / 1415)));
+        ro.observe(zona);
+      }
+    }
+    if (sinView && pt.dataset.ptTapa === 'scroll') {
+      const io = new IntersectionObserver((ents) => {
+        if (ents.some((e) => e.intersectionRatio >= 0.4)) { pt.setAttribute('data-pt-abierta', ''); io.disconnect(); }
+      }, { threshold: [0.4] });
+      io.observe(pt);
+    }
+  }
+</script>

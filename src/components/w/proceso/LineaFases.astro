@@ -1,0 +1,388 @@
+---
+// ─────────────────────────────────────────────────────────────
+// P11 · LineaFases: "Del concepto al lanzamiento" reinventado (design/rediseno-workos-v2.md §2 P11).
+// Gesto F-05 (panel fijo que explica por pasos, el de "Integrate in minutes" de WorkOS) +
+// W-CONT-31 (línea de tiempo que se enciende) + W-ADV-58 (maqueta en plena acción).
+//
+//  · Escritorio (≥ 1120; por debajo el panel no cabe junto a las fases): izquierda 420 px con las fases (número mono oro + punto sobre una
+//    línea de 1 px cuyo tramo oro crece con scaleY + título 24/500 + texto 16/26; activa al
+//    100 %, resto al 55 %). Derecha UN panel sticky 600×440 (compacta 420×320): la escena de
+//    la fase activa sustituye a la anterior (sale opacidad + translateY(-8px) 300 ms, entra
+//    translateY(8px)→0 400 ms) y se reproduce al activarse; repite al reentrar (≥ 8 s fuera).
+//    Truco de maquetación: escenas y bandeja son celdas de la MISMA área de rejilla (columna 2,
+//    todas las filas) y cada una es sticky; así en móvil cada escena cae bajo su paso sin
+//    duplicar DOM. Ningún ancestro lleva overflow:hidden (trampa F-05).
+//  · Fase activa: IntersectionObserver rootMargin -45% 0px -45% 0px (umbral, nunca píxel a píxel).
+//  · Portada: la ÚLTIMA fase va a lo ancho bajo el bloque con el slot `final` (EscenaAbreApps de
+//    P08; si no llega, vacío). Compacta (sobre nosotros): las 5 fases en el bloque y la 5.ª
+//    escena es MiniPasos "publicada".
+//  · Cohete (E-02, G01): al activarse la última fase emite `w2:fases-fin` (burbujea) con
+//    detail.origen = centro del punto de esa fase en px relativos a la <section> que la contiene
+//    (o a la propia línea si no hay sección). No implementa el vuelo.
+//  · Móvil: sin sticky; línea a x = 16; cada escena bajo su paso, a ancho de contenedor; las de
+//    abajo con content-visibility:auto. Cada escena se reproduce al entrar en vista.
+//  · Sin JS: todo encendido, panel con la escena 01 en su estado final.
+//    Reducir movimiento: todo encendido, escenas en su estado final, cambios sin transición.
+// Todo su CSS va aquí (sale fuera de v3: portada) y solo lee --w-* y tokens.
+// ─────────────────────────────────────────────────────────────
+import Ejemplo from '../Ejemplo.astro';
+import MiniPasos from '../objetos/MiniPasos.astro';
+import EscenaAlcance from './EscenaAlcance.astro';
+import EscenaBilingue from './EscenaBilingue.astro';
+import EscenaEncontrar from './EscenaEncontrar.astro';
+import { copy, type Fase, type Lang } from './proceso';
+
+interface Props {
+  fases: Fase[];
+  lang?: Lang;
+  variante?: 'portada' | 'compacta';
+  tono?: 'gold';
+  class?: string;
+}
+const { fases, lang = 'es', variante = 'portada', class: cls } = Astro.props;
+const T = copy[lang];
+const N = fases.length;
+const portada = variante === 'portada';
+const enRejilla = portada ? fases.slice(0, N - 1) : fases;
+const fin = portada ? fases[N - 1] : null;
+const conFinal = portada && Astro.slots.has('final');
+const dos = (i: number) => String(i + 1).padStart(2, '0');
+const C = T.correo;
+---
+<div class:list={['lf', `lf--${variante}`, cls]} data-w2-lf data-lang={lang} style={`--n:${enRejilla.length}`}>
+  <span class="lf__linea" data-w2-linea aria-hidden="true"><i><b></b></i></span>
+
+  <div class="lf__grid">
+    <div class="lf__tray" aria-hidden="true">
+      <div class="lf__bar">
+        <span class="lf__fase">{T.fase} <b data-w2-num>01</b> / {dos(N - 1)}</span>
+        <span class="lf__ticks">{fases.map((_, i) => <span data-w2-tick class:list={[i === 0 && 'is-a']}></span>)}</span>
+        <span class="lf__live"></span>
+        <Ejemplo lang={lang} pos="inline" class="lf__ej" />
+      </div>
+      <div class="lf__stagebg"></div>
+    </div>
+
+    {enRejilla.map((f, i) => (
+      <Fragment>
+        <div class="lf__paso" data-w2-paso={i} style={`--r:${i + 1}`}>
+          <span class="lf__dot" data-w2-dot></span>
+          <span class="lf__n">{f.n}</span>
+          <h3 class="lf__t"><button type="button" class="lf__b" data-w2-ir={i}>{f.titulo}</button></h3>
+          <p class="lf__x">{f.texto}</p>
+        </div>
+        <div class:list={['lf__esc', i === 0 && 'is-active']} data-w2-escena={i} style={`--r:${i + 1}`}>
+          <p class="sr-only">{T.sr[i]}</p>
+          <div class="lf__mbar" aria-hidden="true"><span class="lf__fase">{T.fase} <b>{dos(i)}</b> / {dos(N - 1)}</span><span class="lf__live"></span>{i === 0 && <Ejemplo lang={lang} pos="inline" class="lf__ej" />}</div>
+          <div class="lf__stage" aria-hidden="true">
+            {i === 0 && (
+              /* Escena 01 "Propuesta en 24h": MiniPasos correo (P03) + hoja abierta de la propuesta.
+                 Puente hasta P03: cuando MiniPasos traiga variante="correo" animada con su hoja, la
+                 hoja .co__sat de aquí se retira y queda solo <MiniPasos variante="correo" />. */
+              <div class="co" data-nosnippet>
+                <div class="co__main"><MiniPasos kind="correo" lang={lang} size="card" example={false} /></div>
+                <div class="co__sat">
+                  <span class="co__from"><span translate="no">Marcyan</span><em>{C.hace}</em></span>
+                  <span class="co__tit">{C.titulo}</span>
+                  <ol class="co__idx">{C.idx.map((t, k) => <li style={`--k:${k}`}><span>{dos(k)}</span>{t}</li>)}</ol>
+                  <span class="co__pie"><svg viewBox="0 0 16 16" width="12" height="12"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>{C.pie}</span>
+                </div>
+              </div>
+            )}
+            {i === 1 && <EscenaAlcance lang={lang} />}
+            {i === 2 && <EscenaBilingue lang={lang} />}
+            {i === 3 && <EscenaEncontrar lang={lang} />}
+            {i === 4 && <div class="pu"><MiniPasos kind="publicada" lang={lang} size="card" example={false} /></div>}
+          </div>
+        </div>
+      </Fragment>
+    ))}
+  </div>
+
+  {fin && (
+    <div class:list={['lf__fin', conFinal && 'lf__fin--slot']}>
+      <div class="lf__paso lf__paso--fin" data-w2-paso={N - 1}>
+        <span class="lf__dot" data-w2-dot></span>
+        <span class="lf__n">{fin.n}</span>
+        <h3 class="lf__t"><button type="button" class="lf__b" data-w2-ir={N - 1}>{fin.titulo}</button></h3>
+        <p class="lf__x">{fin.texto}</p>
+      </div>
+      {conFinal && <div class="lf__slot"><slot name="final" /></div>}
+    </div>
+  )}
+</div>
+
+<style>
+  .lf {
+    --ph: 440px;                       /* alto del panel */
+    --pw: 600px;                       /* ancho del panel */
+    --bar: 36px;
+    --top: calc(var(--nav-h, 64px) + 24px);
+    position: relative; font-family: var(--font-body); color: var(--w-ink, #f0ede8);
+  }
+  .lf--compacta { --ph: 320px; --pw: 420px; }
+
+  /* ── Línea ── */
+  .lf__linea { position: absolute; left: 4px; top: 6px; bottom: 0; width: 1px; background: rgba(var(--star-rgb), .10); pointer-events: none; }
+  .lf__linea i { position: absolute; inset: 0; background: var(--accent-gold); transform-origin: 50% 0; transform: scaleY(1); }
+  .lf[data-w2-on] .lf__linea i { transform: scaleY(0); transition: transform 700ms var(--w-ease-text, ease); }
+  /* Luz que baja por el tramo encendido (W-CONT-31 / la "energía" del riel de producción), cada 3,6 s. */
+  .lf__linea b { position: absolute; left: -1px; top: 0; width: 3px; height: 14%; min-height: 24px; border-radius: 2px;
+    background: linear-gradient(180deg, transparent, rgba(255,240,205,.95), transparent); opacity: 0; }
+  .lf[data-w2-on]:not([data-still]) .lf__linea b { animation: lf-glint 3.6s var(--w-ease-ui, ease) infinite; }
+  @keyframes lf-glint { 0% { opacity: 0; transform: translateY(0); } 10% { opacity: 1; } 55% { opacity: 1; transform: translateY(600%); } 62%, 100% { opacity: 0; transform: translateY(620%); } }
+
+  /* ── Fases ── */
+  .lf__paso { position: relative; padding: 0 0 44px 36px; }
+  .lf__dot {
+    position: absolute; left: 0; top: 1px; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent-gold); border: 1px solid var(--accent-gold);
+    transition: background 400ms ease, border-color 400ms ease, box-shadow 400ms ease;
+  }
+  .lf__n { display: block; margin-bottom: 12px; font: 500 12px/12px var(--font-mono); letter-spacing: .1em; color: var(--accent-gold); }
+  .lf__t { margin: 0 0 10px; font: 500 24px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--w-ink, #f0ede8); }
+  .lf__b { all: unset; cursor: pointer; border-radius: 4px; }
+  .lf__b:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .lf__x { margin: 0; max-width: 420px; font-size: 16px; line-height: 26px; color: var(--w-ink-70, rgba(240,237,232,.7)); }
+  .lf[data-w2-on] .lf__paso { opacity: .55; transition: opacity 400ms ease; }
+  .lf[data-w2-on] .lf__paso.is-on { opacity: 1; }
+  .lf[data-w2-on] .lf__dot { background: var(--bg-base, #080808); border-color: rgba(var(--star-rgb), .30); }
+  .lf[data-w2-on] .is-done .lf__dot { background: var(--accent-gold); border-color: var(--accent-gold); }
+  .lf[data-w2-on] .is-on .lf__dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 0 4px rgba(var(--accent-gold-rgb), .18); }
+  .lf[data-still] .lf__paso { opacity: 1; }
+  .lf[data-still] .lf__dot { background: var(--accent-gold); border-color: var(--accent-gold); }
+
+  /* ── Bandeja del panel y escenas ── */
+  .lf__tray { display: none; }
+  .lf__esc { position: relative; }
+  .lf__stage { position: relative; display: grid; container-type: inline-size; }
+  .lf__stage > :global(*) { grid-area: 1 / 1; }
+  .lf__bar, .lf__mbar { display: flex; align-items: center; gap: 12px; }
+  .lf__fase { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); white-space: nowrap; }
+  .lf__fase b { font-weight: 500; color: var(--accent-gold); }
+  .lf__ticks { display: flex; gap: 4px; }
+  .lf__ticks span { width: 16px; height: 2px; border-radius: 1px; background: rgba(var(--star-rgb), .15); transition: background 400ms ease; }
+  .lf__ticks span.is-a { background: var(--accent-gold); }
+  /* Punto "en línea" (micro-vida del panel, §1.5): late cada 2 s con un halo que se abre. */
+  .lf__live { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); }
+  .lf__live::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--accent-gold); opacity: 0; }
+  .lf__live, .lf__live::after, .lf__linea b { animation-play-state: paused; }
+  .lf.is-vista .lf__live, .lf.is-vista .lf__live::after, .lf.is-vista .lf__linea b { animation-play-state: running; }
+  .lf__live { animation: lf-live 2s ease-in-out infinite; }
+  .lf__live::after { animation: lf-halo 2s ease-out infinite; }
+  @keyframes lf-live { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  @keyframes lf-halo { 0% { opacity: .7; transform: scale(.4); } 70%, 100% { opacity: 0; transform: scale(1.3); } }
+  .lf :global(.lf__ej) { margin-left: auto; font-size: 11px; padding: 2px 7px; }
+  .lf__stage :global(.w-example) { display: none; }   /* un solo "Ejemplo": el de la barra */
+
+  /* ── Escritorio: panel sticky ── */
+  @media (min-width: 1120px) {
+    .lf__grid { display: grid; grid-template-columns: 420px var(--pw); justify-content: space-between; column-gap: 48px; }
+    .lf--compacta .lf__grid { grid-template-columns: minmax(0, 1fr) var(--pw); column-gap: clamp(32px, 4vw, 64px); }
+    .lf__paso { grid-column: 1; grid-row: var(--r); }
+    .lf__tray, .lf__esc { grid-column: 2; grid-row: 1 / span var(--n); position: sticky; top: var(--top); align-self: start; }
+    .lf__tray {
+      display: block; height: var(--ph); padding: 16px; border-radius: var(--w-r-tray, 22px);
+      background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09));
+      box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08));
+    }
+    .lf__bar { height: var(--bar); padding: 0 4px 14px; }
+    .lf__stagebg {
+      position: absolute; inset: calc(16px + var(--bar)) 16px 16px; border-radius: var(--w-r-obj, 12px);
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(var(--accent-gold-rgb), .07), transparent 70%),
+        radial-gradient(rgba(var(--accent-gold-rgb), .20) 1px, transparent 1.3px) 0 0 / 24px 24px,
+        #151514;
+      border: 1px solid rgba(var(--star-rgb), .05);
+    }
+    .lf__esc {
+      z-index: 1; top: calc(var(--top) + 16px + var(--bar));
+      height: calc(var(--ph) - 32px - var(--bar)); margin: calc(16px + var(--bar)) 16px 0;
+      opacity: 0; visibility: hidden; transform: translateY(8px);
+    }
+    .lf__esc.is-active { opacity: 1; visibility: visible; transform: none; }
+    .lf[data-w2-on]:not([data-still]) .lf__esc { transition: opacity 300ms ease, transform 300ms ease, visibility 0s linear 300ms; }
+    .lf[data-w2-on]:not([data-still]) .lf__esc.is-active { transition: opacity 400ms var(--w-ease-text, ease) 120ms, transform 400ms var(--w-ease-text, ease) 120ms, visibility 0s; }
+    .lf[data-w2-on] .lf__esc.is-leaving { transform: translateY(-8px); }
+    .lf__mbar { display: none; }
+    .lf__stage { width: 100%; height: 100%; place-items: center; }
+    .lf--compacta .lf__stage { width: 524px; height: 340px; zoom: .74; }
+
+    .lf__fin { display: grid; grid-template-columns: 420px minmax(0, var(--pw)); justify-content: space-between; column-gap: 48px; align-items: start; padding-top: 20px; }
+    .lf__fin .lf__paso { padding-bottom: 0; }
+    .lf__slot { min-width: 0; }
+  }
+
+  /* ── Móvil / apilado: sin sticky, escena bajo su paso ── */
+  @media (max-width: 1119.98px) {
+    .lf__paso { padding-bottom: 20px; }
+    .lf__esc {
+      margin: 0 0 44px; padding: 12px; border-radius: var(--w-r-tray, 22px);
+      background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09));
+    }
+    .lf__esc + .lf__paso, .lf__fin .lf__paso { padding-top: 0; }
+    .lf__esc:not([data-w2-escena='0']) { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+    .lf__mbar { height: 28px; padding: 0 4px 10px; }
+    .lf__stage {
+      border-radius: var(--w-r-obj, 12px); place-items: center; overflow: clip;
+      background: radial-gradient(rgba(var(--accent-gold-rgb), .20) 1px, transparent 1.3px) 0 0 / 24px 24px, #151514;
+      min-height: 360px;
+    }
+    .lf__slot { margin: 16px 0 0; }
+  }
+
+  /* ── Escena 01: correo + hoja de la propuesta ── */
+  .co { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .co__main { width: 320px; transform: translate(-64px, -76px); }
+  .co__main :global(.wo-mini) { width: 100%; }
+  .co__sat {
+    position: absolute; left: calc(50% - 20px); top: calc(50% - 34px); width: 236px;
+    display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 14px;
+    background: #fff; color: var(--w-p-ink, #0e0e0d); border-radius: var(--w-r-obj, 12px);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); box-shadow: 0 26px 50px -16px rgba(0,0,0,.7);
+  }
+  .co__from { display: flex; justify-content: space-between; gap: 8px; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); }
+  .co__from em { font-style: normal; text-transform: none; letter-spacing: 0; }
+  .co__tit { font: 500 18px/1.2 var(--font-display); letter-spacing: -.02em; }
+  .co__idx { list-style: none; margin: 0; padding: 0; }
+  .co__idx li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; font-size: 14px; border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .co__idx li span { font: 500 11px/1 var(--font-mono); color: var(--w-p-ink-2, #4a4743); }
+  .co__pie { display: inline-flex; align-items: center; gap: 6px; padding-top: 4px; font: 500 12px/1.2 var(--font-mono); letter-spacing: .04em; }
+  .co__pie svg { color: #8a6a2c; }
+  @container (max-width: 480px) {
+    .co { min-height: 372px; }
+    .co__main { width: min(100%, 290px); transform: translate(-10px, -86px); }
+    .co__sat { left: auto; right: 10px; top: auto; bottom: 14px; width: 222px; }
+    .co__pie { font-size: 11px; letter-spacing: 0; }
+  }
+  .pu { display: grid; place-items: center; width: 100%; height: 100%; }
+  .pu :global(.wo-mini) { width: 320px; }
+
+  :global(.is-play) .co__main :global(.wo-mini__mail.is-on) { animation: co-row 400ms var(--w-ease-text, ease) 300ms both; }
+  :global(.is-play) .co__sat { animation: co-sat 520ms var(--w-ease-text, ease) 1000ms both; }
+  :global(.is-play) .co__idx li { animation: co-in 360ms ease both; animation-delay: calc(1350ms + var(--k) * 140ms); }
+  :global(.is-play) .co__pie { animation: co-in 360ms ease 1900ms both; }
+  @keyframes co-row { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+  @keyframes co-sat { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+  @keyframes co-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lf__live, .lf__live::after, .lf__linea b { animation: none !important; }
+    :global(.is-play) .co__main :global(.wo-mini__mail.is-on), :global(.is-play) .co__sat, :global(.is-play) .co__idx li, :global(.is-play) .co__pie { animation: none; }
+  }
+</style>
+
+<script>
+  // Evento para el cohete de G01 (mismo valor que EVENTO_FIN de proceso.ts; no se importa
+  // proceso.ts aquí para no meter pricing.ts en el JS del navegador).
+  const FIN = 'w2:fases-fin';
+  const mqR = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mqM = window.matchMedia('(max-width: 1119.98px)');
+
+  function init(root: HTMLElement) {
+    const pasos = [...root.querySelectorAll<HTMLElement>('[data-w2-paso]')].sort((a, b) => +a.dataset.w2Paso! - +b.dataset.w2Paso!);
+    const escs = new Map<number, HTMLElement>();
+    root.querySelectorAll<HTMLElement>('[data-w2-escena]').forEach((e) => escs.set(+e.dataset.w2Escena!, e));
+    const linea = root.querySelector<HTMLElement>('[data-w2-linea]');
+    const lit = linea?.querySelector<HTMLElement>('i');
+    const num = root.querySelector<HTMLElement>('[data-w2-num]');
+    const ticks = [...root.querySelectorAll<HTMLElement>('[data-w2-tick]')];
+    const N = pasos.length;
+    let act = -1, still = mqR.matches, enVista = false, salio = 0, bloqueo = 0;
+    root.toggleAttribute('data-w2-on', true);
+    root.toggleAttribute('data-still', still);
+
+    const centro = (i: number) => {
+      const d = pasos[i].querySelector<HTMLElement>('[data-w2-dot]')!.getBoundingClientRect();
+      return { x: d.left + d.width / 2, y: d.top + d.height / 2 };
+    };
+    function geo() {
+      if (!linea || !lit || N < 2) return;
+      const R = root.getBoundingClientRect();
+      const a = centro(0).y - R.top, b = centro(N - 1).y - R.top;
+      linea.style.top = `${a}px`; linea.style.bottom = 'auto'; linea.style.height = `${Math.max(0, b - a)}px`;
+      const f = still ? 1 : act <= 0 ? 0 : (centro(act).y - R.top - a) / (b - a || 1);
+      lit.style.transform = `scaleY(${Math.min(1, Math.max(0, f))})`;
+    }
+
+    function play(e?: HTMLElement) {
+      if (!e || still) return;
+      const ans = e.querySelectorAll<HTMLElement>('[data-wo-ans]');
+      e.classList.remove('is-play'); ans.forEach((x) => x.classList.remove('is-run'));
+      void e.offsetWidth;
+      const asis = e.querySelector<HTMLElement>('[data-w2-asis]');
+      if (asis) { const n = +asis.dataset.w2Asis! || 1; const veces = +(e.dataset.veces || 0); asis.dataset.k = String(veces % n); e.dataset.veces = String(veces + 1); }
+      e.classList.add('is-play'); ans.forEach((x) => x.classList.add('is-armed', 'is-run'));
+    }
+
+    function activate(i: number) {
+      if (i === act) return;
+      const prev = act; act = i;
+      pasos.forEach((p, j) => {
+        p.classList.toggle('is-on', j === i); p.classList.toggle('is-done', j < i);
+        const b = p.querySelector('[data-w2-ir]'); if (j === i) b?.setAttribute('aria-current', 'step'); else b?.removeAttribute('aria-current');
+      });
+      if (num) num.textContent = String(Math.min(i, N - 2) + 1).padStart(2, '0');
+      ticks.forEach((t, j) => t.classList.toggle('is-a', j <= i));
+      geo();
+      if (!mqM.matches) {
+        const pe = escs.get(prev), ne = escs.get(i);
+        if (ne && ne !== pe) {
+          escs.forEach((e) => { if (e !== ne) e.classList.remove('is-active'); });
+          if (pe && !still) { pe.classList.add('is-leaving'); setTimeout(() => pe.classList.remove('is-leaving'), 320); }
+          ne.classList.add('is-active');
+          if (enVista) play(ne);
+        }
+      }
+      if (i === N - 1 && prev !== -1) {
+        const S = (root.closest('section') ?? root).getBoundingClientRect();
+        const c = centro(i);
+        root.dispatchEvent(new CustomEvent(FIN, { bubbles: true, detail: { origen: { x: Math.round(c.x - S.left), y: Math.round(c.y - S.top) }, lang: root.dataset.lang === 'en' ? 'en' : 'es' } }));
+      }
+    }
+
+    // Fase activa: banda central del 10 % de la pantalla.
+    const ioPaso = new IntersectionObserver((es) => {
+      if (performance.now() < bloqueo) return;
+      const vis = es.filter((e) => e.isIntersecting).map((e) => +(e.target as HTMLElement).dataset.w2Paso!);
+      if (vis.length) activate(Math.max(...vis));
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    pasos.forEach((p) => ioPaso.observe(p));
+
+    // Sección a la vista: reproduce la escena activa al entrar y al volver tras ≥ 8 s fuera.
+    new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      if (e.isIntersecting && !enVista) {
+        enVista = true; root.classList.add('is-vista');
+        if (!mqM.matches && (salio === 0 || performance.now() - salio >= 8000)) play(escs.get(Math.max(0, Math.min(act, N - 1))) ?? escs.get(escs.size - 1));
+      } else if (!e.isIntersecting && enVista) { enVista = false; salio = performance.now(); root.classList.remove('is-vista'); }
+    }, { rootMargin: '100px 0px' }).observe(root);
+
+    // Móvil: cada escena se reproduce al entrar en vista (35 %) y repite tras ≥ 8 s fuera.
+    const fuera = new WeakMap<Element, number>();
+    const ioEsc = new IntersectionObserver((es) => {
+      if (!mqM.matches) return;
+      es.forEach((e) => {
+        const t = e.target as HTMLElement;
+        if (e.isIntersecting) { const s = fuera.get(t); if (s === undefined || s === -1 || performance.now() - s >= 8000) play(t); fuera.set(t, -2); }
+        else if (fuera.get(t) === -2) fuera.set(t, performance.now());
+      });
+    }, { threshold: .35 });
+    escs.forEach((e) => ioEsc.observe(e));
+
+    // Clic / teclado en el título de una fase: la lleva al centro y la activa.
+    root.querySelectorAll<HTMLElement>('[data-w2-ir]').forEach((b) => b.addEventListener('click', () => {
+      const i = +b.dataset.w2Ir!;
+      bloqueo = performance.now() + 1000;
+      activate(i);
+      pasos[i].scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' });
+    }));
+
+    mqR.addEventListener('change', () => { still = mqR.matches; root.toggleAttribute('data-still', still); escs.forEach((e) => e.classList.remove('is-play')); geo(); });
+    mqM.addEventListener('change', () => { const a = act; act = -1; activate(Math.max(0, a)); });
+    new ResizeObserver(() => geo()).observe(root);
+    activate(0);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-w2-lf]').forEach(init);
+</script>

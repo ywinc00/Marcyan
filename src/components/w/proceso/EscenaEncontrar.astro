@@ -1,0 +1,58 @@
+---
+// P11 · Escena 04 "Que te encuentren" (design/rediseno-workos-v2.md §2 P11).
+// Respuesta de asistente (RespuestaAsistente: "Buscando…" → check, "Leyendo fuentes" → check,
+// burbuja que cita **Tu Negocio**, tiempos W-CORE-10) con la ficha de mapa mini asomando
+// abajo a la izquierda (gesto W-ADV-58: objeto + satélite). El asistente que pregunta es uno
+// de los que nombra el paso 04 (ChatGPT, Gemini, Meta AI) y cambia en cada reproducción;
+// va en píldora de texto (§1.4: sin logo de OpenAI; P06 podrá cambiarla por LogoMarca).
+// LineaFases re-dispara RespuestaAsistente (clases is-armed/is-run) y rota [data-k].
+// Negocio neutro "Tu Negocio" (§1.6). Objeto de ejemplo: aria-hidden + data-nosnippet.
+import RespuestaAsistente from '../objetos/RespuestaAsistente.astro';
+import FichaMapaEjemplo from '../objetos/FichaMapaEjemplo.astro';
+import { copy, ASISTENTES, type Lang } from './proceso';
+
+interface Props { lang?: Lang; tone?: 'gold' | 'teal'; class?: string }
+const { lang = 'es', tone = 'gold', class: cls } = Astro.props;
+const T = copy[lang].encontrar;
+const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
+---
+<div class:list={['en', cls]} aria-hidden="true" data-nosnippet data-k="0" data-w2-asis={ASISTENTES.length}>
+  <div class="en__main">
+    <span class="en__who">
+      <span class="en__lab">{T.lab}</span>
+      <span class="en__names">{ASISTENTES.map((a, i) => <b data-i={i}>{a}</b>)}</span>
+    </span>
+    <RespuestaAsistente lang={lang} tone={tone} size="card" business={negocio} question={T.pregunta} />
+  </div>
+  <div class="en__sat"><FichaMapaEjemplo lang={lang} name={negocio} size="mini" tone={tone} /></div>
+</div>
+
+<style>
+  .en { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .en :global(.w-example) { display: none; }   /* un solo "Ejemplo" por sección: lo pone el panel */
+  .en { grid-template-columns: 284px 268px; gap: 16px; place-content: center; align-items: start; }
+  .en > .en__sat { align-self: end; }
+  .en__main { position: relative; width: 100%; transform: translateY(-14px); }
+  .en__main :global(.wo-ans) { width: 100%; }
+  .en__who { display: flex; align-items: center; gap: 8px; margin: 0 0 8px 2px; }
+  .en__lab { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .en__names { display: inline-grid; }
+  .en__names b {
+    grid-area: 1 / 1; display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px;
+    font: 600 13px/1 var(--font-display); letter-spacing: -.01em; color: var(--w-ink, #f0ede8);
+    background: var(--w-s3, #1f1f1d); border: 1px solid rgba(var(--star-rgb), .14);
+    opacity: 0; transition: opacity 320ms ease, transform 320ms var(--w-ease-text, ease); transform: translateY(4px);
+  }
+  .en[data-k='0'] .en__names b[data-i='0'], .en[data-k='1'] .en__names b[data-i='1'], .en[data-k='2'] .en__names b[data-i='2'] { opacity: 1; transform: none; }
+  .en__sat { position: relative; width: 100%; --t: translateY(18px); transform: var(--t); box-shadow: 0 22px 44px -14px rgba(0,0,0,.75); border-radius: var(--w-r-obj, 12px); }
+  .en__sat :global(.wo-map) { width: 100%; }
+
+  @container (max-width: 520px) {
+    .en { grid-template-columns: minmax(0, 300px); gap: 0; padding: 16px 0; }
+    .en__main { transform: none; }
+    .en__sat { width: 250px; margin: -28px 0 0; justify-self: end; --t: translateX(10px); }
+  }
+  :global(.is-play) .en__sat { animation: en-sat 600ms var(--w-ease-text, ease) 2300ms both; }
+  @keyframes en-sat { from { opacity: 0; transform: var(--t) translateY(14px); } to { opacity: 1; transform: var(--t); } }
+  @media (prefers-reduced-motion: reduce) { :global(.is-play) .en__sat { animation: none; } .en__names b { transition: none; } }
+</style>

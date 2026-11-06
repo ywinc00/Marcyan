@@ -1,0 +1,95 @@
+---
+// P11 · Escena 02 "Plan a la vista" (design/rediseno-workos-v2.md §2 P11).
+// Plan de EJEMPLO en papel claro: 4 casillas de alcance que se marcan una a una (250 ms),
+// total "Desde $X" de PRICE_ANCHORS (diseño web, vía proceso.ts) y un cursor que pulsa
+// "Aprobar" → "Aprobado ✓". Se reproduce cuando un ancestro recibe .is-play (LineaFases);
+// sin JS, sin .is-play o con reducir movimiento se ve el estado final (aprobado).
+// Objeto de ejemplo (§1.6): aria-hidden + data-nosnippet, sin h1-h6, sin botones reales.
+import { copy, type Lang } from './proceso';
+
+interface Props { lang?: Lang; class?: string }
+const { lang = 'es', class: cls } = Astro.props;
+const T = copy[lang].alcance;
+---
+<div class:list={['al', cls]} aria-hidden="true" data-nosnippet>
+  <div class="al__card">
+    <div class="al__top">
+      <span class="al__lab">{T.lab}</span>
+      <span class="al__name">{T.producto}</span>
+    </div>
+    <ul class="al__list">
+      {T.items.map((t, i) => (
+        <li style={`--i:${i}`}>
+          <span class="al__chk"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+          <span class="al__it">{t}</span>
+        </li>
+      ))}
+    </ul>
+    <div class="al__tot"><span>{T.total}</span><b>{T.desde}</b></div>
+    <div class="al__act">
+      <span class="al__btn">
+        <span class="al__b1">{T.aprobar}</span>
+        <span class="al__b2">{T.aprobado} <svg viewBox="0 0 16 16" width="12" height="12"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+      </span>
+      <svg class="al__cursor" viewBox="0 0 20 22" width="20" height="22"><path d="M2 1.5l15 9.2-6.6 1.5-3.3 6.3z" fill="#0e0e0d" stroke="#f0ede8" stroke-width="1.4" stroke-linejoin="round" /></svg>
+    </div>
+  </div>
+</div>
+
+<style>
+  .al { display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--font-body); }
+  .al__card {
+    position: relative; width: min(100%, 360px); padding: 16px 18px 14px;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border-radius: var(--w-r-obj, 12px); border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 24px 48px -18px rgba(0,0,0,.6);
+  }
+  .al__top { display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .al__lab { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); }
+  .al__name { font: 500 19px/1.2 var(--font-display); letter-spacing: -.02em; }
+  .al__list { list-style: none; margin: 0; padding: 2px 0; }
+  .al__list li { display: flex; align-items: center; gap: 12px; padding: 7px 0; font-size: 15px; line-height: 1.3; border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08)); }
+  .al__chk {
+    position: relative; flex: none; width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center; color: var(--w-p-bg, #f0ede8); background: var(--w-p-ink, #0e0e0d);
+  }
+  .al__tot { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 0 0; }
+  .al__tot span { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-p-ink-2, #4a4743); }
+  .al__tot b { font: 500 22px/1.1 var(--font-display); letter-spacing: -.02em; }
+  .al__act { position: relative; display: flex; justify-content: flex-end; padding-top: 10px; }
+  .al__btn {
+    position: relative; display: inline-grid; height: 36px; padding: 0 16px; border-radius: 8px;
+    background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); font-size: 14px; font-weight: 500;
+  }
+  .al__b1, .al__b2 { grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+  .al__b1 { opacity: 0; }
+  .al__b2 svg { color: var(--accent-gold); }
+  .al__cursor { position: absolute; right: 30px; bottom: -4px; opacity: 0; pointer-events: none; }
+
+  /* ── Coreografía (solo con .is-play en un ancestro; sin él, estado final) ── */
+  :global(.is-play) .al__chk { animation: al-chk 320ms var(--w-ease-text, ease) both; animation-delay: calc(450ms + var(--i) * 250ms); }
+  :global(.is-play) .al__it { animation: al-it 320ms ease both; animation-delay: calc(450ms + var(--i) * 250ms); }
+  :global(.is-play) .al__tot { animation: al-in 420ms var(--w-ease-text, ease) 1550ms both; }
+  :global(.is-play) .al__btn { animation: al-press 220ms ease 2750ms both; }
+  :global(.is-play) .al__b1 { animation: al-b1 3000ms linear both; }
+  :global(.is-play) .al__b2 { animation: al-b2 3000ms linear both; }
+  :global(.is-play) .al__cursor { animation: al-cur 3600ms var(--w-ease-ui, ease) both; }
+  @keyframes al-chk { from { opacity: 0; transform: scale(.4); background: transparent; } to { opacity: 1; transform: scale(1); } }
+  @keyframes al-it { from { opacity: .35; } to { opacity: 1; } }
+  @keyframes al-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes al-press { 0% { transform: scale(1); } 45% { transform: scale(.95); } 100% { transform: scale(1); } }
+  @keyframes al-b1 { 0%, 92% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes al-b2 { 0%, 92% { opacity: 0; transform: translateY(4px); } 100% { opacity: 1; transform: none; } }
+  @keyframes al-cur {
+    0%, 45% { opacity: 0; transform: translate(70px, 60px); }
+    52% { opacity: 1; transform: translate(70px, 60px); }
+    74% { opacity: 1; transform: translate(0, 0); }
+    78% { transform: translate(0, 0) scale(.88); }
+    82% { transform: translate(0, 0) scale(1); opacity: 1; }
+    94%, 100% { opacity: 0; transform: translate(10px, 14px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.is-play) .al__chk, :global(.is-play) .al__it, :global(.is-play) .al__tot, :global(.is-play) .al__btn,
+    :global(.is-play) .al__b1, :global(.is-play) .al__b2, :global(.is-play) .al__cursor { animation: none; }
+  }
+</style>

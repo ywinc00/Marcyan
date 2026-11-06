@@ -1,0 +1,133 @@
+---
+// Servicios · objeto de la celda "Tienda en línea" (v2 G09; situación: "¿y cuando me compran?").
+// Panel de pedidos de hoy de la marca de ejemplo `tienda` (velas y café, negocios.ts; reparto
+// §1.6: el bento de servicios). Filas de 52 px: el producto como VOLUMEN geométrico sólido con
+// sombra propia (vela, bolsa de café, caja: nunca icono en caja ni dibujo de línea; Palmer),
+// nombre + cliente de ejemplo y un raíl de 3 puntos Pagado → Preparando → Listo (Instacart).
+// Pantalla viva (§1.5): una fila avanza de estado cada 950 ms; tras 3 avances la lista sube 52 px
+// (600 ms). Bucle mientras está a la vista (loop.ts: pausa fuera de vista, pestaña oculta,
+// puntero/foco y botón 44×44 porque dura más de 5 s); obedece además la pausa GLOBAL de la
+// página (html[data-w-pausa] + evento `w:pausa`, contrato de Fondo.astro).
+// Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; sin ids; sin precios.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import { negocios } from '../../objetos/ejemplos/negocios';
+import Producto from './Producto.astro';
+
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const p = negocios.tienda.paleta;
+const T = en
+  ? { sr: 'Example: an online shop’s orders move from paid to preparing to ready.', title: 'Today’s orders', foot: 'tutienda.example', st: ['Paid', 'Preparing', 'Ready'] }
+  : { sr: 'Ejemplo: los pedidos de una tienda en línea pasan de pagado a preparando y a listo.', title: 'Pedidos de hoy', foot: 'tutienda.example', st: ['Pagado', 'Preparando', 'Listo'] };
+type Prod = 'vela' | 'velaOliva' | 'cafe' | 'caja';
+const filas: { prod: Prod; es: string; en: string; who: string; s: number }[] = [
+  { prod: 'vela', es: 'Vela de cedro', en: 'Cedar candle', who: 'Ana R.', s: 2 },
+  { prod: 'cafe', es: 'Café de Veracruz', en: 'Veracruz coffee', who: 'Luis M.', s: 1 },
+  { prod: 'caja', es: 'Caja de regalo', en: 'Gift box', who: 'Carla P.', s: 1 },
+  { prod: 'velaOliva', es: 'Vela de higo', en: 'Fig candle', who: 'Jorge T.', s: 0 },
+  { prod: 'cafe', es: 'Café molido', en: 'Ground coffee', who: 'Rosa G.', s: 0 },
+];
+const style = `--t-bg:${p.bg};--t-ink:${p.ink};--t-ink2:${p.ink2};--t-acc:${p.accent};--ej-ink:${p.ink};--ej-accent:${p.accent}`;
+---
+<div class="opd-wrap">
+  <p class="sr-only">{T.sr}</p>
+  <div class="opd" style={style} data-w2-pedidos data-st={JSON.stringify(T.st)}>
+    <div class="opd__ui" aria-hidden="true" data-nosnippet>
+      <div class="opd__top">
+        <LogoEjemplo marca="tienda" size={11} lang={lang} />
+        <span class="opd__title">{T.title}</span>
+      </div>
+      <div class="opd__win">
+        <ol class="opd__list">
+          {filas.map((f) => (
+            <li class="opd__row" data-s={f.s}>
+              <Producto prod={f.prod} size={40} />
+              <span class="opd__txt"><span class="opd__name">{en ? f.en : f.es}</span><span class="opd__who">{f.who}</span></span>
+              <span class="opd__state"><span class="opd__st">{T.st[f.s]}</span><span class="opd__rail"><i></i><i></i><i></i></span></span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+    <div class="opd__foot" data-w2-host><span aria-hidden="true">{T.foot}</span></div>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  const ROW = 52, TICK = 950, SHIFT = 600;
+  document.querySelectorAll<HTMLElement>('[data-w2-pedidos]').forEach((el) => {
+    const list = el.querySelector<HTMLElement>('.opd__list');
+    if (!list) return;
+    const ST: string[] = JSON.parse(el.dataset.st || '[]');
+    const rows = () => Array.from(list.children) as HTMLElement[];
+    const set = (r: HTMLElement, s: number) => { r.dataset.s = String(s); const t = r.querySelector('.opd__st'); if (t) t.textContent = ST[s] ?? ''; };
+    const initial = [2, 1, 1, 0, 0];
+    let timer = 0, ticks = 0;
+    const step = () => {
+      const r = rows().slice(0, 4).find((x) => Number(x.dataset.s) < 2);
+      if (r) set(r, Number(r.dataset.s) + 1);
+      ticks++;
+      if (ticks % 3 === 0) {
+        list.style.transition = `transform ${SHIFT}ms cubic-bezier(.65,0,.35,1)`;
+        list.style.transform = `translateY(-${ROW}px)`;
+        timer = window.setTimeout(() => {
+          const first = rows()[0];
+          list.style.transition = 'none'; list.style.transform = '';
+          set(first, 0); list.appendChild(first);
+          timer = window.setTimeout(step, TICK);
+        }, SHIFT + 40);
+        return;
+      }
+      timer = window.setTimeout(step, TICK);
+    };
+    const ctrl = registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); window.clearTimeout(timer); timer = window.setTimeout(step, TICK); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); list.style.transition = 'none'; list.style.transform = ''; rows().forEach((r, i) => set(r, initial[i] ?? 0)); el.classList.add('is-still'); },
+    }, { buttonTone: 'light', buttonHost: el.querySelector<HTMLElement>('[data-w2-host]') ?? el });
+    const global = () => document.documentElement.hasAttribute('data-w-pausa');
+    if (global()) ctrl.setUserPaused(true);
+    document.addEventListener('w:pausa', (e) => ctrl.setUserPaused(!!(e as CustomEvent).detail?.paused));
+  });
+</script>
+
+<style>
+  .opd-wrap { width: 100%; min-width: 0; display: flex; justify-content: center; }
+  .opd { position: relative; width: min(100%, 420px); container-type: inline-size; }
+  .opd__ui {
+    background: var(--t-bg); color: var(--t-ink); border-radius: 14px; overflow: hidden;
+    font-family: var(--font-body); text-align: left;
+  }
+  .opd__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px; border-bottom: 1px solid rgba(42,33,27,.12); color: var(--t-ink); }
+  .opd__title { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--t-ink2); }
+  .opd__win { height: 208px; overflow: hidden; }
+  .opd__list { list-style: none; margin: 0; padding: 0; will-change: transform; }
+  .opd__row {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;
+    column-gap: 12px; align-items: center; height: 52px; padding: 0 16px;
+    border-bottom: 1px solid rgba(42,33,27,.08);
+  }
+  .opd__txt { display: flex; flex-direction: column; min-width: 0; }
+  .opd__state { display: inline-flex; align-items: center; gap: 10px; justify-self: end; }
+  .opd__name { font-size: 14px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .opd__who { font-size: 12px; line-height: 1.3; color: var(--t-ink2); }
+  .opd__rail { display: inline-flex; align-items: center; gap: 0; }
+  .opd__rail i { position: relative; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid rgba(42,33,27,.3); background: transparent; }
+  .opd__rail i + i { margin-left: 14px; }
+  .opd__rail i + i::before { content: ''; position: absolute; right: 100%; top: 50%; width: 15px; height: 1.5px; margin-right: 0; transform: translateY(-50%); background: rgba(42,33,27,.2); }
+  .opd__row[data-s='0'] .opd__rail i:nth-child(1),
+  .opd__row[data-s='1'] .opd__rail i:nth-child(-n+2),
+  .opd__row[data-s='2'] .opd__rail i { background: var(--t-acc); border-color: var(--t-acc); }
+  .opd__st { font: 500 11px/1.2 var(--font-mono); letter-spacing: .04em; color: var(--t-ink2); min-width: 9.5ch; text-align: right; }
+  .opd__row[data-s='2'] .opd__st { color: var(--t-acc); }
+  .opd__foot {
+    position: relative; height: 64px; display: flex; align-items: center; padding: 0 68px 0 16px;
+    font: 500 11px/1 var(--font-mono); letter-spacing: .04em; color: var(--t-ink2);
+    background: var(--t-bg); border-top: 1px solid rgba(42,33,27,.12); border-radius: 0 0 14px 14px;
+  }
+  .opd__ui { border-radius: 14px 14px 0 0; }
+  /* Estrecho (móvil): el raíl solo dice el estado y el nombre del producto se lee entero. */
+  @container (max-width: 380px) { .opd__st { display: none; } }
+</style>

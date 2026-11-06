@@ -1,0 +1,122 @@
+---
+// Precios · objeto W-CONV-51 (comparativa de dos modelos de precio, recorte W-CONV-67 de WorkOS:
+// "Clerk · Your bill depends on plans…" frente a "WorkOS · Individual product selection").
+// v2 G09, junto a la prosa "La mayoría te esconde el precio recurrente".
+// Composición del original: dos tarjetas de igual alto (580 / 580 a 1200), radio 22, borde 1 px.
+//  · Izquierda, "Cómo se calcula en otros sitios": pasos numerados 1-3 en mono, título 16/500 y
+//    letra pequeña 14 debajo; divisoria; una pregunta con su respuesta en letra pequeña. SIN
+//    nombrar rivales ni importes (genérica: solo lo que ya dice la prosa congelada).
+//  · Derecha, "Marcyan": filas de 64 px con el icono-objeto del producto (40 px, como las
+//    baldosas de app del original), nombre 16/500 + niveles en 13, y el precio de arranque a la
+//    derecha (de PRICE_ANCHORS vía catalog/fromOf: cero cifras a mano); nota al pie con asterisco.
+//    La tarjeta de Marcyan lleva el halo frío del original traducido a oro al 6 % (estático).
+// Entrada (una vez, al entrar en vista): las filas de la derecha suben 8 px y aparecen en
+// cascada de 60 ms (solo transform/opacity); quieto con reducir movimiento o sin JS.
+// Contenido real (no es un objeto de ejemplo): precios visibles para buscadores y lectores.
+import IconoObjeto from '../../IconoObjeto.astro';
+import type { IconoId } from '../../objects/registry';
+
+interface Fila { id: IconoId; name: string; sub: string; k: string; v: string; mensual: boolean; tone?: 'gold' | 'teal' }
+interface Props {
+  otros: { title: string; sub: string; steps: { t: string; x: string }[]; qs: { t: string; x: string }[] };
+  nosotros: { title: string; sub: string; foot: string };
+  filas: Fila[];
+  lang: 'es' | 'en';
+}
+const { otros, nosotros, filas, lang } = Astro.props;
+const mes = lang === 'en' ? '/mo' : '/mes';
+---
+<div class="pc" data-w2-compara>
+  <article class="pc__card pc__card--otros">
+    <h3 class="pc__t">{otros.title}</h3>
+    <p class="pc__sub">{otros.sub}</p>
+    <ol class="pc__steps">
+      {otros.steps.map((s, i) => (
+        <li class="pc__step">
+          <span class="pc__n">{i + 1}</span>
+          <div><p class="pc__st">{s.t}</p><p class="pc__sx">{s.x}</p></div>
+        </li>
+      ))}
+    </ol>
+    <div class="pc__q">
+      {otros.qs.map((q) => (<div class="pc__qi"><p class="pc__st">{q.t}</p><p class="pc__sx">{q.x}</p></div>))}
+    </div>
+  </article>
+  <article class="pc__card pc__card--mr">
+    <h3 class="pc__t">{nosotros.title}</h3>
+    <p class="pc__sub">{nosotros.sub}</p>
+    <ul class="pc__rows">
+      {filas.map((f) => (
+        <li class="pc__row">
+          <IconoObjeto id={f.id} size={40} tone={f.tone} class="pc__ic" />
+          <div class="pc__rt"><p class="pc__rn">{f.name}</p><p class="pc__rs">{f.sub}</p></div>
+          <p class="pc__rp">{f.k && <span class="pc__rk">{f.k} </span>}<b>{f.v}</b>{f.mensual && <span class="pc__rm">{mes}</span>}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="pc__foot">{nosotros.foot}</p>
+  </article>
+</div>
+
+<script>
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-w2-compara]').forEach((el) => {
+    if (mq.matches) return;
+    el.classList.add('is-armed');
+    const io = new IntersectionObserver((ents) => {
+      if (ents.some((e) => e.isIntersecting)) { el.classList.add('is-in'); io.disconnect(); }
+    }, { threshold: 0.25 });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .pc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 56px; }
+  @media (--lg) { .pc { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; align-items: stretch; } }
+  .pc__card {
+    position: relative; min-width: 0; padding: 32px; border-radius: var(--w-r-tray);
+    border: 1px solid var(--w-line); background: var(--w-s1); box-shadow: var(--w-edge);
+  }
+  .pc__card--mr {
+    background:
+      radial-gradient(80% 60% at 100% 0%, rgba(201,169,110,.07), transparent 70%),
+      var(--w-s2);
+    border-color: var(--w-line-strong);
+  }
+  .pc__t { margin: 0; font: 500 24px/1.2 var(--font-display); letter-spacing: var(--w-tr-h3, -0.02em); color: var(--w-ink); }
+  .pc__sub { margin: 8px 0 0; font: 400 16px/1.55 var(--font-body); color: var(--w-ink-70); max-width: 42ch; }
+  .pc__steps { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 22px; }
+  .pc__step { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: start; }
+  .pc__n { font: 500 13px/1.6 var(--font-mono); color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .pc__st { margin: 0; font: 500 16px/1.4 var(--font-display); color: var(--w-ink-90, var(--w-ink)); }
+  .pc__sx { margin: 6px 0 0; font: 400 14px/1.55 var(--font-body); color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .pc__q { margin-top: 28px; padding: 24px 0 0 32px; border-top: 1px solid var(--w-line); display: grid; gap: 20px; }
+  .pc__rows { list-style: none; margin: 24px 0 0; padding: 0; border-top: 1px solid var(--w-line); }
+  .pc__row {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; column-gap: 16px;
+    min-height: 64px; padding-block: 10px; border-bottom: 1px solid var(--w-line);
+  }
+  .pc__rt { min-width: 0; }
+  .pc__rn { margin: 0; font: 500 16px/1.3 var(--font-display); color: var(--w-ink); }
+  .pc__rs { margin: 2px 0 0; font: 400 13px/1.4 var(--font-body); color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .pc__rp { margin: 0; text-align: right; white-space: nowrap; font: 400 13px/1.2 var(--font-body); color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .pc__rp b { font: 500 16px/1.2 var(--font-display); color: var(--w-ink); font-variant-numeric: tabular-nums; }
+  .pc__rm { color: var(--w-ink-70); }
+  .pc__rp sup { color: var(--w-accent); font-size: 11px; margin-left: 1px; }
+  .pc__foot { margin: 18px 0 0; font: 400 13px/1.55 var(--font-body); color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .pc__foot span { color: var(--w-accent); }
+  .pc.is-armed .pc__row { opacity: 0; transform: translateY(8px); }
+  .pc.is-in .pc__row { animation: pc-in 480ms cubic-bezier(.2,.7,.2,1) forwards; }
+  .pc.is-in .pc__row:nth-child(2) { animation-delay: 60ms; } .pc.is-in .pc__row:nth-child(3) { animation-delay: 120ms; }
+  .pc.is-in .pc__row:nth-child(4) { animation-delay: 180ms; } .pc.is-in .pc__row:nth-child(5) { animation-delay: 240ms; }
+  .pc.is-in .pc__row:nth-child(6) { animation-delay: 300ms; } .pc.is-in .pc__row:nth-child(7) { animation-delay: 360ms; }
+  @keyframes pc-in { to { opacity: 1; transform: none; } }
+  @media (--lt-md) {
+    .pc { margin-top: 40px; }
+    .pc__card { padding: 24px 20px; }
+    .pc__t { font-size: 22px; }
+    .pc__row { grid-template-columns: 40px minmax(0, 1fr); row-gap: 4px; }
+    .pc__rp { grid-column: 2; text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pc .pc__row { animation: none !important; opacity: 1 !important; transform: none !important; } }
+</style>

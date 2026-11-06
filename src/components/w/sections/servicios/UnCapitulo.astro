@@ -9,19 +9,23 @@
 // celdas van con la bandeja "desnuda" (tray: false) y este envoltorio pinta dentro del slot
 // los niveles y, debajo, la bandeja del objeto con la MISMA piel que la del sistema
 // (.ws-tray = .wd-bento__tray). Pedido como [SISTEMA]: slot `extra-<n>` en Bento2x2.
-// Página oro: Marcy en burbujas neutras y la respuesta del asistente en oro (E-14, un acento
-// por bloque). Todos los objetos ESTÁTICOS (la firma de la página es la pila del hero).
-// Móvil (E-18): conservan objeto la web, el chat de Marcy, los pedidos y el mantenimiento;
-// la ficha, la respuesta del asistente y el plano de marca quedan en texto + niveles (.ws-dm).
+// v2 (G09): objetos NUEVOS por la situación de cada servicio, un solo rótulo "Ejemplos" para
+// toda la sección (§1.6; se ocultan los rótulos propios de cada pieza): web en el móvil de la
+// marca tienda (ObjWebTienda, con nombre, paleta y logotipo de P02a) · mapa con ficha y "te encuentran en" (ObjMapaLocal) · mazo de
+// hilos de Marcy con logos de canal (MazoHilos, P05) · respuesta de ChatGPT que te cita
+// (RespuestaAsistente, P05) · pedidos de hoy de la tienda (ObjPedidos, vivo) · plano de marca
+// (PlanoMarca, lo mejor de la v1, quieto) · registro de cuidado de hoy (ObjCuidado, vivo).
+// Reparto §1.6: tienda en la celda 1 y la 5 (nunca en la misma vista); mapa y cuidado neutros.
+// Móvil (E-18): el plano de marca queda en texto + niveles (.ws-dm).
 import CapituloDosFrases from '../../CapituloDosFrases.astro';
 import Bento2x2 from '../../Bento2x2.astro';
-import WebEjemplo from '../../objetos/WebEjemplo.astro';
-import FichaMapaEjemplo from '../../objetos/FichaMapaEjemplo.astro';
-import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import ObjWebTienda from './ObjWebTienda.astro';
+import MazoHilos from '../../agente/MazoHilos.astro';
 import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
-import ListaPedidos from '../../objetos/ListaPedidos.astro';
 import PlanoMarca from '../../objetos/PlanoMarca.astro';
-import MiniPasos from '../../objetos/MiniPasos.astro';
+import ObjMapaLocal from './ObjMapaLocal.astro';
+import ObjPedidos from './ObjPedidos.astro';
+import ObjCuidado from './ObjCuidado.astro';
 import Niveles from './Niveles.astro';
 import { catalog as catalogEs } from '../../../../i18n/pricing';
 import { catalog as catalogEn } from '../../../../i18n/pricing.en';
@@ -30,37 +34,35 @@ import type { ServiciosCopy } from '../../../../i18n/w/servicios';
 interface Props { copy: ServiciosCopy['capitulo']; lang?: 'es' | 'en' }
 const { copy, lang = 'es' } = Astro.props;
 const en = lang === 'en';
-const sr = en
-  ? 'Example: a customer asks to book and Marcy confirms the appointment.'
-  : 'Ejemplo: un cliente pide cita y Marcy se la confirma.';
 const cat = en ? catalogEn : catalogEs;
 const tiersOf = (id: string) => (cat.find((p) => p.id === id)?.tiers ?? []).map((t) => ({ name: t.name, display: t.display }));
 const labelOf = (name: string) => (en ? `${name}: tiers and prices` : `${name}: niveles y precios`);
 const cells = copy.cells.map((c) => ({ ...c, tray: false }));
 const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id), label: labelOf(c.label) }]));
 ---
-<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div data-w-reveal><CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} /></div>
+<p class="ws-ej">{en ? 'Examples' : 'Ejemplos'}</p>
 <div class="ws-gap">
   <Bento2x2 cells={cells} wideLast>
     <div slot="ui-1" class="ws-ui">
       <Niveles {...T['diseno-web']} />
-      <div class="ws-tray"><WebEjemplo frame="movil" kind="plomeria" city="Houston" lang={lang} size="mini" /></div>
+      <div class="ws-tray ws-tray--tel"><ObjWebTienda lang={lang} /></div>
     </div>
     <div slot="ui-2" class="ws-ui">
       <Niveles {...T['seo-local']} />
-      <div class="ws-tray ws-dm"><FichaMapaEjemplo city="Houston" lang={lang} size="card" /></div>
+      <div class="ws-tray"><ObjMapaLocal lang={lang} /></div>
     </div>
     <div slot="ui-3" class="ws-ui">
       <Niveles {...T['ia-conversacional']} />
-      <div class="ws-tray"><ChatMarcy mode="estatico" tone="neutral" lang={lang} size="card" sr={sr} /></div>
+      <div class="ws-tray ws-tray--mazo"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
     </div>
     <div slot="ui-4" class="ws-ui">
       <Niveles {...T['seo-ia']} />
-      <div class="ws-bare ws-dm"><RespuestaAsistente lang={lang} tone="gold" size="mini" /></div>
+      <div class="ws-bare"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" /></div>
     </div>
     <div slot="ui-5" class="ws-ui">
       <Niveles {...T['ecommerce']} />
-      <div class="ws-tray"><ListaPedidos lang={lang} size="card" static /></div>
+      <div class="ws-tray"><ObjPedidos lang={lang} /></div>
     </div>
     <div slot="ui-6" class="ws-ui">
       <Niveles {...T['branding']} />
@@ -68,13 +70,21 @@ const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id)
     </div>
     <div slot="ui-7" class="ws-ui">
       <Niveles {...T['mantenimiento']} />
-      <div class="ws-tray"><MiniPasos kind="mantenimiento" lang={lang} size="card" /></div>
+      <div class="ws-tray"><ObjCuidado lang={lang} /></div>
     </div>
   </Bento2x2>
 </div>
 <style>
-  .ws-gap { margin-top: var(--w-chapter-gap); }
-  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+  .ws-gap { margin-top: 24px; }
+  /* UN rótulo de ejemplo por sección (§1.6): los objetos del bento no llevan el suyo. */
+  .ws-ej {
+    margin: calc(var(--w-chapter-gap) - 40px) 0 0; text-align: right;
+    font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6));
+  }
+  .ws-gap :global(.w-example) { display: none; }
+  .ws-tray--tel { padding-block: 28px; }
+  .ws-tray--mazo { padding-block: 28px 20px; }
+  @media (--lt-md) { .ws-ej { margin-top: 32px; text-align: left; } }
   /* Los niveles van pegados al texto; el objeto, con su aire de siempre debajo. */
   .ws-gap :global(.wd-bento__ui) { margin-top: 28px; }
   .ws-ui { justify-self: stretch; width: 100%; min-width: 0; display: grid; }

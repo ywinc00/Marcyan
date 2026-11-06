@@ -61,6 +61,15 @@ export const tierName = (lang: PreciosLang, id: string, key: string): string => 
   return t.name;
 };
 
+/** Iconos-objeto de "Lo que trae cada web" (Incluido.astro, v2 G09). */
+export type IncluidoIcono = 'medida' | 'rapida' | 'bilingue' | 'seo' | 'ia' | 'tuya';
+
+/** Grupos de tarjetas de precio (v2 G09): ids del catálogo, en el orden en que se pintan. */
+export const GRUPOS_PRECIO = {
+  proyecto: ['diseno-web', 'ecommerce', 'ia-conversacional', 'branding'],
+  mensual: ['seo-local', 'seo-ia', 'mantenimiento'],
+} as const;
+
 interface Copy {
   eyebrow: string;
   lead: string;
@@ -69,12 +78,20 @@ interface Copy {
     mensual: { title: string; text: string; lead: string; cta: string; items: string[] };
   };
   prosa: { tone1: string; tone2: string };
+  /** v2 (G09): objeto W-CONV-51/67 junto a la prosa. Sin rivales ni importes en "otros". */
+  compara: {
+    otros: { title: string; sub: string; steps: { t: string; x: string }[]; qs: { t: string; x: string }[] };
+    nosotros: { title: string; sub: string; foot: string };
+  };
+  /** v2 (G09): las 7 tarjetas agrupadas, cada grupo con su cabecera numerada. */
+  grupos: { proyecto: { label: string; lead: string }; mensual: { label: string; lead: string } };
   cuesta: { label: string; tiersLabel: string; includesLabel: string; note: { title: string; text: string } };
   incluido: {
     label: string;
     title: string;
     lead: string;
-    items: { icon: string; title: string; text: string }[];
+    /** icon: id del icono-objeto propio de Incluido.astro (v2), ya no un glifo Lucide. */
+    items: { icon: IncluidoIcono; title: string; text: string }[];
   };
   despues: {
     label: string;
@@ -117,6 +134,30 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
       },
     },
     prosa: { tone1: 'La mayoría te', tone2: '<em>esconde</em> el precio recurrente' },
+    compara: {
+      otros: {
+        title: 'Cómo se calcula en otros sitios',
+        sub: 'Lo que pagas depende del arranque, de lo que va aparte y de lo que llega después.',
+        steps: [
+          { t: 'Te enseñan un precio de arranque', x: 'Atractivo, y solo del primer paso.' },
+          { t: 'Lo recurrente va aparte', x: 'La mensualidad del SEO, el mantenimiento, las renovaciones.' },
+          { t: 'Te enteras después', x: 'Cuando ya estás adentro.' },
+        ],
+        qs: [
+          { t: '¿Cuánto pagarás en un año?', x: 'Difícil saberlo antes de firmar.' },
+          { t: '¿Y las renovaciones?', x: 'Llegan aparte del precio que te enseñaron.' },
+        ],
+      },
+      nosotros: {
+        title: 'Marcyan',
+        sub: 'Cada servicio con su precio de arranque a la vista. Lo mensual, también.',
+        foot: 'El precio final depende del alcance y te lo damos por escrito antes de empezar.',
+      },
+    },
+    grupos: {
+      proyecto: { label: 'Por proyecto', lead: 'Pagas una vez y el resultado es tuyo.' },
+      mensual: { label: 'Mensual', lead: 'Mes a mes, sin permanencia.' },
+    },
     cuesta: {
       label: 'Lo que cuesta',
       tiersLabel: 'Precios',
@@ -131,12 +172,12 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
       title: 'Lo que trae cada web, <em>de serie</em>',
       lead: 'Da igual el nivel: estas seis cosas vienen siempre.',
       items: [
-        { icon: 'lucide:layout-template', title: 'Diseño a medida', text: 'Hecha para tu negocio y tus clientes.' },
-        { icon: 'lucide:gauge', title: 'Rápida', text: 'Ligera para que cargue rápido, también en el celular.' },
-        { icon: 'lucide:languages', title: 'Bilingüe', text: 'En español e inglés, para todos tus clientes.' },
-        { icon: 'lucide:search', title: 'SEO base', text: 'Preparada para que Google la encuentre.' },
-        { icon: 'lucide:sparkles', title: 'Legible para la IA', text: 'Los asistentes de IA pueden leerla y entender qué haces.' },
-        { icon: 'lucide:key-round', title: 'La web es tuya', text: 'Al terminar, el sitio es tuyo. Nunca te dejamos amarrado.' },
+        { icon: 'medida', title: 'Diseño a medida', text: 'Hecha para tu negocio y tus clientes.' },
+        { icon: 'rapida', title: 'Rápida', text: 'Ligera para que cargue rápido, también en el celular.' },
+        { icon: 'bilingue', title: 'Bilingüe', text: 'En español e inglés, para todos tus clientes.' },
+        { icon: 'seo', title: 'SEO base', text: 'Preparada para que Google la encuentre.' },
+        { icon: 'ia', title: 'Legible para la IA', text: 'Los asistentes de IA pueden leerla y entender qué haces.' },
+        { icon: 'tuya', title: 'La web es tuya', text: 'Al terminar, el sitio es tuyo. Nunca te dejamos amarrado.' },
       ],
     },
     despues: {
@@ -221,6 +262,30 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
       },
     },
     prosa: { tone1: 'Most agencies hide the', tone2: '<em>recurring</em> price' },
+    compara: {
+      otros: {
+        title: 'How others price it',
+        sub: 'What you pay depends on the starting price, what comes separately and what shows up later.',
+        steps: [
+          { t: 'You get a starting price', x: 'Attractive, and only for the first step.' },
+          { t: 'Recurring costs come separately', x: 'The monthly SEO fee, maintenance, renewals.' },
+          { t: 'You find out later', x: 'Once you are already locked in.' },
+        ],
+        qs: [
+          { t: 'What will you pay in a year?', x: 'Hard to know before you sign.' },
+          { t: 'And the renewals?', x: 'They come on top of the price you were shown.' },
+        ],
+      },
+      nosotros: {
+        title: 'Marcyan',
+        sub: 'Every service with its starting price in plain sight. Monthly ones too.',
+        foot: 'The final price depends on scope, and we put it in writing before we start.',
+      },
+    },
+    grupos: {
+      proyecto: { label: 'Per project', lead: 'You pay once and the result is yours.' },
+      mensual: { label: 'Monthly', lead: 'Month to month, no lock-in.' },
+    },
     cuesta: {
       label: 'What it costs',
       tiersLabel: 'Pricing',
@@ -235,12 +300,12 @@ export const preciosCopy: Record<PreciosLang, Copy> = {
       title: 'What every site comes with, <em>as standard</em>',
       lead: 'Whatever the tier, these six things always come with it.',
       items: [
-        { icon: 'lucide:layout-template', title: 'Custom design', text: 'Made for your business and your customers.' },
-        { icon: 'lucide:gauge', title: 'Fast', text: 'Lightweight so it loads quickly, on phones too.' },
-        { icon: 'lucide:languages', title: 'Bilingual', text: 'In English and Spanish, for every customer you serve.' },
-        { icon: 'lucide:search', title: 'Baseline SEO', text: 'Set up so Google can find it.' },
-        { icon: 'lucide:sparkles', title: 'Readable by AI', text: 'AI assistants can read it and understand what you do.' },
-        { icon: 'lucide:key-round', title: 'The site is yours', text: 'Once it is done, you own it. We never lock you in.' },
+        { icon: 'medida', title: 'Custom design', text: 'Made for your business and your customers.' },
+        { icon: 'rapida', title: 'Fast', text: 'Lightweight so it loads quickly, on phones too.' },
+        { icon: 'bilingue', title: 'Bilingual', text: 'In English and Spanish, for every customer you serve.' },
+        { icon: 'seo', title: 'Baseline SEO', text: 'Set up so Google can find it.' },
+        { icon: 'ia', title: 'Readable by AI', text: 'AI assistants can read it and understand what you do.' },
+        { icon: 'tuya', title: 'The site is yours', text: 'Once it is done, you own it. We never lock you in.' },
       ],
     },
     despues: {

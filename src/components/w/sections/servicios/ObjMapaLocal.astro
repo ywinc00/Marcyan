@@ -1,0 +1,153 @@
+---
+// Servicios · objeto de la celda "SEO local" (v2 G09; situación: "¿me encuentran cerca?").
+// Recorte de mapa DIBUJADO por nosotros (calles en dos grises, un parque, un río; abstracto,
+// sin nombres de calles ni logotipo de Google), ruta curva desde "Tú" hasta el alfiler del
+// negocio y, debajo, la ficha: nombre, horario y tres acciones, más la fila "Te encuentran en"
+// con los logos nominativos de P06 (dónde te buscan, nunca alianza: §1.4).
+// Negocio NEUTRO ("Tu negocio"): la marca tienda ya sale en esta página (reparto §1.6).
+// Vida (§1.5, demo con guion): al entrar en vista (35 %) la ruta se dibuja (stroke-dashoffset,
+// 900 ms) y el alfiler cae 6 px con rebote corto; queda con micro-vida (el punto "Abierto" late,
+// 2 s) y se repite al volver a entrar tras ≥ 8 s fuera. Reducir movimiento: estado final quieto.
+// Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; acciones como span; sin ids.
+import LogoMarca from '../../marcas/LogoMarca.astro';
+
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const T = en
+  ? { sr: 'Example: someone nearby finds your business on the map and gets directions.', you: 'You', name: 'Your business', cat: 'Open', close: 'closes 6 PM', a1: 'Directions', a2: 'Call', a3: 'Website', found: 'Found on' }
+  : { sr: 'Ejemplo: alguien cerca encuentra tu negocio en el mapa y pide cómo llegar.', you: 'Tú', name: 'Tu negocio', cat: 'Abierto', close: 'cierra 6 p. m.', a1: 'Cómo llegar', a2: 'Llamar', a3: 'Sitio web', found: 'Te encuentran en' };
+---
+<div class="oml-wrap">
+  <p class="sr-only">{T.sr}</p>
+  <div class="oml" aria-hidden="true" data-nosnippet data-w2-mapa>
+    <div class="oml__map">
+      <svg class="oml__svg" viewBox="0 0 480 196" preserveAspectRatio="xMidYMid slice">
+        <rect width="480" height="196" fill="#EAE6DD" />
+        <path d="M-10 150 C 80 128, 150 170, 250 150 S 420 118, 500 136 L 500 196 L -10 196 Z" fill="#C9D9DE" />
+        <rect x="300" y="18" width="118" height="70" rx="10" fill="#D3DEC6" />
+        <g fill="none" stroke="#D9D3C7" stroke-width="7" stroke-linecap="round">
+          <path d="M-10 52 H 500" /><path d="M-10 104 H 260" /><path d="M120 -10 V 140" /><path d="M210 -10 V 150" /><path d="M440 -10 V 120" />
+        </g>
+        <g fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round">
+          <path d="M-10 84 C 90 84, 160 30, 290 40 S 430 98, 500 92" />
+          <path d="M60 -10 C 64 60, 40 120, 52 206" />
+        </g>
+        <path class="oml__route" pathLength="1" d="M58 150 C 90 120, 120 96, 176 86 S 268 70, 336 62" fill="none" stroke="#1E1C19" stroke-width="3.2" stroke-linecap="round" />
+        <circle cx="58" cy="150" r="7" fill="#FFFFFF" stroke="#1E1C19" stroke-width="2.4" />
+        <circle cx="58" cy="150" r="2.6" fill="#1E1C19" />
+      </svg>
+      <span class="oml__you">{T.you}</span>
+      <span class="oml__pin">
+        <svg viewBox="0 0 28 36" width="28" height="36"><path d="M14 35c-1-2.6-11.5-12.3-11.5-20.6A11.5 11.5 0 0 1 25.5 14.4C25.5 22.7 15 32.4 14 35Z" fill="#1E1C19" /><circle cx="14" cy="14" r="4.4" fill="#F4F1EA" /></svg>
+      </span>
+    </div>
+    <div class="oml__card">
+      <div class="oml__head">
+        <span class="oml__name">{T.name}</span>
+        <span class="oml__open"><span class="oml__dot"></span><b>{T.cat}</b> · {T.close}</span>
+      </div>
+      <div class="oml__acts">
+        <span class="oml__act oml__act--fill">
+          <svg viewBox="0 0 16 16" width="14" height="14"><path d="M2.5 7.6 13.4 2.6 8.4 13.5 7.3 8.7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>{T.a1}
+        </span>
+        <span class="oml__act">
+          <svg viewBox="0 0 16 16" width="14" height="14"><path d="M5.6 2.5 3.4 2.9c-.6.1-1 .7-.9 1.3.8 4.5 4.3 8 8.8 8.8.6.1 1.2-.3 1.3-.9l.4-2.2-2.7-1.3-1.3 1.3a7 7 0 0 1-3-3l1.3-1.3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>{T.a2}
+        </span>
+        <span class="oml__act">
+          <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="M2.6 8h10.8M8 2.4c1.6 1.6 2.3 3.4 2.3 5.6S9.6 12 8 13.6M8 2.4C6.4 4 5.7 5.8 5.7 8s.7 4 2.3 5.6" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>{T.a3}
+        </span>
+      </div>
+      <div class="oml__found">
+        <span class="oml__k">{T.found}</span>
+        <span class="oml__logos">
+          <LogoMarca id="google" size={16} tono="color" titulo="" />
+          <LogoMarca id="googlemaps" size={16} tono="color" titulo="" />
+          <LogoMarca id="applemaps-texto" size={16} tono="color" titulo="" />
+          <LogoMarca id="bing-texto" size={16} tono="color" titulo="" />
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Guion de entrada (demo con guion §1.5): una vez al entrar al 35 %, repite tras ≥ 8 s fuera.
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-w2-mapa]').forEach((el) => {
+    if (mq.matches) { el.classList.add('is-done'); return; }
+    el.classList.add('is-armed');
+    let leftAt = 0;
+    let played = false;
+    const io = new IntersectionObserver((ents) => {
+      for (const e of ents) {
+        if (e.isIntersecting && e.intersectionRatio >= 0.35) {
+          el.classList.add('is-live');
+          if (!played || (leftAt && performance.now() - leftAt >= 8000)) {
+            played = true;
+            el.classList.remove('is-play', 'is-done');
+            void el.offsetWidth;
+            el.classList.add('is-play');
+          }
+          leftAt = 0;
+        } else if (!e.isIntersecting) {
+          el.classList.remove('is-live');
+          if (!leftAt) leftAt = performance.now();
+        }
+      }
+    }, { threshold: [0, 0.35] });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .oml-wrap { width: 100%; min-width: 0; }
+  .oml {
+    --ink: #1E1C19; --ink2: #5E5A53; --paper: #F7F5F0; --line: #E2DED5;
+    width: 100%; border-radius: 14px; overflow: hidden; background: var(--paper);
+    color: var(--ink); font-family: var(--font-body); text-align: left;
+  }
+  .oml__map { position: relative; aspect-ratio: 480 / 196; }
+  .oml__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .oml__route { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .oml__you {
+    position: absolute; left: calc(58 / 480 * 100%); top: calc(150 / 196 * 100%);
+    transform: translate(14px, -50%);
+    font: 600 12px/1 var(--font-body); color: var(--ink);
+    background: #fff; padding: 5px 8px; border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  }
+  .oml__pin { position: absolute; left: calc(336 / 480 * 100%); top: calc(62 / 196 * 100%); transform: translate(-50%, -100%); display: block; line-height: 0; filter: drop-shadow(0 3px 3px rgba(30,28,25,.22)); }
+  .oml__card { padding: 16px 18px 18px; }
+  .oml__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+  .oml__name { font: 600 17px/1.2 var(--font-display); letter-spacing: -0.01em; }
+  .oml__open { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 1.3; color: var(--ink2); }
+  .oml__open b { font-weight: 600; color: #2F6B45; }
+  .oml__dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #2F8A55; flex: none; }
+  .oml__dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #2F8A55; opacity: 0; }
+  .oml__acts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .oml__act {
+    display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px;
+    border-radius: 999px; border: 1px solid #CFCAC0; font: 500 13px/1 var(--font-body); color: var(--ink); white-space: nowrap;
+  }
+  .oml__act--fill { background: var(--ink); border-color: var(--ink); color: #F7F5F0; }
+  .oml__found { display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .oml__k { font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); }
+  .oml__logos { display: inline-flex; align-items: center; gap: 16px; color: var(--ink); --marca-tinta: var(--ink); }
+
+  /* Armado por JS antes de entrar: sin JS o con reducir movimiento se ve el estado final. */
+  .oml.is-armed:not(.is-play) .oml__route { stroke-dashoffset: 1; }
+  .oml.is-armed:not(.is-play) .oml__pin { opacity: 0; }
+  /* Guion: la ruta se dibuja y el alfiler cae con rebote corto. */
+  .oml.is-play .oml__route { animation: oml-route 900ms cubic-bezier(.6,0,.2,1) both; }
+  .oml.is-play .oml__pin { animation: oml-pin 520ms 760ms cubic-bezier(.3,1.5,.5,1) both; }
+  @keyframes oml-route { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes oml-pin { from { transform: translate(-50%, calc(-100% - 6px)); opacity: 0; } to { transform: translate(-50%, -100%); opacity: 1; } }
+  /* Micro-vida mientras está a la vista: el punto "Abierto" late (2 s). */
+  .oml.is-live .oml__dot::after { animation: oml-pulse 2s ease-out infinite; }
+  @keyframes oml-pulse { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(2.6); opacity: 0; } }
+  :global(html[data-w-pausa]) .oml .oml__dot::after { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .oml .oml__route, .oml .oml__pin, .oml .oml__dot::after { animation: none !important; }
+  }
+  @media (max-width: 400px) { .oml__card { padding: 14px; } .oml__act { padding: 0 10px; } }
+</style>

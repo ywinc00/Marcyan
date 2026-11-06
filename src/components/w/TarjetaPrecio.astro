@@ -7,6 +7,10 @@
 // distinto?" (borde 1 px, radio 8). SIN deslizador: las calculadoras son de
 // ToolsHub (§4.10). Ningún precio escrito aquí: todo llega por `tiers`
 // (de priceServices / catalog).
+// v2 (G09, /es/precios): dos props OPCIONALES que no cambian los usos de siempre (barrios, SEO
+// para IA): `variante="compacta"` (columna: cabecera, niveles, cifra "desde" de la prop `desde`,
+// lo incluido plegado en un <details> y la acción al pie; para las tarjetas 2-4 de cada grupo)
+// y `destacada` (la 1.ª de cada grupo: filete oro arriba y superficie un escalón más cálida).
 import IconoObjeto from './IconoObjeto.astro';
 import Icon from '../ui/Icon.astro';
 import type { IconoId } from './objects/registry';
@@ -29,15 +33,57 @@ interface Props {
   tone?: 'gold' | 'teal';
   id?: string;
   class?: string;
+  /** v2: 'compacta' = tarjeta en columna para rejillas (por defecto 'completa', la de siempre). */
+  variante?: 'completa' | 'compacta';
+  /** v2: primera tarjeta de un grupo. */
+  destacada?: boolean;
+  /** v2, solo compacta: cifra grande (k = rótulo pequeño, v = la cifra). */
+  desde?: { k: string; v: string };
 }
 const {
   serviceId, name, desc, tiers, includes, cta, note,
   tiersLabel = 'Precios', includesLabel = 'Qué incluye',
   track = 'pricing_card_clicked', tone, id, class: cls,
+  variante = 'completa', destacada = false, desde,
 } = Astro.props;
+const compacta = variante === 'compacta';
 const headingId = id ? `${id}-t` : undefined;
 ---
-<article class:list={['tp', cls]} id={id} data-w-tone={tone} aria-labelledby={headingId}>
+{compacta ? (
+<article class:list={['tp', 'tp--c', destacada && 'tp--dest', cls]} id={id} data-w-tone={tone} aria-labelledby={headingId}>
+  <header class="tpc__head">
+    <IconoObjeto id={serviceId} size={48} tone={tone} class="tp__icon" />
+    <h3 class="tp__name tpc__name" id={headingId}>{name}</h3>
+    <p class="tp__desc">{desc}</p>
+  </header>
+  {desde && (
+    <p class="tpc__from"><span class="tpc__k">{desde.k}</span><span class="tpc__v">{desde.v}</span></p>
+  )}
+  <div class="tpc__panel">
+    <p class="tp__k tp__k--panel">{tiersLabel}</p>
+    <dl class="tp__tiers">
+      {tiers.map((t) => (
+        <div class="tp__row">
+          <dt>{t.label}</dt>
+          <dd><span class="tp__price">{t.price}</span>{t.unit && <span class="tp__unit">{' '}{t.unit}</span>}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+  {includes && includes.length > 0 && (
+    <details class="tpc__inc">
+      <summary class="tpc__sum">{includesLabel}<span class="tpc__plus" aria-hidden="true"></span></summary>
+      <ul class="tp__list">
+        {includes.map((it) => (
+          <li><Icon name="lucide:check" class="tp__check" />{it}</li>
+        ))}
+      </ul>
+    </details>
+  )}
+  <a class="tp__cta tpc__cta" href={cta.href} data-track={track}>{cta.label}<span class="tp__chev" aria-hidden="true">›</span></a>
+</article>
+) : (
+<article class:list={['tp', destacada && 'tp--dest', cls]} id={id} data-w-tone={tone} aria-labelledby={headingId}>
   <header class="tp__head">
     <IconoObjeto id={serviceId} size={56} tone={tone} class="tp__icon" />
     <div class="tp__intro">
@@ -64,7 +110,7 @@ const headingId = id ? `${id}-t` : undefined;
         {tiers.map((t) => (
           <div class="tp__row">
             <dt>{t.label}</dt>
-            <dd><span class="tp__price">{t.price}</span>{t.unit && <span class="tp__unit"> {t.unit}</span>}</dd>
+            <dd><span class="tp__price">{t.price}</span>{t.unit && <span class="tp__unit">{' '}{t.unit}</span>}</dd>
           </div>
         ))}
       </dl>
@@ -80,6 +126,7 @@ const headingId = id ? `${id}-t` : undefined;
     </div>
   </div>
 </article>
+)}
 
 <style>
   .tp {
@@ -161,5 +208,36 @@ const headingId = id ? `${id}-t` : undefined;
   @media (--lt-md) {
     .tp__head, .tp__inc, .tp__panel { padding-inline: 20px; }
   }
+  /* ── v2: destacada (1.ª de cada grupo) ── */
+  .tp--dest {
+    border-color: var(--w-line-strong);
+    background: radial-gradient(70% 120% at 0% 0%, rgba(201,169,110,.07), transparent 60%), var(--w-s2);
+    box-shadow: var(--w-edge), inset 0 1px 0 rgba(201,169,110,.55);
+  }
+  /* ── v2: compacta (columna) ── */
+  .tp--c { max-width: none; margin: 0; height: 100%; display: flex; flex-direction: column; padding: 28px 28px 20px; }
+  .tpc__head { display: grid; gap: 0; }
+  .tpc__head :global(.tp__icon) { margin-bottom: 20px; }
+  .tpc__name { font-size: 22px; }
+  .tpc__from { margin: 24px 0 0; display: flex; flex-direction: column; gap: 4px; }
+  .tpc__k { font: 400 14px/1.4 var(--font-body); color: var(--w-ink-70); }
+  .tpc__v { font: 500 40px/1 var(--font-display); letter-spacing: -0.03em; color: var(--w-ink); font-variant-numeric: tabular-nums; }
+  .tpc__panel { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--w-line); }
+  .tpc__panel .tp__k--panel { margin-bottom: 4px; font-size: 13px; font-family: var(--font-mono); font-weight: 500; letter-spacing: var(--w-tr-micro, .08em); text-transform: uppercase; color: var(--w-ink-60, rgba(240,237,232,.6)); }
+  .tpc__inc { margin-top: 8px; border-top: 1px solid var(--w-line); }
+  .tpc__sum {
+    list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    min-height: 48px; font: 500 15px/1.3 var(--font-body); color: var(--w-ink-80);
+  }
+  .tpc__sum::-webkit-details-marker { display: none; }
+  .tpc__plus { position: relative; width: 12px; height: 12px; flex: none; }
+  .tpc__plus::before, .tpc__plus::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; background: var(--w-accent, var(--accent-gold)); transform: translateY(-50%); transition: transform var(--w-dur-hover, 200ms) var(--w-ease-ui, ease); }
+  .tpc__plus::after { transform: translateY(-50%) rotate(90deg); }
+  .tpc__inc[open] .tpc__plus::after { transform: translateY(-50%) rotate(0deg); }
+  .tpc__inc .tp__list { padding: 4px 0 16px; gap: 10px; }
+  .tpc__inc .tp__list li { font-size: 14px; }
+  .tpc__cta { margin-top: auto; padding-top: 16px; justify-self: start; align-self: flex-start; }
+  @media (--lt-md) { .tp--c { padding: 24px 20px 16px; } .tpc__v { font-size: 36px; } }
+  @media (--motion-reduce) { .tpc__plus::before, .tpc__plus::after { transition: none; } }
   @media (--motion-reduce) { .tp__chev { transition: none; } .tp__cta:hover .tp__chev, .tp__note-a:hover .tp__chev, .tp__cta:focus-visible .tp__chev, .tp__note-a:focus-visible .tp__chev { transform: none; } }
 </style>

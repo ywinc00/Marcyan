@@ -8,6 +8,9 @@
 // oculta y con reduced-motion en su estado quieto). Entra como objeto (data-w-in="obj").
 // Sin cola en el H1 (regla de longitud §2.14: el H1 ya ocupa 2 líneas a 1440).
 // Móvil: texto arriba y la lista debajo a ancho completo, nunca oculta (W-CORE-41).
+// v3 (E-57, dueño 2026-11-06): hero de la v1 (espacio de SpaceBackdrop y el campo de puntos oro en
+// óvalo detrás de la tarjeta, como hacía ListaPedidos) con la tarjeta PedidosHoy de la v2. Sin F02:
+// un solo motivo de fondo, los puntos.
 import HeroTexto from '../HeroTexto.astro';
 import PedidosHoy from '../sections/ecommerce/PedidosHoy.astro';
 import ProductoArte from '../sections/ecommerce/ProductoArte.astro';
@@ -41,7 +44,7 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
       </HeroTexto>
     </div>
     <div class="he__obj" data-w-in="obj">
-      <PedidosHoy lang={lang} />
+      <div class="he__campo"><PedidosHoy lang={lang} /></div>
       <ProductoArte modo="sprite" />
     </div>
   </div>
@@ -51,6 +54,15 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
   .he { overflow-x: clip; padding-bottom: 72px; }
   .he__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
   .he__obj { display: flex; justify-content: center; padding-inline: 8px; }
+  /* Campo de puntos oro de la v1 (ListaPedidos): 3 px cada 12 px, óvalo más ancho que la tarjeta. */
+  .he__campo { position: relative; isolation: isolate; display: flex; justify-content: inherit; width: min(100%, 440px); }
+  .he__campo::before {
+    content: ''; position: absolute; z-index: -1; inset: -40px -90px;
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .55) 1.5px, transparent 1.8px) 0 0 / 12px 12px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    pointer-events: none;
+  }
   /* El chip de ciudad va encima del eyebrow también a la izquierda (misma pila que el
      centrado del piloto): el eyebrow es el nombre de producto y manda sobre el chip. */
   .he__text :global(.w-herotext__top) { flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -63,6 +75,8 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
   }
   @media (--lt-md) {
     .he { padding-bottom: 64px; }
+    /* En móvil la tarjeta ocupa el ancho: el campo asoma arriba y abajo, como en la v1. */
+    .he__campo::before { inset: -44px -16px; }
     .he__grid { gap: 48px; }
     /* Texto a la izquierda también en móvil, como los demás heros partidos (control global r1). */
   }

@@ -3,7 +3,7 @@
 // §4.15, ola 2). Su existencia activa el tipo (registry.ts); las páginas
 // /es/houston/ecommerce y /es/miami/ecommerce lo importan y montan WLanding.
 //
-// v2 (design/rediseno-workos-v2.md G04): fondo F02, hero con PedidosHoy (productos ilustrados y raíl
+// v2 (design/rediseno-workos-v2.md G04; v3: fondo de la v1, sin F02): hero con PedidosHoy (productos ilustrados y raíl
 // de estados), 01 con PasoTienda + "¿Y a ti cómo te llega?" (navegador con satélites, W-CORE-30),
 // 02 con casillas de logos de P06, contraste con RegistroVivo VIVO y bento con objetos nuevos.
 // Contraste: "El día de tu tienda" (.w-contrast). Degradado: la cifra del precio.
@@ -52,8 +52,8 @@ const anchorOf = (id: string) => {
 const spec: KindSpec = {
   kind: 'ecommerce',
   tone: 'gold',
-  // v2 G04 / P12: fondo temático "Escaparate" (haces de vitrina, baldas, amanecer oro) en lugar del espacio.
-  fondo: 'F02',
+  // v3 (E-57): sin fondo temático. El hero vuelve al espacio de la v1 (SpaceBackdrop) con el campo de
+  // puntos oro detrás de la tarjeta; los haces de F02 se van. F02 se conserva, sin montar.
   Hero: HeroEcommerce,
   hero: (ctx) => {
     const t = copyOf(ctx);

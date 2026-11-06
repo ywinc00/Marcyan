@@ -4,7 +4,7 @@
 // /es/houston/diseno-web y /es/miami/diseno-web lo importan y montan WLanding.
 //
 // Contraste: el bento "Más que una web" (.w-contrast). Degradado: la cifra del precio.
-// v2 (design/rediseno-workos-v2.md §3 G03): fondo F01 (retícula de maqueta, P12) en el hero;
+// v2 (design/rediseno-workos-v2.md §3 G03; v3: hero con el fondo de la v1, sin F01):
 // 01 y 02 FUNDIDAS en la demo de construcción (P01, firma de la página) por un solo camino:
 // Proceso.astro monta DemoConstruye en la celda #proceso y HazlaTuya.astro ya no se monta
 // (el archivo se conserva). Cierre: EscenaCierre (P08) con el trío dentro de la tarjeta de
@@ -52,8 +52,8 @@ const LEAD_PROJECT: Record<WebCity, string> = {
 const spec: KindSpec = {
   kind: 'web',
   tone: 'gold',
-  // F01 · retícula de maqueta (P12): su marco de selección abraza las 3 webs del abanico.
-  fondo: 'F01',
+  // v3 (E-57): sin fondo temático. El hero vuelve al espacio de la v1 (SpaceBackdrop) con las franjas
+  // oro del abanico como único motivo; la retícula F01 (columnas, regla y módulo animado) se va.
   Hero: HeroWeb,
   hero: (ctx) => {
     const t = copyOf(ctx);

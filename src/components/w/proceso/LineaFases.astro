@@ -103,9 +103,11 @@ const C = T.correo;
                 </div>
               </div>
             )}
-            {i === 1 && <EscenaAlcance lang={lang} />}
-            {i === 2 && <EscenaBilingue lang={lang} />}
-            {i === 3 && <EscenaEncontrar lang={lang} />}
+            {/* Escenas 2-4 en <template> (v2 §4.6, nodos ≤ v1): son decorativas (aria-hidden) y el script
+                las pone en la página cuando la sección se acerca (1200 px) o al activarse; sin JS no se ven. */}
+            {i === 1 && <template data-w2-tpl><EscenaAlcance lang={lang} /></template>}
+            {i === 2 && <template data-w2-tpl><EscenaBilingue lang={lang} /></template>}
+            {i === 3 && <template data-w2-tpl><EscenaEncontrar lang={lang} /></template>}
             {i === 4 && <slot name="quinta" />}
           </div>
         </div>
@@ -392,7 +394,16 @@ const C = T.correo;
       lit.style.transform = `scaleY(${Math.min(1, Math.max(0, f))})`;
     }
 
+    // Escenas diferidas: se clonan desde su <template> una sola vez.
+    const hidrata = (e?: Element | null) => e?.querySelectorAll<HTMLTemplateElement>('template[data-w2-tpl]').forEach((t) => t.replaceWith(t.content.cloneNode(true)));
+    const hidrataTodo = () => escs.forEach((e) => hidrata(e));
+    if ('IntersectionObserver' in window) {
+      const ioDif = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { hidrataTodo(); ioDif.disconnect(); } }, { rootMargin: '1200px 0px' });
+      ioDif.observe(root);
+    } else hidrataTodo();
+
     function play(e?: HTMLElement) {
+      hidrata(e);
       if (!e || still) return;
       e.classList.remove('is-play');
       void e.offsetWidth;
@@ -416,6 +427,7 @@ const C = T.correo;
         if (ne && ne !== pe) {
           escs.forEach((e) => { if (e !== ne) e.classList.remove('is-active'); });
           if (pe && !still) { pe.classList.add('is-leaving'); setTimeout(() => pe.classList.remove('is-leaving'), 320); }
+          hidrata(ne);
           ne.classList.add('is-active');
           if (enVista) play(ne);
         }

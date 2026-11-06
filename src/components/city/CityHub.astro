@@ -115,8 +115,25 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
             )}
             {st.vig === 'web' && (
               <div class="vig vig--web" data-vig="web" aria-hidden="true">
-                <div class="vb"><div class="vb__bar"><i></i><i></i><i></i><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
-                  <div class="vb__body"><div class="vb__l"><b></b><b></b><s></s><s></s><u></u></div><div class="vb__r"><em></em></div></div></div>
+                {/* web de ejemplo de verdad (E-56): marca, titular, horario y botón; el idioma cambia ES ⇄ EN mientras se ve */}
+                <div class="vb">
+                  <div class="vb__bar"><i></i><i></i><i></i><span class="vb__url">{j.services.vig.web.url}</span><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
+                  <div class="vb__body">
+                    <div class="vb__l">
+                      <span class="vb__brand"><svg viewBox="0 0 38 38"><rect width="38" height="38" rx="10" fill="#203a31"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.4" stroke-linecap="round"/></svg>{j.services.vig.result}</span>
+                      <p class="vb__h vb__x"><span class="vb-es">{j.services.vig.web.h[0]}</span><span class="vb-en">{j.services.vig.web.h[1]}</span></p>
+                      <p class="vb__m vb__x"><span class="vb-es"><i></i>{j.services.vig.web.m[0]}</span><span class="vb-en"><i></i>{j.services.vig.web.m[1]}</span></p>
+                      <span class="vb__cta vb__x"><span class="vb-es">{j.services.vig.web.b[0]} →</span><span class="vb-en">{j.services.vig.web.b[1]} →</span></span>
+                    </div>
+                    <div class="vb__r" style={j.services.vig.web.art === 'cafe' ? '--vb-art:#2a1d15' : '--vb-art:#1d3229'}>
+                      {j.services.vig.web.art === 'cafe' ? (
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="50" cy="56" r="44" fill="#3a281c"/><ellipse cx="50" cy="76" rx="31" ry="7" fill="#e9e1d3"/><ellipse cx="50" cy="75" rx="21" ry="4" fill="#d3c8b6"/><path d="M71 52a8 8 0 1 1 0 14" fill="none" stroke="#f4eee4" stroke-width="3.2"/><path d="M29 48h42v8a21 21 0 0 1-42 0z" fill="#f4eee4"/><path d="M30 57h40" stroke="#dcc089" stroke-width="1.6"/><ellipse cx="50" cy="48" rx="21" ry="4.2" fill="#f4eee4"/><ellipse cx="50" cy="48.4" rx="18" ry="3.2" fill="#6b4127"/><g class="vb__steam" fill="none" stroke="rgba(244,238,228,.55)" stroke-width="1.8" stroke-linecap="round"><path d="M42 40c-4-5 4-8 0-14"/><path d="M50 38c-4-5 4-8 0-14"/><path d="M58 40c-4-5 4-8 0-14"/></g></svg>
+                      ) : (
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="50" cy="54" r="46" fill="#24402f"/><g class="vb__disc"><circle cx="50" cy="54" r="34" fill="#e6dfd1"/><circle cx="50" cy="54" r="30.5" fill="none" stroke="#c9bfae" stroke-width=".8"/><circle cx="50" cy="54" r="25" fill="none" stroke="#cfc6b6" stroke-width=".8"/><g fill="#1d3229"><circle cx="80" cy="54" r="1.8"/><circle cx="71.2" cy="75.2" r="1.8"/><circle cx="50" cy="84" r="1.8"/><circle cx="28.8" cy="75.2" r="1.8"/><circle cx="20" cy="54" r="1.8"/><circle cx="28.8" cy="32.8" r="1.8"/><circle cx="50" cy="24" r="1.8"/><circle cx="71.2" cy="32.8" r="1.8"/></g><circle cx="50" cy="54" r="13" fill="#bdb3a1"/><circle cx="50" cy="54" r="4.2" fill="#1d3229"/><g fill="#8f8676"><circle cx="50" cy="45.6" r="1.7"/><circle cx="58" cy="51.4" r="1.7"/><circle cx="54.9" cy="60.8" r="1.7"/><circle cx="45.1" cy="60.8" r="1.7"/><circle cx="42" cy="51.4" r="1.7"/></g></g><path d="M64.4 23.2A34 34 0 0 1 80.8 39.6" fill="none" stroke="#dcc089" stroke-width="7.5" stroke-linecap="round"/><path d="M65.6 25.9A31 31 0 0 1 78.2 38.4" fill="none" stroke="#a88648" stroke-width="1.1" stroke-linecap="round"/></svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             {st.vig === 'chat' && (

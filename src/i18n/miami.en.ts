@@ -120,6 +120,8 @@ export const miamiHub = {
       vig: {
         query: 'Cuban restaurant open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
         time: '11:42 PM', me1: 'Do you have a table for four tomorrow at 8?', bot: 'Of course. Tomorrow at 8 we have a table on the terrace. Want me to hold it?', me2: 'Yes please, under Carlos.', ok: 'Table held · tomorrow 8:00 PM',
+        // 02 · Te eligen: web de ejemplo con su cambio ES/EN (orden fijo: español, luego inglés)
+        web: { url: 'yourbusiness.example', art: 'cafe', h: ['Cocina cubana, como en casa.', 'Cuban cooking, just like home.'], m: ['Abierto hoy hasta las 11:00 p. m.', 'Open today until 11:00 PM'], b: ['Reservar mesa', 'Book a table'] },
       },
       all: { label: 'See all pricing', href: '/en/pricing' },
     },

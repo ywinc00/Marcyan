@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════════════════════════
+   MARCYAN · TOKENS v3 QUE SOLO USAN LAS PÁGINAS v3
+   Partidos de w-tokens.css en el control global v2 ronda 2 (I-03, peso): ninguna pieza
+   de portada ni de los hubs los usa, así que viajan con w.css (WStyles.astro) y no se
+   incrustan en el HTML de portada y hubs. Mismos valores que antes.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Tipografía (Space Grotesk, pesos 400/500) ── */
+  --w-h1:          clamp(2.25rem, 1.35rem + 2.6vw, 3.625rem);  /* 36 → 58 */
+  --w-h1-hub:      clamp(2rem,    1.30rem + 2.2vw, 3.25rem);   /* 32 → 52 */
+  --w-h1-night:    clamp(2.5rem,  1.40rem + 3.4vw, 4.5rem);    /* 40 → 72 (IA, SEO para IA) */
+  --w-h2-chapter:  clamp(1.875rem,1.10rem + 2.4vw, 3.25rem);   /* 30 → 52 */
+  --w-h2:          clamp(1.75rem, 1.20rem + 1.6vw, 2.5rem);    /* 28 → 40 */
+  --w-eyebrow:     clamp(1.125rem, 0.90rem + 0.7vw, 1.75rem);  /* 18 → 28 */
+  --w-lead:        clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);    /* 17 → 20 */
+  --w-body:        1rem;                                        /* 16 */
+  --w-small:       0.875rem;                                    /* 14 */
+  --w-micro:       0.75rem;                                     /* 12, mono */
+  --w-lh-h1: 1.02;  --w-lh-h1-hub: 1.07; --w-lh-h2c: 1.08; --w-lh-h2: 1.1;
+  --w-lh-lead: 1.5; --w-lh-body: 1.6;
+  /* --w-tr-h2c calibrado en la captura de 0A: el arranque del plan (-0.055em) juntaba "Má", "we" y
+     "cl" en Space Grotesk 500 a 52 px; -0.045em las separa sin perder la compresión (mínimo -0.03em). */
+  --w-tr-h1: -0.04em; --w-tr-h1-hub: -0.05em; --w-tr-h2c: -0.045em; --w-tr-h2: -0.04em;
+  --w-tr-h3: -0.02em; --w-tr-eyebrow: -0.02em;
+  --w-weight-text: 400;
+
+  /* ── Tinta (derivada de --fg-primary #f0ede8) ── */
+  --w-ink-45:  rgba(var(--star-rgb), .45);  /* SOLO 1.ª frase de H2 de capítulo ≥ 28 px (≈3.9:1, AA grande) */
+  --w-ink-55:  rgba(var(--star-rgb), .55);  /* suelo de las filas apagadas del registro en bucle */
+
+  /* ── Superficies (rampa H-06 sobre la noche) ── */
+  --w-s0: var(--bg-base);                               /* noche + estrellas */
+  --w-s2-a: rgba(var(--star-rgb), .06);                 /* tarjeta translúcida, SOLO sobre noche lisa */
+  --w-contrast-bg: var(--bg-elevated);                  /* capítulo de contraste A */
+  --w-dawn: radial-gradient(120% 60% at 50% 100%, rgba(var(--accent-gold-rgb), .34) 0%,
+            rgba(var(--accent-gold-rgb), .12) 40%, transparent 72%);  /* capítulo de contraste B (amanecer) */
+  --w-dawn-teal: radial-gradient(120% 60% at 50% 100%, rgba(79,195,161,.22) 0%,
+            rgba(79,195,161,.08) 40%, transparent 72%);  /* amanecer de páginas de IA (E-14) */
+  --w-dots: radial-gradient(rgba(var(--accent-gold-rgb), .28) 1px, transparent 1.3px) 0 0 / 24px 24px; /* trama de puntos */
+
+  /* ── Radios (4; ≤ 8 → 8 · 10-16 → 12 · 18-28 → 22 · ≥ 40 → 44; píldoras 999) ── */
+  --w-r-feature: 44px;
+
+  /* ── Espacio y layout ── */
+  /* Raíl = borde del contenido (el de .container de la barra) menos 48 px; 50 % del main. */
+  --w-rail-x: max(16px, calc(max(0px, 50% - var(--container-max) / 2) + var(--container-pad) - 48px));
+  --w-pad-tray: 16px;  --w-gap-tray: 14px;
+  --w-section-y: clamp(80px, 4rem + 3vw, 120px);
+  --w-chapter-gap: 80px;          /* cabecera de capítulo → rejilla */
+  --w-hero-top: calc(var(--nav-h) + clamp(48px, 2rem + 3vw, 96px));
+  --w-gap-eyebrow: 12px; --w-gap-h1: 16px; --w-gap-lead: 24px;
+
+  /* ── Movimiento (F-01 + coreografía aprobada) ── */
+  --w-ease-stack: cubic-bezier(.77, 0, .175, 1);    /* pila de interruptores */
+  --w-ease-out:   cubic-bezier(.2, 0, 0, 1);        /* revelado de sección */
+  --w-dur-ui: 320ms; --w-dur-reveal: 480ms;
+  --w-dur-text: 1100ms; --w-dur-obj: 950ms; --w-dur-sat: 1800ms; --w-dur-layer: 500ms;
+  --w-d1: 100ms; --w-d2: 300ms; --w-d3: 400ms; --w-d-obj: 500ms; --w-d-sat: 750ms;
+  --w-rise: 12px; --w-rise-section: 16px;
+}

@@ -130,6 +130,8 @@ export const miamiHub = {
       vig: {
         query: 'restaurante cubano abierto ahora', result: 'Tu negocio', open: 'Abierto ahora', checks: ['✓ Google', '✓ Maps', '✓ La IA'],
         time: '11:42 p. m.', me1: '¿Tienen mesa para cuatro mañana a las 8?', bot: 'Claro que sí. Mañana a las 8 hay mesa en la terraza. ¿Se la separo?', me2: 'Dale, a nombre de Carlos.', ok: 'Mesa separada · mañana 8:00 p. m.',
+        // 02 · Te eligen: web de ejemplo con su cambio ES/EN (orden fijo: español, luego inglés)
+        web: { url: 'tunegocio.example', art: 'cafe', h: ['Cocina cubana, como en casa.', 'Cuban cooking, just like home.'], m: ['Abierto hoy hasta las 11:00 p. m.', 'Open today until 11:00 PM'], b: ['Reservar mesa', 'Book a table'] },
       },
       all: { label: 'Ver todos los precios', href: '/es/precios' },
     },

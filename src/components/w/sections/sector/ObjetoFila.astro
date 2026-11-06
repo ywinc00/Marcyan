@@ -30,8 +30,8 @@ const en = lang === 'en';
 const ej = en ? 'Example' : 'Ejemplo';
 const T = {
   'antes-despues': en
-    ? { sr: 'Example: a project page on your site with a before-and-after view of a kitchen remodel in Katy and the licensed and insured badge.', nav: ['Projects', 'Services', 'Contact'], k: 'Project', t: 'Kitchen remodel', z: 'Katy, TX', antes: 'Before', despues: 'After', lic: 'Licensed and insured', dom: 'yourplumbing.example' }
-    : { sr: 'Ejemplo: página de proyecto de tu web con antes y después de una remodelación de cocina en Katy y el sello de licencia y seguro.', nav: ['Proyectos', 'Servicios', 'Contacto'], k: 'Proyecto', t: 'Remodelación de cocina', z: 'Katy, TX', antes: 'Antes', despues: 'Después', lic: 'Con licencia y asegurado', dom: negocios.plomeria.dominio },
+    ? { sr: 'Example: a project page on your site with a before-and-after view of a new kitchen sink and pipes in Katy and the licensed and insured badge.', nav: ['Projects', 'Services', 'Contact'], k: 'Project', t: 'New kitchen sink and pipes', z: 'Katy, TX', antes: 'Before', despues: 'After', lic: 'Licensed and insured', dom: 'yourplumbing.example' }
+    : { sr: 'Ejemplo: página de proyecto de tu web con antes y después de un fregadero y una tubería nuevos en Katy y el sello de licencia y seguro.', nav: ['Proyectos', 'Servicios', 'Contacto'], k: 'Proyecto', t: 'Fregadero y tubería nuevos', z: 'Katy, TX', antes: 'Antes', despues: 'Después', lic: 'Con licencia y asegurado', dom: negocios.plomeria.dominio },
   listados: en
     ? { sr: 'Example: your agent site with your homes listed, a buy or sell filter and a button to book a showing.', tabs: ['Buy', 'Sell'], casas: [['Oak House', 'Katy · yard and garage', ['3 bd', '2 ba']], ['Cypress Townhome', 'Cypress · showing Saturday', ['2 bd', '2.5 ba']], ['Garden House', 'Spring Branch · move-in ready', ['4 bd', '3 ba']]], btn: 'Book a showing', dom: 'yourrealty.example' }
     : { sr: 'Ejemplo: tu sitio de agente con tus casas en lista, un filtro para comprar o vender y un botón para agendar visita.', tabs: ['Comprar', 'Vender'], casas: [['Casa Roble', 'Katy · patio y cochera', ['3 hab', '2 baños']], ['Townhome Cypress', 'Cypress · se muestra el sábado', ['2 hab', '2.5 baños']], ['Casa Jardín', 'Spring Branch · lista para mudarse', ['4 hab', '3 baños']]], btn: 'Agendar visita', dom: negocios.inmobiliaria.dominio },
@@ -88,7 +88,8 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
             <rect x="18" y="95" width="284" height="56" rx="3" fill="#1d3039" />
             <path d="M89 95v56M160 95v56M231 95v56" stroke="#2a3e48" stroke-width="1.5" />
             <path d="M48 104h12M119 104h12M190 104h12M261 104h12" stroke="#e0935c" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M196 88V74a8 8 0 0 1 16 0" fill="none" stroke="#a3561f" stroke-width="2.5" stroke-linecap="round" />
+            <rect x="180" y="86.5" width="48" height="5" rx="2" fill="#c7ccce" /><path d="M184 91.5h40" stroke="#9aa2a6" stroke-width="1" />
+            <path d="M196 86V70a9 9 0 0 1 18 0v3" fill="none" stroke="#a3561f" stroke-width="2.8" stroke-linecap="round" /><path d="M190 86v-4M202 86v-4" stroke="#a3561f" stroke-width="2.4" stroke-linecap="round" />
           </svg>
           <span class="of-ad__old">
             <svg viewBox="0 0 320 168" preserveAspectRatio="xMidYMid slice">
@@ -104,7 +105,8 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
               <rect x="86" y="95" width="58" height="56" rx="2" fill="#a69d8e" />
               <rect x="150" y="95" width="70" height="56" rx="2" fill="#ada495" />
               <rect x="226" y="95" width="76" height="56" rx="2" fill="#a49b8c" />
-              <path d="M200 88V78a6 6 0 0 1 12 0" fill="none" stroke="#8f8676" stroke-width="2.5" stroke-linecap="round" />
+              <rect x="182" y="86.5" width="44" height="5" rx="1" fill="#b9b2a5" />
+              <path d="M200 87V77a6 6 0 0 1 12 0v2" fill="none" stroke="#8f8676" stroke-width="2.5" stroke-linecap="round" /><path d="M212 82.5c1.4 1.8 1.4 3.2 0 3.6-1.4-.4-1.4-1.8 0-3.6z" fill="#7d93a0" />
               <path d="M44 50h10M110 50h10M180 50h10M258 50h10M44 104h10M110 104h10M180 104h10M258 104h10" stroke="#8f8676" stroke-width="2" stroke-linecap="round" />
             </svg>
           </span>

@@ -115,21 +115,22 @@ const destinos = {
 
       {/* 1 · la web publicada (salón) */}
       <VentanaApp id="web" url={`${T.dominio} · ${T.ejemplo}`} x={56} y={54} w={650} h={520} z={1} chipTop={114} textoCarga={T.cargaWeb}>
-        <div class="abre-web-p02"><WebEjemplo marca="salon" frame="desnudo" lienzo="escritorio" vista="completa" lang={lang} ejemplo={false} /></div>
+        {/* Cuerpos de las 4 ventanas en <template> (v2 §4.6, nodos): el script los pone al acercarse el portátil. */}
+        <template data-w2-tpl><div class="abre-web-p02"><WebEjemplo marca="salon" frame="desnudo" lienzo="escritorio" vista="completa" lang={lang} ejemplo={false} /></div></template>
         <svg slot="carga" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#d5dacb" stroke="#8c5a4a" stroke-width="1.4" /><path d="M20 9c3.6 3 3.6 6.2 0 9.2-3.6-3-3.6-6.2 0-9.2zM20 21.8c3.6 3 3.6 6.2 0 9.2-3.6-3-3.6-6.2 0-9.2z" fill="none" stroke="#8c5a4a" stroke-width="1.4" /></svg>
         <Fragment slot="chip">{T.publicada}</Fragment>
       </VentanaApp>
 
       {/* 2 · la ficha en el mapa */}
       <VentanaApp id="mapa" titulo={T.apps.mapa} x={700} y={84} w={620} h={420} z={2} textoCarga={T.cargaMapa}>
-        <div class="abre-ficha-p03"><FichaMapaEjemplo variante="mini" marca="salon" lang={lang} /></div>
+        <template data-w2-tpl><div class="abre-ficha-p03"><FichaMapaEjemplo variante="mini" marca="salon" lang={lang} /></div></template>
         <LogoMarca slot="carga" id="googlemaps" size={40} tono="color" titulo="" />
         <Fragment slot="chip">{T.encuentran}</Fragment>
       </VentanaApp>
 
       {/* 3 · WhatsApp: Marcy contesta */}
       <VentanaApp id="wa" titulo={T.apps.wa} x={286} y={292} w={450} h={440} z={3} textoCarga={T.cargaWa}>
-        <div class="wa" data-wa-paso="3">
+        <template data-w2-tpl><div class="wa" data-wa-paso="3">
           <div class="wa-cab">
             <span class="wa-av">LM</span>
             <span class="wa-quien"><b>{T.wa.cliente}</b><small>{T.wa.estado}</small></span>
@@ -141,13 +142,13 @@ const destinos = {
             <span class="wa-msg wa-msg--out wa-msg--resp"><span>{T.wa.respuesta}</span><small>{T.wa.hRespuesta} <svg width="16" height="10" viewBox="0 0 16 10"><path d="m1 5.5 3 3 6-7M6.5 8.5l1 1 6-8" fill="none" stroke="#53bdeb" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg></small></span>
           </div>
           <div class="wa-pie"><span>{T.wa.escribe}</span></div>
-        </div>
+        </div></template>
         <LogoMarca slot="carga" id="whatsapp" size={40} tono="color" titulo="" />
       </VentanaApp>
 
       {/* 4 · correo al dueño (solo ≥ 641 px) */}
       <VentanaApp id="correo" titulo={T.apps.correo} x={742} y={338} w={590} h={400} z={4} textoCarga={T.cargaCorreo} class="abre-correo">
-        <div class="cor">
+        <template data-w2-tpl><div class="cor">
           <div class="cor-lado">
             <span class="cor-carpeta cor-carpeta--on">{T.correo.bandeja}<b>1</b></span>
             {T.correo.otros.map((o) => <span class="cor-carpeta">{o}</span>)}
@@ -162,7 +163,7 @@ const destinos = {
             <span class="cor-filas">{T.correo.filas.map(([k, v]) => <span><small>{k}</small>{v}</span>)}</span>
             <span class="cor-txt cor-txt--2">{T.correo.cierre}</span>
           </div>
-        </div>
+        </div></template>
         <LogoMarca slot="carga" id="gmail" size={40} tono="color" titulo="" />
         <Fragment slot="chip">{T.nuevo}</Fragment>
       </VentanaApp>
@@ -314,7 +315,10 @@ const destinos = {
     if (!esc || !pt) continue;
     const cursor = esc.querySelector<HTMLElement>('[data-w2-cursor]');
     const menu = esc.querySelector<HTMLElement>('[data-w2-menu-app]');
-    const wa = esc.querySelector<HTMLElement>('.wa');
+    // Cuerpos diferidos de las ventanas: se clonan una vez, antes de cualquier estado de la secuencia.
+    const hidrata = () => raiz.querySelectorAll<HTMLTemplateElement>('template[data-w2-tpl]').forEach((t) => t.replaceWith(t.content.cloneNode(true)));
+    let wa: HTMLElement | null = null;
+    const listaWa = () => { hidrata(); wa = esc.querySelector<HTMLElement>('.wa'); };
     const dest = JSON.parse(raiz.dataset.destinos || '{}') as Record<string, { x: number; y: number }>;
     const apps = JSON.parse(raiz.dataset.apps || '{}') as Record<string, string>;
     const ven = (id: string) => esc.querySelector<HTMLElement>(`[data-w2-ventana="${id}"]`);
@@ -342,6 +346,7 @@ const destinos = {
       mover(980, 560);
     };
     const final = () => {
+      listaWa();
       esc.dataset.escFase = 'escritorio';
       for (const id of IDS) { const v = ven(id); if (v) { v.dataset.ventOn = 'true'; v.dataset.ventEstado = 'lista'; } dock(DOCK_DE[id])?.classList.add('is-abierta'); }
       if (wa) wa.dataset.waPaso = '3';
@@ -379,7 +384,10 @@ const destinos = {
     // la secuencia arranca de nuevo. Si vuelve antes de 8 s, se queda como estaba.
     let armada = true;
     let tFuera = 0;
-    const arranca = () => { if (!armada) return; armada = false; reset(); sec.play(); };
+    const arranca = () => { if (!armada) return; armada = false; listaWa(); reset(); sec.play(); };
+    // Los cuerpos se ponen cuando el portátil está a ≤ 1200 px de la vista (sin saltos: cada ventana tiene su tamaño fijo).
+    const ioDif = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { listaWa(); if (wa && !sec.corriendo && esc.dataset.escFase === 'bloqueo') wa.dataset.waPaso = '0'; ioDif.disconnect(); } }, { rootMargin: '1200px 0px' });
+    ioDif.observe(raiz);
     const fuera = () => {
       clearTimeout(tFuera);
       tFuera = window.setTimeout(() => { sec.stop(); reset(); armada = true; }, 8000);

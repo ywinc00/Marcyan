@@ -183,6 +183,8 @@ export const houstonHub = {
       vig: {
         query: 'auto repair near me open now', result: 'Your business', open: 'Open now', checks: ['✓ Google', '✓ Maps', '✓ AI'],
         time: '11:42 PM', me1: 'Can you check my brakes tomorrow?', bot: 'Sure, we have an opening at 8:30. Want me to book it?', me2: 'Yes please. Carlos.', ok: 'Booked · tomorrow 8:30',
+        // 02 · Te eligen: web de ejemplo con su cambio ES/EN (orden fijo: español, luego inglés)
+        web: { url: 'yourbusiness.example', art: 'disco', h: ['Frenos y motor, sin sorpresas.', 'Brakes and engines, no surprises.'], m: ['Abierto hoy hasta las 6:00 p. m.', 'Open today until 6:00 PM'], b: ['Agendar cita', 'Book a visit'] },
       },
       all: { label: 'See all pricing', href: '/en/pricing' },
     },

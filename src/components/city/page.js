@@ -26,16 +26,25 @@ export function initSections(loadGeo, C) {
     await wait(520); if (runs.get(v) !== id) return;
     v.classList.add('st2');
   }
+  // 02 · la web de ejemplo cambia de idioma ES ⇄ EN mientras está a la vista (E-56: nada que parezca congelado)
+  const webSeen = new WeakMap();
+  const webIO = new IntersectionObserver((es) => es.forEach((e) => {
+    webSeen.set(e.target, e.isIntersecting);
+    if (e.isIntersecting && e.target._wake) { const w = e.target._wake; e.target._wake = null; w(); }
+  }), { threshold: 0.25 });
+  const whenSeen = (v) => (webSeen.get(v) ? Promise.resolve() : new Promise((r) => { v._wake = r; }));
   async function playWeb(v, id) {
+    webIO.observe(v);
     v.classList.remove('st1', 'st2', 'en');
     await wait(250); if (runs.get(v) !== id) return;
     v.classList.add('st1');
     await wait(650); if (runs.get(v) !== id) return;
     v.classList.add('st2');
-    await wait(1500); if (runs.get(v) !== id) return;
-    v.classList.add('en');
-    await wait(1700); if (runs.get(v) !== id) return;
-    v.classList.remove('en');
+    for (;;) {
+      await wait(2600); if (runs.get(v) !== id) return;
+      await whenSeen(v); if (runs.get(v) !== id) return;
+      v.classList.toggle('en');
+    }
   }
   async function playChat(v, id) {
     const parts = $$('.vc>*', v); parts.forEach((p) => p.classList.remove('show'));

@@ -28,14 +28,15 @@ export default defineConfig({
     //   alternates /en/… que aún devuelven 404.
     // · filter: fuera /es|en/kit (kit de arranque privado) y /es/kit-diseno (galería
     //   interna), el /formulario y /en/project-brief (todos noindex)
-    //   y /dashboard (panel privado, noindex — no debe anunciarse en el sitemap).
+    //   y /dashboard (panel privado, noindex — no debe anunciarse en el sitemap),
+    //   y los muestrarios internos /es/w-muestrario-* (noindex, se borran antes de main).
     // · /privacidad y /terminos ya son páginas Astro (src/pages/*.astro) → el
     //   sitemap las incluye solo; por eso ya NO van en customPages (evita duplicar).
     // · serialize: URLs SIN barra final — Vercel (cleanUrls+trailingSlash:false)
     //   sirve /es con 200 y /es/ con 308; el sitemap debe listar las que dan 200.
     sitemap({
       filter: (page) =>
-        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/project-brief') && !page.includes('/dashboard'),
+        !page.includes('/kit') && !page.includes('/formulario') && !page.includes('/project-brief') && !page.includes('/dashboard') && !page.includes('/w-muestrario'),
       serialize: (item) => {
         item.url = item.url.replace(/\/$/, '');
         return item;

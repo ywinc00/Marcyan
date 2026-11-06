@@ -1,0 +1,211 @@
+---
+// "Pedidos de hoy" de Tu Tienda · hero de tienda en línea (design/rediseno-workos-v2.md G04 y P03,
+// original W-ADV-36 de WorkOS Pipes: lista viva en la que cada fila pasa de "Connect" a "Connected" y la
+// lista sube). Marca de ejemplo `tienda` (reparto §1.6). Versión local de la tienda mientras P03
+// (ListaPedidos) no esté integrado: ver pendientes [SISTEMA] del informe de G04.
+//
+// Tarjeta de producto claro (papel de la marca), cabecera con el logotipo contorneado de Tu Tienda,
+// rótulos de columna mono, 5 filas de 52 px: miniatura ILUSTRADA del producto (ProductoArte, con su
+// sombra), producto + cliente 14/500 y raíl de 3 puntos Pagado → Preparando → Listo (Instacart) en
+// lugar del botón "Preparar" de la v1. Pie con el dominio y el rótulo "Ejemplo" (uno por objeto).
+//
+// 6 filas en la pista (5 a la vista + la que entra). Pantalla viva (§1.5): cada 950 ms una fila avanza un estado (la primera que no está lista, de arriba
+// abajo); tras dos avances la lista sube 52 px en 600 ms (--w-ease-loop), la fila lista sale por arriba y
+// entra abajo un pedido nuevo en "Pagado". Bucle mientras está a la vista (registerLoop: pausa fuera de
+// vista, con pestaña oculta, con foco o puntero dentro y botón de pausa 44×44). Reducir movimiento o sin
+// JS: estado quieto con sentido (Listo, Preparando, Preparando, Pagado, Pagado).
+// Ilustración: aria-hidden + data-nosnippet + resumen sr-only; sin h1-h6, sin enlaces.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import ProductoArte, { type ProductoId } from './ProductoArte.astro';
+
+interface Props { lang?: 'es' | 'en'; class?: string }
+const { lang = 'es', class: cls } = Astro.props;
+const en = lang === 'en';
+type Row = [ProductoId, string, string];
+const ROWS: Row[] = en
+  ? [['vela', 'Scented candle', 'Ana R.'], ['cafe', 'Ground coffee, 2 lb', 'Luis M.'], ['caja', 'Gift box', 'Sofía G.'],
+     ['taza', 'Clay mug', 'Carlos D.'], ['viaje', 'Travel candle', 'Marta P.'], ['cafe', 'Whole bean coffee', 'Jorge T.']]
+  : [['vela', 'Vela aromática', 'Ana R.'], ['cafe', 'Café de olla, 1 kg', 'Luis M.'], ['caja', 'Caja de regalo', 'Sofía G.'],
+     ['taza', 'Taza de barro', 'Carlos D.'], ['viaje', 'Vela de viaje', 'Marta P.'], ['cafe', 'Café en grano, 1 kg', 'Jorge T.']];
+// Estado inicial (y quieto) de cada fila: 2 = Listo, 1 = Preparando, 0 = Pagado.
+const INI = [2, 1, 1, 0, 0, 0];
+const T = en
+  ? { title: "Today's orders", sub: 'Paid online. You pack and deliver.', col1: 'Order', col2: 'Status', st: ['Paid', 'Packing', 'Ready'],
+      foot: 'yourshop.example', ex: 'Example', today: 'Today',
+      sr: 'Example: orders come into your online store already paid and move from paid to packing to ready, one after another.' }
+  : { title: 'Pedidos de hoy', sub: 'Pagados en línea. Tú preparas y entregas.', col1: 'Pedido', col2: 'Estado', st: ['Pagado', 'Preparando', 'Listo'],
+      foot: 'tutienda.example', ex: 'Ejemplo', today: 'Hoy',
+      sr: 'Ejemplo: los pedidos entran a tu tienda en línea ya pagados y pasan de pagado a preparando y a listo, uno tras otro.' };
+---
+<div class:list={['ph', cls]} data-ph data-nosnippet style={T.st.map((x, i) => `--ph-s${i}:'${x}'`).join(';')}>
+  <p class="sr-only">{T.sr}</p>
+  <div class="ph__card" aria-hidden="true">
+    <div class="ph__top">
+      <LogoEjemplo marca="tienda" size={12} tono="mono" lang={lang} class="ph__logo" />
+      <span class="ph__today"><i></i>{T.today}</span>
+    </div>
+    <p class="ph__t">{T.title}</p>
+    <p class="ph__s">{T.sub}</p>
+    <p class="ph__cols"><span>{T.col1}</span><span>{T.col2}</span></p>
+    <div class="ph__view">
+      <ul class="ph__list">
+        {ROWS.map(([p, name, who], i) => (
+          <li class="ph__row" data-st={INI[i]}>
+            <span class="ph__th"><ProductoArte id={p} size={34} /></span>
+            <span class="ph__txt"><b>{name}</b><span>{who}</span></span>
+            <span class="ph__st">
+              <span class="ph__rail"><i></i><s></s><i></i><s></s><i></i></span>
+              <span class="ph__w"></span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="ph__foot"><span>{T.foot}</span><span class="ph__ex">· {T.ex}</span></p>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  const ROW = 52, TICK = 950, SHIFT = 600;
+  const INI = [2, 1, 1, 0, 0, 0];
+  document.querySelectorAll<HTMLElement>('[data-ph]').forEach((el) => {
+    if (el.dataset.phListo) return;
+    el.dataset.phListo = '1';
+    const list = el.querySelector<HTMLElement>('.ph__list');
+    if (!list) return;
+    let timer = 0;
+    let n = 0;
+    const rows = () => Array.from(list.children) as HTMLElement[];
+    const reset = () => {
+      list.style.transition = 'none'; list.style.transform = '';
+      // Devuelve el orden original (por índice de creación) y su estado inicial.
+      rows().sort((a, b) => +(a.dataset.i ?? 0) - +(b.dataset.i ?? 0)).forEach((r, i) => { list.appendChild(r); r.dataset.st = String(INI[i]); r.classList.remove('is-new'); });
+      n = 0;
+    };
+    rows().forEach((r, i) => (r.dataset.i = String(i)));
+    const step = () => {
+      if (n >= 2) {
+        n = 0;
+        list.style.transition = `transform ${SHIFT}ms var(--w-ease-loop)`;
+        list.style.transform = `translateY(-${ROW}px)`;
+        timer = window.setTimeout(() => {
+          const first = list.firstElementChild as HTMLElement;
+          list.style.transition = 'none'; list.style.transform = '';
+          first.dataset.st = '0';
+          list.appendChild(first);
+          // El pedido que acaba de entrar a la vista (5.ª fila) se marca un instante como nuevo.
+          rows().forEach((r) => r.classList.remove('is-new'));
+          rows()[4]?.classList.add('is-new');
+          timer = window.setTimeout(step, TICK - SHIFT);
+        }, SHIFT);
+        return;
+      }
+      const r = rows().slice(0, 5).find((x) => +(x.dataset.st ?? 0) < 2);
+      if (r) r.dataset.st = String(+(r.dataset.st ?? 0) + 1);
+      n++;
+      timer = window.setTimeout(step, TICK);
+    };
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, TICK); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); reset(); el.classList.add('is-still'); },
+    }, { buttonTone: 'light' });
+  });
+</script>
+
+<style>
+  .ph {
+    --ph-bg: #F5F0E7; --ph-ink: #2A211B; --ph-ink2: #5C5249; --ph-line: rgba(42, 33, 27, .1);
+    --ph-acc: #4E5A3D; --ph-tile: #E6DBC8;
+    position: relative; width: min(100%, 440px);
+    font-family: var(--font-body); text-align: left;
+  }
+  .ph__card {
+    position: relative;
+    background: var(--ph-bg); color: var(--ph-ink);
+    border-radius: 16px; overflow: hidden;
+    padding: 18px 22px 0;
+    box-shadow: 0 0 0 1px rgba(42, 33, 27, .06), 0 1px 0 rgba(255, 255, 255, .6) inset, 0 40px 80px -30px rgba(0, 0, 0, .7), 0 12px 24px -12px rgba(0, 0, 0, .45);
+  }
+  .ph__top { display: flex; align-items: center; justify-content: space-between; height: 22px; margin-bottom: 18px; }
+  .ph__logo { color: var(--ph-ink); }
+  .ph__today {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ph-ink2);
+  }
+  .ph__today i { width: 6px; height: 6px; border-radius: 50%; background: var(--ph-acc); animation: ph-late 2s ease-in-out infinite; }
+  .ph__t { margin: 0; font: 500 19px/1.2 var(--font-display); letter-spacing: -.015em; }
+  .ph__s { margin: 4px 0 16px; font-size: 13.5px; line-height: 1.4; color: var(--ph-ink2); }
+  .ph__cols {
+    display: flex; justify-content: space-between; margin: 0; padding: 0 0 8px;
+    font: 500 10.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ph-ink2);
+  }
+  .ph__cols span:last-child { width: 112px; }
+  .ph__view {
+    height: 262px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent);
+    mask-image: linear-gradient(180deg, #000 80%, transparent);
+  }
+  .ph__list { list-style: none; margin: 0; padding: 0; will-change: transform; }
+  .ph__row { display: flex; align-items: center; gap: 12px; height: 52px; border-top: 1px solid var(--ph-line); }
+  .ph__th {
+    flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px;
+    background: var(--ph-tile);
+    box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .06), 0 1px 2px rgba(42, 33, 27, .12);
+  }
+  .ph__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+  .ph__txt b { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ph__txt span { font-size: 13px; color: var(--ph-ink2); }
+  .ph__st { flex: none; width: 112px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .ph__rail { display: flex; align-items: center; }
+  .ph__rail i {
+    width: 9px; height: 9px; border-radius: 50%; flex: none;
+    box-shadow: inset 0 0 0 1.5px rgba(42, 33, 27, .28);
+    background: transparent;
+    transition: background-color 200ms var(--w-ease-ui), box-shadow 200ms var(--w-ease-ui);
+  }
+  .ph__rail s { width: 22px; height: 1.5px; background: rgba(42, 33, 27, .16); position: relative; overflow: hidden; }
+  .ph__rail s::after {
+    content: ''; position: absolute; inset: 0; background: var(--ph-acc);
+    transform: scaleX(0); transform-origin: left; transition: transform 300ms var(--w-ease-ui);
+  }
+  /* Punto hecho: relleno salvia. Punto actual: relleno + aro. */
+  .ph__row[data-st] .ph__rail i:nth-of-type(1),
+  .ph__row[data-st='1'] .ph__rail i:nth-of-type(2), .ph__row[data-st='2'] .ph__rail i:nth-of-type(2),
+  .ph__row[data-st='2'] .ph__rail i:nth-of-type(3) { background: var(--ph-acc); box-shadow: inset 0 0 0 1.5px var(--ph-acc); }
+  .ph__row[data-st='1'] .ph__rail s:nth-of-type(1)::after,
+  .ph__row[data-st='2'] .ph__rail s::after { transform: scaleX(1); }
+  .ph__row[data-st='2'] .ph__rail i:nth-of-type(3) { box-shadow: inset 0 0 0 1.5px var(--ph-acc), 0 0 0 3px rgba(78, 90, 61, .2); }
+  /* La palabra del estado sale de las variables --ph-s0..2 de la raíz (un nodo por fila, §1.8). */
+  .ph__w { height: 16px; font-size: 12.5px; font-weight: 500; color: var(--ph-ink2); white-space: nowrap; }
+  .ph__w::after { content: var(--ph-s0); }
+  .ph__row[data-st='1'] .ph__w::after { content: var(--ph-s1); }
+  .ph__row[data-st='2'] .ph__w { color: var(--ph-acc); }
+  .ph__row[data-st='2'] .ph__w::after { content: var(--ph-s2); }
+  .ph__row.is-new .ph__txt b { animation: ph-nuevo 900ms var(--w-ease-ui) both; }
+  .ph__foot {
+    margin: 0 -22px; padding: 0 22px; min-height: 60px; display: flex; align-items: center; gap: 6px;
+    background: #ECE4D6; border-top: 1px solid var(--ph-line);
+    font: 500 11.5px/1 var(--font-mono); letter-spacing: .02em; color: var(--ph-ink2);
+  }
+  @keyframes ph-late { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @keyframes ph-nuevo { from { opacity: .3; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 380px) {
+    .ph__card { padding-inline: 16px; }
+    .ph__foot { margin-inline: -16px; padding-inline: 16px; }
+    .ph__st, .ph__cols span:last-child { width: 96px; }
+    .ph__rail s { width: 16px; }
+  }
+  @media (max-width: 340px) {
+    .ph__row { gap: 10px; }
+    .ph__th { width: 36px; height: 36px; }
+    .ph__st, .ph__cols span:last-child { width: 76px; }
+    .ph__rail s { width: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ph__today i { animation: none; }
+    .ph__rail i, .ph__rail s::after { transition: none; }
+    .ph__row.is-new .ph__txt b { animation: none; }
+  }
+</style>

@@ -3,15 +3,17 @@
 // Cabecera numerada (solo etiqueta) + titular centrado con bajada + ventana "Tu Tienda"
 // (objeto de SISTEMA, noche opaca) con control segmentado Pagos / Envíos / Mensajería y
 // una rejilla de 6 casillas de PRODUCTO (claro cálido) cableadas a los dos lados, como el
-// catálogo de W-ADV-38. Sin logotipos de terceros: cada servicio se nombra en texto con un
-// icono Lucide genérico (§1.C). Las plataformas son las que de verdad usamos según la
-// página (Stripe, PayPal; Shopify, WooCommerce o a medida); lo demás se nombra por función.
+// catálogo de W-ADV-38. v2 G04: las casillas son las claras de CasillasMarcas (P06, W-ADV-53) con
+// el LOGO de cada plataforma que la página ya nombra (Stripe, PayPal, WhatsApp; Shopify en la barra),
+// vía LogoMarca, uso nominativo; lo que no tiene plataforma nombrada va por función EN TEXTO, sin
+// icono en caja. CasillasMarcas no admite casillas de texto: por eso la rejilla es propia ([SISTEMA]).
 // Pestañas que maneja el visitante: NO rotan solas, roles tablist/tab/tabpanel, flechas,
 // Inicio y Fin; cambio con fundido de opacidad de 180 ms (sin movimiento con reduced-motion).
 // Sin JS: se ve la primera pestaña.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Ejemplo from '../../Ejemplo.astro';
-import Icon from '../../../ui/Icon.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import type { ShopCopy } from '../../../../i18n/w/ecommerce';
 
 interface Props { copy: ShopCopy['conectado']; n: number; lang?: 'es' | 'en'; uid?: string }
@@ -29,8 +31,8 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
     <p class="sr-only">{copy.sr}</p>
     <div class="tc__bar">
       <span class="tc__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="tc__app"><Icon name="lucide:store" /><b translate="no">{copy.app}</b></span>
-      <span class="tc__plat">{copy.platforms}</span>
+      <span class="tc__app"><LogoEjemplo marca="tienda" size={11} tono="mono" lang={lang} /><span class="sr-only">{copy.app}</span></span>
+      <span class="tc__plat"><LogoMarca id="shopify" size={14} tono="color" titulo="" />Shopify, {copy.platforms}</span>
     </div>
     <Ejemplo lang={lang} on="dark" class="tc__ex" />
 
@@ -55,14 +57,13 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
           </svg>
           <ul class="tc__grid">
             {t.tiles.map((tile) => (
-              <li class="tc__tile">
-                <span class="tc__ic"><Icon name={tile.icon} /></span>
+              <li class:list={['tc__tile', tile.logo && 'tc__tile--logo']}>
+                {tile.logo && <LogoMarca id={tile.logo} size={26} tono="color" titulo="" />}
                 <span class="tc__tx"><b>{tile.name}</b><span>{tile.sub}</span></span>
               </li>
             ))}
             <li class="tc__tile tc__tile--more">
-              <span class="tc__ic"><Icon name="lucide:plus" /></span>
-              <span class="tc__tx"><b>{copy.more}</b><span>{copy.moreSub}</span></span>
+              <span class="tc__tx"><b>+ {copy.more}</b><span>{copy.moreSub}</span></span>
             </li>
           </ul>
           <svg class="tc__wire tc__wire--r" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -129,7 +130,7 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
   .tc__dots { position: absolute; left: 20px; display: flex; gap: 6px; }
   .tc__dots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--w-ink-30); }
   .tc__app { display: inline-flex; align-items: center; gap: 8px; font: 500 14px/1 var(--font-display); color: var(--w-ink); }
-  .tc__app :global(svg) { width: 16px; height: 16px; color: var(--w-accent); }
+  .tc__app { color: var(--w-ink); }
   .tc__plat { display: none; }
   .tc__win > :global(.w-example) { top: 12px; right: 14px; }
 
@@ -164,32 +165,31 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
     position: relative; list-style: none; margin: 0 auto; padding: 0;
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%;
   }
-  /* Móvil: icono encima del texto, para que los títulos tengan todo el ancho de la casilla
-     y no se partan a mitad de palabra (E-18). En --md vuelve a fila. */
+  /* Casillas claras de CasillasMarcas (P06): #F7F6F2, filo interior, radio 12; contenido centrado.
+     Con logo: logo a color de 26 + nombre; sin logo: la función en texto. */
   .tc__tile {
-    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0;
-    min-height: 72px; padding: 12px 14px; border-radius: var(--w-r-obj);
-    background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
+    --marca-tinta: #1B1A17;
+    position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; min-width: 0; min-height: 96px; padding: 12px 10px; border-radius: 12px; text-align: center;
+    background: #F7F6F2; color: #1B1A17;
+    box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .07), 0 1px 2px rgba(0, 0, 0, .3);
   }
-  .tc__ic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); }
-  .tc__ic :global(svg) { width: 16px; height: 16px; }
   .tc__tx { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
-  .tc__tx b { font: 500 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
-  .tc__tx span { font-size: 13px; color: var(--w-p-ink-2); }
+  .tc__tx b { font: 600 15px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .tc__tx span { margin-top: 2px; font-size: 12.5px; color: #55524C; }
+  .tc__tile--logo .tc__tx b { font-size: 13.5px; }
   /* Fondo opaco de la ventana: el hilo de la fila pasa por DETRÁS de la casilla punteada
      y no tacha su texto (E-37; en W-ADV-38 las líneas mueren en el borde de las casillas). */
-  .tc__tile--more { background: var(--w-s2); color: var(--w-ink); border: 1px dashed rgba(var(--star-rgb), .28); }
-  .tc__tile--more .tc__ic { background: transparent; border-color: var(--w-line-strong); color: var(--w-accent); }
+  .tc__tile--more { background: var(--w-s2); color: var(--w-ink); box-shadow: inset 0 0 0 1px rgba(var(--star-rgb), .28); border: 1px dashed rgba(var(--star-rgb), .28); box-shadow: none; }
   .tc__tile--more .tc__tx span { color: var(--w-ink-70); }
   .tc__more { margin: 28px 0 0; text-align: center; }
 
   @media (--md) {
-    .tc__plat { display: block; position: absolute; right: 20px; font-size: 13px; color: var(--w-ink-60); }
+    .tc__plat { display: inline-flex; align-items: center; gap: 7px; position: absolute; right: 20px; font-size: 13px; color: var(--w-ink-60); --marca-tinta: var(--w-ink); }
     .tc__win > :global(.w-example) { top: auto; bottom: 16px; right: 16px; }
     .tc__body { padding: 40px 0 36px; }
     .tc__tabs { margin-bottom: 40px; }
     .tc__wire { display: block; }
-    .tc__tile { flex-direction: row; align-items: center; gap: 12px; }
     .tc__grid { flex: none; width: 624px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     /* Hilo que une las casillas de cada fila (W-ADV-38), por detrás de las casillas opacas. */
     .tc__grid::before, .tc__grid::after {

@@ -1,19 +1,18 @@
 ---
-// Mini-UIs de la tienda de EJEMPLO (objetos de PRODUCTO, claros, estáticos · §2.4, §3.6).
-// Contenido por slot para BandejaPasos ("Del carrito al pago") y Bento2x2 ("Qué incluye")
-// de las landings de tienda en línea (§4.15). Misma familia que ListaPedidos (claro cálido,
-// tinta, el acento de la página solo como relleno de botón o punto de estado, E-14/§2.11).
-//   catalogo   → dos productos, uno ya en el carrito (paso 1).
-//   pago       → resumen con el impuesto real de la ciudad y "Pagar" (paso 2).
-//   pedido     → ficha del pedido clave-valor con "Pagado" (paso 3, W-ADV-37).
-//   idiomas    → la misma ficha en el OTRO idioma; la marca "Tu Tienda" no se traduce (E-24).
-//   variantes  → ficha con tallas y colores, y el carrito.
-//   recibo     → desglose del impuesto de ventas (datos reales de la página).
-//   plataforma → Shopify / WooCommerce / A medida, elegida contigo.
-//   busqueda   → una búsqueda de ejemplo que encuentra tu tienda (sin logotipos de terceros).
-// Ilustración: aria-hidden + resumen sr-only. Productos, nombres y precios de EJEMPLO.
-import Icon from '../../../ui/Icon.astro';
-import Ejemplo from '../../Ejemplo.astro';
+// Objetos del bento "Qué incluye" de tienda en línea (design/rediseno-workos-v2.md G04; W-CORE-07/08:
+// objeto grande con aire de bandeja, ~80 % de su celda). Marca de ejemplo `tienda` (§1.6). Rehechos en la
+// v2: productos ILUSTRADOS (ProductoArte) en lugar del icono de línea en un cuadrado beige (FI §3-2), sin
+// precios (donde iría el precio, "Ejemplo"), sin iconos de catálogo en caja; los logos de plataformas, solo
+// los que la página ya nombra, vía LogoMarca (P06).
+//   idiomas    la misma ficha en el OTRO idioma (EN encendido); la marca "Tu Tienda" no se traduce (E-24)
+//   variantes  ficha con colores y tamaños, y el carrito que asoma con dos productos
+//   recibo     tique del impuesto de ventas (datos reales de la página)
+//   plataforma Shopify / WooCommerce / A medida, elegida contigo
+//   busqueda   alguien busca tu producto y aparece tu tienda (resultado web + respuesta de asistente)
+// Contrato común (§1.6): aria-hidden + data-nosnippet + resumen sr-only; sin h1-h6, sin enlaces.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import ProductoArte from './ProductoArte.astro';
 import type { MiniKind, ShopCopy } from '../../../../i18n/w/ecommerce';
 
 interface Props {
@@ -24,224 +23,208 @@ interface Props {
   class?: string;
 }
 const { kind, tax, city, lang = 'es', class: cls } = Astro.props;
-const money = (n: number) => '$' + n.toFixed(2);
-const SUB = 30; // 18 + 12, los dos productos de ejemplo
-const TAX = Math.round(SUB * tax.rate * 100) / 100;
-const TOTAL = SUB + TAX;
 const miami = city === 'miami';
-const SR: Record<MiniKind, string> = {
-  catalogo: 'Ejemplo: el cliente elige en tu catálogo y añade un producto al carrito.',
-  pago: `Ejemplo: el cliente paga con tarjeta y la tienda suma el impuesto de ${tax.state} (${tax.total}).`,
-  pedido: 'Ejemplo: el pedido te llega pagado, con cliente y forma de entrega.',
+const SR: Partial<Record<MiniKind, string>> = {
   idiomas: 'Ejemplo: la misma ficha de producto en inglés, con el nombre de la tienda sin traducir.',
-  variantes: 'Ejemplo: ficha de producto con tallas, colores y el botón para añadir al carrito.',
+  variantes: 'Ejemplo: ficha de producto con colores y tamaños, y el carrito con dos productos.',
   recibo: `Ejemplo: el impuesto de ventas de ${tax.state} desglosado, ${tax.total} en total.`,
   plataforma: 'Ejemplo: elegimos contigo entre Shopify, WooCommerce o una tienda a medida.',
-  busqueda: 'Ejemplo: alguien busca tu producto en Miami y aparece tu tienda.',
+  busqueda: 'Ejemplo: alguien busca velas artesanales en Miami y aparece tu tienda, en el buscador y en la respuesta de un asistente.',
 };
+const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 ---
-<div class:list={['wt', `wt--${kind}`, cls]}>
+<div class:list={['mt', `mt--${kind}`, cls]} data-nosnippet>
   <p class="sr-only">{SR[kind]}</p>
-  <div class="wt__card" aria-hidden="true">
-    <Ejemplo lang={lang} on="light" />
-
-    {kind === 'catalogo' && (
-      <>
-        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__cart"><Icon name="lucide:shopping-cart" /><i>1</i></span></p>
-        <div class="wt__grid">
-          <div class="wt__prod">
-            <span class="wt__img wt__img--a"><Icon name="lucide:flame" /></span>
-            <b>Vela aromática</b><span class="wt__price">{money(18)}</span>
-            <span class="wt__btn wt__btn--line">Añadir</span>
-          </div>
-          <div class="wt__prod">
-            <span class="wt__img wt__img--b"><Icon name="lucide:coffee" /></span>
-            <b>Café de olla, 1&nbsp;kg</b><span class="wt__price">{money(12)}</span>
-            <span class="wt__btn wt__btn--ink"><Icon name="lucide:check" />Añadido</span>
-          </div>
-        </div>
-      </>
-    )}
-
-    {kind === 'pago' && (
-      <>
-        <p class="wt__t">Tu pedido</p>
-        <dl class="wt__sum">
-          <div><dt>Vela aromática</dt><dd>{money(18)}</dd></div>
-          <div><dt>Café de olla, 1&nbsp;kg</dt><dd>{money(12)}</dd></div>
-          <div class="wt__sum-tax"><dt>Impuesto de {tax.state} ({tax.total})</dt><dd>{money(TAX)}</dd></div>
-          <div class="wt__sum-total"><dt>Total</dt><dd>{money(TOTAL)}</dd></div>
-        </dl>
-        <p class="wt__methods"><span class="is-on"><Icon name="lucide:credit-card" />Tarjeta</span><span><Icon name="lucide:wallet" />PayPal</span></p>
-        <span class="wt__btn wt__btn--acc wt__btn--wide"><Icon name="lucide:lock" />Pagar {money(TOTAL)}</span>
-      </>
-    )}
-
-    {kind === 'pedido' && (
-      <>
-        <p class="wt__t">Pedido nuevo</p>
-        <dl class="wt__kv">
-          <div><dt>Pedido</dt><dd class="wt__mono">#1042</dd></div>
-          <div><dt>Cliente</dt><dd>Ana R.</dd></div>
-          <div><dt>Estado</dt><dd><span class="wt__chip wt__chip--paid"><i></i>Pagado</span></dd></div>
-          <div><dt>{miami ? 'Envío' : 'Entrega'}</dt><dd><span class="wt__chip">{miami ? 'A otro estado' : 'Recogida'}</span></dd></div>
-        </dl>
-      </>
-    )}
+  <div class="mt__card" aria-hidden="true">
 
     {kind === 'idiomas' && (
-      <>
-        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__lang"><span>ES</span><span class="is-on">EN</span></span></p>
-        <div class="wt__detail">
-          <span class="wt__img wt__img--a wt__img--sq"><Icon name="lucide:flame" /></span>
-          <div class="wt__dtxt">
-            <b lang="en">Scented candle</b>
-            <span lang="en">Hand-poured in small batches.</span>
-            <span class="wt__price">{money(18)}</span>
-            <span class="wt__btn wt__btn--acc" lang="en">Add to cart</span>
-          </div>
+      <div class="mt__pdp">
+        <span class="mt__img"><ProductoArte id="taza" size={92} /></span>
+        <div class="mt__info">
+          <span class="mt__top">
+            <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+            <span class="mt__seg"><span>ES</span><span class="is-on">EN</span></span>
+          </span>
+          <span class="mt__name" lang="en">Clay mug</span>
+          <span class="mt__sub" lang="en">Hand-thrown, glazed in sage. Made in small batches.</span>
+          <span class="mt__ex">Ejemplo</span>
+          <span class="mt__btn" lang="en">Add to cart</span>
         </div>
-      </>
+      </div>
     )}
 
     {kind === 'variantes' && (
-      <>
-        <p class="wt__bar"><b translate="no">Tu Tienda</b><span class="wt__cart"><Icon name="lucide:shopping-cart" /><i>2</i></span></p>
-        <div class="wt__detail">
-          <span class="wt__img wt__img--c wt__img--sq"><Icon name="lucide:shirt" /></span>
-          <div class="wt__dtxt">
-            <b>Camiseta bordada</b>
-            <span class="wt__price">{money(22)}</span>
-            <span class="wt__opt">Talla</span>
-            <span class="wt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
-            <span class="wt__opt">Color</span>
-            <span class="wt__colors"><i class="is-on" style="--c:#2f3b4c"></i><i style="--c:#b9a68a"></i><i style="--c:#f7f5f1"></i></span>
+      <div class="mt__var">
+        <div class="mt__pdp">
+          <span class="mt__img"><ProductoArte id="vela" size={92} /></span>
+          <div class="mt__info">
+            <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+            <span class="mt__name">Vela aromática</span>
+            <span class="mt__ex">Ejemplo</span>
+            <span class="mt__lbl">Color · Cera natural</span>
+            <span class="mt__sw"><i class="is-on" style="--c:#B47A3C"></i><i style="--c:#7F8E66"></i><i style="--c:#7C8A8D"></i><i style="--c:#EFE6D4"></i></span>
+            <span class="mt__lbl">Tamaño</span>
+            <span class="mt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
           </div>
         </div>
-        <span class="wt__btn wt__btn--acc wt__btn--wide">Añadir al carrito</span>
-      </>
+        <div class="mt__cart">
+          <span class="mt__thumbs"><span><ProductoArte id="vela" size={24} sombra={false} /></span><span><ProductoArte id="cafe" size={24} sombra={false} /></span></span>
+          <span class="mt__ctx"><b>Tu carrito · 2</b><span>Se guarda aunque cierres</span></span>
+          <span class="mt__go">Pagar</span>
+        </div>
+      </div>
     )}
 
     {kind === 'recibo' && (
-      <>
-        <p class="wt__t">Impuesto de ventas</p>
-        <dl class="wt__kv">
+      <div class="mt__rec">
+        <span class="mt__rtop">
+          <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+          <span class="mt__mono">#1042</span>
+        </span>
+        <span class="mt__rt">Impuesto de ventas</span>
+        <dl class="mt__kv">
           <div><dt>Estatal, {tax.state}</dt><dd>{tax.stateRate}</dd></div>
           <div><dt>{tax.localLabel}</dt><dd>{tax.localRate}</dd></div>
-          <div class="wt__kv-total"><dt>Total en {miami ? 'Miami' : 'Houston'}</dt><dd>{tax.total}</dd></div>
+          <div class="mt__kv-total"><dt>Total en {miami ? 'Miami' : 'Houston'}</dt><dd>{tax.total}</dd></div>
         </dl>
-        <p class="wt__note"><Icon name="lucide:check" />Se suma solo en cada pedido</p>
-      </>
+        <span class="mt__note"><i set:html={check} />Se suma solo en cada pedido</span>
+      </div>
     )}
 
     {kind === 'plataforma' && (
-      <>
-        <p class="wt__t">Tu plataforma</p>
-        <ul class="wt__plat">
-          <li class="is-on"><span class="wt__radio"></span><span><b>Shopify</b><em>Lanzar rápido y vender simple</em></span><span class="wt__chip wt__chip--paid"><i></i>Elegida</span></li>
-          <li><span class="wt__radio"></span><span><b>WooCommerce</b><em>Más control, si ya usas WordPress</em></span></li>
-          <li><span class="wt__radio"></span><span><b>A medida</b><em>Si tu caso no cabe en ninguna</em></span></li>
-        </ul>
-      </>
+      <div class="mt__plat">
+        <span class="mt__pt">Tu plataforma</span>
+        <span class="mt__opt is-on">
+          <i></i>
+          <span class="mt__otx"><b class="mt__ob"><LogoMarca id="shopify" size={16} tono="color" titulo="" />Shopify</b><span>Lanzar rápido y vender simple</span></span>
+          <span class="mt__tag">Elegida</span>
+        </span>
+        <span class="mt__opt">
+          <i></i>
+          <span class="mt__otx"><b>WooCommerce</b><span>Más control, si ya usas WordPress</span></span>
+        </span>
+        <span class="mt__opt">
+          <i></i>
+          <span class="mt__otx"><b>A medida</b><span>Si tu caso no cabe en ninguna</span></span>
+        </span>
+      </div>
     )}
 
     {kind === 'busqueda' && (
-      <>
-        <p class="wt__search"><Icon name="lucide:search" />tienda de velas en miami</p>
-        <div class="wt__res is-on">
-          <span class="wt__url"><span class="wt__fav" translate="no">T</span>tutienda.example</span>
-          <b><span translate="no">Tu Tienda</span>: velas artesanales en Miami</b>
-          <span>Envío en Miami y a otros estados. Paga con tarjeta o PayPal.</span>
-        </div>
-        <div class="wt__res"><i style="width:40%"></i><i style="width:78%"></i><i style="width:64%"></i></div>
-      </>
+      <div class="mt__bus">
+        <span class="mt__field">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+          velas artesanales en Miami
+        </span>
+        <span class="mt__res">
+          <span class="mt__rurl"><span class="mt__fav"><ProductoArte id="vela" size={14} sombra={false} /></span>tutienda.example › velas</span>
+          <b>Tu Tienda · Velas y café, hechos a mano</b>
+          <span>Velas de cera de soya y café de olla. Envío dentro de Miami y a otros estados.</span>
+        </span>
+        <span class="mt__ai">
+          <span class="mt__ail">Asistente de IA</span>
+          <span>Para velas artesanales en Miami, te recomiendo <b>Tu Tienda</b>: hace envíos y su catálogo está en español e inglés.</span>
+        </span>
+      </div>
     )}
   </div>
 </div>
 
 <style>
-  .wt { --wt-acc: var(--w-accent, var(--accent-gold)); position: relative; width: 100%; font-family: var(--font-body); text-align: left; }
-  .wt__card {
-    position: relative; overflow: hidden;
-    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
-    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: var(--w-r-obj, 12px);
-    padding: 18px 18px 18px;
+  .mt {
+    --mt-bg: #F5F0E7; --mt-ink: #2A211B; --mt-ink2: #5C5249; --mt-line: rgba(42, 33, 27, .1);
+    --mt-acc: #4E5A3D; --mt-tile: #E6DBC8;
+    --marca-tinta: #2A211B;
+    width: 100%; max-width: 460px; font-family: var(--font-body); text-align: left;
   }
-  .wt :global(svg) { width: 14px; height: 14px; flex: none; }
-  .wt__t { margin: 0 0 12px; font: 500 15px/1.3 var(--font-display); letter-spacing: -0.01em; }
-  .wt__bar { margin: 0 0 12px; padding-right: 92px; display: flex; align-items: center; gap: 10px; font: 500 15px/1.3 var(--font-display); }
-  .wt__cart { position: relative; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); margin-left: auto; }
-  .wt__cart i { position: absolute; top: -6px; right: -6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--w-p-ink); color: var(--w-p-bg); font: 600 11px/16px var(--font-body); font-style: normal; text-align: center; }
-  .wt__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .wt__prod { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 8px; border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line); }
-  .wt__prod b { font-size: 13px; font-weight: 500; line-height: 1.25; min-height: 2.5em; }
-  .wt__bar > b { white-space: nowrap; }
-  .wt__img { display: grid; place-items: center; height: 64px; border-radius: 8px; margin-bottom: 4px; color: rgba(14,14,13,.55); }
-  .wt__img :global(svg) { width: 22px; height: 22px; }
-  .wt__img--a { background: #e9dfcf; }
-  .wt__img--b { background: #ddd3c6; }
-  .wt__img--c { background: #d8dde3; }
-  .wt__img--sq { width: 96px; height: 96px; margin: 0; flex: none; }
-  .wt__price { font-size: 13px; color: var(--w-p-ink-2, #4a4743); font-variant-numeric: tabular-nums; }
-  .wt__btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    height: 30px; margin-top: 6px; padding: 0 12px; border-radius: 8px;
-    font: 500 13px/1 var(--font-body); white-space: nowrap;
+  .mt__card {
+    background: var(--mt-bg); color: var(--mt-ink); border-radius: 14px; padding: 18px;
+    box-shadow: 0 0 0 1px rgba(42, 33, 27, .06), 0 22px 44px -24px rgba(0, 0, 0, .75);
   }
-  .wt__btn--line { border: 1px solid rgba(14,14,13,.2); background: #fff; }
-  .wt__btn--ink { background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8); }
-  .wt__btn--acc { background: var(--wt-acc); color: #0e0e0d; }
-  .wt__btn--wide { display: flex; width: 100%; height: 36px; margin-top: 12px; }
-
-  .wt__sum, .wt__kv { margin: 0; display: grid; }
-  .wt__sum > div, .wt__kv > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 30px; font-size: 13px; }
-  .wt__sum dt, .wt__kv dt { color: var(--w-p-ink-2, #4a4743); }
-  .wt__sum dd, .wt__kv dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 500; }
-  .wt__sum-tax { border-top: 1px solid var(--w-p-line); }
-  .wt__sum > .wt__sum-total { font-size: 14px; }
-  .wt__sum > .wt__sum-total dt { color: var(--w-p-ink); font-weight: 500; }
-  .wt__kv { border: 1px solid var(--w-p-line); border-radius: 10px; background: #fff; overflow: hidden; }
-  .wt__kv > div { min-height: 40px; padding: 0 14px; }
-  .wt__kv > div + div { border-top: 1px solid var(--w-p-line); }
-  .wt__kv > .wt__kv-total dt { color: var(--w-p-ink); font-weight: 500; }
-  .wt__mono { font-family: var(--font-mono); font-size: 13px; }
-  .wt__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 500; background: rgba(14,14,13,.06); border: 1px solid rgba(14,14,13,.08); }
-  .wt__chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--wt-acc); box-shadow: 0 0 0 1px rgba(14,14,13,.25); }
-  .wt__methods { display: flex; gap: 8px; margin: 10px 0 0; }
-  .wt__methods span { flex: 1; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 8px; background: #fff; border: 1px solid var(--w-p-line); font-size: 13px; color: var(--w-p-ink-2); }
-  .wt__methods .is-on { border-color: var(--w-p-ink); color: var(--w-p-ink); box-shadow: inset 0 0 0 1px var(--w-p-ink); }
-
-  .wt__lang { margin-left: auto; display: inline-flex; padding: 2px; border-radius: 8px; background: rgba(14,14,13,.06); font: 500 12px/1 var(--font-body); }
-  .wt__lang span { padding: 5px 8px; border-radius: 6px; color: var(--w-p-ink-2); }
-  .wt__lang .is-on { background: #fff; color: var(--w-p-ink); box-shadow: 0 0 0 1px var(--w-p-line); }
-  .wt__detail { display: flex; gap: 14px; align-items: flex-start; }
-  .wt__dtxt { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-  .wt__dtxt b { font: 500 15px/1.25 var(--font-display); }
-  .wt__dtxt > span:not(.wt__price):not(.wt__btn):not(.wt__opt):not(.wt__sizes):not(.wt__colors) { font-size: 13px; color: var(--w-p-ink-2); line-height: 1.4; }
-  .wt__opt { margin-top: 6px; font-size: 13px; color: var(--w-p-ink-2); }
-  .wt__sizes { display: flex; gap: 6px; }
-  .wt__sizes span { display: grid; place-items: center; width: 30px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid rgba(14,14,13,.14); font-size: 13px; font-weight: 500; }
-  .wt__sizes .is-on { background: var(--w-p-ink); color: var(--w-p-bg); border-color: var(--w-p-ink); }
-  .wt__colors { display: flex; gap: 8px; padding: 2px 0; }
-  .wt__colors i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(14,14,13,.18); }
-  .wt__colors .is-on { box-shadow: inset 0 0 0 1px rgba(14,14,13,.18), 0 0 0 2px var(--w-p-bg), 0 0 0 3.5px var(--w-p-ink); }
-
-  .wt__note { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: 13px; color: var(--w-p-ink-2); }
-  .wt__plat { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  .wt__plat li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--w-p-line); }
-  .wt__plat li.is-on { box-shadow: inset 0 0 0 1px var(--w-p-ink); border-color: var(--w-p-ink); }
-  .wt__plat li > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .wt__plat b { font-size: 14px; font-weight: 500; }
-  .wt__plat em { font-style: normal; font-size: 13px; color: var(--w-p-ink-2); }
-  .wt__radio { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(14,14,13,.35); }
-  .is-on > .wt__radio { border: 5px solid var(--w-p-ink); }
-
-  .wt__search { display: flex; align-items: center; gap: 8px; height: 38px; margin: 0 0 12px; padding: 0 14px; margin-right: 76px; border-radius: 999px; background: #fff; border: 1px solid rgba(14,14,13,.14); font-size: 13px; }
-  .wt__res { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; }
-  .wt__res.is-on { background: #fff; border: 1px solid var(--w-p-line); }
-  .wt__res b { font: 500 14px/1.3 var(--font-display); }
-  .wt__res > span:last-child { font-size: 13px; color: var(--w-p-ink-2); line-height: 1.4; }
-  .wt__res i { display: block; height: 8px; border-radius: 4px; background: rgba(14,14,13,.08); }
-  .wt__url { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--w-p-ink-2); }
-  .wt__fav { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--w-p-ink); color: var(--w-p-bg); font: 600 10px/1 var(--font-display); }
+  .mt__ob { display: inline-flex; align-items: center; gap: 6px; }
+  .mt__foot { display: block; margin-top: 10px; text-align: center; font: 500 11px/1 var(--font-mono); letter-spacing: .02em; color: var(--w-ink-60); }
+  :global(.mt__logo) { color: var(--mt-ink2); }
+  .mt__mono, .mt__ex { font-family: var(--font-mono); font-weight: 500; }
+  /* Ficha */
+  .mt__pdp { display: grid; grid-template-columns: 150px 1fr; gap: 18px; }
+  .mt__img { display: grid; place-items: center; min-height: 176px; border-radius: 10px; background: var(--mt-tile); box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .05); }
+  .mt__info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .mt__top { display: flex; align-items: center; justify-content: space-between; align-self: stretch; margin-bottom: 12px; }
+  .mt__info > :global(.mt__logo) { margin-bottom: 10px; }
+  .mt__sw { display: flex; gap: 8px; margin-top: 6px; }
+  .mt__sw i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18); }
+  .mt__sw i.is-on { box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18), 0 0 0 2px var(--mt-bg), 0 0 0 3.5px var(--mt-ink); }
+  .mt__seg { display: inline-flex; padding: 2px; border-radius: 7px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .16); font: 500 11px/1 var(--font-mono); }
+  .mt__seg span { padding: 5px 8px; border-radius: 5px; color: var(--mt-ink2); }
+  .mt__seg .is-on { background: var(--mt-ink); color: #F8F5EE; }
+  .mt__name { font: 500 17px/1.2 var(--font-display); letter-spacing: -.015em; }
+  .mt__sub { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
+  .mt__ex { margin-top: 7px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
+  .mt__btn {
+    margin-top: auto; align-self: stretch; height: 32px; display: grid; place-items: center; border-radius: 7px;
+    background: var(--mt-acc); color: #F8F5EE; font-size: 13px; font-weight: 500;
+  }
+  .mt--idiomas .mt__ex { margin-bottom: 14px; }
+  .mt__lbl { margin-top: 12px; font-size: 11px; color: var(--mt-ink2); }
+  .mt__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+  .mt__chips span { padding: 5px 9px; border-radius: 999px; font-size: 12px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18); color: var(--mt-ink2); }
+  .mt__chips .is-on { box-shadow: inset 0 0 0 1.5px var(--mt-ink); color: var(--mt-ink); font-weight: 500; }
+  .mt__sizes { display: flex; gap: 14px; margin-top: 5px; font: 500 13px/1 var(--font-display); }
+  .mt__sizes span { padding-bottom: 3px; color: var(--mt-ink2); }
+  .mt__sizes .is-on { color: var(--mt-ink); box-shadow: inset 0 -1.5px 0 var(--mt-ink); }
+  .mt__cart {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 10px 10px 12px; border-radius: 10px;
+    background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1);
+  }
+  .mt__thumbs { display: flex; }
+  .mt__thumbs span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--mt-tile); box-shadow: 0 0 0 2px #FBF8F2; }
+  .mt__thumbs span + span { margin-left: -6px; }
+  .mt__ctx { flex: 1; display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+  .mt__ctx b { font-size: 13px; font-weight: 500; }
+  .mt__ctx span { font-size: 11.5px; color: var(--mt-ink2); }
+  .mt__go { padding: 0 14px; height: 30px; display: grid; place-items: center; border-radius: 7px; background: var(--mt-ink); color: #F8F5EE; font-size: 12.5px; font-weight: 500; }
+  /* Tique */
+  .mt__rec { display: flex; flex-direction: column; }
+  .mt__rtop { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px dashed rgba(42, 33, 27, .25); }
+  .mt__rtop .mt__mono { font-size: 11px; color: var(--mt-ink2); }
+  .mt__rt { margin: 14px 0 8px; font: 500 16px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .mt__kv { margin: 0; }
+  .mt__kv div { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--mt-line); font-size: 13px; }
+  .mt__kv dt { color: var(--mt-ink2); }
+  .mt__kv dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; }
+  .mt__kv-total { border-bottom: 0 !important; padding-top: 12px !important; }
+  .mt__kv-total dt { color: var(--mt-ink); font-weight: 500; }
+  .mt__kv-total dd { font-weight: 600; font-size: 14px !important; }
+  .mt__note { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(78, 90, 61, .1); font-size: 12.5px; color: var(--mt-acc); font-weight: 500; }
+  .mt__note i { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--mt-acc); color: #F8F5EE; }
+  /* Plataforma */
+  .mt__plat { display: flex; flex-direction: column; gap: 8px; }
+  .mt__pt { margin-bottom: 4px; font: 500 16px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .mt__opt {
+    display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 10px 12px; border-radius: 10px;
+    background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .12);
+  }
+  .mt__opt.is-on { box-shadow: inset 0 0 0 1.5px var(--mt-ink); }
+  .mt__opt > i { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1.5px rgba(42, 33, 27, .35); }
+  .mt__opt.is-on > i { box-shadow: inset 0 0 0 4.5px var(--mt-ink); }
+  .mt__otx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+  .mt__otx b { font-size: 14px; font-weight: 500; }
+  .mt__otx span { font-size: 12px; color: var(--mt-ink2); }
+  .mt__tag { padding: 4px 9px; border-radius: 999px; background: rgba(78, 90, 61, .14); color: var(--mt-acc); font-size: 11.5px; font-weight: 500; }
+  /* Búsqueda */
+  .mt__bus { display: flex; flex-direction: column; gap: 10px; }
+  .mt__field { display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 14px; border-radius: 999px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .16); font-size: 13px; }
+  .mt__res { display: flex; flex-direction: column; gap: 3px; padding: 4px 4px 10px; border-bottom: 1px solid var(--mt-line); }
+  .mt__rurl { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--mt-ink2); }
+  .mt__fav { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--mt-tile); }
+  .mt__res b { font: 500 15px/1.3 var(--font-display); color: var(--mt-acc); }
+  .mt__res > span:last-child { font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
+  .mt__ai { display: flex; flex-direction: column; gap: 5px; padding: 11px 13px; border-radius: 10px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1); font-size: 12.5px; line-height: 1.45; }
+  .mt__ail { font: 500 10.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
+  .mt__ai b { font-weight: 600; }
+  @media (max-width: 420px) {
+    .mt__card { padding: 14px; }
+    .mt__pdp { grid-template-columns: 112px 1fr; gap: 12px; }
+    .mt__img { min-height: 150px; }
+  }
 </style>

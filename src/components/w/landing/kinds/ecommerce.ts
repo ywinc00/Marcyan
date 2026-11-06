@@ -3,8 +3,10 @@
 // §4.15, ola 2). Su existencia activa el tipo (registry.ts); las páginas
 // /es/houston/ecommerce y /es/miami/ecommerce lo importan y montan WLanding.
 //
-// Contraste: "El día de tu tienda" (RegistroVivo estático en .w-contrast). Firma: la lista
-// de pedidos del hero (único bucle). Degradado: la cifra del precio.
+// v2 (design/rediseno-workos-v2.md G04): fondo F02, hero con PedidosHoy (productos ilustrados y raíl
+// de estados), 01 con PasoTienda + "¿Y a ti cómo te llega?" (navegador con satélites, W-CORE-30),
+// 02 con casillas de logos de P06, contraste con RegistroVivo VIVO y bento con objetos nuevos.
+// Contraste: "El día de tu tienda" (.w-contrast). Degradado: la cifra del precio.
 // Orden (R1): hero → tríada → 01 del carrito al pago (#proceso) → 02 todo conectado →
 // contraste → 03 qué incluye → prosa local → precio (#precios) → 04 trabajo real
 // (#proyectos) → franja "En pocas palabras" → FAQ → hermanas → cierre (Contact lo pone
@@ -50,6 +52,8 @@ const anchorOf = (id: string) => {
 const spec: KindSpec = {
   kind: 'ecommerce',
   tone: 'gold',
+  // v2 G04 / P12: fondo temático "Escaparate" (haces de vitrina, baldas, amanecer oro) en lugar del espacio.
+  fondo: 'F02',
   Hero: HeroEcommerce,
   hero: (ctx) => {
     const t = copyOf(ctx);

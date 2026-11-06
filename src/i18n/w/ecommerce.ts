@@ -15,7 +15,9 @@
 
 export type ShopCity = 'houston' | 'miami';
 
-export interface TileCopy { icon: string; name: string; sub: string }
+/** Casilla de "Todo conectado": con `logo`, el logo de la plataforma (P06) que la página ya nombra;
+ *  sin él, la función en texto (nombre + detalle), sin icono en caja (v2 G04). */
+export interface TileCopy { logo?: 'stripe' | 'paypal' | 'shopify' | 'whatsapp'; name: string; sub: string }
 export interface ShopCopy {
   chip: string;
   cityName: string;
@@ -31,6 +33,8 @@ export interface ShopCopy {
   pasos: {
     label: string; title: string; lead: string;
     steps: [{ label: string; title: string; text: string }, { label: string; title: string; text: string }, { label: string; title: string; text: string }];
+    /** "¿Y a ti cómo te llega?" (v2 G04, navegador con satélites). */
+    aviso: { title: string; lead: string; sr: string };
   };
   conectado: {
     label: string; title: string; lead: string; app: string; platforms: string;
@@ -70,11 +74,11 @@ const plataforma = {
 };
 
 const mensajeria: TileCopy[] = [
-  { icon: 'lucide:mail', name: 'Confirmación', sub: 'Correo al cliente' },
-  { icon: 'lucide:bell', name: 'Pedido nuevo', sub: 'Aviso para ti' },
-  { icon: 'lucide:message-circle', name: 'WhatsApp', sub: 'Botón en tu tienda' },
-  { icon: 'lucide:languages', name: 'En su idioma', sub: 'Español o inglés' },
-  { icon: 'lucide:bot', name: 'Marcy', sub: 'Servicio aparte' },
+  { name: 'Confirmación', sub: 'Correo al cliente' },
+  { name: 'Pedido nuevo', sub: 'Aviso para ti' },
+  { logo: 'whatsapp', name: 'WhatsApp', sub: 'Botón en tu tienda' },
+  { name: 'En su idioma', sub: 'Español o inglés' },
+  { name: 'Marcy', sub: 'Servicio aparte' },
 ];
 
 const franja: ShopCopy['franja'] = {
@@ -121,27 +125,32 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
         { label: 'Paso 02', title: 'Paga seguro', text: 'Con tarjeta o PayPal. El impuesto de Texas se calcula solo.' },
         { label: 'Paso 03', title: 'Pedido listo', text: 'Te llega con todo: qué compró, cómo pagó y cómo lo recibe.' },
       ],
+      aviso: {
+        title: '¿Y a ti cómo te llega?',
+        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y por WhatsApp, con lo que compró y cómo lo recibe.',
+        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo y un aviso por WhatsApp con el pedido.',
+      },
     },
     conectado: {
       label: 'Todo conectado',
       title: 'Pagos, entregas y avisos, en tu tienda',
       lead: 'Lo dejamos todo funcionando desde el primer día, en la plataforma que elijamos contigo.',
       app: 'Tu Tienda',
-      platforms: 'Shopify, WooCommerce o a medida',
+      platforms: 'WooCommerce o a medida',
       tabs: [
         { id: 'pagos', label: 'Pagos', tiles: [
-          { icon: 'lucide:credit-card', name: 'Tarjeta', sub: 'Crédito y débito' },
-          { icon: 'lucide:wallet', name: 'Stripe', sub: 'Pasarela de pago' },
-          { icon: 'lucide:wallet', name: 'PayPal', sub: 'Pago con su cuenta' },
-          { icon: 'lucide:lock', name: 'Pago seguro', sub: 'Conexión cifrada' },
-          { icon: 'lucide:tag', name: 'Cupones', sub: 'Para tus ofertas' },
+          { name: 'Tarjeta', sub: 'Crédito y débito' },
+          { logo: 'stripe', name: 'Stripe', sub: 'Pasarela de pago' },
+          { logo: 'paypal', name: 'PayPal', sub: 'Pago con su cuenta' },
+          { name: 'Pago seguro', sub: 'Conexión cifrada' },
+          { name: 'Cupones', sub: 'Para tus ofertas' },
         ] },
         { id: 'entregas', label: 'Entregas', tiles: [
-          { icon: 'lucide:truck', name: 'Entrega local', sub: 'Por zonas de Houston' },
-          { icon: 'lucide:map-pin', name: 'Zonas', sub: 'Cada una con su costo' },
-          { icon: 'lucide:store', name: 'Recogida', sub: 'En tu negocio' },
-          { icon: 'lucide:package', name: 'Paquetería', sub: 'Fuera de tu zona' },
-          { icon: 'lucide:receipt', name: 'Costo claro', sub: 'Antes de pagar' },
+          { name: 'Entrega local', sub: 'Por zonas de Houston' },
+          { name: 'Zonas', sub: 'Cada una con su costo' },
+          { name: 'Recogida', sub: 'En tu negocio' },
+          { name: 'Paquetería', sub: 'Fuera de tu zona' },
+          { name: 'Costo claro', sub: 'Antes de pagar' },
         ] },
         { id: 'mensajes', label: 'Mensajería', tiles: mensajeria },
       ],
@@ -161,6 +170,8 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
         { icon: 'lucide:shopping-bag', label: 'Pedido de Ana R.', chip: 'Pagado', tone: 'ok' },
         { icon: 'lucide:truck', label: 'Entrega local en tu zona', chip: 'Preparada', tone: 'pass' },
         { icon: 'lucide:store', label: 'Recogida en tu negocio', chip: 'Lista', tone: 'pass' },
+        { icon: 'lucide:shopping-bag', label: 'Pedido de Sofía G.', chip: 'Pagado', tone: 'ok' },
+        { icon: 'lucide:tag', label: 'Cupón de bienvenida', chip: 'Usado', tone: 'pass' },
       ],
     },
     incluye: {
@@ -205,27 +216,32 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
         { label: 'Paso 02', title: 'Paga seguro', text: 'Con tarjeta o PayPal, también desde fuera. El impuesto de Florida se calcula solo.' },
         { label: 'Paso 03', title: 'Pedido listo', text: 'Te llega con todo: qué compró, cómo pagó y a dónde se envía.' },
       ],
+      aviso: {
+        title: '¿Y a ti cómo te llega?',
+        lead: 'En cuanto tu cliente paga, te llega el aviso por correo y por WhatsApp, con lo que compró y a dónde se envía.',
+        sr: 'Ejemplo: tu cliente ve la página de gracias con su pedido pagado y a ti te llega al momento un correo y un aviso por WhatsApp con el pedido.',
+      },
     },
     conectado: {
       label: 'Todo conectado',
       title: 'Pagos, envíos y avisos, en tu tienda',
       lead: 'Lo dejamos todo funcionando desde el primer día, en la plataforma que elijamos contigo.',
       app: 'Tu Tienda',
-      platforms: 'Shopify, WooCommerce o a medida',
+      platforms: 'WooCommerce o a medida',
       tabs: [
         { id: 'pagos', label: 'Pagos', tiles: [
-          { icon: 'lucide:credit-card', name: 'Tarjeta', sub: 'Crédito y débito' },
-          { icon: 'lucide:wallet', name: 'Stripe', sub: 'Pasarela de pago' },
-          { icon: 'lucide:wallet', name: 'PayPal', sub: 'Pago con su cuenta' },
-          { icon: 'lucide:globe', name: 'Tarjetas de fuera', sub: 'También de Latinoamérica' },
-          { icon: 'lucide:tag', name: 'Cupones', sub: 'Para tus ofertas' },
+          { name: 'Tarjeta', sub: 'Crédito y débito' },
+          { logo: 'stripe', name: 'Stripe', sub: 'Pasarela de pago' },
+          { logo: 'paypal', name: 'PayPal', sub: 'Pago con su cuenta' },
+          { name: 'Tarjetas de fuera', sub: 'También de Latinoamérica' },
+          { name: 'Cupones', sub: 'Para tus ofertas' },
         ] },
         { id: 'envios', label: 'Envíos', tiles: [
-          { icon: 'lucide:truck', name: 'Miami', sub: 'Entrega en la ciudad' },
-          { icon: 'lucide:package', name: 'Otros estados', sub: 'Tarifa por destino' },
-          { icon: 'lucide:globe', name: 'Latinoamérica', sub: 'Si tu producto lo permite' },
-          { icon: 'lucide:map-pin', name: 'Tarifas por país', sub: 'Cada una con su costo' },
-          { icon: 'lucide:receipt', name: 'Costo claro', sub: 'Antes de pagar' },
+          { name: 'Miami', sub: 'Entrega en la ciudad' },
+          { name: 'Otros estados', sub: 'Tarifa por destino' },
+          { name: 'Latinoamérica', sub: 'Si tu producto lo permite' },
+          { name: 'Tarifas por país', sub: 'Cada una con su costo' },
+          { name: 'Costo claro', sub: 'Antes de pagar' },
         ] },
         { id: 'mensajes', label: 'Mensajería', tiles: mensajeria },
       ],
@@ -245,6 +261,8 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
         { icon: 'lucide:shopping-bag', label: 'Pedido de Ana R.', chip: 'Pagado', tone: 'ok' },
         { icon: 'lucide:truck', label: 'Envío dentro de Miami', chip: 'Preparado', tone: 'pass' },
         { icon: 'lucide:globe', label: 'Envío a Latinoamérica', chip: 'En camino', tone: 'pass' },
+        { icon: 'lucide:shopping-bag', label: 'Pedido de Sofía G.', chip: 'Pagado', tone: 'ok' },
+        { icon: 'lucide:tag', label: 'Cupón de bienvenida', chip: 'Usado', tone: 'pass' },
       ],
     },
     incluye: {

@@ -1,0 +1,209 @@
+---
+// Objetos de los tres pasos de "Del carrito al pago" (design/rediseno-workos-v2.md G04, P03; original
+// W-ADV-37: tres tarjetas en bandeja). Marca de ejemplo `tienda`. Sin precios (§1.6: donde iría el precio
+// va "Ejemplo"), sin iconos de catálogo en caja: los glifos se dibujan aquí con un trazo de 1,5.
+//   producto  ficha de producto tipo Untitled (imagen ilustrada alta, nombre, "Ejemplo" en lugar del precio,
+//             tamaños como letras sueltas, contador − 1 +, botón fino "Añadir")
+//   pago      cobro: tarjeta o PayPal (logo de P06), impuesto real de la ciudad, "Pagar" y "Procesado por
+//             Stripe" (logo de P06): las plataformas que la página ya nombra
+//   estado    pedido con raíl de estados tipo Instacart (Pagado ✓ → Preparando ✓ → Listo) que se rellena
+//             una vez al entrar en vista; productos del pedido y forma de entrega
+// Contrato común (§1.6): raíz aria-hidden + data-nosnippet + resumen sr-only, sin h1-h6, sin enlaces.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import ProductoArte from './ProductoArte.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { kind: 'producto' | 'pago' | 'estado'; tax: ShopCopy['tax']; city: 'houston' | 'miami'; lang?: 'es' | 'en' }
+const { kind, tax, city, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const miami = city === 'miami';
+const T = en
+  ? { ex: 'Example', name: 'Scented candle', sub: 'Soy wax · hand-poured', size: 'Size', add: 'Add',
+      pay: 'Checkout', secure: 'Encrypted', card: 'Card', taxl: `${tax.state} sales tax`, payBtn: 'Pay', by: 'Processed by',
+      order: 'Order #1042', who: miami ? 'Ana R. · Ships to another state' : 'Ana R. · Pickup at your shop',
+      st: ['Paid', 'Packing', 'Ready'], items: '2 items', paidBy: 'Paid by card' }
+  : { ex: 'Ejemplo', name: 'Vela aromática', sub: 'Cera de soya · hecha a mano', size: 'Tamaño', add: 'Añadir',
+      pay: 'Pago', secure: 'Cifrado', card: 'Tarjeta', taxl: `Impuesto de ${tax.state}`, payBtn: 'Pagar', by: 'Procesado por',
+      order: 'Pedido #1042', who: miami ? 'Ana R. · Envío a otro estado' : 'Ana R. · Recogida en tu negocio',
+      st: ['Pagado', 'Preparando', 'Listo'], items: '2 productos', paidBy: 'Pagado con tarjeta' };
+const SR = {
+  producto: en ? 'Example: a product page in your store, with sizes, quantity and an add button.' : 'Ejemplo: la ficha de un producto de tu tienda, con tamaños, cantidad y botón para añadir.',
+  pago: en ? `Example: your customer pays by card or PayPal and the ${tax.state} tax (${tax.total}) is added automatically.` : `Ejemplo: tu cliente paga con tarjeta o PayPal y el impuesto de ${tax.state} (${tax.total}) se suma solo.`,
+  estado: en ? 'Example: the order arrives paid and moves from paid to packing to ready.' : 'Ejemplo: el pedido te llega pagado y pasa de pagado a preparando y a listo.',
+}[kind];
+---
+<div class:list={['pt', `pt--${kind}`]} data-nosnippet data-pt={kind === 'estado' ? '' : undefined}>
+  <p class="sr-only">{SR}</p>
+  <div class="pt__card" aria-hidden="true">
+    {kind === 'producto' && (
+      <div class="pt__pdp">
+        <span class="pt__img"><ProductoArte id="vela" size={84} /></span>
+        <div class="pt__info">
+          <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="pt__logo" />
+          <span class="pt__name">{T.name}</span>
+          <span class="pt__sub">{T.sub}</span>
+          <span class="pt__ex">{T.ex}</span>
+          <span class="pt__lbl">{T.size}</span>
+          <span class="pt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
+          <span class="pt__qty"><span>−</span><b>1</b><span>+</span></span>
+          <span class="pt__add">{T.add}</span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'pago' && (
+      <div class="pt__pay">
+        <p class="pt__row pt__row--head">
+          <span class="pt__h">{T.pay}</span>
+          <span class="pt__lock">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+            {T.secure}
+          </span>
+        </p>
+        <p class="pt__opt is-on"><i></i><span>{T.card}</span><span class="pt__num">•••• 0142</span></p>
+        <p class="pt__opt"><i></i><LogoMarca id="paypal" size={15} tono="color" titulo="" /><span>PayPal</span></p>
+        <p class="pt__row pt__tax"><span>{T.taxl}</span><span class="pt__mono">{tax.total}</span></p>
+        <span class="pt__paybtn">{T.payBtn}</span>
+        <p class="pt__by"><span>{T.by}</span><LogoMarca id="stripe" size={14} tono="color" titulo="" /><b>Stripe</b></p>
+      </div>
+    )}
+
+    {kind === 'estado' && (
+      <div class="pt__est">
+        <p class="pt__row pt__row--head">
+          <span class="pt__h">{T.order}</span>
+        </p>
+        <p class="pt__who">{T.who}</p>
+        <div class="pt__rail">
+          {T.st.map((s, i) => (
+            <>
+              {i > 0 && <s style={`--d:${(i - 1) * 420 + 200}ms`}></s>}
+              <span class:list={['pt__node', i === 2 && 'is-now']} style={`--d:${i * 420}ms`}>
+                <i>{i < 2 && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>}</i>
+                <span>{s}</span>
+              </span>
+            </>
+          ))}
+        </div>
+        <div class="pt__items">
+          <span class="pt__thumbs"><span><ProductoArte id="vela" size={26} sombra={false} /></span><span><ProductoArte id="cafe" size={26} sombra={false} /></span></span>
+          <span class="pt__itx"><b>{T.items}</b><span>{T.paidBy} · {tax.total}</span></span>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  // El raíl del paso 3 se rellena una vez al entrar en vista (y otra si vuelve tras ≥ 8 s fuera, §1.5).
+  document.querySelectorAll<HTMLElement>('[data-pt]').forEach((el) => {
+    if (el.dataset.ptListo) return;
+    el.dataset.ptListo = '1';
+    let fuera = 0;
+    new IntersectionObserver((es) => {
+      for (const e of es) {
+        if (e.isIntersecting) {
+          if (!el.classList.contains('is-in') || (fuera && Date.now() - fuera >= 8000)) {
+            el.classList.remove('is-in'); void el.offsetWidth; el.classList.add('is-in');
+          }
+          fuera = 0;
+        } else if (el.classList.contains('is-in')) fuera = Date.now();
+      }
+    }, { threshold: 0.35 }).observe(el);
+  });
+</script>
+
+<style>
+  .pt {
+    --pt-bg: #F5F0E7; --pt-ink: #2A211B; --pt-ink2: #5C5249; --pt-line: rgba(42, 33, 27, .1);
+    --pt-acc: #4E5A3D; --pt-tile: #E6DBC8;
+    --marca-tinta: #2A211B;
+    width: min(100%, 320px); font-family: var(--font-body); text-align: left;
+  }
+  .pt__card {
+    background: var(--pt-bg); color: var(--pt-ink); border-radius: 14px; padding: 16px;
+    box-shadow: 0 0 0 1px rgba(42, 33, 27, .06), 0 18px 40px -22px rgba(0, 0, 0, .7);
+  }
+  .pt__mono, .pt__ex, .pt__ex2, .pt__num { font-family: var(--font-mono); font-weight: 500; }
+  /* Producto */
+  .pt__pdp { display: grid; grid-template-columns: 118px 1fr; gap: 14px; }
+  .pt__img {
+    display: grid; place-items: center; height: 170px; border-radius: 10px; background: var(--pt-tile);
+    box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .05);
+  }
+  .pt__info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .pt__info > :global(.pt__logo) { color: var(--pt-ink2); margin-bottom: 10px; }
+  .pt__name { font: 500 15px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .pt__sub { margin-top: 3px; font-size: 12px; line-height: 1.35; color: var(--pt-ink2); }
+  .pt__ex { margin-top: 6px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--pt-ink2); }
+  .pt__lbl { margin-top: 10px; font-size: 11px; color: var(--pt-ink2); }
+  .pt__sizes { display: flex; gap: 12px; margin-top: 3px; font: 500 13px/1 var(--font-display); }
+  .pt__sizes span { padding-bottom: 3px; color: var(--pt-ink2); }
+  .pt__sizes .is-on { color: var(--pt-ink); box-shadow: inset 0 -1.5px 0 var(--pt-ink); }
+  .pt__qty {
+    display: inline-flex; align-items: center; gap: 14px; margin-top: 12px; padding: 0 10px; height: 26px;
+    border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .2); font-size: 13px;
+  }
+  .pt__qty span { color: var(--pt-ink2); }
+  .pt__add {
+    align-self: stretch; margin-top: 8px; height: 28px; display: grid; place-items: center; border-radius: 6px;
+    background: var(--pt-ink); color: #F8F5EE; font-size: 12.5px; font-weight: 500;
+  }
+  /* Pago */
+  .pt__row { display: flex; align-items: center; justify-content: space-between; margin: 0; }
+  .pt__row--head { margin-bottom: 12px; }
+  .pt__h { font: 500 15px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .pt__lock { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--pt-ink2); }
+  .pt__opt {
+    display: flex; align-items: center; gap: 9px; margin: 0 0 6px; height: 38px; padding: 0 12px; border-radius: 8px;
+    background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .12); font-size: 13px; font-weight: 500;
+  }
+  .pt__opt i { width: 13px; height: 13px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1.5px rgba(42, 33, 27, .35); }
+  .pt__opt.is-on { box-shadow: inset 0 0 0 1.5px var(--pt-ink); }
+  .pt__opt.is-on i { box-shadow: inset 0 0 0 4px var(--pt-ink); }
+  .pt__num { margin-left: auto; font-size: 11.5px; color: var(--pt-ink2); }
+  .pt__tax { margin: 12px 0 12px; padding-top: 10px; border-top: 1px solid var(--pt-line); font-size: 12.5px; color: var(--pt-ink2); }
+  .pt__tax .pt__mono { color: var(--pt-ink); font-size: 12px; }
+  .pt__paybtn {
+    display: grid; place-items: center; height: 36px; border-radius: 8px; background: var(--pt-acc); color: #F8F5EE;
+    font-size: 13.5px; font-weight: 500;
+  }
+  .pt__by b { font-weight: 600; color: var(--pt-ink); margin-left: -2px; }
+  .pt__by { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0 0; font-size: 11px; color: var(--pt-ink2); }
+  /* Estado */
+  .pt__ex2 { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--pt-ink2); }
+  .pt__who { margin: -6px 0 18px; font-size: 12.5px; color: var(--pt-ink2); }
+  .pt__rail { display: flex; align-items: flex-start; margin-bottom: 18px; }
+  .pt__rail s { flex: 1; height: 2px; margin-top: 8px; background: rgba(42, 33, 27, .14); position: relative; overflow: hidden; }
+  .pt__rail s::after { content: ''; position: absolute; inset: 0; background: var(--pt-acc); transform-origin: left; }
+  .pt__node { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 18px; font-size: 11.5px; font-weight: 500; }
+  .pt__node:first-child { align-items: flex-start; }
+  .pt__node:last-child { align-items: flex-end; }
+  .pt__node i {
+    display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--pt-acc); color: #F8F5EE;
+  }
+  .pt__node.is-now i { background: var(--pt-bg); box-shadow: inset 0 0 0 2px var(--pt-acc), 0 0 0 4px rgba(78, 90, 61, .16); }
+  .pt__node.is-now i::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--pt-acc); }
+  .pt__node span { white-space: nowrap; }
+  .pt__node.is-now span { color: var(--pt-acc); }
+  .pt__items { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--pt-line); }
+  .pt__thumbs { display: flex; }
+  .pt__thumbs span {
+    display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--pt-tile);
+    box-shadow: 0 0 0 2px var(--pt-bg);
+  }
+  .pt__thumbs span + span { margin-left: -6px; }
+  .pt__itx { display: flex; flex-direction: column; line-height: 1.3; }
+  .pt__itx b { font-size: 13px; font-weight: 500; }
+  .pt__itx span { font-size: 11.5px; color: var(--pt-ink2); }
+  /* Relleno del raíl al entrar en vista (solo transform y opacidad). */
+  .pt.is-in .pt__rail s::after { animation: pt-fill 420ms var(--w-ease-ui) var(--d) both; }
+  .pt.is-in .pt__node i { animation: pt-pop 360ms var(--w-ease-ui) var(--d) both; }
+  @keyframes pt-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes pt-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .pt.is-in .pt__rail s::after, .pt.is-in .pt__node i { animation: none; }
+  }
+</style>

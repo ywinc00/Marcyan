@@ -1,11 +1,13 @@
 ---
-// Tienda en línea · 01 "Del carrito al pago" (§4.15-3): CabeceraNumerada (solo etiqueta) +
-// BandejaPasos (W-ADV-37) con un objeto de producto por paso: catálogo, pago con el
-// impuesto real de la ciudad y la ficha del pedido "Pagado" (estado en el acento de la
-// página, como en la lista de pedidos del hero: el mismo estado, la misma marca, E-14).
+// Tienda en línea · 01 "Del carrito al pago" (§4.15-3; v2 G04): CabeceraNumerada (solo etiqueta) +
+// BandejaPasos (W-ADV-37) con los objetos nuevos de PasoTienda (producto ilustrado tipo Untitled, cobro
+// con PayPal/Stripe de P06 y raíl de estados tipo Instacart), sin iconos en caja ni precios (§1.6).
+// Debajo, en la misma sección porque es donde la página habla del pedido que te llega (paso 03),
+// "¿Y a ti cómo te llega?": navegador con dos satélites (W-CORE-30, LlegaAviso).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import BandejaPasos from '../../BandejaPasos.astro';
-import MiniTienda from './MiniTienda.astro';
+import PasoTienda from './PasoTienda.astro';
+import LlegaAviso from './LlegaAviso.astro';
 import type { ShopCopy } from '../../../../i18n/w/ecommerce';
 
 interface Props { copy: ShopCopy['pasos']; tax: ShopCopy['tax']; n: number; city: 'houston' | 'miami'; lang?: 'es' | 'en' }
@@ -14,18 +16,38 @@ const { copy, tax, n, city, lang = 'es' } = Astro.props;
 <CabeceraNumerada n={n} label={copy.label} align="center" />
 <div class="ws-gap">
   <BandejaPasos titleHtml={copy.title} lead={copy.lead} steps={copy.steps}>
-    <MiniTienda slot="ui-1" kind="catalogo" tax={tax} city={city} lang={lang} />
-    <MiniTienda slot="ui-2" kind="pago" tax={tax} city={city} lang={lang} />
-    <MiniTienda slot="ui-3" kind="pedido" tax={tax} city={city} lang={lang} />
+    <PasoTienda slot="ui-1" kind="producto" tax={tax} city={city} lang={lang} />
+    <PasoTienda slot="ui-2" kind="pago" tax={tax} city={city} lang={lang} />
+    <PasoTienda slot="ui-3" kind="estado" tax={tax} city={city} lang={lang} />
   </BandejaPasos>
+</div>
+<div class="ws-aviso">
+  <header class="ws-aviso__head" data-w-reveal>
+    <h3 class="ws-aviso__h">{copy.aviso.title}</h3>
+    <p class="ws-aviso__p">{copy.aviso.lead}</p>
+  </header>
+  <LlegaAviso city={city} lang={lang} sr={copy.aviso.sr} />
 </div>
 <style>
   .ws-gap { margin-top: 12px; }
   /* Las tres tarjetas comparten filas (subgrid): la zona de objeto mide lo que la más
-     alta (la del pago) y los títulos de los pasos quedan en la misma línea (W-ADV-37). */
+     alta y los títulos de los pasos quedan en la misma línea (W-ADV-37). */
   @media (--lg) {
     .ws-gap :global(.wd-bp__tray) { grid-template-rows: auto auto auto; row-gap: 0; }
     .ws-gap :global(.wd-bp__card) { display: grid; grid-row: span 3; grid-template-rows: subgrid; row-gap: 0; }
     .ws-gap :global(.wd-bp__obj) { place-items: start center; }
+  }
+  .ws-aviso { margin-top: 112px; }
+  .ws-aviso__head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+  .ws-aviso__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500; text-wrap: balance;
+    font-size: 32px; line-height: 38px; letter-spacing: -.02em; color: var(--w-ink);
+  }
+  .ws-aviso__p { margin: 14px auto 0; max-width: 34rem; font-size: 18px; line-height: 29px; color: var(--w-ink-80); }
+  @media (--lt-md) {
+    .ws-aviso { margin-top: 72px; }
+    .ws-aviso__head { margin-bottom: 36px; }
+    .ws-aviso__h { font-size: 26px; line-height: 32px; }
+    .ws-aviso__p { font-size: 16px; line-height: 26px; }
   }
 </style>

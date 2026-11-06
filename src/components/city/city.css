@@ -480,6 +480,11 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .w-hg3 + .explore__row{margin-top:24px}
 @media (hover:hover) and (pointer:fine){.hx .explore__row a:hover .exic{transform:translateY(-2px);color:var(--accent-gold)}}
 .hx .explore__row a:focus-visible .exic{color:var(--accent-gold)}
+/* flecha de la tarjeta (la tenía producción): la "›" de los sectores, junto al título, sin quitar ancho a la descripción;
+   en táctil, sin hover, el icono va en oro */
+.hx .explore__chev{display:inline-block;margin-left:6px;font-family:var(--font-body);font-size:20px;font-weight:400;line-height:1;vertical-align:-1px;transition:transform var(--w-dur-hover) var(--w-ease-ui)}
+.hx .explore__row a:hover .explore__chev{transform:translateX(3px)}
+@media (hover:none){.hx .explore__row .exic{color:var(--accent-gold)}}
 /* 10 · cierre en dos tarjetas sobre el horizonte encendido */
 .hx .cta{padding-block:96px 112px}
 /* el tramo de servicios conserva su alto: la bandeja ocupa el sitio de las filas y del margen inferior */
@@ -538,6 +543,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .cta{padding-block:24px 24px}
 }
 @media (prefers-reduced-motion:reduce){
-  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev,.hx .explore__row .exic{transition:none}
-  .hx .explore__row a:hover .exic{transform:none}
+  .hx .w-htray__card,.hx .w-htray__chev,.hx .w-hcase,.hx .w-hcase__chev,.hx .w-hwhere__card,.hx .w-hwhere__chev,.hx .explore__row .exic,.hx .explore__chev{transition:none}
+  .hx .explore__row a:hover .exic,.hx .explore__row a:hover .explore__chev{transform:none}
 }

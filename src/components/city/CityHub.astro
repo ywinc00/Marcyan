@@ -275,7 +275,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
       <TresGarantias items={w.garantias.items} class="w-hg3" />
       <ul class="explore__row">
         {explore.map((l: any) => (
-          <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}</b><small>{l.desc}</small></span></a></li>
+          <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}<span class="explore__chev" aria-hidden="true">›</span></b><small>{l.desc}</small></span></a></li>
         ))}
       </ul>
     </div>

@@ -1,0 +1,204 @@
+---
+// ─────────────────────────────────────────────────────────────
+// ConstelacionMarcas · patrón L4 de WorkOS (Atlas "Connected to all your tools", W-ADV-21;
+// C/04-logos-marcas/frames/_atlas__0.jpg y workos/cat/productos-avanzados/atlas/T-tools-*.jpg).
+// design/rediseno-workos-v2.md P06.
+//
+// Composición del original: un abanico de logos en anillos concéntricos SOBRE el objeto central
+// (allí el robot; aquí, por defecto, Marcy en un disco de 72), los anillos de fuera más pequeños,
+// y una línea fina de horizonte a la altura del centro. Casillas redondas blancas #F7F6F2 de 40 px
+// con filo inset 1 px rgba(41,54,61,.07) y logo A COLOR de 18 px (las multicolor en negro).
+//
+// Coreografía (medida en la tira T-tools): cada ~0,9 s se enciende una casilla al azar: escala
+// 1→1,22 en 1,25 s cubic-bezier(.22,1,.36,1) y vuelta, anillo de halo, y una línea teal de 1 px se
+// dibuja hasta el centro (stroke-dashoffset, 500 ms) y se apaga. Se solapan 2-3 a la vez.
+// Bucle (pantalla viva, §1.5) SOLO mientras está a la vista y con la pestaña visible (loop.ts:
+// IntersectionObserver rootMargin 100px, visibilitychange, pausa con puntero/foco dentro, botón
+// de pausa 44×44 porque dura más de 5 s). Obedece además el estado GLOBAL de pausa: evento
+// `w2:pausa` en document ({ detail: { pausado } }) y sessionStorage 'w2:pausa' = '1'; su propio
+// botón lo publica (contrato propuesto hasta que loop.ts lo integre, ver informe P06).
+// Reducir movimiento: quieta con una casilla encendida y su línea (estado con sentido).
+//
+// Solo herramientas que la página ya nombra (§1.4). Solo ids de trazo (las palabras no caben en
+// una casilla redonda). Escala con el ancho (unidades de contenedor), sin JS de medida.
+// ─────────────────────────────────────────────────────────────
+import LogoMarca from './LogoMarca.astro';
+import { MARCAS, esTrazo, type MarcaId } from './datos';
+
+interface Props {
+  ids: MarcaId[];
+  lang?: 'es' | 'en';
+  /** Frase sr-only que resume la pieza (la pieza visual es aria-hidden). */
+  resumen?: string;
+  class?: string;
+}
+const { ids: idsIn, lang = 'es', resumen, class: extra = '' } = Astro.props;
+const ids = idsIn.filter(esTrazo);
+const nombres = ids.map((id) => MARCAS[id].titulo);
+const sr = resumen ?? (lang === 'en' ? `Connects with ${nombres.join(', ')}.` : `Se conecta con ${nombres.join(', ')}.`);
+
+// Lienzo lógico 560×320; el centro del abanico es el centro del disco.
+const W = 560, H = 320, CX = 280, CY = 262, R_DISCO = 36;
+const n = ids.length;
+const anillos: { r: number; k: number; s: number }[] =
+  n <= 6 ? [{ r: 168, k: n, s: 40 }]
+         : [{ r: 136, k: Math.ceil(n * 0.42), s: 40 }, { r: 222, k: n - Math.ceil(n * 0.42), s: 34 }];
+// Abanico de 200° (de 190° a -10°): un poco por debajo del horizonte, como el original.
+const A0 = 190, A1 = -10;
+type Item = { id: MarcaId; x: number; y: number; s: number };
+const items: Item[] = [];
+let idx = 0;
+for (const [ai, a] of anillos.entries()) {
+  for (let j = 0; j < a.k; j++) {
+    // El anillo de fuera va a medio paso del de dentro para que no se alineen en radios.
+    const t = a.k === 1 ? 0.5 : (j + (ai % 2 ? 0.5 : 0)) / (a.k - (ai % 2 ? 0 : 1));
+    const ang = ((A0 + (A1 - A0) * Math.min(1, t)) * Math.PI) / 180;
+    items.push({ id: ids[idx++], x: CX + a.r * Math.cos(ang), y: CY - a.r * Math.sin(ang), s: a.s });
+  }
+}
+// Polvo de estrellas: anillos de puntos de 3 px entre y fuera de los anillos de casillas. Da la
+// densidad del original (sus logos lejanos, pequeños y pálidos) sin inventar herramientas: son
+// puntos, no logos.
+const polvo: { x: number; y: number; o: number }[] = [];
+const rPolvo = anillos.length === 1 ? [[104, 7, .22], [232, 15, .16]] : [[88, 6, .22], [180, 11, .18], [262, 17, .12]];
+for (const [r, k, o] of rPolvo) {
+  for (let j = 0; j < k; j++) {
+    const t = (j + 0.5) / k;
+    const ang = ((A0 + (A1 - A0) * t) * Math.PI) / 180;
+    polvo.push({ x: CX + r * Math.cos(ang), y: CY - r * Math.sin(ang), o });
+  }
+}
+const pct = (v: number, base: number) => `${((v / base) * 100).toFixed(3)}%`;
+const cq = (v: number) => `min(${v}px, ${((v / W) * 100).toFixed(3)}cqw)`;
+const yTop = CY - R_DISCO;
+---
+<div class={`cm ${extra}`.trim()} data-w2-constelacion data-w2-lang={lang}>
+  <p class="cm-sr">{sr}</p>
+  <div class="cm-st" aria-hidden="true" data-nosnippet>
+    <span class="cm-hz"></span>
+    {polvo.map((p) => <span class="cm-d" style={`left:${pct(p.x, W)};top:${pct(p.y, H)};opacity:${p.o}`}></span>)}
+    <svg class="cm-lines" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" focusable="false">
+      {items.map((it, i) => (
+        <line data-i={i} x1={it.x.toFixed(1)} y1={it.y.toFixed(1)} x2={CX} y2={yTop} pathLength="1" />
+      ))}
+    </svg>
+    <ul class="cm-l" role="list">
+      {items.map((it, i) => (
+        <li class="cm-i" data-i={i} style={`left:${pct(it.x, W)};top:${pct(it.y, H)};--s:${cq(it.s)}`}>
+          <span class="cm-c"><LogoMarca id={it.id} size={18} tono="color" titulo="" /></span>
+        </li>
+      ))}
+    </ul>
+    <div class="cm-centro" style={`left:${pct(CX, W)};top:${pct(CY, H)};--s:${cq(R_DISCO * 2)}`}>
+      <slot>
+        <img src="/assets/bot/marcy-mini.webp" width="256" height="256" alt="" loading="lazy" decoding="async" />
+      </slot>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cm { position: relative; width: 100%; max-width: 560px; margin-inline: auto; container-type: inline-size; --marca-tinta: #111; }
+  .cm-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .cm-st { position: relative; width: 100%; aspect-ratio: 560 / 320; }
+
+  /* Horizonte fino a la altura del centro (el original lo lleva bajo el abanico). */
+  .cm-hz {
+    position: absolute; left: 14%; right: 14%; top: calc(81.875% - .5px); height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240, 237, 232, .14) 18%, rgba(240, 237, 232, .14) 82%, transparent);
+  }
+
+  .cm-d { position: absolute; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; border-radius: 50%; background: #F0EDE8; }
+  /* El botón de pausa de loop.ts va a la esquina superior derecha, que el abanico deja vacía. */
+  .cm > :global(.w-loop-pause) { top: 0 !important; right: 0 !important; bottom: auto !important; }
+
+  .cm-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .cm-lines line {
+    stroke: var(--accent-teal, #4fc3a1); stroke-width: 1; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;
+    transition: stroke-dashoffset 500ms cubic-bezier(.22, 1, .36, 1), opacity 400ms linear;
+  }
+  .cm-lines line.is-on { stroke-dashoffset: 0; opacity: .9; transition: stroke-dashoffset 500ms cubic-bezier(.22, 1, .36, 1), opacity 120ms linear; }
+
+  .cm-l { margin: 0; padding: 0; list-style: none; }
+  .cm-i { position: absolute; width: var(--s); height: var(--s); transform: translate(-50%, -50%); }
+  .cm-c {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #F7F6F2;
+    box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .07), 0 1px 2px rgba(0, 0, 0, .35);
+    transition: transform 1250ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .cm-c :global(svg) { width: 45%; height: 45%; }
+  /* Halo: anillo fino que aparece alrededor de la casilla encendida. */
+  .cm-c::before {
+    content: ''; position: absolute; inset: -22%; border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(79, 195, 161, .55), 0 0 0 5px rgba(79, 195, 161, .07);
+    opacity: 0; transform: scale(.85);
+    transition: opacity 600ms linear, transform 1250ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .cm-i.is-on { z-index: 2; }
+  .cm-i.is-on .cm-c { transform: scale(1.22); }
+  .cm-i.is-on .cm-c::before { opacity: 1; transform: scale(1); }
+
+  .cm-centro {
+    position: absolute; width: var(--s); height: var(--s); transform: translate(-50%, -50%);
+    border-radius: 50%; overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, #26302d, #121513 70%);
+    box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .14), 0 10px 30px rgba(0, 0, 0, .5);
+  }
+  .cm-centro :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cm-c, .cm-c::before, .cm-lines line, .cm-lines line.is-on { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from '../loop';
+  // Tiempos medidos en la tira T-tools de Atlas: una casilla cada ~0,9 s, encendida 1,25 s.
+  const TICK = 900, ON = 1250;
+  const KEY = 'w2:pausa', EVT = 'w2:pausa';
+  const leerPausa = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
+  const guardarPausa = (p: boolean) => { try { p ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch { /* sin almacenamiento */ } };
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-w2-constelacion]')) {
+    if (el.dataset.w2Listo) continue;
+    el.dataset.w2Listo = '1';
+    const items = Array.from(el.querySelectorAll<HTMLElement>('.cm-i'));
+    const lines = Array.from(el.querySelectorAll<SVGLineElement>('.cm-lines line'));
+    if (!items.length) continue;
+    const lang = el.dataset.w2Lang === 'en' ? 'en' : 'es';
+    let tick = 0;
+    const offs = new Set<number>();
+    const recientes: number[] = [];
+    const set = (i: number, on: boolean) => { items[i]?.classList.toggle('is-on', on); lines[i]?.classList.toggle('is-on', on); };
+    const encender = () => {
+      const libres = items.map((_, i) => i).filter((i) => !recientes.includes(i));
+      const i = libres[Math.floor(Math.random() * libres.length)] ?? 0;
+      recientes.push(i);
+      if (recientes.length > Math.min(3, items.length - 1)) recientes.shift();
+      set(i, true);
+      const t = window.setTimeout(() => { set(i, false); offs.delete(t); }, ON);
+      offs.add(t);
+    };
+    const ctrl = registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); items.forEach((_, i) => set(i, false)); encender(); tick = window.setInterval(encender, TICK); },
+      // Al parar, lo encendido termina su vuelta (sin saltos).
+      stop: () => { window.clearInterval(tick); },
+      still: () => { window.clearInterval(tick); offs.forEach((t) => window.clearTimeout(t)); offs.clear(); items.forEach((_, i) => set(i, i === 0)); el.classList.add('is-still'); },
+    }, { pauseButton: true, lang, buttonHost: el });
+
+    // Estado global de pausa (§1.5): lo lee al arrancar, lo sigue y su botón lo publica.
+    if (leerPausa()) ctrl.setUserPaused(true);
+    document.addEventListener(EVT, (e) => {
+      const p = !!(e as CustomEvent<{ pausado?: boolean }>).detail?.pausado;
+      ctrl.setUserPaused(p);
+    });
+    el.querySelector<HTMLButtonElement>('.w-loop-pause')?.addEventListener('click', (e) => {
+      const p = (e.currentTarget as HTMLElement).getAttribute('aria-pressed') === 'true';
+      guardarPausa(p);
+      document.dispatchEvent(new CustomEvent(EVT, { detail: { pausado: p } }));
+    });
+  }
+</script>

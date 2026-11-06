@@ -71,7 +71,4 @@ const { eyebrow, h1Html, lead, cards } = Astro.props;
     .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: none; }
   }
   @media (--lt-md) { .ph__cards { margin-top: 48px; } }
-  /* Móvil (rev1 de G09, E-18): la pausa del fondo (44 px, a 24 px del pie de la zona) caía sobre
-     la última línea de la tarjeta Mensual. El hero deja debajo de las tarjetas su hueco. */
-  @media (--lt-md) { .w-hero.ph { padding-bottom: 92px; } }
 </style>

@@ -23,9 +23,11 @@ interface Props {
   tags?: string[];
   /** Tema explícito opcional para la ilustración; si falta, se deriva de tags. */
   topic?: string;
+  /** v3: ruta base de la portada propia del artículo (sin "-<ancho>.webp"); si falta, ilustración de línea. */
+  cover?: string;
   class?: string;
 }
-const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic, class: cls } = Astro.props;
+const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic, cover, class: cls } = Astro.props;
 ---
 <header class:list={['ahero', cls]}>
   {Astro.slots.has('breadcrumb') && (
@@ -54,8 +56,18 @@ const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic,
   )}
 
   <div class="ahero__cover" data-w-in="obj" aria-hidden="true">
-    <div class="ahero__frame">
-      <BlogIllustration topic={topic} tags={tags} class="ahero__illo" />
+    <div class:list={['ahero__frame', cover && 'ahero__frame--img']}>
+      {cover ? (
+        <img
+          class="ahero__img"
+          src={`${cover}-960.webp`}
+          srcset={`${cover}-640.webp 640w, ${cover}-960.webp 960w, ${cover}-1280.webp 1280w`}
+          sizes="(min-width: 1024px) 746px, 100vw"
+          width="1280" height="800" alt="" decoding="async" loading="lazy"
+        />
+      ) : (
+        <BlogIllustration topic={topic} tags={tags} class="ahero__illo" />
+      )}
     </div>
   </div>
 </header>
@@ -138,6 +150,10 @@ const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic,
     opacity: .7;
   }
   .ahero__frame :global(.ahero__illo) { position: relative; width: min(64%, 440px); }
+  /* Portada propia (v3): la imagen manda en su proporción 16:10, sin trama encima. */
+  .ahero__frame--img, .ahero__frame--img.ahero__frame { aspect-ratio: 16 / 10; background: #0f0c09; }
+  .ahero__frame--img::before { display: none; }
+  .ahero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   @media (--lg) {
     .ahero__cover { margin-inline: -33px; }
   }

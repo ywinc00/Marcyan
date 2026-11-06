@@ -15,7 +15,7 @@ const { posts } = Astro.props;
   {posts.map((p) => (
     <li class="bpar__item">
       <a class="bpar__card" href={p.href}>
-        <Portada tags={p.tags} class="bpar__art" />
+        <Portada tags={p.tags} slug={p.href.split('/').pop()} class="bpar__art" />
         <div class="bpar__body">
           {p.tags[0] && <span class="bpar__tag">{p.tags[0]}</span>}
           <h2 class="bpar__title">{p.title}</h2>

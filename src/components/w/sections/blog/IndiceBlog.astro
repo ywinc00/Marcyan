@@ -5,8 +5,8 @@
 // Orden: cabecera compacta → destacada (único contraste) → pareja → 01 listado con filtro
 // (#articulos) → cierre en dos tarjetas (trío contractual una vez) → Contact (#contacto).
 // Sin guías: cabecera → celda punteada → cierre → Contact. Firma: ninguna. Degradado: ninguno.
-// Fondo (v2 §1.3 y §5-5 · G11): hoja oscura F13 (ZonaHoja) bajo la parte de lectura, sin
-// SpaceBackdrop. El BlogListingLd (Blog con sus BlogPosting, orden por fecha) y el BreadcrumbList no cambian.
+// Fondo (v3): vuelve el de la v1 (SpaceBackdrop oro); la hoja pautada F13 de la v2 se retiró
+// (el dueño: «el fondo rayado no se ve bien»). El BlogListingLd (Blog con sus BlogPosting, orden por fecha) y el BreadcrumbList no cambian.
 import Layout from '../../../../layouts/Layout.astro';
 import SiteNav from '../../../layout/SiteNav.astro';
 import SiteFooter from '../../../layout/SiteFooter.astro';
@@ -16,7 +16,7 @@ import BlogListingLd from '../../../seo/BlogListingLd.astro';
 import WStyles from '../../WStyles.astro';
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Cabecera from './Cabecera.astro';
-import ZonaHoja from './ZonaHoja.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
 import Destacada from './Destacada.astro';
 import Pareja from './Pareja.astro';
 import Lista from './Lista.astro';
@@ -97,7 +97,6 @@ const wa = 'https://wa.me/' + num.replace(/\D/g, '');
   <SiteNav nav={lang === 'en' ? clusterNavEn : clusterNav} lang={lang} homeHref={`/${lang}`} currentPath={base} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold">
-    <ZonaHoja lang={lang}>
     <Cabecera h1Html={h1Html} pill={w.pill}>
       <Breadcrumb slot="crumbs" items={breadcrumb} lang={lang} />
     </Cabecera>
@@ -136,7 +135,6 @@ const wa = 'https://wa.me/' + num.replace(/\D/g, '');
         </div>
       </section>
     )}
-    </ZonaHoja>
 
     <section class="w-cell bx-close">
       <div class="w-container" data-w-reveal>
@@ -148,6 +146,7 @@ const wa = 'https://wa.me/' + num.replace(/\D/g, '');
   </main>
 
   <SiteFooter footer={c.footer} lang={lang} />
+  <SpaceBackdrop tone="gold" />
 </Layout>
 
 <style>

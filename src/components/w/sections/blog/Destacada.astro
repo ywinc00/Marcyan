@@ -30,7 +30,7 @@ const { post, team, readMore } = Astro.props;
         <span class="bd__more">{readMore}<span class="bd__chev" aria-hidden="true">›</span></span>
       </div>
     </div>
-    <Portada tags={post.tags} size="feature" class="bd__art" />
+    <Portada tags={post.tags} slug={post.href.split('/').pop()} size="feature" eager class="bd__art" />
   </a>
 </div>
 

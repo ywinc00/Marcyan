@@ -5,7 +5,9 @@
 // Contraste: SOLO la tarjeta "Mensual" del hero (TarjetasModelo); el banner
 // "Combina servicios" va en --w-s1. Firma: ninguna (página de decisión, F-06
 // "cuándo NO"). Degradado: ninguno (W-CONV-12 en oro plano).
-// v2 (G09): fondo temático F10 en el hero (sin SpaceBackdrop), objeto W-CONV-51 junto a la prosa,
+// v3 (precios): vuelve el fondo de la v1 (SpaceBackdrop oro, aurora quieta). El F10 de rayas que
+// parpadean y su malla de rombos se retiran del sitio por decisión del dueño (E-57).
+// v2 (G09): objeto W-CONV-51 junto a la prosa,
 // tarjetas en dos grupos numerados (01 Por proyecto · 02 Mensual) e incluido con iconos-objeto.
 // Orden: cabecera + 2 modelos · prosa de transparencia (verbatim) · 01 lo que
 // cuesta (#precios, 7 TarjetaPrecio) · 02 incluido en toda web · 03 después de
@@ -20,7 +22,7 @@ import SiteNav from '../../../layout/SiteNav.astro';
 import SiteFooter from '../../../layout/SiteFooter.astro';
 import Breadcrumb from '../../../ui/Breadcrumb.astro';
 import Contact from '../../../sections/Contact.astro';
-import Fondo from '../../fondos/Fondo.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
 import OfferCatalogLd from '../../../seo/OfferCatalogLd.astro';
 import WStyles from '../../WStyles.astro';
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
@@ -119,12 +121,9 @@ const despuesCols = t.despues.cols.map((col) => ({
   <SiteNav nav={nav} lang={lang} homeHref={lang === 'en' ? '/en' : '/es'} currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold">
-    <div class="wf-zona">
-      <Fondo tema="F10" lang={lang} texto="centro" />
-      <HeroPrecios eyebrow={t.eyebrow} h1Html={p.hero.h1} lead={t.lead} cards={cards as any}>
-        <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
-      </HeroPrecios>
-    </div>
+    <HeroPrecios eyebrow={t.eyebrow} h1Html={p.hero.h1} lead={t.lead} cards={cards as any}>
+      <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
+    </HeroPrecios>
 
     {/* Por qué lo publicamos: texto VERBATIM (transparency), titular a dos tonos. */}
     <section class="w-cell" aria-labelledby="transparencia">
@@ -238,6 +237,8 @@ const despuesCols = t.despues.cols.map((col) => ({
     <Contact contact={c.contact} />
   </main>
 
+  <SpaceBackdrop tone="gold" />
+
   <SiteFooter footer={c.footer} lang={lang} />
 </Layout>
 
@@ -310,10 +311,4 @@ const despuesCols = t.despues.cols.map((col) => ({
      tarjeta como el panel gris de WorkOS, con divisoria de 1 px. Sin brillos ni degradados. */
   .pv-card :global(.tp__panel) { background: var(--w-s3); }
   @media (--lg) { .pv-card :global(.tp__panel) { border-left-color: var(--w-line-strong); } }
-  /* rev2 de G09 (menor): a 1440×900 la pausa del fondo (abajo a la derecha de la zona) quedaba
-     pegada al bocadillo del botón de Marcy y medio bajo el borde. En escritorio sube a la línea
-     de las migas, en el borde derecho del contenedor (centrada con ellas). */
-  @media (--lg) {
-    .wf-zona > :global(.wf-pausa) { top: calc(var(--w-hero-top) - 9px); bottom: auto; }
-  }
 </style>

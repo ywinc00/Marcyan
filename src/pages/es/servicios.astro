@@ -1,6 +1,6 @@
 ---
-// v2 (G09): fondo temático F10 (franjas) en el hero en lugar de SpaceBackdrop (una atmósfera
-// por página, §1.3) y bento con objetos nuevos (UnCapitulo).
+// v3: vuelve el fondo de la v1 (SpaceBackdrop oro); el F10 de rayas que parpadean se retira del
+// sitio (dueño, E-57). v2 (G09): bento con objetos nuevos (UnCapitulo).
 // CATÁLOGO DE SERVICIOS · /es/servicios, hub de servicios v3 (design/rediseno-workos.md §4.3).
 // Contraste: el capítulo "un capítulo por servicio" (.w-contrast). Firma: los interruptores
 // del hero. Degradado: el titular del cierre.
@@ -16,7 +16,7 @@ import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Contact from '../../components/sections/Contact.astro';
 import OfferCatalogLd from '../../components/seo/OfferCatalogLd.astro';
 import ItemListLd from '../../components/seo/ItemListLd.astro';
-import Fondo from '../../components/w/fondos/Fondo.astro';
+import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
 import WStyles from '../../components/w/WStyles.astro';
 import CabeceraNumerada from '../../components/w/CabeceraNumerada.astro';
 import Inventario3Etapas from '../../components/w/Inventario3Etapas.astro';
@@ -83,13 +83,10 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 
   <SiteNav nav={clusterNav} lang={lang} homeHref="/es" currentPath={Astro.url.pathname} />
 
-  <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="servicios" data-w-fondo="franjas">
-    <div class="wf-zona">
-    <Fondo tema="F10" lang={lang} texto="izquierda" />
+  <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="servicios">
     <Hero h1Html={s.hero.h1} eyebrow={t.eyebrow} tail={t.tail} lead={t.lead} items={switches} lang={lang}>
       <Breadcrumb slot="crumbs" items={s.breadcrumb} lang={lang} />
     </Hero>
-    </div>
 
     <section class="w-cell">
       <div class="w-container" data-w-reveal>
@@ -167,6 +164,8 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
 
     <Contact contact={c.contact} />
   </main>
+
+  <SpaceBackdrop tone="gold" />
 
   <SiteFooter footer={c.footer} />
 </Layout>

@@ -213,6 +213,10 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
     :global(:root[data-ds="v3"]) .wsb-story { padding-top: 0; }
     .wsb-story :global(.wsb-chip.chipia--sello) { --k: calc(150 / 220); }
   }
+  /* Portátil muy bajo (1280×720): aún faltaban unos 24 px; el hero se acorta otros 24 arriba. */
+  @media (min-width: 768px) and (max-height: 740px) {
+    :global(:root[data-ds="v3"]) .wsb-hero { padding-top: calc(var(--nav-h) + 12px); }
+  }
   .wsb-prose { max-width: 680px; margin: 56px auto 0; }
   .wsb-prose p { margin: 0 0 20px; font: 400 18px/1.65 var(--font-body); color: var(--w-ink-80); }
   .wsb-prose p:last-child { margin-bottom: 0; }

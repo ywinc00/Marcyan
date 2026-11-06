@@ -3,6 +3,8 @@
 // Arriba, franjas pixeladas de líneas finas y bloques de datos que parpadean en
 // escalones (6 s, steps); abajo, rejilla isométrica. "Todo medido". Solo opacity.
 // Quieto: los bloques encendidos a su intensidad base.
+// Por debajo de 1024 el texto centrado llena el ancho: los bloques se comprimen en la
+// franja entre la barra y el antetítulo (AA en el peor instante; rev2 I-2).
 interface Props { estilos?: boolean; eco?: boolean }
 const { estilos = true, eco = false } = Astro.props;
 // Bloques deterministas (posición en % para que llenen cualquier ancho).
@@ -30,6 +32,7 @@ const CSS = `
   }
   .wf-fr__bloques i {
     position: absolute; height: 3px; background: rgb(var(--wf-a)); opacity: var(--o);
+    top: calc(var(--t) * 1px);
     animation: wf-fr-parpadea 6s steps(3, jump-none) infinite;
   }
   @keyframes wf-fr-parpadea { 0%, 100% { opacity: var(--o); } 50% { opacity: .02; } }
@@ -41,6 +44,14 @@ const CSS = `
     -webkit-mask-image: linear-gradient(0deg, #000, transparent);
             mask-image: linear-gradient(0deg, #000, transparent);
   }
+  @media (max-width: 1023.98px) {
+    .wf--hero .wf-fr__bloques {
+      height: calc(var(--w-hero-top) - var(--nav-h) - 22px);
+      -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+              mask-image: linear-gradient(180deg, #000 55%, transparent);
+    }
+    .wf--hero .wf-fr__bloques i { top: calc(var(--t) / 176 * (var(--w-hero-top) - var(--nav-h) - 25px)); }
+  }
   @media (max-width: 767.98px) {
     .wf-fr__bloques i:nth-child(2n) { display: none; }
   }
@@ -51,7 +62,7 @@ const CSS = `
   <div class="wf-fr__lineas"></div>
   {!eco && (
     <div class="wf-fr__bloques">
-      {bloques.map((b) => <i style={`top:${b.top}px;left:${b.left.toFixed(1)}%;width:${b.w}px;--o:${b.o};animation-delay:-${b.d}s`}></i>)}
+      {bloques.map((b) => <i style={`--t:${b.top};left:${b.left.toFixed(1)}%;width:${b.w}px;--o:${b.o};animation-delay:-${b.d}s`}></i>)}
     </div>
   )}
   {!eco && <div class="wf-fr__iso"></div>}

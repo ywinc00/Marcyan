@@ -22,7 +22,7 @@ import type { TemaFondo, BarrioFondo } from '../../components/w/landing/types';
 
 interface Demo {
   tema: TemaFondo; codigo: string; pagina: string; tono: 'gold' | 'teal';
-  texto: 'centro' | 'izquierda'; eyebrow: string; h1: string; lead: string;
+  texto: 'centro' | 'izquierda' | 'ambos'; eyebrow: string; h1: string; lead: string;
   barrio?: BarrioFondo; obj: 'ancho' | 'lado' | 'avatar' | 'plano'; vars?: string;
 }
 const demos: Demo[] = [
@@ -31,7 +31,7 @@ const demos: Demo[] = [
   { tema: 'radar', codigo: 'F03', pagina: 'SEO local', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:481px;--wf-foco-y-movil:755px;--wf-marca-y-movil:452px', eyebrow: 'SEO local', h1: 'SEO local en Houston', lead: 'Que aparezcas en Google Maps y en las búsquedas de tu zona cuando un cliente te necesita.' },
   { tema: 'hilos', codigo: 'F04', pagina: 'IA conversacional', tono: 'teal', texto: 'centro', obj: 'avatar', vars: '--wf-obj:535px;--wf-obj-movil:535px', eyebrow: 'IA conversacional', h1: 'Asistente de IA para tu negocio en Houston', lead: 'Tu recepcionista que no duerme: contesta tus mensajes, agenda citas y te pasa lo que necesita una persona.' },
   { tema: 'placa', codigo: 'F05', pagina: 'IA para pymes', tono: 'teal', texto: 'izquierda', obj: 'lado', vars: '--mf-h:580px', eyebrow: 'IA para pymes', h1: 'IA para tu Negocio', lead: 'Tu negocio contesta aunque estés cerrado: mensajes, citas y preguntas, en español y en inglés.' },
-  { tema: 'construccion', codigo: 'F06', pagina: 'Branding', tono: 'gold', texto: 'izquierda', obj: 'plano', eyebrow: 'Branding', h1: 'Diseño de logo y marca en Houston', lead: 'Un logo y una identidad que se reconocen de lejos: en tu letrero, tu camioneta y tu Instagram.' },
+  { tema: 'construccion', codigo: 'F06', pagina: 'Branding', tono: 'gold', texto: 'ambos', obj: 'plano', eyebrow: 'Branding', h1: 'Diseño de logo y marca en Houston', lead: 'Un logo y una identidad que se reconocen de lejos: en tu letrero, tu camioneta y tu Instagram.' },
   { tema: 'plano', codigo: 'F07', pagina: 'Sectores', tono: 'gold', texto: 'izquierda', obj: 'lado', vars: '--mf-h:384px', eyebrow: 'Contratistas', h1: 'Sitios web para contratistas en Houston', lead: 'Una web que enseña tus trabajos, pide presupuestos y suena a tu oficio, en español y en inglés.' },
   { tema: 'calles', codigo: 'F08', pagina: 'Barrios (Katy, vías reales)', tono: 'gold', texto: 'centro', obj: 'ancho', barrio: 'katy', eyebrow: 'Katy', h1: 'Diseño web en Katy, para tu negocio local', lead: 'Webs para negocios de Katy que quieren que los vecinos los encuentren primero.', vars: '--wf-marca-y-movil:466px' },
   { tema: 'tunel', codigo: 'F09', pagina: 'SEO para IA (eco si hay TunelRejilla)', tono: 'teal', texto: 'centro', obj: 'ancho', eyebrow: 'SEO para IA', h1: 'Que ChatGPT te recomiende a ti', lead: 'Preparamos tu web y tu ficha para que los asistentes de IA te entiendan y te nombren cuando alguien pregunta.' },
@@ -107,6 +107,18 @@ const demos: Demo[] = [
   .mf__texto { display: flex; flex-direction: column; min-width: 0; }
   .mf__texto--centro { align-items: center; text-align: center; max-width: 768px; margin-inline: auto; }
   .mf__texto--izquierda { align-items: flex-start; text-align: left; max-width: 600px; }
+  /* Como HeroBranding: titular a la izquierda, bajada y botones a la derecha, filete debajo. */
+  .mf__texto--ambos { align-items: flex-start; text-align: left; padding-bottom: 40px; border-bottom: 1px solid var(--w-line); }
+  @media (min-width: 1024px) {
+    .mf__texto--ambos {
+      display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: 64px;
+      align-items: end; padding-bottom: 72px;
+    }
+    .mf__texto--ambos .mf__top { grid-column: 1; grid-row: 1; }
+    .mf__texto--ambos [data-mf-h1] { grid-column: 1; grid-row: 2; max-width: 640px; }
+    .mf__texto--ambos .mf__lead { grid-column: 2; grid-row: 1; margin-top: 0; }
+    .mf__texto--ambos .mf__acc { grid-column: 2; grid-row: 2; }
+  }
   .mf__top { margin-bottom: var(--w-gap-eyebrow, 16px); }
   .mf__lead { margin-top: 24px; }
   .mf__acc { display: flex; flex-wrap: wrap; align-items: center; justify-content: inherit; gap: 16px 24px; margin-top: 32px; }

@@ -31,10 +31,16 @@ function trazas(hw: number, hh: number, movil: boolean) {
   for (let i = 0; i < n; i++) {
     const x0 = -((n - 1) * paso) / 2 + i * paso;
     for (const s of [-1, 1]) {
-      // En móvil las de arriba son cortas: sus pads quedan en el hueco entre el texto y el objeto.
+      // En móvil las de arriba son cortas y bajas: suben 6-12 px, giran y acaban a 16-20 px
+      // del objeto, así quedan 20 px o más de aire con los botones (hueco de 40 px a 390).
       const corta = movil && s < 0;
-      const y1 = s * (hh + (corta ? 12 + ((i * 7) % 14) : 34 + ((i * 23) % 50))), dx = (i % 2 ? 1 : -1) * (corta ? 44 : 30);
-      add([[x0, s * hh], [x0, y1], [x0 + dx, y1 + s * (corta ? 18 : 30)], [x0 + dx, s * (hh + (corta ? 46 + ((i * 11) % 30) : movil ? 260 : 420))]]);
+      if (corta) {
+        const y1 = -(hh + 6 + ((i * 5) % 7)), dx = (i % 2 ? 1 : -1) * (26 + ((i * 7) % 12));
+        add([[x0, -hh], [x0, y1], [x0 + dx, -(hh + 16 + ((i * 3) % 5))], [x0 + dx + Math.sign(dx) * 22, -(hh + 16 + ((i * 3) % 5))]]);
+        continue;
+      }
+      const y1 = s * (hh + 34 + ((i * 23) % 50)), dx = (i % 2 ? 1 : -1) * 30;
+      add([[x0, s * hh], [x0, y1], [x0 + dx, y1 + s * 30], [x0 + dx, s * (hh + (movil ? 260 : 420))]]);
     }
   }
   return out;

@@ -125,7 +125,7 @@ export interface KindSpec {
    */
   fondoOpciones?: (ctx: LandingCtx) => {
     eco?: boolean;
-    texto?: 'centro' | 'izquierda';
+    texto?: 'centro' | 'izquierda' | 'ambos';
     barrio?: BarrioFondo;
     vars?: string;
   };

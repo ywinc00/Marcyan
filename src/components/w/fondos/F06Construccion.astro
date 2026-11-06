@@ -3,6 +3,12 @@
 // Círculos, diagonales, rectángulo y arco áureos con rótulos "φ 1.618" y "r 185",
 // que se DIBUJAN una vez (3,2 s, stroke-dashoffset) al entrar en vista y quedan.
 // Foco a la derecha del titular (sobre el objeto, que tapa la mitad baja).
+// Modo 'ambos' (el hero REAL de branding: titular a la izquierda, bajada y botones a la
+// derecha, filete y plano debajo): el centro de la construcción se apoya en el filete,
+// en el hueco entre columnas; el filete hace de línea base (sin horizontal propia ni
+// caja que lo doble) y las placas de noche de Fondo dejan limpias las dos columnas.
+// Apilado (< 1024): el centro baja tras el plano y nada se dibuja por encima del final
+// de los botones (--wf-limpio-movil): los arcos asoman entre los botones y el plano.
 // Quieto (reducir movimiento / eco): dibujado entero.
 interface Props { estilos?: boolean; eco?: boolean }
 const { estilos = true, eco = false } = Astro.props;
@@ -27,9 +33,31 @@ const CSS = `
     animation: wf-c-rotulo .6s 2.6s ease-out both;
   }
   @keyframes wf-c-rotulo { from { opacity: 0; } to { opacity: 1; } }
+  /* Hero con texto a los dos lados (branding). */
+  .wf--hero.wf--ambos .wf-c {
+    --fx: var(--wf-foco-x, 50%); --fy: var(--wf-foco-y, clamp(414px, 380px + 2.5vw, 444px));
+    -webkit-mask-image: linear-gradient(180deg, transparent var(--wf-limpio, calc(var(--w-hero-top) + 24px)), #000 calc(var(--wf-limpio, calc(var(--w-hero-top) + 24px)) + 40px));
+            mask-image: linear-gradient(180deg, transparent var(--wf-limpio, calc(var(--w-hero-top) + 24px)), #000 calc(var(--wf-limpio, calc(var(--w-hero-top) + 24px)) + 40px));
+  }
+  .wf--hero.wf--ambos .wf-c__svg { transform: scale(var(--wf-c-escala, .82)); transform-origin: 750px 560px; }
+  .wf--hero.wf--ambos :is(.wf-c__h, .wf-c__caja) { display: none; }
+  .wf--hero.wf--ambos .wf-c__svg text { font-size: 13px; }
+  /* Rótulos en la franja entre el filete y el plano: fuera de las cajas de texto. */
+  .wf--hero.wf--ambos .wf-c__phi { transform: translateY(-28px); }
+  .wf--hero.wf--ambos .wf-c__r { transform: translateY(236px); }
+  @media (max-width: 1023.98px) {
+    .wf--hero.wf--ambos .wf-c {
+      --fx: var(--wf-foco-x-movil, 50%); --fy: var(--wf-foco-y-movil, 650px);
+      -webkit-mask-image: linear-gradient(180deg, transparent var(--wf-limpio-movil, 482px), #000 calc(var(--wf-limpio-movil, 482px) + 28px));
+              mask-image: linear-gradient(180deg, transparent var(--wf-limpio-movil, 482px), #000 calc(var(--wf-limpio-movil, 482px) + 28px));
+    }
+    .wf--hero.wf--ambos .wf-c__svg { --wf-c-escala: .75; }
+    .wf--hero.wf--ambos .wf-c__svg text { display: none; }
+  }
   @media (max-width: 767.98px) {
     .wf-c, .wf--centro .wf-c { --fx: var(--wf-foco-x-movil, 50%); --fy: var(--wf-foco-y-movil, 360px); }
-    .wf-c__svg { transform: scale(.62); }
+    .wf--hero.wf--ambos .wf-c { --fy: var(--wf-foco-y-movil, 616px); }
+    .wf-c__svg, .wf--hero.wf--ambos .wf-c__svg { transform: scale(.62); }
     .wf-c__svg :is(line, circle, rect, path) { stroke-width: 1.6; }
     .wf-c__svg text { display: none; }
   }
@@ -41,7 +69,7 @@ const CSS = `
     <g class="wf-c__d">
       <line x1="265" y1="74" x2="1235" y2="674" />
       <line x1="1235" y1="74" x2="265" y2="674" />
-      <line x1="0" y1="560" x2="1500" y2="560" />
+      <line class="wf-c__h" x1="0" y1="560" x2="1500" y2="560" />
       <line x1="750" y1="0" x2="750" y2="1000" />
     </g>
     <g class="wf-c__t">
@@ -49,11 +77,11 @@ const CSS = `
       <circle cx="750" cy="560" r="185" pathLength="1" style="animation-delay:.15s" />
       <circle cx="935" cy="560" r="115" pathLength="1" style="animation-delay:.3s" />
       <circle cx="565" cy="560" r="115" pathLength="1" style="animation-delay:.3s" />
-      <rect x="265" y="74" width="970" height="600" pathLength="1" style="animation-delay:.45s" />
+      <rect class="wf-c__caja" x="265" y="74" width="970" height="600" pathLength="1" style="animation-delay:.45s" />
       <line x1="864" y1="74" x2="864" y2="674" pathLength="1" style="animation-delay:.6s" />
       <path d="M864 674A371 371 0 0 1 1235 303" pathLength="1" style="animation-delay:.75s" />
     </g>
-    {!eco && <text x="874" y="640">φ 1.618</text>}
-    {!eco && <text x="760" y="364">r 185</text>}
+    {!eco && <text class="wf-c__phi" x="874" y="640">φ 1.618</text>}
+    {!eco && <text class="wf-c__r" x="760" y="364">r 185</text>}
   </svg>
 </div>

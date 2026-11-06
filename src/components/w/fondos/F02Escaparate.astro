@@ -34,6 +34,15 @@ const CSS = `
     position: absolute; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, rgba(var(--wf-a), .26) 18%, rgba(var(--wf-a), .26) 82%, transparent);
   }
+  .wf-e__balda--1 { top: var(--wf-balda-1, 61%); }
+  .wf-e__balda--2 { top: var(--wf-balda-2, 73%); }
+  /* PC: el hero es partido y el texto llega hasta los botones; las baldas van DEBAJO,
+     ya en el fundido (por eso más vivas), como la repisa de todo el escaparate. */
+  @media (min-width: 1024px) {
+    .wf-e__balda { background: linear-gradient(90deg, transparent, rgba(var(--wf-a), .5) 18%, rgba(var(--wf-a), .5) 82%, transparent); }
+    .wf-e__balda--1 { top: var(--wf-balda-1, calc(100% - 100px)); }
+    .wf-e__balda--2 { top: var(--wf-balda-2, calc(100% - 58px)); }
+  }
   @keyframes wf-e-respira { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
   @media (max-width: 767.98px) {
@@ -48,6 +57,6 @@ const CSS = `
   <div class="wf-e__haz wf-e__haz--1"><b></b></div>
   <div class="wf-e__haz wf-e__haz--2"><b></b></div>
   <div class="wf-e__haz wf-e__haz--3"><b></b></div>
-  {!eco && <span class="wf-e__balda" style="top:61%"></span>}
-  {!eco && <span class="wf-e__balda" style="top:73%"></span>}
+  {!eco && <span class="wf-e__balda wf-e__balda--1"></span>}
+  {!eco && <span class="wf-e__balda wf-e__balda--2"></span>}
 </div>

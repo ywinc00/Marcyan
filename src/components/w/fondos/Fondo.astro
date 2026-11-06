@@ -18,10 +18,13 @@
 // Vida (§1.5): bucle mientras está a la vista; pausa fuera de vista
 // (IntersectionObserver, rootMargin 100px), con la pestaña oculta y cuando el visitante
 // pulsa el botón "Pausar animación" del objeto del hero (loop.ts, .w-loop-pause dentro
-// de la misma zona): un solo botón para todo el hero. Contrato de pausa GLOBAL
-// reservado (hoy sin productor; quien lo implemente en loop.ts debe usar EXACTAMENTE
-// este): <html data-w-pausa> · sessionStorage['w-pausa'] === '1' · evento `w:pausa`
-// en document con detail { paused: boolean }.
+// de la misma zona): un solo botón para todo el hero. Si el hero NO trae ese botón y el
+// motivo es un bucle (todos salvo F06, que se dibuja una vez en 3,2 s, y F07, quieto),
+// este guion cuelga al final de la zona su propio botón .wf-pausa (mismo aspecto y
+// textos que el de loop.ts; WCAG 2.2.2). Ese botón es el PRODUCTOR del contrato de
+// pausa GLOBAL; quien lo consuma (p. ej. loop.ts) debe usar EXACTAMENTE este:
+// <html data-w-pausa> · sessionStorage['w-pausa'] === '1' · evento `w:pausa` en
+// document con detail { paused: boolean }.
 // Con reducir movimiento: sin animación y en su fotograma quieto con sentido.
 // Animación solo transform / opacity / stroke-dashoffset. SVG en línea, sin
 // imágenes ni lienzos. aria-hidden y pointer-events:none.
@@ -35,6 +38,8 @@
 //   --wf-foco-x / --wf-foco-y (+ -movil)  centro del objeto (F03 radar, F05 placa, F06 construcción)
 //   --wf-marca-x / --wf-marca-y (+ -movil) hueco libre para la marca con sentido (F03 negocio encendido)
 //   --wf-cota1 / --wf-cota2              alto de las cotas de F07 · --wf-nucleo-top / --wf-nucleo-h  núcleo de noche
+//   --wf-placa-top / -h / -a / -b        placas de noche del modo 'ambos' (arriba, alto, ancho de cada una)
+//   --wf-limpio-movil                    F06 con las columnas apiladas: por encima de esta altura no dibuja
 // ─────────────────────────────────────────────────────────────
 import { temaDeFondo, type TemaFondo, type CodigoFondo, type BarrioFondo } from '../landing/types';
 import F01Reticula from './F01Reticula.astro';
@@ -55,8 +60,13 @@ interface Props {
   tema: TemaFondo | CodigoFondo;
   /** Versión quieta al 40 % para el capítulo de contraste (llena su sección). */
   eco?: boolean;
-  /** Lado del bloque de texto del hero: decide dónde va el núcleo de noche y el foco del motivo. */
-  texto?: 'centro' | 'izquierda';
+  /**
+   * Lado del bloque de texto del hero: decide dónde va el núcleo de noche y el foco del
+   * motivo. 'ambos': titular a la izquierda y bajada con botones a la derecha (branding);
+   * lleva una placa de noche tras cada columna y el motivo vive en el hueco central y
+   * bajo el filete.
+   */
+  texto?: 'centro' | 'izquierda' | 'ambos';
   /** Solo F08: barrio con vías reales; sin él, trama abstracta declarada. */
   barrio?: BarrioFondo;
   lang?: 'es' | 'en';
@@ -64,9 +74,9 @@ interface Props {
   style?: string;
 }
 
-const TEXTO_POR_TEMA: Record<TemaFondo, 'centro' | 'izquierda'> = {
+const TEXTO_POR_TEMA: Record<TemaFondo, 'centro' | 'izquierda' | 'ambos'> = {
   reticula: 'centro', escaparate: 'izquierda', radar: 'izquierda', hilos: 'centro',
-  placa: 'izquierda', construccion: 'izquierda', plano: 'izquierda', calles: 'centro',
+  placa: 'izquierda', construccion: 'ambos', plano: 'izquierda', calles: 'centro',
   tunel: 'centro', franjas: 'centro', escaneo: 'centro', hoja: 'centro',
 };
 const TEAL: TemaFondo[] = ['hilos', 'placa', 'tunel'];
@@ -77,6 +87,13 @@ const tema = temaDeFondo(Astro.props.tema);
 const texto = Astro.props.texto ?? TEXTO_POR_TEMA[tema];
 const tono = TEAL.includes(tema) ? 'teal' : 'gold';
 const conNucleo = !eco && NUCLEO.includes(tema);
+const conPlacas = !eco && texto === 'ambos';
+// Motivos en bucle: llevan botón de pausa propio si el hero no trae el suyo.
+const BUCLE: TemaFondo[] = ['reticula', 'escaparate', 'radar', 'hilos', 'placa', 'calles', 'tunel', 'franjas', 'escaneo', 'hoja'];
+const enBucle = !eco && BUCLE.includes(tema);
+const TXT_PAUSA = lang === 'en'
+  ? { pause: 'Pause animation', play: 'Resume animation' }
+  : { pause: 'Pausar animación', play: 'Reanudar animación' };
 
 const MOTIVO = {
   reticula: F01Reticula, escaparate: F02Escaparate, radar: F03Radar, hilos: F04Hilos,
@@ -107,6 +124,8 @@ const JS = `
   if (!fondos.length) return;
   const vista = new WeakMap();
   let pausa = pausaGlobal();
+  // La pausa elegida sigue en la sesión: el atributo global se repone al cargar.
+  if (pausa) document.documentElement.setAttribute('data-w-pausa', '');
   // Botón de pausa del objeto del hero (loop.ts) dentro de la misma zona: pausa también el fondo.
   const pulsado = (el) => {
     const z = el.closest('.wf-zona');
@@ -135,12 +154,45 @@ const JS = `
     const t = e.target;
     if (t && t.closest && t.closest('.w-loop-pause')) sync();
   });
+  // Botón propio (productor del contrato global) en las zonas cuyo hero no trae pausa.
+  const ICON_PAUSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="5" height="18" x="14" y="3" rx="1"/><rect width="5" height="18" x="5" y="3" rx="1"/></svg>';
+  const ICON_PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg>';
+  const botones = [];
+  const pinta = () => {
+    for (const b of botones) {
+      const t = pausa ? b.dataset.play : b.dataset.pause;
+      b.setAttribute('aria-pressed', String(pausa));
+      b.setAttribute('aria-label', t);
+      b.title = t;
+      b.innerHTML = pausa ? ICON_PLAY : ICON_PAUSE;
+    }
+  };
+  const fijaPausa = (p) => {
+    pausa = p;
+    if (p) document.documentElement.setAttribute('data-w-pausa', '');
+    else document.documentElement.removeAttribute('data-w-pausa');
+    try { if (p) window.sessionStorage.setItem(KEY, '1'); else window.sessionStorage.removeItem(KEY); } catch (e) {}
+    document.dispatchEvent(new CustomEvent('w:pausa', { detail: { paused: p } }));
+  };
+  for (const el of fondos) {
+    const z = el.closest('.wf-zona');
+    if (!z || !el.hasAttribute('data-w2-bucle')) continue;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wf-pausa';
+    b.dataset.pause = el.dataset.pausa || 'Pausar animación';
+    b.dataset.play = el.dataset.reanudar || 'Reanudar animación';
+    b.addEventListener('click', () => fijaPausa(!pausa));
+    z.appendChild(b);
+    botones.push(b);
+  }
+  pinta();
   document.addEventListener('w:pausa', (e) => {
     const d = e.detail;
     pausa = d && typeof d.paused === 'boolean' ? d.paused : pausaGlobal();
-    sync();
+    pinta(); sync();
   });
-  new MutationObserver(() => { pausa = pausaGlobal(); sync(); })
+  new MutationObserver(() => { pausa = pausaGlobal(); pinta(); sync(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
   sync();
 })();
@@ -149,8 +201,23 @@ const JS = `
 const CSS = `  /* Montaje: la zona del hero (WLanding) contiene el fondo y mide lo que el hero. */
   .wf-zona { position: relative; isolation: isolate; }
   .wf-zona > :not(.wf) { position: relative; z-index: 1; }
-  /* Un solo motivo por página: fuera las luces de suelo de los heroes de la v1. */
-  .wf-zona :is(.hs__horizon, .wo-fan__stripes, .hb__light) { display: none; }
+  /* Un solo motivo por página: fuera las luces de suelo y los haces de los heroes de la v1
+     (horizonte, franjas del abanico, luz del plano, haces de la tarjeta de contratistas)
+     y el amanecer teal de IA para pymes (acababa en borde recto al pie del hero). */
+  .wf-zona :is(.hs__horizon, .wo-fan__stripes, .hb__light, .wo-to__beams) { display: none; }
+  :root[data-ds] .wf-zona .w-hero.w-dawn { background: none; }
+  /* Pausa propia del fondo (WCAG 2.2.2), con la misma gramática que la de loop.ts. Fuera
+     si el hero ya trae la suya (esa pausa también para el fondo) o sin movimiento. */
+  .wf-zona > .wf-pausa {
+    position: absolute; z-index: 4; bottom: 24px;
+    right: max(16px, calc((100% - var(--container-max)) / 2 + var(--container-pad)));
+    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    padding: 0; cursor: pointer; border-radius: var(--w-r-cell, 8px);
+    border: 1px solid var(--w-line-strong); background: rgba(8, 8, 8, .45);
+    color: var(--w-ink-70, rgba(240, 237, 232, .7));
+  }
+  .wf-zona:has(.w-loop-pause) > .wf-pausa { display: none; }
+  @media (prefers-reduced-motion: reduce) { .wf-zona > .wf-pausa { display: none; } }
   [data-w-eco] { isolation: isolate; }
   [data-w-eco] > :not(.wf) { position: relative; z-index: 1; }
 
@@ -189,6 +256,20 @@ const CSS = `  /* Montaje: la zona del hero (WLanding) contiene el fondo y mide 
     left: calc(var(--wf-l) - 150px); transform: none;
     width: 960px; height: var(--wf-nucleo-h, 600px);
   }
+  /* Texto a los dos lados (branding): una placa de noche tras cada columna, de borde
+     suave; el motivo queda vivo en el hueco central, arriba y bajo el filete. Solo con
+     dos columnas (>= 1024); apiladas, el propio motivo se recorta bajo el texto. */
+  .wf__placa {
+    position: absolute; z-index: 2; display: none;
+    top: var(--wf-placa-top, calc(var(--w-hero-top) + 36px)); height: var(--wf-placa-h, 186px);
+    /* Noche OPACA del fondo de página: con transparencia el borde se adivina como caja. */
+    background: var(--bg-base, #080808); border-radius: 28px;
+    box-shadow: 0 0 34px 26px var(--bg-base, #080808);
+  }
+  /* Anchos de las columnas del hero (7fr / 5fr, hueco de 64 px), con tope. */
+  .wf__placa--a { left: calc(var(--wf-l) - 6px); width: var(--wf-placa-a, min(486px, (100% - 2 * var(--wf-l) - 64px) * 7 / 12)); }
+  .wf__placa--b { right: calc(var(--wf-l) - 6px); width: var(--wf-placa-b, calc((100% - 2 * var(--wf-l) - 64px) * 5 / 12 + 12px)); }
+  @media (min-width: 1024px) { .wf__placa { display: block; } }
   @media (max-width: 767.98px) {
     .wf__nucleo, .wf--izq .wf__nucleo {
       left: 50%; transform: translateX(-50%); width: 150%;
@@ -210,13 +291,18 @@ const CSS = `  /* Montaje: la zona del hero (WLanding) contiene el fondo y mide 
 {estilosBase && <style is:inline set:html={CSS}></style>}
 {estilosBase && <script is:inline type="module" set:html={JS}></script>}
 <div
-  class:list={['wf', `wf--${tono}`, eco ? 'wf--eco' : 'wf--hero', texto === 'izquierda' ? 'wf--izq' : 'wf--centro']}
+  class:list={['wf', `wf--${tono}`, eco ? 'wf--eco' : 'wf--hero', texto === 'izquierda' ? 'wf--izq' : texto === 'ambos' ? 'wf--ambos' : 'wf--centro']}
   data-w2-fondo={tema}
+  data-w2-bucle={enBucle ? '' : undefined}
+  data-pausa={enBucle ? TXT_PAUSA.pause : undefined}
+  data-reanudar={enBucle ? TXT_PAUSA.play : undefined}
   aria-hidden="true"
   style={style}
 >
   <Motivo estilos={estilosMotivo} eco={eco} texto={texto} barrio={barrio} lang={lang} />
   {conNucleo && <div class="wf__nucleo"></div>}
+  {conPlacas && <div class="wf__placa wf__placa--a"></div>}
+  {conPlacas && <div class="wf__placa wf__placa--b"></div>}
 </div>
 
 

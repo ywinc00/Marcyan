@@ -1,7 +1,8 @@
 ---
 // P11 · Escena 03 "Diseño bilingüe" (design/rediseno-workos-v2.md §2 P11).
-// La web de EJEMPLO del salón ("Tu Salón", §1.6: marca inventada con signo propio, paleta de 3 tonos,
-// hero tipográfico + volumen geométrico, sin cuadradito con inicial ni botón a todo el ancho) en un
+// La web de EJEMPLO del salón ("Tu Salón" / "Your Salon", §1.6), con la paleta, el logotipo, el titular y la acción
+// CANÓNICOS de P02a (negocios.ts, ver proceso.ts: SALON_PALETA / SALON_LOGO), para que no haya dos salones distintos;
+// hero tipográfico + volumen geométrico (sin cuadradito con inicial ni botón a todo el ancho), en un
 // navegador dibujado, con el segmentado ES | EN como satélite. Cambia UNA vez al otro idioma y vuelve:
 // el idioma nuevo entra con una cortina que barre de izquierda a derecha con su filo de luz (máscara
 // por translate contrapuesto, §1.8: nunca se ven los dos textos a la vez). Arranca con .is-play en un
@@ -9,15 +10,20 @@
 // Micro-vida (§1.5): el sol del arco respira mientras la línea está a la vista (.is-vista).
 // Mientras P02 (WebEjemplo premium) no esté integrado, la web se dibuja aquí; cuando entre, el
 // director decide si se sustituye por <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
-import { copy, salon, type Lang } from './proceso';
+import { copy, salon, SALON_PALETA as P, SALON_LOGO, type Lang } from './proceso';
 
 interface Props { lang?: Lang; class?: string }
 const { lang = 'es', class: cls } = Astro.props;
 const T = copy[lang].bilingue;
 const otro: Lang = lang === 'es' ? 'en' : 'es';
 const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
+// Logotipo canónico del salón (P02a), del idioma de la PÁGINA en las dos capas (E-24): la marca no se traduce al cambiar la web.
+const [lw, lh, ld] = SALON_LOGO[lang];
+const LOGO_CAP = 12;
+const logoH = +(LOGO_CAP * lh / SALON_LOGO.cap).toFixed(2), logoW = +(logoH * lw / lh).toFixed(2);
+const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.accent};--s-on:${P.onAccent}`;
 ---
-<div class:list={['bi', cls]} aria-hidden="true" data-nosnippet>
+<div class:list={['bi', cls]} style={vars} aria-hidden="true" data-nosnippet>
   <div class="bi__win">
     <div class="bi__chrome">
       <span class="bi__dots"><i></i><i></i><i></i></span>
@@ -29,10 +35,7 @@ const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
         const site = (
           <div class="bi__site" lang={l}>
             <div class="bi__nav">
-              <span class="bi__logo">
-                <svg viewBox="0 0 16 20" width="13" height="16"><path d="M2 19V8a6 6 0 0 1 12 0v11" fill="none" stroke="currentColor" stroke-width="1.5" /><circle cx="8" cy="9" r="2.2" fill="currentColor" /></svg>
-                <span translate="no">TU SALÓN</span>
-              </span>
+              <span class="bi__logo"><svg viewBox={`0 0 ${lw} ${lh}`} width={logoW} height={logoH}><path d={ld} fill="currentColor" /></svg></span>
               <span class="bi__links">{S.nav.map((n) => <span>{n}</span>)}<b>{l.toUpperCase()}</b></span>
             </div>
             <div class="bi__hero">
@@ -63,8 +66,7 @@ const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
 </div>
 
 <style>
-  .bi { --s-bg: #f4ece4; --s-ink: #2a1d17; --s-acc: #a8502f;
-    position: relative; display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--font-body); }
+  .bi { position: relative; display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--font-body); }
   .bi__win {
     width: 424px; border-radius: var(--w-r-obj, 12px); overflow: hidden; background: #fbfaf8;
     border: 1px solid rgba(14,14,13,.10); box-shadow: 0 30px 60px -22px rgba(0,0,0,.75); transform: translateX(-12px);
@@ -79,27 +81,32 @@ const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
   .bi__la, .bi__wipe { grid-area: 1 / 1; }
   .bi__wipe { position: relative; overflow: hidden; transform: translateX(-101%); }
   .bi__lb { transform: translateX(101%); }
+  /* Las dos capas ocupan el alto de la más alta (el titular EN canónico es más largo): sin franja vacía bajo la capa corta. */
+  .bi__la, .bi__wipe { display: flex; }
+  .bi__lb { flex: 1; display: flex; }
+  .bi__la > .bi__site, .bi__lb > .bi__site { flex: 1; display: flex; flex-direction: column; }
+  .bi__hero { flex: 1; }
   .bi__edge { position: absolute; top: 0; bottom: 0; width: 56px; pointer-events: none; opacity: 0; }
-  .bi__edge--r { right: 0; background: linear-gradient(90deg, rgba(255,250,240,0), rgba(255,250,240,.85)); }
-  .bi__edge--l { left: 0; background: linear-gradient(270deg, rgba(255,250,240,0), rgba(255,250,240,.85)); }
+  .bi__edge--r { right: 0; background: linear-gradient(90deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
+  .bi__edge--l { left: 0; background: linear-gradient(270deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
 
   .bi__site { background: var(--s-bg); color: var(--s-ink); padding: 14px 20px 0; }
   .bi__nav { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; }
-  .bi__logo { display: inline-flex; align-items: center; gap: 8px; color: var(--s-acc); }
-  .bi__logo span { font: 600 11px/1 var(--font-display); letter-spacing: .3em; color: var(--s-ink); }
-  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: #5b4a41; }
+  .bi__logo { display: inline-flex; align-items: center; line-height: 0; color: var(--s-ink); }
+  .bi__logo svg { display: block; overflow: visible; }
+  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: var(--s-ink2); }
   .bi__links b { font: 600 11px/1 var(--font-mono); letter-spacing: .08em; color: var(--s-acc); }
   .bi__hero { display: grid; grid-template-columns: 1fr 120px; gap: 18px; align-items: end; }
   .bi__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 24px; }
   .bi__h { font: 500 36px/.96 var(--font-display); letter-spacing: -.045em; }
-  .bi__sub { font-size: 12px; line-height: 1.4; color: #5b4a41; }
-  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--s-acc); color: #fff8f2; font: 600 12px/1 var(--font-body); }
-  .bi__art { position: relative; height: 176px; border-radius: 60px 60px 0 0; overflow: hidden; background: linear-gradient(180deg, #f2cdb6 0%, #e3a888 55%, #c9744f 100%); }
-  .bi__sun { position: absolute; left: 50%; top: 40px; width: 48px; height: 48px; margin-left: -24px; border-radius: 50%; background: #fff3e8; }
+  .bi__sub { font-size: 12px; line-height: 1.4; color: var(--s-ink2); }
+  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--s-acc); color: var(--s-on); font: 600 12px/1 var(--font-body); }
+  .bi__art { position: relative; height: 176px; border-radius: 60px 60px 0 0; overflow: hidden; background: linear-gradient(180deg, #eef0e8 0%, #c4cbb8 55%, #9ea893 100%); }
+  .bi__sun { position: absolute; left: 50%; top: 40px; width: 48px; height: 48px; margin-left: -24px; border-radius: 50%; background: var(--s-on); }
   .bi__hill { position: absolute; left: -20%; right: -20%; bottom: -60px; height: 110px; border-radius: 50%; background: var(--s-acc); }
-  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid rgba(42,29,23,.14); font-size: 12px; }
+  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid rgba(30,36,32,.16); font-size: 12px; }
   .bi__svc { display: inline-flex; gap: 14px; font-weight: 600; }
-  .bi__hor { font: 500 11px/1 var(--font-mono); color: #5b4a41; white-space: nowrap; }
+  .bi__hor { font: 500 11px/1 var(--font-mono); color: var(--s-ink2); white-space: nowrap; }
 
   /* Segmentado: satélite que asoma por arriba a la derecha de la ventana (gesto W-ADV-58). */
   .bi__seg {

@@ -123,8 +123,9 @@ const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
     .en__q { font-size: 12px; }
     .en__st { font-size: 12px; }
     .en__a { font-size: 12.5px; }
-    .en__src { display: none; }
-    .en__map { position: relative; right: auto; top: auto; width: 206px; justify-self: end; margin-top: -4px; }
+    /* M-2 (r2): la fuente se ve también en móvil; la ficha va DEBAJO de la ventana, sin taparla (E-18). */
+    .en__src { height: 24px; }
+    .en__map { position: relative; right: auto; top: auto; width: 206px; justify-self: end; margin-top: 10px; }
     .en__geo { height: 64px; }
     .en__info { padding: 8px 10px 10px; gap: 3px; }
     .en__name { font-size: 14px; }
@@ -148,6 +149,7 @@ const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
     :global(.lf--compacta) .en__acts { flex-direction: column; align-items: flex-start; gap: 4px; }
     :global(.lf--compacta) .en__cierra { display: none; }
     :global(.lf--compacta) .en__map { margin-top: 0; }
+    :global(.lf--compacta) .en__src { display: none; }
   }
 
   /* ── Coreografía W-CORE-10 (1170 / 2000 / 2330 ms) ── */
@@ -158,7 +160,12 @@ const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
   :global(.is-play) .en__dot svg { animation: en-chk 1300ms linear both; animation-delay: calc(700ms + var(--s) * 830ms); }
   :global(.is-play) .en__a { animation: en-in 440ms var(--w-ease-text, ease) 2330ms both; }
   :global(.is-play) .en__src { animation: en-in 360ms ease 2650ms both; }
-  :global(.is-play) .en__map { animation: en-sat 600ms var(--w-ease-sat, ease) 2600ms both; }
+  /* M-1 (r2): la ficha asoma en silueta hacia los 900 ms (tarjeta opaca, mapa en gris tenue, sin datos) y se
+     completa a los 2600 ms, cuando la respuesta la nombra: la mitad derecha nunca queda vacía. La tarjeta
+     va opaca desde el principio para que la ventana no se transparente por debajo. */
+  :global(.is-play) .en__map { animation: en-sat 3200ms var(--w-ease-sat, ease) both; }
+  :global(.is-play) .en__info { animation: en-info 3200ms ease both; }
+  :global(.is-play) .en__geo > svg:first-child { animation: en-geo 3200ms ease both; }
   :global(.is-play) .en__route { animation: en-route 900ms var(--w-ease-ui, ease) 3000ms both; }
   :global(.is-play) .en__pin { animation: en-pin 520ms var(--w-ease-text, ease) 3700ms both; }
   @keyframes en-win { from { opacity: 0; translate: 0 10px; scale: .98; } }
@@ -169,7 +176,13 @@ const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
     35% { background: #c9c5bd; transform: scale(1); } 40%, 100% { background: #8a6a2c; transform: scale(1); }
   }
   @keyframes en-chk { 0%, 36% { opacity: 0; transform: scale(.5); } 44%, 100% { opacity: 1; transform: none; } }
-  @keyframes en-sat { from { opacity: 0; transform: translateX(-20px) translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes en-sat {
+    0%, 22% { opacity: 0; transform: translateX(-20px) translateY(10px); }
+    36%, 81% { opacity: 1; transform: translateX(-8px) translateY(4px); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes en-info { 0%, 81% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes en-geo { 0%, 81% { opacity: .4; filter: grayscale(1); } 100% { opacity: 1; filter: none; } }
   @keyframes en-route { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   @keyframes en-pin { 0% { opacity: 0; transform: translateY(-8px); } 60% { opacity: 1; transform: translateY(1px); } 100% { opacity: 1; transform: none; } }
   /* Micro-vida a la vista: cursor (1,06 s, steps) y punto "Abierto" (2 s). */
@@ -180,7 +193,7 @@ const negocio = lang === 'en' ? 'Your Business' : 'Tu Negocio';
   @keyframes en-live { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
   @media (prefers-reduced-motion: reduce) {
     :global(.is-play) .en__main, :global(.is-play) .en__q, :global(.is-play) .en__st, :global(.is-play) .en__dot, :global(.is-play) .en__dot svg,
-    :global(.is-play) .en__a, :global(.is-play) .en__src, :global(.is-play) .en__map, :global(.is-play) .en__route, :global(.is-play) .en__pin,
+    :global(.is-play) .en__a, :global(.is-play) .en__src, :global(.is-play) .en__map, :global(.is-play) .en__info, :global(.is-play) .en__geo > svg:first-child, :global(.is-play) .en__route, :global(.is-play) .en__pin,
     .en__caret, .en__open i { animation: none !important; }
     .en__as { transition: none; }
   }

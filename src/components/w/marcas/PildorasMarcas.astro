@@ -1,0 +1,198 @@
+---
+// ─────────────────────────────────────────────────────────────
+// PildorasMarcas · patrón L3 de WorkOS (píldoras de compatibilidad bajo el chip, W-HOME-13;
+// C/02-chip-marca/pildoras.jpg). design/rediseno-workos-v2.md P06.
+//
+// Las palabras (ChatGPT) van al 80 % en las píldoras de solo logo y al 66 % junto a nombres (allí la
+// palabra ES el nombre y, en crema sólida 600, pesaba más que los nombres al 62 %).
+//
+// Sin etiquetas y sin nombres (variante B): todas las filas van en UNA lista con saltos. En escritorio
+// salta donde dicen las filas (n y n-1, medio paso); en móvil (≤ 640 px) salta en filas equilibradas
+// de máx. 4 que alternan larga/corta (11 → 4/3/4), así nunca queda una fila huérfana.
+// Píldoras de 56 px, radio 100, fondo --bg-card, filo 1 px crema al 6 %, padding 0×28; logo
+// MONOCROMO crema sólido (sin opacidad) de 22-31 px normalizado a ojo (factor óptico de datos.ts)
+// y nombre opcional 15/500 al 62 %. Filas centradas: con filas de n y n-1 píldoras la 2.ª queda
+// desplazada medio paso, como en el original. Etiqueta de fila mono 11 al 60 %
+// ("PIENSA CON", "MONTADA SOBRE", "CONTESTA EN", "TE ENCUENTRAN EN"). Sin enlaces.
+//
+// Entrada: fundido escalonado de 60 ms por píldora.
+//   encender="evento" (por defecto) → espera el evento `w2:encender` despachado en la pieza o en
+//     cualquier ancestro (el chip de P07 lo lanza a 1600 ms). Red de seguridad: si nadie lo lanza,
+//     se encienden solas 3 s después de entrar en vista.
+//   encender="vista" → al entrar en vista (umbral 20 %).
+// Sin JS o con reducir movimiento: visibles desde el primer pintado.
+// ─────────────────────────────────────────────────────────────
+import LogoMarca from './LogoMarca.astro';
+import { MARCAS, type MarcaId } from './datos';
+
+export interface FilaPildoras {
+  etiqueta?: string;
+  ids: MarcaId[];
+}
+interface Props {
+  filas: FilaPildoras[];
+  /** Escribe el nombre junto al logo (las palabras ChatGPT/Bing/Apple Maps ya son su nombre). */
+  nombres?: boolean;
+  encender?: 'evento' | 'vista';
+  /** Alto base del logo antes del factor óptico (22-31). */
+  alto?: number;
+  /** Nombre visible por id cuando el copy de la página lo dice de otra forma (p. ej. "Meta AI", "Gemini"). */
+  rotulos?: Partial<Record<MarcaId, string>>;
+  class?: string;
+}
+const { filas, nombres = true, encender = 'evento', alto = 24, rotulos = {}, class: extra = '' } = Astro.props;
+const h = Math.max(22, Math.min(31, alto));
+let n = 0;
+const palabraSize = (conNombres: boolean) => Math.round(h * (conNombres ? 0.66 : 0.8));
+
+// Variante B (solo logos, sin etiquetas): una lista con saltos de escritorio y de móvil.
+const plano = !nombres && filas.every((f) => !f.etiqueta);
+const todos = plano ? filas.flatMap((f) => f.ids) : [];
+const saltosPc = new Set<number>();
+if (plano) { let acc = 0; for (const f of filas.slice(0, -1)) { acc += f.ids.length; saltosPc.add(acc); } }
+const saltosMovil = new Set<number>();
+if (plano) {
+  const N = todos.length, r = Math.ceil(N / 4), base = Math.floor(N / r);
+  let extra = N % r, acc = 0;
+  // Las filas pares se llevan las sobrantes: larga/corta/larga (medio paso entre filas).
+  const largos = Array.from({ length: r }, (_, i) => base + (i % 2 === 0 && extra > 0 ? (extra--, 1) : 0));
+  while (extra > 0) { for (let i = 0; i < r && extra > 0; i++) if (largos[i] === base) { largos[i]++; extra--; } }
+  for (const l of largos.slice(0, -1)) { acc += l; saltosMovil.add(acc); }
+}
+---
+<div class={`pm ${extra}`.trim()} data-w2-pildoras data-w2-encender={encender}>
+  {plano && (
+    <ul class="pm-lista pm-lista--plana" role="list">
+      {todos.map((id, i) => {
+        const m = MARCAS[id];
+        const br = [saltosPc.has(i) ? 'pm-br--pc' : '', saltosMovil.has(i) ? 'pm-br--m' : ''].filter(Boolean).join(' ');
+        return (
+          <>
+            {br && <li class={`pm-br ${br}`} role="presentation" aria-hidden="true"></li>}
+            <li class="pm-p" style={`--i:${i}`}><LogoMarca id={id} size={m.tipo === 'texto' ? palabraSize(false) : h} tono="mono" /></li>
+          </>
+        );
+      })}
+    </ul>
+  )}
+  {!plano && filas.map((f) => (
+    <div class="pm-fila">
+      {f.etiqueta && <p class="pm-et" style={`--i:${n}`}>{f.etiqueta}</p>}
+      <ul class="pm-lista" role="list">
+        {f.ids.map((id) => {
+          const m = MARCAS[id];
+          const conNombre = nombres && m.tipo === 'trazo';
+          const i = n++;
+          return (
+            <li class="pm-p" style={`--i:${i}`}>
+              {conNombre
+                ? <><LogoMarca id={id} size={h} tono="mono" titulo="" /><span class="pm-n">{rotulos[id] ?? m.titulo}</span></>
+                : <LogoMarca id={id} size={m.tipo === 'texto' ? palabraSize(nombres) : h} tono="mono" />}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  ))}
+</div>
+
+<style>
+  .pm { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+  .pm:has(.pm-et) { gap: 24px; }
+  .pm-fila { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 100%; }
+  .pm-et {
+    margin: 0;
+    font-family: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+    font-size: 11px; line-height: 1.2; letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
+    color: var(--w-ink-60, rgba(240, 237, 232, .6));
+  }
+  .pm-lista { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .pm-p {
+    display: inline-flex; align-items: center; gap: 10px;
+    height: 56px; padding: 0 28px;
+    border-radius: 100px;
+    background: var(--bg-card, #141414);
+    border: 1px solid rgba(240, 237, 232, .06);
+    color: #F0EDE8;
+  }
+  .pm-n {
+    font-family: var(--font-display, 'Space Grotesk Variable', system-ui, sans-serif);
+    font-size: 15px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap;
+    color: rgba(240, 237, 232, .62);
+  }
+
+  /* Entrada: solo si el JS la arma (sin JS se ven desde el primer pintado). */
+  .pm.is-armed .pm-p, .pm.is-armed .pm-et { opacity: 0; transform: translateY(6px); }
+  .pm.is-on .pm-et { opacity: 1; transform: none; transition: opacity 420ms var(--w-ease-text, cubic-bezier(.33, 1, .68, 1)), transform 420ms var(--w-ease-text, cubic-bezier(.33, 1, .68, 1)); transition-delay: calc(var(--i) * 60ms); }
+  .pm.is-on .pm-p {
+    opacity: 1; transform: none;
+    transition: opacity 420ms var(--w-ease-text, cubic-bezier(.33, 1, .68, 1)), transform 420ms var(--w-ease-text, cubic-bezier(.33, 1, .68, 1));
+    transition-delay: calc(var(--i) * 60ms);
+  }
+
+  /* Variante B: una lista con saltos (la fila de 0 alto del salto no suma hueco: el aire va en la píldora). */
+  .pm-lista--plana { row-gap: 0; max-width: 100%; }
+  .pm-lista--plana .pm-p { margin-block: 6px; }
+  .pm-br { display: none; flex-basis: 100%; height: 0; margin: 0; padding: 0; }
+  .pm-br--pc { display: block; }
+  @media (max-width: 640px) {
+    .pm-br--pc { display: none; }
+    .pm-br--m { display: block; }
+    .pm-lista--plana .pm-p { margin-block: 4px; }
+  }
+
+  @media (max-width: 560px) {
+    .pm-lista { gap: 8px; }
+    .pm-p { height: 48px; padding: 0 18px; gap: 8px; }
+    .pm-n { font-size: 14px; }
+  }
+  /* Teléfonos estrechos: la fila de 4 con la palabra ChatGPT tiene que caber entera. */
+  @media (max-width: 380px) {
+    .pm-lista--plana { column-gap: 6px; }
+    .pm-lista--plana .pm-p { padding: 0 12px; }
+  }
+  /* Teléfonos estrechos, filas con etiqueta: la de 3 ("Te encuentran en") cabe entera desde 320 px
+     en vez de partirse 2+1 con una píldora huérfana (rev2 P06). Píldora 44, logo 20, nombre 13. */
+  @media (max-width: 400px) {
+    .pm-fila .pm-lista { gap: 6px; }
+    .pm-fila .pm-p { height: 44px; padding: 0 12px; gap: 6px; }
+    .pm-fila .pm-p > :global(svg) { width: 20px; height: 20px; }
+    .pm-fila .pm-n { font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pm.is-armed .pm-p, .pm.is-on .pm-p, .pm.is-armed .pm-et, .pm.is-on .pm-et { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+
+<script>
+  const ENCENDER = 'w2:encender';
+  for (const el of document.querySelectorAll<HTMLElement>('[data-w2-pildoras]')) {
+    if (el.dataset.w2Listo) continue;
+    el.dataset.w2Listo = '1';
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) continue;
+    const modo = el.dataset.w2Encender === 'vista' ? 'vista' : 'evento';
+    el.classList.add('is-armed');
+    let hecho = false;
+    let seguro = 0;
+    const on = () => {
+      if (hecho) return;
+      hecho = true;
+      clearTimeout(seguro);
+      io.disconnect();
+      document.removeEventListener(ENCENDER, onEvt);
+      el.classList.add('is-on');
+    };
+    // El padre lo lanza en sí mismo o en cualquier ancestro de la pieza (o en la propia pieza).
+    const onEvt = (e: Event) => {
+      const t = e.target;
+      if (t instanceof Node && (t === el || t.contains(el) || el.contains(t))) on();
+    };
+    document.addEventListener(ENCENDER, onEvt);
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      if (modo === 'vista') on();
+      else if (!seguro) seguro = window.setTimeout(on, 3000);
+    }, { threshold: 0.2 });
+    io.observe(el);
+  }
+</script>

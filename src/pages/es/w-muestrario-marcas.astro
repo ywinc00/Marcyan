@@ -1,0 +1,152 @@
+---
+// ─────────────────────────────────────────────────────────────
+// MUESTRARIO P06 · logos de plataformas (design/rediseno-workos-v2.md §1.4, §2 y P06).
+// Página INTERNA: noindex. LISTA DE BORRADO OBLIGATORIA ANTES DE CUALQUIER MERGE A main (§1.2).
+// OJO: el plan dice que astro.config filtra /w-muestrario del sitemap, pero el filtro NO existe:
+// esta página sale en sitemap-0.xml siendo noindex, nofollow. Borrarla (o añadir el filtro) es
+// condición de merge.
+// Monta 2 instancias de cada pieza (§1.6: ids únicos comprobables por verify-extra).
+// Los conjuntos de logos de cada demo salen del copy que ya existe en el sitio (IA conversacional:
+// WhatsApp, Instagram, Messenger y Google; tienda: Shopify, Stripe y PayPal; SEO para IA: ChatGPT,
+// Gemini y Meta AI); el registro completo y la constelación de 16 son solo de muestrario.
+// ─────────────────────────────────────────────────────────────
+import Layout from '../../layouts/Layout.astro';
+import WStyles from '../../components/w/WStyles.astro';
+import LogoMarca from '../../components/w/marcas/LogoMarca.astro';
+import PildorasMarcas from '../../components/w/marcas/PildorasMarcas.astro';
+import FilaMarcas from '../../components/w/marcas/FilaMarcas.astro';
+import ConstelacionMarcas from '../../components/w/marcas/ConstelacionMarcas.astro';
+import CasillasMarcas from '../../components/w/marcas/CasillasMarcas.astro';
+import { MARCAS, esTrazo, type MarcaId } from '../../components/w/marcas/datos';
+
+const todos = Object.keys(MARCAS) as MarcaId[];
+const trazos = todos.filter(esTrazo);
+---
+<Layout title="Muestrario de marcas" description="Muestrario interno de logos de plataformas." lang="es" path="/w-muestrario-marcas" noindex ds="v3">
+  <WStyles />
+  <main id="main" class="mm" data-w data-w-tone="teal">
+    <header class="mm-h">
+      <p class="mm-k">Muestrario interno · P06</p>
+      <h1>Logos de plataformas</h1>
+      <p class="mm-lead">Registro, píldoras, fila, constelación y casillas. Trazados de simple-icons 16.36.0 (CC0); las marcas pertenecen a sus dueños y se usan de forma nominativa.</p>
+    </header>
+
+    <section class="mm-s" id="registro" data-mm="registro">
+      <h2>1 · Registro (LogoMarca)</h2>
+      <p class="mm-n">Por fila: mono crema sólida 28 px · color 28 px · baldosa de app 40 px. Las multicolor van en monocromo; ChatGPT, Apple Maps y Bing en palabra.</p>
+      <ul class="mm-reg">
+        {todos.map((id) => (
+          <li>
+            <span class="mm-reg-c"><LogoMarca id={id} size={28} tono="mono" /></span>
+            <span class="mm-reg-c mm-reg-c--p"><LogoMarca id={id} size={28} tono="color" /></span>
+            <span class="mm-reg-c"><LogoMarca id={id} size={40} tono="color" baldosa /></span>
+            <code>{id}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mm-s mm-s--c" id="pildoras" data-mm="pildoras">
+      <h2>2 · Píldoras (L3)</h2>
+      <p class="mm-n">A · bajo el chip, con etiquetas. Se encienden con el evento w2:encender (botón de prueba).</p>
+      <div class="mm-stage" id="mm-chip">
+        <PildorasMarcas rotulos={{ googlegemini: 'Gemini', meta: 'Meta AI' }} filas={[
+          { etiqueta: 'Piensa con', ids: ['claude'] },
+          { etiqueta: 'Contesta en', ids: ['whatsapp', 'instagram', 'messenger', 'google'] },
+          { etiqueta: 'Te encuentran en', ids: ['chatgpt-texto', 'googlegemini', 'meta'] },
+        ]} />
+        <button type="button" class="mm-btn" data-mm-encender>Lanzar w2:encender</button>
+      </div>
+      <p class="mm-n">B · dos filas sin etiqueta (n y n-1, medio paso), solo logo, al entrar en vista.</p>
+      <div class="mm-stage">
+        <PildorasMarcas encender="vista" nombres={false} alto={26} filas={[
+          { ids: ['claude', 'chatgpt-texto', 'googlegemini', 'perplexity', 'meta', 'google'] },
+          { ids: ['whatsapp', 'instagram', 'messenger', 'facebook', 'googlemaps'] },
+        ]} />
+      </div>
+    </section>
+
+    <section class="mm-s" id="fila" data-mm="fila">
+      <h2>3 · Fila (L5)</h2>
+      <div class="mm-dos">
+        <div>
+          <p class="mm-frase">Aceptas tarjeta y PayPal con pasarelas confiables.</p>
+          <FilaMarcas ids={['shopify', 'stripe', 'paypal']} rotulo="Tienda y pagos" />
+        </div>
+        <div>
+          <p class="mm-frase">Te contesta donde ya te escriben tus clientes.</p>
+          <FilaMarcas ids={['whatsapp', 'instagram', 'messenger', 'google']} rotulo="Canales" />
+        </div>
+      </div>
+    </section>
+
+    <section class="mm-s" id="constelacion" data-mm="constelacion">
+      <h2>4 · Constelación (L4 · Atlas)</h2>
+      <div class="mm-dos mm-dos--c">
+        <div class="mm-txt">
+          <p class="mm-k">A · IA conversacional (6)</p>
+          <h3>Conectada a tus canales.</h3>
+          <p class="mm-n">Marcy es el cerebro y va en el centro; alrededor, solo canales. Dos anillos hasta 8 marcas.</p>
+        </div>
+        <ConstelacionMarcas ids={['whatsapp', 'instagram', 'messenger', 'google', 'facebook', 'googlemaps']} />
+      </div>
+      <div class="mm-dos mm-dos--c">
+        <div class="mm-txt">
+          <p class="mm-k">B · registro completo (16, solo muestrario)</p>
+          <h3>Tres anillos.</h3>
+          <p class="mm-n">Más de 8 marcas: tres anillos juntos; los de fuera, más pequeños.</p>
+        </div>
+        <ConstelacionMarcas ids={trazos} />
+      </div>
+    </section>
+
+    <section class="mm-s mm-s--c" id="casillas" data-mm="casillas">
+      <h2>5 · Casillas (W-ADV-53 · Pipes)</h2>
+      <p class="mm-n">A · con pestañas por categoría (flechas, Inicio y Fin). Grupos de 3: cada pestaña llena su fila.</p>
+      <CasillasMarcas columnas={3} etiqueta="Herramientas por categoría" grupos={[
+        { nombre: 'Mensajería', ids: ['whatsapp', 'instagram', 'messenger'] },
+        { nombre: 'Pagos', ids: ['shopify', 'stripe', 'paypal'] },
+        { nombre: 'Agenda', ids: ['googlecalendar', 'calendly', 'gmail'] },
+      ]} />
+      <p class="mm-n mm-n--sep">B · bandeja de 3×3 sin pestañas (Vault).</p>
+      <CasillasMarcas columnas={3} grupos={[
+        { nombre: 'IA', ids: ['claude', 'chatgpt-texto', 'googlegemini', 'perplexity', 'meta', 'google', 'bing-texto', 'applemaps-texto', 'googlemaps'] },
+      ]} />
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .mm { max-width: 1200px; margin: 0 auto; padding: 120px 24px 160px; color: var(--w-ink); }
+  .mm-h { max-width: 720px; margin-bottom: 72px; }
+  .mm h1 { font-family: var(--font-display); font-size: var(--w-h1); font-weight: 500; letter-spacing: var(--w-tr-h1); line-height: var(--w-lh-h1); margin: 8px 0 16px; }
+  .mm h2 { font-family: var(--font-display); font-size: var(--w-h2-small); font-weight: 500; letter-spacing: var(--w-tr-h2); margin: 0 0 12px; }
+  .mm h3 { font-family: var(--font-display); font-size: var(--w-h2); font-weight: 500; letter-spacing: var(--w-tr-h2); line-height: 1.1; margin: 8px 0 12px; }
+  .mm-k { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); margin: 0; }
+  .mm-lead { font-size: var(--w-lead); color: var(--w-ink-80); line-height: 1.5; margin: 0; }
+  .mm-n { color: var(--w-ink-60); font-size: 14px; margin: 0 0 20px; }
+  .mm-stage + .mm-n, .mm-n--sep { margin-top: 40px; }
+  .mm-s { padding: 64px 0; border-top: 1px solid var(--w-line-ink); }
+  .mm-s--c { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .mm-stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 32px 0 48px; }
+  .mm-btn { min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--w-line-strong); background: transparent; color: var(--w-ink-80); font: 500 13px var(--font-mono); cursor: pointer; }
+  .mm-reg { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; list-style: none; margin: 0; padding: 0; }
+  .mm-reg li { display: flex; flex-wrap: wrap; min-width: 0; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--w-s1); box-shadow: inset 0 0 0 1px var(--w-line-ink); }
+  .mm-reg-c { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 48px; }
+  .mm-reg-c--p { --marca-tinta: #0e0e0d; background: var(--w-p-bg); border-radius: 8px; padding: 0 8px; }
+  .mm-reg code { font-family: var(--font-mono); font-size: 12px; color: var(--w-ink-60); margin-left: auto; }
+  .mm-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .mm-dos + .mm-dos { margin-top: 48px; }
+  .mm-dos--c { grid-template-columns: 5fr 7fr; }
+  .mm-frase { font-size: 18px; color: var(--w-ink-80); margin: 0 0 14px; }
+  @media (max-width: 860px) {
+    .mm { padding: 96px 16px 120px; }
+    .mm-dos, .mm-dos--c { grid-template-columns: 1fr; gap: 28px; }
+  }
+</style>
+
+<script>
+  document.querySelector<HTMLButtonElement>('[data-mm-encender]')?.addEventListener('click', () => {
+    document.getElementById('mm-chip')?.dispatchEvent(new CustomEvent('w2:encender', { bubbles: true }));
+  });
+</script>

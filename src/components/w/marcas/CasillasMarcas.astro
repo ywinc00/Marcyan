@@ -1,0 +1,167 @@
+---
+// ─────────────────────────────────────────────────────────────
+// CasillasMarcas · W-ADV-53 de WorkOS (Vault: bandeja gris con rejilla de casillas blancas y logo a
+// color; HU/hoja-5-confianza-precio-contenido.jpg) con las pestañas por categoría del catálogo de
+// Pipes (C/04-logos-marcas/frames/_pipes__0.jpg). design/rediseno-workos-v2.md P06.
+//
+// Bandeja --w-s1 radio 22 padding 16; casillas 96×64 radio 12 claras (#F7F6F2, filo inset) con logo a
+// color de 28-40 px (las multicolor en negro, las palabras en su tinta). Con más de un grupo, control
+// segmentado de pestañas (tablist manejable: flechas, Inicio/Fin, tabulación itinerante,
+// aria-selected) y fundido de 160 ms del panel. Los paneles se apilan: el alto es el del mayor y la
+// bandeja no salta al cambiar de pestaña; un panel más corto se centra en vertical y sus casillas se
+// centran en la fila (nunca una fila arriba y el resto oscuro, rev2 P06). La pestaña inicial es la del
+// grupo MÁS LLENO salvo que se pida otra (`inicial`): la bandeja entra llena, como W-ADV-53. Regla de
+// uso: grupos del mismo número de casillas (múltiplo de las columnas) siempre que el contenido lo
+// permita. Sin enlaces. Pieza quieta: no lleva bucle (el original tampoco).
+// ─────────────────────────────────────────────────────────────
+import LogoMarca from './LogoMarca.astro';
+import { MARCAS, type MarcaId } from './datos';
+
+export interface GrupoCasillas {
+  nombre: string;
+  ids: MarcaId[];
+}
+interface Props {
+  grupos: GrupoCasillas[];
+  /** Columnas de la rejilla en escritorio (3 = Vault, 6 = Pipes). */
+  columnas?: number;
+  /** Alto del logo dentro de la casilla (28-40). */
+  logo?: number;
+  /** Nombre accesible del grupo de pestañas. */
+  etiqueta?: string;
+  /** Pestaña abierta al cargar (por defecto, la del grupo con más casillas). */
+  inicial?: number;
+  class?: string;
+}
+const { grupos, columnas = 3, logo = 30, etiqueta = 'Categorías', inicial, class: extra = '' } = Astro.props;
+const conTabs = grupos.length > 1;
+const mayor = grupos.reduce((b, g, i) => (g.ids.length > grupos[b].ids.length ? i : b), 0);
+const ini = inicial !== undefined && inicial >= 0 && inicial < grupos.length ? inicial : mayor;
+const uid = `cs${Math.random().toString(36).slice(2, 8)}`;
+const L = Math.max(28, Math.min(40, logo));
+// Las palabras (ChatGPT, Apple Maps, Bing) se ajustan al ancho útil de la casilla (≈ 76 px):
+// ancho de Space Grotesk 600 ≈ 0,56 em por letra y la letra es 0,86 del size.
+const sizeDe = (id: MarcaId) => {
+  const m = MARCAS[id];
+  return m.tipo === 'texto' ? Math.min(Math.round(L * 0.8), Math.floor(76 / (m.palabra.length * 0.56 * 0.86))) : L;
+};
+---
+<div class={`cs ${extra}`.trim()} data-w2-casillas style={`--cols:${columnas}`}>
+  {conTabs && (
+    <div class="cs-tabs" role="tablist" aria-label={etiqueta}>
+      {grupos.map((g, i) => (
+        <button type="button" class="cs-tab" role="tab" id={`${uid}-t${i}`} aria-controls={`${uid}-p${i}`}
+          aria-selected={i === ini ? 'true' : 'false'} tabindex={i === ini ? 0 : -1}>{g.nombre}</button>
+      ))}
+    </div>
+  )}
+  <div class="cs-paneles">
+  {grupos.map((g, i) => (
+    <div class="cs-panel" id={`${uid}-p${i}`} {...(conTabs ? { role: 'tabpanel', 'aria-labelledby': `${uid}-t${i}`, tabindex: 0 } : {})} hidden={i !== ini}>
+      <ul class="cs-grid" role="list">
+        {g.ids.map((id) => <li class="cs-c"><LogoMarca id={id} size={sizeDe(id)} tono="color" /></li>)}
+      </ul>
+    </div>
+  ))}
+  </div>
+</div>
+
+<style>
+  .cs {
+    --marca-tinta: #111;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 16px;
+    max-width: 100%;
+    padding: 16px;
+    border-radius: var(--w-r-tray, 22px);
+    background: var(--w-s1, #121211);
+    box-shadow: inset 0 0 0 1px var(--w-line, rgba(201, 169, 110, .09)), var(--w-edge, inset 0 1px 0 rgba(255, 255, 255, .08));
+  }
+  .cs-tabs {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px;
+    padding: 3px; border-radius: 12px;
+    background: rgba(240, 237, 232, .05);
+    box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .06);
+  }
+  .cs-tab {
+    min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; cursor: pointer;
+    background: transparent;
+    font-family: var(--font-display, 'Space Grotesk Variable', system-ui, sans-serif);
+    font-size: 13px; font-weight: 500; letter-spacing: -.005em;
+    color: var(--w-ink-60, rgba(240, 237, 232, .6));
+    transition: background-color 160ms var(--w-ease-ui, ease), color 160ms var(--w-ease-ui, ease);
+  }
+  .cs-tab:hover { color: var(--w-ink, #f0ede8); }
+  .cs-tab[aria-selected='true'] {
+    background: var(--w-s3, #1f1f1d); color: var(--w-ink, #f0ede8);
+    box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .08), 0 1px 2px rgba(0, 0, 0, .4);
+  }
+  .cs-tab:focus-visible { outline: 2px solid var(--accent-gold, #c9a96e); outline-offset: 2px; }
+  @media (pointer: coarse) { .cs-tab { min-height: 44px; } }
+
+  /* Paneles apilados en la misma celda: la bandeja toma el alto del panel MAYOR y no salta al cambiar
+     de pestaña. El oculto sigue fuera del árbol de accesibilidad (visibility: hidden). */
+  .cs-paneles { display: grid; justify-items: center; align-items: center; }
+  .cs-panel { grid-area: 1 / 1; animation: cs-in 160ms var(--w-ease-ui, ease) both; }
+  .cs-panel[hidden] { display: block; visibility: hidden; animation: none; }
+  .cs-panel:focus-visible { outline: 2px solid var(--accent-gold, #c9a96e); outline-offset: 4px; border-radius: 14px; }
+  /* Ancho fijo de --c columnas; las filas incompletas se centran (flex), no se pegan a la izquierda. */
+  .cs-grid {
+    --c: var(--cols); --cw: 96px; --g: 10px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--g);
+    width: calc(var(--c) * var(--cw) + (var(--c) - 1) * var(--g));
+    margin: 0; padding: 0; list-style: none;
+  }
+  .cs-c {
+    flex: none; display: flex; align-items: center; justify-content: center;
+    width: 96px; height: 64px; border-radius: 12px;
+    background: #F7F6F2;
+    box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .07), 0 1px 2px rgba(0, 0, 0, .3);
+  }
+  @keyframes cs-in { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (max-width: 680px) {
+    .cs-grid { --c: min(var(--cols), 3); }
+  }
+  @media (max-width: 360px) {
+    .cs { padding: 12px; }
+    .cs-grid { --c: min(var(--cols), 3); --cw: 84px; --g: 8px; }
+    .cs-c { width: 84px; height: 58px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-panel { animation: none; }
+    .cs-tab { transition: none; }
+  }
+</style>
+
+<script>
+  for (const el of document.querySelectorAll<HTMLElement>('[data-w2-casillas]')) {
+    if (el.dataset.w2Listo) continue;
+    el.dataset.w2Listo = '1';
+    const tabs = Array.from(el.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = Array.from(el.querySelectorAll<HTMLElement>('.cs-panel'));
+    if (tabs.length < 2) continue;
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = j === i;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        panels[j].hidden = !on;
+      });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        const k = e.key;
+        let j = -1;
+        if (k === 'ArrowRight' || k === 'ArrowDown') j = (i + 1) % tabs.length;
+        else if (k === 'ArrowLeft' || k === 'ArrowUp') j = (i - 1 + tabs.length) % tabs.length;
+        else if (k === 'Home') j = 0;
+        else if (k === 'End') j = tabs.length - 1;
+        if (j < 0) return;
+        e.preventDefault();
+        select(j, true);
+      });
+    });
+  }
+</script>

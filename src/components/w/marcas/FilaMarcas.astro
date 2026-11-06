@@ -1,0 +1,61 @@
+---
+// ─────────────────────────────────────────────────────────────
+// FilaMarcas · patrón L5 de WorkOS (fila mínima junto a una ventaja: authkit "Integrate in minutes",
+// Next.js · Laravel · TanStack… a 22 px a color, gap 12, "+ 10 more"). design/rediseno-workos-v2.md P06.
+//
+// Logos A COLOR de 22 px con gap 12 y rótulo opcional. "+ N más" SOLO si es verdad (prop `mas`).
+// El original vive sobre página clara; aquí la noche apagaría los hex oscuros (PayPal, Meta, Calendly),
+// así que la fila va DENTRO de una cápsula de papel (--w-p-bg): el logo siempre dentro de algo, nunca
+// suelto. Sobre esa cápsula las multicolor toman la tinta del contexto (negro), nunca un solo hex.
+// Remata una frase: se coloca justo debajo del texto al que da evidencia. Sin enlaces.
+// ─────────────────────────────────────────────────────────────
+import LogoMarca from './LogoMarca.astro';
+import type { MarcaId } from './datos';
+
+interface Props {
+  ids: MarcaId[];
+  rotulo?: string;
+  /** Cuántas más hay DE VERDAD (pinta "+ N más" / "+ N more"). */
+  mas?: number;
+  lang?: 'es' | 'en';
+  size?: number;
+  class?: string;
+}
+const { ids, rotulo, mas, lang = 'es', size = 22, class: extra = '' } = Astro.props;
+const masTxt = mas ? (lang === 'en' ? `+ ${mas} more` : `+ ${mas} más`) : '';
+---
+<div class={`fm ${extra}`.trim()} data-w2-fila>
+  {rotulo && <p class="fm-r">{rotulo}</p>}
+  <ul class="fm-l" role="list">
+    {ids.map((id) => <li><LogoMarca id={id} size={size} tono="color" /></li>)}
+    {masTxt && <li class="fm-mas">{masTxt}</li>}
+  </ul>
+</div>
+
+<style>
+  .fm {
+    --marca-tinta: var(--w-p-ink, #0e0e0d);
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px 16px;
+    max-width: 100%;
+    padding: 9px 18px;
+    border-radius: 100px;
+    background: var(--w-p-bg, #f0ede8);
+    box-shadow: inset 0 0 0 1px rgba(14, 14, 13, .06), 0 1px 0 rgba(255, 255, 255, .06);
+    color: var(--w-p-ink, #0e0e0d);
+  }
+  .fm-r {
+    margin: 0;
+    font-family: var(--font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+    font-size: 11px; line-height: 1.2; letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
+    color: var(--w-p-ink-2, #4a4743);
+  }
+  .fm-l { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .fm-l > li { display: inline-flex; }
+  .fm-mas {
+    font-family: var(--font-display, 'Space Grotesk Variable', system-ui, sans-serif);
+    font-size: 13px; font-weight: 500; color: var(--w-p-ink-2, #4a4743);
+  }
+  @media (max-width: 560px) {
+    .fm { border-radius: 18px; padding: 10px 14px; }
+  }
+</style>

@@ -63,7 +63,7 @@ const { kicker, title, lead, dateISO, dateLabel, readingLabel, tags = [], topic,
           src={`${cover}-960.webp`}
           srcset={`${cover}-640.webp 640w, ${cover}-960.webp 960w, ${cover}-1280.webp 1280w`}
           sizes="(min-width: 1024px) 746px, 100vw"
-          width="1280" height="800" alt="" decoding="async" loading="lazy"
+          width="1280" height="800" alt="" decoding="async" loading="eager" fetchpriority="high"
         />
       ) : (
         <BlogIllustration topic={topic} tags={tags} class="ahero__illo" />

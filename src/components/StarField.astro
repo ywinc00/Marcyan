@@ -38,6 +38,8 @@
     neutral: rgbVar('--star-rgb', '240, 237, 232'),
   };
   const TAU = Math.PI * 2;
+  let lastScroll = -1e9;
+  window.addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
 
   interface Star { x: number; y: number; r: number; base: number; amp: number; sp: number; ph: number; drift: number; }
   interface Shooter { x: number; y: number; vx: number; vy: number; life: number; max: number; len: number; }
@@ -103,12 +105,15 @@
         life: 0, max: 800 + Math.random() * 500, len: 70 + Math.random() * 60,
       });
     }
+    // ~30 fps y quieto durante el scroll (igual que SpaceBackdrop): el parpadeo es lento.
     function frame(now: number) {
-      let dt = prev ? now - prev : 16; prev = now; if (dt > 48) dt = 48;
+      raf = requestAnimationFrame(frame);
+      if ((prev && now - prev < 32) || now - lastScroll < 140) return;
+      let dt = prev ? now - prev : 16; prev = now; if (dt > 64) dt = 64;
       ctx!.clearRect(0, 0, W, H);
       for (const s of stars) {
         const tw = s.base + s.amp * (0.5 + 0.5 * Math.sin((now - t0) * s.sp + s.ph));
-        s.x += s.drift; if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
+        s.x += s.drift * (dt / 16); if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
         ctx!.beginPath();
         ctx!.fillStyle = `rgba(${rgb},${tw.toFixed(3)})`;
         ctx!.arc(s.x, s.y, s.r, 0, TAU);
@@ -130,7 +135,6 @@
         ctx!.arc(sh.x, sh.y, 1.3, 0, TAU); ctx!.fill();
         if (p >= 1 || sh.x < -80 || sh.x > W + 80 || sh.y > H + 80) shooters.splice(i, 1);
       }
-      raf = requestAnimationFrame(frame);
     }
     function staticDraw() {
       ctx!.clearRect(0, 0, W, H);

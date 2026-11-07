@@ -140,9 +140,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--fg-secondary); white-space: nowrap; pointer-events: none;
   }
-  .hero__hint-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); box-shadow: 0 0 0 0 var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
-  @keyframes hpulse { 0% { box-shadow: 0 0 0 0 var(--accent-gold-glow); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  @media (--motion-reduce) { .hero__hint-dot { animation: none; } }
+  .hero__hint-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); }
+  .hero__hint-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
+  @keyframes hpulse { 0% { transform: scale(1); opacity: 1; } 70%, 100% { transform: scale(4); opacity: 0; } }
+  @media (--motion-reduce) { .hero__hint-dot::after { animation: none; opacity: 0; } }
 
   /* ── CTA dock — abajo, centro ──────────────────────────── */
   .hero__dock { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
@@ -173,6 +174,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5); opacity: 0; will-change: transform, opacity;
     transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
   }
+  .hero__orbit .hero-node:focus-visible { opacity: 1 !important; z-index: 7 !important; outline: 2px solid var(--accent-gold); outline-offset: 3px; }
   .hero__orbit .hero-node.teal { border-color: var(--accent-teal-line); }
   .hero__orbit .hero-node svg { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
@@ -219,7 +221,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       starsEl.appendChild(frag);
       if (!document.getElementById('hstar-kf')) {
         const st = document.createElement('style'); st.id = 'hstar-kf';
-        st.textContent = '@keyframes hstar{0%,100%{opacity:.12}50%{opacity:.6}}';
+        st.textContent = '@keyframes hstar{0%,100%{opacity:.12}50%{opacity:.6}}[data-hero-stars].is-off>span{animation-play-state:paused}';
         document.head.appendChild(st);
       }
     })();
@@ -229,7 +231,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     let cx = 0, cy = 0, maxR = 0, isAuto = auto(), lastAuto = isAuto, activated = false;
     let energy = 0, target = 0;
     let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
-    let rafId = 0, last = 0, running = false;
+    let rafId = 0, last = 0, running = false, onScreen = true;
     let ro: ResizeObserver | null = null;
 
     function measure() {
@@ -267,8 +269,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       energy += (target - energy) * Math.min(1, dt * 8); // emergencia rápida y natural
-      // en reposo total no tocamos el DOM (ahorra CPU/batería); el loop sigue barato
-      if (energy < 0.004 && target < 0.004) { rafId = requestAnimationFrame(frame); return; }
+      // En reposo total el bucle se DUERME (no pide más fotogramas): lo despierta wake()
+      // al pasar el cursor, al tocar o al volver a pantalla. Antes seguía a la frecuencia
+      // de la pantalla para siempre, también con el hero fuera de vista.
+      if (energy < 0.004 && target < 0.004) { energy = 0; hint.style.opacity = '1'; rafId = 0; return; }
       if (!isAuto) {
         tiltX += (tTiltX - tiltX) * Math.min(1, dt * 5);
         tiltY += (tTiltY - tiltY) * Math.min(1, dt * 5);
@@ -296,16 +300,42 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       rafId = requestAnimationFrame(frame);
     }
 
-    const onEnter = () => { if (!isAuto) target = 1; };
+    function wake() {
+      if (!running || rafId || !onScreen || document.hidden) return;
+      last = performance.now();
+      rafId = requestAnimationFrame(frame);
+    }
+    function sleep() { if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } }
+    // Fuera de pantalla o con la pestaña oculta: ni bucle ni parpadeo de estrellas.
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      starsEl?.classList.toggle('is-off', !onScreen);
+      if (onScreen) wake(); else sleep();
+    });
+    io.observe(hero);
+    document.addEventListener('visibilitychange', () => {
+      starsEl?.classList.toggle('is-off', document.hidden || !onScreen);
+      if (document.hidden) sleep(); else wake();
+    });
+    const onEnter = () => { if (!isAuto) { target = 1; wake(); } };
     const onLeave = () => { if (!isAuto) target = 0; };
     const onMove = (e: PointerEvent) => {
       if (isAuto) return;
       const hr = hero.getBoundingClientRect();
       tTiltY = ((e.clientX - hr.left) / hr.width - 0.5) * 6;
       tTiltX = -((e.clientY - hr.top) / hr.height - 0.5) * 4;
+      if (target > 0) wake();
     };
     // primer toque (móvil): recién entonces sale la órbita
-    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; } };
+    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; wake(); } };
+
+    // Teclado (WCAG 2.4.7): al tabular a una luna la órbita sale entera, como con el cursor.
+    const onFocusIn = (e: FocusEvent) => {
+      if ((e.target as HTMLElement).closest?.('.hero-node')) { activated = true; target = 1; wake(); }
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (!isAuto && !(e.relatedTarget as HTMLElement | null)?.closest?.('.hero-node')) target = 0;
+    };
 
     function enable() {
       if (running) return;
@@ -326,16 +356,17 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.addEventListener('pointermove', onMove);
       hero.addEventListener('pointerdown', onActivate);
       hero.addEventListener('click', onActivate);
+      hero.addEventListener('focusin', onFocusIn);
+      hero.addEventListener('focusout', onFocusOut);
       ro = new ResizeObserver(() => measure());
       ro.observe(stage);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (running) measure(); });
-      last = performance.now();
-      rafId = requestAnimationFrame(frame);
+      rafId = 0; wake();
     }
     function disable() {
       if (!running) return;
       running = false;
-      cancelAnimationFrame(rafId);
+      sleep();
       hero.classList.remove('hero--orbital');
       orbit.innerHTML = '';
       stage.style.transform = '';
@@ -346,6 +377,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.removeEventListener('pointermove', onMove);
       hero.removeEventListener('pointerdown', onActivate);
       hero.removeEventListener('click', onActivate);
+      hero.removeEventListener('focusin', onFocusIn);
+      hero.removeEventListener('focusout', onFocusOut);
       if (ro) { ro.disconnect(); ro = null; }
     }
     function sync() {

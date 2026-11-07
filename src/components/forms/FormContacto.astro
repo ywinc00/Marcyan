@@ -24,7 +24,7 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
 <form
   class:list={['contact__form', cls]} id={`${idp}-contact-form`} novalidate data-contact-form data-source={source} data-err-id={`${idp}-form-error`}
   data-sending={f.sending} data-success={okHead} data-success-ref={okRef} data-success-next={okNext}
-  data-success-urgent={okUrgent} data-error={f.error} data-invalid={f.emailInvalid}
+  data-success-urgent={okUrgent} data-error={f.error} data-invalid={f.emailInvalid} data-need={f.needContact}
   data-brief={f.briefLink} data-href-brief={hrefBrief}
   data-tel-hou={telHou} data-tel-hou-label={nap.houston}
   data-tel-mia={telMia} data-tel-mia-label={nap.miami}
@@ -203,9 +203,10 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
         return;
       }
       if (!hasEmail && digits(data.phone || '').length < 7) {
-        renderError(S.invalid || 'Email inválido.');
-        const culprit = phoneEl || emailEl;
-        if (culprit) { culprit.setAttribute('aria-invalid', 'true'); culprit.setAttribute('aria-describedby', errId); culprit.focus(); }
+        // Falta cualquier vía de contacto: se marcan los dos campos y el foco va al email.
+        renderError(S.need || S.invalid || 'Email inválido.');
+        [emailEl, phoneEl].forEach((el) => { if (el) { el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', errId); } });
+        (emailEl || phoneEl)?.focus();
         delete form.dataset.busy;
         return;
       }

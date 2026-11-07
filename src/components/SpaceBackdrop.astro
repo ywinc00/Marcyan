@@ -115,12 +115,18 @@ const { tone = 'gold', density = 1 } = Astro.props;
         life: 0, max: 800 + Math.random() * 500, len: 70 + Math.random() * 60,
       });
     }
+    // Parpadeo lento: ~30 fps sobran (antes dibujaba a la frecuencia de la pantalla, 120-240 Hz),
+    // y durante el scroll no se redibuja (el lienzo es fijo; se queda quieto unas décimas).
+    let lastScroll = -1e9;
+    window.addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
     function frame(now: number) {
-      let dt = prev ? now - prev : 16; prev = now; if (dt > 48) dt = 48;
+      raf = requestAnimationFrame(frame);
+      if ((prev && now - prev < 32) || now - lastScroll < 140) return;
+      let dt = prev ? now - prev : 16; prev = now; if (dt > 64) dt = 64;
       ctx!.clearRect(0, 0, W, H);
       for (const s of stars) {
         const tw = s.base + s.amp * (0.5 + 0.5 * Math.sin((now - t0) * s.sp + s.ph));
-        s.x += s.drift; if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
+        s.x += s.drift * (dt / 16); if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
         ctx!.beginPath();
         ctx!.fillStyle = `rgba(${s.acc ? rgbAcc : rgbStar},${tw.toFixed(3)})`;
         ctx!.arc(s.x, s.y, s.r, 0, TAU); ctx!.fill();
@@ -139,7 +145,6 @@ const { tone = 'gold', density = 1 } = Astro.props;
         ctx!.beginPath(); ctx!.moveTo(tx, ty); ctx!.lineTo(sh.x, sh.y); ctx!.stroke();
         if (p >= 1 || sh.x < -80 || sh.x > W + 80 || sh.y > H + 80) shooters.splice(i, 1);
       }
-      raf = requestAnimationFrame(frame);
     }
     function staticDraw() {
       ctx!.clearRect(0, 0, W, H);

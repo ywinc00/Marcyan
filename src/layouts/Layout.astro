@@ -137,7 +137,10 @@ const GA_ID = 'G-4GJPX4PTRV';
 // los 2,5 s si reveal.ts no arrancó (red, bloqueador o error previo del bundle). Va inline en el
 // <head> para que el estado inicial exista antes del primer fotograma.
 const wAnimInit = `(function(){var d=document.documentElement;try{if(matchMedia('(prefers-reduced-motion: no-preference)').matches)d.classList.add('w-anim')}catch(e){}setTimeout(function(){if(!d.classList.contains('w-ready'))d.classList.add('w-in-all')},2500)})();`;
-const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`;
+// gtag.js (177 KB) se pide tras la carga, en un momento libre del navegador: el hilo principal
+// queda para pintar la portada (tareas largas de 150-180 ms en móvil). La cola dataLayer guarda
+// la visita y los eventos hasta que llega, así que no se pierde nada salvo rebotes de < 1 s.
+const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');(function(){function l(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s)}function i(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:2500}):setTimeout(l,1200)}document.readyState==='complete'?i():addEventListener('load',i,{once:true})})();`;
 ---
 <!doctype html>
 <html lang={lang} data-ds={ds}>
@@ -176,7 +179,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-    {/* Google Analytics 4 (gtag.js) — async, is:inline para que Astro NO lo
+    {/* Google Analytics 4 (gtag.js) — diferido tras la carga, is:inline para que Astro NO lo
         bundlee. Va al final del <head>: al ser async no bloquea el render y
         deja que fuentes/CSS críticos se descubran primero (cuida el PSI).
         NO se emite en páginas noindex (panel/kit/formulario): sin ruido de
@@ -184,7 +187,6 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
         del snippet no las interprete el JSX de Astro. */}
     {!noindex && (
       <>
-        <script async is:inline src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
         <script is:inline set:html={gaInit} />
       </>
     )}
@@ -207,6 +209,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
       // Instrumenta CtaBand (whatsapp/call), el teaser y las CTAs de herramientas
       // sin que cada página tenga que importar track.
       import { track } from '../lib/track.js';
+      import '../components/w/offscreen';
       document.addEventListener('click', (e) => {
         const el = e.target && e.target.closest && e.target.closest('[data-track]');
         if (el && el.dataset.track) track(el.dataset.track);

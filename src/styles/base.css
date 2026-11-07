@@ -143,3 +143,6 @@ main > .section:first-child { padding-top: calc(var(--nav-h) + var(--space-7)); 
 /* color helpers de marca */
 .gold { color: var(--accent-gold); }
 .teal { color: var(--accent-teal); }
+
+/* Bloques lejos de la pantalla (offscreen.ts): sus animaciones quedan en pausa. */
+.w-off, .w-off *, .w-off *::before, .w-off *::after { animation-play-state: paused !important; }

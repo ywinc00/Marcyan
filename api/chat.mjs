@@ -28,7 +28,8 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures } from '../lib/chat-kb.mjs';
+import { quote } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
@@ -370,6 +371,16 @@ export function computeLossToolResult(input) {
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
 
+// cotizar — puro y testeable. Las reglas viven en lib/quote-rules.mjs; Marcy solo
+// repite las cifras devueltas (van al allowlist dinámico del filtro de precios).
+export function quoteToolResult(input, lang = 'es') {
+  const inp = input || {};
+  const q = quote(Array.isArray(inp.servicios) ? inp.servicios : [], { pedirRebaja: inp.pedir_rebaja === true, lang });
+  if (!q.ok) return FAIL_RESULT;
+  const { cifras, ...visible } = q;
+  return { content: JSON.stringify(visible), extraAllow: cifras.flatMap(priceAllowVariants) };
+}
+
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
 // (lib/diagnostic-checks.mjs). REGLA DE ORO: JAMÁS title/meta/texto del sitio ajeno.
 // Puro y testeable (recibe el output ya calculado de analyzeSite).
@@ -417,6 +428,7 @@ async function reviewSite(url, lang) {
 // request (cap 1 iteración): la llama el handler con el primer tool_use interno.
 async function runInternalTool(toolUse, { lang, ip, sid }) {
   if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
+  if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang);
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
     const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
@@ -513,7 +525,9 @@ export default async function handler(req, res) {
     );
 
     let finalResp = r1;
-    let extraAllow = [];
+    // Cifras que ya salieron en la conversación (del cliente o de una herramienta en un
+    // turno anterior): Marcy puede repetirlas sin que el filtro estricto las corte.
+    let extraAllow = historyFigures(messages);
 
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
@@ -521,7 +535,7 @@ export default async function handler(req, res) {
     const internal = toolUses.find((b) => INTERNAL_TOOLS.has(b.name));
     if (internal) {
       const out = await runInternalTool(internal, { lang, ip, sid });
-      extraAllow = out.extraAllow || [];
+      extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es

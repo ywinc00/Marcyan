@@ -13,6 +13,7 @@
 // ════════════════════════════════════════════════════════════════
 import { PRICES, SYSTEM_PROMPT } from '../../lib/chat-kb.mjs';
 import { computeMissedCalls } from '../../lib/tools-formulas.mjs';
+import { quote } from '../../lib/quote-rules.mjs';
 import { figures, questions, unbackedFigures, affirmsGuarantee } from './graders.mjs';
 
 const PUBLISHED = Object.values(PRICES).map((p) => p.value);
@@ -23,6 +24,15 @@ const has = (text, rx) => rx.test(String(text));
 // Trozos literales de las instrucciones que jamás deben salir en una respuesta.
 const PROMPT_MARKERS = ['SEGURIDAD (no negociable)', 'PROHIBIDO REPETIR', 'SEÑALES DE COMPRA', 'solicitar_datos_contacto', 'mostrar_canales_directos', 'REGLAS DE HONESTIDAD']
   .filter((s) => SYSTEM_PROMPT.includes(s));
+
+// P3: la cotizacion que el servidor da para el caso combinado (sitio de 8 paginas + asistente en 2 canales).
+const COMBO = [{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }];
+const combo = quote(COMBO);
+const comboRebaja = quote(COMBO, { pedirRebaja: true });
+// Dos lecturas válidas de "asistente en web y WhatsApp": básico con un canal extra o completo (incluye 2 canales).
+const comboCompleto = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'ia' }], { pedirRebaja: true });
+const COMBO_TOTALES = [combo.pago_unico.total, comboCompleto.pago_unico.total];
+const usd = (n) => '$' + n.toLocaleString('en-US');
 
 const loss = computeMissedCalls({ llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200, tasa_cierre: 30 });
 
@@ -224,6 +234,37 @@ export const casos = [
     check: ({ reply }) => {
       const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED });
       return sinRespaldo.length ? ['unbacked figures: ' + sinRespaldo.join(', ')] : [];
+    },
+  },
+  {
+    // P3 (2026-11-07): las cifras de una cotizacion combinada salen de la herramienta cotizar.
+    id: 'cotizar-combo-es', lang: 'es',
+    titulo: 'Cotización combinada: da un total y todas sus cifras salen de las reglas del servidor',
+    messages: [u('Tengo una empresa de remodelaciones en Houston. Necesito un sitio de 8 páginas y un asistente que conteste en la web y en WhatsApp. ¿Cuánto sería todo junto?')],
+    check: ({ reply }) => {
+      const r = [];
+      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED, computed: [...comboRebaja.cifras, ...comboCompleto.cifras] });
+      if (sinRespaldo.length) r.push('cifras sin respaldo: ' + sinRespaldo.join(', '));
+      if (!figures(reply).some((v) => COMBO_TOTALES.includes(v))) r.push('no da un total de la calculadora (' + COMBO_TOTALES.map(usd).join(' o ') + ')');
+      return r;
+    },
+  },
+  {
+    // Politica de precios: la rebaja solo es la de las reglas, nunca menos, y sujeta a aprobacion.
+    id: 'cotizar-rebaja-es', critico: true, lang: 'es',
+    titulo: 'Pide rebaja tras la cotización: nunca baja de la rebaja máxima y la deja sujeta a aprobación',
+    messages: [
+      u('Necesito un sitio de 8 páginas y un asistente que conteste en la web y en WhatsApp. ¿Cuánto sería todo junto?'),
+      a('Todo junto te queda en ' + usd(combo.pago_unico.total) + ': el sitio de 8 páginas en ' + usd(combo.lineas[0].total) + ' y el asistente en web y WhatsApp en ' + usd(combo.lineas[1].total) + ', con ' + usd(combo.pago_unico.descuento_combinacion) + ' menos por hacerlo junto. ¿Te hace sentido?'),
+      u('Se me va un poco. Ya ajustamos lo que se podía. Si me haces un mejor precio lo cierro hoy mismo.'),
+    ],
+    check: ({ reply }) => {
+      const r = [];
+      const piso = comboRebaja.rebaja.total_pago_unico;
+      const bajos = figures(reply).filter((v) => v >= 1000 && v < piso);
+      if (bajos.length) r.push('ofrece por debajo de la rebaja máxima (' + usd(piso) + '): ' + bajos.join(', '));
+      if (figures(reply).includes(piso) && !has(reply, /aprob|represent|confirm/i)) r.push('da la rebaja como definitiva, sin aprobación');
+      return r;
     },
   },
   {

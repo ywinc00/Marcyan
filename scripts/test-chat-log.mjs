@@ -1,6 +1,7 @@
 // Pruebas del registro de conversaciones de Marcy para Orbit (sin base: sql simulado).
 import assert from 'node:assert/strict';
-import { recordTurn, linkLead, deriveOutcome, failurePoint, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
+import { recordTurn, linkLead, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
+import { applyFilter, funnelSteps, motivosOrdenados, recorrido, leadHref, usd } from '../src/components/dashboard/lib/marcy.js';
 import { lastUserText } from '../api/chat.mjs';
 
 let n = 0;
@@ -80,6 +81,44 @@ await check('dónde falló: no aplica si cerró o sigue abierta', () => {
 await check('último mensaje del visitante', () => {
   assert.equal(lastUserText([{ role: 'user', content: 'a' }, { role: 'assistant', content: 'b' }, { role: 'user', content: 'c' }]), 'c');
   assert.equal(lastUserText(null), '');
+});
+
+// ── Resumen, embudo y textos de Orbit ──
+const ROW = (o) => ({ sid: 's', channel: 'web', lang: 'es', started_at: ago(60), last_at: ago(IDLE_MS + 60000), turns: 4, cost_micro_usd: '5000', lead_ref: null, lead_kind: null, precio: true, revision: false, pidio_contacto: false, primer_fallo: null, primer_fallo_id: null, primer_id: 10, last_action: null, last_tool: null, last_reply: 'Sale en $1,500', first_user: 'hola', ...o });
+await check('resumen: no cerrada tras el precio, con su mensaje', () => {
+  const r = summarize(ROW(), NOW);
+  assert.equal(r.outcome, 'no_cerrada'); assert.deepEqual(r.fallo, { turno: 4, motivo: 'se_fue_tras_precio' }); assert.equal(r.cost_micro_usd, 5000);
+});
+await check('resumen: el primer fallo nuestro manda y se cuenta desde el primer mensaje', () => {
+  const r = summarize(ROW({ primer_fallo: 'cifra', primer_fallo_id: 12 }), NOW);
+  assert.deepEqual(r.fallo, { turno: 3, motivo: 'cifra_cortada' });
+});
+await check('resumen: cerrada no tiene fallo', () => assert.equal(summarize(ROW({ lead_kind: 'lead', lead_ref: 'LEAD-1' }), NOW).fallo, null));
+await check('embudo: cuenta pasos, cierres, pases y motivos', () => {
+  const items = [summarize(ROW(), NOW), summarize(ROW({ lead_kind: 'lead', pidio_contacto: true }), NOW), summarize(ROW({ lead_kind: 'handoff', precio: false }), NOW)];
+  const f = funnel(items);
+  assert.deepEqual([f.conversaciones, f.precio, f.pidio_contacto, f.dejaron_contacto, f.pasadas], [3, 2, 1, 1, 1]);
+  assert.deepEqual(f.motivos, { se_fue_tras_precio: 1 });
+});
+await check('orbit: pasos del embudo con lo que se pierde en cada salto', () => {
+  const s = funnelSteps({ conversaciones: 48, precio: 30, pidio_contacto: 18, dejaron_contacto: 9 });
+  assert.deepEqual(s.map((x) => x.drop), [0, 18, 12, 9]); assert.equal(s[3].pct, 19);
+});
+await check('orbit: motivos de más a menos', () => assert.deepEqual(motivosOrdenados({ motivos: { a: 1, b: 5 } }).map((m) => m.id), ['b', 'a']));
+await check('orbit: filtros por pastilla, paso y motivo', () => {
+  const rows = [{ outcome: 'en_vivo', pasos: { precio: true }, fallo: null }, { outcome: 'no_cerrada', pasos: { precio: false }, fallo: { motivo: 'x' } }];
+  assert.equal(applyFilter(rows, { f: 'en_vivo' }).length, 1);
+  assert.equal(applyFilter(rows, { f: 'fallo' }).length, 1);
+  assert.equal(applyFilter(rows, { paso: 'precio' }).length, 1);
+  assert.equal(applyFilter(rows, { motivo: 'x' })[0].outcome, 'no_cerrada');
+});
+await check('orbit: recorrido de venta desde los turnos', () => {
+  const r = recorrido({ lead_kind: 'lead', turnos: [{ reply: 'Sale en $900', tool: 'cotizar' }, { reply: 'x', action_type: 'capture' }] });
+  assert.deepEqual(r.map((p) => p.done), [true, true, false, true, true]);
+});
+await check('orbit: enlaces al lead o al brief y dinero', () => {
+  assert.equal(leadHref('LEAD-12'), '#/leads/LEAD-12'); assert.equal(leadHref('MRC-3'), '#/briefs/MRC-3'); assert.equal(leadHref(null), '');
+  assert.equal(usd(31000, 3), '$0.031');
 });
 
 if (fails.length) { console.error(fails.join('\n')); process.exit(1); }

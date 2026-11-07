@@ -1296,7 +1296,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         try {
           const res = await fetchWithTimeout('/api/handoff', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: get('#mrc-c-name'), contact: email || phone, message: need, lang, website_hp: get('#mrc-c-hp') }),
+            body: JSON.stringify({ name: get('#mrc-c-name'), contact: email || phone, message: need, lang, website_hp: get('#mrc-c-hp'), chat_sid: sid }),
           });
           let data = null; try { data = await res.json(); } catch (_) {}
           if (res.ok && data && data.ok) { try { track('chat_handoff_submitted'); } catch {} onSuccess(T.capHandoffOk || T.capOk); }
@@ -1365,7 +1365,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (result) result.hidden = true;
       try {
         const res = await fetchWithTimeout(endpoint, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({}, body, { chat_sid: sid })),
         });
         let data = null; try { data = await res.json(); } catch (_) {}
         if (res.ok && data && data.ok) {

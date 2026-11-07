@@ -21,6 +21,7 @@ import { createNotification, notifyLeadEmailFailure } from '../lib/notifications
 import { emailAdminHandoff, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
 import { createLead } from '../lib/leads.mjs';
+import { linkLead } from '../lib/chat-log.mjs';
 import { rateLimit, LIMITS } from '../lib/ratelimit.mjs';
 
 function sanitize(v, max = 2000) {
@@ -127,6 +128,9 @@ export default async function handler(req, res) {
         console.error('[handoff] no se pudo guardar el lead:', err && err.message);
       }
     }
+
+    // Orbit: la conversación queda como pasada a una persona (best-effort).
+    await linkLead({ sid: body.chat_sid, ref: refId, kind: 'handoff' });
 
     // 2) Notificación in-dashboard — defensiva, no rompe el flujo si falla.
     await createNotification({

@@ -30,6 +30,7 @@ import {
   getDraft, markDraftSubmitted, reconcileDraft, verifyFiles, blobConfigured, isMissingSchema, queueDraftSweep,
 } from '../lib/brief-files.mjs';
 import { secretMatches } from '../lib/brief-upload-rules.mjs';
+import { linkLead } from '../lib/chat-log.mjs';
 
 function sanitize(v, max = 5000) {
   if (v === null || v === undefined) return null;
@@ -215,6 +216,8 @@ export default async function handler(req, res) {
     }
     const projectId = inserted.project_id;
     const data = columns;
+    // Orbit: un brief armado por Marcy cierra su conversación (best-effort).
+    if (body.source === 'chat') await linkLead({ sid: body.chat_sid, ref: projectId, kind: 'brief' });
 
     // Audit log: brief recibido
     await logEvent({

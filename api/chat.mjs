@@ -43,6 +43,7 @@ import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
 // Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
 import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
+import { recordTurn } from '../lib/chat-log.mjs';
 
 // Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
 // y su coste se cuentan aparte para que las pruebas de Marcy (que corren contra
@@ -644,20 +645,33 @@ export default async function handler(req, res) {
     const cortadas = blockedFigures(text || '', extraAllow);
     if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
+    const beforePrice = reply;
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
+    const fallback = !text || reply !== beforePrice;
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
     const usage = sumUsage(finalResp === r1 ? [r1] : [r1, finalResp]);
     const costMicro = turnCostMicroUsd(model, usage);
     const firstTurn = messages.length === 1;
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
-    await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
+    // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
+    await Promise.all([
+      recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro }),
+      recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply, action, tool: internal ? internal.name : null, cortadas, fallback, costMicro }),
+    ]);
 
     return res.status(200).json(action ? { reply, action } : { reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
     console.error('[chat] anthropic error:', err && err.message);
     await recordFailure();
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: M.fallback, fallback: true });
     return res.status(200).json({ reply: M.fallback });
   }
+}
+
+// Último mensaje del visitante (texto) para el historial de Orbit.
+export function lastUserText(messages) {
+  const m = Array.isArray(messages) ? messages[messages.length - 1] : null;
+  return m && m.role === 'user' && typeof m.content === 'string' ? m.content : '';
 }

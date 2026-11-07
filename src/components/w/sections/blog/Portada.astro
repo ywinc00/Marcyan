@@ -15,24 +15,28 @@ interface Props {
   tags: string[];
   /** slug de la guía (último tramo del href). */
   slug?: string;
-  size?: 'feature' | 'card';
+  size?: 'feature' | 'card' | 'thumb';
+  /** Tamaño real en pantalla si no es el de serie (p. ej. la miniatura de "Sigue leyendo"). */
+  sizes?: string;
   /** true solo si la portada cae en la primera pantalla (la destacada). */
   eager?: boolean;
   class?: string;
 }
-const { tags, slug, size = 'card', eager = false, class: cls } = Astro.props;
+const { tags, slug, size = 'card', eager = false, sizes: sizesProp, class: cls } = Astro.props;
 const conImagen = !!slug && PORTADAS.has(slug);
 const src = (w: number) => `/assets/blog/portadas/${slug}-${w}.webp`;
-const sizes = size === 'feature'
+const sizes = sizesProp ?? (size === 'feature'
   ? '(min-width: 1024px) 656px, 100vw'
-  : '(min-width: 1024px) 576px, (min-width: 768px) 50vw, 100vw';
+  : size === 'thumb'
+    ? '140px'
+    : '(min-width: 1024px) 576px, (min-width: 768px) 50vw, 100vw');
 ---
 <div class:list={['bp', `bp--${size}`, conImagen && 'bp--img', cls]} aria-hidden="true">
   {conImagen ? (
     <img
       class="bp__img"
       src={src(960)}
-      srcset={`${src(640)} 640w, ${src(960)} 960w, ${src(1280)} 1280w`}
+      srcset={`${src(320)} 320w, ${src(640)} 640w, ${src(960)} 960w, ${src(1280)} 1280w`}
       sizes={sizes}
       width="1280" height="800" alt=""
       loading={eager ? 'eager' : 'lazy'} decoding="async"

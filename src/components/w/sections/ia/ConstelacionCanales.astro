@@ -70,7 +70,7 @@ const arcoD = (r: number) => {
             {pos.map((t, i) => <line class="ck__ln" data-i={i} x1={t.x.toFixed(1)} y1={t.y.toFixed(1)} x2={CX} y2={CY + 6} pathLength="1" />)}
           </svg>
           <div class="ck__marcy" style={`left:${p(CX, W)};top:${p(CY - 34, H)};width:${p(232, W)}`}>
-            <img src="/assets/bot/marcy-hero.webp" width="364" height="512" alt="" loading="lazy" decoding="async" />
+            <img src="/assets/bot/marcy-hero.webp" srcset="/assets/bot/marcy-hero-182.webp 182w, /assets/bot/marcy-hero-270.webp 270w, /assets/bot/marcy-hero.webp 364w" sizes="(max-width: 767.98px) 50vw, 364px" width="364" height="512" alt="" loading="lazy" decoding="async" />
           </div>
           {pos.map((t, i) => (
             <span class="ck__t" data-i={i} style={`left:${p(t.x, W)};top:${p(t.y, H)}`}>

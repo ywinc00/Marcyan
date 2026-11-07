@@ -1,10 +1,10 @@
 ---
 // "Sigue leyendo" (design/rediseno-workos.md §4.8; W-CONT-26). Al acabar la guía:
-// filas de 680 con miniatura 140×88 (la ilustración PROPIA del tema, nunca capturas),
+// filas de 680 con miniatura 140×88 (v4: la MISMA portada de la guía que en el índice del blog),
 // título 18/500 y la descripción del artículo, separadas por líneas de 1 px; debajo,
 // los enlaces del frontmatter (`related`, a las landings y precios) con sus href
 // EXACTOS (R5). La página elige los artículos (mismos temas primero).
-import BlogIllustration from '../../../BlogIllustration.astro';
+import Portada from './Portada.astro';
 import Icon from '../../../ui/Icon.astro';
 
 interface Post { title: string; href: string; desc?: string; tags: string[] }
@@ -26,7 +26,7 @@ const { posts, links = [], title = 'Sigue leyendo', relatedTitle = 'Recursos rel
           <li>
             <a class="more__row" href={p.href}>
               <span class="more__thumb" aria-hidden="true">
-                <BlogIllustration tags={p.tags} topic={p.tags[0]} class="more__illo" />
+                <Portada tags={p.tags} slug={p.href.split('/').filter(Boolean).pop()} size="thumb" class="more__art" />
               </span>
               <span class="more__txt">
                 <span class="more__ptitle">{p.title}</span>
@@ -79,9 +79,10 @@ const { posts, links = [], title = 'Sigue leyendo', relatedTitle = 'Recursos rel
   .more__thumb {
     inline-size: 140px; block-size: 88px; border-radius: 6px; overflow: hidden;
     background: var(--w-dawn), var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
-    display: grid; place-items: center;
+    display: grid; place-items: stretch;
   }
-  .more__thumb :global(.more__illo) { width: 112px; }
+  .more__thumb :global(.more__art) { width: 100%; height: 100%; }
+  .more__thumb :global(.more__art .bp__illo) { width: 80%; }
   .more__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .more__ptitle {
     font-family: var(--font-display); font-weight: 500; font-size: 1.125rem; line-height: 1.3; letter-spacing: -0.015em;

@@ -50,7 +50,7 @@ const D = 'M70 32H770A178 178 0 0 1 770 388H70';
             <span class="cu__pill">
               <span class="cu__ic"><Icon name={n.icon} width={20} height={20} /></span>
               {esMarcy(n)
-                ? <img class="cu__av" src="/assets/bot/marcy-mini.webp" alt="" width="40" height="40" loading="lazy" decoding="async" />
+                ? <img class="cu__av" src="/assets/bot/marcy-mini-128.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="40px" alt="" width="40" height="40" loading="lazy" decoding="async" />
                 : <span class="cu__num" aria-hidden="true">{pad(i + 1)}</span>}
               {i > 0 && <span class="cu__flecha" aria-hidden="true"></span>}
             </span>

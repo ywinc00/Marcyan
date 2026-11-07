@@ -88,7 +88,7 @@ const sr = en
           {x.msgs.map((m) => (
             <div class:list={['mz__msg', m.m && 'is-m']}>
               {m.m
-                ? <img class="mz__av" src="/assets/bot/marcy-mini.webp" width="26" height="26" alt="" loading="lazy" decoding="async" />
+                ? <img class="mz__av" src="/assets/bot/marcy-mini-64.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="26px" width="26" height="26" alt="" loading="lazy" decoding="async" />
                 : <span class="mz__av mz__av--c"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4.2" /><path d="M3.8 21c.7-4.3 4-7 8.2-7s7.5 2.7 8.2 7z" /></svg></span>}
               <div>
                 <p class="mz__who"><b>{m.m ? 'Marcy' : L.cliente}</b>{m.m && <span class="mz__tag">{L.asist}</span>}<span class="mz__h">{m.h}</span></p>

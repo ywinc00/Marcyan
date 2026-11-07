@@ -55,6 +55,7 @@ const cards = items.map((it) => {
           <div class="w-case__shot">
             <img
               src={`/Galeria/${c.slug}-pc-900.webp`}
+              srcset={[480, 640, 900, 1280].map((w) => `/Galeria/${c.slug}-pc-${w}.webp ${w}w`).join(', ') + `, /Galeria/${c.slug}-pc.webp 1920w`}
               sizes="(min-width: 1024px) 480px, 45vw" width="900" height="506"
               alt={`${c.name}, ${lang === 'en' ? 'desktop view' : 'vista de escritorio'}`}
               loading="lazy" decoding="async"

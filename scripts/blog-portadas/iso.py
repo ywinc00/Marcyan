@@ -172,7 +172,7 @@ class Lienzo:
         yy = np.linspace(0, 1, self.H, dtype=np.float32)[:, None, None]
         self.a[:] = hexrgb(top) * (1 - yy) + hexrgb(base) * yy
 
-    def guardar(self, path_base, grano=5.0, viñeta=0.35, sizes=(1280, 960, 640), q=74):
+    def guardar(self, path_base, grano=5.0, viñeta=0.35, sizes=(1280, 960, 640, 320), q=74):
         a = self.a
         # viñeta
         yy, xx = np.mgrid[0:self.H, 0:self.W].astype(np.float32)

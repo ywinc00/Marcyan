@@ -11,7 +11,7 @@
 // · Demo con guion: se reproduce UNA vez al entrar y se queda en un estado final con
 //   micro-vida (cursor que parpadea). Fuera de vista ≥ 8 s y vuelta → se reproduce de nuevo.
 // · Elección automática: si nadie elige en 6 s, un cursor fantasma elige UNA vez por
-//   ciclo. Se retira para siempre al primer pointerdown/pointerenter/focusin/keydown en
+//   ciclo. Se retira para siempre al primer pointerdown/focusin/keydown (v4: el hover ya no) en
 //   la pieza. Nunca dispara `mrc:ask` ni escribe en aria-live.
 // · `mrc:ask` SOLO con un clic o Enter explícito en "Pregúntale tú a Marcy".
 // · Todo se busca dentro de su nodo (root.querySelector), nunca global.
@@ -363,7 +363,8 @@ export function montarAgente(root: HTMLElement) {
     if (!corriendo) rl.cancel();
   };
   const ctrl = q('[data-w2-ctrl]');
-  ['pointerdown', 'pointerenter', 'keydown'].forEach((ev) => root.addEventListener(ev, retirar, { passive: true }));
+  // v4 (E-58): pasar el ratón por encima no retira nada; solo tocar o teclear.
+  ['pointerdown', 'keydown'].forEach((ev) => root.addEventListener(ev, retirar, { passive: true }));
   ctrl.addEventListener('focusin', retirar);
   root.addEventListener('focusin', retirar);
 
@@ -511,7 +512,7 @@ function montarBuscar(root: HTMLElement) {
     if (gh) gh.style.opacity = '0';
     if (!corriendo) rl.cancel();
   };
-  ['pointerdown', 'pointerenter', 'keydown', 'focusin'].forEach((ev) => root.addEventListener(ev, retirar, { passive: true }));
+  ['pointerdown', 'keydown', 'focusin'].forEach((ev) => root.addEventListener(ev, retirar, { passive: true }));
 
   flechas(ops, (i) => ops.forEach((b, k) => b.classList.toggle('is-on', k === i)));
   ops.forEach((b, i) => b.addEventListener('click', () => { retirar(); responder(i, !RM()); }));
@@ -628,9 +629,8 @@ export function montarMazo(root: HTMLElement) {
     if (p !== usuario) { usuario = p; pintarPausa(); sync(); }
   });
   const pila = root.querySelector<HTMLElement>('[data-w2-pila]')!;
-  pila.addEventListener('pointerenter', () => { hover = true; sync(); });
-  pila.addEventListener('pointerleave', () => { hover = false; sync(); });
-  root.addEventListener('focusin', (e) => { if (e.target === pausa) return; foco = true; sync(); });
+  // v4 (E-58): el hover ya no pausa la pila; solo el botón, el foco y la pestaña oculta.
+  root.addEventListener('focusin', (e) => { if (e.target === pausa || !(e.target as Element)?.matches?.(':focus-visible')) return; foco = true; sync(); });
   root.addEventListener('focusout', (e) => {
     if (e.relatedTarget instanceof Node && root.contains(e.relatedTarget) && e.relatedTarget !== pausa) return;
     foco = false; sync();

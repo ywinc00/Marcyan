@@ -26,7 +26,7 @@ interface Props {
 }
 const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero hs">
+<section class:list={['w-hero hs', `hs--${obj}`]}>
   <div class="w-container hs__grid">
     <HeroTexto
       eyebrow={eyebrow}
@@ -62,6 +62,17 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
       linear-gradient(160deg, rgba(var(--accent-gold-rgb), .62) 0%, rgba(176, 108, 52, .42) 45%, rgba(var(--accent-gold-rgb), .12) 100%);
     border-color: rgba(var(--accent-gold-rgb), .5);
     box-shadow: 0 0 80px rgba(var(--accent-gold-rgb), .16);
+  }
+  /* v4: el haz del atardecer pasa por debajo de los botones; el hero le deja sitio antes del fundido. */
+  @media (--lg) { .hs--inmobiliaria { padding-bottom: 168px; } }
+  /* v4 (dueño): en bienes raíces la placa dorada es más sólida y lleva la trama de seguridad del
+     pasaporte (ondas finas que se cruzan en rombos), como el borde de un documento. */
+  .hs--inmobiliaria .hs__obj :global(.wo-to__layer) {
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18' viewBox='0 0 36 18'%3E%3Cg fill='none' stroke='%237a5a26' stroke-opacity='.6' stroke-width='.8'%3E%3Cpath d='M0 9 Q9 0 18 9 T36 9'/%3E%3Cpath d='M0 9 Q9 18 18 9 T36 9'/%3E%3Cpath d='M0 0 Q9 9 18 0 T36 0'/%3E%3Cpath d='M0 18 Q9 9 18 18 T36 18'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 26px 13px,
+      linear-gradient(150deg, #e2c58c 0%, #c8a96e 38%, #b08a4e 72%, #9c773f 100%);
+    border-color: rgba(242, 214, 160, .7);
+    box-shadow: inset 0 1px 0 rgba(255, 240, 210, .55), 0 0 60px rgba(var(--accent-gold-rgb), .14);
   }
   @media (--lg) {
     /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */

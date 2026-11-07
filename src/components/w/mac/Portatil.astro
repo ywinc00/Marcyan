@@ -87,7 +87,7 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     /* la tapa casi cerrada (giro hacia quien mira) se proyecta POR DEBAJO de la
        bisagra y colgaba como un trapecio oscuro bajo la base: se recorta en la
        línea de la bisagra; por arriba y a los lados queda holgura para el 3D */
-    clip-path: inset(-40% -12% 0 -12%);
+    clip-path: inset(-40% -30% 0 -30%); /* v4: holgura lateral de sobra para la proyección de la tapa */
   }
   .pt-tapa {
     position: absolute; inset: 0;

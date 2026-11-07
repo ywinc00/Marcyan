@@ -1,48 +1,56 @@
 // ─────────────────────────────────────────────────────────────
-// Raíles con corte por sección (v3 · E-57 regla 2). Lo arranca WStyles.astro.
+// Raíles SOLO donde encajan (v4, E-58). Lo arranca WStyles.astro.
 //
-// Los raíles son dos líneas de 1 px que pinta main.w-rails (::before/::after, w.css). WorkOS
-// las quita justo donde se cruzarían con otra pieza; aquí se cortan en cualquier bloque que
-// lleve el atributo genérico `data-w-sin-rail` (un hero con objetos a sangre, una banda con
-// su propio fondo, una pieza que cruza el margen). Se ponen en el componente, no aquí.
+// Los raíles son dos líneas de 1 px que pinta main.w-rails (::before/::after, w.css). En
+// WorkOS no recorren la página entera: enmarcan las secciones de rejilla de celdas, donde el
+// marco de 1 px de la rejilla ES el raíl. Nunca en el hero ni sobre piezas que no casan.
 //
-// · Mide cada bloque marcado respecto al <main> y escribe --w-rail-mask: un degradado
-//   vertical con tramos transparentes en esas bandas (corte seco, a la altura exacta del
-//   bloque). La máscara la aplica w.css a las dos líneas.
-// · Se recalcula con ResizeObserver del <main> y de cada bloque (fuentes, imágenes y
-//   content-visibility cambian alturas), en un rAF. Sin listener de scroll.
-// · Hasta que esto corre (o sin JS), una página con cortes NO pinta los raíles
-//   (w.css: :has([data-w-sin-rail]) sin data-w-rail-listo): nunca se ven cruzando la pieza.
+// · Tramos visibles = la sección que contiene una rejilla de celdas (.w-cells, .wd-bento) o
+//   cualquier bloque marcado a mano con `data-w-rail`. Todo lo demás queda sin raíles.
+// · Nada dentro de un hero (.w-hero) ni de un bloque con data-w-sin-rail se enciende.
+// · Si la página no tiene ningún tramo, no hay raíles (la mayoría de landings).
+// · Mide respecto al <main>, escribe --w-rail-mask (tramos opacos solo en esas bandas) y se
+//   recalcula con ResizeObserver en un rAF. Sin listener de scroll. Sin JS: sin raíles.
 // ─────────────────────────────────────────────────────────────
 
+function tramos(main: HTMLElement): HTMLElement[] {
+  const set = new Set<HTMLElement>();
+  main.querySelectorAll<HTMLElement>('[data-w-rail]').forEach((e) => set.add(e));
+  main.querySelectorAll<HTMLElement>('.w-cells, .wd-bento').forEach((g) => {
+    const sec = g.closest<HTMLElement>('section') ?? g;
+    if (main.contains(sec) && sec !== main) set.add(sec);
+  });
+  return [...set].filter((e) => !e.closest('.w-hero, [data-w-sin-rail]'));
+}
+
 function montar(main: HTMLElement) {
-  const cortes = [...main.querySelectorAll<HTMLElement>('[data-w-sin-rail]')];
-  if (!cortes.length) return;
+  const bandas = tramos(main);
+  if (!bandas.length) return;
   let raf = 0;
   const calc = () => {
     raf = 0;
     const top0 = main.getBoundingClientRect().top;
     const alto = main.offsetHeight;
-    const tramos = cortes
+    const rangos = bandas
       .map((e) => { const r = e.getBoundingClientRect(); return [Math.max(0, r.top - top0), Math.min(alto, r.bottom - top0)]; })
       .filter(([a, b]) => b - a > 0)
       .sort((x, y) => x[0] - y[0]);
     const paradas: string[] = [];
     let y = 0;
-    for (const [a, b] of tramos) {
+    for (const [a, b] of rangos) {
       const ini = Math.max(a, y);
       if (b <= ini) continue;
-      paradas.push(`#000 ${Math.round(y)}px ${Math.round(ini)}px`, `transparent ${Math.round(ini)}px ${Math.round(b)}px`);
+      paradas.push(`transparent ${Math.round(y)}px ${Math.round(ini)}px`, `#000 ${Math.round(ini)}px ${Math.round(b)}px`);
       y = b;
     }
-    paradas.push(`#000 ${Math.round(y)}px`);
+    paradas.push(`transparent ${Math.round(y)}px`);
     main.style.setProperty('--w-rail-mask', `linear-gradient(180deg, ${paradas.join(', ')})`);
     main.dataset.wRailListo = '';
   };
   const pide = () => { if (!raf) raf = requestAnimationFrame(calc); };
   const ro = new ResizeObserver(pide);
   ro.observe(main);
-  cortes.forEach((c) => ro.observe(c));
+  bandas.forEach((c) => ro.observe(c));
   calc();
 }
 

@@ -51,7 +51,7 @@ const { h1Html, tail, lead, shot, side, wa, lang = 'es' } = Astro.props;
             <span class="ph__screen">
               <img
                 src={`/Galeria/${shot.slug}-pc-900.webp`}
-                srcset={`/Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc.webp 1920w`}
+                srcset={`/Galeria/${shot.slug}-pc-480.webp 480w, /Galeria/${shot.slug}-pc-640.webp 640w, /Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc-1280.webp 1280w, /Galeria/${shot.slug}-pc.webp 1920w`}
                 sizes="(min-width: 1024px) 736px, calc(100vw - 32px)"
                 width="900" height="506"
                 alt={shot.alt}

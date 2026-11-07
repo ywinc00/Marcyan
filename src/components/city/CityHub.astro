@@ -46,7 +46,12 @@ const phone: string = (nap as any)[city];
 const telHref = 'tel:' + phone.replace(/[^\d+]/g, '');
 const waHref = 'https://wa.me/' + phone.replace(/\D/g, '');
 const defaultCity = city === 'miami' ? 'Miami, FL' : 'Houston, TX';
-const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
+// v4 (E-58): escalera de anchos (scripts/imagenes/variantes.py) para que nunca se reduzca de más.
+const shot = (slug: string, mh: number) => ({
+  pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320),
+  pcSet: [480, 640, 900, 1280].map((w) => `/Galeria/${slug}-pc-${w}.webp ${w}w`).join(', ') + `, /Galeria/${slug}-pc.webp 1920w`,
+  mvSet: [160, 260, 390, 520, 780].map((w) => `/Galeria/${slug}-movil-${w}.webp ${w}w`).join(', ') + `, /Galeria/${slug}-movil.webp 1320w`,
+});
 // barra del navegador: solo dominios verificados (los demás, barra sin texto; nunca enlace)
 const domains = projects.map((p) => DOMINIOS[p.slug] ?? '');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
@@ -172,12 +177,12 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           <div class="pf__laptop">
             <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url" translate="no"><b data-names={domains.join('|')}>{domains[0]}</b></span></div>
             <div class="pf__screen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} width="900" height="506" alt="" loading="lazy" decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} srcset={shot(p.slug, p.mh).pcSet} sizes="(min-width: 1024px) 620px, 90vw" width="900" height="506" alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <div class="pf__phone">
             <div class="pf__pscreen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes="158px" width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <p class="pf__count"><b>01</b> / {String(projects.length).padStart(2, '0')}</p>
@@ -186,8 +191,8 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           {projects.map((p, i) => (
             <li class:list={['pf__step', i === 0 && 'is-on']} data-i={i}>
               <figure class="pf__mini" data-rev>
-                <img src={shot(p.slug, p.mh).pc} width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
-                <img class="pf__mph" src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
+                <img src={shot(p.slug, p.mh).pc} srcset={shot(p.slug, p.mh).pcSet} sizes="(min-width: 1024px) 560px, 92vw" width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
+                <img class="pf__mph" src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes="(min-width: 1024px) 150px, 28vw" width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
               </figure>
               <div class="w-hcase" style={`--case-acc:var(--accent-${p.accent === 'teal' ? 'teal' : 'gold'})`}>
                 <p class="pf__cat"><span>{String(i + 1).padStart(2, '0')}</span>{p.cat}</p>

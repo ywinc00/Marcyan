@@ -71,7 +71,7 @@ const lead = p.tags.map((t, i) => (i && /^[A-ZÁÉÍÓÚÑ](?![A-ZÁÉÍÓÚÑ])
           <div class="pc__phone-screen">
             <img
               src={`/Galeria/${p.slug}-movil-520.webp`}
-              srcset={`/Galeria/${p.slug}-movil-520.webp 520w, /Galeria/${p.slug}-movil.webp 1320w`}
+              srcset={`/Galeria/${p.slug}-movil-160.webp 160w, /Galeria/${p.slug}-movil-260.webp 260w, /Galeria/${p.slug}-movil-390.webp 390w, /Galeria/${p.slug}-movil-520.webp 520w, /Galeria/${p.slug}-movil-780.webp 780w, /Galeria/${p.slug}-movil.webp 1320w`}
               sizes="(min-width: 1024px) 280px, 64vw"
               width="520" height={MOVIL_520_H[p.slug] ?? 960}
               alt={`${p.name}, ${phoneAlt}`}

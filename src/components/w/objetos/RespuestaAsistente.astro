@@ -87,7 +87,7 @@ const srCols = en
             {i === 0 && <Ejemplo lang={lang} on="light" />}
             <p class="wo-ans__who">
               {c.p === 'marcy'
-                ? <img class="wo-ans__av" src="/assets/bot/marcy-mini.webp" width="16" height="16" alt="" loading="lazy" decoding="async" />
+                ? <img class="wo-ans__av" src="/assets/bot/marcy-mini-64.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="16px" width="16" height="16" alt="" loading="lazy" decoding="async" />
                 : LogoMarca ? <LogoMarca id={PLAT[c.p].id} size={16} tono="color" titulo="" /> : null}
               {!esPalabra(c.p) && <b translate="no">{PLAT[c.p].nombre}</b>} <span>{c.who}</span>
             </p>

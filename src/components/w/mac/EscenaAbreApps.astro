@@ -156,7 +156,7 @@ const destinos = {
           <div class="cor-main">
             <span class="cor-asunto">{T.correo.asunto}</span>
             <span class="cor-de">
-              <img src="/assets/bot/marcy-mini.webp" width="34" height="34" alt="" loading="lazy" decoding="async" />
+              <img src="/assets/bot/marcy-mini-128.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="21px" width="34" height="34" alt="" loading="lazy" decoding="async" />
               <span><b>{T.correo.de}</b><small>{T.correo.hora}</small></span>
             </span>
             <span class="cor-txt">{T.correo.saludo}</span>
@@ -182,8 +182,11 @@ const destinos = {
      portátil) se quede pegada. Una pista invisible
      de --abre-rec px al pie de la escena da la línea de tiempo (timeline-scope):
      su entrada completa coincide EXACTAMENTE con el tramo fijado. Sin listener (E-50). */
-  /* overflow-x: clip: la tapa en 3D se ensancha al girar; no crea contenedor de scroll (el sticky sigue) */
-  .abre { position: relative; display: flex; flex-direction: column; overflow-x: clip; }
+  /* v4: SIN recorte aquí. Al girar, la tapa en 3D se proyecta hasta ~10 % más ancha que la caja
+     (medido: 76 px por lado a 1440) y overflow-x:clip en .abre le cortaba las esquinas de arriba
+     en el tramo final. El recorte horizontal (para no crear scroll lateral) lo hace la sección
+     que la contiene, a ancho de ventana (Process.astro / quien la use). */
+  .abre { position: relative; display: flex; flex-direction: column; }
   .abre[data-tapa="scroll"] {
     --abre-rec: 300px;
     --abre-b: calc(84px + env(safe-area-inset-bottom, 0px));

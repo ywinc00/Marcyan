@@ -20,13 +20,15 @@
 // Movimiento reducido: quieto en el 47 %. Dominios de ejemplo en inglés en las páginas EN (M-2).
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import LogoMarca from '../../marcas/LogoMarca.astro';
-import CasaIlustrada from './CasaIlustrada.astro';
 import PlatoIlustrado from './PlatoIlustrado.astro';
 import { negocios } from '../../objetos/ejemplos/negocios';
 
 interface Props { kind: 'antes-despues' | 'listados' | 'mesa-qr' | 'platos'; lang?: 'es' | 'en' }
 const { kind, lang = 'es' } = Astro.props;
 const en = lang === 'en';
+// v4 (dueño, 2026-11-06): las casas del listado llevan FOTO, igual que la ficha del hero (la casa
+// dibujada "parece PowerPoint"). Casa Roble es la misma foto del hero. Licencias: LICENCIAS.md.
+const CASAS = ['/assets/w/sector/casa-roble-mini', '/assets/w/sector/casa-cypress-mini', '/assets/w/sector/casa-jardin-mini'];
 const ej = en ? 'Example' : 'Ejemplo';
 const T = {
   'antes-despues': en
@@ -145,7 +147,7 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
         <ul class="of-ls__l">
           {T.casas.map(([n, z, d]: [string, string, string[]], i: number) => (
             <li>
-              <span class="of-ls__mini"><CasaIlustrada v={i as 0 | 1 | 2} uid={`ls-${lang}`} /></span>
+              <span class="of-ls__mini"><img src={`${CASAS[i]}-144.webp`} srcset={`${CASAS[i]}-72.webp 72w, ${CASAS[i]}-144.webp 144w, ${CASAS[i]}-216.webp 216w`} sizes="(max-width: 767.98px) 60px, 72px" width="72" height="52" alt="" loading="lazy" decoding="async" /></span>
               <span class="of-ls__t"><b>{n}</b><span>{z}</span></span>
               <span class="of-ls__d">{d.map((x) => <span>{x}</span>)}</span>
             </li>
@@ -258,7 +260,9 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
   .of-ls__tabs .is-on { background: #fff; color: #111316; box-shadow: 0 1px 3px rgba(17, 19, 22, .12); }
   .of-ls__l { list-style: none; margin: 16px 0 0; padding: 0; display: grid; }
   .of-ls__l li { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid rgba(17, 19, 22, .1); }
-  .of-ls__mini { display: block; width: 72px; height: 52px; border-radius: 6px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(17, 19, 22, .08); }
+  .of-ls__mini { display: block; position: relative; width: 72px; height: 52px; border-radius: 6px; overflow: hidden; background: #c9ccd0; }
+  .of-ls__mini img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .of-ls__mini::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(17, 19, 22, .1); }
   .of-ls__t { display: grid; gap: 3px; min-width: 0; }
   .of-ls__t b { font: 300 19px/1.1 var(--font-display); letter-spacing: -0.02em; }
   .of-ls__t span { font: 400 12px/1.3 var(--font-body); color: #4d5358; }

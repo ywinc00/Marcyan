@@ -65,7 +65,7 @@ const price = '$' + PRICE_ANCHORS.web.toLocaleString('en-US');
   <Fragment slot="head">
     <link rel="preload" as="image" fetchpriority="high"
       href={`/Galeria/${first.slug}-pc-900.webp`}
-      imagesrcset={`/Galeria/${first.slug}-pc-900.webp 900w, /Galeria/${first.slug}-pc.webp 1920w`}
+      imagesrcset={`/Galeria/${first.slug}-pc-480.webp 480w, /Galeria/${first.slug}-pc-640.webp 640w, /Galeria/${first.slug}-pc-900.webp 900w, /Galeria/${first.slug}-pc-1280.webp 1280w, /Galeria/${first.slug}-pc.webp 1920w`}
       imagesizes="(min-width: 1024px) 736px, calc(100vw - 32px)" />
     {en
       ? <CollectionPageLd name={p.meta.title} description={p.meta.description} path={p.path} items={works} inLanguage="en" />

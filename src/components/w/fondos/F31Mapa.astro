@@ -1,0 +1,93 @@
+---
+// F31 · Plano real del barrio de noche (barrios, vuelta 4). Sustituye a la malla de rombos (F30), que
+// «no calzó» (dueño, 2026-11-06). Principio de Mapbox (Refero 8ae30fcd-d223-493b-b4d2-e06910d2dc55):
+// el mapa es la única luz de la composición. Calles REALES de OpenStreetMap (E-49: lo que existe no
+// se dibuja a mano), renderizadas en oro sobre la noche por scripts/mapas-barrio/render.py con la
+// MISMA proyección que el chip del barrio: las vías iluminadas del chip caen sobre sus autopistas
+// reales. Imagen con escalera de anchos (E-58), quieta.
+// Encaje: un guion mínimo mide el centro del chip (.wo-hood svg) y su escala, y coloca la imagen
+// (--mp-x, --mp-y, --mp-k). Sin JS queda centrada a la altura típica del chip.
+// Lectura: apagado bajo la navegación y detrás del bloque de texto (E-37), vivo alrededor del chip.
+// Crédito de OpenStreetMap (ODbL) al pie del hero, discreto.
+interface Props { estilos?: boolean; lang?: 'es' | 'en' }
+const { estilos = true, lang = 'es' } = Astro.props;
+const ruta = Astro.url.pathname.replace(/\/+$/, '');
+const BARRIO: Record<string, string> = {
+  '/es/houston/katy': 'katy', '/es/houston/sugar-land': 'sugar-land',
+  '/es/miami/doral': 'doral', '/es/miami/hialeah': 'hialeah',
+};
+const b = BARRIO[ruta] ?? 'katy';
+const base = `/assets/w/barrios/${b}-mapa`;
+// Imagen a 1x: 2400 × 1400, centro del chip en (1200, 700); escala 1 = chip de escritorio (900 px).
+const CSS = `
+  .wf-mp {
+    position: absolute; inset: 0; overflow: hidden;
+    --mp-x: 50%; --mp-y: 720px; --mp-k: 1;
+    -webkit-mask-image:
+      radial-gradient(46% 36% at 50% 28%, rgba(0,0,0,.06) 0%, rgba(0,0,0,.1) 60%, #000 100%),
+      linear-gradient(180deg, transparent calc(var(--nav-h, 72px) - 8px), #000 calc(var(--nav-h, 72px) + 220px));
+    -webkit-mask-composite: source-in;
+            mask-image:
+      radial-gradient(46% 36% at 50% 28%, rgba(0,0,0,.06) 0%, rgba(0,0,0,.1) 60%, #000 100%),
+      linear-gradient(180deg, transparent calc(var(--nav-h, 72px) - 8px), #000 calc(var(--nav-h, 72px) + 220px));
+            mask-composite: intersect;
+  }
+  .wf-mp__img {
+    position: absolute; max-width: none;
+    width: calc(2400px * var(--mp-k)); height: calc(1400px * var(--mp-k));
+    left: calc(var(--mp-x) - 1200px * var(--mp-k)); top: calc(var(--mp-y) - 700px * var(--mp-k));
+    opacity: .82;
+    /* bordes de la imagen fundidos (pantallas de más de 2400 px) */
+    -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 70%, transparent 100%);
+            mask-image: radial-gradient(50% 50% at 50% 50%, #000 70%, transparent 100%);
+  }
+  .wf-mp__osm {
+    position: absolute; left: max(16px, var(--wf-l, 16px)); bottom: 88px; z-index: 1; /* a la izquierda: a la derecha lo tapa el botón del chat */
+    font: 400 10px/1 var(--font-mono); letter-spacing: .04em; color: rgba(240, 237, 232, .34);
+  }
+  @media (max-width: 767.98px) {
+    .wf-mp { --mp-k: .6667; --mp-y: 620px;
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0,0,0,.12) 18%, rgba(0,0,0,.18) 48%, #000 64%);
+              mask-image: linear-gradient(180deg, transparent 0, rgba(0,0,0,.12) 18%, rgba(0,0,0,.18) 48%, #000 64%);
+    }
+    .wf-mp__osm { bottom: 72px; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-mp" data-wf-mapa>
+  <img
+    class="wf-mp__img"
+    src={`${base}-2400.webp`}
+    srcset={`${base}-1200.webp 1200w, ${base}-2400.webp 2400w, ${base}-3600.webp 3600w`}
+    sizes="(max-width: 767.98px) 1600px, 2400px"
+    width="2400" height="1400" alt="" fetchpriority="low" decoding="async"
+  />
+  <span class="wf-mp__osm" aria-hidden="true">{lang === 'en' ? 'Map' : 'Mapa'} © OpenStreetMap</span>
+</div>
+<script>
+  // Coloca el plano bajo el chip: mide su centro (300,150 del lienzo 600×300) y su escala (900 px = 1).
+  function encaja() {
+    const capa = document.querySelector<HTMLElement>('[data-wf-mapa]');
+    const svg = document.querySelector<SVGSVGElement>('.wo-hood svg');
+    if (!capa || !svg) return;
+    let raf = 0;
+    const calc = () => {
+      raf = 0;
+      const c = capa.getBoundingClientRect(), r = svg.getBoundingClientRect();
+      if (!r.width) return;
+      capa.style.setProperty('--mp-x', `${(r.left - c.left + r.width / 2).toFixed(1)}px`);
+      capa.style.setProperty('--mp-y', `${(r.top - c.top + r.height / 2).toFixed(1)}px`);
+      capa.style.setProperty('--mp-k', (r.width / 900).toFixed(4));
+    };
+    const pide = () => { if (!raf) raf = requestAnimationFrame(calc); };
+    const ro = new ResizeObserver(pide);
+    ro.observe(capa); ro.observe(svg);
+    calc();
+    // la entrada del chip usa transform (no la ve ResizeObserver): una medida más al acabar
+    window.addEventListener('load', pide, { once: true });
+    setTimeout(pide, 1400);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', encaja, { once: true });
+  else encaja();
+</script>

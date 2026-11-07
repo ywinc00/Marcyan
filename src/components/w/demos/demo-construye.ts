@@ -11,7 +11,7 @@
 //   P02a). Grupos radiogroup con tabulación itinerante y flechas. Resumen en aria-live SOLO con cambios
 //   del visitante; elecciones del visitante en sessionStorage (try/catch).
 // · Cursor fantasma (§1.5): si nadie toca en 6 s, un ajuste cada 4 s (color → marcos → idioma), máx. 3;
-//   se retira para siempre al primer pointerdown/pointerenter/focusin/keydown; nunca con reducir movimiento,
+//   se retira para siempre al primer pointerdown/focusin/keydown (v4: el hover ya no); nunca con reducir movimiento,
 //   nunca escribe en aria-live ni en sessionStorage.
 // · Solo transform/opacity; los nodos se buscan dentro de su raíz (nunca document.querySelector global).
 // ─────────────────────────────────────────────────────────────
@@ -212,7 +212,6 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
   // Gesto, foco o tecla en cualquier punto de la pieza lo retiran; el ratón solo cuando ENTRA en la demo
   // (con el ratón quieto sobre la columna de texto mientras se baja con la rueda, el fantasma sigue).
   for (const ev of ['pointerdown', 'focusin', 'keydown']) pieza.addEventListener(ev, fantasmaFuera, { once: true, passive: true });
-  pz.querySelector('[data-pz-stage]')?.addEventListener('pointerenter', fantasmaFuera, { once: true, passive: true });
   const ajuste = () => {
     if (retirado || !ghost || hechos >= 3) return;
     // Seis segundos seguidos a la vista y con los controles delante antes del primer ajuste.

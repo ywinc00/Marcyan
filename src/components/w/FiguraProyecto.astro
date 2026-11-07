@@ -50,7 +50,7 @@ const alt = lang === 'en'
         <div class="w-fig__screen">
           <img
             src={`/Galeria/${slug}-pc-900.webp`}
-            srcset={`/Galeria/${slug}-pc-900.webp 900w, /Galeria/${slug}-pc.webp 1920w`}
+            srcset={`/Galeria/${slug}-pc-480.webp 480w, /Galeria/${slug}-pc-640.webp 640w, /Galeria/${slug}-pc-900.webp 900w, /Galeria/${slug}-pc-1280.webp 1280w, /Galeria/${slug}-pc.webp 1920w`}
             sizes="(min-width: 800px) 736px, calc(100vw - 32px)"
             width="900" height="506"
             alt={`${project.name}, ${alt.pc}`}
@@ -62,7 +62,7 @@ const alt = lang === 'en'
         <div class="w-fig__phone-screen">
           <img
             src={`/Galeria/${slug}-movil-520.webp`}
-            srcset={`/Galeria/${slug}-movil-520.webp 520w, /Galeria/${slug}-movil.webp 1320w`}
+            srcset={`/Galeria/${slug}-movil-160.webp 160w, /Galeria/${slug}-movil-260.webp 260w, /Galeria/${slug}-movil-390.webp 390w, /Galeria/${slug}-movil-520.webp 520w, /Galeria/${slug}-movil-780.webp 780w, /Galeria/${slug}-movil.webp 1320w`}
             sizes="(min-width: 800px) 156px, 26vw"
             width="520" height={MOVIL_520_H[slug] ?? 960}
             alt={`${project.name}, ${alt.movil}`}

@@ -43,7 +43,7 @@ const L = { region: 'Conversaciones que contesta Marcy', carrusel: 'carrusel', d
                 {x.msgs.map((m) => (
                   <div class:list={['cz__msg', m.m && 'is-m']}>
                     {m.m
-                      ? <img class="cz__av" src="/assets/bot/marcy-mini.webp" width="28" height="28" alt="" loading="lazy" decoding="async" />
+                      ? <img class="cz__av" src="/assets/bot/marcy-mini-64.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="28px" width="28" height="28" alt="" loading="lazy" decoding="async" />
                       : <span class="cz__av cz__av--p" style={`--av-bg:${x.color[0]};--av-ink:${x.color[1]}`}>{x.ini}</span>}
                     <div>
                       <p class="cz__who"><b>{m.m ? 'Marcy' : x.quien}</b>{m.m && <span class="cz__tag">ASISTENTE</span>}<span class="cz__h">{m.h}</span></p>

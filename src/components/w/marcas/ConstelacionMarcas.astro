@@ -151,7 +151,7 @@ const estiloSt = [
     {polvoM.map((d) => <span class="cm-d cm-d--m" style={`left:${pct(d.x, movil.W)};top:${pct(d.y, movil.H)};opacity:${d.o};--t:${d.t}px`}></span>)}
     <div class="cm-centro">
       <slot>
-        <img src="/assets/bot/marcy-hero.webp" width="364" height="512" alt="" loading="lazy" decoding="async" />
+        <img src="/assets/bot/marcy-hero.webp" srcset="/assets/bot/marcy-hero-182.webp 182w, /assets/bot/marcy-hero-270.webp 270w, /assets/bot/marcy-hero.webp 364w" sizes="(max-width: 767.98px) 50vw, 364px" width="364" height="512" alt="" loading="lazy" decoding="async" />
       </slot>
     </div>
     <svg class="cm-lines cm-lines--p" viewBox={`0 0 ${pc.W} ${pc.H}`} preserveAspectRatio="none" focusable="false">

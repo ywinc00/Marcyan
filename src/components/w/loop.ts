@@ -8,7 +8,8 @@
 //   rootMargin 100px) y con la pestaña visible (visibilitychange).
 // · prefers-reduced-motion: reduce (también si cambia en vivo) → still() pinta
 //   un fotograma representativo y quieto, y nunca arranca.
-// · Se para mientras haya foco (focusin) o puntero (pointerenter) dentro.
+// · Se para mientras haya foco de TECLADO dentro (:focus-visible). v4 (E-58): pasar el ratón
+//   por encima NUNCA la para (en PC daba la sensación de que la animación fallaba).
 // · Bucles > 5 s: botón "Pausar animación" / "Reanudar animación" 44×44
 //   (WCAG 2.2.2), esquina inferior derecha, aria-pressed, fuera de aria-hidden.
 //   Va con estilos en línea (solo variables): funciona también fuera de v3.
@@ -58,13 +59,12 @@ export function registerLoop(el: HTMLElement, handlers: LoopHandlers = {}, optio
 
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
   let inView = false;
-  let hovered = false;
   let focused = false;
   let userPaused = false;
   let playing = false;
   let reduced = mq.matches;
 
-  const shouldPlay = () => !reduced && inView && !document.hidden && !hovered && !focused && !userPaused;
+  const shouldPlay = () => !reduced && inView && !document.hidden && !focused && !userPaused;
   const sync = () => {
     const want = shouldPlay();
     if (want && !playing) { playing = true; start(); }
@@ -101,15 +101,17 @@ export function registerLoop(el: HTMLElement, handlers: LoopHandlers = {}, optio
 
   // El propio botón no debe contar como "foco dentro" que pare el bucle.
   const isBtn = (t: EventTarget | null) => !!btn && t === btn;
-  const onEnter = () => { hovered = true; sync(); };
-  const onLeave = () => { hovered = false; sync(); };
-  const onFocusIn = (e: FocusEvent) => { if (isBtn(e.target)) return; focused = true; sync(); };
+  // Solo el foco de teclado pausa; un clic con el ratón que deja foco no corta el bucle.
+  const onFocusIn = (e: FocusEvent) => {
+    if (isBtn(e.target)) return;
+    const t = e.target as Element | null;
+    if (!t?.matches?.(':focus-visible')) return;
+    focused = true; sync();
+  };
   const onFocusOut = (e: FocusEvent) => {
     if (e.relatedTarget instanceof Node && el.contains(e.relatedTarget) && !isBtn(e.relatedTarget)) return;
     focused = false; sync();
   };
-  el.addEventListener('pointerenter', onEnter);
-  el.addEventListener('pointerleave', onLeave);
   el.addEventListener('focusin', onFocusIn);
   el.addEventListener('focusout', onFocusOut);
 
@@ -149,8 +151,6 @@ export function registerLoop(el: HTMLElement, handlers: LoopHandlers = {}, optio
       io?.disconnect();
       document.removeEventListener('visibilitychange', onVis);
       mq.removeEventListener?.('change', onMq);
-      el.removeEventListener('pointerenter', onEnter);
-      el.removeEventListener('pointerleave', onLeave);
       el.removeEventListener('focusin', onFocusIn);
       el.removeEventListener('focusout', onFocusOut);
       btn?.remove();

@@ -141,7 +141,8 @@ const pasos = [
   [T.s3t, may(enumera(frase)) + '.'],
   [T.s4t, T.resumen4],
 ];
-const avatar = '/assets/bot/marcy-mini.webp';
+const avatar = '/assets/bot/marcy-mini-128.webp';
+const avatarSet = '/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w';
 ---
 <div class:list={['alta', cls]} tabindex="-1" data-w2-alta data-w2-step="5" lang={lang} style={`--alta-bajar:${bajar}px`}>
   <p class="sr-only">{T.sr}</p>
@@ -158,7 +159,7 @@ const avatar = '/assets/bot/marcy-mini.webp';
           <div class="alta-bar"><i></i><i></i><i></i></div>
 
           <div class="alta-scr" data-s="1">
-            <span class="alta-app"><img src={avatar} alt="" width="48" height="48" loading="lazy" decoding="async" /></span>
+            <span class="alta-app"><img src={avatar} srcset={avatarSet} sizes="48px" alt="" width="48" height="48" loading="lazy" decoding="async" /></span>
             <span class="alta-t">{T.s1t}</span>
             <span class="alta-d">{T.s1d}</span>
             <span class="alta-feat">
@@ -228,7 +229,7 @@ const avatar = '/assets/bot/marcy-mini.webp';
         <!-- Panel web de ejemplo (estado final) -->
         <div class="alta-panel">
           <span class="alta-p-head">
-            <span class="alta-p-ava"><img src={avatar} alt="" width="38" height="38" loading="lazy" decoding="async" /></span>
+            <span class="alta-p-ava"><img src={avatar} srcset={avatarSet} sizes="38px" alt="" width="38" height="38" loading="lazy" decoding="async" /></span>
             <span>
               <span class="alta-p-name">{T.negocio}</span>
               <span class="alta-p-on"><i class="alta-p-dot"></i>{T.enLinea}</span>

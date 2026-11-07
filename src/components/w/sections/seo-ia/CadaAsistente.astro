@@ -13,7 +13,7 @@
 // la respuesta se reproduce (pasos → mensaje → fuentes). Al entrar en vista se reproduce la 1.ª;
 // al reentrar tras ≥ 8 s fuera, se repite la activa. Si nadie toca en 6 s, un cursor fantasma
 // cambia de pestaña (máximo 3 veces por visita, cada 4 s contados desde que termina la respuesta)
-// y se retira para siempre al primer pointerenter, pointerdown, focusin o keydown dentro. El
+// y se retira para siempre al primer pointerdown, focusin o keydown (v4: el hover ya no) dentro. El
 // fantasma no mueve el foco ni escribe en ninguna región viva. Con reducir movimiento: sin
 // fantasma, todo en su estado final, las pestañas siguen funcionando.
 // Sin JS: la 1.ª pestaña visible y completa; las demás ocultas (hidden).
@@ -202,7 +202,7 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
       clearTimeout(timer);
       ghost.classList.remove('is-on');
     };
-    ['pointerenter', 'pointerdown', 'focusin', 'keydown'].forEach((ev) =>
+    ['pointerdown', 'focusin', 'keydown'].forEach((ev) =>
       root.addEventListener(ev, retirar, { once: true, passive: true }));
     const pausado = () => { try { return sessionStorage.getItem('w2:pausa') === '1'; } catch { return false; } };
     const programar = (ms: number) => {

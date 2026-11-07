@@ -71,6 +71,9 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
 
   /* ── Fase final: portátil + CTA (slot `final` de LineaFases) ── */
   .process__fin { min-width: 0; }
+  /* v4: el recorte lateral de la tapa en 3D vive aquí, a ancho de ventana (antes en .abre, que le
+     cortaba las esquinas). overflow-x:clip no crea contenedor de scroll: el tramo fijado sigue. */
+  .process[data-process] { overflow-x: clip; }
   /* v3: la tapa vuelve a abrirse con el portátil FIJADO y centrado (tramo de EscenaAbreApps).
      Sin fijar, giraba mientras la pieza aún asomaba por abajo (E-57 regla 4). */
   @media (max-width: 899.98px) {

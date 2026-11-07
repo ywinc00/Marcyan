@@ -104,3 +104,20 @@ Estado: PROPUESTO, pendiente del OK visual del dueño sobre capturas reales (esc
   **E-08** vacío que propone la salida (el "Alta manual" de Origen se convierte en el brief creado al enviar).
 - Sin brief: "Enviar kit de arranque" abre el diálogo, que avisa de que se crea su brief con la ficha.
   Con brief: "Enviar kit desde su brief" lleva a ese brief, donde vive su kit.
+
+## Añadido 2026-11-07 · Sección Marcy (conversaciones en vivo, historial, citas, gasto)
+Estado: PROPUESTO. El dueño elige entre el boceto A (bandeja y lectura) y el B (tabla y conversación en
+ventana): `design/orbit-marcy-bocetos.png` / `.html`. Nada se construye en fino sin su elección.
+- Anfitrión (E-19): una sección más del menú de Orbit, con las primitivas existentes (PageHeader, KpiGrid,
+  Kpi, StatusChip, Card, Modal, EmptyState, LoadingState, ErrorState). Ningún componente nuevo salvo la
+  burbuja de mensaje y el aviso de "aquí se fue".
+- Piezas del catálogo: **E-06** filtros en pastillas por resultado con el estado en la URL; **I-06** pestañas
+  segmentadas Conversaciones · Citas (dos vistas de la misma sección); **E-08/E-09/E-10** vacío con salida,
+  carga honesta y error con Reintentar (incluido "falta aplicar la migración 018"); **H-07** presupuesto del
+  acento: el naranja no aparece (no hay acción principal de crear); en vivo y cerradas en verde de datos,
+  "dónde falló" en ámbar de aviso, nunca solo color (siempre con texto).
+- Datos honestos (E-55): cada cifra sale del registro propio (gasto = precios oficiales por token); el tope
+  solo se dibuja si existe `MARCY_MONTHLY_CAP_USD`.
+- En vivo: refresco cada 5 s solo con la pestaña visible; el punto verde no parpadea (sin animación de bucle).
+- Citas: la pestaña aparece cuando Marcy pueda agendar (fase 1 pendiente); hasta entonces no se dibuja.
+- Ledger aplicable: E-11, E-17, E-19, E-30, E-39, E-55, E-60 (móvil táctil real antes de entregar).

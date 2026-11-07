@@ -376,6 +376,15 @@ function priceAllowVariants(v) {
   return [...s].filter((n) => n >= 10).map(String); // >= PRICE_MIN del filtro (chat-kb.mjs)
 }
 
+// Pérdidas estimadas: se permite también redondearlas (a 10, 50 y 100), como haría
+// cualquier persona ("unos $1,560" por 1559). Verificado en la batería 2026-11-07.
+// Solo para pérdidas: los precios de cotizar se citan EXACTOS.
+export function lossAllow(values) {
+  const out = new Set();
+  for (const v of values) for (const step of [1, 10, 50, 100]) { const r = Math.round(v / step) * step; if (r > 0) out.add(r); }
+  return [...out].flatMap(priceAllowVariants);
+}
+
 export function computeLossToolResult(input) {
   const inp = input || {};
   if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
@@ -384,12 +393,12 @@ export function computeLossToolResult(input) {
     // Cifras intermedias también calculadas aquí: Sonnet 5.5 tiende a citar la semanal o
     // el valor bruto de las llamadas perdidas, y el filtro estricto (P3) cortaba la
     // respuesta entera (batería 2026-11-07, calculadora-es 0/3).
-    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_semanal: weekly, perdida_mensual: monthly, perdida_anual: yearly, valor_llamadas_perdidas_semana: missedValueWeekly, nota: 'perdida = llamadas perdidas x ticket x tasa de cierre estimada' }), extraAllow: [weekly, monthly, yearly, missedValueWeekly].flatMap(priceAllowVariants) };
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_semanal: weekly, perdida_mensual: monthly, perdida_anual: yearly, valor_llamadas_perdidas_semana: missedValueWeekly, nota: 'perdida = llamadas perdidas x ticket x tasa de cierre estimada' }), extraAllow: lossAllow([weekly, monthly, yearly, missedValueWeekly]) };
   }
   if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
     const { monthly, yearly } = computeNoShows(inp);
     if (monthly < 1) return FAIL_RESULT;
-    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: lossAllow([monthly, yearly]) };
   }
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }

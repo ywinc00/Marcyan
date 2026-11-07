@@ -294,6 +294,11 @@ check('calculadora: semanal y valor bruto también salen del servidor y pasan el
   assert.equal(c.valor_llamadas_perdidas_semana, 1200); assert.equal(c.perdida_semanal, 360);
   assert.equal(blockedFigures('Pierdes $1,200 en llamadas a la semana', out.extraAllow).length, 0);
 });
+check('calculadora: la pérdida redondeada pasa (1559 → "unos $1,560"), una inventada no', () => {
+  const out = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200 });
+  assert.equal(blockedFigures('Pierdes unos $1,560 al mes', out.extraAllow).length, 0);
+  assert.equal(blockedFigures('Pierdes unos $1,700 al mes', out.extraAllow).length, 1);
+});
 check('cifras cortadas: lista lo que el filtro cortaría', () => assert.deepEqual(blockedFigures('Te sale en $7,777', []), ['7777']));
 check('captura sin texto: la frase sale del campo mensaje', () => {
   const c = [{ type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Una landing para tu taller parte de $400. Confírmame tu contacto y te armo la propuesta.' } }];

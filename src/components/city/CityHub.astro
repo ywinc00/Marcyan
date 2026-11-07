@@ -31,7 +31,10 @@ const phone: string = (nap as any)[city];
 const telHref = 'tel:' + phone.replace(/[^\d+]/g, '');
 const waHref = 'https://wa.me/' + phone.replace(/\D/g, '');
 const defaultCity = city === 'miami' ? 'Miami, FL' : 'Houston, TX';
-const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
+// el teléfono se ve a ~104-156 px: la variante de 320 basta hasta pantallas x2 (la de 520 queda para tabletas)
+const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320),
+  mvSet: `/Galeria/${slug}-movil-320.webp 320w, /Galeria/${slug}-movil-520.webp 520w` });
+const mvSizes = '(max-width: 1023px) min(30vw, 150px), 154px';
 const names = projects.map((p) => p.name).join('|');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
 const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
@@ -66,7 +69,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           <p class="found__q" id="hx-found-q" hidden><Icon name="lucide:search" class="found__qi" /><span></span></p>
           <div class="found__head">
             <svg class="logo-mark" viewBox="0 0 38 38" aria-hidden="true"><defs><linearGradient id="hx-lmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c4a40"/><stop offset="1" stop-color="#16271f"/></linearGradient></defs><rect width="38" height="38" rx="10" fill="url(#hx-lmg)"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.2" stroke-linecap="round"/><path d="M19 13.2v-2.6M12.6 15.8l-1.8-1.8M25.4 15.8l1.8-1.8" stroke="#f3ecdf" stroke-width="2" stroke-linecap="round"/><path d="M13.5 29h11" stroke="#f3ecdf" stroke-width="1.8" stroke-linecap="round" opacity=".45"/></svg>
-            <span class="found__who"><b>{j.card.name}</b><span>{j.card.meta}</span></span>
+            <span class="found__who"><b>{j.card.name}</b><span class="found__meta"><span class="found__mi">{String(j.card.meta).split(' · ').map((t: string) => <span>{t}</span>)}</span></span></span>
           </div>
           <div class="found__row">{j.card.named} {j.card.checks.map((x: string) => <span class="chk">{x}</span>)}</div>
           <p class="found__ai" id="hx-found-ai"><i></i>{j.card.ai}</p>
@@ -142,7 +145,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           <div class="pf__phone">
             <div class="pf__notch"></div>
             <div class="pf__pscreen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes={mvSizes} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <p class="pf__count"><b>01</b> / {String(projects.length).padStart(2, '0')}</p>
@@ -152,7 +155,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
             <li class:list={['pf__step', i === 0 && 'is-on']} data-i={i}>
               <figure class="pf__mini" data-rev>
                 <img src={shot(p.slug, p.mh).pc} width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
-                <img class="pf__mph" src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
+                <img class="pf__mph" src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes={mvSizes} width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
               </figure>
               <p class="pf__cat"><span>{String(i + 1).padStart(2, '0')}</span>{p.cat}</p>
               <h3 class="pf__name" translate="no">{p.name}</h3>

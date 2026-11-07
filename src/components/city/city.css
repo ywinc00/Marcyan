@@ -126,6 +126,12 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .found__who{flex:1;min-width:0;line-height:1.25}
 .hx .found__who b{display:block;font-size:15px}
 .hx .found__who span{font-size:12.5px;color:#4a4640}
+/* lugar · estado: si no caben en una línea, el estado baja entero y el punto separador no se queda colgando
+   (cada tramo lleva su punto delante y el del principio de cada línea queda fuera, recortado) */
+.hx .found__meta{display:block;overflow:hidden}
+.hx .found__mi{display:flex;flex-wrap:wrap;margin-left:-1em}
+.hx .found__mi>span{white-space:nowrap}
+.hx .found__mi>span::before{content:"·";display:inline-block;width:1em;text-align:center}
 .hx .found__row{margin-top:10px;padding-top:9px;border-top:1px solid rgba(8,8,8,.1);display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#4a4640}
 .hx .chk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 7px;border-radius:4px;background:rgba(8,8,8,.06);color:#2a2824}
 .hx .found__ai{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#2a2824;opacity:0;transform:translateY(4px);transition:opacity .2s cubic-bezier(.2,0,0,1) var(--d,0s),transform .2s cubic-bezier(.2,0,0,1) var(--d,0s)}

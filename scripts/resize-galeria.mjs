@@ -13,6 +13,9 @@ for (const f of readdirSync(DIR)) {
   if (f.endsWith('-movil.webp') && !f.includes('-movil-')) {
     await sharp(join(DIR, f)).resize({ width: 520 }).webp({ quality: 80 })
       .toFile(join(DIR, f.replace('-movil.webp', '-movil-520.webp')));
+    // el teléfono de las maquetas de los hubs de ciudad se ve a ~104-156 px
+    await sharp(join(DIR, f)).resize({ width: 320 }).webp({ quality: 80 })
+      .toFile(join(DIR, f.replace('-movil.webp', '-movil-320.webp')));
   }
 }
 console.log('variantes listas');

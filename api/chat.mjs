@@ -28,7 +28,7 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
@@ -379,9 +379,12 @@ function priceAllowVariants(v) {
 export function computeLossToolResult(input) {
   const inp = input || {};
   if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
-    const { monthly, yearly } = computeMissedCalls(inp);
+    const { monthly, yearly, weekly, missedValueWeekly } = computeMissedCalls(inp);
     if (monthly < 1) return FAIL_RESULT; // pérdida nula → no computa (no cites $0)
-    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    // Cifras intermedias también calculadas aquí: Sonnet 5.5 tiende a citar la semanal o
+    // el valor bruto de las llamadas perdidas, y el filtro estricto (P3) cortaba la
+    // respuesta entera (batería 2026-11-07, calculadora-es 0/3).
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_semanal: weekly, perdida_mensual: monthly, perdida_anual: yearly, valor_llamadas_perdidas_semana: missedValueWeekly, nota: 'perdida = llamadas perdidas x ticket x tasa de cierre estimada' }), extraAllow: [weekly, monthly, yearly, missedValueWeekly].flatMap(priceAllowVariants) };
   }
   if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
     const { monthly, yearly } = computeNoShows(inp);
@@ -585,8 +588,6 @@ export default async function handler(req, res) {
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
     const updatesAsText = model === UPDATES_MODEL;
-    // TEMPORAL (diagnóstico Sonnet 5.5, solo vista previa): tipos y largos de bloque, sin contenido.
-    if (process.env.VERCEL_ENV !== 'production') console.log('[chat-debug] bloques=' + JSON.stringify((finalResp.content || []).map((b) => [b.type, (b.text || b.thinking || '').length])));
     const parsed = parseToolResponse(finalResp.content, lang, { updatesAsText });
     let text = parsed.text;
     let action = parsed.action;
@@ -597,6 +598,8 @@ export default async function handler(req, res) {
       const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
+    const cortadas = blockedFigures(text || '', extraAllow);
+    if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
 

@@ -9,7 +9,7 @@ import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -288,6 +288,13 @@ check('sin updates, el thinking NUNCA se muestra (no filtra razonamiento)', () =
   const c = [{ type: 'thinking', thinking: 'razonamiento interno', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
   assert.doesNotMatch(parseToolResponse(c, 'es').text, /razonamiento/);
 });
+check('calculadora: semanal y valor bruto también salen del servidor y pasan el filtro', () => {
+  const out = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200 });
+  const c = JSON.parse(out.content);
+  assert.equal(c.valor_llamadas_perdidas_semana, 1200); assert.equal(c.perdida_semanal, 360);
+  assert.equal(blockedFigures('Pierdes $1,200 en llamadas a la semana', out.extraAllow).length, 0);
+});
+check('cifras cortadas: lista lo que el filtro cortaría', () => assert.deepEqual(blockedFigures('Te sale en $7,777', []), ['7777']));
 check('captura sin texto: la frase sale del campo mensaje', () => {
   const c = [{ type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Una landing para tu taller parte de $400. Confírmame tu contacto y te armo la propuesta.' } }];
   assert.match(parseToolResponse(c, 'es').text, /landing/);

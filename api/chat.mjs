@@ -74,7 +74,18 @@ export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 
 // Pura y exportada para el guard test.
 export function modelTuning(model) {
   if (model === 'claude-haiku-4-5') return {};
+  // Sonnet 5.5: lo que el modelo escribe ANTES de una herramienta (p. ej. la frase
+  // que acompaña al formulario) ya no llega como texto sino como "nota de progreso"
+  // dentro de un bloque de thinking, vacío por defecto. Con display 'updates' llegan
+  // SOLO esas notas (nunca el razonamiento) y parseToolResponse las usa como texto.
+  // Causa verificada con la batería del 2026-11-07 (decidido-landing 0/3).
+  if (model === UPDATES_MODEL) return { thinking: { type: 'adaptive', display: 'updates' }, output_config: { effort: 'low' } };
   return { thinking: { type: 'adaptive' }, output_config: { effort: 'low' } };
+}
+export const UPDATES_MODEL = 'claude-sonnet-5-5';
+// Cabecera beta que exige display 'updates'.
+export function modelRequestOptions(model) {
+  return model === UPDATES_MODEL ? { headers: { 'anthropic-beta': 'thinking-display-updates-2026-08-18' } } : undefined;
 }
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
@@ -282,9 +293,14 @@ function toolOnlyFallback(action, lang) {
 // Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
 // Un solo turno: NO se envía tool_result ni hay 2ª llamada. Toma el PRIMER tool_use
 // de una de NUESTRAS herramientas (Marcy usa como máximo una por mensaje).
-export function parseToolResponse(content, lang = 'es') {
+export function parseToolResponse(content, lang = 'es', { updatesAsText = false } = {}) {
   const blocks = Array.isArray(content) ? content : [];
   let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
+  // Solo con display 'updates' (Sonnet 5.5) los bloques de thinking traen notas para el
+  // cliente y no razonamiento; en cualquier otro modelo NUNCA se leen (fuga de razonamiento).
+  if (!text && updatesAsText) {
+    text = blocks.filter((b) => b && b.type === 'thinking' && typeof b.thinking === 'string').map((b) => b.thinking.trim()).filter(Boolean).join(' ').trim();
+  }
   // El prompt pide una herramienta por turno, pero si el modelo emitiera varias, la
   // CAPTURA (cierre) manda; si no, la primera reconocida. Así nunca se pierde el form.
   const toolUses = blocks.filter((b) => b && b.type === 'tool_use' && OUR_TOOLS.has(b.name));
@@ -520,7 +536,7 @@ export default async function handler(req, res) {
 
     // 1ª llamada (≤14s: incluye el thinking adaptativo). El input del usuario vive SOLO en `messages`.
     const r1 = await withTimeout(
-      client.messages.create({ ...baseParams, messages }),
+      client.messages.create({ ...baseParams, messages }, modelRequestOptions(model)),
       14000,
       'anthropic'
     );
@@ -557,7 +573,7 @@ export default async function handler(req, res) {
             { role: 'assistant', content: r1.content },
             { role: 'user', content: toolResults },
           ],
-        }),
+        }, modelRequestOptions(model)),
         16000,
         'anthropic2'
       );
@@ -565,14 +581,15 @@ export default async function handler(req, res) {
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
-    const parsed = parseToolResponse(finalResp.content, lang);
+    const updatesAsText = model === UPDATES_MODEL;
+    const parsed = parseToolResponse(finalResp.content, lang, { updatesAsText });
     let text = parsed.text;
     let action = parsed.action;
     // RESCATE: si el turno 1 mezcló una tool interna con una de UI y el modelo NO re-emitió
     // la de UI en la 2ª respuesta, recupera la acción de UI de r1 (si no, se perdería la
     // tarjeta/cajita — perder la CAPTURA sería el "error grave" que advierte el prompt).
     if (internal && !action) {
-      const fromR1 = parseToolResponse(r1.content, lang).action;
+      const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca

@@ -4,7 +4,7 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
@@ -273,6 +273,25 @@ check('brief rico: descripcion/detalles también quitan email/teléfono (defensa
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
 check('DEFAULT_MODEL = claude-sonnet-5-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5-5'));
 check('Sonnet 5.5 lleva thinking adaptativo (disabled = 400 en ese modelo)', () => assert.equal(modelTuning('claude-sonnet-5-5').thinking.type, 'adaptive'));
+check('Sonnet 5.5 pide solo las notas de progreso, con su cabecera beta', () => {
+  assert.equal(modelTuning('claude-sonnet-5-5').thinking.display, 'updates');
+  assert.equal(modelRequestOptions('claude-sonnet-5-5').headers['anthropic-beta'], 'thinking-display-updates-2026-08-18');
+  assert.equal(modelRequestOptions('claude-sonnet-5'), undefined);
+  assert.equal(modelTuning('claude-sonnet-5').thinking.display, undefined);
+});
+check('nota de progreso de Sonnet 5.5 se usa como texto junto al formulario', () => {
+  const c = [{ type: 'thinking', thinking: 'Perfecto, una landing para tu taller arranca en $400.', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
+  const r = parseToolResponse(c, 'es', { updatesAsText: true });
+  assert.match(r.text, /landing/); assert.equal(r.action.type, 'capture');
+});
+check('sin updates, el thinking NUNCA se muestra (no filtra razonamiento)', () => {
+  const c = [{ type: 'thinking', thinking: 'razonamiento interno', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
+  assert.doesNotMatch(parseToolResponse(c, 'es').text, /razonamiento/);
+});
+check('con texto normal, la nota de progreso no se duplica', () => {
+  const c = [{ type: 'thinking', thinking: 'nota', signature: 's' }, { type: 'text', text: 'Hola' }];
+  assert.equal(parseToolResponse(c, 'es', { updatesAsText: true }).text, 'Hola');
+});
 check('Sonnet 5.5 tiene precio en el contador de coste', () => assert.equal(turnCostMicroUsd('claude-sonnet-5-5', { input: 1e6, output: 0, cacheRead: 0, cacheWrite: 0 }), 2e6));
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
 check('ALLOWED_MODELS conserva fallback sonnet-4-6', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-4-6'), true));

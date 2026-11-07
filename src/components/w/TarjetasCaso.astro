@@ -56,7 +56,7 @@ const cards = items.map((it) => {
             <img
               src={`/Galeria/${c.slug}-pc-900.webp`}
               srcset={[480, 640, 900, 1280].map((w) => `/Galeria/${c.slug}-pc-${w}.webp ${w}w`).join(', ') + `, /Galeria/${c.slug}-pc.webp 1920w`}
-              sizes="(min-width: 1024px) 480px, 45vw" width="900" height="506"
+              sizes="(min-width: 1024px) 480px, (min-width: 768px) 45vw, calc(100vw - 72px)" width="900" height="506"
               alt={`${c.name}, ${lang === 'en' ? 'desktop view' : 'vista de escritorio'}`}
               loading="lazy" decoding="async"
             />
@@ -100,11 +100,18 @@ const cards = items.map((it) => {
   }
   .w-case__foot { margin-top: auto; padding-top: 24px; }
 
-  .w-case__shot { display: none; }
+  /* v5 (dueño: «en móvil pierde elementos»): la captura al pie también en móvil, igual que en
+     escritorio (sale del borde inferior, recortada arriba), a menor altura. */
+  .w-case__shot {
+    display: block; margin-top: 20px; height: 150px; overflow: hidden;
+    border: 1px solid var(--w-line); border-bottom: 0; border-radius: var(--w-r-cell, 8px) var(--w-r-cell, 8px) 0 0;
+    background: var(--w-s1);
+  }
+  .w-case__shot img { display: block; width: 100%; height: auto; }
   /* Móvil compacto (sistema tras el piloto, E-18): mismo contenido, menos aire. */
   @media (--lt-md) {
     .w-cases__grid { gap: 12px; }
-    .w-case { padding: 26px 20px 20px; }
+    .w-case { padding: 26px 20px 0; }
     .w-case__name { font-size: 22px; }
     .w-case__did { margin-top: 10px; }
     .w-case__foot { padding-top: 12px; }

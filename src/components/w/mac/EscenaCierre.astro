@@ -16,8 +16,8 @@
 //     de +200u a 0; el portátil "aterriza" entre ellas. Todo con
 //     animation-timeline: view() en entry 0% → cover 50% (como el original).
 //   · Al entrar, la pantalla pasa de apagada a encendida (rango corto).
-// Sin dunas ni paisaje dibujado (E-38). Móvil (< 768): sin portátil, solo la
-// tarjeta sobre el horizonte (padding 48). Reducir movimiento: todo en su sitio.
+// Sin dunas ni paisaje dibujado (E-38). Móvil (< 768, v5): portátil arriba y la tarjeta lo pisa
+// por abajo, sobre el horizonte (padding 48). Reducir movimiento: todo en su sitio.
 // ─────────────────────────────────────────────────────────────
 import Portatil from './Portatil.astro';
 import Escritorio from './Escritorio.astro';
@@ -96,7 +96,9 @@ const W = {
     padding: 48px 16px calc(187 * var(--u) - 8px);
   }
   .cie-lejos, .cie-cerca { position: absolute; left: 50%; translate: -50%; pointer-events: none; }
-  .cie-mac { display: none; }
+  /* v5 (dueño: «en móvil pierde elementos»): el portátil también en móvil, encima de la tarjeta, que
+     lo pisa por abajo como en escritorio (ahí la tarjeta tapa la mitad baja de la pantalla). */
+  .cie-mac { position: relative; z-index: 1; width: min(100%, 440px); margin: 8px auto -64px; }
 
   /* capa lejana: cielo de amanecer + suelo de retícula en perspectiva */
   .cie-lejos { inset: 0 auto 0 50%; width: max(100cqw, 1712 * var(--u)); }

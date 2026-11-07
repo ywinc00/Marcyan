@@ -100,7 +100,6 @@ const spec: KindSpec = {
         titleTone2: copyOf(ctx).prosa.tone2,
         paragraphs: ctx.cluster.local.paragraphs,
         items: copyOf(ctx).prosa.items,
-        itemsMobile: false,
       }),
     },
 

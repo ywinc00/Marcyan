@@ -185,7 +185,6 @@ const spec: KindSpec = {
           titleTone2: t.prosa.tone2,
           paragraphs: ctx.cluster.local.paragraphs,
           items: t.prosa.items.map((i) => inc[i]).filter(Boolean).map((it) => ({ icon: it.icon, title: it.title, text: it.desc })),
-          itemsMobile: false,
         };
       },
     },

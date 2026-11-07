@@ -238,7 +238,7 @@ const SWATCH = ['#2f5266', '#8a4a30', '#5f604a', 'var(--accent-gold)'];
     .wd-esc__opt { padding-block: 12px; }
   }
   @media (--lt-md) {
-    .wd-esc__rail { display: none; }
+    /* v5: las cápsulas no se esconden en móvil: van en dos filas bajo la pantalla (order 2 y 3). */
     .wd-esc__frame { padding: 10px; max-width: 340px; }
     .wd-esc__screen { padding: 16px; display: grid; justify-items: center; }
     .wd-esc__screen > :global(*) { height: auto; }

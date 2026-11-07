@@ -18,6 +18,7 @@ import ArticleHero from '../../../components/sections/ArticleHero.astro';
 import Article from '../../../components/sections/Article.astro';
 import ArticleRail from '../../../components/sections/ArticleRail.astro';
 import RailTools from '../../../components/sections/RailTools.astro';
+import RailCta from '../../../components/sections/RailCta.astro';
 import PostNav from '../../../components/sections/PostNav.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ArticleLd from '../../../components/seo/ArticleLd.astro';
@@ -150,6 +151,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
         <div class="art__body">
           <Article><Content /></Article>
           <div class="art__tools-m">
+            <RailCta t={postChrome.rail.cta} postTitle={d.title} />
             <RailTools t={postChrome.rail.tools} />
           </div>
         </div>
@@ -224,7 +226,8 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   .art__aside { min-width: 0; margin-top: 32px; }
   .art__body { min-width: 0; margin-top: 32px; }
   .art__grid--notoc .art__aside { margin-top: 0; }
-  .art__tools-m { margin-top: 56px; }
+  /* v5: en móvil las DOS tarjetas del raíl van al final de la lectura (antes solo herramientas). */
+  .art__tools-m { margin-top: 56px; display: flex; flex-direction: column; gap: 16px; }
 
   @media (--lg) {
     .art__grid {

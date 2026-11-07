@@ -46,7 +46,9 @@ const { h1Html, pill } = Astro.props;
   @media (--lt-md) {
     .bh { padding-bottom: 40px; }
     .bh__crumbs { margin-bottom: 20px; }
-    .bh__pill { display: none; }
+    /* v5: la píldora también en móvil, debajo del titular (antes se escondía). */
+    .bh__row { flex-direction: column; align-items: flex-start; }
+    .bh__pill { margin-bottom: 0; }
   }
   @media (--motion-reduce) {
     .bh__pill, .bh__chev { transition: none; }

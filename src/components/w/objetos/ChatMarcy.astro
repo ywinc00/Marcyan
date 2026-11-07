@@ -330,7 +330,14 @@ const data = JSON.stringify(tabs.map((t) => t.script));
   .wo-chat.is-paused :global(.wo-chat__typing) :global(p) { animation-play-state: paused; }
   @keyframes wo-chat-shine { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
   @media (--lt-md) {
-    .wo-chat__side { display: none; }
+    /* v5: los canales no se esconden en móvil; pasan a una fila que se desliza encima del chat. */
+    .wo-chat__main { flex-direction: column; }
+    .wo-chat__side {
+      display: flex; gap: 4px; width: auto; padding: 8px; overflow-x: auto; scrollbar-width: none;
+      border-right: 0; border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    }
+    .wo-chat__side::-webkit-scrollbar { display: none; }
+    .wo-chat__side li { flex: none; white-space: nowrap; padding: 5px 9px; font-size: 12px; }
     .wo-chat .wo-chat__msgs { min-height: 0; padding: 12px; }
     .wo-chat :global(.wo-chat__msg) { max-width: 90%; }
   }

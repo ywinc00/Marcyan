@@ -236,7 +236,7 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
     .wo-lock__line { height: 56px; }
     /* Móvil: los cuatro nombres a 13 px caben en su columna sin el logo (en escritorio sí va). */
     .wo-lock__chs li { padding: 6px 7px; font-size: 13px; }
-    .wo-lock__chs li :global(svg) { display: none; }
+    .wo-lock__chs li :global(svg) { width: 14px; height: 14px; } /* v5: los logos de canal también en móvil */
   }
   .wo-lock__chs li :global(svg) { flex: none; }
   /* 320-359: 2 × 2 (cuatro columnas de 72 px no caben a 13 px). */

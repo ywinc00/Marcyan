@@ -266,10 +266,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     <!-- Estado BIENVENIDA — selector de canal de contacto -->
     <div class="mrc-welcome" data-mrc-welcome>
-      <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer lang={lang} /></span>
-      <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
-      <p class="mrc-welcome-sub">{t.welcomeSub}</p>
-      <p class="mrc-welcome-hint">{t.welcomeHint}</p>
+      <!-- v5 (boceto B, dueño 2026-11-06): banda de noche con Marcy de cuerpo entero; las opciones montan sobre ella -->
+      <div class="mrc-wband">
+        <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer lang={lang} /></span>
+        <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
+        <p class="mrc-welcome-sub">{t.welcomeSub}</p>
+        <p class="mrc-welcome-hint">{t.welcomeHint}</p>
+      </div>
 
       <div class="mrc-options">
         <!-- Chat con Marcy → entra a la conversación -->
@@ -645,6 +648,96 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     .mrc-hero-avatar :global(.marcy img) { height: clamp(92px, 24vw, 112px); }
   }
 
+
+  /* ═══ v5 · Boceto B (dueño, 2026-11-06): «el fondo negro no me acaba de encajar». ═══════════
+     Cabecera de noche con el oro del sitio y Marcy de cuerpo entero; cuerpo claro. Refero (mirado
+     en imagen): Alive 7121e4c0 (tarjetas que montan sobre la banda), On 255118e3 (burbujas), Copilot
+     59fa00e4 (sugerencias de borde). Catálogo: H-06 rampa de superficies, G-10 capas, F-09 cambio
+     de estado sin salto. Solo piel: el panel redefine los tokens en claro y la cabecera vuelve a la
+     noche; la lógica, la captura y los textos no cambian (design/chat-marcy.md). */
+  .mrc-panel {
+    --bg-card: #f6f4f0; --bg-elevated: #ffffff; --bg-2: #f6f4f0;
+    --border: rgba(14, 14, 13, .10);
+    --fg-primary: #0e0e0d; --fg-secondary: #5f5b56; --fg-subtle: #8a857e; --fg-inverse: #ffffff;
+    --accent-teal: #1f8a6c; --accent-teal-rgb: 31, 138, 108;
+    --accent-teal-dim: rgba(31, 138, 108, .10); --accent-teal-line: rgba(31, 138, 108, .32);
+    --accent-gold: #8a6a3a; --accent-gold-dim: rgba(200, 169, 110, .16); --accent-gold-line: rgba(160, 124, 62, .40);
+    --shadow-gold: 0 8px 24px -12px rgba(138, 106, 58, .45);
+    --mrc-noche: #121212;
+    border-color: rgba(255, 255, 255, .06);
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .75), 0 0 0 1px rgba(255, 255, 255, .04);
+  }
+  /* Noche: cabecera (siempre) y banda de bienvenida. Recupera los tokens oscuros del sitio. */
+  .mrc-head, .mrc-wband {
+    --fg-primary: #f0ede8; --fg-secondary: rgba(240, 237, 232, .66); --fg-subtle: rgba(240, 237, 232, .45);
+    --bg-elevated: rgba(255, 255, 255, .08); --accent-teal: #4fc3a1; --accent-teal-line: rgba(79, 195, 161, .4);
+    --accent-gold: #c8a96e; --accent-gold-dim: rgba(200, 169, 110, .14);
+    color: var(--fg-primary);
+  }
+  .mrc-fx { display: none; }
+  .mrc-head {
+    border-bottom: 0;
+    background:
+      radial-gradient(120% 160% at 92% -40%, rgba(200, 169, 110, .38), transparent 60%),
+      var(--mrc-noche);
+  }
+  .mrc-avatar { background: none; }
+  /* Bienvenida: la cabecera se funde con la banda (mismo fondo, sin el brillo propio). */
+  .mrc-chat[data-stage="welcome"] .mrc-head { position: absolute; top: 0; left: 0; right: 0; z-index: 3; background: transparent; }
+  .mrc-welcome { align-items: stretch; text-align: left; gap: 0; padding: 0 var(--space-4) var(--space-4); }
+  .mrc-wband {
+    position: relative; margin: 0 calc(-1 * var(--space-4)); padding: 58px 20px 72px;
+    display: flex; flex-direction: column; gap: 6px; min-height: 236px;
+    background:
+      radial-gradient(90% 120% at 88% -12%, rgba(200, 169, 110, .45), transparent 60%),
+      radial-gradient(70% 90% at 0% 115%, rgba(79, 195, 161, .16), transparent 70%),
+      var(--mrc-noche);
+  }
+  /* estrellas sutiles de la marca, solo en la banda */
+  .mrc-wband::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+    background-image:
+      radial-gradient(1.5px 1.5px at 14% 18%, rgba(var(--star-rgb), .6), transparent),
+      radial-gradient(1px 1px at 46% 10%, rgba(var(--star-rgb), .5), transparent),
+      radial-gradient(1px 1px at 30% 62%, rgba(var(--star-rgb), .4), transparent),
+      radial-gradient(1px 1px at 58% 44%, rgba(var(--star-rgb), .4), transparent);
+  }
+  .mrc-wband > :not(.mrc-hero-avatar) { position: relative; }
+  .mrc-hero-avatar {
+    position: absolute; right: 6px; bottom: 40px; margin: 0;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .55));
+  }
+  .mrc-hero-avatar :global(.marcy img) { height: 150px; }
+  .mrc-welcome-title {
+    margin: 0; max-width: 11ch;
+    font-size: 30px; line-height: 1.04; font-weight: 500; letter-spacing: -.035em; color: var(--fg-primary);
+  }
+  .mrc-welcome-sub { margin: 4px 0 0; max-width: 21ch; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .mrc-welcome-hint { max-width: 24ch; color: var(--fg-subtle); }
+  /* Las opciones montan sobre la banda */
+  .mrc-options { position: relative; z-index: 2; max-width: none; margin-top: -52px; gap: 8px; }
+  .mrc-opt {
+    border-radius: 14px; border-color: transparent; background: var(--bg-elevated);
+    box-shadow: 0 10px 26px -14px rgba(14, 14, 13, .35), inset 0 0 0 1px rgba(14, 14, 13, .06);
+  }
+  button.mrc-opt:hover { background: #fff; border-color: transparent; box-shadow: 0 14px 30px -14px rgba(14, 14, 13, .4), inset 0 0 0 1px var(--accent-teal-line); }
+  .mrc-opt-ic { width: 40px; height: 40px; border-color: transparent; }
+  .mrc-opt-arrow { border-color: transparent; }
+  .mrc-opt--gold { background: #fff; }
+  .mrc-opt--gold .mrc-opt-title { color: var(--fg-primary); }
+  .mrc-pill { background: #fff; }
+  /* Conversación: cuerpo claro */
+  .mrc-log { background: var(--bg-card); }
+  .mrc-chip { background: transparent; color: #1f6e57; border-color: rgba(31, 138, 108, .4); }
+  .mrc-form { background: var(--bg-card); border-top-color: var(--border); }
+  .mrc-input { background: #fff; }
+  .mrc-send { background: var(--mrc-noche); color: #c8a96e; }
+  .mrc-foot { background: var(--bg-card); }
+  @media (--lt-md) {
+    .mrc-hero-avatar :global(.marcy img) { height: clamp(124px, 34vw, 150px); }
+    .mrc-welcome-title { font-size: 32px; }
+  }
+
   @media (--motion-reduce) {
     .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
   }
@@ -659,6 +752,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     font-size: var(--text-sm); line-height: var(--leading-normal); word-wrap: break-word; white-space: pre-wrap;
   }
   .mrc-chat .mrc-ai { align-self: flex-start; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); border-bottom-left-radius: 4px; }
+  /* v5 (boceto B): burbuja de Marcy blanca con sombra corta sobre el cuerpo claro */
+  .mrc-chat .mrc-ai { border-color: transparent; box-shadow: 0 1px 2px rgba(14, 14, 13, .06), inset 0 0 0 1px rgba(14, 14, 13, .05); }
   .mrc-chat .mrc-user { align-self: flex-end; background: var(--accent-teal); color: var(--fg-inverse); border-bottom-right-radius: 4px; }
   .mrc-chat .mrc-sys { align-self: center; background: transparent; border: 1px dashed var(--border); color: var(--fg-secondary); font-size: var(--text-xs); max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
   .mrc-chat .mrc-retry {

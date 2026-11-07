@@ -1,0 +1,188 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-10-24",
+    "hasta": "2026-10-30"
+  },
+  "anterior": {
+    "desde": "2026-10-17",
+    "hasta": "2026-10-23"
+  },
+  "anioPasado": {
+    "desde": "2025-10-25",
+    "hasta": "2025-10-31"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 1,
+      "impresiones": 125,
+      "ctr": 0.8,
+      "posicion": 21.2
+    },
+    "anterior": {
+      "clicks": 0,
+      "impresiones": 76,
+      "ctr": 0,
+      "posicion": 10.9
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 1,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 70,
+        "ctr": 0,
+        "posicion": 29.2
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 30,
+        "ctr": 0,
+        "posicion": 17.5
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "home",
+      "clicks": 1,
+      "impresiones": 3,
+      "ctr": 33.33,
+      "posicion": 3.7,
+      "dClicks": 1,
+      "dImpresiones": -4,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 64,
+      "ctr": 0,
+      "posicion": 12.6,
+      "dClicks": 0,
+      "dImpresiones": 12,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "landings",
+      "clicks": 0,
+      "impresiones": 36,
+      "ctr": 0,
+      "posicion": 32.9,
+      "dClicks": 0,
+      "dImpresiones": 28,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 0,
+      "impresiones": 20,
+      "ctr": 0,
+      "posicion": 31.6,
+      "dClicks": 0,
+      "dImpresiones": 14,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 4,
+      "ctr": 0,
+      "posicion": 6.3,
+      "dClicks": 0,
+      "dImpresiones": -2,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 2,
+      "ctr": 0,
+      "posicion": 3.5,
+      "dClicks": 0,
+      "dImpresiones": -19,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "herramientas",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": 0,
+      "dImpresiones": -3,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "en",
+      "clicks": 1,
+      "impresiones": 8,
+      "ctr": 12.5,
+      "posicion": 4.5,
+      "dClicks": 1,
+      "dImpresiones": -8,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "es",
+      "clicks": 0,
+      "impresiones": 121,
+      "ctr": 0,
+      "posicion": 21.7,
+      "dClicks": 0,
+      "dImpresiones": 34,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/en",
+      "clicks": 1,
+      "impresiones": 2,
+      "ctr": 50,
+      "posicion": 2,
+      "dClicks": 1,
+      "dImpresiones": -1,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 9.7,
+      "impresiones": 33,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [
+    {
+      "query": "posicionamiento web miami",
+      "pagina": "https://marcyanstudio.com/es/miami/seo-local",
+      "posicion": 46.2,
+      "impresiones": 11
+    }
+  ],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

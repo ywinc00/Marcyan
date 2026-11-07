@@ -1,0 +1,41 @@
+{
+  "fecha": "2026-11-02",
+  "conflictos": [
+    {
+      "campo": "telefono",
+      "nivel": "info",
+      "web": "+17869381754",
+      "ficha": "(713) 823-9144",
+      "otraSede": true,
+      "paginas": 52,
+      "ejemplo": "https://marcyanstudio.com/en"
+    }
+  ],
+  "invalidos": [],
+  "portadaConNegocio": true,
+  "tipos": {
+    "Organization": 52,
+    "City": 234,
+    "ProfessionalService": 104,
+    "PostalAddress": 52,
+    "AboutPage": 2,
+    "BreadcrumbList": 46,
+    "ListItem": 161,
+    "FAQPage": 40,
+    "Question": 229,
+    "Answer": 229,
+    "Service": 97,
+    "Offer": 99,
+    "PriceSpecification": 81,
+    "Blog": 2,
+    "ItemList": 9,
+    "State": 18,
+    "CollectionPage": 2,
+    "CreativeWork": 8,
+    "OfferCatalog": 5,
+    "UnitPriceSpecification": 18,
+    "QuantitativeValue": 18,
+    "BlogPosting": 12,
+    "WebPage": 6
+  }
+}

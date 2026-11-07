@@ -261,7 +261,10 @@ export const casos = [
     check: ({ reply }) => {
       const r = [];
       const piso = comboRebaja.rebaja.total_pago_unico;
-      const bajos = figures(reply).filter((v) => v >= 1000 && v < piso);
+      // El precio de UNA línea (p. ej. el sitio solo, $1,950) no es una oferta del total:
+      // aparece cuando Marcy desglosa la cotización. Solo cuenta una cifra que no sea línea.
+      const lineas = [...combo.lineas, ...comboCompleto.lineas].map((l) => l.total);
+      const bajos = figures(reply).filter((v) => v >= 1000 && v < piso && !lineas.includes(v));
       if (bajos.length) r.push('ofrece por debajo de la rebaja máxima (' + usd(piso) + '): ' + bajos.join(', '));
       if (figures(reply).includes(piso) && !has(reply, /aprob|represent|confirm/i)) r.push('da la rebaja como definitiva, sin aprobación');
       return r;

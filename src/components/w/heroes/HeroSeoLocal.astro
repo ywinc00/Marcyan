@@ -93,4 +93,11 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
     .hsl__w--2 { top: 200px; font-size: 196px; }
     .hsl__win { left: 196px; width: 300px; }
   }
+  /* Teléfono: «DE TI» baja al pie de la ficha (dueño, 2026-11-07): la altura la marca la ficha y
+     la segunda línea asoma por debajo de su borde, aprovechando el hueco que quedaba vacío. */
+  @media (max-width: 767.98px) {
+    .hsl__obj { height: auto; padding-bottom: 58px; }
+    .hsl__win { position: relative; }
+    .hsl__w--2 { top: auto; bottom: 0; }
+  }
 </style>

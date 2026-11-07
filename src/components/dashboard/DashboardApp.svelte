@@ -10,6 +10,7 @@
   import InicioSection from './InicioSection.svelte';
   import LeadsSection from './LeadsSection.svelte';
   import ClientesSection from './ClientesSection.svelte';
+  import MarcySection from './MarcySection.svelte';
   import BriefsSection from './BriefsSection.svelte';
   import FinanzasSection from './FinanzasSection.svelte';
   import ProgresoSection from './ProgresoSection.svelte';
@@ -57,6 +58,7 @@
     { id: 'inicio',   label: 'Inicio' },
     { id: 'leads',    label: 'Leads' },
     { id: 'clientes', label: 'Clientes' },
+    { id: 'marcy',    label: 'Marcy' },
     { id: 'briefs',   label: 'Briefs' },
     { id: 'finanzas', label: 'Finanzas' },
     { id: 'progreso', label: 'Progreso' },
@@ -450,6 +452,8 @@
         <LeadsSection />
       {:else if section === 'clientes'}
         <ClientesSection />
+      {:else if section === 'marcy'}
+        <MarcySection />
       {:else if section === 'briefs'}
         <BriefsSection />
       {:else if section === 'finanzas'}

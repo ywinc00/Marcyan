@@ -17,7 +17,7 @@
 //   setQuery({ estado: 'nuevo' })          (cambia filtros; reemplaza historial)
 // ─────────────────────────────────────────────────────────────
 
-export const SECTION_IDS = ['inicio', 'leads', 'clientes', 'briefs', 'finanzas', 'progreso', 'seo', 'avisos'];
+export const SECTION_IDS = ['inicio', 'leads', 'clientes', 'marcy', 'briefs', 'finanzas', 'progreso', 'seo', 'avisos'];
 const DEFAULT_SECTION = 'inicio';
 // Nombres de la versión anterior del panel (enlaces guardados).
 const ALIASES = { dashboard: 'inicio', notificaciones: 'avisos' };

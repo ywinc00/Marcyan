@@ -151,7 +151,7 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           </li>
         ))}
         {/* bandeja de hermanos (W-ADV-40): los servicios de cada paso, con su precio de arranque */}
-        <li class="svc__tray" role="none" data-rev>
+        <li class="svc__tray" data-rev>
           <ul class="w-htray" aria-label={w.tray.label}>
             {tray.map((x) => (
               <li><a class="w-htray__card" href={x.href}><IconoObjeto id={x.id} size={48} /><span class="w-htray__txt"><span class="w-htray__name">{x.label}</span><span class="w-htray__price">{x.price}</span></span></a></li>

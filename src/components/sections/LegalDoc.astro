@@ -29,7 +29,7 @@ const { eyebrow = 'Legal', title, updated, updatedLabel = 'Última actualizació
   .legal-doc__inner { display: flex; flex-direction: column; gap: var(--space-4); }
   .legal-doc__title { margin-top: var(--space-2); }
   .legal-doc__updated {
-    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle);
+    font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary);
     letter-spacing: var(--tracking-wide); text-transform: uppercase;
   }
 
@@ -57,6 +57,7 @@ const { eyebrow = 'Legal', title, updated, updatedLabel = 'Última actualizació
   .legal-doc__prose :global(strong) { color: var(--fg-primary); font-weight: 600; }
   .legal-doc__prose :global(a) {
     color: var(--accent-teal); overflow-wrap: anywhere;
+    text-decoration: underline; text-underline-offset: 3px;
     transition: color var(--duration-fast); text-decoration-color: var(--accent-teal-line);
   }
   .legal-doc__prose :global(a:hover) { color: var(--fg-primary); text-decoration: underline; }

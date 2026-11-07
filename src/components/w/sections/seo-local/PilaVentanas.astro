@@ -28,7 +28,7 @@ const titleId = `${id ?? 'sl-pila'}-title`;
   </div>
   <div class="sl-pila__stack" role="list" aria-label={copy.title}>
     {copy.windows.map((w, i) => (
-      <article class={`sl-win sl-win--${i + 1}`} role="listitem">
+      <div class={`sl-win sl-win--${i + 1}`} role="listitem">
         <div class="sl-win__bar" aria-hidden="true"><i></i><i></i><i></i><span class="sl-win__side"></span><span class="sl-win__nav"><Icon name="lucide:chevron-left" /><Icon name="lucide:chevron-right" /></span></div>
         <div class="sl-win__body">
           <h3 class="sl-win__t">
@@ -46,7 +46,7 @@ const titleId = `${id ?? 'sl-pila'}-title`;
             ))}
           </ol>
         </div>
-      </article>
+      </div>
     ))}
   </div>
 </div>

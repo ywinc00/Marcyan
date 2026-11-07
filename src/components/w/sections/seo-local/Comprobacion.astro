@@ -31,7 +31,7 @@ const fix = lang === 'en' ? 'To fix' : 'Por arreglar';
           {r.ok === false ? (
             <b class="sl-chk__st sl-chk__st--fix"><Icon name="lucide:circle-alert" />{fix}</b>
           ) : (
-            <b class="sl-chk__st" aria-label="OK"><Icon name="lucide:check" /></b>
+            <b class="sl-chk__st" role="img" aria-label="OK"><Icon name="lucide:check" /></b>
           )}
         </li>
       ))}

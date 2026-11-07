@@ -201,7 +201,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
         <template> inerte; el DOM visible lo decide el cliente. Aparece también
         en la home: excepción sancionada, con QA de home y OK del dueño. */}
     {otherPath && <LangNotice lang={lang} href={otherPath} />}
-    <ChatWidget lang={lang} />
+    <ChatWidget lang={lang} city={/(^|\/)miami(\/|$)/.test(path) ? 'miami' : 'houston'} />
 
     <script>
       // Tracking first-party delegado: cualquier elemento con [data-track] dispara

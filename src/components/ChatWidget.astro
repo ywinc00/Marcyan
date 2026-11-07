@@ -24,14 +24,16 @@ import MarcyAvatar from './chat/MarcyAvatar.astro';
 import { nap, content } from '../i18n/content';
 import FormContacto from './forms/FormContacto.astro';
 
-interface Props { lang?: 'es' | 'en'; }
-const { lang = 'es' } = Astro.props;
+interface Props { lang?: 'es' | 'en'; city?: 'houston' | 'miami'; }
+const { lang = 'es', city = 'houston' } = Astro.props;
+// En las páginas de Miami el chat da el número de Miami (WhatsApp, SMS y llamada), como el resto de la página.
+const cityPhone = city === 'miami' ? nap.miami : nap.houston;
 
 const telHref = (p: string) => 'tel:' + p.replace(/[^\d+]/g, '');
 
 // Canales directos (tarjeta "Mensaje directo") — derivados del NAP de Houston.
-const waHref = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;        // WhatsApp
-const smsHref = `sms:${nap.houston.replace(/[^\d+]/g, '')}`;             // iMessage / SMS
+const waHref = `https://wa.me/${cityPhone.replace(/\D/g, '')}`;        // WhatsApp
+const smsHref = `sms:${cityPhone.replace(/[^\d+]/g, '')}`;             // iMessage / SMS
 
 const STR = {
   es: {
@@ -203,7 +205,7 @@ const links = [
 ];
 // Canales directos + páginas que Marcy puede insertar en el chat vía herramienta
 // (enlaces/hrefs NUESTROS, nunca texto del modelo → seguros). Bilingüe por routes.
-const channels = { wa: waHref, sms: smsHref, tel: telHref(nap.houston) };
+const channels = { wa: waHref, sms: smsHref, tel: telHref(cityPhone) };
 const pages = {
   precios:    { href: lang === 'en' ? '/en/pricing'  : '/es/precios',   label: t.pgPrecios },
   servicios:  { href: lang === 'en' ? '/en/services' : '/es/servicios', label: t.pgServicios },
@@ -215,7 +217,7 @@ const pages = {
   'calculadora-llamadas': { href: lang === 'en' ? '/en/tools#calls' : '/es/herramientas#llamadas', label: t.pgCalcLlamadas },
   'calculadora-citas': { href: lang === 'en' ? '/en/tools#appointments' : '/es/herramientas#citas', label: t.pgCalcCitas },
 };
-const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston, channels, pages };
+const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: cityPhone, channels, pages };
 ---
 
 <div class="mrc-chat" id="mrc-chat" data-mrc-root data-stage="welcome">

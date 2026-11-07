@@ -155,12 +155,14 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     position: relative; flex: 0 0 auto;
     display: inline-grid; place-items: center;
     width: 22px; height: 22px; padding: 0;
+    /* el botón se ve de 22 px; su zona táctil es de 44 (::before) */
     border: 0; border-radius: var(--radius-sm);
     background: transparent; color: var(--fg-subtle); cursor: pointer;
     transition: color var(--duration-fast), background var(--duration-fast);
   }
   .footer__copy:hover { color: var(--accent-gold); background: var(--accent-gold-dim); }
   .footer__copy:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .footer__copy::before { content: ''; position: absolute; inset: -11px; }
   .footer__copy-ic { display: block; }
   .footer__copy-ic--ok { display: none; color: var(--accent-teal); }
   .footer__copy.is-copied { color: var(--accent-teal); }
@@ -233,6 +235,9 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
 </style>
 
 <script>
+  // Si la página ya tiene su formulario de contacto, el botón del pie lleva ahí (antes sacaba a la portada).
+  const cta = document.querySelector<HTMLAnchorElement>(".footer__cta");
+  if (cta && document.getElementById("contacto") && /#contacto$/.test(cta.getAttribute("href") || "")) cta.setAttribute("href", "#contacto");
   // Copiar correo/teléfono al portapapeles (con fallback) + feedback "¡Copiado!"
   document.querySelectorAll<HTMLButtonElement>('.footer__copy').forEach((btn) => {
     let timer: number | undefined;

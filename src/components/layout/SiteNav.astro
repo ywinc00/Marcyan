@@ -150,7 +150,10 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     color: var(--fg-secondary); transition: color var(--duration-fast);
     min-height: var(--tap-min); display: inline-flex; align-items: center;
+    position: relative;
   }
+  /* Zona táctil de 44 px de ancho sin mover el dibujo del conmutador (WCAG 2.5.8). */
+  .nav__lang-opt::before { content: ''; position: absolute; inset: 0 -12px; }
   .nav__lang-opt.is-on { color: var(--accent-gold); }
   .nav__lang-opt.is-disabled { color: var(--fg-subtle); opacity: .5; cursor: default; }
   a.nav__lang-opt:hover { color: var(--fg-primary); }

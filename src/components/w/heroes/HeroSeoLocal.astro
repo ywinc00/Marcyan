@@ -46,7 +46,7 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
       <p class="sr-only">{sr}</p>
       <div class="hsl__pal" aria-hidden="true">
         <span class="hsl__w hsl__w--1" data-w-in="2">{W[0]}</span>
-        <span class="hsl__w hsl__w--2" data-w-in="2">{W[1]}</span>
+        <span class="hsl__w hsl__w--2" data-w-in="2">{W[1].split(' ').map((t, i) => <><span class={`hsl__p hsl__p--${i + 1}`}>{t}</span>{' '}</>)}</span>
       </div>
       <div class="hsl__win" data-w-in="obj">
         <FichaMapa marca="restaurante" lang={lang} city={cityName} size="hero" />
@@ -93,11 +93,14 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
     .hsl__w--2 { top: 200px; font-size: 196px; }
     .hsl__win { left: 196px; width: 300px; }
   }
-  /* Teléfono: «DE TI» baja al pie de la ficha (dueño, 2026-11-07): la altura la marca la ficha y
-     la segunda línea asoma por debajo de su borde, aprovechando el hueco que quedaba vacío. */
+  /* Teléfono (dueño, 2026-11-07): la altura la marca la ficha; «CERCA» arriba, «DE» a media altura
+     a la izquierda y «TI» abajo a la derecha, asomando bajo el borde de la ficha. */
   @media (max-width: 767.98px) {
-    .hsl__obj { height: auto; padding-bottom: 58px; }
+    .hsl__obj { height: auto; padding-bottom: calc(var(--hsl-f) * .74); }
     .hsl__win { position: relative; }
-    .hsl__w--2 { top: auto; bottom: 0; }
+    .hsl__w--2 { position: static; }
+    .hsl__p { position: absolute; }
+    .hsl__p--1 { left: -6px; top: calc(50% - .4em); }
+    .hsl__p--2 { right: 0; bottom: 0; }
   }
 </style>

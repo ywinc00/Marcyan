@@ -189,7 +189,7 @@ const destinos = {
   .abre { position: relative; display: flex; flex-direction: column; }
   .abre[data-tapa="scroll"] {
     --abre-rec: 300px;
-    --abre-b: calc(84px + env(safe-area-inset-bottom, 0px));
+    --abre-b: calc(24px + env(safe-area-inset-bottom, 0px)); /* v5: ya no hay barra fija de CTA en móvil */
     position: relative;
     timeline-scope: --abre-vista;
     --pt-linea: --abre-vista;
@@ -206,7 +206,6 @@ const destinos = {
     }
     .abre[data-tapa="scroll"] :global(.pt) { width: min(100%, var(--pt-w), var(--abre-wv)); }
   }
-  /* en móvil queda por encima de la barra fija de CTA del sitio (≈ 72 px + zona segura) */
   .abre[data-tapa="scroll"] .abre-fijo { position: sticky; bottom: var(--abre-b); }
   /* Titular y portátil, un solo grupo: --abre-h = alto de la tapa abierta (ancho del
      portátil / 1,08 × 933/1415). Con la tapa a -90° el titular baja ese alto y queda
@@ -401,8 +400,8 @@ const destinos = {
     vigilar(pt, { umbral: 0.001, reentradaMs: 0, alEntrar: dentro, alSalir: fuera });
     const vida = (si: boolean) => { esc.classList.toggle('is-pausa', !si); if (!sec.corriendo && esc.dataset.escFase === 'escritorio') esc.classList.toggle('is-vivo', si); };
     // Disparo = fin del giro de la tapa. La tapa termina cuando la pista (alto
-    // --abre-rec, al pie de la escena) queda ENTERA por encima de --abre-b (el hueco
-    // de la barra fija de CTA en móvil): se observa con ese margen inferior y umbral
+    // --abre-rec, al pie de la escena) queda ENTERA por encima de --abre-b (el margen
+    // inferior del grupo fijado): se observa con ese margen inferior y umbral
     // 0,97, sin listener de scroll. Tapa abierta o sin view(): 35 % del portátil.
     // reentradaMs 0: cada entrada consulta `armada` (la decide el reinicio al salir).
     const conTapa = raiz.dataset.tapa === 'scroll' && CSS.supports('animation-timeline', 'view()') && pista && pista.offsetHeight > 0;

@@ -639,11 +639,9 @@ export function initHero(GEO, C) {
     if (anim) raf = requestAnimationFrame(tick);
   }
   let landed = false, pendingGeo = null, storyArming = false;
-  const ctabar = document.querySelector('[data-nav-ctabar]');
   function guardBar() {
     const pinned = scrollY < pin.offsetTop + pin.offsetHeight - innerHeight * 0.6;
     document.body.classList.toggle('hx-pinned', pinned);            // el globo del chat espera a que termine la portada
-    if (ctabar && pinned) { ctabar.classList.remove('is-visible'); document.body.classList.remove('has-ctabar'); }
   }
   // al salir la portada, la ficha clara se funde antes de meterse bajo la barra (no queda una tira suelta)
   function exitFade() {

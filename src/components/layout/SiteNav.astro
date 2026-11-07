@@ -1,7 +1,6 @@
 ---
 // Navegación del sitio. Mobile-first:
 //  · < md  → marca + hamburguesa → drawer off-canvas (links + lang + CTA dentro)
-//            + barra de CTA fija inferior (aparece al pasar el hero).
 //  · ≥ md  → barra completa (links + lang ES|EN + CTA outline inline).
 // Sobre el hero la barra es TRANSPARENTE (se funde); al hacer scroll gana blur+fondo.
 // Accesible: aria-expanded, aria-hidden/inert, foco atrapado, Esc/overlay cierran,
@@ -22,7 +21,6 @@ interface Props {
   homeHref?: string;
   hasEn?: boolean;
   currentPath?: string;
-  showCtaBar?: boolean;
   /** Megamenú de Servicios + grupos del drawer. false = nav de siempre (plan B, §2.12). */
   mega?: boolean;
 }
@@ -32,7 +30,6 @@ const {
   homeHref = '/es',
   hasEn = true,
   currentPath,
-  showCtaBar = true,
   mega = true,
 } = Astro.props;
 const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
@@ -122,11 +119,8 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     )}
 </aside>
 
-{showCtaBar && (
-  <div class="nav__cta-bar" data-nav-ctabar>
-    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-track={ctaTrack}>{nav.cta.label}</Button>
-  </div>
-)}
+{/* v5 (dueño, 2026-11-07): sin barra fija de «Propuesta gratis» en móvil; el formulario normal
+    vive en el chat de Marcy («Formulario de contacto») y en la sección #contacto. */}
 
 <style>
   .nav {
@@ -276,24 +270,10 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
 
   @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
 
-  /* ── Barra CTA fija inferior (móvil) ──────────────────── */
-  .nav__cta-bar {
-    position: fixed; inset: auto 0 0 0; z-index: var(--z-nav);
-    padding: var(--space-3) var(--container-pad) calc(var(--space-3) + env(safe-area-inset-bottom));
-    background: var(--bg-overlay); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border);
-    transform: translateY(110%); transition: transform var(--duration-slow) var(--ease-out-expo);
-  }
-  .nav__cta-bar.is-visible { transform: translateY(0); }
-  @media (--md) { .nav__cta-bar { display: none; } }
   @media (--motion-reduce) {
-    .nav, .nav__overlay, .nav__drawer, .nav__cta-bar { transition: none; }
+    .nav, .nav__overlay, .nav__drawer { transition: none; }
   }
 
-  /* reservar espacio para la barra CTA inferior (móvil) → no tapa el footer */
-  @media (--lt-md) {
-    :global(body) { padding-bottom: calc(var(--tap-min) + var(--space-3) * 2 + env(safe-area-inset-bottom)); }
-  }
 </style>
 
 <script>
@@ -304,18 +284,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   const drawer = document.querySelector('[data-nav-drawer]') as HTMLElement;
   const overlay = document.querySelector('[data-nav-overlay]') as HTMLElement;
   const closeBtn = document.querySelector('[data-nav-close]') as HTMLButtonElement;
-  // Estado "scrolled" de la barra + barra CTA inferior. Va en su propio guard porque
-  // no depende del drawer: así un cambio en el menú no puede dejar la nav sin fondo
-  // ni sin barra CTA en todo el sitio.
+  // Estado "scrolled" de la barra. Va en su propio guard porque no depende del drawer:
+  // así un cambio en el menú no puede dejar la nav sin fondo en todo el sitio.
   if (root) {
-    const ctabar = document.querySelector('[data-nav-ctabar]') as HTMLElement;
     const onScroll = () => {
       // Con el megamenú abierto la barra conserva su fondo (data-mega-open).
       root.classList.toggle('is-scrolled', window.scrollY > 24 || root.hasAttribute('data-mega-open'));
-      const showBar = window.scrollY > 560;
-      if (ctabar) ctabar.classList.toggle('is-visible', showBar);
-      // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
-      document.body.classList.toggle('has-ctabar', showBar);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -441,7 +415,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       if (isContactLink(l)) requestAnimationFrame(focusContact);
     }));
 
-    // Cualquier otro enlace a #contacto (nav__cta inline, barra CTA inferior):
+    // Cualquier otro enlace a #contacto (nav__cta inline):
     // tras el scroll nativo del ancla, mover el foco al primer campo.
     document.addEventListener('click', (e) => {
       const a = (e.target as Element | null)?.closest?.('a[href$="#contacto"]');

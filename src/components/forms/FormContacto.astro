@@ -1,0 +1,283 @@
+---
+// Formulario de contacto normal (el mismo en la sección #contacto y dentro del chat de Marcy).
+// v5 (dueño, 2026-11-07): la opción «Formulario de contacto» del chat abre ESTE formulario en vez
+// del corto. Un solo marcado y un solo guion para las dos instancias: misma validación, misma
+// trampa antispam (website_hp), mismo envío a /api/contact con su tiempo de espera y el mismo acuse.
+// `idp` da ids únicos por instancia ('home' conserva los de siempre); `source` va a la analítica.
+import Button from '../ui/Button.astro';
+import BtnStates from '../ui/BtnStates.astro';
+import { nap } from '../../i18n/content';
+
+interface Props { f: any; defaultCity?: string; defaultService?: string; idp?: string; source?: string; class?: string }
+const { f, defaultCity, defaultService, idp = 'home', source = 'home_contact', class: cls } = Astro.props;
+const phone = f.phone ?? { label: 'Teléfono (opcional)', ph: 'Tu teléfono o WhatsApp' };
+const doneLbl = f.done ?? 'Recibido';
+const okHead = f.success ?? 'Mensaje recibido.';
+const okRef = f.successRef ?? 'Tu referencia:';
+const okNext = f.successNext ?? 'Te respondemos en menos de 1 hora hábil.';
+const okUrgent = f.successUrgent ?? '¿Es urgente? Llámanos al';
+const telHou = nap.houston.replace(/[^\d+]/g, '');
+const telMia = nap.miami.replace(/[^\d+]/g, '');
+const pathEn = Astro.url.pathname === '/en' || Astro.url.pathname.startsWith('/en/');
+const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
+---
+<form
+  class:list={['contact__form', cls]} id={`${idp}-contact-form`} novalidate data-contact-form data-source={source} data-err-id={`${idp}-form-error`}
+  data-sending={f.sending} data-success={okHead} data-success-ref={okRef} data-success-next={okNext}
+  data-success-urgent={okUrgent} data-error={f.error} data-invalid={f.emailInvalid}
+  data-brief={f.briefLink} data-href-brief={hrefBrief}
+  data-tel-hou={telHou} data-tel-hou-label={nap.houston}
+  data-tel-mia={telMia} data-tel-mia-label={nap.miami}
+>
+  <input type="text" name="website_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div class="field-row">
+    <label class="field">
+      <span class="field__lbl">{f.name.label}</span>
+      <input type="text" name="owner_name" placeholder={f.name.ph} autocomplete="name" />
+    </label>
+    <label class="field">
+      <span class="field__lbl">{f.company.label}</span>
+      <input type="text" name="business_name" placeholder={f.company.ph} autocomplete="organization" />
+    </label>
+  </div>
+
+  <div class="field-row">
+    <label class="field">
+      <span class="field__lbl">{f.email.label}</span>
+      <input type="email" name="email" placeholder={f.email.ph} autocomplete="email" />
+    </label>
+    <label class="field">
+      <span class="field__lbl">{phone.label}</span>
+      <input type="tel" name="phone" placeholder={phone.ph} autocomplete="tel" />
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="field__lbl">{f.city.label}</span>
+    <select name="city_state">
+      <option value="">{f.city.ph}</option>
+      {f.city.opts.map((o: string) => <option value={o} selected={o === defaultCity}>{o}</option>)}
+    </select>
+  </label>
+
+  <label class="field">
+    <span class="field__lbl">{f.service.label}</span>
+    <select name="main_objective">
+      <option value="">{f.service.ph}</option>
+      {f.service.opts.map((o: string) => <option value={o} selected={o === defaultService}>{o}</option>)}
+    </select>
+  </label>
+
+  <label class="field">
+    <span class="field__lbl">{f.message.label}</span>
+    <textarea name="additional_notes" rows="4" placeholder={f.message.ph}></textarea>
+  </label>
+
+  <Button type="submit" variant="primary" size="lg" class="u-full bstate" data-submit>
+    <BtnStates sending={f.sending} done={doneLbl}>{f.submit}</BtnStates>
+  </Button>
+
+  <p class="form-status form-status--error" id={`${idp}-form-error`} data-form-error role="alert" hidden></p>
+  <p class="form-status form-status--ok" id={`${idp}-form-success`} data-form-ok role="status" hidden></p>
+</form>
+
+<style>
+  .contact__form {
+    display: flex; flex-direction: column; gap: var(--space-4);
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-6); min-width: 0;
+  }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  .field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+  .field__lbl { font-family: var(--font-body); font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-secondary); }
+  .field input, .field select, .field textarea {
+    width: 100%; min-width: 0; min-height: var(--tap-min);
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md);
+    color: var(--fg-primary); font-family: var(--font-body); font-size: var(--text-base);
+    padding: 11px 14px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  }
+  .field textarea { resize: vertical; min-height: 110px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--fg-subtle); }
+  .field select { appearance: none; cursor: pointer; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim);
+  }
+
+  .form-status { font-size: var(--text-sm); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+  .form-status:focus { outline: none; }
+  .form-status--error { background: rgba(224, 92, 92, 0.12); border: 1px solid rgba(224, 92, 92, 0.3); color: #e07a7a; }
+  .form-status--error :global(a) { color: inherit; font-weight: 600; text-decoration: underline; }
+  .form-status--error :global(a:hover) { color: #f0a0a0; }
+  .form-status--ok { background: var(--accent-teal-dim); border: 1px solid var(--accent-teal-line); color: var(--accent-teal); }
+  .form-status--ok:focus-visible { box-shadow: 0 0 0 2px var(--accent-teal-line); }
+  .form-status :global(.form-status__head) { display: block; font-weight: 600; }
+  .form-status :global(.form-status__next) { display: block; margin-top: var(--space-1); opacity: 0.92; }
+  /* Las tres líneas del acuse las crea el guion (sin marca de ámbito): :global (antes no se aplicaban y salían pegadas). */
+  /* Salida inmediata: al que no quiere esperar se le da el teléfono ahí mismo. */
+  .form-status :global(.form-status__urgent) { display: block; margin-top: var(--space-2); }
+  .form-status--ok :global(a) { color: inherit; font-weight: 600; text-decoration: underline; }
+  .form-status--ok :global(a:hover) { color: var(--fg-primary); }
+
+  @media (--sm) { .field-row { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<script>
+  import { track } from '../../lib/track.js';
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-contact-form]')) {
+    if (form.dataset.cfListo) continue;
+    form.dataset.cfListo = '1';
+    const btn = form.querySelector('[data-submit]') as HTMLButtonElement;
+    const errorBox = form.querySelector('[data-form-error]') as HTMLElement;
+    const okBox = form.querySelector('[data-form-ok]') as HTMLElement;
+    const errId = form.dataset.errId || errorBox.id;
+    const S = form.dataset;
+    const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const digits = (v: string) => v.replace(/\D/g, '');
+
+    // Pinta el error como NODOS DOM (sin innerHTML). Si la prosa de error contiene
+    // la cadena briefLink, ese tramo se convierte en un <a> real al brief (en su idioma),
+    // dándole al usuario una salida clicable al fallar.
+    const renderError = (msg: string) => {
+      errorBox.textContent = '';
+      const brief = (S.brief || '').trim();
+      const href = S.hrefBrief
+        || ((document.documentElement.lang || 'es').slice(0, 2).toLowerCase() === 'en' ? '/en/project-brief' : '/formulario');
+      const idx = brief ? msg.indexOf(brief) : -1;
+      if (idx >= 0) {
+        if (idx > 0) errorBox.appendChild(document.createTextNode(msg.slice(0, idx)));
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = brief;
+        errorBox.appendChild(a);
+        const rest = msg.slice(idx + brief.length);
+        if (rest) errorBox.appendChild(document.createTextNode(rest));
+      } else {
+        errorBox.textContent = msg;
+      }
+      errorBox.hidden = false;
+    };
+
+    const fields = () => form.querySelectorAll('input, select, textarea, button');
+    // El botón se conmuta SOLO por atributo: su rótulo lo pintan los tres spans
+    // de BtnStates. Escribirle textContent borraría ese marcado (y era lo que
+    // metía la frase entera de éxito dentro del botón).
+    const setState = (state: '' | 'sending' | 'done') => {
+      if (state) btn.dataset.state = state;
+      else delete btn.dataset.state;
+    };
+    const reenable = () => {
+      fields().forEach((el) => ((el as HTMLInputElement).disabled = false));
+      btn.disabled = false;
+      setState('');
+      delete form.dataset.busy;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // Guard de doble envío (la dedup definitiva es server-side).
+      if (form.dataset.busy) return;
+      form.dataset.busy = '1';
+
+      errorBox.hidden = true; okBox.hidden = true;
+      const emailEl = form.querySelector('[name="email"]') as HTMLInputElement | null;
+      const phoneEl = form.querySelector('[name="phone"]') as HTMLInputElement | null;
+      emailEl?.removeAttribute('aria-invalid');
+      phoneEl?.removeAttribute('aria-invalid');
+
+      const fd = new FormData(form);
+      const data: Record<string, string> = {};
+      for (const [k, v] of fd.entries()) data[k] = typeof v === 'string' ? v.trim() : '';
+      data.lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase() === 'en' ? 'en' : 'es';
+
+      if (data.website_hp) { delete form.dataset.busy; return; } // honeypot
+
+      // Validación email-O-teléfono: si hay email, debe ser válido; si no hay email,
+      // exigir un teléfono con >=7 dígitos. Se puede enviar con SOLO teléfono.
+      const hasEmail = !!(data.email && data.email.length);
+      if (hasEmail && !isEmail(data.email)) {
+        renderError(S.invalid || 'Email inválido.');
+        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.setAttribute('aria-describedby', errId); emailEl.focus(); }
+        delete form.dataset.busy;
+        return;
+      }
+      if (!hasEmail && digits(data.phone || '').length < 7) {
+        renderError(S.invalid || 'Email inválido.');
+        const culprit = phoneEl || emailEl;
+        if (culprit) { culprit.setAttribute('aria-invalid', 'true'); culprit.setAttribute('aria-describedby', errId); culprit.focus(); }
+        delete form.dataset.busy;
+        return;
+      }
+
+      fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
+      btn.disabled = true;
+      setState('sending');
+
+      // Timeout de red: aborta el fetch a los ~15s. Se cancela en el `finally`, no
+      // al resolver el fetch: si se cancelara ahí, la guarda cubriría solo la llegada
+      // de las cabeceras y un cuerpo estancado dejaría el botón en "Enviando…".
+      const ctrl = new AbortController();
+      const timer = window.setTimeout(() => ctrl.abort(), 15000);
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data), signal: ctrl.signal,
+        });
+        let payload: any = null;
+        try { payload = await res.json(); } catch (_) { /* ignore */ }
+
+        if (!res.ok || !payload || !payload.ok) {
+          renderError((payload && payload.error) || S.error || 'Error.');
+          reenable();
+          return;
+        }
+        // Éxito: acuse + folio en la 1ª línea, plazo de respuesta en la 2ª y la
+        // salida inmediata en la 3ª (nodos DOM, sin innerHTML).
+        okBox.textContent = '';
+        const lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase();
+        const line1 = document.createElement('span');
+        line1.className = 'form-status__head';
+        line1.textContent = [S.success, payload.refId ? S.successRef : '', payload.refId || '']
+          .filter(Boolean).join(' ');
+        okBox.appendChild(line1);
+        const line2 = document.createElement('span');
+        line2.className = 'form-status__next';
+        line2.textContent = (S.successNext && S.successNext.trim())
+          || (lang === 'en' ? 'We reply within 1 business hour.' : 'Te respondemos en menos de 1 hora hábil.');
+        okBox.appendChild(line2);
+        // Teléfono de la ciudad que eligió, para no mandar a Houston a un cliente de Miami.
+        const mia = /miami/i.test(data.city_state || '');
+        const tel = mia ? S.telMia : S.telHou;
+        const telLbl = (mia ? S.telMiaLabel : S.telHouLabel) || tel;
+        if (tel && S.successUrgent) {
+          const line3 = document.createElement('span');
+          line3.className = 'form-status__urgent';
+          line3.appendChild(document.createTextNode(S.successUrgent + ' '));
+          const a = document.createElement('a');
+          a.href = 'tel:' + tel;
+          a.textContent = telLbl;
+          a.setAttribute('data-track', 'call_clicked');
+          line3.appendChild(a);
+          okBox.appendChild(line3);
+        }
+        okBox.hidden = false;
+        // Conversión real: LEAD creado → GA4 (generate_lead). El lead ya quedó
+        // en la BD vía /api/contact; esto solo marca la conversión en Analytics.
+        try { track('generate_lead', { source: form.dataset.source || 'home_contact', ref: payload.refId || '' }); } catch {}
+        // Éxito visible + foco para lectores de pantalla y scroll a la vista.
+        okBox.setAttribute('tabindex', '-1');
+        okBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        okBox.focus();
+        fields().forEach((el) => ((el as HTMLInputElement).disabled = true));
+        delete form.dataset.busy;
+        setState('done');
+      } catch (err) {
+        renderError(S.error || 'Error de red.');
+        reenable();
+      } finally {
+        window.clearTimeout(timer);
+      }
+    });
+  }
+</script>

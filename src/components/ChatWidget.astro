@@ -21,7 +21,8 @@
 // ─────────────────────────────────────────────────────────────
 import Icon from './ui/Icon.astro';
 import MarcyAvatar from './chat/MarcyAvatar.astro';
-import { nap } from '../i18n/content';
+import { nap, content } from '../i18n/content';
+import FormContacto from './forms/FormContacto.astro';
 
 interface Props { lang?: 'es' | 'en'; }
 const { lang = 'es' } = Astro.props;
@@ -87,6 +88,7 @@ const STR = {
     optDirectSub: 'Habla con nosotros por tu canal favorito.',
     optFormTitle: 'Formulario de contacto',
     optFormSub: 'Cuéntanos sobre tu proyecto y te responderemos.',
+    formIntro: 'Cuéntanos tu proyecto. Te respondemos en menos de 1 hora hábil.',
     optDiagSub: 'Revisamos tu web, SEO y presencia online.',
     // Tarjetas de acción que Marcy inserta en el chat (canales directos / enlace)
     channelsTitle: 'Escríbenos por tu canal favorito',
@@ -153,6 +155,7 @@ const STR = {
     optDirectSub: 'Reach us on your favorite channel.',
     optFormTitle: 'Contact form',
     optFormSub: 'Tell us about your project and we’ll get back to you.',
+    formIntro: 'Tell us about your project. We reply within 1 business hour.',
     optDiagSub: 'We’ll review your site, SEO, and online presence.',
     channelsTitle: 'Reach us on your favorite channel',
     directCall: 'Call',
@@ -327,6 +330,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       </div>
     </div>
 
+    <!-- Estado CONTACTO (v5, dueño 2026-11-07): el formulario NORMAL del sitio, el mismo de #contacto
+         (forms/FormContacto.astro: misma validación, antispam y envío). Sustituye al formulario corto. -->
+    <div class="mrc-contacto" data-mrc-contacto>
+      <h2 class="mrc-ct-title">{t.optFormTitle}</h2>
+      <p class="mrc-ct-sub">{t.formIntro}</p>
+      <FormContacto f={content[lang].contact.form} idp="chat" source="chat_contact_form" class="mrc-ct-form" />
+    </div>
+
     <!-- Estado CONVERSACIÓN -->
     <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false"></div>
 
@@ -365,11 +376,6 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
 <style>
   .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); transition: bottom var(--duration-base) var(--ease-out-expo); }
-  /* móvil: cuando la barra CTA inferior "Iniciar Proyecto" está visible, el FAB sube por
-     encima de ella (altura de la barra + holgura) para que no coincidan. */
-  @media (max-width: 767px) {
-    :global(body.has-ctabar) .mrc-chat { bottom: calc(var(--tap-min) + var(--space-3) * 3 + env(safe-area-inset-bottom)); }
-  }
 
   /* ── Burbuja de atención ────────────────────────────────── */
   .mrc-nudge {
@@ -580,6 +586,28 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
   .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
   .mrc-chat[data-stage="chat"] .mrc-welcome { display: none; }
+  /* Estado CONTACTO: cabecera con Volver + el formulario normal; nada de la conversación. */
+  .mrc-contacto { display: none; }
+  .mrc-chat[data-stage="contacto"] .mrc-welcome,
+  .mrc-chat[data-stage="contacto"] .mrc-log,
+  .mrc-chat[data-stage="contacto"] .mrc-chips,
+  .mrc-chat[data-stage="contacto"] .mrc-form,
+  .mrc-chat[data-stage="contacto"] .mrc-human,
+  .mrc-chat[data-stage="contacto"] .mrc-foot { display: none; }
+  .mrc-chat[data-stage="contacto"] .mrc-contacto {
+    position: relative; z-index: 1; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    display: flex; flex-direction: column; gap: 6px; padding: var(--space-4) var(--space-4) var(--space-5);
+    background: var(--bg-card);
+  }
+  .mrc-ct-title { margin: 0; font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: var(--fg-primary); }
+  .mrc-ct-sub { margin: 0 0 10px; font-size: var(--text-sm); color: var(--fg-secondary); }
+  /* el formulario del sitio, en la piel clara del panel: tarjeta blanca y campos crema */
+  .mrc-contacto :global(.mrc-ct-form) {
+    padding: var(--space-4); gap: var(--space-3); border: 0; border-radius: 14px; background: #fff;
+    box-shadow: 0 10px 26px -16px rgba(14, 14, 13, .35), inset 0 0 0 1px rgba(14, 14, 13, .06);
+    --bg-elevated: #f6f4f0; --accent-gold: #8a6a3a; --accent-gold-dim: rgba(200, 169, 110, .22);
+  }
+  .mrc-contacto :global(.mrc-ct-form .field-row) { grid-template-columns: 1fr; gap: var(--space-3); }
   /* En bienvenida, el footer de acción ('Dejar mis datos') duplicaría la tarjeta
      'Formulario de contacto' del selector → ocultarlo en welcome. */
   .mrc-chat[data-stage="welcome"] .mrc-foot { display: none; }
@@ -1600,7 +1628,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (!el) return;
       const act = el.getAttribute('data-act');
       if (act === 'chat') { try { track('chat_channel_selected', { channel: 'chat' }); } catch {} ensureChat(); if (input) input.focus(); return; }
-      if (act === 'form') { try { track('chat_channel_selected', { channel: 'form' }); } catch {} openCapture('contacto'); return; }
+      if (act === 'form') {
+        try { track('chat_channel_selected', { channel: 'form' }); } catch {}
+        // v5: el formulario normal en su propio estado (antes, la captura corta en la conversación).
+        flushTyper(); setStage('contacto');
+        requestAnimationFrame(() => { const c = root.querySelector('[data-mrc-contacto]'); if (c) c.scrollTop = 0; (closeBtn || panel).focus(); });
+        return;
+      }
       const msg = el.getAttribute('data-msg');
       if (msg) { try { track('chat_channel_selected', { channel: 'diagnostic' }); } catch {} send(msg); }
     });
@@ -1659,13 +1693,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.
-    // Suprimida cuando la barra CTA móvil está visible (body.has-ctabar) para no
-    // solapar FAB + barra + nudge en la esquina (seam-12).
     try {
       if (nudge && !sessionStorage.getItem('mrcNudge')) {
         setTimeout(() => {
-          const ctaBar = document.body && document.body.classList.contains('has-ctabar');
-          if (!opened && !ctaBar && nudge) {
+          if (!opened && nudge) {
             nudge.hidden = false;
             try { sessionStorage.setItem('mrcNudge', '1'); } catch (_) {}
             setTimeout(() => { if (nudge && !opened) nudge.hidden = true; }, 9000);
@@ -1681,7 +1712,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       setTimeout(() => {
         syncViewport();
         const a = document.activeElement;
-        if (a && a.scrollIntoView && log && log.contains(a)) a.scrollIntoView({ block: 'center' });
+        if (a && a.scrollIntoView && ((log && log.contains(a)) || a.closest('[data-mrc-contacto]'))) a.scrollIntoView({ block: 'center' });
       }, 280);
     });
 
@@ -1689,7 +1720,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     panel.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
       if (e.key !== 'Tab') return;
-      const nodes = panel.querySelectorAll('button, a[href], textarea, input, [tabindex]:not([tabindex="-1"])');
+      const nodes = panel.querySelectorAll('button, a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])');
       const list = Array.prototype.filter.call(nodes, (el) => !el.disabled && el.offsetParent !== null);
       if (!list.length) return;
       const first = list[0]; const lastEl = list[list.length - 1];

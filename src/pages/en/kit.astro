@@ -25,7 +25,7 @@ const pageNav = { ...clusterNavEn, cta: { label: 'WhatsApp', href: wa, track: 'w
 >
   <!-- The link carries a token: don't send it as a Referer to other sites. -->
   <meta slot="head" name="referrer" content="same-origin" />
-  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} showCtaBar={false} />
+  <SiteNav nav={pageNav} lang="en" homeHref="/en/" hasEn={true} currentPath={Astro.url.pathname} />
 
   <main id="main" class="kitp">
     <div class="container kitp__inner">

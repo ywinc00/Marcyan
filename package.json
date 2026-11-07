@@ -12,6 +12,7 @@
     "check:kb": "node scripts/verify-chat-kb.mjs",
     "test:chat": "node scripts/test-chat-guard.mjs",
     "test:diag": "node scripts/test-diagnostic.mjs",
+    "test:diag-medicion": "node scripts/test-diagnostic-measure.mjs",
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",

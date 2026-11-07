@@ -7,7 +7,8 @@
 // por detrás de la maqueta y la construye (esqueleto en cascada → barrido de revelado). Estado 2 (la cabecera
 // del bloque 2 cruza el 50 % de la ventana): la maqueta va al centro, la consola se escurre detrás y entran
 // los raíles del personalizador. Ningún ancestro con overflow:hidden (trampa F-05 del sticky).
-// Apilado (< 1120): sin sticky; texto 01 → consola entera → texto 02 con la lista → tiras + maqueta.
+// Apilado (< 1120, v5): sin sticky; texto 01 → consola con la maqueta delante (como en escritorio) →
+// tiras de controles → texto 02 con la lista.
 // Motor: demo-construye.ts (IntersectionObserver; solo transform/opacity).
 import Icon from '../../ui/Icon.astro';
 import ConsolaConstruye, { type ConsolaBloque } from './ConsolaConstruye.astro';
@@ -234,22 +235,24 @@ const [o1, o2, o3] = bloque2.opciones;
   .dc-fan__s--r { transform: translateX(104px) translateY(-6px) rotate(3deg) scale(.95); }
   .dc :global(.pz[data-pz-view='rediseno'] .pz-chip) { visibility: hidden; }
 
-  /* ── Apilado (< 1120): sin sticky; 01 → consola → 02 + lista → tiras + maqueta ── */
+  /* ── Apilado (< 1120): sin sticky; 01 → consola + maqueta juntas → tiras → 02 + lista ── */
   @media (max-width: 1119.98px) {
     .dc { display: flex; flex-direction: column; align-items: center; gap: 28px; }
     .dc__col, .dc__side, .dc__demo, .dc :global(.pz), .dc :global(.pz-stage), .dc :global(.pz-foot) { display: contents; }
     .dc__b { align-self: stretch; }
     .dc__b1 { order: 1; }
-    .dc :global(.dcc) { order: 2; transform: none !important; opacity: 1 !important; }
-    .dc-leg { order: 3; transform: none; margin-top: -12px; }
-    .dc__b2 { order: 4; margin-top: 24px; padding-bottom: 0; }
+    /* v5 (dueño: «en PC se ven las dos piezas, en móvil solo una»): la consola y la web que construye van
+       JUNTAS, como en escritorio: la consola asoma arriba a la izquierda y la web se monta delante, abajo a
+       la derecha. Debajo, sus controles; después el bloque 02 con los tres puntos de partida. */
+    .dc :global(.dcc) { order: 2; align-self: flex-start; width: calc(100% - 36px); position: relative; z-index: 1; transform: none !important; opacity: 1 !important; }
+    .dc :global(.pz-tray) { order: 3; align-self: flex-end; position: relative; z-index: 2; margin-top: -84px; width: min(92%, 420px); }
+    .dc-leg { order: 4; transform: none; margin-top: -12px; }
     .dc :global(.pz-rail--izq) { order: 5; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
-    .dc :global(.pz-tray) { order: 6; }
-    .dc :global(.pz-rail--der) { order: 7; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    .dc :global(.pz-rail--der) { order: 6; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
     .dc :global(.pz-g) { opacity: 1 !important; transform: none !important; }
-    .dc :global(.pz-sum) { order: 8; opacity: 1 !important; transform: none !important; }
+    .dc :global(.pz-sum) { order: 7; opacity: 1 !important; transform: none !important; }
+    .dc__b2 { order: 8; margin-top: 24px; padding-bottom: 0; }
     .dc[data-dc-state='2'] .dc-leg { opacity: 1; }
-    .dc :global(.pz-tray) { margin-top: -8px; }
     .dc :global(.pz.is-norails .pz-rail) { display: none; }
     .dc-fan__s--l { transform: translateX(-40px) translateY(-6px) rotate(-3deg) scale(.95); }
     .dc-fan__s--r { transform: translateX(40px) translateY(-6px) rotate(3deg) scale(.95); }

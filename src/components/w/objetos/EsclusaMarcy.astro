@@ -234,9 +234,20 @@ const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
   @media (--lt-md) {
     .wo-lock { width: min(100%, 335px); padding-inline: 0; }
     .wo-lock__line { height: 56px; }
-    /* Móvil: los cuatro nombres a 13 px caben en su columna sin el logo (en escritorio sí va). */
-    .wo-lock__chs li { padding: 6px 7px; font-size: 13px; }
-    .wo-lock__chs li :global(svg) { width: 14px; height: 14px; } /* v5: los logos de canal también en móvil */
+    /* Móvil (v5, dueño 2026-11-07): nombre y logo juntos no caben. Cada canal enseña su NOMBRE y,
+       cuando la conexión llega a él (el abanico se enciende), el nombre se funde en su LOGO; al pasar
+       al caso siguiente vuelve el nombre. Los dos ocupan la misma celda: el botón no cambia de tamaño. */
+    .wo-lock__chs li { display: grid; place-items: center; padding: 6px 7px; font-size: 13px; }
+    .wo-lock__chs li > :global(*) { grid-area: 1 / 1; transition: opacity 320ms var(--w-ease-ui), transform 320ms var(--w-ease-ui); }
+    .wo-lock__chs li :global(svg) { width: 18px; height: 18px; opacity: 0; transform: scale(.6); }
+    .wo-lock.is-ch[data-ch='0'] .wo-lock__chs li[data-i='0'] :global(svg),
+    .wo-lock.is-ch[data-ch='1'] .wo-lock__chs li[data-i='1'] :global(svg),
+    .wo-lock.is-ch[data-ch='2'] .wo-lock__chs li[data-i='2'] :global(svg),
+    .wo-lock.is-ch[data-ch='3'] .wo-lock__chs li[data-i='3'] :global(svg) { opacity: 1; transform: none; }
+    .wo-lock.is-ch[data-ch='0'] .wo-lock__chs li[data-i='0'] span,
+    .wo-lock.is-ch[data-ch='1'] .wo-lock__chs li[data-i='1'] span,
+    .wo-lock.is-ch[data-ch='2'] .wo-lock__chs li[data-i='2'] span,
+    .wo-lock.is-ch[data-ch='3'] .wo-lock__chs li[data-i='3'] span { opacity: 0; transform: scale(.85); }
   }
   .wo-lock__chs li :global(svg) { flex: none; }
   /* 320-359: 2 × 2 (cuatro columnas de 72 px no caben a 13 px). */

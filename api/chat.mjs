@@ -36,6 +36,8 @@ import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
+import { measurePlace } from '../lib/diagnostic-measure.mjs';
+import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 // Frenos guardados (cuenta compartida entre instancias). Solo cuenta: el
 // módulo importa @vercel/postgres de forma dinámica y solo al contar.
 import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
@@ -147,6 +149,13 @@ export async function siteReviewAllowed(sid, ip, { store, now } = {}) {
     if (!r.ok) return false;
   }
   return true;
+}
+
+// Ficha de Google (Places, de pago): tope diario de TODO el sitio, aparte del
+// cupo de revisar_sitio. Si se agota, la revisión sigue sin ficha.
+export async function placesAllowed({ store, now } = {}) {
+  const r = await persistLimit({ bucket: envBucket('chatPlacesGlobal'), key: GLOBAL_KEY, limits: RL.chatPlacesGlobal, store, now });
+  return r.ok;
 }
 
 // Aviso al panel (texto fijo, sin nada del visitante ni del modelo). Import
@@ -416,24 +425,46 @@ export function quoteToolResult(input, lang = 'es') {
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
 // (lib/diagnostic-checks.mjs). REGLA DE ORO: JAMÁS title/meta/texto del sitio ajeno.
 // Puro y testeable (recibe el output ya calculado de analyzeSite).
-export function buildSiteToolResult({ scores, findings }, lang = 'es') {
+export function buildSiteToolResult({ scores, findings } = {}, lang = 'es', ficha = null) {
   const en = lang === 'en';
-  const rec = recommendService({ scores });
-  return JSON.stringify({
-    ok: true,
-    scores: { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep },
-    hallazgos: (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es })),
-    recomendado: en ? rec.service_en : rec.service_es,
-  });
+  const out = { ok: true };
+  if (scores) {
+    const rec = recommendService({ scores });
+    out.scores = { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep };
+    out.hallazgos = (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es }));
+    out.recomendado = en ? rec.service_en : rec.service_es;
+  } else {
+    out.web = 'sin_revisar'; // nuestro acceso falló: no afirmar que su web está caída
+  }
+  // Ficha de Google: solo enteros + textos de NUESTRO catálogo (fichaForChat).
+  if (ficha) out.ficha_google = ficha;
+  return JSON.stringify(out);
 }
 
 // Descarga + analiza el sitio (SSRF-safe). El network se acota con withTimeout.
-async function reviewSite(url, lang) {
+// Ficha de Google en paralelo con la web. Sin nombre, sin clave o sin cupo → null
+// (la revisión sigue sin ficha). Su propio tope de 6 s, dentro de los 9 s de la fase.
+async function reviewListing({ name, city, url, lang }) {
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key || !name) return null;
+  try {
+    if (!(await placesAllowed())) return null;
+    return fichaForChat(await measurePlace({ name, city, siteUrl: url, lang }, { key, timeoutMs: 6000 }), lang);
+  } catch { return null; }
+}
+
+async function reviewSite(url, lang, { name, city } = {}) {
   const g = await ssrfGuard(url);
   if (!g.ok) return FAIL_RESULT; // bloqueada (IP privada/host interno/esquema) → sin revelar motivo
-  const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
+  const [web, ficha] = await Promise.all([reviewWeb(g, lang), reviewListing({ name, city, url: g.url, lang })]);
+  if (!web && !ficha) return FAIL_RESULT;
+  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [] };
+}
+
+async function reviewWeb(g, lang) {
+  const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 }).catch(() => null);
   const hasSite = !!(site && site.ok && site.html && site.html.length > 0);
-  if (!hasSite) return FAIL_RESULT;
+  if (!hasSite) return null;
   let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
   // Follow-up de /contacto (mismo criterio que api/diagnostic.mjs, presupuesto MÁS corto):
   // sin esto, Marcy afirmaría "no tiene formulario" contra sitios que lo tienen en su
@@ -453,7 +484,7 @@ async function reviewSite(url, lang) {
       })(), 3000, 'contact follow-up');
     } catch { /* el análisis de la home queda tal cual */ }
   }
-  return { content: buildSiteToolResult({ scores: out.scores, findings: out.findings }, lang), extraAllow: [] };
+  return { scores: out.scores, findings: out.findings };
 }
 
 // Ejecuta la tool interna pedida y devuelve { content, extraAllow }. Solo UNA por
@@ -463,9 +494,12 @@ async function runInternalTool(toolUse, { lang, ip, sid }) {
   if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang);
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
-    const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
+    const inp = toolUse.input || {};
+    const url = typeof inp.url === 'string' ? inp.url : '';
     if (!url) return FAIL_RESULT;
-    try { return await withTimeout(reviewSite(url, lang), 9000, 'site review'); }
+    const name = typeof inp.nombre_negocio === 'string' ? inp.nombre_negocio.trim().slice(0, 120) : '';
+    const city = typeof inp.ciudad === 'string' ? inp.ciudad.trim().slice(0, 80) : '';
+    try { return await withTimeout(reviewSite(url, lang, { name, city }), 9000, 'site review'); }
     catch { return FAIL_RESULT; }                                   // timeout/error → silencioso
   }
   return FAIL_RESULT;

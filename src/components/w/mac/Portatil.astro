@@ -117,7 +117,7 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
   .pt-pantalla::after {
     content: ""; position: absolute; inset: 0; z-index: 60; pointer-events: none;
     border-radius: 18.75px 18.75px 5px 5px;
-    box-shadow: 0 0 0 20px #09090b;
+    box-shadow: 0 0 0 20px #151517;
   }
   .pt-apagada {
     position: absolute; inset: 0; z-index: 55; pointer-events: none;
@@ -128,14 +128,14 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
   .pt[data-pt-encendida="false"] .pt-apagada { opacity: 1; transition-duration: .25s; transition-delay: 0s; }
   .pt-marco {
     position: absolute; inset: 0; pointer-events: none;
-    border: solid #09090b; border-width: 17.75px 18.5px 20.25px;
+    border: solid #151517; border-width: 17.75px 18.5px 20.25px; /* v5: un punto más claro que la noche del sitio: el marco se lee como parte de la tapa, no como hueco */
     border-radius: 35px 35px 15px 15px;
     /* v5: filo de aluminio OSCURO a los lados (el gris claro de 2 px se leía, con la tapa inclinada, como
        una línea suelta separada del marco: «mal dibujada»); la luz va solo arriba, en el canto. */
-    box-shadow: 0 0 0 1.5px #2b2c2f, 0 0 0 3px #4a4b4f, 0 -2px 0 2px #8e8f93, inset 0 0 0 1.25px #262628;
+    box-shadow: 0 0 0 1.5px #2b2c2f, 0 0 0 3px #4a4b4f, 0 -3.5px 0 -1px #9a9ba0, inset 0 0 0 1.25px #262628;
   }
   .pt-muesca { position: absolute; top: 13.75px; left: 50%; translate: -50%; width: 177px; height: 30px; z-index: 2; }
-  .pt-muesca svg { display: block; fill: #09090b; }
+  .pt-muesca svg { display: block; fill: #151517; }
   .pt-camara {
     position: absolute; top: 10.25px; right: 36px; width: 5.25px; height: 5.25px; border-radius: 50%;
     background: #131824; box-shadow: inset 0 0 2px #28304d;

@@ -25,6 +25,25 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Astro.props;
+// v5 · bienes raíces (dueño, 2026-11-06: «no tienen nada que ver» con la referencia). Mecanismo del hero
+// de producto de WorkOS, medido en su página: (1) dos haces de 14 líneas finas, uno por cada lado de la
+// tarjeta, ABIERTOS en los extremos de la pantalla y CERRADOS en un punto tras el borde de la tarjeta, a la
+// altura de su parte baja: entran por la izquierda y salen por la derecha como si pasaran por detrás;
+// (2) placa trasera del mismo tamaño que la tarjeta, radio mayor, degradado con malla de rombos grandes de
+// líneas de 1 px a 30° y sombra interior; (3) la tarjeta arranca TAPANDO la placa y se despega 25 px en
+// diagonal (0,85 s, curva ease, tras 0,5 s), con sombra en capas. Geometría propia en oro, no su recurso.
+// Los haces se anclan a la tarjeta (no a la ventana): el punto de cierre siempre cae tras su borde.
+const haz = obj === 'inmobiliaria';
+const N = 14;
+const f = (n: number) => n.toFixed(1);
+// Lienzo izquierdo 1800×760: el cierre está en (1800, 120); x = 1340 es el final de la fila de botones
+// (460 px antes de la tarjeta), donde el haz pasa por debajo de ella. Abre hacia la izquierda.
+const IZQ = Array.from({ length: N }, (_, i) =>
+  `M0 ${f(250 + i * 14)} C 520 ${f(250 + i * 14)}, 1010 ${f(240 + i * 8)}, 1340 ${f(226 + i * 5)} ` +
+  `S 1660 ${f(128 + i * .9)}, 1800 ${f(120 + i * .4)}`);
+// Lienzo derecho 1100×560: el cierre está en (0, 120); sale abriéndose hacia abajo a la derecha.
+const DER = Array.from({ length: N }, (_, i) =>
+  `M0 ${f(120 + i * .4)} C 220 ${f(121 + i * 1.6)}, 420 ${f(150 + i * 9)}, 1100 ${f(176 + i * 17)}`);
 ---
 <section class:list={['w-hero hs', `hs--${obj}`]}>
   <div class="w-container hs__grid">
@@ -42,10 +61,36 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
       <slot name="crumbs" slot="crumbs" />
     </HeroTexto>
     <div class="hs__obj">
-      <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example>
-        <ObjetoOficio slot="icon" kind={obj} lang={lang} parte="band" />
-        <ObjetoOficio kind={obj} lang={lang} parte="body" />
-      </TarjetaObjeto>
+      <div class="hs__pieza">
+        {haz && (
+          <svg class="hs__haz hs__haz--izq" viewBox="0 0 1800 760" aria-hidden="true">
+            <defs>
+              <linearGradient id="hs-haz-i" x1="0" y1="0" x2="1800" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset=".22" stop-color="#c8a96e" stop-opacity="0" />
+                <stop offset=".55" stop-color="#d9b77c" stop-opacity=".26" />
+                <stop offset=".9" stop-color="#f2cf94" stop-opacity=".62" />
+              </linearGradient>
+            </defs>
+            {IZQ.map((d) => <path d={d} />)}
+          </svg>
+        )}
+        {haz && (
+          <svg class="hs__haz hs__haz--der" viewBox="0 0 1100 560" aria-hidden="true">
+            <defs>
+              <linearGradient id="hs-haz-d" x1="0" y1="0" x2="1100" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset=".04" stop-color="#f2cf94" stop-opacity=".6" />
+                <stop offset=".45" stop-color="#d9b77c" stop-opacity=".26" />
+                <stop offset=".85" stop-color="#c8a96e" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            {DER.map((d) => <path d={d} />)}
+          </svg>
+        )}
+        <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example beams={!haz}>
+          <ObjetoOficio slot="icon" kind={obj} lang={lang} parte="band" />
+          <ObjetoOficio kind={obj} lang={lang} parte="body" />
+        </TarjetaObjeto>
+      </div>
     </div>
   </div>
 </section>
@@ -63,16 +108,58 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
     border-color: rgba(var(--accent-gold-rgb), .5);
     box-shadow: 0 0 80px rgba(var(--accent-gold-rgb), .16);
   }
-  /* v4: el haz del atardecer pasa por debajo de los botones; el hero le deja sitio antes del fundido. */
-  @media (--lg) { .hs--inmobiliaria { padding-bottom: 168px; } }
-  /* v4 (dueño): en bienes raíces la placa dorada es más sólida y lleva la trama de seguridad del
-     pasaporte (ondas finas que se cruzan en rombos), como el borde de un documento. */
+  .hs__pieza { position: relative; width: min(100%, 476px); }
+  /* la pieza se estira al alto de la fila (como antes la tarjeta): los haces se miden sobre ella */
+  .hs__pieza > :global(.wo-to) { width: 100%; height: 100%; }
+  /* ── v5 · bienes raíces ───────────────────────────────── */
+  @media (--lg) { .hs--inmobiliaria { padding-bottom: 176px; } }
+  .hs__haz {
+    position: absolute; z-index: -3; pointer-events: none; overflow: visible; max-width: none; max-height: none;
+    fill: none; stroke-width: 1;
+  }
+  .hs__haz path { vector-effect: non-scaling-stroke; }
+  /* cierre (1800,120) 60 px por DETRÁS del borde izquierdo de la tarjeta, al 88 % de su alto */
+  .hs__haz--izq {
+    width: 1800px; height: 760px; stroke: url(#hs-haz-i);
+    right: calc(100% - 60px); top: calc(88% - 120px);
+  }
+  .hs__haz--der { width: 1100px; height: 560px; stroke: url(#hs-haz-d); left: calc(100% - 60px); top: calc(88% - 120px); }
+  /* Placa trasera: mismo tamaño que la tarjeta, radio mayor (WorkOS 72 sobre 50 → 60 sobre 44), oro de
+     champán a bronce con luz arriba a la izquierda, malla de rombos de 112×65 (líneas a 30°, 1 px) y
+     sombra interior. */
   .hs--inmobiliaria .hs__obj :global(.wo-to__layer) {
+    border: 0; border-radius: 60px;
     background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18' viewBox='0 0 36 18'%3E%3Cg fill='none' stroke='%237a5a26' stroke-opacity='.6' stroke-width='.8'%3E%3Cpath d='M0 9 Q9 0 18 9 T36 9'/%3E%3Cpath d='M0 9 Q9 18 18 9 T36 9'/%3E%3Cpath d='M0 0 Q9 9 18 0 T36 0'/%3E%3Cpath d='M0 18 Q9 9 18 18 T36 18'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 26px 13px,
-      linear-gradient(150deg, #e2c58c 0%, #c8a96e 38%, #b08a4e 72%, #9c773f 100%);
-    border-color: rgba(242, 214, 160, .7);
-    box-shadow: inset 0 1px 0 rgba(255, 240, 210, .55), 0 0 60px rgba(var(--accent-gold-rgb), .14);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='65' viewBox='0 0 112 65'%3E%3Cg stroke='%23fff6e0' stroke-opacity='.62' stroke-width='1' fill='none'%3E%3Cpath d='M0 0L112 65M0 65L112 0'/%3E%3C/g%3E%3C/svg%3E") -14px -6px / 112px 65px,
+      radial-gradient(70% 60% at 6% 4%, rgba(255, 244, 220, .78), rgba(255, 244, 220, 0) 70%),
+      linear-gradient(162deg, #ead2a0 0%, #d3a860 34%, #b07e3c 62%, #7d5528 100%);
+    box-shadow: inset 3px 3px 12px rgba(40, 24, 6, .35);
+    transform: none !important; opacity: 1 !important; transition: none !important;
+  }
+  /* Despegue: la tarjeta nace encima de la placa y se separa en diagonal (translate, que no choca
+     con el transform de la coreografía de entrada). */
+  .hs--inmobiliaria .hs__obj :global(.wo-to) { --hs-sep: 25px; }
+  .hs--inmobiliaria .hs__obj :global(.wo-to__card) {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 51px 78px rgba(0, 0, 0, .42), 0 21px 36px rgba(0, 0, 0, .3), 0 6px 12px rgba(0, 0, 0, .22);
+    animation: hs-despega .85s ease .5s both;
+    /* opaca desde el principio: tapa la placa entera y LUEGO se despega (si se fundía a la vez, se
+       veía la placa sola y una tarjeta translúcida encima). El conjunto entra junto. */
+    opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+  .hs--inmobiliaria .hs__pieza { animation: hs-entra .4s ease both; }
+  @keyframes hs-entra { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes hs-despega { from { translate: calc(var(--hs-sep) * -1) calc(var(--hs-sep) * -1); } to { translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hs--inmobiliaria .hs__obj :global(.wo-to__card), .hs--inmobiliaria .hs__pieza { animation: none; }
+  }
+  @media (--lt-md) {
+    .hs--inmobiliaria .hs__obj :global(.wo-to) { --hs-sep: 16px; }
+    .hs--inmobiliaria .hs__obj :global(.wo-to__layer) { border-radius: 30px; background-size: 84px 49px, auto, auto; }
+    .hs__pieza > :global(.wo-to) { width: calc(100% - 25px); }
+    .hs__haz--izq { right: calc(100% - 65px); }
+    .hs__haz--der { left: calc(100% - 40px); }
   }
   @media (--lg) {
     /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */

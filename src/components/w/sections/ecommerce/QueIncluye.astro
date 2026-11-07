@@ -14,7 +14,7 @@ const [c1, c2, c3, c4] = copy.cells;
 ---
 <CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
 <div class="ws-gap qi">
-  <Bento2x2 cells={copy.cells} mobileTextOnly={[2, 4]}>
+  <Bento2x2 cells={copy.cells}>
     <MiniTienda slot="ui-1" kind={c1.ui} tax={tax} city={city} lang={lang} />
     <MiniTienda slot="ui-2" kind={c2.ui} tax={tax} city={city} lang={lang} />
     <MiniTienda slot="ui-3" kind={c3.ui} tax={tax} city={city} lang={lang} />

@@ -16,7 +16,7 @@
 // (RespuestaAsistente, P05) · pedidos de hoy de la tienda (ObjPedidos, vivo) · plano de marca
 // (PlanoMarca, lo mejor de la v1, quieto) · registro de cuidado de hoy (ObjCuidado, vivo).
 // Reparto §1.6: tienda en la celda 1 y la 5 (nunca en la misma vista); mapa y cuidado neutros.
-// Móvil (E-18): el plano de marca queda en texto + niveles (.ws-dm).
+// Móvil (v5): el plano de marca se ve igual que en escritorio, apilado bajo su texto.
 // rev1 de G09: filas iguales por subrejilla, ChatGPT en bandeja con las plataformas de IA, mapa y
 // pedidos llenan su bandeja, y en Mantenimiento los niveles pasan a la columna del texto.
 import CapituloDosFrases from '../../CapituloDosFrases.astro';
@@ -116,7 +116,8 @@ const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id)
      enmarcar dos veces; debajo, dónde te puede recomendar la IA. */
   .ws-ia { width: 100%; max-width: 520px; }
   .ws-tray--ia :global(.wo-ans) { width: 100%; background: none; border: 0; box-shadow: none; padding: 0; }
-  @media (--lt-md) { .ws-dm { display: none; } }
+  /* v5 (dueño: «en móvil pierde elementos»): el plano de marca también se ve en móvil, a su tamaño mini
+     (PlanoMarca ya esconde sus cotas por debajo de md, E-40). */
   /* Mazo en móvil (rev1, menor): controles a 44 px de alto (pieza P05 heredada); los puntos
      siguen a 24 px de ancho porque a 390 px la fila no cabe con más (área 24×44, WCAG 2.5.8). */
   @media (--lt-md) {

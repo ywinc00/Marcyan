@@ -210,25 +210,22 @@ const destinos = {
   .abre[data-tapa="scroll"] .abre-fijo { position: sticky; bottom: var(--abre-b); }
   /* Titular y portátil, un solo grupo: --abre-h = alto de la tapa abierta (ancho del
      portátil / 1,08 × 933/1415). Con la tapa a -90° el titular baja ese alto y queda
-     sobre la base; sube siguiendo la proyección del borde de la tapa (perspectiva
-     260cqw, origen 50% 20%: fracción visible -0,25 · 0,01 · 0,27 · 0,50 · 0,69 · 0,84
-     · 0,94 · 0,99 · 1 cada 12,5 % de giro), remuestreada con la curva de pt-gira (v3: 13
-     fotogramas, misma muestra que la tapa). Su margen inferior (≈ 40 px) es el aire con la tapa. */
+     sobre la base; sube siguiendo la proyección del borde de la tapa (v5: perspectiva
+     900cqw, origen 50% 150%; fracción visible calculada en los 13 fotogramas de pt-gira:
+     0,04 · 0,06 · 0,15 · 0,33 · 0,60 · 0,84 · 0,96 · 1). Con la tapa cerrada el titular
+     queda sobre la franja de la tapa, encima de la base. Su margen inferior (≈ 40 px) es el aire con la tapa. */
   .abre-fijo { container-type: inline-size; }
   .abre-cab { position: relative; z-index: 2; }
   @keyframes abre-cab-baja {
-    0% { transform: translateY(var(--abre-h)); }
-    8.33% { transform: translateY(calc(var(--abre-h) * .999)); }
-    16.67% { transform: translateY(calc(var(--abre-h) * .993)); }
-    25% { transform: translateY(calc(var(--abre-h) * .89)); }
-    33.33% { transform: translateY(calc(var(--abre-h) * .532)); }
-    41.67% { transform: translateY(calc(var(--abre-h) * .229)); }
-    50% { transform: translateY(calc(var(--abre-h) * .081)); }
-    58.33% { transform: translateY(calc(var(--abre-h) * .027)); }
-    66.67% { transform: translateY(calc(var(--abre-h) * .008)); }
-    75% { transform: translateY(calc(var(--abre-h) * .004)); }
-    83.33% { transform: translateY(calc(var(--abre-h) * .002)); }
-    91.67%, 100% { transform: none; }
+    0% { transform: translateY(calc(var(--abre-h) * 0.96)); }
+    8.33% { transform: translateY(calc(var(--abre-h) * 0.938)); }
+    16.67% { transform: translateY(calc(var(--abre-h) * 0.854)); }
+    25% { transform: translateY(calc(var(--abre-h) * 0.674)); }
+    33.33% { transform: translateY(calc(var(--abre-h) * 0.396)); }
+    41.67% { transform: translateY(calc(var(--abre-h) * 0.158)); }
+    50% { transform: translateY(calc(var(--abre-h) * 0.045)); }
+    58.33% { transform: translateY(calc(var(--abre-h) * 0.005)); }
+    66.67%, 100% { transform: none; }
   }
   @supports (animation-timeline: view()) {
     .abre[data-tapa="scroll"] .abre-cab {

@@ -5,31 +5,10 @@
 // así que la sección siguiente nunca corta nada. Motivo único: el haz de líneas que sale por la izquierda
 // pasa por detrás de la tarjeta y sale por la derecha (v4), por debajo de la fila de botones, nunca detrás de texto.
 // El cielo es atmósfera (G-01 + G-02), no un segundo motivo. Quieto. Solo CSS y un SVG en línea.
-// Ajustes: --wf-at-y (alto del punto donde el haz entra en la tarjeta), --wf-sol-x/-y (centro de la luz).
+// Ajustes: --wf-sol-x/-y (centro de la luz).
 interface Props { estilos?: boolean }
 const { estilos = true } = Astro.props;
-// v4 (dueño, 2026-11-06): el haz nace JUNTO por la izquierda, baja en una onda marcada por debajo de los
-// botones (nunca toca texto ni botones: ≥ 40 px de aire), sube a la tarjeta y pasa POR DETRÁS de ella para
-// salir por la derecha cada vez más abierto. Lienzo de 2400 px sin escalar, anclado al borde derecho del
-// contenedor (x = 2400 en el lienzo = borde derecho de la tarjeta): la geometría no se deforma con el ancho.
-// La tarjeta ocupa de y ≈ 180 a 600; los botones acaban en y ≈ 600 (el haz pasa ≥ 48 px por debajo).
-const N = 16;
-const LINEAS = Array.from({ length: N }, (_, i) => {
-  const f = (a: number) => a.toFixed(1);
-  // separación que crece de izquierda a derecha: 2,4 → 5 → 9 → 15 px entre líneas
-  const y0 = 648 + i * 2.4;   // nace pegado (fuera de pantalla)
-  const y1 = 676 + i * 5;     // fondo de la onda, bajo los botones
-  const y2 = 470 + i * 9;     // entra detrás de la tarjeta
-  const y3 = 330 + i * 15;    // sale por la derecha, abierto
-  // Lienzo → pantalla a 1440: x_pantalla = x − 1083. Borde izquierdo de la pantalla = 1083, fin de los
-  // botones ≈ 1503, fin de la columna de texto ≈ 1703, placa dorada desde 1900, tarjeta 1925-2400.
-  return `M0 ${f(y0)} L 1040 ${f(y0)} ` +
-         `C 1240 ${f(y0)}, 1360 ${f(y1)}, 1560 ${f(y1)} ` +
-         `S 1820 ${f(y2 + 70)}, 1990 ${f(y2)} ` +
-         `S 2330 ${f(y3 + 50)}, 2560 ${f(y3)} ` +
-         `C 2790 ${f(y3 - 50)}, 2860 ${f(y3 + 170 + i * 8)}, 3060 ${f(y3 + 150 + i * 11)} ` +
-         `S 3320 ${f(y3 + 30 + i * 8)}, 3400 ${f(y3 + 60 + i * 9)}`;
-});
+// v5: el haz de líneas ya no vive en el fondo; lo pinta HeroSector anclado a la tarjeta (pasa por detrás).
 // Grano fino (G-02): ruido fractal en una tesela de 160 px, en línea.
 const GRANO = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E\")";
 const CSS = `
@@ -52,13 +31,6 @@ const CSS = `
     position: absolute; inset: 0; opacity: .07; mix-blend-mode: soft-light;
     background-image: ${GRANO}; background-size: 160px 160px;
   }
-  .wf-at__haz {
-    position: absolute; top: 0; height: 900px; width: 3400px;
-    /* x = 2400 del lienzo cae en el borde derecho del contenedor (borde de la tarjeta). */
-    left: calc(100% - var(--wf-l) - 2400px);
-    fill: none; stroke: url(#wf-at-g); stroke-width: 1;
-  }
-  .wf-at__haz path { vector-effect: non-scaling-stroke; }
   @media (max-width: 1023.98px) {
     .wf-at { --sx: var(--wf-sol-x-movil, 50%); --sy: var(--wf-sol-y-movil, 64%); }
     .wf-at__cielo {
@@ -67,7 +39,6 @@ const CSS = `
         radial-gradient(120% 34% at var(--sx) calc(var(--sy) + 8%), rgba(118, 62, 104, .30) 0%, transparent 100%),
         linear-gradient(180deg, #080808 0%, #0a0b13 22%, #0e1122 42%, #1a172b 58%, #2a1c2c 68%, #1d1520 84%, #0e0a0d 94%, #080808 100%);
     }
-    .wf-at__haz { display: none; }
   }
 `;
 ---
@@ -75,16 +46,4 @@ const CSS = `
 <div class="wf-at">
   <div class="wf-at__cielo"></div>
   <div class="wf-at__grano"></div>
-  <svg class="wf-at__haz" viewBox="0 0 3400 900" aria-hidden="true">
-    <defs>
-      <linearGradient id="wf-at-g" x1="0" y1="0" x2="3400" y2="0" gradientUnits="userSpaceOnUse">
-        <stop offset=".3" stop-color="#c8a96e" stop-opacity=".1" />
-        <stop offset=".46" stop-color="#e3b27e" stop-opacity=".3" />
-        <stop offset=".58" stop-color="#f2c08c" stop-opacity=".52" />
-        <stop offset=".76" stop-color="#f2c08c" stop-opacity=".44" />
-        <stop offset=".96" stop-color="#c8a96e" stop-opacity="0" />
-      </linearGradient>
-    </defs>
-    {LINEAS.map((d) => <path d={d} />)}
-  </svg>
 </div>

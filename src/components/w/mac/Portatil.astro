@@ -82,12 +82,15 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     margin-inline: auto;
     aspect-ratio: 1415 / 933;
     container-type: inline-size;
-    perspective: 260cqw;
-    perspective-origin: 50% 20%;
-    /* la tapa casi cerrada (giro hacia quien mira) se proyecta POR DEBAJO de la
-       bisagra y colgaba como un trapecio oscuro bajo la base: se recorta en la
-       línea de la bisagra; por arriba y a los lados queda holgura para el 3D */
-    clip-path: inset(-40% -30% 0 -30%); /* v4: holgura lateral de sobra para la proyección de la tapa */
+    /* v5 (dueño: «cerrada parece rota, sin parte de arriba»; al abrir «mal dibujada»). Cámara como
+       W2N-03: LEJOS (9 anchos) y un poco POR DEBAJO de la bisagra (origen al 150 % del alto). Así la
+       tapa cerrada, tumbada hacia quien mira, se ve como una franja negra con su canto ENCIMA de la
+       base (antes, con la cámara arriba y cerca, caía bajo la bisagra y el recorte la borraba), y al
+       abrirse es un trapecio apenas más ancho arriba, nunca más ancho que la base. */
+    perspective: 900cqw;
+    perspective-origin: 50% 150%;
+    /* nada de la tapa baja de la bisagra; por arriba y a los lados, holgura para el 3D */
+    clip-path: inset(-40% -30% 0 -30%);
   }
   .pt-tapa {
     position: absolute; inset: 0;
@@ -127,7 +130,9 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     position: absolute; inset: 0; pointer-events: none;
     border: solid #09090b; border-width: 17.75px 18.5px 20.25px;
     border-radius: 35px 35px 15px 15px;
-    box-shadow: 0 0 0 1px #6f7074, 0 0 0 2px #a1a2a6, inset 0 0 0 1.25px #262628;
+    /* v5: filo de aluminio OSCURO a los lados (el gris claro de 2 px se leía, con la tapa inclinada, como
+       una línea suelta separada del marco: «mal dibujada»); la luz va solo arriba, en el canto. */
+    box-shadow: 0 0 0 1.5px #2b2c2f, 0 0 0 3px #4a4b4f, 0 -2px 0 2px #8e8f93, inset 0 0 0 1.25px #262628;
   }
   .pt-muesca { position: absolute; top: 13.75px; left: 50%; translate: -50%; width: 177px; height: 30px; z-index: 2; }
   .pt-muesca svg { display: block; fill: #09090b; }

@@ -582,6 +582,8 @@ export default async function handler(req, res) {
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
     const updatesAsText = model === UPDATES_MODEL;
+    // TEMPORAL (diagnóstico Sonnet 5.5, solo vista previa): tipos y largos de bloque, sin contenido.
+    if (process.env.VERCEL_ENV !== 'production') console.log('[chat-debug] bloques=' + JSON.stringify((finalResp.content || []).map((b) => [b.type, (b.text || b.thinking || '').length])));
     const parsed = parseToolResponse(finalResp.content, lang, { updatesAsText });
     let text = parsed.text;
     let action = parsed.action;

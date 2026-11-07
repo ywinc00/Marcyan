@@ -137,3 +137,22 @@ Piezas del catálogo: **E-06** filtros con estado en la URL, **I-06** pestañas 
 tiempo (C), **E-08/E-09/E-10** estados, **H-07** presupuesto del acento (naranja: ítem activo y lo que agenda
 Marcy; verde de datos: en vivo y cerrado; ámbar: dónde falló, siempre con texto).
 Ledger aplicable: E-11, E-17, E-19, E-28, E-30, E-39, E-55, E-60, E-61.
+
+## Añadido 2026-11-07 · Citas (Orbit) y agenda en el chat
+Estado: PROPUESTO, pendiente del OK visual del dueño en la vista previa.
+- Orbit, pestaña Citas de la sección Marcy: semana en hora de Houston (referencias Mangomint
+  `1663684e-5602-447a-ac79-99f36d56c690` y GlossGenius `bd279ce7-915e-403f-9f64-1bc258810d3b`): fuera de
+  horario más oscuro, horario de atención en la superficie de tarjeta, citas como bloques con la hora y el
+  nombre; las de Marcy con filo naranja (H-07: es lo pendiente que puso ella), las manuales en verde de datos.
+  Ficha lateral con contacto, lo que necesita, enlace al lead y a la conversación; acciones Hecha, No contestó,
+  Cancelar (peligro). Anfitrión E-19: pestaña nueva dentro de la sección ya aprobada, sin componentes globales.
+- Chat: la cajita de captura de siempre con un bloque de días (pastillas) y horas (rejilla) encima de los
+  campos; mismos tokens del widget (teal del sitio, radios y tipografía de la cajita). Nada nuevo fuera de ella.
+
+## Añadido 2026-11-07 · Icono propio de Orbit (pedido del dueño)
+Estado: PROPUESTO. El panel usaba el planeta oro/teal de Marcyan (el de la empresa), igual que otras apps de
+Marcyan. Orbit pasa a tener su isotipo: planeta y anillo en el naranja de Orbit `#f97316` sobre `#0e0e11`,
+satélite blanco en el anillo. Mismo vocabulario de la marca (planeta orbitado) con el color de Orbit, para que
+se reconozca como de la familia y se distinga en la pantalla de inicio. Archivos: `public/dashboard/orbit-icon.svg`
+y PNG 180/192/512 (iPhone no acepta SVG). Nombre de la app instalada: "Orbit". No toca el logo del navbar,
+el de la empresa ni el favicon del sitio (memoria "Logos: NO unificar").

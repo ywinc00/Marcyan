@@ -1,6 +1,6 @@
 {
-  "name": "Marcyan Panel",
-  "short_name": "Marcyan",
+  "name": "Orbit · Marcyan",
+  "short_name": "Orbit",
   "description": "Panel de operaciones de Marcyan: leads, briefs y proyectos.",
   "id": "/dashboard",
   "start_url": "/dashboard",
@@ -12,7 +12,9 @@
   "lang": "es",
   "dir": "ltr",
   "icons": [
-    { "src": "/dashboard/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/dashboard/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "/dashboard/orbit-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/dashboard/orbit-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/dashboard/orbit-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/dashboard/orbit-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

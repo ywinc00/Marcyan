@@ -14,6 +14,7 @@
     "test:diag": "node scripts/test-diagnostic.mjs",
     "test:diag-medicion": "node scripts/test-diagnostic-measure.mjs",
     "test:marcy-log": "node scripts/test-chat-log.mjs",
+    "test:citas": "node scripts/test-appointments.mjs",
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",

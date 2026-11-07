@@ -196,10 +196,10 @@
     if (mainEl && s) mainEl.focus({ preventScroll: true });
   });
 
-  // Título de pestaña con los avisos sin leer (OP-13): "(3) Marcyan · Leads".
+  // Título de pestaña con los avisos sin leer (OP-13): "(3) Orbit · Leads".
   const unreadBadge = $derived(phase === 'app' ? badgeText(avisos.unread) : '');
   $effect(() => {
-    if (typeof document !== 'undefined') document.title = (unreadBadge ? `(${unreadBadge}) ` : '') + 'Marcyan · ' + sectionTitle;
+    if (typeof document !== 'undefined') document.title = (unreadBadge ? `(${unreadBadge}) ` : '') + 'Orbit · ' + sectionTitle;
   });
   // Contador de Avisos: solo con sesión, cada 60 s con la pestaña visible y
   // al volver a ella (lib/avisos.svelte.js).

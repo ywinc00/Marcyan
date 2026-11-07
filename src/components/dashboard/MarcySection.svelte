@@ -21,6 +21,7 @@
   import LoadingState from './ui/LoadingState.svelte';
   import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
+  import MarcyCitas from './MarcyCitas.svelte';
 
   const POLL_MS = 5000;
 
@@ -37,7 +38,7 @@
   let convError = $state('');
 
   const q = $derived(route.query || {});
-  const vista = $derived(q.vista === 'gasto' ? 'gasto' : 'conversaciones');
+  const vista = $derived(q.vista === 'gasto' || q.vista === 'citas' ? q.vista : 'conversaciones');
   const selectedSid = $derived(route.sub && route.sub[0] ? String(route.sub[0]) : '');
   const visible = $derived(applyFilter(rows, { f: q.f || '', paso: q.paso || '', motivo: q.motivo || '' }));
   const liveCount = $derived(rows.filter((r) => r.outcome === 'en_vivo').length);
@@ -106,7 +107,7 @@
   function pickFilter(id) { setQuery({ ...q, f: id || '', paso: '', motivo: '' }); }
   function pickStep(id) { setQuery({ ...q, paso: q.paso === id ? '' : id, f: '', motivo: '' }); }
   function pickMotivo(id) { setQuery({ ...q, motivo: q.motivo === id ? '' : id, f: '', paso: '' }); }
-  function setVista(v) { setQuery({ ...q, vista: v === 'gasto' ? 'gasto' : '' }); }
+  function setVista(v) { setQuery({ vista: v === 'conversaciones' ? '' : v }); }
   let consoleEl = $state(null);
   // En el móvil la conversación sustituye a la lista: se lleva arriba para leerla desde el principio.
   function open(sid) {
@@ -128,6 +129,7 @@
       <button type="button" role="tab" aria-selected={vista === 'conversaciones'} onclick={() => setVista('conversaciones')}>
         Conversaciones{#if liveCount}<span class="seg__live" aria-label="{liveCount} en vivo">{liveCount}</span>{/if}
       </button>
+      <button type="button" role="tab" aria-selected={vista === 'citas'} onclick={() => setVista('citas')}>Citas</button>
       <button type="button" role="tab" aria-selected={vista === 'gasto'} onclick={() => setVista('gasto')}>Gasto</button>
     </div>
   {/snippet}
@@ -137,6 +139,8 @@
   <EmptyState title="Falta preparar la base de datos" text="La sección necesita la migración 018 aplicada en la base. En cuanto esté, aparecen aquí las conversaciones nuevas." />
 {:else if error && !loaded}
   <ErrorState message={error} onretry={() => loadList()} />
+{:else if vista === 'citas'}
+  <MarcyCitas />
 {:else if vista === 'gasto'}
   <!-- ── Gasto del mes (Rox / Steel: barra frente al tope) ── -->
   <section class="spend card">

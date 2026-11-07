@@ -284,6 +284,11 @@ function toolOnlyFallback(action, lang) {
   if (action.type === 'capture') {
     // Neutro a propósito: la cajita ya viene PRE-RELLENADA con lo que el visitante
     // dio, así que no listamos campos. Mensaje según el destino.
+    if (action.destino === 'cita') {
+      return en
+        ? 'Pick the day and time that work best for you below and leave your contact. 📅'
+        : 'Elige aquí abajo el día y la hora que mejor te vengan y deja tu contacto. 📅';
+    }
     if (action.destino === 'proyecto') {
       return en
         ? 'Perfect — confirm your contact below and we’ll put your custom proposal together. 🚀'
@@ -319,7 +324,7 @@ export function parseToolResponse(content, lang = 'es', { updatesAsText = false 
   if (tool) {
     if (tool.name === CONTACT_TOOL.name) {
       const inp = tool.input || {};
-      const destino = inp.destino === 'proyecto' ? 'proyecto' : 'contacto'; // allowlist, default seguro
+      const destino = inp.destino === 'proyecto' || inp.destino === 'cita' ? inp.destino : 'contacto'; // allowlist, default seguro
       const name = sanitizeName(inp.nombre); // prellenado robusto (nombre de pila)
       // El modelo RAZONA sobre la conversación y rellena el brief de proyecto; aquí
       // saneamos cada campo (sanitizeField quita emails/teléfonos → PII solo por la cajita).

@@ -55,6 +55,12 @@ const STR = {
     capTitleSample: 'Te preparamos una muestra gratis',
     capTitleContact: '¿Cómo te contactamos?',
     capTitleProject: 'Últimos datos para tu propuesta a medida',
+    capTitleCita: 'Elige día y hora para tu llamada',
+    capSubCita: 'Llamada de 30 minutos con el equipo de Marcyan. Horas de Houston.',
+    capSlotsLoading: 'Buscando horas libres…',
+    capSlotsErr: 'No pudimos cargar los horarios. Deja tu contacto y te llamamos para cuadrar la hora.',
+    capPickSlot: 'Elige una hora de la lista.',
+    capCitaOk: 'Listo, tu llamada quedó agendada para el %CUANDO% (hora de Houston). Te llamamos a esa hora. 📅',
     capSub: 'Confirma tu nombre y tu mejor email o teléfono. Sin compromiso.',
     capSubProject: 'Confírmalos y alguien del equipo de Marcyan te arma la propuesta gratis.',
     capName: 'Nombre',
@@ -122,6 +128,12 @@ const STR = {
     capTitleSample: 'We’ll prepare a free sample for you',
     capTitleContact: 'How should we reach you?',
     capTitleProject: 'Final details for your custom proposal',
+    capTitleCita: 'Pick a day and time for your call',
+    capSubCita: 'A 30 minute call with the Marcyan team. Houston time.',
+    capSlotsLoading: 'Finding open times…',
+    capSlotsErr: 'We couldn’t load the times. Leave your contact and we’ll call you to set one.',
+    capPickSlot: 'Please pick a time from the list.',
+    capCitaOk: 'Done, your call is booked for %CUANDO% (Houston time). We’ll call you then. 📅',
     capSub: 'Confirm your name and your best email or phone number. No strings attached.',
     capSubProject: 'Confirm your details and a Marcyan team member will send you the free proposal.',
     capName: 'Name',
@@ -721,6 +733,21 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat .mrc-cap-result { font-size: var(--text-sm); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-result.ok { color: var(--accent-teal); }
   .mrc-chat .mrc-cap-result.err { color: var(--color-error); }
+  /* Citas: días y horas libres (botones creados por el JS). */
+  .mrc-chat .mrc-cap-slots { display: flex; flex-direction: column; gap: var(--space-2); }
+  .mrc-chat .mrc-cap-days { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+  .mrc-chat .mrc-cap-times { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; max-height: 148px; overflow-y: auto; }
+  .mrc-chat .mrc-cap-day, .mrc-chat .mrc-cap-slot {
+    font-family: var(--font-body); font-size: var(--text-xs); white-space: nowrap; cursor: pointer;
+    padding: 7px 10px; min-height: 36px; border-radius: var(--radius-pill);
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--fg-secondary);
+    transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast);
+  }
+  .mrc-chat .mrc-cap-slot { border-radius: var(--radius-md); }
+  .mrc-chat .mrc-cap-day:hover, .mrc-chat .mrc-cap-slot:hover { color: var(--accent-teal); border-color: var(--accent-teal-line); }
+  .mrc-chat .mrc-cap-day[aria-pressed="true"], .mrc-chat .mrc-cap-slot[aria-pressed="true"] { color: var(--fg-primary); border-color: var(--accent-teal); background: var(--accent-teal-dim); font-weight: 600; }
+  .mrc-chat .mrc-cap-day:focus-visible, .mrc-chat .mrc-cap-slot:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+  @media (pointer: coarse) { .mrc-chat .mrc-cap-day, .mrc-chat .mrc-cap-slot { min-height: 44px; } }
 
   /* Tarjeta de acción que Marcy inserta (canales directos / enlace a página).
      Los .mrc-pill de aquí los crea el JS → no reciben el scope de Astro; se estilan
@@ -1054,7 +1081,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             // (fraseo raro tipo "con Yulier"), usa el que el modelo ya conoce de la
             // conversación. Solo el nombre; email/tel siguen viniendo del cliente.
             if (act.name && !known.name) known.name = act.name;
-            openCapture(act.destino === 'proyecto' ? 'proyecto' : 'contacto', act.extras || {});
+            openCapture(act.destino === 'proyecto' || act.destino === 'cita' ? act.destino : 'contacto', act.extras || {});
           } else if (act && act.type === 'channels') {
             renderActionCard('channels');
           } else if (act && act.type === 'link') {
@@ -1167,7 +1194,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         return;
       }
       const title = kind === 'handoff' ? (T.capTitleHuman || T.capTitleContact)
-        : kind === 'proyecto' ? (T.capTitleProject || T.capTitleContact) : T.capTitleContact;
+        : kind === 'proyecto' ? (T.capTitleProject || T.capTitleContact)
+        : kind === 'cita' ? (T.capTitleCita || T.capTitleContact) : T.capTitleContact;
       const card = document.createElement('div');
       card.className = 'mrc-capture';
       card.setAttribute('data-mrc-capture', '');
@@ -1175,6 +1203,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       card.innerHTML =
         '<div class="mrc-cap-title"></div>' +
         '<p class="mrc-cap-sub"></p>' +
+        (kind === 'cita' ? '<div class="mrc-cap-slots" data-mrc-slots></div>' : '') +
         '<input id="mrc-c-name" type="text" autocomplete="name" maxlength="120" />' +
         '<div class="mrc-cap-row">' +
           '<input id="mrc-c-email" type="email" autocomplete="email" inputmode="email" maxlength="200" />' +
@@ -1190,7 +1219,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
       card.querySelector('.mrc-cap-sub').textContent = kind === 'handoff' ? (T.capSubHuman || T.capSub)
-        : kind === 'proyecto' ? (T.capSubProject || T.capSub) : T.capSub;
+        : kind === 'proyecto' ? (T.capSubProject || T.capSub)
+        : kind === 'cita' ? (T.capSubCita || T.capSub) : T.capSub;
       const nameInput = card.querySelector('#mrc-c-name');
       const emailInput = card.querySelector('#mrc-c-email');
       const phoneInput = card.querySelector('#mrc-c-phone');
@@ -1225,6 +1255,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       log.appendChild(card);
       log.scrollTop = log.scrollHeight;
+      if (kind === 'cita') loadSlots(card);
 
       const need = (lastUserText || '').slice(0, 1000);
       card.querySelector('[data-mrc-capdismiss]').addEventListener('click', () => card.remove());
@@ -1232,6 +1263,52 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // Enfoca el primer campo VACÍO (si ya prellenamos algo, el cursor cae donde falta).
       const firstEmpty = [nameInput, emailInput, phoneInput].find((el) => el && !el.value);
       (firstEmpty || nameInput).focus();
+    }
+
+    // ── Citas: huecos libres (hora de Houston) que sirve /api/citas. Botones
+    //    creados con textContent (nada del modelo ni del visitante). ──
+    async function loadSlots(card) {
+      const box = card.querySelector('[data-mrc-slots]');
+      if (!box) return;
+      box.textContent = '';
+      const p = document.createElement('p'); p.className = 'mrc-cap-sub'; p.textContent = T.capSlotsLoading; box.appendChild(p);
+      try {
+        const res = await fetchWithTimeout('/api/citas?lang=' + lang, { method: 'GET' });
+        const data = await res.json();
+        if (!res.ok || !data || !data.ok || !Array.isArray(data.dias) || !data.dias.length) throw new Error('sin huecos');
+        renderSlots(card, data.dias);
+      } catch (_) {
+        p.textContent = T.capSlotsErr;
+        card.dataset.slotsFailed = '1';
+      }
+    }
+    function renderSlots(card, dias) {
+      const box = card.querySelector('[data-mrc-slots]');
+      if (!box) return;
+      box.textContent = '';
+      delete card.dataset.at;
+      const dayRow = document.createElement('div'); dayRow.className = 'mrc-cap-days'; dayRow.setAttribute('role', 'group');
+      const times = document.createElement('div'); times.className = 'mrc-cap-times'; times.setAttribute('role', 'group');
+      const showDay = (i) => {
+        dayRow.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', String(i === j)));
+        times.textContent = '';
+        for (const h of dias[i].huecos) {
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'mrc-cap-slot';
+          b.textContent = h.hora; b.setAttribute('aria-pressed', String(card.dataset.at === h.at));
+          b.addEventListener('click', () => {
+            card.dataset.at = h.at;
+            times.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          });
+          times.appendChild(b);
+        }
+      };
+      dias.forEach((d, i) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'mrc-cap-day'; b.textContent = d.dia;
+        b.addEventListener('click', () => showDay(i));
+        dayRow.appendChild(b);
+      });
+      box.appendChild(dayRow); box.appendChild(times);
+      showDay(0);
     }
 
     // Serializa los últimos turnos del historial como transcript legible, aplicando
@@ -1288,6 +1365,35 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
         showErr(T.capErr);
       };
+
+      // Cita: hueco elegido + contacto → /api/citas (guarda el lead antes que la cita).
+      if (kind === 'cita' && !card.dataset.slotsFailed) {
+        if (!card.dataset.at) { showErr(T.capPickSlot); return; }
+        if (sendB) { sendB.disabled = true; sendB.textContent = T.capSending; }
+        if (result) result.hidden = true;
+        try {
+          const res = await fetchWithTimeout('/api/citas', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ at: card.dataset.at, name: get('#mrc-c-name'), email, phone, topic: need, lang, website_hp: get('#mrc-c-hp'), chat_sid: sid }),
+          });
+          let data = null; try { data = await res.json(); } catch (_) {}
+          if (res.ok && data && data.ok) {
+            try { track('generate_lead', { source: 'chat', kind: 'cita' }); } catch {}
+            card.querySelectorAll('.mrc-cap-slots').forEach((el) => { el.style.display = 'none'; });
+            onSuccess((T.capCitaOk || T.capOk).replace('%CUANDO%', data.cuando || ''));
+            return;
+          }
+          if (res.status === 409 && data && Array.isArray(data.dias)) {
+            renderSlots(card, data.dias);
+            if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; }
+            showErr(data.error || T.capPickSlot);
+            return;
+          }
+          if (data && data.error && res.status === 400) { if (sendB) { sendB.disabled = false; sendB.textContent = T.capSend; } showErr(data.error); return; }
+          throw new Error('bad response');
+        } catch (_) { onFail(); }
+        return;
+      }
 
       // Handoff: pedir hablar con una persona → /api/handoff (no crea lead; avisa al fundador).
       if (kind === 'handoff') {

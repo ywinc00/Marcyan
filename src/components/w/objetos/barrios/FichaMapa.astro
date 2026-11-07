@@ -280,6 +280,7 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
 <style>
   .fm {
     position: relative; width: 100%; max-width: 420px;
+    container: fm / inline-size;
     font-family: var(--font-body); color: #1E1D1B; text-align: left;
   }
   .fm__obj {
@@ -403,6 +404,12 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
   }
   @media (max-width: 359.98px) {
     .fm__act { font-size: 12.5px; gap: 5px; padding: 0 6px; }
+  }
+  /* La ficha se adapta a SU ancho, no al de la pantalla: si un contenedor la deja estrecha
+     (hero de SEO local en teléfonos de 320-360), los dos botones secundarios se apilan enteros
+     en vez de cortarse ("Cómo llega"). */
+  @container fm (max-width: 229.98px) {
+    .fm__acts { grid-template-columns: minmax(0, 1fr); }
   }
   @media (--motion-reduce) {
     .fm .fm__route, .fm .fm__route-c, .fm .fm__pin, .fm .fm__pin-sh, .fm .fm__dot i, .fm .fm__you-halo { animation: none !important; }

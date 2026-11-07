@@ -97,7 +97,8 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
      a la izquierda y «TI» abajo a la derecha, asomando bajo el borde de la ficha. */
   @media (max-width: 767.98px) {
     .hsl__obj { height: auto; padding-bottom: calc(var(--hsl-f) * .74); }
-    .hsl__win { position: relative; }
+    /* ficha hasta el borde derecho de la columna: más ancha en teléfonos estrechos */
+    .hsl__win { position: relative; width: min(calc(100% - var(--hsl-f) * 1.08), 300px); }
     .hsl__w--2 { position: static; }
     .hsl__p { position: absolute; }
     .hsl__p--1 { left: -6px; top: calc(50% - .4em); }

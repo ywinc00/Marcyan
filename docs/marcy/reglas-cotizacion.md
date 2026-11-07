@@ -1,6 +1,6 @@
 # Reglas de cotización de Marcy (P3, opción A)
 
-Estado: **propuesta del 2026-11-07, pendiente del OK del dueño.** Marcy ya no calcula precios:
+Estado: **aprobadas por el dueño el 2026-11-07.** Marcy ya no calcula precios:
 le pasa al servidor lo que pide el cliente y repite la cifra que sale. Si dice una cifra de 100
 dólares o más que no sale de aquí, de los precios publicados o de lo que dijo el propio cliente,
 el servidor la corta antes de que el cliente la vea.
@@ -28,7 +28,7 @@ Código: `lib/quote-rules.mjs` (mantener esta tabla igual al código).
 
 "Tarea" del asistente = contestar, agendar, cotizar, captar datos… "Canal" = web, WhatsApp, Instagram…
 
-## Reglas generales (propuesta)
+## Reglas generales
 
 1. **Descuento por combinación:** 2 o más proyectos de pago único en la misma cotización = 10 % menos
    sobre esos proyectos. Lo mensual nunca se descuenta.
@@ -43,7 +43,6 @@ Sitio de 8 páginas + asistente que contesta en la web y en WhatsApp:
 sitio $1,500 + 3 páginas × $150 = $1,950 · asistente $500 + 1 canal × $250 = $750 ·
 subtotal $2,700 · combinación −$250 · **total $2,450**. Si insiste: **$2,200 sujeto a aprobación.**
 
-## Lo que tiene que decidir el dueño
+## Cambios
 
-Cambiar cualquier cifra de las tablas, quitar o añadir extras, y si el descuento por combinación
-y la rebaja máxima le parecen bien.
+Cualquier cifra se cambia solo con el OK del dueño, en el código y en esta tabla a la vez.

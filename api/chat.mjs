@@ -330,6 +330,9 @@ export function parseToolResponse(content, lang = 'es', { updatesAsText = false 
       };
       action = { type: 'capture', destino, extras };
       if (name) action.name = name;
+      // Sonnet 5.5 llama a la herramienta SIN escribir texto (verificado 2026-11-07:
+      // respuesta = solo tool_use). La frase va en el campo obligatorio "mensaje".
+      if (!text && typeof inp.mensaje === 'string') text = sanitizeField(inp.mensaje, 600);
     } else if (tool.name === CHANNELS_TOOL.name) {
       action = { type: 'channels' };
     } else if (tool.name === LINK_TOOL.name) {

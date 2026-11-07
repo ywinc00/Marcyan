@@ -9,7 +9,7 @@ import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL } from '../lib/chat-kb.mjs';
 import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -288,6 +288,15 @@ check('sin updates, el thinking NUNCA se muestra (no filtra razonamiento)', () =
   const c = [{ type: 'thinking', thinking: 'razonamiento interno', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
   assert.doesNotMatch(parseToolResponse(c, 'es').text, /razonamiento/);
 });
+check('captura sin texto: la frase sale del campo mensaje', () => {
+  const c = [{ type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Una landing para tu taller parte de $400. Confírmame tu contacto y te armo la propuesta.' } }];
+  assert.match(parseToolResponse(c, 'es').text, /landing/);
+});
+check('captura con texto: no se duplica con el campo mensaje', () => {
+  const c = [{ type: 'text', text: 'Hola' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Otra cosa' } }];
+  assert.equal(parseToolResponse(c, 'es').text, 'Hola');
+});
+check('captura: el campo mensaje es obligatorio en la herramienta', () => assert.ok(CONTACT_TOOL.input_schema.required.includes('mensaje')));
 check('con texto normal, la nota de progreso no se duplica', () => {
   const c = [{ type: 'thinking', thinking: 'nota', signature: 's' }, { type: 'text', text: 'Hola' }];
   assert.equal(parseToolResponse(c, 'es', { updatesAsText: true }).text, 'Hola');

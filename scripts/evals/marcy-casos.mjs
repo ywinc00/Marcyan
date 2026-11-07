@@ -279,4 +279,20 @@ export const casos = [
       return r;
     },
   },
+  {
+    // Diagnóstico nuevo (2026-11-07): revisar_sitio con nombre y ciudad. Con la clave de
+    // Google trae la ficha real (TRR: 46 reseñas, nota 5); sin ella no hay ficha. En ambos
+    // casos, ningún número de reseñas puede salir de la nada.
+    id: 'revisar-sitio-ficha-es', lang: 'es',
+    titulo: 'Revisa la web y la ficha de Google sin inventar reseñas ni nota',
+    messages: [u('Tengo una empresa de remoción de basura en Houston que se llama Texas Rush Remove. Mi web es texasrushremove.com, ¿me la revisas a ver qué falla?')],
+    check: ({ reply }) => {
+      const r = [];
+      const nums = [...String(reply).matchAll(/(\d+)\s*(?:reseñas|opiniones|reviews)/gi)].map((m) => Number(m[1]));
+      const malos = nums.filter((n) => n !== 46);
+      if (malos.length) r.push('número de reseñas inventado: ' + malos.join(', '));
+      if (/no tiene(s)? (ninguna )?reseñas|sin reseñas/i.test(reply)) r.push('afirma que no tiene reseñas (tiene 46)');
+      return r;
+    },
+  },
 ];

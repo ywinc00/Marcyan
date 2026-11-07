@@ -271,7 +271,9 @@ check('brief rico: descripcion/detalles también quitan email/teléfono (defensa
 });
 
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
-check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));
+check('DEFAULT_MODEL = claude-sonnet-5-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5-5'));
+check('Sonnet 5.5 lleva thinking adaptativo (disabled = 400 en ese modelo)', () => assert.equal(modelTuning('claude-sonnet-5-5').thinking.type, 'adaptive'));
+check('Sonnet 5.5 tiene precio en el contador de coste', () => assert.equal(turnCostMicroUsd('claude-sonnet-5-5', { input: 1e6, output: 0, cacheRead: 0, cacheWrite: 0 }), 2e6));
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
 check('ALLOWED_MODELS conserva fallback sonnet-4-6', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-4-6'), true));
 check('modelo desconocido NO está en allowlist (se coacciona a default)', () => assert.equal(ALLOWED_MODELS.has('gpt-4o'), false));

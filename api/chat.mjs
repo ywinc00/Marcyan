@@ -59,12 +59,13 @@ export function envBucket(bucket) {
 // widget (ChatWidget.astro) < maxDuration 60. Si cambias un tope, recalcula los tres.
 export const config = { maxDuration: 60 };
 
-// Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
+// Modelo por defecto: Sonnet 5.5 (2026-11-07; mismo precio que Sonnet 5, pasa la batería).
+// Thinking adaptativo + effort low: en 5.5 'disabled' da 400 y tool_choice forzado también (no se usan).
 // Exportados para que el guard test bloquee el id y la allowlist (control de costo).
-export const DEFAULT_MODEL = 'claude-sonnet-5';
+export const DEFAULT_MODEL = 'claude-sonnet-5-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 // Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
-export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
+export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5', 'claude-sonnet-5-5']);
 
 // Parámetros de razonamiento por MODELO (v8). Sonnet 5/4.6 soportan thinking
 // adaptativo + effort; Haiku 4.5 NO (ambos parámetros devuelven 400 en ese modelo):

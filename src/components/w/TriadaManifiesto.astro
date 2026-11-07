@@ -17,6 +17,8 @@ interface Props {
   class?: string;
 }
 const { titleHtml, lead, items, id, class: cls } = Astro.props;
+// Sin título de bloque, cada pieza es el siguiente nivel tras el H1 (h2); con título, h3.
+const Hn = titleHtml ? 'h3' : 'h2';
 ---
 <div class:list={['tri', cls]} id={id}>
   {(titleHtml || lead) && (
@@ -28,7 +30,7 @@ const { titleHtml, lead, items, id, class: cls } = Astro.props;
   <ul class="tri__list" data-tri-list>
     {items.map((it) => (
       <li class="tri__item">
-        <h3 class="tri__h"><span class="tri__t1">{it.tone1}</span> <span class="tri__t2">{it.tone2}</span></h3>
+        <Hn class="tri__h"><span class="tri__t1">{it.tone1}</span> <span class="tri__t2">{it.tone2}</span></Hn>
         <p class="tri__text">{it.text}</p>
       </li>
     ))}

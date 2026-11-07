@@ -106,18 +106,34 @@ Estado: PROPUESTO, pendiente del OK visual del dueño sobre capturas reales (esc
   Con brief: "Enviar kit desde su brief" lleva a ese brief, donde vive su kit.
 
 ## Añadido 2026-11-07 · Sección Marcy (conversaciones en vivo, historial, citas, gasto)
-Estado: PROPUESTO. El dueño elige entre el boceto A (bandeja y lectura) y el B (tabla y conversación en
-ventana): `design/orbit-marcy-bocetos.png` / `.html`. Nada se construye en fino sin su elección.
-- Anfitrión (E-19): una sección más del menú de Orbit, con las primitivas existentes (PageHeader, KpiGrid,
-  Kpi, StatusChip, Card, Modal, EmptyState, LoadingState, ErrorState). Ningún componente nuevo salvo la
-  burbuja de mensaje y el aviso de "aquí se fue".
-- Piezas del catálogo: **E-06** filtros en pastillas por resultado con el estado en la URL; **I-06** pestañas
-  segmentadas Conversaciones · Citas (dos vistas de la misma sección); **E-08/E-09/E-10** vacío con salida,
-  carga honesta y error con Reintentar (incluido "falta aplicar la migración 018"); **H-07** presupuesto del
-  acento: el naranja no aparece (no hay acción principal de crear); en vivo y cerradas en verde de datos,
-  "dónde falló" en ámbar de aviso, nunca solo color (siempre con texto).
-- Datos honestos (E-55): cada cifra sale del registro propio (gasto = precios oficiales por token); el tope
-  solo se dibuja si existe `MARCY_MONTHLY_CAP_USD`.
-- En vivo: refresco cada 5 s solo con la pestaña visible; el punto verde no parpadea (sin animación de bucle).
-- Citas: la pestaña aparece cuando Marcy pueda agendar (fase 1 pendiente); hasta entonces no se dibuja.
-- Ledger aplicable: E-11, E-17, E-19, E-30, E-39, E-55, E-60 (móvil táctil real antes de entregar).
+Estado: PROPUESTO, ronda 2. La ronda 1 (bocetos A/B sin referencias) la rechazó el dueño: "nivel empresa top,
+un CRM de calidad" (ledger E-61). Tres direcciones de verdad distintas en `design/orbit-marcy/direcciones.png`
+(y `.html`), cada una al lado de sus referencias. El dueño elige antes de construir en fino.
+
+Referencias de Refero MIRADAS en imagen (pantallas web, id completo · principio tomado):
+- Lemni `f139a9a3-b343-4ef1-9860-60c5f62c32eb` · acciones del agente como tarjetas dentro de la conversación.
+- Lemni `3a36c541-61e3-4f84-b1b6-220e38a07f65` · ficha lateral con estado, prioridad y resumen del hilo.
+- Intercom `8e601e7d-bf19-4fa2-be9e-ab49d7d8d816` · avisos del sistema discretos entre mensajes.
+- Intercom Fin `de1ab118-183b-45e5-832a-c2f5237103ea` · cifras del agente como pestañas que filtran.
+- Intercom informes `0d71c83b-b64f-43a9-97d0-1df31ec1010c` · KPIs + tabla de rendimiento.
+- Attio `a3cb9102-0320-4ed3-b39b-5a714d16e85f` · ficha de persona con pestañas y actividad por fechas.
+- Krisp `eb64758d-6ba8-4b29-9ae6-1fecc6d5e603` · cinta de turnos sobre la transcripción.
+- Factory `a57432d9-dc26-4267-bb76-04827eff439c` · sesión de agente oscura con pasos plegables.
+- GlossGenius `bd279ce7-915e-403f-9f64-1bc258810d3b` · cita con su cliente en panel lateral.
+- Mangomint `1663684e-5602-447a-ac79-99f36d56c690` · semana densa con citas por color.
+- Rox `c794140c-de8b-46c4-8128-b3a652ea7461` · uso frente al límite con barra.
+- Steel `d499ba7e-45e3-4365-be81-a2d756f9f775` · gasto del periodo y por día.
+- Missive `1c47a246-4f51-4bbe-810b-0ad33fc5de46` · reparto por tramos para ver dónde se acumula.
+- Zendesk `1686eace-68b9-43c8-b6ad-056eca9d35fe` · panel de llamadas en cola (para la fase de teléfono).
+Biblioteca viva: Refero es la fuente de pantallas de producto; Mobbin no se conecta sin consultar; código base
+de la bandeja si se elige A: el ejemplo "mail" de shadcn/ui (MIT) solo como estructura, con primitivas de Orbit.
+
+Direcciones:
+- **A · Consola en vivo:** bandeja | conversación con tarjetas de herramientas y avisos | ficha con recorrido de venta.
+- **B · Embudo y diagnóstico:** embudo del mes que filtra, tabla con cinta de turnos, motivos de fallo ordenados.
+- **C · Ficha de cliente:** contactos | ficha con línea de tiempo por días de todos los canales | datos del negocio.
+- Común: Citas (semana con horas de atención, panel lateral) y Gasto (barra frente al tope con aviso al 80 %).
+Piezas del catálogo: **E-06** filtros con estado en la URL, **I-06** pestañas segmentadas, **I-05** línea de
+tiempo (C), **E-08/E-09/E-10** estados, **H-07** presupuesto del acento (naranja: ítem activo y lo que agenda
+Marcy; verde de datos: en vivo y cerrado; ámbar: dónde falló, siempre con texto).
+Ledger aplicable: E-11, E-17, E-19, E-28, E-30, E-39, E-55, E-60, E-61.

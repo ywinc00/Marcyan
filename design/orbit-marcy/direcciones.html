@@ -1,0 +1,302 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marcy en Orbit · tres direcciones</title>
+<link rel="stylesheet" href="../../src/styles/dashboard.css">
+<style>
+body{background:#09090b;color:var(--fg-primary);font-family:Inter,system-ui,sans-serif;margin:0;font-size:13px}
+.wrap{max-width:1560px;margin:0 auto;padding:40px 32px 80px}
+.intro h1{font-size:30px;font-weight:600;letter-spacing:-.025em;margin:0 0 8px}
+.intro p{color:var(--fg-secondary);max-width:80ch;line-height:1.55;margin:0}
+.dir{margin-top:72px}
+.dirhead{display:grid;grid-template-columns:1fr 640px;gap:32px;align-items:end;margin-bottom:18px}
+.dirhead .lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-gold)}
+.dirhead h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:6px 0 8px}
+.dirhead p{color:var(--fg-secondary);line-height:1.55;margin:0 0 6px;max-width:72ch}
+.dirhead .why b{color:var(--fg-primary);font-weight:500}
+.refs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.refs figure{margin:0}.refs img{width:100%;border-radius:6px;border:1px solid var(--border);display:block}
+.refs figcaption{font-size:11px;color:var(--fg-subtle);margin-top:4px;line-height:1.3}
+/* carcasa Orbit */
+.app{display:grid;grid-template-columns:200px 1fr;border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;background:var(--bg-base);height:760px}
+.side{background:var(--bg-2);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.side .brand{font-weight:600;padding:4px 8px 16px;display:flex;gap:8px;align-items:center}
+.side .brand i{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fdba74,#f97316 55%,#9a3412)}
+.side a{padding:7px 10px;border-radius:8px;color:var(--fg-secondary);display:flex;justify-content:space-between}
+.side a.on{background:var(--bg-elevated);color:var(--fg-primary);box-shadow:inset 2px 0 0 var(--accent-gold)}
+.side small{font-size:11px;color:var(--accent-teal)}
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}
+.top h3{margin:0;font-size:18px;font-weight:600;letter-spacing:-.02em}
+.seg{display:inline-flex;background:var(--bg-elevated);border:1px solid var(--border);border-radius:9px;padding:3px}
+.seg b{font-weight:500;padding:5px 11px;border-radius:7px;color:var(--fg-secondary)}
+.seg b.on{background:var(--surface-3);color:var(--fg-primary)}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:500;white-space:nowrap}
+.c-live{background:var(--accent-teal-dim);color:var(--accent-teal)}.c-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-teal)}
+.c-ok{background:rgba(34,197,94,.14);color:#4ade80}.c-tr{background:rgba(96,165,250,.14);color:#93c5fd}
+.c-no{background:rgba(245,179,56,.14);color:#f5b338}.c-ab{background:rgba(255,255,255,.06);color:var(--fg-secondary)}
+.muted{color:var(--fg-subtle)}.sm{font-size:11px}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:600;flex:none}
+/* ===== A consola ===== */
+.A{display:grid;grid-template-columns:300px 1fr 300px;flex:1;min-height:0}
+.A .list{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.A .lh{padding:12px 14px;display:flex;gap:6px;border-bottom:1px solid var(--border-subtle)}
+.pill{border:1px solid var(--border);border-radius:999px;padding:3px 9px;color:var(--fg-secondary);font-size:12px}
+.pill.on{background:var(--surface-3);color:var(--fg-primary);border-color:var(--border-strong)}
+.A .it{padding:12px 14px;border-bottom:1px solid var(--border-subtle);display:grid;grid-template-columns:28px 1fr;gap:10px}
+.A .it.sel{background:var(--bg-elevated);box-shadow:inset 2px 0 0 var(--accent-gold)}
+.A .it .r1{display:flex;justify-content:space-between;gap:6px}
+.A .it .q{color:var(--fg-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:3px 0 5px}
+.A .grp{padding:10px 14px 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle)}
+.A .conv{display:flex;flex-direction:column;min-height:0}
+.A .ch{padding:12px 18px;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center}
+.A .feed{padding:18px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.mm{max-width:72%;padding:9px 12px;border-radius:12px;line-height:1.45}
+.mu{align-self:flex-start;background:var(--surface-3)}
+.mb{align-self:flex-end;background:#1d1a17;border:1px solid rgba(249,115,22,.18)}
+.tool{align-self:flex-end;width:62%;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);font-size:12px}
+.tool .th{padding:7px 10px;border-bottom:1px solid var(--border-subtle);display:flex;gap:8px;align-items:center;color:var(--fg-secondary)}
+.tool .tb{padding:8px 10px;display:grid;grid-template-columns:1fr auto;gap:4px 12px}
+.ev{align-self:center;font-size:11px;color:var(--fg-subtle)}
+.typing{align-self:flex-end;display:flex;gap:4px;padding:10px 12px;border-radius:12px;background:#1d1a17}
+.typing i{width:5px;height:5px;border-radius:50%;background:var(--fg-subtle)}
+.A .rail{border-left:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:8px 10px;font-size:12px}.kv span:nth-child(odd){color:var(--fg-subtle)}
+.sect{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:8px}
+.box{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg-card)}
+.steps{display:flex;flex-direction:column;gap:6px;font-size:12px}
+.steps div{display:flex;gap:8px;align-items:center}.steps i{width:8px;height:8px;border-radius:50%;background:var(--accent-teal)}
+.steps i.off{background:transparent;border:1px solid var(--fg-faint)}
+/* ===== B embudo ===== */
+.B{padding:20px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg-card)}
+.funnel div{padding:14px 16px;border-right:1px solid var(--border-subtle);position:relative}
+.funnel div:last-child{border-right:0}
+.funnel div.on{background:var(--bg-elevated);box-shadow:inset 0 -2px 0 var(--accent-gold)}
+.funnel p{margin:0 0 6px;color:var(--fg-secondary);font-size:12px}.funnel strong{font-size:24px;font-weight:650}
+.funnel .drop{font-size:11px;color:#f5b338;margin-left:6px}
+.funnel .fw{height:4px;border-radius:4px;background:var(--accent-teal);margin-top:10px;opacity:.85}
+.Bgrid{display:grid;grid-template-columns:1fr 340px;gap:16px;min-height:0;flex:1}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px}
+.tbl .row{display:grid;grid-template-columns:110px 1fr 240px 90px 70px;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border-subtle)}
+.tbl .row.h{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);padding-top:12px}
+.tbl .q{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rib{display:flex;gap:2px;align-items:center;height:14px}
+.rib i{flex:1;height:8px;border-radius:2px;background:var(--surface-3)}
+.rib i.p{background:#a78bfa}.rib i.w{background:#38bdf8}.rib i.f{background:var(--accent-teal)}.rib i.x{background:#f5b338;height:14px}
+.leg{display:flex;gap:12px;font-size:11px;color:var(--fg-subtle);padding:10px 16px}
+.leg span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.why2{padding:16px}
+.bar2{display:grid;grid-template-columns:1fr 34px;gap:4px 10px;align-items:center;font-size:12px;margin-top:10px}
+.bar2 .t{grid-column:1/-1;color:var(--fg-secondary)}
+.bar2 .tr{height:8px;border-radius:4px;background:var(--bg-elevated);overflow:hidden}.bar2 .tr i{display:block;height:100%;background:#f5b338}
+/* ===== C ficha ===== */
+.C{display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0}
+.C .people{border-right:1px solid var(--border)}
+.C .p{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border-subtle)}
+.C .p.sel{background:var(--bg-elevated);box-shadow:inset 2px 0 0 var(--accent-gold)}
+.ch-ic{display:inline-flex;gap:3px}.ch-ic i{width:16px;height:16px;border-radius:4px;background:var(--surface-3);font-style:normal;font-size:9px;display:grid;place-items:center;color:var(--fg-secondary)}
+.C .rec{display:grid;grid-template-columns:1fr 290px;min-height:0}
+.C .hd{padding:18px 22px;border-bottom:1px solid var(--border-subtle);display:flex;gap:14px;align-items:center}
+.C .tabs{display:flex;gap:18px;padding:0 22px;border-bottom:1px solid var(--border-subtle)}
+.C .tabs b{font-weight:500;padding:10px 0;color:var(--fg-secondary)}.C .tabs b.on{color:var(--fg-primary);box-shadow:inset 0 -2px 0 var(--accent-gold)}
+.tl{padding:16px 22px;display:flex;flex-direction:column;gap:0}
+.tl .day{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);margin:6px 0 10px}
+.tl .e{display:grid;grid-template-columns:22px 1fr;gap:12px;position:relative;padding-bottom:16px}
+.tl .e::before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:1px;background:var(--border-strong)}
+.tl .dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--bg-elevated);border:1px solid var(--border-strong);font-size:10px}
+.tl .e .c{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+/* ===== compartido: citas y gasto ===== */
+.shared{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:20px}
+.cal{display:grid;grid-template-columns:44px repeat(6,1fr);font-size:11px}
+.cal .hd{padding:8px 6px;color:var(--fg-secondary);border-bottom:1px solid var(--border-subtle);text-align:center}
+.cal .hd b{display:block;font-size:16px;color:var(--fg-primary);font-weight:600}
+.cal .hd.today b{color:var(--accent-gold)}
+.cal .tm{color:var(--fg-subtle);text-align:right;padding-right:6px;height:44px;border-right:1px solid var(--border-subtle)}
+.cal .cell{height:44px;border-bottom:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);position:relative}
+.ap{position:absolute;left:3px;right:3px;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.3;background:rgba(52,211,153,.12);border-left:2px solid var(--accent-teal)}
+.ap.m{background:rgba(249,115,22,.12);border-left-color:var(--accent-gold)}
+.spend{padding:18px}
+.spend .big{font-size:30px;font-weight:650}
+.meter{height:10px;border-radius:6px;background:var(--bg-elevated);margin:12px 0 6px;position:relative;overflow:hidden}
+.meter i{position:absolute;inset:0 auto 0 0;width:23%;background:var(--accent-teal);border-radius:6px}
+.meter u{position:absolute;top:-3px;bottom:-3px;left:80%;width:2px;background:#f5b338}
+.days{display:flex;gap:4px;align-items:flex-end;height:70px;margin-top:16px}
+.days i{flex:1;background:var(--surface-3);border-radius:3px 3px 0 0}
+.days i.t{background:var(--accent-teal)}
+</style></head><body><div class="wrap">
+
+<div class="intro">
+<h1>Sección Marcy en Orbit · tres direcciones</h1>
+<p>Cada dirección parte de pantallas reales de los mejores productos de atención y ventas (Intercom, Attio, Lemni, Krisp, GlossGenius, Rox), miradas una a una. De ellas se toma la idea, no el aspecto: colores, letra, botones y menú son los de Orbit. Datos de ejemplo. Al final, la pestaña de citas y el panel de gasto, que valen para las tres.</p>
+</div>
+
+<!-- ================= A ================= -->
+<section class="dir">
+ <div class="dirhead"><div>
+  <div class="lbl">Dirección A</div>
+  <h2>Consola en vivo: ver a Marcy trabajar</h2>
+  <p>Tres columnas: la bandeja, la conversación y la ficha. En la conversación se ven también las herramientas que usó Marcy (cotizó, revisó la web, abrió el formulario) como tarjetas, y los avisos del sistema en gris. A la derecha, el resultado, el recorrido de venta y dónde falló.</p>
+  <p class="why"><b>Para qué es la mejor:</b> seguir a Marcy en vivo y entender cada respuesta. <b>Lo que cuesta:</b> menos vista de conjunto; los patrones de fallo se ven conversación a conversación.</p>
+ </div>
+ <div class="refs">
+  <figure><img src="ref/01-lemni-dark.jpg"><figcaption>Lemni: acciones del agente como tarjetas dentro de la conversación</figcaption></figure>
+  <figure><img src="ref/03-intercom-inbox.jpg"><figcaption>Intercom: avisos del sistema discretos entre mensajes</figcaption></figure>
+  <figure><img src="ref/02-lemni-chips.jpg"><figcaption>Lemni: ficha lateral con estado y resumen</figcaption></figure>
+ </div></div>
+ <div class="app"><nav class="side"><div class="brand"><i></i>Orbit</div><a>Inicio</a><a>Leads</a><a>Clientes</a><a class="on">Marcy <small>● 1</small></a><a>Briefs</a><a>Finanzas</a><a>SEO</a></nav>
+ <div class="main"><div class="top"><h3>Marcy</h3><div class="seg"><b class="on">Conversaciones</b><b>Citas</b><b>Gasto</b></div></div>
+ <div class="A">
+  <div class="list">
+   <div class="lh"><span class="pill on">Todas</span><span class="pill">En vivo</span><span class="pill">Cerradas</span><span class="pill">Con fallo</span></div>
+   <div class="grp">Ahora</div>
+   <div class="it sel"><div class="av" style="background:#134e4a;color:#5eead4">TM</div><div><div class="r1"><b>Taller mecánico</b><span class="chip c-live">En vivo</span></div><div class="q">Sí, pero casi no tengo reseñas</div><div class="muted sm">Web · español · 6 mensajes</div></div></div>
+   <div class="grp">Hoy</div>
+   <div class="it"><div class="av" style="background:#14532d;color:#86efac">LC</div><div><div class="r1"><b>Limpieza Cruz</b><span class="chip c-ok">Cerrada</span></div><div class="q">Perfecto, te dejo mi teléfono</div><div class="muted sm">LEAD-112 · 1:20 pm</div></div></div>
+   <div class="it"><div class="av" style="background:#422006;color:#fcd34d">RP</div><div><div class="r1"><b>Roofing Pro</b><span class="chip c-no">No cerrada</span></div><div class="q">ok y cuánto cobran</div><div class="muted sm">Se fue tras el precio · 11:05 am</div></div></div>
+   <div class="grp">Ayer</div>
+   <div class="it"><div class="av" style="background:#1e3a8a;color:#bfdbfe">JS</div><div><div class="r1"><b>Visitante</b><span class="chip c-tr">Pasada a ti</span></div><div class="q">I need to talk to someone</div><div class="muted sm">Web · inglés</div></div></div>
+   <div class="it"><div class="av" style="background:var(--surface-3);color:var(--fg-secondary)">··</div><div><div class="r1"><b>Visitante</b><span class="chip c-ab">Abandonada</span></div><div class="q">Hola</div><div class="muted sm">Se fue tras el saludo</div></div></div>
+  </div>
+  <div class="conv">
+   <div class="ch"><div><b>Taller mecánico</b> <span class="muted sm">· empezó 3:42 pm · Houston</span></div><span class="chip c-live">Escribiendo</span></div>
+   <div class="feed">
+    <div class="ev">Entró desde /es/houston/diseno-web</div>
+    <div class="mm mu">Hola, tengo un taller mecánico en Houston. ¿Cuánto cuesta una web?</div>
+    <div class="tool"><div class="th">◇ Cotizó con las reglas</div><div class="tb"><span>Sitio de 5 páginas</span><b>$1,500</b><span class="muted">Mensual opcional</span><span class="muted">no pedido</span></div></div>
+    <div class="mm mb">Una web de 5 páginas para tu taller sale en $1,500, lista en unas 3 semanas. ¿Ya tienes ficha de Google?</div>
+    <div class="mm mu">Sí, pero casi no tengo reseñas</div>
+    <div class="tool"><div class="th">◇ Revisó la ficha de Google</div><div class="tb"><span>Reseñas</span><b>4</b><span>Nota</span><b>4,6</b><span class="muted">Hallazgo</span><span style="color:#f5b338">pocas reseñas</span></div></div>
+    <div class="typing"><i></i><i></i><i></i></div>
+   </div>
+  </div>
+  <div class="rail">
+   <div><div class="sect">Resultado</div><span class="chip c-live">En vivo</span></div>
+   <div><div class="sect">Recorrido de venta</div><div class="steps"><div><i></i>Contó su negocio</div><div><i></i>Recibió precio</div><div><i></i>Revisión de su ficha</div><div><i class="off"></i><span class="muted">Le pidió contacto</span></div><div><i class="off"></i><span class="muted">Dejó contacto</span></div></div></div>
+   <div><div class="sect">Datos</div><div class="kv"><span>Canal</span><span>Web</span><span>Idioma</span><span>Español</span><span>Página</span><span>Diseño web Houston</span><span>Mensajes</span><span>6</span><span>Coste</span><span>$0.04</span></div></div>
+   <div class="box sm muted">Si no cierra, aquí aparece en ámbar el turno donde se fue y el motivo.</div>
+  </div>
+ </div></div></div>
+</section>
+
+<!-- ================= B ================= -->
+<section class="dir">
+ <div class="dirhead"><div>
+  <div class="lbl">Dirección B</div>
+  <h2>Embudo y diagnóstico: ver dónde se cae la venta</h2>
+  <p>Arriba, el embudo del mes de Marcy: cuántos llegan, cuántos piden precio, a cuántos les pide el contacto y cuántos cierran, con lo que se pierde en cada salto. Cada fila lleva una cinta con sus mensajes: morado precio, azul revisión, verde formulario, ámbar el punto donde se fue. A la derecha, los motivos de fallo ordenados. Al pulsar una fila se abre la conversación en un panel lateral.</p>
+  <p class="why"><b>Para qué es la mejor:</b> mejorar a Marcy, porque se ve qué falla más y en qué paso. <b>Lo que cuesta:</b> seguir una conversación en vivo exige abrir el panel.</p>
+ </div>
+ <div class="refs">
+  <figure><img src="ref/04-intercom-fin.jpg"><figcaption>Intercom (agente de IA): cifras como pestañas que filtran</figcaption></figure>
+  <figure><img src="ref/07-krisp-transcript.jpg"><figcaption>Krisp: cinta con los turnos de la conversación</figcaption></figure>
+  <figure><img src="ref/13-missive-stats.jpg"><figcaption>Missive: reparto por tramos para ver dónde se acumula</figcaption></figure>
+ </div></div>
+ <div class="app"><nav class="side"><div class="brand"><i></i>Orbit</div><a>Inicio</a><a>Leads</a><a>Clientes</a><a class="on">Marcy <small>● 1</small></a><a>Briefs</a><a>Finanzas</a><a>SEO</a></nav>
+ <div class="main"><div class="top"><h3>Marcy</h3><div class="seg"><b class="on">Conversaciones</b><b>Citas</b><b>Gasto</b></div></div>
+ <div class="B">
+  <div class="funnel">
+   <div><p>Conversaciones</p><strong>48</strong><div class="fw" style="width:100%"></div></div>
+   <div><p>Pidieron precio</p><strong>30</strong><span class="drop">−18</span><div class="fw" style="width:62%"></div></div>
+   <div class="on"><p>Les pidió contacto</p><strong>18</strong><span class="drop">−12</span><div class="fw" style="width:37%"></div></div>
+   <div><p>Dejaron contacto</p><strong>9</strong><span class="drop">−9</span><div class="fw" style="width:19%"></div></div>
+   <div><p>Pasadas a ti</p><strong>3</strong><div class="fw" style="width:6%;background:#93c5fd"></div></div>
+  </div>
+  <div class="Bgrid">
+   <div class="card tbl">
+    <div class="row h"><span>Resultado</span><span>Qué preguntó</span><span>Mensajes</span><span>Dónde</span><span>Cuándo</span></div>
+    <div class="row"><span class="chip c-live">En vivo</span><span class="q">¿Cuánto cuesta una web para mi taller?</span><span class="rib"><i></i><i class="p"></i><i></i><i class="w"></i><i></i><i></i></span><span class="muted">—</span><span class="muted">ahora</span></div>
+    <div class="row"><span class="chip c-no">No cerrada</span><span class="q">¿Me revisas mi web? roofingpro…</span><span class="rib"><i></i><i class="w"></i><i></i><i class="p"></i><i class="x"></i></span><span>Precio</span><span class="muted">11:05</span></div>
+    <div class="row"><span class="chip c-ok">Cerrada</span><span class="q">Quiero una página para mi limpieza</span><span class="rib"><i></i><i></i><i class="p"></i><i></i><i></i><i class="f"></i><i></i></span><span class="muted">—</span><span class="muted">1:20 pm</span></div>
+    <div class="row"><span class="chip c-no">No cerrada</span><span class="q">How much for a chatbot on WhatsApp?</span><span class="rib"><i></i><i class="p"></i><i class="f"></i><i class="x"></i></span><span>Formulario</span><span class="muted">ayer</span></div>
+    <div class="row"><span class="chip c-tr">Pasada a ti</span><span class="q">I need to talk to someone</span><span class="rib"><i></i><i></i><i></i></span><span class="muted">—</span><span class="muted">ayer</span></div>
+    <div class="row"><span class="chip c-ab">Abandonada</span><span class="q">Hola</span><span class="rib"><i class="x"></i></span><span>Saludo</span><span class="muted">ayer</span></div>
+    <div class="leg"><span style="--c:#a78bfa">Precio</span><span style="--c:#38bdf8">Revisión</span><span style="--c:var(--accent-teal)">Formulario</span><span style="--c:#f5b338">Se fue</span></div>
+   </div>
+   <div class="card why2"><div class="sect">Dónde se van este mes</div>
+    <div class="bar2"><span class="t">Tras el precio</span><span class="tr"><i style="width:72%"></i></span><b>13</b></div>
+    <div class="bar2"><span class="t">No dejó contacto en el formulario</span><span class="tr"><i style="width:50%"></i></span><b>9</b></div>
+    <div class="bar2"><span class="t">Tras el saludo</span><span class="tr"><i style="width:39%"></i></span><b>7</b></div>
+    <div class="bar2"><span class="t">Tras revisar su web</span><span class="tr"><i style="width:17%"></i></span><b>3</b></div>
+    <div class="bar2"><span class="t">Error o cifra cortada</span><span class="tr"><i style="width:6%"></i></span><b>1</b></div>
+    <p class="muted sm" style="margin-top:14px;line-height:1.5">Pulsar un motivo filtra la tabla con esas conversaciones, para leerlas y corregir a Marcy.</p>
+   </div>
+  </div>
+ </div></div></div>
+</section>
+
+<!-- ================= C ================= -->
+<section class="dir">
+ <div class="dirhead"><div>
+  <div class="lbl">Dirección C</div>
+  <h2>Ficha de cliente: una persona, todos sus canales</h2>
+  <p>Cada contacto es una ficha, como en un CRM de primera. En el centro, su historia en una línea de tiempo por días: chat en la web, llamada, WhatsApp, cita agendada, lead creado. A la derecha, sus datos y lo que Marcy sabe de su negocio. Cuando lleguen el teléfono y WhatsApp, todo cae en la misma ficha.</p>
+  <p class="why"><b>Para qué es la mejor:</b> preparar la llamada de cierre sabiendo todo del cliente. <b>Lo que cuesta:</b> las conversaciones anónimas que no dejan datos pesan menos, y hay que unir los canales por teléfono o correo.</p>
+ </div>
+ <div class="refs">
+  <figure><img src="ref/06-attio-activity.jpg"><figcaption>Attio: ficha con pestañas y actividad por fechas</figcaption></figure>
+  <figure><img src="ref/09-gloss-calendar.jpg"><figcaption>GlossGenius: la cita con su cliente en un panel</figcaption></figure>
+  <figure><img src="ref/02-lemni-chips.jpg"><figcaption>Lemni: datos del contacto a la derecha</figcaption></figure>
+ </div></div>
+ <div class="app"><nav class="side"><div class="brand"><i></i>Orbit</div><a>Inicio</a><a>Leads</a><a>Clientes</a><a class="on">Marcy <small>● 1</small></a><a>Briefs</a><a>Finanzas</a><a>SEO</a></nav>
+ <div class="main"><div class="top"><h3>Marcy</h3><div class="seg"><b class="on">Contactos</b><b>Citas</b><b>Gasto</b></div></div>
+ <div class="C">
+  <div class="people">
+   <div class="p sel"><div class="av" style="background:#14532d;color:#86efac">AC</div><div><b>Ana Cruz</b><div class="muted sm">Limpieza Cruz · Houston</div></div><span class="ch-ic"><i>W</i><i>☎</i></span></div>
+   <div class="p"><div class="av" style="background:#134e4a;color:#5eead4">TM</div><div><b>Taller mecánico</b><div class="muted sm">Sin datos · en vivo</div></div><span class="chip c-live">●</span></div>
+   <div class="p"><div class="av" style="background:#422006;color:#fcd34d">RP</div><div><b>Roofing Pro</b><div class="muted sm">Se fue tras el precio</div></div><span class="ch-ic"><i>W</i></span></div>
+   <div class="p"><div class="av" style="background:#1e3a8a;color:#bfdbfe">JS</div><div><b>John Smith</b><div class="muted sm">Pasada a ti · inglés</div></div><span class="ch-ic"><i>W</i></span></div>
+   <div class="p"><div class="av" style="background:#3b0764;color:#e9d5ff">ML</div><div><b>María López</b><div class="muted sm">Cita el jueves</div></div><span class="ch-ic"><i>☎</i></span></div>
+  </div>
+  <div class="rec">
+   <div style="border-right:1px solid var(--border);min-width:0">
+    <div class="hd"><div class="av" style="width:44px;height:44px;font-size:15px;background:#14532d;color:#86efac">AC</div><div><div style="font-size:17px;font-weight:600">Ana Cruz</div><div class="muted sm">Limpieza Cruz · Houston · LEAD-112</div></div><span class="chip c-ok" style="margin-left:auto">Cerrada</span></div>
+    <div class="tabs"><b class="on">Actividad</b><b>Conversaciones · 2</b><b>Citas · 1</b><b>Notas</b></div>
+    <div class="tl">
+     <div class="day">Hoy</div>
+     <div class="e"><span class="dot" style="color:var(--accent-teal)">✓</span><div class="c"><b>Dejó su teléfono</b> <span class="muted sm">· 1:20 pm</span><div class="muted sm" style="margin-top:4px">Lead LEAD-112 creado desde el chat</div></div></div>
+     <div class="e"><span class="dot">W</span><div class="c"><b>Chat en la web</b> <span class="muted sm">· 7 mensajes · 1:08 pm</span><div style="margin-top:6px;color:var(--fg-secondary)">"Quiero una página para mi negocio de limpieza…" Marcy cotizó $1,500 y revisó su ficha (12 reseñas).</div></div></div>
+     <div class="day">Viernes 13</div>
+     <div class="e"><span class="dot" style="color:var(--accent-gold)">◷</span><div class="c"><b>Llamada agendada</b> <span class="muted sm">· 3:00 pm</span><div class="muted sm" style="margin-top:4px">La agendó Marcy · 30 min · contigo</div></div></div>
+    </div>
+   </div>
+   <div style="padding:16px;display:flex;flex-direction:column;gap:16px">
+    <div><div class="sect">Contacto</div><div class="kv"><span>Teléfono</span><span>(713) ··· ··12</span><span>Idioma</span><span>Español</span><span>Origen</span><span>Diseño web Houston</span></div></div>
+    <div><div class="sect">Su negocio</div><div class="kv"><span>Rubro</span><span>Limpieza</span><span>Web</span><span>No tiene</span><span>Ficha</span><span>12 reseñas · 4,8</span></div></div>
+    <div><div class="sect">Interés</div><div class="kv"><span>Servicio</span><span>Web 5 páginas</span><span>Cotizado</span><span>$1,500</span></div></div>
+   </div>
+  </div>
+ </div></div></div>
+</section>
+
+<!-- ================= compartido ================= -->
+<section class="dir">
+ <div class="dirhead"><div>
+  <div class="lbl">Para las tres</div>
+  <h2>Citas y gasto</h2>
+  <p>Citas: semana con las horas de atención (lunes a sábado de 2:00 a 8:30 pm, domingo de 9:00 am a 5:00 pm); las que agenda Marcy en naranja, las tuyas en verde; al pulsar una se abre su ficha al lado. Gasto: lo gastado del mes frente al tope, con una marca de aviso al 80 % y el gasto de cada día.</p>
+ </div>
+ <div class="refs">
+  <figure><img src="ref/10-mangomint-cal.jpg"><figcaption>Mangomint: semana densa con citas por color</figcaption></figure>
+  <figure><img src="ref/11-rox-billing.jpg"><figcaption>Rox: uso frente al límite con barra</figcaption></figure>
+  <figure><img src="ref/12-steel-usage.jpg"><figcaption>Steel: gasto del periodo y por día</figcaption></figure>
+ </div></div>
+ <div class="shared">
+  <div class="card" style="padding:14px">
+   <div class="cal">
+    <div></div><div class="hd">Lun<b>9</b></div><div class="hd">Mar<b>10</b></div><div class="hd today">Mié<b>11</b></div><div class="hd">Jue<b>12</b></div><div class="hd">Vie<b>13</b></div><div class="hd">Sáb<b>14</b></div>
+    <div class="tm">2 pm</div><div class="cell"></div><div class="cell"><div class="ap m" style="top:4px;height:30px">Ana Cruz · llamada</div></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="tm">3 pm</div><div class="cell"></div><div class="cell"></div><div class="cell"><div class="ap" style="top:4px;height:56px">Revisión proyecto TRR</div></div><div class="cell"></div><div class="cell"><div class="ap m" style="top:22px;height:30px">María López</div></div><div class="cell"></div>
+    <div class="tm">4 pm</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"><div class="ap m" style="top:4px;height:30px">Taller · demo</div></div><div class="cell"></div><div class="cell"></div>
+    <div class="tm">5 pm</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"><div class="ap m" style="top:4px;height:30px">John Smith</div></div>
+   </div>
+  </div>
+  <div class="card spend">
+   <div class="sect">Gasto de Marcy · noviembre</div>
+   <div class="big">$11.40 <span class="muted" style="font-size:14px;font-weight:400">de $50</span></div>
+   <div class="meter"><i></i><u></u></div>
+   <div class="muted sm">Aviso al 80 %. Sale del registro propio con los precios oficiales por mensaje.</div>
+   <div class="days"><i style="height:30%"></i><i style="height:52%"></i><i style="height:20%"></i><i style="height:64%"></i><i style="height:41%"></i><i style="height:35%"></i><i class="t" style="height:58%"></i></div>
+   <div class="kv" style="margin-top:14px"><span>Chat web</span><span>$11.40</span><span>Teléfono</span><span class="muted">cuando se active</span><span>Ficha de Google</span><span class="muted">se sumará al medirla</span></div>
+  </div>
+ </div>
+</section>
+</div></body></html>

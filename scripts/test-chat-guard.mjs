@@ -4,12 +4,13 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES } from '../lib/chat-kb.mjs';
+import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
 import { analyzeSite } from '../lib/diagnostic-checks.mjs';
@@ -106,8 +107,11 @@ check('"la mejor agencia" se reemplaza', () => assert.notEqual(brandPostFilter('
 check('precio publicado $1,500 pasa', () => assert.ok(pricePostFilter('Un sitio desde $1,500.', 'es').includes('$1,500')));
 check('landing ~$400 pasa', () => assert.ok(pricePostFilter('Una landing desde ~$400.', 'es').includes('$400')));
 check('mensual $120 pasa', () => assert.ok(pricePostFilter('Mantenimiento $120/mes.', 'es').includes('$120')));
-check('estimado en banda $850 pasa (cotización en vivo)', () => assert.ok(pricePostFilter('Para tu caso calculo unos $850.', 'es').includes('$850')));
-check('rango/combo $2,000 pasa', () => assert.ok(pricePostFilter('Un paquete completo ronda los $2,000.', 'es').includes('$2,000')));
+check('P3: estimado de cabeza $850 → deriva (los totales salen de cotizar)', () => assert.ok(!pricePostFilter('Para tu caso calculo unos $850.', 'es').includes('$850')));
+check('P3: combo inventado $2,000 → deriva; con la cifra de cotizar → pasa', () => {
+  assert.ok(!pricePostFilter('Un paquete completo ronda los $2,000.', 'es').includes('$2,000'));
+  assert.ok(pricePostFilter('Un paquete completo ronda los $2,000.', 'es', ['2000']).includes('$2,000'));
+});
 check('economía del cliente $25 (corte) pasa — no rompe el diagnóstico', () => assert.ok(pricePostFilter('Si cada corte son $25 y vuelven cada mes, es bastante al año.', 'es').includes('$25')));
 check('economía del cliente "40 dólares" pasa', () => assert.ok(pricePostFilter('Un servicio de 40 dólares que pierdes duele.', 'es').includes('40')));
 check('cifra regalada $5 → deriva', () => assert.ok(!pricePostFilter('Te lo hago por $5.', 'es').includes('$5')));
@@ -559,11 +563,66 @@ check('precedencia: SOLO revisar_sitio (compute) → sin action (no es UI)', () 
   assert.equal(r.action, null);
   assert.equal(r.text, 'Dame unos segundos.');
 });
-check('CHAT_TOOLS incluye las 5 (3 UI + 2 internas); INTERNAL_TOOLS = 2', () => {
-  assert.equal(CHAT_TOOLS.length, 5);
-  assert.ok(CHAT_TOOLS.some((t) => t.name === CALC_TOOL.name) && CHAT_TOOLS.some((t) => t.name === SITE_TOOL.name));
-  assert.equal(INTERNAL_TOOLS.size, 2);
-  assert.ok(INTERNAL_TOOLS.has('calcular_perdida') && INTERNAL_TOOLS.has('revisar_sitio'));
+check('CHAT_TOOLS incluye las 6 (3 UI + 3 internas); INTERNAL_TOOLS = 3', () => {
+  assert.equal(CHAT_TOOLS.length, 6);
+  assert.ok(CHAT_TOOLS.some((t) => t.name === CALC_TOOL.name) && CHAT_TOOLS.some((t) => t.name === SITE_TOOL.name) && CHAT_TOOLS.some((t) => t.name === QUOTE_TOOL.name));
+  assert.equal(INTERNAL_TOOLS.size, 3);
+  assert.ok(INTERNAL_TOOLS.has('calcular_perdida') && INTERNAL_TOOLS.has('revisar_sitio') && INTERNAL_TOOLS.has('cotizar'));
+});
+
+// ── P3: cotizar (reglas del servidor) ──
+check('cotizar: catálogo de reglas = mismas claves que PRICES y que el enum de la herramienta', () => {
+  assert.deepEqual([...SERVICE_KEYS].sort(), Object.keys(PRICES).sort());
+  assert.deepEqual([...QUOTE_TOOL.input_schema.properties.servicios.items.properties.servicio.enum].sort(), Object.keys(PRICES).sort());
+});
+check('cotizar: precio base = precio publicado', () => {
+  for (const k of SERVICE_KEYS) { const q = quote([{ servicio: k }]); assert.equal(q.lineas[0].total, PRICES[k].value, k); }
+});
+check('cotizar: sitio de 8 páginas + asistente con 2 canales (extras, combinación, piso)', () => {
+  const q = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }]);
+  assert.equal(q.lineas[0].total, 1950);
+  assert.equal(q.lineas[1].total, 750);
+  assert.deepEqual(q.pago_unico, { subtotal: 2700, descuento_combinacion: 250, total: 2450 });
+  assert.equal(q.rebaja, null);
+});
+check('cotizar: rebaja solo si se pide, -10 % redondeada y marcada sujeta a aprobación', () => {
+  const q = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }], { pedirRebaja: true });
+  assert.deepEqual(q.rebaja, { total_pago_unico: 2200, sujeto_a_aprobacion: true });
+});
+check('cotizar: nunca baja del 85 % de la suma de precios base', () => {
+  const q = quote([{ servicio: 'webLanding' }, { servicio: 'brandingLogo' }], { pedirRebaja: true });
+  const piso = Math.round((400 + 150) * 0.85 / 50) * 50;
+  assert.ok(q.pago_unico.total >= piso && q.rebaja.total_pago_unico >= piso);
+});
+check('cotizar: lo mensual va aparte y no se descuenta', () => {
+  const q = quote([{ servicio: 'web' }, { servicio: 'seoLocal', ubicaciones: 2 }, { servicio: 'maintenance' }]);
+  assert.equal(q.mensual.total, 600 + 200 + 120);
+  assert.equal(q.pago_unico.descuento_combinacion, 0, 'un solo proyecto de pago único: sin combinación');
+});
+check('cotizar: productos por bloques (tienda esencial con 60 → 2 bloques de 25)', () => {
+  assert.equal(quote([{ servicio: 'ecommerceEssential', productos: 60 }]).lineas[0].total, 900 + 300);
+});
+check('cotizar: entradas basura → ok:false o ignoradas (servicio inventado, negativos, duplicados)', () => {
+  assert.equal(quote([]).ok, false);
+  assert.equal(quote([{ servicio: 'hackeo' }]).ok, false);
+  const q = quote([{ servicio: 'web', paginas: -40 }, { servicio: 'web', paginas: 99 }]);
+  assert.equal(q.lineas.length, 1);
+  assert.equal(q.lineas[0].total, 1500);
+});
+check('cotizar: tool_result sin la lista interna de cifras y con sus cifras en el allowlist', () => {
+  const out = quoteToolResult({ servicios: [{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }] }, 'es');
+  assert.ok(!('cifras' in JSON.parse(out.content)));
+  for (const n of ['1950', '750', '2700', '250', '2450']) assert.ok(out.extraAllow.includes(n), n);
+  assert.ok(pricePostFilter('Todo junto queda en $2,450.', 'es', out.extraAllow).includes('$2,450'));
+  assert.equal(quoteToolResult({}, 'es').content, JSON.stringify({ ok: false }));
+});
+check('historial: las cifras del cliente y de turnos anteriores se pueden repetir', () => {
+  const figs = historyFigures([{ role: 'user', content: 'Tengo $1,000 de presupuesto' }, { role: 'assistant', content: 'Te queda en $2,450.' }]);
+  assert.ok(figs.includes('1000') && figs.includes('2450'));
+  assert.ok(pricePostFilter('Con tus $1,000 arrancamos por la landing.', 'es', figs).includes('$1,000'));
+});
+check('P3: economía del cliente por debajo de $100 sigue pasando sin herramienta', () => {
+  assert.ok(pricePostFilter('Si cada corte son $25, al mes es bastante.', 'es').includes('$25'));
 });
 check('enum de enlazar_pagina INTACTO (9 páginas, anti-checklist)', () => {
   assert.equal(LINK_PAGES.size, 9);

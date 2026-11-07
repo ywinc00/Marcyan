@@ -4,12 +4,12 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -271,7 +271,49 @@ check('brief rico: descripcion/detalles también quitan email/teléfono (defensa
 });
 
 // ── v3: config de modelo (control de costo — Sonnet 5) ──
-check('DEFAULT_MODEL = claude-sonnet-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5'));
+check('DEFAULT_MODEL = claude-sonnet-5-5', () => assert.equal(DEFAULT_MODEL, 'claude-sonnet-5-5'));
+check('Sonnet 5.5 lleva thinking adaptativo (disabled = 400 en ese modelo)', () => assert.equal(modelTuning('claude-sonnet-5-5').thinking.type, 'adaptive'));
+check('Sonnet 5.5 pide solo las notas de progreso, con su cabecera beta', () => {
+  assert.equal(modelTuning('claude-sonnet-5-5').thinking.display, 'updates');
+  assert.equal(modelRequestOptions('claude-sonnet-5-5').headers['anthropic-beta'], 'thinking-display-updates-2026-08-18');
+  assert.equal(modelRequestOptions('claude-sonnet-5'), undefined);
+  assert.equal(modelTuning('claude-sonnet-5').thinking.display, undefined);
+});
+check('nota de progreso de Sonnet 5.5 se usa como texto junto al formulario', () => {
+  const c = [{ type: 'thinking', thinking: 'Perfecto, una landing para tu taller arranca en $400.', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
+  const r = parseToolResponse(c, 'es', { updatesAsText: true });
+  assert.match(r.text, /landing/); assert.equal(r.action.type, 'capture');
+});
+check('sin updates, el thinking NUNCA se muestra (no filtra razonamiento)', () => {
+  const c = [{ type: 'thinking', thinking: 'razonamiento interno', signature: 's' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto' } }];
+  assert.doesNotMatch(parseToolResponse(c, 'es').text, /razonamiento/);
+});
+check('calculadora: semanal y valor bruto también salen del servidor y pasan el filtro', () => {
+  const out = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200 });
+  const c = JSON.parse(out.content);
+  assert.equal(c.valor_llamadas_perdidas_semana, 1200); assert.equal(c.perdida_semanal, 360);
+  assert.equal(blockedFigures('Pierdes $1,200 en llamadas a la semana', out.extraAllow).length, 0);
+});
+check('calculadora: la pérdida redondeada pasa (1559 → "unos $1,560"), una inventada no', () => {
+  const out = computeLossToolResult({ modo: 'llamadas', llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200 });
+  assert.equal(blockedFigures('Pierdes unos $1,560 al mes', out.extraAllow).length, 0);
+  assert.equal(blockedFigures('Pierdes unos $1,700 al mes', out.extraAllow).length, 1);
+});
+check('cifras cortadas: lista lo que el filtro cortaría', () => assert.deepEqual(blockedFigures('Te sale en $7,777', []), ['7777']));
+check('captura sin texto: la frase sale del campo mensaje', () => {
+  const c = [{ type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Una landing para tu taller parte de $400. Confírmame tu contacto y te armo la propuesta.' } }];
+  assert.match(parseToolResponse(c, 'es').text, /landing/);
+});
+check('captura con texto: no se duplica con el campo mensaje', () => {
+  const c = [{ type: 'text', text: 'Hola' }, { type: 'tool_use', id: 't', name: 'solicitar_datos_contacto', input: { destino: 'proyecto', mensaje: 'Otra cosa' } }];
+  assert.equal(parseToolResponse(c, 'es').text, 'Hola');
+});
+check('captura: el campo mensaje es obligatorio en la herramienta', () => assert.ok(CONTACT_TOOL.input_schema.required.includes('mensaje')));
+check('con texto normal, la nota de progreso no se duplica', () => {
+  const c = [{ type: 'thinking', thinking: 'nota', signature: 's' }, { type: 'text', text: 'Hola' }];
+  assert.equal(parseToolResponse(c, 'es', { updatesAsText: true }).text, 'Hola');
+});
+check('Sonnet 5.5 tiene precio en el contador de coste', () => assert.equal(turnCostMicroUsd('claude-sonnet-5-5', { input: 1e6, output: 0, cacheRead: 0, cacheWrite: 0 }), 2e6));
 check('ALLOWED_MODELS incluye claude-sonnet-5', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-5'), true));
 check('ALLOWED_MODELS conserva fallback sonnet-4-6', () => assert.equal(ALLOWED_MODELS.has('claude-sonnet-4-6'), true));
 check('modelo desconocido NO está en allowlist (se coacciona a default)', () => assert.equal(ALLOWED_MODELS.has('gpt-4o'), false));

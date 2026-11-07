@@ -199,7 +199,7 @@ await check('chat: el turno suma su uso en la fila del día (entorno, modelo, co
   const [day, env, model, convs, calls, inp, out, cr, cw, cost] = row.vals;
   assert.match(day, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(env, 'development');
-  assert.equal(model, 'claude-sonnet-5');
+  assert.equal(model, 'claude-sonnet-5-5');
   assert.deepEqual([convs, calls, inp, out, cr, cw], [1, 1, 120, 300, 8000, 0]);
   // 120×2 + 300×10 + 8000×0,2 = 240 + 3000 + 1600 = 4840 micro-USD
   assert.equal(cost, 4840);

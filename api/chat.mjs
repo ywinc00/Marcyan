@@ -28,7 +28,7 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
@@ -59,12 +59,13 @@ export function envBucket(bucket) {
 // widget (ChatWidget.astro) < maxDuration 60. Si cambias un tope, recalcula los tres.
 export const config = { maxDuration: 60 };
 
-// Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
+// Modelo por defecto: Sonnet 5.5 (2026-11-07; mismo precio que Sonnet 5, pasa la batería).
+// Thinking adaptativo + effort low: en 5.5 'disabled' da 400 y tool_choice forzado también (no se usan).
 // Exportados para que el guard test bloquee el id y la allowlist (control de costo).
-export const DEFAULT_MODEL = 'claude-sonnet-5';
+export const DEFAULT_MODEL = 'claude-sonnet-5-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 // Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
-export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
+export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5', 'claude-sonnet-5-5']);
 
 // Parámetros de razonamiento por MODELO (v8). Sonnet 5/4.6 soportan thinking
 // adaptativo + effort; Haiku 4.5 NO (ambos parámetros devuelven 400 en ese modelo):
@@ -73,7 +74,18 @@ export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 
 // Pura y exportada para el guard test.
 export function modelTuning(model) {
   if (model === 'claude-haiku-4-5') return {};
+  // Sonnet 5.5: lo que el modelo escribe ANTES de una herramienta (p. ej. la frase
+  // que acompaña al formulario) ya no llega como texto sino como "nota de progreso"
+  // dentro de un bloque de thinking, vacío por defecto. Con display 'updates' llegan
+  // SOLO esas notas (nunca el razonamiento) y parseToolResponse las usa como texto.
+  // Causa verificada con la batería del 2026-11-07 (decidido-landing 0/3).
+  if (model === UPDATES_MODEL) return { thinking: { type: 'adaptive', display: 'updates' }, output_config: { effort: 'low' } };
   return { thinking: { type: 'adaptive' }, output_config: { effort: 'low' } };
+}
+export const UPDATES_MODEL = 'claude-sonnet-5-5';
+// Cabecera beta que exige display 'updates'.
+export function modelRequestOptions(model) {
+  return model === UPDATES_MODEL ? { headers: { 'anthropic-beta': 'thinking-display-updates-2026-08-18' } } : undefined;
 }
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
@@ -281,9 +293,14 @@ function toolOnlyFallback(action, lang) {
 // Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
 // Un solo turno: NO se envía tool_result ni hay 2ª llamada. Toma el PRIMER tool_use
 // de una de NUESTRAS herramientas (Marcy usa como máximo una por mensaje).
-export function parseToolResponse(content, lang = 'es') {
+export function parseToolResponse(content, lang = 'es', { updatesAsText = false } = {}) {
   const blocks = Array.isArray(content) ? content : [];
   let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
+  // Solo con display 'updates' (Sonnet 5.5) los bloques de thinking traen notas para el
+  // cliente y no razonamiento; en cualquier otro modelo NUNCA se leen (fuga de razonamiento).
+  if (!text && updatesAsText) {
+    text = blocks.filter((b) => b && b.type === 'thinking' && typeof b.thinking === 'string').map((b) => b.thinking.trim()).filter(Boolean).join(' ').trim();
+  }
   // El prompt pide una herramienta por turno, pero si el modelo emitiera varias, la
   // CAPTURA (cierre) manda; si no, la primera reconocida. Así nunca se pierde el form.
   const toolUses = blocks.filter((b) => b && b.type === 'tool_use' && OUR_TOOLS.has(b.name));
@@ -313,6 +330,9 @@ export function parseToolResponse(content, lang = 'es') {
       };
       action = { type: 'capture', destino, extras };
       if (name) action.name = name;
+      // Sonnet 5.5 llama a la herramienta SIN escribir texto (verificado 2026-11-07:
+      // respuesta = solo tool_use). La frase va en el campo obligatorio "mensaje".
+      if (!text && typeof inp.mensaje === 'string') text = sanitizeField(inp.mensaje, 600);
     } else if (tool.name === CHANNELS_TOOL.name) {
       action = { type: 'channels' };
     } else if (tool.name === LINK_TOOL.name) {
@@ -356,17 +376,29 @@ function priceAllowVariants(v) {
   return [...s].filter((n) => n >= 10).map(String); // >= PRICE_MIN del filtro (chat-kb.mjs)
 }
 
+// Pérdidas estimadas: se permite también redondearlas (a 10, 50 y 100), como haría
+// cualquier persona ("unos $1,560" por 1559). Verificado en la batería 2026-11-07.
+// Solo para pérdidas: los precios de cotizar se citan EXACTOS.
+export function lossAllow(values) {
+  const out = new Set();
+  for (const v of values) for (const step of [1, 10, 50, 100]) { const r = Math.round(v / step) * step; if (r > 0) out.add(r); }
+  return [...out].flatMap(priceAllowVariants);
+}
+
 export function computeLossToolResult(input) {
   const inp = input || {};
   if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
-    const { monthly, yearly } = computeMissedCalls(inp);
+    const { monthly, yearly, weekly, missedValueWeekly } = computeMissedCalls(inp);
     if (monthly < 1) return FAIL_RESULT; // pérdida nula → no computa (no cites $0)
-    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    // Cifras intermedias también calculadas aquí: Sonnet 5.5 tiende a citar la semanal o
+    // el valor bruto de las llamadas perdidas, y el filtro estricto (P3) cortaba la
+    // respuesta entera (batería 2026-11-07, calculadora-es 0/3).
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_semanal: weekly, perdida_mensual: monthly, perdida_anual: yearly, valor_llamadas_perdidas_semana: missedValueWeekly, nota: 'perdida = llamadas perdidas x ticket x tasa de cierre estimada' }), extraAllow: lossAllow([weekly, monthly, yearly, missedValueWeekly]) };
   }
   if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
     const { monthly, yearly } = computeNoShows(inp);
     if (monthly < 1) return FAIL_RESULT;
-    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: lossAllow([monthly, yearly]) };
   }
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
@@ -519,7 +551,7 @@ export default async function handler(req, res) {
 
     // 1ª llamada (≤14s: incluye el thinking adaptativo). El input del usuario vive SOLO en `messages`.
     const r1 = await withTimeout(
-      client.messages.create({ ...baseParams, messages }),
+      client.messages.create({ ...baseParams, messages }, modelRequestOptions(model)),
       14000,
       'anthropic'
     );
@@ -556,7 +588,7 @@ export default async function handler(req, res) {
             { role: 'assistant', content: r1.content },
             { role: 'user', content: toolResults },
           ],
-        }),
+        }, modelRequestOptions(model)),
         16000,
         'anthropic2'
       );
@@ -564,16 +596,19 @@ export default async function handler(req, res) {
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
-    const parsed = parseToolResponse(finalResp.content, lang);
+    const updatesAsText = model === UPDATES_MODEL;
+    const parsed = parseToolResponse(finalResp.content, lang, { updatesAsText });
     let text = parsed.text;
     let action = parsed.action;
     // RESCATE: si el turno 1 mezcló una tool interna con una de UI y el modelo NO re-emitió
     // la de UI en la 2ª respuesta, recupera la acción de UI de r1 (si no, se perdería la
     // tarjeta/cajita — perder la CAPTURA sería el "error grave" que advierte el prompt).
     if (internal && !action) {
-      const fromR1 = parseToolResponse(r1.content, lang).action;
+      const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
+    const cortadas = blockedFigures(text || '', extraAllow);
+    if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
     let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
 

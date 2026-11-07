@@ -1,0 +1,41 @@
+---
+// F32 · Ocaso (SEO local, v5). Elegido por el dueño (2026-11-07): los colores de fondo del boceto
+// «Desde los ojos de quien busca» (principio de Joby Aviation, Refero e38f56d1: la ciudad a contraluz
+// al atardecer) con la composición de «La palabra con ventana». La noche de arriba baja a un horizonte
+// ámbar de lado a lado; el calor se concentra a la derecha, detrás de la ventana de la ficha, y el
+// lado del texto queda en noche (E-37). Grano fino (G-02). Quieto. Solo CSS.
+interface Props { estilos?: boolean }
+const { estilos = true } = Astro.props;
+const GRANO = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E\")";
+const CSS = `
+  .wf:has(> .wf-oc) {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent);
+            mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent);
+  }
+  .wf-oc { position: absolute; inset: 0; }
+  .wf-oc__cielo {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(46% 38% at 74% 96%, rgba(234, 176, 102, .62) 0%, rgba(201, 132, 68, .34) 38%, rgba(106, 60, 38, .12) 70%, transparent 100%),
+      radial-gradient(80% 46% at 70% 100%, rgba(106, 60, 38, .40) 0%, transparent 100%),
+      linear-gradient(180deg, #080808 0%, #0a0a12 26%, #16121f 48%, #2a1a1c 66%, #5a3424 82%, #8a5230 92%, #2a1a12 100%);
+  }
+  /* el lado del texto vuelve a la noche (el calor nunca queda detrás de la bajada ni de los botones) */
+  .wf-oc__velo { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8, 8, 8, .9) 0%, rgba(8, 8, 8, .55) 34%, transparent 58%); }
+  .wf-oc__grano { position: absolute; inset: 0; opacity: .08; mix-blend-mode: soft-light; background-image: ${GRANO}; background-size: 160px 160px; }
+  @media (max-width: 1023.98px) {
+    .wf-oc__cielo {
+      background:
+        radial-gradient(90% 26% at 50% 100%, rgba(234, 176, 102, .55) 0%, rgba(201, 132, 68, .28) 42%, transparent 100%),
+        linear-gradient(180deg, #080808 0%, #0a0a12 30%, #16121f 52%, #2a1a1c 68%, #5a3424 84%, #8a5230 93%, #2a1a12 100%);
+    }
+    .wf-oc__velo { background: linear-gradient(180deg, rgba(8, 8, 8, .85) 0%, rgba(8, 8, 8, .5) 40%, transparent 62%); }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-oc">
+  <div class="wf-oc__cielo"></div>
+  <div class="wf-oc__velo"></div>
+  <div class="wf-oc__grano"></div>
+</div>

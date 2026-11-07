@@ -28,7 +28,8 @@ export type LandingLang = 'es' | 'en';
 export type TemaFondo =
   | 'reticula'      // F01 diseño web
   | 'escaparate'    // F02 tienda en línea
-  | 'radar'         // F03 SEO local
+  | 'radar'         // F03 (antes SEO local)
+  | 'ocaso'         // F32 SEO local (v5): atardecer, la palabra con ventana
   | 'hilos'         // F04 IA conversacional
   | 'placa'         // F05 IA para pymes
   | 'construccion'  // F06 branding
@@ -43,11 +44,11 @@ export type TemaFondo =
 
 /** Código del plan (F01…F13, sin F11): el plan G escribe `fondo: 'F01'`; se aceptan los dos. */
 export type CodigoFondo =
-  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F12' | 'F20' | 'F31';
+  | 'F01' | 'F02' | 'F03' | 'F04' | 'F05' | 'F06' | 'F07' | 'F08' | 'F09' | 'F12' | 'F20' | 'F31' | 'F32';
 
 const POR_CODIGO: Record<CodigoFondo, TemaFondo> = {
   F01: 'reticula', F02: 'escaparate', F03: 'radar', F04: 'hilos', F05: 'placa', F06: 'construccion',
-  F07: 'plano', F08: 'calles', F09: 'tunel', F12: 'escaneo', F20: 'sector', F31: 'mapa',
+  F07: 'plano', F08: 'calles', F09: 'tunel', F12: 'escaneo', F20: 'sector', F31: 'mapa', F32: 'ocaso',
 };
 /** Normaliza un código del plan ('F03') o un nombre ('radar') al nombre del tema. */
 export function temaDeFondo(t: TemaFondo | CodigoFondo): TemaFondo {

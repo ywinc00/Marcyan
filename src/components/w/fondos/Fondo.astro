@@ -53,6 +53,7 @@ import F08Calles from './F08Calles.astro';
 import F09Tunel from './F09Tunel.astro';
 import F12Escaneo from './F12Escaneo.astro';
 import F31Mapa from './F31Mapa.astro';
+import F32Ocaso from './F32Ocaso.astro';
 import F20Sector from './F20Sector.astro';
 
 interface Props {
@@ -98,7 +99,7 @@ const TXT_PAUSA = lang === 'en'
 const MOTIVO = {
   reticula: F01Reticula, escaparate: F02Escaparate, radar: F03Radar, hilos: F04Hilos,
   placa: F05Placa, construccion: F06Construccion, plano: F07Plano, calles: F08Calles,
-  tunel: F09Tunel, escaneo: F12Escaneo, mapa: F31Mapa, sector: F20Sector,
+  tunel: F09Tunel, escaneo: F12Escaneo, mapa: F31Mapa, sector: F20Sector, ocaso: F32Ocaso,
 } as const;
 const Motivo = MOTIVO[tema];
 

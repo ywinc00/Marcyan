@@ -1,17 +1,15 @@
 ---
-// Hero de las landings de SEO local (design/rediseno-workos.md §4.16, ola 2).
-// A-05 + W-CORE-16: partido. Izquierda, HeroTexto alineado a la izquierda SIN eyebrow
-// (el nombre del producto coincide con el H1, R3): chip de ciudad, H1 verbatim, cola,
-// bajada y botones. Derecha, TarjetaObjeto con la ficha de mapa de EJEMPLO dentro
-// (W-CORE-16 tal cual: tarjeta clara, capa oro desplazada 25 px, haces recortados a la
-// columna de la tarjeta, luz de horizonte, "Llamar" con halo oro de la propia ficha). SIN radar en el hero
-// (revisión 1, E-08/E-37): el radar es la firma de la sección 01.
-// Coreografía §2.9 (HeroTexto + data-w-in de la tarjeta). Móvil: texto arriba y la
-// tarjeta entera debajo (W-CORE-41), sin haces.
+// Hero de las landings de SEO local · v5 «La palabra con ventana» (dueño, 2026-11-07; design/seo-local-hero.md).
+// Principio de Liron Moran Interiors (Refero 067fe2b3: texto enorme cortado por una imagen) con los colores
+// del ocaso (fondo F32, principio de Joby e38f56d1). Izquierda: HeroTexto de siempre (chip, H1 verbatim,
+// cola, bajada, botones). Derecha: «CERCA / DE TI» a tamaño cartel, decorativo (aria-hidden), y en el hueco
+// entre las letras la ficha de mapa de EJEMPLO que ya usaba esta landing (FichaMapa, marca restaurante): lo
+// que ve tu cliente cuando te busca. La letra grande es la de la marca (Space Grotesk): la serif del boceto
+// sería una fuente nueva = decisión global del dueño (gramática intocable).
+// Nunca detrás de texto (E-37): la palabra vive en la columna derecha. Móvil: texto arriba y debajo la
+// palabra con su ventana, a escala.
 import HeroTexto from '../HeroTexto.astro';
-import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
 import FichaMapa from '../objetos/barrios/FichaMapa.astro';
-import IconoObjeto from '../IconoObjeto.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -26,11 +24,11 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = Astro.props;
+const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
 ---
-<section class="w-hero hs">
-  <div class="hs__horizon" aria-hidden="true"></div>
-  <div class="w-container hs__grid">
-    <div class="hs__text">
+<section class="w-hero hsl">
+  <div class="w-container hsl__grid">
+    <div class="hsl__text">
       <HeroTexto
         tone="gold"
         chip={chip}
@@ -44,71 +42,55 @@ const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = A
         <slot name="crumbs" slot="crumbs" />
       </HeroTexto>
     </div>
-    <div class="hs__obj">
-      <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example={false}>
-        <IconoObjeto id="seo-local" size={56} slot="icon" />
+    <div class="hsl__obj">
+      <p class="sr-only">{sr}</p>
+      <div class="hsl__pal" aria-hidden="true">
+        <span class="hsl__w hsl__w--1" data-w-in="2">{W[0]}</span>
+        <span class="hsl__w hsl__w--2" data-w-in="2">{W[1]}</span>
+      </div>
+      <div class="hsl__win" data-w-in="obj">
         <FichaMapa marca="restaurante" lang={lang} city={cityName} size="hero" />
-      </TarjetaObjeto>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* Recorta en los dos ejes: los haces no pasan del borde del hero (ni asoman sobre la
-     sección 01) y la capa desplazada de la tarjeta cabe en el padding superior. */
-  .hs { overflow: clip; padding-bottom: 96px; position: relative; }
-  /* Luz de horizonte (la del piloto, W-CORE-01/02): franjas oro a ventana completa en la
-     base del hero, fundidas en los cuatro bordes. Detrás de la tarjeta (opaca) y por
-     debajo de la fila de botones: nunca detrás de texto (E-37). */
-  .hs__horizon {
-    position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 150px;
-    background: var(--w-stripes);
-    -webkit-mask-image:
-      linear-gradient(180deg, transparent 0%, #000 60%, #000 100%),
-      linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(180deg, transparent 0%, #000 60%, #000 100%),
-      linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
-    mask-composite: intersect;
-    pointer-events: none;
+  .hsl { overflow: clip; padding-bottom: 104px; position: relative; }
+  .hsl__grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: center; }
+  .hsl__obj { position: relative; min-height: 520px; }
+  /* La palabra: dos líneas a tamaño cartel, crema casi plena; la ventana la corta por el medio. */
+  .hsl__pal { position: absolute; inset: 0; pointer-events: none; }
+  .hsl__w {
+    position: absolute; left: 0; white-space: nowrap;
+    font-family: var(--font-display); font-weight: 400; letter-spacing: -.06em; line-height: .8;
+    color: rgba(240, 237, 232, .94);
   }
-  .hs__grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
-  .hs__obj { display: flex; justify-content: center; padding: 25px 0 0 25px; }
-  /* Haces (W-CORE-16), recortados a la columna de la tarjeta: solo se ve el tramo que
-     cruza el hueco entre texto y tarjeta y entra en ella; nunca pasan por detrás de la
-     bajada ni de los botones (E-37, revisión 1). El tramo visible se funde por la izquierda. */
-  .hs__obj :global(.wo-to__beams) {
-    top: 30%;
-    clip-path: inset(0 0 0 calc(100% - 140px));
-    -webkit-mask-image: linear-gradient(90deg, transparent calc(100% - 140px), #000 calc(100% - 60px));
-    mask-image: linear-gradient(90deg, transparent calc(100% - 140px), #000 calc(100% - 60px));
+  .hsl__w--1 { top: 34px; font-size: 238px; }
+  .hsl__w--2 { top: 262px; left: -18px; font-size: 232px; }
+  /* La ventana: la ficha de mapa de la landing, flotando sobre la palabra con sombra de noche. */
+  .hsl__win {
+    position: absolute; z-index: 2; left: 236px; top: 8px; width: 336px;
+    border-radius: 20px; overflow: hidden; background: var(--w-p-bg, #f0ede8);
+    box-shadow: 0 50px 90px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .06);
   }
-  /* Capa desplazada: más oro y menos losa (en noche, el 40 % sólido se leía marrón). */
-  .hs__obj :global(.wo-to__layer) {
-    background: linear-gradient(180deg, rgba(var(--accent-gold-rgb), .30), rgba(var(--accent-gold-rgb), .05) 70%);
-    border-color: rgba(var(--accent-gold-rgb), .62);
+  /* Partido solo desde 1280: por debajo la palabra no cabe junto al texto y se apila (como en móvil). */
+  @media (min-width: 1280px) {
+    .hsl__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 560px; }
+    .hsl__text :global(.w-herotext--left) { max-width: 560px; }
   }
-  /* v2 (G05): la ficha es la de la marca restaurante (§1.6): su "Llamar" va en el ladrillo
-     de la marca, no en oro, así que el único dorado pleno de la pantalla es el botón del hero. */
-  .hs__obj :global(.wo-to__body) { padding-inline: 32px; }
-  @media (--lg) {
-    /* W-CORE-16: texto a la izquierda en su columna y la tarjeta de 476 a la derecha.
-       La columna de texto se ensancha (560 → 620) para que el H1 entre en una línea. */
-    .hs__grid { grid-template-columns: minmax(0, 1fr) 476px; gap: 72px; }
-    .hs__text :global(.w-herotext--left) { max-width: 620px; }
-    .hs__obj { justify-content: flex-end; padding: 25px 0 0; }
+  @media (max-width: 1279.98px) {
+    .hsl { padding-bottom: 72px; }
+    .hsl__obj { min-height: 0; height: 470px; }
+    .hsl__obj { --hsl-f: clamp(104px, 30vw, 170px); }
+    .hsl__w--1 { top: 18px; font-size: var(--hsl-f); }
+    .hsl__w--2 { top: calc(18px + clamp(96px, 27vw, 156px)); left: -6px; font-size: clamp(100px, 29vw, 166px); }
+    /* la ventana tapa el centro de «CERCA» (la R): deja ver «CE» a la izquierda y «CA» a la derecha */
+    .hsl__win { left: calc(var(--hsl-f) * 1.08); top: 0; width: min(calc(var(--hsl-f) * 1.72), 300px); }
   }
-  @media (--lt-md) {
-    .hs { padding-bottom: 64px; }
-    .hs__horizon { height: 140px; }
-    .hs__grid { gap: 48px; }
-    /* rev2 G05: la ficha se estrujaba (a 320 px le quedaban 146 px útiles). El sangrado de la
-       capa desplazada lo da ya la tarjeta en móvil (16 px): sin el relleno doble de 25 + 25 y
-       con menos margen interior, la ficha gana ~80 px. Banda del icono más baja. */
-    .hs__obj { padding: 16px 0 0; }
-    .hs__obj :global(.wo-to) { width: calc(100% - 16px); margin-left: 16px; }
-    .hs__obj :global(.wo-to__band) { height: 76px; }
-    .hs__obj :global(.wo-to__body) { padding: 4px 14px 18px; }
+  @media (min-width: 768px) and (max-width: 1279.98px) {
+    .hsl__obj { --hsl-f: 200px; height: 520px; }
+    .hsl__w--2 { top: 200px; font-size: 196px; }
+    .hsl__win { left: 196px; width: 300px; }
   }
 </style>

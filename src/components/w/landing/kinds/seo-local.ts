@@ -53,7 +53,8 @@ const spec: KindSpec = {
   tone: 'gold',
   // v2 (G05, §1.3/P12): fondo temático F03 (radar de cercanía) en el hero; texto a la izquierda,
   // foco del radar en la ficha del hero. Sin eco: el capítulo de contraste ya es una matriz.
-  fondo: 'F03',
+  // v5 (dueño, 2026-11-07): «La palabra con ventana» con los colores del ocaso: fondo F32.
+  fondo: 'F32',
   // v3 (E-57 regla 2): sin líneas de margen en el hero: cruzaban los anillos del radar y la ficha del hero.
   sinRail: true,
   fondoOpciones: () => ({ texto: 'izquierda' }),

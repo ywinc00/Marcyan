@@ -59,4 +59,29 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: MistralAI-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
 Sitemap: https://marcyanstudio.com/sitemap-index.xml

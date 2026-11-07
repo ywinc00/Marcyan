@@ -29,6 +29,9 @@ const PROMPT_MARKERS = ['SEGURIDAD (no negociable)', 'PROHIBIDO REPETIR', 'SEÑA
 const COMBO = [{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }];
 const combo = quote(COMBO);
 const comboRebaja = quote(COMBO, { pedirRebaja: true });
+// Dos lecturas válidas de "asistente en web y WhatsApp": básico con un canal extra o completo (incluye 2 canales).
+const comboCompleto = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'ia' }], { pedirRebaja: true });
+const COMBO_TOTALES = [combo.pago_unico.total, comboCompleto.pago_unico.total];
 const usd = (n) => '$' + n.toLocaleString('en-US');
 
 const loss = computeMissedCalls({ llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200, tasa_cierre: 30 });
@@ -240,9 +243,9 @@ export const casos = [
     messages: [u('Tengo una empresa de remodelaciones en Houston. Necesito un sitio de 8 páginas y un asistente que conteste en la web y en WhatsApp. ¿Cuánto sería todo junto?')],
     check: ({ reply }) => {
       const r = [];
-      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED, computed: comboRebaja.cifras });
+      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED, computed: [...comboRebaja.cifras, ...comboCompleto.cifras] });
       if (sinRespaldo.length) r.push('cifras sin respaldo: ' + sinRespaldo.join(', '));
-      if (!figures(reply).includes(combo.pago_unico.total)) r.push('no da el total de la calculadora (' + usd(combo.pago_unico.total) + ')');
+      if (!figures(reply).some((v) => COMBO_TOTALES.includes(v))) r.push('no da un total de la calculadora (' + COMBO_TOTALES.map(usd).join(' o ') + ')');
       return r;
     },
   },

@@ -169,3 +169,9 @@ segmentadas (Conversaciones · Correo · Citas · Gasto), **E-08** vacío que pr
 del acento: naranja solo en "Responder hoy", la oportunidad y el filo de la fila elegida; el resto, chips de datos.
 En la fila, el resumen de Marcy sustituye a la vista previa del correo (lo que aporta ella). Ficha lateral con
 "Abrir en Gmail" como única acción primaria; Respondido y Archivar secundarias. Capturas: `design/orbit-correo/`.
+
+## Añadido 2026-11-07 · Avisos en el dispositivo (Web Push)
+Estado: PROPUESTO. Sin pantalla nueva: el interruptor vive en la cabecera de Avisos (su anfitrión, E-19) con
+los botones de siempre (`b b--ghost`). Estados: activar, probar y apagar; si el navegador lo bloquea, si falta
+la llave o en iPhone sin instalar, una nota corta en su lugar. La notificación usa el icono de Orbit.
+Captura: `design/orbit-correo/avisos-cabecera.jpg` (el panel de pruebas bloquea los avisos, por eso sale la nota).

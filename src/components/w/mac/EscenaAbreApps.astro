@@ -364,6 +364,8 @@ const destinos = {
     --pt-rango: contain 0% contain 13%;
   }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pt) { width: min(100%, var(--pt-w)); }
+  /* Teléfono: la barra de menús del escritorio serían letras de 4 px; se queda la franja sin texto. */
+  @media (max-width: 767.98px) { :global(.lf--pin[data-pin-on]) .abre--viaje :global(.esc-menu-izq), :global(.lf--pin[data-pin-on]) .abre--viaje :global(.esc-menu-der) { visibility: hidden; } }
   :global(.lf--pin[data-pin-on]) .abre--viaje .abre-obj {
     position: absolute; left: var(--pp-x0, 0px); top: var(--pp-y0, 0px); width: var(--pp-w0, 100%);
     transform-origin: 0 0; will-change: transform;
@@ -457,11 +459,8 @@ const destinos = {
   @media (max-width: 767.98px) {
     /* Teléfono: el portátil desborda por los lados (se ve el centro de la pantalla). Las ventanas
        viven en la franja central visible; en «Móvil», un teléfono grande en cascada, uno sobre otro. */
-    .abre[data-modo='pc'] :global(.pp-ven--0) { left: 170px !important; top: 60px !important; width: 1040px !important; height: 660px !important; }
-    .abre[data-modo='pc'] :global(.pp-ven--1) { left: 170px !important; top: 60px !important; width: 1040px !important; height: 660px !important; }
-    .abre[data-modo='pc'] :global(.pp-ven--2) { left: 170px !important; top: 60px !important; width: 1040px !important; height: 660px !important; }
-    .abre[data-modo='pc'] :global(.pp-ven--3) { left: 170px !important; top: 60px !important; width: 1040px !important; height: 660px !important; }
-    .abre[data-modo='movil'] :global(.pp-ven) { left: 424px !important; top: 44px !important; width: 530px !important; height: 840px !important; }
+    .abre[data-modo='pc'] :global(.pp-ven) { left: 40px !important; top: 46px !important; width: 1298px !important; height: 820px !important; }
+    .abre[data-modo='movil'] :global(.pp-ven) { left: 409px !important; top: 40px !important; width: 560px !important; height: 850px !important; }
     /* En el teléfono cada proyecto SUSTITUYE al anterior (sale hacia arriba), sin apilarse. */
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 40% contain 59%; }
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-name: pp-ven-pasa; animation-range: contain 54% contain 73%; }
@@ -617,11 +616,11 @@ const destinos = {
         const ratio = obj.offsetHeight / Math.max(1, obj.offsetWidth) || 0.638;
         const h0 = w0 * ratio;
         let y0 = (H - h0) / 2;
-        if (!qEsc.matches && textoFase) y0 = Math.max(textoFase.offsetTop + textoFase.offsetHeight + 28, (H - h0) / 2 + 40);
+        if (!qEsc.matches && textoFase) y0 = textoFase.offsetTop + textoFase.offsetHeight + 36;
         const x0 = (W - w0) / 2;
         const cabH = cab?.offsetHeight ?? 0, pieH = pie?.offsetHeight ?? 0;
         const libre = H - cabH - pieH - 28 - 16;
-        const T = qMovil.matches ? Math.min(vw * 1.25, libre / ratio)
+        const T = qMovil.matches ? Math.min(vw * 1.02, libre / ratio)
           : qEsc.matches ? Math.min(1120, vw * 0.70, libre / ratio)
           : Math.min(vw * 0.94, libre / ratio);
         const Th = T * ratio;

@@ -406,6 +406,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     box-shadow: var(--shadow-teal), 0 6px 24px rgba(0, 0, 0, 0.5);
     transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
   }
+  .mrc-fab { will-change: transform; }
+  :global(.is-aparta) .mrc-fab { transform: translateY(96px); opacity: 0; pointer-events: none; transition: transform .3s cubic-bezier(.4, 0, 1, 1), opacity .2s ease; }
+  @media (max-width: 767.98px) { .mrc-fab { width: 52px; height: 52px; } }
   .mrc-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-teal), 0 10px 32px rgba(0, 0, 0, 0.6); }
   .mrc-fab:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; }
   .mrc-fab-ic { position: absolute; display: inline-flex; align-items: center; justify-content: center; transition: opacity var(--duration-base), transform var(--duration-base); }
@@ -1698,7 +1701,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.
     try {
-      if (nudge && !sessionStorage.getItem('mrcNudge')) {
+      // En teléfonos la burbuja tapaba títulos y botones (rev. móvil 2026-11-08): solo en pantallas anchas.
+      if (nudge && !sessionStorage.getItem('mrcNudge') && matchMedia('(min-width: 768px)').matches) {
         setTimeout(() => {
           if (!opened && nudge) {
             nudge.hidden = false;
@@ -1713,6 +1717,22 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         }, 3500);
       }
     } catch (_) {}
+
+    // Teléfono: el botón se aparta mientras bajas leyendo (tapaba precios y finales de párrafo) y
+    // vuelve al subir o al parar 0,9 s. Nunca se esconde con el panel abierto.
+    if (matchMedia('(max-width: 767.98px)').matches) {
+      let yA = scrollY, tVuelve = 0, pend = false;
+      const mira = () => {
+        pend = false;
+        const y = scrollY, d = y - yA; yA = y;
+        if (opened) return;
+        if (d > 6 && y > 200) root.classList.add('is-aparta');
+        else if (d < -6) root.classList.remove('is-aparta');
+        clearTimeout(tVuelve);
+        tVuelve = window.setTimeout(() => root.classList.remove('is-aparta'), 900);
+      };
+      addEventListener('scroll', () => { if (!pend) { pend = true; requestAnimationFrame(mira); } }, { passive: true });
+    }
 
     // Al enfocar un campo: reajusta al teclado y, si está dentro del log (campos
     // de la captura), lo deja a la vista por encima del teclado.

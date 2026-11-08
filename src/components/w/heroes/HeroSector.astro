@@ -236,7 +236,7 @@ const DER = Array.from({ length: N }, (_, i) =>
     .hs__ev-track { animation: none; }
   }
   @media (--lt-md) {
-    .hs__evs { left: -24px; right: -24px; }
+    .hs__evs { left: -24px; right: -24px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
   }
   /* v6.1: la rejilla llena el alto de la portada y el objeto se centra en su celda. */
   @media (--lg) { .hs__grid { grid-template-rows: minmax(0, 1fr); align-items: center; } .hs__obj { height: 100%; align-items: center; } }

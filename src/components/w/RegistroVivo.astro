@@ -89,7 +89,8 @@ const sr = Astro.props.sr ?? (en ? 'Example: ' : 'Ejemplo: ') + rows.map((r) => 
   .wd-log__list { position: relative; border-top: 1px solid var(--w-line); }
   /* Móvil (E-18): la etiqueta y el botón de pausa viven en franjas propias, encima y debajo
      de la lista; nunca tapan un chip (control 1). */
-  @media (--lt-md) {
+  /* Apilado hasta 1024 (rev. móvil 2026-11-08: a 768 la lista quedaba en 108 px y cortada). */
+  @media (max-width: 1023.98px) {
     .wd-log__list { padding-top: 48px; }
     .wd-log--loop .wd-log__list { padding-bottom: 64px; }
     .wd-log__list > :global(.w-example--corner) { top: 14px; right: 16px; }
@@ -134,6 +135,11 @@ const sr = Astro.props.sr ?? (en ? 'Example: ' : 'Ejemplo: ') + rows.map((r) => 
   .wd-log__chip--off { color: var(--w-ink-70); border: 1px dashed rgba(var(--star-rgb), .28); }
 
   @media (--md) {
+    .wd-log__h { font-size: 32px; line-height: 38px; }
+    .wd-log__p { font-size: 19px; line-height: 30px; }
+    .wd-log__copy { padding: 48px 40px 32px; }
+  }
+  @media (--lg) {
     .wd-log { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); min-height: 530px; border-radius: var(--w-r-feature); }
     .wd-log__copy { align-self: center; padding: 64px 60px 64px 64px; max-width: 548px; }
     .wd-log__h { font-size: 32px; line-height: 38px; }

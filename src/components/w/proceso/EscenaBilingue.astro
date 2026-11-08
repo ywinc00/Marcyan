@@ -160,8 +160,15 @@ const marca = lang === 'en' ? 'Your Law Firm' : 'Tu Bufete';
   :global(.is-play) .bi__seg[data-from='en'] .bi__pill { animation: bi-pill-r 5400ms var(--w-ease-ui, ease) both; --d: 44px; }
   @keyframes bi-win { from { opacity: 0; translate: 0 10px; scale: .98; } }
   /* 0-24 % quieta · 24-41 % la cortina descubre el otro idioma · 41-72 % quieta · 72-89 % la cortina se va y vuelve el de la página. */
-  @keyframes bi-wipe { 0%, 24% { transform: translateX(-101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(101%); } }
-  @keyframes bi-lb { 0%, 24% { transform: translateX(101%); } 41%, 72% { transform: translateX(0); } 89%, 100% { transform: translateX(-101%); } }
+  /* v8 (rev. móvil 2026-11-08): en vez de cortina, un idioma se va del todo antes de que entre el otro
+     (a media cortina se leían los dos textos partidos). La capa B ya está en su sitio; solo cambia la opacidad. */
+  .bi__wipe, .bi__lb { transform: none !important; }
+  .bi__wipe { opacity: 0; }
+  .bi__edge { display: none; }
+  @keyframes bi-wipe { 0%, 30% { opacity: 0; } 35%, 72% { opacity: 1; } 76%, 100% { opacity: 0; } }
+  @keyframes bi-lb { from { opacity: 1; } to { opacity: 1; } }
+  :global(.is-play) .bi__la { animation: bi-la 5400ms linear both; }
+  @keyframes bi-la { 0%, 25% { opacity: 1; } 29%, 77% { opacity: 0; } 81%, 100% { opacity: 1; } }
   @keyframes bi-er { 0%, 24% { opacity: 0; } 26%, 39% { opacity: 1; } 41%, 100% { opacity: 0; } }
   @keyframes bi-el { 0%, 72% { opacity: 0; } 74%, 87% { opacity: 1; } 89%, 100% { opacity: 0; } }
   @keyframes bi-pill { 0%, 24% { transform: none; } 30%, 72% { transform: translateX(var(--d)); } 78%, 100% { transform: none; } }
@@ -174,6 +181,6 @@ const marca = lang === 'en' ? 'Your Law Firm' : 'Tu Bufete';
   @keyframes bi-ob { 0%, 26% { color: rgba(240,237,232,.6); } 28%, 74% { color: var(--w-p-ink, #0e0e0d); } 76%, 100% { color: rgba(240,237,232,.6); } }
   @media (prefers-reduced-motion: reduce) {
     :global(.is-play) .bi__win, :global(.is-play) .bi__wipe, :global(.is-play) .bi__lb, :global(.is-play) .bi__edge--r, :global(.is-play) .bi__edge--l,
-    :global(.is-play) .bi__pill, :global(.is-play) .bi__o { animation: none !important; }
+    :global(.is-play) .bi__pill, :global(.is-play) .bi__o, :global(.is-play) .bi__la { animation: none !important; }
   }
 </style>

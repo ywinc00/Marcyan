@@ -152,7 +152,7 @@ const T = en
   .oml__act--fill { background: var(--ink); border-color: var(--ink); color: #F7F5F0; }
   .oml__found { display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
   .oml__k { font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); }
-  .oml__logos { display: inline-flex; align-items: center; gap: 16px; color: var(--ink); --marca-tinta: var(--ink); }
+  .oml__logos { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-width: 0; color: var(--ink); --marca-tinta: var(--ink); }
 
   /* Armado por JS antes de entrar: sin JS o con reducir movimiento se ve el estado final. */
   .oml.is-armed:not(.is-play) .oml__route { stroke-dashoffset: 1; }

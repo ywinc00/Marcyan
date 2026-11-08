@@ -232,6 +232,13 @@ const telMia = nap.miami.replace(/[^\d+]/g, '');
     .footer__col-chevron { display: none; }
     .footer__col > ul { margin-bottom: 0; }
   }
+  /* Zonas táctiles de 44 px sin mover el dibujo (rev. móvil 2026-11-08: botones de copiar de 22 px
+     y enlaces de 17-20 px de alto en el teléfono). */
+  .footer__copy { position: relative; }
+  .footer__copy::after { content: ''; position: absolute; inset: -11px; }
+  @media (max-width: 767.98px) {
+    .footer :global(a) { padding-block: 6px; }
+  }
 </style>
 
 <script>

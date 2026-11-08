@@ -87,9 +87,9 @@ const uid = `wsai-${lang}`;
 <style>
   .wsai { width: 100%; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: #F7F5F0; color: #1E1C19; text-align: left; }
   .wsai__k { display: block; font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #5E5A53; }
-  .wsai__row { display: grid; grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; --marca-tinta: #1E1C19; }
+  .wsai__row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; --marca-tinta: #1E1C19; }
   .wsai__l {
-    display: grid; place-items: center; height: 48px; padding: 0; border-radius: 10px; cursor: pointer;
+    display: grid; place-items: center; flex: 1 0 auto; height: 48px; padding: 0 16px; border-radius: 10px; cursor: pointer;
     border: 1px solid #E2DED5; background: #FFFFFF; color: inherit; font: inherit;
     transition: transform 400ms var(--w-ease-ui, ease), border-color 400ms ease, box-shadow 400ms ease, background-color 400ms ease;
   }

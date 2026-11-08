@@ -183,6 +183,16 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     const box = el.querySelector<HTMLElement>('[data-wo-msgs]');
     const typingTpl = el.querySelector<HTMLTemplateElement>('template[data-wo-typing]');
     const tabs = Array.from(el.querySelectorAll<HTMLElement>('.wo-chat__tab'));
+    // Fila de pestañas más ancha que su sitio: se desvanece por el lado que sigue (antes se cortaba en seco).
+    const fila = el.querySelector<HTMLElement>('.wo-chat__tabs');
+    if (fila) {
+      const marca = () => {
+        const sobra = fila.scrollWidth - fila.clientWidth;
+        fila.classList.toggle('is-sigue', sobra > 2 && fila.scrollLeft < sobra - 2);
+        fila.classList.toggle('is-vuelve', sobra > 2 && fila.scrollLeft > 2);
+      };
+      marca(); fila.addEventListener('scroll', marca, { passive: true }); addEventListener('resize', marca, { passive: true });
+    }
     const pill = el.querySelector<HTMLElement>('.wo-chat__pill');
     if (!box || !scripts.length) return;
     const stillHTML = box.innerHTML;
@@ -276,6 +286,9 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     overflow-x: auto; scrollbar-width: none;
   }
   .wo-chat__tabs::-webkit-scrollbar { display: none; }
+  .wo-chat__tabs.is-sigue { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  .wo-chat__tabs.is-vuelve { -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px); mask-image: linear-gradient(90deg, transparent, #000 40px); }
+  .wo-chat__tabs.is-sigue.is-vuelve { -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
   .wo-chat__pill {
     position: absolute; left: 0; top: 4px; bottom: 4px; width: 0; border-radius: 999px;
     background: var(--w-p-bg, #f0ede8);

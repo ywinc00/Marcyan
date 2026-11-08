@@ -80,6 +80,6 @@ const { comando, bloques, cierre, class: cls } = Astro.props;
     .dcc__body { position: relative; inset: auto; margin: 0 5px 5px; }
     .dcc__lines { padding: 14px 12px 18px; }
     /* El comando en UNA línea, recortado al borde como el original (no se parte en dos). */
-    .dcc__l--wrap { overflow: hidden; text-overflow: ellipsis; }
+    .dcc__l--wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
   }
 </style>

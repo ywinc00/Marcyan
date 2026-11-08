@@ -134,6 +134,7 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
     --mt-acc: #4E5A3D; --mt-tile: #E6DBC8;
     --marca-tinta: #2A211B;
     width: 100%; max-width: 460px; font-family: var(--font-body); text-align: left;
+    container: mt / inline-size;
   }
   .mt__card {
     background: var(--mt-bg); color: var(--mt-ink); border-radius: 14px; padding: 18px;
@@ -219,9 +220,18 @@ const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" strok
   .mt__ai { display: flex; flex-direction: column; gap: 5px; padding: 11px 13px; border-radius: 10px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1); font-size: 12.5px; line-height: 1.45; }
   .mt__ail { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
   .mt__ai b { font-weight: 600; }
-  @media (max-width: 420px) {
+  /* Se adapta a SU ancho, no a la pantalla (E-62; en tableta la celda mide ~210 px y la ficha se
+     rompía): estrecha → foto pequeña al lado; muy estrecha → foto arriba y texto debajo. */
+  @container mt (max-width: 400px) {
     .mt__card { padding: 14px; }
     .mt__pdp { grid-template-columns: 112px 1fr; gap: 12px; }
     .mt__img { min-height: 150px; }
+  }
+  @container mt (max-width: 300px) {
+    .mt__pdp { grid-template-columns: 1fr; }
+    .mt__img { min-height: 120px; }
+    .mt__btn { margin-top: 12px; }
+    .mt__cart { flex-wrap: wrap; }
+    .mt__go { margin-left: auto; }
   }
 </style>

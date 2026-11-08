@@ -21,6 +21,7 @@ import Ciclo from '../../sections/sector/Ciclo.astro';
 import Zonas from '../../sections/barrio/Zonas.astro';
 import Precio from '../../sections/barrio/Precio.astro';
 import Caso from '../../sections/barrio/Caso.astro';
+import { NEGOCIO_BARRIO } from '../../objetos/barrios/negociosFicha';
 import { barrioCopy, barrioComun as T, barrioOf, zonasCiudad, type Barrio } from '../../../../i18n/w/barrio';
 import { nap } from '../../../../i18n/content';
 import { catalog } from '../../../../i18n/pricing';
@@ -113,6 +114,7 @@ const spec: KindSpec = {
           titleHtml: T.recibeTitle(t.name),
           lead: T.recibeLead,
           name: t.name,
+          negocio: NEGOCIO_BARRIO[slugOf(ctx)],
           cells: T.recibe(t.name).map((c) => ({ ...c, href: href(c.id) })),
           todos: svc.map((s) => ({ label: s.name, href: s.href })),
           tambien: T.tambien,
@@ -175,7 +177,7 @@ const spec: KindSpec = {
           mapLabel: T.zonasMapa(t.name, t.cityName),
           tags: T.zonasTag,
           servicesLabel: T.zonasServicios,
-          ficha: { city: t.name, caption: T.fichaCaption(t.name) },
+          ficha: { city: t.name, caption: T.fichaCaption(t.name), negocio: NEGOCIO_BARRIO[slug] },
           lang: ctx.lang,
         };
       },

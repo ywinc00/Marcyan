@@ -1,0 +1,55 @@
+---
+// Web de ejemplo de la portada: salón de belleza en Heights, Houston (v8, 2026-11-08).
+// Principio de Refero Christopher Ireland (f293bacf, christopherireland.net): lienzo pergamino,
+// marca serif grande, una línea fina y una composición partida: a la izquierda los servicios en
+// serif con «+», a la derecha UNA pieza (aquí la reserva con su estilista, que es lo que el salón
+// vende). Sin fotos inventadas ni bloques de color. Se adapta sola a ventana pequeña o teléfono.
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const T = lang === 'en'
+  ? { marca: 'Your Salon', sub: 'Heights · Houston', linea: 'Cuts, color and styling · by appointment · English and Spanish', servicios: ['Cut', 'Color', 'Styling'], res: 'Book with Daniela', dia: 'Tomorrow, Wed', horas: ['10:00 AM', '1:30 PM', '4:00 PM'], btn: 'Book 10:00 AM' }
+  : { marca: 'Tu Salón', sub: 'Heights · Houston', linea: 'Corte, color y peinado · con cita · en español y en inglés', servicios: ['Corte', 'Color', 'Peinados'], res: 'Reserva con Daniela', dia: 'Mañana, miércoles', horas: ['10:00 a. m.', '1:30 p. m.', '4:00 p. m.'], btn: 'Reservar 10:00 a. m.' };
+---
+<div class="ws">
+  <header class="ws__top">
+    <span class="ws__marca">{T.marca}</span>
+    <span class="ws__sub">{T.sub}</span>
+  </header>
+  <div class="ws__linea"><span>{T.linea}</span></div>
+  <div class="ws__cuerpo">
+    <ul class="ws__lista">{T.servicios.map((s) => <li><span>{s}</span><i>+</i></li>)}</ul>
+    <div class="ws__res">
+      <span class="ws__rt">{T.res}</span>
+      <span class="ws__rd">{T.dia}</span>
+      <span class="ws__horas">{T.horas.map((h, i) => <i class:list={[i === 0 && 'on']}>{h}</i>)}</span>
+      <b class="ws__btn">{T.btn}</b>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ws { position: absolute; inset: 0; container: ws / inline-size; display: flex; flex-direction: column; background: #f3efe6; color: #23201c; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ws__top { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 30px 40px 18px; }
+  .ws__marca { font: 400 64px/.95 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; }
+  .ws__sub { font-size: 13px; color: #6d675e; padding-bottom: 8px; }
+  .ws__linea { margin: 0 40px; padding: 14px 0; border-top: 1px solid #cfc8bb; font-size: 13px; color: #6d675e; }
+  .ws__cuerpo { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 6px 40px 30px; }
+  .ws__lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .ws__lista li { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e0d9cc; font: 400 34px/1 Georgia, 'Times New Roman', serif; letter-spacing: -.015em; }
+  .ws__lista i { font: 300 22px/1 'DM Sans', sans-serif; font-style: normal; color: #8a8378; }
+  .ws__res { display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 1px solid #d8d0c2; border-radius: 6px; }
+  .ws__rt { font: 400 22px/1.1 Georgia, 'Times New Roman', serif; }
+  .ws__rd { font-size: 13px; color: #6d675e; }
+  .ws__horas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ws__horas i { font-style: normal; font-size: 14px; padding: 9px 13px; border-radius: 4px; box-shadow: inset 0 0 0 1px #d8d0c2; }
+  .ws__horas i.on { background: #23201c; color: #f3efe6; box-shadow: none; }
+  .ws__btn { margin-top: 4px; padding: 13px; border-radius: 4px; background: #7b3b2d; color: #f3efe6; text-align: center; font-size: 14.5px; font-weight: 600; }
+  @container ws (max-width: 520px) {
+    .ws__top { flex-direction: column; align-items: flex-start; gap: 6px; padding: 20px 18px 12px; }
+    .ws__marca { font-size: 44px; }
+    .ws__sub { padding: 0; }
+    .ws__linea { margin: 0 18px; font-size: 12.5px; }
+    .ws__cuerpo { display: flex; flex-direction: column; align-items: stretch; gap: 22px; padding: 4px 18px 18px; }
+    .ws__lista li { font-size: 28px; }
+  }
+</style>

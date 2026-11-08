@@ -8,6 +8,7 @@
 <div class="wt">
   <header class="wt__nav">
     <span class="wt__marca"><i></i>Tu Taller</span>
+    <span class="wt__menu" aria-hidden="true"><i></i><i></i></span>
     <nav><span>Servicios</span><span>Cómo llegar</span><span>Contacto</span></nav>
     <b class="wt__cta wt__cta--sm">Pedir cita</b>
   </header>
@@ -40,7 +41,7 @@
 </div>
 
 <style>
-  .wt { position: absolute; inset: 0; display: flex; flex-direction: column; background: #fafaf8; color: #141414; font-family: 'DM Sans', system-ui, sans-serif; }
+  .wt { position: absolute; inset: 0; container: wt / inline-size; display: flex; flex-direction: column; background: #fafaf8; color: #141414; font-family: 'DM Sans', system-ui, sans-serif; }
   .wt__nav { display: flex; align-items: center; gap: 28px; padding: 22px 40px; border-bottom: 1px solid #ecebe7; }
   .wt__marca { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
   .wt__marca i { width: 12px; height: 12px; border-radius: 3px; background: #d9541e; }
@@ -62,4 +63,20 @@
   .wt__pie { display: flex; padding: 0 40px 22px; font-size: 13px; color: #6e6e6e; }
   .wt__pie span { padding-right: 16px; margin-right: 16px; border-right: 1px solid #e3e2dd; }
   .wt__pie span:last-child { border: 0; }
+  .wt__menu { display: none; }
+  @container wt (max-width: 520px) {
+    .wt__nav { padding: 16px 18px; gap: 12px; }
+    .wt__nav nav, .wt__nav .wt__cta--sm { display: none; }
+    .wt__menu { display: grid; gap: 5px; margin-left: auto; }
+    .wt__menu i { display: block; width: 20px; height: 1.5px; background: #141414; }
+    .wt__hero { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 14px 18px 18px; }
+    .wt__txt { gap: 12px; }
+    .wt__h { font-size: 38px; }
+    .wt__p { font-size: 14.5px; }
+    .wt__acc { gap: 16px; }
+    .wt__cta { height: 44px; padding: 0 20px; font-size: 14.5px; }
+    .wt__hero { flex: none; }
+    .wt__mapa { height: 230px; }
+    .wt__pie { flex-wrap: wrap; gap: 8px 0; padding: 4px 18px 18px; font-size: 13px; }
+  }
 </style>

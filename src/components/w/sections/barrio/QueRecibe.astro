@@ -8,6 +8,12 @@
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Bento2x2 from '../../Bento2x2.astro';
 import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import TelefonoWeb from '../../heroes/webs/TelefonoWeb.astro';
+import WebClinica from '../../heroes/webs/WebClinica.astro';
+import WebTaller from '../../heroes/webs/WebTaller.astro';
+import WebCafe from '../../heroes/webs/WebCafe.astro';
+import EscenaBilingueCarga from '../../heroes/escenas/EscenaBilingueCarga.astro';
+import type { NegocioId } from '../../objetos/barrios/negociosFicha';
 import ObjMapaLocal from '../servicios/ObjMapaLocal.astro';
 import MazoHilos from '../../agente/MazoHilos.astro';
 import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
@@ -22,9 +28,12 @@ interface Props {
   cells: Cell[];
   todos: { label: string; href: string }[];
   tambien: string;
+  /** v8: el teléfono enseña la web del negocio de ESTE barrio (el mismo de su portada). */
+  negocio?: NegocioId;
   lang?: 'es' | 'en';
 }
-const { n, label, titleHtml, lead, name, cells, todos, tambien, lang = 'es' } = Astro.props;
+const { n, label, titleHtml, lead, name, cells, todos, tambien, negocio, lang = 'es' } = Astro.props;
+const TEL: Record<string, { fondo: string; tinta: string }> = { clinica: { fondo: '#f7f4ee', tinta: '#1f2a24' }, taller: { fondo: '#fafaf8', tinta: '#141414' }, cafe: { fondo: '#b4492f', tinta: '#f6ead8' }, carga: { fondo: '#101113', tinta: '#f2f0eb' } };
 const ICON: Record<string, string> = {
   'diseno-web': 'lucide:monitor-smartphone', 'seo-local': 'lucide:map-pin',
   'ia-conversacional': 'lucide:message-circle', 'seo-ia': 'lucide:sparkles',
@@ -38,7 +47,15 @@ const bento = cells.map((c) => ({
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
 <div class="br-rc">
   <Bento2x2 cells={bento}>
-    <div slot="ui-1" class="br-rc__ui br-rc__ui--tel"><WebEjemplo marca="plomeria" frame="movil" vista="mini" city={name} lang={lang} /></div>
+    <div slot="ui-1" class="br-rc__ui br-rc__ui--tel">
+      {negocio && negocio !== 'carga' && negocio !== 'barberia' ? (
+        <TelefonoWeb lang={lang} fondo={TEL[negocio].fondo} tinta={TEL[negocio].tinta} sr={`Ejemplo: la web del negocio de ${name} en un teléfono.`}>
+          {negocio === 'clinica' ? <WebClinica /> : negocio === 'taller' ? <WebTaller /> : <WebCafe lang={lang} />}
+        </TelefonoWeb>
+      ) : negocio === 'carga' ? (
+        <TelefonoWeb lang={lang} fondo={TEL.carga.fondo} tinta={TEL.carga.tinta} class="br-rc__carga" sr={`Ejemplo: la web bilingüe del negocio de ${name} en un teléfono.`}><EscenaBilingueCarga /></TelefonoWeb>
+      ) : <WebEjemplo marca="plomeria" frame="movil" vista="mini" city={name} lang={lang} />}
+    </div>
     <div slot="ui-2" class="br-rc__ui"><ObjMapaLocal lang={lang} /></div>
     <div slot="ui-3" class="br-rc__ui"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
     <div slot="ui-4" class="br-rc__ui"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" /></div>
@@ -50,7 +67,7 @@ const bento = cells.map((c) => ({
   .br-rc { margin-top: var(--w-chapter-gap); }
   .br-rc__ui { display: flex; justify-content: center; align-items: flex-start; width: 100%; }
   .br-rc__ui > :global(*) { width: min(100%, 380px); }
-  .br-rc__ui--tel > :global(*) { width: min(100%, 240px); }
+  .br-rc__ui--tel > :global(*) { width: min(100%, 264px); }
   /* el título de cada celda lleva a la página del servicio (el enlace que daban las tarjetas) */
   .br-rc :global(.br-rc__a) { color: inherit; text-decoration: none; }
   .br-rc :global(.br-rc__a:hover) { color: var(--w-accent, var(--accent-gold)); }
@@ -66,4 +83,8 @@ const bento = cells.map((c) => ({
   }
   .br-rc__todos a:hover { text-decoration-color: var(--accent-gold); }
   @media (--lt-md) { .br-rc { margin-top: 40px; } }
+  /* La agencia de Doral en el teléfono: su web bilingüe sin el marco de navegador (ya está en un teléfono). */
+  .br-rc :global(.br-rc__carga .bc__win) { border-radius: 0; box-shadow: none; }
+  .br-rc :global(.br-rc__carga .bc), .br-rc :global(.br-rc__carga .bc__win) { height: 100%; }
+  .br-rc :global(.br-rc__carga .bc__body) { height: calc(100% - 45px); aspect-ratio: auto; }
 </style>

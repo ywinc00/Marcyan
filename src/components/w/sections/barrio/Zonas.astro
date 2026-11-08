@@ -14,6 +14,7 @@
 // A la derecha, la ficha de mapa de ejemplo (se conserva: «la tarjeta del mapa está bien»).
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import FichaMapa from '../../objetos/barrios/FichaMapa.astro';
+import { fichaDe, type NegocioId } from '../../objetos/barrios/negociosFicha';
 import MapaZonas from '../../objetos/barrios/MapaZonas.astro';
 import Icon from '../../../ui/Icon.astro';
 
@@ -30,7 +31,7 @@ interface Props {
   mapLabel: string;
   tags: { here: string; own: string };
   servicesLabel: (z: string) => string;
-  ficha: { city: string; caption: string };
+  ficha: { city: string; caption: string; negocio?: NegocioId };
   lang?: 'es' | 'en';
 }
 const { n, label, title, lead, city, zones, listLabel, mapLabel, tags, servicesLabel, ficha, lang = 'es' } = Astro.props;
@@ -69,7 +70,7 @@ const grupo = `wz-${city}`;
     <MapaZonas city={city} zones={zones} label={mapLabel} class="wz__mapa" />
   </div>
   <figure class="wb-z__ficha">
-    <FichaMapa marca="inmobiliaria" city={ficha.city} lang={lang} size="card" />
+    <FichaMapa marca="inmobiliaria" negocio={ficha.negocio ? fichaDe(ficha.negocio, lang) : undefined} city={ficha.city} lang={lang} size="card" />
     <figcaption>{ficha.caption}</figcaption>
   </figure>
 </div>

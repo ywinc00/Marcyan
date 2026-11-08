@@ -111,7 +111,7 @@ const jsonLd = {
       knowsLanguage: ['es', 'en'],
       address: { '@type': 'PostalAddress', addressLocality: 'Houston', addressRegion: 'TX', addressCountry: 'US' },
       areaServed: { '@type': 'City', name: 'Houston' },
-      // Ficha de Google de Houston (enlace dado por el dueño, 2026-11-07; cid de la ficha). Miami: pendiente.
+      // Ficha de Google de Houston (enlace dado por el dueño, 2026-11-07; cid de la ficha).
       hasMap: 'https://maps.google.com/?cid=12570640077238981353',
       sameAs: ['https://maps.google.com/?cid=12570640077238981353'],
     },
@@ -129,6 +129,9 @@ const jsonLd = {
       // coherente con el copy "sin dirección pública". Houston sí lleva address
       // por ser la base de operaciones.
       areaServed: { '@type': 'City', name: 'Miami' },
+      // Ficha de Google de Miami (encontrada en Maps con el teléfono 786, 2026-11-07; cid de la ficha).
+      hasMap: 'https://maps.google.com/?cid=16706895790770498199',
+      sameAs: ['https://maps.google.com/?cid=16706895790770498199'],
     },
   ],
 };

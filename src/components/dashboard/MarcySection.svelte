@@ -72,10 +72,14 @@
     try {
       const d = await api('/api/admin/marcy?sid=' + encodeURIComponent(sid));
       if (shownSid === sid) {
-        const grew = !conv || conv.sid !== sid || (d.conversation.turnos || []).length !== (conv.turnos || []).length;
+        const opened = !conv || conv.sid !== sid;
+        const grew = opened || (d.conversation.turnos || []).length !== (conv.turnos || []).length;
+        // Como WhatsApp: al abrir baja al último mensaje y, en vivo, sigue bajando
+        // con cada mensaje nuevo salvo que estés leyendo más arriba.
+        const f0 = document.querySelector('.feed');
+        const atBottom = !f0 || f0.scrollHeight - f0.scrollTop - f0.clientHeight < 140;
         conv = d.conversation;
-        // Si la llevas tú, la conversación baja sola al último mensaje.
-        if (conv.takeover_at && grew) tick().then(() => { const f = document.querySelector('.feed'); if (f) f.scrollTop = f.scrollHeight; });
+        if (grew && (opened || atBottom)) tick().then(() => { const f = document.querySelector('.feed'); if (f) f.scrollTop = f.scrollHeight; });
       }
     } catch (e) {
       if (isSessionError(e)) return;
@@ -125,13 +129,20 @@
     } catch (e) { if (!isSessionError(e)) toast(errorMessage(e), { tone: 'error' }); }
     finally { tomoBusy = false; }
   }
+  // Mientras escribes, el cliente ve "escribiendo…" (como mucho un aviso cada 4 s).
+  let typingSent = 0;
+  function onDraftInput() {
+    if (!conv || !conv.takeover_at || !draft.trim() || Date.now() - typingSent < 4000) return;
+    typingSent = Date.now();
+    api('/api/admin/marcy', { method: 'POST', body: { sid: conv.sid, action: 'escribiendo' } }).catch(() => {});
+  }
   async function enviar() {
     const text = draft.trim();
     if (!conv || !text || tomoBusy) return;
     tomoBusy = true;
     try {
       await api('/api/admin/marcy', { method: 'POST', body: { sid: conv.sid, action: 'enviar', text } });
-      draft = '';
+      draft = ''; typingSent = 0;
       await loadConv(conv.sid, { quiet: true });
     } catch (e) { if (!isSessionError(e)) toast(errorMessage(e), { tone: 'error' }); }
     finally { tomoBusy = false; }
@@ -341,7 +352,7 @@
           {#if conv.takeover_at}
             <form class="composer" onsubmit={(e) => { e.preventDefault(); enviar(); }}>
               <label class="sr" for="tomo-msg">Tu mensaje al cliente</label>
-              <textarea id="tomo-msg" rows="2" maxlength="2000" bind:value={draft} placeholder={conv.channel === 'whatsapp' ? 'Escribe al cliente. Le llega a su WhatsApp.' : conv.channel === 'instagram' ? 'Escribe al cliente. Le llega por Instagram.' : 'Escribe al cliente. Le aparece en el chat de la web.'}
+              <textarea id="tomo-msg" rows="2" maxlength="2000" bind:value={draft} oninput={onDraftInput} placeholder={conv.channel === 'whatsapp' ? 'Escribe al cliente. Le llega a su WhatsApp.' : conv.channel === 'instagram' ? 'Escribe al cliente. Le llega por Instagram.' : 'Escribe al cliente. Le aparece en el chat de la web.'}
                 onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }}></textarea>
               <div class="composer__acts">
                 <button type="button" class="btn" disabled={tomoBusy} onclick={() => tomo('devolver')}>Devolver a Marcy</button>

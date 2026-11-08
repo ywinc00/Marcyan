@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { recordTurn, linkLead, deleteConversation, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
 import { applyFilter, funnelSteps, motivosOrdenados, recorrido, leadHref, usd } from '../src/components/dashboard/lib/marcy.js';
 import { lastUserText } from '../api/chat.mjs';
+import { ownerUpdates, markOwnerTyping } from '../lib/takeover.mjs';
 
 let n = 0;
 const fails = [];
@@ -149,6 +150,30 @@ await check('borrar: con la casilla se van el lead y sus citas; un brief nunca',
 });
 await check('borrar: conversación que no existe', async () => {
   assert.equal(await deleteConversation('nada', { sqlImpl: convSql(undefined).sql }), null);
+});
+
+// "Escribiendo…" del dueño (migración 024).
+function typingSql({ takeover = true, typing = true, noColumn = false } = {}) {
+  return async (strings) => {
+    const t = strings.join('?');
+    if (/SELECT takeover_at/.test(t)) return { rows: [{ takeover_at: takeover ? new Date().toISOString() : null }] };
+    if (/owner_typing_at >/.test(t)) { if (noColumn) { const e = new Error('column'); e.code = '42703'; throw e; } return { rows: [{ typing }] }; }
+    if (/UPDATE chat_conversations c SET owner_typing_at/.test(t)) { if (noColumn) { const e = new Error('column'); e.code = '42703'; throw e; } return { rows: takeover ? [{ channel: 'web', contact: null, prev: null }] : [] }; }
+    return { rows: [] };
+  };
+}
+await check('escribiendo: el widget lo ve solo con la conversación tomada', async () => {
+  assert.equal((await ownerUpdates({ sid: 'abc-123', sqlImpl: typingSql() })).typing, true);
+  assert.equal((await ownerUpdates({ sid: 'abc-123', sqlImpl: typingSql({ takeover: false }) })).typing, false);
+});
+await check('escribiendo: sin la migración 024 no rompe', async () => {
+  const r = await ownerUpdates({ sid: 'abc-123', sqlImpl: typingSql({ noColumn: true }) });
+  assert.equal(r.takeover, true); assert.equal(r.typing, false);
+  assert.equal(await markOwnerTyping('abc-123', { sqlImpl: typingSql({ noColumn: true }) }), null);
+});
+await check('escribiendo: marcar solo si la llevas tú', async () => {
+  assert.ok(await markOwnerTyping('abc-123', { sqlImpl: typingSql() }));
+  assert.equal(await markOwnerTyping('abc-123', { sqlImpl: typingSql({ takeover: false }) }), null);
 });
 
 if (fails.length) { console.error(fails.join('\n')); process.exit(1); }

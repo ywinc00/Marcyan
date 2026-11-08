@@ -156,3 +156,16 @@ satélite blanco en el anillo. Mismo vocabulario de la marca (planeta orbitado) 
 se reconozca como de la familia y se distinga en la pantalla de inicio. Archivos: `public/dashboard/orbit-icon.svg`
 y PNG 180/192/512 (iPhone no acepta SVG). Nombre de la app instalada: "Orbit". No toca el logo del navbar,
 el de la empresa ni el favicon del sitio (memoria "Logos: NO unificar").
+
+## Añadido 2026-11-07 · Correo (Orbit, Marcy › Correo)
+Estado: PROPUESTO, pendiente del OK visual del dueño. Pestaña nueva dentro de la sección ya aprobada (dirección A,
+consola en vivo); sin componentes globales nuevos (E-15, E-19).
+Referencias de Refero MIRADAS en imagen:
+- Jace AI `141b9b34-309d-463f-a2ff-b400ef320699` · filas de una línea agrupadas por día: remitente, asunto en
+  negrita + vista previa gris, chips pequeños de estado (necesita respuesta, borrador), fecha a la derecha.
+- Missive `aa850cd0-4334-4b58-b169-064df8aed985` · grupos por día y fila elegida con filo de color.
+Piezas del catálogo: **E-06** filtros en pastillas con contador (Responder hoy primero), **I-06** pestañas
+segmentadas (Conversaciones · Correo · Citas · Gasto), **E-08** vacío que propone la salida, **H-07** presupuesto
+del acento: naranja solo en "Responder hoy", la oportunidad y el filo de la fila elegida; el resto, chips de datos.
+En la fila, el resumen de Marcy sustituye a la vista previa del correo (lo que aporta ella). Ficha lateral con
+"Abrir en Gmail" como única acción primaria; Respondido y Archivar secundarias. Capturas: `design/orbit-correo/`.

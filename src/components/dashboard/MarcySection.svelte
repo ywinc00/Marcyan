@@ -22,6 +22,7 @@
   import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
   import MarcyCitas from './MarcyCitas.svelte';
+  import MarcyCorreo from './MarcyCorreo.svelte';
 
   const POLL_MS = 5000;
 
@@ -38,7 +39,7 @@
   let convError = $state('');
 
   const q = $derived(route.query || {});
-  const vista = $derived(q.vista === 'gasto' || q.vista === 'citas' ? q.vista : 'conversaciones');
+  const vista = $derived(q.vista === 'gasto' || q.vista === 'citas' || q.vista === 'correo' ? q.vista : 'conversaciones');
   const selectedSid = $derived(route.sub && route.sub[0] ? String(route.sub[0]) : '');
   const visible = $derived(applyFilter(rows, { f: q.f || '', paso: q.paso || '', motivo: q.motivo || '' }));
   const liveCount = $derived(rows.filter((r) => r.outcome === 'en_vivo').length);
@@ -129,6 +130,7 @@
       <button type="button" role="tab" aria-selected={vista === 'conversaciones'} onclick={() => setVista('conversaciones')}>
         Conversaciones{#if liveCount}<span class="seg__live" aria-label="{liveCount} en vivo">{liveCount}</span>{/if}
       </button>
+      <button type="button" role="tab" aria-selected={vista === 'correo'} onclick={() => setVista('correo')}>Correo</button>
       <button type="button" role="tab" aria-selected={vista === 'citas'} onclick={() => setVista('citas')}>Citas</button>
       <button type="button" role="tab" aria-selected={vista === 'gasto'} onclick={() => setVista('gasto')}>Gasto</button>
     </div>
@@ -139,6 +141,8 @@
   <EmptyState title="Falta preparar la base de datos" text="La sección necesita la migración 018 aplicada en la base. En cuanto esté, aparecen aquí las conversaciones nuevas." />
 {:else if error && !loaded}
   <ErrorState message={error} onretry={() => loadList()} />
+{:else if vista === 'correo'}
+  <MarcyCorreo />
 {:else if vista === 'citas'}
   <MarcyCitas />
 {:else if vista === 'gasto'}

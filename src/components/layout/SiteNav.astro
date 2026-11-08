@@ -291,9 +291,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   // Estado "scrolled" de la barra. Va en su propio guard porque no depende del drawer:
   // así un cambio en el menú no puede dejar la nav sin fondo en todo el sitio.
   if (root) {
+    // Solo se toca la clase cuando el estado CAMBIA (antes se tocaba en cada evento de scroll).
+    let estado: boolean | null = null;
     const onScroll = () => {
       // Con el megamenú abierto la barra conserva su fondo (data-mega-open).
-      root.classList.toggle('is-scrolled', window.scrollY > 24 || root.hasAttribute('data-mega-open'));
+      const s = window.scrollY > 24 || root.hasAttribute('data-mega-open');
+      if (s !== estado) { estado = s; root.classList.toggle('is-scrolled', s); }
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });

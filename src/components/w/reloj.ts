@@ -11,7 +11,9 @@
 //   data-reloj-cap      → primera letra en mayúscula
 type Fmt = 'menu' | 'hora' | 'hm' | 'ap' | 'fecha' | 'dia';
 
-const loc = (el: Element) => ((el.closest('[lang]') as HTMLElement | null)?.lang || document.documentElement.lang || 'es').startsWith('en') ? 'en-US' : 'es-US';
+const LANG = new WeakMap<Element, string>();
+const loc = (el: Element) => LANG.get(el) ?? (LANG.set(el, locDe(el)), LANG.get(el)!);
+const locDe = (el: Element) => ((el.closest('[lang]') as HTMLElement | null)?.lang || document.documentElement.lang || 'es').startsWith('en') ? 'en-US' : 'es-US';
 const limpia = (s: string) => s.replace(/\./g, '').replace(/ | /g, ' ');
 
 function hora12(d: Date, en: boolean) {
@@ -20,18 +22,24 @@ function hora12(d: Date, en: boolean) {
   return { hm: `${h}:${m}`, ap: d.getHours() < 12 ? (en ? 'AM' : 'a. m.') : (en ? 'PM' : 'p. m.') };
 }
 
-function texto(fmt: Fmt, d: Date, l: string): string {
+const FMT = new Map<string, Intl.DateTimeFormat>();
+const fmt = (l: string, o: Intl.DateTimeFormatOptions) => {
+  const k = l + JSON.stringify(o);
+  let f = FMT.get(k); if (!f) { f = new Intl.DateTimeFormat(l, o); FMT.set(k, f); }
+  return f;
+};
+function texto(fmt_: Fmt, d: Date, l: string): string {
   const en = l === 'en-US';
   const { hm, ap } = hora12(d, en);
-  switch (fmt) {
+  switch (fmt_) {
     case 'hm': return hm;
     case 'ap': return ap;
     case 'hora': return `${hm} ${ap}`;
-    case 'dia': return new Intl.DateTimeFormat(l, { weekday: 'long' }).format(d);
-    case 'fecha': return limpia(new Intl.DateTimeFormat(l, { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
+    case 'dia': return fmt(l, { weekday: 'long' }).format(d);
+    case 'fecha': return limpia(fmt(l, { weekday: 'long', day: 'numeric', month: 'long' }).format(d));
     case 'menu': {
-      const dia = limpia(new Intl.DateTimeFormat(l, { weekday: 'short' }).format(d));
-      const mes = limpia(new Intl.DateTimeFormat(l, { month: 'short' }).format(d));
+      const dia = limpia(fmt(l, { weekday: 'short' }).format(d));
+      const mes = limpia(fmt(l, { month: 'short' }).format(d));
       return en ? `${dia} ${mes} ${d.getDate()}  ${hm} ${ap}` : `${dia} ${d.getDate()} ${mes}  ${hm} ${ap}`;
     }
   }
@@ -53,6 +61,7 @@ export function iniciaRelojes() {
   if (iniciado) return;
   iniciado = true;
   pintaRelojes();
-  // Cuerpos de ventanas que se ponen más tarde (<template>): se repinta cada 15 s, barato.
-  window.setInterval(() => { if (!document.hidden) pintaRelojes(); }, 15000);
+  // Solo se repinta cuando cambia el minuto (los cuerpos que llegan después se pintan al ponerse).
+  let min = new Date().getMinutes();
+  window.setInterval(() => { const m = new Date().getMinutes(); if (m !== min && !document.hidden) { min = m; pintaRelojes(); } }, 5000);
 }

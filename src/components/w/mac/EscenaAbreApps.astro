@@ -645,18 +645,18 @@ const destinos = {
         tMed = window.setTimeout(() => { if (innerWidth !== wMed || Math.abs(innerHeight - hMed) > 120) { wMed = innerWidth; hMed = innerHeight; medirViaje(); } }, 200);
       });
       // Progreso del tramo (0 → 1) para el disparo de la secuencia; solo con el tramo a la vista.
+      let navPx = 0;
       const progreso = () => {
         const r = tramo.getBoundingClientRect();
-        const z = zoom();
-        const nav = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64) * z;
-        return (nav - r.top) / Math.max(1, r.height - (innerHeight - nav));
+        if (!navPx) navPx = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64) * zoom();
+        return (navPx - r.top) / Math.max(1, r.height - (innerHeight - navPx));
       };
+      addEventListener('resize', () => { navPx = 0; }, { passive: true });
       tapaPasada = () => progreso() >= 0.12;
       let enVista = false, pend = false;
       const mira = () => {
         pend = false;
         const p = progreso();
-        raiz.dataset.ppP = p.toFixed(3);
         if (p >= 0.12 && armada) arranca();
         else if (p < 0.02 && !armada) { sec.stop(); reset(); armada = true; }
       };

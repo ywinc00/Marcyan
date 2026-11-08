@@ -72,6 +72,9 @@ const L = {
   .bc__body { position: relative; aspect-ratio: 16 / 10; }
   .bc__capa { position: absolute; inset: 0; display: flex; flex-direction: column; color: #f2f0eb; font-family: 'DM Sans', system-ui, sans-serif; transition: opacity .5s ease, transform .5s ease; }
   .bc__capa--en { opacity: 0; transform: translateY(6px); }
+  /* un idioma sale del todo (.2 s) antes de que entre el otro: nunca se cruzan */
+  .bc__capa { transition: opacity .2s ease, transform .2s ease; }
+  .bc.is-en .bc__capa--en, .bc:not(.is-en) .bc__capa--es { transition: opacity .35s ease .22s, transform .35s ease .22s; }
   .bc.is-en .bc__capa--es { opacity: 0; transform: translateY(-6px); }
   .bc.is-en .bc__capa--en { opacity: 1; transform: none; }
   .bc__nav { display: flex; align-items: center; gap: 3cqw; padding: 2.6cqw 4cqw; }
@@ -82,7 +85,7 @@ const L = {
   .bc__hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 4cqw; align-items: start; padding: 3.4cqw 4cqw 0; }
   .bc__izq { display: flex; flex-direction: column; gap: 1.6cqw; }
   .bc__zona { font-size: 1.4cqw; color: rgba(242, 240, 235, .55); }
-  .bc__h { font-size: 3.6cqw; line-height: 1.04; font-weight: 700; letter-spacing: -.035em; }
+  .bc__h { font-size: 3.6cqw; line-height: 1.04; font-weight: 700; letter-spacing: -.035em; text-wrap: balance; }
   .bc__track { display: flex; flex-direction: column; gap: 1.4cqw; padding: 2.4cqw; border-radius: 1.6cqw; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
   .bc__pasos { flex-direction: column; gap: 1.1cqw; margin-top: .6cqw; }
   .bc__lbl { font-size: 1.35cqw; color: rgba(242, 240, 235, .55); }

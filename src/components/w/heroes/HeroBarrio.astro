@@ -100,7 +100,12 @@ const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/p
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 32px;
     padding-top: 32px;
   }
-  @media (min-width: 768px) and (max-height: 820px) { .hb__escena { gap: 22px; padding-top: 22px; } }
+  @media (min-width: 768px) and (max-height: 820px) {
+    .hb__escena { gap: 22px; padding-top: 22px; }
+    /* Doral en portátiles bajos (1366×768): la píldora cede su sitio para que se lea el titular y el
+       rastreo de la web; la historia la sigue contando el cambio ES | EN de la propia web. */
+    .hb--franjas :global(.hb__pf) { display: none; }
+  }
   .hb__pf { position: relative; z-index: 2; flex: 0 0 auto; }
   .hb__prod { position: relative; flex: 0 0 auto; width: min(100%, 440px); }
 
@@ -113,7 +118,7 @@ const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/p
   /* velo arriba para que el texto se lea igual de noche que al amanecer */
   .hb__paisaje::after { content: ''; position: absolute; inset: 0; background:
       radial-gradient(900px 480px at 50% 32%, rgba(5, 7, 15, .48), rgba(5, 7, 15, 0) 72%),
-      linear-gradient(180deg, rgba(5, 7, 15, .5) 0%, rgba(5, 7, 15, .34) 44%, rgba(5, 7, 15, .22) 54%, rgba(5, 7, 15, 0) 64%); }
+      linear-gradient(180deg, rgba(5, 7, 15, .5) 0%, rgba(5, 7, 15, .38) 44%, rgba(5, 7, 15, .28) 54%, rgba(5, 7, 15, 0) 64%); }
   /* el enlace secundario lleva una sombra suave para leerse sobre el amanecer */
   .hb--paisaje :global(.btn--link) { text-shadow: 0 1px 12px rgba(5, 7, 15, .75), 0 0 2px rgba(5, 7, 15, .6); }
   .hb__p--alba { opacity: 0; transition: opacity 1.6s ease; }
@@ -163,8 +168,8 @@ const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/p
   .hb__lado b { color: var(--w-ink); font-weight: 600; }
   .hb__lado-wa { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #6fd3a4; }
   .hb__lado-wa :global(svg) { width: 13px; height: 13px; }
-  .hb__lado--1 { right: calc(100% + 56px); top: 4%; transform: rotate(-2deg); }
-  .hb__lado--2 { left: calc(100% + 56px); top: 14%; transform: rotate(2deg); }
+  .hb__lado--1 { right: calc(100% + 56px); top: 4%; }
+  .hb__lado--2 { left: calc(100% + 56px); top: 14%; }
   @media (max-width: 1100px) { .hb__lado { display: none; } }
 
   /* ── teléfono: la portada sigue midiendo la pantalla; el objeto se adapta a lo que queda ── */
@@ -174,7 +179,10 @@ const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/p
     .hb--franjas .hb__prod, .hb--bruma .hb__prod--chat { width: 100%; }
     .hb__laptop { padding-top: 28px; }
     .hb__laptop { justify-content: center; }
-    .hb__laptop > :global(.ep) { width: 170vw; flex: 0 0 auto; }
+    .hb__laptop > :global(.ep) { width: 145vw; flex: 0 0 auto; }
+    /* la píldora en dos líneas compactas, no en una tarjeta de tres */
+    .hb :global(.hb__pf) { flex-direction: row !important; border-radius: 14px !important; font-size: 12.5px !important; gap: 4px 8px !important; padding: 7px 12px !important; }
+    .hb :global(.hb__pf .wo-pf__ar) { display: none !important; } /* sin flechas sueltas al final de línea */
     .hb__laptop--planeta { padding-top: 56px; }
     /* en vertical el paisaje se alarga hacia abajo para que el horizonte quede detrás del portátil */
     .hb__p img { height: 124%; }

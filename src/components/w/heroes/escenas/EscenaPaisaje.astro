@@ -34,8 +34,8 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
     <div class="ep__capa" aria-hidden="true">
       {(['noche', 'alba'] as const).map((m) => (
         <picture class:list={['ep__cp', `ep__cp--${m}`]}>
-          <source type="image/avif" srcset={capa(m, 'avif')} sizes="(max-width: 767px) 660vw, 280vw" />
-          <img src={`/assets/w/paisajes/katy-capa-${m}-2400.webp`} srcset={capa(m, 'webp')} sizes="(max-width: 767px) 660vw, 280vw" alt="" width="4800" height="940" decoding="async" fetchpriority={m === 'noche' ? 'high' : 'low'} />
+          <source type="image/avif" srcset={capa(m, 'avif')} sizes="(max-width: 767px) 680vw, 280vw" />
+          <img src={`/assets/w/paisajes/katy-capa-${m}-2400.webp`} srcset={capa(m, 'webp')} sizes="(max-width: 767px) 680vw, 280vw" alt="" width="4800" height="940" decoding="async" fetchpriority={m === 'noche' ? 'high' : 'low'} />
         </picture>
       ))}
     </div>
@@ -43,7 +43,7 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
   <div class="ep__pt" data-nosnippet>
     <Portatil ancho={1180} base={false} transparente>
       <Escritorio lang={lang} dock={false} fondo={false} app={D.app} fase="escritorio" hora="5:48 a. m." horaDia="6:12 a. m.">
-        <VentanaApp id="web" url={`${D.url} · Ejemplo`} x={239} y={74} w={900} h={640} z={2} estado="lista" on={true}>
+        <VentanaApp id="web" url={`${D.url} · Ejemplo`} x={96} y={74} w={900} h={640} z={2} estado="lista" on={true}>
           {web === 'clinica' ? <WebClinica /> : <WebTaller />}
         </VentanaApp>
         <div class="ep__aviso" data-ep-aviso>
@@ -103,7 +103,8 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
   .ep :global([data-w2-ventana="web"]) { transition: opacity .6s ease, transform .6s cubic-bezier(.22, 1, .36, 1); }
   .ep.is-prep:not(.is-abierta) :global([data-w2-ventana="web"]) { opacity: 0; transform: scale(.96) translateY(12px); }
   /* barra de menús oscura y translúcida sobre el paisaje */
-  .ep :global(.esc-menu) { background: rgba(8, 10, 16, .45); }
+  .ep :global(.esc-menu) { background: rgba(8, 10, 16, .5); }
+  .ep--taller :global(.esc-menu) { background: rgba(8, 10, 16, .62); }
 
   /* Katy: capa anclada al portátil. Unidades de la capa: L = ancho del portátil = 1200 px fuente;
      la capa mide 4L y la tapa empieza en y = 260 px fuente (21,67 % de L). */
@@ -116,10 +117,11 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
 
   /* aviso del negocio (px de la pantalla fuente: a 1440 se ve a ~0,6) */
   .ep__aviso {
-    position: absolute; top: 48px; right: 22px; z-index: 40; width: 420px;
+    /* en el hueco de fondo de pantalla a la derecha de la ventana: no tapa nada de la web */
+    position: absolute; top: 96px; right: 16px; z-index: 40; width: 344px;
     display: grid; grid-template-columns: 46px 1fr auto; gap: 14px; align-items: center;
     padding: 16px 18px; border-radius: 20px;
-    background: rgba(246, 246, 248, .92); color: #1d1d1f;
+    background: #f5f5f7; color: #1d1d1f;
     box-shadow: 0 0 0 .5px rgba(0, 0, 0, .12), 0 18px 40px -12px rgba(0, 0, 0, .45);
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
@@ -133,8 +135,12 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
   .ep__av-txt em { font-style: normal; color: #5f5f66; font-size: 18px; }
   .ep__ahora { align-self: start; font-size: 15px; color: #8e8e93; }
   /* teléfono: el portátil desborda por los lados; el aviso se centra en la parte visible */
+  /* teléfono: el portátil desborda por los lados. La ventana vuelve al centro y baja para dejar,
+     entre la barra y la ventana, el hueco del aviso; la barra de menús no enseña palabras cortadas. */
   @media (max-width: 767.98px) {
-    .ep__aviso { right: auto; left: 50%; translate: -50% 0; }
+    .ep :global([data-w2-ventana="web"]) { left: 239px !important; top: 176px !important; }
+    .ep__aviso { top: 52px; right: auto; left: 50%; translate: -50% 0; width: 420px; }
+    .ep :global(.esc-menu-izq), .ep :global(.esc-menu-der) { visibility: hidden; }
   }
   @media (prefers-reduced-motion: reduce) {
     .ep__pt, .ep__aviso, .ep__cp--alba, .ep :global([data-w2-ventana="web"]) { transition: none; }

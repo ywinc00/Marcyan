@@ -298,4 +298,20 @@ export const casos = [
       return r;
     },
   },
+  {
+    // Agenda (2026-11-07): quiere hablarlo por teléfono → la cajita de cita, sin horarios inventados.
+    id: 'agendar-llamada-es', lang: 'es',
+    titulo: 'Pide hablarlo en una llamada: abre la cajita de cita y no inventa horarios',
+    messages: [
+      u('Tengo una constructora en Houston y quiero una web nueva con cotizador.'),
+      a('¡Qué buen proyecto! Un sitio con cotizador ayuda mucho a filtrar clientes. ¿Cuántos servicios ofreces y en qué zonas trabajas?'),
+      u('Son varios servicios, prefiero explicártelo por teléfono. ¿Podemos agendar una llamada?'),
+    ],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!action || action.type !== 'capture' || action.destino !== 'cita') r.push('no abrió la cajita de cita (acción: ' + JSON.stringify(action) + ')');
+      if (/\b\d{1,2}(:\d{2})?\s?(am|pm|a\.m\.|p\.m\.)/i.test(reply)) r.push('propone horas concretas');
+      return r;
+    },
+  },
 ];

@@ -655,8 +655,12 @@ const destinos = {
         else { set('--pp-tl', tl + (T - tapaW) / 2); set('--pp-tw', tapaW); }
         set('--pp-tt', tt); set('--pp-th', Th);
       };
-      medirViaje();
-      document.fonts?.ready.then(() => { medirViaje(); if (location.hash === '#proyectos' && ancla) requestAnimationFrame(() => ancla.scrollIntoView()); });
+      // Las medidas (fuerzan maquetación) se hacen cuando el tramo se acerca, no en la carga.
+      // Con #proyectos en la dirección se mide ya, para que el salto caiga en su sitio.
+      const conHash = location.hash === '#proyectos';
+      const primera = () => document.fonts?.ready.then(() => { medirViaje(); if (conHash && ancla) requestAnimationFrame(() => ancla.scrollIntoView()); }) ?? medirViaje();
+      if (conHash) primera();
+      else { const ioM = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { ioM.disconnect(); primera(); } }, { rootMargin: '1500px 0px' }); ioM.observe(tramo); }
       let tMed = 0, wMed = innerWidth, hMed = innerHeight;
       addEventListener('resize', () => {
         clearTimeout(tMed);

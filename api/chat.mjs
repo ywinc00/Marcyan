@@ -506,8 +506,15 @@ async function runInternalTool(toolUse, { lang, ip, sid }) {
     if (!url) return FAIL_RESULT;
     const name = typeof inp.nombre_negocio === 'string' ? inp.nombre_negocio.trim().slice(0, 120) : '';
     const city = typeof inp.ciudad === 'string' ? inp.ciudad.trim().slice(0, 80) : '';
-    try { return await withTimeout(reviewSite(url, lang, { name, city }), 9000, 'site review'); }
+    let out;
+    try { out = await withTimeout(reviewSite(url, lang, { name, city }), 9000, 'site review'); }
     catch { return FAIL_RESULT; }                                   // timeout/error → silencioso
+    // Web real y revisada: la velocidad de Google se mide en segundo plano y Marcy
+    // la recibe en el siguiente turno (lib/site-speed.mjs). Import dinámico: sin base aquí.
+    if (out !== FAIL_RESULT && sid) {
+      try { const { startSiteSpeed } = await import('../lib/site-speed.mjs'); await startSiteSpeed({ sid, url, lang }); } catch {}
+    }
+    return out;
   }
   return FAIL_RESULT;
 }
@@ -584,9 +591,42 @@ export default async function handler(req, res) {
     if (t.tagged) { messages.splice(0, messages.length, ...t.messages); ownerCtx = OWNER_CONTEXT; }
   }
 
-  const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
+  // Velocidad de Google medida en segundo plano tras revisar su web: llega una vez.
+  if (messages.length > 1) {
+    try {
+      const { takeSiteSpeed } = await import('../lib/site-speed.mjs');
+      const sp = await takeSiteSpeed(sid);
+      if (sp) ownerCtx = ownerCtx ? `${ownerCtx}\n\n${sp}` : sp;
+    } catch {}
+  }
 
   try {
+    const t = await marcyTurn({ messages, lang, sid, ip, extraContext: ownerCtx });
+    // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro });
+    return res.status(200).json(t.action ? { reply: t.reply, action: t.action } : { reply: t.reply });
+  } catch (err) {
+    // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
+    console.error('[chat] anthropic error:', err && err.message);
+    await recordFailure();
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: M.fallback, fallback: true });
+    return res.status(200).json({ reply: M.fallback });
+  }
+}
+
+// ── Un turno de Marcy (el mismo cerebro para todos los canales) ──────────
+// Web, WhatsApp, Instagram y teléfono llaman aquí. Devuelve la respuesta ya
+// filtrada (marca y precios) y la acción de interfaz pedida, o lanza si la IA
+// falla (cada canal decide su mensaje de respaldo). `extraContext` va detrás de
+// la marca de caché (canal, dueño); `tools` y `extraInternal` los pone el canal
+// (p. ej. agendar por texto en WhatsApp). Cuenta el coste del día (P2); el
+// registro del turno lo hace quien llama, con su canal.
+export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraContext = null, tools = CHAT_TOOLS, extraInternal = null }) {
+  const M = MESSAGES[lang] || MESSAGES.es;
+  const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
+  const isInternal = (name) => INTERNAL_TOOLS.has(name) || !!(extraInternal && extraInternal.names.has(name));
+
+  {
     const client = new Anthropic({ maxRetries: 1, timeout: 20000 }); // lee ANTHROPIC_API_KEY del env
 
     // Parámetros comunes a las 2 llamadas (mismo prefijo system+tools → cache-friendly).
@@ -597,11 +637,11 @@ export default async function handler(req, res) {
       // + idioma de la página DETRÁS de la marca de caché (no rompe el prefijo cacheado).
       system: [
         { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
-        { type: 'text', text: langContext(lang) + (ownerCtx ? '\n\n' + ownerCtx : '') },
+        { type: 'text', text: langContext(lang) + (extraContext ? '\n\n' + extraContext : '') },
       ],
       // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
       // tool_choice = auto (omitido) → el modelo decide cuándo.
-      tools: CHAT_TOOLS,
+      tools,
       // Thinking ADAPTATIVO con esfuerzo bajo (v8). Antes iba 'disabled' por latencia,
       // pero la doc oficial de Sonnet 5 lo desaconseja para harneses con tools: con
       // thinking apagado el modelo dispara menos las herramientas y lee peor el turno
@@ -627,9 +667,13 @@ export default async function handler(req, res) {
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
     const toolUses = (Array.isArray(r1.content) ? r1.content : []).filter((b) => b && b.type === 'tool_use');
-    const internal = toolUses.find((b) => INTERNAL_TOOLS.has(b.name));
+    const internal = toolUses.find((b) => isInternal(b.name));
+    const extraTools = [];
+    const extraResps = [];
     if (internal) {
-      const out = await runInternalTool(internal, { lang, ip, sid });
+      const out = extraInternal && extraInternal.names.has(internal.name)
+        ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
+        : await runInternalTool(internal, { lang, ip, sid });
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
@@ -655,6 +699,32 @@ export default async function handler(req, res) {
         16000,
         'anthropic2'
       );
+      // Canales de texto: agendar necesita consultar horas y reservar en el MISMO turno
+      // (el historial guardado solo tiene texto, no los códigos de las horas). Solo ahí
+      // se permite UNA vuelta más, y solo con las herramientas de agendar.
+      const second = extraInternal && (Array.isArray(finalResp.content) ? finalResp.content : [])
+        .filter((b) => b && b.type === 'tool_use');
+      const again = second && second.find((b) => extraInternal.names.has(b.name));
+      if (again) {
+        const out2 = await extraInternal.run(again).catch(() => FAIL_RESULT);
+        extraTools.push(again.name);
+        const prev = finalResp;
+        extraResps.push(prev);
+        finalResp = await withTimeout(
+          client.messages.create({
+            ...baseParams,
+            messages: [
+              ...messages,
+              { role: 'assistant', content: r1.content },
+              { role: 'user', content: toolResults },
+              { role: 'assistant', content: prev.content },
+              { role: 'user', content: second.map((b) => ({ type: 'tool_result', tool_use_id: b.id, content: b.id === again.id ? out2.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }) })) },
+            ],
+          }, modelRequestOptions(model)),
+          16000,
+          'anthropic3'
+        );
+      }
     }
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
@@ -678,25 +748,17 @@ export default async function handler(req, res) {
     const fallback = !text || reply !== beforePrice;
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
-    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, finalResp]);
+    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, ...extraResps, finalResp]);
     const costMicro = turnCostMicroUsd(model, usage);
     const firstTurn = messages.length === 1;
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
-    // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
-    await Promise.all([
-      recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro }),
-      recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply, action, tool: internal ? internal.name : null, cortadas, fallback, costMicro }),
-    ]);
+    await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
-    return res.status(200).json(action ? { reply, action } : { reply });
-  } catch (err) {
-    // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
-    console.error('[chat] anthropic error:', err && err.message);
-    await recordFailure();
-    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: M.fallback, fallback: true });
-    return res.status(200).json({ reply: M.fallback });
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model };
   }
 }
+
+export { recordFailure as recordChatFailure };
 
 // Último mensaje del visitante (texto) para el historial de Orbit.
 export function lastUserText(messages) {

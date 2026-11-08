@@ -13,6 +13,23 @@ import { requireAdmin } from '../../lib/auth.mjs';
 import { listConversations, getConversation, monthlySpend, monthFunnel } from '../../lib/chat-log.mjs';
 import { setTakeover, recordOwnerMessage } from '../../lib/takeover.mjs';
 
+// Manda por WhatsApp o Instagram lo que escribe el dueño. null = canal web (nada que mandar).
+async function sendOwnerByChannel(sid, text) {
+  const { sql } = await import('@vercel/postgres');
+  let c;
+  try { c = (await sql`SELECT channel, contact FROM chat_conversations WHERE sid = ${sid}`).rows[0]; } catch { return null; }
+  if (!c || !['whatsapp', 'instagram'].includes(c.channel) || !c.contact) return null;
+  try {
+    const { ADAPTERS } = await import('../../lib/channel-runtime.mjs');
+    await ADAPTERS[c.channel].send(c.contact, String(text || '').trim().slice(0, 2000));
+    return { ok: true };
+  } catch (err) {
+    console.error('[admin/marcy] envío por canal fallido', err && err.message);
+    const w = c.channel === 'whatsapp' ? 'WhatsApp' : 'Instagram';
+    return { ok: false, error: err && /24|window|re-engagement|131047/i.test(err.message) ? `${w} ya no deja escribirle: pasaron más de 24 h desde su último mensaje. Contesta desde la app.` : `No salió por ${w}. Quedó guardado; prueba de nuevo o contesta desde la app.` };
+  }
+}
+
 const missing = (err) => err && (err.code === '42P01' || /does not exist/i.test(err.message || ''));
 
 export default async function handler(req, res) {
@@ -28,7 +45,11 @@ export default async function handler(req, res) {
       }
       if (b.action === 'enviar') {
         const row = await recordOwnerMessage({ sid, text: b.text });
-        return row ? res.status(200).json({ ok: true, turno: row }) : res.status(409).json({ ok: false, error: 'Primero toma la conversación' });
+        if (!row) return res.status(409).json({ ok: false, error: 'Primero toma la conversación' });
+        // WhatsApp e Instagram: el mensaje del dueño sale por el mismo canal (en la web lo recoge el widget).
+        const sent = await sendOwnerByChannel(sid, b.text);
+        if (sent && !sent.ok) return res.status(502).json({ ok: false, error: sent.error, turno: row });
+        return res.status(200).json({ ok: true, turno: row });
       }
       return res.status(400).json({ ok: false, error: 'Acción no válida' });
     } catch (err) {

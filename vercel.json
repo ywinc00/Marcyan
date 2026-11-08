@@ -111,6 +111,7 @@
   },
   "crons": [
     { "path": "/api/cron/brief-cleanup", "schedule": "40 9 * * *" },
-    { "path": "/api/cron/seo-sync", "schedule": "0 9 * * *" }
+    { "path": "/api/cron/seo-sync", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/mail", "schedule": "*/10 * * * *" }
   ]
 }

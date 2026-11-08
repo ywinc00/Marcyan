@@ -24,6 +24,7 @@
   import MarcyCitas from './MarcyCitas.svelte';
   import { toast } from './lib/toast.svelte.js';
   import MarcyCorreo from './MarcyCorreo.svelte';
+  import ConfirmDialog from './ui/ConfirmDialog.svelte';
 
   const POLL_MS = 5000;
 
@@ -134,6 +135,23 @@
       await loadConv(conv.sid, { quiet: true });
     } catch (e) { if (!isSessionError(e)) toast(errorMessage(e), { tone: 'error' }); }
     finally { tomoBusy = false; }
+  }
+
+  // Borrar (pruebas o spam): la conversación, y si se marca, su lead y su cita.
+  let delOpen = $state(false);
+  let delLead = $state(true);
+  let delBusy = $state(false);
+  async function borrar() {
+    if (!conv || delBusy) return;
+    delBusy = true;
+    try {
+      const j = await api('/api/admin/marcy', { method: 'DELETE', body: { sid: conv.sid, conLead: !!conv.lead_ref && delLead } });
+      delOpen = false;
+      toast(j.lead ? `Conversación y ${j.lead} borrados` : 'Conversación borrada');
+      back();
+      await loadList({ quiet: true });
+    } catch (e) { if (!isSessionError(e)) toast(errorMessage(e, 'No se pudo borrar.'), { tone: 'error' }); }
+    finally { delBusy = false; }
   }
 
   function pickFilter(id) { setQuery({ ...q, f: id || '', paso: '', motivo: '' }); }
@@ -367,9 +385,21 @@
             {#if conv.lead_ref}<dt>Registro</dt><dd>{#if leadHref(conv.lead_ref)}<a href={leadHref(conv.lead_ref)}>{conv.lead_ref}</a>{:else}{conv.lead_ref}{/if}</dd>{/if}
           </dl>
         </div>
+        <div class="rail__del">
+          <button type="button" class="b b--danger" onclick={() => { delLead = true; delOpen = true; }}><Icon name="trash" size={16} />Borrar conversación</button>
+          <span class="muted small">Para pruebas o spam.</span>
+        </div>
       {/if}
     </aside>
   </section>
+  {#if conv}
+    <ConfirmDialog bind:open={delOpen} title="Borrar conversación" confirmLabel="Borrar para siempre" busy={delBusy} onconfirm={borrar}
+      message={`Se borrarán los ${conv.turnos.length} mensajes de esta conversación${conv.contact ? ' con ' + (conv.contact_name || conv.contact) : ''}. No se puede deshacer.`}>
+      {#if conv.lead_ref && /^LEAD-/i.test(conv.lead_ref)}
+        <label class="del-check"><input type="checkbox" bind:checked={delLead} disabled={delBusy} /> Borrar también {conv.lead_ref} y sus citas</label>
+      {/if}
+    </ConfirmDialog>
+  {/if}
 {/if}
 
 <style>
@@ -466,6 +496,8 @@
   .steps i { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--fg-faint); flex: none; }
   .steps li.done { color: var(--fg-primary); }
   .steps li.done i { background: var(--accent-teal); border-color: var(--accent-teal); }
+  .rail__del { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .del-check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: var(--dash-small); color: var(--fg-secondary); cursor: pointer; }
   .kv { display: grid; grid-template-columns: 110px 1fr; gap: 7px 10px; margin: 0; font-size: var(--dash-small); }
   .kv dt { color: var(--fg-subtle); }
   .kv dd { margin: 0; overflow-wrap: anywhere; }

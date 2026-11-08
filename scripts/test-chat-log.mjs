@@ -1,6 +1,6 @@
 // Pruebas del registro de conversaciones de Marcy para Orbit (sin base: sql simulado).
 import assert from 'node:assert/strict';
-import { recordTurn, linkLead, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
+import { recordTurn, linkLead, deleteConversation, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
 import { applyFilter, funnelSteps, motivosOrdenados, recorrido, leadHref, usd } from '../src/components/dashboard/lib/marcy.js';
 import { lastUserText } from '../api/chat.mjs';
 
@@ -119,6 +119,36 @@ await check('orbit: recorrido de venta desde los turnos', () => {
 await check('orbit: enlaces al lead o al brief y dinero', () => {
   assert.equal(leadHref('LEAD-12'), '#/leads/LEAD-12'); assert.equal(leadHref('MRC-3'), '#/briefs/MRC-3'); assert.equal(leadHref(null), '');
   assert.equal(usd(31000, 3), '$0.031');
+});
+
+// Borrar a mano desde Orbit: qué tablas toca según la casilla del lead.
+function convSql(leadRef) {
+  const calls = [];
+  const sql = async (strings, ...values) => {
+    const text = strings.join('?'); calls.push(text);
+    if (/^SELECT sid, lead_ref/.test(text.trim())) return { rows: leadRef === undefined ? [] : [{ sid: 's', lead_ref: leadRef }], rowCount: 1 };
+    if (/FROM site_speed/.test(text)) { const e = new Error('no table'); e.code = '42P01'; throw e; }
+    return { rows: [], rowCount: 1 };
+  };
+  return { sql, calls };
+}
+await check('borrar: sin la casilla deja el lead y las citas', async () => {
+  const { sql, calls } = convSql('LEAD-9');
+  const out = await deleteConversation('wa-1', { sqlImpl: sql });
+  assert.deepEqual(out, { sid: 'wa-1', lead: null, citas: 0 });
+  assert.ok(!calls.some((t) => /FROM leads|FROM appointments/.test(t)));
+  assert.ok(calls.some((t) => /DELETE FROM channel_inbox/.test(t)) && calls.some((t) => /DELETE FROM chat_conversations/.test(t)));
+});
+await check('borrar: con la casilla se van el lead y sus citas; un brief nunca', async () => {
+  const a = convSql('LEAD-9');
+  assert.deepEqual(await deleteConversation('wa-1', { withLead: true, sqlImpl: a.sql }), { sid: 'wa-1', lead: 'LEAD-9', citas: 1 });
+  const b = convSql('MRC-4');
+  const out = await deleteConversation('wa-1', { withLead: true, sqlImpl: b.sql });
+  assert.equal(out.lead, null);
+  assert.ok(!b.calls.some((t) => /FROM leads/.test(t)));
+});
+await check('borrar: conversación que no existe', async () => {
+  assert.equal(await deleteConversation('nada', { sqlImpl: convSql(undefined).sql }), null);
 });
 
 if (fails.length) { console.error(fails.join('\n')); process.exit(1); }

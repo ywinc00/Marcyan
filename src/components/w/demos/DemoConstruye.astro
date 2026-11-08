@@ -29,11 +29,14 @@ interface Props {
   class?: string;
 }
 const { lang, bloque1, bloque2, consola, controles, id, class: cls, city } = Astro.props;
+// v8 (dueño, 2026-11-08): Houston y Miami no enseñan el mismo negocio (Miami: restaurante de cocina de casa).
+const marca = /miami/i.test(city ?? '') ? 'restaurante' : 'plomeria';
 const L = lang === 'en';
 const uid = id ?? `dc-${lang}`;
 const num = (n: number) => String(n).padStart(2, '0');
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-const chip = `<code class="dc-cmd">${esc(consola.comando)}</code>`;
+const comando = marca === 'restaurante' ? consola.comando.replace(/Tu Plomería|Your Plumbing/, lang === 'en' ? 'Your Restaurant' : 'Tu Restaurante') : consola.comando;
+const chip = `<code class="dc-cmd">${esc(comando)}</code>`;
 const texto1 = bloque1.texto.replace('{comando}', chip);
 const sr = L ? 'Example: how we prepare a website, from your brand to a site ready to publish.' : 'Ejemplo: así preparamos una web, de la marca a la web lista para publicar.';
 const ab = L ? { antes: 'Before', despues: 'After', label: 'Compare' } : { antes: 'Antes', despues: 'Después', label: 'Comparar' };
@@ -70,21 +73,21 @@ const [o1, o2, o3] = bloque2.opciones;
     <div class="dc__demo" data-dc-demo>
       <p class="dc-sr">{sr}</p>
       <Personalizador lang={lang} embebido controles={controles} opciones={bloque2.opciones} id={uid}>
-        <ConsolaConstruye slot="consola" comando={consola.comando} bloques={consola.bloques} cierre={consola.cierre} />
+        <ConsolaConstruye slot="consola" comando={comando} bloques={consola.bloques} cierre={consola.cierre} />
         <Fragment slot="maqueta">
           <slot name="maqueta">
-            <WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" lang={lang} />
+            <WebEjemplo city={city} marca={marca} frame="tarjeta" vista="completa" lang={lang} />
           </slot>
         </Fragment>
         <div slot="capa" class="dc-sk" aria-hidden="true" data-dc-sk>
           <div class="dc-sk__in" data-dc-sk-in>
-            <WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="esqueleto" lang={lang} ejemplo={false} />
+            <WebEjemplo city={city} marca={marca} frame="tarjeta" vista="completa" estado="esqueleto" lang={lang} ejemplo={false} />
           </div>
         </div>
         {o2 && (
           <div slot={`opcion-${o2.id}`} class="dc-ab" data-dc-ab data-i="0">
-            <div class="dc-ab__v is-on" data-dc-ab-v="0"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="antes" lang={lang} /></div>
-            <div class="dc-ab__v" data-dc-ab-v="1"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" estado="lista" lang={lang} /></div>
+            <div class="dc-ab__v is-on" data-dc-ab-v="0"><WebEjemplo city={city} marca={marca} frame="tarjeta" vista="completa" estado="antes" lang={lang} /></div>
+            <div class="dc-ab__v" data-dc-ab-v="1"><WebEjemplo city={city} marca={marca} frame="tarjeta" vista="completa" estado="lista" lang={lang} /></div>
             <div class="dc-ab__seg" role="radiogroup" aria-label={ab.label} data-dc-ab-g>
               <span class="dc-ab__pill" aria-hidden="true"></span>
               <button type="button" role="radio" aria-checked="true" tabindex="0" data-dc-ab-i="0">{ab.antes}</button>
@@ -94,9 +97,9 @@ const [o1, o2, o3] = bloque2.opciones;
         )}
         {o3 && (
           <div slot={`opcion-${o3.id}`} class="dc-fan">
-            <div class="dc-fan__s dc-fan__s--l"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="hero" pagina="servicios" lang={lang} ejemplo={false} /></div>
-            <div class="dc-fan__s dc-fan__s--r"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="hero" pagina="contacto" lang={lang} ejemplo={false} /></div>
-            <div class="dc-fan__c"><WebEjemplo city={city} marca="plomeria" frame="tarjeta" vista="completa" pagina="inicio" lang={lang} /></div>
+            <div class="dc-fan__s dc-fan__s--l"><WebEjemplo city={city} marca={marca} frame="tarjeta" vista="hero" pagina="servicios" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__s dc-fan__s--r"><WebEjemplo city={city} marca={marca} frame="tarjeta" vista="hero" pagina="contacto" lang={lang} ejemplo={false} /></div>
+            <div class="dc-fan__c"><WebEjemplo city={city} marca={marca} frame="tarjeta" vista="completa" pagina="inicio" lang={lang} /></div>
           </div>
         )}
         <p slot="leyenda" class="dc-leg" aria-hidden="true" data-dc-leg>

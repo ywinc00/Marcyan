@@ -222,10 +222,37 @@ export const negocios: Record<NegocioId, Negocio> = {
         bg: '#EFEDEA', ink: '#1A1A1A', ink2: '#4F4D4A', accent: '#8C3B2B', onAccent: '#FBF4F2',
         noche: { bg: '#121212', ink: '#EDEBE8', ink2: '#A7A4A0', accent: '#E39482', onAccent: '#200D09' } },
     ],
-    logo: 'restaurante', boton: 'outline', radio: 2, telefono: '(281) 555-0163',
+    logo: 'restaurante', boton: 'outline', radio: 2, telefono: '(305) 555-0163',
+    // v8 (2026-11-08): textos completos para que diseño web en Miami tenga su propio negocio (no la plomería de Houston).
     textos: {
-      es: { titular: 'Cocina de casa, hoy.', accion: 'Ver la carta', abierto: 'Hoy desde 11 a. m.' },
-      en: { titular: 'Home cooking, today.', accion: 'See the menu', abierto: 'Today from 11 AM' },
+      es: {
+        antetitulo: 'Cocina de casa en {city}', titular: 'Cocina de casa, hoy.', bajada: 'Almuerzo y cena con receta de familia. Para comer aquí o llevar.',
+        accion: 'Ver la carta', abierto: 'Hoy desde 11 a. m.',
+        nav: ['Carta', 'Encargos', 'Contacto'], garantias: ['Hecho al día', 'Encargos para grupos', 'Español e inglés'],
+        servicios: { rotulo: 'La carta', titulo: 'Lo de siempre', intro: 'Lo que más piden en {city}.', filas: [
+          { t: 'Ropa vieja', d: 'Con arroz, frijoles y maduros' },
+          { t: 'Pollo asado', d: 'Al mojo, con yuca' },
+          { t: 'Encargos', d: 'Bandejas para fiestas y oficinas' },
+        ], accionFila: 'Pedir' },
+        contacto: { titulo: 'Reserva o encarga.', intro: 'Dinos para cuántos y a qué hora, y te lo tenemos listo.', horario: [
+          { d: 'Lunes a jueves', h: '11:00 a. m. a 10:00 p. m.' }, { d: 'Viernes y sábado', h: '11:00 a. m. a 11:00 p. m.' }, { d: 'Domingo', h: '11:00 a. m. a 9:00 p. m.' },
+        ], campos: ['Nombre', 'Teléfono', '¿Para cuántos?'], enviar: 'Enviar', zona: '{city}' },
+        antes: { bienvenida: 'Bienvenidos a Tu Restaurante', texto: 'Somos un restaurante familiar en {city}. Ofrecemos comida casera, almuerzos, cenas y servicio de encargos para eventos. Nuestro menú tiene platos para todos los gustos. Visítenos o llámenos para más información.', llamada: '¡Visítenos hoy!', nav: ['Inicio', 'Nosotros', 'Menú', 'Galería', 'Contacto'], pie: '© Tu Restaurante. Todos los derechos reservados.' },
+      },
+      en: {
+        antetitulo: 'Home cooking in {city}', titular: 'Home cooking, today.', bajada: 'Lunch and dinner from family recipes. Dine in or take out.',
+        accion: 'See the menu', abierto: 'Today from 11 AM',
+        nav: ['Menu', 'Catering', 'Contact'], garantias: ['Made fresh daily', 'Group catering', 'Spanish and English'],
+        servicios: { rotulo: 'The menu', titulo: 'The usuals', intro: 'What {city} orders most.', filas: [
+          { t: 'Ropa vieja', d: 'With rice, beans and plantains' },
+          { t: 'Roast chicken', d: 'Mojo style, with yuca' },
+          { t: 'Catering', d: 'Trays for parties and offices' },
+        ], accionFila: 'Order' },
+        contacto: { titulo: 'Book or order ahead.', intro: 'Tell us how many and what time, and we will have it ready.', horario: [
+          { d: 'Monday to Thursday', h: '11:00 AM to 10:00 PM' }, { d: 'Friday and Saturday', h: '11:00 AM to 11:00 PM' }, { d: 'Sunday', h: '11:00 AM to 9:00 PM' },
+        ], campos: ['Name', 'Phone', 'How many?'], enviar: 'Send', zona: '{city}' },
+        antes: { bienvenida: 'Welcome to Your Restaurant', texto: 'We are a family restaurant in {city}. We offer home cooking, lunch, dinner and catering for events. Our menu has dishes for every taste. Visit us or call us for more information.', llamada: 'Visit us today!', nav: ['Home', 'About', 'Menu', 'Gallery', 'Contact'], pie: '© Your Restaurant. All rights reserved.' },
+      },
     },
   },
 

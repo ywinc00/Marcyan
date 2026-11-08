@@ -1,3 +1,4 @@
+import { zrect, zoom } from '../zoom';
 // ─────────────────────────────────────────────────────────────
 // Motor de DemoConstruye + Personalizador (P01 · design/rediseno-workos-v2.md §2 P01, §1.5, §1.7).
 //
@@ -120,7 +121,7 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
     if (!t) return;
     // Marco de selección ajustado a la pieza (2 px de aire) con su mismo radio; el rótulo va encima
     // (en el hueco sobre la pieza) y, si la pieza llega al borde de la bandeja, por dentro.
-    const r = t.getBoundingClientRect(); const b = tray.getBoundingClientRect();
+    const r = zrect(t); const b = zrect(tray);
     const pad = g === 'marcos' ? 0 : 2;
     tag.style.left = `${Math.round(r.left - b.left - pad)}px`;
     tag.style.top = `${Math.round(r.top - b.top - pad)}px`;
@@ -226,8 +227,9 @@ function montarPz(pz: HTMLElement, pieza: HTMLElement, activo: () => boolean): P
     const opts = $$(grupo, '[role="radio"]');
     const i = (estado[g] + 1) % opts.length;
     const b = opts[i];
-    const base = (ghost.offsetParent as HTMLElement | null)?.getBoundingClientRect();
-    const r = b.getBoundingClientRect();
+    const op = ghost.offsetParent as HTMLElement | null;
+    const base = op ? zrect(op) : null;
+    const r = zrect(b);
     if (!base) return;
     ghost.style.transform = `translate(${Math.round(r.left - base.left + r.width / 2 - 3)}px, ${Math.round(r.top - base.top + r.height / 2 - 2)}px)`;
     ghost.classList.add('is-on');

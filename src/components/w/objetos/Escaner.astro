@@ -108,6 +108,7 @@ const sr = en
 </div>
 
 <script>
+  import { zrect, zoom } from '../zoom';
   import { registerLoop } from '../loop';
 
   const rectsOverlap = (a: DOMRect, b: DOMRect) =>
@@ -183,13 +184,13 @@ const sr = en
       };
       const obstacles = [el.querySelector('.w-example'), host.querySelector('.w-loop-pause')]
         .filter((o): o is Element => !!o && !(o as HTMLElement).hidden)
-        .map((o) => { const r = o.getBoundingClientRect(); return new DOMRect(r.left - 6, r.top - 6, r.width + 12, r.height + 12); });
+        .map((o) => { const r = zrect(o); return new DOMRect(r.left - 6, r.top - 6, r.width + 12, r.height + 12); });
 
       // 1) lados de la caja (lo más nítido), fila a fila: izquierda y derecha.
       const lados = rows.filter((r) => r.classList.contains('wo-scan__row--lados'));
       for (const r of lados) {
         for (const side of r.querySelectorAll<HTMLElement>('.wo-scan__lado')) {
-          const sr = side.getBoundingClientRect();
+          const sr = zrect(side);
           const k = Math.max(1, Math.round(sr.width / cap));
           const colW = Math.floor((sr.width - (k - 1) * gap) / k);
           for (let j = 0; j < k; j++) {
@@ -209,7 +210,7 @@ const sr = en
       //    par (chip a chip) para que arriba y abajo queden equilibradas.
       const anchas = rows.filter((r) => r.classList.contains('wo-scan__row--ancha'));
       const fila = (r: HTMLElement) => {
-        const rr = r.getBoundingClientRect();
+        const rr = zrect(r);
         const cs = getComputedStyle(r);
         const left = rr.left + parseFloat(cs.paddingLeft);
         let right = rr.right - parseFloat(cs.paddingRight);
@@ -242,11 +243,11 @@ const sr = en
         f.chips.forEach((c) => { c.s.style.width = `${Math.floor(c.w + extra)}px`; });
       }
 
-      const card = el.getBoundingClientRect();
+      const card = zrect(el);
       candidates = [];
       for (const { s } of all) {
         if (!s.isConnected) continue;
-        const r = s.getBoundingClientRect();
+        const r = zrect(s);
         const cx = (r.left + r.right) / 2 - (card.left + card.width / 2);
         const cy = (r.top + r.bottom) / 2 - (card.top + card.height / 2);
         // a encender: dentro de la zona nítida (la máscara funde la derecha y los bordes)

@@ -21,8 +21,19 @@ html {
 }
 @media (--motion-reduce) { html { scroll-behavior: auto; } }
 
+/* Pantallas grandes (TV, 2K, 4K; dueño, 2026-11-07): el sitio entero se amplía en proporción, como
+   en un portátil pero más grande, en vez de quedarse en una columna de 1280 px perdida en el centro.
+   Ninguna pieza cambia de forma: crecen juntas letra, objetos, márgenes y arte. Ancho efectivo
+   siempre ≥1536 px. Las alturas en vh/svh se dividen por --z (con zoom, 100vh medía más que la
+   pantalla y las portadas se iban por debajo). */
+:root { --z: 1; }
+@media (min-width: 1920px) { :root { --z: 1.25; } }
+@media (min-width: 2400px) { :root { --z: 1.6; } }
+@media (min-width: 3200px) { :root { --z: 2.1; } }
+html { zoom: var(--z); }
+
 body {
-  min-height: 100svh;
+  min-height: calc(100svh / var(--z, 1));
   background: var(--bg-base);
   color: var(--fg-primary);
   font-family: var(--font-body);

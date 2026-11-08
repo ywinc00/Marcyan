@@ -202,7 +202,7 @@ const destinos = {
          navegación: el ancho del portátil se limita por el alto de la ventana. Alto
          del portátil ≈ 0,638 × su ancho (tapa 1/1,08 × 933/1415 + base 2,75 %).
          --abre-cabh = alto del titular con su aire (lo mide el script; 220 sin JS). */
-      --abre-wv: max(600px, calc((100svh - var(--nav-h, 72px) - 24px - var(--abre-cabh, 220px) - 20px) / .638));
+      --abre-wv: max(600px, calc((calc(100svh / var(--z, 1)) - var(--nav-h, 72px) - 24px - var(--abre-cabh, 220px) - 20px) / .638));
     }
     .abre[data-tapa="scroll"] :global(.pt) { width: min(100%, var(--pt-w), var(--abre-wv)); }
   }
@@ -296,6 +296,7 @@ const destinos = {
 </style>
 
 <script>
+  import { zrect, zoom } from '../zoom';
   import { secuencia, vigilar, reducido, type Secuencia } from './mac';
 
   for (const raiz of document.querySelectorAll<HTMLElement>('[data-w2-abreapps]')) {
@@ -418,7 +419,7 @@ const destinos = {
       const medir = () => {
         medidaW = innerWidth; medidaH = innerHeight;
         raiz.style.removeProperty('--abre-b');
-        const cabh = obj ? Math.round(obj.getBoundingClientRect().top - fijo.getBoundingClientRect().top) : 0;
+        const cabh = obj ? Math.round(zrect(obj).top - zrect(fijo).top) : 0;
         if (cabh > 0) raiz.style.setProperty('--abre-cabh', `${cabh}px`);
         // v3 (E-57 regla 4): también en escritorio. Con el margen de 24 px el portátil se fijaba
         // pegado al borde inferior y la tapa giraba con la pieza a medio encuadrar. Ahora el
@@ -427,12 +428,12 @@ const destinos = {
         {
           const b0 = parseFloat(getComputedStyle(fijo).bottom) || 0;
           const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
-          const hueco = innerHeight - nav - b0 - fijo.offsetHeight;
+          const hueco = innerHeight / zoom() - nav - b0 - fijo.offsetHeight;
           if (hueco > 24) raiz.style.setProperty('--abre-b', `${Math.round(b0 + hueco / 2)}px`);
         }
         const b = Math.round(parseFloat(getComputedStyle(fijo).bottom) || 0);
         cortaPista();
-        cortaPista = vigilar(pista!, { umbral: 0.97, margen: `0px 0px ${-b}px 0px`, reentradaMs: 0, alEntrar: arranca });
+        cortaPista = vigilar(pista!, { umbral: 0.97, margen: `0px 0px ${-b * zoom()}px 0px`, reentradaMs: 0, alEntrar: arranca });
       };
       medir();
       document.fonts?.ready.then(() => medir());

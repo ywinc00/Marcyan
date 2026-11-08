@@ -128,7 +128,7 @@ const items = headings.filter((h: Heading) => h.depth === 2);
     .toc[data-js][data-open] .toc__btn { opacity: 0; }
     .toc[data-js][data-open] .toc__panel {
       position: absolute; top: -12px; left: -16px; z-index: 6; margin: 0;
-      inline-size: 264px; max-height: calc(100vh - var(--nav-h) - 48px); overflow-y: auto; overscroll-behavior: contain;
+      inline-size: 264px; max-height: calc(calc(100vh / var(--z, 1)) - var(--nav-h) - 48px); overflow-y: auto; overscroll-behavior: contain;
       padding: 18px 18px 14px;
       background: var(--w-s-solid); border: 1px solid var(--w-line-strong); border-radius: var(--w-r-obj);
       box-shadow: var(--w-edge), 0 18px 40px rgba(0, 0, 0, .45);
@@ -144,7 +144,7 @@ const items = headings.filter((h: Heading) => h.depth === 2);
     .toc[data-js] .toc__btn { display: none; }
     .toc[data-js] .toc__panel,
     .toc[data-js][data-open] .toc__panel {
-      display: block; position: static; inline-size: auto; max-height: calc(100vh - var(--nav-h) - 64px); overflow-y: auto;
+      display: block; position: static; inline-size: auto; max-height: calc(calc(100vh / var(--z, 1)) - var(--nav-h) - 64px); overflow-y: auto;
       padding: 0; background: none; border: 0; box-shadow: none; animation: none;
     }
   }

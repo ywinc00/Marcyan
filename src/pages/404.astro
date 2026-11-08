@@ -9,14 +9,25 @@ import SiteNav from '../components/layout/SiteNav.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import Button from '../components/ui/Button.astro';
 import { nap, content } from '../i18n/content';
-import { clusterNav } from '../i18n/clusters';
+import { clusterNav, clusterNavEn } from '../i18n/clusters';
 
 const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#contacto' } };
+const pageNavEn = { ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } };
 const telH = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 const telM = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
 ---
 <Layout title="Página no encontrada · Marcyan Studio" description="Esta página no existe o cambió de dirección." lang="es" path="/404" noindex hasEn={false}>
-  <SiteNav nav={pageNav} lang="es" homeHref="/es" currentPath="/404" />
+  {/* Barra y pie en inglés para rutas /en/...: se cambian ANTES de que arranquen los scripts del
+      menú (módulos diferidos), así el menú se engancha a la versión que queda. Las piezas de la
+      barra son fijas, así que el envoltorio no cambia su colocación. */}
+  <div data-nf-nav="es"><SiteNav nav={pageNav} lang="es" homeHref="/es" currentPath="/404" /></div>
+  <template data-nf-tpl="nav"><div data-nf-nav="en"><SiteNav nav={pageNavEn} lang="en" homeHref="/en" currentPath="/404" /></div></template>
+  <script is:inline>
+    if (location.pathname.startsWith('/en')) {
+      var t = document.querySelector('template[data-nf-tpl="nav"]');
+      document.querySelector('[data-nf-nav="es"]').replaceWith(t.content.cloneNode(true));
+    }
+  </script>
   <main id="main" class="nf">
     <div class="nf__in">
       <p class="nf__code" aria-hidden="true">404</p>
@@ -41,7 +52,14 @@ const telM = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
       <p class="nf__alt" lang="en" data-nf-alt>Looking for the English site? <a href="/en">Go to the English home</a>.</p>
     </div>
   </main>
-  <SiteFooter footer={content.es.footer} />
+  <div data-nf-foot="es"><SiteFooter footer={content.es.footer} /></div>
+  <template data-nf-tpl="foot"><SiteFooter footer={content.en.footer} lang="en" /></template>
+  <script is:inline>
+    if (location.pathname.startsWith('/en')) {
+      var tf = document.querySelector('template[data-nf-tpl="foot"]');
+      document.querySelector('[data-nf-foot="es"]').replaceWith(tf.content.cloneNode(true));
+    }
+  </script>
 </Layout>
 
 <script>
@@ -56,7 +74,7 @@ const telM = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
 </script>
 
 <style>
-  .nf { min-height: 70vh; display: grid; place-items: center; padding-block: clamp(96px, 14vh, 160px) clamp(64px, 10vh, 120px); }
+  .nf { min-height: calc(70vh / var(--z, 1)); display: grid; place-items: center; padding-block: clamp(96px, calc(14vh / var(--z, 1)), 160px) clamp(64px, calc(10vh / var(--z, 1)), 120px); }
   .nf__in { width: min(100%, 720px); padding-inline: var(--space-5, 20px); text-align: left; }
   .nf__code {
     margin: 0 0 8px; font-family: var(--font-display); font-weight: 400; letter-spacing: -.06em; line-height: .8;

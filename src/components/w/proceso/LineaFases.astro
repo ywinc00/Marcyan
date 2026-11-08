@@ -360,6 +360,7 @@ const C = T.correo;
 </style>
 
 <script>
+  import { zrect, zoom } from '../zoom';
   // Evento para el cohete de G01 (mismo valor que EVENTO_FIN de proceso.ts; no se importa
   // proceso.ts aquí para no meter pricing.ts en el JS del navegador).
   const FIN = 'w2:fases-fin';
@@ -382,12 +383,12 @@ const C = T.correo;
     root.toggleAttribute('data-still', still);
 
     const centro = (i: number) => {
-      const d = pasos[i].querySelector<HTMLElement>('[data-w2-dot]')!.getBoundingClientRect();
+      const d = zrect(pasos[i].querySelector<HTMLElement>('[data-w2-dot]')!);
       return { x: d.left + d.width / 2, y: d.top + d.height / 2 };
     };
     function geo() {
       if (!linea || !lit || N < 2) return;
-      const R = root.getBoundingClientRect();
+      const R = zrect(root);
       const a = centro(0).y - R.top, b = centro(N - 1).y - R.top;
       linea.style.top = `${a}px`; linea.style.bottom = 'auto'; linea.style.height = `${Math.max(0, b - a)}px`;
       const f = still ? 1 : act <= 0 ? 0 : (centro(act).y - R.top - a) / (b - a || 1);
@@ -433,7 +434,7 @@ const C = T.correo;
         }
       }
       if (i === N - 1 && prev !== -1) {
-        const S = (root.closest('section') ?? root).getBoundingClientRect();
+        const S = zrect((root.closest('section') ?? root));
         const c = centro(i);
         root.dispatchEvent(new CustomEvent(FIN, { bubbles: true, detail: { origen: { x: Math.round(c.x - S.left), y: Math.round(c.y - S.top) }, lang: root.dataset.lang === 'en' ? 'en' : 'es' } }));
       }

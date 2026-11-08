@@ -232,7 +232,7 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
   .da {
     --da-t: 40px;
     position: relative; isolation: isolate; overflow: clip;
-    min-height: max(100svh, 800px);
+    min-height: max(calc(100svh / var(--z, 1)), 800px);
     display: flex; flex-direction: column; align-items: center;
     padding: calc(var(--nav-h, 72px) + 24px) 16px 0;
     text-align: center; color: var(--w-ink, #f0ede8);

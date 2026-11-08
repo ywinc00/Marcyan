@@ -139,6 +139,7 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
 </div>
 
 <script>
+  import { zrect, zoom } from '../../zoom';
   // Cada bloque busca dentro de su propio nodo (Cerrojo 2). Sin estado global.
   document.querySelectorAll<HTMLElement>('[data-ca]').forEach((root) => {
     if (root.dataset.caMontado) return;
@@ -214,8 +215,8 @@ const uid = 'ca' + Math.random().toString(36).slice(2, 7);
       if (retirado || usos >= 3) return;
       if (!visible || document.hidden || pausado()) { programar(1500); return; }
       const to = (active + 1) % tabs.length;
-      const c = card.getBoundingClientRect();
-      const r = tabs[to].getBoundingClientRect();
+      const c = zrect(card);
+      const r = zrect(tabs[to]);
       const x = r.left - c.left + Math.min(r.width / 2, 28);
       const y = r.top - c.top + r.height / 2;
       // Si la pestaña queda fuera de la tira visible (móvil), la tira se desplaza primero.

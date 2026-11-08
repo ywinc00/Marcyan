@@ -90,6 +90,7 @@ const CSS = `
   ))}
 </div>
 <script>
+  import { zrect, zoom } from '../zoom';
   // Ancla las pistas de arriba (móvil) al borde superior de la burbuja de la pregunta del hero.
   function anclaPlaca() {
     const capa = document.querySelector<HTMLElement>('.wf-pl');
@@ -98,7 +99,7 @@ const CSS = `
     let raf = 0;
     const calc = () => {
       raf = 0;
-      const c = capa.getBoundingClientRect(), r = ask.getBoundingClientRect();
+      const c = zrect(capa), r = zrect(ask);
       if (!r.width) return;
       capa.style.setProperty('--pl-x', `${(r.left - c.left + r.width / 2).toFixed(1)}px`);
       capa.style.setProperty('--pl-top', `${(r.top - c.top).toFixed(1)}px`);

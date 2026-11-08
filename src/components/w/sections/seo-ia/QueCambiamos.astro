@@ -58,6 +58,7 @@ const { n, label, titleHtml, items, card } = Astro.props;
 </div>
 
 <script>
+  import { zrect, zoom } from '../../zoom';
   // Curvas de cada pieza a la ficha: se recalculan solo cuando cambia el tamaño del bloque
   // (ResizeObserver). Nada se anima ni se redibuja en bucle.
   const SVGNS = 'http://www.w3.org/2000/svg';
@@ -67,16 +68,16 @@ const { n, label, titleHtml, items, card } = Astro.props;
     const dots = [...root.querySelectorAll<HTMLElement>('[data-qc-dot]')];
     if (!svg || !card || !dots.length) return;
     const draw = () => {
-      const R = root.getBoundingClientRect();
+      const R = zrect(root);
       if (getComputedStyle(svg).display === 'none') { svg.replaceChildren(); return; }
       svg.setAttribute('viewBox', `0 0 ${R.width.toFixed(0)} ${R.height.toFixed(0)}`);
-      const C = card.getBoundingClientRect();
+      const C = zrect(card);
       const tx = C.left - R.left;
       const cy = C.top - R.top + C.height / 2;
       const spread = Math.min(C.height * 0.5, 160);
       const frag = document.createDocumentFragment();
       dots.forEach((d, i) => {
-        const b = d.getBoundingClientRect();
+        const b = zrect(d);
         const x0 = b.left - R.left + b.width / 2;
         const y0 = b.top - R.top + b.height / 2;
         // Llegan repartidas en la mitad central del borde de la ficha, en el mismo orden.

@@ -122,7 +122,7 @@ const {
     display: flex; flex-direction: column;
   }
   @media (--lg) {
-    .cityhero { min-height: min(88vh, 860px); }
+    .cityhero { min-height: min(calc(88vh / var(--z, 1)), 860px); }
   }
 
   .cityhero--gold { --tint: var(--accent-gold); }

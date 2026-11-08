@@ -210,6 +210,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
       // sin que cada página tenga que importar track.
       import { track } from '../lib/track.js';
       import '../components/w/offscreen';
+      import '../components/w/zoom-img';
       document.addEventListener('click', (e) => {
         const el = e.target && e.target.closest && e.target.closest('[data-track]');
         if (el && el.dataset.track) track(el.dataset.track);

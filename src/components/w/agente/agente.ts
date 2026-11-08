@@ -16,6 +16,7 @@
 // · `mrc:ask` SOLO con un clic o Enter explícito en "Pregúntale tú a Marcy".
 // · Todo se busca dentro de su nodo (root.querySelector), nunca global.
 // ─────────────────────────────────────────────────────────────
+import { zrect, zoom } from '../zoom';
 import { GUIONES, T, type Bloque, type Parte, type Lang, type Escenario } from './guiones';
 
 const RM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -99,8 +100,8 @@ function filas(bloques: Bloque[]) {
 function fantasma(root: HTMLElement, target: HTMLElement, done: () => void, rl: ReturnType<typeof reloj>) {
   const g = root.querySelector<HTMLElement>('[data-w2-fantasma]');
   if (!g) { done(); return; }
-  const rr = root.getBoundingClientRect();
-  const tr = target.getBoundingClientRect();
+  const rr = zrect(root);
+  const tr = zrect(target);
   const x = tr.left - rr.left + Math.min(120, tr.width * 0.4);
   const y = tr.top - rr.top + tr.height * 0.55;
   g.style.transition = 'none';

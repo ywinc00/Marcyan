@@ -66,6 +66,7 @@ const CSS = `
   <span class="wf-mp__osm" aria-hidden="true">{lang === 'en' ? 'Map' : 'Mapa'} © OpenStreetMap</span>
 </div>
 <script>
+  import { zrect, zoom } from '../zoom';
   // Coloca el plano bajo el chip: mide su centro (300,150 del lienzo 600×300) y su escala (900 px = 1).
   function encaja() {
     const capa = document.querySelector<HTMLElement>('[data-wf-mapa]');
@@ -74,7 +75,7 @@ const CSS = `
     let raf = 0;
     const calc = () => {
       raf = 0;
-      const c = capa.getBoundingClientRect(), r = svg.getBoundingClientRect();
+      const c = zrect(capa), r = zrect(svg);
       if (!r.width) return;
       capa.style.setProperty('--mp-x', `${(r.left - c.left + r.width / 2).toFixed(1)}px`);
       capa.style.setProperty('--mp-y', `${(r.top - c.top + r.height / 2).toFixed(1)}px`);

@@ -178,8 +178,14 @@ const pings4 = P.slice(0, 4).map((p, i) => {
   }
   @keyframes wo-radar-beat { 0% { opacity: .8; transform: scale(.6); } 70%, 100% { opacity: 0; transform: scale(1.9); } }
 
-  @media (--lt-md) {
-    .wo-radar { --R: 440px; --cx: 50%; height: 290px; }
+  /* El radar se adapta a SU celda, no a la pantalla (E-62): en tableta la celda mide ~350-480 px
+     y con la colocación de escritorio los avisos se salían por los lados. Por debajo de 560 px de
+     celda usa la colocación compacta; por debajo de 340, el radar encoge con la celda. */
+  .wo-radar { container: wor / inline-size; }
+  @media (--lt-md) { .wo-radar { height: 290px; } }
+  @container wor (max-width: 559.98px) {
+    .wo-radar__scope, .wo-radar__pings { --R: 440px; --cx: 50%; }
+    .wo-radar__pings { left: 50%; }
     .wo-radar__ping {
       --px: calc(var(--xm) * var(--rm) * var(--R) / 2);
       --py: calc(var(--ym) * var(--rm) * var(--R) / 2);
@@ -190,13 +196,11 @@ const pings4 = P.slice(0, 4).map((p, i) => {
     .wo-radar__ping[data-side-m='l'] i { left: auto; right: calc(100% + 10px); }
     .wo-radar__ping[data-side-m='r'] i { right: auto; left: calc(100% + 10px); }
   }
-  /* rev2 G05: por debajo de ~380 px los avisos (de ancho fijo, son texto) se salían de la
-     celda. El radar encoge con la pantalla y, en la más estrecha, sin el punto exterior. */
-  @media (max-width: 379.98px) {
-    .wo-radar { --R: 116vw; }
+  @container wor (max-width: 339.98px) {
+    .wo-radar__scope, .wo-radar__pings { --R: 130cqw; }
     .wo-radar__ping { font-size: 12px; padding: 5px 10px; }
   }
-  @media (max-width: 359.98px) {
+  @container wor (max-width: 309.98px) {
     .wo-radar__ping i { display: none; }
   }
   @media (--motion-reduce) {

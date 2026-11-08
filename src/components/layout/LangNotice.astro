@@ -90,6 +90,7 @@ const text = target === 'en' ? 'Prefer English?' : '¿Prefieres español?';
 </style>
 
 <script>
+  import { zrect, zoom } from '../w/zoom';
   import { track } from '../../lib/track.js';
 
   const KEY_PREF = 'mrc_lang_pref';        // 'es' | 'en' · elección explícita (la escribe el conmutador)
@@ -106,14 +107,14 @@ const text = target === 'en' ? 'Prefer English?' : '¿Prefieres español?';
 
   /** Coloca el rótulo bajo la opción destino, alineado a su lado, con el caret centrado en ella. */
   function place(hint: HTMLElement, host: HTMLElement, opt: HTMLElement) {
-    const base = (hint.offsetParent || document.body).getBoundingClientRect();
-    const o = opt.getBoundingClientRect();
-    const h = host.getBoundingClientRect();
+    const base = zrect((hint.offsetParent || document.body));
+    const o = zrect(opt);
+    const h = zrect(host);
     hint.style.top = `${Math.round(o.bottom - base.top + 6)}px`;
     const rightSide = o.left + o.width / 2 > h.left + h.width / 2;
     if (rightSide) { hint.style.right = `${Math.round(base.right - o.right)}px`; hint.style.left = 'auto'; }
     else { hint.style.left = `${Math.round(o.left - base.left)}px`; hint.style.right = 'auto'; }
-    const r = hint.getBoundingClientRect();
+    const r = zrect(hint);
     hint.style.setProperty('--caret-x', `${Math.round(o.left + o.width / 2 - r.left)}px`);
   }
 

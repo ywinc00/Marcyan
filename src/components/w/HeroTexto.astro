@@ -15,6 +15,8 @@
 import Button from '../ui/Button.astro';
 import ChipCiudad from './ChipCiudad.astro';
 import Eyebrow from './Eyebrow.astro';
+import Icon from '../ui/Icon.astro';
+import { nap } from '../../i18n/content';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -36,6 +38,16 @@ const {
   primary, link, align = 'center', size = 'landing', class: cls,
 } = Astro.props;
 const mod = size === 'landing' ? null : size;
+// Llamar en la primera pantalla del teléfono (dueño, 2026-11-07; política de conversión: en móvil
+// domina llamar). Solo en las landings de servicio (/houston/<slug>, /miami/<slug>, ES y EN), con el
+// número de su ciudad. En el teléfono pasa a ser la acción sólida y el formulario queda en contorno;
+// desde 768 no se pinta: ahí domina el formulario y el teléfono sigue en el pie y en el chat.
+const path = Astro.url.pathname;
+const cityM = path.match(/\/(houston|miami)\/[^/]+/);
+const isEn = path.startsWith('/en');
+const callCity = cityM && !primary.href.startsWith('tel:') ? (cityM[1] as 'houston' | 'miami') : null;
+const callNum = callCity ? nap[callCity].replace(/^\+1\s*/, '') : '';
+const callHref = callCity ? 'tel:' + nap[callCity].replace(/[^\d+]/g, '') : '';
 ---
 <div class:list={['w-herotext', `w-herotext--${align}`, cls]} data-w-tone={tone}>
   {Astro.slots.has('crumbs') && <div class="w-herotext__crumbs"><slot name="crumbs" /></div>}
@@ -50,8 +62,14 @@ const mod = size === 'landing' ? null : size;
     <p class:list={['w-h1__tail', mod && `w-h1__tail--${mod}`, tailGrad && 'w-grad-text']} data-w-in="1">{tail}</p>
   )}
   <p class="w-lead w-herotext__lead" data-w-in="2">{lead}</p>
-  <div class="w-herotext__actions" data-w-in="3">
-    <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
+  <div class:list={['w-herotext__actions', callCity && 'w-herotext__actions--call']} data-w-in="3">
+    {callCity && (
+      <Button variant="primary" size="lg" href={callHref} data-track="call_clicked" class="w-herotext__call">
+        <Icon name="lucide:phone" />
+        <span>{isEn ? 'Call' : 'Llamar'} {callNum}</span>
+      </Button>
+    )}
+    <Button variant="primary" size="lg" href={primary.href} data-track={primary.track} class="w-herotext__form">{primary.label}</Button>
     {link && <Button variant="link" href={link.href} data-track={link.track}>{link.label}</Button>}
   </div>
 </div>
@@ -81,4 +99,18 @@ const mod = size === 'landing' ? null : size;
     margin-top: var(--w-gap-lead);
   }
   .w-herotext--center .w-herotext__actions { justify-content: center; }
+  /* Llamar (solo teléfono): sólido y primero; el formulario pasa a contorno debajo. */
+  .w-herotext__actions :global(.w-herotext__call) { display: none; }
+  @media (max-width: 767.98px) {
+    .w-herotext__actions :global(.w-herotext__call) { display: inline-flex; gap: 10px; }
+    .w-herotext__actions :global(.w-herotext__call svg) { width: 18px; height: 18px; flex: 0 0 auto; stroke-width: 1.75; }
+    .w-herotext__actions--call { flex-direction: column; align-items: stretch; gap: 12px; width: 100%; max-width: 22rem; }
+    .w-herotext--center .w-herotext__actions--call { margin-inline: auto; }
+    .w-herotext__actions--call > :global(.btn) { width: 100%; justify-content: center; }
+    .w-herotext__actions--call > :global(.w-herotext__form) {
+      background: transparent; color: var(--fg-primary); border: 1px solid var(--border-accent); box-shadow: none;
+    }
+    .w-herotext__actions--call > :global(.btn--link) { width: auto; align-self: center; }
+    .w-herotext--left .w-herotext__actions--call > :global(.btn--link) { align-self: flex-start; }
+  }
 </style>

@@ -1,3 +1,4 @@
+import { zrect, zoom } from './zoom';
 // ─────────────────────────────────────────────────────────────
 // Raíles SOLO donde encajan (v4, E-58). Lo arranca WStyles.astro.
 //
@@ -29,10 +30,10 @@ function montar(main: HTMLElement) {
   let raf = 0;
   const calc = () => {
     raf = 0;
-    const top0 = main.getBoundingClientRect().top;
+    const top0 = zrect(main).top;
     const alto = main.offsetHeight;
     const rangos = bandas
-      .map((e) => { const r = e.getBoundingClientRect(); return [Math.max(0, r.top - top0), Math.min(alto, r.bottom - top0)]; })
+      .map((e) => { const r = zrect(e); return [Math.max(0, r.top - top0), Math.min(alto, r.bottom - top0)]; })
       .filter(([a, b]) => b - a > 0)
       .sort((x, y) => x[0] - y[0]);
     const paradas: string[] = [];

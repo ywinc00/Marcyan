@@ -7,6 +7,11 @@ import { geoOrthographic, geoPath, geoInterpolate, geoDistance } from 'd3-geo';
 //  · los puntos nacen sobre el mapa mientras aún se acerca, pegados a su sitio, y la historia (hilos, etiquetas,
 //    búsqueda encendida, ficha) corre con transiciones CSS en el compositor; el lienzo deja de dibujarse al llegar.
 export function initHero(GEO, C) {
+  // Pantallas grandes (base.css, --z): el sitio va ampliado con zoom. La ventana, el scroll y getBoundingClientRect
+  // vienen en píxeles de pantalla; offset*, client* y los estilos, en píxeles CSS. Todo se pasa a píxeles CSS.
+  const Z = () => parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const zr = (r) => { const z = Z(); return z === 1 ? r : { left: r.left / z, right: r.right / z, top: r.top / z, bottom: r.bottom / z, width: r.width / z, height: r.height / z }; };
+  const sY = () => scrollY / Z();
   const GOLD = '#dcc089', TEAL = '#4fc3a1';
   // la ciudad del hub (cities.js): su centro, sus cuatro zonas y el encuadre del acercamiento
   const HOUSTON = C.center;                          // (nombre histórico: es el centro de la ciudad, sea cual sea)
@@ -36,13 +41,13 @@ export function initHero(GEO, C) {
       // pantallas cortas: al acercarse, el párrafo de entrada se recoge para dejar sitio a la historia
       const short = H < 760; stage.classList.toggle('short', short);
       const lead = copy && copy.querySelector('.lead');
-      let cb = copy ? copy.getBoundingClientRect().bottom + lift - stage.getBoundingClientRect().top : H * 0.62;
+      let cb = copy ? zr(copy.getBoundingClientRect()).bottom + lift - zr(stage.getBoundingClientRect()).top : H * 0.62;
       if (short && lead && !stage.classList.contains('zoomed')) cb -= lead.scrollHeight + 16;
-      const sr = stage.getBoundingClientRect();
+      const sr = zr(stage.getBoundingClientRect());
       const Ra = Math.min(W * 0.44, H * 0.24, 260);
       // al empezar, el planeta asoma por debajo de TODO el texto (nunca detrás del teléfono ni del botón)
-      const full = copy ? copy.getBoundingClientRect().bottom + lift - sr.top : H * 0.62;
-      const pad = copy ? Math.max(16, copy.getBoundingClientRect().left - sr.left) : 20, navH = 64;
+      const full = copy ? zr(copy.getBoundingClientRect()).bottom + lift - sr.top : H * 0.62;
+      const pad = copy ? Math.max(16, zr(copy.getBoundingClientRect()).left - sr.left) : 20, navH = 64;
       // la historia ocupa la franja entre la barra y el botón del chat; la escala del mapa sale de lo que cabe:
       // de alto (etiquetas arriba, ficha abajo) y de ancho: de Katy (44 km al oeste) hasta que asome la bahía de
       // Galveston (36 km al este), que es lo que dice "esto es Houston" igual que en escritorio
@@ -100,8 +105,8 @@ export function initHero(GEO, C) {
     // Escritorio, a pantalla completa: el texto va alineado con la barra (contenedor del sitio) y el planeta
     // se ancla al borde derecho de la ventana, con aire de sobra entre los dos (ya no hay caja central escalada).
     const W = sticky.clientWidth, H = sticky.clientHeight;
-    const sr = stage.getBoundingClientRect();
-    const copyRight = copyEl ? copyEl.getBoundingClientRect().right - sr.left : W * 0.45;
+    const sr = zr(stage.getBoundingClientRect());
+    const copyRight = copyEl ? zr(copyEl.getBoundingClientRect()).right - sr.left : W * 0.45;
     // el planeta entero a la vista al empezar, nunca encima del texto; crece con la altura de la pantalla
     // el aro (1,17 R hacia la izquierda) nunca se acerca a menos de 48 px del texto; el planeta deja aire al borde
     const edge = Math.max(24, W * 0.025);
@@ -155,12 +160,12 @@ export function initHero(GEO, C) {
     // el desvanecido de abajo va dentro del propio lienzo (una máscara CSS encima obligaba a recomponerlo cada fotograma)
     F.fade = innerWidth >= 900 ? 140 : innerHeight >= 520 ? 110 : 0;
     goAt = 1 - 80 / DUR_IN();                          // la historia arranca 80 ms antes de posarse (residuo < 1 px)
-    dpr = Math.min(isM ? 2 : 1.75, window.devicePixelRatio || 1); patCache.clear();
+    dpr = Math.min(isM ? 2 : 1.75, window.devicePixelRatio || 1) * Math.min(Z(), 1.6); patCache.clear();   // ampliado: lienzo nítido
     // el lienzo es la ventana entera (CSS 100 % × 100 %): el planeta y su brillo nunca se cortan
     canvas.width = Math.round(F.W * dpr); canvas.height = Math.round(F.H * dpr);
     // el resplandor dorado del fondo sigue al planeta
     const cueEl = document.getElementById('hx-cue');
-    if (cueEl && copyEl) { cueEl.hidden = false; cueEl.hidden = cueEl.getBoundingClientRect().top < copyEl.getBoundingClientRect().bottom + 24; }
+    if (cueEl && copyEl) { cueEl.hidden = false; cueEl.hidden = zr(cueEl.getBoundingClientRect()).top < zr(copyEl.getBoundingClientRect()).bottom + 24; }
     stage.style.setProperty('--pcx', A.cx + 'px'); stage.style.setProperty('--pcy', A.cy + 'px'); stage.style.setProperty('--pr', A.R + 'px');
   }
 
@@ -305,8 +310,8 @@ export function initHero(GEO, C) {
     if (noTags) items.forEach((it) => { it.lx = -999; it.ly = -999; it.hide = true; });
     else if (!isM) {
       // borde derecho real del texto de la portada: ninguna etiqueta se acerca a menos de 24 px
-      const sl = stage.getBoundingClientRect().left;
-      const txR = copyEl ? Math.max(0, ...[...copyEl.children].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 1 && r.height > 1).map((r) => r.right - sl)) : 0;
+      const sl = zr(stage.getBoundingClientRect()).left;
+      const txR = copyEl ? Math.max(0, ...[...copyEl.children].map((e) => zr(e.getBoundingClientRect())).filter((r) => r.width > 1 && r.height > 1).map((r) => r.right - sl)) : 0;
       items.forEach((it) => {
       const tw = it.tag.offsetWidth || 200;
       it.lx = Math.max(it.x - tw + 22, Math.min(it.x - 22, it.x + it.z.dx));
@@ -322,9 +327,9 @@ export function initHero(GEO, C) {
       // parte una etiqueta en dos líneas equilibradas y ajusta la caja a la línea más larga (sin hueco a la derecha)
       const wrap = (it, maxW) => {
         it.tag.style.maxWidth = Math.max(120, maxW) + 'px'; it.tag.style.whiteSpace = 'normal';
-        const tr = it.tag.getBoundingClientRect(), cs = getComputedStyle(it.tag), rg = document.createRange();
+        const tr = zr(it.tag.getBoundingClientRect()), cs = getComputedStyle(it.tag), rg = document.createRange();
         rg.selectNodeContents(it.tag.querySelector('span'));
-        const right = Math.max(it.tag.querySelector('small').getBoundingClientRect().right, ...[...rg.getClientRects()].map((r) => r.right));
+        const right = Math.max(zr(it.tag.querySelector('small').getBoundingClientRect()).right, ...[...rg.getClientRects()].map((r) => zr(r).right));
         it.tag.style.width = Math.ceil(right - tr.left + parseFloat(cs.paddingRight) + 2) + 'px';
         it.tw = it.tag.offsetWidth; it.th = it.tag.offsetHeight;
       };
@@ -411,7 +416,7 @@ export function initHero(GEO, C) {
       fyM = F.lite ? P.y + 24 : Math.max(gu.ly + gu.th, P.y + 20) + 18;
       found.style.width = '';
     }
-    const cr = isM || !copyEl ? 0 : copyEl.getBoundingClientRect().right - stage.getBoundingClientRect().left;
+    const cr = isM || !copyEl ? 0 : zr(copyEl.getBoundingClientRect()).right - zr(stage.getBoundingClientRect()).left;
     if (!isM) {
       fx = Math.max(cr + 24, Math.min(P.x - 190, F.W - 112 - 344));
       // en horizontal, sin pisar el botón del chat; nunca más estrecha de 280 px (si no cabe, se corre a la izquierda)
@@ -508,7 +513,7 @@ export function initHero(GEO, C) {
       stage.classList.remove('leaving'); stage.classList.toggle('again', storyDone);
       storyEnd = performance.now() + (storyDone ? 400 : 1900);           // mientras dura, nada se recoloca
       stage.classList.add('go');
-      if (scrollY - pin.offsetTop < pin.offsetHeight - innerHeight * 0.6) storyDone = true;
+      if (sY() - pin.offsetTop < pin.offsetHeight - innerHeight / Z() * 0.6) storyDone = true;
     } else if (!go && on && cur < 0.9999) { stage.classList.remove('go', 'again'); stage.classList.add('leaving'); }
   }
   // el mismo estado sin animar (al cargar, al cambiar de tamaño, con movimiento reducido)
@@ -541,7 +546,7 @@ export function initHero(GEO, C) {
   // ── un gesto dispara el viaje entero ──
   let cur = 0, target = 0, raf = 0, anim = null, pendingLayout = false, swapT = 0;
   const cue = document.getElementById('hx-cue');
-  const atTop = () => scrollY - pin.offsetTop <= 2;
+  const atTop = () => sY() - pin.offsetTop <= 2;
   function goTo(to) {
     if (target === to) return;
     target = to;
@@ -640,13 +645,13 @@ export function initHero(GEO, C) {
   }
   let landed = false, pendingGeo = null, storyArming = false;
   function guardBar() {
-    const pinned = scrollY < pin.offsetTop + pin.offsetHeight - innerHeight * 0.6;
+    const pinned = sY() < pin.offsetTop + pin.offsetHeight - innerHeight / Z() * 0.6;
     document.body.classList.toggle('hx-pinned', pinned);            // el globo del chat espera a que termine la portada
   }
   // al salir la portada, la ficha clara se funde antes de meterse bajo la barra (no queda una tira suelta)
   function exitFade() {
     if (!stage.classList.contains('go')) return;
-    const ex = scrollY - pin.offsetTop - (pin.offsetHeight - sticky.offsetHeight);
+    const ex = sY() - pin.offsetTop - (pin.offsetHeight - sticky.offsetHeight);
     if (ex <= 0) { if (found.dataset.xf) { found.style.opacity = ''; found.style.transition = ''; delete found.dataset.xf; } return; }
     const top = (parseFloat(found.style.top) || 0) - ex;
     found.dataset.xf = '1'; found.style.transition = 'none';

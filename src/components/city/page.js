@@ -182,7 +182,7 @@ export function initSections(loadGeo, C) {
 
     // dos capas dibujadas UNA vez: el fondo (tierra, agua, bayous y el resplandor de la ciudad) y la luz de las carreteras
     function build() {
-      W = plate.clientWidth; H = plate.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = plate.clientWidth; H = plate.clientHeight; dpr = Math.min(2, window.devicePixelRatio || 1) * Math.min(parseFloat(getComputedStyle(document.documentElement).zoom) || 1, 1.6);   // ampliado (pantallas grandes): nítido
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       const proj = projFinal(), [hx, hy] = proj(HOU);
       const [B, b] = mk(), [R, r] = mk();

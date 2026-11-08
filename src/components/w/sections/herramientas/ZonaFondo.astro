@@ -19,7 +19,7 @@ const { lang } = Astro.props;
 
 <style>
   /* Medidas tomadas del HTML compilado (W2/diagnostico-blog/informe.md). */
-  .thz > :global(.wf) { --wf-alto: max(100svh, 860px); --wf-obj: 400px; bottom: auto; }
+  .thz > :global(.wf) { --wf-alto: max(calc(100svh / var(--z, 1)), 860px); --wf-obj: 400px; bottom: auto; }
   @media (max-width: 767.98px) {
     .thz > :global(.wf) { --wf-obj: 380px; }
     /* En móvil la bajada ocupa todo el ancho al pie de la zona: la pausa sube a la línea de

@@ -34,7 +34,8 @@ export function initAtmo() {
   function measure() {
     const vh = innerHeight; marks = [];
     document.querySelectorAll('[data-atmo]').forEach((el) => {
-      const top = el.getBoundingClientRect().top + scrollY, h = el.offsetHeight;
+      // todo en píxeles de pantalla (con el zoom de pantallas grandes, offsetHeight va en píxeles CSS)
+      const top = el.getBoundingClientRect().top + scrollY, h = el.getBoundingClientRect().height;
       el.dataset.atmo.split(';').forEach((part) => {
         const [at, vals] = part.split('|'); if (!vals) return;
         const m = at.trim().match(/^(top|mid|end|[\d.]+)([+-][\d.]+)?$/);

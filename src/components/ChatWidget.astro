@@ -650,8 +650,6 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-foot-link:hover { color: var(--accent-teal); }
   .mrc-foot-actions { display: inline-flex; gap: var(--space-3); flex-wrap: wrap; justify-content: flex-end; }
   .mrc-chat[data-human] [data-mrc-talk] { display: none; }
-  /* Mensaje del equipo (Orbit "Tomo yo"): rótulo sutil encima de la burbuja. */
-  .mrc-chat .mrc-who { align-self: flex-start; margin: var(--space-2) 0 -4px 4px; font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: .02em; }
   .mrc-foot-link:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
 
   .mrc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -679,6 +677,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 </style>
 
 <style is:global>
+  /* Mensaje del equipo (Orbit "Tomo yo"): rótulo sutil encima de la burbuja. */
+  .mrc-chat .mrc-who { align-self: flex-start; margin: var(--space-2) 0 -4px 4px; font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: .02em; }
   /* Elementos dinámicos (los crea el JS → sin atributo de scope de Astro) y el
      avatar Marcy (otro componente). Scopeados a mano bajo .mrc-chat. */
   .mrc-chat .mrc-bub {

@@ -18,6 +18,8 @@ import TarjetasHermanas from '../../TarjetasHermanas.astro';
 import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
 import Dilema from '../../sections/sector/Dilema.astro';
 import Ciclo from '../../sections/sector/Ciclo.astro';
+import MarcyOficio from '../../sections/sector/MarcyOficio.astro';
+import DiaOficio from '../../sections/sector/DiaOficio.astro';
 import FilasOficio from '../../sections/sector/FilasOficio.astro';
 import Precio from '../../sections/sector/Precio.astro';
 import Proyectos from '../../sections/sector/Proyectos.astro';
@@ -82,9 +84,21 @@ const spec: KindSpec = {
     { component: Ciclo, id: 'proceso', contrast: 'contrast', props: (ctx) => ({ copy: copyOf(ctx).ciclo, n: 2 }) },
 
     // 03 · Lo que necesita tu web: filas alternas texto + objeto con includes.items.
+    // v6 · Marcy en tu oficio (W-ADV-19), solo en los sectores que traen su copy (bienes raíces no cambia).
+    {
+      component: MarcyOficio,
+      when: (ctx) => !!copyOf(ctx).marcy,
+      props: (ctx) => ({ copy: copyOf(ctx).marcy!, n: 3, lang: ctx.lang }),
+    },
     {
       component: FilasOficio,
-      props: (ctx) => ({ copy: copyOf(ctx).filas, n: 3, items: ctx.cluster.includes.items, oficio: copyOf(ctx).obj, lang: ctx.lang }),
+      props: (ctx) => ({ copy: copyOf(ctx).filas, n: copyOf(ctx).marcy ? 4 : 3, items: ctx.cluster.includes.items, oficio: copyOf(ctx).obj, lang: ctx.lang }),
+    },
+    // v6 · Al final del día (W-ADV-44, RegistroVivo).
+    {
+      component: DiaOficio,
+      when: (ctx) => !!copyOf(ctx).dia,
+      props: (ctx) => ({ copy: copyOf(ctx).dia!, n: 5, lang: ctx.lang }),
     },
 
     // Por qué este enfoque: local.paragraphs VERBATIM (contrato de paridad).
@@ -94,6 +108,8 @@ const spec: KindSpec = {
         titleTone1: copyOf(ctx).prosa.tone1,
         titleTone2: copyOf(ctx).prosa.tone2,
         paragraphs: ctx.cluster.local.paragraphs,
+        // v6: plegada tras dos párrafos en los sectores rehechos (sigue en el HTML para Google).
+        fold: copyOf(ctx).more ? { visible: 2, more: copyOf(ctx).more! } : undefined,
       }),
     },
 
@@ -110,7 +126,7 @@ const spec: KindSpec = {
       id: 'proyectos',
       props: (ctx) => ({
         copy: copyOf(ctx).proyectos,
-        n: 4,
+        n: copyOf(ctx).marcy ? 6 : 4,
         items: ctx.cluster.proof.items,
         lead: LEAD_PROJECT[ctx.cluster.path],
         lang: ctx.lang,

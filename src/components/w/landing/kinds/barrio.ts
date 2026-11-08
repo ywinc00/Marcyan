@@ -16,14 +16,11 @@ import ProsaLocal from '../../ProsaLocal.astro';
 import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
 import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
 import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
-import Servicios from '../../sections/barrio/Servicios.astro';
+import QueRecibe from '../../sections/barrio/QueRecibe.astro';
+import Ciclo from '../../sections/sector/Ciclo.astro';
 import Zonas from '../../sections/barrio/Zonas.astro';
 import Precio from '../../sections/barrio/Precio.astro';
 import Caso from '../../sections/barrio/Caso.astro';
-import katy from '../../objetos/barrios/katy.svg';
-import sugarLand from '../../objetos/barrios/sugar-land.svg';
-import doral from '../../objetos/barrios/doral.svg';
-import hialeah from '../../objetos/barrios/hialeah.svg';
 import { barrioCopy, barrioComun as T, barrioOf, zonasCiudad, type Barrio } from '../../../../i18n/w/barrio';
 import { nap } from '../../../../i18n/content';
 import { catalog } from '../../../../i18n/pricing';
@@ -31,7 +28,6 @@ import { serviciosPara } from '../../../../i18n/w/nav';
 import type { IconoId } from '../../objects/registry';
 import type { KindSpec, LandingCtx } from '../types';
 
-const TRACKS: Record<Barrio, typeof katy> = { katy, 'sugar-land': sugarLand, doral, hialeah };
 
 const slugOf = (ctx: LandingCtx) => barrioOf(ctx.cluster.path);
 const copyOf = (ctx: LandingCtx) => barrioCopy[slugOf(ctx)];
@@ -93,37 +89,46 @@ const spec: KindSpec = {
       primary: { label: ctx.cluster.hero.primary.label, href: '#contacto', track: 'proposal_requested' },
       link: { label: t.link, href: '#precios' },
       name: t.name,
-      tracks: TRACKS[slugOf(ctx)].tracks,
+      producto: t.escena.producto,
+      pildora: t.escena.pildora,
+      chat: t.escena.chat,
+      chatSr: t.escena.chat ? `Ejemplo: un cliente de ${t.name} escribe por WhatsApp y Marcy le contesta en español al momento.` : undefined,
       lang: ctx.lang,
     };
   },
   sections: [
-    // 2 · 01 Servicios en tu barrio: hermanas de la ciudad madre + recursos.
+    // 2 · 01 Qué recibe tu negocio (v6): celdas con mini pantalla (W-CORE-08) en lugar de las 7
+    // tarjetas de texto; debajo, la línea con todos los servicios de la ciudad (enlaces internos).
     {
-      component: Servicios,
+      component: QueRecibe,
       props: (ctx) => {
         const t = copyOf(ctx);
-        const hub = T.recursos.hub(t.cityName);
+        const svc = serviciosPara('es', ctx.cluster.path);
+        const href = (id: string) => svc.find((s) => s.id === id)?.href ?? `/es/${t.city}`;
         return {
           n: 1,
-          label: T.serviciosLabel,
-          hermanas: {
-            titleHtml: t.servicios.title,
-            lead: t.servicios.lead,
-            lang: ctx.lang,
-            // Sin "Desde $X" en estas tarjetas (revisión 1, I2 y M5): el ancla baja de diseño
-            // web ($400, landing) chocaba con "Tu web en <barrio>, desde $1,500" y con la FAQ, y el
-            // SEO local ($300) con "$600 al mes". Los precios de lo que cubre la página viven en
-            // #precios y el resto en /es/precios (recurso de al lado); así ninguna tarjeta va
-            // sin precio mientras otras lo llevan.
-            items: serviciosPara('es', ctx.cluster.path).map((s) => ({
-              id: s.id, label: s.name, desc: s.promise, href: s.href,
-            })),
-            recursos: [
-              { icon: 'lucide:map-pin', title: hub.title, text: hub.text, href: `/es/${t.city}` },
-              { icon: 'lucide:scan-search', title: T.recursos.diag.title, text: T.recursos.diag.text, href: '/es/diagnostico', track: 'tool_cta_clicked' },
-              { icon: 'lucide:tag', title: T.recursos.precios.title, text: T.recursos.precios.text, href: '/es/precios' },
-            ],
+          label: T.recibeLabel,
+          titleHtml: T.recibeTitle(t.name),
+          lead: T.recibeLead,
+          name: t.name,
+          cells: T.recibe(t.name).map((c) => ({ ...c, href: href(c.id) })),
+          todos: svc.map((s) => ({ label: s.name, href: s.href })),
+          tambien: T.tambien,
+          lang: ctx.lang,
+        };
+      },
+    },
+
+    // 2b · 02 Cómo llega un cliente (v6): el ciclo en U de los sectores (W-PROOF-11) con la búsqueda del barrio.
+    {
+      component: Ciclo,
+      props: (ctx) => {
+        const t = copyOf(ctx);
+        return {
+          n: 2,
+          copy: {
+            label: T.cicloLabel, title: T.cicloTitle(t.name), lead: T.cicloLead,
+            uTitle: T.cicloU.title, uSub: T.cicloU.sub, nodes: T.cicloNodes(t.ciclo.busca, t.ciclo.zona),
           },
         };
       },
@@ -158,7 +163,7 @@ const spec: KindSpec = {
           };
         });
         return {
-          n: 2,
+          n: 3,
           label: T.zonasLabel,
           title: t.zonas.title,
           lead: t.zonas.lead,
@@ -179,12 +184,13 @@ const spec: KindSpec = {
       component: ProsaLocal,
       props: (ctx) => {
         const t = copyOf(ctx);
-        const inc = ctx.cluster.includes.items;
+        // v6: sin la rejilla de 4 tarjetas de texto (lo que incluye ya lo cuentan las celdas de 01) y
+        // con el texto plegado tras dos párrafos (sigue en el HTML para Google).
         return {
           titleTone1: t.prosa.tone1,
           titleTone2: t.prosa.tone2,
           paragraphs: ctx.cluster.local.paragraphs,
-          items: t.prosa.items.map((i) => inc[i]).filter(Boolean).map((it) => ({ icon: it.icon, title: it.title, text: it.desc })),
+          fold: { visible: 2, more: T.prosaMore },
         };
       },
     },
@@ -202,7 +208,7 @@ const spec: KindSpec = {
           unit: x.monthly ? 'al mes' : 'proyecto',
         }));
         return {
-          n: 3,
+          n: 4,
           label: T.precioLabel,
           title: dosTonos(p.title),
           card: {
@@ -228,7 +234,7 @@ const spec: KindSpec = {
       // Conserva el ancla #proyectos de la landing de antes (la prueba vivía ahí).
       id: 'proyectos',
       props: (ctx) => ({
-        n: 4,
+        n: 5,
         label: T.casoLabel,
         title: dosTonos(ctx.cluster.proof.title),
         lead: copyOf(ctx).caso.lead,

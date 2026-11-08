@@ -44,6 +44,12 @@ export interface SectorCopy {
     chatSr: string;
   };
   prosa: { tone1: string; tone2: string };
+  /** v6 · «Marcy en tu oficio»: casos del oficio que se reproducen solos (WorkOS W-ADV-19). */
+  marcy?: { label: string; title: string; lead: string; tabs: { label: string; script: Msg[] }[]; sr: string };
+  /** v6 · «Al final del día»: lo que la web hizo hoy en ese oficio (WorkOS W-ADV-44, RegistroVivo). */
+  dia?: { label: string; title: string; lead: string; rTitle: string; rText: string; rows: { icon: string; label: string; chip: string; tone: 'ok' | 'pass' | 'off' }[] };
+  /** v6 · rótulo de «seguir leyendo» de la prosa plegada. */
+  more?: string;
   proyectos: { label: string; title: string; lead: string; more: string };
   precio: { eyebrow: string; title: string; from: string; slice: string; includes: string; note: string; cta: string };
   franja: { queEs: string; desdeT: string; desde: string; tiempoT: string; tiempo: string; verQue: string; verPrecios: string; pedir: string; preciosHref: string };
@@ -175,6 +181,48 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chatSr: 'Ejemplo: tras una llamada perdida, Marcy le escribe al cliente, anota el trabajo y queda en que lo llamas hoy con el presupuesto.',
     },
     prosa: { tone1: 'En Houston, el trabajo se lo lleva', tone2: 'quien contesta primero.' },
+    marcy: {
+      label: 'Marcy en tu oficio',
+      title: "<span class='w-tone'>Mientras estás en la obra,</span> Marcy atiende.",
+      lead: 'Tres conversaciones de ejemplo de un contratista en Houston. Marcy pregunta lo justo, guarda los datos y te lo pasa.',
+      sr: 'Ejemplos: un cliente con una fuga de agua, otro que pide presupuesto de techo y otro que quiere agendar una inspección; Marcy contesta y te pasa el caso.',
+      tabs: [
+        { label: 'Emergencia de agua', script: [
+          { from: 'c', text: 'Tengo una fuga debajo del fregadero, ¿pueden venir hoy?', time: '2:10' },
+          { from: 'm', text: 'Sí. ¿En qué zona estás? Te paso con el técnico de guardia ahora mismo.', time: '2:10' },
+          { from: 'c', text: 'En Pasadena.', time: '2:11' },
+          { from: 'm', text: 'Anotado. Te llaman en unos minutos para confirmar la hora.', time: '2:11' },
+        ] },
+        { label: 'Presupuesto de techo', script: [
+          { from: 'c', text: '¿Cuánto cuesta cambiar el techo de una casa?', time: '10:30' },
+          { from: 'm', text: 'Depende del tamaño y del material. ¿Me mandas unas fotos y la dirección? El dueño te da el precio por escrito.', time: '10:30' },
+          { from: 'c', text: 'Ahí van. Es en Katy.', time: '10:32' },
+          { from: 'm', text: 'Recibido. Te escribimos hoy con el presupuesto.', time: '10:32' },
+        ] },
+        { label: 'Agendar inspección', script: [
+          { from: 'c', text: 'Quiero que revisen el aire acondicionado antes del verano.', time: '18:05' },
+          { from: 'm', text: 'Claro. Tengo el jueves a las 9:00 o el viernes a las 2:00. ¿Cuál te aparto?', time: '18:05' },
+          { from: 'c', text: 'El jueves.', time: '18:06' },
+          { from: 'm', text: 'Listo, jueves a las 9:00. Te llega la confirmación por mensaje.', time: '18:06' },
+        ] },
+      ],
+    },
+    dia: {
+      label: 'Al final del día',
+      title: "<span class='w-tone'>Llegas a casa</span> y todo está en orden.",
+      lead: 'Lo que tu sitio y Marcy hicieron hoy mientras trabajabas. Tú solo miras lo que te pasaron.',
+      rTitle: 'Hoy, en tu negocio',
+      rText: 'Un día de ejemplo de un contratista en Houston.',
+      rows: [
+        { icon: 'lucide:phone-missed', label: 'Llamada perdida a las 2:10', chip: 'Contestada por chat', tone: 'ok' },
+        { icon: 'lucide:file-text', label: 'Solicitud de presupuesto · techo', chip: 'Guardada', tone: 'ok' },
+        { icon: 'lucide:calendar', label: 'Inspección jueves 9:00 a. m.', chip: 'Agendada', tone: 'ok' },
+        { icon: 'lucide:image', label: 'Fotos de obra recibidas', chip: 'Te lo pasa', tone: 'pass' },
+        { icon: 'lucide:star', label: 'Reseña nueva en Google', chip: 'Contestada', tone: 'ok' },
+        { icon: 'lucide:user', label: 'Quiere hablar con el dueño', chip: 'Te lo pasa', tone: 'pass' },
+      ],
+    },
+    more: 'Seguir leyendo',
     proyectos: {
       label: 'Trabajo real',
       title: 'Un oficio de Houston, con su sitio nuevo',
@@ -301,6 +349,48 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chatSr: 'Example: after a missed call, Marcy texts the customer, notes the job and lets them know you will call today with the estimate.',
     },
     prosa: { tone1: 'In Houston, the job goes to', tone2: 'whoever answers first.' },
+    marcy: {
+      label: 'Marcy on the job',
+      title: "<span class='w-tone'>While you're on site,</span> Marcy picks up.",
+      lead: 'Three example conversations for a Houston contractor. Marcy asks just enough, saves the details and hands it to you.',
+      sr: 'Examples: a customer with a water leak, one asking for a roof quote and one booking an inspection; Marcy replies and hands you the case.',
+      tabs: [
+        { label: 'Water emergency', script: [
+          { from: 'c', text: 'I have a leak under the sink, can someone come today?', time: '2:10' },
+          { from: 'm', text: "Yes. What area are you in? I'm passing you to the on-call tech right now.", time: '2:10' },
+          { from: 'c', text: 'Pasadena.', time: '2:11' },
+          { from: 'm', text: "Got it. They'll call you in a few minutes to confirm the time.", time: '2:11' },
+        ] },
+        { label: 'Roof quote', script: [
+          { from: 'c', text: 'How much to replace a roof?', time: '10:30' },
+          { from: 'm', text: 'It depends on size and material. Can you send a few photos and the address? The owner will send the price in writing.', time: '10:30' },
+          { from: 'c', text: "Sent. It's in Katy.", time: '10:32' },
+          { from: 'm', text: "Received. We'll send your quote today.", time: '10:32' },
+        ] },
+        { label: 'Book an inspection', script: [
+          { from: 'c', text: 'I want the AC checked before summer.', time: '18:05' },
+          { from: 'm', text: 'Sure. I have Thursday at 9:00 or Friday at 2:00. Which one should I hold?', time: '18:05' },
+          { from: 'c', text: 'Thursday.', time: '18:06' },
+          { from: 'm', text: "Done, Thursday at 9:00. You'll get a text confirmation.", time: '18:06' },
+        ] },
+      ],
+    },
+    dia: {
+      label: 'End of the day',
+      title: "<span class='w-tone'>You get home</span> and it's all sorted.",
+      lead: 'What your site and Marcy did today while you worked. You only look at what they handed you.',
+      rTitle: 'Today, at your business',
+      rText: 'An example day for a Houston contractor.',
+      rows: [
+        { icon: 'lucide:phone-missed', label: 'Missed call at 2:10', chip: 'Answered by chat', tone: 'ok' },
+        { icon: 'lucide:file-text', label: 'Quote request · roof', chip: 'Saved', tone: 'ok' },
+        { icon: 'lucide:calendar', label: 'Inspection Thursday 9:00 AM', chip: 'Booked', tone: 'ok' },
+        { icon: 'lucide:image', label: 'Job photos received', chip: 'Handed to you', tone: 'pass' },
+        { icon: 'lucide:star', label: 'New Google review', chip: 'Replied', tone: 'ok' },
+        { icon: 'lucide:user', label: 'Wants to talk to the owner', chip: 'Handed to you', tone: 'pass' },
+      ],
+    },
+    more: 'Keep reading',
     proyectos: {
       label: 'Real work',
       title: 'A Houston trade, with its new site',
@@ -363,6 +453,48 @@ export const sectorCopy: Record<SectorKey, SectorCopy> = {
       chatSr: 'Example: a customer orders tacos to go by message and Marcy confirms the order and the pickup time.',
     },
     prosa: { tone1: 'In Houston, your taqueria lives on', tone2: 'WhatsApp, not an expensive app.' },
+    marcy: {
+      label: 'Marcy at your restaurant',
+      title: "<span class='w-tone'>During the dinner rush,</span> Marcy takes the messages.",
+      lead: 'Three example conversations for a Houston restaurant. Orders and reservations land on your WhatsApp, ready to go.',
+      sr: 'Examples: a pickup order, a table reservation and a gluten-free question; Marcy replies and sends them to your WhatsApp.',
+      tabs: [
+        { label: 'Pickup order', script: [
+          { from: 'c', text: 'Can I order 2 shrimp tacos and rice and beans for pickup?', time: '7:02' },
+          { from: 'm', text: 'Of course. Ready at 7:20. What name should I put on it?', time: '7:02' },
+          { from: 'c', text: 'Ana.', time: '7:03' },
+          { from: 'm', text: 'Done, Ana. Your order is in the kitchen.', time: '7:03' },
+        ] },
+        { label: 'Reservation', script: [
+          { from: 'c', text: 'Do you have a table for 4 on Friday at 8?', time: '15:40' },
+          { from: 'm', text: 'Yes, Friday at 8:00 for 4. Is it a special occasion?', time: '15:40' },
+          { from: 'c', text: 'A birthday.', time: '15:41' },
+          { from: 'm', text: "Noted. Your table is booked and we'll have it ready.", time: '15:41' },
+        ] },
+        { label: 'Gluten free?', script: [
+          { from: 'c', text: 'Do you have gluten-free options?', time: '12:15' },
+          { from: 'm', text: 'Yes: the corn tortilla tacos and the rice and beans. Want me to mark it on your order?', time: '12:15' },
+          { from: 'c', text: 'Yes, please.', time: '12:16' },
+          { from: 'm', text: 'Marked. The kitchen will see it on the ticket.', time: '12:16' },
+        ] },
+      ],
+    },
+    dia: {
+      label: 'End of the night',
+      title: "<span class='w-tone'>You close up</span> and it's all on the list.",
+      lead: 'What your site and Marcy did tonight while the kitchen was full.',
+      rTitle: 'Tonight, at your restaurant',
+      rText: 'An example night for a Houston restaurant.',
+      rows: [
+        { icon: 'lucide:shopping-bag', label: 'Pickup order #41 · WhatsApp', chip: 'Sent to kitchen', tone: 'ok' },
+        { icon: 'lucide:calendar', label: 'Table for 4 · Friday 8:00 PM', chip: 'Booked', tone: 'ok' },
+        { icon: 'lucide:help-circle', label: 'Are you open?', chip: 'Answered', tone: 'ok' },
+        { icon: 'lucide:utensils', label: 'Menu item sold out', chip: 'Menu updated', tone: 'ok' },
+        { icon: 'lucide:star', label: 'New Google review', chip: 'Handed to you', tone: 'pass' },
+        { icon: 'lucide:user', label: 'Catering request', chip: 'Handed to you', tone: 'pass' },
+      ],
+    },
+    more: 'Keep reading',
     proyectos: {
       label: 'Real work',
       title: 'Real bespoke sites',

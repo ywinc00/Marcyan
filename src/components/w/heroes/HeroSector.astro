@@ -11,6 +11,7 @@
 import HeroTexto from '../HeroTexto.astro';
 import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
 import ObjetoOficio from '../sections/sector/ObjetoOficio.astro';
+import Icon from '../../ui/Icon.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -34,6 +35,54 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
 // diagonal (0,85 s, curva ease, tras 0,5 s), con sombra en capas. Geometría propia en oro, no su recurso.
 // Los haces se anclan a la tarjeta (no a la ventana): el punto de cierre siempre cae tras su borde.
 const haz = obj === 'inmobiliaria';
+// v6 · contratistas (WorkOS W-ADV-51, página de la caja fuerte: los objetos viajan por una cinta y
+// entran en la caja). Aquí lo que le llega a un contratista viaja por la cinta y entra en su sitio.
+const cinta = obj === 'contratista';
+const en = lang === 'en';
+const CINTA = en
+  ? [
+      { icon: 'lucide:phone-missed', t: 'Missed call' },
+      { icon: 'lucide:image', t: 'Job photos' },
+      { icon: 'lucide:file-text', t: 'Quote request' },
+      { icon: 'lucide:star', t: 'New review' },
+      { icon: 'lucide:message-circle', t: 'WhatsApp message' },
+    ]
+  : [
+      { icon: 'lucide:phone-missed', t: 'Llamada perdida' },
+      { icon: 'lucide:image', t: 'Fotos de obra' },
+      { icon: 'lucide:file-text', t: 'Solicitud de presupuesto' },
+      { icon: 'lucide:star', t: 'Reseña nueva' },
+      { icon: 'lucide:message-circle', t: 'Mensaje de WhatsApp' },
+    ];
+// v6 · restaurantes (WorkOS W-ADV-56 + W-CORE-24, páginas de registros y de sincronización: el
+// producto al frente y los tipos de evento desfilando detrás en dos cintas pálidas).
+const eventos = obj === 'restaurante';
+const EV1 = en
+  ? [
+      { icon: 'lucide:shopping-bag', n: 'order.whatsapp', d: 'Pickup order #41' },
+      { icon: 'lucide:calendar', n: 'table.booked', d: 'Friday 8:00 PM, 4 people' },
+      { icon: 'lucide:utensils', n: 'menu.updated', d: 'Sold out item hidden' },
+      { icon: 'lucide:map-pin', n: 'maps.found', d: 'tacos near me' },
+    ]
+  : [
+      { icon: 'lucide:shopping-bag', n: 'pedido.whatsapp', d: 'Pedido #41 para recoger' },
+      { icon: 'lucide:calendar', n: 'mesa.reservada', d: 'Viernes 8:00 p. m., 4 personas' },
+      { icon: 'lucide:utensils', n: 'carta.actualizada', d: 'Plato agotado oculto' },
+      { icon: 'lucide:map-pin', n: 'maps.encontrado', d: 'tacos cerca de mí' },
+    ];
+const EV2 = en
+  ? [
+      { icon: 'lucide:message-circle', n: 'marcy.replied', d: 'Are you open?' },
+      { icon: 'lucide:star', n: 'review.new', d: 'New Google review' },
+      { icon: 'lucide:qr-code', n: 'qr.scanned', d: 'Menu opened at table 6' },
+      { icon: 'lucide:truck', n: 'catering.request', d: 'Handed to you' },
+    ]
+  : [
+      { icon: 'lucide:message-circle', n: 'marcy.respondio', d: '¿Están abiertos?' },
+      { icon: 'lucide:star', n: 'resena.nueva', d: 'Reseña nueva en Google' },
+      { icon: 'lucide:qr-code', n: 'qr.escaneado', d: 'Carta abierta en la mesa 6' },
+      { icon: 'lucide:truck', n: 'catering.solicitud', d: 'Te lo pasa' },
+    ];
 const N = 14;
 const f = (n: number) => n.toFixed(1);
 // Lienzo izquierdo 1800×760: el cierre está en (1800, 120); x = 1340 es el final de la fila de botones
@@ -86,7 +135,31 @@ const DER = Array.from({ length: N }, (_, i) =>
             {DER.map((d) => <path d={d} />)}
           </svg>
         )}
-        <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example beams={!haz}>
+        {cinta && (
+          <div class="hs__cinta" aria-hidden="true">
+            <div class="hs__banda"></div>
+            <div class="hs__carril hs__carril--izq">
+              {CINTA.slice(0, 2).map((c, i) => <span class="hs__pza" style={`--i:${i}`}><Icon name={c.icon} />{c.t}</span>)}
+            </div>
+            <div class="hs__carril hs__carril--der">
+              {CINTA.slice(2).map((c, i) => <span class="hs__pza" style={`--i:${i}`}><Icon name={c.icon} />{c.t}</span>)}
+            </div>
+          </div>
+        )}
+        {eventos && (
+          <div class="hs__evs" aria-hidden="true">
+            {[EV1, EV2].map((row, r) => (
+              <div class:list={['hs__ev-row', `hs__ev-row--${r + 1}`]}>
+                <div class="hs__ev-track">
+                  {[...row, ...row, ...row, ...row].map((e) => (
+                    <span class="hs__ev"><Icon name={e.icon} /><b>{e.n}</b>{e.d}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <TarjetaObjeto lang={lang} surface="product" tone="gold" sr={sr} example beams={!haz && !cinta && !eventos}>
           <ObjetoOficio slot="icon" kind={obj} lang={lang} parte="band" />
           <ObjetoOficio kind={obj} lang={lang} parte="body" />
         </TarjetaObjeto>
@@ -108,7 +181,7 @@ const DER = Array.from({ length: N }, (_, i) =>
     border-color: rgba(var(--accent-gold-rgb), .5);
     box-shadow: 0 0 80px rgba(var(--accent-gold-rgb), .16);
   }
-  .hs__pieza { position: relative; width: min(100%, 476px); }
+  .hs__pieza { position: relative; width: min(100%, 476px); container-type: inline-size; }
   /* la pieza se estira al alto de la fila (como antes la tarjeta): los haces se miden sobre ella */
   .hs__pieza > :global(.wo-to) { width: 100%; height: 100%; }
   /* ── v5 · bienes raíces ───────────────────────────────── */
@@ -160,6 +233,69 @@ const DER = Array.from({ length: N }, (_, i) =>
     .hs__pieza > :global(.wo-to) { width: calc(100% - 25px); }
     .hs__haz--izq { right: calc(100% - 65px); }
     .hs__haz--der { left: calc(100% - 40px); }
+  }
+
+  /* ── v6 · contratistas: la cinta (W-ADV-51) ───────────────────────────
+     Banda de noche con franjas diagonales finas en oro que nace en el centro de la tarjeta y sale
+     por el borde derecho de la ventana (nunca bajo el texto, E-37). Las piezas viajan de derecha a
+     izquierda y entran por detrás de la tarjeta: lo que le llega al negocio entra en su sitio. */
+  .hs__cinta { position: absolute; z-index: -2; left: -170px; right: -50vw; top: 58%; height: 92px; transform: translateY(-50%); pointer-events: none; }
+  .hs__banda {
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(115deg, rgba(var(--accent-gold-rgb), .2) 0 1px, transparent 1px 12px),
+      linear-gradient(180deg, rgba(var(--accent-gold-rgb), .12), rgba(var(--accent-gold-rgb), .05));
+    border-block: 1px solid rgba(var(--accent-gold-rgb), .4);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 75%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 75%, transparent 100%);
+  }
+  /* Dos carriles que acaban en el centro de la tarjeta: lo de la izquierda entra hacia la derecha y
+     lo de la derecha hacia la izquierda; las piezas desaparecen por detrás de la tarjeta. */
+  .hs__carril { position: absolute; top: 0; bottom: 0; }
+  /* la cinta empieza 200 px a la izquierda de la tarjeta; 50cqw = media tarjeta (la pieza es contenedor) */
+  .hs__carril--izq { left: 0; width: calc(170px + 50cqw); }
+  .hs__carril--der { left: calc(170px + 50cqw); right: 0; }
+  .hs__pza {
+    position: absolute; top: 50%;
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    padding: 8px 13px; border-radius: 999px;
+    background: var(--w-p-bg, #f0ede8); color: #1b1815; font: 500 13px/1.2 var(--font-body);
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .7);
+    opacity: 0;
+  }
+  .hs__pza :global(svg) { width: 15px; height: 15px; color: #8a6a3a; flex: 0 0 auto; }
+  .hs__carril--der .hs__pza { left: 100%; transform: translate(0, -50%); animation: hs-pza-d 9s linear infinite; animation-delay: calc(var(--i) * -3s); }
+  .hs__carril--izq .hs__pza { left: 0; transform: translate(0, -50%); animation: hs-pza-i 7s linear infinite; animation-delay: calc(var(--i) * -3.5s); }
+  @keyframes hs-pza-d { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 85% { opacity: 1; } 100% { left: 0; opacity: 0; } }
+  @keyframes hs-pza-i { 0% { left: 0; opacity: 0; } 20% { opacity: 1; } 75% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+  /* ── v6 · restaurantes: eventos desfilando detrás (W-ADV-56 + W-CORE-24) ── */
+  .hs__evs { position: absolute; z-index: -2; left: -280px; right: -50vw; top: 0; bottom: 0; pointer-events: none; overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 80%, transparent 100%); }
+  .hs__ev-row { position: absolute; left: 0; right: 0; }
+  .hs__ev-row--1 { top: 10%; }
+  .hs__ev-row--2 { top: 78%; }
+  .hs__ev-track { display: flex; gap: 12px; width: max-content; animation: hs-ev 48s linear infinite; }
+  .hs__ev-row--2 .hs__ev-track { animation-direction: reverse; animation-duration: 56s; }
+  .hs__ev {
+    display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
+    padding: 12px 22px; border-radius: 999px; border: 1px solid rgba(var(--star-rgb, 240, 237, 232), .1);
+    background: rgba(20, 18, 16, .6); color: var(--w-ink-60); font: 400 13px/1.2 var(--font-body); opacity: .75;
+  }
+  .hs__ev b { font: 500 12px var(--font-mono); color: var(--w-ink-80); }
+  .hs__ev :global(svg) { width: 15px; height: 15px; color: var(--accent-teal); flex: 0 0 auto; }
+  @keyframes hs-ev { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .hs__carril .hs__pza { animation: none; opacity: 1; }
+    .hs__carril--izq .hs__pza { left: 40%; } .hs__carril--izq .hs__pza:nth-child(n + 2) { display: none; }
+    .hs__carril--der .hs__pza { left: 70%; } .hs__carril--der .hs__pza:nth-child(n + 2) { display: none; }
+    .hs__ev-track { animation: none; }
+  }
+  @media (--lt-md) {
+    .hs__cinta { left: -24px; right: -24px; height: 76px; }
+    .hs__carril--izq { width: calc(24px + 50cqw); } .hs__carril--der { left: calc(24px + 50cqw); }
+    .hs__pza { font-size: 12px; padding: 7px 11px; }
+    .hs__evs { left: -24px; right: -24px; }
   }
   @media (--lg) {
     /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */

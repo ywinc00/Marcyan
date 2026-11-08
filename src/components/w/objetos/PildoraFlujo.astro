@@ -1,0 +1,66 @@
+---
+// Píldora «quién → qué → resultado» (WorkOS W-EVT-06, portada de autorización: persona → recurso →
+// veredicto en una fila, encima de la tarjeta del producto). v6 · heros de barrio: un vecino del
+// barrio → lo que busca o hace → lo que consigue tu negocio. Objeto de SISTEMA (noche translúcida,
+// texto claro); el veredicto en teal con su casilla. Las tres partes entran de una en una al cargar
+// (F-03) y quedan quietas; con movimiento reducido, quietas desde el principio.
+import Icon from '../../ui/Icon.astro';
+
+interface Props {
+  quien: string;
+  que: string;
+  resultado: string;
+  /** Icono de la acción del medio (búsqueda por defecto). */
+  icon?: string;
+  class?: string;
+}
+const { quien, que, resultado, icon = 'lucide:search', class: cls } = Astro.props;
+const inicial = quien.trim().charAt(0).toUpperCase();
+---
+<p class:list={['wo-pf', cls]}>
+  <span class="wo-pf__s wo-pf__s--1"><span class="wo-pf__av" aria-hidden="true">{inicial}</span>{quien}</span>
+  <span class="wo-pf__ar" aria-hidden="true">→</span>
+  <span class="wo-pf__s wo-pf__s--2"><Icon name={icon} />{que}</span>
+  <span class="wo-pf__ar wo-pf__ar--2" aria-hidden="true">→</span>
+  <span class="wo-pf__s wo-pf__s--3"><span class="wo-pf__ok" aria-hidden="true"><Icon name="lucide:check" /></span>{resultado}</span>
+</p>
+
+<style>
+  .wo-pf {
+    display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px;
+    margin: 0; padding: 7px 14px 7px 8px; border-radius: 999px; max-width: 100%;
+    background: rgba(20, 18, 16, .78); border: 1px solid rgba(var(--star-rgb, 240, 237, 232), .14);
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    font-family: var(--font-body); font-size: 14px; line-height: 1.3; color: var(--w-ink, #f0ede8);
+  }
+  .wo-pf__s { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .wo-pf__s :global(svg) { width: 15px; height: 15px; flex: 0 0 auto; color: var(--w-ink-60, rgba(240, 237, 232, .6)); }
+  .wo-pf__av {
+    display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; flex: 0 0 auto;
+    background: linear-gradient(140deg, var(--accent-gold), #9c7a45); color: #16130f; font: 600 11px/1 var(--font-body);
+  }
+  .wo-pf__ar { color: var(--w-ink-45, rgba(240, 237, 232, .45)); }
+  .wo-pf__ok {
+    display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; flex: 0 0 auto;
+    background: var(--accent-teal);
+  }
+  .wo-pf__ok :global(svg) { width: 12px; height: 12px; color: #0c0b09; stroke-width: 3; }
+  .wo-pf__s--3 { color: var(--w-ink); font-weight: 600; }
+  /* Entrada: quién, luego qué, luego el resultado (300 ms entre partes). */
+  .wo-pf > * { animation: wo-pf-in .45s var(--w-ease-out, cubic-bezier(.2, .7, .2, 1)) both; }
+  .wo-pf__s--1 { animation-delay: .5s; }
+  .wo-pf__ar { animation-delay: .7s; }
+  .wo-pf__s--2 { animation-delay: .85s; }
+  .wo-pf__ar--2 { animation-delay: 1.05s; }
+  .wo-pf__s--3 { animation-delay: 1.2s; }
+  .wo-pf > .wo-pf__ar { animation-name: wo-pf-fade; }
+  @keyframes wo-pf-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes wo-pf-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .wo-pf > * { animation: none; } }
+  /* Teléfono: cada parte en su línea si no caben, sin flechas sueltas al final de línea. */
+  @media (max-width: 479.98px) {
+    .wo-pf { border-radius: 16px; padding: 10px 14px; flex-direction: column; gap: 6px; }
+    .wo-pf__ar { display: inline-block; transform: rotate(90deg); line-height: 1; }
+  }
+</style>

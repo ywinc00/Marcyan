@@ -7,11 +7,17 @@
 // bajo los botones (nunca detrás del texto, E-37): el chip es un bloque aparte.
 // Resplandor oro al 6 % arriba a la izquierda (capa de la sección, sin texto encima de
 // ningún detalle).
+// v6: el chip del barrio deja la portada; en su lugar, el producto que promete cada barrio y la
+// píldora quién → qué → resultado (ver la escena abajo).
 import HeroTexto from '../HeroTexto.astro';
-import ChipBarrio from '../objetos/ChipBarrio.astro';
+import PildoraFlujo from '../objetos/PildoraFlujo.astro';
+import FichaMapa from '../objetos/barrios/FichaMapa.astro';
+import WebEjemplo from '../objetos/WebEjemplo.astro';
+import EscenaBilingue from '../proceso/EscenaBilingue.astro';
+import ChatMarcy from '../objetos/ChatMarcy.astro';
 
 interface Cta { label: string; href: string; track?: string }
-interface Track { d: string; name?: string; at?: [number, number] }
+interface Msg { from: 'c' | 'm'; text: string; time?: string }
 interface Props {
   h1Html: string;
   eyebrow: string;
@@ -19,10 +25,14 @@ interface Props {
   primary: Cta;
   link?: Cta;
   name: string;
-  tracks?: Track[];
+  /** v6: el producto de la portada (el que promete la bajada) y su píldora quién → qué → resultado. */
+  producto: 'ficha' | 'web' | 'bilingue' | 'chat';
+  pildora: { quien: string; que: string; resultado: string; icon?: string };
+  chat?: Msg[];
+  chatSr?: string;
   lang?: 'es' | 'en';
 }
-const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astro.props;
+const { h1Html, eyebrow, lead, primary, link, name, producto, pildora, chat, chatSr, lang = 'es' } = Astro.props;
 ---
 <section class="w-hero w-hero--bleed hb">
   <div class="w-container hb__text">
@@ -38,9 +48,15 @@ const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astr
       <slot name="crumbs" slot="crumbs" />
     </HeroTexto>
   </div>
-  <div class="hb__chip" data-w-in="obj">
-    <div class="hb__obj">
-      <ChipBarrio name={name} tracks={tracks} lang={lang} size="hero" />
+  <!-- v6 (dueño, 2026-11-07): cada barrio con su portada. Mecanismo de WorkOS W-EVT-06: la píldora
+       quién → qué → resultado encima de la tarjeta del producto, sobre el plano real del barrio (F31). -->
+  <div class="w-container hb__escena" data-w-in="obj">
+    <PildoraFlujo {...pildora} class="hb__pf" />
+    <div class:list={['hb__prod', `hb__prod--${producto}`]}>
+      {producto === 'ficha' && <FichaMapa marca="restaurante" lang={lang} city={name} size="hero" />}
+      {producto === 'web' && <WebEjemplo marca="plomeria" frame="navegador" vista="completa" city={name} lang={lang} />}
+      {producto === 'bilingue' && <EscenaBilingue lang={lang} city={name} />}
+      {producto === 'chat' && <ChatMarcy mode="compacto" tabsBar={false} tone="neutral" lang={lang} size="card" tabs={[{ label: name, script: chat ?? [] }]} sr={chatSr} />}
     </div>
   </div>
 </section>
@@ -53,14 +69,21 @@ const { h1Html, eyebrow, lead, primary, link, name, tracks, lang = 'es' } = Astr
     background: radial-gradient(60% 70% at 8% 0%, rgba(var(--accent-gold-rgb), .06), transparent 70%);
   }
   .hb > * { position: relative; z-index: 1; }
-  /* El chip se corta en una línea de suelo (la de la celda que sigue), no en un borde suelto (E-36). */
-  .hb__chip { margin-top: 24px; padding-bottom: 8px; border-bottom: 1px solid var(--w-line-strong); }
-  /* El objeto mide lo que su lienzo (v2 G05: 900 a ×1,5; 600 en móvil): la etiqueta "Ejemplo"
-     y el botón de pausa quedan junto al chip y no sueltos en el borde de la pantalla. Grosor y
-     tinta de las vías viven ya en ChipBarrio (se retira el apaño provisional de la v1). */
-  .hb__obj { max-width: 960px; margin-inline: auto; }
-  /* v4: el fondo es el plano real del barrio, quieto (F31); el movimiento del hero lo llevan el chip y sus vías. */
+  .hb__escena {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px;
+    margin-top: 40px; padding-bottom: 72px;
+  }
+  .hb__pf { position: relative; z-index: 2; }
+  .hb__prod { position: relative; width: min(100%, 440px); }
+  .hb__prod--web { width: min(100%, 720px); }
+  .hb__prod--bilingue { width: min(100%, 560px); container-type: inline-size; }
+  .hb__prod--chat { width: min(100%, 420px); }
+  /* sombra de noche bajo el objeto, para que se despegue del plano de calles */
+  .hb__prod::after {
+    content: ''; position: absolute; left: 8%; right: 8%; bottom: -24px; height: 48px; z-index: -1; pointer-events: none;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, .7), transparent 70%); filter: blur(6px);
+  }
   @media (--lt-md) {
-    .hb__chip { margin-top: 32px; }
+    .hb__escena { margin-top: 32px; gap: 14px; padding-bottom: 56px; }
   }
 </style>

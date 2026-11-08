@@ -1,0 +1,20 @@
+---
+// Sector · «Marcy en tu oficio» (v6, dueño 2026-11-07: explicar el producto como el resto del sitio).
+// WorkOS W-ADV-19: pestañas de casos que se reproducen solos con una conversación real. Pieza del
+// sitio: ChatMarcy en modo pestañas (la misma de IA conversacional), con casos del oficio.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props { copy: NonNullable<SectorCopy['marcy']>; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sm-gap">
+  <div class="sm-chat"><ChatMarcy mode="pestanas" tone="teal" lang={lang} size="hero" tabs={copy.tabs} sr={copy.sr} /></div>
+</div>
+<style>
+  .sm-gap { margin-top: var(--w-chapter-gap); display: flex; justify-content: center; }
+  .sm-chat { width: min(100%, 880px); }
+  @media (--lt-md) { .sm-gap { margin-top: 40px; } }
+</style>

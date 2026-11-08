@@ -12,8 +12,10 @@
 // director decide si se sustituye por <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
 import { copy, salon, SALON_PALETA as P, SALON_LOGO, type Lang } from './proceso';
 
-interface Props { lang?: Lang; class?: string }
-const { lang = 'es', class: cls } = Astro.props;
+interface Props { lang?: Lang; city?: string; class?: string }
+const { lang = 'es', city, class: cls } = Astro.props;
+/** v6: el salón del ejemplo dice la ciudad de la página donde aparece (Doral), no siempre Houston. */
+const enCiudad = (t: string) => (city ? t.replace('Houston', city) : t);
 const T = copy[lang].bilingue;
 const otro: Lang = lang === 'es' ? 'en' : 'es';
 const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
@@ -41,7 +43,7 @@ const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.acc
             <div class="bi__hero">
               <div class="bi__txt">
                 <span class="bi__h">{S.titular}</span>
-                <span class="bi__sub">{S.bajada}</span>
+                <span class="bi__sub">{enCiudad(S.bajada)}</span>
                 <span class="bi__btn">{S.boton}</span>
               </div>
               <span class="bi__art"><i class="bi__sun"></i><i class="bi__hill"></i></span>

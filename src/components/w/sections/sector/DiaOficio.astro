@@ -1,0 +1,19 @@
+---
+// Sector · «Al final del día» (v6). WorkOS W-ADV-44: registro vivo de eventos con su estado. Pieza
+// del sitio: RegistroVivo (la de «Al final del día, todo en orden» de IA conversacional), con un día
+// de ejemplo del oficio.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import RegistroVivo from '../../RegistroVivo.astro';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props { copy: NonNullable<SectorCopy['dia']>; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sd-gap">
+  <RegistroVivo variant="loop" tone="gold" titleHtml={copy.rTitle} text={copy.rText} rows={copy.rows} lang={lang} />
+</div>
+<style>
+  .sd-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .sd-gap { margin-top: 40px; } }
+</style>

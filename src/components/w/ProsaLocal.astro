@@ -16,16 +16,27 @@ interface Props {
   itemsMobile?: boolean;
   /** id del titular (para aria-labelledby de la sección que lo monte). */
   id?: string;
+  /** v6 (dueño, 2026-11-07: «páginas casi todo texto»): se ven los primeros `visible` párrafos y el
+   *  resto queda plegado bajo «Seguir leyendo». Sigue en el HTML (paridad de texto y Google). */
+  fold?: { visible: number; more: string };
   class?: string;
 }
-const { titleTone1, titleTone2, paragraphs, items, itemsMobile = true, id, class: cls } = Astro.props;
+const { titleTone1, titleTone2, paragraphs, items, itemsMobile = true, id, fold, class: cls } = Astro.props;
+const vis = fold ? paragraphs.slice(0, fold.visible) : paragraphs;
+const rest = fold ? paragraphs.slice(fold.visible) : [];
 ---
 <div class:list={['w-prose', cls]}>
   <h2 class="w-prose__title" id={id}>
     <span class="w-prose__tone" set:html={titleTone1} />{' '}<span set:html={titleTone2} />
   </h2>
   <div class="w-prose__body">
-    {paragraphs.map((html) => <p class="w-prose__p" set:html={protegerNombresHtml(html)} />)}
+    {vis.map((html) => <p class="w-prose__p" set:html={protegerNombresHtml(html)} />)}
+    {rest.length > 0 && (
+      <details class="w-prose__more">
+        <summary class="w-prose__sum">{fold!.more}<span aria-hidden="true">›</span></summary>
+        {rest.map((html) => <p class="w-prose__p" set:html={protegerNombresHtml(html)} />)}
+      </details>
+    )}
     {items && items.length > 0 && (
       <ul class:list={['w-prose__grid', !itemsMobile && 'w-prose__grid--desk']}>
         {items.map((it) => (
@@ -57,6 +68,16 @@ const { titleTone1, titleTone2, paragraphs, items, itemsMobile = true, id, class
     font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--w-ink-80);
   }
   .w-prose__p:last-of-type { margin-bottom: 0; }
+  .w-prose__more { margin-top: 1.1em; }
+  .w-prose__more .w-prose__p:first-of-type { margin-top: 1.1em; }
+  .w-prose__sum {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; cursor: pointer; list-style: none;
+    font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--w-ink);
+  }
+  .w-prose__sum::-webkit-details-marker { display: none; }
+  .w-prose__sum span { color: var(--w-accent, var(--accent-gold)); transition: transform .2s var(--w-ease-ui, ease); }
+  .w-prose__more[open] .w-prose__sum span { transform: rotate(90deg); }
+  .w-prose__sum:focus-visible { outline: 2px solid var(--w-accent, var(--accent-gold)); outline-offset: 4px; border-radius: 4px; }
   .w-prose__p :global(strong) { color: var(--w-ink); font-weight: 600; }
   .w-prose__p :global(a) { color: var(--w-ink); text-decoration: underline; text-decoration-color: rgba(var(--accent-gold-rgb), 0.5); text-underline-offset: 3px; }
 

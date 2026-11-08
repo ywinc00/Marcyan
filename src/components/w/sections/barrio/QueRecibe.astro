@@ -1,0 +1,69 @@
+---
+// Barrio · 01 «Qué recibe tu negocio» (v6, dueño 2026-11-07: «las páginas de barrio son casi todo
+// texto»). Sustituye a las 7 tarjetas de texto de los servicios por el patrón con el que el resto del
+// sitio explica sus productos: celdas con su mini pantalla (WorkOS W-CORE-08, B-03; la pieza
+// Bento2x2 de «Un capítulo por servicio» y «Más que una web»). Objetos distintos de los de la portada
+// del barrio, para no repetir pieza en la misma página.
+// Debajo, una línea con TODOS los servicios de la ciudad (los enlaces internos que daban las tarjetas).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import ObjMapaLocal from '../servicios/ObjMapaLocal.astro';
+import MazoHilos from '../../agente/MazoHilos.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+
+interface Cell { id: string; tag: string; title: string; text: string; link: string; href: string }
+interface Props {
+  n: number;
+  label: string;
+  titleHtml: string;
+  lead: string;
+  name: string;
+  cells: Cell[];
+  todos: { label: string; href: string }[];
+  tambien: string;
+  lang?: 'es' | 'en';
+}
+const { n, label, titleHtml, lead, name, cells, todos, tambien, lang = 'es' } = Astro.props;
+const ICON: Record<string, string> = {
+  'diseno-web': 'lucide:monitor-smartphone', 'seo-local': 'lucide:map-pin',
+  'ia-conversacional': 'lucide:message-circle', 'seo-ia': 'lucide:sparkles',
+};
+const bento = cells.map((c) => ({
+  id: `recibe-${c.id}`, icon: ICON[c.id] ?? 'lucide:circle', label: c.tag,
+  titleHtml: `<a class="br-rc__a" href="${c.href}">${c.title}</a>`, text: c.text,
+  tray: c.id !== 'seo-ia',
+}));
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+<div class="br-rc">
+  <Bento2x2 cells={bento}>
+    <div slot="ui-1" class="br-rc__ui br-rc__ui--tel"><WebEjemplo marca="plomeria" frame="movil" vista="mini" city={name} lang={lang} /></div>
+    <div slot="ui-2" class="br-rc__ui"><ObjMapaLocal lang={lang} /></div>
+    <div slot="ui-3" class="br-rc__ui"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
+    <div slot="ui-4" class="br-rc__ui"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" /></div>
+  </Bento2x2>
+  <p class="br-rc__todos"><span>{tambien}</span>{todos.map((t) => <a href={t.href}>{t.label}</a>)}</p>
+</div>
+
+<style>
+  .br-rc { margin-top: var(--w-chapter-gap); }
+  .br-rc__ui { display: flex; justify-content: center; align-items: flex-start; width: 100%; }
+  .br-rc__ui > :global(*) { width: min(100%, 380px); }
+  .br-rc__ui--tel > :global(*) { width: min(100%, 240px); }
+  /* el título de cada celda lleva a la página del servicio (el enlace que daban las tarjetas) */
+  .br-rc :global(.br-rc__a) { color: inherit; text-decoration: none; }
+  .br-rc :global(.br-rc__a:hover) { color: var(--w-accent, var(--accent-gold)); }
+  .br-rc :global(.br-rc__a:focus-visible) { outline: 2px solid var(--w-accent, var(--accent-gold)); outline-offset: 3px; border-radius: 3px; }
+  .br-rc__todos {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 28px 0 0;
+    font-size: 15px; color: var(--w-ink-60);
+  }
+  .br-rc__todos span { font: 500 12px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+  .br-rc__todos a {
+    display: inline-flex; align-items: center; min-height: 44px; color: var(--w-ink);
+    text-decoration: underline; text-decoration-color: rgba(var(--accent-gold-rgb), .45); text-underline-offset: 4px;
+  }
+  .br-rc__todos a:hover { text-decoration-color: var(--accent-gold); }
+  @media (--lt-md) { .br-rc { margin-top: 40px; } }
+</style>

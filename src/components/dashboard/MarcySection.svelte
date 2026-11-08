@@ -196,6 +196,12 @@
         <dt>Mensajes respondidos</dt><dd>{gasto.turnos}</dd>
         <dt>Coste medio por mensaje</dt><dd>{gasto.turnos ? '$' + (gasto.usd / gasto.turnos).toFixed(3) : '—'}</dd>
       </dl>
+      {#if gasto.por_canal && gasto.por_canal.length > 1}
+        <p class="cap">Por canal</p>
+        <dl class="kv">
+          {#each gasto.por_canal as c (c.canal)}<dt>{CHANNELS[c.canal] || c.canal}</dt><dd>${c.usd.toFixed(2)} · {c.conversaciones} conv.{#if c.canal === 'telefono' && gasto.tope_telefono_usd} · tope ${gasto.tope_telefono_usd}{/if}</dd>{/each}
+        </dl>
+      {/if}
       {#if gasto.por_dia && gasto.por_dia.length}
         {@const maxDia = Math.max(0.01, ...gasto.por_dia.map((d) => d.usd))}
         <p class="cap" style="margin-top:18px">Por día</p>
@@ -310,14 +316,14 @@
             {#if t.cortadas}<li class="ev ev--warn">El filtro de precios cortó {t.cortadas} y mostró una respuesta genérica</li>{/if}
             {#if failTurn === i + 1}<li class="failbox">Aquí se fue: {motivoLabel(conv.fallo.motivo).toLowerCase()}.</li>{/if}
           {/each}
-          {#if conv.takeover_at}<li class="ev ev--live">La llevas tú · Marcy no contesta hasta que se la devuelvas</li>
+          {#if conv.takeover_at}<li class="ev ev--live">{String(conv.takeover_by || '').startsWith('app-') ? 'Contestaste desde la app del teléfono · Marcy vuelve sola a las 12 h o cuando se la devuelvas' : 'La llevas tú · Marcy no contesta hasta que se la devuelvas'}</li>
           {:else if conv.outcome === 'en_vivo'}<li class="ev ev--live">Conversación en curso · se actualiza sola</li>{/if}
         </ol>
-        {#if conv.channel === 'web' || !conv.channel}
+        {#if !conv.channel || ['web', 'whatsapp', 'instagram'].includes(conv.channel)}
           {#if conv.takeover_at}
             <form class="composer" onsubmit={(e) => { e.preventDefault(); enviar(); }}>
               <label class="sr" for="tomo-msg">Tu mensaje al cliente</label>
-              <textarea id="tomo-msg" rows="2" maxlength="2000" bind:value={draft} placeholder="Escribe al cliente. Le aparece en el chat de la web."
+              <textarea id="tomo-msg" rows="2" maxlength="2000" bind:value={draft} placeholder={conv.channel === 'whatsapp' ? 'Escribe al cliente. Le llega a su WhatsApp.' : conv.channel === 'instagram' ? 'Escribe al cliente. Le llega por Instagram.' : 'Escribe al cliente. Le aparece en el chat de la web.'}
                 onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }}></textarea>
               <div class="composer__acts">
                 <button type="button" class="btn" disabled={tomoBusy} onclick={() => tomo('devolver')}>Devolver a Marcy</button>
@@ -353,6 +359,7 @@
           <p class="cap">Datos</p>
           <dl class="kv">
             <dt>Canal</dt><dd>{CHANNELS[conv.channel] || 'Web'}</dd>
+            {#if conv.contact}<dt>Contacto</dt><dd>{#if conv.contact_name}{conv.contact_name} · {/if}{#if conv.channel === 'whatsapp' || conv.channel === 'telefono'}<a href={'tel:' + conv.contact}>{conv.contact}</a>{:else}{conv.contact}{/if}</dd>{/if}
             <dt>Idioma</dt><dd>{LANGS[conv.lang] || conv.lang}</dd>
             <dt>Mensajes</dt><dd>{conv.turnos.length}</dd>
             <dt>Último</dt><dd>{rel(conv.last_at)}</dd>

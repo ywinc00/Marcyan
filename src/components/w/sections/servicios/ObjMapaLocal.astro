@@ -14,8 +14,8 @@
 // Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; acciones como span; sin ids.
 import LogoMarca from '../../marcas/LogoMarca.astro';
 
-interface Props { lang?: 'es' | 'en' }
-const { lang = 'es' } = Astro.props;
+interface Props { lang?: 'es' | 'en'; nombre?: string }
+const { lang = 'es', nombre } = Astro.props;
 const en = lang === 'en';
 const T = en
   ? { sr: 'Example: someone nearby finds your business on the map and gets directions.', you: 'You', name: 'Your business', cat: 'Open', close: 'closes 6 PM', a1: 'Directions', a2: 'Call', a3: 'Website', found: 'Found on' }
@@ -64,7 +64,7 @@ const T = en
     </div>
     <div class="oml__card">
       <div class="oml__head">
-        <span class="oml__name">{T.name}</span>
+        <span class="oml__name">{nombre ?? T.name}</span>
         <span class="oml__open"><span class="oml__dot"></span><b>{T.cat}</b> · {T.close}</span>
       </div>
       <div class="oml__acts">

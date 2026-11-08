@@ -434,7 +434,8 @@ const destinos = {
   :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='wa']),
   :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='correo']) { animation: pp-retira linear both; animation-timeline: --lf-pin; animation-range: contain 34% contain 38%; }
   @keyframes pp-retira { to { opacity: 0; visibility: hidden; } }
-  @keyframes pp-ven-entra { from { opacity: 0; transform: translateY(90px) scale(.96); visibility: hidden; } to { opacity: 1; transform: none; visibility: visible; } }
+  /* Escritorio: la ventana entra OPACA deslizándose desde abajo (nunca dos webs a media opacidad). */
+  @keyframes pp-ven-entra { 0% { opacity: 0; transform: translateY(560px); visibility: hidden; } 1% { opacity: 1; visibility: visible; } 100% { opacity: 1; transform: none; visibility: visible; } }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-range: contain 40% contain 45%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-range: contain 54% contain 59%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-range: contain 68% contain 73%; }

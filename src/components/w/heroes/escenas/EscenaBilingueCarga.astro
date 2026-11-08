@@ -100,6 +100,9 @@ const L = {
   .bc__pie { margin-top: auto; padding: 2cqw 4cqw; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 1.3cqw; color: rgba(242, 240, 235, .45); }
   /* teléfono: la web se reordena en una columna y pasa a tamaños fijos legibles (nunca 6 px) */
   .bc__svc { display: none; }
+  /* Dentro de un teléfono no hay barra de navegador de escritorio: solo queda el ES | EN. */
+  :global(.tw) .bc__dots, :global(.tw) .bc__url { display: none; }
+  :global(.tw) .bc__bar { justify-content: flex-end; }
   @container (max-width: 560px) {
     :global(.tw) .bc__svc { display: flex; flex-direction: column; margin: 18px 16px 0; }
     .bc__svc span { display: flex; justify-content: space-between; padding: 13px 2px; border-top: 1px solid rgba(255, 255, 255, .08); font-size: 15px; color: rgba(242, 240, 235, .85); }

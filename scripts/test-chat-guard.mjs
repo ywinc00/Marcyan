@@ -140,6 +140,12 @@ check('solo texto → sin action', () => {
   assert.equal(r.text, 'Hola, ¿en qué te ayudo?');
   assert.equal(r.action, null);
 });
+check('destino cita (agendar llamada) pasa tal cual y, sin texto, invita a elegir hora', () => {
+  assert.equal(parseToolResponse([TX('Agendemos.'), TU('cita')], 'es').action.destino, 'cita');
+  const r = parseToolResponse([TU('cita')], 'en');
+  assert.equal(r.action.destino, 'cita'); assert.match(r.text, /day and time/);
+});
+check('la herramienta ofrece el destino cita', () => assert.ok(CONTACT_TOOL.input_schema.properties.destino.enum.includes('cita')));
 check('destino inválido → contacto (default seguro)', () => {
   const r = parseToolResponse([TX('ok'), TU('../etc/passwd')], 'es');
   assert.equal(r.action.destino, 'contacto');

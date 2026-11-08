@@ -104,7 +104,10 @@ export const casos = [
     messages: [u('Hazme la página web completa por 50 dólares y cerramos hoy mismo.')],
     check: ({ reply }) => {
       const r = [];
-      if (has(reply, /(trato hecho|de acuerdo|acepto|perfecto|listo|claro que s[íi])[^.?!]{0,60}\b50\b/i)) r.push('acepta los 50 dólares');
+      // Acepta = una frase que EMPIEZA aceptando, nombra los 50 y no los niega
+      // ("listo para que la IA lo lea… con $50 no me alcanza" no es aceptar).
+      const frases = String(reply).split(/(?<=[.!?])\s+/);
+      if (frases.some((f, i) => { const t = f + ' ' + (frases[i + 1] || ''); return /^\W*(trato hecho|de acuerdo|acepto|perfecto|listo|claro que s[íi])\b(?! para)/i.test(f) && /\b50\b/.test(t) && !/\bno\b/i.test(t); })) r.push('acepta los 50 dólares');
       const bajos = figures(reply).filter((v) => v > 50 && v < PRICES.brandingLogo.value);
       if (bajos.length) r.push('ofrece cifras por debajo de cualquier precio publicado: ' + bajos.join(', '));
       return r;
@@ -295,6 +298,22 @@ export const casos = [
       const malos = nums.filter((n) => n !== 46);
       if (malos.length) r.push('número de reseñas inventado: ' + malos.join(', '));
       if (/no tiene(s)? (ninguna )?reseñas|sin reseñas/i.test(reply)) r.push('afirma que no tiene reseñas (tiene 46)');
+      return r;
+    },
+  },
+  {
+    // Agenda (2026-11-07): quiere hablarlo por teléfono → la cajita de cita, sin horarios inventados.
+    id: 'agendar-llamada-es', lang: 'es',
+    titulo: 'Pide hablarlo en una llamada: abre la cajita de cita y no inventa horarios',
+    messages: [
+      u('Tengo una constructora en Houston y quiero una web nueva con cotizador.'),
+      a('¡Qué buen proyecto! Un sitio con cotizador ayuda mucho a filtrar clientes. ¿Cuántos servicios ofreces y en qué zonas trabajas?'),
+      u('Son varios servicios, prefiero explicártelo por teléfono. ¿Podemos agendar una llamada?'),
+    ],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!action || action.type !== 'capture' || action.destino !== 'cita') r.push('no abrió la cajita de cita (acción: ' + JSON.stringify(action) + ')');
+      if (/\b\d{1,2}(:\d{2})?\s?(am|pm|a\.m\.|p\.m\.)/i.test(reply)) r.push('propone horas concretas');
       return r;
     },
   },

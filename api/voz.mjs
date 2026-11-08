@@ -11,7 +11,7 @@
 //  Lógica pura en lib/voice.mjs; el turno es el de todos los canales.
 // ════════════════════════════════════════════════════════════════
 import { validTwilio, publicUrl, greetTwiml, replyTwiml, repeatTwiml, waitTwiml, recordTwiml, dialTwiml, byeTwiml, twiml, inTransferHours, wantsEnglish, callCostMicro, voiceCapUsd, V_MSG } from '../lib/voice.mjs';
-import { sidFor, processInbound, saveInbound, SLOTS_TOOL, BOOK_TOOL } from '../lib/channels.mjs';
+import { sidFor, processInbound, saveInbound, SLOTS_TOOL, BOOK_TOOL, PASS_NOTE } from '../lib/channels.mjs';
 
 export const config = { maxDuration: 60 };
 
@@ -52,6 +52,7 @@ async function voiceTools() {
 
 // Respuesta de voz a partir de la respuesta y la acción de Marcy.
 function voiceAnswer(reply, actionType, lang) {
+  if (reply === PASS_NOTE) reply = '';
   if (actionType === 'channels') {
     const to = process.env.VOICE_TRANSFER_TO;
     if (to && inTransferHours()) return dialTwiml(to, reply ? `${reply} ${V_MSG[lang].paso}` : V_MSG[lang].paso, lang);

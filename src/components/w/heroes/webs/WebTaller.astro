@@ -1,0 +1,65 @@
+---
+// Web de ejemplo de Katy: taller mecánico cerca de Cinco Ranch (v7, 2026-11-08).
+// Minimalista. Principios de Refero Getburnt (1e4cee52): partido texto | imagen de contexto con
+// mucha calma y monocromo; y Rivian (11e2e52c): tipografía grande y compacta con un único color
+// de acción. La "imagen" de la derecha es el mapa de cómo llegar, que es lo que pide el cliente
+// en la historia de Katy. Medidas en px de la ventana fuente (900 × 602 de cuerpo).
+---
+<div class="wt">
+  <header class="wt__nav">
+    <span class="wt__marca"><i></i>Tu Taller</span>
+    <nav><span>Servicios</span><span>Cómo llegar</span><span>Contacto</span></nav>
+    <b class="wt__cta wt__cta--sm">Pedir cita</b>
+  </header>
+  <div class="wt__hero">
+    <div class="wt__txt">
+      <span class="wt__zona">Katy · cerca de Cinco Ranch</span>
+      <span class="wt__h">Tu carro, listo el mismo día.</span>
+      <span class="wt__p">Frenos, cambio de aceite y aire acondicionado. Te avisamos por mensaje cuando esté listo.</span>
+      <span class="wt__acc"><b class="wt__cta">Pedir cita</b><span class="wt__lnk">Cómo llegar</span></span>
+    </div>
+    <div class="wt__mapa" aria-hidden="true">
+      <svg viewBox="0 0 360 380" preserveAspectRatio="xMidYMid slice">
+        <rect width="360" height="380" fill="#ecebe7" />
+        <g fill="none" stroke="#fff" stroke-linecap="round">
+          <path d="M-10 120 L 370 96" stroke-width="14" /><path d="M120 -10 L 150 390" stroke-width="12" />
+          <path d="M-10 280 C 90 270, 200 300, 370 250" stroke-width="10" /><path d="M260 -10 L 236 390" stroke-width="8" />
+          <path d="M40 -10 L 60 390" stroke-width="6" /><path d="M-10 200 L 370 190" stroke-width="6" />
+        </g>
+        <rect x="170" y="130" width="54" height="46" rx="4" fill="#e2e0da" /><rect x="22" y="300" width="80" height="54" rx="4" fill="#dfe6db" />
+        <path d="M58 348 C 70 300, 140 300, 146 250 S 150 140, 238 112" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
+        <path d="M58 348 C 70 300, 140 300, 146 250 S 150 140, 238 112" fill="none" stroke="#d9541e" stroke-width="5" stroke-linecap="round" />
+        <circle cx="58" cy="348" r="7" fill="#1c1c1c" stroke="#fff" stroke-width="3" />
+        <path d="M238 112c0-12 -9-20-18-20s-18 8-18 20c0 14 18 28 18 28s18-14 18-28z" transform="translate(18 -26)" fill="#1c1c1c" />
+        <circle cx="238" cy="104" r="5" fill="#fff" />
+      </svg>
+      <span class="wt__estado"><i></i>Abierto · cierra 6:00 p. m.</span>
+    </div>
+  </div>
+  <footer class="wt__pie"><span>Frenos</span><span>Aceite</span><span>Aire acondicionado</span><span>Diagnóstico</span></footer>
+</div>
+
+<style>
+  .wt { position: absolute; inset: 0; display: flex; flex-direction: column; background: #fafaf8; color: #141414; font-family: 'DM Sans', system-ui, sans-serif; }
+  .wt__nav { display: flex; align-items: center; gap: 28px; padding: 22px 40px; border-bottom: 1px solid #ecebe7; }
+  .wt__marca { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+  .wt__marca i { width: 12px; height: 12px; border-radius: 3px; background: #d9541e; }
+  .wt__nav nav { display: flex; gap: 24px; margin-left: auto; font-size: 14px; color: #5c5c5c; }
+  .wt__cta { display: inline-flex; align-items: center; height: 46px; padding: 0 24px; border-radius: 999px; background: #141414; color: #fafaf8; font-size: 15px; font-weight: 600; }
+  .wt__cta--sm { height: 36px; padding: 0 16px; font-size: 13.5px; }
+  .wt__hero { flex: 1; display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; padding: 24px 40px; }
+  .wt__txt { display: flex; flex-direction: column; gap: 18px; }
+  .wt__zona { font-size: 13px; font-weight: 600; color: #d9541e; }
+  .wt__h { margin: 0; font-size: 56px; line-height: 1; font-weight: 700; letter-spacing: -.045em; }
+  .wt__p { margin: 0; max-width: 360px; font-size: 16px; line-height: 1.55; color: #5c5c5c; }
+  .wt__acc { display: flex; align-items: center; gap: 22px; margin-top: 6px; }
+  .wt__lnk { font-size: 15px; font-weight: 600; }
+  .wt__lnk::after { content: ' →'; }
+  .wt__mapa { position: relative; height: 380px; border-radius: 14px; overflow: hidden; }
+  .wt__mapa svg { display: block; width: 100%; height: 100%; }
+  .wt__estado { position: absolute; left: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: #fff; font-size: 13.5px; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+  .wt__estado i { width: 8px; height: 8px; border-radius: 50%; background: #2f9e5b; }
+  .wt__pie { display: flex; padding: 0 40px 22px; font-size: 13px; color: #6e6e6e; }
+  .wt__pie span { padding-right: 16px; margin-right: 16px; border-right: 1px solid #e3e2dd; }
+  .wt__pie span:last-child { border: 0; }
+</style>

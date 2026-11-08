@@ -20,6 +20,8 @@
 //   base   → pinta la base y la bisagra (por defecto true)
 //   encendida → false deja la pantalla apagada (la escena la enciende con
 //            data-pt-encendida="true")
+//   transparente → pantalla sin fondo: deja ver el paisaje que hay detrás del portátil, como en
+//            WorkOS /passport (el fondo del hero continúa dentro de la pantalla).
 // Slot por defecto: el contenido de la pantalla (px de la pantalla fuente).
 // ─────────────────────────────────────────────────────────────
 interface Props {
@@ -27,9 +29,10 @@ interface Props {
   tapa?: 'abierta' | 'scroll';
   base?: boolean;
   encendida?: boolean;
+  transparente?: boolean;
   class?: string;
 }
-const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls } = Astro.props;
+const { ancho = 990, tapa = 'abierta', base = true, encendida = true, transparente = false, class: cls } = Astro.props;
 ---
 <div
   class:list={['pt', cls]}
@@ -37,6 +40,7 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
   data-pt-tapa={tapa}
   data-pt-base={base ? 'true' : 'false'}
   data-pt-encendida={encendida ? 'true' : 'false'}
+  data-pt-transparente={transparente ? 'true' : undefined}
   style={`--pt-w:${ancho}px`}
   aria-hidden="true"
 >
@@ -114,6 +118,8 @@ const { ancho = 990, tapa = 'abierta', base = true, encendida = true, class: cls
     background: #050506;
     -webkit-font-smoothing: antialiased;
   }
+  .pt[data-pt-transparente="true"] .pt-pantalla { background: transparent; }
+  .pt[data-pt-transparente="true"] .pt-apagada { display: none; }
   .pt-pantalla::after {
     content: ""; position: absolute; inset: 0; z-index: 60; pointer-events: none;
     border-radius: 18.75px 18.75px 5px 5px;

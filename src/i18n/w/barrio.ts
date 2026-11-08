@@ -30,7 +30,7 @@ export interface BarrioCopy {
   /** v6 · portada: el producto que promete la bajada + la píldora quién → qué → resultado
    *  (WorkOS W-EVT-06). Todo es ejemplo y va rotulado en el objeto. */
   escena: {
-    producto: 'ficha' | 'pasaporte' | 'bilingue' | 'chat';
+    producto: 'planeta' | 'pasaporte' | 'bilingue' | 'chat';
     pildora: { quien: string; que: string; resultado: string; icon?: string };
     /** Guion del chat (solo producto 'chat'). */
     chat?: { from: 'c' | 'm'; text: string; time?: string }[];
@@ -120,7 +120,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
       lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Houston.',
     },
     prosa: { tone1: 'En Katy, el cliente busca', tone2: 'por su zona, no por «Houston».', items: [1, 2, 3, 5] },
-    escena: { producto: 'ficha', pildora: { quien: 'Vecino en Cinco Ranch', que: '«taller mecánico abierto»', resultado: 'Pidió cómo llegar' } },
+    escena: { producto: 'planeta', pildora: { quien: 'Vecino en Cinco Ranch', que: '«taller mecánico abierto»', resultado: 'Pidió cómo llegar' } },
     ciclo: { busca: 'taller mecánico abierto', zona: 'Cinco Ranch' },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },
     cierre: { proof: 'Hacemos sitios para negocios reales del área de Houston, como Julio’s Landscape TX y Texas Rush Remove.' },
@@ -160,7 +160,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
       lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Miami.',
     },
     prosa: { tone1: 'Doral no es «Miami genérico»:', tone2: 'es Doralzuela.', items: [0, 1, 2, 3] },
-    escena: { producto: 'bilingue', pildora: { quien: 'Client in Doral', que: '«freight forwarder near me»', resultado: 'Cotizó en inglés' } },
+    escena: { producto: 'bilingue', pildora: { quien: 'Cliente en Doral', que: '«freight forwarder near me»', resultado: 'Cotizó en inglés' } },
     ciclo: { busca: 'agencia de carga en Doral', zona: 'Doral' },
     caso: { lead: 'Nuestro trabajo publicado es de Houston y de Florida (Orlando), y lo rotulamos por su ciudad real.' },
     cierre: { proof: 'Hacemos sitios para negocios reales, como Move Junk Away en Orlando, Florida.' },

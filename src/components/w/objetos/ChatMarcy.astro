@@ -162,7 +162,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
 
 <script>
   import { registerLoop } from '../loop';
-  const CHAR = 35, MAX_TYPE = 2200, TYPING = 1500, HOLD = 1200, GAP = 400;
+  const CHAR = 35, MAX_TYPE = 2200, TYPING = 1500, HOLD = 3500, GAP = 400;
 
   document.querySelectorAll<HTMLElement>('[data-wo-chat]').forEach((el) => {
     const scripts: { from: string; text: string; time?: string }[][] = JSON.parse(el.dataset.scripts || '[]');
@@ -174,6 +174,9 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     const stillHTML = box.innerHTML;
     let timers: number[] = [];
     let idx = 0;
+    // La conversación anterior se queda hasta que entra el primer mensaje nuevo: la caja nunca queda vacía.
+    let viejos: Element[] = [];
+    const limpiar = () => { viejos.forEach((n) => n.remove()); viejos = []; };
     const later = (fn: () => void, ms: number) => { timers.push(window.setTimeout(fn, ms)); };
     const clear = () => { timers.forEach((t) => window.clearTimeout(t)); timers = []; };
 
@@ -184,6 +187,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
     };
     const bubble = (m: { from: string; time?: string }, text = '') => {
       const d = document.createElement('div');
+      limpiar();
       d.className = `wo-chat__msg wo-chat__msg--${m.from} is-new`;
       const p = document.createElement('p'); p.textContent = text; d.appendChild(p);
       if (m.time) { const s = document.createElement('span'); s.className = 'wo-chat__time'; s.textContent = m.time; d.appendChild(s); }
@@ -191,7 +195,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
       return p;
     };
     const play = (i: number, done: () => void) => {
-      clear(); idx = i; box.innerHTML = '';
+      clear(); idx = i; viejos = Array.from(box.children);
       const script = scripts[i] || [];
       let t = 300;
       script.forEach((m) => {
@@ -199,7 +203,7 @@ const data = JSON.stringify(tabs.map((t) => t.script));
           later(() => bubble(m, m.text), t); t += 500;
         } else {
           let typing: Element | null = null;
-          later(() => { typing = typingTpl?.content.firstElementChild?.cloneNode(true) as Element; if (typing) box.appendChild(typing); }, t);
+          later(() => { typing = typingTpl?.content.firstElementChild?.cloneNode(true) as Element; if (typing) { limpiar(); box.appendChild(typing); } }, t);
           t += TYPING;
           const dur = Math.min(MAX_TYPE, m.text.length * CHAR);
           const steps = Math.max(1, Math.round(dur / CHAR));

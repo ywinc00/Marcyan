@@ -1,20 +1,17 @@
 ---
-// Hero de las landings de barrio. v6.1 (dueño, 2026-11-07): cada barrio con su portada y su fondo
-// propios, y la portada ocupa EXACTAMENTE la primera pantalla (como WorkOS): ni más corta ni más larga.
-//   · Katy (calles): plano real del barrio (F31) + píldora quién → qué → resultado + ficha del mapa.
-//   · Sugar Land (pasaporte): WorkOS /passport. Cielo de noche con el horizonte del planeta de Marcyan
-//     (la versión de la marca de sus dunas al anochecer) y la parte de arriba de un portátil que entra
-//     por abajo; dentro se abre la web a medida de una clínica de First Colony.
-//   · Doral (franjas): WorkOS /authkit. Banda de franjas horizontales finas en degradado (oro → teal →
-//     noche) detrás del producto: la web de una agencia de carga que pasa de español a inglés.
-//   · Hialeah (bruma): estilo de Suno (Refero 9844e7bf): bruma cálida que respira detrás del texto y
-//     tarjetas inclinadas que asoman por los lados; al centro, Marcy contestando por WhatsApp.
-// Texto centrado (HeroTexto hub, H1 verbatim). La píldora y los objetos son ejemplo, rotulados.
+// Hero de las landings de barrio. Cada barrio con su portada y su fondo propios, y la portada mide
+// EXACTAMENTE la primera pantalla (dueño, 2026-11-07).
+// v7 (dueño, 2026-11-08):
+//   · Sugar Land y Katy: WorkOS /passport medido en vivo. Un paisaje propio a sangre (Sugar Land:
+//     dunas; Katy: salida de planeta sobre la llanura) que CONTINÚA dentro de la pantalla del
+//     portátil (pantalla transparente). La ventana se abre, amanece fuera y dentro a la vez y llega
+//     el aviso del negocio. Cada barrio con su web de ejemplo propia y minimalista.
+//   · Doral (franjas, WorkOS /authkit) y Hialeah (bruma): el producto a buen tamaño; si no cabe,
+//     lo corta el borde de la portada como en Passport, nunca se encoge.
 import HeroTexto from '../HeroTexto.astro';
 import PildoraFlujo from '../objetos/PildoraFlujo.astro';
-import FichaMapa from '../objetos/barrios/FichaMapa.astro';
 import ChatMarcy from '../objetos/ChatMarcy.astro';
-import EscenaPasaporte from './escenas/EscenaPasaporte.astro';
+import EscenaPaisaje from './escenas/EscenaPaisaje.astro';
 import EscenaBilingueCarga from './escenas/EscenaBilingueCarga.astro';
 import Icon from '../../ui/Icon.astro';
 
@@ -27,7 +24,7 @@ interface Props {
   primary: Cta;
   link?: Cta;
   name: string;
-  producto: 'ficha' | 'pasaporte' | 'bilingue' | 'chat';
+  producto: 'planeta' | 'pasaporte' | 'bilingue' | 'chat';
   pildora: { quien: string; que: string; resultado: string; icon?: string };
   chat?: Msg[];
   chatSr?: string;
@@ -36,11 +33,20 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { h1Html, eyebrow, lead, primary, link, name, producto, pildora, chat, chatSr, lados = [], lang = 'es' } = Astro.props;
-const fondo = { ficha: 'calles', pasaporte: 'pasaporte', bilingue: 'franjas', chat: 'bruma' }[producto];
+const fondo = { planeta: 'paisaje', pasaporte: 'paisaje', bilingue: 'franjas', chat: 'bruma' }[producto];
+const escena = producto === 'planeta' ? 'llanura' : 'dunas';
+const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/paisajes/${escena}-${m}-${w}.${f} ${w}w`).join(', ');
 ---
 <section class:list={['w-hero w-hero--bleed hb', `hb--${fondo}`]} data-hb>
-  {fondo === 'pasaporte' && (
-    <div class="hb__cielo" aria-hidden="true"><span class="hb__est"></span><span class="hb__alba"></span><span class="hb__planeta"></span></div>
+  {fondo === 'paisaje' && (
+    <div class="hb__paisaje" aria-hidden="true">
+      {(['noche', 'alba'] as const).map((m) => (
+        <picture class:list={['hb__p', `hb__p--${m}`]}>
+          <source type="image/avif" srcset={img(m, 'avif')} sizes="100vw" />
+          <img src={`/assets/w/paisajes/${escena}-${m}-1920.webp`} srcset={img(m, 'webp')} sizes="100vw" alt="" width="1920" height="1200" decoding="async" fetchpriority={m === 'noche' ? 'high' : 'low'} />
+        </picture>
+      ))}
+    </div>
   )}
   {fondo === 'franjas' && <div class="hb__franjas" aria-hidden="true"></div>}
   {fondo === 'bruma' && (
@@ -52,19 +58,18 @@ const fondo = { ficha: 'calles', pasaporte: 'pasaporte', bilingue: 'franjas', ch
     </HeroTexto>
   </div>
 
-  {producto === 'pasaporte' ? (
-    <div class="hb__laptop" data-w-in="obj"><EscenaPasaporte lang={lang} /></div>
+  {fondo === 'paisaje' ? (
+    <div class:list={['hb__laptop', producto === 'planeta' && 'hb__laptop--planeta']}><EscenaPaisaje web={producto === 'planeta' ? 'taller' : 'clinica'} lang={lang} /></div>
   ) : (
     <div class="w-container hb__escena" data-w-in="obj">
       <PildoraFlujo {...pildora} class="hb__pf" />
       <div class:list={['hb__prod', `hb__prod--${producto}`]}>
-        {producto === 'ficha' && <FichaMapa marca="inmobiliaria" lang={lang} city={name} size="hero" propio={lang === 'en' ? { nombre: 'Your Auto Shop', cat: `Auto repair · ${name}`, svc: 'brakes · oil change · A/C', icono: 'llave' } : { nombre: 'Tu Taller', cat: `Taller mecánico · ${name}`, svc: 'frenos · cambio de aceite · aire', icono: 'llave' }} />}
         {producto === 'bilingue' && <EscenaBilingueCarga />}
         {producto === 'chat' && (
           <>
-            {lados.map((l, i) => (
+            {lados.slice(0, 2).map((l, i) => (
               <div class:list={['hb__lado', `hb__lado--${i + 1}`]} aria-hidden="true">
-                <span class="hb__lado-wa"><Icon name="lucide:message-circle" />WhatsApp</span>
+                <span class="hb__lado-wa"><Icon name="lucide:message-circle" />{lang === 'en' ? 'New message' : 'Mensaje nuevo'}</span>
                 <b>{l.quien}</b>
                 <span>{l.texto}</span>
               </div>
@@ -86,105 +91,92 @@ const fondo = { ficha: 'calles', pasaporte: 'pasaporte', bilingue: 'franjas', ch
     padding-bottom: 0;
   }
   .hb > * { position: relative; z-index: 1; }
-  .hb > .hb__cielo, .hb > .hb__franjas, .hb > .hb__bruma { position: absolute; z-index: 0; }
-  .hb__text { flex: 0 0 auto; }
+  .hb > .hb__paisaje, .hb > .hb__franjas, .hb > .hb__bruma { position: absolute; z-index: 0; }
+  .hb > .hb__text { flex: 0 0 auto; z-index: 2; } /* por encima de la capa del planeta de Katy, que sube detrás del texto */
+  /* El producto va a buen tamaño, arriba, y lo que no cabe lo corta el borde de la portada (Passport):
+     nunca se encoge para caber (dueño, 2026-11-08: "muy pequeños y comprimidos"). */
   .hb__escena {
     flex: 1 1 auto; min-height: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-    padding-block: 12px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 32px;
+    padding-top: 32px;
   }
-  /* Pantallas bajas (portátiles de 768, ventanas pequeñas): el objeto se reduce entero, en proporción,
-     para que la portada siga midiendo la pantalla sin cortar nada. */
-  /* El objeto se reduce entero, en proporción, según el alto que le queda bajo el texto (consulta de
-     contenedor: funciona igual con el zoom de pantallas grandes). Así la portada mide la pantalla. */
-  @media (min-width: 768px) {
-    .hb__escena { container: hbesc / size; }
-  }
-  @container hbesc (max-height: 600px) { .hb__prod { zoom: .9; } }
-  @container hbesc (max-height: 540px) { .hb__prod { zoom: .8; } }
-  @container hbesc (max-height: 480px) { .hb__prod { zoom: .7; } }
-  @container hbesc (max-height: 420px) { .hb__prod { zoom: .6; } }
-  @container hbesc (max-height: 360px) { .hb__prod { zoom: .5; } }
+  @media (min-width: 768px) and (max-height: 820px) { .hb__escena { gap: 22px; padding-top: 22px; } }
   .hb__pf { position: relative; z-index: 2; flex: 0 0 auto; }
-  .hb__prod { position: relative; flex: 0 1 auto; min-height: 0; width: min(100%, 440px); }
-  .hb__prod--bilingue { width: min(100%, 760px); }
-  .hb__prod--chat { width: min(100%, 400px); }
+  .hb__prod { position: relative; flex: 0 0 auto; width: min(100%, 440px); }
 
-  /* ── Katy · calles: el plano real lo pone F31 detrás; resplandor oro arriba a la izquierda ── */
-  .hb--calles::before {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 720px; pointer-events: none; z-index: 0;
-    background: radial-gradient(60% 70% at 8% 0%, rgba(var(--accent-gold-rgb), .06), transparent 70%);
-  }
-  /* la ficha se encoge con la altura disponible para que la portada no pase de la pantalla */
-  .hb--calles .hb__prod { width: min(100%, 440px, calc((100svh / var(--z, 1) - 560px) * 1.05)); min-width: min(100%, 300px); }
-
-  /* ── Sugar Land · pasaporte ─────────────────────────────────────────── */
-  .hb--pasaporte { background: #07080e; }
-  .hb__cielo { position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    background: linear-gradient(180deg, #06070d 0%, #0b0d1c 34%, #17162a 58%, #2c2230 76%, #4a3426 100%); }
-  .hb__cielo > span { position: absolute; inset: 0; }
-  .hb__est { background:
-      radial-gradient(1.3px 1.3px at 12% 14%, rgba(255,255,255,.7), transparent 60%),
-      radial-gradient(1.1px 1.1px at 27% 31%, rgba(255,255,255,.45), transparent 60%),
-      radial-gradient(1.5px 1.5px at 41% 9%, rgba(255,255,255,.6), transparent 60%),
-      radial-gradient(1px 1px at 58% 24%, rgba(255,255,255,.4), transparent 60%),
-      radial-gradient(1.4px 1.4px at 73% 12%, rgba(255,255,255,.6), transparent 60%),
-      radial-gradient(1.1px 1.1px at 88% 29%, rgba(255,255,255,.45), transparent 60%),
-      radial-gradient(1.2px 1.2px at 94% 7%, rgba(255,255,255,.5), transparent 60%),
-      radial-gradient(1px 1px at 6% 38%, rgba(255,255,255,.35), transparent 60%); }
-  .hb__alba { background: radial-gradient(60% 34% at 50% 86%, rgba(232, 184, 108, .5) 0%, rgba(232, 184, 108, .14) 45%, transparent 75%); }
-  .hb__planeta { inset: auto -40% -150% -40% !important; height: 190%; border-radius: 50%;
-    background: radial-gradient(60% 50% at 50% 0%, #1b1a22 0%, #0b0b10 60%, #060609 100%);
-    box-shadow: 0 -2px 0 rgba(240, 200, 130, .6), 0 -14px 60px rgba(232, 184, 108, .38); }
-  /* el portátil entra por abajo: se ve la parte de arriba de la tapa y la ventana que se abre */
-  .hb__laptop { flex: 1 1 auto; min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding-top: 36px; }
-  .hb__laptop > :global(.pp) { width: min(1040px, 92vw, calc((100svh / var(--z, 1) - 360px) * 1.75)); }
+  /* ── Sugar Land y Katy · paisaje que sigue dentro de la pantalla (Passport) ── */
+  .hb--paisaje { background: #05070f; }
+  .hb__paisaje { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .hb__p, .hb__p img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* arriba a ras: así el horizonte cae detrás del portátil en pantallas anchas y bajas */
+  .hb__p img { object-fit: cover; object-position: 50% 0%; }
+  /* velo arriba para que el texto se lea igual de noche que al amanecer */
+  .hb__paisaje::after { content: ''; position: absolute; inset: 0; background:
+      radial-gradient(900px 480px at 50% 32%, rgba(5, 7, 15, .48), rgba(5, 7, 15, 0) 72%),
+      linear-gradient(180deg, rgba(5, 7, 15, .5) 0%, rgba(5, 7, 15, .34) 44%, rgba(5, 7, 15, .22) 54%, rgba(5, 7, 15, 0) 64%); }
+  /* el enlace secundario lleva una sombra suave para leerse sobre el amanecer */
+  .hb--paisaje :global(.btn--link) { text-shadow: 0 1px 12px rgba(5, 7, 15, .75), 0 0 2px rgba(5, 7, 15, .6); }
+  .hb__p--alba { opacity: 0; transition: opacity 1.6s ease; }
+  .hb[data-alba="true"] .hb__p--alba { opacity: 1; }
+  .hb__laptop { flex: 1 1 auto; min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding-top: clamp(20px, 3svh, 40px); }
+  .hb__laptop > :global(.ep) { width: min(1120px, 70vw); }
+  .hb__laptop--planeta { padding-top: clamp(64px, 7svh, 84px); }
+  /* tableta en vertical: sobra alto, el portátil crece para llenar la portada */
+  @media (min-width: 768px) and (max-aspect-ratio: 1/1) { .hb__laptop > :global(.ep) { width: min(1120px, 96vw); } }
+  @media (prefers-reduced-motion: reduce) { .hb__p--alba { transition: none; } }
 
   /* ── Doral · franjas (AuthKit) ──────────────────────────────────────── */
   .hb--franjas { background: var(--w-bg, #0c0b09); }
+  /* líneas finas (1 px cada 9 px) en degradado oro → cobre → teal → noche, que se apagan arriba y abajo
+     y detrás de la columna de texto (AuthKit) */
   .hb__franjas {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 52%; z-index: 0; pointer-events: none;
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58%; z-index: 0; pointer-events: none;
     background:
-      repeating-linear-gradient(180deg, rgba(12, 11, 9, 0) 0 3px, rgba(12, 11, 9, .82) 3px 7px),
-      linear-gradient(180deg, transparent 0%, rgba(var(--accent-gold-rgb), .5) 30%, rgba(214, 140, 96, .45) 48%, rgba(79, 195, 161, .4) 68%, rgba(40, 64, 110, .35) 84%, transparent 100%);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
-    mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+      repeating-linear-gradient(180deg, rgba(12, 11, 9, 0) 0 1px, rgba(12, 11, 9, 1) 1px 9px),
+      linear-gradient(180deg, rgba(var(--accent-gold-rgb), .85) 0%, rgba(214, 140, 96, .8) 34%, rgba(79, 195, 161, .7) 66%, rgba(40, 64, 110, .6) 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%), radial-gradient(38% 40% at 50% 8%, transparent 0 60%, #000 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%), radial-gradient(38% 40% at 50% 8%, transparent 0 60%, #000 100%);
+    mask-composite: intersect;
   }
-  .hb--franjas .hb__prod { width: min(100%, 760px, calc((100svh / var(--z, 1) - 560px) * 1.42)); min-width: min(100%, 320px); }
+  .hb--franjas .hb__prod { width: min(100%, 940px, 68vw); }
 
   /* ── Hialeah · bruma (Suno) ─────────────────────────────────────────── */
   .hb--bruma { background: #0b0806; }
   .hb__bruma { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .hb__bruma i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .75; will-change: transform; animation: hb-bruma 18s ease-in-out infinite alternate; }
   .hb__bruma i:nth-child(1) { width: 62vw; height: 62vw; left: -12vw; top: -28vw; background: radial-gradient(circle, rgba(var(--accent-gold-rgb), .55), transparent 65%); }
-  .hb__bruma i:nth-child(2) { width: 56vw; height: 56vw; right: -14vw; top: -18vw; background: radial-gradient(circle, rgba(196, 92, 62, .5), transparent 65%); animation-duration: 22s; animation-delay: -6s; }
-  .hb__bruma i:nth-child(3) { width: 70vw; height: 50vw; left: 15vw; bottom: -30vw; background: radial-gradient(circle, rgba(140, 70, 40, .45), transparent 65%); animation-duration: 26s; animation-delay: -12s; }
+  .hb__bruma i:nth-child(2) { width: 52vw; height: 52vw; right: -16vw; top: -20vw; background: radial-gradient(circle, rgba(196, 120, 70, .32), transparent 65%); animation-duration: 22s; animation-delay: -6s; }
+  .hb__bruma i:nth-child(3) { display: none; }
   @keyframes hb-bruma { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(3vw, 2vw, 0) scale(1.08); } }
   @media (prefers-reduced-motion: reduce) { .hb__bruma i { animation: none; } }
-  .hb--bruma .hb__prod--chat { width: min(100%, 400px, calc((100svh / var(--z, 1) - 470px) * .82)); min-width: min(100%, 300px); }
+  .hb--bruma .hb__prod--chat { width: min(100%, 460px); }
   /* el chat crece con sus mensajes, sin alto mínimo (cabe en la pantalla con la portada) */
-  .hb--bruma .hb__prod--chat :global(.wo-chat__msgs) { min-height: 0; }
+  .hb--bruma .hb__prod--chat :global(.wo-chat__msgs) { min-height: 0; padding-bottom: 52px; } /* la hora del último mensaje no queda bajo el botón de pausa */
   /* tarjetas inclinadas que asoman por los lados, como en Suno */
   .hb__lado {
-    position: absolute; top: 18%; width: 230px; padding: 14px 16px; border-radius: 16px;
+    position: absolute; top: 14%; width: 290px; padding: 16px 18px; border-radius: 16px;
     background: rgba(26, 20, 16, .82); border: 1px solid rgba(255, 236, 210, .12);
     box-shadow: 0 30px 60px -24px rgba(0, 0, 0, .8);
-    display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.4; color: var(--w-ink-80);
+    display: flex; flex-direction: column; gap: 7px; font-size: 15.5px; line-height: 1.45; color: var(--w-ink-80);
   }
   .hb__lado b { color: var(--w-ink); font-weight: 600; }
   .hb__lado-wa { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #6fd3a4; }
   .hb__lado-wa :global(svg) { width: 13px; height: 13px; }
-  .hb__lado--1 { right: calc(100% + 64px); transform: rotate(-7deg); }
-  .hb__lado--2 { left: calc(100% + 64px); top: 34%; transform: rotate(6deg); }
-  .hb__lado--3 { right: calc(100% + 120px); top: 64%; transform: rotate(4deg); }
+  .hb__lado--1 { right: calc(100% + 56px); top: 4%; transform: rotate(-2deg); }
+  .hb__lado--2 { left: calc(100% + 56px); top: 14%; transform: rotate(2deg); }
   @media (max-width: 1100px) { .hb__lado { display: none; } }
 
   /* ── teléfono: la portada sigue midiendo la pantalla; el objeto se adapta a lo que queda ── */
   @media (--lt-md) {
     .hb { height: auto; min-height: calc(100svh / var(--z, 1)); }
-    .hb__escena { padding-block: 24px 32px; }
-    .hb--calles .hb__prod, .hb--franjas .hb__prod, .hb--bruma .hb__prod--chat { width: min(100%, 420px); }
+    .hb__escena { padding-block: 28px 32px; gap: 24px; }
+    .hb--franjas .hb__prod, .hb--bruma .hb__prod--chat { width: 100%; }
     .hb__laptop { padding-top: 28px; }
-    .hb__laptop > :global(.pp) { width: 100%; }
+    .hb__laptop { justify-content: center; }
+    .hb__laptop > :global(.ep) { width: 170vw; flex: 0 0 auto; }
+    .hb__laptop--planeta { padding-top: 56px; }
+    /* en vertical el paisaje se alarga hacia abajo para que el horizonte quede detrás del portátil */
+    .hb__p img { height: 124%; }
   }
 </style>

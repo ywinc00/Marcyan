@@ -26,6 +26,8 @@ interface Props {
   fase?: 'bloqueo' | 'escritorio';
   dia?: boolean;
   bloqueo?: { fecha: string; hora: string; nombre: string };
+  /** false: sin fondo propio (la pantalla deja ver el paisaje del hero, WorkOS /passport). */
+  fondo?: boolean;
   class?: string;
 }
 const {
@@ -38,6 +40,7 @@ const {
   fase = 'escritorio',
   dia = false,
   bloqueo,
+  fondo = true,
   class: cls,
 } = Astro.props;
 
@@ -59,12 +62,14 @@ const MARCA: Partial<Record<DockId, MarcaId>> = {
   data-esc-dia={dia ? 'true' : 'false'}
   data-esc-dock={dock ? 'true' : 'false'}
 >
-  <div class="esc-fondo">
-    <span class="esc-cielo-dia"></span>
-    <span class="esc-estrellas"></span>
-    <span class="esc-alba"></span>
-    <span class="esc-planeta"></span>
-  </div>
+  {fondo && (
+    <div class="esc-fondo">
+      <span class="esc-cielo-dia"></span>
+      <span class="esc-estrellas"></span>
+      <span class="esc-alba"></span>
+      <span class="esc-planeta"></span>
+    </div>
+  )}
 
   <div class="esc-ventanas"><slot /></div>
 

@@ -226,7 +226,7 @@
   <ConfirmDialog
     bind:open={confirmDelete}
     title={`Borrar ${lead.ref_id}`}
-    message={`Se borrará el lead de ${name} con su mensaje, sus notas y su historial. No se puede deshacer.${lead.converted_client_id || lead.converted_brief_id ? ' El cliente y el brief que se crearon a partir de él se conservan.' : ''}`}
+    message={`Se borrará el lead de ${name} con su mensaje, sus notas, su historial y sus citas. No se puede deshacer.${lead.converted_client_id || lead.converted_brief_id ? ' El cliente y el brief que se crearon a partir de él se conservan.' : ''}`}
     confirmLabel="Borrar lead"
     busy={deleting}
     onconfirm={doDelete}

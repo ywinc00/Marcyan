@@ -4,6 +4,7 @@
 //                         no_cerrada · abandonada) y el gasto del mes.
 //                         ?limit=50 (máx 200) · ?days=30 (máx 400)
 //   GET ?sid=<id>       → { ok, conversation }  turnos, resultado y dónde falló.
+//   DELETE { sid, conLead? } → borra la conversación (y con conLead su lead LEAD-XXX y sus citas)
 //   POST { sid, action:'tomar'|'devolver'|'enviar', text } → "Tomo yo" (migración 022):
 //                         el dueño toma la conversación (Marcy calla), escribe, y la devuelve.
 //   Entorno: el del despliegue (la vista previa ve solo sus pruebas).
@@ -59,8 +60,23 @@ export default async function handler(req, res) {
       return res.status(500).json({ ok: false, error: 'No se pudo' });
     }
   }
+  if (req.method === 'DELETE') {
+    const b = req.body && typeof req.body === 'object' ? req.body : {};
+    const sid = String(b.sid || '').slice(0, 120);
+    if (!sid) return res.status(400).json({ ok: false, error: 'Falta la conversación' });
+    try {
+      const { deleteConversation } = await import('../../lib/chat-log.mjs');
+      const out = await deleteConversation(sid, { withLead: b.conLead === true });
+      if (!out) return res.status(404).json({ ok: false, error: 'Conversación no encontrada' });
+      console.log(`[admin/marcy DELETE] ${sid} borrada por ${session.email}${out.lead ? ' con ' + out.lead : ''}`);
+      return res.status(200).json({ ok: true, ...out });
+    } catch (err) {
+      console.error('[admin/marcy DELETE] error:', err);
+      return res.status(500).json({ ok: false, error: 'No se pudo borrar' });
+    }
+  }
   if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET, POST');
+    res.setHeader('Allow', 'GET, POST, DELETE');
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
   const q = req.query || {};

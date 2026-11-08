@@ -1,9 +1,10 @@
 // /api/admin/citas — calendario de citas de Orbit (sección Marcy, vista Citas).
 //   GET   ?desde=YYYY-MM-DD&dias=7  → { ok, citas, horario }  (hora de Houston)
 //   PATCH { id, status }           → { ok }  status: pendiente | hecha | cancelada | no_vino
+//   DELETE { id }                  → { ok }  borra la cita (pruebas o spam)
 // Protegida con requireAdmin.
 import { requireAdmin } from '../../lib/auth.mjs';
-import { listAppointments, setAppointmentStatus, zonedToUtc, HOURS, STATUSES } from '../../lib/appointments.mjs';
+import { listAppointments, setAppointmentStatus, deleteAppointment, zonedToUtc, HOURS, STATUSES } from '../../lib/appointments.mjs';
 
 const missing = (err) => err && (err.code === '42P01' || /does not exist/i.test(err.message || ''));
 
@@ -35,7 +36,15 @@ export default async function handler(req, res) {
         throw err;
       }
     }
-    res.setHeader('Allow', 'GET, PATCH');
+    if (req.method === 'DELETE') {
+      const b = req.body && typeof req.body === 'object' ? req.body : {};
+      const id = parseInt(b.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'Falta la cita' });
+      const ok = await deleteAppointment(id);
+      if (ok) console.log(`[admin/citas DELETE] cita ${id} borrada por ${session.email}`);
+      return ok ? res.status(200).json({ ok: true }) : res.status(404).json({ ok: false, error: 'Cita no encontrada' });
+    }
+    res.setHeader('Allow', 'GET, PATCH, DELETE');
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   } catch (err) {
     if (missing(err)) return res.status(503).json({ ok: false, code: 'migration_pending', error: 'Falta aplicar la migración 019' });

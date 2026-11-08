@@ -11,6 +11,7 @@
   import EmptyState from './ui/EmptyState.svelte';
   import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
+  import ConfirmDialog from './ui/ConfirmDialog.svelte';
 
   const START = 9 * 60;            // la rejilla empieza a las 9:00 (domingo)
   const END = 21 * 60;             // y acaba a las 9:00 pm
@@ -52,6 +53,21 @@
     if (!horario) return null;
     const [o, cl] = horario[day.wd] || [0, 0];
     return { top: ((o - START) / 30) * ROW, height: ((cl - o) / 30) * ROW };
+  }
+
+  // Borrar (pruebas o spam). Cancelar la deja en el historial; borrar la quita.
+  let delOpen = $state(false);
+  async function borrar() {
+    if (!sel || busy) return;
+    busy = true;
+    try {
+      await api('/api/admin/citas', { method: 'DELETE', body: { id: sel.id } });
+      delOpen = false;
+      toast('Cita borrada');
+      sel = null;
+      await load();
+    } catch (e) { if (!isSessionError(e)) toast(errorMessage(e, 'No se pudo borrar.'), { tone: 'error' }); }
+    finally { busy = false; }
   }
 
   async function setStatus(status) {
@@ -126,6 +142,12 @@
             {#if sel.status !== 'no_vino'}<button type="button" class="btn" disabled={busy} onclick={() => setStatus('no_vino')}>No contestó</button>{/if}
             {#if sel.status !== 'cancelada'}<button type="button" class="btn btn--danger" disabled={busy} onclick={() => setStatus('cancelada')}>Cancelar</button>{/if}
           </div>
+          <div class="del">
+            <button type="button" class="btn btn--mini" disabled={busy} onclick={() => (delOpen = true)}><Icon name="trash" size={14} />Borrar cita</button>
+            <span class="muted">Para pruebas o spam.</span>
+          </div>
+          <ConfirmDialog bind:open={delOpen} title="Borrar cita" confirmLabel="Borrar para siempre" busy={busy} onconfirm={borrar}
+            message={`Se borrará la cita${sel.name ? ' de ' + sel.name : ''} del ${dayLabel(houstonParts(new Date(sel.starts_at)))} a las ${timeLabel(houstonParts(new Date(sel.starts_at)).minutes)}. Si fue real, mejor cancélala: así queda en el historial. No se puede deshacer.`} />
         {:else if !loading && !citas.length}
           <EmptyState compact title="Sin citas esta semana" text="Cuando un cliente agende una llamada con Marcy, aparece aquí con su contacto y lo que necesita." />
         {:else}
@@ -173,4 +195,5 @@
   .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   @media (max-width: 1100px) { .cal__body { grid-template-columns: 1fr; } .detail { border-left: 0; border-top: 1px solid var(--border); } }
   @media (max-width: 900px) { .cal__leg { margin-left: 0; } .btn { min-height: 44px; } }
+  .del { display: flex; gap: 10px; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); font-size: var(--dash-caption); }
 </style>

@@ -10,47 +10,49 @@
 // Micro-vida (§1.5): el sol del arco respira mientras la línea está a la vista (.is-vista).
 // Mientras P02 (WebEjemplo premium) no esté integrado, la web se dibuja aquí; cuando entre, el
 // director decide si se sustituye por <WebEjemplo marca="salon" frame="tarjeta" lienzo="vertical" />.
-import { copy, salon, SALON_PALETA as P, SALON_LOGO, type Lang } from './proceso';
+import { copy, type Lang } from './proceso';
 
 interface Props { lang?: Lang; city?: string; class?: string }
-const { lang = 'es', city, class: cls } = Astro.props;
-/** v6: el salón del ejemplo dice la ciudad de la página donde aparece (Doral), no siempre Houston. */
-const enCiudad = (t: string) => (city ? t.replace('Houston', city) : t);
+const { lang = 'es', city = 'Houston', class: cls } = Astro.props;
+// v8 (dueño, 2026-11-08: «no todo ejemplo de web tiene que ser tu salón»): la web bilingüe es la de un
+// BUFETE de inmigración y familia, donde el idioma es el servicio. Principios de Refero Legora
+// (0ab6a10a) y Titan (56105743): pergamino, titular serif, pastilla negra y áreas en filas finas.
+const B = {
+  es: { nav: ['Áreas', 'Equipo', 'Contacto'], zona: `Inmigración y familia · ${city}`, h: 'Te explicamos tu caso en tu idioma.', sub: 'Primera consulta sin costo, con un abogado que te habla claro.', btn: 'Pedir consulta', areas: ['Residencia', 'Ciudadanía', 'Visas de trabajo', 'Familia'], pie: 'Atendemos en español e inglés', hor: 'Lun a vie · 9 a. m. a 6 p. m.' },
+  en: { nav: ['Practice', 'Team', 'Contact'], zona: `Immigration and family · ${city}`, h: 'We explain your case in your language.', sub: 'First consultation at no cost, with a lawyer who speaks plainly.', btn: 'Book a consultation', areas: ['Green cards', 'Citizenship', 'Work visas', 'Family'], pie: 'We serve you in English and Spanish', hor: 'Mon to Fri · 9 AM to 6 PM' },
+} as const;
 const T = copy[lang].bilingue;
 const otro: Lang = lang === 'es' ? 'en' : 'es';
 const capas = [{ l: lang, c: 'a' }, { l: otro, c: 'b' }] as const;
-// Logotipo canónico del salón (P02a), del idioma de la PÁGINA en las dos capas (E-24): la marca no se traduce al cambiar la web.
-const [lw, lh, ld] = SALON_LOGO[lang];
-const LOGO_CAP = 12;
-const logoH = +(LOGO_CAP * lh / SALON_LOGO.cap).toFixed(2), logoW = +(logoH * lw / lh).toFixed(2);
-const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.accent};--s-on:${P.onAccent}`;
+const marca = lang === 'en' ? 'Your Law Firm' : 'Tu Bufete';
 ---
-<div class:list={['bi', cls]} style={vars} aria-hidden="true" data-nosnippet>
+<div class:list={['bi', cls]} aria-hidden="true" data-nosnippet>
   <div class="bi__win">
     <div class="bi__chrome">
       <span class="bi__dots"><i></i><i></i><i></i></span>
-      <span class="bi__url" translate="no">tusalon.example</span>
+      <span class="bi__url" translate="no">tubufete.example</span>
     </div>
     <div class="bi__view">
       {capas.map(({ l, c }) => {
-        const S = salon[l];
+        const S = B[l];
         const site = (
           <div class="bi__site" lang={l}>
             <div class="bi__nav">
-              <span class="bi__logo"><svg viewBox={`0 0 ${lw} ${lh}`} width={logoW} height={logoH}><path d={ld} fill="currentColor" /></svg></span>
+              <span class="bi__logo">{marca}</span>
               <span class="bi__links">{S.nav.map((n) => <span>{n}</span>)}<b>{l.toUpperCase()}</b></span>
             </div>
             <div class="bi__hero">
               <div class="bi__txt">
-                <span class="bi__h">{S.titular}</span>
-                <span class="bi__sub">{enCiudad(S.bajada)}</span>
-                <span class="bi__btn">{S.boton}</span>
+                <span class="bi__zona">{S.zona}</span>
+                <span class="bi__h">{S.h}</span>
+                <span class="bi__sub">{S.sub}</span>
+                <span class="bi__btn">{S.btn}</span>
               </div>
-              <span class="bi__art"><i class="bi__sun"></i><i class="bi__hill"></i></span>
+              <ul class="bi__areas">{S.areas.map((x) => <li>{x}<i>→</i></li>)}</ul>
             </div>
             <div class="bi__strip">
-              <span class="bi__svc">{S.servicios.map((s) => <span>{s}</span>)}</span>
-              <span class="bi__hor">{S.horario}</span>
+              <span class="bi__svc">{S.pie}</span>
+              <span class="bi__hor">{S.hor}</span>
             </div>
           </div>
         );
@@ -92,23 +94,24 @@ const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.acc
   .bi__edge--r { right: 0; background: linear-gradient(90deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
   .bi__edge--l { left: 0; background: linear-gradient(270deg, rgba(246,239,234,0), rgba(246,239,234,.85)); }
 
-  .bi__site { background: var(--s-bg); color: var(--s-ink); padding: 14px 20px 0; }
+  .bi__site { background: #f6f4ef; color: #16181d; padding: 14px 20px 0; }
   .bi__nav { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; }
-  .bi__logo { display: inline-flex; align-items: center; line-height: 0; color: var(--s-ink); }
-  .bi__logo svg { display: block; overflow: visible; }
-  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: var(--s-ink2); }
-  .bi__links b { font: 600 11px/1 var(--font-mono); letter-spacing: .08em; color: var(--s-acc); }
-  .bi__hero { display: grid; grid-template-columns: 1fr 120px; gap: 18px; align-items: end; }
-  .bi__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 24px; }
-  .bi__h { font: 500 36px/.96 var(--font-display); letter-spacing: -.045em; }
-  .bi__sub { font-size: 12px; line-height: 1.4; color: var(--s-ink2); }
-  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: var(--s-acc); color: var(--s-on); font: 600 12px/1 var(--font-body); }
-  .bi__art { position: relative; height: 176px; border-radius: 60px 60px 0 0; overflow: hidden; background: linear-gradient(180deg, #eef0e8 0%, #c4cbb8 55%, #9ea893 100%); }
-  .bi__sun { position: absolute; left: 50%; top: 40px; width: 48px; height: 48px; margin-left: -24px; border-radius: 50%; background: var(--s-on); }
-  .bi__hill { position: absolute; left: -20%; right: -20%; bottom: -60px; height: 110px; border-radius: 50%; background: var(--s-acc); }
-  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid rgba(30,36,32,.16); font-size: 12px; }
-  .bi__svc { display: inline-flex; gap: 14px; font-weight: 600; }
-  .bi__hor { font: 500 11px/1 var(--font-mono); color: var(--s-ink2); white-space: nowrap; }
+  .bi__logo { font: 400 17px/1 Georgia, 'Times New Roman', serif; letter-spacing: -.01em; }
+  .bi__links { display: inline-flex; align-items: center; gap: 14px; font-size: 11px; color: #5d6068; }
+  .bi__links b { font: 600 11px/1 var(--font-mono); letter-spacing: .08em; color: #1d2b4f; }
+  .bi__hero { display: grid; grid-template-columns: 1fr 136px; gap: 20px; align-items: end; }
+  .bi__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 22px; }
+  .bi__zona { font-size: 11px; font-weight: 600; color: #1d2b4f; }
+  .bi__h { font: 400 30px/1.02 Georgia, 'Times New Roman', serif; letter-spacing: -.02em; text-wrap: balance; }
+  .bi__sub { font-size: 12px; line-height: 1.4; color: #5d6068; }
+  .bi__btn { display: inline-flex; align-items: center; height: 30px; padding: 0 16px; border-radius: 999px; background: #16181d; color: #f6f4ef; font: 600 12px/1 var(--font-body); }
+  .bi__areas { margin: 0 0 22px; padding: 0; list-style: none; display: flex; flex-direction: column; }
+  .bi__areas li { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #dcd8cf; font-size: 12px; color: #16181d; }
+  .bi__areas li:last-child { border-bottom: 1px solid #dcd8cf; }
+  .bi__areas i { font-style: normal; color: #8a8c93; }
+  .bi__strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; border-top: 1px solid #dcd8cf; font-size: 12px; }
+  .bi__svc { font-weight: 600; }
+  .bi__hor { font: 500 11px/1 var(--font-mono); color: #5d6068; white-space: nowrap; }
 
   /* Segmentado: satélite que asoma por arriba a la derecha de la ventana (gesto W-ADV-58). */
   .bi__seg {
@@ -133,14 +136,12 @@ const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.acc
     .bi__site { padding: 10px 14px 0; }
     .bi__nav { padding-bottom: 10px; }
     .bi__links span { display: none; }
-    .bi__hero { grid-template-columns: 1fr 84px; gap: 12px; }
+    .bi__hero { grid-template-columns: 1fr; gap: 0; }
+    .bi__areas { display: none; }
     .bi__txt { gap: 7px; padding-bottom: 12px; }
-    .bi__h { font-size: 22px; }
+    .bi__h { font-size: 21px; }
     .bi__sub { font-size: 11px; }
     .bi__btn { height: 26px; padding: 0 12px; font-size: 11px; }
-    .bi__art { height: 100px; border-radius: 42px 42px 0 0; }
-    .bi__sun { top: 22px; width: 30px; height: 30px; margin-left: -15px; }
-    .bi__hill { bottom: -70px; }
     .bi__strip { height: 30px; font-size: 11px; }
     .bi__hor { display: none; }
     .bi__seg { top: 6px; right: max(6px, calc(50% - 166px)); }
@@ -171,12 +172,8 @@ const vars = `--s-bg:${P.bg};--s-ink:${P.ink};--s-ink2:${P.ink2};--s-acc:${P.acc
   :global(.is-play) .bi__o:not(.is-a) { animation: bi-ob 5400ms linear both; }
   @keyframes bi-oa { 0%, 26% { color: var(--w-p-ink, #0e0e0d); } 28%, 74% { color: rgba(240,237,232,.6); } 76%, 100% { color: var(--w-p-ink, #0e0e0d); } }
   @keyframes bi-ob { 0%, 26% { color: rgba(240,237,232,.6); } 28%, 74% { color: var(--w-p-ink, #0e0e0d); } 76%, 100% { color: rgba(240,237,232,.6); } }
-  /* Micro-vida: el sol del arco respira (6 s) mientras la línea está a la vista. */
-  .bi__sun { animation: bi-sun 6s ease-in-out infinite; animation-play-state: paused; }
-  :global(.is-vista) .bi__sun { animation-play-state: running; }
-  @keyframes bi-sun { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(5px) scale(1.06); } }
   @media (prefers-reduced-motion: reduce) {
     :global(.is-play) .bi__win, :global(.is-play) .bi__wipe, :global(.is-play) .bi__lb, :global(.is-play) .bi__edge--r, :global(.is-play) .bi__edge--l,
-    :global(.is-play) .bi__pill, :global(.is-play) .bi__o, .bi__sun { animation: none !important; }
+    :global(.is-play) .bi__pill, :global(.is-play) .bi__o { animation: none !important; }
   }
 </style>

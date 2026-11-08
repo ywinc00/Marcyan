@@ -27,7 +27,7 @@ import Portatil from './Portatil.astro';
 import Escritorio from './Escritorio.astro';
 import VentanaApp from './VentanaApp.astro';
 import { centroDock } from './mac';
-import WebEjemplo from '../objetos/WebEjemplo.astro';
+import WebSalon from '../heroes/webs/WebSalon.astro';
 import FichaMapaEjemplo from '../objetos/FichaMapaEjemplo.astro';
 import LogoMarca from '../marcas/LogoMarca.astro';
 import Kicker from '../../ui/Kicker.astro';
@@ -132,7 +132,7 @@ const destinos = {
       {/* 1 · la web publicada (salón) */}
       <VentanaApp id="web" url={`${T.dominio} · ${T.ejemplo}`} x={56} y={54} w={650} h={520} z={1} chipTop={114} textoCarga={T.cargaWeb}>
         {/* Cuerpos de las 4 ventanas en <template> (v2 §4.6, nodos): el script los pone al acercarse el portátil. */}
-        <template data-w2-tpl><div class="abre-web-p02"><WebEjemplo marca="salon" frame="desnudo" lienzo="escritorio" vista="completa" lang={lang} ejemplo={false} /></div></template>
+        <template data-w2-tpl><div class="abre-web-p02"><WebSalon lang={lang} /></div></template>
         <svg slot="carga" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#d5dacb" stroke="#8c5a4a" stroke-width="1.4" /><path d="M20 9c3.6 3 3.6 6.2 0 9.2-3.6-3-3.6-6.2 0-9.2zM20 21.8c3.6 3 3.6 6.2 0 9.2-3.6-3-3.6-6.2 0-9.2z" fill="none" stroke="#8c5a4a" stroke-width="1.4" /></svg>
         <Fragment slot="chip">{T.publicada}</Fragment>
       </VentanaApp>

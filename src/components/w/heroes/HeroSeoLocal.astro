@@ -9,6 +9,7 @@
 // Nunca detrás de texto (E-37): la palabra vive en la columna derecha. Móvil: texto arriba y debajo la
 // palabra con su ventana, a escala.
 import HeroTexto from '../HeroTexto.astro';
+import { fichaDe } from '../objetos/barrios/negociosFicha';
 import FichaMapa from '../objetos/barrios/FichaMapa.astro';
 
 interface Cta { label: string; href: string; track?: string }
@@ -49,7 +50,7 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
         <span class="hsl__w hsl__w--2" data-w-in="2">{W[1].split(' ').map((t, i) => <><span class={`hsl__p hsl__p--${i + 1}`}>{t}</span>{' '}</>)}</span>
       </div>
       <div class="hsl__win" data-w-in="obj">
-        <FichaMapa marca="restaurante" lang={lang} city={cityName} size="hero" />
+        <FichaMapa marca="restaurante" negocio={/miami/i.test(cityName ?? '') ? fichaDe('barberia', lang) : undefined} lang={lang} city={cityName} size="hero" />
       </div>
     </div>
   </div>

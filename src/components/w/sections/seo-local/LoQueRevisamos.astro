@@ -13,6 +13,8 @@ import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import Bento2x2 from '../../Bento2x2.astro';
 import Radar from '../../objetos/Radar.astro';
 import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import TelefonoWeb from '../../heroes/webs/TelefonoWeb.astro';
+import WebBarberia from '../../heroes/webs/WebBarberia.astro';
 import Ejemplo from '../../Ejemplo.astro';
 import Comprobacion from './Comprobacion.astro';
 import type { SeoCopy } from '../../../../i18n/w/seo-local';
@@ -26,7 +28,7 @@ const { copy, n, city, lang = 'es' } = Astro.props;
     <div slot="ui-1" class="sl-rev__radar"><Radar lang={lang} size="card" /></div>
     <Comprobacion slot="ui-2" title={copy.datos.title} rows={copy.datos.rows} lang={lang} />
     <Comprobacion slot="ui-3" title={copy.ficha.title} rows={copy.ficha.rows} lang={lang} />
-    <div slot="ui-4" class="sl-rev__web"><Ejemplo lang={lang} on="dark" class="sl-rev__ex" /><WebEjemplo frame="movil" marca="restaurante" vista="hero" ejemplo={false} city={city} lang={lang} class="sl-rev__phone" /></div>
+    <div slot="ui-4" class="sl-rev__web"><Ejemplo lang={lang} on="dark" class="sl-rev__ex" />{/miami/i.test(city) ? <TelefonoWeb lang={lang} fondo="#fbfaf7" tinta="#111318" class="sl-rev__phone"><WebBarberia lang={lang} /></TelefonoWeb> : <WebEjemplo frame="movil" marca="restaurante" vista="hero" ejemplo={false} city={city} lang={lang} class="sl-rev__phone" />}</div>
   </Bento2x2>
 </div>
 <style>

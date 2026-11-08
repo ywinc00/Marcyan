@@ -71,6 +71,11 @@ export default async function handler(req, res) {
       });
     }
 
+    // "Hablar con una persona" desde el chat, SIN datos personales: avisa al
+    // equipo (Orbit + móvil) con el enlace a la conversación y dice si hay alguien
+    // conectado a Orbit ahora. Si no, el chat ofrece agendar una llamada.
+    if (body.pide === true) return await requestPerson(req, res, body);
+
     const lang = body.lang === 'en' ? 'en' : (body.lang === 'es' ? 'es' : null);
     const data = {
       name:    sanitize(body.name, 200),
@@ -171,4 +176,40 @@ export default async function handler(req, res) {
       error: 'No pudimos pasar tu solicitud. Por favor escríbenos directo por WhatsApp o email.',
     });
   }
+}
+
+
+// Hay alguien del equipo con Orbit abierto hace poco (la sesión se renueva cada
+// 5 minutos de uso, así que 12 minutos cubren a quien lo tiene delante).
+export async function teamOnline(sqlImpl) {
+  try {
+    const sql = sqlImpl || (await import('@vercel/postgres')).sql;
+    const r = await sql`SELECT 1 FROM admin_sessions WHERE revoked_at IS NULL AND expires_at > NOW() AND last_used_at > NOW() - interval '12 minutes' LIMIT 1`;
+    return r.rows.length > 0;
+  } catch { return false; }
+}
+
+async function requestPerson(req, res, body) {
+  const { originOk, validSessionId } = await import('./chat.mjs');
+  if (!originOk(req)) return res.status(403).json({ ok: false });
+  const sid = body.sessionId;
+  if (!validSessionId(sid)) return res.status(400).json({ ok: false });
+  const lang = body.lang === 'en' ? 'en' : 'es';
+  const env = process.env.VERCEL_ENV || 'development';
+  const { sql } = await import('@vercel/postgres');
+  try {
+    await sql`INSERT INTO chat_conversations (sid, env, channel, lang) VALUES (${sid}, ${env}, 'web', ${lang}) ON CONFLICT (sid) DO NOTHING`;
+    const { recordTurn } = await import('../lib/chat-log.mjs');
+    await recordTurn({ sid, env, lang, userText: lang === 'en' ? '[Asked to talk to a person]' : '[Pidió hablar con una persona]', reply: lang === 'en' ? 'Connecting you with a person from the team.' : 'Te estoy conectando con una persona del equipo.', action: { type: 'persona' } });
+  } catch (err) { console.warn('[handoff] sin conversación', err && (err.code || err.message)); }
+  const disponible = await teamOnline();
+  await createNotification({
+    type: 'chat_handoff',
+    title: 'Un cliente quiere hablar con una persona',
+    body: disponible ? 'Está esperando en el chat de la web. Entra y pulsa Tomo yo.' : 'Está en el chat de la web. Si no entras en 2 minutos, Marcy le ofrece agendar una llamada.',
+    ref: `persona:${sid}`.slice(0, 100),
+    url: `/dashboard#/marcy/${sid}`,
+    dedupeMinutes: 10,
+  }).catch((err) => console.warn('[handoff] aviso falló', err && err.message));
+  return res.status(200).json({ ok: true, disponible });
 }

@@ -66,6 +66,8 @@ const STR = {
     humanOn: 'Ahora te atiende una persona del equipo de Marcyan.',
     teamLabel: 'Equipo Marcyan · persona',
     teamTyping: 'Una persona del equipo está escribiendo',
+    connecting: 'Te estoy conectando con una persona del equipo. Ya les avisé; quédate aquí un momento.',
+    noOne: 'Ahora mismo no hay nadie del equipo disponible para atenderte en vivo. Si quieres, te agendo una llamada: elige el día y la hora aquí abajo, o dime cuándo te viene bien y te la dejo marcada.',
     talkHuman: 'Hablar con una persona',
     humanOff: 'Te vuelve a atender Marcy.',
     capCitaOk: 'Listo, tu llamada quedó agendada para el %CUANDO% (hora de Houston). Te llamamos a esa hora. 📅',
@@ -145,6 +147,8 @@ const STR = {
     humanOn: 'A person from the Marcyan team is with you now.',
     teamLabel: 'Marcyan team · person',
     teamTyping: 'A person from the team is typing',
+    connecting: 'I’m connecting you with a person from the team. They’ve been notified; stay here a moment.',
+    noOne: 'Nobody from the team is available to chat live right now. If you like, I can book you a call: pick a day and time below, or tell me when works and I’ll mark it for you.',
     talkHuman: 'Talk to a person',
     humanOff: 'Marcy is back with you.',
     capCitaOk: 'Done, your call is booked for %CUANDO% (Houston time). We’ll call you then. 📅',
@@ -979,18 +983,29 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     const leaveBtn = root.querySelector('[data-mrc-leave]');
     const nudge = root.querySelector('[data-mrc-nudge]');
 
-    const sid = (crypto && crypto.randomUUID)
+    // La conversación sobrevive a cerrar la pestaña o el navegador: se guarda en
+    // ESTE dispositivo (7 días sin movimiento) y al volver sigue la misma, con lo
+    // que escribió el equipo mientras tanto. Nunca guarda email ni teléfono.
+    const STORE_KEY = 'mrcConv';
+    const STORE_TTL = 7 * 24 * 3600 * 1000;
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (_) { saved = null; }
+    if (!saved || typeof saved.sid !== 'string' || !/^[\w-]{8,64}$/.test(saved.sid) || saved.lang !== lang
+      || !Array.isArray(saved.view) || Date.now() - (Number(saved.ts) || 0) > STORE_TTL) saved = null;
+    const sid = saved ? saved.sid : ((crypto && crypto.randomUUID)
       ? crypto.randomUUID()
-      : String(Date.now()) + Math.random().toString(36).slice(2);
+      : String(Date.now()) + Math.random().toString(36).slice(2));
+    let view = saved ? saved.view.slice(-60) : [];   // lo que se ve en el chat, para pintarlo al volver
+    let restoring = false;
 
-    let history = [];      // solo pares user/assistant completados (alternancia válida)
+    let history = saved && Array.isArray(saved.history) ? saved.history.slice(-18) : [];      // solo pares user/assistant completados (alternancia válida)
     // "Tomo yo": el dueño puede llevar la conversación desde Orbit. Mientras la
     // lleva, lo que escribe el visitante queda en `waitingUser` (sin respuesta de
     // Marcy) y lo del dueño llega por /api/chat-updates. Se mete en `history` como
     // turno del asistente para que, al devolverla, Marcy sepa lo que se habló.
     let waitingUser = '';
     let human = false;
-    let lastOwnerId = 0;
+    let lastOwnerId = saved ? Number(saved.lastOwnerId) || 0 : 0;
     let pollTimer = null;
     let lastActivity = Date.now();
     let lastUserText = '';
@@ -1023,7 +1038,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       html.style.scrollBehavior = prevSB;
     }
     let started = false;   // ya pasó de bienvenida a conversación
-    let captured = false;  // ya envió sus datos
+    let captured = !!(saved && saved.captured);  // ya envió sus datos
+    function saveConv() {
+      if (!started) return;
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify({ sid, lang, ts: Date.now(), view: view.slice(-60), history: history.slice(-18), lastOwnerId, human, captured }));
+      } catch (_) {}
+    }
+    function remember(item) { if (!restoring) { view.push(item); if (view.length > 80) view = view.slice(-60); } }
 
     // Memoria de contacto (SOLO cliente): lo que el visitante mencionó en el chat.
     // Se usa para PRE-RELLENAR la captura y quitar fricción. Sus valores NUNCA se
@@ -1047,7 +1069,22 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // pero el saludo se inyecta UNA sola vez (no se duplica).
       const first = !started;
       setStage('chat');
-      if (first) {
+      if (first && view.length) {
+        // Vuelve a una conversación guardada: se pinta tal cual y sigue en vivo.
+        started = true;
+        restoring = true;
+        for (const it of view) {
+          if (it.k === 'who') { const w = document.createElement('div'); w.className = 'mrc-who'; w.textContent = it.t; log.appendChild(w); }
+          else if (it.k === 'note') appendNote(it.t);
+          else appendBubble(it.k === 'user' ? 'user' : 'ai', it.t);
+        }
+        restoring = false;
+        log.scrollTop = log.scrollHeight;
+        if (captured && root) root.setAttribute('data-captured', '');
+        if (saved && saved.human) { human = true; setHuman(true); }
+        if (history.length || human) startPolling();
+        if (opened && closeBtn) closeBtn.focus();
+      } else if (first) {
         started = true;
         appendBubble('ai', T.greeting || '');
         // El elemento activado (tema/CTA de bienvenida) se oculta al cambiar de
@@ -1140,6 +1177,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     function appendBubble(role, text, opts) {
+      remember({ k: role === 'user' ? 'user' : 'ai', t: String(text || '').slice(0, 4000) });
       const wantsAnchor = !!(opts && opts.animate) && role === 'ai'; // respuestas de Marcy
       const animate = wantsAnchor && !reduceMotion;
       const b = document.createElement('div');
@@ -1246,7 +1284,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             if (act.name && !known.name) known.name = act.name;
             openCapture(act.destino === 'proyecto' || act.destino === 'cita' ? act.destino : 'contacto', act.extras || {});
           } else if (act && act.type === 'channels') {
-            renderActionCard('channels');
+            // Quiere una persona: se le conecta en vivo con el equipo.
+            requestPerson({ fromMarcy: true });
           } else if (act && act.type === 'link') {
             renderActionCard('link', act.page);
           } else if (!captured && invitesContact(data.reply)) {
@@ -1263,6 +1302,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         appendError(T.error, text);
       } finally {
         setBusy(false);
+        saveConv();
         // No robar el foco si Marcy acaba de abrir la captura: deja el cursor en el
         // campo que falta (mejor con el pre-rellenado). Si no, re-enfoca el input.
         if (opened && input && !log.querySelector('[data-mrc-capture]')) input.focus();
@@ -1273,6 +1313,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     function appendNote(msg) {
+      remember({ k: 'note', t: String(msg || '') });
       const b = document.createElement('div');
       b.className = 'mrc-bub mrc-sys';
       b.textContent = msg;
@@ -1288,6 +1329,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       who.className = 'mrc-who';
       who.textContent = T.teamLabel;
       log.appendChild(who);
+      remember({ k: 'who', t: T.teamLabel });
       appendBubble('ai', text, { animate: true });
       const last = history[history.length - 1];
       if (waitingUser) {
@@ -1307,7 +1349,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         const res = await fetch('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) });
         if (!res.ok) return;
         const d = await res.json();
-        if (d.takeover && !human) { human = true; appendNote(T.humanOn); setHuman(true); }
+        if (d.takeover && !human) { human = true; clearTimeout(personTimer); appendNote(T.humanOn); setHuman(true); }
         if (!d.takeover && human && !waitingUser) { human = false; appendNote(T.humanOff); setHuman(false); }
         if (human && d.typing && !(d.mensajes || []).length) showOwnerTyping(); else hideOwnerTyping();
         for (const m of d.mensajes || []) {
@@ -1316,6 +1358,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           lastActivity = Date.now();
           ownerSays(String(m.text || ''));
         }
+        if ((d.mensajes || []).length) saveConv();
       } catch (_) {}
     }
     function startPolling() {
@@ -1325,6 +1368,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // Con una persona atendiendo se pregunta cada 5 s (para ver "escribiendo…" a tiempo).
     function setHuman(on) {
       if (on) root.setAttribute('data-human', ''); else root.removeAttribute('data-human');
+      saveConv();
       if (pollTimer) { clearInterval(pollTimer); pollTimer = null; startPolling(); }
     }
     function showOwnerTyping() {
@@ -1338,6 +1382,48 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       log.appendChild(ty); log.scrollTop = log.scrollHeight;
     }
     function hideOwnerTyping() { const ty = log.querySelector('[data-mrc-otyping]'); if (ty) ty.remove(); }
+
+    // Texto que el chat dice por su cuenta: entra al historial como turno de Marcy
+    // para que, si el cliente sigue escribiendo, ella sepa qué se le ofreció.
+    function marcySaysLocal(text) {
+      appendBubble('ai', text, { animate: true });
+      const last = history[history.length - 1];
+      if (last && last.role === 'assistant') last.content = last.content + '\n\n' + text;
+      else if (last && last.role === 'user') history = history.concat([{ role: 'assistant', content: text }]).slice(-18);
+      saveConv();
+    }
+
+    // "Hablar con una persona": avisa al equipo (Orbit y móvil), dice que lo está
+    // conectando y espera. Si no hay nadie en Orbit, o nadie la toma en 2 minutos,
+    // le ofrece agendar una llamada con la cajita de horas.
+    let personAsked = 0;
+    let personTimer = null;
+    function offerBooking() {
+      if (human) return;
+      marcySaysLocal(T.noOne);
+      openCapture('cita');
+    }
+    async function requestPerson(opts = {}) {
+      ensureChat();
+      if (human) return;
+      if (Date.now() - personAsked < 3 * 60 * 1000) { if (!opts.fromMarcy) appendNote(T.connecting); return; }
+      personAsked = Date.now();
+      try { track('chat_person_requested'); } catch {}
+      appendNote(T.connecting);
+      startPolling();
+      let disponible = false;
+      try {
+        const res = await fetchWithTimeout('/api/handoff', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pide: true, sessionId: sid, lang }),
+        });
+        const d = await res.json().catch(() => null);
+        disponible = !!(res.ok && d && d.disponible);
+      } catch (_) {}
+      clearTimeout(personTimer);
+      personTimer = setTimeout(offerBooking, disponible ? 120000 : 2500);
+      saveConv();
+    }
 
     // Burbuja de error de red con botón 'Reintentar' (A4 / Chat-F02). Restaura
     // el texto del usuario en el input para que no se pierda.
@@ -1418,17 +1504,22 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     function openCapture(kind, extras) {
       flushTyper();     // que no quede una respuesta a medio "escribir" al abrir la captura
       ensureChat();
-      if (captured) return;
-      if (log.querySelector('[data-mrc-capture]')) { // ya hay una abierta → enfocar
-        const n = log.querySelector('#mrc-c-name'); if (n) n.focus();
+      if (captured && kind !== 'cita') return;
+      const open = log.querySelector('[data-mrc-capture]');
+      if (open && open.dataset.kind === kind && !(kind === 'cita' && extras && extras.at)) { // ya hay una igual abierta → enfocar
+        const n = open.querySelector('#mrc-c-name'); if (n) n.focus();
         return;
       }
+      // Otra cajita distinta abierta (p. ej. la de "hablar con una persona" y ahora
+      // toca elegir hora): se cambia por la nueva, nunca se queda tapando la buena.
+      if (open) open.remove();
       const title = kind === 'handoff' ? (T.capTitleHuman || T.capTitleContact)
         : kind === 'proyecto' ? (T.capTitleProject || T.capTitleContact)
         : kind === 'cita' ? (T.capTitleCita || T.capTitleContact) : T.capTitleContact;
       const card = document.createElement('div');
       card.className = 'mrc-capture';
       card.setAttribute('data-mrc-capture', '');
+      card.dataset.kind = kind;
       // HTML estático (todas las cadenas son nuestras, no del modelo/usuario).
       card.innerHTML =
         '<div class="mrc-cap-title"></div>' +
@@ -1485,7 +1576,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       log.appendChild(card);
       log.scrollTop = log.scrollHeight;
-      if (kind === 'cita') loadSlots(card);
+      if (kind === 'cita') loadSlots(card, extras && extras.at);
 
       const need = (lastUserText || '').slice(0, 1000);
       card.querySelector('[data-mrc-capdismiss]').addEventListener('click', () => card.remove());
@@ -1497,7 +1588,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     // ── Citas: huecos libres (hora de Houston) que sirve /api/citas. Botones
     //    creados con textContent (nada del modelo ni del visitante). ──
-    async function loadSlots(card) {
+    async function loadSlots(card, wantedAt) {
       const box = card.querySelector('[data-mrc-slots]');
       if (!box) return;
       box.textContent = '';
@@ -1506,13 +1597,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         const res = await fetchWithTimeout('/api/citas?lang=' + lang, { method: 'GET' });
         const data = await res.json();
         if (!res.ok || !data || !data.ok || !Array.isArray(data.dias) || !data.dias.length) throw new Error('sin huecos');
-        renderSlots(card, data.dias);
+        renderSlots(card, data.dias, wantedAt);
       } catch (_) {
         p.textContent = T.capSlotsErr;
         card.dataset.slotsFailed = '1';
       }
     }
-    function renderSlots(card, dias) {
+    function renderSlots(card, dias, wantedAt) {
       const box = card.querySelector('[data-mrc-slots]');
       if (!box) return;
       box.textContent = '';
@@ -1538,7 +1629,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         dayRow.appendChild(b);
       });
       box.appendChild(dayRow); box.appendChild(times);
-      showDay(0);
+      // Si el cliente ya dijo día y hora y Marcy la encontró libre, queda marcada.
+      let start = 0;
+      if (wantedAt) {
+        const di = dias.findIndex((d) => d.huecos.some((h) => h.at === wantedAt));
+        if (di >= 0) { start = di; card.dataset.at = wantedAt; }
+      }
+      showDay(start);
     }
 
     // Serializa los últimos turnos del historial como transcript legible, aplicando
@@ -1586,6 +1683,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
       const onSuccess = (okText) => {
         captured = true;
+        setTimeout(saveConv, 0);
         if (root) root.setAttribute('data-captured', '');  // colapsa las chips
         card.querySelectorAll('input, .mrc-cap-send, .mrc-cap-dismiss').forEach((el) => { el.disabled = true; });
         card.querySelectorAll('input, .mrc-cap-row, .mrc-cap-actions, .mrc-cap-consent').forEach((el) => { el.style.display = 'none'; });
@@ -1773,6 +1871,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
       if (nudge) nudge.hidden = true;
+      // Conversación guardada en este dispositivo: se abre directamente en ella.
+      if (!started && view.length) ensureChat();
       syncViewport();
       // Re-sincroniza tras la animación del teclado/viewport (evita franjas de fondo).
       requestAnimationFrame(() => requestAnimationFrame(syncViewport));
@@ -1809,9 +1909,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     if (nudge) nudge.addEventListener('click', () => { nudge.hidden = true; if (!opened) openPanel(); });
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
     const humanBtn = root.querySelector('[data-mrc-human]');
-    if (humanBtn) humanBtn.addEventListener('click', () => openCapture('handoff'));
+    if (humanBtn) humanBtn.addEventListener('click', () => requestPerson());
     const talkBtn = root.querySelector('[data-mrc-talk]');
-    if (talkBtn) talkBtn.addEventListener('click', () => openCapture('handoff'));
+    if (talkBtn) talkBtn.addEventListener('click', () => requestPerson());
     const backBtn = root.querySelector('[data-mrc-back]');
     if (backBtn) backBtn.addEventListener('click', backToWelcome);
     if (form) form.addEventListener('submit', (e) => { e.preventDefault(); send(input && input.value); });

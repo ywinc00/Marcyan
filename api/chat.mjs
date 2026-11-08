@@ -344,6 +344,8 @@ export function parseToolResponse(content, lang = 'es', { updatesAsText = false 
         idioma: sanitizeField(inp.idioma, 60),
         detalles: sanitizeField(inp.detalles, 800),
       };
+      // Hora que el cliente pidió y Marcy encontró libre: la cajita la deja marcada.
+      if (destino === 'cita' && typeof inp.hora === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{3})?)?Z$/.test(inp.hora.trim())) extras.at = inp.hora.trim();
       action = { type: 'capture', destino, extras };
       if (name) action.name = name;
       // Sonnet 5.5 llama a la herramienta SIN escribir texto (verificado 2026-11-07:
@@ -601,7 +603,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const t = await marcyTurn({ messages, lang, sid, ip, extraContext: ownerCtx });
+    // La web también consulta horas libres (sin datos personales: el contacto lo
+    // pone el visitante en la cajita) y sabe qué día es hoy para entender "mañana".
+    const ch = await import('../lib/channels.mjs');
+    const dateCtx = ch.dateContext(lang);
+    const webSlots = {
+      names: new Set([ch.SLOTS_TOOL.name]),
+      async run(toolUse) {
+        let taken = [];
+        try { taken = await (await import('../lib/appointments.mjs')).takenSlots(); } catch { taken = []; }
+        return ch.slotsToolResult({ taken, lang, fecha: toolUse.input && toolUse.input.fecha });
+      },
+    };
+    const t = await marcyTurn({ messages, lang, sid, ip, extraContext: ownerCtx ? `${ownerCtx}
+
+${dateCtx}` : dateCtx, tools: [...CHAT_TOOLS, ch.SLOTS_TOOL], extraInternal: webSlots });
     // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
     await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro });
     return res.status(200).json(t.action ? { reply: t.reply, action: t.action } : { reply: t.reply });

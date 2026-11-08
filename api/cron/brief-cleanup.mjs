@@ -23,6 +23,7 @@
 import { cleanupExpiredDrafts, sweepQueuedDrafts, runFileRetention, verifyPendingFiles, blobConfigured, isMissingSchema } from '../../lib/brief-files.mjs';
 import { purgeOldHits } from '../../lib/ratelimit.mjs';
 import { purgeOldConversations } from '../../lib/chat-log.mjs';
+import { purgeOldMail } from '../../lib/mail-pass.mjs';
 import { safeEqual } from '../../lib/auth.mjs';
 
 function bearerOk(req) {
@@ -37,7 +38,7 @@ async function step(name, fn) {
   try {
     return { ok: true, ...(await fn()) };
   } catch (err) {
-    const why = isMissingSchema(err) ? (name === 'reintentos' ? 'migración 016 sin aplicar' : name === 'conversaciones de Marcy' ? 'migración 018 sin aplicar' : 'migración 010 sin aplicar') : (err && err.message);
+    const why = isMissingSchema(err) ? (name === 'reintentos' ? 'migración 016 sin aplicar' : name === 'conversaciones de Marcy' ? 'migración 018 sin aplicar' : name === 'correo de Marcy' ? 'migración 020 sin aplicar' : 'migración 010 sin aplicar') : (err && err.message);
     console.error(`[cron/brief-cleanup] ${name} falló:`, why);
     return { ok: false, error: why };
   }
@@ -61,8 +62,9 @@ export default async function handler(req, res) {
   const verify = blob ? await step('verificación', () => verifyPendingFiles({ limit: 40 })) : { ok: false, error: 'almacén no configurado' };
   const hits = await step('límite de envíos', async () => ({ deleted: await purgeOldHits() }));
   const chats = await step('conversaciones de Marcy', async () => ({ deleted: await purgeOldConversations() }));
+  const correo = await step('correo de Marcy', async () => ({ deleted: await purgeOldMail() }));
   const sweepOk = sweep.ok || sweep.error === 'migración 016 sin aplicar';
 
   console.log(`[cron/brief-cleanup] borradores=${drafts.drafts ?? '-'} blobs=${drafts.blobs ?? '-'} reintentos=${sweep.swept ?? '-'} avisos_borrado=${retention.notices ?? '-'} briefs_borrados=${retention.purged ?? '-'} archivos_borrados=${retention.files ?? '-'} verificados=${verify.verified ?? '-'} rechazados=${verify.rejected ?? '-'} ventanas=${hits.deleted ?? '-'} conversaciones_borradas=${chats.deleted ?? '-'}`);
-  return res.status(200).json({ ok: drafts.ok && sweepOk && retention.ok && verify.ok && hits.ok, drafts, sweep, retention, verify, hits, chats });
+  return res.status(200).json({ ok: drafts.ok && sweepOk && retention.ok && verify.ok && hits.ok, drafts, sweep, retention, verify, hits, chats, correo });
 }

@@ -445,9 +445,13 @@ const C = T.correo;
     function geo() {
       if (!linea || !lit || N < 2) return;
       const R = zrect(root);
-      const a = centro(0).y - R.top, b = centro(N - 1).y - R.top;
+      // último punto con caja (con el escenario fijado, el de la fase final está oculto)
+      let ult = N - 1;
+      while (ult > 0 && !pasos[ult].querySelector<HTMLElement>('[data-w2-dot]')?.offsetParent) ult--;
+      if (ult < 1) return;
+      const a = centro(0).y - R.top, b = centro(ult).y - R.top;
       linea.style.top = `${a}px`; linea.style.bottom = 'auto'; linea.style.height = `${Math.max(0, b - a)}px`;
-      const f = still ? 1 : act <= 0 ? 0 : (centro(act).y - R.top - a) / (b - a || 1);
+      const f = still ? 1 : act <= 0 ? 0 : (centro(Math.min(act, ult)).y - R.top - a) / (b - a || 1);
       lit.style.transform = `scaleY(${Math.min(1, Math.max(0, f))})`;
     }
 

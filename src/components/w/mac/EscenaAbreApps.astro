@@ -32,6 +32,7 @@ import FichaMapaEjemplo from '../objetos/FichaMapaEjemplo.astro';
 import LogoMarca from '../marcas/LogoMarca.astro';
 import Kicker from '../../ui/Kicker.astro';
 import Button from '../../ui/Button.astro';
+import TelefonoWeb from '../heroes/webs/TelefonoWeb.astro';
 
 /** Proyecto real (capturas de /Galeria) para el modo «viaje» de la portada. */
 export interface ProyectoViaje { slug: string; name: string; cat: string; result: string; domain?: string; movilH: number }
@@ -188,7 +189,6 @@ const destinos = {
       {viaje?.proyectos.map((pr, i) => (
         <VentanaApp id={`p${i}`} url={pr.domain ?? pr.name} x={214} y={70} w={950} h={600} z={10 + i} class={`pp-ven pp-ven--${i}`}>
           <img class="pp-img pp-img--pc" src={`/Galeria/${pr.slug}-pc-900.webp`} srcset={`/Galeria/${pr.slug}-pc-480.webp 480w, /Galeria/${pr.slug}-pc-640.webp 640w, /Galeria/${pr.slug}-pc-900.webp 900w, /Galeria/${pr.slug}-pc-1280.webp 1280w`} sizes="(min-width: 1120px) 680px, 340px" width="900" height="506" alt="" loading="lazy" decoding="async" />
-          <img class="pp-img pp-img--movil" src={`/Galeria/${pr.slug}-movil-520.webp`} width="520" height={pr.movilH} alt="" loading="lazy" decoding="async" />
         </VentanaApp>
       ))}
     </Escritorio>
@@ -196,6 +196,18 @@ const destinos = {
   </div>
   {viaje && (
     <Fragment>
+      {/* Modo «Móvil»: el portátil se cambia por un iPhone con las capturas móviles reales. */}
+      <div class="pp-tel" aria-hidden="true">
+        <TelefonoWeb lang={lang} fondo="#fff">
+          {viaje.proyectos.map((pr, i) => (
+            <img class={`pp-tel__p pp-tel__p--${i}`} src={`/Galeria/${pr.slug}-movil-520.webp`} width="520" height={pr.movilH} alt="" loading="lazy" decoding="async" />
+          ))}
+        </TelefonoWeb>
+      </div>
+      <div class="pp-lanza">
+        {viaje.lanza.kicker && <span class="pp-lanza__k">{viaje.lanza.kicker}</span>}
+        <Button href={viaje.lanza.href} variant="primary" size="lg">{viaje.lanza.label}</Button>
+      </div>
       <div class="pp-cab">
         <div class="pp-tit">
           <Kicker>{viaje.cab.tag}</Kicker>
@@ -208,10 +220,6 @@ const destinos = {
         </div>
       </div>
       <div class="pp-pie">
-        <div class="pp-lanza">
-          {viaje.lanza.kicker && <span class="pp-lanza__k">{viaje.lanza.kicker}</span>}
-          <Button href={viaje.lanza.href} variant="primary" size="lg">{viaje.lanza.label}</Button>
-        </div>
         <ol class="pp-caps" role="list" aria-hidden="true">
           {viaje.proyectos.map((pr, i) => (
             <li class:list={['pp-cap', i === viaje.proyectos.length - 1 && 'pp-cap--fin']} style={`--i:${i}`}>
@@ -356,7 +364,7 @@ const destinos = {
      El guion mide y pone --pp-k/--pp-x/--pp-y (acercamiento, solo transform) y el rectángulo final
      del portátil (--pp-tl/--pp-tt/--pp-tw/--pp-th) para colocar la cabecera encima y el pie debajo.
      Sin JS, sin línea de tiempo o con movimiento reducido: data-pin-on no se pone y todo queda quieto. */
-  .abre--viaje .pp-cab, .abre--viaje .pp-pie { display: none; }
+  .abre--viaje .pp-cab, .abre--viaje .pp-pie, .abre--viaje .pp-tel, .abre--viaje .pp-lanza { display: none; }
   :global(.lf--pin[data-pin-on]) .abre--viaje { position: absolute; inset: 0; display: block; }
   :global(.lf--pin[data-pin-on]) .abre--viaje .abre-hueco, :global(.lf--pin[data-pin-on]) .abre--viaje .abre-pista { display: none; }
   :global(.lf--pin[data-pin-on]) .abre--viaje .abre-fijo { position: absolute; inset: 0; bottom: auto; height: 100%; }
@@ -370,20 +378,46 @@ const destinos = {
   :global(.lf--pin[data-pin-on]) .abre--viaje .abre-obj {
     position: absolute; left: var(--pp-x0, 0px); top: var(--pp-y0, 0px); width: var(--pp-w0, 100%);
     transform-origin: 0 0; will-change: transform;
+    transition: opacity .38s cubic-bezier(.22, 1, .36, 1), visibility 0s linear 0s;
     animation: pp-acerca linear both; animation-timeline: --lf-pin; animation-range: contain 13% contain 23%;
   }
+  /* Tapa fija (dueño, 2026-11-08): una vez abierta, al volver hacia arriba NO se cierra. */
+  .abre[data-tapa-fija] :global(.pt .pt-tapa) { animation: none !important; transform: none !important; }
+  .abre[data-tapa-fija] :global(.pt .pt-apagada) { animation: none !important; opacity: 0 !important; }
+  /* Modo «Móvil» con los proyectos a la vista: el portátil se va y entra el iPhone. */
+  .abre[data-modo='movil'][data-pp] .abre-obj { opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility 0s linear .3s; }
+  :global(.lf--pin[data-pin-on]) .abre--viaje .pp-tel {
+    display: block; position: absolute; z-index: 2; left: var(--pp-telx); top: var(--pp-tely); width: var(--pp-telw);
+    opacity: 0; visibility: hidden; transform: translateY(24px) scale(.97);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22, 1, .36, 1), visibility 0s linear .45s;
+  }
+  .abre[data-modo='movil'][data-pp] .pp-tel { opacity: 1; visibility: visible; transform: none; transition: opacity .4s ease .12s, transform .5s cubic-bezier(.22, 1, .36, 1) .12s, visibility 0s; }
+  .pp-tel :global(.tw__marco) { border-radius: calc(var(--pp-telw, 280px) * .14); }
+  .pp-tel :global(.tw__vp) { border-radius: calc(var(--pp-telw, 280px) * .12); }
+  .pp-tel__p { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 0; background: #fff; }
+  /* Cada proyecto sube y tapa al anterior, al mismo ritmo que las ventanas del portátil. */
+  :global(.lf--pin[data-pin-on]) .pp-tel__p:not(.pp-tel__p--0) { animation: pp-tel-sube linear both; animation-timeline: --lf-pin; }
+  @keyframes pp-tel-sube { from { transform: translateY(101%); } to { transform: none; } }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--1:not(.pp-tel__p--0) { animation-range: contain 54% contain 59%; }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--2:not(.pp-tel__p--0) { animation-range: contain 68% contain 73%; }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--3:not(.pp-tel__p--0) { animation-range: contain 82% contain 87%; }
   @keyframes pp-acerca { to { transform: translate(var(--pp-x, 0px), var(--pp-y, 0px)) scale(var(--pp-k, 1)); } }
 
   /* Cabecera (encima del portátil final) y pie (debajo). */
   :global(.lf--pin[data-pin-on]) .abre--viaje .pp-cab {
     position: absolute; z-index: 3; left: var(--pp-tl); width: var(--pp-tw); bottom: calc(100% - var(--pp-tt) + 14px);
     display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+    transition: bottom .45s cubic-bezier(.22, 1, .36, 1);
     animation: pp-entra linear both; animation-timeline: --lf-pin; animation-range: contain 37% contain 41%;
   }
   :global(.lf--pin[data-pin-on]) .abre--viaje .pp-pie {
-    position: absolute; z-index: 3; left: var(--pp-tl); width: var(--pp-tw); top: calc(var(--pp-tt) + var(--pp-th) + 14px);
+    position: absolute; z-index: 3; left: var(--pp-tl); width: var(--pp-tw); top: var(--pp-piet-pc);
+    transition: top .45s cubic-bezier(.22, 1, .36, 1);
     display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: 32px;
   }
+  .abre[data-modo='movil'][data-pp] .pp-pie { top: var(--pp-piet-movil); }
+  /* En «Móvil» la cabecera se coloca encima del iPhone (en el teléfono el iPhone es más alto que el portátil). */
+  .abre[data-modo='movil'][data-pp] .pp-cab { bottom: calc(100% - var(--pp-tely) + 14px); }
   @keyframes pp-entra { from { opacity: 0; transform: translateY(10px); visibility: hidden; } to { opacity: 1; transform: none; visibility: visible; } }
   @keyframes pp-sale { 0% { opacity: 0; visibility: hidden; transform: translateY(8px); } 14%, 86% { opacity: 1; visibility: visible; transform: none; } 100% { opacity: 0; visibility: hidden; transform: translateY(-6px); } }
   @keyframes pp-queda { 0% { opacity: 0; visibility: hidden; transform: translateY(8px); } 30%, 100% { opacity: 1; visibility: visible; transform: none; } }
@@ -398,8 +432,14 @@ const destinos = {
   .pp-seg__pill { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: #f0ede8; transition: transform .26s cubic-bezier(.22, 1, .36, 1); }
   .abre[data-modo='movil'] .pp-seg__pill { transform: translateX(100%); }
 
-  .pp-lanza { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-    animation: pp-sale linear both; animation-timeline: --lf-pin; animation-range: contain 20% contain 35%; }
+  /* «Lanza tu proyecto»: fuera en escritorio; en el teléfono, centrado y abajo (dueño, 2026-11-08). */
+  @media (max-width: 767.98px) {
+    :global(.lf--pin[data-pin-on]) .abre--viaje .pp-lanza {
+      position: absolute; z-index: 3; left: 0; right: 0; bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+      animation: pp-sale linear both; animation-timeline: --lf-pin; animation-range: contain 20% contain 35%;
+    }
+  }
   .pp-lanza__k { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
   .pp-caps { grid-column: 1; grid-row: 1; display: grid; margin: 0; padding: 0; list-style: none; }
   .pp-cap { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 4px; min-width: 0;
@@ -441,19 +481,11 @@ const destinos = {
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-range: contain 68% contain 73%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--3) { animation-range: contain 82% contain 87%; }
   /* Escritorio: cascada que baja hacia la derecha (cada ventana tapa la anterior). */
-  .abre[data-modo='pc'] :global(.pp-ven--0) { left: 214px !important; top: 66px !important; width: 950px !important; height: 600px !important; }
-  .abre[data-modo='pc'] :global(.pp-ven--1) { left: 254px !important; top: 104px !important; width: 950px !important; height: 600px !important; }
-  .abre[data-modo='pc'] :global(.pp-ven--2) { left: 294px !important; top: 142px !important; width: 950px !important; height: 600px !important; }
-  .abre[data-modo='pc'] :global(.pp-ven--3) { left: 334px !important; top: 180px !important; width: 950px !important; height: 600px !important; }
-  /* Móvil: cada proyecto en una ventana con forma de teléfono, en fila. */
-  .abre[data-modo='movil'] :global(.pp-ven--0) { left: 104px !important; top: 66px !important; width: 270px !important; height: 620px !important; }
-  .abre[data-modo='movil'] :global(.pp-ven--1) { left: 410px !important; top: 66px !important; width: 270px !important; height: 620px !important; }
-  .abre[data-modo='movil'] :global(.pp-ven--2) { left: 716px !important; top: 66px !important; width: 270px !important; height: 620px !important; }
-  .abre[data-modo='movil'] :global(.pp-ven--3) { left: 1022px !important; top: 66px !important; width: 270px !important; height: 620px !important; }
+  .abre :global(.pp-ven--0) { left: 214px !important; top: 66px !important; width: 950px !important; height: 600px !important; }
+  .abre :global(.pp-ven--1) { left: 254px !important; top: 104px !important; width: 950px !important; height: 600px !important; }
+  .abre :global(.pp-ven--2) { left: 294px !important; top: 142px !important; width: 950px !important; height: 600px !important; }
+  .abre :global(.pp-ven--3) { left: 334px !important; top: 180px !important; width: 950px !important; height: 600px !important; }
   .abre :global(.pp-img) { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 0; }
-  .abre[data-modo='pc'] :global(.pp-img--movil), .abre[data-modo='movil'] :global(.pp-img--pc) { display: none; }
-  .abre[data-modo='movil'] :global(.pp-ven .vent-url) { min-width: 0; padding: 0 8px; font-size: 11px; }
-  .abre[data-modo='movil'] :global(.pp-ven .vent-url svg) { display: none; }
 
   @media (max-width: 1119.98px) {
     :global(.lf--pin[data-pin-on]) .abre--viaje .pp-cab { flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -464,8 +496,7 @@ const destinos = {
   @media (max-width: 767.98px) {
     /* Teléfono: el portátil desborda por los lados (se ve el centro de la pantalla). Las ventanas
        viven en la franja central visible; en «Móvil», un teléfono grande en cascada, uno sobre otro. */
-    .abre[data-modo='pc'] :global(.pp-ven) { left: 40px !important; top: 46px !important; width: 1298px !important; height: 820px !important; }
-    .abre[data-modo='movil'] :global(.pp-ven) { left: 409px !important; top: 40px !important; width: 560px !important; height: 850px !important; }
+    .abre :global(.pp-ven) { left: 40px !important; top: 46px !important; width: 1298px !important; height: 820px !important; }
     /* En el teléfono cada proyecto SUSTITUYE al anterior (sale hacia arriba), sin apilarse. */
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 40% contain 54%; }
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-name: pp-ven-pasa; animation-range: contain 54% contain 68%; }
@@ -568,6 +599,7 @@ const destinos = {
     ioDif.observe(raiz);
     const fuera = () => {
       clearTimeout(tFuera);
+      if (raiz.dataset.tapaFija !== undefined) return; // con la tapa fija, el escritorio se queda como está
       tFuera = window.setTimeout(() => { sec.stop(); reset(); armada = true; }, 8000);
     };
     // Al volver a la vista (también desde ABAJO, con la tapa ya abierta por el scroll): si la
@@ -615,7 +647,8 @@ const destinos = {
         raiz.dataset.modo = m;
         botones.forEach((b) => { const on = b.dataset.ppModo === m; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
       };
-      ponModo(qMovil.matches ? 'movil' : 'pc');
+      // Siempre empieza en «Escritorio»: el móvil es solo para quien quiera verlo (dueño, 2026-11-08).
+      ponModo('pc');
       botones.forEach((b) => b.addEventListener('click', () => ponModo(b.dataset.ppModo || 'pc')));
       raiz.querySelector('[data-pp-seg]')?.addEventListener('keydown', (e) => {
         const k = (e as KeyboardEvent).key;
@@ -655,6 +688,13 @@ const destinos = {
         if (qMovil.matches) { set('--pp-tl', 0); set('--pp-tw', W); }
         else { set('--pp-tl', tl + (T - tapaW) / 2); set('--pp-tw', tapaW); }
         set('--pp-tt', tt); set('--pp-th', Th);
+        // iPhone del modo «Móvil»: centrado en el hueco libre, tan alto como quepa (marco 8 px, pantalla 390 × 844)
+        const bandaT = 24 + cabH + 14;
+        const telH = Math.min(libre, qMovil.matches ? 620 : 700);
+        const telW = (telH - 16) * 390 / 844 + 16;
+        const telY = bandaT + Math.max(0, (libre - telH) / 2);
+        set('--pp-telw', telW); set('--pp-telx', tl + T / 2 - telW / 2); set('--pp-tely', telY);
+        set('--pp-piet-pc', tt + Th + 14); set('--pp-piet-movil', Math.max(tt + Th, telY + telH) + 14);
       };
       // Las medidas (fuerzan maquetación) se hacen cuando el tramo se acerca, no en la carga.
       // Con #proyectos en la dirección se mide ya, para que el salto caiga en su sitio.
@@ -685,13 +725,16 @@ const destinos = {
       const mira = () => {
         pend = false;
         const p = progreso();
+        // Tapa abierta del todo: queda fija (al volver hacia arriba no se cierra).
+        if (p >= 0.13 && raiz.dataset.tapaFija === undefined) raiz.dataset.tapaFija = '';
+        raiz.toggleAttribute('data-pp', p >= 0.37);
         // Llegada directa a mitad del tramo (recarga, salto, scroll rápido): estado final, sin secuencia.
         if (p >= 0.3 && armada) { armada = false; listaWa(); final(); }
         else if (p >= 0.12 && armada) arranca();
         // Si se llega a los proyectos con la secuencia a medias, se salta a su final (nunca el bloqueo encima).
         if (p >= 0.33 && sec.corriendo) { sec.stop(); final(); }
         if (menu) { const m = p >= 0.38 ? (apps.web ?? '') : sec.corriendo ? null : (apps.correo ?? ''); if (m !== null && menu.textContent !== m) menu.textContent = m; }
-        else if (p < 0.02 && !armada) { sec.stop(); reset(); armada = true; }
+        if (p < 0.02 && !armada && raiz.dataset.tapaFija === undefined) { sec.stop(); reset(); armada = true; }
       };
       new IntersectionObserver((es) => { enVista = es.some((e) => e.isIntersecting); if (enVista) mira(); }).observe(tramo);
       addEventListener('scroll', () => { if (enVista && !pend) { pend = true; requestAnimationFrame(mira); } }, { passive: true });

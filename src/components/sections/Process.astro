@@ -32,13 +32,15 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
 const lista = lang === 'en' ? PEN : PES;
 const MOVIL_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
 const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
+// TRR y MJA tienen colores muy parecidos: nunca uno detrás del otro (dueño, 2026-11-08).
+const ORDEN = ['trr', 'jls', 'mja', 'rn'];
 const viaje = projects ? {
   proyectos: (projects.items as any[]).map((p) => {
     const slug = lista.find((x) => x.name === p.name)?.slug ?? PES.find((x) => x.name === p.name)?.slug;
     const parts = String(p.cat ?? '').split('·').map((x: string) => x.trim());
     const city = slug === 'mja' ? 'Florida (Orlando)' : (parts[1] ?? '').replace(/,\s*[A-Z]{2}$/, '');
     return slug ? { slug, name: p.name, cat: [parts[0], city].filter(Boolean).join(' · '), result: p.result, domain: DOMINIOS[slug], movilH: MOVIL_H[slug] ?? 960 } : null;
-  }).filter(Boolean),
+  }).filter(Boolean).sort((a: any, b: any) => ORDEN.indexOf(a.slug) - ORDEN.indexOf(b.slug)),
   cab: { tag: projects.tag, titleHtml: projects.title, cta: { label: lang === 'en' ? 'See the full portfolio' : 'Ver todo el portafolio', href: lang === 'en' ? '/en/portfolio' : '/es/portafolio' } },
   lanza: launch,
 } : undefined;

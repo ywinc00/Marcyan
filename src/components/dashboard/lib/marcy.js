@@ -40,7 +40,8 @@ export function actionLabel(type, destino) {
     if (destino === 'persona') return 'Ofreció pasarle con una persona';
     return 'Abrió el formulario de contacto';
   }
-  if (type === 'channels') return 'Mostró llamar y WhatsApp';
+  if (type === 'channels') return 'Quiso hablar con una persona';
+  if (type === 'persona') return 'Pidió hablar con una persona: se avisó al equipo';
   if (type === 'link') return 'Le dejó un enlace del sitio';
   return '';
 }

@@ -124,6 +124,14 @@ check('folio MRC no se marca', () => assert.equal(pricePostFilter('Tu folio es M
 // ── v2: parseToolResponse (texto + tool_use → {text, action}) ──
 const TU = (destino) => ({ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino } });
 const TX = (t) => ({ type: 'text', text: t });
+check('cita: la hora pedida viaja a la cajita solo si es un código válido', () => {
+  const ok = parseToolResponse([{ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino: 'cita', mensaje: 'Te dejé marcada mañana a las 3.', hora: '2026-11-09T21:00:00.000Z' } }], 'es');
+  assert.equal(ok.action.extras.at, '2026-11-09T21:00:00.000Z');
+  const bad = parseToolResponse([{ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino: 'cita', mensaje: 'x', hora: 'mañana a las 3' } }], 'es');
+  assert.equal(bad.action.extras.at, undefined);
+  const otro = parseToolResponse([{ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino: 'contacto', mensaje: 'x', hora: '2026-11-09T21:00:00.000Z' } }], 'es');
+  assert.equal(otro.action.extras.at, undefined);
+});
 check('texto + tool destino proyecto', () => {
   const r = parseToolResponse([TX('Te armo la propuesta.'), TU('proyecto')], 'es');
   assert.equal(r.text, 'Te armo la propuesta.');

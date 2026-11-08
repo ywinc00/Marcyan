@@ -11,6 +11,8 @@ import '../styles/dashboard.css';
 
 interface Props { title?: string }
 const { title = 'Marcyan · Panel' } = Astro.props;
+// Versión de este despliegue (la misma que devuelve /api/version en producción).
+const BUILD = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_DEPLOYMENT_ID || 'dev').slice(0, 12);
 ---
 <!doctype html>
 <html lang="es">
@@ -20,11 +22,13 @@ const { title = 'Marcyan · Panel' } = Astro.props;
     <title>{title}</title>
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#0e0e11" />
-    <link rel="icon" type="image/svg+xml" href="/dashboard/orbit-icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/dashboard/orbit-icon.svg" />
+
     <link rel="icon" type="image/png" sizes="192x192" href="/dashboard/orbit-192.png" />
     <link rel="manifest" href="/dashboard/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/dashboard/orbit-180.png" />
     <meta name="apple-mobile-web-app-title" content="Orbit" />
+    <meta name="orbit-version" content={BUILD} />
     {import.meta.env.DEV && <script is:inline src="/dev/dash-mock.js"></script>}
     {/* Service worker SOLO en producción (SH-16): en desarrollo cacheaba los
         módulos de Vite y se veía código viejo. En dev, además, se da de baja
@@ -39,11 +43,51 @@ const { title = 'Marcyan · Panel' } = Astro.props;
       <script is:inline>
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', function () {
-            navigator.serviceWorker.register('/dashboard/sw.js', { scope: '/dashboard' }).catch(function (e) {
+            // Si el aviso no pudo navegar la ventana abierta, lo pide por mensaje.
+            navigator.serviceWorker.addEventListener('message', function (ev) {
+              var d = ev.data || {};
+              if (d.type === 'orbit:navigate' && typeof d.url === 'string' && d.url.indexOf('/dashboard') === 0) location.href = d.url;
+            });
+            navigator.serviceWorker.register('/dashboard/sw.js', { scope: '/dashboard', updateViaCache: 'none' }).catch(function (e) {
               console.warn('[panel] no se pudo registrar el service worker', e);
             });
           });
         }
+        // Actualización sola: tras cada publicación, Orbit nota la versión nueva
+        // (al volver a la pestaña o cada 5 min) y se recarga. Si estás escribiendo
+        // en un campo, espera a que lo dejes para no perder lo escrito.
+        (function () {
+          var meta = document.querySelector('meta[name="orbit-version"]');
+          var mine = meta && meta.content;
+          if (!mine || mine === 'dev') return;
+          var pending = false;
+          function typing() {
+            var a = document.activeElement;
+            return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable);
+          }
+          var target = '';
+          function reload() {
+            // Una sola recarga por versión: si el navegador devolviera la página
+            // vieja, no se queda recargando en bucle.
+            try { if (sessionStorage.getItem('orbit-reloaded-for') === target) return; sessionStorage.setItem('orbit-reloaded-for', target); } catch (e) {}
+            location.reload();
+          }
+          function apply() {
+            if (typing()) { pending = true; return; }
+            reload();
+          }
+          function check() {
+            if (document.visibilityState !== 'visible') return;
+            fetch('/api/version', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+              if (d && d.v && d.v !== mine) { target = d.v; apply(); }
+            }).catch(function () {});
+            if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistration('/dashboard').then(function (g) { if (g) g.update(); }).catch(function () {});
+          }
+          document.addEventListener('visibilitychange', check);
+          window.addEventListener('focus', check);
+          document.addEventListener('focusout', function () { if (pending) setTimeout(function () { if (!typing()) reload(); }, 300); });
+          setInterval(check, 5 * 60 * 1000);
+        })();
       </script>
     )}
   </head>

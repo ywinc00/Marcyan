@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   MAILBOXES, headerMap, parseAddress, isAutomated, isOwnSender, extractText,
   buildClassifyInput, parseClassification, fallbackClassification, shouldAck,
-  ackText, buildReplyRaw, needsDraft, LABELS, CATEGORIES,
+  ackText, buildReplyRaw, needsDraft, LABELS, CATEGORIES, isOwnSystemMail,
 } from '../lib/mail-triage.mjs';
 
 let n = 0; const fails = [];
@@ -110,6 +110,12 @@ check('borrador: cliente y oportunidad sí; aviso automático no', () => {
   assert.equal(needsDraft({ category: 'importante', automated: false, own: false }), true);
   assert.equal(needsDraft({ category: 'spam', automated: false, own: false }), false);
   assert.equal(needsDraft({ category: 'cliente', automated: false, own: true }), false);
+});
+
+check('correos de sistema propios', () => {
+  assert.equal(isOwnSystemMail('Tu enlace de acceso a Orbit'), true);
+  assert.equal(isOwnSystemMail('Tu acceso a Marcyan Admin'), true);
+  assert.equal(isOwnSystemMail('Nuevo lead LEAD-120'), false);
 });
 
 check('cada categoría tiene etiqueta', () => { for (const c of CATEGORIES) assert.ok(LABELS[c], c); });

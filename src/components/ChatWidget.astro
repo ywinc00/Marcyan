@@ -61,6 +61,9 @@ const STR = {
     capSlotsErr: 'No pudimos cargar los horarios. Deja tu contacto y te llamamos para cuadrar la hora.',
     capPickSlot: 'Elige una hora de la lista.',
     humanOn: 'Ahora te atiende una persona del equipo de Marcyan.',
+    teamLabel: 'Equipo Marcyan · persona',
+    teamTyping: 'Una persona del equipo está escribiendo',
+    talkHuman: 'Hablar con una persona',
     humanOff: 'Te vuelve a atender Marcy.',
     capCitaOk: 'Listo, tu llamada quedó agendada para el %CUANDO% (hora de Houston). Te llamamos a esa hora. 📅',
     capSub: 'Confirma tu nombre y tu mejor email o teléfono. Sin compromiso.',
@@ -136,6 +139,9 @@ const STR = {
     capSlotsErr: 'We couldn’t load the times. Leave your contact and we’ll call you to set one.',
     capPickSlot: 'Please pick a time from the list.',
     humanOn: 'A person from the Marcyan team is with you now.',
+    teamLabel: 'Marcyan team · person',
+    teamTyping: 'A person from the team is typing',
+    talkHuman: 'Talk to a person',
     humanOff: 'Marcy is back with you.',
     capCitaOk: 'Done, your call is booked for %CUANDO% (Houston time). We’ll call you then. 📅',
     capSub: 'Confirm your name and your best email or phone number. No strings attached.',
@@ -368,6 +374,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     <p class="mrc-foot">
       <span class="mrc-foot-note"><Icon name="lucide:shield-check" />{t.privacy}</span>
       <span class="mrc-foot-actions">
+        <button type="button" class="mrc-foot-link" data-mrc-talk>{t.talkHuman}</button>
         <button type="button" class="mrc-foot-link" data-mrc-leave>{t.leaveData}</button>
       </span>
     </p>
@@ -641,6 +648,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     font-size: var(--text-xs); color: var(--fg-secondary); text-decoration: underline; font-family: var(--font-body);
   }
   .mrc-foot-link:hover { color: var(--accent-teal); }
+  .mrc-foot-actions { display: inline-flex; gap: var(--space-3); flex-wrap: wrap; justify-content: flex-end; }
+  .mrc-chat[data-human] [data-mrc-talk] { display: none; }
   .mrc-foot-link:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
 
   .mrc-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -668,6 +677,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 </style>
 
 <style is:global>
+  /* Mensaje del equipo (Orbit "Tomo yo"): rótulo sutil encima de la burbuja. */
+  .mrc-chat .mrc-who { align-self: flex-start; margin: var(--space-2) 0 -4px 4px; font-size: var(--text-xs); color: var(--accent-gold); letter-spacing: .02em; }
   /* Elementos dinámicos (los crea el JS → sin atributo de scope de Astro) y el
      avatar Marcy (otro componente). Scopeados a mano bajo .mrc-chat. */
   .mrc-chat .mrc-bub {
@@ -1089,11 +1100,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (data && data.human) {
           // Lo lleva el dueño: sin respuesta de Marcy; se guarda para el historial.
           waitingUser = userText;
-          if (!human) { human = true; appendNote(T.humanOn); }
+          if (!human) { human = true; appendNote(T.humanOn); setHuman(true); }
           startPolling();
         } else if (data && data.reply) {
           waitingUser = '';
-          if (human) { human = false; appendNote(T.humanOff); }
+          if (human) { human = false; appendNote(T.humanOff); setHuman(false); }
           appendBubble('ai', data.reply, { animate: true });
           // `history` = SOLO texto crudo (sin banderas, sin PII) → alternancia válida y transcript limpio.
           history = recent.concat([{ role: 'user', content: userText }, { role: 'assistant', content: data.reply }]);
@@ -1143,6 +1154,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // Mensajes del dueño (Orbit "Tomo yo"). Pregunta cada 10 s con el panel
     // abierto y la pestaña visible; se apaga sola tras 30 min sin movimiento.
     function ownerSays(text) {
+      hideOwnerTyping();
+      const who = document.createElement('div');
+      who.className = 'mrc-who';
+      who.textContent = T.teamLabel;
+      log.appendChild(who);
       appendBubble('ai', text, { animate: true });
       const last = history[history.length - 1];
       if (waitingUser) {
@@ -1162,8 +1178,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         const res = await fetch('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) });
         if (!res.ok) return;
         const d = await res.json();
-        if (d.takeover && !human) { human = true; appendNote(T.humanOn); }
-        if (!d.takeover && human && !waitingUser) { human = false; appendNote(T.humanOff); }
+        if (d.takeover && !human) { human = true; appendNote(T.humanOn); setHuman(true); }
+        if (!d.takeover && human && !waitingUser) { human = false; appendNote(T.humanOff); setHuman(false); }
+        if (human && d.typing && !(d.mensajes || []).length) showOwnerTyping(); else hideOwnerTyping();
         for (const m of d.mensajes || []) {
           if (m.id <= lastOwnerId) continue;
           lastOwnerId = m.id;
@@ -1174,8 +1191,24 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
     function startPolling() {
       lastActivity = Date.now();
-      if (!pollTimer) pollTimer = setInterval(pollOwner, 10000);
+      if (!pollTimer) pollTimer = setInterval(pollOwner, human ? 5000 : 10000);
     }
+    // Con una persona atendiendo se pregunta cada 5 s (para ver "escribiendo…" a tiempo).
+    function setHuman(on) {
+      if (on) root.setAttribute('data-human', ''); else root.removeAttribute('data-human');
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; startPolling(); }
+    }
+    function showOwnerTyping() {
+      if (log.querySelector('[data-mrc-otyping]')) return;
+      const ty = document.createElement('div');
+      ty.className = 'mrc-typing'; ty.setAttribute('data-mrc-otyping', '');
+      ty.setAttribute('role', 'status'); ty.setAttribute('aria-label', T.teamTyping);
+      ty.appendChild(document.createElement('span'));
+      ty.appendChild(document.createElement('span'));
+      ty.appendChild(document.createElement('span'));
+      log.appendChild(ty); log.scrollTop = log.scrollHeight;
+    }
+    function hideOwnerTyping() { const ty = log.querySelector('[data-mrc-otyping]'); if (ty) ty.remove(); }
 
     // Burbuja de error de red con botón 'Reintentar' (A4 / Chat-F02). Restaura
     // el texto del usuario en el input para que no se pierda.
@@ -1648,6 +1681,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
     const humanBtn = root.querySelector('[data-mrc-human]');
     if (humanBtn) humanBtn.addEventListener('click', () => openCapture('handoff'));
+    const talkBtn = root.querySelector('[data-mrc-talk]');
+    if (talkBtn) talkBtn.addEventListener('click', () => openCapture('handoff'));
     const backBtn = root.querySelector('[data-mrc-back]');
     if (backBtn) backBtn.addEventListener('click', backToWelcome);
     if (form) form.addEventListener('submit', (e) => { e.preventDefault(); send(input && input.value); });

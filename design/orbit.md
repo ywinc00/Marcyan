@@ -175,3 +175,11 @@ Estado: PROPUESTO. Sin pantalla nueva: el interruptor vive en la cabecera de Avi
 los botones de siempre (`b b--ghost`). Estados: activar, probar y apagar; si el navegador lo bloquea, si falta
 la llave o en iPhone sin instalar, una nota corta en su lugar. La notificación usa el icono de Orbit.
 Captura: `design/orbit-correo/avisos-cabecera.jpg` (el panel de pruebas bloquea los avisos, por eso sale la nota).
+
+## Añadido 2026-11-07 · "Tomo yo" (el dueño contesta en el chat web)
+Estado: PROPUESTO. Dentro de la conversación ya aprobada (dirección A): debajo del hilo, "Tomo yo" (primario)
+con una línea que explica que Marcy se calla; tomada, una caja de texto con "Enviar" (primario, Enter envía)
+y "Devolver a Marcy" (secundario). Chip de la cabecera "La llevas tú" en naranja (H-07: es lo que pide tu
+acción). Tus mensajes en verde de datos ("Tú · hora"), distintos de los de Marcy (filo naranja). En el chat de la
+web, nota centrada "Ahora te atiende una persona del equipo" con el estilo de nota que ya existe.
+Captura: `design/orbit-correo/tomo-yo.png`.

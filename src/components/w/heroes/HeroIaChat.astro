@@ -18,6 +18,7 @@
 // Migas: arriba a la izquierda en la línea del logo (como HeroTexto en escritorio); en
 // móvil, centradas encima de la pregunta del acto 1.
 import EscenaDosActos from '../mac/EscenaDosActos.astro';
+import LlamarMovil from '../LlamarMovil.astro';
 import Button from '../../ui/Button.astro';
 
 interface Cta { label: string; href: string; track?: string }
@@ -41,6 +42,9 @@ const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
         </p>
       )}
       <h1 class="hic__h1" set:html={h1Html} />
+      {/* En el teléfono el portátil va entre el titular y los botones: Llamar sube bajo el titular
+          para quedar en la primera pantalla (LlamarMovil solo se pinta por debajo de 768). */}
+      <div class="hic__llamar"><LlamarMovil primaryHref={primary.href} /></div>
     </Fragment>
     <p slot="bajada">{lead}</p>
     <Fragment slot="acciones">
@@ -51,6 +55,8 @@ const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
 </div>
 
 <style>
+  .hic__llamar:empty { display: none; }
+  @media (max-width: 767.98px) { .hic__llamar { margin: 20px auto 0; } }
   .hic { position: relative; }
   /* Noche: transparente (la noche lisa de la página y los hilos F04 se ven debajo). */
   .hic :global(.da-noche) { background: none; }

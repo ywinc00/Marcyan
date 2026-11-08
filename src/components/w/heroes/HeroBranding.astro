@@ -13,6 +13,7 @@
 // del personalizador y construcción animada al entrar. Pendiente [SISTEMA]: el PlanoMarca nuevo de P03.
 // HeroTexto no sirve aquí (solo centrado o a la izquierda en una columna): el marcado
 // repite sus clases y data-w-in para heredar la misma coreografía y escala.
+import LlamarMovil from '../LlamarMovil.astro';
 import Button from '../../ui/Button.astro';
 import ChipCiudad from '../ChipCiudad.astro';
 import Eyebrow from '../Eyebrow.astro';
@@ -46,6 +47,7 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.
       <div class="hb__r">
         <p class="hb__lead" data-w-in="2">{lead}</p>
         <div class="hb__actions" data-w-in="3">
+          <LlamarMovil primaryHref={primary.href} />
           <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
           {link && <Button variant="link" href={link.href} data-track={link.track}>{link.label}</Button>}
         </div>

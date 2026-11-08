@@ -311,8 +311,6 @@ const C = T.correo;
       .lf--pin[data-pin-on] .lf__fin--pin .lf__paso--fin { top: 20px; translate: none; width: auto; right: 0; }
       .lf--pin[data-pin-on] .lf__fin--pin .lf__slot { inset: 0; }
     }
-    /* el tramo de la línea dorada no cruza el escenario fijado */
-    .lf--pin[data-pin-on] .lf__fin--pin .lf__dot { display: none; }
   }
   @keyframes lf-pin-sale { to { opacity: 0; transform: translateX(-28px); visibility: hidden; } }
   @media (max-width: 1119.98px) { @keyframes lf-pin-sale { to { opacity: 0; transform: translateY(-16px); visibility: hidden; } } }
@@ -550,6 +548,19 @@ const C = T.correo;
     mqR.addEventListener('change', () => { still = mqR.matches; root.toggleAttribute('data-still', still); escs.forEach((e) => e.classList.remove('is-play')); finEsc?.classList.remove('is-play'); geo(); });
     mqM.addEventListener('change', () => { const a = act; act = -1; activate(Math.max(0, a)); });
     new ResizeObserver(() => geo()).observe(root);
+    // Portada con el escenario fijado: la línea llega al punto de la fase 05 y lo sigue mientras el
+    // escenario está pegado (el punto no se mueve en pantalla), hasta que el texto de la fase se va.
+    const tramoFin = root.querySelector<HTMLElement>('[data-w2-pin]');
+    const pasoFin = tramoFin?.querySelector<HTMLElement>('.lf__paso--fin');
+    if (tramoFin && pasoFin) {
+      let dentroFin = false, pendG = false;
+      new IntersectionObserver((es) => { dentroFin = es.some((e) => e.isIntersecting); }).observe(tramoFin);
+      addEventListener('scroll', () => {
+        if (!dentroFin || pendG || !root.hasAttribute('data-pin-on')) return;
+        pendG = true;
+        requestAnimationFrame(() => { pendG = false; if (getComputedStyle(pasoFin).visibility !== 'hidden') geo(); });
+      }, { passive: true });
+    }
     activate(0);
   }
 

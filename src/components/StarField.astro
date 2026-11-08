@@ -108,7 +108,8 @@
     // ~30 fps y quieto durante el scroll (igual que SpaceBackdrop): el parpadeo es lento.
     function frame(now: number) {
       raf = requestAnimationFrame(frame);
-      if ((prev && now - prev < 32) || now - lastScroll < 140) return;
+      // Durante el scroll se salta el parpadeo, pero una estrella fugaz en vuelo sigue su camino (antes se congelaba a medias, dueño 2026-11-08).
+      if ((prev && now - prev < 32) || (now - lastScroll < 140 && shooters.length === 0)) return;
       let dt = prev ? now - prev : 16; prev = now; if (dt > 64) dt = 64;
       ctx!.clearRect(0, 0, W, H);
       for (const s of stars) {

@@ -1,8 +1,8 @@
 ---
 // Web de ejemplo de Hialeah: cafetería cubana con ventanita (v8, 2026-11-08).
 // Principio de Refero Monte (698567da, montecafe.com.au): UN campo de color terracota a sangre,
-// marca serif centrada, rótulos pequeños en mayúsculas en las esquinas (horario y lugar) y un
-// dibujo de línea propio en el centro. Nada de bloques de relleno: color, letra y un dibujo.
+// marca serif centrada, rótulos pequeños en mayúsculas en las esquinas (horario y lugar) y, en el
+// centro, una FOTO real del cafecito desde arriba (Unsplash 1572286258217, licencia libre, 2026-11-08). Nada de bloques de relleno: color, letra y un dibujo.
 // Se adapta sola: ancha en una ventana de escritorio, en columna dentro de un teléfono (≤ 520 px).
 interface Props { lang?: 'es' | 'en' }
 const { lang = 'es' } = Astro.props;
@@ -20,13 +20,7 @@ const T = lang === 'en'
     <span class="wf__esq wf__esq--i">{T.izq}</span>
     <span class="wf__esq wf__esq--d">{T.der}</span>
     <div class="wf__centro">
-      <svg class="wf__taza" viewBox="0 0 160 150" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M66 18c-6 8 6 13 0 22M84 12c-7 10 7 16 0 27M101 18c-6 8 6 13 0 22" />
-        <path d="M40 62h80l-7 46a20 20 0 0 1-20 17H67a20 20 0 0 1-20-17z" />
-        <path d="M120 72h7a13 13 0 0 1 0 26h-11" />
-        <path d="M22 134h116" />
-        <path d="M60 86c8 6 32 6 40 0" opacity=".55" />
-      </svg>
+      <img class="wf__taza" src="/fotos/ejemplos/cafecito-320.webp" srcset="/fotos/ejemplos/cafecito-320.webp 320w, /fotos/ejemplos/cafecito-640.webp 640w" sizes="150px" width="320" height="320" alt="" loading="lazy" decoding="async" />
       <span class="wf__h">{T.h[0]}<br />{T.h[1]}</span>
       <span class="wf__acc"><b class="wf__cta">{T.cta}</b><span class="wf__nota">{T.nota}</span></span>
     </div>
@@ -45,7 +39,7 @@ const T = lang === 'en'
   .wf__esq { position: absolute; top: 50%; opacity: .9; }
   .wf__esq--i { left: 36px; } .wf__esq--d { right: 36px; }
   .wf__centro { display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
-  .wf__taza { width: 118px; height: auto; color: #f6ead8; }
+  .wf__taza { width: 150px; height: 150px; max-width: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 6px rgba(246, 234, 216, .18), 0 18px 34px -12px rgba(60, 20, 8, .6); }
   .wf__h { font: 400 46px/1.05 Georgia, 'Times New Roman', serif; letter-spacing: -.02em; }
   .wf__acc { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 4px; }
   .wf__cta { display: inline-flex; align-items: center; height: 46px; padding: 0 24px; border-radius: 999px; background: #f6ead8; color: #7a2a17; font-size: 15px; font-weight: 600; }
@@ -65,7 +59,7 @@ const T = lang === 'en'
     .wf__esq { position: static; display: block; text-align: center; font-size: 11px; }
     .wf__esq--d { display: none; }
     .wf__campo { display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 0 18px 10px; }
-    .wf__taza { width: 96px; }
+    .wf__taza { width: 108px; height: 108px; }
     .wf__h { font-size: 38px; }
     .wf__pie { flex-wrap: wrap; gap: 10px 18px; padding: 14px 18px 18px; font-size: 15px; }
   }

@@ -38,8 +38,8 @@ const T = {
     ? { sr: 'Example: your agent site with your homes listed, a buy or sell filter and a button to book a showing.', tabs: ['Buy', 'Sell'], casas: [['Oak House', 'Katy · yard and garage', ['3 bd', '2 ba']], ['Cypress Townhome', 'Cypress · showing Saturday', ['2 bd', '2.5 ba']], ['Garden House', 'Spring Branch · move-in ready', ['4 bd', '3 ba']]], btn: 'Book a showing', dom: 'yourrealty.example' }
     : { sr: 'Ejemplo: tu sitio de agente con tus casas en lista, un filtro para comprar o vender y un botón para agendar visita.', tabs: ['Comprar', 'Vender'], casas: [['Casa Roble', 'Katy · patio y cochera', ['3 hab', '2 baños']], ['Townhome Cypress', 'Cypress · se muestra el sábado', ['2 hab', '2.5 baños']], ['Casa Jardín', 'Spring Branch · lista para mudarse', ['4 hab', '3 baños']]], btn: 'Agendar visita', dom: negocios.inmobiliaria.dominio },
   platos: en
-    ? { sr: "Example: your restaurant's website on a phone, with a large photo of the shrimp tacos, today's menu with two more dishes and a button to order on WhatsApp.", hero: 'Shrimp tacos', k: "Today's menu", abierto: 'Kitchen’s open', platos: ['Chicken enchiladas', 'Rice and beans'], btn: 'Order on WhatsApp', dom: 'yourrestaurant.example' }
-    : { sr: 'Ejemplo: la web de tu restaurante en un teléfono, con una foto grande de los tacos de camarón, la carta de hoy con dos platos más y un botón para pedir por WhatsApp.', hero: 'Tacos de camarón', k: 'La carta de hoy', abierto: 'Cocina abierta', platos: ['Enchiladas de pollo', 'Arroz y frijoles'], btn: 'Pedir por WhatsApp', dom: negocios.restaurante.dominio },
+    ? { sr: "Example: your restaurant's website on a phone, with a large photo of the carne asada tacos, today's menu with two more dishes and a button to order on WhatsApp.", hero: 'Carne asada tacos', k: "Today's menu", abierto: 'Kitchen’s open', platos: ['Birria with consomé', 'Al pastor plate'], btn: 'Order on WhatsApp', dom: 'yourrestaurant.example' }
+    : { sr: 'Ejemplo: la web de tu restaurante en un teléfono, con una foto grande de los tacos de asada, la carta de hoy con dos platos más y un botón para pedir por WhatsApp.', hero: 'Tacos de asada', k: 'La carta de hoy', abierto: 'Cocina abierta', platos: ['Birria con consomé', 'Orden al pastor'], btn: 'Pedir por WhatsApp', dom: negocios.restaurante.dominio },
   'mesa-qr': en
     ? { sr: 'Example: a table card with a QR code that opens the menu in English and Spanish.', scan: 'Scan for the menu', mesa: 'Table 4' }
     : { sr: 'Ejemplo: tarjeta de mesa con un código QR que abre la carta en español e inglés.', scan: 'Escanea para ver la carta', mesa: 'Mesa 4' },
@@ -178,17 +178,20 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
       </div>
     )}
     {kind === 'mesa-qr' && (
+      <div class="of-qrm">
+      <img class="of-qrm__foto" src="/fotos/ejemplos/plato-tacos-960.webp" srcset="/fotos/ejemplos/plato-tacos-480.webp 480w, /fotos/ejemplos/plato-tacos-960.webp 960w" sizes="340px" width="960" height="600" alt="" loading="lazy" decoding="async" />
       <div class="of-qr">
         <span class="of-qr__marca"><LogoEjemplo marca="restaurante" size={17} lang={lang} tono="mono" /></span>
         <span class="of-qr__code">
           <svg viewBox={`-1.5 -1.5 ${Q + 3} ${Q + 3}`} shape-rendering="crispEdges">
-            <rect x="-1.5" y="-1.5" width={Q + 3} height={Q + 3} rx="1.5" fill="#fff6ec" />
+            <rect x="-1.5" y="-1.5" width={Q + 3} height={Q + 3} rx="1.5" fill="#fff" />
             <path d={qr.join('')} fill="#3a1a0c" />
           </svg>
         </span>
         <p class="of-qr__scan">{T.scan}</p>
         <p class="of-qr__langs"><span class:list={[en && 'is-on']}>EN</span><span class:list={[!en && 'is-on']}>ES</span></p>
         <p class="of-qr__pie"><span>{T.mesa}</span><span>{ej}</span></p>
+      </div>
       </div>
     )}
   </div>
@@ -273,15 +276,19 @@ if (kind === 'mesa-qr') for (let r = 0; r < Q; r++) for (let c = 0; c < Q; c++) 
   .of-ls__ej { text-align: right; font: 500 11px/1 var(--font-mono); color: #4d5358; }
 
   /* ── Tarjeta de mesa de Your Restaurant ── */
-  .of-qr { width: min(100%, 280px); margin-inline: auto; box-sizing: border-box; display: grid; justify-items: center; gap: 12px; padding: 24px 22px 16px; border-radius: 16px; background: #8e3a1e; color: #fff6ec; box-shadow: 0 24px 48px rgba(0, 0, 0, .4), inset 0 0 0 6px #8e3a1e, inset 0 0 0 7px rgba(255, 246, 236, .3); }
-  .of-qr__marca { display: inline-flex; color: #fff6ec; }
-  .of-qr__code { display: block; width: 150px; padding: 4px; }
+  /* 2026-11-08 (dueño: nada de bloques de color, fotos reales): la tarjeta de mesa es de cartulina crema y
+     está SOBRE la mesa, junto a los tacos (foto real, Unsplash 1687881063470, licencia libre). */
+  .of-qrm { position: relative; width: min(100%, 340px); margin-inline: auto; padding: 34px 0 30px; border-radius: 16px; overflow: hidden; }
+  .of-qrm__foto { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 60%; filter: brightness(.62) saturate(.9); }
+  .of-qr { position: relative; width: min(calc(100% - 48px), 230px); margin-inline: auto; box-sizing: border-box; display: grid; justify-items: center; gap: 10px; padding: 20px 18px 14px; border-radius: 6px; background: #f6efe4; color: #2a1a10; box-shadow: 0 28px 40px -14px rgba(0, 0, 0, .7), 0 2px 0 rgba(255, 255, 255, .6) inset; }
+  .of-qr__marca { display: inline-flex; color: #2a1a10; }
+  .of-qr__code { display: block; width: 128px; padding: 4px; }
   .of-qr__code svg { display: block; width: 100%; }
   .of-qr__scan { margin: 0; font: 600 15px/1.2 var(--font-display); }
-  .of-qr__langs { margin: 0; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 246, 236, .14); font: 600 11px/1 var(--font-mono); }
-  .of-qr__langs span { padding: 5px 10px; border-radius: 999px; color: #f2d8c4; }
-  .of-qr__langs .is-on { background: #fff6ec; color: #3a1a0c; }
-  .of-qr__pie { width: 100%; margin: 4px 0 0; padding-top: 10px; display: flex; justify-content: space-between; border-top: 1px solid rgba(255, 246, 236, .22); font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #f2d8c4; }
+  .of-qr__langs { margin: 0; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(42, 26, 16, .08); font: 600 11px/1 var(--font-mono); }
+  .of-qr__langs span { padding: 5px 10px; border-radius: 999px; color: #7a5a48; }
+  .of-qr__langs .is-on { background: #2a1a10; color: #f6efe4; }
+  .of-qr__pie { width: 100%; margin: 4px 0 0; padding-top: 10px; display: flex; justify-content: space-between; border-top: 1px solid rgba(42, 26, 16, .16); font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #7a5a48; }
   /* ── Teléfono con la web de Your Restaurant y sus platos ── */
   .of-pl { width: 268px; margin-inline: auto; padding: 8px; border-radius: 44px; background: #161514; box-shadow: 0 30px 60px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .1); }
   .of-pl__pant { overflow: hidden; border-radius: 36px; background: #fff6ec; color: #3a1a0c; display: flex; flex-direction: column; }

@@ -2,8 +2,8 @@
 // Web de ejemplo de Katy: taller mecánico cerca de Cinco Ranch (v7, 2026-11-08).
 // Minimalista. Principios de Refero Getburnt (1e4cee52): partido texto | imagen de contexto con
 // mucha calma y monocromo; y Rivian (11e2e52c): tipografía grande y compacta con un único color
-// de acción. La "imagen" de la derecha es el mapa de cómo llegar, que es lo que pide el cliente
-// en la historia de Katy. Medidas en px de la ventana fuente (900 × 602 de cuerpo).
+// de acción. 2026-11-08: la imagen de la derecha es una FOTO real del taller (Unsplash 1676018366904,
+// licencia libre); el mapa de cómo llegar ya lo enseña la ficha de Maps de la página. Medidas en px de la ventana fuente (900 × 602 de cuerpo).
 ---
 <div class="wt">
   <header class="wt__nav">
@@ -20,20 +20,7 @@
       <span class="wt__acc"><b class="wt__cta">Pedir cita</b><span class="wt__lnk">Cómo llegar</span></span>
     </div>
     <div class="wt__mapa" aria-hidden="true">
-      <svg viewBox="0 0 360 380" preserveAspectRatio="xMidYMid slice">
-        <rect width="360" height="380" fill="#ecebe7" />
-        <g fill="none" stroke="#fff" stroke-linecap="round">
-          <path d="M-10 120 L 370 96" stroke-width="14" /><path d="M120 -10 L 150 390" stroke-width="12" />
-          <path d="M-10 280 C 90 270, 200 300, 370 250" stroke-width="10" /><path d="M260 -10 L 236 390" stroke-width="8" />
-          <path d="M40 -10 L 60 390" stroke-width="6" /><path d="M-10 200 L 370 190" stroke-width="6" />
-        </g>
-        <rect x="170" y="130" width="54" height="46" rx="4" fill="#e2e0da" /><rect x="22" y="300" width="80" height="54" rx="4" fill="#dfe6db" />
-        <path d="M58 348 C 70 300, 140 300, 146 250 S 150 140, 238 112" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
-        <path d="M58 348 C 70 300, 140 300, 146 250 S 150 140, 238 112" fill="none" stroke="#d9541e" stroke-width="5" stroke-linecap="round" />
-        <circle cx="58" cy="348" r="7" fill="#1c1c1c" stroke="#fff" stroke-width="3" />
-        <path d="M238 112c0-12 -9-20-18-20s-18 8-18 20c0 14 18 28 18 28s18-14 18-28z" transform="translate(18 -26)" fill="#1c1c1c" />
-        <circle cx="238" cy="104" r="5" fill="#fff" />
-      </svg>
+      <img src="/fotos/ejemplos/taller-900.webp" srcset="/fotos/ejemplos/taller-520.webp 520w, /fotos/ejemplos/taller-900.webp 900w, /fotos/ejemplos/taller-1300.webp 1300w" sizes="(min-width: 1100px) 400px, 320px" width="900" height="562" alt="" loading="lazy" decoding="async" />
       <span class="wt__estado"><i></i>Abierto · cierra 6:00 p. m.</span>
     </div>
   </div>
@@ -57,7 +44,7 @@
   .wt__lnk { font-size: 15px; font-weight: 600; }
   .wt__lnk::after { content: ' →'; }
   .wt__mapa { position: relative; height: 380px; border-radius: 14px; overflow: hidden; }
-  .wt__mapa svg { display: block; width: 100%; height: 100%; }
+  .wt__mapa img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 45%; }
   .wt__estado { position: absolute; left: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: #fff; font-size: 13.5px; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
   .wt__estado i { width: 8px; height: 8px; border-radius: 50%; background: #2f9e5b; }
   .wt__pie { display: flex; padding: 0 40px 22px; font-size: 13px; color: #6e6e6e; }

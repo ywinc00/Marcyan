@@ -1,0 +1,170 @@
+---
+// Hero de restaurantes (ES y EN). Dirección C «Mientras cocinas», elegida por el dueño (2026-11-08).
+// Mecanismo: una foto REAL del servicio (cocina abierta de noche, Unsplash 1697376354276, licencia libre)
+// y, encima, lo que la web del restaurante hace sola mientras cocinan, en orden: la carta que el cliente
+// abre con el QR de la mesa → Marcy contestando una reserva → el pedido que entra a WhatsApp sin
+// comisión → el restaurante apareciendo en Maps. Principio de turn.io (5f60ec61: foto de persona con los
+// mensajes encima) y sunday (3605b9bd: el producto flotando sobre un momento real); estética de Marcyan.
+// Objetos de ejemplo: aria-hidden + data-nosnippet + resumen sr-only + un rótulo «Ejemplo».
+import HeroTexto from '../HeroTexto.astro';
+import LogoMarca from '../marcas/LogoMarca.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string; chip: string; eyebrow: string; lead: string;
+  primary: Cta; link?: Cta; sr: string; lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, sr, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const T = en
+  ? {
+      ej: 'Example', negocio: 'Your Taquería', mesa: 'Menu · table 6', platos: [['Carne asada tacos', '$4.50'], ['Birria with consomé', '$13.00']], pedir: 'Order on WhatsApp',
+      q: 'Do you have a table for 4 at 8?', a: 'Yes! I’ll hold one by the window. What name should I put it under?', marcy: 'Marcy · Your Taquería',
+      ped: 'New order #41', pedD: 'Pickup 8:15 PM · $38.00', com: 'App commission', cero: '$0.00',
+      maps: 'tacos near me', abierto: 'Open now',
+    }
+  : {
+      ej: 'Ejemplo', negocio: 'Tu Taquería', mesa: 'Carta · mesa 6', platos: [['Tacos de asada', '$4.50'], ['Birria con consomé', '$13.00']], pedir: 'Pedir por WhatsApp',
+      q: '¿Tienen mesa para 4 a las 8?', a: '¡Sí! Te aparto una junto a la ventana. ¿A nombre de quién?', marcy: 'Marcy · Tu Taquería',
+      ped: 'Pedido nuevo #41', pedD: 'Para recoger 8:15 p. m. · $38.00', com: 'Comisión de app', cero: '$0.00',
+      maps: 'tacos cerca de mí', abierto: 'Abierto ahora',
+    };
+---
+<section class="w-hero w-hero--pantalla hr" data-hr>
+  <div class="w-container hr__grid w-hero__llena">
+    <HeroTexto eyebrow={eyebrow} tone="gold" chip={chip} h1Html={h1Html} lead={lead} primary={primary} link={link} align="left" class="hr__text">
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+    <div class="hr__escena" data-nosnippet>
+      <p class="sr-only">{sr}</p>
+      <div class="hr__foto" aria-hidden="true">
+        <img src="/fotos/ejemplos/cocina-noche-1280.webp" srcset="/fotos/ejemplos/cocina-noche-800.webp 800w, /fotos/ejemplos/cocina-noche-1280.webp 1280w, /fotos/ejemplos/cocina-noche-1800.webp 1800w" sizes="(min-width: 1024px) 46vw, 100vw" width="1280" height="853" alt="" fetchpriority="high" decoding="async" />
+        <span class="hr__ej">{T.ej}</span>
+      </div>
+      <div class="hr__piezas" aria-hidden="true">
+        {/* 1 · la carta que el cliente abre con el QR de la mesa */}
+        <div class="hr__p hr__carta">
+          <p class="hr__ct"><b>{T.negocio}</b><span class="hr__qr"><i></i><i></i><i></i><i></i></span></p>
+          <p class="hr__mesa">{T.mesa}</p>
+          <img class="hr__plato" src="/fotos/ejemplos/plato-tacos-480.webp" width="240" height="150" alt="" loading="lazy" decoding="async" />
+          <ul>{T.platos.map(([n, p]) => <li><span>{n}</span><b>{p}</b></li>)}</ul>
+          <span class="hr__btn"><LogoMarca id="whatsapp" size={15} tono="mono" titulo="" />{T.pedir}</span>
+        </div>
+        {/* 2 · Marcy contesta una reserva */}
+        <div class="hr__p hr__chat">
+          <span class="hr__b hr__b--in">{T.q}<small data-reloj="hora" data-reloj-min="-1">7:41 p. m.</small></span>
+          <span class="hr__quien"><i></i>{T.marcy}</span>
+          <span class="hr__b hr__b--out">{T.a}<small data-reloj="hora">7:42 p. m.</small></span>
+        </div>
+        {/* 3 · el pedido entra a WhatsApp, entero */}
+        <div class="hr__p hr__pedido">
+          <span class="hr__app"><LogoMarca id="whatsapp" size={22} tono="color" titulo="" /></span>
+          <span class="hr__pt"><b>{T.ped}</b><span>{T.pedD}</span><span class="hr__com">{T.com} <b>{T.cero}</b></span></span>
+        </div>
+        {/* 4 · te encuentran en Maps */}
+        <div class="hr__p hr__maps">
+          <LogoMarca id="googlemaps" size={18} tono="color" titulo="" />
+          <span><small>“{T.maps}”</small><b>{T.negocio}</b><em>{T.abierto}</em></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { iniciaRelojes } from '../reloj';
+  iniciaRelojes();
+  // Las piezas entran en orden cuando la escena está a la vista (una vez).
+  for (const h of document.querySelectorAll<HTMLElement>('[data-hr]')) {
+    const e = h.querySelector<HTMLElement>('.hr__escena');
+    if (!e) continue;
+    if (!('IntersectionObserver' in window)) { e.classList.add('is-on'); continue; }
+    const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { e.classList.add('is-on'); io.disconnect(); } }, { threshold: 0.25 });
+    io.observe(e);
+  }
+</script>
+
+<style>
+  .hr__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: clamp(40px, 5vw, 80px); align-items: center; }
+  .hr__escena { position: relative; padding: 28px 0 40px; }
+  /* luz cálida detrás de la foto (sin dibujo de fondo: la foto es la escena) */
+  .hr__escena::before { content: ''; position: absolute; inset: -12% -18% -6% -10%; z-index: -1; background: radial-gradient(50% 50% at 55% 45%, rgba(214, 150, 70, .16), transparent 70%); pointer-events: none; }
+  .hr__foto { position: relative; overflow: hidden; aspect-ratio: 5 / 5.2; border-radius: 18px; box-shadow: 0 0 0 1px rgba(240, 237, 232, .08), 0 40px 80px -40px rgba(0, 0, 0, .9); background: #14110d; }
+  .hr__foto img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 55% 50%; }
+  .hr__foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 8, 8, .35), rgba(8, 8, 8, 0) 30%, rgba(8, 8, 8, 0) 60%, rgba(8, 8, 8, .55)), radial-gradient(120% 80% at 50% 40%, transparent 55%, rgba(8, 8, 8, .45)); }
+  .hr__ej { position: absolute; z-index: 1; left: 16px; top: 14px; font: 500 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(243, 239, 230, .7); }
+  .hr__piezas { position: absolute; inset: 0; pointer-events: none; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  .hr__p { position: absolute; color: #111b21; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 24px 48px -16px rgba(0, 0, 0, .65), 0 2px 6px rgba(0, 0, 0, .25); }
+  /* carta */
+  .hr__carta { left: -36px; bottom: 0; width: 236px; padding: 14px 14px 12px; }
+  .hr__ct { display: flex; align-items: center; justify-content: space-between; margin: 0; font: 600 15px/1.2 Georgia, 'Times New Roman', serif; }
+  .hr__qr { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
+  .hr__qr i { border: 2px solid #111; border-radius: 2px; }
+  .hr__mesa { margin: 2px 0 10px; font-size: 11.5px; color: #667781; }
+  .hr__plato { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 9px; }
+  .hr__carta ul { margin: 10px 0 12px; padding: 0; list-style: none; display: grid; gap: 7px; font-size: 13px; }
+  .hr__carta li { display: flex; justify-content: space-between; gap: 10px; }
+  .hr__carta li b { font-weight: 600; }
+  .hr__btn { display: flex; align-items: center; justify-content: center; gap: 7px; height: 36px; border-radius: 9px; background: #1d8a4e; color: #fff; font-size: 13px; font-weight: 600; }
+  /* chat */
+  .hr__chat { right: -28px; top: 64px; width: 268px; padding: 10px; display: flex; flex-direction: column; gap: 6px; background: #efeae2; }
+  .hr__b { position: relative; max-width: 88%; padding: 8px 10px 6px; border-radius: 9px; font-size: 13px; line-height: 1.38; box-shadow: 0 1px .5px rgba(11, 20, 26, .13); }
+  .hr__b small { display: block; margin-top: 2px; text-align: right; font-size: 10.5px; color: #667781; }
+  .hr__b--in { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
+  .hr__b--out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px; }
+  .hr__quien { align-self: flex-end; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #0b7a5f; }
+  .hr__quien i { width: 7px; height: 7px; border-radius: 50%; background: #25d366; }
+  /* pedido */
+  .hr__pedido { right: 24px; bottom: 84px; width: 264px; display: flex; gap: 11px; padding: 12px 14px; background: rgba(250, 250, 248, .97); }
+  .hr__app { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: #e8f8ee; }
+  .hr__pt { display: grid; gap: 2px; font-size: 12.5px; color: #3b4a54; }
+  .hr__pt > b { font-size: 13.5px; color: #111b21; }
+  .hr__com { margin-top: 4px; padding-top: 6px; border-top: 1px dashed #d4d8db; }
+  .hr__com b { color: #1d8a4e; }
+  /* maps */
+  .hr__maps { left: 28px; top: 84px; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 999px; }
+  .hr__maps span { display: grid; font-size: 12px; line-height: 1.25; }
+  .hr__maps small { color: #667781; font-size: 11px; }
+  .hr__maps em { font-style: normal; color: #1d8a4e; font-size: 11px; font-weight: 600; }
+
+  /* Entrada en orden (una vez, al estar a la vista). Sin JS o con movimiento reducido: todo visible. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hr__p, .hr__b, .hr__quien { transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .65s cubic-bezier(.22, 1, .36, 1); }
+    :global(html.w-anim) .hr__escena:not(.is-on) .hr__p { opacity: 0; transform: translateY(18px) scale(.97); }
+    :global(html.w-anim) .hr__escena:not(.is-on) .hr__chat .hr__b, :global(html.w-anim) .hr__escena:not(.is-on) .hr__quien { opacity: 0; transform: translateY(8px); }
+    .hr__carta { transition-delay: .25s; }
+    .hr__chat { transition-delay: .9s; }
+    .hr__chat .hr__b--in { transition-delay: 1.15s; }
+    .hr__chat .hr__quien { transition-delay: 1.8s; }
+    .hr__chat .hr__b--out { transition-delay: 2.2s; }
+    .hr__pedido { transition-delay: 2.9s; }
+    .hr__maps { transition-delay: 3.5s; }
+  }
+
+  @media (max-width: 1023.98px) {
+    .hr__grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .hr__escena { max-width: 620px; width: 100%; margin: 0 auto; padding: 8px 0 24px; }
+    .hr__foto { aspect-ratio: 4 / 4.6; }
+    .hr__carta { left: 12px; bottom: 12px; }
+    .hr__chat { right: 12px; top: 48px; }
+    .hr__pedido { right: 12px; bottom: 150px; }
+    .hr__maps { left: 12px; top: 44px; }
+  }
+  /* Teléfono: la foto arriba con el chat; la carta y el pedido salen por debajo, uno al lado del otro. */
+  @media (max-width: 559.98px) {
+    .hr__escena { padding: 4px 0 112px; }
+    .hr__foto { aspect-ratio: 4 / 4.2; border-radius: 14px; }
+    .hr__maps { display: none; }
+    .hr__chat { width: 212px; top: 40px; right: 10px; }
+    .hr__b { font-size: 12px; }
+    .hr__carta { left: 0; bottom: 0; width: calc(50% - 4px); padding: 10px; }
+    .hr__carta ul { font-size: 11px; gap: 5px; margin: 8px 0 9px; }
+    .hr__carta li { flex-direction: column; gap: 0; }
+    .hr__ct { font-size: 13px; }
+    .hr__btn { height: 32px; font-size: 11px; }
+    .hr__pedido { right: 0; bottom: 36px; width: calc(50% - 4px); padding: 10px; flex-direction: column; gap: 8px; }
+    .hr__pt { font-size: 11px; }
+    .hr__pt > b { font-size: 12.5px; }
+    .hr__ej { top: 16px; }
+  }
+</style>

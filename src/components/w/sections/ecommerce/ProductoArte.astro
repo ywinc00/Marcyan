@@ -21,8 +21,11 @@ const IDS: ProductoId[] = ['vela', 'cafe', 'caja', 'taza', 'viaje', 'grano'];
 interface Props { id?: ProductoId; size?: number; sombra?: boolean; class?: string; modo?: 'uso' | 'sprite' }
 const { id = 'vela', size = 40, sombra = true, class: cls, modo = 'uso' } = Astro.props;
 ---
+{/* 2026-11-08 (dueño: «los productos dibujados hacen que el ejemplo parezca pobre»): cada producto es
+    ahora una FOTO real de Unsplash (licencia libre, ids en design/ejemplos-v8.md). El dibujo queda solo
+    en el modo 'sprite', que ya no se usa para pintar. */}
 {modo === 'uso' && (
-  <svg class:list={['pa', cls]} width={size} height={size} viewBox="5 5 54 54" aria-hidden="true" focusable="false">{sombra && <ellipse cx="32" cy="57.5" rx={id === 'caja' ? 20 : id === 'cafe' || id === 'grano' ? 16 : 15} ry="2.6" fill="#2A211B" opacity=".18" />}<use href={`#tt-pa-${id}`} /></svg>
+  <img class:list={['pa', cls]} src={`/fotos/ejemplos/prod-${id}-160.webp`} srcset={`/fotos/ejemplos/prod-${id}-160.webp 160w, /fotos/ejemplos/prod-${id}-320.webp 320w, /fotos/ejemplos/prod-${id}-640.webp 640w`} sizes={`${size}px`} width={size} height={size} style={`--pa:${size}px`} alt="" aria-hidden="true" loading="lazy" decoding="async" />
 )}
 {modo === 'sprite' && (
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -109,5 +112,5 @@ const { id = 'vela', size = 40, sombra = true, class: cls, modo = 'uso' } = Astr
 )}
 
 <style>
-  .pa { display: block; flex: none; overflow: visible; }
+  .pa { display: block; flex: none; width: var(--pa); height: var(--pa); max-width: none; object-fit: cover; border-radius: max(3px, calc(var(--pa) * .1)); background: #e9e3d8; }
 </style>

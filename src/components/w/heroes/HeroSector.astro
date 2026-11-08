@@ -13,6 +13,7 @@ import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
 import ObjetoOficio from '../sections/sector/ObjetoOficio.astro';
 import Icon from '../../ui/Icon.astro';
 import HeroContratista from './HeroContratista.astro';
+import HeroRestaurante from './HeroRestaurante.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -83,6 +84,10 @@ const DER = Array.from({ length: N }, (_, i) =>
   <HeroContratista h1Html={h1Html} chip={chip} eyebrow={eyebrow} lead={lead} primary={primary} link={link} sr={sr} lang={lang}>
     <slot name="crumbs" slot="crumbs" />
   </HeroContratista>
+) : obj === 'restaurante' ? (
+  <HeroRestaurante h1Html={h1Html} chip={chip} eyebrow={eyebrow} lead={lead} primary={primary} link={link} sr={sr} lang={lang}>
+    <slot name="crumbs" slot="crumbs" />
+  </HeroRestaurante>
 ) : (
 <section class:list={['w-hero w-hero--pantalla hs', `hs--${obj}`]}>
   <div class="w-container hs__grid w-hero__llena">

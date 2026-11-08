@@ -34,6 +34,7 @@ const L = {
                 </span>
               </span>
             </div>
+            <span class="bc__foto"><img src="/fotos/ejemplos/carga-520.webp" srcset="/fotos/ejemplos/carga-520.webp 520w, /fotos/ejemplos/carga-900.webp 900w" sizes="(min-width: 1100px) 640px, 360px" width="520" height="650" alt="" loading="lazy" decoding="async" /><span>{k === 'en' ? 'Our Doral warehouse · ships daily' : 'Nuestra bodega en Doral · salida diaria'}</span></span>
             <div class="bc__svc">{t.pie.split(' · ').map((x) => <span>{x}<i>→</i></span>)}</div>
             <div class="bc__pie">{t.pie}</div>
           </div>
@@ -100,6 +101,11 @@ const L = {
   .bc__pie { margin-top: auto; padding: 2cqw 4cqw; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 1.3cqw; color: rgba(242, 240, 235, .45); }
   /* teléfono: la web se reordena en una columna y pasa a tamaños fijos legibles (nunca 6 px) */
   .bc__svc { display: none; }
+  /* Foto real de la bodega (Unsplash 1721937127582, licencia libre; dueño 2026-11-08: ejemplos con fotos). */
+  .bc__foto { position: relative; flex: 1; min-height: 0; margin: 2.6cqw 4cqw 0; border-radius: 1cqw; overflow: hidden; }
+  .bc__foto img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 60%; filter: saturate(.85); }
+  .bc__foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 10, 12, .7), rgba(10, 10, 12, 0) 60%); }
+  .bc__foto > span { position: absolute; z-index: 1; left: 2cqw; bottom: 1.8cqw; font-size: 1.4cqw; font-weight: 600; color: #f2f0eb; }
   /* Dentro de un teléfono no hay barra de navegador de escritorio: solo queda el ES | EN. */
   :global(.tw) .bc__dots, :global(.tw) .bc__url { display: none; }
   :global(.tw) .bc__bar { justify-content: flex-end; }
@@ -108,6 +114,8 @@ const L = {
     .bc__svc span { display: flex; justify-content: space-between; padding: 13px 2px; border-top: 1px solid rgba(255, 255, 255, .08); font-size: 15px; color: rgba(242, 240, 235, .85); }
     .bc__svc i { font-style: normal; color: #ff5a36; }
     .bc__body { aspect-ratio: auto; height: 380px; }
+    :global(.tw) .bc__foto { flex: none; height: 150px; margin: 16px 16px 0; border-radius: 10px; }
+    :global(.tw) .bc__foto > span { left: 12px; bottom: 10px; font-size: 12px; }
     .bc__nav { padding: 14px 16px; gap: 12px; }
     .bc__logo { font-size: 15px; }
     .bc__links { display: none; }

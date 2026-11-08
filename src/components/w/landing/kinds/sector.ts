@@ -60,7 +60,8 @@ const spec: KindSpec = {
   // por la izquierda en bienes raíces, armazón de obra en contratistas, mesa de comedor en restaurantes.
   // F20 elige la escena por la ruta.
   // v6.1: contratistas pinta su propio fondo (espacio con nebulosa); el resto sigue con F20.
-  fondo: (ctx) => (copyOf(ctx).obj === 'contratista' ? undefined : 'F20'),
+  // 2026-11-08: restaurantes lleva foto real en su portada (HeroRestaurante); el dibujo de lámparas de F20 competía con ella.
+  fondo: (ctx) => (['contratista', 'restaurante'].includes(copyOf(ctx).obj) ? undefined : 'F20'),
   fondoOpciones: () => ({ texto: 'izquierda' }),
   Hero: HeroSector,
   hero: (ctx) => {

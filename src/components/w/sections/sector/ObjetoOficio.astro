@@ -46,7 +46,7 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
 {parte === 'band' && (
   <div class:list={['oo-band', `oo-band--${kind}`]} data-nosnippet>
     {kind === 'contratista' && (
-      <p class="oo-reloj" data-oo-i="0"><span class="oo-reloj__d">{C.dia}</span><span class="oo-reloj__h">{C.hora}<span class="oo-reloj__p">{C.p}</span></span></p>
+      <p class="oo-reloj" data-oo-i="0"><span class="oo-reloj__d" data-reloj="dia">{C.dia}</span><span class="oo-reloj__h"><span data-reloj="hm">{C.hora}</span><span class="oo-reloj__p" data-reloj="ap">{C.p}</span></span></p>
     )}
     {kind === 'inmobiliaria' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="inmobiliaria" size={13} lang={lang} tono="mono" /></span>}
     {kind === 'restaurante' && <span class="oo-marca" data-oo-i="0"><LogoEjemplo marca="restaurante" size={18} lang={lang} tono="mono" /></span>}
@@ -114,6 +114,8 @@ const GOTA_APP = 'M8.5 21.5C8.5 21.5 11.5 24.6 11.5 26.3A3 3 0 0 1 5.5 26.3C5.5 
 )}
 
 <script>
+  import { iniciaRelojes } from '../../reloj';
+  iniciaRelojes();
   // Coreografía: una vez al cruzar el 35 %; repite al volver tras ≥ 8 s fuera (§1.5).
   const mq = matchMedia('(prefers-reduced-motion: reduce)');
   for (const el of document.querySelectorAll<HTMLElement>('[data-oo]:not([data-oo-on])')) {

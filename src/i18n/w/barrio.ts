@@ -183,7 +183,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     escena: { producto: 'chat', pildora: { quien: 'Cliente en Hialeah', que: '«¿abren hoy?»', resultado: 'Respondido al instante', icon: 'lucide:message-circle' },
       chat: [
         { from: 'c', text: 'Oye, ¿abren hoy? El aire del carro echa caliente.', time: '9:12' },
-        { from: 'm', text: '¡Buenos días! Sí, hasta las 6:00 p. m. Tráelo a las 11:00 y te lo revisan.', time: '9:12' },
+        { from: 'm', text: '¡Hola! Sí, hoy hasta las 6:00 p. m. Tráelo a las 11:00 y te lo revisan.', time: '9:12' },
         { from: 'c', text: 'Perfecto, allá voy.', time: '9:13' },
       ],
       lados: [

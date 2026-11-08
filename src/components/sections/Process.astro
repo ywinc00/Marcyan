@@ -20,11 +20,28 @@ import Button from '../ui/Button.astro';
 import LineaFases from '../w/proceso/LineaFases.astro';
 import EscenaAbreApps from '../w/mac/EscenaAbreApps.astro';
 import { fasesDe } from '../w/proceso/proceso';
+import { portfolioProjects as PES } from '../../i18n/portfolio';
+import { portfolioProjects as PEN } from '../../i18n/portfolio.en';
 
-interface Props { process: any }
-const { process } = Astro.props;
+interface Props { process: any; projects?: any }
+const { process, projects } = Astro.props;
 const lang: 'es' | 'en' = Astro.url.pathname.startsWith('/en') ? 'en' : 'es';
 const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#contacto' };
+// Modo viaje (dueño, 2026-11-08): con `projects`, la fase final se fija, el portátil se acerca y los
+// proyectos reales salen como ventanas en su pantalla (la sección Proyectos queda de respaldo).
+const lista = lang === 'en' ? PEN : PES;
+const MOVIL_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
+const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
+const viaje = projects ? {
+  proyectos: (projects.items as any[]).map((p) => {
+    const slug = lista.find((x) => x.name === p.name)?.slug ?? PES.find((x) => x.name === p.name)?.slug;
+    const parts = String(p.cat ?? '').split('·').map((x: string) => x.trim());
+    const city = slug === 'mja' ? 'Florida (Orlando)' : (parts[1] ?? '').replace(/,\s*[A-Z]{2}$/, '');
+    return slug ? { slug, name: p.name, cat: [parts[0], city].filter(Boolean).join(' · '), result: p.result, domain: DOMINIOS[slug], movilH: MOVIL_H[slug] ?? 960 } : null;
+  }).filter(Boolean),
+  cab: { tag: projects.tag, titleHtml: projects.title, cta: { label: lang === 'en' ? 'See the full portfolio' : 'Ver todo el portafolio', href: lang === 'en' ? '/en/portfolio' : '/es/portafolio' } },
+  lanza: launch,
+} : undefined;
 ---
 <section class="section process" id="proceso" data-process data-fx="gold">
   <div class="container">
@@ -33,9 +50,9 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
       <h2 class="h2" set:html={process.title} />
     </header>
 
-    <LineaFases fases={fasesDe(process.steps)} lang={lang} variante="portada" class="process__fases">
+    <LineaFases fases={fasesDe(process.steps)} lang={lang} variante="portada" pin={!!viaje} class="process__fases">
       <div slot="final" class="process__fin">
-        <EscenaAbreApps lang={lang} ancho={880} />
+        <EscenaAbreApps lang={lang} ancho={880} viaje={viaje as any} />
         <!-- CTA bajo el portátil (todas las anchuras) -->
         <div class="riel__launch-inline">
           {launch.kicker && <span class="riel__cta-kicker">{launch.kicker}</span>}
@@ -53,6 +70,11 @@ const launch = process.launch ?? { label: 'Lanza tu proyecto ahora', href: '#con
 
   /* ── Fase final: portátil + CTA (slot `final` de LineaFases) ── */
   .process__fin { min-width: 0; }
+  /* Modo viaje encendido: el CTA ya vive en el pie del portátil y la sección Proyectos de debajo
+     (respaldo sin JS) se retira: los proyectos salen en la pantalla del portátil. */
+  :global(.lf--pin[data-pin-on]) .process__fin > .riel__launch-inline { display: none; }
+  :global(body:has(.lf--pin[data-pin-on])) :global(#proyectos.projects) { display: none; }
+  :global(.lf--pin[data-pin-on]) .process__fin { position: absolute; inset: 0; }
   /* v4: el recorte lateral de la tapa en 3D vive aquí, a ancho de ventana (antes en .abre, que le
      cortaba las esquinas). overflow-x:clip no crea contenedor de scroll: el tramo fijado sigue. */
   .process[data-process] { overflow-x: clip; }

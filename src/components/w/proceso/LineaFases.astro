@@ -42,9 +42,13 @@ interface Props {
   lang?: Lang;
   variante?: 'portada' | 'compacta';
   tono?: 'gold';
+  /** Portada (2026-11-08, dueño): la fase final se FIJA en pantalla en un tramo alto (`.lf__pin`):
+   *  el portátil del slot `final` se abre, se acerca al centro y enseña los proyectos. El slot
+   *  recibe la línea de tiempo `--lf-pin` (contain 0 % → 100 % = todo el tramo fijado). */
+  pin?: boolean;
   class?: string;
 }
-const { fases, lang = 'es', variante = 'portada', class: cls } = Astro.props;
+const { fases, lang = 'es', variante = 'portada', pin = false, class: cls } = Astro.props;
 const T = copy[lang];
 const N = fases.length;
 const portada = variante === 'portada';
@@ -54,7 +58,7 @@ const conFinal = portada && Astro.slots.has('final');
 const dos = (i: number) => String(i + 1).padStart(2, '0');
 const C = T.correo;
 ---
-<div class:list={['lf', `lf--${variante}`, cls]} data-w2-lf data-lang={lang} style={`--n:${enRejilla.length}`}>
+<div class:list={['lf', `lf--${variante}`, pin && 'lf--pin', cls]} data-w2-lf data-lang={lang} style={`--n:${enRejilla.length}`}>
   <span class="lf__linea" data-w2-linea aria-hidden="true"><i><b></b></i></span>
 
   <div class="lf__grid">
@@ -116,7 +120,9 @@ const C = T.correo;
   </div>
 
   {fin && (
-    <div class="lf__fin lf__fin--slot">
+    <div class:list={['lf__fin lf__fin--slot', pin && conFinal && 'lf__fin--pin']} data-w2-pin={pin && conFinal ? '' : undefined}>
+      {pin && conFinal && <span class="lf__pin-ancla" aria-hidden="true"></span>}
+      <div class="lf__pin">
       <div class="lf__paso lf__paso--fin" data-w2-paso={N - 1}>
         <span class="lf__dot" data-w2-dot></span>
         <span class="lf__n">{fin.n}</span>
@@ -131,6 +137,7 @@ const C = T.correo;
             <div class="lf__stage" aria-hidden="true"><slot name="quinta" /></div>
           </div>
         )}
+      </div>
     </div>
   )}
 </div>
@@ -260,6 +267,47 @@ const C = T.correo;
     .lf__slot { margin: 16px 0 0; }
     .lf__slot--esc { padding: 12px; border-radius: var(--w-r-tray, 22px); background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09)); }
   }
+
+  /* ── Móvil: las tarjetas de escena no pisan la línea del recorrido (dueño, 2026-11-08):
+     empiezan en la misma columna que el texto de cada fase. ── */
+  @media (max-width: 1119.98px) {
+    .lf__esc, .lf__fin:not(.lf__fin--pin) .lf__slot { margin-left: 36px; }
+  }
+  .lf__pin { display: contents; }
+  @media (min-width: 1120px) {
+    .lf__fin:not(.lf__fin--pin) .lf__pin { display: contents; }
+  }
+
+  /* ── Fase final FIJADA (pin): tramo alto + escenario pegado bajo la navegación. Solo cuando el
+     guion del portátil lo enciende (data-pin-on: hay JS, línea de tiempo de scroll y movimiento);
+     si no, la fase final se pinta como siempre (texto y portátil, quietos). ── */
+  .lf--pin { timeline-scope: --lf-pin; }
+  .lf__pin-ancla { display: none; }
+  @supports (animation-timeline: view()) {
+    .lf--pin[data-pin-on] .lf__fin--pin {
+      display: block; position: relative; padding: 0;
+      height: calc(var(--pin-vh, 100svh) / var(--z, 1) * var(--pin-k, 4.6));
+      view-timeline: --lf-pin block;
+      view-timeline-inset: var(--nav-h, 64px) 0px;
+    }
+    .lf--pin[data-pin-on] .lf__fin--pin > .lf__pin {
+      display: block; position: sticky; top: var(--nav-h, 64px);
+      height: calc(var(--pin-vh, 100svh) / var(--z, 1) - var(--nav-h, 64px));
+    }
+    .lf--pin[data-pin-on] .lf__fin--pin .lf__paso--fin {
+      position: absolute; z-index: 2; left: 0; top: 50%; translate: 0 -50%; width: 300px; padding: 0 0 0 36px;
+      animation: lf-pin-sale linear both; animation-timeline: --lf-pin; animation-range: contain 13% contain 21%;
+    }
+    .lf--pin[data-pin-on] .lf__fin--pin .lf__slot { position: absolute; inset: 0 0 0 340px; margin: 0; }
+    @media (max-width: 1119.98px) {
+      .lf--pin[data-pin-on] .lf__fin--pin .lf__paso--fin { top: 20px; translate: none; width: auto; right: 0; }
+      .lf--pin[data-pin-on] .lf__fin--pin .lf__slot { inset: 0; }
+    }
+    /* el tramo de la línea dorada no cruza el escenario fijado */
+    .lf--pin[data-pin-on] .lf__fin--pin .lf__dot { display: none; }
+  }
+  @keyframes lf-pin-sale { to { opacity: 0; transform: translateX(-28px); visibility: hidden; } }
+  @media (max-width: 1119.98px) { @keyframes lf-pin-sale { to { opacity: 0; transform: translateY(-16px); visibility: hidden; } } }
 
   /* ── Escena 01: correo abierto "Tu propuesta" + aviso que llega (satélite delante, arriba a la
      derecha) + reloj de 24 h (satélite detrás, abajo a la derecha). ── */

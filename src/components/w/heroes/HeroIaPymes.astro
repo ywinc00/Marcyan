@@ -23,8 +23,8 @@ interface Props {
 }
 const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero w-hero--pantalla w-hero--bleed w-dawn hip" data-w-tone="teal">
-  <div class="w-container hip__grid w-hero__llena">
+<section class="w-hero w-hero--bleed w-dawn hip" data-w-tone="teal">
+  <div class="w-container hip__grid">
     <div class="hip__text">
       <HeroTexto
         eyebrow={eyebrow}
@@ -41,7 +41,7 @@ const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = As
         <slot name="crumbs" slot="crumbs" />
       </HeroTexto>
     </div>
-    <div class="hip__obj w-fit" data-w-in="obj">
+    <div class="hip__obj" data-w-in="obj">
       <EsclusaMarcy lang={lang} />
     </div>
   </div>
@@ -67,7 +67,4 @@ const { h1Html, eyebrow, tail, tailGrad, lead, primary, link, lang = 'es' } = As
     .hip__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: 64px; min-height: 560px; }
   }
   @media (--lt-md) { .hip__grid { gap: 40px; } }
-
-  /* v6.1: la portada mide la pantalla; la rejilla llena el alto y el objeto se reduce si falta. */
-  @media (--lg) { .hip__grid { grid-template-rows: minmax(0, 1fr); min-height: 0; } .hip__obj { height: 100%; align-items: center; } }
 </style>

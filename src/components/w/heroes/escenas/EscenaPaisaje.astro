@@ -71,10 +71,6 @@ const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisaj
     const hero = root.closest<HTMLElement>('[data-hb]');
     const aviso = root.querySelector<HTMLElement>('[data-ep-aviso]');
     const esc = root.querySelector<HTMLElement>('[data-w2-escritorio]');
-    // el día real de quien mira junto a la hora fija de madrugada
-    const d = new Date(); const es = (document.documentElement.lang || 'es').startsWith('es');
-    const dia = d.toLocaleDateString(es ? 'es-US' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
-    root.querySelectorAll<HTMLElement>('.esc-hora').forEach((h) => { h.textContent = `${dia}  ${h.textContent?.trim()}`; });
     const fin = () => {
       root.classList.add('is-arriba', 'is-abierta');
       aviso?.classList.add('is-on');

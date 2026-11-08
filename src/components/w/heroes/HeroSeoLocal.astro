@@ -26,8 +26,8 @@ interface Props {
 const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = Astro.props;
 const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
 ---
-<section class="w-hero w-hero--pantalla hsl">
-  <div class="w-container hsl__grid w-hero__llena">
+<section class="w-hero hsl">
+  <div class="w-container hsl__grid">
     <div class="hsl__text">
       <HeroTexto
         tone="gold"
@@ -42,8 +42,7 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
         <slot name="crumbs" slot="crumbs" />
       </HeroTexto>
     </div>
-    <div class="hsl__obj w-fit">
-      <div class="hsl__stage">
+    <div class="hsl__obj">
       <p class="sr-only">{sr}</p>
       <div class="hsl__pal" aria-hidden="true">
         <span class="hsl__w hsl__w--1" data-w-in="2">{W[0]}</span>
@@ -51,7 +50,6 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
       </div>
       <div class="hsl__win" data-w-in="obj">
         <FichaMapa marca="restaurante" lang={lang} city={cityName} size="hero" />
-      </div>
       </div>
     </div>
   </div>
@@ -61,7 +59,6 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
   .hsl { overflow: clip; padding-bottom: 104px; position: relative; }
   .hsl__grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: center; }
   .hsl__obj { position: relative; min-height: 520px; }
-  .hsl__stage { position: relative; width: 100%; height: 100%; }
   /* La palabra: dos líneas a tamaño cartel, crema casi plena; la ventana la corta por el medio. */
   .hsl__pal { position: absolute; inset: 0; pointer-events: none; }
   .hsl__w {
@@ -78,12 +75,6 @@ const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
     box-shadow: 0 50px 90px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .06);
   }
   /* Partido solo desde 1280: por debajo la palabra no cabe junto al texto y se apila (como en móvil). */
-  /* v6.1: la rejilla llena la portada; el objeto (palabra + ficha, 520 de alto) se reduce si falta alto. */
-  @media (min-width: 1280px) {
-    .hsl__grid { grid-template-rows: minmax(0, 1fr); }
-    .hsl__obj { height: 100%; min-height: 0; display: flex; align-items: center; }
-    .hsl__obj > .hsl__stage { position: relative; width: 100%; height: 520px; }
-  }
   @media (min-width: 1280px) {
     .hsl__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 560px; }
     .hsl__text :global(.w-herotext--left) { max-width: 560px; }

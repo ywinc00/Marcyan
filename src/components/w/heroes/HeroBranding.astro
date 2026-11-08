@@ -32,8 +32,8 @@ interface Props {
 }
 const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero w-hero--pantalla hb">
-  <div class="w-container w-hero__llena hb__col">
+<section class="w-hero hb">
+  <div class="w-container">
     <div class="hb__crumbs"><slot name="crumbs" /></div>
     <div class="hb__head">
       <div class="hb__l">
@@ -53,7 +53,7 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.
         </div>
       </div>
     </div>
-    <div class="hb__plan w-fit">
+    <div class="hb__plan">
       <div class="hb__light" aria-hidden="true"></div>
       <div data-w-in="obj">
         <PlanoTuMarca lang={lang} />
@@ -113,9 +113,4 @@ const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.
     .hb__head { padding-bottom: 40px; }
     .hb__plan { margin-top: 40px; }
   }
-
-  /* v6.1: la portada mide la pantalla; el plano de marca ocupa el resto y se reduce si falta alto. */
-  .hb__col { display: flex; flex-direction: column; }
-  .hb__col > .hb__plan { flex: 1 1 auto; min-height: 0; }
-  @media (--lg) { .hb__head { padding-bottom: 40px; } .hb__plan { margin-top: 32px; } }
 </style>

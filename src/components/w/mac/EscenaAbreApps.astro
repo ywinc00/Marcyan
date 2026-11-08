@@ -55,6 +55,9 @@ const TV = lang === 'en'
   ? { modo: 'View projects on', pc: 'Desktop', movil: 'Mobile', de: 'of', vista: (n: string) => `${n}, website` }
   : { modo: 'Ver los proyectos en', pc: 'Escritorio', movil: 'Móvil', de: 'de', vista: (n: string) => `${n}, sitio web` };
 const dos = (n: number) => String(n).padStart(2, '0');
+// Color del pie de cada captura móvil: la captura se ajusta al ANCHO del iPhone (sin cortar los lados)
+// y el hueco de abajo se rellena con su propio color.
+const PIE_MOVIL: Record<string, string> = { trr: '#d6dce2', jls: '#eeefe5', mja: '#fbfcfe', rn: '#cbc9c4' };
 
 const T = {
   es: {
@@ -200,7 +203,7 @@ const destinos = {
       <div class="pp-tel" aria-hidden="true">
         <TelefonoWeb lang={lang} fondo="#fff">
           {viaje.proyectos.map((pr, i) => (
-            <img class={`pp-tel__p pp-tel__p--${i}`} src={`/Galeria/${pr.slug}-movil-520.webp`} width="520" height={pr.movilH} alt="" loading="lazy" decoding="async" />
+            <img class={`pp-tel__p pp-tel__p--${i}`} style={`background:${PIE_MOVIL[pr.slug] ?? '#fff'}`} src={`/Galeria/${pr.slug}-movil-520.webp`} width="520" height={pr.movilH} alt="" loading="lazy" decoding="async" />
           ))}
         </TelefonoWeb>
       </div>
@@ -394,13 +397,14 @@ const destinos = {
   .abre[data-modo='movil'][data-pp] .pp-tel { opacity: 1; visibility: visible; transform: none; transition: opacity .4s ease .12s, transform .5s cubic-bezier(.22, 1, .36, 1) .12s, visibility 0s; }
   .pp-tel :global(.tw__marco) { border-radius: calc(var(--pp-telw, 280px) * .14); }
   .pp-tel :global(.tw__vp) { border-radius: calc(var(--pp-telw, 280px) * .12); }
-  .pp-tel__p { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 0; background: #fff; }
+  .pp-tel__p { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: contain; object-position: 50% 0; }
   /* Cada proyecto sube y tapa al anterior, al mismo ritmo que las ventanas del portátil. */
   :global(.lf--pin[data-pin-on]) .pp-tel__p:not(.pp-tel__p--0) { animation: pp-tel-sube linear both; animation-timeline: --lf-pin; }
-  @keyframes pp-tel-sube { from { transform: translateY(101%); } to { transform: none; } }
-  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--1:not(.pp-tel__p--0) { animation-range: contain 54% contain 59%; }
-  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--2:not(.pp-tel__p--0) { animation-range: contain 68% contain 73%; }
-  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--3:not(.pp-tel__p--0) { animation-range: contain 82% contain 87%; }
+  /* Entra OPACA como una hoja que sube con su sombra (nunca dos webs a media opacidad, E-64). */
+  @keyframes pp-tel-sube { 0% { transform: translateY(102%); box-shadow: 0 -18px 30px rgba(0, 0, 0, .45); } 99% { box-shadow: 0 -18px 30px rgba(0, 0, 0, .45); } 100% { transform: none; box-shadow: none; } }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--1:not(.pp-tel__p--0) { animation-range: contain 54% contain 58%; }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--2:not(.pp-tel__p--0) { animation-range: contain 68% contain 72%; }
+  :global(.lf--pin[data-pin-on]) .pp-tel__p.pp-tel__p--3:not(.pp-tel__p--0) { animation-range: contain 82% contain 86%; }
   @keyframes pp-acerca { to { transform: translate(var(--pp-x, 0px), var(--pp-y, 0px)) scale(var(--pp-k, 1)); } }
 
   /* Cabecera (encima del portátil final) y pie (debajo). */
@@ -435,7 +439,7 @@ const destinos = {
   /* «Lanza tu proyecto»: fuera en escritorio; en el teléfono, centrado y abajo (dueño, 2026-11-08). */
   @media (max-width: 767.98px) {
     :global(.lf--pin[data-pin-on]) .abre--viaje .pp-lanza {
-      position: absolute; z-index: 3; left: 0; right: 0; bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+      position: absolute; z-index: 3; left: 0; right: 0; bottom: calc(92px + env(safe-area-inset-bottom, 0px));
       display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
       animation: pp-sale linear both; animation-timeline: --lf-pin; animation-range: contain 20% contain 35%;
     }
@@ -444,7 +448,7 @@ const destinos = {
   .pp-caps { grid-column: 1; grid-row: 1; display: grid; margin: 0; padding: 0; list-style: none; }
   .pp-cap { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 4px; min-width: 0;
     animation: pp-sale linear both; animation-timeline: --lf-pin; }
-  .pp-cap:nth-child(1) { animation-range: contain 40% contain 54%; }
+  .pp-cap:nth-child(1) { animation-range: contain 38% contain 54%; }
   .pp-cap:nth-child(2) { animation-range: contain 54% contain 68%; }
   .pp-cap:nth-child(3) { animation-range: contain 68% contain 82%; }
   .pp-cap--fin { animation-name: pp-queda; animation-range: contain 82% contain 100% !important; }
@@ -476,7 +480,7 @@ const destinos = {
   @keyframes pp-retira { to { opacity: 0; visibility: hidden; } }
   /* Escritorio: la ventana entra OPACA deslizándose desde abajo (nunca dos webs a media opacidad). */
   @keyframes pp-ven-entra { 0% { opacity: 0; transform: translateY(560px); visibility: hidden; } 1% { opacity: 1; visibility: visible; } 100% { opacity: 1; transform: none; visibility: visible; } }
-  :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-range: contain 40% contain 45%; }
+  :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-range: contain 37.5% contain 42.5%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-range: contain 54% contain 59%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-range: contain 68% contain 73%; }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--3) { animation-range: contain 82% contain 87%; }
@@ -498,7 +502,7 @@ const destinos = {
        viven en la franja central visible; en «Móvil», un teléfono grande en cascada, uno sobre otro. */
     .abre :global(.pp-ven) { left: 40px !important; top: 46px !important; width: 1298px !important; height: 820px !important; }
     /* En el teléfono cada proyecto SUSTITUYE al anterior (sale hacia arriba), sin apilarse. */
-    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 40% contain 54%; }
+    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 37% contain 54%; }
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-name: pp-ven-pasa; animation-range: contain 54% contain 68%; }
     :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-name: pp-ven-pasa; animation-range: contain 68% contain 82%; }
     .pp-seg button { min-width: 92px; }
@@ -690,7 +694,7 @@ const destinos = {
         set('--pp-tt', tt); set('--pp-th', Th);
         // iPhone del modo «Móvil»: centrado en el hueco libre, tan alto como quepa (marco 8 px, pantalla 390 × 844)
         const bandaT = 24 + cabH + 14;
-        const telH = Math.min(libre, qMovil.matches ? 620 : 700);
+        const telH = Math.min(libre, qMovil.matches ? 620 : 780);
         const telW = (telH - 16) * 390 / 844 + 16;
         const telY = bandaT + Math.max(0, (libre - telH) / 2);
         set('--pp-telw', telW); set('--pp-telx', tl + T / 2 - telW / 2); set('--pp-tely', telY);

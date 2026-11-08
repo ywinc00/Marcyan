@@ -1,6 +1,6 @@
 ---
 // Hero de restaurantes (ES y EN). Dirección C «Mientras cocinas», elegida por el dueño (2026-11-08).
-// Mecanismo: una foto REAL del servicio (cocina abierta de noche, Unsplash 1697376354276, licencia libre)
+// Mecanismo: una foto REAL del servicio (cocina abierta de noche, Unsplash 1769955821416, cocinero bajo las lámparas de calor, licencia libre)
 // y, encima, lo que la web del restaurante hace sola mientras cocinan, en orden: la carta que el cliente
 // abre con el QR de la mesa → Marcy contestando una reserva → el pedido que entra a WhatsApp sin
 // comisión → el restaurante apareciendo en Maps. Principio de turn.io (5f60ec61: foto de persona con los
@@ -18,13 +18,13 @@ const { h1Html, chip, eyebrow, lead, primary, link, sr, lang = 'es' } = Astro.pr
 const en = lang === 'en';
 const T = en
   ? {
-      ej: 'Example', negocio: 'Your Taquería', mesa: 'Menu · table 6', platos: [['Carne asada tacos', '$4.50'], ['Birria with consomé', '$13.00']], pedir: 'Order on WhatsApp',
+      ej: 'Example', negocio: 'Your Taquería', mesa: 'Menu · table 6', platos: [['Quesabirria tacos', '$4.50'], ['Birria with consomé', '$13.00']], pedir: 'Order on WhatsApp',
       q: 'Do you have a table for 4 at 8?', a: 'Yes! I’ll hold one by the window. What name should I put it under?', marcy: 'Marcy · Your Taquería',
       ped: 'New order #41', pedD: 'Pickup 8:15 PM · $38.00', com: 'App commission', cero: '$0.00',
       maps: 'tacos near me', abierto: 'Open now',
     }
   : {
-      ej: 'Ejemplo', negocio: 'Tu Taquería', mesa: 'Carta · mesa 6', platos: [['Tacos de asada', '$4.50'], ['Birria con consomé', '$13.00']], pedir: 'Pedir por WhatsApp',
+      ej: 'Ejemplo', negocio: 'Tu Taquería', mesa: 'Carta · mesa 6', platos: [['Tacos de quesabirria', '$4.50'], ['Birria con consomé', '$13.00']], pedir: 'Pedir por WhatsApp',
       q: '¿Tienen mesa para 4 a las 8?', a: '¡Sí! Te aparto una junto a la ventana. ¿A nombre de quién?', marcy: 'Marcy · Tu Taquería',
       ped: 'Pedido nuevo #41', pedD: 'Para recoger 8:15 p. m. · $38.00', com: 'Comisión de app', cero: '$0.00',
       maps: 'tacos cerca de mí', abierto: 'Abierto ahora',
@@ -38,7 +38,7 @@ const T = en
     <div class="hr__escena" data-nosnippet>
       <p class="sr-only">{sr}</p>
       <div class="hr__foto" aria-hidden="true">
-        <img src="/fotos/ejemplos/cocina-noche-1280.webp" srcset="/fotos/ejemplos/cocina-noche-800.webp 800w, /fotos/ejemplos/cocina-noche-1280.webp 1280w, /fotos/ejemplos/cocina-noche-1800.webp 1800w" sizes="(min-width: 1024px) 46vw, 100vw" width="1280" height="853" alt="" fetchpriority="high" decoding="async" />
+        <img src="/fotos/ejemplos/cocina-noche-1280.webp" srcset="/fotos/ejemplos/cocina-noche-800.webp 800w, /fotos/ejemplos/cocina-noche-1280.webp 1280w, /fotos/ejemplos/cocina-noche-1800.webp 1800w" sizes="(min-width: 1024px) 46vw, 100vw" width="1280" height="1920" alt="" fetchpriority="high" decoding="async" />
         <span class="hr__ej">{T.ej}</span>
       </div>
       <div class="hr__piezas" aria-hidden="true">
@@ -46,7 +46,7 @@ const T = en
         <div class="hr__p hr__carta">
           <p class="hr__ct"><b>{T.negocio}</b><span class="hr__qr"><i></i><i></i><i></i><i></i></span></p>
           <p class="hr__mesa">{T.mesa}</p>
-          <img class="hr__plato" src="/fotos/ejemplos/plato-tacos-480.webp" width="240" height="150" alt="" loading="lazy" decoding="async" />
+          <img class="hr__plato" src="/fotos/ejemplos/plato-quesabirria-480.webp" width="240" height="150" alt="" loading="lazy" decoding="async" />
           <ul>{T.platos.map(([n, p]) => <li><span>{n}</span><b>{p}</b></li>)}</ul>
           <span class="hr__btn"><LogoMarca id="whatsapp" size={15} tono="mono" titulo="" />{T.pedir}</span>
         </div>
@@ -90,13 +90,13 @@ const T = en
   /* luz cálida detrás de la foto (sin dibujo de fondo: la foto es la escena) */
   .hr__escena::before { content: ''; position: absolute; inset: -12% -18% -6% -10%; z-index: -1; background: radial-gradient(50% 50% at 55% 45%, rgba(214, 150, 70, .16), transparent 70%); pointer-events: none; }
   .hr__foto { position: relative; overflow: hidden; aspect-ratio: 5 / 5.2; border-radius: 18px; box-shadow: 0 0 0 1px rgba(240, 237, 232, .08), 0 40px 80px -40px rgba(0, 0, 0, .9); background: #14110d; }
-  .hr__foto img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 55% 50%; }
+  .hr__foto img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 38%; }
   .hr__foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 8, 8, .35), rgba(8, 8, 8, 0) 30%, rgba(8, 8, 8, 0) 60%, rgba(8, 8, 8, .55)), radial-gradient(120% 80% at 50% 40%, transparent 55%, rgba(8, 8, 8, .45)); }
   .hr__ej { position: absolute; z-index: 1; left: 16px; top: 14px; font: 500 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(243, 239, 230, .7); }
   .hr__piezas { position: absolute; inset: 0; pointer-events: none; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
   .hr__p { position: absolute; color: #111b21; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 24px 48px -16px rgba(0, 0, 0, .65), 0 2px 6px rgba(0, 0, 0, .25); }
   /* carta */
-  .hr__carta { left: -36px; bottom: 0; width: 236px; padding: 14px 14px 12px; }
+  .hr__carta { left: -28px; bottom: 40px; width: 236px; padding: 14px 14px 12px; }
   .hr__ct { display: flex; align-items: center; justify-content: space-between; margin: 0; font: 600 15px/1.2 Georgia, 'Times New Roman', serif; }
   .hr__qr { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
   .hr__qr i { border: 2px solid #111; border-radius: 2px; }
@@ -107,7 +107,7 @@ const T = en
   .hr__carta li b { font-weight: 600; }
   .hr__btn { display: flex; align-items: center; justify-content: center; gap: 7px; height: 36px; border-radius: 9px; background: #1d8a4e; color: #fff; font-size: 13px; font-weight: 600; }
   /* chat */
-  .hr__chat { right: -28px; top: 64px; width: 268px; padding: 10px; display: flex; flex-direction: column; gap: 6px; background: #efeae2; }
+  .hr__chat { right: 16px; top: 56px; width: 268px; padding: 10px; display: flex; flex-direction: column; gap: 6px; background: #efeae2; }
   .hr__b { position: relative; max-width: 88%; padding: 8px 10px 6px; border-radius: 9px; font-size: 13px; line-height: 1.38; box-shadow: 0 1px .5px rgba(11, 20, 26, .13); }
   .hr__b small { display: block; margin-top: 2px; text-align: right; font-size: 10.5px; color: #667781; }
   .hr__b--in { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
@@ -132,13 +132,13 @@ const T = en
     .hr__p, .hr__b, .hr__quien { transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .65s cubic-bezier(.22, 1, .36, 1); }
     :global(html.w-anim) .hr__escena:not(.is-on) .hr__p { opacity: 0; transform: translateY(18px) scale(.97); }
     :global(html.w-anim) .hr__escena:not(.is-on) .hr__chat .hr__b, :global(html.w-anim) .hr__escena:not(.is-on) .hr__quien { opacity: 0; transform: translateY(8px); }
-    .hr__carta { transition-delay: .25s; }
-    .hr__chat { transition-delay: .9s; }
-    .hr__chat .hr__b--in { transition-delay: 1.15s; }
-    .hr__chat .hr__quien { transition-delay: 1.8s; }
-    .hr__chat .hr__b--out { transition-delay: 2.2s; }
-    .hr__pedido { transition-delay: 2.9s; }
-    .hr__maps { transition-delay: 3.5s; }
+    .hr__carta { transition-delay: .2s; }
+    .hr__chat { transition-delay: .6s; }
+    .hr__chat .hr__b--in { transition-delay: .8s; }
+    .hr__chat .hr__quien { transition-delay: 1.25s; }
+    .hr__chat .hr__b--out { transition-delay: 1.5s; }
+    .hr__pedido { transition-delay: 2s; }
+    .hr__maps { transition-delay: 2.4s; }
   }
 
   @media (max-width: 1023.98px) {
@@ -155,7 +155,8 @@ const T = en
     .hr__escena { padding: 4px 0 112px; }
     .hr__foto { aspect-ratio: 4 / 4.2; border-radius: 14px; }
     .hr__maps { display: none; }
-    .hr__chat { width: 212px; top: 40px; right: 10px; }
+    .hr__chat { width: 200px; top: 40px; right: 10px; }
+    .hr__chat .hr__quien { display: none; }
     .hr__b { font-size: 12px; }
     .hr__carta { left: 0; bottom: 0; width: calc(50% - 4px); padding: 10px; }
     .hr__carta ul { font-size: 11px; gap: 5px; margin: 8px 0 9px; }

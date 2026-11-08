@@ -135,7 +135,8 @@ const ask = lang === 'en' ? 'Use another tool? Ask us' : '¿Usas otra herramient
   .tc__app { color: var(--w-ink); }
   /* v5: la plataforma también en móvil, a la derecha de la barra, en pequeño (antes se escondía). */
   .tc__plat { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; min-width: 0; font-size: 11.5px; color: var(--w-ink-60); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; --marca-tinta: var(--w-ink); }
-  .tc__win > :global(.w-example) { top: 12px; right: 14px; }
+  /* abajo también en el teléfono: arriba pisaba la plataforma (crítica 2026-11-08) */
+  .tc__win > :global(.w-example) { top: auto; bottom: 12px; right: 14px; }
 
   .tc__body { position: relative; padding: 32px 16px 28px; }
   /* Control segmentado (W-ADV-38, radio 12, padding 4); pestañas de 44 de alto (§6.8). */

@@ -306,6 +306,16 @@ await check('pastillas: el filtro sin estado no lleva status', () => {
   assert.ok(!/status =/.test(f.text));
   assert.ok(/source =/.test(f.text));
 });
+await check('prueba y spam: fuera de "Todos" y de su total, visibles con su pastilla', () => {
+  assert.ok(/status NOT IN \('test', 'spam'\)/.test(buildLeadFilter({}).text));
+  assert.ok(!/NOT IN/.test(buildLeadFilter({ includeHidden: true }).text));
+  const f = buildLeadFilter({ status: 'spam' });
+  assert.ok(/status = \$1/.test(f.text) && !/NOT IN/.test(f.text) && f.params[0] === 'spam');
+  const o = packFacet([{ k: 'new', n: 3 }, { k: 'test', n: 2 }, { k: 'spam', n: 4 }], ['new', 'test', 'spam']);
+  assert.deepEqual(o, { all: 3, new: 3, test: 2, spam: 4 });
+  assert.equal(leadFiltersFromQuery({ estado: 'prueba' }).status, 'test');
+  assert.equal(leadFiltersFromQuery({ estado: 'spam' }).status, 'spam');
+});
 
 // ── crm.js: URL ↔ API ───────────────────────────────────────────
 await check('url leads: estado y origen legibles → valores de la API', () => {

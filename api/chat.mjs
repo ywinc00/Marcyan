@@ -28,18 +28,23 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
+import { quote } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
 // la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
+import { measurePlace } from '../lib/diagnostic-measure.mjs';
+import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 // Frenos guardados (cuenta compartida entre instancias). Solo cuenta: el
 // módulo importa @vercel/postgres de forma dinámica y solo al contar.
 import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
 // Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
 import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
+import { recordTurn } from '../lib/chat-log.mjs';
+import { isTakenOver, recordVisitorWaiting, ownerTexts, tagOwnerTurns, OWNER_CONTEXT, OWNER_TAG } from '../lib/takeover.mjs';
 
 // Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
 // y su coste se cuentan aparte para que las pruebas de Marcy (que corren contra
@@ -58,12 +63,13 @@ export function envBucket(bucket) {
 // widget (ChatWidget.astro) < maxDuration 60. Si cambias un tope, recalcula los tres.
 export const config = { maxDuration: 60 };
 
-// Modelo por defecto: Sonnet 5 (más capaz y mejor cerrando, precio de intro).
+// Modelo por defecto: Sonnet 5.5 (2026-11-07; mismo precio que Sonnet 5, pasa la batería).
+// Thinking adaptativo + effort low: en 5.5 'disabled' da 400 y tool_choice forzado también (no se usan).
 // Exportados para que el guard test bloquee el id y la allowlist (control de costo).
-export const DEFAULT_MODEL = 'claude-sonnet-5';
+export const DEFAULT_MODEL = 'claude-sonnet-5-5';
 // Allowlist de modelos: evita que un env mal puesto dispare un modelo caro por error.
 // Se conservan los anteriores para poder revertir vía CHAT_MODEL sin desplegar.
-export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5']);
+export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-sonnet-5', 'claude-sonnet-5-5']);
 
 // Parámetros de razonamiento por MODELO (v8). Sonnet 5/4.6 soportan thinking
 // adaptativo + effort; Haiku 4.5 NO (ambos parámetros devuelven 400 en ese modelo):
@@ -72,7 +78,18 @@ export const ALLOWED_MODELS = new Set(['claude-haiku-4-5', 'claude-sonnet-4-6', 
 // Pura y exportada para el guard test.
 export function modelTuning(model) {
   if (model === 'claude-haiku-4-5') return {};
+  // Sonnet 5.5: lo que el modelo escribe ANTES de una herramienta (p. ej. la frase
+  // que acompaña al formulario) ya no llega como texto sino como "nota de progreso"
+  // dentro de un bloque de thinking, vacío por defecto. Con display 'updates' llegan
+  // SOLO esas notas (nunca el razonamiento) y parseToolResponse las usa como texto.
+  // Causa verificada con la batería del 2026-11-07 (decidido-landing 0/3).
+  if (model === UPDATES_MODEL) return { thinking: { type: 'adaptive', display: 'updates' }, output_config: { effort: 'low' } };
   return { thinking: { type: 'adaptive' }, output_config: { effort: 'low' } };
+}
+export const UPDATES_MODEL = 'claude-sonnet-5-5';
+// Cabecera beta que exige display 'updates'.
+export function modelRequestOptions(model) {
+  return model === UPDATES_MODEL ? { headers: { 'anthropic-beta': 'thinking-display-updates-2026-08-18' } } : undefined;
 }
 
 // Quita control chars C0 del input. Conserva TAB (9) y LF (10); descarta el
@@ -88,7 +105,7 @@ function stripControl(s) {
 }
 
 // ── clientIp propio (NO importar lib/auth.mjs → evita acoplar Postgres) ──
-function clientIp(req) {
+export function clientIp(req) {
   const fwd = req.headers['x-forwarded-for'];
   if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
   return req.headers['x-real-ip'] || null;
@@ -136,6 +153,13 @@ export async function siteReviewAllowed(sid, ip, { store, now } = {}) {
   return true;
 }
 
+// Ficha de Google (Places, de pago): tope diario de TODO el sitio, aparte del
+// cupo de revisar_sitio. Si se agota, la revisión sigue sin ficha.
+export async function placesAllowed({ store, now } = {}) {
+  const r = await persistLimit({ bucket: envBucket('chatPlacesGlobal'), key: GLOBAL_KEY, limits: RL.chatPlacesGlobal, store, now });
+  return r.ok;
+}
+
 // Aviso al panel (texto fijo, sin nada del visitante ni del modelo). Import
 // dinámico: notifications.mjs solo se carga cuando hay algo que avisar.
 async function alertOwner(kind) {
@@ -172,7 +196,7 @@ function allowedOrigins() {
     'http://localhost:4321',
   ];
 }
-function originOk(req) {
+export function originOk(req) {
   const o = req.headers.origin;
   if (!o) return false; // fail-closed
   return allowedOrigins().includes(o);
@@ -261,6 +285,11 @@ function toolOnlyFallback(action, lang) {
   if (action.type === 'capture') {
     // Neutro a propósito: la cajita ya viene PRE-RELLENADA con lo que el visitante
     // dio, así que no listamos campos. Mensaje según el destino.
+    if (action.destino === 'cita') {
+      return en
+        ? 'Pick the day and time that work best for you below and leave your contact. 📅'
+        : 'Elige aquí abajo el día y la hora que mejor te vengan y deja tu contacto. 📅';
+    }
     if (action.destino === 'proyecto') {
       return en
         ? 'Perfect — confirm your contact below and we’ll put your custom proposal together. 🚀'
@@ -280,9 +309,14 @@ function toolOnlyFallback(action, lang) {
 // Pura y testeable. text=null si no hubo texto ni tool (el caller usa fallback).
 // Un solo turno: NO se envía tool_result ni hay 2ª llamada. Toma el PRIMER tool_use
 // de una de NUESTRAS herramientas (Marcy usa como máximo una por mensaje).
-export function parseToolResponse(content, lang = 'es') {
+export function parseToolResponse(content, lang = 'es', { updatesAsText = false } = {}) {
   const blocks = Array.isArray(content) ? content : [];
   let text = blocks.filter((b) => b && b.type === 'text').map((b) => b.text).join('').trim();
+  // Solo con display 'updates' (Sonnet 5.5) los bloques de thinking traen notas para el
+  // cliente y no razonamiento; en cualquier otro modelo NUNCA se leen (fuga de razonamiento).
+  if (!text && updatesAsText) {
+    text = blocks.filter((b) => b && b.type === 'thinking' && typeof b.thinking === 'string').map((b) => b.thinking.trim()).filter(Boolean).join(' ').trim();
+  }
   // El prompt pide una herramienta por turno, pero si el modelo emitiera varias, la
   // CAPTURA (cierre) manda; si no, la primera reconocida. Así nunca se pierde el form.
   const toolUses = blocks.filter((b) => b && b.type === 'tool_use' && OUR_TOOLS.has(b.name));
@@ -291,7 +325,7 @@ export function parseToolResponse(content, lang = 'es') {
   if (tool) {
     if (tool.name === CONTACT_TOOL.name) {
       const inp = tool.input || {};
-      const destino = inp.destino === 'proyecto' ? 'proyecto' : 'contacto'; // allowlist, default seguro
+      const destino = inp.destino === 'proyecto' || inp.destino === 'cita' ? inp.destino : 'contacto'; // allowlist, default seguro
       const name = sanitizeName(inp.nombre); // prellenado robusto (nombre de pila)
       // El modelo RAZONA sobre la conversación y rellena el brief de proyecto; aquí
       // saneamos cada campo (sanitizeField quita emails/teléfonos → PII solo por la cajita).
@@ -312,6 +346,9 @@ export function parseToolResponse(content, lang = 'es') {
       };
       action = { type: 'capture', destino, extras };
       if (name) action.name = name;
+      // Sonnet 5.5 llama a la herramienta SIN escribir texto (verificado 2026-11-07:
+      // respuesta = solo tool_use). La frase va en el campo obligatorio "mensaje".
+      if (!text && typeof inp.mensaje === 'string') text = sanitizeField(inp.mensaje, 600);
     } else if (tool.name === CHANNELS_TOOL.name) {
       action = { type: 'channels' };
     } else if (tool.name === LINK_TOOL.name) {
@@ -355,42 +392,86 @@ function priceAllowVariants(v) {
   return [...s].filter((n) => n >= 10).map(String); // >= PRICE_MIN del filtro (chat-kb.mjs)
 }
 
+// Pérdidas estimadas: se permite también redondearlas (a 10, 50 y 100), como haría
+// cualquier persona ("unos $1,560" por 1559). Verificado en la batería 2026-11-07.
+// Solo para pérdidas: los precios de cotizar se citan EXACTOS.
+export function lossAllow(values) {
+  const out = new Set();
+  for (const v of values) for (const step of [1, 10, 50, 100]) { const r = Math.round(v / step) * step; if (r > 0) out.add(r); }
+  return [...out].flatMap(priceAllowVariants);
+}
+
 export function computeLossToolResult(input) {
   const inp = input || {};
   if (inp.modo === 'llamadas' && isPos(inp.llamadas_semana) && isPos(inp.ticket)) {
-    const { monthly, yearly } = computeMissedCalls(inp);
+    const { monthly, yearly, weekly, missedValueWeekly } = computeMissedCalls(inp);
     if (monthly < 1) return FAIL_RESULT; // pérdida nula → no computa (no cites $0)
-    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    // Cifras intermedias también calculadas aquí: Sonnet 5.5 tiende a citar la semanal o
+    // el valor bruto de las llamadas perdidas, y el filtro estricto (P3) cortaba la
+    // respuesta entera (batería 2026-11-07, calculadora-es 0/3).
+    return { content: JSON.stringify({ ok: true, modo: 'llamadas', perdida_semanal: weekly, perdida_mensual: monthly, perdida_anual: yearly, valor_llamadas_perdidas_semana: missedValueWeekly, nota: 'perdida = llamadas perdidas x ticket x tasa de cierre estimada' }), extraAllow: lossAllow([weekly, monthly, yearly, missedValueWeekly]) };
   }
   if (inp.modo === 'citas' && isPos(inp.citas_semana) && isPos(inp.valor_cita)) {
     const { monthly, yearly } = computeNoShows(inp);
     if (monthly < 1) return FAIL_RESULT;
-    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: [...priceAllowVariants(monthly), ...priceAllowVariants(yearly)] };
+    return { content: JSON.stringify({ ok: true, modo: 'citas', perdida_mensual: monthly, perdida_anual: yearly }), extraAllow: lossAllow([monthly, yearly]) };
   }
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
+}
+
+// cotizar — puro y testeable. Las reglas viven en lib/quote-rules.mjs; Marcy solo
+// repite las cifras devueltas (van al allowlist dinámico del filtro de precios).
+export function quoteToolResult(input, lang = 'es') {
+  const inp = input || {};
+  const q = quote(Array.isArray(inp.servicios) ? inp.servicios : [], { pedirRebaja: inp.pedir_rebaja === true, lang });
+  if (!q.ok) return FAIL_RESULT;
+  const { cifras, ...visible } = q;
+  return { content: JSON.stringify(visible), extraAllow: cifras.flatMap(priceAllowVariants) };
 }
 
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
 // (lib/diagnostic-checks.mjs). REGLA DE ORO: JAMÁS title/meta/texto del sitio ajeno.
 // Puro y testeable (recibe el output ya calculado de analyzeSite).
-export function buildSiteToolResult({ scores, findings }, lang = 'es') {
+export function buildSiteToolResult({ scores, findings } = {}, lang = 'es', ficha = null) {
   const en = lang === 'en';
-  const rec = recommendService({ scores });
-  return JSON.stringify({
-    ok: true,
-    scores: { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep },
-    hallazgos: (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es })),
-    recomendado: en ? rec.service_en : rec.service_es,
-  });
+  const out = { ok: true };
+  if (scores) {
+    const rec = recommendService({ scores });
+    out.scores = { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep };
+    out.hallazgos = (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es }));
+    out.recomendado = en ? rec.service_en : rec.service_es;
+  } else {
+    out.web = 'sin_revisar'; // nuestro acceso falló: no afirmar que su web está caída
+  }
+  // Ficha de Google: solo enteros + textos de NUESTRO catálogo (fichaForChat).
+  if (ficha) out.ficha_google = ficha;
+  return JSON.stringify(out);
 }
 
 // Descarga + analiza el sitio (SSRF-safe). El network se acota con withTimeout.
-async function reviewSite(url, lang) {
+// Ficha de Google en paralelo con la web. Sin nombre, sin clave o sin cupo → null
+// (la revisión sigue sin ficha). Su propio tope de 6 s, dentro de los 9 s de la fase.
+async function reviewListing({ name, city, url, lang }) {
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key || !name) return null;
+  try {
+    if (!(await placesAllowed())) return null;
+    return fichaForChat(await measurePlace({ name, city, siteUrl: url, lang }, { key, timeoutMs: 6000 }), lang);
+  } catch { return null; }
+}
+
+async function reviewSite(url, lang, { name, city } = {}) {
   const g = await ssrfGuard(url);
   if (!g.ok) return FAIL_RESULT; // bloqueada (IP privada/host interno/esquema) → sin revelar motivo
-  const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 });
+  const [web, ficha] = await Promise.all([reviewWeb(g, lang), reviewListing({ name, city, url: g.url, lang })]);
+  if (!web && !ficha) return FAIL_RESULT;
+  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [] };
+}
+
+async function reviewWeb(g, lang) {
+  const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 }).catch(() => null);
   const hasSite = !!(site && site.ok && site.html && site.html.length > 0);
-  if (!hasSite) return FAIL_RESULT;
+  if (!hasSite) return null;
   let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
   // Follow-up de /contacto (mismo criterio que api/diagnostic.mjs, presupuesto MÁS corto):
   // sin esto, Marcy afirmaría "no tiene formulario" contra sitios que lo tienen en su
@@ -410,19 +491,30 @@ async function reviewSite(url, lang) {
       })(), 3000, 'contact follow-up');
     } catch { /* el análisis de la home queda tal cual */ }
   }
-  return { content: buildSiteToolResult({ scores: out.scores, findings: out.findings }, lang), extraAllow: [] };
+  return { scores: out.scores, findings: out.findings };
 }
 
 // Ejecuta la tool interna pedida y devuelve { content, extraAllow }. Solo UNA por
 // request (cap 1 iteración): la llama el handler con el primer tool_use interno.
 async function runInternalTool(toolUse, { lang, ip, sid }) {
   if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
+  if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang);
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
-    const url = toolUse.input && typeof toolUse.input.url === 'string' ? toolUse.input.url : '';
+    const inp = toolUse.input || {};
+    const url = typeof inp.url === 'string' ? inp.url : '';
     if (!url) return FAIL_RESULT;
-    try { return await withTimeout(reviewSite(url, lang), 9000, 'site review'); }
+    const name = typeof inp.nombre_negocio === 'string' ? inp.nombre_negocio.trim().slice(0, 120) : '';
+    const city = typeof inp.ciudad === 'string' ? inp.ciudad.trim().slice(0, 80) : '';
+    let out;
+    try { out = await withTimeout(reviewSite(url, lang, { name, city }), 9000, 'site review'); }
     catch { return FAIL_RESULT; }                                   // timeout/error → silencioso
+    // Web real y revisada: la velocidad de Google se mide en segundo plano y Marcy
+    // la recibe en el siguiente turno (lib/site-speed.mjs). Import dinámico: sin base aquí.
+    if (out !== FAIL_RESULT && sid) {
+      try { const { startSiteSpeed } = await import('../lib/site-speed.mjs'); await startSiteSpeed({ sid, url, lang }); } catch {}
+    }
+    return out;
   }
   return FAIL_RESULT;
 }
@@ -466,6 +558,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: M.badRequest });
   }
 
+  // "Tomo yo": si el dueño lleva esta conversación desde Orbit, Marcy calla.
+  // El mensaje se guarda y le llega al dueño como aviso; su respuesta la
+  // recoge el widget (api/chat-updates.mjs). Si la base falla, sigue Marcy.
+  if (await isTakenOver(sid)) {
+    const text = lastUserText(messages);
+    try { await recordVisitorWaiting({ sid, text }); } catch (err) { console.warn('[chat] espera sin guardar', err && err.message); }
+    try {
+      const { createNotification } = await import('../lib/notifications.mjs');
+      await createNotification({ type: 'chat_handoff', title: 'Te escribió en el chat', body: String(text || '').slice(0, 300), ref: `chat:${sid}`.slice(0, 100), url: `/dashboard#/marcy/${sid}`, dedupeMinutes: 1 });
+    } catch {}
+    return res.status(200).json({ reply: null, human: true });
+  }
+
   // Tope diario de todo el sitio, DESPUÉS de validar: solo cuentan los mensajes
   // que de verdad irían a la IA (un bot no agota el tope con basura). Pasado,
   // el visitante ve el mismo mensaje que con el chat apagado (formulario y
@@ -477,9 +582,51 @@ export default async function handler(req, res) {
     return res.status(200).json({ reply: M.disabled });
   }
 
-  const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
+  // Si el dueño atendió en persona en esta conversación, sus mensajes se marcan
+  // (comprobados contra la base) para que Marcy no los desmienta al retomarla.
+  let ownerCtx = null;
+  if (messages.length > 1) {
+    const texts = await ownerTexts(sid);
+    const t = tagOwnerTurns(messages, texts);
+    if (t.tagged) { messages.splice(0, messages.length, ...t.messages); ownerCtx = OWNER_CONTEXT; }
+  }
+
+  // Velocidad de Google medida en segundo plano tras revisar su web: llega una vez.
+  if (messages.length > 1) {
+    try {
+      const { takeSiteSpeed } = await import('../lib/site-speed.mjs');
+      const sp = await takeSiteSpeed(sid);
+      if (sp) ownerCtx = ownerCtx ? `${ownerCtx}\n\n${sp}` : sp;
+    } catch {}
+  }
 
   try {
+    const t = await marcyTurn({ messages, lang, sid, ip, extraContext: ownerCtx });
+    // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro });
+    return res.status(200).json(t.action ? { reply: t.reply, action: t.action } : { reply: t.reply });
+  } catch (err) {
+    // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
+    console.error('[chat] anthropic error:', err && err.message);
+    await recordFailure();
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: M.fallback, fallback: true });
+    return res.status(200).json({ reply: M.fallback });
+  }
+}
+
+// ── Un turno de Marcy (el mismo cerebro para todos los canales) ──────────
+// Web, WhatsApp, Instagram y teléfono llaman aquí. Devuelve la respuesta ya
+// filtrada (marca y precios) y la acción de interfaz pedida, o lanza si la IA
+// falla (cada canal decide su mensaje de respaldo). `extraContext` va detrás de
+// la marca de caché (canal, dueño); `tools` y `extraInternal` los pone el canal
+// (p. ej. agendar por texto en WhatsApp). Cuenta el coste del día (P2); el
+// registro del turno lo hace quien llama, con su canal.
+export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraContext = null, tools = CHAT_TOOLS, extraInternal = null }) {
+  const M = MESSAGES[lang] || MESSAGES.es;
+  const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
+  const isInternal = (name) => INTERNAL_TOOLS.has(name) || !!(extraInternal && extraInternal.names.has(name));
+
+  {
     const client = new Anthropic({ maxRetries: 1, timeout: 20000 }); // lee ANTHROPIC_API_KEY del env
 
     // Parámetros comunes a las 2 llamadas (mismo prefijo system+tools → cache-friendly).
@@ -490,11 +637,11 @@ export default async function handler(req, res) {
       // + idioma de la página DETRÁS de la marca de caché (no rompe el prefijo cacheado).
       system: [
         { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
-        { type: 'text', text: langContext(lang) },
+        { type: 'text', text: langContext(lang) + (extraContext ? '\n\n' + extraContext : '') },
       ],
       // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
       // tool_choice = auto (omitido) → el modelo decide cuándo.
-      tools: CHAT_TOOLS,
+      tools,
       // Thinking ADAPTATIVO con esfuerzo bajo (v8). Antes iba 'disabled' por latencia,
       // pero la doc oficial de Sonnet 5 lo desaconseja para harneses con tools: con
       // thinking apagado el modelo dispara menos las herramientas y lee peor el turno
@@ -507,21 +654,27 @@ export default async function handler(req, res) {
 
     // 1ª llamada (≤14s: incluye el thinking adaptativo). El input del usuario vive SOLO en `messages`.
     const r1 = await withTimeout(
-      client.messages.create({ ...baseParams, messages }),
+      client.messages.create({ ...baseParams, messages }, modelRequestOptions(model)),
       14000,
       'anthropic'
     );
 
     let finalResp = r1;
-    let extraAllow = [];
+    // Cifras que ya salieron en la conversación (del cliente o de una herramienta en un
+    // turno anterior): Marcy puede repetirlas sin que el filtro estricto las corte.
+    let extraAllow = historyFigures(messages);
 
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
     const toolUses = (Array.isArray(r1.content) ? r1.content : []).filter((b) => b && b.type === 'tool_use');
-    const internal = toolUses.find((b) => INTERNAL_TOOLS.has(b.name));
+    const internal = toolUses.find((b) => isInternal(b.name));
+    const extraTools = [];
+    const extraResps = [];
     if (internal) {
-      const out = await runInternalTool(internal, { lang, ip, sid });
-      extraAllow = out.extraAllow || [];
+      const out = extraInternal && extraInternal.names.has(internal.name)
+        ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
+        : await runInternalTool(internal, { lang, ip, sid });
+      extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
@@ -542,39 +695,73 @@ export default async function handler(req, res) {
             { role: 'assistant', content: r1.content },
             { role: 'user', content: toolResults },
           ],
-        }),
+        }, modelRequestOptions(model)),
         16000,
         'anthropic2'
       );
+      // Canales de texto: agendar necesita consultar horas y reservar en el MISMO turno
+      // (el historial guardado solo tiene texto, no los códigos de las horas). Solo ahí
+      // se permite UNA vuelta más, y solo con las herramientas de agendar.
+      const second = extraInternal && (Array.isArray(finalResp.content) ? finalResp.content : [])
+        .filter((b) => b && b.type === 'tool_use');
+      const again = second && second.find((b) => extraInternal.names.has(b.name));
+      if (again) {
+        const out2 = await extraInternal.run(again).catch(() => FAIL_RESULT);
+        extraTools.push(again.name);
+        const prev = finalResp;
+        extraResps.push(prev);
+        finalResp = await withTimeout(
+          client.messages.create({
+            ...baseParams,
+            messages: [
+              ...messages,
+              { role: 'assistant', content: r1.content },
+              { role: 'user', content: toolResults },
+              { role: 'assistant', content: prev.content },
+              { role: 'user', content: second.map((b) => ({ type: 'tool_result', tool_use_id: b.id, content: b.id === again.id ? out2.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }) })) },
+            ],
+          }, modelRequestOptions(model)),
+          16000,
+          'anthropic3'
+        );
+      }
     }
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
     // respuesta se IGNORA (parseToolResponse solo reconoce las SOLO-UI) → cap 1 iteración.
-    const parsed = parseToolResponse(finalResp.content, lang);
+    const updatesAsText = model === UPDATES_MODEL;
+    const parsed = parseToolResponse(finalResp.content, lang, { updatesAsText });
     let text = parsed.text;
     let action = parsed.action;
     // RESCATE: si el turno 1 mezcló una tool interna con una de UI y el modelo NO re-emitió
     // la de UI en la 2ª respuesta, recupera la acción de UI de r1 (si no, se perdería la
     // tarjeta/cajita — perder la CAPTURA sería el "error grave" que advierte el prompt).
     if (internal && !action) {
-      const fromR1 = parseToolResponse(r1.content, lang).action;
+      const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
-    let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
+    const cortadas = blockedFigures(text || '', extraAllow);
+    if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
+    let reply = brandPostFilter(String(text || M.fallback).split(OWNER_TAG).join('').trim() || M.fallback, lang);   // honestidad de marca (y nunca la marca del dueño)
+    const beforePrice = reply;
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
+    const fallback = !text || reply !== beforePrice;
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
-    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, finalResp]);
+    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, ...extraResps, finalResp]);
     const costMicro = turnCostMicroUsd(model, usage);
     const firstTurn = messages.length === 1;
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
-    return res.status(200).json(action ? { reply, action } : { reply });
-  } catch (err) {
-    // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
-    console.error('[chat] anthropic error:', err && err.message);
-    await recordFailure();
-    return res.status(200).json({ reply: M.fallback });
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model };
   }
+}
+
+export { recordFailure as recordChatFailure };
+
+// Último mensaje del visitante (texto) para el historial de Orbit.
+export function lastUserText(messages) {
+  const m = Array.isArray(messages) ? messages[messages.length - 1] : null;
+  return m && m.role === 'user' && typeof m.content === 'string' ? m.content : '';
 }

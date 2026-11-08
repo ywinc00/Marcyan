@@ -26,6 +26,7 @@
   import LoadingState from './ui/LoadingState.svelte';
   import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
+  import PushToggle from './PushToggle.svelte';
 
   // type → etiqueta legible + tono del chip (sin naranja: el acento queda
   // para la acción principal y lo pendiente, H-07).
@@ -275,6 +276,7 @@
 
 <PageHeader title="Avisos" subtitle="Lo que pasó en el sitio y en el panel. Cada aviso te lleva a su registro.">
   {#snippet actions()}
+    <PushToggle />
     <button type="button" class="b b--ghost" onclick={load} disabled={loading}><Icon name="refresh" size={16} />Actualizar</button>
     <button type="button" class="b b--primary" disabled={busyAll || markPending === 0} onclick={markAll}>
       <Icon name="check" size={16} />{busyAll ? 'Marcando…' : markAction.label}

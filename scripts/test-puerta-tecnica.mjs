@@ -74,7 +74,7 @@ process.env.ANTHROPIC_API_KEY = 'prueba-sin-red';
 const chat = (await import('../api/chat.mjs')).default;
 
 const handoff = (await import('../api/handoff.mjs')).default;
-const { __resetForTests } = await import('../lib/ratelimit.mjs');
+const { __resetForTests, shouldAlertOnFailure } = await import('../lib/ratelimit.mjs');
 const contact = (await import('../api/contact.mjs')).default;
 const diagnostic = (await import('../api/diagnostic.mjs')).default;
 
@@ -199,7 +199,7 @@ await check('chat: el turno suma su uso en la fila del día (entorno, modelo, co
   const [day, env, model, convs, calls, inp, out, cr, cw, cost] = row.vals;
   assert.match(day, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(env, 'development');
-  assert.equal(model, 'claude-sonnet-5');
+  assert.equal(model, 'claude-sonnet-5-5');
   assert.deepEqual([convs, calls, inp, out, cr, cw], [1, 1, 120, 300, 8000, 0]);
   // 120×2 + 300×10 + 8000×0,2 = 240 + 3000 + 1600 = 4840 micro-USD
   assert.equal(cost, 4840);
@@ -278,6 +278,19 @@ await check('freno: con la base colgada responde en segundos y luego deja de esp
   assert.equal(r2.code, 200);
   assert.ok(first < 9000, 'primera petición acotada (' + first + ' ms)');
   assert.ok(second < 500, 'la segunda no espera a la base (' + second + ' ms)');
+});
+
+await check('un despertar lento de la base no avisa; tres en 10 min o un fallo real sí', () => {
+  __resetForTests();
+  const to = { code: 'timeout' };
+  assert.equal(shouldAlertOnFailure(to, 0), false);
+  assert.equal(shouldAlertOnFailure(to, 60_000), false);
+  assert.equal(shouldAlertOnFailure(to, 120_000), true);
+  __resetForTests();
+  assert.equal(shouldAlertOnFailure(to, 0), false);
+  assert.equal(shouldAlertOnFailure(to, 11 * 60_000), false);
+  assert.equal(shouldAlertOnFailure({ code: '42P01' }, 0), true);
+  __resetForTests();
 });
 
 if (fails.length) {

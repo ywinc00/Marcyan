@@ -12,6 +12,9 @@ export const LEAD_STATUSES = [
   { id: 'contacted', slug: 'contactado', label: 'Contactado', plural: 'Contactados', tone: 'info'    },
   { id: 'converted', slug: 'convertido', label: 'Convertido', plural: 'Convertidos', tone: 'success' },
   { id: 'archived',  slug: 'archivado',  label: 'Archivado',  plural: 'Archivados',  tone: 'neutral' },
+  // Prueba y spam no cuentan en las estadísticas ni salen en "Todos".
+  { id: 'test',      slug: 'prueba',     label: 'Prueba',     plural: 'Pruebas',     tone: 'neutral' },
+  { id: 'spam',      slug: 'spam',       label: 'Spam',       plural: 'Spam',        tone: 'error'   },
 ];
 // Origen: Contacto y Diagnóstico ya no comparten color (CRM-14).
 export const LEAD_SOURCES = [

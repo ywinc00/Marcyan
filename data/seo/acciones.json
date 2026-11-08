@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-11-04",
+  "actualizado": "2026-11-07",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -124,7 +124,7 @@
       "ref": "marcyan-senal-local-es",
       "tipo": "dueno",
       "titulo": "Decidir la señal local en las páginas genéricas en español",
-      "estado": "pedida",
+      "estado": "descartada",
       "primeraVez": "2026-10-05",
       "ultimaVez": "2026-10-05",
       "propuestas": 1,
@@ -133,6 +133,16 @@
         {
           "fecha": "2026-10-05",
           "estado": "pedida"
+        },
+        {
+          "fecha": "2026-11-07",
+          "estado": "pedida",
+          "nota": "7-nov: las páginas comerciales ya llegan a EE.UU. (58 de 83 apariciones con país en octubre); lo de fuera entra por el blog. Propuesta: no tocar portada ni páginas genéricas; señal de EE.UU. solo en las guías del blog"
+        },
+        {
+          "fecha": "2026-11-07",
+          "estado": "descartada",
+          "nota": "Yan, 7-nov: no se pone la ciudad en las páginas generales en español; las de venta ya llegan a EE.UU. y lo de fuera entra por el blog (se corrige en la guía del chatbot)"
         }
       ]
     },
@@ -545,7 +555,7 @@
       "ref": "marcyan-guia-chatbot-enlaces",
       "tipo": "web",
       "titulo": "Enlazar la guía de precio del chatbot de WhatsApp desde /es/precios y las dos páginas de IA conversacional (Houston y Miami) y afinar su título para «precio chatbot whatsapp», tras el congelado del 23-nov (cambia lo que se ve, OK de Yan)",
-      "estado": "propuesta",
+      "estado": "encargada",
       "primeraVez": "2026-11-04",
       "ultimaVez": "2026-11-04",
       "propuestas": 1,
@@ -559,6 +569,16 @@
         {
           "fecha": "2026-11-04",
           "estado": "propuesta"
+        },
+        {
+          "fecha": "2026-11-07",
+          "estado": "propuesta",
+          "nota": "Revisado en vivo el 7-nov: datos del informe correctos, pero 79 de 80 apariciones del blog en octubre (con país) vienen de fuera de EE.UU. (guía: 1 de 72 desde EE.UU.). Replanteo propuesto: enfoque EE.UU. en la guía (dólares, Houston y Miami) + enlace desde las 2 páginas de IA conversacional, no desde Precios; tras el 23-nov y con OK del dueño"
+        },
+        {
+          "fecha": "2026-11-07",
+          "estado": "encargada",
+          "nota": "OK de Yan el 7-nov con el enfoque EE.UU. (no tal cual): la hace el chat del rediseño WorkOS y sale con él, no antes del 23-nov. Encargo: _cerebro/marcyan-web/encargos/2026-11-07-seo-guia-chatbot-eeuu.md"
         }
       ]
     },

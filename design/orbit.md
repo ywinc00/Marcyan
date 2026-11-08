@@ -104,3 +104,82 @@ Estado: PROPUESTO, pendiente del OK visual del dueño sobre capturas reales (esc
   **E-08** vacío que propone la salida (el "Alta manual" de Origen se convierte en el brief creado al enviar).
 - Sin brief: "Enviar kit de arranque" abre el diálogo, que avisa de que se crea su brief con la ficha.
   Con brief: "Enviar kit desde su brief" lleva a ese brief, donde vive su kit.
+
+## Añadido 2026-11-07 · Sección Marcy (conversaciones en vivo, historial, citas, gasto)
+Estado: PROPUESTO, ronda 2. La ronda 1 (bocetos A/B sin referencias) la rechazó el dueño: "nivel empresa top,
+un CRM de calidad" (ledger E-61). Tres direcciones de verdad distintas en `design/orbit-marcy/direcciones.png`
+(y `.html`), cada una al lado de sus referencias. El dueño elige antes de construir en fino.
+
+Referencias de Refero MIRADAS en imagen (pantallas web, id completo · principio tomado):
+- Lemni `f139a9a3-b343-4ef1-9860-60c5f62c32eb` · acciones del agente como tarjetas dentro de la conversación.
+- Lemni `3a36c541-61e3-4f84-b1b6-220e38a07f65` · ficha lateral con estado, prioridad y resumen del hilo.
+- Intercom `8e601e7d-bf19-4fa2-be9e-ab49d7d8d816` · avisos del sistema discretos entre mensajes.
+- Intercom Fin `de1ab118-183b-45e5-832a-c2f5237103ea` · cifras del agente como pestañas que filtran.
+- Intercom informes `0d71c83b-b64f-43a9-97d0-1df31ec1010c` · KPIs + tabla de rendimiento.
+- Attio `a3cb9102-0320-4ed3-b39b-5a714d16e85f` · ficha de persona con pestañas y actividad por fechas.
+- Krisp `eb64758d-6ba8-4b29-9ae6-1fecc6d5e603` · cinta de turnos sobre la transcripción.
+- Factory `a57432d9-dc26-4267-bb76-04827eff439c` · sesión de agente oscura con pasos plegables.
+- GlossGenius `bd279ce7-915e-403f-9f64-1bc258810d3b` · cita con su cliente en panel lateral.
+- Mangomint `1663684e-5602-447a-ac79-99f36d56c690` · semana densa con citas por color.
+- Rox `c794140c-de8b-46c4-8128-b3a652ea7461` · uso frente al límite con barra.
+- Steel `d499ba7e-45e3-4365-be81-a2d756f9f775` · gasto del periodo y por día.
+- Missive `1c47a246-4f51-4bbe-810b-0ad33fc5de46` · reparto por tramos para ver dónde se acumula.
+- Zendesk `1686eace-68b9-43c8-b6ad-056eca9d35fe` · panel de llamadas en cola (para la fase de teléfono).
+Biblioteca viva: Refero es la fuente de pantallas de producto; Mobbin no se conecta sin consultar; código base
+de la bandeja si se elige A: el ejemplo "mail" de shadcn/ui (MIT) solo como estructura, con primitivas de Orbit.
+
+Direcciones:
+- **A · Consola en vivo:** bandeja | conversación con tarjetas de herramientas y avisos | ficha con recorrido de venta.
+- **B · Embudo y diagnóstico:** embudo del mes que filtra, tabla con cinta de turnos, motivos de fallo ordenados.
+- **C · Ficha de cliente:** contactos | ficha con línea de tiempo por días de todos los canales | datos del negocio.
+- Común: Citas (semana con horas de atención, panel lateral) y Gasto (barra frente al tope con aviso al 80 %).
+Piezas del catálogo: **E-06** filtros con estado en la URL, **I-06** pestañas segmentadas, **I-05** línea de
+tiempo (C), **E-08/E-09/E-10** estados, **H-07** presupuesto del acento (naranja: ítem activo y lo que agenda
+Marcy; verde de datos: en vivo y cerrado; ámbar: dónde falló, siempre con texto).
+Ledger aplicable: E-11, E-17, E-19, E-28, E-30, E-39, E-55, E-60, E-61.
+
+## Añadido 2026-11-07 · Citas (Orbit) y agenda en el chat
+Estado: PROPUESTO, pendiente del OK visual del dueño en la vista previa.
+- Orbit, pestaña Citas de la sección Marcy: semana en hora de Houston (referencias Mangomint
+  `1663684e-5602-447a-ac79-99f36d56c690` y GlossGenius `bd279ce7-915e-403f-9f64-1bc258810d3b`): fuera de
+  horario más oscuro, horario de atención en la superficie de tarjeta, citas como bloques con la hora y el
+  nombre; las de Marcy con filo naranja (H-07: es lo pendiente que puso ella), las manuales en verde de datos.
+  Ficha lateral con contacto, lo que necesita, enlace al lead y a la conversación; acciones Hecha, No contestó,
+  Cancelar (peligro). Anfitrión E-19: pestaña nueva dentro de la sección ya aprobada, sin componentes globales.
+- Chat: la cajita de captura de siempre con un bloque de días (pastillas) y horas (rejilla) encima de los
+  campos; mismos tokens del widget (teal del sitio, radios y tipografía de la cajita). Nada nuevo fuera de ella.
+
+## Añadido 2026-11-07 · Icono propio de Orbit (pedido del dueño)
+Estado: PROPUESTO. El panel usaba el planeta oro/teal de Marcyan (el de la empresa), igual que otras apps de
+Marcyan. Orbit pasa a tener su isotipo: planeta y anillo en el naranja de Orbit `#f97316` sobre `#0e0e11`,
+satélite blanco en el anillo. Mismo vocabulario de la marca (planeta orbitado) con el color de Orbit, para que
+se reconozca como de la familia y se distinga en la pantalla de inicio. Archivos: `public/dashboard/orbit-icon.svg`
+y PNG 180/192/512 (iPhone no acepta SVG). Nombre de la app instalada: "Orbit". No toca el logo del navbar,
+el de la empresa ni el favicon del sitio (memoria "Logos: NO unificar").
+
+## Añadido 2026-11-07 · Correo (Orbit, Marcy › Correo)
+Estado: PROPUESTO, pendiente del OK visual del dueño. Pestaña nueva dentro de la sección ya aprobada (dirección A,
+consola en vivo); sin componentes globales nuevos (E-15, E-19).
+Referencias de Refero MIRADAS en imagen:
+- Jace AI `141b9b34-309d-463f-a2ff-b400ef320699` · filas de una línea agrupadas por día: remitente, asunto en
+  negrita + vista previa gris, chips pequeños de estado (necesita respuesta, borrador), fecha a la derecha.
+- Missive `aa850cd0-4334-4b58-b169-064df8aed985` · grupos por día y fila elegida con filo de color.
+Piezas del catálogo: **E-06** filtros en pastillas con contador (Responder hoy primero), **I-06** pestañas
+segmentadas (Conversaciones · Correo · Citas · Gasto), **E-08** vacío que propone la salida, **H-07** presupuesto
+del acento: naranja solo en "Responder hoy", la oportunidad y el filo de la fila elegida; el resto, chips de datos.
+En la fila, el resumen de Marcy sustituye a la vista previa del correo (lo que aporta ella). Ficha lateral con
+"Abrir en Gmail" como única acción primaria; Respondido y Archivar secundarias. Capturas: `design/orbit-correo/`.
+
+## Añadido 2026-11-07 · Avisos en el dispositivo (Web Push)
+Estado: PROPUESTO. Sin pantalla nueva: el interruptor vive en la cabecera de Avisos (su anfitrión, E-19) con
+los botones de siempre (`b b--ghost`). Estados: activar, probar y apagar; si el navegador lo bloquea, si falta
+la llave o en iPhone sin instalar, una nota corta en su lugar. La notificación usa el icono de Orbit.
+Captura: `design/orbit-correo/avisos-cabecera.jpg` (el panel de pruebas bloquea los avisos, por eso sale la nota).
+
+## Añadido 2026-11-07 · "Tomo yo" (el dueño contesta en el chat web)
+Estado: PROPUESTO. Dentro de la conversación ya aprobada (dirección A): debajo del hilo, "Tomo yo" (primario)
+con una línea que explica que Marcy se calla; tomada, una caja de texto con "Enviar" (primario, Enter envía)
+y "Devolver a Marcy" (secundario). Chip de la cabecera "La llevas tú" en naranja (H-07: es lo que pide tu
+acción). Tus mensajes en verde de datos ("Tú · hora"), distintos de los de Marcy (filo naranja). En el chat de la
+web, nota centrada "Ahora te atiende una persona del equipo" con el estilo de nota que ya existe.
+Captura: `design/orbit-correo/tomo-yo.png`.

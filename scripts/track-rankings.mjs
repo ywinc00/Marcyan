@@ -1217,6 +1217,7 @@ SELECT l.source,
   MAX(l.created_at) AS ultimo
 FROM leads l
 WHERE NOT (COALESCE(l.ip_address, '') = ANY ($3::text[]))
+  AND l.status NOT IN ('test', 'spam')
 GROUP BY l.source
 ORDER BY mes DESC, historico DESC, l.source`,
 
@@ -1246,6 +1247,7 @@ SELECT d.ref_id, d.created_at, d.lead_ref, l.status AS lead_status
 FROM diagnostics d
 LEFT JOIN leads l ON l.ref_id = d.lead_ref
 WHERE d.lead_ref IS NOT NULL
+  AND COALESCE(l.status, '') NOT IN ('test', 'spam')
   AND NOT (COALESCE(d.ip_address, '') = ANY ($3::text[]))
   AND d.created_at >= ($1::date) AT TIME ZONE 'UTC'
   AND d.created_at <  (($2::date) + 1) AT TIME ZONE 'UTC'

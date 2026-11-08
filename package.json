@@ -12,6 +12,12 @@
     "check:kb": "node scripts/verify-chat-kb.mjs",
     "test:chat": "node scripts/test-chat-guard.mjs",
     "test:diag": "node scripts/test-diagnostic.mjs",
+    "test:diag-medicion": "node scripts/test-diagnostic-measure.mjs",
+    "test:marcy-log": "node scripts/test-chat-log.mjs",
+    "test:citas": "node scripts/test-appointments.mjs",
+    "test:correo": "node scripts/test-mail-triage.mjs",
+    "test:push": "node scripts/test-push.mjs",
+    "test:canales": "node scripts/test-channels.mjs",
     "test:dash": "node scripts/test-dashboard-lib.mjs",
     "test:admin": "node scripts/test-admin-backend.mjs",
     "test:brief": "node scripts/test-brief-v2.mjs",
@@ -41,6 +47,7 @@
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "@iconify-json/lucide": "^1.2.111",
     "@vercel/blob": "2.8.0",
+    "@vercel/functions": "3.10.3",
     "@vercel/postgres": "^0.10.0",
     "astro-icon": "^1.1.5",
     "d3-geo": "3.1.1",
@@ -48,7 +55,8 @@
     "file-type": "22.1.1",
     "heic-to": "1.5.2",
     "resend": "^4.0.1",
-    "svelte": "^5.56.3"
+    "svelte": "^5.56.3",
+    "web-push": "3.6.7"
   },
   "devDependencies": {
     "@csstools/postcss-global-data": "^4.0.0",

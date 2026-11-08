@@ -5,7 +5,7 @@
   import Modal from './Modal.svelte';
   let {
     open = $bindable(false), title = '¿Seguro?', message = '', confirmLabel = 'Borrar',
-    danger = true, busy = false, requireText = '', onconfirm, oncancel,
+    danger = true, busy = false, requireText = '', onconfirm, oncancel, children,
   } = $props();
   let typed = $state('');
   const canConfirm = $derived(!busy && (!requireText || typed.trim() === requireText));
@@ -29,6 +29,7 @@
 
 <Modal bind:open {title} size="sm" onclose={handleClose}>
   {#if message}<p class="ui-confirm__msg">{message}</p>{/if}
+  {@render children?.()}
   {#if requireText}
     <label class="ui-field">
       <span class="ui-field__label">Escribe <strong>{requireText}</strong> para confirmar</span>

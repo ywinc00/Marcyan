@@ -9,6 +9,7 @@
 //    Si un correo no sale, aviso al panel (el lead ya está guardado).
 // ════════════════════════════════════════════════════════════════
 import { createLead } from '../lib/leads.mjs';
+import { linkLead } from '../lib/chat-log.mjs';
 import { createNotification, notifyLeadEmailFailure } from '../lib/notifications.mjs';
 import { emailAdminNewLead, emailClientLeadConfirmation, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
@@ -110,6 +111,8 @@ export default async function handler(req, res) {
     };
 
     const refId = await createLead(data);
+    // Orbit: si viene del chat, la conversación queda como cerrada (best-effort).
+    if (source === 'chat') await linkLead({ sid: body.chat_sid, ref: refId, kind: 'lead' });
 
     // Aviso in-dashboard (createNotification nunca lanza; es defensiva)
     await createNotification({

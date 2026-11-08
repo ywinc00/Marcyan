@@ -4,7 +4,7 @@
 // Estrategia: navegación (HTML) NETWORK-FIRST → el shell siempre fresco tras un
 // deploy (antes era cache-first y mostraba la versión vieja una carga); estáticos
 // hasheados cache-first con revalidación; /api/* SIEMPRE a la red (nunca cachear).
-const CACHE = 'mrc-dash-v4';
+const CACHE = 'mrc-dash-v5';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -69,5 +69,38 @@ self.addEventListener('fetch', (e) => {
     });
     if (cached) { network.catch(() => {}); return cached; }
     return network;
+  })());
+});
+
+// ── Avisos de Orbit (Web Push, lib/push.mjs) ──────────────────
+// El servidor manda { title, body, url, tag }. Al tocar el aviso se abre
+// (o se enfoca) Orbit en el enlace del aviso.
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'Orbit', body: e.data ? e.data.text() : '' }; }
+  const url = typeof d.url === 'string' && d.url.startsWith('/dashboard') ? d.url : '/dashboard';
+  e.waitUntil(self.registration.showNotification(d.title || 'Orbit', {
+    body: d.body || '',
+    tag: d.tag || undefined,
+    renotify: !!d.tag,
+    icon: '/dashboard/orbit-192.png',
+    badge: '/dashboard/orbit-192.png',
+    data: { url },
+  }));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/dashboard';
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of wins) {
+      if (new URL(w.url).pathname.startsWith('/dashboard')) {
+        await w.focus();
+        try { await w.navigate(url); } catch { w.postMessage({ type: 'orbit:navigate', url }); }
+        return;
+      }
+    }
+    await self.clients.openWindow(url);
   })());
 });

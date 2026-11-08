@@ -228,7 +228,7 @@ export const negocios: Record<NegocioId, Negocio> = {
       es: {
         antetitulo: 'Cocina de casa en {city}', titular: 'Cocina de casa, hoy.', bajada: 'Almuerzo y cena con receta de familia. Para comer aquí o llevar.',
         accion: 'Ver la carta', abierto: 'Hoy desde 11 a. m.',
-        nav: ['Carta', 'Encargos', 'Contacto'], garantias: ['Hecho al día', 'Encargos para grupos', 'Español e inglés'],
+        nav: ['Carta', 'Encargos', 'Contacto'],
         servicios: { rotulo: 'La carta', titulo: 'Lo de siempre', intro: 'Lo que más piden en {city}.', filas: [
           { t: 'Ropa vieja', d: 'Con arroz, frijoles y maduros' },
           { t: 'Pollo asado', d: 'Al mojo, con yuca' },
@@ -242,7 +242,7 @@ export const negocios: Record<NegocioId, Negocio> = {
       en: {
         antetitulo: 'Home cooking in {city}', titular: 'Home cooking, today.', bajada: 'Lunch and dinner from family recipes. Dine in or take out.',
         accion: 'See the menu', abierto: 'Today from 11 AM',
-        nav: ['Menu', 'Catering', 'Contact'], garantias: ['Made fresh daily', 'Group catering', 'Spanish and English'],
+        nav: ['Menu', 'Catering', 'Contact'],
         servicios: { rotulo: 'The menu', titulo: 'The usuals', intro: 'What {city} orders most.', filas: [
           { t: 'Ropa vieja', d: 'With rice, beans and plantains' },
           { t: 'Roast chicken', d: 'Mojo style, with yuca' },

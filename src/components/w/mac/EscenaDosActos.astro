@@ -301,6 +301,8 @@ const iniciales = (q: string) => q.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g
     .da-mac { width: calc(100% + 32px); max-width: none; margin-inline: -16px; }
     .da-ejemplo { right: calc(5% + 16px); }
     .da-panel { scale: 1.45; transform-origin: 50% 0; }
+    /* La barra de menús del escritorio a este tamaño son letras de 4 px: se queda la franja, sin texto. */
+    .da-mac :global(.esc-menu-izq), .da-mac :global(.esc-menu-der) { visibility: hidden; }
     .da-hoja { scale: 1.45; }
   }
 

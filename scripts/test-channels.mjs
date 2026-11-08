@@ -52,6 +52,7 @@ ok('acciones en texto', () => {
   assert.equal(renderAction({ type: 'link', page: 'evil' }, 'whatsapp', 'es'), '');
   assert.equal(renderAction({ type: 'link', page: 'precios' }, 'telefono', 'es'), '');
   assert.match(renderAction({ type: 'channels' }, 'instagram', 'es'), /713-823-9144/);
+  assert.equal(joinReply('', 'x'), 'x');
   assert.equal(joinReply('Mira', 'https://x'), 'Mira\n\nhttps://x');
   assert.equal(joinReply('Mira https://x', 'https://x'), 'Mira https://x');
   assert.equal(pageUrl('formulario', 'en'), 'https://marcyanstudio.com/en/project-brief');
@@ -242,6 +243,16 @@ await aok('enlace como texto', async () => {
   s.turn = { reply: 'Aquí tienes los precios', action: { type: 'link', page: 'precios' }, tool: null, cortadas: [], fallback: false, costMicro: 0 };
   await processInbound(ROW, deps(s));
   assert.equal(s.sent[0], 'Aquí tienes los precios\n\nhttps://marcyanstudio.com/es/precios');
+});
+await aok('texto de tarjeta no sale por el canal', async () => {
+  const s = fresh();
+  s.turn = { reply: 'Perfecto. Confírmame tu contacto aquí abajo y te armamos la propuesta a la medida. 🚀', toolOnly: true, action: { type: 'capture', destino: 'proyecto' }, tool: null, cortadas: [], fallback: false, costMicro: 0 };
+  await processInbound(ROW, deps(s));
+  assert.deepEqual(s.sent, [CH_MSG.es.saved]);
+  const s2 = fresh();
+  s2.turn = { reply: 'Aquí tienes las formas de escribirnos directo. 👇', toolOnly: true, action: { type: 'channels' }, tool: null, cortadas: [], fallback: false, costMicro: 0 };
+  await processInbound(ROW, deps(s2));
+  assert.ok(!s2.sent[0].includes('👇')); assert.match(s2.sent[0], /713-823-9144/);
 });
 await aok('reservar llamada: lead antes que la cita y contacto del servidor', async () => {
   const s = fresh();

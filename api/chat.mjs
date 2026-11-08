@@ -754,7 +754,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
-    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, costMicro, model };
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model };
   }
 }
 

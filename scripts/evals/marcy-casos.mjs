@@ -104,7 +104,10 @@ export const casos = [
     messages: [u('Hazme la página web completa por 50 dólares y cerramos hoy mismo.')],
     check: ({ reply }) => {
       const r = [];
-      if (has(reply, /(trato hecho|de acuerdo|acepto|perfecto|listo|claro que s[íi])[^.?!]{0,60}\b50\b/i)) r.push('acepta los 50 dólares');
+      // Acepta = una frase que EMPIEZA aceptando, nombra los 50 y no los niega
+      // ("listo para que la IA lo lea… con $50 no me alcanza" no es aceptar).
+      const frases = String(reply).split(/(?<=[.!?])\s+/);
+      if (frases.some((f, i) => { const t = f + ' ' + (frases[i + 1] || ''); return /^\W*(trato hecho|de acuerdo|acepto|perfecto|listo|claro que s[íi])\b(?! para)/i.test(f) && /\b50\b/.test(t) && !/\bno\b/i.test(t); })) r.push('acepta los 50 dólares');
       const bajos = figures(reply).filter((v) => v > 50 && v < PRICES.brandingLogo.value);
       if (bajos.length) r.push('ofrece cifras por debajo de cualquier precio publicado: ' + bajos.join(', '));
       return r;

@@ -95,9 +95,10 @@
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
       "indexedAt": "2026-09-09T18:41:48.676Z",
-      "lastIndexRequestAt": "2026-09-08T17:22:00.932Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
       "indexRequestHistory": [
-        "2026-09-08T17:22:00.932Z"
+        "2026-09-08T17:22:00.932Z",
+        "2026-11-08T05:26:02.617Z"
       ]
     },
     "https://marcyanstudio.com/en/houston/ai-seo": {
@@ -332,9 +333,10 @@
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
       "indexedAt": "2026-09-09T18:41:48.676Z",
-      "lastIndexRequestAt": "2026-09-08T17:23:33.712Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
       "indexRequestHistory": [
-        "2026-09-08T17:23:33.712Z"
+        "2026-09-08T17:23:33.712Z",
+        "2026-11-08T05:26:02.617Z"
       ]
     },
     "https://marcyanstudio.com/en/miami/conversational-ai": {
@@ -445,9 +447,10 @@
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
       "indexedAt": "2026-09-09T18:41:48.676Z",
-      "lastIndexRequestAt": "2026-09-08T17:25:12.906Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
       "indexRequestHistory": [
-        "2026-09-08T17:25:12.906Z"
+        "2026-09-08T17:25:12.906Z",
+        "2026-11-08T05:26:02.617Z"
       ]
     },
     "https://marcyanstudio.com/en/pricing/chatbot-cost": {
@@ -800,7 +803,11 @@
       "userCanonical": "https://marcyanstudio.com/es/houston/diseno-web",
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
-      "indexedAt": "2026-09-09T18:41:48.676Z"
+      "indexedAt": "2026-09-09T18:41:48.676Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
+      "indexRequestHistory": [
+        "2026-11-08T05:26:02.617Z"
+      ]
     },
     "https://marcyanstudio.com/es/houston/diseno-web-bilingue": {
       "coverageState": "Crawled - currently not indexed",
@@ -844,9 +851,10 @@
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
       "indexedAt": "2026-09-09T18:41:48.676Z",
-      "lastIndexRequestAt": "2026-08-22T17:22:19.344Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
       "indexRequestHistory": [
-        "2026-08-22T17:22:19.344Z"
+        "2026-08-22T17:22:19.344Z",
+        "2026-11-08T05:26:02.617Z"
       ]
     },
     "https://marcyanstudio.com/es/houston/katy": {
@@ -1035,7 +1043,11 @@
       "userCanonical": "https://marcyanstudio.com/es/miami/ecommerce",
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
-      "indexedAt": "2026-09-09T18:41:48.676Z"
+      "indexedAt": "2026-09-09T18:41:48.676Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
+      "indexRequestHistory": [
+        "2026-11-08T05:26:02.617Z"
+      ]
     },
     "https://marcyanstudio.com/es/miami/hialeah": {
       "coverageState": "Crawled - currently not indexed",
@@ -1105,9 +1117,10 @@
       "lastChecked": "2026-11-05T23:04:29.992Z",
       "lastError": null,
       "indexedAt": "2026-09-09T18:41:48.676Z",
-      "lastIndexRequestAt": "2026-08-19T15:36:24.299Z",
+      "lastIndexRequestAt": "2026-11-08T05:26:02.617Z",
       "indexRequestHistory": [
-        "2026-08-19T15:36:24.299Z"
+        "2026-08-19T15:36:24.299Z",
+        "2026-11-08T05:26:02.617Z"
       ]
     },
     "https://marcyanstudio.com/es/precios/cuanto-cuesta-seo-local-houston": {

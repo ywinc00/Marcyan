@@ -249,8 +249,8 @@
     },
     "https://marcyanstudio.com/en/houston": {
       "primeraVez": null,
-      "ultimaPeticion": "2026-09-08",
-      "peticiones": 1,
+      "ultimaPeticion": "2026-11-07",
+      "peticiones": 2,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -946,8 +946,8 @@
     },
     "https://marcyanstudio.com/en/miami": {
       "primeraVez": null,
-      "ultimaPeticion": "2026-09-08",
-      "peticiones": 1,
+      "ultimaPeticion": "2026-11-07",
+      "peticiones": 2,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "PASS",
@@ -1276,8 +1276,8 @@
     },
     "https://marcyanstudio.com/en/pricing": {
       "primeraVez": null,
-      "ultimaPeticion": "2026-09-08",
-      "peticiones": 1,
+      "ultimaPeticion": "2026-11-07",
+      "peticiones": 2,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "PASS",
@@ -2266,7 +2266,7 @@
     },
     "https://marcyanstudio.com/es/houston/diseno-web": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -2299,7 +2299,8 @@
       ],
       "hash": "7255fce751427fc8",
       "enlacesVivos": 35,
-      "hashCambio": "2026-11-01"
+      "hashCambio": "2026-11-01",
+      "ultimaPeticion": "2026-11-07"
     },
     "https://marcyanstudio.com/es/houston/diseno-web-bilingue": {
       "primeraVez": null,
@@ -2382,8 +2383,8 @@
     },
     "https://marcyanstudio.com/es/houston/ia-conversacional": {
       "primeraVez": null,
-      "ultimaPeticion": "2026-08-22",
-      "peticiones": 1,
+      "ultimaPeticion": "2026-11-07",
+      "peticiones": 2,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -2848,7 +2849,7 @@
     },
     "https://marcyanstudio.com/es/miami/ecommerce": {
       "primeraVez": null,
-      "peticiones": 0,
+      "peticiones": 1,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",
@@ -2881,7 +2882,8 @@
       ],
       "hash": "3e76968038a53b82",
       "enlacesVivos": 4,
-      "hashCambio": "2026-11-02"
+      "hashCambio": "2026-11-02",
+      "ultimaPeticion": "2026-11-07"
     },
     "https://marcyanstudio.com/es/miami/hialeah": {
       "primeraVez": null,
@@ -3037,8 +3039,8 @@
     },
     "https://marcyanstudio.com/es/precios": {
       "primeraVez": null,
-      "ultimaPeticion": "2026-08-19",
-      "peticiones": 1,
+      "ultimaPeticion": "2026-11-07",
+      "peticiones": 2,
       "indexadaDesde": "2026-09-09",
       "gsc": {
         "verdict": "NEUTRAL",

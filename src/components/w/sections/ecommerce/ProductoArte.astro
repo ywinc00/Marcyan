@@ -25,7 +25,7 @@ const { id = 'vela', size = 40, sombra = true, class: cls, modo = 'uso' } = Astr
     ahora una FOTO real de Unsplash (licencia libre, ids en design/ejemplos-v8.md). El dibujo queda solo
     en el modo 'sprite', que ya no se usa para pintar. */}
 {modo === 'uso' && (
-  <img class:list={['pa', cls]} src={`/fotos/ejemplos/prod-${id}-160.webp`} srcset={`/fotos/ejemplos/prod-${id}-160.webp 160w, /fotos/ejemplos/prod-${id}-320.webp 320w, /fotos/ejemplos/prod-${id}-640.webp 640w`} sizes={`${size}px`} width={size} height={size} style={`--pa:${size}px`} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+  <img class:list={['pa', cls]} src={`/fotos/ejemplos/prod-${id}-${size >= 60 ? 640 : 160}.webp`} srcset={`/fotos/ejemplos/prod-${id}-160.webp 160w, /fotos/ejemplos/prod-${id}-320.webp 320w, /fotos/ejemplos/prod-${id}-640.webp 640w`} sizes={size >= 60 ? '420px' : `${Math.max(Math.round(size * 2.4), 80)}px`} width={size} height={size} style={`--pa:${size}px`} alt="" aria-hidden="true" loading="lazy" decoding="async" />
 )}
 {modo === 'sprite' && (
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">

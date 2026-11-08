@@ -62,7 +62,7 @@ const bento = cells.map((c) => ({
         <TelefonoWeb lang={lang} fondo={TEL.carga.fondo} tinta={TEL.carga.tinta} class="br-rc__carga" sr={`Ejemplo: la web bilingüe del negocio de ${name} en un teléfono.`}><EscenaBilingueCarga /></TelefonoWeb>
       ) : <WebEjemplo marca="plomeria" frame="movil" vista="mini" city={name} lang={lang} />}
     </div>
-    <div slot="ui-2" class="br-rc__ui"><ObjMapaLocal lang={lang} nombre={negocio && PREG[negocio] ? PREG[negocio].b : undefined} /></div>
+    <div slot="ui-2" class="br-rc__ui"><ObjMapaLocal lang={lang} negocio={negocio} nombre={negocio && PREG[negocio] ? PREG[negocio].b : undefined} /></div>
     <div slot="ui-3" class="br-rc__ui"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
     <div slot="ui-4" class="br-rc__ui"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" question={negocio && PREG[negocio] ? PREG[negocio].q : undefined} business={negocio && PREG[negocio] ? PREG[negocio].b : undefined} /></div>
   </Bento2x2>

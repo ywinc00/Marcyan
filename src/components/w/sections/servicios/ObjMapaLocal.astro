@@ -12,10 +12,79 @@
 // fuera de vista. En el bento llena el alto de la fila (el SVG recorta por los lados). "Tú" y el
 // alfiler viven DENTRO del SVG para no despegarse con el recorte. Reducir movimiento: quieto.
 // Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; acciones como span; sin ids.
+// v9 (dueño, 2026-11-08: «las fichas de mapas son iguales, adapta cada una a su contexto; algunas rutas
+// se salen de las calles»): cada barrio tiene su propio recorte de calles (Sugar Land con el lago y la
+// plaza de Town Square, Katy con la autopista y su vía de servicio, Doral con naves y la pista del
+// aeropuerto, Hialeah con su cuadrícula apretada y el canal) y la ruta va SIEMPRE por el eje de las
+// calles principales (los mismos puntos que las dibujan). Tú en (84, 238); el alfiler en (340, 94).
 import LogoMarca from '../../marcas/LogoMarca.astro';
+import { fichaDe, type NegocioId } from '../../objetos/barrios/negociosFicha';
 
-interface Props { lang?: 'es' | 'en'; nombre?: string }
-const { lang = 'es', nombre } = Astro.props;
+interface Props { lang?: 'es' | 'en'; nombre?: string; negocio?: NegocioId }
+const { lang = 'es', nombre, negocio } = Astro.props;
+type R = [number, number, number, number];
+type Mapa = { agua: string[]; parque: R[]; manzanas: R[]; menores: string[]; mayores: string[]; ruta: string; extra?: string };
+const rejilla = (xs: number[], ys: number[], fuera: (x: number, y: number) => boolean = () => false): R[] => {
+  const out: R[] = [];
+  for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < ys.length - 1; j++) {
+    const x = xs[i] + 10, y = ys[j] + 10, w = xs[i + 1] - xs[i] - 20, h = ys[j + 1] - ys[j] - 20;
+    if (w > 8 && h > 8 && !fuera(x + w / 2, y + h / 2)) out.push([x, y, w, h]);
+  }
+  return out;
+};
+const MAPAS: Record<string, Mapa> = {
+  // Negocio neutro (página de servicios): barrio con río abajo y un parque.
+  neutro: {
+    agua: ['M-10 282 C 80 264, 150 302, 250 284 S 420 258, 500 272 L 500 330 L -10 330 Z'],
+    parque: [[352, 116, 106, 96]],
+    manzanas: [[10, 20, 64, 52], [106, 20, 88, 52], [226, 20, 92, 52], [352, 20, 108, 52], [10, 116, 64, 96], [106, 116, 88, 96], [226, 116, 92, 96]],
+    menores: ['M90 -10 V 250', 'M335 -10 V 250', 'M-10 166 H 500'],
+    mayores: ['M-10 238 H 500', 'M210 -10 V 330', 'M-10 94 H 500'],
+    ruta: 'M84 238 H 210 V 94 H 340',
+  },
+  // Sugar Land: lago de First Colony abajo a la derecha, plaza verde de Town Square y bulevar que rodea el agua.
+  clinica: {
+    agua: ['M300 330 C 300 268, 352 214, 432 206 C 462 203, 488 208, 500 212 V 330 Z'],
+    parque: [[236, 112, 84, 72]],
+    manzanas: [[16, 20, 62, 52], [118, 20, 74, 52], [236, 20, 84, 52], [352, 20, 120, 52], [16, 116, 62, 96], [118, 116, 74, 96], [352, 112, 120, 68], [118, 262, 140, 58]],
+    menores: ['M210 -10 V 250', 'M336 -10 V 94', 'M290 238 C 312 206, 362 186, 432 184 S 490 190, 500 192', 'M210 184 H 336'],
+    mayores: ['M-10 238 H 296', 'M100 -10 V 330', 'M-10 94 H 500'],
+    ruta: 'M84 238 H 100 V 94 H 340',
+  },
+  // Katy: la autopista I-10 arriba, su vía de servicio donde está el taller y el barrio en cuadrícula.
+  taller: {
+    agua: [],
+    parque: [[316, 262, 150, 58]],
+    manzanas: [[20, 116, 110, 96], [160, 116, 130, 96], [316, 116, 150, 96], [20, 262, 110, 58], [160, 262, 130, 58]],
+    menores: ['M303 94 V 330', 'M-10 300 H 500', 'M60 72 C 100 76, 128 88, 150 94'],
+    mayores: ['M-10 238 H 500', 'M145 94 V 330', 'M-10 94 H 500'],
+    ruta: 'M84 238 H 145 V 94 H 340',
+    extra: 'autopista',
+  },
+  // Doral: naves alargadas, la pista del aeropuerto arriba y un canal recto a la derecha.
+  carga: {
+    agua: ['M470 60 H 486 V 330 H 470 Z'],
+    parque: [],
+    manzanas: [[16, 116, 176, 38], [16, 168, 176, 46], [248, 116, 112, 98], [382, 116, 80, 98], [16, 262, 176, 58], [248, 262, 214, 58]],
+    menores: ['M371 94 V 238', 'M-10 160 H 200'],
+    mayores: ['M-10 238 H 470', 'M220 64 V 330', 'M-10 94 H 470'],
+    ruta: 'M84 238 H 220 V 94 H 340',
+    extra: 'pista',
+  },
+  // Hialeah: cuadrícula apretada de manzanas pequeñas, Palm Ave en vertical y el canal en diagonal.
+  cafe: {
+    agua: ['M300 340 L 500 168 L 500 196 L 336 340 Z'],
+    parque: [[150, 166, 60, 72]],
+    manzanas: rejilla([-20, 30, 90, 150, 210, 270, 330, 390, 450, 510], [-26, 34, 94, 166, 238, 300, 360], (x, y) => (x > 150 && x < 210 && y > 166 && y < 238) || y + 0.86 * x > 560),
+    menores: ['M30 -10 V 330', 'M90 -10 V 330', 'M150 -10 V 330', 'M210 -10 V 330', 'M330 -10 V 330', 'M390 -10 V 330', 'M450 -10 V 330', 'M-10 34 H 500', 'M-10 166 H 500', 'M-10 300 H 500'],
+    mayores: ['M-10 238 H 500', 'M270 -10 V 330', 'M-10 94 H 500'],
+    ruta: 'M84 238 H 270 V 94 H 340',
+  },
+};
+const M = MAPAS[negocio && MAPAS[negocio] ? negocio : 'neutro'];
+const F = negocio ? fichaDe(negocio, lang) : null;
+const acento = F?.acc ?? '#1E1C19';
+const cierra = negocio === 'cafe' ? (lang === 'en' ? 'closes 8 PM' : 'cierra 8 p. m.') : null;
 const en = lang === 'en';
 const T = en
   ? { sr: 'Example: someone nearby finds your business on the map and gets directions.', you: 'You', name: 'Your business', cat: 'Open', close: 'closes 6 PM', a1: 'Directions', a2: 'Call', a3: 'Website', found: 'Found on' }
@@ -27,35 +96,28 @@ const T = en
     <div class="oml__map">
       <svg class="oml__svg" viewBox="0 0 480 320" preserveAspectRatio="xMidYMid slice">
         <rect width="480" height="320" fill="#EAE6DD" />
-        <g fill="#E1DCD0">
-          <rect x="132" y="72" width="66" height="54" rx="4" /><rect x="222" y="150" width="70" height="40" rx="4" />
-          <rect x="132" y="152" width="66" height="36" rx="4" /><rect x="412" y="150" width="60" height="44" rx="4" />
-          <rect x="10" y="20" width="44" height="26" rx="4" /><rect x="222" y="212" width="54" height="30" rx="4" />
-        </g>
-        <path d="M-10 262 C 80 240, 150 282, 250 262 S 420 230, 500 248 L 500 330 L -10 330 Z" fill="#C9D9DE" />
-        <rect x="300" y="146" width="96" height="60" rx="10" fill="#D3DEC6" />
-        <g fill="none" stroke="#D9D3C7" stroke-width="7" stroke-linecap="round">
-          <path d="M-10 60 H 500" /><path d="M-10 140 H 500" /><path d="M-10 204 H 300" />
-          <path d="M120 -10 V 250" /><path d="M210 -10 V 256" /><path d="M404 -10 V 236" />
-        </g>
-        <g fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round">
-          <path d="M-10 112 C 90 112, 160 58, 290 66 S 430 128, 500 122" />
-          <path d="M68 -10 C 72 90, 48 190, 60 330" />
-        </g>
-        <path class="oml__route" pathLength="1" d="M84 238 C 122 204, 146 166, 204 152 S 300 122, 340 94" fill="none" stroke="#1E1C19" stroke-width="3.2" stroke-linecap="round" />
-        <path class="oml__go oml__go--o" pathLength="1" d="M84 238 C 122 204, 146 166, 204 152 S 300 122, 340 94" fill="none" stroke="#1E1C19" stroke-width="12" stroke-linecap="round" stroke-dasharray="0.0001 2" />
-        <path class="oml__go oml__go--i" pathLength="1" d="M84 238 C 122 204, 146 166, 204 152 S 300 122, 340 94" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-dasharray="0.0001 2" />
+        {M.agua.map((d) => <path d={d} fill="#C9D9DE" />)}
+        {M.extra === 'autopista' && (<Fragment><path d="M-10 46 H 500" stroke="#D2CBBE" stroke-width="36" /><path d="M-10 46 H 500" stroke="#FBF7EE" stroke-width="30" /><path d="M-10 46 H 500" stroke="#D9D3C7" stroke-width="1.6" stroke-dasharray="10 9" /></Fragment>)}
+        {M.extra === 'pista' && (<Fragment><path d="M200 44 H 500" stroke="#D8D3C8" stroke-width="26" /><path d="M214 44 H 500" stroke="#FFFFFF" stroke-width="1.8" stroke-dasharray="16 10" /></Fragment>)}
+        <g fill="#E1DCD0">{M.manzanas.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} rx="4" />)}</g>
+        {M.parque.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} rx="10" fill="#D3DEC6" />)}
+        <g fill="none" stroke="#D9D3C7" stroke-width="7" stroke-linecap="round">{M.menores.map((d) => <path d={d} />)}</g>
+        <g fill="none" stroke="#D9D3C7" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">{M.mayores.map((d) => <path d={d} />)}</g>
+        <g fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">{M.mayores.map((d) => <path d={d} />)}</g>
+        <path class="oml__route" pathLength="1" d={M.ruta} stroke-linejoin="round" fill="none" stroke={acento} stroke-width="4" stroke-linecap="round" />
+        <path class="oml__go oml__go--o" pathLength="1" d={M.ruta} stroke-linejoin="round" fill="none" stroke={acento} stroke-width="12" stroke-linecap="round" stroke-dasharray="0.0001 2" />
+        <path class="oml__go oml__go--i" pathLength="1" d={M.ruta} stroke-linejoin="round" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-dasharray="0.0001 2" />
         <circle cx="84" cy="238" r="7" fill="#FFFFFF" stroke="#1E1C19" stroke-width="2.4" />
         <circle cx="84" cy="238" r="2.6" fill="#1E1C19" />
         <g transform="translate(98 238)">
           <rect x="0" y="-13" width="36" height="26" rx="13" fill="#FFFFFF" />
           <text x="18" y="4.6" text-anchor="middle" class="oml__you">{T.you}</text>
         </g>
-        <circle class="oml__ring" cx="340" cy="94" r="12" fill="none" stroke="#1E1C19" stroke-width="2" />
+        <circle class="oml__ring" cx="340" cy="94" r="12" fill="none" stroke={acento} stroke-width="2" />
         <g transform="translate(326 59)">
           <g class="oml__hop">
             <g class="oml__pin">
-              <path d="M14 35c-1-2.6-11.5-12.3-11.5-20.6A11.5 11.5 0 0 1 25.5 14.4C25.5 22.7 15 32.4 14 35Z" fill="#1E1C19" />
+              <path d="M14 35c-1-2.6-11.5-12.3-11.5-20.6A11.5 11.5 0 0 1 25.5 14.4C25.5 22.7 15 32.4 14 35Z" fill={acento} />
               <circle cx="14" cy="14" r="4.4" fill="#F4F1EA" />
             </g>
           </g>
@@ -64,8 +126,8 @@ const T = en
     </div>
     <div class="oml__card">
       <div class="oml__head">
-        <span class="oml__name">{nombre ?? T.name}</span>
-        <span class="oml__open"><span class="oml__dot"></span><b>{T.cat}</b> · {T.close}</span>
+        <span class="oml__name">{F?.nombre ?? nombre ?? T.name}</span>
+        <span class="oml__open"><span class="oml__dot"></span><b>{T.cat}</b> · {cierra ?? T.close}</span>
       </div>
       <div class="oml__acts">
         <span class="oml__act oml__act--fill">

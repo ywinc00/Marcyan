@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import {
   sidFor, e164, detectLang, historyFromTurns, buildMessages, renderAction, joinReply, pageUrl,
-  slotsToolResult, channelContext, processInbound, textBooking, CH_MSG,
+  slotsToolResult, channelContext, processInbound, textBooking, CH_MSG, houstonDate, dateContext,
 } from '../lib/channels.mjs';
 import { validMetaSignature, verifyChallenge, parseWhatsApp, parseInstagram, chunkText } from '../lib/meta.mjs';
 import { twilioSignature, validTwilio, speakable, greetTwiml, replyTwiml, dialTwiml, recordTwiml, waitTwiml, inTransferHours, wantsEnglish, callCostMicro } from '../lib/voice.mjs';
@@ -320,6 +320,21 @@ await aok('Twilio: sin firma válida no hay llamada', async () => {
   assert.equal(r.code, 200);
   assert.match(r.body, /<Record/);                              // no contestó el equipo → recado
   delete process.env.TWILIO_AUTH_TOKEN;
+});
+
+// ── Agendar con el día que dijo el cliente ──
+ok('huecos: fecha de hoy y todas las horas del día pedido', () => {
+  const now = Date.UTC(2026, 10, 8, 21, 0, 0); // dom 8-nov, 3 p.m. Houston
+  assert.equal(houstonDate(now), '2026-11-08');
+  const r = JSON.parse(slotsToolResult({ now, fecha: '2026-11-09' }).content);
+  assert.equal(r.hoy, '2026-11-08');
+  assert.ok(r.horas.length > 3, 'todas las del lunes, no solo 3');
+  assert.ok(r.horas.every((h) => houstonDate(h.at) === '2026-11-09'));
+  assert.ok(r.horas.some((h) => /3:00 p\.m\./.test(h.texto)));
+  const sin = JSON.parse(slotsToolResult({ now, fecha: 'mañana' }).content);
+  assert.ok(sin.horas.length > 0 && sin.horas.length <= 8);
+  assert.match(dateContext('es', now), /2026-11-08/);
+  assert.match(channelContext('whatsapp', 'es'), /Fecha de hoy en Houston/);
 });
 
 console.log(`✓ ${n} pruebas de canales (WhatsApp, Instagram, teléfono) pasaron.`);

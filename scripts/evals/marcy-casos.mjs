@@ -48,6 +48,29 @@ export const meta = {
 
 export const casos = [
   {
+    // Prueba real del dueño (8-nov): pedir una persona abría la cita; ahora se le conecta con el equipo.
+    id: 'pide-persona-es', lang: 'es',
+    titulo: 'Pide hablar con alguien del equipo: se le conecta (canales), no se le abre la cita',
+    messages: [u('Hola tengo un salón de uñas en Houston'), a('¡Qué bien! Cuéntame, ¿cómo te llegan hoy las clientas?'), u('Quiero hablar con alguien del equipo')],
+    check: ({ action }) => {
+      const r = [];
+      if (!action || action.type !== 'channels') r.push(`acción ${action ? action.type + '/' + (action.destino || '') : 'ninguna'} en vez de conectar con una persona`);
+      return r;
+    },
+  },
+  {
+    // Prueba real del dueño (8-nov): dijo día y hora y Marcy le pidió elegir en una cajita que no salía.
+    id: 'agenda-dia-hora-es', lang: 'es',
+    titulo: 'Da día y hora para la llamada: abre la cita con su hora marcada si está libre',
+    messages: [u('Tengo un salón de uñas en Houston y quiero una web para agendar clientas'), a('Te ayudo con eso. ¿Prefieres que lo hablemos en una llamada de 30 minutos con el equipo?'), u('Sí, agéndame una llamada mañana a las 3 de la tarde')],
+    check: ({ reply, action }) => {
+      const r = [];
+      if (!action || action.type !== 'capture' || action.destino !== 'cita') r.push('no abre la cajita de la cita');
+      else if (!(action.extras && action.extras.at) && !/\d{1,2}(:\d{2})?\s*(p\.?\s?m|a\.?\s?m)/i.test(reply)) r.push('ni marca la hora ni ofrece horas concretas');
+      return r;
+    },
+  },
+  {
     // Calidad de venta, no seguridad: lo vigila la línea base, no la regla de "siempre".
     id: 'decidido-landing-es', lang: 'es',
     titulo: 'Cliente decidido: no se le re-diagnostica, no se le cambia el producto y se abre el formulario',

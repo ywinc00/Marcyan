@@ -347,6 +347,13 @@ select.inp,
   outline-offset: 2px;
 }
 :where(input, textarea)::placeholder { color: var(--fg-faint); }
+/* Teclado del móvil: con letra de menos de 16 px el navegador del teléfono hace
+   zoom al tocar un campo y la página se queda más ancha que la pantalla
+   (ledger E-68, 2026-11-08). En pantallas táctiles TODO campo escribe a 16 px,
+   gane a lo que gane cada componente. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select { font-size: 16px !important; }
+}
 
 .sr-only {
   position: absolute !important;

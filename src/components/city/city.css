@@ -201,7 +201,7 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx-js .hx .vig--web:not(.st2) .vb__m{opacity:0;transform:translateY(6px)}
 .hx-js .hx .vig--web:not(.st2) .vb__cta{transform:scale(0)}
 .hx .vb__cta{transition:transform .45s cubic-bezier(.34,1.45,.64,1) .1s}
-@media (max-width:900px){.hx .vb{inset:10px}.hx .vb__l{gap:6px;padding:6px 8px 6px 12px}.hx .vb__h{font-size:15px}.hx .vb__m{display:none}.hx .vb__cta{padding:4px 10px;font-size:10.5px}.hx .vb__r{margin:6px 6px 6px 0}}
+@media (max-width:900px){.hx .vb{inset:10px}.hx .vb__l{gap:6px;padding:6px 8px 6px 12px}.hx .vb__h{font-size:15px}.hx .vb__m{font-size:11px}.hx .vb__cta{padding:4px 10px;font-size:10.5px}.hx .vb__r{margin:6px 6px 6px 0}}
 @media (prefers-reduced-motion:reduce){.hx .vb__disc,.hx .vb__steam path{animation:none}.hx .vb__steam path{opacity:.8}}
 .hx-js .hx .vig--web:not(.st2) .vb__r{opacity:0;transform:scale(.94)}
 .hx .vc{display:flex;flex-direction:column;gap:7px;font-size:12px;line-height:1.35;width:100%}
@@ -520,13 +520,13 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .w-htray__card .wi{width:30px;height:30px}
   .hx .w-htray__txt{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:10px}
   .hx .w-htray__name{font-size:15px}
+  @media (max-width:379.98px){.hx .w-htray__txt{grid-template-columns:minmax(0,1fr)}}
   .hx .w-htray__all a{min-height:44px}
   .hx .pf__step{margin-bottom:32px}
   .hx .pf__mini::before{height:20px}
   .hx .w-hcase{padding:24px 18px 12px}
   .hx .pf__dl dd{font-size:15px;line-height:1.55}
   /* una sola fila de etiquetas: caben las que caben enteras (las que saltarían a otra fila se ocultan), sin alargar el tramo */
-  .hx .pf__tags{max-height:26px;overflow:hidden}
   .hx .pf__tags li{line-height:16px}
   .hx .answer{padding-block:160px 150px}
   .hx .faq{padding-block:36px}
@@ -542,7 +542,8 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx .w-hg3 .g3__item{display:grid;grid-template-columns:20px minmax(0,1fr);justify-items:start;align-items:center;text-align:left;column-gap:14px;padding:12px 4px}
   .hx .w-hg3 .g3__ic{margin-top:0}
   .hx .w-hg3 .g3__h{margin-top:0}
-  .hx .w-hg3 .g3__text{display:none}
+  /* regla del dueño (2026-11-07): en móvil no se quita nada; el texto va bajo el título */
+  .hx .w-hg3 .g3__text{grid-column:2;margin-top:4px;text-align:left}
   /* el alto de cada tramo depende del largo de los textos de cada página: se iguala aquí, dentro de sus contenedores */
   .hx[data-city="miami"]:lang(es) .pf--solo .pf__step{margin-bottom:8px}
   .hx[data-city="houston"]:lang(en) .pf__step{margin-bottom:56px}
@@ -552,7 +553,6 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
   .hx[data-city="miami"]:lang(en) .cta{padding-block:52px}
   .hx .w-hwhere{grid-template-columns:minmax(0,1fr);gap:8px}
   .hx .w-hwhere>li:last-child:nth-child(odd){grid-column:auto}
-  .hx .w-hwhere>li.w-hwhere__barrio{display:none}
   .hx .w-hwhere__card{padding:12px 14px 12px 18px}
   .hx .w-hwhere__ic{width:40px;height:40px}
   .hx .w-hanswer .answer__figs{flex-direction:column;gap:20px;margin-top:28px}

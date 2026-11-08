@@ -48,6 +48,9 @@ const cols = cells.length % 4 === 0 ? 4 : 3;
   }
   @media (--hover-fine) { .spec__aside:hover { color: var(--w-accent); } }
 
+  .spec { container: spec / inline-size; }
+  /* Por debajo de ~340 px de ancho propio, una columna: a 2 columnas "Optimización" se partía. */
+  @container spec (max-width: 339.98px) { .spec__grid { grid-template-columns: minmax(0, 1fr) !important; } }
   .spec__grid {
     margin: 0; display: grid; gap: 1px; grid-template-columns: repeat(2, minmax(0, 1fr));
     background: var(--w-line); border: 1px solid var(--w-line); border-radius: var(--w-r-cell); overflow: hidden;

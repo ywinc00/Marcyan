@@ -166,6 +166,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
     color: var(--accent-gold); background: var(--accent-gold-dim);
     border: 1px solid var(--accent-gold-line);
+    white-space: nowrap;
     transition: background var(--duration-fast) var(--ease-out-expo), color var(--duration-fast);
   }
   .nav__cta:hover { background: var(--accent-gold); color: var(--fg-inverse); }
@@ -198,7 +199,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
      entre enlaces baja de 16 a 12: devuelve los ~18 px que ocupa el botón y la
      barra mide lo mismo que antes (el CTA no se estrecha). */
   .nav__mega { display: none; }
-  @media (--md) and (--lt-lg) { .nav__links:has(.nav__mega) { gap: var(--space-3); } }
+  @media (--md) and (--lt-lg) { .nav__links:has(.nav__mega) { gap: var(--space-3); } .nav__cta { padding: 9px 12px; } }
   @media (--md) {
     .nav__mega { display: inline-flex; align-items: center; gap: 2px; }
     .nav__mega-btn {

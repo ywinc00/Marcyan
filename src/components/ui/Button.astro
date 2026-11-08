@@ -35,6 +35,10 @@ const Tag = href ? 'a' : 'button';
   .btn--md { padding: 10px 22px; font-size: var(--text-sm); }
   .btn--lg { padding: 14px 28px; font-size: var(--text-base); }
   .btn:active { transform: scale(0.97); }
+  /* Nunca más ancho que su sitio: en teléfonos estrechos el texto largo pasa a dos líneas
+     en vez de cortarse ("Pide una propuesta combina…" a 320, barrido 2026-11-07). */
+  .btn { max-width: 100%; }
+  @media (max-width: 419.98px) { .btn { white-space: normal; text-wrap: balance; line-height: 1.25; } }
 
   .btn--primary { background: var(--accent-gold); color: var(--fg-inverse); }
   .btn--primary:hover { background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold); }

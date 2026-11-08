@@ -156,7 +156,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 
   /* ── ≥ lg: titular izq · planeta der · Caso0 abajo-dcha · dock abajo-centro ── */
   @media (--lg) {
-    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: 92svh; }
+    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: min(92svh, 900px); }
     .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); }
     .hero__stage { max-width: 440px; }
     .hero__dock { position: absolute; left: 50%; bottom: var(--space-7); transform: translateX(-50%); flex-direction: row; align-items: center; gap: var(--space-4); margin-top: 0; }

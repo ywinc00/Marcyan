@@ -1704,6 +1704,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
             nudge.hidden = false;
             try { sessionStorage.setItem('mrcNudge', '1'); } catch (_) {}
             setTimeout(() => { if (nudge && !opened) nudge.hidden = true; }, 9000);
+            // Si la persona se pone a leer (scroll), la burbuja se retira: tapaba botones y precios
+            // del borde inferior en teléfonos (barrido 2026-11-07).
+            const y0 = scrollY;
+            const off = () => { if (Math.abs(scrollY - y0) > 240) { nudge.hidden = true; removeEventListener('scroll', off); } };
+            addEventListener('scroll', off, { passive: true });
           }
         }, 3500);
       }

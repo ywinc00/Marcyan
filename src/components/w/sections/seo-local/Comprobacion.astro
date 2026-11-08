@@ -51,7 +51,7 @@ const fix = lang === 'en' ? 'To fix' : 'Por arreglar';
     margin: 0; padding-right: 84px;
     font: 600 14px/1.35 var(--font-body); color: var(--w-p-ink, #0e0e0d);
   }
-  .sl-chk__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .sl-chk__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; container: chk / inline-size; }
   .sl-chk__row {
     display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
     min-height: 44px; padding: 8px 10px 8px 14px; border-radius: 8px;
@@ -77,9 +77,14 @@ const fix = lang === 'en' ? 'To fix' : 'Por arreglar';
     .sl-chk--fill { height: 100%; }
     .sl-chk--fill .sl-chk__card { height: 100%; }
   }
-  @media (--lt-md) {
+  /* La fila se adapta a SU ancho (no al de la pantalla): con la tarjeta estrecha, en 320 o en la
+     columna de tableta, las palabras se partían ("Telé|fono", "Categoría") por falta de sitio. */
+  @container chk (max-width: 479.98px) {
     .sl-chk__row { grid-template-columns: minmax(0, 1fr) auto; }
     .sl-chk__v { grid-column: 1; grid-row: 2; text-align: left; }
     .sl-chk__st { grid-column: 2; grid-row: 1 / 3; }
+  }
+  @container chk (max-width: 329.98px) {
+    .sl-chk__st--fix { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 2px; }
   }
 </style>

@@ -668,6 +668,8 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
     const toolUses = (Array.isArray(r1.content) ? r1.content : []).filter((b) => b && b.type === 'tool_use');
     const internal = toolUses.find((b) => isInternal(b.name));
+    const extraTools = [];
+    const extraResps = [];
     if (internal) {
       const out = extraInternal && extraInternal.names.has(internal.name)
         ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
@@ -697,6 +699,32 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
         16000,
         'anthropic2'
       );
+      // Canales de texto: agendar necesita consultar horas y reservar en el MISMO turno
+      // (el historial guardado solo tiene texto, no los códigos de las horas). Solo ahí
+      // se permite UNA vuelta más, y solo con las herramientas de agendar.
+      const second = extraInternal && (Array.isArray(finalResp.content) ? finalResp.content : [])
+        .filter((b) => b && b.type === 'tool_use');
+      const again = second && second.find((b) => extraInternal.names.has(b.name));
+      if (again) {
+        const out2 = await extraInternal.run(again).catch(() => FAIL_RESULT);
+        extraTools.push(again.name);
+        const prev = finalResp;
+        extraResps.push(prev);
+        finalResp = await withTimeout(
+          client.messages.create({
+            ...baseParams,
+            messages: [
+              ...messages,
+              { role: 'assistant', content: r1.content },
+              { role: 'user', content: toolResults },
+              { role: 'assistant', content: prev.content },
+              { role: 'user', content: second.map((b) => ({ type: 'tool_result', tool_use_id: b.id, content: b.id === again.id ? out2.content : JSON.stringify({ ok: OUR_TOOLS.has(b.name) }) })) },
+            ],
+          }, modelRequestOptions(model)),
+          16000,
+          'anthropic3'
+        );
+      }
     }
 
     // Texto + tool_use de SOLO-UI de la respuesta final. Una tool de CÓMPUTO en la 2ª
@@ -720,13 +748,13 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     const fallback = !text || reply !== beforePrice;
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
-    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, finalResp]);
+    const usage = sumUsage(finalResp === r1 ? [r1] : [r1, ...extraResps, finalResp]);
     const costMicro = turnCostMicroUsd(model, usage);
     const firstTurn = messages.length === 1;
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
-    return { reply, action, tool: internal ? internal.name : null, cortadas, fallback, costMicro, model };
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, costMicro, model };
   }
 }
 

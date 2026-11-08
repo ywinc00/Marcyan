@@ -38,7 +38,7 @@ const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
     <Fragment slot="titulo">
       {respondido && (
         <p class="hic__ok" aria-hidden="true">
-          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.4 3 3 6-6.4" /></svg>{respondido}
+          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.4 3 3 6-6.4" /></svg>{respondido}
         </p>
       )}
       <h1 class="hic__h1" set:html={h1Html} />

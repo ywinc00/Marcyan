@@ -49,9 +49,6 @@ const STATE_SHAPE: Record<string, { viewBox: string; path: string }> = {
             {c.stateFull && (
               <div class="loc__pills">
                 <span class="loc__pill">
-                  {STATE_SHAPE[c.state] && (
-                    <svg class="loc__pill-ic" viewBox={STATE_SHAPE[c.state].viewBox} aria-hidden="true"><path d={STATE_SHAPE[c.state].path} fill="currentColor" /></svg>
-                  )}
                   {c.stateFull}
                 </span>
               </div>

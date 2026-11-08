@@ -32,8 +32,8 @@ const ART: Record<IncluidoIcono, string> = {
   ia: `<path d="M17 12h20l10 10v30H17Z" class="l"/><path d="M37 12v10h10" class="l"/>
     <path d="M24.5 30 21.5 34l3 4M39.5 30l3 4-3 4" class="l s"/><path d="M30 41.5 34 27" class="l s"/>
     <path class="g" pathLength="1" d="M48 41v8M44 45h8"/>`,
-  tuya: `<circle cx="24" cy="30" r="8.5" class="l"/><circle cx="24" cy="30" r="2.6" class="l s"/>
-    <path class="g" pathLength="1" d="M32.5 30H51M44.5 30v6M49.5 30v4.5"/><path d="M15 40.5 13 46.5h13l-2-6" class="l s o"/>`,
+  tuya: `<circle cx="21" cy="32" r="9" class="l"/><circle cx="21" cy="32" r="3" class="l s"/>
+    <path class="g" pathLength="1" d="M30 32H52M45 32v7M50.5 32v5"/>`,
 };
 ---
 <CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
@@ -80,7 +80,7 @@ const ART: Record<IncluidoIcono, string> = {
     color: var(--w-ink);
   }
   .pi__tile svg { display: block; }
-  .pi__tile :global(.l) { fill: none; stroke: rgba(240,237,232,.82); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .pi__tile :global(.l) { fill: none; stroke: rgba(240,237,232,.82); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .pi__tile :global(.s) { stroke: rgba(240,237,232,.55); }
   .pi__tile :global(.o) { stroke: rgba(240,237,232,.3); }
   .pi__tile :global(.f) { fill: rgba(240,237,232,.6); }

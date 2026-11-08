@@ -64,7 +64,7 @@ const GLYPHS: Record<string, string> = {
     `<rect x="14.5" y="37.2" width="10" height="3.4" rx="1.7" style="fill:${ACC}"/>` +
     `<rect x="40" y="30" width="13" height="21" rx="3.2" style="fill:${PLATE};stroke:${INK};stroke-width:var(--wi-sw, 2)"/>` +
     `<rect x="43.5" y="44.5" width="6" height="2.4" rx="1.2" style="fill:${ACC}"/>` +
-    `<path d="M45 33.4h3" style="stroke:${INK}" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>`,
+    `<path d="M45 33.4h3" style="stroke:${INK};stroke-width:calc(var(--wi-sw, 2) * .8)" stroke-linecap="round" opacity=".6"/>`,
 
   // Pin de mapa con núcleo hueco, sombra en elipse y dos arcos de radar oro.
   'seo-local':
@@ -91,16 +91,16 @@ const GLYPHS: Record<string, string> = {
         `<path d="M26 25v-3.4a6 6 0 0 1 12 0V25"/>`,
     ) +
     `<path d="M20.2 31.2H43.8" stroke-linecap="round" style="stroke:${ACC};stroke-width:var(--wi-sw, 2)"/>` +
-    `<g transform="rotate(16 47 28)"><path d="M43.6 25.6 47 28" style="stroke:${INK}" stroke-width="1.6" stroke-linecap="round"/>` +
-    `<path d="M47 27.2l5.4 3.6v7.6a1.6 1.6 0 0 1-1.6 1.6h-7.6a1.6 1.6 0 0 1-1.6-1.6v-7.6Z" style="fill:${PLATE};stroke:${INK}" stroke-width="1.8" stroke-linejoin="round"/>` +
+    `<g transform="rotate(16 47 28)"><path d="M43.6 25.6 47 28" style="stroke:${INK};stroke-width:calc(var(--wi-sw, 2) * .8)" stroke-linecap="round"/>` +
+    `<path d="M47 27.2l5.4 3.6v7.6a1.6 1.6 0 0 1-1.6 1.6h-7.6a1.6 1.6 0 0 1-1.6-1.6v-7.6Z" style="fill:${PLATE};stroke:${INK};stroke-width:calc(var(--wi-sw, 2) * .9)" stroke-linejoin="round"/>` +
     `<circle cx="47" cy="31.4" r="1.5" style="fill:${INK}"/></g>`,
 
   // Sello de marca con 16 dientes, estrella oro y cota de plano.
   branding:
-    g(`<path d="${sealPath(32, 27, 15, 13)}"/><circle cx="32" cy="27" r="9.5" opacity=".5" stroke-width="1.4"/>`) +
+    g(`<path d="${sealPath(32, 27, 15, 13)}"/><circle cx="32" cy="27" r="9.5" opacity=".5"/>`) +
     `<path d="M32 21.2Q32.9 26.1 37.8 27 32.9 27.9 32 32.8 31.1 27.9 26.2 27 31.1 26.1 32 21.2Z" style="fill:${ACC}"/>` +
-    `<g fill="none" stroke-width="1.6" stroke-linecap="round" style="stroke:${INK}" opacity=".7">` +
-    `<path d="M17 49.5H47"/><path d="M17 46.5v6"/><path d="M47 46.5v6"/><path d="M17 49.5l3-1.8M17 49.5l3 1.8M47 49.5l-3-1.8M47 49.5l-3 1.8"/></g>`,
+    // cinta del sello (sustituye a la cota de plano, que a 40-48 px no se entendía)
+    g(`<path d="M25 39.5 21.5 51l5.2-2.4 3 4.4 2.3-11.2M39 39.5l3.5 11.5-5.2-2.4-3 4.4L32 41.8"/>`),
 
   // Chispa IA grande + 2 pequeñas sobre 3 líneas de respuesta (la 2.ª teal).
   'seo-ia':
@@ -116,7 +116,6 @@ const GLYPHS: Record<string, string> = {
     `<g transform="rotate(-45 33 33)">` +
     g(`<path d="M36.4 29.6H18.6a2.4 2.4 0 0 0 0 4.8H36.4A8 8 0 0 0 51.4 35H46.2a3 3 0 0 1 0-6H51.4A8 8 0 0 0 36.4 29.6Z"/>`) +
     `<circle cx="48.4" cy="32" r="2.1" style="fill:${ACC}"/>` +
-    `<path d="M47.4 19.4a13 13 0 0 1 9.2 15.9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2 3" style="stroke:${INK}" opacity=".4"/>` +
     `</g>`,
 };
 

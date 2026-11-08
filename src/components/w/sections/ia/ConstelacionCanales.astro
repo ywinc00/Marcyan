@@ -186,4 +186,10 @@ const arcoD = (r: number) => {
   @media (prefers-reduced-motion: reduce) {
     .ck__c, .ck__c::before, .ck__ln, .ck__ln.is-on { transition: none; }
   }
+  /* Un solo tratamiento de marca en el arco (auditoría de iconos, 2026-11-08): todas en tinta oscura
+     sobre su círculo blanco, y los pictogramas sin su azulejo propio (no doble contenedor). */
+  .ck__c :global(.lm path), .ck__c :global(.lm svg) { fill: #1d1d1f; }
+  .ck__c :global(.lm--picto) { background: none !important; box-shadow: none !important; }
+  .ck__c :global(.lm--picto svg) { stroke: #1d1d1f; fill: none; }
+  .ck__web { stroke-width: 1.7; }
 </style>

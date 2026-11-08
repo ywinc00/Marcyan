@@ -91,6 +91,7 @@ export default async function handler(req, res) {
                COUNT(*)::int AS n
           FROM leads
          WHERE created_at >= ${since.startISO}
+           AND status NOT IN ('test', 'spam')
          GROUP BY 1`,
       sql`
         SELECT to_char(date_trunc('month', created_at AT TIME ZONE ${TZ}), 'YYYY-MM') AS month,

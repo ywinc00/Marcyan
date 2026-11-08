@@ -44,6 +44,7 @@ import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/rate
 // Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
 import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
 import { recordTurn } from '../lib/chat-log.mjs';
+import { isTakenOver, recordVisitorWaiting } from '../lib/takeover.mjs';
 
 // Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
 // y su coste se cuentan aparte para que las pruebas de Marcy (que corren contra
@@ -104,7 +105,7 @@ function stripControl(s) {
 }
 
 // ── clientIp propio (NO importar lib/auth.mjs → evita acoplar Postgres) ──
-function clientIp(req) {
+export function clientIp(req) {
   const fwd = req.headers['x-forwarded-for'];
   if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
   return req.headers['x-real-ip'] || null;
@@ -195,7 +196,7 @@ function allowedOrigins() {
     'http://localhost:4321',
   ];
 }
-function originOk(req) {
+export function originOk(req) {
   const o = req.headers.origin;
   if (!o) return false; // fail-closed
   return allowedOrigins().includes(o);
@@ -548,6 +549,19 @@ export default async function handler(req, res) {
   if (!messages) {
     console.warn('[chat] blocked=shape ip=' + ip);
     return res.status(400).json({ error: M.badRequest });
+  }
+
+  // "Tomo yo": si el dueño lleva esta conversación desde Orbit, Marcy calla.
+  // El mensaje se guarda y le llega al dueño como aviso; su respuesta la
+  // recoge el widget (api/chat-updates.mjs). Si la base falla, sigue Marcy.
+  if (await isTakenOver(sid)) {
+    const text = lastUserText(messages);
+    try { await recordVisitorWaiting({ sid, text }); } catch (err) { console.warn('[chat] espera sin guardar', err && err.message); }
+    try {
+      const { createNotification } = await import('../lib/notifications.mjs');
+      await createNotification({ type: 'chat_handoff', title: 'Te escribió en el chat', body: String(text || '').slice(0, 300), ref: `chat:${sid}`.slice(0, 100), url: `/dashboard#/marcy/${sid}`, dedupeMinutes: 1 });
+    } catch {}
+    return res.status(200).json({ reply: null, human: true });
   }
 
   // Tope diario de todo el sitio, DESPUÉS de validar: solo cuentan los mensajes

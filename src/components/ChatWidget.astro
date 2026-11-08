@@ -60,6 +60,8 @@ const STR = {
     capSlotsLoading: 'Buscando horas libres…',
     capSlotsErr: 'No pudimos cargar los horarios. Deja tu contacto y te llamamos para cuadrar la hora.',
     capPickSlot: 'Elige una hora de la lista.',
+    humanOn: 'Ahora te atiende una persona del equipo de Marcyan.',
+    humanOff: 'Te vuelve a atender Marcy.',
     capCitaOk: 'Listo, tu llamada quedó agendada para el %CUANDO% (hora de Houston). Te llamamos a esa hora. 📅',
     capSub: 'Confirma tu nombre y tu mejor email o teléfono. Sin compromiso.',
     capSubProject: 'Confírmalos y alguien del equipo de Marcyan te arma la propuesta gratis.',
@@ -133,6 +135,8 @@ const STR = {
     capSlotsLoading: 'Finding open times…',
     capSlotsErr: 'We couldn’t load the times. Leave your contact and we’ll call you to set one.',
     capPickSlot: 'Please pick a time from the list.',
+    humanOn: 'A person from the Marcyan team is with you now.',
+    humanOff: 'Marcy is back with you.',
     capCitaOk: 'Done, your call is booked for %CUANDO% (Houston time). We’ll call you then. 📅',
     capSub: 'Confirm your name and your best email or phone number. No strings attached.',
     capSubProject: 'Confirm your details and a Marcyan team member will send you the free proposal.',
@@ -840,6 +844,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       : String(Date.now()) + Math.random().toString(36).slice(2);
 
     let history = [];      // solo pares user/assistant completados (alternancia válida)
+    // "Tomo yo": el dueño puede llevar la conversación desde Orbit. Mientras la
+    // lleva, lo que escribe el visitante queda en `waitingUser` (sin respuesta de
+    // Marcy) y lo del dueño llega por /api/chat-updates. Se mete en `history` como
+    // turno del asistente para que, al devolverla, Marcy sepa lo que se habló.
+    let waitingUser = '';
+    let human = false;
+    let lastOwnerId = 0;
+    let pollTimer = null;
+    let lastActivity = Date.now();
     let lastUserText = '';
     let busy = false;
     let opened = false;
@@ -1061,8 +1074,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       // Antepone banderas NO-PII (solo si ya tenemos algún dato) para que Marcy pida
       // únicamente lo que falta. El valor real NUNCA viaja; `history` guarda el texto crudo.
       const hasKnown = !!(known.name || known.email || known.phone);
-      const wireContent = hasKnown ? (contactFlags(known) + '\n' + text) : text;
+      const userText = waitingUser ? (waitingUser + '\n' + text) : text;
+      const wireContent = hasKnown ? (contactFlags(known) + '\n' + userText) : userText;
       const reqMessages = recent.concat([{ role: 'user', content: wireContent }]);
+      lastActivity = Date.now();
       try {
         const res = await fetchWithTimeout('/api/chat', {
           method: 'POST',
@@ -1071,10 +1086,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         });
         let data = null; try { data = await res.json(); } catch (_) {}
         hideTyping();
-        if (data && data.reply) {
+        if (data && data.human) {
+          // Lo lleva el dueño: sin respuesta de Marcy; se guarda para el historial.
+          waitingUser = userText;
+          if (!human) { human = true; appendNote(T.humanOn); }
+          startPolling();
+        } else if (data && data.reply) {
+          waitingUser = '';
+          if (human) { human = false; appendNote(T.humanOff); }
           appendBubble('ai', data.reply, { animate: true });
           // `history` = SOLO texto crudo (sin banderas, sin PII) → alternancia válida y transcript limpio.
-          history = recent.concat([{ role: 'user', content: text }, { role: 'assistant', content: data.reply }]);
+          history = recent.concat([{ role: 'user', content: userText }, { role: 'assistant', content: data.reply }]);
+          startPolling();
           const act = data.action;
           if (act && act.type === 'capture') {
             // Prellenado robusto: si el extractor del cliente no agarró el nombre
@@ -1107,6 +1130,51 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         // pendingAsk se vacía antes de reenviar).
         if (pendingAsk) { const t = pendingAsk; pendingAsk = null; requestAnimationFrame(() => send(t)); }
       }
+    }
+
+    function appendNote(msg) {
+      const b = document.createElement('div');
+      b.className = 'mrc-bub mrc-sys';
+      b.textContent = msg;
+      log.appendChild(b);
+      b.scrollIntoView({ block: 'end' });
+    }
+
+    // Mensajes del dueño (Orbit "Tomo yo"). Pregunta cada 10 s con el panel
+    // abierto y la pestaña visible; se apaga sola tras 30 min sin movimiento.
+    function ownerSays(text) {
+      appendBubble('ai', text, { animate: true });
+      const last = history[history.length - 1];
+      if (waitingUser) {
+        history = history.concat([{ role: 'user', content: waitingUser }, { role: 'assistant', content: text }]).slice(-18);
+        waitingUser = '';
+      } else if (last && last.role === 'assistant') {
+        last.content = last.content + '\n\n' + text;
+      } else {
+        // El dueño escribe antes de que el visitante diga nada: queda como contexto.
+        history = history.concat([{ role: 'user', content: '…' }, { role: 'assistant', content: text }]).slice(-18);
+      }
+    }
+    async function pollOwner() {
+      if (!opened || document.visibilityState !== 'visible') return;
+      if (Date.now() - lastActivity > 30 * 60 * 1000) { clearInterval(pollTimer); pollTimer = null; return; }
+      try {
+        const res = await fetch('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) });
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d.takeover && !human) { human = true; appendNote(T.humanOn); }
+        if (!d.takeover && human && !waitingUser) { human = false; appendNote(T.humanOff); }
+        for (const m of d.mensajes || []) {
+          if (m.id <= lastOwnerId) continue;
+          lastOwnerId = m.id;
+          lastActivity = Date.now();
+          ownerSays(String(m.text || ''));
+        }
+      } catch (_) {}
+    }
+    function startPolling() {
+      lastActivity = Date.now();
+      if (!pollTimer) pollTimer = setInterval(pollOwner, 10000);
     }
 
     // Burbuja de error de red con botón 'Reintentar' (A4 / Chat-F02). Restaura

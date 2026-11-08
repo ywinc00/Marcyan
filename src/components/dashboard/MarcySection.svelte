@@ -7,7 +7,7 @@
   //   ?f=en_vivo|cerrada|…    pastillas · ?paso=precio|… embudo · ?motivo=… dónde se van
   //   ?vista=gasto            gasto del mes
   // En vivo: se refresca cada 5 s solo con la pestaña visible.
-  import { onDestroy, untrack } from 'svelte';
+  import { onDestroy, untrack, tick } from 'svelte';
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { fmtTime, rel, fmtDateTime } from './lib/dates.js';
   import { route, setSub, setQuery } from './lib/router.svelte.js';
@@ -22,6 +22,7 @@
   import ErrorState from './ui/ErrorState.svelte';
   import Icon from './ui/Icon.svelte';
   import MarcyCitas from './MarcyCitas.svelte';
+  import { toast } from './lib/toast.svelte.js';
   import MarcyCorreo from './MarcyCorreo.svelte';
 
   const POLL_MS = 5000;
@@ -69,7 +70,12 @@
     if (!quiet) { convLoading = true; convError = ''; }
     try {
       const d = await api('/api/admin/marcy?sid=' + encodeURIComponent(sid));
-      if (shownSid === sid) conv = d.conversation;
+      if (shownSid === sid) {
+        const grew = !conv || conv.sid !== sid || (d.conversation.turnos || []).length !== (conv.turnos || []).length;
+        conv = d.conversation;
+        // Si la llevas tú, la conversación baja sola al último mensaje.
+        if (conv.takeover_at && grew) tick().then(() => { const f = document.querySelector('.feed'); if (f) f.scrollTop = f.scrollHeight; });
+      }
     } catch (e) {
       if (isSessionError(e)) return;
       if (!quiet) convError = errorMessage(e);
@@ -100,10 +106,35 @@
   function tickLive() {
     if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
     loadList({ quiet: true });
-    if (shownSid && conv && ['en_vivo', 'abierta'].includes(conv.outcome)) loadConv(shownSid, { quiet: true });
+    if (shownSid && conv && (conv.takeover_at || ['en_vivo', 'abierta'].includes(conv.outcome))) loadConv(shownSid, { quiet: true });
   }
   timer = setInterval(tickLive, POLL_MS);
   onDestroy(() => clearInterval(timer));
+
+  // "Tomo yo" (migración 022): tomar, escribir y devolver la conversación.
+  let draft = $state('');
+  let tomoBusy = $state(false);
+  async function tomo(action) {
+    if (!conv || tomoBusy) return;
+    tomoBusy = true;
+    try {
+      await api('/api/admin/marcy', { method: 'POST', body: { sid: conv.sid, action } });
+      toast(action === 'tomar' ? 'La llevas tú. Marcy no contesta en esta conversación.' : 'Devuelta a Marcy');
+      await loadConv(conv.sid, { quiet: true });
+    } catch (e) { if (!isSessionError(e)) toast(errorMessage(e), { tone: 'error' }); }
+    finally { tomoBusy = false; }
+  }
+  async function enviar() {
+    const text = draft.trim();
+    if (!conv || !text || tomoBusy) return;
+    tomoBusy = true;
+    try {
+      await api('/api/admin/marcy', { method: 'POST', body: { sid: conv.sid, action: 'enviar', text } });
+      draft = '';
+      await loadConv(conv.sid, { quiet: true });
+    } catch (e) { if (!isSessionError(e)) toast(errorMessage(e), { tone: 'error' }); }
+    finally { tomoBusy = false; }
+  }
 
   function pickFilter(id) { setQuery({ ...q, f: id || '', paso: '', motivo: '' }); }
   function pickStep(id) { setQuery({ ...q, paso: q.paso === id ? '' : id, f: '', motivo: '' }); }
@@ -262,19 +293,44 @@
             <b>{CHANNELS[conv.channel] || 'Web'} · {LANGS[conv.lang] || conv.lang}</b>
             <span class="muted small"> · empezó {fmtDateTime(conv.started_at)}</span>
           </div>
-          <StatusChip tone={om.tone} label={conv.outcome === 'en_vivo' ? 'En vivo' : om.label} />
+          {#if conv.takeover_at}<StatusChip tone="accent" label="La llevas tú" />{:else}<StatusChip tone={om.tone} label={conv.outcome === 'en_vivo' ? 'En vivo' : om.label} />{/if}
         </header>
         <ol class="feed" aria-live={conv.outcome === 'en_vivo' ? 'polite' : 'off'}>
           {#each conv.turnos as t, i (t.id)}
+            {#if t.action_type === 'dueno'}
+              <li class="msg msg--o"><span class="who">Tú · {fmtTime(t.created_at)}</span>{t.reply}</li>
+            {:else if t.action_type === 'espera'}
+              <li class="msg msg--u"><span class="who">Cliente · {fmtTime(t.created_at)}</span>{t.user_text}</li>
+            {:else}
             <li class="msg msg--u"><span class="who">Cliente</span>{t.user_text}</li>
             {#if t.tool}<li class="toolcard"><Icon name="check" size={14} />{toolLabel(t.tool)}</li>{/if}
             <li class="msg msg--m" class:msg--fb={t.fallback}><span class="who">Marcy · {fmtTime(t.created_at)}</span>{t.reply}</li>
             {#if t.action_type}<li class="ev">{actionLabel(t.action_type, t.action_destino)}</li>{/if}
+            {/if}
             {#if t.cortadas}<li class="ev ev--warn">El filtro de precios cortó {t.cortadas} y mostró una respuesta genérica</li>{/if}
             {#if failTurn === i + 1}<li class="failbox">Aquí se fue: {motivoLabel(conv.fallo.motivo).toLowerCase()}.</li>{/if}
           {/each}
-          {#if conv.outcome === 'en_vivo'}<li class="ev ev--live">Conversación en curso · se actualiza sola</li>{/if}
+          {#if conv.takeover_at}<li class="ev ev--live">La llevas tú · Marcy no contesta hasta que se la devuelvas</li>
+          {:else if conv.outcome === 'en_vivo'}<li class="ev ev--live">Conversación en curso · se actualiza sola</li>{/if}
         </ol>
+        {#if conv.channel === 'web' || !conv.channel}
+          {#if conv.takeover_at}
+            <form class="composer" onsubmit={(e) => { e.preventDefault(); enviar(); }}>
+              <label class="sr" for="tomo-msg">Tu mensaje al cliente</label>
+              <textarea id="tomo-msg" rows="2" maxlength="2000" bind:value={draft} placeholder="Escribe al cliente. Le aparece en el chat de la web."
+                onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }}></textarea>
+              <div class="composer__acts">
+                <button type="button" class="btn" disabled={tomoBusy} onclick={() => tomo('devolver')}>Devolver a Marcy</button>
+                <button type="submit" class="btn btn--primary" disabled={tomoBusy || !draft.trim()}><Icon name="send" size={16} />Enviar</button>
+              </div>
+            </form>
+          {:else}
+            <div class="composer composer--off">
+              <span class="muted small">Si quieres contestar tú, Marcy se calla en esta conversación hasta que se la devuelvas.</span>
+              <button type="button" class="btn btn--primary" disabled={tomoBusy} onclick={() => tomo('tomar')}>Tomo yo</button>
+            </div>
+          {/if}
+        {/if}
       {/if}
     </div>
 
@@ -381,6 +437,13 @@
   .who { display: block; font-size: 11px; color: var(--fg-subtle); margin-bottom: 3px; }
   .msg--u { align-self: flex-start; background: var(--surface-3); }
   .msg--m { align-self: flex-end; background: rgba(var(--accent-gold-rgb), .07); border: 1px solid rgba(var(--accent-gold-rgb), .18); }
+  .msg--o { align-self: flex-end; background: rgba(52, 211, 153, .08); border: 1px solid rgba(52, 211, 153, .25); }
+  .composer { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
+  .composer--off { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+  .composer textarea { width: 100%; resize: vertical; min-height: 56px; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-base); color: var(--fg-primary); font: inherit; font-size: var(--dash-body); line-height: 1.5; }
+  .composer textarea:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 1px; }
+  .composer__acts { display: flex; justify-content: flex-end; gap: 8px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .msg--fb { border-color: rgba(245, 179, 56, .5); }
   .toolcard { align-self: flex-end; display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); }
   .ev { align-self: flex-end; font-size: var(--dash-caption); color: var(--fg-subtle); }

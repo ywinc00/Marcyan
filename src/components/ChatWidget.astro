@@ -1259,9 +1259,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     function marcySaysLocal(text) {
       appendBubble('ai', text, { animate: true });
       const last = history[history.length - 1];
-      if (last && last.role === 'assistant') last.content = last.content + '
-
-' + text;
+      if (last && last.role === 'assistant') last.content = last.content + '\n\n' + text;
       else if (last && last.role === 'user') history = history.concat([{ role: 'assistant', content: text }]).slice(-18);
       saveConv();
     }

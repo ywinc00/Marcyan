@@ -33,6 +33,12 @@ interface Props {
   lang?: 'es' | 'en';
 }
 const { n, label, titleHtml, lead, name, cells, todos, tambien, negocio, lang = 'es' } = Astro.props;
+const PREG: Record<string, { q: string; b: string }> = {
+  clinica: { q: '¿Qué dentista en Sugar Land atiende en español?', b: 'Tu Clínica' },
+  taller: { q: '¿Qué taller en Katy me arregla el aire hoy?', b: 'Tu Taller' },
+  carga: { q: '¿Qué agencia de carga en Doral envía a Bogotá?', b: 'Tu Carga' },
+  cafe: { q: '¿Dónde hay café cubano abierto ahora en Hialeah?', b: 'Tu Café' },
+};
 const TEL: Record<string, { fondo: string; tinta: string }> = { clinica: { fondo: '#f7f4ee', tinta: '#1f2a24' }, taller: { fondo: '#fafaf8', tinta: '#141414' }, cafe: { fondo: '#b4492f', tinta: '#f6ead8' }, carga: { fondo: '#101113', tinta: '#f2f0eb' } };
 const ICON: Record<string, string> = {
   'diseno-web': 'lucide:monitor-smartphone', 'seo-local': 'lucide:map-pin',
@@ -58,7 +64,7 @@ const bento = cells.map((c) => ({
     </div>
     <div slot="ui-2" class="br-rc__ui"><ObjMapaLocal lang={lang} /></div>
     <div slot="ui-3" class="br-rc__ui"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
-    <div slot="ui-4" class="br-rc__ui"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" /></div>
+    <div slot="ui-4" class="br-rc__ui"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" question={negocio && PREG[negocio] ? PREG[negocio].q : undefined} business={negocio && PREG[negocio] ? PREG[negocio].b : undefined} /></div>
   </Bento2x2>
   <p class="br-rc__todos"><span>{tambien}</span>{todos.map((t) => <a href={t.href}>{t.label}</a>)}</p>
 </div>
@@ -68,6 +74,8 @@ const bento = cells.map((c) => ({
   .br-rc__ui { display: flex; justify-content: center; align-items: flex-start; width: 100%; }
   .br-rc__ui > :global(*) { width: min(100%, 380px); }
   .br-rc__ui--tel > :global(*) { width: min(100%, 264px); }
+  /* el teléfono nunca más grande que una pantalla (crítica de diseño: medía 518 × 1102 a 1440) */
+  .br-rc .br-rc__ui--tel > :global(.tw) { width: min(100%, 272px); }
   /* el título de cada celda lleva a la página del servicio (el enlace que daban las tarjetas) */
   .br-rc :global(.br-rc__a) { color: inherit; text-decoration: none; }
   .br-rc :global(.br-rc__a:hover) { color: var(--w-accent, var(--accent-gold)); }

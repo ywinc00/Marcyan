@@ -7,8 +7,8 @@
 interface Props { lang?: 'es' | 'en' }
 const { lang = 'es' } = Astro.props;
 const T = lang === 'en'
-  ? { menu: 'Menu', pedir: 'Order', izq: 'Today from 6:00 AM', der: 'Hialeah · Palm Ave', h: ['Cuban coffee,', 'right at the window.'], cta: 'Order on WhatsApp', nota: 'Pastelitos out of the oven at 6:30', carta: ['Cafecito', 'Colada', 'Pastelitos', 'Cuban bread'] }
-  : { menu: 'Menú', pedir: 'Pedir', izq: 'Hoy desde las 6:00 a. m.', der: 'Hialeah · Palm Ave', h: ['Café cubano,', 'en la ventanita.'], cta: 'Pedir por WhatsApp', nota: 'Pastelitos recién salidos a las 6:30', carta: ['Cafecito', 'Colada', 'Pastelitos', 'Pan cubano'] };
+  ? { menu: 'Menu', pedir: 'Order', izq: 'Today from 6:00 AM', der: 'Hialeah · Palm Ave', h: ['Cuban coffee,', 'right at the window.'], cta: 'Order on WhatsApp', nota: 'Pastelitos out of the oven at 6:30', carta: ['Cafecito', 'Colada', 'Pastelitos', 'Cuban bread'], det: ['sweet and strong', 'to share at work', 'guava and cheese', 'baked this morning'], cartaT: 'The window menu' }
+  : { menu: 'Menú', pedir: 'Pedir', izq: 'Hoy desde las 6:00 a. m.', der: 'Hialeah · Palm Ave', h: ['Café cubano,', 'en la ventanita.'], cta: 'Pedir por WhatsApp', nota: 'Pastelitos recién salidos a las 6:30', carta: ['Cafecito', 'Colada', 'Pastelitos', 'Pan cubano'], det: ['dulce y fuerte', 'para compartir en el trabajo', 'de guayaba y queso', 'horneado esta mañana'], cartaT: 'La carta de la ventanita' };
 ---
 <div class="wf">
   <header class="wf__nav">
@@ -32,6 +32,7 @@ const T = lang === 'en'
     </div>
   </div>
   <footer class="wf__pie">{T.carta.map((c) => <span>{c}</span>)}</footer>
+  <div class="wf__carta"><span class="wf__ct">{T.cartaT}</span>{T.carta.map((c, i) => <span class="wf__fila"><b>{c}</b><small>{T.det[i]}</small></span>)}</div>
 </div>
 
 <style>
@@ -50,7 +51,15 @@ const T = lang === 'en'
   .wf__cta { display: inline-flex; align-items: center; height: 46px; padding: 0 24px; border-radius: 999px; background: #f6ead8; color: #7a2a17; font-size: 15px; font-weight: 600; }
   .wf__nota { font-size: 13.5px; opacity: .85; }
   .wf__pie { display: flex; justify-content: center; gap: 28px; padding: 16px 36px 22px; border-top: 1px solid rgba(246, 234, 216, .25); font: 400 16px/1 Georgia, 'Times New Roman', serif; }
+  .wf__carta { display: none; }
   @container wf (max-width: 520px) {
+    .wf__campo { flex: none; padding-top: 18px; padding-bottom: 26px; }
+    .wf__pie { display: none; }
+    .wf__carta { display: flex; flex: 1; flex-direction: column; gap: 0; padding: 18px 18px 24px; background: #f6ead8; color: #3b1a10; }
+    .wf__ct { font: 600 11px/1 var(--font-mono, ui-monospace, monospace); letter-spacing: .14em; text-transform: uppercase; color: #8a3220; margin-bottom: 8px; }
+    .wf__fila { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 13px 0; border-bottom: 1px solid rgba(59, 26, 16, .14); }
+    .wf__fila b { font: 400 19px/1.1 Georgia, 'Times New Roman', serif; font-weight: 400; }
+    .wf__fila small { font-size: 12.5px; color: #7a5a4c; text-align: right; }
     .wf__nav { padding: 14px 18px; }
     .wf__marca { font-size: 24px; }
     .wf__esq { position: static; display: block; text-align: center; font-size: 11px; }

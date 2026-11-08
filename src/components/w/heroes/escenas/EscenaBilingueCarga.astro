@@ -34,6 +34,7 @@ const L = {
                 </span>
               </span>
             </div>
+            <div class="bc__svc">{t.pie.split(' · ').map((x) => <span>{x}<i>→</i></span>)}</div>
             <div class="bc__pie">{t.pie}</div>
           </div>
         );
@@ -98,7 +99,11 @@ const L = {
   .bc__paso.is-ahora { color: #f2f0eb; } .bc__paso.is-ahora i { background: #ff5a36; box-shadow: 0 0 0 .5cqw rgba(255, 90, 54, .2); }
   .bc__pie { margin-top: auto; padding: 2cqw 4cqw; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 1.3cqw; color: rgba(242, 240, 235, .45); }
   /* teléfono: la web se reordena en una columna y pasa a tamaños fijos legibles (nunca 6 px) */
+  .bc__svc { display: none; }
   @container (max-width: 560px) {
+    :global(.tw) .bc__svc { display: flex; flex-direction: column; margin: 18px 16px 0; }
+    .bc__svc span { display: flex; justify-content: space-between; padding: 13px 2px; border-top: 1px solid rgba(255, 255, 255, .08); font-size: 15px; color: rgba(242, 240, 235, .85); }
+    .bc__svc i { font-style: normal; color: #ff5a36; }
     .bc__body { aspect-ratio: auto; height: 380px; }
     .bc__nav { padding: 14px 16px; gap: 12px; }
     .bc__logo { font-size: 15px; }

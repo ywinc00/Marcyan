@@ -27,7 +27,7 @@ export interface NegocioFicha {
   nombre: string; cat: string; svc: string; sr: string;
   ico: 'diente' | 'llave' | 'avion' | 'taza' | 'tijera';
   acc: string; on: string; tile: string; tileInk: string;
-  /** 1 lago y avenida en diagonal · 2 autopista con salida · 3 canales en cuadrícula */
+  /** 1 lago y avenida en diagonal · 2 autopista con salida · 3 canales en cuadrícula · 4 costa con puente */
   mapa: 1 | 2 | 3 | 4;
   grupos?: { d: string; dias: number[]; h: string | null; cierra?: string; abre?: string; a?: number; c?: number }[];
 }

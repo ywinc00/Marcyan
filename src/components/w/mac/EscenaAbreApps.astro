@@ -139,7 +139,7 @@ const destinos = {
 
       {/* 2 · la ficha en el mapa */}
       <VentanaApp id="mapa" titulo={T.apps.mapa} x={700} y={84} w={620} h={420} z={2} textoCarga={T.cargaMapa}>
-        <template data-w2-tpl><div class="abre-ficha-p03"><FichaMapaEjemplo variante="mini" marca="salon" lang={lang} /></div></template>
+        <template data-w2-tpl><div class="abre-ficha-p03"><FichaMapaEjemplo name={lang === 'en' ? 'Your Salon' : 'Tu Salón'} cat={lang === 'en' ? 'Hair salon · Heights, Houston' : 'Salón de belleza · Heights, Houston'} lang={lang} /></div></template>
         <LogoMarca slot="carga" id="googlemaps" size={40} tono="color" titulo="" />
         <Fragment slot="chip">{T.encuentran}</Fragment>
       </VentanaApp>
@@ -212,7 +212,7 @@ const destinos = {
           {viaje.lanza.kicker && <span class="pp-lanza__k">{viaje.lanza.kicker}</span>}
           <Button href={viaje.lanza.href} variant="primary" size="lg">{viaje.lanza.label}</Button>
         </div>
-        <ol class="pp-caps" role="list">
+        <ol class="pp-caps" role="list" aria-hidden="true">
           {viaje.proyectos.map((pr, i) => (
             <li class:list={['pp-cap', i === viaje.proyectos.length - 1 && 'pp-cap--fin']} style={`--i:${i}`}>
               <span class="pp-cap__n">{dos(i + 1)} {TV.de} {dos(viaje.proyectos.length)}</span>
@@ -221,6 +221,7 @@ const destinos = {
             </li>
           ))}
         </ol>
+        <ul class="sr-only">{viaje.proyectos.map((pr) => <li><span translate="no">{pr.name}</span>, {pr.cat}. {pr.result}</li>)}</ul>
         <a class="pp-ver" href={viaje.cab.cta.href}>{viaje.cab.cta.label}<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4.5 12.5 8 9 11.5" /></svg></a>
       </div>
     </Fragment>
@@ -377,14 +378,14 @@ const destinos = {
   :global(.lf--pin[data-pin-on]) .abre--viaje .pp-cab {
     position: absolute; z-index: 3; left: var(--pp-tl); width: var(--pp-tw); bottom: calc(100% - var(--pp-tt) + 14px);
     display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
-    animation: pp-entra linear both; animation-timeline: --lf-pin; animation-range: contain 35% contain 40%;
+    animation: pp-entra linear both; animation-timeline: --lf-pin; animation-range: contain 37% contain 41%;
   }
   :global(.lf--pin[data-pin-on]) .abre--viaje .pp-pie {
     position: absolute; z-index: 3; left: var(--pp-tl); width: var(--pp-tw); top: calc(var(--pp-tt) + var(--pp-th) + 14px);
     display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: 32px;
   }
   @keyframes pp-entra { from { opacity: 0; transform: translateY(10px); visibility: hidden; } to { opacity: 1; transform: none; visibility: visible; } }
-  @keyframes pp-sale { 0% { opacity: 0; visibility: hidden; transform: translateY(8px); } 12%, 82% { opacity: 1; visibility: visible; transform: none; } 100% { opacity: 0; visibility: hidden; transform: translateY(-6px); } }
+  @keyframes pp-sale { 0% { opacity: 0; visibility: hidden; transform: translateY(8px); } 14%, 86% { opacity: 1; visibility: visible; transform: none; } 100% { opacity: 0; visibility: hidden; transform: translateY(-6px); } }
   @keyframes pp-queda { 0% { opacity: 0; visibility: hidden; transform: translateY(8px); } 30%, 100% { opacity: 1; visibility: visible; transform: none; } }
   .pp-tit { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .pp-h2 { margin: 0; font-size: clamp(26px, 2.3vw, 34px); line-height: 1.1; }
@@ -398,7 +399,7 @@ const destinos = {
   .abre[data-modo='movil'] .pp-seg__pill { transform: translateX(100%); }
 
   .pp-lanza { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-    animation: pp-sale linear both; animation-timeline: --lf-pin; animation-range: contain 22% contain 37%; }
+    animation: pp-sale linear both; animation-timeline: --lf-pin; animation-range: contain 20% contain 35%; }
   .pp-lanza__k { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold); }
   .pp-caps { grid-column: 1; grid-row: 1; display: grid; margin: 0; padding: 0; list-style: none; }
   .pp-cap { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 4px; min-width: 0;
@@ -414,6 +415,9 @@ const destinos = {
   .pp-ver { grid-column: 2; grid-row: 1; align-self: center; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--w-ink, #f0ede8); font: 500 14px/1 var(--font-body); text-decoration: none; white-space: nowrap;
     animation: pp-entra linear both; animation-timeline: --lf-pin; animation-range: contain 36% contain 40%; }
   .pp-ver:hover { color: var(--accent-gold); }
+  /* Con teclado, lo que tiene foco se ve aunque el scroll aún no haya llegado a su tramo. */
+  .pp-cab:focus-within, .pp-ver:focus-visible, .pp-lanza:focus-within { animation: none !important; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .pp-caps[aria-hidden] { pointer-events: none; }
   .pp-ver:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; border-radius: 4px; }
 
   /* Ventanas de proyecto: geometría por modo (px de la pantalla fuente 1378 × 895). */
@@ -423,12 +427,12 @@ const destinos = {
     transition: left .5s cubic-bezier(.22, 1, .36, 1), top .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1);
     animation: pp-ven-entra linear both; animation-timeline: --lf-pin;
   }
-  @keyframes pp-ven-pasa { 0% { opacity: 0; transform: translateY(90px) scale(.96); visibility: hidden; } 26%, 74% { opacity: 1; transform: none; visibility: visible; } 100% { opacity: 0; transform: translateY(-60px) scale(.97); visibility: hidden; } }
+  @keyframes pp-ven-pasa { 0% { opacity: 0; transform: translateY(60px) scale(.97); visibility: hidden; } 14%, 86% { opacity: 1; transform: none; visibility: visible; } 100% { opacity: 0; transform: translateY(-40px) scale(.98); visibility: hidden; } }
   /* Las ventanas del salón se retiran cuando llegan los proyectos (pantalla limpia). */
   :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='web']),
   :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='mapa']),
   :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='wa']),
-  :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='correo']) { animation: pp-retira linear both; animation-timeline: --lf-pin; animation-range: contain 39% contain 44%; }
+  :global(.lf--pin[data-pin-on]) .abre--viaje :global([data-w2-ventana='correo']) { animation: pp-retira linear both; animation-timeline: --lf-pin; animation-range: contain 34% contain 38%; }
   @keyframes pp-retira { to { opacity: 0; visibility: hidden; } }
   @keyframes pp-ven-entra { from { opacity: 0; transform: translateY(90px) scale(.96); visibility: hidden; } to { opacity: 1; transform: none; visibility: visible; } }
   :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-range: contain 40% contain 45%; }
@@ -462,9 +466,9 @@ const destinos = {
     .abre[data-modo='pc'] :global(.pp-ven) { left: 40px !important; top: 46px !important; width: 1298px !important; height: 820px !important; }
     .abre[data-modo='movil'] :global(.pp-ven) { left: 409px !important; top: 40px !important; width: 560px !important; height: 850px !important; }
     /* En el teléfono cada proyecto SUSTITUYE al anterior (sale hacia arriba), sin apilarse. */
-    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 40% contain 59%; }
-    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-name: pp-ven-pasa; animation-range: contain 54% contain 73%; }
-    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-name: pp-ven-pasa; animation-range: contain 68% contain 87%; }
+    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--0) { animation-name: pp-ven-pasa; animation-range: contain 40% contain 54%; }
+    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--1) { animation-name: pp-ven-pasa; animation-range: contain 54% contain 68%; }
+    :global(.lf--pin[data-pin-on]) .abre--viaje :global(.pp-ven--2) { animation-name: pp-ven-pasa; animation-range: contain 68% contain 82%; }
     .pp-seg button { min-width: 92px; }
     .pp-cap__r { font-size: 14px; }
   }
@@ -549,7 +553,7 @@ const destinos = {
     }
     pasos.push([9100, () => esc.classList.add('is-vivo')]);
 
-    const sec: Secuencia = secuencia(pasos);
+    const sec: Secuencia = secuencia(raiz.dataset.viaje !== undefined ? pasos.map(([ms, f]) => [Math.round(ms * 0.55), f] as [number, () => void]) : pasos);
     reset();
     // Reinicio AL SALIR, no al entrar (I-1 de la ronda 2): cuando el portátil
     // lleva ≥ 8 s del todo fuera de vista (margen 100 px), se para la secuencia y
@@ -582,8 +586,21 @@ const destinos = {
     const lfPin = raiz.dataset.viaje !== undefined ? raiz.closest<HTMLElement>('.lf--pin') : null;
     const tramo = lfPin?.querySelector<HTMLElement>('[data-w2-pin]') ?? null;
     const escenario = tramo?.querySelector<HTMLElement>('.lf__pin') ?? null;
-    if (lfPin && tramo && escenario && CSS.supports('animation-timeline', 'view()')) {
+    // El modo fijado necesita alto: en un teléfono en horizontal o una ventana muy baja la escena se
+    // queda quieta y completa (crítica técnica 2026-11-08: con poco alto la escala salía negativa).
+    const altoOk = () => innerHeight / zoom() >= 560;
+    if (lfPin && tramo && escenario && CSS.supports('animation-timeline', 'view()') && altoOk()) {
       lfPin.setAttribute('data-pin-on', '');
+      // El ancla #proyectos pasa al punto del tramo donde entra el primer proyecto (la sección de
+      // respaldo se oculta y ya no puede recibir el salto).
+      const ancla = tramo.querySelector<HTMLElement>('.lf__pin-ancla');
+      const respaldo = document.getElementById('proyectos');
+      const anclaOn = (on: boolean) => {
+        if (!ancla) return;
+        if (on) { if (respaldo && respaldo !== ancla) respaldo.id = 'proyectos-lista'; ancla.id = 'proyectos'; }
+        else { ancla.removeAttribute('id'); if (respaldo) respaldo.id = 'proyectos'; }
+      };
+      anclaOn(true);
       const obj = raiz.querySelector<HTMLElement>('.abre-obj')!;
       const cab = raiz.querySelector<HTMLElement>('.pp-cab');
       const pie = raiz.querySelector<HTMLElement>('.pp-pie');
@@ -595,15 +612,15 @@ const destinos = {
       const botones = Array.from(raiz.querySelectorAll<HTMLButtonElement>('[data-pp-modo]'));
       const ponModo = (m: string) => {
         raiz.dataset.modo = m;
-        botones.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.ppModo === m)));
+        botones.forEach((b) => { const on = b.dataset.ppModo === m; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
       };
       ponModo(qMovil.matches ? 'movil' : 'pc');
       botones.forEach((b) => b.addEventListener('click', () => ponModo(b.dataset.ppModo || 'pc')));
       raiz.querySelector('[data-pp-seg]')?.addEventListener('keydown', (e) => {
         const k = (e as KeyboardEvent).key;
-        if (k !== 'ArrowLeft' && k !== 'ArrowRight') return;
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(k)) return;
         e.preventDefault();
-        const otro = raiz.dataset.modo === 'pc' ? 'movil' : 'pc';
+        const otro = k === 'Home' ? 'pc' : k === 'End' ? 'movil' : raiz.dataset.modo === 'pc' ? 'movil' : 'pc';
         ponModo(otro); botones.find((b) => b.dataset.ppModo === otro)?.focus();
       });
       const set = (k: string, v: number) => raiz.style.setProperty(k, `${Math.round(v * 1000) / 1000}px`);
@@ -618,17 +635,19 @@ const destinos = {
         let y0 = (H - h0) / 2;
         if (!qEsc.matches && textoFase) y0 = textoFase.offsetTop + textoFase.offsetHeight + 36;
         const x0 = (W - w0) / 2;
+        // cabecera y pie se miden SIN el ancho de la medida anterior (evita la realimentación al girar)
+        raiz.style.removeProperty('--pp-tw'); raiz.style.removeProperty('--pp-tl');
         const cabH = cab?.offsetHeight ?? 0, pieH = pie?.offsetHeight ?? 0;
-        const libre = H - cabH - pieH - 28 - 16;
+        const libre = Math.max(H * 0.45, H - cabH - pieH - 28 - 16 - 24);
         const T = qMovil.matches ? Math.min(vw * 1.02, libre / ratio)
           : qEsc.matches ? Math.min(1120, vw * 0.70, libre / ratio)
           : Math.min(vw * 0.94, libre / ratio);
-        const Th = T * ratio;
+        const Th = Math.max(T, w0 * 0.6) * ratio;
         const izq = (raiz.getBoundingClientRect().left - escenario.getBoundingClientRect().left) / zoom(); // 340 px en escritorio
         const tl = (escenario.clientWidth - T) / 2 - izq;  // en coordenadas de la escena
-        const tt = cabH + 14 + Math.max(0, (libre - Th) / 2);
+        const tt = 24 + cabH + 14 + Math.max(0, (libre - Th) / 2);
         set('--pp-x0', x0); set('--pp-y0', y0);
-        raiz.style.setProperty('--pp-k', String(Math.round((T / w0) * 10000) / 10000));
+        raiz.style.setProperty('--pp-k', String(Math.round((Math.max(T, w0 * 0.6) / w0) * 10000) / 10000));
         set('--pp-x', tl - x0); set('--pp-y', tt - y0);
         // cabecera y pie: al ancho de la TAPA (sin el saliente de la base); en el teléfono, a lo ancho
         const tapaW = T / 1.08;
@@ -637,11 +656,16 @@ const destinos = {
         set('--pp-tt', tt); set('--pp-th', Th);
       };
       medirViaje();
-      document.fonts?.ready.then(medirViaje);
+      document.fonts?.ready.then(() => { medirViaje(); if (location.hash === '#proyectos' && ancla) requestAnimationFrame(() => ancla.scrollIntoView()); });
       let tMed = 0, wMed = innerWidth, hMed = innerHeight;
       addEventListener('resize', () => {
         clearTimeout(tMed);
-        tMed = window.setTimeout(() => { if (innerWidth !== wMed || Math.abs(innerHeight - hMed) > 120) { wMed = innerWidth; hMed = innerHeight; medirViaje(); } }, 200);
+        tMed = window.setTimeout(() => {
+          if (innerWidth === wMed && Math.abs(innerHeight - hMed) <= 120) return;
+          wMed = innerWidth; hMed = innerHeight;
+          if (!altoOk()) { lfPin.removeAttribute('data-pin-on'); anclaOn(false); listaWa(); final(); return; }
+          lfPin.setAttribute('data-pin-on', ''); anclaOn(true); medirViaje();
+        }, 200);
       });
       // Progreso del tramo (0 → 1) para el disparo de la secuencia; solo con el tramo a la vista.
       let navPx = 0;
@@ -656,7 +680,12 @@ const destinos = {
       const mira = () => {
         pend = false;
         const p = progreso();
-        if (p >= 0.12 && armada) arranca();
+        // Llegada directa a mitad del tramo (recarga, salto, scroll rápido): estado final, sin secuencia.
+        if (p >= 0.3 && armada) { armada = false; listaWa(); final(); }
+        else if (p >= 0.12 && armada) arranca();
+        // Si se llega a los proyectos con la secuencia a medias, se salta a su final (nunca el bloqueo encima).
+        if (p >= 0.33 && sec.corriendo) { sec.stop(); final(); }
+        if (menu) { const m = p >= 0.38 ? (apps.web ?? '') : sec.corriendo ? null : (apps.correo ?? ''); if (m !== null && menu.textContent !== m) menu.textContent = m; }
         else if (p < 0.02 && !armada) { sec.stop(); reset(); armada = true; }
       };
       new IntersectionObserver((es) => { enVista = es.some((e) => e.isIntersecting); if (enVista) mira(); }).observe(tramo);

@@ -11,13 +11,15 @@ interface Props {
   city?: string;
   size?: 'hero' | 'card' | 'mini';
   tone?: 'gold' | 'teal';
+  /** Categoría (por defecto la de la plomería de ejemplo). */
+  cat?: string;
   class?: string;
 }
-const { lang = 'es', name, city = 'Houston', size = 'card', tone = 'gold', class: cls } = Astro.props;
+const { lang = 'es', name, city = 'Houston', size = 'card', tone = 'gold', cat, class: cls } = Astro.props;
 const en = lang === 'en';
 const T = {
   name: name ?? (en ? 'Your Plumbing' : 'Tu Plomería'),
-  cat: en ? `Plumber · ${city}` : `Plomero · ${city}`,
+  cat: cat ?? (en ? `Plumber · ${city}` : `Plomero · ${city}`),
   reviews: en ? 'Reviews' : 'Reseñas',
   open: en ? 'Open' : 'Abierto',
   closes: en ? 'closes 6 p.m.' : 'cierra 6 p. m.',

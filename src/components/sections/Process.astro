@@ -73,7 +73,7 @@ const viaje = projects ? {
   /* Modo viaje encendido: el CTA ya vive en el pie del portátil y la sección Proyectos de debajo
      (respaldo sin JS) se retira: los proyectos salen en la pantalla del portátil. */
   :global(.lf--pin[data-pin-on]) .process__fin > .riel__launch-inline { display: none; }
-  :global(body:has(.lf--pin[data-pin-on])) :global(#proyectos.projects) { display: none; }
+  :global(body:has(.lf--pin[data-pin-on])) :global(section.projects) { display: none; }
   :global(.lf--pin[data-pin-on]) .process__fin { position: absolute; inset: 0; }
   /* v4: el recorte lateral de la tapa en 3D vive aquí, a ancho de ventana (antes en .abre, que le
      cortaba las esquinas). overflow-x:clip no crea contenedor de scroll: el tramo fijado sigue. */

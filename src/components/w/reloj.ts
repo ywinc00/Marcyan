@@ -60,7 +60,9 @@ let iniciado = false;
 export function iniciaRelojes() {
   if (iniciado) return;
   iniciado = true;
-  pintaRelojes();
+  // Fuera del arranque (la hora de reserva del HTML ya se ve): en tiempo ocioso.
+  const ric = (window as any).requestIdleCallback as ((f: () => void, o?: object) => number) | undefined;
+  if (ric) ric(() => pintaRelojes(), { timeout: 1200 }); else setTimeout(pintaRelojes, 300);
   // Solo se repinta cuando cambia el minuto (los cuerpos que llegan después se pintan al ponerse).
   let min = new Date().getMinutes();
   window.setInterval(() => { const m = new Date().getMinutes(); if (m !== min && !document.hidden) { min = m; pintaRelojes(); } }, 5000);

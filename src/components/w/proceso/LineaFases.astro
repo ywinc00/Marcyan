@@ -284,6 +284,14 @@ const C = T.correo;
   .lf--pin { timeline-scope: --lf-pin; }
   .lf__pin-ancla { display: none; }
   @supports (animation-timeline: view()) {
+    /* #proyectos: donde entra el primer proyecto (42 % del tramo fijado). */
+    .lf--pin[data-pin-on] .lf__pin-ancla {
+      display: block; position: absolute; left: 0; width: 1px; height: 1px;
+      top: calc((100% - (var(--pin-vh, 100svh) / var(--z, 1) - var(--nav-h, 64px))) * .42);
+      scroll-margin-top: var(--nav-h, 64px);
+    }
+  }
+  @supports (animation-timeline: view()) {
     .lf--pin[data-pin-on] .lf__fin--pin {
       display: block; position: relative; padding: 0;
       height: calc(var(--pin-vh, 100svh) / var(--z, 1) * var(--pin-k, 4.6));

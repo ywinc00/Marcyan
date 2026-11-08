@@ -404,9 +404,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     border-radius: 50%; cursor: pointer;
     background: var(--accent-teal); color: var(--fg-inverse); border: none;
     box-shadow: var(--shadow-teal), 0 6px 24px rgba(0, 0, 0, 0.5);
-    transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
+    transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo), opacity .25s ease;
   }
-  .mrc-fab { will-change: transform; }
   :global(.is-aparta) .mrc-fab { transform: translateY(96px); opacity: 0; pointer-events: none; transition: transform .3s cubic-bezier(.4, 0, 1, 1), opacity .2s ease; }
   @media (max-width: 767.98px) { .mrc-fab { width: 52px; height: 52px; } }
   .mrc-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-teal), 0 10px 32px rgba(0, 0, 0, 0.6); }
@@ -1726,7 +1725,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         pend = false;
         const y = scrollY, d = y - yA; yA = y;
         if (opened) return;
-        if (d > 6 && y > 200) root.classList.add('is-aparta');
+        if (d > 6 && y > 200) { if (!root.classList.contains('is-aparta')) root.classList.add('is-aparta'); }
         else if (d < -6) root.classList.remove('is-aparta');
         clearTimeout(tVuelve);
         tVuelve = window.setTimeout(() => root.classList.remove('is-aparta'), 900);

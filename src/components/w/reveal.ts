@@ -57,7 +57,7 @@ function boot() {
       io.unobserve(el);
       i++;
     }
-  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -12% 0px' }); // umbral 0: un bloque muy alto (3.000 px en móvil) se quedaba invisible hasta ver su 15 %
   targets.forEach((el) => io.observe(el));
 }
 

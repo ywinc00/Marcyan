@@ -29,8 +29,11 @@ interface Props {
   distancia?: string;
   size?: 'hero' | 'card';
   class?: string;
+  /** Negocio propio de la página (v6.1): nombre, categoría, servicios e icono, para no repetir
+   *  la misma ficha en dos landings. El horario y la paleta siguen saliendo de `marca`. */
+  propio?: { nombre: string; cat: string; svc: string; icono: 'llave' };
 }
-const { marca = 'restaurante', lang = 'es', city = 'Houston', distancia, size = 'card', class: cls } = Astro.props;
+const { marca = 'restaurante', lang = 'es', city = 'Houston', distancia, size = 'card', class: cls, propio } = Astro.props;
 const en = lang === 'en';
 const n = negocios[marca];
 const pal = n.paleta;
@@ -91,6 +94,7 @@ const T = en
         ? `Ficha de mapa de ejemplo de un restaurante de ${city}: ruta en el mapa, categoría, horario, servicios y botones para llamar, llegar o ir a su web.`
         : `Ficha de mapa de ejemplo de una inmobiliaria de ${city}: ruta en el mapa, categoría, horario, servicios y botones para llamar, llegar o ir a su web.`,
     };
+if (propio) { T.cat = propio.cat; T.svc = propio.svc; T.sr = en ? `Example map listing of ${propio.nombre} in ${city}.` : `Ficha de mapa de ejemplo de ${propio.nombre} en ${city}.`; }
 const hoy = grupos[gHoy];
 const style = `--fm-acc:${pal.accent === '#F7D9A0' ? pal.bg : pal.accent};--fm-on:${pal.accent === '#F7D9A0' ? pal.ink : pal.onAccent};--fm-ink:${marca === 'restaurante' ? pal.bg : pal.ink};--fm-tile:${pal.bg};--fm-tile-ink:${pal.ink}`;
 // La ruta: de "Tú" (abajo a la izquierda) al alfiler, por las calles dibujadas.
@@ -147,14 +151,16 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
     <div class="fm__body">
       <div class="fm__id">
         <span class="fm__tile">
-          {marca === 'restaurante' ? (
+          {propio ? (
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-2-2Z" /><path d="M14.5 6.5 17 4l3 3-2.5 2.5" /></svg>
+          ) : marca === 'restaurante' ? (
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 21V3c-2.2 1.4-3 4-3 7v3h3" /></svg>
           ) : (
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5.5h4V20" /></svg>
           )}
         </span>
         <span class="fm__names">
-          <span class="fm__logo"><LogoEjemplo marca={marca} size={size === 'hero' ? 15 : 13} lang={lang} tono="mono" signo={false} /></span>
+          <span class="fm__logo">{propio ? <b class="fm__nom">{propio.nombre}</b> : <LogoEjemplo marca={marca} size={size === 'hero' ? 15 : 13} lang={lang} tono="mono" signo={false} />}</span>
           <span class="fm__cat">{T.cat}</span>
         </span>
       </div>
@@ -326,6 +332,7 @@ const ROUTE = 'M70 128 C 110 128, 118 96, 160 94 S 236 92, 252 70 S 282 50, 298 
   /* El logotipo es un trazado (no se parte): si la columna es más estrecha que la palabra,
      se escala entero; nunca se recorta (rev2 G05: a 320 px quedaba "tu restau"). */
   .fm__logo :global(.ej-logo) { max-width: 100%; }
+  .fm__nom { display: block; font: 600 1.05em/1.2 var(--font-display); letter-spacing: -.01em; }
   .fm__logo :global(.ej-logo__palabra) { flex: 0 1 auto; max-width: 100%; height: auto; }
   .fm__cat { font-size: 13px; line-height: 1.2; color: #5B5852; }
   .fm__state { margin: 14px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 14px; line-height: 1.2; color: #3E3B36; }

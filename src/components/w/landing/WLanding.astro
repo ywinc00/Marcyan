@@ -63,7 +63,9 @@ const tone: LandingTone =
     : spec.tone ?? (cluster.hero.tone === 'teal' ? 'teal' : 'gold');
 const ctx: LandingCtx = { ...base, tone };
 
-const fondo = spec.fondo ? temaDeFondo(spec.fondo) : undefined;
+// v6: el fondo puede depender de la página (cada barrio y cada sector con su portada propia).
+const fondoId = typeof spec.fondo === 'function' ? spec.fondo(ctx) : spec.fondo;
+const fondo = fondoId ? temaDeFondo(fondoId) : undefined;
 const fondoOp: ReturnType<NonNullable<KindSpec['fondoOpciones']>> =
   fondo && spec.fondoOpciones ? spec.fondoOpciones(ctx) : {};
 const conEco = !!(fondo && fondoOp.eco);

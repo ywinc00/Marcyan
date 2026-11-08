@@ -32,6 +32,29 @@
   padding-inline: var(--container-pad); margin-inline: auto;
 }
 :root[data-ds="v3"] .w-hero { padding-top: var(--w-hero-top); }
+/* v6.1 (dueño, 2026-11-07, como WorkOS): la portada mide EXACTAMENTE la primera pantalla.
+   .w-hero--pantalla: alto de la ventana (dividido por --z en pantallas grandes), en columna, y lo que
+   sobra se recorta en su borde (nunca empuja la página). .w-hero__llena: la parte que ocupa el resto
+   del alto. .w-fit: el objeto se reduce entero, en proporción, si le falta alto (consulta de
+   contenedor; funciona igual con el zoom de pantallas grandes). En el teléfono la portada mide al
+   menos la pantalla y crece si su contenido lo pide (no se corta texto). */
+:root[data-ds="v3"] .w-hero--pantalla {
+  display: flex; flex-direction: column; overflow: clip;
+  height: calc(100svh / var(--z, 1)); min-height: calc(100svh / var(--z, 1)); max-height: 1400px;
+  padding-bottom: 0 !important; box-sizing: border-box;
+}
+:root[data-ds="v3"] .w-hero--pantalla > .w-hero__llena { flex: 1 1 auto; min-height: 0; }
+@media (min-width: 768px) {
+  :root[data-ds="v3"] .w-fit { container: wfit / size; min-height: 0; align-self: stretch; }
+}
+@container wfit (max-height: 640px) { :root[data-ds="v3"] .w-fit > * { zoom: .9; } }
+@container wfit (max-height: 580px) { :root[data-ds="v3"] .w-fit > * { zoom: .8; } }
+@container wfit (max-height: 520px) { :root[data-ds="v3"] .w-fit > * { zoom: .72; } }
+@container wfit (max-height: 460px) { :root[data-ds="v3"] .w-fit > * { zoom: .64; } }
+@container wfit (max-height: 400px) { :root[data-ds="v3"] .w-fit > * { zoom: .56; } }
+@media (max-width: 767.98px) {
+  :root[data-ds="v3"] .w-hero--pantalla { height: auto; overflow-x: clip; overflow-y: visible; }
+}
 
 /* Raíles: 2 líneas verticales de 1 px 48 px POR FUERA del borde del contenido (en WorkOS,
    raíl en x=120 y texto en x=168). El contenido sigue en la línea del logo de la barra; lo

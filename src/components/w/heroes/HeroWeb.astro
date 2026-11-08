@@ -51,6 +51,7 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
 };
 ---
 <section class="w-hero w-hero--bleed hw">
+  <div class="hw__pantalla">
   <div class="w-container hw__text">
     <HeroTexto
       eyebrow={eyebrow}
@@ -65,7 +66,7 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
       <slot name="crumbs" slot="crumbs" />
     </HeroTexto>
   </div>
-  <div class="hw__fan">
+  <div class="hw__fan w-fit">
     <div class="hf">
       <p class="sr-only">{sr}</p>
       <div class="hf__stripes" aria-hidden="true"></div>
@@ -85,6 +86,7 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
         <WebEjemplo marca="plomeria" frame="desnudo" lienzo="vertical" vista="hero" lang={lang} city={cityName} ejemplo={false} />
       </div>
     </div>
+  </div>
   </div>
   <div class="w-container hw__rot"><span>{rotulo}</span></div>
   {city !== 'miami' && (
@@ -180,4 +182,10 @@ const fondoDe = (id: 'salon' | 'restaurante') => {
     /* Solo asoman 25 px: color de la marca, sin texto (nada a medias). */
     .hf__mini, .hf__foto { display: none; }
   }
+
+  /* v6.1: texto y abanico ocupan exactamente la primera pantalla (como AuthKit); el abanico se reduce si
+     falta alto y el rótulo y los logos quedan justo debajo, al bajar. */
+  .hw__pantalla { display: flex; flex-direction: column; height: calc(100svh / var(--z, 1) - var(--w-hero-top)); max-height: 1300px; }
+  .hw__pantalla > .hw__fan { flex: 1 1 auto; min-height: 0; }
+  @media (max-width: 767.98px) { .hw__pantalla { height: auto; } }
 </style>

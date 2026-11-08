@@ -24,15 +24,15 @@ interface Props {
 }
 const { eyebrow, h1Html, lead, cards } = Astro.props;
 ---
-<section class="w-hero ph">
-  <div class="w-container ph__wrap">
+<section class="w-hero w-hero--pantalla ph">
+  <div class="w-container ph__wrap w-hero__llena">
     {Astro.slots.has('crumbs') && <div class="ph__crumbs"><slot name="crumbs" /></div>}
     <div class="ph__text">
       <div data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
       <h1 class="w-h1 w-h1--hub ph__h1" data-w-in="1" set:html={h1Html} />
       <p class="w-lead ph__lead" data-w-in="2">{lead.split(' · ').map((part, i) => <>{i > 0 && <span class="ph__dot" aria-hidden="true"> · </span>}<span class="ph__part">{part}</span></>)}</p>
     </div>
-    <div class="ph__cards" data-w-in="obj">
+    <div class="ph__cards w-fit" data-w-in="obj">
       <TarjetasModelo cards={cards} />
     </div>
   </div>
@@ -71,4 +71,8 @@ const { eyebrow, h1Html, lead, cards } = Astro.props;
     .ph__cards :global(.tm__card:first-child .btn--link:focus-visible .btn__chev) { transform: none; }
   }
   @media (--lt-md) { .ph__cards { margin-top: 48px; } }
+
+  /* v6.1: la portada mide la pantalla; los dos modelos ocupan el resto y se reducen si falta alto. */
+  .ph__wrap { display: flex; flex-direction: column; }
+  .ph__wrap > .ph__cards { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
 </style>

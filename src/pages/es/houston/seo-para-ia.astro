@@ -92,7 +92,7 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
     <!-- 1 · Hero: túnel de rejilla a ventana completa; texto en el rectángulo limpio; la
          respuesta del asistente debajo del rectángulo, fuera del túnel. -->
     <!-- v3 (E-57 regla 2): sin líneas de margen en el hero (cruzaban las líneas del túnel). -->
-    <section class="w-hero--bleed sh" data-w-sin-rail>
+    <section class="w-hero--bleed w-hero--pantalla sh" data-w-sin-rail>
       <div class="w-container sh__crumbs">
         <Breadcrumb items={p.breadcrumb} lang="es" />
       </div>
@@ -109,7 +109,7 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
           />
         </div>
       </div>
-      <div class="w-container sh__obj" data-w-in="obj">
+      <div class="w-container sh__obj w-hero__llena" data-w-in="obj">
         <RespuestaAsistente variant="tarjeta" size="hero" business={t.business} class="sh__ans" />
       </div>
     </section>
@@ -292,6 +292,15 @@ const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
   /* Margen superior algo más corto que en la ronda 1: a 1440×900 la tarjeta del hero entra
      entera en la primera pantalla (control rev1 m-1). */
   .sh__room { position: relative; margin-top: clamp(96px, 6vw + 20px, 140px); }
+  /* v6.1: la portada mide la pantalla; la respuesta del asistente ocupa el resto y se reduce si falta alto. */
+  @media (min-width: 768px) { .sh__room { margin-top: clamp(40px, 4vw, 80px); } .sh.w-hero--pantalla > .sh__obj { margin-top: 40px; padding-bottom: 24px; align-items: flex-start; }
+    .sh.w-hero--pantalla > .sh__obj { container: shobj / size; } }
+  /* la tarjeta mide 460×~260: se reduce solo lo que falte de alto para que la respuesta se vea entera */
+  @container shobj (max-height: 290px) { .sh__obj :global(.sh__ans) { zoom: .86; } }
+  @container shobj (max-height: 250px) { .sh__obj :global(.sh__ans) { zoom: .74; } }
+  @container shobj (max-height: 215px) { .sh__obj :global(.sh__ans) { zoom: .64; } }
+  @container shobj (max-height: 185px) { .sh__obj :global(.sh__ans) { zoom: .56; } }
+  @container shobj (max-height: 160px) { .sh__obj :global(.sh__ans) { zoom: .5; } }
   .sh__room :global(.sh__tunnel) {
     inset: auto; left: calc(50% - 50vw); right: calc(50% - 50vw);
     top: calc(-40% - 86.4px); bottom: calc(-40% - 86.4px);

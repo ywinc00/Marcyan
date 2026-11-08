@@ -1,0 +1,95 @@
+---
+// Doral · la web bilingüe de ejemplo (v6.1). Misma idea que la escena bilingüe del proceso (la web
+// que pasa de español a inglés), con contenido PROPIO de esta página para no repetir texto entre
+// landings: una agencia de carga de Doral (el barrio vive del aeropuerto y la logística). La pastilla
+// ES | EN cambia sola cada 3,5 s y la web cruza de idioma; con movimiento reducido, quieta en español.
+const L = {
+  es: { nav: ['Servicios', 'Rastreo', 'Contacto'], zona: 'Doral · junto al aeropuerto de Miami', h: 'Tu carga, de Doral al mundo.', p: 'Envíos aéreos y marítimos a Latinoamérica, con seguimiento en tu idioma.', cta: 'Cotizar envío', svc: ['Aéreo', 'Marítimo', 'Aduanas', 'Puerta a puerta'], pie: 'Lun a vie · 8:00 a. m. a 7:00 p. m.' },
+  en: { nav: ['Services', 'Tracking', 'Contact'], zona: 'Doral · next to Miami airport', h: 'Your cargo, from Doral to the world.', p: 'Air and ocean freight to Latin America, tracked in your language.', cta: 'Get a quote', svc: ['Air', 'Ocean', 'Customs', 'Door to door'], pie: 'Mon to Fri · 8:00 AM to 7:00 PM' },
+} as const;
+---
+<div class="bc" data-bc>
+  <p class="sr-only">Ejemplo: la web de una agencia de carga de Doral que cambia de español a inglés.</p>
+  <div class="bc__win" aria-hidden="true" data-nosnippet>
+    <div class="bc__bar">
+      <span class="bc__dots"><i></i><i></i><i></i></span>
+      <span class="bc__url">tucarga.example · Ejemplo</span>
+      <span class="bc__tog"><span class="bc__pill"></span><b>ES</b><b>EN</b></span>
+    </div>
+    <div class="bc__body">
+      {(['es', 'en'] as const).map((k) => {
+        const t = L[k];
+        return (
+          <div class:list={['bc__capa', `bc__capa--${k}`]} lang={k}>
+            <div class="bc__nav"><span class="bc__logo"><i></i>Tu Carga</span><span class="bc__links">{t.nav.map((n) => <span>{n}</span>)}<b>{t.cta}</b></span></div>
+            <div class="bc__hero">
+              <div class="bc__txt">
+                <span class="bc__zona">{t.zona}</span>
+                <span class="bc__h">{t.h}</span>
+                <span class="bc__p">{t.p}</span>
+                <span class="bc__btn">{t.cta}</span>
+              </div>
+              <span class="bc__arte"><i></i><i></i><i></i></span>
+            </div>
+            <div class="bc__svc">{t.svc.map((s) => <span>{s}</span>)}</div>
+            <div class="bc__pie">{t.pie}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-bc]').forEach((el) => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let en = false, t = 0;
+    const tick = () => { en = !en; el.classList.toggle('is-en', en); };
+    const io = new IntersectionObserver((es) => {
+      const on = es.some((e) => e.isIntersecting);
+      window.clearInterval(t);
+      if (on) t = window.setInterval(tick, 3500);
+    });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .bc { position: relative; width: 100%; }
+  .bc__win { border-radius: 14px; overflow: hidden; background: #f6f3ec; box-shadow: 0 60px 100px -40px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 255, 255, .06); container-type: inline-size; }
+  .bc__bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #ebe6dc; border-bottom: 1px solid #ddd6c8; }
+  .bc__dots { display: inline-flex; gap: 6px; } .bc__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(14, 14, 13, .16); }
+  .bc__url { flex: 1; text-align: center; font: 12px var(--font-mono); color: #6b655a; background: #f6f3ec; border-radius: 6px; padding: 4px 10px; }
+  .bc__tog { position: relative; display: inline-flex; background: #1b1815; border-radius: 999px; padding: 3px; }
+  .bc__tog b { position: relative; z-index: 1; width: 36px; text-align: center; font: 600 11px/22px var(--font-mono); color: rgba(240, 237, 232, .6); transition: color .3s; }
+  .bc__tog b:first-of-type { color: #1b1815; }
+  .bc__pill { position: absolute; top: 3px; left: 3px; width: 36px; height: 22px; border-radius: 999px; background: var(--accent-gold); transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
+  .bc.is-en .bc__pill { transform: translateX(36px); }
+  .bc.is-en .bc__tog b:first-of-type { color: rgba(240, 237, 232, .6); }
+  .bc.is-en .bc__tog b:last-of-type { color: #1b1815; }
+  .bc__body { position: relative; aspect-ratio: 16 / 9.4; }
+  .bc__capa { position: absolute; inset: 0; display: flex; flex-direction: column; transition: opacity .5s ease, transform .5s ease; color: #17202a; }
+  .bc__capa--en { opacity: 0; transform: translateY(6px); }
+  .bc.is-en .bc__capa--es { opacity: 0; transform: translateY(-6px); }
+  .bc.is-en .bc__capa--en { opacity: 1; transform: none; }
+  .bc__nav { display: flex; justify-content: space-between; align-items: center; padding: 2.4cqw 3.4cqw; border-bottom: 1px solid #e3ddd1; }
+  .bc__logo { display: inline-flex; align-items: center; gap: 1cqw; font: 600 2.1cqw var(--font-display); }
+  .bc__logo i { width: 2.4cqw; height: 2.4cqw; border-radius: .6cqw; background: linear-gradient(140deg, #1f4e79, #3f86b8); }
+  .bc__links { display: inline-flex; gap: 2.2cqw; align-items: center; font-size: 1.6cqw; color: #4b5562; }
+  .bc__links b { background: #1f4e79; color: #f6f3ec; padding: .9cqw 1.6cqw; border-radius: 999px; font-weight: 600; }
+  .bc__hero { flex: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 3cqw; padding: 3.4cqw; align-items: center; }
+  .bc__txt { display: flex; flex-direction: column; gap: 1.4cqw; }
+  .bc__zona { font: 500 1.3cqw var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #1f4e79; }
+  .bc__h { font: 500 4.6cqw/1.04 var(--font-display); letter-spacing: -.03em; }
+  .bc__p { font-size: 1.8cqw; line-height: 1.45; color: #4b5562; }
+  .bc__btn { align-self: flex-start; margin-top: .6cqw; background: #17202a; color: #f6f3ec; padding: 1.3cqw 2.2cqw; border-radius: 999px; font-weight: 600; font-size: 1.6cqw; }
+  .bc__arte { position: relative; height: 26cqw; border-radius: 2cqw; overflow: hidden; background: linear-gradient(170deg, #d9e6f0, #a9c6dc 55%, #6f9fc4); }
+  .bc__arte i { position: absolute; border-radius: .8cqw; background: #f6f3ec; box-shadow: 0 1.4cqw 3cqw -1cqw rgba(23, 32, 42, .35); }
+  .bc__arte i:nth-child(1) { left: 14%; bottom: 14%; width: 34%; height: 30%; background: #e7b77a; }
+  .bc__arte i:nth-child(2) { left: 40%; bottom: 14%; width: 34%; height: 44%; background: #d39a55; }
+  .bc__arte i:nth-child(3) { left: 26%; bottom: 52%; width: 30%; height: 26%; background: #f0d2a4; }
+  .bc__svc { display: flex; gap: 1.2cqw; padding: 0 3.4cqw 1.8cqw; }
+  .bc__svc span { border: 1px solid #d9d2c4; border-radius: 999px; padding: .8cqw 1.6cqw; font-size: 1.5cqw; color: #34404c; background: #fbf9f4; }
+  .bc__pie { padding: 1.4cqw 3.4cqw; border-top: 1px solid #e3ddd1; font: 1.3cqw var(--font-mono); color: #6a7480; }
+  @media (prefers-reduced-motion: reduce) { .bc__capa, .bc__pill { transition: none; } }
+</style>

@@ -78,7 +78,8 @@ const spec: KindSpec = {
   // v3 (dueño, E-57): el hero lleva SOLO la malla de rombos (F30), sin la trama de calles. Sin
   // eco en el capítulo de contraste: «Zonas que cubrimos» ya trae su mapa real del área.
   // v4 (dueño, 2026-11-06): la malla «no calzó»; el hero lleva el plano REAL de calles del barrio (F31).
-  fondo: 'F31',
+  // v6.1: solo Katy conserva el plano de calles; Sugar Land, Doral y Hialeah pintan su propio fondo en la portada.
+  fondo: (ctx) => (barrioOf(ctx.cluster.path) === 'katy' ? 'F31' : undefined),
   Hero: HeroBarrio,
   hero: (ctx) => {
     const t = copyOf(ctx);
@@ -92,6 +93,7 @@ const spec: KindSpec = {
       producto: t.escena.producto,
       pildora: t.escena.pildora,
       chat: t.escena.chat,
+      lados: t.escena.lados,
       chatSr: t.escena.chat ? `Ejemplo: un cliente de ${t.name} escribe por WhatsApp y Marcy le contesta en español al momento.` : undefined,
       lang: ctx.lang,
     };

@@ -119,7 +119,7 @@ export interface KindSpec {
    * Fondo temático (P12). Si existe, WLanding monta `<Fondo tema>` en el hero y NO monta
    * SpaceBackdrop (una atmósfera por página). Si falta, la página queda igual que hoy.
    */
-  fondo?: TemaFondo | CodigoFondo;
+  fondo?: TemaFondo | CodigoFondo | ((ctx: LandingCtx) => TemaFondo | CodigoFondo | undefined);
   /**
    * Opciones del fondo: eco quieto al 40 % en el capítulo de contraste, lado del texto del
    * hero, barrio de F08 (solo el eco dibuja sus vías reales) y `vars`, ajustes de posición

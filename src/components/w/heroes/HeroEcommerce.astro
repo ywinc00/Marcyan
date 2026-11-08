@@ -27,8 +27,8 @@ interface Props {
 }
 const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero he">
-  <div class="w-container he__grid">
+<section class="w-hero w-hero--pantalla he">
+  <div class="w-container he__grid w-hero__llena">
     <div class="he__text">
       <HeroTexto
         eyebrow={eyebrow}
@@ -43,7 +43,7 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
         <slot name="crumbs" slot="crumbs" />
       </HeroTexto>
     </div>
-    <div class="he__obj" data-w-in="obj">
+    <div class="he__obj w-fit" data-w-in="obj">
       <div class="he__campo"><PedidosHoy lang={lang} /></div>
       <ProductoArte modo="sprite" />
     </div>
@@ -80,4 +80,7 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
     .he__grid { gap: 48px; }
     /* Texto a la izquierda también en móvil, como los demás heros partidos (control global r1). */
   }
+
+  /* v6.1: la portada mide la pantalla; la rejilla llena el alto y el objeto se reduce si falta. */
+  @media (--lg) { .he__grid { grid-template-rows: minmax(0, 1fr); min-height: 0; } .he__obj { height: 100%; align-items: center; } }
 </style>

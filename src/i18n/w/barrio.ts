@@ -30,10 +30,12 @@ export interface BarrioCopy {
   /** v6 · portada: el producto que promete la bajada + la píldora quién → qué → resultado
    *  (WorkOS W-EVT-06). Todo es ejemplo y va rotulado en el objeto. */
   escena: {
-    producto: 'ficha' | 'web' | 'bilingue' | 'chat';
+    producto: 'ficha' | 'pasaporte' | 'bilingue' | 'chat';
     pildora: { quien: string; que: string; resultado: string; icon?: string };
     /** Guion del chat (solo producto 'chat'). */
     chat?: { from: 'c' | 'm'; text: string; time?: string }[];
+    /** Tarjetas inclinadas de los lados (Hialeah). */
+    lados?: { quien: string; texto: string }[];
   };
   /** v6 · ciclo «cómo llega un cliente» con la búsqueda del barrio (WorkOS W-PROOF-11). */
   ciclo: { busca: string; zona: string };
@@ -118,8 +120,8 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
       lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Houston.',
     },
     prosa: { tone1: 'En Katy, el cliente busca', tone2: 'por su zona, no por «Houston».', items: [1, 2, 3, 5] },
-    escena: { producto: 'ficha', pildora: { quien: 'Familia en Cinco Ranch', que: '«restaurante abierto ahora»', resultado: 'Pidió cómo llegar' } },
-    ciclo: { busca: 'restaurante abierto ahora', zona: 'Cinco Ranch' },
+    escena: { producto: 'ficha', pildora: { quien: 'Vecino en Cinco Ranch', que: '«taller mecánico abierto»', resultado: 'Pidió cómo llegar' } },
+    ciclo: { busca: 'taller mecánico abierto', zona: 'Cinco Ranch' },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },
     cierre: { proof: 'Hacemos sitios para negocios reales del área de Houston, como Julio’s Landscape TX y Texas Rush Remove.' },
   },
@@ -138,7 +140,7 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
       lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Houston.',
     },
     prosa: { tone1: 'Sugar Land', tone2: 'no es un mercado cualquiera.', items: [0, 1, 2, 4] },
-    escena: { producto: 'web', pildora: { quien: 'Cliente en First Colony', que: 'abre tu web', resultado: 'Pidió presupuesto', icon: 'lucide:globe' } },
+    escena: { producto: 'pasaporte', pildora: { quien: 'Cliente en First Colony', que: 'abre tu web', resultado: 'Pidió presupuesto', icon: 'lucide:globe' } },
     ciclo: { busca: 'salón de belleza cerca de mí', zona: 'First Colony' },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },
     cierre: { proof: 'Hacemos sitios para negocios reales del área de Houston, como Julio’s Landscape TX y Texas Rush Remove.' },
@@ -158,8 +160,8 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
       lead: 'Elige una zona para ver sus servicios. Donde una zona no tiene página propia, cada servicio te lleva a su página de Miami.',
     },
     prosa: { tone1: 'Doral no es «Miami genérico»:', tone2: 'es Doralzuela.', items: [0, 1, 2, 3] },
-    escena: { producto: 'bilingue', pildora: { quien: 'Cliente en Doral', que: '«hair salon near me»', resultado: 'Reservó en inglés' } },
-    ciclo: { busca: 'salón de belleza en Doral', zona: 'Doral' },
+    escena: { producto: 'bilingue', pildora: { quien: 'Client in Doral', que: '«freight forwarder near me»', resultado: 'Cotizó en inglés' } },
+    ciclo: { busca: 'agencia de carga en Doral', zona: 'Doral' },
     caso: { lead: 'Nuestro trabajo publicado es de Houston y de Florida (Orlando), y lo rotulamos por su ciudad real.' },
     cierre: { proof: 'Hacemos sitios para negocios reales, como Move Junk Away en Orlando, Florida.' },
   },
@@ -180,10 +182,14 @@ export const barrioCopy: Record<Barrio, BarrioCopy> = {
     prosa: { tone1: 'En Hialeah, el español', tone2: 'es el negocio.', items: [0, 2, 3, 4] },
     escena: { producto: 'chat', pildora: { quien: 'Cliente en Hialeah', que: '«¿abren hoy?»', resultado: 'Respondido al instante', icon: 'lucide:message-circle' },
       chat: [
-        { from: 'c', text: 'Oye, ¿ustedes abren hoy? Necesito arreglar el aire del carro.', time: '9:12' },
-        { from: 'm', text: '¡Buenos días! Sí, abrimos hasta las 6:00 p. m. ¿Qué carro es y qué le pasa al aire?', time: '9:12' },
-        { from: 'c', text: 'Un Corolla, echa aire caliente.', time: '9:13' },
-        { from: 'm', text: 'Tráelo a las 11:00 y te lo revisan. Te lo dejo apuntado a tu nombre.', time: '9:13' },
+        { from: 'c', text: 'Oye, ¿abren hoy? El aire del carro echa caliente.', time: '9:12' },
+        { from: 'm', text: '¡Buenos días! Sí, hasta las 6:00 p. m. Tráelo a las 11:00 y te lo revisan.', time: '9:12' },
+        { from: 'c', text: 'Perfecto, allá voy.', time: '9:13' },
+      ],
+      lados: [
+        { quien: 'Panadería en la 49', texto: '¿Les quedan pastelitos de guayaba?' },
+        { quien: 'Uñas en Palm Ave', texto: '¿Tienen turno el sábado por la mañana?' },
+        { quien: 'Notaría', texto: '¿Hacen traducciones certificadas?' },
       ] },
     ciclo: { busca: 'mecánico en Hialeah', zona: 'Hialeah' },
     caso: { lead: 'Nuestro trabajo publicado es del área de Houston y lo rotulamos por su ciudad real.' },

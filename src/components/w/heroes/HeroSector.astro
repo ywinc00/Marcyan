@@ -12,6 +12,7 @@ import HeroTexto from '../HeroTexto.astro';
 import TarjetaObjeto from '../objetos/TarjetaObjeto.astro';
 import ObjetoOficio from '../sections/sector/ObjetoOficio.astro';
 import Icon from '../../ui/Icon.astro';
+import HeroContratista from './HeroContratista.astro';
 
 interface Cta { label: string; href: string; track?: string }
 interface Props {
@@ -35,25 +36,9 @@ const { h1Html, chip, eyebrow, lead, primary, link, obj, sr, lang = 'es' } = Ast
 // diagonal (0,85 s, curva ease, tras 0,5 s), con sombra en capas. Geometría propia en oro, no su recurso.
 // Los haces se anclan a la tarjeta (no a la ventana): el punto de cierre siempre cae tras su borde.
 const haz = obj === 'inmobiliaria';
-// v6 · contratistas (WorkOS W-ADV-51, página de la caja fuerte: los objetos viajan por una cinta y
-// entran en la caja). Aquí lo que le llega a un contratista viaja por la cinta y entra en su sitio.
-const cinta = obj === 'contratista';
+// v6.1: contratistas tiene su propia portada (HeroContratista, mecanismo de /audit-logs).
+const cinta = false;
 const en = lang === 'en';
-const CINTA = en
-  ? [
-      { icon: 'lucide:phone-missed', t: 'Missed call' },
-      { icon: 'lucide:image', t: 'Job photos' },
-      { icon: 'lucide:file-text', t: 'Quote request' },
-      { icon: 'lucide:star', t: 'New review' },
-      { icon: 'lucide:message-circle', t: 'WhatsApp message' },
-    ]
-  : [
-      { icon: 'lucide:phone-missed', t: 'Llamada perdida' },
-      { icon: 'lucide:image', t: 'Fotos de obra' },
-      { icon: 'lucide:file-text', t: 'Solicitud de presupuesto' },
-      { icon: 'lucide:star', t: 'Reseña nueva' },
-      { icon: 'lucide:message-circle', t: 'Mensaje de WhatsApp' },
-    ];
 // v6 · restaurantes (WorkOS W-ADV-56 + W-CORE-24, páginas de registros y de sincronización: el
 // producto al frente y los tipos de evento desfilando detrás en dos cintas pálidas).
 const eventos = obj === 'restaurante';
@@ -94,8 +79,13 @@ const IZQ = Array.from({ length: N }, (_, i) =>
 const DER = Array.from({ length: N }, (_, i) =>
   `M0 ${f(120 + i * .4)} C 220 ${f(121 + i * 1.6)}, 420 ${f(150 + i * 9)}, 1100 ${f(176 + i * 17)}`);
 ---
-<section class:list={['w-hero hs', `hs--${obj}`]}>
-  <div class="w-container hs__grid">
+{obj === 'contratista' ? (
+  <HeroContratista h1Html={h1Html} chip={chip} eyebrow={eyebrow} lead={lead} primary={primary} link={link} sr={sr} lang={lang}>
+    <slot name="crumbs" slot="crumbs" />
+  </HeroContratista>
+) : (
+<section class:list={['w-hero w-hero--pantalla hs', `hs--${obj}`]}>
+  <div class="w-container hs__grid w-hero__llena">
     <HeroTexto
       eyebrow={eyebrow}
       tone="gold"
@@ -109,7 +99,7 @@ const DER = Array.from({ length: N }, (_, i) =>
     >
       <slot name="crumbs" slot="crumbs" />
     </HeroTexto>
-    <div class="hs__obj">
+    <div class="hs__obj w-fit">
       <div class="hs__pieza">
         {haz && (
           <svg class="hs__haz hs__haz--izq" viewBox="0 0 1800 760" aria-hidden="true">
@@ -135,17 +125,6 @@ const DER = Array.from({ length: N }, (_, i) =>
             {DER.map((d) => <path d={d} />)}
           </svg>
         )}
-        {cinta && (
-          <div class="hs__cinta" aria-hidden="true">
-            <div class="hs__banda"></div>
-            <div class="hs__carril hs__carril--izq">
-              {CINTA.slice(0, 2).map((c, i) => <span class="hs__pza" style={`--i:${i}`}><Icon name={c.icon} />{c.t}</span>)}
-            </div>
-            <div class="hs__carril hs__carril--der">
-              {CINTA.slice(2).map((c, i) => <span class="hs__pza" style={`--i:${i}`}><Icon name={c.icon} />{c.t}</span>)}
-            </div>
-          </div>
-        )}
         {eventos && (
           <div class="hs__evs" aria-hidden="true">
             {[EV1, EV2].map((row, r) => (
@@ -167,6 +146,7 @@ const DER = Array.from({ length: N }, (_, i) =>
     </div>
   </div>
 </section>
+)}
 
 <style>
   .hs { overflow-x: clip; padding-bottom: 96px; }
@@ -235,39 +215,6 @@ const DER = Array.from({ length: N }, (_, i) =>
     .hs__haz--der { left: calc(100% - 40px); }
   }
 
-  /* ── v6 · contratistas: la cinta (W-ADV-51) ───────────────────────────
-     Banda de noche con franjas diagonales finas en oro que nace en el centro de la tarjeta y sale
-     por el borde derecho de la ventana (nunca bajo el texto, E-37). Las piezas viajan de derecha a
-     izquierda y entran por detrás de la tarjeta: lo que le llega al negocio entra en su sitio. */
-  .hs__cinta { position: absolute; z-index: -2; left: -170px; right: -50vw; top: 58%; height: 92px; transform: translateY(-50%); pointer-events: none; }
-  .hs__banda {
-    position: absolute; inset: 0;
-    background:
-      repeating-linear-gradient(115deg, rgba(var(--accent-gold-rgb), .2) 0 1px, transparent 1px 12px),
-      linear-gradient(180deg, rgba(var(--accent-gold-rgb), .12), rgba(var(--accent-gold-rgb), .05));
-    border-block: 1px solid rgba(var(--accent-gold-rgb), .4);
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 75%, transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 75%, transparent 100%);
-  }
-  /* Dos carriles que acaban en el centro de la tarjeta: lo de la izquierda entra hacia la derecha y
-     lo de la derecha hacia la izquierda; las piezas desaparecen por detrás de la tarjeta. */
-  .hs__carril { position: absolute; top: 0; bottom: 0; }
-  /* la cinta empieza 200 px a la izquierda de la tarjeta; 50cqw = media tarjeta (la pieza es contenedor) */
-  .hs__carril--izq { left: 0; width: calc(170px + 50cqw); }
-  .hs__carril--der { left: calc(170px + 50cqw); right: 0; }
-  .hs__pza {
-    position: absolute; top: 50%;
-    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
-    padding: 8px 13px; border-radius: 999px;
-    background: var(--w-p-bg, #f0ede8); color: #1b1815; font: 500 13px/1.2 var(--font-body);
-    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .7);
-    opacity: 0;
-  }
-  .hs__pza :global(svg) { width: 15px; height: 15px; color: #8a6a3a; flex: 0 0 auto; }
-  .hs__carril--der .hs__pza { left: 100%; transform: translate(0, -50%); animation: hs-pza-d 9s linear infinite; animation-delay: calc(var(--i) * -3s); }
-  .hs__carril--izq .hs__pza { left: 0; transform: translate(0, -50%); animation: hs-pza-i 7s linear infinite; animation-delay: calc(var(--i) * -3.5s); }
-  @keyframes hs-pza-d { 0% { left: 100%; opacity: 0; } 10% { opacity: 1; } 85% { opacity: 1; } 100% { left: 0; opacity: 0; } }
-  @keyframes hs-pza-i { 0% { left: 0; opacity: 0; } 20% { opacity: 1; } 75% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
   /* ── v6 · restaurantes: eventos desfilando detrás (W-ADV-56 + W-CORE-24) ── */
   .hs__evs { position: absolute; z-index: -2; left: -280px; right: -50vw; top: 0; bottom: 0; pointer-events: none; overflow: hidden;
     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 80%, transparent 100%);
@@ -286,17 +233,13 @@ const DER = Array.from({ length: N }, (_, i) =>
   .hs__ev :global(svg) { width: 15px; height: 15px; color: var(--accent-teal); flex: 0 0 auto; }
   @keyframes hs-ev { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce) {
-    .hs__carril .hs__pza { animation: none; opacity: 1; }
-    .hs__carril--izq .hs__pza { left: 40%; } .hs__carril--izq .hs__pza:nth-child(n + 2) { display: none; }
-    .hs__carril--der .hs__pza { left: 70%; } .hs__carril--der .hs__pza:nth-child(n + 2) { display: none; }
     .hs__ev-track { animation: none; }
   }
   @media (--lt-md) {
-    .hs__cinta { left: -24px; right: -24px; height: 76px; }
-    .hs__carril--izq { width: calc(24px + 50cqw); } .hs__carril--der { left: calc(24px + 50cqw); }
-    .hs__pza { font-size: 12px; padding: 7px 11px; }
     .hs__evs { left: -24px; right: -24px; }
   }
+  /* v6.1: la rejilla llena el alto de la portada y el objeto se centra en su celda. */
+  @media (--lg) { .hs__grid { grid-template-rows: minmax(0, 1fr); align-items: center; } .hs__obj { height: 100%; align-items: center; } }
   @media (--lg) {
     /* Texto en la línea del logo (contenedor), objeto a la derecha con aire para su capa. */
     .hs__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 480px; }

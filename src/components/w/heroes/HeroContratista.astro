@@ -1,0 +1,245 @@
+---
+// Hero de contratistas (ES y EN). v6.1 (dueño, 2026-11-07). Mecanismo de WorkOS /audit-logs: el
+// producto al frente y, detrás, los tipos de evento en filas de cápsulas pálidas que desfilan
+// despacio. Aquí el producto es la pantalla de bloqueo del teléfono del contratista: cada vez que una
+// cápsula del fondo se enciende (llamada, reseña, solicitud, correo, WhatsApp, cita), llega su aviso
+// a la pila y el contador de avisos anteriores sube. La hora y el día del reloj son los del visitante.
+// Fondo: espacio con pocas estrellas y una nebulosa suave en los tonos de Marcyan (sin dibujos de obra).
+// Ocupa exactamente la primera pantalla; el teléfono se reduce entero si falta alto (consulta de
+// contenedor, igual con el zoom de pantallas grandes).
+import HeroTexto from '../HeroTexto.astro';
+import Icon from '../../ui/Icon.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  sr: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, sr, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+type Ev = { icon: string; n: string; d: string; app: string; t: string; b: string };
+const EV: Ev[] = en
+  ? [
+      { icon: 'lucide:phone-missed', n: 'call.missed', d: 'Missed call · answered by Marcy', app: 'Marcy', t: 'Missed call answered', b: 'Leak under the sink · Pasadena' },
+      { icon: 'lucide:star', n: 'review.new', d: 'New 5-star review', app: 'Google', t: 'New review ★★★★★', b: '“They came the same day.”' },
+      { icon: 'lucide:file-text', n: 'quote.requested', d: 'Quote request from your site', app: 'Your site', t: 'Quote request', b: 'Roof replacement · Katy' },
+      { icon: 'lucide:mail', n: 'email.received', d: 'Email saved to your inbox', app: 'Email', t: 'New contact', b: 'Bathroom remodel · Sugar Land' },
+      { icon: 'lucide:message-circle', n: 'whatsapp.message', d: 'WhatsApp message answered', app: 'WhatsApp', t: 'Do you work on Saturdays?', b: 'Marcy replied with your hours' },
+      { icon: 'lucide:calendar-check', n: 'visit.booked', d: 'Inspection booked', app: 'Calendar', t: 'Inspection booked', b: 'Thursday 9:00 AM · Spring Branch' },
+      { icon: 'lucide:image', n: 'photos.received', d: 'Job photos received', app: 'Your site', t: 'Photos received', b: 'Water heater · 3 photos' },
+    ]
+  : [
+      { icon: 'lucide:phone-missed', n: 'llamada.perdida', d: 'Llamada perdida · Marcy contestó', app: 'Marcy', t: 'Llamada contestada', b: 'Fuga debajo del fregadero · Pasadena' },
+      { icon: 'lucide:star', n: 'reseña.nueva', d: 'Reseña nueva de 5 estrellas', app: 'Google', t: 'Reseña nueva ★★★★★', b: '«Vinieron el mismo día.»' },
+      { icon: 'lucide:file-text', n: 'presupuesto.pedido', d: 'Solicitud desde tu web', app: 'Tu web', t: 'Solicitud de presupuesto', b: 'Cambio de techo · Katy' },
+      { icon: 'lucide:mail', n: 'correo.recibido', d: 'Correo guardado en tu bandeja', app: 'Correo', t: 'Contacto nuevo', b: 'Remodelación de baño · Sugar Land' },
+      { icon: 'lucide:message-circle', n: 'whatsapp.mensaje', d: 'Mensaje de WhatsApp contestado', app: 'WhatsApp', t: '¿Trabajan los sábados?', b: 'Marcy contestó con tu horario' },
+      { icon: 'lucide:calendar-check', n: 'visita.agendada', d: 'Inspección agendada', app: 'Calendario', t: 'Inspección agendada', b: 'Jueves 9:00 a. m. · Spring Branch' },
+      { icon: 'lucide:image', n: 'fotos.recibidas', d: 'Fotos de obra recibidas', app: 'Tu web', t: 'Fotos recibidas', b: 'Calentador · 3 fotos' },
+    ];
+// Filas del fondo: cada evento aparece en las filas, a izquierda y derecha del teléfono.
+const FILAS = [0, 1, 2, 3].map((r) => [...EV.slice(r % EV.length), ...EV.slice(0, r % EV.length)]);
+const T = en
+  ? { mas: (n: number) => `${n} earlier notifications`, dia: 'Thursday', hora: '9:40', p: 'PM', ahora: 'now' }
+  : { mas: (n: number) => `${n} avisos anteriores`, dia: 'jueves', hora: '9:40', p: 'p. m.', ahora: 'ahora' };
+---
+<section class="w-hero hc" data-hc data-lang={lang}>
+  <div class="hc__cielo" aria-hidden="true"><i class="hc__neb hc__neb--1"></i><i class="hc__neb hc__neb--2"></i><i class="hc__neb hc__neb--3"></i><span class="hc__est"></span></div>
+
+  <div class="w-container hc__text">
+    <HeroTexto eyebrow={eyebrow} tone="gold" chip={chip} h1Html={h1Html} lead={lead} primary={primary} link={link} align="center">
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+  </div>
+
+  <div class="hc__zona" data-w-in="obj">
+    <div class="hc__filas" aria-hidden="true">
+      {FILAS.map((fila, r) => (
+        <div class:list={['hc__fila', `hc__fila--${r + 1}`]}>
+          <div class="hc__pista">
+            {[...fila, ...fila].map((e) => (
+              <span class="hc__ev" data-ev={e.n}><Icon name={e.icon} /><b>{e.n}</b><span>{e.d}</span></span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="hc__tel" data-nosnippet>
+      <p class="sr-only">{sr}</p>
+      <div class="hc__pantalla" aria-hidden="true">
+        <span class="hc__isla"></span>
+        <span class="hc__ej">{en ? 'EXAMPLE' : 'EJEMPLO'}</span>
+        <p class="hc__reloj"><span class="hc__dia" data-hc-dia>{T.dia}</span><span class="hc__hora"><span data-hc-hora>{T.hora}</span><span class="hc__ap" data-hc-ap>{T.p}</span></span></p>
+        <ol class="hc__pila" data-hc-pila>
+          {EV.slice(0, 2).reverse().map((e) => (
+            <li class="hc__noti">
+              <span class="hc__app"><Icon name={e.icon} /></span>
+              <span class="hc__nt"><span class="hc__ntop"><b>{e.app}</b><span>{T.ahora}</span></span><span class="hc__ntt">{e.t}</span><span class="hc__ntb">{e.b}</span></span>
+            </li>
+          ))}
+        </ol>
+        <span class="hc__mas" data-hc-mas data-n="2">{T.mas(2)}</span>
+        <span class="hc__lock"><i></i><span></span><i></i></span>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" data-hc-evs set:html={JSON.stringify(EV.map((e) => ({ n: e.n, app: e.app, t: e.t, b: e.b })))} />
+  <template data-hc-ico>{EV.map((e) => <span data-ico={e.n}><Icon name={e.icon} /></span>)}</template>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hc]').forEach((root) => {
+    const en = root.dataset.lang === 'en';
+    const loc = en ? 'en-US' : 'es-US';
+    // Reloj con la hora y el día del visitante.
+    const hora = root.querySelector<HTMLElement>('[data-hc-hora]');
+    const ap = root.querySelector<HTMLElement>('[data-hc-ap]');
+    const dia = root.querySelector<HTMLElement>('[data-hc-dia]');
+    const pinta = () => {
+      const d = new Date();
+      const h = d.getHours(), m = d.getMinutes();
+      if (hora) hora.textContent = `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')}`;
+      if (ap) ap.textContent = en ? (h < 12 ? 'AM' : 'PM') : (h < 12 ? 'a. m.' : 'p. m.');
+      if (dia) { const s = d.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' }); dia.textContent = s.charAt(0).toUpperCase() + s.slice(1); }
+    };
+    pinta();
+    window.setInterval(pinta, 20000);
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const evs: { n: string; app: string; t: string; b: string }[] = JSON.parse(root.querySelector('[data-hc-evs]')?.textContent || '[]');
+    const icos = root.querySelector<HTMLTemplateElement>('[data-hc-ico]')?.content;
+    const pila = root.querySelector<HTMLElement>('[data-hc-pila]');
+    const mas = root.querySelector<HTMLElement>('[data-hc-mas]');
+    if (!pila || !mas || !evs.length) return;
+    let i = 2, n = Number(mas.dataset.n) || 2, t = 0, on = false;
+    const ahora = en ? 'now' : 'ahora';
+    const llega = () => {
+      const e = evs[i % evs.length]; i++;
+      // la cápsula del fondo se enciende (la que está más cerca del centro de la pantalla)
+      const caps = Array.from(root.querySelectorAll<HTMLElement>(`.hc__ev[data-ev="${e.n}"]`));
+      const cx = innerWidth / 2;
+      const vis = caps.filter((c) => { const r = c.getBoundingClientRect(); return r.right > 0 && r.left < innerWidth && Math.abs(r.left + r.width / 2 - cx) > 220; });
+      const cap = vis.sort((a, b) => Math.abs(a.getBoundingClientRect().top - 300) - Math.abs(b.getBoundingClientRect().top - 300))[0];
+      if (cap) { cap.classList.add('is-on'); window.setTimeout(() => cap.classList.remove('is-on'), 1600); }
+      // y su aviso llega a la pila del teléfono
+      window.setTimeout(() => {
+        const li = document.createElement('li');
+        li.className = 'hc__noti is-nueva';
+        const ico = icos?.querySelector(`[data-ico="${e.n}"]`)?.innerHTML ?? '';
+        li.innerHTML = `<span class="hc__app">${ico}</span><span class="hc__nt"><span class="hc__ntop"><b></b><span></span></span><span class="hc__ntt"></span><span class="hc__ntb"></span></span>`;
+        (li.querySelector('.hc__ntop b') as HTMLElement).textContent = e.app;
+        (li.querySelector('.hc__ntop span') as HTMLElement).textContent = ahora;
+        (li.querySelector('.hc__ntt') as HTMLElement).textContent = e.t;
+        (li.querySelector('.hc__ntb') as HTMLElement).textContent = e.b;
+        pila.prepend(li);
+        const items = pila.querySelectorAll('.hc__noti');
+        if (items.length > 3) { items[items.length - 1].remove(); n++; }
+        mas.textContent = en ? `${n} earlier notifications` : `${n} avisos anteriores`;
+        mas.classList.remove('is-sube'); void mas.offsetWidth; mas.classList.add('is-sube');
+      }, 650);
+    };
+    const io = new IntersectionObserver((es) => {
+      on = es.some((x) => x.isIntersecting);
+      window.clearInterval(t);
+      if (on) { window.setTimeout(llega, 900); t = window.setInterval(llega, 3000); }
+    }, { threshold: 0.15 });
+    io.observe(root);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) window.clearInterval(t); else if (on) t = window.setInterval(llega, 3000); });
+  });
+</script>
+
+<style is:global>
+  /* global a propósito: los avisos que llegan los crea el script (sin el sello de estilos de Astro); todo va con el prefijo hc__. */
+  .hc {
+    position: relative; overflow: clip; isolation: isolate; display: flex; flex-direction: column;
+    min-height: calc(100svh / var(--z, 1)); height: calc(100svh / var(--z, 1)); max-height: 1400px; padding-bottom: 0;
+    background: #07070b;
+  }
+  .hc > * { position: relative; z-index: 1; }
+  .hc > .hc__cielo { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  /* Nebulosa: tres nubes de luz muy desenfocadas (oro, cobre y teal sobre índigo), como una foto del espacio. */
+  .hc__neb { position: absolute; border-radius: 50%; filter: blur(80px); }
+  .hc__neb--1 { width: 70vw; height: 46vw; left: 38%; top: 30%; background: radial-gradient(closest-side, rgba(200, 150, 90, .32), rgba(150, 90, 60, .14) 55%, transparent); transform: rotate(-14deg); }
+  .hc__neb--2 { width: 50vw; height: 34vw; left: -10%; top: 46%; background: radial-gradient(closest-side, rgba(70, 70, 140, .38), rgba(40, 40, 90, .16) 60%, transparent); }
+  .hc__neb--3 { width: 34vw; height: 26vw; right: -6%; top: 10%; background: radial-gradient(closest-side, rgba(79, 195, 161, .16), transparent 70%); }
+  .hc__est { position: absolute; inset: 0; background:
+      radial-gradient(1.2px 1.2px at 9% 18%, rgba(255,255,255,.7), transparent 60%),
+      radial-gradient(1px 1px at 22% 62%, rgba(255,255,255,.4), transparent 60%),
+      radial-gradient(1.4px 1.4px at 37% 12%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(1px 1px at 63% 26%, rgba(255,255,255,.4), transparent 60%),
+      radial-gradient(1.3px 1.3px at 81% 14%, rgba(255,255,255,.6), transparent 60%),
+      radial-gradient(1px 1px at 91% 58%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(1.1px 1.1px at 53% 84%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(1px 1px at 4% 86%, rgba(255,255,255,.3), transparent 60%); }
+
+  .hc__text { flex: 0 0 auto; }
+  .hc__zona { position: relative; flex: 1 1 auto; min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding-top: 22px; }
+
+  /* ── Filas de eventos detrás (W-ADV-56): pálidas, desfilan despacio, nunca detrás del texto ── */
+  .hc__filas { position: absolute; inset: 0; display: grid; align-content: start; padding-top: 56px; gap: 16px; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%); }
+  .hc__fila { overflow: hidden; }
+  .hc__pista { display: flex; gap: 14px; width: max-content; animation: hc-pista 80s linear infinite; }
+  .hc__fila--2 .hc__pista { animation-direction: reverse; animation-duration: 95s; margin-left: -160px; }
+  .hc__fila--3 .hc__pista { animation-duration: 110s; margin-left: -320px; }
+  .hc__fila--4 .hc__pista { animation-direction: reverse; animation-duration: 90s; margin-left: -60px; }
+  @keyframes hc-pista { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .hc__ev {
+    display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+    padding: 12px 20px; border-radius: 999px; border: 1px solid rgba(240, 237, 232, .08);
+    background: rgba(18, 17, 22, .55); color: rgba(240, 237, 232, .38); font: 400 13px/1.2 var(--font-body);
+    transition: color .4s, border-color .4s, background .4s, box-shadow .4s;
+  }
+  .hc__ev b { font: 500 12px var(--font-mono); color: rgba(240, 237, 232, .55); transition: color .4s; }
+  .hc__ev svg { width: 15px; height: 15px; color: rgba(79, 195, 161, .7); flex: 0 0 auto; }
+  .hc__ev.is-on { color: var(--w-ink); border-color: rgba(var(--accent-gold-rgb), .7); background: rgba(40, 32, 20, .85); box-shadow: 0 0 0 4px rgba(var(--accent-gold-rgb), .12), 0 18px 40px -16px rgba(0, 0, 0, .8); }
+  .hc__ev.is-on b { color: var(--accent-gold); }
+
+  /* ── El teléfono (pantalla de bloqueo) ── */
+  .hc__tel { position: relative; z-index: 2; width: 360px; padding: 10px; border-radius: 46px; background: #121214; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 60px 100px -30px rgba(0, 0, 0, .9); }
+  .hc__pantalla { position: relative; height: 560px; border-radius: 38px; overflow: hidden; padding: 54px 18px 22px; display: flex; flex-direction: column;
+    background: radial-gradient(120% 70% at 50% 0%, #2c3640 0%, #1a2028 55%, #11151a 100%); color: #f3efe6; }
+  .hc__isla { position: absolute; top: 12px; left: 50%; width: 104px; height: 28px; margin-left: -52px; border-radius: 999px; background: #050506; }
+  .hc__ej { position: absolute; top: 18px; right: 18px; font: 500 9px var(--font-mono); letter-spacing: .14em; color: rgba(243, 239, 230, .5); }
+  .hc__reloj { margin: 0; display: grid; justify-items: center; line-height: 1; }
+  .hc__dia { font: 500 14px var(--font-body); color: rgba(243, 239, 230, .75); }
+  .hc__hora { margin-top: 6px; font: 300 72px/.95 var(--font-display); letter-spacing: -.04em; }
+  .hc__ap { margin-left: .14em; font-size: .26em; font-weight: 500; letter-spacing: 0; }
+  .hc__pila { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 8px; }
+  .hc__noti { display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: center; padding: 11px 12px; border-radius: 18px;
+    background: rgba(245, 242, 236, .9); color: #14232b; box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .6); }
+  .hc__noti:nth-child(2) { opacity: .92; } .hc__noti:nth-child(3) { opacity: .8; }
+  .hc__noti.is-nueva { animation: hc-cae .6s cubic-bezier(.2, .9, .3, 1.1) both; }
+  @keyframes hc-cae { from { opacity: 0; transform: translateY(-18px) scale(.96); } to { opacity: 1; transform: none; } }
+  .hc__app { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; background: #14232b; color: #f3efe6; }
+  .hc__app svg { width: 18px; height: 18px; }
+  .hc__nt { display: grid; gap: 1px; min-width: 0; }
+  .hc__ntop { display: flex; justify-content: space-between; font: 500 11px var(--font-body); color: rgba(20, 35, 43, .55); }
+  .hc__ntop b { font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: rgba(20, 35, 43, .75); }
+  .hc__ntt { font: 600 14px/1.25 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hc__ntb { font: 400 12.5px/1.3 var(--font-body); color: #4e5a5f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hc__mas { margin-top: 12px; text-align: center; font: 500 12px var(--font-body); color: rgba(243, 239, 230, .6); }
+  .hc__mas.is-sube { animation: hc-sube .5s ease; }
+  @keyframes hc-sube { 0% { color: var(--accent-gold); transform: translateY(-3px); } 100% { color: rgba(243, 239, 230, .6); transform: none; } }
+  .hc__lock { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
+  .hc__lock i { width: 44px; height: 44px; border-radius: 50%; background: rgba(243, 239, 230, .12); }
+  .hc__lock span { width: 120px; height: 5px; border-radius: 999px; background: rgba(243, 239, 230, .55); align-self: flex-end; }
+
+  /* Como el portátil de Passport, el teléfono entra por abajo: la portada lo corta en su borde y se ve
+     el reloj y la pila de avisos; el resto aparece al bajar. */
+  @media (prefers-reduced-motion: reduce) { .hc__pista { animation: none; } .hc__noti.is-nueva { animation: none; } }
+  @media (--lt-md) {
+    .hc { height: auto; min-height: calc(100svh / var(--z, 1)); }
+    .hc__zona { padding-block: 28px 0; }
+    .hc__tel { width: min(340px, 100%); }
+    .hc__pantalla { height: 520px; }
+  }
+</style>

@@ -31,8 +31,8 @@ interface Props {
 const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide, phones, callLabel } = Astro.props;
 const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
 ---
-<section class="w-hero ciu-hero">
-  <div class="w-container">
+<section class="w-hero w-hero--pantalla ciu-hero">
+  <div class="w-container w-hero__llena ciu-hero__col">
     <div class="ciu-hero__text" data-w-tone="gold">
       {Astro.slots.has('crumbs') && <div class="ciu-hero__crumbs"><slot name="crumbs" /></div>}
       <div class="ciu-hero__top" data-w-in="1">
@@ -42,7 +42,7 @@ const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{
       <p class="w-h1__tail w-h1__tail--hub w-grad-text" data-w-in="1">{tail}</p>
       <p class="w-lead ciu-hero__lead" data-w-in="2">{lead}</p>
     </div>
-    <div class="ciu-hero__cards" data-w-in="obj">
+    <div class="ciu-hero__cards w-fit" data-w-in="obj">
       <TarjetasPerfil titleHtml={perfilesTitle} cards={cards} wide={wide} id="elige" class="ciu-prof" />
       <ul class="ciu-tel" role="list">
         {phones.map((p) => (
@@ -93,4 +93,8 @@ const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{
   .ciu-tel__city { color: var(--w-ink-60); font-weight: 400; }
   @media (--hover-fine) { .ciu-tel__a:hover { color: var(--w-accent); } }
   @media (--motion-reduce) { .ciu-tel__a { transition: none; } }
+
+  /* v6.1: la portada mide la pantalla; las tarjetas de ciudad ocupan el resto y se reducen si falta alto. */
+  .ciu-hero__col { display: flex; flex-direction: column; }
+  .ciu-hero__col > .ciu-hero__cards { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
 </style>

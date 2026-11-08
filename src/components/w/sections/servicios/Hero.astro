@@ -20,8 +20,8 @@ interface Props {
 }
 const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
 ---
-<section class="w-hero ws-hero">
-  <div class="w-container ws-hero__grid">
+<section class="w-hero w-hero--pantalla ws-hero">
+  <div class="w-container ws-hero__grid w-hero__llena">
     <div class="ws-hero__text" data-w-tone="gold">
       <div class="ws-hero__crumbs"><slot name="crumbs" /></div>
       <div data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
@@ -29,7 +29,7 @@ const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
       {tail && <p class="w-h1__tail w-h1__tail--hub" data-w-in="1">{tail}</p>}
       <p class="w-lead ws-hero__lead" data-w-in="2">{lead}</p>
     </div>
-    <div class="ws-hero__obj" data-w-in="obj">
+    <div class="ws-hero__obj w-fit" data-w-in="obj">
       <Interruptores items={items} lang={lang} size="card" />
     </div>
   </div>
@@ -87,4 +87,7 @@ const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
     .ws-hero__grid { gap: 24px; }
     .ws-hero__crumbs { margin-bottom: 20px; }
   }
+
+  /* v6.1: la portada mide la pantalla; la rejilla llena el alto y el objeto se centra. */
+  @media (--lg) { .ws-hero__grid { grid-template-rows: minmax(0, 1fr); align-items: center; } .ws-hero__obj { height: 100%; display: flex; align-items: center; justify-content: center; } }
 </style>

@@ -44,7 +44,7 @@ import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/rate
 // Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
 import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
 import { recordTurn } from '../lib/chat-log.mjs';
-import { isTakenOver, recordVisitorWaiting } from '../lib/takeover.mjs';
+import { isTakenOver, recordVisitorWaiting, ownerTexts, tagOwnerTurns, OWNER_CONTEXT, OWNER_TAG } from '../lib/takeover.mjs';
 
 // Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
 // y su coste se cuentan aparte para que las pruebas de Marcy (que corren contra
@@ -575,6 +575,15 @@ export default async function handler(req, res) {
     return res.status(200).json({ reply: M.disabled });
   }
 
+  // Si el dueño atendió en persona en esta conversación, sus mensajes se marcan
+  // (comprobados contra la base) para que Marcy no los desmienta al retomarla.
+  let ownerCtx = null;
+  if (messages.length > 1) {
+    const texts = await ownerTexts(sid);
+    const t = tagOwnerTurns(messages, texts);
+    if (t.tagged) { messages.splice(0, messages.length, ...t.messages); ownerCtx = OWNER_CONTEXT; }
+  }
+
   const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
 
   try {
@@ -588,7 +597,7 @@ export default async function handler(req, res) {
       // + idioma de la página DETRÁS de la marca de caché (no rompe el prefijo cacheado).
       system: [
         { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
-        { type: 'text', text: langContext(lang) },
+        { type: 'text', text: langContext(lang) + (ownerCtx ? '\n\n' + ownerCtx : '') },
       ],
       // SOLO-UI (captura, canales, enlazar) + INTERNAS (calcular_perdida, revisar_sitio).
       // tool_choice = auto (omitido) → el modelo decide cuándo.
@@ -663,7 +672,7 @@ export default async function handler(req, res) {
     }
     const cortadas = blockedFigures(text || '', extraAllow);
     if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
-    let reply = brandPostFilter(text || M.fallback, lang);   // honestidad de marca
+    let reply = brandPostFilter(String(text || M.fallback).split(OWNER_TAG).join('').trim() || M.fallback, lang);   // honestidad de marca (y nunca la marca del dueño)
     const beforePrice = reply;
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
     const fallback = !text || reply !== beforePrice;

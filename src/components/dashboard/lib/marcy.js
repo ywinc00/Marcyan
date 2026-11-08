@@ -29,8 +29,10 @@ export const TOOLS = {
   cotizar: 'Cotizó con las reglas',
   revisar_sitio: 'Revisó su web y su ficha de Google',
   calcular_perdida: 'Calculó lo que pierde el negocio',
+  huecos_libres: 'Ofreció horas libres para una llamada',
+  reservar_llamada: 'Agendó la llamada',
 };
-export const toolLabel = (t) => TOOLS[t] || 'Usó una herramienta';
+export const toolLabel = (t) => TOOLS[t] || (String(t || '').includes('reservar_llamada') ? 'Agendó la llamada' : 'Usó una herramienta');
 
 export function actionLabel(type, destino) {
   if (type === 'capture') {

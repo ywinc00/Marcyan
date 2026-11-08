@@ -45,7 +45,9 @@ const mod = size === 'landing' ? null : size;
 const path = Astro.url.pathname;
 const cityM = path.match(/\/(houston|miami)\/[^/]+/);
 const isEn = path.startsWith('/en');
-const callCity = cityM && !primary.href.startsWith('tel:') ? (cityM[1] as 'houston' | 'miami') : null;
+// IA para pymes (ES y EN) es landing de servicio sin ciudad en la ruta: usa la línea principal (Houston).
+const sinCiudad = /^\/(es\/ia-para-pymes|en\/ai-for-small-business)\/?$/.test(path);
+const callCity = primary.href.startsWith('tel:') ? null : cityM ? (cityM[1] as 'houston' | 'miami') : sinCiudad ? 'houston' : null;
 const callNum = callCity ? nap[callCity].replace(/^\+1\s*/, '') : '';
 const callHref = callCity ? 'tel:' + nap[callCity].replace(/[^\d+]/g, '') : '';
 ---

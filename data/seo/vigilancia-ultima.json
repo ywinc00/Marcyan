@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-10",
+  "fecha": "2026-11-11",
   "primeraEjecucion": false,
   "sitemap": 52,
   "inspeccion": true,
@@ -79,7 +79,7 @@
   },
   "sinRastreoReciente": 11,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 65,
+  "certificadoDias": 64,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 52
@@ -97,12 +97,12 @@
       {
         "pagina": "/",
         "status": 200,
-        "formularios": 2
+        "formularios": 3
       },
       {
         "pagina": "/en/",
         "status": 200,
-        "formularios": 2
+        "formularios": 3
       }
     ],
     "endpoint": {
@@ -113,8 +113,8 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 23,
-    "sesionesDiaHabitual": 8.6,
+    "sesionesUltimos3Dias": 18,
+    "sesionesDiaHabitual": 8.8,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
     "probabilidadAzar": null
@@ -148,59 +148,18 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/checkup"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/cities"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/blog"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/branding"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/ecommerce"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/seo-local"
-      }
-    ],
+    "alta": [],
     "media": [
       {
-        "fecha": "2026-11-10",
+        "fecha": "2026-11-11",
+        "cliente": "marcyan",
+        "nivel": "media",
+        "tipo": "robots",
+        "detalle": "robots.txt cambió desde la última vigilancia",
+        "url": null
+      },
+      {
+        "fecha": "2026-11-11",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -210,55 +169,7 @@
     ],
     "info": [
       {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/en/houston"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/houston/diseno-web"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/miami/ecommerce"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/miami/seo-local"
-      },
-      {
-        "fecha": "2026-11-10",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "indexacion",
-        "detalle": "Entró al índice",
-        "url": "https://marcyanstudio.com/es/precios"
-      },
-      {
-        "fecha": "2026-11-10",
+        "fecha": "2026-11-11",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -269,52 +180,12 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-11-10",
+      "fecha": "2026-11-11",
       "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/checkup"
-    },
-    {
-      "fecha": "2026-11-10",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/cities"
-    },
-    {
-      "fecha": "2026-11-10",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/blog"
-    },
-    {
-      "fecha": "2026-11-10",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/branding"
-    },
-    {
-      "fecha": "2026-11-10",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/ecommerce"
-    },
-    {
-      "fecha": "2026-11-10",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/seo-local"
+      "nivel": "media",
+      "tipo": "robots",
+      "detalle": "robots.txt cambió desde la última vigilancia",
+      "url": null
     }
   ],
   "pedirIndexacion": [],

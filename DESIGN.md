@@ -1,242 +1,296 @@
-# DESIGN.md — Marcyan Studio · Doctrina visual "Space-Tech"
+# DESIGN.md · Marcyan Studio · Doctrina visual (sistema v3, en producción desde 2026-11-10)
 
-> **Autoridad.** Este archivo MANDA sobre cualquier decisión de UI. Se deriva de la
-> **home (`src/pages/es/index.astro` + sus secciones)**, que es la pieza de referencia
-> aprobada. Todo lo demás (secciones y landings) debe sentirse parte de la MISMA nave:
-> mismo fondo, misma paleta, misma tipografía, mismo nivel de craft. Si una página se ve
-> "plana, genérica o aburrida", está mal por definición. Complementa a `design/art-direction.md`
-> y a las skills `design-director` (gate) + `refero-design` (craft).
-
----
-
-## 0) Identidad (CONSERVADA — nunca se inventa ni se cambia)
-
-Fuente única de tokens: `src/styles/tokens.css`. Breakpoints: `src/styles/media.css`
-(`@custom-media --sm/--md/--lg/--xl`, `--lt-md`, `--motion-reduce`, `--hover-fine`).
-
-- **Fondo:** `--bg-base #080808` (nunca negro puro). Tarjetas `--bg-card #141414`, elevado `--bg-elevated #1c1c1c`.
-- **Acentos (con MODERACIÓN):** oro `--accent-gold #c8a96e` (~7 %, primario) · teal `--accent-teal #4fc3a1` (~3 %, señal IA / "en vivo"). Familias `*-dim` (relleno 15 %), `*-line` (borde 30 %), `*-glow`.
-- **Texto:** `--fg-primary #f0ede8` · `--fg-secondary #9a9590` (texto legible secundario) · `--fg-subtle` SOLO disabled/placeholder.
-- **Tipografía:** display **Space Grotesk** (`--font-display`), cuerpo **DM Sans** (`--font-body`), datos/labels **JetBrains Mono** (`--font-mono`). Escala fluida `--fluid-display/h1..h4/lead`; escala fija `--text-xs..5xl`.
-- **Radios:** sm 4 · md 8 (botones) · lg 12 (tarjetas) · xl 20 · pill 100. **Nunca** mezclar radios al azar en superficies del mismo nivel.
-- **Espaciado:** base-4 (`--space-1..10`). Sección: `.section { padding-block: var(--section-gap) }`. Gutter: `.container` con `--container-pad`.
-- **Iconos:** Lucide outline vía `ui/Icon.astro`, `stroke-width:1.5`, un concepto = un icono. El único filled permitido es la marca `marcyan-ai`, en UN solo slot insignia (SEO para IA). No mezclar familias.
-- **Motion:** `--ease-out-expo` por defecto; SIEMPRE apagar animaciones en `@media (--motion-reduce)`.
-
-**Solo tokens, nunca hardcode.** Excepción ya existente: maquetas realistas (laptop/teléfono en `Projects.astro`) usan grises de hardware crudos; no es plantilla a seguir en otros sitios.
-
-> **Enmienda 2026-11-01 · rediseño WorkOS (sistema v3).** Aprobado por el dueño; detalle y valores en
-> `design/rediseno-workos.md` (manda sobre este archivo SOLO en sus 11 cambios globales, §1.B).
-> - **Iconos-objeto propios (7)** para representar PRODUCTOS (uno por `id` de `pricing.ts`, en
->   `src/components/w/IconoObjeto.astro` + sprite `w/objects/`): cuadrado en relieve con glifo propio
->   dibujado en SVG con los tokens. **Lucide sigue para la UI funcional** (flechas, teléfono, check,
->   menú, migas). `marcyan-ai` sigue siendo el único Lucide-like relleno.
-> - **Tokens nuevos aparte** en `src/styles/w-tokens.css` (`--w-*`, solo variables, derivados de
->   `tokens.css`, que no se edita) y clases `.w-*` en `src/styles/w.css`, que solo cargan las páginas
->   con `Layout ds="v3"`. Portada y hubs de ciudad no llevan `ds` y no cambian (cerrojos de §2.13).
+> **Autoridad.** Este archivo MANDA sobre cualquier decisión de UI del sitio. Describe el diseño que
+> está EN VIVO tras el rediseño WorkOS (PR #65, 2026-11-10). Todo cambio nuevo debe salir con la misma
+> forma de contar los productos, la misma estética y el mismo nivel de oficio. Si una pieza nueva se ve
+> más pobre, más plana o más genérica que sus vecinas, está mal por definición.
+>
+> Punto de vuelta al diseño anterior: etiqueta git `prod-antes-rediseno-2026-11-10`.
+> La versión vieja de este archivo ("Space-Tech", jul-2026) vive en el historial de git.
+>
+> Se usa junto a: skill `design-director` (gate + `errores-ledger.md`), skill `design-catalog`
+> (piezas nombradas), skill `refero-design` (referencias mirando la imagen), `design/frontend-design.md`
+> (checklist de salida). Detalle histórico y valores originales: `design/rediseno-workos.md` (v1) y
+> `design/rediseno-workos-v2.md` (v2). Si chocan con este archivo, manda este.
 
 ---
 
-## 1) El fondo (KEYSTONE) — `SpaceBackdrop`
+## 0) La idea en una frase
 
-El motivo nº1 de que las landings se vieran genéricas: sus secciones mostraban `--bg-base`
-sólido (losas planas) mientras la home tiene estrellas + glows por sección. **Las `.section`
-no pintan fondo propio** → basta poner una atmósfera detrás del contenido.
-
-- **Componente:** `src/components/SpaceBackdrop.astro`. Capa **fija, a pantalla completa,
-  `z-index:-1`, aria-hidden**: glows radiales oro/teal (eco de la viñeta del hero) + viñeta
-  inferior + **un** canvas de estrellas a la deriva con fugaces ocasionales. Progresivo
-  (sin JS quedan los gradientes), reduced-motion (estrellas quietas), pausa con pestaña oculta.
-- **Regla:** TODA página de sección/landing incluye `<SpaceBackdrop tone="gold|teal" />`
-  **una sola vez** (al final del `<main>` o tras él). `ClusterLanding.astro` ya lo trae →
-  las ~30 landings finas quedan cubiertas. Las páginas bespoke deben añadirlo.
-- **No duplicar atmósfera:** una página usa SpaceBackdrop **o** el patrón `data-fx`+`StarField`
-  de la home, nunca ambos (evita 2 canvas). En landings: SpaceBackdrop. La **home NO se toca**
-  (ya tiene su atmósfera; no se le añade SpaceBackdrop).
-- Las tarjetas (`--bg-card`) siguen opacas y flotan sobre la atmósfera — eso da el contraste.
-  Acentos locales (gradiente de esquina tipo `svc-hero`, barra teal del chat) son craft bienvenido.
+**Marcyan no enseña decoración: enseña el producto funcionando.** Cada página vende un servicio
+mostrando QUÉ hacemos, CÓMO funciona y QUÉ gana el cliente, con objetos de producto reales y
+premium (webs, fichas de Maps, chats, pedidos, consolas) que se mueven sobre la noche de la marca.
+Referencia madre: **workos.com** (composición, ritmo, objetos vivos, celdas de 1 px, coreografía).
+Refero es apoyo para lo que WorkOS no cubre, y se dice cuando se usa.
 
 ---
 
-## 2) "Hero de landing" vs "Header de sección" (queja del dueño)
+## 1) Identidad conservada (nunca se cambia)
 
-> "Todas las secciones tienen un hero estilo página principal; no es necesario en secciones."
+Fuente de tokens base: `src/styles/tokens.css` (NO se edita). Breakpoints: `src/styles/media.css`.
 
-- **Landings de aterrizaje** (ciudad: `/es/houston`, `/es/miami`; servicio×ciudad; wedge IA):
-  **SÍ llevan hero potente.** Son páginas de conversión; el hero vende. Houston y Miami deben
-  ser **páginas potentes, nivel home**, no listas de enlaces apiladas.
-- **Páginas de sección / hub** (`/es/servicios`, `/es/precios`, `/es/ciudades`, `/es/portafolio`,
-  `/es/sobre-nosotros`, `/es/blog`): **NO** repiten el hero alto de portada. Usan un **header
-  compacto y distintivo** (kicker + H1 + bajada + 1 acción), más corto, sobre la atmósfera —
-  no un bloque de 90vh. La energía visual va al CONTENIDO de la página, no a un hero clónico.
-- El `LandingHero` debe soportar ambas intenciones (p. ej. prop `variant: 'landing' | 'header'`,
-  aditiva, default = comportamiento actual para no romper consumidores). Las páginas hub pasan
-  `variant="header"` o montan su propio header compacto.
-
----
-
-## 3) Anti-genérico (NO → SÍ) — se aplica a TODA pieza
-
-- **NO** grid de 3 tarjetas icono+título+párrafo (el `FeatureGrid` actual ES esto) →
-  **SÍ** una composición con jerarquía real: destacado + lista, zig-zag con visual, columnas
-  asimétricas, o tarjetas con dato/numeral/línea de conexión. Que NO parezca plantilla SaaS.
-- **NO** fondo sólido plano que no coincide con la home → **SÍ** la atmósfera SpaceBackdrop +
-  acentos de gradiente locales.
-- **NO** hero alto y centrado clónico en cada subpágina → **SÍ** header compacto (ver §2).
-- **NO** muro de texto gris → **SÍ** ritmo: kicker mono, H2 display, lead, y elementos
-  escaneables (pills de dato, líneas, iconos precisos, micro-ilustración).
-- **NO** dos CTAs gemelos con el mismo peso → **SÍ** 1 acción primaria dominante (oro sólido)
-  + secundaria contorno/ghost.
-- **NO** iconos multicolor / mezcla de familias → **SÍ** Lucide outline 1.5px, 1 icono = 1 concepto.
-- **NO** em-dash "—" como muletilla en cuerpo → **SÍ** comas/puntos (se permiten rangos "Lun–Vie"
-  y guiones en titulares). Sin copy de relleno ("soluciones innovadoras"): claims reales con cifra/entregable.
-- **NO** stock / imágenes nuevas binarias → **SÍ** **ilustración inline SVG** line-art (oro/teal,
-  baja opacidad, `aria-hidden`), en la línea del skyline/siluetas de `Locations.astro`.
-- **Enmienda v3 (rediseño WorkOS, G5):** en las páginas `ds="v3"` cada sección enseña el **objeto del
-  servicio** como mini-UI redibujada en HTML/CSS/SVG (web en móvil, ficha de mapa, chat de Marcy,
-  pedidos, plano de marca, respuesta de asistente…), con datos de EJEMPLO rotulados "Ejemplo". Las
-  capturas REALES de clientes solo en prueba y casos, nunca como arte de hero u objeto (E-32). Detalle
-  en `design/rediseno-workos.md` §2.4 y §3.6.
+- **Noche:** `--bg-base #080808` (nunca negro puro). Elevado `--bg-elevated #1c1c1c`.
+- **Acentos:** oro `--accent-gold #c8a96e` (primario, escaso) · teal `--accent-teal #4fc3a1`
+  (señal IA y "en vivo"). Una página tiene UN acento (`--w-accent`): oro por defecto, teal en
+  páginas de IA con `data-w-tone="teal"`.
+- **Tinta:** `--fg-primary #f0ede8` (crema). En v3 se gradúa con `--w-ink-80/70/60` (60 % es el
+  mínimo para texto de 14-16 px); `--w-ink-30` solo decoración, nunca texto.
+- **Tipos:** Space Grotesk (títulos, pesos 400/500) · DM Sans (texto) · JetBrains Mono (etiquetas,
+  datos, rótulos "Ejemplo").
+- **Logos (no unificar):** navbar = texto `BrandType` · logo de empresa = marca ilustrada (schema) ·
+  favicon = isotipo propio. Tres piezas separadas.
+- **Avatar de Marcy:** colorway blanco; el encuadre es un contrato (`scripts/build-marcy-avatar.mjs`).
 
 ---
 
-## 4) Briefs por componente de landing (superficie a rediseñar)
+## 2) Dos mundos en el mismo sitio
 
-Mantener SIEMPRE el contrato de props (las páginas dependen de él); cambios solo ADITIVOS.
-Conservar `set:html`, tonos `gold|teal`, ids, `data-*`, nombres de campo, schema y copy honesto.
+| Mundo | Páginas | Regla |
+|---|---|---|
+| **Espacio estricto** | Portada `/es` `/en` y hubs de ciudad (Houston, Miami) | Fondo de estrellas `StarField`/`SpaceBackdrop`, planeta, viaje de ciudad (`components/city`). **Intocables**: solo se cambia el CONTENIDO de sus secciones permitidas, nunca hero, animación, orden, `data-fx` ni `data-atmo`. |
+| **Sistema v3** | Todo lo demás: servicios, precios, portafolio, sobre nosotros, blog, diagnóstico, herramientas, landings servicio × ciudad, sectores, barrios | `<Layout ds="v3">` carga `WStyles.astro` → `w-tokens-v3.css` + `w.css` (todo bajo `:root[data-ds="v3"]`). Cada landing puede tener SU fondo temático en el hero (§5.3). |
 
-- **`LandingHero`** → hero de aterrizaje con más fuerza (jerarquía, acento de gradiente, chips de
-  prueba como datos mono) + **variante `header` compacta** para hubs (§2). Sin motor planetario
-  (eso es solo la home), pero puede llevar una micro-ilustración line-art o un acento orbital sutil.
-- **`FeatureGrid`** → **abandonar el 3-card cliché.** Reformatear a algo con jerarquía (destacado +
-  lista tipo `Services`, o tarjetas numeradas/conectadas, o zig-zag). Iconos precisos por concepto.
-- **`AnswerBlock`** → la tarjeta AEO answer-first, pero más memorable: tratar la pregunta como
-  titular, la respuesta como cita de alta densidad; acento teal de "dato"/fuente. Sigue siendo
-  citable verbatim (no romper el texto de la respuesta ni la fuente).
-- **`Pricing`** (panel único) y **`PriceGrid`** (catálogo) → paneles de precio con más carácter
-  (numeral display grande, "desde" mono, badge de recurrencia ya existe, check-list clara,
-  stretched-link ya existe en PriceGrid). Que se sienta "panel de control", no caja sosa.
-- **`CtaBand`** → banda final con gravedad: glow de acento, 1 acción dominante; puede llevar un
-  motivo espacial sutil (estrella/órbita line-art) sin ruido.
-- **`RelatedLinks`** → de lista de tarjetas planas a "constelación" navegable: enlaces con icono
-  preciso + subtítulo + flecha que se desplaza; en hubs de ciudad es el conmutador de servicios,
-  hazlo escaneable y vivo.
-- **`Prose`** → editorial: ancho de lectura, ritmo, `<em>` de acento, `<strong>` legible; opcional
-  filete/numeral o marca de párrafo. Nada de muro gris.
-- **`ArticleHero`** (blog) → header editorial de artículo (ya sin CTA); reforzar meta (fecha/lectura/
-  tags) y darle un acento espacial sutil. Coordinar con el rediseño del blog.
+Los tokens `--w-*` compartidos viven en `src/styles/w-tokens.css` (solo variables, entra en todas
+las páginas sin pintar nada). Los que solo usa v3, en `w-tokens-v3.css`. Las clases `.w-*`, en
+`src/styles/w.css`. Un componente que se monte fuera de v3 lleva TODO su CSS dentro y solo lee `--w-*`.
 
 ---
 
-## 5) Intención por página bespoke (workstream de páginas)
+## 3) Sistema v3 (valores)
 
-- **`/es/houston` y `/es/miami`** (hubs de ciudad) → **páginas potentes, nivel home.** Hero fuerte
-  con identidad local (reusar/echar mano del line-art skyline + siluetas de estado TX/FL y las pills
-  de coords de `Locations.astro`), un showcase de servicios (no solo `RelatedLinks` plano), contexto
-  local con peso, prueba (Projects), FAQ, CTA. Son las landing principales de cada ciudad.
-- **`/es/servicios`** (catálogo) → hub de los 7 productos con anclas bajas; header compacto + PriceGrid
-  rediseñado + por qué nosotros (sin 3-card) + FAQ + CTA. Navegable y con jerarquía.
-- **`/es/precios`** → tabla/grid de precios clara y confiable (AEO), comparables sin caos.
-- **`/es/ciudades`** → hub geográfico vivo (fichas de ciudad como `Locations`, mapa line-art opcional).
-- **`/es/portafolio`** → prueba real con dignidad (sin exponer dominios; resultado + tags), reusar el
-  device-mockup de `Projects` si aplica.
-- **`/es/sobre-nosotros`** → E-E-A-T con carácter (proceso, valores, NAP), no muro de texto.
-- **`/es/blog` (índice)** → **buena navegación + ilustración que dé vida**: header editorial, filtros/
-  categorías o índice por tema, tarjetas de post con jerarquía (no 3-card soso), micro-ilustración SVG.
-- **`/es/blog/[slug]`** (+ `Article`, `ArticleToc`, `PostNav`) → lectura cómoda: ToC pegajoso, ritmo
-  tipográfico, navegación anterior/siguiente clara, acentos espaciales sutiles.
+### 3.1 Tipografía (Space Grotesk 500 en títulos)
+
+| Token | Tamaño | Uso |
+|---|---|---|
+| `--w-h1` | 36 → 58 px, lh 1.02, tracking -0.04em | H1 de landing (`.w-h1`) |
+| `--w-h1-hub` | 32 → 52 px | H1 de hubs de venta |
+| `--w-h1-night` | 40 → 72 px | H1 de IA y SEO para IA |
+| `--w-h2-chapter` | 30 → 52 px, tracking -0.045em | H2 de capítulo: 1.ª frase en `--w-ink-45` (`.w-tone`), 2.ª en crema |
+| `--w-h2` / `--w-h2-small` | 28 → 40 / 24 → 32 px | H2 normal / FAQ y demos |
+| `--w-h3` / `--w-h4` | 24 / 20 px | Títulos de celda y objeto |
+| `--w-eyebrow` | 18 → 28 px | Cola o antetítulo grande (no mono) |
+| `--w-lead` | 17 → 20 px, lh 1.5 | Bajada |
+| `--w-micro` | 12 px mono, tracking 0.1em | Etiquetas, rótulos, `CabeceraNumerada` |
+
+`.w-h1 em` = la palabra en acento. H1 verbatim de cada página (SEO): no se reescriben sin decisión.
+
+### 3.2 Superficies (rampa H-06)
+`--w-s0` noche · `--w-s1 #121211` bandeja opaca (texto sobre patrón) · `--w-s2 #181817` objeto ·
+`--w-s3 #1f1f1d` objeto activo · objetos de producto en CLARO: `--w-p-bg #f0ede8` con tinta
+`--w-p-ink #0e0e0d`. Filo de luz `--w-edge` (inset 1 px blanco 8 %). Capítulos de contraste:
+`--w-contrast-bg` (elevado) o `--w-dawn` (amanecer oro abajo; `--w-dawn-teal` en IA).
+
+### 3.3 Radios (4, sin mezclar)
+celda 8 · objeto 12 · bandeja 22 · pieza destacada 44 · píldora 999.
+
+### 3.4 Líneas y raíles
+`--w-line` (oro 9 %) y `--w-line-strong` (18 %, hover/activo). Rejillas de **celdas de 1 px**
+(`.w-cells`) como WorkOS. **Los raíles verticales solo enmarcan rejillas de celdas**: nunca en heros,
+nunca encima de piezas; si cruzan algo, se cortan.
+
+### 3.5 Acento y degradado
+Un acento por página. **Un solo degradado por página** (`--w-grad` oro → teal), en un elemento.
+Nunca un elemento de acento sobre fondo del mismo acento (E-35).
+
+### 3.6 Botones
+Variantes de `ui/Button.astro` (primary oro relleno · secondary · teal · ghost · link). No se crean
+variantes nuevas ni se copian botones de una referencia. Un botón mide lo que pide su texto: flex que
+reparte y baja de línea, nunca columnas fijas con `nowrap`, nunca más ancho que su sitio. Una acción
+dominante por vista; en móvil, llamar; en escritorio, formulario (política de CTAs).
+
+### 3.7 Iconos y logos (tres familias, cada una a lo suyo)
+- **Lucide** outline 1.5 px vía `ui/Icon.astro`: SOLO UI funcional (flechas, teléfono, check, menú).
+- **Iconos-objeto** (`w/IconoObjeto.astro` + sprite `w/objects/`): uno por producto de `pricing.ts`,
+  cuadrado en relieve con glifo propio. Representan PRODUCTOS.
+- **Logos de plataformas** (`w/marcas/LogoMarca.astro`, trazados simple-icons CC0, licencias en
+  `w/marcas/LICENCIAS.md`): a color dentro de interfaces dibujadas; crema sólido en listados; siempre
+  dentro de algo, nunca un muro suelto. Uso nominativo ("dónde te encuentran", "con qué trabajamos"),
+  nunca "partner" ni "construido con". Modelo que usamos = Claude. ChatGPT y Bing en palabra, sin
+  logo; Apple fuera.
 
 ---
 
-## 6) NO TOCAR (estándar de la home + lógica crítica)
+## 4) Cómo contamos los productos (lo que hace que el sitio funcione)
 
-- **La home** (`src/pages/es/index.astro`, `en/index.astro`) y sus secciones: `Hero`, `Services`,
-  `AiSection`, `Process`, `Projects`, `Guarantees`, `Locations`, `Contact`. **Definen el estándar
-  bueno.** `Process`, `Projects`, `Contact` se REUSAN en landings → cambiarlos cambia la home: NO se
-  rediseñan. (Si una landing necesita otra cosa, se hace en la página, no en el componente compartido.)
-- **El formulario** (`Contact.astro`, `formulario.astro`): contrato a `/api/contact` y `/api/brief`,
-  `website_hp`, nombres de campo, validación, ids. **Intacto.**
-- **`api/`, `lib/`, `public/admin/`**, schema SEO (`seo/*`), contenido honesto, precios, textos AEO
-  answer-first: **no se alteran** (es rediseño visual/estructural, no de contenido ni backend).
-- **Honestidad dura:** nada de portafolio/testimonios/stats falsos; sin promesas de #1.
+### 4.1 La portada de cada landing enseña el MECANISMO
+El hero de una landing de servicio no es la web del cliente ni una foto bonita: es **el servicio
+funcionando** (E-67, E-34). Heros en `src/components/w/heroes/`, uno por tipo:
+
+| Tipo | Hero | Qué cuenta |
+|---|---|---|
+| Diseño web | `HeroWeb` | Tu web se construye y se personaliza (consola + web que aparece) |
+| Tienda en línea | `HeroEcommerce` | Producto, pedido y cobro moviéndose |
+| SEO local | `HeroSeoLocal` | Te buscan cerca y llegan a ti (ficha de Maps, ruta) |
+| IA conversacional / IA pymes | `HeroIaChat` / `HeroIaPymes` | Marcy contesta y captura, conectada a tus canales |
+| Branding | `HeroBranding` | La marca construida en su plano |
+| Sectores | `HeroSector` → `HeroContratista`, `HeroRestaurante` | El día del negocio resuelto ("mientras cocinas" llega el pedido, sin comisión) |
+| Barrios | `HeroBarrio` | El negocio del barrio con su web, en su sitio |
+
+Regla para un hero nuevo: buscar inspiración en cómo OTROS productos explican un mecanismo
+(cualquier sector, E-61), al menos dos de tres direcciones de fuera del sector, bocetos low-fi y el
+dueño elige. Las webs del sector solo sirven para los ejemplos que van DENTRO.
+
+### 4.2 Objetos de producto, no esqueletos
+Lo que vendemos se dibuja como **producto real premium** (minimalista, tipografía y detalle de
+verdad), nunca como bloques grises, barras de relleno ni tarjeta con iconos en cajita. Piezas en
+`w/objetos/` (WebEjemplo, ChatMarcy, FichaMapaEjemplo, ListaPedidos, SolicitudOficio, Escaner,
+RespuestaAsistente, AbanicoWebs…), `w/demos/` (ConsolaConstruye, Personalizador), `w/mac/`
+(portátil que abre apps, portafolio laptop ↔ iPhone), `w/heroes/webs/` (webs de barrio),
+`w/objetos/barrios/` (mapas). Antes de crear una pieza, buscar si ya existe una que resuelva esa
+SITUACIÓN (abrir, elegir, construir, conectar): las piezas se eligen por situación, no por su texto.
+
+### 4.3 Ejemplos con marcas inventadas, cada página el suyo
+- Marcas "Tu …" (`w/objetos/ejemplos/negocios.ts`): logotipo en trazos, paleta propia de 3 tonos AA,
+  voz propia. Marco Marcyan por fuera, la marca del ejemplo por dentro.
+- **Cada página enseña SU negocio con su propio diseño.** Dos páginas hermanas (Houston/Miami, los
+  cuatro barrios) no comparten ejemplo ni mapa. Ninguna marca en más de 3 páginas ni dos veces en la
+  misma vista (E-65).
+- Un solo rótulo "Ejemplo" por objeto (barra del navegador o pie, mono 10-12 px).
+- Sin precios, estrellas, número de reseñas ni teléfonos reales (rango ficticio 555-01xx). Horas en
+  12 h ("4:00 p. m." / "4:00 PM").
+- Contrato de accesibilidad de todo ejemplo: sin `h1`-`h6` dentro, raíz `aria-hidden` +
+  `data-nosnippet` + resumen `sr-only`, sin `tel:`, `wa.me` ni `data-track`, ids SVG con sufijo.
+
+### 4.4 Fotos: reales, nítidas y del tema
+- Productos, platos, locales y escenas llevan foto (un rectángulo vacío "parece PowerPoint", E-57).
+- Fuente: bancos libres (Unsplash con licencia libre), anotadas en `design/ejemplos-v8.md` con su id.
+  Se recortan al hueco y se guardan en WebP en `public/fotos/ejemplos/<nombre>-<ancho>.webp`.
+- Escalera de anchos (160/320/640 o según uso) y `sizes` igual a la caja REAL en pantalla; una foto
+  que llena su caja lleva `sizes` de la caja, no del tamaño nominal (E-58, E-68). Se comprueba a tamaño
+  real que no pixela.
+- Nunca capturas del trabajo de clientes como arte de hero (E-32); los proyectos reales van en
+  portafolio y casos.
+
+### 4.5 Mapas que dicen dónde están
+Cada mapa de ejemplo dibuja el lugar de su página (agua, autopista, naves, cuadrícula, canal) y la
+ruta usa los mismos puntos que el eje de las calles que recorre, nunca curvas libres por encima de
+las manzanas (E-68, E-41). Datos en `w/sections/servicios/ObjMapaLocal.astro` (`MAPAS`) y
+`w/objetos/barrios/FichaMapa.astro` (`MAPAS_F`); el color de ruta y pin es el acento del negocio.
+
+### 4.6 Marcy (el chat)
+El widget es el de producción: avatar blanco, selector de canal, "Equipo Marcyan" cuando contesta
+una persona, tres puntos al escribir, "Hablar con una persona". Diseño en `design/chat-marcy.md`.
+Campos a 16 px en táctil (E-68): nunca bloquear el zoom.
 
 ---
 
-## 7) Puerta de salida (build-safety + a11y) — bloqueante
+## 5) Composición de una página v3
 
-Antes de dar por buena una pieza, verificar item por item:
+### 5.1 Plantilla de landings
+`w/landing/WLanding.astro` + `registry.ts` + `kinds/<tipo>.ts` (web, ecommerce, seo-local, ia-chat,
+ia-pymes, branding, sector, barrio). Una landing nueva = un `kind` que reutiliza secciones de
+`w/sections/<tipo>/` y piezas de `w/`. No se monta una página a mano si un `kind` la cubre.
 
-1. **Build-safe:** solo tokens; breakpoints vía `@custom-media`; CSS de contenido `set:html`/slot
-   estilizado con `:global()` acotado bajo una clase con scope; sin romper imports/props.
-2. **Contrato intacto:** props, `data-*`, ids, names, schema, copy honesto, tonos — sin cambios
-   no aditivos.
-3. **A11y:** un solo `<h1>` por página; foco visible (`:focus-visible`); tap-targets ≥44px;
-   contraste AA (cuerpo ≥4.5:1); `aria-hidden` en decoración.
-4. **Responsive:** sin scroll-x de 320→1440 (`min-width:0` en hijos de flex/grid; medios fluidos).
-5. **Motion:** toda animación se apaga en `@media (--motion-reduce)`.
-6. **Coherencia:** ¿se ve parte de la MISMA nave que la home? Fondo atmosférico, no losa plana;
-   nada genérico; jerarquía clara con 1 acción primaria.
+### 5.2 Ritmo
+Hero (≈ una pantalla, sin encoger el producto) → capítulos con `CabeceraNumerada` (mono, número +
+nombre) → rejillas de celdas / bandejas / demos → capítulo de contraste (elevado o amanecer) →
+prueba (casos, `FichaProyecto`, `TarjetasCaso`) → precio (`TarjetaPrecio`, `PrecioPuntos`) → FAQ
+(`PreguntasFrecuentes`) → cierre (`CierreDosTarjetas`). Separación de sección `--w-section-y`
+(80 → 120 px). Una idea fuerte por sección.
+
+### 5.3 Fondos
+Espacio estricto solo en portada y hubs. Cada landing puede llevar UN motivo de fondo que cuente su
+tema, en el hero (fundido a la noche abajo) y como mucho un eco en el capítulo de contraste. Nunca
+dos motivos a la vez, nunca detalle corriendo detrás del texto (E-37, E-57). Donde hay fondo
+temático no se monta `SpaceBackdrop`.
 
 ---
 
-## 8) Ronda 2 — Afinado del dueño (2026-07-02) · MANDA sobre lo anterior si choca
+## 6) Movimiento
 
-Fixes concretos tras revisar el preview. UI y UX van **de la mano**, ambos premium.
+- **Contrato de vida:** demo con guion = se reproduce una vez al entrar (35 %), se queda en un final
+  con micro-vida (cursor, punto en línea) y se repite tras ≥ 8 s fuera. Pantalla viva = bucle a la
+  vista, pausa fuera de vista y con pestaña oculta; > 5 s de bucle lleva botón de pausa 44 × 44.
+  Interactivo = responde al visitante; cursor fantasma solo si nadie toca (máx. 3 ajustes).
+- **Una pieza que en la referencia es interactiva, aquí también** (teclado, foco oro, `radiogroup`).
+- **Animaciones de scroll** (portátil, fases, viajes): se revisan en tira de fotogramas en escritorio
+  y móvil, también volviendo hacia atrás; una apertura se QUEDA abierta al volver (E-66); empiezan
+  cuando la pieza ya está encuadrada.
+- El hover nunca pausa ni retira una animación (E-58).
+- Solo `transform` y `opacity` (más `stroke-dashoffset`); sin `backdrop-filter` nuevo, sin canvas
+  nuevos, sin capas de efecto a pantalla completa.
+- Coreografía de entrada única (`w/reveal.ts`, curvas `--w-ease-*`, duraciones `--w-dur-*`), gated
+  por `html.w-anim`. `prefers-reduced-motion` = estado final quieto y completo.
+- Las estrellas fugaces siguen dibujándose mientras se hace scroll si hay una en vuelo.
 
-### 8.1 Hub header = SLIM (no "hero" por sección)
-Aunque los hubs ya usan `LandingHero variant="header"`, éste todavía pinta H1 `display` + 2 CTAs +
-chips + badge → sigue leyéndose como un **hero** y hace que cada sección se sienta "página nueva".
-- **Regla:** `variant="header"` = **franja de título compacta y consistente** en TODOS los hubs:
-  breadcrumb (slot) + kicker mono + **H1 en `.h1` (fluid-h1, NO `.display`)** + **una** línea de bajada.
-  **Elimina en header:** los botones CTA, los chips, el badge y el motivo orbital. Padding vertical
-  mínimo. Un filete/hairline inferior opcional para cerrar la franja. Sin 90vh, sin bloque de hero.
-- `variant="landing"` (Houston/Miami/servicio×ciudad) **NO se toca** — ahí el hero potente es correcto.
-- Contrato aditivo: seguir aceptando `primary/secondary/chips/badge` en los props (los hubs los pasan),
-  pero en modo header simplemente NO se renderizan. Nada se rompe.
+---
 
-### 8.2 CtaBand ("Cuéntanos qué necesitas… te orientamos gratis")
-Defectos: el `.ctaband__orbit` (arco grande) cruza por detrás del **título** (bajo contraste, se pisa)
-y el satélite `offset-path` **se corta** (animación con saltos).
-- **Quita** el arco de órbita que cruza el texto y el satélite animado que tartamudea.
-- **Recréalo con buen contraste, sin colisionar con el texto:** el motivo (si se conserva) va a
-  **espacio negativo** — p. ej. un horizonte/arco anclado al **borde inferior** por debajo del CTA, o
-  una constelación pequeña en una esquina — nunca detrás del titular. Anima solo si es sutil y estable
-  (nada de saltos); si dudas, **déjalo estático** o **elimínalo**. Conserva el filete superior + glow
-  suave. Prioridad: limpio y premium por encima de decoración.
+## 7) Pantallas y tamaños
 
-### 8.3 Nada de "reflejo verde" en las tarjetas de IA (tono teal)
-En `servicios`/`precios`, las tarjetas de servicios IA (tono teal) tienen un **glow/halo verde feo**.
-Origen: `PriceGrid` → `.pcard__amt { text-shadow: 0 0 32px var(--tint-glow) }` con `--tint-glow` teal,
-+ el `.pcard__corner` (wash teal) + `box-shadow` teal en dots.
-- **Regla:** en tono **teal**, el acento se expresa por **borde/icono/texto nítidos**, **no** por
-  halos/glmore difusos. Elimina o baja drásticamente el `text-shadow` del numeral en teal (el verde
-  saturado "sangra" feo), suaviza el wash de esquina teal, y quita los `box-shadow` de glow teal que
-  se vean sucios. El oro puede conservar un glow muy sutil; el teal debe quedar **limpio**. Revisa
-  también `FeatureGrid`/`RelatedLinks` en teal por el mismo tic. Objetivo: teal se ve premium, no radiactivo.
+- Un componente se adapta a SU ancho (container queries): reordena o apila; nunca corta, parte
+  palabras ni esconde. `display:none` por tamaño prohibido salvo que la información siga visible de
+  otra forma (E-62).
+- **Nunca se encoge una portada ni su producto con zoom para que quepa**: se recorta en el borde o se
+  reordena, y la portada crece si hace falta (E-64, E-65).
+- Lo que en escritorio va junto, en móvil va junto (apilado y solapado, no separado, E-60).
+- Conmutadores de vista arrancan en la vista principal; "ver en móvil" cambia el dispositivo
+  dibujado por un iPhone (E-66).
+- Verificación con captura real a 320, 360, 390, 768, 1440 y 2560. Scroll, sticky y animaciones en el
+  Chrome real.
 
-### 8.4 Convención de iconos (extender la de la home a secciones y landings)
-La home ya resolvió: **un icono = un concepto**; nunca el mismo icono para dos cosas que "parecen lo
-mismo pero no lo son"; `marcyan-ai` (marca, filled) reservado a **un solo** slot insignia (SEO para IA).
-- **Auditar y corregir** los iconos que alimentan las secciones/landings — viven sobre todo en los datos
-  `src/i18n/*.ts` (`clusters.ts`, `servicios.ts`, `houston.ts`, `miami.ts`, `seo-ia.ts`, `pricing.ts`,
-  `blog.ts`, `content.ts`) como `icon: 'lucide:…'`. Donde un mismo icono se reusa para conceptos distintos,
-  asignar el **icono Lucide preciso** de cada concepto (p. ej. automatizaciones `waypoints`; IA
-  conversacional `messages-square`/`bot-message-square`; búsqueda/SEO `scan-search`/`search`; velocidad
-  `gauge`; reseñas `star`; NAP/ficha `map-pinned`; multilingüe `languages`). Una sola familia Lucide 1.5px.
-- **Enmienda v3 (rediseño WorkOS, G6):** los 7 **productos** se representan con iconos-objeto propios
-  (`w/IconoObjeto.astro`, 40-80 px, acento oro; teal en IA conversacional y SEO para IA) en páginas v3,
-  megamenú y tarjetas de servicio de portada y hubs. Lucide queda para la interfaz funcional. Ver
-  `design/rediseno-workos.md` §2.8.
+---
 
-### 8.5 Blog — navegación + ilustraciones PROPIAS
-Referencia de **principios** (no clonar marca/look): onceonceagency.com/blog → tarjetas **image-forward**
-(miniatura arriba + categoría + título + fecha + extracto), categoría única por pieza, filtro/índice claro,
-tarjeta entera clicable.
-- **Ilustraciones propias por tema:** crear un sistema de **ilustración inline SVG line-art** (oro/teal,
-  aria-hidden, estilo de la casa) mapeado por **tag/tema** de cada post (diseño web, IA/chatbot, precios,
-  SEO/AEO, atención al cliente, guía de compra, restaurantes… + fallback). Cada tarjeta del índice lleva su
-  ilustración **arriba** (image-forward), y el artículo la reusa como marca de tema. **Sin binarios/stock.**
-- **Navegación:** conservar y pulir el filtro por categoría (mejor que paginación para pocas piezas);
-  jerarquía real (pieza destacada + grid), tarjeta clicable, foco/estado accesibles.
-- El artículo (`[slug]` + `Article`/`ArticleToc`/`PostNav`/`ArticleHero`) mantiene lectura cómoda + la
-  ilustración de tema; contrato de blog (`render`, `ArticleLd`/FAQPage, `headings`, prev/next) intacto.
+## 8) Copy visible
+
+- Español natural y EN nativo; sin guiones ni em-dash como conector.
+- "Dominamos" la IA, nunca "construimos con IA".
+- Nada de cifras, reseñas ni testimonios inventados. Plazos: contacto "1 hora hábil", propuesta "en
+  24 horas". Formularios sin precios; las páginas mantienen sus anclas "desde $X" de `pricing.ts`.
+
+---
+
+## 9) Cómo se hace un cambio a partir de hoy
+
+1. Invocar `design-director` (y de nuevo tras cada compactación) y leer `errores-ledger.md`.
+2. Nombrar 2 o 3 piezas de `design-catalog` por su código.
+3. Inventariar lo que el sitio YA tiene (este archivo §4 y §5): reutilizar piezas y gramática antes
+   de inventar. Referencia madre WorkOS; Refero mirando imágenes para lo demás.
+4. Pieza grande (hero, sección nueva, página): 2 o 3 bocetos de verdad distintos, el dueño elige.
+5. Construir con los tokens `--w-*` y las clases `.w-*`; nada hardcodeado salvo dentro de ejemplos.
+6. Capturas reales en todos los anchos de §7 + crítica adversarial independiente; corregir y repetir
+   hasta que no queden fallos graves.
+7. Vista previa de Vercel y OK del dueño sobre el render antes de fusionar. Sus correcciones van al
+   ledger en la misma sesión.
+
+---
+
+## 10) NO TOCAR sin decisión del dueño
+
+- Portada y hubs de ciudad (hero, planeta, órbita, viaje de ciudad, animaciones, orden, `data-fx`,
+  `data-atmo`). Cualquier cambio de animación o "feel" del hero se enseña renderizado antes de fusionar.
+- Gramática del sitio: `SiteNav` + megamenú, `SiteFooter` ("El Arribo"), variantes de `Button`,
+  `tokens.css`, `base.css`, `media.css`.
+- Formularios y su lógica (puerta técnica), `pricing.ts`, JSON-LD, canonical, hreflang, H1 verbatim,
+  trío de contacto, widget de Marcy y su blindaje.
+- Diseños descartados que no se reconstruyen: Miami "Aproximación", hero Houston "El Domo",
+  footer v3.
+
+---
+
+## 11) Puerta de salida (bloqueante)
+
+Un solo punto que falle = no se entrega.
+
+- [ ] Captura real en 320 / 360 / 768 / 1440 / 2560; nada cortado, partido, escondido ni encogido.
+- [ ] Animaciones revisadas en tira de fotogramas, hacia delante y hacia atrás, escritorio y móvil.
+- [ ] Objetos de producto con oficio premium; ejemplos propios de la página, con foto nítida.
+- [ ] Un acento, un degradado y un motivo de fondo por página; raíles solo en rejillas.
+- [ ] Contraste AA (texto ≥ `--w-ink-60`), foco visible, objetivos táctiles ≥ 44 px, campos ≥ 16 px.
+- [ ] `prefers-reduced-motion` deja un estado final completo.
+- [ ] Copy según §8; ningún dato inventado.
+- [ ] `npx astro build` limpio (70 páginas) y pruebas del repo en verde.
+- [ ] Crítica adversarial pasada y OK del dueño sobre la vista previa.
+
+---
+
+## 12) Mapa de documentos de diseño
+
+| Documento | Qué tiene |
+|---|---|
+| `design/rediseno-workos.md` · `-v2.md` | Plan y valores originales del sistema v3 (histórico) |
+| `design/ejemplos-v8.md` | Fotos de bancos libres usadas (ids) y referencias de los ejemplos |
+| `design/chat-marcy.md` | Diseño del chat |
+| `design/houston.md` · `design/miami.md` | Hubs de ciudad "el viaje" |
+| `design/frontend-design.md` | Checklist de revisión visual |
+| `design/art-direction.md` | Registro del gate por encargo |
+| `~/.claude/skills/design-director/errores-ledger.md` | Memoria de gusto del dueño (E-01…E-69) |

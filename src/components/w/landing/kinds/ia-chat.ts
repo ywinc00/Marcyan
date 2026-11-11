@@ -198,7 +198,9 @@ const spec: KindSpec = {
           recursos: [
             ...(tool ? [{ icon: 'lucide:calculator', title: tool.linkLabel, text: tool.text, href: tool.href, track: 'tool_cta_clicked' }] : []),
             { icon: 'lucide:scan-search', title: t.diag.title, text: t.diag.text, href: '/es/diagnostico', track: 'tool_cta_clicked' },
-            { icon: 'lucide:tag', title: t.precios.title, text: t.precios.text, href: '/es/precios' },
+            // La guía de precios del chatbot (encargo marcyan-guia-chatbot-enlaces): ocupa el hueco de Precios,
+            // que ya está en el menú y el pie; así la fila sigue en tres.
+            { icon: 'lucide:book-open', title: t.guia.title, text: t.guia.text, href: '/es/blog/cuanto-cuesta-chatbot-whatsapp-guia' },
           ],
         };
       },

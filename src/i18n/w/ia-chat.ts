@@ -283,6 +283,7 @@ const base = (city: IaCity) => {
       title: `<span class="w-tone">Marcy trabaja mejor</span> con todo lo demás.`,
       lead: 'Todo lo que hacemos, para que tu asistente tenga una buena casa.',
       precios: { title: 'Precios', text: 'Todos los servicios y lo que incluye cada uno.' },
+      guia: { title: '¿Cuánto cuesta un chatbot?', text: 'Guía de precios en Estados Unidos: apps, a medida y el cobro de Meta.' },
       diag: { title: 'Diagnóstico gratis', text: 'Revisamos tu web, tu ficha de mapa y si la IA te encuentra.' },
     },
   };

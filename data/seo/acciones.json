@@ -1,5 +1,5 @@
 {
-  "actualizado": "2026-11-07",
+  "actualizado": "2026-11-10",
   "nota": "Memoria de acciones del cliente (kit/acciones.mjs). Sembrada el 2026-10-12 con lo propuesto, hecho, pedido y puesto hasta esa fecha.",
   "acciones": {
     "marcyan-triage-paginas-sin-indexar": {
@@ -579,6 +579,15 @@
           "fecha": "2026-11-07",
           "estado": "encargada",
           "nota": "OK de Yan el 7-nov con el enfoque EE.UU. (no tal cual): la hace el chat del rediseño WorkOS y sale con él, no antes del 23-nov. Encargo: _cerebro/marcyan-web/encargos/2026-11-07-seo-guia-chatbot-eeuu.md"
+        },
+        {
+          "fecha": "2026-11-10",
+          "estado": "hecha"
+        },
+        {
+          "fecha": "2026-11-10",
+          "estado": "encargada",
+          "nota": "Título EE.UU. en producción 2026-11-10 (PR #65). Falta el enlace desde las 2 páginas de IA conversacional: la plantilla nueva de landings no pinta 'Sigue explorando'."
         }
       ]
     },
